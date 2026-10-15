@@ -7,7 +7,7 @@
  */
 
 import * as React from "react";
-import { ToastInput, dismissToast, dismissToastKey } from "@/editor/chrome-ui";
+import { ToastInput, dismissToastKey } from "@/editor/chrome-ui";
 import { createComposer, Composer } from "@/engine";
 import { ProductCollectionService } from "@/engine/cms";
 import { THRESHOLDS } from "@/shared/constants/config";
@@ -23,6 +23,7 @@ import { migrateDesignTokens } from "@/engine/designSystem/tokenMigrations";
 import { isV6TokenRow } from "@/engine/designSystem/projectTokens";
 import { captureError } from "@/shared/utils/errorTracking";
 import {
+  getBaselineLastEditedAt,
   getSiteIdFromUrl,
   isSaveConflictPending,
   loadCurrentUserId,
@@ -38,9 +39,8 @@ import {
   clearUnsaved,
   keepUnsaved,
   markUnsavedOffScreen,
-  onOffScreenSettled,
   readUnsaved,
-  takeOffScreenUnsaved,
+  RESTORE_OFFER_EVENT,
 } from "@/services/unsavedRecovery";
 import { isFeatureEnabled } from "@/shared/utils/featureFlags";
 import { IS_DEV_BUILD, DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
@@ -335,43 +335,22 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
               setSaveState({ status: "idle", error: undefined });
             } else if (unsaved) {
               markUnsavedOffScreen(siteId);
-              setSaveState({
-                status: "error",
-                error: "This site has edits that never reached the server.",
-              });
-              const recoveryToast = addToastRef.current?.({
-                title: "Some work never reached the server",
-                description:
-                  "A save failed before this page was reloaded. The version on screen is the server's. Restoring puts your unsaved edits back so you can save them again.",
-                tone: "warning",
-                /* Never applied automatically. Importing a stored project over
-                   a freshly loaded one is this codebase's documented data-loss
-                   precondition, so the choice is the user's. */
-                action: {
-                  label: "Restore my edits",
-                  onClick: () => {
-                    /* Handed over once; Retry may already have taken it. The
-                       copy stays kept until a save of it is confirmed. */
-                    const kept = takeOffScreenUnsaved(siteId);
-                    if (!kept) return;
-                    instance.importProject(kept.project);
-                    setIsDirty(true);
-                    setSaveState({ status: "idle", error: undefined });
-                    /* L5-075: the import emits only PROJECT_LOADED, which
-                       autosave does not follow, so the restored edits sat
-                       under "Unsaved changes" until some other edit. This
-                       schedules their save. */
-                    instance.emit(EVENTS.PROJECT_CHANGED, { reason: "restore-unsaved" });
-                  },
-                },
-                duration: Infinity,
-              });
-              /* EDT-018: the offer is spent once the copy is handed over —
-                 by Restore, or by a manual Retry that restores it first
-                 (useSaveCallback) — or discarded. A warning toast does not
-                 dismiss on its action, so it stood over the saved work
-                 inviting a second, empty restore. */
-              if (recoveryToast) onOffScreenSettled(siteId, () => dismissToast(recoveryToast));
+              /* Not "Saved", and not yet the failure banner either: the
+                 restore dialog says it, and nothing sits over that dialog
+                 (design decision 1). Closing it unanswered raises the
+                 banner (useServerConflict). */
+              setSaveState({ status: "idle", error: undefined });
+              /* BK-04: offered in the restore dialog, never applied on its
+                 own — importing a stored project over a freshly loaded one is
+                 this codebase's documented data-loss precondition. The dialog
+                 compares the edits' base with the token just loaded (R1), so
+                 a teammate's save since is named instead of overwritten.
+                 Dispatched after this load settles, so the shell's listener
+                 (mounted with the editor) is in place. */
+              window.setTimeout(
+                () => window.dispatchEvent(new CustomEvent(RESTORE_OFFER_EVENT, { detail: { siteId } })),
+                0,
+              );
             } else {
               setSaveState({ status: "idle", lastSavedAt: Date.now(), error: undefined });
             }
@@ -680,7 +659,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
         if (siteId && isSaveConflictPending()) {
           /* Held, not sent — so this edit exists only in the tab. Keep it for
              the reload, the same as an offline edit. */
-          keepUnsaved(siteId, composer.exportProject());
+          keepUnsaved(siteId, composer.exportProject(), getBaselineLastEditedAt());
           setSaveState((prev) => ({ ...prev, status: "conflict", error: undefined }));
           setIsDirty(true);
           return;
@@ -696,7 +675,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
           refusedTokens !== null &&
           JSON.stringify(snapshot.settings?.designTokens ?? null) === refusedTokens
         ) {
-          keepUnsaved(siteId!, snapshot);
+          keepUnsaved(siteId!, snapshot, getBaselineLastEditedAt());
           setIsDirty(true);
           return;
         }
@@ -755,7 +734,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
             if (message.startsWith("TOKENS_INVALID:")) {
               if (siteId && snapshot) {
                 refusedTokens = JSON.stringify(snapshot.settings?.designTokens ?? null);
-                keepUnsaved(siteId, snapshot);
+                keepUnsaved(siteId, snapshot, getBaselineLastEditedAt());
               }
               console.error("[BuildrikSync] auto-save refused:", message);
               setSaveState((prev) => ({ ...prev, status: "error", error: message }));
@@ -784,7 +763,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
               /* Nothing local is written for a dashboard-backed site, so this
                  edit exists only in this tab. Keep it, or a reload discards it
                  while the load path seeds "Saved · just now" over the gap. */
-              if (siteId) keepUnsaved(siteId, composer.exportProject());
+              if (siteId) keepUnsaved(siteId, composer.exportProject(), getBaselineLastEditedAt());
               /* `status: "error"` matches `useSaveCallback`; the topbar's own
                  offline flag outranks it and draws the Offline pill. There is
                  no "offline" status in this state machine. */

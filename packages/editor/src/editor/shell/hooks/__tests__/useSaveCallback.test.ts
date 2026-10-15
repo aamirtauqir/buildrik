@@ -658,7 +658,10 @@ describe("useSaveCallback — TOKENS_INVALID", () => {
     Object.defineProperty(window, "location", { value: url, writable: true });
     try {
       const kept = { pages: [{ id: "p", name: "mine" }] };
-      keepUnsaved("site_kept", kept as never);
+      // Made on the copy still on the server — restoring loses nobody's work.
+      const { setBaselineLastEditedAt } = await import("@/services/BuildrikSyncProvider");
+      setBaselineLastEditedAt("2026-10-15T10:00:00.000Z");
+      keepUnsaved("site_kept", kept as never, "2026-10-15T10:00:00.000Z");
       markUnsavedOffScreen("site_kept");
       const importProject = vi.fn();
       const opts = makeOpts();
@@ -681,7 +684,54 @@ describe("useSaveCallback — TOKENS_INVALID", () => {
       });
       expect(readUnsaved("site_kept")).toBeNull();
       clearUnsaved("site_kept");
+      setBaselineLastEditedAt(null);
     } finally {
+      Object.defineProperty(window, "location", { value: original, writable: true });
+    }
+  });
+
+  /* BK-04: edits kept on an OLDER server copy are not restored by a save —
+     that would replace a teammate's newer work unasked. The restore dialog is
+     offered again instead, and nothing is sent. */
+  it.each([
+    ["the server moved since the edits", "2026-10-15T09:00:00.000Z"],
+    ["the edits' base is unknown (older record)", null],
+  ])("Retry does not restore when %s; it re-offers the dialog", async (_case, base) => {
+    const { keepUnsaved, markUnsavedOffScreen, readUnsaved, takeOffScreenUnsaved, RESTORE_OFFER_EVENT } = await import(
+      "@/services/unsavedRecovery"
+    );
+    const { setBaselineLastEditedAt } = await import("@/services/BuildrikSyncProvider");
+    const url = new URL("http://localhost:3000/edit/site_newer");
+    const original = window.location;
+    Object.defineProperty(window, "location", { value: url, writable: true });
+    const offers: string[] = [];
+    const onOffer = (e: Event) => offers.push((e as CustomEvent<{ siteId: string }>).detail.siteId);
+    window.addEventListener(RESTORE_OFFER_EVENT, onOffer);
+    try {
+      setBaselineLastEditedAt("2026-10-15T10:00:00.000Z");
+      keepUnsaved("site_newer", { pages: [{ id: "p" }] } as never, base);
+      markUnsavedOffScreen("site_newer");
+      const importProject = vi.fn();
+      const opts = makeOpts();
+      const composer = { ...opts.composer, importProject } as never;
+      svc.saveProject.mockClear();
+      const { result } = renderHook(() =>
+        useSaveCallback({ composer, addToast: opts.addToast, setSaveState: opts.setSaveState, setIsDirty: opts.setIsDirty }),
+      );
+      let outcome: unknown;
+      await act(async () => {
+        outcome = await result.current();
+      });
+      expect(outcome).toBe("conflict");
+      expect(offers).toEqual(["site_newer"]);
+      expect(importProject).not.toHaveBeenCalled();
+      expect(svc.saveProject).not.toHaveBeenCalled();
+      expect(readUnsaved("site_newer")).not.toBeNull();
+    } finally {
+      window.removeEventListener(RESTORE_OFFER_EVENT, onOffer);
+      takeOffScreenUnsaved("site_newer");
+      localStorage.removeItem("bk-unsaved-v1-site_newer");
+      setBaselineLastEditedAt(null);
       Object.defineProperty(window, "location", { value: original, writable: true });
     }
   });

@@ -58,6 +58,7 @@ import { PUBLISH_CHECK_ISSUE } from "./hooks/useIssuesFeed";
 import { useHistoryFeedback } from "./hooks/useHistoryFeedback";
 import { usePublishOutcomeFlash } from "./hooks/usePublishOutcomeFlash";
 import { useSaveCallback } from "./hooks/useSaveCallback";
+import { useServerConflict } from "./hooks/useServerConflict";
 import { useStudioHandlers } from "./hooks/useStudioHandlers";
 import { useStudioModals } from "./hooks/useStudioModals";
 import { useStudioState } from "./hooks/useStudioState";
@@ -68,9 +69,7 @@ import { StudioPanels } from "./StudioPanels";
 import { requestAssetPick, useAssetPickBridge } from "../sidebar/tabs/media/data/assetPick";
 import type { MediaAsset, MediaAssetType } from "@shared/types/media";
 import { ConflictModal } from "./modals/ConflictModal";
-import { navigateBypassingUnloadGuard } from "./unloadGuardBypass";
 import { useOtherTabNotice } from "./hooks/useOtherTabNotice";
-import { SAVE_CONFLICT_EVENT, setBaselineLastEditedAt } from "@/services/BuildrikSyncProvider";
 
 import "../../themes/default.css";
 import { requestBrandToken } from "@/editor/design-system/ui/brandOpenRequest";
@@ -384,22 +383,16 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     return () => { window.removeEventListener("online", on); window.removeEventListener("offline", off); };
   }, []);
 
-  // 61-conflict: a behind-copy save was rejected by the server. Listen on the
-  // window event; idempotent (keep the first) so repeated autosave conflicts
-  // don't stack dialogs while one is open. `open` is separate from the token:
-  // a dismissed dialog keeps the token, so the save pill's `conflict` state
-  // can re-open it (B2, decision #23) with the same three ways out.
-  const [conflict, setConflict] = React.useState<{ serverToken: string; brandFormat: boolean; open: boolean } | null>(null);
-
-  React.useEffect(() => {
-    const onConflict = (e: Event) => {
-      const detail = (e as CustomEvent<{ serverLastEditedAt: string; brandFormat?: boolean }>).detail;
-      const token = detail?.serverLastEditedAt;
-      if (token) setConflict((c) => (c?.open ? c : { serverToken: token, brandFormat: detail.brandFormat === true, open: true }));
-    };
-    window.addEventListener(SAVE_CONFLICT_EVENT, onConflict);
-    return () => window.removeEventListener(SAVE_CONFLICT_EVENT, onConflict);
-  }, []);
+  // 61-conflict + BK-04: a refused save and kept edits that never reached
+  // the server, both resolved in ConflictModal (useServerConflict).
+  const serverConflict = useServerConflict({
+    composer,
+    siteId: getSiteIdFromUrl(),
+    addToast,
+    setIsDirty: state.setIsDirty,
+    setSaveState: state.setSaveState,
+    saveProject,
+  });
 
   // Export + publish lifecycle (HTML zip, Vercel deploy, publish-toast effect,
   // usePublishJob) extracted into useExportHandlers — D2 stage 4. The hook
@@ -701,7 +694,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           onOpenActivity={() => guardedOpenLeftPanelToTab("activity")}
           onOpenIssues={() => setIssuesOpen(true)}
           onOpenReview={() => guardedOpenLeftPanelToTab("review")}
-          onOpenConflict={() => setConflict((c) => (c ? { ...c, open: true } : c))}
+          onOpenConflict={serverConflict.reopenSaveConflict}
           onOpenShortcuts={modals.toggleShortcuts}
           onSave={saveProject}
           onExportHTML={handleExportHTML}
@@ -805,36 +798,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         onCloseCMSCollectionSetup={modals.closeCMSCollectionSetup}
       />
 
-      <ConflictModal
-        open={!!conflict?.open}
-        brandFormat={conflict?.brandFormat}
-        siteId={getSiteIdFromUrl()}
-        onClose={() => setConflict((c) => (c ? { ...c, open: false } : c))}
-        /* The user already chose to drop this tab's copy; the dirty-tab
-           "Leave site?" prompt on top of that choice was a second, scarier
-           dialog asking the same thing (L5-077). */
-        onReload={() => navigateBypassingUnloadGuard(() => window.location.reload())}
-        onSaveBackup={() => {
-          // Download the local copy so nothing is lost, then take the latest.
-          try {
-            const blob = new Blob([JSON.stringify(composer.exportProject(), null, 2)], { type: "application/json" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = `buildrik-backup-${Date.now()}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-          } finally {
-            navigateBypassingUnloadGuard(() => window.location.reload());
-          }
-        }}
-        onOverwrite={() => {
-          // Adopt the server's version token so our next save matches + wins.
-          if (conflict) setBaselineLastEditedAt(conflict.serverToken);
-          setConflict(null);
-          saveProject();
-        }}
-      />
+      <ConflictModal {...serverConflict.modalProps} />
 
       <PreviewOverlay
         html={previewHtml}

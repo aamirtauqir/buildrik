@@ -104,6 +104,7 @@ vi.mock("@/services/BuildrikSyncProvider", () => ({
   loadServerMedia: vi.fn(() => Promise.resolve(null)),
   saveProject: vi.fn(() => Promise.resolve({ success: true })),
   keepStoredTokensOnSave: vi.fn(),
+  getBaselineLastEditedAt: vi.fn(() => null),
   /* The real class, so `instanceof` in the autosave catch behaves as it does
      in the app. */
   isSaveConflictPending: vi.fn(() => false),
@@ -128,7 +129,7 @@ vi.mock("@/services/AssetUploadService", () => ({
 
 import { getDefaultPageName } from "@/shared/utils/pageUtils";
 import { deriveLifecycleState } from "@/editor/shell/lifecycle";
-import { takeOffScreenUnsaved } from "@/services/unsavedRecovery";
+import { RESTORE_OFFER_EVENT, takeOffScreenUnsaved } from "@/services/unsavedRecovery";
 import {
   getSiteIdFromUrl,
   isSaveConflictPending,
@@ -296,6 +297,9 @@ describe("useComposerInit — siteId load flow (happy path)", () => {
       JSON.stringify({ project: { pages: [{ id: "p" }], styles: [] }, at: "2026-09-03T00:00:00.000Z" }),
     );
 
+    const offers: string[] = [];
+    const onOffer = (e: Event) => offers.push((e as CustomEvent<{ siteId: string }>).detail.siteId);
+    window.addEventListener(RESTORE_OFFER_EVENT, onOffer);
     const params = makeParams();
     renderHook(() => useComposerInit(params));
     await act(async () => {
@@ -306,91 +310,26 @@ describe("useComposerInit — siteId load flow (happy path)", () => {
     const seeded = vi.mocked(params.setSaveState!).mock.calls.map(([v]) => v);
     expect(seeded.some((v) => typeof v === "object" && v !== null && "lastSavedAt" in v)).toBe(false);
 
-    const toast = vi
-      .mocked(params.addToast!)
-      .mock.calls.map(([t]) => t)
-      .find((t) => /never reached the server/i.test(t.title ?? ""));
-    expect(toast).toBeTruthy();
-    expect(toast!.action?.label).toBe("Restore my edits");
+    /* BK-04: offered in the restore dialog (useServerConflict), not a toast
+       that could sit under or over it. */
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 0));
+    });
+    window.removeEventListener(RESTORE_OFFER_EVENT, onOffer);
+    expect(offers).toEqual(["site-9"]);
+    expect(
+      vi.mocked(params.addToast!).mock.calls.some(([t]) => /never reached the server/i.test(t.title ?? "")),
+    ).toBe(false);
+    takeOffScreenUnsaved("site-9");
+    localStorage.removeItem("bk-unsaved-v1-site-9");
     /* Never applied on its own: importing a stored project over a freshly
        loaded one is this codebase's documented data-loss precondition, so the
        only import so far is the server's own. */
     expect(mockComposer.importProject).toHaveBeenCalledTimes(1);
   });
 
-  /* L5-075: Restore put the edits back and lit "Unsaved changes", then nothing
-     saved them — importProject emits PROJECT_LOADED, which is not an autosave
-     trigger. Closing the tab then lost them a second time. */
-  it("Restore my edits schedules a save of the restored edits", async () => {
-    vi.mocked(getSiteIdFromUrl).mockReturnValue("site-9");
-    vi.mocked(loadProject).mockResolvedValue({ pages: [{ id: "p" }], styles: [] } as never);
-    localStorage.setItem(
-      "bk-unsaved-v1-site-9",
-      JSON.stringify({ project: { pages: [{ id: "p" }, { id: "q" }], styles: [] }, at: "2026-10-08T00:00:00.000Z" }),
-    );
-    try {
-      const params = makeParams();
-      renderHook(() => useComposerInit(params));
-      await act(async () => {
-        mockComposer.emit("composer:ready");
-        await flushMicrotasks();
-      });
-      const toast = vi
-        .mocked(params.addToast!)
-        .mock.calls.map(([t]) => t)
-        .find((t) => /never reached the server/i.test(t.title ?? ""));
-      mockComposer.emit.mockClear();
-      const chrome = await import("@/editor/chrome-ui");
-      const dismissed: string[] = [];
-      const spy = vi.spyOn(chrome, "dismissToast").mockImplementation((id: string) => void dismissed.push(id));
-      act(() => toast!.action!.onClick());
-      expect(mockComposer.importProject).toHaveBeenLastCalledWith({ pages: [{ id: "p" }, { id: "q" }], styles: [] });
-      expect(mockComposer.emit).toHaveBeenCalledWith("project:changed", expect.anything());
-      /* L5-076: the toast is acted on, so it goes — it stayed up after
-         Restore and after every later save. */
-      const recoveryId = vi.mocked(params.addToast!).mock.results[
-        vi.mocked(params.addToast!).mock.calls.findIndex(([t]) => /never reached the server/i.test(t.title ?? ""))
-      ].value;
-      expect(dismissed).toContain(recoveryId);
-      spy.mockRestore();
-    } finally {
-      localStorage.removeItem("bk-unsaved-v1-site-9");
-    }
-  });
-
-  /* EDT-018: the prompt outlived the save of the restored work ("still there
-     8 s later, topbar Done"). Once the copy is handed over — by Restore, or by
-     a Retry that restores it first — the prompt has nothing left to offer. */
-  it.each([
-    ["Restore my edits", (t: { action?: { onClick: () => void } }) => t.action!.onClick()],
-    ["a Retry that restores the copy first", () => void takeOffScreenUnsaved("site-9")],
-  ])("the recovery prompt goes once the copy is handed over (%s)", async (_door, handOver) => {
-    vi.mocked(getSiteIdFromUrl).mockReturnValue("site-9");
-    vi.mocked(loadProject).mockResolvedValue({ pages: [{ id: "p" }], styles: [] } as never);
-    localStorage.setItem(
-      "bk-unsaved-v1-site-9",
-      JSON.stringify({ project: { pages: [{ id: "q" }], styles: [] }, at: "2026-10-09T00:00:00.000Z" }),
-    );
-    dismissToastMock.mockClear();
-    try {
-      const params = makeParams({ addToast: vi.fn().mockReturnValue("recovery-toast") });
-      renderHook(() => useComposerInit(params));
-      await act(async () => {
-        mockComposer.emit("composer:ready");
-        await flushMicrotasks();
-      });
-      const toast = vi
-        .mocked(params.addToast!)
-        .mock.calls.map(([t]) => t)
-        .find((t) => /never reached the server/i.test(t.title ?? ""));
-      expect(dismissToastMock).not.toHaveBeenCalled();
-      act(() => handOver(toast!));
-      expect(dismissToastMock).toHaveBeenCalledWith("recovery-toast");
-    } finally {
-      takeOffScreenUnsaved("site-9");
-      localStorage.removeItem("bk-unsaved-v1-site-9");
-    }
-  });
+  /* L5-075 / EDT-018 (Restore schedules a save; the offer goes once the copy
+     is handed over) moved with the offer to useServerConflict.test.ts. */
 
   /* C-9: a member demoted mid-save is sent to view mode, where nothing can
      be saved — offering "Restore my edits" there would put back edits that
@@ -422,38 +361,6 @@ describe("useComposerInit — siteId load flow (happy path)", () => {
       window.history.replaceState(null, "", before);
       localStorage.removeItem("bk-unsaved-v1-site-9");
     }
-  });
-
-  /* Rewritten for L5-074: the record used to be cleared the moment Restore
-     was clicked — before any save of it. It now stays until a save of the
-     restored work is confirmed (the autosave success clears it). */
-  it("restores only when the user asks, and keeps the record until that work is saved", async () => {
-    vi.mocked(getSiteIdFromUrl).mockReturnValue("site-9");
-    vi.mocked(loadProject).mockResolvedValue({ pages: [{ id: "server" }], styles: [] } as never);
-    const mine = { pages: [{ id: "mine" }], styles: [] };
-    localStorage.setItem(
-      "bk-unsaved-v1-site-9",
-      JSON.stringify({ project: mine, at: "2026-09-03T00:00:00.000Z" }),
-    );
-
-    const params = makeParams();
-    renderHook(() => useComposerInit(params));
-    await act(async () => {
-      mockComposer.emit("composer:ready");
-      await flushMicrotasks();
-    });
-
-    const toast = vi
-      .mocked(params.addToast!)
-      .mock.calls.map(([t]) => t)
-      .find((t) => /never reached the server/i.test(t.title ?? ""));
-    act(() => toast!.action!.onClick());
-
-    expect(mockComposer.importProject).toHaveBeenLastCalledWith(mine);
-    // Restored work is unsaved work — the dirty flag has to say so.
-    expect(vi.mocked(params.setIsDirty!).mock.calls.some(([v]) => v === true)).toBe(true);
-    expect(localStorage.getItem("bk-unsaved-v1-site-9")).not.toBeNull();
-    localStorage.removeItem("bk-unsaved-v1-site-9");
   });
 
   /* L1-008: the engine mirrored the open site into ONE unscoped

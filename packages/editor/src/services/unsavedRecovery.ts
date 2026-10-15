@@ -30,6 +30,25 @@ export interface UnsavedWork {
   project: ProjectData;
   /** When the save that failed was attempted. */
   at: string;
+  /** The server's `lastEditedAt` these edits were made on top of (the CAS
+   *  token at the time). Absent on records written before it existed. */
+  base?: string | null;
+}
+
+/**
+ * How the kept work relates to the server copy that just loaded (OV-1, R1):
+ *   unchanged     — the server is still the version the edits were based on,
+ *                   so restoring them loses nobody's work;
+ *   server-newer  — someone saved since: restoring would replace their work;
+ *   unknown       — a record with no base (older shape) or no loaded token:
+ *                   treated as possibly conflicting (always ask).
+ * The attempt time (`at`) is never the test: a teammate can save after it.
+ */
+export type KeptVsServer = "unchanged" | "server-newer" | "unknown";
+
+export function compareKeptToServer(kept: UnsavedWork, loadedToken: string | null): KeptVsServer {
+  if (!kept.base || !loadedToken) return "unknown";
+  return Date.parse(loadedToken) === Date.parse(kept.base) ? "unchanged" : "server-newer";
 }
 
 /* Sites whose kept copy the user threw away in this page (conflict → Reload
@@ -80,6 +99,15 @@ export function markUnsavedOffScreen(siteId: string): void {
   offScreen.add(siteId);
 }
 
+/** Asks the shell to offer this site's off-screen copy back (the restore
+ *  variant of ConflictModal). detail: { siteId }. */
+export const RESTORE_OFFER_EVENT = "buildrik:restore-offer";
+
+/** The kept work waiting off screen, without handing it over; null if none. */
+export function peekOffScreenUnsaved(siteId: string): UnsavedWork | null {
+  return offScreen.has(siteId) ? readUnsaved(siteId) : null;
+}
+
 /** The kept work to restore, once; null when none is waiting off screen. */
 export function takeOffScreenUnsaved(siteId: string): UnsavedWork | null {
   if (!settleOffScreen(siteId)) return null;
@@ -90,10 +118,11 @@ export function takeOffScreenUnsaved(siteId: string): UnsavedWork | null {
  *  can exceed quota, and failing to keep it must never break the editor the
  *  user is still holding the work in. A no-op once the user discarded this
  *  site's copy (`discardUnsaved`). */
-export function keepUnsaved(siteId: string, project: ProjectData): void {
+export function keepUnsaved(siteId: string, project: ProjectData, base: string | null): void {
   if (discarded.has(siteId) || offScreen.has(siteId)) return;
   try {
-    localStorage.setItem(keyFor(siteId), JSON.stringify({ project, at: new Date().toISOString() }));
+    const record: UnsavedWork = { project, at: new Date().toISOString(), base };
+    localStorage.setItem(keyFor(siteId), JSON.stringify(record));
   } catch {
     /* quota or storage disabled — the tab still holds the work, and the load
        path simply has nothing extra to report. */

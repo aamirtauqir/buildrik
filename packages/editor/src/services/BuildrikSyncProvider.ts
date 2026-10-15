@@ -55,6 +55,24 @@ function getClient() {
 // Sent with each save so the server can detect a behind-copy. Updated on every
 // successful save; the caller may force it (to the server's value) to overwrite.
 let _baselineLastEditedAt: string | null = null;
+/* Who wrote the loaded copy (A1), as the server reported it with the load. */
+let _loadedLastEditedBy: EditorAttribution | null = null;
+
+/** Who saved a server copy: a name, and whether it was the viewer themself. */
+export interface EditorAttribution {
+  name: string;
+  isViewer: boolean;
+}
+
+/** The server token the current document is based on (the CAS baseline). */
+export function getBaselineLastEditedAt(): string | null {
+  return _baselineLastEditedAt;
+}
+
+/** Who wrote the copy this editor loaded; null when unknown (older rows). */
+export function getLoadedLastEditedBy(): EditorAttribution | null {
+  return _loadedLastEditedBy;
+}
 
 /* A-2 / PD-11: set when the server refused a behind-copy, cleared only when the
    user resolves it (Overwrite adopts the server token; Reload re-loads). While
@@ -726,8 +744,9 @@ export async function loadProject(siteId: string): Promise<ProjectData> {
        token — the next save then passed CAS and overwrote unseen work.
        SA-01: retried once, as the settings read alone used to be. */
     const readSnapshot = () => client.sites.loadForEditor.query({ siteId });
-    const { site, pages, settings: settingsResult } = await readSnapshot().catch(readSnapshot);
+    const { site, pages, settings: settingsResult, lastEditedBy } = await readSnapshot().catch(readSnapshot);
     const data = projectDataFromRows(site, pages, settingsResult);
+    _loadedLastEditedBy = lastEditedBy ?? null;
 
     // Capture the workspace plan so plan-gated editor UI reads the real tier.
     _editorPlanTier = mapDashboardPlan((settingsResult as { plan?: unknown } | null)?.plan);
@@ -749,6 +768,24 @@ export async function loadProject(siteId: string): Promise<ProjectData> {
     if (/not_found/i.test(error.message)) _missingSites.add(siteId);
     throw new Error(`BuildrikSyncProvider.loadProject failed for site ${siteId}: ${error.message}`, { cause: error });
   }
+}
+
+/**
+ * The server's current copy, read the way a load reads it (one snapshot),
+ * WITHOUT touching this editor's baseline or loaded state: the conflict
+ * dialog names who saved and lists what changed from it (O7), and Overwrite
+ * keeps it as a version first (BK-59).
+ */
+export async function readServerCopy(
+  siteId: string,
+): Promise<{ project: ProjectData; lastEditedAt: string | null; lastEditedBy: EditorAttribution | null }> {
+  const { site, pages, settings, lastEditedBy } = await getClient().sites.loadForEditor.query({ siteId });
+  const editedAt = (site as { lastEditedAt?: string | Date | null }).lastEditedAt;
+  return {
+    project: projectDataFromRows(site, pages, settings),
+    lastEditedAt: editedAt ? new Date(editedAt).toISOString() : null,
+    lastEditedBy: lastEditedBy ?? null,
+  };
 }
 
 /* Saves run one at a time. Two in flight at once (autosave + ⌘S, 180 ms
