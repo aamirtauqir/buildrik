@@ -88,13 +88,21 @@ if (isFactory && WRITE_TOOLS.has(tool) && READ_ONLY_ROLES.has(ROLE)) {
 if (isFactory && tool === "Bash") {
   const raw = String(ti.command ?? "");
   if (/\bgh\s+pr\s+merge\b/.test(raw)) decide("deny", `${ROLE} cannot merge — the PM merges after every gate passes`);
-  if (/\bgit\b[^\n]*\bpush\b/.test(raw) && !/\bgit\b[^\n]*\bpush\b[^\n]*\bfactory\/T-\d+\b/.test(raw)) {
-    decide("deny", `${ROLE} may push only its own factory/<ID> branch, never main`);
+  // Push is an ALLOWLIST, not a denylist: every `git push` in the command must be
+  // exactly `git push [-u|--set-upstream] origin factory/T-NNN[:factory/T-NNN]`.
+  // A denylist was walked twice (`factory/T-001:main`, then quotes / `+ref`).
+  // Upstream and push-config rewrites are denied so a bare push cannot be aimed
+  // elsewhere. GitHub cannot tell an agent from the founder (same token, admin
+  // bypass), so this hook is the control for agents — keep it strict.
+  const pushes = raw.replace(/\s*\d?>&\d/g, "").replace(/\s*\d?>>?\s*\S+/g, "")
+    .match(/\bgit\b[^\n;&|]*\bpush\b[^\n;&|]*/g) ?? [];
+  const PUSH_OK = /^git\s+push(\s+(-u|--set-upstream))?\s+origin\s+(factory\/T-\d+)(:\3)?\s*$/;
+  for (const p of pushes) {
+    if (!PUSH_OK.test(p.trim())) decide("deny", `${ROLE} may only run: git push -u origin factory/<ID> (got: ${p.trim()})`);
   }
-  // A factory/T-NNN branch name in the command is not enough: `factory/T-001:main`
-  // pushes that branch INTO main.
-  if (/\bgit\b[^\n]*\bpush\b[^\n]*(:|\s)(refs\/heads\/)?(main|master)\b/.test(raw)) {
-    decide("deny", `${ROLE} may push only to its own factory/<ID> branch, never into main`);
+  if (/\bgit\b[^\n]*\bconfig\b[^\n]*\b(remote\.|push\.|branch\.|url\.)/.test(raw) ||
+      /\bgit\b[^\n]*\b(branch\s+(-u|--set-upstream-to)|remote\s+(add|set-url|rename))\b|--set-upstream-to/.test(raw)) {
+    decide("deny", `${ROLE} cannot change remotes, upstreams or push config`);
   }
   if (READ_ONLY_ROLES.has(ROLE) && /\bgit\s+(commit|push|add|reset|checkout\s+--|restore|apply|am|rebase|merge|cherry-pick)\b/.test(raw)) {
     decide("deny", `${ROLE} is read-only — no commits, staging or resets`);

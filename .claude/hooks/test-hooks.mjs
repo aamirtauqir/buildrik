@@ -72,6 +72,14 @@ expect("dev push branch:main", guard("factory-developer", "Bash", { command: "gi
 expect("dev push refs/heads/main", guard("factory-developer", "Bash", { command: "git push origin factory/T-001:refs/heads/main" }), "deny");
 expect("dev push branch to its own name", guard("factory-developer", "Bash", { command: "git push origin factory/T-001:factory/T-001" }), "allow");
 for (const [label, command] of [
+  ["quoted main", "git push origin factory/T-001:'main'"], ["plus ref", "git push origin +factory/T-001:main"],
+  ["other branch name", "git push origin factory/T-001:factory/T-002"], ["two refs", "git push origin factory/T-001 main"],
+  ["git -C", "git -C . push origin factory/T-001:main"], ["push config", "git config remote.origin.push refs/heads/x:refs/heads/main"],
+  ["set upstream", "git branch --set-upstream-to=origin/main"], ["remote set-url", "git remote set-url origin x"],
+  ["chained", "git push -u origin factory/T-001 && git push origin HEAD:main"], ["tags", "git push --tags"],
+]) expect(`dev push bypass: ${label}`, guard("factory-developer", "Bash", { command }), "deny");
+expect("dev push -u ok", guard("factory-developer", "Bash", { command: "git push -u origin factory/T-001 2>&1 | tail -3" }), "allow");
+for (const [label, command] of [
   ["redirect", "echo hacked > packages/editor/src/a.ts"], ["append", "printf x >> server/a.ts"], ["sed -i", "sed -i '' s/a/b/ lib/x.ts"],
   ["tee", "echo x | tee lib/x.ts"], ["cp", "cp /tmp/x lib/x.ts"], ["node writeFile", "node -e 'require(\"fs\").writeFileSync(\"a\",\"b\")'"],
   ["perl -pi", "perl -pi -e s/a/b/ x.ts"], ["git apply", "git apply /tmp/p.diff"],
