@@ -71,6 +71,8 @@ import { AIAssistService } from "./designSystem/services";
 import { VersionTimelineManager } from "./VersionTimelineManager";
 import { Viewport } from "./Viewport";
 import { getDefaultPageName } from "../shared/utils/pageUtils";
+import { elementBaseCSS } from "./styles/cascadeCSS";
+import { elementSelector } from "@/shared/utils/elementSelector";
 
 /**
  * From-address for form-submission notifications on published sites. Must stay on
@@ -822,7 +824,15 @@ export class Composer extends EventEmitter {
    */
   exportHTML(options?: ExportOptions): ExportResult {
     const html = this.elements.toHTML(options);
-    const css = this.styles.toCSS(options);
+    /* The same cascade as the published page (D10): each element's own styles
+       as base rules (the HTML carries none inline), then the breakpoint and
+       state rules desktop-first, against real viewport queries. It used to be
+       inline bases + `toCSS()` in insertion order, so Preview could disagree
+       with the live site about which rule wins. */
+    const css =
+      elementBaseCSS([this.elements.getActivePageRootData?.()], elementSelector, "media", false) +
+      "\n\n" +
+      this.styles.generateResponsiveCSS(options);
 
     // The site's own fonts. The comment above is about this exact gap and it
     // reopened: the export learned to emit the three font slots and to fetch
@@ -836,9 +846,8 @@ export class Composer extends EventEmitter {
        Brand preset binds. */
     const siteCss =
       emitSiteTokenCss(projectSettings, brandSwitch) + siteFontCSS(fonts);
-    // The HTML too, not just the CSS: this document carries element styles
-    // INLINE (`elements.toHTML`), so a heading set in Lora names its family in
-    // a style attribute and nowhere in the stylesheet.
+    // The HTML too, not just the CSS: a font named in an attribute or in
+    // content still has to be fetched.
     const slotFamilies = [fonts.heading, fonts.body, fonts.mono].filter((f): f is string => Boolean(f));
     /* The site's ADDED fonts (Clone 3721:43423): this document renders in its
        own frame, where the editor's document.fonts never reach, so the faces

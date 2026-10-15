@@ -269,9 +269,8 @@ export function useStyleHandlers(
         const id = el.getId();
         const sel = elementSelector(id);
         /* P-8: a device-hide flag (`--hide-tablet`) names its own device, so it
-           always goes on the base styles — the one place the canvas
-           (Canvas.css `[style*="--hide-<bp>: true"]`) and the export
-           (ExportEngine hideRulesFor) read it. Written into the tablet rule
+           always goes on the base styles — the one place the canvas and
+           the export both read it (cascadeCSS hideRulesFor). Written into the tablet rule
            while the canvas was on Tablet, it hid nothing anywhere. */
         const baseOnly = property.startsWith("--hide-");
         const bp = baseOnly ? "desktop" : currentBreakpoint;

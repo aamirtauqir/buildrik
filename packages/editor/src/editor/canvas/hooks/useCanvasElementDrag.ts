@@ -373,7 +373,11 @@ export function useCanvasElementDrag({
 
       // Clean up the element that was being dragged
       if (draggableEl) {
-        draggableEl.style.opacity = "1";
+        /* Removed, not reset to "1": the canvas no longer re-renders its HTML
+           on a style change, so an inline opacity left here would override the
+           element's own opacity from then on. (`cursor: grab` is the canvas's
+           own drag affordance on every element — useElementDragDomSync.) */
+        draggableEl.style.removeProperty("opacity");
         draggableEl.style.cursor = "grab";
         draggableEl.classList.remove("bd-dragging");
         draggableEl.classList.remove("bd-clone-mode");
@@ -381,7 +385,7 @@ export function useCanvasElementDrag({
 
       // Also clean up via ref in case DOM was recreated during drag
       if (draggingElementRef.current && draggingElementRef.current !== draggableEl) {
-        draggingElementRef.current.style.opacity = "1";
+        draggingElementRef.current.style.removeProperty("opacity");
         draggingElementRef.current.style.cursor = "grab";
         draggingElementRef.current.classList.remove("bd-dragging");
         draggingElementRef.current.classList.remove("bd-clone-mode");

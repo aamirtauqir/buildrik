@@ -16,6 +16,33 @@ import { getDOMElement } from "./utils";
 // DOM STYLE APPLICATION
 // =============================================================================
 
+/* Inline styles a gesture writes for live feedback, so they can be taken off
+   when it ends (OV-E3). The canvas carries element styles as stylesheet rules
+   and no longer re-renders its HTML on a style change, so an inline width
+   left behind would override the committed value — or the undone one — for
+   good. */
+const gestureStyles = new Map<HTMLElement, Set<string>>();
+
+function setGestureStyle(el: HTMLElement, property: string, value: string): void {
+  el.style.setProperty(property, value);
+  let props = gestureStyles.get(el);
+  if (!props) gestureStyles.set(el, (props = new Set()));
+  props.add(property);
+}
+
+/**
+ * End of a gesture (commit, cancel or keyboard step): bring the stylesheet up
+ * to the model first, then take the gesture's inline feedback off, so the
+ * element never shows a frame of its old size in between.
+ */
+export function releaseGestureStyles(composer: Pick<Composer, "styles"> | null | undefined): void {
+  composer?.styles?.flush?.();
+  for (const [el, props] of gestureStyles) {
+    for (const prop of props) el.style.removeProperty(prop);
+  }
+  gestureStyles.clear();
+}
+
 /**
  * Apply bounds to DOM element styles
  * Updates width, height, position, and rotation
@@ -24,17 +51,17 @@ export function applyBoundsToDOM(elementId: string, bounds: TransformBounds): vo
   const domElement = getDOMElement(elementId);
   if (!domElement) return;
 
-  domElement.style.width = `${bounds.width}px`;
-  domElement.style.height = `${bounds.height}px`;
+  setGestureStyle(domElement, "width", `${bounds.width}px`);
+  setGestureStyle(domElement, "height", `${bounds.height}px`);
 
   const position = window.getComputedStyle(domElement).position;
   if (position === "absolute" || position === "fixed") {
-    domElement.style.left = `${bounds.x}px`;
-    domElement.style.top = `${bounds.y}px`;
+    setGestureStyle(domElement, "left", `${bounds.x}px`);
+    setGestureStyle(domElement, "top", `${bounds.y}px`);
   }
 
   if (bounds.rotation !== undefined) {
-    domElement.style.transform = `rotate(${bounds.rotation}deg)`;
+    setGestureStyle(domElement, "transform", `rotate(${bounds.rotation}deg)`);
   }
 }
 
@@ -61,8 +88,8 @@ export function expandParentDOM(
   newWidth: number,
   newHeight: number
 ): void {
-  parentElement.style.width = `${newWidth}px`;
-  parentElement.style.height = `${newHeight}px`;
+  setGestureStyle(parentElement, "width", `${newWidth}px`);
+  setGestureStyle(parentElement, "height", `${newHeight}px`);
 }
 
 // =============================================================================

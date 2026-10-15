@@ -443,7 +443,9 @@ describe("useCanvasElementDrag", () => {
 
       child.dispatchEvent(dragEvent("dragend", null));
 
-      expect(child.style.opacity).toBe("1");
+      // Removed, not set to "1": a leftover inline value would override the
+      // element's own opacity, now that the canvas keeps styles in a sheet.
+      expect(child.style.opacity).toBe("");
       expect(child.classList.contains("bd-dragging")).toBe(false);
       expect(child.classList.contains("bd-clone-mode")).toBe(false);
       expect(mocks.stopAutoScroll).toHaveBeenCalled();

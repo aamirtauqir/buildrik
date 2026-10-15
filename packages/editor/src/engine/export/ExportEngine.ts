@@ -19,6 +19,7 @@ import { DEFAULT_EXPORT_CONFIG } from "@/shared/types/export";
 import { collectUsedKeyframes } from "@/shared/constants/animationKeyframes";
 import { getDefaultAttributes, getDefaultTagName } from "@/shared/utils/html";
 import { CMSExportResolver } from "../cms/CMSExportResolver";
+import { elementBaseCSS, hideRulesFor } from "../styles/cascadeCSS";
 import type { CMSExportMode, CMSExportOptions } from "../cms/CMSExportResolver";
 import type { Composer } from "../Composer";
 import { generateAnalyticsScripts } from "./AnalyticsInjector";
@@ -122,27 +123,6 @@ function multiPageFileType(name: string): MultiPageExportFile["type"] {
 // ============================================================================
 // EXPORT ENGINE CLASS
 // ============================================================================
-
-const HIDE_MEDIA_QUERIES: Record<string, string> = {
-  "--hide-mobile": "(max-width:767px)",
-  "--hide-tablet": "(min-width:768px) and (max-width:1023px)",
-  "--hide-desktop": "(min-width:1024px)",
-};
-
-/**
- * Per-breakpoint hide, as the media queries that actually hide something.
- *
- * The inspector's Visibility toggles write `--hide-<bp>: true` into an
- * element's styles. That is an inert custom property in a browser — the
- * publish path turns it into a media query, and the single-file export wrote
- * the property straight into the stylesheet and nothing else, so an element
- * hidden on mobile was fully visible on mobile in the exported file.
- */
-function hideRulesFor(selector: string, styles: Record<string, string>): string[] {
-  return Object.entries(HIDE_MEDIA_QUERIES)
-    .filter(([key]) => styles[key] === "true")
-    .map(([, query]) => `@media ${query}{${selector}{display:none!important}}`);
-}
 
 type LiveElement = NonNullable<ReturnType<Composer["elements"]["getElement"]>>;
 
@@ -523,28 +503,12 @@ export class ExportEngine {
    */
   private buildPublishBaseCss(pages: PageData[], minify: boolean): string {
     const prefix = this.config.cssPrefix;
-    const HIDE_QUERIES = HIDE_MEDIA_QUERIES;
-    const baseRules: string[] = [];
-    const hideRules: string[] = [];
-
-    const walk = (el: PageData["root"] | undefined): void => {
-      if (!el) return;
-      const styles = el.styles;
-      if (isSafeElementId(el.id) && styles && Object.keys(styles).length > 0) {
-        const sel = `.${prefix}${el.id}`;
-        // Same defense-in-depth guard buildAttributeString applies — drop the
-        // whole rule if it carries a dangerous CSS pattern (F1 carried over).
-        if (isSafeAttrValue("style", stylesToString(styles), "")) {
-          const styleStr = stylesToCSS(styles, minify);
-          baseRules.push(minify ? `${sel}{${styleStr}}` : `${sel} {\n${styleStr}}\n`);
-        }
-        hideRules.push(...hideRulesFor(sel, styles));
-      }
-      el.children?.forEach(walk);
-    };
-    for (const page of pages) walk(page.root);
-
-    return [...baseRules, ...hideRules].join(minify ? "" : "\n");
+    return elementBaseCSS(
+      pages.map((page) => page.root),
+      (id) => `.${prefix}${id}`,
+      "media",
+      minify,
+    );
   }
 
   /**

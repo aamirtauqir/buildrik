@@ -76,8 +76,9 @@ export class HTMLParser {
     const rootElement = this.ctx.elements.get(page.root.id);
     const rootData = rootElement ? rootElement.toJSON() : page.root;
 
-    // Use shared HTML generation with data attributes for editor mode
-    return elementDataToHTML(rootData, { includeDataAttributes: true });
+    // Editor mode: data attributes on, and no inline styles — the canvas and
+    // Preview carry each element's styles as stylesheet rules (cascadeCSS).
+    return elementDataToHTML(rootData, { includeDataAttributes: true, inlineStyles: false });
   }
 
   /**

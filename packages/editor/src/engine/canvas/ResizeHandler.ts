@@ -24,6 +24,7 @@ import {
   applyMultiResizeToDOM,
   applyBoundsToModel,
   applyMultiResizeToModel,
+  releaseGestureStyles,
 } from "./resize/DOMUpdater";
 import { hitTestHandles, hitTestRotation, hitTestBorder, hitTest } from "./resize/HitTester";
 import { ResizeInputManager, InputModifiers } from "./resize/ResizeInputManager";
@@ -244,7 +245,9 @@ export class ResizeHandler extends EventEmitter {
     }
 
     applyBoundsToModel(elementId, newBounds, this.composer);
-    applyBoundsToDOM(elementId, newBounds);
+    // The model change reaches the canvas through its stylesheet; nothing
+    // inline to write or leave behind.
+    releaseGestureStyles(this.composer);
     this.composer.canvas.indicators?.createSelectionBox(elementId);
 
     return true;
@@ -258,9 +261,6 @@ export class ResizeHandler extends EventEmitter {
 
     if (state.rafId !== null) cancelAnimationFrame(state.rafId);
 
-    applyBoundsToDOM(state.elementId, state.startBounds);
-    for (const [elId, bounds] of state.additionalStartBounds) applyBoundsToDOM(elId, bounds);
-
     if (state.options.useTransaction !== false) {
       try {
         this.composer.endTransaction?.();
@@ -269,6 +269,9 @@ export class ResizeHandler extends EventEmitter {
         /* ignore */
       }
     }
+    // The undo restored the model; drop the drag's inline feedback so the
+    // stylesheet's (restored) values show.
+    releaseGestureStyles(this.composer);
     this.composer.canvas.indicators?.createSelectionBox(state.elementId);
     this.emit(EVENTS.RESIZE_CANCEL, { elementId: state.elementId });
     this.composer.emit?.(EVENTS.RESIZE_CANCEL, { elementId: state.elementId });
@@ -371,6 +374,7 @@ export class ResizeHandler extends EventEmitter {
     if (state.options.useTransaction !== false) {
       this.composer.endTransaction?.();
     }
+    releaseGestureStyles(this.composer);
 
     this.emitResizeEvent(EVENTS.RESIZE_END, state.startBounds, finalBounds);
     this.cleanup();

@@ -235,9 +235,12 @@ describe("HTMLParser.toHTML", () => {
     kids[0].setContent("edited");
 
     const html = manager.toHTML();
-    expect(html).toContain("color: red");
     expect(html).toContain("edited");
     expect(html).not.toContain(">hi<");
+    // The live style reaches the canvas as a stylesheet rule (cascadeCSS),
+    // not an inline attribute that would outrank breakpoint and :hover rules.
+    expect(html).not.toContain("style=");
+    expect(manager.getActivePageRootData()?.children?.[0]?.styles).toMatchObject({ color: "red" });
   });
 
   it("includes data-buildrick attributes for editor mode", () => {

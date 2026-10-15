@@ -83,6 +83,14 @@ export class ElementManager {
     return this.pageManager.getActivePage();
   }
 
+  /** The active page's element tree as data, read from the live root (so
+   *  edits applied through Element APIs are included). */
+  getActivePageRootData(): ElementData | undefined {
+    const root = this.getActivePage()?.root;
+    if (!root?.id) return root;
+    return this.getElement(root.id)?.toJSON() ?? root;
+  }
+
   /** Update page metadata (name/slug/settings/slugManuallySet/meta) */
   updatePage(
     id: string,
