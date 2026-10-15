@@ -6,7 +6,7 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint packages/dashboard server lib __tests__ packages/shared",
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
     "funnel": "tsx scripts/funnel-report.ts",
@@ -26,7 +26,10 @@
     "dev:reset": "node scripts/dev-clean.mjs && rm -rf packages/dashboard/.next packages/editor/dist packages/editor/node_modules/.vite",
     "smoke:prod": "node scripts/smoke-deployed.mjs",
     "audit:links": "node scripts/audit/link-audit.mjs",
-    "gate:baked-flags": "node scripts/check-baked-flags.mjs"
+    "gate:baked-flags": "node scripts/check-baked-flags.mjs",
+    "lint:prune": "eslint packages/dashboard server lib __tests__ packages/shared --prune-suppressions",
+    "test:related": "vitest related --run",
+    "hooks:install": "pnpm --filter @buildrik/editor hooks:install"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.0.0",

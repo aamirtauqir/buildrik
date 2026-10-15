@@ -23,10 +23,37 @@ on:
       - "__tests__/**"
       - "package.json"
       - "pnpm-lock.yaml"
+      - "eslint.config.mjs"
+      - "eslint-suppressions.json"
   push:
     branches: [main]
 
 jobs:
+  # Nothing outside packages/editor was linted: the root `lint` script was
+  # `next lint`, which Next 16 removed. 609 pre-existing errors (566 of them
+  # no-explicit-any) are baselined in eslint-suppressions.json — a NEW
+  # violation fails; fixing old ones is `pnpm lint:prune`.
+  lint:
+    name: eslint (dashboard, server, lib)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: ESLint
+        run: pnpm lint
+
+
   unit:
     name: vitest
     runs-on: ubuntu-latest

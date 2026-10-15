@@ -1,0 +1,321 @@
+{
+  "__tests__/account-service.test.ts": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 38
+    }
+  },
+  "__tests__/alt-text.service.test.ts": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 27
+    }
+  },
+  "__tests__/auth-check-email.test.ts": {
+    "@typescript-eslint/no-require-imports": {
+      "count": 4
+    }
+  },
+  "__tests__/auth-config.test.ts": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 103
+    }
+  },
+  "__tests__/billing-service.test.ts": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 27
+    }
+  },
+  "__tests__/dashboard-service.test.ts": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 17
+    }
+  },
+  "__tests__/db/auth-config-account-first.db.test.ts": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 10
+    }
+  },
+  "__tests__/duplicate-site-setting-columns.test.ts": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 3
+    }
+  },
+  "__tests__/email-wiring.test.ts": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 1
+    }
+  },
+  "__tests__/form-submission-service.test.ts": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 69
+    }
+  },
+  "__tests__/help-service.test.ts": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 7
+    }
+  },
+  "__tests__/logout-route.test.ts": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 5
+    }
+  },
+  "__tests__/notification-service.test.ts": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 5
+    }
+  },
+  "__tests__/notification-triggers.test.ts": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 4
+    }
+  },
+  "__tests__/onboarding-service.test.ts": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 18
+    }
+  },
+  "__tests__/page-service.test.ts": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 20
+    }
+  },
+  "__tests__/publish-service.test.ts": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 27
+    }
+  },
+  "__tests__/site-detail-service.test.ts": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 32
+    }
+  },
+  "__tests__/sites-delete.test.ts": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 2
+    }
+  },
+  "__tests__/sites-save-project.test.ts": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 17
+    }
+  },
+  "__tests__/sites-service.dsSchemaVersion.test.ts": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 11
+    }
+  },
+  "__tests__/sites-service.test.ts": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 29
+    }
+  },
+  "__tests__/stripe-webhook-service.test.ts": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 21
+    }
+  },
+  "__tests__/team-service.test.ts": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 44
+    }
+  },
+  "__tests__/template-ai-service.test.ts": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 12
+    }
+  },
+  "lib/hooks/__tests__/use-debounced-value.test.ts": {
+    "prefer-const": {
+      "count": 1
+    },
+    "react-hooks/globals": {
+      "count": 1
+    }
+  },
+  "packages/dashboard/app/api/sse/collab/[siteId]/route.ts": {
+    "prefer-const": {
+      "count": 1
+    }
+  },
+  "packages/dashboard/app/api/webhooks/stripe/route.ts": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 1
+    }
+  },
+  "packages/dashboard/app/dashboard/learn/page.tsx": {
+    "react/no-unescaped-entities": {
+      "count": 3
+    }
+  },
+  "packages/dashboard/app/dashboard/marketplace/page.tsx": {
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  },
+  "packages/dashboard/app/dashboard/page.tsx": {
+    "react-hooks/purity": {
+      "count": 1
+    }
+  },
+  "packages/dashboard/app/dashboard/projects/page.tsx": {
+    "react-hooks/set-state-in-effect": {
+      "count": 2
+    }
+  },
+  "packages/dashboard/app/dashboard/settings/integrations/vercel-team-picker/page.tsx": {
+    "react-hooks/purity": {
+      "count": 1
+    }
+  },
+  "packages/dashboard/app/edit/[siteId]/__tests__/page.test.tsx": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 2
+    }
+  },
+  "packages/dashboard/app/onboarding/ai/generating/page.tsx": {
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    },
+    "react/no-unescaped-entities": {
+      "count": 1
+    }
+  },
+  "packages/dashboard/app/onboarding/ai/preview/page.tsx": {
+    "react/no-unescaped-entities": {
+      "count": 1
+    }
+  },
+  "packages/dashboard/app/onboarding/site/page.tsx": {
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  },
+  "packages/dashboard/components/ai-wizard/generation-progress.tsx": {
+    "react-hooks/set-state-in-effect": {
+      "count": 2
+    }
+  },
+  "packages/dashboard/components/auth/auth-input.tsx": {
+    "react-hooks/static-components": {
+      "count": 1
+    }
+  },
+  "packages/dashboard/components/auth/resend-timer.tsx": {
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  },
+  "packages/dashboard/components/billing/cancel-modal.tsx": {
+    "react/no-unescaped-entities": {
+      "count": 2
+    }
+  },
+  "packages/dashboard/components/billing/limit-reached.tsx": {
+    "react/no-unescaped-entities": {
+      "count": 1
+    }
+  },
+  "packages/dashboard/components/clients/clients-view.tsx": {
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  },
+  "packages/dashboard/components/dashboard/dataviz.tsx": {
+    "react-hooks/immutability": {
+      "count": 1
+    }
+  },
+  "packages/dashboard/components/dashboard/shell/page-actions.tsx": {
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  },
+  "packages/dashboard/components/editor-route/__tests__/EditorClient.cold-load.test.tsx": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 4
+    }
+  },
+  "packages/dashboard/components/editor-route/__tests__/EditorClient.key-remount.test.tsx": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 7
+    }
+  },
+  "packages/dashboard/components/editor-route/__tests__/EditorLink.props.test.tsx": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 1
+    }
+  },
+  "packages/dashboard/components/editor-route/__tests__/EditorLink.test.tsx": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 1
+    }
+  },
+  "packages/dashboard/components/global/cookie-consent.tsx": {
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  },
+  "packages/dashboard/components/global/offline-banner.tsx": {
+    "react-hooks/set-state-in-effect": {
+      "count": 2
+    }
+  },
+  "packages/dashboard/components/onboarding/wizard/wizard-context.tsx": {
+    "react-hooks/refs": {
+      "count": 1
+    }
+  },
+  "packages/dashboard/components/settings/account-tab.tsx": {
+    "react/no-unescaped-entities": {
+      "count": 1
+    }
+  },
+  "packages/dashboard/components/site-detail/site-header.tsx": {
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  },
+  "packages/dashboard/components/site-detail/submission-drawer.tsx": {
+    "react-hooks/refs": {
+      "count": 1
+    },
+    "react/no-unescaped-entities": {
+      "count": 1
+    }
+  },
+  "packages/dashboard/components/sites/create-site-modal.tsx": {
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  },
+  "packages/dashboard/components/team/members-table.tsx": {
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  },
+  "packages/dashboard/components/templates/use-template-modal.tsx": {
+    "react-hooks/immutability": {
+      "count": 1
+    }
+  },
+  "packages/dashboard/emails/reset-password.tsx": {
+    "react/no-unescaped-entities": {
+      "count": 1
+    }
+  },
+  "packages/dashboard/emails/team-invite.tsx": {
+    "react/no-unescaped-entities": {
+      "count": 1
+    }
+  },
+  "packages/dashboard/emails/verify-email.tsx": {
+    "react/no-unescaped-entities": {
+      "count": 1
+    }
+  },
+  "server/trpc/routers/__tests__/forms.test.ts": {
+    "@typescript-eslint/no-explicit-any": {
+      "count": 1
+    }
+  }
+}

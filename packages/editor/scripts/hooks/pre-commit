@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+# Buildrik pre-commit — the fast per-change tier (seconds to ~1 min).
+#
+# Installed by `pnpm hooks:install` (copies this dir into .git/hooks/).
+# The full suite (~14 min) stays in CI; the DS/tsc gates stay in pre-push.
+#
+#   1. Secrets: refuses a commit whose STAGED FILE NAMES include .env* (not
+#      .env.example), auth.json (Playwright storageState), *.pem, *.p12, *.key.
+#      Names, not command text: it does not matter how the file was staged.
+#      The repo is public.
+#   2. ESLint on the staged .ts/.tsx files — editor files under the editor's
+#      config, everything else under the root config (existing violations are
+#      baselined in eslint-suppressions.json; only NEW ones fail).
+#   3. Tests: the staged test files, plus `__tests__/<name>*.test.ts(x)` beside
+#      each staged source file. Direct file runs — `vitest related` builds the
+#      whole module graph here and takes minutes. DB-tier tests (*.db.test.ts)
+#      are left to `pnpm test:db` / CI.
+#
+# Bypass: git commit --no-verify — and say why in the message.
+
+set -u
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+cd "$REPO_ROOT"
+
+STAGED="$(git diff --cached --name-only --diff-filter=ACMR)"
+[ -z "$STAGED" ] && exit 0
+
+# 1. Secrets ----------------------------------------------------------------
+SECRETS="$(printf '%s\n' "$STAGED" | grep -E '(^|/)(\.env($|\.)|auth\.json$)|\.(pem|p12|key)$' | grep -vE '(^|/)\.env\.example$|(^|/)\.env\.local\.example$')"
+if [ -n "$SECRETS" ]; then
+  echo "pre-commit: BLOCK — secrets file(s) staged in a public repo:"
+  printf '   %s\n' $SECRETS
+  echo "   Unstage: git restore --staged <file>"
+  exit 1
+fi
+
+TS="$(printf '%s\n' "$STAGED" | grep -E '\.(ts|tsx)$' | while read -r f; do [ -f "$f" ] && echo "$f"; done)"
+[ -z "$TS" ] && exit 0
+
+# 2. ESLint ------------------------------------------------------------------
+FAIL=0
+EDITOR_TS="$(printf '%s\n' "$TS" | grep '^packages/editor/' | sed 's#^packages/editor/##')"
+OTHER_TS="$(printf '%s\n' "$TS" | grep -v '^packages/editor/')"
+if [ -n "$EDITOR_TS" ]; then
+  (cd packages/editor && printf '%s\n' "$EDITOR_TS" | xargs npx eslint --quiet --no-warn-ignored) || FAIL=1
+fi
+if [ -n "$OTHER_TS" ]; then
+  printf '%s\n' "$OTHER_TS" | xargs npx eslint --quiet --no-warn-ignored || FAIL=1
+fi
+if [ "$FAIL" != "0" ]; then
+  echo "pre-commit: BLOCK — ESLint errors in staged files (above)."
+  exit 1
+fi
+
+# 3. Tests -------------------------------------------------------------------
+TESTS="$(
+  for f in $TS; do
+    case "$f" in
+      (*.db.test.ts) ;;
+      (*.test.ts|*.test.tsx) echo "$f" ;;
+      (*)
+        dir="$(dirname "$f")"; base="$(basename "$f")"; base="${base%.*}"
+        ls "$dir/__tests__/$base".test.ts "$dir/__tests__/$base".test.tsx "$dir/__tests__/$base".*.test.ts "$dir/__tests__/$base".*.test.tsx 2>/dev/null | grep -v '\.db\.test\.ts$'
+        ;;
+    esac
+  done | sort -u
+)"
+[ -z "$TESTS" ] && exit 0
+
+echo "pre-commit: running $(printf '%s\n' "$TESTS" | wc -l | tr -d ' ') test file(s) for the staged change"
+if ! printf '%s\n' "$TESTS" | xargs npx vitest run --reporter=dot; then
+  echo "pre-commit: BLOCK — tests failing for the staged change (above)."
+  exit 1
+fi
+exit 0

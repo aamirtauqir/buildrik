@@ -8,6 +8,10 @@
  *   ask  — sometimes right, always worth a human look (migrations, auth,
  *          billing, publish, tokens, test baselines, CI, --no-verify).
  *
+ * A backstop, not a sandbox: command text can always be assembled at runtime.
+ * The binding checks live server-side (branch protection blocks force-push)
+ * and in the pre-commit hook (staged file NAMES, however they were staged).
+ *
  * Fails open on unparseable input: a guard that crashes would block every
  * tool call, and the deny list is a backstop, not the only line.
  */
@@ -16,7 +20,7 @@ import { relative, isAbsolute } from "node:path";
 
 // `git` plus any global options (`git -C dir`, `git -c k=v`, `git --no-pager`)
 // before the subcommand — otherwise `git -C . stash` walks past every rule.
-const GIT = String.raw`\bgit(?:\s+-[Cc]\s+\S+|\s+--[\w-]+(?:=\S+)?)*\s+`;
+const GIT = String.raw`\bgit(?:\s+-[Cc]\s*\S+|\s+--(?:git-dir|work-tree|namespace|exec-path|config-env)(?:=|\s+)\S+|\s+--[\w-]+(?:=\S+)?)*\s+`;
 const git = (rest) => new RegExp(GIT + rest);
 
 const DENY_COMMANDS = [

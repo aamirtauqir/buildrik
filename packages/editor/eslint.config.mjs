@@ -84,7 +84,10 @@ export default [
   // Global ignores: generated output, static assets, harness helper scripts and
   // untracked scratch files at the package root. `eslint .` visits all of these;
   // none is shipped code.
-  { ignores: [".flowbite-react/**", "assets/**", "e2e/**/*.mjs", "*.mjs", "dist/**", "docs/**"] },
+  // Local scratch dirs (gitignored) held 570 of a local run's 570 errors while CI
+  // reported 0, so `pnpm lint` failed on every machine that had run an audit.
+  { ignores: [".flowbite-react/**", "assets/**", "e2e/**/*.mjs", "*.mjs", "dist/**", "docs/**",
+    "scratchpad_audit/**", ".playwright-mcp/**", ".scratch/**", "coverage/**", "playwright-report/**", "test-results/**"] },
   js.configs.recommended,
   // Files outside src/ that `eslint .` still visits. Without a TS parser they
   // fail to PARSE ("Unexpected token <" / "as"), which is an error, which made
