@@ -42,6 +42,7 @@ import {
   takeOffScreenUnsaved,
   type KeptVsServer,
 } from "@/services/unsavedRecovery";
+import { trackEvent } from "@/shared/utils/errorTracking";
 import type { ConflictModalProps, ServerCopyInfo } from "../modals/ConflictModal";
 import { navigateBypassingUnloadGuard } from "../unloadGuardBypass";
 import type { SaveState } from "./useStudioState";
@@ -97,9 +98,11 @@ export function useServerConflict(opts: UseServerConflictOptions): {
       const token = detail?.serverLastEditedAt;
       if (!token) return;
       /* Idempotent while open: repeated autosave conflicts don't restack. */
-      setDialog((d) =>
-        d?.open ? d : { variant: "save", serverToken: token, brandFormat: detail.brandFormat === true, open: true },
-      );
+      setDialog((d) => {
+        if (d?.open) return d;
+        trackEvent("save.conflict", { brandFormat: detail.brandFormat === true });
+        return { variant: "save", serverToken: token, brandFormat: detail.brandFormat === true, open: true };
+      });
     };
     window.addEventListener(SAVE_CONFLICT_EVENT, onConflict);
     return () => window.removeEventListener(SAVE_CONFLICT_EVENT, onConflict);
@@ -180,17 +183,27 @@ export function useServerConflict(opts: UseServerConflictOptions): {
     setDialog((d) => (d ? { ...d, open: false } : d));
   }, [dialog?.variant, setSaveState]);
 
+  /* D8: which way people resolve kept edits a later save overtook. */
+  const trackRestoreChoice = (choice: "keep" | "download" | "replace") => {
+    if (dialog?.variant === "restore" && dialog.relation !== "unchanged") {
+      trackEvent("restore.stale_choice", { choice, relation: dialog.relation });
+    }
+  };
+
   const onKeep = React.useCallback(() => {
+    trackRestoreChoice("keep");
     if (dialog?.variant === "save") {
       reload();
       return;
     }
     setDialog(null);
     setSaveState({ status: "idle", lastSavedAt: Date.now(), error: undefined });
-  }, [dialog?.variant, setSaveState]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- trackRestoreChoice reads `dialog`
+  }, [dialog, setSaveState]);
 
   const onDownload = React.useCallback((): boolean => {
     if (!composer) return false;
+    trackRestoreChoice("download");
     if (dialog?.variant === "restore") {
       const kept = siteId ? peekOffScreenUnsaved(siteId) : null;
       return kept ? downloadProject(kept.project, "buildrik-unsaved-edits") : false;
@@ -199,10 +212,12 @@ export function useServerConflict(opts: UseServerConflictOptions): {
     /* After the dialog has discarded the kept copy for this written file. */
     window.setTimeout(reload, 0);
     return true;
-  }, [composer, dialog?.variant, siteId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- trackRestoreChoice reads `dialog`
+  }, [composer, dialog, siteId]);
 
   const onReplace = React.useCallback(async () => {
     if (!composer || !dialog) return;
+    trackRestoreChoice("replace");
     if (dialog.variant === "restore") {
       if (!siteId) return;
       if (dialog.relation !== "unchanged") {
@@ -245,6 +260,7 @@ export function useServerConflict(opts: UseServerConflictOptions): {
     setBaselineLastEditedAt(copy?.lastEditedAt ?? dialog.serverToken);
     setDialog(null);
     saveProject();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- trackRestoreChoice reads `dialog`
   }, [addToast, composer, dialog, saveProject, setIsDirty, setSaveState, siteId]);
 
   const reopenSaveConflict = React.useCallback(

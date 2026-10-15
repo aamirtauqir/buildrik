@@ -400,6 +400,16 @@ export async function getSite(siteId: string, db: Prisma.TransactionClient = pri
 }
 
 /**
+ * Kill switch for the editor's load-time repair (CEO D5): the repair rewrites
+ * saved content, so it must be stoppable in production without a rebuild.
+ * Read per request — `EDITOR_LOAD_REPAIR=off` in the server env (restart, no
+ * build) stops every automatic repair; possible-damage rows still list.
+ */
+export function isLoadRepairEnabled(): boolean {
+  return process.env.EDITOR_LOAD_REPAIR !== "off";
+}
+
+/**
  * Everything the editor loads, read as ONE snapshot. It used to be three
  * parallel requests (`sites.get`, `pages.list`, `siteDetail.settings.get`): a
  * save landing between them paired the old pages with the new `lastEditedAt`,
@@ -427,6 +437,7 @@ export async function loadSiteForEditor(siteId: string, viewerId: string) {
         lastEditedBy: editor
           ? { name: editor.displayName || editor.fullName, isViewer: editor.id === viewerId }
           : null,
+        loadRepair: isLoadRepairEnabled(),
       };
     },
     { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead },

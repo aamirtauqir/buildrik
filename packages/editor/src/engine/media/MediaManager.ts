@@ -6,6 +6,7 @@
  * @license BSD-3-Clause
  */
 
+import { trackEvent } from "@/shared/utils/errorTracking";
 import DOMPurify from "dompurify";
 import {
   MEDIA_DEFAULTS,
@@ -408,6 +409,7 @@ export class MediaManager extends MediaEventEmitter {
       if (asset.uploadedUrl) {
         const registered = await this.remoteSync.registerUploaded(asset.uploadedUrl, meta);
         if (registered) {
+          trackEvent("media.registration_recovered");
           await this.replaceAssetId(id, registered.serverId, registered.url);
           this.retryQueue.delete(id);
         }
@@ -671,6 +673,7 @@ export class MediaManager extends MediaEventEmitter {
   private async keepUploadedUrl(id: string, url: string): Promise<void> {
     const idx = this.state.assets.findIndex((a) => a.id === id);
     if (idx === -1) return;
+    trackEvent("media.registration_failed", { retry: Boolean(this.state.assets[idx].uploadedUrl) });
     const old = this.state.assets[idx];
     const updated: MediaAsset = { ...old, src: url, uploadedUrl: url, localOnly: true, updatedAt: new Date().toISOString() };
     this.state.assets[idx] = updated;

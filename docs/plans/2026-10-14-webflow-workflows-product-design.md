@@ -2001,6 +2001,16 @@ REALITY: pr-count pass no ship-policy file; one PR per lane (4), S0 merged first
 | — | A restore offer does not set the save-failed state on load; closing the dialog unanswered does | The save-failed banner is a portal that rendered ABOVE the dialog's scrim (live 2026-10-15) — decision 1 says nothing over the modal. The pill reads neither "Saved" nor failed while the dialog is up; Escape raises the banner, whose Retry re-offers the dialog. | within design decision 1 |
 | — | Retry / ⌘S do not restore kept edits whose base is not the loaded token; they re-offer the restore dialog | `useSaveCallback` restored any off-screen copy before saving (L5-074), which would save edits made on an older copy over a teammate's newer save without asking — the exact case R1 exists for. | within R1 |
 
+| — | S7 content rule: `contentFormat` "text" is escaped, anything else (incl. absent) is sanitized markup — on canvas, Preview, export and publish (`contentToHTML`) | Absent meant "markup" on the canvas and "text" in export; every load already sanitized content as markup, so absent = markup is the reading that matches what users saw. | within BK-40 / BK-51 |
+| — | BK-44 radio/checkbox default value = the label's text at export (no per-insert unique value) | Block HTML is static and elements carry no option index; the label text is what the visitor chose, and a Value row on the block overrides it. | within BK-44 |
+| — | D10 fallback: deployment origins (`publishedUrl`, `<project>.vercel.app`) count only while the site has a live deployment | Verified on code, not on a registered origin: the local workspace lost its Vercel connection in the 2026-10-15 DB rebuild. Regression tests cover accepted and rejected `_return`. | within D10 (live verify pending) |
+| — | E-T9: D9's "exact-match images" repair not built | Placed images carry no asset id, so a dead `blob:` src has no exact asset to relink to; the library's URL remap already covers the case where a match exists. BK-42 now prevents new dead `blob:` srcs. | owner to confirm |
+| — | Form wiring prepends action/method/enctype instead of removing the inspector's | Two background security reviews flagged removal-by-pattern (and a stricter walker) as parser differentials; the browser keeps the first of a repeated attribute, so prepending needs no parsing. | security review |
+
+**D8 runbook lines (proposed; owner to confirm):**
+- `repair.undone` / `repair.applied` above 5 % over a week → the non-finite-size rule is removing values people want; set `EDITOR_LOAD_REPAIR=off`, restart, and read the "Before automatic repair" versions of the affected sites.
+- `component.overrides_dropped` above 0 after Phase 3 ships → the component format migration is losing overrides; stop the rollout and diff a dropped instance against its master.
+
 Built so far on `feat/phase1-s3-recovery` (worktree `~/Desktop/buildrik-worktrees/phase1-s0`): S0 / ER-T1 `93484937d`; S2 / E-T1 + E-T3 part `89367e913`, `bee52ba1c`; BK-06 `5f57d4f29`; BK-05 / D36 `80e0ad723`, `80a20de1a`; BK-11 `377e1197a`; S3 (BK-04, BK-59, O1, O7, R1, T1, C1) — see the S3 commit.
 
 ## GSTACK REVIEW REPORT

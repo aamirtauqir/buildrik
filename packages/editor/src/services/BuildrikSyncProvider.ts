@@ -69,6 +69,14 @@ export function getBaselineLastEditedAt(): string | null {
   return _baselineLastEditedAt;
 }
 
+/* Server kill switch for load-time repair (D5); on unless the server says off. */
+let _loadRepairEnabled = true;
+
+/** Whether the server allows this load's automatic repairs (`EDITOR_LOAD_REPAIR`). */
+export function isLoadRepairEnabled(): boolean {
+  return _loadRepairEnabled;
+}
+
 /** Who wrote the copy this editor loaded; null when unknown (older rows). */
 export function getLoadedLastEditedBy(): EditorAttribution | null {
   return _loadedLastEditedBy;
@@ -744,9 +752,10 @@ export async function loadProject(siteId: string): Promise<ProjectData> {
        token — the next save then passed CAS and overwrote unseen work.
        SA-01: retried once, as the settings read alone used to be. */
     const readSnapshot = () => client.sites.loadForEditor.query({ siteId });
-    const { site, pages, settings: settingsResult, lastEditedBy } = await readSnapshot().catch(readSnapshot);
+    const { site, pages, settings: settingsResult, lastEditedBy, loadRepair } = await readSnapshot().catch(readSnapshot);
     const data = projectDataFromRows(site, pages, settingsResult);
     _loadedLastEditedBy = lastEditedBy ?? null;
+    _loadRepairEnabled = loadRepair !== false;
 
     // Capture the workspace plan so plan-gated editor UI reads the real tier.
     _editorPlanTier = mapDashboardPlan((settingsResult as { plan?: unknown } | null)?.plan);

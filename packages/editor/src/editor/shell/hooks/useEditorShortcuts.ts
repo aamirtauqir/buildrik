@@ -53,6 +53,7 @@ import type { Composer } from "@/engine";
 import { cycleRegion } from "../regionCycle";
 import { EVENTS } from "@/shared/constants/events";
 import { CONNECT_TOKENS_LABEL } from "@/engine/designSystem/facade";
+import { trackEvent } from "@/shared/utils/errorTracking";
 
 // Modals subset the shortcut handler reads. Match the public surface of
 // useStudioModals; passing the full modals object keeps mocking simple.
@@ -191,9 +192,11 @@ export function useEditorShortcuts({
         typeof document !== "undefined" ? document.querySelector('[data-bk-surface="fullpage"]') : null;
       const tokensOnly = surface?.getAttribute("data-bk-history") === "tokens";
       const historyBlocked = composer.readOnly || (surface !== null && !tokensOnly);
+      if ((isUndo || isRedo) && historyBlocked && surface) trackEvent("undo.blocked_surface", { redo: isRedo });
       if (isUndo && !historyBlocked) {
         e.preventDefault();
         if (tokensOnly && !composer.history.nextUndoTouchesOnly(["/settings/"], [CONNECT_TOKENS_LABEL])) {
+          trackEvent("undo.blocked_surface", { redo: false, tokensOnly: true });
           composer.emit(EVENTS.HISTORY_UNDO_OUT_OF_SCOPE, undefined);
         } else {
           composer.history.undo();

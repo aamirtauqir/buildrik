@@ -59,6 +59,8 @@ import { useHistoryFeedback } from "./hooks/useHistoryFeedback";
 import { usePublishOutcomeFlash } from "./hooks/usePublishOutcomeFlash";
 import { useSaveCallback } from "./hooks/useSaveCallback";
 import { useServerConflict } from "./hooks/useServerConflict";
+import { useLoadRepair } from "./hooks/useLoadRepair";
+import { getEditorViewMode } from "@shared/utils/editorViewMode";
 import { useStudioHandlers } from "./hooks/useStudioHandlers";
 import { useStudioModals } from "./hooks/useStudioModals";
 import { useStudioState } from "./hooks/useStudioState";
@@ -418,9 +420,14 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   // Its server check rows re-read when a publish settles and when the panel
   // opens (IR-1), as well as after a save and on return to the tab.
   useOtherTabNotice(getSiteIdFromUrl(), addToast);
+  /* E-T9 / DR-T5: the load scan's repairs, toast and Issues rows — after the
+     restore dialog (decision 1). View mode only lists them. */
+  const viewOnly = React.useMemo(() => getEditorViewMode().readOnlyView, []);
+  const loadRepair = useLoadRepair({ composer, siteId: getSiteIdFromUrl(), addToast, readOnly: viewOnly });
   const issuesFeed = useIssuesFeed(composer, getSiteIdFromUrl(), state.setIssues, {
     publishState: publishJob.uiState,
     panelOpen: issuesOpen,
+    damageIssues: loadRepair.issues,
   });
 
   /* ── The site's ONE next move, derived once (B4, decision #34) ────────────
@@ -626,6 +633,9 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         }
         return fixed;
       }}
+      onDamageFix={loadRepair.fix}
+      onDamageKeep={loadRepair.keep}
+      damageReadOnly={viewOnly}
       onOpenBrand={(tokenId) => {
         setIssuesOpen(false);
         if (tokenId) requestBrandToken(composer, tokenId);

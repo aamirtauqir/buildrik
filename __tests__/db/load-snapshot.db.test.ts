@@ -101,3 +101,23 @@ describe("loadSiteForEditor — one consistent snapshot (O2)", () => {
     await expect(loadSiteForEditor(site.id, user.id)).resolves.toBeNull();
   });
 });
+
+/* CEO D5: the load-time repair rewrites saved content, so production must be
+   able to stop it without a rebuild — the server says so with every load. */
+describe("loadSiteForEditor — load-repair kill switch", () => {
+  it("is on by default and off when EDITOR_LOAD_REPAIR=off, read per load", async () => {
+    const user = await createTestUser();
+    const workspace = await createTestWorkspace({ ownerId: user.id });
+    const site = await createTestSite({ workspaceId: workspace.id, createdBy: user.id });
+    const prior = process.env.EDITOR_LOAD_REPAIR;
+    try {
+      delete process.env.EDITOR_LOAD_REPAIR;
+      expect((await loadSiteForEditor(site.id, user.id))?.loadRepair).toBe(true);
+      process.env.EDITOR_LOAD_REPAIR = "off";
+      expect((await loadSiteForEditor(site.id, user.id))?.loadRepair).toBe(false);
+    } finally {
+      if (prior === undefined) delete process.env.EDITOR_LOAD_REPAIR;
+      else process.env.EDITOR_LOAD_REPAIR = prior;
+    }
+  });
+});
