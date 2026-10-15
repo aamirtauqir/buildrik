@@ -2007,6 +2007,8 @@ REALITY: pr-count pass no ship-policy file; one PR per lane (4), S0 merged first
 | — | E-T9: D9's "exact-match images" repair not built | Placed images carry no asset id, so a dead `blob:` src has no exact asset to relink to; the library's URL remap already covers the case where a match exists. BK-42 now prevents new dead `blob:` srcs. | owner to confirm |
 | — | Form wiring prepends action/method/enctype instead of removing the inspector's | Two background security reviews flagged removal-by-pattern (and a stricter walker) as parser differentials; the browser keeps the first of a repeated attribute, so prepending needs no parsing. | security review |
 
+| — | DR-T1: RecoveryBanner stays a banner, not folded into the restore dialog | It shows only when the server load FAILED and the local draft is on screen (`localDraftShown`); the restore dialog only follows a SUCCESSFUL load. They never coexist, so the "never two overlays" rule holds without merging a load-failure surface into the conflict dialog. Order verified: restore dialog → repair scan → repair toast → Issues (useLoadRepair waits for the restore choice; unit + live). | within decision 1 |
+
 **D8 runbook lines (proposed; owner to confirm):**
 - `repair.undone` / `repair.applied` above 5 % over a week → the non-finite-size rule is removing values people want; set `EDITOR_LOAD_REPAIR=off`, restart, and read the "Before automatic repair" versions of the affected sites.
 - `component.overrides_dropped` above 0 after Phase 3 ships → the component format migration is losing overrides; stop the rollout and diff a dropped instance against its master.
