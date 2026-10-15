@@ -2017,6 +2017,55 @@ REALITY: pr-count pass no ship-policy file; one PR per lane (4), S0 merged first
 
 Built so far on `feat/phase1-s3-recovery` (worktree `~/Desktop/buildrik-worktrees/phase1-s0`): S0 / ER-T1 `93484937d`; S2 / E-T1 + E-T3 part `89367e913`, `bee52ba1c`; BK-06 `5f57d4f29`; BK-05 / D36 `80e0ad723`, `80a20de1a`; BK-11 `377e1197a`; S3 (BK-04, BK-59, O1, O7, R1, T1, C1) — see the S3 commit.
 
+## Implementation status (2026-10-16)
+
+All Phase 1 slices are committed on one stacked chain of local branches,
+`feat/phase1-s0-consistent-load` → … → `feat/phase1-s6-publish` (tip
+`3d13305e9`). Nothing is pushed or merged.
+
+| Slice | Commits | Notes |
+|---|---|---|
+| S0 consistent load | 93484937d | migration `20261015120000_site_last_edited_by` |
+| S2 precedence | 89367e913, bee52ba1c, 5f57d4f29, 80e0ad723, 80a20de1a, 377e1197a | D35, D36 |
+| S3 recovery | 765343348 | one ConflictModal (save / restore) |
+| S7 content | 2530f1626, 823586eb2, 1fb7ce981, e8b25045a, 931fb6c90, 5cfd71467, 5ca521fce, 28dc5dda1 | BK-40/42/44/51, E-T9, DR-T5, DR-T1 decision |
+| S1 gestures | 9e1958a5e | E-T2, DR-T3 |
+| S4 locks/keys | cbdb7d6c8 | E-T8, DR-T7, DR-T8 |
+| S5 authz | 7140abdd2 | BK-08, D7 |
+| S6 publish | 64c6c973e, 9e65d8b7d, 84f13e841, 3d13305e9 | DR-T6, E-T6, ER-T3, ER-T4, DR-T4; migration `20261016120000_publish_bundle_forms_status` |
+
+S6 decisions taken while building:
+
+- The bundle lives on the job row (`publish_build_jobs.bundle`, `bundleHash`,
+  `formsPlan`, `formsStatus`, `failedPhase`), not a new table — pruning a
+  version already nulls its payload, and the bundle goes with it.
+- A rollback redeploys the stored bytes only while the workspace's
+  entitlements match the ones the bundle was built under (`bundle.context`:
+  badge + app-scripts hash). Otherwise it rebuilds from that version's pages
+  with today's settings. Without this a downgraded workspace could roll back
+  to a paid-era version with no badge (security review finding, fixed in
+  84f13e841, verified live in both directions).
+- Rollbacks skip the server's pre-publish checks: they re-ship a version that
+  already passed them.
+- The server refusal reaches the editor as `Publish stopped: <labels>.`;
+  `parseServerBlockers` in `usePublishJob.ts` reads that message.
+
+Decision 10 (VIEWER IP note): not shown. Both VIEWER exports are CSV-only and
+never carried IP, so there was nothing to explain.
+
+Not built: D9's exact-match image relink — assets carry no id to match on, so
+no relink is unambiguous yet. Owner to confirm.
+
+Not live-verified (unit-tested only): a published form's real submission
+end to end, the `EDITOR_LOAD_REPAIR` kill switch flip, S5 authorization with
+a second real user (no new users created on purpose), the "Updating forms" /
+"Forms couldn't update" / post-deploy retry lines (simulation finishes forms
+too fast to see PENDING), the server-refusal line, and any real Vercel deploy
+(the QA workspace lost its Vercel connection in the 2026-10-15 DB rebuild).
+
+Production needs `prisma migrate deploy` for both migrations above before
+this code ships.
+
 ## GSTACK REVIEW REPORT
 
 | Review | Trigger | Why | Runs | Status | Findings |
