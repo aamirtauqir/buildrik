@@ -2,8 +2,8 @@
 
 <!-- Ledger. Only the PM (main session) edits this file. -->
 
-- **Status:** ready-to-merge
-- **Stage owner:** PM (merge after CI)
+- **Status:** merged
+- **Stage owner:** —
 - **Created:** 2026-10-15
 - **Founder issue (verbatim):** "(factory pilot, from the 2026-10-15 readiness audit) packages/editor/CLAUDE.md §ENV says prod values live in 'Vercel project settings'; prod is cPanel."
 - **Guarded areas touched:** none
@@ -31,6 +31,7 @@ Agents reading packages/editor/CLAUDE.md are told the true place production env 
 | 3 | push + PR | PM (interactive) | pushed with the spec-age-only bypass after re-running the hook in the dev worktree (`editor=0 dashboard=0 figma=0 orphans=0 spec-age=1 button-variants=0`); PR opened | https://github.com/aamirtauqir/buildrik/pull/31 | 2026-10-15 |
 | 4 | qa | factory-qa | PASS — 5/5 done-condition lines + root CLAUDE.md consistency; audit:rules controlled against clean main (same pre-existing CLAUDE.md:169 finding, only :648→:652 shift) | factory/T-001 @ 4660acf3e, inline report | 2026-10-15 |
 | 5 | review | factory-code-reviewer | APPROVE — 0 blocking, 2 non-blocking: (1) section now self-contradicts: heading/first sentence/table still say VITE_ (table tells prod to set VITE_FEATURE_PUBLISH, which the shipping bundle never reads); (2) runtimeEnv.ts:13-15 VITE_ wins over NEXT_PUBLIC_ during SSR — note, not verified as a defect | PR 31 @ 4660acf3e | 2026-10-15 |
+| 6 | merge | PM | MERGED — 7/7 required checks pass on PR 31; squash 50b124854; dev worktree removed | https://github.com/aamirtauqir/buildrik/pull/31 | 2026-10-15 |
 
 ## Founder decisions
 
