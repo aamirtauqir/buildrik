@@ -258,13 +258,15 @@ export async function listSubmissions(input: ListSubmissionsInput, opts: { techn
   return { data: opts.technical ? data : data.map(withoutTechnical), total, page, perPage };
 }
 
+/* D7: these answer an EDITOR too — the row goes back without the visitor's
+   IP and device. Only the ADMIN list carries them. */
 export async function updateSubmission(input: UpdateInput) {
   const { id, ...data } = input;
-  return prisma.formSubmission.update({ where: { id }, data });
+  return withoutTechnical(await prisma.formSubmission.update({ where: { id }, data }));
 }
 
 export async function deleteSubmission(id: string) {
-  return prisma.formSubmission.delete({ where: { id } });
+  return withoutTechnical(await prisma.formSubmission.delete({ where: { id } }));
 }
 
 export async function listFormBlocks(siteId: string) {

@@ -427,6 +427,20 @@ describe("Form Submission Service", () => {
     });
   });
 
+  /* D7: update/delete answer an EDITOR too — the visitor's IP and device
+     never ride back on them. */
+  describe("update/delete never return IP or device", () => {
+    it("strips both from the updated and the deleted row", async () => {
+      const { updateSubmission, deleteSubmission } = await import("@/server/services/form-submission.service");
+      const row = { id: "sub1", isRead: true, ip: "203.0.113.9", deviceInfo: "UA" };
+      vi.mocked(prisma.formSubmission.update).mockResolvedValue(row as any);
+      vi.mocked(prisma.formSubmission.delete).mockResolvedValue(row as any);
+      for (const r of [await updateSubmission({ id: "sub1", isRead: true }), await deleteSubmission("sub1")]) {
+        expect(r).toEqual({ id: "sub1", isRead: true });
+      }
+    });
+  });
+
   describe("listFormBlocks", () => {
     it("returns form blocks for site", async () => {
       const { listFormBlocks } = await import("@/server/services/form-submission.service");

@@ -440,7 +440,10 @@ export async function loadSiteForEditor(siteId: string, viewerId: string) {
         loadRepair: isLoadRepairEnabled(),
       };
     },
-    { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead },
+    /* Prisma's interactive defaults (2s to start, 5s to run) fail a large
+       site or a busy pool with P2028 — and the editor cannot open at all.
+       Reads only: a longer ceiling holds no row locks. */
+    { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead, maxWait: 10_000, timeout: 30_000 },
   );
 }
 

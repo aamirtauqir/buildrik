@@ -527,7 +527,6 @@ export async function listReviews(
   };
 }
 
-/** Approve / request-changes on a review. Workspace-scoped; only a PENDING one. */
 /** The site a review belongs to, within the workspace — what its resolve
  *  is authorized against (BK-08). Null when there is no such review. */
 export async function getReviewSiteId(workspaceId: string, id: string): Promise<string | null> {
@@ -535,6 +534,7 @@ export async function getReviewSiteId(workspaceId: string, id: string): Promise<
   return review?.siteId ?? null;
 }
 
+/** Approve / request-changes on a review. Workspace-scoped; only a PENDING one. */
 export async function resolveReview(
   workspaceId: string,
   id: string,
