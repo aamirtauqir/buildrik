@@ -17,7 +17,7 @@ import type { SectionProgress } from "./manager/HTMLParser";
 import { HTMLParser } from "./manager/HTMLParser";
 import { PageManager } from "./manager/PageManager";
 import type { ElementManagerContext } from "./manager/types";
-import type { IdRename } from "@buildrik/shared/content/elementIds";
+import { copyIdKeyedStyles, type IdRename } from "@buildrik/shared/content/elementIds";
 
 /**
  * Manages the element tree and operations
@@ -49,7 +49,8 @@ export class ElementManager {
       },
       buildElementTree: (data: ElementData, parent?: Element) =>
         this.buildElementTree(data, parent),
-      cloneElementData: (data: ElementData) => this.cloneElementData(data),
+      cloneElementData: (data: ElementData, renames?: IdRename[]) => this.cloneElementData(data, renames),
+      copyStyleRules: (renames: IdRename[]) => this.copyStyleRules(renames),
       getAllDescendants: (element: Element) => this.getAllDescendants(element),
     };
 
@@ -370,13 +371,30 @@ export class ElementManager {
    * element's own `attributes` object, so a spread clone shared it — setting
    * the duplicate's href (or src, alt…) rewrote the original's too.
    */
-  private cloneElementData(data: ElementData): ElementData {
+  private cloneElementData(data: ElementData, renames?: IdRename[]): ElementData {
     const { children, ...own } = data;
+    const id = generateId("el");
+    renames?.push({ from: data.id, to: id });
     return {
       ...structuredClone(own),
-      id: generateId("el"),
-      children: children?.map((c) => this.cloneElementData(c)),
+      id,
+      children: children?.map((c) => this.cloneElementData(c, renames)),
     };
+  }
+
+  /**
+   * An element's breakpoint and `:state` styles live in StyleEngine rules
+   * keyed to its id (`[data-buildrick-id="<id>"]` + media/pseudo), not on the
+   * element. A copy with a fresh id therefore came out with its base styles
+   * only — every Tablet/Mobile value and every :hover lost, and a reload did
+   * not bring them back (BK-06). The rules are copied onto the new ids; the
+   * originals stay with the source.
+   */
+  private copyStyleRules(renames: IdRename[]): void {
+    const styles = this.composer.styles;
+    if (!styles || renames.length === 0) return;
+    const copies = copyIdKeyedStyles(styles.exportStyles(), renames);
+    if (copies.length > 0) styles.importStyles(copies);
   }
 
   /**

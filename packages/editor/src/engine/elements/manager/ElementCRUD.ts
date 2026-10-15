@@ -15,6 +15,7 @@ import { Element } from "../Element";
 import type { ElementManagerContext } from "./types";
 import { resolvePlacement } from "./placement";
 import { LAYER_NAME_KEY, nextCopyName } from "@/shared/constants/elementTypeLabels";
+import type { IdRename } from "@buildrik/shared/content/elementIds";
 
 /**
  * Manages element CRUD operations
@@ -229,11 +230,13 @@ export class ElementCRUD {
     if (!original) return null;
 
     // Use toJSON() to get current children, not getData() which has stale data
-    const clonedData = this.ctx.cloneElementData(original.toJSON());
+    const renames: IdRename[] = [];
+    const clonedData = this.ctx.cloneElementData(original.toJSON(), renames);
 
     // Build the entire element tree (including children) from cloned data
     // Don't pass parent here - we'll add to parent manually at correct position
     const clone = this.ctx.buildElementTree(clonedData);
+    this.ctx.copyStyleRules(renames);
 
     // Add after original in parent
     const parent = original.getParent();
@@ -259,8 +262,10 @@ export class ElementCRUD {
   serializeElement(id: string): ElementData | null {
     const element = this.ctx.elements.get(id);
     if (!element) return null;
-    // Use toJSON() to get current children, not getData() which has stale data
-    return this.ctx.cloneElementData(element.toJSON());
+    /* A deep copy that KEEPS the source ids: paste re-ids it, and the source
+       ids are how paste finds the breakpoint/:state rules to copy (BK-06).
+       Rules outlive a cut element, so cut + paste keeps them too. */
+    return structuredClone(element.toJSON());
   }
 
   /**
@@ -274,11 +279,13 @@ export class ElementCRUD {
     if (!data) return null;
 
     // Clone with new IDs
-    const clonedData = keepIds ? data : this.ctx.cloneElementData(data);
+    const renames: IdRename[] = [];
+    const clonedData = keepIds ? data : this.ctx.cloneElementData(data, renames);
 
     // Build the entire element tree from cloned data
     // This creates and registers all elements including children
     const newElement = this.ctx.buildElementTree(clonedData);
+    this.ctx.copyStyleRules(renames);
 
     // Add to target at index — or after it when it may not hold this element
     const place = resolvePlacement(newElement, target, index) ?? { parent: target, index };
