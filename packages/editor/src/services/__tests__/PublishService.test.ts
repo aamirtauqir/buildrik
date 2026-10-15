@@ -143,6 +143,9 @@ describe("fetchPublishStatus", () => {
       publishedUrl: null,
       error: null,
       deploymentId: "dep-1",
+      formsStatus: null,
+      formsError: null,
+      failedPhase: null,
     });
   });
 
