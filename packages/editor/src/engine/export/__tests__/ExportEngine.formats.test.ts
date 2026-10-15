@@ -346,6 +346,21 @@ describe("ExportEngine.generateHTML — config knobs", () => {
 
   // Text content stays escaped. This is the safe default and the reason the
   // escape exists: a user who types markup must not get markup on their site.
+  /* BK-42: a `blob:` URL is this tab's Object URL — published, it is a broken
+     image for every visitor. */
+  it("never writes a session-only blob: URL", () => {
+    const root: LiveNode = {
+      id: "root",
+      children: [
+        { id: "i1", type: "image", tagName: "img", attributes: { src: "blob:https://app/1234", alt: "a" } },
+        { id: "i2", type: "image", tagName: "img", attributes: { src: "https://cdn/x.png", srcset: "blob:https://app/9 2x" } },
+      ],
+    };
+    const html = new ExportEngine(makeComposer({ root })).generateHTML();
+    expect(html).not.toContain("blob:");
+    expect(html).toContain('src="https://cdn/x.png"');
+  });
+
   it("escapes plain-text content verbatim", () => {
     const root: LiveNode = {
       id: "root",

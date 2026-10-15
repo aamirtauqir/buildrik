@@ -145,6 +145,9 @@ function readPageNode(el: PageData["root"]): LinkNodeView<PageData["root"]> {
   };
 }
 
+/** A URL that exists only in the browser session that created it. */
+const isSessionUrl = (value: string): boolean => /(^|[\s,])blob:/i.test(value);
+
 export class ExportEngine {
   private composer: Composer;
   private config: ExportConfig;
@@ -398,6 +401,9 @@ export class ExportEngine {
       const out = key === "href" ? this.resolveHref(value) : value;
       const isLinkAttr = blockLink?.isLinkAttr(key) ?? false;
       if (!isSafeAttrValue(key, out, isLinkAttr ? "a" : tag)) continue;
+      /* BK-42: a `blob:` URL lives only in the tab that made it — on a
+         published page it is a broken image for every visitor. */
+      if (isSessionUrl(out)) continue;
       if (isLinkAttr) {
         if (blockLink?.wrap) linkParts.push(`${key}="${escapeHTML(out)}"`);
         continue;
@@ -1130,6 +1136,9 @@ ${bodyContent}${interactionScript}${themeToggleScript}${sanitizeHeadCode(siteCus
         const out = key === "href" ? this.resolveHref(value) : value;
         const isLinkAttr = blockLink?.isLinkAttr(key) ?? false;
         if (!isSafeAttrValue(key, out, isLinkAttr ? "a" : tag)) continue;
+        /* BK-42: a `blob:` URL lives only in the tab that made it — on a
+           published page it is a broken image for every visitor. */
+        if (isSessionUrl(out)) continue;
         if (isLinkAttr) {
           if (blockLink?.wrap) linkParts.push(`${key}="${escapeHTML(out)}"`);
           continue;

@@ -66,6 +66,7 @@ function makeFile(content: string, name: string, type: string, sizeOverride?: nu
 function makeRemoteSync(overrides: Partial<RemoteAssetSync> = {}): RemoteAssetSync {
   return {
     uploadAndCreate: vi.fn(async () => ({ serverId: "srv-1", url: "https://cdn/x.png" })),
+    registerUploaded: vi.fn(async (url: string) => ({ serverId: "srv-reg", url })),
     deleteRemote: vi.fn(async () => true),
     createFolder: vi.fn(async () => ({ serverId: "srv-f1" })),
     deleteFolder: vi.fn(async () => true),
@@ -412,6 +413,36 @@ describe("uploadFile — server mirror (Phase B2)", () => {
     const asset = (manager as any).state.assets[0] as MediaAsset;
     expect(asset.localOnly).toBe(true);
     expect((manager as any).retryQueue.has(asset.id)).toBe(true);
+  });
+
+  /* BK-42: with the row create refused once, the file was uploaded three
+     times (three Blob copies, duplicate rows) and the placed image kept a
+     `blob:` src that was gone after a reload. */
+  it("a refused row keeps the uploaded URL, re-points placements, and the retry only registers it", async () => {
+    const remote = makeRemoteSync({
+      uploadAndCreate: vi.fn(async () => ({ serverId: null, url: "https://cdn/kept.png" })),
+    });
+    const manager = new MediaManager(remote);
+    mockStorage(manager);
+    const remaps: unknown[] = [];
+    manager.on(MEDIA_EVENTS.LOCAL_URLS_REBUILT, (p: unknown) => remaps.push(p));
+
+    await manager.uploadFile(makeFile("img", "a.png", "image/png"), { autoOptimize: false, generateThumbnail: false });
+
+    const asset = (manager as any).state.assets[0] as MediaAsset;
+    expect(asset).toMatchObject({ src: "https://cdn/kept.png", uploadedUrl: "https://cdn/kept.png", localOnly: true });
+    expect((manager as any).retryQueue.has(asset.id)).toBe(true);
+    const [[from, to]] = Object.entries((remaps.at(-1) as { remapped: Record<string, string> }).remapped);
+    expect(from.startsWith("blob:")).toBe(true);
+    expect(to).toBe("https://cdn/kept.png");
+
+    await manager.retryLocalOnlyAssets();
+    expect(remote.uploadAndCreate).toHaveBeenCalledTimes(1);
+    expect(remote.registerUploaded).toHaveBeenCalledWith("https://cdn/kept.png", expect.objectContaining({ filename: "a.png" }));
+    const registered = (manager as any).state.assets[0] as MediaAsset;
+    expect(registered).toMatchObject({ id: "srv-reg", serverId: "srv-reg", src: "https://cdn/kept.png", localOnly: false });
+    expect(registered.uploadedUrl).toBeUndefined();
+    expect((manager as any).retryQueue.size).toBe(0);
   });
 
   it("keeps audio local without queuing a retry (no server schema for audio)", async () => {
