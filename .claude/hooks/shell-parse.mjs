@@ -182,15 +182,31 @@ export function parseScript(src, depth = 0) {
     // code that a shell will execute
     if (SHELLS.has(prog)) {
       // -c may sit in a cluster (`-ec`, `-xc`); the code is the next word.
-      const ci = words.findIndex((w, k) => k > 0 && /^-[a-zA-Z]*c[a-zA-Z]*$/.test(w));
-      const code = ci !== -1 ? words[ci + 1] : null;
-      if (ci !== -1 && code == null) return null;
+      // Walk the shell's own options: short clusters (-ec, +x), the ones that
+      // take an argument (-o/-O/+o/+O, --rcfile, --init-file), `--`. Any other
+      // long option is unknown grammar → unparseable. The first operand is the
+      // -c code if a cluster contained `c`, otherwise a script path.
+      let hasC = false, k = 1;
+      for (; k < words.length; k++) {
+        const w = words[k];
+        if (w === "--") { k++; break; }
+        if (/^[-+][oO]$/.test(w)) { k++; continue; }
+        if (w === "--rcfile" || w === "--init-file") { k++; continue; }
+        if (/^--/.test(w)) { if (/^--(norc|noprofile|posix|login|noediting|restricted|verbose)$/.test(w)) continue; return null; }
+        if (/^[-+][a-zA-Z]+$/.test(w)) { if (w[0] === "-" && w.includes("c")) hasC = true; if (w[0] === "-" && w.includes("s")) return null; continue; }
+        break;
+      }
+      const operand = words[k];
+      const code = hasC ? operand : null;
+      if (hasC && code == null) return null;
       const hereStrings = c.redirects.filter((r) => r.op === "<<<").map((r) => r.target);
-      const scriptArg = words.slice(1).find((w) => !w.startsWith("-"));
-      const prevHeredoc = pending[pending.indexOf(c) - 1]?.heredocBodies?.length;
-      // A shell reading code from stdin that is not a literal we can see: fail closed.
-      if (ci === -1 && !scriptArg && !c.heredocBodies.length && !hereStrings.length &&
-          (c.prevOp === "|" || words.includes("-s") || c.redirects.some((r) => r.op === "<")) && !prevHeredoc) return null;
+      // stdin and fd paths are opaque code
+      if (!hasC && operand && /^(-|\/dev\/(stdin|fd\/\d+)|\/proc\/self\/fd\/\d+)$/.test(operand)) return null;
+      const prevHeredoc = pending[pending.indexOf(c) - 1]?.heredocBodies?.length; // parsed below
+      // No -c, no script path, no own heredoc / here-string: code comes from
+      // stdin we cannot see (a pipe, a `<` redirect, an inherited stdin) — fail
+      // closed, unless the previous command is a heredoc we parse below.
+      if (!hasC && !operand && !c.heredocBodies.length && !hereStrings.length && !(c.prevOp === "|" && prevHeredoc)) return null;
       for (const s of [code, ...hereStrings, ...c.heredocBodies.map((h) => h.body)].filter((x) => x != null)) {
         const sub = parseScript(s, depth + 1); if (!sub) return null; commands.push(...sub.commands);
       }
