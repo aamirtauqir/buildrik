@@ -30,16 +30,19 @@ describe("wireForms", () => {
     ["method=GET", "method=GET enctype='text/plain'"],
   ])("sends urlencoded POST whatever Method/Encoding the inspector set (%s)", (_label, attrs) => {
     const { html } = wireForms(`<form data-buildrick-id="f1" ${attrs}><input name="email"></form>`, opts);
-    const open = /<form\b[^>]*>/i.exec(html)![0];
-    expect(open.match(/\bmethod=/gi)).toHaveLength(1);
-    expect(open).toContain('method="POST"');
-    expect(open).not.toMatch(/enctype=/i);
+    // The browser keeps the first of a repeated attribute; wiring's come first.
+    const form = new DOMParser().parseFromString(html, "text/html").querySelector("form")!;
+    expect(form.getAttribute("method")).toBe("POST");
+    expect(form.getAttribute("enctype")).toBe("application/x-www-form-urlencoded");
+    expect(form.method).toBe("post");
+    expect(form.enctype).toBe("application/x-www-form-urlencoded");
   });
 
   /* Security review of the BK-44 change: removing method/enctype by a search
      across the tag also cut text inside another attribute's value, shifting
-     its quotes so the rest parsed as a new (event handler) attribute. */
-  it("drops method/enctype only as attributes, never text inside another value", () => {
+     its quotes so the rest parsed as a new (event handler) attribute. Wiring
+     now removes nothing: every value on the tag survives verbatim. */
+  it("leaves every other attribute value as written — no text inside a value is ever cut", () => {
     const open =
       '<form data-buildrick-id="f1" title="x method=y" data-q=" onmouseover=alert(1) " ' +
       "aria-label='a enctype=b' method=\"get\">";
