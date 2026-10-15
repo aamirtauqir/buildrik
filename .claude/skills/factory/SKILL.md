@@ -40,10 +40,27 @@ Dispatch `factory-developer` with the ID (it runs in its own worktree). Several 
 may build in parallel only if their specs touch disjoint files; otherwise serialise.
 `BLOCKED` → read why; fix the input (spec, decision) or ask the founder.
 
+**Developer BLOCKED only by the pre-push spec-age gate** (the hook prints
+`spec-age=1` and every other gate `=0`): agents may not `--no-verify`, and a headless
+session cannot answer the guard's ask. If the founder's standing spec-age-only
+approval is recorded, re-run the hook yourself in the developer's worktree
+(`bash packages/editor/scripts/hooks/pre-push origin x </dev/null`), confirm the
+summary line, then push the branch and open the PR as PM. Record it as its own
+stage-log row. Without that approval, ask the founder.
+
 ## 5. Verify and review
 
-1. `factory-qa` with ID, PR number and branch. FAIL → back to the developer with the
-   failed checks verbatim.
+0. **Prepare QA's checkout** (QA is read-only and cannot create env links):
+   `git worktree add --detach ../qa-<ID> origin/factory/<ID>` (the branch itself
+   is checked out in the developer's worktree), then in it
+   `ln -s "$PWD/.env.local" ../qa-<ID>/.env.local` and
+   `ln -s "$PWD/packages/dashboard/.env" ../qa-<ID>/packages/dashboard/.env`
+   (run from the main checkout), and `pnpm install --frozen-lockfile` there when
+   the spec has running-app checks. Pass the path to QA. Running-app QA uses
+   :3000 (other ports fail the tRPC origin allowlist), so serialise those tasks.
+   Remove the worktree after QA: `git worktree remove ../qa-<ID>`.
+1. `factory-qa` with ID, PR number, branch and the prepared worktree path. FAIL →
+   back to the developer with the failed checks verbatim.
 2. After QA PASS: `factory-code-reviewer` with the PR number. If `GUARDED` is not
    `none`, also `factory-security` (in parallel with the reviewer).
 3. Any CHANGES_REQUESTED / FAIL → developer fixes on the same branch → QA re-verifies

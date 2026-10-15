@@ -101,8 +101,19 @@ if (isFactory && tool === "Bash") {
   const SCRIPTERS = new Set(["node", "python", "python3", "ruby", "perl", "deno", "bun", "php"]);
   const FS_WRITE = /\b(writeFile|appendFile|createWriteStream|copyFile|rename|unlink|rmSync|rm\s*\(|mkdirSync|truncate|symlink)\w*\s*\(|open\([^)]*['"][wa+]|\.write_text|\.write_bytes|shutil\./;
 
+  const KNOWN_GIT = new Set(("add am apply archive bisect blame branch bundle cat-file check-ignore cherry cherry-pick clean clone commit config count-objects " +
+    "describe diff difftool fetch for-each-ref format-patch fsck gc grep hash-object help init log ls-files ls-remote ls-tree merge merge-base mergetool mv " +
+    "name-rev notes pull push range-diff rebase reflog remote reset restore revert rev-list rev-parse rm shortlog show show-branch show-ref sparse-checkout " +
+    "stash status submodule switch tag update-index var version whatchanged worktree").split(" "));
+  // Raw backstop, scoped so it cannot false-positive on a grep: a command that
+  // RUNS git and also names a GIT_* variable anywhere is denied.
+  const runsGit = parsed.commands.some((c) => programOf(c) === "git");
+  if (runsGit && /GIT_[A-Z_]+/i.test(String(ti.command ?? "").replace(/[\\'"]/g, ""))) decide("deny", `${ROLE} cannot run git in a command that names GIT_* variables`);
+
   for (const sc of parsed.commands) {
     const prog = programOf(sc);
+    if (prog === "source" || prog === ".") decide("deny", `${ROLE} cannot source scripts — run the command directly`);
+    if ((prog === "git" || prog === "gh") && sc.openArgs) decide("deny", `${ROLE} cannot run ${prog} with arguments appended by xargs / find +`);
     const args = sc.words.slice(1);
 
     // Git config via the environment, or variables named for it.
@@ -112,6 +123,13 @@ if (isFactory && tool === "Bash") {
       decide("deny", `${ROLE} cannot set GIT_* variables`);
     }
 
+    if (SCRIPTERS.has(prog)) {
+      const ci = args.findIndex((a) => /^-(e|c|p|-eval|-print)$/.test(a));
+      const code = ci !== -1 ? args.slice(ci + 1).join(" ") : "";
+      if (/child_process|subprocess|execSync|spawnSync|\bspawn\(|\bexec\(|os\.system|Bun\.spawn|Deno\.Command|\bsystem\(/.test(code) && /\bgit\b|\bgh\b/.test(code)) {
+        decide("deny", `${ROLE} cannot run git/gh from inside a ${prog} one-liner`);
+      }
+    }
     if (prog === "gh" && args[0] === "pr" && args[1] === "merge") decide("deny", `${ROLE} cannot merge — the PM merges after every gate passes`);
 
     if (prog === "git") {
@@ -124,6 +142,9 @@ if (isFactory && tool === "Bash") {
       }
       const sub = args[k];
       const rest = args.slice(k + 1);
+      if (sub !== undefined && !KNOWN_GIT.has(sub)) decide("deny", `${ROLE}: git subcommand "${sub}" is not a known literal (variables and aliases are not allowed)`);
+      if (sub === "push" && rest.some((a) => a.includes("$"))) decide("deny", `${ROLE}: git push arguments must be literal`);
+      if (sub === "config" && rest.some((a) => /^(alias|include|includeIf|core\.hooksPath|core\.sshCommand)\b/i.test(a))) decide("deny", `${ROLE} cannot set git aliases, includes or hook paths`);
       if (sub === "push") {
         // Allowlist: exactly [-u|--set-upstream] origin factory/T-NNN[:factory/T-NNN]
         const r = rest.filter((a) => a !== "-u" && a !== "--set-upstream");

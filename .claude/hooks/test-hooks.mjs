@@ -82,6 +82,10 @@ for (const [label, command] of [
   ["git -c", "git -c remote.origin.push=x push origin factory/T-001"], ["wrapper to main", "nice git push origin main"],
   ["sh -c to main", "sh -c 'git push origin main'"], ["xargs appends args", "echo main | xargs git push origin factory/T-001"],
   ["find -exec push", "find . -maxdepth 0 -exec git push origin main \;"], ["subst push", "echo $(git push origin main)"], ["eval push", "eval git push origin HEAD:main"],
+  ["var subcommand", "S=push; git $S origin main"], ["alias config", "git config alias.p push"], ["alias use", "git p origin main"],
+  ["push var ref", "B=main; git push origin factory/T-001:$B"], ["node child_process", "node -e 'require(\"child_process\").execSync(\"git push origin main\")'"],
+  ["python subprocess", "python3 -c 'import subprocess; subprocess.run([\"git\",\"push\",\"origin\",\"main\"])'"], ["source", "source ./x.sh"],
+  ["GIT_ via raw", "X=GIT_DIR; git status"], ["xargs gh", "echo 31 | xargs gh pr merge"],
   ["heredoc to bash", "bash <<'EOF'\ngit push origin main\nEOF"], ["unbalanced quote", "git push origin 'factory/T-001"],
   ["declare", "declare -x GIT_CONFIG_COUNT=1; git push origin factory/T-001"], ["printf -v", "printf -v GIT_DIR x; git push origin factory/T-001"],
   ["quoted name", "export 'GIT''_CONFIG_PARAMETERS'=x; git push origin factory/T-001"], ["backslash", "G\\IT_DIR=x git push origin factory/T-001"],
@@ -97,7 +101,7 @@ for (const [role, command] of [
   ["factory-qa", "grep -n 'touch' x.ts"], ["factory-qa", "awk -F, '$3 > 5' data.csv"], ["factory-qa", "node -e 'console.log(1 > 0)'"],
   ["factory-qa", "git log --format='%h > %s' -5"], ["factory-qa", "gh pr diff 31 | grep -n 'cp '"], ["factory-code-reviewer", 'git log -p -S"git push" -- scripts/'],
   ["factory-security", "grep -rn 'GIT_DIR' scripts/"], ["factory-developer", 'git commit -m "feat(notifications): push toasts to the panel"'],
-  ["factory-developer", 'git commit -m "docs: explain the git push hook"'], ["factory-analyst", "grep -rn 'install' package.json"], ["factory-qa", "find . -name '*.test.ts' -newer x"],
+  ["factory-developer", 'git commit -m "docs: explain the git push hook"'], ["factory-analyst", "grep -rn 'install' package.json"], ["factory-qa", "find . -name '*.test.ts' -newer x"], ["factory-qa", "git worktree list"], ["factory-qa", "git rev-parse --short HEAD"], ["factory-qa", "git -C ../qa-T-001 log -1"],
 ]) expect(`no false positive: ${role} ${command}`, guard(role, "Bash", { command }), "allow");
 expect("qa find -delete", guard("factory-qa", "Bash", { command: "find . -name x -delete" }), "deny");
 expect("qa find -exec rm", guard("factory-qa", "Bash", { command: "find . -name x -exec rm {} +" }), "deny");

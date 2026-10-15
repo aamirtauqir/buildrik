@@ -17,6 +17,13 @@ test -f .env.local && test -f packages/dashboard/.env || echo "env missing — s
 pnpm exec prisma migrate status       # pending migrations = 500s on new columns
 ```
 
+**In a git worktree** (factory developer / QA): `.env.local` and
+`packages/dashboard/.env` are gitignored, so a fresh worktree has neither and the
+dashboard fails to boot. Link them from the main checkout rather than copying
+secrets: `ln -s <main-checkout>/.env.local .env.local` and the same for
+`packages/dashboard/.env`; then `pnpm install --frozen-lockfile`. Only one dev
+server can own :3000 at a time.
+
 Apply pending migrations with `pnpm exec prisma migrate deploy` (never
 `db:push`). If the QA user is missing, run `pnpm db:seed`.
 

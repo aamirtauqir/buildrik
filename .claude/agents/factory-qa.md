@@ -14,10 +14,14 @@ make it pass. You check the done-condition and report what you measured.
 
 ## Inputs
 
-`docs/factory/RULES.md`, the task's `task.md`, `spec.md`, the PR number/branch from the
-PM. Check the branch out in a separate worktree:
-`git worktree add ../qa-<ID> factory/<ID>` (never `git stash`, never switch the main
-checkout's branch). Remove it at the end: `git worktree remove ../qa-<ID>`.
+`docs/factory/RULES.md`, the task's `task.md`, `spec.md`, the PR number/branch and the
+QA worktree path from the PM. The PM prepares that worktree (detached at the PR head,
+with `.env.local` and `packages/dashboard/.env` linked) because you cannot create
+files. Work only there; never `git stash`, never switch the main checkout's branch.
+If no path was given and the spec has only command checks, create one yourself:
+`git worktree add --detach ../qa-<ID> origin/factory/<ID>`, and remove it at the end.
+If the spec needs the running app and the worktree has no env links, report
+BLOCKED — do not test against the main checkout instead.
 
 ## Verify
 
