@@ -14,14 +14,21 @@
 import { readFileSync } from "node:fs";
 import { relative, isAbsolute } from "node:path";
 
+// `git` plus any global options (`git -C dir`, `git -c k=v`, `git --no-pager`)
+// before the subcommand — otherwise `git -C . stash` walks past every rule.
+const GIT = String.raw`\bgit(?:\s+-[Cc]\s+\S+|\s+--[\w-]+(?:=\S+)?)*\s+`;
+const git = (rest) => new RegExp(GIT + rest);
+
 const DENY_COMMANDS = [
-  [/\bgit\s+push\b[^\n]*(\s--force(?!-with-lease)\b|\s-f\b)/, "force-push rewrites shared history"],
-  [/\bgit\s+stash\b/, "CLAUDE.md bans git stash mid-execution (5 recovery incidents) — use git worktree add"],
+  // --force, -f, a `+ref` refspec, --mirror, and deleting a remote ref
+  // (`--delete`, `:ref`) all rewrite or remove shared history.
+  [git(String.raw`push\b[^\n]*(\s--force(?!-with-lease)\b|\s-f\b|\s\+\S|\s--mirror\b|\s--delete\b|\s-d\b|\s:\S)`), "force-push / remote ref deletion rewrites shared history"],
+  [git(String.raw`stash\b`), "CLAUDE.md bans git stash mid-execution (5 recovery incidents) — use git worktree add"],
   [/\b(db:push|prisma\s+db\s+push)\b/, "prisma db push bypasses migrations and can drop columns — write a migration"],
   [/\bprisma\s+migrate\s+reset\b/, "migrate reset drops the database"],
   [/\benv:set:prod\b|set-prod-env\.mjs/, "rewrites the entire production env map over SSH — founder step"],
   [/\bcloudlinux-selector\s+set\b/, "replaces the entire production env map — founder step"],
-  [/\bgit\s+add\b[^\n]*(\.env(?!\.example)(\.[\w.-]+)?(\s|$)|auth\.json|\.pem\b|\.p12\b)/, "staging a secrets file in a public repo"],
+  [git(String.raw`add\b[^\n]*(\.env(?!\.example)(\.[\w.-]+)?(['"\s]|$)|auth\.json|\.pem\b|\.p12\b)`), "staging a secrets file in a public repo"],
 ];
 
 const ASK_COMMANDS = [
@@ -30,7 +37,7 @@ const ASK_COMMANDS = [
   [/\bprisma\s+migrate\s+(deploy|dev)\b/, "applies migrations to the database DATABASE_URL points at"],
   [/\bsmoke:prod\b|smoke-deployed\.mjs/, "hits the live production deployment"],
   [/\bUPDATE_PARITY=true\b|--update-snapshots\b|\s-u\b.*vitest|vitest.*\s-u\b/, "rewrites test baselines — every change needs a named intended cause"],
-  [/\bgit\s+add\s+(-A|--all|\.)(\s|$)/, "bulk staging — the working tree holds untracked audit dumps and local files"],
+  [git(String.raw`add\s+(-A|--all|\.)(\s|$)`), "bulk staging — the working tree holds untracked audit dumps and local files"],
 ];
 
 const ASK_PATHS = [
@@ -60,11 +67,15 @@ const tool = input.tool_name ?? "";
 const ti = input.tool_input ?? {};
 
 if (tool === "Bash") {
-  // Match what runs, not what is written: a commit message or heredoc that
-  // MENTIONS `git stash` is not a stash. Heredoc bodies and quoted strings go.
+  // Match what runs, not what is written: a commit message that MENTIONS
+  // `git stash` is not a stash. Only message text is dropped — the quoted
+  // value of -m/--message/--title/--body, and a heredoc whose opener line is a
+  // git commit/tag or gh pr/issue/release that is not piped into a shell.
+  // Everything else is matched raw, so `bash -c "git stash"` and
+  // `bash <<EOF ... EOF` are still read.
   const cmd = String(ti.command ?? "")
-    .replace(/<<-?\s*(['"]?)(\w+)\1[^\n]*\n[\s\S]*?\n\s*\2\s*(\n|$)/g, "\n")
-    .replace(/'[^']*'|"(?:[^"\\]|\\.)*"/g, "''");
+    .replace(/^([^\n]*\b(?:git\s+(?:commit|tag)|gh\s+(?:pr|issue|release))\b(?![^\n]*\|\s*(?:ba|z)?sh\b)[^\n]*)<<-?\s*(['"]?)(\w+)\2[^\n]*\n[\s\S]*?\n\s*\3\s*(?=\n|$)/gm, "$1")
+    .replace(/(\s(?:-m|--message|--title|--body)[\s=])\s*('[^']*'|"(?:[^"\\]|\\.)*")/g, "$1''");
   for (const [re, why] of DENY_COMMANDS) if (re.test(cmd)) decide("deny", why);
   for (const [re, why] of ASK_COMMANDS) if (re.test(cmd)) decide("ask", why);
   process.exit(0);
