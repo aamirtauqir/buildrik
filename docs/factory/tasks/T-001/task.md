@@ -2,8 +2,8 @@
 
 <!-- Ledger. Only the PM (main session) edits this file. -->
 
-- **Status:** build
-- **Stage owner:** factory-developer
+- **Status:** blocked
+- **Stage owner:** founder (push of factory/T-001)
 - **Created:** 2026-10-15
 - **Founder issue (verbatim):** "(factory pilot, from the 2026-10-15 readiness audit) packages/editor/CLAUDE.md §ENV says prod values live in 'Vercel project settings'; prod is cPanel."
 - **Guarded areas touched:** none
@@ -36,4 +36,5 @@ Agents reading packages/editor/CLAUDE.md are told the true place production env 
 
 ## Open questions
 
+- 2026-10-15 PM re-ran the normal push of factory/T-001 from the dev worktree: pre-push hook failed again ONLY on spec-age (inspector-v4-* specs 17d old, limit 14d). PM then tried the hook-bypass push under the recorded spec-age-only founder approval; the repo guard's ask tier refused it (`[guard] bypasses the pre-push / pre-commit gates — say why`) and this non-interactive session cannot answer an ask. Founder to choose: push commit 4660acf3e yourself from `.claude/worktrees/agent-ab748a6868414a496` with the hook bypass, approve the bypass in an interactive session, or re-extract the Figma specs. QA and code review wait on the PR.
 - Follow-ups proposed by analyst, not in scope: editor CLAUDE.md:513 `VITE_`-only prefix claim; :521 "once Vercel pipeline live".
