@@ -73,6 +73,7 @@ import { Viewport } from "./Viewport";
 import { getDefaultPageName } from "../shared/utils/pageUtils";
 import { elementBaseCSS } from "./styles/cascadeCSS";
 import { elementSelector } from "@/shared/utils/elementSelector";
+import { CONNECT_TOKENS_LABEL } from "./designSystem/facade";
 
 /**
  * From-address for form-submission notifications on published sites. Must stay on
@@ -344,7 +345,7 @@ export class Composer extends EventEmitter {
           for (const r of s.refs) writes.push({ ...r, value: `var(${token.cssVar})` });
         }
         if (writes.length === 0) return 0;
-        this.beginTransaction("Connect to tokens");
+        this.beginTransaction(CONNECT_TOKENS_LABEL);
         try {
           for (const w of writes) {
             if (w.breakpoint) this.styles.setBreakpointStyle(w.elementId, w.breakpoint, { [w.prop]: w.value });

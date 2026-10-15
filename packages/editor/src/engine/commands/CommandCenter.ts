@@ -81,6 +81,16 @@ function isTextEntry(el: HTMLElement | null): boolean {
     : false;
 }
 
+/**
+ * Whether a full-page surface (Templates, Asset library, Settings, Brand)
+ * owns the keyboard. The canvas stays mounted behind it, but no canvas
+ * shortcut may act on a document the user is not looking at. DOM query, not
+ * an import — engine/ must not depend on editor/.
+ */
+export function isFullPageSurfaceOpen(): boolean {
+  return typeof document !== "undefined" && document.querySelector('[data-bk-surface="fullpage"]') !== null;
+}
+
 export class CommandCenter {
   private composer: Composer;
   private commands: Map<string, CommandData> = new Map();
@@ -217,11 +227,7 @@ export class CommandCenter {
     // keyboard while mounted — the canvas stays mounted behind it but is not
     // what the user is looking at. DOM query, not an import — engine/ must
     // not depend on editor/, same contract as the modal carve-out below.
-    if (
-      !UNIVERSAL_COMMANDS.has(commandId) &&
-      typeof document !== "undefined" &&
-      document.querySelector('[data-bk-surface="fullpage"]')
-    ) {
+    if (!UNIVERSAL_COMMANDS.has(commandId) && isFullPageSurfaceOpen()) {
       return false;
     }
 

@@ -294,6 +294,17 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
       composer.off(EVENTS.BRAND_PREVIEW_CHANGED, sync);
     };
   }, [composer]);
+  /* D36: ⌘Z here undoes Brand edits only. When the next undo is a canvas
+     change, say so instead of reverting something out of sight. */
+  React.useEffect(() => {
+    if (!composer || typeof composer.on !== "function") return;
+    const outOfScope = () =>
+      addToast({ description: "Nothing to undo in Brand. Canvas edits undo on the canvas.", tone: "info" });
+    composer.on(EVENTS.HISTORY_UNDO_OUT_OF_SCOPE, outOfScope);
+    return () => {
+      composer.off(EVENTS.HISTORY_UNDO_OUT_OF_SCOPE, outOfScope);
+    };
+  }, [composer, addToast]);
   const shownMode: "light" | "dark" = canvasPreview?.theme ?? "light";
   /* L4-021: the Light / Dark switch is PREVIEW-ONLY — a dark preview of the
      saved brand through the preview layer: never saved, never in ⌘Z, gone
@@ -1133,7 +1144,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
             <section aria-label="About restore points" className={SIDE_CARD} data-testid="brand-restore-guide">
               <p className={SIDE_CARD_TITLE}>Changes apply instantly</p>
               <p className={SIDE_CARD_BODY}>
-                Every edit updates your canvas. Use ⌘Z to undo, including changes made on the canvas.
+                Every edit updates your canvas. Use ⌘Z to undo your Brand changes; canvas edits undo on the canvas.
               </p>
               <p className={`${SIDE_CARD_BODY} tw:font-semibold tw:text-[var(--bk-ink)]`}>Primitives → Semantic tokens → Elements</p>
               <p className={SIDE_CARD_BODY}>

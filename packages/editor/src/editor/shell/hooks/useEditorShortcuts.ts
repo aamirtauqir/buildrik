@@ -51,6 +51,7 @@ import { isModalOpen } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
 import { cycleRegion } from "../regionCycle";
 import { EVENTS } from "@/shared/constants/events";
+import { CONNECT_TOKENS_LABEL } from "@/engine/designSystem/facade";
 
 // Modals subset the shortcut handler reads. Match the public surface of
 // useStudioModals; passing the full modals object keeps mocking simple.
@@ -185,10 +186,25 @@ export function useEditorShortcuts({
       const isRedo =
         (e.ctrlKey || e.metaKey) &&
         ((e.shiftKey && e.key.toLowerCase() === "z") || e.key.toLowerCase() === "y");
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z" && !e.shiftKey) {
+      const isUndo = (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z" && !e.shiftKey;
+      /* BK-05: ⌘Z / ⌘⇧Z change the document, so they obey the same gates as
+         every other mutating command: not while read-only (view mode, History
+         time-travel) and not behind a full-page surface (Settings, Templates,
+         Assets) — there they undid canvas edits nobody could see. A surface
+         marked `data-bk-history="tokens"` (Brand, D36) keeps ⌘Z for its own
+         token edits only; a canvas change next in line is left alone. */
+      const surface =
+        typeof document !== "undefined" ? document.querySelector('[data-bk-surface="fullpage"]') : null;
+      const tokensOnly = surface?.getAttribute("data-bk-history") === "tokens";
+      const historyBlocked = composer.readOnly || (surface !== null && !tokensOnly);
+      if (isUndo && !historyBlocked) {
         e.preventDefault();
-        composer.history.undo();
-      } else if (isRedo) {
+        if (tokensOnly && !composer.history.nextUndoTouchesOnly(["/settings/"], [CONNECT_TOKENS_LABEL])) {
+          composer.emit(EVENTS.HISTORY_UNDO_OUT_OF_SCOPE, undefined);
+        } else {
+          composer.history.undo();
+        }
+      } else if (isRedo && !historyBlocked && !tokensOnly) {
         e.preventDefault();
         composer.history.redo();
       }

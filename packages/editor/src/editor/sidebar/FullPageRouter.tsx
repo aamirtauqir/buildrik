@@ -188,6 +188,11 @@ export const FullPageRouter: React.FC<FullPageRouterProps> = ({
           <div
             className="tw:fixed tw:inset-0 tw:z-[var(--bk-z-overlay)] tw:bg-[var(--bk-bg-panel)]"
             data-testid="brand-host"
+            /* BK-05 / D36: Brand owns the keyboard like the other full-page
+               surfaces, but keeps ⌘Z for its own token edits — never for a
+               canvas edit behind it. */
+            data-bk-surface="fullpage"
+            data-bk-history="tokens"
           >
             <BrandWorkspace
               composer={composer}

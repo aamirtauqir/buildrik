@@ -330,3 +330,69 @@ describe("useEditorShortcuts", () => {
     });
   });
 });
+
+/* BK-05 / D36: ⌘Z and ⌘⇧Z obey the mutating-command gates. */
+describe("useEditorShortcuts — undo gates (BK-05, D36)", () => {
+  const surfaceHost = (attrs: Record<string, string>) => {
+    const el = document.createElement("div");
+    for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+    document.body.appendChild(el);
+    return el;
+  };
+  const make = (extra: Record<string, unknown> = {}) => ({
+    history: { undo: vi.fn(), redo: vi.fn(), nextUndoTouchesOnly: vi.fn(() => false) },
+    emit: vi.fn(),
+    ...extra,
+  });
+  const mountWith = (c: ReturnType<typeof make>) =>
+    renderHook(() =>
+      useEditorShortcuts({
+        composer: c as unknown as UseEditorShortcutsOptions["composer"],
+        modals: { setShowShortcuts: vi.fn() },
+        saveProject: vi.fn(),
+      } as UseEditorShortcutsOptions),
+    );
+
+  afterEach(() => {
+    document.body.innerHTML = "";
+  });
+
+  it("does nothing while read-only (view mode, time-travel)", () => {
+    const c = make({ readOnly: true });
+    const { unmount } = mountWith(c);
+    dispatchKey({ key: "z", metaKey: true });
+    dispatchKey({ key: "z", metaKey: true, shiftKey: true });
+    expect(c.history.undo).not.toHaveBeenCalled();
+    expect(c.history.redo).not.toHaveBeenCalled();
+    unmount();
+  });
+
+  it("does nothing behind a full-page surface (Settings, Templates, Assets)", () => {
+    surfaceHost({ "data-bk-surface": "fullpage" });
+    const c = make();
+    const { unmount } = mountWith(c);
+    dispatchKey({ key: "z", metaKey: true });
+    expect(c.history.undo).not.toHaveBeenCalled();
+    unmount();
+  });
+
+  it("in Brand, undoes a token edit", () => {
+    surfaceHost({ "data-bk-surface": "fullpage", "data-bk-history": "tokens" });
+    const c = make();
+    c.history.nextUndoTouchesOnly.mockReturnValue(true);
+    const { unmount } = mountWith(c);
+    dispatchKey({ key: "z", metaKey: true });
+    expect(c.history.undo).toHaveBeenCalledTimes(1);
+    unmount();
+  });
+
+  it("in Brand, leaves a canvas edit alone and says so", () => {
+    surfaceHost({ "data-bk-surface": "fullpage", "data-bk-history": "tokens" });
+    const c = make();
+    const { unmount } = mountWith(c);
+    dispatchKey({ key: "z", metaKey: true });
+    expect(c.history.undo).not.toHaveBeenCalled();
+    expect(c.emit).toHaveBeenCalledWith("history:undo-out-of-scope", undefined);
+    unmount();
+  });
+});

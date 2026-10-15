@@ -716,6 +716,24 @@ export class HistoryManager {
     return this.undoStack.length > 1 && this.lastActionRecorded;
   }
 
+  /**
+   * Whether the next undo would change nothing outside `pathPrefixes` (JSON
+   * pointers into ProjectData, e.g. "/settings/"), or is one of `labels`.
+   * Brand undoes its own token edits with ⌘Z but must not reach a canvas
+   * change the user cannot see behind it (BK-05, D36).
+   */
+  nextUndoTouchesOnly(pathPrefixes: string[], labels: string[] = []): boolean {
+    this.flushPending();
+    if (!this.canUndo()) return false;
+    const top = this.undoStack[this.undoStack.length - 1];
+    if (top.label && labels.includes(top.label)) return true;
+    const patch =
+      top.type === "patch"
+        ? top.patch
+        : createPatch(this.reconstructState(this.undoStack.length - 2), (top as CheckpointEntry).snapshot);
+    return patch.every((op) => pathPrefixes.some((prefix) => op.path.startsWith(prefix)));
+  }
+
   /** A feature changed the project outside history. Undo stops offering
    *  until the next recorded action, and a refusal names `label`. The label
    *  is user-facing copy, said the way the toast will say it. */
