@@ -13,7 +13,6 @@ import type { Composer } from "@/engine";
 import { Z_LAYERS } from "@/shared/constants/canvas";
 import type { SpacingIndicator, CanvasGuide } from "@/shared/types/canvas";
 import type { InvalidDropReason } from "@/shared/utils/dragDrop/dropValidation";
-import { RichTextEditor } from "@/editor/panels/RichTextEditor";
 import {
   spotsOverlayStyles,
   getMarqueeStyles,
@@ -26,6 +25,7 @@ import type { SnapLine } from "../hooks/useCanvasSnapping";
 import type { CursorState } from "../hooks/useCursorIntelligence";
 import type { SectionBoundary, SectionDragState } from "../hooks/useSectionReorder";
 import { CanvasSpotSpacing } from "../spots";
+import { InlineTextToolbar } from "./InlineTextToolbar";
 import { announceInsertTarget, describeInsertTarget, useInsertDrag } from "../insertDrag";
 import {
   SelectionBoxOverlay,
@@ -292,39 +292,10 @@ export function CanvasOverlayGroup({
         </div>
       )}
 
-      {/* Inline Text Editor — board 1176:4824 floats the 18-control toolbar
-          above the element being edited. The overlay host is
-          pointer-events:none by design; without re-enabling here every
-          control is mouse-transparent and clicks fall through to the canvas.
-          The bd-inline-toolbar class is load-bearing: useCanvasInlineEdit's
-          blur/click guards match on it to keep a toolbar click from ending
-          the edit session. */}
+      {/* Inline Text Editor — board 1176:4824 floats the toolbar above the
+          element being edited; InlineTextToolbar owns placement and values. */}
       {editing.id && (
-        <div
-          className="bd-inline-toolbar"
-          style={{
-            position: "absolute",
-            left: editing.rect ? Math.max(8, editing.rect.left) : 8,
-            top: editing.rect ? Math.max(8, editing.rect.top - 52) : 8,
-            zIndex: Z_LAYERS.floatingToolbar,
-            pointerEvents: "auto",
-          }}
-          /* The standard rich-text toolbar pair. preventDefault on mousedown
-             keeps focus — and the user's text selection — in the editing
-             element while the button is pressed. stopPropagation on click
-             keeps the click from bubbling into the canvas, whose handlers
-             refocus the canvas wrapper; that focus steal blurred the editor
-             with a relatedTarget outside this toolbar and ended the session
-             after every command. A text field (the link URL) is the one
-             exception: it has to take focus, or the URL is typed into the
-             element over the selected words. */
-          onMouseDown={(e) => {
-            if (!(e.target as HTMLElement).closest("input, textarea, select")) e.preventDefault();
-          }}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <RichTextEditor onCommand={onInlineCommand} />
-        </div>
+        <InlineTextToolbar editingId={editing.id} canvasRef={canvasRef} onCommand={onInlineCommand} />
       )}
 
       {/* Drag & drop feedback (slot indicators, breadcrumb) */}

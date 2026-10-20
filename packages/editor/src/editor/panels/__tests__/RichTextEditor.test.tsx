@@ -187,3 +187,28 @@ describe("RichTextEditor — color popovers", () => {
     expect(onCommand).toHaveBeenCalledWith("hiliteColor", "#00ff00");
   });
 });
+
+/* Audit 2026-10-20 #16: the selects were uncontrolled, so they always showed
+   their first option — "Paragraph" / "10px" on a 36px H2. */
+describe("RichTextEditor — shows the edited element's own values", () => {
+  it("shows the block tag and font size it is given", () => {
+    renderEditor({ blockTag: "h2", fontSizePx: 36 });
+    const style = screen.getByLabelText("Text style") as HTMLSelectElement;
+    const size = screen.getByLabelText("Font size") as HTMLSelectElement;
+    expect(style.options[style.selectedIndex].text).toBe("Heading 2");
+    expect(size.options[size.selectedIndex].text).toBe("36px");
+  });
+
+  it("selects a listed size when the element's size is on the scale", () => {
+    renderEditor({ blockTag: "p", fontSizePx: 16 });
+    const size = screen.getByLabelText("Font size") as HTMLSelectElement;
+    expect(size.value).toBe("3");
+    expect(screen.getAllByRole("option", { name: "16px" })).toHaveLength(1);
+  });
+
+  it("names a tag the style list does not hold instead of claiming Paragraph", () => {
+    renderEditor({ blockTag: "span", fontSizePx: 14 });
+    const style = screen.getByLabelText("Text style") as HTMLSelectElement;
+    expect(style.options[style.selectedIndex].text).toBe("Text");
+  });
+});
