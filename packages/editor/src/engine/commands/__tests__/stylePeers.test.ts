@@ -93,6 +93,15 @@ describe("applyStyleToPeers", () => {
     expect(c.elements.getElement(peer.getId())!.getStyles().color).toBeUndefined();
   });
 
+  it("copies a pseudo-state rule written the way the Inspector writes it (data-buildrick-id)", () => {
+    const src = add("button");
+    const peer = add("button");
+    c.styles.setRule(`[data-buildrick-id="${src.getId()}"]`, { color: "rgb(0, 128, 0)" }, { pseudo: ":hover" });
+    const n = applyStyleToPeers(c, src, [peer], { breakpoint: "desktop", pseudo: "hover" });
+    expect(n).toBe(1);
+    expect(c.styles.getRule(`[data-buildrick-id="${peer.getId()}"]:hover`)?.properties).toMatchObject({ color: "rgb(0, 128, 0)" });
+  });
+
   it("copies typography, fill, border and effects only — keeps layout, size, spacing and position (board 31)", () => {
     const src = add("heading");
     const peer = add("heading");

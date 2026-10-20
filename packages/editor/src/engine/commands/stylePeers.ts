@@ -76,7 +76,7 @@ function isCopiedStyleProperty(prop: string): boolean {
 const pickCopied = (styles: Record<string, string>): Record<string, string> =>
   Object.fromEntries(Object.entries(styles).filter(([k]) => isCopiedStyleProperty(k)));
 
-const selectorFor = (id: string) => `[data-buildrik-id="${id}"]`;
+const selectorFor = (id: string) => `[data-buildrick-id="${id}"]`;
 
 /** The source's style map at this breakpoint + state, as authored. */
 function styleAt(composer: Composer, source: Element, { breakpoint, pseudo }: ApplyStyleOptions): Record<string, string> {
