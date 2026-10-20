@@ -32,7 +32,6 @@ export function fromElementAction(id: ElementActionId, group: string, rowId: str
 export const standaloneActions: ContextAction[] = [
   // v3 IA (Q8): doors to existing surfaces at the element, board 4428:43928.
   fromElementAction("replace-with-block", "standalone"),
-  fromElementAction("improve-with-ai", "standalone"),
   fromElementAction("bind-to-cms", "standalone"),
   fromElementAction("add-interaction", "standalone"),
   fromElementAction("save-as-component", "standalone"),

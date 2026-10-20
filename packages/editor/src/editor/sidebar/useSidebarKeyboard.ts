@@ -21,7 +21,6 @@ import { isModalOpen } from "@/editor/chrome-ui";
  */
 export function useSidebarKeyboard(
   onTabChange: (tab: GroupedTabId) => void,
-  onAssistant?: () => void,
   disabledTabs?: ReadonlySet<GroupedTabId>,
 ): void {
   React.useEffect(() => {
@@ -48,14 +47,6 @@ export function useSidebarKeyboard(
       const key = e.key.toUpperCase();
       const isShift = e.shiftKey;
 
-      /* I opens AI — in the inspector column, its one home (G2-127); it is
-         not a drawer tab any more, so it is not in the registry. */
-      if (key === "I" && !isShift && onAssistant) {
-        e.preventDefault();
-        onAssistant();
-        return;
-      }
-
       for (const tab of GROUPED_TABS_CONFIG) {
         if (!tab.shortcut || disabledTabs?.has(tab.id)) continue;
 
@@ -75,5 +66,5 @@ export function useSidebarKeyboard(
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [onTabChange, onAssistant, disabledTabs]);
+  }, [onTabChange, disabledTabs]);
 }

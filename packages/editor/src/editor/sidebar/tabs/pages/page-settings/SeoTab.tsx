@@ -9,7 +9,6 @@
  */
 
 import * as React from "react";
-import { generateContent } from "@/shared/utils/openai";
 import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants/events";
 import type { PageItem } from "../types";
@@ -66,51 +65,6 @@ const GHOST_BTN = "tw:border-transparent tw:bg-transparent";
 const BTN_32 = "tw:rounded-[var(--bk-radius-md)] tw:text-[length:var(--bk-text-13)] tw:font-medium tw:focus:ring-0 tw:focus:[box-shadow:var(--bk-shadow-focus)]";
 const BTN_SECONDARY = `${BTN_32} tw:border-transparent tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-gray-200)]`;
 
-/** The first heading and the first run of body copy on a page — what the
- *  page is actually about, for the AI title prompt. */
-function pageCopySample(composer: Composer | null, pageId: string): string[] {
-  const rootId = composer?.elements?.getAllPages?.().find((p) => p.id === pageId)?.root?.id;
-  const root = rootId ? composer?.elements?.getElement?.(rootId) : null;
-  if (!root) return [];
-  let heading: string | undefined;
-  let body: string | undefined;
-  const queue = [...root.getChildren()];
-  while (queue.length > 0 && !(heading && body)) {
-    const el = queue.shift();
-    if (!el) break;
-    const text = String(el.getContent?.() ?? "").replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
-    if (text && !heading && el.getType() === "heading") heading = text.slice(0, 120);
-    else if (text && !body && el.getType() !== "heading" && el.getType() !== "button") body = text.slice(0, 240);
-    queue.push(...el.getChildren());
-  }
-  return [heading, body].filter((t): t is string => Boolean(t));
-}
-
-/** "Write with AI"'s prompt: the site, the page and the page's own copy
- *  (L5-017 — it carried the page name alone, inside a generic "headline"
- *  template, and a local bakery got web-builder marketing back). */
-function seoTitlePrompt(siteName: string | undefined, pageName: string, description: string, copy: string[]): string {
-  const lines = [
-    "Write one SEO page title for a web page. At most 60 characters. Plain text, no quotes.",
-    siteName ? `Website: ${siteName}` : null,
-    `Page: ${pageName}`,
-    description ? `Page description: ${description}` : null,
-    ...copy.map((c) => `On the page: ${c}`),
-    "Describe what this page offers; do not invent claims the page does not make.",
-  ];
-  return lines.filter(Boolean).join("\n");
-}
-
-/** An AI title cut to `max` characters at the last whole word (L5-018: a
- *  hard slice ended "…Website B"). Quotes the model adds are dropped. */
-function trimTitle(raw: string, max = 60): string {
-  const clean = raw.replace(/^["'\s]+|["'\s]+$/g, "").replace(/\s+/g, " ");
-  if (clean.length <= max) return clean;
-  const cut = clean.slice(0, max + 1);
-  const lastSpace = cut.lastIndexOf(" ");
-  return (lastSpace > 0 ? cut.slice(0, lastSpace) : clean.slice(0, max)).replace(/[\s,;:–—-]+$/, "");
-}
-
 export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, onOpenSiteDefaults }) => {
   const siteName = composer?.getProjectMetadata?.()?.name;
   const domain = s.domain ?? "yoursite.com";
@@ -132,8 +86,6 @@ export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, onOpe
   const servedFile =
     pageFileNames(withThis.map((p) => (p.id === page.id ? { ...p, slug: s.slug } : p))).get(page.id) ?? "index.html";
   const previewUrl = (pageCanonicalUrl(domain, servedFile) ?? "").replace(/^https?:\/\//, "");
-  const [aiBusy, setAiBusy] = React.useState(false);
-  const [aiFailed, setAiFailed] = React.useState(false);
 
   /* The redirect offer (Clone 3519:19920's door). `page.slug` is the SAVED
      slug — the row re-syncs from the engine after updatePage — so a change of
@@ -169,25 +121,6 @@ export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, onOpe
       repair: { pageId: page.id, pageName: page.name, from, to },
     });
   };
-
-  // Generate an SEO title via the AI service (was a dead TODO handler).
-  const suggestTitle = React.useCallback(async () => {
-    if (aiBusy) return;
-    setAiBusy(true);
-    setAiFailed(false);
-    try {
-      const prompt = seoTitlePrompt(siteName, page.name, s.seoDesc, pageCopySample(composer, page.id));
-      const title = await generateContent(prompt, "headline", "professional", { useEnhancedPrompts: false });
-      const clean = trimTitle(title);
-      if (clean) s.setSeoTitle(clean);
-      else setAiFailed(true);
-    } catch {
-      // The field stays for manual entry; say why nothing arrived.
-      setAiFailed(true);
-    } finally {
-      setAiBusy(false);
-    }
-  }, [aiBusy, page.name, page.id, s, siteName, composer]);
 
   return (
     <div className="tw:flex tw:flex-col tw:gap-4">
@@ -299,21 +232,6 @@ export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, onOpe
       <div className={FIELD} data-testid="seo-field-title">
         <div className={FIELD_HEAD}>
           <Label htmlFor="seo-title" className={BK_LABEL_CLASS} data-testid="seo-label-title">Meta title · page override</Label>
-          <Button
-            color="light"
-            size="xs"
-            type="button"
-            aria-label="Suggest SEO title"
-            disabled={aiBusy}
-            onClick={suggestTitle}
-            aria-busy={aiBusy || undefined}
-            className={`tw:ml-auto tw:inline-flex tw:items-center tw:gap-1 tw:h-auto tw:min-h-0 tw:p-0 tw:border-0 tw:bg-transparent tw:text-[var(--bk-accent-text)] tw:hover:bg-transparent tw:hover:underline tw:text-[length:var(--bk-text-11)] tw:font-medium ${UI}`}
-          >
-            <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-              <path d="M5 3l14 9-14 9V3z" />
-            </svg>
-            {s.seoTitle.length < 10 ? "Write with AI" : "Regenerate"}
-          </Button>
           <span
             className={`${COUNTER} ${
               range === "ok" || range === "ideal"
@@ -336,11 +254,6 @@ export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, onOpe
           placeholder={s.inheritedTitle}
           aria-describedby="seo-title-hint"
         />
-        {aiFailed && (
-          <HelperText role="alert" className={BK_HELPER_ERROR_CLASS}>
-            Couldn&rsquo;t write a title just now. Try again, or type one.
-          </HelperText>
-        )}
       </div>
       {/* ── 4. META DESCRIPTION ─────────────────────────────────────────── */}
       <div className={FIELD} data-testid="seo-field-desc">

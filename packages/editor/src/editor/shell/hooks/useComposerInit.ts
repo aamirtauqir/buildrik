@@ -14,7 +14,6 @@ import { THRESHOLDS } from "@/shared/constants/config";
 import { BRAND_READ_ONLY_FAILED, BRAND_READ_ONLY_HELD, BRAND_READ_ONLY_SWITCH_OFF } from "@/shared/constants/brandReadOnly";
 import { EVENTS, isNavigationOnlyChange } from "@/shared/constants/events";
 import type { SaveState } from "./useStudioState";
-import { attachAdoptionRevertListener } from "@/services/ai/adoptionTracker";
 import type { ComposerConfig, ProjectData, DeviceType } from "@/shared/types";
 import { importMigratedProject } from "@/editor/design-system";
 import { migrateTokensToV6, TokenMigrationError } from "@buildrik/shared/tokens";
@@ -42,10 +41,7 @@ import {
   readUnsaved,
   takeOffScreenUnsaved,
 } from "@/services/unsavedRecovery";
-import { isFeatureEnabled } from "@/shared/utils/featureFlags";
 import { IS_DEV_BUILD, DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
-import { ComponentSchemaAIClient } from "@/engine/designSystem/services";
-import { getAiSubscriptionClient } from "@/services/ai/subscriptionClient";
 import { getDefaultPageName } from "@/shared/utils/pageUtils";
 import { isAuthSaveError, isForbiddenSaveError, refuseForbiddenSave, SAVE_FAILED_TOAST_KEY } from "./useSaveCallback";
 import { getEditorViewMode } from "@shared/utils/editorViewMode";
@@ -201,14 +197,6 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
     // gracefully falls back to local-only on auth fail / offline / dashboard
     // unconfigured. siteId scopes asset rows when known.
     const remoteSync = createRemoteAssetSync({ siteId: getSiteIdFromUrl() });
-    // Phase C.2: ai.componentSchema mutation returns single-shot JSON via
-    // ComponentSchemaAIClient. The adapter's args are the router's input
-    // shape, so the call is type-checked end to end (DQ-032: was `as any`).
-    const aiClient = isFeatureEnabled("dsAi")
-      ? new ComponentSchemaAIClient({
-          mutate: (args, options) => getAiSubscriptionClient().ai.componentSchema.mutate(args, options),
-        })
-      : null;
     const instance = createComposer({
       container: containerRef.current || document.createElement("div"),
       ...composerOptions,
@@ -218,7 +206,6 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
          site's page. Only the siteless demo keeps a local project. */
       ...(getSiteIdFromUrl() ? { storage: { type: "none", autoSave: false } } : {}),
       remoteSync,
-      aiClient,
     } as ComposerConfig);
 
     // Store event handlers for proper cleanup
@@ -554,10 +541,6 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
     };
 
     const toggleExporterHandler = () => setShowExporter((v) => !v);
-    // AI is one surface now — the AITab rail panel. The ⌘K "AI" command emits
-    // ui:toggle:ai; translate it to opening the "ai" tab (StudioPanels listens
-    // for ui:switch-tab) instead of the removed AIAssistant modal.
-    const toggleAIHandler = () => instance.emit("ui:switch-tab", { tab: "ai" });
     const deviceChangedHandler = (d: DeviceType) => setDevice(d);
     const zoomChangedHandler = (z: number) => setZoom(z);
 
@@ -566,7 +549,6 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
     instance.on("project:changed", projectChangedHandler);
     instance.on("history:recorded", historyRecordedHandler);
     instance.on("ui:toggle:exporter", toggleExporterHandler);
-    instance.on("ui:toggle:ai", toggleAIHandler);
     /* The engine names these BREAKPOINT_CHANGED and VIEWPORT_ZOOM (Viewport.ts
        :70,:87). Listening for "device:changed" / "zoom:changed" meant nothing
        the engine did to zoom ever reached React — and the canvas transform is
@@ -579,17 +561,12 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
     setComposer(instance);
     onEditorRef.current?.(instance);
 
-    // Adoption telemetry: report when the user undoes an AI edit ("ai-edit" label).
-    const detachAdoption = attachAdoptionRevertListener(instance);
-
     // Cleanup: Remove all event listeners before destroying
     return () => {
-      detachAdoption();
       instance.off("composer:ready", composerReadyHandler);
       instance.off("project:changed", projectChangedHandler);
       instance.off("history:recorded", historyRecordedHandler);
       instance.off("ui:toggle:exporter", toggleExporterHandler);
-      instance.off("ui:toggle:ai", toggleAIHandler);
       instance.off(EVENTS.BREAKPOINT_CHANGED, deviceChangedHandler);
       instance.off(EVENTS.VIEWPORT_ZOOM, zoomChangedHandler);
       instance.destroy();

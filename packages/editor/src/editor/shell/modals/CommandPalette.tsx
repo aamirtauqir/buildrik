@@ -30,7 +30,6 @@ import { getLayerPreview } from "@/editor/panels/layers/data/layerUtils";
 import { LAYER_NAME_KEY } from "@/shared/constants/elementTypeLabels";
 import { ELEMENT_TYPE_LABELS } from "@/shared/constants/elementTypeLabels";
 import { PAGE_TEMPLATES, getMyTemplates } from "@/editor/sidebar/tabs/templates/templatesData";
-import { requestGenerateBlock } from "@/editor/sidebar/tabs/build/insertGroupRequest";
 import { isTabAllowedForViewer, type GroupedTabId } from "@/editor/rail/tabsConfig";
 import { useViewerChrome } from "../hooks/useEditorRole";
 
@@ -79,13 +78,9 @@ const OPENING_BANDS = new Set(["Pages", "Navigate", "Edit", "View", "Add", "Tool
  * StudioPanels' rail/ui:switch-tab handler and useStudioState's
  * openLeftPanelToTab/setLeftPanelTab sink use. A row absent from this map
  * opens no tab (new-page, replace-layout, issues, shortcuts, permissions)
- * and is never hidden here. "ai" is not a formal GroupedTabId (it opens the
- * inspector column, not a rail tab) but shares the same VIEWER_TABS gate at
- * the sink, so it is included for consistency — a VIEWER's ⌘K would
- * otherwise show a live "Open AI assistant" row that the sink silently
- * swallows.
+ * and is never hidden here.
  */
-const NAV_TAB_TARGET: Partial<Record<string, GroupedTabId | "ai">> = {
+const NAV_TAB_TARGET: Partial<Record<string, GroupedTabId>> = {
   pages: "pages",
   add: "add",
   layers: "layers",
@@ -94,7 +89,6 @@ const NAV_TAB_TARGET: Partial<Record<string, GroupedTabId | "ai">> = {
   content: "content",
   design: "design",
   publish: "publish",
-  ai: "ai",
   templates: "templates",
   review: "review",
   activity: "activity",
@@ -126,7 +120,6 @@ function buildCommands(
     ["content", "Open CMS", () => openPanel("content"), ["collections", "records"]],
     ["design", "Open Brand", () => openPanel("design"), ["tokens", "colours", "fonts"]],
     ["publish", "Open Publish", () => openPanel("publish")],
-    ["ai", "Open AI assistant", () => composer?.emit(EVENTS.UI_SWITCH_TAB, { tab: "ai" })],
     ["templates", "Browse Templates", () => openPanel("templates")],
     /* C4 #19: one of the New-page doors, from anywhere — the same event every
        door emits. */
@@ -146,14 +139,7 @@ function buildCommands(
   ];
   for (const [id, label, fn, keywords] of nav) {
     const target = NAV_TAB_TARGET[id];
-    // "ai" isn't a real GroupedTabId (it opens the inspector column, not a
-    // rail tab) but shares VIEWER_TABS' gate: it isn't in that set, so a
-    // VIEWER never sees it, same as every other tab absent from the set.
-    if (target === "ai") {
-      if (viewerChrome) continue;
-    } else if (target !== undefined && !isTabAllowedForViewer(target, viewerChrome)) {
-      continue;
-    }
+    if (target !== undefined && !isTabAllowedForViewer(target, viewerChrome)) continue;
     commands.push({ id: `nav-${id}`, label, group: "Navigate", keywords, handler: run(fn) });
   }
   /* The Permissions dialog's door for every role but a viewer (whose door is
@@ -234,14 +220,6 @@ function buildCommands(
   // ADD
   fromRegistry("add-text", "Add");
   fromRegistry("add-container", "Add");
-  commands.push({
-    id: "add-ai-block",
-    label: "Generate a block with AI…",
-    group: "Add",
-    keywords: ["ai", "generate", "section", "block"],
-    /* Add › Generate a block (G2-117) — the screen the command names. */
-    handler: run(() => requestGenerateBlock(composer)),
-  });
 
   // TOOLS
   fromRegistry("cms-records", "Tools");
@@ -533,11 +511,7 @@ const CommandPaletteCard: React.FC<CommandPaletteProps> = ({
     );
   }, [commands, recordCommands, recentCommands, query]);
 
-  // A query that matches nothing is never a dead end: AI, or stock photos.
-  const askAI = React.useCallback(() => {
-    composer?.emit(EVENTS.UI_SWITCH_TAB, { tab: "ai" });
-    onClose();
-  }, [composer, onClose]);
+  // A query that matches nothing is never a dead end: stock photos.
   const searchStock = React.useCallback(() => {
     composer?.emit(EVENTS.UI_PANEL_OPEN, { panel: "assets", screen: `stock:${query.trim()}` });
     onClose();
@@ -580,17 +554,15 @@ const CommandPaletteCard: React.FC<CommandPaletteProps> = ({
           e.preventDefault();
           setSelectedIndex((i) => Math.max(i - 1, 0));
           break;
-        case "Enter":
+        case "Enter": {
           e.preventDefault();
-          if (orderedCommands.length === 0 && query.trim()) askAI();
-          else {
-            const cmd = orderedCommands[selectedIndex];
-            if (cmd) runCommand(cmd);
-          }
+          const cmd = orderedCommands[selectedIndex];
+          if (cmd) runCommand(cmd);
           break;
+        }
       }
     },
-    [orderedCommands, selectedIndex, onClose, query, askAI, runCommand],
+    [orderedCommands, selectedIndex, onClose, runCommand],
   );
 
   return (
@@ -676,9 +648,6 @@ const CommandPaletteCard: React.FC<CommandPaletteProps> = ({
                 </div>
                 <Button onClick={searchStock} data-idx={0} variant="link" data-testid="cmdk-no-results-stock">
                   Search stock photos for &lsquo;{query.trim()}&rsquo;
-                </Button>
-                <Button onClick={askAI} variant="link" data-testid="cmdk-no-results-ai">
-                  Ask AI instead ›
                 </Button>
               </div>
             ) : null

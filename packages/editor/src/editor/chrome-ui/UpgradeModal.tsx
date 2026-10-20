@@ -46,16 +46,16 @@ export function openUpgrade(detail: UpgradeEventDetail = {}) {
 }
 
 /**
- * The board lists four. "Unlimited exports" is not one of them here, and that
+ * The board lists four; "AI-powered features" is dropped because this
+ * version ships without AI. "Unlimited exports" is not one of them here, and that
  * is deliberate: there is no export limit anywhere in `PLAN_LIMITS`, so Free
  * exports without limit too and the line sells nothing. "Custom domain" is a
  * real Free→Pro delta in that table (`customDomains: 0 → 3`), so it takes the
- * slot. The other three are the board's own.
+ * slot. The other two are the board's own.
  */
 const FEATURES = [
   "Custom domain",
   "Premium templates",
-  "AI-powered features",
   "Priority support",
 ];
 

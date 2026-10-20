@@ -22,5 +22,3 @@ export { useHistoryState } from "./useHistoryState";
 export type { UseHistoryStateReturn } from "./useHistoryState";
 export { useVersionHistory } from "./useVersionHistory";
 export type { UseVersionHistoryReturn } from "./useVersionHistory";
-export { useAutoMilestone } from "./useAutoMilestone";
-export type { MilestoneSuggestion, UseAutoMilestoneReturn } from "./useAutoMilestone";

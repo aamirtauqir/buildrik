@@ -53,6 +53,17 @@ const ROUTER_KEYS = {
  * should shrink. Adding one requires saying why in the same commit.
  */
 const ALLOWED = {
+  // --- server AI kept, editor AI removed (owner 2026-10-20) ---
+  "actions.propose": "Server AI kept for the future Build tab; the editor AI surfaces were removed 2026-10-20 (owner: no AI this version).",
+  "actions.confirm": "Server AI kept for the future Build tab; the editor AI surfaces were removed 2026-10-20 (owner: no AI this version).",
+  "ai.content": "Server AI kept for the future Build tab; the editor AI surfaces were removed 2026-10-20 (owner: no AI this version).",
+  "ai.summarize": "Server AI kept for the future Build tab; the editor AI surfaces were removed 2026-10-20 (owner: no AI this version).",
+  "ai.milestoneSuggest": "Server AI kept for the future Build tab; the editor AI surfaces were removed 2026-10-20 (owner: no AI this version).",
+  "ai.quota": "Server AI kept for the future Build tab; the editor AI surfaces were removed 2026-10-20 (owner: no AI this version).",
+  "ai.streamPrompt": "Server AI kept for the future Build tab; the editor AI surfaces were removed 2026-10-20 (owner: no AI this version).",
+  "ai.componentSchema": "Server AI kept for the future Build tab; the editor AI surfaces were removed 2026-10-20 (owner: no AI this version).",
+  "ai.logAdoption": "Server AI kept for the future Build tab; the editor AI surfaces were removed 2026-10-20 (owner: no AI this version).",
+  "media.generateAltText": "Server AI kept for the future Build tab; the editor AI surfaces were removed 2026-10-20 (owner: no AI this version).",
   // --- superseded: a shipped screen already does this job ---
   "billing.usage": "The Usage screen reads dashboard.usage; this is a second reader of the same numbers.",
   "team.auditLog": "Reads activityLog — the same table /dashboard/activity already shows via dashboard.activity.",

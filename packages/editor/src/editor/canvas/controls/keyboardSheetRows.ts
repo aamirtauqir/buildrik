@@ -131,11 +131,10 @@ export const CHROME_CHORDS: ChromeChord[] = [
   { id: "edit-reorder-ends", group: "Edit", keys: "alt+Home / alt+End", description: "Move to first / last position" },
 
   // ── View — CanvasFooterToolbar (zoom, overlays), StudioHeader (⌘K),
-  //          useEditorShortcuts (⌘P, ⌘⇧P, ⌘/, ⌘J), StudioModals (?) ────────
+  //          useEditorShortcuts (⌘P, ⌘⇧P, ⌘/), StudioModals (?) ────────
   { id: "view-palette", group: "View", keys: "ctrl+k / ctrl+shift+p", description: "Command palette" },
   { id: "view-sheet", group: "View", keys: "? / ctrl+/", description: "Keyboard shortcuts" },
   { id: "view-preview", group: "View", keys: "ctrl+p", description: "Preview" },
-  { id: "view-ai", group: "View", keys: "ctrl+j", description: "Ask AI" },
   { id: "view-zoom-in", group: "View", keys: "ctrl++", description: "Zoom in" },
   { id: "view-zoom-out", group: "View", keys: "ctrl+-", description: "Zoom out" },
   /* ⌘0 is 100%, ⌘1 fits, ⌘2 zooms to the selection — measured at 1440×900

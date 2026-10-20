@@ -48,11 +48,6 @@ describe("getContextMenuActions — structure (board 4428:43928)", () => {
     expect(actions.find((a) => a.id === "style-group")!.label).toBe("Style");
   });
 
-  it("Improve with AI leads when the shell passes an AI door", () => {
-    const actions = getContextMenuActions({ ...makeCtx(), openAI: () => {} });
-    expect(actions[0].id).toBe("improve-with-ai");
-  });
-
   it("keeps every older row, under Structure", () => {
     const structure = getContextMenuActions(makeCtx()).find((a) => a.id === "structure-group")!;
     expect(structure.submenu!.map((a) => a.id)).toEqual(

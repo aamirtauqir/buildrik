@@ -197,11 +197,6 @@ export function useEditorShortcuts({
         e.preventDefault();
         modals.setShowShortcuts(true);
       }
-      if ((e.ctrlKey || e.metaKey) && e.key === "j") {
-        e.preventDefault();
-        // AI is one surface now — open the AITab rail panel.
-        composer.emit("ui:switch-tab", { tab: "ai" });
-      }
       if (e.key === "Escape") {
         modals.setShowShortcuts(false);
       }

@@ -451,11 +451,6 @@ describe("selection + toggles", () => {
     const ids = buildDefaultCommands(composer as unknown as Composer).map((c) => c.id);
     expect(ids).not.toContain("toggle-snap-to-grid");
   });
-
-  it("ui-open-* commands emit their toggle events on the captured composer", () => {
-    run("ui-open-ai");
-    expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_TOGGLE_AI);
-  });
 });
 
 describe("nudge guard", () => {

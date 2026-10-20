@@ -69,11 +69,6 @@ import { Row as InsertRow } from "@/editor/sidebar/tabs/build/components/GroupSe
 import { BuildTab } from "@/editor/sidebar/tabs/build/BuildTab";
 import type { ComponentDefinition } from "@/shared/types/components";
 import { PanelLoadingSkeleton } from "@/editor/shared/PanelStates";
-/* AgentPlan carries `.bd-ai-*` styles that only AITab imports, so the probe
-   loads the panel's stylesheet the way production does. */
-import "@/editor/sidebar/tabs/ai/AITab.css";
-import { AgentPlan } from "@/editor/sidebar/tabs/ai/AgentPlan";
-import type { RunStep } from "@/editor/sidebar/tabs/ai/hooks/useAgentRunner";
 import { ApprovedCompareView } from "@/editor/panels/version-history/ApprovedCompareView";
 import type { ComparePage } from "@/shared/utils/html";
 import { ComponentsTab } from "@/editor/sidebar/tabs/ComponentsTab";
@@ -82,7 +77,6 @@ import { DSModeProvider } from "@/editor/design-system/state/DSModeContext";
 import { LayerTreeItem } from "@/editor/panels/layers/LayerTreeItem";
 import type { LayerItem } from "@/editor/panels/layers/types";
 import { HistoryTab } from "@/editor/sidebar/tabs/history/HistoryTab";
-import { MilestoneSuggestionBanner } from "@/editor/sidebar/tabs/history/components/MilestoneSuggestionBanner";
 import { PublishHistory } from "@/editor/shell/PublishHistory";
 import { IssuesPanel } from "@/editor/shell/IssuesPanel";
 import { ConfirmDialog } from "@/editor/chrome-ui";
@@ -1399,54 +1393,6 @@ const APPLY_STEPS = [
 
 
 /**
- * AI run states (boards 170:29 thinking · 170:41 planning · 171:67 done).
- *
- * The AI panel's own chrome — back row, title row, scope band, prompt block —
- * is measured LIVE by the `ai-idle` recipe against the running editor, where it
- * is reached by the inspector's `✦ Ask AI`. The three states below cannot be
- * reached there at all: each one needs an answer from the dashboard's AI
- * endpoint, which the standalone editor has no credentials for. So the probe
- * mounts the ONE block each state adds, in the branch production renders it
- * from — `AgentPlan` at phase "planning" for the Thinking band (decision #23
- * retired the chat bubble that used to carry it), and at the run phase for the
- * band and the step rows.
- *
- * 280 is the board frame. Nothing compared from these three depends on it (the
- * anchored properties are heights, fills and type), and it keeps a probe
- * screenshot comparable to the board by eye. The shipped panel is 299 — the 300
- * inspector column less its own rule — which `ai-idle` records.
- */
-const aiHost = (name: string, children: React.ReactNode) => (
-  <div data-probe={name} style={{ width: 280, background: "#fff" }}>{children}</div>
-);
-
-/** Board 170:41's three, as `useAgentRunner` shapes them before step 0 runs. */
-const RUN_STEPS = (status: RunStep["status"]): RunStep[] =>
-  [
-    "Rewrite the headline",
-    "Warm the background tint",
-    "Swap the hero photo",
-  ].map((title) => ({
-    plan: { title, scope: { kind: "page" as const }, instruction: title },
-    status,
-  }));
-
-const agentPlan = (over: Partial<React.ComponentProps<typeof AgentPlan>>) => (
-  <AgentPlan
-    phase="planning"
-    steps={[]}
-    currentIndex={-1}
-    error={null}
-    onApprove={() => {}}
-    onEditStep={() => {}}
-    onRunPlan={() => {}}
-    onSkip={() => {}}
-    onStop={() => {}}
-    {...over}
-  />
-);
-
-/**
  * Compare fixtures (boards 168:2 side-by-side · 168:26 overlay · 168:48 list).
  *
  * Compare only has states when the dashboard hands back an approved snapshot
@@ -1871,16 +1817,6 @@ function ContentPanelHost({ probe, composer }: { probe: string; composer: Compos
 }
 
 const CASES: Record<string, () => React.ReactElement> = {
-  // ── AI run states (boards 170:29 / 170:41 / 171:67) ─────────────────────
-  "ai-thinking": () => aiHost("ai-thinking", agentPlan({ phase: "planning", steps: [] })),
-  /* Planning has NO step rows in the shipped runner: `start()` clears `steps`,
-     awaits the plan, then sets steps and phase "running" in the same breath.
-     The board draws a plan-review gate over three pending rows, which is a new
-     FSM state (ledger J-170:41, founder lane) — so the probe mounts what the
-     product actually renders here, the band alone. */
-  "ai-planning": () => aiHost("ai-planning", agentPlan({ phase: "planning", steps: [] })),
-  "ai-done": () =>
-    aiHost("ai-done", agentPlan({ phase: "done", steps: RUN_STEPS("applied"), currentIndex: -1 })),
   // ── Compare modes (boards 168:2 / 168:26 / 168:48) ──────────────────────
   "compare-side-by-side": () => <div data-probe="compare-side-by-side">{compareView(1080)}</div>,
   "compare-overlay": () => <div data-probe="compare-overlay">{compareView(1080)}</div>,
@@ -2372,28 +2308,6 @@ const CASES: Record<string, () => React.ReactElement> = {
       </div>
     );
   },
-  // Board 433:2348 — the milestone suggestion banner, all three of its states.
-  // `useAutoMilestone` only produces a suggestion after the engine has watched
-  // a real editing session cross a trigger threshold, so the component is
-  // mounted directly, in the 280 drawer it ships inside (the board's 600 is a
-  // component-gallery frame, not a surface the product has).
-  "history-milestone-banner": () => (
-    <div data-probe="history-milestone-banner">
-      {historyHost(
-        <MilestoneSuggestionBanner
-          suggestion={{
-            trigger: "page_added",
-            suggestedName: "Added pricing page",
-            reasoning: "3 sections added, hero copy changed",
-          } as never}
-          isLoading={false}
-          onAccept={() => {}}
-          onDismiss={() => {}}
-          onEdit={() => {}}
-        />,
-      )}
-    </div>
-  ),
   // ── Compare · loading-render / no-changes (boards 169:28 / 168:82) ───────
   // `currentPages={null}` IS the loading branch — the live side is still
   // exporting while the stored snapshot renders at once. Passing the same

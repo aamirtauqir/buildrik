@@ -56,14 +56,6 @@ vi.mock("@/editor/inspector/ProInspector", () => ({
     return <div data-testid="pro-inspector" data-revealed={revealed ?? ""} />;
   },
 }));
-vi.mock("@/editor/sidebar/tabs/ai/AITab", () => ({
-  AITab: ({ onBack, onClose }: { onBack?: () => void; onClose: () => void }) => (
-    <div data-testid="ai-tab">
-      {onBack ? <button onClick={onBack}>‹ Inspector</button> : null}
-      <button onClick={onClose}>Close AI</button>
-    </div>
-  ),
-}));
 
 import { ToastProvider } from "@/editor/chrome-ui";
 import { EVENTS } from "@/shared/constants/events";
@@ -147,22 +139,6 @@ beforeEach(() => localStorage.clear());
 afterEach(cleanup);
 
 describe("StudioPanels — a section-focus request always lands on a visible inspector (I-1)", () => {
-  it("with AI open: AI closes, the inspector mounts, the section is revealed", async () => {
-    const composer = makeComposer();
-    render(<Harness composer={composer} />);
-    act(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "ai" }));
-    expect(screen.getByTestId("ai-tab")).toBeTruthy();
-    /* P-7a: covered, not unmounted. */
-    expect(screen.getByTestId("inspector-body-host").getAttribute("aria-hidden")).toBe("true");
-
-    act(() => composer.emit(EVENTS.UI_INSPECTOR_FOCUS_SECTION, { section: "content" }));
-    await flushFrame();
-
-    expect(screen.queryByTestId("ai-tab")).toBeNull();
-    expect(screen.getByTestId("pro-inspector").getAttribute("data-revealed")).toBe("content");
-    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("false");
-  });
-
   it("with a column tab (History) open: the tab closes and the section is revealed", async () => {
     const composer = makeComposer();
     render(<Harness composer={composer} leftPanelTab="history" />);
@@ -240,14 +216,6 @@ describe("StudioPanels — Show inspector on the canvas (board 36)", () => {
     expect(inspectorColumn().getAttribute("aria-hidden")).toBe("false");
   });
 
-  it("not drawn while a mode fills the column (AI) — the column is open", () => {
-    const composer = makeComposer();
-    render(<Harness composer={composer} />);
-    act(() => composer.emit(EVENTS.UI_TOGGLE_INSPECTOR));
-    act(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "ai" }));
-    expect(showButton()).toBeNull();
-  });
-
   it("the hidden state does not survive a remount (no persistence)", () => {
     const composer = makeComposer();
     const { unmount } = render(<Harness composer={composer} />);
@@ -263,27 +231,7 @@ describe("StudioPanels — Show inspector on the canvas (board 36)", () => {
    mode and the whole column went with it — no inspector. It now goes where it
    says: the mode closes and the inspector shows. */
 describe("StudioPanels — ‹ Inspector leads to the inspector (M-1)", () => {
-  it("AI's back row shows the inspector even when it was hidden", () => {
-    const composer = makeComposer();
-    render(<Harness composer={composer} />);
-    act(() => composer.emit(EVENTS.UI_TOGGLE_INSPECTOR));
-    act(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "ai" }));
-    fireEvent.click(screen.getByRole("button", { name: "‹ Inspector" }));
-    expect(screen.queryByTestId("ai-tab")).toBeNull();
-    expect(screen.getByTestId("pro-inspector")).toBeTruthy();
-    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("false");
-  });
-
-  it("AI's ✕ leaves a hidden inspector hidden", () => {
-    const composer = makeComposer();
-    render(<Harness composer={composer} />);
-    act(() => composer.emit(EVENTS.UI_TOGGLE_INSPECTOR));
-    act(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "ai" }));
-    fireEvent.click(screen.getByRole("button", { name: "Close AI" }));
-    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("true");
-  });
-
-  it("Issues' back row gets the same promise", () => {
+  it("Issues' back row shows the inspector even when it was hidden", () => {
     const composer = makeComposer();
     const onCloseIssues = vi.fn();
     const { rerender } = render(
@@ -305,16 +253,10 @@ describe("StudioPanels — ‹ Inspector leads to the inspector (M-1)", () => {
 /* A-14 / GW-2: every panel the column hosts opens the column, even with the
    inspector hidden (was a source-text check). */
 describe("StudioPanels — the column opens for every panel it hosts", () => {
-  it("AI, a column tab and Issues each open a hidden inspector's column", () => {
+  it("a column tab and Issues each open a hidden inspector's column", () => {
     const composer = makeComposer();
     const { rerender } = render(<Harness composer={composer} />);
     act(() => composer.emit(EVENTS.UI_TOGGLE_INSPECTOR));
-    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("true");
-
-    act(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "ai" }));
-    expect(screen.getByTestId("ai-tab")).toBeTruthy();
-    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("false");
-    fireEvent.click(screen.getByRole("button", { name: "Close AI" }));
     expect(inspectorColumn().getAttribute("aria-hidden")).toBe("true");
 
     act(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "history" }));
@@ -388,34 +330,6 @@ describe("StudioPanels — a full page keeps the selection to give back (P-5)", 
   });
 });
 
-/* P-7a: the AI panel replaced ProInspector by unmounting it, so "‹ Inspector"
-   came back to a fresh one — tab Style, scroll 0, :hover back to Base. The
-   stub's revealed-section state stands in for all of that local state. */
-describe("StudioPanels — the AI round trip keeps the inspector's state (P-7a)", () => {
-  it("state held by the inspector survives AI open → ‹ Inspector", async () => {
-    const composer = makeComposer();
-    render(<Harness composer={composer} />);
-    act(() => composer.emit(EVENTS.UI_INSPECTOR_FOCUS_SECTION, { section: "typography" }));
-    await flushFrame();
-    const before = screen.getByTestId("pro-inspector");
-    expect(before.getAttribute("data-revealed")).toBe("typography");
-
-    act(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "ai" }));
-    expect(screen.getByTestId("ai-tab")).toBeTruthy();
-    fireEvent.click(screen.getByRole("button", { name: "‹ Inspector" }));
-
-    const after = screen.getByTestId("pro-inspector");
-    expect(after).toBe(before);
-    expect(after.getAttribute("data-revealed")).toBe("typography");
-    expect(screen.getByTestId("inspector-body-host").getAttribute("aria-hidden")).toBeNull();
-  });
-});
-
-/* §13 "Open record ›" / "Open collection ›": the CMS workspace replaces the
-   canvas and the inspector. It had no way back to where the door was opened —
-   leaving meant the rail, and the drawer landed on the CMS list. "‹ Back to
-   canvas" gives back the drawer tab, the drawer's open state and the
-   selection; the inspector, mounted throughout, keeps its tab and scroll. */
 describe("StudioPanels — the CMS workspace returns to the bound element (§13)", () => {
   it("Back to canvas restores the drawer tab and re-selects the element", async () => {
     const composer = selectingComposer(["el-1"]);
