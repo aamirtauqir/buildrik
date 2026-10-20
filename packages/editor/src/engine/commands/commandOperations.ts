@@ -281,9 +281,11 @@ export function stylesAt(
 
 /**
  * Set (or, with "", remove) one style property at `breakpoint` — the element's
- * base styles on desktop, its override rule on tablet/mobile. The one branch
- * the Inspector and the canvas-direct writes share. No lock check and no
- * transaction: callers run it inside writeElement / writableElements.
+ * base styles on desktop, its override rule on tablet/mobile — or, with a
+ * pseudo `state`, in the element's `:state` rule at that breakpoint. The one
+ * branch the Inspector, paste-style and the canvas-direct writes share. No
+ * lock check and no transaction: callers run it inside writeElement /
+ * writableElements.
  */
 export function setStyleAt(
   composer: Pick<Composer, "styles"> | null | undefined,
@@ -291,8 +293,21 @@ export function setStyleAt(
   breakpoint: BreakpointId,
   property: string,
   value: string,
+  state: PseudoStateId = "normal",
 ): void {
-  if (breakpoint === "desktop") {
+  if (state !== "normal" && composer?.styles) {
+    const sel = elementSelector(el.getId());
+    const mq = breakpoint === "desktop" ? undefined : getBreakpointQuery(breakpoint) ?? undefined;
+    if (value === "") {
+      const existing = composer.styles.getRule(`${sel}:${state}`, mq);
+      if (!existing) return;
+      const props = { ...existing.properties };
+      delete props[property];
+      composer.styles.setRule(sel, props, { pseudo: `:${state}`, mediaQuery: mq, replace: true });
+    } else {
+      composer.styles.setRule(sel, { [property]: value }, { pseudo: `:${state}`, mediaQuery: mq });
+    }
+  } else if (breakpoint === "desktop") {
     if (value === "") el.removeStyle?.(property);
     else el.setStyle?.(property, value);
   } else if (value === "") {
@@ -329,7 +344,8 @@ export function writeCanvasStyles(
  * target. The ⋯ and canvas menu used `setStyles`, which replaced the whole
  * style map and wiped those properties, while ⌥⌘V merged — three doors, two
  * results. One transaction, so one undo takes the paste back. A locked
- * element is refused (P-1). Written at the active breakpoint (setStyleAt).
+ * element is refused (P-1). Written at the active breakpoint and in the
+ * pseudo-state the Inspector shows (BD-36) — where Inspector writes land.
  *
  * Returns how many properties were applied (0 when nothing was).
  */
@@ -340,8 +356,9 @@ export function pasteStyles(composer: Composer, element: Element): number {
   /* At the active breakpoint, like every other style write: pasting on
      Tablet used to write the base styles, changing Desktop. */
   const breakpoint = activeBreakpoint(composer);
+  const state = composer.stylePseudoState;
   const ran = writeElement(composer, element, "paste-styles", (el) => {
-    for (const key of keys) setStyleAt(composer, el, breakpoint, key, clipboard[key]);
+    for (const key of keys) setStyleAt(composer, el, breakpoint, key, clipboard[key], state);
   });
   return ran ? keys.length : 0;
 }

@@ -13,7 +13,7 @@ import type { CommandData, CommandOptions, ElementType } from "@/shared/types";
 import type { Element } from "../elements/Element";
 import { canNestElement } from "@/shared/utils/nesting";
 import type { Composer } from "../Composer";
-import { nudgeSelected, reorderElement, dropLockedAndInstances, pasteStyles, writeElement, writableElements } from "./commandOperations";
+import { nudgeSelected, reorderElement, dropLockedAndInstances, pasteStyles, writeElement, writableElements, stylesAt, activeBreakpoint } from "./commandOperations";
 
 /**
  * Build the full list of default commands.
@@ -193,8 +193,10 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
       run: (c) => {
         const el = c.selection.getSelected();
         if (!el) return 0;
-        /* A snapshot: later edits to the source must not change the clipboard. */
-        const styles = { ...(el.getStyles?.() ?? {}) };
+        /* A snapshot of what the Inspector shows — the active breakpoint and
+           pseudo-state, by the published cascade (BD-36); later edits to the
+           source must not change the clipboard. */
+        const styles = stylesAt(c, el, activeBreakpoint(c), c.stylePseudoState);
         const count = Object.keys(styles).length;
         if (count > 0) c.styleClipboard = styles;
         c.emit(EVENTS.STYLES_COPIED, { count });

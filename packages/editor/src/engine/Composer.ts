@@ -124,6 +124,11 @@ export class Composer extends EventEmitter {
   // Style clipboard for copy/paste styles only
   styleClipboard: Record<string, string> | null = null;
 
+  /* The pseudo-state the Inspector's ContextRow shows (BD-36). Kept by the
+     Inspector, read by copy-style / paste-style so they use the layer the
+     Inspector writes to. Session UI state, never serialised. */
+  stylePseudoState: import("../shared/types").PseudoStateId = "normal";
+
   // Core managers — flat fields (kept flat per Option B-tight: high-traffic
   // hot paths like history/media/elements/styles all stay top-level).
   readonly elements: ElementManager;
