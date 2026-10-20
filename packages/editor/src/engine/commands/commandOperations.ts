@@ -10,6 +10,8 @@ import { snapToGrid } from "@/shared/utils/dragDrop";
 import { EVENTS } from "@/shared/constants/events";
 import { getBreakpointQuery, isValidBreakpoint } from "@/shared/constants/breakpoints";
 import { elementSelector } from "@/shared/utils/elementSelector";
+import { classSelector } from "@/shared/utils/classSelector";
+import { devWarn } from "@/shared/utils/devLogger";
 import type { PseudoStateId } from "@/shared/types";
 import { resolveStyle, type StyleLayerSource } from "../styles/ResolvedStyle";
 import type { BreakpointId } from "@/shared/types/breakpoints";
@@ -296,17 +298,7 @@ export function setStyleAt(
   state: PseudoStateId = "normal",
 ): void {
   if (state !== "normal" && composer?.styles) {
-    const sel = elementSelector(el.getId());
-    const mq = breakpoint === "desktop" ? undefined : getBreakpointQuery(breakpoint) ?? undefined;
-    if (value === "") {
-      const existing = composer.styles.getRule(`${sel}:${state}`, mq);
-      if (!existing) return;
-      const props = { ...existing.properties };
-      delete props[property];
-      composer.styles.setRule(sel, props, { pseudo: `:${state}`, mediaQuery: mq, replace: true });
-    } else {
-      composer.styles.setRule(sel, { [property]: value }, { pseudo: `:${state}`, mediaQuery: mq });
-    }
+    setRuleProperty(composer.styles, elementSelector(el.getId()), breakpoint, state, property, value);
   } else if (breakpoint === "desktop") {
     if (value === "") el.removeStyle?.(property);
     else el.setStyle?.(property, value);
@@ -315,6 +307,62 @@ export function setStyleAt(
   } else {
     composer?.styles?.setBreakpointStyle(el.getId(), breakpoint, { [property]: value });
   }
+}
+
+/**
+ * Set (or, with "", remove) one property in the StyleEngine rule for
+ * `selector` at `breakpoint` (desktop = no media query) and `state` (normal =
+ * no pseudo). Removing leaves the rule's other properties as they were.
+ */
+function setRuleProperty(
+  styles: Composer["styles"],
+  selector: string,
+  breakpoint: BreakpointId,
+  state: PseudoStateId,
+  property: string,
+  value: string,
+): void {
+  const mq = breakpoint === "desktop" ? undefined : getBreakpointQuery(breakpoint) ?? undefined;
+  const pseudo = state === "normal" ? undefined : `:${state}`;
+  if (value === "") {
+    const existing = styles.getRule(`${selector}${pseudo ?? ""}`, mq);
+    if (!existing) return;
+    const props = { ...existing.properties };
+    delete props[property];
+    styles.setRule(selector, props, { pseudo, mediaQuery: mq, replace: true });
+  } else {
+    styles.setRule(selector, { [property]: value }, { pseudo, mediaQuery: mq });
+  }
+}
+
+/**
+ * Set (or, with "", remove) one property on a CLASS rule — the chain's
+ * selector (`.card`, `.card.is-dark`) at `breakpoint` × `state`
+ * (CLASS-FIRST-SPEC §2.2). The class-first sibling of setStyleAt, with its
+ * contract: no lock check and no transaction — callers wrap it. A class write
+ * is not an element write, so the element lock gate does not apply; whether
+ * the class may be written (read-only composer, a locked element using it —
+ * owner Q6) is the caller's decision.
+ *
+ * Returns false, writing nothing, when the chain cannot be a class selector
+ * (a name not in normalised form, more than CLASS_CHAIN_MAX classes): the
+ * edit is not applied (spec §3.5 "rule refused").
+ */
+export function setClassStyleAt(
+  composer: Pick<Composer, "styles">,
+  chain: readonly string[],
+  breakpoint: BreakpointId,
+  state: PseudoStateId,
+  property: string,
+  value: string,
+): boolean {
+  const selector = classSelector(chain);
+  if (!selector) {
+    devWarn("setClassStyleAt", `not a class chain: ${JSON.stringify(chain)}`);
+    return false;
+  }
+  setRuleProperty(composer.styles, selector, breakpoint, state, property, value);
+  return true;
 }
 
 /**

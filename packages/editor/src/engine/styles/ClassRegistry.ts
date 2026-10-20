@@ -69,7 +69,8 @@ export class ClassRegistry {
 
     for (const rule of this.composer.styles.exportStyles()) {
       const layer = selectorLayer(rule.selector);
-      if (layer.kind !== "class") continue;
+      // A rule emptied by removing its last value styles nothing.
+      if (layer.kind !== "class" || Object.keys(rule.properties).length === 0) continue;
       const named = new Set<string>();
       for (const spelling of layer.chain) {
         const usage = entry(spelling);
