@@ -1,11 +1,17 @@
 /**
  * PreviewOverlay — in-shell preview (Figma shell state 7, board 65:211).
  *
- * The topbar stays; everything below it is replaced by a clean, sandboxed
- * render of the sanitized page HTML; "‹ Back to canvas" (or Esc) exits.
- * Replaces the old pop-up-window preview (which could be blocked and lost
- * the shell context). Same sanitize path as before — the iframe is fully
- * sandboxed and the HTML has been through sanitizeHTMLForPreview.
+ * The topbar stays; everything below it is replaced by a sandboxed render of
+ * the sanitized page HTML; "‹ Back to canvas" (or Esc) exits. Replaces the
+ * old pop-up-window preview (which could be blocked and lost the shell
+ * context). The HTML has been through sanitizeHTMLForPreview.
+ *
+ * BD-34 (2026-10-20): the frame RUNS scripts, so interactions behave as
+ * published — `sandbox="allow-scripts"` and never `allow-same-origin`, so the
+ * page gets an opaque origin: no editor cookies, storage or DOM. The only
+ * scripts in it are the editor's own: the interaction runtime (when the page
+ * uses interactions) and a bridge that posts Escape and link clicks up, since
+ * the shell can no longer reach into the frame.
  *
  * Board 807:8663 (`S3.8 · preview-responsive · mobile-device-frame`) adds the
  * responsive half: a device row under the topbar and, on a narrow device, the
@@ -35,6 +41,7 @@ import * as React from "react";
 import type { DeviceType } from "@/shared/types";
 import { Button, BreakpointSwitcher, Select, type Breakpoint } from "@/editor/chrome-ui";
 import { isModalOpen } from "@/editor/chrome-ui";
+import { buildInteractionRuntimeScript, INTERACTION_ATTR } from "@/engine/export/interactionRuntime";
 import { DeviceFramePreview } from "../canvas/DeviceFramePreview";
 import { PreviewShareModal } from "./PreviewShareModal";
 
@@ -74,6 +81,28 @@ function pageForHref(
   const path = raw.split(/[?#]/)[0].replace(/^\.?\//, "").replace(/\/+$/, "").replace(/\.html$/i, "");
   if (path === "" || path === "index") return pages.find((p) => p.isHome)?.id ?? pages[0]?.id ?? null;
   return pages.find((p) => p.slug === path)?.id ?? null;
+}
+
+/** Tag on the frame bridge's messages. */
+const BRIDGE_SOURCE = "bk-preview";
+
+/* Runs inside the opaque-origin frame. Escape and link clicks never reach the
+   shell's listeners there, so the bridge posts them up; a click a site script
+   already handled (defaultPrevented) is left alone. */
+const BRIDGE_SCRIPT =
+  "<script>(function(){" +
+  `function post(m){m.source=${JSON.stringify(BRIDGE_SOURCE)};parent.postMessage(m,"*");}` +
+  'document.addEventListener("keydown",function(e){if(e.key==="Escape")post({type:"escape"});},true);' +
+  'document.addEventListener("click",function(e){if(e.defaultPrevented)return;var t=e.target,a=t&&t.closest?t.closest("a[href]"):null;' +
+  'if(!a)return;var h=a.getAttribute("href")||"";if(h.charAt(0)==="#")return;e.preventDefault();post({type:"link",href:h});});' +
+  "})();</script>";
+
+/** The frame's document: the sanitized page plus the editor's own scripts,
+ *  before `</body>` when there is one. */
+function previewDocument(html: string): string {
+  const scripts = (html.includes(INTERACTION_ATTR) ? buildInteractionRuntimeScript() : "") + BRIDGE_SCRIPT;
+  const end = html.lastIndexOf("</body>");
+  return end < 0 ? html + scripts : html.slice(0, end) + scripts + html.slice(end);
 }
 
 /* Board 4418:165611 (C5 G1-086): the preview is full-screen with its own
@@ -135,33 +164,35 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({
   const showPageRef = React.useRef(onShowPage);
   showPageRef.current = onShowPage;
 
-  /* Links in the frame. Nothing in it runs (no allow-scripts), so the shell
-     answers its clicks: a page of this site opens in the preview, another
-     site opens in a new tab, anything else stays put — it used to navigate
-     the srcdoc frame to nothing (L5-051). */
-  const doneRef = React.useRef(onDone);
-  doneRef.current = onDone;
-  const onFrameLoad = React.useCallback((e: React.SyntheticEvent<HTMLIFrameElement>) => {
-    const doc = e.currentTarget.contentDocument;
-    if (!doc) return;
-    /* Decision 9: Escape closes even with focus inside the frame — keys typed
-       there never reach the shell's window listener. */
-    doc.addEventListener("keydown", (ev) => {
-      if (ev.key === "Escape" && !isModalOpen()) doneRef.current();
-    });
-    doc.addEventListener("click", (ev) => {
-      const link = (ev.target as Element | null)?.closest?.("a[href]");
-      if (!link) return;
-      const href = link.getAttribute("href") ?? "";
-      if (href.startsWith("#")) return;
-      ev.preventDefault();
-      const pageId = pageForHref(href, pagesRef.current);
-      if (pageId) showPageRef.current?.(pageId);
-      else if (/^https?:\/\//i.test(href)) window.open(href, "_blank", "noopener,noreferrer");
-    });
-  }, []);
-
   const open = html != null || status != null;
+  const frameRef = React.useRef<HTMLIFrameElement>(null);
+  const srcDoc = React.useMemo(() => (html == null ? "" : previewDocument(html)), [html]);
+
+  /* The frame bridge's messages — only from this frame (site scripts run in
+     it, so the content is untrusted: it can close the preview, show a page
+     of this site, or open an http(s) link in a new tab, nothing else).
+     Decision 9: Escape closes even with focus inside the frame. Links: a
+     page of this site opens in the preview, another site in a new tab,
+     anything else stays put — it used to navigate the srcdoc frame to
+     nothing (L5-051). */
+  React.useEffect(() => {
+    if (!open) return;
+    const onMessage = (e: MessageEvent) => {
+      if (!frameRef.current || e.source !== frameRef.current.contentWindow) return;
+      const data: unknown = e.data;
+      if (typeof data !== "object" || data === null || (data as { source?: unknown }).source !== BRIDGE_SOURCE) return;
+      const { type, href } = data as { type?: unknown; href?: unknown };
+      if (type === "escape") {
+        if (!isModalOpen()) onDone();
+      } else if (type === "link" && typeof href === "string") {
+        const pageId = pageForHref(href, pagesRef.current);
+        if (pageId) showPageRef.current?.(pageId);
+        else if (/^https?:\/\//i.test(href)) window.open(href, "_blank", "noopener,noreferrer");
+      }
+    };
+    window.addEventListener("message", onMessage);
+    return () => window.removeEventListener("message", onMessage);
+  }, [open, onDone]);
   const headingRef = React.useRef<HTMLHeadingElement>(null);
   const backRef = React.useRef<HTMLButtonElement>(null);
   /* Focus lands on what the overlay is saying: the state heading while it
@@ -270,12 +301,12 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({
         ) : (
         <DeviceFramePreview device={device as DeviceType} active={framed}>
           <iframe
+            ref={frameRef}
             title="Site preview"
-            /* No allow-scripts: nothing in the frame runs. allow-same-origin
-               only lets onFrameLoad answer its link clicks. */
-            sandbox="allow-same-origin"
-            srcDoc={html ?? ""}
-            onLoad={onFrameLoad}
+            /* BD-34: scripts run, in an opaque origin — never add
+               allow-same-origin (it would hand site scripts the editor). */
+            sandbox="allow-scripts"
+            srcDoc={srcDoc}
             className={framed ? SCREEN_FRAME_CLASS : PAGE_FRAME_CLASS}
           />
         </DeviceFramePreview>
