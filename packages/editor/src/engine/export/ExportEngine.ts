@@ -26,6 +26,8 @@ import { generateAnalyticsScripts } from "./AnalyticsInjector";
 import { AssetBundler } from "./AssetBundler";
 import {
   RESET_CSS,
+  IMG_HEIGHT_CSS,
+  finishPageImages,
   siteFontCSS,
   siteFontFaceCSS,
   emitSiteTokenCss,
@@ -171,6 +173,13 @@ function choiceLabelText(parts: Array<{ tag: string; content: string; format?: "
     .replace(/\s+/g, " ")
     .trim();
   return text || undefined;
+}
+
+/** Whether a page tree holds an image — the IMG_HEIGHT_CSS rule ships only then. */
+function treeHasImage(el: PageData["root"] | undefined): boolean {
+  if (!el) return false;
+  if (el.type === "image" || el.tagName === "img" || (el.content ?? "").includes("<img")) return true;
+  return (el.children ?? []).some(treeHasImage);
 }
 
 /** A URL that exists only in the browser session that created it. */
@@ -811,7 +820,8 @@ export class ExportEngine {
        emitted it, so every published page with no Brand body font rendered in
        the browser's default SERIF, and the font links below had no base family
        to fetch. The site's own font rules come after it, so they still win. */
-    const reset = options.minify ? RESET_CSS.replace(/\s+/g, " ") : RESET_CSS;
+    const fullReset = pages.some((p) => treeHasImage(p.root)) ? RESET_CSS + IMG_HEIGHT_CSS : RESET_CSS;
+    const reset = options.minify ? fullReset.replace(/\s+/g, " ") : fullReset;
     let css = [reset, baseCss, responsiveCss, siteCss].filter(Boolean).join(options.minify ? "" : "\n\n");
 
     /* …and the @keyframes those styles reference. `generateCSS` has emitted
@@ -842,6 +852,10 @@ export class ExportEngine {
     this.buildPageHrefs(pages);
     this.pageHrefPrefix = options.rootAbsoluteHrefs ? "/" : "";
 
+    // The media library's intrinsic sizes, by file URL (finishPageImages).
+    const sizes = new Map((this.composer.media?.getAssets?.() ?? []).map((a) => [a.src, a]));
+    const imageSize = (src: string) => sizes.get(src);
+
     // Export each page
     for (const page of pages) {
       let html = this.exportPageToHtml(page, css);
@@ -851,7 +865,7 @@ export class ExportEngine {
       if (cmsOptions.mode !== "none") {
         html = await this.cmsResolver.resolve(html, { ...cmsOptions, pageFile: fileName });
       }
-
+      html = finishPageImages(html, imageSize);
 
       files.push({
         name: fileName,

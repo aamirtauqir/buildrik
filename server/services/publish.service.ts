@@ -141,7 +141,7 @@ export async function runPrePublishChecks(siteId: string): Promise<PrePublishChe
   const noFileCount = contentFindings.filter((f) => f.kind === "missing-image").length;
   checks.push(
     noFileCount > 0
-      ? { label: CONTENT_CHECK_LABELS["missing-image"], status: "warning", detail: `${noFileCount} image${noFileCount > 1 ? "s have" : " has"} no file and will show as broken.` }
+      ? { label: CONTENT_CHECK_LABELS["missing-image"], status: "warning", detail: `${noFileCount} image${noFileCount > 1 ? "s have" : " has"} no file and will be left out of the published page.` }
       : { label: CONTENT_CHECK_LABELS["missing-image"], status: "pass", detail: "Every image has a file." },
   );
   checks.push(

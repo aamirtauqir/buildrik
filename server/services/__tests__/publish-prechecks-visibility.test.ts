@@ -191,7 +191,7 @@ describe("pre-publish content checks (shared detector)", () => {
     expect(status(result.checks, "Image alt text")).toBe("warning");
     expect(detail(result.checks, "Image alt text")).toContain("2 images");
     expect(status(result.checks, "Images")).toBe("warning");
-    expect(detail(result.checks, "Images")).toBe("1 image has no file and will show as broken.");
+    expect(detail(result.checks, "Images")).toBe("1 image has no file and will be left out of the published page.");
     expect(status(result.checks, "Links")).toBe("warning");
     expect(detail(result.checks, "Links")).toContain("1 link");
     expect(result.ready).toBe(true);

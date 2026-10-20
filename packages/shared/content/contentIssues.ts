@@ -132,8 +132,9 @@ function checkImage(el: ContentElement, pageId: string, pageName: string): Conte
 const PLACEHOLDER_ALT = "Image";
 
 /**
- * No file: an image with no (or a blank) `src` renders and ships as a broken
- * `<img>` (L1-016 / L1-035). A warning, like missing alt — it degrades the
+ * No file: an image with no (or a blank) `src` renders as a placeholder on the
+ * canvas and is left out of the published page (L1-016 / L1-035; REA #23,
+ * `finishPageImages`). A warning, like missing alt — it degrades the
  * page, it does not stop the deploy.
  */
 function checkImageSource(el: ContentElement, pageId: string, pageName: string): ContentIssueFinding | null {

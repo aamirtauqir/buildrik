@@ -306,6 +306,60 @@ input,button,textarea,select{font:inherit}
 p,h1,h2,h3,h4,h5,h6{overflow-wrap:break-word}
 `;
 
+/**
+ * Keeps an image that carries `width`/`height` attributes (finishPageImages)
+ * in proportion once `max-width:100%` narrows it — without it the height
+ * attribute stands and the picture is squashed. The canvas has always applied
+ * the same rule (`[data-buildrick-id] img`, Canvas.css). An element selector,
+ * so any height the user styled still wins. Emitted only for a site that has
+ * images.
+ */
+export const IMG_HEIGHT_CSS = "img{height:auto}\n";
+
+const IMG_TAG = /<img\b[^>]*>/gi;
+/** Script and style bodies are code, not markup: an `<img` inside a string
+ *  literal there is left alone. */
+const CODE_BLOCK = /(<script\b[\s\S]*?<\/script>|<style\b[\s\S]*?<\/style>)/i;
+
+const decodeAttr = (s: string) =>
+  s.replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
+
+/**
+ * The page's `<img>` tags as a visitor should get them (REA #23):
+ * - one with no `src` (an Image block with no file chosen) is left out — it
+ *   could only render as the browser's broken-image glyph;
+ * - every image after the page's first gets `loading="lazy"` (the first is
+ *   the likeliest hero, so it keeps the default eager load);
+ * - `width`/`height` from the media library's intrinsic size when `sizeOf`
+ *   knows the file, so the browser reserves its box before it loads.
+ * A `loading`, `width` or `height` the user set on the element is kept, and
+ * the size is never half-filled. Run on the finished page, after CMS
+ * bindings have filled their sources.
+ */
+export function finishPageImages(
+  html: string,
+  sizeOf: (src: string) => { width?: number; height?: number } | undefined,
+): string {
+  let first = true;
+  return html
+    .split(CODE_BLOCK)
+    .map((part, i) =>
+      i % 2 === 1
+        ? part
+        : part.replace(IMG_TAG, (tag) => {
+            const src = /\ssrc="([^"]*)"/i.exec(tag)?.[1]?.trim() ?? "";
+            if (!src) return "";
+            const extra: string[] = [];
+            if (!first && !/\sloading=/i.test(tag)) extra.push('loading="lazy"');
+            first = false;
+            const size = /\s(?:width|height)=/i.test(tag) ? undefined : sizeOf(decodeAttr(src));
+            if (size?.width && size.height) extra.push(`width="${size.width}" height="${size.height}"`);
+            return extra.length ? tag.replace(/\s*\/?>$/, (end) => ` ${extra.join(" ")}${end}`) : tag;
+          }),
+    )
+    .join("");
+}
+
 // ============================================================================
 // TAG MAPPING
 // ============================================================================
