@@ -164,6 +164,8 @@ function buildCommands(
      engine cannot carry this — its list is built once at startup while the
      selection changes under it — so the reason is computed here, each open. */
   const guard = (cmd: { id: string; requiresSelection?: boolean }): string | undefined => {
+    const blocked = composer.commands.blockedReason(cmd.id);
+    if (blocked) return blocked;
     if (cmd.id === "group") return selectedCount < 2 ? "select two or more" : undefined;
     if (cmd.id === "ungroup") return selectedType !== "container" ? "select a group" : undefined;
     if (cmd.id === "paste") return composer.clipboard?.length ? undefined : "nothing copied";
@@ -189,15 +191,19 @@ function buildCommands(
     });
   };
 
+  /* Undo, Redo and Clear history answer to the registry's gate (read-only,
+     Time-travel, a full-page surface) — the same one ⌘Z does. */
+  const historyBlock = composer.commands.blockedReason("undo");
+
   // EDIT
   commands.push({
     id: "edit-undo",
     label: "Undo",
     group: "Edit",
     shortcut: "Ctrl+Z",
-    disabled: !composer.history.canUndo(),
-    disabledReason: "No changes to undo",
-    handler: run(() => composer.history.undo()),
+    disabled: !!historyBlock || !composer.history.canUndo(),
+    disabledReason: historyBlock ?? "No changes to undo",
+    handler: run(() => composer.commands.run("undo")),
   });
   used.add("undo");
   fromRegistry("duplicate", "Edit");
@@ -244,9 +250,9 @@ function buildCommands(
       label: "Redo",
       group: "More",
       shortcut: "Ctrl+Y",
-      disabled: !composer.history.canRedo(),
-      disabledReason: "nothing to redo",
-      handler: run(() => composer.history.redo()),
+      disabled: !!historyBlock || !composer.history.canRedo(),
+      disabledReason: historyBlock ?? "nothing to redo",
+      handler: run(() => composer.commands.run("redo")),
     },
     { id: "view-zoom-in", label: "Zoom in", group: "More", shortcut: "Ctrl++", handler: run(() => composer.emit(EVENTS.ZOOM_IN, {})) },
     { id: "view-zoom-out", label: "Zoom out", group: "More", shortcut: "Ctrl+-", handler: run(() => composer.emit(EVENTS.ZOOM_OUT, {})) },
@@ -262,6 +268,8 @@ function buildCommands(
       id: "history-clear",
       label: "Clear history",
       group: "More",
+      disabled: !!historyBlock,
+      disabledReason: historyBlock,
       /* PD-38: kept, but not as a confirm-less destructive action — it used
          to emit HISTORY_CLEARED as pure notification, with nothing actually
          clearing the undo stack (C-6/A14-3). composer.history.clear() is the
