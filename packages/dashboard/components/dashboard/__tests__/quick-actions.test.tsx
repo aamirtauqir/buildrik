@@ -5,9 +5,11 @@
  * the reason on it.
  */
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, act } from "@testing-library/react";
 
 const role = vi.hoisted(() => ({ current: "OWNER" as string | undefined }));
+const push = vi.hoisted(() => vi.fn());
+const created = vi.hoisted(() => ({ opts: undefined as undefined | { onSuccess: (site: { id: string }) => void } }));
 
 vi.mock("@lib/trpc/client", async () => {
   const { trpcStub } = await import("@/components/__test-utils__/trpc-stub");
@@ -18,12 +20,30 @@ vi.mock("@lib/trpc/client", async () => {
         if (key === "dashboard") {
           return { health: { useQuery: () => (role.current ? { data: { role: role.current }, isLoading: false } : { data: undefined, isLoading: true }) }, stats: { invalidate: vi.fn() } };
         }
+        if (key === "sites") {
+          const real = Reflect.get(target, key) as object;
+          return new Proxy(real, {
+            get: (t, k) =>
+              k === "create"
+                ? {
+                    useMutation: (opts: typeof created.opts) => {
+                      created.opts = opts;
+                      return { mutate: vi.fn(), isPending: false };
+                    },
+                  }
+                : Reflect.get(t, k),
+          });
+        }
         return Reflect.get(target, key);
       },
     }),
   };
 });
-vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn() }) }));
+vi.mock("next/navigation", () => ({ useRouter: () => ({ push }) }));
+vi.mock("@/components/editor-route/unified-flag", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/components/editor-route/unified-flag")>()),
+  useUnifiedEditorFlag: () => true,
+}));
 vi.mock("@/components/dashboard/toast-provider", () => ({ useToast: () => ({ addToast: vi.fn() }) }));
 
 import { QuickActions } from "../quick-actions";
@@ -53,5 +73,16 @@ describe("QuickActions — an unknown role keeps the door", () => {
     role.current = undefined;
     render(<QuickActions />);
     expect(screen.getByRole("link", { name: /Invite teammate/ })).toHaveAttribute("href", "/dashboard/settings/team");
+  });
+});
+
+/* BD-37 (2026-10-20): every create-site path opens the editor on the new site.
+   Quick actions used to land on the site detail page instead. */
+describe("QuickActions — Create a site opens the editor", () => {
+  it("routes a blank create to /edit/:id", () => {
+    role.current = "OWNER";
+    render(<QuickActions />);
+    act(() => created.opts?.onSuccess({ id: "site-9" }));
+    expect(push).toHaveBeenCalledWith("/edit/site-9");
   });
 });
