@@ -7,6 +7,7 @@
  */
 
 import { EVENTS } from "@/shared/constants/events";
+import { writableElements } from "../commands/commandOperations";
 import type { ElementData, PageData, ExportOptions } from "@/shared/types";
 import { generateId } from "@/shared/utils/helpers";
 import type { Composer } from "../Composer";
@@ -224,6 +225,9 @@ export class ElementManager {
       .map((id) => this.getElement(id))
       .filter((e): e is Element => Boolean(e));
     if (els.length < 2) return null;
+    /* REA #12: a locked element is not reparented, from any door — the one
+       lock gate refuses and raises the "locked" toast (ungroup's twin). */
+    if (writableElements(this.composer, els).length !== els.length) return null;
 
     const parent = els[0].getParent();
     if (!parent) return null;

@@ -11,6 +11,7 @@ import {
   removeEngineBrowserStubs,
 } from "./test-utils/realComposer";
 import { buildDefaultCommands } from "@/engine/commands/defaultCommands";
+import { EVENTS } from "@/shared/constants/events";
 
 beforeAll(installEngineBrowserStubs);
 afterAll(removeEngineBrowserStubs);
@@ -75,5 +76,16 @@ describe("groupElements / ungroupElement", () => {
     composer.selection.select(group);
     buildDefaultCommands(composer).find((c) => c.id === "ungroup")!.run!(composer);
     expect(composer.elements.getElement(group.getId())).toBeTruthy();
+  });
+  /* REA #12 (ISS-C05): Group reparented locked elements into a new container,
+     from every door (canvas menu, Multi-select bar, ⌘G). The engine refuses,
+     through the one lock gate, the way ungroup already does. */
+  it("refuses to group when any element is locked, and says so", () => {
+    const { composer, a, b } = setup();
+    b.setLocked(true);
+    const emit = vi.spyOn(composer, "emit");
+    expect(composer.elements.groupElements([a.getId(), b.getId()])).toBeNull();
+    expect(childTypes(composer)).toEqual(["heading", "paragraph", "paragraph"]);
+    expect(emit).toHaveBeenCalledWith(EVENTS.LOCKED_ELEMENTS_SKIPPED, undefined);
   });
 });

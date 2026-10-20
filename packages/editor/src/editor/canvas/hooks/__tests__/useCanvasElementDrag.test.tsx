@@ -272,6 +272,23 @@ describe("useCanvasElementDrag", () => {
     });
   });
 
+  /* REA #12 (ISS-C03): the hook had no read-only gate, and Ctrl/Cmd+drag
+     duplicates at dragstart — so view mode and Time-travel cloned anyway. */
+  describe("dragstart — a read-only composer drags nothing", () => {
+    it("refuses a Ctrl/Cmd+drag clone and a plain move", () => {
+      composer = makeComposer({ readOnly: true });
+      mountHook();
+      const clone = dragEvent("dragstart", makeDataTransfer(), { ctrlKey: true });
+      child.dispatchEvent(clone);
+      const move = dragEvent("dragstart", makeDataTransfer());
+      child.dispatchEvent(move);
+      expect(composer.elements.duplicateElement).not.toHaveBeenCalled();
+      expect(clone.defaultPrevented).toBe(true);
+      expect(move.defaultPrevented).toBe(true);
+      expect(onDraggingChange).not.toHaveBeenCalled();
+    });
+  });
+
   describe("dragstart — Ctrl/Cmd+drag clone mode", () => {
     it("duplicates the element in a clone-element transaction and drags the clone", () => {
       const clone = { getId: () => "el-1-copy", getType: () => "text", getParent: () => null };
