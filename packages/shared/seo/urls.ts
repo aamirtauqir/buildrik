@@ -80,3 +80,19 @@ export function pageCanonicalUrl(domain: string | null, path: string): string | 
   if (!base) return null;
   return `${base}${publicPagePath(path)}`;
 }
+
+/**
+ * The URL a user is handed for a page (Copy link, the page drawer's search
+ * preview). Unlike the canonical, it must open on the deploy that is live
+ * NOW: a site last published before cleanUrls shipped serves only the
+ * `.html` files, so `/about` is a 404 there until it is republished
+ * (BD-39 (4)). `servesCleanUrls` is the server's reading of the live
+ * deploy's own vercel.json (`servesCleanUrls`, publish.service).
+ */
+export function pageLinkUrl(domain: string | null, path: string, servesCleanUrls: boolean): string | null {
+  if (servesCleanUrls) return pageCanonicalUrl(domain, path);
+  const base = normalizeCanonicalOrigin(domain ?? "");
+  if (!base) return null;
+  const file = path.replace(/^\/+/, "");
+  return file === "index.html" ? `${base}/` : `${base}/${file}`;
+}

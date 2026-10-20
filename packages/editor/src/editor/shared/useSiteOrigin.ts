@@ -7,8 +7,14 @@
  * their host through this, so none of them reads a metadata field that does
  * not exist (SEO D2).
  *
- * Returns a getter, not a value: the published URL changes under a live
+ * The origin is a getter, not a value: the published URL changes under a live
  * session, so the answer is computed from the composer at call time.
+ *
+ * `servesCleanUrls` (BD-39 (4)) says whether the LIVE deploy serves `/about`
+ * or only `/about.html` — the server reads it off the last publish's own
+ * vercel.json. Until it is known, false: a `.html` link opens on either
+ * deploy (cleanUrls 308s it), a clean one 404s on an old one. It is read once
+ * per site, so a publish inside this session flips it on the next load.
  *
  * @license BSD-3-Clause
  */
@@ -20,10 +26,16 @@ import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { siteOrigin, type SiteDomainRow } from "@buildrik/shared/seo/urls";
 import { devWarn } from "@/shared/utils/devLogger";
 
-export function useSiteOrigin(composer: Composer | null, siteId: string | null | undefined): () => string | null {
-  const [host, setHost] = React.useState<{ canonicalUrl: string | null; domains: SiteDomainRow[] }>({
+interface SiteHost {
+  getOrigin: () => string | null;
+  servesCleanUrls: boolean;
+}
+
+export function useSiteOrigin(composer: Composer | null, siteId: string | null | undefined): SiteHost {
+  const [host, setHost] = React.useState<{ canonicalUrl: string | null; domains: SiteDomainRow[]; servesCleanUrls: boolean }>({
     canonicalUrl: null,
     domains: [],
+    servesCleanUrls: false,
   });
 
   React.useEffect(() => {
@@ -35,7 +47,7 @@ export function useSiteOrigin(composer: Composer | null, siteId: string | null |
       client.siteDetail.domains.list.query({ siteId }).catch((): SiteDomainRow[] => []),
     ])
       .then(([row, domains]) => {
-        if (!stale) setHost({ canonicalUrl: row.canonicalUrl ?? null, domains });
+        if (!stale) setHost({ canonicalUrl: row.canonicalUrl ?? null, domains, servesCleanUrls: row.servesCleanUrls === true });
       })
       .catch((error) => devWarn("useSiteOrigin", "site origin read failed", error));
     return () => {
@@ -43,5 +55,8 @@ export function useSiteOrigin(composer: Composer | null, siteId: string | null |
     };
   }, [siteId]);
 
-  return () => siteOrigin(host.domains, composer?.getProjectMetadata?.()?.publishedUrl, host.canonicalUrl);
+  return {
+    getOrigin: () => siteOrigin(host.domains, composer?.getProjectMetadata?.()?.publishedUrl, host.canonicalUrl),
+    servesCleanUrls: host.servesCleanUrls,
+  };
 }

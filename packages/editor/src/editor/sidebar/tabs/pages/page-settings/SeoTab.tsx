@@ -17,7 +17,7 @@ import { BK_HELPER_CLASS, BK_HELPER_ERROR_CLASS, BK_LABEL_CLASS, Button, HelperT
 import { isPlaceholderSlug } from "../utils/seoScore";
 import { resolvePageDescription } from "@/engine/export/SEOInjector";
 import { pageFileNames } from "@/engine/export/pageFiles";
-import { pageCanonicalUrl } from "@buildrik/shared/seo/urls";
+import { pageLinkUrl } from "@buildrik/shared/seo/urls";
 
 interface Props {
   s: UsePageSettingsReturn;
@@ -77,15 +77,15 @@ export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, onOpe
   const siteSeo = composer?.getProjectSettings?.()?.seo;
   const previewTitle = s.effectiveTitle;
   const previewDesc = resolvePageDescription({ metaDescription: s.seoDesc }, undefined, siteSeo);
-  /* The URL the deploy serves for this page: the file the export writes for it
-     (`about.html`, numbered on a slug clash, index.html for home) through the
-     same builder as the canonical and sitemap, which names its clean form
-     (`/about` — vercel.json cleanUrls, REA #26). */
+  /* The URL the live deploy serves for this page: the file the export writes
+     for it (`about.html`, numbered on a slug clash, index.html for home) —
+     its clean form (`/about`, vercel.json cleanUrls, REA #26) once the site
+     serves clean URLs, the `.html` file until it is republished (BD-39 (4)). */
   const sitePages = composer?.elements?.getAllPages?.() ?? [];
   const withThis = sitePages.some((p) => p.id === page.id) ? sitePages : [...sitePages, page];
   const servedFile =
     pageFileNames(withThis.map((p) => (p.id === page.id ? { ...p, slug: s.slug } : p))).get(page.id) ?? "index.html";
-  const previewUrl = (pageCanonicalUrl(domain, servedFile) ?? "").replace(/^https?:\/\//, "");
+  const previewUrl = (pageLinkUrl(domain, servedFile, s.servesCleanUrls) ?? "").replace(/^https?:\/\//, "");
 
   /* The redirect offer (Clone 3519:19920's door). `page.slug` is the SAVED
      slug — the row re-syncs from the engine after updatePage — so a change of

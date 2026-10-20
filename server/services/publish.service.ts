@@ -900,6 +900,25 @@ export function hasLiveDeployment(site: { status: string; publishedUrl: string |
   return site.status === "PUBLISHED" || site.publishedUrl != null;
 }
 
+/**
+ * Whether the site's live deploy serves clean URLs (`/about`, not
+ * `/about.html`). Read from the vercel.json the last completed publish
+ * shipped (its retained bundle, D11) — so a site published before cleanUrls
+ * (REA #26), or rolled back to a bundle from then, answers false until it is
+ * republished, and the editor keeps handing out `.html` links that open
+ * (BD-39 (4)). A publish from before bundles were kept has none: false.
+ */
+export async function servesCleanUrls(siteId: string, db: Prisma.TransactionClient = prisma): Promise<boolean> {
+  const job = await db.publishBuildJob.findFirst({
+    where: { siteId, status: "COMPLETED" },
+    orderBy: { completedAt: "desc" },
+    select: { bundle: true },
+  });
+  const files = (job?.bundle as { files?: Array<{ file: string; data: string }> } | null)?.files ?? [];
+  const config = files.find((f) => f.file === "vercel.json");
+  return config ? (JSON.parse(config.data) as { cleanUrls?: unknown }).cleanUrls === true : false;
+}
+
 /** The site has had a Vercel project created for it at some point — true even
  *  after an unpublish, which removes the deployment but keeps the project. */
 export async function hasEverDeployed(siteId: string): Promise<boolean> {

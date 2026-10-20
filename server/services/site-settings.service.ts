@@ -3,7 +3,7 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { encrypt, decrypt } from "@/lib/encryption";
 import { slugifyProjectName } from "@/lib/vercel";
-import { hasEverDeployed } from "@/server/services/publish.service";
+import { hasEverDeployed, servesCleanUrls } from "@/server/services/publish.service";
 import { isBrandTokensV2Enabled } from "@/server/services/brand-tokens";
 import { SITE_COLUMN_FIELDS } from "@buildrik/shared/schemas/site-column-fields";
 import {
@@ -241,6 +241,9 @@ export async function getSiteSettings(siteId: string, db: Prisma.TransactionClie
        unmigrated site may upgrade. */
     brandTokensV2: isBrandTokensV2Enabled(workspace.id),
     pageSeo,
+    /* BD-39 (4): the editor hands out `/about.html` links until the live
+       deploy serves clean URLs; this read is where it learns which. */
+    servesCleanUrls: await servesCleanUrls(siteId, db),
   };
 }
 

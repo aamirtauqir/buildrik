@@ -417,6 +417,7 @@ describe("usePages copyPageLink", () => {
   it("uses a verified primary custom domain over the published URL", async () => {
     site.id = "s1";
     api.siteDetail.domains.list.query.mockResolvedValue([{ domain: "bellacucina.com", status: "VERIFIED", isPrimary: true }]);
+    api.siteDetail.settings.get.query.mockResolvedValue({ canonicalUrl: null, servesCleanUrls: true });
     const composer = createMockComposer({
       pages: [pg("p1", "Home", { isHome: true }), pg("p2", "Menu")],
       projectMetadata: { publishedUrl: "https://bella.vercel.app" },
@@ -434,7 +435,7 @@ describe("usePages copyPageLink", () => {
 
   it("a typed canonical wins over everything", async () => {
     site.id = "s1";
-    api.siteDetail.settings.get.query.mockResolvedValue({ canonicalUrl: "https://www.bella.example" });
+    api.siteDetail.settings.get.query.mockResolvedValue({ canonicalUrl: "https://www.bella.example", servesCleanUrls: true });
     const composer = createMockComposer({
       pages: [pg("p1", "Home", { isHome: true }), pg("p2", "Menu")],
       projectMetadata: { publishedUrl: "https://bella.vercel.app" },
@@ -450,8 +451,30 @@ describe("usePages copyPageLink", () => {
     expect(writeText).toHaveBeenCalledWith("https://www.bella.example/menu");
   });
 
+  /* BD-39 (4): the live deploy decides the form. A site last published before
+     cleanUrls serves only the `.html` files, so `/menu` would be a 404. */
+  it("copies the .html form until the live deploy serves clean URLs", async () => {
+    site.id = "s1";
+    api.siteDetail.domains.list.query.mockResolvedValue([{ domain: "bellacucina.com", status: "VERIFIED", isPrimary: true }]);
+    api.siteDetail.settings.get.query.mockResolvedValue({ canonicalUrl: null, servesCleanUrls: false });
+    const composer = createMockComposer({
+      pages: [pg("p1", "Home", { isHome: true }), pg("p2", "Menu")],
+      projectMetadata: { publishedUrl: "https://bella.vercel.app" },
+    });
+    const writeText = vi.fn(() => Promise.resolve());
+    defineClipboard({ writeText });
+    const { result } = setup(composer);
+    await waitFor(() => expect(api.siteDetail.domains.list.query).toHaveBeenCalled());
+    await act(async () => {});
+
+    act(() => result.current.copyPageLink("p2"));
+
+    expect(writeText).toHaveBeenCalledWith("https://bellacucina.com/menu.html");
+  });
+
   /* The served URL, as the page drawer previews it: home is the bare origin,
-     every other page its written file (no cleanUrls yet), never `/<slug>`. */
+     every other page its written file until the site is known to serve clean
+     URLs, never `/<slug>`. */
   it("copies the home page as the site root", async () => {
     const composer = createMockComposer({
       pages: [pg("p1", "Home", { isHome: true }), pg("p2", "Menu")],
@@ -477,10 +500,10 @@ describe("usePages copyPageLink", () => {
 
     act(() => result.current.copyPageLink("p2"));
 
-    expect(writeText).toHaveBeenCalledWith("https://example.com/menu");
+    expect(writeText).toHaveBeenCalledWith("https://example.com/menu.html");
     await waitFor(() =>
       expect(lastToast()).toMatchObject({
-        description: "Link copied · example.com/menu",
+        description: "Link copied · example.com/menu.html",
         tone: "success",
       })
     );
