@@ -162,6 +162,10 @@ const AxisInput: React.FC<AxisInputProps> = ({ box, side, value, onChange, disab
             const next = String(Math.round((base + (e.shiftKey ? 10 : 1) * (e.key === "ArrowUp" ? 1 : -1)) * 100) / 100);
             setLocal({ num: next, unit: local.unit || "px", isKeyword: false });
             commit(next);
+          } else if (e.key === "Enter") {
+            /* The typed number is already written: Enter makes it the value
+               Escape returns to (REA 2026-10-20 P0-1). */
+            atFocusRef.current = value;
           } else if (e.key === "Escape") {
             const before = atFocusRef.current;
             if (before !== null && before !== value && !field.readOnly) {

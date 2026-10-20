@@ -260,22 +260,25 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
 
   /* Enter / blur: read the entry. Unreadable → red border + the message, the
      entry stays so it can be corrected, the element keeps its old value. */
-  const commit = () => {
-    if (field.readOnly || (field.mixed && text === "")) return;
+  /* Returns the value the property holds once the entry is read, or null
+     when nothing was committed (read-only, unreadable). */
+  const commit = (): string | null => {
+    if (field.readOnly || (field.mixed && text === "")) return null;
     /* Untouched is not an entry. A token-bound size shows the number it
        resolves to, so reading that back on blur wrote "24px" over the token —
        which is also what undid an Escape the moment focus left. */
-    if (text === shown && !invalid) return;
+    if (text === shown && !invalid) return value;
     const next = parseEntry(text, units, unit);
     if (next === null) {
       setInvalid(true);
-      return;
+      return null;
     }
     setInvalid(false);
     /* Emptied = clear the property (DD-19, P-11d); an empty field left empty
        writes nothing. */
-    if (next === "" && value === "") return;
+    if (next === "" && value === "") return value;
     if (next !== value) onChange(next);
+    return next;
   };
 
   const step = (delta: number) => {
@@ -301,7 +304,10 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
       }
       restore();
     } else if (e.key === "Enter") {
-      commit();
+      /* Enter commits: Escape now cancels only what is typed after it, so it
+         never reverts a saved value (REA 2026-10-20 P0-1). */
+      const committed = commit();
+      if (committed !== null) atFocusRef.current = committed;
     }
   };
 
