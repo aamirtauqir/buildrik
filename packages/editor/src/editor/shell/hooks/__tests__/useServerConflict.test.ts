@@ -22,7 +22,7 @@ vi.mock("@/services/BuildrikSyncProvider", () => ({
   setBaselineLastEditedAt: sync.setBaselineLastEditedAt,
 }));
 const nav = vi.hoisted(() => ({ navigate: vi.fn() }));
-vi.mock("../../unloadGuardBypass", () => ({ navigateBypassingUnloadGuard: nav.navigate }));
+vi.mock("@/editor/shell/unloadGuardBypass", () => ({ navigateBypassingUnloadGuard: nav.navigate }));
 
 import { useServerConflict } from "../useServerConflict";
 import {

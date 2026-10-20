@@ -10,7 +10,7 @@ import { renderHook, act } from "@testing-library/react";
 import type * as React from "react";
 import { describe, it, expect, vi } from "vitest";
 
-vi.mock("../../shared/hitTesting", () => ({
+vi.mock("@/editor/canvas/shared/hitTesting", () => ({
   buildElementStack: () => ["inner", "middle", "outer"],
   findElementWithHitExpansion: () => null,
 }));
