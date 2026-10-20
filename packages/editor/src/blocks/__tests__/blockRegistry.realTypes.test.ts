@@ -126,7 +126,10 @@ async function publishedFiles(composer: ReturnType<typeof createTestComposer>): 
     /* The site's token declarations are site-wide, not the block's: since
        BRD-23 every export declares the seed tokens (the baseline predates it).
        That block is pinned by `ExportEngine.tokenClosure.test.ts`. */
-    .replace(/\n\n\n:root\{--buildrick-design-[^}]*\}\n/, "");
+    .replace(/\n\n\n:root\{--buildrick-design-[^}]*\}\n/, "")
+    /* Site-wide too: since REA #18 every export paints body text with the
+       site's Text token, saved or seed. Pinned by ExportEngine.siteFonts.test.ts. */
+    .replace(/\nbody\{color:var\(--buildrick-design-color-text,[^)]*\)\}\n/, "");
 }
 
 describe("Q2 — inserted blocks keep their real element type", () => {

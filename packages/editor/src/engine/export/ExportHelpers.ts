@@ -59,11 +59,16 @@ export function siteFontsFromTokens(
 }
 
 /**
- * The font slots and text colour the SITE saved, resolved against the same
- * list the canvas and the token CSS use. A slot is reported only when the site
- * carries its token: the seed's Inter must not become a rule on every export,
- * or "a missing token leaves the reset's family in place" (`siteFontCSS`)
- * could never be true.
+ * The font slots the SITE saved, and its text colour, resolved against the
+ * same list the canvas and the token CSS use. A font slot is reported only when
+ * the site carries its token: the seed's Inter must not become a rule on every
+ * export, or "a missing token leaves the reset's family in place"
+ * (`siteFontCSS`) could never be true.
+ *
+ * The text colour is reported from the seed too. The canvas always paints body
+ * text with the Text token (site-content.css), saved or not, so a site that
+ * never saved one was slate on the canvas and browser black in Preview and on
+ * the published page (REA #18).
  */
 export function siteFontsFromSettings(
   settings: SiteTokenSettings | undefined,
@@ -75,7 +80,7 @@ export function siteFontsFromSettings(
     heading: saved.has("font-heading") ? all.heading : undefined,
     body: saved.has("font-body") ? all.body : undefined,
     mono: saved.has("font-mono") ? all.mono : undefined,
-    text: saved.has("color-text") ? all.text : undefined,
+    text: all.text,
   };
 }
 
