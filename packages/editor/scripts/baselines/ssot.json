@@ -23,6 +23,13 @@
     "category": "antiPatterns",
     "violations": [
       {
+        "path": "src/engine/export/publishPostProcess.ts",
+        "line": 149,
+        "severity": "minor",
+        "message": "Dead export \"wireForms\" — not imported anywhere",
+        "suggestion": "Delete unused export; rely on git history if needed later."
+      },
+      {
         "path": "src/shared/utils/nesting/typeChecks.ts",
         "line": 39,
         "severity": "minor",
