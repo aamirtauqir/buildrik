@@ -1,5 +1,6 @@
 /**
- * "Update component" — the door onto updateComponentMaster.
+ * "Push to master…" (was "Update from selection…", BD-32) — the door onto
+ * updateComponentMaster. Offered only on an instance root of this component.
  *
  * The engine could promote an element to master and fan the change out to every
  * instance, with tests, for months. Nothing in the product called it: the panel
@@ -53,6 +54,7 @@ function makeComposer(
         instantiateComponent: vi.fn(),
         getInstancesOfComponent: () => instances,
         isInstance: () => false,
+        getInstanceByElementId: (id: string) => (id === "el-9" ? { elementId: "el-9", componentId: "c1" } : undefined),
       },
     } as never,
     updateComponentMaster,
@@ -71,12 +73,12 @@ const renderScreen = (composer: never, selectedElementId: string | null) =>
     </ToastProvider>,
   );
 
-const updateButton = () => screen.getByRole("button", { name: /^update from selection…$/i });
+const updateButton = () => screen.getByRole("button", { name: /^push to master…$/i });
 /* The trigger and the confirm must not share a name — they did, and the test
    could not tell them apart, which means neither could a screen-reader user. */
-const confirmButton = () => screen.getByRole("button", { name: /^update component$/i });
+const confirmButton = () => screen.getByRole("button", { name: /^replace master$/i });
 
-describe("ComponentDetailScreen — Update component", () => {
+describe("ComponentDetailScreen — Push to master", () => {
   it("is disabled with no canvas selection, and says why", () => {
     const { composer } = makeComposer();
     renderScreen(composer, null);
@@ -84,7 +86,7 @@ describe("ComponentDetailScreen — Update component", () => {
     expect(btn).toBeDisabled();
     expect(btn).toHaveAttribute(
       "title",
-      expect.stringContaining("Select an element on the canvas"),
+      expect.stringContaining("Select an instance of CTA on the canvas"),
     );
   });
 

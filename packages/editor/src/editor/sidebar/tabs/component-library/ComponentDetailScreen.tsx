@@ -159,6 +159,11 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
     }
   };
 
+  /* BD-32: only the root of an instance of THIS component can be pushed to
+     the master — a child element or a non-instance never replaces it. */
+  const canPush =
+    !!selectedElementId && composer?.components?.getInstanceByElementId?.(selectedElementId)?.componentId === component.id;
+
   /**
    * Promote the canvas selection to this component's master.
    *
@@ -169,7 +174,7 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
    */
   const confirmUpdateAction = async () => {
     setShowUpdateConfirm(false);
-    if (!composer || !selectedElementId) return;
+    if (!composer || !selectedElementId || !canPush) return;
 
     const before = composer.components.snapshotComponent(component.id);
     const { updated, instancesSynced, overridesDropped } =
@@ -339,12 +344,12 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
           </Button>
           <Button
             onClick={() => setShowUpdateConfirm(true)}
-            disabled={!selectedElementId}
-            title={selectedElementId ? undefined : "Select an element on the canvas to update this master from"}
+            disabled={!canPush}
+            title={canPush ? undefined : `Select an instance of ${component.name} on the canvas (its outer element) to push it to the master`}
             data-testid="component-update"
             className={BTN_28}
           >
-            Update from selection…
+            Push to master…
           </Button>
           <Button
             color="light"
@@ -452,16 +457,16 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
         open={showUpdateConfirm}
         onClose={() => setShowUpdateConfirm(false)}
         onConfirm={confirmUpdateAction}
-        title="Update component"
+        title="Push to master"
         message={
           /* ⌘Z alone reverts the pages, not the component definition (measured),
              so the way back is the toast's Undo, which restores the master. */
           (instanceCount > 0
-            ? `Replace "${component.name}" with the element selected on the canvas? ${instanceCount} instance(s) will change to match. Any edits made on an instance are kept where they still fit, and lost where the new version no longer has that part. `
-            : `Replace "${component.name}" with the element selected on the canvas? `) +
+            ? `Replace the "${component.name}" master with the selected instance? ${instanceCount} instance(s) will change to match. Any edits made on an instance are kept where they still fit, and lost where the new version no longer has that part. `
+            : `Replace the "${component.name}" master with the selected instance? `) +
           "To go back, use Undo on the confirmation that follows."
         }
-        confirmLabel="Update component"
+        confirmLabel="Replace master"
         tone="destructive"
       />
       <ConfirmDialog
