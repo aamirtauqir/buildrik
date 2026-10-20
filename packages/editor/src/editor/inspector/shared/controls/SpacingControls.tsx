@@ -16,7 +16,7 @@ import { Link, Unlink } from "lucide-react";
 import * as React from "react";
 import { FieldDot } from "./FieldDot";
 import { useInspectorField, mixedName } from "./InspectorFieldContext";
-import { unitWords } from "./InputControls";
+import { parseEntry, unitWords } from "./InputControls";
 import { TextField, Button, TextInput, IconButton } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
 import { requestBrandToken } from "@/editor/design-system/ui/brandOpenRequest";
@@ -28,6 +28,8 @@ import { isTokenVar, extractVarName, cssVarToTokenId, resolveTokenVar } from "..
 
 type Side = "top" | "right" | "bottom" | "left";
 type Box = "margin" | "padding";
+
+const SIDE_UNITS: readonly string[] = ["px", "%", "em", "rem", "vw", "vh", "auto"];
 
 const parseValue = (val: string): { num: string; unit: string; isKeyword: boolean } => {
   if (!val) return { num: "", unit: "", isKeyword: false };
@@ -82,11 +84,15 @@ const AxisInput: React.FC<AxisInputProps> = ({ box, side, value, onChange, disab
   }, [value]);
 
   /* A typed or stepped number keeps the side's own unit: a video embed's
-     `padding-bottom: 56.25%` stepped up is 57.25%, never 57.25px. */
+     `padding-bottom: 56.25%` stepped up is 57.25%, never 57.25px. A number
+     typed with its own unit ("2rem", "10%") keeps the typed one. */
   const commit = (raw: string) => {
     if (raw === "") onChange("");
-    else if (raw === "auto" || raw === "inherit") onChange(raw);
-    else if (/^-?[\d.]+$/.test(raw)) onChange(`${raw}${local.isKeyword ? "px" : local.unit || "px"}`);
+    else if (raw === "inherit") onChange(raw);
+    else {
+      const next = parseEntry(raw, SIDE_UNITS, local.isKeyword ? "px" : local.unit || "px");
+      if (next) onChange(next);
+    }
   };
 
   const tokenId = isTokenVar(value) ? cssVarToTokenId(extractVarName(value) ?? "") : null;
@@ -145,7 +151,7 @@ const AxisInput: React.FC<AxisInputProps> = ({ box, side, value, onChange, disab
           const next = e.target.value;
           field.startTyping();
           setLocal({ num: next, unit: local.unit, isKeyword: /^[a-z]+$/i.test(next) });
-          if (next === "" || /^-?[\d.]+$/.test(next) || next === "auto" || next === "inherit") commit(next);
+          commit(next);
         }}
         onKeyDown={(e) => {
           /* §16: ↑/↓ step 1, Shift 10; Esc puts the value back. */
