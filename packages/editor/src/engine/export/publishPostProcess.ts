@@ -249,7 +249,7 @@ const INERT_SCRIPT = new RegExp(`<script\\b([^>]*?)\\s${CUSTOM_CODE_ATTR}="([^"]
  * type it was written with (none, for plain JavaScript), in place, so their
  * order is kept.
  */
-export function activateCustomCode(html: string): string {
+function activateCustomCode(html: string): string {
   if (!html.includes(CUSTOM_CODE_ATTR)) return html;
   return html.replace(INERT_SCRIPT, (_tag, before: string, type: string, after: string) => {
     const rest = `${before}${after}`.replace(/\stype="text\/plain"/i, "");
