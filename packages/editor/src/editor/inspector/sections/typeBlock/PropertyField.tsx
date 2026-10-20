@@ -22,14 +22,7 @@ import {
   runTxn,
   writeAttribute,
 } from "./attributeWriter";
-const styles = {
-  nameWarning: {
-    margin: "-6px 0 10px",
-    fontSize: 11,
-    lineHeight: 1.45,
-    color: "var(--bk-warning-text)",
-  } as React.CSSProperties,
-};
+const NAME_WARNING_CLASS = "tw:mt-[-6px] tw:mb-2.5 tw:text-[11px] tw:leading-[1.45] tw:text-[var(--bk-warning-text)]";
 
 // ============================================================================
 // TYPES
@@ -114,7 +107,7 @@ const PropertyField: React.FC<PropertyFieldProps> = ({
         placeholder={prop.placeholder}
       />
       {prop.id === "name" && CLOBBERING_NAMES.has(value.trim().toLowerCase()) && (
-        <p style={styles.nameWarning} role="status">
+        <p className={NAME_WARNING_CLASS} role="status">
           &ldquo;{value.trim()}&rdquo; won&rsquo;t survive publishing — it collides with a form
           property, so the field ships with no name and its answer is dropped from the submission.
           Try &ldquo;full{value.trim().toLowerCase() === "name" ? "name" : "_" + value.trim().toLowerCase()}&rdquo;.
@@ -123,7 +116,7 @@ const PropertyField: React.FC<PropertyFieldProps> = ({
       {/* BK-44: a form with its own action is left as it is at publish, so its
           answers never reach Submissions — that happened without a word. */}
       {prop.id === "action" && selectedElement.type === "form" && value.trim() && (
-        <p style={styles.nameWarning} role="status">
+        <p className={NAME_WARNING_CLASS} role="status">
           Answers go to this URL instead of Submissions. Clear it to collect them in Buildrick.
         </p>
       )}
