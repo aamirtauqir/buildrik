@@ -18,11 +18,37 @@
  * the live site resolve every property the same way (ResolvedStyle).
  */
 import { isSafeElementId } from "@buildrik/shared/schemas/element-markup";
+import { CLASS_CHAIN_MAX, type StyleModel } from "@buildrik/shared/schemas/class-styles";
 import type { BreakpointId } from "@/shared/types/breakpoints";
 import { isSafeAttrValue } from "@/shared/utils/html/sanitization";
 import { stylesToCSS, stylesToString } from "../export/ExportHelpers";
 
 export type CascadeTarget = "media" | BreakpointId;
+
+/**
+ * How many times an element-local rule repeats its identity selector in the
+ * class style model (CLASS-FIRST-SPEC §4.2, the specificity ladder). A class
+ * rule is at most CLASS_CHAIN_MAX classes plus one pseudo-class — (0,4,0) —
+ * so a local identity repeated one more time than that, (0,5,0), beats every
+ * class rule, state rules included, by specificity alone. The spec's 4×
+ * relied on locals coming after classes in source order, but every surface
+ * writes the element base rules (elementBaseCSS) BEFORE the class rules, so
+ * `.a.b.c:hover` would have tied a local base value and won.
+ */
+const LOCAL_LADDER = CLASS_CHAIN_MAX + 2;
+
+/**
+ * An element-local rule's identity selector (`.buildrick-<id>` on publish,
+ * `[data-buildrick-id="<id>"]` on the canvas and in StyleEngine rules) as the
+ * cascade writes it: unchanged in the element model, so legacy output stays
+ * byte-identical; repeated LOCAL_LADDER times in the class model, so a value
+ * set on "this element only" wins over every tag and class rule at every
+ * breakpoint and in every state (owner Q3, BD-38). `pseudo` (`:hover`) goes
+ * after the repeated identity.
+ */
+export function localSelector(identity: string, styleModel: StyleModel, pseudo = ""): string {
+  return (styleModel === "class" ? identity.repeat(LOCAL_LADDER) : identity) + pseudo;
+}
 
 /** `--hide-<bp>: true` (the inspector's Visibility toggles), per breakpoint, as the viewport query that hides. */
 const HIDE_QUERIES: Record<BreakpointId, { key: string; query: string }> = {
