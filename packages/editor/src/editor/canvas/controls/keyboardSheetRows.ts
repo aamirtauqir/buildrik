@@ -151,7 +151,6 @@ export const CHROME_CHORDS: ChromeChord[] = [
 
   // ── Panels — useSidebarKeyboard (letters), useEditorShortcuts (the rest) ─
   ...PANEL_LETTERS,
-  { id: "panel-site-settings", group: "Panels", keys: "ctrl+,", description: "Site settings" },
   { id: "panel-version-history", group: "Panels", keys: "ctrl+h", description: "Version history" },
   { id: "panel-comment-mode", group: "Panels", keys: "C", description: "Comment mode" },
 
@@ -167,7 +166,15 @@ export const CHROME_CHORDS: ChromeChord[] = [
  *  command with a chord and no `group` lands under Edit — the test in
  *  `KeyboardCheatSheet.commands.test.tsx` refuses that case so it stays
  *  hypothetical. */
-export function buildSheetGroups(registry: readonly CommandData[]): SheetGroup[] {
+/** Rows whose key is bound only while the site's review layer is on: R
+ *  (useSidebarKeyboard's disabledTabs) and C (useEditorShortcuts'
+ *  reviewsEnabled). Printing them while it is off promised a dead key. */
+const REVIEW_ONLY_ROWS = new Set(["panel-review", "panel-comment-mode"]);
+
+export function buildSheetGroups(
+  registry: readonly CommandData[],
+  { reviewsEnabled = true }: { reviewsEnabled?: boolean } = {},
+): SheetGroup[] {
   const byGroup = new Map<string, SheetRow[]>();
   const push = (group: string, row: SheetRow) => {
     const rows = byGroup.get(group);
@@ -184,7 +191,10 @@ export function buildSheetGroups(registry: readonly CommandData[]): SheetGroup[]
       description: cmd.label ?? cmd.id,
     });
   }
-  for (const { group, ...row } of CHROME_CHORDS) push(group, row);
+  for (const { group, ...row } of CHROME_CHORDS) {
+    if (!reviewsEnabled && REVIEW_ONLY_ROWS.has(row.id)) continue;
+    push(group, row);
+  }
 
   const rank = (g: string) => {
     const i = SHEET_GROUP_ORDER.indexOf(g);

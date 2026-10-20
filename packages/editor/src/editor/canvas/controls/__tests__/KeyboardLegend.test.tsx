@@ -37,7 +37,9 @@ describe("KeyboardLegend", () => {
     for (const k of ["Tab", "F6 / ⇧F6", "Esc", "⌘K", "A L P M D B", "R", "C", "⌘S · save", "⌘P", "⌘Z / ⌘⇧Z"]) {
       expect(screen.getByText(k, { selector: "[data-testid=kbd-legend-key]" })).toBeInTheDocument();
     }
-    expect(card).toHaveTextContent("Also: ⌃, opens Settings");
+    expect(card).toHaveTextContent("Also: ⌃H opens History");
+    /* SC-12 / owner Q4: Site settings has no shortcut. */
+    expect(card).not.toHaveTextContent("⌃,");
   });
 
   /* L1-014: three lines contradicted the real bindings (useEditorShortcuts,

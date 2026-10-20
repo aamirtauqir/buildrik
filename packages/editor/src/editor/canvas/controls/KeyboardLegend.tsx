@@ -90,7 +90,7 @@ export function KeyboardLegend({ composer }: { composer: Composer | null }) {
           </div>
         ))}
         <p className="tw:m-0 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
-          Also: ⌃, opens Settings · ⌃H opens History · ⇧A opens Components · ⌘Y redoes. Conditional regions drop
+          Also: ⌃H opens History · ⇧A opens Components · ⌘Y redoes. Conditional regions drop
           out when their feature is off.
         </p>
       </div>

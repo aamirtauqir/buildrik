@@ -162,7 +162,8 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
     ariaLabel: "Site config, SEO, export, publish",
     section: "bottom",
     pattern: "card-drill-in",
-    shortcut: "S",
+    // No letter: owner Q4 (SC-12, R-1018b) — Site settings has no shortcut;
+    // its doors are the topbar button and ⌘K. S used to open it full-page.
     // P5: graduated from a 320px drawer to a full-page surface (authoritative
     // IA 14-screen-specs.md:8 — "Site full-page = settings×11 …"). SettingsTab's
     // 140px-snav + 1fr-pane now renders full-width via FullPageRouter; the drawer

@@ -1,9 +1,7 @@
 /**
- * F6/T9 — the Site-settings hint shows the chord that works on THIS platform.
- *
- * The handler (useEditorShortcuts) accepts ctrl OR meta everywhere, but ⌘H is
- * macOS's OS-level window-hide: the browser never sees it, so advertising it
- * is a lie. `IS_MAC` is computed at module scope, hence the resetModules dance.
+ * SC-12 / owner Q4 (R-1018b): Site settings has no shortcut — the row used
+ * to print ⌃, (Ctrl , elsewhere). Checked on both platforms because `IS_MAC`
+ * is computed at module scope, hence the resetModules dance.
  *
  * @license BSD-3-Clause
  */
@@ -30,12 +28,12 @@ async function settingsHint(platform: string): Promise<string | null> {
   return screen.getByRole("menuitem", { name: /Site settings/ }).textContent;
 }
 
-describe("T9 platform-aware site-settings shortcut hint", () => {
-  it("macOS shows ⌃, — ⌘, is the browser's Preferences chord", async () => {
-    expect(await settingsHint("MacIntel")).toBe("Site settings⌃,");
+describe("SC-12 / owner Q4: the Site settings row prints no chord", () => {
+  it("macOS: no ⌃, — Site settings has no shortcut", async () => {
+    expect(await settingsHint("MacIntel")).toBe("Site settings");
   });
 
-  it("everywhere else shows Ctrl ,", async () => {
-    expect(await settingsHint("Win32")).toBe("Site settingsCtrl ,");
+  it("elsewhere: no Ctrl ,", async () => {
+    expect(await settingsHint("Win32")).toBe("Site settings");
   });
 });
