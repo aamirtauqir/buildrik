@@ -198,11 +198,46 @@ describe("clipboard", () => {
 
     run("paste");
 
-    expect(composer.elements.pasteElement).toHaveBeenCalledWith(
-      composer.clipboard![0],
-      target,
-      undefined,
-    );
+    expect(composer.elements.pasteElement).toHaveBeenCalledWith(composer.clipboard![0], target, 0);
+  });
+
+  /* Audit 2026-10-20 #15 (Webflow): a selected container takes the paste as
+     its LAST child; a selected non-container gets it as the next sibling —
+     even one the rules let hold it (a Button may hold an Image). */
+  it("pastes as the LAST child of a selected container", () => {
+    composer.clipboard = [{ type: "heading" }];
+    const box = makeElement("box", "container");
+    box.getChildren = () => [makeElement("a", "paragraph"), makeElement("b", "paragraph")];
+    composer.selection.getSelected.mockReturnValue(box);
+
+    run("paste");
+
+    expect(composer.elements.pasteElement).toHaveBeenCalledWith(composer.clipboard![0], box, 2);
+  });
+
+  it("pastes an Image AFTER a selected Button, not inside it", () => {
+    composer.clipboard = [{ type: "image" }];
+    const button = makeElement("btn", "button");
+    const parent = makeElement("el-parent", "container");
+    button.getParent = () => parent;
+    parent.getChildren = () => [button, makeElement("p", "paragraph")];
+    composer.selection.getSelected.mockReturnValue(button);
+
+    run("paste");
+
+    expect(composer.elements.pasteElement).toHaveBeenCalledWith(composer.clipboard![0], parent, 1);
+  });
+
+  it("keeps a multi-item paste into a container in clipboard order", () => {
+    composer.clipboard = [{ type: "heading" }, { type: "paragraph" }];
+    const box = makeElement("box", "container");
+    box.getChildren = () => [makeElement("a", "paragraph")];
+    composer.selection.getSelected.mockReturnValue(box);
+
+    run("paste");
+
+    expect(composer.elements.pasteElement).toHaveBeenNthCalledWith(1, composer.clipboard![0], box, 1);
+    expect(composer.elements.pasteElement).toHaveBeenNthCalledWith(2, composer.clipboard![1], box, 2);
   });
 
   it("pastes AFTER a leaf that cannot hold it, not inside it", () => {

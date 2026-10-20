@@ -11,7 +11,7 @@ import { stepZoom } from "@/shared/constants/canvas";
 import type { CommandData, CommandOptions, ElementType } from "@/shared/types";
 /* Explicit: without it `Element` in this file resolves to the DOM one. */
 import type { Element } from "../elements/Element";
-import { canNestElement } from "@/shared/utils/nesting";
+import { insertionPlace } from "@/shared/utils/nesting";
 import type { Composer } from "../Composer";
 import { nudgeSelected, reorderElement, dropLockedAndInstances, pasteStyles, writeElement, writableElements, stylesAt, activeBreakpoint } from "./commandOperations";
 
@@ -347,25 +347,19 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
         const plan: { data: (typeof items)[number]; target: Element; index?: number }[] = [];
         for (const data of items) {
           const pastedType = data.type as ElementType;
+          /* Audit 2026-10-20 #15: the same landing rule as click-to-add
+             (`insertionPlace`) — last child of a selected container, else the
+             next sibling, climbing to an ancestor that may hold it. When none
+             may, `target` stays the page root — that fallback is the contract.
+             The slot offset keeps a multi-item paste in clipboard order. */
           let target: Element | null = root ?? null;
           let index: number | undefined;
-          if (selected) {
-            if (canNestElement(pastedType, selected.getType() as ElementType)) {
-              target = selected;
-            } else {
-              const parent = selected.getParent();
-              if (parent && canNestElement(pastedType, parent.getType() as ElementType)) {
-                target = parent;
-                const used = usedSlots.get(parent) ?? 0;
-                index = parent.getChildren().indexOf(selected) + 1 + used;
-                usedSlots.set(parent, used + 1);
-              }
-              /* No else. When neither the selection nor its parent can hold the
-                 item, `target` stays the page root — that fallback is the
-                 contract ("falls back to the page root when the parent cannot
-                 hold it either") and rewriting this loop briefly dropped it.
-                 An item is unplaceable only when there is no page at all. */
-            }
+          const place = selected ? insertionPlace(pastedType, selected) : null;
+          if (place) {
+            const used = usedSlots.get(place.parent) ?? 0;
+            target = place.parent;
+            index = place.index + used;
+            usedSlots.set(place.parent, used + 1);
           }
           if (!target) continue;
           plan.push({ data, target, index });
