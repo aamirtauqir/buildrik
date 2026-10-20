@@ -13,6 +13,9 @@ import * as React from "react";
 import { devLog } from "@/shared/utils/devLogger";
 import { isSafeUrl } from "@/shared/utils/html";
 
+/** The inline elements "Clear formatting" unwraps. */
+const INLINE_FORMAT_TAGS = "strong, b, em, i, u, s, strike, del, ins, mark, font, span, sub, sup, small, big";
+
 interface UseCanvasInlineCommandsParams {
   canvasRef: React.RefObject<HTMLDivElement | null>;
   editingId: string | null;
@@ -21,7 +24,7 @@ interface UseCanvasInlineCommandsParams {
 /**
  * Rich text inline editing commands using Selection API.
  * Supports bold, italic, underline, strikethrough, insertText,
- * createLink, unlink, and formatBlock.
+ * createLink, unlink, formatBlock and removeFormat (Clear formatting).
  */
 export function useCanvasInlineCommands({
   canvasRef,
@@ -184,6 +187,26 @@ export function useCanvasInlineCommands({
           document.execCommand("styleWithCSS", false, "true");
           document.execCommand(command, false, value);
           document.execCommand("styleWithCSS", false, "false");
+          break;
+        }
+
+        case "removeFormat": {
+          /* Clear formatting: unwrap every inline formatting element the
+             selection touches (links stay — they are content, not format)
+             and drop inline styles from what remains in it. */
+          const touched = Array.from(editingEl.querySelectorAll<HTMLElement>(INLINE_FORMAT_TAGS)).filter((node) =>
+            range.intersectsNode(node)
+          );
+          for (const node of touched) {
+            const parent = node.parentNode;
+            if (!parent) continue;
+            while (node.firstChild) parent.insertBefore(node.firstChild, node);
+            parent.removeChild(node);
+          }
+          editingEl.querySelectorAll<HTMLElement>("[style]").forEach((node) => {
+            if (range.intersectsNode(node)) node.removeAttribute("style");
+          });
+          editingEl.normalize();
           break;
         }
 

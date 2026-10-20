@@ -152,3 +152,29 @@ describe("useCanvasInlineCommands — Insert link wraps the selection the user m
     urlField.remove();
   });
 });
+
+describe("useCanvasInlineCommands — Clear formatting", () => {
+  it("removeFormat strips inline formatting from the selection and keeps the text and links", () => {
+    const canvasDiv = document.createElement("div");
+    const p = document.createElement("p");
+    p.setAttribute("data-buildrick-id", "el-3");
+    p.innerHTML = 'Hello <strong>bold <em>it</em></strong> <span style="color: red">red</span> <a href="https://x.dev">link</a>';
+    canvasDiv.appendChild(p);
+    document.body.appendChild(canvasDiv);
+    const canvasRef = { current: canvasDiv } as React.RefObject<HTMLDivElement | null>;
+    const { result } = renderHook(() => useCanvasInlineCommands({ canvasRef, editingId: "el-3" }));
+
+    const range = document.createRange();
+    range.selectNodeContents(p);
+    const sel = window.getSelection()!;
+    sel.removeAllRanges();
+    sel.addRange(range);
+
+    act(() => {
+      result.current.handleInlineCommand("removeFormat");
+    });
+
+    expect(p.innerHTML).toBe('Hello bold it red <a href="https://x.dev">link</a>');
+    canvasDiv.remove();
+  });
+});
