@@ -42,7 +42,7 @@ export function ConfirmFolderDeleteModal({
   onCancel,
   onMoveFiles,
 }: ConfirmFolderDeleteModalProps) {
-  const { folderName, assetCount, subFolderCount } = payload;
+  const { folderName, assetCount, subFolderCount, inUseCount } = payload;
   const isEmpty = assetCount === 0 && subFolderCount === 0;
 
   // "N files and M folders" — Section 5 finding. Hiding the sub-folder count
@@ -92,6 +92,9 @@ export function ConfirmFolderDeleteModal({
             role="alert"
           >
             ⚠ Deleting this folder will remove its contents along with it.
+            {inUseCount > 0 &&
+              ` ${inUseCount} of the files ${inUseCount === 1 ? "is" : "are"} used on the site and will be cleared from ${inUseCount === 1 ? "its" : "their"} elements.`}
+            {" "}You can undo for a few seconds after.
           </div>
         </>
       )}

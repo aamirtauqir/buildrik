@@ -11,7 +11,15 @@ import { STORAGE_KEYS } from "@/shared/constants/storageKeys";
 import { getSiteIdFromUrl, loadServerMedia } from "@/services/BuildrikSyncProvider";
 import type { MediaSortBy, SortDirection } from "@/shared/types/media";
 import type { MediaAsset } from "@/shared/types/media";
-import type { LibraryItem, LibraryStateResult, MediaBucket, MediaTypeFilter } from "../data/mediaTypes";
+import type { GraceDelete } from "@/engine/media/MediaCommandLayer";
+import type {
+  FolderDeleteResult,
+  FolderInspection,
+  LibraryItem,
+  LibraryStateResult,
+  MediaBucket,
+  MediaTypeFilter,
+} from "../data/mediaTypes";
 import {
   countByType,
   filterByFmt,
@@ -266,20 +274,37 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
     [composer, currentFolderId],
   );
 
+  /* The folder and every folder under it, the folder first — the order a
+     delete takes them in reverse. */
+  const folderSubtree = useCallback(
+    (id: string): string[] => {
+      const order: string[] = [];
+      const walk = (folderId: string) => {
+        if (order.includes(folderId)) return;
+        order.push(folderId);
+        for (const sub of composer.media.getFolders(folderId)) walk(sub.id);
+      };
+      walk(id);
+      return order;
+    },
+    [composer],
+  );
+
   /**
-   * Inspect a folder before deleting. Returns counts so the caller (component
-   * layer) can prompt the user via a real dialog, then call `deleteFolder`
-   * with `force: true` to commit the deletion.
+   * Inspect a folder before deleting. Returns what a forced delete would take
+   * — every file in the folder AND its sub-folders, which is what the confirm
+   * must count — so the caller can prompt with a real dialog (and ask which
+   * of `assetIds` are in use), then call `deleteFolder` with `force: true`.
    *
    * Pure read — no side effects, safe to call in render.
    */
   const inspectFolder = useCallback(
-    (id: string): { assetCount: number; subFolderCount: number } => {
-      const assetsInFolder = composer.media.getAssets({ folderId: id });
-      const subFolders = composer.media.getFolders(id);
-      return { assetCount: assetsInFolder.length, subFolderCount: subFolders.length };
+    (id: string): FolderInspection => {
+      const order = folderSubtree(id);
+      const assetIds = order.flatMap((folderId) => composer.media.getAssets({ folderId }).map((a) => a.id));
+      return { assetCount: assetIds.length, subFolderCount: order.length - 1, assetIds };
     },
-    [composer],
+    [composer, folderSubtree],
   );
 
   /**
@@ -288,14 +313,17 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
    * user with their preferred dialog, and re-call with `force: true` on confirm.
    * This keeps UI dialog logic out of the hook (testable, SSR-safe).
    *
-   * `force` deletes the folder WITH its contents — every asset in it and in
-   * its sub-folders, then the sub-folders (deepest first), then the folder.
-   * That is what the confirm says (board B1-13 7564:185465: "Deleting this
-   * folder will remove its contents along with it"); the engine's own
-   * deleteFolder moves a folder's assets to root, which left the files behind.
+   * `force` deletes the folder WITH its contents (board B1-13 7564:185465:
+   * "Deleting this folder will remove its contents along with it"); the
+   * engine's own deleteFolder moves a folder's assets to root, which left the
+   * files behind. Each file goes through `mediaOps.deleteWithGrace` — the same
+   * path as a single delete, so in-use references are cleared AND restored by
+   * one Undo. It used to hard-delete every file (REA 2026-10-20 #10). The
+   * folders go only once the grace window closes without an Undo, and not at
+   * all if any file failed to delete (the survivor stays where it was).
    */
   const deleteFolder = useCallback(
-    async (id: string, opts: { force?: boolean } = {}) => {
+    async (id: string, opts: { force?: boolean } = {}): Promise<FolderDeleteResult | undefined> => {
       if (!opts.force) {
         const { assetCount, subFolderCount } = inspectFolder(id);
         if (assetCount > 0 || subFolderCount > 0) {
@@ -304,25 +332,47 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
           );
         }
         await composer.media.deleteFolder(id);
-        return;
+        return undefined;
       }
-      const order: string[] = [];
-      const walk = (folderId: string) => {
-        if (order.includes(folderId)) return;
-        order.push(folderId);
-        for (const sub of composer.media.getFolders(folderId)) walk(sub.id);
-      };
-      walk(id);
-      for (const folderId of order) {
-        for (const asset of composer.media.getAssets({ folderId })) {
-          await composer.media.deleteAsset(asset.id);
+      const order = folderSubtree(id);
+      const { assetIds } = inspectFolder(id);
+      const graced: GraceDelete[] = [];
+      let files = 0;
+      let failed = 0;
+      for (const assetId of assetIds) {
+        try {
+          const g = await composer.mediaOps.deleteWithGrace(assetId);
+          if (g) graced.push(g);
+          files += 1;
+        } catch {
+          failed += 1;
         }
       }
-      for (const folderId of [...order].reverse()) {
-        await composer.media.deleteFolder(folderId);
-      }
+      let undone = false;
+      const removeFolders = async () => {
+        if (undone || failed > 0) return;
+        await Promise.all(graced.map((g) => g.commitNow()));
+        for (const folderId of [...order].reverse()) {
+          await composer.media.deleteFolder(folderId);
+        }
+      };
+      const closesAt = Math.max(Date.now(), ...graced.map((g) => g.expiresAt));
+      const settled = new Promise<void>((resolve, reject) => {
+        setTimeout(() => removeFolders().then(resolve, reject), closesAt - Date.now());
+      });
+      return {
+        files,
+        failed,
+        settled,
+        usageCount: graced.reduce((n, g) => n + g.usageCount, 0),
+        undo: () => {
+          if (undone) return;
+          undone = true;
+          graced.forEach((g) => g.undo());
+        },
+      };
     },
-    [composer, inspectFolder],
+    [composer, inspectFolder, folderSubtree],
   );
 
   const moveAsset = useCallback(async (assetId: string, folderId: string | null) => {
