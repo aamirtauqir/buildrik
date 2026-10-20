@@ -75,7 +75,7 @@ export default defineConfig({
       // Workspace package — editor's "../shared" lands here from root POV.
       "@buildrik/shared": path.resolve(__dirname, "packages/shared"),
 
-      // Workspace package — lib/publish-sliders.ts imports the carousel
+      // Workspace package — lib/publish-forms.ts imports the page post-processing
       // runtime straight from the editor package (packages/dashboard has it
       // as a real `workspace:*` dependency + `transpilePackages`; root-level
       // vitest has no node_modules symlink for it, only packages/dashboard's

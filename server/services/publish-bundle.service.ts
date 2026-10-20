@@ -15,7 +15,7 @@
  */
 import { createHash } from "node:crypto";
 import { prisma } from "@/lib/prisma";
-import type { DiscoveredForm } from "@/lib/publish-forms";
+import type { DiscoveredForm } from "@buildrik/editor/src/engine/export/publishPostProcess";
 import { recordPublishedForms } from "@/server/services/form-submission.service";
 import { applyPublishedPassword } from "@/server/services/publish.service";
 import { decryptPublishedPassword } from "@/server/services/site-settings.service";

@@ -232,6 +232,7 @@ describe("ExportModal — download flows", () => {
     expect(mocks.generateZip).toHaveBeenCalledWith(
       expect.objectContaining({ format: "zip" }),
       "https://bellacucina.com",
+      null, // no ?siteId= in this URL, so no submissions endpoint for forms
     );
     expect(revokeObjectURL).toHaveBeenCalledWith("blob:mock-url");
   });

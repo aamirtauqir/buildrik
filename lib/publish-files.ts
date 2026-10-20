@@ -18,9 +18,9 @@ import {
   injectSeoTags,
   injectBadge,
 } from "@lib/publish-html";
-import { resolveSiteOrigin, withSitemapDirective } from "@lib/publish-urls";
+import { resolveSiteOrigin } from "@lib/publish-urls";
 import { pageCanonicalUrl } from "@buildrik/shared/seo/urls";
-import { buildSitemapXml } from "@buildrik/shared/seo/sitemap";
+import { buildRobotsTxt, buildSitemapXml } from "@buildrik/shared/seo/sitemap";
 import { publishPathError } from "@buildrik/shared/schemas/publish";
 
 export interface DeployPage {
@@ -200,14 +200,9 @@ export function buildDeployFiles(input: DeployInputs): DeployFile[] {
     ),
   }));
 
-  // The site's custom rules if set, else a default driven by the indexing
-  // toggle — plus the sitemap pointer, unless the author wrote their own.
-  const robotsBody = input.robotsTxt?.trim()
-    ? input.robotsTxt
-    : `User-agent: *\n${input.allowIndexing ? "Allow: /" : "Disallow: /"}\n`;
   files.push({
     file: "robots.txt",
-    data: input.allowIndexing ? withSitemapDirective(robotsBody, input.origin) : robotsBody,
+    data: buildRobotsTxt({ robotsTxt: input.robotsTxt, allowIndexing: input.allowIndexing, origin: input.origin }),
   });
 
   /* No sitemap when indexing is off: a staging site asking to be crawled is the

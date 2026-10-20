@@ -2,9 +2,10 @@
  * A published form used to post nowhere — see publish-forms.ts.
  */
 import { describe, it, expect } from "vitest";
-import { planFormWiring, wireForms } from "../publish-forms";
+import { planPublishPages } from "../publish-forms";
+import { wireForms } from "@buildrik/editor/src/engine/export/publishPostProcess";
 
-const opts = { siteId: "site-1", appOrigin: "https://app.buildrick.io", path: "contact.html" };
+const opts = { target: { siteId: "site-1", appOrigin: "https://app.buildrick.io" }, path: "contact.html" };
 
 const FORM = `<form data-buildrick-id="f1" class="c">
   <input data-buildrick-id="e1" type="email" name="email" placeholder="Email">
@@ -134,11 +135,11 @@ describe("wireForms", () => {
   });
 });
 
-describe("planFormWiring", () => {
+describe("planPublishPages", () => {
   const pages = [{ path: "contact.html", html: FORM }];
 
   it("wires every page and lets the sweep run when the origin is known", () => {
-    const plan = planFormWiring(pages, { siteId: "site-1", appOrigin: "https://app.buildrick.io" });
+    const plan = planPublishPages(pages, { siteId: "site-1", appOrigin: "https://app.buildrick.io" });
     expect(plan.error).toBeNull();
     expect(plan.deactivateMissing).toBe(true);
     expect(plan.forms.map((f) => f.blockId)).toEqual(["f1"]);
@@ -146,18 +147,18 @@ describe("planFormWiring", () => {
   });
 
   it("refuses the deploy rather than shipping a form that posts nowhere", () => {
-    const plan = planFormWiring(pages, { siteId: "site-1", appOrigin: "" });
+    const plan = planPublishPages(pages, { siteId: "site-1", appOrigin: "" });
     expect(plan.error).toMatch(/NEXT_PUBLIC_APP_URL/);
   });
 
   it("never sweeps rows off when wiring could not run", () => {
-    const plan = planFormWiring(pages, { siteId: "site-1", appOrigin: "" });
+    const plan = planPublishPages(pages, { siteId: "site-1", appOrigin: "" });
     expect(plan.deactivateMissing).toBe(false);
     expect(plan.forms).toEqual([]);
   });
 
   it("lets a site with no forms publish without an origin", () => {
-    const plan = planFormWiring([{ path: "index.html", html: "<p>hi</p>" }], {
+    const plan = planPublishPages([{ path: "index.html", html: "<p>hi</p>" }], {
       siteId: "site-1",
       appOrigin: "",
     });
@@ -166,7 +167,7 @@ describe("planFormWiring", () => {
   });
 
   it("ignores a form the owner already pointed elsewhere when deciding to refuse", () => {
-    const plan = planFormWiring(
+    const plan = planPublishPages(
       [{ path: "c.html", html: '<form id="f2" action="https://formspree.io/x"></form>' }],
       { siteId: "site-1", appOrigin: "" },
     );

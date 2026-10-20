@@ -11,6 +11,7 @@
  * Pure string in, string out. No Prisma, no request context.
  */
 import { MARKETING_URL } from "@lib/constants/contact";
+import { escapeAttr } from "@buildrik/editor/src/engine/export/publishPostProcess";
 
 /**
  * Inject the first-party analytics beacon into a page's HTML before deploy.
@@ -26,10 +27,6 @@ export function injectAnalyticsBeacon(html: string, siteId: string): string {
   const snippet = `<script>(function(){try{var s=localStorage.getItem("_bk_sid");if(!s){s=Math.random().toString(36).slice(2)+Date.now().toString(36);try{localStorage.setItem("_bk_sid",s)}catch(e){}}var d={path:location.pathname,referrer:document.referrer,sessionId:s,viewportWidth:window.innerWidth};var b=new Blob([JSON.stringify(d)],{type:"application/json"});if(navigator.sendBeacon){navigator.sendBeacon(${JSON.stringify(url)},b)}else{fetch(${JSON.stringify(url)},{method:"POST",body:b,keepalive:true})}}catch(e){}})();</script>`;
   if (html.includes("</body>")) return html.replace("</body>", `${snippet}</body>`);
   return html + snippet;
-}
-
-export function escapeAttr(s: string): string {
-  return s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
 /**

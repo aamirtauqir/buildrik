@@ -48,3 +48,22 @@ export function buildSitemapXml(
 ${entries}
 </urlset>`;
 }
+
+/**
+ * robots.txt for a site — the ONE builder, beside the sitemap it points at:
+ * the publish worker (lib/publish-files.ts) and the editor's ZIP export both
+ * call it. The site's custom rules if set, else a default driven by the
+ * indexing toggle — plus the sitemap pointer when indexing is on and the
+ * origin is known, unless the author wrote their own.
+ */
+export function buildRobotsTxt(input: {
+  robotsTxt: string | null | undefined;
+  allowIndexing: boolean;
+  origin: string | null;
+}): string {
+  const body = input.robotsTxt?.trim()
+    ? input.robotsTxt
+    : `User-agent: *\n${input.allowIndexing ? "Allow: /" : "Disallow: /"}\n`;
+  if (!input.allowIndexing || !input.origin || /^\s*sitemap:/im.test(body)) return body;
+  return `${body.endsWith("\n") ? body : `${body}\n`}\nSitemap: ${input.origin}/sitemap.xml\n`;
+}
