@@ -279,6 +279,12 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
             type="text"
             value={linkUrl}
             onChange={(e) => setLinkUrl(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                handleLink();
+              }
+            }}
             placeholder="https://..."
             style={{
               width: "100%",

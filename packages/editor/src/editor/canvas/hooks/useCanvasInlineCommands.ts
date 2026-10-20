@@ -27,6 +27,26 @@ export function useCanvasInlineCommands({
   canvasRef,
   editingId,
 }: UseCanvasInlineCommandsParams) {
+  /* The last selection made inside the element being edited. Typing a URL
+     into the toolbar's link field moves the document selection into that
+     field, so by "Apply" the live selection no longer points at the words the
+     user chose — the command would act on nothing (or on the field). */
+  const savedRangeRef = React.useRef<Range | null>(null);
+
+  React.useEffect(() => {
+    savedRangeRef.current = null;
+    if (!editingId) return;
+    const onSelectionChange = () => {
+      const editingEl = canvasRef.current?.querySelector(`[data-buildrick-id="${editingId}"]`);
+      const sel = window.getSelection();
+      if (!editingEl || !sel || sel.rangeCount === 0) return;
+      const r = sel.getRangeAt(0);
+      if (editingEl.contains(r.commonAncestorContainer)) savedRangeRef.current = r.cloneRange();
+    };
+    document.addEventListener("selectionchange", onSelectionChange);
+    return () => document.removeEventListener("selectionchange", onSelectionChange);
+  }, [editingId, canvasRef]);
+
   const handleInlineCommand = React.useCallback(
     (command: string, value?: string) => {
       const editingEl = canvasRef.current?.querySelector(
@@ -36,7 +56,14 @@ export function useCanvasInlineCommands({
 
       editingEl.focus();
       const selection = window.getSelection();
-      if (!selection || selection.rangeCount === 0) return;
+      if (!selection) return;
+      const live = selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
+      if (!live || !editingEl.contains(live.commonAncestorContainer)) {
+        const saved = savedRangeRef.current;
+        if (!saved || !editingEl.contains(saved.commonAncestorContainer)) return;
+        selection.removeAllRanges();
+        selection.addRange(saved);
+      }
 
       const range = selection.getRangeAt(0);
 

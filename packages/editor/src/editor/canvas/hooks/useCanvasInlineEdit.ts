@@ -194,8 +194,10 @@ export function useCanvasInlineEdit({
       // Don't finish editing if focus is moving to the inline toolbar
       const relatedTarget = evt.relatedTarget as HTMLElement | null;
       if (relatedTarget?.closest(".bd-inline-toolbar")) {
-        // Re-focus the contentEditable element after toolbar interaction
-        setTimeout(() => el.focus(), 0);
+        /* Re-focus the contentEditable element after toolbar interaction —
+           except into a toolbar text field (the link URL), which must keep
+           focus so the URL is typed there, not over the selection. */
+        if (!relatedTarget.matches("input, textarea, select")) setTimeout(() => el.focus(), 0);
         return;
       }
       finishEdit(true);

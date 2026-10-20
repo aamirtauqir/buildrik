@@ -315,8 +315,12 @@ export function CanvasOverlayGroup({
              keeps the click from bubbling into the canvas, whose handlers
              refocus the canvas wrapper; that focus steal blurred the editor
              with a relatedTarget outside this toolbar and ended the session
-             after every command. */
-          onMouseDown={(e) => e.preventDefault()}
+             after every command. A text field (the link URL) is the one
+             exception: it has to take focus, or the URL is typed into the
+             element over the selected words. */
+          onMouseDown={(e) => {
+            if (!(e.target as HTMLElement).closest("input, textarea, select")) e.preventDefault();
+          }}
           onClick={(e) => e.stopPropagation()}
         >
           <RichTextEditor onCommand={onInlineCommand} />
