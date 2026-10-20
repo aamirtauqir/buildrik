@@ -39,7 +39,7 @@ import { onOffScreenSettled, peekOffScreenUnsaved } from "@/services/unsavedReco
 import { trackEvent } from "@/shared/utils/errorTracking";
 import type { Issue } from "./useStudioState";
 
-export const LOAD_REPAIR_LABEL = "Automatic repair";
+const LOAD_REPAIR_LABEL = "Automatic repair";
 export const BEFORE_REPAIR_VERSION = "Before automatic repair";
 const KEPT_PREFIX = "bk-damage-kept-v1-";
 
