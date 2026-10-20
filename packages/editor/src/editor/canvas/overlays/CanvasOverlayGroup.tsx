@@ -342,17 +342,19 @@ export function CanvasOverlayGroup({
         />
       )}
 
-      {/* Section reorder handles */}
-      <SectionReorderHandles
-        boundaries={sectionBoundaries}
-        dragState={sectionDragState}
-        hoveredBoundary={hoveredSectionBoundary}
-        onStartDrag={onSectionStartDrag}
-        onUpdateDrag={onSectionUpdateDrag}
-        onCompleteDrag={onSectionCompleteDrag}
-        onCancelDrag={onSectionCancelDrag}
-        onHoverBoundary={onSectionHoverBoundary}
-      />
+      {/* Section reorder handles — an edit affordance, so not in read-only. */}
+      {!readOnly && (
+        <SectionReorderHandles
+          boundaries={sectionBoundaries}
+          dragState={sectionDragState}
+          hoveredBoundary={hoveredSectionBoundary}
+          onStartDrag={onSectionStartDrag}
+          onUpdateDrag={onSectionUpdateDrag}
+          onCompleteDrag={onSectionCompleteDrag}
+          onCancelDrag={onSectionCancelDrag}
+          onHoverBoundary={onSectionHoverBoundary}
+        />
+      )}
 
       {/* Remote cursors for collaboration */}
       <RemoteCursorsOverlay composer={composer} />

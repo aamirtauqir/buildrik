@@ -59,4 +59,41 @@ describe("P-1 — inline text edit respects the lock", () => {
     act(() => handlers.get(EVENTS.UI_INLINE_EDIT_REQUEST)?.({ elementId: "el-1" }));
     expect(hook.result.current.isEditing).toBe(true);
   });
+  /* REA #12 (ISS-C01): the lock was checked when the edit began only; a lock
+     applied mid-edit (another door, a collaborator) was overwritten at
+     commit, which wrote setContent directly. The commit asks the gate again. */
+  it("a lock applied mid-edit refuses the commit and restores the text", () => {
+    const setContent = vi.fn();
+    let locked = false;
+    const handlers = new Map<string, (p: unknown) => void>();
+    const emit = vi.fn();
+    const composer = {
+      beginTransaction: vi.fn(),
+      endTransaction: vi.fn(),
+      emit,
+      on: vi.fn((ev: string, fn: (p: unknown) => void) => handlers.set(ev, fn)),
+      off: vi.fn(),
+      elements: { getElement: vi.fn(() => ({ isLocked: () => locked, setContent })) },
+    } as unknown as Composer;
+    const canvas = document.createElement("div");
+    const p = document.createElement("p");
+    p.setAttribute("data-buildrick-id", "el-1");
+    p.textContent = "Hello";
+    canvas.appendChild(p);
+    document.body.appendChild(canvas);
+    const canvasRef = { current: canvas } as React.RefObject<HTMLDivElement | null>;
+    const hook = renderHook(() => useCanvasInlineEdit({ composer, canvasRef }));
+    act(() => handlers.get(EVENTS.UI_INLINE_EDIT_REQUEST)?.({ elementId: "el-1" }));
+    expect(hook.result.current.isEditing).toBe(true);
+
+    p.innerHTML = "Changed";
+    locked = true;
+    act(() => { p.dispatchEvent(new FocusEvent("blur")); });
+
+    expect(setContent).not.toHaveBeenCalled();
+    expect(emit).toHaveBeenCalledWith(EVENTS.LOCKED_ELEMENTS_SKIPPED, undefined);
+    expect(emit).not.toHaveBeenCalledWith(EVENTS.ELEMENT_EDIT_INLINE, expect.anything());
+    expect(p.innerHTML).toBe("Hello");
+    expect(hook.result.current.isEditing).toBe(false);
+  });
 });

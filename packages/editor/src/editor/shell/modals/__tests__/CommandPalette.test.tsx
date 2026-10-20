@@ -36,7 +36,7 @@ type Reg = {
 };
 
 function makeComposer(
-  opts: { registry?: Reg[]; selected?: string[]; type?: string; clipboard?: unknown[] | null; canUndo?: boolean } = {},
+  opts: { registry?: Reg[]; selected?: string[]; type?: string; clipboard?: unknown[] | null; canUndo?: boolean; blocked?: string } = {},
 ) {
   const selected = opts.selected ?? [];
   return {
@@ -55,7 +55,13 @@ function makeComposer(
     },
     elements: { removeElement: vi.fn(), getActivePage: () => ({ name: "Home" }) },
     clipboard: opts.clipboard ?? null,
-    commands: { run: vi.fn(), getAll: () => opts.registry ?? [] },
+    commands: {
+      run: vi.fn(),
+      getAll: () => opts.registry ?? [],
+      blockedReason: vi.fn((id: string) =>
+        opts.blocked && ["undo", "redo", "add-text", "add-container"].includes(id) ? opts.blocked : undefined,
+      ),
+    },
   };
 }
 
@@ -195,10 +201,29 @@ describe("CommandPalette — doors", () => {
     expect(composer!.setZoom).toHaveBeenCalledWith(50);
   });
 
-  it("Undo runs the history", () => {
+  it("Undo runs the registry's undo, through its gate", () => {
     const { composer } = renderPalette();
     fireEvent.click(screen.getByTestId("cmdk-row-edit-undo"));
-    expect(composer!.history.undo).toHaveBeenCalledTimes(1);
+    expect(composer!.commands.run).toHaveBeenCalledWith("undo");
+    expect(composer!.history.undo).not.toHaveBeenCalled();
+  });
+
+  /* REA #12: palette Undo / Redo / Clear history / Add text / Add container
+     called composer.history directly or skipped the gate ⌘Z respects, so
+     during Time-travel (readOnly) ⌘K → Undo changed the live document. */
+  it("Undo, Redo, Clear history and the Add rows are disabled with the gate's reason", () => {
+    const { composer } = renderPalette(makeComposer({ registry: BOARD_REGISTRY, blocked: "Read-only right now" }));
+    for (const row of ["edit-undo", "cmd-add-text", "cmd-add-container"]) {
+      expect(screen.getByTestId(`cmdk-row-${row}`)).toHaveAttribute("aria-disabled", "true");
+      fireEvent.click(screen.getByTestId(`cmdk-row-${row}`));
+    }
+    expect(screen.getByTestId("cmdk-label-edit-undo")).toHaveTextContent("Read-only right now");
+    type("clear history");
+    expect(screen.getByTestId("cmdk-row-history-clear")).toHaveAttribute("aria-disabled", "true");
+    type("redo");
+    expect(screen.getByTestId("cmdk-row-edit-redo")).toHaveAttribute("aria-disabled", "true");
+    expect(composer!.commands.run).not.toHaveBeenCalled();
+    expect(composer!.history.undo).not.toHaveBeenCalled();
   });
 
   it("a disabled row runs nothing and stays open", () => {

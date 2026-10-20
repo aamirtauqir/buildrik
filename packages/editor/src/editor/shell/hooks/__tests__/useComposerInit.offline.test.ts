@@ -25,6 +25,7 @@ const composer = {
   off: vi.fn(),
   emit: vi.fn((e: string, ...a: unknown[]) => (handlers[e] ?? []).forEach((h) => h(...a))),
   saveProject: vi.fn(() => Promise.resolve()),
+  markSaved: vi.fn(),
   loadProject: vi.fn(() => Promise.resolve(null)),
   importProject: vi.fn(),
   exportProject: vi.fn(() => ({})),
@@ -53,6 +54,7 @@ vi.mock("@/services/BuildrikSyncProvider", () => ({
      signed-in user so versions and history stop recording `userId: null`. */
   loadCurrentUserId: vi.fn(() => Promise.resolve(null)),
   getBaselineLastEditedAt: vi.fn(() => null),
+  hasProjectLoaded: vi.fn(() => true),
   getSiteIdFromUrl: vi.fn(() => "site-1"),
   loadProject: vi.fn(() => Promise.resolve({})),
   loadServerMedia: vi.fn(() => Promise.resolve(null)),
@@ -292,5 +294,59 @@ describe("autosave refused with TOKENS_INVALID", () => {
     expect(syncSaveProject).toHaveBeenCalledTimes(2);
     composer.exportProject.mockImplementation(() => ({}));
     localStorage.removeItem("bk-unsaved-v1-site-1");
+  });
+});
+
+/* REA #7: a save that failed on a server fault (5xx, generic) only scheduled
+   a retry and toasted "Changes are unsaved" — no recovery copy. Close the tab
+   while the server is failing and the edit existed nowhere. */
+describe("autosave failing on a server error", () => {
+  afterEach(() => localStorage.removeItem("bk-unsaved-v1-site-1"));
+
+  it("keeps the local recovery copy", async () => {
+    localStorage.removeItem("bk-unsaved-v1-site-1");
+    vi.mocked(syncSaveProject).mockRejectedValueOnce(new Error("Internal server error"));
+    const toasts = await runAutosave(params());
+
+    expect(toasts.some((t) => t.title === "Save failed")).toBe(true);
+    expect(localStorage.getItem("bk-unsaved-v1-site-1")).not.toBeNull();
+  });
+
+  it("does not keep the never-loaded fallback as a recovery copy", async () => {
+    localStorage.removeItem("bk-unsaved-v1-site-1");
+    vi.mocked(syncSaveProject).mockRejectedValueOnce(new Error("PROJECT_NOT_LOADED"));
+    await runAutosave(params());
+
+    expect(localStorage.getItem("bk-unsaved-v1-site-1")).toBeNull();
+  });
+});
+
+/* REA #8: an edit made less than one debounce before the tab closed was lost
+   — the save had not been sent, and nothing was kept. pagehide is the last
+   moment the page can write; a pending, in-flight or failed save keeps the
+   recovery copy there. Nothing pending writes nothing. */
+describe("pagehide with work not yet on the server", () => {
+  const KEY = "bk-unsaved-v1-site-1";
+  afterEach(() => localStorage.removeItem(KEY));
+  const hide = () => act(() => { window.dispatchEvent(new Event("pagehide")); });
+
+  it("keeps the recovery copy for an edit still inside the debounce", () => {
+    localStorage.removeItem(KEY);
+    renderHook(() => useComposerInit(params()));
+    act(() => { composer.emit("project:changed"); });
+    hide();
+    expect(localStorage.getItem(KEY)).not.toBeNull();
+  });
+
+  it("writes nothing when no edit is pending", async () => {
+    localStorage.removeItem(KEY);
+    vi.mocked(syncSaveProject).mockResolvedValueOnce(undefined as never);
+    renderHook(() => useComposerInit(params()));
+    hide();
+    expect(localStorage.getItem(KEY)).toBeNull();
+    act(() => { composer.emit("project:changed"); });
+    await act(async () => { await vi.advanceTimersByTimeAsync(THRESHOLDS.AUTOSAVE_DEBOUNCE + 1); });
+    hide();
+    expect(localStorage.getItem(KEY)).toBeNull();
   });
 });

@@ -178,8 +178,9 @@ export function useCanvasElementDrag({
 
       const rootId = rootIdRef.current;
 
-      // Don't allow dragging root element
-      if (elementId === rootId) {
+      /* The root never drags. REA #12: a read-only composer (view mode, Time-travel) neither moves
+         nor clones — and a clone is written at dragstart, before any drop. */
+      if (elementId === rootId || composer.readOnly) {
         e.preventDefault();
         return;
       }

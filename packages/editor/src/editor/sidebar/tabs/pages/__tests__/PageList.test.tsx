@@ -59,6 +59,9 @@ describe("PageList", () => {
     render(<PageList {...makeProps({ pages: [], loading: true })} />);
     expect(screen.queryByText("No pages yet")).not.toBeInTheDocument();
     expect(screen.queryByText("Create blank page")).not.toBeInTheDocument();
+    // REA #13: the footer's create doors wait for the load too, saying why.
+    expect(screen.getByTestId("pages-add-page")).toBeDisabled();
+    expect(screen.getByTestId("pages-add-page")).toHaveAttribute("title", expect.stringMatching(/finished loading/));
   });
 
   it("shows the empty state once the load has answered", () => {

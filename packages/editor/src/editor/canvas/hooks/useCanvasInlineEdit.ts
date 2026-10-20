@@ -10,7 +10,7 @@ import type { Composer } from "@/engine";
 import { getElementId } from "@/shared/utils/dragDrop";
 import { sanitizeHTML } from "@/shared/utils/html";
 import { EVENTS } from "@/shared/constants";
-import { canWrite } from "@/engine/commands/commandOperations";
+import { canWrite, writeElement } from "@/engine/commands/commandOperations";
 
 export interface EditingState {
   id: string | null;
@@ -161,14 +161,16 @@ export function useCanvasInlineEdit({
         // contentEditable can hold pasted/typed markup — sanitize before it
         // is persisted into the element tree and re-rendered onto the canvas.
         const newHtml = sanitizeHTML(el.innerHTML);
-        if (newHtml !== editing.original) {
-          composer.beginTransaction("inline-edit");
-          try {
-            const element = composer.elements.getElement(editing.id!);
-            element?.setContent?.(newHtml, "html");
-          } finally {
-            composer.endTransaction();
-          }
+        /* REA #12: the lock is asked again at commit — one applied mid-edit
+           (another door, a collaborator) refuses the write through the one
+           lock gate, and the canvas text goes back to what it was. */
+        const written =
+          newHtml !== editing.original &&
+          writeElement(composer, composer.elements.getElement(editing.id!), "inline-edit", (element) =>
+            element.setContent?.(newHtml, "html"),
+          );
+        if (newHtml !== editing.original && !written) el.innerHTML = editing.original;
+        if (written) {
           /* The one signal that says "the user edited text on the canvas".
              EVENTS.ELEMENT_EDIT_INLINE existed as a constant with no
              emitter, so the onboarding step that asks for exactly this

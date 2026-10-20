@@ -23,6 +23,12 @@ vi.mock("@/editor/chrome-ui", async (importOriginal) => ({
   useToast: () => ({ addToast, removeToast: vi.fn(), toasts: [] }),
 }));
 
+const load = vi.hoisted(() => ({ siteId: null as string | null, loaded: true }));
+vi.mock("@/services/BuildrikSyncProvider", () => ({
+  getSiteIdFromUrl: () => load.siteId,
+  hasProjectLoaded: () => load.loaded,
+}));
+
 import { NewPageModal } from "../components/NewPageModal";
 
 function makeComposer() {
@@ -47,7 +53,34 @@ function makeComposer() {
   return { composer, request };
 }
 
-beforeEach(() => addToast.mockClear());
+beforeEach(() => {
+  addToast.mockClear();
+  load.siteId = null;
+  load.loaded = true;
+});
+
+/* REA #13: a page created while the project loads is wiped by importProject,
+   with no undo. Every Add-page door goes through this listener, so it is the
+   one place that refuses — with the reason — until the project has loaded. */
+describe("NewPageModal while the project is loading", () => {
+  it("does not open, and says why", () => {
+    load.siteId = "site-1";
+    load.loaded = false;
+    const { composer, request } = makeComposer();
+    render(<NewPageModal composer={composer as never} />);
+    request();
+    expect(screen.queryByTestId("new-page-modal")).toBeNull();
+    expect(addToast).toHaveBeenCalledWith(expect.objectContaining({ title: "Pages are still loading" }));
+  });
+
+  it("opens once the project has loaded", () => {
+    load.siteId = "site-1";
+    const { composer, request } = makeComposer();
+    render(<NewPageModal composer={composer as never} />);
+    request();
+    expect(screen.getByTestId("new-page-modal")).toBeInTheDocument();
+  });
+});
 
 describe("NewPageModal", () => {
   it("opens on UI_NEW_PAGE_REQUESTED with the board's fields, Blank selected (BD-33)", () => {

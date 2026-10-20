@@ -17,6 +17,7 @@ import { PanelLoadError, PanelLoadingSkeleton, PanelNoResults } from "@/editor/s
 import type { Composer } from "@/engine";
 import type { FolderItem, PageItem } from "../types";
 import { AddPageButton } from "./AddPageButton";
+import { PAGES_LOADING_REASON } from "./NewPageModal";
 import { BulkToolbar } from "./BulkToolbar";
 import { PageFolder } from "./PageFolder";
 import { PageRow } from "./PageRow";
@@ -140,7 +141,12 @@ export const PageList: React.FC<Props> = ({
           <PanelLoadingSkeleton label="Loading pages" testId="pages-loading" barTestId="pages-sk-bar" />
         </div>
         <div className="bd-pg-footer" data-testid="pages-footer">
-          <AddPageButton onAddBlank={onAddPage} onFromTemplate={onRequestTemplates} onAddFolder={onAddFolder} />
+          <AddPageButton
+            onAddBlank={onAddPage}
+            onFromTemplate={onRequestTemplates}
+            onAddFolder={onAddFolder}
+            disabledReason={loading ? PAGES_LOADING_REASON : undefined}
+          />
         </div>
       </div>
     );
@@ -371,7 +377,12 @@ export const PageList: React.FC<Props> = ({
                 : "⌂ homepage · ● unpublished changes · ⠿ drag to reorder · ⋯ page menu"}
             </p>
           )}
-          <AddPageButton onAddBlank={onAddPage} onFromTemplate={onRequestTemplates} onAddFolder={onAddFolder} />
+          <AddPageButton
+            onAddBlank={onAddPage}
+            onFromTemplate={onRequestTemplates}
+            onAddFolder={onAddFolder}
+            disabledReason={loading ? PAGES_LOADING_REASON : undefined}
+          />
         </div>
       )}
     </div>

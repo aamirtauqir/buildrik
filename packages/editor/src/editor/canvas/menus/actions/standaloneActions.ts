@@ -45,13 +45,9 @@ export const standaloneActions: ContextAction[] = [
     shortcut: "Cmd+G",
     // Group the current multi-selection (≥2 elements sharing a parent).
     isVisible: ({ composer }) => composer.selection.getSelectedIds().length >= 2,
+    /* The registry's "group" — one door, behind its read-only gate. */
     handler: ({ composer }) => {
-      const ids = composer.selection.getSelectedIds();
-      if (ids.length < 2) return;
-      runTransaction(composer, "group-elements", () => {
-        const group = composer.elements.groupElements(ids);
-        if (group) composer.selection.select(group as never);
-      });
+      composer.commands.run("group");
     },
   },
   {

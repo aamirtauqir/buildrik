@@ -66,6 +66,7 @@ vi.mock("@/services/BuildrikSyncProvider", () => ({
   /* Added with the attribution wiring: useComposerInit now reads the
      signed-in user so versions and history stop recording `userId: null`. */
   loadCurrentUserId: vi.fn(() => Promise.resolve(null)),
+  getBaselineLastEditedAt: vi.fn(() => null),
   getSiteIdFromUrl: vi.fn(() => "site-1"),
   loadProject: vi.fn(() => Promise.resolve({})),
   loadServerMedia: vi.fn(() => Promise.resolve(null)),

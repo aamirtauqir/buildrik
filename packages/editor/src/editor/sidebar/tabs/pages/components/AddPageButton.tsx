@@ -17,12 +17,16 @@ export interface AddPageButtonProps {
   onAddBlank: () => void;
   onFromTemplate?: () => void;
   onAddFolder?: () => void;
+  /** Set while page creation must wait (the project is still loading): both
+   *  create buttons are disabled and carry this as their reason. */
+  disabledReason?: string;
 }
 
 export const AddPageButton: React.FC<AddPageButtonProps> = ({
   onAddBlank,
   onFromTemplate,
   onAddFolder,
+  disabledReason,
 }) => {
   const [menuOpen, setMenuOpen] = React.useState(false);
   const wrapRef = React.useRef<HTMLDivElement>(null);
@@ -42,6 +46,8 @@ export const AddPageButton: React.FC<AddPageButtonProps> = ({
         color="light"
         size="xs"
         onClick={onAddBlank}
+        disabled={!!disabledReason}
+        title={disabledReason}
         aria-label="Add new page"
         variant="link"
         className="tw:font-medium"
@@ -55,6 +61,8 @@ export const AddPageButton: React.FC<AddPageButtonProps> = ({
           color="light"
           size="xs"
           onClick={onFromTemplate}
+          disabled={!!disabledReason}
+          title={disabledReason}
           variant="link" className="tw:text-[var(--bk-ink-soft)] tw:enabled:hover:text-[var(--bk-ink)]"
         >
           From template

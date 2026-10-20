@@ -236,6 +236,30 @@ describe("shortcut guard (shouldHandleShortcut)", () => {
     );
   });
 
+  /* REA #12: the palette's Add rows ran on a read-only composer (and during
+     Time-travel, which sets readOnly) because they were not mutating. */
+  it("run() refuses Add text / Add container on a read-only composer", () => {
+    const { center, composer } = makeCenter();
+    composer.readOnly = true;
+    center.run("add-text");
+    center.run("add-container");
+    expect(composer.emit).not.toHaveBeenCalledWith(EVENTS.ELEMENT_QUICK_ADD, expect.anything());
+  });
+
+  it("blockedReason answers for mutating commands only: read-only, then a full-page surface", () => {
+    const { center, composer } = makeCenter();
+    expect(center.blockedReason("undo")).toBeUndefined();
+    const host = document.createElement("div");
+    host.setAttribute("data-bk-surface", "fullpage");
+    document.body.appendChild(host);
+    expect(center.blockedReason("undo")).toMatch(/full-page/);
+    expect(center.blockedReason("save")).toBeUndefined();
+    expect(center.blockedReason("zoom-in")).toBeUndefined();
+    host.remove();
+    composer.readOnly = true;
+    expect(center.blockedReason("add-text")).toMatch(/read-only/i);
+  });
+
   it("run() still allows a command that changes nothing", () => {
     const { center, composer } = makeCenter();
     composer.readOnly = true;

@@ -70,6 +70,7 @@ const MUTATING_COMMANDS = new Set([
   "paste-style", "reset-style", "lock-element", "unlock-element",
   "bring-forward", "send-backward", "bring-to-front", "send-to-back",
   "move-up", "move-down", "nudge-up", "nudge-down", "nudge-left", "nudge-right",
+  "add-text", "add-heading", "add-image", "add-button", "add-container",
 ]);
 
 /** Is the keystroke aimed at somewhere the user is typing? */
@@ -181,6 +182,20 @@ export class CommandCenter {
 
   // ─── Query ──────────────────────────────────────────────────────────────────
 
+  /**
+   * Why a command that changes the document may not run right now, or
+   * undefined. The one gate ⌘Z and every other mutating chord answer to; the
+   * ⌘K palette asks it too, so a row cannot run what the keyboard refuses
+   * (REA #12: palette Undo changed the live document during Time-travel,
+   * which sets readOnly).
+   */
+  blockedReason(id: string): string | undefined {
+    if (!MUTATING_COMMANDS.has(id)) return undefined;
+    if (this.composer.readOnly) return "Read-only right now";
+    if (!UNIVERSAL_COMMANDS.has(id) && getFullPageSurface() !== null) return "Close the full-page view first";
+    return undefined;
+  }
+
   isActive(id: string): boolean {
     return this.activeCommands.has(id);
   }
@@ -221,7 +236,7 @@ export class CommandCenter {
     const target = e.target as HTMLElement | null;
 
     // A read-only composer runs no command that changes the document.
-    if (this.composer.readOnly && MUTATING_COMMANDS.has(commandId)) return false;
+    if (this.blockedReason(commandId)) return false;
 
     // BK-28: a focused control that owns its shortcuts (a page row's ⌘D / ⌫)
     // keeps them — this capture-phase listener ran first and duplicated the

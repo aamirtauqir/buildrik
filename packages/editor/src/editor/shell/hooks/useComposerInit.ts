@@ -23,6 +23,7 @@ import { isV6TokenRow } from "@/engine/designSystem/projectTokens";
 import { captureError } from "@/shared/utils/errorTracking";
 import {
   getBaselineLastEditedAt,
+  hasProjectLoaded,
   getSiteIdFromUrl,
   isSaveConflictPending,
   loadCurrentUserId,
@@ -566,6 +567,10 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
        clears, and the editor claims work is on the server that never left the
        tab. Close it there and the edit is gone. */
     let changeSeq = 0;
+    /* The changeSeq the server last confirmed. Anything past it — an edit
+       still inside the debounce, a save in flight, a failed one — exists only
+       in this tab. */
+    let savedSeq = 0;
 
     /* A read-only VIEW (?view=readonly — a VIEWER, or a member demoted
        mid-session, see refuseForbiddenSave) never writes: an autosave from it
@@ -677,6 +682,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
                "Saved · just now". `composer.saveProject()` (the no-siteId
                branch, and the manual ⌘S path) has always announced itself;
                only the branch every real user takes did not. */
+            savedSeq = seqAtSend;
             if (snapshot) composer.markSaved(snapshot);
             /* The server has it now, so the recovery copy is no longer work
                that is missing — leaving it would offer a stale restore on the
@@ -764,6 +770,13 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
               return;
             }
             console.error("[BuildrikSync] auto-save failed:", message);
+            /* REA #7: every other failure keeps the edit for the reload; a
+               server fault (5xx) left it only in the tab. Not when the project
+               never loaded — that document is the fallback, and restoring it
+               would offer to overwrite the real site. */
+            if (siteId && !message.includes("PROJECT_NOT_LOADED")) {
+              keepUnsaved(siteId, composer.exportProject(), getBaselineLastEditedAt());
+            }
             setSaveState((prev) => ({
               ...prev,
               status: "error",
@@ -846,9 +859,19 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
        anything was wrong. */
     const onConflict = () =>
       setSaveState((prev) => ({ ...prev, status: "conflict", error: undefined }));
+    /* REA #8: closing the tab inside the autosave debounce lost the edit — the
+       save was never sent and nothing was kept. pagehide is the page's last
+       chance to write; keep the recovery copy the next load offers. */
+    const onPageHide = () => {
+      if (readOnlyView || !siteId || changeSeq === savedSeq) return;
+      // A never-loaded project is the fallback, not work to restore.
+      if (!hasProjectLoaded(siteId)) return;
+      keepUnsaved(siteId, composer.exportProject(), getBaselineLastEditedAt());
+    };
     if (typeof window !== "undefined") {
       window.addEventListener(SAVE_CONFLICT_EVENT, onConflict);
       window.addEventListener("online", onOnline);
+      window.addEventListener("pagehide", onPageHide);
     }
     composer.on("project:changed", handler);
     composer.on("history:undo", handler);
@@ -858,6 +881,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
       if (typeof window !== "undefined") {
         window.removeEventListener(SAVE_CONFLICT_EVENT, onConflict);
         window.removeEventListener("online", onOnline);
+        window.removeEventListener("pagehide", onPageHide);
       }
       if (retryTimer) clearTimeout(retryTimer);
       composer.off("project:changed", handler);
