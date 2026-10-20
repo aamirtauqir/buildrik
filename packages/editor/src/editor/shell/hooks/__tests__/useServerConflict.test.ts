@@ -157,18 +157,20 @@ describe("restore variant (BK-04)", () => {
     expect(opts.setSaveState).toHaveBeenCalledWith(expect.objectContaining({ status: "idle" }));
   });
 
-  it("Download writes the kept edits, deletes nothing, does not reload", () => {
+  /* BD-35: the kept edits go to History as a restorable version, not a file. */
+  it("Save to History keeps the kept edits as a version, deletes nothing, does not reload", async () => {
     keepOffScreen(T0);
-    URL.createObjectURL = vi.fn(() => "blob:x");
-    URL.revokeObjectURL = vi.fn();
-    const click = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => {});
     const { result } = render();
     offer();
-    expect(result.current.modalProps.onDownload()).toBe(true);
-    expect(click).toHaveBeenCalledTimes(1);
+    let ok: boolean | undefined;
+    await act(async () => {
+      ok = await result.current.modalProps.onSaveToHistory();
+    });
+    expect(ok).toBe(true);
+    expect(composer.versions.createVersion).toHaveBeenCalledWith(expect.stringMatching(/^Unsaved edits — /), expect.any(String), MINE);
+    expect(opts.addToast).toHaveBeenCalledWith(expect.objectContaining({ tone: "success", title: "Saved to History" }));
     expect(readUnsaved("s1")).not.toBeNull();
     expect(nav.navigate).not.toHaveBeenCalled();
-    click.mockRestore();
   });
 
   /* EDT-018: a Retry that takes the copy spends the offer — the dialog goes. */
@@ -226,7 +228,7 @@ describe("save variant", () => {
     expect(result.current.modalProps.open).toBe(true);
   });
 
-  it("Keep reloads; Download reloads only after the file was written", async () => {
+  it("Keep reloads; Save to History reloads only after the version was written (BD-35)", async () => {
     sync.readServerCopy.mockReturnValue(new Promise(() => {}));
     const { result } = render();
     conflict();
@@ -234,20 +236,23 @@ describe("save variant", () => {
     expect(nav.navigate).toHaveBeenCalledTimes(1);
 
     nav.navigate.mockReset();
-    URL.createObjectURL = vi.fn(() => {
-      throw new Error("blocked");
+    composer.versions.createVersion.mockImplementationOnce(() => Promise.reject(new Error("quota")));
+    let ok: boolean | undefined;
+    await act(async () => {
+      ok = await result.current.modalProps.onSaveToHistory();
     });
-    expect(result.current.modalProps.onDownload()).toBe(false);
-    await new Promise((r) => setTimeout(r, 5));
+    expect(ok).toBe(false);
+    await new Promise((r) => setTimeout(r, 1400));
     expect(nav.navigate).not.toHaveBeenCalled();
 
-    URL.createObjectURL = vi.fn(() => "blob:x");
-    URL.revokeObjectURL = vi.fn();
-    const click = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => {});
-    expect(result.current.modalProps.onDownload()).toBe(true);
-    await new Promise((r) => setTimeout(r, 5));
+    await act(async () => {
+      ok = await result.current.modalProps.onSaveToHistory();
+    });
+    expect(ok).toBe(true);
+    expect(composer.versions.createVersion).toHaveBeenLastCalledWith(expect.stringMatching(/^Before reload — /), expect.any(String), SCREEN);
+    expect(opts.addToast).toHaveBeenCalledWith(expect.objectContaining({ tone: "success", title: "Saved to History" }));
+    await new Promise((r) => setTimeout(r, 1400));
     expect(nav.navigate).toHaveBeenCalledTimes(1);
-    click.mockRestore();
   });
 
   it("repeated conflicts while open don't restack; the pill reopens a dismissed one", () => {

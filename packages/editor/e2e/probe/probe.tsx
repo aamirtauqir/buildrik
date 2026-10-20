@@ -2087,7 +2087,7 @@ const CASES: Record<string, () => React.ReactElement> = {
         siteId={null}
         server={{ status: "loading" }}
         onKeep={() => {}}
-        onDownload={() => false}
+        onSaveToHistory={() => false}
         onReplace={() => {}}
         onClose={() => {}}
       />

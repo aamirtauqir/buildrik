@@ -4,8 +4,8 @@
  * "restore" (the load found edits that never reached the server, BK-04).
  * The shared contract runs table-driven over both; variant-only rules follow.
  *
- * The download itself is the parent's (useServerConflict); at this boundary
- * the contract is the callback and what is discarded around it.
+ * Saving to History itself is the parent's (useServerConflict, BD-35); at
+ * this boundary the contract is the callback and what is discarded around it.
  *
  * @license BSD-3-Clause
  */
@@ -33,7 +33,7 @@ function makeProps(over: Partial<ConflictModalProps> = {}): ConflictModalProps {
     siteId: "s1",
     server: { status: "ready", by: { name: "Sara Khan", isViewer: false }, at: new Date().toISOString(), differences: [] },
     onKeep: vi.fn(),
-    onDownload: vi.fn(() => true),
+    onSaveToHistory: vi.fn(() => true),
     onReplace: vi.fn(),
     onClose: vi.fn(),
     ...over,
@@ -69,7 +69,7 @@ describe.each(VARIANTS)("ConflictModal — $variant variant", ({ variant, extra,
     render(<ConflictModal {...props()} />);
     expect(screen.getByRole("dialog", { name: title })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Keep the server version" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Download my edits" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Save my edits to History" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Replace with mine…" })).toBeInTheDocument();
   });
 
@@ -147,11 +147,11 @@ describe.each(VARIANTS)("ConflictModal — $variant variant", ({ variant, extra,
     expect(localStorage.getItem(KEY)).toBe(kept());
   });
 
-  it("a failed download deletes nothing and says so", async () => {
+  it("a failed save to History deletes nothing and says so", async () => {
     localStorage.setItem(KEY, kept());
-    render(<ConflictModal {...props({ onDownload: vi.fn(() => Promise.reject(new Error("blocked"))) })} />);
-    fireEvent.click(screen.getByRole("button", { name: "Download my edits" }));
-    expect(await screen.findByRole("alert")).toHaveTextContent("The download didn't complete. Nothing was deleted.");
+    render(<ConflictModal {...props({ onSaveToHistory: vi.fn(() => Promise.reject(new Error("blocked"))) })} />);
+    fireEvent.click(screen.getByRole("button", { name: "Save my edits to History" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("Couldn't save your edits to History. Nothing was deleted.");
     expect(localStorage.getItem(KEY)).toBe(kept());
   });
 
@@ -200,14 +200,14 @@ describe.each(VARIANTS)("ConflictModal — $variant variant", ({ variant, extra,
 });
 
 describe("ConflictModal — save variant only", () => {
-  it("a written download discards the kept copy (the reload follows)", async () => {
+  it("a version saved to History discards the kept copy (the reload follows)", async () => {
     localStorage.setItem(KEY, kept());
-    const onDownload = vi.fn(() => Promise.resolve(true));
-    render(<ConflictModal {...makeProps({ onDownload })} />);
+    const onSaveToHistory = vi.fn(() => Promise.resolve(true));
+    render(<ConflictModal {...makeProps({ onSaveToHistory })} />);
     await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: "Download my edits" }));
+      fireEvent.click(screen.getByRole("button", { name: "Save my edits to History" }));
     });
-    expect(onDownload).toHaveBeenCalledTimes(1);
+    expect(onSaveToHistory).toHaveBeenCalledTimes(1);
     await waitFor(() => expect(localStorage.getItem(KEY)).toBeNull());
   });
 
@@ -274,14 +274,14 @@ describe("ConflictModal — restore variant only", () => {
     expect(readUnsaved("s1")).not.toBeNull();
   });
 
-  it("a written download keeps the kept copy and the dialog", async () => {
+  it("a version saved to History keeps the kept copy and the dialog", async () => {
     localStorage.setItem(KEY, kept());
     const p = restore({ relation: "server-newer" });
     render(<ConflictModal {...p} />);
     await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: "Download my edits" }));
+      fireEvent.click(screen.getByRole("button", { name: "Save my edits to History" }));
     });
-    expect(p.onDownload).toHaveBeenCalledTimes(1);
+    expect(p.onSaveToHistory).toHaveBeenCalledTimes(1);
     expect(localStorage.getItem(KEY)).toBe(kept());
     expect(screen.getByRole("dialog")).toBeInTheDocument();
     expect(screen.queryByRole("alert")).toBeNull();
