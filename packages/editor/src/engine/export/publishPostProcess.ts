@@ -25,6 +25,7 @@
 import { initSliderRuntime, SLIDER_RUNTIME_CSS } from "./sliderRuntime";
 import { initCountdownRuntime } from "./countdownRuntime";
 import { initAccordionRuntime } from "./accordionRuntime";
+import { initTabsRuntime } from "./tabsRuntime";
 
 export function escapeAttr(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -209,6 +210,7 @@ const RUNTIMES: ReadonlyArray<{ marker: string; uses: string; fn: (root: ParentN
   { marker: "data-buildrick-slider-runtime", uses: "buildrick-slider", fn: initSliderRuntime, css: SLIDER_RUNTIME_CSS },
   { marker: "data-buildrick-countdown-runtime", uses: "data-countdown-end=", fn: initCountdownRuntime },
   { marker: "data-buildrick-accordion-runtime", uses: "data-allow-multiple", fn: initAccordionRuntime },
+  { marker: "data-buildrick-tabs-runtime", uses: 'role="tablist"', fn: initTabsRuntime },
 ];
 
 /**
