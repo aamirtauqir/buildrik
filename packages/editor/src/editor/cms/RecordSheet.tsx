@@ -340,14 +340,27 @@ export function RecordSheet({
       setTypedDelete(true);
       return;
     }
-    await onDelete(record);
+    /* A delete that failed used to say nothing (`void remove()`, no catch —
+       REA 2026-10-20 #11a): the sheet now stays and says so. */
+    try {
+      await onDelete(record);
+    } catch {
+      addToast({ tone: "error", title: `Could not delete ${title}`, description: "The record is unchanged. Try again." });
+      return;
+    }
     leave(onClose);
     /* 6881:70387 — "<name> deleted · <collection>", what went, what Undo does. */
     addToast({
       tone: "success",
       title: `${title} deleted · ${collection.name}`,
       description: "The record is gone. Undo restores it.",
-      action: { label: "Undo", onClick: () => void onRestore(record) },
+      action: {
+        label: "Undo",
+        onClick: () =>
+          void onRestore(record).catch(() =>
+            addToast({ tone: "error", title: `Could not restore ${title}`, description: "The server did not take the record back. It is still deleted." }),
+          ),
+      },
     });
   };
 
@@ -751,7 +764,12 @@ export function RecordSheet({
           open={typedDelete}
           onClose={() => setTypedDelete(false)}
           onConfirm={async () => {
-            await onDelete(record);
+            try {
+              await onDelete(record);
+            } catch {
+              addToast({ tone: "error", title: `Could not delete ${title}`, description: "The record and its page are unchanged. Try again." });
+              return;
+            }
             setTypedDelete(false);
             leave(onClose);
             addToast({ tone: "success", title: `${title} deleted · ${collection.name}`, description: "The record and its generated page are gone." });

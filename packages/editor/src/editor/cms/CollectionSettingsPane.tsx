@@ -85,12 +85,24 @@ export function CollectionSettingsPane({ composer, collection, records }: Collec
 
   const remove = async () => {
     if (!composer) return;
+    /* Delete FIRST, unbind after (REA 2026-10-20 #11a). The bindings used to
+       go before a delete that can fail — a failure left the collection in
+       place with its elements silently unbound, and said nothing. */
+    let deleted = false;
+    try {
+      deleted = await composer.cms.collections.deleteCollection(collection.id);
+    } catch {
+      deleted = false;
+    }
+    if (!deleted) {
+      addToast({ tone: "error", title: `Could not delete “${collection.name}”`, description: "The collection and its bindings are unchanged. Try again." });
+      return;
+    }
     const bindings = composer.cms.bindings;
     for (const elementId of boundElements) {
       for (const b of bindings.getBindings(elementId)) if (b.collectionId === collection.id) bindings.unbind(elementId, b.property);
       if (bindings.getCollectionBinding(elementId)?.collectionId === collection.id) bindings.unbindCollection(elementId);
     }
-    await composer.cms.collections.deleteCollection(collection.id);
     setConfirmDelete(false);
     cmsWorkspace.openCollection(null);
     addToast({ tone: "success", title: `“${collection.name}” deleted`, description: consequence.replace("Deleting removes", "Removed").replace("and unbinds", "and unbound") });

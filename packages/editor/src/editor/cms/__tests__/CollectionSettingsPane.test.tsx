@@ -84,7 +84,7 @@ describe("CollectionSettingsPane", () => {
 
   /* CMS-06: the delete warned only about records and left every bound
      element bound to nothing. */
-  it("names the bound elements it will unbind, and unbinds them before the delete", async () => {
+  it("names the bound elements it will unbind, and unbinds them once the delete succeeded", async () => {
     const engine = makeEngine({
       collections: [MENU, TEAM],
       items: [rec("a")],
@@ -104,5 +104,29 @@ describe("CollectionSettingsPane", () => {
     expect(engine.composer.cms.bindings.unbind).toHaveBeenCalledWith("h1", "content");
     expect(engine.composer.cms.bindings.unbind).not.toHaveBeenCalledWith("h2", expect.anything());
     expect(engine.composer.cms.bindings.unbindCollection).toHaveBeenCalledWith("list");
+  });
+
+  /* REA 2026-10-20 #11a: the bindings were stripped BEFORE a delete that
+     can fail, and a failure said nothing — the collection stayed, its
+     elements were silently unbound. */
+  it("a failed delete keeps every binding and says so", async () => {
+    const engine = makeEngine({
+      collections: [MENU, TEAM],
+      items: [rec("a")],
+      bindings: { h1: [{ collectionId: "col-1", fieldSlug: "slug", property: "content" }] },
+      collectionBindings: [{ elementId: "list", collectionId: "col-1", repeat: "children" }],
+    });
+    engine.composer.cms.collections.deleteCollection.mockRejectedValueOnce(new Error("storage"));
+    render(
+      <ToastProvider>
+        <CollectionSettingsPane composer={engine.composer as never} collection={MENU} records={[rec("a")]} />
+      </ToastProvider>,
+    );
+    fireEvent.click(screen.getByTestId("cms-settings-delete"));
+    fireEvent.change(screen.getByPlaceholderText("Click to type DELETE"), { target: { value: "DELETE" } });
+    fireEvent.click(screen.getByTestId("cms-delete-collection-confirm"));
+    await waitFor(() => expect(screen.getByText(/could not delete/i)).toBeInTheDocument());
+    expect(engine.composer.cms.bindings.unbind).not.toHaveBeenCalled();
+    expect(engine.composer.cms.bindings.unbindCollection).not.toHaveBeenCalled();
   });
 });

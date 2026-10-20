@@ -446,6 +446,49 @@ export async function deleteEntry(siteId: string, id: string): Promise<void> {
   await touchCmsEdited(siteId);
 }
 
+/**
+ * Undo a record delete on the SAME id (REA 2026-10-20 #11a). Re-creating the
+ * record under a new id broke every reference and binding to the old one,
+ * and upserting the old id is GONE — the row is a tombstone. This clears the
+ * tombstone. A record that is still live (its delete never reached the
+ * server) is returned as it is. The rules a create would meet still apply:
+ * the collection must exist and have room, and a published record must not
+ * take a slug or page path another live record holds now.
+ */
+export async function restoreEntry(siteId: string, id: string) {
+  const row = await prisma.cmsEntry.findFirst({
+    where: { id, collection: { siteId } },
+    select: {
+      id: true,
+      collectionId: true,
+      deletedAt: true,
+      updatedAt: true,
+      data: true,
+      status: true,
+      collection: { select: { deletedAt: true, fields: true, pageSlugPattern: true } },
+    },
+  });
+  if (!row) throw new CmsError("NOT_FOUND", "Entry not found");
+  if (row.collection.deletedAt) throw new CmsError("GONE", "This collection was deleted.");
+  if (!row.deletedAt) return row;
+  if (row.status === "PUBLISHED") {
+    const peers = await prisma.cmsEntry.findMany({
+      where: { collectionId: row.collectionId, deletedAt: null },
+      select: { id: true, data: true, status: true },
+    });
+    const clash = cmsRecordClash(
+      { fields: fieldRules(row.collection.fields), pageSlugPattern: row.collection.pageSlugPattern },
+      { id: row.id, data: (row.data ?? {}) as Record<string, unknown> },
+      peers.map((p) => ({ id: p.id, data: (p.data ?? {}) as Record<string, unknown>, published: p.status === "PUBLISHED" })),
+    );
+    if (clash) throw new CmsError("INVALID", clash);
+  }
+  await assertEntryRoom(row.collectionId);
+  const restored = await prisma.cmsEntry.update({ where: { id }, data: { deletedAt: null } });
+  await touchCmsEdited(siteId);
+  return restored;
+}
+
 // ── CSV import ────────────────────────────────────────────────────────────
 // Server-side parsing + validation: the client only reads the file as text
 // and posts it, never parses it. `previewCsvImport` and `importCsvEntries`

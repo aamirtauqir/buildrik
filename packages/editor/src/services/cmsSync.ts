@@ -971,6 +971,37 @@ export async function syncEntryDelete(id: string): Promise<void> {
   );
 }
 
+/**
+ * Undo of a record delete, on the server (REA 2026-10-20 #11a): the record
+ * comes back under its own id, so references and bindings to it hold.
+ * Re-creating it would mint a new id, and upserting the old one is GONE (the
+ * row is a tombstone). A delete still queued never reached the server — it
+ * is simply dropped. Resolves false when the server could not be reached or
+ * refused; the caller then leaves the record deleted and says so.
+ */
+export async function syncEntryRestore(item: CMSContentItem): Promise<boolean> {
+  const siteId = getSiteIdFromUrl();
+  if (!siteId) return true;
+  const deleteKey = `entryDelete:${item.id}`;
+  if (queue.isPending(deleteKey)) {
+    queue.drop(deleteKey);
+    outboxRemove(siteId, deleteKey);
+    return true;
+  }
+  await queue.settled(deleteKey);
+  try {
+    const row = await client().cms.entries.restore.mutate({ siteId, id: item.id });
+    /* The un-tombstoning moved the row's updatedAt: without the new stamp the
+       next save of this record would CONFLICT against its own restore. */
+    if (row?.updatedAt) confirmServerCopy(`entry:${item.id}`, row.updatedAt, item.updatedAt);
+    return true;
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.warn("[cms-sync] entry restore failed", e);
+    return false;
+  }
+}
+
 /* One replay per site per page load at a time — React's dev double-mount runs
    the editor-open effect twice. */
 const flushing = new Map<string, Promise<void>>();
