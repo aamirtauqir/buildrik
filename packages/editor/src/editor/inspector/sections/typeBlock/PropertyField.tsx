@@ -22,7 +22,7 @@ import {
   runTxn,
   writeAttribute,
 } from "./attributeWriter";
-const NAME_WARNING_CLASS = "tw:mt-[-6px] tw:mb-2.5 tw:text-[11px] tw:leading-[1.45] tw:text-[var(--bk-warning-text)]";
+const NAME_WARNING_CLASS = "tw:mt-[-6px] tw:mb-2.5 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-warning-text)]";
 
 // ============================================================================
 // TYPES

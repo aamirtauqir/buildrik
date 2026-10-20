@@ -239,7 +239,7 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({
             <h2
               ref={headingRef}
               tabIndex={-1}
-              className="tw:m-0 tw:text-[15px] tw:font-semibold tw:text-[var(--bk-ink)] tw:outline-none"
+              className="tw:m-0 tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:text-[var(--bk-ink)] tw:outline-none"
             >
               {status === "building" ? "Building preview…" : attempts > 1 ? "Still failing" : "Preview couldn’t be built"}
             </h2>
