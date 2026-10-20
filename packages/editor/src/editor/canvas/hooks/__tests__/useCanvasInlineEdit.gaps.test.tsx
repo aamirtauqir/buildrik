@@ -143,19 +143,21 @@ describe("useCanvasInlineEdit — gaps", () => {
       expect(result.current.isEditing).toBe(false);
     });
 
-    it("Escape cancels the edit, restores the original content and persists nothing", () => {
+    it("Escape commits the typed text (Webflow behaviour) and ends the session", () => {
       const { composer, setContent } = makeMockComposer();
       const el = addEl("p", "el-1", "Original");
       const { result } = renderHook(() => useCanvasInlineEdit({ composer, canvasRef }));
 
       dblClick(result, el);
       act(() => {
-        el.innerHTML = "Discarded edit";
+        el.innerHTML = "Kept edit";
         el.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
       });
 
-      expect(el.innerHTML).toBe("Original");
-      expect(setContent).not.toHaveBeenCalled();
+      expect(el.innerHTML).toBe("Kept edit");
+      expect(setContent).toHaveBeenCalledTimes(1);
+      expect(setContent.mock.calls[0][0]).toBe("Kept edit");
+      expect(composer.beginTransaction).toHaveBeenCalledWith("inline-edit");
       expect(result.current.isEditing).toBe(false);
       expect(el.contentEditable).not.toBe("true");
     });
