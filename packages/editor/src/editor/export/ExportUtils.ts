@@ -10,6 +10,8 @@
 
 const FORBIDDEN_PROTOCOLS = ["javascript:", "data:", "vbscript:"];
 const FORBIDDEN_STYLE_TOKENS = ["expression", "url("];
+/** Where a form, or a button or input inside one, would send it. */
+const FORM_SUBMIT_ATTRS = ["action", "method", "target", "enctype", "formaction", "formmethod", "formtarget", "formenctype"];
 
 /**
  * The one stylesheet host the preview may keep.
@@ -36,11 +38,17 @@ export function sanitizeHTMLForPreview(html: string): string {
   try {
     const doc = new DOMParser().parseFromString(html, "text/html");
     doc
-      .querySelectorAll("script,iframe,object,embed,link,meta[http-equiv],base,form")
+      .querySelectorAll("script,iframe,object,embed,link,meta[http-equiv],base")
       .forEach((n) => {
         if (n.tagName === "LINK" && isAllowedStylesheet(n)) return;
         n.remove();
       });
+    /* Forms stay — removing one took every field and button inside it, so
+       Preview showed a page without its contact form (REA #18) — but with
+       nowhere to send: the preview frame has no allow-forms either. */
+    doc.querySelectorAll("form,button,input").forEach((el) => {
+      FORM_SUBMIT_ATTRS.forEach((a) => el.removeAttribute(a));
+    });
 
     doc.querySelectorAll("*").forEach((el) => {
       [...el.attributes].forEach((attr) => {

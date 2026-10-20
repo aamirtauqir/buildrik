@@ -45,13 +45,12 @@ describe("preview keeps the site's fonts and nothing else external", () => {
     expect(out).not.toContain("<script");
   });
 
-  it("still removes scripts, iframes and forms", () => {
+  it("still removes scripts and iframes", () => {
     const out = sanitizeHTMLForPreview(
-      '<!DOCTYPE html><html><body><script>x()</script><iframe></iframe><form></form><p>hi</p></body></html>'
+      '<!DOCTYPE html><html><body><script>x()</script><iframe></iframe><p>hi</p></body></html>'
     );
     expect(out).not.toContain("<script");
     expect(out).not.toContain("<iframe");
-    expect(out).not.toContain("<form");
     expect(out).toContain("hi");
   });
 

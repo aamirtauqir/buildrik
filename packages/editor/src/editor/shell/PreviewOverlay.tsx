@@ -45,6 +45,7 @@ import { buildInteractionRuntimeScript, INTERACTION_ATTR } from "@/engine/export
 import { injectPageRuntimes } from "@/engine/export/publishPostProcess";
 import { DeviceFramePreview } from "../canvas/DeviceFramePreview";
 import { PreviewShareModal } from "./PreviewShareModal";
+import { PreviewNotices } from "./PreviewNotices";
 
 interface PreviewOverlayProps {
   /** Sanitized page HTML of a finished build. null with no `status` → hidden. */
@@ -266,6 +267,7 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({
           )}
         </div>
       </div>
+      {!status && html != null && <PreviewNotices html={html} />}
       <div className={STAGE_CLASS}>
         {status ? (
           /* Never the last page's output: a stale frame read as the current
