@@ -51,6 +51,45 @@ describe("PreviewOverlay", () => {
     expect(withRuntime.indexOf("<script>")).toBeLessThan(withRuntime.lastIndexOf("</body>"));
   });
 
+  /* REA #18: the published page gets each widget's runtime (publishPostProcess)
+     and the preview sanitizer strips every script, so tabs, accordions and
+     modals previewed dead. The same runtimes are added back here. */
+  it("adds the widget runtimes the published page gets", () => {
+    render(<PreviewOverlay html={'<body><div role="tablist"></div></body>'} onDone={vi.fn()} />);
+    const doc = (screen.getByTitle("Site preview") as HTMLIFrameElement).getAttribute("srcdoc") ?? "";
+    expect(doc).toContain("data-buildrick-tabs-runtime");
+  });
+
+  /* REA #18: a previewed form is shown but cannot submit (the frame has no
+     allow-forms), and the preview says so rather than leaving a dead button. */
+  it("says that forms don't submit in preview, only when the page has one", () => {
+    const { unmount } = render(<PreviewOverlay html="<body><p>x</p></body>" onDone={vi.fn()} />);
+    expect(screen.queryByTestId("preview-notice-forms")).toBeNull();
+    unmount();
+    render(<PreviewOverlay html={'<body><form><input name="a"></form></body>'} onDone={vi.fn()} />);
+    expect(screen.getByTestId("preview-notice-forms")).toHaveTextContent(/don.t submit in preview/i);
+    const frame = screen.getByTitle("Site preview") as HTMLIFrameElement;
+    expect((frame.getAttribute("sandbox") ?? "").split(/\s+/)).not.toContain("allow-forms");
+  });
+
+  /* REA #18: an image with no file chosen showed the browser's broken-image
+     glyph and its alt text, unexplained; the canvas draws a placeholder. */
+  it("names images with no file chosen", () => {
+    render(<PreviewOverlay html={'<body><img alt="Image"><img src="" alt="b"><img src="https://x/y.png"></body>'} onDone={vi.fn()} />);
+    expect(screen.getByTestId("preview-notice-images")).toHaveTextContent(/2 images have no file chosen/i);
+    const doc = (screen.getByTitle("Site preview") as HTMLIFrameElement).getAttribute("srcdoc") ?? "";
+    expect(doc).toContain('img:not([src]),img[src=""]');
+  });
+
+  /* REA #18: draft collection records vanished from Preview with no word. */
+  it("says how many draft records the page's lists leave out", () => {
+    const { unmount } = render(<PreviewOverlay html="<body><p>x</p></body>" hiddenDrafts={0} onDone={vi.fn()} />);
+    expect(screen.queryByTestId("preview-notice-drafts")).toBeNull();
+    unmount();
+    render(<PreviewOverlay html="<body><p>x</p></body>" hiddenDrafts={1} onDone={vi.fn()} />);
+    expect(screen.getByTestId("preview-notice-drafts")).toHaveTextContent(/1 draft item isn.t shown/i);
+  });
+
   /* Board 4418:165611 (C5 G1-086): the way out is "‹ Back to canvas" in the
      preview's own bar; the Done pill is gone, and each device names its width. */
   it("'‹ Back to canvas' exits, and each device names its width", () => {

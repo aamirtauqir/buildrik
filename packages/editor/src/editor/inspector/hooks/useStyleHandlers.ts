@@ -21,6 +21,8 @@ import { getDOMElement } from "@/engine/canvas/resize/utils";
 import type { PseudoStateId } from "@/shared/types";
 import type { BreakpointId } from "@/shared/types/breakpoints";
 import { devLogger } from "@/shared/utils/devLogger";
+import { parseColor } from "@/shared/utils/parsers/colorParser";
+import { rgbToHex } from "@/shared/utils/parsers/colorConversionBasic";
 import { computeEffectiveStyles } from "../config/cssContext";
 import { activeBreakpoint, canWrite, setStyleAt, writableElements } from "@/engine/commands/commandOperations";
 
@@ -60,10 +62,10 @@ const WRITE_INTERVAL_MS = 50;
  * What the element ACTUALLY renders, for the properties it has no value of its
  * own. Keeps the panel honest without changing which rows it shows.
  *
- * Colours are skipped: `getComputedStyle` returns `rgb(...)` and the colour
- * controls expect a hex string, so a computed colour would be shown as a
- * broken value rather than a truer one. They keep the type default until the
- * controls speak both.
+ * Colours arrive as `rgb(...)` and the colour controls speak hex, so an
+ * opaque one is converted. A translucent one keeps the type default: the
+ * controls have no way to show it (REA #18 — an H2 rendering #334155 read
+ * 1a1a1a, the type default, a colour nothing rendered).
  */
 function readRenderedValues(
   elementId: string,
@@ -76,9 +78,14 @@ function readRenderedValues(
   const out: Record<string, string> = {};
   for (const key of keys) {
     if (authored[key]) continue;
-    if (key === "color" || key.endsWith("-color")) continue;
-    const value = cs.getPropertyValue(key);
-    if (value) out[key] = value.trim();
+    const value = cs.getPropertyValue(key).trim();
+    if (!value) continue;
+    if (key === "color" || key.endsWith("-color")) {
+      const rgb = parseColor(value);
+      if (rgb && (rgb.a === undefined || rgb.a >= 1)) out[key] = rgbToHex(rgb);
+      continue;
+    }
+    out[key] = value;
   }
   return out;
 }
