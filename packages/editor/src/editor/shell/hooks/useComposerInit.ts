@@ -764,6 +764,13 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
               return;
             }
             console.error("[BuildrikSync] auto-save failed:", message);
+            /* REA #7: every other failure keeps the edit for the reload; a
+               server fault (5xx) left it only in the tab. Not when the project
+               never loaded — that document is the fallback, and restoring it
+               would offer to overwrite the real site. */
+            if (siteId && !message.includes("PROJECT_NOT_LOADED")) {
+              keepUnsaved(siteId, composer.exportProject(), getBaselineLastEditedAt());
+            }
             setSaveState((prev) => ({
               ...prev,
               status: "error",

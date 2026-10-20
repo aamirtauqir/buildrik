@@ -294,3 +294,27 @@ describe("autosave refused with TOKENS_INVALID", () => {
     localStorage.removeItem("bk-unsaved-v1-site-1");
   });
 });
+
+/* REA #7: a save that failed on a server fault (5xx, generic) only scheduled
+   a retry and toasted "Changes are unsaved" — no recovery copy. Close the tab
+   while the server is failing and the edit existed nowhere. */
+describe("autosave failing on a server error", () => {
+  afterEach(() => localStorage.removeItem("bk-unsaved-v1-site-1"));
+
+  it("keeps the local recovery copy", async () => {
+    localStorage.removeItem("bk-unsaved-v1-site-1");
+    vi.mocked(syncSaveProject).mockRejectedValueOnce(new Error("Internal server error"));
+    const toasts = await runAutosave(params());
+
+    expect(toasts.some((t) => t.title === "Save failed")).toBe(true);
+    expect(localStorage.getItem("bk-unsaved-v1-site-1")).not.toBeNull();
+  });
+
+  it("does not keep the never-loaded fallback as a recovery copy", async () => {
+    localStorage.removeItem("bk-unsaved-v1-site-1");
+    vi.mocked(syncSaveProject).mockRejectedValueOnce(new Error("PROJECT_NOT_LOADED"));
+    await runAutosave(params());
+
+    expect(localStorage.getItem("bk-unsaved-v1-site-1")).toBeNull();
+  });
+});
