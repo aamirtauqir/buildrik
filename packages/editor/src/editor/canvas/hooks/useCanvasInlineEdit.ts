@@ -153,35 +153,31 @@ export function useCanvasInlineEdit({
 
     let active = true;
 
-    const finishEdit = (commit: boolean) => {
+    const finishEdit = () => {
       if (!active) return;
       active = false;
 
       try {
-        if (commit) {
-          // contentEditable can hold pasted/typed markup — sanitize before it
-          // is persisted into the element tree and re-rendered onto the canvas.
-          const newHtml = sanitizeHTML(el.innerHTML);
-          if (newHtml !== editing.original) {
-            composer.beginTransaction("inline-edit");
-            try {
-              const element = composer.elements.getElement(editing.id!);
-              element?.setContent?.(newHtml);
-            } finally {
-              composer.endTransaction();
-            }
-            /* The one signal that says "the user edited text on the canvas".
-               EVENTS.ELEMENT_EDIT_INLINE existed as a constant with no
-               emitter, so the onboarding step that asks for exactly this
-               action had nothing to listen to. */
-            composer.emit(EVENTS.ELEMENT_EDIT_INLINE, { elementId: editing.id });
-            /* No saveProject() here: with a site bound it only wrote
-               localStorage yet marked the project saved before the server had
-               the edit. The transaction's project:changed schedules the real
-               autosave (audit 2026-10-08 P2-2). */
+        // contentEditable can hold pasted/typed markup — sanitize before it
+        // is persisted into the element tree and re-rendered onto the canvas.
+        const newHtml = sanitizeHTML(el.innerHTML);
+        if (newHtml !== editing.original) {
+          composer.beginTransaction("inline-edit");
+          try {
+            const element = composer.elements.getElement(editing.id!);
+            element?.setContent?.(newHtml);
+          } finally {
+            composer.endTransaction();
           }
-        } else {
-          el.innerHTML = sanitizeHTML(editing.original);
+          /* The one signal that says "the user edited text on the canvas".
+             EVENTS.ELEMENT_EDIT_INLINE existed as a constant with no
+             emitter, so the onboarding step that asks for exactly this
+             action had nothing to listen to. */
+          composer.emit(EVENTS.ELEMENT_EDIT_INLINE, { elementId: editing.id });
+          /* No saveProject() here: with a site bound it only wrote
+             localStorage yet marked the project saved before the server had
+             the edit. The transaction's project:changed schedules the real
+             autosave (audit 2026-10-08 P2-2). */
         }
       } finally {
         el.contentEditable = "false";
@@ -200,16 +196,15 @@ export function useCanvasInlineEdit({
         if (!relatedTarget.matches("input, textarea, select")) setTimeout(() => el.focus(), 0);
         return;
       }
-      finishEdit(true);
+      finishEdit();
     };
 
     const handleKey = (evt: KeyboardEvent) => {
-      if (evt.key === "Escape") {
+      /* Escape leaves the edit and keeps what was typed (Webflow behaviour)
+         — it used to throw the typed text away. Undo takes it back. */
+      if (evt.key === "Escape" || (evt.key === "Enter" && el.tagName.toLowerCase() !== "textarea")) {
         evt.preventDefault();
-        finishEdit(false);
-      } else if (evt.key === "Enter" && el.tagName.toLowerCase() !== "textarea") {
-        evt.preventDefault();
-        finishEdit(true);
+        finishEdit();
       }
     };
 
@@ -224,7 +219,7 @@ export function useCanvasInlineEdit({
       }
 
       if (!el.contains(target)) {
-        finishEdit(true);
+        finishEdit();
         return;
       }
     };

@@ -195,7 +195,7 @@ export function useCanvasInlineCommands({
          the element, which destroyed the contentEditable session on the FIRST
          toolbar click — format applied, editing over, in a toolbar of
          eighteen controls. The live DOM already holds every edit;
-         useCanvasInlineEdit's finishEdit(true) sanitizes and persists the
+         useCanvasInlineEdit's finishEdit() sanitizes and persists the
          final markup once, when the session actually ends (Enter, Escape,
          click-outside). One writer, one transaction, one undo step. */
     },
