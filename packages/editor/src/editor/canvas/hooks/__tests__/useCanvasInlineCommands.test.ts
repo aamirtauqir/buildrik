@@ -109,3 +109,72 @@ describe("useCanvasInlineCommands — createLink scheme validation (T4)", () => 
     expect(calls[calls.length - 1]).toBe("styleWithCSS");
   });
 });
+
+describe("useCanvasInlineCommands — Insert link wraps the selection the user made", () => {
+  it("links the canvas selection even after focus moved to the URL field", () => {
+    const canvasDiv = document.createElement("div");
+    const p = document.createElement("p");
+    p.setAttribute("data-buildrick-id", "el-2");
+    p.textContent = "Lorem ipsum dolor";
+    canvasDiv.appendChild(p);
+    const urlField = document.createElement("input");
+    urlField.value = "https://example.com";
+    document.body.append(canvasDiv, urlField);
+    const canvasRef = { current: canvasDiv } as React.RefObject<HTMLDivElement | null>;
+    const { result } = renderHook(() => useCanvasInlineCommands({ canvasRef, editingId: "el-2" }));
+
+    const text = p.firstChild as Text;
+    const sel = window.getSelection()!;
+    const range = document.createRange();
+    range.setStart(text, 6);
+    range.setEnd(text, 11);
+    sel.removeAllRanges();
+    sel.addRange(range);
+    document.dispatchEvent(new Event("selectionchange"));
+
+    /* Typing the URL moves the selection out of the paragraph. */
+    urlField.focus();
+    const away = document.createRange();
+    away.selectNodeContents(document.body.lastChild as Node);
+    sel.removeAllRanges();
+    sel.addRange(away);
+    document.dispatchEvent(new Event("selectionchange"));
+
+    act(() => {
+      result.current.handleInlineCommand("createLink", "https://example.com");
+    });
+
+    const anchor = p.querySelector("a");
+    expect(anchor?.textContent).toBe("ipsum");
+    expect(anchor?.getAttribute("href")).toBe("https://example.com");
+    expect(p.textContent).toBe("Lorem ipsum dolor");
+    canvasDiv.remove();
+    urlField.remove();
+  });
+});
+
+describe("useCanvasInlineCommands — Clear formatting", () => {
+  it("removeFormat strips inline formatting from the selection and keeps the text and links", () => {
+    const canvasDiv = document.createElement("div");
+    const p = document.createElement("p");
+    p.setAttribute("data-buildrick-id", "el-3");
+    p.innerHTML = 'Hello <strong>bold <em>it</em></strong> <span style="color: red">red</span> <a href="https://x.dev">link</a>';
+    canvasDiv.appendChild(p);
+    document.body.appendChild(canvasDiv);
+    const canvasRef = { current: canvasDiv } as React.RefObject<HTMLDivElement | null>;
+    const { result } = renderHook(() => useCanvasInlineCommands({ canvasRef, editingId: "el-3" }));
+
+    const range = document.createRange();
+    range.selectNodeContents(p);
+    const sel = window.getSelection()!;
+    sel.removeAllRanges();
+    sel.addRange(range);
+
+    act(() => {
+      result.current.handleInlineCommand("removeFormat");
+    });
+
+    expect(p.innerHTML).toBe('Hello bold it red <a href="https://x.dev">link</a>');
+    canvasDiv.remove();
+  });
+});

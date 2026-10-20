@@ -41,6 +41,28 @@ export const parseFunction = (value: string | undefined, type: string, defaultVa
   return match?.[1] || defaultValue;
 };
 
+/** The `name(args)` functions of a filter / transform value, in order;
+    nested parentheses (`drop-shadow(… rgba(…))`) stay inside their function. */
+const splitFunctions = (value: string): Array<[string, string]> => {
+  const out: Array<[string, string]> = [];
+  const re = /([\w-]+)\(/g;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(value))) {
+    let depth = 1;
+    let i = re.lastIndex;
+    for (; i < value.length && depth > 0; i++) {
+      if (value[i] === "(") depth++;
+      else if (value[i] === ")") depth--;
+    }
+    out.push([m[1], value.slice(re.lastIndex, i - 1)]);
+    re.lastIndex = i;
+  }
+  return out;
+};
+
+/* Functions the sliders do not own (`translate(-50%, -50%)`, `matrix(…)`,
+   `drop-shadow(…)`) are kept, ahead of the slider functions and in their
+   own order — editing rotate used to drop a centring translate. */
 const composeFunctional = (
   current: string | undefined,
   order: string[],
@@ -49,16 +71,18 @@ const composeFunctional = (
   arg: string
 ): string => {
   const map = new Map<string, string>();
+  const others: string[] = [];
   if (current && current !== "none") {
-    const re = /([\w-]+)\(([^)]*)\)/g;
-    let m: RegExpExecArray | null;
-    while ((m = re.exec(current))) map.set(m[1], m[2]);
+    for (const [name, args] of splitFunctions(current)) {
+      if (order.includes(name)) map.set(name, args);
+      else others.push(`${name}(${args})`);
+    }
   }
   const trimmed = arg.trim();
   if (trimmed === "" || trimmed === identity[fn]) map.delete(fn);
   else map.set(fn, trimmed);
 
-  const parts: string[] = [];
+  const parts: string[] = [...others];
   for (const key of order) {
     const v = map.get(key);
     if (v === undefined || v === "" || v === identity[key]) continue;

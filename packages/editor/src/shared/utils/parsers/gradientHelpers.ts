@@ -41,7 +41,9 @@ export function extractGradientUI(background: string | undefined): GradientUI {
   if (bg.startsWith("var(")) return { type: "color" };
 
   const gradient = parseGradient(bg);
-  if (!gradient) return { type: "color" };
+  /* A gradient the parser cannot read (several layers, repeating-…) is
+     opaque too — reading it as "no gradient" fed the editor default stops. */
+  if (!gradient) return /gradient\(/.test(bg) ? { type: "gradient", isOpaque: true } : { type: "color" };
 
   // More than 2 stops is opaque for the simple UI
   if (gradient.stops.length > 2) {

@@ -52,6 +52,10 @@ export function useSelectionBehavior({
   const [clickThroughStack, setClickThroughStack] = React.useState<string[]>([]);
   const [clickThroughIndex, setClickThroughIndex] = React.useState(0);
   const lastClickPosition = React.useRef<{ x: number; y: number } | null>(null);
+  /* Where the current ⌘-click cycle started — its own record. Sharing
+     lastClickPosition with the click counter (which writes it first) made
+     every first ⌘-click look like a repeat: empty stack, NaN, no selection. */
+  const clickThroughPosition = React.useRef<{ x: number; y: number } | null>(null);
 
   // Multi-click tracking
   const lastClickTime = React.useRef<number>(0);
@@ -61,26 +65,28 @@ export function useSelectionBehavior({
     setClickThroughStack([]);
     setClickThroughIndex(0);
     lastClickPosition.current = null;
+    clickThroughPosition.current = null;
   }, []);
 
-  const isSamePosition = React.useCallback((x: number, y: number): boolean => {
-    if (!lastClickPosition.current) return false;
-    return (
-      Math.abs(lastClickPosition.current.x - x) < SAME_POSITION_THRESHOLD &&
-      Math.abs(lastClickPosition.current.y - y) < SAME_POSITION_THRESHOLD
-    );
-  }, []);
+  const isSamePosition = React.useCallback(
+    (x: number, y: number, from: React.RefObject<{ x: number; y: number } | null> = lastClickPosition): boolean => {
+      const at = from.current;
+      if (!at) return false;
+      return Math.abs(at.x - x) < SAME_POSITION_THRESHOLD && Math.abs(at.y - y) < SAME_POSITION_THRESHOLD;
+    },
+    []
+  );
 
   /** Handle click-through selection (Cmd/Ctrl + Click) */
   const handleClickThrough = React.useCallback(
     (x: number, y: number) => {
       if (!composer) return;
 
-      if (!isSamePosition(x, y)) {
+      if (!isSamePosition(x, y, clickThroughPosition) || clickThroughStack.length === 0) {
         const stack = buildElementStack(x, y);
         setClickThroughStack(stack);
         setClickThroughIndex(0);
-        lastClickPosition.current = { x, y };
+        clickThroughPosition.current = { x, y };
 
         if (stack.length > 0) {
           const element = composer.elements.getElement(stack[0]);

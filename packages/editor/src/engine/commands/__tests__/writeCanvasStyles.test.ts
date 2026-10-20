@@ -16,7 +16,7 @@
 import { beforeAll, describe, it, expect, vi } from "vitest";
 import { Composer } from "@/engine/Composer";
 import { EVENTS } from "@/shared/constants/events";
-import { activeBreakpoint, stylesAt, writeCanvasStyles } from "../commandOperations";
+import { activeBreakpoint, pasteStyles, stylesAt, writeCanvasStyles } from "../commandOperations";
 import { applyBoundsToModel } from "@/engine/canvas/resize/DOMUpdater";
 
 beforeAll(() => {
@@ -89,6 +89,30 @@ describe("writeCanvasStyles", () => {
     expect(writeCanvasStyles(c, box(c), "resize-element", { width: "300px" })).toBe(false);
     expect(box(c).getStyle("width")).toBe("400px");
     expect(skipped).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("stylesAt cascade", () => {
+  it("Mobile inherits desktop → tablet → mobile", () => {
+    const c = load();
+    c.styles.setBreakpointStyle("box", "tablet", { width: "300px", color: "blue" });
+    c.styles.setBreakpointStyle("box", "mobile", { color: "red" });
+    const mobile = stylesAt(c, box(c), "mobile");
+    expect(mobile.width).toBe("300px");
+    expect(mobile.color).toBe("red");
+    expect(mobile.position).toBe("absolute");
+  });
+});
+
+describe("pasteStyles at the active breakpoint", () => {
+  it("pasting on Tablet writes the tablet override and leaves Desktop alone", () => {
+    const c = load();
+    c.setDevice("tablet");
+    c.styleClipboard = { width: "250px", color: "red" };
+    expect(pasteStyles(c, box(c))).toBe(2);
+    expect(box(c).getStyle("width")).toBe("400px");
+    expect(box(c).getStyle("color")).toBeUndefined();
+    expect(c.styles.getBreakpointStyle("box", "tablet")).toMatchObject({ width: "250px", color: "red" });
   });
 });
 

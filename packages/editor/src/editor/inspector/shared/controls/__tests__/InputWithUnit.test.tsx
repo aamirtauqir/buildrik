@@ -234,3 +234,14 @@ describe("InputWithUnit — field context", () => {
     expect(screen.queryByRole("button", { name: "Overridden on Tablet" })).toBeNull();
   });
 });
+
+describe("InputWithUnit — unitless line height stays unitless", () => {
+  const units = ["px", "", "em", "%", "normal"];
+  it.each(["normal", ""])("typing 1.5 over %j writes 1.5, not 1.5px", (value) => {
+    const { onChange, input } = renderInput({ label: "Line height", value, units });
+    fireEvent.change(input, { target: { value: "1.5" } });
+    expect(onChange).toHaveBeenLastCalledWith("1.5");
+    fireEvent.keyDown(input, { key: "Enter" });
+    expect(onChange).toHaveBeenLastCalledWith("1.5");
+  });
+});
