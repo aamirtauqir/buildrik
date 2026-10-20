@@ -1039,7 +1039,7 @@ export class ExportEngine {
 
     // The site's head scripts, on every published page — see the note in
     // wrapInDocument. Sanitised by the same allowlist as the per-page field.
-    const siteHeadScripts = sanitizeHeadCode(siteCustomCode?.headScripts);
+    const siteHeadScripts = sanitizeHeadCode(siteCustomCode?.headScripts, { inertInlineScripts: true });
     if (siteHeadScripts) headParts.push(`  ${siteHeadScripts}`);
 
     // …and the site's analytics, which the published page never carried: the
@@ -1057,13 +1057,15 @@ export class ExportEngine {
     const themeToggleScript =
       toggle.auto && bodyContent.includes(THEME_TOGGLE_ATTR) ? "\n" + buildThemeToggleRuntimeScript() : "";
 
+    // Inline scripts in the site's code ship inert; see sanitizeHeadCode.
+    const siteBodyScripts = sanitizeHeadCode(siteCustomCode?.bodyScripts, { inertInlineScripts: true });
     let html = `<!DOCTYPE html>
 <html lang="${resolveLanguage(siteSEO)}">
 <head>
 ${headParts.join("\n")}
 </head>
 <body>
-${bodyContent}${interactionScript}${themeToggleScript}${sanitizeHeadCode(siteCustomCode?.bodyScripts) ? `\n  ${sanitizeHeadCode(siteCustomCode?.bodyScripts)}` : ""}
+${bodyContent}${interactionScript}${themeToggleScript}${siteBodyScripts ? `\n  ${siteBodyScripts}` : ""}
 </body>
 </html>`;
 

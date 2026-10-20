@@ -170,8 +170,7 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({
   const [headValidation, setHeadValidation] = React.useState<HtmlValidationResult | null>(null);
   /* Body scripts run through the SAME export sanitizer as head scripts
      (ExportEngine calls sanitizeHeadCode on both), and this field showed no
-     feedback at all — so an inline script here was dropped even more quietly
-     than in the field above. */
+     feedback at all — so what the sanitizer drops here went unexplained. */
   const [bodyValidation, setBodyValidation] = React.useState<HtmlValidationResult | null>(null);
   const [cssValidation, setCssValidation] = React.useState<CssValidationResult | null>(null);
   /* Head and body as the Site row holds them (CSS is the composer's,
@@ -287,9 +286,10 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({
           setHeadCode(next);
         }}
         describedBy={headValidation ? "head-validation-feedback" : undefined}
-        /* `<script src>`, never `<script>…</script>`: the export sanitizer
-           strips inline scripts, and the validator under the field says so
-           the moment one is typed. */
+        /* `<script src>` as the example: an inline `<script>…</script>` ships
+           to the published site but never runs in the editor or Preview (REA
+           #27), and the validator under the field says so the moment one is
+           typed. */
         placeholder={'<script src="https://…/analytics.js"></script>\n<link rel="preconnect" href="https://…">'}
       >
         <HtmlFeedback id="head-validation-feedback" result={headValidation} />
