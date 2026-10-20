@@ -222,6 +222,8 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
 
   // In-shell preview (shell state 7) — sanitized page HTML below the topbar.
   const [previewHtml, setPreviewHtml] = React.useState<string | null>(null);
+  /** Draft records the previewed page's lists leave out (REA #18). */
+  const [previewDrafts, setPreviewDrafts] = React.useState(0);
   /* Decision 9: the build's own state — building, or failed (with its cause
      and how many times in a row). A failed build showed nothing. */
   const [previewBuild, setPreviewBuild] = React.useState<
@@ -287,9 +289,10 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     setPreviewHtml(null);
     setPreviewBuild((b) => ({ status: "building", attempts: b?.status === "error" ? b.attempts : 0 }));
     renderPreviewHtml(composer).then(
-      (html) => {
+      ({ html, hiddenDrafts }) => {
         if (mine !== previewRun.current) return;
         setPreviewBuild(null);
+        setPreviewDrafts(hiddenDrafts);
         setPreviewHtml(sanitizeHTMLForPreview(html));
       },
       (err: unknown) => {
@@ -829,6 +832,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
 
       <PreviewOverlay
         html={previewHtml}
+        hiddenDrafts={previewDrafts}
         status={previewBuild?.status}
         error={previewBuild?.status === "error" ? previewBuild.error : undefined}
         attempts={previewBuild?.attempts}

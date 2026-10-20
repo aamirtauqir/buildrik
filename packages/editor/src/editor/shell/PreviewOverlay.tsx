@@ -50,6 +50,8 @@ import { PreviewNotices } from "./PreviewNotices";
 interface PreviewOverlayProps {
   /** Sanitized page HTML of a finished build. null with no `status` → hidden. */
   html: string | null;
+  /** Unpublished records the page's collection lists leave out (REA #18). */
+  hiddenDrafts?: number;
   /** Design decision 9: the build is running, or it failed. A preview that
    *  failed used to show nothing at all — the promise rejected silently. */
   status?: "building" | "error";
@@ -99,12 +101,23 @@ const BRIDGE_SCRIPT =
   'if(!a)return;var h=a.getAttribute("href")||"";if(h.charAt(0)==="#")return;e.preventDefault();post({type:"link",href:h});});' +
   "})();</script>";
 
+/* An image with no file chosen drew the browser's broken-image glyph and its
+   alt text; the canvas draws a placeholder box there, and so does the preview
+   (`content` replaces the glyph, as Canvas.css does).
+   PreviewNotices says the published site will not (REA #18). */
+const EMPTY_IMAGE_STYLE =
+  '<style>img:not([src]),img[src=""]{display:inline-block;min-width:120px;min-height:80px;' +
+  "content:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E\");background:rgba(128,128,128,.12);" +
+  "outline:1px dashed rgba(128,128,128,.5);outline-offset:-1px}</style>";
+
 /** The frame's document: the sanitized page plus the editor's own scripts,
  *  before `</body>` when there is one — the widget runtimes the published page
  *  gets (`injectPageRuntimes`, the publish post-process step), the interaction
- *  runtime and the bridge. */
+ *  runtime and the bridge — and the empty-image placeholder before `</head>`. */
 function previewDocument(sanitized: string): string {
-  const html = injectPageRuntimes(sanitized);
+  const head = sanitized.indexOf("</head>");
+  const styled = head < 0 ? sanitized + EMPTY_IMAGE_STYLE : sanitized.slice(0, head) + EMPTY_IMAGE_STYLE + sanitized.slice(head);
+  const html = injectPageRuntimes(styled);
   const scripts = (html.includes(INTERACTION_ATTR) ? buildInteractionRuntimeScript() : "") + BRIDGE_SCRIPT;
   const end = html.lastIndexOf("</body>");
   return end < 0 ? html + scripts : html.slice(0, end) + scripts + html.slice(end);
@@ -150,6 +163,7 @@ const SCREEN_FRAME_CLASS = "tw:w-full tw:h-full tw:border-0 tw:bg-[var(--bk-bg-e
 
 export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({
   html,
+  hiddenDrafts = 0,
   status,
   error,
   attempts = 0,
@@ -267,7 +281,7 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({
           )}
         </div>
       </div>
-      {!status && html != null && <PreviewNotices html={html} />}
+      {!status && html != null && <PreviewNotices html={html} hiddenDrafts={hiddenDrafts} />}
       <div className={STAGE_CLASS}>
         {status ? (
           /* Never the last page's output: a stale frame read as the current

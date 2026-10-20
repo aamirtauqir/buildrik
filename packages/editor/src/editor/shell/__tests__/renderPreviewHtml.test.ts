@@ -36,7 +36,7 @@ describe("renderPreviewHtml", () => {
       },
     } as never);
 
-    const html = await renderPreviewHtml(c);
+    const { html } = await renderPreviewHtml(c);
     expect(html).toContain("Tom &amp; Jerry &lt;3");
     expect(html).not.toContain(">Stored<");
   });
@@ -55,6 +55,6 @@ describe("renderPreviewHtml", () => {
     const shipped = await exportPublishPages(c);
     const aboutPage = shipped.find((p) => p.html.includes("About title"));
     expect(aboutPage).toBeDefined();
-    expect(await renderPreviewHtml(c)).toBe(aboutPage!.html);
+    expect((await renderPreviewHtml(c)).html).toBe(aboutPage!.html);
   });
 });
