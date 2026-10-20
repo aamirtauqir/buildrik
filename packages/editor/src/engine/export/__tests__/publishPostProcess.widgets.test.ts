@@ -5,7 +5,7 @@
  * actually runs the widget.
  */
 import { describe, it, expect, afterEach } from "vitest";
-import { wireWidgetRuntimes } from "../publish-widgets";
+import { injectPageRuntimes } from "../publishPostProcess";
 
 const COUNTDOWN = `<html><body>
 <div data-countdown-end="2099-01-01T00:00"><div><span class="buildrick-countdown-value">12</span></div></div>
@@ -30,29 +30,29 @@ afterEach(() => {
   document.body.innerHTML = "";
 });
 
-describe("wireWidgetRuntimes", () => {
+describe("injectPageRuntimes", () => {
   it("leaves a page with neither widget untouched (incl. a countdown with no end time)", () => {
     const plain = "<html><body><p>hi</p></body></html>";
-    expect(wireWidgetRuntimes(plain)).toBe(plain);
+    expect(injectPageRuntimes(plain)).toBe(plain);
     const oldCountdown = '<html><body><div class="buildrick-countdown"><span>12</span></div></body></html>';
-    expect(wireWidgetRuntimes(oldCountdown)).toBe(oldCountdown);
+    expect(injectPageRuntimes(oldCountdown)).toBe(oldCountdown);
   });
 
   it("injects each runtime once, before </body>, only for the widget the page has", () => {
-    const out = wireWidgetRuntimes(COUNTDOWN);
+    const out = injectPageRuntimes(COUNTDOWN);
     expect(out).toContain("<script data-buildrick-countdown-runtime>");
     expect(out).not.toContain("data-buildrick-accordion-runtime");
     expect(out.indexOf("</script>")).toBeLessThan(out.indexOf("</body>"));
-    expect(wireWidgetRuntimes(out)).toBe(out);
+    expect(injectPageRuntimes(out)).toBe(out);
   });
 
   it("the injected countdown script ticks the page's countdown", () => {
-    runScripts(wireWidgetRuntimes(COUNTDOWN));
+    runScripts(injectPageRuntimes(COUNTDOWN));
     expect(document.querySelector(".buildrick-countdown-value")?.textContent).not.toBe("12");
   });
 
   it("the injected accordion script honours one-at-a-time on click", () => {
-    runScripts(wireWidgetRuntimes(ACCORDION));
+    runScripts(injectPageRuntimes(ACCORDION));
     const items = Array.from(document.querySelectorAll<HTMLElement>("[data-accordion-state]"));
     const open = () => items.map((i) => i.lastElementChild!.getAttribute("aria-hidden") !== "true");
     expect(open()).toEqual([false, true]);

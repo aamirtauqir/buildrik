@@ -38,9 +38,8 @@ const formPlan = vi.hoisted(() => ({
   next: null as null | { forms: unknown[]; deactivateMissing: boolean },
 }));
 vi.mock("@/lib/publish-forms", () => ({
-  planFormWiring: (pages: unknown) => ({ pages, forms: [], deactivateMissing: false, ...(formPlan.next ?? {}) }),
+  planPublishPages: (pages: unknown) => ({ pages, forms: [], deactivateMissing: false, ...(formPlan.next ?? {}) }),
 }));
-vi.mock("@/lib/publish-sliders", () => ({ wireSliders: (html: string) => html }));
 vi.mock("@/server/services/form-submission.service", () => ({
   getPublishedFormSettings: vi.fn(async () => ({})),
   recordPublishedForms: (...a: unknown[]) => recordPublishedForms(...a),

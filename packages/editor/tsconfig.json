@@ -27,7 +27,8 @@
       "@shared/*": ["./src/shared/*"],
       "@server/*": ["../../server/*"],
       "@lib/*": ["../../lib/*"],
-      "@buildrik/shared/*": ["../shared/*"]
+      "@buildrik/shared/*": ["../shared/*"],
+      "@buildrik/editor/*": ["./*"]
     }
   },
   "include": ["src", "demo", "e2e", "../../types/**/*.ts"],

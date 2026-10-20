@@ -12,7 +12,7 @@ import { isAbsoluteHttpUrl, isSitePath } from "@buildrik/shared/schemas/element-
 import { resolveSiteOrigins } from "@/lib/publish-urls";
 import { resolveVercelProjectName } from "@/lib/vercel";
 import { hasLiveDeployment } from "@/server/services/publish.service";
-import type { DiscoveredForm, FormBlockWireSettings } from "@/lib/publish-forms";
+import type { DiscoveredForm, FormBlockWireSettings } from "@buildrik/editor/src/engine/export/publishPostProcess";
 import { notifyWorkspaceOwner } from "@/server/services/notification.trigger";
 import { sendFormSubmissionEmail } from "@/server/services/email.service";
 
@@ -32,7 +32,7 @@ export class FormError extends Error {
  * Validates a URL against one of the site's own known origins before
  * trusting it as a redirect target — an arbitrary attacker string here
  * would be an open redirect. Used for BOTH the visitor's own `location.href`
- * (sent as `returnUrl`, filled by the page script in `lib/publish-forms.ts`)
+ * (sent as `returnUrl`, filled by the page script in `publishPostProcess.ts`)
  * and the raw `Referer` header — the Referer is attacker-influenceable too
  * (any page can link to a form with a crafted opener, and some browsers/
  * extensions strip or rewrite it), so it gets the exact same exact-origin
@@ -295,7 +295,7 @@ const DEFAULT_FORM_BLOCK_SETTINGS: FormBlockSettings = {
 
 /**
  * Inspector AFTER SUBMIT / PROTECTION read. The block's row may not exist yet
- * — the row is created at first publish (`planFormWiring` → the publish
+ * — the row is created at first publish (`planPublishPages` → the publish
  * worker's upsert) — so an unpublished form reads as the same defaults its
  * row will get once it exists.
  */
@@ -378,7 +378,7 @@ export async function getPublishedFormSettings(
  * the site stop accepting submissions, but their rows and everything already
  * submitted stay — the Submissions tab is a record, not a mirror of the
  * current design. `deactivateMissing` is false whenever wiring could not run
- * (`planFormWiring`), so an empty list never sweeps a site's live forms.
+ * (`planPublishPages`), so an empty list never sweeps a site's live forms.
  */
 export async function recordPublishedForms(
   siteId: string,

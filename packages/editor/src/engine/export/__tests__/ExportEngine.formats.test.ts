@@ -644,7 +644,7 @@ describe("ExportEngine.generateZip", () => {
     expect(html).toContain('href="styles.css"');
   });
 
-  it("produces just index.html + styles.css when there are no assets", async () => {
+  it("produces just index.html + styles.css (+ robots.txt) when there are no assets", async () => {
     const fetchMock = vi.fn();
     vi.stubGlobal("fetch", fetchMock);
 
@@ -652,7 +652,7 @@ describe("ExportEngine.generateZip", () => {
     const zip = await unzip(blob);
 
     expect(fetchMock).not.toHaveBeenCalled();
-    expect(Object.keys(zip.files).sort()).toEqual(["index.html", "styles.css"]);
+    expect(Object.keys(zip.files).sort()).toEqual(["index.html", "robots.txt", "styles.css"]);
   });
 });
 

@@ -45,7 +45,8 @@ import { devWarn } from "@/shared/utils/devLogger";
 import { FormspreeInjector } from "./FormspreeInjector";
 import { SEOInjector, resolveLanguage } from "./SEOInjector";
 import { sanitizeHeadCode } from "./sanitizeHeadCode";
-import { buildSitemapXml } from "@buildrik/shared/seo/sitemap";
+import { buildRobotsTxt, buildSitemapXml } from "@buildrik/shared/seo/sitemap";
+import { postProcessPages, type FormTarget } from "./publishPostProcess";
 import { ReactExporter } from "./ReactExporter";
 import { generateStripeScripts } from "./StripeInjector";
 import { buildInteractionRuntimeScript, INTERACTION_ATTR } from "./interactionRuntime";
@@ -1263,8 +1264,17 @@ ${bodyContent}${interactionScript}${themeToggleScript}${sanitizeHeadCode(siteCus
    * server facts, so the caller supplies it). The archive carries sitemap.xml
    * by the publish worker's rule (lib/publish-files.ts): indexing on and an
    * origin known. It never carried one before — nothing set includeSitemap.
+   *
+   * Every page goes through `postProcessPages`, the step the publish worker
+   * runs (widget runtimes, form wiring), and the archive carries robots.txt
+   * by the worker's rule. `formTarget` is the site's submissions endpoint;
+   * without it forms are still made POST, never GET.
    */
-  async generateZip(config?: Partial<ExportConfig>, siteOrigin?: string | null): Promise<Blob> {
+  async generateZip(
+    config?: Partial<ExportConfig>,
+    siteOrigin?: string | null,
+    formTarget: FormTarget | null = null,
+  ): Promise<Blob> {
     const cfg = { ...this.config, ...config };
     // D-12: JSZip is a heavy dep only needed on the ZIP export path — lazy
     // import keeps it out of the /edit/:id first-load chunk.
@@ -1286,12 +1296,15 @@ ${bodyContent}${interactionScript}${themeToggleScript}${sanitizeHeadCode(siteCus
       baseUrl: siteOrigin ?? undefined,
     });
 
-    const htmlFiles = files.filter((f) => f.type === "html");
+    const { pages: htmlFiles } = postProcessPages(
+      files.filter((f) => f.type === "html").map((f) => ({ ...f, path: f.name, html: f.content })),
+      { formTarget },
+    );
     let css = files.find((f) => f.name === "styles.css")?.content ?? "";
 
     // Assets referenced by ANY page, deduped — one image used on three pages
     // should be bundled once.
-    const imageUrls = [...new Set(htmlFiles.flatMap((f) => bundler.extractImageUrls(f.content)))];
+    const imageUrls = [...new Set(htmlFiles.flatMap((f) => bundler.extractImageUrls(f.html)))];
     const { assets: imageAssets } = await bundler.bundleAssets(imageUrls);
     const fontUrls = bundler.extractFontUrls(css);
     const { assets: fontAssets } = await bundler.bundleAssets(fontUrls);
@@ -1299,14 +1312,19 @@ ${bodyContent}${interactionScript}${themeToggleScript}${sanitizeHeadCode(siteCus
 
     css = bundler.rewriteFontUrls(css, fontAssets);
 
+    for (const page of htmlFiles) zip.file(page.name, bundler.rewriteUrls(page.html, allAssets));
     for (const file of files) {
-      if (file.name === "styles.css") continue;
-      zip.file(
-        file.name,
-        file.type === "html" ? bundler.rewriteUrls(file.content, allAssets) : file.content
-      );
+      if (file.type !== "html" && file.name !== "styles.css") zip.file(file.name, file.content);
     }
     if (css) zip.file("styles.css", css);
+    zip.file(
+      "robots.txt",
+      buildRobotsTxt({
+        robotsTxt: this.composer.getProjectSettings?.()?.seo?.robotsTxt,
+        allowIndexing,
+        origin: siteOrigin ?? null,
+      }),
+    );
 
     // Add assets to ZIP
     if (allAssets.length > 0) {
@@ -1330,8 +1348,12 @@ ${bodyContent}${interactionScript}${themeToggleScript}${sanitizeHeadCode(siteCus
   /**
    * Download as ZIP file
    */
-  async downloadZip(filename = "export.zip", config?: Partial<ExportConfig>): Promise<void> {
-    const blob = await this.generateZip(config);
+  async downloadZip(
+    filename = "export.zip",
+    config?: Partial<ExportConfig>,
+    formTarget: FormTarget | null = null,
+  ): Promise<void> {
+    const blob = await this.generateZip(config, null, formTarget);
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;

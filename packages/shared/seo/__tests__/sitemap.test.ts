@@ -2,7 +2,7 @@
  * The one sitemap builder (publish worker + editor ZIP export).
  */
 import { describe, it, expect } from "vitest";
-import { buildSitemapXml } from "../sitemap";
+import { buildRobotsTxt, buildSitemapXml } from "../sitemap";
 
 describe("buildSitemapXml", () => {
   const pages = [
@@ -54,5 +54,24 @@ describe("buildSitemapXml", () => {
     );
     expect(xml).not.toContain("<url>");
     expect(xml).toContain("</urlset>");
+  });
+});
+
+describe("buildRobotsTxt", () => {
+  const origin = "https://example.com";
+  it("defaults to Allow plus the sitemap pointer when indexing is on", () => {
+    expect(buildRobotsTxt({ robotsTxt: null, allowIndexing: true, origin })).toBe(
+      "User-agent: *\nAllow: /\n\nSitemap: https://example.com/sitemap.xml\n",
+    );
+  });
+  it("disallows, with no pointer, when indexing is off", () => {
+    expect(buildRobotsTxt({ robotsTxt: null, allowIndexing: false, origin })).toBe("User-agent: *\nDisallow: /\n");
+  });
+  it("does not touch a robots.txt that already names a sitemap", () => {
+    const custom = "User-agent: *\nAllow: /\nSitemap: https://cdn.example/sm.xml\n";
+    expect(buildRobotsTxt({ robotsTxt: custom, allowIndexing: true, origin })).toBe(custom);
+  });
+  it("adds no pointer when there is no origin to point at", () => {
+    expect(buildRobotsTxt({ robotsTxt: null, allowIndexing: true, origin: null })).toBe("User-agent: *\nAllow: /\n");
   });
 });

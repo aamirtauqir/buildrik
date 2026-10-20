@@ -20,6 +20,7 @@ import { formatBytes } from "@shared/utils/helpers/number";
 import { PreviewFrame } from "./PreviewFrame";
 import { useSiteOrigin } from "@/editor/shared/useSiteOrigin";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
+import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -192,7 +193,11 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
     setDownloadPhase("preparing");
     try {
       const engine = new ExportEngine(composer, config);
-      const zipBlob = await engine.generateZip(config, getSiteOrigin());
+      const zipBlob = await engine.generateZip(
+        config,
+        getSiteOrigin(),
+        siteId ? { siteId, appOrigin: DASHBOARD_URL } : null,
+      );
       const url = URL.createObjectURL(zipBlob);
       const a = document.createElement("a");
       a.href = url;

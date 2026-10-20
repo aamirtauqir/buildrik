@@ -8,7 +8,7 @@
  *   never executes `<script>` tags, so the canvas can't run a script string,
  *   it has to run real code on its own DOM.
  * - The published page gets the same behaviour by importing this function
- *   from `@buildrik/editor` (`lib/publish-sliders.ts`, dashboard side —
+ *   from `@buildrik/editor` (`publishPostProcess.ts`, run by the dashboard —
  *   `packages/dashboard/package.json` carries `@buildrik/editor` as a
  *   `workspace:*` dependency and `next.config.mjs`'s `transpilePackages`
  *   already transpiles it for the Next build) and serializing the compiled
@@ -28,7 +28,7 @@
  *
  * @license BSD-3-Clause
  */
-/** Minimal visual chrome for the arrow/dot controls the runtime injects — imported by `lib/publish-sliders.ts` too, same reason as the function above. */
+/** Minimal visual chrome for the arrow/dot controls the runtime injects — imported by `publishPostProcess.ts` too, same reason as the function above. */
 export const SLIDER_RUNTIME_CSS =
   ".buildrick-slider-arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:2;" +
   "width:32px;height:32px;border:0;border-radius:9999px;background:rgba(0,0,0,.45);color:#fff;" +

@@ -61,7 +61,13 @@ export function useExportHandlers({
     setExportLoading(true);
     try {
       const exportEngine = new ExportEngine(composer);
-      await exportEngine.downloadZip("site-export.zip");
+      // Forms post to the same submissions endpoint as Publish.
+      const siteId = getSiteIdFromUrl();
+      await exportEngine.downloadZip(
+        "site-export.zip",
+        undefined,
+        siteId ? { siteId, appOrigin: dashboardUrlFromEnv } : null,
+      );
       addToast({
         title: "Export complete",
         description: "Your site has been downloaded as a zip file.",

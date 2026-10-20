@@ -4,7 +4,7 @@
  * a runtime script + CSS into any published page that has one.
  */
 import { describe, it, expect } from "vitest";
-import { wireSliders } from "../publish-sliders";
+import { injectPageRuntimes } from "../publishPostProcess";
 
 const PAGE_WITH_SLIDER = `<html><body>
 <div class="buildrick-slider" data-autoplay="true" data-interval="4">
@@ -13,43 +13,43 @@ const PAGE_WITH_SLIDER = `<html><body>
 </div>
 </body></html>`;
 
-describe("wireSliders", () => {
+describe("injectPageRuntimes", () => {
   it("leaves a page with no slider untouched", () => {
     const page = "<html><body><p>hi</p></body></html>";
-    expect(wireSliders(page)).toBe(page);
+    expect(injectPageRuntimes(page)).toBe(page);
   });
 
   it("injects the runtime script and CSS once, before </body>", () => {
-    const out = wireSliders(PAGE_WITH_SLIDER);
+    const out = injectPageRuntimes(PAGE_WITH_SLIDER);
     expect(out).toContain('<style data-buildrick-slider-runtime>');
     expect(out).toContain('<script data-buildrick-slider-runtime>');
     expect(out.indexOf("</script>")).toBeLessThan(out.indexOf("</body>"));
   });
 
   it("is idempotent — running it twice doesn't double-inject", () => {
-    const once = wireSliders(PAGE_WITH_SLIDER);
-    const twice = wireSliders(once);
+    const once = injectPageRuntimes(PAGE_WITH_SLIDER);
+    const twice = injectPageRuntimes(once);
     expect(twice).toBe(once);
     expect(once.match(/data-buildrick-slider-runtime/g)).toHaveLength(2);
   });
 
   it("appends at the end when there is no </body>", () => {
     const noBody = '<div class="buildrick-slider"><div class="buildrick-slide"></div><div class="buildrick-slide"></div></div>';
-    const out = wireSliders(noBody);
+    const out = injectPageRuntimes(noBody);
     expect(out.startsWith(noBody)).toBe(true);
     expect(out).toContain("data-buildrick-slider-runtime");
   });
 
   // Parity: the injected <script> is `initSliderRuntime` serialized via
   // `Function.prototype.toString()` (imported from @buildrik/editor, not
-  // hand-copied — see publish-sliders.ts's header). Run the ACTUAL injected
+  // hand-copied — see publishPostProcess.ts). Run the ACTUAL injected
   // script body against a real DOM to prove the serialize step didn't lose
   // or mangle behaviour, rather than trusting that importing the same
   // function is equivalent to running it.
   it("the injected script, executed for real, behaves like initSliderRuntime itself", () => {
     const sliderHtml =
       '<div class="buildrick-slider" data-buildrick-id="s1"><div class="buildrick-slide">One</div><div class="buildrick-slide">Two</div></div>';
-    const out = wireSliders(sliderHtml);
+    const out = injectPageRuntimes(sliderHtml);
     const script = /<script data-buildrick-slider-runtime>([\s\S]*?)<\/script>/.exec(out)?.[1];
     expect(script).toBeTruthy();
 

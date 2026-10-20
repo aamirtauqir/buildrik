@@ -5,7 +5,7 @@ import { prisma } from "@lib/prisma";
 import { resolveVercelProjectName, type VercelFile } from "@lib/vercel";
 import { resolveSiteOrigin } from "@lib/publish-urls";
 import { buildDeployFiles, verifiedPrimaryDomain } from "@lib/publish-files";
-import { planFormWiring } from "@lib/publish-forms";
+import { planPublishPages } from "@lib/publish-forms";
 import { getPublishedFormSettings } from "@server/services/form-submission.service";
 import {
   activatePublishedForms,
@@ -16,8 +16,6 @@ import {
   type Bundle,
   type FormsPlan,
 } from "@server/services/publish-bundle.service";
-import { wireSliders } from "@lib/publish-sliders";
-import { wireWidgetRuntimes } from "@lib/publish-widgets";
 import type { PublishPage } from "@buildrik/shared/schemas/publish";
 import { record as recordActivity } from "@server/services/activity-log.service";
 import { notifyWorkspaceOwner } from "@server/services/notification.trigger";
@@ -451,10 +449,12 @@ async function runVercelDeployJob(
     files = storedBundle.files;
     formsPlan = storedFormsPlan;
   } else {
-    /* Forms: point every actionless one at the public endpoint. The plan is
-       recorded only once the deploy is live (A3/O3) — recording it here left
-       a failed deploy's forms switched on and the live site's switched off. */
-    const plan = planFormWiring(pages, {
+    /* The shared page post-processing (forms + widget runtimes — the same
+       step the ZIP export runs). Forms: every actionless one is pointed at
+       the public endpoint. The plan is recorded only once the deploy is live
+       (A3/O3) — recording it here left a failed deploy's forms switched on
+       and the live site's switched off. */
+    const plan = planPublishPages(pages, {
       siteId,
       appOrigin: process.env.NEXT_PUBLIC_APP_URL ?? "",
       formSettings: await getPublishedFormSettings(siteId),
@@ -462,16 +462,9 @@ async function runVercelDeployJob(
     if (plan.error) throw new Error(plan.error);
     formsPlan = plan.forms.length > 0 || plan.deactivateMissing ? { forms: plan.forms, deactivateMissing: plan.deactivateMissing } : null;
 
-    // Slider/Carousel runtime (autoplay/interval, arrows/dots) — the block
-    // exported as stacked slides with no behaviour; inject the runtime only on
-    // pages that actually have one.
-    // Countdown ticking + accordion Open/Closed (Inspector v4 boards 11, 13):
-    // same rule — only on pages that have the widget.
-    const slidedPages = plan.pages.map((page) => ({ ...page, html: wireWidgetRuntimes(wireSliders(page.html)) }));
-
     files = buildDeployFiles({
       siteId,
-      pages: slidedPages,
+      pages: plan.pages,
       origin: resolveSiteOrigin({
         canonicalUrl: site.canonicalUrl,
         verifiedDomain: verifiedPrimaryDomain(domains),

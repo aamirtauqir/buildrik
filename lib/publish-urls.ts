@@ -70,10 +70,3 @@ export function resolveSiteOrigins(opts: {
   if (opts.vercelProjectName) origins.add(`https://${opts.vercelProjectName}.vercel.app`);
   return Array.from(origins);
 }
-
-/** Add the sitemap pointer to robots.txt, unless the author already wrote one. */
-export function withSitemapDirective(robotsTxt: string, origin: string | null): string {
-  if (!origin || /^\s*sitemap:/im.test(robotsTxt)) return robotsTxt;
-  const body = robotsTxt.endsWith("\n") ? robotsTxt : `${robotsTxt}\n`;
-  return `${body}\nSitemap: ${origin}/sitemap.xml\n`;
-}
