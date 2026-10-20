@@ -111,6 +111,63 @@ describe("Escape restores the value the field had at focus", () => {
   });
 });
 
+/* REA audit 2026-10-20 P0-1: Enter commits; an Escape after it reverted the
+   saved value to the one at focus (and on Tablet planted it as an override). */
+describe("Escape after Enter writes nothing", () => {
+  it("number field: 27 Enter, then Escape keeps 27px", () => {
+    const onWrite = vi.fn();
+    render(<Owned initial="44px" onWrite={onWrite} />);
+    const input = screen.getByRole("textbox");
+    fireEvent.focus(input);
+    fireEvent.change(input, { target: { value: "27" } });
+    fireEvent.keyDown(input, { key: "Enter" });
+    onWrite.mockClear();
+    fireEvent.keyDown(input, { key: "Escape" });
+    expect(onWrite).not.toHaveBeenCalled();
+    expect(input).toHaveValue("27");
+  });
+
+  it("number field: typing after Enter, Escape goes back to the committed value", () => {
+    const onWrite = vi.fn();
+    render(<Owned initial="44px" onWrite={onWrite} />);
+    const input = screen.getByRole("textbox");
+    fireEvent.focus(input);
+    fireEvent.change(input, { target: { value: "27" } });
+    fireEvent.keyDown(input, { key: "Enter" });
+    fireEvent.change(input, { target: { value: "30" } });
+    fireEvent.keyDown(input, { key: "Escape" });
+    expect(onWrite).toHaveBeenLastCalledWith("27px");
+    expect(input).toHaveValue("27");
+  });
+
+  it("padding side: 12 Enter, then Escape keeps 12px", () => {
+    const onWrite = vi.fn();
+    function Box() {
+      const [padding, setPadding] = React.useState({ top: "4px", right: "", bottom: "", left: "" });
+      return (
+        <SpacingBox
+          margin={{ top: "", right: "", bottom: "", left: "" }}
+          padding={padding}
+          onMarginChange={() => {}}
+          onPaddingChange={(side, v) => {
+            onWrite(side, v);
+            setPadding((p) => ({ ...p, [side]: v }));
+          }}
+        />
+      );
+    }
+    render(<Box />);
+    const field = screen.getByRole("textbox", { name: /Padding top/ });
+    fireEvent.focus(field);
+    fireEvent.change(field, { target: { value: "12" } });
+    fireEvent.keyDown(field, { key: "Enter" });
+    onWrite.mockClear();
+    fireEvent.keyDown(field, { key: "Escape" });
+    expect(onWrite).not.toHaveBeenCalled();
+    expect(field).toHaveValue("12");
+  });
+});
+
 describe("leaving a field untouched writes nothing", () => {
   it("a token-bound size is not unbound by focus + blur (nor after an Escape)", () => {
     const onWrite = vi.fn();
