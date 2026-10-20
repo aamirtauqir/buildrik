@@ -158,13 +158,29 @@ describe("ContentTab", () => {
     );
   });
 
-  it("says it is watching only when there is a source to watch (board 303:2083)", async () => {
+  it("shows the session-only pill only when there is a source (board 303:2083)", async () => {
     const { composer } = makeEngine({ collections: [MENU], items: [] });
     render(<ContentTab composer={composer as never} />);
     fireEvent.click(await screen.findByText("Sources"));
     // Only the live `site` variables source is registered here, and the panel
-    // filters that one out — so there is nothing to watch and no claim to make.
-    expect(screen.queryByTestId("sources-watching")).toBeNull();
+    // filters that one out — so there is no source and no pill.
+    expect(screen.queryByTestId("sources-session-only")).toBeNull();
+  });
+
+  /* REA 2026-10-20 #11b: sources live in memory only (DataManager, not in
+     exportProject) and are gone on reload — the panel said "Watching for
+     changes". Until they persist, it says they last this session. */
+  it("a connected source is labelled session-only, never 'Watching for changes'", async () => {
+    const { composer } = makeEngine({ collections: [MENU], items: [] });
+    render(<ContentTab composer={composer as never} />);
+    fireEvent.click(await screen.findByText("Sources"));
+    fireEvent.click(await screen.findByRole("button", { name: "+ Connect a source" }));
+    fireEvent.change(screen.getByLabelText("Source JSON"), { target: { value: '{"products": [{"name": "A"}]}' } });
+    fireEvent.click(screen.getByRole("button", { name: "Add source" }));
+    expect(await screen.findByText("products")).toBeInTheDocument();
+    expect(screen.queryByText("Watching for changes")).toBeNull();
+    expect(screen.getByTestId("sources-session-only")).toHaveTextContent(/this session/i);
+    expect(screen.getByTestId("content-source-note")).toHaveTextContent(/not saved with the site/i);
   });
 
   it("sources: JSON import goes through importSampleData; bad JSON shows the error", async () => {

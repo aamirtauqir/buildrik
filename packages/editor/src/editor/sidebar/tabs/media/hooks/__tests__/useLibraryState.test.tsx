@@ -366,7 +366,7 @@ describe("useLibraryState — folder delete guard", () => {
       [{ id: "sub" }],
     );
     const { result } = renderHook(() => useLibraryState(composer));
-    expect(result.current.inspectFolder("f1")).toEqual({
+    expect(result.current.inspectFolder("f1")).toMatchObject({
       assetCount: 2,
       subFolderCount: 1,
     });
@@ -392,20 +392,115 @@ describe("useLibraryState — folder delete guard", () => {
 
   /* QA 2026-09-24: "Delete folder with contents" kept the file — the engine
      moves a deleted folder's assets to root. The confirm (board B1-13
-     7564:185465) says the contents are removed, so force deletes them first. */
-  it("force-deletes a non-empty folder WITH its contents", async () => {
-    const composer = makeComposer([asset({ id: "in-f1", folderId: "f1" }), asset({ id: "at-root" })]);
-    const media = (composer as never as {
-      media: { deleteFolder: ReturnType<typeof vi.fn>; deleteAsset: ReturnType<typeof vi.fn> };
-    }).media;
+     7564:185465) says the contents are removed, so force deletes them — but
+     through the same grace path as a single delete (REA 2026-10-20 #10): no
+     hard delete, the toast's Undo brings every file back, and the folder
+     itself goes only once the grace window closes without an Undo. */
+  function withGrace(composer: never) {
+    const undo = vi.fn();
+    const commitNow = vi.fn(async () => {});
+    const deleteWithGrace = vi.fn(async (id: string) => ({
+      name: id,
+      usageCount: id === "in-f1" ? 2 : 0,
+      expiresAt: Date.now() + 8000,
+      undo,
+      commitNow,
+    }));
+    (composer as { mediaOps?: unknown }).mediaOps = { deleteWithGrace };
+    return { deleteWithGrace, undo, commitNow };
+  }
+
+  it("force-deletes a folder's contents through the grace path, never a hard delete", async () => {
+    vi.useFakeTimers();
+    try {
+      const composer = makeComposer([asset({ id: "in-f1", folderId: "f1" }), asset({ id: "at-root" })]);
+      const media = (composer as never as {
+        media: { deleteFolder: ReturnType<typeof vi.fn>; deleteAsset: ReturnType<typeof vi.fn> };
+      }).media;
+      const grace = withGrace(composer);
+      const { result } = renderHook(() => useLibraryState(composer));
+      let outcome: Awaited<ReturnType<typeof result.current.deleteFolder>> | undefined;
+      await act(async () => {
+        outcome = await result.current.deleteFolder("f1", { force: true });
+      });
+      expect(media.deleteAsset).not.toHaveBeenCalled();
+      expect(grace.deleteWithGrace).toHaveBeenCalledWith("in-f1");
+      expect(grace.deleteWithGrace).not.toHaveBeenCalledWith("at-root");
+      expect(outcome).toMatchObject({ files: 1, usageCount: 2, failed: 0 });
+      // The folder stays while Undo can still bring its files back…
+      expect(media.deleteFolder).not.toHaveBeenCalled();
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(8000);
+      });
+      // …and goes once the window closes.
+      expect(grace.commitNow).toHaveBeenCalled();
+      expect(media.deleteFolder).toHaveBeenCalledWith("f1");
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("Undo restores every file and keeps the folder", async () => {
+    vi.useFakeTimers();
+    try {
+      const composer = makeComposer([asset({ id: "in-f1", folderId: "f1" }), asset({ id: "b", folderId: "f1" })]);
+      const media = (composer as never as { media: { deleteFolder: ReturnType<typeof vi.fn> } }).media;
+      const grace = withGrace(composer);
+      const { result } = renderHook(() => useLibraryState(composer));
+      let outcome: Awaited<ReturnType<typeof result.current.deleteFolder>> | undefined;
+      await act(async () => {
+        outcome = await result.current.deleteFolder("f1", { force: true });
+      });
+      act(() => outcome!.undo());
+      expect(grace.undo).toHaveBeenCalledTimes(2);
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(10000);
+      });
+      expect(media.deleteFolder).not.toHaveBeenCalled();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("a file that fails to delete keeps the folder and is counted", async () => {
+    vi.useFakeTimers();
+    try {
+      const composer = makeComposer([asset({ id: "in-f1", folderId: "f1" }), asset({ id: "bad", folderId: "f1" })]);
+      const media = (composer as never as { media: { deleteFolder: ReturnType<typeof vi.fn> } }).media;
+      const grace = withGrace(composer);
+      const ok = grace.deleteWithGrace.getMockImplementation()!;
+      grace.deleteWithGrace.mockImplementation(async (id: string) => {
+        if (id === "bad") throw new Error("boom");
+        return ok(id);
+      });
+      const { result } = renderHook(() => useLibraryState(composer));
+      let outcome: Awaited<ReturnType<typeof result.current.deleteFolder>> | undefined;
+      await act(async () => {
+        outcome = await result.current.deleteFolder("f1", { force: true });
+      });
+      expect(outcome).toMatchObject({ files: 1, failed: 1 });
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(10000);
+      });
+      expect(media.deleteFolder).not.toHaveBeenCalled();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("inspectFolder lists every file the delete would take, sub-folders included", () => {
+    const composer = makeComposer(
+      [asset({ id: "top", folderId: "f1" }), asset({ id: "deep", folderId: "sub" }), asset({ id: "else" })],
+    );
+    (composer as never as { media: { getFolders: ReturnType<typeof vi.fn> } }).media.getFolders.mockImplementation(
+      (parent?: string) => (parent === "f1" ? [{ id: "sub" }] : []),
+    );
     const { result } = renderHook(() => useLibraryState(composer));
-    await act(async () => {
-      await result.current.deleteFolder("f1", { force: true });
+    expect(result.current.inspectFolder("f1")).toEqual({
+      assetCount: 2,
+      subFolderCount: 1,
+      assetIds: ["top", "deep"],
     });
-    expect(media.deleteAsset).toHaveBeenCalledWith("in-f1");
-    expect(media.deleteAsset).not.toHaveBeenCalledWith("at-root");
-    expect(media.deleteFolder).toHaveBeenCalledWith("f1");
-    expect(media.deleteAsset.mock.invocationCallOrder[0]).toBeLessThan(media.deleteFolder.mock.invocationCallOrder[0]);
   });
 });
 
@@ -423,5 +518,33 @@ describe("useLibraryState — engine event sync", () => {
       media.emit(MEDIA_EVENTS.MEDIA_ADDED);
     });
     expect(result.current.libraryItems.map((i) => i.key).sort()).toEqual(["one", "two"]);
+  });
+});
+
+/* REA 2026-10-20 #14: a refused server write used to be invisible — the
+   drawer always said "Moved N files", and a drawer version restore dropped
+   the restored `src`, so nothing changed locally. */
+describe("useLibraryState — honest writes (REA #14)", () => {
+  it("bulkMoveAssets reports which files the server refused", async () => {
+    const composer = makeComposer([asset({ id: "ok" }), asset({ id: "bad" })]);
+    const media = (composer as never as { media: { updateAsset: ReturnType<typeof vi.fn> } }).media;
+    media.updateAsset.mockImplementation(async (id: string) => {
+      if (id === "bad") throw new Error("The server did not save this change (move)");
+      return null;
+    });
+    const { result } = renderHook(() => useLibraryState(composer));
+    let outcome: { moved: string[]; failed: string[] } | undefined;
+    await act(async () => {
+      outcome = await result.current.bulkMoveAssets(["ok", "bad"], "f1");
+    });
+    expect(outcome).toEqual({ moved: ["ok"], failed: ["bad"] });
+  });
+
+  it("updateItem carries a restored version's src to the engine", async () => {
+    const composer = makeComposer([asset({ id: "hero" })]);
+    const media = (composer as never as { media: { updateAsset: ReturnType<typeof vi.fn> } }).media;
+    const { result } = renderHook(() => useLibraryState(composer));
+    await act(() => result.current.updateItem("hero", { src: "https://blob/v2.png" }));
+    expect(media.updateAsset).toHaveBeenCalledWith("hero", { src: "https://blob/v2.png" });
   });
 });

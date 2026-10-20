@@ -483,9 +483,7 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
             await panel.deleteRecord(r.id);
             await loadRecords(collection.id);
           }}
-          onRestore={async (r) => {
-            await panel.saveRecord(collection.id, null, r.data, r.status === "published");
-          }}
+          onRestore={(r) => panel.restoreRecord(r)}
           onOpenMediaLibrary={onOpenMediaLibrary}
         />
       ) : null}

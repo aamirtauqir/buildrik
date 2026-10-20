@@ -504,7 +504,7 @@ describe("Clone 3683:19950 · Move 2 assets — from the bulk bar", () => {
   });
 
   it("Cancel returns to the library with the selection intact (A06)", async () => {
-    const bulkMoveAssets = vi.fn(() => Promise.resolve());
+    const bulkMoveAssets = vi.fn((keys: string[], _folderId: string | null) => Promise.resolve({ moved: keys, failed: [] as string[] }));
     const clearSelection = vi.fn();
     await mountLibrary(twoChecked({ bulkMoveAssets, clearSelection }));
     openMoveModal();
@@ -518,7 +518,7 @@ describe("Clone 3683:19950 · Move 2 assets — from the bulk bar", () => {
 
 describe("Clone 3683:19964 / 3699:20381 · Moved to <Folder> — the result in the rail", () => {
   it("3683:19964 · a clean move to Products: the rail reports it, the bar still counts 2, the selection is kept", async () => {
-    const bulkMoveAssets = vi.fn(() => Promise.resolve());
+    const bulkMoveAssets = vi.fn((keys: string[], _folderId: string | null) => Promise.resolve({ moved: keys, failed: [] as string[] }));
     const clearSelection = vi.fn();
     const toggleSelMode = vi.fn();
     await mountLibrary(twoChecked({ bulkMoveAssets, clearSelection, toggleSelMode }));
@@ -541,7 +541,7 @@ describe("Clone 3683:19964 / 3699:20381 · Moved to <Folder> — the result in t
   });
 
   it("3699:20381 · a move to Hero shots, where hero-dark.jpg already was, says so", async () => {
-    await mountLibrary(twoChecked({ bulkMoveAssets: vi.fn(() => Promise.resolve()) }));
+    await mountLibrary(twoChecked({ bulkMoveAssets: vi.fn((keys: string[], _folderId: string | null) => Promise.resolve({ moved: keys, failed: [] as string[] })) }));
     openMoveModal();
     fireEvent.click(screen.getByTestId("mgr-move-folder-f2"));
     await screen.findByTestId("mgr-det-move-result");
@@ -554,7 +554,7 @@ describe("Clone 3683:19964 / 3699:20381 · Moved to <Folder> — the result in t
   it("View destination scopes the library to that folder and keeps the selection (edge `Action / Move to folder`)", async () => {
     const setCurrentFolderId = vi.fn();
     const clearSelection = vi.fn();
-    await mountLibrary(twoChecked({ bulkMoveAssets: vi.fn(() => Promise.resolve()), setCurrentFolderId, clearSelection }));
+    await mountLibrary(twoChecked({ bulkMoveAssets: vi.fn((keys: string[], _folderId: string | null) => Promise.resolve({ moved: keys, failed: [] as string[] })), setCurrentFolderId, clearSelection }));
     openMoveModal();
     fireEvent.click(screen.getByTestId("mgr-move-folder-f1"));
     await screen.findByTestId("mgr-det-move-result");
@@ -565,7 +565,7 @@ describe("Clone 3683:19964 / 3699:20381 · Moved to <Folder> — the result in t
 
   it("Clear selection empties the checked set (edge `Action / Clear selection`)", async () => {
     const clearSelection = vi.fn();
-    await mountLibrary(twoChecked({ bulkMoveAssets: vi.fn(() => Promise.resolve()), clearSelection }));
+    await mountLibrary(twoChecked({ bulkMoveAssets: vi.fn((keys: string[], _folderId: string | null) => Promise.resolve({ moved: keys, failed: [] as string[] })), clearSelection }));
     openMoveModal();
     fireEvent.click(screen.getByTestId("mgr-move-folder-f1"));
     await screen.findByTestId("mgr-det-move-result");
@@ -574,7 +574,7 @@ describe("Clone 3683:19964 / 3699:20381 · Moved to <Folder> — the result in t
   });
 
   it("the result clears once the selection changes", async () => {
-    const { rerender } = await mountLibrary(twoChecked({ bulkMoveAssets: vi.fn(() => Promise.resolve()) }));
+    const { rerender } = await mountLibrary(twoChecked({ bulkMoveAssets: vi.fn((keys: string[], _folderId: string | null) => Promise.resolve({ moved: keys, failed: [] as string[] })) }));
     openMoveModal();
     fireEvent.click(screen.getByTestId("mgr-move-folder-f1"));
     await screen.findByTestId("mgr-det-move-result");
@@ -586,7 +586,7 @@ describe("Clone 3683:19964 / 3699:20381 · Moved to <Folder> — the result in t
   });
 
   it("the result clears once the scope changes", async () => {
-    const { rerender } = await mountLibrary(twoChecked({ bulkMoveAssets: vi.fn(() => Promise.resolve()) }));
+    const { rerender } = await mountLibrary(twoChecked({ bulkMoveAssets: vi.fn((keys: string[], _folderId: string | null) => Promise.resolve({ moved: keys, failed: [] as string[] })) }));
     openMoveModal();
     fireEvent.click(screen.getByTestId("mgr-move-folder-f1"));
     await screen.findByTestId("mgr-det-move-result");
@@ -601,9 +601,9 @@ describe("Clone 3683:19964 / 3699:20381 · Moved to <Folder> — the result in t
 describe("Clone 3699:20347 · Files could not be moved", () => {
   it("a rejected move shows the failure; Retry runs the same move again and then reports it", async () => {
     const bulkMoveAssets = vi
-      .fn<(keys: string[], folderId: string | null) => Promise<void>>()
-      .mockRejectedValueOnce(new Error("offline"))
-      .mockResolvedValueOnce(undefined);
+      .fn<(keys: string[], folderId: string | null) => Promise<{ moved: string[]; failed: string[] }>>()
+      .mockImplementationOnce(async (keys) => ({ moved: [], failed: keys }))
+      .mockImplementationOnce(async (keys) => ({ moved: keys, failed: [] }));
     await mountLibrary(twoChecked({ bulkMoveAssets }));
     openMoveModal();
     fireEvent.click(screen.getByTestId("mgr-move-folder-f1"));
@@ -619,7 +619,7 @@ describe("Clone 3699:20347 · Files could not be moved", () => {
   });
 
   it("Cancel leaves the selection and the folders as they were", async () => {
-    const bulkMoveAssets = vi.fn(() => Promise.reject(new Error("offline")));
+    const bulkMoveAssets = vi.fn((keys: string[], _folderId: string | null) => Promise.resolve({ moved: [] as string[], failed: keys }));
     const clearSelection = vi.fn();
     await mountLibrary(twoChecked({ bulkMoveAssets, clearSelection }));
     openMoveModal();
@@ -684,7 +684,7 @@ describe("Clone 4215:26635 / 4207:26629 / 4220:26643 · dragging assets over the
   });
 
   it("dropping the checked pair on Products moves both and the rail reports it", async () => {
-    const bulkMoveAssets = vi.fn(() => Promise.resolve());
+    const bulkMoveAssets = vi.fn((keys: string[], _folderId: string | null) => Promise.resolve({ moved: keys, failed: [] as string[] }));
     await mountLibrary(twoChecked({ bulkMoveAssets }));
     toList();
     fireEvent.dragStart(screen.getByTestId("mgr-list-row-chef"), { dataTransfer: dragTransfer("chef") });
@@ -701,7 +701,7 @@ describe("Clone 4215:26635 / 4207:26629 / 4220:26643 · dragging assets over the
   });
 
   it("dropping an unchecked card moves only that card, even while others are checked", async () => {
-    const bulkMoveAssets = vi.fn(() => Promise.resolve());
+    const bulkMoveAssets = vi.fn((keys: string[], _folderId: string | null) => Promise.resolve({ moved: keys, failed: [] as string[] }));
     await mountLibrary(twoChecked({ bulkMoveAssets }));
     toList();
     fireEvent.dragStart(screen.getByTestId("mgr-list-row-menu"), { dataTransfer: dragTransfer("menu") });
@@ -711,7 +711,7 @@ describe("Clone 4215:26635 / 4207:26629 / 4220:26643 · dragging assets over the
   });
 
   it("a drop on All assets unfiles, and the rail names the destination", async () => {
-    const bulkMoveAssets = vi.fn(() => Promise.resolve());
+    const bulkMoveAssets = vi.fn((keys: string[], _folderId: string | null) => Promise.resolve({ moved: keys, failed: [] as string[] }));
     await mountLibrary(twoChecked({ bulkMoveAssets }));
     toList();
     fireEvent.dragStart(screen.getByTestId("mgr-list-row-hero"), { dataTransfer: dragTransfer("hero") });
@@ -1426,5 +1426,23 @@ describe("Clone 3695:45615 → 3720:43313 → 3720:43316 · Apply latest saved v
     expect(composer.mediaOps.replaceAcrossSelective).toHaveBeenCalledWith("blob:hero-v2", "blob:menu", ["p-home", "p-menu"]);
     expect(screen.getByTestId("rx-result-count")).toHaveTextContent("3 of 3 uses updated");
     expect(placements.src).toBe("blob:menu");
+  });
+});
+
+/* REA 2026-10-20 #14: a partly refused move reports the real counts, and
+   Retry moves only the files that stayed behind. */
+describe("Files could not be moved — partial", () => {
+  it("names how many moved and retries only the refused ones", async () => {
+    const bulkMoveAssets = vi
+      .fn<(keys: string[], folderId: string | null) => Promise<{ moved: string[]; failed: string[] }>>()
+      .mockImplementationOnce(async () => ({ moved: ["hero"], failed: ["chef"] }))
+      .mockImplementationOnce(async (keys) => ({ moved: keys, failed: [] }));
+    await mountLibrary(twoChecked({ bulkMoveAssets }));
+    openMoveModal();
+    fireEvent.click(screen.getByTestId("mgr-move-folder-f1"));
+    await screen.findByTestId("mgr-move-failed");
+    expect(screen.getByTestId("mgr-move-failed-body")).toHaveTextContent("1 file moved. 1 file could not be moved");
+    fireEvent.click(screen.getByTestId("mgr-move-failed-retry"));
+    expect(bulkMoveAssets).toHaveBeenLastCalledWith(["chef"], "f1");
   });
 });

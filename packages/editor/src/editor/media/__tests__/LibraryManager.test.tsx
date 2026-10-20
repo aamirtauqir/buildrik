@@ -152,7 +152,7 @@ describe("LibraryManager — D5 baseline", () => {
         allFolders: [folder],
         libraryItems: [inFolder, atRoot],
         allLibraryItems: [inFolder, atRoot],
-        inspectFolder: vi.fn(() => ({ assetCount: 1, subFolderCount: 0 })),
+        inspectFolder: vi.fn(() => ({ assetCount: 1, subFolderCount: 0, assetIds: ["a"] })),
       }),
     );
     fireEvent.click(screen.getByRole("button", { name: "Delete folder" }));

@@ -38,7 +38,7 @@ import type { ImageEditorOptions } from "../shell/hooks/useStudioModals";
 import { LIBRARY_KINDS, MEDIA_EVENTS, STORAGE_QUOTA_BYTES, getAssetTypeFromMime } from "@/shared/constants/media";
 import { useToast, Button, IconButton, Menu, MenuItem, Popover, TextInput, Tooltip } from "@/editor/chrome-ui";
 import { useMediaWriteAccess } from "@/editor/sidebar/tabs/media/hooks/useMediaWriteAccess";
-import type { LibraryItem, VersionEntry } from "../sidebar/tabs/media/data/mediaTypes";
+import type { ConfirmFolderDeletePayload, LibraryItem, VersionEntry } from "../sidebar/tabs/media/data/mediaTypes";
 import { displayNameFor } from "../sidebar/tabs/media/data/mediaUtils";
 import type { EditsSnapshot, IconConfig, MediaAsset } from "@/shared/types/media";
 import { FolderTree, type SmartFolder } from "./components/FolderTree";
@@ -130,12 +130,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
      because the payload is different (no in-use list, has sub-folder count)
      and the secondary action (Move files…) belongs to the move picker, not
      the asset delete. SSOT per type — see `ConfirmFolderDeletePayload`. */
-  const [folderConfirm, setFolderConfirm] = React.useState<{
-    folderId: string;
-    folderName: string;
-    assetCount: number;
-    subFolderCount: number;
-  } | null>(null);
+  const [folderConfirm, setFolderConfirm] = React.useState<ConfirmFolderDeletePayload | null>(null);
 
   /* Clone 3585:23337 — the drawer's "Manage in full library" selects the file
      it just uploaded through the engine (`composer.media.selectAssets`) and
@@ -352,7 +347,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
   } | null>(null);
   /* Clone 3699:20347 — the move the engine refused, held so Retry can run
      exactly it again — including which door it came through. */
-  const [moveFailure, setMoveFailure] = React.useState<{ keys: string[]; folderId: string | null; from: MoveDoor } | null>(null);
+  const [moveFailure, setMoveFailure] = React.useState<{ keys: string[]; folderId: string | null; from: MoveDoor; movedCount: number } | null>(null);
   /* Clone 3721:45952 — the card menu's `Move to folder…` opens the same Move
      modal for that ONE file; it creates no selection. */
   const [menuMoveTarget, setMenuMoveTarget] = React.useState<LibraryItem | null>(null);
@@ -383,10 +378,11 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
         .map((k) => state.allLibraryItems.find((i) => i.key === k))
         .filter((i): i is LibraryItem => i !== undefined);
       const wasHere = new Set(items.filter((i) => (i.folderId ?? null) === folderId).map((i) => i.key));
-      try {
-        await state.bulkMoveAssets(keys, folderId);
-      } catch {
-        setMoveFailure({ keys, folderId, from });
+      /* A file the server refused stays where it was (REA 2026-10-20 #14):
+         those — and only those — go to the failure modal and its Retry. */
+      const { failed } = await state.bulkMoveAssets(keys, folderId);
+      if (failed.length > 0) {
+        setMoveFailure({ keys: failed, folderId, from, movedCount: keys.length - failed.length });
         return;
       }
       setMoveFailure(null);
@@ -886,8 +882,9 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
                never force-deletes silently. */
             const folder = state.folders.find((f) => f.id === folderId);
             const folderName = folder?.name ?? "Untitled";
-            const { assetCount, subFolderCount } = state.inspectFolder(folderId);
-            setFolderConfirm({ folderId, folderName, assetCount, subFolderCount });
+            const { assetCount, subFolderCount, assetIds } = state.inspectFolder(folderId);
+            const inUseCount = state.checkInUse(assetIds).length;
+            setFolderConfirm({ folderId, folderName, assetCount, subFolderCount, inUseCount });
           }}
           onMoveAssetToFolder={handleDropOnFolder}
           assetDragActive={assetDrag !== null}
@@ -971,7 +968,11 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
             if (el) composer.selection.select(el);
             onClose();
           }}
-          onUpdateTags={(key, tags) => void state.updateItem(key, { tags })}
+          onUpdateTags={(key, tags) =>
+            void state.updateItem(key, { tags }).catch(() =>
+              addToast({ description: "Could not save the tags — the server did not save the change.", tone: "error" }),
+            )
+          }
           /* Clone 3696:21550 — Site fonts is mounted once in the shell and
              opens on the composer event, with this file highlighted. */
           onManageFont={(item) => composer.emit("ui:site-fonts", { assetId: item.key })}
@@ -981,7 +982,9 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
             void composer.media.updateAsset(key, {
               altText,
               generatedMetadata: undefined,
-            });
+            }).catch(() =>
+              addToast({ description: "Could not save the alt text — the server did not save the change.", tone: "error" }),
+            );
           }}
           // Regenerate is an explicit ask to REPLACE the current text.
         />
@@ -1081,8 +1084,33 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
                folder. The ConfirmDeleteModal pattern is the same — execute
                always closes the modal, success tells the toast. */
             try {
-              await state.deleteFolder(folderConfirm.folderId, { force: true });
+              const folderName = folderConfirm.folderName;
+              const outcome = await state.deleteFolder(folderConfirm.folderId, { force: true });
               setFolderConfirm(null);
+              outcome?.settled.catch(() =>
+                addToast({ description: `Could not delete the folder “${folderName}”. It is still in the library.`, tone: "error" }),
+              );
+              /* The same grace + Undo as a file delete: the toast is the one
+                 way back, and it says what went — or what did not. */
+              if (outcome && outcome.failed > 0) {
+                addToast({
+                  description: `Could not delete ${outcome.failed} of ${outcome.files + outcome.failed} files. “${folderConfirm.folderName}” was kept.`,
+                  tone: "error",
+                  action: outcome.files > 0 ? { label: "Undo", onClick: outcome.undo } : undefined,
+                  duration: 8000,
+                });
+              } else if (outcome) {
+                const what = `“${folderConfirm.folderName}” and ${outcome.files} ${outcome.files === 1 ? "file" : "files"}`;
+                const broke = outcome.usageCount;
+                addToast({
+                  description: broke > 0
+                    ? `Deleted ${what} and cleared ${broke} element${broke === 1 ? "" : "s"} that used them.`
+                    : `Deleted ${what}.`,
+                  tone: "info",
+                  action: { label: "Undo", onClick: outcome.undo },
+                  duration: 8000,
+                });
+              }
             } catch {
               setFolderConfirm(null);
               addToast({ description: "Could not delete folder", tone: "error" });
@@ -1232,6 +1260,8 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
       />
       <MoveFailedModal
         open={moveFailure !== null}
+        movedCount={moveFailure?.movedCount ?? 0}
+        failedCount={moveFailure?.keys.length ?? 0}
         onClose={() => setMoveFailure(null)}
         onRetry={() => {
           if (moveFailure) void runMove(moveFailure.keys, moveFailure.folderId, moveFailure.from);

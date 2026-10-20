@@ -363,7 +363,6 @@ export function useMediaState(composer: Composer): MediaStateResult {
     createFolder: library.createFolder,
     inspectFolder: library.inspectFolder,
     deleteFolder: library.deleteFolder,
-    moveAsset: library.moveAsset,
     bulkMoveAssets: library.bulkMoveAssets,
     uploadQueue: upload.uploadQueue,
     counts: library.counts,

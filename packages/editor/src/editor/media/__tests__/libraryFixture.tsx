@@ -107,8 +107,7 @@ export function makeMediaState(over: Partial<MediaStateResult> = {}): MediaState
        scopes to the id it gets back (Clone 3700:20353). */
     createFolder: vi.fn((name: string) => Promise.resolve(makeFolder({ id: `new-${name}`, name }))),
     deleteFolder: noopAsync(),
-    moveAsset: noopAsync(),
-    bulkMoveAssets: noopAsync(),
+    bulkMoveAssets: vi.fn((keys: string[]) => Promise.resolve({ moved: keys, failed: [] as string[] })),
     uploadQueue: [],
     counts: { all: 0, img: 0, vid: 0, ico: 0, fnt: 0 },
     sort: "date",
