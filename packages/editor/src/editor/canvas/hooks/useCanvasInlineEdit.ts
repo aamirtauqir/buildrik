@@ -15,7 +15,6 @@ import { canWrite, writeElement } from "@/engine/commands/commandOperations";
 export interface EditingState {
   id: string | null;
   original: string;
-  rect: { top: number; left: number; width: number; height: number } | null;
 }
 
 export interface UseCanvasInlineEditOptions {
@@ -61,7 +60,6 @@ export function useCanvasInlineEdit({
   const [editing, setEditing] = React.useState<EditingState>({
     id: null,
     original: "",
-    rect: null,
   });
 
   /** Start editing this canvas node if it is editable text; false if not. */
@@ -86,21 +84,10 @@ export function useCanvasInlineEdit({
       if (composer && !canWrite(composer, id)) return false;
 
       const original = editableEl.innerHTML;
-      const domRect = editableEl.getBoundingClientRect();
-      const canvasRect = canvasRef.current?.getBoundingClientRect();
-      // Get position relative to canvas wrapper
-      const rect = canvasRect
-        ? {
-            top: domRect.top - canvasRect.top,
-            left: domRect.left - canvasRect.left,
-            width: domRect.width,
-            height: domRect.height,
-          }
-        : null;
-      setEditing({ id, original, rect });
+      setEditing({ id, original });
       return true;
     },
-    [canvasRef, composer]
+    [composer]
   );
 
   // Handle double-click to start inline editing
@@ -184,7 +171,7 @@ export function useCanvasInlineEdit({
       } finally {
         el.contentEditable = "false";
         el.draggable = true;
-        setEditing({ id: null, original: "", rect: null });
+        setEditing({ id: null, original: "" });
       }
     };
 

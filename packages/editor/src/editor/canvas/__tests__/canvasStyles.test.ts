@@ -20,6 +20,8 @@
  * These assert the mechanism, not a screenshot. The live proof is in
  * docs/audits/2026-08-31-chrome-weight-and-canvas-fit.md.
  */
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { describe, it, expect } from "vitest";
 import { BREAKPOINTS } from "@/shared/constants/breakpoints";
 import { DEVICE_SIZES } from "../Canvas.types";
@@ -79,5 +81,20 @@ describe("getCanvasStyles — a device frame keeps its width", () => {
     // the layout, and a scaled canvas still overflows its scroller.
     expect(styles("desktop", 0.5).transform).toBe("scale(0.5)");
     expect(styles("desktop", 0.5).width).toBe(DEVICE_SIZES.desktop.width);
+  });
+});
+
+/* Audit 2026-10-20 #17: on Tablet the 1024px-tall frame was centred in a
+   715px scroller with `align-items: center`, so its top ~74–166px sat at
+   negative y — outside scroll range, the page's first heading unreachable.
+   `safe` falls back to start alignment when the frame is taller than the
+   scroller, on both axes. */
+describe(".bd-canvas-scroll keeps an oversized frame reachable", () => {
+  const css = readFileSync(join(__dirname, "../Canvas.css"), "utf8");
+  const rule = css.match(/\.bd-canvas-scroll\s*\{([^}]*)\}/)?.[1] ?? "";
+
+  it("centres with `safe` on both axes", () => {
+    expect(rule).toMatch(/align-items:\s*safe center/);
+    expect(rule).toMatch(/justify-content:\s*safe center/);
   });
 });

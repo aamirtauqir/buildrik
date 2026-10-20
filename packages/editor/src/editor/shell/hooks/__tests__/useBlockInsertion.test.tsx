@@ -18,7 +18,6 @@ const mocks = vi.hoisted(() => ({
   addToast: vi.fn(),
   getBlockDefinitions: vi.fn(),
   insertBlock: vi.fn(),
-  canNestElement: vi.fn(),
   getSuggestedParents: vi.fn(() => [] as string[]),
   animateDropSuccess: vi.fn(() => Promise.resolve()),
 }));
@@ -37,7 +36,6 @@ vi.mock("@/blocks/blockRegistry", () => ({
 
 vi.mock("@/shared/utils/nesting", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/shared/utils/nesting")>()),
-  canNestElement: mocks.canNestElement,
   getSuggestedParents: mocks.getSuggestedParents,
 }));
 
@@ -52,7 +50,7 @@ type MockElement = {
   getId: () => string;
   getType: () => string;
   getChildCount: () => number;
-  getChildren: () => Array<{ getId: () => string }>;
+  getChildren: () => MockElement[];
   getParent: () => MockElement | null;
   getAttribute: (name: string) => string | null;
 };
@@ -118,7 +116,6 @@ describe("useBlockInsertion", () => {
       { id: "image", label: "Image", elementType: "image" },
     ]);
     mocks.insertBlock.mockReturnValue("new-1");
-    mocks.canNestElement.mockReturnValue(true);
     mocks.getSuggestedParents.mockReturnValue([]);
     elements.set("new-1", makeElement("new-1", "section"));
   });
@@ -211,47 +208,55 @@ describe("useBlockInsertion", () => {
     expect(composer.endTransaction).toHaveBeenCalled();
   });
 
-  it("inserts INSIDE the selected element when it accepts the block type", () => {
-    elements.set(
-      "sel-1",
-      makeElement("sel-1", "container", { getChildCount: () => 2 })
-    );
+  /* Placement runs the real nesting rules (`insertionPlace`, shared with
+     paste) — mocking them here once hid `<button><img>` (audit 2026-10-20 #15). */
+  function child(id: string, type: string, parent: MockElement): MockElement {
+    const el = makeElement(id, type, { getParent: () => parent });
+    elements.set(id, el);
+    return el;
+  }
+
+  it("inserts INSIDE a selected container, as its last child", () => {
+    const box = makeElement("sel-1", "container");
+    const kids = [child("a", "paragraph", box), child("b", "paragraph", box)];
+    box.getChildren = () => kids;
+    elements.set("sel-1", box);
     selectedIds = ["sel-1"];
-    mocks.canNestElement.mockImplementation(
-      (_child: string, parentType: string) => parentType === "container"
-    );
 
     const { result } = mountHook();
     act(() => result.current.handleBlockClick(heroBlock));
 
-    expect(mocks.insertBlock).toHaveBeenCalledWith(
-      composer,
-      expect.anything(),
-      "sel-1",
-      2 // end of selected's children
-    );
+    expect(mocks.insertBlock).toHaveBeenCalledWith(composer, expect.anything(), "sel-1", 2);
   });
 
-  it("walks UP to the nearest accepting ancestor and inserts as sibling after the selection path", () => {
-    const parent = makeElement("par-1", "container", {
-      getChildren: () => [{ getId: () => "other" }, { getId: () => "sel-1" }],
-      getChildCount: () => 2,
-    });
-    elements.set("par-1", parent);
-    elements.set(
-      "sel-1",
-      makeElement("sel-1", "text", { getParent: () => parent })
-    );
-    selectedIds = ["sel-1"];
-    // text cannot contain a section; container can
-    mocks.canNestElement.mockImplementation(
-      (_child: string, parentType: string) => parentType === "container"
-    );
+  it("an Image added with a Button selected goes after the Button, never inside it", () => {
+    const box = makeElement("par-1", "container");
+    const kids = [child("btn", "button", box), child("p", "paragraph", box)];
+    box.getChildren = () => kids;
+    elements.set("par-1", box);
+    selectedIds = ["btn"];
 
     const { result } = mountHook();
-    act(() => result.current.handleBlockClick(heroBlock));
+    act(() => result.current.handleBlockClick({ id: "image", label: "Image" } as unknown as BlockData));
 
-    // sel-1 is at index 1 inside par-1 → insert as its next sibling (index 2)
+    expect(mocks.insertBlock).toHaveBeenCalledWith(composer, expect.anything(), "par-1", 1);
+  });
+
+  it("walks UP to the nearest accepting ancestor and inserts after the selection path", () => {
+    const box = makeElement("par-1", "container");
+    const heading = child("h", "heading", box);
+    const link = makeElement("sel-1", "link", { getParent: () => heading });
+    elements.set("sel-1", link);
+    heading.getChildren = () => [link];
+    box.getChildren = () => [child("other", "paragraph", box), heading];
+    elements.set("par-1", box);
+    selectedIds = ["sel-1"];
+    mocks.getBlockDefinitions.mockReturnValue([{ id: "heading", label: "Heading", elementType: "heading" }]);
+
+    const { result } = mountHook();
+    act(() => result.current.handleBlockClick({ id: "heading", label: "Heading" } as unknown as BlockData));
+
+    // a heading may not sit in a heading: after the heading holding the link (index 1 → 2)
     expect(mocks.insertBlock).toHaveBeenCalledWith(composer, expect.anything(), "par-1", 2);
   });
 
@@ -262,14 +267,11 @@ describe("useBlockInsertion", () => {
   it.each(["heading", "paragraph", "text", "label"])(
     "inserts AFTER a selected %s, never inside it",
     (type) => {
-      const parent = makeElement("par-1", "container", {
-        getChildren: () => [{ getId: () => "sel-1" }, { getId: () => "other" }],
-        getChildCount: () => 2,
-      });
-      elements.set("par-1", parent);
-      elements.set("sel-1", makeElement("sel-1", type, { getParent: () => parent }));
+      const box = makeElement("par-1", "container");
+      const kids = [child("sel-1", type, box), child("other", "paragraph", box)];
+      box.getChildren = () => kids;
+      elements.set("par-1", box);
       selectedIds = ["sel-1"];
-      mocks.canNestElement.mockReturnValue(true);
 
       const { result } = mountHook();
       act(() => result.current.handleBlockClick(heroBlock));
@@ -283,15 +285,15 @@ describe("useBlockInsertion", () => {
      container, leaving its prompt empty above it. The section's lone
      container is its content slot. */
   it("inserts into a selected Section's lone inner container", () => {
-    const slot = makeElement("slot-1", "container", { getChildCount: () => 0 });
-    const section = makeElement("sec-1", "section", { getChildren: () => [slot] as never, getChildCount: () => 1 });
+    const section = makeElement("sec-1", "section");
+    const slot = child("slot-1", "container", section);
+    section.getChildren = () => [slot];
     elements.set("sec-1", section);
-    elements.set("slot-1", slot);
     selectedIds = ["sec-1"];
-    mocks.canNestElement.mockReturnValue(true);
+    mocks.getBlockDefinitions.mockReturnValue([{ id: "image", label: "Image", elementType: "image" }]);
 
     const { result } = mountHook();
-    act(() => result.current.handleBlockClick(heroBlock));
+    act(() => result.current.handleBlockClick({ id: "image", label: "Image" } as unknown as BlockData));
 
     expect(mocks.insertBlock).toHaveBeenCalledWith(composer, expect.anything(), "slot-1", 0);
   });
@@ -299,7 +301,6 @@ describe("useBlockInsertion", () => {
   it("falls back to the page root when no ancestor accepts the block", () => {
     elements.set("sel-1", makeElement("sel-1", "text"));
     selectedIds = ["sel-1"];
-    mocks.canNestElement.mockReturnValue(false);
 
     const { result } = mountHook();
     act(() => result.current.handleBlockClick(heroBlock));

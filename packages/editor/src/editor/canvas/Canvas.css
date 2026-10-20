@@ -803,7 +803,9 @@ button:hover > .bd-canvas-empty-cta__thumb {
   min-width: 0;
   min-height: 0; /* the wrapper is a column now — the docked footer sits under this */
   display: flex;
-  align-items: center;
+  /* `safe` on the cross axis too: a Tablet frame (1024 tall) in a 715px
+     scroller stranded its top ~74px above scroll range (audit 2026-10-20 #17). */
+  align-items: safe center;
   justify-content: safe center;
   overflow: auto;
 }

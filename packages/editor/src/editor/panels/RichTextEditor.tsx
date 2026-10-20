@@ -17,9 +17,18 @@ export interface RichTextEditorProps {
     strikethrough?: boolean;
     link?: boolean;
   };
+  /** The edited element's tag ("h2", "p", "span"…) — what Text style shows. */
+  blockTag?: string;
+  /** Its computed font size in px — what Font size shows. */
+  fontSizePx?: number;
 }
 
-export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activeStyles = {} }) => {
+export const RichTextEditor: React.FC<RichTextEditorProps> = ({
+  onCommand,
+  activeStyles = {},
+  blockTag,
+  fontSizePx,
+}) => {
   const [linkUrl, setLinkUrl] = React.useState("");
   const [textColorOpen, setTextColorOpen] = React.useState(false);
   const [bgColorOpen, setBgColorOpen] = React.useState(false);
@@ -114,9 +123,17 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
     { value: "h6", label: "Heading 6" },
   ];
 
+  /* Audit 2026-10-20 #16: both selects were uncontrolled, so they showed
+     their first option — "Paragraph" / "10px" on a 36px H2. They show the
+     element's own tag and computed size; one not on the list gets its own
+     row (the size scale is execCommand's 1–7, not every px value). */
+  const styleValue = headings.some((h) => h.value === blockTag) ? (blockTag as string) : "";
+  const sizePx = fontSizePx === undefined ? undefined : Math.round(fontSizePx);
+  const sizeValue = fontSizes.find((s) => s.label === `${sizePx}px`)?.value ?? "";
+
   return (
     <div
-      className="tw:flex tw:items-center tw:gap-0.5"
+      className="tw:flex tw:flex-wrap tw:items-center tw:gap-0.5"
       style={{
         padding: 4,
         background: "var(--bk-bg-panel)",
@@ -130,6 +147,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
            that reads out as "combo box, combo box" tells a screen-reader user
            nothing about which one sets the block and which the size. */
         aria-label="Text style"
+        value={styleValue}
         onChange={(e) => onCommand("formatBlock", e.target.value)}
         style={{
           padding: "2px 6px",
@@ -143,6 +161,11 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
           appearance: "auto",
         }}
       >
+        {styleValue === "" && (
+          <option value="" disabled>
+            Text
+          </option>
+        )}
         {headings.map((h) => (
           <option key={h.value} value={h.value}>
             {h.label}
@@ -152,6 +175,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
       {/* Font Size */}
       <Select
         aria-label="Font size"
+        value={sizeValue}
         onChange={(e) => onCommand("fontSize", e.target.value)}
         style={{
           padding: "2px 6px",
@@ -165,6 +189,11 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
           appearance: "auto",
         }}
       >
+        {sizeValue === "" && (
+          <option value="" disabled>
+            {sizePx === undefined ? "Size" : `${sizePx}px`}
+          </option>
+        )}
         {fontSizes.map((s) => (
           <option key={s.value} value={s.value}>
             {s.label}

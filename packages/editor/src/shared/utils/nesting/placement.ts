@@ -17,7 +17,7 @@
 
 import type { ElementType } from "@/shared/types";
 import { canNestElement } from "./validator";
-import { canHaveChildren, isInteractiveType, isVoidType } from "./typeChecks";
+import { canHaveChildren, isContainerType, isInteractiveType, isVoidType } from "./typeChecks";
 import { CAN_HAVE_CHILDREN_SET, ELEMENT_CATEGORIES } from "./derived";
 
 export const TEXT_ELEMENT_TYPES: ReadonlySet<string> = new Set(["text", "span", "paragraph", "heading", "label"]);
@@ -42,7 +42,40 @@ export function engineMayPlaceInside(childType: string, parentType: string): boo
   return insideRefusal(childType as ElementType, parentType as ElementType) === null;
 }
 
-const HEADING_TAGS = new Set(["h1", "h2", "h3", "h4", "h5", "h6"]);
+interface InsertionNode<T> {
+  getType(): string;
+  getParent(): T | null;
+  getChildren(): T[];
+}
+
+/** Where an element added (click-to-add) or pasted with `selected` selected
+ *  lands — Webflow's rule (audit 2026-10-20 #15): a selected CONTAINER that
+ *  may hold it takes it as its last child (a Section's lone inner container
+ *  is its content slot, L1-037); anything else gets it as the next sibling,
+ *  climbing to the nearest ancestor that may hold it. Container-ness, not
+ *  "may have children", decides: the rules let a Button hold an Image and a
+ *  Heading hold blocks, which is how `<button><img>` was made. Null when no
+ *  ancestor may hold it — the caller falls back to the page root. */
+export function insertionPlace<T extends InsertionNode<T>>(
+  childType: ElementType,
+  selected: T,
+): { parent: T; index: number } | null {
+  const fits = (parent: T) => insideRefusal(childType, parent.getType() as ElementType) === null;
+  const kids = selected.getChildren();
+  if (selected.getType() === "section" && kids.length === 1 && kids[0].getType() === "container" && fits(kids[0])) {
+    return { parent: kids[0], index: kids[0].getChildren().length };
+  }
+  if (isContainerType(selected.getType() as ElementType) && fits(selected)) {
+    return { parent: selected, index: kids.length };
+  }
+  let onPath = selected;
+  for (let parent = selected.getParent(); parent; onPath = parent, parent = parent.getParent()) {
+    if (fits(parent)) return { parent, index: parent.getChildren().indexOf(onPath) + 1 };
+  }
+  return null;
+}
+
+const HEADING_TAGS =new Set(["h1", "h2", "h3", "h4", "h5", "h6"]);
 /* HTML parsing, "in body" insertion mode: these start tags close an open <p>. */
 const CLOSES_P = new Set([
   "address", "article", "aside", "blockquote", "center", "details", "dialog", "dir", "div", "dl",
