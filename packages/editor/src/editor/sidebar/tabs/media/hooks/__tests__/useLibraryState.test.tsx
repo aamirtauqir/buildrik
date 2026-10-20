@@ -520,3 +520,31 @@ describe("useLibraryState — engine event sync", () => {
     expect(result.current.libraryItems.map((i) => i.key).sort()).toEqual(["one", "two"]);
   });
 });
+
+/* REA 2026-10-20 #14: a refused server write used to be invisible — the
+   drawer always said "Moved N files", and a drawer version restore dropped
+   the restored `src`, so nothing changed locally. */
+describe("useLibraryState — honest writes (REA #14)", () => {
+  it("bulkMoveAssets reports which files the server refused", async () => {
+    const composer = makeComposer([asset({ id: "ok" }), asset({ id: "bad" })]);
+    const media = (composer as never as { media: { updateAsset: ReturnType<typeof vi.fn> } }).media;
+    media.updateAsset.mockImplementation(async (id: string) => {
+      if (id === "bad") throw new Error("The server did not save this change (move)");
+      return null;
+    });
+    const { result } = renderHook(() => useLibraryState(composer));
+    let outcome: { moved: string[]; failed: string[] } | undefined;
+    await act(async () => {
+      outcome = await result.current.bulkMoveAssets(["ok", "bad"], "f1");
+    });
+    expect(outcome).toEqual({ moved: ["ok"], failed: ["bad"] });
+  });
+
+  it("updateItem carries a restored version's src to the engine", async () => {
+    const composer = makeComposer([asset({ id: "hero" })]);
+    const media = (composer as never as { media: { updateAsset: ReturnType<typeof vi.fn> } }).media;
+    const { result } = renderHook(() => useLibraryState(composer));
+    await act(() => result.current.updateItem("hero", { src: "https://blob/v2.png" }));
+    expect(media.updateAsset).toHaveBeenCalledWith("hero", { src: "https://blob/v2.png" });
+  });
+});

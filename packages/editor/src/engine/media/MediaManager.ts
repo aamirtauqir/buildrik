@@ -15,7 +15,7 @@ import {
   getAssetTypeFromMime,
   mimeTypeForFile,
 } from "@/shared/constants/media";
-import { MediaQuotaError } from "./MediaStorageTypes";
+import { MediaQuotaError, MediaRemoteWriteError } from "./MediaStorageTypes";
 import type {
   EditsSnapshot,
   MediaAsset,
@@ -1321,48 +1321,34 @@ export class MediaManager extends MediaEventEmitter {
       updatedAt: new Date().toISOString(),
     };
 
-    await this.persist(updated);
-    const index = this.state.assets.findIndex((a) => a.id === id);
-    if (index >= 0) {
-      this.state.assets[index] = updated;
-    }
-
-    // Phase B4: mirror folderId changes server-side. Only fires when the
-    // folderId field is explicitly part of `updates` (not all updateAsset
-    // calls — rename/altText changes don't move the asset). Asset must
-    // have a serverId (was uploaded successfully); local-only assets
-    // skip this mirror until they sync.
-    if (
-      this.remoteSync &&
-      asset.serverId &&
-      Object.prototype.hasOwnProperty.call(updates, "folderId") &&
-      asset.folderId !== updated.folderId
-    ) {
-      await this.remoteSync.moveAsset(asset.serverId, updated.folderId ?? null);
-      // Failure tolerated — local move stuck, server out of sync until
-      // next move or full sync. Phase B5 (deferred) would add a queue.
-    }
-
-    // S-tier wire (2026-06-24): mirror name / alt-text edits server-side.
-    // These were local-IndexedDB-only before — `media.updateAsset` existed
-    // but nothing called it, so renames / hand-written alt text never
-    // persisted across devices. Guarded on serverId (asset is synced) and
-    // an actual name/altText change in this update (folderId keeps its own
-    // moveAsset path above).
-    //
-    // BLOCKERS C3 (2026-09-13): tags ride the same patch as
-    // `userMetadata: { tags }` — the server row's JSON column, which
-    // `media.updateAsset` already took and `importServerAssets` reads back.
-    // Sent only when the list actually changed, so a name edit's patch is
-    // still exactly `{ filename, altText }`.
-    //
-    // Clone 3686:42317 (Phase 5): `siteFont` shares that column, and since
-    // Phase 6 (3695:45529) so do `versionOf` and `edits`. The server
-    // REPLACES the column with what is sent, so the patch is the whole
-    // column — the tags AND every flag, from the asset as it now is —
-    // whichever of them changed (`userMetadataOf`). A flag that was never
-    // set stays out of it: an image has nothing to preserve.
+    /* The server goes FIRST (REA 2026-10-20 #14). Each mirror used to run
+       after the local write with its `false` ignored, so a refused move left
+       the library showing a folder the server never heard of while the UI
+       reported "Moved N files". A refused write now throws before anything
+       local changes, and the library stays what the server holds. Assets
+       without a serverId (not synced yet) have nothing to mirror. */
     if (this.remoteSync && asset.serverId) {
+      // Phase B4: folderId changes move the asset server-side — only when
+      // folderId is explicitly part of `updates` and actually changed.
+      if (Object.prototype.hasOwnProperty.call(updates, "folderId") && asset.folderId !== updated.folderId) {
+        const moved = await this.remoteSync.moveAsset(asset.serverId, updated.folderId ?? null);
+        if (!moved) throw new MediaRemoteWriteError("move");
+      }
+
+      // S-tier wire (2026-06-24): name / alt-text edits mirror server-side.
+      //
+      // BLOCKERS C3 (2026-09-13): tags ride the same patch as
+      // `userMetadata: { tags }` — the server row's JSON column, which
+      // `media.updateAsset` already took and `importServerAssets` reads back.
+      // Sent only when the list actually changed, so a name edit's patch is
+      // still exactly `{ filename, altText }`.
+      //
+      // Clone 3686:42317 (Phase 5): `siteFont` shares that column, and since
+      // Phase 6 (3695:45529) so do `versionOf` and `edits`. The server
+      // REPLACES the column with what is sent, so the patch is the whole
+      // column — the tags AND every flag, from the asset as it now is —
+      // whichever of them changed (`userMetadataOf`). A flag that was never
+      // set stays out of it: an image has nothing to preserve.
       const patch: Parameters<RemoteAssetSync["updateAsset"]>[1] = {};
       if (
         (Object.prototype.hasOwnProperty.call(updates, "name") && asset.name !== updated.name) ||
@@ -1385,13 +1371,25 @@ export class MediaManager extends MediaEventEmitter {
         patch.userMetadata = userMetadataOf(updated);
       }
       if (Object.keys(patch).length > 0) {
-        await this.remoteSync.updateAsset(asset.serverId, patch);
-        // Failure tolerated — local ahead until next edit / full sync.
+        const saved = await this.remoteSync.updateAsset(asset.serverId, patch);
+        if (!saved) throw new MediaRemoteWriteError("update");
       }
     }
 
-    this.emit(MEDIA_EVENTS.MEDIA_UPDATED, { asset: updated, previous: asset, changes: updates });
+    await this.applyLocalUpdate(asset, updated, updates);
     return updated;
+  }
+
+  /** The local half of an update: storage, state, event. Also used where the
+   *  server already made the change itself (a deleted folder's files land at
+   *  root server-side), so nothing is mirrored from here. */
+  private async applyLocalUpdate(asset: MediaAsset, updated: MediaAsset, changes: Partial<MediaAsset>): Promise<void> {
+    await this.persist(updated);
+    const index = this.state.assets.findIndex((a) => a.id === asset.id);
+    if (index >= 0) {
+      this.state.assets[index] = updated;
+    }
+    this.emit(MEDIA_EVENTS.MEDIA_UPDATED, { asset: updated, previous: asset, changes });
   }
 
   getAsset(id: string): MediaAsset | undefined {
@@ -1596,6 +1594,17 @@ export class MediaManager extends MediaEventEmitter {
       }
     };
     walk(id);
+
+    /* Phase B4: the server delete goes FIRST (REA 2026-10-20 #14) — it used
+       to run last with its result ignored, so a refused delete left a folder
+       the server still held and the next import brought it back. A folder
+       still localOnly has no server row to delete. */
+    const folder = this.state.folders.find((f) => f.id === id);
+    if (this.remoteSync && folder && !folder.localOnly) {
+      const deleted = await this.remoteSync.deleteFolder(id);
+      if (!deleted) throw new MediaRemoteWriteError("delete-folder");
+    }
+
     for (const purgeId of toPurgeFromQueue) {
       this.folderRetryQueue.delete(purgeId);
     }
@@ -1603,18 +1612,12 @@ export class MediaManager extends MediaEventEmitter {
     await this.storage.deleteFolder(id);
     this.state.folders = this.state.folders.filter((f) => f.id !== id);
 
-    // Orphaned assets move to root
+    // Orphaned assets move to root — locally only: the server cascades its
+    // own rows to root, so mirroring each move would ask it twice.
     const orphaned = this.state.assets.filter((a) => a.folderId === id);
     for (const asset of orphaned) {
-      await this.updateAsset(asset.id, { folderId: undefined });
-    }
-
-    // Phase B4: mirror server delete. Server cascades assets-to-root
-    // independently per Phase A spec; we just notify it.
-    if (this.remoteSync) {
-      await this.remoteSync.deleteFolder(id);
-      // Failure ignored — local delete already happened. Server cleans
-      // up on next sync cycle if it ever adds one.
+      const rooted: MediaAsset = { ...asset, folderId: undefined, updatedAt: new Date().toISOString() };
+      await this.applyLocalUpdate(asset, rooted, { folderId: undefined });
     }
 
     this.emit(MEDIA_EVENTS.FOLDER_DELETED, { id });
@@ -1634,18 +1637,19 @@ export class MediaManager extends MediaEventEmitter {
       name: trimmed,
       updatedAt: new Date().toISOString(),
     };
+    // S-tier wire (2026-06-24): mirror the rename server-side. The local
+    // folder id is the server CUID once synced (same canonical-id-swap as
+    // delete/create); skip folders still localOnly (no server row yet — the
+    // create-retry queue carries the latest name when it lands). It goes
+    // FIRST and a refusal throws with the old name still in place (REA
+    // 2026-10-20 #14) — it used to be tolerated, and names diverged.
+    if (this.remoteSync && !updated.localOnly) {
+      const renamed = await this.remoteSync.renameFolder(id, trimmed);
+      if (!renamed) throw new MediaRemoteWriteError("rename-folder");
+    }
+
     this.state.folders[idx] = updated;
     await this.persistFolder(updated);
-
-    // S-tier wire (2026-06-24): mirror the rename server-side. Was local-only
-    // before, so folder names diverged per browser. The local folder id is
-    // the server CUID once synced (same canonical-id-swap as delete/create);
-    // skip folders still localOnly (no server row yet — the create-retry
-    // queue carries the latest name when it lands).
-    if (this.remoteSync && !updated.localOnly) {
-      await this.remoteSync.renameFolder(id, trimmed);
-      // Failure tolerated — local rename stays ahead until next sync.
-    }
 
     this.emit(MEDIA_EVENTS.FOLDER_UPDATED, updated);
   }

@@ -31,7 +31,6 @@ vi.mock("../useLibraryState", () => ({
     setCurrentFolderId: () => {},
     createFolder: () => {},
     deleteFolder: () => {},
-    moveAsset: () => {},
     bulkMoveAssets: () => {},
     renameItem: () => {},
     updateItem: () => {},

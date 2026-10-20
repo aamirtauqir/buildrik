@@ -15,7 +15,7 @@ import * as React from "react";
 import { MoveFailedModal } from "../MoveFailedModal";
 
 function mount(open = true) {
-  const props = { open, onClose: vi.fn(), onRetry: vi.fn() };
+  const props = { open, movedCount: 0, failedCount: 2, onClose: vi.fn(), onRetry: vi.fn() };
   render(<MoveFailedModal {...props} />);
   return props;
 }

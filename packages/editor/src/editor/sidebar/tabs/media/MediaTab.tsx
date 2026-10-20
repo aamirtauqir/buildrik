@@ -292,9 +292,22 @@ function MediaTabWithComposer({
         onBulkMove={onOpenLibrary ? () => onOpenLibrary() : undefined}
         onBulkMoveTo={(folderId) => {
           const keys = [...state.selectedKeys];
-          void Promise.all(keys.map((k) => state.moveAsset(k, folderId))).then(() => {
-            addToast({ description: `Moved ${keys.length} file${keys.length === 1 ? "" : "s"}`, tone: "success" });
-            state.toggleSelMode();
+          void state.bulkMoveAssets(keys, folderId).then(({ moved, failed }) => {
+            /* The real count (REA 2026-10-20 #14): a file the server refused
+               stays where it was and stays selected, so Retry is one click. */
+            const files = (n: number) => `${n} file${n === 1 ? "" : "s"}`;
+            if (failed.length === 0) {
+              addToast({ description: `Moved ${files(moved.length)}`, tone: "success" });
+              state.toggleSelMode();
+              return;
+            }
+            addToast({
+              description: moved.length
+                ? `Moved ${files(moved.length)}. ${files(failed.length)} could not be moved — the server did not save the change.`
+                : `Could not move ${files(failed.length)} — the server did not save the change.`,
+              tone: "error",
+            });
+            for (const key of moved) state.toggleSelect(key);
           });
         }}
         onBulkDelete={() =>

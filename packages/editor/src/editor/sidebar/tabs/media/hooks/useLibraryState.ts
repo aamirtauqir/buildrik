@@ -375,16 +375,18 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
     [composer, inspectFolder, folderSubtree],
   );
 
-  const moveAsset = useCallback(async (assetId: string, folderId: string | null) => {
-    await composer.media.updateAsset(assetId, { folderId: folderId ?? undefined });
-  }, [composer]);
-
+  /* Each file moves on its own and the answer says which did: the engine
+     rejects a move the server refused and leaves that file where it was
+     (REA 2026-10-20 #14), so a caller can report the real count instead of
+     "Moved N files" whatever happened. */
   const bulkMoveAssets = useCallback(async (assetIds: string[], folderId: string | null) => {
-    await Promise.all(
-      assetIds.map((id) =>
-        composer.media.updateAsset(id, { folderId: folderId ?? undefined })
-      )
+    const results = await Promise.allSettled(
+      assetIds.map((id) => composer.media.updateAsset(id, { folderId: folderId ?? undefined })),
     );
+    const moved: string[] = [];
+    const failed: string[] = [];
+    results.forEach((r, i) => (r.status === "fulfilled" ? moved : failed).push(assetIds[i]));
+    return { moved, failed };
   }, [composer]);
 
   const renameItem = useCallback(
@@ -407,6 +409,10 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
       if (updates.name) assetUpdates.name = updates.name;
       if (updates.altText !== undefined) assetUpdates.altText = updates.altText;
       if (updates.tags !== undefined) assetUpdates.tags = updates.tags;
+      /* A drawer version restore: the server already points the asset at
+         the version's URL; the library row has to follow or nothing changes
+         until a reload (REA 2026-10-20 #14). */
+      if (updates.src) assetUpdates.src = updates.src;
       await composer.media.updateAsset(key, assetUpdates);
     },
     [composer]
@@ -550,7 +556,6 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
     createFolder,
     inspectFolder,
     deleteFolder,
-    moveAsset,
     bulkMoveAssets,
     counts,
     sort,

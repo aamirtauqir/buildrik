@@ -36,7 +36,7 @@ vi.mock("../useLibraryState", () => ({
     libraryItems: [], folders: [], allFolders: [],
     counts: { all: 0, img: 0, vid: 0, ico: 0, fnt: 0 },
     activeType: "all", currentFolderId: null, setCurrentFolderId: () => {},
-    createFolder: () => {}, deleteFolder: () => {}, moveAsset: () => {},
+    createFolder: () => {}, deleteFolder: () => {},
     bulkMoveAssets: () => {}, renameItem: () => {}, updateItem: () => {},
     setActiveType: () => {}, sort: "newest", sortDir: "desc", gridN: 3,
     fmtFilter: "all", librarySearch: "", setLibrarySearch: () => {},

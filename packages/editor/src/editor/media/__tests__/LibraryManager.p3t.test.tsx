@@ -131,11 +131,10 @@ describe("card menu · Replace across pages…", () => {
 
 describe("Clone 3721:45952 → 3721:45960 · Move team-photo.jpg from the menu", () => {
   it("Move to folder… opens the Move modal for that one file, and choosing a folder moves just it", async () => {
-    const bulkMoveAssets = vi.fn(() => Promise.resolve());
-    const moveAsset = vi.fn(() => Promise.resolve());
+    const bulkMoveAssets = vi.fn((keys: string[], _folderId: string | null) => Promise.resolve({ moved: keys, failed: [] as string[] }));
     const enterSelectModeWith = vi.fn();
     const toggleSelMode = vi.fn();
-    await mountLibrary({ ...menuOpenOn(), bulkMoveAssets, moveAsset, enterSelectModeWith, toggleSelMode });
+    await mountLibrary({ ...menuOpenOn(), bulkMoveAssets, enterSelectModeWith, toggleSelMode });
     fireEvent.click(screen.getByTestId("media-ctx-move"));
     expect(screen.getByTestId("mgr-move-title")).toHaveTextContent("Move 1 asset");
     expect(screen.getByTestId("mgr-move-body")).toHaveTextContent("team-photo.jpg is unfiled. Choose a destination.");
@@ -143,7 +142,6 @@ describe("Clone 3721:45952 → 3721:45960 · Move team-photo.jpg from the menu",
     expect(screen.queryByRole("menuitem", { name: "(Root)" })).toBeNull();
     fireEvent.click(screen.getByTestId("mgr-move-folder-f1"));
     expect(bulkMoveAssets).toHaveBeenCalledWith(["team"], "f1");
-    expect(moveAsset).not.toHaveBeenCalled();
     // No bulk selection is created by a menu move.
     expect(enterSelectModeWith).not.toHaveBeenCalled();
     expect(toggleSelMode).not.toHaveBeenCalled();
@@ -151,7 +149,7 @@ describe("Clone 3721:45952 → 3721:45960 · Move team-photo.jpg from the menu",
   });
 
   it("3721:45960 · afterwards the count line reads '<Scope> · <file> moved' and the rail is untouched", async () => {
-    await mountLibrary({ ...menuOpenOn(), bulkMoveAssets: vi.fn(() => Promise.resolve()) });
+    await mountLibrary({ ...menuOpenOn(), bulkMoveAssets: vi.fn((keys: string[], _folderId: string | null) => Promise.resolve({ moved: keys, failed: [] as string[] })) });
     fireEvent.click(screen.getByTestId("media-ctx-move"));
     fireEvent.click(screen.getByTestId("mgr-move-folder-f1"));
     await vi.waitFor(() => expect(screen.getByTestId("mgr-count")).toHaveTextContent("All assets · team-photo.jpg moved"));
@@ -168,7 +166,7 @@ describe("Clone 3721:45952 → 3721:45960 · Move team-photo.jpg from the menu",
       currentFolderId: "f2",
       libraryItems: TAGGED.filter((i) => i.key === "team"),
       allLibraryItems: TAGGED,
-      bulkMoveAssets: vi.fn(() => Promise.resolve()),
+      bulkMoveAssets: vi.fn((keys: string[], _folderId: string | null) => Promise.resolve({ moved: keys, failed: [] as string[] })),
     });
     fireEvent.click(screen.getByTestId("media-ctx-move"));
     fireEvent.click(screen.getByTestId("mgr-move-folder-f1"));
@@ -176,7 +174,7 @@ describe("Clone 3721:45952 → 3721:45960 · Move team-photo.jpg from the menu",
   });
 
   it("the moved line clears on the next scope change", async () => {
-    const utils = await mountLibrary({ ...menuOpenOn(), bulkMoveAssets: vi.fn(() => Promise.resolve()) });
+    const utils = await mountLibrary({ ...menuOpenOn(), bulkMoveAssets: vi.fn((keys: string[], _folderId: string | null) => Promise.resolve({ moved: keys, failed: [] as string[] })) });
     fireEvent.click(screen.getByTestId("media-ctx-move"));
     fireEvent.click(screen.getByTestId("mgr-move-folder-f1"));
     await vi.waitFor(() => expect(screen.getByTestId("mgr-count")).toHaveTextContent(/moved$/));
@@ -185,7 +183,7 @@ describe("Clone 3721:45952 → 3721:45960 · Move team-photo.jpg from the menu",
   });
 
   it("the moved line clears on the next filter change", async () => {
-    const utils = await mountLibrary({ ...menuOpenOn(), bulkMoveAssets: vi.fn(() => Promise.resolve()) });
+    const utils = await mountLibrary({ ...menuOpenOn(), bulkMoveAssets: vi.fn((keys: string[], _folderId: string | null) => Promise.resolve({ moved: keys, failed: [] as string[] })) });
     fireEvent.click(screen.getByTestId("media-ctx-move"));
     fireEvent.click(screen.getByTestId("mgr-move-folder-f1"));
     await vi.waitFor(() => expect(screen.getByTestId("mgr-count")).toHaveTextContent(/moved$/));
@@ -195,9 +193,9 @@ describe("Clone 3721:45952 → 3721:45960 · Move team-photo.jpg from the menu",
 
   it("a refused menu move reports 'Files could not be moved' and Retry runs the same single move", async () => {
     const bulkMoveAssets = vi
-      .fn<(keys: string[], folderId: string | null) => Promise<void>>()
-      .mockRejectedValueOnce(new Error("offline"))
-      .mockResolvedValueOnce(undefined);
+      .fn<(keys: string[], folderId: string | null) => Promise<{ moved: string[]; failed: string[] }>>()
+      .mockImplementationOnce(async (keys) => ({ moved: [], failed: keys }))
+      .mockImplementationOnce(async (keys) => ({ moved: keys, failed: [] }));
     await mountLibrary({ ...menuOpenOn(), bulkMoveAssets });
     fireEvent.click(screen.getByTestId("media-ctx-move"));
     fireEvent.click(screen.getByTestId("mgr-move-folder-f1"));
@@ -210,7 +208,7 @@ describe("Clone 3721:45952 → 3721:45960 · Move team-photo.jpg from the menu",
   });
 
   it("Cancel on the modal moves nothing and leaves the count line alone", async () => {
-    const bulkMoveAssets = vi.fn(() => Promise.resolve());
+    const bulkMoveAssets = vi.fn((keys: string[], _folderId: string | null) => Promise.resolve({ moved: keys, failed: [] as string[] }));
     await mountLibrary({ ...menuOpenOn(), bulkMoveAssets });
     fireEvent.click(screen.getByTestId("media-ctx-move"));
     fireEvent.click(screen.getByTestId("mgr-move-cancel"));

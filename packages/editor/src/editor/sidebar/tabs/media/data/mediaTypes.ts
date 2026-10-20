@@ -161,6 +161,13 @@ export interface ConfirmFolderDeletePayload {
   inUseCount: number;
 }
 
+/** Which files a bulk move moved, and which the server refused (those stay
+ *  where they were). */
+export interface BulkMoveResult {
+  moved: string[];
+  failed: string[];
+}
+
 /** What a forced folder delete would take: every file in the folder and its
  *  sub-folders (`assetIds`), so the confirm can count them and ask which are
  *  in use. */
@@ -250,8 +257,7 @@ export interface LibraryStateResult {
   createFolder(name: string): Promise<MediaFolder>;
   inspectFolder(id: string): FolderInspection;
   deleteFolder(id: string, options?: { force?: boolean }): Promise<FolderDeleteResult | undefined>;
-  moveAsset(assetId: string, folderId: string | null): Promise<void>;
-  bulkMoveAssets(assetIds: string[], folderId: string | null): Promise<void>;
+  bulkMoveAssets(assetIds: string[], folderId: string | null): Promise<BulkMoveResult>;
   counts: TypeCounts;
   sort: MediaSortBy;
   sortDir: SortDirection;
@@ -385,8 +391,7 @@ export interface MediaStateResult {
   createFolder(name: string): Promise<MediaFolder>;
   inspectFolder(id: string): FolderInspection;
   deleteFolder(id: string, options?: { force?: boolean }): Promise<FolderDeleteResult | undefined>;
-  moveAsset(assetId: string, folderId: string | null): Promise<void>;
-  bulkMoveAssets(assetIds: string[], folderId: string | null): Promise<void>;
+  bulkMoveAssets(assetIds: string[], folderId: string | null): Promise<BulkMoveResult>;
   uploadQueue: UploadProgress[];
   counts: TypeCounts;
   sort: MediaSortBy;

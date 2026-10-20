@@ -347,7 +347,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
   } | null>(null);
   /* Clone 3699:20347 — the move the engine refused, held so Retry can run
      exactly it again — including which door it came through. */
-  const [moveFailure, setMoveFailure] = React.useState<{ keys: string[]; folderId: string | null; from: MoveDoor } | null>(null);
+  const [moveFailure, setMoveFailure] = React.useState<{ keys: string[]; folderId: string | null; from: MoveDoor; movedCount: number } | null>(null);
   /* Clone 3721:45952 — the card menu's `Move to folder…` opens the same Move
      modal for that ONE file; it creates no selection. */
   const [menuMoveTarget, setMenuMoveTarget] = React.useState<LibraryItem | null>(null);
@@ -378,10 +378,11 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
         .map((k) => state.allLibraryItems.find((i) => i.key === k))
         .filter((i): i is LibraryItem => i !== undefined);
       const wasHere = new Set(items.filter((i) => (i.folderId ?? null) === folderId).map((i) => i.key));
-      try {
-        await state.bulkMoveAssets(keys, folderId);
-      } catch {
-        setMoveFailure({ keys, folderId, from });
+      /* A file the server refused stays where it was (REA 2026-10-20 #14):
+         those — and only those — go to the failure modal and its Retry. */
+      const { failed } = await state.bulkMoveAssets(keys, folderId);
+      if (failed.length > 0) {
+        setMoveFailure({ keys: failed, folderId, from, movedCount: keys.length - failed.length });
         return;
       }
       setMoveFailure(null);
@@ -967,7 +968,11 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
             if (el) composer.selection.select(el);
             onClose();
           }}
-          onUpdateTags={(key, tags) => void state.updateItem(key, { tags })}
+          onUpdateTags={(key, tags) =>
+            void state.updateItem(key, { tags }).catch(() =>
+              addToast({ description: "Could not save the tags — the server did not save the change.", tone: "error" }),
+            )
+          }
           /* Clone 3696:21550 — Site fonts is mounted once in the shell and
              opens on the composer event, with this file highlighted. */
           onManageFont={(item) => composer.emit("ui:site-fonts", { assetId: item.key })}
@@ -977,7 +982,9 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
             void composer.media.updateAsset(key, {
               altText,
               generatedMetadata: undefined,
-            });
+            }).catch(() =>
+              addToast({ description: "Could not save the alt text — the server did not save the change.", tone: "error" }),
+            );
           }}
           // Regenerate is an explicit ask to REPLACE the current text.
         />
@@ -1253,6 +1260,8 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
       />
       <MoveFailedModal
         open={moveFailure !== null}
+        movedCount={moveFailure?.movedCount ?? 0}
+        failedCount={moveFailure?.keys.length ?? 0}
         onClose={() => setMoveFailure(null)}
         onRetry={() => {
           if (moveFailure) void runMove(moveFailure.keys, moveFailure.folderId, moveFailure.from);

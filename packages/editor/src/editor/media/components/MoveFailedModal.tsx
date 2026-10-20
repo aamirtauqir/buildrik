@@ -2,9 +2,9 @@
  * MoveFailedModal — Clone 3699:20347 "Files could not be moved".
  *
  * Shown when the move the person asked for — from the Move modal or a drop
- * on a folder — was rejected by the engine (`bulkMoveAssets` rejects).
- * Nothing changed: the selection and the folders are as they were. Retry
- * runs the same move again; the orchestrator holds which one.
+ * on a folder — was refused for some or all files (`bulkMoveAssets` names
+ * them). A refused file stays where it was; Retry moves only those again;
+ * the orchestrator holds which.
  *
  * @license BSD-3-Clause
  */
@@ -20,11 +20,16 @@ import {
 
 interface MoveFailedModalProps {
   open: boolean;
+  /** Files that did move before the refusal — 0 when none did. */
+  movedCount: number;
+  /** Files the server refused; Retry moves these. */
+  failedCount: number;
   onClose(): void;
   onRetry(): void;
 }
 
-export function MoveFailedModal({ open, onClose, onRetry }: MoveFailedModalProps) {
+export function MoveFailedModal({ open, movedCount, failedCount, onClose, onRetry }: MoveFailedModalProps) {
+  const files = (n: number) => `${n} file${n === 1 ? "" : "s"}`;
   return (
     <ModalRoot open={open} onClose={onClose}>
       <ModalContent size="form" srTitle="Files could not be moved" data-testid="mgr-move-failed">
@@ -33,7 +38,9 @@ export function MoveFailedModal({ open, onClose, onRetry }: MoveFailedModalProps
         </h2>
         <ModalBody>
           <p className={LIBRARY_MODAL_BODY} data-testid="mgr-move-failed-body">
-            No files moved. Your selection and current folders are unchanged. Try again.
+            {movedCount > 0
+              ? `${files(movedCount)} moved. ${files(failedCount)} could not be moved and stayed where ${failedCount === 1 ? "it was" : "they were"}. Try again.`
+              : "No files moved. Your selection and current folders are unchanged. Try again."}
           </p>
         </ModalBody>
         <div className={LIBRARY_MODAL_FOOT} data-testid="mgr-move-failed-foot">
