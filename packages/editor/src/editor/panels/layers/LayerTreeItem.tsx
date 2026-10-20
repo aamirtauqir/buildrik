@@ -100,7 +100,17 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
      nothing — the words on the page are what a designer is looking for.
      That rule was spelled out inline here, which is how it drifted from the
      copy in `getDisplayName` that search and the breadcrumb read. */
-  const displayName = getDisplayName(layer.id, layer.type, customNames, layer.preview);
+  const isInstance = !!composer?.components?.isInstance?.(layer.id);
+  /* REA 2026-10-20 #19: an instance and everything inside it name their
+     component — the row read "Card ◇" (the element type) and its children
+     looked like any other layers. Panel 04 N1: "Instance of {main}". */
+  const host = composer?.components?.findInstanceContainingElement?.(layer.id) ?? null;
+  const componentName = host ? composer?.components?.getComponent?.(host.componentId)?.name ?? null : null;
+  const isInstancePart = !!componentName && !isInstance;
+  const displayName =
+    isInstance && componentName && !customNames.has(layer.id)
+      ? componentName
+      : getDisplayName(layer.id, layer.type, customNames, layer.preview);
   /* Every row but a locked one drags — top-level rows (depth 0, the page
      root's children) included; `depth > 0` barred reordering them (walk
      2026-09-24). The page root itself is not a row. */
@@ -122,8 +132,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
   // for the instance ROOT, while the other was `element.isComponentInstance()`
   // — true for the root and every descendant inside it. Two different facts,
   // one label, two glyphs, where the board draws one. The descendant signal
-  // is not on any board and is gone with it.
-  const isInstance = !!composer?.components?.isInstance?.(layer.id);
+  // came back with #19 as a row attribute and a tinted glyph — not a badge.
 
   /* Display settings (board 4418:84113, decision 18). A dimmed row leaves the
      list when "Show dimmed layers" is off — its children go with it, since a
@@ -213,7 +222,10 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
         draggable={canDrag}
         aria-selected={isSelected}
         aria-expanded={hasChildren ? isExpanded : undefined}
-        aria-label={`${displayName}, ${layer.type} element${isHidden ? ", dimmed in editor" : ""}${isLocked ? ", locked" : ""}`}
+        aria-label={`${displayName}, ${layer.type} element${isInstance && componentName ? `, instance of ${componentName}` : ""}${
+          isInstancePart ? `, part of ${componentName} instance` : ""
+        }${isHidden ? ", dimmed in editor" : ""}${isLocked ? ", locked" : ""}`}
+        data-instance-part={isInstancePart || undefined}
         aria-level={layer.depth + 1}
         title={`${displayName}${isHidden ? " (Hidden)" : ""}${isLocked ? " (Locked)" : ""}`}
         style={rowStyle}
@@ -286,7 +298,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
              that file and a real glyph needs no CSS of its own. The square
              background is dropped here rather than overridden there. */
           className={`bdc-lr-ic tw:inline-flex tw:items-center tw:justify-center tw:bg-transparent ${
-            isHidden ? "tw:text-[var(--bk-gray-300)]" : ""
+            isHidden ? "tw:text-[var(--bk-gray-300)]" : isInstance || isInstancePart ? "tw:text-[var(--bk-success)]!" : ""
           }`}
           aria-hidden
         >
@@ -319,8 +331,8 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
             {isInstance && (
               <span
                 className="bdc-lr-comp"
-                title="Component instance"
-                aria-label="Component instance"
+                title={componentName ? `Instance of ${componentName}` : "Component instance"}
+                aria-label={componentName ? `Instance of ${componentName}` : "Component instance"}
                 data-testid={`layer-instance-badge-${layer.id}`}
               >
                 {"\u25C7"}
