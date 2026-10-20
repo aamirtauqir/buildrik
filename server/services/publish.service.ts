@@ -154,6 +154,15 @@ export async function runPrePublishChecks(siteId: string): Promise<PrePublishChe
       ? { label: CONTENT_CHECK_LABELS["broken-link"], status: "warning", detail: `${linkCount} link${linkCount > 1 ? "s are" : " is"} broken or missing a destination.` }
       : { label: CONTENT_CHECK_LABELS["broken-link"], status: "pass", detail: "Every link has a destination." },
   );
+  /* REA #28: the Heading block defaults to <h2>, so a page built from blocks
+     has no <h1> unless a heading's level was changed. A warning — SEO never
+     blocks publish (SEO plan Q8). */
+  const noH1 = contentFindings.filter((f) => f.kind === "missing-h1").map((f) => f.location);
+  checks.push(
+    noH1.length > 0
+      ? { label: CONTENT_CHECK_LABELS["missing-h1"], status: "warning", detail: `${noH1.length} page${noH1.length > 1 ? "s have" : " has"} no H1 heading: ${noH1.join(", ")}.` }
+      : { label: CONTENT_CHECK_LABELS["missing-h1"], status: "pass", detail: "Every page has an H1 heading." },
+  );
 
   // CMS dynamic-page templates (A-17): a page-generating collection whose
   // bound template page was deleted/renamed since binding would otherwise
