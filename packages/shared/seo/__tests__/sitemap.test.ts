@@ -11,13 +11,13 @@ describe("buildSitemapXml", () => {
     { path: "blog/post.html", html: "<html></html>" },
   ];
 
-  it("lists the filenames the deploy serves, with the root as the bare origin", () => {
+  it("lists the clean URLs the deploy serves, with the root as the bare origin", () => {
     const xml = buildSitemapXml("https://example.com", pages, "2026-08-21T10:00:00.000Z");
     expect(xml).toContain("<loc>https://example.com/</loc>");
-    expect(xml).toContain("<loc>https://example.com/about.html</loc>");
-    expect(xml).toContain("<loc>https://example.com/blog/post.html</loc>");
-    // NOT the clean-URL form: there is no vercel.json, so /about would 404.
-    expect(xml).not.toContain("<loc>https://example.com/about</loc>");
+    expect(xml).toContain("<loc>https://example.com/about</loc>");
+    expect(xml).toContain("<loc>https://example.com/blog/post</loc>");
+    // NOT the .html form: under vercel.json `cleanUrls` it is a 308 (REA #26).
+    expect(xml).not.toContain(".html</loc>");
     expect(xml).toContain("<lastmod>2026-08-21</lastmod>");
     expect(xml).toContain('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">');
   });
@@ -32,7 +32,7 @@ describe("buildSitemapXml", () => {
       "2026-08-21T00:00:00.000Z",
     );
     expect(xml).toContain("https://example.com/");
-    expect(xml).not.toContain("secret.html");
+    expect(xml).not.toContain("secret");
   });
 
   it("gives the root priority 1.0 and the rest 0.8", () => {
@@ -43,7 +43,7 @@ describe("buildSitemapXml", () => {
 
   it("escapes XML special characters in a loc", () => {
     const xml = buildSitemapXml("https://example.com", [{ path: `a&b<c>.html` }], "2026-08-21T00:00:00.000Z");
-    expect(xml).toContain("<loc>https://example.com/a&amp;b&lt;c&gt;.html</loc>");
+    expect(xml).toContain("<loc>https://example.com/a&amp;b&lt;c&gt;</loc>");
   });
 
   it("produces an empty urlset when every page is noindex", () => {

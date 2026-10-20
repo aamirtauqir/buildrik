@@ -19,11 +19,10 @@ function escapeXml(s: string): string {
  * tested in the editor for months — it only ran on the ZIP export, and the
  * publish payload carries pages, so nothing else ever reached the deploy.
  *
- * Entries use the uploaded filenames (about.html), because that is what the
- * deploy serves: the vercel.json we ship (publish-files.ts, Settings S3)
- * carries redirects and headers, not `cleanUrls`, and a sitemap of /about
- * would be a list of 404s. A page carrying its own noindex is left
- * out — a sitemap is a list of pages you want indexed.
+ * Entries are the clean URLs the deploy serves (/about, through
+ * pageCanonicalUrl): the vercel.json we ship sets `cleanUrls` (REA #26), so
+ * an `.html` entry would be a list of redirects. A page carrying its own
+ * noindex is left out — a sitemap is a list of pages you want indexed.
  */
 export function buildSitemapXml(
   origin: string,

@@ -390,8 +390,8 @@ export function usePages(composer: Composer | null): UsePagesReturn {
       }
 
       // The URL the deploy serves, the same as the page drawer's preview: the
-      // file the export writes (index.html → `/`, `about.html`), not `/<slug>`,
-      // which 404s while the generated vercel.json carries no cleanUrls.
+      // file the export writes (index.html → `/`, about.html → `/about`, under
+      // vercel.json cleanUrls), numbered on a slug clash as the export numbers it.
       const url = pageCanonicalUrl(origin, pageFileNames(pages).get(page.id) ?? "index.html") ?? origin;
       /* v3 4418:93929: "Link copied · bellacucina.com/menu". */
       const successMsg = `Link copied · ${url.replace(/^https?:\/\//, "")}`;

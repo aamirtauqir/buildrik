@@ -429,7 +429,7 @@ describe("usePages copyPageLink", () => {
 
     act(() => result.current.copyPageLink("p2"));
 
-    expect(writeText).toHaveBeenCalledWith("https://bellacucina.com/menu.html");
+    expect(writeText).toHaveBeenCalledWith("https://bellacucina.com/menu");
   });
 
   it("a typed canonical wins over everything", async () => {
@@ -447,7 +447,7 @@ describe("usePages copyPageLink", () => {
 
     act(() => result.current.copyPageLink("p2"));
 
-    expect(writeText).toHaveBeenCalledWith("https://www.bella.example/menu.html");
+    expect(writeText).toHaveBeenCalledWith("https://www.bella.example/menu");
   });
 
   /* The served URL, as the page drawer previews it: home is the bare origin,
@@ -477,10 +477,10 @@ describe("usePages copyPageLink", () => {
 
     act(() => result.current.copyPageLink("p2"));
 
-    expect(writeText).toHaveBeenCalledWith("https://example.com/menu.html");
+    expect(writeText).toHaveBeenCalledWith("https://example.com/menu");
     await waitFor(() =>
       expect(lastToast()).toMatchObject({
-        description: "Link copied · example.com/menu.html",
+        description: "Link copied · example.com/menu",
         tone: "success",
       })
     );

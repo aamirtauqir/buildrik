@@ -64,7 +64,7 @@ describe("ExportEngine — internal page links", () => {
   });
 
   /* C0.6: publish asks for root-absolute links — a record page generated at
-     `<slug>/index.html` must still reach `/pricing.html`. The ZIP (opened
+     `<slug>/index.html` must still reach `/pricing`. The ZIP (opened
      from disk) keeps the relative form above. */
   it("writes root-absolute hrefs when asked (the publish payload)", async () => {
     const { files } = await new ExportEngine(makeComposer(pages)).exportAllPages({
@@ -72,8 +72,11 @@ describe("ExportEngine — internal page links", () => {
       rootAbsoluteHrefs: true,
     });
     const out = new Map(files.map((f) => [f.name, f.content]));
-    expect(out.get("index.html")).toContain('href="/pricing.html"');
-    expect(out.get("pricing.html")).toContain('href="/index.html"');
+    /* REA #26: and clean — the deploy serves /pricing (vercel.json
+       cleanUrls), and /pricing.html would be a 308 on every click. */
+    expect(out.get("index.html")).toContain('href="/pricing"');
+    expect(out.get("pricing.html")).toContain('href="/"');
+    for (const html of out.values()) expect(html).not.toMatch(/href="[^"]*\.html"/);
   });
 
   it("never ships the raw scheme", async () => {

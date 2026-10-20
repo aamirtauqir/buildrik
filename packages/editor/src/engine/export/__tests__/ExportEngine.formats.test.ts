@@ -535,7 +535,7 @@ describe("ExportEngine.exportAllPages — sitemap & SEO titles", () => {
     expect(noBaseUrl.files.some((f) => f.name === "sitemap.xml")).toBe(false);
   });
 
-  it("the ZIP sitemap is the publish builder's: served .html locs, noindex pages left out", async () => {
+  it("the ZIP sitemap is the publish builder's: served clean locs, noindex pages left out", async () => {
     const pages = [
       page("Home", { isHome: true }),
       page("About", { slug: "about" }),
@@ -548,7 +548,7 @@ describe("ExportEngine.exportAllPages — sitemap & SEO titles", () => {
     });
     const xml = files.find((f) => f.name === "sitemap.xml")!.content;
     expect(xml).toContain("<loc>https://example.com/</loc>");
-    expect(xml).toContain("<loc>https://example.com/about.html</loc>");
+    expect(xml).toContain("<loc>https://example.com/about</loc>");
     expect(xml).not.toContain("secret");
   });
 

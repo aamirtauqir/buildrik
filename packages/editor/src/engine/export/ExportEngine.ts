@@ -49,6 +49,7 @@ import { FormspreeInjector } from "./FormspreeInjector";
 import { SEOInjector, resolveLanguage } from "./SEOInjector";
 import { sanitizeHeadCode } from "./sanitizeHeadCode";
 import { buildRobotsTxt, buildSitemapXml } from "@buildrik/shared/seo/sitemap";
+import { publicPagePath } from "@buildrik/shared/seo/urls";
 import { postProcessPages, type FormTarget } from "./publishPostProcess";
 import { ReactExporter } from "./ReactExporter";
 import { generateStripeScripts } from "./StripeInjector";
@@ -82,7 +83,8 @@ export interface MultiPageExportOptions {
   cmsMode?: CMSExportMode;
   /** Template syntax for 'template' mode */
   cmsSyntax?: "handlebars" | "liquid";
-  /** Internal page links as root-absolute paths (`/about.html`) instead of
+  /** Internal page links as root-absolute clean paths (`/about`, served under
+   *  vercel.json cleanUrls — REA #26) instead of
    *  file-relative ones (`about.html`). The publish payload needs them: a
    *  collection's record pages are generated at `<slug>/index.html`
    *  (cms.service `generateDynamicPages`) from the template page's HTML, and
@@ -242,8 +244,8 @@ export class ExportEngine {
    * scheme. Built per export because it depends on the page set being written.
    */
   private pageHrefs = new Map<string, string>();
-  /** "/" while a publish export runs (`rootAbsoluteHrefs`), "" otherwise. */
-  private pageHrefPrefix = "";
+  /** Set while a publish export runs (`rootAbsoluteHrefs`). */
+  private rootAbsoluteHrefs = false;
   /** Label ↔ field attributes for the page being written (`labelLinks`). */
   private pageLabelLinks = new Map<string, Record<string, string>>();
 
@@ -302,7 +304,7 @@ export class ExportEngine {
     this.buildPageHrefs(
       this.composer.elements.exportPages?.() ?? this.composer.elements.getAllPages?.() ?? []
     );
-    this.pageHrefPrefix = "";
+    this.rootAbsoluteHrefs = false;
     const page = this.composer.elements.getActivePage?.();
     if (!page) return this.wrapInDocument("", cfg);
 
@@ -924,7 +926,7 @@ export class ExportEngine {
     };
 
     this.buildPageHrefs(pages);
-    this.pageHrefPrefix = options.rootAbsoluteHrefs ? "/" : "";
+    this.rootAbsoluteHrefs = !!options.rootAbsoluteHrefs;
 
     // The media library's intrinsic sizes, by file URL (finishPageImages).
     const sizes = new Map((this.composer.media?.getAssets?.() ?? []).map((a) => [a.src, a]));
@@ -1020,7 +1022,10 @@ export class ExportEngine {
 
   private resolveHref(href: string): string {
     if (!href.startsWith("#page:")) return href;
-    return this.pageHrefPrefix + (this.pageHrefs.get(href.slice("#page:".length)) ?? "index.html");
+    const file = this.pageHrefs.get(href.slice("#page:".length)) ?? "index.html";
+    /* The publish payload links by the clean URL the deploy serves
+       (vercel.json cleanUrls, REA #26); the ZIP, opened from disk, by file. */
+    return this.rootAbsoluteHrefs ? publicPagePath(file) : file;
   }
 
   private exportPageToHtml(page: PageData, css: string, cssMode: "link" | "inline"): string {

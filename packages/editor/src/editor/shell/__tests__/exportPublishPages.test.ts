@@ -77,9 +77,10 @@ describe("exportPublishPages", () => {
     } as never);
     const pages = await exportPublishPages(composer);
     const byPath = new Map(pages.map((p) => [p.path, p.html]));
-    expect(byPath.get("index.html")).toContain('href="/about.html"');
-    expect(byPath.get("about.html")).toContain('href="/index.html"');
-    for (const html of byPath.values()) expect(html).not.toMatch(/href="(?:about|index)\.html"/);
+    // Clean, as the deploy serves them (vercel.json cleanUrls, REA #26).
+    expect(byPath.get("index.html")).toContain('href="/about"');
+    expect(byPath.get("about.html")).toContain('href="/"');
+    for (const html of byPath.values()) expect(html).not.toMatch(/href="[^"]*(?:about|index)\.html"/);
   });
 
   it("ships html for each page, not empty documents", async () => {

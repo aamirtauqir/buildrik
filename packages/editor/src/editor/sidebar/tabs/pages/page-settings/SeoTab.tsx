@@ -79,8 +79,8 @@ export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, onOpe
   const previewDesc = resolvePageDescription({ metaDescription: s.seoDesc }, undefined, siteSeo);
   /* The URL the deploy serves for this page: the file the export writes for it
      (`about.html`, numbered on a slug clash, index.html for home) through the
-     same builder as the canonical and sitemap. It read `/<slug>` while the
-     deploy served `/<slug>.html` (no cleanUrls yet). */
+     same builder as the canonical and sitemap, which names its clean form
+     (`/about` — vercel.json cleanUrls, REA #26). */
   const sitePages = composer?.elements?.getAllPages?.() ?? [];
   const withThis = sitePages.some((p) => p.id === page.id) ? sitePages : [...sitePages, page];
   const servedFile =

@@ -417,11 +417,11 @@ describe("SeoTab Google preview — served URL", () => {
     { id: "p1", slug: "about" },
   ];
 
-  it("shows /<slug>.html — the file the export writes — not /<slug>", () => {
+  it("shows /<slug> — the clean URL the deploy serves (cleanUrls, REA #26)", () => {
     render(
       <SeoTab s={makeSettings({ slug: "about", domain: "bellacucina.com" })} page={makePage({ id: "p1", slug: "about" })} composer={composerWithPages(pages)} />,
     );
-    expect(screen.getByTestId("seo-preview-url").textContent).toBe("bellacucina.com/about.html");
+    expect(screen.getByTestId("seo-preview-url").textContent).toBe("bellacucina.com/about");
   });
 
   it("the home page previews as the bare origin", () => {
@@ -443,6 +443,6 @@ describe("SeoTab Google preview — served URL", () => {
         composer={composerWithPages([pages[0], { id: "p0", slug: "menu" }, pages[1]])}
       />,
     );
-    expect(screen.getByTestId("seo-preview-url").textContent).toBe("bellacucina.com/menu-2.html");
+    expect(screen.getByTestId("seo-preview-url").textContent).toBe("bellacucina.com/menu-2");
   });
 });
