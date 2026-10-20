@@ -210,7 +210,7 @@ const NUMBER = /^-?(\d+\.?\d*|\.\d+)$/;
  * that could end the declaration. Where the browser can judge the value
  * (`CSS.supports`), it has the last word.
  */
-export function isCssExpression(raw: string): boolean {
+function isCssExpression(raw: string): boolean {
   const text = raw.trim();
   if (!/^(calc|min|max|clamp|var)\(\s*\S[\s\S]*\)$/i.test(text)) return false;
   if (/[;{}<>"'\\]|url\(/i.test(text)) return false;

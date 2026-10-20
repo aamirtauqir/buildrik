@@ -35,7 +35,7 @@ const NUMERIC = /^-?(\d+\.?\d*|\.\d+)$/;
 
 /** What a side says when it cannot read an entry (REA 2026-10-20 #22 — a
  *  calc() it could not read used to vanish on blur without a word). */
-export const SPACING_ERROR = "Enter a number with px, %, em, rem, vw or vh, auto, or a calc() / var() expression.";
+const SPACING_ERROR = "Enter a number with px, %, em, rem, vw or vh, auto, or a calc() / var() expression.";
 
 const parseValue = (val: string): { num: string; unit: string; isKeyword: boolean } => {
   if (!val) return { num: "", unit: "", isKeyword: false };
