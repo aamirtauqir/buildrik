@@ -191,7 +191,15 @@ function splitValue(val: string, units: readonly string[]): { num: string; unit:
      height's "1.5 ×", 7079:79176). */
   const bare = units.includes("") ? "" : "px";
   if (match) return { num: match[1], unit: match[2] || bare };
-  return { num: val, unit: val === "" ? (units[0] ?? "px") : "px" };
+  return { num: val, unit: val === "" ? (units.includes("") ? "" : units[0] ?? "px") : "px" };
+}
+
+/** The unit a bare typed number takes: the field's own, or — over a keyword
+    ("normal", "auto") — unitless where the field offers it (line height's
+    1.5 stays 1.5, never 1.5px), else the first real unit. */
+function numericUnit(unit: string, units: readonly string[]): string {
+  if (!KEYWORDS.has(unit)) return unit;
+  return units.includes("") ? "" : (units.find((u) => !KEYWORDS.has(u)) ?? "px");
 }
 
 const NUMBER = /^-?(\d+\.?\d*|\.\d+)$/;
@@ -209,8 +217,7 @@ export function parseEntry(raw: string, units: readonly string[], currentUnit: s
   if (!m) return null;
   const [, num, typed] = m;
   if (typed) return units.includes(typed) ? `${num}${typed}` : null;
-  const unit = KEYWORDS.has(currentUnit) ? (units.find((u) => !KEYWORDS.has(u)) ?? "px") : currentUnit;
-  return `${num}${unit}`;
+  return `${num}${numericUnit(currentUnit, units)}`;
 }
 
 export const InputWithUnit: React.FC<InputWithUnitProps> = ({
@@ -330,8 +337,7 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
           /* A plain number is written as it is typed (live on the canvas);
              anything else waits for Enter / blur to be read. */
           if (!field.readOnly && NUMBER.test(next.trim())) {
-            const unitNow = KEYWORDS.has(unit) ? (units.find((u) => !KEYWORDS.has(u)) ?? "px") : unit;
-            onChange(`${next.trim()}${unitNow}`);
+            onChange(`${next.trim()}${numericUnit(unit, units)}`);
           }
         }}
         onFocus={() => {
