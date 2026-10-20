@@ -248,7 +248,7 @@
     "contrastFailures": 1,
     "nonTextFailures": 0,
     "contrastPairs": {
-      "span.tw:ml-auto.tw:text-[var(--bk-ink-muted)] | \u2318D | rgb(108, 112, 121) | rgb(235, 245, 255)": 4.5
+      "span.tw:ml-auto.tw:text-[var(--bk-ink-muted)] | ⌘D | rgb(108, 112, 121) | rgb(235, 245, 255)": 4.5
     },
     "nonTextPairs": {},
     "skipped": 0,
@@ -285,14 +285,6 @@
     "nonTextPairs": {},
     "skipped": 0,
     "compared": 94
-  },
-  "inspector-v4-35": {
-    "contrastFailures": 0,
-    "nonTextFailures": 0,
-    "contrastPairs": {},
-    "nonTextPairs": {},
-    "skipped": 0,
-    "compared": 2
   },
   "inspector-v4-36": {
     "contrastFailures": 0,

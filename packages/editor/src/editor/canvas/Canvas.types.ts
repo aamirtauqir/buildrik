@@ -13,7 +13,6 @@ export interface CanvasProps {
   composer: Composer | null;
   device: DeviceType;
   zoom: number;
-  onAIRequest?: (payload: { elementId: string; elementType?: string }) => void;
   showSpacing?: boolean;
   showBadges?: boolean;
   showGuides?: boolean;

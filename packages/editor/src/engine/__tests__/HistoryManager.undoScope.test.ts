@@ -13,6 +13,7 @@ import { Composer } from "@/engine/Composer";
 import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
 import { DEFAULT_TOKENS } from "@/engine/designSystem/defaultTokens";
 import { tokensForEmit } from "@/engine/designSystem/projectTokens";
+import { setTokenLiteral } from "@buildrik/shared/tokens";
 
 function pageData() {
   return {
@@ -106,7 +107,7 @@ describe("undo scope (A-4 / PD-12)", () => {
      writes the seed explicitly instead: [] at the current schema version
      ([] with no version reads as v1). */
   it("undoing the first brand edit persists as an explicit empty v6 token set", () => {
-    expect(composer.designSystem.setDesignToken("color-primary", "#FF0000")).toBe("#FF0000");
+    expect(composer.designSystem.setTokens(setTokenLiteral(DEFAULT_TOKENS, "color-primary", "light", "#FF0000"), "Set design token")).toBe(true);
     expect(composer.exportProject().settings?.designTokens).toBeDefined();
 
     composer.history.undo();

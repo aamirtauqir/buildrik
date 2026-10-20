@@ -90,7 +90,7 @@ export const IDS = {
  *   tab: "style" | "behaviour" | "effects"
  *   breakpoint: "tablet" · state: "hover" · menu: true · applyDialog: true
  *   stateMenu: true · colour: { section, field } · fieldError: { field, value }
- *   ai: true · hideInspector: true · conflict: true
+ *   hideInspector: true · conflict: true
  *   needs: lanes that must land before the board's state is fully reachable
  *     (the build plan's lane ids). "W1" = `// needs W1` in the task wording.
  */
@@ -134,7 +134,6 @@ export const BOARDS = {
   /* Board 34 is the Heading, Size › Width: the number sits in the size row's
      own field (`inspector-size-width` › `.bdi-fld`), typed "24.." as drawn. */
   34: { select: IDS.heading, tab: "style", fieldError: { selector: '[data-testid="inspector-size-width"] .bdi-fld input', label: "Width", section: "Size", value: "24.." }, needs: [] },
-  35: { select: IDS.heading, tab: "style", ai: true, needs: ["L3-D"] }, // "Scope: Heading" + return note
   36: { select: IDS.heading, tab: "style", hideInspector: true, needs: ["L3-D"] }, // Show inspector ⌘\ button
 };
 
@@ -297,12 +296,6 @@ const RUNNER = String.raw`async (spec) => {
       note("field-error:type", true, via);
       note("field-error:shown", Boolean(q("inspector-field-error") || input.getAttribute("aria-invalid") === "true"), "v4");
     }
-  }
-
-  /* 9. AI column (board 35) — the ✦ chip's own event. */
-  if (spec.ai) {
-    c.emit("ui:switch-tab", { tab: "ai" }); await sleep(800);
-    note("ai-column", true, "event");
   }
 
   /* 10. Inspector hidden (board 36). */

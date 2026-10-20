@@ -51,7 +51,6 @@ const ACTION_DESCRIPTIONS: Record<string, string> = {
   "import-html-to-active-page": "Imported HTML",
   "insert-html-to-element": "Inserted HTML",
   "apply-interpreted-tree": "Applied generated layout",
-  "ai-edit": "Applied an AI edit",
   // Remove / duplicate
   delete: "Deleted element",
   "delete-element": "Deleted element",

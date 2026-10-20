@@ -153,16 +153,6 @@ describe("useVersionHistory", () => {
     await expect(nullResult.current.compareWithDraft("b")).resolves.toBeNull();
   });
 
-  it("updateAiSummary patches the version's aiSummary", async () => {
-    const composer = createMockComposer();
-    const { result } = renderHook(() => useVersionHistory(asComposer(composer)));
-
-    await act(() => result.current.updateAiSummary("v1", "Rebuilt the hero section"));
-    expect(composer.versions.updateVersion).toHaveBeenCalledWith("v1", {
-      aiSummary: "Rebuilt the hero section",
-    });
-  });
-
   it("unsubscribes VERSION_LIST_UPDATED on unmount", () => {
     const composer = createMockComposer();
     const { unmount } = renderHook(() => useVersionHistory(asComposer(composer)));

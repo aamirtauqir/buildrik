@@ -40,9 +40,6 @@ vi.mock("../tabs/publish/PublishTab", () => ({
 vi.mock("../tabs/history/HistoryTab", () => ({
   default: () => <div data-testid="tab-history" />,
 }));
-vi.mock("../tabs/ai/AITab", () => ({
-  AITab: () => <div data-testid="tab-ai" />,
-}));
 const noop = vi.fn();
 
 function renderRouter(activeTab: GroupedTabId, extra: Partial<TabRouterProps> = {}) {

@@ -199,12 +199,6 @@ describe("useEditorShortcuts", () => {
     expect(ev.defaultPrevented).toBe(false);
   });
 
-  it("Cmd+J opens the AI tab (composer ui:switch-tab)", () => {
-    mount();
-    dispatchKey({ key: "j", metaKey: true });
-    expect(composer.emit).toHaveBeenCalledWith("ui:switch-tab", { tab: "ai" });
-  });
-
   it("Escape closes the shortcuts modal", () => {
     mount();
     dispatchKey({ key: "Escape" });

@@ -340,8 +340,6 @@ export const EVENTS = {
    *  context menu's "Replace with block…" opens Add AND lands on BLOCKS —
    *  switching the tab alone leaves the user at ELEMENTS. */
   UI_INSERT_OPEN_GROUP: "ui:insert-open-group",
-  /** Add opens on its "Generate a block" screen (G2-117). */
-  UI_INSERT_OPEN_GENERATE: "ui:insert-open-generate",
   /** An Add-drawer drag started (`{ label }`) or ended (`{ label: null }`) —
    *  board 4418:100890's drag state (canvas cue, drawer note, readout). */
   UI_INSERT_DRAG: "ui:insert-drag",
@@ -423,7 +421,6 @@ export const EVENTS = {
   UI_TOGGLE_ASSETS: "ui:toggle:assets",
   UI_TOGGLE_CODE: "ui:toggle:code",
   UI_TOGGLE_PREVIEW: "ui:toggle:preview",
-  UI_TOGGLE_AI: "ui:toggle:ai",
   UI_PANEL_RESIZE: "ui:panel:resize",
 
   // ============================================
@@ -476,14 +473,6 @@ export const EVENTS = {
   EXPORT_START: "export:start",
   EXPORT_COMPLETE: "export:complete",
   EXPORT_ERROR: "export:error",
-
-  // ============================================
-  // AI Events
-  // ============================================
-  AI_REQUEST_START: "ai:request:start",
-  AI_REQUEST_COMPLETE: "ai:request:complete",
-  AI_REQUEST_ERROR: "ai:request:error",
-  AI_SUGGESTION_APPLIED: "ai:suggestion:applied",
 
   // ============================================
   // Form Events (AQUI-035)
@@ -811,7 +800,6 @@ export type EventCategory =
   | "asset"
   | "font"
   | "export"
-  | "ai"
   | "form"
   | "sync"
   | "network"

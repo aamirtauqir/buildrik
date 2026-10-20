@@ -297,28 +297,3 @@ export {
   isMediaType,
 } from "./nesting";
 
-// =============================================================================
-// AI SERVICE (formerly "openai" — calls server /api/ai/*, not OpenAI directly)
-// =============================================================================
-
-export {
-  clearCache,
-  getRateLimitStatus,
-  clearQueue,
-  isAIError,
-  getErrorMessage,
-  PROMPT_TEMPLATES,
-  type AIRequestOptions,
-  type ContentRequest,
-  type ImageRequest,
-  type AIError,
-  type AIResponse,
-  type StreamCallbacks,
-  type ContentType,
-  type ToneType,
-  type LayoutStyle,
-  type ImageSize,
-  type ImageStyle,
-  type ProgrammingLanguage,
-  type CodeStyle,
-} from "./openai";

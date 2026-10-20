@@ -46,11 +46,10 @@ afterEach(() => {
 });
 
 describe("PagePanel — board 21", () => {
-  it("names the page: path 'Home', then 'Home · Page' with ✦ AI, ⋯ and ✕", () => {
+  it("names the page: path 'Home', then 'Home · Page' with ⋯ and ✕", () => {
     setup();
     expect(screen.getByTestId("inspector-breadcrumb")).toHaveTextContent("Home");
     expect(screen.getByTestId("inspector-element-name")).toHaveTextContent("Home · Page");
-    expect(screen.getByTestId("inspector-ai-chip")).toBeInTheDocument();
     expect(screen.getByTestId("inspector-page-menu")).toBeInTheDocument();
     expect(screen.getByTestId("inspector-hide")).toBeInTheDocument();
   });

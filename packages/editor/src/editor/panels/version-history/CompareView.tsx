@@ -3,24 +3,18 @@
  *
  * Renders the inline detail section that appears below an expanded
  * version row: visual/semantic toggle, screenshot diptych, change-list
- * summary badges, AI summary button + result/error.
+ * summary badges.
  *
  * Pre-extraction: lines 39-236 of VersionHistoryPanel.tsx (interface
- * + toggle-pill style constants + function body). All references to
- * NamedVersion, CompareResult, aiSummaryState are passed via props
- * — CompareView is leaf-level and doesn't reach into the orchestrator's
- * state machinery.
- *
- * Stage 3 (next) will further split AI summary state + button + error
- * out of this file into AIPanel.tsx so the diff/visual rendering and
- * the AI surface stop bundling concerns.
+ * + toggle-pill style constants + function body). NamedVersion and
+ * CompareResult are passed via props — CompareView is leaf-level and
+ * doesn't reach into the orchestrator's state machinery.
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
 import type { CompareResult, NamedVersion } from "@/shared/types/versions";
-import { AIResultText, AIControls } from "./AIPanel";
 import { Button } from "@/editor/chrome-ui";
 import { versionDisplayName } from "@/shared/utils/versionLabel";
 // ─── Style constants ──────────────────────────────────────────────────
@@ -70,9 +64,6 @@ export interface CompareViewProps {
   version: NamedVersion;
   compareResult: CompareResult | null;
   currentVisualSnapshot: string | null;
-  aiSummaryState: { loading: boolean; result: string | null; error: string | null };
-  onGetAiSummary: () => void;
-  aiCooldownSeconds: number;
 }
 
 // ─── Component ────────────────────────────────────────────────────────
@@ -81,9 +72,6 @@ export function CompareView({
   version,
   compareResult,
   currentVisualSnapshot,
-  aiSummaryState,
-  onGetAiSummary,
-  aiCooldownSeconds,
 }: CompareViewProps) {
   const { summary, changes } = compareResult ?? { summary: null, changes: [] };
 
@@ -129,9 +117,6 @@ export function CompareView({
           Semantic
         </Button>
       </div>
-      {/* AI Summary text — shown ABOVE the diff body when a result
-          (cached or fresh) exists. Component lives in ./AIPanel.tsx. */}
-      <AIResultText cachedSummary={version.aiSummary} state={aiSummaryState} />
       {/* Visual mode — screenshots side-by-side */}
       {mode === "visual" && hasVisual && (
         <div className="compare-screenshots">
@@ -223,14 +208,6 @@ export function CompareView({
           )}
         </div>
       )}
-      {/* AI Summary controls — button + cooldown countdown + error.
-          Component lives in ./AIPanel.tsx. */}
-      <AIControls
-        state={aiSummaryState}
-        onGetSummary={onGetAiSummary}
-        cooldownSeconds={aiCooldownSeconds}
-        nothingToSummarise={changes.length === 0}
-      />
     </div>
   );
 }

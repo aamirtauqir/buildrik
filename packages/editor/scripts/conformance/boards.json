@@ -8873,12 +8873,10 @@
       "state": "35 · AI column",
       "width": 1440,
       "height": 900,
-      "status": "active",
+      "status": "out-of-scope",
       "authority": "board:inspector-v4-approved-2026-09-27",
       "page": "4418:45431",
-      "recipe": "inspector-v4-35",
-      "verified": "match",
-      "verifiedNote": "W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-35 measured + diffed (all joined properties PASS). match. ‹ Inspector, 'Scope: Heading', prompt, 3 suggestions, return note. Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): no Inspector header or context row on this board (AI column replaces it), nothing shared to compare; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed.",
+      "verifiedNote": "OUT OF SCOPE 2026-10-20: AI removed from the editor for this version (owner). Prior note: W4 2026-10-02: board PNG vs live 1440x900 by eye (port 3160, fixture 'Inspector v4 fixture · W4'), recipe inspector-v4-35 measured + diffed (all joined properties PASS). match. ‹ Inspector, 'Scope: Heading', prompt, 3 suggestions, return note. Shared, not judged per board — QA re-walk 2026-10-02 (fix/insp-qa, port 3200, board PNG vs live 1440x900 + rule positions): no Inspector header or context row on this board (AI column replaces it), nothing shared to compare; 'More settings' rows under Typography/Size/Flex/Fill/Border kept, collapsed by default (owner decision 2026-10-02; live: closed on a Heading and a Container); board sample data not conformed.",
       "decisions": "DD-7, P-6, P-7"
     },
     {
@@ -9933,6 +9931,6 @@
       "verifiedNote": "Not walked in the QA walk 2026-10-03: a §1 related state board; only General's loading / load-error / save-error were forced (they share the load/save-error shell components). Board image not fetched (Figma budget)."
     }
   ],
-  "coveredFloor": 36,
+  "coveredFloor": 35,
   "sourceOfTruthFlippedAt": "2026-09-15"
 }

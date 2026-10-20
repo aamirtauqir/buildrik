@@ -109,22 +109,6 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
 
   const { currentPseudoState, setCurrentPseudoState } = useInspectorState(selectedElement);
 
-  // Board 160:512 — while the AI agent runs, the inspector hands over to a
-  // status card; selection is kept and restored on return.
-  const [agentRun, setAgentRun] = React.useState<{ running: boolean; summary: string }>({
-    running: false,
-    summary: "",
-  });
-  React.useEffect(() => {
-    if (!composer) return;
-    const onRun = (p: { running?: boolean; summary?: string }) =>
-      setAgentRun({ running: Boolean(p?.running), summary: p?.summary ?? "" });
-    composer.on("ai:agent-run", onRun);
-    return () => {
-      composer.off("ai:agent-run", onRun);
-    };
-  }, [composer]);
-
   /* ⋯ "Apply style to all … on this page" asks for its confirm (DD-6b). */
   const [applyStyleFor, setApplyStyleFor] = React.useState<string | null>(null);
   React.useEffect(() => {
@@ -346,71 +330,59 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
         )}
         <StatusLine composer={composer} elementId={selectedElement.id} locked={locked} conflict={conflict} />
         {targetIds.length > 1 ? <MultiSelectBar composer={composer} selectedIds={targetIds} /> : null}
-        {agentRun.running ? (
-          /* AI agent takeover (board 160:512) — the run replaces the
-             controls; the selection is kept and restored when it ends. */
-          <div role="status" aria-live="polite" className="tw:flex tw:flex-col tw:gap-2 tw:px-4 tw:py-5" data-testid="inspector-ai-run">
-            <div className="tw:text-[13px] tw:font-semibold tw:text-[var(--bk-ink)]">AI</div>
-            <div className="tw:text-[13px] tw:text-[var(--bk-ink)]">{agentRun.summary || "Working…"}</div>
-            <div className="tw:text-[12px] tw:text-[var(--bk-ink-muted)]">Your selection is kept and restored when you go back.</div>
-          </div>
-        ) : (
-          <>
-            <Tabs
-              tabs={INSPECTOR_TABS}
-              value={activeTab}
-              onChange={(id) => setActiveTab(id as TabId)}
-              label="Inspector tabs"
-              panelId="inspector-tabpanel"
-              data-testid="inspector-tab-strip"
-              className="tw:h-8 tw:p-0 tw:gap-0"
-              tabClassName={INSPECTOR_TAB_CLASS}
-            />
-            {showContextRow ? (
-              <ContextRow
-                state={currentPseudoState}
-                onStateChange={(s: PseudoStateId) => setCurrentPseudoState(s)}
-                statesWithOverrides={statesWithOverrides}
-                stateOverrideCount={fieldOverrides.counts.pseudo}
-                onResetState={() => runDiscrete(fieldOverrides.resetPseudo)}
-                breakpointName={breakpointName}
-                breakpointOverrideCount={fieldOverrides.counts.breakpoint}
-                onRevertBreakpoint={() => runDiscrete(fieldOverrides.revertBreakpoint)}
+        <Tabs
+          tabs={INSPECTOR_TABS}
+          value={activeTab}
+          onChange={(id) => setActiveTab(id as TabId)}
+          label="Inspector tabs"
+          panelId="inspector-tabpanel"
+          data-testid="inspector-tab-strip"
+          className="tw:h-8 tw:p-0 tw:gap-0"
+          tabClassName={INSPECTOR_TAB_CLASS}
+        />
+        {showContextRow ? (
+          <ContextRow
+            state={currentPseudoState}
+            onStateChange={(s: PseudoStateId) => setCurrentPseudoState(s)}
+            statesWithOverrides={statesWithOverrides}
+            stateOverrideCount={fieldOverrides.counts.pseudo}
+            onResetState={() => runDiscrete(fieldOverrides.resetPseudo)}
+            breakpointName={breakpointName}
+            breakpointOverrideCount={fieldOverrides.counts.breakpoint}
+            onRevertBreakpoint={() => runDiscrete(fieldOverrides.revertBreakpoint)}
+          />
+        ) : null}
+        <div
+          ref={contentRef}
+          className="bdi-panel-scroll"
+          role="tabpanel"
+          id="inspector-tabpanel"
+          aria-labelledby={`inspector-tabpanel-tab-${activeTab}`}
+        >
+          <div className="bdi-body">
+            <InspectorErrorBoundary>
+              <InspectorTabContent
+                tabId={activeTab}
+                composer={composer}
+                selectedElement={selectedElement}
+                selectedIds={targetIds}
+                selectedTypes={selectedTypes}
+                styles={styles_state}
+                authoredStyles={authoredStyles}
+                onChange={handleStyleChange}
+                onBatchChange={handleBatchStyleChange}
+                cssContext={enrichedContext}
+                propertyStates={propertyStates}
+                choices={choices}
+                onSetChoices={setChoices}
+                advancedState={advancedState}
+                onOpenMediaLibrary={onOpenMediaLibrary}
+                onOpenIconPicker={onOpenIconPicker}
+                onOpenCreateCollection={onOpenCreateCollection}
               />
-            ) : null}
-            <div
-              ref={contentRef}
-              className="bdi-panel-scroll"
-              role="tabpanel"
-              id="inspector-tabpanel"
-              aria-labelledby={`inspector-tabpanel-tab-${activeTab}`}
-            >
-              <div className="bdi-body">
-                <InspectorErrorBoundary>
-                  <InspectorTabContent
-                    tabId={activeTab}
-                    composer={composer}
-                    selectedElement={selectedElement}
-                    selectedIds={targetIds}
-                    selectedTypes={selectedTypes}
-                    styles={styles_state}
-                    authoredStyles={authoredStyles}
-                    onChange={handleStyleChange}
-                    onBatchChange={handleBatchStyleChange}
-                    cssContext={enrichedContext}
-                    propertyStates={propertyStates}
-                    choices={choices}
-                    onSetChoices={setChoices}
-                    advancedState={advancedState}
-                    onOpenMediaLibrary={onOpenMediaLibrary}
-                    onOpenIconPicker={onOpenIconPicker}
-                    onOpenCreateCollection={onOpenCreateCollection}
-                  />
-                </InspectorErrorBoundary>
-              </div>
-            </div>
-          </>
-        )}
+            </InspectorErrorBoundary>
+          </div>
+        </div>
       </div>
     </InspectorFieldContext.Provider>
   );

@@ -2,8 +2,8 @@
  * AssetDetailOverlay — the asset drill-in HUB, board 146:2, with its two
  * sub-screens: Versions (146:32) and Used-in (146:68).
  *
- * The board's IA is list rows, not tabs: preview + dimensions, alt text with
- * ✨ Generate ABOVE the fold ("the one field with a legal consequence"), then
+ * The board's IA is list rows, not tabs: preview + dimensions, alt text
+ * ABOVE the fold ("the one field with a legal consequence"), then
  * five 32h rows — Used in N places · Versions · Edit image · Optimise ·
  * Replace across site. Edit image opens the image-editor MODAL (cargo-sheets
  * §4: "Modals, not drill-in"); Optimise opens the same modal on its Optimise
@@ -54,9 +54,6 @@ interface AssetDetailOverlayProps {
   onEditImage?(item: LibraryItem, initialTab?: "optimise"): void | Promise<void>;
   composer?: Composer;
   onReplaceAcross?(item: LibraryItem): void;
-  /** G3-022 — the server's alt-text model (AltTextService). `null` = it
-   *  could not run; `skipped` = the server kept text the user wrote. */
-  onGenerateAltText?(item: LibraryItem): Promise<{ altText: string; skipped: boolean } | null>;
   /* Board 4418:61698 — the library's own actions, under the destination rows
      (G3-021). Each row renders only when its handler is supplied. */
   onInsert?(item: LibraryItem): void;
@@ -100,7 +97,6 @@ export function AssetDetailOverlay({
   onEditImage,
   composer,
   onReplaceAcross,
-  onGenerateAltText,
   onInsert,
   onRename,
   onCopyUrl,
@@ -118,8 +114,6 @@ export function AssetDetailOverlay({
     viewRef.current = view;
   }, [view]);
   const [altDraft, setAltDraft] = useState(item.altText ?? "");
-  const [altBusy, setAltBusy] = useState(false);
-  const [altFailed, setAltFailed] = useState(false);
   const [metaError, setMetaError] = useState(false);
   // Board 146:9 draws "1440×960 · 245 KB" under the preview, and MediaAsset
   // only carries width/height when the upload went through the WebP optimiser
@@ -217,7 +211,6 @@ export function AssetDetailOverlay({
 
   useEffect(() => {
     setAltDraft(item.altText ?? "");
-    setAltFailed(false);
     setView("hub");
     setMetaError(false);
     setPendingRestore(null);
@@ -248,25 +241,6 @@ export function AssetDetailOverlay({
     if (next === (item.altText ?? "")) return;
     void onUpdate(item.key, { altText: next });
   }, [onUpdate, altDraft, item.altText, item.key]);
-
-  /* ✨ Generate / Regenerate (G3-022) — the server's alt-text model through
-     AltTextService, which also writes the result to the asset. Its states are
-     the boards': generating (6623:149646), failed + Retry (6623:150370). */
-  const generateAlt = useCallback(async () => {
-    if (altBusy || !onGenerateAltText) return;
-    setAltBusy(true);
-    setAltFailed(false);
-    try {
-      const result = await onGenerateAltText(item);
-      if (!mountedRef.current) return;
-      if (!result) setAltFailed(true);
-      else if (!result.skipped) setAltDraft(result.altText);
-    } catch {
-      if (mountedRef.current) setAltFailed(true);
-    } finally {
-      if (mountedRef.current) setAltBusy(false);
-    }
-  }, [altBusy, item, onGenerateAltText]);
 
   // The asset's own metadata wins; the measured bitmap is the fallback.
   const dims = item.width != null && item.height != null
@@ -366,23 +340,20 @@ export function AssetDetailOverlay({
               </span>
             </div>
 
-            {/* Board 146:11 — alt text above the fold, with ✨ Generate. */}
+            {/* Board 146:11 — alt text above the fold. */}
             <div className="tw:w-full tw:px-4 tw:pt-1.5" data-testid="media-detail-alt">
               <label className="tw:block tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]" htmlFor="med-alt-input" data-testid="media-detail-alt-label">
                 Alt text
               </label>
-              {/* Board 4418:61698 — one bordered box: the text, then the
-                  Generate link inside it. */}
+              {/* Board 4418:61698 — one bordered box around the text. */}
               <div className="tw:mt-1 tw:flex tw:flex-col tw:rounded-md tw:border tw:border-[var(--bk-gray-400)] tw:bg-white tw:px-2 tw:py-1.5" data-testid="media-alt-box">
                 <Textarea
                   id="med-alt-input"
                   rows={2}
                   className="tw:resize-none tw:border-0 tw:bg-transparent tw:p-0 tw:text-[length:var(--bk-text-12)] tw:leading-[18px] tw:text-[var(--bk-ink)] tw:shadow-none tw:focus:ring-0"
                   value={altDraft}
-                  disabled={altBusy}
                   onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
                     setAltDraft(e.target.value);
-                    setAltFailed(false);
                   }}
                   onBlur={commitAltText}
                   onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -392,32 +363,9 @@ export function AssetDetailOverlay({
                       e.currentTarget.blur();
                     }
                   }}
-                  placeholder={
-                    altBusy
-                      ? "Generating alt text…"
-                      : altFailed
-                        ? "Couldn't generate alt text — write it or retry"
-                        : "Describe this image for screen readers"
-                  }
+                  placeholder="Describe this image for screen readers"
                   aria-label="Alt text"
-                  aria-invalid={altFailed || undefined}
                 />
-                {onGenerateAltText && item.type === "img" ? (
-                  <Button
-                    type="button"
-                    color="light"
-                    size="xs"
-                    variant="link"
-                    className="tw:min-h-5 tw:self-start tw:text-[length:var(--bk-text-12)]"
-                    data-testid="media-alt-generate"
-                    disabled={altBusy}
-                    aria-busy={altBusy || undefined}
-                    onClick={generateAlt}
-                  >
-                    {"✨"}&nbsp;&nbsp;
-                    {altBusy ? "Generating…" : altFailed ? "Retry" : altDraft.trim() ? "Regenerate" : "Generate"}
-                  </Button>
-                ) : null}
               </div>
             </div>
 

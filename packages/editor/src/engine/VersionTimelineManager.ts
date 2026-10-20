@@ -343,11 +343,11 @@ export class VersionTimelineManager {
   }
 
   /**
-   * Update version metadata (name, description, tags, aiSummary, visualSnapshot)
+   * Update version metadata (name, description, tags, visualSnapshot)
    */
   async updateVersion(
     versionId: string,
-    updates: Partial<Pick<NamedVersion, "name" | "description" | "tags" | "aiSummary" | "visualSnapshot">>
+    updates: Partial<Pick<NamedVersion, "name" | "description" | "tags" | "visualSnapshot">>
   ): Promise<boolean> {
     const version = this.versions.find((v) => v.id === versionId);
     if (!version) return false;

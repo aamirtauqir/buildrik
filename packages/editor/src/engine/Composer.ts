@@ -62,12 +62,10 @@ import { LintState } from "./designSystem/LintState";
 import { TokenBindingResolver } from "./designSystem/TokenBindingResolver";
 import type { DesignSystemFacade } from "./designSystem/facade";
 import { applyContrastFix } from "./designSystem/contrastFix";
-import { isAiEditableTokenValue } from "./designSystem/tokenValueGuard";
 import { mergeProjectTokens } from "./designSystem/projectTokens";
 import type { DesignToken } from "./designSystem/types";
 import { validateTokens, TOKENS_SCHEMA_VERSION } from "@buildrik/shared/schemas/design-tokens";
 import { DSLinter } from "./designSystem/linter";
-import { AIAssistService } from "./designSystem/services";
 import { VersionTimelineManager } from "./VersionTimelineManager";
 import { Viewport } from "./Viewport";
 import { getDefaultPageName } from "../shared/utils/pageUtils";
@@ -160,7 +158,6 @@ export class Composer extends EventEmitter {
   readonly aliasResolver!: AliasResolver;
   readonly colorMode!: ColorMode;
   readonly dsLinter!: DSLinter;
-  readonly aiAssistService!: AIAssistService;
 
   // Facade groupings — D3 Stage 1 (Option B-tight). Three clusters where
   // ≥2 managers share a domain:
@@ -213,7 +210,6 @@ export class Composer extends EventEmitter {
     this.aliasResolver = new AliasResolver(this);
     this.colorMode = new ColorMode(this);
     this.dsLinter = new DSLinter();
-    this.aiAssistService = new AIAssistService(this, config.aiClient ?? null);
 
     // Facade groupings — D3 Stage 1.
     const cmsCollections = new CollectionManager();
@@ -268,16 +264,6 @@ export class Composer extends EventEmitter {
         if (fixed === current) return null;
         return this.designSystem.setTokens(setTokenLiteral(tokens, tokenId, "light", fixed), "Auto-fix contrast")
           ? fixed
-          : null;
-      },
-      setDesignToken: (tokenId, value) => {
-        const tokens = this.mergedDesignTokens();
-        const target = tokens.find((t) => t.id === tokenId);
-        if (!target) return null; // unknown id — never write a token that isn't registered
-        if (!isAiEditableTokenValue(target.type, value)) return null; // per-type value guard
-        if (value === resolveTokenLiteral(tokens, tokenId, "light")) return null; // no-op
-        return this.designSystem.setTokens(setTokenLiteral(tokens, tokenId, "light", value), "Set design token")
-          ? value
           : null;
       },
       setTokens: (next, label) => {

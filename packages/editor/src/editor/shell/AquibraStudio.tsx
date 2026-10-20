@@ -52,7 +52,6 @@ import { useExportHandlers } from "./hooks/useExportHandlers";
 import { exportPublishPages, renderPreviewHtml } from "./exportPublishPages";
 import { submitForReview } from "@/services/ReviewService";
 import { locateComment } from "@/editor/sidebar/tabs/review/locate";
-import { IMPROVE_ELEMENT_PROMPT } from "@/editor/sidebar/tabs/ai/types";
 import { openPublishCheckFix } from "@/editor/sidebar/tabs/publish/PublishTab";
 import { PUBLISH_CHECK_ISSUE } from "./hooks/useIssuesFeed";
 import { useHistoryFeedback } from "./hooks/useHistoryFeedback";
@@ -579,7 +578,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
 
   /* FB-8: Issues used to float as an absolute 360px overlay on top of the
      inspector (z-45). It is now a real right-column mode — StudioPanels
-     swaps it in for ProInspector the same way it swaps in the AI drill-in.
+     swaps it in for ProInspector the same way it swaps in a column tab.
      Built here (not in StudioPanels) because it needs `requestBrandToken`
      and `composer.designSystem`, both already in scope on this component. */
   /* StudioPanels supplies the back row's action: "‹ Inspector" also shows a
@@ -690,9 +689,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           issues={state.issues}
           onSetPreviewLoading={modals.setPreviewLoading}
           onSetExportLoading={modals.setExportLoading}
-          // ✨ Ask AI → the AITab rail panel (single consolidated AI surface).
-          // Emitting ui:switch-tab opens the "ai" tab; AITab reads the live
-          // canvas selection itself, so no element context needs threading.
           onShowExporter={modals.openExporter}
           onOpenProjectSettings={() => guardedOpenLeftPanelToTab("settings")}
           onOpenPublish={() => guardedOpenLeftPanelToTab("publish")}
@@ -751,12 +747,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         onOpenIconPicker={modals.openIconPicker}
         onOpenImageEditor={modals.openImageEditor}
         onOpenCreateCollection={modals.openCMSCollectionSetup}
-        /* FA-1: the canvas context menu's "Improve with AI" (right-click →
-           el already selected, see Canvas.tsx handleContextMenu) opens the
-           SAME right-column AI thread as every other AI door — same event,
-           same panel, no second engine. Without this prop the menu item
-           hides itself (useCanvasContextMenu only shows it when set). */
-        onAIRequest={() => composer.emit("ui:switch-tab", { tab: "ai", prompt: IMPROVE_ELEMENT_PROMPT })}
         onResendReview={resendReview}
         canvasRef={canvasRef}
         composerContainerRef={composerContainerRef}

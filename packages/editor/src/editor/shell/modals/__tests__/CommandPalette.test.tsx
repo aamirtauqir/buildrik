@@ -121,11 +121,11 @@ describe("CommandPalette — board 4418:141220 structure", () => {
     renderPalette();
     expect(labels()).toEqual([
       "Open Pages", "Open Add", "Open Layers", "Open Assets", "Open Asset library", "Open CMS", "Open Brand",
-      "Open Publish", "Open AI assistant", "Browse Templates", "New page", "Replace layout with template…", "Open Review", "Open Activity", "Open Issues",
+      "Open Publish", "Browse Templates", "New page", "Replace layout with template…", "Open Review", "Open Activity", "Open Issues",
       "Open Site settings", "Open Components", "Keyboard shortcuts",
       "Undo", "Duplicate · Select an element first", "Replace selected media · Select an element first",
       "Zoom to 50%", "Preview Home page",
-      "Add text", "Add container", "Generate a block with AI…",
+      "Add text", "Add container",
       "Manage CMS records", "Save page as template", "Open History",
       "Search stock photos",
     ]);
@@ -172,12 +172,10 @@ describe("CommandPalette — doors", () => {
   const doors: Array<[string, string, unknown]> = [
     ["Open Pages", EVENTS.UI_PANEL_OPEN, { panel: "pages" }],
     ["Open Asset library", EVENTS.UI_SWITCH_TAB, { tab: "assets", fullPage: true }],
-    ["Open AI assistant", EVENTS.UI_SWITCH_TAB, { tab: "ai" }],
     ["Browse Templates", EVENTS.UI_PANEL_OPEN, { panel: "templates" }],
     ["Open Activity", EVENTS.UI_PANEL_OPEN, { panel: "activity" }],
     ["Open Issues", EVENTS.UI_OPEN_ISSUES, undefined],
     ["Keyboard shortcuts", EVENTS.UI_TOGGLE_CHEAT_SHEET, {}],
-    ["Generate a block with AI…", EVENTS.UI_INSERT_OPEN_GENERATE, {}],
     ["Replace layout with template…", EVENTS.UI_BROWSE_TEMPLATES, { replace: true }],
     ["Open History", EVENTS.UI_PANEL_OPEN, { panel: "history" }],
     ["Search stock photos", EVENTS.UI_PANEL_OPEN, { panel: "assets", screen: "stock" }],
@@ -219,15 +217,15 @@ describe("CommandPalette — VIEWER hides disallowed nav commands", () => {
   it("a non-viewer sees every nav door", () => {
     mockViewerChrome.mockReturnValue(false);
     renderPalette();
-    for (const label of ["Open Add", "Open Brand", "Open Site settings", "Open CMS", "Open Components", "Open Publish", "Open AI assistant", "Browse Templates", "Open Pages"]) {
+    for (const label of ["Open Add", "Open Brand", "Open Site settings", "Open CMS", "Open Components", "Open Publish", "Browse Templates", "Open Pages"]) {
       expect(screen.getByText(label)).toBeInTheDocument();
     }
   });
 
-  it("a viewer does not see Add/Brand/Settings/CMS/Components/Publish/AI/Templates/Pages", () => {
+  it("a viewer does not see Add/Brand/Settings/CMS/Components/Publish/Templates/Pages", () => {
     mockViewerChrome.mockReturnValue(true);
     renderPalette();
-    for (const label of ["Open Add", "Open Brand", "Open Site settings", "Open CMS", "Open Components", "Open Publish", "Open AI assistant", "Browse Templates", "Open Pages"]) {
+    for (const label of ["Open Add", "Open Brand", "Open Site settings", "Open CMS", "Open Components", "Open Publish", "Browse Templates", "Open Pages"]) {
       expect(screen.queryByText(label)).toBeNull();
     }
   });
@@ -364,20 +362,13 @@ describe("CommandPalette — search", () => {
     confirmSpy.mockRestore();
   });
 
-  it("a query that matches nothing offers stock photos for it, and AI", () => {
+  it("a query that matches nothing offers stock photos for it", () => {
     const { composer, onClose } = renderPalette();
     type("zzqq");
     expect(screen.getByTestId("cmdk-no-results-line")).toHaveTextContent("Nothing matches ‘zzqq’.");
     fireEvent.click(screen.getByTestId("cmdk-no-results-stock"));
     expect(composer!.emit).toHaveBeenCalledWith(EVENTS.UI_PANEL_OPEN, { panel: "assets", screen: "stock:zzqq" });
     expect(onClose).toHaveBeenCalledTimes(1);
-  });
-
-  it("Enter on no results asks AI", () => {
-    const { composer } = renderPalette();
-    type("zzqq");
-    fireEvent.keyDown(input(), { key: "Enter" });
-    expect(composer!.emit).toHaveBeenCalledWith(EVENTS.UI_SWITCH_TAB, { tab: "ai" });
   });
 
   it("starts with a handed query (G2-059)", () => {

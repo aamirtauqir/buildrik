@@ -58,18 +58,6 @@ export interface DesignSystemFacade {
    */
   readonly applyAutoFix: (tokenId: string, hint: string | undefined) => string | null;
   /**
-   * AI token write (W4 set-token). Models on `applyAutoFix`: looks the token up
-   * in `projectSettings.designTokens`, validates the value against the token's
-   * `type` (the trust boundary — see tokenValueGuard), and writes it inside a
-   * labeled transaction so the `project:changed` re-hydration in TokensSection
-   * re-applies the live CSS var AND Cmd+Z roundtrips through the same path.
-   *
-   * Returns the new value on success, or `null` when the id is unknown, the
-   * type is not AI-editable, the value fails its format guard, or it is a no-op.
-   * The single engine write path means the AI never touches the React hooks.
-   */
-  readonly setDesignToken: (tokenId: string, value: string) => string | null;
-  /**
    * THE token write (spec §4: one undo stack). Validates the whole v6 set
    * and writes `projectSettings.designTokens` + schema version 6 inside one
    * labelled transaction, so a multi-token edit is one ⌘Z step shared with

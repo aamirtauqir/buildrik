@@ -37,9 +37,6 @@ function renderCompare(compareResult: Parameters<typeof CompareView>[0]["compare
       version={autoSave}
       compareResult={compareResult}
       currentVisualSnapshot={null}
-      aiSummaryState={{ loading: false, result: null, error: null }}
-      onGetAiSummary={() => {}}
-      aiCooldownSeconds={0}
     />
   );
 }
