@@ -13,7 +13,7 @@ import {
   removeEngineBrowserStubs,
   createTestComposer,
 } from "@/engine/__tests__/test-utils/realComposer";
-import { renderPreviewHtml } from "../exportPublishPages";
+import { exportPublishPages, renderPreviewHtml } from "../exportPublishPages";
 
 beforeAll(() => installEngineBrowserStubs());
 afterAll(() => removeEngineBrowserStubs());
@@ -39,5 +39,22 @@ describe("renderPreviewHtml", () => {
     const html = await renderPreviewHtml(c);
     expect(html).toContain("Tom &amp; Jerry &lt;3");
     expect(html).not.toContain(">Stored<");
+  });
+
+  /* REA #18: Preview built its own document (`exportHTML`) while Publish ran
+     the multi-page export — two renderers for "what the page looks like". */
+  it("is the page Publish ships, for the page being edited", async () => {
+    const c = createTestComposer();
+    const home = c.elements.getActivePage() ?? c.elements.createPage("Home");
+    c.elements.addElement(c.elements.createElement("heading", { content: "Home title" }), home.root.id);
+    const about = c.elements.createPage("About", { slug: "about" });
+    c.elements.setActivePage(about.id);
+    const live = c.elements.getActivePage()!;
+    c.elements.addElement(c.elements.createElement("heading", { content: "About title" }), live.root.id);
+
+    const shipped = await exportPublishPages(c);
+    const aboutPage = shipped.find((p) => p.html.includes("About title"));
+    expect(aboutPage).toBeDefined();
+    expect(await renderPreviewHtml(c)).toBe(aboutPage!.html);
   });
 });

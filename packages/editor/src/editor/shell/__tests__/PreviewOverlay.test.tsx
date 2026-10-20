@@ -51,6 +51,15 @@ describe("PreviewOverlay", () => {
     expect(withRuntime.indexOf("<script>")).toBeLessThan(withRuntime.lastIndexOf("</body>"));
   });
 
+  /* REA #18: the published page gets each widget's runtime (publishPostProcess)
+     and the preview sanitizer strips every script, so tabs, accordions and
+     modals previewed dead. The same runtimes are added back here. */
+  it("adds the widget runtimes the published page gets", () => {
+    render(<PreviewOverlay html={'<body><div role="tablist"></div></body>'} onDone={vi.fn()} />);
+    const doc = (screen.getByTitle("Site preview") as HTMLIFrameElement).getAttribute("srcdoc") ?? "";
+    expect(doc).toContain("data-buildrick-tabs-runtime");
+  });
+
   /* Board 4418:165611 (C5 G1-086): the way out is "‹ Back to canvas" in the
      preview's own bar; the Done pill is gone, and each device names its width. */
   it("'‹ Back to canvas' exits, and each device names its width", () => {

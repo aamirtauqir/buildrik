@@ -152,13 +152,21 @@ export async function renderProjectPages(
 }
 
 /**
- * The in-editor Preview's HTML: `exportHTML()` with CMS bindings resolved the
- * way the publish export resolves them (CMSExportResolver, static — text
- * semantics, the shared allowlist). `exportHTML()` alone writes each element's
- * STORED text, so a bound element previewed stale or blank while the canvas
- * showed its record (dashboard verify pass 3, DV3-3).
+ * The in-editor Preview's HTML: the page being edited, exactly as Publish
+ * ships it — the same multi-page export, the same inlined stylesheet. It was
+ * `exportHTML()`, a second document assembly, so Preview could disagree with
+ * the published page (REA #18). CMS bindings resolve the way that export
+ * resolves them (published records, from this browser's store).
+ *
+ * A page the export leaves out (Hidden or Password) is still previewed, from
+ * the single-page document: the user is looking at it, and it has no
+ * published twin to disagree with.
  */
 export async function renderPreviewHtml(composer: Composer): Promise<string> {
+  const pageId = composer.elements.getActivePage?.()?.id;
+  const files = await exportPageFiles(composer);
+  const index = files.filter((f) => f.name.endsWith(".html")).findIndex((f) => f.pageId === pageId);
+  if (index >= 0) return inlinePublishStylesheet(files)[index].html;
   const raw = composer.exportHTML().combined || "<!DOCTYPE html><html><body>No content</body></html>";
   // A resolve that throws previews the stored text, as before — never nothing.
   return new CMSExportResolver(composer).resolve(raw, { mode: "static" }).catch(() => raw);

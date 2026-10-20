@@ -42,6 +42,7 @@ import type { DeviceType } from "@/shared/types";
 import { Button, BreakpointSwitcher, Select, type Breakpoint } from "@/editor/chrome-ui";
 import { isModalOpen } from "@/editor/chrome-ui";
 import { buildInteractionRuntimeScript, INTERACTION_ATTR } from "@/engine/export/interactionRuntime";
+import { injectPageRuntimes } from "@/engine/export/publishPostProcess";
 import { DeviceFramePreview } from "../canvas/DeviceFramePreview";
 import { PreviewShareModal } from "./PreviewShareModal";
 
@@ -98,8 +99,11 @@ const BRIDGE_SCRIPT =
   "})();</script>";
 
 /** The frame's document: the sanitized page plus the editor's own scripts,
- *  before `</body>` when there is one. */
-function previewDocument(html: string): string {
+ *  before `</body>` when there is one — the widget runtimes the published page
+ *  gets (`injectPageRuntimes`, the publish post-process step), the interaction
+ *  runtime and the bridge. */
+function previewDocument(sanitized: string): string {
+  const html = injectPageRuntimes(sanitized);
   const scripts = (html.includes(INTERACTION_ATTR) ? buildInteractionRuntimeScript() : "") + BRIDGE_SCRIPT;
   const end = html.lastIndexOf("</body>");
   return end < 0 ? html + scripts : html.slice(0, end) + scripts + html.slice(end);
