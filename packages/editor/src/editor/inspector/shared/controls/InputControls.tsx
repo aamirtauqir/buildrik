@@ -205,13 +205,40 @@ function numericUnit(unit: string, units: readonly string[]): string {
 const NUMBER = /^-?(\d+\.?\d*|\.\d+)$/;
 
 /**
- * Read what was typed (DD-19): 24 · 24px · 2rem · 50% · auto · a token.
- * A bare number takes the field's current unit. `null` = cannot be read.
+ * A CSS math / variable expression — calc(), min(), max(), clamp(), var() —
+ * complete enough to write: parentheses balanced, something inside, nothing
+ * that could end the declaration. Where the browser can judge the value
+ * (`CSS.supports`), it has the last word.
  */
-export function parseEntry(raw: string, units: readonly string[], currentUnit: string): string | null {
+function isCssExpression(raw: string): boolean {
+  const text = raw.trim();
+  if (!/^(calc|min|max|clamp|var)\(\s*\S[\s\S]*\)$/i.test(text)) return false;
+  if (/[;{}<>"'\\]|url\(/i.test(text)) return false;
+  let depth = 0;
+  for (const ch of text) {
+    if (ch === "(") depth++;
+    else if (ch === ")" && --depth < 0) return false;
+  }
+  if (depth !== 0) return false;
+  return typeof CSS !== "undefined" && typeof CSS.supports === "function" ? CSS.supports("margin-left", text) : true;
+}
+
+/**
+ * Read what was typed (DD-19): 24 · 24px · 2rem · 50% · auto · a token — and,
+ * where the field allows it, a calc() / var() expression, kept as typed
+ * (custom-property names are case-sensitive). A bare number takes the
+ * field's current unit. `null` = cannot be read.
+ */
+export function parseEntry(
+  raw: string,
+  units: readonly string[],
+  currentUnit: string,
+  allowExpression = false,
+): string | null {
   const text = raw.trim().toLowerCase();
   if (text === "") return "";
   if (isTokenVar(raw.trim())) return raw.trim();
+  if (allowExpression && isCssExpression(raw)) return raw.trim();
   if (KEYWORDS.has(text)) return units.includes(text) ? text : null;
   const m = text.match(/^(-?(?:\d+\.?\d*|\.\d+))\s*([a-z%]*)$/);
   if (!m) return null;

@@ -51,6 +51,8 @@ export interface StudioModalsProps {
    *  and the footer help button all flip it. */
   showShortcuts: boolean;
   onCloseShortcuts: () => void;
+  /** The site's review layer — the sheet prints R and C only while it is on. */
+  reviewsEnabled?: boolean;
 
   // Media modals
   showImageEditor: boolean;
@@ -105,6 +107,7 @@ export const StudioModals: React.FC<StudioModalsProps> = ({
   onCloseExporter,
   showShortcuts,
   onCloseShortcuts,
+  reviewsEnabled,
   showImageEditor,
   onCloseImageEditor,
   imageEditorContext,
@@ -126,9 +129,9 @@ export const StudioModals: React.FC<StudioModalsProps> = ({
   /* FC-11: Board 1172:4867's Project settings modal (General · Canvas · SEO)
      is superseded by the Clone's full-screen Settings (3397:32915 — its
      General carries the site name, author and the canvas grid). The shell's
-     two doors to it — the site menu's `Site settings` row and ⌃, — call
+     door to it — the site menu's `Site settings` row — calls
      `state.openLeftPanelToTab("settings")` directly in AquibraStudio now,
-     the same route S and ⌘K already used. This used to go through a
+     the same route ⌘K uses (⌃, and S were removed: owner Q4, SC-12). This used to go through a
      `showProjectSettings` flag here that did nothing but immediately emit
      that same tab-switch and clear itself — a modal prop with no modal. */
 
@@ -166,7 +169,7 @@ export const StudioModals: React.FC<StudioModalsProps> = ({
 
       {/* Keyboard shortcuts — mounted here, not on the canvas, so the sheet
           answers from every view the shell renders. */}
-      <KeyboardCheatSheet isOpen={showShortcuts} onClose={onCloseShortcuts} composer={composer} />
+      <KeyboardCheatSheet isOpen={showShortcuts} onClose={onCloseShortcuts} composer={composer} reviewsEnabled={reviewsEnabled} />
       {/* Rail Help's legend card (4418:126882); its "All shortcuts ›" opens the sheet above. */}
       <KeyboardLegend composer={composer} />
 

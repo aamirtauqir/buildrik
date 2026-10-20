@@ -696,7 +696,7 @@ describe("StudioHeader", () => {
       fireEvent.click(screen.getByRole("button", { name: "Site menu" }));
       const labels = screen.getAllByRole("menuitem").map((i) => i.textContent);
       expect(labels).toEqual([
-        "Site settingsCtrl ,",
+        "Site settings",
         "Export site…",
         "Issues",
         "Enter view mode",

@@ -114,32 +114,16 @@ describe("useEditorShortcuts", () => {
     expect(composer.history.redo).not.toHaveBeenCalled();
   });
 
-  // SITE-MENU CHORDS -----------------------------------------------------------
-  // T9: the site menu prints these on its rows, so a row and its chord have to
-  // land on the same handler. ⌃, exists because macOS browsers eat ⌘,.
-  it("Ctrl+, opens site settings — the same door as the menu row", () => {
-    const openSiteSettings = vi.fn();
+  // SC-12 / owner Q4 (R-1018b): Site settings has no shortcut — its doors are
+  // the topbar button and ⌘K. ⌘, is the browser's own settings chord.
+  it("Ctrl+, and Cmd+, open nothing and leave the browser its chord", () => {
     const openLeftPanelToTab = vi.fn();
-    mount({ openSiteSettings, openLeftPanelToTab });
-    const ev = dispatchKey({ key: ",", ctrlKey: true });
-    expect(openSiteSettings).toHaveBeenCalledTimes(1);
-    expect(ev.defaultPrevented).toBe(true);
-    // Regression: it used to open the left panel's settings tab instead.
+    mount({ openLeftPanelToTab });
+    const ctrl = dispatchKey({ key: ",", ctrlKey: true });
+    const cmd = dispatchKey({ key: ",", metaKey: true });
     expect(openLeftPanelToTab).not.toHaveBeenCalled();
-  });
-
-  it("Cmd+, does the same, for platforms whose browser lets it through", () => {
-    const openSiteSettings = vi.fn();
-    mount({ openSiteSettings });
-    dispatchKey({ key: ",", metaKey: true });
-    expect(openSiteSettings).toHaveBeenCalledTimes(1);
-  });
-
-  it("a bare comma types a comma — no modifier, no navigation", () => {
-    const openSiteSettings = vi.fn();
-    mount({ openSiteSettings });
-    dispatchKey({ key: "," });
-    expect(openSiteSettings).not.toHaveBeenCalled();
+    expect(ctrl.defaultPrevented).toBe(false);
+    expect(cmd.defaultPrevented).toBe(false);
   });
 
   it("Ctrl+H opens version history", () => {

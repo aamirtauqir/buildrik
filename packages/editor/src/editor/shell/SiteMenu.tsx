@@ -76,11 +76,10 @@ function openDashboard(path: string) {
 }
 
 /**
- * F6/T9: ⌘, and ⌘/ belong to the browser on macOS; the handlers accept ctrl OR
- * meta everywhere, so the hint shows the chord that actually reaches the page.
+ * F6/T9: the hint shows the chord that actually reaches the page on this
+ * platform. Site settings prints none — owner Q4 (SC-12): it has no shortcut.
  */
 const IS_MAC = typeof navigator !== "undefined" && /Mac|iP(hone|ad|od)/.test(navigator.platform);
-const SETTINGS_KBD = IS_MAC ? "⌃," : "Ctrl ,";
 const PALETTE_KBD = IS_MAC ? "⌘K" : "Ctrl K";
 const SHORTCUTS_KBD = IS_MAC ? "⌘/" : "Ctrl /";
 
@@ -162,7 +161,7 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
               <MenuGroup>
                 <MenuLabel>This site</MenuLabel>
                 {onOpenSiteSettings ? (
-                  <MenuItem kbd={SETTINGS_KBD} onClick={run(onOpenSiteSettings)} data-testid="site-menu-site-settings">
+                  <MenuItem onClick={run(onOpenSiteSettings)} data-testid="site-menu-site-settings">
                     Site settings
                   </MenuItem>
                 ) : null}

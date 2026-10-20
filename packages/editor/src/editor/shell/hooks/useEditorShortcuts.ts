@@ -16,7 +16,6 @@
  *   Escape                → close shortcuts modal
  *   F6 / Shift+F6         → cycle focus between shell regions (board 58:2)
  *   C                     → toggle canvas comment mode (board 58:215 legend)
- *   Ctrl/Cmd+,            → openSiteSettings() — the site menu's own row
  *   Ctrl/Cmd+H            → left panel · version history
  *
  * (Shift+A → Components was bound here too until FB-1 (2026-09-25) — a
@@ -70,12 +69,6 @@ export interface UseEditorShortcutsOptions {
   modals: ShortcutModals;
   /** Opens a left-panel destination; the site menu prints these shortcuts. */
   openLeftPanelToTab?: (primaryTab: string, subTab?: string) => void;
-  /**
-   * Site settings (⌃,). Its own callback rather than a panel tab, because the
-   * menu row of the same name opens the project-settings modal — the chord and
-   * the row have to land in the same place.
-   */
-  openSiteSettings?: () => void;
   /** A-8/PD-7/PD-8: the C shortcut opens comment mode — a review-flow tool.
    *  Off (default) matches "not reachable" rather than silently degrading;
    *  callers that know the site's workspace has no agency layer pass false. */
@@ -86,7 +79,6 @@ export function useEditorShortcuts({
   composer,
   modals,
   openLeftPanelToTab,
-  openSiteSettings,
   reviewsEnabled = true,
 }: UseEditorShortcutsOptions): void {
   React.useEffect(() => {
@@ -150,11 +142,8 @@ export function useEditorShortcuts({
         return;
       }
 
-      if ((e.ctrlKey || e.metaKey) && e.key === ",") {
-        e.preventDefault();
-        openSiteSettings?.();
-        return;
-      }
+      /* No ⌃, / ⌘, — owner Q4 (SC-12, R-1018b): Site settings has no
+         shortcut, and ⌘, is the browser's own settings chord. */
       if ((e.ctrlKey || e.metaKey) && (e.key === "h" || e.key === "H")) {
         e.preventDefault();
         openLeftPanelToTab?.("history");
@@ -219,5 +208,5 @@ export function useEditorShortcuts({
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [composer, modals, openLeftPanelToTab, openSiteSettings, reviewsEnabled]);
+  }, [composer, modals, openLeftPanelToTab, reviewsEnabled]);
 }

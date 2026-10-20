@@ -12,8 +12,8 @@
  * FC-11: Project Settings used to live here as a `showProjectSettings` flag
  * that StudioModals converted straight back into `openLeftPanelToTab("settings")`
  * and cleared — a modal prop with no modal. AquibraStudio now calls
- * `state.openLeftPanelToTab("settings")` directly from both doors (⌃, and
- * the site menu's "Site settings" row), the same route S and ⌘K already used.
+ * `state.openLeftPanelToTab("settings")` directly from the site menu's "Site
+ * settings" row, the same route ⌘K uses (⌃, and S were removed: owner Q4).
  *
  * @license BSD-3-Clause
  */

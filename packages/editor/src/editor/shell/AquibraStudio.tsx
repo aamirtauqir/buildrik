@@ -492,12 +492,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     composer,
     modals,
     openLeftPanelToTab: guardedOpenLeftPanelToTab,
-    /* FC-11: same door the site menu's "Site settings" row uses — both go
-       straight to the Settings tab now, the way S and ⌘K already did. This
-       used to round-trip through a `showProjectSettings` flag that
-       StudioModals immediately converted back into this same call and
-       cleared — a modal that never rendered a modal. */
-    openSiteSettings: () => guardedOpenLeftPanelToTab("settings"),
     // reviewsEnabled is `boolean | null` before the status resolves (see
     // ReviewStatus) — treat "unknown yet" the same as "on" (the hook's own
     // default), never as "off": the C shortcut should not go dead for the
@@ -809,6 +803,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         onCloseExporter={modals.closeExporter}
         showShortcuts={modals.showShortcuts}
         onCloseShortcuts={modals.closeShortcuts}
+        reviewsEnabled={reviewStatus.reviewsEnabled ?? true}
         showImageEditor={modals.showImageEditor}
         onCloseImageEditor={modals.closeImageEditor}
         imageEditorContext={modals.imageEditorContext}
