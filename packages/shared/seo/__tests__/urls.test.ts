@@ -27,20 +27,21 @@ describe("normalizeCanonicalOrigin", () => {
 });
 
 describe("pageCanonicalUrl", () => {
-  it("gives each page its OWN url, not the site's", () => {
+  /* REA #26: the deploy serves clean URLs (vercel.json `cleanUrls`, see
+     lib/publish-files.ts) — `/about.html` 308s to `/about` — so every
+     absolute URL names the clean path, never one that redirects. */
+  it("gives each page its OWN clean url, not the site's", () => {
     expect(pageCanonicalUrl("https://example.com", "index.html")).toBe("https://example.com/");
-    expect(pageCanonicalUrl("https://example.com", "about.html")).toBe(
-      "https://example.com/about.html",
-    );
-    expect(pageCanonicalUrl("https://example.com", "blog/post.html")).toBe(
-      "https://example.com/blog/post.html",
-    );
+    expect(pageCanonicalUrl("https://example.com", "about.html")).toBe("https://example.com/about");
+    expect(pageCanonicalUrl("https://example.com", "blog/post.html")).toBe("https://example.com/blog/post");
+  });
+
+  it("names a directory's index page by the directory (CMS record pages)", () => {
+    expect(pageCanonicalUrl("https://example.com", "blog/my-post/index.html")).toBe("https://example.com/blog/my-post");
   });
 
   it("does not double the slash when the export path has a leading one", () => {
-    expect(pageCanonicalUrl("https://example.com", "/about.html")).toBe(
-      "https://example.com/about.html",
-    );
+    expect(pageCanonicalUrl("https://example.com", "/about.html")).toBe("https://example.com/about");
   });
 
   it("is null when no canonical domain is configured, or it is not a URL", () => {

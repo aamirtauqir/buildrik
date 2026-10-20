@@ -117,7 +117,7 @@ describe("publish file builder = export, for a Brand-heavy page", () => {
     const single = new ExportEngine(brandSite("auto")).generateHTML();
     const tokenCss = emitSiteTokenCss(c.getProjectSettings() as never, { migrate: true, hasThemeToggle: true });
 
-    expect(files.map((f) => f.file)).toEqual(["index.html", "about.html", "robots.txt", "sitemap.xml"]);
+    expect(files.map((f) => f.file)).toEqual(["index.html", "about.html", "robots.txt", "sitemap.xml", "vercel.json"]);
     const deployed = file(files, "index.html");
     expect(deployed).toContain('data-bk-theme-toggle="true"');
     expect(deployed).toContain("var(--buildrick-design-color-brand-x)");

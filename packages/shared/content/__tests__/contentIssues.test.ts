@@ -6,6 +6,9 @@ function el(partial: Partial<ElementData> & { id: string }): ElementData {
   return { type: "container", ...partial } as ElementData;
 }
 
+/** A page title, so the link/image tests below are not also "no H1" pages (#28). */
+const title = (id = "title") => el({ id, type: "heading", tagName: "h1", content: "Title" });
+
 function page(partial: Partial<PageData> & { id: string; root: ElementData }): PageData {
   return { name: partial.name ?? "Home", ...partial } as PageData;
 }
@@ -113,6 +116,7 @@ describe("detectContentIssues", () => {
         root: el({
           id: "root",
           children: [
+            title(),
             el({ id: "l1", type: "link", tagName: "a", attributes: { href: "https://example.com" } }),
             el({ id: "l2", type: "link", tagName: "a", attributes: { href: "mailto:hi@example.com" } }),
             el({ id: "l3", type: "link", tagName: "a", attributes: { href: "tel:+15551234567" } }),
@@ -135,7 +139,7 @@ describe("detectContentIssues", () => {
         id: "home",
         root: el({
           id: "root",
-          children: hrefs.map((href, i) => el({ id: `l${i}`, type: "link", tagName: "a", attributes: { href } })),
+          children: [title(), ...hrefs.map((href, i) => el({ id: `l${i}`, type: "link", tagName: "a", attributes: { href } }))],
         }),
       }),
     ];
@@ -149,7 +153,7 @@ describe("detectContentIssues", () => {
         id: "home",
         root: el({
           id: "root",
-          children: hrefs.map((href, i) => el({ id: `l${i}`, type: "link", tagName: "a", attributes: { href } })),
+          children: [title(), ...hrefs.map((href, i) => el({ id: `l${i}`, type: "link", tagName: "a", attributes: { href } }))],
         }),
       }),
     ];
@@ -164,14 +168,14 @@ describe("detectContentIssues", () => {
         id: "home",
         root: el({
           id: "root",
-          children: [el({ id: "img1", type: "image", tagName: "img", attributes: { src: "/a.png" } })],
+          children: [title(), el({ id: "img1", type: "image", tagName: "img", attributes: { src: "/a.png" } })],
         }),
       }),
       page({
         id: "about",
         root: el({
           id: "root2",
-          children: [el({ id: "l1", type: "link", tagName: "a", attributes: { href: "" } })],
+          children: [title("title2"), el({ id: "l1", type: "link", tagName: "a", attributes: { href: "" } })],
         }),
       }),
     ];
@@ -192,6 +196,33 @@ describe("detectContentIssues", () => {
   it("skips a malformed stored children value instead of throwing", () => {
     const root = { id: "r", type: "container", children: "oops" } as unknown as ElementData;
     expect(() => detectContentIssues([page({ id: "home", root })])).not.toThrow();
+  });
+});
+
+/* REA #28 (R4 P1-11): the Heading block defaults to <h2>, so a page built
+   from blocks ships with no <h1> unless the user changes one. A warning —
+   SEO never blocks publish (SEO plan Q8). */
+describe("detectContentIssues — a page with no H1", () => {
+  const withKids = (...children: ElementData[]) => el({ id: "root", children });
+
+  it("warns once for a page with content and no h1", () => {
+    const pages = [page({ id: "home", name: "Home", root: withKids(el({ id: "h", type: "heading", tagName: "h2", content: "Hi" })) })];
+    expect(detectContentIssues(pages)).toEqual([
+      expect.objectContaining({
+        kind: "missing-h1", type: "warning", pageId: "home", elementId: "root",
+        message: "Page has no H1 heading", location: "Home",
+      }),
+    ]);
+  });
+
+  it("is satisfied by an h1 element anywhere on the page, or one inside rich text", () => {
+    const nested = withKids(el({ id: "s", children: [el({ id: "h", type: "heading", tagName: "H1", content: "Hi" })] }));
+    const rich = withKids(el({ id: "t", type: "text", tagName: "div", content: "<h1>Hi</h1><p>x</p>" }));
+    expect(detectContentIssues([page({ id: "a", root: nested }), page({ id: "b", root: rich })])).toEqual([]);
+  });
+
+  it("says nothing about an empty page — 'Empty pages' already does", () => {
+    expect(detectContentIssues([page({ id: "home", root: el({ id: "root", children: [] }) })])).toEqual([]);
   });
 });
 

@@ -260,12 +260,12 @@ describe("AdvancedScreen — body scripts validate on the same rules", () => {
     );
   });
 
-  it("warns that an inline script will not reach the published page", () => {
+  it("says an inline script runs on the published site, not in the editor or Preview (REA #27)", () => {
     setup();
     fireEvent.change(bodyBox(), { target: { value: "<script>track()</script>" } });
     advance(500);
     expect(document.getElementById("body-validation-feedback")?.textContent).toMatch(
-      /Inline <script> is removed when the site is published/
+      /Inline <script> runs on the published site and in the ZIP export — not in the editor or Preview/
     );
   });
 

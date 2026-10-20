@@ -358,7 +358,15 @@ export class StyleEngine {
    * Generate CSS with proper media query ordering for export
    * Desktop-first: base styles, then tablet, then mobile
    */
-  generateResponsiveCSS(options?: ExportOptions & { target?: CascadeTarget }): string {
+  generateResponsiveCSS(
+    options?: ExportOptions & {
+      target?: CascadeTarget;
+      /** Which rules to write, by selector — all when omitted. The publish
+       *  export passes one to leave out rules for elements that are not on
+       *  the page (or not on the site at all). */
+      keep?: (selector: string) => boolean;
+    },
+  ): string {
     const opts = {
       minify: false,
       ...options,
@@ -374,6 +382,7 @@ export class StyleEngine {
     const mobileQuery = getBreakpointQuery("mobile");
 
     this.writableRules().forEach((style) => {
+      if (opts.keep && !opts.keep(style.selector)) return;
       const css = this.generateStyleRule(style);
 
       if (!style.mediaQuery) {

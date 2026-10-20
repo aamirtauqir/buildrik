@@ -3,10 +3,12 @@
  * `<link rel="canonical">`, og:url and sitemap `<loc>` on the server
  * (lib/publish-files.ts, lib/publish-urls.ts), and the editor's Google preview.
  *
- * Paths are the files the export writes (`index.html`, `about.html`,
- * `blog/post.html`), because that is what the deploy serves today: the
- * generated vercel.json carries no `cleanUrls`. When the cleanUrls ticket
- * lands, this function changes and every output moves with it.
+ * Paths come in as the files the export writes (`index.html`, `about.html`,
+ * `blog/post/index.html`) and go out as the clean URL the deploy serves for
+ * them: the generated vercel.json sets `cleanUrls` (REA #26, SEO plan Q3),
+ * under which Vercel serves `about.html` at `/about` and 308-redirects the
+ * `.html` form — a canonical, og:url or sitemap entry must never name a
+ * redirect.
  */
 
 /** Normalize a user-typed domain: add https:// if absent, drop a trailing slash. */
@@ -58,6 +60,17 @@ export function siteOrigin(
 }
 
 /**
+ * The root-relative URL the deploy serves an exported file at: `index.html` →
+ * `/`, `about.html` → `/about`, `blog/post/index.html` → `/blog/post`. Also
+ * what the publish export writes for internal links, so a click never takes
+ * the `.html` redirect.
+ */
+export function publicPagePath(path: string): string {
+  const file = path.replace(/^\/+/, "");
+  return `/${file.replace(/(?:^|\/)index\.html$/, "").replace(/\.html$/, "")}`;
+}
+
+/**
  * The canonical URL for one exported page, or null when no domain is set.
  * `index.html` is the site root, so it canonicalizes to the bare origin.
  */
@@ -65,7 +78,5 @@ export function pageCanonicalUrl(domain: string | null, path: string): string | 
   if (!domain) return null;
   const base = normalizeCanonicalOrigin(domain);
   if (!base) return null;
-  const clean = path.replace(/^\/+/, "");
-  if (clean === "index.html" || clean === "") return `${base}/`;
-  return `${base}/${clean}`;
+  return `${base}${publicPagePath(path)}`;
 }

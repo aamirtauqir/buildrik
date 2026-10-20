@@ -41,7 +41,7 @@ export interface ContentPage {
 }
 
 export type ContentIssueSeverity = "error" | "warning";
-export type ContentIssueKind = "missing-alt" | "missing-image" | "broken-link";
+export type ContentIssueKind = "missing-alt" | "missing-image" | "broken-link" | "missing-h1";
 
 export interface ContentIssueFinding {
   id: string;
@@ -132,8 +132,9 @@ function checkImage(el: ContentElement, pageId: string, pageName: string): Conte
 const PLACEHOLDER_ALT = "Image";
 
 /**
- * No file: an image with no (or a blank) `src` renders and ships as a broken
- * `<img>` (L1-016 / L1-035). A warning, like missing alt — it degrades the
+ * No file: an image with no (or a blank) `src` renders as a placeholder on the
+ * canvas and is left out of the published page (L1-016 / L1-035; REA #23,
+ * `finishPageImages`). A warning, like missing alt — it degrades the
  * page, it does not stop the deploy.
  */
 function checkImageSource(el: ContentElement, pageId: string, pageName: string): ContentIssueFinding | null {
@@ -227,6 +228,31 @@ function walkPage(
   if (Array.isArray(root.children)) root.children.forEach((child) => walkPage(child, pageId, pageName, pageIds, out));
 }
 
+const hasH1 = (el: ContentElement): boolean =>
+  el.tagName?.toLowerCase() === "h1" ||
+  /<h1\b/i.test(el.content ?? "") ||
+  (Array.isArray(el.children) && el.children.some(hasH1));
+
+/**
+ * No H1 (REA #28): the Heading block defaults to `<h2>`, so a page built from
+ * blocks ships without the one heading that names it unless the user changes
+ * a heading's level. Page-level — the finding points at the page root. An
+ * empty page is left to the "Empty pages" check. A warning: SEO never blocks
+ * a publish (SEO plan Q8).
+ */
+function checkPageH1(root: ContentElement | undefined, pageId: string, pageName: string): ContentIssueFinding | null {
+  if (!root || !Array.isArray(root.children) || root.children.length === 0 || hasH1(root)) return null;
+  return {
+    id: `content:no-h1:${pageId}`,
+    type: "warning",
+    kind: "missing-h1",
+    message: "Page has no H1 heading",
+    location: pageName,
+    elementId: root.id,
+    pageId,
+  };
+}
+
 /**
  * Scan every page for content issues. "This page" vs "Whole site" scoping is
  * the existing `issueAppliesToPage` filter in the Issues panel — every
@@ -243,6 +269,8 @@ export function detectContentIssues(
   const pageIds = new Set(existingPageIds);
   for (const page of pages) {
     walkPage(page.root, page.id, page.name, pageIds, out);
+    const noH1 = checkPageH1(page.root, page.id, page.name);
+    if (noH1) out.push(noH1);
   }
   return out;
 }
@@ -262,4 +290,5 @@ export const CONTENT_CHECK_LABELS: Record<ContentIssueKind, string> = {
   "missing-alt": "Image alt text",
   "missing-image": "Images",
   "broken-link": "Links",
+  "missing-h1": "Headings",
 };

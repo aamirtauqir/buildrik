@@ -8,7 +8,7 @@
  * downloaded site had every accordion panel open and a contact form that
  * submitted the visitor's details as a GET query string (REA audit R4 P0 #5).
  *
- * Two jobs, per page:
+ * Three jobs, per page:
  *   1. Forms — every form without an action is pointed at the public
  *      submissions endpoint (when the site is known) and always sent as
  *      urlencoded POST, never GET.
@@ -16,6 +16,8 @@
  *      that widget, and only once. Every runtime is one import-free function,
  *      also run directly by the canvas, serialized here with
  *      `Function.prototype.toString()`.
+ *   3. The site's inline custom-code scripts, carried inert by the export,
+ *      are made runnable (`activateCustomCode`).
  *
  * Keep this file free of `@/` imports: the dashboard imports it through
  * `@buildrik/editor/src/...`, where `@/` resolves to the dashboard first.
@@ -229,6 +231,33 @@ export function injectPageRuntimes(html: string): string {
 }
 
 // =============================================================================
+// SITE CUSTOM CODE
+// =============================================================================
+
+/** Marks an inline script from the site's custom code that the export kept
+ *  inert (`type="text/plain"`, `sanitizeHeadCode`'s `inertInlineScripts`);
+ *  its value is the type the script was written with. */
+export const CUSTOM_CODE_ATTR = "data-buildrick-custom-code";
+
+const INERT_SCRIPT = new RegExp(`<script\\b([^>]*?)\\s${CUSTOM_CODE_ATTR}="([^"]*)"([^>]*)>`, "gi");
+
+/**
+ * REA #27: the site's inline head/body scripts (chat widgets, analytics
+ * snippets) run on the shipped site. The export's pages carry them inert,
+ * because that same HTML is rendered inside the app (Review, Compare, the
+ * share preview); only this step — the shipped site — gives each back the
+ * type it was written with (none, for plain JavaScript), in place, so their
+ * order is kept.
+ */
+function activateCustomCode(html: string): string {
+  if (!html.includes(CUSTOM_CODE_ATTR)) return html;
+  return html.replace(INERT_SCRIPT, (_tag, before: string, type: string, after: string) => {
+    const rest = `${before}${after}`.replace(/\stype="text\/plain"/i, "");
+    return `<script${type ? ` type="${escapeAttr(type)}"` : ""}${rest}>`;
+  });
+}
+
+// =============================================================================
 // THE STEP
 // =============================================================================
 
@@ -237,7 +266,8 @@ export interface ShippedPage {
   html: string;
 }
 
-/** Forms, then runtimes, on every page — what Publish deploys and the ZIP holds. */
+/** Forms, then runtimes, then the site's own inline scripts, on every page —
+ *  what Publish deploys and the ZIP holds. */
 export function postProcessPages<P extends ShippedPage>(
   pages: P[],
   opts: { formTarget: FormTarget | null; formSettings?: Record<string, FormBlockWireSettings> },
@@ -246,7 +276,7 @@ export function postProcessPages<P extends ShippedPage>(
   const out = pages.map((page) => {
     const r = wireForms(page.html, { target: opts.formTarget, path: page.path }, opts.formSettings);
     forms.push(...r.forms);
-    return { ...page, html: injectPageRuntimes(r.html) };
+    return { ...page, html: activateCustomCode(injectPageRuntimes(r.html)) };
   });
   return { pages: out, forms };
 }

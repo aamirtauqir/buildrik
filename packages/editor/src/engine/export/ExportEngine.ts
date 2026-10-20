@@ -9,6 +9,7 @@ import { escapeStyleText, isSafeElementId } from "@buildrik/shared/schemas/eleme
 import { DarkModeSchema } from "@buildrik/shared/schemas/design-tokens";
 import type { PageData } from "@/shared/types";
 import { isPageLive, pageFileNames, resolveHomePageId } from "./pageFiles";
+import { elementIdsInSelector } from "@/shared/utils/elementSelector";
 import type {
   ExportConfig,
   ExportResult,
@@ -26,6 +27,8 @@ import { generateAnalyticsScripts } from "./AnalyticsInjector";
 import { AssetBundler } from "./AssetBundler";
 import {
   RESET_CSS,
+  IMG_HEIGHT_CSS,
+  finishPageImages,
   siteFontCSS,
   siteFontFaceCSS,
   emitSiteTokenCss,
@@ -46,6 +49,7 @@ import { FormspreeInjector } from "./FormspreeInjector";
 import { SEOInjector, resolveLanguage } from "./SEOInjector";
 import { sanitizeHeadCode } from "./sanitizeHeadCode";
 import { buildRobotsTxt, buildSitemapXml } from "@buildrik/shared/seo/sitemap";
+import { publicPagePath } from "@buildrik/shared/seo/urls";
 import { postProcessPages, type FormTarget } from "./publishPostProcess";
 import { ReactExporter } from "./ReactExporter";
 import { generateStripeScripts } from "./StripeInjector";
@@ -79,7 +83,8 @@ export interface MultiPageExportOptions {
   cmsMode?: CMSExportMode;
   /** Template syntax for 'template' mode */
   cmsSyntax?: "handlebars" | "liquid";
-  /** Internal page links as root-absolute paths (`/about.html`) instead of
+  /** Internal page links as root-absolute clean paths (`/about`, served under
+   *  vercel.json cleanUrls — REA #26) instead of
    *  file-relative ones (`about.html`). The publish payload needs them: a
    *  collection's record pages are generated at `<slug>/index.html`
    *  (cms.service `generateDynamicPages`) from the template page's HTML, and
@@ -87,6 +92,12 @@ export interface MultiPageExportOptions {
    *  The ZIP keeps relative links — it is opened from disk, where `/` is the
    *  filesystem root, and holds no record pages. */
   rootAbsoluteHrefs?: boolean;
+  /** Each page carries its own CSS in a <style> — the shared CSS plus only
+   *  its own elements' rules — and no styles.css is written. The publish
+   *  payload needs it: it carries pages only, so a linked stylesheet never
+   *  reaches the deploy, and inlining the whole site's CSS put every other
+   *  page's rules on each page (REA #25). The ZIP keeps the shared file. */
+  inlineStyles?: boolean;
 }
 
 /**
@@ -137,10 +148,14 @@ function readLiveNode(el: LiveElement): LinkNodeView<LiveElement> {
   };
 }
 
+/** The tag a saved node renders as — a stored "div" defers to its type. */
+const nodeTag = (n: PageData["root"]): string =>
+  n.tagName && n.tagName !== "div" ? n.tagName : getDefaultTagName(n.type);
+
 /** blockLinkPlan's view of a saved page node (publish writer). */
 function readPageNode(el: PageData["root"]): LinkNodeView<PageData["root"]> {
   return {
-    tag: el.tagName && el.tagName !== "div" ? el.tagName : getDefaultTagName(el.type),
+    tag: nodeTag(el),
     href: el.attributes?.href,
     children: el.children ?? [],
   };
@@ -173,6 +188,48 @@ function choiceLabelText(parts: Array<{ tag: string; content: string; format?: "
   return text || undefined;
 }
 
+/** Whether a page tree holds an image — the IMG_HEIGHT_CSS rule ships only then. */
+function treeHasImage(el: PageData["root"] | undefined): boolean {
+  if (!el) return false;
+  if (el.type === "image" || el.tagName === "img" || (el.content ?? "").includes("<img")) return true;
+  return (el.children ?? []).some(treeHasImage);
+}
+
+/** A control a label can name: inputs a visitor fills in, never a button. */
+function isLabelableField(n: PageData["root"]): boolean {
+  const tag = nodeTag(n);
+  if (tag === "textarea" || tag === "select") return true;
+  return tag === "input" && !/^(hidden|submit|button|reset|image)$/i.test(n.attributes?.type ?? "");
+}
+
+const holdsField = (n: PageData["root"]): boolean =>
+  (n.children ?? []).some((c) => isLabelableField(c) || holdsField(c));
+
+/**
+ * REA #24: the attributes that tie each label to its field on one page —
+ * `for` on a label, `id` on a field that has none of its own (its element id,
+ * already unique on the page). A label is matched to the next field among its
+ * siblings, stopping at the next label; one that wraps its field, or already
+ * has a `for`, is associated already and is left alone. Element-id keyed.
+ */
+function labelLinks(root: PageData["root"] | undefined): Map<string, Record<string, string>> {
+  const links = new Map<string, Record<string, string>>();
+  const walk = (el: PageData["root"]): void => {
+    const kids = el.children ?? [];
+    kids.forEach((kid, i) => {
+      if (nodeTag(kid) !== "label" || kid.attributes?.for || holdsField(kid)) return;
+      const next = kids.slice(i + 1).find((k) => nodeTag(k) === "label" || isLabelableField(k));
+      if (!next || nodeTag(next) === "label") return;
+      const fieldId = next.attributes?.id || next.id;
+      links.set(kid.id, { ...links.get(kid.id), for: fieldId });
+      if (!next.attributes?.id) links.set(next.id, { ...links.get(next.id), id: fieldId });
+    });
+    kids.forEach(walk);
+  };
+  if (root) walk(root);
+  return links;
+}
+
 /** A URL that exists only in the browser session that created it. */
 const isSessionUrl = (value: string): boolean => /(^|[\s,])blob:/i.test(value);
 
@@ -187,8 +244,10 @@ export class ExportEngine {
    * scheme. Built per export because it depends on the page set being written.
    */
   private pageHrefs = new Map<string, string>();
-  /** "/" while a publish export runs (`rootAbsoluteHrefs`), "" otherwise. */
-  private pageHrefPrefix = "";
+  /** Set while a publish export runs (`rootAbsoluteHrefs`). */
+  private rootAbsoluteHrefs = false;
+  /** Label ↔ field attributes for the page being written (`labelLinks`). */
+  private pageLabelLinks = new Map<string, Record<string, string>>();
 
   constructor(composer: Composer, config?: Partial<ExportConfig>) {
     this.composer = composer;
@@ -245,7 +304,7 @@ export class ExportEngine {
     this.buildPageHrefs(
       this.composer.elements.exportPages?.() ?? this.composer.elements.getAllPages?.() ?? []
     );
-    this.pageHrefPrefix = "";
+    this.rootAbsoluteHrefs = false;
     const page = this.composer.elements.getActivePage?.();
     if (!page) return this.wrapInDocument("", cfg);
 
@@ -559,6 +618,69 @@ export class ExportEngine {
   }
 
   /**
+   * The published CSS for `scope` — every page (the shared stylesheet) or one
+   * page (its inline <style>).
+   */
+  private publishCss(scope: PageData[], minify: boolean): string {
+    // CSS = class-based base styles FIRST, then StyleEngine breakpoint overrides.
+    // Order matters: base + breakpoint rules share specificity (0,0,1,0), so the
+    // @media override must come later to win at its viewport (H1 cascade fix).
+    const baseCss = this.buildPublishBaseCss(scope, minify);
+    /* REA #25: a StyleEngine rule that names elements ships only with a page
+       that has one of them — so a deleted element's rules ship nowhere, and a
+       page carries no other page's. A rule naming no element (a class, a tag)
+       is site-wide and always ships. */
+    const ids = new Set<string>();
+    const collect = (el: PageData["root"] | undefined): void => {
+      if (!el) return;
+      ids.add(el.id);
+      (el.children ?? []).forEach(collect);
+    };
+    scope.forEach((p) => collect(p.root));
+    const keep = (selector: string) => {
+      const named = elementIdsInSelector(selector);
+      return named.length === 0 || named.some((id) => ids.has(id));
+    };
+    const responsiveCss =
+      this.composer.styles?.generateResponsiveCSS?.({ minify, keep }) ??
+      this.generateCSS({ ...this.config, minify });
+    /* The site's own font rules. `generateCSS` emits these for the single file;
+       this path emitted the LINKS that fetch the families and no rule that
+       uses them, so a published page requested Verdana and rendered in
+       whatever the reset named. Found by the whole-page test, which exists to
+       catch exactly this — it was the ninth thing a publish dropped in one
+       day. */
+    const projectSettings = this.composer.getProjectSettings?.();
+    const siteCss =
+      emitSiteTokenCss(projectSettings, { ...this.brandSwitch(), hasThemeToggle: this.themeToggleState().has }) +
+      siteFontCSS(siteFontsFromSettings(projectSettings, this.brandSwitch()));
+
+    /* The reset leads, as in `generateCSS`: it carries the base body font
+       (THEME.fontFamily — what the canvas renders unstyled text in) and the
+       box-sizing/margin rules the canvas was designed under. This path never
+       emitted it, so every published page with no Brand body font rendered in
+       the browser's default SERIF, and the font links below had no base family
+       to fetch. The site's own font rules come after it, so they still win. */
+    const fullReset = scope.some((p) => treeHasImage(p.root)) ? RESET_CSS + IMG_HEIGHT_CSS : RESET_CSS;
+    const reset = minify ? fullReset.replace(/\s+/g, " ") : fullReset;
+    let css = [reset, baseCss, responsiveCss, siteCss].filter(Boolean).join(minify ? "" : "\n\n");
+
+    /* …and the @keyframes those styles reference. `generateCSS` has emitted
+       them since the single-file export was found shipping `animation:
+       bd-anim-fadeIn` with no keyframe behind it; this path never did, so the
+       animation worked in a downloaded file and silently no-opped on the
+       PUBLISHED site — the direction that actually reaches visitors. */
+    const publishKeyframes = collectUsedKeyframes(css);
+    if (publishKeyframes) css += (minify ? "" : "\n") + publishKeyframes;
+
+    /* …and the faces the site's ADDED fonts provide, at the top of the one
+       stylesheet every page links — once, before any rule on any page that
+       names them. Same reader as the single file; `generateCSS` above is a
+       different assembly, so it has its own call. */
+    return this.withSiteFontFaces(css, minify);
+  }
+
+  /**
    * Wrap content in full HTML document
    */
   private wrapInDocument(content: string, config: ExportConfig, css?: string): string {
@@ -787,46 +909,10 @@ export class ExportEngine {
         : allPages.filter((p) => p.id === resolveHomePageId(allPages));
     const files: MultiPageExportFile[] = [];
 
-    // CSS = class-based base styles FIRST, then StyleEngine breakpoint overrides.
-    // Order matters: base + breakpoint rules share specificity (0,0,1,0), so the
-    // @media override must come later to win at its viewport (H1 cascade fix).
-    const baseCss = this.buildPublishBaseCss(pages, !!options.minify);
-    const responsiveCss =
-      this.composer.styles?.generateResponsiveCSS?.({ minify: options.minify }) ??
-      this.generateCSS({ ...this.config, minify: options.minify });
-    /* The site's own font rules. `generateCSS` emits these for the single file;
-       this path emitted the LINKS that fetch the families and no rule that
-       uses them, so a published page requested Verdana and rendered in
-       whatever the reset named. Found by the whole-page test, which exists to
-       catch exactly this — it was the ninth thing a publish dropped in one
-       day. */
-    const projectSettings = this.composer.getProjectSettings?.();
-    const siteCss =
-      emitSiteTokenCss(projectSettings, { ...this.brandSwitch(), hasThemeToggle: this.themeToggleState().has }) +
-      siteFontCSS(siteFontsFromSettings(projectSettings, this.brandSwitch()));
-
-    /* The reset leads, as in `generateCSS`: it carries the base body font
-       (THEME.fontFamily — what the canvas renders unstyled text in) and the
-       box-sizing/margin rules the canvas was designed under. This path never
-       emitted it, so every published page with no Brand body font rendered in
-       the browser's default SERIF, and the font links below had no base family
-       to fetch. The site's own font rules come after it, so they still win. */
-    const reset = options.minify ? RESET_CSS.replace(/\s+/g, " ") : RESET_CSS;
-    let css = [reset, baseCss, responsiveCss, siteCss].filter(Boolean).join(options.minify ? "" : "\n\n");
-
-    /* …and the @keyframes those styles reference. `generateCSS` has emitted
-       them since the single-file export was found shipping `animation:
-       bd-anim-fadeIn` with no keyframe behind it; this path never did, so the
-       animation worked in a downloaded file and silently no-opped on the
-       PUBLISHED site — the direction that actually reaches visitors. */
-    const publishKeyframes = collectUsedKeyframes(css);
-    if (publishKeyframes) css += (options.minify ? "" : "\n") + publishKeyframes;
-
-    /* …and the faces the site's ADDED fonts provide, at the top of the one
-       stylesheet every page links — once, before any rule on any page that
-       names them. Same reader as the single file; `generateCSS` above is a
-       different assembly, so it has its own call. */
-    css = this.withSiteFontFaces(css, !!options.minify);
+    /* One shared stylesheet (the ZIP's styles.css), or — `inlineStyles`, the
+       publish payload — each page's own CSS inline (REA #25). */
+    const minify = !!options.minify;
+    const css = options.inlineStyles ? "" : this.publishCss(pages, minify);
 
     /* CMS export options. The default was "none", and nothing set it: publish
        calls exportAllPages({format,minify}) and the ZIP path does the same, so
@@ -840,18 +926,24 @@ export class ExportEngine {
     };
 
     this.buildPageHrefs(pages);
-    this.pageHrefPrefix = options.rootAbsoluteHrefs ? "/" : "";
+    this.rootAbsoluteHrefs = !!options.rootAbsoluteHrefs;
+
+    // The media library's intrinsic sizes, by file URL (finishPageImages).
+    const sizes = new Map((this.composer.media?.getAssets?.() ?? []).map((a) => [a.src, a]));
+    const imageSize = (src: string) => sizes.get(src);
 
     // Export each page
     for (const page of pages) {
-      let html = this.exportPageToHtml(page, css);
+      let html = options.inlineStyles
+        ? this.exportPageToHtml(page, this.publishCss([page], minify), "inline")
+        : this.exportPageToHtml(page, css, "link");
       const fileName = this.pageHrefs.get(page.id) ?? "index.html";
 
       // Apply CMS resolution if mode is not 'none'
       if (cmsOptions.mode !== "none") {
         html = await this.cmsResolver.resolve(html, { ...cmsOptions, pageFile: fileName });
       }
-
+      html = finishPageImages(html, imageSize);
 
       files.push({
         name: fileName,
@@ -874,7 +966,7 @@ export class ExportEngine {
       });
     }
 
-    // Add shared CSS if not empty
+    // Add shared CSS if not empty (none when each page carries its own)
     if (css) {
       files.push({
         name: "styles.css",
@@ -930,13 +1022,17 @@ export class ExportEngine {
 
   private resolveHref(href: string): string {
     if (!href.startsWith("#page:")) return href;
-    return this.pageHrefPrefix + (this.pageHrefs.get(href.slice("#page:".length)) ?? "index.html");
+    const file = this.pageHrefs.get(href.slice("#page:".length)) ?? "index.html";
+    /* The publish payload links by the clean URL the deploy serves
+       (vercel.json cleanUrls, REA #26); the ZIP, opened from disk, by file. */
+    return this.rootAbsoluteHrefs ? publicPagePath(file) : file;
   }
 
-  private exportPageToHtml(page: PageData, css: string): string {
+  private exportPageToHtml(page: PageData, css: string, cssMode: "link" | "inline"): string {
     // Build body content from root element
     let bodyContent = "";
     if (page.root) {
+      this.pageLabelLinks = labelLinks(page.root);
       bodyContent = this.renderPageElement(page.root);
     }
 
@@ -958,7 +1054,9 @@ export class ExportEngine {
     }
 
     if (css) {
-      headParts.push('  <link rel="stylesheet" href="styles.css">');
+      headParts.push(
+        cssMode === "inline" ? `  <style>${escapeStyleText(css)}</style>` : '  <link rel="stylesheet" href="styles.css">',
+      );
     }
 
     // Same reason as generateHTML: a named family that is never fetched is the
@@ -983,7 +1081,7 @@ export class ExportEngine {
 
     // The site's head scripts, on every published page — see the note in
     // wrapInDocument. Sanitised by the same allowlist as the per-page field.
-    const siteHeadScripts = sanitizeHeadCode(siteCustomCode?.headScripts);
+    const siteHeadScripts = sanitizeHeadCode(siteCustomCode?.headScripts, { inertInlineScripts: true });
     if (siteHeadScripts) headParts.push(`  ${siteHeadScripts}`);
 
     // …and the site's analytics, which the published page never carried: the
@@ -1001,13 +1099,15 @@ export class ExportEngine {
     const themeToggleScript =
       toggle.auto && bodyContent.includes(THEME_TOGGLE_ATTR) ? "\n" + buildThemeToggleRuntimeScript() : "";
 
+    // Inline scripts in the site's code ship inert; see sanitizeHeadCode.
+    const siteBodyScripts = sanitizeHeadCode(siteCustomCode?.bodyScripts, { inertInlineScripts: true });
     let html = `<!DOCTYPE html>
 <html lang="${resolveLanguage(siteSEO)}">
 <head>
 ${headParts.join("\n")}
 </head>
 <body>
-${bodyContent}${interactionScript}${themeToggleScript}${sanitizeHeadCode(siteCustomCode?.bodyScripts) ? `\n  ${sanitizeHeadCode(siteCustomCode?.bodyScripts)}` : ""}
+${bodyContent}${interactionScript}${themeToggleScript}${siteBodyScripts ? `\n  ${siteBodyScripts}` : ""}
 </body>
 </html>`;
 
@@ -1115,10 +1215,7 @@ ${bodyContent}${interactionScript}${themeToggleScript}${sanitizeHeadCode(siteCus
     if (!element) return "";
 
     // Same rule as the live-element writer: a stored "div" defers to the type.
-    const tag =
-      element.tagName && element.tagName !== "div"
-        ? element.tagName
-        : getDefaultTagName(element.type);
+    const tag = nodeTag(element);
     const indentStr = "  ".repeat(indent);
     const children = element.children ?? [];
     const content = element.content ?? "";
@@ -1197,6 +1294,9 @@ ${bodyContent}${interactionScript}${themeToggleScript}${sanitizeHeadCode(siteCus
 
     const choiceValue = choiceDefaultValue(tag, element.attributes, choiceLabel);
     if (choiceValue) attrParts.push(`value="${escapeHTML(choiceValue)}"`);
+    for (const [key, value] of Object.entries(this.pageLabelLinks.get(element.id) ?? {})) {
+      attrParts.push(`${key}="${escapeHTML(value)}"`);
+    }
 
     // Interactions live on element.data.interactions, NOT element.attributes
     // (toJSON serializes raw data.attributes; the computed interactions attr is
