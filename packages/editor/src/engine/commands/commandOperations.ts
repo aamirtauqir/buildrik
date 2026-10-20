@@ -8,7 +8,7 @@
 
 import { snapToGrid } from "@/shared/utils/dragDrop";
 import { EVENTS } from "@/shared/constants/events";
-import { isValidBreakpoint } from "@/shared/constants/breakpoints";
+import { BREAKPOINT_ORDER, isValidBreakpoint } from "@/shared/constants/breakpoints";
 import type { BreakpointId } from "@/shared/types/breakpoints";
 import type { Composer } from "../Composer";
 import type { Element } from "../elements/Element";
@@ -248,17 +248,22 @@ export function activeBreakpoint(composer: Pick<Composer, "device">): Breakpoint
 }
 
 /**
- * The element's styles as they apply at `breakpoint`: the base, with that
- * breakpoint's override on top. The read side of setStyleAt.
+ * The element's styles as they apply at `breakpoint`: the base, then every
+ * override down to that breakpoint, desktop-first (mobile = desktop → tablet
+ * → mobile, as the exported media queries cascade). The read side of
+ * setStyleAt. Mobile used to skip the tablet layer.
  */
 export function stylesAt(
   composer: Pick<Composer, "styles"> | null | undefined,
   el: Element,
   breakpoint: BreakpointId,
 ): Record<string, string> {
-  const base = { ...(el.getStyles?.() || {}) };
-  if (breakpoint === "desktop" || !composer?.styles) return base;
-  return { ...base, ...composer.styles.getBreakpointStyle(el.getId(), breakpoint) };
+  const out = { ...(el.getStyles?.() || {}) };
+  if (breakpoint === "desktop" || !composer?.styles) return out;
+  for (const bp of BREAKPOINT_ORDER.slice(1, BREAKPOINT_ORDER.indexOf(breakpoint) + 1)) {
+    Object.assign(out, composer.styles.getBreakpointStyle(el.getId(), bp));
+  }
+  return out;
 }
 
 /**

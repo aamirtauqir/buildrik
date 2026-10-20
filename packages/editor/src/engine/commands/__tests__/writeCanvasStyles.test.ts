@@ -92,6 +92,18 @@ describe("writeCanvasStyles", () => {
   });
 });
 
+describe("stylesAt cascade", () => {
+  it("Mobile inherits desktop → tablet → mobile", () => {
+    const c = load();
+    c.styles.setBreakpointStyle("box", "tablet", { width: "300px", color: "blue" });
+    c.styles.setBreakpointStyle("box", "mobile", { color: "red" });
+    const mobile = stylesAt(c, box(c), "mobile");
+    expect(mobile.width).toBe("300px");
+    expect(mobile.color).toBe("red");
+    expect(mobile.position).toBe("absolute");
+  });
+});
+
 describe("pasteStyles at the active breakpoint", () => {
   it("pasting on Tablet writes the tablet override and leaves Desktop alone", () => {
     const c = load();
