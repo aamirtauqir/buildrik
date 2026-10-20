@@ -311,7 +311,7 @@ export function writeCanvasStyles(
  * target. The ⋯ and canvas menu used `setStyles`, which replaced the whole
  * style map and wiped those properties, while ⌥⌘V merged — three doors, two
  * results. One transaction, so one undo takes the paste back. A locked
- * element is refused (P-1).
+ * element is refused (P-1). Written at the active breakpoint (setStyleAt).
  *
  * Returns how many properties were applied (0 when nothing was).
  */
@@ -319,8 +319,11 @@ export function pasteStyles(composer: Composer, element: Element): number {
   const clipboard = composer.styleClipboard;
   const keys = clipboard ? Object.keys(clipboard) : [];
   if (!clipboard || keys.length === 0) return 0;
+  /* At the active breakpoint, like every other style write: pasting on
+     Tablet used to write the base styles, changing Desktop. */
+  const breakpoint = activeBreakpoint(composer);
   const ran = writeElement(composer, element, "paste-styles", (el) => {
-    for (const key of keys) el.setStyle(key, clipboard[key]);
+    for (const key of keys) setStyleAt(composer, el, breakpoint, key, clipboard[key]);
   });
   return ran ? keys.length : 0;
 }
