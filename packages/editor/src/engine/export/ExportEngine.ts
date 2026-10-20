@@ -139,10 +139,14 @@ function readLiveNode(el: LiveElement): LinkNodeView<LiveElement> {
   };
 }
 
+/** The tag a saved node renders as — a stored "div" defers to its type. */
+const nodeTag = (n: PageData["root"]): string =>
+  n.tagName && n.tagName !== "div" ? n.tagName : getDefaultTagName(n.type);
+
 /** blockLinkPlan's view of a saved page node (publish writer). */
 function readPageNode(el: PageData["root"]): LinkNodeView<PageData["root"]> {
   return {
-    tag: el.tagName && el.tagName !== "div" ? el.tagName : getDefaultTagName(el.type),
+    tag: nodeTag(el),
     href: el.attributes?.href,
     children: el.children ?? [],
   };
@@ -182,6 +186,41 @@ function treeHasImage(el: PageData["root"] | undefined): boolean {
   return (el.children ?? []).some(treeHasImage);
 }
 
+/** A control a label can name: inputs a visitor fills in, never a button. */
+function isLabelableField(n: PageData["root"]): boolean {
+  const tag = nodeTag(n);
+  if (tag === "textarea" || tag === "select") return true;
+  return tag === "input" && !/^(hidden|submit|button|reset|image)$/i.test(n.attributes?.type ?? "");
+}
+
+const holdsField = (n: PageData["root"]): boolean =>
+  (n.children ?? []).some((c) => isLabelableField(c) || holdsField(c));
+
+/**
+ * REA #24: the attributes that tie each label to its field on one page —
+ * `for` on a label, `id` on a field that has none of its own (its element id,
+ * already unique on the page). A label is matched to the next field among its
+ * siblings, stopping at the next label; one that wraps its field, or already
+ * has a `for`, is associated already and is left alone. Element-id keyed.
+ */
+function labelLinks(root: PageData["root"] | undefined): Map<string, Record<string, string>> {
+  const links = new Map<string, Record<string, string>>();
+  const walk = (el: PageData["root"]): void => {
+    const kids = el.children ?? [];
+    kids.forEach((kid, i) => {
+      if (nodeTag(kid) !== "label" || kid.attributes?.for || holdsField(kid)) return;
+      const next = kids.slice(i + 1).find((k) => nodeTag(k) === "label" || isLabelableField(k));
+      if (!next || nodeTag(next) === "label") return;
+      const fieldId = next.attributes?.id || next.id;
+      links.set(kid.id, { ...links.get(kid.id), for: fieldId });
+      if (!next.attributes?.id) links.set(next.id, { ...links.get(next.id), id: fieldId });
+    });
+    kids.forEach(walk);
+  };
+  if (root) walk(root);
+  return links;
+}
+
 /** A URL that exists only in the browser session that created it. */
 const isSessionUrl = (value: string): boolean => /(^|[\s,])blob:/i.test(value);
 
@@ -198,6 +237,8 @@ export class ExportEngine {
   private pageHrefs = new Map<string, string>();
   /** "/" while a publish export runs (`rootAbsoluteHrefs`), "" otherwise. */
   private pageHrefPrefix = "";
+  /** Label ↔ field attributes for the page being written (`labelLinks`). */
+  private pageLabelLinks = new Map<string, Record<string, string>>();
 
   constructor(composer: Composer, config?: Partial<ExportConfig>) {
     this.composer = composer;
@@ -951,6 +992,7 @@ export class ExportEngine {
     // Build body content from root element
     let bodyContent = "";
     if (page.root) {
+      this.pageLabelLinks = labelLinks(page.root);
       bodyContent = this.renderPageElement(page.root);
     }
 
@@ -1129,10 +1171,7 @@ ${bodyContent}${interactionScript}${themeToggleScript}${sanitizeHeadCode(siteCus
     if (!element) return "";
 
     // Same rule as the live-element writer: a stored "div" defers to the type.
-    const tag =
-      element.tagName && element.tagName !== "div"
-        ? element.tagName
-        : getDefaultTagName(element.type);
+    const tag = nodeTag(element);
     const indentStr = "  ".repeat(indent);
     const children = element.children ?? [];
     const content = element.content ?? "";
@@ -1211,6 +1250,9 @@ ${bodyContent}${interactionScript}${themeToggleScript}${sanitizeHeadCode(siteCus
 
     const choiceValue = choiceDefaultValue(tag, element.attributes, choiceLabel);
     if (choiceValue) attrParts.push(`value="${escapeHTML(choiceValue)}"`);
+    for (const [key, value] of Object.entries(this.pageLabelLinks.get(element.id) ?? {})) {
+      attrParts.push(`${key}="${escapeHTML(value)}"`);
+    }
 
     // Interactions live on element.data.interactions, NOT element.attributes
     // (toJSON serializes raw data.attributes; the computed interactions attr is
