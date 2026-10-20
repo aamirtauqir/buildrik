@@ -19,6 +19,7 @@ import { DEFAULT_EXPORT_CONFIG } from "@/shared/types/export";
 import { collectUsedKeyframes } from "@/shared/constants/animationKeyframes";
 import { getDefaultAttributes, getDefaultTagName } from "@/shared/utils/html";
 import { CMSExportResolver } from "../cms/CMSExportResolver";
+import { elementBaseCSS, hideRulesFor } from "../styles/cascadeCSS";
 import type { CMSExportMode, CMSExportOptions } from "../cms/CMSExportResolver";
 import type { Composer } from "../Composer";
 import { generateAnalyticsScripts } from "./AnalyticsInjector";
@@ -54,7 +55,7 @@ import {
   THEME_BOOT_SCRIPT,
   THEME_TOGGLE_ATTR,
 } from "./themeToggleRuntime";
-import { classTokens, isSafeAttrValue, sanitizeHTML } from "@/shared/utils/html/sanitization";
+import { classTokens, contentToHTML, isSafeAttrValue, stripAllTags } from "@/shared/utils/html/sanitization";
 import { embedFrameHTML } from "@/shared/utils/embed/embedFrameHTML";
 
 // ============================================================================
@@ -123,27 +124,6 @@ function multiPageFileType(name: string): MultiPageExportFile["type"] {
 // EXPORT ENGINE CLASS
 // ============================================================================
 
-const HIDE_MEDIA_QUERIES: Record<string, string> = {
-  "--hide-mobile": "(max-width:767px)",
-  "--hide-tablet": "(min-width:768px) and (max-width:1023px)",
-  "--hide-desktop": "(min-width:1024px)",
-};
-
-/**
- * Per-breakpoint hide, as the media queries that actually hide something.
- *
- * The inspector's Visibility toggles write `--hide-<bp>: true` into an
- * element's styles. That is an inert custom property in a browser — the
- * publish path turns it into a media query, and the single-file export wrote
- * the property straight into the stylesheet and nothing else, so an element
- * hidden on mobile was fully visible on mobile in the exported file.
- */
-function hideRulesFor(selector: string, styles: Record<string, string>): string[] {
-  return Object.entries(HIDE_MEDIA_QUERIES)
-    .filter(([key]) => styles[key] === "true")
-    .map(([, query]) => `@media ${query}{${selector}{display:none!important}}`);
-}
-
 type LiveElement = NonNullable<ReturnType<Composer["elements"]["getElement"]>>;
 
 /** blockLinkPlan's view of a live Element (single-file writer). */
@@ -164,6 +144,36 @@ function readPageNode(el: PageData["root"]): LinkNodeView<PageData["root"]> {
     children: el.children ?? [],
   };
 }
+
+/**
+ * BK-44: what a radio or checkbox submits when it has no value of its own —
+ * the text of the label it sits in. Without a value the browser sends "on",
+ * so every answer to a three-option question was stored as "on". `null` when
+ * the input already has a value, is not a choice, or has no label text.
+ */
+function choiceDefaultValue(
+  tag: string,
+  attrs: Record<string, string> | undefined,
+  choiceLabel: string | undefined,
+): string | null {
+  if (tag !== "input" || !choiceLabel) return null;
+  if (!/^(radio|checkbox)$/i.test(attrs?.type ?? "") || attrs?.value) return null;
+  return choiceLabel;
+}
+
+/** The label text of a radio/checkbox choice: its children's text, not its input. */
+function choiceLabelText(parts: Array<{ tag: string; content: string; format?: "text" | "html" }>): string | undefined {
+  const text = parts
+    .filter((p) => p.tag !== "input")
+    .map((p) => (p.format === "text" ? p.content : stripAllTags(p.content)))
+    .join(" ")
+    .replace(/\s+/g, " ")
+    .trim();
+  return text || undefined;
+}
+
+/** A URL that exists only in the browser session that created it. */
+const isSessionUrl = (value: string): boolean => /(^|[\s,])blob:/i.test(value);
 
 export class ExportEngine {
   private composer: Composer;
@@ -371,7 +381,8 @@ export class ExportEngine {
   private elementToHTML(
     element: ReturnType<typeof this.composer.elements.getElement>,
     config: ExportConfig,
-    indent = 0
+    indent = 0,
+    choiceLabel?: string,
   ): string {
     if (!element) return "";
 
@@ -418,12 +429,17 @@ export class ExportEngine {
       const out = key === "href" ? this.resolveHref(value) : value;
       const isLinkAttr = blockLink?.isLinkAttr(key) ?? false;
       if (!isSafeAttrValue(key, out, isLinkAttr ? "a" : tag)) continue;
+      /* BK-42: a `blob:` URL lives only in the tab that made it — on a
+         published page it is a broken image for every visitor. */
+      if (isSessionUrl(out)) continue;
       if (isLinkAttr) {
         if (blockLink?.wrap) linkParts.push(`${key}="${escapeHTML(out)}"`);
         continue;
       }
       attrParts.push(`${key}="${escapeHTML(out)}"`);
     }
+    const choiceValue = choiceDefaultValue(tag, attrs, choiceLabel);
+    if (choiceValue) attrParts.push(`value="${escapeHTML(choiceValue)}"`);
     // No wrapper when the href itself was refused as unsafe — an <a> without
     // one would only restyle the section's cursor and focus order.
     const openLink =
@@ -448,16 +464,26 @@ export class ExportEngine {
     // Build children content — an embed with a valid URL renders its iframe
     // in place of its placeholder children (embedFrameHTML).
     const embedFrame = embedFrameHTML(type, attrs);
+    const childChoiceLabel =
+      type === "radio" || type === "checkbox"
+        ? choiceLabelText(
+            children.map((c) => ({
+              tag: c?.getTagName?.() ?? "",
+              content: c?.getContent?.() ?? "",
+              format: c?.getData?.().contentFormat,
+            })),
+          )
+        : undefined;
     let childContent = "";
     if (embedFrame) {
       childContent = embedFrame;
     } else {
       // Own text first, then children — the canvas renders both, in this order.
-      if (content) childContent = this.renderContent(content, contentFormat, type);
+      if (content) childContent = this.renderContent(content, contentFormat);
       if (children.length > 0) {
         childContent +=
           newline +
-          children.map((child) => this.elementToHTML(child, config, indent + 1)).join("") +
+          children.map((child) => this.elementToHTML(child, config, indent + 1, childChoiceLabel)).join("") +
           indentStr;
       }
     }
@@ -523,28 +549,12 @@ export class ExportEngine {
    */
   private buildPublishBaseCss(pages: PageData[], minify: boolean): string {
     const prefix = this.config.cssPrefix;
-    const HIDE_QUERIES = HIDE_MEDIA_QUERIES;
-    const baseRules: string[] = [];
-    const hideRules: string[] = [];
-
-    const walk = (el: PageData["root"] | undefined): void => {
-      if (!el) return;
-      const styles = el.styles;
-      if (isSafeElementId(el.id) && styles && Object.keys(styles).length > 0) {
-        const sel = `.${prefix}${el.id}`;
-        // Same defense-in-depth guard buildAttributeString applies — drop the
-        // whole rule if it carries a dangerous CSS pattern (F1 carried over).
-        if (isSafeAttrValue("style", stylesToString(styles), "")) {
-          const styleStr = stylesToCSS(styles, minify);
-          baseRules.push(minify ? `${sel}{${styleStr}}` : `${sel} {\n${styleStr}}\n`);
-        }
-        hideRules.push(...hideRulesFor(sel, styles));
-      }
-      el.children?.forEach(walk);
-    };
-    for (const page of pages) walk(page.root);
-
-    return [...baseRules, ...hideRules].join(minify ? "" : "\n");
+    return elementBaseCSS(
+      pages.map((page) => page.root),
+      (id) => `.${prefix}${id}`,
+      "media",
+      minify,
+    );
   }
 
   /**
@@ -1073,30 +1083,16 @@ ${bodyContent}${interactionScript}${themeToggleScript}${sanitizeHeadCode(siteCus
    * Render a page element to HTML string (simplified for multi-page export)
    */
   /**
-   * Emit an element's `content` for export.
-   *
-   * Plain text is escaped. That is what every hand-authored element relies on —
-   * without it a user who types `<script>` gets markup on their published site.
-   *
-   * `contentFormat: "html"` means `content` is already markup. AI site
-   * generation stores whole generated sections that way and the canvas mounts
-   * them un-escaped, so escaping them here published every AI-generated site as
-   * visible angle brackets. Those are emitted as markup — but sanitized first,
-   * because model output is untrusted input like any other. Export runs in the
-   * editor client, so DOMPurify has a real DOM here.
+   * Emit an element's `content` for export — by `contentToHTML`, the rule the
+   * canvas mounts it with, so what the canvas shows is what publishes (BK-40).
+   * Plain text (`"text"`) is escaped; anything else is markup, sanitized:
+   * a typed `<script>` never reaches a published page either way. Export runs
+   * in the editor client, so DOMPurify has a real DOM here.
    */
-  private renderContent(content: string, contentFormat?: "text" | "html", type?: string): string {
-    // A real tag (`<h1>…`), not plain text like "a < b". Template & AI page
-    // seeds store raw HTML in a container's `content` without stamping
-    // contentFormat, so an unset format on a container with tag-shaped content
-    // is treated as markup. The type gate is load-bearing: a hand-authored
-    // `text` element that literally contains `<script>` must still be escaped,
-    // never rendered — that is the safety guarantee the escape default exists for.
-    const looksLikeHtml = /<[a-z][\s\S]*>/i.test(content);
-    if (contentFormat === "html" || (contentFormat == null && type === "container" && looksLikeHtml)) {
-      return sanitizeHTML(this.withSiteVariables(content, escapeHTML));
-    }
-    return escapeHTML(this.withSiteVariables(content));
+  private renderContent(content: string, contentFormat?: "text" | "html"): string {
+    return contentFormat === "text"
+      ? contentToHTML(this.withSiteVariables(content), "text")
+      : contentToHTML(this.withSiteVariables(content, escapeHTML), contentFormat);
   }
 
   /**
@@ -1114,7 +1110,7 @@ ${bodyContent}${interactionScript}${themeToggleScript}${sanitizeHeadCode(siteCus
     );
   }
 
-  private renderPageElement(element: PageData["root"], indent = 1): string {
+  private renderPageElement(element: PageData["root"], indent = 1, choiceLabel?: string): string {
     if (!element) return "";
 
     // Same rule as the live-element writer: a stored "div" defers to the type.
@@ -1180,6 +1176,9 @@ ${bodyContent}${interactionScript}${themeToggleScript}${sanitizeHeadCode(siteCus
         const out = key === "href" ? this.resolveHref(value) : value;
         const isLinkAttr = blockLink?.isLinkAttr(key) ?? false;
         if (!isSafeAttrValue(key, out, isLinkAttr ? "a" : tag)) continue;
+        /* BK-42: a `blob:` URL lives only in the tab that made it — on a
+           published page it is a broken image for every visitor. */
+        if (isSessionUrl(out)) continue;
         if (isLinkAttr) {
           if (blockLink?.wrap) linkParts.push(`${key}="${escapeHTML(out)}"`);
           continue;
@@ -1194,6 +1193,9 @@ ${bodyContent}${interactionScript}${themeToggleScript}${sanitizeHeadCode(siteCus
         ? `<a ${linkParts.join(" ")} style="${BLOCK_LINK_STYLE}">`
         : "";
     const closeLink = openLink ? "</a>" : "";
+
+    const choiceValue = choiceDefaultValue(tag, element.attributes, choiceLabel);
+    if (choiceValue) attrParts.push(`value="${escapeHTML(choiceValue)}"`);
 
     // Interactions live on element.data.interactions, NOT element.attributes
     // (toJSON serializes raw data.attributes; the computed interactions attr is
@@ -1214,16 +1216,20 @@ ${bodyContent}${interactionScript}${themeToggleScript}${sanitizeHeadCode(siteCus
     // Build children content — an embed with a valid URL renders its iframe
     // in place of its placeholder children (embedFrameHTML).
     const embedFrame = embedFrameHTML(element.type, element.attributes);
+    const childChoiceLabel =
+      element.type === "radio" || element.type === "checkbox"
+        ? choiceLabelText(children.map((c) => ({ tag: c.tagName ?? "", content: c.content ?? "", format: c.contentFormat })))
+        : undefined;
     let childContent = "";
     if (embedFrame) {
       childContent = embedFrame;
     } else {
       // Own text first, then children — the canvas renders both, in this order.
-      if (content) childContent = this.renderContent(content, contentFormat, element.type);
+      if (content) childContent = this.renderContent(content, contentFormat);
       if (children.length > 0) {
         childContent +=
           "\n" +
-          children.map((child) => this.renderPageElement(child, indent + 1)).join("") +
+          children.map((child) => this.renderPageElement(child, indent + 1, childChoiceLabel)).join("") +
           indentStr;
       }
     }

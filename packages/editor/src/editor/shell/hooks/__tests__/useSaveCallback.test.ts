@@ -32,6 +32,13 @@ function makeOpts() {
   const setIsDirty = vi.fn();
   const composer = {
     saveProject,
+    /* BK-11: the siteless branch writes storage directly (saveProject is the
+       registry entry that routes back here); same mock, so the assertions on
+       `saveProject` keep meaning "storage was written". */
+    saveToStorage: saveProject,
+    getChangeSeq: vi.fn(() => 0),
+    setSaveHandler: vi.fn(),
+    markSaved: vi.fn(),
     exportProject: vi.fn(() => ({ pages: [] })),
   } as unknown as UseSaveCallbackOptions["composer"];
   return { composer, addToast, setSaveState, setIsDirty, saveProject };
@@ -651,7 +658,10 @@ describe("useSaveCallback — TOKENS_INVALID", () => {
     Object.defineProperty(window, "location", { value: url, writable: true });
     try {
       const kept = { pages: [{ id: "p", name: "mine" }] };
-      keepUnsaved("site_kept", kept as never);
+      // Made on the copy still on the server — restoring loses nobody's work.
+      const { setBaselineLastEditedAt } = await import("@/services/BuildrikSyncProvider");
+      setBaselineLastEditedAt("2026-10-15T10:00:00.000Z");
+      keepUnsaved("site_kept", kept as never, "2026-10-15T10:00:00.000Z");
       markUnsavedOffScreen("site_kept");
       const importProject = vi.fn();
       const opts = makeOpts();
@@ -674,8 +684,99 @@ describe("useSaveCallback — TOKENS_INVALID", () => {
       });
       expect(readUnsaved("site_kept")).toBeNull();
       clearUnsaved("site_kept");
+      setBaselineLastEditedAt(null);
     } finally {
       Object.defineProperty(window, "location", { value: original, writable: true });
     }
+  });
+
+  /* BK-04: edits kept on an OLDER server copy are not restored by a save —
+     that would replace a teammate's newer work unasked. The restore dialog is
+     offered again instead, and nothing is sent. */
+  it.each([
+    ["the server moved since the edits", "2026-10-15T09:00:00.000Z"],
+    ["the edits' base is unknown (older record)", null],
+  ])("Retry does not restore when %s; it re-offers the dialog", async (_case, base) => {
+    const { keepUnsaved, markUnsavedOffScreen, readUnsaved, takeOffScreenUnsaved, RESTORE_OFFER_EVENT } = await import(
+      "@/services/unsavedRecovery"
+    );
+    const { setBaselineLastEditedAt } = await import("@/services/BuildrikSyncProvider");
+    const url = new URL("http://localhost:3000/edit/site_newer");
+    const original = window.location;
+    Object.defineProperty(window, "location", { value: url, writable: true });
+    const offers: string[] = [];
+    const onOffer = (e: Event) => offers.push((e as CustomEvent<{ siteId: string }>).detail.siteId);
+    window.addEventListener(RESTORE_OFFER_EVENT, onOffer);
+    try {
+      setBaselineLastEditedAt("2026-10-15T10:00:00.000Z");
+      keepUnsaved("site_newer", { pages: [{ id: "p" }] } as never, base);
+      markUnsavedOffScreen("site_newer");
+      const importProject = vi.fn();
+      const opts = makeOpts();
+      const composer = { ...opts.composer, importProject } as never;
+      svc.saveProject.mockClear();
+      const { result } = renderHook(() =>
+        useSaveCallback({ composer, addToast: opts.addToast, setSaveState: opts.setSaveState, setIsDirty: opts.setIsDirty }),
+      );
+      let outcome: unknown;
+      await act(async () => {
+        outcome = await result.current();
+      });
+      expect(outcome).toBe("conflict");
+      expect(offers).toEqual(["site_newer"]);
+      expect(importProject).not.toHaveBeenCalled();
+      expect(svc.saveProject).not.toHaveBeenCalled();
+      expect(readUnsaved("site_newer")).not.toBeNull();
+    } finally {
+      window.removeEventListener(RESTORE_OFFER_EVENT, onOffer);
+      takeOffScreenUnsaved("site_newer");
+      localStorage.removeItem("bk-unsaved-v1-site_newer");
+      setBaselineLastEditedAt(null);
+      Object.defineProperty(window, "location", { value: original, writable: true });
+    }
+  });
+});
+
+
+/* BK-11: an edit made while a save travelled is not on the server — it stays
+   Unsaved until its own save returns. */
+describe("useSaveCallback — edits during an in-flight save (BK-11)", () => {
+  afterEach(() => {
+    window.history.replaceState(null, "", "/");
+    svc.saveProject.mockResolvedValue(undefined);
+  });
+
+  it("keeps the document dirty when it changed while the save was in flight", async () => {
+    window.history.replaceState(null, "", "/edit/site-1?siteId=site-1");
+    let seq = 1;
+    let release!: () => void;
+    svc.saveProject.mockImplementationOnce(() => new Promise<void>((r) => (release = r)));
+    const opts = makeOpts();
+    (opts.composer as unknown as { getChangeSeq: () => number }).getChangeSeq = () => seq;
+    const { result } = renderHook(() =>
+      useSaveCallback({ composer: opts.composer, addToast: opts.addToast, setSaveState: opts.setSaveState, setIsDirty: opts.setIsDirty }),
+    );
+    let done!: Promise<unknown>;
+    act(() => {
+      done = result.current();
+    });
+    seq = 2; // an edit lands while the save is travelling
+    await act(async () => {
+      release();
+      await done;
+    });
+    expect(opts.setIsDirty).not.toHaveBeenCalledWith(false);
+    expect((opts.composer as unknown as { markSaved: ReturnType<typeof vi.fn> }).markSaved).not.toHaveBeenCalled();
+  });
+
+  it("installs itself as the composer's save, and removes itself on unmount", () => {
+    const opts = makeOpts();
+    const setSaveHandler = (opts.composer as unknown as { setSaveHandler: ReturnType<typeof vi.fn> }).setSaveHandler;
+    const { unmount } = renderHook(() =>
+      useSaveCallback({ composer: opts.composer, addToast: opts.addToast, setSaveState: opts.setSaveState, setIsDirty: opts.setIsDirty }),
+    );
+    expect(setSaveHandler).toHaveBeenCalledWith(expect.any(Function));
+    unmount();
+    expect(setSaveHandler).toHaveBeenLastCalledWith(null);
   });
 });

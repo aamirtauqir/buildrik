@@ -92,14 +92,14 @@ export const siteComponentsRouter = router({
     .input(componentLibrarySchema)
     .query(async ({ ctx, input }) => {
       await guardSite(ctx.prisma, ctx.session.user.id, input.siteId);
-      return listComponentLibrary(input.siteId);
+      return listComponentLibrary(input.siteId, ctx.session.user.id);
     }),
 
   libraryGet: protectedProcedure
     .input(libraryComponentSchema)
     .query(async ({ ctx, input }) => {
       await guardSite(ctx.prisma, ctx.session.user.id, input.siteId);
-      return getLibraryComponent(input.siteId, input.componentId);
+      return getLibraryComponent(input.siteId, input.componentId, ctx.session.user.id);
     }),
 
   // C1: the component browser — every master across the agency's workspace with

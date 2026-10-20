@@ -93,7 +93,9 @@ describe("AI-generated content survives the real load path", () => {
     expect(out).not.toContain("onerror");
   });
 
-  it("leaves ordinary text content escaped when contentFormat is absent", () => {
+  /* BK-40: absent format is markup on the canvas, so it is markup here too —
+     sanitized. Plain text is a stated format ("text"), and that is escaped. */
+  it("writes absent-format content as sanitized markup and \"text\" content escaped", () => {
     const composer = new Composer({} as never);
     composer.importProject({
       pages: [
@@ -101,14 +103,18 @@ describe("AI-generated content survives the real load path", () => {
           id: "p", name: "P", slug: "p",
           root: {
             id: "root", type: "container" as const, tagName: "div",
-            children: [{ id: "t", type: "text" as const, content: "<b>typed</b>", children: [] }],
+            children: [
+              { id: "t", type: "text" as const, content: "<b>typed</b><script>x()</script>", children: [] },
+              { id: "u", type: "text" as const, content: "<i>literal</i>", contentFormat: "text" as const, children: [] },
+            ],
           },
         },
       ],
     } as never);
 
     const out = new ExportEngine(composer).generateHTML();
-    expect(out).toContain("&lt;b&gt;typed&lt;/b&gt;");
-    expect(out).not.toContain("<b>typed</b>");
+    expect(out).toContain("<b>typed</b>");
+    expect(out).not.toContain("<script>");
+    expect(out).toContain("&lt;i&gt;literal&lt;/i&gt;");
   });
 });

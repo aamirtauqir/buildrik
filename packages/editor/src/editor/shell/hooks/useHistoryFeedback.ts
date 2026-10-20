@@ -110,6 +110,8 @@ const ACTION_DESCRIPTIONS: Record<string, string> = {
   "edit preset": "Changed a style preset",
   "inline edit": "Edited text",
   "inline-edit": "Edited text",
+  "fix escaped text": "Fixed escaped text",
+  "automatic repair": "Repaired broken sizes",
   "link-change": "Changed link",
   "link-target-change": "Changed link target",
   "animation-change": "Changed animation",

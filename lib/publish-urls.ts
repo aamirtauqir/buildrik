@@ -49,6 +49,8 @@ export function resolveSiteOrigin(opts: {
 export function resolveSiteOrigins(opts: {
   canonicalUrl: string | null;
   verifiedDomain?: string | null;
+  /** Where the site is live now (`Site.publishedUrl`). */
+  publishedUrl?: string | null;
   vercelProjectName?: string | null;
 }): string[] {
   const origins = new Set<string>();
@@ -63,6 +65,8 @@ export function resolveSiteOrigins(opts: {
   };
   addWithWwwCounterpart(opts.canonicalUrl);
   addWithWwwCounterpart(opts.verifiedDomain);
+  const published = normalizeCanonicalOrigin(opts.publishedUrl ?? "");
+  if (published) origins.add(published);
   if (opts.vercelProjectName) origins.add(`https://${opts.vercelProjectName}.vercel.app`);
   return Array.from(origins);
 }

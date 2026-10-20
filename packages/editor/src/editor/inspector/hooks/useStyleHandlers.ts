@@ -29,6 +29,7 @@ import { activeBreakpoint, canWrite, setStyleAt, writableElements } from "@/engi
 // ============================================================================
 
 import type { SelectedElementInfo as SelectedElement } from "@/shared/types";
+import { elementSelector } from "@/shared/utils/elementSelector";
 export type { SelectedElement };
 
 export interface StyleHandlers {
@@ -266,11 +267,10 @@ export function useStyleHandlers(
       if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
       const writeOne = (el: Element) => {
         const id = el.getId();
-        const sel = `[data-buildrick-id="${id}"]`;
+        const sel = elementSelector(id);
         /* P-8: a device-hide flag (`--hide-tablet`) names its own device, so it
-           always goes on the base styles — the one place the canvas
-           (Canvas.css `[style*="--hide-<bp>: true"]`) and the export
-           (ExportEngine hideRulesFor) read it. Written into the tablet rule
+           always goes on the base styles — the one place the canvas and
+           the export both read it (cascadeCSS hideRulesFor). Written into the tablet rule
            while the canvas was on Tablet, it hid nothing anywhere. */
         const baseOnly = property.startsWith("--hide-");
         const bp = baseOnly ? "desktop" : currentBreakpoint;
@@ -369,7 +369,7 @@ export function useStyleHandlers(
         const id = el.getId();
         // Pseudo-state batch changes: each element's OWN rule.
         if (currentPseudoState !== "normal" && composer.styles) {
-          const selector = `[data-buildrick-id="${id}"]`;
+          const selector = elementSelector(id);
           const existingRule = composer.styles.getRule(`${selector}:${currentPseudoState}`, mq);
           const existing = existingRule ? { ...existingRule.properties } : {};
           Object.entries(changes).forEach(([prop, val]) => {

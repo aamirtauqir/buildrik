@@ -53,6 +53,8 @@ interface Props {
   onBulkDelete: () => void;
   onClearSelection: () => void;
   onContextMenu: (id: string, x: number, y: number) => void;
+  /** BK-28: ⌘D / ⌫ on a focused page row act on that PAGE (not the canvas). */
+  onPageShortcut?: (id: string, action: "duplicate" | "delete") => void;
   onRenameStart: (id: string) => void;
   onRenameCommit: (id: string, name: string, updateUrl?: boolean) => void;
   onRenameCancel: () => void;
@@ -94,6 +96,7 @@ export const PageList: React.FC<Props> = ({
   onBulkDelete,
   onClearSelection,
   onContextMenu,
+    onPageShortcut,
   onRenameStart,
   onRenameCommit,
   onRenameCancel,
@@ -263,6 +266,7 @@ export const PageList: React.FC<Props> = ({
                   onFolderDelete={() => onFolderDelete(folder.id)}
                   onSelectPage={onSelectPage}
                   onContextMenu={onContextMenu}
+                  onPageShortcut={onPageShortcut}
                   onRenameStart={onRenameStart}
                   onRenameCommit={onRenameCommit}
                   onRenameCancel={onRenameCancel}
@@ -295,6 +299,7 @@ export const PageList: React.FC<Props> = ({
                   onRenameCommit={(name, updateUrl) => onRenameCommit(page.id, name, updateUrl)}
                   onRenameCancel={onRenameCancel}
                   onContextMenu={(x, y) => onContextMenu(page.id, x, y)}
+                  onShortcut={onPageShortcut ? (action) => onPageShortcut(page.id, action) : undefined}
                   searchContext={
                     search
                       ? folders.find((f) => f.id === pageToFolder.get(page.id))?.name

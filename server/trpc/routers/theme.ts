@@ -7,6 +7,7 @@ import { extractBrandFromUrl, BrandExtractError } from "@/server/services/brand-
 import { isFeatureEnabled } from "@/server/services/feature-flag.service";
 import {
   checkSiteRole,
+  assertSiteAccess,
   checkWorkspaceRole,
   PermissionError,
 } from "@/server/services/permission.service";
@@ -77,7 +78,7 @@ export const themeRouter = router({
   targets: protectedProcedure.query(async ({ ctx }) => {
     const workspaceId = await resolveWorkspaceId(ctx);
     await requireAgencyLayer(workspaceId);
-    return listThemeTargets(workspaceId);
+    return listThemeTargets(workspaceId, ctx.session.user.id);
   }),
 
   // Capture one site's tokens as the workspace shared theme. Admin-gated.
@@ -118,7 +119,7 @@ export const themeRouter = router({
       await requireAgencyLayer(workspaceId);
       await requireAdmin(ctx, workspaceId);
       try {
-        return await pushSharedTheme(workspaceId, input.siteIds);
+        return await pushSharedTheme(workspaceId, input.siteIds, ctx.session.user.id);
       } catch (e) {
         translateThemeError(e);
       }
@@ -146,7 +147,7 @@ export const themeRouter = router({
       await requireAgencyLayer(workspaceId);
       await requireAdmin(ctx, workspaceId);
       try {
-        return await rollbackSiteTheme(workspaceId, input.siteId);
+        return await rollbackSiteTheme(workspaceId, input.siteId, ctx.session.user.id);
       } catch (e) {
         translateThemeError(e);
       }
@@ -158,6 +159,14 @@ export const themeRouter = router({
     .query(async ({ ctx, input }) => {
       const workspaceId = await resolveWorkspaceId(ctx);
       await requireAgencyLayer(workspaceId);
+      /* BK-08: a site's rollback history is that site's — read it only with
+         access to the site. */
+      try {
+        await assertSiteAccess(ctx.prisma, ctx.session.user.id, input.siteId);
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
       try {
         return await listSiteThemeSnapshots(workspaceId, input.siteId);
       } catch (e) {

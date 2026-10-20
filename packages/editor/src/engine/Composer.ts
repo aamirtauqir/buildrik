@@ -69,6 +69,9 @@ import { DSLinter } from "./designSystem/linter";
 import { VersionTimelineManager } from "./VersionTimelineManager";
 import { Viewport } from "./Viewport";
 import { getDefaultPageName } from "../shared/utils/pageUtils";
+import { elementBaseCSS } from "./styles/cascadeCSS";
+import { elementSelector } from "@/shared/utils/elementSelector";
+import { CONNECT_TOKENS_LABEL } from "./designSystem/facade";
 
 /**
  * From-address for form-submission notifications on published sites. Must stay on
@@ -328,7 +331,7 @@ export class Composer extends EventEmitter {
           for (const r of s.refs) writes.push({ ...r, value: `var(${token.cssVar})` });
         }
         if (writes.length === 0) return 0;
-        this.beginTransaction("Connect to tokens");
+        this.beginTransaction(CONNECT_TOKENS_LABEL);
         try {
           for (const w of writes) {
             if (w.breakpoint) this.styles.setBreakpointStyle(w.elementId, w.breakpoint, { [w.prop]: w.value });
@@ -618,10 +621,39 @@ export class Composer extends EventEmitter {
     }
   }
 
+  /* BK-11: the shell's one save (the dashboard RPC for a site-bound editor,
+     with conflict, offline and recovery handling). ⌘S, the palette and every
+     other caller of saveProject() go through it, so a project has ONE save
+     path. Unset (tests, the standalone demo) = write to storage. */
+  private saveHandler: (() => Promise<void>) | null = null;
+  /* Counts document changes, so a save in flight can tell whether what it
+     sent is still the current document (BK-11): an edit made while a save
+     travelled stays Unsaved until its own save returns. */
+  private changeSeq = 0;
+
+  /** Install (or clear, with null) the shell's save — see saveHandler. */
+  setSaveHandler(handler: (() => Promise<void>) | null): void {
+    this.saveHandler = handler;
+  }
+
+  /** Increases on every document change (markDirty). */
+  getChangeSeq(): number {
+    return this.changeSeq;
+  }
+
   /**
-   * Save current project
+   * Save the project through the shell's save when one is installed,
+   * otherwise to storage.
    */
   async saveProject(): Promise<void> {
+    if (this.saveHandler) return this.saveHandler();
+    return this.saveToStorage();
+  }
+
+  /**
+   * Write the project to this composer's storage adapter and announce it.
+   */
+  async saveToStorage(): Promise<void> {
     /* PROJECT_SAVING, not PROJECT_SAVED-with-a-flag. Listeners read the event
        NAME: useDirtyPages clears every dirty page marker on PROJECT_SAVED, so
        announcing the save before storage.save() ran cleared the markers up
@@ -808,7 +840,15 @@ export class Composer extends EventEmitter {
    */
   exportHTML(options?: ExportOptions): ExportResult {
     const html = this.elements.toHTML(options);
-    const css = this.styles.toCSS(options);
+    /* The same cascade as the published page (D10): each element's own styles
+       as base rules (the HTML carries none inline), then the breakpoint and
+       state rules desktop-first, against real viewport queries. It used to be
+       inline bases + `toCSS()` in insertion order, so Preview could disagree
+       with the live site about which rule wins. */
+    const css =
+      elementBaseCSS([this.elements.getActivePageRootData?.()], elementSelector, "media", false) +
+      "\n\n" +
+      this.styles.generateResponsiveCSS(options);
 
     // The site's own fonts. The comment above is about this exact gap and it
     // reopened: the export learned to emit the three font slots and to fetch
@@ -822,9 +862,8 @@ export class Composer extends EventEmitter {
        Brand preset binds. */
     const siteCss =
       emitSiteTokenCss(projectSettings, brandSwitch) + siteFontCSS(fonts);
-    // The HTML too, not just the CSS: this document carries element styles
-    // INLINE (`elements.toHTML`), so a heading set in Lora names its family in
-    // a style attribute and nowhere in the stylesheet.
+    // The HTML too, not just the CSS: a font named in an attribute or in
+    // content still has to be fetched.
     const slotFamilies = [fonts.heading, fonts.body, fonts.mono].filter((f): f is string => Boolean(f));
     /* The site's ADDED fonts (Clone 3721:43423): this document renders in its
        own frame, where the editor's document.fonts never reach, so the faces
@@ -1125,6 +1164,7 @@ ${html}${interactionScript}
     if (!this.state.dirty) {
       this.state.dirty = true;
     }
+    this.changeSeq += 1;
     if (this.transactionDepth > 0) {
       this.transactionDirty = true;
       return;

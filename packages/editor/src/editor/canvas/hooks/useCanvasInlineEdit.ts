@@ -166,7 +166,7 @@ export function useCanvasInlineEdit({
             composer.beginTransaction("inline-edit");
             try {
               const element = composer.elements.getElement(editing.id!);
-              element?.setContent?.(newHtml);
+              element?.setContent?.(newHtml, "html");
             } finally {
               composer.endTransaction();
             }

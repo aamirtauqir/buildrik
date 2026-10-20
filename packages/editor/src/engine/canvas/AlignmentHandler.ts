@@ -5,6 +5,7 @@
  */
 
 import type { Composer } from "@/engine";
+import { activeBreakpoint, setStyleAt, stylesAt, writableElements } from "@/engine/commands/commandOperations";
 
 // ============================================================================
 // TYPES
@@ -34,6 +35,8 @@ interface ElementBounds {
  */
 export class AlignmentHandler {
   private composer: Composer;
+  /** The members the current operation may move (unlocked). */
+  private writable = new Set<string>();
 
   constructor(composer: Composer) {
     this.composer = composer;
@@ -44,12 +47,20 @@ export class AlignmentHandler {
    */
   private getElementBounds(elementIds: string[]): ElementBounds[] {
     const bounds: ElementBounds[] = [];
+    const breakpoint = activeBreakpoint(this.composer);
+    /* BK-13: a locked member still anchors the alignment but is not moved —
+       one "locked" toast for the whole operation (writableElements). */
+    const elements = elementIds.map((id) => this.composer.elements.getElement(id));
+    const kept = new Set(writableElements(this.composer, elements));
+    this.writable = new Set(elementIds.filter((_, i) => elements[i] && kept.has(elements[i]!)));
 
     for (const id of elementIds) {
       const el = this.composer.elements.getElement(id);
       if (!el) continue;
 
-      const styles = el.getStyles?.() || {};
+      /* At the device on screen: base styles were read (and written) on
+         Tablet too, so an align there moved the Desktop layout. */
+      const styles = stylesAt(this.composer, el, breakpoint);
       const left = parseFloat(styles.left || "0") || 0;
       const top = parseFloat(styles.top || "0") || 0;
       const width = parseFloat(styles.width || "100") || 100;
@@ -215,13 +226,14 @@ export class AlignmentHandler {
    */
   private setElementPosition(id: string, left: number | undefined, top: number | undefined): void {
     const el = this.composer.elements.getElement(id);
-    if (!el) return;
+    if (!el || !this.writable.has(id)) return;
+    const breakpoint = activeBreakpoint(this.composer);
 
     if (left !== undefined) {
-      el.setStyle?.("left", `${left}px`);
+      setStyleAt(this.composer, el, breakpoint, "left", `${left}px`);
     }
     if (top !== undefined) {
-      el.setStyle?.("top", `${top}px`);
+      setStyleAt(this.composer, el, breakpoint, "top", `${top}px`);
     }
   }
 }

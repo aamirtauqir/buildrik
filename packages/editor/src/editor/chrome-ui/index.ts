@@ -31,6 +31,8 @@
  */
 export { getOverlayRoot } from "./OverlayRoot";
 export { Portal } from "./Portal";
+export { FullPageHost } from "./FullPageHost";
+export type { FullPageHostProps } from "./FullPageHost";
 export { useFocusTrap, isModalOpen } from "./focus";
 export { TextField, type TextFieldProps } from "./TextField";
 export { SkeletonListItem, StudioSkeleton, type SkeletonListItemProps } from "./Skeleton";

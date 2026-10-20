@@ -23,6 +23,7 @@ import type { RemoteAssetSync, MediaAsset } from "@/shared/types/media";
 function makeRemoteSync(): RemoteAssetSync {
   return {
     uploadAndCreate: vi.fn(async () => ({ serverId: "srv", url: "https://x/y" })),
+    registerUploaded: vi.fn(async (url: string) => ({ serverId: "srv-reg", url })),
     deleteRemote: vi.fn(async () => true),
     createFolder: vi.fn(async () => ({ serverId: "srv-f" })),
     deleteFolder: vi.fn(async () => true),

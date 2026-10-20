@@ -11,6 +11,7 @@ import type {
 import { isAbsoluteHttpUrl, isSitePath } from "@buildrik/shared/schemas/element-markup";
 import { resolveSiteOrigins } from "@/lib/publish-urls";
 import { resolveVercelProjectName } from "@/lib/vercel";
+import { hasLiveDeployment } from "@/server/services/publish.service";
 import type { DiscoveredForm, FormBlockWireSettings } from "@/lib/publish-forms";
 import { notifyWorkspaceOwner } from "@/server/services/notification.trigger";
 import { sendFormSubmissionEmail } from "@/server/services/email.service";
@@ -96,7 +97,16 @@ export async function submitForm(
 
   const site = await prisma.site.findUnique({
     where: { id: siteId },
-    select: { workspaceId: true, name: true, deletedAt: true, canonicalUrl: true, slug: true, vercelProjectName: true },
+    select: {
+      workspaceId: true,
+      name: true,
+      deletedAt: true,
+      canonicalUrl: true,
+      slug: true,
+      vercelProjectName: true,
+      status: true,
+      publishedUrl: true,
+    },
   });
   if (!site || site.deletedAt) throw new FormError("NOT_FOUND", "FORM_NOT_FOUND");
 
@@ -177,10 +187,15 @@ export async function submitForm(
     });
   }
 
+  /* D10: the deployment origins count only while the site is live. After an
+     unpublish (or the project's deletion) `<project>.vercel.app` is a dead
+     page, and as the first origin it was where "show message" sent visitors. */
+  const live = hasLiveDeployment(site);
   const origins = resolveSiteOrigins({
     canonicalUrl: site.canonicalUrl,
     verifiedDomain: verifiedDomain?.domain ?? null,
-    vercelProjectName: site.slug ? resolveVercelProjectName(site) : null,
+    publishedUrl: live ? site.publishedUrl : null,
+    vercelProjectName: live && site.slug ? resolveVercelProjectName(site) : null,
   });
   const returnUrl = safeUrlOnOrigins(input.returnUrl, origins);
 
@@ -212,7 +227,13 @@ export async function submitForm(
   };
 }
 
-export async function listSubmissions(input: ListSubmissionsInput) {
+/** D7: a submitter's IP and device are technical data — ADMIN and up only. */
+function withoutTechnical<T extends { ip?: string | null; deviceInfo?: string | null }>(row: T): Omit<T, "ip" | "deviceInfo"> {
+  const { ip: _ip, deviceInfo: _device, ...rest } = row;
+  return rest;
+}
+
+export async function listSubmissions(input: ListSubmissionsInput, opts: { technical: boolean }) {
   const { siteId, formBlockId, isRead, isSpam, isArchived, page, perPage } = input;
 
   const where = {
@@ -234,16 +255,18 @@ export async function listSubmissions(input: ListSubmissionsInput) {
     }),
   ]);
 
-  return { data, total, page, perPage };
+  return { data: opts.technical ? data : data.map(withoutTechnical), total, page, perPage };
 }
 
+/* D7: these answer an EDITOR too — the row goes back without the visitor's
+   IP and device. Only the ADMIN list carries them. */
 export async function updateSubmission(input: UpdateInput) {
   const { id, ...data } = input;
-  return prisma.formSubmission.update({ where: { id }, data });
+  return withoutTechnical(await prisma.formSubmission.update({ where: { id }, data }));
 }
 
 export async function deleteSubmission(id: string) {
-  return prisma.formSubmission.delete({ where: { id } });
+  return withoutTechnical(await prisma.formSubmission.delete({ where: { id } }));
 }
 
 export async function listFormBlocks(siteId: string) {
@@ -389,6 +412,7 @@ export async function exportSubmissions(
   // button) rather than a single form block — the full dataset, not one page.
   formBlockId: string | null | undefined,
   format: "csv" | "json",
+  opts: { technical: boolean },
 ): Promise<string> {
   const submissions = await prisma.formSubmission.findMany({
     where: { siteId, ...(formBlockId ? { formBlockId } : {}) },
@@ -397,7 +421,7 @@ export async function exportSubmissions(
   });
 
   if (format === "json") {
-    return JSON.stringify(submissions, null, 2);
+    return JSON.stringify(opts.technical ? submissions : submissions.map(withoutTechnical), null, 2);
   }
 
   if (submissions.length === 0) return "";

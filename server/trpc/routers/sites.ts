@@ -6,6 +6,7 @@ import {
   listSites,
   createSite,
   getSite,
+  loadSiteForEditor,
   renameSite,
   duplicateSite,
   archiveSite,
@@ -32,6 +33,7 @@ import {
 import {
   runPrePublishChecks,
   startPublish,
+  PublishBlockedError,
   getPublishStatus,
   cancelPublish,
   unpublishSite,
@@ -40,6 +42,7 @@ import {
   getPublishHistory,
   rollbackPublish,
 } from "@/server/services/publish.service";
+import { retryFormsActivation, retryPostDeployStep } from "@/server/services/publish-bundle.service";
 import {
   listSitesSchema,
   createSiteSchema,
@@ -88,6 +91,22 @@ export const sitesRouter = router({
       return site;
     }),
 
+  /** The editor's load: site, pages and settings as one consistent snapshot
+   *  (see loadSiteForEditor). Same access rule as `get` — VIEWER may read. */
+  loadForEditor: protectedProcedure
+    .input(z.object({ siteId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      try {
+        await assertSiteAccess(ctx.prisma, ctx.session.user.id, input.siteId);
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
+      const loaded = await loadSiteForEditor(input.siteId, ctx.session.user.id);
+      if (!loaded) throw new TRPCError({ code: "NOT_FOUND" });
+      return loaded;
+    }),
+
   create: protectedProcedure
     .input(createSiteSchema)
     .mutation(async ({ ctx, input }) => {
@@ -125,7 +144,7 @@ export const sitesRouter = router({
         if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
         throw e;
       }
-      return renameSite(input.id, input.name);
+      return renameSite(input.id, input.name, ctx.session.user.id);
     }),
 
   duplicate: protectedProcedure
@@ -373,7 +392,7 @@ export const sitesRouter = router({
       }
 
       try {
-        return await saveProjectFromEditor(input.siteId, input.projectData, input.expectedLastEditedAt ?? undefined);
+        return await saveProjectFromEditor(input.siteId, input.projectData, input.expectedLastEditedAt ?? undefined, ctx.session.user.id);
       } catch (e: unknown) {
         /* I-2: a page id in the save belongs to another site. BAD_REQUEST, not
            FORBIDDEN — the editor treats FORBIDDEN as a revoked role. */
@@ -512,6 +531,15 @@ export const sitesRouter = router({
             code: "PRECONDITION_FAILED",
             message: "Connect this workspace to Vercel before publishing.",
             cause: { reason: "VERCEL_NOT_CONNECTED" },
+          });
+        /* D11: the server's checks refused it — the rows go back so the panel
+           (`parseServerBlockers` in usePublishJob.ts reads this message)
+           shows the SERVER's result (decision 6), not its own guess. */
+        if (e instanceof PublishBlockedError)
+          throw new TRPCError({
+            code: "PRECONDITION_FAILED",
+            message: e.userMessage,
+            cause: { reason: "PUBLISH_BLOCKED", blockers: e.blockers },
           });
         // m-approval gate (publish.service startPublish): a member in an
         // approval-required workspace without an APPROVED review gets a clear
@@ -726,6 +754,47 @@ export const sitesRouter = router({
       } catch (e: unknown) {
         if (e instanceof Error && e.message === "NOT_FOUND")
           throw new TRPCError({ code: "NOT_FOUND", message: "That published version was not found." });
+        throw e;
+      }
+    }),
+
+  /* Decision 7: "Retry form update" — the forms switch-over of the live
+     publish, on its own (A3/O3). Only the job that is live can switch. */
+  retryFormsActivation: protectedProcedure
+    .input(rollbackInput)
+    .mutation(async ({ ctx, input }) => {
+      try {
+        await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.siteId, "EDITOR");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
+      try {
+        return { formsStatus: await retryFormsActivation(input.siteId, input.jobId) };
+      } catch (e: unknown) {
+        if (e instanceof Error && e.message === "NOT_FOUND")
+          throw new TRPCError({ code: "NOT_FOUND", message: "That publish was not found." });
+        throw e;
+      }
+    }),
+
+  /* O6: a step that failed after the deployment went live is retried on its
+     own — never a redeploy. */
+  retryPostDeploy: protectedProcedure
+    .input(rollbackInput)
+    .mutation(async ({ ctx, input }) => {
+      try {
+        await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.siteId, "EDITOR");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
+      try {
+        await retryPostDeployStep(input.siteId, input.jobId);
+        return { ok: true as const };
+      } catch (e: unknown) {
+        if (e instanceof Error && e.message === "NOT_FOUND")
+          throw new TRPCError({ code: "NOT_FOUND", message: "Nothing to retry on that publish." });
         throw e;
       }
     }),

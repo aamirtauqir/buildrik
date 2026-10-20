@@ -27,6 +27,15 @@ vi.mock("../api-client", () => ({
   createBuildrikApiClient: () => ({
     sites: {
       get: { query: (...args: any[]) => mocks.sitesGetQuery(...args) },
+      // sites.loadForEditor is one server snapshot; the mock composes the three reads it replaced.
+      loadForEditor: {
+        query: async ({ siteId }: { siteId: string }) => ({
+          site: await mocks.sitesGetQuery({ id: siteId }),
+          pages: await mocks.pagesListQuery({ siteId }),
+          settings: await mocks.siteDetailSettingsGetQuery({ siteId }),
+          lastEditedBy: null,
+        }),
+      },
       saveProject: { mutate: (...args: any[]) => mocks.saveProjectMutate(...args) },
     },
     pages: {
@@ -63,7 +72,7 @@ import {
   isBrandFormatConflict,
   keepStoredTokensOnSave,
   isSaveConflictPending,
-  siteColumnsLoaded,
+  hasProjectLoaded,
 } from "../BuildrikSyncProvider";
 import { SITE_COLUMN_FIELDS } from "@buildrik/shared/schemas/site-column-fields";
 import { publishSite } from "../PublishService";
@@ -745,16 +754,6 @@ describe("loadProject — column-backed settings come from the columns only (SA-
     expect(project.settings?.publishing).toEqual({ provider: "vercel" });
   });
 
-  it("the JSON copy stays out when the columns could not be read at all", async () => {
-    mocks.siteDetailSettingsGetQuery
-      .mockRejectedValueOnce(new Error("offline"))
-      .mockRejectedValueOnce(new Error("offline"));
-    const project = await loadProject("s1");
-    expect(project.settings?.seo?.metaTitle).toBeUndefined();
-    expect(project.settings?.customCode?.headScripts).toBe("");
-    expect(project.settings?.seo?.twitterHandle).toBe("@kept");
-  });
-
   it("a NULL column loaded over a JSON value is not a change: the next save mirrors nothing", async () => {
     mocks.saveProjectMutate.mockResolvedValue({ success: true, savedAt: new Date() });
     mocks.siteDetailSettingsUpdateMutate.mockClear();
@@ -776,8 +775,12 @@ describe("loadProject — column-backed settings come from the columns only (SA-
 /* SA-01 fix round 1: with the columns the only source, a settings read that
    fails leaves the <head> fields empty — so the read is retried once, and a
    session that still has no columns may not publish what it renders. */
-describe("loadProject — a failed site-settings read (SA-01)", () => {
-  const REFUSAL = "Site settings didn't load. Reload the editor before publishing.";
+/* The columns arrive in the same snapshot as the pages (sites.loadForEditor),
+   so a session can no longer hold pages without their Site columns (SA-01's
+   degraded state). A failed snapshot is retried once; a second failure fails
+   the load, and publish is refused like any failed load. */
+describe("loadProject — a failed snapshot read (SA-01)", () => {
+  const REFUSAL = "This site didn't load. Reload the editor before publishing.";
 
   beforeEach(() => {
     mocks.sitesGetQuery.mockResolvedValue({ id: "s9", name: "T", projectSettings: {} });
@@ -785,15 +788,15 @@ describe("loadProject — a failed site-settings read (SA-01)", () => {
     mocks.siteDetailSettingsGetQuery.mockReset().mockResolvedValue(null);
   });
 
-  it("a failed read and a failed retry leave the site degraded, and publish is refused", async () => {
+  it("a failed read and a failed retry fail the load, and publish is refused", async () => {
     mocks.siteDetailSettingsGetQuery
       .mockRejectedValueOnce(new Error("offline"))
       .mockRejectedValueOnce(new Error("offline"));
-    await loadProject("s9");
+    await expect(loadProject("s9-failed")).rejects.toThrow(/loadProject failed/);
 
     expect(mocks.siteDetailSettingsGetQuery).toHaveBeenCalledTimes(2);
-    expect(siteColumnsLoaded("s9")).toBe(false);
-    await expect(publishSite("s9", [{ path: "index.html", html: "<html></html>" }])).rejects.toThrow(REFUSAL);
+    expect(hasProjectLoaded("s9-failed")).toBe(false);
+    await expect(publishSite("s9-failed", [{ path: "index.html", html: "<html></html>" }])).rejects.toThrow(REFUSAL);
   });
 
   it("a failed read and a successful retry load the columns normally", async () => {
@@ -803,26 +806,15 @@ describe("loadProject — a failed site-settings read (SA-01)", () => {
     const project = await loadProject("s9");
 
     expect(mocks.siteDetailSettingsGetQuery).toHaveBeenCalledTimes(2);
-    expect(siteColumnsLoaded("s9")).toBe(true);
+    expect(hasProjectLoaded("s9")).toBe(true);
     expect(project.settings?.seo?.metaTitleTemplate).toBe("{page_title} — T");
     expect(getEditorPlanTier()).toBe("pro");
-  });
-
-  it("a later load that reads the columns clears the degraded state", async () => {
-    mocks.siteDetailSettingsGetQuery
-      .mockRejectedValueOnce(new Error("offline"))
-      .mockRejectedValueOnce(new Error("offline"));
-    await loadProject("s9");
-    expect(siteColumnsLoaded("s9")).toBe(false);
-
-    await loadProject("s9");
-    expect(siteColumnsLoaded("s9")).toBe(true);
   });
 });
 
 /* P1-2 (2026-10-08 audit): a load that failed leaves the fallback (a stale
    local copy or the default project) on screen. Saves already refuse it
-   (ProjectNotLoadedError); publish did not — `siteColumnsLoaded` answered true
+   (ProjectNotLoadedError); publish did not — the columns check answered true
    for a site no load ever touched, and the fallback went live. */
 describe("publish after a failed project load", () => {
   it("is refused before any request, and the columns do not count as loaded", async () => {
@@ -830,7 +822,7 @@ describe("publish after a failed project load", () => {
     mocks.pagesListQuery.mockResolvedValue([]);
     await expect(loadProject("never-loaded")).rejects.toThrow(/loadProject failed/);
 
-    expect(siteColumnsLoaded("never-loaded")).toBe(false);
+    expect(hasProjectLoaded("never-loaded")).toBe(false);
     await expect(
       publishSite("never-loaded", [{ path: "index.html", html: "<html></html>" }]),
     ).rejects.toThrow("This site didn't load. Reload the editor before publishing.");

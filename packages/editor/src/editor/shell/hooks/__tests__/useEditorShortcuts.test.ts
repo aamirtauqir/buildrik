@@ -55,14 +55,12 @@ function dispatchKey(opts: {
 describe("useEditorShortcuts", () => {
   let composer: ReturnType<typeof makeComposer>;
   let modals: ReturnType<typeof makeModals>;
-  let saveProject: ReturnType<typeof vi.fn>;
 
   function mount(overrides: Partial<UseEditorShortcutsOptions> = {}) {
     return renderHook(() =>
       useEditorShortcuts({
         composer: (composer as unknown) as UseEditorShortcutsOptions["composer"],
         modals,
-        saveProject,
         ...overrides,
       } as UseEditorShortcutsOptions),
     );
@@ -71,7 +69,6 @@ describe("useEditorShortcuts", () => {
   beforeEach(() => {
     composer = makeComposer();
     modals = makeModals();
-    saveProject = vi.fn();
   });
 
   afterEach(() => {
@@ -79,23 +76,13 @@ describe("useEditorShortcuts", () => {
   });
 
   // SAVE -----------------------------------------------------------------------
-  it("Cmd+S triggers saveProject + preventDefault", () => {
+  /* BK-11: ⌘S belongs to the command registry's `save` alone (it reaches the
+     shell's save through composer.saveProject). This hook handling it as well
+     sent two saves per press. */
+  it("Cmd+S is not handled here — the registry owns it", () => {
     mount();
     const ev = dispatchKey({ key: "s", metaKey: true });
-    expect(saveProject).toHaveBeenCalledTimes(1);
-    expect(ev.defaultPrevented).toBe(true);
-  });
-
-  it("Ctrl+S also triggers saveProject", () => {
-    mount();
-    dispatchKey({ key: "s", ctrlKey: true });
-    expect(saveProject).toHaveBeenCalledTimes(1);
-  });
-
-  it("plain 's' does not trigger save", () => {
-    mount();
-    dispatchKey({ key: "s" });
-    expect(saveProject).not.toHaveBeenCalled();
+    expect(ev.defaultPrevented).toBe(false);
   });
 
   // UNDO / REDO ----------------------------------------------------------------
@@ -119,14 +106,12 @@ describe("useEditorShortcuts", () => {
     expect(composer.history.redo).toHaveBeenCalledTimes(1);
   });
 
-  it("history shortcuts are no-ops without composer (but Cmd+S still fires)", () => {
+  it("history shortcuts are no-ops without composer", () => {
     mount({ composer: null });
     dispatchKey({ key: "z", metaKey: true });
     dispatchKey({ key: "y", metaKey: true });
-    dispatchKey({ key: "s", metaKey: true });
     expect(composer.history.undo).not.toHaveBeenCalled();
     expect(composer.history.redo).not.toHaveBeenCalled();
-    expect(saveProject).toHaveBeenCalledTimes(1);
   });
 
   // SITE-MENU CHORDS -----------------------------------------------------------
@@ -213,7 +198,6 @@ describe("useEditorShortcuts", () => {
     dispatchKey({ key: "s", metaKey: true, target: input });
     dispatchKey({ key: "z", metaKey: true, target: input });
     dispatchKey({ key: "/", metaKey: true, target: input });
-    expect(saveProject).not.toHaveBeenCalled();
     expect(composer.history.undo).not.toHaveBeenCalled();
     expect(modals.setShowShortcuts).not.toHaveBeenCalled();
     document.body.removeChild(input);
@@ -225,7 +209,6 @@ describe("useEditorShortcuts", () => {
     div.setAttribute("contenteditable", "true");
     document.body.appendChild(div);
     dispatchKey({ key: "s", metaKey: true, target: div });
-    expect(saveProject).not.toHaveBeenCalled();
     document.body.removeChild(div);
   });
 
@@ -253,7 +236,6 @@ describe("useEditorShortcuts", () => {
       dispatchKey({ key: "s", metaKey: true });
       dispatchKey({ key: "z", metaKey: true });
       expect(composer.emit).not.toHaveBeenCalled();
-      expect(saveProject).not.toHaveBeenCalled();
       expect(composer.history.undo).not.toHaveBeenCalled();
     } finally {
       dialog.remove();
@@ -266,7 +248,6 @@ describe("useEditorShortcuts", () => {
     unmount();
     dispatchKey({ key: "s", metaKey: true });
     dispatchKey({ key: "z", metaKey: true });
-    expect(saveProject).not.toHaveBeenCalled();
     expect(composer.history.undo).not.toHaveBeenCalled();
   });
 
@@ -322,5 +303,70 @@ describe("useEditorShortcuts", () => {
       expect(composer.emit).not.toHaveBeenCalledWith("ui:comment-mode", {});
       expect(ev.defaultPrevented).toBe(false);
     });
+  });
+});
+
+/* BK-05 / D36: ⌘Z and ⌘⇧Z obey the mutating-command gates. */
+describe("useEditorShortcuts — undo gates (BK-05, D36)", () => {
+  const surfaceHost = (attrs: Record<string, string>) => {
+    const el = document.createElement("div");
+    for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+    document.body.appendChild(el);
+    return el;
+  };
+  const make = (extra: Record<string, unknown> = {}) => ({
+    history: { undo: vi.fn(), redo: vi.fn(), nextUndoTouchesOnly: vi.fn(() => false) },
+    emit: vi.fn(),
+    ...extra,
+  });
+  const mountWith = (c: ReturnType<typeof make>) =>
+    renderHook(() =>
+      useEditorShortcuts({
+        composer: c as unknown as UseEditorShortcutsOptions["composer"],
+        modals: { setShowShortcuts: vi.fn() },
+      } as UseEditorShortcutsOptions),
+    );
+
+  afterEach(() => {
+    document.body.innerHTML = "";
+  });
+
+  it("does nothing while read-only (view mode, time-travel)", () => {
+    const c = make({ readOnly: true });
+    const { unmount } = mountWith(c);
+    dispatchKey({ key: "z", metaKey: true });
+    dispatchKey({ key: "z", metaKey: true, shiftKey: true });
+    expect(c.history.undo).not.toHaveBeenCalled();
+    expect(c.history.redo).not.toHaveBeenCalled();
+    unmount();
+  });
+
+  it("does nothing behind a full-page surface (Settings, Templates, Assets)", () => {
+    surfaceHost({ "data-bk-surface": "fullpage" });
+    const c = make();
+    const { unmount } = mountWith(c);
+    dispatchKey({ key: "z", metaKey: true });
+    expect(c.history.undo).not.toHaveBeenCalled();
+    unmount();
+  });
+
+  it("in Brand, undoes a token edit", () => {
+    surfaceHost({ "data-bk-surface": "fullpage", "data-bk-history": "tokens" });
+    const c = make();
+    c.history.nextUndoTouchesOnly.mockReturnValue(true);
+    const { unmount } = mountWith(c);
+    dispatchKey({ key: "z", metaKey: true });
+    expect(c.history.undo).toHaveBeenCalledTimes(1);
+    unmount();
+  });
+
+  it("in Brand, leaves a canvas edit alone and says so", () => {
+    surfaceHost({ "data-bk-surface": "fullpage", "data-bk-history": "tokens" });
+    const c = make();
+    const { unmount } = mountWith(c);
+    dispatchKey({ key: "z", metaKey: true });
+    expect(c.history.undo).not.toHaveBeenCalled();
+    expect(c.emit).toHaveBeenCalledWith("history:undo-out-of-scope", undefined);
+    unmount();
   });
 });

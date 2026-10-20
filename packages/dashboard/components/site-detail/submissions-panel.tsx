@@ -130,7 +130,10 @@ export function SubmissionsPanel({ siteId, formBlocks, isLoading }: SubmissionsP
     );
   }
 
-  const rows = (submissionsQuery.data?.data ?? []) as unknown as FormSubmissionData[];
+  const rows: FormSubmissionData[] = (submissionsQuery.data?.data ?? []).map((r) => ({
+    ...r,
+    data: r.data as Record<string, string>,
+  }));
   const total = submissionsQuery.data?.total ?? 0;
   const totalPages = Math.max(1, Math.ceil(total / PER_PAGE));
 

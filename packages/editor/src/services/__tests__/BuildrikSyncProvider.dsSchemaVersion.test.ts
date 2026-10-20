@@ -8,7 +8,18 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock("../api-client", () => ({
   createBuildrikApiClient: vi.fn(() => ({
-    sites: { get: { query: mocks.sitesGetQuery } },
+    sites: {
+      get: { query: mocks.sitesGetQuery },
+      // One server snapshot; the mock composes the three reads it replaced.
+      loadForEditor: {
+        query: async ({ siteId }: { siteId: string }) => ({
+          site: await mocks.sitesGetQuery({ id: siteId }),
+          pages: await mocks.pagesListQuery({ siteId }),
+          settings: await mocks.siteDetailSettingsGetQuery({ siteId }),
+          lastEditedBy: null,
+        }),
+      },
+    },
     pages: { list: { query: mocks.pagesListQuery } },
     siteDetail: {
       settings: { get: { query: mocks.siteDetailSettingsGetQuery } },

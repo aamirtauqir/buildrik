@@ -23,6 +23,39 @@ describe("wireForms", () => {
     expect(forms[0].blockId).toBe("f1");
   });
 
+  /* BK-44: Method GET put the visitor's details in the URL and got a 405;
+     multipart and text/plain bodies were refused as "Invalid JSON". */
+  it.each([
+    ['method="get"', 'method="get" enctype="multipart/form-data"'],
+    ["method=GET", "method=GET enctype='text/plain'"],
+  ])("sends urlencoded POST whatever Method/Encoding the inspector set (%s)", (_label, attrs) => {
+    const { html } = wireForms(`<form data-buildrick-id="f1" ${attrs}><input name="email"></form>`, opts);
+    // The browser keeps the first of a repeated attribute; wiring's come first.
+    const form = new DOMParser().parseFromString(html, "text/html").querySelector("form")!;
+    expect(form.getAttribute("method")).toBe("POST");
+    expect(form.getAttribute("enctype")).toBe("application/x-www-form-urlencoded");
+    expect(form.method).toBe("post");
+    expect(form.enctype).toBe("application/x-www-form-urlencoded");
+  });
+
+  /* Security review of the BK-44 change: removing method/enctype by a search
+     across the tag also cut text inside another attribute's value, shifting
+     its quotes so the rest parsed as a new (event handler) attribute. Wiring
+     now removes nothing: every value on the tag survives verbatim. */
+  it("leaves every other attribute value as written — no text inside a value is ever cut", () => {
+    const open =
+      '<form data-buildrick-id="f1" title="x method=y" data-q=" onmouseover=alert(1) " ' +
+      "aria-label='a enctype=b' method=\"get\">";
+    const { html } = wireForms(`${open}<input name="email"></form>`, opts);
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    const form = doc.querySelector("form")!;
+    expect(form.getAttribute("title")).toBe("x method=y");
+    expect(form.getAttribute("data-q")).toBe(" onmouseover=alert(1) ");
+    expect(form.getAttribute("aria-label")).toBe("a enctype=b");
+    expect(form.getAttribute("method")).toBe("POST");
+    expect([...form.attributes].some((a) => a.name.startsWith("on"))).toBe(false);
+  });
+
   it("reports the fields, skipping the submit and anything unnamed", () => {
     const { forms } = wireForms(FORM, opts);
     expect(forms[0].fields).toEqual([

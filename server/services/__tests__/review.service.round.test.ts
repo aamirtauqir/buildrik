@@ -160,10 +160,10 @@ describe("revokeReviewRound", () => {
 
   it("revokes when the revision matches (no concurrent re-send)", async () => {
     rrUpdateMany.mockResolvedValue({ count: 1 });
-    const res = await revokeReviewRound("ws-1", "r1", rev);
+    const res = await revokeReviewRound("ws-1", "site-1", "r1", rev);
     expect(res).toEqual({ revoked: true });
     expect(rrUpdateMany).toHaveBeenCalledWith({
-      where: { id: "r1", site: { workspaceId: "ws-1" }, revokedAt: null, updatedAt: new Date(rev) },
+      where: { id: "r1", siteId: "site-1", site: { workspaceId: "ws-1" }, revokedAt: null, updatedAt: new Date(rev) },
       data: { revokedAt: expect.any(Date) },
     });
   });
@@ -172,11 +172,11 @@ describe("revokeReviewRound", () => {
     rrUpdateMany.mockResolvedValue({ count: 0 });
     // row exists in the workspace, live, but updatedAt moved on → stale revision
     rrFindFirst.mockResolvedValue({ revokedAt: null });
-    const res = await revokeReviewRound("ws-1", "r1", rev);
+    const res = await revokeReviewRound("ws-1", "site-1", "r1", rev);
     expect(res).toEqual({ revoked: false, reason: "token-changed" });
     // disambiguation is workspace-scoped (IDOR guard)
     expect(rrFindFirst).toHaveBeenCalledWith({
-      where: { id: "r1", site: { workspaceId: "ws-1" } },
+      where: { id: "r1", siteId: "site-1", site: { workspaceId: "ws-1" } },
       select: { revokedAt: true },
     });
   });
@@ -184,14 +184,23 @@ describe("revokeReviewRound", () => {
   it("reports already-revoked idempotently", async () => {
     rrUpdateMany.mockResolvedValue({ count: 0 });
     rrFindFirst.mockResolvedValue({ revokedAt: new Date() });
-    const res = await revokeReviewRound("ws-1", "r1", rev);
+    const res = await revokeReviewRound("ws-1", "site-1", "r1", rev);
     expect(res).toEqual({ revoked: false, reason: "already-revoked" });
+  });
+
+  /* BK-08: an EDITOR checked on site-1 revoked a review of another site. */
+  it("never revokes a review of another site — the site the role was checked on binds it", async () => {
+    rrUpdateMany.mockResolvedValue({ count: 0 });
+    rrFindFirst.mockResolvedValue(null);
+    const res = await revokeReviewRound("ws-1", "site-1", "r-on-site-2", rev);
+    expect(res).toEqual({ revoked: false, reason: "not-found" });
+    expect(rrUpdateMany.mock.calls.at(-1)![0].where.siteId).toBe("site-1");
   });
 
   it("reports not-found for a review outside the workspace (IDOR guard)", async () => {
     rrUpdateMany.mockResolvedValue({ count: 0 });
     rrFindFirst.mockResolvedValue(null);
-    const res = await revokeReviewRound("ws-1", "rX", rev);
+    const res = await revokeReviewRound("ws-1", "site-1", "rX", rev);
     expect(res).toEqual({ revoked: false, reason: "not-found" });
   });
 });

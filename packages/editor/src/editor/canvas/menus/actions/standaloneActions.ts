@@ -6,6 +6,7 @@
  */
 
 import { runTransaction } from "@/shared/utils/helpers";
+import { writableElements } from "@/engine/commands/commandOperations";
 import type { ContextAction } from "../contextMenuRegistry";
 import { ELEMENT_ACTIONS, type ElementActionId } from "@/editor/shared/elementActions";
 
@@ -64,7 +65,12 @@ export const standaloneActions: ContextAction[] = [
       // Show Ungroup for containers that wrap other elements
       return type === "container" && (element.getChildren?.()?.length ?? 0) > 0;
     },
+    /* BK-13: ungrouping removes the container — a locked one stays. */
+    isEnabled: ({ element }) => !element.isLocked?.(),
+    disabledReason: ({ element }) =>
+      element.isLocked?.() ? "This group is locked — unlock it to ungroup." : undefined,
     handler: ({ composer, element }) => {
+      if (writableElements(composer, [element]).length === 0) return;
       runTransaction(composer, "ungroup-elements", () => {
         composer.elements.ungroupElement(element.getId());
         composer.selection.clear();

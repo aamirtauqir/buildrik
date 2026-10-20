@@ -59,13 +59,15 @@ export interface IssuesFeedTriggers {
   publishState?: string;
   /** The Issues panel is open — opening it must never show a stale list. */
   panelOpen?: boolean;
+  /** Load-scan findings (useLoadRepair) — computed elsewhere, listed here. */
+  damageIssues?: Issue[];
 }
 
 export function useIssuesFeed(
   composer: Composer | null,
   siteId: string | null,
   setIssues: React.Dispatch<React.SetStateAction<Issue[]>>,
-  { publishState, panelOpen }: IssuesFeedTriggers = {},
+  { publishState, panelOpen, damageIssues }: IssuesFeedTriggers = {},
 ): UseIssuesFeedReturn {
   const content = useContentIssueScanner(composer);
 
@@ -159,8 +161,8 @@ export function useIssuesFeed(
   useRefetchOnFocus(refetchChecks);
 
   React.useEffect(() => {
-    setIssues([...lintIssues, ...content.issues, ...checkIssues]);
-  }, [lintIssues, content.issues, checkIssues, setIssues]);
+    setIssues([...lintIssues, ...content.issues, ...checkIssues, ...(damageIssues ?? [])]);
+  }, [lintIssues, content.issues, checkIssues, damageIssues, setIssues]);
 
   const rescan = React.useCallback(() => {
     content.rescan();

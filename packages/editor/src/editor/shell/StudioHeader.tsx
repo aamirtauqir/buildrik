@@ -49,6 +49,8 @@ import { SiteMenu } from "./SiteMenu";
 import { PermissionsHost } from "./PermissionsHost";
 import { TimeTravelHost } from "./TimeTravelHost";
 import { SaveFailedBanner } from "./SaveFailedBanner";
+import { STALL_AFTER_MS, useSaveStall } from "./hooks/useSaveStall";
+import { downloadFile } from "@/engine/export/ExportHelpers";
 import { shellDirty, useShellDirty } from "./shellDirtyRegistry";
 import "./header.css";
 
@@ -57,6 +59,24 @@ import type { SelectedElementInfo } from "@/shared/types";
 import { writeClipboardText } from "@buildrik/shared/browser/clipboard";
 import { endUnloadGuardBypass, isUnloadGuardBypassed, navigateBypassingUnloadGuard } from "./unloadGuardBypass";
 export type { SelectedElementInfo };
+
+/** Design decision 4's priority table: the one state the save pill shows. */
+export function savePillState(input: {
+  saveStatus: StudioSaveState["status"];
+  offline: boolean;
+  stalled: boolean;
+  dirty: boolean;
+}): SaveState {
+  if (input.saveStatus === "conflict") return "conflict";
+  if (input.offline) return "offline";
+  if (input.saveStatus === "error") return "error";
+  if (input.stalled) return "stalled";
+  if (input.saveStatus === "saving") return "saving";
+  return input.dirty ? "unsaved" : "saved";
+}
+
+/** The stuck-save panel's one reminder, this long after it first opened. */
+const STALL_REMIND_MS = 120_000;
 
 export interface StudioHeaderProps {
   /** Composer instance */
@@ -202,6 +222,9 @@ const SAVE_ANNOUNCEMENTS: Partial<Record<SaveState, { assertive: boolean; msg: s
      carries CMS, components, templates and versions — never the project.
      Proven by blocking the save and reloading: the edit was gone. */
   offline: { assertive: false, msg: "Offline — changes not saved" },
+  /* DR-T3: the stall panel opens on its own without taking focus — the live
+     region is how a screen reader hears that the work is only in this tab. */
+  stalled: { assertive: false, msg: "Autosave is stuck — changes are only in this tab" },
 };
 
 /** The strings the save effect owns, so it clears only its own stale text. */
@@ -628,17 +651,79 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   /* SaveStatus has carried a "conflict" state — label, amber pill, dot — that
      this derivation could not produce, so board 66:640's condition showed the
      chip as Saved. */
-  const save: SaveState = offline
-    ? "offline"
-    : saveStatus === "saving"
-      ? "saving"
-      : saveStatus === "conflict"
-        ? "conflict"
-        : saveStatus === "error"
-          ? "error"
-          : isDirty || shellIsDirty
-            ? "unsaved"
-            : "saved";
+  /* Design decision 4: ONE state at a time, in this order — Conflict >
+     Offline > Save failed > Not saving > Saving > Unsaved > Saved. "Not
+     saving" (useSaveStall) is a change older than 30 s that no save picked up;
+     it outranks Saving because a stuck gesture can keep a save from ever
+     starting while the pill would still read calm. */
+  const stalledFor = useSaveStall(composer, saveStatus);
+  const save = savePillState({ saveStatus, offline, stalled: stalledFor !== null, dirty: isDirty || shellIsDirty });
+
+  /* The "Autosave is stuck" panel opens by itself once when saving stalls,
+     again once 2 min later if it still has, and on every pill click. */
+  const [stallPanelOpen, setStallPanelOpen] = React.useState(false);
+  const stallOpens = React.useRef(0);
+  React.useEffect(() => {
+    if (save !== "stalled") {
+      stallOpens.current = 0;
+      setStallPanelOpen(false);
+      return;
+    }
+    if (stallOpens.current === 0) {
+      stallOpens.current = 1;
+      setStallPanelOpen(true);
+      return;
+    }
+    if (stallOpens.current === 1 && stalledFor !== null && stalledFor >= STALL_AFTER_MS + STALL_REMIND_MS) {
+      stallOpens.current = 2;
+      setStallPanelOpen(true);
+    }
+  }, [save, stalledFor]);
+  const gestureOpen = save === "stalled" && Boolean(composer?.canvas?.resize?.isCurrentlyResizing());
+  const stallPanel =
+    save === "stalled"
+      ? {
+          open: stallPanelOpen,
+          onClose: () => setStallPanelOpen(false),
+          label: "Autosave is stuck",
+          content: (
+            <div className="tw:w-[260px] tw:p-3" data-testid="save-stall-panel">
+              <p className="tw:m-0 tw:text-[13px] tw:font-semibold tw:text-[var(--bk-ink)]">Autosave is stuck</p>
+              <p className="tw:mt-1 tw:mb-0 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)]">
+                Your changes are only in this tab.
+              </p>
+              <div className="tw:mt-3 tw:flex tw:items-start tw:gap-2">
+                <Button
+                  size="xs"
+                  data-testid="save-stall-save-now"
+                  disabledReason={gestureOpen ? "Finish resizing to save" : undefined}
+                  onClick={() => {
+                    setStallPanelOpen(false);
+                    void onSave();
+                  }}
+                >
+                  Save now
+                </Button>
+                <Button
+                  size="xs"
+                  color="light"
+                  data-testid="save-stall-download"
+                  onClick={() => {
+                    if (!composer) return;
+                    downloadFile(
+                      JSON.stringify(composer.exportProject(), null, 2),
+                      `buildrik-unsaved-${Date.now()}.json`,
+                      "application/json",
+                    );
+                  }}
+                >
+                  Download a copy
+                </Button>
+              </div>
+            </div>
+          ),
+        }
+      : undefined;
 
   /* ── B2 (decision #23) · the save pill's click, by state ─────────────────
      The pill used to save for `unsaved`/`error` and do nothing otherwise.
@@ -650,7 +735,9 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
        offline                  → nothing to click; the reason is a tooltip
      `onSave` stays the save — ⌘S and the exit guard call it directly. */
   const savePillClick: (() => void) | undefined =
-    save === "error"
+    save === "stalled"
+      ? () => setStallPanelOpen((o) => !o)
+      : save === "error"
       ? () => void onSave()
       : save === "conflict"
         ? onOpenConflict
@@ -798,6 +885,8 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
            view does not offer one — nothing in it can become unsaved. */
         onSaveClick={viewMode.readOnlyView ? undefined : savePillClick}
         saveHint={viewMode.readOnlyView ? undefined : savePillHint}
+        saveStalledFor={stalledFor ?? undefined}
+        savePanel={viewMode.readOnlyView ? undefined : stallPanel}
         review={review}
         tools={tools}
         presence={

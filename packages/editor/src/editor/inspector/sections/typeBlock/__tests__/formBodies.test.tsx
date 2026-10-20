@@ -80,7 +80,7 @@ describe("Input (board 14)", () => {
     renderBlock(makeMockComposer({ element: el }), { id: "e1", type: "select" });
     const area = screen.getByLabelText("Options (one per line)") as HTMLTextAreaElement;
     fireEvent.change(area, { target: { value: "Red\nBlue" } });
-    expect(el.setContent).toHaveBeenCalledWith("<option>Red</option><option>Blue</option>");
+    expect(el.setContent).toHaveBeenCalledWith("<option>Red</option><option>Blue</option>", "html");
   });
 });
 
@@ -109,8 +109,20 @@ describe("Checkbox (board 15)", () => {
     renderBlock(c, { id: "cb", type: "checkbox" });
     expect(screen.getByRole("button", { name: /^Checkbox section/ })).toBeInTheDocument();
     expect(screen.queryByText("Container")).toBeNull();
-    inOrder(blockText(), ["Edit text on canvas", "Name", "Checked by default", "Required"]);
+    inOrder(blockText(), ["Edit text on canvas", "Name", "Value", "Checked by default", "Required"]);
     expect((screen.getByLabelText("Name") as HTMLInputElement).value).toBe("updates");
+  });
+
+  /* BK-44: a choice's value could only be set from a field labelled "Default"
+     on the inner input; the block had none, and answers were stored as "on". */
+  it("Value writes what the choice submits on the inner input", () => {
+    const c = project();
+    renderBlock(c, { id: "cb", type: "checkbox" });
+    const value = screen.getByLabelText("Value") as HTMLInputElement;
+    expect(value.value).toBe("");
+    fireEvent.change(value, { target: { value: "yes-updates" } });
+    expect(inner(c).getAttribute("value")).toBe("yes-updates");
+    expect(c.elements.getElement("cb")!.getAttribute("value")).toBeUndefined();
   });
 
   it("Edit text on canvas edits the text beside the box, not the label wrapping both", () => {

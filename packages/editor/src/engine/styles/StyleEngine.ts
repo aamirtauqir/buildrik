@@ -19,9 +19,9 @@ import { devWarn } from "@/shared/utils/devLogger";
 import { generateId, camelToKebab } from "@/shared/utils/helpers";
 import type { Composer } from "../Composer";
 import type { Element } from "../elements/Element";
+import { elementSelector } from "@/shared/utils/elementSelector";
+import { elementBaseCSS, type BaseRuleCache, type CascadeTarget } from "./cascadeCSS";
 
-/** The Inspector State menu's states (Base · :hover · :focus · :active · :disabled). */
-const STATE_PSEUDO = /:(hover|focus|focus-visible|focus-within|active|disabled)\b/;
 
 /**
  * Manages CSS styles and selectors
@@ -31,18 +31,25 @@ export class StyleEngine {
   private styles: Map<string, StyleData> = new Map();
   private ruleIndex: Map<string, StyleData> = new Map();
   private styleElement: HTMLStyleElement | null = null;
+  /** The canvas sheet's per-element base rules, reused across flushes. */
+  private baseRuleCache: BaseRuleCache = new Map();
   private pendingUpdate = false;
   private rafId: number | null = null;
 
   constructor(composer: Composer) {
     this.composer = composer;
     this.createStyleElement();
-    // The live stylesheet's device-preview block (see flush) depends on the
-    // active device, so a device switch must re-render the sheet.
-    this.composer.on(EVENTS.BREAKPOINT_CHANGED, this.onBreakpointChanged);
+    /* The live sheet carries every element's base styles (see canvasCSS), so
+       any document change — an element's own style, an add, a page switch, an
+       undo — re-renders it, on the same signals the canvas HTML follows. */
+    this.composer.on(EVENTS.COMPOSER_READY, this.onDocumentChanged);
+    this.composer.on(EVENTS.PROJECT_LOADED, this.onDocumentChanged);
+    this.composer.on(EVENTS.PROJECT_CHANGED, this.onDocumentChanged);
+    // …and a device switch changes which breakpoint layers the sheet holds.
+    this.composer.on(EVENTS.BREAKPOINT_CHANGED, this.onDocumentChanged);
   }
 
-  private onBreakpointChanged = (): void => {
+  private onDocumentChanged = (): void => {
     this.updateStylesheet();
   };
 
@@ -202,7 +209,7 @@ export class StyleEngine {
       return;
     }
 
-    const selector = `[data-buildrick-id="${elementId}"]`;
+    const selector = elementSelector(elementId);
     const mediaQuery = getBreakpointQuery(breakpoint);
 
     // For desktop (base styles), use regular setRule without media query
@@ -225,7 +232,7 @@ export class StyleEngine {
    */
   getBreakpointStyles(elementId: string): BreakpointStyles {
     const result: BreakpointStyles = {};
-    const selector = `[data-buildrick-id="${elementId}"]`;
+    const selector = elementSelector(elementId);
 
     for (const breakpoint of BREAKPOINT_ORDER) {
       const mediaQuery = getBreakpointQuery(breakpoint);
@@ -250,7 +257,7 @@ export class StyleEngine {
       return {};
     }
 
-    const selector = `[data-buildrick-id="${elementId}"]`;
+    const selector = elementSelector(elementId);
     const mediaQuery = getBreakpointQuery(breakpoint);
     const style = this.findRule(selector, mediaQuery ?? undefined);
 
@@ -272,7 +279,7 @@ export class StyleEngine {
       return;
     }
 
-    const selector = `[data-buildrick-id="${elementId}"]`;
+    const selector = elementSelector(elementId);
     const mediaQuery = getBreakpointQuery(breakpoint);
     const style = this.findRule(selector, mediaQuery ?? undefined);
 
@@ -310,7 +317,7 @@ export class StyleEngine {
       return;
     }
 
-    const selector = `[data-buildrick-id="${elementId}"]`;
+    const selector = elementSelector(elementId);
     const mediaQuery = getBreakpointQuery(breakpoint);
     this.removeRule(selector, mediaQuery ?? undefined);
 
@@ -351,11 +358,12 @@ export class StyleEngine {
    * Generate CSS with proper media query ordering for export
    * Desktop-first: base styles, then tablet, then mobile
    */
-  generateResponsiveCSS(options?: ExportOptions): string {
+  generateResponsiveCSS(options?: ExportOptions & { target?: CascadeTarget }): string {
     const opts = {
       minify: false,
       ...options,
     };
+    const target: CascadeTarget = opts.target ?? "media";
 
     const baseRules: string[] = [];
     const tabletRules: string[] = [];
@@ -391,17 +399,19 @@ export class StyleEngine {
       output.push(baseRules.join("\n\n"));
     }
 
-    // Tablet styles (larger breakpoint first)
-    if (tabletRules.length > 0) {
-      output.push(`@media ${tabletQuery} {\n${tabletRules.join("\n")}\n}`);
-    }
+    /* Tablet then mobile — the larger breakpoint first, so the narrower one
+       wins by order. On the canvas (target = a breakpoint) the layers that
+       apply there are written without their query; the rest are left out. */
+    const layer = (bp: "tablet" | "mobile", query: string | null, rules: string[]): void => {
+      if (rules.length === 0 || !query) return;
+      if (target === "media") output.push(`@media ${query} {\n${rules.join("\n")}\n}`);
+      else if (BREAKPOINT_ORDER.indexOf(target) >= BREAKPOINT_ORDER.indexOf(bp)) output.push(rules.join("\n"));
+    };
+    layer("tablet", tabletQuery, tabletRules);
+    layer("mobile", mobileQuery, mobileRules);
 
-    // Mobile styles (smaller breakpoint last)
-    if (mobileRules.length > 0) {
-      output.push(`@media ${mobileQuery} {\n${mobileRules.join("\n")}\n}`);
-    }
-
-    // Other media queries
+    // Other media queries — custom ranges a canvas cannot evaluate keep their
+    // viewport query everywhere.
     otherMediaRules.forEach((rules, query) => {
       output.push(`@media ${query} {\n${rules.join("\n")}\n}`);
     });
@@ -537,14 +547,13 @@ export class StyleEngine {
   /**
    * Generate a single style rule
    */
-  private generateStyleRule(style: StyleData, scope?: string, important = false): string {
+  private generateStyleRule(style: StyleData, scope?: string): string {
     const selector = scope ? `${scope} ${style.selector}` : style.selector;
-    const bang = important ? " !important" : "";
     // Exported into a published <style>: a declaration that could leave the
     // rule or the element is not written (A19-1 class).
     const props = Object.entries(style.properties ?? {})
       .filter(([key, value]) => isSafeCssDeclaration(key, value))
-      .map(([key, value]) => `  ${camelToKebab(key)}: ${value}${bang};`)
+      .map(([key, value]) => `  ${camelToKebab(key)}: ${value};`)
       .join("\n");
 
     return `${selector} {\n${props}\n}`;
@@ -651,63 +660,28 @@ export class StyleEngine {
    */
   flush(): void {
     if (!this.pendingUpdate || !this.styleElement) return;
-    this.styleElement.textContent = this.toCSS() + this.editorStatePreviewCSS() + this.editorDevicePreviewCSS();
+    this.styleElement.textContent = this.canvasCSS();
     this.pendingUpdate = false;
   }
 
   /**
-   * The canvas renders an element's BASE styles inline, and inline beats any
-   * stylesheet rule — so a `:hover` / `:focus` rule set in the Inspector's
-   * State menu never showed on the canvas (L2-008: hover fill set, rule in the
-   * sheet, computed background unchanged under the pointer). Re-emit the
-   * state rules `!important`, editor-only, the same answer the device block
-   * below gives breakpoint rules. Placed before that block so a tablet/mobile
-   * state rule it re-emits still wins by order. Exports never see this: the
-   * publish path emits base styles as class rules, which a state rule
-   * out-specifies on its own.
+   * The canvas stylesheet: the published cascade at the breakpoint being
+   * previewed (plan D10, D35).
+   *
+   * It used to render an element's BASE styles inline on the canvas, which
+   * beat every stylesheet rule — so breakpoint and :hover rules were
+   * re-emitted `!important`. That made the canvas a different cascade from
+   * the published page: a mobile base value beat the desktop :hover on the
+   * canvas and lost to it live. Now the base is a rule like on the published
+   * page (`[data-buildrick-id]` here, `.buildrick-<id>` there, same
+   * specificity) and the previewed breakpoint's layers follow it unwrapped.
    */
-  private editorStatePreviewCSS(): string {
-    const out = this.writableRules()
-      .filter((style) => !style.mediaQuery && (style.pseudo || STATE_PSEUDO.test(style.selector)))
-      .map((style) => this.generateStyleRule(style, undefined, true));
-    if (out.length === 0) return "";
-    return `\n\n/* editor state preview — state rules over the inline base styles */\n${out.join("\n")}`;
-  }
-
-  /**
-   * The editor's device preview is a NARROWED CANVAS in a full-width page, so
-   * `@media (max-width: …)` rules never match inside the editor no matter
-   * which device is active — a tablet font-size override was stored,
-   * exported, and invisible on the canvas that claimed to be showing Tablet.
-   * When a narrow device is active, re-emit that breakpoint's rules without
-   * their media query, appended AFTER the base rules so they win by source
-   * order — the same desktop-first cascade the exported CSS gets from real
-   * media queries (mobile preview applies tablet rules first, then mobile).
-   * Editor-only: exports go through toCSS/generateCSS, which never append
-   * this block.
-   */
-  private editorDevicePreviewCSS(): string {
+  private canvasCSS(): string {
+    const root = this.composer.elements?.getActivePageRootData?.();
     const device = this.composer.viewport?.getDevice();
-    if (device !== "tablet" && device !== "mobile") return "";
-
-    const cascade: BreakpointId[] = device === "tablet" ? ["tablet"] : ["tablet", "mobile"];
-    const out: string[] = [];
-    for (const bp of cascade) {
-      const query = getBreakpointQuery(bp);
-      if (!query) continue;
-      this.writableRules().forEach((style) => {
-        // !important, because the canvas renders an element's BASE styles
-        // inline and inline beats any stylesheet. The publish path solved the
-        // same collision by emitting base styles as class rules instead
-        // ("Inline base styles … shadowed breakpoint overrides"); the canvas
-        // still inlines them, so this block — which exists to make the
-        // override visible — lost to them. Measured: a heading set to 22px on
-        // Mobile, this rule present in the sheet, and the canvas drawing 48px.
-        if (style.mediaQuery === query) out.push(this.generateStyleRule(style, undefined, true));
-      });
-    }
-    if (out.length === 0) return "";
-    return `\n\n/* editor device preview (${device}) — breakpoint rules re-emitted without media queries */\n${out.join("\n")}`;
+    const breakpoint: CascadeTarget = device && isValidBreakpoint(device) ? device : "desktop";
+    const base = elementBaseCSS([root], elementSelector, breakpoint, false, this.baseRuleCache);
+    return [base, this.generateResponsiveCSS({ target: breakpoint })].filter(Boolean).join("\n\n");
   }
 
   // ============================================
@@ -728,7 +702,7 @@ export class StyleEngine {
     // Batched: setProperty calls are coalesced into a single RAF flush
     propsToInherit.forEach((prop) => {
       if (fromStyles.properties[prop]) {
-        this.setProperty(`[data-buildrick-id="${to.getId()}"]`, prop, fromStyles.properties[prop]);
+        this.setProperty(elementSelector(to.getId()), prop, fromStyles.properties[prop]);
       }
     });
 
@@ -777,7 +751,7 @@ export class StyleEngine {
    * Get styles for an element ID
    */
   getStyles(elementId: string): StyleData | undefined {
-    return this.findRule(`[data-buildrick-id="${elementId}"]`);
+    return this.findRule(elementSelector(elementId));
   }
 
   /**
@@ -809,12 +783,16 @@ export class StyleEngine {
    * Destroy the style engine
    */
   destroy(): void {
-    this.composer.off(EVENTS.BREAKPOINT_CHANGED, this.onBreakpointChanged);
+    this.composer.off(EVENTS.COMPOSER_READY, this.onDocumentChanged);
+    this.composer.off(EVENTS.PROJECT_LOADED, this.onDocumentChanged);
+    this.composer.off(EVENTS.PROJECT_CHANGED, this.onDocumentChanged);
+    this.composer.off(EVENTS.BREAKPOINT_CHANGED, this.onDocumentChanged);
     if (this.rafId !== null) {
       cancelAnimationFrame(this.rafId);
       this.rafId = null;
     }
     this.pendingUpdate = false;
+    this.baseRuleCache.clear();
     this.styles.clear();
     this.ruleIndex.clear();
     if (this.styleElement && this.styleElement.parentNode) {

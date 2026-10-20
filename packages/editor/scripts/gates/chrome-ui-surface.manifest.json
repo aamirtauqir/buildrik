@@ -53,6 +53,8 @@
     "FormFieldProps": "local",
     "FormatRow": "local",
     "FormatRowProps": "local",
+    "FullPageHost": "local",
+    "FullPageHostProps": "local",
     "HelpTooltip": "local",
     "HelpTooltipProps": "local",
     "HelperText": "flowbite-reexport",

@@ -57,6 +57,10 @@ import { PUBLISH_CHECK_ISSUE } from "./hooks/useIssuesFeed";
 import { useHistoryFeedback } from "./hooks/useHistoryFeedback";
 import { usePublishOutcomeFlash } from "./hooks/usePublishOutcomeFlash";
 import { useSaveCallback } from "./hooks/useSaveCallback";
+import { useServerConflict } from "./hooks/useServerConflict";
+import { useLoadRepair } from "./hooks/useLoadRepair";
+import { trackEvent } from "@/shared/utils/errorTracking";
+import { getEditorViewMode } from "@shared/utils/editorViewMode";
 import { useStudioHandlers } from "./hooks/useStudioHandlers";
 import { useStudioModals } from "./hooks/useStudioModals";
 import { useStudioState } from "./hooks/useStudioState";
@@ -67,9 +71,7 @@ import { StudioPanels } from "./StudioPanels";
 import { requestAssetPick, useAssetPickBridge } from "../sidebar/tabs/media/data/assetPick";
 import type { MediaAsset, MediaAssetType } from "@shared/types/media";
 import { ConflictModal } from "./modals/ConflictModal";
-import { navigateBypassingUnloadGuard } from "./unloadGuardBypass";
 import { useOtherTabNotice } from "./hooks/useOtherTabNotice";
-import { SAVE_CONFLICT_EVENT, setBaselineLastEditedAt } from "@/services/BuildrikSyncProvider";
 
 import "../../themes/default.css";
 import { requestBrandToken } from "@/editor/design-system/ui/brandOpenRequest";
@@ -220,6 +222,11 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
 
   // In-shell preview (shell state 7) — sanitized page HTML below the topbar.
   const [previewHtml, setPreviewHtml] = React.useState<string | null>(null);
+  /* Decision 9: the build's own state — building, or failed (with its cause
+     and how many times in a row). A failed build showed nothing. */
+  const [previewBuild, setPreviewBuild] = React.useState<
+    { status: "building"; attempts: number } | { status: "error"; error: string; attempts: number } | null
+  >(null);
 
 
   // Initialize composer with hooks
@@ -273,29 +280,50 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
    * the overlay now, and toggle it closed if it is already up.
    */
   const previewOpenRef = React.useRef(false);
-  previewOpenRef.current = previewHtml != null;
+  const previewRun = React.useRef(0);
+  const buildPreview = React.useCallback(() => {
+    if (!composer) return;
+    const mine = ++previewRun.current;
+    setPreviewHtml(null);
+    setPreviewBuild((b) => ({ status: "building", attempts: b?.status === "error" ? b.attempts : 0 }));
+    renderPreviewHtml(composer).then(
+      (html) => {
+        if (mine !== previewRun.current) return;
+        setPreviewBuild(null);
+        setPreviewHtml(sanitizeHTMLForPreview(html));
+      },
+      (err: unknown) => {
+        if (mine !== previewRun.current) return;
+        const error = err instanceof Error && err.message ? err.message : "Something on this page couldn't be rendered.";
+        setPreviewBuild((b) => {
+          const attempts = (b?.attempts ?? 0) + 1;
+          trackEvent("preview.build_failed", { attempt: attempts });
+          return { status: "error", error, attempts };
+        });
+      },
+    );
+  }, [composer]);
+  const closePreview = React.useCallback(() => {
+    previewRun.current += 1;
+    setPreviewBuild(null);
+    setPreviewHtml(null);
+  }, []);
+  previewOpenRef.current = previewHtml != null || previewBuild != null;
   React.useEffect(() => {
     if (!composer) return;
-    /* Building is async now — CMS bindings resolve as publish resolves them
+    /* Building is async — CMS bindings resolve as publish resolves them
        (renderPreviewHtml) — so a toggle that lands while one is building
-       supersedes it instead of opening a stale preview. */
-    let run = 0;
+       supersedes it (previewRun) instead of opening a stale preview. */
     const handle = () => {
-      const mine = ++run;
-      if (previewOpenRef.current) {
-        setPreviewHtml(null);
-        return;
-      }
-      void renderPreviewHtml(composer).then((html) => {
-        if (mine === run) setPreviewHtml(sanitizeHTMLForPreview(html));
-      });
+      if (previewOpenRef.current) closePreview();
+      else buildPreview();
     };
     composer.on(EVENTS.UI_TOGGLE_PREVIEW, handle);
     return () => {
-      run += 1;
+      previewRun.current += 1;
       composer.off(EVENTS.UI_TOGGLE_PREVIEW, handle);
     };
-  }, [composer]);
+  }, [composer, buildPreview, closePreview]);
 
   // Composer-driven side-effects (COMPONENT_CREATE_REQUESTED, overlay-defaults
   // init, …) live in useEditorEventListeners — D2 stage 3.
@@ -383,22 +411,16 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     return () => { window.removeEventListener("online", on); window.removeEventListener("offline", off); };
   }, []);
 
-  // 61-conflict: a behind-copy save was rejected by the server. Listen on the
-  // window event; idempotent (keep the first) so repeated autosave conflicts
-  // don't stack dialogs while one is open. `open` is separate from the token:
-  // a dismissed dialog keeps the token, so the save pill's `conflict` state
-  // can re-open it (B2, decision #23) with the same three ways out.
-  const [conflict, setConflict] = React.useState<{ serverToken: string; brandFormat: boolean; open: boolean } | null>(null);
-
-  React.useEffect(() => {
-    const onConflict = (e: Event) => {
-      const detail = (e as CustomEvent<{ serverLastEditedAt: string; brandFormat?: boolean }>).detail;
-      const token = detail?.serverLastEditedAt;
-      if (token) setConflict((c) => (c?.open ? c : { serverToken: token, brandFormat: detail.brandFormat === true, open: true }));
-    };
-    window.addEventListener(SAVE_CONFLICT_EVENT, onConflict);
-    return () => window.removeEventListener(SAVE_CONFLICT_EVENT, onConflict);
-  }, []);
+  // 61-conflict + BK-04: a refused save and kept edits that never reached
+  // the server, both resolved in ConflictModal (useServerConflict).
+  const serverConflict = useServerConflict({
+    composer,
+    siteId: getSiteIdFromUrl(),
+    addToast,
+    setIsDirty: state.setIsDirty,
+    setSaveState: state.setSaveState,
+    saveProject,
+  });
 
   // Export + publish lifecycle (HTML zip, Vercel deploy, publish-toast effect,
   // usePublishJob) extracted into useExportHandlers — D2 stage 4. The hook
@@ -424,9 +446,14 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   // Its server check rows re-read when a publish settles and when the panel
   // opens (IR-1), as well as after a save and on return to the tab.
   useOtherTabNotice(getSiteIdFromUrl(), addToast);
+  /* E-T9 / DR-T5: the load scan's repairs, toast and Issues rows — after the
+     restore dialog (decision 1). View mode only lists them. */
+  const viewOnly = React.useMemo(() => getEditorViewMode().readOnlyView, []);
+  const loadRepair = useLoadRepair({ composer, siteId: getSiteIdFromUrl(), addToast, readOnly: viewOnly });
   const issuesFeed = useIssuesFeed(composer, getSiteIdFromUrl(), state.setIssues, {
     publishState: publishJob.uiState,
     panelOpen: issuesOpen,
+    damageIssues: loadRepair.issues,
   });
 
   /* ── The site's ONE next move, derived once (B4, decision #34) ────────────
@@ -461,7 +488,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   useEditorShortcuts({
     composer,
     modals,
-    saveProject,
     openLeftPanelToTab: guardedOpenLeftPanelToTab,
     /* FC-11: same door the site menu's "Site settings" row uses — both go
        straight to the Settings tab now, the way S and ⌘K already did. This
@@ -633,6 +659,9 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         }
         return fixed;
       }}
+      onDamageFix={loadRepair.fix}
+      onDamageKeep={loadRepair.keep}
+      damageReadOnly={viewOnly}
       onOpenBrand={(tokenId) => {
         setIssuesOpen(false);
         if (tokenId) requestBrandToken(composer, tokenId);
@@ -698,7 +727,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           onOpenActivity={() => guardedOpenLeftPanelToTab("activity")}
           onOpenIssues={() => setIssuesOpen(true)}
           onOpenReview={() => guardedOpenLeftPanelToTab("review")}
-          onOpenConflict={() => setConflict((c) => (c ? { ...c, open: true } : c))}
+          onOpenConflict={serverConflict.reopenSaveConflict}
           onOpenShortcuts={modals.toggleShortcuts}
           onSave={saveProject}
           onExportHTML={handleExportHTML}
@@ -796,40 +825,15 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         onCloseCMSCollectionSetup={modals.closeCMSCollectionSetup}
       />
 
-      <ConflictModal
-        open={!!conflict?.open}
-        brandFormat={conflict?.brandFormat}
-        siteId={getSiteIdFromUrl()}
-        onClose={() => setConflict((c) => (c ? { ...c, open: false } : c))}
-        /* The user already chose to drop this tab's copy; the dirty-tab
-           "Leave site?" prompt on top of that choice was a second, scarier
-           dialog asking the same thing (L5-077). */
-        onReload={() => navigateBypassingUnloadGuard(() => window.location.reload())}
-        onSaveBackup={() => {
-          // Download the local copy so nothing is lost, then take the latest.
-          try {
-            const blob = new Blob([JSON.stringify(composer.exportProject(), null, 2)], { type: "application/json" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = `buildrik-backup-${Date.now()}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-          } finally {
-            navigateBypassingUnloadGuard(() => window.location.reload());
-          }
-        }}
-        onOverwrite={() => {
-          // Adopt the server's version token so our next save matches + wins.
-          if (conflict) setBaselineLastEditedAt(conflict.serverToken);
-          setConflict(null);
-          saveProject();
-        }}
-      />
+      <ConflictModal {...serverConflict.modalProps} />
 
       <PreviewOverlay
         html={previewHtml}
-        onDone={() => setPreviewHtml(null)}
+        status={previewBuild?.status}
+        error={previewBuild?.status === "error" ? previewBuild.error : undefined}
+        attempts={previewBuild?.attempts}
+        onRetry={buildPreview}
+        onDone={closePreview}
         siteId={getSiteIdFromUrl()}
         siteName={previewHtml ? composer.getProjectMetadata?.()?.name : null}
         pageName={previewHtml ? composer.elements.getActivePage?.()?.name : null}
@@ -840,7 +844,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
            was being previewed (L5-051). */
         onShowPage={(pageId) => {
           composer.elements.setActivePage(pageId);
-          void renderPreviewHtml(composer).then((html) => setPreviewHtml(sanitizeHTMLForPreview(html)));
+          buildPreview();
         }}
       />
       {/* B8: the one Compare, opened by every Compare door via UI_COMPARE_OPEN. */}

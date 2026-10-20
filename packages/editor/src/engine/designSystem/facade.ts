@@ -14,6 +14,10 @@ import type { TokenBindingResolver } from "./TokenBindingResolver";
 import type { ConnectSuggestion } from "./connectTokens";
 import type { BrandPreview, DarkMode, DesignToken } from "./types";
 
+/** History label of Brand's "Connect to tokens" — a Brand edit that writes
+ *  element styles, so Brand's ⌘Z may undo it (D36). */
+export const CONNECT_TOKENS_LABEL = "Connect to tokens";
+
 export interface DesignSystemFacade {
   /** True when the site's tokens failed to migrate on load: Brand shows the
    *  old tokens and refuses edits. Set by the load path, announced with

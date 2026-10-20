@@ -151,11 +151,12 @@ export class VersionTimelineManager {
   // ============================================
 
   /**
-   * Create a new named version
+   * Create a new named version — of the current document, or of `snapshot`
+   * when given (the server's copy kept before an Overwrite, BK-59).
    */
-  async createVersion(name: string, description?: string): Promise<NamedVersion> {
-    const snapshot = await this.captureSnapshotAsync();
-    const visualSnapshot = this.captureVisualSnapshot();
+  async createVersion(name: string, description?: string, snapshot?: ProjectData): Promise<NamedVersion> {
+    const visualSnapshot = snapshot ? null : this.captureVisualSnapshot();
+    snapshot ??= await this.captureSnapshotAsync();
 
     const version: NamedVersion = {
       id: generateVersionId(),
@@ -717,7 +718,9 @@ export class VersionTimelineManager {
     return this.compareSnapshots(this.captureSnapshot(), target.snapshot, "Current draft", target.name);
   }
 
-  private compareSnapshots(
+  /** Element-content diff of two snapshots (rows read current → target).
+   *  Public for the conflict dialog's "Review differences" (C1). */
+  compareSnapshots(
     currentData: ProjectData,
     targetData: ProjectData,
     currentName: string,

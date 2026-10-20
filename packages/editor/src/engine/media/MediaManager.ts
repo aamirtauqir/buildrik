@@ -6,6 +6,7 @@
  * @license BSD-3-Clause
  */
 
+import { trackEvent } from "@/shared/utils/errorTracking";
 import DOMPurify from "dompurify";
 import {
   MEDIA_DEFAULTS,
@@ -396,24 +397,38 @@ export class MediaManager extends MediaEventEmitter {
         this.retryQueue.delete(id);
         continue;
       }
+      const meta = {
+        filename: asset.originalName,
+        mimeType: asset.mimeType,
+        bytes: asset.size,
+        type: serverType,
+        folderId: asset.folderId ?? null,
+      };
+      /* BK-42: a file already in storage is only registered, never sent
+         again. */
+      if (asset.uploadedUrl) {
+        const registered = await this.remoteSync.registerUploaded(asset.uploadedUrl, meta);
+        if (registered) {
+          trackEvent("media.registration_recovered");
+          await this.replaceAssetId(id, registered.serverId, registered.url);
+          this.retryQueue.delete(id);
+        }
+        continue;
+      }
       const blob = await this.storage.getBlob(id);
       if (!blob) {
         // Local blob lost — drop from retry; nothing to upload.
         this.retryQueue.delete(id);
         continue;
       }
-      const result = await this.remoteSync.uploadAndCreate(blob, {
-        filename: asset.originalName,
-        mimeType: asset.mimeType,
-        bytes: asset.size,
-        type: serverType,
-        folderId: asset.folderId ?? null,
-      });
-      if (result) {
+      const result = await this.remoteSync.uploadAndCreate(blob, meta);
+      if (result?.serverId) {
         // Replace local id with server CUID, clear localOnly flag,
         // re-key IndexedDB so engine and server agree on identity.
         await this.replaceAssetId(id, result.serverId, result.url);
         this.retryQueue.delete(id);
+      } else if (result) {
+        await this.keepUploadedUrl(id, result.url);
       }
     }
     // Drain pending deletes too.
@@ -624,6 +639,7 @@ export class MediaManager extends MediaEventEmitter {
       serverId: newId,
       src: remoteUrl,
       localOnly: false,
+      uploadedUrl: undefined,
       updatedAt: new Date().toISOString(),
     };
     // Move IndexedDB record under the new key, then drop old key.
@@ -646,6 +662,26 @@ export class MediaManager extends MediaEventEmitter {
        uses, so the Composer re-points every element that holds it. */
     if (old.src.startsWith("blob:") && old.src !== remoteUrl) {
       this.emit(MEDIA_EVENTS.LOCAL_URLS_REBUILT, { remapped: { [old.src]: remoteUrl } });
+    }
+  }
+
+  /**
+   * BK-42: the file is in storage at `url` but has no asset row yet. The asset
+   * points at that URL (placements of its `blob:` preview are re-pointed, so a
+   * reload or a teammate sees the image) and stays queued to be registered.
+   */
+  private async keepUploadedUrl(id: string, url: string): Promise<void> {
+    const idx = this.state.assets.findIndex((a) => a.id === id);
+    if (idx === -1) return;
+    trackEvent("media.registration_failed", { retry: Boolean(this.state.assets[idx].uploadedUrl) });
+    const old = this.state.assets[idx];
+    const updated: MediaAsset = { ...old, src: url, uploadedUrl: url, localOnly: true, updatedAt: new Date().toISOString() };
+    this.state.assets[idx] = updated;
+    this.retryQueue.add(id);
+    await this.persist(updated, (await this.storage.getBlob(id)) ?? undefined);
+    this.emit(MEDIA_EVENTS.MEDIA_UPDATED, updated);
+    if (old.src.startsWith("blob:") && old.src !== url) {
+      this.emit(MEDIA_EVENTS.LOCAL_URLS_REBUILT, { remapped: { [old.src]: url } });
     }
   }
 
@@ -1094,7 +1130,10 @@ export class MediaManager extends MediaEventEmitter {
         });
         this.inFlightUploads.delete(assetId);
 
-        if (remote) {
+        if (remote && !remote.serverId && !this.deleteOnReconcile.has(assetId)) {
+          await this.keepUploadedUrl(assetId, remote.url);
+          finalAsset = this.state.assets.find((a) => a.id === assetId) ?? asset;
+        } else if (remote?.serverId) {
           // P1C tombstone check — if user deleted local during in-flight
           // upload, server row exists but engine state was already cleaned.
           // Delete the server row + Vercel Blob to match.

@@ -81,6 +81,16 @@ function isTextEntry(el: HTMLElement | null): boolean {
     : false;
 }
 
+/**
+ * Whether a full-page surface (Templates, Asset library, Settings, Brand)
+ * owns the keyboard. The canvas stays mounted behind it, but no canvas
+ * shortcut may act on a document the user is not looking at. DOM query, not
+ * an import — engine/ must not depend on editor/.
+ */
+export function getFullPageSurface(): Element | null {
+  return typeof document !== "undefined" ? document.querySelector('[data-bk-surface="fullpage"]') : null;
+}
+
 export class CommandCenter {
   private composer: Composer;
   private commands: Map<string, CommandData> = new Map();
@@ -213,15 +223,17 @@ export class CommandCenter {
     // A read-only composer runs no command that changes the document.
     if (this.composer.readOnly && MUTATING_COMMANDS.has(commandId)) return false;
 
+    // BK-28: a focused control that owns its shortcuts (a page row's ⌘D / ⌫)
+    // keeps them — this capture-phase listener ran first and duplicated the
+    // canvas selection instead. DOM attribute, not an import (engine/ must
+    // not depend on editor/).
+    if (target?.closest?.("[data-bk-owns-keys]")) return false;
+
     // A full-page surface (Templates, Asset library, Settings) owns the
     // keyboard while mounted — the canvas stays mounted behind it but is not
     // what the user is looking at. DOM query, not an import — engine/ must
     // not depend on editor/, same contract as the modal carve-out below.
-    if (
-      !UNIVERSAL_COMMANDS.has(commandId) &&
-      typeof document !== "undefined" &&
-      document.querySelector('[data-bk-surface="fullpage"]')
-    ) {
+    if (!UNIVERSAL_COMMANDS.has(commandId) && getFullPageSurface() !== null) {
       return false;
     }
 

@@ -176,6 +176,7 @@ Dashboard package (Next.js — `process.env.X`). Vite editor env lives in `packa
 | `COOKIE_DOMAIN` | Optional cookie domain override when the app and editor sit on different subdomains. | No |
 | `CRON_SECRET` | Bearer token the cron routes (`/api/cron/*`) check before running. | Yes in production |
 | `BRAND_TOKENS_V2` | `on` enables the v6 brand-token migration (Brand Part 1) for every workspace. Off (unset) = no NEW migrations; already-migrated sites keep working. Server-side, read per request — never `NEXT_PUBLIC_*`. Rollout: QA workspace first via `BRAND_TOKENS_V2_WORKSPACES`, then `on`. See docs/runbooks/brand-token-migration.md. | Yes once Part 1 ships |
+| `EDITOR_LOAD_REPAIR` | Kill switch for the editor's load-time repair (CEO D5, `isLoadRepairEnabled` in `sites.service.ts`, sent with every `sites.loadForEditor`). `off` stops every automatic repair (sizes that aren't numbers) — possible-damage rows still list in Issues. Read per request: change it and restart, no rebuild. Unset = on. | No |
 | `BRAND_TOKENS_V2_WORKSPACES` | Comma-separated workspace ids the v6 migration is enabled for while `BRAND_TOKENS_V2` is not `on` (`isBrandTokensV2Enabled(workspaceId)`, `server/services/brand-tokens.ts`) — the save path, the editor's settings read and the theme push all ask per site's workspace. Ignored once `BRAND_TOKENS_V2=on`. | Only for the staged rollout |
 
 ### Auth providers

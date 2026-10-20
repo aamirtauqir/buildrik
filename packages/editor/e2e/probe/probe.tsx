@@ -2078,11 +2078,19 @@ const CASES: Record<string, () => React.ReactElement> = {
   /* Save conflict, board 66:640. The overlay opens only when the server
      rejects a save because the site moved underneath this editor — no click in
      the standalone demo reaches it, and AquibraStudio's `conflict` state is
-     set from a save response. The REAL component is mounted with the four
-     callbacks it takes. */
+     set from a save response. The REAL component is mounted with the
+     callbacks it takes and a server copy that is still loading. */
   "shell-state-11-saving-conflict": () => (
     <div data-probe="shell-state-11-saving-conflict">
-      <ConflictModal open siteId={null} onReload={() => {}} onSaveBackup={() => {}} onOverwrite={() => {}} onClose={() => {}} />
+      <ConflictModal
+        open
+        siteId={null}
+        server={{ status: "loading" }}
+        onKeep={() => {}}
+        onDownload={() => false}
+        onReplace={() => {}}
+        onClose={() => {}}
+      />
     </div>
   ),
   /* Layers drawer, boards 142:2 / 143:2 / 143:295 / 1082:4589 / 1171:4829.

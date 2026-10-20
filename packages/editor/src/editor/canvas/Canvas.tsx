@@ -699,6 +699,18 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
         if (!id) return;
         const el = composer.elements.getElement(id);
         if (!el) return;
+        /* BK-13: a locked element is not selected by a left click, and a
+           right click selected it — and opened every structural action on
+           it. Same answer as the left click. */
+        if (el.isLocked?.()) {
+          closeContextMenu();
+          addToast({
+            description: "This element is locked. Unlock it here in the inspector or in Layers.",
+            tone: "info",
+            duration: 2500,
+          });
+          return;
+        }
         /* G2-056: right-clicking a member of a multi-selection keeps the
            selection, so the menu's Delete / Duplicate / Group act on all of
            it; right-clicking anything else selects just that. */
@@ -707,7 +719,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
 
         setContextMenu({ x: e.clientX, y: e.clientY, elementId: id });
       },
-      [composer, select, closeContextMenu, setContextMenu]
+      [composer, select, closeContextMenu, setContextMenu, addToast]
     );
 
     /* G2-014: "Custom width…" previews at a width of the user's choosing, in

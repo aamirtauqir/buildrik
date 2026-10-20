@@ -3,7 +3,8 @@
  * stage 1). Owns the global window keydown handler that drives the
  * editor's keyboard shortcuts:
  *
- *   Cmd/Ctrl+S            → saveProject()
+ *   (Cmd/Ctrl+S is the command registry's `save`, which runs the shell's save
+ *    through composer.saveProject() — one handler everywhere, BK-11.)
  *   Cmd/Ctrl+Z            → composer.history.undo()
  *   Cmd/Ctrl+Shift+Z      → composer.history.redo()
  *   Cmd/Ctrl+Y            → composer.history.redo()
@@ -51,6 +52,9 @@ import { isModalOpen } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
 import { cycleRegion } from "../regionCycle";
 import { EVENTS } from "@/shared/constants/events";
+import { CONNECT_TOKENS_LABEL } from "@/engine/designSystem/facade";
+import { trackEvent } from "@/shared/utils/errorTracking";
+import { getFullPageSurface } from "@/engine/commands/CommandCenter";
 
 // Modals subset the shortcut handler reads. Match the public surface of
 // useStudioModals; passing the full modals object keeps mocking simple.
@@ -64,7 +68,6 @@ const isQuestionMark = (e: KeyboardEvent) => e.key === "?" && !e.metaKey && !e.c
 export interface UseEditorShortcutsOptions {
   composer: Composer | null;
   modals: ShortcutModals;
-  saveProject: () => void;
   /** Opens a left-panel destination; the site menu prints these shortcuts. */
   openLeftPanelToTab?: (primaryTab: string, subTab?: string) => void;
   /**
@@ -82,7 +85,6 @@ export interface UseEditorShortcutsOptions {
 export function useEditorShortcuts({
   composer,
   modals,
-  saveProject,
   openLeftPanelToTab,
   openSiteSettings,
   reviewsEnabled = true,
@@ -164,11 +166,6 @@ export function useEditorShortcuts({
       // the one table (it also feeds the keyboard-shortcuts sheet), so this
       // one stands down.
 
-      if ((e.ctrlKey || e.metaKey) && e.key === "s") {
-        e.preventDefault();
-        saveProject();
-      }
-
       /* ⌘P — Preview. Printed in two places (the ⌘K palette's Preview row and
          the keyboard-shortcuts panel) and bound nowhere, so the chord fell
          through to the browser and opened its PRINT dialog over the editor.
@@ -185,12 +182,30 @@ export function useEditorShortcuts({
       const isRedo =
         (e.ctrlKey || e.metaKey) &&
         ((e.shiftKey && e.key.toLowerCase() === "z") || e.key.toLowerCase() === "y");
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z" && !e.shiftKey) {
+      const isUndo = (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z" && !e.shiftKey;
+      /* BK-05: ⌘Z / ⌘⇧Z change the document, so they obey the same gates as
+         every other mutating command: not while read-only (view mode, History
+         time-travel) and not behind a full-page surface (Settings, Templates,
+         Assets) — there they undid canvas edits nobody could see. A surface
+         marked `data-bk-history="tokens"` (Brand, D36) keeps ⌘Z for its own
+         token edits only; a canvas change next in line is left alone. */
+      const surface = getFullPageSurface();
+      const tokensOnly = surface?.getAttribute("data-bk-history") === "tokens";
+      const historyBlocked = composer.readOnly || (surface !== null && !tokensOnly);
+      if ((isUndo || isRedo) && historyBlocked && surface) trackEvent("undo.blocked_surface", { redo: isRedo });
+      if (isUndo && !historyBlocked) {
         e.preventDefault();
-        composer.history.undo();
-      } else if (isRedo) {
+        if (tokensOnly && !composer.history.nextUndoTouchesOnly(["/settings/"], [CONNECT_TOKENS_LABEL])) {
+          trackEvent("undo.blocked_surface", { redo: false, tokensOnly: true });
+          composer.emit(EVENTS.HISTORY_UNDO_OUT_OF_SCOPE, undefined);
+        } else {
+          composer.history.undo();
+        }
+      } else if (isRedo && !historyBlocked) {
         e.preventDefault();
-        composer.history.redo();
+        if (!tokensOnly || composer.history.nextRedoTouchesOnly(["/settings/"], [CONNECT_TOKENS_LABEL])) {
+          composer.history.redo();
+        }
       }
 
       if ((e.ctrlKey || e.metaKey) && e.key === "/") {
@@ -204,5 +219,5 @@ export function useEditorShortcuts({
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [saveProject, composer, modals, openLeftPanelToTab, openSiteSettings, reviewsEnabled]);
+  }, [composer, modals, openLeftPanelToTab, openSiteSettings, reviewsEnabled]);
 }

@@ -126,6 +126,9 @@ export const EVENTS = {
   /** A feature changed the project OUTSIDE history — the change is real and
    *  cannot be undone. The Undo affordance reads this so it stops offering. */
   HISTORY_UNRECORDED: "history:unrecorded",
+  /** ⌘Z inside a surface that may only undo its own kind of change (Brand:
+   *  token edits) found a canvas change next, and did nothing (BK-05, D36). */
+  HISTORY_UNDO_OUT_OF_SCOPE: "history:undo-out-of-scope",
   HISTORY_CHANGED: "history:changed",
   HISTORY_CLEARED: "history:cleared",
   HISTORY_RECORDED: "history:recorded",
@@ -906,6 +909,7 @@ export interface EventPayloads {
     superseded?: string;
   };
   [EVENTS.HISTORY_UNRECORDED]: { label: string };
+  [EVENTS.HISTORY_UNDO_OUT_OF_SCOPE]: void;
   [EVENTS.HISTORY_RECORDED]: { label?: string };
   [EVENTS.HISTORY_CLEARED]: void;
 

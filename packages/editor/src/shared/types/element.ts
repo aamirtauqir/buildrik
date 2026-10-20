@@ -49,15 +49,19 @@ export interface ElementData {
   /** Text content */
   content?: string;
   /**
-   * How `content` should be treated on export. Absent or `"text"` means plain
-   * text and it is HTML-escaped — the safe default every hand-authored element
-   * relies on, so a user typing `<script>` cannot inject markup.
+   * How `content` is written into the page — the SAME rule on the canvas,
+   * Preview, export and publish (BK-40, `contentToHTML`):
    *
-   * `"html"` means `content` is already markup. AI site generation stores whole
-   * generated sections that way (`ai-generate/[jobId]/route.ts`), which the
-   * canvas mounts un-escaped. Without this flag the export path escaped them
-   * too, and every AI-generated site published as visible angle brackets.
-   * Export sanitizes `"html"` content before emitting it; it is never trusted.
+   * `"text"` — plain text, HTML-escaped: `<script>` shows as typed. HTML
+   * import stamps its text nodes this way, so an escaped `&lt;img onerror&gt;`
+   * in pasted markup stays text and never becomes a tag (BK-51).
+   *
+   * `"html"` or absent — markup, always sanitized (DOMPurify) before it is
+   * written, never trusted. Inline editing commits `innerHTML` (where a typed
+   * `&` is already `&amp;`), and every load has sanitized content as markup,
+   * so absent means markup. Export used to ESCAPE absent content while the
+   * canvas mounted it raw: a bolded word published as `<strong>bold</strong>`
+   * and `Q&A` as `Q&amp;A`, while the canvas ran pasted script.
    */
   contentFormat?: "text" | "html";
   /** Child elements */

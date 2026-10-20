@@ -278,3 +278,24 @@ describe("VersionTimelineManager.compareWithDraft", () => {
     ]);
   });
 });
+
+/* BK-59: before a Replace saves this tab's copy over a newer server one, that
+   server copy is kept as a version — of the GIVEN snapshot, not the open
+   document (which is the copy about to win). */
+describe("VersionTimelineManager.createVersion — of a given snapshot", () => {
+  it("stores the given snapshot instead of the open document", async () => {
+    const captureSnapshot = vi.fn(() => ({ pages: [{ id: "open" }] }));
+    const m = new (await import("../VersionTimelineManager")).VersionTimelineManager({
+      on: () => {},
+      off: () => {},
+      emit: () => {},
+      exportProject: captureSnapshot,
+    } as any);
+    const server = { pages: [{ id: "server" }] } as any;
+    const v = await m.createVersion("Before overwrite", "", server);
+    expect(v.snapshot).toBe(server);
+    expect(v.visualSnapshot).toBeNull();
+    expect(m.getVersions()[0].snapshot).toBe(server);
+    expect(captureSnapshot).not.toHaveBeenCalled();
+  });
+});

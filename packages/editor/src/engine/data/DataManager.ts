@@ -473,9 +473,9 @@ export class DataManager extends EventEmitter {
     if (binding.type === "variable") {
       const result = await this.resolve(binding);
       if (result.success) {
-        element.setContent(String(result.value));
+        element.setContent(String(result.value), "text");
       } else {
-        element.setContent(String(binding.fallback || ""));
+        element.setContent(String(binding.fallback || ""), "text");
       }
     } else if (binding.type === "collection") {
       const collectionBinding = binding as CollectionBinding;
@@ -504,7 +504,7 @@ export class DataManager extends EventEmitter {
           for (const b of Object.values(childBindings)) {
             const res = await this.resolve(b, context);
             if (res.success) {
-              child.setContent(String(res.value));
+              child.setContent(String(res.value), "text");
             }
           }
         }

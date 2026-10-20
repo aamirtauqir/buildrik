@@ -190,6 +190,14 @@ export interface ResizeState {
   rafId: number | null;
   /** Parent and canvas boundary constraints */
   boundaryConstraints: BoundaryConstraints;
+  /** Screen px per CSS px at the start (canvas zoom). Bounds, deltas and
+   *  constraints are screen px; writes divide by this (BK-01). */
+  scale: number;
+  /** The pointer left its start point — a click with no movement writes nothing. */
+  moved: boolean;
+  /** The model was written during the gesture (a parent grown to fit), so a
+   *  cancel must roll the gesture's own transaction back (BK-03). */
+  modelTouched: boolean;
 }
 
 // =============================================================================

@@ -135,10 +135,17 @@ export function wireForms(
     const successMessage = settings?.successMessage;
 
     const action = `${opts.appOrigin.replace(/\/+$/, "")}/api/public/forms/${opts.siteId}/${blockId}`;
-    let attrs = ` action="${action}" method="POST"`;
+    let attrs = ` action="${escapeAttr(action)}" method="POST" enctype="application/x-www-form-urlencoded"`;
     if (successMessage) attrs += ` data-success-message="${escapeAttr(successMessage)}"`;
+    /* BK-44: the endpoint takes urlencoded POST, but the inspector's Method /
+       Encoding stayed on the tag — GET put the visitor's name and email in
+       the URL (405) and multipart/plain bodies were refused. Ours go FIRST,
+       straight after the tag name: a browser keeps the first of a repeated
+       attribute, so the inspector's later ones are ignored. Nothing on the
+       tag is removed or re-parsed — cutting attributes out of markup found
+       by pattern is how a value can end up read as a new attribute. */
     const rewritten =
-      open.replace(/>$/, `${attrs}>`) + RETURN_FIELD + (spamProtection ? HONEYPOT_FIELD : "");
+      `<form${attrs}${open.slice("<form".length)}` + RETURN_FIELD + (spamProtection ? HONEYPOT_FIELD : "");
     out = out.replace(open, rewritten);
 
     found.push({

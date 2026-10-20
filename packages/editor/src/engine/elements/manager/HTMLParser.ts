@@ -76,8 +76,9 @@ export class HTMLParser {
     const rootElement = this.ctx.elements.get(page.root.id);
     const rootData = rootElement ? rootElement.toJSON() : page.root;
 
-    // Use shared HTML generation with data attributes for editor mode
-    return elementDataToHTML(rootData, { includeDataAttributes: true });
+    // Editor mode: data attributes on, and no inline styles — the canvas and
+    // Preview carry each element's styles as stylesheet rules (cascadeCSS).
+    return elementDataToHTML(rootData, { includeDataAttributes: true, inlineStyles: false });
   }
 
   /**
@@ -247,7 +248,14 @@ export class HTMLParser {
        that element's own content — it imported as layers, a <br> in a hero
        <h1> as a 63-px "Container". Links stay elements: they are edited. */
     if (isTextOnlyTag(tagName) && el.children.length > 0 && [...el.children].every(isInlinePhrasing)) {
-      const data: ElementData = { id: generateId("el"), type, tagName, children: [], content: el.innerHTML };
+      const data: ElementData = {
+        id: generateId("el"),
+        type,
+        tagName,
+        children: [],
+        content: el.innerHTML,
+        contentFormat: "html",
+      };
       if (Object.keys(attributes).length > 0) data.attributes = attributes;
       if (classes.length > 0) data.classes = classes;
       if (styles && Object.keys(styles).length > 0) data.styles = styles;
@@ -284,7 +292,9 @@ export class HTMLParser {
       type,
       tagName,
       children,
-      ...(isTextOnlyElement && { content: textBuffer }),
+      /* Decoded text: an escaped "&lt;img onerror…&gt;" in the source is TEXT,
+         and stored as markup it would become a tag (BK-51). */
+      ...(isTextOnlyElement && { content: textBuffer, contentFormat: "text" as const }),
     };
 
     if (Object.keys(attributes).length > 0) {
@@ -320,6 +330,7 @@ export class HTMLParser {
       type: "text",
       tagName: "span",
       content: text,
+      contentFormat: "text",
       children: [],
     };
   }

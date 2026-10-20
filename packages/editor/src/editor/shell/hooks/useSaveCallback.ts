@@ -4,15 +4,18 @@
  *
  *   1. Bail if no composer.
  *   2. Set saveState → "saving" (preserves prior fields).
- *   3. composer.saveProject() promise:
- *      - resolved → saveState → idle + lastSavedAt, isDirty=false,
+ *   3. The dashboard RPC (site-bound) or composer.saveToStorage():
+ *      - resolved → saveState → idle + lastSavedAt; isDirty=false and
+ *        markSaved only if no edit landed while it travelled (BK-11);
  *        success toast (1.8s).
  *      - rejected → map error message to a user-friendly hint
  *        (network/storage/permission/timeout/default), saveState →
  *        error, error toast with Retry action that re-invokes save.
  *
  * The Retry action closes over the returned `save` reference so it
- * always retries with current closure state.
+ * always retries with current closure state. It is also installed as the
+ * composer's save handler, so composer.saveProject() — ⌘S, the palette —
+ * runs it: one save path (BK-11).
  *
  * @license BSD-3-Clause
  */
@@ -22,6 +25,7 @@ import { ToastInput, dismissToastKey } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
 import type { SaveState } from "./useStudioState";
 import {
+  getBaselineLastEditedAt,
   getSiteIdFromUrl,
   saveProject,
   SaveConflictError,
@@ -30,7 +34,14 @@ import {
 } from "@/services/BuildrikSyncProvider";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { fetchMyRole, invalidateMyRole, roleAtLeast } from "@/services/RoleService";
-import { clearUnsaved, keepUnsaved, takeOffScreenUnsaved } from "@/services/unsavedRecovery";
+import {
+  clearUnsaved,
+  compareKeptToServer,
+  keepUnsaved,
+  peekOffScreenUnsaved,
+  RESTORE_OFFER_EVENT,
+  takeOffScreenUnsaved,
+} from "@/services/unsavedRecovery";
 import { navigateBypassingUnloadGuard } from "../unloadGuardBypass";
 
 /** One "not saved" card for both save paths (manual and autosave); the next
@@ -98,7 +109,7 @@ export function refuseForbiddenSave(opts: {
 }): void {
   const { siteId, composer, addToast, setIsDirty, setSaveState } = opts;
   const navigate = opts.navigate ?? ((url: string) => window.location.replace(url));
-  if (siteId) keepUnsaved(siteId, composer.exportProject());
+  if (siteId) keepUnsaved(siteId, composer.exportProject(), getBaselineLastEditedAt());
   invalidateMyRole();
   addToast({
     title: "You don't have access to save this site",
@@ -196,25 +207,45 @@ export function useSaveCallback({
 
   const save = React.useCallback((): Promise<SaveOutcome> => {
     if (!composer) return Promise.resolve("error");
-    setSaveState((prev) => ({ ...prev, status: "saving", error: undefined }));
     // When the editor is bound to a dashboard site, manual Save / Cmd+S must
     // persist to the dashboard (same path as autosave) — composer.saveProject()
     // alone only writes localStorage, so the "Saved" toast was a lie for
     // dashboard-backed projects.
     const siteId = getSiteIdFromUrl();
+    /* BK-04: kept edits made on an older server copy are not restored by a
+       save — that would replace a teammate's newer work unasked. The restore
+       dialog is offered again, where that choice is named. */
+    const waiting = siteId ? peekOffScreenUnsaved(siteId) : null;
+    if (waiting && compareKeptToServer(waiting, getBaselineLastEditedAt()) !== "unchanged") {
+      window.dispatchEvent(new CustomEvent(RESTORE_OFFER_EVENT, { detail: { siteId } }));
+      return Promise.resolve("conflict");
+    }
+    setSaveState((prev) => ({ ...prev, status: "saving", error: undefined }));
     /* L5-074: after a reload with work the server never got, the screen is the
        server's copy. Saving it would send the wrong thing — the kept edits go
        back on screen first, and are what this save sends. */
     const kept = siteId ? takeOffScreenUnsaved(siteId) : null;
     if (kept) composer.importProject(kept.project);
-    const savePromise = siteId
-      ? saveProject(siteId, composer.exportProject()).then(() => undefined)
-      : composer.saveProject();
+    /* BK-11: what this save sends, and the document revision it is. */
+    const snapshot = siteId ? composer.exportProject() : null;
+    const seqAtSend = composer.getChangeSeq();
+    const savePromise = snapshot
+      ? saveProject(siteId!, snapshot).then(() => undefined)
+      : composer.saveToStorage();
     return savePromise
       .then((): SaveOutcome => {
+        /* BK-11: an edit made while this save travelled is not on the server.
+           Leave it Unsaved — its own (auto)save reports on it — instead of
+           calling the whole document saved. */
+        if (composer.getChangeSeq() !== seqAtSend) {
+          setSaveState((prev) => ({ ...prev, status: "idle", lastSavedAt: Date.now(), error: undefined }));
+          return "saved";
+        }
         /* On the server now, so the recovery copy is no longer missing work.
            Left behind it would offer a stale restore on the next load. */
         if (siteId) clearUnsaved(siteId);
+        /* The engine hears it too (dirty page markers), as autosave does. */
+        if (snapshot) composer.markSaved(snapshot);
         setSaveState({ status: "idle", lastSavedAt: Date.now(), error: undefined });
         setIsDirty(false);
         dismissToastKey(SAVE_FAILED_TOAST_KEY);
@@ -247,7 +278,7 @@ export function useSaveCallback({
            copy from saveState.error — the same handling as autosave
            (useComposerInit). */
         if (errorMessage.startsWith("TOKENS_INVALID:")) {
-          if (siteId) keepUnsaved(siteId, composer.exportProject());
+          if (siteId) keepUnsaved(siteId, composer.exportProject(), getBaselineLastEditedAt());
           setSaveState((prev) => ({ ...prev, status: "error", error: errorMessage }));
           setIsDirty(true);
           return "error";
@@ -280,7 +311,7 @@ export function useSaveCallback({
              in this tab and a reload discards it. Keep it, so the reload can
              offer it back instead of seeding "Saved · just now" over the gap.
              The siteId-less branch already reaches localStorage. */
-          if (siteId) keepUnsaved(siteId, composer.exportProject());
+          if (siteId) keepUnsaved(siteId, composer.exportProject(), getBaselineLastEditedAt());
           setSaveState((prev) =>
             siteId ? { ...prev, status: "error", error: errorMessage } : { ...prev, status: "idle" },
           );
@@ -361,7 +392,7 @@ export function useSaveCallback({
              nothing can ever be saved to a deleted site, and offering a
              restore later would be the lie this module exists to stop.
              `forbidden` IS (A15-9, above): a role can change back. */
-          if (siteId) keepUnsaved(siteId, composer.exportProject());
+          if (siteId) keepUnsaved(siteId, composer.exportProject(), getBaselineLastEditedAt());
           setSaveState((prev) => ({ ...prev, status: "error", error: errorMessage }));
           if (onAuthExpired) {
             // The blocking surface (board 813:4870) owns the story now.
@@ -393,6 +424,16 @@ export function useSaveCallback({
         return "error";
       });
   }, [composer, addToast, setSaveState, setIsDirty, onAuthExpired]);
+
+  /* BK-11: this is the editor's one save. ⌘S (the command registry), the
+     palette and anything else calling composer.saveProject() land here — the
+     registry's ⌘S used to write to storage directly, which for a site-bound
+     editor is "none": nothing was sent and the project was marked saved. */
+  React.useEffect(() => {
+    if (!composer) return;
+    composer.setSaveHandler(() => save().then(() => undefined));
+    return () => composer.setSaveHandler(null);
+  }, [composer, save]);
 
   return save;
 }

@@ -28,10 +28,8 @@ const settledBaseline = vi.fn(() => Promise.resolve<string | null>("2026-09-20T1
 const raiseSaveConflict = vi.fn((err: unknown) =>
   /SAVE_CONFLICT:/.test(String(err)) ? new Error("SAVE_CONFLICT") : null,
 );
-const siteColumnsLoaded = vi.fn((_siteId: string) => true);
 const hasProjectLoaded = vi.fn((_siteId: string) => true);
 vi.mock("../BuildrikSyncProvider", () => ({
-  siteColumnsLoaded: (siteId: string) => siteColumnsLoaded(siteId),
   hasProjectLoaded: (siteId: string) => hasProjectLoaded(siteId),
   settledBaselineLastEditedAt: () => settledBaseline(),
   raiseSaveConflict: (e: unknown) => raiseSaveConflict(e),
@@ -90,17 +88,6 @@ describe("publishSite", () => {
     expect(raiseSaveConflict).toHaveBeenCalled();
   });
 
-  /* SA-01: the columns are the only source of the site's <head> settings; a
-     session whose settings read failed renders pages without them. */
-  it("refuses, before any request, while the site's settings have not loaded", async () => {
-    siteColumnsLoaded.mockReturnValueOnce(false);
-    await expect(publishSite("site-1", [{ path: "index.html", html: "<html></html>" }])).rejects.toThrow(
-      "Site settings didn't load. Reload the editor before publishing.",
-    );
-    expect(siteColumnsLoaded).toHaveBeenCalledWith("site-1");
-    expect(publishMutate).not.toHaveBeenCalled();
-  });
-
   /* P1-2: a tab whose project never loaded shows the fallback; publishing it
      would replace the live site with that. Same invariant the save boundary
      enforces. */
@@ -156,6 +143,9 @@ describe("fetchPublishStatus", () => {
       publishedUrl: null,
       error: null,
       deploymentId: "dep-1",
+      formsStatus: null,
+      formsError: null,
+      failedPhase: null,
     });
   });
 

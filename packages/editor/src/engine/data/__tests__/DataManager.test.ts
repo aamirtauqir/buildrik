@@ -353,7 +353,7 @@ describe("element binding application", () => {
     const el = makeElementMock();
 
     dm.bindVariable(el as never, "user", "profile.name");
-    await vi.waitFor(() => expect(el.setContent).toHaveBeenCalledWith("Ada"));
+    await vi.waitFor(() => expect(el.setContent).toHaveBeenCalledWith("Ada", "text"));
 
     expect(el.setDataBinding).toHaveBeenCalledWith(
       "content",
@@ -368,7 +368,7 @@ describe("element binding application", () => {
 
     dm.bindVariable(el as never, "user", "profile.name", { transform: "uppercase" });
 
-    await vi.waitFor(() => expect(el.setContent).toHaveBeenCalledWith("ADA"));
+    await vi.waitFor(() => expect(el.setContent).toHaveBeenCalledWith("ADA", "text"));
   });
 
   it("bindVariable falls back when the source is missing", async () => {
@@ -377,7 +377,7 @@ describe("element binding application", () => {
 
     dm.bindVariable(el as never, "ghost", "x", { fallback: "fb" });
 
-    await vi.waitFor(() => expect(el.setContent).toHaveBeenCalledWith("fb"));
+    await vi.waitFor(() => expect(el.setContent).toHaveBeenCalledWith("fb", "text"));
   });
 
   it("bindCondition toggles data-condition-hidden from the condition result", async () => {

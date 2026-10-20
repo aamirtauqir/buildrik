@@ -226,6 +226,19 @@ describe("Publish Service", () => {
         deletedAt: null, workspaceId: "ws1", publishedUrl: null, name: "S",
         workspace: { deletionScheduledAt: null },
       } as never);
+      /* D11: the server's checks now gate startPublish — one live page
+         passes them. */
+      vi.mocked(prisma.page.findMany).mockResolvedValue([{ name: "Home", blocks: [], settings: {} }] as never);
+    });
+
+    it("refuses a site its checks block, with the blocking rows (D11)", async () => {
+      vi.mocked(prisma.publishBuildJob.findFirst).mockResolvedValue(null);
+      vi.mocked(prisma.page.findMany).mockResolvedValue([] as never);
+      await expect(startPublish("s1", "user1")).rejects.toMatchObject({
+        name: "PublishBlockedError",
+        blockers: [expect.objectContaining({ label: "Pages ready" })],
+      });
+      expect(prisma.publishBuildJob.create).not.toHaveBeenCalled();
     });
 
     it("creates a job and updates site status", async () => {
