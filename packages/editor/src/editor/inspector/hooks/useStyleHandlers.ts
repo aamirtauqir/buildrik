@@ -266,8 +266,6 @@ export function useStyleHandlers(
       if (pendingFlushRef.current && pendingFlushRef.current.property !== property) flushPending();
       if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
       const writeOne = (el: Element) => {
-        const id = el.getId();
-        const sel = elementSelector(id);
         /* P-8: a device-hide flag (`--hide-tablet`) names its own device, so it
            always goes on the base styles — the one place the canvas and
            the export both read it (cascadeCSS hideRulesFor). Written into the tablet rule
@@ -275,32 +273,10 @@ export function useStyleHandlers(
         const baseOnly = property.startsWith("--hide-");
         const bp = baseOnly ? "desktop" : currentBreakpoint;
         const pseudo = baseOnly ? "normal" : currentPseudoState;
-        if (pseudo !== "normal" && composer?.styles) {
-          const mq = bp === "desktop" ? undefined : getBreakpointQuery(bp) ?? undefined;
-          const pseudoSelector = `${sel}:${pseudo}`;
-          if (value === "" || value == null) {
-            const existingRule = composer.styles.getRule(pseudoSelector, mq);
-            if (existingRule) {
-              const props = { ...existingRule.properties };
-              delete props[property];
-              composer.styles.setRule(sel, props, {
-                pseudo: `:${pseudo}`,
-                mediaQuery: mq,
-                replace: true,
-              });
-            }
-          } else {
-            composer.styles.setRule(
-              sel,
-              { [property]: value },
-              { pseudo: `:${pseudo}`, mediaQuery: mq }
-            );
-          }
-        } else {
-          /* The base on desktop, the breakpoint override elsewhere — the same
-             branch the canvas-direct writes use (engine setStyleAt). */
-          setStyleAt(composer, el, bp, property, value ?? "");
-        }
+        /* The base on desktop, the breakpoint override elsewhere, the
+           `:state` rule in a pseudo-state — the same branch paste-style and
+           the canvas-direct writes use (engine setStyleAt). */
+        setStyleAt(composer, el, bp, property, value ?? "", pseudo);
       };
 
       const flush = () => {

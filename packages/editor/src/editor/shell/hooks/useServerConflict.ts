@@ -10,11 +10,13 @@
  *
  * What each action does (O1, BK-59, R1):
  *   save · Keep      reload (the dialog already discarded the kept copy)
- *   save · Download  the tab's copy as a file, then reload — only once written
+ *   save · History   the tab's copy as a "Before reload — <time>" version,
+ *                    then reload — only once written (BD-35)
  *   save · Replace   keep the server copy as a "Before overwrite" version,
  *                    adopt its token, save this tab's copy over it
  *   restore · Keep      stay on the server copy (the kept copy is discarded)
- *   restore · Download  the kept copy as a file; nothing deleted, stays open
+ *   restore · History   the kept copy as an "Unsaved edits — <time>"
+ *                       version; nothing deleted, stays open (BD-35)
  *   restore · Restore   keep the server copy as a version unless the kept
  *                       edits were made on it, then put the edits on screen
  *                       and save them
@@ -60,22 +62,11 @@ export interface UseServerConflictOptions {
   saveProject: () => unknown;
 }
 
-/** Writes `project` as a JSON file. True once the download was handed to the
- *  browser; false when building it threw. */
-function downloadProject(project: ProjectData, name: string): boolean {
-  try {
-    const blob = new Blob([JSON.stringify(project, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${name}-${Date.now()}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-    return true;
-  } catch {
-    return false;
-  }
-}
+/* Long enough to read the "Saved to History" toast before the save variant
+   reloads; the version itself is already in History (IndexedDB). */
+const RELOAD_AFTER_SAVE_MS = 1200;
+
+const clockTime = () => new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
 const UNSAVED_OFF_SCREEN = "This site has edits that never reached the server.";
 
@@ -184,7 +175,7 @@ export function useServerConflict(opts: UseServerConflictOptions): {
   }, [dialog?.variant, setSaveState]);
 
   /* D8: which way people resolve kept edits a later save overtook. */
-  const trackRestoreChoice = (choice: "keep" | "download" | "replace") => {
+  const trackRestoreChoice = (choice: "keep" | "history" | "replace") => {
     if (dialog?.variant === "restore" && dialog.relation !== "unchanged") {
       trackEvent("restore.stale_choice", { choice, relation: dialog.relation });
     }
@@ -201,19 +192,32 @@ export function useServerConflict(opts: UseServerConflictOptions): {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- trackRestoreChoice reads `dialog`
   }, [dialog, setSaveState]);
 
-  const onDownload = React.useCallback((): boolean => {
+  /* BD-35: the copy at risk becomes a named version History can restore —
+     it used to download a JSON file nothing in the editor could import. */
+  const onSaveToHistory = React.useCallback(async (): Promise<boolean> => {
     if (!composer) return false;
-    trackRestoreChoice("download");
-    if (dialog?.variant === "restore") {
-      const kept = siteId ? peekOffScreenUnsaved(siteId) : null;
-      return kept ? downloadProject(kept.project, "buildrik-unsaved-edits") : false;
+    trackRestoreChoice("history");
+    const restoring = dialog?.variant === "restore";
+    const project = restoring ? (siteId ? peekOffScreenUnsaved(siteId)?.project : null) : composer.exportProject();
+    if (!project) return false;
+    const name = `${restoring ? "Unsaved edits" : "Before reload"} — ${clockTime()}`;
+    try {
+      await composer.versions.createVersion(
+        name,
+        restoring
+          ? "Edits that never reached the server, kept from the conflict dialog."
+          : "This tab's copy, kept from the conflict dialog before reloading.",
+        project,
+      );
+    } catch {
+      return false;
     }
-    if (!downloadProject(composer.exportProject(), "buildrik-backup")) return false;
-    /* After the dialog has discarded the kept copy for this written file. */
-    window.setTimeout(reload, 0);
+    addToast({ tone: "success", title: "Saved to History", description: `Your edits are saved as "${name}". Restore them from History.` });
+    /* After the dialog has discarded the kept copy for this written version. */
+    if (!restoring) window.setTimeout(reload, RELOAD_AFTER_SAVE_MS);
     return true;
     // eslint-disable-next-line react-hooks/exhaustive-deps -- trackRestoreChoice reads `dialog`
-  }, [composer, dialog, siteId]);
+  }, [addToast, composer, dialog, siteId]);
 
   const onReplace = React.useCallback(async () => {
     if (!composer || !dialog) return;
@@ -279,7 +283,7 @@ export function useServerConflict(opts: UseServerConflictOptions): {
       brandFormat: dialog?.variant === "save" ? dialog.brandFormat : false,
       server,
       onKeep,
-      onDownload,
+      onSaveToHistory,
       onReplace: () => void onReplace(),
       onClose: close,
     },

@@ -107,7 +107,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
   const rootId = composer?.elements?.getActivePage?.()?.root.id;
   const selectedElement = selectedProp && selectedProp.id !== rootId ? selectedProp : null;
 
-  const { currentPseudoState, setCurrentPseudoState } = useInspectorState(selectedElement);
+  const { currentPseudoState, setCurrentPseudoState } = useInspectorState(selectedElement, composer);
 
   /* ⋯ "Apply style to all … on this page" asks for its confirm (DD-6b). */
   const [applyStyleFor, setApplyStyleFor] = React.useState<string | null>(null);

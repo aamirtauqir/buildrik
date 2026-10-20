@@ -10,7 +10,9 @@
  *
  * Actions, the same in both:
  *   - Keep the server version   (primary, opening focus — the least destructive)
- *   - Download my edits         (a file of the copy at risk; deletes nothing)
+ *   - Save my edits to History  (the copy at risk as a restorable named
+ *                                version — BD-35, was a JSON download nothing
+ *                                could import; deletes nothing)
  *   - Replace with mine…        (two-step; the parent keeps the server copy
  *                                as a version first, BK-59)
  * A restore whose server copy is still the one the edits were made on top of
@@ -21,8 +23,8 @@
  * lists what changed from it (decision 16, the History compare's diff).
  *
  * Discard rules (T1, O1): Keep the server version discards the kept copy.
- * Download discards it only after the file was written — and in the restore
- * variant never, the dialog stays open. Replace keeps it (it is the copy
+ * Save to History discards it only after the version was written — and in the
+ * restore variant never, the dialog stays open. Replace keeps it (it is the copy
  * being saved) and lifts a discard left by a cancelled reload.
  *
  * A brand-format conflict (the server refused this tab's brand as an older
@@ -65,8 +67,9 @@ export interface ConflictModalProps {
   keptAt?: string | null;
   server: ServerCopyInfo;
   onKeep: () => void;
-  /** Writes the file. Resolves true once written; false/throw = not written. */
-  onDownload: () => Promise<boolean> | boolean;
+  /** Saves the copy at risk as a History version. Resolves true once written;
+   *  false/throw = not written. */
+  onSaveToHistory: () => Promise<boolean> | boolean;
   onReplace: () => void;
   onClose: () => void;
   /** The server refused this tab's brand as an older format: no Replace. */
@@ -107,7 +110,7 @@ export function ConflictModal({
   keptAt,
   server,
   onKeep,
-  onDownload,
+  onSaveToHistory,
   onReplace,
   onClose,
   brandFormat = false,
@@ -118,12 +121,12 @@ export function ConflictModal({
     if (confirmReplace) confirmRef.current?.focus();
   }, [confirmReplace]);
   const [showDiff, setShowDiff] = React.useState(false);
-  const [downloadFailed, setDownloadFailed] = React.useState(false);
+  const [saveFailed, setSaveFailed] = React.useState(false);
   React.useEffect(() => {
     if (!open) {
       setConfirmReplace(false);
       setShowDiff(false);
-      setDownloadFailed(false);
+      setSaveFailed(false);
     }
   }, [open]);
 
@@ -141,16 +144,16 @@ export function ConflictModal({
     }
     onKeep();
   };
-  const download = async () => {
+  const saveToHistory = async () => {
     let written = false;
     try {
-      written = (await onDownload()) === true;
+      written = (await onSaveToHistory()) === true;
     } catch {
       written = false;
     }
-    setDownloadFailed(!written);
+    setSaveFailed(!written);
     /* The save variant hands over to a reload, so its copy is spent — but
-       only once the file exists. The restore variant keeps everything. */
+       only once the version exists. The restore variant keeps everything. */
     if (written && !restore && siteId) discardUnsaved(siteId);
   };
   const replace = () => {
@@ -166,7 +169,7 @@ export function ConflictModal({
   if (brandFormat) {
     body =
       "This site's brand was upgraded to a newer format, so this tab can't save over it. " +
-      "Keep the server version to keep editing. Download your edits first if you want a copy of your recent changes.";
+      "Keep the server version to keep editing. Save your edits to History first if you want a copy of your recent changes.";
   } else if (safeRestore) {
     body =
       "A save failed before this page was reloaded. The version on screen is the server's. " +
@@ -236,9 +239,9 @@ export function ConflictModal({
               Replace saves your copy over the newer one. The newer one is kept as a version in History first.
             </p>
           )}
-          {downloadFailed && (
+          {saveFailed && (
             <p role="alert" className="tw:mt-2.5 tw:mb-0 tw:text-[13px] tw:text-[var(--bk-error-text)]">
-              The download didn&apos;t complete. Nothing was deleted.
+              Couldn&apos;t save your edits to History. Nothing was deleted.
             </p>
           )}
         </ModalBody>
@@ -246,7 +249,7 @@ export function ConflictModal({
           {safeRestore ? (
             <>
               <Button data-autofocus onClick={replace}>Restore my edits</Button>
-              <Button color="light" onClick={() => void download()}>Download my edits</Button>
+              <Button color="light" onClick={() => void saveToHistory()}>Save my edits to History</Button>
               <Button color="light" onClick={keep}>Keep the server version</Button>
             </>
           ) : (
@@ -267,7 +270,7 @@ export function ConflictModal({
                     Replace with mine…
                   </Button>
                 ))}
-              <Button color="light" onClick={() => void download()}>Download my edits</Button>
+              <Button color="light" onClick={() => void saveToHistory()}>Save my edits to History</Button>
               <Button data-autofocus onClick={keep}>Keep the server version</Button>
             </>
           )}

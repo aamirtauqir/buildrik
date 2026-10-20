@@ -174,11 +174,14 @@ export default function ProjectsPage() {
   }, [foldersQuery.isError, addToast]);
 
   // Mutations
+  // BD-37: every create-site path opens the editor on the new site.
   const createMutation = trpc.sites.create.useMutation({
-    onSuccess: () => {
-      sitesQuery.refetch();
+    onSuccess: (site) => {
       setCreateOpen(false);
       addToast("success", "Site created");
+      const href = getEditorHref(site.id, unified);
+      if (unified) router.push(href);
+      else window.location.href = href;
     },
     onError: (err) => addToast("error", "Failed to create site", err.message),
   });

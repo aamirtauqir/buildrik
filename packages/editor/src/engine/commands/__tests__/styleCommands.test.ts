@@ -9,6 +9,8 @@ import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from "vites
 import type { Composer } from "@/engine/Composer";
 import type { Element } from "@/engine/elements/Element";
 import { EVENTS } from "@/shared/constants/events";
+import { getBreakpointQuery } from "@/shared/constants/breakpoints";
+import { elementSelector } from "@/shared/utils/elementSelector";
 import { createTestComposer, installEngineBrowserStubs, removeEngineBrowserStubs } from "@/engine/__tests__/test-utils/realComposer";
 
 beforeAll(installEngineBrowserStubs);
@@ -58,6 +60,35 @@ describe("copy-style / paste-style", () => {
     c.history.flushPending();
     c.history.undo();
     expect(c.elements.getElement(b.getId())!.getStyles().color).toBeUndefined();
+  });
+});
+
+/* BD-36 (2026-10-20): paste writes to the breakpoint AND pseudo-state the
+   inspector shows, and copy captures what the inspector shows there. */
+describe("copy-style / paste-style honour the inspector scope", () => {
+  const hoverTablet = (id: string) =>
+    c.styles.getRule(`${elementSelector(id)}:hover`, getBreakpointQuery("tablet") ?? undefined)?.properties ?? {};
+
+  it("paste on Tablet + :hover writes the tablet hover rule, not base or tablet normal", () => {
+    c.setDevice("tablet");
+    c.stylePseudoState = "hover";
+    c.styleClipboard = { color: "rgb(1, 2, 3)" };
+    c.selection.select(b);
+    c.commands.run("paste-style");
+    expect(hoverTablet(b.getId())).toMatchObject({ color: "rgb(1, 2, 3)" });
+    expect(c.elements.getElement(b.getId())!.getStyles().color).toBeUndefined();
+    expect(c.styles.getBreakpointStyle(b.getId(), "tablet")?.color).toBeUndefined();
+  });
+
+  it("copy on Tablet + :hover captures the hover value the inspector shows", () => {
+    a.setStyle("margin", "4px");
+    a.setStyle("color", "rgb(0, 0, 0)");
+    c.setDevice("tablet");
+    c.stylePseudoState = "hover";
+    c.selection.select(a);
+    c.styles.setRule(elementSelector(a.getId()), { color: "rgb(7, 7, 7)" }, { pseudo: ":hover", mediaQuery: getBreakpointQuery("tablet") ?? undefined });
+    c.commands.run("copy-style");
+    expect(c.styleClipboard).toEqual({ margin: "4px", color: "rgb(7, 7, 7)" });
   });
 });
 

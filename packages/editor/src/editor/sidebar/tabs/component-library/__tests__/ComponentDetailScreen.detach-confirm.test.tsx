@@ -59,6 +59,8 @@ function makeComposer() {
     },
     components: {
       getInstancesOfComponent: () => [{ elementId: "e1" }, { elementId: "e2" }, { elementId: "e3" }],
+      getInstanceByElementId: (id: string) =>
+        ({ e1: { elementId: "e1", componentId: "cmp-1" }, x1: { elementId: "x1", componentId: "cmp-other" } })[id],
       detachInstance,
       updateComponent,
     },
@@ -73,6 +75,32 @@ const renderMaster = (composer: Composer) =>
     </ToastProvider>,
   );
 
+/* BD-32 (2026-10-20): the push is offered only when the canvas selection is
+   the root of an instance of THIS component — never a child, never a
+   non-instance (FLOW-SENSE FS-08: a child heading was offered as the master). */
+describe("ComponentDetailScreen — Push to master is instance-root only", () => {
+  const renderWith = (selectedElementId: string | null) =>
+    render(
+      <ToastProvider>
+        <ComponentDetailScreen component={makeComponent()} composer={makeComposer().composer} onBack={() => {}} selectedElementId={selectedElementId} />
+      </ToastProvider>,
+    );
+
+  it.each([
+    ["nothing selected", null],
+    ["a child of an instance / a non-instance", "e1-child"],
+    ["an instance of another component", "x1"],
+  ])("disabled with %s", (_label, id) => {
+    renderWith(id);
+    expect(screen.getByTestId("component-update")).toBeDisabled();
+  });
+
+  it("enabled on this component's instance root", () => {
+    renderWith("e1");
+    expect(screen.getByTestId("component-update")).not.toBeDisabled();
+  });
+});
+
 describe("ComponentDetailScreen — master screen (4418:142876)", () => {
   it("draws the scope block with the real instance count and site name", () => {
     renderMaster(makeComposer().composer);
@@ -81,7 +109,7 @@ describe("ComponentDetailScreen — master screen (4418:142876)", () => {
       "3 linked instances on Bella Cucina. Updating this master affects those instances. Inserting adds one instance.",
     );
     expect(screen.getByTestId("component-insert").textContent).toBe("Insert from saved components");
-    expect(screen.getByTestId("component-update").textContent).toBe("Update from selection…");
+    expect(screen.getByTestId("component-update").textContent).toBe("Push to master…");
     expect(screen.getByTestId("component-delete").textContent).toBe("Delete Menu card master");
     expect(screen.queryByText("Type")).toBeNull();
     expect(screen.queryByText("Tags")).toBeNull();

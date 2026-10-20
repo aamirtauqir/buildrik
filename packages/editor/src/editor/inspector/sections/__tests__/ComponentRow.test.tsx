@@ -109,7 +109,7 @@ describe("ComponentRow — board 26", () => {
     renderRow(makeComposer({ component: makeComponent(), instance: makeInstance() }));
     const row = screen.getByTestId("component-row");
     expect(screen.getByLabelText("Variant")).toBeTruthy();
-    expect(screen.getByTestId("component-edit-master").textContent).toBe("Edit master");
+    expect(screen.getByTestId("component-edit-master").textContent).toBe("Push to master");
     expect(screen.getByRole("button", { name: "Instance actions" })).toBeTruthy();
     expect(row.textContent).not.toMatch(/VARIANT|Detach this instance|Edit master ·/);
   });

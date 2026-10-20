@@ -46,8 +46,8 @@ describe("PreviewOverlay — build states", () => {
     const onDone = vi.fn();
     render(<PreviewOverlay html="<p>hi</p>" onDone={onDone} />);
     const frame = screen.getByTitle("Site preview") as HTMLIFrameElement;
-    fireEvent.load(frame);
-    frame.contentDocument!.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    /* The frame's bridge forwards Escape (no same-origin access, BD-34). */
+    window.dispatchEvent(new MessageEvent("message", { data: { source: "bk-preview", type: "escape" }, source: frame.contentWindow as Window }));
     expect(onDone).toHaveBeenCalled();
   });
 });

@@ -2,9 +2,10 @@
  * NewPageModal — decision #19 (v3 Q2b): Add page opens this modal instead of
  * creating "About" instantly and dropping into an inline rename.
  *
- * Boards 6752:59256 (From template selected — the resting state) and
- * 6752:59365 (Blank selected): Page name · Blank "Empty canvas" · From
- * template "Pick from N layouts" · Cancel · Create page. Create on Blank lands
+ * Boards 6752:59365 (Blank selected — the resting state since BD-33,
+ * 2026-10-20) and 6752:59256 (From template selected): Page name · Blank
+ * "Empty canvas" · From template "Pick from N layouts" · Cancel · Create page
+ * (reads "Choose template…" on From template). Create on Blank lands
  * on the new, empty page with "Page created" (6700:71154); Create on From
  * template opens the templates catalogue (4418:54134) carrying the name, and
  * creates nothing until a template is chosen there — leaving the catalogue
@@ -41,7 +42,7 @@ export function NewPageModal({ composer }: { composer: Composer | null }) {
   const { addToast } = useToast();
   const [open, setOpen] = React.useState(false);
   const [name, setName] = React.useState("");
-  const [source, setSource] = React.useState<Source>("template");
+  const [source, setSource] = React.useState<Source>("blank");
   const [addToNav, setAddToNav] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
 
@@ -49,7 +50,7 @@ export function NewPageModal({ composer }: { composer: Composer | null }) {
     if (!composer) return;
     const onRequest = () => {
       setName(getDefaultPageName(composer.elements.getAllPages()));
-      setSource("template");
+      setSource("blank");
       setAddToNav(true);
       setError(null);
       setOpen(true);
@@ -121,7 +122,7 @@ export function NewPageModal({ composer }: { composer: Composer | null }) {
             Cancel
           </Button>
           <Button size="xs" data-testid="new-page-create" disabled={!name.trim()} onClick={create}>
-            Create page
+            {source === "template" ? "Choose template…" : "Create page"}
           </Button>
         </>
       }
