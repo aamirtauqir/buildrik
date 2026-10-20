@@ -50,7 +50,7 @@ function makeComposer() {
 beforeEach(() => addToast.mockClear());
 
 describe("NewPageModal", () => {
-  it("opens on UI_NEW_PAGE_REQUESTED with the board's fields, From template selected", () => {
+  it("opens on UI_NEW_PAGE_REQUESTED with the board's fields, Blank selected (BD-33)", () => {
     const { composer, request } = makeComposer();
     render(<NewPageModal composer={composer as never} />);
     expect(screen.queryByTestId("new-page-modal")).toBeNull();
@@ -59,7 +59,9 @@ describe("NewPageModal", () => {
     expect(screen.getByLabelText("Page name")).toHaveValue("About");
     expect(screen.getByTestId("new-page-source-blank")).toHaveTextContent("BlankEmpty canvas");
     expect(screen.getByTestId("new-page-source-template")).toHaveTextContent(/From templatePick from \d+ layouts/);
-    expect(screen.getByTestId("new-page-source-template")).toHaveAttribute("aria-checked", "true");
+    expect(screen.getByTestId("new-page-source-blank")).toHaveAttribute("aria-checked", "true");
+    expect(screen.getByTestId("new-page-source-template")).toHaveAttribute("aria-checked", "false");
+    expect(screen.getByTestId("new-page-create")).toHaveTextContent("Create page");
     // 6752:59256: ✕ in the head, and the navigation toggle ON by default.
     expect(screen.getByTestId("modal-close-new-page-modal")).toBeInTheDocument();
     expect(screen.getByText("Add to site navigation")).toBeInTheDocument();
@@ -86,6 +88,17 @@ describe("NewPageModal", () => {
     expect(composer.elements.addPageToNavigation).not.toHaveBeenCalled();
   });
 
+  /* BD-33 (2026-10-20): the primary button creates a page on the first click —
+     no source choice needed. */
+  it("Create page on first click, with no source picked, creates the page", () => {
+    const { composer, request } = makeComposer();
+    render(<NewPageModal composer={composer as never} />);
+    request();
+    fireEvent.click(screen.getByTestId("new-page-create"));
+    expect(composer.elements.createPage).toHaveBeenCalledWith("About");
+    expect(composer.emit).not.toHaveBeenCalledWith(EVENTS.UI_BROWSE_TEMPLATES, expect.anything());
+  });
+
   it("Blank → creates the named page, makes it active, toasts Page created", () => {
     const { composer, request } = makeComposer();
     render(<NewPageModal composer={composer as never} />);
@@ -110,6 +123,8 @@ describe("NewPageModal", () => {
     render(<NewPageModal composer={composer as never} />);
     request();
     fireEvent.change(screen.getByLabelText("Page name"), { target: { value: "Our menu" } });
+    fireEvent.click(screen.getByTestId("new-page-source-template"));
+    expect(screen.getByTestId("new-page-create")).toHaveTextContent("Choose template…");
     fireEvent.click(screen.getByTestId("new-page-create"));
     expect(composer.elements.createPage).not.toHaveBeenCalled();
     expect(composer.elements.setActivePage).not.toHaveBeenCalled();
