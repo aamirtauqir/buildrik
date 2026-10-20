@@ -154,7 +154,7 @@ async function previewPageHtml(composer: Composer): Promise<string> {
   const pageId = composer.elements.getActivePage?.()?.id;
   const files = await exportPageFiles(composer);
   const index = files.filter((f) => f.name.endsWith(".html")).findIndex((f) => f.pageId === pageId);
-  if (index >= 0) return inlinePublishStylesheet(files)[index].html;
+  if (index >= 0) return publishPagesOf(files)[index].html;
   const raw = composer.exportHTML().combined || "<!DOCTYPE html><html><body>No content</body></html>";
   // A resolve that throws previews the stored text, as before — never nothing.
   return new CMSExportResolver(composer).resolve(raw, { mode: "static" }).catch(() => raw);
