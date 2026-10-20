@@ -9,6 +9,7 @@ import { escapeStyleText, isSafeElementId } from "@buildrik/shared/schemas/eleme
 import { DarkModeSchema } from "@buildrik/shared/schemas/design-tokens";
 import type { PageData } from "@/shared/types";
 import { isPageLive, pageFileNames, resolveHomePageId } from "./pageFiles";
+import { elementIdsInSelector } from "@/shared/utils/elementSelector";
 import type {
   ExportConfig,
   ExportResult,
@@ -89,6 +90,12 @@ export interface MultiPageExportOptions {
    *  The ZIP keeps relative links — it is opened from disk, where `/` is the
    *  filesystem root, and holds no record pages. */
   rootAbsoluteHrefs?: boolean;
+  /** Each page carries its own CSS in a <style> — the shared CSS plus only
+   *  its own elements' rules — and no styles.css is written. The publish
+   *  payload needs it: it carries pages only, so a linked stylesheet never
+   *  reaches the deploy, and inlining the whole site's CSS put every other
+   *  page's rules on each page (REA #25). The ZIP keeps the shared file. */
+  inlineStyles?: boolean;
 }
 
 /**
@@ -609,6 +616,69 @@ export class ExportEngine {
   }
 
   /**
+   * The published CSS for `scope` — every page (the shared stylesheet) or one
+   * page (its inline <style>).
+   */
+  private publishCss(scope: PageData[], minify: boolean): string {
+    // CSS = class-based base styles FIRST, then StyleEngine breakpoint overrides.
+    // Order matters: base + breakpoint rules share specificity (0,0,1,0), so the
+    // @media override must come later to win at its viewport (H1 cascade fix).
+    const baseCss = this.buildPublishBaseCss(scope, minify);
+    /* REA #25: a StyleEngine rule that names elements ships only with a page
+       that has one of them — so a deleted element's rules ship nowhere, and a
+       page carries no other page's. A rule naming no element (a class, a tag)
+       is site-wide and always ships. */
+    const ids = new Set<string>();
+    const collect = (el: PageData["root"] | undefined): void => {
+      if (!el) return;
+      ids.add(el.id);
+      (el.children ?? []).forEach(collect);
+    };
+    scope.forEach((p) => collect(p.root));
+    const keep = (selector: string) => {
+      const named = elementIdsInSelector(selector);
+      return named.length === 0 || named.some((id) => ids.has(id));
+    };
+    const responsiveCss =
+      this.composer.styles?.generateResponsiveCSS?.({ minify, keep }) ??
+      this.generateCSS({ ...this.config, minify });
+    /* The site's own font rules. `generateCSS` emits these for the single file;
+       this path emitted the LINKS that fetch the families and no rule that
+       uses them, so a published page requested Verdana and rendered in
+       whatever the reset named. Found by the whole-page test, which exists to
+       catch exactly this — it was the ninth thing a publish dropped in one
+       day. */
+    const projectSettings = this.composer.getProjectSettings?.();
+    const siteCss =
+      emitSiteTokenCss(projectSettings, { ...this.brandSwitch(), hasThemeToggle: this.themeToggleState().has }) +
+      siteFontCSS(siteFontsFromSettings(projectSettings, this.brandSwitch()));
+
+    /* The reset leads, as in `generateCSS`: it carries the base body font
+       (THEME.fontFamily — what the canvas renders unstyled text in) and the
+       box-sizing/margin rules the canvas was designed under. This path never
+       emitted it, so every published page with no Brand body font rendered in
+       the browser's default SERIF, and the font links below had no base family
+       to fetch. The site's own font rules come after it, so they still win. */
+    const fullReset = scope.some((p) => treeHasImage(p.root)) ? RESET_CSS + IMG_HEIGHT_CSS : RESET_CSS;
+    const reset = minify ? fullReset.replace(/\s+/g, " ") : fullReset;
+    let css = [reset, baseCss, responsiveCss, siteCss].filter(Boolean).join(minify ? "" : "\n\n");
+
+    /* …and the @keyframes those styles reference. `generateCSS` has emitted
+       them since the single-file export was found shipping `animation:
+       bd-anim-fadeIn` with no keyframe behind it; this path never did, so the
+       animation worked in a downloaded file and silently no-opped on the
+       PUBLISHED site — the direction that actually reaches visitors. */
+    const publishKeyframes = collectUsedKeyframes(css);
+    if (publishKeyframes) css += (minify ? "" : "\n") + publishKeyframes;
+
+    /* …and the faces the site's ADDED fonts provide, at the top of the one
+       stylesheet every page links — once, before any rule on any page that
+       names them. Same reader as the single file; `generateCSS` above is a
+       different assembly, so it has its own call. */
+    return this.withSiteFontFaces(css, minify);
+  }
+
+  /**
    * Wrap content in full HTML document
    */
   private wrapInDocument(content: string, config: ExportConfig, css?: string): string {
@@ -837,47 +907,10 @@ export class ExportEngine {
         : allPages.filter((p) => p.id === resolveHomePageId(allPages));
     const files: MultiPageExportFile[] = [];
 
-    // CSS = class-based base styles FIRST, then StyleEngine breakpoint overrides.
-    // Order matters: base + breakpoint rules share specificity (0,0,1,0), so the
-    // @media override must come later to win at its viewport (H1 cascade fix).
-    const baseCss = this.buildPublishBaseCss(pages, !!options.minify);
-    const responsiveCss =
-      this.composer.styles?.generateResponsiveCSS?.({ minify: options.minify }) ??
-      this.generateCSS({ ...this.config, minify: options.minify });
-    /* The site's own font rules. `generateCSS` emits these for the single file;
-       this path emitted the LINKS that fetch the families and no rule that
-       uses them, so a published page requested Verdana and rendered in
-       whatever the reset named. Found by the whole-page test, which exists to
-       catch exactly this — it was the ninth thing a publish dropped in one
-       day. */
-    const projectSettings = this.composer.getProjectSettings?.();
-    const siteCss =
-      emitSiteTokenCss(projectSettings, { ...this.brandSwitch(), hasThemeToggle: this.themeToggleState().has }) +
-      siteFontCSS(siteFontsFromSettings(projectSettings, this.brandSwitch()));
-
-    /* The reset leads, as in `generateCSS`: it carries the base body font
-       (THEME.fontFamily — what the canvas renders unstyled text in) and the
-       box-sizing/margin rules the canvas was designed under. This path never
-       emitted it, so every published page with no Brand body font rendered in
-       the browser's default SERIF, and the font links below had no base family
-       to fetch. The site's own font rules come after it, so they still win. */
-    const fullReset = pages.some((p) => treeHasImage(p.root)) ? RESET_CSS + IMG_HEIGHT_CSS : RESET_CSS;
-    const reset = options.minify ? fullReset.replace(/\s+/g, " ") : fullReset;
-    let css = [reset, baseCss, responsiveCss, siteCss].filter(Boolean).join(options.minify ? "" : "\n\n");
-
-    /* …and the @keyframes those styles reference. `generateCSS` has emitted
-       them since the single-file export was found shipping `animation:
-       bd-anim-fadeIn` with no keyframe behind it; this path never did, so the
-       animation worked in a downloaded file and silently no-opped on the
-       PUBLISHED site — the direction that actually reaches visitors. */
-    const publishKeyframes = collectUsedKeyframes(css);
-    if (publishKeyframes) css += (options.minify ? "" : "\n") + publishKeyframes;
-
-    /* …and the faces the site's ADDED fonts provide, at the top of the one
-       stylesheet every page links — once, before any rule on any page that
-       names them. Same reader as the single file; `generateCSS` above is a
-       different assembly, so it has its own call. */
-    css = this.withSiteFontFaces(css, !!options.minify);
+    /* One shared stylesheet (the ZIP's styles.css), or — `inlineStyles`, the
+       publish payload — each page's own CSS inline (REA #25). */
+    const minify = !!options.minify;
+    const css = options.inlineStyles ? "" : this.publishCss(pages, minify);
 
     /* CMS export options. The default was "none", and nothing set it: publish
        calls exportAllPages({format,minify}) and the ZIP path does the same, so
@@ -899,7 +932,9 @@ export class ExportEngine {
 
     // Export each page
     for (const page of pages) {
-      let html = this.exportPageToHtml(page, css);
+      let html = options.inlineStyles
+        ? this.exportPageToHtml(page, this.publishCss([page], minify), "inline")
+        : this.exportPageToHtml(page, css, "link");
       const fileName = this.pageHrefs.get(page.id) ?? "index.html";
 
       // Apply CMS resolution if mode is not 'none'
@@ -929,7 +964,7 @@ export class ExportEngine {
       });
     }
 
-    // Add shared CSS if not empty
+    // Add shared CSS if not empty (none when each page carries its own)
     if (css) {
       files.push({
         name: "styles.css",
@@ -988,7 +1023,7 @@ export class ExportEngine {
     return this.pageHrefPrefix + (this.pageHrefs.get(href.slice("#page:".length)) ?? "index.html");
   }
 
-  private exportPageToHtml(page: PageData, css: string): string {
+  private exportPageToHtml(page: PageData, css: string, cssMode: "link" | "inline"): string {
     // Build body content from root element
     let bodyContent = "";
     if (page.root) {
@@ -1014,7 +1049,9 @@ export class ExportEngine {
     }
 
     if (css) {
-      headParts.push('  <link rel="stylesheet" href="styles.css">');
+      headParts.push(
+        cssMode === "inline" ? `  <style>${escapeStyleText(css)}</style>` : '  <link rel="stylesheet" href="styles.css">',
+      );
     }
 
     // Same reason as generateHTML: a named family that is never fetched is the

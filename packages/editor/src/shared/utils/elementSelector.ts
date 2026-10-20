@@ -11,3 +11,15 @@
 export function elementSelector(id: string): string {
   return `[data-buildrick-id="${id.replace(/["\\]/g, "\\$&")}"]`;
 }
+
+const ELEMENT_ID_IN_SELECTOR = /\[data-buildrick-id="((?:[^"\\]|\\.)*)"\]/g;
+
+/**
+ * The element ids a style rule's selector names through `elementSelector` —
+ * its inverse. Empty for a rule that names no element (a class, a tag), which
+ * applies site-wide. The publish export reads it to leave out the rules of a
+ * deleted element and to give each page only its own elements' rules.
+ */
+export function elementIdsInSelector(selector: string): string[] {
+  return [...selector.matchAll(ELEMENT_ID_IN_SELECTOR)].map((m) => m[1].replace(/\\(.)/g, "$1"));
+}
