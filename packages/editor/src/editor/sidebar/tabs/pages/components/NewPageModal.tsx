@@ -28,6 +28,11 @@ import { getDefaultPageName } from "@/shared/utils/pageUtils";
 import { Grid3x3, Square } from "lucide-react";
 import { BK_LABEL_CLASS, Button, Label, Modal, TextInput, ToggleSwitch, useToast } from "@/editor/chrome-ui";
 import { SITE_TEMPLATES, getMyTemplates } from "@/editor/sidebar/tabs/templates/templatesData";
+import { getSiteIdFromUrl, hasProjectLoaded } from "@/services/BuildrikSyncProvider";
+
+/** Why page creation waits (REA #13): `importProject` replaces the whole page
+ *  set when the load lands, so a page added before it is wiped with no undo. */
+export const PAGES_LOADING_REASON = "You can add a page once the site has finished loading.";
 
 type Source = "blank" | "template";
 
@@ -49,6 +54,11 @@ export function NewPageModal({ composer }: { composer: Composer | null }) {
   React.useEffect(() => {
     if (!composer) return;
     const onRequest = () => {
+      const siteId = getSiteIdFromUrl();
+      if (siteId && !hasProjectLoaded(siteId)) {
+        addToast({ title: "Pages are still loading", description: PAGES_LOADING_REASON, tone: "warning" });
+        return;
+      }
       setName(getDefaultPageName(composer.elements.getAllPages()));
       setSource("blank");
       setAddToNav(true);
@@ -59,7 +69,7 @@ export function NewPageModal({ composer }: { composer: Composer | null }) {
     return () => {
       composer.off(EVENTS.UI_NEW_PAGE_REQUESTED, onRequest);
     };
-  }, [composer]);
+  }, [composer, addToast]);
 
   const layoutCount = React.useMemo(
     () => (open ? SITE_TEMPLATES.filter((t) => t.type === "page").length + getMyTemplates().length : 0),
