@@ -1,0 +1,67 @@
+[data-buildrick-id="root1"] {
+  padding: 8px;
+}
+
+[data-buildrick-id="heroTitle"] {
+  color: rgb(10, 20, 30);
+  font-size: 48px;
+}
+
+[data-buildrick-id="noteText"] {
+  line-height: 1.5;
+  --hide-mobile: true;
+}
+
+[data-buildrick-id="ctaButton"] {
+  background: rgb(26, 86, 219);
+}
+
+
+[data-buildrick-id="heroTitle"]:hover {
+  color: rgb(11, 21, 31);
+}
+
+[data-buildrick-id="goneEl"] {
+  outline: 7px dotted rgb(1, 2, 3);
+}
+
+.hero-title {
+  color: rgb(200, 0, 0);
+  letter-spacing: 1px;
+}
+
+.hero-title:hover {
+  color: rgb(0, 200, 0);
+}
+
+.card.note {
+  border: 1px solid rgb(9, 9, 9);
+}
+
+.card {
+  padding: 24px;
+  border: 2px solid rgb(5, 5, 5);
+}
+
+h1 {
+  font-weight: 600;
+  color: rgb(1, 1, 1);
+}
+
+p {
+  margin: 0 0 4px;
+}
+
+[data-buildrick-id="heroTitle"] {
+  font-size: 36px;
+}
+[data-buildrick-id="ctaButton"]:focus {
+  outline: 2px solid rgb(0, 0, 0);
+}
+[data-buildrick-id="goneEl"] {
+  font-size: 9px;
+}
+.hero-title {
+  font-size: 30px;
+  letter-spacing: 2px;
+}
