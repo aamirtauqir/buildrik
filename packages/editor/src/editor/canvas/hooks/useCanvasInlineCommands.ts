@@ -57,13 +57,18 @@ export function useCanvasInlineCommands({
       ) as HTMLElement | null;
       if (!editingEl) return;
 
+      /* Read before focus(): a browser moves the caret to the start of a
+         contentEditable when it regains focus (from the link field, say), so
+         after it the live range no longer marks the words the user chose. */
+      const cameBack = document.activeElement !== editingEl;
+      const saved = savedRangeRef.current?.cloneRange() ?? null;
+      const savedInside = saved !== null && editingEl.contains(saved.commonAncestorContainer);
       editingEl.focus();
       const selection = window.getSelection();
       if (!selection) return;
       const live = selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
-      if (!live || !editingEl.contains(live.commonAncestorContainer)) {
-        const saved = savedRangeRef.current;
-        if (!saved || !editingEl.contains(saved.commonAncestorContainer)) return;
+      if ((cameBack && savedInside) || !live || !editingEl.contains(live.commonAncestorContainer)) {
+        if (!saved || !savedInside) return;
         selection.removeAllRanges();
         selection.addRange(saved);
       }

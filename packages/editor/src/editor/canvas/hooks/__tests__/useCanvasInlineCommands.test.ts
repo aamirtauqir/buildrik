@@ -151,6 +151,51 @@ describe("useCanvasInlineCommands — Insert link wraps the selection the user m
     canvasDiv.remove();
     urlField.remove();
   });
+
+  /* Live 2026-10-20: a real browser moves the caret to the start of a
+     contentEditable when it regains focus. jsdom does not, so the test above
+     passed while the editor inserted an empty <a> before the text. */
+  it("links the chosen words when refocusing the paragraph collapses the selection to its start", () => {
+    const canvasDiv = document.createElement("div");
+    const p = document.createElement("p");
+    p.setAttribute("data-buildrick-id", "el-3");
+    p.contentEditable = "true";
+    p.textContent = "visit our site here";
+    canvasDiv.appendChild(p);
+    const urlField = document.createElement("input");
+    document.body.append(canvasDiv, urlField);
+    const canvasRef = { current: canvasDiv } as React.RefObject<HTMLDivElement | null>;
+    const { result } = renderHook(() => useCanvasInlineCommands({ canvasRef, editingId: "el-3" }));
+
+    const text = p.firstChild as Text;
+    const sel = window.getSelection()!;
+    const range = document.createRange();
+    range.setStart(text, 10);
+    range.setEnd(text, 14);
+    sel.removeAllRanges();
+    sel.addRange(range);
+    document.dispatchEvent(new Event("selectionchange"));
+    urlField.focus();
+
+    const realFocus = p.focus.bind(p);
+    p.focus = () => {
+      realFocus();
+      const caret = document.createRange();
+      caret.setStart(text, 0);
+      caret.collapse(true);
+      sel.removeAllRanges();
+      sel.addRange(caret);
+    };
+
+    act(() => {
+      result.current.handleInlineCommand("createLink", "https://example.com");
+    });
+
+    expect(p.querySelector("a")?.textContent).toBe("site");
+    expect(p.textContent).toBe("visit our site here");
+    canvasDiv.remove();
+    urlField.remove();
+  });
 });
 
 describe("useCanvasInlineCommands — Clear formatting", () => {
