@@ -27,6 +27,7 @@ import { initCountdownRuntime } from "./countdownRuntime";
 import { initAccordionRuntime } from "./accordionRuntime";
 import { initTabsRuntime } from "./tabsRuntime";
 import { initModalRuntime } from "./modalRuntime";
+import { initNavbarRuntime, NAVBAR_RUNTIME_CSS } from "./navbarRuntime";
 
 export function escapeAttr(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -213,6 +214,7 @@ const RUNTIMES: ReadonlyArray<{ marker: string; uses: string; fn: (root: ParentN
   { marker: "data-buildrick-accordion-runtime", uses: "data-allow-multiple", fn: initAccordionRuntime },
   { marker: "data-buildrick-tabs-runtime", uses: 'role="tablist"', fn: initTabsRuntime },
   { marker: "data-buildrick-modal-runtime", uses: "modal-trigger", fn: initModalRuntime },
+  { marker: "data-buildrick-navbar-runtime", uses: "<nav", fn: initNavbarRuntime, css: NAVBAR_RUNTIME_CSS },
 ];
 
 /**
