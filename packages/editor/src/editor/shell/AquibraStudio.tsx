@@ -851,7 +851,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         onDone={closePreview}
         siteId={getSiteIdFromUrl()}
         siteName={previewHtml ? composer.getProjectMetadata?.()?.name : null}
-        pageName={previewHtml ? composer.elements.getActivePage?.()?.name : null}
         pages={previewHtml ? composer.elements.getAllPages() : undefined}
         currentPageId={previewHtml ? composer.elements.getActivePage?.()?.id : null}
         /* Another page in the preview (its menu, or an internal link): the

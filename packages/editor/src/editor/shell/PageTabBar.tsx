@@ -73,10 +73,12 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
   return (
     <div className={BAR}>
       {/* Board 4418:123573 drew the tabs only (no ⌂ glyph, no "+" — decision
-          #19). OWNER OVERRIDE 2026-10-03: a trailing "+" is back. It does not
-          create a page itself — Add page still lives in the Pages panel; the
-          "+" opens that panel through UI_PANEL_OPEN, the same sink the rail
-          and ⌘K "Open Pages" use. Board to be updated. */}
+          #19). OWNER OVERRIDE 2026-10-03: a trailing "+" is back. It opens the
+          Pages panel through UI_PANEL_OPEN (the sink the rail and ⌘K "Open
+          Pages" use) and then asks for the New page dialog, the same request
+          every other Add-page door makes — a "+" named "Add page" that only
+          opened the panel was a label the click did not keep (REA S-4).
+          Board to be updated. */}
       <div className={ROW}>
         {/* Tab list with keyboard navigation */}
         <div
@@ -126,7 +128,10 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
           size="sm"
           className={ADD}
           data-testid="page-tab-add"
-          onClick={() => composer.emit(EVENTS.UI_PANEL_OPEN, { panel: "pages" })}
+          onClick={() => {
+            composer.emit(EVENTS.UI_PANEL_OPEN, { panel: "pages" });
+            composer.emit(EVENTS.UI_NEW_PAGE_REQUESTED, {});
+          }}
         >
           <Plus size={14} aria-hidden="true" />
         </IconButton>

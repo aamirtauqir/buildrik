@@ -45,7 +45,7 @@ afterEach(() => {
 const renderModal = (onOpenChange = vi.fn()) =>
   render(
     <ToastProvider>
-      <PreviewShareModal open onOpenChange={onOpenChange} siteId="site-abc" siteName="Bella Cucina" pageName="Home" />
+      <PreviewShareModal open onOpenChange={onOpenChange} siteId="site-abc" siteName="Bella Cucina" />
     </ToastProvider>,
   );
 
@@ -131,13 +131,13 @@ describe("PreviewShareModal", () => {
   });
 
   /* Board 4418:165739. */
-  it("names the page, says what it shares, and closes with Done — no ✕", async () => {
+  it("names the site (the link shares every page), says what it shares, and closes with Done — no ✕", async () => {
     const onOpenChange = vi.fn();
     list.mockResolvedValue([link("tok")]);
     renderModal(onOpenChange);
     await screen.findByTestId("preview-share-link");
-    expect(screen.getByText("Share preview of Home")).toBeInTheDocument();
-    expect(screen.getByText("Bella Cucina · Home · current saved design")).toBeInTheDocument();
+    expect(screen.getByText("Share preview of Bella Cucina")).toBeInTheDocument();
+    expect(screen.getByText("Bella Cucina · current saved design · every page")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /close share dialog/i })).toBeNull();
     const done = screen.getByRole("button", { name: "Done" });
     expect(done.className).toContain("tw:bg-[var(--bk-accent)]");

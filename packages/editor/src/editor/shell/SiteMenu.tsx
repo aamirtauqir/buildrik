@@ -51,7 +51,6 @@ export interface SiteMenuProps {
   siteId?: string | null;
   /** Named in the share dialog's title/subtitle (board 4418:165739). */
   siteName?: string | null;
-  pageName?: string | null;
   /** Collaboration is flag-gated. Absent while the flag is off (the row is
    *  drawn PLANNED, disabled) and while a session is already running. */
   onStartCollaboration?: () => void;
@@ -101,7 +100,6 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
   onOpenShortcuts,
   siteId,
   siteName,
-  pageName,
   onStartCollaboration,
   collabEnabled = false,
   onUnpublish,
@@ -260,7 +258,7 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
           )}
         </Menu>
       </Popover>
-      {siteId && shareOpen ? <PreviewShareModal open={shareOpen} onOpenChange={setShareOpen} siteId={siteId} siteName={siteName} pageName={pageName} /> : null}
+      {siteId && shareOpen ? <PreviewShareModal open={shareOpen} onOpenChange={setShareOpen} siteId={siteId} siteName={siteName} /> : null}
       {onDuplicateSite ? (
         <ConfirmDialog
           open={duplicateConfirmOpen}
@@ -270,7 +268,7 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
             onDuplicateSite();
           }}
           title="Duplicate site?"
-          message="This makes a full copy of the site, including every page. The copy opens in a new tab once it's ready."
+          message="This makes a full copy of the site, including every page. When it's ready, you can open it in a new tab."
           confirmLabel="Duplicate site"
           testId="duplicate-site-confirm"
         />

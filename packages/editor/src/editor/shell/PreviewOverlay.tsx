@@ -65,7 +65,6 @@ interface PreviewOverlayProps {
   siteId?: string | null;
   /** Named in the share dialog (board 4418:165739). */
   siteName?: string | null;
-  pageName?: string | null;
   /** The site's pages: the preview's page menu, and where its internal links
    *  go (L5-051 — it showed one page, and a link blanked the frame). */
   pages?: ReadonlyArray<{ id: string; name: string; slug?: string; isHome?: boolean }>;
@@ -171,7 +170,6 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({
   onDone,
   siteId,
   siteName,
-  pageName,
   pages = [],
   currentPageId,
   onShowPage,
@@ -333,7 +331,7 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({
         )}
       </div>
       {siteId && shareOpen && (
-        <PreviewShareModal open={shareOpen} onOpenChange={setShareOpen} siteId={siteId} siteName={siteName} pageName={pageName} />
+        <PreviewShareModal open={shareOpen} onOpenChange={setShareOpen} siteId={siteId} siteName={siteName} />
       )}
     </div>
   );
