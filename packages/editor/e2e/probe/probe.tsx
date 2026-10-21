@@ -3386,7 +3386,7 @@ const CASES: Record<string, () => React.ReactElement> = {
        */
       "s1-2-load-error": () => (
         <div data-probe="s1-2-load-error" className="tw:w-[1440px]">
-          <LoadErrorBanner kind="network" onRetry={() => {}} onSignIn={() => {}} />
+          <LoadErrorBanner kind="network" onRetry={() => {}} onSignIn={() => {}} onGoToDashboard={() => {}} />
         </div>
       ),
       "s1-2f-save-indicator": () => (
