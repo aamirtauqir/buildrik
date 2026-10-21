@@ -25,7 +25,7 @@ export {
   useButtonPresets, useCardPresets, useFormPresets, useLinkPresets,
   useBadgePresets, useAlertPresets, useTooltipPresets, useModalPresets,
   useNavPresets, useTablePresets, useLayoutPresets,
-  useResetAllPresets, PRESET_CATEGORIES,
+  PRESET_CATEGORIES,
 } from "./state/StylePresetRegistryContext";
-export type { PresetsForCategoryRegistry } from "./state/usePresetsForCategory";
+export type { PresetsForCategoryRegistry } from "./state/StylePresetRegistryContext";
 export type { PresetCategory, StylePreset, PresetBinding } from "./types";

@@ -2,19 +2,30 @@
  * StylePresetRegistryContext — 11 separate contexts (one per PresetCategory).
  *
  * Mirrors TokenRegistryContext architecturally so consumers learn one pattern
- * for both Tokens and Styles. Seeded from the localStorage namespace
- * `buildrick-design-presets-${projectId}-v1` when a cache exists, else
- * DEFAULT_PRESETS. Read-only since Brand Part 1a Task 10: no UI edits presets,
- * so nothing writes that cache any more.
+ * for both Tokens and Styles. The list is the project's own
+ * `projectSettings.designPresets` — the store the engine counts token usage
+ * from and restore points capture — re-read on every settings change, with
+ * DEFAULT_PRESETS when the project has none. Read-only: no UI edits presets
+ * since Brand Part 1a Task 10.
+ *
+ * B-3: this used to read a per-browser localStorage cache
+ * (`buildrick-design-presets-<id>-v1`), so another device or a teammate saw a
+ * different list from the one the project saves. That cache is no longer
+ * read; it was keyed `default` for every site until the shell passed a site
+ * id, so importing it could copy one site's presets into another.
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
+import type { Composer } from "@/engine";
+import { EVENTS } from "@/shared/constants/events";
 import type { PresetCategory, StylePreset } from "../types";
-import { usePresetsForCategory } from "./usePresetsForCategory";
-import type { PresetsForCategoryRegistry } from "./usePresetsForCategory";
 import { DEFAULT_PRESETS } from "../constants";
+
+export interface PresetsForCategoryRegistry {
+  presets: StylePreset[];
+}
 
 const PRESET_CATEGORIES: PresetCategory[] = [
   "button", "card", "form", "link", "badge",
@@ -40,64 +51,39 @@ const CONTEXT_BY_CATEGORY: Record<PresetCategory, React.Context<PresetsForCatego
 };
 
 export interface StylePresetRegistryProviderProps {
-  projectId?: string | null;
+  composer?: Composer | null;
   children: React.ReactNode;
 }
 
+const readPresets = (composer: Composer | null): StylePreset[] =>
+  composer?.getProjectSettings().designPresets ?? DEFAULT_PRESETS;
+
 export const StylePresetRegistryProvider: React.FC<StylePresetRegistryProviderProps> = ({
-  projectId,
+  composer = null,
   children,
 }) => {
-  const storageKey = `buildrick-design-presets-${projectId ?? "default"}-v1`;
+  const [all, setAll] = React.useState<StylePreset[]>(() => readPresets(composer));
 
-  // Load on first render. Accepts either { schemaVersion, presets } or a raw
-  // StylePreset[] (legacy). Falls through to DEFAULT_PRESETS on any error.
-  const initialPresets = React.useMemo((): StylePreset[] => {
-    try {
-      const raw = localStorage.getItem(storageKey);
-      if (!raw) return DEFAULT_PRESETS;
-      const parsed: unknown = JSON.parse(raw);
-      if (Array.isArray(parsed)) return parsed as StylePreset[];
-      if (
-        parsed &&
-        typeof parsed === "object" &&
-        "presets" in parsed &&
-        Array.isArray((parsed as { presets: unknown }).presets)
-      ) {
-        return (parsed as { presets: StylePreset[] }).presets;
-      }
-      return DEFAULT_PRESETS;
-    } catch {
-      return DEFAULT_PRESETS;
-    }
-  }, [storageKey]);
+  React.useEffect(() => {
+    const sync = () => setAll(readPresets(composer));
+    sync();
+    if (!composer) return;
+    composer.on(EVENTS.SETTINGS_CHANGE, sync);
+    composer.on(EVENTS.PROJECT_LOADED, sync);
+    return () => {
+      composer.off(EVENTS.SETTINGS_CHANGE, sync);
+      composer.off(EVENTS.PROJECT_LOADED, sync);
+    };
+  }, [composer]);
 
-  const button   = usePresetsForCategory("button",   initialPresets);
-  const card     = usePresetsForCategory("card",     initialPresets);
-  const form     = usePresetsForCategory("form",     initialPresets);
-  const link     = usePresetsForCategory("link",     initialPresets);
-  const badge    = usePresetsForCategory("badge",    initialPresets);
-  const alert    = usePresetsForCategory("alert",    initialPresets);
-  const tooltip  = usePresetsForCategory("tooltip",  initialPresets);
-  const modal    = usePresetsForCategory("modal",    initialPresets);
-  const nav      = usePresetsForCategory("nav",      initialPresets);
-  const table    = usePresetsForCategory("table",    initialPresets);
-  const layout   = usePresetsForCategory("layout",   initialPresets);
-
-
-  const providers: Array<{ Context: React.Context<unknown>; value: unknown }> = [
-    { Context: ButtonContext   as React.Context<unknown>, value: button   },
-    { Context: CardContext     as React.Context<unknown>, value: card     },
-    { Context: FormContext     as React.Context<unknown>, value: form     },
-    { Context: LinkContext     as React.Context<unknown>, value: link     },
-    { Context: BadgeContext    as React.Context<unknown>, value: badge    },
-    { Context: AlertContext    as React.Context<unknown>, value: alert    },
-    { Context: TooltipContext  as React.Context<unknown>, value: tooltip  },
-    { Context: ModalContext    as React.Context<unknown>, value: modal    },
-    { Context: NavContext      as React.Context<unknown>, value: nav      },
-    { Context: TableContext    as React.Context<unknown>, value: table    },
-    { Context: LayoutContext   as React.Context<unknown>, value: layout   },
-  ];
+  const providers = React.useMemo(
+    () =>
+      PRESET_CATEGORIES.map((category) => ({
+        Context: CONTEXT_BY_CATEGORY[category] as React.Context<unknown>,
+        value: { presets: all.filter((p) => p.category === category) },
+      })),
+    [all],
+  );
 
   return <>{composeProviders(providers, children)}</>;
 };
@@ -117,12 +103,8 @@ function composeProviders(
 // ============================================================================
 
 // Fallback so consumers rendered outside StylePresetRegistryProvider (isolated
-// tests, AI-modal previews) don't crash. Returns an empty registry with no-op
-// hydrate — mirrors the seed fallbacks in TokenRegistryContext.
-const FALLBACK_REGISTRY: PresetsForCategoryRegistry = {
-  presets: [],
-  hydrateFromExternal: () => {},
-};
+// tests) don't crash — mirrors the seed fallbacks in TokenRegistryContext.
+const FALLBACK_REGISTRY: PresetsForCategoryRegistry = { presets: [] };
 
 function useCategoryRegistry(category: PresetCategory, _hookName: string): PresetsForCategoryRegistry {
   const ctx = React.useContext(CONTEXT_BY_CATEGORY[category]);
@@ -142,46 +124,5 @@ export const useTablePresets    = (): PresetsForCategoryRegistry => useCategoryR
 export const useLayoutPresets   = (): PresetsForCategoryRegistry => useCategoryRegistry("layout",   "useLayoutPresets");
 
 
-/** Fans an external preset list out to all 11 category registries via hydrateFromExternal. */
-export function useResetAllPresets(): (allPresets: StylePreset[]) => void {
-  const button   = useButtonPresets();
-  const card     = useCardPresets();
-  const form     = useFormPresets();
-  const link     = useLinkPresets();
-  const badge    = useBadgePresets();
-  const alert    = useAlertPresets();
-  const tooltip  = useTooltipPresets();
-  const modal    = useModalPresets();
-  const nav      = useNavPresets();
-  const table    = useTablePresets();
-  const layout   = useLayoutPresets();
-
-  // Mirror of useResetAllKinds — see that hook for the full rationale.
-  // Each useXPresets() returns a fresh object every render, so listing
-  // them in useCallback deps would rotate this callable's identity per
-  // render and destabilise any downstream useCallback/useEffect that
-  // captures it. Pin via ref + empty-deps useCallback.
-  const latest = React.useRef({
-    button, card, form, link, badge, alert, tooltip, modal, nav, table, layout,
-  });
-  latest.current = {
-    button, card, form, link, badge, alert, tooltip, modal, nav, table, layout,
-  };
-
-  return React.useCallback((all: StylePreset[]) => {
-    const r = latest.current;
-    r.button.hydrateFromExternal(all);
-    r.card.hydrateFromExternal(all);
-    r.form.hydrateFromExternal(all);
-    r.link.hydrateFromExternal(all);
-    r.badge.hydrateFromExternal(all);
-    r.alert.hydrateFromExternal(all);
-    r.tooltip.hydrateFromExternal(all);
-    r.modal.hydrateFromExternal(all);
-    r.nav.hydrateFromExternal(all);
-    r.table.hydrateFromExternal(all);
-    r.layout.hydrateFromExternal(all);
-  }, []);
-}
 
 export { PRESET_CATEGORIES };

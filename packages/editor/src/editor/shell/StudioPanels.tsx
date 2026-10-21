@@ -766,7 +766,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   return (
     <DSModeProvider>
     <TokenRegistryProvider composer={composer}>
-    <StylePresetRegistryProvider projectId={projectId}>
+    <StylePresetRegistryProvider composer={composer}>
       {/* Headless. The linter only ran from inside the Brand panel, so the
           topbar Issues chip — which gates the publish-anyway confirm — read
           "No issues" until the user happened to open Brand. */}
