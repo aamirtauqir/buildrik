@@ -23,6 +23,7 @@ import {
   getProjectData,
   redactSitePassword,
   getEditorAccess,
+  assertCodeExportAllowed,
 } from "@/server/services/sites.service";
 import {
   listFolders,
@@ -54,6 +55,8 @@ import {
   checkSlugSchema,
   getProjectDataSchema,
   editorSaveProjectSchema,
+  codeExportAccessSchema,
+  CODE_EXPORT_NOT_IN_PLAN,
 } from "@buildrik/shared/schemas/sites";
 import {
   schedulePublish,
@@ -477,6 +480,34 @@ export const sitesRouter = router({
         throw e;
       }
       return runPrePublishChecks(input.siteId);
+    }),
+
+  // Pro gate for the editor's "Download code (ZIP)" (the "Export site…" dialog
+  // stays ungated, owner decision). Any member with access to the site may ask;
+  // the plan decides. The FORBIDDEN message leads with CODE_EXPORT_NOT_IN_PLAN
+  // so the editor shows the upgrade prompt for that refusal and only that one.
+  authorizeCodeExport: protectedProcedure
+    .input(codeExportAccessSchema)
+    .query(async ({ ctx, input }) => {
+      try {
+        await assertSiteAccess(ctx.prisma, ctx.session.user!.id!, input.siteId);
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
+      try {
+        await assertCodeExportAllowed(input.siteId);
+      } catch (e) {
+        if (e instanceof Error && e.message === "SITE_NOT_FOUND")
+          throw new TRPCError({ code: "NOT_FOUND", message: "Site not found" });
+        if (e instanceof Error && e.message === CODE_EXPORT_NOT_IN_PLAN)
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: `${CODE_EXPORT_NOT_IN_PLAN}: Downloading your site's code is a Pro feature. Upgrade your plan in Settings → Billing.`,
+          });
+        throw e;
+      }
+      return { allowed: true as const };
     }),
 
   publish: protectedProcedure

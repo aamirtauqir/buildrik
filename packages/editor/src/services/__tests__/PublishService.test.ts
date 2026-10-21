@@ -12,6 +12,7 @@ const publishMutate = vi.fn();
 const publishStatusQuery = vi.fn();
 const cancelMutate = vi.fn();
 const sitesGetQuery = vi.fn();
+const authorizeCodeExportQuery = vi.fn();
 
 vi.mock("../api-client", () => ({
   createBuildrikApiClient: () => ({
@@ -20,6 +21,7 @@ vi.mock("../api-client", () => ({
       publishStatus: { query: (...a: unknown[]) => publishStatusQuery(...a) },
       cancelPublish: { mutate: (...a: unknown[]) => cancelMutate(...a) },
       get: { query: (...a: unknown[]) => sitesGetQuery(...a) },
+      authorizeCodeExport: { query: (...a: unknown[]) => authorizeCodeExportQuery(...a) },
     },
   }),
 }));
@@ -40,10 +42,11 @@ import {
   fetchPublishStatus,
   cancelPublish,
   fetchSitePublishState,
+  authorizeCodeExport,
 } from "../PublishService";
 
 beforeEach(() => {
-  [publishMutate, publishStatusQuery, cancelMutate, sitesGetQuery].forEach((m) => m.mockReset());
+  [publishMutate, publishStatusQuery, cancelMutate, sitesGetQuery, authorizeCodeExportQuery].forEach((m) => m.mockReset());
 });
 
 describe("publishSite", () => {
@@ -267,5 +270,29 @@ describe("fetchSitePublishState", () => {
       lastEditedAt: "2026-08-21T09:00:00.000Z",
     });
     expect((await fetchSitePublishState("site-1")).hasUnpublishedChanges).toBeNull();
+  });
+});
+
+describe("authorizeCodeExport", () => {
+  const trpcError = (code: string, message: string) => Object.assign(new Error(message), { data: { code } });
+
+  it("is 'allowed' when the server says yes", async () => {
+    authorizeCodeExportQuery.mockResolvedValueOnce({ allowed: true });
+    await expect(authorizeCodeExport("site-1")).resolves.toBe("allowed");
+    expect(authorizeCodeExportQuery).toHaveBeenCalledWith({ siteId: "site-1" });
+  });
+
+  it("is 'upgrade' only for the plan refusal", async () => {
+    authorizeCodeExportQuery.mockRejectedValueOnce(
+      trpcError("FORBIDDEN", "CODE_EXPORT_NOT_IN_PLAN: Downloading your site's code is a Pro feature."),
+    );
+    await expect(authorizeCodeExport("site-1")).resolves.toBe("upgrade");
+  });
+
+  it("throws any other FORBIDDEN (not a member) and network errors", async () => {
+    authorizeCodeExportQuery.mockRejectedValueOnce(trpcError("FORBIDDEN", "FORBIDDEN"));
+    await expect(authorizeCodeExport("site-1")).rejects.toThrow("FORBIDDEN");
+    authorizeCodeExportQuery.mockRejectedValueOnce(new TypeError("Failed to fetch"));
+    await expect(authorizeCodeExport("site-1")).rejects.toThrow("Failed to fetch");
   });
 });

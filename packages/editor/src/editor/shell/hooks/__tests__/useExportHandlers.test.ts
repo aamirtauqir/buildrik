@@ -1,5 +1,7 @@
 /**
- * useExportHandlers.test.ts — covers handleExportHTML success/failure,
+ * useExportHandlers.test.ts — covers handleExportHTML success/failure and its
+ * server Pro gate (sites.authorizeCodeExport: refusal → upgrade prompt, error
+ * → toast, never a ZIP),
  * handleVercelPublish branches
  * (no siteId, empty pages, success, export failure), and the
  * publish-toast useEffect for COMPLETED / FAILED transitions.
@@ -39,6 +41,15 @@ vi.mock("@/services/BuildrikSyncProvider", () => ({
   getSiteIdFromUrl: vi.fn(() => "site-123"),
 }));
 
+vi.mock("@/services/PublishService", () => ({
+  authorizeCodeExport: vi.fn(() => Promise.resolve("allowed")),
+}));
+
+vi.mock("@/editor/chrome-ui", async (orig) => ({
+  ...(await orig<typeof import("@/editor/chrome-ui")>()),
+  openUpgrade: vi.fn(),
+}));
+
 vi.mock("../usePublishJob", () => {
   const baseResult = {
     uiState: "idle" as const,
@@ -66,6 +77,8 @@ vi.mock("../usePublishJob", () => {
 // Lazy imports — must come AFTER the vi.mock calls.
 import * as ExportMod from "@/engine/export";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
+import { authorizeCodeExport } from "@/services/PublishService";
+import { openUpgrade } from "@/editor/chrome-ui";
 import * as PublishJobMod from "../usePublishJob";
 
 const exportInstance = (ExportMod as unknown as {
@@ -121,6 +134,7 @@ describe("useExportHandlers", () => {
       .mockReset()
       .mockResolvedValue({ files: DEFAULT_EXPORT_FILES });
     vi.mocked(getSiteIdFromUrl).mockReturnValue("site-123");
+    vi.mocked(authorizeCodeExport).mockReset().mockResolvedValue("allowed");
   });
 
   afterEach(() => {
@@ -151,6 +165,57 @@ describe("useExportHandlers", () => {
       expect(opts.setExportLoading).not.toHaveBeenCalled();
       expect(exportInstance.downloadZip).not.toHaveBeenCalled();
       expect(opts.addToast).not.toHaveBeenCalled();
+    });
+
+    it("asks the server for this site before building the ZIP", async () => {
+      const { result } = renderHook(() => useExportHandlers(opts));
+      await act(async () => {
+        await result.current.handleExportHTML();
+      });
+      expect(authorizeCodeExport).toHaveBeenCalledWith("site-123");
+      expect(vi.mocked(authorizeCodeExport).mock.invocationCallOrder[0]).toBeLessThan(
+        exportInstance.downloadZip.mock.invocationCallOrder[0],
+      );
+      expect(openUpgrade).not.toHaveBeenCalled();
+    });
+
+    it("server plan refusal → upgrade prompt, no ZIP, no toast", async () => {
+      vi.mocked(authorizeCodeExport).mockResolvedValueOnce("upgrade");
+      const { result } = renderHook(() => useExportHandlers(opts));
+      await act(async () => {
+        await result.current.handleExportHTML();
+      });
+      expect(openUpgrade).toHaveBeenCalledWith({ feature: "Downloading your site's code" });
+      expect(exportInstance.downloadZip).not.toHaveBeenCalled();
+      expect(opts.addToast).not.toHaveBeenCalled();
+      expect(opts.setExportLoading).toHaveBeenLastCalledWith(false);
+    });
+
+    it("a failed check (network) → error toast, no ZIP, no upgrade prompt", async () => {
+      vi.mocked(authorizeCodeExport).mockRejectedValueOnce(new TypeError("Failed to fetch"));
+      const { result } = renderHook(() => useExportHandlers(opts));
+      await act(async () => {
+        await result.current.handleExportHTML();
+      });
+      expect(opts.addToast).toHaveBeenCalledWith(
+        expect.objectContaining({ tone: "error", title: "Couldn't check your plan" }),
+      );
+      expect(exportInstance.downloadZip).not.toHaveBeenCalled();
+      expect(openUpgrade).not.toHaveBeenCalled();
+      expect(opts.setExportLoading).toHaveBeenLastCalledWith(false);
+    });
+
+    it("without a site there is no server to ask → toast, no check, no ZIP", async () => {
+      vi.mocked(getSiteIdFromUrl).mockReturnValue(null);
+      const { result } = renderHook(() => useExportHandlers(opts));
+      await act(async () => {
+        await result.current.handleExportHTML();
+      });
+      expect(authorizeCodeExport).not.toHaveBeenCalled();
+      expect(exportInstance.downloadZip).not.toHaveBeenCalled();
+      expect(opts.addToast).toHaveBeenCalledWith(
+        expect.objectContaining({ tone: "error", title: "Cannot download code" }),
+      );
     });
 
     it("toasts error on failure and clears loading", async () => {

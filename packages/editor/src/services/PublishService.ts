@@ -15,6 +15,7 @@ import {
 } from "./BuildrikSyncProvider";
 import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
 import type { PrePublishChecksResult } from "@buildrik/shared/schemas/publish";
+import { CODE_EXPORT_NOT_IN_PLAN } from "@buildrik/shared/schemas/sites";
 import type { ComparePage } from "../shared/utils/html";
 
 let _client: ReturnType<typeof createBuildrikApiClient> | null = null;
@@ -317,6 +318,23 @@ export async function fetchPrePublishChecks(siteId: string): Promise<PrePublishC
  */
 export async function unpublishSite(siteId: string): Promise<void> {
   await getClient().sites.unpublish.mutate({ siteId });
+}
+
+/**
+ * Ask the server whether this site's plan allows downloading its code (the
+ * Publish panel's "Download code (ZIP)"). "upgrade" is the plan refusal and
+ * nothing else; every other failure (network, not a member, site gone) THROWS,
+ * so the caller can tell the user something other than "upgrade".
+ */
+export async function authorizeCodeExport(siteId: string): Promise<"allowed" | "upgrade"> {
+  try {
+    await getClient().sites.authorizeCodeExport.query({ siteId });
+    return "allowed";
+  } catch (e) {
+    const err = e as { data?: { code?: string } | null; message?: string } | null;
+    if (err?.data?.code === "FORBIDDEN" && err.message?.startsWith(CODE_EXPORT_NOT_IN_PLAN)) return "upgrade";
+    throw e;
+  }
 }
 
 export type PublishPageChange = "added" | "removed" | "changed" | "same";

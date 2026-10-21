@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { sanitizeBlocks, sanitizeProjectStyles } from "@/lib/sanitize-blocks";
 import { pagesFromTemplate } from "@/server/services/template.service";
 import { newPageRoot, copiesForRenamedIds, copyIdKeyedRecord, reidSite, type IdRename } from "@buildrik/shared/content/elementIds";
-import { checkSiteRole, getEffectiveSiteRole, PermissionError, siteScopeWhere } from "@/server/services/permission.service";
+import { checkSiteRole, getEffectiveSiteRole, getSiteWorkspace, PermissionError, siteScopeWhere } from "@/server/services/permission.service";
 import type {
   CreateSiteInput,
   ListSitesInput,
@@ -11,7 +11,7 @@ import type {
   SaveProjectDataInput,
   CmsBindingsInput,
 } from "@buildrik/shared/schemas/sites";
-import { filterCmsBindings, MAX_CMS_BINDINGS_CHARS, SITE_RESTORE_WINDOW_DAYS } from "@buildrik/shared/schemas/sites";
+import { CODE_EXPORT_NOT_IN_PLAN, filterCmsBindings, MAX_CMS_BINDINGS_CHARS, SITE_RESTORE_WINDOW_DAYS } from "@buildrik/shared/schemas/sites";
 import { ANALYTICS_ID_FIELDS, ANALYTICS_ID_SAFE, type AnalyticsProvider } from "@buildrik/shared/schemas/analytics-ids";
 import { SITE_SETTINGS_COLUMNS, getSiteSettings, keepValidJsonOnlySettings, stripColumnBackedSettings } from "@/server/services/site-settings.service";
 import { listPages } from "@/server/services/page.service";
@@ -1037,6 +1037,23 @@ async function assertPageLimit(siteId: string, workspaceId: string, incoming: nu
   if (limit === -1 || incoming <= limit) return;
   const stored = await prisma.page.count({ where: { siteId } });
   if (incoming > stored) throw new Error(`PAGE_LIMIT:${limit}`);
+}
+
+/**
+ * The server half of the Pro gate on the Publish panel's "Download code (ZIP)".
+ * The ZIP is built in the browser, so the editor asks here first and builds
+ * nothing on a refusal.
+ *
+ * Reads `Workspace.plan`, like every other entitlement gate: the Stripe
+ * webhook keeps it in step with the subscription (PAST_DUE keeps the paid plan
+ * through dunning, a deleted subscription drops it to FREE), so subscription
+ * status needs no second reading here. The caller has already proven site
+ * access. Throws SITE_NOT_FOUND or CODE_EXPORT_NOT_IN_PLAN.
+ */
+export async function assertCodeExportAllowed(siteId: string): Promise<void> {
+  const workspace = await getSiteWorkspace(prisma, siteId);
+  if (!workspace) throw new Error("SITE_NOT_FOUND");
+  if (PLAN_LIMITS[workspace.plan].codeExport !== true) throw new Error(CODE_EXPORT_NOT_IN_PLAN);
 }
 
 /** `editorId` is the user making the save; it lands in `Site.lastEditedById`
