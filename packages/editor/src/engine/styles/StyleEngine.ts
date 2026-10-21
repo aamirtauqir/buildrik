@@ -19,7 +19,7 @@ import { devWarn } from "@/shared/utils/devLogger";
 import { generateId, camelToKebab } from "@/shared/utils/helpers";
 import type { Composer } from "../Composer";
 import type { Element } from "../elements/Element";
-import { elementSelector } from "@/shared/utils/elementSelector";
+import { elementIdsInSelector, elementSelector } from "@/shared/utils/elementSelector";
 import { elementBaseCSS, localSelector, type BaseRuleCache, type CascadeTarget } from "./cascadeCSS";
 import { selectorLayer } from "@/shared/utils/classSelector";
 
@@ -156,6 +156,30 @@ export class StyleEngine {
       return true;
     }
     return false;
+  }
+
+  /**
+   * Remove every rule that names only elements in `ids` (through
+   * elementSelector) — a deleted element's breakpoint and :state rules.
+   * Class and tag rules name no element and are never touched. Returns how
+   * many rules went.
+   */
+  removeRulesOf(ids: ReadonlySet<string>): number {
+    if (ids.size === 0) return 0;
+    let removed = 0;
+    for (const style of [...this.styles.values()]) {
+      const named = elementIdsInSelector(style.selector);
+      if (named.length === 0 || !named.every((id) => ids.has(id))) continue;
+      this.styles.delete(style.id);
+      this.ruleIndex.delete(this.ruleKey(style.selector, style.mediaQuery ?? undefined));
+      this.composer.emit(EVENTS.STYLE_REMOVED, style);
+      removed++;
+    }
+    if (removed > 0) {
+      this.updateStylesheet();
+      this.composer.markDirty();
+    }
+    return removed;
   }
 
   /**
