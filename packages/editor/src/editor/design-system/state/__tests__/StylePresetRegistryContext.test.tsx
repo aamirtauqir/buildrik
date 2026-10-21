@@ -1,18 +1,15 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import * as React from "react";
+import type { Composer } from "@/engine";
 import {
   StylePresetRegistryProvider,
   useButtonPresets,
   useCardPresets,
-  useResetAllPresets,
   PRESET_CATEGORIES,
 } from "../StylePresetRegistryContext";
+import { DEFAULT_PRESETS } from "@/editor/design-system/constants";
 import type { StylePreset } from "@/editor/design-system/types";
-
-const wrap = ({ children }: { children: React.ReactNode }) => (
-  <StylePresetRegistryProvider projectId="preset-test">{children}</StylePresetRegistryProvider>
-);
 
 const mk = (id: string, category: StylePreset["category"]): StylePreset => ({
   id,
@@ -21,6 +18,30 @@ const mk = (id: string, category: StylePreset["category"]): StylePreset => ({
   variant: "primary",
   bindings: {},
 });
+
+/** Just enough composer: project settings plus the settings-change event. */
+function fakeComposer(designPresets?: StylePreset[]) {
+  let settings: { designPresets?: StylePreset[] } = { designPresets };
+  const handlers = new Map<string, Set<() => void>>();
+  const composer = {
+    getProjectSettings: () => settings,
+    on: (e: string, h: () => void) => {
+      if (!handlers.has(e)) handlers.set(e, new Set());
+      handlers.get(e)!.add(h);
+    },
+    off: (e: string, h: () => void) => handlers.get(e)?.delete(h),
+  };
+  const setPresets = (next: StylePreset[]) => {
+    settings = { designPresets: next };
+    handlers.get("settings:change")?.forEach((h) => h());
+  };
+  return { composer: composer as unknown as Composer, setPresets };
+}
+
+const wrapWith = (composer: Composer | null) =>
+  function Wrap({ children }: { children: React.ReactNode }) {
+    return <StylePresetRegistryProvider composer={composer}>{children}</StylePresetRegistryProvider>;
+  };
 
 beforeEach(() => {
   localStorage.clear();
@@ -33,52 +54,42 @@ describe("StylePresetRegistryContext", () => {
     expect(PRESET_CATEGORIES).toContain("layout");
   });
 
-  it("loads presets from localStorage seeded blob", () => {
-    localStorage.setItem(
-      "buildrick-design-presets-preset-test-v1",
-      JSON.stringify({ schemaVersion: 1, presets: [mk("button-primary", "button")] }),
-    );
-    const { result } = renderHook(() => useButtonPresets(), { wrapper: wrap });
-    expect(result.current.presets).toHaveLength(1);
-    expect(result.current.presets[0].id).toBe("button-primary");
+  it("reads the project's designPresets (B-3)", () => {
+    const { composer } = fakeComposer([mk("button-primary", "button")]);
+    const { result } = renderHook(() => useButtonPresets(), { wrapper: wrapWith(composer) });
+    expect(result.current.presets.map((p) => p.id)).toEqual(["button-primary"]);
   });
 
-  it("falls back to DEFAULT_PRESETS when localStorage is empty", () => {
-    const { result } = renderHook(() => useButtonPresets(), { wrapper: wrap });
-    // DEFAULT_PRESETS is [] until E4 populates it; assertion is shape, not count.
-    expect(Array.isArray(result.current.presets)).toBe(true);
+  it("ignores the old per-browser cache (B-3)", () => {
+    localStorage.setItem(
+      "buildrick-design-presets-default-v1",
+      JSON.stringify({ schemaVersion: 1, presets: [mk("from-cache", "button")] }),
+    );
+    const { composer } = fakeComposer([mk("from-project", "button")]);
+    const { result } = renderHook(() => useButtonPresets(), { wrapper: wrapWith(composer) });
+    expect(result.current.presets.map((p) => p.id)).toEqual(["from-project"]);
+  });
+
+  it("falls back to DEFAULT_PRESETS when the project has none", () => {
+    const { composer } = fakeComposer(undefined);
+    const { result } = renderHook(() => useButtonPresets(), { wrapper: wrapWith(composer) });
+    expect(result.current.presets).toEqual(DEFAULT_PRESETS.filter((p) => p.category === "button"));
   });
 
   it("isolated per category — cards don't see button presets", () => {
-    localStorage.setItem(
-      "buildrick-design-presets-preset-test-v1",
-      JSON.stringify({
-        schemaVersion: 1,
-        presets: [mk("button-primary", "button"), mk("card-elevated", "card")],
-      }),
-    );
+    const { composer } = fakeComposer([mk("button-primary", "button"), mk("card-elevated", "card")]);
     const { result } = renderHook(
       () => ({ button: useButtonPresets(), card: useCardPresets() }),
-      { wrapper: wrap },
+      { wrapper: wrapWith(composer) },
     );
     expect(result.current.button.presets.map((p) => p.id)).toEqual(["button-primary"]);
     expect(result.current.card.presets.map((p) => p.id)).toEqual(["card-elevated"]);
   });
 
-  it("useResetAllPresets fans out across categories", () => {
-    const { result } = renderHook(
-      () => ({
-        button: useButtonPresets(),
-        card: useCardPresets(),
-        reset: useResetAllPresets(),
-      }),
-      { wrapper: wrap },
-    );
-    act(() => {
-      result.current.reset([mk("button-new", "button"), mk("card-new", "card")]);
-    });
-    expect(result.current.button.presets[0].id).toBe("button-new");
-    expect(result.current.card.presets[0].id).toBe("card-new");
+  it("re-reads on a settings change (undo, restore, another write)", () => {
+    const { composer, setPresets } = fakeComposer([mk("button-old", "button")]);
+    const { result } = renderHook(() => useButtonPresets(), { wrapper: wrapWith(composer) });
+    act(() => setPresets([mk("button-new", "button")]));
+    expect(result.current.presets.map((p) => p.id)).toEqual(["button-new"]);
   });
-
 });

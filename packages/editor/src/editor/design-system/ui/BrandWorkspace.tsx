@@ -518,17 +518,19 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
   }, [requestedToken, allTokens]);
   /* A value edit — light, and the dark value when the card sets one — is ONE
      write, so ⌘Z undoes it in one step (and Review changes lists one row). */
-  const changeToken = (id: string, value: string, darkValue?: string) => {
+  const changeToken = (id: string, value: string, darkValue?: string): boolean => {
     const tok = tokenById(id);
-    if (!tok) return;
+    if (!tok) return false;
     let next = allTokens;
     const write = (mode: "light" | "dark", v: string) => {
       if ((resolveTokenLiteral(next, id, mode) ?? "") !== v) next = setTokenLiteral(next, id, mode, v);
     };
     write("light", value);
     if (darkValue !== undefined) write("dark", darkValue);
-    if (next === allTokens) return;
-    if (!store.commit(next, "Edit token")) refused(`"${tok.name}"`);
+    if (next === allTokens) return true;
+    if (store.commit(next, "Edit token")) return true;
+    refused(`"${tok.name}"`);
+    return false;
   };
   const deleteToken = (id: string, opts?: { replaceWith?: string }) => {
     const tok = tokenById(id);

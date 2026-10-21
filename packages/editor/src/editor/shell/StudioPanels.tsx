@@ -766,11 +766,11 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   return (
     <DSModeProvider>
     <TokenRegistryProvider composer={composer}>
-    <StylePresetRegistryProvider projectId={projectId}>
+    <StylePresetRegistryProvider composer={composer}>
       {/* Headless. The linter only ran from inside the Brand panel, so the
           topbar Issues chip — which gates the publish-anyway confirm — read
           "No issues" until the user happened to open Brand. */}
-      <DSLintRunner composer={composer} />
+      <DSLintRunner composer={composer} siteId={projectId} />
       <MigrationProgressMount composer={composer} />
       {/* Headless, for the same reason the linter above is: a site's own
           tokens reached the page only when the Brand panel mounted, so a
