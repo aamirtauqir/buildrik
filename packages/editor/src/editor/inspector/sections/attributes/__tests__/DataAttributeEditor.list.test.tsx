@@ -5,7 +5,7 @@
  * @license BSD-3-Clause
  */
 
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, act } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
 import { DataAttributeEditor, resolveAttributeName } from "../DataAttributeEditor";
 import { makeMockElement, makeMockComposer } from "@/editor/inspector/__tests__/harness";
@@ -33,6 +33,29 @@ describe("DataAttributeEditor — existing attributes", () => {
     fireEvent.blur(input);
     expect(el.setAttribute).toHaveBeenCalledWith("data-track", "footer");
     expect(composer.beginTransaction).toHaveBeenCalledWith("data-attribute-edit");
+  });
+
+  it("keeps focus in the field after an Enter commit re-renders the list", () => {
+    const { el, composer } = setup({ "data-track": "hero" });
+    const input = screen.getByLabelText("data-track value");
+    input.focus();
+    fireEvent.change(input, { target: { value: "footer" } });
+    fireEvent.keyDown(input, { key: "Enter" });
+    expect(el.setAttribute).toHaveBeenCalledWith("data-track", "footer");
+    const onUpdated = composer.on.mock.calls.find((call) => call[0] === "element:updated")?.[1];
+    act(() => onUpdated());
+    expect(screen.getByLabelText("data-track value")).toBe(input);
+    expect(document.activeElement).toBe(input);
+    expect(input).toHaveValue("footer");
+  });
+
+  it("an outside write to the value resets the draft", () => {
+    const { el, composer } = setup({ "data-track": "hero" });
+    const input = screen.getByLabelText("data-track value");
+    el.setAttribute("data-track", "undone");
+    const onUpdated = composer.on.mock.calls.find((call) => call[0] === "element:updated")?.[1];
+    act(() => onUpdated());
+    expect(input).toHaveValue("undone");
   });
 
   it("does not write when the value is unchanged", () => {

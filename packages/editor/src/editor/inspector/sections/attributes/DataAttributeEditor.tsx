@@ -41,6 +41,29 @@ export function resolveAttributeName(raw: string): { name: string } | { error: s
   return { name };
 }
 
+/** One attribute's value field. The draft follows the stored value, so an undo
+ *  or another write resets it. It used to be keyed by that value instead, which
+ *  remounted the input on its own Enter commit and dropped focus to <body> —
+ *  where the next keystroke fired a global shortcut. */
+function AttributeValueInput({ name, value, onCommit }: { name: string; value: string; onCommit: (next: string) => void }) {
+  const [draft, setDraft] = React.useState(value);
+  React.useEffect(() => setDraft(value), [value]);
+  return (
+    <TextInput
+      sizing="sm"
+      type="text"
+      value={draft}
+      aria-label={`${name} value`}
+      className="tw:flex-1 tw:min-w-0"
+      onChange={(e) => setDraft(e.target.value)}
+      onBlur={() => onCommit(draft)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") onCommit(draft);
+      }}
+    />
+  );
+}
+
 export const DataAttributeEditor: React.FC<DataAttributeEditorProps> = ({ elementId, composer }) => {
   const [newKey, setNewKey] = React.useState("");
   const [newValue, setNewValue] = React.useState("");
@@ -83,19 +106,7 @@ export const DataAttributeEditor: React.FC<DataAttributeEditorProps> = ({ elemen
               >
                 {name}
               </span>
-              {/* Keyed by the stored value: an undo or another write resets the draft. */}
-              <TextInput
-                key={value}
-                sizing="sm"
-                type="text"
-                defaultValue={value}
-                aria-label={`${name} value`}
-                className="tw:flex-1 tw:min-w-0"
-                onBlur={(e) => commitValue(name, value, e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") commitValue(name, value, e.currentTarget.value);
-                }}
-              />
+              <AttributeValueInput name={name} value={value} onCommit={(next) => commitValue(name, value, next)} />
               <IconButton
                 label={`Remove ${name}`}
                 size="sm"
