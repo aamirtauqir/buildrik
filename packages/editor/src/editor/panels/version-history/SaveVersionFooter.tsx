@@ -31,7 +31,7 @@ export const SaveVersionFooter: React.FC<{
          closed by "Done". */
       const id = addToast({
         title: "Version saved",
-        description: `${name}\nYour current draft is saved as a named milestone. It is available in Saved versions.`,
+        description: `${name}\nYour current draft is saved as a named milestone. Find it in History under Saves.`,
         tone: "success",
         action: { label: "Done", onClick: () => removeToast(id) },
       });

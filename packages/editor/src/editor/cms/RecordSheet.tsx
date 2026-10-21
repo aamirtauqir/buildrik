@@ -266,7 +266,7 @@ export function RecordSheet({
     addToast({
       tone: "success",
       title: `Record saved · ${collection.name}`,
-      description: "Changes to this record are live in the CMS. Published pages using this record will refresh on next build.",
+      description: "Changes to this record are live in the CMS. Published pages that use it update when you next publish.",
     });
     leave(onClose);
   };

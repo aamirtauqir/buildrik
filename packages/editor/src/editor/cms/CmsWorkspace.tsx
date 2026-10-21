@@ -326,7 +326,7 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
         : ws.tab === "fields"
           ? { title: "Select a field", hint: "Click a row to open its settings — type, key, required and validation." }
         : ws.tab === "settings"
-          ? { title: "Settings apply to every record", hint: "Rename, re-sync or delete this collection here." }
+          ? { title: "Settings apply to every record", hint: "Rename or delete this collection here." }
           : null;
 
   return (

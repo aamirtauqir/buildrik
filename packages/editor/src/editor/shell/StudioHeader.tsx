@@ -974,7 +974,6 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
             }
             siteId={siteIdForMenu}
             siteName={siteName}
-            pageName={crumbCtx ?? pageName}
             readOnlyView={viewMode.readOnlyView}
             onToggleReadOnlyView={canLeaveView ? toggleReadOnlyView : undefined}
           />

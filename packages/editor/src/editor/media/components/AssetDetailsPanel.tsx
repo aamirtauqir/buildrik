@@ -635,8 +635,7 @@ export function AssetDetailsPanel({
           </ModalClose>
           <ModalBody>
             <p className={`tw:mb-3 ${MUTED_SM}`}>
-              Pick a replacement asset. All canvas usages will be swapped atomically
-              (one undo reverses everything).
+              Pick a replacement asset. Every use on the canvas switches to it.
             </p>
             <div className="med-grid" data-cols="3">
               {replaceCandidates.map((i) => (

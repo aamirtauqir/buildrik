@@ -87,7 +87,7 @@ export const RestorePointsSection: React.FC<RestorePointsSectionProps> = ({ comp
       ) : points.status === "ready" && points.rows.length === 0 ? (
         <>
           <p className={TITLE} data-testid="brand-restore-empty">No restore points yet</p>
-          <p className={COPY}>A restore point is created before a theme push, generator, dark-mode switch or logo import.</p>
+          <p className={COPY}>A restore point is saved before a theme push, a generator run, switching dark mode to Auto, or applying a brand from a logo or website.</p>
         </>
       ) : (
         <ul className="tw:m-0 tw:flex tw:w-full tw:list-none tw:flex-col tw:gap-3 tw:p-0" aria-busy={points.status === "loading" || undefined}>

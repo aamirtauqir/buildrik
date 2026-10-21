@@ -165,7 +165,7 @@ describe("AnalyticsScreen — Connection status and Last received data", () => {
     const pill = screen.getByTestId("set-an-ga-status");
     expect(pill).toHaveTextContent("RECEIVING DATA");
     expect(pill).toHaveClass("tw:bg-[var(--bk-success-tint)]");
-    expect(screen.getByTestId("set-an-ga-verified")).toHaveTextContent("Measurement ID verified on 2 Jul 2025");
+    expect(screen.getByTestId("set-an-ga-verified")).toHaveTextContent("Format checked on 2 Jul 2025");
     expect(screen.getByTestId("set-an-ga-last")).toHaveTextContent("2 Jul 2025, 19:38 · 1,284 events in the last 24 hours");
   });
 
@@ -264,7 +264,7 @@ describe("AnalyticsScreen — Verify and Connection verified (4256:26844)", () =
 
     // Behind the dialog the rows already show the re-read and the stamp.
     expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("RECEIVING DATA");
-    expect(screen.getByTestId("set-an-ga-verified")).toHaveTextContent(`Measurement ID verified on ${formatDay(new Date())}`);
+    expect(screen.getByTestId("set-an-ga-verified")).toHaveTextContent(`Format checked on ${formatDay(new Date())}`);
     expect(screen.getByTestId("set-an-ga-last")).toHaveTextContent("1,284 events in the last 24 hours");
     expect(onDirtyChange).toHaveBeenLastCalledWith(true);
     expect(composer.setProjectSettings).not.toHaveBeenCalled();

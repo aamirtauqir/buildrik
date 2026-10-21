@@ -38,6 +38,8 @@ import { CHECK_DOOR, PrePublishChecks } from "./PrePublishChecks";
 import { ApprovalCheckRow, PublishGateBanner } from "./PublishGateBanner";
 import { UnpublishConfirmModal } from "./UnpublishConfirmModal";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
+import { useEditorRole } from "@/editor/shell/hooks/useEditorRole";
+import { roleAtLeast } from "@/services/RoleService";
 import {
   VERCEL_CHECK_LABEL,
   type PrePublishChecksResult,
@@ -457,7 +459,11 @@ export const PublishTab: React.FC<PublishTabProps> = ({
   /* Board 7045:77972 — the panel ⋯: All versions › (History › Published) and,
      while the site is live, Unpublish site… (the confirm below). */
   const [menuOpen, setMenuOpen] = React.useState(false);
-  const canUnpublish = Boolean(snapshot.lastDeploy?.isLive && siteId);
+  /* Unpublish is ADMIN on the server; the site menu already hides its row
+     below that (StudioHeader `atLeastAdmin`). This menu offered it to every
+     role, so an editor collected a server error. Unknown role still asks. */
+  const atLeastAdmin = roleAtLeast(useEditorRole(), "ADMIN") !== false;
+  const canUnpublish = Boolean(snapshot.lastDeploy?.isLive && siteId && atLeastAdmin);
   const publishMenu = (
     <Popover
       open={menuOpen}

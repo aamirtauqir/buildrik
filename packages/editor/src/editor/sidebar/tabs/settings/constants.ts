@@ -257,6 +257,13 @@ export const SAVE_ERROR_MESSAGES: Partial<Record<SettingsNavId, string>> = {
   access: "Access settings were not saved. Your changes are still here. Review the values, then retry.",
 };
 
+/** Domains and Redirects act per row, straight to the server: a refused row
+ *  action is not a refused form, so it does not say "review the values". */
+export const ACTION_ERROR_MESSAGES = {
+  domains: "That domain change didn't go through. Try again.",
+  redirects: "That redirect change didn't go through. Try again.",
+} as const;
+
 /**
  * Workspace doors — dashboard pages, opened in a new tab. Only pages that
  * exist ship here; Billing is also where every `Upgrade` goes. "Integrations &

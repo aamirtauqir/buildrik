@@ -32,7 +32,6 @@ export interface PreviewShareModalProps {
   siteId: string;
   /** Title and subtitle name what is shared (board 4418:165739). */
   siteName?: string | null;
-  pageName?: string | null;
 }
 
 interface ShareLinkRow {
@@ -99,7 +98,7 @@ const PRIMARY_CLASS = "tw:border-0 tw:bg-[var(--bk-accent)] tw:hover:bg-[var(--b
 
 const STATUS_CLASS = "tw:m-0 tw:text-xs tw:text-[var(--bk-ink-muted)]";
 
-export const PreviewShareModal: React.FC<PreviewShareModalProps> = ({ open, onOpenChange, siteId, siteName, pageName }) => {
+export const PreviewShareModal: React.FC<PreviewShareModalProps> = ({ open, onOpenChange, siteId, siteName }) => {
   const { addToast } = useToast();
   const [state, setState] = React.useState<LinkState>({ kind: "loading" });
   const [attempt, setAttempt] = React.useState(0);
@@ -127,16 +126,17 @@ export const PreviewShareModal: React.FC<PreviewShareModalProps> = ({ open, onOp
         addToast({
           title: "Link copied",
           description: `The preview link is on your clipboard. Anyone with it can view the saved design of ${
-            pageName || "this site"
+            siteName || "this site"
           } — no editing access.`,
           tone: "success",
         }),
       () => addToast({ description: "Couldn't copy the link", tone: "error" }),
     );
-  }, [url, addToast, pageName]);
+  }, [url, addToast, siteName]);
 
-  const page = pageName || "this page";
-  const subtitle = [siteName, pageName, "current saved design"].filter(Boolean).join(" · ");
+  /* `/share/<token>` is the whole site — every live page, opening on the
+     first — so the dialog names the site, not the page (REA S-11). */
+  const subtitle = [siteName, "current saved design", "every page"].filter(Boolean).join(" · ");
   const close = () => onOpenChange(false);
 
   /* No ✕ — the board draws none; Done and Escape close it. */
@@ -144,7 +144,7 @@ export const PreviewShareModal: React.FC<PreviewShareModalProps> = ({ open, onOp
     <Modal
       open={open}
       onClose={close}
-      title={`Share preview of ${page}`}
+      title={`Share preview of ${siteName || "this site"}`}
       testId="preview-share-modal"
       footer={
         <>

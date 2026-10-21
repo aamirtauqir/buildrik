@@ -170,15 +170,17 @@ describe("PageTabBar", () => {
   });
 
   /* Owner override 2026-10-03 (board 4418:123573 drew no "+"): a trailing
-     "Add page" button opens the Pages panel through UI_PANEL_OPEN — it does
-     not create a page itself (Add page still lives in that panel). */
-  it("the + button opens the Pages panel and creates nothing", () => {
+     "Add page" button opens the Pages panel through UI_PANEL_OPEN, then asks
+     for the New page dialog like every other Add-page door. It creates no
+     page itself — the dialog does, once the user picks a name (REA S-4). */
+  it("the + button opens the Pages panel and the New page dialog, and creates nothing itself", () => {
     const { composer, elements } = makeComposer(TWO_PAGES);
     renderBar(composer);
     const add = screen.getByRole("button", { name: "Add page" });
     expect(add).toHaveAttribute("title", "Add page");
     fireEvent.click(add);
     expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_PANEL_OPEN, { panel: "pages" });
+    expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_NEW_PAGE_REQUESTED, {});
     expect(elements.createPage).not.toHaveBeenCalled();
   });
 

@@ -21,7 +21,7 @@ const ROWS: ReadonlyArray<[string, string]> = [
   ["Tab", "moves within the focused region, never between"],
   ["F6 / ⇧F6", "cycles between regions, 1 → 7 → back"],
   ["Esc", "steps out one level: drill-in → panel root → close → deselect"],
-  ["⌘K", "focuses the shell search — scope follows the open panel; jump-to when nothing is open"],
+  ["⌘K", "opens the command palette — panels, pages and actions"],
   ["A L P M D B", "rail panels — Add, Layers, Pages, Assets, CMS, Brand"],
   ["R", "Review panel"],
   ["C", "Comments · C · Esc leaves"],

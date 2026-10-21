@@ -26,6 +26,9 @@ import { createAssetVersion } from "@/services/MediaVersionService";
 import { displayNameFor } from "./data/mediaUtils";
 import type { IconConfig } from "@shared/types/media";
 
+/** The stock-save toast names what was saved: the drawer saves photos, videos and icons. */
+const STOCK_SAVED = { img: "Stock image saved", vid: "Stock video saved", ico: "Icon saved" } as const;
+
 interface MediaTabProps {
   composer: Composer | null;
   isExpanded?: boolean;
@@ -346,7 +349,7 @@ function MediaTabWithComposer({
           const saved = await state.saveToLibrary(type, item);
           if (saved) {
             setStockBrowserOpen(false);
-            addToast({ description: "Stock image saved", tone: "success" });
+            addToast({ description: STOCK_SAVED[type], tone: "success" });
           }
         }}
       />

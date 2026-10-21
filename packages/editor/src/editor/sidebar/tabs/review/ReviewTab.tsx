@@ -6,7 +6,7 @@
  * revoked · 158:213 review-closed · 453:3974 load-error · 1138:4527 loading).
  *
  * The frame every state shares, top to bottom: the panel header (its ⋯ holds
- * Compare rounds and Round history, board 7071:79114), one status line
+ * Compare with approved and Round history, board 7071:79114), one status line
  * ("2 open · 1 resolved · Awaiting Sara", board 4418:115784), the thread, then
  * a fixed foot — the note composer. The 4418 Review boards (116040–118896)
  * draw no primary under it, so the re-send ("Re-send review link" · "Send a new
@@ -379,7 +379,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
     });
 
   /* Board 7071:79114 — the round's own actions live in a panel ⋯ menu
-     (G1-058/059). Compare rounds and Round history live here, not in the
+     (G1-058/059). Compare and Round history live here, not in the
      body. "Open current review link" needs the round's token, which
      `currentRound` carries only while the client's link still opens — so the
      row is drawn only then (post-Oct-1 R4). */
@@ -419,7 +419,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
               openCompare();
             }}
           >
-            Compare rounds
+            Compare with approved
           </MenuItem>
           <MenuItem
             onClick={() => {

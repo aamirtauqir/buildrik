@@ -464,7 +464,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
   const [importDraft, setImportDraft] = React.useState("");
   const [importResult, setImportResult] = React.useState<ImportResult | null>(null);
   /* Clone 3695:45573 — the stock save's result, with the asset it landed as. */
-  const [stockSaved, setStockSaved] = React.useState<{ key: string; name: string } | null>(null);
+  const [stockSaved, setStockSaved] = React.useState<{ key: string; name: string; video: boolean } | null>(null);
 
   const handleImportFromUrl = React.useCallback(
     async (url: string) => {
@@ -1046,7 +1046,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
           const saved = await state.saveToLibrary(type, item);
           if (saved) {
             setStockModalOpen(false);
-            setStockSaved(saved);
+            setStockSaved({ ...saved, video: type === "vid" });
           }
         }}
       />
