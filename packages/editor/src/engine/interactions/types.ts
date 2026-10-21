@@ -205,9 +205,3 @@ export const DEFAULT_ANIMATION_CONFIG: InteractionAnimationConfig = {
   reverse: false,
   loop: 1,
 };
-
-export const DEFAULT_INTERACTION: Omit<Interaction, "id"> = {
-  trigger: "hover",
-  animation: DEFAULT_ANIMATION_CONFIG,
-  enabled: true,
-};
