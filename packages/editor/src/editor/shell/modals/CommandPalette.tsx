@@ -254,8 +254,8 @@ function buildCommands(
       disabledReason: historyBlock ?? "nothing to redo",
       handler: run(() => composer.commands.run("redo")),
     },
-    { id: "view-zoom-in", label: "Zoom in", group: "More", shortcut: "Ctrl++", handler: run(() => composer.emit(EVENTS.ZOOM_IN, {})) },
-    { id: "view-zoom-out", label: "Zoom out", group: "More", shortcut: "Ctrl+-", handler: run(() => composer.emit(EVENTS.ZOOM_OUT, {})) },
+    { id: "view-zoom-in", label: "Zoom in", group: "More", shortcut: "Ctrl++", handler: run(() => composer.commands.run("zoom-in")) },
+    { id: "view-zoom-out", label: "Zoom out", group: "More", shortcut: "Ctrl+-", handler: run(() => composer.commands.run("zoom-out")) },
     /* ⇧1 is fit (CanvasFooterToolbar binds ⇧1 fit, ⇧2 selection, ⇧0 100% —
        SC-12 / BD-39 moved them off ⌘1 / ⌘2, which switch browser tabs). */
     { id: "view-fit", label: "Zoom to fit", group: "More", shortcut: "Shift+1", handler: run(() => composer.emit(EVENTS.ZOOM_FIT, {})) },

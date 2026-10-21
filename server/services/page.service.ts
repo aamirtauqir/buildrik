@@ -1,25 +1,12 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { PLAN_LIMITS, PlanName } from "@/lib/constants/plan-limits";
 import { sanitizeBlocks } from "@/lib/sanitize-blocks";
-import { newPageRoot } from "@buildrik/shared/content/elementIds";
 import type {
-  CreatePageInput,
-  UpdatePageInput,
   SetTranslationInput,
   RemoveTranslationInput,
 } from "@buildrik/shared/schemas/pages";
 
-type DeletePageInput = { pageId: string; siteId: string };
-
 type TranslationMap = Record<string, { blocks: Prisma.JsonValue }>;
-
-function slugify(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/\s+/g, "-")
-    .replace(/[^a-z0-9-]/g, "");
-}
 
 export async function listPages(siteId: string, db: Prisma.TransactionClient = prisma) {
   // Phase -1: full page hydration. BuildrikSyncProvider.loadProject expects
@@ -50,90 +37,6 @@ export async function listPages(siteId: string, db: Prisma.TransactionClient = p
 
 export async function getPage(pageId: string) {
   return prisma.page.findUnique({ where: { id: pageId } });
-}
-
-export async function createPage(input: CreatePageInput) {
-  const site = await prisma.site.findUnique({ where: { id: input.siteId } });
-  if (!site || site.deletedAt) throw new Error("SITE_NOT_FOUND");
-
-  const member = await prisma.workspaceMember.findFirst({
-    where: { workspaceId: site.workspaceId },
-    include: { workspace: true },
-  });
-
-  const plan = (member?.workspace?.plan ?? "FREE") as PlanName;
-  const limit = PLAN_LIMITS[plan].pagesPerSite as number;
-
-  const pageCount = await prisma.page.count({ where: { siteId: input.siteId } });
-  if (pageCount >= limit) throw new Error("PAGE_LIMIT");
-
-  const baseSlug = input.slug ?? slugify(input.name);
-  const existing = await prisma.page.findUnique({
-    where: { siteId_slug: { siteId: input.siteId, slug: baseSlug } },
-  });
-  const slug = existing ? `${baseSlug}-${Date.now()}` : baseSlug;
-
-  const position = input.position ?? pageCount;
-
-  const page = await prisma.page.create({
-    data: {
-      siteId: input.siteId,
-      name: input.name,
-      slug,
-      position,
-      isHomePage: input.isHomePage ?? false,
-      // X-A1: its own root (id unique per page), not the column's [] default
-      // — every [] page used to load with one shared "root".
-      blocks: newPageRoot(`${input.siteId}:${slug}`),
-    },
-  });
-
-  await prisma.site.update({
-    where: { id: input.siteId },
-    data: { pages: { increment: 1 } },
-  });
-
-  return page;
-}
-
-export async function updatePage(input: UpdatePageInput) {
-  const existing = await prisma.page.findUnique({ where: { id: input.pageId } });
-  // The router's role gate ran against input.siteId, so the page must BE on
-  // that site — or an EDITOR of site A could edit any page by id (audit
-  // 2026-09-24). A foreign page is reported as missing, not as forbidden.
-  if (!existing || existing.siteId !== input.siteId) throw new Error("NOT_FOUND");
-
-  if (input.updatedAt && existing.updatedAt > input.updatedAt) {
-    throw new Error("CONFLICT");
-  }
-
-  const { pageId, siteId: _siteId, updatedAt: _updatedAt, blocks, ...fields } = input;
-
-  return prisma.page.update({
-    where: { id: pageId },
-    data: {
-      ...fields,
-      ...(blocks !== undefined
-        ? { blocks: sanitizeBlocks(blocks) as Prisma.InputJsonValue }
-        : {}),
-    },
-  });
-}
-
-export async function deletePage(input: DeletePageInput) {
-  // Same site-binding as updatePage: the role gate checked input.siteId.
-  const page = await prisma.page.findUnique({ where: { id: input.pageId } });
-  if (!page || page.siteId !== input.siteId) throw new Error("NOT_FOUND");
-
-  const pageCount = await prisma.page.count({ where: { siteId: input.siteId } });
-  if (pageCount <= 1) throw new Error("LAST_PAGE");
-
-  await prisma.formBlock.deleteMany({ where: { pageId: input.pageId } });
-  await prisma.page.delete({ where: { id: input.pageId } });
-  await prisma.site.update({
-    where: { id: input.siteId },
-    data: { pages: { decrement: 1 } },
-  });
 }
 
 // Locale fallback chain: `fr-FR` → `fr` → site.defaultLocale → null.
@@ -206,7 +109,7 @@ export async function setTranslation(input: SetTranslationInput) {
   if (input.locale === site.defaultLocale) {
     // Default-locale content lives at Page.blocks (the canonical column).
     // Writing to translations[defaultLocale] would create two competing
-    // sources of truth — route the caller through updatePage(blocks) instead.
+    // sources of truth — the project save (sites.saveProject) owns it.
     throw new Error("DEFAULT_LOCALE_USES_BLOCKS");
   }
 
