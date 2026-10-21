@@ -137,11 +137,17 @@ function readOutbox(): Record<string, OutboxOp[]> {
   }
 }
 
+let outboxWriteWarned = false;
 function writeOutbox(box: Record<string, OutboxOp[]>): void {
   try {
     localStorage.setItem(OUTBOX_KEY, JSON.stringify(box));
-  } catch {
-    // Private mode / quota: the in-memory queue still retries this session.
+  } catch (e) {
+    /* Private mode / quota: the in-memory queue still retries this session and
+       the unload guard counts it, but nothing survives a reload — say so once. */
+    if (!outboxWriteWarned) {
+      outboxWriteWarned = true;
+      console.warn("[cms-sync] outbox not persisted; unsynced CMS changes will not survive a reload", e);
+    }
   }
 }
 
