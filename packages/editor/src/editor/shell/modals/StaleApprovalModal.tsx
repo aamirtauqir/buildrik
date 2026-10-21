@@ -12,6 +12,7 @@
 import * as React from "react";
 import { ModalBody, ModalContent, ModalFooter, ModalRoot, ModalTitle, useToast, Button } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
+import { writeClipboardText } from "@buildrik/shared/browser/clipboard";
 import { EVENTS } from "@/shared/constants/events";
 import { exportPublishPages, type PublishPage } from "../exportPublishPages";
 import {
@@ -102,7 +103,7 @@ export const StaleApprovalModal: React.FC<StaleApprovalModalProps> = ({
   const handleResend = async () => {
     setResending(true);
     try {
-      await submitForReview(
+      const outcome = await submitForReview(
         undefined,
         changed?.length
           ? `Re-send after ${changed.length} change${changed.length === 1 ? "" : "s"}`
@@ -111,12 +112,35 @@ export const StaleApprovalModal: React.FC<StaleApprovalModalProps> = ({
         currentPages ?? undefined,
       );
       composer?.emit(EVENTS.REVIEW_SENT, { invitedEmail: round?.invitedEmail ?? null });
-      addToast({
-        tone: "success",
-        title: "Sent for approval",
-        description: `A fresh review round is on its way to ${round?.invitedEmail ?? "the client"}.`,
-        duration: 4000,
-      });
+      /* The round exists either way; the toast reports what happened to the
+         invite (R1 S-2). It used to say "on its way" even when the server said
+         the mail did not go — SendForReview already draws this line. */
+      const { inviteEmailSent, reviewUrl } = outcome;
+      if (inviteEmailSent === false) {
+        addToast({
+          tone: "warning",
+          title: "Round started, email not sent",
+          description: "The invite didn't go out. Copy the link and send it yourself.",
+          action: reviewUrl
+            ? { label: "Copy link", onClick: () => void writeClipboardText(reviewUrl) }
+            : undefined,
+          duration: Infinity,
+        });
+      } else if (inviteEmailSent === null) {
+        addToast({
+          tone: "success",
+          title: "Review round started",
+          description: "No client email on this round, so no invite was sent.",
+          duration: 4000,
+        });
+      } else {
+        addToast({
+          tone: "success",
+          title: "Sent for approval",
+          description: `A fresh review round is on its way to ${round?.invitedEmail ?? "the client"}.`,
+          duration: 4000,
+        });
+      }
       onClose();
     } catch {
       addToast({
