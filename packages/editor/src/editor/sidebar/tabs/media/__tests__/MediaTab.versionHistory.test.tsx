@@ -78,7 +78,8 @@ describe("MediaTab — drawer edit-save history follows the parent (M-6)", () =>
         selectAssets: vi.fn(),
       },
     } as unknown as Composer;
-    let onSave: ((src: string) => Promise<void>) | null = null;
+    type OnSave = Parameters<NonNullable<React.ComponentProps<typeof MediaTab>["onOpenImageEditor"]>>[1];
+    let onSave: OnSave | null = null;
     render(
       <ToastProvider>
         <MediaTab composer={composer} onOpenImageEditor={(_src, save) => { onSave = save; }} />
@@ -86,7 +87,7 @@ describe("MediaTab — drawer edit-save history follows the parent (M-6)", () =>
     );
     overlayProps.current?.onEditImage?.(versionItem);
     expect(onSave).not.toBeNull();
-    await onSave!("blob:edited");
+    await onSave!("blob:edited", {} as Parameters<OnSave>[1]);
 
     const [file, opts] = uploadFile.mock.calls[0] as unknown as [File, { folderId?: string; versionOf: string }];
     expect(file.name).toMatch(/^hero-v3/);
