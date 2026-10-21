@@ -76,7 +76,7 @@
   },
   "__tests__/page-service.test.ts": {
     "@typescript-eslint/no-explicit-any": {
-      "count": 20
+      "count": 1
     }
   },
   "__tests__/publish-service.test.ts": {

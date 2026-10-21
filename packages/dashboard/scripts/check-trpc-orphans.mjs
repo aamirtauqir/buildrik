@@ -81,8 +81,6 @@ const ALLOWED = {
   "theme.presets.save": "Theme presets: server half complete, no UI. FOUNDER DECISION — build or drop.",
   "theme.presets.delete": "Theme presets: server half complete, no UI. FOUNDER DECISION — build or drop.",
   "theme.presets.applyPreset": "Theme presets: server half complete, no UI. FOUNDER DECISION — build or drop.",
-  "pages.create": "Page CRUD lives in the editor's Pages panel, which mutates through the project save.",
-  "pages.update": "Page CRUD lives in the editor's Pages panel, which mutates through the project save.",
   "pages.getTranslation": "Per-locale page content: server half complete, no i18n UI. FOUNDER DECISION.",
   "pages.setTranslation": "Per-locale page content: server half complete, no i18n UI. FOUNDER DECISION.",
   "pages.removeTranslation": "Per-locale page content: server half complete, no i18n UI. FOUNDER DECISION.",

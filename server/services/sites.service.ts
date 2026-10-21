@@ -1026,8 +1026,8 @@ const MIN_PAGES_PER_SITE = Math.min(...Object.values(PLAN_LIMITS).map((l) => l.p
 
 /**
  * L3-013: the plan's pages-per-site limit, at the write boundary the editor
- * uses (it saves full snapshots; `pages.create` was the only gate and the
- * editor never calls it). A site already over the limit — a downgrade — keeps
+ * uses (it saves full snapshots; the old `pages.create` gate was never
+ * called and is gone). A site already over the limit — a downgrade — keeps
  * saving as long as the save adds no page. Throws `PAGE_LIMIT:<limit>`.
  */
 async function assertPageLimit(siteId: string, workspaceId: string, incoming: number) {
