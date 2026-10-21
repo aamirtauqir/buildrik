@@ -2,7 +2,7 @@
  * AttributesSection — Behaviour › Attributes (board 2): closed by default
  * with a one-line summary ("id: hero-title · 1 attribute"); open, the
  * element's ID, title, tab index, its §17.H per-type rows and custom data-*
- * attributes. Replaced the Settings tab's "Advanced" section.
+ * attributes (listed, editable, removable). Replaced the Settings tab's "Advanced" section.
  *
  * @license BSD-3-Clause
  */
@@ -12,7 +12,7 @@ import type { Composer } from "@/engine";
 import { Section } from "@/editor/inspector/shared/controls";
 import { attributeFieldsFor } from "@/editor/inspector/config/attributeFields";
 import { PropertyRows } from "../typeBlock/PropertyField";
-import { DataAttributeEditor } from "./DataAttributeEditor";
+import { DataAttributeEditor, customAttributes } from "./DataAttributeEditor";
 
 export interface AttributesSectionProps {
   composer: Composer | null;
@@ -29,8 +29,7 @@ export function attributesSummary(composer: Composer | null | undefined, element
   if (!el) return null;
   const id = el.getAttribute?.("id") || "";
   const named = attributeFieldsFor(element.type).filter((f) => f.id !== "id" && el.getAttribute?.(f.id));
-  const data = Object.keys(el.getAttributes?.() ?? {}).filter((k) => k.startsWith("data-") && !k.startsWith("data-buildrick"));
-  const count = named.length + data.length;
+  const count = named.length + customAttributes(el).length;
   const parts = [id ? `id: ${id}` : null, count > 0 ? `${count} attribute${count === 1 ? "" : "s"}` : null].filter(Boolean);
   return parts.length ? parts.join(" · ") : null;
 }

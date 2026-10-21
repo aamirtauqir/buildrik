@@ -63,6 +63,7 @@ export function makeMockElement(opts: MockElementOptions = {}) {
     removeAttribute: vi.fn((name: string) => {
       attrs.delete(name);
     }),
+    getAttributes: vi.fn(() => Object.fromEntries(attrs)),
     getClasses: vi.fn(() => opts.classes ?? []),
     addClass: vi.fn(),
     removeClass: vi.fn(),
