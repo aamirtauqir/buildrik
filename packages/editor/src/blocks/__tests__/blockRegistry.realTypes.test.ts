@@ -19,7 +19,8 @@
  * `__fixtures__/catalogBlockHtml.baseline.json` from the pre-fix code) —
  * except the Carousel, whose old output was the bug (see
  * `sliderExport.test.ts`), and the Heading, which on this empty page now
- * inserts as the page's h1 (BD-39 (6): same styles, `<h1>` for `<h2>`).
+ * inserts as the page's h1 (BD-39 (6): same styles, `<h1>` for `<h2>`), and
+ * the Form, whose fields now sit in visible labels (BD-39 (7)).
  *
  * @license BSD-3-Clause
  */
