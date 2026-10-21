@@ -5,6 +5,7 @@ import { encrypt, decrypt } from "@/lib/encryption";
 import { slugifyProjectName } from "@/lib/vercel";
 import { hasEverDeployed } from "@/server/services/publish.service";
 import { isBrandTokensV2Enabled } from "@/server/services/brand-tokens";
+import { effectiveStyleModel } from "@/server/services/class-styles";
 import { SITE_COLUMN_FIELDS } from "@buildrik/shared/schemas/site-column-fields";
 import {
   PROJECT_SETTINGS_KEY_SCHEMAS,
@@ -193,6 +194,7 @@ export async function getSiteSettings(siteId: string, db: Prisma.TransactionClie
       id: true,
       ...SITE_SETTINGS_COLUMNS,
       deletedAt: true,
+      styleModel: true,
       workspace: { select: { id: true, plan: true, name: true } },
     },
   });
@@ -227,7 +229,7 @@ export async function getSiteSettings(siteId: string, db: Prisma.TransactionClie
 
   // P0.3: redact publishedPassword. Client gets a boolean indicator,
   // never the hash. Editor's "password is set" UI works on the boolean.
-  const { workspace, publishedPassword, ...rest } = site;
+  const { workspace, publishedPassword, styleModel, ...rest } = site;
   return {
     ...rest,
     publishedPassword: null, // typed as String? on schema; null = not set or redacted
@@ -240,6 +242,10 @@ export async function getSiteSettings(siteId: string, db: Prisma.TransactionClie
        the editor reads it with the site's own hold flag to decide whether an
        unmigrated site may upgrade. */
     brandTokensV2: isBrandTokensV2Enabled(workspace.id),
+    /* Class-first (BD-30): the style model the editor renders and saves in —
+       "element" unless the column says "class" AND the flags enable this
+       workspace (the save guard reads the same function). */
+    styleModel: effectiveStyleModel(styleModel, workspace.id),
     pageSeo,
   };
 }

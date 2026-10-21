@@ -12,6 +12,15 @@ import { z } from "zod";
 export const styleModelSchema = z.enum(["element", "class"]);
 export type StyleModel = z.infer<typeof styleModelSchema>;
 
+/**
+ * The reason a save is refused because the editor did not load the site in
+ * its style model (a tab opened before the site moved to classes, or a build
+ * that predates class-first). Carried AHEAD of the ordinary
+ * `SAVE_CONFLICT:<iso>` tail, like BRAND_FORMAT_CONFLICT, so an older bundle
+ * still opens its conflict dialog and a current one offers Reload only.
+ */
+export const STYLE_MODEL_CONFLICT = "SAVE_CONFLICT_STYLE_MODEL";
+
 /** Most classes one element's chain may hold (owner Q2, BD-38). */
 export const CLASS_CHAIN_MAX = 3;
 

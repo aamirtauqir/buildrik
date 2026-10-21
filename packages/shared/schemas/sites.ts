@@ -311,6 +311,9 @@ export const saveProjectDataSchema = z.object({
   settings: z.unknown().optional(),
   dsSchemaVersion: z.number().int().min(0).optional(),
   cmsBindings: cmsBindingsSchema.optional(),
+  /* Class-first: the editor loaded this site in the class style model. A
+     class-model site refuses a save without it (stale tab / older build). */
+  styleModelAck: z.literal("class").optional(),
 });
 
 /**
@@ -332,6 +335,9 @@ export const editorSaveProjectSchema = z.object({
   // the copy is behind — the server rejects with CONFLICT instead of clobbering.
   // Omitted (older callers / first save) = no check, so this is non-regressive.
   expectedLastEditedAt: z.string().datetime().nullish(),
+  /* Class-first stale-editor guard: sent only by an editor that loaded the
+     site in the class style model (see saveProjectDataSchema). */
+  styleModelAck: z.literal("class").optional(),
   projectData: z.object({
     version: z.string(),
     pages: z.array(
