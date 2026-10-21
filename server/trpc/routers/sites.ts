@@ -22,6 +22,7 @@ import {
   PageSlugTakenError,
   getProjectData,
   redactSitePassword,
+  getEditorAccess,
 } from "@/server/services/sites.service";
 import {
   listFolders,
@@ -106,6 +107,12 @@ export const sitesRouter = router({
       if (!loaded) throw new TRPCError({ code: "NOT_FOUND" });
       return loaded;
     }),
+
+  /** What the /edit/:siteId route renders: "edit", "view" (VIEWER, read-only
+   *  mode) or null (no access / no such site). Never throws on denial. */
+  editorAccess: protectedProcedure
+    .input(z.object({ siteId: z.string() }))
+    .query(({ ctx, input }) => getEditorAccess(ctx.session.user.id, input.siteId)),
 
   create: protectedProcedure
     .input(createSiteSchema)
