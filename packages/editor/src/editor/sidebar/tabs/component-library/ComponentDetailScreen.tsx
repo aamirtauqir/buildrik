@@ -153,10 +153,14 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
   const handleDuplicate = async () => {
     if (!composer) return;
 
-    const duplicate = await composer.components.duplicateComponent(component.id);
-    if (duplicate) {
-      onDuplicate?.();
+    /* P-4: it said nothing either way and a throw went unhandled. */
+    const duplicate = await composer.components.duplicateComponent(component.id).catch(() => null);
+    if (!duplicate) {
+      addToast({ description: `Couldn't duplicate "${component.name}".`, tone: "error", duration: 4000 });
+      return;
     }
+    addToast({ description: `Duplicated "${component.name}".`, duration: 4000 });
+    onDuplicate?.();
   };
 
   /* BD-32: only the root of an instance of THIS component can be pushed to
@@ -177,8 +181,9 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
     if (!composer || !selectedElementId || !canPush) return;
 
     const before = composer.components.snapshotComponent(component.id);
-    const { updated, instancesSynced, overridesDropped } =
-      await composer.components.updateComponentMaster(component.id, selectedElementId);
+    const { updated, instancesSynced, overridesDropped } = await composer.components
+      .updateComponentMaster(component.id, selectedElementId)
+      .catch(() => ({ updated: false, instancesSynced: 0, overridesDropped: 0 }));
 
     if (!updated) {
       addToast({
@@ -265,7 +270,12 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
   const confirmDetachAll = async () => {
     setShowDetachAll(false);
     if (!composer) return;
-    await Promise.all(instances.map((inst) => composer.components.detachInstance(inst.elementId)));
+    try {
+      await Promise.all(instances.map((inst) => composer.components.detachInstance(inst.elementId)));
+    } catch {
+      addToast({ description: "Couldn't detach every instance. Try again.", tone: "error", duration: 4000 });
+      return;
+    }
     onDetachedAll?.(instances.length);
     onBack();
   };
