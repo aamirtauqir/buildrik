@@ -2,7 +2,6 @@ import { z } from "zod";
 import { publicProcedure, protectedProcedure, router } from "../trpc";
 import { TRPCError } from "@trpc/server";
 import {
-  listCategories,
   searchArticles,
   listArticlesByCategory,
   getArticle,
@@ -12,8 +11,6 @@ import {
 import { supportTicketSchema } from "@buildrik/shared/schemas/help";
 
 export const helpRouter = router({
-  categories: publicProcedure.query(() => listCategories()),
-
   search: publicProcedure
     .input(z.object({ query: z.string().min(1).max(200) }))
     .query(async ({ input }) => searchArticles(input.query)),

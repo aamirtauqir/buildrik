@@ -91,24 +91,6 @@ describe("Billing Service", () => {
     });
   });
 
-  describe("getUsageDetails", () => {
-    it("returns detailed usage with percentages", async () => {
-      const { getUsageDetails } = await import(
-        "@/server/services/billing.service"
-      );
-      vi.mocked(prisma.site.count).mockResolvedValue(2);
-      vi.mocked(prisma.workspaceMember.count).mockResolvedValue(1);
-      vi.mocked(prisma.domain.count).mockResolvedValue(0);
-      vi.mocked(prisma.aIGenerationJob.count).mockResolvedValue(1);
-      vi.mocked(prisma.formSubmission.count).mockResolvedValue(50);
-      vi.mocked(prisma.redirect.count).mockResolvedValue(10);
-
-      const result = await getUsageDetails("ws1", "FREE");
-      expect(result.sites.used).toBe(2);
-      expect(result.sites.percentage).toBe(67);
-    });
-  });
-
   describe("listInvoices", () => {
     it("returns paginated invoices", async () => {
       const { listInvoices } = await import(

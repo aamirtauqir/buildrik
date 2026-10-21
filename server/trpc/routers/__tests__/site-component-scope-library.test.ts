@@ -12,7 +12,6 @@ const svc = vi.hoisted(() => ({
   getSiteComponent: vi.fn(),
   deleteSiteComponent: vi.fn(),
   listWorkspaceComponents: vi.fn(),
-  getComponentUsage: vi.fn(),
   renameWorkspaceComponent: vi.fn(),
   deleteWorkspaceComponent: vi.fn(),
   listComponentLibrary: vi.fn(),
