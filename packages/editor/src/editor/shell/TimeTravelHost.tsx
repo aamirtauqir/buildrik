@@ -28,10 +28,11 @@
 import * as React from "react";
 import type { Composer } from "@/engine";
 import type { HistoryDisplayEntry } from "@/engine/HistoryManager";
-import { Button, Portal, Tooltip, useToast } from "@/editor/chrome-ui";
+import { Button, Portal, Tooltip } from "@/editor/chrome-ui";
 import { EVENTS } from "@/shared/constants/events";
 import { renderProjectPages } from "./exportPublishPages";
 import { useEditorRole } from "./hooks/useEditorRole";
+import { useCheckpointedRestore } from "./hooks/useCheckpointedRestore";
 
 type Frame = { status: "live" } | { status: "loading" } | { status: "ready"; html: string } | { status: "none" };
 
@@ -66,7 +67,8 @@ export const TimeTravelHost: React.FC<{ composer: Composer | null }> = ({ compos
   const [index, setIndex] = React.useState(0);
   const [frame, setFrame] = React.useState<Frame>({ status: "live" });
   const [confirming, setConfirming] = React.useState(false);
-  const { addToast } = useToast();
+  const restoreEntry = React.useCallback((id: string) => composer?.history?.restoreEntry?.(id), [composer]);
+  const checkpointedRestore = useCheckpointedRestore(composer, restoreEntry);
   const [geom, setGeom] = React.useState(measure);
 
   const open = React.useCallback(() => {
@@ -219,26 +221,8 @@ export const TimeTravelHost: React.FC<{ composer: Composer | null }> = ({ compos
        already changed shape under it). Exiting first means there is no
        window where a completed write is still described as pending. */
     exit();
-    /* The "Before restoring" version is the way back from this restore. If it
-       fails to save, restoring anyway overwrites the current state with no
-       copy of it (DQ-011) — so stop and say so; the user can still choose to.
-       A null result is not a failure: it means nothing changed since the
-       newest auto-version, which already is the way back. */
-    try {
-      await composer.versions?.autoCheckpoint?.("Before restoring");
-    } catch (error) {
-      addToast({
-        tone: "error",
-        title: "Couldn't save a version first",
-        description: `Nothing was restored, so your current work is untouched (${
-          error instanceof Error ? error.message : String(error)
-        }).`,
-        action: { label: "Restore anyway", onClick: () => composer.history?.restoreEntry?.(targetId) },
-      });
-      return;
-    }
-    composer.history?.restoreEntry?.(targetId);
-  }, [composer, entry, exit, addToast]);
+    await checkpointedRestore(targetId);
+  }, [composer, entry, exit, checkpointedRestore]);
 
   React.useEffect(() => {
     if (!active) return;

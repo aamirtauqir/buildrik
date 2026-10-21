@@ -18,6 +18,7 @@ import { collapseIdenticalChanges, type CollapsedChange } from "../helpers";
 import type { ActivityViewProps } from "../types";
 import type { HistoryDisplayEntry } from "@/engine/historyTypes";
 import { formatChord } from "@/editor/canvas/controls/keyboardSheetRows";
+import { useCheckpointedRestore } from "@/editor/shell/hooks/useCheckpointedRestore";
 
 /** "⌘Z" on a Mac, "Ctrl+Z" elsewhere — the spelling the palette uses. */
 const undoChord = () =>
@@ -316,6 +317,9 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
     },
     [composer, reducedMotion, cancelPendingRestore, clearCanvasAnim]
   );
+  /* Same safety as Time-travel's restore: a "Before restoring" version first
+     (R1 H-1). */
+  const confirmRestore = useCheckpointedRestore(composer, runRestore);
 
   /* The timestamp is a RESTORE, not a jump: `history.restoreEntry` truncates
      the undo stack at that point and empties the redo stack, so everything
@@ -361,10 +365,10 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
         title={`Restore to ${pendingRestore.time}?`}
         message={
           <>
-            This rewinds the project to <strong>{pendingRestore.label}</strong> at{" "}
-            {pendingRestore.time}.{" "}
+            Your current work is saved as a version first. This rewinds the project
+            to <strong>{pendingRestore.label}</strong> at {pendingRestore.time}.{" "}
             {losses.length > 0
-              ? `It permanently discards ${losses.join(" and ")}.`
+              ? `It discards ${losses.join(" and ")}.`
               : "Nothing later is discarded."}
             {unsaved ? " Some of that work has not been saved yet." : ""}
           </>
@@ -377,7 +381,7 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
         onClose={() => setPendingRestoreId(null)}
         onConfirm={() => {
           setPendingRestoreId(null);
-          runRestore(pendingRestore.id);
+          void confirmRestore(pendingRestore.id);
         }}
       />
     );
