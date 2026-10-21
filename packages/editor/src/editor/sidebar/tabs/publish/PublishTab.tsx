@@ -24,7 +24,7 @@
 
 import { listNames } from "@shared/utils/helpers/string";
 import * as React from "react";
-import { PanelFrame, Button, Menu, MenuItem, Modal, Popover, Progress, SkeletonBlock, Tooltip, useToast } from "@/editor/chrome-ui";
+import { PanelFrame, Badge, Button, Menu, MenuItem, Modal, Popover, Progress, SkeletonBlock, Tooltip, openUpgrade, useToast } from "@/editor/chrome-ui";
 import { ChevronDown, ChevronRight, MoreHorizontal } from "lucide-react";
 import type { SettingsNavId } from "../settings/types";
 import type { Composer } from "@/engine";
@@ -37,7 +37,7 @@ import { relativeShort, usePublishSnapshot } from "./usePublishSnapshot";
 import { CHECK_DOOR, PrePublishChecks } from "./PrePublishChecks";
 import { ApprovalCheckRow, PublishGateBanner } from "./PublishGateBanner";
 import { UnpublishConfirmModal } from "./UnpublishConfirmModal";
-import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
+import { getEditorPlanTier, getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { useEditorRole } from "@/editor/shell/hooks/useEditorRole";
 import { roleAtLeast } from "@/services/RoleService";
 import {
@@ -71,6 +71,12 @@ export interface PublishTabProps {
   /** The ONE publish door — opens the dialog `nextMove.gate` names. Absent =
    *  no publish path is wired (the flag is off): board 784:4480. */
   onRequestPublish?: () => void;
+  /** One-click ZIP of the site's code (useExportHandlers.handleExportHTML).
+   *  Absent = no row. Pro: a Free workspace sees the row with a PRO badge and
+   *  gets the upgrade prompt. */
+  onDownloadCode?: () => void;
+  /** The ZIP is being built — the row says so and cannot be pressed twice. */
+  downloadingCode?: boolean;
   /** Initial published URL from loaded project */
   publishedUrl?: string | null;
   /** Initial published state from loaded project */
@@ -206,6 +212,8 @@ export const PublishTab: React.FC<PublishTabProps> = ({
   publishJob,
   nextMove,
   onRequestPublish,
+  onDownloadCode,
+  downloadingCode = false,
   publishedUrl: initialUrl,
   isProjectPublished,
   initialUnpublish,
@@ -464,6 +472,9 @@ export const PublishTab: React.FC<PublishTabProps> = ({
      role, so an editor collected a server error. Unknown role still asks. */
   const atLeastAdmin = roleAtLeast(useEditorRole(), "ADMIN") !== false;
   const canUnpublish = Boolean(snapshot.lastDeploy?.isLive && siteId && atLeastAdmin);
+  /* Code download is Pro (owner decision). The same tier read the
+     templates tab gates on: only the starter (FREE) workspace is locked. */
+  const codeLocked = getEditorPlanTier() === "starter";
   const publishMenu = (
     <Popover
       open={menuOpen}
@@ -495,6 +506,24 @@ export const PublishTab: React.FC<PublishTabProps> = ({
         >
           All versions ›
         </MenuItem>
+        {onDownloadCode ? (
+          <MenuItem
+            disabled={downloadingCode}
+            onClick={() => {
+              setMenuOpen(false);
+              if (codeLocked) openUpgrade({ feature: "Downloading your site's code" });
+              else onDownloadCode();
+            }}
+            data-testid="publish-download-code"
+          >
+            <span className="tw:flex tw:items-center tw:gap-2">
+              {downloadingCode ? "Preparing ZIP…" : "Download code (ZIP)"}
+              {/* The plan gate's own mark (UpgradeModal, IntegrationRow): the
+                  Flowbite purple ramp is allowlisted for the PRO badge only. */}
+              {codeLocked ? <Badge color="purple">PRO</Badge> : null}
+            </span>
+          </MenuItem>
+        ) : null}
         {canUnpublish ? (
           <MenuItem
             danger

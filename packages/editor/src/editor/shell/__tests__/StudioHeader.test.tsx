@@ -681,7 +681,6 @@ describe("StudioHeader", () => {
     const menuProps = {
       onOpenProjectSettings: vi.fn(),
       onOpenHistory: vi.fn(),
-      onExportHTML: vi.fn(),
       onOpenShortcuts: vi.fn(),
       onOpenIssues: vi.fn(),
     };

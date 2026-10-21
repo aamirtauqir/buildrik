@@ -763,7 +763,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           onOpenConflict={serverConflict.reopenSaveConflict}
           onOpenShortcuts={modals.toggleShortcuts}
           onSave={saveProject}
-          onExportHTML={handleExportHTML}
           onVercelPublish={requestPublish}
           publishLoading={publishJob.uiState === "publishing"}
           publishedUrl={publishJob.publishedUrl}
@@ -819,6 +818,11 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
            facts confirm — two gates for one board (B3-10). */
         nextMove={nextMove}
         onRequestPublish={requestPublish}
+        /* The one-click ZIP (useExportHandlers.handleExportHTML) lives in the
+           Publish panel's ⋯ menu — the panel is where a site leaves the
+           editor, and its menu is there whatever state publishing is in. */
+        onDownloadCode={handleExportHTML}
+        downloadingCode={modals.exportLoading}
         issuesOpen={issuesOpen}
         renderIssuesPanel={renderIssuesPanel}
         onCloseIssues={() => setIssuesOpen(false)}

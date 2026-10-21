@@ -125,6 +125,10 @@ export interface StudioPanelsProps {
   /** The ONE publish door — AquibraStudio's `requestPublish`, which routes on
    *  `nextMove.gate`. Absent = no publish path is wired (flag off). */
   onRequestPublish?: () => void;
+  /** One-click ZIP of the site's code — the Publish panel's ⋯ row. */
+  onDownloadCode?: () => void;
+  /** The ZIP is being built. */
+  downloadingCode?: boolean;
   /** FB-8: Issues is a right-column mode, same mechanism as the column
    *  tabs — it swaps in for ProInspector rather than
    *  floating an absolute overlay on top of it. AquibraStudio owns the open
@@ -245,6 +249,8 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   publishJob,
   nextMove = null,
   onRequestPublish,
+  onDownloadCode,
+  downloadingCode,
   issuesOpen = false,
   renderIssuesPanel,
   onCloseIssues,
@@ -737,6 +743,8 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
         publishJob={publishJob}
         nextMove={nextMove}
         onRequestPublish={onRequestPublish}
+        onDownloadCode={onDownloadCode}
+        downloadingCode={downloadingCode}
         onResendReview={onResendReview}
         reviewsEnabled={reviewsEnabled}
       />
