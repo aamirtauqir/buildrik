@@ -37,7 +37,9 @@ describe("KeyboardLegend", () => {
     for (const k of ["Tab", "F6 / ⇧F6", "Esc", "⌘K", "A L P M D B", "R", "C", "⌘S · save", "⌘P", "⌘Z / ⌘⇧Z"]) {
       expect(screen.getByText(k, { selector: "[data-testid=kbd-legend-key]" })).toBeInTheDocument();
     }
-    expect(card).toHaveTextContent("Also: ⌃H opens History");
+    /* SC-12 / BD-39: History is H only; Enter edits the selected text. */
+    expect(card).toHaveTextContent("Also: H opens History · Enter edits the selected text");
+    expect(card).not.toHaveTextContent("⌃H");
     /* SC-12 / owner Q4: Site settings has no shortcut. */
     expect(card).not.toHaveTextContent("⌃,");
   });

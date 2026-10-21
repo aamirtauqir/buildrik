@@ -16,17 +16,11 @@
  *   Escape                → close shortcuts modal
  *   F6 / Shift+F6         → cycle focus between shell regions (board 58:2)
  *   C                     → toggle canvas comment mode (board 58:215 legend)
- *   Ctrl/Cmd+H            → left panel · version history
  *
  * (Shift+A → Components was bound here too until FB-1 (2026-09-25) — a
  * second listener racing GROUPED_TABS_CONFIG's own "⇧A" binding in
  * useSidebarKeyboard.ts for the same destination. That table is the one
  * source now; this hook no longer touches it.)
- *
- * The other two are printed on site-menu rows (Figma 642:3664), so the hints
- * and these handlers are one contract. On macOS the browser eats ⌘, and ⌘H
- * before the page sees them, which is why `SiteMenu` advertises the control
- * chords there — the handler accepts either modifier so both platforms work.
  *
  * The handler short-circuits when the keydown originates inside an
  * editable surface (input/textarea/select/contenteditable) so users
@@ -67,8 +61,6 @@ const isQuestionMark = (e: KeyboardEvent) => e.key === "?" && !e.metaKey && !e.c
 export interface UseEditorShortcutsOptions {
   composer: Composer | null;
   modals: ShortcutModals;
-  /** Opens a left-panel destination; the site menu prints these shortcuts. */
-  openLeftPanelToTab?: (primaryTab: string, subTab?: string) => void;
   /** A-8/PD-7/PD-8: the C shortcut opens comment mode — a review-flow tool.
    *  Off (default) matches "not reachable" rather than silently degrading;
    *  callers that know the site's workspace has no agency layer pass false. */
@@ -78,7 +70,6 @@ export interface UseEditorShortcutsOptions {
 export function useEditorShortcuts({
   composer,
   modals,
-  openLeftPanelToTab,
   reviewsEnabled = true,
 }: UseEditorShortcutsOptions): void {
   React.useEffect(() => {
@@ -143,12 +134,9 @@ export function useEditorShortcuts({
       }
 
       /* No ⌃, / ⌘, — owner Q4 (SC-12, R-1018b): Site settings has no
-         shortcut, and ⌘, is the browser's own settings chord. */
-      if ((e.ctrlKey || e.metaKey) && (e.key === "h" || e.key === "H")) {
-        e.preventDefault();
-        openLeftPanelToTab?.("history");
-        return;
-      }
+         shortcut, and ⌘, is the browser's own settings chord. No ⌘H / Ctrl+H
+         either (SC-12, BD-39): ⌘H hides the browser on macOS and Ctrl+H is
+         browser history on Windows — History is the rail letter H. */
       // FB-1: ⇧A was bound here AND in useSidebarKeyboard.ts (driven by
       // GROUPED_TABS_CONFIG's "⇧A" shortcut on the "components" tab) — two
       // listeners racing to the same destination. useSidebarKeyboard.ts is
@@ -208,5 +196,5 @@ export function useEditorShortcuts({
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [composer, modals, openLeftPanelToTab, reviewsEnabled]);
+  }, [composer, modals, reviewsEnabled]);
 }
