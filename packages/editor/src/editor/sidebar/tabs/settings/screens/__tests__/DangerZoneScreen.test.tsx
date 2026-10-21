@@ -52,6 +52,7 @@ beforeEach(() => {
       { userId: "u-sam", fullName: "Sam Lee", role: "ADMIN" },
       { userId: "u-v", fullName: "Viewer", role: "VIEWER" },
     ],
+    total: 4,
   });
   addToast.mockReset();
   deleteSite.mockReset().mockResolvedValue(undefined);
@@ -146,6 +147,36 @@ describe("Transfer — 8137:217348 → 8137:217625", () => {
     fireEvent.click(screen.getByTestId("set-danger-transfer-confirm"));
     expect(await screen.findByRole("alert")).toHaveTextContent("Only the site owner can transfer.");
     expect(screen.getByTestId("set-danger-transfer-dialog")).toBeInTheDocument();
+  });
+});
+
+describe("Transfer members — S-2", () => {
+  it("loads every page of the team, not just the first 50", async () => {
+    const member = (i: number) => ({ userId: `u-${i}`, fullName: `Member ${i}`, role: "EDITOR" });
+    api.team.list.query.mockImplementation(({ page }: { page: number }) =>
+      Promise.resolve({
+        data: page === 1 ? Array.from({ length: 50 }, (_, i) => member(i)) : [member(50), member(51)],
+        total: 52,
+      }),
+    );
+    setup();
+    await loaded();
+    fireEvent.click(screen.getByTestId("set-danger-transfer-btn"));
+    await waitFor(() => expect(screen.getByTestId("set-danger-transfer-member").querySelectorAll("option")).toHaveLength(52));
+    expect(api.team.list.query).toHaveBeenCalledTimes(2);
+    expect(api.team.list.query).toHaveBeenLastCalledWith({ page: 2, perPage: 50 });
+  });
+
+  it("a failed member load is an error with Try again, not an empty team", async () => {
+    api.team.list.query.mockRejectedValueOnce(new Error("down"));
+    setup();
+    await loaded();
+    fireEvent.click(screen.getByTestId("set-danger-transfer-btn"));
+    expect(await screen.findByTestId("set-danger-transfer-members-error")).toHaveTextContent("Couldn't load workspace members.");
+    expect(screen.queryByText("No other admins or editors")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Try again" }));
+    await waitFor(() => expect(screen.getByTestId("set-danger-transfer-member")).toHaveValue("u-maria"));
+    expect(screen.queryByTestId("set-danger-transfer-members-error")).toBeNull();
   });
 });
 

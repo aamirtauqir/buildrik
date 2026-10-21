@@ -74,6 +74,9 @@ const hostOf = (url: string | null | undefined): string | null => {
   }
 };
 
+/** `team.list`'s largest page (`listMembersSchema`). */
+const MEMBERS_PER_PAGE = 50;
+
 /** The server's sentence, else ours. */
 const refusal = (e: unknown, fallback: string) => (e instanceof Error && e.message ? e.message : fallback);
 
@@ -123,6 +126,7 @@ export const DangerZoneScreen: React.FC<ScreenProps> = ({
   const [archiveError, setArchiveError] = React.useState<string | null>(null);
   const [actionFailed, setActionFailed] = React.useState<string | null>(null);
   const [members, setMembers] = React.useState<TransferMember[] | null>(null);
+  const [membersFailed, setMembersFailed] = React.useState(false);
 
   React.useEffect(() => {
     onDirtyChange?.(false);
@@ -184,21 +188,35 @@ export const DangerZoneScreen: React.FC<ScreenProps> = ({
     }
   };
 
-  const openTransfer = async () => {
-    setDialog("transfer");
+  /* S-2: every page of the team (team.list caps a page at 50), and a failure
+     is its own state — it used to read as "No other admins or editors". */
+  const loadMembers = async () => {
     setMembers(null);
+    setMembersFailed(false);
     try {
-      const page = await client().team.list.query({ page: 1, perPage: 50 });
-      setMembers(
-        page.data
+      const eligible: TransferMember[] = [];
+      let seen = 0;
+      for (let page = 1; ; page++) {
+        const res = await client().team.list.query({ page, perPage: MEMBERS_PER_PAGE });
+        seen += res.data.length;
+        for (const m of res.data) {
           /* Not the current owner: a creator ADMIN transferring would
              otherwise be offered themselves. */
-          .filter((m) => (m.role === "ADMIN" || m.role === "EDITOR") && m.userId !== site.createdBy)
-          .map((m) => ({ userId: m.userId, fullName: m.fullName ?? m.email ?? "Member", role: m.role })),
-      );
+          if ((m.role === "ADMIN" || m.role === "EDITOR") && m.userId !== site.createdBy) {
+            eligible.push({ userId: m.userId, fullName: m.fullName ?? m.email ?? "Member", role: m.role });
+          }
+        }
+        if (res.data.length < MEMBERS_PER_PAGE || seen >= res.total) break;
+      }
+      setMembers(eligible);
     } catch {
-      setMembers([]);
+      setMembersFailed(true);
     }
+  };
+
+  const openTransfer = () => {
+    setDialog("transfer");
+    void loadMembers();
   };
 
   const transfer = async (member: TransferMember) => {
@@ -339,7 +357,7 @@ export const DangerZoneScreen: React.FC<ScreenProps> = ({
             className={ACTION}
             id="danger-transfer"
             disabled={transferOff}
-            onClick={() => void openTransfer()}
+            onClick={openTransfer}
             data-testid="set-danger-transfer-btn"
           >
             Transfer site
@@ -382,6 +400,8 @@ export const DangerZoneScreen: React.FC<ScreenProps> = ({
         open={dialog === "transfer"}
         siteName={siteName}
         members={members}
+        membersFailed={membersFailed}
+        onRetryMembers={() => void loadMembers()}
         onTransfer={transfer}
         onCancel={() => setDialog(null)}
       />
