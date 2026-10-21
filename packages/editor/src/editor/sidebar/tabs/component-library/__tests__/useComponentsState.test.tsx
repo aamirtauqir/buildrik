@@ -76,6 +76,23 @@ describe("useComponentsState — initial load + refresh", () => {
     expect(result.current.components).toEqual([]);
   });
 
+  /* R1 P-3: Retry used to clear the error only, landing on an empty list. */
+  it("retry loads the list again", () => {
+    const composer = createMockComposer({ components: [] });
+    asMock(composer.components.getAllComponents).mockImplementationOnce(() => {
+      throw new Error("registry unavailable");
+    });
+    const { result } = renderHook(() => useComponentsState({ composer }));
+    expect(result.current.error).toBe("registry unavailable");
+
+    asMock(composer.components.getAllComponents).mockReturnValue(FIXTURES.map((c) => ({ ...c })));
+    act(() => result.current.retry());
+
+    expect(result.current.error).toBeNull();
+    expect(result.current.isLoaded).toBe(true);
+    expect(result.current.components.map((c) => c.id)).toEqual(["c1", "c2"]);
+  });
+
   it("unsubscribes from COMPONENT_LIST_UPDATED on unmount", () => {
     const { composer, unmount } = setup();
 

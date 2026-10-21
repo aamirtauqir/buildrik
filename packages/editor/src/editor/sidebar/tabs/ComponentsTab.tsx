@@ -125,7 +125,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         <PanelErrorState
           title="Couldn't load your components."
           message="Your components are safe — only this list failed."
-          onRetry={() => state.setError(null)}
+          onRetry={state.retry}
         />
       </PanelFrame>
     );
