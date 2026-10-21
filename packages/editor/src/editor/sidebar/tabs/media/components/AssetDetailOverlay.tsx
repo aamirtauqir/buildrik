@@ -34,6 +34,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { formatRelativeTime } from "@/shared/utils/relativeTime";
 import type { LibraryItem } from "../data/mediaTypes";
 import { collectUsageByPage, fmtSize } from "../data/mediaUtils";
+import { useAltTextDraft } from "../hooks/useAltTextDraft";
 import type { Composer } from "@/engine/Composer";
 import {
   listAssetVersions,
@@ -113,7 +114,6 @@ export function AssetDetailOverlay({
   useEffect(() => {
     viewRef.current = view;
   }, [view]);
-  const [altDraft, setAltDraft] = useState(item.altText ?? "");
   const [metaError, setMetaError] = useState(false);
   // Board 146:9 draws "1440×960 · 245 KB" under the preview, and MediaAsset
   // only carries width/height when the upload went through the WebP optimiser
@@ -210,12 +210,11 @@ export function AssetDetailOverlay({
   });
 
   useEffect(() => {
-    setAltDraft(item.altText ?? "");
     setView("hub");
     setMetaError(false);
     setPendingRestore(null);
     setNatural(null);
-  }, [item.key, item.altText]);
+  }, [item.key]);
 
   // Images decode off-screen, from `item.src` and never from `item.thumb`:
   // the thumbnail is a resize of the same picture, so its bitmap would print a
@@ -235,12 +234,14 @@ export function AssetDetailOverlay({
     };
   }, [item.type, item.src, item.width, item.height]);
 
-  const commitAltText = useCallback(() => {
-    if (!onUpdate) return;
-    const next = altDraft.trim();
-    if (next === (item.altText ?? "")) return;
-    void onUpdate(item.key, { altText: next });
-  }, [onUpdate, altDraft, item.altText, item.key]);
+  const saveAltText = useCallback(
+    async (key: string, altText: string) => {
+      await onUpdate?.(key, { altText });
+    },
+    [onUpdate],
+  );
+  const { field: altField, saveFailed: altSaveFailed } = useAltTextDraft(item, saveAltText);
+  const altDraft = altField.value;
 
   // The asset's own metadata wins; the measured bitmap is the fallback.
   const dims = item.width != null && item.height != null
@@ -351,22 +352,16 @@ export function AssetDetailOverlay({
                   id="med-alt-input"
                   rows={2}
                   className="tw:resize-none tw:border-0 tw:bg-transparent tw:p-0 tw:text-[length:var(--bk-text-12)] tw:leading-[18px] tw:text-[var(--bk-ink)] tw:shadow-none tw:focus:ring-0"
-                  value={altDraft}
-                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
-                    setAltDraft(e.target.value);
-                  }}
-                  onBlur={commitAltText}
-                  onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-                    if (e.key === "Enter" && !e.shiftKey) {
-                      e.preventDefault();
-                      commitAltText();
-                      e.currentTarget.blur();
-                    }
-                  }}
+                  {...altField}
                   placeholder="Describe this image for screen readers"
                   aria-label="Alt text"
                 />
               </div>
+              {altSaveFailed && (
+                <p role="alert" data-testid="media-alt-error" className="tw:mt-1 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-error-text)]">
+                  Could not save the alt text — the server did not save the change.
+                </p>
+              )}
             </div>
 
             {/* Board 233:1254-1274 — the five 32h destination rows. */}

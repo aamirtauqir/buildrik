@@ -1,13 +1,14 @@
 /**
  * AssetDetailsPanel — P7 alt text section tests.
  *
- * Covers: editor render, user-typed edit triggers onUpdateAltText, the
- * character counter, non-image hides the section, missing handlers hide it.
+ * Covers: editor render, one commit per blur / Enter (M-4, never per
+ * keystroke), the character counter, a refused save shown under the field,
+ * non-image hides the section, missing handlers hide it.
  *
  * @license BSD-3-Clause
  */
 
-import { render, fireEvent } from "@testing-library/react";
+import { render, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import * as React from "react";
 import { AssetDetailsPanel } from "../AssetDetailsPanel";
@@ -47,7 +48,7 @@ function renderPanel(overrides: Partial<React.ComponentProps<typeof AssetDetails
     onRequestDelete: vi.fn(),
     composer,
     addToast: vi.fn(),
-    onUpdateAltText: vi.fn(),
+    onUpdateAltText: vi.fn().mockResolvedValue(undefined),
     ...overrides,
   };
   return { ...render(<AssetDetailsPanel {...props} />), props };
@@ -68,12 +69,46 @@ describe("AssetDetailsPanel — alt text section (P7)", () => {
     expect(textarea.value).toBe("A red bicycle.");
   });
 
-  it("calls onUpdateAltText with the new value when the user types", () => {
-    const onUpdateAltText = vi.fn();
+  it("M-4: typing writes nothing; blur commits the trimmed text once", () => {
+    const onUpdateAltText = vi.fn().mockResolvedValue(undefined);
     const { container } = renderPanel({ onUpdateAltText });
     const textarea = container.querySelector("textarea") as HTMLTextAreaElement;
-    fireEvent.change(textarea, { target: { value: "User typed this" } });
+    fireEvent.change(textarea, { target: { value: "User" } });
+    fireEvent.change(textarea, { target: { value: "User typed this " } });
+    expect(onUpdateAltText).not.toHaveBeenCalled();
+    fireEvent.blur(textarea);
+    expect(onUpdateAltText).toHaveBeenCalledTimes(1);
     expect(onUpdateAltText).toHaveBeenCalledWith("asset-1", "User typed this");
+  });
+
+  it("M-4: Enter commits once (via the blur it triggers); Shift+Enter does not", () => {
+    const onUpdateAltText = vi.fn().mockResolvedValue(undefined);
+    const { container } = renderPanel({ onUpdateAltText });
+    const textarea = container.querySelector("textarea") as HTMLTextAreaElement;
+    textarea.focus();
+    fireEvent.change(textarea, { target: { value: "A bike" } });
+    fireEvent.keyDown(textarea, { key: "Enter", shiftKey: true });
+    expect(onUpdateAltText).not.toHaveBeenCalled();
+    fireEvent.keyDown(textarea, { key: "Enter" });
+    expect(onUpdateAltText).toHaveBeenCalledTimes(1);
+    expect(onUpdateAltText).toHaveBeenCalledWith("asset-1", "A bike");
+  });
+
+  it("M-4: blur with unchanged text sends nothing", () => {
+    const onUpdateAltText = vi.fn().mockResolvedValue(undefined);
+    const { container } = renderPanel({ onUpdateAltText, selectedItem: makeImage({ altText: "Same" }) });
+    fireEvent.blur(container.querySelector("textarea") as HTMLTextAreaElement);
+    expect(onUpdateAltText).not.toHaveBeenCalled();
+  });
+
+  it("M-4: a refused save is shown under the field", async () => {
+    const onUpdateAltText = vi.fn().mockRejectedValue(new Error("refused"));
+    const { container, findByTestId } = renderPanel({ onUpdateAltText });
+    const textarea = container.querySelector("textarea") as HTMLTextAreaElement;
+    fireEvent.change(textarea, { target: { value: "x" } });
+    fireEvent.blur(textarea);
+    await waitFor(() => expect(onUpdateAltText).toHaveBeenCalled());
+    expect(await findByTestId("alt-text-error")).toBeTruthy();
   });
 
   it("enforces the 125-char max via maxLength attribute", () => {

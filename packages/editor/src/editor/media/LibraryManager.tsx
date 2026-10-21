@@ -976,16 +976,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
           /* Clone 3696:21550 — Site fonts is mounted once in the shell and
              opens on the composer event, with this file highlighted. */
           onManageFont={(item) => composer.emit("ui:site-fonts", { assetId: item.key })}
-          onUpdateAltText={(key, altText) => {
-            // User-typed edit — clear AI provenance so the chip disappears.
-            // Empty user edit also counts as "no longer AI's text."
-            void composer.media.updateAsset(key, {
-              altText,
-              generatedMetadata: undefined,
-            }).catch(() =>
-              addToast({ description: "Could not save the alt text — the server did not save the change.", tone: "error" }),
-            );
-          }}
+          onUpdateAltText={(key, altText) => state.updateItem(key, { altText })}
           // Regenerate is an explicit ask to REPLACE the current text.
         />
       </div>
