@@ -518,9 +518,8 @@ export const PublishTab: React.FC<PublishTabProps> = ({
           >
             <span className="tw:flex tw:items-center tw:gap-2">
               {downloadingCode ? "Preparing ZIP…" : "Download code (ZIP)"}
-              {/* The plan gate's own mark (UpgradeModal, IntegrationRow): the
-                  Flowbite purple ramp is allowlisted for the PRO badge only. */}
-              {codeLocked ? <Badge color="purple">PRO</Badge> : null}
+              {/* Same mark as IntegrationRow's plan gate. */}
+              {codeLocked ? <Badge>PRO</Badge> : null}
             </span>
           </MenuItem>
         ) : null}

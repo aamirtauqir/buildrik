@@ -436,20 +436,14 @@ export type CmsSyncErrorInfo = SyncRetryInfo;
  *  publish gate's "Retry the sync" line and the sync-error toast — the toast
  *  used to read the queue's own `size`, which left out the outbox and the
  *  mirrors in flight, so it undercounted what publish refused on (C-16). */
-function unsentCmsChanges(keys: Set<string> = outstandingCmsKeys()): number {
+export function getCmsSyncPendingCount(keys: Set<string> = outstandingCmsKeys()): number {
   return [...keys].filter((k) => !conflicted.has(k)).length;
 }
 
 /** Subscribe to CMS sync failures. Returns an unsubscribe fn. `pending` is
- *  `unsentCmsChanges()`, the publish gate's count, not the queue's. */
+ *  `getCmsSyncPendingCount()`, the publish gate's count, not the queue's. */
 export function onCmsSyncError(cb: (info: CmsSyncErrorInfo) => void): () => void {
-  return queue.onError(() => cb({ pending: unsentCmsChanges() }));
-}
-
-/** How many CMS changes are still waiting to be sent — the same number the
- *  publish gate and the sync-error toast report. */
-export function getCmsSyncPendingCount(): number {
-  return unsentCmsChanges();
+  return queue.onError(() => cb({ pending: getCmsSyncPendingCount() }));
 }
 
 /* P0-B audit 2026-09-30 — the sheet's save needs to know whether the mirror
@@ -479,7 +473,7 @@ export function cmsSyncBlocker(): string | null {
     /* A conflicted change is outstanding too (it stays in the outbox), but
        "Retry the sync" cannot settle it — the user's choice does. Named
        apart (QA 2026-10-02). */
-    const unsent = unsentCmsChanges(keys);
+    const unsent = getCmsSyncPendingCount(keys);
     const waiting = keys.size - unsent;
     const parts: string[] = [];
     if (unsent > 0) {
