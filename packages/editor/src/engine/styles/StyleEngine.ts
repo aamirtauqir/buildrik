@@ -15,13 +15,13 @@ import {
 } from "@/shared/constants/breakpoints";
 import type { StyleData, ExportOptions, BreakpointStyles } from "@/shared/types";
 import type { BreakpointId } from "@/shared/types/breakpoints";
+import { blockForeignCssUrls } from "@/shared/utils/canvasCssUrls";
 import { devWarn } from "@/shared/utils/devLogger";
 import { generateId, camelToKebab } from "@/shared/utils/helpers";
 import type { Composer } from "../Composer";
 import type { Element } from "../elements/Element";
 import { elementSelector } from "@/shared/utils/elementSelector";
 import { elementBaseCSS, type BaseRuleCache, type CascadeTarget } from "./cascadeCSS";
-import { blockForeignCssUrls } from "@/shared/utils/canvasCssUrls";
 
 
 /**
