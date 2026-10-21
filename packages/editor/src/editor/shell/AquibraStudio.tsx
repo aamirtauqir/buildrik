@@ -11,6 +11,7 @@
 
 import * as React from "react";
 import type { Composer } from "@/engine";
+import { makeFirstHeadingH1 } from "@/engine/commands/commandOperations";
 import { useElementFlash } from "@/shared/hooks";
 import { EVENTS } from "@/shared/constants";
 import { useActivePageId } from "@/editor/shared/useActivePageId";
@@ -655,6 +656,20 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           });
         }
         return fixed;
+      }}
+      /* BD-39 (6): the no-H1 row's fix — the page's first heading becomes
+         its h1, one undo step through the engine's lock gate. */
+      onMakeH1={(issue) => {
+        if (!issue.pageId || !makeFirstHeadingH1(composer, issue.pageId)) return false;
+        const undo = composer.history.captureUndo();
+        addToast({
+          title: "Issue fixed",
+          description: "The page's first heading is now its H1.",
+          tone: "success",
+          duration: 8000,
+          action: { label: "Undo", onClick: () => void undo() },
+        });
+        return true;
       }}
       onDamageFix={loadRepair.fix}
       onDamageKeep={loadRepair.keep}

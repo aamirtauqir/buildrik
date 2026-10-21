@@ -167,3 +167,27 @@ describe("IssuesPanel — a long message stays inside its 56 row", () => {
     expect(screen.getByTestId("issue-location-0").className).toMatch(/tw:truncate/);
   });
 });
+
+/* BD-39 (6): the no-H1 warning stays, and gets a one-click fix on its row. */
+describe("IssuesPanel — Make this H1", () => {
+  const noH1 = { id: "content:no-h1:p1", type: "warning" as const, message: "Page has no H1 heading", location: "Home", elementId: "root", pageId: "p1", contentKind: "missing-h1" as const };
+
+  it("offers Make this H1 on a no-H1 row and runs it for that issue", () => {
+    const onMakeH1 = vi.fn(() => true);
+    render(<IssuesPanel issues={[noH1]} onClose={vi.fn()} activePageId="p1" onMakeH1={onMakeH1} />);
+    fireEvent.click(screen.getByRole("button", { name: "Make this H1" }));
+    expect(onMakeH1).toHaveBeenCalledWith(noH1);
+    expect(screen.queryByTestId("issues-h1-failed")).toBeNull();
+  });
+
+  it("says why when the page has no heading it could re-level", () => {
+    render(<IssuesPanel issues={[noH1]} onClose={vi.fn()} activePageId="p1" onMakeH1={() => false} />);
+    fireEvent.click(screen.getByRole("button", { name: "Make this H1" }));
+    expect(screen.getByTestId("issues-h1-failed")).toHaveTextContent("No heading on this page could be made H1");
+  });
+
+  it("offers it on no other row", () => {
+    render(<IssuesPanel issues={ISSUES} onClose={vi.fn()} onMakeH1={vi.fn()} />);
+    expect(screen.queryByRole("button", { name: "Make this H1" })).toBeNull();
+  });
+});

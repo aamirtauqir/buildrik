@@ -73,6 +73,9 @@ export interface IssuesPanelProps {
   onDamageKeep?: (issue: Issue) => void;
   /** VIEWER / view mode: damage rows are read-only ("An editor can fix this."). */
   damageReadOnly?: boolean;
+  /** BD-39 (6): a no-H1 row's "Make this H1" — re-level the page's first
+   *  heading. False = no heading could be (none, or locked). */
+  onMakeH1?: (issue: Issue) => boolean;
 }
 
 type Filter = "all" | "error" | "warning";
@@ -157,7 +160,9 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
   onDamageFix,
   onDamageKeep,
   damageReadOnly = false,
+  onMakeH1,
 }) => {
+  const [h1Failed, setH1Failed] = React.useState(false);
   const [damageMenu, setDamageMenu] = React.useState<string | null>(null);
   const [filter, setFilter] = React.useState<Filter>("all");
   // T10 page scope. Defaults to "page" — "what's wrong with what I'm looking
@@ -166,6 +171,7 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
   const [scope, setScope] = React.useState<"page" | "site">("page");
   const [fixing, setFixing] = React.useState<Issue | null>(null);
   const [failed, setFailed] = React.useState<Issue | null>(null);
+  const canMakeH1 = (i: Issue) => i.contentKind === "missing-h1" && !!onMakeH1 && !damageReadOnly;
   const scoped = scope === "page" ? issues.filter((i) => issueAppliesToPage(i, activePageId)) : issues;
 
   const runFix = async (issue: Issue) => {
@@ -307,6 +313,13 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
             </div>
           )}
 
+          {h1Failed && (
+            <div className={`${BAND} tw:bg-[var(--bk-warning-tint)]`} role="alert" data-testid="issues-h1-failed">
+              <div className="tw:text-xs tw:text-[var(--bk-error-text)]">
+                No heading on this page could be made H1. Add a Heading, or unlock the first one.
+              </div>
+            </div>
+          )}
           {failed?.damage && (
             <div className={`${BAND} tw:bg-[var(--bk-warning-tint)]`} role="alert" data-testid="issues-damage-failed">
               <div className="tw:text-xs tw:text-[var(--bk-error-text)]">This text changed since the check. Nothing was replaced.</div>
@@ -361,7 +374,7 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
                       {/* One line each: the row is a fixed 56. Full text: title + DOM.
                           The first line leaves room for Fix ›, the second for the pill. */}
                       <span
-                        className={`tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)] tw:truncate ${(isFixable(i) && onFix) || (i.damage && !damageReadOnly) ? "tw:pr-16" : ""}`}
+                        className={`tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)] tw:truncate ${(isFixable(i) && onFix) || (i.damage && !damageReadOnly) ? "tw:pr-16" : canMakeH1(i) ? "tw:pr-28" : ""}`}
                         /* A damage row's second line is its preview, so its place rides here. */
                         title={i.damage && i.location ? `${i.message} · ${i.location}` : i.message}
                         data-testid={`issue-message-${idx}`}
@@ -405,6 +418,17 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
                       onClick={() => void runFix(i)}
                     >
                       Fix ›
+                    </Button>
+                  )}
+                  {canMakeH1(i) && (
+                    <Button
+                      color="light"
+                      size="xs"
+                      className={`tw:absolute tw:right-4 tw:top-2 ${FIX_BTN}`}
+                      data-testid={`issue-make-h1-${idx}`}
+                      onClick={() => setH1Failed(!onMakeH1!(i))}
+                    >
+                      Make this H1
                     </Button>
                   )}
                   {i.damage?.kind === "escaped-text" && !damageReadOnly && (

@@ -228,10 +228,24 @@ function walkPage(
   if (Array.isArray(root.children)) root.children.forEach((child) => walkPage(child, pageId, pageName, pageIds, out));
 }
 
-const hasH1 = (el: ContentElement): boolean =>
+/** Does this subtree carry an h1 — as an element, or inside rich text? Also
+ *  the editor's insert rule (BD-39 (6): a Heading dropped on a page with no
+ *  H1 becomes it). */
+export const hasH1 = (el: ContentElement): boolean =>
   el.tagName?.toLowerCase() === "h1" ||
   /<h1\b/i.test(el.content ?? "") ||
   (Array.isArray(el.children) && el.children.some(hasH1));
+
+/** The first h2–h6 element in document order — what "Make this H1" re-levels
+ *  (BD-39 (6)). Headings inside rich text are not elements and cannot be. */
+export function firstHeadingId(el: ContentElement): string | null {
+  if (/^h[2-6]$/i.test(el.tagName ?? "")) return el.id;
+  for (const child of Array.isArray(el.children) ? el.children : []) {
+    const found = firstHeadingId(child);
+    if (found) return found;
+  }
+  return null;
+}
 
 /**
  * No H1 (REA #28): the Heading block defaults to `<h2>`, so a page built from

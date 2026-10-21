@@ -18,7 +18,8 @@
  * byte-for-byte what it did before the fix (captured in
  * `__fixtures__/catalogBlockHtml.baseline.json` from the pre-fix code) —
  * except the Carousel, whose old output was the bug (see
- * `sliderExport.test.ts`).
+ * `sliderExport.test.ts`), and the Heading, which on this empty page now
+ * inserts as the page's h1 (BD-39 (6): same styles, `<h1>` for `<h2>`).
  *
  * @license BSD-3-Clause
  */

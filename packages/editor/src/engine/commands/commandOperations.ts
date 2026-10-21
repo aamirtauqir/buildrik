@@ -15,6 +15,7 @@ import { resolveStyle, type StyleLayerSource } from "../styles/ResolvedStyle";
 import type { BreakpointId } from "@/shared/types/breakpoints";
 import type { Composer } from "../Composer";
 import type { Element } from "../elements/Element";
+import { firstHeadingId } from "@buildrik/shared/content/contentIssues";
 
 /** Direction for z-index reordering */
 export type ReorderDirection = "forward" | "backward" | "front" | "back";
@@ -361,4 +362,20 @@ export function pasteStyles(composer: Composer, element: Element): number {
     for (const key of keys) setStyleAt(composer, el, breakpoint, key, clipboard[key], state);
   });
   return ran ? keys.length : 0;
+}
+
+/**
+ * "Make this H1" (BD-39 (6)) — the Issues panel's fix for the no-H1 warning,
+ * which stays (SEO never blocks a publish): the page's first heading becomes
+ * its h1, through the lock gate, as one undo step. False when the page has no
+ * heading element, or that heading is locked (the gate's toast says so). Its
+ * sibling rule — a Heading inserted on a page with no H1 becomes it — lives
+ * in the insert path (`blocks/blockRegistry.ts`).
+ */
+export function makeFirstHeadingH1(composer: Composer, pageId: string): boolean {
+  const rootId = composer.elements.getAllPages().find((p) => p.id === pageId)?.root?.id;
+  const root = rootId ? composer.elements.getElement(rootId) : undefined;
+  const headingId = root ? firstHeadingId(root.toJSON()) : null;
+  if (!headingId) return false;
+  return writeElement(composer, composer.elements.getElement(headingId), "make-h1", (el) => el.setTagName("h1"));
 }
