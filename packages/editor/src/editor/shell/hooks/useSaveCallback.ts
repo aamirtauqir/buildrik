@@ -81,6 +81,29 @@ export function isForbiddenSaveError(err: unknown): boolean {
   return err instanceof Error && /forbidden|403/i.test(err.message);
 }
 
+/** Did the save die in transport, and why. Two facts, not one: `isNetwork`
+ *  says the save never reached a verdict; `isOffline` says WHY, and only
+ *  navigator can answer it. Conflating them made a server that refused while
+ *  the browser was online report "Offline — not saved". One rule for manual
+ *  save and autosave — it lived in two copies and only one got fixed. */
+export function classifyTransportSaveError(message: string): { isNetwork: boolean; isOffline: boolean } {
+  const isOffline = typeof navigator !== "undefined" && !navigator.onLine;
+  return { isOffline, isNetwork: isOffline || /network|fetch|offline|failed to fetch|connection/i.test(message) };
+}
+
+/** The toast for a site-bound save that died in transport. Same words from
+ *  both save paths, so one event is never named two different things. */
+export function transportNotSavedToast(isOffline: boolean): ToastInput {
+  return {
+    title: isOffline ? "Offline — not saved" : "Couldn't reach the server — not saved",
+    description: isOffline
+      ? "Your changes are still open in this tab. Keep it open and save again once you're back online."
+      : "Your changes are still open in this tab. Keep it open and try saving again.",
+    tone: "warning",
+    key: SAVE_FAILED_TOAST_KEY,
+  };
+}
+
 /**
  * A save refused FORBIDDEN mid-session (A15-9 / C-9) — one handler for the
  * manual save and autosave. The refused edit existed only in this tab, so it
@@ -287,15 +310,7 @@ export function useSaveCallback({
         // edit stays in the local project and syncs on reconnect. Don't show the
         // scary "Save failed" + Retry; clear the spinner (the topbar's offline
         // indicator already says "changes queued") and nudge once, calmly.
-        /* Two facts, not one. `isNetwork` says the save died in transport;
-           `isOffline` says WHY. They were conflated, so a server that refused
-           while the browser was online (error text "Failed to fetch", which
-           this regex matches) produced the toast "Offline — not saved" beside
-           a pill reading "Save failed — retry" — one event, two causes named,
-           and the named one was false. Only navigator can answer "offline". */
-        const isOffline = typeof navigator !== "undefined" && !navigator.onLine;
-        const isNetwork =
-          isOffline || /network|fetch|offline|failed to fetch|connection/i.test(errorMessage);
+        const { isOffline, isNetwork } = classifyTransportSaveError(errorMessage);
         if (isNetwork) {
           /* This copy used to promise, for every project, that the edit was
              "saved on this device and will sync when you're back". For a
@@ -317,14 +332,7 @@ export function useSaveCallback({
           );
           addToast(
             siteId
-              ? {
-                  title: isOffline ? "Offline — not saved" : "Couldn't reach the server — not saved",
-                  description: isOffline
-                    ? "Your changes are still open in this tab. Keep it open and save again once you're back online."
-                    : "Your changes are still open in this tab. Keep it open and try saving again.",
-                  tone: "warning",
-                  key: SAVE_FAILED_TOAST_KEY,
-                }
+              ? transportNotSavedToast(isOffline)
               : {
                   title: isOffline
                     ? "Offline — saved on this device"
