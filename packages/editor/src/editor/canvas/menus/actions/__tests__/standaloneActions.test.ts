@@ -65,6 +65,19 @@ describe("standaloneActions", () => {
     });
   });
 
+  /* REA ISS-C18: the registry's refusal reason reached the Inspector ⋯ but
+     not the canvas menu, which drew a bare grey row. */
+  describe("replace-with-block", () => {
+    it("carries the registry's reason when a lock refuses it, and none when allowed", () => {
+      const section = makeElementStub({ id: "s-1", type: "section", parent });
+      const sectionCtx = { ...ctx, element: section as unknown as Element };
+      expect(action("replace-with-block").disabledReason!(sectionCtx)).toBeUndefined();
+      section.isLocked.mockReturnValue(true);
+      expect(action("replace-with-block").isEnabled!(sectionCtx)).toBe(false);
+      expect(action("replace-with-block").disabledReason!(sectionCtx)).toBe("Unlock it to replace it");
+    });
+  });
+
   describe("save-as-component", () => {
     it("emits COMPONENT_SAVE_AS_REQUESTED with the multi-selection when present", () => {
       composer.selection.getSelectedIds.mockReturnValue(["a", "b"]);

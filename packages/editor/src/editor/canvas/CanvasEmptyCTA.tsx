@@ -84,7 +84,7 @@ export function CanvasEmptyCTA({
             This page is empty
           </p>
           <p className="bd-canvas-empty-cta__subtitle" data-testid="canvas-empty-cta-subtitle">
-            Start with a template, drop a block, or describe your site.
+            Start with a template, add a block, or start blank.
           </p>
           <ul className="bd-canvas-empty-cta__cards" data-testid="canvas-empty-cta-cards">
             {cards.map((t) => (
@@ -93,7 +93,7 @@ export function CanvasEmptyCTA({
                   color="light"
                   className={CARD}
                   data-testid={`canvas-empty-template-${t.id}`}
-                  aria-label={`Start from the ${t.name} template`}
+                  aria-label={`Browse templates, starting with ${t.name}`}
                   onClick={onBrowseTemplates}
                 >
                   {/* Board 4428:44164: a light wireframe thumbnail with the

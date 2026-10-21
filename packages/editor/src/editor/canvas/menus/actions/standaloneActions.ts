@@ -26,6 +26,14 @@ export function fromElementAction(id: ElementActionId, group: string, rowId: str
     shortcut: action.shortcut,
     isVisible: action.isVisible,
     isEnabled: action.isEnabled ? (ctx) => action.isEnabled!(ctx) === true : undefined,
+    /* The registry's refusal is a sentence ("Unlock it to replace it"); the
+       menu prints it under a greyed row instead of a bare grey (REA ISS-C18). */
+    disabledReason: action.isEnabled
+      ? (ctx) => {
+          const verdict = action.isEnabled!(ctx);
+          return verdict === true ? undefined : verdict;
+        }
+      : undefined,
     handler: action.run,
   };
 }

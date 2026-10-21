@@ -39,7 +39,7 @@ describe("CanvasEmptyCTA — board 4428:44164", () => {
   it("names the page's state and the three ways forward", () => {
     renderCTA();
     expect(screen.getByText("This page is empty")).toBeInTheDocument();
-    expect(screen.getByText("Start with a template, drop a block, or describe your site.")).toBeInTheDocument();
+    expect(screen.getByText("Start with a template, add a block, or start blank.")).toBeInTheDocument();
   });
 
   it("draws three template cards from the catalogue, each opening Templates", () => {
