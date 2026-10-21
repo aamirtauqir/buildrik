@@ -8,9 +8,12 @@
 
 import { describe, it, expect, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
-import { resolveDisplayMode, SECTION_PREFS_KEY, useInspectorSections } from "../useInspectorSections";
+import { resetSectionChoicesForTests, resolveDisplayMode, SECTION_PREFS_KEY, useInspectorSections } from "../useInspectorSections";
 
-beforeEach(() => localStorage.clear());
+beforeEach(() => {
+  localStorage.clear();
+  resetSectionChoicesForTests();
+});
 
 describe("resolveDisplayMode", () => {
   it("always / open arrive open; closed arrives as a summary", () => {
@@ -50,6 +53,16 @@ describe("useInspectorSections", () => {
     localStorage.setItem(SECTION_PREFS_KEY, JSON.stringify({ "image:fill": "open", "junk": 3 }));
     const { result } = renderHook(() => useInspectorSections());
     expect(result.current.choices).toEqual({ "image:fill": "open" });
+  });
+
+  it("two panels share one set of choices: a save from one keeps the other's", () => {
+    const page = renderHook(() => useInspectorSections());
+    const inspector = renderHook(() => useInspectorSections());
+    act(() => page.result.current.setChoices("body", ["seo"], "closed"));
+    act(() => inspector.result.current.setChoices("heading", ["typography"], "open"));
+    expect(inspector.result.current.choices).toEqual({ "body:seo": "closed", "heading:typography": "open" });
+    expect(page.result.current.choices).toEqual(inspector.result.current.choices);
+    expect(JSON.parse(localStorage.getItem(SECTION_PREFS_KEY)!)).toEqual({ "body:seo": "closed", "heading:typography": "open" });
   });
 
   it("deletes the retired v2, legacy and Beginner/Pro keys on first load", () => {
