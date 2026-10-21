@@ -1,9 +1,0 @@
-/**
- * History Tab Module Exports
- * @license BSD-3-Clause
- */
-
-export * from "./types";
-export * from "./helpers";
-export { ActivityView } from "./components/ActivityView";
-export { DiffRow } from "./components/DiffRow";
