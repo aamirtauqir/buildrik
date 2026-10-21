@@ -219,7 +219,7 @@ export const BrandFromSource: React.FC<BrandFromSourceProps> = ({ composer }) =>
       }
       preview.clear();
       if (!composer.designSystem.setTokens(brandProposal(savedTokens(), roles, fonts), "Brand from logo")) {
-        addToast({ tone: "error", description: "That brand couldn't be applied — a token it replaces is still in use." });
+        addToast({ tone: "error", description: "That brand couldn't be applied. Nothing was changed." });
         setState({ kind: "source" });
         return false;
       }
