@@ -222,14 +222,33 @@ export function useServerConflict(opts: UseServerConflictOptions): {
   const onReplace = React.useCallback(async () => {
     if (!composer || !dialog) return;
     trackRestoreChoice("replace");
+    /* The server's version is kept as a version before anything replaces it;
+       when that write fails, nothing is replaced and the user is told — it
+       used to reject unhandled and leave the dialog sitting there. */
+    const keepServerVersion = async (name: string, description: string, project: ProjectData) => {
+      try {
+        await composer.versions.createVersion(name, description, project);
+        return true;
+      } catch {
+        addToast({
+          tone: "error",
+          title: "Couldn't keep the server version first",
+          description: "Nothing was replaced. Try again.",
+        });
+        return false;
+      }
+    };
     if (dialog.variant === "restore") {
       if (!siteId) return;
-      if (dialog.relation !== "unchanged") {
-        await composer.versions.createVersion(
+      if (
+        dialog.relation !== "unchanged" &&
+        !(await keepServerVersion(
           "Before restore",
           "The server's version, kept before your unsaved edits replaced it.",
           composer.exportProject(),
-        );
+        ))
+      ) {
+        return;
       }
       setDialog(null);
       const kept = takeOffScreenUnsaved(siteId);
@@ -252,12 +271,15 @@ export function useServerConflict(opts: UseServerConflictOptions): {
       });
       return;
     }
-    if (copy) {
-      await composer.versions.createVersion(
+    if (
+      copy &&
+      !(await keepServerVersion(
         "Before overwrite",
         "The server's version, kept before your copy replaced it.",
         copy.project,
-      );
+      ))
+    ) {
+      return;
     }
     /* Adopt the token of the copy kept as a version: if the server moved
        again since, this save is refused again rather than losing that. */
