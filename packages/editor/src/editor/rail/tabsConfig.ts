@@ -225,10 +225,8 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
     mode: "panel",
   },
   {
-    // P4.2 data front-door. Off-rail like review (no `zone`), so it doesn't
-    // disturb the locked 6-tool rail order; reachable via ⌘K ("Open Content
-    // panel") + routable. The authoritative IA (14-screen-specs.md:8) promotes
-    // it to a first-class rail tab in the pending 6-tab redesign.
+    // P4.2 data front-door (CMS). On the rail: RAIL_FIGMA lists it in the
+    // creation group, and ⌘K ("Open Content panel") reaches it too.
     id: "content",
     iconName: "LayoutGrid",
     // v3 IA Q4: "CMS" — the panel IS the CMS (collections, records, fields,
