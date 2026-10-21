@@ -249,6 +249,25 @@ if (requirePresent("BLOB_READ_WRITE_TOKEN")) {
   }
 }
 
+// The editor canvas lets user CSS load only from the media store's own host
+// (canvasCssUrls.ts), never `*.public.blob.vercel-storage.com` — that would
+// admit anyone's store. @vercel/blob builds that host from the token's store
+// id (`vercel_blob_rw_<storeId>_…` → `<storeId>.public.blob.vercel-storage.com`).
+// Unset is a soft failure: only Global CSS / attribute rules that point at
+// uploaded media lose the image on the canvas. Baked at build time.
+{
+  const storeId = (env.BLOB_READ_WRITE_TOKEN ?? "").split("_")[3];
+  const expected = storeId ? `${storeId.toLowerCase()}.public.blob.vercel-storage.com` : null;
+  const host = env.NEXT_PUBLIC_BLOB_STORE_HOST?.trim().toLowerCase();
+  if (!host) {
+    warn("NEXT_PUBLIC_BLOB_STORE_HOST", `unset — canvas CSS cannot load uploaded media${expected ? ` (set it to ${expected})` : ""}`);
+  } else if (expected && host !== expected) {
+    fail("NEXT_PUBLIC_BLOB_STORE_HOST", `${host} is not the store BLOB_READ_WRITE_TOKEN writes to (${expected})`);
+  } else {
+    pass("NEXT_PUBLIC_BLOB_STORE_HOST");
+  }
+}
+
 // AI. Absent → every ai-generate-worker job fails on "Missing credentials", the
 // AI onboarding path is dead, and in-editor AI + alt-text throw.
 requirePresent("OPENAI_API_KEY");

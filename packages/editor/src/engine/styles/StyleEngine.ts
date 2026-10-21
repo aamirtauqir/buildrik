@@ -15,6 +15,7 @@ import {
 } from "@/shared/constants/breakpoints";
 import type { StyleData, ExportOptions, BreakpointStyles } from "@/shared/types";
 import type { BreakpointId } from "@/shared/types/breakpoints";
+import { blockForeignCssUrls } from "@/shared/utils/canvasCssUrls";
 import { devWarn } from "@/shared/utils/devLogger";
 import { generateId, camelToKebab } from "@/shared/utils/helpers";
 import type { Composer } from "../Composer";
@@ -690,7 +691,10 @@ export class StyleEngine {
     const device = this.composer.viewport?.getDevice();
     const breakpoint: CascadeTarget = device && isValidBreakpoint(device) ? device : "desktop";
     const base = elementBaseCSS([root], elementSelector, breakpoint, false, this.baseRuleCache);
-    return [base, this.generateResponsiveCSS({ target: breakpoint })].filter(Boolean).join("\n\n");
+    const sheet = [base, this.generateResponsiveCSS({ target: breakpoint })].filter(Boolean).join("\n\n");
+    // This <style> is in the dashboard document: foreign url()s are blocked
+    // except in rules that test no attribute value (canvasCssUrls.ts).
+    return blockForeignCssUrls(sheet, { keepUrlsInAttributeFreeRules: true });
   }
 
   // ============================================
