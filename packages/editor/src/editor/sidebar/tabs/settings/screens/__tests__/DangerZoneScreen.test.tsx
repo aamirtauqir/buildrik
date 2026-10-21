@@ -34,7 +34,7 @@ vi.mock("@/editor/chrome-ui", async (importOriginal) => ({
   useToast: () => ({ addToast, removeToast: vi.fn() }),
 }));
 
-import { DANGER_READ_ONLY_NOTICE, DangerZoneScreen, RECENTLY_DELETED_PATH } from "../DangerZoneScreen";
+import { DANGER_READ_ONLY_NOTICE, DANGER_ROLE_UNKNOWN_LINE, DangerZoneScreen, RECENTLY_DELETED_PATH } from "../DangerZoneScreen";
 
 const assign = vi.fn();
 
@@ -240,11 +240,22 @@ describe("Read-only below OWNER — 8137:216834", () => {
     expect(disabled("set-danger-transfer-btn")).toBe(true);
   });
 
-  it("the role lookup failing reads as not allowed", async () => {
-    api.sites.myRole.query.mockRejectedValue(new Error("down"));
+  it("the role lookup failing says so and offers Try again, instead of a silent disabled Transfer (S-1)", async () => {
+    api.sites.myRole.query.mockRejectedValueOnce(new Error("down")).mockResolvedValue({ role: "ADMIN", canTransfer: true });
     setup(true);
     await loaded();
-    expect(disabled("set-danger-transfer-btn")).toBe(true);
-    expect(screen.getByTestId("set-readonly").textContent).toBe(DANGER_READ_ONLY_NOTICE.all);
+    expect(screen.getByTestId("set-danger-transfer")).toHaveTextContent(DANGER_ROLE_UNKNOWN_LINE);
+    expect(screen.queryByTestId("set-danger-transfer-btn")).toBeNull();
+    expect(screen.getByTestId("set-readonly").textContent).toBe("Only the workspace owner can archive or delete this site.");
+    fireEvent.click(screen.getByTestId("set-danger-role-retry"));
+    await waitFor(() => expect(screen.getByTestId("set-danger-transfer-btn")).toBeEnabled());
+    expect(screen.getByTestId("set-readonly").textContent).toBe(DANGER_READ_ONLY_NOTICE.transferOnly);
+  });
+
+  it("the OWNER is not gated on a failed role lookup", async () => {
+    api.sites.myRole.query.mockRejectedValue(new Error("down"));
+    setup(false);
+    await loaded();
+    expect(screen.getByTestId("set-danger-transfer-btn")).toBeEnabled();
   });
 });

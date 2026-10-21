@@ -47,6 +47,8 @@ interface SiteLifecycle {
   canTransfer: boolean;
   /** The viewer may transfer from here: `transferSite` allows them and they can list the members (ADMIN+). */
   transferAllowed: boolean;
+  /** `sites.myRole` failed: whether the viewer may transfer is unknown, not "no". */
+  roleUnknown: boolean;
 }
 
 /* 8137:216834: the read-only notice, true for the viewer it is shown to. */
@@ -59,6 +61,9 @@ export const DANGER_READ_ONLY_NOTICE = {
   /** An ADMIN who created the site keeps Transfer. */
   transferOnly: "Only the workspace owner can archive or delete this site. You created it, so you can transfer it.",
 } as const;
+
+/* S-1: a failed role lookup used to leave Transfer quietly disabled. */
+export const DANGER_ROLE_UNKNOWN_LINE = "Couldn't check whether you can transfer this site.";
 
 const hostOf = (url: string | null | undefined): string | null => {
   if (!url) return null;
@@ -112,7 +117,7 @@ export const DangerZoneScreen: React.FC<ScreenProps> = ({
 }) => {
   const { addToast } = useToast();
   const siteName = composer?.getProjectMetadata?.()?.name ?? "";
-  const [site, setSite] = React.useState<SiteLifecycle>({ archived: false, liveAddress: null, createdBy: null, canTransfer: false, transferAllowed: false });
+  const [site, setSite] = React.useState<SiteLifecycle>({ archived: false, liveAddress: null, createdBy: null, canTransfer: false, transferAllowed: false, roleUnknown: false });
   const [dialog, setDialog] = React.useState<"archive" | "transfer" | "delete" | null>(null);
   const [busy, setBusy] = React.useState(false);
   const [archiveError, setArchiveError] = React.useState<string | null>(null);
@@ -129,7 +134,7 @@ export const DangerZoneScreen: React.FC<ScreenProps> = ({
       const [row, domains, mine] = await Promise.all([
         client.sites.get.query({ id: siteId }),
         client.siteDetail.domains.list.query({ siteId }).catch(() => []),
-        client.sites.myRole.query({ siteId }).catch(() => null),
+        client.sites.myRole.query({ siteId }).catch(() => undefined),
       ]);
       const live = row.status === "PUBLISHED" || row.publishedUrl != null;
       const primary = domains.find((d) => d.isPrimary && d.status === "VERIFIED")?.domain ?? null;
@@ -139,6 +144,7 @@ export const DangerZoneScreen: React.FC<ScreenProps> = ({
         createdBy: row.createdBy ?? null,
         canTransfer: !!mine?.canTransfer,
         transferAllowed: !!mine?.canTransfer && roleAtLeast(mine.role, "ADMIN") === true,
+        roleUnknown: mine === undefined,
       };
     },
     setSite,
@@ -245,9 +251,14 @@ export const DangerZoneScreen: React.FC<ScreenProps> = ({
   /* PD-3: Archive and Delete are the OWNER's. Transfer follows Q-B5. */
   const ownerActionsOff = !!readOnly;
   const transferOff = !!readOnly && !site.transferAllowed;
+  /* Below OWNER only the role decides Transfer, so an unknown role is a
+     failure to say and retry, not a refusal. The OWNER is never gated on it. */
+  const roleUnknown = !!readOnly && site.roleUnknown;
   const notice = !readOnly
     ? null
-    : site.transferAllowed
+    : roleUnknown
+      ? "Only the workspace owner can archive or delete this site."
+      : site.transferAllowed
       ? DANGER_READ_ONLY_NOTICE.transferOnly
       : site.canTransfer
         ? DANGER_READ_ONLY_NOTICE.creatorBelowAdmin
@@ -301,21 +312,39 @@ export const DangerZoneScreen: React.FC<ScreenProps> = ({
 
       <ActionCard
         title="Transfer site"
-        line="Transfer this site to another workspace member. The workspace owner or site creator can do this."
+        line={
+          roleUnknown
+            ? DANGER_ROLE_UNKNOWN_LINE
+            : "Transfer this site to another workspace member. The workspace owner or site creator can do this."
+        }
         testId="set-danger-transfer"
       >
-        <Button
-          type="button"
-          size="xs"
-          variant="ghost"
-          className={ACTION}
-          id="danger-transfer"
-          disabled={transferOff}
-          onClick={() => void openTransfer()}
-          data-testid="set-danger-transfer-btn"
-        >
-          Transfer site
-        </Button>
+        {roleUnknown ? (
+          <Button
+            type="button"
+            size="xs"
+            variant="ghost"
+            className={ACTION}
+            id="danger-transfer"
+            onClick={load.retry}
+            data-testid="set-danger-role-retry"
+          >
+            Try again
+          </Button>
+        ) : (
+          <Button
+            type="button"
+            size="xs"
+            variant="ghost"
+            className={ACTION}
+            id="danger-transfer"
+            disabled={transferOff}
+            onClick={() => void openTransfer()}
+            data-testid="set-danger-transfer-btn"
+          >
+            Transfer site
+          </Button>
+        )}
       </ActionCard>
 
       <ActionCard
