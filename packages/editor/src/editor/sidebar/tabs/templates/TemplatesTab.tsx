@@ -17,7 +17,7 @@ import { X } from "lucide-react";
 import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants/events";
 import { type TemplateItem, SITE_TEMPLATES, PAGE_TEMPLATES, DEFAULT_TEMPLATE_VERSION, getMyTemplates } from "./templatesData";
-import { clearAppliedId, recordTemplateApplied, saveAppliedId } from "./templatesStorage";
+import { recordTemplateApplied, saveAppliedId } from "./templatesStorage";
 import { ReplaceModal, CreatePageConfirmModal, CreatePageSuccessModal, CreatePageErrorModal, BackupFailedModal } from "./TemplatesTabModals";
 import { TemplatePreview } from "./TemplatePreview";
 import { useEditorRole } from "@/editor/shell/hooks/useEditorRole";

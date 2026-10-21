@@ -124,7 +124,7 @@ export function applyMultiResizeToDOM(state: ResizeState, primaryBounds: Transfo
  * Expand parent element DOM dimensions
  * Used when child resize exceeds parent bounds
  */
-export function expandParentDOM(
+function expandParentDOM(
   parentElement: HTMLElement,
   newWidth: number,
   newHeight: number

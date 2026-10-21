@@ -40,12 +40,9 @@ import { escapeStyleText } from "@buildrik/shared/schemas/element-markup";
 import { copyIdKeyedRecord, copyIdKeyedStyles, type IdRename } from "@buildrik/shared/content/elementIds";
 import { resolveTokenLiteral, setTokenLiteral } from "@buildrik/shared/tokens";
 import { FontManager } from "./fonts/FontManager";
-import { FormHandler } from "./forms/FormHandler";
 import { HistoryManager } from "./HistoryManager";
-import { InteractionManager } from "./interactions/InteractionManager";
 import { MediaManager } from "./media/MediaManager";
 import { MediaCommandLayer } from "./media/MediaCommandLayer";
-import { PluginManager } from "./PluginManager";
 import { RecoveryManager } from "./recovery/RecoveryManager";
 import { PageRouter } from "./routing/PageRouter";
 import { SelectionManager } from "./SelectionManager";
@@ -146,13 +143,11 @@ export class Composer extends EventEmitter {
   readonly versions!: VersionTimelineManager;
   readonly storage!: StorageAdapter;
   readonly viewport!: Viewport;
-  readonly plugins!: PluginManager;
   readonly data!: DataManager;
   readonly fonts!: FontManager;
   readonly components!: ComponentManager;
   readonly media!: MediaManager;
   readonly mediaOps!: MediaCommandLayer;
-  readonly forms!: FormHandler;
   readonly router!: PageRouter;
   readonly recovery!: RecoveryManager;
   readonly migration!: MigrationManager;
@@ -164,7 +159,7 @@ export class Composer extends EventEmitter {
   // ≥2 managers share a domain:
   //   cms.{collections, bindings}
   //   collab.{manager}        (was {manager, sync} — cloud sync stack removed)
-  //   canvas.{indicators, resize, drag, interactions}
+  //   canvas.{indicators, resize, drag}
   readonly cms!: {
     readonly collections: CollectionManager;
     readonly bindings: CMSBindingManager;
@@ -176,7 +171,6 @@ export class Composer extends EventEmitter {
     readonly indicators: CanvasIndicators;
     readonly resize: ResizeHandler;
     readonly drag: DragManager;
-    readonly interactions: InteractionManager;
   };
   readonly designSystem!: DesignSystemFacade;
 
@@ -198,13 +192,11 @@ export class Composer extends EventEmitter {
     this.versions = new VersionTimelineManager(this);
     this.storage = new StorageAdapter(this, this.config.storage);
     this.viewport = new Viewport(this);
-    this.plugins = new PluginManager(this);
     this.data = new DataManager(this);
     this.fonts = new FontManager(this);
     this.components = new ComponentManager(this);
     this.media = new MediaManager(this.config.remoteSync);
     this.mediaOps = new MediaCommandLayer(this);
-    this.forms = new FormHandler(this);
     this.router = new PageRouter();
     this.recovery = new RecoveryManager(this);
     this.migration = new MigrationManager(this);
@@ -225,7 +217,6 @@ export class Composer extends EventEmitter {
       indicators: new CanvasIndicators(this),
       resize: new ResizeHandler(this),
       drag: new DragManager(this),
-      interactions: new InteractionManager(this),
     };
 
     const tokenUsage = new TokenUsageTracker(
@@ -1280,33 +1271,6 @@ ${html}${interactionScript}
   }
 
   // ============================================
-  // Preview Mode
-  // ============================================
-
-  /**
-   * Toggle preview mode
-   * Starts/stops interaction runtime and updates UI state
-   */
-  setPreviewMode(enabled: boolean): void {
-    if (this.state.isPreviewMode === enabled) return;
-
-    this.state.isPreviewMode = enabled;
-
-    if (enabled) {
-      this.canvas.interactions.startRuntime();
-    } else {
-      this.canvas.interactions.stopRuntime();
-    }
-
-    this.emit(EVENTS.PREVIEW_MODE_CHANGED, { enabled });
-  }
-
-  /** Check if composer is in preview mode */
-  isPreviewMode(): boolean {
-    return !!this.state.isPreviewMode;
-  }
-
-  // ============================================
   // Cleanup
   // ============================================
 
@@ -1316,14 +1280,12 @@ ${html}${interactionScript}
   async destroy(): Promise<void> {
     this.emit(EVENTS.COMPOSER_DESTROY);
 
-    if (this.plugins?.destroy) await this.plugins.destroy();
     if (this.data?.destroy) this.data.destroy();
     if (this.canvas.indicators?.destroy) this.canvas.indicators.destroy();
     if (this.fonts?.destroy) this.fonts.destroy();
     if (this.components?.destroy) this.components.destroy();
     if (this.cms.bindings?.destroy) this.cms.bindings.destroy();
     if (this.collab.manager?.destroy) this.collab.manager.destroy();
-    if (this.forms?.destroy) this.forms.destroy();
     if (this.recovery?.destroy) this.recovery.destroy();
     if (this.media?.destroy) this.media.destroy();
     if (this.canvas.drag?.destroy) this.canvas.drag.destroy();

@@ -6,7 +6,7 @@
 import { ELEMENT_TYPE_LABELS, elementTypeLabel } from "@/shared/constants/elementTypeLabels";
 
 // Text elements that support inline editing
-export const TEXT_ELEMENT_TAGS = new Set([
+const TEXT_ELEMENT_TAGS = new Set([
   "h1",
   "h2",
   "h3",
@@ -68,7 +68,7 @@ export function getElementNameFromType(type: string, tagName?: string): string {
 /**
  * Get parent element name
  */
-export function getParentName(element: HTMLElement): string | null {
+function getParentName(element: HTMLElement): string | null {
   const parent = element.parentElement?.closest("[data-buildrick-id]") as HTMLElement | null;
   if (!parent) return null;
   return getFriendlyName(parent);

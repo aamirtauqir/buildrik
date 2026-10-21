@@ -2,7 +2,6 @@ import { z } from "zod";
 import { createRateLimitedProcedure, publicProcedure, protectedProcedure, router } from "../trpc";
 import { TRPCError } from "@trpc/server";
 import {
-  listCategories,
   searchArticles,
   listArticlesByCategory,
   getArticle,
@@ -16,8 +15,6 @@ import { supportTicketSchema } from "@buildrik/shared/schemas/help";
 const feedbackLimit = createRateLimitedProcedure(30, 15 * 60 * 1000);
 
 export const helpRouter = router({
-  categories: publicProcedure.query(() => listCategories()),
-
   search: publicProcedure
     .input(z.object({ query: z.string().min(1).max(200) }))
     .query(async ({ input }) => searchArticles(input.query)),

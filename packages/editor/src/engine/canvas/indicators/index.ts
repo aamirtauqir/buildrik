@@ -12,8 +12,6 @@ export { SpacingCalculator } from "./SpacingCalculator";
 export { SnapCalculator } from "./SnapCalculator";
 export { SelectionIndicatorManager } from "./SelectionIndicatorManager";
 export { MeasurementManager } from "./MeasurementManager";
-export { GuideManager } from "./GuideManager";
-export { AutoLayoutManager } from "./AutoLayoutManager";
 
 // Types
 export type { SimpleBounds, IndicatorContext } from "./types";

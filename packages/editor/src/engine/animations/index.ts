@@ -1,7 +1,9 @@
 /**
  * Animations Engine Index
  *
- * Only GSAPEngine remains (live consumer: InteractionRuntime).
+ * Only GSAPEngine remains (live consumer: the inspector easing list,
+ * `GSAPEngine.EASINGS`). InteractionRuntime, its only animation caller, was
+ * removed with InteractionManager.
  *
  * ScrollTriggerEngine + TimelineManager deleted 2026-05-18 — 778 LOC of
  * unused infrastructure flagged in the animation feature audit

@@ -1,23 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { DASHBOARD_TASK_IDS, wizardDataSchema, type WizardData } from "@buildrik/shared/schemas/onboarding";
 
-const STEP_SEQUENCE = [
-  "ROLE_SELECT",
-  "PROJECT_SETUP",
-  "SITE_CREATION",
-  "EDITOR_TOUR",
-  "CHECKLIST",
-  "COMPLETED",
-] as const;
-
-type OnboardingStep = (typeof STEP_SEQUENCE)[number];
-
-function nextStep(current: OnboardingStep): OnboardingStep {
-  const idx = STEP_SEQUENCE.indexOf(current);
-  if (idx === -1 || idx >= STEP_SEQUENCE.length - 1) return "COMPLETED";
-  return STEP_SEQUENCE[idx + 1];
-}
-
 // The full-variant checklist must be entirely done before onboarding flips
 // to completed (invited-variant users finish via dismiss).
 const FULL_CHECKLIST_TASK_IDS = DASHBOARD_TASK_IDS.filter((id) => id !== "edit-page");
@@ -80,31 +63,6 @@ export async function completeWizard(userId: string) {
   return prisma.onboardingState.update({
     where: { userId },
     data: { step: "CHECKLIST" },
-  });
-}
-
-export async function completeStep(userId: string, step: string) {
-  // Unknown input used to fall through nextStep's idx===-1 branch straight to
-  // COMPLETED — any stray caller could (and did) finish ALL of onboarding.
-  if (!STEP_SEQUENCE.includes(step as OnboardingStep)) {
-    throw new Error("INVALID_STEP");
-  }
-  // Closing the other half of the same hole: a KNOWN step was taken on trust
-  // and advanced from whatever the caller named, so completeStep("CHECKLIST")
-  // finished all of onboarding from a standing start no matter where the user
-  // actually was. That is not only a skip — `completed` permanently hides the
-  // dashboard checklist, and nothing brings it back. The step a caller reports
-  // finishing only counts when it is the one they are standing on; anything
-  // else, including the same step arriving twice, leaves the state alone.
-  const state = await prisma.onboardingState.findUnique({ where: { userId } });
-  if (!state) throw new Error("ONBOARDING_NOT_FOUND");
-  if (state.step !== step) return state;
-
-  const next = nextStep(step as OnboardingStep);
-  const isCompleted = next === "COMPLETED";
-  return prisma.onboardingState.update({
-    where: { userId },
-    data: { step: next, ...(isCompleted && { completed: true }) },
   });
 }
 

@@ -30,17 +30,6 @@ describe("Help Service", () => {
     vi.mocked(prisma.user.findUnique).mockResolvedValue(null as never);
   });
 
-  describe("listCategories()", () => {
-    it("returns 6 categories", async () => {
-      const { listCategories } = await import("@/server/services/help.service");
-      const result = listCategories();
-      expect(result).toHaveLength(6);
-      expect(result[0]).toHaveProperty("key");
-      expect(result[0]).toHaveProperty("label");
-      expect(result[0]).toHaveProperty("icon");
-    });
-  });
-
   describe("searchArticles(query)", () => {
     it("returns matching articles from prisma", async () => {
       const { searchArticles } = await import("@/server/services/help.service");

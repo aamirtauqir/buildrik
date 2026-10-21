@@ -722,26 +722,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
     setMediaFullPage(true);
   }, []);
 
-  const handleEditMedia = React.useCallback(
-    (item: { key: string; src: string; name: string }) => {
-      if (!onOpenImageEditor || !composer) return;
-      onOpenImageEditor(item.src, async (editedSrc) => {
-        try {
-          const res = await fetch(editedSrc);
-          const blob = await res.blob();
-          const file = new File([blob], `edited-${item.name}.webp`, { type: "image/webp" });
-          const result = await composer.media.uploadFile(file);
-          if (result.success && result.asset) {
-            composer.elements.getElement(item.key)?.setAttribute("src", result.asset.src);
-          }
-        } catch (err) {
-          console.error("Failed to save edited canvas media:", err);
-        }
-      });
-    },
-    [onOpenImageEditor, composer]
-  );
-
   /* The column-hosted tab (Publish · Review · History · Activity). One
      element, two hosts: the inspector column, and a VIEWER's (X-8). */
   const columnPanel = rightColumnTab ? (
@@ -844,7 +824,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
               showGrid={showGrid}
               showRulers={showRulers}
               showXRay={showXRay}
-              onOpenImageEditor={handleEditMedia}
               onZoomChange={onZoomChange}
               onOverlayChange={onOverlayChange}
               onDeviceChange={onDeviceChange}

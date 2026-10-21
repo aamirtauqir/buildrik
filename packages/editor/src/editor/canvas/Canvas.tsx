@@ -212,8 +212,8 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       onContextMenuClose: closeContextMenu,
     });
 
-    // Inspector pick mode — subscribe to inspector:pick-start/cancel events
-    // emitted by the ProInspector Crosshair button. While active, next canvas
+    // Pick mode — subscribe to inspector:pick-start/cancel events (emitted
+    // by the Content panel's pick-an-element button). While active, next canvas
     // click resolves the element under cursor and selects it instead of
     // running normal selection behavior. Escape key cancels.
     const [pickMode, setPickMode] = React.useState(false);

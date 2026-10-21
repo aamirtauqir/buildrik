@@ -26,14 +26,3 @@ export const SELECTION_HANDLE_SIZE = 12;
 
 /** Rotation handle offset from element */
 export const ROTATION_HANDLE_OFFSET = 24;
-
-
-// ============================================
-// Rulers & Guides
-// ============================================
-
-/** Ruler size in pixels (width for vertical, height for horizontal) */
-export const RULER_SIZE = 20;
-
-
-

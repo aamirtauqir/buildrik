@@ -121,13 +121,6 @@ export class SnapCalculator {
   }
 
   /**
-   * Get snap points
-   */
-  getSnapPoints(): SnapPoint[] {
-    return [...this.snapPoints];
-  }
-
-  /**
    * Calculate smart guides during drag operation
    */
   calculateSmartGuides(draggedElementId: string, draggedBounds: SimpleBounds): SmartGuide[] {
@@ -310,13 +303,6 @@ export class SnapCalculator {
         color: "#FF00FF",
       });
     }
-  }
-
-  /**
-   * Get current smart guides
-   */
-  getSmartGuides(): SmartGuide[] {
-    return [...this.smartGuides];
   }
 
   /**

@@ -151,26 +151,6 @@ export async function deleteWorkspaceComponent(
   return { deleted: res.count };
 }
 
-export async function getComponentUsage(
-  workspaceId: string,
-  componentId: string
-): Promise<{
-  componentId: string;
-  siteCount: number;
-  sites: Array<{ siteId: string; siteName: string; updatedAt: Date }>;
-}> {
-  const rows = await prisma.siteComponent.findMany({
-    where: { componentId, site: { workspaceId, deletedAt: null } },
-    orderBy: { updatedAt: "desc" },
-    select: { siteId: true, updatedAt: true, site: { select: { name: true } } },
-  });
-  return {
-    componentId,
-    siteCount: rows.length,
-    sites: rows.map((r) => ({ siteId: r.siteId, siteName: r.site.name, updatedAt: r.updatedAt })),
-  };
-}
-
 /**
  * FROM LIBRARY (board 4418:99857) / LINKED FROM LIBRARY (board 4418:142419):
  * the workspace's shared component library, as seen from one site. A master

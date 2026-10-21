@@ -48,8 +48,8 @@ export const ANIMATION_KEYFRAMES: Record<string, string> = {
   /* The inspector offers 39 presets; 20 of them had no keyframe here, so the
      Preview button and any element animation set to one of these names
      resolved against an undefined @keyframes and did nothing — on the canvas
-     AND on the published site. Bodies mirror the GSAP timelines in
-     InteractionRuntime's PRESET_TIMELINES so the two paths agree. */
+     AND on the published site. Bodies mirrored the GSAP timelines of
+     the (since removed) canvas InteractionRuntime. */
   "bd-anim-slideUp": "@keyframes bd-anim-slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}",
   "bd-anim-slideDown": "@keyframes bd-anim-slideDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}",
   "bd-anim-slideLeft": "@keyframes bd-anim-slideLeft{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}",

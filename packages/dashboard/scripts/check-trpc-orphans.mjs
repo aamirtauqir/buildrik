@@ -65,16 +65,7 @@ const ALLOWED = {
   "ai.logAdoption": "Server AI kept for the future Build tab; the editor AI surfaces were removed 2026-10-20 (owner: no AI this version).",
   "media.generateAltText": "Server AI kept for the future Build tab; the editor AI surfaces were removed 2026-10-20 (owner: no AI this version).",
   // --- superseded: a shipped screen already does this job ---
-  "billing.usage": "The Usage screen reads dashboard.usage; this is a second reader of the same numbers.",
-  "team.auditLog": "Reads activityLog — the same table /dashboard/activity already shows via dashboard.activity.",
-  "dashboard.quickActions": "Home's quick actions are a fixed list now (components/dashboard/quick-actions.tsx).",
-  "dashboard.recentSites": "Home shows recent ACTIVITY, not recent sites; the sites list is its own screen.",
-  "auth.logout": "Sign-out goes through NextAuth signOut + /api/auth/logout.",
   "sites.getProjectData": "The editor loads through sites.get; saves through sites.saveProject.",
-  "upload.limits": "Upload limits are read from PLAN_LIMITS on the client.",
-  "siteComponents.usage": "The editor's component library shows usage from its own local registry.",
-  "help.categories": "The Help index renders its categories from help.articles.",
-  "onboarding.completeStep": "The wizard persists its position through onboarding.saveProgress.",
 
   // --- built server-side, UI never built. A product decision, not dead code ---
   "theme.presets.list": "Theme presets: server half complete, no UI. FOUNDER DECISION — build or drop.",

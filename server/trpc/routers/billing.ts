@@ -2,12 +2,11 @@ import { z } from "zod";
 import { protectedProcedure, router } from "../trpc";
 import { TRPCError } from "@trpc/server";
 import {
-  getBillingOverview, getUsageDetails, listInvoices,
+  getBillingOverview, listInvoices,
   createCheckoutSession, createPortalSession,
   cancelSubscription, reactivateSubscription, getPlans,
 } from "@/server/services/billing.service";
 import { upgradeSchema, cancelSchema } from "@buildrik/shared/schemas/billing";
-import { type PlanName } from "@/lib/constants/plan-limits";
 import { resolveWorkspaceId as getWorkspaceId } from "@/server/trpc/workspace-ctx";
 import { checkWorkspaceRole, PermissionError } from "@/server/services/permission.service";
 
@@ -59,11 +58,6 @@ export const billingRouter = router({
     return getBillingOverview(wsId);
   }),
   plans: protectedProcedure.query(() => getPlans()),
-  usage: protectedProcedure.query(async ({ ctx }) => {
-    const wsId = await getWorkspaceId(ctx);
-    const overview = await getBillingOverview(wsId);
-    return getUsageDetails(wsId, overview.plan as PlanName);
-  }),
   invoices: protectedProcedure
     .input(z.object({ page: z.number().min(1).default(1), perPage: z.number().default(10) }))
     .query(async ({ ctx, input }) => {

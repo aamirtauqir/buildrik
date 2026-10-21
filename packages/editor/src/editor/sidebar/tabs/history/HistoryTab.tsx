@@ -339,8 +339,8 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
           />
         )}
 
-        {/* M2 — the published-version list's canonical home. Same component the
-            Publish panel embeds; rollback stays ADMIN-gated inside it. */}
+        {/* M2 — the published-version list's canonical home (HistoryTab is its
+            only host); rollback stays ADMIN-gated inside it. */}
         {activeView === "published" &&
           (siteId ? (
             <PublishHistory

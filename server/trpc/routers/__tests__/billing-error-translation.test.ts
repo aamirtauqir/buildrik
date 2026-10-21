@@ -44,7 +44,7 @@ vi.mock("@/server/services/permission.service", () => ({
   },
 }));
 vi.mock("@/server/services/billing.service", () => ({
-  getBillingOverview: vi.fn(), getUsageDetails: vi.fn(), listInvoices: vi.fn(), getPlans: vi.fn(),
+  getBillingOverview: vi.fn(), listInvoices: vi.fn(), getPlans: vi.fn(),
   createCheckoutSession: (...a: unknown[]) => createCheckoutSessionMock(...a),
   createPortalSession: (...a: unknown[]) => createPortalSessionMock(...a),
   cancelSubscription: (...a: unknown[]) => cancelSubscriptionMock(...a),
