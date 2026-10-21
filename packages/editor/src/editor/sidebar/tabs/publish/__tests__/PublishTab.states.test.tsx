@@ -28,6 +28,13 @@ vi.mock("@/services/PublishService", () => ({
   unpublishSite: (siteId: string) => unpublishSite(siteId),
 }));
 
+/* Unknown role by default — the panel does not gate on a role it has not read. */
+const fetchMyRole = vi.fn((): Promise<string | null> => Promise.resolve(null));
+vi.mock("@/services/RoleService", async () => {
+  const actual = await vi.importActual<Record<string, unknown>>("@/services/RoleService");
+  return { ...actual, fetchMyRole: () => fetchMyRole() };
+});
+
 vi.mock("@/editor/chrome-ui", async () => {
   const actual = await vi.importActual<Record<string, unknown>>("@/editor/chrome-ui");
   return { ...actual, useToast: () => ({ addToast: vi.fn(), removeToast: vi.fn(), toasts: [] }) };
@@ -579,6 +586,28 @@ describe("PublishTab — Unpublish has a door, one confirm, and tells the shell"
     expect(await screen.findByText("Unpublish site?")).toBeTruthy();
     expect(screen.getByTestId("unpublish-word")).toBeTruthy();
     expect(consumed).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not offer Unpublish to a role below ADMIN — the server would refuse it", async () => {
+    fetchMyRole.mockResolvedValueOnce("EDITOR");
+    fetchPublishHistory.mockResolvedValue([
+      { id: "j1", version: 3, completedAt: new Date(), deploymentId: "d", rollbackable: true, rolledBackFrom: null },
+    ]);
+    renderTab(
+      <PublishTab
+        composer={composerWith()}
+        projectId="site_1"
+        publishedUrl="https://bellacucina.com"
+        publishJob={job({ uiState: "idle", publishedUrl: "https://bellacucina.com" })}
+        nextMove={OPEN_MOVE} onRequestPublish={vi.fn()}
+      />,
+    );
+    await expandSections();
+    await waitFor(() => expect(screen.getByText("LIVE · v3")).toBeTruthy());
+    await waitFor(() => expect(fetchMyRole).toHaveBeenCalled());
+    await openPublishMenu();
+    expect(screen.getByRole("menuitem", { name: "All versions ›" })).toBeTruthy();
+    expect(screen.queryByRole("menuitem", { name: "Unpublish site…" })).toBeNull();
   });
 
   it("does not offer Unpublish on a deploy that is not serving", async () => {

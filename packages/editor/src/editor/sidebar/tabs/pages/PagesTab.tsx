@@ -451,7 +451,8 @@ export const PagesTab: React.FC<PagesTabProps> = ({
               >
                 {"\u2039"} Pages
               </Button>
-              <SearchListingsTable pages={p.pages} onEditPage={p.openSettings} onOpenFull={onExpandToggle} />
+              {/* Already wide: "Open full listings" would narrow it (REA P-7). */}
+              <SearchListingsTable pages={p.pages} onEditPage={p.openSettings} onOpenFull={isExpanded ? undefined : onExpandToggle} />
             </div>
           ) : (
           <PageList
