@@ -6,6 +6,7 @@
  * @license BSD-3-Clause
  */
 import { vi } from "vitest";
+import { DataSourceConflictError } from "@/engine/data/DataManager";
 import type { CMSCollection, CMSContentItem } from "@/shared/types/cms";
 
 type Handler = (p: unknown) => void;
@@ -78,6 +79,8 @@ export function makeEngine(opts?: {
       getAllSources: () => [...sources.values()],
       importSampleData: vi.fn((json: string) => {
         const parsed = JSON.parse(json) as Record<string, unknown>;
+        const taken = Object.keys(parsed).filter((key) => sources.has(key));
+        if (taken.length > 0) throw new DataSourceConflictError(taken);
         for (const key of Object.keys(parsed)) {
           sources.set(key, {
             id: key,

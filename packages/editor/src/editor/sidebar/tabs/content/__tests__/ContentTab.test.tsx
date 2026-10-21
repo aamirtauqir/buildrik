@@ -210,6 +210,24 @@ describe("ContentTab", () => {
     expect(await screen.findByText("products")).toBeInTheDocument();
   });
 
+  it("C-2: a key that names an existing source says so, and adds nothing", async () => {
+    const { composer } = makeEngine({ collections: [MENU], items: [] });
+    render(<ContentTab composer={composer as never} />);
+    fireEvent.click(await screen.findByText("Sources"));
+    fireEvent.click(await screen.findByRole("button", { name: "+ Connect a source" }));
+    const box = screen.getByLabelText("Source JSON");
+    fireEvent.change(box, { target: { value: '{"products": [{"name": "A"}]}' } });
+    fireEvent.click(screen.getByRole("button", { name: "Add source" }));
+    expect(await screen.findByText("products")).toBeInTheDocument();
+    fireEvent.click(await screen.findByRole("button", { name: "+ Connect a source" }));
+    fireEvent.change(screen.getByLabelText("Source JSON"), { target: { value: '{"extra": [1], "products": []}' } });
+    fireEvent.click(screen.getByRole("button", { name: "Add source" }));
+    const alert = await screen.findByRole("alert");
+    expect(alert).toHaveTextContent("“products” already exists as a source");
+    expect(alert).not.toHaveTextContent("Not valid JSON");
+    expect(composer.data.getAllSources().map((s: { id: string }) => s.id)).not.toContain("extra");
+  });
+
   /* Walked live 2026-08-18: typing into a new record and clicking the crumb
      returned to the collection and threw the value away without a word. The
      view already knows it is dirty — it renders "Unsaved changes · Discard ·
