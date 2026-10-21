@@ -20,25 +20,27 @@ import {
 } from "./libraryModal";
 
 interface StockSavedModalProps {
-  saved: { name: string } | null;
+  /** `video` — the dialog also saves stock videos; the board draws the image case. */
+  saved: { name: string; video?: boolean } | null;
   onClose(): void;
   onViewAsset(): void;
 }
 
 export function StockSavedModal({ saved, onClose, onViewAsset }: StockSavedModalProps) {
   if (!saved) return null;
+  const title = saved.video ? "Stock video saved" : "Stock image saved";
   return (
     <ModalRoot open onClose={onClose}>
-      <ModalContent size="table" srTitle="Stock image saved" data-testid="stock-saved">
+      <ModalContent size="table" srTitle={title} data-testid="stock-saved">
         <h2 className={LIBRARY_MODAL_TITLE} data-testid="stock-saved-title">
-          Stock image saved
+          {title}
         </h2>
         <ModalBody>
           <p className={LIBRARY_MODAL_BODY} data-testid="stock-saved-body">
             {saved.name} is now in your asset library.
           </p>
           <p className={LIBRARY_MODAL_BODY} data-testid="stock-saved-note">
-            Not used on this site. Choose it from Assets when you are ready to insert or replace an image.
+            Not used on this site. Choose it from Assets when you are ready to insert or replace {saved.video ? "a video" : "an image"}.
           </p>
         </ModalBody>
         <div className={LIBRARY_MODAL_FOOT} data-testid="stock-saved-foot">
