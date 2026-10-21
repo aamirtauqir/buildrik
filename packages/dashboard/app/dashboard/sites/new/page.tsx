@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useId, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { LayoutTemplate, Sparkles, FileText } from "lucide-react";
+import { LayoutTemplate, FileText } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { InputField } from "@/components/dashboard/primitives";
@@ -126,19 +126,6 @@ function NewSitePageInner() {
             <div>
               <p className="text-body font-semibold" style={{ color: "var(--color-text-primary)" }}>Use a Template</p>
               <p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>Browse the full template gallery</p>
-            </div>
-          </button>
-          <button
-            onClick={() => setView("ai-type")}
-            className="flex w-full items-center gap-4 rounded-lg border p-5 text-left transition-colors hover:bg-[var(--color-primary-subtle)]/30"
-            style={{ borderColor: "var(--color-border-default)" }}
-          >
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg" style={{ backgroundColor: "var(--color-primary-subtle)" }}>
-              <Sparkles className="h-6 w-6" style={{ color: "var(--color-primary)" }} />
-            </div>
-            <div>
-              <p className="text-body font-semibold" style={{ color: "var(--color-text-primary)" }}>Generate with AI</p>
-              <p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>Describe your site and let AI build it</p>
             </div>
           </button>
           <button

@@ -254,22 +254,23 @@ test.describe("onboarding · site", () => {
   });
 });
 
-// S3 · path-chooser — 3 build-path cards (AI / Template / Blank), each routing
-// via saveAndGo to its own flow. On a freshly-reset wizard (no workspace.role
-// captured yet) the "ai" path is the default recommendation, so its per-card
-// CTA ("Start AI Draft") is duplicated by the page's bottom recommended-path
-// CTA — both trigger the identical choose("ai") handler, so `.first()` is a
-// safe, deterministic way to hit the (leftmost, per-card) one.
+// S3 · path-chooser — 2 build-path cards (Template / Blank), each routing via
+// saveAndGo to its own flow. The AI Draft card is not offered this version (no
+// AI in the UI, R3-22). On a freshly-reset wizard (no workspace.role captured
+// yet) Template is the default recommendation, so its per-card CTA ("Browse
+// Templates") is duplicated by the page's bottom recommended-path CTA — both
+// trigger the identical choose("template") handler, so `.first()` is a safe,
+// deterministic way to hit the per-card one.
 test.describe("onboarding · path", () => {
-  test("AI Draft card routes to the AI-draft flow", async ({ page }) => {
+  test("offers no AI Draft card", async ({ page }) => {
     await page.goto("/onboarding/path");
-    await page.getByRole("button", { name: /^start ai draft$/i }).first().click();
-    await expect(page).toHaveURL(/\/onboarding\/ai\/basics/, { timeout: 15_000 });
+    await expect(page.getByRole("button", { name: /browse templates/i }).first()).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByRole("button", { name: /start ai draft/i })).toHaveCount(0);
   });
 
   test("Template card routes to the template flow", async ({ page }) => {
     await page.goto("/onboarding/path");
-    await page.getByRole("button", { name: /browse templates/i }).click();
+    await page.getByRole("button", { name: /browse templates/i }).first().click();
     await expect(page).toHaveURL(/\/onboarding\/template/, { timeout: 15_000 });
   });
 
@@ -282,24 +283,16 @@ test.describe("onboarding · path", () => {
 
 // A1-A5 · AI-draft flow — Business basics / Goal & audience / Brand style /
 // Generating / Draft ready frames. Each of the 3 form steps is reachable by
-// direct navigation (WizardBoot doesn't gate on prior-step data), matching
-// how the frame gallery + S3's "Start AI Draft" card land here.
+// direct navigation (WizardBoot doesn't gate on prior-step data) — the only
+// way in while S3 offers no AI Draft card (R3-22).
 //
 // Real generation calls the configured AI provider (OPENAI_API_KEY) and can
 // take minutes, so only the deterministic portion — basics → goal → brand
 // advancing, and the generating spinner appearing — runs by default. The
 // completed-draft assertion needs a live provider and is gated behind
 // PW_ONB_AI (unset in CI, so that test is skipped by default).
-//
-// Module-scoped (not local to the describe block below) so the full AI
-// walkthrough at the bottom of the file can reuse it without re-navigating —
-// `navigate: false` skips the initial goto when the caller already clicked
-// its way onto /onboarding/ai/basics.
-async function fillAiBasicsGoalBrand(
-  page: import("@playwright/test").Page,
-  opts: { navigate?: boolean } = {},
-) {
-  if (opts.navigate !== false) await page.goto("/onboarding/ai/basics");
+async function fillAiBasicsGoalBrand(page: import("@playwright/test").Page) {
+  await page.goto("/onboarding/ai/basics");
   await page.getByRole("button", { name: "Restaurant", exact: true }).click();
   await page.getByPlaceholder("Bright Events").fill("Sunrise Bakery");
   await page.getByPlaceholder("Event planning and coordination services").fill("Fresh bread and pastries daily");
@@ -434,7 +427,7 @@ test.describe("onboarding · blank + ready", () => {
   });
 });
 
-// Full-flow walkthroughs — one per build path (AI / Template / Blank), each
+// Full-flow walkthroughs — one per build path (Template / Blank), each
 // driven start-to-finish through client-side navigation (workspace → site →
 // path → the path's own flow → ready), unlike the per-step describes above
 // which each open a single frame directly. Every walkthrough ends by creating
@@ -446,7 +439,7 @@ test.describe("onboarding · full walkthroughs", () => {
     await resetOnboardingUser();
   });
 
-  // Shared workspace → site prefix for all three walkthroughs below. "My own
+  // Shared workspace → site prefix for both walkthroughs below. "My own
   // business" is picked at S2 purely to avoid the New-client field validation
   // (already covered by the S2 describe block above) — org type isn't what
   // these tests are about.
@@ -464,39 +457,12 @@ test.describe("onboarding · full walkthroughs", () => {
     await expect(page).toHaveURL(/\/onboarding\/path/, { timeout: 15_000 });
   }
 
-  test("AI full path: workspace → site → path → AI draft → generating spinner (draft-ready gated behind PW_ONB_AI)", async ({
-    page,
-  }) => {
-    await completeWorkspaceAndSiteSteps(page, "AI");
-
-    await page.getByRole("button", { name: /^start ai draft$/i }).first().click();
-    await expect(page).toHaveURL(/\/onboarding\/ai\/basics/, { timeout: 15_000 });
-
-    // Already on /onboarding/ai/basics via the click above — skip the helper's
-    // own goto so this walkthrough exercises the real client-side transitions.
-    await fillAiBasicsGoalBrand(page, { navigate: false });
-
-    await expect(page.getByRole("heading", { name: /creating your site draft/i })).toBeVisible({
-      timeout: 30_000,
-    });
-    await expect(page.getByText(/creating sitemap/i)).toBeVisible({ timeout: 30_000 });
-    await expect(page.getByRole("button", { name: /^cancel and go back$/i })).toBeVisible({ timeout: 30_000 });
-
-    // Real generation takes minutes — only assert the completed draft when a
-    // live AI provider is explicitly opted into.
-    if (process.env.PW_ONB_AI) {
-      await expect(page).toHaveURL(/\/onboarding\/ai\/preview/, { timeout: 180_000 });
-      await expect(page.getByRole("heading", { name: /your first draft is ready/i })).toBeVisible();
-      await expect(page.getByRole("button", { name: /^open in editor$/i })).toBeVisible();
-    }
-  });
-
   test("Template full path: workspace → site → path → template gallery → preview → selected → ready", async ({
     page,
   }) => {
     await completeWorkspaceAndSiteSteps(page, "Template");
 
-    await page.getByRole("button", { name: /browse templates/i }).click();
+    await page.getByRole("button", { name: /browse templates/i }).first().click();
     await expect(page).toHaveURL(/\/onboarding\/template/, { timeout: 15_000 });
 
     // "Studio Portfolio" (prisma/seed.ts) — same seeded template the T1-T3
