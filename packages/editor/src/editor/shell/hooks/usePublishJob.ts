@@ -33,6 +33,8 @@ const POLL_INTERVAL_MS = 2000;
 const FORMS_POLL_INTERVAL_MS = 15_000;
 const FORMS_POLL_MAX_MS = 10 * 60_000;
 const MAX_CONSECUTIVE_POLL_FAILURES = 3;
+/** Waits before re-asking the server for publish state after a failed mount read. */
+const HYDRATE_RETRY_DELAYS_MS = [2000, 5000];
 const TERMINAL = new Set(["COMPLETED", "FAILED", "CANCELLED"]);
 
 export type PublishUiState =
@@ -386,13 +388,22 @@ export function usePublishJob(): UsePublishJobResult {
     const siteId = getSiteIdFromUrl();
     if (!siteId) return;
     let cancelled = false;
+    /* P-5: a network blip at mount left a live site reading "Publish" (draft)
+       for the whole session. Retry a couple of times before giving up; the
+       draft UI stays only if the server never answers, and that is logged. */
     void (async () => {
-      try {
-        const state = await fetchSitePublishState(siteId);
+      for (let attempt = 0; attempt < HYDRATE_RETRY_DELAYS_MS.length + 1; attempt++) {
+        if (attempt > 0) await new Promise((r) => setTimeout(r, HYDRATE_RETRY_DELAYS_MS[attempt - 1]));
         if (cancelled) return;
-        setHydrated(state);
-      } catch {
-        // Hydration is best-effort — failures fall back to draft UI.
+        try {
+          const state = await fetchSitePublishState(siteId);
+          if (!cancelled) setHydrated(state);
+          return;
+        } catch (e) {
+          if (attempt === HYDRATE_RETRY_DELAYS_MS.length) {
+            console.warn("[publish] publish-state hydrate failed; showing draft state", e);
+          }
+        }
       }
     })();
     return () => {
