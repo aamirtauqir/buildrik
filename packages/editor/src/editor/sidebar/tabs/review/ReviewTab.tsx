@@ -264,15 +264,21 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
   /* Every mutation in this panel — reply, resolve, reopen — lands here. The
      canvas draws the same comments as pins and refetches them on
      "comments:refresh". */
+  const { addToast } = useToast();
   const reload = React.useCallback(async () => {
     try {
       setComments(await fetchReviewComments());
       setRound(await fetchCurrentRound());
       composer?.emit("comments:refresh", {});
     } catch {
-      /* keep the current view; the next explicit load surfaces errors */
+      /* The list on screen is stale; say so instead of keeping it silently (R-2). */
+      addToast({
+        key: "review-refresh-failed",
+        tone: "warning",
+        description: "The comment list didn't refresh. Reopen Review to see the latest.",
+      });
     }
-  }, [composer]);
+  }, [composer, addToast]);
 
   /* Board 156:2 labels a group "OPEN · HOME" — the page's NAME. The engine is
      the only thing that knows it; without this the panel printed the raw
@@ -493,7 +499,6 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
      page-then-select seam (C2, #39). An anchor deleted since the list loaded
      moves the row into the Detached group — where it has Reattach, not
      Locate (#27) — and a toast says why nothing was selected. */
-  const { addToast } = useToast();
   const locate = React.useCallback(
     (c: ReviewComment) => {
       if (!composer) return;
