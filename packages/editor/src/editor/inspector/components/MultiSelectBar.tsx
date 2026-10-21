@@ -10,13 +10,15 @@
  * The panel below is the SAME panel as for one element — the sections every
  * selected type has, with "Mixed" where they differ — not a separate batch
  * panel. Align / Distribute are actions, not a state: no option stays lit.
+ * They move elements by left/top from their rendered boxes, so they are shut,
+ * with the reason, while any member sits in the normal flow (static).
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
 import type { Composer } from "@/engine";
-import { AlignmentHandler } from "@/engine/canvas/AlignmentHandler";
+import { AlignmentHandler, isMovable, type RenderedBox } from "@/engine/canvas/AlignmentHandler";
 import { Button } from "@/editor/chrome-ui";
 import { ActionRow } from "../sections/behaviourRows";
 
@@ -35,14 +37,39 @@ const SEGMENT = "tw:flex tw:h-6 tw:shrink-0 tw:gap-0 tw:rounded-[4px] tw:bg-[var
 const ROW = "tw:flex tw:h-8 tw:items-center tw:gap-2 tw:px-3";
 const LABEL = "tw:shrink-0 tw:truncate tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 
+const IN_FLOW_REASON = "Align and Distribute move positioned elements only — set Position to Absolute or Relative first";
+
+/** The element's box on the canvas, zoom removed (offsetWidth ignores transforms). */
+function measureRenderedBox(id: string): RenderedBox | null {
+  const node = document.querySelector<HTMLElement>(`[data-buildrick-id="${CSS.escape(id)}"]`);
+  if (!node) return null;
+  const rect = node.getBoundingClientRect();
+  const scale = node.offsetWidth && rect.width ? rect.width / node.offsetWidth : 1;
+  const computed = getComputedStyle(node);
+  return {
+    left: rect.left / scale,
+    top: rect.top / scale,
+    width: rect.width / scale,
+    height: rect.height / scale,
+    position: computed.position,
+    cssLeft: parseFloat(computed.left) || 0,
+    cssTop: parseFloat(computed.top) || 0,
+  };
+}
+
 export function MultiSelectBar({ composer, selectedIds }: MultiSelectBarProps) {
-  const handler = React.useMemo(() => (composer ? new AlignmentHandler(composer) : null), [composer]);
+  const handler = React.useMemo(() => (composer ? new AlignmentHandler(composer, measureRenderedBox) : null), [composer]);
   const ids = [...selectedIds];
   const n = ids.length;
+  const inFlow = ids.some((id) => {
+    const box = measureRenderedBox(id);
+    return !box || !isMovable(box);
+  });
   /* The engine groups siblings only; say why rather than a dead click. */
   const parents = ids.map((id) => composer?.elements.getElement(id)?.getParent?.()?.getId?.() ?? null);
   const sameParent = parents.length > 1 && parents.every((p) => p !== null && p === parents[0]);
-  const canDistribute = Boolean(handler) && n >= 3;
+  const canAlign = Boolean(handler) && n >= 2 && !inFlow;
+  const canDistribute = canAlign && n >= 3;
 
   const align: [string, string, () => void][] = [
     ["Align left", "⇤", () => handler?.alignHorizontal(ids, "left")],
@@ -59,7 +86,12 @@ export function MultiSelectBar({ composer, selectedIds }: MultiSelectBarProps) {
         <span className={`${LABEL} tw:w-16`} id="inspector-multi-align-label" data-testid="inspector-multi-align-label">
           Align
         </span>
-        <div className={`${SEGMENT} tw:w-[204px]`} role="group" aria-labelledby="inspector-multi-align-label">
+        <div
+          className={`${SEGMENT} tw:w-[204px]`}
+          role="group"
+          aria-labelledby="inspector-multi-align-label"
+          title={inFlow ? IN_FLOW_REASON : undefined}
+        >
           {align.map(([label, glyph, run]) => (
             <Button
               key={label}
@@ -67,7 +99,7 @@ export function MultiSelectBar({ composer, selectedIds }: MultiSelectBarProps) {
               aria-label={label}
               title={label}
               className={OPTION}
-              disabled={!handler || n < 2}
+              disabled={!canAlign}
               onClick={run}
             >
               <span aria-hidden="true">{glyph}</span>
@@ -83,7 +115,7 @@ export function MultiSelectBar({ composer, selectedIds }: MultiSelectBarProps) {
           className={`${SEGMENT} tw:w-40`}
           role="group"
           aria-labelledby="inspector-multi-distribute-label"
-          title={canDistribute ? undefined : "Distribute needs 3 or more elements"}
+          title={canDistribute ? undefined : inFlow ? IN_FLOW_REASON : "Distribute needs 3 or more elements"}
         >
           <Button
             type="button"
