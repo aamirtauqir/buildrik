@@ -35,12 +35,22 @@ export function useVersionSync(
     // VersionTimelineManager already loaded IndexedDB at init (before hydrate
     // writes), so when hydrate adds server versions, re-read the store + emit
     // the list-updated event (setProjectId) so they show WITHOUT a 2nd reload.
-    void hydrateVersionsFromServer().then((added) => {
-      if (added > 0) {
-        const sid = getSiteIdFromUrl();
-        if (sid) void composer.versions.setProjectId(sid);
-      }
-    });
+    const hydrate = () =>
+      void hydrateVersionsFromServer(() =>
+        addToast?.({
+          key: "version-hydrate-failed",
+          title: "Couldn't load versions from the server",
+          description: "Versions saved on other devices may be missing from the list.",
+          tone: "warning",
+          action: { label: "Try again", onClick: hydrate },
+        }),
+      ).then((added) => {
+        if (added > 0) {
+          const sid = getSiteIdFromUrl();
+          if (sid) void composer.versions.setProjectId(sid);
+        }
+      });
+    hydrate();
 
     const onCreated = (p: VersionCreatedPayload) => void mirrorVersionCreate(p.version, p.isAuto);
     const onDeleted = (p: VersionDeletedPayload) => void mirrorVersionDelete(p.versionId);

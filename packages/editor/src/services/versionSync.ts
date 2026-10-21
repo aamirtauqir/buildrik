@@ -123,7 +123,9 @@ const HYDRATE_CHUNK = 10;
  * has no stamp at all; otherwise the local name stays and its rename is mirrored
  * again (a rename made offline survives a reload — the retry queue is in memory
  * and does not). Returns how many versions were added or renamed —
- * they surface on the next version-list read. Best-effort; never throws.
+ * they surface on the next version-list read. Best-effort; never throws —
+ * a failure is reported through `onError` (H-7: a teammate's versions
+ * silently did not appear).
  *
  * Bounded (walk 2026-09-24): on a cold cache it fetched every missing payload
  * one after another — 50 sequential `siteVersions.get` in 6.7 s on open,
@@ -131,7 +133,7 @@ const HYDRATE_CHUNK = 10;
  * versions (the list comes back newest-first), fetched concurrently in
  * chunks so tRPC batches each chunk into one request.
  */
-export async function hydrateVersionsFromServer(): Promise<number> {
+export async function hydrateVersionsFromServer(onError?: (e: unknown) => void): Promise<number> {
   const siteId = getSiteIdFromUrl();
   if (!siteId) return 0;
   let added = 0;
@@ -222,6 +224,7 @@ export async function hydrateVersionsFromServer(): Promise<number> {
   } catch (e) {
     // eslint-disable-next-line no-console
     console.warn("[version-sync] hydrate from server failed", e);
+    onError?.(e);
   }
   return added;
 }

@@ -294,8 +294,10 @@ describe("versionSync hydrate edge paths", () => {
   it("a failed hydrate warns + resolves 0 — never throws into editor open", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     list.mockRejectedValueOnce(new Error("offline"));
-    await expect(hydrateVersionsFromServer()).resolves.toBe(0);
+    const onError = vi.fn();
+    await expect(hydrateVersionsFromServer(onError)).resolves.toBe(0);
     expect(warn).toHaveBeenCalledWith("[version-sync] hydrate from server failed", expect.any(Error));
+    expect(onError).toHaveBeenCalledWith(expect.any(Error)); // H-7: reported, not console-only
     warn.mockRestore();
   });
 
