@@ -23,6 +23,7 @@ import type { Composer } from "@/engine/Composer";
 import type { LibraryItem, VersionEntry } from "@/editor/sidebar/tabs/media/data/mediaTypes";
 import { formatBytes } from "@shared/utils/helpers/number";
 import { versionLabel, collectUsageByPage } from "@/editor/sidebar/tabs/media/data/mediaUtils";
+import { useAltTextDraft } from "@/editor/sidebar/tabs/media/hooks/useAltTextDraft";
 import {
   Button,
   IconButton,
@@ -181,9 +182,10 @@ export interface AssetDetailsPanelProps {
   composer: Composer;
   addToast(t: ToastInput): void;
   /**
-   * P7 — write user-typed alt text back to the engine.
+   * P7 — write user-typed alt text back. Called once per commit (blur or
+   * Enter, `useAltTextDraft`); a rejection shows under the field.
    */
-  onUpdateAltText?(key: string, altText: string): void;
+  onUpdateAltText?(key: string, altText: string): Promise<void>;
   /**
    * BLOCKERS C3 (authority `code:tag-writer`) — write the file's whole tag
    * list back. The Clone draws the TAGS chips (3695:45155) and the tag filter
@@ -693,11 +695,15 @@ export function AssetDetailsPanel({
 
 interface AltTextSectionProps {
   item: LibraryItem;
-  onUpdateAltText(key: string, altText: string): void;
+  onUpdateAltText(key: string, altText: string): Promise<void>;
 }
 
 function AltTextSection({ item, onUpdateAltText }: AltTextSectionProps) {
-  const altText = item.altText ?? "";
+  const { field: draftProps, saveFailed } = useAltTextDraft(item, onUpdateAltText);
+  const altText = draftProps.value;
+  /* The box follows the SAVED text, not the draft: swapping branches
+     remounts the textarea, which would drop focus mid-typing. */
+  const saved = !!item.altText;
   const field = (filled: boolean) => (
     <Textarea
       className={
@@ -706,11 +712,10 @@ function AltTextSection({ item, onUpdateAltText }: AltTextSectionProps) {
           : "tw:bg-white tw:focus:border-primary-700 tw:focus:ring-primary-700"
       }
       id={`alt-text-${item.key}`}
-      value={altText}
+      {...draftProps}
       maxLength={ALT_TEXT_MAX}
       rows={2}
       placeholder="Add a description for this image"
-      onChange={(e) => onUpdateAltText(item.key, e.target.value)}
     />
   );
   return (
@@ -718,7 +723,7 @@ function AltTextSection({ item, onUpdateAltText }: AltTextSectionProps) {
       <label htmlFor={`alt-text-${item.key}`} className="mgr-det-label">
         Alt text
       </label>
-      {altText ? (
+      {saved ? (
         /* 4418:58292 — written alt text reads as a grey box: the text, then
            its length. The field stays editable in place. */
         <div className="mgr-alt-box tw:flex tw:flex-col tw:gap-1.5 tw:rounded-[var(--bk-radius-md)] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-subtle)] tw:p-2" data-testid="alt-text-box">
@@ -733,9 +738,14 @@ function AltTextSection({ item, onUpdateAltText }: AltTextSectionProps) {
         <>
           {field(false)}
           <div className="tw:flex tw:items-center tw:justify-between tw:gap-2 tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-ink-disabled)]">
-            <span>0 / {ALT_TEXT_MAX}</span>
+            <span>{altText.length} / {ALT_TEXT_MAX}</span>
           </div>
         </>
+      )}
+      {saveFailed && (
+        <p role="alert" data-testid="alt-text-error" className="tw:mt-1 tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-error-text)]">
+          Could not save the alt text — the server did not save the change.
+        </p>
       )}
     </div>
   );

@@ -61,6 +61,15 @@ describe("DynamicPagesPane", () => {
     expect(screen.getByTestId("cms-dp-save")).toHaveTextContent("Generate 2 pages");
   });
 
+  it("C-6: a refused save says so instead of ending in silence", async () => {
+    const { updateCollection } = mount(MENU, [rec("a", "Margherita")]);
+    updateCollection.mockRejectedValueOnce(new Error("quota"));
+    fireEvent.change(screen.getByTestId("cms-dp-pattern"), { target: { value: "/menu/{slug}" } });
+    fireEvent.click(screen.getByTestId("cms-dp-save"));
+    expect(await screen.findByText("Could not save dynamic pages")).toBeInTheDocument();
+    expect(screen.queryByText("Dynamic pages saved")).toBeNull();
+  });
+
   it("refuses a pattern that names no field and offers the fix (4418:164278)", () => {
     mount(MENU, [rec("a", "Margherita")]);
     fireEvent.change(screen.getByTestId("cms-dp-pattern"), { target: { value: "/menu/{title}" } });

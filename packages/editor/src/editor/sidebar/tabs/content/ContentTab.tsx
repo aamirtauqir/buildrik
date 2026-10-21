@@ -18,6 +18,7 @@
 import * as React from "react";
 import { Button, PanelHeader, SectionHeader, SkeletonBlock } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
+import { DataSourceConflictError } from "@/engine/data/DataManager";
 import type { ConditionExpression } from "@/shared/types/data";
 import {
   getCmsHydrationStatus,
@@ -111,8 +112,13 @@ export const ContentTab: React.FC<ContentTabProps> = ({
       composer.data.importSampleData(json);
       reload();
       return null;
-    } catch {
-      return "Not valid JSON — check the syntax and try again.";
+    } catch (err) {
+      if (err instanceof DataSourceConflictError) {
+        const names = err.ids.map((id) => `“${id}”`).join(", ");
+        return `${names} already ${err.ids.length === 1 ? "exists" : "exist"} as a source — rename ${err.ids.length === 1 ? "that key" : "those keys"} and try again. Nothing was added.`;
+      }
+      if (err instanceof SyntaxError) return "Not valid JSON — check the syntax and try again.";
+      return "Could not add the source — nothing was added.";
     }
   };
 

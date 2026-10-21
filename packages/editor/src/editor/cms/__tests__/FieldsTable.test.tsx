@@ -43,7 +43,7 @@ function engine() {
     getDataBindings: () => ({}),
     removeDataBinding: () => {},
   });
-  (e.composer.cms.collections as unknown as { updateField: unknown }).updateField = vi.fn(() => Promise.resolve(null));
+  (e.composer.cms.collections as unknown as { updateField: unknown }).updateField = vi.fn((_c: string, id: string) => Promise.resolve({ id }));
   return e;
 }
 
@@ -88,6 +88,14 @@ describe("FieldInspector", () => {
     const updateField = (e.composer.cms.collections as unknown as { updateField: ReturnType<typeof vi.fn> }).updateField;
     return { updateField, onDeleteField, onOpenUse };
   }
+
+  it("C-6: a refused change is said under the field, not dropped", async () => {
+    const { updateField } = mount(1);
+    updateField.mockRejectedValueOnce(new Error("quota"));
+    fireEvent.change(screen.getByTestId("cms-fi-name"), { target: { value: "Cost" } });
+    fireEvent.blur(screen.getByTestId("cms-fi-name"));
+    expect(await screen.findByTestId("cms-fi-save-error")).toHaveTextContent("Could not save that change");
+  });
 
   it("edits name, key and required of an unbound field; summarises its rule", () => {
     const { updateField } = mount(1);

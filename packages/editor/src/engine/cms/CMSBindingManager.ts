@@ -116,6 +116,10 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
     // Only published records resolve, so a status change re-resolves too (L3-016).
     this.cmsManager.on(EVENTS.CMS_CONTENT_PUBLISHED, () => this.reapplyAll());
     this.cmsManager.on(EVENTS.CMS_CONTENT_UNPUBLISHED, () => this.reapplyAll());
+    this.cmsManager.on(EVENTS.CMS_COLLECTION_REKEYED, (payload: unknown) => {
+      const { from, to } = (payload ?? {}) as { from?: string; to?: string };
+      if (from && to) this.rekeyCollection(from, to);
+    });
 
     /* BD-22 / BD-06: a binding lives as long as its element, and a copy of
        the element carries a copy of it. Bindings sit in this map, keyed by
@@ -134,6 +138,42 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
     this.composer.on?.(EVENTS.PROJECT_CHANGED, (payload: unknown) => {
       if ((payload as { type?: string } | null)?.type === "page:deleted") this.pruneMissing();
     });
+  }
+
+  /**
+   * REA C-7: a duplicate collection made on this device was merged into the
+   * server's (cmsSync `adoptServerCollection`) — its records moved, and the
+   * field and list bindings made to the local id move with them instead of
+   * naming a collection that no longer exists. Not a user edit, so it is
+   * saved (the map is part of the project) without a history step.
+   */
+  private rekeyCollection(fromId: string, toId: string): void {
+    const field = this.export();
+    const fieldHit = Object.values(field).some((list) => list.some((b) => b.collectionId === fromId));
+    if (fieldHit) {
+      const next: Record<string, CMSElementBinding[]> = {};
+      for (const [elementId, list] of Object.entries(field)) {
+        next[elementId] = list.map((b) =>
+          b.collectionId === fromId
+            ? { ...b, collectionId: toId, binding: { ...b.binding, sourceId: `cms:${toId}` } }
+            : b,
+        );
+      }
+      this.import(next);
+    }
+    let listHit = false;
+    for (const [elementId, binding] of this.collectionBindings) {
+      if (binding.collectionId !== fromId) continue;
+      this.collectionBindings.set(elementId, { ...binding, collectionId: toId });
+      this.composer.emit(EVENTS.CMS_COLLECTION_BOUND, { elementId, collectionId: toId });
+      listHit = true;
+    }
+    if (!fieldHit && !listHit) return;
+    const dirty = () => this.composer.markDirty?.();
+    const history = this.composer.history;
+    if (history?.runWithoutTracking) history.runWithoutTracking(dirty);
+    else dirty();
+    void this.reapplyAll();
   }
 
   /** An element's field AND list bindings, gone with it. */

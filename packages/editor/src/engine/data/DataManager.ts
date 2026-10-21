@@ -39,6 +39,15 @@ import type { Element } from "../elements/Element";
 import { EventEmitter } from "../EventEmitter";
 import { getTransformFunction as getCentralizedTransform } from "../utils/Transforms";
 
+/** A sample import names sources that already exist (REA 2026-10-20 C-2).
+ *  Nothing was registered: the import is all-or-nothing. */
+export class DataSourceConflictError extends Error {
+  constructor(readonly ids: string[]) {
+    super(`Data source ${ids.map((id) => `"${id}"`).join(", ")} already exists`);
+    this.name = "DataSourceConflictError";
+  }
+}
+
 /**
  * Data Manager
  * Central hub for all data-related operations
@@ -310,10 +319,16 @@ export class DataManager extends EventEmitter {
   }
 
   /**
-   * Import sample data for testing
+   * Import sample data: one source per top-level key. Every key is checked
+   * against the registered sources (the site-variables source included)
+   * before any is added, so a collision throws `DataSourceConflictError`
+   * with nothing half-imported. Malformed JSON throws JSON.parse's
+   * SyntaxError.
    */
   importSampleData(json: string): void {
     const data = JSON.parse(json) as Record<string, unknown>;
+    const taken = Object.keys(data).filter((key) => this.sources.has(key));
+    if (taken.length > 0) throw new DataSourceConflictError(taken);
 
     // Auto-create data sources from JSON structure
     Object.entries(data).forEach(([key, value]) => {

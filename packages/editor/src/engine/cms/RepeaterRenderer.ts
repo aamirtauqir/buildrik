@@ -175,15 +175,33 @@ export class RepeaterRenderer {
       const intoTemplate = canvas && index === 0;
       const nodes = intoTemplate ? templates : pristine.map((t) => t.cloneNode(true) as HTMLElement);
       for (const node of nodes) {
+        const slots = canvas ? [] : this.placeholderSlots(node, binding.itemVar || "item");
         this.applyContext(node, context, binding, null, refs);
-        this.applyCurrentItem(node, listEl, item, binding.collectionId, canvas);
+        slots.push(...this.applyCurrentItem(node, listEl, item, binding.collectionId, canvas));
         if (intoTemplate) continue;
         if (canvas) node.setAttribute("data-cms-repeater-clone", String(index));
-        else this.clearUnresolved(node, binding.itemVar || "item");
+        else {
+          this.clearUnresolved(node, binding.itemVar || "item");
+          /* #21: a slot this record has nothing for ships as nothing, not as
+             an empty <p> holding the card's space open. */
+          const empty = slots.filter((slot) => !slot.textContent?.trim() && slot.children.length === 0);
+          if (empty.includes(node)) continue;
+          empty.forEach((slot) => slot.remove());
+        }
         listEl.appendChild(node);
       }
     });
     if (!canvas) templates.forEach((t) => t.remove());
+  }
+
+  /** Elements in a copy whose whole text is `{{item.…}}` placeholders — what
+   *  they show comes only from the record. Raw-text elements are never
+   *  substituted (see applyContext), so they are not slots. */
+  private placeholderSlots(node: HTMLElement, itemVar: string): HTMLElement[] {
+    const only = new RegExp(`^\\s*(?:\\{\\{\\s*${escapeRegExp(itemVar)}\\.[\\w.-]+\\s*\\}\\}\\s*)+$`);
+    return [node, ...Array.from(node.querySelectorAll<HTMLElement>("*"))].filter(
+      (el) => el.children.length === 0 && !el.matches(RAW_TEXT_SELECTOR) && only.test(el.textContent ?? ""),
+    );
   }
 
   /**
@@ -193,7 +211,8 @@ export class RepeaterRenderer {
    * same record. An element inside a nested list belongs to that list.
    * The canvas keeps an element's own text when the record has no value
    * (as the page-wide preview does); the export writes the fallback, or
-   * nothing (C0.7).
+   * nothing (C0.7). Returns the elements whose content the export left
+   * empty that way.
    */
   private applyCurrentItem(
     node: HTMLElement,
@@ -201,7 +220,8 @@ export class RepeaterRenderer {
     item: CMSContentItem,
     collectionId: string,
     canvas: boolean,
-  ): void {
+  ): HTMLElement[] {
+    const emptied: HTMLElement[] = [];
     const bindings = this.composer.cms.bindings;
     const rich = richtextKeys(this.composer.cms.collections?.getCollection?.(collectionId)?.fields);
     const isList = (el: Element) => bindings.getCollectionBinding?.(el.getAttribute("data-buildrick-id") ?? "")?.repeat === "children";
@@ -218,10 +238,12 @@ export class RepeaterRenderer {
         const value = cmsTextOf(item.data[b.fieldSlug]) || b.fallback || "";
         if (canvas && !value) continue;
         writeBoundValue(el, b.property, value, rich.has(b.fieldSlug));
+        if (!value && b.property === "content") emptied.push(el);
       }
       el.setAttribute(CURRENT_ITEM_ATTR, collectionId);
       if (canvas) el.setAttribute("data-cms-bound", "true");
     }
+    return emptied;
   }
 
   /** A published page never shows `{{item.x}}` for a field the record does

@@ -407,12 +407,12 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
     async (key: string, updates: Partial<LibraryItem>) => {
       const assetUpdates: Partial<MediaAsset> = {};
       if (updates.name) assetUpdates.name = updates.name;
-      if (updates.altText !== undefined) assetUpdates.altText = updates.altText;
+      if (updates.altText !== undefined) {
+        assetUpdates.altText = updates.altText;
+        // A user-typed alt text is no longer generated text, empty included.
+        assetUpdates.generatedMetadata = undefined;
+      }
       if (updates.tags !== undefined) assetUpdates.tags = updates.tags;
-      /* A drawer version restore: the server already points the asset at
-         the version's URL; the library row has to follow or nothing changes
-         until a reload (REA 2026-10-20 #14). */
-      if (updates.src) assetUpdates.src = updates.src;
       await composer.media.updateAsset(key, assetUpdates);
     },
     [composer]

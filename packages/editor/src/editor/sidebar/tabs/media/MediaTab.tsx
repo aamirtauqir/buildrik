@@ -101,20 +101,27 @@ function MediaTabWithComposer({
       if (!onOpenImageEditor) return;
       const parentKey = item.versionOf ?? item.key;
       const onSave = async (editedSrc: string, edits?: EditsSnapshot) => {
+        /* The family's parent names, files and owns the history — editing a
+           version must not link the server history row to that version
+           (REA 2026-10-20 M-6; LibraryManager's save does the same). */
+        const parent = composer.media.getAsset(parentKey);
+        const parentName = parent?.name ?? item.name;
+        const parentFolderId = parent ? parent.folderId : item.folderId;
+        const parentServerId = parent ? parent.serverId : item.assetId;
         const res = await fetch(editedSrc);
         const blob = await res.blob();
         const versionCount = composer.media.getAssets().filter((a) => a.versionOf === parentKey).length;
-        const stem = item.name.replace(/\.[^/.]+$/, "");
+        const stem = parentName.replace(/\.[^/.]+$/, "");
         const file = new File([blob], displayNameFor(`${stem}-v${versionCount + 2}`, blob.type), { type: blob.type });
         const result = await composer.media.uploadFile(file, {
-          ...(item.folderId ? { folderId: item.folderId } : {}),
+          ...(parentFolderId ? { folderId: parentFolderId } : {}),
           versionOf: parentKey,
           ...(edits ? { edits } : {}),
         });
         if (!result.success || !result.asset) throw new Error(result.error ?? "Could not save the version");
         const saved = result.asset;
-        if (item.assetId && saved.serverId && !saved.localOnly) {
-          createAssetVersion({ assetId: item.assetId, url: saved.src, bytes: saved.size, edits: edits ?? {} }).catch(() => {
+        if (parentServerId && saved.serverId && !saved.localOnly) {
+          createAssetVersion({ assetId: parentServerId, url: saved.src, bytes: saved.size, edits: edits ?? {} }).catch(() => {
             /* History is a convenience; the version itself has landed. */
           });
         }

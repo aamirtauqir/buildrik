@@ -1,12 +1,11 @@
 /**
  * MediaVersionService — Editor → dashboard asset-version bridge.
  *
- * Companion to AssetUploadService. Calls the `media.listAssetVersions`,
- * `media.createAssetVersion`, and `media.restoreAssetVersion` tRPC endpoints
- * (server-side version history keyed on the dashboard MediaAsset id). The
- * editor's media items expose that id as `LibraryItem.assetId` (from
- * MediaAsset.serverId), so the detail drawer's Versions tab can read + restore
- * the real history rather than only the local sibling-file heuristic.
+ * Companion to AssetUploadService. Calls the `media.listAssetVersions` and
+ * `media.createAssetVersion` tRPC endpoints (server-side version history
+ * keyed on the dashboard MediaAsset id). The editor's media items expose that
+ * id as `LibraryItem.assetId` (from MediaAsset.serverId), so the detail
+ * drawer's Versions view can list the real history.
  *
  * @license BSD-3-Clause
  */
@@ -47,9 +46,4 @@ export async function createAssetVersion(input: {
   edits: Record<string, unknown>;
 }): Promise<AssetVersion> {
   return (await getClient().media.createAssetVersion.mutate(input)) as unknown as AssetVersion;
-}
-
-/** Restore: point the parent asset back at this version's URL/bytes. */
-export async function restoreAssetVersion(versionId: string): Promise<{ id: string; url: string }> {
-  return (await getClient().media.restoreAssetVersion.mutate({ versionId })) as { id: string; url: string };
 }

@@ -302,8 +302,9 @@ export function useContentPanel(composer: Composer | null): UseContentPanelRetur
     async (collectionId: string, field: Omit<CMSField, "id" | "order">) => {
       if (!composer) return;
       const order = composer.cms.collections.getCollection(collectionId)?.fields.length ?? 0;
-      await composer.cms.collections.addField(collectionId, { ...field, order });
+      const added = await composer.cms.collections.addField(collectionId, { ...field, order });
       reload();
+      if (!added) throw new Error("The collection no longer exists.");
     },
     [composer, reload],
   );
