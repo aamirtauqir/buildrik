@@ -520,6 +520,11 @@ export const sitesRouter = router({
           });
         if (e instanceof Error && e.message === "WORKSPACE_DELETION_SCHEDULED")
           throw new TRPCError({ code: "PRECONDITION_FAILED", message: WORKSPACE_DELETION_SCHEDULED_MESSAGE });
+        if (e instanceof Error && e.message === "NO_PAGES")
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Nothing to publish. Open the site in the editor and publish from there.",
+          });
         // Sites deploy into the workspace's own Vercel account. The pre-publish
         // check already disables the button, but the editor and the API can still
         // reach here — they get a reason, not a 500.
