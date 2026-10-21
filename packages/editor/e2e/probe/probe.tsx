@@ -218,14 +218,11 @@ const FAILED_UPLOAD: UploadProgress[] = [
  * drawer's own 320 to be measurable at all — mounting one bare stretches it to
  * the probe root and every width reads wrong.
  *
- * `versions` (146:32) used to be deliberately absent, on the reasoning that
- * its rows "come from IndexedDB". They do not: `reloadDbVersions` calls
- * `listAssetVersions`, which is a tRPC read over the wire (MediaVersionService
- * :34), and the probe already answers that transport for the review surfaces.
- * So the versions case stubs `media.listAssetVersions` — the component mounts
- * exactly as it ships and the only thing faked is what the server said. The
- * old reasoning is what left a board with four drawn rows measured against a
- * screen that had none.
+ * `versions` (146:32 / v3 4418:62883) lists the asset's FAMILY — the
+ * original and its saved versions, the rows the library's Asset versions
+ * dialog lists too (`useAssetVersions`). The fixture hands the overlay that
+ * family and answers `getUsages` so the site carries the newest; the server
+ * history (`media.listAssetVersions`, stubbed) only supplies author lines.
  */
 const DETAIL_ITEM: LibraryItem = MEDIA_ITEM({
   key: "hero",
@@ -237,28 +234,44 @@ const DETAIL_ITEM: LibraryItem = MEDIA_ITEM({
 });
 
 /**
- * Restore points as `media.listAssetVersions` returns them: newest first, and
- * `assetId` present on the ITEM (without it `reloadDbVersions` short-circuits
- * to an empty list before any request is made). The byte deltas are what the
- * board's "+12 KB / −4 KB / original" column is computed FROM — the overlay
- * derives each row's label by differencing with its successor, so the fixture
- * supplies sizes rather than the labels themselves.
+ * The family as `versionsOf` returns it: the original first, saved versions
+ * oldest to newest. The byte sizes are what the board's "+12 KB / −4 KB /
+ * original" column is computed FROM (each row against the one before), so the
+ * fixture supplies sizes rather than the labels themselves. The newest is on
+ * the site (`USAGE_COMPOSER.mediaOps.getUsages`), which is what makes it
+ * `current`.
  */
+const DAY = 24 * 60 * 60 * 1000;
 const VERSIONED_ITEM: LibraryItem = MEDIA_ITEM({
   key: "hero",
   name: "hero-dark.jpg",
   assetId: "asset-hero",
-  size: 840 * 1024,
+  size: 844_000,
   width: 2400,
   height: 1600,
   altText: "Dark restaurant interior with…",
+  createdAt: new Date(Date.now() - 12 * DAY).toISOString(),
 });
-
-const DAY = 24 * 60 * 60 * 1000;
+const versionOfHero = (n: number, size: number, daysAgo: number): LibraryItem =>
+  MEDIA_ITEM({
+    key: `hero-v${n}`,
+    name: `hero-dark-v${n}.jpg`,
+    src: `${VERSIONED_ITEM.src}#v${n}`,
+    size,
+    versionOf: "hero",
+    createdAt: new Date(Date.now() - daysAgo * DAY).toISOString(),
+  });
+const VERSION_FAMILY: LibraryItem[] = [
+  VERSIONED_ITEM,
+  versionOfHero(2, 840_000, 5),
+  versionOfHero(3, 852_000, 2),
+  versionOfHero(4, 852_000, 0),
+];
+const ON_SITE_SRC = VERSION_FAMILY[3].src;
 const ASSET_VERSIONS = [
-  { id: "v3", assetId: "asset-hero", url: VERSIONED_ITEM.src, bytes: 852_000, edits: {}, createdAt: new Date(Date.now() - 2 * DAY).toISOString() },
-  { id: "v2", assetId: "asset-hero", url: VERSIONED_ITEM.src, bytes: 840_000, edits: {}, createdAt: new Date(Date.now() - 5 * DAY).toISOString() },
-  { id: "v1", assetId: "asset-hero", url: VERSIONED_ITEM.src, bytes: 844_000, edits: {}, createdAt: new Date(Date.now() - 12 * DAY).toISOString() },
+  { id: "sv4", assetId: "asset-hero", url: VERSION_FAMILY[3].src, bytes: 852_000, edits: {}, createdAt: VERSION_FAMILY[3].createdAt, createdByName: "Ali" },
+  { id: "sv3", assetId: "asset-hero", url: VERSION_FAMILY[2].src, bytes: 852_000, edits: {}, createdAt: VERSION_FAMILY[2].createdAt, createdByName: "Ali" },
+  { id: "sv2", assetId: "asset-hero", url: VERSION_FAMILY[1].src, bytes: 840_000, edits: {}, createdAt: VERSION_FAMILY[1].createdAt, createdByName: "Sara" },
 ];
 
 /** Pages shaped for `collectUsageByPage`: Home ×2, Menu ×1 (board 146:68). */
@@ -302,7 +315,9 @@ const usageEl = (id: string, name: string) => ({
 });
 
 const USAGE_COMPOSER = {
+  media: { on: () => {}, off: () => {} },
   mediaOps: {
+    getUsages: (src: string) => ({ count: src === ON_SITE_SRC ? 3 : 0, elements: [] }),
     getUsagesByPage: () =>
       new Map<string, unknown[]>([
         ["home", [usageEl("e1", "hero"), usageEl("e2", "gallery")]],
@@ -2440,6 +2455,7 @@ const CASES: Record<string, () => React.ReactElement> = {
           <AutoOpen testid="media-detail-versions">
             <AssetDetailOverlay
               item={VERSIONED_ITEM}
+              versions={VERSION_FAMILY}
               composer={USAGE_COMPOSER}
               onClose={() => {}}
               onEditImage={() => {}}
@@ -3279,7 +3295,7 @@ const CASES: Record<string, () => React.ReactElement> = {
       <div className="tw:relative tw:h-203 tw:w-70 tw:overflow-hidden tw:bg-white">
         <ToastProvider>
           <AutoOpen testid="media-detail-versions">
-            <AssetDetailOverlay item={DETAIL_ITEM} composer={USAGE_COMPOSER} onClose={() => {}} />
+            <AssetDetailOverlay item={VERSIONED_ITEM} versions={VERSION_FAMILY} composer={USAGE_COMPOSER} onClose={() => {}} />
           </AutoOpen>
         </ToastProvider>
       </div>

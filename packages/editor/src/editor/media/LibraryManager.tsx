@@ -32,7 +32,9 @@ import { ReplaceResultModal, type ReplaceOutcome } from "./components/ReplaceRes
 import { UploadFilesModal } from "./components/UploadFilesModal";
 import { UploadCompleteModal } from "./components/UploadCompleteModal";
 import { VersionsModal } from "./components/VersionsModal";
-import { ApplyVersionModal } from "./components/ApplyVersionModal";
+import { RestoreVersionModal } from "./components/RestoreVersionModal";
+import { useAssetVersions } from "../sidebar/tabs/media/hooks/useAssetVersions";
+import { versionLabel } from "../sidebar/tabs/media/data/mediaUtils";
 import { UrlImportError, fetchUrlAsFile } from "./fetchUrlAsFile";
 import type { ImageEditorOptions } from "../shell/hooks/useStudioModals";
 import { LIBRARY_KINDS, MEDIA_EVENTS, STORAGE_QUOTA_BYTES, getAssetTypeFromMime } from "@/shared/constants/media";
@@ -76,7 +78,7 @@ interface LibraryManagerProps {
   ) => void;
 }
 
-/* 3720:43313 — `replaceAcross` is synchronous, so the Applying card would
+/* 3720:43313 — `replaceAcross` is synchronous, so the Restoring card would
    never be seen without a beat; the prototype advances it on an AFTER
    delay. Long enough to read, short enough to feel like work, not a wait. */
 const APPLY_DWELL_MS = 350;
@@ -569,32 +571,28 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
 
   /* ─── P6-V Versions ────────────────────────────────────────────────── */
   /* Clone 3695:45529 — the Asset versions dialog, open on this file's family
-     (its parent's key: a version's own key resolves to the same family). */
+     (its parent's key: a version's own key resolves to the same family). The
+     list is the one the drawer draws (`useAssetVersions`); it stays mounted
+     on `versionsFor` through the restore confirm and its result. */
   const [versionsFor, setVersionsFor] = React.useState<string | null>(null);
-  /* 3695:45615 — the apply confirm for the latest saved version, then
-     (3720:43313) the Applying card while the placements move. */
-  const [applyTarget, setApplyTarget] = React.useState<{ parentKey: string; versionKey: string } | null>(null);
+  const { versionsOf } = state;
+  const versionsFamily = React.useMemo(() => (versionsFor ? versionsOf(versionsFor) : []), [versionsFor, versionsOf]);
+  const familyVersions = useAssetVersions(composer, versionsFamily);
+  /* 3695:45615 — the restore confirm for one version (by key), then
+     (3720:43313) the Restoring card while the placements move. */
+  const [restoreKey, setRestoreKey] = React.useState<string | null>(null);
   const [applying, setApplying] = React.useState(false);
-  /* 3720:43316 — what the apply did, per element, until Done or View
-     versions. `sources` are the srcs the placements carried, kept so Retry
-     can run exactly the same replace for the ones that failed. */
-  const [applyResult, setApplyResult] = React.useState<{
-    parentKey: string;
-    versionKey: string;
-    sources: string[];
-    replaced: string[];
-    failed: string[];
-  } | null>(null);
+  /* 3720:43316 — what the restore did, per element, until Done or View
+     versions. */
+  const [restoreResult, setRestoreResult] = React.useState<{ versionKey: string; replaced: string[]; failed: string[] } | null>(null);
 
-  const versionsFamily = React.useMemo(() => (versionsFor ? familyOf(versionsFor) : []), [versionsFor, familyOf]);
-  /* What the apply would move: every placement NOT already on the target
-     version — the original's, and an older version's if one was applied
-     before. Their pages name the confirm's "on Home and Menu". */
-  const applyFamily = React.useMemo(() => (applyTarget ? familyOf(applyTarget.parentKey) : []), [applyTarget, familyOf]);
-  const applySources = applyFamily.filter((v) => v.item.key !== applyTarget?.versionKey && v.placements > 0);
-  const applyUses = applySources.reduce((n, v) => n + v.placements, 0);
-  const applyPages = [...new Set(applySources.flatMap((v) => v.pages))];
-  const applyName = applyFamily[0]?.item.displayName ?? applyFamily[0]?.item.name ?? "";
+  const restoreRow = familyVersions.rows.find((r) => r.item.key === restoreKey);
+  /* What the restore would move: every placement NOT already on the target
+     version. Their pages name the confirm's "on Home and Menu". */
+  const restoreSources = restoreRow ? familyVersions.movingTo(restoreRow) : [];
+  const restoreUses = restoreSources.reduce((n, r) => n + r.placements, 0);
+  const restorePages = [...new Set(state.checkInUse(restoreSources.map((r) => r.item.key)).flatMap((u) => u.pages))];
+  const familyName = familyVersions.rows[0]?.item.displayName ?? familyVersions.rows[0]?.item.name ?? "";
 
   /* The family at SAVE time, not at open time: a second save from the same
      editor session numbers itself after the version the first one made. */
@@ -653,50 +651,32 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
     [onOpenImageEditor, addToast, composer],
   );
 
-  /* Move every placement the family has on the site onto the target
-     version — one `replaceAcross` per src the placements carry (the
-     original's, or an earlier applied version's), each its own undo step.
-     A placement that failed keeps its old src, so running the same sources
-     again is exactly the retry. */
-  const applyOnto = React.useCallback(
-    (target: { parentKey: string; versionKey: string }, sources: string[]) => {
-      const version = familyOf(target.parentKey).find((v) => v.item.key === target.versionKey);
-      const results = version ? sources.map((src) => composer.mediaOps.replaceAcross(src, version.item.src)) : [];
-      setPlacementsTick((t) => t + 1);
-      return {
-        replaced: results.flatMap((r) => r.replaced.map((e) => e.elementId)),
-        failed: results.flatMap((r) => r.failed.map((f) => f.elementId)),
-      };
-    },
-    [familyOf, composer],
-  );
+  /* 3695:45615 → 3720:43313 → 3720:43316: the confirm's Restore. Held on
+     the Restoring card for a beat, then the result takes its place. The move
+     itself is the shared list's restore (M-5 semantics). */
+  const runRestore = React.useCallback(async () => {
+    if (!restoreRow) return;
+    setApplying(true);
+    await new Promise((resolve) => setTimeout(resolve, APPLY_DWELL_MS));
+    const outcome = familyVersions.restore(restoreRow);
+    setPlacementsTick((t) => t + 1);
+    setApplying(false);
+    setRestoreKey(null);
+    setRestoreResult({ versionKey: restoreRow.item.key, ...outcome });
+  }, [restoreRow, familyVersions]);
 
-  /* 3695:45615 → 3720:43313 → 3720:43316: the confirm's Apply. Held on the
-     Applying card for a beat, then the result takes its place. */
-  const runApply = React.useCallback(
-    async (target: { parentKey: string; versionKey: string }, sources: string[]) => {
-      setVersionsFor(null);
-      setApplying(true);
-      await new Promise((resolve) => setTimeout(resolve, APPLY_DWELL_MS));
-      const outcome = applyOnto(target, sources);
-      setApplying(false);
-      setApplyTarget(null);
-      setApplyResult({ ...target, sources, ...outcome });
-    },
-    [applyOnto],
-  );
-
-  /* 3695:43906 — Retry failed use: the same replace for the same sources;
-     what landed before stays counted. */
-  /* The result card's Retry runs the failed placements again and reads the
-     outcome back (the card's own contract, shared with Replace across site). */
-  const retryApply = React.useCallback(async (): Promise<ReplaceOutcome> => {
-    if (!applyResult) return { replaced: [], failed: [] };
-    const outcome = applyOnto(applyResult, applyResult.sources);
-    const merged = { replaced: [...applyResult.replaced, ...outcome.replaced], failed: outcome.failed };
-    setApplyResult({ ...applyResult, ...merged });
+  /* The result card's Retry: a refused placement keeps its old src, so the
+     same restore again moves exactly those; what landed before stays counted
+     (the card's own contract, shared with Replace across site). */
+  const retryRestore = React.useCallback(async (): Promise<ReplaceOutcome> => {
+    const row = familyVersions.rows.find((r) => r.item.key === restoreResult?.versionKey);
+    if (!restoreResult || !row) return { replaced: [], failed: [] };
+    const outcome = familyVersions.restore(row);
+    setPlacementsTick((t) => t + 1);
+    const merged = { replaced: [...restoreResult.replaced, ...outcome.replaced], failed: outcome.failed };
+    setRestoreResult({ ...restoreResult, ...merged });
     return merged;
-  }, [applyResult, applyOnto]);
+  }, [restoreResult, familyVersions]);
 
   /* Clone 3721:43697 — TAGS lists the LIBRARY's tags (`menu · team · food`
      stay while Products is the scope), so it reads the unscoped list. It used
@@ -1140,46 +1120,43 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
       {/* ─── P6-V Versions ──────────────────────────────────────────────── */}
       {/* Clone 3695:45529 — Asset versions, from the editor's Done or a rail
           row. Edit latest saved version gives way to the editor (its Done
-          brings the dialog back); Apply opens the confirm over it, and
-          Cancel there returns here. */}
+          brings the dialog back); a row's restore opens the confirm over it,
+          and Cancel there returns here. */}
       <VersionsModal
-        open={versionsFor !== null && applyTarget === null}
-        versions={versionsFamily}
+        open={versionsFor !== null && restoreKey === null && restoreResult === null}
+        versions={familyVersions}
         onClose={() => setVersionsFor(null)}
         onEditLatest={(latest) => {
           setVersionsFor(null);
           void handleEditImage(latest);
         }}
-        onApplyLatest={(latest) => {
-          if (versionsFor) setApplyTarget({ parentKey: versionsFor, versionKey: latest.key });
-        }}
+        onRestore={(row) => setRestoreKey(row.item.key)}
       />
-      <ApplyVersionModal
-        open={applyTarget !== null}
-        name={applyName}
-        uses={applyUses}
-        pages={applyPages}
+      <RestoreVersionModal
+        open={restoreRow !== undefined}
+        name={familyName}
+        label={restoreRow ? versionLabel(restoreRow, familyVersions.rows.length) : ""}
+        uses={restoreUses}
+        pages={restorePages}
         applying={applying}
-        onClose={() => setApplyTarget(null)}
-        onApply={() => {
-          if (applyTarget) void runApply(applyTarget, applySources.map((v) => v.item.src));
-        }}
+        onClose={() => setRestoreKey(null)}
+        onRestore={() => void runRestore()}
       />
-      {/* 3720:43316 — the result under P6-V's title; View versions returns to
-          Asset versions with the applied marker moved. */}
-      {applyResult && (
+      {/* 3720:43316 — the result; View versions returns to Asset versions
+          with the current marker moved. */}
+      {restoreResult && (
         <ReplaceResultModal
           open
-          title="Saved version applied"
-          replaced={applyResult.replaced}
-          failed={applyResult.failed}
+          title="Version restored"
+          replaced={restoreResult.replaced}
+          failed={restoreResult.failed}
           composer={composer}
-          onRetry={retryApply}
-          onDone={() => setApplyResult(null)}
-          onViewVersions={() => {
-            setVersionsFor(applyResult.parentKey);
-            setApplyResult(null);
+          onRetry={retryRestore}
+          onDone={() => {
+            setRestoreResult(null);
+            setVersionsFor(null);
           }}
+          onViewVersions={() => setRestoreResult(null)}
         />
       )}
       <ImportUrlModal
