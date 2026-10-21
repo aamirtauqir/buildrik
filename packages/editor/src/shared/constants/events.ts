@@ -215,6 +215,9 @@ export const EVENTS = {
   CMS_COLLECTION_CREATED: "collection:created",
   CMS_COLLECTION_UPDATED: "collection:updated",
   CMS_COLLECTION_DELETED: "collection:deleted",
+  /** A local collection was merged into the server's under another id
+   *  (cmsSync DM-07): `{ from, to }`. Bindings follow it (REA C-7). */
+  CMS_COLLECTION_REKEYED: "collection:rekeyed",
   CMS_CONTENT_CREATED: "content:created",
   CMS_CONTENT_UPDATED: "content:updated",
   CMS_CONTENT_DELETED: "content:deleted",

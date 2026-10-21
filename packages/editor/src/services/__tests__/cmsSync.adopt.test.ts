@@ -35,7 +35,8 @@ vi.mock("@/engine/cms/CollectionStorage", () => ({
   deleteContentItem: vi.fn(),
 }));
 
-import { onCmsConflict, onCmsSyncError, syncCollectionUpsert } from "../cmsSync";
+import { bindCmsEngine, onCmsConflict, onCmsSyncError, syncCollectionUpsert } from "../cmsSync";
+import { EVENTS } from "@/shared/constants/events";
 
 beforeEach(() => {
   window.history.replaceState({}, "", "/edit/site-1");
@@ -62,6 +63,17 @@ describe("SLUG_TAKEN (DM-07)", () => {
     expect(store.saveCollection).toHaveBeenCalledWith(expect.objectContaining({ id: "c-server" }));
     expect(prompts).toEqual([]);
     offConflict();
+    off();
+  });
+
+  it("tells the engine the local id became the server's, so bindings follow (C-7)", async () => {
+    const off = onCmsSyncError(() => {});
+    const emit = vi.fn();
+    bindCmsEngine({ emit, forgetLocal: vi.fn(), refreshFromStorage: vi.fn(async () => {}) } as never);
+    colUpsert.mockRejectedValueOnce(new Error("CMS_CONFLICT:SLUG_TAKEN:c-server"));
+    await syncCollectionUpsert({ id: "c-local", name: "Blog", slug: "blog", fields: [], createdAt: "", updatedAt: "" } as never);
+    await vi.waitFor(() => expect(emit).toHaveBeenCalledWith(EVENTS.CMS_COLLECTION_REKEYED, { from: "c-local", to: "c-server" }));
+    bindCmsEngine(null);
     off();
   });
 });

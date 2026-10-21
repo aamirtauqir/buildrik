@@ -16,6 +16,7 @@ import { omit } from "@shared/utils/helpers/object";
 import { getBuildrikClient } from "./api-client";
 import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
 import { getSiteIdFromUrl } from "./BuildrikSyncProvider";
+import { EVENTS } from "../shared/constants/events";
 import * as Storage from "../engine/cms/CollectionStorage";
 import type { CMSCollection, CMSContentItem, CMSField } from "../shared/types/cms";
 import {
@@ -309,7 +310,7 @@ function classify(e: unknown): Outcome | null {
    *_DELETED event the sync layer listens to). */
 type CmsEngine = Pick<
   import("../engine/cms/CollectionManager").CollectionManager,
-  "forgetLocal" | "refreshFromStorage"
+  "forgetLocal" | "refreshFromStorage" | "emit"
 >;
 let engine: CmsEngine | null = null;
 export function bindCmsEngine(cm: CmsEngine | null): void {
@@ -838,8 +839,8 @@ async function takeServerCopy(siteId: string, kind: "collection" | "entry", id: 
  * here, then mirrored), the local copy goes, and the server's collection is
  * hydrated in — so a second "Blog" made on another device becomes the one
  * Blog with both devices' records, instead of a create 500ing forever.
- * Not covered: element bindings made to the local id in the window before
- * its first mirror; they still name it.
+ * Element bindings made to the local id in the window before its first
+ * mirror follow it to the server's id (CMS_COLLECTION_REKEYED, REA C-7).
  */
 async function adoptServerCollection(siteId: string, local: CMSCollection, serverId: string): Promise<void> {
   const key = `collectionUpsert:${local.id}`;
@@ -850,6 +851,7 @@ async function adoptServerCollection(siteId: string, local: CMSCollection, serve
   for (const item of moved) await Storage.saveContentItem(item);
   await Storage.deleteCollection(local.id);
   forgetRow(`collection:${local.id}`);
+  engine?.emit(EVENTS.CMS_COLLECTION_REKEYED, { from: local.id, to: serverId });
   forceServer.add(`collection:${serverId}`);
   await hydrateCmsFromServer();
   await Promise.all(moved.map((item) => syncEntryUpsert(item)));
