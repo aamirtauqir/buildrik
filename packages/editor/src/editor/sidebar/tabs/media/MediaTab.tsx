@@ -82,6 +82,9 @@ function MediaTabWithComposer({
   /* A deleted asset takes its open hub with it (the delete lands after the
      confirm; a cancelled confirm leaves the hub where it was). */
   const detailKey = state.detailItem?.key;
+  /* The drill-in's Versions list — the same family the library's dialog lists. */
+  const { versionsOf } = state;
+  const detailVersions = React.useMemo(() => (detailKey ? versionsOf(detailKey) : []), [detailKey, versionsOf]);
   const detailGone = detailKey != null && !state.libraryItems.some((i) => i.key === detailKey);
   React.useEffect(() => {
     if (detailGone) state.closeDetail();
@@ -185,6 +188,7 @@ function MediaTabWithComposer({
         <AssetDetailOverlay
           /* The live row, so a rename from the hub shows at once. */
           item={state.libraryItems.find((i) => i.key === state.detailItem?.key) ?? state.detailItem}
+          versions={detailVersions}
           onUpdate={state.updateItem}
           onClose={state.closeDetail}
           onEditImage={handleEditImage}

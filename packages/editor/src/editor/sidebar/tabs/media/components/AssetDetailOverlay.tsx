@@ -9,21 +9,12 @@
  * §4: "Modals, not drill-in"); Optimise opens the same modal on its Optimise
  * tab (4418:149547, G3-026) — the drawer's own optimise panel is gone.
  *
- * Versions view (146:32): 44h chips — dot · relative time · size delta,
- * current pinned with a 3px accent bar (boards 75:65 / 75:71 beat 241:1436's
- * 56h full-bleed row) — and restore confirms INLINE in the 84h band 146:64
- * draws ("a drill-in that spawns a modal has lost the plot"). The rows are
- * the server's history of saved edits (`media.listAssetVersions`). Restore
- * does what the library's Asset versions "Apply" does: it moves every
- * placement of the family (the original and its saved versions) onto that
- * version's file, as undoable canvas edits. It used to call
- * `media.restoreAssetVersion`, which rewrote the parent asset's URL on the
- * server and left the site untouched, despite the confirm's "those will
- * update too", and dropped the original from the library (REA 2026-10-20
- * M-5). The author line
- * (L8, 4418:62883) is real: `media.listAssetVersions` joins `createdBy` to a
- * display name server-side; omitted (not "Unknown") when the row predates the
- * column or the account no longer resolves.
+ * Versions view (146:32 / v3 4418:62883) is `AssetVersionList` — the same
+ * list, data and restore the library's Asset versions dialog draws
+ * (`useAssetVersions`): the asset's family, where Restore moves every
+ * placement onto the chosen version's file (REA 2026-10-20 M-5). It used to
+ * list the server's best-effort history instead, so the drawer and the
+ * library disagreed about one asset's versions.
  *
  * Used-in view: one 44h chip PER HIT — page name over the element's own name
  * with a "Go ›" link — and no page-group header, per board 75:90, which beat
@@ -37,19 +28,24 @@
 
 import * as React from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { formatRelativeTime } from "@/shared/utils/relativeTime";
 import type { LibraryItem } from "../data/mediaTypes";
 import { collectUsageByPage, fmtSize } from "../data/mediaUtils";
 import { useAltTextDraft } from "../hooks/useAltTextDraft";
 import type { Composer } from "@/engine/Composer";
-import { listAssetVersions, type AssetVersion } from "@/services/MediaVersionService";
+import { useAssetVersions } from "../hooks/useAssetVersions";
+import { AssetVersionList } from "./AssetVersionList";
 import { Button, PanelFrame, Textarea, useFocusTrap } from "@/editor/chrome-ui";
 import { Download, Link2, Pencil, SquarePlus, Trash2 } from "lucide-react";
 
 type View = "hub" | "used" | "versions";
 
+const NO_VERSIONS: LibraryItem[] = [];
+
 interface AssetDetailOverlayProps {
   item: LibraryItem;
+  /** `versionsOf(item.key)`, memoized — the family the Versions view lists.
+   *  Absent: the asset has no saved version. */
+  versions?: LibraryItem[];
   /** Back to the grid (the ‹ row). ESC does the same, one level at a time. */
   onClose(): void;
   onUpdate?(key: string, updates: Partial<LibraryItem>): Promise<void>;
@@ -73,13 +69,6 @@ interface AssetDetailOverlayProps {
 const ROW =
   "tw:flex tw:h-8 tw:w-full tw:items-center tw:justify-start tw:gap-2 tw:rounded tw:border-0 tw:bg-transparent tw:px-4 tw:font-normal " +
   "tw:text-left tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-bg-subtle)]";
-const VERSION_ROW = "tw:flex tw:h-14 tw:w-full tw:items-start tw:gap-3 tw:pt-2.5 tw:pl-5 tw:pr-4";
-const VERSION_DOT = "tw:mt-1.5 tw:size-2 tw:shrink-0 tw:rounded-full";
-const VERSION_TIME_COL = "tw:flex tw:min-w-0 tw:flex-1 tw:flex-col";
-const VERSION_TIME = "tw:min-w-0 tw:truncate tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]";
-/* Board 4418:62883 — the author line under the time, "Ali" / "Sara". */
-const VERSION_AUTHOR = "tw:min-w-0 tw:truncate tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
-const VERSION_META = "tw:mt-0.5 tw:w-[72px] tw:shrink-0 tw:text-[11px] tw:font-medium tw:leading-4 tw:text-[var(--bk-gray-500)]";
 /* Board 4418:61698: the nav rows end in a 12px ink › in a 24 box, and
    Versions' count is 11/400 ink beside it. */
 const ROW_CHEVRON = "tw:flex tw:w-6 tw:shrink-0 tw:justify-center tw:text-[12px] tw:text-[var(--bk-ink)]";
@@ -95,6 +84,7 @@ const BACK_ROW_SUB = "tw:text-[13px] tw:text-[var(--bk-accent-text)]";
 
 export function AssetDetailOverlay({
   item,
+  versions: family = NO_VERSIONS,
   onClose,
   onUpdate,
   onEditImage,
@@ -127,25 +117,7 @@ export function AssetDetailOverlay({
 
   const display = item.displayName ?? item.name;
 
-  // ── Server restore points — loaded on mount so the hub row carries a count.
-  const [dbVersions, setDbVersions] = useState<AssetVersion[]>([]);
-  /* The version whose restore just failed — its row says so (DQ-012). */
-  const [restoreFailedId, setRestoreFailedId] = useState<string | null>(null);
-  const [pendingRestore, setPendingRestore] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!item.assetId) {
-      setDbVersions([]);
-      return;
-    }
-    listAssetVersions(item.assetId)
-      .then((vs) => {
-        if (mountedRef.current) setDbVersions(vs);
-      })
-      .catch(() => {
-        if (mountedRef.current) setDbVersions([]);
-      });
-  }, [item.assetId]);
+  const versions = useAssetVersions(composer, family);
 
   // ── Cross-page usage (board 146:68 groups by page).
   const usage = useMemo(() => {
@@ -157,36 +129,6 @@ export function AssetDetailOverlay({
     }
   }, [composer, item.src]);
   const usageCount = usage.reduce((n, p) => n + p.hits.length, 0);
-
-  /* Every src the family's placements can carry: the original's and each
-     saved version's (an earlier restore or Apply may have moved them). */
-  const familySources = useCallback(
-    (c: Composer) => {
-      const children = c.media.getAssets().filter((a) => a.versionOf === item.key);
-      return [...new Set([item.src, ...children.map((a) => a.src)].filter(Boolean))];
-    },
-    [item.key, item.src],
-  );
-  const familyUsageCount =
-    composer && pendingRestore
-      ? familySources(composer).reduce((n, src) => n + composer.mediaOps.getUsages(src).count, 0)
-      : 0;
-
-  /* A refused placement keeps its old src, so Restore again is the retry. */
-  const confirmRestore = useCallback(
-    (version: AssetVersion) => {
-      setPendingRestore(null);
-      if (!composer) {
-        setRestoreFailedId(version.id);
-        return;
-      }
-      const failed = familySources(composer)
-        .filter((src) => src !== version.url)
-        .flatMap((src) => composer.mediaOps.replaceAcross(src, version.url).failed);
-      setRestoreFailedId(failed.length > 0 ? version.id : null);
-    },
-    [composer, familySources],
-  );
 
   const handleJump = useCallback(
     (pageId: string, elementId: string) => {
@@ -218,7 +160,6 @@ export function AssetDetailOverlay({
   useEffect(() => {
     setView("hub");
     setMetaError(false);
-    setPendingRestore(null);
     setNatural(null);
   }, [item.key]);
 
@@ -257,8 +198,8 @@ export function AssetDetailOverlay({
   const showEdit = item.type === "img" && !!onEditImage;
   const showOptimize = showEdit;
   const showReplace = (item.type === "img" || item.type === "vid") && !!onReplaceAcross;
-  // Restore points + the live state — the count the hub row shows.
-  const versionCount = dbVersions.length > 0 ? dbVersions.length + 1 : 0;
+  // The family's size once a version is saved — the count the hub row shows.
+  const versionCount = versions.rows.length > 1 ? versions.rows.length : 0;
 
   const backLabel =
     view === "versions"
@@ -446,115 +387,7 @@ export function AssetDetailOverlay({
           </>
         )
       ) : view === "versions" ? (
-        <div className="tw:w-full" role="list" aria-label="Version history">
-          {/* v3 4418:62883: 56-high full-bleed rows — dot 20 in, the time
-              13 ink over the author line, the size delta 11/500 muted in a
-              column at 156, ⋯ in a 24 box 16 from the edge. The current
-              version is tinted with the 3px accent bar. (Pre-v3 board 75:65
-              drew 44 chips at a 12 inset.) An empty history shows only the
-              note, as 4418:63971 draws it. */}
-          {dbVersions.length > 0 ? (
-            <div className={`${VERSION_ROW} tw:relative tw:bg-[var(--bk-accent-tint)]`} data-testid="media-version-current" role="listitem">
-              <span className="tw:absolute tw:inset-y-0 tw:left-0 tw:w-[3px] tw:bg-[var(--bk-accent)]" aria-hidden="true" />
-              <span className={`${VERSION_DOT} tw:bg-[var(--bk-accent)]`} aria-hidden="true" />
-              <span className={VERSION_TIME_COL}>
-                <span className={VERSION_TIME}>now</span>
-              </span>
-              <span className={VERSION_META}>current</span>
-              <span className="tw:w-6 tw:shrink-0" aria-hidden="true" />
-            </div>
-          ) : null}
-          {dbVersions.map((v, i) => {
-            const ts = new Date(v.createdAt).getTime();
-            const prev = dbVersions[i + 1];
-            const delta = prev ? v.bytes - prev.bytes : null;
-            const meta =
-              i === dbVersions.length - 1
-                ? "original"
-                : delta === null || delta === 0
-                  ? fmtSize(v.bytes)
-                  : `${delta > 0 ? "+" : "−"}${fmtSize(Math.abs(delta))}`;
-            return (
-              <React.Fragment key={v.id}>
-                <div className={VERSION_ROW} data-testid={`media-version-${v.id}`} role="listitem">
-                  <span className={`${VERSION_DOT} tw:bg-[var(--bk-gray-300)]`} aria-hidden="true" />
-                  <span className={VERSION_TIME_COL}>
-                    <span className={VERSION_TIME}>{formatRelativeTime(ts, { fallback: "daysShort" })}</span>
-                    {v.createdByName ? (
-                      <span className={VERSION_AUTHOR} data-testid={`media-version-author-${v.id}`}>
-                        {v.createdByName}
-                      </span>
-                    ) : null}
-                  </span>
-                  <span className={VERSION_META}>{meta}</span>
-                  <Button
-                    type="button"
-                    color="light"
-                    size="xs"
-                    className="tw:-mt-0.5 tw:size-6 tw:min-h-6 tw:shrink-0 tw:border-0 tw:bg-transparent tw:p-0 tw:text-[13px] tw:text-[var(--bk-gray-500)] tw:enabled:hover:bg-transparent tw:enabled:hover:text-[var(--bk-ink)]"
-                    data-testid={`media-version-menu-${v.id}`}
-                    aria-label={`Restore options for version from ${formatRelativeTime(ts, { fallback: "daysShort" })}`}
-                    onClick={() => setPendingRestore(pendingRestore === v.id ? null : v.id)}
-                  >
-                    ⋯
-                  </Button>
-                </div>
-                {restoreFailedId === v.id ? (
-                  <div
-                    role="alert"
-                    className="tw:w-full tw:px-4 tw:py-1 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-error)]"
-                    data-testid={`media-restore-failed-${v.id}`}
-                  >
-                    Couldn&apos;t move every place onto this version — try again.
-                  </div>
-                ) : null}
-                {/* Board 146:64 — restore confirms INLINE, and the band is 84
-                    tall because the question names the cost: it shipped as a
-                    32h strip saying "Restore?", which asks for a decision
-                    while withholding the one fact needed to make it. */}
-                {pendingRestore === v.id ? (
-                  <div
-                    className="tw:flex tw:h-21 tw:w-full tw:flex-col tw:justify-start tw:gap-2 tw:bg-[var(--bk-bg-subtle)] tw:px-4 tw:pt-2 tw:text-[12px] tw:leading-[18px]"
-                    data-testid="media-restore-confirm"
-                  >
-                    <span className="tw:text-[var(--bk-ink)]">
-                      Restore this version?{familyUsageCount > 0
-                        ? ` It is used in ${familyUsageCount} ${familyUsageCount === 1 ? "place" : "places"} — those will update too.`
-                        : ""}
-                    </span>
-                    <span className="tw:flex tw:items-center tw:justify-end tw:gap-4">
-                      <Button
-                        type="button"
-                        color="light"
-                        size="xs"
-                        variant="link" className="tw:min-h-5 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]"
-                        data-testid="media-restore-cancel"
-                        onClick={() => setPendingRestore(null)}
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        type="button"
-                        color="light"
-                        size="xs"
-                        variant="link" className="tw:min-h-5 tw:text-[12px] tw:leading-[18px]"
-                        data-testid="media-restore-go"
-                        onClick={() => confirmRestore(v)}
-                      >
-                        Restore
-                      </Button>
-                    </span>
-                  </div>
-                ) : null}
-              </React.Fragment>
-            );
-          })}
-          {dbVersions.length === 0 ? (
-            <div className="tw:px-4 tw:pt-8 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-gray-500)]" data-testid="media-versions-empty">
-              No saved versions yet. Edits create restore points automatically.
-            </div>
-          ) : null}
-        </div>
+        <AssetVersionList key={item.key} versions={versions} />
       ) : view === "used" ? (
         <div className="tw:w-full" role="list" aria-label="Pages using this asset">
           {usage.length === 0 ? (

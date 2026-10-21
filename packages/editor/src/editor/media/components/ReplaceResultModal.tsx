@@ -2,8 +2,8 @@
  * ReplaceResultModal — the Clone's four replace-across outcome cards (640),
  * section 4184:26629: 3695:43897 "Replacing image" · 3695:43900 "Replacement
  * complete" · 3695:43903 "Some uses could not update" · 3695:43906 "Retrying
- * failed use". P6-V's "Applying saved version" / "Saved version applied"
- * (3720:43313 / 3720:43316) are the same card under another title with a
+ * failed use". P6-V's version restore result ("Version restored", from
+ * 3720:43316) is the same card under another title with a
  * View versions door, so there is ONE component with `title` and `busy` as
  * props. Displaces V1 board 1174:4849's three result states (the `Replaced 3
  * uses ✓` line, the `▸ Failed elements` disclosure and its text-link footer).
@@ -50,7 +50,7 @@ export interface ReplaceResultModalProps extends ReplaceOutcome {
   open: boolean;
   /** The engine the ids belong to — the per-page lines and the failed placements are read from it. */
   composer: Composer;
-  /** The complete card's title: `Replacement complete` (3695:43900) or `Saved version applied` (3720:43316). */
+  /** The complete card's title: `Replacement complete` (3695:43900) or `Version restored` (3720:43316). */
   title: string;
   /** While the caller's own run is in flight: the progress card (3695:43897 / 3720:43313). `title` defaults to `Replacing image`. */
   busy?: { title?: string; label: string };
