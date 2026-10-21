@@ -290,3 +290,16 @@ describe("EmailService.sendFormEmails", () => {
     expect(notification.subject).toBe("Lead in");
   });
 });
+
+describe("configureFromSettings (project email integration)", () => {
+  it("configures only for an enabled integration with a key", () => {
+    service.configureFromSettings({ provider: "none", enabled: false });
+    expect(service.isConfigured()).toBe(false);
+    service.configureFromSettings({ provider: "sendgrid", enabled: false, apiKey: "k" });
+    expect(service.isConfigured()).toBe(false);
+    service.configureFromSettings();
+    expect(service.isConfigured()).toBe(false);
+    service.configureFromSettings({ provider: "sendgrid", enabled: true, apiKey: "k" });
+    expect(service.isConfigured()).toBe(true);
+  });
+});

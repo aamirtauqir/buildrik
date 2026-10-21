@@ -13,7 +13,7 @@ import { FormHandler, type FormConfig } from "../FormHandler";
 import { EVENTS } from "@/shared/constants";
 import type { Composer } from "@/engine/Composer";
 
-let composer: { emit: ReturnType<typeof vi.fn> };
+let composer: { emit: ReturnType<typeof vi.fn>; getProjectSettings: () => object };
 let handler: FormHandler;
 
 function config(partial: Partial<FormConfig> = {}): FormConfig {
@@ -25,7 +25,7 @@ function emitted(event: string): unknown[][] {
 }
 
 beforeEach(() => {
-  composer = { emit: vi.fn() };
+  composer = { emit: vi.fn(), getProjectSettings: () => ({}) };
   handler = new FormHandler(composer as unknown as Composer);
 });
 

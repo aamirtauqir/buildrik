@@ -4,6 +4,7 @@
  * @license BSD-3-Clause
  */
 
+import type { EmailServiceConfig } from "@/shared/types/project";
 import { emailService, type FormEmailOptions } from "./EmailService";
 
 // ============================================================================
@@ -49,6 +50,8 @@ export interface FormSubmissionData {
   emailOptions?: FormEmailOptions;
   /** Submitter email field name (for confirmation emails) */
   submitterEmailField?: string;
+  /** The project's email integration settings (`settings.integrations.email`) */
+  emailSettings?: EmailServiceConfig;
 }
 
 /**
@@ -127,6 +130,7 @@ export class FormSubmissionService {
     }
 
     // Send email notifications if configured
+    emailService.configureFromSettings(submission.emailSettings);
     if (submission.emailOptions && emailService.isConfigured()) {
       const submitterEmail = submission.submitterEmailField
         ? String(submission.data[submission.submitterEmailField] || "")

@@ -31,7 +31,7 @@ function makeEl(opts: {
 describe("state no-op paths", () => {
   let handler: FormHandler;
   beforeEach(() => {
-    handler = new FormHandler({ emit: vi.fn() } as unknown as Composer);
+    handler = new FormHandler({ emit: vi.fn(), getProjectSettings: () => ({}) } as unknown as Composer);
   });
 
   it("setFieldValue on an unknown form does nothing", () => {
@@ -46,7 +46,7 @@ describe("state no-op paths", () => {
 
 describe("findFormElement", () => {
   function handlerWith(elements: unknown): FormHandler {
-    return new FormHandler({ emit: vi.fn(), elements } as unknown as Composer);
+    return new FormHandler({ emit: vi.fn(), elements, getProjectSettings: () => ({}) } as unknown as Composer);
   }
 
   it("returns null when there is no active page", () => {
@@ -87,7 +87,7 @@ describe("findFormElement", () => {
 
 describe("findFormFields", () => {
   it("collects input/textarea/select descendants, skipping others", () => {
-    const handler = new FormHandler({ emit: vi.fn() } as unknown as Composer);
+    const handler = new FormHandler({ emit: vi.fn(), getProjectSettings: () => ({}) } as unknown as Composer);
     const tree = makeEl({
       tag: "form",
       children: [

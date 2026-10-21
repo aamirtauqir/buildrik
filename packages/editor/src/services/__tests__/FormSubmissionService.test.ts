@@ -14,6 +14,7 @@ const emailMocks = {
 vi.mock("../EmailService", () => ({
   emailService: {
     isConfigured: () => emailMocks.isConfigured(),
+    configureFromSettings: () => {},
     sendFormEmails: (...args: unknown[]) => emailMocks.sendFormEmails(...(args as [])),
   },
 }));

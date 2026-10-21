@@ -6,7 +6,6 @@
  * @license BSD-3-Clause
  */
 
-import { emailService } from "../services/EmailService";
 import { IS_DEV_BUILD } from "@/shared/utils/runtimeEnv";
 import { MEDIA_EVENTS } from "../shared/constants/media";
 import { EVENTS, THRESHOLDS, isNavigationOnlyChange } from "../shared/constants";
@@ -72,12 +71,6 @@ import { getDefaultPageName } from "../shared/utils/pageUtils";
 import { elementBaseCSS } from "./styles/cascadeCSS";
 import { elementSelector } from "@/shared/utils/elementSelector";
 import { CONNECT_TOKENS_LABEL } from "./designSystem/facade";
-
-/**
- * From-address for form-submission notifications on published sites. Must stay on
- * a domain we control, so it can be SPF/DKIM-verified with the mail provider.
- */
-const FORM_NOTIFICATION_SENDER = "noreply@buildrick.io";
 
 /**
  * Main Aquibra Composer class
@@ -939,38 +932,13 @@ ${html}${interactionScript}
   // ============================================
 
   /**
-   * Apply project settings and update dependent integrations
+   * Apply project settings and notify listeners
    */
   private applyProjectSettings(
     settings: ProjectSettings,
     options?: { emitProjectChanged?: boolean; emitSettingsChange?: boolean }
   ): void {
     this.projectSettings = settings ?? {};
-
-    const emailConfig = this.projectSettings.integrations?.email || {
-      provider: "none",
-      enabled: false,
-    };
-
-    // Configure form email notification service
-    // Maps project settings to the form email service format
-    if (emailConfig.provider === "sendgrid" && emailConfig.apiKey && emailConfig.enabled) {
-      emailService.configure({
-        provider: "sendgrid",
-        apiKey: emailConfig.apiKey,
-        // Sender must be on a domain we can verify with the provider. It used to
-        // be noreply@aquibra.com — a domain from the project this was forked from,
-        // which SendGrid would reject as an unverified sender, so form
-        // notifications failed silently.
-        fromEmail: FORM_NOTIFICATION_SENDER,
-      });
-    } else if (emailConfig.provider !== "none" && emailConfig.apiKey && emailConfig.enabled) {
-      // For other providers with API keys, use mock until properly configured
-      emailService.configure({
-        provider: "mock",
-        fromEmail: FORM_NOTIFICATION_SENDER,
-      });
-    }
 
     if (options?.emitSettingsChange !== false) {
       this.emit(EVENTS.SETTINGS_CHANGE, this.projectSettings);
