@@ -29,7 +29,6 @@ const SECTION_HEADER =
 
 export const ComponentsTab: React.FC<ComponentsTabProps> = ({
   composer,
-  compactMode = false,
   onCreateNew,
   onComponentSelect,
   selectedComponentId,
@@ -141,7 +140,6 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         onBack={state.handleBackFromDetail}
         onBackToInstance={state.backToInstance}
         onClose={onClose}
-        onInsert={state.handleDetailInsert}
         onDelete={state.handleDetailDelete}
         onDetachedAll={(count) => {
           const { id, name } = state.detailComponent!;
@@ -155,29 +153,6 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
   // ── Empty state ───────────────────────────────────────────────────────────────
 
   if (state.components.length === 0) {
-    if (compactMode) {
-      /* Was bare unstyled markup — the audits' "fifth empty-state language".
-         The shared EmptyState is the only one. */
-      return (
-        <EmptyState
-          size="sm"
-          align="start"
-          body="No components saved yet."
-          action={
-            onCreateNew && (
-              <Button
-                variant="link"
-                size="xs"
-                onClick={onCreateNew}
-                title="Right-click any element to save as component"
-              >
-                + New
-              </Button>
-            )
-          }
-        />
-      );
-    }
     return (
       <PanelFrame className="tw:h-full">
         {backRow}
