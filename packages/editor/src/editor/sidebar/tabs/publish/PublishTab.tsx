@@ -1022,11 +1022,17 @@ export const PublishTab: React.FC<PublishTabProps> = ({
             /* Two different facts wore one sentence. With no deploy to measure
                from, "Nothing has changed since the last deploy." is false. The
                never-published line states what the section claims to state —
-               what would go out if you published now. */
+               what would go out if you published now.
+               REA P-2: the rows are this session's undo stack, which is empty
+               after every load, so an empty list is not "nothing changed".
+               That claim is the lifecycle's (saved edits vs the last publish,
+               `nextMove === null`) — the same answer the CTA prints. */
             <p className={META}>
-              {snapshot.lastDeploy
-                ? "Nothing has changed since the last deploy."
-                : "Publishing will put the whole site live for the first time."}
+              {!snapshot.lastDeploy
+                ? "Publishing will put the whole site live for the first time."
+                : nextMove === null
+                  ? "Nothing has changed since the last deploy."
+                  : "No edits in this session. Publishing ships the site as it is saved now."}
             </p>
           )}
           </>

@@ -455,24 +455,41 @@ describe("PublishTab — the zero-changes sentence tells the truth", () => {
     expect(screen.getByText("This site has never been published.")).toBeInTheDocument();
   });
 
-  it("keeps the original sentence once a deploy exists", async () => {
-    fetchPublishHistory.mockResolvedValue([
-      {
-        id: "j1",
-        version: 4,
-        completedAt: new Date("2026-08-14T10:00:00Z"),
-        deploymentId: "d",
-        rollbackable: true,
-        rolledBackFrom: null,
-      },
-    ]);
+  const DEPLOYED = [
+    {
+      id: "j1",
+      version: 4,
+      completedAt: new Date("2026-08-14T10:00:00Z"),
+      deploymentId: "d",
+      rollbackable: true,
+      rolledBackFrom: null,
+    },
+  ];
+
+  it("says nothing changed only when the lifecycle says nothing is waiting", async () => {
+    fetchPublishHistory.mockResolvedValue(DEPLOYED);
+    renderTab(<PublishTab composer={composerWith([])} projectId="site_1" nextMove={null} onRequestPublish={vi.fn()} />);
+
+    await expandSections();
+    // The section and the CTA's reason say the same thing.
+    await waitFor(() => expect(screen.getAllByText("Nothing has changed since the last deploy.")).toHaveLength(2));
+    expect(screen.queryByText("Publishing will put the whole site live for the first time.")).toBeNull();
+  });
+
+  /* REA P-2: after a reload the undo stack is empty by design, while saved
+     edits since the last deploy are still waiting (the lifecycle's nextMove).
+     The empty list must not read as "nothing changed". */
+  it("an empty undo stack over waiting saved changes does not claim nothing changed", async () => {
+    fetchPublishHistory.mockResolvedValue(DEPLOYED);
     renderTab(<PublishTab composer={composerWith([])} projectId="site_1" nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} />);
 
     await expandSections();
     await waitFor(() =>
-      expect(screen.getByText("Nothing has changed since the last deploy.")).toBeInTheDocument(),
+      expect(
+        screen.getByText("No edits in this session. Publishing ships the site as it is saved now."),
+      ).toBeInTheDocument(),
     );
-    expect(screen.queryByText("Publishing will put the whole site live for the first time.")).toBeNull();
+    expect(screen.queryByText("Nothing has changed since the last deploy.")).toBeNull();
   });
 });
 
