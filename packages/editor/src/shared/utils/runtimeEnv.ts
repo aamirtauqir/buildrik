@@ -47,6 +47,7 @@ function readNextEnv(): EnvMap {
       NEXT_PUBLIC_FEATURE_DS_AI: process.env.NEXT_PUBLIC_FEATURE_DS_AI,
       NEXT_PUBLIC_FEATURE_COLLAB: process.env.NEXT_PUBLIC_FEATURE_COLLAB,
       NEXT_PUBLIC_FEATURE_CMS_DATA_SOURCES: process.env.NEXT_PUBLIC_FEATURE_CMS_DATA_SOURCES,
+      NEXT_PUBLIC_BLOB_STORE_HOST: process.env.NEXT_PUBLIC_BLOB_STORE_HOST,
       NODE_ENV: process.env.NODE_ENV,
     };
   } catch {
@@ -75,6 +76,15 @@ export const DASHBOARD_URL: string = pick(
   "VITE_DASHBOARD_URL",
   "NEXT_PUBLIC_APP_URL",
   defaultDashboardUrl,
+);
+
+// The media library's Vercel Blob host (`<storeId>.public.blob.vercel-storage.com`).
+// Canvas CSS may load from it (canvasCssUrls.ts); unset = it may not, and only
+// Global CSS / attribute rules that point at uploaded media lose the image on
+// the canvas. Not secret — it is in every media URL.
+export const BLOB_STORE_HOST: string | undefined = pickOptional(
+  "VITE_BLOB_STORE_HOST",
+  "NEXT_PUBLIC_BLOB_STORE_HOST",
 );
 
 export const SENTRY_DSN: string | undefined = pickOptional(

@@ -19,9 +19,9 @@ import { devWarn } from "@/shared/utils/devLogger";
 import { generateId, camelToKebab } from "@/shared/utils/helpers";
 import type { Composer } from "../Composer";
 import type { Element } from "../elements/Element";
-import { elementSelector, isElementOwnSelector } from "@/shared/utils/elementSelector";
-import { blockForeignCssUrls } from "@/shared/utils/canvasCssUrls";
+import { elementSelector } from "@/shared/utils/elementSelector";
 import { elementBaseCSS, type BaseRuleCache, type CascadeTarget } from "./cascadeCSS";
+import { blockForeignCssUrls } from "@/shared/utils/canvasCssUrls";
 
 
 /**
@@ -366,10 +366,6 @@ export class StyleEngine {
        *  export passes one to leave out rules for elements that are not on
        *  the page (or not on the site at all). */
       keep?: (selector: string) => boolean;
-      /** Applied to each rule whose selector reaches beyond one element
-       *  (`isElementOwnSelector` is false). The canvas sheet passes
-       *  `blockForeignCssUrls`; the publish export passes nothing. */
-      sharedRuleFilter?: (css: string) => string;
     },
   ): string {
     const opts = {
@@ -388,9 +384,7 @@ export class StyleEngine {
 
     this.writableRules().forEach((style) => {
       if (opts.keep && !opts.keep(style.selector)) return;
-      const rule = this.generateStyleRule(style);
-      const css =
-        opts.sharedRuleFilter && !isElementOwnSelector(style.selector) ? opts.sharedRuleFilter(rule) : rule;
+      const css = this.generateStyleRule(style);
 
       if (!style.mediaQuery) {
         // Base/desktop styles
@@ -697,12 +691,10 @@ export class StyleEngine {
     const device = this.composer.viewport?.getDevice();
     const breakpoint: CascadeTarget = device && isValidBreakpoint(device) ? device : "desktop";
     const base = elementBaseCSS([root], elementSelector, breakpoint, false, this.baseRuleCache);
-    /* The sheet lives in the dashboard document, so a class / tag / attribute
-       rule's foreign url() could leak what its selector matches there. An
-       element's own rules (and `base`, which only holds those) keep theirs —
-       they cannot test anything but that element. */
-    const rules = this.generateResponsiveCSS({ target: breakpoint, sharedRuleFilter: blockForeignCssUrls });
-    return [base, rules].filter(Boolean).join("\n\n");
+    const sheet = [base, this.generateResponsiveCSS({ target: breakpoint })].filter(Boolean).join("\n\n");
+    // This <style> is in the dashboard document: foreign url()s are blocked
+    // except in rules that test no attribute value (canvasCssUrls.ts).
+    return blockForeignCssUrls(sheet, { keepUrlsInAttributeFreeRules: true });
   }
 
   // ============================================

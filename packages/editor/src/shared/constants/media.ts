@@ -452,19 +452,20 @@ export function placeholderImageSrc(width: number, height: number): string {
 }
 
 /**
- * The hosts a stylesheet on the editor canvas may load a resource from — every
- * place the product itself puts an image or font: the media library's Vercel
- * Blob store, the two stock-photo CDNs (`stock.service.ts`), the font services
- * (`googleFonts.ts`, the Bunny mirror) and the default placeholder-image token.
+ * The hosts a stylesheet on the editor canvas may load a resource from — the
+ * places the product itself puts an image or font: the two stock-photo CDNs
+ * (`stock.service.ts`), the font services (`googleFonts.ts`, the Bunny mirror)
+ * and the default placeholder-image token. The media library's own Blob store
+ * is added from `NEXT_PUBLIC_BLOB_STORE_HOST` (`canvasCssAssetHosts`); a
+ * `*.public.blob.vercel-storage.com` wildcard would admit anyone's store.
  *
  * The canvas is not a frame: its CSS runs in the dashboard document, beside the
  * signed-in session. A `url()` to any other host in CSS that carries its own
  * selectors (Global CSS, project rules) can leak what those selectors match,
  * one request per guess, so `blockForeignCssUrls` turns it into `data:,` there.
- * The published site keeps the CSS as written. `*.` means any subdomain.
+ * The published site keeps the CSS as written.
  */
 export const CANVAS_CSS_ASSET_HOSTS: readonly string[] = [
-  "*.public.blob.vercel-storage.com",
   "images.unsplash.com",
   "images.pexels.com",
   "fonts.googleapis.com",

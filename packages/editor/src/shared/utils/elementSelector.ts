@@ -23,15 +23,3 @@ const ELEMENT_ID_IN_SELECTOR = /\[data-buildrick-id="((?:[^"\\]|\\.)*)"\]/g;
 export function elementIdsInSelector(selector: string): string[] {
   return [...selector.matchAll(ELEMENT_ID_IN_SELECTOR)].map((m) => m[1].replace(/\\(.)/g, "$1"));
 }
-
-const ELEMENT_OWN_SELECTOR = /^\[data-buildrick-id="[A-Za-z0-9_-]+"\](?:::?[a-z-]+)*$/;
-
-/**
- * Whether a rule's selector can match one element and nothing else — that
- * element's `elementSelector`, optionally with a state or pseudo-element
- * (`:hover`, `::before`). Such a rule cannot test anything outside the canvas;
- * a class, tag or attribute selector can.
- */
-export function isElementOwnSelector(selector: string): boolean {
-  return ELEMENT_OWN_SELECTOR.test(selector);
-}
