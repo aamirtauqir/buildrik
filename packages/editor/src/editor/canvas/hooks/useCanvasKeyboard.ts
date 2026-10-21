@@ -3,6 +3,7 @@
  * Keys: Tab/Shift+Tab (cycle) | Arrows (navigate) | Alt+Arrows (reorder)
  * Ctrl+Arrow (move 1px) | Shift+Arrow (10px) | Del (delete) | Esc (clear)
  * Ctrl+D (duplicate) | Ctrl+A (select all) | Shift+F10 (context menu)
+ * Enter (inline text edit, BD-39)
  * @license BSD-3-Clause
  */
 
@@ -11,6 +12,7 @@ import { ToastActionPayload, ToastTone } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine/Composer";
 import type { Element } from "@/engine/elements/Element";
 import { devLogger } from "@/shared/utils/devLogger";
+import { EVENTS } from "@/shared/constants/events";
 import {
   getNavigationTargets,
   getAllNavigableElements,
@@ -161,6 +163,18 @@ export function useCanvasKeyboard({
       }
 
       if (!selectedId) return;
+
+      /* BD-39 (1): Enter on one selected element starts inline text edit —
+         the request the Inspector's "Edit text on canvas" sends, so
+         useCanvasInlineEdit alone decides what is editable text and asks the
+         lock gate; anything else ignores it. Not while read-only (time travel
+         sets composer.readOnly; view mode withholds this handler). */
+      if (e.key === "Enter" && !e.shiftKey && !e.altKey && !e.metaKey && !e.ctrlKey) {
+        if (composer.readOnly || selectedIds.length > 1) return;
+        e.preventDefault();
+        composer.emit(EVENTS.UI_INLINE_EDIT_REQUEST, { elementId: selectedId });
+        return;
+      }
 
       const element = composer.elements.getElement(selectedId);
       if (!element) return;
