@@ -383,7 +383,7 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
                 className="tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-muted)]"
                 data-testid="set-an-ga-verified"
               >
-                Measurement ID verified on {formatDay(gaVerifiedAt)}
+                Format checked on {formatDay(gaVerifiedAt)}
               </span>
             ) : null}
             <Button

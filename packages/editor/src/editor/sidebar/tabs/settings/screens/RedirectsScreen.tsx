@@ -45,7 +45,7 @@ import {
   Screen,
   Section,
 } from "../shared";
-import { SAVE_ERROR_MESSAGES } from "../constants";
+import { ACTION_ERROR_MESSAGES } from "../constants";
 import { useServerLoad } from "../hooks/useServerLoad";
 import { useSettingsScreen } from "../hooks/useSettingsScreen";
 import { RedirectCsvDialog } from "../components/RedirectCsvDialog";
@@ -423,7 +423,7 @@ export const RedirectsScreen: React.FC<RedirectsScreenProps> = ({
     );
   }
 
-  const banner = saveError ?? (actionFailed ? SAVE_ERROR_MESSAGES.redirects : null);
+  const banner = saveError ?? (actionFailed ? ACTION_ERROR_MESSAGES.redirects : null);
   const visibleSuggestions = suggest ? suggestions : [];
 
   return (
