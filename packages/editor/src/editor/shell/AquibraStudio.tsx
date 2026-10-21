@@ -712,6 +712,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
            them — the exact failure the session-expired surface exists to
            prevent. Same-origin cookie lands either way. */
         onSignIn={() => window.open(`${DASHBOARD_URL}/auth?reason=session-expired`, "_blank", "noopener")}
+        onGoToDashboard={() => window.open(`${DASHBOARD_URL}/dashboard`, "_blank", "noopener")}
         onDismiss={() => setLoadError(null)}
       />
       <header role="banner" aria-label="Editor toolbar">

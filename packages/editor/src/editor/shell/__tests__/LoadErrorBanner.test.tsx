@@ -11,7 +11,7 @@ import { LoadErrorBanner } from "../LoadErrorBanner";
 
 function renderBanner(props: Partial<React.ComponentProps<typeof LoadErrorBanner>> = {}) {
   return render(
-    <LoadErrorBanner kind={null} onRetry={vi.fn()} onSignIn={vi.fn()} {...props} />,
+    <LoadErrorBanner kind={null} onRetry={vi.fn()} onSignIn={vi.fn()} onGoToDashboard={vi.fn()} {...props} />,
   );
 }
 
@@ -41,7 +41,8 @@ describe("LoadErrorBanner", () => {
   it("a missing site says so, and does not offer a Retry that cannot work", () => {
     const onRetry = vi.fn();
     const onSignIn = vi.fn();
-    renderBanner({ kind: "missing", onRetry, onSignIn });
+    const onGoToDashboard = vi.fn();
+    renderBanner({ kind: "missing", onRetry, onSignIn, onGoToDashboard });
     expect(screen.getByText(/isn't there anymore/i)).toBeInTheDocument();
     expect(screen.getByText(/nothing you do here can be saved/i)).toBeInTheDocument();
     /* No trash is offered, because there is none: deleteSite soft-deletes for a
@@ -50,8 +51,11 @@ describe("LoadErrorBanner", () => {
     expect(screen.queryByText(/trash to restore from/i)).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /restore/i })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /^retry$/i })).not.toBeInTheDocument();
+    /* "Go to dashboard" goes to the dashboard, not the session-expired
+       sign-in page (R1 S-1): the user lost the site, not the session. */
     fireEvent.click(screen.getByRole("button", { name: /go to dashboard/i }));
-    expect(onSignIn).toHaveBeenCalled();
+    expect(onGoToDashboard).toHaveBeenCalled();
+    expect(onSignIn).not.toHaveBeenCalled();
     expect(onRetry).not.toHaveBeenCalled();
   });
 
