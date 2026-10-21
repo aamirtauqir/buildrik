@@ -344,8 +344,19 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
 
   // #13/25: pull server "My Templates" into the local cache on open (best-effort).
   React.useEffect(() => {
-    if (composer) void hydrateUserTemplatesFromServer();
-  }, [composer]);
+    if (!composer) return;
+    const hydrate = () =>
+      void hydrateUserTemplatesFromServer(() =>
+        addToast({
+          key: "template-hydrate-failed",
+          title: "Couldn't load your saved templates",
+          description: "Templates saved on other devices may be missing from My templates.",
+          tone: "warning",
+          action: { label: "Try again", onClick: hydrate },
+        }),
+      );
+    hydrate();
+  }, [composer, addToast]);
 
   useEditorEventListeners({
     composer,
