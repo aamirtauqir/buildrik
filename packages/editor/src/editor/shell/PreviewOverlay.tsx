@@ -41,6 +41,7 @@ import * as React from "react";
 import type { DeviceType } from "@/shared/types";
 import { Button, BreakpointSwitcher, Select, type Breakpoint } from "@/editor/chrome-ui";
 import { isModalOpen } from "@/editor/chrome-ui";
+import { writeClipboardText } from "@buildrik/shared/browser/clipboard";
 import { buildInteractionRuntimeScript, INTERACTION_ATTR } from "@/engine/export/interactionRuntime";
 import { injectPageRuntimes } from "@/engine/export/publishPostProcess";
 import { DeviceFramePreview } from "../canvas/DeviceFramePreview";
@@ -178,6 +179,8 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({
 }) => {
   const [device, setDevice] = React.useState<Breakpoint>("desktop");
   const [shareOpen, setShareOpen] = React.useState(false);
+  /* S-8: the copy said nothing either way; the button now answers. */
+  const [errorCopied, setErrorCopied] = React.useState<boolean | null>(null);
   const pagesRef = React.useRef(pages);
   pagesRef.current = pages;
   const showPageRef = React.useRef(onShowPage);
@@ -306,9 +309,14 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({
                       size="xs"
                       color="light"
                       data-testid="preview-copy-error"
-                      onClick={() => void navigator.clipboard?.writeText(error)}
+                      onClick={() =>
+                        void writeClipboardText(error).then(
+                          () => setErrorCopied(true),
+                          () => setErrorCopied(false),
+                        )
+                      }
                     >
-                      Copy error details
+                      {errorCopied ? "Copied ✓" : errorCopied === false ? "Couldn't copy" : "Copy error details"}
                     </Button>
                   )}
                   <Button size="xs" color="light" data-testid="preview-back-to-editor" onClick={onDone}>
