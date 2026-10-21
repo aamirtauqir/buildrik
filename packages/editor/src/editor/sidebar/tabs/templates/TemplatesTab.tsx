@@ -307,23 +307,41 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
       // being offered rather than promising an undo it cannot do.
       setApplyStepIndex(1);
       await paint();
+      const importTemplate = () => {
+        setApplyCancellable(false);
+        setImportedSections([]);
+        composer.elements.importHTMLToActivePage(resolvedHtml, (label, done, total) => {
+          setImportedSections((prev) => [...prev, `${label} (${done}/${total})`]);
+        });
+      };
       if (wasNewPageMode) {
-        /* Switch to the page we just made BEFORE importing. `createPage`
-           adopts the new page only when there is no active one
-           (PageManager:87), so on any real site the import below landed on
-           the page the user was looking at: asking for the template as a NEW
-           page replaced the page they were on, and left the new one empty.
-           Walked live — Page 1 held "SaaS Landing", "Add as new page" with
-           Portfolio, and Page 1 came back as Portfolio. */
-        const created = composer.elements.createPage(newPageName ?? t.name);
-        if (addToNavigation) composer.elements.addPageToNavigation(created.id);
-        composer.elements.setActivePage?.(created.id);
+        /* The new page, its nav links and its import are one change. If the
+           import throws, the rollback takes the page back out, so the error
+           toast's "nothing was changed" is true and Retry does not add a
+           second page (R1 P-2). No await inside the transaction. */
+        const previousPageId = composer.elements.getActivePage()?.id;
+        composer.beginTransaction("apply-template");
+        try {
+          /* Switch to the page we just made BEFORE importing. `createPage`
+             adopts the new page only when there is no active one
+             (PageManager:87), so on any real site the import below landed on
+             the page the user was looking at: asking for the template as a NEW
+             page replaced the page they were on, and left the new one empty.
+             Walked live — Page 1 held "SaaS Landing", "Add as new page" with
+             Portfolio, and Page 1 came back as Portfolio. */
+          const created = composer.elements.createPage(newPageName ?? t.name);
+          if (addToNavigation) composer.elements.addPageToNavigation(created.id);
+          composer.elements.setActivePage(created.id);
+          importTemplate();
+        } catch (err) {
+          composer.rollbackTransaction();
+          if (previousPageId) composer.elements.setActivePage(previousPageId);
+          throw err;
+        }
+        composer.endTransaction();
+      } else {
+        importTemplate();
       }
-      setApplyCancellable(false);
-      setImportedSections([]);
-      composer.elements.importHTMLToActivePage(resolvedHtml, (label, done, total) => {
-        setImportedSections((prev) => [...prev, `${label} (${done}/${total})`]);
-      });
 
       // 3 — the canvas re-render the import triggers
       setApplyStepIndex(2);
