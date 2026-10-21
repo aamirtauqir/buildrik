@@ -22,6 +22,9 @@ import { emittedSurfaces, loadStyleModelSite } from "./fixtures/styleModelSite";
 
 const DIR = join(__dirname, "fixtures", "style-model-golden");
 const UPDATE = process.env.UPDATE_STYLE_GOLDEN === "1";
+/* `.golden`, not `.css`/`.html`: the DS gates scan src/ stylesheets, and
+   published output (site tokens included) is not chrome CSS. */
+const golden = (name: string) => join(DIR, `${name}.golden`);
 
 beforeAll(() => {
   installEngineBrowserStubs();
@@ -45,12 +48,12 @@ describe("legacy style model — byte-identical output (P0 acceptance 1)", () =>
       const surfaces = await emittedSurfaces(composer);
       const names = Object.keys(surfaces).sort();
       if (UPDATE) {
-        for (const name of names) writeFileSync(join(DIR, name), surfaces[name]);
+        for (const name of names) writeFileSync(golden(name), surfaces[name]);
         writeFileSync(join(DIR, "MANIFEST.txt"), names.join("\n") + "\n");
       }
       expect(names.join("\n") + "\n").toBe(readFileSync(join(DIR, "MANIFEST.txt"), "utf8"));
       for (const name of names) {
-        const file = join(DIR, name);
+        const file = golden(name);
         expect(existsSync(file), name).toBe(true);
         expect(surfaces[name], name).toBe(readFileSync(file, "utf8"));
       }
