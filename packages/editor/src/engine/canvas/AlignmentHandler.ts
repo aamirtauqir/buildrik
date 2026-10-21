@@ -1,11 +1,17 @@
 /**
  * Alignment Handler
- * Handles alignment and distribution of multiple elements
+ * Handles alignment and distribution of multiple elements.
+ *
+ * Geometry is the RENDERED box, measured by the chrome (the engine has no
+ * DOM) — authored left/width were often absent (an in-flow element, a width
+ * from a class or from its content) and defaulted to 0/100. Moves are written
+ * as left/top deltas on top of the element's computed offset, which only a
+ * positioned element obeys: a static (or sticky) member is never written.
  * @license BSD-3-Clause
  */
 
 import type { Composer } from "@/engine";
-import { activeBreakpoint, setStyleAt, stylesAt, writableElements } from "@/engine/commands/commandOperations";
+import { activeBreakpoint, setStyleAt, writableElements } from "@/engine/commands/commandOperations";
 
 // ============================================================================
 // TYPES
@@ -16,15 +22,34 @@ export type HorizontalAlignment = "left" | "center" | "right";
 export type VerticalAlignment = "top" | "middle" | "bottom";
 export type DistributionType = "horizontal" | "vertical";
 
-interface ElementBounds {
-  id: string;
+/** An element's box as rendered on the canvas, in unzoomed CSS pixels. */
+export interface RenderedBox {
   left: number;
   top: number;
   width: number;
   height: number;
+  /** Computed `position`. */
+  position: string;
+  /** Computed `left` / `top` in px — the offset a move is added to. */
+  cssLeft: number;
+  cssTop: number;
+}
+
+/** Reads one element's rendered box; null when it is not on the canvas. */
+export type MeasureBox = (id: string) => RenderedBox | null;
+
+interface ElementBounds extends RenderedBox {
+  id: string;
   right: number;
   bottom: number;
 }
+
+/** left/top move only positioned elements; static and sticky ignore them. */
+export function isMovable(box: RenderedBox): boolean {
+  return box.position === "absolute" || box.position === "fixed" || box.position === "relative";
+}
+
+const px = (n: number) => `${Math.round(n * 100) / 100}px`;
 
 // ============================================================================
 // ALIGNMENT HANDLER
@@ -35,48 +60,30 @@ interface ElementBounds {
  */
 export class AlignmentHandler {
   private composer: Composer;
+  private measure: MeasureBox;
   /** The members the current operation may move (unlocked). */
   private writable = new Set<string>();
 
-  constructor(composer: Composer) {
+  constructor(composer: Composer, measure: MeasureBox) {
     this.composer = composer;
+    this.measure = measure;
   }
 
   /**
-   * Get bounds for all selected elements
+   * Rendered bounds for every selected element still on the canvas
    */
   private getElementBounds(elementIds: string[]): ElementBounds[] {
-    const bounds: ElementBounds[] = [];
-    const breakpoint = activeBreakpoint(this.composer);
     /* BK-13: a locked member still anchors the alignment but is not moved —
        one "locked" toast for the whole operation (writableElements). */
     const elements = elementIds.map((id) => this.composer.elements.getElement(id));
     const kept = new Set(writableElements(this.composer, elements));
     this.writable = new Set(elementIds.filter((_, i) => elements[i] && kept.has(elements[i]!)));
 
-    for (const id of elementIds) {
-      const el = this.composer.elements.getElement(id);
-      if (!el) continue;
-
-      /* At the device on screen: base styles were read (and written) on
-         Tablet too, so an align there moved the Desktop layout. */
-      const styles = stylesAt(this.composer, el, breakpoint);
-      const left = parseFloat(styles.left || "0") || 0;
-      const top = parseFloat(styles.top || "0") || 0;
-      const width = parseFloat(styles.width || "100") || 100;
-      const height = parseFloat(styles.height || "100") || 100;
-
-      bounds.push({
-        id,
-        left,
-        top,
-        width,
-        height,
-        right: left + width,
-        bottom: top + height,
-      });
-    }
-
+    const bounds: ElementBounds[] = [];
+    elementIds.forEach((id, i) => {
+      const box = elements[i] ? this.measure(id) : null;
+      if (box) bounds.push({ ...box, id, right: box.left + box.width, bottom: box.top + box.height });
+    });
     return bounds;
   }
 
@@ -99,7 +106,7 @@ export class AlignmentHandler {
         case "left":
           referenceX = Math.min(...bounds.map((b) => b.left));
           bounds.forEach((b) => {
-            this.setElementPosition(b.id, referenceX, undefined);
+            this.setElementPosition(b, referenceX, undefined);
           });
           break;
 
@@ -109,7 +116,7 @@ export class AlignmentHandler {
           referenceX = (minLeft + maxRight) / 2;
           bounds.forEach((b) => {
             const newLeft = referenceX - b.width / 2;
-            this.setElementPosition(b.id, newLeft, undefined);
+            this.setElementPosition(b, newLeft, undefined);
           });
           break;
         }
@@ -118,7 +125,7 @@ export class AlignmentHandler {
           referenceX = Math.max(...bounds.map((b) => b.right));
           bounds.forEach((b) => {
             const newLeft = referenceX - b.width;
-            this.setElementPosition(b.id, newLeft, undefined);
+            this.setElementPosition(b, newLeft, undefined);
           });
           break;
       }
@@ -145,7 +152,7 @@ export class AlignmentHandler {
         case "top":
           referenceY = Math.min(...bounds.map((b) => b.top));
           bounds.forEach((b) => {
-            this.setElementPosition(b.id, undefined, referenceY);
+            this.setElementPosition(b, undefined, referenceY);
           });
           break;
 
@@ -155,7 +162,7 @@ export class AlignmentHandler {
           referenceY = (minTop + maxBottom) / 2;
           bounds.forEach((b) => {
             const newTop = referenceY - b.height / 2;
-            this.setElementPosition(b.id, undefined, newTop);
+            this.setElementPosition(b, undefined, newTop);
           });
           break;
         }
@@ -164,7 +171,7 @@ export class AlignmentHandler {
           referenceY = Math.max(...bounds.map((b) => b.bottom));
           bounds.forEach((b) => {
             const newTop = referenceY - b.height;
-            this.setElementPosition(b.id, undefined, newTop);
+            this.setElementPosition(b, undefined, newTop);
           });
           break;
       }
@@ -197,7 +204,7 @@ export class AlignmentHandler {
 
         let currentX = leftMost;
         bounds.forEach((b) => {
-          this.setElementPosition(b.id, currentX, undefined);
+          this.setElementPosition(b, currentX, undefined);
           currentX += b.width + gap;
         });
       } else {
@@ -212,7 +219,7 @@ export class AlignmentHandler {
 
         let currentY = topMost;
         bounds.forEach((b) => {
-          this.setElementPosition(b.id, undefined, currentY);
+          this.setElementPosition(b, undefined, currentY);
           currentY += b.height + gap;
         });
       }
@@ -222,20 +229,18 @@ export class AlignmentHandler {
   }
 
   /**
-   * Helper to set element position
+   * Move a member so its rendered box starts at left/top (canvas px)
    */
-  private setElementPosition(id: string, left: number | undefined, top: number | undefined): void {
-    const el = this.composer.elements.getElement(id);
-    if (!el || !this.writable.has(id)) return;
+  private setElementPosition(b: ElementBounds, left: number | undefined, top: number | undefined): void {
+    const el = this.composer.elements.getElement(b.id);
+    if (!el || !this.writable.has(b.id) || !isMovable(b)) return;
     const breakpoint = activeBreakpoint(this.composer);
 
     if (left !== undefined) {
-      setStyleAt(this.composer, el, breakpoint, "left", `${left}px`);
+      setStyleAt(this.composer, el, breakpoint, "left", px(b.cssLeft + left - b.left));
     }
     if (top !== undefined) {
-      setStyleAt(this.composer, el, breakpoint, "top", `${top}px`);
+      setStyleAt(this.composer, el, breakpoint, "top", px(b.cssTop + top - b.top));
     }
   }
 }
-
-export default AlignmentHandler;

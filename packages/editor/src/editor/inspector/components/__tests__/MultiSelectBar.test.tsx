@@ -21,9 +21,20 @@ afterAll(removeEngineBrowserStubs);
 afterEach(() => {
   cleanup();
   vi.restoreAllMocks();
+  document.querySelectorAll("[data-buildrick-id]").forEach((n) => n.remove());
 });
 
-function setup(count: number, splitParents = false) {
+/** Stand-ins for the canvas nodes the bar measures. */
+function mountCanvasNodes(ids: readonly string[], position: string) {
+  for (const id of ids) {
+    const node = document.createElement("div");
+    node.setAttribute("data-buildrick-id", id);
+    node.style.position = position;
+    document.body.appendChild(node);
+  }
+}
+
+function setup(count: number, splitParents = false, position = "absolute") {
   const composer = createTestComposer();
   const page = composer.elements.createPage("Home");
   const box = composer.elements.createElement("container");
@@ -33,6 +44,7 @@ function setup(count: number, splitParents = false) {
     composer.elements.addElement(h, splitParents && i === 0 ? page.root.id : box.getId());
     return h.getId();
   });
+  mountCanvasNodes(ids, position);
   render(<MultiSelectBar composer={composer} selectedIds={ids} />);
   return { composer, ids };
 }
@@ -82,5 +94,13 @@ describe("MultiSelectBar — board 22", () => {
     setup(3, true);
     expect(screen.getByTestId("inspector-multi-group")).toBeDisabled();
     expect(screen.getByTitle("Group needs elements that share a parent")).toBeInTheDocument();
+  });
+
+  it("Align and Distribute are shut, with the reason, while a member is in the normal flow", () => {
+    setup(3, false, "static");
+    const group = screen.getByRole("group", { name: "Align" });
+    for (const b of within(group).getAllByRole("button")) expect(b).toBeDisabled();
+    expect(screen.getByTestId("inspector-multi-distribute-h")).toBeDisabled();
+    expect(group).toHaveAttribute("title", expect.stringMatching(/positioned elements only/));
   });
 });

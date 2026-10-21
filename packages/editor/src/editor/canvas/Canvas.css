@@ -562,21 +562,6 @@ button:hover > .bd-canvas-empty-cta__thumb {
   animation: dropLineFadeIn 150ms ease-out forwards;
 }
 
-.bd-drag-handle {
-  animation: dragHandleFadeIn 0.15s ease-out;
-}
-
-@keyframes dragHandleFadeIn {
-  from {
-    opacity: 0;
-    transform: scale(0.8) translateX(-4px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateX(0);
-  }
-}
-
 .bd-layer-hover-highlight {
   outline: 1px solid var(--bk-accent) !important;
   outline-offset: 1px;

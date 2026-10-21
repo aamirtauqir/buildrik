@@ -6,7 +6,7 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from "vitest";
 import type { Composer } from "@/engine/Composer";
 import { createTestComposer, installEngineBrowserStubs, removeEngineBrowserStubs } from "@/engine/__tests__/test-utils/realComposer";
-import { AlignmentHandler } from "@/engine/canvas/AlignmentHandler";
+import { AlignmentHandler, type RenderedBox } from "@/engine/canvas/AlignmentHandler";
 import { EVENTS } from "@/shared/constants/events";
 import { standaloneActions } from "@/editor/canvas/menus/actions/standaloneActions";
 
@@ -26,6 +26,13 @@ beforeEach(() => {
   root = c.elements.createPage("Home").root.id;
 });
 
+/** The rendered box the canvas would report, read off the base styles. */
+const measure = (id: string): RenderedBox => {
+  const s = c.elements.getElement(id)!.getStyles();
+  const left = parseFloat(s.left ?? "0");
+  return { left, top: 0, width: parseFloat(s.width ?? "0"), height: 10, position: s.position ?? "static", cssLeft: left, cssTop: 0 };
+};
+
 describe("multi-select align (BK-13)", () => {
   it("a locked member anchors but does not move; one locked signal", () => {
     const a = add("container");
@@ -35,7 +42,7 @@ describe("multi-select align (BK-13)", () => {
     b.setLocked(true);
     const skipped = vi.fn();
     c.on(EVENTS.LOCKED_ELEMENTS_SKIPPED, skipped);
-    new AlignmentHandler(c).alignHorizontal([a.getId(), b.getId()], "right");
+    new AlignmentHandler(c, measure).alignHorizontal([a.getId(), b.getId()], "right");
     expect(a.getStyles().left).toBe("200px");
     expect(b.getStyles().left).toBe("200px");
     expect(skipped).toHaveBeenCalledTimes(1);
@@ -47,7 +54,7 @@ describe("multi-select align (BK-13)", () => {
     a.setStyles({ position: "absolute", left: "40px", width: "100px" });
     b.setStyles({ position: "absolute", left: "200px", width: "100px" });
     c.setDevice("tablet");
-    new AlignmentHandler(c).alignHorizontal([a.getId(), b.getId()], "left");
+    new AlignmentHandler(c, measure).alignHorizontal([a.getId(), b.getId()], "left");
     expect(b.getStyles().left).toBe("200px");
     expect(c.styles.getBreakpointStyle(b.getId(), "tablet").left).toBe("40px");
   });
