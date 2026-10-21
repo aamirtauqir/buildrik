@@ -388,6 +388,13 @@ export async function startPublish(
     rollbackOf?: { bundle: Prisma.InputJsonValue; bundleHash: string; formsPlan: Prisma.InputJsonValue | null; log: Prisma.InputJsonValue };
   },
 ) {
+  /* The Publish feature flag gates the server, not just the editor's button:
+     with only the client checking it, any caller of this function (the RPC,
+     the API, a scheduled publish) deployed regardless. Next inlines
+     NEXT_PUBLIC_* at build time on the server too, so this and the button
+     always agree within one build. */
+  if (process.env.NEXT_PUBLIC_FEATURE_PUBLISH !== "true") throw new Error("PUBLISH_DISABLED");
+
   const staleCutoff = new Date(Date.now() - STALE_QUEUED_AFTER_MS);
   const buildingCutoff = new Date(Date.now() - STALE_BUILDING_AFTER_MS);
   const existing = await prisma.publishBuildJob.findFirst({

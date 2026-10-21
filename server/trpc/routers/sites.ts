@@ -527,6 +527,12 @@ export const sitesRouter = router({
           });
         if (e instanceof Error && e.message === "WORKSPACE_DELETION_SCHEDULED")
           throw new TRPCError({ code: "PRECONDITION_FAILED", message: WORKSPACE_DELETION_SCHEDULED_MESSAGE });
+        if (e instanceof Error && e.message === "PUBLISH_DISABLED")
+          throw new TRPCError({
+            code: "PRECONDITION_FAILED",
+            message: "Publishing is not enabled on this server.",
+            cause: { reason: "PUBLISH_DISABLED" },
+          });
         if (e instanceof Error && e.message === "NO_PAGES")
           throw new TRPCError({
             code: "BAD_REQUEST",
@@ -837,6 +843,8 @@ export const sitesRouter = router({
           throw new TRPCError({ code: "PRECONDITION_FAILED", message: WORKSPACE_DELETION_SCHEDULED_MESSAGE });
         if (msg === "VERCEL_NOT_CONNECTED")
           throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Connect Vercel before rolling back." });
+        if (msg === "PUBLISH_DISABLED")
+          throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Publishing is not enabled on this server." });
         throw e;
       }
       await recordForSite({
