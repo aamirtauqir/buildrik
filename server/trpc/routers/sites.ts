@@ -392,7 +392,7 @@ export const sitesRouter = router({
       }
 
       try {
-        return await saveProjectFromEditor(input.siteId, input.projectData, input.expectedLastEditedAt ?? undefined, ctx.session.user.id);
+        return await saveProjectFromEditor(input.siteId, input.projectData, input.expectedLastEditedAt ?? undefined, ctx.session.user.id, input.styleModelAck);
       } catch (e: unknown) {
         /* I-2: a page id in the save belongs to another site. BAD_REQUEST, not
            FORBIDDEN — the editor treats FORBIDDEN as a revoked role. */

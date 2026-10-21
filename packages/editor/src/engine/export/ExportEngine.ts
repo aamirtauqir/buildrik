@@ -20,7 +20,7 @@ import { DEFAULT_EXPORT_CONFIG } from "@/shared/types/export";
 import { collectUsedKeyframes } from "@/shared/constants/animationKeyframes";
 import { getDefaultAttributes, getDefaultTagName } from "@/shared/utils/html";
 import { CMSExportResolver } from "../cms/CMSExportResolver";
-import { elementBaseCSS, hideRulesFor } from "../styles/cascadeCSS";
+import { elementBaseCSS, hideRulesFor, localSelector } from "../styles/cascadeCSS";
 import type { CMSExportMode, CMSExportOptions } from "../cms/CMSExportResolver";
 import type { Composer } from "../Composer";
 import { generateAnalyticsScripts } from "./AnalyticsInjector";
@@ -566,7 +566,8 @@ export class ExportEngine {
     const children = element.getChildren?.() || [];
 
     let css = "";
-    const className = `.${config.cssPrefix}${id}`;
+    // The class model weights it above every class rule (the ladder).
+    const className = localSelector(`.${config.cssPrefix}${id}`, this.composer.styleModel);
 
     // The id is written into the selector; one that is not a plain word never
     // is (the load sanitizer regenerates it — this is the writer's own check).
@@ -614,6 +615,8 @@ export class ExportEngine {
       (id) => `.${prefix}${id}`,
       "media",
       minify,
+      undefined,
+      this.composer.styleModel,
     );
   }
 

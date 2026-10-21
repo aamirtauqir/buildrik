@@ -50,7 +50,7 @@ import { navigateBypassingUnloadGuard } from "../unloadGuardBypass";
 import type { SaveState } from "./useStudioState";
 
 type Dialog =
-  | { variant: "save"; serverToken: string; brandFormat: boolean; open: boolean }
+  | { variant: "save"; serverToken: string; brandFormat: boolean; styleModel: boolean; open: boolean }
   | { variant: "restore"; relation: KeptVsServer; keptAt: string | null; open: boolean };
 
 export interface UseServerConflictOptions {
@@ -85,14 +85,20 @@ export function useServerConflict(opts: UseServerConflictOptions): {
 
   React.useEffect(() => {
     const onConflict = (e: Event) => {
-      const detail = (e as CustomEvent<{ serverLastEditedAt: string; brandFormat?: boolean }>).detail;
+      const detail = (e as CustomEvent<{ serverLastEditedAt: string; brandFormat?: boolean; styleModel?: boolean }>).detail;
       const token = detail?.serverLastEditedAt;
       if (!token) return;
       /* Idempotent while open: repeated autosave conflicts don't restack. */
       setDialog((d) => {
         if (d?.open) return d;
         trackEvent("save.conflict", { brandFormat: detail.brandFormat === true });
-        return { variant: "save", serverToken: token, brandFormat: detail.brandFormat === true, open: true };
+        return {
+          variant: "save",
+          serverToken: token,
+          brandFormat: detail.brandFormat === true,
+          styleModel: detail.styleModel === true,
+          open: true,
+        };
       });
     };
     window.addEventListener(SAVE_CONFLICT_EVENT, onConflict);
@@ -281,6 +287,7 @@ export function useServerConflict(opts: UseServerConflictOptions): {
       relation: dialog?.variant === "restore" ? dialog.relation : undefined,
       keptAt: dialog?.variant === "restore" ? dialog.keptAt : undefined,
       brandFormat: dialog?.variant === "save" ? dialog.brandFormat : false,
+      styleModel: dialog?.variant === "save" ? dialog.styleModel : false,
       server,
       onKeep,
       onSaveToHistory,

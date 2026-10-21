@@ -9,7 +9,7 @@
 import { act, renderHook } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-const provider = vi.hoisted(() => ({ token: null as string | null, brandFormat: false }));
+const provider = vi.hoisted(() => ({ token: null as string | null, brandFormat: false, styleModel: false }));
 
 vi.mock("@/services/BuildrikSyncProvider", () => ({
   SAVE_CONFLICT_EVENT: "buildrik:save-conflict",
@@ -17,6 +17,7 @@ vi.mock("@/services/BuildrikSyncProvider", () => ({
   isSaveConflictPending: () => provider.token !== null,
   getPendingConflictToken: () => provider.token,
   isBrandFormatConflict: () => provider.brandFormat,
+  isStyleModelConflict: () => provider.styleModel,
 }));
 
 import { useSaveConflict } from "../useSaveConflict";
@@ -33,6 +34,7 @@ const clear = () => {
 afterEach(() => {
   provider.token = null;
   provider.brandFormat = false;
+  provider.styleModel = false;
 });
 
 describe("useSaveConflict", () => {
@@ -45,7 +47,7 @@ describe("useSaveConflict", () => {
       provider.brandFormat = true;
       heard.mockClear();
       act(() => result.current.resolve());
-      expect((heard.mock.calls[0][0] as CustomEvent).detail).toEqual({ serverLastEditedAt: "2026-09-28T10:00:00.000Z", brandFormat: true });
+      expect((heard.mock.calls[0][0] as CustomEvent).detail).toEqual({ serverLastEditedAt: "2026-09-28T10:00:00.000Z", brandFormat: true, styleModel: false });
     } finally {
       window.removeEventListener("buildrik:save-conflict", heard);
     }
@@ -79,7 +81,7 @@ describe("useSaveConflict", () => {
       heard.mockClear();
       act(() => result.current.resolve());
       expect(heard).toHaveBeenCalledTimes(1);
-      expect((heard.mock.calls[0][0] as CustomEvent).detail).toEqual({ serverLastEditedAt: "2026-09-28T10:00:00.000Z", brandFormat: false });
+      expect((heard.mock.calls[0][0] as CustomEvent).detail).toEqual({ serverLastEditedAt: "2026-09-28T10:00:00.000Z", brandFormat: false, styleModel: false });
       expect(result.current.pending).toBe(true);
     } finally {
       window.removeEventListener("buildrik:save-conflict", heard);

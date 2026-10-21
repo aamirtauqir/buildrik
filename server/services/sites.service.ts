@@ -22,6 +22,8 @@ import { hasLiveDeployment, unpublishSite } from "@/server/services/publish.serv
 import { slugifyProjectName } from "@/lib/vercel";
 import { BRAND_FORMAT_CONFLICT, TOKENS_SCHEMA_VERSION } from "@buildrik/shared/schemas/design-tokens";
 import { checkTokenPayload, TokenSaveError, type TokenCheck } from "@/server/services/brand-tokens";
+import { effectiveStyleModel, newSiteStyleModel } from "@/server/services/class-styles";
+import { STYLE_MODEL_CONFLICT } from "@buildrik/shared/schemas/class-styles";
 
 function slugify(name: string): string {
   return name
@@ -235,6 +237,7 @@ export async function createSite(
           creationMethod: "TEMPLATE",
           templateId: input.templateId,
           pages: templatePageCount,
+          styleModel: newSiteStyleModel(workspaceId),
           lastEditedAt: new Date(),
           lastEditedById: userId,
         },
@@ -265,6 +268,7 @@ export async function createSite(
         workspaceId,
         createdBy: userId,
         pages: 1,
+        styleModel: newSiteStyleModel(workspaceId),
         lastEditedAt: new Date(),
         lastEditedById: userId,
       },
@@ -562,6 +566,8 @@ export async function duplicateSite(
         projectAssets: (original.projectAssets as Prisma.InputJsonValue) ?? undefined,
         projectSettings: (original.projectSettings as Prisma.InputJsonValue) ?? undefined,
         projectCmsBindings: copyCmsBindings(original.projectCmsBindings, reid.renames),
+        // The copy renders like the original: same cascade.
+        styleModel: original.styleModel,
         lastEditedAt: new Date(),
         lastEditedById: userId,
       },
@@ -810,6 +816,7 @@ export async function saveProjectFromEditor(
   },
   expectedLastEditedAt?: string,
   editorId?: string,
+  styleModelAck?: "class",
 ) {
   // 2026-05-23: array-level cast — Zod's passthrough output type
   // (`objectOutputType<{...},...,"passthrough">`) for the `meta` field
@@ -839,6 +846,7 @@ export async function saveProjectFromEditor(
     settings: projectData.settings,
     dsSchemaVersion: projectData.dsSchemaVersion,
     cmsBindings: projectData.cmsBindings,
+    styleModelAck,
   }, expectedLastEditedAt, editorId);
 }
 
@@ -1051,9 +1059,21 @@ export async function saveProjectData(input: SaveProjectDataInput, expectedLastE
       workspaceId: true,
       dsSchemaVersion: true,
       tokensMigrationHold: true,
+      styleModel: true,
     },
   });
   if (!site || site.deletedAt) throw new Error("SITE_NOT_FOUND");
+
+  /* Class-first stale-editor guard (CLASS-FIRST-SPEC §2.3): a class-model
+     site only takes saves from an editor that loaded it in the class model
+     and says so (`styleModelAck`). A tab opened before the switch, or an
+     older build, would save with the legacy rule order and local weights
+     over class data. Refused as a conflict every bundle opens; a current
+     bundle reads the reason and offers Reload only. */
+  if (effectiveStyleModel(site.styleModel, site.workspaceId) === "class" && input.styleModelAck !== "class") {
+    console.warn("[class-styles] save refused: editor not in the class style model", { siteId: input.siteId });
+    throw new Error(`${STYLE_MODEL_CONFLICT} SAVE_CONFLICT:${site.lastEditedAt.toISOString()}`);
+  }
 
   /* Brand Part 1 (eng E4): the first save that moves a site's tokens to v6
      must carry the CAS token and match it now — the migration snapshot below

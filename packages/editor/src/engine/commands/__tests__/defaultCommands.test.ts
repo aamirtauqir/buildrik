@@ -63,6 +63,7 @@ function makeComposer() {
       groupElements: vi.fn(() => makeElement("group-1")),
       ungroupElement: vi.fn(),
     },
+    styles: { removeRulesOf: vi.fn() },
     getState: vi.fn(() => ({ zoom: 100, snapToGrid: false, gridSize: 8 })),
     setZoom: vi.fn(),
     setDevice: vi.fn(),

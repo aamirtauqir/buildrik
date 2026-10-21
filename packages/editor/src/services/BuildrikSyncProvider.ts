@@ -19,6 +19,7 @@ import type { updateSiteSettingsSchema } from "@buildrik/shared/schemas/site-det
 import { SITE_COLUMN_FIELDS } from "@buildrik/shared/schemas/site-column-fields";
 import { MAX_CMS_BINDINGS_CHARS } from "@buildrik/shared/schemas/sites";
 import { BRAND_FORMAT_CONFLICT } from "@buildrik/shared/schemas/design-tokens";
+import { STYLE_MODEL_CONFLICT, type StyleModel } from "@buildrik/shared/schemas/class-styles";
 import type { z } from "zod";
 import type { ElementData } from "@/shared/types/element";
 import { blankPageRoot } from "@buildrik/shared/content/elementIds";
@@ -91,6 +92,12 @@ let _conflictToken: string | null = null;
 /* The held conflict was refused for its brand format (BRAND_FORMAT_CONFLICT):
    Overwrite would resend the same refused payload, so only Reload resolves it. */
 let _conflictBrandFormat = false;
+/* …or because this tab did not load the site in its style model
+   (STYLE_MODEL_CONFLICT, class-first): Reload only, for the same reason. */
+let _conflictStyleModel = false;
+/* Sites this editor loaded in the class style model. Their saves carry
+   `styleModelAck: "class"`; a class-model site refuses a save without it. */
+const _classModelSites = new Set<string>();
 
 /** Whether a save conflict is waiting on the user's choice. Autosave reads it
  *  and holds the edit; a manual save is not sent either — saveProjectNow
@@ -112,6 +119,12 @@ export function isBrandFormatConflict(): boolean {
   return _conflictToken !== null && _conflictBrandFormat;
 }
 
+/** Whether the pending conflict is a style-model refusal (the site moved to
+ *  classes after this tab loaded it) — the dialog then offers Reload only. */
+export function isStyleModelConflict(): boolean {
+  return _conflictToken !== null && _conflictStyleModel;
+}
+
 /** Dispatched on `window` when a pending conflict is resolved — Overwrite
  *  adopted the server token, or a fresh load replaced the copy. */
 export const SAVE_CONFLICT_CLEARED_EVENT = "buildrik:save-conflict-cleared";
@@ -120,6 +133,7 @@ function clearConflictToken(): void {
   if (_conflictToken === null) return;
   _conflictToken = null;
   _conflictBrandFormat = false;
+  _conflictStyleModel = false;
   if (typeof window !== "undefined") window.dispatchEvent(new CustomEvent(SAVE_CONFLICT_CLEARED_EVENT));
 }
 
@@ -213,15 +227,16 @@ export function raiseSaveConflict(err: unknown): SaveConflictError | null {
   if (!match) return null;
   _conflictToken = match[1].trim();
   _conflictBrandFormat = msg.includes(BRAND_FORMAT_CONFLICT);
-  return announceConflict(_conflictToken, _conflictBrandFormat);
+  _conflictStyleModel = msg.includes(STYLE_MODEL_CONFLICT);
+  return announceConflict(_conflictToken, _conflictBrandFormat, _conflictStyleModel);
 }
 
-function announceConflict(serverToken: string, brandFormat: boolean): SaveConflictError {
+function announceConflict(serverToken: string, brandFormat: boolean, styleModel: boolean): SaveConflictError {
   /* A conflict raised after a Reload whose unload prompt was cancelled: the
      page lives on, and its refused work must be kept again. */
   resumeKeepingUnsaved();
   if (typeof window !== "undefined") {
-    window.dispatchEvent(new CustomEvent(SAVE_CONFLICT_EVENT, { detail: { serverLastEditedAt: serverToken, brandFormat } }));
+    window.dispatchEvent(new CustomEvent(SAVE_CONFLICT_EVENT, { detail: { serverLastEditedAt: serverToken, brandFormat, styleModel } }));
   }
   return new SaveConflictError(serverToken);
 }
@@ -730,6 +745,9 @@ export function projectDataFromRows(
     // Stored by sites.saveProject from exportProject()'s own `cmsBindings`.
     cmsBindings: siteRow.projectCmsBindings ?? undefined,
     brandTokensV2: (siteColumns as { brandTokensV2?: boolean } | null)?.brandTokensV2,
+    // The server's effective style model (column AND flags); absent = element,
+    // and an element-model site's data carries no key (unchanged shape).
+    ...((siteColumns as { styleModel?: StyleModel } | null)?.styleModel === "class" ? { styleModel: "class" as const } : {}),
     tokensMigrationHold: siteRow.tokensMigrationHold,
     metadata: {
       name: siteRow.name,
@@ -767,6 +785,8 @@ export async function loadProject(siteId: string): Promise<ProjectData> {
     clearConflictToken();
     _baselineSiteColumns = extractSiteColumnPatch(data.settings);
     _storedTokensKept.delete(siteId);
+    if (data.styleModel === "class") _classModelSites.add(siteId);
+    else _classModelSites.delete(siteId);
     // Same moment, same fact: this site's project is now known-good in memory,
     // which is the only condition under which saving over it is safe.
     _loadedSites.add(siteId);
@@ -849,7 +869,7 @@ async function saveProjectNow(
   /* A save queued behind the one that was refused carries the same stale
      token — sending it would only be refused again. It is refused here, with
      the same conflict, until the user resolves it (Overwrite / reload). */
-  if (_conflictToken !== null) throw announceConflict(_conflictToken, _conflictBrandFormat);
+  if (_conflictToken !== null) throw announceConflict(_conflictToken, _conflictBrandFormat, _conflictStyleModel);
   const client = getClient();
   /* Never persist a session Object URL: it is a broken image on every later
      open. The live element keeps its preview; once its upload reaches the
@@ -876,6 +896,8 @@ async function saveProjectNow(
       projectData: persisted,
       // 61-conflict: opt into behind-copy detection.
       expectedLastEditedAt: _baselineLastEditedAt,
+      // Class-first: this tab loaded the site in the class style model.
+      ...(_classModelSites.has(siteId) ? { styleModelAck: "class" as const } : {}),
     });
   } catch (err) {
     // Translate the server's CONFLICT into a typed error the shell can catch to
