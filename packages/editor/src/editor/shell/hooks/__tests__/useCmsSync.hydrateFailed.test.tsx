@@ -42,6 +42,7 @@ vi.mock("@/editor/chrome-ui", () => ({
 
 import { useCmsSync } from "../useCmsSync";
 import type { Composer } from "@/engine/Composer";
+import type { ToastInput } from "@/editor/chrome-ui";
 
 function stubComposer(collections: number) {
   return {
@@ -57,12 +58,12 @@ function stubComposer(collections: number) {
 }
 
 describe("useCmsSync — a failed hydrate is not silent (C-8)", () => {
-  let addToast: ReturnType<typeof vi.fn>;
+  let addToast: ReturnType<typeof vi.fn<(input: ToastInput) => string>>;
   beforeEach(() => {
     hydrationCb = null;
     dismissedKeys.length = 0;
     retryHydration.mockClear();
-    addToast = vi.fn(() => "t1");
+    addToast = vi.fn((_input: ToastInput) => "t1");
   });
 
   it("toasts with Try again when collections are already on screen", () => {
