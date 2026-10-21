@@ -429,13 +429,6 @@ describe("destroy", () => {
 
 describe("AUDIT — command registry reachability", () => {
   it.todo(
-    "AUDIT: registered 'export-html' and 'export-json' commands are unreachable — they have no " +
-      "shortcut field (so KeybindingManager never indexes them) and no UI affordance calls " +
-      "commands.run('export-html') / commands.run('export-json') anywhere in src/editor. " +
-      "Either wire an affordance or delete the registrations.",
-  );
-
-  it.todo(
     "AUDIT: CommandPalette (src/editor/shell/modals/CommandPalette.tsx) builds its own hardcoded " +
       "command list (composer.history.undo(), composer.emit(ZOOM_IN), ...) and never reads the " +
       "CommandCenter registry — commands registered via composer.commands.register() never appear " +

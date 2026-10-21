@@ -518,7 +518,7 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
     },
 
     // ============================================
-    // Preview & Export
+    // Preview
     // ============================================
     {
       id: "preview",
@@ -533,18 +533,6 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
           previewWindow.document.close();
         }
       },
-    },
-    {
-      id: "export-html",
-      label: "Export HTML",
-      group: "Tools",
-      run: (c) => c.exportHTML(),
-    },
-    {
-      id: "export-json",
-      label: "Export JSON",
-      group: "Tools",
-      run: (c) => c.exportJSON(),
     },
 
     // ============================================

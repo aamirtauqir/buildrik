@@ -354,7 +354,7 @@ function buildCommands(
     });
   }
 
-  /* Everything else the registry holds (Export HTML/JSON, devices, nudges…) —
+  /* Everything else the registry holds (devices, nudges…) —
      searchable under MORE. The Pages panel's rows keep their PAGES band. Dedup
      by id AND label: a registry row the board list already carries is not
      printed twice. */
