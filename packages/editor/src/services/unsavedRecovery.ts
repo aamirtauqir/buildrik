@@ -114,18 +114,23 @@ export function takeOffScreenUnsaved(siteId: string): UnsavedWork | null {
   return readUnsaved(siteId);
 }
 
+/** Fired on `window` when a refused snapshot could not be kept (quota or
+ *  storage disabled). detail: { siteId }. The shell tells the user the work
+ *  now lives only in this tab. */
+export const UNSAVED_KEEP_FAILED_EVENT = "buildrik:unsaved-keep-failed";
+
 /** Keep a snapshot the server refused. Best-effort: a full state is large and
  *  can exceed quota, and failing to keep it must never break the editor the
- *  user is still holding the work in. A no-op once the user discarded this
- *  site's copy (`discardUnsaved`). */
+ *  user is still holding the work in — but it is reported, because the user
+ *  is then one closed tab away from losing it. A no-op once the user discarded
+ *  this site's copy (`discardUnsaved`). */
 export function keepUnsaved(siteId: string, project: ProjectData, base: string | null): void {
   if (discarded.has(siteId) || offScreen.has(siteId)) return;
   try {
     const record: UnsavedWork = { project, at: new Date().toISOString(), base };
     localStorage.setItem(keyFor(siteId), JSON.stringify(record));
   } catch {
-    /* quota or storage disabled — the tab still holds the work, and the load
-       path simply has nothing extra to report. */
+    window.dispatchEvent(new CustomEvent(UNSAVED_KEEP_FAILED_EVENT, { detail: { siteId } }));
   }
 }
 
