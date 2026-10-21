@@ -75,12 +75,17 @@ export function CollectionSettingsPane({ composer, collection, records }: Collec
   const rename = async () => {
     if (!composer || error || !dirty) return;
     setSaving(true);
+    /* C-6: a refused rename used to end in silence (try/finally, no catch). */
+    let saved = false;
     try {
-      await composer.cms.collections.updateCollection(collection.id, { name: nextName, slug: nextSlug });
-      addToast({ tone: "success", title: "Collection renamed", description: nextName });
+      saved = (await composer.cms.collections.updateCollection(collection.id, { name: nextName, slug: nextSlug })) !== null;
+    } catch {
+      saved = false;
     } finally {
       setSaving(false);
     }
+    if (saved) addToast({ tone: "success", title: "Collection renamed", description: nextName });
+    else addToast({ tone: "error", title: `Could not rename “${collection.name}”`, description: "The name and slug are unchanged. Try again." });
   };
 
   const remove = async () => {

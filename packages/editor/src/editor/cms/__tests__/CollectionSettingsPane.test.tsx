@@ -52,6 +52,15 @@ describe("CollectionSettingsPane", () => {
     await waitFor(() => expect(updateCollection).toHaveBeenCalledWith("col-1", { name: "Dishes", slug: "dishes" }));
   });
 
+  it("C-6: a refused rename says so instead of ending in silence", async () => {
+    const { updateCollection } = mount(MENU, []);
+    updateCollection.mockRejectedValueOnce(new Error("quota"));
+    fireEvent.change(screen.getByTestId("cms-settings-name"), { target: { value: "Dishes" } });
+    fireEvent.click(screen.getByTestId("cms-settings-rename"));
+    expect(await screen.findByText("Could not rename “Menu items”")).toBeInTheDocument();
+    expect(screen.queryByText("Collection renamed")).toBeNull();
+  });
+
   it("refuses a slug another collection already uses, or an empty name", () => {
     mount(MENU, []);
     fireEvent.change(screen.getByTestId("cms-settings-slug"), { target: { value: "team" } });

@@ -130,7 +130,7 @@ export function makeEngine(opts?: {
           items = items.filter((i) => i.id !== id);
           return Promise.resolve(true);
         }),
-        addField: vi.fn(() => Promise.resolve(null)),
+        addField: vi.fn((_id: string, field: Record<string, unknown>) => Promise.resolve({ ...field, id: "f-new" })),
         deleteField: vi.fn(() => Promise.resolve(true)),
         /* Mutates the array the getters read from, so a save is observable the
            way it is in the engine — a spy that only records the call would pass
