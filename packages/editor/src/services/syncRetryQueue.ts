@@ -19,7 +19,8 @@
 import { deepEqual } from "@shared/utils/helpers/objectDeep";
 
 export interface SyncRetryInfo {
-  /** Number of changes still queued (not yet mirrored to the server). */
+  /** Changes this queue still owes the server — queued retries and in-flight
+   *  mirrors (`outstandingCount()`), read after the settling op left both. */
   pending: number;
 }
 
@@ -54,11 +55,16 @@ export function totalPendingMirrors(): number {
   return total;
 }
 
+type Attempt = "ok" | "cleared" | "failed";
+
 export class SyncRetryQueue {
   private queue = new Map<string, () => Promise<boolean>>();
   private subscribers = new Set<(info: SyncRetryInfo) => void>();
   /** The op running per target — the next one for it waits (see `run`). */
-  private inFlight = new Map<string, Promise<boolean>>();
+  private inFlight = new Map<string, Promise<Attempt>>();
+  /** The last notification reported work outstanding, so a "not on the
+   *  server" notice may be on screen and every settle has to correct it. */
+  private announced = false;
 
   constructor() {
     if (typeof window !== "undefined") {
@@ -100,7 +106,7 @@ export class SyncRetryQueue {
    *  in flight and none is queued (publish is allowed to proceed). */
   settled(key: string): Promise<boolean> {
     const inflight = this.inFlight.get(key);
-    if (inflight) return inflight;
+    if (inflight) return inflight.then((o) => o !== "failed");
     return Promise.resolve(!this.queue.has(key));
   }
 
@@ -127,7 +133,8 @@ export class SyncRetryQueue {
   }
 
   private notify(): void {
-    const info: SyncRetryInfo = { pending: this.queue.size };
+    const info: SyncRetryInfo = { pending: this.outstandingCount() };
+    this.announced = info.pending > 0;
     this.subscribers.forEach((cb) => {
       try {
         cb(info);
@@ -140,7 +147,7 @@ export class SyncRetryQueue {
   /**
    * Run one mirror task. On success the target clears from the queue; on failure
    * the (latest) task is queued under `key`, `onWarn` fires, and subscribers are
-   * notified with the new pending count. Never throws.
+   * notified with the new outstanding count. Never throws.
    *
    * Resolves true when THIS op reached the server, false when it was queued —
    * `pendingCount()` cannot answer that, since it counts every target and a
@@ -161,35 +168,43 @@ export class SyncRetryQueue {
     const prev = this.inFlight.get(key);
     const mine = (prev ?? Promise.resolve()).then(() => this.attempt(key, task, onWarn));
     this.inFlight.set(key, mine);
+    let outcome: Attempt = "ok";
     try {
-      return await mine;
+      outcome = await mine;
+      return outcome !== "failed";
     } finally {
       /* Only delete if this is still the latest in-flight entry — a newer
          run on the same key keeps its own promise tracked. */
       if (this.inFlight.get(key) === mine) this.inFlight.delete(key);
+      /* Notified HERE, after the op left `inFlight`, so the count matches
+         `outstandingCount()` — what the publish gate reads (C-16). Read
+         inside `attempt`, a success still counted itself and the notice
+         never reached zero; read as `queue.size`, it left out the mirrors in
+         flight that the gate counts. While a notice is up (`announced`),
+         every settle corrects it — a mirror in flight when it was raised
+         must take it down when it lands, though nothing was queued for it.
+         A first-time success with nothing announced stays quiet: nothing was
+         pending, nothing changed. */
+      if (outcome !== "ok" || this.announced) this.notify();
     }
   }
 
+  /* "cleared": succeeded and took a queued retry with it. Subscribers put a
+     permanent "not on the server" toast on screen; when the queue drains — by
+     a retry, or by the `online` handler replaying it with no UI involved — it
+     has to fire, or that toast stands forever asserting a fixed failure. */
   private async attempt(
     key: string,
     task: () => Promise<unknown>,
     onWarn: (e: unknown) => void
-  ): Promise<boolean> {
+  ): Promise<Attempt> {
     try {
       await task();
-      /* Notify only when this actually cleared something. Subscribers put a
-         permanent "not on the server" toast on screen; when the queue drains —
-         by this retry, or by the `online` handler replaying it with no UI
-         involved — nothing used to fire, so that toast stood forever asserting
-         a failure that had already been fixed. Firing on every first-time
-         success instead would be noise: nothing was pending, nothing changed. */
-      if (this.queue.delete(key)) this.notify();
-      return true;
+      return this.queue.delete(key) ? "cleared" : "ok";
     } catch (e) {
       onWarn(e);
       this.queue.set(key, () => this.run(key, task, onWarn));
-      this.notify();
-      return false;
+      return "failed";
     }
   }
 
