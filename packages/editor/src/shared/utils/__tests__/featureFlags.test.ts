@@ -12,7 +12,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 // VITE_FEATURE_PUBLISH are ON — which would flip the "default off" assertions.
 // Clear every feature key (both context prefixes) so the baseline is hermetic
 // regardless of which config/cwd runs the file.
-const FEATURE_KEYS = ["PUBLISH", "DS_AI", "COLLAB"].flatMap((n) => [
+const FEATURE_KEYS = ["PUBLISH", "DS_AI", "COLLAB", "CMS_DATA_SOURCES"].flatMap((n) => [
   `VITE_FEATURE_${n}`,
   `NEXT_PUBLIC_FEATURE_${n}`,
 ]);
@@ -33,7 +33,9 @@ describe("FEATURES / isFeatureEnabled", () => {
       publish: false,
       dsAi: false,
       collab: false,
+      cmsDataSources: false,
     });
+    expect(isFeatureEnabled("cmsDataSources")).toBe(false);
     expect(isFeatureEnabled("publish")).toBe(false);
     expect(isFeatureEnabled("collab")).toBe(false);
   });
