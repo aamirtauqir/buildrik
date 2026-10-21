@@ -83,7 +83,6 @@ export function useCanvasIndicators({
     // Subscribe to indicator events
     indicators.on("spacing:updated", updateIndicators);
     indicators.on("badge:set", updateIndicators);
-    indicators.on("badge:removed", updateIndicators);
     composer.on(EVENTS.ELEMENT_SELECTED, updateIndicators);
 
     // Initial update
@@ -99,7 +98,6 @@ export function useCanvasIndicators({
       try {
         capturedIndicators.off("spacing:updated", updateIndicators);
         capturedIndicators.off("badge:set", updateIndicators);
-        capturedIndicators.off("badge:removed", updateIndicators);
       } catch {
         // Indicators may have been destroyed
       }
