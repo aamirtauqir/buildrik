@@ -137,9 +137,6 @@ export interface StudioHeaderProps {
   /** Save now. Resolves with the HONEST outcome — the exit guard branches on it. */
   onSave: () => Promise<SaveOutcome>;
 
-  /** Export HTML as zip download */
-  onExportHTML?: () => void;
-
   /** The publish door. AquibraStudio's `requestPublish` — it routes on
    *  `nextMove.gate` and opens the right dialog (errors confirm · stale
    *  acknowledgement · facts confirm); this bar never publishes on its own. */
@@ -267,7 +264,6 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   onOpenReview,
   onOpenConflict,
   onSave,
-  onExportHTML,
   onVercelPublish,
   publishLoading,
   publishedUrl,

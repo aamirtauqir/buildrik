@@ -113,6 +113,22 @@
       "status": "ships",
       "file": null,
       "shipsInstead": null
+    },
+    {
+      "surface": "Publish panel ⋯ · Download code",
+      "copy": "Download code (ZIP)",
+      "status": "ships",
+      "file": "src/editor/sidebar/tabs/publish/PublishTab.tsx",
+      "shipsInstead": null,
+      "note": "Owner decision (REA audit follow-up, lane A): the one-click ZIP (useExportHandlers.handleExportHTML) restored as a Publish panel ⋯ row, Pro-gated via getEditorPlanTier + openUpgrade. Not a board line."
+    },
+    {
+      "surface": "Publish panel ⋯ · Download code",
+      "copy": "Preparing ZIP…",
+      "status": "ships",
+      "file": "src/editor/sidebar/tabs/publish/PublishTab.tsx",
+      "shipsInstead": null,
+      "note": "Owner decision (REA audit follow-up, lane A): the one-click ZIP (useExportHandlers.handleExportHTML) restored as a Publish panel ⋯ row, Pro-gated via getEditorPlanTier + openUpgrade. Not a board line."
     }
   ]
 }

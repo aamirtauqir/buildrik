@@ -583,7 +583,6 @@ export class Composer extends EventEmitter {
       activePageId: null,
       snapToGrid: false,
       gridSize: 10,
-      isPreviewMode: false,
     };
   }
 

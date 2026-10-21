@@ -436,7 +436,6 @@ export const EVENTS = {
   MODE_EDIT: "mode:edit",
   MODE_PREVIEW: "mode:preview",
   MODE_CODE: "mode:code",
-  PREVIEW_MODE_CHANGED: "preview:mode:changed",
 
   // ============================================
   // Responsive Events
@@ -654,18 +653,6 @@ export const EVENTS = {
   OT_OPERATION_TRANSFORMED: "operation:transformed",
   OT_PENDING_CLEANUP: "pending:cleanup",
   OT_DIVERGENCE_DETECTED: "divergence:detected",
-
-  // ============================================
-  // Interaction Manager Events
-  // ============================================
-  INTERACTIONS_RUNTIME_STARTED: "interactions:runtime:started",
-  INTERACTIONS_RUNTIME_STOPPED: "interactions:runtime:stopped",
-  INTERACTION_ADDED: "interaction:added",
-  INTERACTION_UPDATED: "interaction:updated",
-  INTERACTION_REMOVED: "interaction:removed",
-  INTERACTION_TOGGLED: "interaction:toggled",
-  INTERACTIONS_CLEARED: "interactions:cleared",
-  INTERACTIONS_REORDERED: "interactions:reordered",
 
   // ============================================
   // Recovery Events

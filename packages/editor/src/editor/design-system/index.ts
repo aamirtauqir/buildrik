@@ -18,7 +18,6 @@ export {
 export type { ColorRegistry, SpacingRegistry, TypeRegistry } from "./state/TokenRegistryContext";
 export { DSModeProvider, useDSMode, useDSModeOptional } from "./state/DSModeContext";
 export type { DSMode } from "./state/DSModeContext";
-export { DSModeToggle } from "./ui/DSModeToggle";
 export {
   StylePresetRegistryProvider,
   useButtonPresets, useCardPresets, useFormPresets, useLinkPresets,
