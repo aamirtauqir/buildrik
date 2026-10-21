@@ -14,7 +14,6 @@ import { useCanvasNavigationGuard } from "./hooks/useCanvasNavigationGuard";
 /** Grey left each side of the page card when the canvas fits on load. */
 const FIT_GUTTER = 60;
 import { DeleteSelectionConfirm } from "./DeleteSelectionConfirm";
-import { stepZoom } from "@/shared/constants/canvas";
 import { getBreakpointForWidth } from "@/shared/constants/breakpoints";
 import type { DeviceType } from "@/shared/types";
 import { useToast } from "@/editor/chrome-ui";
@@ -398,7 +397,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
 
     /* React state and composer state each hold a zoom, and only some paths
        wrote both. The canvas paints from the PROP (zoom / 100), while
-       `EVENTS.ZOOM_IN` above steps from `composer.getState().zoom` — so after
+       the `zoom-in` command steps from `composer.getState().zoom` — so after
        a chord that moved only React state, the flyout's Zoom In computed from
        a stale percent and the canvas jumped. Push the prop down whenever they
        disagree; `setZoom` no-ops when the value already matches, and the
@@ -426,25 +425,6 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
     React.useEffect(() => {
       composer?.setSnapToGrid(showGrid);
     }, [composer, showGrid]);
-
-    /* ZOOM_IN / ZOOM_OUT had no listener anywhere. The ⌘K palette emits them
-       (CommandPalette.tsx "view-zoom-in"/"view-zoom-out") — so "Zoom in" was a
-       command you could find, read and run, and nothing moved. Steps to the
-       next preset, like ⌘=/⌘- (stepZoom, G2-016). */
-    React.useEffect(() => {
-      if (!composer) return;
-      const step = (direction: 1 | -1) => () => {
-        composer.setZoom(stepZoom(composer.getState().zoom, direction));
-      };
-      const zoomIn = step(1);
-      const zoomOut = step(-1);
-      composer.on(EVENTS.ZOOM_IN, zoomIn);
-      composer.on(EVENTS.ZOOM_OUT, zoomOut);
-      return () => {
-        composer.off(EVENTS.ZOOM_IN, zoomIn);
-        composer.off(EVENTS.ZOOM_OUT, zoomOut);
-      };
-    }, [composer]);
 
     // Emit hover events for LayersPanel sync
     React.useEffect(() => {
