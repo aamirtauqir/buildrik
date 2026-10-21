@@ -88,11 +88,14 @@ function flushMicrotasks() {
 function makeOpts() {
   const composer = {
     getProjectSettings: vi.fn(() => ({ seo: {} })),
+    isDirty: vi.fn(() => false),
+    getChangeSeq: vi.fn(() => 0),
   } as unknown as UseExportHandlersOptions["composer"];
   return {
     composer,
     addToast: vi.fn().mockReturnValue("toast-id"),
     setExportLoading: vi.fn(),
+    saveProject: vi.fn<UseExportHandlersOptions["saveProject"]>(async () => "saved"),
   };
 }
 

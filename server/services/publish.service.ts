@@ -415,13 +415,16 @@ export async function startPublish(
   // nothing new may go live in a workspace scheduled for deletion.
   if (site.workspace.deletionScheduledAt) throw new Error("WORKSPACE_DELETION_SCHEDULED");
 
-  /* C-3 freshness: the editor publishes the pages in ITS tab. If the site was
-     saved by someone else after this tab last loaded or saved it, those pages
-     are a behind-copy and would silently replace the newer work on the live
-     site. Same token and same refusal the save path uses. */
+  /* C-3 freshness + REA #9 binding: the editor saves before it publishes, and
+     its pages are rendered from that saved revision; the token names it. The
+     site must still BE that revision — a save after it (another tab, another
+     person) means the pages are not what is stored, and would replace newer
+     work on the live site; a token from no save at all is not a revision.
+     Equal, not "not older": the publish ships exactly the saved state the
+     approval gate below judges. Same refusal the save path uses. */
   if (
     opts?.expectedLastEditedAt &&
-    site.lastEditedAt.getTime() > new Date(opts.expectedLastEditedAt).getTime()
+    site.lastEditedAt.getTime() !== new Date(opts.expectedLastEditedAt).getTime()
   ) {
     throw new Error(`SAVE_CONFLICT:${site.lastEditedAt.toISOString()}`);
   }

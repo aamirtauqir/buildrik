@@ -96,10 +96,13 @@ function makeOpts() {
   const composer = {
     getProjectSettings: vi.fn(() => ({ seo: { siteName: "my-cool-site" } })),
     exportProject: vi.fn(() => ({ cmsBindings: undefined })),
-  } as unknown as UseExportHandlersOptions["composer"];
+    isDirty: vi.fn(() => false),
+    getChangeSeq: vi.fn(() => 0),
+  } as unknown as NonNullable<UseExportHandlersOptions["composer"]>;
   const addToast = vi.fn().mockReturnValue("toast-id");
   const setExportLoading = vi.fn();
-  return { composer, addToast, setExportLoading };
+  const saveProject = vi.fn<UseExportHandlersOptions["saveProject"]>(async () => "saved");
+  return { composer, addToast, setExportLoading, saveProject };
 }
 
 function flushMicrotasks() {
@@ -209,6 +212,82 @@ describe("useExportHandlers", () => {
         ],
         { acknowledgeStale: false },
       );
+    });
+
+    /* REA #9: publish ships the saved revision. */
+    describe("saved revision (REA #9)", () => {
+      const NOT_SAVED = expect.objectContaining({ title: "Publish blocked", tone: "neutral" });
+
+      it("does not save a clean document — a save would stale a fresh approval", async () => {
+        const { result } = renderHook(() => useExportHandlers(opts));
+        await act(async () => {
+          await result.current.handleVercelPublish();
+        });
+        expect(opts.saveProject).not.toHaveBeenCalled();
+        expect(result.current.publishJob.publish).toHaveBeenCalled();
+      });
+
+      it("saves unsaved edits first, then publishes", async () => {
+        const dirty = vi.mocked(opts.composer.isDirty);
+        dirty.mockReturnValue(true);
+        opts.saveProject.mockImplementation(async () => {
+          dirty.mockReturnValue(false);
+          return "saved";
+        });
+        const { result } = renderHook(() => useExportHandlers(opts));
+        await act(async () => {
+          await result.current.handleVercelPublish();
+        });
+        expect(opts.saveProject).toHaveBeenCalledTimes(1);
+        expect(result.current.publishJob.publish).toHaveBeenCalled();
+      });
+
+      it.each(["error", "queued-offline"] as const)("a %s save publishes nothing and says why", async (outcome) => {
+        vi.mocked(opts.composer.isDirty).mockReturnValue(true);
+        opts.saveProject.mockResolvedValue(outcome);
+        const { result } = renderHook(() => useExportHandlers(opts));
+        await act(async () => {
+          await result.current.handleVercelPublish();
+        });
+        expect(exportInstance.exportAllPages).not.toHaveBeenCalled();
+        expect(result.current.publishJob.publish).not.toHaveBeenCalled();
+        expect(opts.addToast).toHaveBeenCalledWith(NOT_SAVED);
+      });
+
+      it("a conflicted save publishes nothing and leaves the word to the conflict dialog", async () => {
+        vi.mocked(opts.composer.isDirty).mockReturnValue(true);
+        opts.saveProject.mockResolvedValue("conflict");
+        const { result } = renderHook(() => useExportHandlers(opts));
+        await act(async () => {
+          await result.current.handleVercelPublish();
+        });
+        expect(result.current.publishJob.publish).not.toHaveBeenCalled();
+        expect(opts.addToast).not.toHaveBeenCalled();
+      });
+
+      it("an edit landing while the save travelled publishes nothing", async () => {
+        vi.mocked(opts.composer.isDirty).mockReturnValue(true);
+        const { result } = renderHook(() => useExportHandlers(opts));
+        await act(async () => {
+          await result.current.handleVercelPublish();
+        });
+        expect(result.current.publishJob.publish).not.toHaveBeenCalled();
+        expect(opts.addToast).toHaveBeenCalledWith(NOT_SAVED);
+      });
+
+      it("an edit landing while the pages render publishes nothing", async () => {
+        const seq = vi.mocked(opts.composer.getChangeSeq);
+        exportInstance.exportAllPages.mockImplementationOnce(async () => {
+          seq.mockReturnValue(1);
+          return { files: DEFAULT_EXPORT_FILES };
+        });
+        const { result } = renderHook(() => useExportHandlers(opts));
+        await act(async () => {
+          await result.current.handleVercelPublish();
+        });
+        expect(result.current.publishJob.publish).not.toHaveBeenCalled();
+        expect(opts.addToast).toHaveBeenCalledWith(NOT_SAVED);
+      });
     });
 
     it("toasts error when export throws", async () => {

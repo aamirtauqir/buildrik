@@ -439,6 +439,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     composer,
     addToast,
     setExportLoading: modals.setExportLoading,
+    saveProject,
   });
   // The Issues panel had a state slot but no producer, so it rendered "No
   // issues" no matter how many the DS linter had found. `useIssuesFeed`
