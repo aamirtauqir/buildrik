@@ -90,7 +90,6 @@ export interface MockComposerOptions {
   /** Full element set — id-addressable via elements.getElement. */
   elements?: MockElement[];
   pages?: Array<{ id: string; name: string; isHome?: boolean }>;
-  globalClasses?: string[];
   selected?: MockElement | null;
   allSelected?: MockElement[];
 }
@@ -123,7 +122,6 @@ export function makeMockComposer(opts: MockComposerOptions = {}) {
       removeBreakpointStyleProperty: vi.fn(),
       getRule: vi.fn(() => undefined),
       setRule: vi.fn(),
-      getGlobalClasses: vi.fn(() => opts.globalClasses ?? []),
     },
     history: { push: vi.fn() },
     commands: { run: vi.fn() },

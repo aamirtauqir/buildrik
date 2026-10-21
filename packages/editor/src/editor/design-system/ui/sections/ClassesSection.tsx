@@ -14,10 +14,9 @@
  * at a time in the inspector, and nothing anywhere would tell you which ones
  * existed, how often, or whether a name had been typed two ways.
  *
- * The count is measured off the live element tree rather than a registry.
- * `composer.styles.getGlobalClasses()` — which the inspector's suggestion list
- * calls — is not implemented on the engine at all, so that list has always
- * come back empty; the tree is the only thing that knows.
+ * The count is measured off the live element tree rather than a registry —
+ * there is no engine class registry; the tree is the only thing that knows.
+ * The inspector's Add class suggestions read the same tally.
  *
  * @license BSD-3-Clause
  */
@@ -35,7 +34,7 @@ export interface ClassesSectionProps {
 const ENGINE_PREFIX = "buildrick-";
 
 /** `.name` → how many elements carry it, most-used first. */
-function tally(composer: Composer | null | undefined): [string, number][] {
+export function tallySiteClasses(composer: Composer | null | undefined): [string, number][] {
   const all = composer?.elements?.getAllElements?.() ?? [];
   const counts = new Map<string, number>();
   for (const el of all) {
@@ -49,12 +48,12 @@ function tally(composer: Composer | null | undefined): [string, number][] {
 }
 
 export const ClassesSection: React.FC<ClassesSectionProps> = ({ composer }) => {
-  const [rows, setRows] = React.useState<[string, number][]>(() => tally(composer));
+  const [rows, setRows] = React.useState<[string, number][]>(() => tallySiteClasses(composer));
 
   React.useEffect(() => {
-    setRows(tally(composer));
+    setRows(tallySiteClasses(composer));
     if (!composer) return;
-    const refresh = () => setRows(tally(composer));
+    const refresh = () => setRows(tallySiteClasses(composer));
     composer.on(EVENTS.ELEMENT_UPDATED, refresh);
     composer.on(EVENTS.ELEMENT_CREATED, refresh);
     composer.on(EVENTS.ELEMENT_DELETED, refresh);
