@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { publicProcedure, protectedProcedure, router } from "../trpc";
+import { createRateLimitedProcedure, publicProcedure, protectedProcedure, router } from "../trpc";
 import { TRPCError } from "@trpc/server";
 import {
   listCategories,
@@ -10,6 +10,10 @@ import {
   createTicket,
 } from "@/server/services/help.service";
 import { supportTicketSchema } from "@buildrik/shared/schemas/help";
+
+/* `feedback` is public (the help centre is readable signed-out) and writes a
+   row per call, so it is capped per IP: 30 votes per 15 minutes. */
+const feedbackLimit = createRateLimitedProcedure(30, 15 * 60 * 1000);
 
 export const helpRouter = router({
   categories: publicProcedure.query(() => listCategories()),
@@ -30,7 +34,7 @@ export const helpRouter = router({
       return article;
     }),
 
-  feedback: publicProcedure
+  feedback: feedbackLimit
     .input(z.object({ articleId: z.string(), helpful: z.boolean() }))
     .mutation(async ({ input }) => {
       await submitFeedback(input.articleId, input.helpful);

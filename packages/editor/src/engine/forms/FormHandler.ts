@@ -261,6 +261,7 @@ export class FormHandler {
         webhookUrl: config.webhookUrl,
         emailOptions: config.emailOptions,
         submitterEmailField: config.submitterEmailField,
+        emailSettings: this.composer.getProjectSettings().integrations?.email,
       };
 
       // Submit via service

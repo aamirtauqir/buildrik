@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { buildSteps, STEPS, SKIPPED_STEPS } from "./route";
+import { buildSteps, STEPS, SKIPPED_STEPS } from "@server/services/publish-worker.service";
 
 /**
  * Publish worker — honest step status.

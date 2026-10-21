@@ -51,6 +51,7 @@ vi.mock("@/server/services/publish.service", () => ({
   assertProjectNameFree: (...a: unknown[]) => assertProjectNameFree(...a),
   completePublish: (...a: unknown[]) => completePublish(...a),
   applyPublishedPassword: (...a: unknown[]) => applyPublishedPassword(...a),
+  isSimulationAllowed: () => false,
 }));
 vi.mock("@/server/services/site-settings.service", () => ({ decryptPublishedPassword: () => null }));
 vi.mock("@/server/services/marketplace.service", () => ({ getWorkspaceAppScripts: vi.fn(async () => "") }));

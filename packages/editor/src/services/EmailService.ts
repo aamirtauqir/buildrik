@@ -5,6 +5,13 @@
  */
 
 import { escapeHTML } from "../shared/utils/html/encoding";
+import type { EmailServiceConfig } from "@/shared/types/project";
+
+/**
+ * From-address for form-submission notifications on published sites. Must stay on
+ * a domain we control, so it can be SPF/DKIM-verified with the mail provider.
+ */
+const FORM_NOTIFICATION_SENDER = "noreply@buildrick.io";
 
 // ============================================================================
 // TYPES
@@ -188,6 +195,31 @@ export class EmailService {
    */
   configure(config: EmailProviderConfig): void {
     this.config = config;
+  }
+
+  /**
+   * Configure from the project's email integration settings
+   * (`settings.integrations.email`). Leaves the current config untouched when
+   * the integration is off, has no key, or is `none`.
+   */
+  configureFromSettings(emailConfig: EmailServiceConfig = { provider: "none", enabled: false }): void {
+    if (emailConfig.provider === "sendgrid" && emailConfig.apiKey && emailConfig.enabled) {
+      this.configure({
+        provider: "sendgrid",
+        apiKey: emailConfig.apiKey,
+        // Sender must be on a domain we can verify with the provider. It used to
+        // be noreply@aquibra.com — a domain from the project this was forked from,
+        // which SendGrid would reject as an unverified sender, so form
+        // notifications failed silently.
+        fromEmail: FORM_NOTIFICATION_SENDER,
+      });
+    } else if (emailConfig.provider !== "none" && emailConfig.apiKey && emailConfig.enabled) {
+      // For other providers with API keys, use mock until properly configured
+      this.configure({
+        provider: "mock",
+        fromEmail: FORM_NOTIFICATION_SENDER,
+      });
+    }
   }
 
   /**

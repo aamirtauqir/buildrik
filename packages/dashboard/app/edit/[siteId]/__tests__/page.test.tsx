@@ -38,8 +38,20 @@ vi.mock("@server/auth", () => ({
   auth: () => authMock(),
 }));
 
-vi.mock("@server/services/sites.service", () => ({
-  getEditorAccess: (...args: unknown[]) => canEditMock(...args),
+// The page reads access through a server-side tRPC caller (sites.editorAccess),
+// not the service. The caller's context carries the session the page already
+// resolved (the last auth() result).
+vi.mock("@server/trpc/trpc", () => ({
+  createTRPCContext: async () => ({ session: await authMock.mock.results.at(-1)?.value }),
+}));
+vi.mock("@server/trpc/router", () => ({
+  appRouter: {
+    createCaller: (ctx: { session: { user: { id: string } } }) => ({
+      sites: {
+        editorAccess: ({ siteId }: { siteId: string }) => canEditMock(ctx.session.user.id, siteId),
+      },
+    }),
+  },
 }));
 
 vi.mock("@/components/editor-route/EditorClient", () => ({

@@ -234,6 +234,17 @@ describe("Publish Service", () => {
       vi.mocked(prisma.page.findMany).mockResolvedValue([{ name: "Home", blocks: [], settings: {} }] as never);
     });
 
+    it("refuses with PUBLISH_DISABLED when the Publish flag is off, before touching the DB", async () => {
+      vi.stubEnv("NEXT_PUBLIC_FEATURE_PUBLISH", "false");
+      try {
+        await expect(startPublish("s1", "user1", PAGES)).rejects.toThrow("PUBLISH_DISABLED");
+        expect(prisma.publishBuildJob.findFirst).not.toHaveBeenCalled();
+        expect(prisma.publishBuildJob.create).not.toHaveBeenCalled();
+      } finally {
+        vi.unstubAllEnvs();
+      }
+    });
+
     it("refuses a site its checks block, with the blocking rows (D11)", async () => {
       vi.mocked(prisma.publishBuildJob.findFirst).mockResolvedValue(null);
       vi.mocked(prisma.page.findMany).mockResolvedValue([] as never);
