@@ -30,6 +30,7 @@ import {
   assertProjectNameFree,
   runVercelDeploy,
   completePublish,
+  isSimulationAllowed,
 } from "@server/services/publish.service";
 import { decryptPublishedPassword } from "@server/services/site-settings.service";
 import { getWorkspaceAppScripts } from "@server/services/marketplace.service";
@@ -120,7 +121,7 @@ export async function runPublishJob(jobId: string): Promise<PublishJobResult> {
     // here — while locally the same click produced a green "Published" state
     // and nobody could see the bug. Simulation is now opt-in via an explicit
     // flag, so no environment can silently fake a successful deploy.
-    const simulationAllowed = process.env.PUBLISH_ALLOW_SIMULATION === "true";
+    const simulationAllowed = isSimulationAllowed();
     if (!useVercel && !simulationAllowed) {
       throw new Error(
         "No page content to deploy. Open the site in the editor and publish from there.",

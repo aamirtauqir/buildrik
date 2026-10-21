@@ -136,13 +136,26 @@ describe("publish.service Vercel connection gating", () => {
   });
 
   it("falls through to simulation only when PUBLISH_ALLOW_SIMULATION is explicitly set", async () => {
-    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("NODE_ENV", "development");
     vi.stubEnv("PUBLISH_ALLOW_SIMULATION", "true");
     getConnMock.mockResolvedValueOnce(null);
 
     // Returns null so the worker can fall through to runSimulation.
     const result = await runVercelDeploy("ws_1", "buildrik-site-test", []);
     expect(result).toBeNull();
+  });
+
+  it("refuses simulation under NODE_ENV=production even with PUBLISH_ALLOW_SIMULATION set, and says so", async () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("PUBLISH_ALLOW_SIMULATION", "true");
+    getConnMock.mockResolvedValueOnce(null);
+    const err = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    await expect(
+      runVercelDeploy("ws_1", "buildrik-site-test", []),
+    ).rejects.toThrow("VERCEL_NOT_CONNECTED");
+    expect(err).toHaveBeenCalledWith(expect.stringContaining("IGNORED in production"));
+    err.mockRestore();
   });
 
   it("passes {token, teamId} to createVercelDeployment when connection exists", async () => {

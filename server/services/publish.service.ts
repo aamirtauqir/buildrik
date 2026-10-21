@@ -22,6 +22,25 @@ import {
 
 const CMS_EMPTY_BINDINGS_LABEL = "CMS bindings";
 
+/**
+ * Is the no-credentials simulation publish path allowed? Only on the explicit
+ * `PUBLISH_ALLOW_SIMULATION=true` opt-in, and NEVER under
+ * `NODE_ENV=production`: a production process with the flag set would report
+ * every publish as live with a `.invalid` URL while deploying nothing. That
+ * case is refused here (and logged loudly), so production always takes the
+ * real Vercel path or fails honestly.
+ */
+export function isSimulationAllowed(): boolean {
+  if (process.env.PUBLISH_ALLOW_SIMULATION !== "true") return false;
+  if (process.env.NODE_ENV === "production") {
+    console.error(
+      "[publish] PUBLISH_ALLOW_SIMULATION=true is IGNORED in production — simulation publishes are refused. Remove it from the production env.",
+    );
+    return false;
+  }
+  return true;
+}
+
 export async function runPrePublishChecks(siteId: string): Promise<PrePublishChecksResult> {
   const [allPages, site, domain] = await Promise.all([
     /* Every page WITH its visibility, because these checks describe the
@@ -69,7 +88,7 @@ export async function runPrePublishChecks(siteId: string): Promise<PrePublishChe
   const vercel = site ? await getActiveVercelConnection(site.workspaceId) : null;
   if (vercel) {
     checks.push({ label: VERCEL_CHECK_LABEL, status: "pass", detail: "This workspace is connected to Vercel." });
-  } else if (process.env.PUBLISH_ALLOW_SIMULATION === "true") {
+  } else if (isSimulationAllowed()) {
     /* The same explicit opt-in startPublish and the worker already honour
        (never NODE_ENV): with no connection the publish runs the simulation.
        Failing here left "Publish now" disabled, so the local loop the flag
@@ -512,7 +531,7 @@ export async function startPublish(
      die in the worker with "No page content to deploy", while the sweep
      recorded the schedule as started. Refused here, before any job exists.
      Simulation (dev only) is the one path that runs without pages. */
-  if (!pages?.length && !opts?.rollbackOf && process.env.PUBLISH_ALLOW_SIMULATION !== "true") {
+  if (!pages?.length && !opts?.rollbackOf && !isSimulationAllowed()) {
     throw new Error("NO_PAGES");
   }
 
@@ -525,7 +544,7 @@ export async function startPublish(
   // NODE_ENV meant dev silently exercised a different publish path than
   // production, which is how the dashboard's no-payload publish stayed
   // invisible locally while failing every time in prod.
-  if (process.env.PUBLISH_ALLOW_SIMULATION !== "true") {
+  if (!isSimulationAllowed()) {
     const vercel = await getActiveVercelConnection(site.workspaceId);
     if (!vercel) throw new Error("VERCEL_NOT_CONNECTED");
   }
@@ -1112,7 +1131,7 @@ export async function runVercelDeploy(
     // can fall through to runSimulation for a no-credentials local loop.
     // Otherwise throw, so the editor toast can surface a reconnect link. Was
     // keyed on NODE_ENV, which made dev and prod take different publish paths.
-    if (process.env.PUBLISH_ALLOW_SIMULATION === "true") return null;
+    if (isSimulationAllowed()) return null;
     throw new Error("VERCEL_NOT_CONNECTED");
   }
 
