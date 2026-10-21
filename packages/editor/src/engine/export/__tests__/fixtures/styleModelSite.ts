@@ -19,7 +19,11 @@ import { ExportEngine } from "@/engine/export/ExportEngine";
 const TABLET = "(max-width: 1023px)";
 const MOBILE = "(max-width: 767px)";
 
-export function loadStyleModelSite(composer: Composer): void {
+/**
+ * `classRules: false` leaves out the imported class and tag rules — the shape
+ * of every site today, 100% element-local (classes on elements, no rules).
+ */
+export function loadStyleModelSite(composer: Composer, { classRules = true }: { classRules?: boolean } = {}): void {
   composer.importProject({
     pages: [
       {
@@ -75,6 +79,7 @@ export function loadStyleModelSite(composer: Composer): void {
   s.setRule(elementSelector("goneEl"), { outline: "7px dotted rgb(1, 2, 3)" });
   s.setRule(elementSelector("goneEl"), { "font-size": "9px" }, { mediaQuery: TABLET });
 
+  if (!classRules) return;
   // Imported class and tag rules, after the element rules.
   s.setRule(".hero-title", { color: "rgb(200, 0, 0)", "letter-spacing": "1px" });
   s.setRule(".hero-title", { color: "rgb(0, 200, 0)" }, { pseudo: ":hover" });
@@ -86,7 +91,7 @@ export function loadStyleModelSite(composer: Composer): void {
   s.setRule("p", { margin: "0 0 4px" });
 }
 
-function canvasSheet(composer: Composer, device: "desktop" | "tablet" | "mobile"): string {
+export function canvasSheet(composer: Composer, device: "desktop" | "tablet" | "mobile"): string {
   composer.setDevice(device);
   composer.styles.flush();
   return document.getElementById("aquibra-styles")?.textContent ?? "";

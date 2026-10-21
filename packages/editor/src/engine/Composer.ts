@@ -53,6 +53,7 @@ import { SelectionManager } from "./SelectionManager";
 import { StorageAdapter } from "./storage/StorageAdapter";
 import { StyleEngine } from "./styles/StyleEngine";
 import { ClassRegistry } from "./styles/ClassRegistry";
+import type { StyleModel } from "@buildrik/shared/schemas/class-styles";
 import type { Patch } from "./utils/JsonPatch";
 import { MigrationManager } from "./migration/MigrationManager";
 import { AliasResolver } from "./aliasResolver";
@@ -136,6 +137,15 @@ export class Composer extends EventEmitter {
   readonly styles: StyleEngine;
   /** The site's classes, derived from element.classes + class rules (class-first, BD-30). */
   readonly classes: ClassRegistry;
+  /**
+   * The site's style model (class-first, BD-30): the server-owned
+   * `Site.styleModel` column, set at load (before the import) and never taken
+   * from a project payload. "element" — every site today — keeps the cascade
+   * byte-identical; "class" orders rules tag → class → element-local and
+   * weights element-local rules above every class rule (cascadeCSS
+   * localSelector).
+   */
+  styleModel: StyleModel = "element";
   readonly commands!: CommandCenter;
 
   /**
@@ -855,7 +865,7 @@ export class Composer extends EventEmitter {
        inline bases + `toCSS()` in insertion order, so Preview could disagree
        with the live site about which rule wins. */
     const css =
-      elementBaseCSS([this.elements.getActivePageRootData?.()], elementSelector, "media", false) +
+      elementBaseCSS([this.elements.getActivePageRootData?.()], elementSelector, "media", false, undefined, this.styleModel) +
       "\n\n" +
       this.styles.generateResponsiveCSS(options);
 

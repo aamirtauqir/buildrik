@@ -92,6 +92,9 @@ export type BaseRuleCache = Map<string, { base: string | null; hides: string[] }
  * whole block carrying a dangerous pattern (expression(), -moz-binding) is
  * dropped, as the inline style attribute used to be.
  *
+ * `styleModel` "class" writes each selector through localSelector (the
+ * specificity ladder); "element" leaves it as `selectorFor` built it.
+ *
  * `cache` (the canvas passes one) keeps each element's built rules between
  * calls: the canvas rewrites its whole sheet on every edit, and rebuilding
  * 500 unchanged rules each time was the bulk of the cost. An element whose
@@ -103,11 +106,12 @@ export function elementBaseCSS(
   target: CascadeTarget,
   minify: boolean,
   cache?: BaseRuleCache,
+  styleModel: StyleModel = "element",
 ): string {
   const baseRules: string[] = [];
   const hideRules: string[] = [];
   const build = (id: string, styles: Record<string, string>, flat: string) => {
-    const sel = selectorFor(id);
+    const sel = localSelector(selectorFor(id), styleModel);
     const base = isSafeAttrValue("style", flat, "")
       ? minify
         ? `${sel}{${stylesToCSS(styles, true)}}`
@@ -122,7 +126,7 @@ export function elementBaseCSS(
       const flat = stylesToString(styles);
       let built;
       if (cache) {
-        const key = `${el.id}|${target}|${flat}`;
+        const key = `${el.id}|${target}|${styleModel}|${flat}`;
         built = cache.get(key);
         if (!built) cache.set(key, (built = build(el.id, styles, flat)));
       } else {

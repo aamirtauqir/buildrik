@@ -20,7 +20,22 @@ import { generateId, camelToKebab } from "@/shared/utils/helpers";
 import type { Composer } from "../Composer";
 import type { Element } from "../elements/Element";
 import { elementSelector } from "@/shared/utils/elementSelector";
-import { elementBaseCSS, type BaseRuleCache, type CascadeTarget } from "./cascadeCSS";
+import { elementBaseCSS, localSelector, type BaseRuleCache, type CascadeTarget } from "./cascadeCSS";
+import { selectorLayer } from "@/shared/utils/classSelector";
+
+/**
+ * Where a rule sorts inside its breakpoint bucket in the class style model
+ * (CLASS-FIRST-SPEC §4.2): tags, then class chains by length (a combo after
+ * its base), then any other selector, then element-local rules. Ties keep
+ * insertion order (first-seen).
+ */
+function layerRank(selector: string): number {
+  const layer = selectorLayer(selector);
+  if (layer.kind === "tag") return 0;
+  if (layer.kind === "class") return layer.chain.length;
+  if (layer.kind === "other") return 100;
+  return 200;
+}
 
 
 /**
@@ -381,9 +396,16 @@ export class StyleEngine {
     const tabletQuery = getBreakpointQuery("tablet");
     const mobileQuery = getBreakpointQuery("mobile");
 
-    this.writableRules().forEach((style) => {
+    /* The class model writes each bucket in layer order (tag → class →
+       element-local, stable) and weights element-local selectors (the
+       ladder). The element model keeps insertion order, byte for byte. */
+    const classModel = this.composer.styleModel === "class";
+    const rules = this.writableRules();
+    if (classModel) rules.sort((a, b) => layerRank(a.selector) - layerRank(b.selector));
+
+    rules.forEach((style) => {
       if (opts.keep && !opts.keep(style.selector)) return;
-      const css = this.generateStyleRule(style);
+      const css = this.generateStyleRule(style, undefined, classModel);
 
       if (!style.mediaQuery) {
         // Base/desktop styles
@@ -556,8 +578,10 @@ export class StyleEngine {
   /**
    * Generate a single style rule
    */
-  private generateStyleRule(style: StyleData, scope?: string): string {
-    const selector = scope ? `${scope} ${style.selector}` : style.selector;
+  private generateStyleRule(style: StyleData, scope?: string, ladder = false): string {
+    const layer = ladder ? selectorLayer(style.selector) : undefined;
+    const own = layer?.kind === "local" ? localSelector(layer.identity, "class", layer.pseudo) : style.selector;
+    const selector = scope ? `${scope} ${own}` : own;
     // Exported into a published <style>: a declaration that could leave the
     // rule or the element is not written (A19-1 class).
     const props = Object.entries(style.properties ?? {})
@@ -689,7 +713,7 @@ export class StyleEngine {
     const root = this.composer.elements?.getActivePageRootData?.();
     const device = this.composer.viewport?.getDevice();
     const breakpoint: CascadeTarget = device && isValidBreakpoint(device) ? device : "desktop";
-    const base = elementBaseCSS([root], elementSelector, breakpoint, false, this.baseRuleCache);
+    const base = elementBaseCSS([root], elementSelector, breakpoint, false, this.baseRuleCache, this.composer.styleModel);
     return [base, this.generateResponsiveCSS({ target: breakpoint })].filter(Boolean).join("\n\n");
   }
 
