@@ -35,7 +35,7 @@ const makeComposer = (lintState: LintState, lint = vi.fn(() => FOUND)) =>
 const mount = (composer: Composer) =>
   render(
     <TokenRegistryProvider composer={undefined}>
-      <DSLintRunner composer={composer} />
+      <DSLintRunner composer={composer} siteId="s1" />
     </TokenRegistryProvider>,
   );
 
@@ -78,7 +78,7 @@ describe("DSLintRunner", () => {
     const lint = vi.fn(() => FOUND);
     render(
       <TokenRegistryProvider composer={undefined}>
-        <DSLintRunner composer={null} />
+        <DSLintRunner composer={null} siteId={null} />
       </TokenRegistryProvider>,
     );
     vi.advanceTimersByTime(600);

@@ -22,15 +22,20 @@
  *
  * @license BSD-3-Clause
  */
-import type * as React from "react";
+import * as React from "react";
 import type { Composer } from "@/engine";
 import { useDSLint } from "../state/useDSLint";
 
 export interface DSLintRunnerProps {
   composer: Composer | null | undefined;
+  /** The open site. Scopes "Ignore" decisions so they do not leak across sites. */
+  siteId: string | null;
 }
 
-export const DSLintRunner: React.FC<DSLintRunnerProps> = ({ composer }) => {
+export const DSLintRunner: React.FC<DSLintRunnerProps> = ({ composer, siteId }) => {
+  React.useEffect(() => {
+    composer?.designSystem.lintState.setSite(siteId);
+  }, [composer, siteId]);
   // The publish into lintState is the point; the returned array is for
   // surfaces that render the findings themselves.
   useDSLint(composer);

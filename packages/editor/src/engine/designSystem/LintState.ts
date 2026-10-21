@@ -2,7 +2,8 @@
  * LintState
  *
  * Tracks per-token lint issues plus per-token suppression flags. Suppressions
- * persist to localStorage so an "Ignore" decision sticks across reloads.
+ * persist to localStorage per site (`setSite`) so an "Ignore" decision sticks
+ * across reloads without hiding the same token's warning on every other site.
  *
  * Issues arrive from DSLinter via `useDSLint`, which is the one place the
  * linter runs. This store was passive and empty for the whole of that arc:
@@ -34,7 +35,11 @@ export interface LintIssue {
   autoFixHint?: string;
 }
 
-const STORAGE_KEY = "buildrik:ds:lintSuppressions";
+/* B-1: this key once had no site id, so one "Ignore" hid that token's warning
+   on every site in the browser. The global list cannot be attributed to a
+   site, so it is dropped rather than imported into whichever site opens next. */
+const LEGACY_GLOBAL_KEY = "buildrik:ds:lintSuppressions";
+const storageKey = (siteId: string) => `${LEGACY_GLOBAL_KEY}:${siteId}`;
 
 /**
  * Emits `"lint:changed"` after every mutation (setIssues / suppress /
@@ -45,10 +50,16 @@ const STORAGE_KEY = "buildrik:ds:lintSuppressions";
 export class LintState extends EventEmitter {
   private issues = new Map<string, LintIssue[]>();
   private suppressed = new Set<string>();
+  /** Null until the editor names the site: suppressions stay in memory only. */
+  private siteId: string | null = null;
 
-  constructor() {
-    super();
+  /** Scope suppressions to one site and load that site's saved list. */
+  setSite(siteId: string | null): void {
+    if (siteId === this.siteId) return;
+    this.siteId = siteId;
+    this.suppressed.clear();
     this.loadSuppressions();
+    this.emit("lint:changed");
   }
 
   /**
@@ -131,10 +142,10 @@ export class LintState extends EventEmitter {
   }
 
   private persist(): void {
-    if (typeof window === "undefined") return;
+    if (typeof window === "undefined" || this.siteId === null) return;
     try {
       window.localStorage.setItem(
-        STORAGE_KEY,
+        storageKey(this.siteId),
         JSON.stringify([...this.suppressed]),
       );
     } catch {
@@ -143,9 +154,10 @@ export class LintState extends EventEmitter {
   }
 
   private loadSuppressions(): void {
-    if (typeof window === "undefined") return;
+    if (typeof window === "undefined" || this.siteId === null) return;
     try {
-      const raw = window.localStorage.getItem(STORAGE_KEY);
+      window.localStorage.removeItem(LEGACY_GLOBAL_KEY);
+      const raw = window.localStorage.getItem(storageKey(this.siteId));
       if (!raw) return;
       const list: unknown = JSON.parse(raw);
       if (Array.isArray(list)) {
