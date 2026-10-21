@@ -144,6 +144,16 @@ describe("CsvImportDialog", () => {
     expect(await screen.findByTestId("cms-csv-import-error")).toHaveTextContent("limit is 500");
   });
 
+  it("an unreadable file shows the error step instead of hanging (C-19)", async () => {
+    render(<CsvImportDialog collection={MENU} onClose={vi.fn()} onImported={vi.fn()} />);
+    fireEvent.click(screen.getByTestId("cms-csv-import-pick"));
+    const file = new File(["x"], "records.csv", { type: "text/csv" });
+    Object.defineProperty(file, "text", { value: () => Promise.reject(new Error("NotReadableError")) });
+    fireEvent.change(screen.getByTestId("cms-csv-import-input"), { target: { files: [file] } });
+    expect(await screen.findByTestId("cms-csv-import-error")).toHaveTextContent("Couldn't read this file.");
+    expect(api.cms.entries.importCsvPreview.mutate).not.toHaveBeenCalled();
+  });
+
   it("Cancel closes without importing anything", async () => {
     const onClose = vi.fn();
     render(<CsvImportDialog collection={MENU} onClose={onClose} onImported={vi.fn()} />);
