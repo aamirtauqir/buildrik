@@ -8,7 +8,7 @@ import * as React from "react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, cleanup, waitFor, fireEvent } from "@testing-library/react";
 
-const submitForReview = vi.fn().mockResolvedValue(undefined);
+const submitForReview = vi.fn().mockResolvedValue({ inviteEmailSent: true, reviewUrl: "https://app.test/review/t1" });
 const round = {
   id: "r1",
   status: "APPROVED",
@@ -111,6 +111,16 @@ describe("StaleApprovalModal", () => {
       invitedEmail: "sara@client.example",
     });
     await waitFor(() => expect(onClose).toHaveBeenCalled());
+  });
+
+  it("says the email did not go when the server reports it failed", async () => {
+    submitForReview.mockResolvedValueOnce({ inviteEmailSent: false, reviewUrl: "https://app.test/review/t1" });
+    mount();
+    await screen.findByText(/2 things changed/);
+    fireEvent.click(screen.getByRole("button", { name: "Request fresh review" }));
+    expect(await screen.findByText("Round started, email not sent")).toBeInTheDocument();
+    expect(screen.queryByText(/on its way/)).toBeNull();
+    expect(screen.getByRole("button", { name: "Copy link" })).toBeInTheDocument();
   });
 
   it("'Publish anyway' invokes the acknowledged publish path", async () => {

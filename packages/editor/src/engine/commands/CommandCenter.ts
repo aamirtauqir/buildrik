@@ -42,7 +42,18 @@ const WIDGET_ROLES = [
  * Each of these is a chord the OS/browser already binds to text editing, so
  * when the caret is in a field the user means the text, not the canvas.
  */
-const TEXT_OWNED_COMMANDS = new Set(["select-all", "cut", "copy", "paste", "undo", "redo", "copy-style", "paste-style"]);
+const TEXT_OWNED_COMMANDS = new Set([
+  "select-all",
+  "cut",
+  "copy",
+  "paste",
+  "undo",
+  "redo",
+  "copy-style",
+  "paste-style",
+  // ⌘⇧V is the browser's paste-as-plain-text; in a field it is not "Paste HTML…" (R1 I-3).
+  "paste-html",
+]);
 
 /**
  * Commands that CHANGE the document. In a read-only composer they must not run,

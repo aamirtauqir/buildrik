@@ -2,7 +2,7 @@
  * Site menu — the ⋯ overflow in the topbar. Board 4418:126034 (C5 G1-016,
  * G1-020, G1-025; owner rule 2026-09-24: anything visual, the board wins).
  *
- *   THIS SITE          Site settings ⌘, · Export site… · Duplicate site ·
+ *   THIS SITE          Site settings · Export site… · Duplicate site ·
  *                      Issues · Activity log · Command palette ⌘K ·
  *                      Enter view mode · Keyboard shortcuts · Share preview link
  *   COLLABORATE        Start collaboration (PLANNED while the flag is off) ·

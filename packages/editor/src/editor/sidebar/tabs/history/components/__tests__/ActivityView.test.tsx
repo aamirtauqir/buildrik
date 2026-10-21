@@ -7,13 +7,19 @@
  * and the Time-Travel trigger.
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent, cleanup } from "@testing-library/react";
+import { render, screen, fireEvent, cleanup, waitFor } from "@testing-library/react";
 import type { HistoryDisplayEntry } from "@/engine/historyTypes";
 import { ActivityView } from "../ActivityView";
 
-const { historyState } = vi.hoisted(() => ({
+const { historyState, addToast } = vi.hoisted(() => ({
   historyState: { historyStack: [] as unknown[], isLoading: false },
+  addToast: vi.fn(),
 }));
+
+vi.mock("@/editor/chrome-ui", async () => {
+  const actual = await vi.importActual<Record<string, unknown>>("@/editor/chrome-ui");
+  return { ...actual, useToast: () => ({ addToast, removeToast: vi.fn() }) };
+});
 
 vi.mock("@/shared/hooks/useHistoryState", () => ({
   useHistoryState: () => historyState,
@@ -134,8 +140,9 @@ describe("ActivityView — the list body actually mounts", () => {
    every step after that point is gone. The word "Jump" promised navigation.
    These lock the affordance to what it actually does. */
 describe("ActivityView — restoring from a timestamp is confirmed", () => {
-  const makeComposer = () => ({
+  const makeComposer = (autoCheckpoint = vi.fn(() => Promise.resolve(null))) => ({
     history: { restoreEntry: vi.fn() },
+    versions: { autoCheckpoint },
     isDirty: () => false,
   });
 
@@ -144,7 +151,7 @@ describe("ActivityView — restoring from a timestamp is confirmed", () => {
     entry({ id: "h1", label: "Move heading", timestamp: 1_700_000_000_000 }),
   ];
 
-  it("does not destroy the stack on the click alone — it asks first", () => {
+  it("does not destroy the stack on the click alone — it asks first", async () => {
     const restore = withHeight(400);
     try {
       const composer = makeComposer();
@@ -160,11 +167,33 @@ describe("ActivityView — restoring from a timestamp is confirmed", () => {
 
       // A confirmation naming the loss stands between the click and the engine.
       const dialog = screen.getByRole("dialog");
-      expect(dialog.textContent).toMatch(/permanently discards 1 later change/);
+      expect(dialog.textContent).toMatch(/discards 1 later change/);
+      expect(dialog.textContent).toMatch(/saved as a version first/);
 
       fireEvent.click(screen.getByRole("button", { name: /^Restore, discard 1 change$/ }));
-      expect(composer.history.restoreEntry).toHaveBeenCalledTimes(1);
+      await waitFor(() => expect(composer.history.restoreEntry).toHaveBeenCalledTimes(1));
       expect(composer.history.restoreEntry).toHaveBeenCalledWith("h1");
+      /* R1 H-1: the same "Before restoring" version Time-travel saves, first. */
+      expect(composer.versions.autoCheckpoint).toHaveBeenCalledWith("Before restoring");
+    } finally {
+      restore();
+    }
+  });
+
+  it("does not restore when the safety version fails to save, and says so", async () => {
+    const restore = withHeight(400);
+    try {
+      addToast.mockClear();
+      const composer = makeComposer(vi.fn(() => Promise.reject(new Error("quota"))));
+      setHistory(twoEntries(), false);
+      const { container } = render(<ActivityView composer={composer as never} />);
+
+      fireEvent.click(container.querySelectorAll(".entry-time-btn")[1]);
+      fireEvent.click(screen.getByRole("button", { name: /^Restore, discard 1 change$/ }));
+
+      await waitFor(() => expect(addToast).toHaveBeenCalled());
+      expect(addToast.mock.calls[0][0]).toMatchObject({ title: "Couldn't save a version first" });
+      expect(composer.history.restoreEntry).not.toHaveBeenCalled();
     } finally {
       restore();
     }

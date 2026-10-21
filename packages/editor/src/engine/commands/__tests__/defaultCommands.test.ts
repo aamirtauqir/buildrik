@@ -506,19 +506,12 @@ describe("nudge guard", () => {
   });
 });
 
+/* R1 I-2: the palette's Export HTML / Export JSON rows computed the export and
+   threw it away. Exporting is the exporter modal's job ("Open exporter"). */
 describe("export commands", () => {
-  it("export-html and export-json delegate to composer exporters", () => {
-    run("export-html");
-    expect(composer.exportHTML).toHaveBeenCalled();
-    run("export-json");
-    expect(composer.exportJSON).toHaveBeenCalled();
-  });
-
-  it("export-html / export-json carry no shortcut (keyboard-unreachable)", () => {
-    // Documented state backing the CommandCenter AUDIT it.todo: without a
-    // shortcut AND without any UI caller these registrations are dead.
-    expect(byId.get("export-html")?.shortcut).toBeUndefined();
-    expect(byId.get("export-json")?.shortcut).toBeUndefined();
+  it("registers no export rows that discard their output", () => {
+    expect(byId.has("export-html")).toBe(false);
+    expect(byId.has("export-json")).toBe(false);
   });
 });
 

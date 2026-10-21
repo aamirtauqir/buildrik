@@ -347,7 +347,15 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
       // Carry the round's client forward. `submitReview` only mints a token
       // when it is given an email, so a re-send without this produced a round
       // with `token: null` that the client could never open.
-      const outcome = await onResend(round?.invitedEmail ?? undefined);
+      let outcome: Awaited<ReturnType<typeof onResend>>;
+      try {
+        outcome = await onResend(round?.invitedEmail ?? undefined);
+      } catch {
+        /* R1 R-1: a refused submit was an unhandled rejection with the
+           confirm already closed — nothing on screen said it failed. */
+        setNotice("Couldn't re-send. Try again.");
+        return;
+      }
       await reload();
       /* The round lands either way — a mail failure must never fail the
          re-send. Saying nothing is what made a misconfigured SMTP look

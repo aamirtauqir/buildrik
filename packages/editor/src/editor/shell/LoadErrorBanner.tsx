@@ -36,6 +36,7 @@ export interface LoadErrorBannerProps {
   kind: LoadErrorKind;
   onRetry: () => void;
   onSignIn: () => void;
+  onGoToDashboard: () => void;
   onDismiss?: () => void;
 }
 
@@ -57,7 +58,7 @@ const ACTION =
 const QUIET =
   "tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]";
 
-export const LoadErrorBanner: React.FC<LoadErrorBannerProps> = ({ kind, onRetry, onSignIn, onDismiss }) => {
+export const LoadErrorBanner: React.FC<LoadErrorBannerProps> = ({ kind, onRetry, onSignIn, onGoToDashboard, onDismiss }) => {
   /* Board 294:1992's "Reconnecting…" state, on the control rather than as the
      board's full-screen takeover. Retry is a whole-page reload and said
      nothing while it ran, so the banner read as a dead button. The takeover
@@ -103,7 +104,7 @@ export const LoadErrorBanner: React.FC<LoadErrorBannerProps> = ({ kind, onRetry,
         {onDismiss && <Button color="light" size="xs" onClick={onDismiss} className={QUIET}>Dismiss</Button>}
         {isAuth && <Button color="light" size="xs" onClick={onSignIn} className={ACTION}>Sign in</Button>}
         {noRetry ? (
-          <Button color="light" size="xs" onClick={onSignIn} className={ACTION}>Go to dashboard</Button>
+          <Button color="light" size="xs" onClick={onGoToDashboard} className={ACTION}>Go to dashboard</Button>
         ) : (
           <Button
             color="light"

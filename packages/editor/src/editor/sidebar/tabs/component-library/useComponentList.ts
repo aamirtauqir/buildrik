@@ -28,7 +28,9 @@ export interface UseComponentListResult {
   isLoaded: boolean;
   /** Set if `getAllComponents()` threw; the caller decides how to show it. */
   error: string | null;
-  setError: (error: string | null) => void;
+  /** Load again — the error state's Retry (R1 P-3: it used to only clear the
+   *  error, leaving an empty list). */
+  retry: () => void;
   /** The workspace's shared library entries (fetchComponentLibrary). */
   library: LibraryComponentEntry[];
 }
@@ -38,6 +40,8 @@ export function useComponentList(composer: Composer | null): UseComponentListRes
   const [isLoaded, setIsLoaded] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [library, setLibrary] = React.useState<LibraryComponentEntry[]>([]);
+  const [attempt, setAttempt] = React.useState(0);
+  const retry = React.useCallback(() => setAttempt((n) => n + 1), []);
 
   React.useEffect(() => {
     if (!composer?.components) return;
@@ -64,7 +68,7 @@ export function useComponentList(composer: Composer | null): UseComponentListRes
       composer.off(EVENTS.COMPONENT_LIST_UPDATED, loadLibrary);
       composer.off(EVENTS.PAGE_CHANGED, loadComponents);
     };
-  }, [composer]);
+  }, [composer, attempt]);
 
-  return { components, isLoaded, error, setError, library };
+  return { components, isLoaded, error, retry, library };
 }
