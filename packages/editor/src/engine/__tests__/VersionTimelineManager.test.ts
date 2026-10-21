@@ -91,7 +91,7 @@ describe("VersionTimelineManager.restoreVersion — the open work survives", () 
   });
 
   it("aborts the restore when the safety save fails — losing the work is the failure mode", async () => {
-    const { m, composer } = await makeManager();
+    const { m, composer, emitted } = await makeManager();
     vi.spyOn(m, "getVersion").mockResolvedValue({ id: "v1", name: "Launch", snapshot: {} } as never);
     vi.spyOn(m, "createVersion").mockRejectedValue(new Error("quota"));
 
@@ -99,6 +99,8 @@ describe("VersionTimelineManager.restoreVersion — the open work survives", () 
 
     expect(ok).toBe(false);
     expect(composer.importProject).not.toHaveBeenCalled();
+    // H-3: a failed restore is not a failed history load.
+    expect(emitted.map((e) => e.event)).not.toContain("version:load-failed");
   });
 });
 
