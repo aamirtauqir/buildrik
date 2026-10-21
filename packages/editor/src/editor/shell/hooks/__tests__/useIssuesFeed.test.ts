@@ -107,6 +107,9 @@ describe("useIssuesFeed", () => {
     await waitFor(() => expect(issues.get()).toHaveLength(2));
     expect(issues.get().find((i) => i.id === "publish-check:Domain connected")?.type).toBe("error");
     expect(issues.get().find((i) => i.id === "publish-check:SEO configured")?.type).toBe("warning");
+    // The label names the passing state; on a failing row it read as the
+    // opposite of the detail beside it ("Domain connected · No custom domain").
+    expect(issues.get().find((i) => i.id === "publish-check:Domain connected")?.location).toBe("Publish");
   });
 
   it("without a siteId, contributes no publish-check rows", async () => {

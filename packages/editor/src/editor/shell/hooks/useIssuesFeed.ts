@@ -118,7 +118,11 @@ export function useIssuesFeed(
               id: `${PUBLISH_CHECK_ISSUE}${c.label}`,
               type: c.status === "fail" ? ("error" as const) : ("warning" as const),
               message: c.detail,
-              location: `Publish › ${c.label}`,
+              // Not `Publish › ${c.label}`: every label names the PASSING
+              // state ("Vercel connected", "Domain connected"), so a failing
+              // row read "Vercel connected · … Connect it to publish." The
+              // detail already says what is wrong.
+              location: "Publish",
             })),
         );
       })
