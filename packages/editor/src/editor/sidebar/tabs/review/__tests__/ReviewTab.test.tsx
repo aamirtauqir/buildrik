@@ -323,6 +323,17 @@ describe("actions", () => {
     await waitFor(() => expect(onResend).toHaveBeenCalled());
   });
 
+  /* R1 R-1: a refused re-send used to be an unhandled rejection with no message. */
+  it("a failed re-send says so", async () => {
+    const onResend = vi.fn(() => Promise.reject(new Error("FORBIDDEN")));
+    renderTab({ onResend });
+    await screen.findByText(/hero photo is too dark/);
+    fireEvent.click(screen.getByTestId("review-round-menu"));
+    fireEvent.click(await screen.findByRole("menuitem", { name: "Re-send review link" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Send new review" }));
+    expect(await screen.findByText("Couldn't re-send. Try again.")).toBeInTheDocument();
+  });
+
   /* Board 158:57 — while it is in flight the panel says which round is being
      sent, and the re-send cannot be pressed again. */
   it("names the round it is sending while the re-send is in flight", async () => {
