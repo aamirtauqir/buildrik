@@ -41,6 +41,7 @@ function makeSettings(over: Partial<UsePageSettingsReturn> = {}): UsePageSetting
     setCustomHead: vi.fn(),
     headCodeError: null,
     domain: null,
+    servesCleanUrls: false,
     saveState: "clean",
     isDirty: false,
     save: vi.fn(),

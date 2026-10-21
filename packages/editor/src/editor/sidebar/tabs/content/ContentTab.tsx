@@ -26,6 +26,7 @@ import {
   type CmsHydrationStatus,
 } from "@/services/cmsSync";
 import { useContentPanel } from "./useContentPanel";
+import { isFeatureEnabled } from "@/shared/utils/featureFlags";
 import { cmsWorkspace, useCmsWorkspace } from "@/editor/cms/cmsWorkspaceStore";
 import {
   ConditionsView,
@@ -80,6 +81,10 @@ export const ContentTab: React.FC<ContentTabProps> = ({
   const panel = useContentPanel(composer);
   const workspace = useCmsWorkspace();
   const { view, setView, reload } = panel;
+  /* BD-39 (8): Data sources are session-only (nothing saves them), so they
+     are hidden this version unless the flag is on. This drawer is their one
+     door — RootView's row and its zero-state button. */
+  const showSources = isFeatureEnabled("cmsDataSources");
   const [pickedElementId, setPickedElementId] = React.useState<string | null>(null);
 
   // "+ New condition" pick flow — reuses the inspector's canvas pick mode.
@@ -204,7 +209,7 @@ export const ContentTab: React.FC<ContentTabProps> = ({
         <RootView
           collections={panel.collections}
           recordCounts={panel.recordCounts}
-          sourcesCount={panel.sources.length}
+          sourcesCount={showSources ? panel.sources.length : 0}
           variablesCount={panel.variables.length}
           conditionsCount={panel.conditions.length}
           selectedCollectionId={workspace.collectionId}
@@ -212,7 +217,7 @@ export const ContentTab: React.FC<ContentTabProps> = ({
              the drawer; the drawer stays on its list. */
           onOpenCollection={(id) => cmsWorkspace.openCollection(id)}
           onCreateCollection={onCreateCollection}
-          onOpenSources={() => setView({ kind: "sources" })}
+          onOpenSources={showSources ? () => setView({ kind: "sources" }) : undefined}
           onOpenVariables={() => setView({ kind: "variables" })}
           onOpenConditions={() => setView({ kind: "conditions" })}
         />

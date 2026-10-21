@@ -14,7 +14,18 @@ import { cmsWorkspace } from "@/editor/cms/cmsWorkspaceStore";
 import { makeEngine, MENU, ITEM } from "@/editor/cms/__tests__/fakeCmsEngine";
 import { CMSValidationError } from "@/engine/cms/CollectionManager";
 
-beforeEach(() => localStorage.clear());
+/* BD-39 (8): Data sources sit behind `cmsDataSources` (default OFF). The
+   suite below drives them, so it runs with the flag on; the OFF behaviour has
+   its own describe at the end. */
+const flags = vi.hoisted(() => ({ cmsDataSources: true }));
+vi.mock("@/shared/utils/featureFlags", () => ({
+  isFeatureEnabled: (flag: string) => flag === "cmsDataSources" && flags.cmsDataSources,
+}));
+
+beforeEach(() => {
+  localStorage.clear();
+  flags.cmsDataSources = true;
+});
 afterEach(() => cleanup());
 
 describe("ContentTab", () => {
@@ -214,5 +225,29 @@ describe("ContentTab", () => {
     await waitFor(() => expect(screen.getByTestId("content-collection-col-1")).toHaveAttribute("aria-current", "true"));
     expect(screen.getByTestId("content-open-sources")).toBeInTheDocument();
     cmsWorkspace.reset();
+  });
+});
+
+describe("ContentTab — Data sources flag off (BD-39 8)", () => {
+  beforeEach(() => {
+    flags.cmsDataSources = false;
+  });
+
+  it("the root has no Sources row; Variables and Conditions stay", async () => {
+    const { composer } = makeEngine({ collections: [MENU], items: [ITEM] });
+    render(<ContentTab composer={composer as never} />);
+    await screen.findByText("Menu items");
+    expect(screen.queryByTestId("content-open-sources")).toBeNull();
+    expect(screen.queryByText("Sources")).toBeNull();
+    expect(screen.getByTestId("content-open-variables")).toBeInTheDocument();
+    expect(screen.getByTestId("content-open-conditions")).toBeInTheDocument();
+  });
+
+  it("the zero state offers no Open Sources door", async () => {
+    const { composer } = makeEngine();
+    render(<ContentTab composer={composer as never} onCreateCollection={vi.fn()} />);
+    await screen.findByTestId("content-empty");
+    expect(screen.queryByTestId("content-empty-sources")).toBeNull();
+    expect(screen.getByTestId("content-empty-variables")).toBeInTheDocument();
   });
 });

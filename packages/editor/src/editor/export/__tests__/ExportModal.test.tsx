@@ -36,7 +36,7 @@ vi.mock("@/engine/export", () => ({
 /* The site's published host is server-read (canonical, custom domains); the
    modal hands it to generateZip so the archive's sitemap names it. */
 vi.mock("@/editor/shared/useSiteOrigin", () => ({
-  useSiteOrigin: () => () => "https://bellacucina.com",
+  useSiteOrigin: () => ({ getOrigin: () => "https://bellacucina.com", servesCleanUrls: true }),
 }));
 
 vi.mock("@/engine/export/ReactExporter", () => ({

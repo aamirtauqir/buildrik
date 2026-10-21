@@ -151,7 +151,9 @@ export function RootView({
   selectedCollectionId?: string | null;
   onOpenCollection: (id: string) => void;
   onCreateCollection?: () => void;
-  onOpenSources: () => void;
+  /** Absent = Data sources are hidden (BD-39 (8), `cmsDataSources` flag):
+   *  no Sources row, no zero-state door. */
+  onOpenSources?: () => void;
   onOpenVariables: () => void;
   onOpenConditions: () => void;
 }) {
@@ -197,15 +199,17 @@ export function RootView({
               Create a collection
             </Button>
           ) : null}
-          <Button
-            color="light"
-            size="xs"
-            variant="link" className="tw:min-h-6 tw:font-normal"
-            data-testid="content-empty-sources"
-            onClick={onOpenSources}
-          >
-            Open Sources
-          </Button>
+          {onOpenSources ? (
+            <Button
+              color="light"
+              size="xs"
+              variant="link" className="tw:min-h-6 tw:font-normal"
+              data-testid="content-empty-sources"
+              onClick={onOpenSources}
+            >
+              Open Sources
+            </Button>
+          ) : null}
           <Button
             color="light"
             size="xs"
@@ -264,7 +268,9 @@ export function RootView({
         </Row>
       )}
       <SectionHeader tint className={SECTION_H} data-testid="content-section-data">Data</SectionHeader>
-      <ListRow icon={<Database size={16} />} label="Sources" count={sourcesCount} chevron data-testid="content-open-sources" onClick={onOpenSources} />
+      {onOpenSources ? (
+        <ListRow icon={<Database size={16} />} label="Sources" count={sourcesCount} chevron data-testid="content-open-sources" onClick={onOpenSources} />
+      ) : null}
       <ListRow icon={<Braces size={16} />} label="Variables" count={variablesCount} chevron data-testid="content-open-variables" onClick={onOpenVariables} />
       <ListRow icon={<GitBranch size={16} />} label="Conditions" count={conditionsCount} chevron data-testid="content-open-conditions" onClick={onOpenConditions} />
     </div>

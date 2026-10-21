@@ -71,7 +71,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
   const siteId = React.useMemo(() => getSiteIdFromUrl(), []);
   /* The modal stays mounted for the whole session; reading on open keeps a
      canonical or domain changed since then in the ZIP's sitemap. */
-  const getSiteOrigin = useSiteOrigin(composer, isOpen ? siteId : null);
+  const { getOrigin: getSiteOrigin } = useSiteOrigin(composer, isOpen ? siteId : null);
   const [downloadPhase, setDownloadPhase] = React.useState<DownloadPhase>("idle");
   const [downloadedFile, setDownloadedFile] = React.useState("");
   const [downloadError, setDownloadError] = React.useState("");

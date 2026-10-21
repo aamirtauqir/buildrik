@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { asContentRoot, detectContentIssues } from "../contentIssues";
+import { asContentRoot, detectContentIssues, firstHeadingId, hasH1 } from "../contentIssues";
 import type { ContentElement as ElementData, ContentPage as PageData } from "../contentIssues";
 
 function el(partial: Partial<ElementData> & { id: string }): ElementData {
@@ -241,5 +241,31 @@ describe("asContentRoot", () => {
       page({ id: "home", root: el({ id: "img1", type: "image", tagName: "img", attributes: { src: "/a.png" } }) }),
     ];
     expect(detectContentIssues(pages)[0].location).toBe("Home › Image");
+  });
+});
+
+/* BD-39 (6): the "Make this H1" fix and the insert rule read these. */
+describe("firstHeadingId / hasH1", () => {
+  const tree = {
+    id: "root",
+    type: "container",
+    children: [
+      { id: "p", type: "paragraph", tagName: "p", content: "Intro" },
+      { id: "s", type: "section", tagName: "section", children: [{ id: "h3", type: "heading", tagName: "H3" }] },
+      { id: "h2", type: "heading", tagName: "h2" },
+    ],
+  };
+
+  it("is the first h2–h6 element in document order", () => {
+    expect(firstHeadingId(tree)).toBe("h3");
+  });
+
+  it("is null when the page has no heading element", () => {
+    expect(firstHeadingId({ id: "root", type: "container", children: [{ id: "p", type: "paragraph", tagName: "p" }] })).toBeNull();
+  });
+
+  it("hasH1 sees an h1 element or one inside rich text", () => {
+    expect(hasH1(tree)).toBe(false);
+    expect(hasH1({ id: "r", type: "text", content: "<h1>Hi</h1>" })).toBe(true);
   });
 });

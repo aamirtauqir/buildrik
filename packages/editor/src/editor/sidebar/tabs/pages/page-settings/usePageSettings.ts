@@ -67,6 +67,9 @@ export interface UsePageSettingsReturn {
   /** The host the published page sits on, without the scheme (`acme.com`,
    *  `proj.vercel.app`); null until something is known. */
   domain: string | null;
+  /** Whether the live deploy serves clean URLs (`/about`); until then the
+   *  page's URL is its `.html` file (BD-39 (4)). */
+  servesCleanUrls: boolean;
   /** The site's live URL, or null when it has never been published. Gates the
       slug-change warning: "existing links" can only exist if the site is
       reachable, which is a fact about the site rather than the page. */
@@ -162,7 +165,7 @@ export function usePageSettings(
   const savedSnapshot = React.useRef<string>("");
 
   const siteId = React.useMemo(() => getSiteIdFromUrl(), []);
-  const getSiteOrigin = useSiteOrigin(composer, siteId);
+  const { getOrigin: getSiteOrigin, servesCleanUrls } = useSiteOrigin(composer, siteId);
 
   const applyPersistedState = React.useCallback((p: PageItem) => {
     const state = getPersistedState(p);
@@ -385,6 +388,7 @@ export function usePageSettings(
     setCustomHead,
     headCodeError,
     domain,
+    servesCleanUrls,
     publishedUrl,
     saveState,
     isDirty,
