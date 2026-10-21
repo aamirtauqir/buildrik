@@ -36,15 +36,17 @@ export function useVersionSync(
     // writes), so when hydrate adds server versions, re-read the store + emit
     // the list-updated event (setProjectId) so they show WITHOUT a 2nd reload.
     const hydrate = () =>
-      void hydrateVersionsFromServer(() =>
-        addToast?.({
-          key: "version-hydrate-failed",
-          title: "Couldn't load versions from the server",
-          description: "Versions saved on other devices may be missing from the list.",
-          tone: "warning",
-          action: { label: "Try again", onClick: hydrate },
-        }),
-      ).then((added) => {
+      void hydrateVersionsFromServer({
+        maxVersions: composer.versions.maxVersions,
+        onError: () =>
+          addToast?.({
+            key: "version-hydrate-failed",
+            title: "Couldn't load versions from the server",
+            description: "Versions saved on other devices may be missing from the list.",
+            tone: "warning",
+            action: { label: "Try again", onClick: hydrate },
+          }),
+      }).then((added) => {
         if (added > 0) {
           const sid = getSiteIdFromUrl();
           if (sid) void composer.versions.setProjectId(sid);
