@@ -279,6 +279,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       onDraggingChange: setDraggingElementId,
       onSnapLinesChange: setSnapLines,
       snapCalculator: calculateSnapping,
+      addToast,
     });
 
     // Ruler guides

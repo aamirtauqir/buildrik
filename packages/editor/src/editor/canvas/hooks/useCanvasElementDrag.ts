@@ -24,6 +24,7 @@
 
 import * as React from "react";
 import type { Composer } from "@/engine";
+import type { ToastInput } from "@/editor/chrome-ui";
 import type { ElementType, GrapesElement } from "@/shared/types";
 import { setMultiDragData } from "@/shared/utils/dragDrop";
 import { writableElements } from "@/engine/commands/commandOperations";
@@ -52,6 +53,8 @@ export interface UseCanvasElementDragOptions {
     scale: number
   ) => { x: number; y: number; snapLines: import("./useCanvasSnapping").SnapLine[] };
   onDropTargetChange?: (targetId: string | null) => void;
+  /** A Ctrl/Cmd-drag whose duplicate fails says so (ISS-C21). */
+  addToast?: (toast: ToastInput) => void;
 }
 
 export function useCanvasElementDrag({
@@ -62,7 +65,10 @@ export function useCanvasElementDrag({
   onSnapLinesChange,
   snapCalculator,
   onDropTargetChange,
+  addToast,
 }: UseCanvasElementDragOptions): void {
+  const addToastRef = React.useRef(addToast);
+  addToastRef.current = addToast;
   // Track the currently dragging element for cleanup
   const draggingElementRef = React.useRef<HTMLElement | null>(null);
   const isDraggingRef = React.useRef(false);
@@ -233,6 +239,10 @@ export function useCanvasElementDrag({
         } catch {
           composer.rollbackTransaction();
           isCloneModeRef.current = false;
+          addToastRef.current?.({
+            tone: "error",
+            description: "Couldn't duplicate this element. The drag moves the original instead.",
+          });
         }
       } else {
         isCloneModeRef.current = false;

@@ -320,13 +320,15 @@ describe("useSectionReorder", () => {
       composer.elements.moveElement.mockImplementation(() => {
         throw new Error("move failed");
       });
-      const { result } = mountHook();
+      const addToast = vi.fn();
+      const { result } = mountHook(true, addToast);
       act(() => result.current.startDrag("sec-a", 0));
       act(() => result.current.updateDrag(250));
       act(() => result.current.completeDrag());
 
       expect(composer.rollbackTransaction).toHaveBeenCalled();
       expect(result.current.dragState).toBeNull();
+      expect(addToast).toHaveBeenCalledWith(expect.objectContaining({ tone: "error" })); // ISS-C21
     });
 
     it("cancelDrag clears dragState without moving anything", () => {
