@@ -29,6 +29,7 @@ import { ChevronDown, ChevronRight, MoreHorizontal } from "lucide-react";
 import type { SettingsNavId } from "../settings/types";
 import type { Composer } from "@/engine";
 import type { UsePublishJobResult } from "@/editor/shell/hooks/usePublishJob";
+import { CODE_DOWNLOAD_UPGRADE } from "@/editor/shell/hooks/useExportHandlers";
 import type { NextMove } from "@/editor/shell/lifecycle";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { fetchPrePublishChecks, unpublishSite } from "@/services/PublishService";
@@ -473,7 +474,9 @@ export const PublishTab: React.FC<PublishTabProps> = ({
   const atLeastAdmin = roleAtLeast(useEditorRole(), "ADMIN") !== false;
   const canUnpublish = Boolean(snapshot.lastDeploy?.isLive && siteId && atLeastAdmin);
   /* Code download is Pro (owner decision). The same tier read the
-     templates tab gates on: only the starter (FREE) workspace is locked. */
+     templates tab gates on: only the starter (FREE) workspace is locked.
+     This is the fast path; onDownloadCode asks the server
+     (sites.authorizeCodeExport) before it builds anything. */
   const codeLocked = getEditorPlanTier() === "starter";
   const publishMenu = (
     <Popover
@@ -511,7 +514,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
             disabled={downloadingCode}
             onClick={() => {
               setMenuOpen(false);
-              if (codeLocked) openUpgrade({ feature: "Downloading your site's code" });
+              if (codeLocked) openUpgrade(CODE_DOWNLOAD_UPGRADE);
               else onDownloadCode();
             }}
             data-testid="publish-download-code"

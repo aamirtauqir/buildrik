@@ -2,7 +2,9 @@
  * useExportHandlers — extracted from AquibraStudio (Phase D D2 split,
  * stage 4). Owns the complete export + publish lifecycle:
  *
- *   - handleExportHTML        → ExportEngine.downloadZip() + toasts.
+ *   - handleExportHTML        → the Publish panel's "Download code (ZIP)":
+ *                               sites.authorizeCodeExport (Pro gate, server
+ *                               side) → ExportEngine.downloadZip() + toasts.
  *   - handleVercelPublish     → siteId resolution → save unsaved edits →
  *                               exportPublishPages() → publishJob.publish()
  *                               (REA #9: publish ships the SAVED revision).
@@ -24,10 +26,11 @@
  */
 
 import * as React from "react";
-import { ToastInput } from "@/editor/chrome-ui";
+import { ToastInput, openUpgrade } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
 import { ExportEngine } from "@/engine/export";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
+import { authorizeCodeExport } from "@/services/PublishService";
 import { DASHBOARD_URL as dashboardUrlFromEnv } from "@/shared/utils/runtimeEnv";
 import { usePublishJob, type UsePublishJobResult } from "./usePublishJob";
 import type { SaveProjectFn } from "./useSaveCallback";
@@ -62,6 +65,10 @@ const NOT_SAVED_TOAST: ToastInput = {
   tone: "neutral",
 };
 
+/** The upgrade prompt for downloading code — the panel's client fast path and
+ *  the server's refusal open the same one. */
+export const CODE_DOWNLOAD_UPGRADE = { feature: "Downloading your site's code" };
+
 export function useExportHandlers({
   composer,
   addToast,
@@ -72,16 +79,37 @@ export function useExportHandlers({
 
   const handleExportHTML = React.useCallback(async () => {
     if (!composer) return;
+    // Code download is Pro on BOTH sides: the server has to say yes before a
+    // byte of the ZIP is built. No site means no server to ask.
+    const siteId = getSiteIdFromUrl();
+    if (!siteId) {
+      addToast({
+        title: "Cannot download code",
+        description: "Open this editor from a site to download its code.",
+        tone: "error",
+      });
+      return;
+    }
     setExportLoading(true);
     try {
+      let access: "allowed" | "upgrade";
+      try {
+        access = await authorizeCodeExport(siteId);
+      } catch {
+        addToast({
+          title: "Couldn't check your plan",
+          description: "Nothing was downloaded. Check your connection and try again.",
+          tone: "error",
+        });
+        return;
+      }
+      if (access === "upgrade") {
+        openUpgrade(CODE_DOWNLOAD_UPGRADE);
+        return;
+      }
       const exportEngine = new ExportEngine(composer);
       // Forms post to the same submissions endpoint as Publish.
-      const siteId = getSiteIdFromUrl();
-      await exportEngine.downloadZip(
-        "site-export.zip",
-        undefined,
-        siteId ? { siteId, appOrigin: dashboardUrlFromEnv } : null,
-      );
+      await exportEngine.downloadZip("site-export.zip", undefined, { siteId, appOrigin: dashboardUrlFromEnv });
       addToast({
         title: "Export complete",
         description: "Your site has been downloaded as a zip file.",
