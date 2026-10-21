@@ -879,14 +879,26 @@ export const PublishTab: React.FC<PublishTabProps> = ({
                   View live site
                 </a>
               )}
-              {snapshot.lastDeploy && snapshot.lastDeploy.version > 1 && (
+              {snapshot.lastDeploy && snapshot.previousDeploy && (
+                /* A door of the one Compare (B8): the two deploys it names.
+                   It only switched to History, which opened on Session with
+                   no compare at all (REA P-1). */
                 <Button
                   color="light"
                   size="xs"
-                  onClick={() => composer?.emit("ui:switch-tab", { tab: "history" })}
+                  onClick={() => {
+                    const { lastDeploy, previousDeploy } = snapshot;
+                    if (!lastDeploy || !previousDeploy) return;
+                    composer?.emit(EVENTS.UI_COMPARE_OPEN, {
+                      left: { kind: "published", jobId: previousDeploy.jobId, version: previousDeploy.version },
+                      right: { kind: "published", jobId: lastDeploy.jobId, version: lastDeploy.version },
+                      from: "Publish",
+                    });
+                  }}
                   className={TEXT_LINK}
+                  data-testid="publish-compare-deploys"
                 >
-                  Compare v{snapshot.lastDeploy.version - 1} → v{snapshot.lastDeploy.version}
+                  Compare v{snapshot.previousDeploy.version} → v{snapshot.lastDeploy.version}
                 </Button>
               )}
             </div>

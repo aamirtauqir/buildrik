@@ -221,10 +221,12 @@ describe("PublishTab — board 784:4326, just published", () => {
   it("states the result, offers the live site, and greys the CTA", async () => {
     fetchPublishHistory.mockResolvedValue([
       { id: "j1", version: 15, completedAt: new Date(), deploymentId: "d", rollbackable: true, rolledBackFrom: null },
+      { id: "j0", version: 14, completedAt: new Date(), deploymentId: "c", rollbackable: true, rolledBackFrom: null },
     ]);
+    const composer = composerWith();
     renderTab(
       <PublishTab
-        composer={composerWith()}
+        composer={composer}
         projectId="site_1"
         nextMove={OPEN_MOVE} onRequestPublish={vi.fn()}
         publishJob={job({ uiState: "published", jobId: "job-1", publishedUrl: "https://bellacucina.com" })}
@@ -234,7 +236,14 @@ describe("PublishTab — board 784:4326, just published", () => {
     await waitFor(() => expect(screen.getByText("Published to production.")).toBeTruthy());
     expect(screen.getByText(/LIVE · v15/)).toBeTruthy(); // 4418:97787
     expect((screen.getByText("View live site") as HTMLAnchorElement).href).toContain("bellacucina.com");
-    expect(screen.getByText("Compare v14 → v15")).toBeTruthy();
+    /* REA P-1: the button opens the one Compare on the two deploys it names
+       — it used to switch to History, which opened on Session. */
+    fireEvent.click(screen.getByText("Compare v14 → v15"));
+    expect(composer?.emit).toHaveBeenCalledWith("ui:compare-open", {
+      left: { kind: "published", jobId: "j0", version: 14 },
+      right: { kind: "published", jobId: "j1", version: 15 },
+      from: "Publish",
+    });
     // Nothing pending — the button says so (4418:97787) and has nothing to send.
     expect((screen.getByText("No new changes").closest("button") as HTMLButtonElement).disabled).toBe(true);
     expect(screen.getByTestId("publish-footer-meta").textContent).toMatch(
