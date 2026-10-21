@@ -10,10 +10,10 @@ import { snapToGrid } from "@/shared/utils/dragDrop";
 import { EVENTS } from "@/shared/constants/events";
 import { getBreakpointQuery, isValidBreakpoint } from "@/shared/constants/breakpoints";
 import { elementSelector } from "@/shared/utils/elementSelector";
-import { classSelector } from "@/shared/utils/classSelector";
+import { classSelector, selectorLayer } from "@/shared/utils/classSelector";
 import { devWarn } from "@/shared/utils/devLogger";
 import type { PseudoStateId } from "@/shared/types";
-import { resolveStyle, type StyleLayerSource } from "../styles/ResolvedStyle";
+import { resolveStyle, type StyleLayerSource, type StyleSource } from "../styles/ResolvedStyle";
 import type { BreakpointId } from "@/shared/types/breakpoints";
 import type { Composer } from "../Composer";
 import type { Element } from "../elements/Element";
@@ -263,6 +263,44 @@ function styleLayers(composer: Pick<Composer, "styles"> | null | undefined, el: 
       composer?.styles?.getRule(`${elementSelector(el.getId())}:${state}`, getBreakpointQuery(bp) ?? undefined)
         ?.properties ?? {},
   };
+}
+
+/** A tag or class selector's rules as a cascade layer source. */
+function ruleLayers(styles: Composer["styles"], selector: string): StyleLayerSource {
+  const mq = (bp: BreakpointId) => getBreakpointQuery(bp) ?? undefined;
+  return {
+    base: () => ({ ...(styles.getRule(selector)?.properties ?? {}) }),
+    breakpoint: (bp) => ({ ...(styles.getRule(selector, mq(bp))?.properties ?? {}) }),
+    state: (state, bp) => ({ ...(styles.getRule(`${selector}:${state}`, mq(bp))?.properties ?? {}) }),
+  };
+}
+
+/**
+ * Every rule source that styles `el` in the class model, lowest first, for
+ * resolveStyleSources: its tag's rules, each class chain the element carries
+ * (all names present, case-sensitive as CSS matches; shorter chains first,
+ * then first-seen — the order the class model's sheet writes them), then the
+ * element's own styles. The inspector's origin read (P2 indicators).
+ */
+export function styleSourcesOf(composer: Pick<Composer, "styles">, el: Element): StyleSource[] {
+  const own = new Set(el.getClasses());
+  const tag = el.getTagName();
+  const tags = new Set<string>();
+  const chains = new Map<string, number>();
+  for (const rule of composer.styles.exportStyles()) {
+    const layer = selectorLayer(rule.selector);
+    if (layer.kind === "tag" && layer.tag === tag) tags.add(layer.tag);
+    if (layer.kind === "class" && layer.chain.every((name) => own.has(name))) {
+      const selector = `.${layer.chain.join(".")}`;
+      if (!chains.has(selector)) chains.set(selector, layer.chain.length);
+    }
+  }
+  const classSources = [...chains].sort((a, b) => a[1] - b[1]).map(([selector]) => selector);
+  return [
+    ...[...tags].map((selector): StyleSource => ({ kind: "tag", selector, layers: ruleLayers(composer.styles, selector) })),
+    ...classSources.map((selector): StyleSource => ({ kind: "class", selector, layers: ruleLayers(composer.styles, selector) })),
+    { kind: "local", selector: elementSelector(el.getId()), layers: styleLayers(composer, el) },
+  ];
 }
 
 /**
