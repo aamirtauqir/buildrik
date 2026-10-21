@@ -314,12 +314,14 @@ describe("useCanvasElementDrag", () => {
       composer.elements.duplicateElement.mockImplementation(() => {
         throw new Error("dup failed");
       });
-      mountHook();
+      const addToast = vi.fn();
+      mountHook({ addToast });
 
       const dt = makeDataTransfer();
       child.dispatchEvent(dragEvent("dragstart", dt, { ctrlKey: true }));
 
       expect(composer.rollbackTransaction).toHaveBeenCalled();
+      expect(addToast).toHaveBeenCalledWith(expect.objectContaining({ tone: "error" })); // ISS-C21
       expect(JSON.parse(dt.getData("element"))).toEqual({ elementId: "el-1" });
       expect(dt.effectAllowed).toBe("move");
       expect(child.classList.contains("bd-clone-mode")).toBe(false);

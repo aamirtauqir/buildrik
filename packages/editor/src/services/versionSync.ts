@@ -17,7 +17,7 @@
 import { getBuildrikClient } from "./api-client";
 import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
 import { getSiteIdFromUrl } from "./BuildrikSyncProvider";
-import { loadVersions, saveVersion } from "../engine/storage/VersionHistoryStorage";
+import { loadVersions, pruneVersions, saveVersion } from "../engine/storage/VersionHistoryStorage";
 import type { NamedVersion } from "../shared/types/versions";
 import {
   SyncRetryQueue,
@@ -123,7 +123,14 @@ const HYDRATE_CHUNK = 10;
  * has no stamp at all; otherwise the local name stays and its rename is mirrored
  * again (a rename made offline survives a reload — the retry queue is in memory
  * and does not). Returns how many versions were added or renamed —
- * they surface on the next version-list read. Best-effort; never throws.
+ * they surface on the next version-list read. Best-effort; never throws —
+ * a failure is reported through `opts.onError` (H-7: a teammate's versions
+ * silently did not appear).
+ *
+ * H-8: what it adds goes through the same cap the local store keeps
+ * (`opts.maxVersions`). Local prunes are not mirrored to the server, so an
+ * auto-save pruned here could still be on the server and came back on every
+ * open; pruning after the pull drops it again under the same rule.
  *
  * Bounded (walk 2026-09-24): on a cold cache it fetched every missing payload
  * one after another — 50 sequential `siteVersions.get` in 6.7 s on open,
@@ -131,7 +138,9 @@ const HYDRATE_CHUNK = 10;
  * versions (the list comes back newest-first), fetched concurrently in
  * chunks so tRPC batches each chunk into one request.
  */
-export async function hydrateVersionsFromServer(): Promise<number> {
+export async function hydrateVersionsFromServer(
+  opts: { onError?: (e: unknown) => void; maxVersions?: number } = {},
+): Promise<number> {
   const siteId = getSiteIdFromUrl();
   if (!siteId) return 0;
   let added = 0;
@@ -219,9 +228,11 @@ export async function hydrateVersionsFromServer(): Promise<number> {
         added++;
       }
     }
+    if (missing.length > 0 && opts.maxVersions !== undefined) await pruneVersions(siteId, opts.maxVersions);
   } catch (e) {
     // eslint-disable-next-line no-console
     console.warn("[version-sync] hydrate from server failed", e);
+    opts.onError?.(e);
   }
   return added;
 }

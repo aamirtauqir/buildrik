@@ -9,6 +9,7 @@
 import { canvasScale } from "../utils/canvasScale";
 import * as React from "react";
 import type { Composer } from "@/engine";
+import type { ToastInput } from "@/editor/chrome-ui";
 import { canWrite } from "@/engine/commands/commandOperations";
 import { EVENTS } from "@/shared/constants/events";
 import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
@@ -41,7 +42,7 @@ export interface UseSectionReorderOptions {
   canvasRef: React.RefObject<HTMLDivElement | null>;
   enabled?: boolean;
   /** Board 5940:148012: a finished move says so — "Moved down" + Undo. */
-  addToast?: (toast: { description: string; action?: { label: string; onClick: () => void } }) => void;
+  addToast?: (toast: ToastInput) => void;
 }
 
 export interface UseSectionReorderResult {
@@ -297,6 +298,7 @@ export function useSectionReorder({
         });
       } catch {
         composer.rollbackTransaction();
+        addToastRef.current?.({ tone: "error", description: "Couldn't move the section. Nothing changed." });
       }
     }
 

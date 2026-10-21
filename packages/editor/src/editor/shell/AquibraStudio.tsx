@@ -344,8 +344,19 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
 
   // #13/25: pull server "My Templates" into the local cache on open (best-effort).
   React.useEffect(() => {
-    if (composer) void hydrateUserTemplatesFromServer();
-  }, [composer]);
+    if (!composer) return;
+    const hydrate = () =>
+      void hydrateUserTemplatesFromServer(() =>
+        addToast({
+          key: "template-hydrate-failed",
+          title: "Couldn't load your saved templates",
+          description: "Templates saved on other devices may be missing from My templates.",
+          tone: "warning",
+          action: { label: "Try again", onClick: hydrate },
+        }),
+      );
+    hydrate();
+  }, [composer, addToast]);
 
   useEditorEventListeners({
     composer,
@@ -541,11 +552,13 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
      tradeoff SendForReview already makes. */
   const resendReview = React.useCallback(async (clientEmail?: string) => {
     let snapshotPages;
+    let snapshotFailed = false;
     if (composer) {
       try {
         snapshotPages = await exportPublishPages(composer);
       } catch (e) {
         console.warn("[review] snapshot render failed; re-sending without preview", e);
+        snapshotFailed = true;
       }
     }
     /* The third argument is `clientEmail`, and it used to be hardcoded
@@ -558,8 +571,15 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
        passes undefined and stays internal. */
     const outcome = await submitForReview(undefined, undefined, clientEmail, snapshotPages);
     composer?.emit(EVENTS.REVIEW_SENT, { invitedEmail: clientEmail ?? null });
+    /* R-5: the user is told the round went out without its preview. */
+    if (snapshotFailed) {
+      addToast({
+        tone: "warning",
+        description: "Re-sent without a page preview — it couldn't be built. The review link still works.",
+      });
+    }
     return outcome;
-  }, [composer]);
+  }, [composer, addToast]);
 
   /* Routes on the GATE, not the kind: `changes-requested` is a publish door
      even though the topbar's own verb there is "Open feedback" — the panel's

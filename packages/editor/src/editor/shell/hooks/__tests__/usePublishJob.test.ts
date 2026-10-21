@@ -522,6 +522,28 @@ describe("usePublishJob", () => {
       expect(result.current.error).toBeNull();
     });
 
+    it("a failed mount read is retried, so a blip does not leave a live site as draft (P-5)", async () => {
+      mockGetSiteId.mockReturnValue("site-9");
+      mockFetchSiteState.mockRejectedValueOnce(new Error("blip")).mockResolvedValueOnce({
+        isPublished: true,
+        publishedUrl: "https://live.example.com",
+        hasUnpublishedChanges: null,
+        lastPublishedAt: null,
+        lastEditedAt: null,
+      });
+
+      const { result } = renderHook(() => usePublishJob());
+      await flushMicrotasks();
+      expect(result.current.uiState).toBe("idle");
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(2000);
+      });
+      await flushMicrotasks();
+
+      expect(mockFetchSiteState).toHaveBeenCalledTimes(2);
+      expect(result.current.uiState).toBe("published");
+    });
+
     it("hydrated 'published' does not poison the re-entrancy guard", async () => {
       mockGetSiteId.mockReturnValue("site-9");
       mockFetchSiteState.mockResolvedValue({

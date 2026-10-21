@@ -22,6 +22,8 @@ const flushSpy = vi.fn(() => Promise.resolve());
 
 vi.mock("@/services/cmsSync", () => ({
   bindCmsEngine: () => () => {},
+  onCmsHydrationChange: () => () => {},
+  retryCmsHydration: vi.fn(),
   hydrateCmsFromServer: () => Promise.resolve(),
   flushCmsOutbox: () => flushSpy(),
   onCmsInvalid: () => () => {},
@@ -54,6 +56,7 @@ vi.mock("@/services/cmsSync", () => ({
 const dismissed: string[] = [];
 vi.mock("@/editor/chrome-ui", () => ({
   dismissToast: (id: string) => dismissed.push(id),
+  dismissToastKey: vi.fn(),
 }));
 
 import { useCmsSync } from "../useCmsSync";

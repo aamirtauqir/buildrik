@@ -295,6 +295,15 @@ describe("actions", () => {
     await waitFor(() => expect(resolveReviewComment).toHaveBeenCalledWith("c1", "RESOLVED"));
   });
 
+  it("a failed refresh after resolving says the list is stale (R-2)", async () => {
+    renderTab();
+    await screen.findByText(/hero photo is too dark/);
+    fetchReviewComments.mockRejectedValueOnce(new Error("network"));
+    const row = screen.getByText(/hero photo is too dark/).closest("[data-comment-row]") as HTMLElement;
+    fireEvent.click(within(row).getByRole("button", { name: /resolve/i }));
+    expect(await screen.findByText(/comment list didn't refresh/)).toBeInTheDocument();
+  });
+
   /* The canvas draws these same comments as pins and refetches on
      "comments:refresh". Nothing emitted it, so resolving greyed the row here
      and left the pin on the canvas open. */

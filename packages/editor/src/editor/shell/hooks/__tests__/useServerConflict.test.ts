@@ -147,6 +147,18 @@ describe("restore variant (BK-04)", () => {
     expect(composer.importProject).toHaveBeenCalledWith(MINE);
   });
 
+  it("Replace whose 'Before restore' version fails restores nothing and says so", async () => {
+    keepOffScreen(T0);
+    sync.baseline = T1;
+    composer.versions.createVersion.mockImplementationOnce(() => Promise.reject(new Error("quota")));
+    const { result } = render();
+    offer();
+    await act(async () => result.current.modalProps.onReplace());
+    expect(composer.importProject).not.toHaveBeenCalled();
+    expect(opts.addToast).toHaveBeenCalledWith(expect.objectContaining({ title: "Couldn't keep the server version first" }));
+    expect(result.current.modalProps.open).toBe(true);
+  });
+
   it("Keep stays on the server copy and settles the save state", () => {
     keepOffScreen(T0);
     const { result } = render();
@@ -226,6 +238,18 @@ describe("save variant", () => {
     expect(sync.setBaselineLastEditedAt).not.toHaveBeenCalled();
     expect(opts.addToast).toHaveBeenCalledWith(expect.objectContaining({ title: "Couldn't keep the server version first" }));
     expect(result.current.modalProps.open).toBe(true);
+  });
+
+  it("Replace whose 'Before overwrite' version fails saves nothing and says so", async () => {
+    sync.readServerCopy.mockResolvedValue({ project: { pages: [] }, lastEditedAt: T1, lastEditedBy: null });
+    composer.versions.createVersion.mockImplementationOnce(() => Promise.reject(new Error("quota")));
+    const { result } = render();
+    conflict(T0);
+    await waitFor(() => expect(result.current.modalProps.server.status).toBe("ready"));
+    await act(async () => result.current.modalProps.onReplace());
+    expect(opts.saveProject).not.toHaveBeenCalled();
+    expect(sync.setBaselineLastEditedAt).not.toHaveBeenCalled();
+    expect(opts.addToast).toHaveBeenCalledWith(expect.objectContaining({ title: "Couldn't keep the server version first" }));
   });
 
   it("Keep reloads; Save to History reloads only after the version was written (BD-35)", async () => {

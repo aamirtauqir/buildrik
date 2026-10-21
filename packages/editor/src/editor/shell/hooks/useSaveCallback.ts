@@ -41,6 +41,7 @@ import {
   peekOffScreenUnsaved,
   RESTORE_OFFER_EVENT,
   takeOffScreenUnsaved,
+  UNSAVED_KEEP_FAILED_EVENT,
 } from "@/services/unsavedRecovery";
 import { navigateBypassingUnloadGuard } from "../unloadGuardBypass";
 
@@ -222,9 +223,22 @@ export function useSaveCallback({
       });
     };
     window.addEventListener(CMS_BINDINGS_TOO_LARGE_EVENT, onBindingsTooLarge);
+    /* A refused save's copy could not be kept in this browser (quota or
+       storage off): a reload or a closed tab now loses it. */
+    const onKeepFailed = () => {
+      addToast({
+        key: "unsaved-keep-failed",
+        title: "No backup of unsaved changes",
+        description:
+          "This browser's storage is full or turned off, so your unsaved changes exist only in this tab. Keep it open until they save.",
+        tone: "warning",
+      });
+    };
+    window.addEventListener(UNSAVED_KEEP_FAILED_EVENT, onKeepFailed);
     return () => {
       window.removeEventListener(SETTINGS_MIRROR_ERROR_EVENT, onMirrorError);
       window.removeEventListener(CMS_BINDINGS_TOO_LARGE_EVENT, onBindingsTooLarge);
+      window.removeEventListener(UNSAVED_KEEP_FAILED_EVENT, onKeepFailed);
     };
   }, [addToast]);
 

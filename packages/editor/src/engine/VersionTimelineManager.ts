@@ -303,7 +303,8 @@ export class VersionTimelineManager {
       savedAs = safety.name;
       safetyVersionId = safety.id;
     } catch {
-      this.composer.emit(EVENTS.VERSION_LOAD_FAILED, {});
+      /* The caller's restore-failed toast says it. VERSION_LOAD_FAILED here
+         swapped the Saves list for "Couldn't load version history" (H-3). */
       return false;
     }
 

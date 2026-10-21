@@ -30,6 +30,13 @@ describe("ReviewSentModal — board 129:223 · sent", () => {
     expect(screen.getByRole("button", { name: "Open" })).toBeInTheDocument();
   });
 
+  it("a refused copy says so on the button instead of nothing (S-8)", async () => {
+    Object.assign(navigator, { clipboard: { writeText: vi.fn(() => Promise.reject(new Error("denied"))) } });
+    render(<ReviewSentModal state="sent" reviewUrl={URL_} invitedEmail="sara@bellacucina.com" onClose={vi.fn()} />);
+    fireEvent.click(screen.getByRole("button", { name: "Copy" }));
+    expect(await screen.findByRole("button", { name: "Couldn't copy" })).toBeInTheDocument();
+  });
+
   it("names who it was emailed to (board's 'Emailed to …' line)", () => {
     render(<ReviewSentModal state="sent" reviewUrl={URL_} invitedEmail="sara@bellacucina.com" onClose={vi.fn()} />);
     expect(screen.getByText(/Emailed to sara@bellacucina\.com/)).toBeInTheDocument();
