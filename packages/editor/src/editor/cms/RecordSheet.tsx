@@ -240,7 +240,7 @@ export function RecordSheet({
   };
 
   // shellDirtyRegistry (B-1): this sheet already guards its OWN Cancel/Close
-  // via `guard` above, but a shell-level tab switch (⌘H, ⇧A, the palette,
+  // via `guard` above, but a shell-level tab switch (H, ⇧A, the palette,
   // ui:switch-tab, UI_PANEL_OPEN) doesn't go through that — it just
   // unmounts this sheet. Registering `dirty` here lets the shell's own
   // switch guard catch that case too. Cleared on unmount so a closed sheet

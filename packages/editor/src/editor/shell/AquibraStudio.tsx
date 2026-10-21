@@ -173,7 +173,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
 
   /* B-1: every left-panel tab-switch door gets these two guarded sinks, never
      the raw `state.setLeftPanelTab` / `state.openLeftPanelToTab` — the rail,
-     ui:switch-tab and StudioPanels' open requests (setLeftPanelTab), and ⌘H,
+     ui:switch-tab and StudioPanels' open requests (setLeftPanelTab), and
      ⇧A, the palette, UI_PANEL_OPEN and every onOpen* deep link
      (openLeftPanelToTab). A switch that would unmount unsaved Settings or CMS
      record work (shellDirtyRegistry) prompts first. The VIEWER gate stays in
@@ -491,7 +491,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   useEditorShortcuts({
     composer,
     modals,
-    openLeftPanelToTab: guardedOpenLeftPanelToTab,
     // reviewsEnabled is `boolean | null` before the status resolves (see
     // ReviewStatus) — treat "unknown yet" the same as "on" (the hook's own
     // default), never as "off": the C shortcut should not go dead for the
@@ -855,7 +854,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
       <OnboardingMount composer={composer} />
 
       {/* B-1: the shared tab-switch guard's confirm — Settings/Brand/CMS
-          record dirty, caught before ⌘H, ⇧A, the palette, ui:switch-tab or
+          record dirty, caught before H, ⇧A, the palette, ui:switch-tab or
           UI_PANEL_OPEN silently discards it. */}
       <UnsavedTabSwitchDialog {...tabSwitchDialogProps} />
 

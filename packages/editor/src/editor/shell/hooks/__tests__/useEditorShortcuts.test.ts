@@ -117,20 +117,23 @@ describe("useEditorShortcuts", () => {
   // SC-12 / owner Q4 (R-1018b): Site settings has no shortcut — its doors are
   // the topbar button and ⌘K. ⌘, is the browser's own settings chord.
   it("Ctrl+, and Cmd+, open nothing and leave the browser its chord", () => {
-    const openLeftPanelToTab = vi.fn();
-    mount({ openLeftPanelToTab });
+    mount();
     const ctrl = dispatchKey({ key: ",", ctrlKey: true });
     const cmd = dispatchKey({ key: ",", metaKey: true });
-    expect(openLeftPanelToTab).not.toHaveBeenCalled();
+    expect(composer.emit).not.toHaveBeenCalled();
     expect(ctrl.defaultPrevented).toBe(false);
     expect(cmd.defaultPrevented).toBe(false);
   });
 
-  it("Ctrl+H opens version history", () => {
-    const openLeftPanelToTab = vi.fn();
-    mount({ openLeftPanelToTab });
-    dispatchKey({ key: "h", ctrlKey: true });
-    expect(openLeftPanelToTab).toHaveBeenCalledWith("history");
+  // SC-12 / BD-39 (2): History is H only (the rail letter, useSidebarKeyboard).
+  // ⌘H hides the browser on macOS and Ctrl+H is browser history on Windows.
+  it("Ctrl+H and Cmd+H open nothing and leave the browser its chord", () => {
+    mount();
+    const ctrl = dispatchKey({ key: "h", ctrlKey: true });
+    const cmd = dispatchKey({ key: "h", metaKey: true });
+    expect(composer.emit).not.toHaveBeenCalled();
+    expect(ctrl.defaultPrevented).toBe(false);
+    expect(cmd.defaultPrevented).toBe(false);
   });
 
   // FB-1: Shift+A used to be bound here too, racing GROUPED_TABS_CONFIG's own
@@ -139,10 +142,10 @@ describe("useEditorShortcuts", () => {
   // table now (useSidebarKeyboard.ai.test.ts covers ⇧A there); this hook
   // must stay silent on it.
   it("Shift+A is not bound here — useSidebarKeyboard.ts owns it", () => {
-    const openLeftPanelToTab = vi.fn();
-    mount({ openLeftPanelToTab });
-    dispatchKey({ key: "A", shiftKey: true });
-    expect(openLeftPanelToTab).not.toHaveBeenCalled();
+    mount();
+    const ev = dispatchKey({ key: "A", shiftKey: true });
+    expect(ev.defaultPrevented).toBe(false);
+    expect(composer.emit).not.toHaveBeenCalled();
   });
 
   // MODALS ---------------------------------------------------------------------

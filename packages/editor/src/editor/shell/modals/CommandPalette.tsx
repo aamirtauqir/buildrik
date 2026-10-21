@@ -256,14 +256,15 @@ function buildCommands(
     },
     { id: "view-zoom-in", label: "Zoom in", group: "More", shortcut: "Ctrl++", handler: run(() => composer.emit(EVENTS.ZOOM_IN, {})) },
     { id: "view-zoom-out", label: "Zoom out", group: "More", shortcut: "Ctrl+-", handler: run(() => composer.emit(EVENTS.ZOOM_OUT, {})) },
-    /* Ctrl+1 is fit (CanvasFooterToolbar binds ⌘1 to fit, ⌘0 to 100%). */
-    { id: "view-fit", label: "Zoom to fit", group: "More", shortcut: "Ctrl+1", handler: run(() => composer.emit(EVENTS.ZOOM_FIT, {})) },
-    /* The footer flyout's third row (⌘2). Canvas has always listened for
+    /* ⇧1 is fit (CanvasFooterToolbar binds ⇧1 fit, ⇧2 selection, ⇧0 100% —
+       SC-12 / BD-39 moved them off ⌘1 / ⌘2, which switch browser tabs). */
+    { id: "view-fit", label: "Zoom to fit", group: "More", shortcut: "Shift+1", handler: run(() => composer.emit(EVENTS.ZOOM_FIT, {})) },
+    /* The footer flyout's third row (⇧2). Canvas has always listened for
        ZOOM_SELECTION; nothing emitted it (DQ-003). */
-    { id: "view-zoom-selection", label: "Zoom to selection", group: "More", shortcut: "Ctrl+2", handler: run(() => composer.emit(EVENTS.ZOOM_SELECTION, {})) },
-    /* The registry's chordless "Reset zoom" printed nothing although ⌘0 works
+    { id: "view-zoom-selection", label: "Zoom to selection", group: "More", shortcut: "Shift+2", handler: run(() => composer.emit(EVENTS.ZOOM_SELECTION, {})) },
+    /* The registry's chordless "Reset zoom" printed nothing although ⇧0 works
        (the flyout binds it). The row prints the flyout's chord, like fit's. */
-    { id: "view-zoom-100", label: "Reset zoom", group: "More", shortcut: "Ctrl+0", handler: run(() => composer.setZoom(100)) },
+    { id: "view-zoom-100", label: "Reset zoom", group: "More", shortcut: "Shift+0", handler: run(() => composer.setZoom(100)) },
     {
       id: "history-clear",
       label: "Clear history",

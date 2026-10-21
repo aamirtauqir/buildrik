@@ -329,13 +329,13 @@ describe("CommandPalette — search", () => {
 
   /* L1-033: ⌘0 worked and the palette's Reset zoom printed no chord. One row,
      not the registry's chordless copy beside it. */
-  it("Reset zoom prints ⌘0 / Ctrl+0 and appears once", () => {
+  it("Reset zoom prints ⇧0 (SC-12 / BD-39) and appears once", () => {
     const { composer } = renderPalette(
       makeComposer({ registry: [...BOARD_REGISTRY, { id: "zoom-reset", label: "Reset zoom" }] }),
     );
     type("reset zoom");
     expect(screen.getAllByRole("option")).toHaveLength(1);
-    expect(screen.getByTestId("cmdk-kbd-view-zoom-100").textContent).toMatch(/0$/);
+    expect(screen.getByTestId("cmdk-kbd-view-zoom-100").textContent).toMatch(/^(⇧|Shift\+)0$/);
     fireEvent.click(screen.getByTestId("cmdk-row-view-zoom-100"));
     expect(composer!.setZoom).toHaveBeenCalledWith(100);
   });
@@ -347,17 +347,17 @@ describe("CommandPalette — search", () => {
     expect(screen.getByTestId("cmdk-row-cmd-add-heading")).toBeInTheDocument();
   });
 
-  it("Zoom to fit prints ⌘1 / Ctrl+1, not Ctrl+0", () => {
+  it("Zoom to fit prints ⇧1 — ⌘1 switches browser tabs (SC-12 / BD-39)", () => {
     renderPalette();
     type("fit");
-    expect(screen.getByTestId("cmdk-kbd-view-fit").textContent).toMatch(/1$/);
+    expect(screen.getByTestId("cmdk-kbd-view-fit").textContent).toMatch(/^(⇧|Shift\+)1$/);
   });
 
   /* DQ-003: Canvas listened for ZOOM_SELECTION and nothing emitted it. */
-  it("Zoom to selection emits ZOOM_SELECTION and prints Ctrl+2", () => {
+  it("Zoom to selection emits ZOOM_SELECTION and prints ⇧2", () => {
     const { composer } = renderPalette();
     type("zoom to selection");
-    expect(screen.getByTestId("cmdk-kbd-view-zoom-selection").textContent).toMatch(/2$/);
+    expect(screen.getByTestId("cmdk-kbd-view-zoom-selection").textContent).toMatch(/^(⇧|Shift\+)2$/);
     fireEvent.click(screen.getByTestId("cmdk-row-view-zoom-selection"));
     expect(composer!.emit).toHaveBeenCalledWith(EVENTS.ZOOM_SELECTION, {});
   });
