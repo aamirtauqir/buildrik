@@ -235,6 +235,15 @@ describe("ConflictModal — save variant only", () => {
     });
   });
 
+  describe("a style-model conflict (the site moved to classes after this tab loaded it)", () => {
+    it("offers Reload only and says why", () => {
+      render(<ConflictModal {...makeProps({ styleModel: true })} />);
+      expect(screen.queryByRole("button", { name: /replace/i })).toBeNull();
+      expect(screen.getByRole("button", { name: "Keep the server version" })).toBeTruthy();
+      expect(screen.getByTestId("conflict-body").textContent).toMatch(/now uses classes/);
+    });
+  });
+
   it("a new conflict raised after a Keep whose reload was cancelled keeps work again", async () => {
     const { raiseSaveConflict, setBaselineLastEditedAt } = await import("@/services/BuildrikSyncProvider");
     render(<ConflictModal {...makeProps()} />);

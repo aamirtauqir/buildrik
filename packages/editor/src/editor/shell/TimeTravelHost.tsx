@@ -170,7 +170,7 @@ export const TimeTravelHost: React.FC<{ composer: Composer | null }> = ({ compos
       return;
     }
     const pageId = composer.elements.getActivePage()?.id;
-    void renderProjectPages(snapshot, [], undefined, composer.designSystem.brandTokensV2)
+    void renderProjectPages(snapshot, [], undefined, composer.designSystem.brandTokensV2, composer.styleModel)
       .then((pages) => {
         if (cancelled) return;
         const i = snapshot.pages.findIndex((p) => p.id === pageId);

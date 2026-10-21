@@ -70,6 +70,7 @@ import {
   SAVE_CONFLICT_CLEARED_EVENT,
   getPendingConflictToken,
   isBrandFormatConflict,
+  isStyleModelConflict,
   keepStoredTokensOnSave,
   isSaveConflictPending,
   hasProjectLoaded,
@@ -276,6 +277,28 @@ describe("saveProject", () => {
       // project has been loaded/saved in this session).
       expectedLastEditedAt: null,
     });
+  });
+});
+
+describe("saveProject — class-first style model ack", () => {
+  const PROJECT = { version: "1.0" as const, pages: [], styles: [], assets: [], metadata: { name: "X" } };
+
+  it("loads the server's style model and acks it on save; an element-model site sends no ack", async () => {
+    mocks.saveProjectMutate.mockResolvedValue({ success: true, savedAt: new Date("2026-10-21") });
+    mocks.sitesGetQuery.mockResolvedValue({ id: "cls", name: "T" });
+    mocks.pagesListQuery.mockResolvedValue([]);
+    mocks.siteDetailSettingsGetQuery.mockResolvedValueOnce({ styleModel: "class" });
+    const loaded = await loadProject("cls");
+    expect(loaded.styleModel).toBe("class");
+    setBaselineLastEditedAt(null);
+    await saveProject("cls", PROJECT);
+    expect(mocks.saveProjectMutate).toHaveBeenLastCalledWith(expect.objectContaining({ siteId: "cls", styleModelAck: "class" }));
+
+    mocks.siteDetailSettingsGetQuery.mockResolvedValueOnce({ styleModel: "element" });
+    const legacy = await loadProject("cls");
+    expect(legacy).not.toHaveProperty("styleModel");
+    await saveProject("cls", PROJECT);
+    expect(mocks.saveProjectMutate.mock.lastCall?.[0]).not.toHaveProperty("styleModelAck");
   });
 });
 
@@ -505,7 +528,7 @@ describe("save-conflict parsing (61-conflict)", () => {
     window.addEventListener(SAVE_CONFLICT_EVENT, listener);
 
     await expect(saveProject("s1", PROJECT)).rejects.toMatchObject({ serverLastEditedAt: "2026-07-01T10:00:00.000Z" });
-    expect(heard).toEqual([{ serverLastEditedAt: "2026-07-01T10:00:00.000Z", brandFormat: true }]);
+    expect(heard).toEqual([{ serverLastEditedAt: "2026-07-01T10:00:00.000Z", brandFormat: true, styleModel: false }]);
     expect(isBrandFormatConflict()).toBe(true);
 
     window.removeEventListener(SAVE_CONFLICT_EVENT, listener);
@@ -518,7 +541,23 @@ describe("save-conflict parsing (61-conflict)", () => {
     window.addEventListener(SAVE_CONFLICT_EVENT, listener);
 
     await expect(saveProject("s1", PROJECT)).rejects.toThrow(SaveConflictError);
-    expect(heard).toEqual([{ serverLastEditedAt: "2026-07-01T10:00:00.000Z", brandFormat: false }]);
+    expect(heard).toEqual([{ serverLastEditedAt: "2026-07-01T10:00:00.000Z", brandFormat: false, styleModel: false }]);
+    expect(isBrandFormatConflict()).toBe(false);
+
+    window.removeEventListener(SAVE_CONFLICT_EVENT, listener);
+  });
+
+  it("a style-model refusal (class-first stale tab) marks the conflict styleModel — Reload only", async () => {
+    mocks.saveProjectMutate.mockRejectedValue(
+      new Error("SAVE_CONFLICT_STYLE_MODEL SAVE_CONFLICT:2026-07-01T10:00:00.000Z")
+    );
+    const heard: unknown[] = [];
+    const listener = (e: Event) => heard.push((e as CustomEvent).detail);
+    window.addEventListener(SAVE_CONFLICT_EVENT, listener);
+
+    await expect(saveProject("s1", PROJECT)).rejects.toMatchObject({ serverLastEditedAt: "2026-07-01T10:00:00.000Z" });
+    expect(heard).toEqual([{ serverLastEditedAt: "2026-07-01T10:00:00.000Z", brandFormat: false, styleModel: true }]);
+    expect(isStyleModelConflict()).toBe(true);
     expect(isBrandFormatConflict()).toBe(false);
 
     window.removeEventListener(SAVE_CONFLICT_EVENT, listener);

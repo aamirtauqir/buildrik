@@ -265,6 +265,9 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
                it, and a pre-v6 site must not be migrated in memory while
                the server's switch is off for it (I3). */
             instance.designSystem.brandTokensV2 = data.brandTokensV2 === true;
+            /* Class-first: the server's style model, before the import, so
+               the first canvas sheet is already in that cascade. */
+            instance.styleModel = data.styleModel === "class" ? "class" : "element";
             const tokenLoad = data.settings
               ? loadTokensSafely(data.settings, siteId, {
                   switchOn: data.brandTokensV2 === true,
