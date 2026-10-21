@@ -14,6 +14,8 @@ let invalidCb: ((i: { kind: "collection" | "entry"; id: string; message: string 
 
 vi.mock("@/services/cmsSync", () => ({
   bindCmsEngine: () => () => {},
+  onCmsHydrationChange: () => () => {},
+  retryCmsHydration: vi.fn(),
   hydrateCmsFromServer: () => Promise.resolve(),
   flushCmsOutbox: () => Promise.resolve(),
   onCmsGone: () => () => {},
@@ -32,7 +34,7 @@ vi.mock("@/services/cmsSync", () => ({
   syncEntryDelete: vi.fn(),
   consumeDirectSync: () => false,
 }));
-vi.mock("@/editor/chrome-ui", () => ({ dismissToast: vi.fn() }));
+vi.mock("@/editor/chrome-ui", () => ({ dismissToast: vi.fn(), dismissToastKey: vi.fn() }));
 
 import { useCmsSync } from "../useCmsSync";
 import type { Composer } from "@/engine/Composer";
