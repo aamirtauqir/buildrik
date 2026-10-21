@@ -221,10 +221,12 @@ describe("PublishTab — board 784:4326, just published", () => {
   it("states the result, offers the live site, and greys the CTA", async () => {
     fetchPublishHistory.mockResolvedValue([
       { id: "j1", version: 15, completedAt: new Date(), deploymentId: "d", rollbackable: true, rolledBackFrom: null },
+      { id: "j0", version: 14, completedAt: new Date(), deploymentId: "c", rollbackable: true, rolledBackFrom: null },
     ]);
+    const composer = composerWith();
     renderTab(
       <PublishTab
-        composer={composerWith()}
+        composer={composer}
         projectId="site_1"
         nextMove={OPEN_MOVE} onRequestPublish={vi.fn()}
         publishJob={job({ uiState: "published", jobId: "job-1", publishedUrl: "https://bellacucina.com" })}
@@ -234,7 +236,14 @@ describe("PublishTab — board 784:4326, just published", () => {
     await waitFor(() => expect(screen.getByText("Published to production.")).toBeTruthy());
     expect(screen.getByText(/LIVE · v15/)).toBeTruthy(); // 4418:97787
     expect((screen.getByText("View live site") as HTMLAnchorElement).href).toContain("bellacucina.com");
-    expect(screen.getByText("Compare v14 → v15")).toBeTruthy();
+    /* REA P-1: the button opens the one Compare on the two deploys it names
+       — it used to switch to History, which opened on Session. */
+    fireEvent.click(screen.getByText("Compare v14 → v15"));
+    expect(composer?.emit).toHaveBeenCalledWith("ui:compare-open", {
+      left: { kind: "published", jobId: "j0", version: 14 },
+      right: { kind: "published", jobId: "j1", version: 15 },
+      from: "Publish",
+    });
     // Nothing pending — the button says so (4418:97787) and has nothing to send.
     expect((screen.getByText("No new changes").closest("button") as HTMLButtonElement).disabled).toBe(true);
     expect(screen.getByTestId("publish-footer-meta").textContent).toMatch(
@@ -300,14 +309,17 @@ describe("PublishTab — a fresh load is not a fresh publish", () => {
 });
 
 describe("PublishTab — board 784:4480, no publish path", () => {
-  it("is one sentence and one action, not a checklist", () => {
+  /* REA P-3: no publish path means the build flag is off. "Connect Vercel"
+     named the wrong cause — a connected workspace saw it too, and connecting
+     changed nothing. */
+  it("names the flag, offers no Connect Vercel, and is not a checklist", () => {
     const { container } = renderTab(<PublishTab composer={composerWith()} projectId="site_1" nextMove={OPEN_MOVE} />);
-    expect(container.textContent).toContain("Connect Vercel to publish.");
-    expect(container.textContent).toContain("we host nothing");
-    expect(screen.getByText("Connect Vercel")).toBeTruthy();
+    expect(container.textContent).toContain("Publishing is turned off.");
+    expect(container.textContent).not.toContain("Connect Vercel to publish.");
+    expect(screen.queryByRole("button", { name: "Connect Vercel" })).toBeNull();
+    expect((screen.getByText("Publish to production").closest("button") as HTMLButtonElement).disabled).toBe(true);
     // The board draws no release/changes/deploy sections here.
     expect(container.textContent).not.toContain("Changes in this session");
-    expect(screen.queryByText("Publish to production")).toBeNull();
   });
 });
 
@@ -394,15 +406,15 @@ describe("PublishTab — board 781:4489, the deploy service is unreachable", () 
 });
 
 /* The panel has three whole-body states that can be true at once. Their order
-   is a product decision, not an accident of JSX nesting: with no publish path,
-   connecting is the only next step, so it outranks a history read that failed;
+   is a product decision, not an accident of JSX nesting: with no publish path
+   nothing in the panel can act, so it outranks a history read that failed;
    and a failed read outranks sections it cannot speak for. */
 describe("PublishTab — which whole-body state wins", () => {
   it("no publish path beats an unreachable deploy service", async () => {
     fetchPublishHistory.mockRejectedValue(new Error("network"));
     const { container } = renderTab(<PublishTab composer={composerWith()} projectId="site_1" nextMove={OPEN_MOVE} />);
 
-    await waitFor(() => expect(container.textContent).toContain("Connect Vercel to publish."));
+    await waitFor(() => expect(container.textContent).toContain("Publishing is turned off."));
     expect(container.textContent).not.toContain("Couldn't reach the deploy service.");
   });
 
@@ -446,24 +458,41 @@ describe("PublishTab — the zero-changes sentence tells the truth", () => {
     expect(screen.getByText("This site has never been published.")).toBeInTheDocument();
   });
 
-  it("keeps the original sentence once a deploy exists", async () => {
-    fetchPublishHistory.mockResolvedValue([
-      {
-        id: "j1",
-        version: 4,
-        completedAt: new Date("2026-08-14T10:00:00Z"),
-        deploymentId: "d",
-        rollbackable: true,
-        rolledBackFrom: null,
-      },
-    ]);
+  const DEPLOYED = [
+    {
+      id: "j1",
+      version: 4,
+      completedAt: new Date("2026-08-14T10:00:00Z"),
+      deploymentId: "d",
+      rollbackable: true,
+      rolledBackFrom: null,
+    },
+  ];
+
+  it("says nothing changed only when the lifecycle says nothing is waiting", async () => {
+    fetchPublishHistory.mockResolvedValue(DEPLOYED);
+    renderTab(<PublishTab composer={composerWith([])} projectId="site_1" nextMove={null} onRequestPublish={vi.fn()} />);
+
+    await expandSections();
+    // The section and the CTA's reason say the same thing.
+    await waitFor(() => expect(screen.getAllByText("Nothing has changed since the last deploy.")).toHaveLength(2));
+    expect(screen.queryByText("Publishing will put the whole site live for the first time.")).toBeNull();
+  });
+
+  /* REA P-2: after a reload the undo stack is empty by design, while saved
+     edits since the last deploy are still waiting (the lifecycle's nextMove).
+     The empty list must not read as "nothing changed". */
+  it("an empty undo stack over waiting saved changes does not claim nothing changed", async () => {
+    fetchPublishHistory.mockResolvedValue(DEPLOYED);
     renderTab(<PublishTab composer={composerWith([])} projectId="site_1" nextMove={OPEN_MOVE} onRequestPublish={vi.fn()} />);
 
     await expandSections();
     await waitFor(() =>
-      expect(screen.getByText("Nothing has changed since the last deploy.")).toBeInTheDocument(),
+      expect(
+        screen.getByText("No edits in this session. Publishing ships the site as it is saved now."),
+      ).toBeInTheDocument(),
     );
-    expect(screen.queryByText("Publishing will put the whole site live for the first time.")).toBeNull();
+    expect(screen.queryByText("Nothing has changed since the last deploy.")).toBeNull();
   });
 });
 

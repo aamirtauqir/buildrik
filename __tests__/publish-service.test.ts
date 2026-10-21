@@ -221,6 +221,9 @@ describe("Publish Service", () => {
   });
 
   describe("startPublish", () => {
+    /* REA #29: a publish carries the editor's rendered pages. */
+    const PAGES = [{ path: "index.html", html: "<html></html>" }];
+
     beforeEach(() => {
       vi.mocked(prisma.site.findUnique).mockResolvedValue({
         deletedAt: null, workspaceId: "ws1", publishedUrl: null, name: "S",
@@ -234,7 +237,7 @@ describe("Publish Service", () => {
     it("refuses a site its checks block, with the blocking rows (D11)", async () => {
       vi.mocked(prisma.publishBuildJob.findFirst).mockResolvedValue(null);
       vi.mocked(prisma.page.findMany).mockResolvedValue([] as never);
-      await expect(startPublish("s1", "user1")).rejects.toMatchObject({
+      await expect(startPublish("s1", "user1", PAGES)).rejects.toMatchObject({
         name: "PublishBlockedError",
         blockers: [expect.objectContaining({ label: "Pages ready" })],
       });
@@ -252,7 +255,7 @@ describe("Publish Service", () => {
       } as any);
       vi.mocked(prisma.site.update).mockResolvedValue({ id: "s1" } as any);
 
-      const job = await startPublish("s1", "user1");
+      const job = await startPublish("s1", "user1", PAGES);
       expect(job.id).toBe("job1");
       expect(prisma.site.update).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -292,7 +295,7 @@ describe("Publish Service", () => {
       vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false, status: 500 }));
       queueOneJob();
 
-      const job = await startPublish("s1", "user1");
+      const job = await startPublish("s1", "user1", PAGES);
 
       expect(job.id).toBe("job1");
       // The worker owns the outcome from here — overwriting it is what erased
@@ -311,7 +314,7 @@ describe("Publish Service", () => {
       vi.stubGlobal("fetch", f);
       queueOneJob();
 
-      await startPublish("s1", "user1");
+      await startPublish("s1", "user1", PAGES);
 
       expect(f).toHaveBeenCalledTimes(1);
     });
@@ -326,8 +329,19 @@ describe("Publish Service", () => {
         workspace: { deletionScheduledAt: null },
       } as never);
 
-      await expect(startPublish("s1", "user1")).rejects.toThrow("WORKER_DISPATCH_FAILED");
+      await expect(startPublish("s1", "user1", PAGES)).rejects.toThrow("WORKER_DISPATCH_FAILED");
       expect(f).toHaveBeenCalledTimes(3);
+    });
+
+    /* REA #29: no renderer on the server — a pageless publish (the
+       scheduled-publish sweep, a bare API call) used to queue and die in
+       the worker. Refused before any job or site write. */
+    it("refuses a publish with no pages before queueing anything", async () => {
+      vi.mocked(prisma.publishBuildJob.findFirst).mockResolvedValue(null);
+      await expect(startPublish("s1", "user1")).rejects.toThrow("NO_PAGES");
+      await expect(startPublish("s1", "user1", [])).rejects.toThrow("NO_PAGES");
+      expect(prisma.publishBuildJob.create).not.toHaveBeenCalled();
+      expect(prisma.site.update).not.toHaveBeenCalled();
     });
 
     it("throws when already publishing", async () => {

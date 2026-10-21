@@ -415,13 +415,16 @@ export async function startPublish(
   // nothing new may go live in a workspace scheduled for deletion.
   if (site.workspace.deletionScheduledAt) throw new Error("WORKSPACE_DELETION_SCHEDULED");
 
-  /* C-3 freshness: the editor publishes the pages in ITS tab. If the site was
-     saved by someone else after this tab last loaded or saved it, those pages
-     are a behind-copy and would silently replace the newer work on the live
-     site. Same token and same refusal the save path uses. */
+  /* C-3 freshness + REA #9 binding: the editor saves before it publishes, and
+     its pages are rendered from that saved revision; the token names it. The
+     site must still BE that revision — a save after it (another tab, another
+     person) means the pages are not what is stored, and would replace newer
+     work on the live site; a token from no save at all is not a revision.
+     Equal, not "not older": the publish ships exactly the saved state the
+     approval gate below judges. Same refusal the save path uses. */
   if (
     opts?.expectedLastEditedAt &&
-    site.lastEditedAt.getTime() > new Date(opts.expectedLastEditedAt).getTime()
+    site.lastEditedAt.getTime() !== new Date(opts.expectedLastEditedAt).getTime()
   ) {
     throw new Error(`SAVE_CONFLICT:${site.lastEditedAt.toISOString()}`);
   }
@@ -503,6 +506,16 @@ export async function startPublish(
     }
   }
 
+  /* REA #29: only the editor renders pages — the server has no renderer. A
+     publish with neither pages nor a stored bundle (the scheduled-publish
+     sweep, a bare API call) used to queue, flip the site to PUBLISHING, and
+     die in the worker with "No page content to deploy", while the sweep
+     recorded the schedule as started. Refused here, before any job exists.
+     Simulation (dev only) is the one path that runs without pages. */
+  if (!pages?.length && !opts?.rollbackOf && process.env.PUBLISH_ALLOW_SIMULATION !== "true") {
+    throw new Error("NO_PAGES");
+  }
+
   // Refuse to queue a publish that cannot succeed. Sites deploy into the
   // workspace's own Vercel account, so with no connection the worker reaches
   // runVercelDeploy and throws — but only after the job has queued, shown a
@@ -529,7 +542,7 @@ export async function startPublish(
 
   // Persist HTML payload (if provided) on the job so the worker can deploy
   // without re-fetching from the editor. `log` is an existing Json column.
-  // Pages omitted = worker falls back to dev simulation (current behavior).
+  // Pages omitted = dev simulation (refused above unless it is opted into).
   //
   // The partial unique index publish_build_jobs_active_unique guarantees
   // at most one ACTIVE job per site at the DB layer. A parallel publish

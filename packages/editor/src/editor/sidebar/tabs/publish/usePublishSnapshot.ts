@@ -41,7 +41,9 @@ export interface PublishSnapshot {
   pageNames: string[];
   /** `rawAt` is the timestamp itself — board 784:4326 prints it relatively
       ("just now"), board 641:2652 absolutely ("2 Jul, 14:22"). */
-  lastDeploy: { version: number; when: string; rawAt: string | Date | null; isLive: boolean } | null;
+  lastDeploy: { jobId: string; version: number; when: string; rawAt: string | Date | null; isLive: boolean } | null;
+  /** The deploy before the last one — the other side of "Compare v(n-1) → v(n)". */
+  previousDeploy: { jobId: string; version: number } | null;
   loading: boolean;
   /** The history read failed. Board 781:4489 — never the same as "no deploys
       yet", which is what a silent catch made it look like. */
@@ -150,6 +152,7 @@ export function usePublishSnapshot(
   }, [composer]);
 
   const latest = rows?.[0] ?? null;
+  const previous = rows?.[1] ?? null;
   const lastDeployAt = latest?.completedAt ? new Date(latest.completedAt).getTime() : null;
 
   /* Changes SINCE the last deploy, not the whole undo stack: the section's
@@ -193,12 +196,14 @@ export function usePublishSnapshot(
        serving; a finished job only says a deploy once ran. */
     lastDeploy: latest
       ? {
+          jobId: latest.id,
           version: latest.version,
           when: deployStamp(latest.completedAt),
           rawAt: latest.completedAt,
           isLive: Boolean(publishedUrl),
         }
       : null,
+    previousDeploy: previous ? { jobId: previous.id, version: previous.version } : null,
     loading,
     error,
     reload: () => setRetry((n) => n + 1),
