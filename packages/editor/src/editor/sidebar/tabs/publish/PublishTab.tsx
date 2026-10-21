@@ -436,8 +436,11 @@ export const PublishTab: React.FC<PublishTabProps> = ({
   const blockedOnVercel = blocking.some((c) => c.label === VERCEL_CHECK_LABEL);
 
   /*
-    Board 784:4480 ("Connect Vercel to publish.") is the panel with no publish
-    path at all — `onRequestPublish` absent, i.e. publishing not wired.
+    No publish path at all — `onRequestPublish` absent, which means the
+    `publish` build flag is off (TabRouter). Board 784:4480 draws this panel as
+    "Connect Vercel to publish.", but that names the wrong cause: a connected
+    workspace saw it too, and connecting changes nothing (REA P-3). The panel
+    states the flag and offers no action, since none in the editor fixes it.
 
     It is NOT the panel for "connected account missing". That case is the
     Vercel check failing in the list above, with `Connect` on the row and a
@@ -716,15 +719,16 @@ export const PublishTab: React.FC<PublishTabProps> = ({
       />
       {noPublishPath ? (
         <div className={CONTENT}>
-          {/* Board 784:4480 — with no publish path there is nothing to say
-              about environments, changes or deploys: the panel states the one
-              fact that matters and offers the one action that changes it. */}
+          {/* Board 784:4480's shape — with no publish path there is nothing
+              to say about environments, changes or deploys: the panel states
+              the one fact that matters. */}
           <section className={SECTION}>
             <h2 className="tw:m-0 tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:text-[var(--bk-ink)]">
-              Connect Vercel to publish.
+              Publishing is turned off.
             </h2>
             <p className="tw:m-0 tw:mt-1 tw:text-[13px] tw:leading-normal tw:text-[var(--bk-ink-muted)]">
-              Buildrick deploys into your own Vercel account — we host nothing.
+              This build of the editor has publishing switched off, so nothing can be published from here. Connecting
+              Vercel won&apos;t change that.
             </p>
           </section>
         </div>
@@ -1101,10 +1105,9 @@ export const PublishTab: React.FC<PublishTabProps> = ({
         data-testid="publish-footer"
       >
         {noPublishPath ? (
-          /* Board 784:4480 puts the CTA here too — the panel body above
-             carries the sentence, this is the action. */
-          <Button onClick={openIntegrations} className="tw:w-full">
-            Connect Vercel
+          /* A disabled primary always says why; the body carries the why. */
+          <Button disabled className="tw:h-7 tw:w-auto tw:flex-none tw:self-start tw:px-3 tw:py-1.5 tw:text-[13px]">
+            Publish to production
           </Button>
         ) : (
           <>

@@ -189,7 +189,7 @@ describe("PublishTab — the other shut doors", () => {
         <PublishTab composer={composerWith()} projectId="site_1" nextMove={moveAt({ reviewState: "approved" })} />
       </ToastProvider>,
     );
-    expect(container.textContent).toContain("Connect Vercel to publish.");
+    expect(container.textContent).toContain("Publishing is turned off.");
     expect(screen.queryByTestId("publish-cta")).toBeNull();
   });
 });

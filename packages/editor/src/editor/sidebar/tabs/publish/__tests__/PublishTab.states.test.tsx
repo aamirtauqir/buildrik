@@ -309,14 +309,17 @@ describe("PublishTab — a fresh load is not a fresh publish", () => {
 });
 
 describe("PublishTab — board 784:4480, no publish path", () => {
-  it("is one sentence and one action, not a checklist", () => {
+  /* REA P-3: no publish path means the build flag is off. "Connect Vercel"
+     named the wrong cause — a connected workspace saw it too, and connecting
+     changed nothing. */
+  it("names the flag, offers no Connect Vercel, and is not a checklist", () => {
     const { container } = renderTab(<PublishTab composer={composerWith()} projectId="site_1" nextMove={OPEN_MOVE} />);
-    expect(container.textContent).toContain("Connect Vercel to publish.");
-    expect(container.textContent).toContain("we host nothing");
-    expect(screen.getByText("Connect Vercel")).toBeTruthy();
+    expect(container.textContent).toContain("Publishing is turned off.");
+    expect(container.textContent).not.toContain("Connect Vercel to publish.");
+    expect(screen.queryByRole("button", { name: "Connect Vercel" })).toBeNull();
+    expect((screen.getByText("Publish to production").closest("button") as HTMLButtonElement).disabled).toBe(true);
     // The board draws no release/changes/deploy sections here.
     expect(container.textContent).not.toContain("Changes in this session");
-    expect(screen.queryByText("Publish to production")).toBeNull();
   });
 });
 
@@ -403,15 +406,15 @@ describe("PublishTab — board 781:4489, the deploy service is unreachable", () 
 });
 
 /* The panel has three whole-body states that can be true at once. Their order
-   is a product decision, not an accident of JSX nesting: with no publish path,
-   connecting is the only next step, so it outranks a history read that failed;
+   is a product decision, not an accident of JSX nesting: with no publish path
+   nothing in the panel can act, so it outranks a history read that failed;
    and a failed read outranks sections it cannot speak for. */
 describe("PublishTab — which whole-body state wins", () => {
   it("no publish path beats an unreachable deploy service", async () => {
     fetchPublishHistory.mockRejectedValue(new Error("network"));
     const { container } = renderTab(<PublishTab composer={composerWith()} projectId="site_1" nextMove={OPEN_MOVE} />);
 
-    await waitFor(() => expect(container.textContent).toContain("Connect Vercel to publish."));
+    await waitFor(() => expect(container.textContent).toContain("Publishing is turned off."));
     expect(container.textContent).not.toContain("Couldn't reach the deploy service.");
   });
 

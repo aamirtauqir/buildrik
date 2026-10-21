@@ -98,7 +98,7 @@ describe("PublishTab — canonical publish wiring (B1)", () => {
   it("shows 'not configured' when no publish door is wired (flag off / inert)", () => {
     const { container } = renderTab(<PublishTab composer={composer} publishJob={makeJob()} nextMove={OPEN_MOVE} />);
     // Board 784:4480: with no publish path the panel is that one sentence.
-    expect(container.textContent).toContain("Connect Vercel to publish.");
+    expect(container.textContent).toContain("Publishing is turned off.");
   });
 
   it("enables Publish and opens the ONE door when wired — the same door the topbar opens", () => {
