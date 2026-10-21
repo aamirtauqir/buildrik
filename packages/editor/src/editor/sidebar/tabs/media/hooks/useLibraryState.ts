@@ -413,10 +413,6 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
         assetUpdates.generatedMetadata = undefined;
       }
       if (updates.tags !== undefined) assetUpdates.tags = updates.tags;
-      /* A drawer version restore: the server already points the asset at
-         the version's URL; the library row has to follow or nothing changes
-         until a reload (REA 2026-10-20 #14). */
-      if (updates.src) assetUpdates.src = updates.src;
       await composer.media.updateAsset(key, assetUpdates);
     },
     [composer]

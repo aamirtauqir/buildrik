@@ -12,9 +12,15 @@
  * Versions view (146:32): 44h chips — dot · relative time · size delta,
  * current pinned with a 3px accent bar (boards 75:65 / 75:71 beat 241:1436's
  * 56h full-bleed row) — and restore confirms INLINE in the 84h band 146:64
- * draws ("a drill-in that spawns a modal has lost the plot"). The data is
- * the server restore points; the old sibling-filename heuristic list is gone
- * (those are separate library items the grid already shows). The author line
+ * draws ("a drill-in that spawns a modal has lost the plot"). The rows are
+ * the server's history of saved edits (`media.listAssetVersions`). Restore
+ * does what the library's Asset versions "Apply" does: it moves every
+ * placement of the family (the original and its saved versions) onto that
+ * version's file, as undoable canvas edits. It used to call
+ * `media.restoreAssetVersion`, which rewrote the parent asset's URL on the
+ * server and left the site untouched, despite the confirm's "those will
+ * update too", and dropped the original from the library (REA 2026-10-20
+ * M-5). The author line
  * (L8, 4418:62883) is real: `media.listAssetVersions` joins `createdBy` to a
  * display name server-side; omitted (not "Unknown") when the row predates the
  * column or the account no longer resolves.
@@ -36,11 +42,7 @@ import type { LibraryItem } from "../data/mediaTypes";
 import { collectUsageByPage, fmtSize } from "../data/mediaUtils";
 import { useAltTextDraft } from "../hooks/useAltTextDraft";
 import type { Composer } from "@/engine/Composer";
-import {
-  listAssetVersions,
-  restoreAssetVersion,
-  type AssetVersion,
-} from "@/services/MediaVersionService";
+import { listAssetVersions, type AssetVersion } from "@/services/MediaVersionService";
 import { Button, PanelFrame, Textarea, useFocusTrap } from "@/editor/chrome-ui";
 import { Download, Link2, Pencil, SquarePlus, Trash2 } from "lucide-react";
 
@@ -127,12 +129,11 @@ export function AssetDetailOverlay({
 
   // ── Server restore points — loaded on mount so the hub row carries a count.
   const [dbVersions, setDbVersions] = useState<AssetVersion[]>([]);
-  const [restoringId, setRestoringId] = useState<string | null>(null);
   /* The version whose restore just failed — its row says so (DQ-012). */
   const [restoreFailedId, setRestoreFailedId] = useState<string | null>(null);
   const [pendingRestore, setPendingRestore] = useState<string | null>(null);
 
-  const reloadDbVersions = useCallback(() => {
+  useEffect(() => {
     if (!item.assetId) {
       setDbVersions([]);
       return;
@@ -146,31 +147,6 @@ export function AssetDetailOverlay({
       });
   }, [item.assetId]);
 
-  useEffect(() => {
-    reloadDbVersions();
-  }, [reloadDbVersions]);
-
-  const confirmRestore = useCallback(
-    (versionId: string) => {
-      setRestoringId(versionId);
-      setRestoreFailedId(null);
-      setPendingRestore(null);
-      restoreAssetVersion(versionId)
-        .then((res) => {
-          if (!mountedRef.current) return;
-          onUpdate?.(item.key, { src: res.url });
-          reloadDbVersions();
-        })
-        .catch(() => {
-          if (mountedRef.current) setRestoreFailedId(versionId);
-        })
-        .finally(() => {
-          if (mountedRef.current) setRestoringId(null);
-        });
-    },
-    [onUpdate, item.key, reloadDbVersions],
-  );
-
   // ── Cross-page usage (board 146:68 groups by page).
   const usage = useMemo(() => {
     if (!composer || !item.src) return [];
@@ -181,6 +157,36 @@ export function AssetDetailOverlay({
     }
   }, [composer, item.src]);
   const usageCount = usage.reduce((n, p) => n + p.hits.length, 0);
+
+  /* Every src the family's placements can carry: the original's and each
+     saved version's (an earlier restore or Apply may have moved them). */
+  const familySources = useCallback(
+    (c: Composer) => {
+      const children = c.media.getAssets().filter((a) => a.versionOf === item.key);
+      return [...new Set([item.src, ...children.map((a) => a.src)].filter(Boolean))];
+    },
+    [item.key, item.src],
+  );
+  const familyUsageCount =
+    composer && pendingRestore
+      ? familySources(composer).reduce((n, src) => n + composer.mediaOps.getUsages(src).count, 0)
+      : 0;
+
+  /* A refused placement keeps its old src, so Restore again is the retry. */
+  const confirmRestore = useCallback(
+    (version: AssetVersion) => {
+      setPendingRestore(null);
+      if (!composer) {
+        setRestoreFailedId(version.id);
+        return;
+      }
+      const failed = familySources(composer)
+        .filter((src) => src !== version.url)
+        .flatMap((src) => composer.mediaOps.replaceAcross(src, version.url).failed);
+      setRestoreFailedId(failed.length > 0 ? version.id : null);
+    },
+    [composer, familySources],
+  );
 
   const handleJump = useCallback(
     (pageId: string, elementId: string) => {
@@ -488,10 +494,9 @@ export function AssetDetailOverlay({
                     className="tw:-mt-0.5 tw:size-6 tw:min-h-6 tw:shrink-0 tw:border-0 tw:bg-transparent tw:p-0 tw:text-[13px] tw:text-[var(--bk-gray-500)] tw:enabled:hover:bg-transparent tw:enabled:hover:text-[var(--bk-ink)]"
                     data-testid={`media-version-menu-${v.id}`}
                     aria-label={`Restore options for version from ${formatRelativeTime(ts, { fallback: "daysShort" })}`}
-                    disabled={restoringId !== null}
                     onClick={() => setPendingRestore(pendingRestore === v.id ? null : v.id)}
                   >
-                    {restoringId === v.id ? "…" : "⋯"}
+                    ⋯
                   </Button>
                 </div>
                 {restoreFailedId === v.id ? (
@@ -500,7 +505,7 @@ export function AssetDetailOverlay({
                     className="tw:w-full tw:px-4 tw:py-1 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-error)]"
                     data-testid={`media-restore-failed-${v.id}`}
                   >
-                    Couldn&apos;t restore this version. Nothing changed — try again.
+                    Couldn&apos;t move every place onto this version — try again.
                   </div>
                 ) : null}
                 {/* Board 146:64 — restore confirms INLINE, and the band is 84
@@ -513,8 +518,8 @@ export function AssetDetailOverlay({
                     data-testid="media-restore-confirm"
                   >
                     <span className="tw:text-[var(--bk-ink)]">
-                      Restore this version?{usageCount > 0
-                        ? ` It is used in ${usageCount} ${usageCount === 1 ? "place" : "places"} — those will update too.`
+                      Restore this version?{familyUsageCount > 0
+                        ? ` It is used in ${familyUsageCount} ${familyUsageCount === 1 ? "place" : "places"} — those will update too.`
                         : ""}
                     </span>
                     <span className="tw:flex tw:items-center tw:justify-end tw:gap-4">
@@ -534,7 +539,7 @@ export function AssetDetailOverlay({
                         size="xs"
                         variant="link" className="tw:min-h-5 tw:text-[12px] tw:leading-[18px]"
                         data-testid="media-restore-go"
-                        onClick={() => confirmRestore(v.id)}
+                        onClick={() => confirmRestore(v)}
                       >
                         Restore
                       </Button>

@@ -540,11 +540,11 @@ describe("useLibraryState — honest writes (REA #14)", () => {
     expect(outcome).toEqual({ moved: ["ok"], failed: ["bad"] });
   });
 
-  it("updateItem carries a restored version's src to the engine", async () => {
+  it("updateItem with alt text clears the generated-text provenance (M-4)", async () => {
     const composer = makeComposer([asset({ id: "hero" })]);
     const media = (composer as never as { media: { updateAsset: ReturnType<typeof vi.fn> } }).media;
     const { result } = renderHook(() => useLibraryState(composer));
-    await act(() => result.current.updateItem("hero", { src: "https://blob/v2.png" }));
-    expect(media.updateAsset).toHaveBeenCalledWith("hero", { src: "https://blob/v2.png" });
+    await act(() => result.current.updateItem("hero", { altText: "A plate" }));
+    expect(media.updateAsset).toHaveBeenCalledWith("hero", { altText: "A plate", generatedMetadata: undefined });
   });
 });
