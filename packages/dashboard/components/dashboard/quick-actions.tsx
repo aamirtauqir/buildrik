@@ -34,8 +34,8 @@ export function QuickActions() {
   const knownNonAdmin = role != null && role !== "OWNER" && role !== "ADMIN";
 
   // Same contract the Projects screen uses: a blank site is created inline and
-  // opens in the editor (BD-37), the template and AI methods carry the name
-  // into the full flow.
+  // opens in the editor (BD-37), the template method carries the name into
+  // the full flow.
   const createMutation = trpc.sites.create.useMutation({
     onSuccess: (site) => {
       setCreateOpen(false);

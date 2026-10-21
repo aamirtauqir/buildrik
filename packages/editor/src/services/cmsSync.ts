@@ -430,16 +430,26 @@ function deleteAlreadyDone(e: unknown): never {
 
 export type CmsSyncErrorInfo = SyncRetryInfo;
 
-/** Subscribe to CMS sync failures. Returns an unsubscribe fn. */
-export function onCmsSyncError(cb: (info: CmsSyncErrorInfo) => void): () => void {
-  return queue.onError(cb);
+/** CMS changes still waiting to be sent: outstanding (queued, in flight, or in
+ *  the outbox from an earlier page load) and not parked on a conflict, which
+ *  only Keep mine / Use theirs can settle. The ONE number behind both the
+ *  publish gate's "Retry the sync" line and the sync-error toast — the toast
+ *  used to read the queue's own `size`, which left out the outbox and the
+ *  mirrors in flight, so it undercounted what publish refused on (C-16). */
+function unsentCmsChanges(keys: Set<string> = outstandingCmsKeys()): number {
+  return [...keys].filter((k) => !conflicted.has(k)).length;
 }
 
-/** How many CMS changes are queued for retry (not yet on the server). Excludes
- *  in-flight mirrors — use `cmsSyncBlocker` for the publish-gate count, which
- *  includes both queued and in-flight work. */
+/** Subscribe to CMS sync failures. Returns an unsubscribe fn. `pending` is
+ *  `unsentCmsChanges()`, the publish gate's count, not the queue's. */
+export function onCmsSyncError(cb: (info: CmsSyncErrorInfo) => void): () => void {
+  return queue.onError(() => cb({ pending: unsentCmsChanges() }));
+}
+
+/** How many CMS changes are still waiting to be sent — the same number the
+ *  publish gate and the sync-error toast report. */
 export function getCmsSyncPendingCount(): number {
-  return queue.pendingCount();
+  return unsentCmsChanges();
 }
 
 /* P0-B audit 2026-09-30 — the sheet's save needs to know whether the mirror
@@ -469,8 +479,8 @@ export function cmsSyncBlocker(): string | null {
     /* A conflicted change is outstanding too (it stays in the outbox), but
        "Retry the sync" cannot settle it — the user's choice does. Named
        apart (QA 2026-10-02). */
-    const waiting = [...keys].filter((k) => conflicted.has(k)).length;
-    const unsent = keys.size - waiting;
+    const unsent = unsentCmsChanges(keys);
+    const waiting = keys.size - unsent;
     const parts: string[] = [];
     if (unsent > 0) {
       const noun = unsent === 1 ? "change hasn't" : "changes haven't";

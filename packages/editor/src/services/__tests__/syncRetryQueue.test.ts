@@ -140,6 +140,40 @@ describe("SyncRetryQueue — pending includes in-flight, settled awaits", () => 
   });
 });
 
+/* C-16: the "not on the server" notice reports what the publish gate reads
+   (`outstandingCount()`, in flight included), and comes down when the last
+   outstanding mirror lands — even one that was only in flight, never queued. */
+describe("SyncRetryQueue — notifications carry the outstanding count", () => {
+  it("counts a mirror in flight, and the notice reaches zero when it lands", async () => {
+    const q = new SyncRetryQueue();
+    const seen: number[] = [];
+    q.onError(({ pending }) => seen.push(pending));
+    let release!: () => void;
+    const slow = q.run("in-flight", () => new Promise<void>((r) => (release = r)), () => {});
+    await q.run("bad", async () => { throw new Error("down"); }, () => {});
+    expect(seen).toEqual([2]); // the failure, plus the mirror still in flight
+    expect(seen.at(-1)).toBe(q.outstandingCount());
+
+    await q.retry(); // "bad" is still down
+    await q.run("bad", async () => {}, () => {}); // now it lands
+    expect(seen.at(-1)).toBe(1); // only the in-flight mirror is left
+    release();
+    await slow;
+    expect(seen.at(-1)).toBe(0); // first-time success, but a notice was up
+  });
+
+  it("a cleared retry does not count itself", async () => {
+    const q = new SyncRetryQueue();
+    const seen: number[] = [];
+    q.onError(({ pending }) => seen.push(pending));
+    let fail = true;
+    await q.run("k", async () => { if (fail) throw new Error("down"); }, () => {});
+    fail = false;
+    await q.retry();
+    expect(seen).toEqual([1, 0]);
+  });
+});
+
 /* The Inspector v4 fixture's Menu collection loaded with no fields: its
    create and its field update were two upserts of the same row in flight at
    once, the create landed last (or the update lost a create race on the

@@ -37,7 +37,9 @@ describe("CMS_INVALID", () => {
     entUpsert.mockResolvedValue({ updatedAt: new Date(0) });
     const reached = await syncEntryUpsert({ id: "e1", collectionId: "c1", data: {}, status: "published", createdAt: "", updatedAt: "" } as never);
     expect(reached).toBe(false);
-    expect(getCmsSyncPendingCount()).toBe(0);
+    /* The refusal is never queued; the count (in-flight aware, like the
+       publish gate) only holds the draft re-mirror until it lands. */
+    await vi.waitFor(() => expect(getCmsSyncPendingCount()).toBe(0));
     expect(seen).toEqual(["e1:Name is required"]);
     expect(takeCmsInvalid("entry", "e1")).toBe("Name is required");
     expect(takeCmsInvalid("entry", "e1")).toBeNull();
