@@ -78,3 +78,17 @@ describe("LayersPanel — view mode is read-only", () => {
     expect(screen.getByTestId("layer-eye-dg-a")).toBeInTheDocument();
   });
 });
+
+/* Task 1.6: the same withholding follows any engine edit lock — a site that
+   has not loaded — through editlock:changed, not the URL. */
+describe("LayersPanel — an edit lock is read-only", () => {
+  it("rows stop dragging and lose eye / lock under not-loaded, and get them back when it clears", () => {
+    const c = mount();
+    act(() => c.setEditLock("not-loaded", true));
+    expect(screen.getByTestId("layer-row-dg-a")).toHaveAttribute("draggable", "false");
+    expect(screen.queryByTestId("layer-eye-dg-a")).toBeNull();
+    act(() => c.setEditLock("not-loaded", false));
+    expect(screen.getByTestId("layer-row-dg-a")).toHaveAttribute("draggable", "true");
+    expect(screen.getByTestId("layer-eye-dg-a")).toBeInTheDocument();
+  });
+});

@@ -49,6 +49,7 @@ import { getAiSubscriptionClient } from "@/services/ai/subscriptionClient";
 import { getDefaultPageName } from "@/shared/utils/pageUtils";
 import { isAuthSaveError, isForbiddenSaveError, refuseForbiddenSave, SAVE_FAILED_TOAST_KEY } from "./useSaveCallback";
 import { getEditorViewMode } from "@shared/utils/editorViewMode";
+import { describeLoadFailure, setSiteLoadStatus, type SiteLoadErrorKind } from "../siteLoadStatus";
 
 export type ComposerOptions = Partial<ComposerConfig> & {
   project?: {
@@ -78,7 +79,7 @@ export interface UseComposerInitParams {
   /** S1.5: surface a dashboard load failure as a persistent banner instead of
    *  a transient toast. `auth` = session expired, `network` = generic failure.
    *  When wired, it replaces the toast; when omitted, the toast is kept (back-compat). */
-  onLoadError?: (kind: "auth" | "network" | "missing" | "forbidden") => void;
+  onLoadError?: (kind: SiteLoadErrorKind) => void;
   /** Board 813:4870: a mid-session 401 during AUTOSAVE opens the blocking
    *  recovery surface. Same back-compat shape as onLoadError. */
   onAuthExpired?: () => void;
@@ -266,22 +267,24 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
            the canvas and footer read to draw it. Cleared in .finally() so a
            failed load never leaves a permanent skeleton (it stays read-only:
            the not-loaded lock holds until a load lands). */
-        loadFromServer(siteId);
+        void loadFromServer(siteId);
         return;
       }
 
       loadFromLocalStorage(instance, projectConfig);
     };
 
-    function loadFromServer(siteId: string) {
+    /* Resolves true once the site is in. `retry` is the banner's in-place
+       Retry: the same path, minus the fallback the first failure ran. */
+    function loadFromServer(siteId: string, retry = false): Promise<boolean> {
       instance.setProjectLoading(true);
-      loadProject(siteId)
+      return loadProject(siteId)
         .then(async (data) => {
           /* Every write is refused while not-loaded holds, so nothing can
              have reached the history before this import. If something did,
              a write path is bypassing the lock: fail the load loudly rather
              than replace that state silently. (Today's Retry is a full page
-             reload; an in-place retry must come back through here.) */
+             reload, or the banner's in-place retry, which comes through here.) */
           if (instance.history.canUndo() || instance.history.canRedo()) {
             throw new Error("EDIT_LOCK_BYPASSED: history recorded before the site loaded");
           }
@@ -325,6 +328,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
             instance.importProject(loaded);
           }
           instance.setEditLock("not-loaded", false);
+          setSiteLoadStatus(null);
           if (tokenLoad?.readOnly) {
             instance.designSystem.readOnly = true;
             instance.designSystem.readOnlyReason = tokenLoad.reason ?? null;
@@ -422,35 +426,36 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
             });
           }
         })
+        .then(() => true)
         .catch((err) => {
           console.error("[BuildrikSync] load failed:", err);
-          // Distinguish an auth failure from a generic load failure. On
-          // UNAUTHORIZED the generic "falling back to local" message is
-          // misleading — the user has a real site on the server they can't
-          // see because they are signed out. Point them at sign-in instead.
-          const isAuth =
-            err instanceof Error && /unauthorized/i.test(err.message);
-          /* NOT_FOUND is not a blip. The site is deleted or the link is
-             stale, so no retry will ever succeed and no save will ever land
-             — the editor was offering a blank canvas and "Start blank" to
-             someone whose work could not be stored anywhere. */
-          const isMissing =
-            err instanceof Error && /not_found/i.test(err.message);
-          /* FORBIDDEN fell through to "network", so a role refusal on load
-             got "You're seeing local changes for now" and a Retry that can
-             never succeed. This file already imports the helper for the
-             autosave path (:34); the load path just never used it. */
-          const isForbidden = isForbiddenSaveError(err);
-          // S1.5: prefer a persistent banner over a transient toast when the
-          // shell wired onLoadError; the toast stays as the back-compat path.
-          if (isMissing) {
+          /* One classification (offline, auth, missing, forbidden, network)
+             for the banner, the inspector line and the report. Offline is
+             asked of the browser at the moment of failure: a fetch that never
+             left reads as a generic network error otherwise. */
+          const failure = describeLoadFailure(err, typeof navigator === "undefined" || navigator.onLine !== false);
+          /* Status and the server's request id, so a report can be matched to
+             the server log. The URL has no query string (a tRPC GET carries its
+             input there) and nothing here reads a token. */
+          captureError(new Error(`Site load failed: ${failure.code ?? failure.status ?? failure.kind}`), {
+            kind: failure.kind,
+            status: failure.status,
+            code: failure.code,
+            requestId: failure.requestId,
+            url: failure.url,
+            retry,
+          });
+          setSiteLoadStatus({ failure, retry: () => loadFromServer(siteId, true) });
+          if (failure.kind === "missing") {
             // The canvas invites work ("Start blank") and cannot see the
             // banner; it has to hear that this site is not coming back.
             instance.emit(EVENTS.PROJECT_UNAVAILABLE, { reason: "missing" });
           }
+          // S1.5: prefer a persistent banner over a transient toast when the
+          // shell wired onLoadError; the toast stays as the back-compat path.
           if (onLoadErrorRef.current) {
-            onLoadErrorRef.current(isAuth ? "auth" : isMissing ? "missing" : isForbidden ? "forbidden" : "network");
-          } else if (isAuth) {
+            onLoadErrorRef.current(failure.kind);
+          } else if (failure.kind === "auth") {
             addToastRef.current({
               title: "Session expired",
               description:
@@ -471,7 +476,10 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
               tone: "warning",
             });
           }
-          loadFromLocalStorage(instance, projectConfig);
+          /* The fallback ran with the first failure; a retry has nothing new
+             to fall back to. */
+          if (!retry) loadFromLocalStorage(instance, projectConfig);
+          return false;
         })
         .finally(() => instance.setProjectLoading(false));
     }
@@ -615,6 +623,8 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
       instance.off("ui:toggle:ai", toggleAIHandler);
       instance.off(EVENTS.BREAKPOINT_CHANGED, deviceChangedHandler);
       instance.off(EVENTS.VIEWPORT_ZOOM, zoomChangedHandler);
+      // Its retry re-runs a load into this composer, which is going away.
+      setSiteLoadStatus(null);
       instance.destroy();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

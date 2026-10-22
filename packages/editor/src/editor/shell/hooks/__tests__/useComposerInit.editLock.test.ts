@@ -49,8 +49,11 @@ vi.mock("@/services/BuildrikSyncProvider", () => ({
 }));
 
 vi.mock("@/services/AssetUploadService", () => ({ createRemoteAssetSync: vi.fn(() => ({})) }));
+vi.mock("@/shared/utils/errorTracking", () => ({ captureError: vi.fn(), setUser: vi.fn() }));
 
 import { loadProject, saveProject } from "@/services/BuildrikSyncProvider";
+import { captureError } from "@/shared/utils/errorTracking";
+import { setSiteLoadStatus, useSiteLoadStatus } from "@/editor/shell/siteLoadStatus";
 
 const SITE: ProjectData = {
   version: "1.0.0",
@@ -107,6 +110,7 @@ beforeEach(() => {
 });
 afterEach(() => {
   created.composer = null;
+  setSiteLoadStatus(null);
 });
 
 describe("useComposerInit › not-loaded lock", () => {
@@ -167,5 +171,78 @@ describe("useComposerInit › not-loaded lock", () => {
     });
     expect(params.onLoadError).toHaveBeenCalledWith("network");
     expect(composer.editLocks.has("not-loaded")).toBe(true);
+  });
+});
+
+/** A server refusal shaped like the tRPC client's, wrapped the way
+ *  loadProject wraps it. */
+function serverError(status: number, code: string, requestId: string | null): Error {
+  const client = Object.assign(new Error("Internal error"), {
+    data: { httpStatus: status, code },
+    meta: {
+      response: {
+        url: "https://app.example/api/trpc/sites.get?batch=1&input=%7B%22id%22%3A%22site-1%22%7D",
+        headers: { get: (name: string) => (name === "x-request-id" ? requestId : null) },
+      },
+    },
+  });
+  return new Error(`BuildrikSyncProvider.loadProject failed for site site-1: ${client.message}`, { cause: client });
+}
+
+describe("useComposerInit › load failure report and in-place retry", () => {
+  it("reports the failure to Sentry with status and the server's request id, query string stripped", async () => {
+    vi.mocked(captureError).mockClear();
+    vi.mocked(loadProject).mockRejectedValueOnce(serverError(500, "INTERNAL_SERVER_ERROR", "req-9"));
+    const { params } = await mountAndWaitForReady();
+    await act(settle);
+    expect(params.onLoadError).toHaveBeenCalledWith("network");
+    expect(captureError).toHaveBeenCalledTimes(1);
+    const [, extras] = vi.mocked(captureError).mock.calls[0];
+    expect(extras).toMatchObject({
+      kind: "network",
+      status: 500,
+      code: "INTERNAL_SERVER_ERROR",
+      requestId: "req-9",
+      url: "https://app.example/api/trpc/sites.get",
+    });
+    expect(JSON.stringify(extras)).not.toContain("input=");
+  });
+
+  it("an offline browser is reported as offline, not as a generic failure", async () => {
+    const online = vi.spyOn(navigator, "onLine", "get").mockReturnValue(false);
+    vi.mocked(loadProject).mockRejectedValueOnce(new TypeError("Failed to fetch"));
+    const { params } = await mountAndWaitForReady();
+    await act(settle);
+    online.mockRestore();
+    expect(params.onLoadError).toHaveBeenCalledWith("offline");
+  });
+
+  it("Retry re-runs the load; the lock and the failure clear only once it lands", async () => {
+    vi.mocked(loadProject).mockRejectedValueOnce(new Error("boom 500"));
+    const { composer } = await mountAndWaitForReady();
+    await act(settle);
+    const status = renderHook(() => useSiteLoadStatus());
+    expect(status.result.current.failure?.kind).toBe("network");
+    const retry = status.result.current.retry!;
+
+    vi.mocked(loadProject).mockRejectedValueOnce(new Error("boom again"));
+    let landed: boolean | undefined;
+    await act(async () => {
+      landed = await retry();
+    });
+    expect(landed).toBe(false);
+    expect(composer.editLocks.has("not-loaded")).toBe(true);
+    expect(loadProject).toHaveBeenCalledTimes(2);
+
+    vi.mocked(loadProject).mockResolvedValueOnce(structuredClone(SITE));
+    await act(async () => {
+      landed = await status.result.current.retry!();
+    });
+    expect(landed).toBe(true);
+    expect(loadProject).toHaveBeenCalledTimes(3);
+    expect(composer.readOnly).toBe(false);
+    expect(composer.elements.getAllPages().map((p) => p.name)).toEqual(["Home"]);
+    expect(status.result.current.failure).toBeNull();
+    expect(saveProject).not.toHaveBeenCalled();
   });
 });

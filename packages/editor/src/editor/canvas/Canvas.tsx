@@ -23,6 +23,7 @@ import type { CanvasProps, CanvasRef } from "./Canvas.types";
 import { DEVICE_SIZES } from "./Canvas.types";
 import { CanvasEmptyCTA } from "./CanvasEmptyCTA";
 import { CanvasLoadingSkeleton } from "./CanvasLoadingSkeleton";
+import { useEditLocks } from "@/editor/shared/useEditLocks";
 import { useProjectLoading } from "../shell/hooks/useProjectLoading";
 import { CanvasFooterToolbar } from "./CanvasFooterToolbar";
 import { DeviceFramePreview, DeviceFrameToggle } from "./DeviceFramePreview";
@@ -88,7 +89,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       showRulers = false,
       showXRay = false,
       showFooterToolbar = true,
-      readOnly = false,
+      readOnly: readOnlyProp = false,
       onZoomChange,
       onOverlayChange,
       onDeviceChange,
@@ -97,6 +98,12 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
     },
     ref
   ) => {
+    /* Any engine edit lock (view, time travel, a site that has not loaded)
+       withholds the same handlers view mode does: the engine would refuse the
+       write anyway, and an affordance that does nothing teaches distrust. */
+    const editLocks = useEditLocks(composer);
+    const readOnly = readOnlyProp || editLocks.length > 0;
+    const notLoaded = editLocks.includes("not-loaded");
     const canvasRef = React.useRef<HTMLDivElement>(null);
     const wrapperRef = React.useRef<HTMLDivElement>(null);
     /* The scrolling viewport, one level inside the wrapper. Zoom-to-fit and
@@ -803,6 +810,15 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
           />
 
           {showLoadingCanvas && <CanvasLoadingSkeleton />}
+
+          {/* Board B7-G02: after a failed load the canvas is neutral — no
+              skeleton (nothing is on its way), no build invitation (nothing can
+              be saved), and not the banner's sentence a second time. */}
+          {pageIsEmpty && notLoaded && !projectLoading && (
+            <div className="bd-canvas-loading tw:items-center tw:justify-center" data-testid="canvas-not-loaded">
+              <span className="tw:text-[13px] tw:text-[var(--bk-ink-muted)]">Nothing to show here yet</span>
+            </div>
+          )}
 
           {/* "Start with a template, or drop your first section" with Browse
              templates / Start blank — build CTAs, and Browse templates emits an
