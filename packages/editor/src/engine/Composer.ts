@@ -149,6 +149,8 @@ export class Composer extends EventEmitter {
   /** > 0 while importProject runs: a load is not an edit, and it has to land
    *  while `not-loaded` holds (that lock clears only after it). */
   private importDepth = 0;
+  /** > 0 while runDerivedSync runs one under a viewing lock: on screen only. */
+  private derivedSyncDepth = 0;
   readonly selection!: SelectionManager;
   readonly history!: HistoryManager;
   readonly versions!: VersionTimelineManager;
@@ -460,11 +462,13 @@ export class Composer extends EventEmitter {
   /** Point any element carrying a dead local media URL at its live one. */
   private repairLocalMediaUrls(): void {
     if (Object.keys(this.localMediaUrlRemap).length === 0) return;
-    for (const element of this.elements.getAllElements()) {
-      const src = element.getAttributes().src;
-      const next = src ? this.localMediaUrlRemap[src] : undefined;
-      if (next) element.setAttribute("src", next);
-    }
+    this.runDerivedSync(() => {
+      for (const element of this.elements.getAllElements()) {
+        const src = element.getAttributes().src;
+        const next = src ? this.localMediaUrlRemap[src] : undefined;
+        if (next) element.setAttribute("src", next);
+      }
+    });
   }
 
   private async initialize(): Promise<void> {
@@ -1152,6 +1156,33 @@ ${html}${interactionScript}
   }
 
   /**
+   * Run a derived-data sync — a CMS binding refresh, a component instance
+   * sync, the media-URL repair after a library rebuild. None is a user edit:
+   * each follows data that changed elsewhere, so `view` and `time-travel`
+   * must not freeze it. Under those locks it runs inside the import bypass
+   * and changes only what is shown — no dirty flag, no PROJECT_CHANGED (so
+   * no autosave) and no undo step. `not-loaded` still refuses it: there is
+   * no project to sync. Unlocked, it is a plain call. Returns undefined when
+   * refused.
+   */
+  runDerivedSync<T>(sync: () => T): T | undefined {
+    if (!this.writeLocked) return sync();
+    if (this.editLocks.has("not-loaded")) return undefined;
+    let result: T | undefined;
+    this.importDepth++;
+    this.derivedSyncDepth++;
+    try {
+      this.history.runWithoutTracking(() => {
+        result = sync();
+      });
+    } finally {
+      this.importDepth--;
+      this.derivedSyncDepth--;
+    }
+    return result;
+  }
+
+  /**
    * Check if project has unsaved changes
    */
   isDirty(): boolean {
@@ -1164,7 +1195,7 @@ ${html}${interactionScript}
   markDirty(): void {
     /* Backstop for a write path that reached here without asking: while
        locked nothing is dirtied, so no autosave and no history record. */
-    if (this.writeLocked) return;
+    if (this.writeLocked || this.derivedSyncDepth > 0) return;
     /* Dev-only forensics, and LOAD-BEARING: `e2e/boot-clean.spec.ts` asserts
        against `__bkDirtyTrace` and fails as UNMEASURED if this is removed.
        A freshly loaded, untouched project was measured

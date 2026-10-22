@@ -647,8 +647,11 @@ export class ComponentManager {
 
   /** Dropped overrides are a whole-component concern — see updateComponentMaster. */
   async syncInstance(elementId: string): Promise<boolean> {
-    if (this.composer.writeLocked) return false;
-    return (await syncInstance(this.composer, this.maps, elementId)).synced;
+    /* Taking the master's newer version is derived, not an edit: it runs while
+       viewing, never before load. syncInstance's writes are all synchronous,
+       so they land inside the bypass. */
+    const outcome = await this.composer.runDerivedSync(() => syncInstance(this.composer, this.maps, elementId));
+    return outcome?.synced ?? false;
   }
 
   async updateInstanceVariant(elementId: string, variantId: string): Promise<boolean> {

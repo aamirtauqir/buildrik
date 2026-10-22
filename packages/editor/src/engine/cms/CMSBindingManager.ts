@@ -294,8 +294,12 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
       else element.setTrait(property, value);
     };
     const history = this.composer.history;
-    if (history?.runWithoutTracking) history.runWithoutTracking(write);
-    else write();
+    /* A refresh, not an edit: it still runs while the site is only being
+       viewed (runDerivedSync), never before it has loaded. */
+    this.composer.runDerivedSync(() => {
+      if (history?.runWithoutTracking) history.runWithoutTracking(write);
+      else write();
+    });
   }
 
   /**

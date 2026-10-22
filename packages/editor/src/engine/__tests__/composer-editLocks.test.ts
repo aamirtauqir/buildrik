@@ -9,7 +9,8 @@
  *
  * @license BSD-3-Clause
  */
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { MEDIA_EVENTS } from "@/shared/constants/media";
 import { EVENTS } from "@/shared/constants/events";
 import type { Composer } from "@/engine/Composer";
 import type { Element } from "@/engine/elements/Element";
@@ -19,6 +20,13 @@ import {
   removeEngineBrowserStubs,
   createTestComposer,
 } from "./test-utils/realComposer";
+
+/* CMS records live in memory here: the derived-sync tests below need a
+   published record without IndexedDB. */
+vi.mock("@/engine/cms/CollectionStorage", async () => {
+  const { createInMemoryCollectionStorage } = await import("@/engine/cms/__tests__/inMemoryCollectionStorage");
+  return createInMemoryCollectionStorage();
+});
 
 beforeEach(() => installEngineBrowserStubs());
 afterEach(() => removeEngineBrowserStubs());
@@ -258,5 +266,83 @@ describe("Composer edit locks › history", () => {
     composer.setEditLock("time-travel", true);
     expect(composer.history.redo()).toBe(false);
     expect(documentOf(composer)).toBe(afterUndo);
+  });
+});
+
+/** A heading bound to a published CMS record's title, settled and saved. */
+async function boundHeadingFixture() {
+  const composer = createTestComposer();
+  await composer.whenReady();
+  const cms = composer.cms.collections;
+  const collection = await cms.createCollection("Posts");
+  const draft = (await cms.createContentItem(collection.id, { title: "First" }))!;
+  const item = (await cms.updateContentItem(draft.id, { status: "published" }))!;
+  const page = composer.elements.createPage("Home");
+  const heading = composer.elements.createElement("heading" as never);
+  composer.elements.addElement(heading, page.root.id);
+  composer.cms.bindings.bindToField(heading.getId(), collection.id, item.id, "title", "content");
+  await vi.waitFor(() => expect(heading.getContent()).toBe("First"));
+  composer.history.flushPending();
+  composer.markSaved();
+  return { composer, cms, item, heading };
+}
+
+describe("Composer edit locks › derived syncs (not user edits)", () => {
+  it.each(["view", "time-travel"] as const)(
+    "under %s, a CMS binding refresh updates the bound element with no history and no project:changed",
+    async (reason) => {
+      const { composer, cms, item, heading } = await boundHeadingFixture();
+      composer.setEditLock(reason, true);
+      const undoBefore = composer.history.getUndoCount();
+      let changed = 0;
+      composer.on(EVENTS.PROJECT_CHANGED, () => changed++);
+
+      await cms.updateContentItem(item.id, { data: { title: "Second" } });
+      await vi.waitFor(() => expect(heading.getContent()).toBe("Second"));
+      composer.history.flushPending();
+
+      expect(changed).toBe(0);
+      expect(composer.isDirty()).toBe(false);
+      expect(composer.history.getUndoCount()).toBe(undoBefore);
+      // The bypass is scoped to the sync: a user write is still refused.
+      heading.setContent("typed");
+      expect(heading.getContent()).toBe("Second");
+    },
+  );
+
+  it("under not-loaded, a CMS binding refresh is refused", async () => {
+    const { composer, cms, item, heading } = await boundHeadingFixture();
+    composer.setEditLock("not-loaded", true);
+    let changed = 0;
+    composer.on(EVENTS.PROJECT_CHANGED, () => changed++);
+
+    await cms.updateContentItem(item.id, { data: { title: "Second" } });
+    await new Promise((r) => setTimeout(r, 20));
+
+    expect(heading.getContent()).toBe("First");
+    expect(changed).toBe(0);
+    expect(composer.isDirty()).toBe(false);
+  });
+
+  it("the media-URL repair after a library rebuild runs under view, not under not-loaded", async () => {
+    for (const [reason, expected] of [
+      ["view", "blob:new"],
+      ["not-loaded", "blob:old"],
+    ] as const) {
+      const composer = createTestComposer();
+      await composer.whenReady();
+      const page = composer.elements.createPage("Home");
+      const image = composer.elements.createElement("image" as never);
+      composer.elements.addElement(image, page.root.id);
+      image.setAttribute("src", "blob:old");
+      composer.markSaved();
+      composer.setEditLock(reason, true);
+
+      /* emit is protected on the media emitter; the rebuild is what fires it. */
+      (composer.media as unknown as { emit: (event: string, payload: unknown) => void }).emit(MEDIA_EVENTS.LOCAL_URLS_REBUILT, { remapped: { "blob:old": "blob:new" } });
+
+      expect(image.getAttributes().src).toBe(expected);
+      expect(composer.isDirty()).toBe(false);
+    }
   });
 });
