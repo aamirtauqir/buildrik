@@ -33,7 +33,7 @@ import { FullPageView } from "../sidebar/FullPageView";
 import type { SettingsOpenRequest } from "../sidebar/tabs/settings/types";
 import type { TemplatesOpenRequest } from "@/editor/sidebar/tabs/templates/TemplatesTab";
 import type { PageSettingsOpenRequest } from "../sidebar/tabs/pages/types";
-import { usePageCommands, usePageJumpList } from "../sidebar/tabs/pages/usePageCommands";
+import { usePageCommands } from "../sidebar/tabs/pages/usePageCommands";
 import { cmsWorkspace, type CmsOpenRequest } from "@/editor/cms/cmsWorkspaceStore";
 import { TokenRegistryProvider, DSModeProvider, StylePresetRegistryProvider } from "@/editor/design-system";
 import { MigrationProgressMount } from "@/editor/design-system/ui/MigrationProgressMount";
@@ -44,7 +44,8 @@ import { useBlockInsertion } from "./hooks/useBlockInsertion";
 import { useClipboardToasts } from "./hooks/useClipboardToasts";
 import { useConnectOfferToast } from "./hooks/useConnectOfferToast";
 import { useAltTextAutoTrigger } from "./hooks/useAltTextAutoTrigger";
-import { PageTabBar } from "./PageTabBar";
+import { BottomBar } from "./BottomBar";
+import { usePageSummaries } from "./usePageSummaries";
 import { RightColumnPanel } from "./RightColumnPanel";
 import { useColumnPanelEscape } from "./hooks/useColumnPanelEscape";
 import type { NextMove } from "./lifecycle";
@@ -277,10 +278,10 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   /* v3 FC-2: page-jump ⌘K rows registered from the shell — always present,
      like Layers/Assets/Records/Templates — instead of only while the Pages
      drawer happens to be mounted (PagesTab no longer calls this). */
-  const pageJumpList = usePageJumpList(composer);
+  const pageSummaries = usePageSummaries(composer);
   usePageCommands(
     composer,
-    pageJumpList,
+    pageSummaries,
     React.useCallback((id: string) => composer?.elements.setActivePage(id), [composer]),
     React.useCallback(() => composer?.emit(EVENTS.UI_NEW_PAGE_REQUESTED, {}), [composer]),
   );
@@ -867,8 +868,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
 
         {/* Canvas Area — main editing surface */}
         <LayoutShell.Canvas>
-          {/* Board 4418:123573: the page tabs head the canvas column. */}
-          <PageTabBar composer={composer} />
           <div style={styles.canvasPattern} />
           <div ref={composerContainerRef} style={styles.canvasContent}>
             <Canvas
@@ -1024,6 +1023,22 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
           />
         </LayoutShell.FullPage>
         )}
+
+        {/* 2L9 Shell/BottomBar (497:99485): the page switcher across the
+            bottom, or — while a resource area covers the canvas — the way back. */}
+        <LayoutShell.Footer>
+          <BottomBar
+            composer={composer}
+            pages={pageSummaries}
+            resourceArea={(!readOnlyView && effectiveFullPageMode) || cmsWorkspaceOpen}
+            onBackToEditor={() => {
+              if (!cmsWorkspaceOpen) handleFullPageClose();
+              else if (cmsReturn) backToCanvas();
+              else onLeftPanelToggle?.();
+            }}
+            viewMode={readOnlyView}
+          />
+        </LayoutShell.Footer>
       </LayoutShell>
 
       {/* Clone 3686:42317 — Site fonts. Mounted once, here, and opened by

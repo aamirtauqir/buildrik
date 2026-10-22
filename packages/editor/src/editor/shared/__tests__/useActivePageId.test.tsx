@@ -1,6 +1,7 @@
 /**
  * DQ-013: the active page id was held in three useStates (AquibraStudio,
- * PageTabBar, usePages), each subscribed to a different event set. The shell's
+ * the page tab bar — now the bottom-bar PageSwitcher — and usePages), each
+ * subscribed to a different event set. The shell's
  * copy listened to PAGE_CHANGED + PROJECT_LOADED only, and deleting the active
  * page emits neither — PageManager reassigns it and says PROJECT_CHANGED
  * `page:deleted` — so the Issues panel's "This page" scope kept a page that no

@@ -2048,7 +2048,7 @@
     },
     {
       "nodeId": "435:2348",
-      "name": "Pages · page tab bar (code: PageTabBar.tsx)",
+      "name": "Pages · page tab bar (code: deleted 2026-10-22 — replaced by shell/PageSwitcher.tsx, 2L9 Task 1.3)",
       "family": "Pages",
       "state": "superseded",
       "width": 1080,
@@ -2056,7 +2056,7 @@
       "status": "out-of-scope",
       "authority": "superseded:v3-4418:45431",
       "recipe": null,
-      "verifiedNote": "V1 node deleted — superseded by Editor v3 page 4418:45431 (owner 2026-10-07). Prior note: 2026-09-08 conformed + recipe on the DEFAULT sample. The 2026-08-31 drift (active tab 4px above the bar bottom) is fixed and documented in PageTabBar.tsx ROW/TAB_ACTIVE. Tab gap 4 -> 6 (board 435:2352). diff: 23/23 PASS. Rename / context-menu / delete sections are driven states, still eye-verified only.",
+      "verifiedNote": "V1 node deleted — superseded by Editor v3 page 4418:45431 (owner 2026-10-07). Prior note: 2026-09-08 conformed + recipe on the DEFAULT sample. The 2026-08-31 drift (active tab 4px above the bar bottom) is fixed and documented in PageTabBar.tsx ROW/TAB_ACTIVE (file deleted 2026-10-22, 2L9 Task 1.3 bottom-bar page switcher). Tab gap 4 -> 6 (board 435:2352). diff: 23/23 PASS. Rename / context-menu / delete sections are driven states, still eye-verified only.",
       "verified": "drift-fixed"
     },
     {

@@ -104,7 +104,8 @@ import {
 } from "@/editor/sidebar/tabs/templates/TemplatesTabModals";
 import type { UsePublishJobResult } from "@/editor/shell/hooks/usePublishJob";
 import type { PageItem } from "@/editor/sidebar/tabs/pages/types";
-import { PageTabBar } from "@/editor/shell/PageTabBar";
+import { PageSwitcher } from "@/editor/shell/PageSwitcher";
+import { LayoutShell } from "@/editor/rail/LayoutShell";
 import { NotificationPanel } from "@/editor/shell/NotificationPanel";
 import { PublishConfirmModal } from "@/editor/shell/modals/PublishConfirmModal";
 import { PageContextMenu } from "@/editor/sidebar/tabs/pages/components/PageContextMenu";
@@ -127,7 +128,7 @@ import {
   FormsScreen,
   LocalizationScreen,
 } from "@/editor/sidebar/tabs/settings/screens";
-import type { PageData } from "@/shared/types";
+import type { PageSummary } from "@/shared/types";
 import { ReviewTab } from "@/editor/sidebar/tabs/review/ReviewTab";
 import { PublishGateModal, type PublishGateReason } from "@/editor/shell/modals/PublishGateModal";
 import { StaleApprovalModal } from "@/editor/shell/modals/StaleApprovalModal";
@@ -1355,39 +1356,54 @@ const reviewHost = (name: string, children: React.ReactNode) => (
 );
 
 /**
- * Page-tab-bar fixture (board 435:2348).
- *
- * PageTabBar returns null without a composer — the whole bar IS the page list —
- * so a stub answers the two reads it makes and the two events it subscribes to.
- * The dirty dot is deliberately absent: `useDirtyPages` keeps its state in a
- * per-composer store fed by real engine events, and faking one would measure a
- * store this fixture wrote rather than the one the editor keeps.
+ * Page switcher fixture (2L9 Shell/BottomBar 497:99485 + Shell/PageSwitcherMenu
+ * 558:4419): five static pages, one collection template, Home active and
+ * dirty. `?open=1` opens the menu. Rendered in the shell's bottom band
+ * (LayoutShell's footer slot) at the bottom of the viewport, where the menu
+ * opens upward.
  */
-const TAB_PAGE = (id: string, name: string, over: Partial<PageData> = {}): PageData =>
-  ({ id, name, slug: name.toLowerCase(), root: { id: `r-${id}`, type: "container" }, ...over }) as PageData;
+const SWITCHER_PAGE = (id: string, name: string, slug: string, over: Partial<PageSummary> = {}): PageSummary => ({
+  id,
+  name,
+  slug,
+  kind: "static",
+  isHome: false,
+  dirty: false,
+  depth: 0,
+  ...over,
+});
 
-const TAB_PAGES: PageData[] = [
-  TAB_PAGE("home", "Home", { isHome: true }),
-  TAB_PAGE("about", "About"),
-  TAB_PAGE("pricing", "Pricing"),
+const SWITCHER_PAGES: PageSummary[] = [
+  SWITCHER_PAGE("home", "Home", "/", { isHome: true, dirty: true }),
+  SWITCHER_PAGE("about", "About", "/about"),
+  SWITCHER_PAGE("work", "Work", "/work"),
+  SWITCHER_PAGE("contact", "Contact", "/contact"),
+  SWITCHER_PAGE("legal", "Legal", "/legal"),
+  SWITCHER_PAGE("blog-post", "Blog post template", "/blog/:slug", {
+    kind: "template",
+    collectionId: "c-blog",
+    collectionName: "Blog post",
+  }),
 ];
 
-function tabBarStub() {
-  return {
-    on: () => {},
-    off: () => {},
-    emit: () => {},
-    elements: {
-      getAllPages: () => TAB_PAGES,
-      getActivePage: () => TAB_PAGES[0],
-      setActivePage: () => {},
-      createPage: () => {},
-      updatePage: () => {},
-      duplicatePage: () => true,
-      deletePage: () => {},
-      setHomePage: () => {},
-    },
-  } as unknown as Composer;
+function PageSwitcherProbe() {
+  const [open, setOpen] = React.useState(() => new URLSearchParams(location.search).get("open") === "1");
+  const [active, setActive] = React.useState("home");
+  return (
+    <div className="tw:fixed tw:inset-x-0 tw:bottom-0">
+      <LayoutShell.Footer>
+        <PageSwitcher
+          pages={SWITCHER_PAGES}
+          activePageId={active}
+          open={open}
+          onOpenChange={setOpen}
+          onSelect={setActive}
+          onManagePages={() => {}}
+          onAddPage={() => {}}
+        />
+      </LayoutShell.Footer>
+    </div>
+  );
 }
 
 const APPLY_STEPS = [
@@ -2674,12 +2690,10 @@ const CASES: Record<string, () => React.ReactElement> = {
       <CreatePageErrorModal onCancel={() => {}} onRetry={() => {}} />
     </div>
   ),
-  // ── Page tab bar (board 435:2348) ────────────────────────────────────────
-  "pages-page-tab-bar": () => (
-    <div data-probe="pages-page-tab-bar">
-      <ToastProvider>
-        <PageTabBar composer={tabBarStub()} />
-      </ToastProvider>
+  // ── Page switcher (2L9 Shell/BottomBar 497:99485, menu 558:4419) ──────────
+  "page-switcher": () => (
+    <div data-probe="page-switcher">
+      <PageSwitcherProbe />
     </div>
   ),
   // ── Publish states (boards 784:4250 / 781:4489) ──────────────────────────

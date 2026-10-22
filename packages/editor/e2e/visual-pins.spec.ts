@@ -159,3 +159,62 @@ for (const viewport of [
     });
   });
 }
+
+
+/* 2L9 Task 1.3 — bottom-bar page switcher (Shell/BottomBar 497:99485, menu
+   Shell/PageSwitcherMenu 558:4419), closed and open, at the three supported
+   widths. The bar must not overflow at 1024 and 1280 (plan Review Focus 4). */
+for (const viewport of [
+  { width: 1440, height: 900 },
+  { width: 1280, height: 720 },
+  { width: 1024, height: 768 },
+]) {
+  test.describe(`visual pin · page switcher @${viewport.width}`, () => {
+    test.skip(!!process.env.CI, "visual pins are recorded on darwin only");
+    test.use({ viewport });
+    for (const open of [false, true]) {
+      const name = `page-switcher-${open ? "open" : "closed"}-${viewport.width}`;
+      test(name, async ({ page }) => {
+        await page.emulateMedia({ reducedMotion: "reduce" });
+        await page.goto(`/e2e/probe/probe.html?case=page-switcher${open ? "&open=1" : ""}`);
+        await expect(page.locator("#probe-root")).toHaveAttribute("data-probe-ready", "page-switcher");
+        await page.evaluate(() => document.fonts.ready);
+        expect(await fontsLoadedStatus(page), "fonts must be loaded").toBe("loaded");
+        await stylesheetsSettled(page);
+
+        const bar = page.locator("footer.layout-shell__footer");
+        const fit = await bar.evaluate((el) => ({ scroll: el.scrollWidth, client: el.clientWidth, height: el.getBoundingClientRect().height }));
+        expect(fit.scroll, "bottom bar content overflows").toBeLessThanOrEqual(fit.client);
+        expect(fit.height).toBe(32);
+        if (open) {
+          const menu = page.getByTestId("page-switcher-menu");
+          await expect(menu).toBeVisible();
+          const box = await menu.evaluate((el) => el.closest('[role="dialog"]')!.getBoundingClientRect().toJSON());
+          expect(box.width).toBe(260);
+          expect(box.y).toBeGreaterThanOrEqual(0);
+          expect(box.y + box.height).toBeLessThanOrEqual(viewport.height - 32);
+        }
+
+        await expect(page).toHaveScreenshot(`${name}.png`, {
+          fullPage: true,
+          animations: "disabled",
+          threshold: 0.02,
+          maxDiffPixelRatio: 0.002,
+        });
+      });
+    }
+  });
+}
+
+/* Behaviour pin: choosing "About" in the open menu changes the page the bar
+   shows (the probe's stand-in for the canvas page). */
+test("page switcher · pick About from the menu", async ({ page }) => {
+  test.skip(!!process.env.CI, "visual pins are recorded on darwin only");
+  await page.goto("/e2e/probe/probe.html?case=page-switcher&open=1");
+  await expect(page.locator("#probe-root")).toHaveAttribute("data-probe-ready", "page-switcher");
+  await expect(page.getByRole("combobox", { name: "Search pages" })).toBeFocused();
+  await page.getByTestId("page-switcher-row-about").click();
+  await expect(page.getByTestId("page-switcher-menu")).toHaveCount(0);
+  await expect(page.getByTestId("page-switcher-trigger")).toContainText("About");
+  await expect(page.getByTestId("page-switcher-trigger")).toBeFocused();
+});
