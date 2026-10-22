@@ -112,6 +112,8 @@ import { PublishConfirmModal } from "@/editor/shell/modals/PublishConfirmModal";
 import { PageContextMenu } from "@/editor/sidebar/tabs/pages/components/PageContextMenu";
 import { PageSettingsDrawer } from "@/editor/sidebar/tabs/pages/page-settings/PageSettingsDrawer";
 import { Topbar, SiteMenuIcon, IconButton, BreakpointSwitcher } from "@/editor/chrome-ui";
+import { RecordsTable } from "@/editor/cms/RecordsTable";
+import type { CMSCollection, CMSContentItem } from "@/shared/types/cms";
 import { SmartGuidesOverlay } from "@/editor/canvas/overlays";
 import type { SnapLine } from "@/editor/canvas/hooks";
 import { DropFeedbackOverlay } from "@/editor/canvas/overlays";
@@ -1887,6 +1889,39 @@ function ContentPanelHost({ probe, composer }: { probe: string; composer: Compos
   );
 }
 
+const CMS_STATUS_COLLECTION: CMSCollection = {
+  id: "probe-blog",
+  name: "Blog",
+  slug: "blog",
+  displayField: "title",
+  fields: [{ id: "title", slug: "title", name: "Title", type: "text", order: 0 }],
+  createdAt: "2026-10-01T00:00:00.000Z",
+  updatedAt: "2026-10-01T00:00:00.000Z",
+};
+/* Stamped at render so the Updated column reads the same relative time on
+   every run; the changed row's publish stamp sits a minute earlier. */
+const CMS_PROBE_NOW = Date.now();
+const cmsProbeRecord = (id: string, title: string, extra: Partial<CMSContentItem>): CMSContentItem => ({
+  id,
+  collectionId: "probe-blog",
+  data: { title },
+  status: "draft",
+  createdAt: new Date(CMS_PROBE_NOW).toISOString(),
+  updatedAt: new Date(CMS_PROBE_NOW).toISOString(),
+  ...extra,
+});
+const CMS_STATUS_RECORDS: CMSContentItem[] = [
+  cmsProbeRecord("r1", "A clearer point of view", {
+    status: "published",
+    publishedAt: new Date(CMS_PROBE_NOW - 60_000).toISOString(),
+  }),
+  cmsProbeRecord("r2", "How we design for trust", { status: "draft" }),
+  cmsProbeRecord("r3", "A studio built around people", {
+    status: "published",
+    publishedAt: new Date(CMS_PROBE_NOW).toISOString(),
+  }),
+];
+
 const CASES: Record<string, () => React.ReactElement> = {
   // ── AI run states (boards 170:29 / 170:41 / 171:67) ─────────────────────
   "ai-thinking": () => aiHost("ai-thinking", agentPlan({ phase: "planning", steps: [] })),
@@ -1967,6 +2002,12 @@ const CASES: Record<string, () => React.ReactElement> = {
   "breakpoint-switcher": () => (
     <div data-probe="breakpoint-switcher" style={{ padding: 24 }}>
       <BreakpointSwitcher value="tablet" onChange={() => {}} includeWide />
+    </div>
+  ),
+  /* 2L9 board 165:2: the records table's Status column, one row per tone. */
+  "cms-records-status": () => (
+    <div data-probe="cms-records-status" style={{ display: "flex", height: 240, width: 900 }}>
+      <RecordsTable collection={CMS_STATUS_COLLECTION} records={CMS_STATUS_RECORDS} query="" onOpenRecord={() => {}} />
     </div>
   ),
   "canvas-footer-toolbar": () => (
