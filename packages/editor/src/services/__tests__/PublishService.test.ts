@@ -289,9 +289,14 @@ describe("authorizeCodeExport", () => {
     await expect(authorizeCodeExport("site-1")).resolves.toBe("upgrade");
   });
 
-  it("throws any other FORBIDDEN (not a member) and network errors", async () => {
-    authorizeCodeExportQuery.mockRejectedValueOnce(trpcError("FORBIDDEN", "FORBIDDEN"));
-    await expect(authorizeCodeExport("site-1")).rejects.toThrow("FORBIDDEN");
+  it("is 'forbidden' for any other FORBIDDEN (a viewer, or not a member)", async () => {
+    authorizeCodeExportQuery.mockRejectedValueOnce(trpcError("FORBIDDEN", "Insufficient permissions"));
+    await expect(authorizeCodeExport("site-1")).resolves.toBe("forbidden");
+  });
+
+  it("throws network and other errors", async () => {
+    authorizeCodeExportQuery.mockRejectedValueOnce(trpcError("NOT_FOUND", "Site not found"));
+    await expect(authorizeCodeExport("site-1")).rejects.toThrow("Site not found");
     authorizeCodeExportQuery.mockRejectedValueOnce(new TypeError("Failed to fetch"));
     await expect(authorizeCodeExport("site-1")).rejects.toThrow("Failed to fetch");
   });

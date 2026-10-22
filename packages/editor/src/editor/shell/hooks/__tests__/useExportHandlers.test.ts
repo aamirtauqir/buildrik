@@ -191,6 +191,19 @@ describe("useExportHandlers", () => {
       expect(opts.setExportLoading).toHaveBeenLastCalledWith(false);
     });
 
+    it("a viewer → 'Only editors' toast, no ZIP, no upgrade prompt", async () => {
+      vi.mocked(authorizeCodeExport).mockResolvedValueOnce("forbidden");
+      const { result } = renderHook(() => useExportHandlers(opts));
+      await act(async () => {
+        await result.current.handleExportHTML();
+      });
+      expect(opts.addToast).toHaveBeenCalledWith(
+        expect.objectContaining({ tone: "error", title: "Only editors can download code" }),
+      );
+      expect(exportInstance.downloadZip).not.toHaveBeenCalled();
+      expect(openUpgrade).not.toHaveBeenCalled();
+    });
+
     it("a failed check (network) → error toast, no ZIP, no upgrade prompt", async () => {
       vi.mocked(authorizeCodeExport).mockRejectedValueOnce(new TypeError("Failed to fetch"));
       const { result } = renderHook(() => useExportHandlers(opts));

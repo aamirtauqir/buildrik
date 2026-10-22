@@ -1,6 +1,6 @@
 /**
  * sites.authorizeCodeExport — the editor asks this before it builds the
- * "Download code (ZIP)". Site access first (any member with scope), then the
+ * "Download code (ZIP)". Site role first (EDITOR and up — viewers can't), then the
  * plan; the plan refusal is FORBIDDEN with a CODE_EXPORT_NOT_IN_PLAN-led
  * message so the editor can show the upgrade prompt for it alone.
  *
@@ -8,7 +8,7 @@
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-const assertSiteAccessMock = vi.fn();
+const checkSiteRoleMock = vi.fn();
 const assertCodeExportAllowedMock = vi.fn();
 
 vi.mock("@/server/auth", () => ({ auth: vi.fn().mockResolvedValue(null) }));
@@ -22,8 +22,8 @@ vi.mock("next/headers", () => ({
 vi.mock("@/lib/prisma", () => ({ prisma: {} }));
 vi.mock("@/server/trpc/workspace-ctx", () => ({ resolveWorkspaceId: vi.fn().mockResolvedValue("ws_1") }));
 vi.mock("@/server/services/permission.service", () => ({
-  assertSiteAccess: (...a: unknown[]) => assertSiteAccessMock(...a),
-  checkSiteRole: vi.fn(),
+  assertSiteAccess: vi.fn(),
+  checkSiteRole: (...a: unknown[]) => checkSiteRoleMock(...a),
   checkWorkspaceRole: vi.fn(),
   PermissionError: class PermissionError extends Error {
     code: string;
@@ -47,14 +47,14 @@ const prisma = {};
 const caller = () => sitesRouter.createCaller({ session: { user: { id: "u_1" } }, prisma } as never);
 
 beforeEach(() => {
-  assertSiteAccessMock.mockReset().mockResolvedValue(undefined);
+  checkSiteRoleMock.mockReset().mockResolvedValue(undefined);
   assertCodeExportAllowedMock.mockReset().mockResolvedValue(undefined);
 });
 
 describe("sites.authorizeCodeExport", () => {
   it("allows a member of a site whose plan has code export", async () => {
     await expect(caller().authorizeCodeExport({ siteId: "s1" })).resolves.toEqual({ allowed: true });
-    expect(assertSiteAccessMock).toHaveBeenCalledWith(prisma, "u_1", "s1");
+    expect(checkSiteRoleMock).toHaveBeenCalledWith(prisma, "u_1", "s1", "EDITOR");
     expect(assertCodeExportAllowedMock).toHaveBeenCalledWith("s1");
   });
 
@@ -65,8 +65,8 @@ describe("sites.authorizeCodeExport", () => {
     expect((err as Error).message.startsWith(CODE_EXPORT_NOT_IN_PLAN)).toBe(true);
   });
 
-  it("refuses a non-member without reading the plan, and without the plan reason", async () => {
-    assertSiteAccessMock.mockRejectedValueOnce(new PermissionError("FORBIDDEN" as never));
+  it("refuses a viewer or non-member without reading the plan, and without the plan reason", async () => {
+    checkSiteRoleMock.mockRejectedValueOnce(new PermissionError("FORBIDDEN" as never));
     const err = await caller().authorizeCodeExport({ siteId: "s1" }).catch((e: unknown) => e);
     expect(err).toMatchObject({ code: "FORBIDDEN" });
     expect((err as Error).message.startsWith(CODE_EXPORT_NOT_IN_PLAN)).toBe(false);
@@ -80,6 +80,6 @@ describe("sites.authorizeCodeExport", () => {
 
   it("rejects an empty siteId at the input boundary", async () => {
     await expect(caller().authorizeCodeExport({ siteId: "" })).rejects.toMatchObject({ code: "BAD_REQUEST" });
-    expect(assertSiteAccessMock).not.toHaveBeenCalled();
+    expect(checkSiteRoleMock).not.toHaveBeenCalled();
   });
 });

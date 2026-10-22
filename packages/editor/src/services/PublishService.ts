@@ -322,17 +322,17 @@ export async function unpublishSite(siteId: string): Promise<void> {
 
 /**
  * Ask the server whether this site's plan allows downloading its code (the
- * Publish panel's "Download code (ZIP)"). "upgrade" is the plan refusal and
- * nothing else; every other failure (network, not a member, site gone) THROWS,
- * so the caller can tell the user something other than "upgrade".
+ * Publish panel's "Download code (ZIP)"). "upgrade" is the plan refusal,
+ * "forbidden" any other FORBIDDEN (a viewer, or not a member); every other
+ * failure (network, site gone) THROWS.
  */
-export async function authorizeCodeExport(siteId: string): Promise<"allowed" | "upgrade"> {
+export async function authorizeCodeExport(siteId: string): Promise<"allowed" | "upgrade" | "forbidden"> {
   try {
     await getClient().sites.authorizeCodeExport.query({ siteId });
     return "allowed";
   } catch (e) {
     const err = e as { data?: { code?: string } | null; message?: string } | null;
-    if (err?.data?.code === "FORBIDDEN" && err.message?.startsWith(CODE_EXPORT_NOT_IN_PLAN)) return "upgrade";
+    if (err?.data?.code === "FORBIDDEN") return err.message?.startsWith(CODE_EXPORT_NOT_IN_PLAN) ? "upgrade" : "forbidden";
     throw e;
   }
 }

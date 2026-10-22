@@ -490,7 +490,8 @@ export const sitesRouter = router({
     .input(codeExportAccessSchema)
     .query(async ({ ctx, input }) => {
       try {
-        await assertSiteAccess(ctx.prisma, ctx.session.user!.id!, input.siteId);
+        // Owner 2026-10-22: viewers can't download code — Editor and up only.
+        await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.siteId, "EDITOR");
       } catch (e) {
         if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
         throw e;

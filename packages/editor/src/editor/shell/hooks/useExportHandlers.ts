@@ -92,7 +92,7 @@ export function useExportHandlers({
     }
     setExportLoading(true);
     try {
-      let access: "allowed" | "upgrade";
+      let access: "allowed" | "upgrade" | "forbidden";
       try {
         access = await authorizeCodeExport(siteId);
       } catch {
@@ -105,6 +105,14 @@ export function useExportHandlers({
       }
       if (access === "upgrade") {
         openUpgrade(CODE_DOWNLOAD_UPGRADE);
+        return;
+      }
+      if (access === "forbidden") {
+        addToast({
+          title: "Only editors can download code",
+          description: "Ask a workspace admin for Editor access.",
+          tone: "error",
+        });
         return;
       }
       const exportEngine = new ExportEngine(composer);
