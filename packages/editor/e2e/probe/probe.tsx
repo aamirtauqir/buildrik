@@ -63,6 +63,7 @@ import { ToastProvider, useToast } from "@/editor/chrome-ui";
 import { ContentTab } from "@/editor/sidebar/tabs/content/ContentTab";
 import { CMSCollectionSetupModal } from "@/editor/shell/modals/CMSCollectionSetupModal";
 import { LayersTab } from "@/editor/sidebar/tabs/layers/LayersTab";
+import { InspectorHeader } from "@/editor/inspector/components/InspectorHeader";
 import { Composer } from "@/engine/Composer";
 import { LayersLoadError, LayersNoResults } from "@/editor/panels/layers/components/LayersStateBlocks";
 import { Row as InsertRow } from "@/editor/sidebar/tabs/build/components/GroupSection";
@@ -2126,6 +2127,29 @@ const CASES: Record<string, () => React.ReactElement> = {
       <ContentTab composer={null} hydrationStatus="error" onClose={() => {}} />
     </div>
   ),
+  // ── Shell/InspectorHeader (2L9 497:339496, plan Task 1.4) ────────────────
+  // The real header on the real layers composer, in the inspector's 300 column:
+  // "Text"-style target row + "Editing · Desktop · Default state". Home is not
+  // a collection template, so this is the 84 variant (no element path).
+  "inspector-header": () => {
+    const c = layersComposer();
+    const el = c.elements.getElement("lx-heading")!;
+    c.selection.select(el);
+    return (
+      <ToastProvider>
+        <div data-probe="inspector-header" className="tw:w-[300px] tw:bg-white">
+          <InspectorHeader
+            composer={c}
+            element={{ id: el.getId(), type: el.getType() }}
+            selectedIds={[el.getId()]}
+            breakpointLabel="Desktop"
+            state="normal"
+            onStateChange={() => {}}
+          />
+        </div>
+      </ToastProvider>
+    );
+  },
   // ── Layers states (boards 775:4130 / 781:4217 / 782:4260) ────────────────
   // Loading is the REAL path (composer null = editor boot), so the case mounts
   // the whole tab. Error/no-results need a throwing tree or a live search —

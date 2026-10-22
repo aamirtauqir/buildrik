@@ -81,9 +81,10 @@ describe.each(TYPES)("MUST-NOT — %s", (type) => {
       fireEvent.click(within(screen.getByTestId("inspector-tab-strip")).getByRole("tab", { name: tab }));
       const text = panel().textContent ?? "";
       for (const re of NEVER) expect(text, `${type} · ${tab}: ${re}`).not.toMatch(re);
-      /* DD-14: no state / breakpoint context on Behaviour. */
+      /* DD-14: no override Reset / Revert lines on Behaviour. (The state and
+         breakpoint themselves are the header's "Editing" row — 2L9 Task 1.4 —
+         and the lines draw only when something is overridden.) */
       if (tab === "Behaviour") expect(screen.queryByTestId("inspector-context-row"), `${type} · Behaviour`).toBeNull();
-      else expect(screen.getByTestId("inspector-context-row"), `${type} · ${tab}`).toBeInTheDocument();
       /* DD-10: CMS binding only on bindable types. */
       if (tab === "Behaviour" && !BINDABLE_TYPES.has(type)) expect(sectionNames(), type).not.toContain("CMS binding");
       /* Q1: Interactions lives on Behaviour, never Effects. */

@@ -218,3 +218,35 @@ test("page switcher · pick About from the menu", async ({ page }) => {
   await expect(page.getByTestId("page-switcher-trigger")).toContainText("About");
   await expect(page.getByTestId("page-switcher-trigger")).toBeFocused();
 });
+
+/* 2L9 Task 1.4 — Shell/InspectorHeader (497:339496) is 300×84. Height is
+   asserted from the live box, then pinned, at the plan's three viewports. */
+for (const viewport of [
+  { width: 1440, height: 900 },
+  { width: 1280, height: 720 },
+  { width: 1024, height: 768 },
+]) {
+  test.describe(`inspector header @${viewport.width}`, () => {
+    test.skip(!!process.env.CI, "visual pins are recorded on darwin only");
+    test.use({ viewport });
+    /* Run alone (-g), the first case pays Vite's cold dependency optimisation,
+       which measured 30s+ on the probe server. */
+    test.setTimeout(120_000);
+    test("84 tall, pinned", async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.goto("/e2e/probe/probe.html?case=inspector-header");
+      await expect(page.locator("#probe-root")).toHaveAttribute("data-probe-ready", "inspector-header");
+      await page.evaluate(() => document.fonts.ready.then(() => undefined));
+      expect(await fontsLoadedStatus(page), "fonts must be loaded").toBe("loaded");
+      await stylesheetsSettled(page);
+      const header = page.getByTestId("inspector-header");
+      const height = await header.evaluate((el) => el.getBoundingClientRect().height);
+      expect(Math.abs(height - 84), `header height ${height}`).toBeLessThanOrEqual(1);
+      await expect(header).toHaveScreenshot(`inspector-header-${viewport.width}.png`, {
+        animations: "disabled",
+        threshold: 0.02,
+        maxDiffPixelRatio: 0.002,
+      });
+    });
+  });
+}
