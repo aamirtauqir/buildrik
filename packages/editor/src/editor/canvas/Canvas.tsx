@@ -93,8 +93,6 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       onZoomChange,
       onOverlayChange,
       onDeviceChange,
-      canUndo,
-      canRedo,
     },
     ref
   ) => {
@@ -967,10 +965,6 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
                     }
                   : undefined
               }
-              canUndo={canUndo}
-              canRedo={canRedo}
-              onUndo={composer ? () => composer.history.undo() : undefined}
-              onRedo={composer ? () => composer.history.redo() : undefined}
             />
             <DeviceFrameToggle
               active={deviceFrameActive}

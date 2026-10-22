@@ -109,7 +109,7 @@ import { NotificationPanel } from "@/editor/shell/NotificationPanel";
 import { PublishConfirmModal } from "@/editor/shell/modals/PublishConfirmModal";
 import { PageContextMenu } from "@/editor/sidebar/tabs/pages/components/PageContextMenu";
 import { PageSettingsDrawer } from "@/editor/sidebar/tabs/pages/page-settings/PageSettingsDrawer";
-import { Topbar } from "@/editor/chrome-ui";
+import { Topbar, SiteMenuIcon, IconButton } from "@/editor/chrome-ui";
 import { SmartGuidesOverlay } from "@/editor/canvas/overlays";
 import type { SnapLine } from "@/editor/canvas/hooks";
 import { DropFeedbackOverlay } from "@/editor/canvas/overlays";
@@ -1942,8 +1942,6 @@ const CASES: Record<string, () => React.ReactElement> = {
         onDeviceChange={() => {}}
         onOverlayChange={() => {}}
         onZoomChange={() => {}}
-        onUndo={() => {}}
-        onRedo={() => {}}
       />
     </div>
   ),
@@ -1954,8 +1952,6 @@ const CASES: Record<string, () => React.ReactElement> = {
         zoom={100}
         onOverlayChange={() => {}}
         onZoomChange={() => {}}
-        onUndo={() => {}}
-        onRedo={() => {}}
       />
     </div>
   ),
@@ -2819,6 +2815,36 @@ const CASES: Record<string, () => React.ReactElement> = {
         );
       },
     ]),
+  ),
+
+  /* design-2l9 board 497:99433 (Task 1.2): the whole topbar at the page's
+     width, carrying the longest review label and a site name long enough to
+     have to give way. Pinned at 1024 / 1280 / 1440; at 1024 the review
+     control and ⋯ must sit inside the bar with nothing wrapped. */
+  "topbar-shell": () => (
+    <div data-probe="topbar-shell" style={{ width: "100vw" }}>
+      <Topbar
+        siteName="Fieldwork Studio · Northgate Architecture Collective"
+        pageName="Home"
+        onOpenPages={() => {}}
+        onPageCrumb={() => {}}
+        onExit={() => {}}
+        history={{ canUndo: true, canRedo: false, onUndo: () => {}, onRedo: () => {}, undoChord: "⌘Z", redoChord: "⇧⌘Z" }}
+        save="saved"
+        savedAt={Date.now() - 2 * 60_000}
+        onSaveClick={() => {}}
+        review={{ label: "In review · 12 open", tone: "info", title: "Sent to Sara — waiting on approval", onClick: () => {} }}
+        tools={{ onPreview: () => {}, onToggleComments: () => {}, commentsPressed: false }}
+        unreadCount={2}
+        onOpenNotifications={() => {}}
+        onPublish={() => {}}
+        menu={
+          <IconButton label="Site menu" data-testid="topbar-site-menu">
+            <SiteMenuIcon />
+          </IconButton>
+        }
+      />
+    </div>
   ),
 
   "notifications-jump-target-deleted": () => {
