@@ -1,0 +1,1613 @@
+{
+ "36:2": {
+  "status": "drift",
+  "note": "Board Content·Style·Behavior·Effects; code has no Content tab; page/multi contexts differ (spec specimen)",
+  "archetype": "Inspector context specimens"
+ },
+ "39:9114": {
+  "status": "drift",
+  "note": "Board splits \"Update shared Brand color\" vs \"Use on selected element\"; popover has no such split. L-D overlap",
+  "archetype": "Color scope and safe commits"
+ },
+ "156:716": {
+  "status": "drift",
+  "note": "Fields sits in Behaviour (config/sectionOrder.ts:29), board Content; no reorder hint/Move up·down menu; Semantics/Conditions rows missing",
+  "archetype": "Form field list"
+ },
+ "156:4279": {
+  "status": "drift",
+  "note": "Fields sits in Behaviour (config/sectionOrder.ts:29), board Content; no reorder hint/Move up·down menu; Semantics/Conditions rows missing",
+  "archetype": "Form field list",
+  "inheritsFrom": "156:716"
+ },
+ "159:6780": {
+  "status": "drift",
+  "note": "Fields sits in Behaviour (config/sectionOrder.ts:29), board Content; no reorder hint/Move up·down menu; Semantics/Conditions rows missing",
+  "archetype": "Form field list",
+  "inheritsFrom": "156:716"
+ },
+ "159:7279": {
+  "status": "drift",
+  "note": "Fields sits in Behaviour (config/sectionOrder.ts:29), board Content; no reorder hint/Move up·down menu; Semantics/Conditions rows missing",
+  "archetype": "Form field list",
+  "inheritsFrom": "156:716"
+ },
+ "159:7646": {
+  "status": "drift",
+  "note": "Fields sits in Behaviour (config/sectionOrder.ts:29), board Content; no reorder hint/Move up·down menu; Semantics/Conditions rows missing",
+  "archetype": "Form field list",
+  "inheritsFrom": "156:716"
+ },
+ "159:8041": {
+  "status": "drift",
+  "note": "Fields sits in Behaviour (config/sectionOrder.ts:29), board Content; no reorder hint/Move up·down menu; Semantics/Conditions rows missing",
+  "archetype": "Form field list",
+  "inheritsFrom": "156:716"
+ },
+ "171:25296": {
+  "status": "drift",
+  "note": "Fields sits in Behaviour (config/sectionOrder.ts:29), board Content; no reorder hint/Move up·down menu; Semantics/Conditions rows missing",
+  "archetype": "Form field list",
+  "inheritsFrom": "156:716"
+ },
+ "171:25654": {
+  "status": "drift",
+  "note": "Fields sits in Behaviour (config/sectionOrder.ts:29), board Content; no reorder hint/Move up·down menu; Semantics/Conditions rows missing",
+  "archetype": "Form field list",
+  "inheritsFrom": "156:716"
+ },
+ "157:102776": {
+  "status": "drift",
+  "note": "Fields sits in Behaviour (config/sectionOrder.ts:29), board Content; no reorder hint/Move up·down menu; Semantics/Conditions rows missing",
+  "archetype": "Form field list"
+ },
+ "157:103493": {
+  "status": "drift",
+  "note": "Fields sits in Behaviour (config/sectionOrder.ts:29), board Content; no reorder hint/Move up·down menu; Semantics/Conditions rows missing",
+  "archetype": "Form field list"
+ },
+ "157:104210": {
+  "status": "drift",
+  "note": "Fields sits in Behaviour (config/sectionOrder.ts:29), board Content; no reorder hint/Move up·down menu; Semantics/Conditions rows missing",
+  "archetype": "Form field list"
+ },
+ "157:104927": {
+  "status": "drift",
+  "note": "Fields sits in Behaviour (config/sectionOrder.ts:29), board Content; no reorder hint/Move up·down menu; Semantics/Conditions rows missing",
+  "archetype": "Form field list"
+ },
+ "156:1316": {
+  "status": "drift",
+  "note": "Label row writes the placeholder attr; no separate Placeholder, Name (submission key), Default value, Validation rows",
+  "archetype": "Field detail"
+ },
+ "156:2506": {
+  "status": "drift",
+  "note": "Label row writes the placeholder attr; no separate Placeholder, Name (submission key), Default value, Validation rows",
+  "archetype": "Field detail",
+  "inheritsFrom": "156:1316"
+ },
+ "156:3684": {
+  "status": "drift",
+  "note": "Label row writes the placeholder attr; no separate Placeholder, Name (submission key), Default value, Validation rows",
+  "archetype": "Field detail",
+  "inheritsFrom": "156:1316"
+ },
+ "157:103125": {
+  "status": "drift",
+  "note": "Label row writes the placeholder attr; no separate Placeholder, Name (submission key), Default value, Validation rows",
+  "archetype": "Field detail"
+ },
+ "157:103842": {
+  "status": "drift",
+  "note": "Label row writes the placeholder attr; no separate Placeholder, Name (submission key), Default value, Validation rows",
+  "archetype": "Field detail"
+ },
+ "157:104559": {
+  "status": "drift",
+  "note": "Label row writes the placeholder attr; no separate Placeholder, Name (submission key), Default value, Validation rows",
+  "archetype": "Field detail"
+ },
+ "157:105276": {
+  "status": "drift",
+  "note": "Label row writes the placeholder attr; no separate Placeholder, Name (submission key), Default value, Validation rows",
+  "archetype": "Field detail"
+ },
+ "156:1911": {
+  "status": "missing",
+  "note": "No submission-key uniqueness check or retained-draft error",
+  "archetype": "Duplicate submission key"
+ },
+ "156:4859": {
+  "status": "missing",
+  "note": "No plain-text Password warning; type block still offers Password as a type (sections/typeBlock/bodies/formBodies.tsx:33)",
+  "archetype": "Legacy Password warning"
+ },
+ "156:5458": {
+  "status": "missing",
+  "note": "No accessible-label repair for existing unlabeled fields",
+  "archetype": "Unlabeled field repair"
+ },
+ "156:3109": {
+  "status": "drift",
+  "note": "Code 6 types (Text, Email, Phone, Number, Date, Long text); board 13 incl. Select, Checkbox, Radio, Switch, Slider, Time, Color, Submit",
+  "archetype": "Add field types"
+ },
+ "156:6055": {
+  "status": "drift",
+  "note": "Board \"Form settings · This form\", \"Applies on next publish\" tags, status row + \"Saved separately…\" note; code After submit, no status row",
+  "archetype": "Form settings"
+ },
+ "156:7819": {
+  "status": "drift",
+  "note": "Board \"Form settings · This form\", \"Applies on next publish\" tags, status row + \"Saved separately…\" note; code After submit, no status row",
+  "archetype": "Form settings",
+  "inheritsFrom": "156:6055"
+ },
+ "156:10131": {
+  "status": "drift",
+  "note": "Board \"Form settings · This form\", \"Applies on next publish\" tags, status row + \"Saved separately…\" note; code After submit, no status row",
+  "archetype": "Form settings"
+ },
+ "156:10723": {
+  "status": "drift",
+  "note": "Board \"Form settings · This form\", \"Applies on next publish\" tags, status row + \"Saved separately…\" note; code After submit, no status row",
+  "archetype": "Form settings",
+  "inheritsFrom": "156:6055"
+ },
+ "156:6643": {
+  "status": "drift",
+  "note": "Code \"Saving…\" note; board \"Form settings status · Saving…\" row",
+  "archetype": "Form settings saving"
+ },
+ "156:7230": {
+  "status": "drift",
+  "note": "Code shows raw error; board \"Couldn’t save — your message is still here\" + Retry",
+  "archetype": "Form settings failed save"
+ },
+ "156:8406": {
+  "status": "missing",
+  "note": "No offline state disabling service controls while Content stays reachable",
+  "archetype": "Form settings offline"
+ },
+ "156:9001": {
+  "status": "drift",
+  "note": "Code learns Admin-only from a FORBIDDEN save; board discloses up front, field disabled",
+  "archetype": "Recipient requires Admin"
+ },
+ "156:9584": {
+  "status": "drift",
+  "note": "\"Loading…\" vs board \"Loading form settings…\"",
+  "archetype": "Form settings loading"
+ },
+ "156:11319": {
+  "status": "missing",
+  "note": "Redirect is a free-text CommitRow (FormAfterSubmitSection.tsx:195); no shared page picker, URL check, atomic save",
+  "archetype": "Redirect page picker"
+ },
+ "159:8959": {
+  "status": "missing",
+  "note": "Redirect is a free-text CommitRow (FormAfterSubmitSection.tsx:195); no shared page picker, URL check, atomic save",
+  "archetype": "Redirect page picker",
+  "inheritsFrom": "156:11319"
+ },
+ "159:9710": {
+  "status": "missing",
+  "note": "Redirect is a free-text CommitRow (FormAfterSubmitSection.tsx:195); no shared page picker, URL check, atomic save",
+  "archetype": "Redirect page picker",
+  "inheritsFrom": "156:11319"
+ },
+ "159:8570": {
+  "status": "missing",
+  "note": "No \"Enter a complete https:// or http:// URL\" validation with retained draft",
+  "archetype": "Redirect URL invalid draft"
+ },
+ "159:9347": {
+  "status": "missing",
+  "note": "No pending state for page+action atomic save",
+  "archetype": "Redirect saving atomically"
+ },
+ "157:105715": {
+  "status": "match",
+  "note": "Copy matches board; owned by L-F",
+  "archetype": "Viewer role disclosure"
+ },
+ "170:121692": {
+  "status": "drift",
+  "note": "Type select swaps immediately; no Field type menu or \"applied · Undo\" toast",
+  "archetype": "Field type lossless change"
+ },
+ "170:122069": {
+  "status": "drift",
+  "note": "Type select swaps immediately; no Field type menu or \"applied · Undo\" toast",
+  "archetype": "Field type lossless change",
+  "inheritsFrom": "170:121692"
+ },
+ "170:122442": {
+  "status": "missing",
+  "note": "Field list has no Select/options rows; no data-loss confirm (BD-29, owner-approved 2026-10-19)",
+  "archetype": "Select→Text data-loss conversion"
+ },
+ "170:122820": {
+  "status": "missing",
+  "note": "Field list has no Select/options rows; no data-loss confirm (BD-29, owner-approved 2026-10-19)",
+  "archetype": "Select→Text data-loss conversion"
+ },
+ "170:123180": {
+  "status": "missing",
+  "note": "Field list has no Select/options rows; no data-loss confirm (BD-29, owner-approved 2026-10-19)",
+  "archetype": "Select→Text data-loss conversion"
+ },
+ "170:123569": {
+  "status": "missing",
+  "note": "Field list has no Select/options rows; no data-loss confirm (BD-29, owner-approved 2026-10-19)",
+  "archetype": "Select→Text data-loss conversion"
+ },
+ "170:123968": {
+  "status": "missing",
+  "note": "Field list has no Select/options rows; no data-loss confirm (BD-29, owner-approved 2026-10-19)",
+  "archetype": "Select→Text data-loss conversion"
+ },
+ "170:124352": {
+  "status": "missing",
+  "note": "Field list has no Select/options rows; no data-loss confirm (BD-29, owner-approved 2026-10-19)",
+  "archetype": "Select→Text data-loss conversion"
+ },
+ "156:11902": {
+  "status": "drift",
+  "note": "Handoff/acceptance board for F01–F19, not a UI surface",
+  "archetype": "Forms handoff note"
+ },
+ "160:8757": {
+  "status": "missing",
+  "note": "Published form posts to dashboard app/api/public/forms/[siteId]/[formBlockId]/route.ts which returns separate HTML pages (:19,:148); no inl…",
+  "archetype": "Visitor form states (published)"
+ },
+ "160:8779": {
+  "status": "missing",
+  "note": "Published form posts to dashboard app/api/public/forms/[siteId]/[formBlockId]/route.ts which returns separate HTML pages (:19,:148); no inl…",
+  "archetype": "Visitor form states (published)"
+ },
+ "160:8801": {
+  "status": "missing",
+  "note": "Published form posts to dashboard app/api/public/forms/[siteId]/[formBlockId]/route.ts which returns separate HTML pages (:19,:148); no inl…",
+  "archetype": "Visitor form states (published)"
+ },
+ "160:8824": {
+  "status": "missing",
+  "note": "Published form posts to dashboard app/api/public/forms/[siteId]/[formBlockId]/route.ts which returns separate HTML pages (:19,:148); no inl…",
+  "archetype": "Visitor form states (published)"
+ },
+ "160:8847": {
+  "status": "missing",
+  "note": "Published form posts to dashboard app/api/public/forms/[siteId]/[formBlockId]/route.ts which returns separate HTML pages (:19,:148); no inl…",
+  "archetype": "Visitor form states (published)"
+ },
+ "160:8870": {
+  "status": "missing",
+  "note": "Published form posts to dashboard app/api/public/forms/[siteId]/[formBlockId]/route.ts which returns separate HTML pages (:19,:148); no inl…",
+  "archetype": "Visitor form states (published)"
+ },
+ "160:8893": {
+  "status": "missing",
+  "note": "Published form posts to dashboard app/api/public/forms/[siteId]/[formBlockId]/route.ts which returns separate HTML pages (:19,:148); no inl…",
+  "archetype": "Visitor form states (published)"
+ },
+ "160:8900": {
+  "status": "missing",
+  "note": "Published form posts to dashboard app/api/public/forms/[siteId]/[formBlockId]/route.ts which returns separate HTML pages (:19,:148); no inl…",
+  "archetype": "Visitor form states (published)"
+ },
+ "160:8922": {
+  "status": "missing",
+  "note": "Published form posts to dashboard app/api/public/forms/[siteId]/[formBlockId]/route.ts which returns separate HTML pages (:19,:148); no inl…",
+  "archetype": "Visitor form states (published)"
+ },
+ "160:8944": {
+  "status": "missing",
+  "note": "Published form posts to dashboard app/api/public/forms/[siteId]/[formBlockId]/route.ts which returns separate HTML pages (:19,:148); no inl…",
+  "archetype": "Visitor form states (published)"
+ },
+ "160:8967": {
+  "status": "missing",
+  "note": "Published form posts to dashboard app/api/public/forms/[siteId]/[formBlockId]/route.ts which returns separate HTML pages (:19,:148); no inl…",
+  "archetype": "Visitor form states (published)"
+ },
+ "160:8990": {
+  "status": "missing",
+  "note": "Published form posts to dashboard app/api/public/forms/[siteId]/[formBlockId]/route.ts which returns separate HTML pages (:19,:148); no inl…",
+  "archetype": "Visitor form states (published)"
+ },
+ "160:9013": {
+  "status": "missing",
+  "note": "Published form posts to dashboard app/api/public/forms/[siteId]/[formBlockId]/route.ts which returns separate HTML pages (:19,:148); no inl…",
+  "archetype": "Visitor form states (published)"
+ },
+ "160:9036": {
+  "status": "missing",
+  "note": "Published form posts to dashboard app/api/public/forms/[siteId]/[formBlockId]/route.ts which returns separate HTML pages (:19,:148); no inl…",
+  "archetype": "Visitor form states (published)"
+ },
+ "160:9047": {
+  "status": "missing",
+  "note": "Published form posts to dashboard app/api/public/forms/[siteId]/[formBlockId]/route.ts which returns separate HTML pages (:19,:148); no inl…",
+  "archetype": "Visitor form states (published)"
+ },
+ "161:8480": {
+  "status": "drift",
+  "note": "\"Edit text on canvas\" exists but in Style type block (config/sectionOrder.ts:17); Tag/ID Semantics, Conditions, Advanced attributes rows mi…",
+  "archetype": "Text content and semantics"
+ },
+ "161:8940": {
+  "status": "drift",
+  "note": "Board Width mode/Height mode rows vs Fixed/Fill/Hug (sections/SizeSection.tsx:165); \"Background\" vs code \"Fill\"; \"2 set\" summaries",
+  "archetype": "Text Style tab"
+ },
+ "161:10007": {
+  "status": "drift",
+  "note": "Board Width mode/Height mode rows vs Fixed/Fill/Hug (sections/SizeSection.tsx:165); \"Background\" vs code \"Fill\"; \"2 set\" summaries",
+  "archetype": "Text Style tab",
+  "inheritsFrom": "161:8940"
+ },
+ "161:9467": {
+  "status": "missing",
+  "note": "No inline \"Enter a non-negative number… Last applied: 24 px\"; draft not retained",
+  "archetype": "Invalid unit draft"
+ },
+ "161:10541": {
+  "status": "missing",
+  "note": "No \"Unapplied font size\" Keep editing / Revert and switch guard",
+  "archetype": "Tab-switch guard"
+ },
+ "161:11006": {
+  "status": "drift",
+  "note": "Generic unit list px % em rem vw vh auto; board property-specific list + conversion note",
+  "archetype": "Unit menu"
+ },
+ "161:11470": {
+  "status": "missing",
+  "note": "No px→rem conversion on unit change",
+  "archetype": "Unit conversion"
+ },
+ "161:12005": {
+  "status": "missing",
+  "note": "calc() not shown as \"Custom value · Preserved as authored\"",
+  "archetype": "Custom expression preserved"
+ },
+ "161:12525": {
+  "status": "drift",
+  "note": "Shadow Outer/Inner rows vs layered list; Filters do not show \"Authored value\" custom compound (effects/FiltersSection.tsx:23)",
+  "archetype": "Effects compound values"
+ },
+ "161:13037": {
+  "status": "missing",
+  "note": "No exact-expression filter editing that keeps sequence",
+  "archetype": "Filter expression edit"
+ },
+ "161:13481": {
+  "status": "missing",
+  "note": "No exact-expression filter editing that keeps sequence",
+  "archetype": "Filter expression edit",
+  "inheritsFrom": "161:13037"
+ },
+ "161:17404": {
+  "status": "drift",
+  "note": "Handoff/acceptance board for I01–I19",
+  "archetype": "Precision handoff note"
+ },
+ "161:13919": {
+  "status": "drift",
+  "note": "Board \"Show on these devices\", data-conditions note, \"Plays on all breakpoints\", \"No interactions yet\"; tab label Behavior vs code \"Behavio…",
+  "archetype": "Visibility + Interactions empty"
+ },
+ "161:15688": {
+  "status": "drift",
+  "note": "Board \"Show on these devices\", data-conditions note, \"Plays on all breakpoints\", \"No interactions yet\"; tab label Behavior vs code \"Behavio…",
+  "archetype": "Visibility + Interactions empty",
+  "inheritsFrom": "161:13919"
+ },
+ "271:130019": {
+  "status": "drift",
+  "note": "Board \"Show on these devices\", data-conditions note, \"Plays on all breakpoints\", \"No interactions yet\"; tab label Behavior vs code \"Behavio…",
+  "archetype": "Visibility + Interactions empty",
+  "inheritsFrom": "161:13919"
+ },
+ "271:130378": {
+  "status": "drift",
+  "note": "Board \"Show on these devices\", data-conditions note, \"Plays on all breakpoints\", \"No interactions yet\"; tab label Behavior vs code \"Behavio…",
+  "archetype": "Visibility + Interactions empty",
+  "inheritsFrom": "161:13919"
+ },
+ "161:14383": {
+  "status": "missing",
+  "note": "No \"Hidden on the live Desktop page… stays visible here\" note",
+  "archetype": "Hidden on live breakpoint note"
+ },
+ "161:14772": {
+  "status": "drift",
+  "note": "Code trigger groups under \"Choose Trigger\"; board presets first, then \"Choose a trigger ›\"",
+  "archetype": "Add interaction presets"
+ },
+ "271:129231": {
+  "status": "drift",
+  "note": "Code trigger groups under \"Choose Trigger\"; board presets first, then \"Choose a trigger ›\"",
+  "archetype": "Add interaction presets",
+  "inheritsFrom": "161:14772"
+ },
+ "161:15179": {
+  "status": "drift",
+  "note": "Board Trigger/Effect/Animate/Repeat/When rows, Play/More…, \"Interaction added · Undo\" toast",
+  "archetype": "Interaction editor"
+ },
+ "271:129605": {
+  "status": "drift",
+  "note": "Board Trigger/Effect/Animate/Repeat/When rows, Play/More…, \"Interaction added · Undo\" toast",
+  "archetype": "Interaction editor",
+  "inheritsFrom": "161:15179"
+ },
+ "161:16082": {
+  "status": "missing",
+  "note": "No Play/Stop canvas preview",
+  "archetype": "Interaction preview playback"
+ },
+ "161:16511": {
+  "status": "missing",
+  "note": "No reduced-motion disclosure",
+  "archetype": "Interaction reduced motion"
+ },
+ "161:16940": {
+  "status": "missing",
+  "note": "No missing-target fallback state",
+  "archetype": "Interaction missing target"
+ },
+ "165:17822": {
+  "status": "drift",
+  "note": "Inline Disable/Delete buttons; board \"Interaction actions\" menu Duplicate/Disable/Delete",
+  "archetype": "Interaction actions menu"
+ },
+ "165:19449": {
+  "status": "drift",
+  "note": "Inline Disable/Delete buttons; board \"Interaction actions\" menu Duplicate/Disable/Delete",
+  "archetype": "Interaction actions menu",
+  "inheritsFrom": "165:17822"
+ },
+ "165:18272": {
+  "status": "drift",
+  "note": "Disable exists; board keeps config visible with disabled marker",
+  "archetype": "Interaction disabled"
+ },
+ "165:18662": {
+  "status": "drift",
+  "note": "Delete exists; no \"Interaction deleted · Undo\" toast",
+  "archetype": "Interaction deleted + Undo"
+ },
+ "165:19056": {
+  "status": "drift",
+  "note": "Delete exists; no \"Interaction deleted · Undo\" toast",
+  "archetype": "Interaction deleted + Undo",
+  "inheritsFrom": "165:18662"
+ },
+ "271:131163": {
+  "status": "drift",
+  "note": "\"Locked — unlock to edit\"/Unlock copy matches; no \"No interaction was added\" note; Selector row is class-first",
+  "archetype": "Add interaction on locked target"
+ },
+ "241:16522": {
+  "status": "drift",
+  "note": "Code \"Component\" section in Style with \"Edit master\"; board block above tabs: library·version, Variant, Edit main component ›, Reset · N ov…",
+  "archetype": "Instance identity block"
+ },
+ "241:17060": {
+  "status": "drift",
+  "note": "Confirm copy \"Overrides on this instance will be discarded.\" vs board consequence list",
+  "archetype": "Reset to main confirm"
+ },
+ "241:17608": {
+  "status": "missing",
+  "note": "No disabled Reset with \"No overrides to reset\"",
+  "archetype": "Reset disabled with reason"
+ },
+ "241:18146": {
+  "status": "missing",
+  "note": "No missing-variant state",
+  "archetype": "Variant unavailable"
+ },
+ "241:18683": {
+  "status": "drift",
+  "note": "Override dot exists; board section count \"2 overrides\", \"Remove Tablet override\", \"Falls back to Desktop\" missing",
+  "archetype": "Instance breakpoint override signals"
+ },
+ "241:19230": {
+  "status": "drift",
+  "note": "Code confirms detach in a dialog; board applies directly with \"detached · Undo\" toast",
+  "archetype": "Detach without dialog"
+ },
+ "241:19772": {
+  "status": "drift",
+  "note": "Handoff board for IC01–IC06",
+  "archetype": "Instance handoff note"
+ },
+ "245:36832": {
+  "status": "missing",
+  "note": "tabs is a plain container (src/shared/constants/elementCapabilities.ts:171); no pair/relationship UI",
+  "archetype": "Tabs pair relationships"
+ },
+ "245:37366": {
+  "status": "missing",
+  "note": "tabs is a plain container (src/shared/constants/elementCapabilities.ts:171); no pair/relationship UI",
+  "archetype": "Tabs pair relationships"
+ },
+ "245:37877": {
+  "status": "missing",
+  "note": "tabs is a plain container (src/shared/constants/elementCapabilities.ts:171); no pair/relationship UI",
+  "archetype": "Tabs pair relationships"
+ },
+ "245:38385": {
+  "status": "missing",
+  "note": "tabs is a plain container (src/shared/constants/elementCapabilities.ts:171); no pair/relationship UI",
+  "archetype": "Tabs pair relationships",
+  "inheritsFrom": "245:36832"
+ },
+ "245:38888": {
+  "status": "missing",
+  "note": "tabs is a plain container (src/shared/constants/elementCapabilities.ts:171); no pair/relationship UI",
+  "archetype": "Tabs pair relationships"
+ },
+ "245:39392": {
+  "status": "missing",
+  "note": "tabs is a plain container (src/shared/constants/elementCapabilities.ts:171); no pair/relationship UI",
+  "archetype": "Tabs pair relationships"
+ },
+ "245:39899": {
+  "status": "missing",
+  "note": "No modal trigger↔dialog link, local insertion or close policy UI",
+  "archetype": "Modal trigger/dialog"
+ },
+ "245:40398": {
+  "status": "missing",
+  "note": "No modal trigger↔dialog link, local insertion or close policy UI",
+  "archetype": "Modal trigger/dialog"
+ },
+ "245:40932": {
+  "status": "missing",
+  "note": "No modal trigger↔dialog link, local insertion or close policy UI",
+  "archetype": "Modal trigger/dialog"
+ },
+ "245:41419": {
+  "status": "missing",
+  "note": "No modal trigger↔dialog link, local insertion or close policy UI",
+  "archetype": "Modal trigger/dialog",
+  "inheritsFrom": "245:39899"
+ },
+ "245:41919": {
+  "status": "missing",
+  "note": "No modal trigger↔dialog link, local insertion or close policy UI",
+  "archetype": "Modal trigger/dialog"
+ },
+ "245:42414": {
+  "status": "missing",
+  "note": "No modal trigger↔dialog link, local insertion or close policy UI",
+  "archetype": "Modal trigger/dialog"
+ },
+ "252:46614": {
+  "status": "missing",
+  "note": "No modal trigger↔dialog link, local insertion or close policy UI",
+  "archetype": "Modal trigger/dialog"
+ },
+ "252:46927": {
+  "status": "missing",
+  "note": "No modal trigger↔dialog link, local insertion or close policy UI",
+  "archetype": "Modal trigger/dialog",
+  "inheritsFrom": "245:39899"
+ },
+ "245:42929": {
+  "status": "missing",
+  "note": "table is a plain container (elementCapabilities.ts:173); no rows/cols/caption/merged-cell UI",
+  "archetype": "Table structure"
+ },
+ "245:43495": {
+  "status": "missing",
+  "note": "table is a plain container (elementCapabilities.ts:173); no rows/cols/caption/merged-cell UI",
+  "archetype": "Table structure",
+  "inheritsFrom": "245:42929"
+ },
+ "245:44049": {
+  "status": "missing",
+  "note": "table is a plain container (elementCapabilities.ts:173); no rows/cols/caption/merged-cell UI",
+  "archetype": "Table structure",
+  "inheritsFrom": "245:42929"
+ },
+ "245:44573": {
+  "status": "missing",
+  "note": "table is a plain container (elementCapabilities.ts:173); no rows/cols/caption/merged-cell UI",
+  "archetype": "Table structure"
+ },
+ "247:21216": {
+  "status": "drift",
+  "note": "Board \"Children layout\"/\"Placement\"/\"Advanced layout\" groups, Row/Column gap, Align lines; code one \"Layout\" section",
+  "archetype": "Children layout + placement"
+ },
+ "247:21762": {
+  "status": "drift",
+  "note": "Code Columns count only; board tracks + item placement",
+  "archetype": "Grid tracks + item placement"
+ },
+ "247:22310": {
+  "status": "drift",
+  "note": "Overflow/Box sizing exist; Float/Clear and grouped Size constraints differ",
+  "archetype": "Advanced layout + size constraints"
+ },
+ "247:22853": {
+  "status": "drift",
+  "note": "Grow/shrink exist; board \"Flex item\" group + spacing-token picker differ (SizeSection.tsx:95)",
+  "archetype": "Spacing tokens + flex item"
+ },
+ "247:23404": {
+  "status": "drift",
+  "note": "Rows exist; board grouping/labels differ (\"Text inside\" registry/text.tsx:120)",
+  "archetype": "Full typography + text inside"
+ },
+ "247:23966": {
+  "status": "drift",
+  "note": "Two-stop Color 1/2 only; no 3-stop \"Custom gradient\" preservation; image options exist (:346)",
+  "archetype": "Gradient preservation + image fill"
+ },
+ "247:24493": {
+  "status": "drift",
+  "note": "Per-side borders/corners/outline grouping differs from board",
+  "archetype": "Borders, corners, outline"
+ },
+ "247:25026": {
+  "status": "drift",
+  "note": "Transform/Transition rows exist; multi-layer authored shadow not preserved (ShadowSection.tsx:46)",
+  "archetype": "Shadow/transform/transition lossless"
+ },
+ "247:25554": {
+  "status": "drift",
+  "note": "Cursor/Blend/Text shadow rows; board shows authored values read-only/editable",
+  "archetype": "Advanced effects authored values"
+ },
+ "247:26063": {
+  "status": "drift",
+  "note": "Animation row exists; no legacy-trigger note or property-conflict warning",
+  "archetype": "Legacy CSS animation conflicts"
+ },
+ "247:26594": {
+  "status": "drift",
+  "note": "Attributes in Behaviour tab; board Content › Semantics + \"Custom attributes\", data-bk-id protected note",
+  "archetype": "Native attributes + protected keys"
+ },
+ "247:27113": {
+  "status": "missing",
+  "note": "No \"Change semantic tag\" impact review / one-Undo conversion",
+  "archetype": "Semantic tag conversion"
+ },
+ "247:27602": {
+  "status": "missing",
+  "note": "No \"Change semantic tag\" impact review / one-Undo conversion",
+  "archetype": "Semantic tag conversion"
+ },
+ "247:28097": {
+  "status": "drift",
+  "note": "Mixed detection exists; no \"2 of 3 eligible\", locked exclusion, per-target Inspect rows",
+  "archetype": "Batch eligibility + mixed"
+ },
+ "247:28584": {
+  "status": "missing",
+  "note": "Progress Value/Maximum single-target only (sections/typeBlock/bodies/widgetBodies.tsx:176)",
+  "archetype": "Batch progress maximum rejection"
+ },
+ "247:29083": {
+  "status": "missing",
+  "note": "No per-target maxima batch write/Undo result",
+  "archetype": "Batch progress independent maxima"
+ },
+ "251:77000": {
+  "status": "missing",
+  "note": "No per-target maxima batch write/Undo result",
+  "archetype": "Batch progress independent maxima",
+  "inheritsFrom": "247:29083"
+ },
+ "247:29578": {
+  "status": "missing",
+  "note": "No zero-property no-op disclosure",
+  "archetype": "Batch geometry eligibility"
+ },
+ "247:30075": {
+  "status": "missing",
+  "note": "No multi-source token disclosure for mixed selection",
+  "archetype": "Same value, different sources"
+ },
+ "247:30567": {
+  "status": "drift",
+  "note": "Board \"Inter · System\" source label + \"Applied stack\"; code family name only",
+  "archetype": "Font picker source-aware"
+ },
+ "251:76737": {
+  "status": "drift",
+  "note": "Board \"Inter · System\" source label + \"Applied stack\"; code family name only",
+  "archetype": "Font picker source-aware",
+  "inheritsFrom": "247:30567"
+ },
+ "247:31047": {
+  "status": "drift",
+  "note": "\"Manage site fonts\" foot exists; board returns to exact Inspector origin",
+  "archetype": "Manage site fonts"
+ },
+ "251:76342": {
+  "status": "drift",
+  "note": "\"Manage site fonts\" foot exists; board returns to exact Inspector origin",
+  "archetype": "Manage site fonts",
+  "inheritsFrom": "247:31047"
+ },
+ "247:31533": {
+  "status": "drift",
+  "note": "openSiteFonts routes out; board inline availability panel \"Added to site · Ready to use\"",
+  "archetype": "Site fonts availability-only"
+ },
+ "247:32025": {
+  "status": "missing",
+  "note": "No explicit \"Use\" step after returning from site fonts",
+  "archetype": "Returned family needs explicit Use"
+ },
+ "247:32505": {
+  "status": "missing",
+  "note": "No \"Font unavailable — fallback rendering\" + Retry",
+  "archetype": "Font load failed"
+ },
+ "247:32989": {
+  "status": "missing",
+  "note": "No \"Selection changed\" refusal",
+  "archetype": "Stale picker target"
+ },
+ "252:46432": {
+  "status": "drift",
+  "note": "Assets › Fonts pinned origin row lives in Assets (L-C)",
+  "archetype": "Assets Fonts origin pin"
+ },
+ "249:71560": {
+  "status": "drift",
+  "note": "Per-type bodies exist in Style type block; board homes them under Content (Tag, Children, Source, Alt…)",
+  "archetype": "Per-block control references"
+ },
+ "249:71797": {
+  "status": "drift",
+  "note": "Per-type bodies exist in Style type block; board homes them under Content (Tag, Children, Source, Alt…)",
+  "archetype": "Per-block control references"
+ },
+ "249:72047": {
+  "status": "drift",
+  "note": "Per-type bodies exist in Style type block; board homes them under Content (Tag, Children, Source, Alt…)",
+  "archetype": "Per-block control references"
+ },
+ "249:72335": {
+  "status": "drift",
+  "note": "Per-type bodies exist in Style type block; board homes them under Content (Tag, Children, Source, Alt…)",
+  "archetype": "Per-block control references"
+ },
+ "249:72598": {
+  "status": "drift",
+  "note": "Per-type bodies exist in Style type block; board homes them under Content (Tag, Children, Source, Alt…)",
+  "archetype": "Per-block control references"
+ },
+ "249:72907": {
+  "status": "drift",
+  "note": "Per-type bodies exist in Style type block; board homes them under Content (Tag, Children, Source, Alt…)",
+  "archetype": "Per-block control references"
+ },
+ "249:73201": {
+  "status": "drift",
+  "note": "Per-type bodies exist in Style type block; board homes them under Content (Tag, Children, Source, Alt…)",
+  "archetype": "Per-block control references"
+ },
+ "249:73469": {
+  "status": "drift",
+  "note": "Per-type bodies exist in Style type block; board homes them under Content (Tag, Children, Source, Alt…)",
+  "archetype": "Per-block control references"
+ },
+ "249:73725": {
+  "status": "drift",
+  "note": "Per-type bodies exist in Style type block; board homes them under Content (Tag, Children, Source, Alt…)",
+  "archetype": "Per-block control references"
+ },
+ "249:73974": {
+  "status": "drift",
+  "note": "Per-type bodies exist in Style type block; board homes them under Content (Tag, Children, Source, Alt…)",
+  "archetype": "Per-block control references"
+ },
+ "249:74252": {
+  "status": "drift",
+  "note": "Switch/Toggle bodies exist; Tabs/Modal/Dialog/Table relationship controls missing",
+  "archetype": "Stack/Tabs/Modal/Table/Product Card refs"
+ },
+ "249:74541": {
+  "status": "missing",
+  "note": "product types have no type body (src/shared/constants/elementCapabilities.ts:21)",
+  "archetype": "Ecommerce block refs"
+ },
+ "249:74672": {
+  "status": "missing",
+  "note": "No native-tag (time/abbr/wbr…) Tag control or attribute routes",
+  "archetype": "Native semantics support routes"
+ },
+ "249:74769": {
+  "status": "missing",
+  "note": "No native-tag (time/abbr/wbr…) Tag control or attribute routes",
+  "archetype": "Native semantics support routes"
+ },
+ "249:74874": {
+  "status": "missing",
+  "note": "No native-tag (time/abbr/wbr…) Tag control or attribute routes",
+  "archetype": "Native semantics support routes"
+ },
+ "249:74983": {
+  "status": "missing",
+  "note": "No native-tag (time/abbr/wbr…) Tag control or attribute routes",
+  "archetype": "Native semantics support routes"
+ },
+ "255:82447": {
+  "status": "drift",
+  "note": "Board tabs + \"Loading project · Your saved content is still arriving…\"; code skeleton only when nothing selected",
+  "archetype": "Project loading"
+ },
+ "255:82909": {
+  "status": "drift",
+  "note": "phase1 — load-failed chrome (Task 1.6)",
+  "archetype": "Project load failure"
+ },
+ "255:83370": {
+  "status": "drift",
+  "note": "\"Inspector Error\" vs \"Unable to display Inspector · … still selected\" + Try again",
+  "archetype": "Inspector error boundary"
+ },
+ "255:83852": {
+  "status": "drift",
+  "note": "Recovery must return original target + Style; boundary resets but tab/target not asserted",
+  "archetype": "Inspector recovered"
+ },
+ "255:84358": {
+  "status": "missing",
+  "note": "One boundary for the whole tab (ProInspector.tsx:389); no per-section \"Retry Typography\"",
+  "archetype": "Section render failure"
+ },
+ "255:84855": {
+  "status": "drift",
+  "note": "\"Editing Desktop · Page appearance\" context; \"SEO & social\" vs \"SEO and social\"; ✦ AI on page header to remove (:236)",
+  "archetype": "Page appearance"
+ },
+ "255:85352": {
+  "status": "drift",
+  "note": "\"Template applied!\" vs \"Template applied · The Studio template was applied to Home\" + Dismiss notice",
+  "archetype": "Template applied notice"
+ },
+ "255:85835": {
+  "status": "drift",
+  "note": "Board groups Clipboard/Structure/State + Bind to CMS, Show in Layers, Add interaction; Selector row is class-first",
+  "archetype": "Element menu"
+ },
+ "255:86352": {
+  "status": "drift",
+  "note": "Board \"Hero heading deleted · Undo\" on Page panel",
+  "archetype": "Element deletion Undo"
+ },
+ "255:86840": {
+  "status": "drift",
+  "note": "Board selects the new copy explicitly with receipt",
+  "archetype": "Element duplicate selection"
+ },
+ "255:87335": {
+  "status": "drift",
+  "note": "Fixed categories in code; board choose Typography/Spacing/Fill/Border, locked-skipped count",
+  "archetype": "Apply style categories"
+ },
+ "255:87841": {
+  "status": "drift",
+  "note": "Fixed categories in code; board choose Typography/Spacing/Fill/Border, locked-skipped count",
+  "archetype": "Apply style categories",
+  "inheritsFrom": "255:87335"
+ },
+ "255:88341": {
+  "status": "drift",
+  "note": "Reset is a link; board lists the exact Hover properties before removal",
+  "archetype": "Remove state-layer overrides"
+ },
+ "255:88837": {
+  "status": "drift",
+  "note": "Reset is a link; board lists the exact Hover properties before removal",
+  "archetype": "Remove state-layer overrides",
+  "inheritsFrom": "255:88341"
+ },
+ "255:89334": {
+  "status": "drift",
+  "note": "Revert is a link; board lists properties + Desktop fallback values",
+  "archetype": "Remove breakpoint-layer overrides"
+ },
+ "255:89827": {
+  "status": "drift",
+  "note": "Revert is a link; board lists properties + Desktop fallback values",
+  "archetype": "Remove breakpoint-layer overrides",
+  "inheritsFrom": "255:89334"
+ },
+ "255:90324": {
+  "status": "drift",
+  "note": "⌘K global rows \"label · path\"; board Inspector-scoped \"Properties · Hero heading\" search",
+  "archetype": "Jump to property"
+ },
+ "255:90822": {
+  "status": "drift",
+  "note": "⌘K global rows \"label · path\"; board Inspector-scoped \"Properties · Hero heading\" search",
+  "archetype": "Jump to property",
+  "inheritsFrom": "255:90324"
+ },
+ "255:91321": {
+  "status": "missing",
+  "note": "No category selection, so no zero-category no-history case",
+  "archetype": "Apply style none selected"
+ },
+ "255:91826": {
+  "status": "drift",
+  "note": "Resets without confirm (\"Styles reset · Undo\"); board names layer + properties",
+  "archetype": "Reset style named layer"
+ },
+ "255:92313": {
+  "status": "drift",
+  "note": "Resets without confirm (\"Styles reset · Undo\"); board names layer + properties",
+  "archetype": "Reset style named layer",
+  "inheritsFrom": "255:91826"
+ },
+ "255:92819": {
+  "status": "drift",
+  "note": "Board header \"Read only · … is locked\" + \"Editing unavailable\" card; code status line",
+  "archetype": "Locked element read-only"
+ },
+ "258:31477": {
+  "status": "drift",
+  "note": "Collection/Field/Record selects in Behaviour; board \"Bind Title text\" source picker (This page’s record/Specific/List item)",
+  "archetype": "Bind text to CMS"
+ },
+ "258:31982": {
+  "status": "drift",
+  "note": "Collection/Field/Record selects in Behaviour; board \"Bind Title text\" source picker (This page’s record/Specific/List item)",
+  "archetype": "Bind text to CMS",
+  "inheritsFrom": "258:31477"
+ },
+ "258:32482": {
+  "status": "drift",
+  "note": "\"Bound to …\" mark; board Content \"Dynamic bindings\" row",
+  "archetype": "Bound text"
+ },
+ "258:32981": {
+  "status": "drift",
+  "note": "Unbind exists; board return path + Undo toast",
+  "archetype": "Unbind + exact return"
+ },
+ "258:33493": {
+  "status": "drift",
+  "note": "Unbind exists; board return path + Undo toast",
+  "archetype": "Unbind + exact return",
+  "inheritsFrom": "258:32981"
+ },
+ "258:35802": {
+  "status": "drift",
+  "note": "Enter/Escape exist inline; board confirm card noting DOM ID/tag unchanged",
+  "archetype": "Rename display name"
+ },
+ "258:36291": {
+  "status": "drift",
+  "note": "Enter/Escape exist inline; board confirm card noting DOM ID/tag unchanged",
+  "archetype": "Rename display name",
+  "inheritsFrom": "258:35802"
+ },
+ "258:36770": {
+  "status": "drift",
+  "note": "Shell chrome; \"Show inspector\" vs board \"Show Inspector\"",
+  "archetype": "Inspector hidden"
+ },
+ "258:37248": {
+  "status": "drift",
+  "note": "phase1 — Inspector header breadcrumb (Task 1.4)",
+  "archetype": "Ancestor overflow breadcrumb"
+ },
+ "258:37744": {
+  "status": "drift",
+  "note": "Per-element restore exists; board per element+tab",
+  "archetype": "Scroll restoration"
+ },
+ "258:38255": {
+  "status": "drift",
+  "note": "URL rows exist; no retained invalid draft + \"Restore last valid URL\"",
+  "archetype": "Video embed invalid draft"
+ },
+ "258:38731": {
+  "status": "missing",
+  "note": "No SVG→image replacement with content-loss confirm",
+  "archetype": "Inline SVG replacement"
+ },
+ "258:39198": {
+  "status": "missing",
+  "note": "No SVG→image replacement with content-loss confirm",
+  "archetype": "Inline SVG replacement"
+ },
+ "258:39679": {
+  "status": "drift",
+  "note": "\"Source missing — …\" mark; board card with Choose another/Keep/Unbind",
+  "archetype": "Binding source deleted"
+ },
+ "255:93321": {
+  "status": "drift",
+  "note": "Board Content › \"Dynamic bindings\" with \"‹ CMS · Dynamic pages\" return; code Behaviour \"CMS binding\"",
+  "archetype": "Property binding owner"
+ },
+ "255:93677": {
+  "status": "drift",
+  "note": "Board Content › \"Dynamic bindings\" with \"‹ CMS · Dynamic pages\" return; code Behaviour \"CMS binding\"",
+  "archetype": "Property binding owner",
+  "inheritsFrom": "255:93321"
+ },
+ "255:94031": {
+  "status": "missing",
+  "note": "No searchable \"Choose source\" picker",
+  "archetype": "Bind source picker"
+ },
+ "255:94411": {
+  "status": "missing",
+  "note": "No element Conditions (show/hide by record field) in Inspector",
+  "archetype": "Content Conditions"
+ },
+ "255:94775": {
+  "status": "missing",
+  "note": "No element Conditions (show/hide by record field) in Inspector",
+  "archetype": "Content Conditions"
+ },
+ "255:95134": {
+  "status": "missing",
+  "note": "No element Conditions (show/hide by record field) in Inspector",
+  "archetype": "Content Conditions"
+ },
+ "258:33994": {
+  "status": "missing",
+  "note": "No element Conditions (show/hide by record field) in Inspector",
+  "archetype": "Content Conditions"
+ },
+ "258:34343": {
+  "status": "missing",
+  "note": "No element Conditions (show/hide by record field) in Inspector",
+  "archetype": "Content Conditions"
+ },
+ "258:34707": {
+  "status": "missing",
+  "note": "No element Conditions (show/hide by record field) in Inspector",
+  "archetype": "Content Conditions"
+ },
+ "258:35104": {
+  "status": "missing",
+  "note": "No element Conditions (show/hide by record field) in Inspector",
+  "archetype": "Content Conditions"
+ },
+ "258:35441": {
+  "status": "drift",
+  "note": "unbindAll keeps text; board retained static value + Undo",
+  "archetype": "Template binding removed"
+ },
+ "271:124080": {
+  "status": "drift",
+  "note": "No \"2 styles copied · This element only · Desktop / Default\" receipt; Selector row blocked:owner-class-first",
+  "archetype": "Copy/paste style"
+ },
+ "271:124383": {
+  "status": "drift",
+  "note": "No \"2 styles copied · This element only · Desktop / Default\" receipt; Selector row blocked:owner-class-first",
+  "archetype": "Copy/paste style",
+  "inheritsFrom": "271:124080"
+ },
+ "271:124689": {
+  "status": "drift",
+  "note": "Disabled reason \"Copy a style first\" matches; menu grouping differs (S08)",
+  "archetype": "Paste style empty clipboard"
+ },
+ "271:124992": {
+  "status": "drift",
+  "note": "No locked-before-command refusal note",
+  "archetype": "Paste style locked target"
+ },
+ "271:125321": {
+  "status": "drift",
+  "note": "Save as component… opens existing dialog; no \"Where it can be used\" Library/This page scope, pending/failure states",
+  "archetype": "Create component scope"
+ },
+ "271:125668": {
+  "status": "drift",
+  "note": "Save as component… opens existing dialog; no \"Where it can be used\" Library/This page scope, pending/failure states",
+  "archetype": "Create component scope",
+  "inheritsFrom": "271:125321"
+ },
+ "271:126015": {
+  "status": "drift",
+  "note": "Save as component… opens existing dialog; no \"Where it can be used\" Library/This page scope, pending/failure states",
+  "archetype": "Create component scope"
+ },
+ "271:126365": {
+  "status": "drift",
+  "note": "Save as component… opens existing dialog; no \"Where it can be used\" Library/This page scope, pending/failure states",
+  "archetype": "Create component scope"
+ },
+ "271:126712": {
+  "status": "drift",
+  "note": "Save as component… opens existing dialog; no \"Where it can be used\" Library/This page scope, pending/failure states",
+  "archetype": "Create component scope"
+ },
+ "271:127059": {
+  "status": "drift",
+  "note": "Save as component… opens existing dialog; no \"Where it can be used\" Library/This page scope, pending/failure states",
+  "archetype": "Create component scope"
+ },
+ "271:127407": {
+  "status": "drift",
+  "note": "Save as component… opens existing dialog; no \"Where it can be used\" Library/This page scope, pending/failure states",
+  "archetype": "Create component scope"
+ },
+ "271:127754": {
+  "status": "drift",
+  "note": "Save as component… opens existing dialog; no \"Where it can be used\" Library/This page scope, pending/failure states",
+  "archetype": "Create component scope"
+ },
+ "271:128109": {
+  "status": "drift",
+  "note": "Save as component… opens existing dialog; no \"Where it can be used\" Library/This page scope, pending/failure states",
+  "archetype": "Create component scope",
+  "inheritsFrom": "271:125321"
+ },
+ "271:128338": {
+  "status": "drift",
+  "note": "Save as component… opens existing dialog; no \"Where it can be used\" Library/This page scope, pending/failure states",
+  "archetype": "Create component scope",
+  "inheritsFrom": "271:125321"
+ },
+ "271:128567": {
+  "status": "drift",
+  "note": "Save as component… opens existing dialog; no \"Where it can be used\" Library/This page scope, pending/failure states",
+  "archetype": "Create component scope",
+  "inheritsFrom": "271:125321"
+ },
+ "271:128896": {
+  "status": "drift",
+  "note": "Save as component… opens existing dialog; no \"Where it can be used\" Library/This page scope, pending/failure states",
+  "archetype": "Create component scope",
+  "inheritsFrom": "271:125321"
+ },
+ "271:131476": {
+  "status": "drift",
+  "note": "REVIEW ONLY board for S08/G01–G22",
+  "archetype": "Menu action review note"
+ },
+ "273:252986": {
+  "status": "blocked:owner-class-first",
+  "note": "Class-scoped copy/paste; class-first flow decisions pending",
+  "archetype": "Class copy/paste"
+ },
+ "273:253283": {
+  "status": "blocked:owner-class-first",
+  "note": "Class-scoped copy/paste; class-first flow decisions pending",
+  "archetype": "Class copy/paste"
+ },
+ "273:253576": {
+  "status": "blocked:owner-class-first",
+  "note": "Class-scoped copy/paste; class-first flow decisions pending",
+  "archetype": "Class copy/paste"
+ },
+ "273:253882": {
+  "status": "blocked:owner-class-first",
+  "note": "Class-scoped copy/paste; class-first flow decisions pending",
+  "archetype": "Class copy/paste"
+ },
+ "415:50289": {
+  "status": "blocked:owner-class-first",
+  "note": "CF0–CF34; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Class styling core (selectors, combos, scope, conflicts)"
+ },
+ "415:50616": {
+  "status": "blocked:owner-class-first",
+  "note": "CF0–CF34; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Class styling core (selectors, combos, scope, conflicts)"
+ },
+ "415:50937": {
+  "status": "blocked:owner-class-first",
+  "note": "CF0–CF34; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Class styling core (selectors, combos, scope, conflicts)"
+ },
+ "415:51278": {
+  "status": "blocked:owner-class-first",
+  "note": "CF0–CF34; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Class styling core (selectors, combos, scope, conflicts)"
+ },
+ "415:51609": {
+  "status": "blocked:owner-class-first",
+  "note": "CF0–CF34; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Class styling core (selectors, combos, scope, conflicts)"
+ },
+ "415:51938": {
+  "status": "blocked:owner-class-first",
+  "note": "CF0–CF34; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Class styling core (selectors, combos, scope, conflicts)"
+ },
+ "415:52267": {
+  "status": "blocked:owner-class-first",
+  "note": "CF0–CF34; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Class styling core (selectors, combos, scope, conflicts)"
+ },
+ "415:52582": {
+  "status": "blocked:owner-class-first",
+  "note": "CF0–CF34; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Class styling core (selectors, combos, scope, conflicts)"
+ },
+ "415:52899": {
+  "status": "blocked:owner-class-first",
+  "note": "CF0–CF34; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Class styling core (selectors, combos, scope, conflicts)"
+ },
+ "415:53226": {
+  "status": "blocked:owner-class-first",
+  "note": "CF0–CF34; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Class styling core (selectors, combos, scope, conflicts)"
+ },
+ "415:53556": {
+  "status": "blocked:owner-class-first",
+  "note": "CF0–CF34; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Class styling core (selectors, combos, scope, conflicts)"
+ },
+ "415:53883": {
+  "status": "blocked:owner-class-first",
+  "note": "CF0–CF34; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Class styling core (selectors, combos, scope, conflicts)"
+ },
+ "415:54221": {
+  "status": "blocked:owner-class-first",
+  "note": "CF0–CF34; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Class styling core (selectors, combos, scope, conflicts)"
+ },
+ "415:54548": {
+  "status": "blocked:owner-class-first",
+  "note": "CF0–CF34; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Class styling core (selectors, combos, scope, conflicts)"
+ },
+ "415:54889": {
+  "status": "blocked:owner-class-first",
+  "note": "CF0–CF34; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Class styling core (selectors, combos, scope, conflicts)"
+ },
+ "415:55220": {
+  "status": "blocked:owner-class-first",
+  "note": "CF0–CF34; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Class styling core (selectors, combos, scope, conflicts)"
+ },
+ "415:55532": {
+  "status": "blocked:owner-class-first",
+  "note": "CF0–CF34; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Class styling core (selectors, combos, scope, conflicts)"
+ },
+ "415:55850": {
+  "status": "blocked:owner-class-first",
+  "note": "CF0–CF34; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Class styling core (selectors, combos, scope, conflicts)"
+ },
+ "415:56160": {
+  "status": "blocked:owner-class-first",
+  "note": "CF0–CF34; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Class styling core (selectors, combos, scope, conflicts)"
+ },
+ "415:56487": {
+  "status": "blocked:owner-class-first",
+  "note": "CF0–CF34; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Class styling core (selectors, combos, scope, conflicts)"
+ },
+ "415:56814": {
+  "status": "blocked:owner-class-first",
+  "note": "CF0–CF34; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Class styling core (selectors, combos, scope, conflicts)"
+ },
+ "415:57134": {
+  "status": "blocked:owner-class-first",
+  "note": "CF0–CF34; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Class styling core (selectors, combos, scope, conflicts)"
+ },
+ "415:57464": {
+  "status": "blocked:owner-class-first",
+  "note": "CF0–CF34; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Class styling core (selectors, combos, scope, conflicts)"
+ },
+ "415:57794": {
+  "status": "blocked:owner-class-first",
+  "note": "CF0–CF34; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Class styling core (selectors, combos, scope, conflicts)"
+ },
+ "415:58112": {
+  "status": "blocked:owner-class-first",
+  "note": "CF0–CF34; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Class styling core (selectors, combos, scope, conflicts)"
+ },
+ "415:58442": {
+  "status": "blocked:owner-class-first",
+  "note": "CF0–CF34; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Class styling core (selectors, combos, scope, conflicts)"
+ },
+ "415:58760": {
+  "status": "blocked:owner-class-first",
+  "note": "CF0–CF34; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Class styling core (selectors, combos, scope, conflicts)"
+ },
+ "415:59090": {
+  "status": "blocked:owner-class-first",
+  "note": "CF0–CF34; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Class styling core (selectors, combos, scope, conflicts)"
+ },
+ "415:59408": {
+  "status": "blocked:owner-class-first",
+  "note": "CF0–CF34; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Class styling core (selectors, combos, scope, conflicts)"
+ },
+ "415:59738": {
+  "status": "blocked:owner-class-first",
+  "note": "CF0–CF34; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Class styling core (selectors, combos, scope, conflicts)"
+ },
+ "415:60080": {
+  "status": "blocked:owner-class-first",
+  "note": "CF0–CF34; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Class styling core (selectors, combos, scope, conflicts)"
+ },
+ "415:60422": {
+  "status": "blocked:owner-class-first",
+  "note": "CF0–CF34; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Class styling core (selectors, combos, scope, conflicts)"
+ },
+ "415:60751": {
+  "status": "blocked:owner-class-first",
+  "note": "CF0–CF34; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Class styling core (selectors, combos, scope, conflicts)"
+ },
+ "415:61091": {
+  "status": "blocked:owner-class-first",
+  "note": "CF0–CF34; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Class styling core (selectors, combos, scope, conflicts)"
+ },
+ "415:61494": {
+  "status": "blocked:owner-class-first",
+  "note": "CF0–CF34; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Class styling core (selectors, combos, scope, conflicts)"
+ },
+ "419:51523": {
+  "status": "blocked:owner-class-first",
+  "note": "CF35–CF41; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Brand Classes manager"
+ },
+ "419:51881": {
+  "status": "blocked:owner-class-first",
+  "note": "CF35–CF41; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Brand Classes manager"
+ },
+ "419:52239": {
+  "status": "blocked:owner-class-first",
+  "note": "CF35–CF41; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Brand Classes manager"
+ },
+ "419:52564": {
+  "status": "blocked:owner-class-first",
+  "note": "CF35–CF41; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Brand Classes manager"
+ },
+ "419:52888": {
+  "status": "blocked:owner-class-first",
+  "note": "CF35–CF41; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Brand Classes manager"
+ },
+ "419:53259": {
+  "status": "blocked:owner-class-first",
+  "note": "CF35–CF41; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Brand Classes manager"
+ },
+ "419:53619": {
+  "status": "blocked:owner-class-first",
+  "note": "CF35–CF41; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Brand Classes manager"
+ },
+ "419:53909": {
+  "status": "blocked:owner-class-first",
+  "note": "CF42–CF48; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Class-mode conversion + history"
+ },
+ "419:54241": {
+  "status": "blocked:owner-class-first",
+  "note": "CF42–CF48; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Class-mode conversion + history"
+ },
+ "419:54542": {
+  "status": "blocked:owner-class-first",
+  "note": "CF42–CF48; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Class-mode conversion + history"
+ },
+ "419:54873": {
+  "status": "blocked:owner-class-first",
+  "note": "CF42–CF48; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Class-mode conversion + history"
+ },
+ "419:55203": {
+  "status": "blocked:owner-class-first",
+  "note": "CF42–CF48; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Class-mode conversion + history"
+ },
+ "419:55514": {
+  "status": "blocked:owner-class-first",
+  "note": "CF42–CF48; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Class-mode conversion + history"
+ },
+ "419:55816": {
+  "status": "blocked:owner-class-first",
+  "note": "CF42–CF48; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Class-mode conversion + history"
+ },
+ "419:56147": {
+  "status": "blocked:owner-class-first",
+  "note": "CF49–CF69; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Push/restore/conflict recovery"
+ },
+ "419:56435": {
+  "status": "blocked:owner-class-first",
+  "note": "CF49–CF69; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Push/restore/conflict recovery"
+ },
+ "419:56721": {
+  "status": "blocked:owner-class-first",
+  "note": "CF49–CF69; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Push/restore/conflict recovery"
+ },
+ "419:57052": {
+  "status": "blocked:owner-class-first",
+  "note": "CF49–CF69; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Push/restore/conflict recovery"
+ },
+ "421:47803": {
+  "status": "blocked:owner-class-first",
+  "note": "CF49–CF69; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Push/restore/conflict recovery"
+ },
+ "421:48122": {
+  "status": "blocked:owner-class-first",
+  "note": "CF49–CF69; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Push/restore/conflict recovery"
+ },
+ "421:48406": {
+  "status": "blocked:owner-class-first",
+  "note": "CF49–CF69; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Push/restore/conflict recovery"
+ },
+ "421:48706": {
+  "status": "blocked:owner-class-first",
+  "note": "CF49–CF69; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Push/restore/conflict recovery"
+ },
+ "421:49016": {
+  "status": "blocked:owner-class-first",
+  "note": "CF49–CF69; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Push/restore/conflict recovery"
+ },
+ "421:49325": {
+  "status": "blocked:owner-class-first",
+  "note": "CF49–CF69; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Push/restore/conflict recovery"
+ },
+ "421:49634": {
+  "status": "blocked:owner-class-first",
+  "note": "CF49–CF69; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Push/restore/conflict recovery"
+ },
+ "421:49952": {
+  "status": "blocked:owner-class-first",
+  "note": "CF49–CF69; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Push/restore/conflict recovery"
+ },
+ "421:50233": {
+  "status": "blocked:owner-class-first",
+  "note": "CF49–CF69; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Push/restore/conflict recovery"
+ },
+ "421:50544": {
+  "status": "blocked:owner-class-first",
+  "note": "CF49–CF69; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Push/restore/conflict recovery"
+ },
+ "421:50695": {
+  "status": "blocked:owner-class-first",
+  "note": "CF49–CF69; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Push/restore/conflict recovery"
+ },
+ "421:51002": {
+  "status": "blocked:owner-class-first",
+  "note": "CF49–CF69; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Push/restore/conflict recovery"
+ },
+ "421:51306": {
+  "status": "blocked:owner-class-first",
+  "note": "CF49–CF69; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Push/restore/conflict recovery"
+ },
+ "421:51618": {
+  "status": "blocked:owner-class-first",
+  "note": "CF49–CF69; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Push/restore/conflict recovery"
+ },
+ "421:51921": {
+  "status": "blocked:owner-class-first",
+  "note": "CF49–CF69; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Push/restore/conflict recovery"
+ },
+ "421:52209": {
+  "status": "blocked:owner-class-first",
+  "note": "CF49–CF69; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Push/restore/conflict recovery"
+ },
+ "421:52495": {
+  "status": "blocked:owner-class-first",
+  "note": "CF49–CF69; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Push/restore/conflict recovery"
+ },
+ "422:50614": {
+  "status": "blocked:owner-class-first",
+  "note": "CF70–CF77; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Class manager viewports"
+ },
+ "422:50915": {
+  "status": "blocked:owner-class-first",
+  "note": "CF70–CF77; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Class manager viewports"
+ },
+ "433:50940": {
+  "status": "blocked:owner-class-first",
+  "note": "CF70–CF77; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Class manager viewports"
+ },
+ "433:51230": {
+  "status": "blocked:owner-class-first",
+  "note": "CF70–CF77; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Class manager viewports"
+ },
+ "433:51611": {
+  "status": "blocked:owner-class-first",
+  "note": "CF70–CF77; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Class manager viewports"
+ },
+ "439:51387": {
+  "status": "blocked:owner-class-first",
+  "note": "CF70–CF77; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Class manager viewports"
+ },
+ "439:51578": {
+  "status": "blocked:owner-class-first",
+  "note": "CF70–CF77; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Class manager viewports"
+ },
+ "439:51767": {
+  "status": "blocked:owner-class-first",
+  "note": "CF70–CF77; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Class manager viewports"
+ },
+ "462:51685": {
+  "status": "blocked:owner-class-first",
+  "note": "CF78–CF81; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Component push with classes"
+ },
+ "462:51821": {
+  "status": "blocked:owner-class-first",
+  "note": "CF78–CF81; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Component push with classes"
+ },
+ "462:52099": {
+  "status": "blocked:owner-class-first",
+  "note": "CF78–CF81; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Component push with classes"
+ },
+ "462:52381": {
+  "status": "blocked:owner-class-first",
+  "note": "CF78–CF81; class-first styling flow decisions pending (CLASS-FIRST-SPEC.md)",
+  "archetype": "Component push with classes"
+ }
+}

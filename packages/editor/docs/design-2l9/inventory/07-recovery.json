@@ -1,0 +1,473 @@
+{
+ "10:2": {
+  "status": "missing",
+  "note": "Add panel has no target card; useBlockInsertion.ts:81-92 walks up / lock gate refuses silently. Needs \"Hero is locked\"+Unlock",
+  "archetype": "C · Insertion target locked"
+ },
+ "10:370": {
+  "status": "missing",
+  "note": "No \"Target no longer exists / Select target\" state; insertion falls back to page root (useBlockInsertion.ts:81-83)",
+  "archetype": "C · Insertion target stale"
+ },
+ "10:3787": {
+  "status": "missing",
+  "note": "No \"Insert into Hero · At end\" header or \"Text added to Hero\" receipt; no collapsed-Inspector mode at 1280",
+  "archetype": "C · Narrow insertion, Inspector closed"
+ },
+ "10:1190": {
+  "status": "drift",
+  "note": "InspectorHeader.tsx:78 \"2 selected · Elements\" vs \"2 elements\"; no canvas bar Duplicate/Delete/Group/More; MultiSelectBar rows not on board",
+  "archetype": "C · Mixed multi-selection"
+ },
+ "10:1626": {
+  "status": "match",
+  "note": "phase1 bottom bar: SaveStatus.tsx:58 \"Saving…\" matches",
+  "archetype": "C · Save pending"
+ },
+ "10:2199": {
+  "status": "drift",
+  "note": "phase1: SaveStatus.tsx:67 \"Save failed — retry\" vs \"Couldn't save — Retry\"; SaveFailedBanner.tsx:74-77 card copy differs from strip",
+  "archetype": "C · Save failed, edits retained"
+ },
+ "10:2647": {
+  "status": "missing",
+  "note": "No hide-all-panels mode or \"Show panels\" control anywhere in shell",
+  "archetype": "C · Focus mode"
+ },
+ "10:2795": {
+  "status": "match",
+  "note": "useStudioState.ts:190-211 persists panel state (PANEL_STATE_KEY) and restores on load",
+  "archetype": "C · Restored panel arrangement"
+ },
+ "10:3228": {
+  "status": "missing",
+  "note": "No narrow-window inspector overlay mode in shell; phase1 narrow pins cover topbar/bottom bar only",
+  "archetype": "C · Narrow window overlay (1366)"
+ },
+ "225:2297": {
+  "status": "drift",
+  "note": "phase1: StudioSkeleton (chrome-ui/Skeleton.tsx:91, AquibraStudio.tsx:577) has no \"Opening <site>…\" line",
+  "archetype": "G · Opening skeleton"
+ },
+ "225:2821": {
+  "status": "drift",
+  "note": "phase1 Task 1.6: LoadErrorBanner.tsx:100 copy differs; no Download local copy; mounted above header (AquibraStudio.tsx:668)",
+  "archetype": "G · Load failed (network)"
+ },
+ "225:3353": {
+  "status": "drift",
+  "note": "SessionExpiredModal.tsx:87-92 title \"Your session expired\" vs \"Sign in again to save\"; body copy differs; extra at-risk list",
+  "archetype": "G · Session expired dialog"
+ },
+ "225:3888": {
+  "status": "missing",
+  "note": "Mid-session 401 opens modal/toast (useComposerInit.ts:821-829); no persistent banner slot. LoadErrorBanner auth is load-time only",
+  "archetype": "G · Session expired banner"
+ },
+ "225:4416": {
+  "status": "missing",
+  "note": "No auto-resend after same-user sign-in; retry is manual (SessionExpiredModal.tsx:71)",
+  "archetype": "G · Signed in again, queue sent"
+ },
+ "225:4941": {
+  "status": "missing",
+  "note": "No account-identity check before resend",
+  "archetype": "G · Different account signed in"
+ },
+ "225:5474": {
+  "status": "drift",
+  "note": "Two surfaces: RecoveryBanner.tsx:132 \"Recovered your work…\" and toast useComposerInit.ts:333-350; board one banner + Discard…",
+  "archetype": "G · Unsaved work, server older"
+ },
+ "225:6003": {
+  "status": "missing",
+  "note": "RecoveryBanner.tsx:116 hides when server newer; no Download my copy / Compare banner",
+  "archetype": "G · Unsaved work, server newer"
+ },
+ "225:6532": {
+  "status": "missing",
+  "note": "RecoveryBanner.tsx:116 hides when server time unknown; board shows banner with Download/Compare",
+  "archetype": "G · Unsaved work, server unknown"
+ },
+ "225:7061": {
+  "status": "missing",
+  "note": "Discard & reload is immediate (RecoveryBanner.tsx:120-127); no \"Delete the kept copy?\" confirm",
+  "archetype": "G · Discard kept copy confirm"
+ },
+ "225:7600": {
+  "status": "drift",
+  "note": "Offline is a toast (useComposerInit.ts:800) + SaveStatus pill, not the global warning banner",
+  "archetype": "G · Offline banner"
+ },
+ "225:8126": {
+  "status": "drift",
+  "note": "Toast \"Couldn't reach the server — not saved\" (useComposerInit.ts:800); board banner + Retry now",
+  "archetype": "G · Can't reach Buildrick"
+ },
+ "225:8654": {
+  "status": "missing",
+  "note": "scheduleRetry runs silently; no \"Reconnecting… saving N changes\" banner",
+  "archetype": "G · Reconnecting, saving queued"
+ },
+ "225:9180": {
+  "status": "drift",
+  "note": "ConflictModal.tsx:70 title matches; body :79-80 differs; buttons Reload latest/Save a backup/Overwrite… vs board order + Download a copy",
+  "archetype": "G · Conflict dialog"
+ },
+ "225:9715": {
+  "status": "missing",
+  "note": "Reload latest runs immediately (ConflictModal.tsx:90); no class-b confirm",
+  "archetype": "G · Reload latest confirm"
+ },
+ "225:10249": {
+  "status": "drift",
+  "note": "Inline warning ConflictModal.tsx:84-86 + \"Yes, overwrite\"; no \"Before overwrite\" save of the newer version",
+  "archetype": "G · Overwrite confirm, keep newer"
+ },
+ "225:10783": {
+  "status": "missing",
+  "note": "No failure state when keeping the newer version fails",
+  "archetype": "G · Overwrite stopped"
+ },
+ "227:7411": {
+  "status": "drift",
+  "note": "Role refusal is a toast (useSaveCallback.ts:105; useComposerInit.ts:325-332); board banner + Download/Ask an admin",
+  "archetype": "G · Role changed to Viewer"
+ },
+ "227:7943": {
+  "status": "missing",
+  "note": "No role-raised detection or \"Reload to edit\" banner",
+  "archetype": "G · Role raised"
+ },
+ "227:8473": {
+  "status": "missing",
+  "note": "No workspace-deletion state in editor",
+  "archetype": "G · Workspace deletion, owner"
+ },
+ "227:9003": {
+  "status": "missing",
+  "note": "No workspace-deletion state in editor",
+  "archetype": "G · Workspace deletion, others"
+ },
+ "227:9531": {
+  "status": "drift",
+  "note": "phase1 Task 1.6: LoadErrorBanner.tsx:97 says no trash; board + DangerZoneScreen.tsx:326 say Recently deleted 30 days",
+  "archetype": "G · Site deleted"
+ },
+ "227:10063": {
+  "status": "missing",
+  "note": "No build-version detection",
+  "archetype": "G · New version ready"
+ },
+ "227:10593": {
+  "status": "missing",
+  "note": "No build-version detection",
+  "archetype": "G · New version, saving first"
+ },
+ "227:11119": {
+  "status": "missing",
+  "note": "No build-version detection",
+  "archetype": "G · New version, reload stopped"
+ },
+ "227:11649": {
+  "status": "drift",
+  "note": "StudioErrorBoundary AquibraStudio.tsx:98-147 \"Something went wrong\"/Reload; no error code, Download a copy, Back to sites",
+  "archetype": "G · Editor stopped (crash card)"
+ },
+ "227:12184": {
+  "status": "missing",
+  "note": "No per-panel chunk-load recovery",
+  "archetype": "G · Panel chunk skew"
+ },
+ "227:12711": {
+  "status": "drift",
+  "note": "useOtherTabNotice.ts:33-40 persistent toast; board warning banner + \"Edit here\"",
+  "archetype": "G · Also open in another tab"
+ },
+ "227:13239": {
+  "status": "missing",
+  "note": "No tab handoff / read-only-here state",
+  "archetype": "G · Editing moved to another tab"
+ },
+ "227:13769": {
+  "status": "missing",
+  "note": "No tab handoff",
+  "archetype": "G · Edit here refused"
+ },
+ "227:14297": {
+  "status": "missing",
+  "note": "No single banner slot with \"N more\" stacking",
+  "archetype": "G · Several conditions, N more"
+ },
+ "227:14836": {
+  "status": "missing",
+  "note": "No <1024 px notice",
+  "archetype": "G · Narrow window notice"
+ },
+ "227:15364": {
+  "status": "missing",
+  "note": "No phone gate",
+  "archetype": "G · Phone, read-only"
+ },
+ "227:15894": {
+  "status": "drift",
+  "note": "chrome-ui/Toast.tsx:325 stacks all toasts; no ≤1 transient + ≤2 persistent cap or \"+N more\"",
+  "archetype": "G · Toast stack"
+ },
+ "227:16435": {
+  "status": "drift",
+  "note": "NotificationPanel.tsx:206-218 header+Mark all read match; grouped by day, not This site / Other sites",
+  "archetype": "G · Notifications grouped"
+ },
+ "227:16980": {
+  "status": "missing",
+  "note": "No plan-lock state in editor",
+  "archetype": "G · Site locked on Free"
+ },
+ "227:17512": {
+  "status": "missing",
+  "note": "No trial in code (plans memory 10-17)",
+  "archetype": "G · Trial ended notice"
+ },
+ "227:18042": {
+  "status": "blocked:handoff-note",
+  "note": "Annotation board, no UI; suggest manifest status out-of-scope",
+  "archetype": "Handoff note"
+ },
+ "230:12999": {
+  "status": "drift",
+  "note": "HistoryTab.tsx:33-37 Session/Saves/Published match; rows lack verb·target·place + \"Restore to here\" + j/k footer",
+  "archetype": "H · Session rows"
+ },
+ "230:13557": {
+  "status": "drift",
+  "note": "ActivityView.tsx:361-375 \"Restore to {time}?\"/\"Restore, discard N changes\" vs named step + \"Restore to here\"",
+  "archetype": "H · Restore-to-here confirm"
+ },
+ "230:14116": {
+  "status": "drift",
+  "note": "Restore writes a row (TimeTravelHost.tsx:141) but not \"Restored to … · N later steps removed\"",
+  "archetype": "H · Session restored row"
+ },
+ "230:14662": {
+  "status": "drift",
+  "note": "SavesFilter.tsx:36 All/Named/Auto-saves + Author submenu vs flat list; Save a version is a footer (HistoryTab.tsx:404)",
+  "archetype": "H · Saves filter + Save a version"
+ },
+ "230:15227": {
+  "status": "drift",
+  "note": "VersionList.tsx:322 Restore to draft…; no inline Visual/Semantic compare in the row (CompareView.tsx:90 is a separate view)",
+  "archetype": "H · Version details + inline compare"
+ },
+ "230:15797": {
+  "status": "drift",
+  "note": "\"Before restoring\" checkpoint exists (TimeTravelHost.tsx:228); no \"Undo restore\" toast",
+  "archetype": "H · Restore to draft + Undo restore"
+ },
+ "230:16354": {
+  "status": "drift",
+  "note": "Inline row confirm (VersionList.tsx:259) vs modal \"Delete “…”?\"",
+  "archetype": "H · Delete version interim confirm"
+ },
+ "230:16914": {
+  "status": "missing",
+  "note": "Needs RT-D1 server soft-delete; no Undo or Recently deleted",
+  "archetype": "H · Delete version, Recently deleted"
+ },
+ "230:17468": {
+  "status": "drift",
+  "note": "PublishHistory.tsx:434 Republish v{n}… matches; \"Compare with current\" vs \"Compare with live\"; no Pruned row",
+  "archetype": "H · Published releases"
+ },
+ "230:18022": {
+  "status": "drift",
+  "note": "PublishHistory.tsx:663-672 \"Republish vN as vM?\" (code contract: new version) vs \"Republish v13 to <domain>?\"",
+  "archetype": "H · Republish confirm"
+ },
+ "230:18582": {
+  "status": "drift",
+  "note": "CompareHost.tsx:156-164 \"Compare\" + from/to pickers vs \"‹ Back to History · Compare · A → B · Visual/Semantic · Page\"",
+  "archetype": "H · Compare view"
+ },
+ "230:19126": {
+  "status": "drift",
+  "note": "TimeTravelHost.tsx:332 \"Restore to {time}?\" vs \"Restore to this point…\" + \"Showing … Nothing changes until you restore.\"",
+  "archetype": "H · Time Travel"
+ },
+ "230:19664": {
+  "status": "drift",
+  "note": "ActivityLogView.tsx:50-57 chips match; no Load more",
+  "archetype": "H · Activity list"
+ },
+ "230:20217": {
+  "status": "drift",
+  "note": "BackToActivityRow.tsx:24 \"‹ Activity\" vs \"‹ Back to Activity\"",
+  "archetype": "H · History from Activity"
+ },
+ "230:20770": {
+  "status": "missing",
+  "note": "No offline note on Saves",
+  "archetype": "H · Saves offline"
+ },
+ "230:21326": {
+  "status": "drift",
+  "note": "ActivityLogView.tsx:218-219 title matches; extra body line not on board",
+  "archetype": "H · Activity load error"
+ },
+ "231:16144": {
+  "status": "missing",
+  "note": "SiteMenu.tsx:149 has no plan row; no trial data in editor",
+  "archetype": "P · Plan chip in site menu"
+ },
+ "231:16683": {
+  "status": "missing",
+  "note": "No plan chip",
+  "archetype": "P · Plan chip, trial ending",
+  "inheritsFrom": "231:16144"
+ },
+ "231:17222": {
+  "status": "missing",
+  "note": "No plan chip / explanation popover",
+  "archetype": "P · Plan chip, non-owner"
+ },
+ "231:17763": {
+  "status": "missing",
+  "note": "No plan chip",
+  "archetype": "P · Plan chip, payment failed"
+ },
+ "231:18302": {
+  "status": "missing",
+  "note": "Pages panel shows no limit line; limit only surfaces as save refusal toast (useComposerInit.ts:850)",
+  "archetype": "P · Pages at Free limit"
+ },
+ "231:18866": {
+  "status": "drift",
+  "note": "UpgradeModal.tsx:95-103 \"Upgrade Your Plan\"/Maybe Later/Upgrade to X vs \"<Feature> is a Pro feature\"/Not now/Choose Pro in Billing ↗",
+  "archetype": "P · Upgrade dialog, owner"
+ },
+ "231:19410": {
+  "status": "missing",
+  "note": "UpgradeModal has no non-owner variant (OK, ask owner)",
+  "archetype": "P · Upgrade dialog, non-owner"
+ },
+ "231:19951": {
+  "status": "missing",
+  "note": "No per-page lock",
+  "archetype": "P · Page over Free limit"
+ },
+ "231:20481": {
+  "status": "missing",
+  "note": "NotificationPanel has no workspace section",
+  "archetype": "P · Bell trial reminder"
+ },
+ "231:21019": {
+  "status": "missing",
+  "note": "Dashboard billing/page.tsx has no active-set chooser",
+  "archetype": "P · Billing choose active set"
+ },
+ "231:21072": {
+  "status": "missing",
+  "note": "Dashboard: no active-set chooser",
+  "archetype": "P · Active set confirm"
+ },
+ "231:21134": {
+  "status": "missing",
+  "note": "Dashboard: no active-set chooser",
+  "archetype": "P · Active set saved"
+ },
+ "231:21190": {
+  "status": "blocked:handoff-note",
+  "note": "Annotation board, no UI; suggest manifest status out-of-scope",
+  "archetype": "Handoff note"
+ },
+ "232:18928": {
+  "status": "missing",
+  "note": "Flag collab (StudioHeader.tsx:296); PresenceIndicators avatars only, no \"N here\" pill or People popover",
+  "archetype": "CL · Presence popover"
+ },
+ "232:19504": {
+  "status": "missing",
+  "note": "Phase B: no remote selection/name tag (RemoteCursorsOverlay only); flag-gated",
+  "archetype": "CL · Live remote selection"
+ },
+ "232:20039": {
+  "status": "missing",
+  "note": "Phase B not built",
+  "archetype": "CL · Typing prompt"
+ },
+ "232:20582": {
+  "status": "missing",
+  "note": "No Follow mode",
+  "archetype": "CL · Following"
+ },
+ "232:21118": {
+  "status": "missing",
+  "note": "Phase B not built",
+  "archetype": "CL · Teammate deleted target"
+ },
+ "232:21651": {
+  "status": "missing",
+  "note": "HistoryManager has no remote-aware skip",
+  "archetype": "CL · Undo skips teammate step"
+ },
+ "232:22183": {
+  "status": "missing",
+  "note": "Needs MP-12; no peer-save banner",
+  "archetype": "CL · Peer saved, Get latest"
+ },
+ "232:22718": {
+  "status": "drift",
+  "note": "SiteMenu.tsx:220-230 \"Collaborate › Start collaboration · Planned\" vs \"People on this site — Planned\"",
+  "archetype": "CL · Collab flag off row"
+ },
+ "232:23250": {
+  "status": "missing",
+  "note": "No People popover",
+  "archetype": "CL · Viewer redacted people"
+ },
+ "232:23803": {
+  "status": "drift",
+  "note": "phase1 Task 1.2: useHistoryFeedback.ts:180 \"Undo: <action>\" vs \"Undo is ⌘Z: “…”\"",
+  "archetype": "RJ · Undo hint toast"
+ },
+ "232:24328": {
+  "status": "drift",
+  "note": "RecordSheet.tsx:346-351 \"<name> deleted · <collection>\" + body vs \"“<name>” deleted\" + Undo",
+  "archetype": "RJ · CMS delete toast Undo"
+ },
+ "232:24584": {
+  "status": "blocked:superseded-one-undo",
+  "note": "Board itself marked SUPERSEDED by owner one-undo decision 2026-10-22",
+  "archetype": "RJ · ⌘Z in CMS (superseded)"
+ },
+ "232:24836": {
+  "status": "missing",
+  "note": "phase1 Task 1.2: undo lives in canvas footer (CanvasFooterToolbar.tsx:71); no \"Undo: <step> · ⌘Z\" tooltip",
+  "archetype": "RJ · Undo names its step"
+ },
+ "232:25361": {
+  "status": "blocked:handoff-note",
+  "note": "Annotation board, no UI; suggest manifest status out-of-scope",
+  "archetype": "Handoff note"
+ },
+ "250:48733": {
+  "status": "missing",
+  "note": "CmsWorkspace.tsx:486 restore re-saves silently; no \"Restoring “…”…\" state",
+  "archetype": "RJ · CMS restore pending"
+ },
+ "250:48891": {
+  "status": "missing",
+  "note": "No \"“…” restored\" receipt",
+  "archetype": "RJ · CMS restore succeeded"
+ },
+ "250:49052": {
+  "status": "missing",
+  "note": "No \"Couldn’t restore … Try again\" state; error unhandled in toast action",
+  "archetype": "RJ · CMS restore failed"
+ },
+ "250:49215": {
+  "status": "blocked:handoff-note",
+  "note": "Review-control fixture board, not product UI; suggest out-of-scope",
+  "archetype": "Handoff note"
+ }
+}
