@@ -21,7 +21,7 @@ import type { Composer, Element } from "@/engine";
 import { isValidBreakpoint, BREAKPOINTS } from "@/shared/constants/breakpoints";
 import { EVENTS } from "@/shared/constants/events";
 import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
-import type { DeviceType, PseudoStateId } from "@/shared/types";
+import type { DeviceType } from "@/shared/types";
 import type { BreakpointId } from "@/shared/types/breakpoints";
 import type { IconConfig, MediaAsset, MediaAssetType } from "@/shared/types/media";
 import { Tabs } from "@/editor/chrome-ui";
@@ -340,7 +340,15 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
         <div role="status" aria-live="polite" aria-atomic="true" className="bdi-sr-only">
           {elementTypeLabel(selectedElement.type)} selected
         </div>
-        <InspectorHeader composer={composer} element={selectedElement} selectedIds={targetIds} />
+        <InspectorHeader
+          composer={composer}
+          element={selectedElement}
+          selectedIds={targetIds}
+          breakpointLabel={BREAKPOINTS[currentBreakpoint]?.name ?? currentBreakpoint}
+          state={currentPseudoState}
+          onStateChange={setCurrentPseudoState}
+          statesWithOverrides={statesWithOverrides}
+        />
         {targetIds.length > 1 ? null : (
           <StatusMarks composer={composer} elementId={selectedElement.id} binding={binding} locked={locked} />
         )}
@@ -369,8 +377,6 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
             {showContextRow ? (
               <ContextRow
                 state={currentPseudoState}
-                onStateChange={(s: PseudoStateId) => setCurrentPseudoState(s)}
-                statesWithOverrides={statesWithOverrides}
                 stateOverrideCount={fieldOverrides.counts.pseudo}
                 onResetState={() => runDiscrete(fieldOverrides.resetPseudo)}
                 breakpointName={breakpointName}

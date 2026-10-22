@@ -37,8 +37,7 @@ describe("override marks — boards 27 / 28", () => {
     const { c, id, view } = mount("button");
     c.styles.setRule(`[data-buildrick-id="${id}"]`, { "background-color": "red" }, { pseudo: ":hover" });
     render(view());
-    fireEvent.click(screen.getByTestId("inspector-state-chip"));
-    fireEvent.click(screen.getByTestId("inspector-state-opt-hover"));
+    fireEvent.change(screen.getByRole("combobox", { name: "Editing" }), { target: { value: "hover" } });
     await act(async () => {});
     expect(screen.getByTestId("inspector-state-overrides").textContent).toContain("1 :hover override");
     const fill = document.getElementById("inspector-section-fill")!;
@@ -54,7 +53,8 @@ describe("override marks — boards 27 / 28", () => {
     const { c, id, view } = mount("heading", "tablet");
     c.styles.setBreakpointStyle(id, "tablet", { width: "480px" });
     render(view());
-    expect(screen.getByTestId("inspector-bp-chip").textContent).toContain("Tablet · 1 override");
+    expect(screen.getByTestId("inspector-breakpoint-prefix").textContent).toBe("Tablet ·");
+    expect(screen.getByTestId("inspector-bp-line").textContent).toContain("Tablet · 1 override");
     const size = document.getElementById("inspector-section-size")!;
     expect(within(size).getByRole("img", { name: "Overridden on Tablet" })).toBeTruthy();
     expect(within(size).getByTestId("inspector-section-note").textContent).toBe("Overridden on Tablet");

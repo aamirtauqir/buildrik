@@ -1,11 +1,16 @@
 /**
- * InspectorHeader — board 1's header, three rows:
- *   1. the path — chrome-ui Breadcrumb, "Home › Hero › Heading": the page
- *      crumb clears the selection (→ Page panel), an ancestor crumb selects it
- *      (the Layers-click path);
- *   2. identity — type icon + editable name · ⋯ (board 30) · ✕ "Hide inspector (⌘\)";
- * 72 tall like every board: the identity row is 28 (the boards' 28px action
- * boxes). The status marks are their own row below it (StatusMarks).
+ * InspectorHeader — Shell/InspectorHeader (2L9 `497:339496`), 300×84:
+ *   1. Target (24): type icon + editable name · ⋯ · ✕ "Hide inspector (⌘\)";
+ *   2. Authored element state (32): "Editing" + a read-only `${breakpoint} ·`
+ *      prefix + the state Select — together "Desktop · Default state". The
+ *      topbar BreakpointSwitcher is the only breakpoint control; the prefix
+ *      follows it.
+ * 12 padding, 4 between rows: 84 tall. The element path (chrome-ui
+ * Breadcrumb, "Home › Hero › Heading") is a third row on top — 104 tall —
+ * ONLY while the current page is a collection template. It never depends on
+ * the selection, so the header keeps its height as selection moves within a
+ * page (plan Task 1.4). The page crumb clears the selection, an ancestor
+ * crumb selects it.
  * Variants: `multi` (board 22): the name row reads "3 selected · Headings"
  * with no type icon, and the path is the shared parent's own ("Home › Hero"),
  * ending on that parent — the selection is not repeated as a crumb.
@@ -16,11 +21,13 @@
 import { X } from "lucide-react";
 import * as React from "react";
 import type { Composer, Element } from "@/engine";
-import { Breadcrumb, IconButton, type BreadcrumbItem } from "@/editor/chrome-ui";
+import { Breadcrumb, IconButton, Label, Select, type BreadcrumbItem, type CustomFlowbiteTheme } from "@/editor/chrome-ui";
 import { getElementIcon } from "@/editor/shared/elementIcons";
 import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
 import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
 import { EVENTS } from "@/shared/constants/events";
+import type { PseudoStateId } from "@/shared/types";
+import { pageFileNames } from "@/engine/export/pageFiles";
 import { ElementNameField } from "./ElementNameField";
 import { InspectorElementMenu } from "./InspectorElementMenu";
 
@@ -29,6 +36,35 @@ export interface InspectorHeaderProps {
   element: { id: string; type: string };
   /** Every selected id (primary first); more than one = the multi variant. */
   selectedIds: readonly string[];
+  /** The topbar's breakpoint by name ("Desktop", "Tablet") — read-only here. */
+  breakpointLabel: string;
+  /** The element state the Style / Effects writes land on. */
+  state: PseudoStateId;
+  onStateChange: (state: PseudoStateId) => void;
+  /** States that carry overrides at this breakpoint — their option says so. */
+  statesWithOverrides?: ReadonlySet<PseudoStateId>;
+}
+
+const STATES: readonly { id: PseudoStateId; label: string }[] = [
+  { id: "normal", label: "Default state" },
+  { id: "hover", label: "Hover state" },
+  { id: "focus", label: "Focus state" },
+  { id: "active", label: "Active state" },
+  { id: "disabled", label: "Disabled state" },
+];
+
+/* The row is 32 tall (the board's "Authored element state" frame), so the
+   select is too; flowbite's md is 42. */
+const STATE_SELECT_THEME: NonNullable<CustomFlowbiteTheme["select"]> = {
+  field: { select: { sizes: { md: "tw:h-8 tw:py-0 tw:pl-2 tw:pr-8 tw:text-[12px] tw:leading-4" } } },
+};
+
+/** Whether the active page is a collection's template page. */
+function onTemplatePage(composer: Composer): boolean {
+  const page = composer.elements.getActivePage?.();
+  if (!page) return false;
+  const file = pageFileNames(composer.elements.getAllPages()).get(page.id);
+  return Boolean(file) && (composer.cms?.collections.getAllCollections() ?? []).some((c) => c.pageTemplatePath === file);
 }
 
 /** Page crumb, then each ancestor below the page root down to `anchor`, then
@@ -63,14 +99,23 @@ function commonParent(els: Element[]): Element | null {
 
 const pluralType = (type: string) => `${elementTypeLabel(type)}s`;
 
-export function InspectorHeader({ composer, element, selectedIds }: InspectorHeaderProps) {
+export function InspectorHeader({
+  composer,
+  element,
+  selectedIds,
+  breakpointLabel,
+  state,
+  onStateChange,
+  statesWithOverrides,
+}: InspectorHeaderProps) {
+  const stateId = React.useId();
   const multi = selectedIds.length > 1;
   const typeLabel = elementTypeLabel(element.type);
   const Icon = getElementIcon(element.type);
 
   let items: BreadcrumbItem[] = [];
   let multiName = "";
-  if (composer) {
+  if (composer && onTemplatePage(composer)) {
     if (multi) {
       const els = selectedIds.map((id) => composer.elements.getElement(id)).filter((e): e is Element => Boolean(e));
       const types = new Set(els.map((e) => e.getType()));
@@ -85,8 +130,10 @@ export function InspectorHeader({ composer, element, selectedIds }: InspectorHea
 
   return (
     <div className="tw:flex tw:flex-col tw:gap-1 tw:p-3" data-testid="inspector-header">
-      {items.length > 0 ? <Breadcrumb label="Element path" items={items} data-testid="inspector-breadcrumb" /> : null}
-      <div className="tw:flex tw:min-h-7 tw:items-center tw:gap-1">
+      {items.length > 0 ? (
+        <Breadcrumb label="Element path" items={items} className="tw:h-4" data-testid="inspector-breadcrumb" />
+      ) : null}
+      <div className="tw:flex tw:h-6 tw:items-center tw:gap-1" data-testid="inspector-target-row">
         <div className="tw:flex tw:min-w-0 tw:flex-1 tw:items-center tw:gap-2 tw:text-[13px] tw:font-semibold tw:leading-4 tw:text-[var(--bk-ink-soft)]">
           {multi ? null : (
             <span className="tw:inline-flex tw:shrink-0" aria-hidden="true" data-testid="inspector-type-icon">
@@ -110,6 +157,31 @@ export function InspectorHeader({ composer, element, selectedIds }: InspectorHea
         >
           <X size={16} aria-hidden="true" />
         </IconButton>
+      </div>
+      <div className="tw:flex tw:h-8 tw:items-center tw:gap-2" data-testid="inspector-editing-row">
+        <Label htmlFor={stateId} className="tw:shrink-0 tw:text-[11px] tw:font-medium tw:leading-4 tw:text-[var(--bk-ink-muted)]">
+          Editing
+        </Label>
+        <span
+          className="tw:shrink-0 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)] tw:whitespace-nowrap"
+          data-testid="inspector-breakpoint-prefix"
+        >
+          {breakpointLabel} ·
+        </span>
+        <Select
+          id={stateId}
+          value={state}
+          onChange={(e) => onStateChange(e.target.value as PseudoStateId)}
+          theme={STATE_SELECT_THEME}
+          className="tw:min-w-0 tw:flex-1"
+          data-testid="inspector-state-select"
+        >
+          {STATES.map((s) => (
+            <option key={s.id} value={s.id}>
+              {statesWithOverrides?.has(s.id) ? `${s.label} · edited` : s.label}
+            </option>
+          ))}
+        </Select>
       </div>
     </div>
   );

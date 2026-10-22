@@ -43,16 +43,6 @@
       }
     },
     {
-      "name": "state-chip",
-      "testId": "inspector-state-chip",
-      "spec": "inspector-v4-03",
-      "nodeId": "7993:199438",
-      "skipProps": {
-        "padding-top": "24px pointer target (build plan §16, L3-C): the chip is 24 tall with its label centred; the board draws 20 with 2px padding. Same label position.",
-        "padding-bottom": "24px pointer target (build plan §16, L3-C): the chip is 24 tall with its label centred; the board draws 20 with 2px padding. Same label position."
-      }
-    },
-    {
       "name": "empty-filters",
       "testId": "inspector-sechead-filters",
       "spec": "inspector-v4-03",
