@@ -17,3 +17,12 @@ Format: `{fileKey, pageId, count, scrubbed, D, rows}`; each row is `{id, name, w
 Re-run after the owner's Legacy cleanup (~2026-10-29): delete `.cursor.json`, run the dump, commit the diff. Frame counts must not change.
 
 Live comparison: seeded QA site id — record here when Task 0.0 Step 3 is first run by a lane.
+
+## Regression-net status (2026-10-23)
+
+All 17 pins in `e2e/visual-pins.spec.ts` FAIL on `main` itself (diff ratio 0.01–0.09,
+baselines last updated 2026-09-24). The largest diffs are real layout changes, not
+font noise (e.g. `media-drawer-grid`: the asset grid now renders full width). They are
+not caused by design-2l9 work and are not re-baselined blind: each needs a look at the
+diff to decide "intended change → re-baseline" or "regression → fix". Until then, new
+design-2l9 pins are judged on their own and the old 17 are tracked here.
