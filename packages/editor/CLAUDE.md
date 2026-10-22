@@ -22,12 +22,20 @@ Demo app: `demo/main.tsx` on port 5050.
 
 ## FIGMA UI REBUILD — THE LOOP (founder rules, 2026-08-06)
 
-Full-UI rebuild in progress: every editor surface rebuilt to Figma
-`g4GzQFqzNYz5sosz1QtZXC` page `4418:45431` (Editor v3 · IA — source of truth since
-2026-09-15; `1:3` and the two Clone pages are `Archive ·`). Checklist = `scripts/conformance/boards.json`
-(300 active boards / 33 families as of 2026-08-07). The 2026-08-06 plan doc was
-removed on founder order 2026-08-07 (superseded by
-`docs/plans/2026-08-07-editor-figma-completion.md`; recovery: git history).
+Full-UI rebuild in progress. **Current target (owner decision 2026-10-22): Figma
+`2L9OTGzBrL6kYmU18yA1c7`**, pages 03–09 plus the "✦ Improved — 2026-10-22" page
+`497:99417`. Plan: `docs/superpowers/plans/2026-10-22-implement-2l9-design.md`.
+Checklist = `scripts/conformance/boards-2l9.json`; open rows =
+`node scripts/conformance/census-2l9.mjs`. Read boards from the local dump
+`docs/design-2l9/dump/` (`scripts/design-2l9/dump.mjs`), not from Figma, unless a
+board is missing there.
+
+History, not targets: `g4GzQFqzNYz5sosz1QtZXC` page `4418:45431` (Editor v3 · IA,
+source of truth 2026-09-15 → 2026-10-22) and its checklist
+`scripts/conformance/boards.json`, which stays the regression net for existing
+recipes. The 2026-08-06 plan doc was removed on founder order 2026-08-07
+(superseded by `docs/plans/2026-08-07-editor-figma-completion.md`; recovery: git
+history).
 
 **Precedence (founder, final):** behaviour → the CODE contract (Zod schemas,
 service returns — proof: the 8-row pre-checks board was corrected TO the code).

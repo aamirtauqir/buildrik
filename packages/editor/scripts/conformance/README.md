@@ -8,6 +8,15 @@ measuring.
 Everything below is LIVE as of 2026-08-03 and covered by 78 tests in
 `scripts/__tests__/conformance-{lib,scripts}.test.mjs`.
 
+## Manifests (2026-10-22)
+
+- `boards-2l9.json` — **current target**, Figma `2L9OTGzBrL6kYmU18yA1c7`. Same row
+  schema as `boards.json`, plus optional `inheritsFrom`. Open rows:
+  `node scripts/conformance/census-2l9.mjs [--json]` (exit 0 done, 1 open, 2 invalid).
+- `boards.json` — previous target (`g4GzQ…` page `4418:45431`), kept as the
+  regression net: its recipes still run, and are edited only when a change moves
+  the element they measure.
+
 ## The loop
 
 ```
