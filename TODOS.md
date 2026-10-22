@@ -541,3 +541,21 @@ root cause is fixed in `466158dd`; these are the rest.
 
 - [x] **Refresh stale Figma conformance specs (spec-age gate).** Done 2026-10-07: retired 308 dead V1 specs (their Figma nodes were deleted; 168 recipes removed; boards.json: 291 rows newly superseded + 15 that only lost their recipe; superseded by Editor v3 page 4418:45431, owner decision). v3 specs are created per surface by the build loop. See docs/design-jobs/SPEC-REFRESH-2026-10-07.md.
 - [ ] **[P2 · deferred by /plan-ceo-review D3, 2026-10-15] Scripted Preview on an isolated origin.** Preview today is `sandbox="allow-same-origin"` with no scripts (`packages/editor/src/editor/shell/PreviewOverlay.tsx:209-211`), so interactions, tabs, sliders and forms can only be checked after publish (audit BK-61, IA-08; L6 #4). Phase 1 of `docs/plans/2026-10-14-webflow-workflows-product-design.md` delivers CSS parity only. Do: run the published WAAPI runtime in a separate-origin frame; never enable scripts with same-origin. Needs a security review first.
+
+## Design 2L9 implementation — deferred by the 2026-10-22 /autoplan review
+
+Plan: `docs/superpowers/plans/2026-10-22-implement-2l9-design.md`.
+
+- [ ] **First-run surfaces (Figma page 08).** Blocked on the B9 user interviews;
+  building first-run before them would bake in guesses about who arrives and why.
+- [ ] **Figma Legacy-layer cleanup (~2026-10-29).** Owner chose option B: keep the
+  hidden `Legacy ·` shells for about a week, save a Figma version, then remove.
+  After it, re-run `scripts/design-2l9/dump.mjs` and commit the diff (frame counts
+  must not change).
+- [ ] **Class-first styling rows.** Inspector rows that depend on the class-first
+  model stay `blocked:owner` until its six pending flow decisions close.
+- [ ] **Code Connect mapping (chrome-ui ↔ 2L9 components).** Useful, but it is new
+  tooling outside the plan's blast radius; revisit once Phase 1 has shipped.
+- [ ] **P0 functional bugs outside the design lanes.** The lanes only conform
+  visuals to boards; functional P0s from the 2026-10-20 audits stay on their own
+  track instead of riding along with design PRs.
