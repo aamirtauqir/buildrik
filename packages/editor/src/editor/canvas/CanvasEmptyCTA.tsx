@@ -3,8 +3,8 @@
  *
  * The board draws an empty page as five things, top to bottom: the title
  * ("This page is empty"), one sentence naming the three ways forward, a row
- * of three template cards, and a row of four actions — Browse all templates ·
- * Add a block · ✦ Describe your site · Start blank. What shipped before was
+ * of three template cards, and a row of actions — Browse all templates ·
+ * Add a block · Start blank. What shipped before was
  * board 65:2's first-run pair (one sentence, Browse templates / Start blank),
  * which offered less than the design (G2-018).
  *
@@ -35,7 +35,6 @@ import type { FrameSpan } from "./hooks/useVisibleFrameSpan";
 interface CanvasEmptyCTAProps {
   onBrowseTemplates: () => void;
   onAddBlock: () => void;
-  onDescribe: () => void;
   onStartBlank: () => void;
   /** The part of the frame on screen (useVisibleFrameSpan). The frame can be
    *  wider than its viewport, and a CTA centred on the frame hid "Start blank"
@@ -67,7 +66,6 @@ const CARD_COUNT = 3;
 export function CanvasEmptyCTA({
   onBrowseTemplates,
   onAddBlock,
-  onDescribe,
   onStartBlank,
   span,
   scale = 1,
@@ -86,7 +84,7 @@ export function CanvasEmptyCTA({
             This page is empty
           </p>
           <p className="bd-canvas-empty-cta__subtitle" data-testid="canvas-empty-cta-subtitle">
-            Start with a template, drop a block, or describe your site.
+            Start with a template, add a block, or start blank.
           </p>
           <ul className="bd-canvas-empty-cta__cards" data-testid="canvas-empty-cta-cards">
             {cards.map((t) => (
@@ -95,7 +93,7 @@ export function CanvasEmptyCTA({
                   color="light"
                   className={CARD}
                   data-testid={`canvas-empty-template-${t.id}`}
-                  aria-label={`Start from the ${t.name} template`}
+                  aria-label={`Browse templates, starting with ${t.name}`}
                   onClick={onBrowseTemplates}
                 >
                   {/* Board 4428:44164: a light wireframe thumbnail with the
@@ -115,16 +113,13 @@ export function CanvasEmptyCTA({
           </ul>
           <div className="bd-canvas-empty-cta__actions" data-testid="canvas-empty-cta-actions">
             {/* Board 4428:44164: Browse all templates is the primary; Add a
-                block and Describe are bordered secondaries; Start blank is a
-                plain text action. */}
+                block is a bordered secondary; Start blank is a plain text
+                action. */}
             <Button onClick={onBrowseTemplates} className={PRIMARY} data-testid="canvas-empty-browse">
               Browse all templates
             </Button>
             <Button color="light" onClick={onAddBlock} className={SECONDARY} data-testid="canvas-empty-add-block">
               Add a block
-            </Button>
-            <Button color="light" onClick={onDescribe} className={SECONDARY} data-testid="canvas-empty-describe">
-              ✦ Describe your site
             </Button>
             <Button color="light" onClick={onStartBlank} className={TEXT_ACTION} data-testid="canvas-empty-start-blank">
               Start blank

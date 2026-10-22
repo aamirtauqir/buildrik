@@ -99,7 +99,6 @@ const VAR_KEY = "tw:[font-family:var(--bk-font-mono)] tw:text-xs tw:leading-4 tw
 const STATUS_PILL =
   "tw:inline-flex tw:items-center tw:rounded-full tw:border tw:border-solid " +
   "tw:px-2.5 tw:py-0.5 tw:text-[12px] tw:leading-4 tw:font-medium";
-const STATUS_PILL_OK = "tw:bg-[var(--bk-green-100)] tw:border-[var(--bk-green-500)] tw:text-[var(--bk-green-700)]";
 const STATUS_PILL_IDLE = "tw:bg-[var(--bk-gray-200)] tw:border-[var(--bk-gray-400)] tw:text-[var(--bk-gray-700)]";
 /* The second line of every two-line row: 151:11 the field's type, 151:56 a
    source's status, 151:71 a variable's value, 151:96 a condition's summary —
@@ -152,7 +151,9 @@ export function RootView({
   selectedCollectionId?: string | null;
   onOpenCollection: (id: string) => void;
   onCreateCollection?: () => void;
-  onOpenSources: () => void;
+  /** Absent = Data sources are hidden (BD-39 (8), `cmsDataSources` flag):
+   *  no Sources row, no zero-state door. */
+  onOpenSources?: () => void;
   onOpenVariables: () => void;
   onOpenConditions: () => void;
 }) {
@@ -198,15 +199,17 @@ export function RootView({
               Create a collection
             </Button>
           ) : null}
-          <Button
-            color="light"
-            size="xs"
-            variant="link" className="tw:min-h-6 tw:font-normal"
-            data-testid="content-empty-sources"
-            onClick={onOpenSources}
-          >
-            Open Sources
-          </Button>
+          {onOpenSources ? (
+            <Button
+              color="light"
+              size="xs"
+              variant="link" className="tw:min-h-6 tw:font-normal"
+              data-testid="content-empty-sources"
+              onClick={onOpenSources}
+            >
+              Open Sources
+            </Button>
+          ) : null}
           <Button
             color="light"
             size="xs"
@@ -265,7 +268,9 @@ export function RootView({
         </Row>
       )}
       <SectionHeader tint className={SECTION_H} data-testid="content-section-data">Data</SectionHeader>
-      <ListRow icon={<Database size={16} />} label="Sources" count={sourcesCount} chevron data-testid="content-open-sources" onClick={onOpenSources} />
+      {onOpenSources ? (
+        <ListRow icon={<Database size={16} />} label="Sources" count={sourcesCount} chevron data-testid="content-open-sources" onClick={onOpenSources} />
+      ) : null}
       <ListRow icon={<Braces size={16} />} label="Variables" count={variablesCount} chevron data-testid="content-open-variables" onClick={onOpenVariables} />
       <ListRow icon={<GitBranch size={16} />} label="Conditions" count={conditionsCount} chevron data-testid="content-open-conditions" onClick={onOpenConditions} />
     </div>
@@ -329,13 +334,14 @@ export function SourcesView({
   return (
     <div className={CONTENT_BODY}>
       <Crumb label="Sources" onClick={onBack} />
-      {/* Board 303:2083. Shown only when there is something to watch, and only
-          because ContentTab now subscribes to DataManager's own events — the
-          panel states this because it is true, not as decoration. */}
+      {/* Board 303:2083 draws "Watching for changes" here. That was not true:
+          sources live in memory only (DataManager, absent from exportProject)
+          and are gone on reload (REA 2026-10-20 #11b). Until persisting them
+          is decided, the pill says what they are. */}
       {sources.length > 0 && (
         <div className="tw:px-4 tw:pb-1">
-          <span className={`${STATUS_PILL} ${STATUS_PILL_OK}`} data-testid="sources-watching">
-            Watching for changes
+          <span className={`${STATUS_PILL} ${STATUS_PILL_IDLE}`} data-testid="sources-session-only">
+            For this session only
           </span>
         </div>
       )}
@@ -402,7 +408,7 @@ export function SourcesView({
             panel's foot with a rule above it, it read as a footer note on
             a different subject — 600px below the thing it explains. */}
         <div className={INLINE_HINT} data-testid="content-source-note">
-          A source feeds a collection. Edits sync one way — from the source in.
+          A source feeds a collection for this session. Sources are not saved with the site — reloading the editor removes them.
         </div>
       </div>
       {actions ? (

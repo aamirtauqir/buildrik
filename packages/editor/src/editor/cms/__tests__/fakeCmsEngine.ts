@@ -6,6 +6,7 @@
  * @license BSD-3-Clause
  */
 import { vi } from "vitest";
+import { DataSourceConflictError } from "@/engine/data/DataManager";
 import type { CMSCollection, CMSContentItem } from "@/shared/types/cms";
 
 type Handler = (p: unknown) => void;
@@ -78,6 +79,8 @@ export function makeEngine(opts?: {
       getAllSources: () => [...sources.values()],
       importSampleData: vi.fn((json: string) => {
         const parsed = JSON.parse(json) as Record<string, unknown>;
+        const taken = Object.keys(parsed).filter((key) => sources.has(key));
+        if (taken.length > 0) throw new DataSourceConflictError(taken);
         for (const key of Object.keys(parsed)) {
           sources.set(key, {
             id: key,
@@ -127,7 +130,7 @@ export function makeEngine(opts?: {
           items = items.filter((i) => i.id !== id);
           return Promise.resolve(true);
         }),
-        addField: vi.fn(() => Promise.resolve(null)),
+        addField: vi.fn((_id: string, field: Record<string, unknown>) => Promise.resolve({ ...field, id: "f-new" })),
         deleteField: vi.fn(() => Promise.resolve(true)),
         /* Mutates the array the getters read from, so a save is observable the
            way it is in the engine — a spy that only records the call would pass

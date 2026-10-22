@@ -18,7 +18,9 @@
  * byte-for-byte what it did before the fix (captured in
  * `__fixtures__/catalogBlockHtml.baseline.json` from the pre-fix code) —
  * except the Carousel, whose old output was the bug (see
- * `sliderExport.test.ts`).
+ * `sliderExport.test.ts`), and the Heading, which on this empty page now
+ * inserts as the page's h1 (BD-39 (6): same styles, `<h1>` for `<h2>`), and
+ * the Form, whose fields now sit in visible labels (BD-39 (7)).
  *
  * @license BSD-3-Clause
  */
@@ -126,7 +128,10 @@ async function publishedFiles(composer: ReturnType<typeof createTestComposer>): 
     /* The site's token declarations are site-wide, not the block's: since
        BRD-23 every export declares the seed tokens (the baseline predates it).
        That block is pinned by `ExportEngine.tokenClosure.test.ts`. */
-    .replace(/\n\n\n:root\{--buildrick-design-[^}]*\}\n/, "");
+    .replace(/\n\n\n:root\{--buildrick-design-[^}]*\}\n/, "")
+    /* Site-wide too: since REA #18 every export paints body text with the
+       site's Text token, saved or seed. Pinned by ExportEngine.siteFonts.test.ts. */
+    .replace(/\nbody\{color:var\(--buildrick-design-color-text,[^)]*\)\}\n/, "");
 }
 
 describe("Q2 — inserted blocks keep their real element type", () => {

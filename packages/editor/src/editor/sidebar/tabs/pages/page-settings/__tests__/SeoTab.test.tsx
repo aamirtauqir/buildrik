@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 /**
  * SeoTab — pure form renderer. Tests field behavior, counters, slug warning,
- * noIndex banner, and the AI "Write with AI" affordance.
+ * and the noIndex banner.
  *
  * Two former defects, now FIXED and asserted here:
  *   - "SEO counter mismatches": the enforced input limits (maxLength/slice)
@@ -12,10 +12,6 @@
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, act } from "@testing-library/react";
-
-vi.mock("@/shared/utils/openai", () => ({
-  generateContent: vi.fn(async () => "AI Suggested Title"),
-}));
 
 import * as React from "react";
 import { SeoTab } from "../SeoTab";
@@ -58,6 +54,7 @@ function makeSettings(over: Partial<UsePageSettingsReturn> = {}): UsePageSetting
     setCustomHead: vi.fn(),
     headCodeError: null,
     domain: null,
+    servesCleanUrls: false,
     saveState: "clean",
     isDirty: false,
     save: vi.fn(),
@@ -112,74 +109,6 @@ describe("SeoTab title field", () => {
     expect(screen.getByText(/60\/60/)).toBeTruthy();
   });
 
-  it('shows "Write with AI" only when the title is under 10 chars, and it calls the AI service', async () => {
-    const s = makeSettings({ seoTitle: "Hi" });
-    render(<SeoTab s={s} page={makePage()} composer={null} />);
-    const btn = screen.getByRole("button", { name: /suggest seo title/i });
-    await act(async () => {
-      fireEvent.click(btn);
-    });
-    const { generateContent } = await import("@/shared/utils/openai");
-    expect(generateContent).toHaveBeenCalled();
-  });
-
-  /* L5-017: the prompt carried only the page name ("Home") inside a generic
-     "headline" template, so a local-business site got web-builder marketing.
-     It now carries the site name and the page's own copy, unwrapped. */
-  it("grounds the AI title in the site name and the page's own copy", async () => {
-    const heading = { getType: () => "heading", getContent: () => "<b>Fresh</b> bread daily", getChildren: () => [] };
-    const para = { getType: () => "paragraph", getContent: () => "Family bakery in Leeds since 1982.", getChildren: () => [] };
-    const root = { getType: () => "container", getContent: () => "", getChildren: () => [heading, para] };
-    const composer = {
-      getProjectMetadata: () => ({ name: "Rosie's Bakery" }),
-      getProjectSettings: () => ({}),
-      elements: {
-        getAllPages: () => [{ id: "p1", name: "Home", slug: "home", root: { id: "root" } }],
-        getElement: (id: string) => (id === "root" ? root : null),
-      },
-    } as unknown as Composer;
-    render(<SeoTab s={makeSettings({ seoTitle: "" })} page={makePage()} composer={composer} />);
-    await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: /suggest seo title/i }));
-    });
-    const { generateContent } = await import("@/shared/utils/openai");
-    const [prompt, , , options] = vi.mocked(generateContent).mock.calls[0];
-    expect(prompt).toContain("Rosie's Bakery");
-    expect(prompt).toContain("Fresh bread daily");
-    expect(prompt).toContain("Family bakery in Leeds since 1982.");
-    expect(options).toMatchObject({ useEnhancedPrompts: false });
-  });
-
-  /* L5-018: a filled title keeps a way to ask again — the button used to
-     vanish at 10 characters, so a bad result could not be regenerated. */
-  it('offers "Regenerate" once the title reaches 10 chars', () => {
-    const s = makeSettings({ seoTitle: "Long Title Here" });
-    render(<SeoTab s={s} page={makePage()} composer={null} />);
-    expect(screen.getByRole("button", { name: /suggest seo title/i }).textContent).toContain("Regenerate");
-  });
-
-  it("trims a long AI title at a word boundary, never mid-word", async () => {
-    const { generateContent } = await import("@/shared/utils/openai");
-    vi.mocked(generateContent).mockResolvedValueOnce(
-      '"Transform Your Online Presence with Our Innovative Website Builder Today"',
-    );
-    const s = makeSettings({ seoTitle: "" });
-    render(<SeoTab s={s} page={makePage()} composer={null} />);
-    await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: /suggest seo title/i }));
-    });
-    expect(s.setSeoTitle).toHaveBeenCalledWith("Transform Your Online Presence with Our Innovative Website");
-  });
-
-  it("says so when the AI call fails, instead of failing silently", async () => {
-    const { generateContent } = await import("@/shared/utils/openai");
-    vi.mocked(generateContent).mockRejectedValueOnce(new Error("down"));
-    render(<SeoTab s={makeSettings({ seoTitle: "" })} page={makePage()} composer={null} />);
-    await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: /suggest seo title/i }));
-    });
-    expect(screen.getByRole("alert").textContent).toContain("write a title just now");
-  });
 });
 
 // ── Description field ────────────────────────────────────────────────────────
@@ -489,9 +418,22 @@ describe("SeoTab Google preview — served URL", () => {
     { id: "p1", slug: "about" },
   ];
 
-  it("shows /<slug>.html — the file the export writes — not /<slug>", () => {
+  it("shows /<slug> once the live deploy serves clean URLs (cleanUrls, REA #26)", () => {
     render(
-      <SeoTab s={makeSettings({ slug: "about", domain: "bellacucina.com" })} page={makePage({ id: "p1", slug: "about" })} composer={composerWithPages(pages)} />,
+      <SeoTab s={makeSettings({ slug: "about", domain: "bellacucina.com", servesCleanUrls: true })} page={makePage({ id: "p1", slug: "about" })} composer={composerWithPages(pages)} />,
+    );
+    expect(screen.getByTestId("seo-preview-url").textContent).toBe("bellacucina.com/about");
+  });
+
+  /* BD-39 (4): until the site is republished with cleanUrls the live deploy
+     serves only `/about.html`, so that is the URL the preview names. */
+  it("shows /<slug>.html while the live deploy predates cleanUrls", () => {
+    render(
+      <SeoTab
+        s={makeSettings({ slug: "about", domain: "bellacucina.com", servesCleanUrls: false })}
+        page={makePage({ id: "p1", slug: "about" })}
+        composer={composerWithPages(pages)}
+      />,
     );
     expect(screen.getByTestId("seo-preview-url").textContent).toBe("bellacucina.com/about.html");
   });
@@ -510,11 +452,11 @@ describe("SeoTab Google preview — served URL", () => {
   it("follows the drafted slug, numbered on a clash exactly as the export numbers it", () => {
     render(
       <SeoTab
-        s={makeSettings({ slug: "menu", domain: "bellacucina.com" })}
+        s={makeSettings({ slug: "menu", domain: "bellacucina.com", servesCleanUrls: true })}
         page={makePage({ id: "p1", slug: "about" })}
         composer={composerWithPages([pages[0], { id: "p0", slug: "menu" }, pages[1]])}
       />,
     );
-    expect(screen.getByTestId("seo-preview-url").textContent).toBe("bellacucina.com/menu-2.html");
+    expect(screen.getByTestId("seo-preview-url").textContent).toBe("bellacucina.com/menu-2");
   });
 });

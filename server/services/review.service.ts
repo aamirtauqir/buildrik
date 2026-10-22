@@ -460,12 +460,16 @@ export async function getApprovedSnapshot(
  */
 export async function revokeReviewRound(
   workspaceId: string,
+  siteId: string,
   reviewId: string,
   expectedRevision: string,
 ): Promise<{ revoked: boolean; reason?: "token-changed" | "already-revoked" | "not-found" }> {
+  /* BK-08: bound to the site the caller's role was checked on. By workspace
+     alone, an EDITOR scoped to site A revoked a review on site B. */
   const { count } = await prisma.reviewRequest.updateMany({
     where: {
       id: reviewId,
+      siteId,
       site: { workspaceId },
       revokedAt: null,
       updatedAt: new Date(expectedRevision),
@@ -474,7 +478,7 @@ export async function revokeReviewRound(
   });
   if (count === 1) return { revoked: true };
   const row = await prisma.reviewRequest.findFirst({
-    where: { id: reviewId, site: { workspaceId } },
+    where: { id: reviewId, siteId, site: { workspaceId } },
     select: { revokedAt: true },
   });
   if (!row) return { revoked: false, reason: "not-found" };
@@ -521,6 +525,13 @@ export async function listReviews(
     })),
     nextCursor: hasMore ? slice[slice.length - 1].id : null,
   };
+}
+
+/** The site a review belongs to, within the workspace — what its resolve
+ *  is authorized against (BK-08). Null when there is no such review. */
+export async function getReviewSiteId(workspaceId: string, id: string): Promise<string | null> {
+  const review = await prisma.reviewRequest.findFirst({ where: { id, site: { workspaceId } }, select: { siteId: true } });
+  return review?.siteId ?? null;
 }
 
 /** Approve / request-changes on a review. Workspace-scoped; only a PENDING one. */

@@ -26,7 +26,7 @@
   },
   "__tests__/dashboard-service.test.ts": {
     "@typescript-eslint/no-explicit-any": {
-      "count": 17
+      "count": 15
     }
   },
   "__tests__/db/auth-config-account-first.db.test.ts": {
@@ -71,12 +71,12 @@
   },
   "__tests__/onboarding-service.test.ts": {
     "@typescript-eslint/no-explicit-any": {
-      "count": 18
+      "count": 13
     }
   },
   "__tests__/page-service.test.ts": {
     "@typescript-eslint/no-explicit-any": {
-      "count": 20
+      "count": 1
     }
   },
   "__tests__/publish-service.test.ts": {

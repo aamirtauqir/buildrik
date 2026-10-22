@@ -4,10 +4,8 @@ import * as React from "react";
 import { StylesRouter } from "../StylesRouter";
 import { StylePresetRegistryProvider } from "@/editor/design-system/state/StylePresetRegistryContext";
 
-const PROJECT_ID = "styles-router-test";
-
 const wrap = (ui: React.ReactNode) => (
-  <StylePresetRegistryProvider projectId={PROJECT_ID}>
+  <StylePresetRegistryProvider>
     {ui}
   </StylePresetRegistryProvider>
 );

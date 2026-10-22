@@ -314,7 +314,8 @@ export class PageManager {
        looked right for the page that happened to be open, because that is the
        page whose elements are registered. */
     const liveRoot = this.ctx.elements.get(source.root.id);
-    const clonedRoot = this.ctx.cloneElementData(liveRoot ? liveRoot.toJSON() : source.root);
+    const renames: IdRename[] = [];
+    const clonedRoot = this.ctx.cloneElementData(liveRoot ? liveRoot.toJSON() : source.root, renames);
     const name = uniqueCopyName(source.name, this.existingNames());
     const slug = uniqueCopySlug(source.slug ?? slugify(source.name), this.existingSlugs());
     const now = new Date().toISOString();
@@ -334,6 +335,7 @@ export class PageManager {
 
     this.ctx.pages.set(page.id, page);
     const copy = this.ctx.buildElementTree(page.root);
+    this.ctx.copyStyleRules(renames);
     this.registerRoute(page);
     /* BD-06: the copy's elements are bound like the source's. */
     if (liveRoot && copy) this.ctx.composer.cms?.bindings?.copyTree(liveRoot, copy);

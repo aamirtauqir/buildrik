@@ -86,11 +86,11 @@ export function installDomShims() {
   });
 }
 
-export const wrap = (ui: React.ReactNode, composer: ComposerProp | null = null, projectId = "brand-workspace-test") => (
+export const wrap = (ui: React.ReactNode, composer: ComposerProp | null = null) => (
   <ToastProvider>
     <DSModeProvider initialMode="pro">
       <TokenRegistryProvider composer={composer}>
-        <StylePresetRegistryProvider projectId={projectId}>{ui}</StylePresetRegistryProvider>
+        <StylePresetRegistryProvider composer={composer}>{ui}</StylePresetRegistryProvider>
       </TokenRegistryProvider>
     </DSModeProvider>
   </ToastProvider>

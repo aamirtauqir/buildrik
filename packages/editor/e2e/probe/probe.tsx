@@ -69,11 +69,6 @@ import { Row as InsertRow } from "@/editor/sidebar/tabs/build/components/GroupSe
 import { BuildTab } from "@/editor/sidebar/tabs/build/BuildTab";
 import type { ComponentDefinition } from "@/shared/types/components";
 import { PanelLoadingSkeleton } from "@/editor/shared/PanelStates";
-/* AgentPlan carries `.bd-ai-*` styles that only AITab imports, so the probe
-   loads the panel's stylesheet the way production does. */
-import "@/editor/sidebar/tabs/ai/AITab.css";
-import { AgentPlan } from "@/editor/sidebar/tabs/ai/AgentPlan";
-import type { RunStep } from "@/editor/sidebar/tabs/ai/hooks/useAgentRunner";
 import { ApprovedCompareView } from "@/editor/panels/version-history/ApprovedCompareView";
 import type { ComparePage } from "@/shared/utils/html";
 import { ComponentsTab } from "@/editor/sidebar/tabs/ComponentsTab";
@@ -82,7 +77,6 @@ import { DSModeProvider } from "@/editor/design-system/state/DSModeContext";
 import { LayerTreeItem } from "@/editor/panels/layers/LayerTreeItem";
 import type { LayerItem } from "@/editor/panels/layers/types";
 import { HistoryTab } from "@/editor/sidebar/tabs/history/HistoryTab";
-import { MilestoneSuggestionBanner } from "@/editor/sidebar/tabs/history/components/MilestoneSuggestionBanner";
 import { PublishHistory } from "@/editor/shell/PublishHistory";
 import { IssuesPanel } from "@/editor/shell/IssuesPanel";
 import { ConfirmDialog } from "@/editor/chrome-ui";
@@ -224,14 +218,11 @@ const FAILED_UPLOAD: UploadProgress[] = [
  * drawer's own 320 to be measurable at all — mounting one bare stretches it to
  * the probe root and every width reads wrong.
  *
- * `versions` (146:32) used to be deliberately absent, on the reasoning that
- * its rows "come from IndexedDB". They do not: `reloadDbVersions` calls
- * `listAssetVersions`, which is a tRPC read over the wire (MediaVersionService
- * :34), and the probe already answers that transport for the review surfaces.
- * So the versions case stubs `media.listAssetVersions` — the component mounts
- * exactly as it ships and the only thing faked is what the server said. The
- * old reasoning is what left a board with four drawn rows measured against a
- * screen that had none.
+ * `versions` (146:32 / v3 4418:62883) lists the asset's FAMILY — the
+ * original and its saved versions, the rows the library's Asset versions
+ * dialog lists too (`useAssetVersions`). The fixture hands the overlay that
+ * family and answers `getUsages` so the site carries the newest; the server
+ * history (`media.listAssetVersions`, stubbed) only supplies author lines.
  */
 const DETAIL_ITEM: LibraryItem = MEDIA_ITEM({
   key: "hero",
@@ -243,28 +234,44 @@ const DETAIL_ITEM: LibraryItem = MEDIA_ITEM({
 });
 
 /**
- * Restore points as `media.listAssetVersions` returns them: newest first, and
- * `assetId` present on the ITEM (without it `reloadDbVersions` short-circuits
- * to an empty list before any request is made). The byte deltas are what the
- * board's "+12 KB / −4 KB / original" column is computed FROM — the overlay
- * derives each row's label by differencing with its successor, so the fixture
- * supplies sizes rather than the labels themselves.
+ * The family as `versionsOf` returns it: the original first, saved versions
+ * oldest to newest. The byte sizes are what the board's "+12 KB / −4 KB /
+ * original" column is computed FROM (each row against the one before), so the
+ * fixture supplies sizes rather than the labels themselves. The newest is on
+ * the site (`USAGE_COMPOSER.mediaOps.getUsages`), which is what makes it
+ * `current`.
  */
+const DAY = 24 * 60 * 60 * 1000;
 const VERSIONED_ITEM: LibraryItem = MEDIA_ITEM({
   key: "hero",
   name: "hero-dark.jpg",
   assetId: "asset-hero",
-  size: 840 * 1024,
+  size: 844_000,
   width: 2400,
   height: 1600,
   altText: "Dark restaurant interior with…",
+  createdAt: new Date(Date.now() - 12 * DAY).toISOString(),
 });
-
-const DAY = 24 * 60 * 60 * 1000;
+const versionOfHero = (n: number, size: number, daysAgo: number): LibraryItem =>
+  MEDIA_ITEM({
+    key: `hero-v${n}`,
+    name: `hero-dark-v${n}.jpg`,
+    src: `${VERSIONED_ITEM.src}#v${n}`,
+    size,
+    versionOf: "hero",
+    createdAt: new Date(Date.now() - daysAgo * DAY).toISOString(),
+  });
+const VERSION_FAMILY: LibraryItem[] = [
+  VERSIONED_ITEM,
+  versionOfHero(2, 840_000, 5),
+  versionOfHero(3, 852_000, 2),
+  versionOfHero(4, 852_000, 0),
+];
+const ON_SITE_SRC = VERSION_FAMILY[3].src;
 const ASSET_VERSIONS = [
-  { id: "v3", assetId: "asset-hero", url: VERSIONED_ITEM.src, bytes: 852_000, edits: {}, createdAt: new Date(Date.now() - 2 * DAY).toISOString() },
-  { id: "v2", assetId: "asset-hero", url: VERSIONED_ITEM.src, bytes: 840_000, edits: {}, createdAt: new Date(Date.now() - 5 * DAY).toISOString() },
-  { id: "v1", assetId: "asset-hero", url: VERSIONED_ITEM.src, bytes: 844_000, edits: {}, createdAt: new Date(Date.now() - 12 * DAY).toISOString() },
+  { id: "sv4", assetId: "asset-hero", url: VERSION_FAMILY[3].src, bytes: 852_000, edits: {}, createdAt: VERSION_FAMILY[3].createdAt, createdByName: "Ali" },
+  { id: "sv3", assetId: "asset-hero", url: VERSION_FAMILY[2].src, bytes: 852_000, edits: {}, createdAt: VERSION_FAMILY[2].createdAt, createdByName: "Ali" },
+  { id: "sv2", assetId: "asset-hero", url: VERSION_FAMILY[1].src, bytes: 840_000, edits: {}, createdAt: VERSION_FAMILY[1].createdAt, createdByName: "Sara" },
 ];
 
 /** Pages shaped for `collectUsageByPage`: Home ×2, Menu ×1 (board 146:68). */
@@ -308,7 +315,9 @@ const usageEl = (id: string, name: string) => ({
 });
 
 const USAGE_COMPOSER = {
+  media: { on: () => {}, off: () => {} },
   mediaOps: {
+    getUsages: (src: string) => ({ count: src === ON_SITE_SRC ? 3 : 0, elements: [] }),
     getUsagesByPage: () =>
       new Map<string, unknown[]>([
         ["home", [usageEl("e1", "hero"), usageEl("e2", "gallery")]],
@@ -1399,54 +1408,6 @@ const APPLY_STEPS = [
 
 
 /**
- * AI run states (boards 170:29 thinking · 170:41 planning · 171:67 done).
- *
- * The AI panel's own chrome — back row, title row, scope band, prompt block —
- * is measured LIVE by the `ai-idle` recipe against the running editor, where it
- * is reached by the inspector's `✦ Ask AI`. The three states below cannot be
- * reached there at all: each one needs an answer from the dashboard's AI
- * endpoint, which the standalone editor has no credentials for. So the probe
- * mounts the ONE block each state adds, in the branch production renders it
- * from — `AgentPlan` at phase "planning" for the Thinking band (decision #23
- * retired the chat bubble that used to carry it), and at the run phase for the
- * band and the step rows.
- *
- * 280 is the board frame. Nothing compared from these three depends on it (the
- * anchored properties are heights, fills and type), and it keeps a probe
- * screenshot comparable to the board by eye. The shipped panel is 299 — the 300
- * inspector column less its own rule — which `ai-idle` records.
- */
-const aiHost = (name: string, children: React.ReactNode) => (
-  <div data-probe={name} style={{ width: 280, background: "#fff" }}>{children}</div>
-);
-
-/** Board 170:41's three, as `useAgentRunner` shapes them before step 0 runs. */
-const RUN_STEPS = (status: RunStep["status"]): RunStep[] =>
-  [
-    "Rewrite the headline",
-    "Warm the background tint",
-    "Swap the hero photo",
-  ].map((title) => ({
-    plan: { title, scope: { kind: "page" as const }, instruction: title },
-    status,
-  }));
-
-const agentPlan = (over: Partial<React.ComponentProps<typeof AgentPlan>>) => (
-  <AgentPlan
-    phase="planning"
-    steps={[]}
-    currentIndex={-1}
-    error={null}
-    onApprove={() => {}}
-    onEditStep={() => {}}
-    onRunPlan={() => {}}
-    onSkip={() => {}}
-    onStop={() => {}}
-    {...over}
-  />
-);
-
-/**
  * Compare fixtures (boards 168:2 side-by-side · 168:26 overlay · 168:48 list).
  *
  * Compare only has states when the dashboard hands back an approved snapshot
@@ -1871,16 +1832,6 @@ function ContentPanelHost({ probe, composer }: { probe: string; composer: Compos
 }
 
 const CASES: Record<string, () => React.ReactElement> = {
-  // ── AI run states (boards 170:29 / 170:41 / 171:67) ─────────────────────
-  "ai-thinking": () => aiHost("ai-thinking", agentPlan({ phase: "planning", steps: [] })),
-  /* Planning has NO step rows in the shipped runner: `start()` clears `steps`,
-     awaits the plan, then sets steps and phase "running" in the same breath.
-     The board draws a plan-review gate over three pending rows, which is a new
-     FSM state (ledger J-170:41, founder lane) — so the probe mounts what the
-     product actually renders here, the band alone. */
-  "ai-planning": () => aiHost("ai-planning", agentPlan({ phase: "planning", steps: [] })),
-  "ai-done": () =>
-    aiHost("ai-done", agentPlan({ phase: "done", steps: RUN_STEPS("applied"), currentIndex: -1 })),
   // ── Compare modes (boards 168:2 / 168:26 / 168:48) ──────────────────────
   "compare-side-by-side": () => <div data-probe="compare-side-by-side">{compareView(1080)}</div>,
   "compare-overlay": () => <div data-probe="compare-overlay">{compareView(1080)}</div>,
@@ -2142,11 +2093,19 @@ const CASES: Record<string, () => React.ReactElement> = {
   /* Save conflict, board 66:640. The overlay opens only when the server
      rejects a save because the site moved underneath this editor — no click in
      the standalone demo reaches it, and AquibraStudio's `conflict` state is
-     set from a save response. The REAL component is mounted with the four
-     callbacks it takes. */
+     set from a save response. The REAL component is mounted with the
+     callbacks it takes and a server copy that is still loading. */
   "shell-state-11-saving-conflict": () => (
     <div data-probe="shell-state-11-saving-conflict">
-      <ConflictModal open siteId={null} onReload={() => {}} onSaveBackup={() => {}} onOverwrite={() => {}} onClose={() => {}} />
+      <ConflictModal
+        open
+        siteId={null}
+        server={{ status: "loading" }}
+        onKeep={() => {}}
+        onSaveToHistory={() => false}
+        onReplace={() => {}}
+        onClose={() => {}}
+      />
     </div>
   ),
   /* Layers drawer, boards 142:2 / 143:2 / 143:295 / 1082:4589 / 1171:4829.
@@ -2372,28 +2331,6 @@ const CASES: Record<string, () => React.ReactElement> = {
       </div>
     );
   },
-  // Board 433:2348 — the milestone suggestion banner, all three of its states.
-  // `useAutoMilestone` only produces a suggestion after the engine has watched
-  // a real editing session cross a trigger threshold, so the component is
-  // mounted directly, in the 280 drawer it ships inside (the board's 600 is a
-  // component-gallery frame, not a surface the product has).
-  "history-milestone-banner": () => (
-    <div data-probe="history-milestone-banner">
-      {historyHost(
-        <MilestoneSuggestionBanner
-          suggestion={{
-            trigger: "page_added",
-            suggestedName: "Added pricing page",
-            reasoning: "3 sections added, hero copy changed",
-          } as never}
-          isLoading={false}
-          onAccept={() => {}}
-          onDismiss={() => {}}
-          onEdit={() => {}}
-        />,
-      )}
-    </div>
-  ),
   // ── Compare · loading-render / no-changes (boards 169:28 / 168:82) ───────
   // `currentPages={null}` IS the loading branch — the live side is still
   // exporting while the stored snapshot renders at once. Passing the same
@@ -2518,6 +2455,7 @@ const CASES: Record<string, () => React.ReactElement> = {
           <AutoOpen testid="media-detail-versions">
             <AssetDetailOverlay
               item={VERSIONED_ITEM}
+              versions={VERSION_FAMILY}
               composer={USAGE_COMPOSER}
               onClose={() => {}}
               onEditImage={() => {}}
@@ -3357,7 +3295,7 @@ const CASES: Record<string, () => React.ReactElement> = {
       <div className="tw:relative tw:h-203 tw:w-70 tw:overflow-hidden tw:bg-white">
         <ToastProvider>
           <AutoOpen testid="media-detail-versions">
-            <AssetDetailOverlay item={DETAIL_ITEM} composer={USAGE_COMPOSER} onClose={() => {}} />
+            <AssetDetailOverlay item={VERSIONED_ITEM} versions={VERSION_FAMILY} composer={USAGE_COMPOSER} onClose={() => {}} />
           </AutoOpen>
         </ToastProvider>
       </div>
@@ -3464,7 +3402,7 @@ const CASES: Record<string, () => React.ReactElement> = {
        */
       "s1-2-load-error": () => (
         <div data-probe="s1-2-load-error" className="tw:w-[1440px]">
-          <LoadErrorBanner kind="network" onRetry={() => {}} onSignIn={() => {}} />
+          <LoadErrorBanner kind="network" onRetry={() => {}} onSignIn={() => {}} onGoToDashboard={() => {}} />
         </div>
       ),
       "s1-2f-save-indicator": () => (

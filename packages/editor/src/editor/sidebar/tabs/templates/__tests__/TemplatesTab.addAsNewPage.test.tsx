@@ -27,7 +27,7 @@ vi.mock("@/editor/chrome-ui", async () => {
 import { TemplatesTab } from "../TemplatesTab";
 import { SITE_TEMPLATES } from "../templatesData";
 
-function makeComposer() {
+function makeComposer(importThrows = false) {
   const calls: string[] = [];
   const created = { id: "page-new", name: "New" };
   return {
@@ -45,11 +45,16 @@ function makeComposer() {
         }),
         importHTMLToActivePage: vi.fn(() => {
           calls.push("import");
+          if (importThrows) throw new Error("bad markup");
         }),
         recordAppliedTemplate: vi.fn(),
         getElement: vi.fn(() => null),
       },
       styles: { clear: vi.fn() },
+      history: { captureUndo: vi.fn(() => vi.fn()) },
+      beginTransaction: vi.fn(() => calls.push("begin")),
+      endTransaction: vi.fn(() => calls.push("end")),
+      rollbackTransaction: vi.fn(() => calls.push("rollback")),
       on: vi.fn(),
       off: vi.fn(),
       emit: vi.fn(),
@@ -77,8 +82,24 @@ describe("Templates — add as new page", () => {
 
     await waitFor(() => expect(calls).toContain("import"), { timeout: 5000 });
 
-    expect(calls).toEqual(["createPage", "setActivePage:page-new", "import"]);
+    expect(calls).toEqual(["begin", "createPage", "setActivePage:page-new", "import", "end"]);
     // The import must never run while the old page is still the active one.
     expect(calls.indexOf("setActivePage:page-new")).toBeLessThan(calls.indexOf("import"));
+  });
+
+  /* R1 P-2: a failed import used to leave the new page behind while the toast
+     said "nothing was changed", and Retry made a second page. */
+  it("rolls the new page back when the import fails", async () => {
+    const { calls, composer } = makeComposer(true);
+    render(<TemplatesTab composer={composer as never} />);
+    const first = SITE_TEMPLATES[0];
+    fireEvent.click(await screen.findByTestId(`tpl-ws-item-${first.id}`));
+    fireEvent.click(await screen.findByText("Create page"));
+    fireEvent.click(within(await screen.findByTestId("tpl-create-confirm")).getByRole("button", { name: "Create page" }));
+
+    await waitFor(() => expect(calls).toContain("rollback"), { timeout: 5000 });
+
+    expect(calls).toEqual(["begin", "createPage", "setActivePage:page-new", "import", "rollback", "setActivePage:page-1"]);
+    expect(calls).not.toContain("end");
   });
 });

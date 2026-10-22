@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { sanitizeBlocks, sanitizeProjectStyles } from "@/lib/sanitize-blocks";
 import { pagesFromTemplate } from "@/server/services/template.service";
 import { newPageRoot, copiesForRenamedIds, copyIdKeyedRecord, reidSite, type IdRename } from "@buildrik/shared/content/elementIds";
-import { checkSiteRole, getEffectiveSiteRole, PermissionError, siteScopeWhere } from "@/server/services/permission.service";
+import { checkSiteRole, getEffectiveSiteRole, getSiteWorkspace, PermissionError, siteScopeWhere } from "@/server/services/permission.service";
 import type {
   CreateSiteInput,
   ListSitesInput,
@@ -11,9 +11,10 @@ import type {
   SaveProjectDataInput,
   CmsBindingsInput,
 } from "@buildrik/shared/schemas/sites";
-import { filterCmsBindings, MAX_CMS_BINDINGS_CHARS, SITE_RESTORE_WINDOW_DAYS } from "@buildrik/shared/schemas/sites";
+import { CODE_EXPORT_NOT_IN_PLAN, filterCmsBindings, MAX_CMS_BINDINGS_CHARS, SITE_RESTORE_WINDOW_DAYS } from "@buildrik/shared/schemas/sites";
 import { ANALYTICS_ID_FIELDS, ANALYTICS_ID_SAFE, type AnalyticsProvider } from "@buildrik/shared/schemas/analytics-ids";
-import { SITE_SETTINGS_COLUMNS, keepValidJsonOnlySettings, stripColumnBackedSettings } from "@/server/services/site-settings.service";
+import { SITE_SETTINGS_COLUMNS, getSiteSettings, keepValidJsonOnlySettings, stripColumnBackedSettings } from "@/server/services/site-settings.service";
+import { listPages } from "@/server/services/page.service";
 import { sendSiteTransferredEmail } from "@/server/services/email.service";
 import { assertSiteQuota } from "@/server/services/site-quota";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
@@ -235,6 +236,7 @@ export async function createSite(
           templateId: input.templateId,
           pages: templatePageCount,
           lastEditedAt: new Date(),
+          lastEditedById: userId,
         },
       });
 
@@ -264,6 +266,7 @@ export async function createSite(
         createdBy: userId,
         pages: 1,
         lastEditedAt: new Date(),
+        lastEditedById: userId,
       },
     });
 
@@ -388,18 +391,66 @@ export function redactSitePassword<T extends { publishedPassword: string | null 
   return { ...rest, hasPublishedPassword: Boolean(publishedPassword) };
 }
 
-export async function getSite(siteId: string) {
-  const site = await prisma.site.findFirst({
+export async function getSite(siteId: string, db: Prisma.TransactionClient = prisma) {
+  const site = await db.site.findFirst({
     where: { id: siteId, deletedAt: null },
     include: { folder: true, sourceTemplate: { select: { id: true, name: true } } },
   });
   return site ? redactSitePassword(site) : null;
 }
 
-export async function renameSite(siteId: string, name: string) {
+/**
+ * Kill switch for the editor's load-time repair (CEO D5): the repair rewrites
+ * saved content, so it must be stoppable in production without a rebuild.
+ * Read per request — `EDITOR_LOAD_REPAIR=off` in the server env (restart, no
+ * build) stops every automatic repair; possible-damage rows still list.
+ */
+export function isLoadRepairEnabled(): boolean {
+  return process.env.EDITOR_LOAD_REPAIR !== "off";
+}
+
+/**
+ * Everything the editor loads, read as ONE snapshot. It used to be three
+ * parallel requests (`sites.get`, `pages.list`, `siteDetail.settings.get`): a
+ * save landing between them paired the old pages with the new `lastEditedAt`,
+ * and the editor's next save then passed the CAS check and overwrote work it
+ * never saw. REPEATABLE READ makes every read in the transaction see the same
+ * committed state, so the token always matches the content it came with.
+ *
+ * `lastEditedBy.isViewer` lets the restore/conflict dialog say "You … from
+ * another tab" instead of naming the viewer.
+ */
+export async function loadSiteForEditor(siteId: string, viewerId: string) {
+  return prisma.$transaction(
+    async (tx) => {
+      const site = await getSite(siteId, tx);
+      if (!site) return null;
+      const pages = await listPages(siteId, tx);
+      const settings = await getSiteSettings(siteId, tx);
+      const editor = site.lastEditedById
+        ? await tx.user.findUnique({ where: { id: site.lastEditedById }, select: { id: true, displayName: true, fullName: true } })
+        : null;
+      return {
+        site,
+        pages,
+        settings,
+        lastEditedBy: editor
+          ? { name: editor.displayName || editor.fullName, isViewer: editor.id === viewerId }
+          : null,
+        loadRepair: isLoadRepairEnabled(),
+      };
+    },
+    /* Prisma's interactive defaults (2s to start, 5s to run) fail a large
+       site or a busy pool with P2028 — and the editor cannot open at all.
+       Reads only: a longer ceiling holds no row locks. */
+    { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead, maxWait: 10_000, timeout: 30_000 },
+  );
+}
+
+export async function renameSite(siteId: string, name: string, editorId: string) {
   return redactSitePassword(await prisma.site.update({
     where: { id: siteId },
-    data: { name, lastEditedAt: new Date() },
+    data: { name, lastEditedAt: new Date(), lastEditedById: editorId },
   }));
 }
 
@@ -512,6 +563,7 @@ export async function duplicateSite(
         projectSettings: (original.projectSettings as Prisma.InputJsonValue) ?? undefined,
         projectCmsBindings: copyCmsBindings(original.projectCmsBindings, reid.renames),
         lastEditedAt: new Date(),
+        lastEditedById: userId,
       },
     });
 
@@ -757,6 +809,7 @@ export async function saveProjectFromEditor(
     cmsBindings?: CmsBindingsInput;
   },
   expectedLastEditedAt?: string,
+  editorId?: string,
 ) {
   // 2026-05-23: array-level cast — Zod's passthrough output type
   // (`objectOutputType<{...},...,"passthrough">`) for the `meta` field
@@ -786,7 +839,7 @@ export async function saveProjectFromEditor(
     settings: projectData.settings,
     dsSchemaVersion: projectData.dsSchemaVersion,
     cmsBindings: projectData.cmsBindings,
-  }, expectedLastEditedAt);
+  }, expectedLastEditedAt, editorId);
 }
 
 export async function bulkAction(
@@ -973,8 +1026,8 @@ const MIN_PAGES_PER_SITE = Math.min(...Object.values(PLAN_LIMITS).map((l) => l.p
 
 /**
  * L3-013: the plan's pages-per-site limit, at the write boundary the editor
- * uses (it saves full snapshots; `pages.create` was the only gate and the
- * editor never calls it). A site already over the limit — a downgrade — keeps
+ * uses (it saves full snapshots; the old `pages.create` gate was never
+ * called and is gone). A site already over the limit — a downgrade — keeps
  * saving as long as the save adds no page. Throws `PAGE_LIMIT:<limit>`.
  */
 async function assertPageLimit(siteId: string, workspaceId: string, incoming: number) {
@@ -986,7 +1039,26 @@ async function assertPageLimit(siteId: string, workspaceId: string, incoming: nu
   if (incoming > stored) throw new Error(`PAGE_LIMIT:${limit}`);
 }
 
-export async function saveProjectData(input: SaveProjectDataInput, expectedLastEditedAt?: string) {
+/**
+ * The server half of the Pro gate on the Publish panel's "Download code (ZIP)".
+ * The ZIP is built in the browser, so the editor asks here first and builds
+ * nothing on a refusal.
+ *
+ * Reads `Workspace.plan`, like every other entitlement gate: the Stripe
+ * webhook keeps it in step with the subscription (PAST_DUE keeps the paid plan
+ * through dunning, a deleted subscription drops it to FREE), so subscription
+ * status needs no second reading here. The caller has already proven site
+ * access. Throws SITE_NOT_FOUND or CODE_EXPORT_NOT_IN_PLAN.
+ */
+export async function assertCodeExportAllowed(siteId: string): Promise<void> {
+  const workspace = await getSiteWorkspace(prisma, siteId);
+  if (!workspace) throw new Error("SITE_NOT_FOUND");
+  if (PLAN_LIMITS[workspace.plan].codeExport !== true) throw new Error(CODE_EXPORT_NOT_IN_PLAN);
+}
+
+/** `editorId` is the user making the save; it lands in `Site.lastEditedById`
+ *  next to `lastEditedAt`. Omitted (internal callers, older tests) = unknown. */
+export async function saveProjectData(input: SaveProjectDataInput, expectedLastEditedAt?: string, editorId?: string) {
   const site = await prisma.site.findUnique({
     where: { id: input.siteId },
     select: {
@@ -1079,6 +1151,7 @@ export async function saveProjectData(input: SaveProjectDataInput, expectedLastE
         // stored bindings alone; the editor always sends its full map.
         projectCmsBindings: cmsBindings as Prisma.InputJsonValue | undefined,
         lastEditedAt: savedAt,
+        lastEditedById: editorId ?? null,
         ...(isFullSnapshot ? { pages: input.pages.length } : {}),
       },
     });

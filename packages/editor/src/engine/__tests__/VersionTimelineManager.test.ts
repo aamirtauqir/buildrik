@@ -91,7 +91,7 @@ describe("VersionTimelineManager.restoreVersion — the open work survives", () 
   });
 
   it("aborts the restore when the safety save fails — losing the work is the failure mode", async () => {
-    const { m, composer } = await makeManager();
+    const { m, composer, emitted } = await makeManager();
     vi.spyOn(m, "getVersion").mockResolvedValue({ id: "v1", name: "Launch", snapshot: {} } as never);
     vi.spyOn(m, "createVersion").mockRejectedValue(new Error("quota"));
 
@@ -99,6 +99,8 @@ describe("VersionTimelineManager.restoreVersion — the open work survives", () 
 
     expect(ok).toBe(false);
     expect(composer.importProject).not.toHaveBeenCalled();
+    // H-3: a failed restore is not a failed history load.
+    expect(emitted.map((e) => e.event)).not.toContain("version:load-failed");
   });
 });
 
@@ -276,5 +278,26 @@ describe("VersionTimelineManager.compareWithDraft", () => {
     expect(result?.changes).toEqual([
       expect.objectContaining({ property: "Text", before: "“Added after v1”", after: "" }),
     ]);
+  });
+});
+
+/* BK-59: before a Replace saves this tab's copy over a newer server one, that
+   server copy is kept as a version — of the GIVEN snapshot, not the open
+   document (which is the copy about to win). */
+describe("VersionTimelineManager.createVersion — of a given snapshot", () => {
+  it("stores the given snapshot instead of the open document", async () => {
+    const captureSnapshot = vi.fn(() => ({ pages: [{ id: "open" }] }));
+    const m = new (await import("../VersionTimelineManager")).VersionTimelineManager({
+      on: () => {},
+      off: () => {},
+      emit: () => {},
+      exportProject: captureSnapshot,
+    } as any);
+    const server = { pages: [{ id: "server" }] } as any;
+    const v = await m.createVersion("Before overwrite", "", server);
+    expect(v.snapshot).toBe(server);
+    expect(v.visualSnapshot).toBeNull();
+    expect(m.getVersions()[0].snapshot).toBe(server);
+    expect(captureSnapshot).not.toHaveBeenCalled();
   });
 });

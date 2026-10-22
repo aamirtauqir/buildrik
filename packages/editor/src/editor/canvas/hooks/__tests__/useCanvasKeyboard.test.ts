@@ -2,6 +2,7 @@ import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import type { Composer } from "@/engine/Composer";
 import { useCanvasKeyboard } from "../useCanvasKeyboard";
+import { EVENTS } from "@/shared/constants/events";
 
 // Minimal mock composer satisfying the hook's usage
 const mockComposer = {
@@ -159,5 +160,79 @@ describe("useCanvasKeyboard — Delete runs the delete command", () => {
     const { composer, press } = setup("root-id", ["root-id"]);
     press("Delete");
     expect(composer.commands.run).not.toHaveBeenCalled();
+  });
+});
+
+/* BD-39 (1): Enter on a selection starts inline edit — the same request the
+   Inspector's "Edit text on canvas" sends, so useCanvasInlineEdit decides what
+   is editable text (and asks the lock gate) for all three doors. */
+describe("useCanvasKeyboard — Enter starts inline edit", () => {
+  const setup = (opts: { readOnly?: boolean; selectedIds?: string[]; selectedId?: string | null } = {}) => {
+    const composer = {
+      ...mockComposer,
+      readOnly: opts.readOnly ?? false,
+      emit: vi.fn(),
+      elements: { ...mockComposer.elements, getElement: vi.fn(() => ({ getId: () => "el-1" })) },
+    } as unknown as Composer;
+    const { result } = renderHook(() =>
+      useCanvasKeyboard({
+        composer,
+        selectedId: opts.selectedId === undefined ? "el-1" : opts.selectedId,
+        selectedIds: opts.selectedIds ?? ["el-1"],
+        editingId: null,
+        select: vi.fn(),
+        clear: vi.fn(),
+        syncFromComposer: vi.fn(),
+      }),
+    );
+    const press = (init: KeyboardEventInit, target?: HTMLElement) => {
+      const ev = new KeyboardEvent("keydown", { key: "Enter", cancelable: true, ...init });
+      if (target) Object.defineProperty(ev, "target", { value: target });
+      act(() => result.current.handleKeyDown(ev as unknown as React.KeyboardEvent));
+      return ev;
+    };
+    const requested = () =>
+      (composer.emit as ReturnType<typeof vi.fn>).mock.calls.filter(([name]) => name === EVENTS.UI_INLINE_EDIT_REQUEST);
+    return { press, requested };
+  };
+
+  it("asks for inline edit on the selected element", () => {
+    const { press, requested } = setup();
+    const ev = press({});
+    expect(requested()).toEqual([[EVENTS.UI_INLINE_EDIT_REQUEST, { elementId: "el-1" }]]);
+    expect(ev.defaultPrevented).toBe(true);
+  });
+
+  it("does nothing while the document is read-only (view mode, time travel)", () => {
+    const { press, requested } = setup({ readOnly: true });
+    press({});
+    expect(requested()).toHaveLength(0);
+  });
+
+  it("does nothing with a modifier, a multi-selection or no selection", () => {
+    for (const init of [{ shiftKey: true }, { metaKey: true }, { ctrlKey: true }, { altKey: true }]) {
+      const { press, requested } = setup();
+      press(init);
+      expect(requested()).toHaveLength(0);
+    }
+    const multi = setup({ selectedIds: ["el-1", "el-2"] });
+    multi.press({});
+    expect(multi.requested()).toHaveLength(0);
+    const none = setup({ selectedId: null, selectedIds: [] });
+    none.press({});
+    expect(none.requested()).toHaveLength(0);
+  });
+
+  it("leaves Enter to a field, a select or text being edited", () => {
+    for (const tag of ["input", "textarea", "select"]) {
+      const { press, requested } = setup();
+      press({}, document.createElement(tag));
+      expect(requested()).toHaveLength(0);
+    }
+    const editable = document.createElement("div");
+    editable.setAttribute("contenteditable", "true");
+    const { press, requested } = setup();
+    press({}, editable);
+    expect(requested()).toHaveLength(0);
   });
 });

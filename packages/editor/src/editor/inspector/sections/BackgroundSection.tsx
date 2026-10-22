@@ -158,7 +158,15 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
         <MoreSettingsToggle isOpen={advancedExpanded} onToggle={() => onAdvancedToggle()} advancedCount={2} />
       )}
       {/* Gradient Background */}
-      {bgType === "gradient" && (
+      {/* A gradient with more stops (or layers) than the 2-stop editor holds
+          is shown, never offered to it: any edit there rewrote it as two
+          stops, destroying the rest. */}
+      {bgType === "gradient" && gradientUI?.isOpaque && (
+        <p className={`${FIELD_LABEL} tw:mb-3`} data-testid="inspector-fill-gradient-complex">
+          This gradient has more than two colour stops or layers, so it can&apos;t be edited here. It is kept as it is.
+        </p>
+      )}
+      {bgType === "gradient" && !gradientUI?.isOpaque && (
         <>
           {/* One labelled row, like every other row in the panel. It used to
               be a caption over two 44px gradient tiles — the only pair of

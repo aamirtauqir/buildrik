@@ -16,16 +16,14 @@ export {
   useProjectTokenStore,
 } from "./state/TokenRegistryContext";
 export type { ColorRegistry, SpacingRegistry, TypeRegistry } from "./state/TokenRegistryContext";
-export { useTokenUsageMap } from "./state/useTokenUsageMap";
 export { DSModeProvider, useDSMode, useDSModeOptional } from "./state/DSModeContext";
 export type { DSMode } from "./state/DSModeContext";
-export { DSModeToggle } from "./ui/DSModeToggle";
 export {
   StylePresetRegistryProvider,
   useButtonPresets, useCardPresets, useFormPresets, useLinkPresets,
   useBadgePresets, useAlertPresets, useTooltipPresets, useModalPresets,
   useNavPresets, useTablePresets, useLayoutPresets,
-  useResetAllPresets, PRESET_CATEGORIES,
+  PRESET_CATEGORIES,
 } from "./state/StylePresetRegistryContext";
-export type { PresetsForCategoryRegistry } from "./state/usePresetsForCategory";
+export type { PresetsForCategoryRegistry } from "./state/StylePresetRegistryContext";
 export type { PresetCategory, StylePreset, PresetBinding } from "./types";

@@ -14,7 +14,18 @@ import { cmsWorkspace } from "@/editor/cms/cmsWorkspaceStore";
 import { makeEngine, MENU, ITEM } from "@/editor/cms/__tests__/fakeCmsEngine";
 import { CMSValidationError } from "@/engine/cms/CollectionManager";
 
-beforeEach(() => localStorage.clear());
+/* BD-39 (8): Data sources sit behind `cmsDataSources` (default OFF). The
+   suite below drives them, so it runs with the flag on; the OFF behaviour has
+   its own describe at the end. */
+const flags = vi.hoisted(() => ({ cmsDataSources: true }));
+vi.mock("@/shared/utils/featureFlags", () => ({
+  isFeatureEnabled: (flag: string) => flag === "cmsDataSources" && flags.cmsDataSources,
+}));
+
+beforeEach(() => {
+  localStorage.clear();
+  flags.cmsDataSources = true;
+});
 afterEach(() => cleanup());
 
 describe("ContentTab", () => {
@@ -158,13 +169,29 @@ describe("ContentTab", () => {
     );
   });
 
-  it("says it is watching only when there is a source to watch (board 303:2083)", async () => {
+  it("shows the session-only pill only when there is a source (board 303:2083)", async () => {
     const { composer } = makeEngine({ collections: [MENU], items: [] });
     render(<ContentTab composer={composer as never} />);
     fireEvent.click(await screen.findByText("Sources"));
     // Only the live `site` variables source is registered here, and the panel
-    // filters that one out — so there is nothing to watch and no claim to make.
-    expect(screen.queryByTestId("sources-watching")).toBeNull();
+    // filters that one out — so there is no source and no pill.
+    expect(screen.queryByTestId("sources-session-only")).toBeNull();
+  });
+
+  /* REA 2026-10-20 #11b: sources live in memory only (DataManager, not in
+     exportProject) and are gone on reload — the panel said "Watching for
+     changes". Until they persist, it says they last this session. */
+  it("a connected source is labelled session-only, never 'Watching for changes'", async () => {
+    const { composer } = makeEngine({ collections: [MENU], items: [] });
+    render(<ContentTab composer={composer as never} />);
+    fireEvent.click(await screen.findByText("Sources"));
+    fireEvent.click(await screen.findByRole("button", { name: "+ Connect a source" }));
+    fireEvent.change(screen.getByLabelText("Source JSON"), { target: { value: '{"products": [{"name": "A"}]}' } });
+    fireEvent.click(screen.getByRole("button", { name: "Add source" }));
+    expect(await screen.findByText("products")).toBeInTheDocument();
+    expect(screen.queryByText("Watching for changes")).toBeNull();
+    expect(screen.getByTestId("sources-session-only")).toHaveTextContent(/this session/i);
+    expect(screen.getByTestId("content-source-note")).toHaveTextContent(/not saved with the site/i);
   });
 
   it("sources: JSON import goes through importSampleData; bad JSON shows the error", async () => {
@@ -183,6 +210,24 @@ describe("ContentTab", () => {
     expect(await screen.findByText("products")).toBeInTheDocument();
   });
 
+  it("C-2: a key that names an existing source says so, and adds nothing", async () => {
+    const { composer } = makeEngine({ collections: [MENU], items: [] });
+    render(<ContentTab composer={composer as never} />);
+    fireEvent.click(await screen.findByText("Sources"));
+    fireEvent.click(await screen.findByRole("button", { name: "+ Connect a source" }));
+    const box = screen.getByLabelText("Source JSON");
+    fireEvent.change(box, { target: { value: '{"products": [{"name": "A"}]}' } });
+    fireEvent.click(screen.getByRole("button", { name: "Add source" }));
+    expect(await screen.findByText("products")).toBeInTheDocument();
+    fireEvent.click(await screen.findByRole("button", { name: "+ Connect a source" }));
+    fireEvent.change(screen.getByLabelText("Source JSON"), { target: { value: '{"extra": [1], "products": []}' } });
+    fireEvent.click(screen.getByRole("button", { name: "Add source" }));
+    const alert = await screen.findByRole("alert");
+    expect(alert).toHaveTextContent("“products” already exists as a source");
+    expect(alert).not.toHaveTextContent("Not valid JSON");
+    expect(composer.data.getAllSources().map((s: { id: string }) => s.id)).not.toContain("extra");
+  });
+
   /* Walked live 2026-08-18: typing into a new record and clicking the crumb
      returned to the collection and threw the value away without a word. The
      view already knows it is dirty — it renders "Unsaved changes · Discard ·
@@ -198,5 +243,29 @@ describe("ContentTab", () => {
     await waitFor(() => expect(screen.getByTestId("content-collection-col-1")).toHaveAttribute("aria-current", "true"));
     expect(screen.getByTestId("content-open-sources")).toBeInTheDocument();
     cmsWorkspace.reset();
+  });
+});
+
+describe("ContentTab — Data sources flag off (BD-39 8)", () => {
+  beforeEach(() => {
+    flags.cmsDataSources = false;
+  });
+
+  it("the root has no Sources row; Variables and Conditions stay", async () => {
+    const { composer } = makeEngine({ collections: [MENU], items: [ITEM] });
+    render(<ContentTab composer={composer as never} />);
+    await screen.findByText("Menu items");
+    expect(screen.queryByTestId("content-open-sources")).toBeNull();
+    expect(screen.queryByText("Sources")).toBeNull();
+    expect(screen.getByTestId("content-open-variables")).toBeInTheDocument();
+    expect(screen.getByTestId("content-open-conditions")).toBeInTheDocument();
+  });
+
+  it("the zero state offers no Open Sources door", async () => {
+    const { composer } = makeEngine();
+    render(<ContentTab composer={composer as never} onCreateCollection={vi.fn()} />);
+    await screen.findByTestId("content-empty");
+    expect(screen.queryByTestId("content-empty-sources")).toBeNull();
+    expect(screen.getByTestId("content-empty-variables")).toBeInTheDocument();
   });
 });

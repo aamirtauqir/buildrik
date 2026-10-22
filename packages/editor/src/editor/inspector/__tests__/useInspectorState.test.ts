@@ -28,3 +28,16 @@ describe("useInspectorState — pseudo-state", () => {
     expect(result.current.currentPseudoState).toBe("normal");
   });
 });
+
+/* BD-36: copy-style / paste-style read the state the Inspector shows from the
+   composer, so the hook publishes it there — and puts it back on unmount. */
+describe("useInspectorState — publishes the state to the composer", () => {
+  it("mirrors the pseudo-state onto composer.stylePseudoState", () => {
+    const composer = { stylePseudoState: "normal" as string };
+    const { result, unmount } = renderHook(() => useInspectorState({ id: "el-1", type: "heading" }, composer as never));
+    act(() => result.current.setCurrentPseudoState("hover"));
+    expect(composer.stylePseudoState).toBe("hover");
+    unmount();
+    expect(composer.stylePseudoState).toBe("normal");
+  });
+});

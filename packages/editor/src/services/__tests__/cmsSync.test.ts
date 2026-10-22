@@ -52,6 +52,7 @@ import {
   onCmsConflict,
   retryCmsSync,
   getCmsSyncPendingCount,
+  cmsSyncBlocker,
 } from "../cmsSync";
 import { recordServerStamp } from "../syncRetryQueue";
 
@@ -190,6 +191,36 @@ describe("cmsSync retry queue (#5/#6 — no silent drop)", () => {
     // colUpsert now resolves (set in drain's mockResolvedValue); retry flushes.
     await retryCmsSync();
     expect(getCmsSyncPendingCount()).toBe(0);
+    off();
+  });
+
+  /* C-16: the toast's count is the publish gate's — an in-flight mirror and
+     an outbox entry from an earlier page load are not on the server either. */
+  it("reports the same pending count as the publish gate", async () => {
+    await drain();
+    const events: number[] = [];
+    const off = onCmsSyncError(({ pending }) => events.push(pending));
+    localStorage.setItem("bk-cms-outbox-v1", JSON.stringify({
+      "site-123": [{ key: "entryDelete:left-over", op: "entryDelete", id: "left-over", seq: "0-0" }],
+    }));
+
+    let land!: (v: unknown) => void;
+    colUpsert.mockImplementationOnce(() => new Promise((r) => (land = r)));
+    const inFlight = syncCollectionUpsert({
+      id: "c-slow", name: "S", slug: "s", fields: [], createdAt: "", updatedAt: "",
+    } as never);
+    entUpsert.mockRejectedValueOnce(new Error("network down"));
+    await syncEntryUpsert({ id: "e-down", collectionId: "c1", data: {}, status: "draft", createdAt: "", updatedAt: "" } as never);
+
+    // queued failure + in-flight mirror + outbox-only entry
+    expect(events).toEqual([3]);
+    expect(getCmsSyncPendingCount()).toBe(3);
+    expect(cmsSyncBlocker()).toContain("3 CMS changes haven't reached the server");
+
+    land({ updatedAt: new Date(0) });
+    await inFlight;
+    expect(events.at(-1)).toBe(2);
+    expect(cmsSyncBlocker()).toContain("2 CMS changes haven't reached the server");
     off();
   });
 

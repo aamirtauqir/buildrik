@@ -36,7 +36,7 @@ type Reg = {
 };
 
 function makeComposer(
-  opts: { registry?: Reg[]; selected?: string[]; type?: string; clipboard?: unknown[] | null; canUndo?: boolean } = {},
+  opts: { registry?: Reg[]; selected?: string[]; type?: string; clipboard?: unknown[] | null; canUndo?: boolean; blocked?: string } = {},
 ) {
   const selected = opts.selected ?? [];
   return {
@@ -55,7 +55,13 @@ function makeComposer(
     },
     elements: { removeElement: vi.fn(), getActivePage: () => ({ name: "Home" }) },
     clipboard: opts.clipboard ?? null,
-    commands: { run: vi.fn(), getAll: () => opts.registry ?? [] },
+    commands: {
+      run: vi.fn(),
+      getAll: () => opts.registry ?? [],
+      blockedReason: vi.fn((id: string) =>
+        opts.blocked && ["undo", "redo", "add-text", "add-container"].includes(id) ? opts.blocked : undefined,
+      ),
+    },
   };
 }
 
@@ -121,11 +127,11 @@ describe("CommandPalette — board 4418:141220 structure", () => {
     renderPalette();
     expect(labels()).toEqual([
       "Open Pages", "Open Add", "Open Layers", "Open Assets", "Open Asset library", "Open CMS", "Open Brand",
-      "Open Publish", "Open AI assistant", "Browse Templates", "New page", "Replace layout with template…", "Open Review", "Open Activity", "Open Issues",
+      "Open Publish", "Browse Templates", "New page", "Replace layout with template…", "Open Review", "Open Activity", "Open Issues",
       "Open Site settings", "Open Components", "Keyboard shortcuts",
       "Undo", "Duplicate · Select an element first", "Replace selected media · Select an element first",
       "Zoom to 50%", "Preview Home page",
-      "Add text", "Add container", "Generate a block with AI…",
+      "Add text", "Add container",
       "Manage CMS records", "Save page as template", "Open History",
       "Search stock photos",
     ]);
@@ -172,12 +178,10 @@ describe("CommandPalette — doors", () => {
   const doors: Array<[string, string, unknown]> = [
     ["Open Pages", EVENTS.UI_PANEL_OPEN, { panel: "pages" }],
     ["Open Asset library", EVENTS.UI_SWITCH_TAB, { tab: "assets", fullPage: true }],
-    ["Open AI assistant", EVENTS.UI_SWITCH_TAB, { tab: "ai" }],
     ["Browse Templates", EVENTS.UI_PANEL_OPEN, { panel: "templates" }],
     ["Open Activity", EVENTS.UI_PANEL_OPEN, { panel: "activity" }],
     ["Open Issues", EVENTS.UI_OPEN_ISSUES, undefined],
     ["Keyboard shortcuts", EVENTS.UI_TOGGLE_CHEAT_SHEET, {}],
-    ["Generate a block with AI…", EVENTS.UI_INSERT_OPEN_GENERATE, {}],
     ["Replace layout with template…", EVENTS.UI_BROWSE_TEMPLATES, { replace: true }],
     ["Open History", EVENTS.UI_PANEL_OPEN, { panel: "history" }],
     ["Search stock photos", EVENTS.UI_PANEL_OPEN, { panel: "assets", screen: "stock" }],
@@ -197,10 +201,29 @@ describe("CommandPalette — doors", () => {
     expect(composer!.setZoom).toHaveBeenCalledWith(50);
   });
 
-  it("Undo runs the history", () => {
+  it("Undo runs the registry's undo, through its gate", () => {
     const { composer } = renderPalette();
     fireEvent.click(screen.getByTestId("cmdk-row-edit-undo"));
-    expect(composer!.history.undo).toHaveBeenCalledTimes(1);
+    expect(composer!.commands.run).toHaveBeenCalledWith("undo");
+    expect(composer!.history.undo).not.toHaveBeenCalled();
+  });
+
+  /* REA #12: palette Undo / Redo / Clear history / Add text / Add container
+     called composer.history directly or skipped the gate ⌘Z respects, so
+     during Time-travel (readOnly) ⌘K → Undo changed the live document. */
+  it("Undo, Redo, Clear history and the Add rows are disabled with the gate's reason", () => {
+    const { composer } = renderPalette(makeComposer({ registry: BOARD_REGISTRY, blocked: "Read-only right now" }));
+    for (const row of ["edit-undo", "cmd-add-text", "cmd-add-container"]) {
+      expect(screen.getByTestId(`cmdk-row-${row}`)).toHaveAttribute("aria-disabled", "true");
+      fireEvent.click(screen.getByTestId(`cmdk-row-${row}`));
+    }
+    expect(screen.getByTestId("cmdk-label-edit-undo")).toHaveTextContent("Read-only right now");
+    type("clear history");
+    expect(screen.getByTestId("cmdk-row-history-clear")).toHaveAttribute("aria-disabled", "true");
+    type("redo");
+    expect(screen.getByTestId("cmdk-row-edit-redo")).toHaveAttribute("aria-disabled", "true");
+    expect(composer!.commands.run).not.toHaveBeenCalled();
+    expect(composer!.history.undo).not.toHaveBeenCalled();
   });
 
   it("a disabled row runs nothing and stays open", () => {
@@ -219,15 +242,15 @@ describe("CommandPalette — VIEWER hides disallowed nav commands", () => {
   it("a non-viewer sees every nav door", () => {
     mockViewerChrome.mockReturnValue(false);
     renderPalette();
-    for (const label of ["Open Add", "Open Brand", "Open Site settings", "Open CMS", "Open Components", "Open Publish", "Open AI assistant", "Browse Templates", "Open Pages"]) {
+    for (const label of ["Open Add", "Open Brand", "Open Site settings", "Open CMS", "Open Components", "Open Publish", "Browse Templates", "Open Pages"]) {
       expect(screen.getByText(label)).toBeInTheDocument();
     }
   });
 
-  it("a viewer does not see Add/Brand/Settings/CMS/Components/Publish/AI/Templates/Pages", () => {
+  it("a viewer does not see Add/Brand/Settings/CMS/Components/Publish/Templates/Pages", () => {
     mockViewerChrome.mockReturnValue(true);
     renderPalette();
-    for (const label of ["Open Add", "Open Brand", "Open Site settings", "Open CMS", "Open Components", "Open Publish", "Open AI assistant", "Browse Templates", "Open Pages"]) {
+    for (const label of ["Open Add", "Open Brand", "Open Site settings", "Open CMS", "Open Components", "Open Publish", "Browse Templates", "Open Pages"]) {
       expect(screen.queryByText(label)).toBeNull();
     }
   });
@@ -306,13 +329,13 @@ describe("CommandPalette — search", () => {
 
   /* L1-033: ⌘0 worked and the palette's Reset zoom printed no chord. One row,
      not the registry's chordless copy beside it. */
-  it("Reset zoom prints ⌘0 / Ctrl+0 and appears once", () => {
+  it("Reset zoom prints ⇧0 (SC-12 / BD-39) and appears once", () => {
     const { composer } = renderPalette(
       makeComposer({ registry: [...BOARD_REGISTRY, { id: "zoom-reset", label: "Reset zoom" }] }),
     );
     type("reset zoom");
     expect(screen.getAllByRole("option")).toHaveLength(1);
-    expect(screen.getByTestId("cmdk-kbd-view-zoom-100").textContent).toMatch(/0$/);
+    expect(screen.getByTestId("cmdk-kbd-view-zoom-100").textContent).toMatch(/^(⇧|Shift\+)0$/);
     fireEvent.click(screen.getByTestId("cmdk-row-view-zoom-100"));
     expect(composer!.setZoom).toHaveBeenCalledWith(100);
   });
@@ -324,17 +347,17 @@ describe("CommandPalette — search", () => {
     expect(screen.getByTestId("cmdk-row-cmd-add-heading")).toBeInTheDocument();
   });
 
-  it("Zoom to fit prints ⌘1 / Ctrl+1, not Ctrl+0", () => {
+  it("Zoom to fit prints ⇧1 — ⌘1 switches browser tabs (SC-12 / BD-39)", () => {
     renderPalette();
     type("fit");
-    expect(screen.getByTestId("cmdk-kbd-view-fit").textContent).toMatch(/1$/);
+    expect(screen.getByTestId("cmdk-kbd-view-fit").textContent).toMatch(/^(⇧|Shift\+)1$/);
   });
 
   /* DQ-003: Canvas listened for ZOOM_SELECTION and nothing emitted it. */
-  it("Zoom to selection emits ZOOM_SELECTION and prints Ctrl+2", () => {
+  it("Zoom to selection emits ZOOM_SELECTION and prints ⇧2", () => {
     const { composer } = renderPalette();
     type("zoom to selection");
-    expect(screen.getByTestId("cmdk-kbd-view-zoom-selection").textContent).toMatch(/2$/);
+    expect(screen.getByTestId("cmdk-kbd-view-zoom-selection").textContent).toMatch(/^(⇧|Shift\+)2$/);
     fireEvent.click(screen.getByTestId("cmdk-row-view-zoom-selection"));
     expect(composer!.emit).toHaveBeenCalledWith(EVENTS.ZOOM_SELECTION, {});
   });
@@ -364,20 +387,13 @@ describe("CommandPalette — search", () => {
     confirmSpy.mockRestore();
   });
 
-  it("a query that matches nothing offers stock photos for it, and AI", () => {
+  it("a query that matches nothing offers stock photos for it", () => {
     const { composer, onClose } = renderPalette();
     type("zzqq");
     expect(screen.getByTestId("cmdk-no-results-line")).toHaveTextContent("Nothing matches ‘zzqq’.");
     fireEvent.click(screen.getByTestId("cmdk-no-results-stock"));
     expect(composer!.emit).toHaveBeenCalledWith(EVENTS.UI_PANEL_OPEN, { panel: "assets", screen: "stock:zzqq" });
     expect(onClose).toHaveBeenCalledTimes(1);
-  });
-
-  it("Enter on no results asks AI", () => {
-    const { composer } = renderPalette();
-    type("zzqq");
-    fireEvent.keyDown(input(), { key: "Enter" });
-    expect(composer!.emit).toHaveBeenCalledWith(EVENTS.UI_SWITCH_TAB, { tab: "ai" });
   });
 
   it("starts with a handed query (G2-059)", () => {

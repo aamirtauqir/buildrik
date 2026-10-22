@@ -46,11 +46,6 @@ export {
   type UseComposerSelectionOptions,
   type UseComposerSelectionResult,
 } from "./useComposerSelection";
-export {
-  useSelectionRect,
-  type UseSelectionRectOptions,
-  type SelectionRect as SelectionRectType,
-} from "./useSelectionRect";
 export { useSelectionBehavior } from "./useSelectionBehavior";
 export { useCanvasSnapping, type SnapLine, type SnapResult } from "./useCanvasSnapping";
 
@@ -99,7 +94,6 @@ export {
   type ContextMenuData,
   type ContextMenuContext,
 } from "./useCanvasContextMenu";
-export { useCanvasFloatingPanel, type FloatingPanelState } from "./useCanvasFloatingPanel";
 
 // Collaboration hooks
 export {
@@ -116,23 +110,6 @@ export {
   type CursorState,
   type CursorContext,
 } from "./useCursorIntelligence";
-
-// Performance hooks
-export {
-  useElementRect,
-  useMultipleElementRects,
-  type ElementRect,
-  type UseElementRectOptions,
-} from "./useElementRect";
-
-// Utility hooks
-export {
-  useEventListener,
-  useWindowEventListener,
-  useDocumentEventListener,
-  useEventListeners,
-  type UseEventListenerOptions,
-} from "./useEventListener";
 
 // Animation hooks
 export { useSelectionAnimation } from "./useSelectionAnimation";

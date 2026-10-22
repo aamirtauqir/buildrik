@@ -36,7 +36,6 @@ export interface ContextMenuData {
 
 interface UseCanvasContextMenuProps {
   composer: Composer | null;
-  onAIRequest?: (payload: { elementId: string; elementType?: string }) => void;
   /** Toast function for showing undo notifications */
   addToast?: AddToastFn;
 }
@@ -54,7 +53,6 @@ interface UseCanvasContextMenuReturn {
 
 export function useCanvasContextMenu({
   composer,
-  onAIRequest,
   addToast,
 }: UseCanvasContextMenuProps): UseCanvasContextMenuReturn {
   const [contextMenu, setContextMenu] = React.useState<ContextMenuState | null>(null);
@@ -102,13 +100,6 @@ export function useCanvasContextMenu({
       composer,
       element: el,
       isRoot: Boolean(isRoot),
-      openAI: onAIRequest
-        ? () =>
-            onAIRequest({
-              elementId: el.getId(),
-              elementType: el.getType(),
-            })
-        : undefined,
       addToast,
     };
 
@@ -117,7 +108,7 @@ export function useCanvasContextMenu({
       context: ctx,
       actions: getContextMenuActions(ctx),
     });
-  }, [contextMenu?.elementId, contextMenu?.x, contextMenu?.y, composer, onAIRequest, addToast]);
+  }, [contextMenu?.elementId, contextMenu?.x, contextMenu?.y, composer, addToast]);
 
   const closeContextMenu = React.useCallback(() => {
     setContextMenu(null);

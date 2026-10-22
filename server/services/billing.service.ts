@@ -101,49 +101,6 @@ export async function getBillingOverview(workspaceId: string) {
   };
 }
 
-export async function getUsageDetails(workspaceId: string, plan: PlanName) {
-  const counts = await getUsageCounts(workspaceId);
-  const limits = PLAN_LIMITS[plan];
-
-  function computePercentage(used: number, limit: number): number {
-    if (limit === -1) return 0;
-    return Math.round((used / limit) * 100);
-  }
-
-  return {
-    sites: {
-      used: counts.sites,
-      limit: limits.sites as number,
-      percentage: computePercentage(counts.sites, limits.sites as number),
-    },
-    teamMembers: {
-      used: counts.teamMembers,
-      limit: limits.teamMembers as number,
-      percentage: computePercentage(counts.teamMembers, limits.teamMembers as number),
-    },
-    domains: {
-      used: counts.domains,
-      limit: limits.customDomains as number,
-      percentage: computePercentage(counts.domains, limits.customDomains as number),
-    },
-    aiCredits: {
-      used: counts.aiCredits,
-      limit: limits.aiGenerations as number,
-      percentage: computePercentage(counts.aiCredits, limits.aiGenerations as number),
-    },
-    formSubmissions: {
-      used: counts.formSubmissions,
-      limit: limits.formSubmissions as number,
-      percentage: computePercentage(counts.formSubmissions, limits.formSubmissions as number),
-    },
-    redirects: {
-      used: counts.redirects,
-      limit: limits.urlRedirects as number,
-      percentage: computePercentage(counts.redirects, limits.urlRedirects as number),
-    },
-  };
-}
-
 export async function listInvoices(
   workspaceId: string,
   page: number,

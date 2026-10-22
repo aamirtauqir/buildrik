@@ -16,7 +16,8 @@ import { Link, Unlink } from "lucide-react";
 import * as React from "react";
 import { FieldDot } from "./FieldDot";
 import { useInspectorField, mixedName } from "./InspectorFieldContext";
-import { unitWords } from "./InputControls";
+import { parseEntry, unitWords } from "./InputControls";
+import { ErrorLine, useFieldError } from "./Section";
 import { TextField, Button, TextInput, IconButton } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
 import { requestBrandToken } from "@/editor/design-system/ui/brandOpenRequest";
@@ -28,6 +29,13 @@ import { isTokenVar, extractVarName, cssVarToTokenId, resolveTokenVar } from "..
 
 type Side = "top" | "right" | "bottom" | "left";
 type Box = "margin" | "padding";
+
+const SIDE_UNITS: readonly string[] = ["px", "%", "em", "rem", "vw", "vh", "auto"];
+const NUMERIC = /^-?(\d+\.?\d*|\.\d+)$/;
+
+/** What a side says when it cannot read an entry (REA 2026-10-20 #22 — a
+ *  calc() it could not read used to vanish on blur without a word). */
+const SPACING_ERROR = "Enter a number with px, %, em, rem, vw or vh, auto, or a calc() / var() expression.";
 
 const parseValue = (val: string): { num: string; unit: string; isKeyword: boolean } => {
   if (!val) return { num: "", unit: "", isKeyword: false };
@@ -76,17 +84,37 @@ const AxisInput: React.FC<AxisInputProps> = ({ box, side, value, onChange, disab
   /* Typed numbers are written live, so Escape has to write back what the side
      held at focus — resetting the text alone left the typed padding on. */
   const atFocusRef = React.useRef<string | null>(null);
+  /* An entry it cannot read stays in the field, flagged, until corrected or
+     Escaped; the side keeps its last good value meanwhile. */
+  const [invalid, setInvalid] = React.useState(false);
+  const errorId = useFieldError(invalid ? SPACING_ERROR : null);
 
   React.useEffect(() => {
     setLocal(parseValue(value));
+    setInvalid(false);
   }, [value]);
 
   /* A typed or stepped number keeps the side's own unit: a video embed's
-     `padding-bottom: 56.25%` stepped up is 57.25%, never 57.25px. */
-  const commit = (raw: string) => {
+     `padding-bottom: 56.25%` stepped up is 57.25%, never 57.25px. A number
+     typed with its own unit ("2rem", "10%") keeps the typed one, and a
+     calc() / var() is written as typed once it is complete. Returns false
+     for an entry it cannot read — nothing is written then. */
+  const commit = (raw: string): boolean => {
     if (raw === "") onChange("");
-    else if (raw === "auto" || raw === "inherit") onChange(raw);
-    else if (/^-?[\d.]+$/.test(raw)) onChange(`${raw}${local.isKeyword ? "px" : local.unit || "px"}`);
+    else if (raw === "inherit") onChange(raw);
+    else {
+      const next = parseEntry(raw, SIDE_UNITS, local.isKeyword ? "px" : local.unit || "px", true);
+      if (!next) return false;
+      onChange(next);
+    }
+    return true;
+  };
+  /* Enter / blur: a draft that still cannot be read is flagged, not dropped. */
+  const readDraft = (): boolean => {
+    if (field.readOnly || field.mixed) return false;
+    const unreadable = local.num !== parseValue(value).num && parseEntry(local.num, SIDE_UNITS, "px", true) === null;
+    if (unreadable) setInvalid(true);
+    return unreadable;
   };
 
   const tokenId = isTokenVar(value) ? cssVarToTokenId(extractVarName(value) ?? "") : null;
@@ -98,7 +126,10 @@ const AxisInput: React.FC<AxisInputProps> = ({ box, side, value, onChange, disab
   /* §16: the name carries the unit ("Padding top in pixels"). */
   const nameId = React.useId();
   const suffixId = React.useId();
-  const suffix = field.mixed ? "Mixed values" : local.isKeyword || local.num === "" ? "" : unitWords(local.unit || "px");
+  /* The unit is shown, not only spoken: "2" on a rem side read as 2px
+     (R3 W7). A keyword or an expression carries no unit of its own. */
+  const shownUnit = !field.mixed && NUMERIC.test(local.num) ? local.unit || "px" : "";
+  const suffix = field.mixed ? "Mixed values" : shownUnit ? unitWords(shownUnit) : "";
 
   return (
     <span className={CELL} data-testid={`inspector-spacing-${property}`}>
@@ -140,12 +171,15 @@ const AxisInput: React.FC<AxisInputProps> = ({ box, side, value, onChange, disab
         readOnly={field.readOnly}
         aria-readonly={field.readOnly || undefined}
         aria-labelledby={suffix ? `${nameId} ${suffixId}` : nameId}
+        aria-invalid={invalid || undefined}
+        aria-describedby={invalid ? errorId : undefined}
         placeholder={field.mixed ? "Mixed" : "0"}
         onChange={(e) => {
           const next = e.target.value;
           field.startTyping();
+          setInvalid(false);
           setLocal({ num: next, unit: local.unit, isKeyword: /^[a-z]+$/i.test(next) });
-          if (next === "" || /^-?[\d.]+$/.test(next) || next === "auto" || next === "inherit") commit(next);
+          commit(next);
         }}
         onKeyDown={(e) => {
           /* §16: ↑/↓ step 1, Shift 10; Esc puts the value back. */
@@ -156,7 +190,13 @@ const AxisInput: React.FC<AxisInputProps> = ({ box, side, value, onChange, disab
             const next = String(Math.round((base + (e.shiftKey ? 10 : 1) * (e.key === "ArrowUp" ? 1 : -1)) * 100) / 100);
             setLocal({ num: next, unit: local.unit || "px", isKeyword: false });
             commit(next);
+          } else if (e.key === "Enter") {
+            /* The typed number is already written: Enter makes it the value
+               Escape returns to (REA 2026-10-20 P0-1). */
+            atFocusRef.current = value;
+            readDraft();
           } else if (e.key === "Escape") {
+            setInvalid(false);
             const before = atFocusRef.current;
             if (before !== null && before !== value && !field.readOnly) {
               onChange(before);
@@ -170,10 +210,18 @@ const AxisInput: React.FC<AxisInputProps> = ({ box, side, value, onChange, disab
           atFocusRef.current = value;
         }}
         onBlur={() => {
-          setLocal(parseValue(value));
+          if (!readDraft()) setLocal(parseValue(value));
           field.stopTyping();
         }}
       />
+      <span
+        aria-hidden="true"
+        data-testid={`inspector-spacing-${property}-unit`}
+        className="tw:ml-px tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]"
+      >
+        {shownUnit}
+      </span>
+      <ErrorLine id={errorId} message={invalid ? SPACING_ERROR : null} />
     </span>
   );
 };

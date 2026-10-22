@@ -110,6 +110,12 @@ export interface Issue {
    * `broken-link`.
    */
   contentKind?: ContentIssueKind;
+  /**
+   * Set on a load-scan finding (DamageScanner, design decision 8): possibly
+   * escaped text, shown as `before → after` with Fix / Keep as written, or
+   * styles that could not be verified, shown under "Couldn't verify".
+   */
+  damage?: { kind: "escaped-text" | "unverified-styles"; before?: string; after?: string };
 }
 
 /**

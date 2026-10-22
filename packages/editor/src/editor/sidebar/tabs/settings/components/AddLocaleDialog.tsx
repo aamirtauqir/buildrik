@@ -6,8 +6,9 @@
  * enabled, each `<Language> — <Native> · <code>` · `Locale code`, read-only,
  * with `URL prefix /<code>` at its right · a `Set as default locale` row
  * with its toggle (`Visitors without a matching language land here.`) ·
- * `Starts as a draft. Translate every required page before this locale can
- * be published.` · Cancel · `Create locale`.
+ * `Starts as a draft. Only the default language publishes for now.` (S-4:
+ * the board's line promised a publish the pipeline does not do) · Cancel ·
+ * `Create locale`.
  *
  * Create is a save, at once: `settings.update` with the enabled list plus
  * the code (and the code as `defaultLocale` when the toggle is on), then
@@ -177,7 +178,7 @@ export function AddLocaleDialog({ open, siteName, enabledLocales, onClose, onCre
           </div>
 
           <p className={`${HINT} tw:mt-3`} data-testid="set-loc-draft-note">
-            Starts as a draft. Translate every required page before this locale can be published.
+            Starts as a draft. Only the default language publishes for now.
           </p>
 
           {error ? (

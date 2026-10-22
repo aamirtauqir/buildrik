@@ -13,6 +13,9 @@ import * as React from "react";
 import { devLog } from "@/shared/utils/devLogger";
 import { isSafeUrl } from "@/shared/utils/html";
 
+/** The inline elements "Clear formatting" unwraps. */
+const INLINE_FORMAT_TAGS = "strong, b, em, i, u, s, strike, del, ins, mark, font, span, sub, sup, small, big";
+
 interface UseCanvasInlineCommandsParams {
   canvasRef: React.RefObject<HTMLDivElement | null>;
   editingId: string | null;
@@ -21,12 +24,32 @@ interface UseCanvasInlineCommandsParams {
 /**
  * Rich text inline editing commands using Selection API.
  * Supports bold, italic, underline, strikethrough, insertText,
- * createLink, unlink, and formatBlock.
+ * createLink, unlink, formatBlock and removeFormat (Clear formatting).
  */
 export function useCanvasInlineCommands({
   canvasRef,
   editingId,
 }: UseCanvasInlineCommandsParams) {
+  /* The last selection made inside the element being edited. Typing a URL
+     into the toolbar's link field moves the document selection into that
+     field, so by "Apply" the live selection no longer points at the words the
+     user chose — the command would act on nothing (or on the field). */
+  const savedRangeRef = React.useRef<Range | null>(null);
+
+  React.useEffect(() => {
+    savedRangeRef.current = null;
+    if (!editingId) return;
+    const onSelectionChange = () => {
+      const editingEl = canvasRef.current?.querySelector(`[data-buildrick-id="${editingId}"]`);
+      const sel = window.getSelection();
+      if (!editingEl || !sel || sel.rangeCount === 0) return;
+      const r = sel.getRangeAt(0);
+      if (editingEl.contains(r.commonAncestorContainer)) savedRangeRef.current = r.cloneRange();
+    };
+    document.addEventListener("selectionchange", onSelectionChange);
+    return () => document.removeEventListener("selectionchange", onSelectionChange);
+  }, [editingId, canvasRef]);
+
   const handleInlineCommand = React.useCallback(
     (command: string, value?: string) => {
       const editingEl = canvasRef.current?.querySelector(
@@ -34,9 +57,21 @@ export function useCanvasInlineCommands({
       ) as HTMLElement | null;
       if (!editingEl) return;
 
+      /* Read before focus(): a browser moves the caret to the start of a
+         contentEditable when it regains focus (from the link field, say), so
+         after it the live range no longer marks the words the user chose. */
+      const cameBack = document.activeElement !== editingEl;
+      const saved = savedRangeRef.current?.cloneRange() ?? null;
+      const savedInside = saved !== null && editingEl.contains(saved.commonAncestorContainer);
       editingEl.focus();
       const selection = window.getSelection();
-      if (!selection || selection.rangeCount === 0) return;
+      if (!selection) return;
+      const live = selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
+      if ((cameBack && savedInside) || !live || !editingEl.contains(live.commonAncestorContainer)) {
+        if (!saved || !savedInside) return;
+        selection.removeAllRanges();
+        selection.addRange(saved);
+      }
 
       const range = selection.getRangeAt(0);
 
@@ -160,6 +195,26 @@ export function useCanvasInlineCommands({
           break;
         }
 
+        case "removeFormat": {
+          /* Clear formatting: unwrap every inline formatting element the
+             selection touches (links stay — they are content, not format)
+             and drop inline styles from what remains in it. */
+          const touched = Array.from(editingEl.querySelectorAll<HTMLElement>(INLINE_FORMAT_TAGS)).filter((node) =>
+            range.intersectsNode(node)
+          );
+          for (const node of touched) {
+            const parent = node.parentNode;
+            if (!parent) continue;
+            while (node.firstChild) parent.insertBefore(node.firstChild, node);
+            parent.removeChild(node);
+          }
+          editingEl.querySelectorAll<HTMLElement>("[style]").forEach((node) => {
+            if (range.intersectsNode(node)) node.removeAttribute("style");
+          });
+          editingEl.normalize();
+          break;
+        }
+
         default:
           devLog("Canvas", `Unsupported inline command: ${command}`);
       }
@@ -168,7 +223,7 @@ export function useCanvasInlineCommands({
          the element, which destroyed the contentEditable session on the FIRST
          toolbar click — format applied, editing over, in a toolbar of
          eighteen controls. The live DOM already holds every edit;
-         useCanvasInlineEdit's finishEdit(true) sanitizes and persists the
+         useCanvasInlineEdit's finishEdit() sanitizes and persists the
          final markup once, when the session actually ends (Enter, Escape,
          click-outside). One writer, one transaction, one undo step. */
     },

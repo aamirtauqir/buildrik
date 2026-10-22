@@ -76,6 +76,23 @@ describe("useComponentsState — initial load + refresh", () => {
     expect(result.current.components).toEqual([]);
   });
 
+  /* R1 P-3: Retry used to clear the error only, landing on an empty list. */
+  it("retry loads the list again", () => {
+    const composer = createMockComposer({ components: [] });
+    asMock(composer.components.getAllComponents).mockImplementationOnce(() => {
+      throw new Error("registry unavailable");
+    });
+    const { result } = renderHook(() => useComponentsState({ composer }));
+    expect(result.current.error).toBe("registry unavailable");
+
+    asMock(composer.components.getAllComponents).mockReturnValue(FIXTURES.map((c) => ({ ...c })));
+    act(() => result.current.retry());
+
+    expect(result.current.error).toBeNull();
+    expect(result.current.isLoaded).toBe(true);
+    expect(result.current.components.map((c) => c.id)).toEqual(["c1", "c2"]);
+  });
+
   it("unsubscribes from COMPONENT_LIST_UPDATED on unmount", () => {
     const { composer, unmount } = setup();
 
@@ -146,36 +163,6 @@ describe("useComponentsState — canvas selection sync", () => {
     ]) {
       expect(asMock(composer.off)).toHaveBeenCalledWith(event, expect.any(Function));
     }
-  });
-});
-
-describe("useComponentsState — duplicate", () => {
-  it("handleDuplicate calls duplicateComponent and toasts success", async () => {
-    const { composer, result } = setup();
-
-    await act(async () => {
-      await result.current.handleDuplicate("c1");
-    });
-
-    expect(asMock(composer.components.duplicateComponent)).toHaveBeenCalledWith("c1");
-    expect(result.current.pendingToast).toEqual({
-      message: "Component duplicated",
-      variant: "success",
-    });
-  });
-
-  it("surfaces an error toast when duplicateComponent rejects", async () => {
-    const { composer, result } = setup();
-    asMock(composer.components.duplicateComponent).mockRejectedValueOnce(new Error("boom"));
-
-    await act(async () => {
-      await result.current.handleDuplicate("c1");
-    });
-
-    expect(result.current.pendingToast).toEqual({
-      message: "Couldn't duplicate component.",
-      variant: "error",
-    });
   });
 });
 
@@ -252,66 +239,6 @@ describe("useComponentsState — delete confirm machine", () => {
     expect(result.current.confirmDelete).toBeNull();
   });
 
-});
-
-describe("useComponentsState — insert / instantiate", () => {
-  it("instantiates into the first selected canvas element", async () => {
-    const { composer, result } = setup({ selectedIds: ["el-1", "el-2"] });
-
-    await act(async () => {
-      await result.current.handleInstantiate("c2");
-    });
-
-    expect(asMock(composer.components.instantiateComponent)).toHaveBeenCalledWith("c2", "el-1");
-    expect(result.current.pendingToast).toEqual({
-      message: "Component added to canvas",
-      variant: "success",
-    });
-  });
-
-  it("falls back to the active page root when nothing is selected", async () => {
-    const { composer, result } = setup({ selectedIds: [] });
-    asMock(composer.elements.getActivePage).mockReturnValue({
-      id: "p1",
-      name: "Home",
-      root: { id: "root-1" },
-    });
-
-    await act(async () => {
-      await result.current.handleInstantiate("c2");
-    });
-
-    expect(asMock(composer.components.instantiateComponent)).toHaveBeenCalledWith("c2", "root-1");
-  });
-
-  it("warns (and does not instantiate) when there is no selection and no page root", async () => {
-    // Default mock has no pages → getActivePage() returns null.
-    const { composer, result } = setup({ selectedIds: [] });
-
-    await act(async () => {
-      await result.current.handleInstantiate("c2");
-    });
-
-    expect(asMock(composer.components.instantiateComponent)).not.toHaveBeenCalled();
-    expect(result.current.pendingToast).toEqual({
-      message: "Open a page first to add this component.",
-      variant: "warning",
-    });
-  });
-
-  it("surfaces an error toast when instantiateComponent rejects", async () => {
-    const { composer, result } = setup({ selectedIds: ["el-1"] });
-    asMock(composer.components.instantiateComponent).mockRejectedValueOnce(new Error("fail"));
-
-    await act(async () => {
-      await result.current.handleInstantiate("c2");
-    });
-
-    expect(result.current.pendingToast).toEqual({
-      message: "Couldn't add component. Try again.",
-      variant: "error",
-    });
-  });
 });
 
 /* §13 "Edit master ›": the door is on an instance, in the inspector. The

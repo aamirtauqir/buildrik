@@ -2,22 +2,19 @@
  * AssetDetailOverlay — the asset drill-in HUB, board 146:2, with its two
  * sub-screens: Versions (146:32) and Used-in (146:68).
  *
- * The board's IA is list rows, not tabs: preview + dimensions, alt text with
- * ✨ Generate ABOVE the fold ("the one field with a legal consequence"), then
+ * The board's IA is list rows, not tabs: preview + dimensions, alt text
+ * ABOVE the fold ("the one field with a legal consequence"), then
  * five 32h rows — Used in N places · Versions · Edit image · Optimise ·
  * Replace across site. Edit image opens the image-editor MODAL (cargo-sheets
  * §4: "Modals, not drill-in"); Optimise opens the same modal on its Optimise
  * tab (4418:149547, G3-026) — the drawer's own optimise panel is gone.
  *
- * Versions view (146:32): 44h chips — dot · relative time · size delta,
- * current pinned with a 3px accent bar (boards 75:65 / 75:71 beat 241:1436's
- * 56h full-bleed row) — and restore confirms INLINE in the 84h band 146:64
- * draws ("a drill-in that spawns a modal has lost the plot"). The data is
- * the server restore points; the old sibling-filename heuristic list is gone
- * (those are separate library items the grid already shows). The author line
- * (L8, 4418:62883) is real: `media.listAssetVersions` joins `createdBy` to a
- * display name server-side; omitted (not "Unknown") when the row predates the
- * column or the account no longer resolves.
+ * Versions view (146:32 / v3 4418:62883) is `AssetVersionList` — the same
+ * list, data and restore the library's Asset versions dialog draws
+ * (`useAssetVersions`): the asset's family, where Restore moves every
+ * placement onto the chosen version's file (REA 2026-10-20 M-5). It used to
+ * list the server's best-effort history instead, so the drawer and the
+ * library disagreed about one asset's versions.
  *
  * Used-in view: one 44h chip PER HIT — page name over the element's own name
  * with a "Go ›" link — and no page-group header, per board 75:90, which beat
@@ -31,22 +28,24 @@
 
 import * as React from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { formatRelativeTime } from "@/shared/utils/relativeTime";
 import type { LibraryItem } from "../data/mediaTypes";
 import { collectUsageByPage, fmtSize } from "../data/mediaUtils";
+import { useAltTextDraft } from "../hooks/useAltTextDraft";
 import type { Composer } from "@/engine/Composer";
-import {
-  listAssetVersions,
-  restoreAssetVersion,
-  type AssetVersion,
-} from "@/services/MediaVersionService";
+import { useAssetVersions } from "../hooks/useAssetVersions";
+import { AssetVersionList } from "./AssetVersionList";
 import { Button, PanelFrame, Textarea, useFocusTrap } from "@/editor/chrome-ui";
 import { Download, Link2, Pencil, SquarePlus, Trash2 } from "lucide-react";
 
 type View = "hub" | "used" | "versions";
 
+const NO_VERSIONS: LibraryItem[] = [];
+
 interface AssetDetailOverlayProps {
   item: LibraryItem;
+  /** `versionsOf(item.key)`, memoized — the family the Versions view lists.
+   *  Absent: the asset has no saved version. */
+  versions?: LibraryItem[];
   /** Back to the grid (the ‹ row). ESC does the same, one level at a time. */
   onClose(): void;
   onUpdate?(key: string, updates: Partial<LibraryItem>): Promise<void>;
@@ -54,9 +53,6 @@ interface AssetDetailOverlayProps {
   onEditImage?(item: LibraryItem, initialTab?: "optimise"): void | Promise<void>;
   composer?: Composer;
   onReplaceAcross?(item: LibraryItem): void;
-  /** G3-022 — the server's alt-text model (AltTextService). `null` = it
-   *  could not run; `skipped` = the server kept text the user wrote. */
-  onGenerateAltText?(item: LibraryItem): Promise<{ altText: string; skipped: boolean } | null>;
   /* Board 4418:61698 — the library's own actions, under the destination rows
      (G3-021). Each row renders only when its handler is supplied. */
   onInsert?(item: LibraryItem): void;
@@ -73,13 +69,6 @@ interface AssetDetailOverlayProps {
 const ROW =
   "tw:flex tw:h-8 tw:w-full tw:items-center tw:justify-start tw:gap-2 tw:rounded tw:border-0 tw:bg-transparent tw:px-4 tw:font-normal " +
   "tw:text-left tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-bg-subtle)]";
-const VERSION_ROW = "tw:flex tw:h-14 tw:w-full tw:items-start tw:gap-3 tw:pt-2.5 tw:pl-5 tw:pr-4";
-const VERSION_DOT = "tw:mt-1.5 tw:size-2 tw:shrink-0 tw:rounded-full";
-const VERSION_TIME_COL = "tw:flex tw:min-w-0 tw:flex-1 tw:flex-col";
-const VERSION_TIME = "tw:min-w-0 tw:truncate tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]";
-/* Board 4418:62883 — the author line under the time, "Ali" / "Sara". */
-const VERSION_AUTHOR = "tw:min-w-0 tw:truncate tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
-const VERSION_META = "tw:mt-0.5 tw:w-[72px] tw:shrink-0 tw:text-[11px] tw:font-medium tw:leading-4 tw:text-[var(--bk-gray-500)]";
 /* Board 4418:61698: the nav rows end in a 12px ink › in a 24 box, and
    Versions' count is 11/400 ink beside it. */
 const ROW_CHEVRON = "tw:flex tw:w-6 tw:shrink-0 tw:justify-center tw:text-[12px] tw:text-[var(--bk-ink)]";
@@ -95,12 +84,12 @@ const BACK_ROW_SUB = "tw:text-[13px] tw:text-[var(--bk-accent-text)]";
 
 export function AssetDetailOverlay({
   item,
+  versions: family = NO_VERSIONS,
   onClose,
   onUpdate,
   onEditImage,
   composer,
   onReplaceAcross,
-  onGenerateAltText,
   onInsert,
   onRename,
   onCopyUrl,
@@ -117,9 +106,6 @@ export function AssetDetailOverlay({
   useEffect(() => {
     viewRef.current = view;
   }, [view]);
-  const [altDraft, setAltDraft] = useState(item.altText ?? "");
-  const [altBusy, setAltBusy] = useState(false);
-  const [altFailed, setAltFailed] = useState(false);
   const [metaError, setMetaError] = useState(false);
   // Board 146:9 draws "1440×960 · 245 KB" under the preview, and MediaAsset
   // only carries width/height when the upload went through the WebP optimiser
@@ -131,51 +117,7 @@ export function AssetDetailOverlay({
 
   const display = item.displayName ?? item.name;
 
-  // ── Server restore points — loaded on mount so the hub row carries a count.
-  const [dbVersions, setDbVersions] = useState<AssetVersion[]>([]);
-  const [restoringId, setRestoringId] = useState<string | null>(null);
-  /* The version whose restore just failed — its row says so (DQ-012). */
-  const [restoreFailedId, setRestoreFailedId] = useState<string | null>(null);
-  const [pendingRestore, setPendingRestore] = useState<string | null>(null);
-
-  const reloadDbVersions = useCallback(() => {
-    if (!item.assetId) {
-      setDbVersions([]);
-      return;
-    }
-    listAssetVersions(item.assetId)
-      .then((vs) => {
-        if (mountedRef.current) setDbVersions(vs);
-      })
-      .catch(() => {
-        if (mountedRef.current) setDbVersions([]);
-      });
-  }, [item.assetId]);
-
-  useEffect(() => {
-    reloadDbVersions();
-  }, [reloadDbVersions]);
-
-  const confirmRestore = useCallback(
-    (versionId: string) => {
-      setRestoringId(versionId);
-      setRestoreFailedId(null);
-      setPendingRestore(null);
-      restoreAssetVersion(versionId)
-        .then((res) => {
-          if (!mountedRef.current) return;
-          onUpdate?.(item.key, { src: res.url });
-          reloadDbVersions();
-        })
-        .catch(() => {
-          if (mountedRef.current) setRestoreFailedId(versionId);
-        })
-        .finally(() => {
-          if (mountedRef.current) setRestoringId(null);
-        });
-    },
-    [onUpdate, item.key, reloadDbVersions],
-  );
+  const versions = useAssetVersions(composer, family);
 
   // ── Cross-page usage (board 146:68 groups by page).
   const usage = useMemo(() => {
@@ -216,13 +158,10 @@ export function AssetDetailOverlay({
   });
 
   useEffect(() => {
-    setAltDraft(item.altText ?? "");
-    setAltFailed(false);
     setView("hub");
     setMetaError(false);
-    setPendingRestore(null);
     setNatural(null);
-  }, [item.key, item.altText]);
+  }, [item.key]);
 
   // Images decode off-screen, from `item.src` and never from `item.thumb`:
   // the thumbnail is a resize of the same picture, so its bitmap would print a
@@ -242,31 +181,14 @@ export function AssetDetailOverlay({
     };
   }, [item.type, item.src, item.width, item.height]);
 
-  const commitAltText = useCallback(() => {
-    if (!onUpdate) return;
-    const next = altDraft.trim();
-    if (next === (item.altText ?? "")) return;
-    void onUpdate(item.key, { altText: next });
-  }, [onUpdate, altDraft, item.altText, item.key]);
-
-  /* ✨ Generate / Regenerate (G3-022) — the server's alt-text model through
-     AltTextService, which also writes the result to the asset. Its states are
-     the boards': generating (6623:149646), failed + Retry (6623:150370). */
-  const generateAlt = useCallback(async () => {
-    if (altBusy || !onGenerateAltText) return;
-    setAltBusy(true);
-    setAltFailed(false);
-    try {
-      const result = await onGenerateAltText(item);
-      if (!mountedRef.current) return;
-      if (!result) setAltFailed(true);
-      else if (!result.skipped) setAltDraft(result.altText);
-    } catch {
-      if (mountedRef.current) setAltFailed(true);
-    } finally {
-      if (mountedRef.current) setAltBusy(false);
-    }
-  }, [altBusy, item, onGenerateAltText]);
+  const saveAltText = useCallback(
+    async (key: string, altText: string) => {
+      await onUpdate?.(key, { altText });
+    },
+    [onUpdate],
+  );
+  const { field: altField, saveFailed: altSaveFailed } = useAltTextDraft(item, saveAltText);
+  const altDraft = altField.value;
 
   // The asset's own metadata wins; the measured bitmap is the fallback.
   const dims = item.width != null && item.height != null
@@ -276,8 +198,8 @@ export function AssetDetailOverlay({
   const showEdit = item.type === "img" && !!onEditImage;
   const showOptimize = showEdit;
   const showReplace = (item.type === "img" || item.type === "vid") && !!onReplaceAcross;
-  // Restore points + the live state — the count the hub row shows.
-  const versionCount = dbVersions.length > 0 ? dbVersions.length + 1 : 0;
+  // The family's size once a version is saved — the count the hub row shows.
+  const versionCount = versions.rows.length > 1 ? versions.rows.length : 0;
 
   const backLabel =
     view === "versions"
@@ -366,59 +288,27 @@ export function AssetDetailOverlay({
               </span>
             </div>
 
-            {/* Board 146:11 — alt text above the fold, with ✨ Generate. */}
+            {/* Board 146:11 — alt text above the fold. */}
             <div className="tw:w-full tw:px-4 tw:pt-1.5" data-testid="media-detail-alt">
               <label className="tw:block tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]" htmlFor="med-alt-input" data-testid="media-detail-alt-label">
                 Alt text
               </label>
-              {/* Board 4418:61698 — one bordered box: the text, then the
-                  Generate link inside it. */}
+              {/* Board 4418:61698 — one bordered box around the text. */}
               <div className="tw:mt-1 tw:flex tw:flex-col tw:rounded-md tw:border tw:border-[var(--bk-gray-400)] tw:bg-white tw:px-2 tw:py-1.5" data-testid="media-alt-box">
                 <Textarea
                   id="med-alt-input"
                   rows={2}
                   className="tw:resize-none tw:border-0 tw:bg-transparent tw:p-0 tw:text-[length:var(--bk-text-12)] tw:leading-[18px] tw:text-[var(--bk-ink)] tw:shadow-none tw:focus:ring-0"
-                  value={altDraft}
-                  disabled={altBusy}
-                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
-                    setAltDraft(e.target.value);
-                    setAltFailed(false);
-                  }}
-                  onBlur={commitAltText}
-                  onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-                    if (e.key === "Enter" && !e.shiftKey) {
-                      e.preventDefault();
-                      commitAltText();
-                      e.currentTarget.blur();
-                    }
-                  }}
-                  placeholder={
-                    altBusy
-                      ? "Generating alt text…"
-                      : altFailed
-                        ? "Couldn't generate alt text — write it or retry"
-                        : "Describe this image for screen readers"
-                  }
+                  {...altField}
+                  placeholder="Describe this image for screen readers"
                   aria-label="Alt text"
-                  aria-invalid={altFailed || undefined}
                 />
-                {onGenerateAltText && item.type === "img" ? (
-                  <Button
-                    type="button"
-                    color="light"
-                    size="xs"
-                    variant="link"
-                    className="tw:min-h-5 tw:self-start tw:text-[length:var(--bk-text-12)]"
-                    data-testid="media-alt-generate"
-                    disabled={altBusy}
-                    aria-busy={altBusy || undefined}
-                    onClick={generateAlt}
-                  >
-                    {"✨"}&nbsp;&nbsp;
-                    {altBusy ? "Generating…" : altFailed ? "Retry" : altDraft.trim() ? "Regenerate" : "Generate"}
-                  </Button>
-                ) : null}
               </div>
+              {altSaveFailed && (
+                <p role="alert" data-testid="media-alt-error" className="tw:mt-1 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-error-text)]">
+                  Could not save the alt text — the server did not save the change.
+                </p>
+              )}
             </div>
 
             {/* Board 233:1254-1274 — the five 32h destination rows. */}
@@ -497,116 +387,7 @@ export function AssetDetailOverlay({
           </>
         )
       ) : view === "versions" ? (
-        <div className="tw:w-full" role="list" aria-label="Version history">
-          {/* v3 4418:62883: 56-high full-bleed rows — dot 20 in, the time
-              13 ink over the author line, the size delta 11/500 muted in a
-              column at 156, ⋯ in a 24 box 16 from the edge. The current
-              version is tinted with the 3px accent bar. (Pre-v3 board 75:65
-              drew 44 chips at a 12 inset.) An empty history shows only the
-              note, as 4418:63971 draws it. */}
-          {dbVersions.length > 0 ? (
-            <div className={`${VERSION_ROW} tw:relative tw:bg-[var(--bk-accent-tint)]`} data-testid="media-version-current" role="listitem">
-              <span className="tw:absolute tw:inset-y-0 tw:left-0 tw:w-[3px] tw:bg-[var(--bk-accent)]" aria-hidden="true" />
-              <span className={`${VERSION_DOT} tw:bg-[var(--bk-accent)]`} aria-hidden="true" />
-              <span className={VERSION_TIME_COL}>
-                <span className={VERSION_TIME}>now</span>
-              </span>
-              <span className={VERSION_META}>current</span>
-              <span className="tw:w-6 tw:shrink-0" aria-hidden="true" />
-            </div>
-          ) : null}
-          {dbVersions.map((v, i) => {
-            const ts = new Date(v.createdAt).getTime();
-            const prev = dbVersions[i + 1];
-            const delta = prev ? v.bytes - prev.bytes : null;
-            const meta =
-              i === dbVersions.length - 1
-                ? "original"
-                : delta === null || delta === 0
-                  ? fmtSize(v.bytes)
-                  : `${delta > 0 ? "+" : "−"}${fmtSize(Math.abs(delta))}`;
-            return (
-              <React.Fragment key={v.id}>
-                <div className={VERSION_ROW} data-testid={`media-version-${v.id}`} role="listitem">
-                  <span className={`${VERSION_DOT} tw:bg-[var(--bk-gray-300)]`} aria-hidden="true" />
-                  <span className={VERSION_TIME_COL}>
-                    <span className={VERSION_TIME}>{formatRelativeTime(ts, { fallback: "daysShort" })}</span>
-                    {v.createdByName ? (
-                      <span className={VERSION_AUTHOR} data-testid={`media-version-author-${v.id}`}>
-                        {v.createdByName}
-                      </span>
-                    ) : null}
-                  </span>
-                  <span className={VERSION_META}>{meta}</span>
-                  <Button
-                    type="button"
-                    color="light"
-                    size="xs"
-                    className="tw:-mt-0.5 tw:size-6 tw:min-h-6 tw:shrink-0 tw:border-0 tw:bg-transparent tw:p-0 tw:text-[13px] tw:text-[var(--bk-gray-500)] tw:enabled:hover:bg-transparent tw:enabled:hover:text-[var(--bk-ink)]"
-                    data-testid={`media-version-menu-${v.id}`}
-                    aria-label={`Restore options for version from ${formatRelativeTime(ts, { fallback: "daysShort" })}`}
-                    disabled={restoringId !== null}
-                    onClick={() => setPendingRestore(pendingRestore === v.id ? null : v.id)}
-                  >
-                    {restoringId === v.id ? "…" : "⋯"}
-                  </Button>
-                </div>
-                {restoreFailedId === v.id ? (
-                  <div
-                    role="alert"
-                    className="tw:w-full tw:px-4 tw:py-1 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-error)]"
-                    data-testid={`media-restore-failed-${v.id}`}
-                  >
-                    Couldn&apos;t restore this version. Nothing changed — try again.
-                  </div>
-                ) : null}
-                {/* Board 146:64 — restore confirms INLINE, and the band is 84
-                    tall because the question names the cost: it shipped as a
-                    32h strip saying "Restore?", which asks for a decision
-                    while withholding the one fact needed to make it. */}
-                {pendingRestore === v.id ? (
-                  <div
-                    className="tw:flex tw:h-21 tw:w-full tw:flex-col tw:justify-start tw:gap-2 tw:bg-[var(--bk-bg-subtle)] tw:px-4 tw:pt-2 tw:text-[12px] tw:leading-[18px]"
-                    data-testid="media-restore-confirm"
-                  >
-                    <span className="tw:text-[var(--bk-ink)]">
-                      Restore this version?{usageCount > 0
-                        ? ` It is used in ${usageCount} ${usageCount === 1 ? "place" : "places"} — those will update too.`
-                        : ""}
-                    </span>
-                    <span className="tw:flex tw:items-center tw:justify-end tw:gap-4">
-                      <Button
-                        type="button"
-                        color="light"
-                        size="xs"
-                        variant="link" className="tw:min-h-5 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]"
-                        data-testid="media-restore-cancel"
-                        onClick={() => setPendingRestore(null)}
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        type="button"
-                        color="light"
-                        size="xs"
-                        variant="link" className="tw:min-h-5 tw:text-[12px] tw:leading-[18px]"
-                        data-testid="media-restore-go"
-                        onClick={() => confirmRestore(v.id)}
-                      >
-                        Restore
-                      </Button>
-                    </span>
-                  </div>
-                ) : null}
-              </React.Fragment>
-            );
-          })}
-          {dbVersions.length === 0 ? (
-            <div className="tw:px-4 tw:pt-8 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-gray-500)]" data-testid="media-versions-empty">
-              No saved versions yet. Edits create restore points automatically.
-            </div>
-          ) : null}
-        </div>
+        <AssetVersionList key={item.key} versions={versions} />
       ) : view === "used" ? (
         <div className="tw:w-full" role="list" aria-label="Pages using this asset">
           {usage.length === 0 ? (

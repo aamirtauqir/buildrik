@@ -40,6 +40,17 @@ describe("AddFieldDialog", () => {
     expect(onClose).toHaveBeenCalled();
   });
 
+  it("C-6: a refused add stays open and says so", async () => {
+    const onAdd = vi.fn(() => Promise.reject(new Error("quota")));
+    const onClose = vi.fn();
+    render(<AddFieldDialog collection={MENU} collections={[MENU, TEAM]} onClose={onClose} onAdd={onAdd} />);
+    fireEvent.click(screen.getByTestId("cms-add-field-type-number"));
+    fireEvent.change(screen.getByTestId("cms-add-field-name"), { target: { value: "Cooking time" } });
+    fireEvent.click(screen.getByTestId("cms-add-field-save"));
+    expect(await screen.findByTestId("cms-add-field-save-error")).toHaveTextContent("Could not add the field");
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
   it("a multi-select field carries its options, one per line (PD-1)", async () => {
     const { onAdd } = mount();
     fireEvent.click(screen.getByTestId("cms-add-field-type-multiselect"));

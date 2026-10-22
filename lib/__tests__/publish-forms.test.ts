@@ -2,9 +2,10 @@
  * A published form used to post nowhere — see publish-forms.ts.
  */
 import { describe, it, expect } from "vitest";
-import { planFormWiring, wireForms } from "../publish-forms";
+import { planPublishPages } from "../publish-forms";
+import { wireForms } from "@buildrik/editor/src/engine/export/publishPostProcess";
 
-const opts = { siteId: "site-1", appOrigin: "https://app.buildrick.io", path: "contact.html" };
+const opts = { target: { siteId: "site-1", appOrigin: "https://app.buildrick.io" }, path: "contact.html" };
 
 const FORM = `<form data-buildrick-id="f1" class="c">
   <input data-buildrick-id="e1" type="email" name="email" placeholder="Email">
@@ -21,6 +22,39 @@ describe("wireForms", () => {
     );
     expect(forms).toHaveLength(1);
     expect(forms[0].blockId).toBe("f1");
+  });
+
+  /* BK-44: Method GET put the visitor's details in the URL and got a 405;
+     multipart and text/plain bodies were refused as "Invalid JSON". */
+  it.each([
+    ['method="get"', 'method="get" enctype="multipart/form-data"'],
+    ["method=GET", "method=GET enctype='text/plain'"],
+  ])("sends urlencoded POST whatever Method/Encoding the inspector set (%s)", (_label, attrs) => {
+    const { html } = wireForms(`<form data-buildrick-id="f1" ${attrs}><input name="email"></form>`, opts);
+    // The browser keeps the first of a repeated attribute; wiring's come first.
+    const form = new DOMParser().parseFromString(html, "text/html").querySelector("form")!;
+    expect(form.getAttribute("method")).toBe("POST");
+    expect(form.getAttribute("enctype")).toBe("application/x-www-form-urlencoded");
+    expect(form.method).toBe("post");
+    expect(form.enctype).toBe("application/x-www-form-urlencoded");
+  });
+
+  /* Security review of the BK-44 change: removing method/enctype by a search
+     across the tag also cut text inside another attribute's value, shifting
+     its quotes so the rest parsed as a new (event handler) attribute. Wiring
+     now removes nothing: every value on the tag survives verbatim. */
+  it("leaves every other attribute value as written — no text inside a value is ever cut", () => {
+    const open =
+      '<form data-buildrick-id="f1" title="x method=y" data-q=" onmouseover=alert(1) " ' +
+      "aria-label='a enctype=b' method=\"get\">";
+    const { html } = wireForms(`${open}<input name="email"></form>`, opts);
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    const form = doc.querySelector("form")!;
+    expect(form.getAttribute("title")).toBe("x method=y");
+    expect(form.getAttribute("data-q")).toBe(" onmouseover=alert(1) ");
+    expect(form.getAttribute("aria-label")).toBe("a enctype=b");
+    expect(form.getAttribute("method")).toBe("POST");
+    expect([...form.attributes].some((a) => a.name.startsWith("on"))).toBe(false);
   });
 
   it("reports the fields, skipping the submit and anything unnamed", () => {
@@ -101,11 +135,11 @@ describe("wireForms", () => {
   });
 });
 
-describe("planFormWiring", () => {
+describe("planPublishPages", () => {
   const pages = [{ path: "contact.html", html: FORM }];
 
   it("wires every page and lets the sweep run when the origin is known", () => {
-    const plan = planFormWiring(pages, { siteId: "site-1", appOrigin: "https://app.buildrick.io" });
+    const plan = planPublishPages(pages, { siteId: "site-1", appOrigin: "https://app.buildrick.io" });
     expect(plan.error).toBeNull();
     expect(plan.deactivateMissing).toBe(true);
     expect(plan.forms.map((f) => f.blockId)).toEqual(["f1"]);
@@ -113,18 +147,18 @@ describe("planFormWiring", () => {
   });
 
   it("refuses the deploy rather than shipping a form that posts nowhere", () => {
-    const plan = planFormWiring(pages, { siteId: "site-1", appOrigin: "" });
+    const plan = planPublishPages(pages, { siteId: "site-1", appOrigin: "" });
     expect(plan.error).toMatch(/NEXT_PUBLIC_APP_URL/);
   });
 
   it("never sweeps rows off when wiring could not run", () => {
-    const plan = planFormWiring(pages, { siteId: "site-1", appOrigin: "" });
+    const plan = planPublishPages(pages, { siteId: "site-1", appOrigin: "" });
     expect(plan.deactivateMissing).toBe(false);
     expect(plan.forms).toEqual([]);
   });
 
   it("lets a site with no forms publish without an origin", () => {
-    const plan = planFormWiring([{ path: "index.html", html: "<p>hi</p>" }], {
+    const plan = planPublishPages([{ path: "index.html", html: "<p>hi</p>" }], {
       siteId: "site-1",
       appOrigin: "",
     });
@@ -133,7 +167,7 @@ describe("planFormWiring", () => {
   });
 
   it("ignores a form the owner already pointed elsewhere when deciding to refuse", () => {
-    const plan = planFormWiring(
+    const plan = planPublishPages(
       [{ path: "c.html", html: '<form id="f2" action="https://formspree.io/x"></form>' }],
       { siteId: "site-1", appOrigin: "" },
     );

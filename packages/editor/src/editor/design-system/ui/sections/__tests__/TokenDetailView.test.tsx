@@ -147,7 +147,7 @@ describe("TokenDetailView", () => {
      useColorTokens.updateToken took a third `darkValue` argument. The comment
      outlived the limitation, so the field kept silently discarding input. */
   describe("dark value commit", () => {
-    type ValueChange = (id: string, value: string, darkValue?: string) => void;
+    type ValueChange = (id: string, value: string, darkValue?: string) => boolean;
     const renderDark = (onValueChange: ValueChange, token = colorToken) => {
       const utils = render(
         wrap(
@@ -331,6 +331,45 @@ describe("TokenDetailView", () => {
     );
     fireEvent.click(getByText("Auto-fix"));
     expect(onValueChange).toHaveBeenCalledWith(colorToken.id, "#1B4FCC");
+  });
+
+  it("Auto-fix suppresses the warning only when the write lands (B-2)", () => {
+    const issue: LintIssue = {
+      type: "banned-hue",
+      severity: "warning",
+      message: "fail",
+      autoFixHint: "contrast:#FFFFFF",
+    };
+    const composer = makeMockComposer({
+      issues: new Map([[colorToken.id, [issue]]]),
+      computeAutoFix: () => "#1B4FCC",
+    });
+    const onValueChange = vi.fn(() => true);
+    const { getByText, queryByText } = render(
+      wrap(<TokenDetailView token={colorToken} composer={composer} onValueChange={onValueChange} />),
+    );
+    fireEvent.click(getByText("Auto-fix"));
+    expect(queryByText("Auto-fix")).toBeNull();
+  });
+
+  it("Auto-fix keeps the warning and says so when the write is refused (B-2)", () => {
+    const issue: LintIssue = {
+      type: "banned-hue",
+      severity: "warning",
+      message: "fail",
+      autoFixHint: "contrast:#FFFFFF",
+    };
+    const composer = makeMockComposer({
+      issues: new Map([[colorToken.id, [issue]]]),
+      computeAutoFix: () => "#1B4FCC",
+    });
+    const onValueChange = vi.fn(() => false);
+    const { getByText, getByTestId } = render(
+      wrap(<TokenDetailView token={colorToken} composer={composer} onValueChange={onValueChange} />),
+    );
+    fireEvent.click(getByText("Auto-fix"));
+    expect(getByText("Auto-fix")).toBeTruthy();
+    expect(getByTestId("brand-token-autofix-failed").textContent).toMatch(/wasn't applied/);
   });
 
   it("Color token: Dark value row present", () => {

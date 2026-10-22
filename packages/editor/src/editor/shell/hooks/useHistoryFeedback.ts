@@ -51,7 +51,6 @@ const ACTION_DESCRIPTIONS: Record<string, string> = {
   "import-html-to-active-page": "Imported HTML",
   "insert-html-to-element": "Inserted HTML",
   "apply-interpreted-tree": "Applied generated layout",
-  "ai-edit": "Applied an AI edit",
   // Remove / duplicate
   delete: "Deleted element",
   "delete-element": "Deleted element",
@@ -111,6 +110,8 @@ const ACTION_DESCRIPTIONS: Record<string, string> = {
   "edit preset": "Changed a style preset",
   "inline edit": "Edited text",
   "inline-edit": "Edited text",
+  "fix escaped text": "Fixed escaped text",
+  "automatic repair": "Repaired broken sizes",
   "link-change": "Changed link",
   "link-target-change": "Changed link target",
   "animation-change": "Changed animation",

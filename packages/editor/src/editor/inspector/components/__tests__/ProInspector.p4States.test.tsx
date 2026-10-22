@@ -76,23 +76,6 @@ function mount(composer = makeComposer()) {
 afterEach(() => cleanup());
 
 describe("ProInspector P4 states", () => {
-  it("ai:agent-run replaces the controls with the run status and restores after", () => {
-    const composer = mount();
-    expect(screen.getByTestId("inspector-body")).toBeInTheDocument();
-
-    act(() => composer.emit("ai:agent-run", { running: true, summary: "Rewriting 3 headings…" }));
-    expect(screen.getByTestId("inspector-ai-run")).toBeInTheDocument();
-    expect(screen.getByText("Rewriting 3 headings…")).toBeInTheDocument();
-    expect(screen.getByText(/selection is kept and restored/)).toBeInTheDocument();
-    expect(screen.queryByTestId("inspector-body")).toBeNull();
-
-    act(() => composer.emit("ai:agent-run", { running: false, summary: "" }));
-    expect(screen.queryByTestId("inspector-ai-run")).toBeNull();
-    expect(screen.getByTestId("inspector-body")).toBeInTheDocument();
-  });
-
-  /* DD-6a/6b: the Applies-to scope and its Whole site takeover are gone —
-     the one reach beyond this element is ⋯ "Apply style to all …". */
   it("offers no scope row: no Applies to, no Whole site", () => {
     mount();
     expect(screen.queryByText("Applies to")).toBeNull();

@@ -75,11 +75,11 @@ describe("scheduled-publish cron", () => {
       { id: "sp2", siteId: "s2", workspaceId: "ws1", createdBy: "u1" },
     ]);
     startPublishMock
-      .mockRejectedValueOnce(new Error("NO_RENDERER"))
+      .mockRejectedValueOnce(new Error("NO_PAGES"))
       .mockResolvedValueOnce({ id: "job2" });
     const res = await GET(makeReq("Bearer test-secret"));
     await expect(res.json()).resolves.toEqual({ due: 2, started: 1, failed: 1, skipped: 0 });
-    expect(markScheduleFailedMock).toHaveBeenCalledWith("sp1", "NO_RENDERER");
+    expect(markScheduleFailedMock).toHaveBeenCalledWith("sp1", "NO_PAGES");
     expect(markScheduleStartedMock).toHaveBeenCalledWith("sp2", "job2");
   });
 

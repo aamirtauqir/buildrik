@@ -124,12 +124,19 @@ describe("the save pill's click, by state", () => {
     expect(screen.getByRole("tooltip").textContent).toMatch(/Offline — changes aren't reaching the server/);
   });
 
-  it("offline outranks a conflict and an error — the pill never navigates without a connection", () => {
-    for (const saveStatus of ["conflict", "error"] as const) {
-      cleanup();
-      const p = mount({ isOffline: true, saveStatus });
-      expect(screen.queryByRole("button", { name: /Conflict|Save failed|Offline/ })).toBeNull();
-      expect(p.onOpenConflict).not.toHaveBeenCalled();
-    }
+  /* Design decision 4 reorders the pill: Conflict > Offline > Save failed >
+     Not saving > Saving > Unsaved > Saved. A conflict is the one state that
+     needs a choice whatever the connection, so it stays reachable offline;
+     offline still outranks a failed save. */
+  it("a conflict outranks offline; offline outranks a failed save and never navigates", () => {
+    cleanup();
+    const conflicted = mount({ isOffline: true, saveStatus: "conflict" });
+    fireEvent.click(screen.getByRole("button", { name: /Conflict/ }));
+    expect(conflicted.onOpenConflict).toHaveBeenCalledTimes(1);
+
+    cleanup();
+    const failed = mount({ isOffline: true, saveStatus: "error" });
+    expect(screen.queryByRole("button", { name: /Save failed|Offline/ })).toBeNull();
+    expect(failed.onSave).not.toHaveBeenCalled();
   });
 });

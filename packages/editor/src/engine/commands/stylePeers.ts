@@ -24,6 +24,7 @@ import { getBreakpointQuery } from "@/shared/constants/breakpoints";
 import type { BreakpointId } from "@/shared/types/breakpoints";
 import type { PseudoStateId } from "@/shared/types";
 import { writableElements } from "./commandOperations";
+import { elementSelector } from "@/shared/utils/elementSelector";
 
 export interface StylePeers {
   peers: Element[];
@@ -76,13 +77,12 @@ function isCopiedStyleProperty(prop: string): boolean {
 const pickCopied = (styles: Record<string, string>): Record<string, string> =>
   Object.fromEntries(Object.entries(styles).filter(([k]) => isCopiedStyleProperty(k)));
 
-const selectorFor = (id: string) => `[data-buildrik-id="${id}"]`;
 
 /** The source's style map at this breakpoint + state, as authored. */
 function styleAt(composer: Composer, source: Element, { breakpoint, pseudo }: ApplyStyleOptions): Record<string, string> {
   if (pseudo !== "normal") {
     const mq = breakpoint === "desktop" ? undefined : getBreakpointQuery(breakpoint) ?? undefined;
-    return { ...(composer.styles.getRule(`${selectorFor(source.getId())}:${pseudo}`, mq)?.properties ?? {}) };
+    return { ...(composer.styles.getRule(`${elementSelector(source.getId())}:${pseudo}`, mq)?.properties ?? {}) };
   }
   if (breakpoint !== "desktop") return { ...composer.styles.getBreakpointStyle(source.getId(), breakpoint) };
   return { ...source.getStyles() };
@@ -104,7 +104,7 @@ export function applyStyleToPeers(
   composer.beginTransaction("apply-style-to-peers");
   try {
     for (const peer of targets) {
-      if (pseudo !== "normal") composer.styles.setRule(selectorFor(peer.getId()), styles, { pseudo: `:${pseudo}`, mediaQuery: mq });
+      if (pseudo !== "normal") composer.styles.setRule(elementSelector(peer.getId()), styles, { pseudo: `:${pseudo}`, mediaQuery: mq });
       else if (breakpoint !== "desktop") composer.styles.setBreakpointStyle(peer.getId(), breakpoint, styles);
       else for (const [k, v] of Object.entries(styles)) peer.setStyle(k, v);
     }

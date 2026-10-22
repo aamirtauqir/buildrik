@@ -30,6 +30,7 @@ vi.mock("@/editor/sidebar/tabs/media/hooks/useMediaState", () => ({
 const versionServiceStub = vi.hoisted(() => ({ createAssetVersion: vi.fn(async () => ({})) }));
 vi.mock("@/services/MediaVersionService", () => ({
   createAssetVersion: versionServiceStub.createAssetVersion,
+  listAssetVersions: async () => [],
 }));
 beforeEach(() => versionServiceStub.createAssetVersion.mockClear());
 
@@ -504,7 +505,7 @@ describe("Clone 3683:19950 · Move 2 assets — from the bulk bar", () => {
   });
 
   it("Cancel returns to the library with the selection intact (A06)", async () => {
-    const bulkMoveAssets = vi.fn(() => Promise.resolve());
+    const bulkMoveAssets = vi.fn((keys: string[], _folderId: string | null) => Promise.resolve({ moved: keys, failed: [] as string[] }));
     const clearSelection = vi.fn();
     await mountLibrary(twoChecked({ bulkMoveAssets, clearSelection }));
     openMoveModal();
@@ -518,7 +519,7 @@ describe("Clone 3683:19950 · Move 2 assets — from the bulk bar", () => {
 
 describe("Clone 3683:19964 / 3699:20381 · Moved to <Folder> — the result in the rail", () => {
   it("3683:19964 · a clean move to Products: the rail reports it, the bar still counts 2, the selection is kept", async () => {
-    const bulkMoveAssets = vi.fn(() => Promise.resolve());
+    const bulkMoveAssets = vi.fn((keys: string[], _folderId: string | null) => Promise.resolve({ moved: keys, failed: [] as string[] }));
     const clearSelection = vi.fn();
     const toggleSelMode = vi.fn();
     await mountLibrary(twoChecked({ bulkMoveAssets, clearSelection, toggleSelMode }));
@@ -541,7 +542,7 @@ describe("Clone 3683:19964 / 3699:20381 · Moved to <Folder> — the result in t
   });
 
   it("3699:20381 · a move to Hero shots, where hero-dark.jpg already was, says so", async () => {
-    await mountLibrary(twoChecked({ bulkMoveAssets: vi.fn(() => Promise.resolve()) }));
+    await mountLibrary(twoChecked({ bulkMoveAssets: vi.fn((keys: string[], _folderId: string | null) => Promise.resolve({ moved: keys, failed: [] as string[] })) }));
     openMoveModal();
     fireEvent.click(screen.getByTestId("mgr-move-folder-f2"));
     await screen.findByTestId("mgr-det-move-result");
@@ -554,7 +555,7 @@ describe("Clone 3683:19964 / 3699:20381 · Moved to <Folder> — the result in t
   it("View destination scopes the library to that folder and keeps the selection (edge `Action / Move to folder`)", async () => {
     const setCurrentFolderId = vi.fn();
     const clearSelection = vi.fn();
-    await mountLibrary(twoChecked({ bulkMoveAssets: vi.fn(() => Promise.resolve()), setCurrentFolderId, clearSelection }));
+    await mountLibrary(twoChecked({ bulkMoveAssets: vi.fn((keys: string[], _folderId: string | null) => Promise.resolve({ moved: keys, failed: [] as string[] })), setCurrentFolderId, clearSelection }));
     openMoveModal();
     fireEvent.click(screen.getByTestId("mgr-move-folder-f1"));
     await screen.findByTestId("mgr-det-move-result");
@@ -565,7 +566,7 @@ describe("Clone 3683:19964 / 3699:20381 · Moved to <Folder> — the result in t
 
   it("Clear selection empties the checked set (edge `Action / Clear selection`)", async () => {
     const clearSelection = vi.fn();
-    await mountLibrary(twoChecked({ bulkMoveAssets: vi.fn(() => Promise.resolve()), clearSelection }));
+    await mountLibrary(twoChecked({ bulkMoveAssets: vi.fn((keys: string[], _folderId: string | null) => Promise.resolve({ moved: keys, failed: [] as string[] })), clearSelection }));
     openMoveModal();
     fireEvent.click(screen.getByTestId("mgr-move-folder-f1"));
     await screen.findByTestId("mgr-det-move-result");
@@ -574,7 +575,7 @@ describe("Clone 3683:19964 / 3699:20381 · Moved to <Folder> — the result in t
   });
 
   it("the result clears once the selection changes", async () => {
-    const { rerender } = await mountLibrary(twoChecked({ bulkMoveAssets: vi.fn(() => Promise.resolve()) }));
+    const { rerender } = await mountLibrary(twoChecked({ bulkMoveAssets: vi.fn((keys: string[], _folderId: string | null) => Promise.resolve({ moved: keys, failed: [] as string[] })) }));
     openMoveModal();
     fireEvent.click(screen.getByTestId("mgr-move-folder-f1"));
     await screen.findByTestId("mgr-det-move-result");
@@ -586,7 +587,7 @@ describe("Clone 3683:19964 / 3699:20381 · Moved to <Folder> — the result in t
   });
 
   it("the result clears once the scope changes", async () => {
-    const { rerender } = await mountLibrary(twoChecked({ bulkMoveAssets: vi.fn(() => Promise.resolve()) }));
+    const { rerender } = await mountLibrary(twoChecked({ bulkMoveAssets: vi.fn((keys: string[], _folderId: string | null) => Promise.resolve({ moved: keys, failed: [] as string[] })) }));
     openMoveModal();
     fireEvent.click(screen.getByTestId("mgr-move-folder-f1"));
     await screen.findByTestId("mgr-det-move-result");
@@ -601,9 +602,9 @@ describe("Clone 3683:19964 / 3699:20381 · Moved to <Folder> — the result in t
 describe("Clone 3699:20347 · Files could not be moved", () => {
   it("a rejected move shows the failure; Retry runs the same move again and then reports it", async () => {
     const bulkMoveAssets = vi
-      .fn<(keys: string[], folderId: string | null) => Promise<void>>()
-      .mockRejectedValueOnce(new Error("offline"))
-      .mockResolvedValueOnce(undefined);
+      .fn<(keys: string[], folderId: string | null) => Promise<{ moved: string[]; failed: string[] }>>()
+      .mockImplementationOnce(async (keys) => ({ moved: [], failed: keys }))
+      .mockImplementationOnce(async (keys) => ({ moved: keys, failed: [] }));
     await mountLibrary(twoChecked({ bulkMoveAssets }));
     openMoveModal();
     fireEvent.click(screen.getByTestId("mgr-move-folder-f1"));
@@ -619,7 +620,7 @@ describe("Clone 3699:20347 · Files could not be moved", () => {
   });
 
   it("Cancel leaves the selection and the folders as they were", async () => {
-    const bulkMoveAssets = vi.fn(() => Promise.reject(new Error("offline")));
+    const bulkMoveAssets = vi.fn((keys: string[], _folderId: string | null) => Promise.resolve({ moved: [] as string[], failed: keys }));
     const clearSelection = vi.fn();
     await mountLibrary(twoChecked({ bulkMoveAssets, clearSelection }));
     openMoveModal();
@@ -684,7 +685,7 @@ describe("Clone 4215:26635 / 4207:26629 / 4220:26643 · dragging assets over the
   });
 
   it("dropping the checked pair on Products moves both and the rail reports it", async () => {
-    const bulkMoveAssets = vi.fn(() => Promise.resolve());
+    const bulkMoveAssets = vi.fn((keys: string[], _folderId: string | null) => Promise.resolve({ moved: keys, failed: [] as string[] }));
     await mountLibrary(twoChecked({ bulkMoveAssets }));
     toList();
     fireEvent.dragStart(screen.getByTestId("mgr-list-row-chef"), { dataTransfer: dragTransfer("chef") });
@@ -701,7 +702,7 @@ describe("Clone 4215:26635 / 4207:26629 / 4220:26643 · dragging assets over the
   });
 
   it("dropping an unchecked card moves only that card, even while others are checked", async () => {
-    const bulkMoveAssets = vi.fn(() => Promise.resolve());
+    const bulkMoveAssets = vi.fn((keys: string[], _folderId: string | null) => Promise.resolve({ moved: keys, failed: [] as string[] }));
     await mountLibrary(twoChecked({ bulkMoveAssets }));
     toList();
     fireEvent.dragStart(screen.getByTestId("mgr-list-row-menu"), { dataTransfer: dragTransfer("menu") });
@@ -711,7 +712,7 @@ describe("Clone 4215:26635 / 4207:26629 / 4220:26643 · dragging assets over the
   });
 
   it("a drop on All assets unfiles, and the rail names the destination", async () => {
-    const bulkMoveAssets = vi.fn(() => Promise.resolve());
+    const bulkMoveAssets = vi.fn((keys: string[], _folderId: string | null) => Promise.resolve({ moved: keys, failed: [] as string[] }));
     await mountLibrary(twoChecked({ bulkMoveAssets }));
     toList();
     fireEvent.dragStart(screen.getByTestId("mgr-list-row-hero"), { dataTransfer: dragTransfer("hero") });
@@ -1100,12 +1101,12 @@ describe("Clone 3695:43897 → 3695:43900 / 3695:43903 → 3695:43906 · Replace
 
 /* ─── P6-V Versions ─────────────────────────────────────────────────────── */
 
-/* Clone 3695:45529 (Asset versions), 3697:20326 / 3697:20341 (a card
-   selected / v2 applied), 3695:45615 (Apply saved version across site),
-   3720:43313 (Applying), 3720:43316 (Saved version applied), and the editor's
-   Saved → Done door (3681:20026). The model: Save creates a version of the
-   SAME asset — a library row flagged with its parent, hidden from the grid —
-   and applying it to the site is a separate, explicit `replaceAcross`. */
+/* Clone 3695:45529 (Asset versions — now the shared version list the drawer
+   draws too), 3695:45615 (the restore confirm), 3720:43313 (Restoring),
+   3720:43316 (Version restored), and the editor's Saved → Done door
+   (3681:20026). The model: Save creates a version of the SAME asset — a
+   library row flagged with its parent, hidden from the grid — and restoring
+   one moves the family's placements onto it (`replaceAcross`, M-5). */
 
 const EDITS = {
   width: 2400,
@@ -1299,8 +1300,9 @@ describe("Clone 3697:20326 · the rail's VERSIONS block", () => {
     expect(within(block.getByTestId("mgr-det-version-hero")).getByText("APPLIED")).toBeInTheDocument();
     openVersions();
     expect(screen.getByTestId("versions-title")).toHaveTextContent("Asset versions");
-    expect(screen.getByTestId("versions-card-state-hero")).toHaveTextContent("Currently used on Home and Menu · 3 placements");
-    expect(screen.getByTestId("versions-card-state-hero-v2")).toHaveTextContent("Not applied to site");
+    /* The shared list (the drawer's too): the original carries the site. */
+    expect(screen.getByTestId("media-version-meta-hero")).toHaveTextContent("current");
+    expect(screen.getByTestId("media-version-hero-v2")).not.toHaveAttribute("data-current");
   });
 
   it("is absent while only the original exists, and USED IN still reads the placements", async () => {
@@ -1348,42 +1350,57 @@ describe("Clone 3697:20326 · the rail's VERSIONS block", () => {
   });
 });
 
-describe("Clone 3695:45615 → 3720:43313 → 3720:43316 · Apply latest saved version across site", () => {
-  it("confirms with the real count and pages, applies through replaceAcross, reports per page, and View versions shows v2 applied", async () => {
+/* A row's restore in the library's dialog runs the library's confirm, then the
+   per-page result — with the drawer's M-5 semantics: every placement the
+   family has moves onto the chosen version. */
+const restoreRow = (key: string) => fireEvent.click(screen.getByTestId(`media-version-menu-${key}`));
+
+describe("Clone 3695:45615 → 3720:43313 → 3720:43316 · Restore a version across site", () => {
+  it("confirms with the real count and pages, moves the placements through replaceAcross, reports per page, and View versions shows v2 current", async () => {
     const { composer, placements } = await mountVersions({ family: [HERO, HERO_V2] });
     selectHero();
     openVersions();
-    fireEvent.click(screen.getByTestId("versions-apply-latest"));
-    expect(screen.getByTestId("apply-version-title")).toHaveTextContent("Apply saved version across site");
-    expect(screen.getByTestId("apply-version-body")).toHaveTextContent(
-      "Update 3 uses on Home and Menu to the latest saved version. The original and prior saved version remain available.",
+    restoreRow("hero-v2");
+    expect(screen.getByTestId("restore-version-title")).toHaveTextContent("Restore version across site");
+    expect(screen.getByTestId("restore-version-body")).toHaveTextContent(
+      "Update 3 uses on Home and Menu to v2 · Latest saved. Every other version remains available.",
     );
-    fireEvent.click(screen.getByTestId("apply-version-confirm"));
-    expect(screen.getByTestId("apply-version-applying-line")).toHaveTextContent("Updating 3 uses across Home and Menu. Please wait.");
+    fireEvent.click(screen.getByTestId("restore-version-confirm"));
+    expect(screen.getByTestId("restore-version-applying-line")).toHaveTextContent("Updating 3 uses across Home and Menu. Please wait.");
     expect(screen.queryByTestId("versions-modal")).toBeNull();
     const result = await screen.findByTestId("rx-result");
     expect(composer.mediaOps.replaceAcross).toHaveBeenCalledWith("blob:hero", "blob:hero-v2");
     expect(placements.src).toBe("blob:hero-v2");
-    expect(within(result).getByTestId("rx-result-title")).toHaveTextContent("Saved version applied");
+    expect(within(result).getByTestId("rx-result-title")).toHaveTextContent("Version restored");
     expect(within(result).getByTestId("rx-result-count")).toHaveTextContent("3 of 3 uses updated");
     expect(within(result).getByTestId("rx-result-pages")).toHaveTextContent("Home: 2 updated · Menu: 1 updated");
-    expect(within(result).getByTestId("rx-result-note")).toHaveTextContent("Other elements are unchanged.");
     fireEvent.click(screen.getByTestId("rx-result-versions"));
     expect(screen.queryByTestId("rx-result")).toBeNull();
-    expect(screen.getByTestId("versions-card-state-hero-v2")).toHaveTextContent("Applied to site · 3 placements");
-    expect(screen.getByTestId("versions-card-state-hero")).toHaveTextContent("Not on site");
-    expect(screen.getByTestId("versions-apply-latest")).toBeDisabled();
+    expect(screen.getByTestId("media-version-meta-hero-v2")).toHaveTextContent("current");
+    expect(screen.getByTestId("media-version-hero")).not.toHaveAttribute("data-current");
     /* And the rail's marker moved with the placements. */
     fireEvent.click(screen.getByTestId("versions-close"));
     expect(within(screen.getByTestId("mgr-det-version-hero-v2")).getByText("APPLIED")).toBeInTheDocument();
+  });
+
+  it("restores the ORIGINAL too — any version, not only the latest", async () => {
+    const { composer, placements } = await mountVersions({ family: [HERO, HERO_V2], on: "blob:hero-v2" });
+    selectHero();
+    openVersions();
+    restoreRow("hero");
+    expect(screen.getByTestId("restore-version-body")).toHaveTextContent("to v1 · Original.");
+    fireEvent.click(screen.getByTestId("restore-version-confirm"));
+    await screen.findByTestId("rx-result");
+    expect(composer.mediaOps.replaceAcross).toHaveBeenCalledWith("blob:hero-v2", "blob:hero");
+    expect(placements.src).toBe("blob:hero");
   });
 
   it("Done closes the result and the library stands as it was", async () => {
     await mountVersions({ family: [HERO, HERO_V2] });
     selectHero();
     openVersions();
-    fireEvent.click(screen.getByTestId("versions-apply-latest"));
-    fireEvent.click(screen.getByTestId("apply-version-confirm"));
+    restoreRow("hero-v2");
+    fireEvent.click(screen.getByTestId("restore-version-confirm"));
     fireEvent.click(within(await screen.findByTestId("rx-result")).getByTestId("rx-result-done"));
     expect(screen.queryByTestId("rx-result")).toBeNull();
     expect(screen.queryByTestId("versions-modal")).toBeNull();
@@ -1394,19 +1411,18 @@ describe("Clone 3695:45615 → 3720:43313 → 3720:43316 · Apply latest saved v
     await mountVersions({ family: [HERO, HERO_V2] });
     selectHero();
     openVersions();
-    fireEvent.click(screen.getByTestId("versions-apply-latest"));
-    fireEvent.click(screen.getByTestId("apply-version-cancel"));
-    expect(screen.queryByTestId("apply-version-modal")).toBeNull();
+    restoreRow("hero-v2");
+    fireEvent.click(screen.getByTestId("restore-version-cancel"));
+    expect(screen.queryByTestId("restore-version-modal")).toBeNull();
     expect(screen.getByTestId("versions-modal")).toBeInTheDocument();
   });
 
-  it("nothing on the site: the confirm's primary is disabled with the reason, and nothing is replaced", async () => {
+  it("nothing on the site: no row offers a restore, and nothing is replaced", async () => {
     const { composer } = await mountVersions({ family: [HERO, HERO_V2], on: "blob:elsewhere" });
     selectHero();
     openVersions();
-    fireEvent.click(screen.getByTestId("versions-apply-latest"));
-    expect(screen.getByTestId("apply-version-confirm")).toBeDisabled();
-    expect(screen.getByTestId("apply-version-body")).toHaveTextContent("Nothing on the site uses hero-dark.jpg yet");
+    expect(screen.queryByTestId("media-version-menu-hero")).toBeNull();
+    expect(screen.queryByTestId("media-version-menu-hero-v2")).toBeNull();
     expect(composer.mediaOps.replaceAcross).not.toHaveBeenCalled();
   });
 
@@ -1426,5 +1442,23 @@ describe("Clone 3695:45615 → 3720:43313 → 3720:43316 · Apply latest saved v
     expect(composer.mediaOps.replaceAcrossSelective).toHaveBeenCalledWith("blob:hero-v2", "blob:menu", ["p-home", "p-menu"]);
     expect(screen.getByTestId("rx-result-count")).toHaveTextContent("3 of 3 uses updated");
     expect(placements.src).toBe("blob:menu");
+  });
+});
+
+/* REA 2026-10-20 #14: a partly refused move reports the real counts, and
+   Retry moves only the files that stayed behind. */
+describe("Files could not be moved — partial", () => {
+  it("names how many moved and retries only the refused ones", async () => {
+    const bulkMoveAssets = vi
+      .fn<(keys: string[], folderId: string | null) => Promise<{ moved: string[]; failed: string[] }>>()
+      .mockImplementationOnce(async () => ({ moved: ["hero"], failed: ["chef"] }))
+      .mockImplementationOnce(async (keys) => ({ moved: keys, failed: [] }));
+    await mountLibrary(twoChecked({ bulkMoveAssets }));
+    openMoveModal();
+    fireEvent.click(screen.getByTestId("mgr-move-folder-f1"));
+    await screen.findByTestId("mgr-move-failed");
+    expect(screen.getByTestId("mgr-move-failed-body")).toHaveTextContent("1 file moved. 1 file could not be moved");
+    fireEvent.click(screen.getByTestId("mgr-move-failed-retry"));
+    expect(bulkMoveAssets).toHaveBeenLastCalledWith(["chef"], "f1");
   });
 });

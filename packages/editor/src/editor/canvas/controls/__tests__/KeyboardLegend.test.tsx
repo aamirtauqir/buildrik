@@ -34,10 +34,14 @@ describe("KeyboardLegend", () => {
     c.fire(EVENTS.UI_TOGGLE_KEYBOARD_LEGEND);
     const card = screen.getByTestId("kbd-legend");
     expect(card).toHaveTextContent("Keyboard");
-    for (const k of ["Tab", "F6 / ⇧F6", "Esc", "⌘K", "A L P M D B", "R", "C", "⌘S · save", "⌘P / ⌘J", "⌘Z / ⌘⇧Z"]) {
+    for (const k of ["Tab", "F6 / ⇧F6", "Esc", "⌘K", "A L P M D B", "R", "C", "⌘S · save", "⌘P", "⌘Z / ⌘⇧Z"]) {
       expect(screen.getByText(k, { selector: "[data-testid=kbd-legend-key]" })).toBeInTheDocument();
     }
-    expect(card).toHaveTextContent("Also: ⌃, opens Settings");
+    /* SC-12 / BD-39: History is H only; Enter edits the selected text. */
+    expect(card).toHaveTextContent("Also: H opens History · Enter edits the selected text");
+    expect(card).not.toHaveTextContent("⌃H");
+    /* SC-12 / owner Q4: Site settings has no shortcut. */
+    expect(card).not.toHaveTextContent("⌃,");
   });
 
   /* L1-014: three lines contradicted the real bindings (useEditorShortcuts,
@@ -52,7 +56,7 @@ describe("KeyboardLegend", () => {
     expect(card).not.toHaveTextContent("jump to a page");
     expect(card).not.toHaveTextContent("only while a review is live");
     expect(card).toHaveTextContent("⇧A opens Components");
-    expect(card).toHaveTextContent("preview · AI panel");
+    expect(card).toHaveTextContent("preview (⌘K finds pages)");
   });
 
   it("All shortcuts › opens the full sheet and closes the legend", () => {

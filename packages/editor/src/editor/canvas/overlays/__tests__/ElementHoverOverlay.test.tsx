@@ -28,10 +28,7 @@ vi.mock("@/editor/canvas/utils/elementInfo", () => ({
   }),
 }));
 
-// Mock DragHandle and SpacingLabels — they're not under test here
-vi.mock("../DragHandle", () => ({
-  DragHandle: () => null,
-}));
+// SpacingLabels is not under test here
 vi.mock("../SpacingLabels", () => ({
   SpacingLabels: () => null,
 }));

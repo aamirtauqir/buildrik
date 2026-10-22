@@ -118,6 +118,7 @@ export {
   TEXT_ELEMENT_TYPES,
   insideRefusal,
   engineMayPlaceInside,
+  insertionPlace,
   parserHoists,
   type InsideRefusal,
 } from "./placement";

@@ -1,5 +1,7 @@
 /**
- * useExportHandlers.test.ts — covers handleExportHTML success/failure,
+ * useExportHandlers.test.ts — covers handleExportHTML success/failure and its
+ * server Pro gate (sites.authorizeCodeExport: refusal → upgrade prompt, error
+ * → toast, never a ZIP),
  * handleVercelPublish branches
  * (no siteId, empty pages, success, export failure), and the
  * publish-toast useEffect for COMPLETED / FAILED transitions.
@@ -39,6 +41,15 @@ vi.mock("@/services/BuildrikSyncProvider", () => ({
   getSiteIdFromUrl: vi.fn(() => "site-123"),
 }));
 
+vi.mock("@/services/PublishService", () => ({
+  authorizeCodeExport: vi.fn(() => Promise.resolve("allowed")),
+}));
+
+vi.mock("@/editor/chrome-ui", async (orig) => ({
+  ...(await orig<typeof import("@/editor/chrome-ui")>()),
+  openUpgrade: vi.fn(),
+}));
+
 vi.mock("../usePublishJob", () => {
   const baseResult = {
     uiState: "idle" as const,
@@ -66,6 +77,8 @@ vi.mock("../usePublishJob", () => {
 // Lazy imports — must come AFTER the vi.mock calls.
 import * as ExportMod from "@/engine/export";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
+import { authorizeCodeExport } from "@/services/PublishService";
+import { openUpgrade } from "@/editor/chrome-ui";
 import * as PublishJobMod from "../usePublishJob";
 
 const exportInstance = (ExportMod as unknown as {
@@ -96,10 +109,13 @@ function makeOpts() {
   const composer = {
     getProjectSettings: vi.fn(() => ({ seo: { siteName: "my-cool-site" } })),
     exportProject: vi.fn(() => ({ cmsBindings: undefined })),
-  } as unknown as UseExportHandlersOptions["composer"];
+    isDirty: vi.fn(() => false),
+    getChangeSeq: vi.fn(() => 0),
+  } as unknown as NonNullable<UseExportHandlersOptions["composer"]>;
   const addToast = vi.fn().mockReturnValue("toast-id");
   const setExportLoading = vi.fn();
-  return { composer, addToast, setExportLoading };
+  const saveProject = vi.fn<UseExportHandlersOptions["saveProject"]>(async () => "saved");
+  return { composer, addToast, setExportLoading, saveProject };
 }
 
 function flushMicrotasks() {
@@ -118,6 +134,7 @@ describe("useExportHandlers", () => {
       .mockReset()
       .mockResolvedValue({ files: DEFAULT_EXPORT_FILES });
     vi.mocked(getSiteIdFromUrl).mockReturnValue("site-123");
+    vi.mocked(authorizeCodeExport).mockReset().mockResolvedValue("allowed");
   });
 
   afterEach(() => {
@@ -148,6 +165,70 @@ describe("useExportHandlers", () => {
       expect(opts.setExportLoading).not.toHaveBeenCalled();
       expect(exportInstance.downloadZip).not.toHaveBeenCalled();
       expect(opts.addToast).not.toHaveBeenCalled();
+    });
+
+    it("asks the server for this site before building the ZIP", async () => {
+      const { result } = renderHook(() => useExportHandlers(opts));
+      await act(async () => {
+        await result.current.handleExportHTML();
+      });
+      expect(authorizeCodeExport).toHaveBeenCalledWith("site-123");
+      expect(vi.mocked(authorizeCodeExport).mock.invocationCallOrder[0]).toBeLessThan(
+        exportInstance.downloadZip.mock.invocationCallOrder[0],
+      );
+      expect(openUpgrade).not.toHaveBeenCalled();
+    });
+
+    it("server plan refusal → upgrade prompt, no ZIP, no toast", async () => {
+      vi.mocked(authorizeCodeExport).mockResolvedValueOnce("upgrade");
+      const { result } = renderHook(() => useExportHandlers(opts));
+      await act(async () => {
+        await result.current.handleExportHTML();
+      });
+      expect(openUpgrade).toHaveBeenCalledWith({ feature: "Downloading your site's code" });
+      expect(exportInstance.downloadZip).not.toHaveBeenCalled();
+      expect(opts.addToast).not.toHaveBeenCalled();
+      expect(opts.setExportLoading).toHaveBeenLastCalledWith(false);
+    });
+
+    it("a viewer → 'Only editors' toast, no ZIP, no upgrade prompt", async () => {
+      vi.mocked(authorizeCodeExport).mockResolvedValueOnce("forbidden");
+      const { result } = renderHook(() => useExportHandlers(opts));
+      await act(async () => {
+        await result.current.handleExportHTML();
+      });
+      expect(opts.addToast).toHaveBeenCalledWith(
+        expect.objectContaining({ tone: "error", title: "Only editors can download code" }),
+      );
+      expect(exportInstance.downloadZip).not.toHaveBeenCalled();
+      expect(openUpgrade).not.toHaveBeenCalled();
+    });
+
+    it("a failed check (network) → error toast, no ZIP, no upgrade prompt", async () => {
+      vi.mocked(authorizeCodeExport).mockRejectedValueOnce(new TypeError("Failed to fetch"));
+      const { result } = renderHook(() => useExportHandlers(opts));
+      await act(async () => {
+        await result.current.handleExportHTML();
+      });
+      expect(opts.addToast).toHaveBeenCalledWith(
+        expect.objectContaining({ tone: "error", title: "Couldn't check your plan" }),
+      );
+      expect(exportInstance.downloadZip).not.toHaveBeenCalled();
+      expect(openUpgrade).not.toHaveBeenCalled();
+      expect(opts.setExportLoading).toHaveBeenLastCalledWith(false);
+    });
+
+    it("without a site there is no server to ask → toast, no check, no ZIP", async () => {
+      vi.mocked(getSiteIdFromUrl).mockReturnValue(null);
+      const { result } = renderHook(() => useExportHandlers(opts));
+      await act(async () => {
+        await result.current.handleExportHTML();
+      });
+      expect(authorizeCodeExport).not.toHaveBeenCalled();
+      expect(exportInstance.downloadZip).not.toHaveBeenCalled();
+      expect(opts.addToast).toHaveBeenCalledWith(
+        expect.objectContaining({ tone: "error", title: "Cannot download code" }),
+      );
     });
 
     it("toasts error on failure and clears loading", async () => {
@@ -209,6 +290,82 @@ describe("useExportHandlers", () => {
         ],
         { acknowledgeStale: false },
       );
+    });
+
+    /* REA #9: publish ships the saved revision. */
+    describe("saved revision (REA #9)", () => {
+      const NOT_SAVED = expect.objectContaining({ title: "Publish blocked", tone: "neutral" });
+
+      it("does not save a clean document — a save would stale a fresh approval", async () => {
+        const { result } = renderHook(() => useExportHandlers(opts));
+        await act(async () => {
+          await result.current.handleVercelPublish();
+        });
+        expect(opts.saveProject).not.toHaveBeenCalled();
+        expect(result.current.publishJob.publish).toHaveBeenCalled();
+      });
+
+      it("saves unsaved edits first, then publishes", async () => {
+        const dirty = vi.mocked(opts.composer.isDirty);
+        dirty.mockReturnValue(true);
+        opts.saveProject.mockImplementation(async () => {
+          dirty.mockReturnValue(false);
+          return "saved";
+        });
+        const { result } = renderHook(() => useExportHandlers(opts));
+        await act(async () => {
+          await result.current.handleVercelPublish();
+        });
+        expect(opts.saveProject).toHaveBeenCalledTimes(1);
+        expect(result.current.publishJob.publish).toHaveBeenCalled();
+      });
+
+      it.each(["error", "queued-offline"] as const)("a %s save publishes nothing and says why", async (outcome) => {
+        vi.mocked(opts.composer.isDirty).mockReturnValue(true);
+        opts.saveProject.mockResolvedValue(outcome);
+        const { result } = renderHook(() => useExportHandlers(opts));
+        await act(async () => {
+          await result.current.handleVercelPublish();
+        });
+        expect(exportInstance.exportAllPages).not.toHaveBeenCalled();
+        expect(result.current.publishJob.publish).not.toHaveBeenCalled();
+        expect(opts.addToast).toHaveBeenCalledWith(NOT_SAVED);
+      });
+
+      it("a conflicted save publishes nothing and leaves the word to the conflict dialog", async () => {
+        vi.mocked(opts.composer.isDirty).mockReturnValue(true);
+        opts.saveProject.mockResolvedValue("conflict");
+        const { result } = renderHook(() => useExportHandlers(opts));
+        await act(async () => {
+          await result.current.handleVercelPublish();
+        });
+        expect(result.current.publishJob.publish).not.toHaveBeenCalled();
+        expect(opts.addToast).not.toHaveBeenCalled();
+      });
+
+      it("an edit landing while the save travelled publishes nothing", async () => {
+        vi.mocked(opts.composer.isDirty).mockReturnValue(true);
+        const { result } = renderHook(() => useExportHandlers(opts));
+        await act(async () => {
+          await result.current.handleVercelPublish();
+        });
+        expect(result.current.publishJob.publish).not.toHaveBeenCalled();
+        expect(opts.addToast).toHaveBeenCalledWith(NOT_SAVED);
+      });
+
+      it("an edit landing while the pages render publishes nothing", async () => {
+        const seq = vi.mocked(opts.composer.getChangeSeq);
+        exportInstance.exportAllPages.mockImplementationOnce(async () => {
+          seq.mockReturnValue(1);
+          return { files: DEFAULT_EXPORT_FILES };
+        });
+        const { result } = renderHook(() => useExportHandlers(opts));
+        await act(async () => {
+          await result.current.handleVercelPublish();
+        });
+        expect(result.current.publishJob.publish).not.toHaveBeenCalled();
+        expect(opts.addToast).toHaveBeenCalledWith(NOT_SAVED);
+      });
     });
 
     it("toasts error when export throws", async () => {

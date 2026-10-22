@@ -230,6 +230,33 @@ describe("useSectionReorder", () => {
       expect(result.current.dragState).toBeNull();
     });
 
+    /* REA #12 (ISS-C02): the handles rendered outside the read-only block
+       and completeDrag never asked the lock gate. */
+    it("completeDrag moves nothing on a read-only composer (view mode, Time-travel)", () => {
+      (composer as unknown as { readOnly: boolean }).readOnly = true;
+      const { result } = mountHook();
+      act(() => result.current.startDrag("sec-a", 0));
+      act(() => result.current.updateDrag(250));
+      act(() => result.current.completeDrag());
+      expect(composer.elements.moveElement).not.toHaveBeenCalled();
+      expect(result.current.dragState).toBeNull();
+    });
+
+    it("completeDrag does not move a locked section, and says so", () => {
+      const emit = vi.fn();
+      (composer as unknown as { emit: typeof emit }).emit = emit;
+      const base = composer.elements.getElement.getMockImplementation() as (id: string) => unknown;
+      composer.elements.getElement.mockImplementation((id: string) =>
+        id === "sec-a" ? { getId: () => id, isLocked: () => true } : base(id),
+      );
+      const { result } = mountHook();
+      act(() => result.current.startDrag("sec-a", 0));
+      act(() => result.current.updateDrag(250));
+      act(() => result.current.completeDrag());
+      expect(composer.elements.moveElement).not.toHaveBeenCalled();
+      expect(emit).toHaveBeenCalledWith(EVENTS.LOCKED_ELEMENTS_SKIPPED, undefined);
+    });
+
     /* G2-031 / board 5940:148012: a completed move says "Moved down" + Undo. */
     it("completeDrag toasts 'Moved down' with an Undo after a downward move", () => {
       const addToast = vi.fn();
@@ -293,13 +320,15 @@ describe("useSectionReorder", () => {
       composer.elements.moveElement.mockImplementation(() => {
         throw new Error("move failed");
       });
-      const { result } = mountHook();
+      const addToast = vi.fn();
+      const { result } = mountHook(true, addToast);
       act(() => result.current.startDrag("sec-a", 0));
       act(() => result.current.updateDrag(250));
       act(() => result.current.completeDrag());
 
       expect(composer.rollbackTransaction).toHaveBeenCalled();
       expect(result.current.dragState).toBeNull();
+      expect(addToast).toHaveBeenCalledWith(expect.objectContaining({ tone: "error" })); // ISS-C21
     });
 
     it("cancelDrag clears dragState without moving anything", () => {

@@ -57,7 +57,7 @@ export const MAX_IMAGE_EDIT_DIMENSION = 8192;
 /**
  * Allowed MIME types for media uploads
  */
-export const ALLOWED_MIME_TYPES = {
+const ALLOWED_MIME_TYPES = {
   /** Allowed image MIME types */
   IMAGE: [
     "image/jpeg",
@@ -81,7 +81,7 @@ export const ALLOWED_MIME_TYPES = {
 /**
  * All allowed MIME types combined
  */
-export const ALL_ALLOWED_MIME_TYPES = [
+const ALL_ALLOWED_MIME_TYPES = [
   ...ALLOWED_MIME_TYPES.IMAGE,
   ...ALLOWED_MIME_TYPES.VIDEO,
   ...ALLOWED_MIME_TYPES.AUDIO,

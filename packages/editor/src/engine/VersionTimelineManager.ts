@@ -151,11 +151,12 @@ export class VersionTimelineManager {
   // ============================================
 
   /**
-   * Create a new named version
+   * Create a new named version — of the current document, or of `snapshot`
+   * when given (the server's copy kept before an Overwrite, BK-59).
    */
-  async createVersion(name: string, description?: string): Promise<NamedVersion> {
-    const snapshot = await this.captureSnapshotAsync();
-    const visualSnapshot = this.captureVisualSnapshot();
+  async createVersion(name: string, description?: string, snapshot?: ProjectData): Promise<NamedVersion> {
+    const visualSnapshot = snapshot ? null : this.captureVisualSnapshot();
+    snapshot ??= await this.captureSnapshotAsync();
 
     const version: NamedVersion = {
       id: generateVersionId(),
@@ -302,7 +303,8 @@ export class VersionTimelineManager {
       savedAs = safety.name;
       safetyVersionId = safety.id;
     } catch {
-      this.composer.emit(EVENTS.VERSION_LOAD_FAILED, {});
+      /* The caller's restore-failed toast says it. VERSION_LOAD_FAILED here
+         swapped the Saves list for "Couldn't load version history" (H-3). */
       return false;
     }
 
@@ -343,11 +345,11 @@ export class VersionTimelineManager {
   }
 
   /**
-   * Update version metadata (name, description, tags, aiSummary, visualSnapshot)
+   * Update version metadata (name, description, tags, visualSnapshot)
    */
   async updateVersion(
     versionId: string,
-    updates: Partial<Pick<NamedVersion, "name" | "description" | "tags" | "aiSummary" | "visualSnapshot">>
+    updates: Partial<Pick<NamedVersion, "name" | "description" | "tags" | "visualSnapshot">>
   ): Promise<boolean> {
     const version = this.versions.find((v) => v.id === versionId);
     if (!version) return false;
@@ -717,7 +719,9 @@ export class VersionTimelineManager {
     return this.compareSnapshots(this.captureSnapshot(), target.snapshot, "Current draft", target.name);
   }
 
-  private compareSnapshots(
+  /** Element-content diff of two snapshots (rows read current → target).
+   *  Public for the conflict dialog's "Review differences" (C1). */
+  compareSnapshots(
     currentData: ProjectData,
     targetData: ProjectData,
     currentName: string,

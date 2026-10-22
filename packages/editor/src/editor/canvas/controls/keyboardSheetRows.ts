@@ -129,31 +129,34 @@ export const CHROME_CHORDS: ChromeChord[] = [
   { id: "edit-move-1", group: "Edit", keys: "ctrl+Arrows", description: "Move element 1px" },
   { id: "edit-reorder", group: "Edit", keys: "alt+arrowup / alt+arrowdown", description: "Reorder up / down in DOM" },
   { id: "edit-reorder-ends", group: "Edit", keys: "alt+Home / alt+End", description: "Move to first / last position" },
+  /* BD-39 (1): useCanvasKeyboard asks useCanvasInlineEdit, the double-click's
+     own entry, so only editable text answers. */
+  { id: "edit-text", group: "Edit", keys: "Enter", description: "Edit selected text" },
 
   // ── View — CanvasFooterToolbar (zoom, overlays), StudioHeader (⌘K),
-  //          useEditorShortcuts (⌘P, ⌘⇧P, ⌘/, ⌘J), StudioModals (?) ────────
+  //          useEditorShortcuts (⌘P, ⌘⇧P, ⌘/), StudioModals (?) ────────
   { id: "view-palette", group: "View", keys: "ctrl+k / ctrl+shift+p", description: "Command palette" },
   { id: "view-sheet", group: "View", keys: "? / ctrl+/", description: "Keyboard shortcuts" },
   { id: "view-preview", group: "View", keys: "ctrl+p", description: "Preview" },
-  { id: "view-ai", group: "View", keys: "ctrl+j", description: "Ask AI" },
   { id: "view-zoom-in", group: "View", keys: "ctrl++", description: "Zoom in" },
   { id: "view-zoom-out", group: "View", keys: "ctrl+-", description: "Zoom out" },
-  /* ⌘0 is 100%, ⌘1 fits, ⌘2 zooms to the selection — measured at 1440×900
-     and bound in CanvasFooterToolbar. Two sheets printed ⌘0 as "fit". */
-  { id: "view-zoom-100", group: "View", keys: "ctrl+0", description: "Zoom to 100%" },
-  { id: "view-zoom-fit", group: "View", keys: "ctrl+1", description: "Zoom to fit" },
-  { id: "view-zoom-selection", group: "View", keys: "ctrl+2", description: "Zoom to selection" },
+  /* ⇧0 is 100% (⌘0 its alias), ⇧1 fits, ⇧2 zooms to the selection — bound in
+     CanvasFooterToolbar. SC-12 / BD-39 moved them off ⌘1 / ⌘2, which switch
+     browser tabs. Two sheets once printed ⌘0 as "fit". */
+  { id: "view-zoom-100", group: "View", keys: "shift+0 / ctrl+0", description: "Zoom to 100%" },
+  { id: "view-zoom-fit", group: "View", keys: "shift+1", description: "Zoom to fit" },
+  { id: "view-zoom-selection", group: "View", keys: "shift+2", description: "Zoom to selection" },
   { id: "view-guides", group: "View", keys: "ctrl+;", description: "Toggle snap guides" },
   { id: "view-spacing", group: "View", keys: "ctrl+shift+;", description: "Toggle spacing overlay" },
   { id: "view-grid", group: "View", keys: "ctrl+'", description: "Toggle grid" },
-  { id: "view-badges", group: "View", keys: "ctrl+b", description: "Toggle badges" },
-  { id: "view-rulers", group: "View", keys: "ctrl+r", description: "Toggle rulers" },
-  { id: "view-xray", group: "View", keys: "ctrl+shift+x", description: "Toggle X-ray" },
+  /* SC-12 / BD-39: ⌘B is Bold and ⌘⇧X strikethrough in text, ⌘R reloads. */
+  { id: "view-badges", group: "View", keys: "alt+b", description: "Toggle badges" },
+  { id: "view-rulers", group: "View", keys: "shift+r", description: "Toggle rulers" },
+  { id: "view-xray", group: "View", keys: "alt+x", description: "Toggle X-ray" },
 
-  // ── Panels — useSidebarKeyboard (letters), useEditorShortcuts (the rest) ─
+  // ── Panels — useSidebarKeyboard (letters, incl. History's H — ⌘H is the
+  //            browser's, SC-12 / BD-39), useEditorShortcuts (C) ─────────────
   ...PANEL_LETTERS,
-  { id: "panel-site-settings", group: "Panels", keys: "ctrl+,", description: "Site settings" },
-  { id: "panel-version-history", group: "Panels", keys: "ctrl+h", description: "Version history" },
   { id: "panel-comment-mode", group: "Panels", keys: "C", description: "Comment mode" },
 
   // ── Regions — useEditorShortcuts / regionCycle ───────────────────────────
@@ -168,7 +171,15 @@ export const CHROME_CHORDS: ChromeChord[] = [
  *  command with a chord and no `group` lands under Edit — the test in
  *  `KeyboardCheatSheet.commands.test.tsx` refuses that case so it stays
  *  hypothetical. */
-export function buildSheetGroups(registry: readonly CommandData[]): SheetGroup[] {
+/** Rows whose key is bound only while the site's review layer is on: R
+ *  (useSidebarKeyboard's disabledTabs) and C (useEditorShortcuts'
+ *  reviewsEnabled). Printing them while it is off promised a dead key. */
+const REVIEW_ONLY_ROWS = new Set(["panel-review", "panel-comment-mode"]);
+
+export function buildSheetGroups(
+  registry: readonly CommandData[],
+  { reviewsEnabled = true }: { reviewsEnabled?: boolean } = {},
+): SheetGroup[] {
   const byGroup = new Map<string, SheetRow[]>();
   const push = (group: string, row: SheetRow) => {
     const rows = byGroup.get(group);
@@ -185,7 +196,10 @@ export function buildSheetGroups(registry: readonly CommandData[]): SheetGroup[]
       description: cmd.label ?? cmd.id,
     });
   }
-  for (const { group, ...row } of CHROME_CHORDS) push(group, row);
+  for (const { group, ...row } of CHROME_CHORDS) {
+    if (!reviewsEnabled && REVIEW_ONLY_ROWS.has(row.id)) continue;
+    push(group, row);
+  }
 
   const rank = (g: string) => {
     const i = SHEET_GROUP_ORDER.indexOf(g);

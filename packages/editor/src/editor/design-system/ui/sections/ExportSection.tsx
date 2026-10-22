@@ -373,8 +373,8 @@ export const ExportSection: React.FC<ExportSectionProps> = ({ onClose }) => {
             className="tw:px-2.5 tw:py-2 tw:rounded tw:border-l-[3px] tw:border-l-[var(--bk-warning-text)] tw:bg-[var(--bk-warning-tint)] tw:text-[11px] tw:leading-normal tw:text-[var(--bk-ink)]"
           >
             <strong>Tailwind warning:</strong>{" "}
-            {tailwindDropped} tokens drop because Tailwind doesn&apos;t model dark variants per token.
-            Dark mode disabled on round-trip — banner surfaces this before commit.
+            {tailwindDropped} tokens are left out because Tailwind has no per-token dark variant.
+            Dark mode values are not in this file.
           </div>
         )}
       </div>

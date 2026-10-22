@@ -109,44 +109,6 @@ export {
 } from "./approvedCompare";
 
 // =============================================================================
-// DOM UTILITIES
-// =============================================================================
-
-export {
-  $,
-  $$,
-  byClass,
-  byTag,
-  createDOMElement,
-  removeElement,
-  replaceElement,
-  insertBefore,
-  insertAfter,
-  appendChildren,
-  clearChildren,
-  cloneElement,
-  matches,
-  closest,
-  parent,
-  parents,
-  siblings,
-  prevSibling,
-  nextSibling,
-  children,
-  firstChild,
-  lastChild,
-  getIndex,
-  isInViewport,
-  getRect,
-  getStyle,
-  setStyles,
-  toggleClass,
-  addClass,
-  removeClass,
-  hasClass,
-} from "./dom";
-
-// =============================================================================
 // ACCESSIBILITY
 // =============================================================================
 

@@ -119,7 +119,3 @@ export async function confirmUpload(
   });
   return { confirmed: true, cdnUrl: upload.storedUrl };
 }
-
-export function getUploadLimits() {
-  return UPLOAD_LIMITS;
-}

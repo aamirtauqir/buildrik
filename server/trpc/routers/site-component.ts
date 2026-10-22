@@ -13,7 +13,6 @@ import {
   getSiteComponent,
   deleteSiteComponent,
   listWorkspaceComponents,
-  getComponentUsage,
   renameWorkspaceComponent,
   deleteWorkspaceComponent,
   listComponentLibrary,
@@ -92,14 +91,14 @@ export const siteComponentsRouter = router({
     .input(componentLibrarySchema)
     .query(async ({ ctx, input }) => {
       await guardSite(ctx.prisma, ctx.session.user.id, input.siteId);
-      return listComponentLibrary(input.siteId);
+      return listComponentLibrary(input.siteId, ctx.session.user.id);
     }),
 
   libraryGet: protectedProcedure
     .input(libraryComponentSchema)
     .query(async ({ ctx, input }) => {
       await guardSite(ctx.prisma, ctx.session.user.id, input.siteId);
-      return getLibraryComponent(input.siteId, input.componentId);
+      return getLibraryComponent(input.siteId, input.componentId, ctx.session.user.id);
     }),
 
   // C1: the component browser — every master across the agency's workspace with
@@ -108,14 +107,6 @@ export const siteComponentsRouter = router({
     const workspaceId = await resolveWorkspaceId(ctx);
     return listWorkspaceComponents(workspaceId, ctx.session.user.id);
   }),
-
-  // C1 jump-to + C3 blast-radius: which sites carry a given master.
-  usage: protectedProcedure
-    .input(componentUsageSchema)
-    .query(async ({ ctx, input }) => {
-      const workspaceId = await resolveWorkspaceId(ctx);
-      return getComponentUsage(workspaceId, input.componentId);
-    }),
 
   // P6 shared library — rename a master everywhere (ADMIN).
   workspaceRename: protectedProcedure

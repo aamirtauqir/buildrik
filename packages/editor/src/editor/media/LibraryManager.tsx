@@ -32,13 +32,15 @@ import { ReplaceResultModal, type ReplaceOutcome } from "./components/ReplaceRes
 import { UploadFilesModal } from "./components/UploadFilesModal";
 import { UploadCompleteModal } from "./components/UploadCompleteModal";
 import { VersionsModal } from "./components/VersionsModal";
-import { ApplyVersionModal } from "./components/ApplyVersionModal";
+import { RestoreVersionModal } from "./components/RestoreVersionModal";
+import { useAssetVersions } from "../sidebar/tabs/media/hooks/useAssetVersions";
+import { versionLabel } from "../sidebar/tabs/media/data/mediaUtils";
 import { UrlImportError, fetchUrlAsFile } from "./fetchUrlAsFile";
 import type { ImageEditorOptions } from "../shell/hooks/useStudioModals";
 import { LIBRARY_KINDS, MEDIA_EVENTS, STORAGE_QUOTA_BYTES, getAssetTypeFromMime } from "@/shared/constants/media";
 import { useToast, Button, IconButton, Menu, MenuItem, Popover, TextInput, Tooltip } from "@/editor/chrome-ui";
 import { useMediaWriteAccess } from "@/editor/sidebar/tabs/media/hooks/useMediaWriteAccess";
-import type { LibraryItem, VersionEntry } from "../sidebar/tabs/media/data/mediaTypes";
+import type { ConfirmFolderDeletePayload, LibraryItem, VersionEntry } from "../sidebar/tabs/media/data/mediaTypes";
 import { displayNameFor } from "../sidebar/tabs/media/data/mediaUtils";
 import type { EditsSnapshot, IconConfig, MediaAsset } from "@/shared/types/media";
 import { FolderTree, type SmartFolder } from "./components/FolderTree";
@@ -46,7 +48,6 @@ import { AssetDetailsPanel } from "./components/AssetDetailsPanel";
 import { AssetGrid } from "./components/AssetGrid";
 import { formatBytes } from "@shared/utils/helpers/number";
 import { formatQuotaSize } from "@/editor/sidebar/tabs/media/components/StorageQuotaBar";
-import { regenerateAltText } from "@/services/AltTextService";
 import { createAssetVersion } from "@/services/MediaVersionService";
 import "./LibraryManager.css";
 
@@ -77,7 +78,7 @@ interface LibraryManagerProps {
   ) => void;
 }
 
-/* 3720:43313 — `replaceAcross` is synchronous, so the Applying card would
+/* 3720:43313 — `replaceAcross` is synchronous, so the Restoring card would
    never be seen without a beat; the prototype advances it on an AFTER
    delay. Long enough to read, short enough to feel like work, not a wait. */
 const APPLY_DWELL_MS = 350;
@@ -131,12 +132,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
      because the payload is different (no in-use list, has sub-folder count)
      and the secondary action (Move files…) belongs to the move picker, not
      the asset delete. SSOT per type — see `ConfirmFolderDeletePayload`. */
-  const [folderConfirm, setFolderConfirm] = React.useState<{
-    folderId: string;
-    folderName: string;
-    assetCount: number;
-    subFolderCount: number;
-  } | null>(null);
+  const [folderConfirm, setFolderConfirm] = React.useState<ConfirmFolderDeletePayload | null>(null);
 
   /* Clone 3585:23337 — the drawer's "Manage in full library" selects the file
      it just uploaded through the engine (`composer.media.selectAssets`) and
@@ -353,7 +349,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
   } | null>(null);
   /* Clone 3699:20347 — the move the engine refused, held so Retry can run
      exactly it again — including which door it came through. */
-  const [moveFailure, setMoveFailure] = React.useState<{ keys: string[]; folderId: string | null; from: MoveDoor } | null>(null);
+  const [moveFailure, setMoveFailure] = React.useState<{ keys: string[]; folderId: string | null; from: MoveDoor; movedCount: number } | null>(null);
   /* Clone 3721:45952 — the card menu's `Move to folder…` opens the same Move
      modal for that ONE file; it creates no selection. */
   const [menuMoveTarget, setMenuMoveTarget] = React.useState<LibraryItem | null>(null);
@@ -384,10 +380,11 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
         .map((k) => state.allLibraryItems.find((i) => i.key === k))
         .filter((i): i is LibraryItem => i !== undefined);
       const wasHere = new Set(items.filter((i) => (i.folderId ?? null) === folderId).map((i) => i.key));
-      try {
-        await state.bulkMoveAssets(keys, folderId);
-      } catch {
-        setMoveFailure({ keys, folderId, from });
+      /* A file the server refused stays where it was (REA 2026-10-20 #14):
+         those — and only those — go to the failure modal and its Retry. */
+      const { failed } = await state.bulkMoveAssets(keys, folderId);
+      if (failed.length > 0) {
+        setMoveFailure({ keys: failed, folderId, from, movedCount: keys.length - failed.length });
         return;
       }
       setMoveFailure(null);
@@ -469,7 +466,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
   const [importDraft, setImportDraft] = React.useState("");
   const [importResult, setImportResult] = React.useState<ImportResult | null>(null);
   /* Clone 3695:45573 — the stock save's result, with the asset it landed as. */
-  const [stockSaved, setStockSaved] = React.useState<{ key: string; name: string } | null>(null);
+  const [stockSaved, setStockSaved] = React.useState<{ key: string; name: string; video: boolean } | null>(null);
 
   const handleImportFromUrl = React.useCallback(
     async (url: string) => {
@@ -574,32 +571,28 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
 
   /* ─── P6-V Versions ────────────────────────────────────────────────── */
   /* Clone 3695:45529 — the Asset versions dialog, open on this file's family
-     (its parent's key: a version's own key resolves to the same family). */
+     (its parent's key: a version's own key resolves to the same family). The
+     list is the one the drawer draws (`useAssetVersions`); it stays mounted
+     on `versionsFor` through the restore confirm and its result. */
   const [versionsFor, setVersionsFor] = React.useState<string | null>(null);
-  /* 3695:45615 — the apply confirm for the latest saved version, then
-     (3720:43313) the Applying card while the placements move. */
-  const [applyTarget, setApplyTarget] = React.useState<{ parentKey: string; versionKey: string } | null>(null);
+  const { versionsOf } = state;
+  const versionsFamily = React.useMemo(() => (versionsFor ? versionsOf(versionsFor) : []), [versionsFor, versionsOf]);
+  const familyVersions = useAssetVersions(composer, versionsFamily);
+  /* 3695:45615 — the restore confirm for one version (by key), then
+     (3720:43313) the Restoring card while the placements move. */
+  const [restoreKey, setRestoreKey] = React.useState<string | null>(null);
   const [applying, setApplying] = React.useState(false);
-  /* 3720:43316 — what the apply did, per element, until Done or View
-     versions. `sources` are the srcs the placements carried, kept so Retry
-     can run exactly the same replace for the ones that failed. */
-  const [applyResult, setApplyResult] = React.useState<{
-    parentKey: string;
-    versionKey: string;
-    sources: string[];
-    replaced: string[];
-    failed: string[];
-  } | null>(null);
+  /* 3720:43316 — what the restore did, per element, until Done or View
+     versions. */
+  const [restoreResult, setRestoreResult] = React.useState<{ versionKey: string; replaced: string[]; failed: string[] } | null>(null);
 
-  const versionsFamily = React.useMemo(() => (versionsFor ? familyOf(versionsFor) : []), [versionsFor, familyOf]);
-  /* What the apply would move: every placement NOT already on the target
-     version — the original's, and an older version's if one was applied
-     before. Their pages name the confirm's "on Home and Menu". */
-  const applyFamily = React.useMemo(() => (applyTarget ? familyOf(applyTarget.parentKey) : []), [applyTarget, familyOf]);
-  const applySources = applyFamily.filter((v) => v.item.key !== applyTarget?.versionKey && v.placements > 0);
-  const applyUses = applySources.reduce((n, v) => n + v.placements, 0);
-  const applyPages = [...new Set(applySources.flatMap((v) => v.pages))];
-  const applyName = applyFamily[0]?.item.displayName ?? applyFamily[0]?.item.name ?? "";
+  const restoreRow = familyVersions.rows.find((r) => r.item.key === restoreKey);
+  /* What the restore would move: every placement NOT already on the target
+     version. Their pages name the confirm's "on Home and Menu". */
+  const restoreSources = restoreRow ? familyVersions.movingTo(restoreRow) : [];
+  const restoreUses = restoreSources.reduce((n, r) => n + r.placements, 0);
+  const restorePages = [...new Set(state.checkInUse(restoreSources.map((r) => r.item.key)).flatMap((u) => u.pages))];
+  const familyName = familyVersions.rows[0]?.item.displayName ?? familyVersions.rows[0]?.item.name ?? "";
 
   /* The family at SAVE time, not at open time: a second save from the same
      editor session numbers itself after the version the first one made. */
@@ -658,50 +651,32 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
     [onOpenImageEditor, addToast, composer],
   );
 
-  /* Move every placement the family has on the site onto the target
-     version — one `replaceAcross` per src the placements carry (the
-     original's, or an earlier applied version's), each its own undo step.
-     A placement that failed keeps its old src, so running the same sources
-     again is exactly the retry. */
-  const applyOnto = React.useCallback(
-    (target: { parentKey: string; versionKey: string }, sources: string[]) => {
-      const version = familyOf(target.parentKey).find((v) => v.item.key === target.versionKey);
-      const results = version ? sources.map((src) => composer.mediaOps.replaceAcross(src, version.item.src)) : [];
-      setPlacementsTick((t) => t + 1);
-      return {
-        replaced: results.flatMap((r) => r.replaced.map((e) => e.elementId)),
-        failed: results.flatMap((r) => r.failed.map((f) => f.elementId)),
-      };
-    },
-    [familyOf, composer],
-  );
+  /* 3695:45615 → 3720:43313 → 3720:43316: the confirm's Restore. Held on
+     the Restoring card for a beat, then the result takes its place. The move
+     itself is the shared list's restore (M-5 semantics). */
+  const runRestore = React.useCallback(async () => {
+    if (!restoreRow) return;
+    setApplying(true);
+    await new Promise((resolve) => setTimeout(resolve, APPLY_DWELL_MS));
+    const outcome = familyVersions.restore(restoreRow);
+    setPlacementsTick((t) => t + 1);
+    setApplying(false);
+    setRestoreKey(null);
+    setRestoreResult({ versionKey: restoreRow.item.key, ...outcome });
+  }, [restoreRow, familyVersions]);
 
-  /* 3695:45615 → 3720:43313 → 3720:43316: the confirm's Apply. Held on the
-     Applying card for a beat, then the result takes its place. */
-  const runApply = React.useCallback(
-    async (target: { parentKey: string; versionKey: string }, sources: string[]) => {
-      setVersionsFor(null);
-      setApplying(true);
-      await new Promise((resolve) => setTimeout(resolve, APPLY_DWELL_MS));
-      const outcome = applyOnto(target, sources);
-      setApplying(false);
-      setApplyTarget(null);
-      setApplyResult({ ...target, sources, ...outcome });
-    },
-    [applyOnto],
-  );
-
-  /* 3695:43906 — Retry failed use: the same replace for the same sources;
-     what landed before stays counted. */
-  /* The result card's Retry runs the failed placements again and reads the
-     outcome back (the card's own contract, shared with Replace across site). */
-  const retryApply = React.useCallback(async (): Promise<ReplaceOutcome> => {
-    if (!applyResult) return { replaced: [], failed: [] };
-    const outcome = applyOnto(applyResult, applyResult.sources);
-    const merged = { replaced: [...applyResult.replaced, ...outcome.replaced], failed: outcome.failed };
-    setApplyResult({ ...applyResult, ...merged });
+  /* The result card's Retry: a refused placement keeps its old src, so the
+     same restore again moves exactly those; what landed before stays counted
+     (the card's own contract, shared with Replace across site). */
+  const retryRestore = React.useCallback(async (): Promise<ReplaceOutcome> => {
+    const row = familyVersions.rows.find((r) => r.item.key === restoreResult?.versionKey);
+    if (!restoreResult || !row) return { replaced: [], failed: [] };
+    const outcome = familyVersions.restore(row);
+    setPlacementsTick((t) => t + 1);
+    const merged = { replaced: [...restoreResult.replaced, ...outcome.replaced], failed: outcome.failed };
+    setRestoreResult({ ...restoreResult, ...merged });
     return merged;
-  }, [applyResult, applyOnto]);
+  }, [restoreResult, familyVersions]);
 
   /* Clone 3721:43697 — TAGS lists the LIBRARY's tags (`menu · team · food`
      stay while Products is the scope), so it reads the unscoped list. It used
@@ -887,8 +862,9 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
                never force-deletes silently. */
             const folder = state.folders.find((f) => f.id === folderId);
             const folderName = folder?.name ?? "Untitled";
-            const { assetCount, subFolderCount } = state.inspectFolder(folderId);
-            setFolderConfirm({ folderId, folderName, assetCount, subFolderCount });
+            const { assetCount, subFolderCount, assetIds } = state.inspectFolder(folderId);
+            const inUseCount = state.checkInUse(assetIds).length;
+            setFolderConfirm({ folderId, folderName, assetCount, subFolderCount, inUseCount });
           }}
           onMoveAssetToFolder={handleDropOnFolder}
           assetDragActive={assetDrag !== null}
@@ -972,20 +948,16 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
             if (el) composer.selection.select(el);
             onClose();
           }}
-          onUpdateTags={(key, tags) => void state.updateItem(key, { tags })}
+          onUpdateTags={(key, tags) =>
+            void state.updateItem(key, { tags }).catch(() =>
+              addToast({ description: "Could not save the tags — the server did not save the change.", tone: "error" }),
+            )
+          }
           /* Clone 3696:21550 — Site fonts is mounted once in the shell and
              opens on the composer event, with this file highlighted. */
           onManageFont={(item) => composer.emit("ui:site-fonts", { assetId: item.key })}
-          onUpdateAltText={(key, altText) => {
-            // User-typed edit — clear AI provenance so the chip disappears.
-            // Empty user edit also counts as "no longer AI's text."
-            void composer.media.updateAsset(key, {
-              altText,
-              generatedMetadata: undefined,
-            });
-          }}
+          onUpdateAltText={(key, altText) => state.updateItem(key, { altText })}
           // Regenerate is an explicit ask to REPLACE the current text.
-          onRegenerateAltText={(key) => regenerateAltText(composer.media, key, key)}
         />
       </div>
       {/* ═══ STATUS BAR ═══ */}
@@ -1054,7 +1026,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
           const saved = await state.saveToLibrary(type, item);
           if (saved) {
             setStockModalOpen(false);
-            setStockSaved(saved);
+            setStockSaved({ ...saved, video: type === "vid" });
           }
         }}
       />
@@ -1083,8 +1055,33 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
                folder. The ConfirmDeleteModal pattern is the same — execute
                always closes the modal, success tells the toast. */
             try {
-              await state.deleteFolder(folderConfirm.folderId, { force: true });
+              const folderName = folderConfirm.folderName;
+              const outcome = await state.deleteFolder(folderConfirm.folderId, { force: true });
               setFolderConfirm(null);
+              outcome?.settled.catch(() =>
+                addToast({ description: `Could not delete the folder “${folderName}”. It is still in the library.`, tone: "error" }),
+              );
+              /* The same grace + Undo as a file delete: the toast is the one
+                 way back, and it says what went — or what did not. */
+              if (outcome && outcome.failed > 0) {
+                addToast({
+                  description: `Could not delete ${outcome.failed} of ${outcome.files + outcome.failed} files. “${folderConfirm.folderName}” was kept.`,
+                  tone: "error",
+                  action: outcome.files > 0 ? { label: "Undo", onClick: outcome.undo } : undefined,
+                  duration: 8000,
+                });
+              } else if (outcome) {
+                const what = `“${folderConfirm.folderName}” and ${outcome.files} ${outcome.files === 1 ? "file" : "files"}`;
+                const broke = outcome.usageCount;
+                addToast({
+                  description: broke > 0
+                    ? `Deleted ${what} and cleared ${broke} element${broke === 1 ? "" : "s"} that used them.`
+                    : `Deleted ${what}.`,
+                  tone: "info",
+                  action: { label: "Undo", onClick: outcome.undo },
+                  duration: 8000,
+                });
+              }
             } catch {
               setFolderConfirm(null);
               addToast({ description: "Could not delete folder", tone: "error" });
@@ -1123,46 +1120,43 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
       {/* ─── P6-V Versions ──────────────────────────────────────────────── */}
       {/* Clone 3695:45529 — Asset versions, from the editor's Done or a rail
           row. Edit latest saved version gives way to the editor (its Done
-          brings the dialog back); Apply opens the confirm over it, and
-          Cancel there returns here. */}
+          brings the dialog back); a row's restore opens the confirm over it,
+          and Cancel there returns here. */}
       <VersionsModal
-        open={versionsFor !== null && applyTarget === null}
-        versions={versionsFamily}
+        open={versionsFor !== null && restoreKey === null && restoreResult === null}
+        versions={familyVersions}
         onClose={() => setVersionsFor(null)}
         onEditLatest={(latest) => {
           setVersionsFor(null);
           void handleEditImage(latest);
         }}
-        onApplyLatest={(latest) => {
-          if (versionsFor) setApplyTarget({ parentKey: versionsFor, versionKey: latest.key });
-        }}
+        onRestore={(row) => setRestoreKey(row.item.key)}
       />
-      <ApplyVersionModal
-        open={applyTarget !== null}
-        name={applyName}
-        uses={applyUses}
-        pages={applyPages}
+      <RestoreVersionModal
+        open={restoreRow !== undefined}
+        name={familyName}
+        label={restoreRow ? versionLabel(restoreRow, familyVersions.rows.length) : ""}
+        uses={restoreUses}
+        pages={restorePages}
         applying={applying}
-        onClose={() => setApplyTarget(null)}
-        onApply={() => {
-          if (applyTarget) void runApply(applyTarget, applySources.map((v) => v.item.src));
-        }}
+        onClose={() => setRestoreKey(null)}
+        onRestore={() => void runRestore()}
       />
-      {/* 3720:43316 — the result under P6-V's title; View versions returns to
-          Asset versions with the applied marker moved. */}
-      {applyResult && (
+      {/* 3720:43316 — the result; View versions returns to Asset versions
+          with the current marker moved. */}
+      {restoreResult && (
         <ReplaceResultModal
           open
-          title="Saved version applied"
-          replaced={applyResult.replaced}
-          failed={applyResult.failed}
+          title="Version restored"
+          replaced={restoreResult.replaced}
+          failed={restoreResult.failed}
           composer={composer}
-          onRetry={retryApply}
-          onDone={() => setApplyResult(null)}
-          onViewVersions={() => {
-            setVersionsFor(applyResult.parentKey);
-            setApplyResult(null);
+          onRetry={retryRestore}
+          onDone={() => {
+            setRestoreResult(null);
+            setVersionsFor(null);
           }}
+          onViewVersions={() => setRestoreResult(null)}
         />
       )}
       <ImportUrlModal
@@ -1234,6 +1228,8 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
       />
       <MoveFailedModal
         open={moveFailure !== null}
+        movedCount={moveFailure?.movedCount ?? 0}
+        failedCount={moveFailure?.keys.length ?? 0}
         onClose={() => setMoveFailure(null)}
         onRetry={() => {
           if (moveFailure) void runMove(moveFailure.keys, moveFailure.folderId, moveFailure.from);

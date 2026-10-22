@@ -6,6 +6,7 @@ import {
   listSites,
   createSite,
   getSite,
+  loadSiteForEditor,
   renameSite,
   duplicateSite,
   archiveSite,
@@ -21,6 +22,8 @@ import {
   PageSlugTakenError,
   getProjectData,
   redactSitePassword,
+  getEditorAccess,
+  assertCodeExportAllowed,
 } from "@/server/services/sites.service";
 import {
   listFolders,
@@ -32,6 +35,7 @@ import {
 import {
   runPrePublishChecks,
   startPublish,
+  PublishBlockedError,
   getPublishStatus,
   cancelPublish,
   unpublishSite,
@@ -40,6 +44,7 @@ import {
   getPublishHistory,
   rollbackPublish,
 } from "@/server/services/publish.service";
+import { retryFormsActivation, retryPostDeployStep } from "@/server/services/publish-bundle.service";
 import {
   listSitesSchema,
   createSiteSchema,
@@ -50,6 +55,8 @@ import {
   checkSlugSchema,
   getProjectDataSchema,
   editorSaveProjectSchema,
+  codeExportAccessSchema,
+  CODE_EXPORT_NOT_IN_PLAN,
 } from "@buildrik/shared/schemas/sites";
 import {
   schedulePublish,
@@ -88,6 +95,28 @@ export const sitesRouter = router({
       return site;
     }),
 
+  /** The editor's load: site, pages and settings as one consistent snapshot
+   *  (see loadSiteForEditor). Same access rule as `get` — VIEWER may read. */
+  loadForEditor: protectedProcedure
+    .input(z.object({ siteId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      try {
+        await assertSiteAccess(ctx.prisma, ctx.session.user.id, input.siteId);
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
+      const loaded = await loadSiteForEditor(input.siteId, ctx.session.user.id);
+      if (!loaded) throw new TRPCError({ code: "NOT_FOUND" });
+      return loaded;
+    }),
+
+  /** What the /edit/:siteId route renders: "edit", "view" (VIEWER, read-only
+   *  mode) or null (no access / no such site). Never throws on denial. */
+  editorAccess: protectedProcedure
+    .input(z.object({ siteId: z.string() }))
+    .query(({ ctx, input }) => getEditorAccess(ctx.session.user.id, input.siteId)),
+
   create: protectedProcedure
     .input(createSiteSchema)
     .mutation(async ({ ctx, input }) => {
@@ -125,7 +154,7 @@ export const sitesRouter = router({
         if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
         throw e;
       }
-      return renameSite(input.id, input.name);
+      return renameSite(input.id, input.name, ctx.session.user.id);
     }),
 
   duplicate: protectedProcedure
@@ -373,7 +402,7 @@ export const sitesRouter = router({
       }
 
       try {
-        return await saveProjectFromEditor(input.siteId, input.projectData, input.expectedLastEditedAt ?? undefined);
+        return await saveProjectFromEditor(input.siteId, input.projectData, input.expectedLastEditedAt ?? undefined, ctx.session.user.id);
       } catch (e: unknown) {
         /* I-2: a page id in the save belongs to another site. BAD_REQUEST, not
            FORBIDDEN — the editor treats FORBIDDEN as a revoked role. */
@@ -453,6 +482,35 @@ export const sitesRouter = router({
       return runPrePublishChecks(input.siteId);
     }),
 
+  // Pro gate for the editor's "Download code (ZIP)" (the "Export site…" dialog
+  // stays ungated, owner decision). Any member with access to the site may ask;
+  // the plan decides. The FORBIDDEN message leads with CODE_EXPORT_NOT_IN_PLAN
+  // so the editor shows the upgrade prompt for that refusal and only that one.
+  authorizeCodeExport: protectedProcedure
+    .input(codeExportAccessSchema)
+    .query(async ({ ctx, input }) => {
+      try {
+        // Owner 2026-10-22: viewers can't download code — Editor and up only.
+        await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.siteId, "EDITOR");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
+      try {
+        await assertCodeExportAllowed(input.siteId);
+      } catch (e) {
+        if (e instanceof Error && e.message === "SITE_NOT_FOUND")
+          throw new TRPCError({ code: "NOT_FOUND", message: "Site not found" });
+        if (e instanceof Error && e.message === CODE_EXPORT_NOT_IN_PLAN)
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: `${CODE_EXPORT_NOT_IN_PLAN}: Downloading your site's code is a Pro feature. Upgrade your plan in Settings → Billing.`,
+          });
+        throw e;
+      }
+      return { allowed: true as const };
+    }),
+
   publish: protectedProcedure
     .input(publishInputSchema)
     .mutation(async ({ ctx, input }) => {
@@ -501,6 +559,17 @@ export const sitesRouter = router({
           });
         if (e instanceof Error && e.message === "WORKSPACE_DELETION_SCHEDULED")
           throw new TRPCError({ code: "PRECONDITION_FAILED", message: WORKSPACE_DELETION_SCHEDULED_MESSAGE });
+        if (e instanceof Error && e.message === "PUBLISH_DISABLED")
+          throw new TRPCError({
+            code: "PRECONDITION_FAILED",
+            message: "Publishing is not enabled on this server.",
+            cause: { reason: "PUBLISH_DISABLED" },
+          });
+        if (e instanceof Error && e.message === "NO_PAGES")
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Nothing to publish. Open the site in the editor and publish from there.",
+          });
         // Sites deploy into the workspace's own Vercel account. The pre-publish
         // check already disables the button, but the editor and the API can still
         // reach here — they get a reason, not a 500.
@@ -512,6 +581,15 @@ export const sitesRouter = router({
             code: "PRECONDITION_FAILED",
             message: "Connect this workspace to Vercel before publishing.",
             cause: { reason: "VERCEL_NOT_CONNECTED" },
+          });
+        /* D11: the server's checks refused it — the rows go back so the panel
+           (`parseServerBlockers` in usePublishJob.ts reads this message)
+           shows the SERVER's result (decision 6), not its own guess. */
+        if (e instanceof PublishBlockedError)
+          throw new TRPCError({
+            code: "PRECONDITION_FAILED",
+            message: e.userMessage,
+            cause: { reason: "PUBLISH_BLOCKED", blockers: e.blockers },
           });
         // m-approval gate (publish.service startPublish): a member in an
         // approval-required workspace without an APPROVED review gets a clear
@@ -730,6 +808,47 @@ export const sitesRouter = router({
       }
     }),
 
+  /* Decision 7: "Retry form update" — the forms switch-over of the live
+     publish, on its own (A3/O3). Only the job that is live can switch. */
+  retryFormsActivation: protectedProcedure
+    .input(rollbackInput)
+    .mutation(async ({ ctx, input }) => {
+      try {
+        await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.siteId, "EDITOR");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
+      try {
+        return { formsStatus: await retryFormsActivation(input.siteId, input.jobId) };
+      } catch (e: unknown) {
+        if (e instanceof Error && e.message === "NOT_FOUND")
+          throw new TRPCError({ code: "NOT_FOUND", message: "That publish was not found." });
+        throw e;
+      }
+    }),
+
+  /* O6: a step that failed after the deployment went live is retried on its
+     own — never a redeploy. */
+  retryPostDeploy: protectedProcedure
+    .input(rollbackInput)
+    .mutation(async ({ ctx, input }) => {
+      try {
+        await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.siteId, "EDITOR");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
+      try {
+        await retryPostDeployStep(input.siteId, input.jobId);
+        return { ok: true as const };
+      } catch (e: unknown) {
+        if (e instanceof Error && e.message === "NOT_FOUND")
+          throw new TRPCError({ code: "NOT_FOUND", message: "Nothing to retry on that publish." });
+        throw e;
+      }
+    }),
+
   // P1: roll back = re-publish a prior version as a NEW job (contract §5).
   // ADMIN — a destructive/cross-history action (§2). Bypasses the approval gate
   // in the service (restoring an already-shipped version). Activity-logged.
@@ -756,6 +875,8 @@ export const sitesRouter = router({
           throw new TRPCError({ code: "PRECONDITION_FAILED", message: WORKSPACE_DELETION_SCHEDULED_MESSAGE });
         if (msg === "VERCEL_NOT_CONNECTED")
           throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Connect Vercel before rolling back." });
+        if (msg === "PUBLISH_DISABLED")
+          throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Publishing is not enabled on this server." });
         throw e;
       }
       await recordForSite({

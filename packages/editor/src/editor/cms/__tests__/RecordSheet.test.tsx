@@ -326,8 +326,25 @@ describe("RecordSheet", () => {
     await waitFor(() => expect(composer.cms.collections.deleteContentItem).toHaveBeenCalledWith("r1"));
     fireEvent.click(await screen.findByRole("button", { name: "Undo" }));
     await waitFor(() =>
-      expect(composer.cms.collections.createContentItem).toHaveBeenCalledWith("col-1", MARGHERITA.data, expect.anything()),
+      expect(composer.cms.collections.createContentItem).toHaveBeenCalledWith(
+        "col-1",
+        MARGHERITA.data,
+        // REA 2026-10-20 #11a: the SAME id comes back — a new one broke every
+        // reference and binding to the record.
+        expect.objectContaining({ id: "r1" }),
+      ),
     );
+  });
+
+  it("a failed delete keeps the sheet open and says so (REA #11a)", async () => {
+    const { composer } = mount();
+    composer.cms.collections.deleteContentItem.mockRejectedValueOnce(new Error("storage"));
+    await openRow();
+    fireEvent.click(screen.getByTestId("cms-sheet-more"));
+    fireEvent.click(screen.getByTestId("cms-sheet-delete"));
+    expect(await screen.findByText(/could not delete/i)).toBeInTheDocument();
+    expect(screen.getByTestId("cms-sheet")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Undo" })).toBeNull();
   });
 
   it("a published record with a generated page takes the typed DELETE dialog (6881:70349 · #29)", async () => {

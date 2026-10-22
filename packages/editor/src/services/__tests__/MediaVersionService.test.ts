@@ -10,14 +10,12 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 const listQuery = vi.fn();
 const createMutate = vi.fn();
-const restoreMutate = vi.fn();
 
 vi.mock("../api-client", () => ({
   createBuildrikApiClient: () => ({
     media: {
       listAssetVersions: { query: (...a: unknown[]) => listQuery(...a) },
       createAssetVersion: { mutate: (...a: unknown[]) => createMutate(...a) },
-      restoreAssetVersion: { mutate: (...a: unknown[]) => restoreMutate(...a) },
     },
   }),
 }));
@@ -25,11 +23,10 @@ vi.mock("../api-client", () => ({
 import {
   listAssetVersions,
   createAssetVersion,
-  restoreAssetVersion,
 } from "../MediaVersionService";
 
 beforeEach(() => {
-  [listQuery, createMutate, restoreMutate].forEach((m) => m.mockReset());
+  [listQuery, createMutate].forEach((m) => m.mockReset());
 });
 
 describe("listAssetVersions", () => {
@@ -74,21 +71,5 @@ describe("createAssetVersion", () => {
     await expect(
       createAssetVersion({ assetId: "asset-1", url: "u", bytes: 1, edits: {} }),
     ).rejects.toThrow(/Version limit/);
-  });
-});
-
-describe("restoreAssetVersion", () => {
-  it("mutates media.restoreAssetVersion with the versionId and returns the restored asset pointer", async () => {
-    restoreMutate.mockResolvedValueOnce({ id: "asset-1", url: "https://cdn/x-v1.png" });
-
-    const result = await restoreAssetVersion("ver-1");
-
-    expect(restoreMutate).toHaveBeenCalledWith({ versionId: "ver-1" });
-    expect(result).toEqual({ id: "asset-1", url: "https://cdn/x-v1.png" });
-  });
-
-  it("propagates a NOT_FOUND failure", async () => {
-    restoreMutate.mockRejectedValueOnce(new Error("NOT_FOUND"));
-    await expect(restoreAssetVersion("gone")).rejects.toThrow("NOT_FOUND");
   });
 });

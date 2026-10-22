@@ -346,15 +346,70 @@ describe("ExportEngine.generateHTML — config knobs", () => {
 
   // Text content stays escaped. This is the safe default and the reason the
   // escape exists: a user who types markup must not get markup on their site.
-  it("escapes plain text content verbatim", () => {
+  /* BK-44: a radio or checkbox with no value submits "on" — every answer to
+     a three-option question was stored as "on". With no value of its own it
+     publishes its label's text; a value the user set wins. */
+  it("a radio or checkbox without a value submits its label's text", () => {
+    const choice = (id: string, label: string, extra: Record<string, string> = {}) => ({
+      id,
+      type: "radio",
+      tagName: "label",
+      children: [
+        { id: `${id}-in`, type: "input", tagName: "input", attributes: { type: "radio", name: "size", ...extra } },
+        { id: `${id}-t`, type: "text", tagName: "span", content: label, contentFormat: "text" as const },
+      ],
+    });
     const root: LiveNode = {
       id: "root",
-      children: [{ id: "t1", type: "text", content: '<b>bold</b> & "quotes"' }],
+      children: [choice("r1", "Small"), choice("r2", "Tom & Jerry"), choice("r3", "Large", { value: "lg" })],
+    };
+    const html = new ExportEngine(makeComposer({ root })).generateHTML();
+    expect(html).toMatch(/<input[^>]*value="Small"/);
+    expect(html).toMatch(/<input[^>]*value="Tom &amp; Jerry"/);
+    expect(html).toMatch(/<input[^>]*value="lg"/);
+    expect(html.match(/value="/g)).toHaveLength(3);
+  });
+
+  /* BK-42: a `blob:` URL is this tab's Object URL — published, it is a broken
+     image for every visitor. */
+  it("never writes a session-only blob: URL", () => {
+    const root: LiveNode = {
+      id: "root",
+      children: [
+        { id: "i1", type: "image", tagName: "img", attributes: { src: "blob:https://app/1234", alt: "a" } },
+        { id: "i2", type: "image", tagName: "img", attributes: { src: "https://cdn/x.png", srcset: "blob:https://app/9 2x" } },
+      ],
+    };
+    const html = new ExportEngine(makeComposer({ root })).generateHTML();
+    expect(html).not.toContain("blob:");
+    expect(html).toContain('src="https://cdn/x.png"');
+  });
+
+  it("escapes plain-text content verbatim", () => {
+    const root: LiveNode = {
+      id: "root",
+      children: [{ id: "t1", type: "text", content: '<b>bold</b> & "quotes"', contentFormat: "text" }],
     };
     const html = new ExportEngine(makeComposer({ root })).generateHTML();
 
-    expect(html).toContain("&lt;b&gt;bold&lt;/b&gt; &amp; &quot;quotes&quot;");
+    expect(html).toContain(`&lt;b&gt;bold&lt;/b&gt; &amp; "quotes"`);
     expect(html).not.toContain("<b>bold</b>");
+  });
+
+  /* BK-40: content with no format is what inline editing stores (innerHTML,
+     "&" already "&amp;") and what the canvas mounts as markup. Escaping it
+     here published "<strong>bold</strong>" and "Q&amp;A" as visible text. */
+  it("writes content with no format as the canvas does: sanitized markup", () => {
+    const root: LiveNode = {
+      id: "root",
+      children: [{ id: "t1", type: "text", content: 'Q&amp;A <strong>bold</strong><img src=x onerror="alert(1)">' }],
+    };
+    const html = new ExportEngine(makeComposer({ root })).generateHTML();
+
+    expect(html).toContain("Q&amp;A <strong>bold</strong>");
+    expect(html).not.toContain("&amp;amp;");
+    expect(html).not.toContain("&lt;strong&gt;");
+    expect(html).not.toContain("onerror");
   });
 
   // Regression: every AI-generated site published as visible angle brackets.
@@ -480,7 +535,7 @@ describe("ExportEngine.exportAllPages — sitemap & SEO titles", () => {
     expect(noBaseUrl.files.some((f) => f.name === "sitemap.xml")).toBe(false);
   });
 
-  it("the ZIP sitemap is the publish builder's: served .html locs, noindex pages left out", async () => {
+  it("the ZIP sitemap is the publish builder's: served clean locs, noindex pages left out", async () => {
     const pages = [
       page("Home", { isHome: true }),
       page("About", { slug: "about" }),
@@ -493,7 +548,7 @@ describe("ExportEngine.exportAllPages — sitemap & SEO titles", () => {
     });
     const xml = files.find((f) => f.name === "sitemap.xml")!.content;
     expect(xml).toContain("<loc>https://example.com/</loc>");
-    expect(xml).toContain("<loc>https://example.com/about.html</loc>");
+    expect(xml).toContain("<loc>https://example.com/about</loc>");
     expect(xml).not.toContain("secret");
   });
 
@@ -589,7 +644,7 @@ describe("ExportEngine.generateZip", () => {
     expect(html).toContain('href="styles.css"');
   });
 
-  it("produces just index.html + styles.css when there are no assets", async () => {
+  it("produces just index.html + styles.css (+ robots.txt) when there are no assets", async () => {
     const fetchMock = vi.fn();
     vi.stubGlobal("fetch", fetchMock);
 
@@ -597,7 +652,7 @@ describe("ExportEngine.generateZip", () => {
     const zip = await unzip(blob);
 
     expect(fetchMock).not.toHaveBeenCalled();
-    expect(Object.keys(zip.files).sort()).toEqual(["index.html", "styles.css"]);
+    expect(Object.keys(zip.files).sort()).toEqual(["index.html", "robots.txt", "styles.css"]);
   });
 });
 

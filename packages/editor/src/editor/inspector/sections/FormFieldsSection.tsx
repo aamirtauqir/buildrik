@@ -132,7 +132,11 @@ export const FormFieldsSection: React.FC<FormFieldsSectionProps> = ({ elementId,
     });
     const parent = submit?.getParent() ?? form;
     const index = submit ? parent.getChildIndex(submit) : undefined;
-    const n = fields.length + 1;
+    /* BK-44: `field-<count+1>` repeated a name after a delete, and two fields
+       with one name merged into one answer. The first free number is used. */
+    const taken = new Set(form.getDescendants().map((el) => el.getAttribute("name")));
+    let n = fields.length + 1;
+    while (taken.has(`field-${n}`)) n++;
     writeElement(composer, form, "form-field-add", () => {
       const field = composer.elements.createElement("input", {
         attributes: { type: "text", name: `field-${n}`, placeholder: `Field ${n}` },

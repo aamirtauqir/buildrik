@@ -3,12 +3,14 @@
  * board 26, DD-16), above the type block:
  *
  *   Variant   [Default ▾]
- *   Edit master ↗                ⋯  → Reset to master · Detach instance…
+ *   Push to master ↗             ⋯  → Reset to master · Detach instance…
  *
  * The confirms are the instance doors' own (Reset 6979:77597, Detach
  * 6887:78306). Every write passes the P-1 lock gate, and none runs while the
- * panel is read-only (locked / save conflict); Edit master is navigation and
- * stays. What the instance overrides is not listed here — the fields carry
+ * panel is read-only (locked / save conflict). "Push to master" (was "Edit
+ * master", BD-32) opens the master's screen on this instance, where its push
+ * runs behind a confirm; it is navigation and stays. The row exists only for
+ * an instance ROOT — the instance map is keyed by root element id. What the instance overrides is not listed here — the fields carry
  * their "Overrides master" dots.
  *
  * @license BSD-3-Clause
@@ -128,7 +130,7 @@ export const ComponentRow: React.FC<ComponentRowProps> = ({ composer, elementId 
             className={EDIT_MASTER}
             onClick={() => requestOpenMaster(composer, component.id, instanceId)}
           >
-            <span className="tw:min-w-0 tw:flex-1 tw:truncate tw:text-left">Edit master</span>
+            <span className="tw:min-w-0 tw:flex-1 tw:truncate tw:text-left">Push to master</span>
             <ExternalLink size={12} aria-hidden="true" className="tw:shrink-0" />
           </Button>
           <Popover

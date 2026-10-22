@@ -562,21 +562,6 @@ button:hover > .bd-canvas-empty-cta__thumb {
   animation: dropLineFadeIn 150ms ease-out forwards;
 }
 
-.bd-drag-handle {
-  animation: dragHandleFadeIn 0.15s ease-out;
-}
-
-@keyframes dragHandleFadeIn {
-  from {
-    opacity: 0;
-    transform: scale(0.8) translateX(-4px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateX(0);
-  }
-}
-
 .bd-layer-hover-highlight {
   outline: 1px solid var(--bk-accent) !important;
   outline-offset: 1px;
@@ -780,22 +765,10 @@ button:hover > .bd-canvas-empty-cta__thumb {
  * tokens) and a 16px focus offset; this rule used hex fallbacks + 0px focus
  * top + a quarter-rounded radius. a11y.css is authoritative. */
 
-/* Responsive visibility (D1). The inspector's per-breakpoint show/hide toggle
- * (VisibilitySection) writes `--hide-<bp>: true` into the element's inline
- * style. Canvas previews a breakpoint by resizing the frame, not by changing
- * the viewport, so a real @media query can't read the previewed width — we key
- * off the active device on the canvas root instead. The element stays in the
- * tree (so it's still selectable to un-hide); only its box is hidden, matching
- * how it will behave at that breakpoint on the published site.
- * Inline serialization is `--hide-<bp>: true` (see buildAttributeString). */
-[data-buildrick-canvas][data-device="desktop"] [style*="--hide-desktop: true"],
-/* Wide previews the Desktop styles (it stores as Desktop), so a
-   desktop-hidden element stays hidden there too (G2-008). */
-[data-buildrick-canvas][data-device="wide"] [style*="--hide-desktop: true"],
-[data-buildrick-canvas][data-device="tablet"] [style*="--hide-tablet: true"],
-[data-buildrick-canvas][data-device="mobile"] [style*="--hide-mobile: true"] {
-  display: none !important;
-}
+/* Responsive visibility (D1): `--hide-<bp>: true` is turned into a
+ * `display:none` rule for the previewed breakpoint by the canvas stylesheet
+ * (engine/styles/cascadeCSS hideRulesFor), the same rule the published page
+ * gets inside a media query. */
 
 
 /* The canvas viewport. This scrolls; its parent (the padded wrapper) does not.
@@ -815,7 +788,9 @@ button:hover > .bd-canvas-empty-cta__thumb {
   min-width: 0;
   min-height: 0; /* the wrapper is a column now — the docked footer sits under this */
   display: flex;
-  align-items: center;
+  /* `safe` on the cross axis too: a Tablet frame (1024 tall) in a 715px
+     scroller stranded its top ~74px above scroll range (audit 2026-10-20 #17). */
+  align-items: safe center;
   justify-content: safe center;
   overflow: auto;
 }

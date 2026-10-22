@@ -48,24 +48,8 @@ export function takeReplaceTarget(composer: Composer): string | undefined {
   return id && selected.length === 1 && selected[0] === id ? id : undefined;
 }
 
-/* G2-117: "Generate a block with AI…" (⌘K, the AI panel's CREATE door) opens
-   Add on its Generate screen. Held until the panel mounts, like a group. */
-const pendingGenerate = new WeakSet<Composer>();
-
-export function requestGenerateBlock(composer: Composer): void {
-  pendingGenerate.add(composer);
-  composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "add" });
-  composer.emit(EVENTS.UI_INSERT_OPEN_GENERATE, {});
-}
-
-export function takePendingGenerate(composer: Composer): boolean {
-  const asked = pendingGenerate.has(composer);
-  pendingGenerate.delete(composer);
-  return asked;
-}
-
 /* ⌘⇧V (board 7063:78846): Add opens its Paste HTML dialog. Held until the
-   panel mounts, like Generate. */
+   panel mounts, like a group. */
 const pendingPasteHtml = new WeakSet<Composer>();
 
 export function requestPasteHtml(composer: Composer): void {

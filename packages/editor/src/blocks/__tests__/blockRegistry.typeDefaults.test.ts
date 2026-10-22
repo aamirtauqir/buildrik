@@ -40,7 +40,13 @@ function fakeElement(type: string, tagName: string, existing: Record<string, str
 function composerWith(created: any[]) {
   return {
     elements: {
-      getElement: () => ({ getType: () => "container" }),
+      /* A page that already has its H1, so the BD-39 (6) re-tag stays out
+         of these default-style tests (blockRegistry.headingH1.test.ts). */
+      getElement: () => ({
+        getType: () => "container",
+        getParent: () => null,
+        toJSON: () => ({ id: "root", type: "container", children: [{ id: "h", type: "heading", tagName: "h1" }] }),
+      }),
       insertHTMLToElement: vi.fn(() => created),
     },
     emit: vi.fn(),

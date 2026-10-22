@@ -6,7 +6,6 @@
  * @license BSD-3-Clause
  */
 
-import { emailService } from "../services/EmailService";
 import { IS_DEV_BUILD } from "@/shared/utils/runtimeEnv";
 import { MEDIA_EVENTS } from "../shared/constants/media";
 import { EVENTS, THRESHOLDS, isNavigationOnlyChange } from "../shared/constants";
@@ -41,12 +40,9 @@ import { escapeStyleText } from "@buildrik/shared/schemas/element-markup";
 import { copyIdKeyedRecord, copyIdKeyedStyles, type IdRename } from "@buildrik/shared/content/elementIds";
 import { resolveTokenLiteral, setTokenLiteral } from "@buildrik/shared/tokens";
 import { FontManager } from "./fonts/FontManager";
-import { FormHandler } from "./forms/FormHandler";
 import { HistoryManager } from "./HistoryManager";
-import { InteractionManager } from "./interactions/InteractionManager";
 import { MediaManager } from "./media/MediaManager";
 import { MediaCommandLayer } from "./media/MediaCommandLayer";
-import { PluginManager } from "./PluginManager";
 import { RecoveryManager } from "./recovery/RecoveryManager";
 import { PageRouter } from "./routing/PageRouter";
 import { SelectionManager } from "./SelectionManager";
@@ -62,21 +58,16 @@ import { LintState } from "./designSystem/LintState";
 import { TokenBindingResolver } from "./designSystem/TokenBindingResolver";
 import type { DesignSystemFacade } from "./designSystem/facade";
 import { applyContrastFix } from "./designSystem/contrastFix";
-import { isAiEditableTokenValue } from "./designSystem/tokenValueGuard";
 import { mergeProjectTokens } from "./designSystem/projectTokens";
 import type { DesignToken } from "./designSystem/types";
 import { validateTokens, TOKENS_SCHEMA_VERSION } from "@buildrik/shared/schemas/design-tokens";
 import { DSLinter } from "./designSystem/linter";
-import { AIAssistService } from "./designSystem/services";
 import { VersionTimelineManager } from "./VersionTimelineManager";
 import { Viewport } from "./Viewport";
 import { getDefaultPageName } from "../shared/utils/pageUtils";
-
-/**
- * From-address for form-submission notifications on published sites. Must stay on
- * a domain we control, so it can be SPF/DKIM-verified with the mail provider.
- */
-const FORM_NOTIFICATION_SENDER = "noreply@buildrick.io";
+import { elementBaseCSS } from "./styles/cascadeCSS";
+import { elementSelector } from "@/shared/utils/elementSelector";
+import { CONNECT_TOKENS_LABEL } from "./designSystem/facade";
 
 /**
  * Main Aquibra Composer class
@@ -123,6 +114,11 @@ export class Composer extends EventEmitter {
   // Style clipboard for copy/paste styles only
   styleClipboard: Record<string, string> | null = null;
 
+  /* The pseudo-state the Inspector's ContextRow shows (BD-36). Kept by the
+     Inspector, read by copy-style / paste-style so they use the layer the
+     Inspector writes to. Session UI state, never serialised. */
+  stylePseudoState: import("../shared/types").PseudoStateId = "normal";
+
   // Core managers — flat fields (kept flat per Option B-tight: high-traffic
   // hot paths like history/media/elements/styles all stay top-level).
   readonly elements: ElementManager;
@@ -147,26 +143,23 @@ export class Composer extends EventEmitter {
   readonly versions!: VersionTimelineManager;
   readonly storage!: StorageAdapter;
   readonly viewport!: Viewport;
-  readonly plugins!: PluginManager;
   readonly data!: DataManager;
   readonly fonts!: FontManager;
   readonly components!: ComponentManager;
   readonly media!: MediaManager;
   readonly mediaOps!: MediaCommandLayer;
-  readonly forms!: FormHandler;
   readonly router!: PageRouter;
   readonly recovery!: RecoveryManager;
   readonly migration!: MigrationManager;
   readonly aliasResolver!: AliasResolver;
   readonly colorMode!: ColorMode;
   readonly dsLinter!: DSLinter;
-  readonly aiAssistService!: AIAssistService;
 
   // Facade groupings — D3 Stage 1 (Option B-tight). Three clusters where
   // ≥2 managers share a domain:
   //   cms.{collections, bindings}
   //   collab.{manager}        (was {manager, sync} — cloud sync stack removed)
-  //   canvas.{indicators, resize, drag, interactions}
+  //   canvas.{indicators, resize, drag}
   readonly cms!: {
     readonly collections: CollectionManager;
     readonly bindings: CMSBindingManager;
@@ -178,7 +171,6 @@ export class Composer extends EventEmitter {
     readonly indicators: CanvasIndicators;
     readonly resize: ResizeHandler;
     readonly drag: DragManager;
-    readonly interactions: InteractionManager;
   };
   readonly designSystem!: DesignSystemFacade;
 
@@ -200,20 +192,17 @@ export class Composer extends EventEmitter {
     this.versions = new VersionTimelineManager(this);
     this.storage = new StorageAdapter(this, this.config.storage);
     this.viewport = new Viewport(this);
-    this.plugins = new PluginManager(this);
     this.data = new DataManager(this);
     this.fonts = new FontManager(this);
     this.components = new ComponentManager(this);
     this.media = new MediaManager(this.config.remoteSync);
     this.mediaOps = new MediaCommandLayer(this);
-    this.forms = new FormHandler(this);
     this.router = new PageRouter();
     this.recovery = new RecoveryManager(this);
     this.migration = new MigrationManager(this);
     this.aliasResolver = new AliasResolver(this);
     this.colorMode = new ColorMode(this);
     this.dsLinter = new DSLinter();
-    this.aiAssistService = new AIAssistService(this, config.aiClient ?? null);
 
     // Facade groupings — D3 Stage 1.
     const cmsCollections = new CollectionManager();
@@ -228,7 +217,6 @@ export class Composer extends EventEmitter {
       indicators: new CanvasIndicators(this),
       resize: new ResizeHandler(this),
       drag: new DragManager(this),
-      interactions: new InteractionManager(this),
     };
 
     const tokenUsage = new TokenUsageTracker(
@@ -268,16 +256,6 @@ export class Composer extends EventEmitter {
         if (fixed === current) return null;
         return this.designSystem.setTokens(setTokenLiteral(tokens, tokenId, "light", fixed), "Auto-fix contrast")
           ? fixed
-          : null;
-      },
-      setDesignToken: (tokenId, value) => {
-        const tokens = this.mergedDesignTokens();
-        const target = tokens.find((t) => t.id === tokenId);
-        if (!target) return null; // unknown id — never write a token that isn't registered
-        if (!isAiEditableTokenValue(target.type, value)) return null; // per-type value guard
-        if (value === resolveTokenLiteral(tokens, tokenId, "light")) return null; // no-op
-        return this.designSystem.setTokens(setTokenLiteral(tokens, tokenId, "light", value), "Set design token")
-          ? value
           : null;
       },
       setTokens: (next, label) => {
@@ -342,7 +320,7 @@ export class Composer extends EventEmitter {
           for (const r of s.refs) writes.push({ ...r, value: `var(${token.cssVar})` });
         }
         if (writes.length === 0) return 0;
-        this.beginTransaction("Connect to tokens");
+        this.beginTransaction(CONNECT_TOKENS_LABEL);
         try {
           for (const w of writes) {
             if (w.breakpoint) this.styles.setBreakpointStyle(w.elementId, w.breakpoint, { [w.prop]: w.value });
@@ -605,7 +583,6 @@ export class Composer extends EventEmitter {
       activePageId: null,
       snapToGrid: false,
       gridSize: 10,
-      isPreviewMode: false,
     };
   }
 
@@ -632,10 +609,39 @@ export class Composer extends EventEmitter {
     }
   }
 
+  /* BK-11: the shell's one save (the dashboard RPC for a site-bound editor,
+     with conflict, offline and recovery handling). ⌘S, the palette and every
+     other caller of saveProject() go through it, so a project has ONE save
+     path. Unset (tests, the standalone demo) = write to storage. */
+  private saveHandler: (() => Promise<void>) | null = null;
+  /* Counts document changes, so a save in flight can tell whether what it
+     sent is still the current document (BK-11): an edit made while a save
+     travelled stays Unsaved until its own save returns. */
+  private changeSeq = 0;
+
+  /** Install (or clear, with null) the shell's save — see saveHandler. */
+  setSaveHandler(handler: (() => Promise<void>) | null): void {
+    this.saveHandler = handler;
+  }
+
+  /** Increases on every document change (markDirty). */
+  getChangeSeq(): number {
+    return this.changeSeq;
+  }
+
   /**
-   * Save current project
+   * Save the project through the shell's save when one is installed,
+   * otherwise to storage.
    */
   async saveProject(): Promise<void> {
+    if (this.saveHandler) return this.saveHandler();
+    return this.saveToStorage();
+  }
+
+  /**
+   * Write the project to this composer's storage adapter and announce it.
+   */
+  async saveToStorage(): Promise<void> {
     /* PROJECT_SAVING, not PROJECT_SAVED-with-a-flag. Listeners read the event
        NAME: useDirtyPages clears every dirty page marker on PROJECT_SAVED, so
        announcing the save before storage.save() ran cleared the markers up
@@ -822,7 +828,15 @@ export class Composer extends EventEmitter {
    */
   exportHTML(options?: ExportOptions): ExportResult {
     const html = this.elements.toHTML(options);
-    const css = this.styles.toCSS(options);
+    /* The same cascade as the published page (D10): each element's own styles
+       as base rules (the HTML carries none inline), then the breakpoint and
+       state rules desktop-first, against real viewport queries. It used to be
+       inline bases + `toCSS()` in insertion order, so Preview could disagree
+       with the live site about which rule wins. */
+    const css =
+      elementBaseCSS([this.elements.getActivePageRootData?.()], elementSelector, "media", false) +
+      "\n\n" +
+      this.styles.generateResponsiveCSS(options);
 
     // The site's own fonts. The comment above is about this exact gap and it
     // reopened: the export learned to emit the three font slots and to fetch
@@ -836,9 +850,8 @@ export class Composer extends EventEmitter {
        Brand preset binds. */
     const siteCss =
       emitSiteTokenCss(projectSettings, brandSwitch) + siteFontCSS(fonts);
-    // The HTML too, not just the CSS: this document carries element styles
-    // INLINE (`elements.toHTML`), so a heading set in Lora names its family in
-    // a style attribute and nowhere in the stylesheet.
+    // The HTML too, not just the CSS: a font named in an attribute or in
+    // content still has to be fetched.
     const slotFamilies = [fonts.heading, fonts.body, fonts.mono].filter((f): f is string => Boolean(f));
     /* The site's ADDED fonts (Clone 3721:43423): this document renders in its
        own frame, where the editor's document.fonts never reach, so the faces
@@ -909,38 +922,13 @@ ${html}${interactionScript}
   // ============================================
 
   /**
-   * Apply project settings and update dependent integrations
+   * Apply project settings and notify listeners
    */
   private applyProjectSettings(
     settings: ProjectSettings,
     options?: { emitProjectChanged?: boolean; emitSettingsChange?: boolean }
   ): void {
     this.projectSettings = settings ?? {};
-
-    const emailConfig = this.projectSettings.integrations?.email || {
-      provider: "none",
-      enabled: false,
-    };
-
-    // Configure form email notification service
-    // Maps project settings to the form email service format
-    if (emailConfig.provider === "sendgrid" && emailConfig.apiKey && emailConfig.enabled) {
-      emailService.configure({
-        provider: "sendgrid",
-        apiKey: emailConfig.apiKey,
-        // Sender must be on a domain we can verify with the provider. It used to
-        // be noreply@aquibra.com — a domain from the project this was forked from,
-        // which SendGrid would reject as an unverified sender, so form
-        // notifications failed silently.
-        fromEmail: FORM_NOTIFICATION_SENDER,
-      });
-    } else if (emailConfig.provider !== "none" && emailConfig.apiKey && emailConfig.enabled) {
-      // For other providers with API keys, use mock until properly configured
-      emailService.configure({
-        provider: "mock",
-        fromEmail: FORM_NOTIFICATION_SENDER,
-      });
-    }
 
     if (options?.emitSettingsChange !== false) {
       this.emit(EVENTS.SETTINGS_CHANGE, this.projectSettings);
@@ -1139,6 +1127,7 @@ ${html}${interactionScript}
     if (!this.state.dirty) {
       this.state.dirty = true;
     }
+    this.changeSeq += 1;
     if (this.transactionDepth > 0) {
       this.transactionDirty = true;
       return;
@@ -1281,33 +1270,6 @@ ${html}${interactionScript}
   }
 
   // ============================================
-  // Preview Mode
-  // ============================================
-
-  /**
-   * Toggle preview mode
-   * Starts/stops interaction runtime and updates UI state
-   */
-  setPreviewMode(enabled: boolean): void {
-    if (this.state.isPreviewMode === enabled) return;
-
-    this.state.isPreviewMode = enabled;
-
-    if (enabled) {
-      this.canvas.interactions.startRuntime();
-    } else {
-      this.canvas.interactions.stopRuntime();
-    }
-
-    this.emit(EVENTS.PREVIEW_MODE_CHANGED, { enabled });
-  }
-
-  /** Check if composer is in preview mode */
-  isPreviewMode(): boolean {
-    return !!this.state.isPreviewMode;
-  }
-
-  // ============================================
   // Cleanup
   // ============================================
 
@@ -1317,14 +1279,12 @@ ${html}${interactionScript}
   async destroy(): Promise<void> {
     this.emit(EVENTS.COMPOSER_DESTROY);
 
-    if (this.plugins?.destroy) await this.plugins.destroy();
     if (this.data?.destroy) this.data.destroy();
     if (this.canvas.indicators?.destroy) this.canvas.indicators.destroy();
     if (this.fonts?.destroy) this.fonts.destroy();
     if (this.components?.destroy) this.components.destroy();
     if (this.cms.bindings?.destroy) this.cms.bindings.destroy();
     if (this.collab.manager?.destroy) this.collab.manager.destroy();
-    if (this.forms?.destroy) this.forms.destroy();
     if (this.recovery?.destroy) this.recovery.destroy();
     if (this.media?.destroy) this.media.destroy();
     if (this.canvas.drag?.destroy) this.canvas.drag.destroy();

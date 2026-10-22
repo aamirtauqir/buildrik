@@ -14,6 +14,10 @@ import type { TokenBindingResolver } from "./TokenBindingResolver";
 import type { ConnectSuggestion } from "./connectTokens";
 import type { BrandPreview, DarkMode, DesignToken } from "./types";
 
+/** History label of Brand's "Connect to tokens" — a Brand edit that writes
+ *  element styles, so Brand's ⌘Z may undo it (D36). */
+export const CONNECT_TOKENS_LABEL = "Connect to tokens";
+
 export interface DesignSystemFacade {
   /** True when the site's tokens failed to migrate on load: Brand shows the
    *  old tokens and refuses edits. Set by the load path, announced with
@@ -57,18 +61,6 @@ export interface DesignSystemFacade {
    * registries on every emission, so Cmd+Z roundtrips back into the UI.
    */
   readonly applyAutoFix: (tokenId: string, hint: string | undefined) => string | null;
-  /**
-   * AI token write (W4 set-token). Models on `applyAutoFix`: looks the token up
-   * in `projectSettings.designTokens`, validates the value against the token's
-   * `type` (the trust boundary — see tokenValueGuard), and writes it inside a
-   * labeled transaction so the `project:changed` re-hydration in TokensSection
-   * re-applies the live CSS var AND Cmd+Z roundtrips through the same path.
-   *
-   * Returns the new value on success, or `null` when the id is unknown, the
-   * type is not AI-editable, the value fails its format guard, or it is a no-op.
-   * The single engine write path means the AI never touches the React hooks.
-   */
-  readonly setDesignToken: (tokenId: string, value: string) => string | null;
   /**
    * THE token write (spec §4: one undo stack). Validates the whole v6 set
    * and writes `projectSettings.designTokens` + schema version 6 inside one

@@ -28,7 +28,7 @@ import { getSiteIdFromUrl, hasProjectLoaded } from "@/services/BuildrikSyncProvi
 import { useSiteOrigin } from "@/editor/shared/useSiteOrigin";
 import { writeClipboardText } from "@buildrik/shared/browser/clipboard";
 import { pageFileNames } from "@/engine/export/pageFiles";
-import { pageCanonicalUrl } from "@buildrik/shared/seo/urls";
+import { pageLinkUrl } from "@buildrik/shared/seo/urls";
 import { useActivePageId } from "@/editor/shared/useActivePageId";
 
 /** A page's stored visibility → its panel status. Unset is "live" (what the
@@ -115,7 +115,7 @@ export function usePages(composer: Composer | null): UsePagesReturn {
   const siteId = React.useMemo(() => getSiteIdFromUrl(), []);
   const [loaded, setLoaded] = React.useState(() => !siteId || hasProjectLoaded(siteId));
   const [retryKey, setRetryKey] = React.useState(0);
-  const getSiteOrigin = useSiteOrigin(composer, siteId);
+  const { getOrigin: getSiteOrigin, servesCleanUrls } = useSiteOrigin(composer, siteId);
 
   // ── Sync from composer ────────────────────────────────────────────────────
   React.useEffect(() => {
@@ -389,10 +389,11 @@ export function usePages(composer: Composer | null): UsePagesReturn {
         return;
       }
 
-      // The URL the deploy serves, the same as the page drawer's preview: the
-      // file the export writes (index.html → `/`, `about.html`), not `/<slug>`,
-      // which 404s while the generated vercel.json carries no cleanUrls.
-      const url = pageCanonicalUrl(origin, pageFileNames(pages).get(page.id) ?? "index.html") ?? origin;
+      // The URL the live deploy serves, the same as the page drawer's preview:
+      // the file the export writes, numbered on a slug clash as the export
+      // numbers it — `/about` once the site serves clean URLs, `/about.html`
+      // until it is republished with them (BD-39 (4)).
+      const url = pageLinkUrl(origin, pageFileNames(pages).get(page.id) ?? "index.html", servesCleanUrls) ?? origin;
       /* v3 4418:93929: "Link copied · bellacucina.com/menu". */
       const successMsg = `Link copied · ${url.replace(/^https?:\/\//, "")}`;
 
@@ -408,7 +409,7 @@ export function usePages(composer: Composer | null): UsePagesReturn {
           });
         });
     },
-    [pages, addToast, getSiteOrigin]
+    [pages, addToast, getSiteOrigin, servesCleanUrls]
   );
 
   const retrySync = React.useCallback(() => {

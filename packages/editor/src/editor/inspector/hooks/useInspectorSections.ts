@@ -69,17 +69,37 @@ export interface UseInspectorSectionsResult {
   setChoices: (elementType: string, sectionIds: readonly string[], choice: SectionChoice) => void;
 }
 
+/* One store for every caller. ProInspector and PagePanel each held their own
+   copy loaded at mount, and each `setChoices` saved its whole copy — so a
+   choice made in one panel was silently dropped by the next save from the
+   other. */
+let store: Record<string, SectionChoice> | null = null;
+const listeners = new Set<() => void>();
+
+function getSnapshot(): Record<string, SectionChoice> {
+  if (store === null) store = load();
+  return store;
+}
+
+function subscribe(listener: () => void): () => void {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+}
+
+function setChoices(elementType: string, sectionIds: readonly string[], choice: SectionChoice): void {
+  const next = { ...getSnapshot() };
+  for (const id of sectionIds) next[`${elementType}:${id}`] = choice;
+  store = next;
+  save(next);
+  for (const listener of listeners) listener();
+}
+
+/** Tests only: forget the in-memory store so the next read reloads storage. */
+export function resetSectionChoicesForTests(): void {
+  store = null;
+}
+
 export function useInspectorSections(): UseInspectorSectionsResult {
-  const [choices, setState] = React.useState<Record<string, SectionChoice>>(load);
-
-  const setChoices = React.useCallback((elementType: string, sectionIds: readonly string[], choice: SectionChoice) => {
-    setState((prev) => {
-      const next = { ...prev };
-      for (const id of sectionIds) next[`${elementType}:${id}`] = choice;
-      save(next);
-      return next;
-    });
-  }, []);
-
+  const choices = React.useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
   return { choices, setChoices };
 }

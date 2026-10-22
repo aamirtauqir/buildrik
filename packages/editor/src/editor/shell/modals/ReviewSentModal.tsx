@@ -55,8 +55,10 @@ const LINK_TEXT =
 export const ReviewSentModal: React.FC<ReviewSentModalProps> = ({
   state, reviewUrl, invitedEmail, versionLabel, onClose, onResend,
 }) => {
-  const [copied, setCopied] = React.useState(false);
-  React.useEffect(() => { setCopied(false); }, [state]);
+  /* null = not tried; a refused copy says so on the button (S-8) — the link
+     is printed beside it to select by hand. */
+  const [copied, setCopied] = React.useState<boolean | null>(null);
+  React.useEffect(() => { setCopied(null); }, [state]);
 
   const copy = React.useCallback(() => {
     if (!reviewUrl) return;
@@ -72,7 +74,7 @@ export const ReviewSentModal: React.FC<ReviewSentModalProps> = ({
   const linkRow = reviewUrl ? (
     <div className={LINK_ROW}>
       <span className={LINK_TEXT} title={reviewUrl}>{reviewUrl}</span>
-      <Button color="light" size="xs" onClick={copy}>{copied ? "Copied ✓" : "Copy"}</Button>
+      <Button color="light" size="xs" onClick={copy}>{copied ? "Copied ✓" : copied === false ? "Couldn't copy" : "Copy"}</Button>
       <Button color="light" size="xs" onClick={() => window.open(reviewUrl, "_blank", "noopener,noreferrer")}>
         Open
       </Button>

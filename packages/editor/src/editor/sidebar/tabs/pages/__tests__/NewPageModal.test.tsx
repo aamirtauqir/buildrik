@@ -23,6 +23,12 @@ vi.mock("@/editor/chrome-ui", async (importOriginal) => ({
   useToast: () => ({ addToast, removeToast: vi.fn(), toasts: [] }),
 }));
 
+const load = vi.hoisted(() => ({ siteId: null as string | null, loaded: true }));
+vi.mock("@/services/BuildrikSyncProvider", () => ({
+  getSiteIdFromUrl: () => load.siteId,
+  hasProjectLoaded: () => load.loaded,
+}));
+
 import { NewPageModal } from "../components/NewPageModal";
 
 function makeComposer() {
@@ -47,10 +53,37 @@ function makeComposer() {
   return { composer, request };
 }
 
-beforeEach(() => addToast.mockClear());
+beforeEach(() => {
+  addToast.mockClear();
+  load.siteId = null;
+  load.loaded = true;
+});
+
+/* REA #13: a page created while the project loads is wiped by importProject,
+   with no undo. Every Add-page door goes through this listener, so it is the
+   one place that refuses — with the reason — until the project has loaded. */
+describe("NewPageModal while the project is loading", () => {
+  it("does not open, and says why", () => {
+    load.siteId = "site-1";
+    load.loaded = false;
+    const { composer, request } = makeComposer();
+    render(<NewPageModal composer={composer as never} />);
+    request();
+    expect(screen.queryByTestId("new-page-modal")).toBeNull();
+    expect(addToast).toHaveBeenCalledWith(expect.objectContaining({ title: "Pages are still loading" }));
+  });
+
+  it("opens once the project has loaded", () => {
+    load.siteId = "site-1";
+    const { composer, request } = makeComposer();
+    render(<NewPageModal composer={composer as never} />);
+    request();
+    expect(screen.getByTestId("new-page-modal")).toBeInTheDocument();
+  });
+});
 
 describe("NewPageModal", () => {
-  it("opens on UI_NEW_PAGE_REQUESTED with the board's fields, From template selected", () => {
+  it("opens on UI_NEW_PAGE_REQUESTED with the board's fields, Blank selected (BD-33)", () => {
     const { composer, request } = makeComposer();
     render(<NewPageModal composer={composer as never} />);
     expect(screen.queryByTestId("new-page-modal")).toBeNull();
@@ -59,7 +92,9 @@ describe("NewPageModal", () => {
     expect(screen.getByLabelText("Page name")).toHaveValue("About");
     expect(screen.getByTestId("new-page-source-blank")).toHaveTextContent("BlankEmpty canvas");
     expect(screen.getByTestId("new-page-source-template")).toHaveTextContent(/From templatePick from \d+ layouts/);
-    expect(screen.getByTestId("new-page-source-template")).toHaveAttribute("aria-checked", "true");
+    expect(screen.getByTestId("new-page-source-blank")).toHaveAttribute("aria-checked", "true");
+    expect(screen.getByTestId("new-page-source-template")).toHaveAttribute("aria-checked", "false");
+    expect(screen.getByTestId("new-page-create")).toHaveTextContent("Create page");
     // 6752:59256: ✕ in the head, and the navigation toggle ON by default.
     expect(screen.getByTestId("modal-close-new-page-modal")).toBeInTheDocument();
     expect(screen.getByText("Add to site navigation")).toBeInTheDocument();
@@ -86,6 +121,17 @@ describe("NewPageModal", () => {
     expect(composer.elements.addPageToNavigation).not.toHaveBeenCalled();
   });
 
+  /* BD-33 (2026-10-20): the primary button creates a page on the first click —
+     no source choice needed. */
+  it("Create page on first click, with no source picked, creates the page", () => {
+    const { composer, request } = makeComposer();
+    render(<NewPageModal composer={composer as never} />);
+    request();
+    fireEvent.click(screen.getByTestId("new-page-create"));
+    expect(composer.elements.createPage).toHaveBeenCalledWith("About");
+    expect(composer.emit).not.toHaveBeenCalledWith(EVENTS.UI_BROWSE_TEMPLATES, expect.anything());
+  });
+
   it("Blank → creates the named page, makes it active, toasts Page created", () => {
     const { composer, request } = makeComposer();
     render(<NewPageModal composer={composer as never} />);
@@ -110,6 +156,8 @@ describe("NewPageModal", () => {
     render(<NewPageModal composer={composer as never} />);
     request();
     fireEvent.change(screen.getByLabelText("Page name"), { target: { value: "Our menu" } });
+    fireEvent.click(screen.getByTestId("new-page-source-template"));
+    expect(screen.getByTestId("new-page-create")).toHaveTextContent("Choose template…");
     fireEvent.click(screen.getByTestId("new-page-create"));
     expect(composer.elements.createPage).not.toHaveBeenCalled();
     expect(composer.elements.setActivePage).not.toHaveBeenCalled();

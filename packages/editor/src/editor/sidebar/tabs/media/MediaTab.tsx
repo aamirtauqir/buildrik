@@ -23,9 +23,11 @@ import { PickModePanel } from "./components/PickModePanel";
 import "./MediaTab.css";
 import type { LibraryItem } from "./data/mediaTypes";
 import { createAssetVersion } from "@/services/MediaVersionService";
-import { regenerateAltText } from "@/services/AltTextService";
 import { displayNameFor } from "./data/mediaUtils";
 import type { IconConfig } from "@shared/types/media";
+
+/** The stock-save toast names what was saved: the drawer saves photos, videos and icons. */
+const STOCK_SAVED = { img: "Stock image saved", vid: "Stock video saved", ico: "Icon saved" } as const;
 
 interface MediaTabProps {
   composer: Composer | null;
@@ -80,6 +82,9 @@ function MediaTabWithComposer({
   /* A deleted asset takes its open hub with it (the delete lands after the
      confirm; a cancelled confirm leaves the hub where it was). */
   const detailKey = state.detailItem?.key;
+  /* The drill-in's Versions list — the same family the library's dialog lists. */
+  const { versionsOf } = state;
+  const detailVersions = React.useMemo(() => (detailKey ? versionsOf(detailKey) : []), [detailKey, versionsOf]);
   const detailGone = detailKey != null && !state.libraryItems.some((i) => i.key === detailKey);
   React.useEffect(() => {
     if (detailGone) state.closeDetail();
@@ -102,20 +107,27 @@ function MediaTabWithComposer({
       if (!onOpenImageEditor) return;
       const parentKey = item.versionOf ?? item.key;
       const onSave = async (editedSrc: string, edits?: EditsSnapshot) => {
+        /* The family's parent names, files and owns the history — editing a
+           version must not link the server history row to that version
+           (REA 2026-10-20 M-6; LibraryManager's save does the same). */
+        const parent = composer.media.getAsset(parentKey);
+        const parentName = parent?.name ?? item.name;
+        const parentFolderId = parent ? parent.folderId : item.folderId;
+        const parentServerId = parent ? parent.serverId : item.assetId;
         const res = await fetch(editedSrc);
         const blob = await res.blob();
         const versionCount = composer.media.getAssets().filter((a) => a.versionOf === parentKey).length;
-        const stem = item.name.replace(/\.[^/.]+$/, "");
+        const stem = parentName.replace(/\.[^/.]+$/, "");
         const file = new File([blob], displayNameFor(`${stem}-v${versionCount + 2}`, blob.type), { type: blob.type });
         const result = await composer.media.uploadFile(file, {
-          ...(item.folderId ? { folderId: item.folderId } : {}),
+          ...(parentFolderId ? { folderId: parentFolderId } : {}),
           versionOf: parentKey,
           ...(edits ? { edits } : {}),
         });
         if (!result.success || !result.asset) throw new Error(result.error ?? "Could not save the version");
         const saved = result.asset;
-        if (item.assetId && saved.serverId && !saved.localOnly) {
-          createAssetVersion({ assetId: item.assetId, url: saved.src, bytes: saved.size, edits: edits ?? {} }).catch(() => {
+        if (parentServerId && saved.serverId && !saved.localOnly) {
+          createAssetVersion({ assetId: parentServerId, url: saved.src, bytes: saved.size, edits: edits ?? {} }).catch(() => {
             /* History is a convenience; the version itself has landed. */
           });
         }
@@ -176,15 +188,12 @@ function MediaTabWithComposer({
         <AssetDetailOverlay
           /* The live row, so a rename from the hub shows at once. */
           item={state.libraryItems.find((i) => i.key === state.detailItem?.key) ?? state.detailItem}
+          versions={detailVersions}
           onUpdate={state.updateItem}
           onClose={state.closeDetail}
           onEditImage={handleEditImage}
           composer={composer}
           onReplaceAcross={handleReplaceAcross}
-          /* A local-only file has no server row for the model to read. */
-          onGenerateAltText={(it) =>
-            it.assetId ? regenerateAltText(composer.media, it.key, it.assetId) : Promise.resolve(null)
-          }
           onInsert={(it) => state.insertToCanvas(it.key)}
           onRename={setRenameTarget}
           onCopyUrl={state.copyUrl}
@@ -297,9 +306,22 @@ function MediaTabWithComposer({
         onBulkMove={onOpenLibrary ? () => onOpenLibrary() : undefined}
         onBulkMoveTo={(folderId) => {
           const keys = [...state.selectedKeys];
-          void Promise.all(keys.map((k) => state.moveAsset(k, folderId))).then(() => {
-            addToast({ description: `Moved ${keys.length} file${keys.length === 1 ? "" : "s"}`, tone: "success" });
-            state.toggleSelMode();
+          void state.bulkMoveAssets(keys, folderId).then(({ moved, failed }) => {
+            /* The real count (REA 2026-10-20 #14): a file the server refused
+               stays where it was and stays selected, so Retry is one click. */
+            const files = (n: number) => `${n} file${n === 1 ? "" : "s"}`;
+            if (failed.length === 0) {
+              addToast({ description: `Moved ${files(moved.length)}`, tone: "success" });
+              state.toggleSelMode();
+              return;
+            }
+            addToast({
+              description: moved.length
+                ? `Moved ${files(moved.length)}. ${files(failed.length)} could not be moved — the server did not save the change.`
+                : `Could not move ${files(failed.length)} — the server did not save the change.`,
+              tone: "error",
+            });
+            for (const key of moved) state.toggleSelect(key);
           });
         }}
         onBulkDelete={() =>
@@ -331,7 +353,7 @@ function MediaTabWithComposer({
           const saved = await state.saveToLibrary(type, item);
           if (saved) {
             setStockBrowserOpen(false);
-            addToast({ description: "Stock image saved", tone: "success" });
+            addToast({ description: STOCK_SAVED[type], tone: "success" });
           }
         }}
       />

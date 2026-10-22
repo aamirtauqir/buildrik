@@ -104,10 +104,9 @@ describe("useCanvasContextMenu — Save as component (T12)", () => {
       elements: [el],
     });
 
-    const onAIRequest = vi.fn();
     const addToast = vi.fn();
     const { result } = renderHook(() =>
-      useCanvasContextMenu({ composer, onAIRequest, addToast }),
+      useCanvasContextMenu({ composer, addToast }),
     );
 
     // The hook freezes menu data when contextMenu state is set.
@@ -130,10 +129,9 @@ describe("useCanvasContextMenu — Save as component (T12)", () => {
       resolveResult: bindings,
     });
 
-    const onAIRequest = vi.fn();
     const addToast = vi.fn();
     const { result } = renderHook(() =>
-      useCanvasContextMenu({ composer, onAIRequest, addToast }),
+      useCanvasContextMenu({ composer, addToast }),
     );
 
     act(() => {
@@ -162,10 +160,9 @@ describe("useCanvasContextMenu — Save as component (T12)", () => {
       elements: [el],
     });
 
-    const onAIRequest = vi.fn();
     const addToast = vi.fn();
     const { result } = renderHook(() =>
-      useCanvasContextMenu({ composer, onAIRequest, addToast }),
+      useCanvasContextMenu({ composer, addToast }),
     );
 
     act(() => {

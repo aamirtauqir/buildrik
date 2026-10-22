@@ -6,6 +6,7 @@
  */
 
 import { runTransaction } from "@/shared/utils/helpers";
+import { writableElements } from "@/engine/commands/commandOperations";
 import type { ContextAction } from "../contextMenuRegistry";
 import { ELEMENT_ACTIONS, type ElementActionId } from "@/editor/shared/elementActions";
 
@@ -25,6 +26,14 @@ export function fromElementAction(id: ElementActionId, group: string, rowId: str
     shortcut: action.shortcut,
     isVisible: action.isVisible,
     isEnabled: action.isEnabled ? (ctx) => action.isEnabled!(ctx) === true : undefined,
+    /* The registry's refusal is a sentence ("Unlock it to replace it"); the
+       menu prints it under a greyed row instead of a bare grey (REA ISS-C18). */
+    disabledReason: action.isEnabled
+      ? (ctx) => {
+          const verdict = action.isEnabled!(ctx);
+          return verdict === true ? undefined : verdict;
+        }
+      : undefined,
     handler: action.run,
   };
 }
@@ -32,7 +41,6 @@ export function fromElementAction(id: ElementActionId, group: string, rowId: str
 export const standaloneActions: ContextAction[] = [
   // v3 IA (Q8): doors to existing surfaces at the element, board 4428:43928.
   fromElementAction("replace-with-block", "standalone"),
-  fromElementAction("improve-with-ai", "standalone"),
   fromElementAction("bind-to-cms", "standalone"),
   fromElementAction("add-interaction", "standalone"),
   fromElementAction("save-as-component", "standalone"),
@@ -45,13 +53,9 @@ export const standaloneActions: ContextAction[] = [
     shortcut: "Cmd+G",
     // Group the current multi-selection (≥2 elements sharing a parent).
     isVisible: ({ composer }) => composer.selection.getSelectedIds().length >= 2,
+    /* The registry's "group" — one door, behind its read-only gate. */
     handler: ({ composer }) => {
-      const ids = composer.selection.getSelectedIds();
-      if (ids.length < 2) return;
-      runTransaction(composer, "group-elements", () => {
-        const group = composer.elements.groupElements(ids);
-        if (group) composer.selection.select(group as never);
-      });
+      composer.commands.run("group");
     },
   },
   {
@@ -65,7 +69,12 @@ export const standaloneActions: ContextAction[] = [
       // Show Ungroup for containers that wrap other elements
       return type === "container" && (element.getChildren?.()?.length ?? 0) > 0;
     },
+    /* BK-13: ungrouping removes the container — a locked one stays. */
+    isEnabled: ({ element }) => !element.isLocked?.(),
+    disabledReason: ({ element }) =>
+      element.isLocked?.() ? "This group is locked — unlock it to ungroup." : undefined,
     handler: ({ composer, element }) => {
+      if (writableElements(composer, [element]).length === 0) return;
       runTransaction(composer, "ungroup-elements", () => {
         composer.elements.ungroupElement(element.getId());
         composer.selection.clear();

@@ -359,8 +359,8 @@ export const DEVICE_PRESETS = [
    as the floor: it is the min-zoom state and the disabled bound for Zoom out. */
 export const ZOOM_PRESETS = [10, 25, 50, 75, 100, 150, 200, 400] as const;
 
-/* G2-016: the one zoom step rule. ⌘=/⌘-, the flyout's + and −, the ⌘K
-   commands and the ZOOM_IN/OUT events all move to the next preset — they
+/* G2-016: the one zoom step rule. ⌘=/⌘-, the flyout's + and − and the
+   zoom-in/zoom-out commands (also the ⌘K rows) all move to the next preset — they
    used to disagree (presets vs ±10: 100% → 150 by key, 110 by palette). */
 export const stepZoom = (zoom: number, direction: 1 | -1): number =>
   direction > 0

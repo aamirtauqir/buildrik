@@ -191,7 +191,7 @@ describe("pre-publish content checks (shared detector)", () => {
     expect(status(result.checks, "Image alt text")).toBe("warning");
     expect(detail(result.checks, "Image alt text")).toContain("2 images");
     expect(status(result.checks, "Images")).toBe("warning");
-    expect(detail(result.checks, "Images")).toBe("1 image has no file and will show as broken.");
+    expect(detail(result.checks, "Images")).toBe("1 image has no file and will be left out of the published page.");
     expect(status(result.checks, "Links")).toBe("warning");
     expect(detail(result.checks, "Links")).toContain("1 link");
     expect(result.ready).toBe(true);
@@ -217,6 +217,23 @@ describe("pre-publish content checks (shared detector)", () => {
     expect(status(checks, "Image alt text")).toBe("pass");
     expect(status(checks, "Images")).toBe("pass");
     expect(status(checks, "Links")).toBe("pass");
+    expect(status(checks, "Headings")).toBe("pass");
+  });
+
+  /* REA #28: the Heading block defaults to <h2>, so most pages ship with no
+     <h1>. Named by page, as a warning — SEO never blocks publish (Q8). */
+  it("warns, by page name, about live pages with no H1, without blocking", async () => {
+    const h = (id: string, tagName: string) => ({ id, type: "heading", tagName, content: "Hi", children: [] });
+    pageFindManyMock.mockResolvedValue([
+      { id: "p1", name: "Home", blocks: { id: "r1", type: "container", children: [h("a", "h2")] }, settings: null },
+      { id: "p2", name: "About", blocks: { id: "r2", type: "container", children: [h("b", "h1")] }, settings: null },
+      { id: "p3", name: "Menu", blocks: { id: "r3", type: "container", children: [h("c", "h3")] }, settings: null },
+      { id: "p4", name: "Draft", blocks: { id: "r4", type: "container", children: [h("d", "h2")] }, settings: { visibility: "hidden" } },
+    ]);
+    const result = await runPrePublishChecks("s1");
+    expect(status(result.checks, "Headings")).toBe("warning");
+    expect(detail(result.checks, "Headings")).toBe("2 pages have no H1 heading: Home, Menu.");
+    expect(result.ready).toBe(true);
   });
 });
 

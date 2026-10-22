@@ -143,7 +143,7 @@ describe("the three documents carry the token definitions", () => {
     const c = Object.create(Composer.prototype) as InstanceType<typeof Composer>;
     Object.assign(c, {
       elements: { toHTML: () => "<div></div>", getActivePage: () => ({ name: "Home" }) },
-      styles: { toCSS: () => "" },
+      styles: { generateResponsiveCSS: () => "" },
       getProjectSettings: () => ({ designTokens: tokens }),
     });
     expect(c.exportHTML().combined).toContain("--buildrick-design-color-text-primary:#22AA66");
@@ -203,7 +203,7 @@ describe("the three documents follow the brand switch", () => {
     const c = Object.create(Composer.prototype) as InstanceType<typeof Composer>;
     Object.assign(c, {
       elements: { toHTML: () => "<div></div>", getActivePage: () => ({ name: "Home" }) },
-      styles: { toCSS: () => "" },
+      styles: { generateResponsiveCSS: () => "" },
       getProjectSettings: () => v5,
       designSystem: { brandTokensV2: on },
     });

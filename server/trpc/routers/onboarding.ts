@@ -1,9 +1,7 @@
-import { z } from "zod";
 import { router, protectedProcedure } from "../trpc";
 import { TRPCError } from "@trpc/server";
 import {
   getOnboardingState,
-  completeStep,
   completeDashboardTask,
   completeEditorTask,
   dismissOnboarding,
@@ -24,18 +22,6 @@ export const onboardingRouter = router({
       throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to load onboarding state" });
     }
   }),
-
-  completeStep: protectedProcedure
-    .input(z.object({ step: z.string() }))
-    .mutation(async ({ ctx, input }) => {
-      try {
-        return await completeStep(ctx.session.user.id, input.step);
-      } catch (e: unknown) {
-        if (e instanceof Error && e.message === "INVALID_STEP")
-          throw new TRPCError({ code: "BAD_REQUEST", message: "Unknown onboarding step" });
-        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to advance step" });
-      }
-    }),
 
   completeDashboardTask: protectedProcedure
     .input(completeDashboardTaskSchema)

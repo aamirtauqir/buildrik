@@ -28,6 +28,8 @@ export type ContextAction = {
   submenu?: ContextAction[];
   isVisible?: (ctx: ActionContext) => boolean;
   isEnabled?: (ctx: ActionContext) => boolean;
+  /** Why a disabled row is disabled — shown on it (design decision 13). */
+  disabledReason?: (ctx: ActionContext) => string | undefined;
   handler?: (ctx: ActionContext) => void;
 };
 
@@ -36,13 +38,12 @@ const pick = (list: ContextAction[], id: string, group: string): ContextAction[]
 const pickStandalone = (id: string, group: string) => pick(standaloneActions, id, group);
 
 /* Board 4428:43928 (Canvas · selected · ⋯ More): four groups split by rules —
-   ✦ Improve with AI · Duplicate · Delete | Arrange › Style › Structure › |
+   Duplicate · Delete | Arrange › Style › Structure › |
    Lock · Group · Bind to CMS field… | Add interaction. The old menu was
    Edit › Insert › Layout › Quick Style › then a flat tail. Nothing is
    dropped: Copy / Cut / Paste, Wrap / Unwrap, Replace with block… and Save
    as component sit under Structure; Ungroup / Unlock take their pair's slot. */
 const menuItems: ContextAction[] = [
-  ...pickStandalone("improve-with-ai", "top"),
   ...pick(editSubmenu, "duplicate", "top"),
   ...pick(editSubmenu, "delete", "top"),
   { id: "layout-group", label: "Arrange", icon: "layout", group: "sub", submenu: layoutSubmenu },

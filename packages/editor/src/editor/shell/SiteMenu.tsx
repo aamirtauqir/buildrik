@@ -2,7 +2,7 @@
  * Site menu — the ⋯ overflow in the topbar. Board 4418:126034 (C5 G1-016,
  * G1-020, G1-025; owner rule 2026-09-24: anything visual, the board wins).
  *
- *   THIS SITE          Site settings ⌘, · Export site… · Duplicate site ·
+ *   THIS SITE          Site settings · Export site… · Duplicate site ·
  *                      Issues · Activity log · Command palette ⌘K ·
  *                      Enter view mode · Keyboard shortcuts · Share preview link
  *   COLLABORATE        Start collaboration (PLANNED while the flag is off) ·
@@ -51,7 +51,6 @@ export interface SiteMenuProps {
   siteId?: string | null;
   /** Named in the share dialog's title/subtitle (board 4418:165739). */
   siteName?: string | null;
-  pageName?: string | null;
   /** Collaboration is flag-gated. Absent while the flag is off (the row is
    *  drawn PLANNED, disabled) and while a session is already running. */
   onStartCollaboration?: () => void;
@@ -76,11 +75,10 @@ function openDashboard(path: string) {
 }
 
 /**
- * F6/T9: ⌘, and ⌘/ belong to the browser on macOS; the handlers accept ctrl OR
- * meta everywhere, so the hint shows the chord that actually reaches the page.
+ * F6/T9: the hint shows the chord that actually reaches the page on this
+ * platform. Site settings prints none — owner Q4 (SC-12): it has no shortcut.
  */
 const IS_MAC = typeof navigator !== "undefined" && /Mac|iP(hone|ad|od)/.test(navigator.platform);
-const SETTINGS_KBD = IS_MAC ? "⌃," : "Ctrl ,";
 const PALETTE_KBD = IS_MAC ? "⌘K" : "Ctrl K";
 const SHORTCUTS_KBD = IS_MAC ? "⌘/" : "Ctrl /";
 
@@ -102,7 +100,6 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
   onOpenShortcuts,
   siteId,
   siteName,
-  pageName,
   onStartCollaboration,
   collabEnabled = false,
   onUnpublish,
@@ -162,7 +159,7 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
               <MenuGroup>
                 <MenuLabel>This site</MenuLabel>
                 {onOpenSiteSettings ? (
-                  <MenuItem kbd={SETTINGS_KBD} onClick={run(onOpenSiteSettings)} data-testid="site-menu-site-settings">
+                  <MenuItem onClick={run(onOpenSiteSettings)} data-testid="site-menu-site-settings">
                     Site settings
                   </MenuItem>
                 ) : null}
@@ -261,7 +258,7 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
           )}
         </Menu>
       </Popover>
-      {siteId && shareOpen ? <PreviewShareModal open={shareOpen} onOpenChange={setShareOpen} siteId={siteId} siteName={siteName} pageName={pageName} /> : null}
+      {siteId && shareOpen ? <PreviewShareModal open={shareOpen} onOpenChange={setShareOpen} siteId={siteId} siteName={siteName} /> : null}
       {onDuplicateSite ? (
         <ConfirmDialog
           open={duplicateConfirmOpen}
@@ -271,7 +268,7 @@ export const SiteMenu: React.FC<SiteMenuProps> = ({
             onDuplicateSite();
           }}
           title="Duplicate site?"
-          message="This makes a full copy of the site, including every page. The copy opens in a new tab once it's ready."
+          message="This makes a full copy of the site, including every page. When it's ready, you can open it in a new tab."
           confirmLabel="Duplicate site"
           testId="duplicate-site-confirm"
         />

@@ -29,7 +29,6 @@ const renderCTA = () => {
   const handlers = {
     onBrowseTemplates: vi.fn(),
     onAddBlock: vi.fn(),
-    onDescribe: vi.fn(),
     onStartBlank: vi.fn(),
   };
   render(<CanvasEmptyCTA {...handlers} />);
@@ -40,7 +39,7 @@ describe("CanvasEmptyCTA — board 4428:44164", () => {
   it("names the page's state and the three ways forward", () => {
     renderCTA();
     expect(screen.getByText("This page is empty")).toBeInTheDocument();
-    expect(screen.getByText("Start with a template, drop a block, or describe your site.")).toBeInTheDocument();
+    expect(screen.getByText("Start with a template, add a block, or start blank.")).toBeInTheDocument();
   });
 
   it("draws three template cards from the catalogue, each opening Templates", () => {
@@ -52,19 +51,16 @@ describe("CanvasEmptyCTA — board 4428:44164", () => {
     expect(h.onBrowseTemplates).toHaveBeenCalledTimes(1);
   });
 
-  it("offers the four routes in the board's order and wires each", () => {
+  it("offers the three routes in the board's order and wires each", () => {
     const h = renderCTA();
     const actions = screen.getByTestId("canvas-empty-cta-actions");
     expect(Array.from(actions.querySelectorAll("button")).map((b) => b.textContent)).toEqual([
       "Browse all templates",
       "Add a block",
-      "✦ Describe your site",
       "Start blank",
     ]);
     fireEvent.click(screen.getByTestId("canvas-empty-add-block"));
     expect(h.onAddBlock).toHaveBeenCalledTimes(1);
-    fireEvent.click(screen.getByTestId("canvas-empty-describe"));
-    expect(h.onDescribe).toHaveBeenCalledTimes(1);
     fireEvent.click(screen.getByTestId("canvas-empty-start-blank"));
     expect(h.onStartBlank).toHaveBeenCalledTimes(1);
   });

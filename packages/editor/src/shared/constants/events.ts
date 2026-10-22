@@ -126,6 +126,9 @@ export const EVENTS = {
   /** A feature changed the project OUTSIDE history — the change is real and
    *  cannot be undone. The Undo affordance reads this so it stops offering. */
   HISTORY_UNRECORDED: "history:unrecorded",
+  /** ⌘Z inside a surface that may only undo its own kind of change (Brand:
+   *  token edits) found a canvas change next, and did nothing (BK-05, D36). */
+  HISTORY_UNDO_OUT_OF_SCOPE: "history:undo-out-of-scope",
   HISTORY_CHANGED: "history:changed",
   HISTORY_CLEARED: "history:cleared",
   HISTORY_RECORDED: "history:recorded",
@@ -212,6 +215,9 @@ export const EVENTS = {
   CMS_COLLECTION_CREATED: "collection:created",
   CMS_COLLECTION_UPDATED: "collection:updated",
   CMS_COLLECTION_DELETED: "collection:deleted",
+  /** A local collection was merged into the server's under another id
+   *  (cmsSync DM-07): `{ from, to }`. Bindings follow it (REA C-7). */
+  CMS_COLLECTION_REKEYED: "collection:rekeyed",
   CMS_CONTENT_CREATED: "content:created",
   CMS_CONTENT_UPDATED: "content:updated",
   CMS_CONTENT_DELETED: "content:deleted",
@@ -340,8 +346,6 @@ export const EVENTS = {
    *  context menu's "Replace with block…" opens Add AND lands on BLOCKS —
    *  switching the tab alone leaves the user at ELEMENTS. */
   UI_INSERT_OPEN_GROUP: "ui:insert-open-group",
-  /** Add opens on its "Generate a block" screen (G2-117). */
-  UI_INSERT_OPEN_GENERATE: "ui:insert-open-generate",
   /** An Add-drawer drag started (`{ label }`) or ended (`{ label: null }`) —
    *  board 4418:100890's drag state (canvas cue, drawer note, readout). */
   UI_INSERT_DRAG: "ui:insert-drag",
@@ -423,7 +427,6 @@ export const EVENTS = {
   UI_TOGGLE_ASSETS: "ui:toggle:assets",
   UI_TOGGLE_CODE: "ui:toggle:code",
   UI_TOGGLE_PREVIEW: "ui:toggle:preview",
-  UI_TOGGLE_AI: "ui:toggle:ai",
   UI_PANEL_RESIZE: "ui:panel:resize",
 
   // ============================================
@@ -433,7 +436,6 @@ export const EVENTS = {
   MODE_EDIT: "mode:edit",
   MODE_PREVIEW: "mode:preview",
   MODE_CODE: "mode:code",
-  PREVIEW_MODE_CHANGED: "preview:mode:changed",
 
   // ============================================
   // Responsive Events
@@ -476,14 +478,6 @@ export const EVENTS = {
   EXPORT_START: "export:start",
   EXPORT_COMPLETE: "export:complete",
   EXPORT_ERROR: "export:error",
-
-  // ============================================
-  // AI Events
-  // ============================================
-  AI_REQUEST_START: "ai:request:start",
-  AI_REQUEST_COMPLETE: "ai:request:complete",
-  AI_REQUEST_ERROR: "ai:request:error",
-  AI_SUGGESTION_APPLIED: "ai:suggestion:applied",
 
   // ============================================
   // Form Events (AQUI-035)
@@ -582,8 +576,6 @@ export const EVENTS = {
   // ============================================
   // Device/Zoom Events
   // ============================================
-  ZOOM_IN: "zoom:in",
-  ZOOM_OUT: "zoom:out",
   ZOOM_FIT: "zoom:fit",
   /** Board 817:4723 row 2. Only the canvas can measure the selected element,
    *  and the flyout that offers this now lives in the footer, so the two talk
@@ -661,18 +653,6 @@ export const EVENTS = {
   OT_OPERATION_TRANSFORMED: "operation:transformed",
   OT_PENDING_CLEANUP: "pending:cleanup",
   OT_DIVERGENCE_DETECTED: "divergence:detected",
-
-  // ============================================
-  // Interaction Manager Events
-  // ============================================
-  INTERACTIONS_RUNTIME_STARTED: "interactions:runtime:started",
-  INTERACTIONS_RUNTIME_STOPPED: "interactions:runtime:stopped",
-  INTERACTION_ADDED: "interaction:added",
-  INTERACTION_UPDATED: "interaction:updated",
-  INTERACTION_REMOVED: "interaction:removed",
-  INTERACTION_TOGGLED: "interaction:toggled",
-  INTERACTIONS_CLEARED: "interactions:cleared",
-  INTERACTIONS_REORDERED: "interactions:reordered",
 
   // ============================================
   // Recovery Events
@@ -811,7 +791,6 @@ export type EventCategory =
   | "asset"
   | "font"
   | "export"
-  | "ai"
   | "form"
   | "sync"
   | "network"
@@ -918,6 +897,7 @@ export interface EventPayloads {
     superseded?: string;
   };
   [EVENTS.HISTORY_UNRECORDED]: { label: string };
+  [EVENTS.HISTORY_UNDO_OUT_OF_SCOPE]: void;
   [EVENTS.HISTORY_RECORDED]: { label?: string };
   [EVENTS.HISTORY_CLEARED]: void;
 

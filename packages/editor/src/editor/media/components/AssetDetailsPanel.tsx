@@ -17,12 +17,13 @@
  * @license BSD-3-Clause
  */
 
-import { Sparkles, X } from "lucide-react";
+import { X } from "lucide-react";
 import * as React from "react";
 import type { Composer } from "@/engine/Composer";
 import type { LibraryItem, VersionEntry } from "@/editor/sidebar/tabs/media/data/mediaTypes";
 import { formatBytes } from "@shared/utils/helpers/number";
 import { versionLabel, collectUsageByPage } from "@/editor/sidebar/tabs/media/data/mediaUtils";
+import { useAltTextDraft } from "@/editor/sidebar/tabs/media/hooks/useAltTextDraft";
 import {
   Button,
   IconButton,
@@ -47,7 +48,6 @@ import {
 import { LIBRARY_MODAL_BTN_SECONDARY } from "./libraryModal";
 
 /** Small dense button matching the panel's `mgr-btn` chrome. */
-const MINI_BTN = "tw:h-6 tw:px-2 tw:py-0 tw:text-[length:var(--bk-text-11)]";
 /* The rail's tag chip — the same pill the folder rail draws (1160:44 /
    3695:45155: 8/3, full radius, --bk-border edge on bg-panel, 11 ink-soft),
    with a 16 × inside it. A span, not a button: the × is the control. */
@@ -182,18 +182,10 @@ export interface AssetDetailsPanelProps {
   composer: Composer;
   addToast(t: ToastInput): void;
   /**
-   * P7 — write user-typed alt text back to the engine. Implementations
-   * should also clear `generatedMetadata.altText` so the provenance chip
-   * disappears once the user edits (the chip is misleading if the text
-   * is no longer the AI's output).
+   * P7 — write user-typed alt text back. Called once per commit (blur or
+   * Enter, `useAltTextDraft`); a rejection shows under the field.
    */
-  onUpdateAltText?(key: string, altText: string): void;
-  /**
-   * P7 — fire `media.generateAltText` for this asset. Returns the result
-   * so the panel can show a toast; null on failure or when the server
-   * preserved an existing user-typed alt text.
-   */
-  onRegenerateAltText?(key: string): Promise<{ altText: string; skipped: boolean } | null>;
+  onUpdateAltText?(key: string, altText: string): Promise<void>;
   /**
    * BLOCKERS C3 (authority `code:tag-writer`) — write the file's whole tag
    * list back. The Clone draws the TAGS chips (3695:45155) and the tag filter
@@ -241,7 +233,6 @@ export function AssetDetailsPanel({
   composer,
   addToast,
   onUpdateAltText,
-  onRegenerateAltText,
   onUpdateTags,
   onManageFont,
   onJumpToElement,
@@ -264,7 +255,6 @@ export function AssetDetailsPanel({
         </Button>
       </Tooltip>
     );
-  const [regenerating, setRegenerating] = React.useState(false);
   const [moreOpen, setMoreOpen] = React.useState(false);
   /* 4418:58292 / 7093:78271 — TAGS, VERSIONS and USED IN sit behind one
      "Details ▸" row whose right side summarises them. */
@@ -438,11 +428,7 @@ export function AssetDetailsPanel({
           {selectedItem.type === "img" && onUpdateAltText && (
             <AltTextSection
               item={selectedItem}
-              regenerating={regenerating}
               onUpdateAltText={onUpdateAltText}
-              onRegenerateAltText={onRegenerateAltText}
-              setRegenerating={setRegenerating}
-              addToast={addToast}
             />
           )}
 
@@ -649,8 +635,7 @@ export function AssetDetailsPanel({
           </ModalClose>
           <ModalBody>
             <p className={`tw:mb-3 ${MUTED_SM}`}>
-              Pick a replacement asset. All canvas usages will be swapped atomically
-              (one undo reverses everything).
+              Pick a replacement asset. Every use on the canvas switches to it.
             </p>
             <div className="med-grid" data-cols="3">
               {replaceCandidates.map((i) => (
@@ -709,46 +694,15 @@ export function AssetDetailsPanel({
 
 interface AltTextSectionProps {
   item: LibraryItem;
-  regenerating: boolean;
-  setRegenerating(v: boolean): void;
-  onUpdateAltText(key: string, altText: string): void;
-  onRegenerateAltText?(key: string): Promise<{ altText: string; skipped: boolean } | null>;
-  addToast(t: ToastInput): void;
+  onUpdateAltText(key: string, altText: string): Promise<void>;
 }
 
-function AltTextSection({
-  item,
-  regenerating,
-  setRegenerating,
-  onUpdateAltText,
-  onRegenerateAltText,
-  addToast,
-}: AltTextSectionProps) {
-  const provenance = item.generatedAltMeta;
-
-  const handleRegenerate = async () => {
-    if (!onRegenerateAltText) return;
-    setRegenerating(true);
-    try {
-      const result = await onRegenerateAltText(item.key);
-      if (!result) {
-        addToast({ description: "Couldn't generate alt text — try again later", tone: "error" });
-        return;
-      }
-      if (result.skipped) {
-        addToast({
-          description: "Kept your alt text instead of overwriting",
-          tone: "info",
-        });
-        return;
-      }
-      addToast({ description: "Alt text regenerated", tone: "success" });
-    } finally {
-      setRegenerating(false);
-    }
-  };
-
-  const altText = item.altText ?? "";
+function AltTextSection({ item, onUpdateAltText }: AltTextSectionProps) {
+  const { field: draftProps, saveFailed } = useAltTextDraft(item, onUpdateAltText);
+  const altText = draftProps.value;
+  /* The box follows the SAVED text, not the draft: swapping branches
+     remounts the textarea, which would drop focus mid-typing. */
+  const saved = !!item.altText;
   const field = (filled: boolean) => (
     <Textarea
       className={
@@ -757,59 +711,40 @@ function AltTextSection({
           : "tw:bg-white tw:focus:border-primary-700 tw:focus:ring-primary-700"
       }
       id={`alt-text-${item.key}`}
-      value={altText}
+      {...draftProps}
       maxLength={ALT_TEXT_MAX}
       rows={2}
       placeholder="Add a description for this image"
-      onChange={(e) => onUpdateAltText(item.key, e.target.value)}
     />
   );
-  const regenerate = (label: string, className: string) =>
-    onRegenerateAltText ? (
-      <Button data-testid="alt-text-regenerate" className={className} onClick={handleRegenerate} disabled={regenerating}>
-        {label === "Generate" && <Sparkles size={12} />}
-        {regenerating ? "Generating…" : label}
-      </Button>
-    ) : null;
-
   return (
     <div data-testid="alt-text-section" className="mgr-det-section">
       <label htmlFor={`alt-text-${item.key}`} className="mgr-det-label">
         Alt text
       </label>
-      {altText ? (
+      {saved ? (
         /* 4418:58292 — written alt text reads as a grey box: the text, then
-           "✨ AI" (when the model wrote it) and Regenerate. The field stays
-           editable in place. */
+           its length. The field stays editable in place. */
         <div className="mgr-alt-box tw:flex tw:flex-col tw:gap-1.5 tw:rounded-[var(--bk-radius-md)] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-subtle)] tw:p-2" data-testid="alt-text-box">
           {field(true)}
           <div className="tw:flex tw:items-center tw:gap-2">
-            {provenance && (
-              <span
-                data-testid="alt-text-provenance"
-                className="tw:inline-flex tw:h-[18px] tw:items-center tw:gap-[3px] tw:rounded-full tw:bg-[var(--bk-accent-subtle)] tw:px-1.5 tw:text-[length:var(--bk-text-11)] tw:leading-[14px] tw:font-medium tw:text-[var(--bk-accent-text)]"
-                title={`AI-generated by ${provenance.model} on ${new Date(provenance.generatedAt).toLocaleDateString()}`}
-              >
-                <Sparkles size={12} aria-hidden="true" />
-                AI
-              </span>
-            )}
-            {regenerate("Regenerate", "mgr-alt-regenerate")}
-            {!provenance && (
-              <span className="tw:ml-auto tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-ink-disabled)]">
-                {altText.length} / {ALT_TEXT_MAX}
-              </span>
-            )}
+            <span className="tw:ml-auto tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-ink-disabled)]">
+              {altText.length} / {ALT_TEXT_MAX}
+            </span>
           </div>
         </div>
       ) : (
         <>
           {field(false)}
           <div className="tw:flex tw:items-center tw:justify-between tw:gap-2 tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-ink-disabled)]">
-            <span>0 / {ALT_TEXT_MAX}</span>
-            {regenerate("Generate", `mgr-btn ${MINI_BTN}`)}
+            <span>{altText.length} / {ALT_TEXT_MAX}</span>
           </div>
         </>
+      )}
+      {saveFailed && (
+        <p role="alert" data-testid="alt-text-error" className="tw:mt-1 tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-error-text)]">
+          Could not save the alt text — the server did not save the change.
+        </p>
       )}
     </div>
   );

@@ -3,6 +3,7 @@
  * Keys: Tab/Shift+Tab (cycle) | Arrows (navigate) | Alt+Arrows (reorder)
  * Ctrl+Arrow (move 1px) | Shift+Arrow (10px) | Del (delete) | Esc (clear)
  * Ctrl+D (duplicate) | Ctrl+A (select all) | Shift+F10 (context menu)
+ * Enter (inline text edit, BD-39)
  * @license BSD-3-Clause
  */
 
@@ -11,6 +12,7 @@ import { ToastActionPayload, ToastTone } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine/Composer";
 import type { Element } from "@/engine/elements/Element";
 import { devLogger } from "@/shared/utils/devLogger";
+import { EVENTS } from "@/shared/constants/events";
 import {
   getNavigationTargets,
   getAllNavigableElements,
@@ -52,6 +54,9 @@ export interface UseCanvasKeyboardResult {
  * Hook for handling keyboard navigation and shortcuts on the canvas.
  * Pure helper functions are in ./keyboard/keyboardHelpers.ts.
  */
+/** Controls that own their keys even inside the canvas column. */
+const CONTROL_SELECTOR = 'button, a[href], select, [role="button"], [role="menu"], [role="menuitem"], [role="dialog"], [role="listbox"]';
+
 /** A held arrow repeats every ~30 ms; a gap this long is a new press. */
 const REFUSED_NUDGE_MS = 1500;
 
@@ -71,6 +76,12 @@ export function useCanvasKeyboard({
     (e: React.KeyboardEvent) => {
       if (!composer || editingId) return;
       if ((e.target as HTMLElement)?.closest("input, textarea, [contenteditable]")) return;
+      /* BK-28: the canvas keys are the canvas's. A key pressed on a control
+         inside the canvas column — the footer's Zoom, a resize handle, a menu
+         — belongs to that control: Tab on Zoom cycled the canvas selection and
+         never left the button. */
+      const target = e.target as HTMLElement | null;
+      if (target && target !== e.currentTarget && target.closest(CONTROL_SELECTOR)) return;
 
       /* The command registry listens capture-phase on window and calls
          preventDefault() on anything it owns, which means it has already RUN by
@@ -152,6 +163,18 @@ export function useCanvasKeyboard({
       }
 
       if (!selectedId) return;
+
+      /* BD-39 (1): Enter on one selected element starts inline text edit —
+         the request the Inspector's "Edit text on canvas" sends, so
+         useCanvasInlineEdit alone decides what is editable text and asks the
+         lock gate; anything else ignores it. Not while read-only (time travel
+         sets composer.readOnly; view mode withholds this handler). */
+      if (e.key === "Enter" && !e.shiftKey && !e.altKey && !e.metaKey && !e.ctrlKey) {
+        if (composer.readOnly || selectedIds.length > 1) return;
+        e.preventDefault();
+        composer.emit(EVENTS.UI_INLINE_EDIT_REQUEST, { elementId: selectedId });
+        return;
+      }
 
       const element = composer.elements.getElement(selectedId);
       if (!element) return;

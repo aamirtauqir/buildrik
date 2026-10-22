@@ -1,14 +1,14 @@
 /**
  * S-9 — a member scoped to specific sites (has SitePermission rows) must see
  * only those sites in every workspace-wide LIST/aggregate: listSites,
- * getDashboardStats, getRecentSites, domains.listForWorkspace,
+ * getDashboardStats, domains.listForWorkspace,
  * siteComponents.workspaceList. All five now go through the same
  * `siteScopeWhere` helper as `resolveSiteScope`.
  */
 import { describe, it, expect, beforeEach } from "vitest";
 import { prisma } from "@/lib/prisma";
 import { listSites } from "@/server/services/sites.service";
-import { getDashboardStats, getRecentSites } from "@/server/services/dashboard.service";
+import { getDashboardStats } from "@/server/services/dashboard.service";
 import { listWorkspaceDomains } from "@/server/services/domain.service";
 import { listWorkspaceComponents } from "@/server/services/site-component.service";
 import {
@@ -66,12 +66,6 @@ describe("S-9 site-scoped workspace lists", () => {
     const { workspace, scopedUser } = await seedScopedMember();
     const stats = await getDashboardStats(workspace.id, scopedUser.id, "EDITOR");
     expect(stats.totalSites).toBe(1);
-  });
-
-  it("getRecentSites returns only the granted site", async () => {
-    const { workspace, scopedUser, s1 } = await seedScopedMember();
-    const sites = await getRecentSites(workspace.id, scopedUser.id);
-    expect(sites.map((s) => s.id)).toEqual([s1.id]);
   });
 
   it("listWorkspaceDomains returns only the granted site's domain", async () => {

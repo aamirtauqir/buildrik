@@ -36,7 +36,7 @@ vi.mock("@/services/api-client", () => ({
 }));
 
 import { DomainsScreen } from "../DomainsScreen";
-import { SAVE_ERROR_MESSAGES } from "@/editor/sidebar/tabs/settings/constants";
+import { ACTION_ERROR_MESSAGES } from "@/editor/sidebar/tabs/settings/constants";
 import type { DomainRow } from "../DomainsScreen";
 
 const d = api.siteDetail.domains;
@@ -266,7 +266,7 @@ describe("DomainsScreen — actions land as they are confirmed", () => {
     setup();
     await manage();
     fireEvent.click(httpsToggle());
-    await waitFor(() => expect(screen.getByTestId("set-save-error")).toHaveTextContent(SAVE_ERROR_MESSAGES.domains!));
+    await waitFor(() => expect(screen.getByTestId("set-save-error")).toHaveTextContent(ACTION_ERROR_MESSAGES.domains));
     expect(httpsToggle()).toHaveAttribute("aria-checked", "true");
     expect(httpsToggle()).not.toBeDisabled();
   });

@@ -451,7 +451,8 @@ export const PagesTab: React.FC<PagesTabProps> = ({
               >
                 {"\u2039"} Pages
               </Button>
-              <SearchListingsTable pages={p.pages} onEditPage={p.openSettings} onOpenFull={onExpandToggle} />
+              {/* Already wide: "Open full listings" would narrow it (REA P-7). */}
+              <SearchListingsTable pages={p.pages} onEditPage={p.openSettings} onOpenFull={isExpanded ? undefined : onExpandToggle} />
             </div>
           ) : (
           <PageList
@@ -479,6 +480,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
             onBulkDelete={handleBulkDelete}
             onClearSelection={leaveSelectMode}
             onContextMenu={p.openContextMenu}
+            onPageShortcut={(id, action) => (action === "duplicate" ? p.duplicatePage(id) : handleDeleteRequest(id))}
             dirtyPages={dirtyPages}
             onRenameStart={p.startRename}
             onRenameCommit={handleRenameCommit}

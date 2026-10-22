@@ -24,11 +24,12 @@
 
 import { listNames } from "@shared/utils/helpers/string";
 import * as React from "react";
-import { PanelFrame, Button, Menu, MenuItem, Modal, Popover, Progress, SkeletonBlock, Tooltip, useToast } from "@/editor/chrome-ui";
+import { PanelFrame, Badge, Button, Menu, MenuItem, Modal, Popover, Progress, SkeletonBlock, Tooltip, openUpgrade, useToast } from "@/editor/chrome-ui";
 import { ChevronDown, ChevronRight, MoreHorizontal } from "lucide-react";
 import type { SettingsNavId } from "../settings/types";
 import type { Composer } from "@/engine";
 import type { UsePublishJobResult } from "@/editor/shell/hooks/usePublishJob";
+import { CODE_DOWNLOAD_UPGRADE } from "@/editor/shell/hooks/useExportHandlers";
 import type { NextMove } from "@/editor/shell/lifecycle";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { fetchPrePublishChecks, unpublishSite } from "@/services/PublishService";
@@ -37,7 +38,9 @@ import { relativeShort, usePublishSnapshot } from "./usePublishSnapshot";
 import { CHECK_DOOR, PrePublishChecks } from "./PrePublishChecks";
 import { ApprovalCheckRow, PublishGateBanner } from "./PublishGateBanner";
 import { UnpublishConfirmModal } from "./UnpublishConfirmModal";
-import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
+import { getEditorPlanTier, getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
+import { useEditorRole } from "@/editor/shell/hooks/useEditorRole";
+import { roleAtLeast } from "@/services/RoleService";
 import {
   VERCEL_CHECK_LABEL,
   type PrePublishChecksResult,
@@ -69,6 +72,12 @@ export interface PublishTabProps {
   /** The ONE publish door — opens the dialog `nextMove.gate` names. Absent =
    *  no publish path is wired (the flag is off): board 784:4480. */
   onRequestPublish?: () => void;
+  /** One-click ZIP of the site's code (useExportHandlers.handleExportHTML).
+   *  Absent = no row. Pro: a Free workspace sees the row with a PRO badge and
+   *  gets the upgrade prompt. */
+  onDownloadCode?: () => void;
+  /** The ZIP is being built — the row says so and cannot be pressed twice. */
+  downloadingCode?: boolean;
   /** Initial published URL from loaded project */
   publishedUrl?: string | null;
   /** Initial published state from loaded project */
@@ -100,6 +109,21 @@ const FIX_TARGETS: Record<string, FixTarget> = {
 /** Open the pane that fixes a pre-publish check (by its label). False when
  *  the check has no fix door. Shared by this panel's row buttons and the
  *  Issues panel's server-check rows, which opened Brand (L4-035). */
+/* O6: the worker records a post-deploy failure as `<step>: <reason>`. */
+const POST_DEPLOY_STEPS: Record<string, string> = {
+  "password protection": "password protection",
+  "project pin": "project link",
+  progress: "status update",
+  "after going live": "after-publish step",
+};
+function postDeployStepName(error: string): string {
+  return POST_DEPLOY_STEPS[error.split(":")[0].trim()] ?? "after-publish step";
+}
+function postDeployLabel(error: string): string {
+  const step = postDeployStepName(error);
+  return `${step.charAt(0).toUpperCase()}${step.slice(1)} couldn't update`;
+}
+
 export function openPublishCheckFix(composer: Composer | null | undefined, label: string): boolean {
   const target = FIX_TARGETS[label];
   if (!target || !composer) return false;
@@ -189,6 +213,8 @@ export const PublishTab: React.FC<PublishTabProps> = ({
   publishJob,
   nextMove,
   onRequestPublish,
+  onDownloadCode,
+  downloadingCode = false,
   publishedUrl: initialUrl,
   isProjectPublished,
   initialUnpublish,
@@ -282,6 +308,22 @@ export const PublishTab: React.FC<PublishTabProps> = ({
   /* Board 4418:98663 — the run was cancelled. Only a job THIS session started
      can be cancelled, so a job id is implied; nothing was deployed. */
   const wasCancelled = publishJob?.uiState === "cancelled";
+  const serverBlockers = publishJob?.serverBlockers ?? null;
+  const liveFollowUp =
+    publishJob?.jobId != null &&
+    publishJob.uiState === "published" &&
+    (publishJob.formsStatus === "PENDING" ||
+      publishJob.formsStatus === "FAILED" ||
+      publishJob.postDeployError != null);
+  /* Design decision 7: past a minute the forms line says so. */
+  const formsPending = publishJob?.formsStatus === "PENDING";
+  const [formsSlow, setFormsSlow] = React.useState(false);
+  React.useEffect(() => {
+    setFormsSlow(false);
+    if (!formsPending) return;
+    const t = setTimeout(() => setFormsSlow(true), 60_000);
+    return () => clearTimeout(t);
+  }, [formsPending]);
   /* The build log behind board 784:4403's "View log". A pre-job failure never
      reaches the worker, so there are no steps and the link stays away rather
      than opening an empty list. */
@@ -387,6 +429,11 @@ export const PublishTab: React.FC<PublishTabProps> = ({
   React.useEffect(() => {
     if (uiState === "published" || uiState === "failed") void loadChecks();
   }, [uiState, loadChecks]);
+  /* DR-T4: the server refused — its rows replace whatever the list showed. */
+  const refusedBy = publishJob?.serverBlockers;
+  React.useEffect(() => {
+    if (refusedBy) void loadChecks();
+  }, [refusedBy, loadChecks]);
 
   const blocking = React.useMemo(
     () => (checks?.checks ?? []).filter((c) => c.status === "fail"),
@@ -400,8 +447,11 @@ export const PublishTab: React.FC<PublishTabProps> = ({
   const blockedOnVercel = blocking.some((c) => c.label === VERCEL_CHECK_LABEL);
 
   /*
-    Board 784:4480 ("Connect Vercel to publish.") is the panel with no publish
-    path at all — `onRequestPublish` absent, i.e. publishing not wired.
+    No publish path at all — `onRequestPublish` absent, which means the
+    `publish` build flag is off (TabRouter). Board 784:4480 draws this panel as
+    "Connect Vercel to publish.", but that names the wrong cause: a connected
+    workspace saw it too, and connecting changes nothing (REA P-3). The panel
+    states the flag and offers no action, since none in the editor fixes it.
 
     It is NOT the panel for "connected account missing". That case is the
     Vercel check failing in the list above, with `Connect` on the row and a
@@ -418,7 +468,16 @@ export const PublishTab: React.FC<PublishTabProps> = ({
   /* Board 7045:77972 — the panel ⋯: All versions › (History › Published) and,
      while the site is live, Unpublish site… (the confirm below). */
   const [menuOpen, setMenuOpen] = React.useState(false);
-  const canUnpublish = Boolean(snapshot.lastDeploy?.isLive && siteId);
+  /* Unpublish is ADMIN on the server; the site menu already hides its row
+     below that (StudioHeader `atLeastAdmin`). This menu offered it to every
+     role, so an editor collected a server error. Unknown role still asks. */
+  const atLeastAdmin = roleAtLeast(useEditorRole(), "ADMIN") !== false;
+  const canUnpublish = Boolean(snapshot.lastDeploy?.isLive && siteId && atLeastAdmin);
+  /* Code download is Pro (owner decision). The same tier read the
+     templates tab gates on: only the starter (FREE) workspace is locked.
+     This is the fast path; onDownloadCode asks the server
+     (sites.authorizeCodeExport) before it builds anything. */
+  const codeLocked = getEditorPlanTier() === "starter";
   const publishMenu = (
     <Popover
       open={menuOpen}
@@ -450,6 +509,23 @@ export const PublishTab: React.FC<PublishTabProps> = ({
         >
           All versions ›
         </MenuItem>
+        {onDownloadCode ? (
+          <MenuItem
+            disabled={downloadingCode}
+            onClick={() => {
+              setMenuOpen(false);
+              if (codeLocked) openUpgrade(CODE_DOWNLOAD_UPGRADE);
+              else onDownloadCode();
+            }}
+            data-testid="publish-download-code"
+          >
+            <span className="tw:flex tw:items-center tw:gap-2">
+              {downloadingCode ? "Preparing ZIP…" : "Download code (ZIP)"}
+              {/* Same mark as IntegrationRow's plan gate. */}
+              {codeLocked ? <Badge>PRO</Badge> : null}
+            </span>
+          </MenuItem>
+        ) : null}
         {canUnpublish ? (
           <MenuItem
             danger
@@ -538,7 +614,11 @@ export const PublishTab: React.FC<PublishTabProps> = ({
       <h2 className={RESULT_TITLE_ERROR}>Publish failed.</h2>
       <p className={`${META} tw:mt-2 tw:leading-[18px]`}>
         {error}
-        {error && !/nothing was deployed|unchanged/i.test(error)
+        {/* O6: the job says where it stopped; before the deploy finished the
+            live site is untouched, whatever the error text reads. */}
+        {error && publishJob?.failedPhase && publishJob.failedPhase !== "post-deploy"
+          ? " Your live site wasn't changed."
+          : error && !/nothing was deployed|unchanged/i.test(error)
           ? snapshot.lastDeploy?.isLive
             ? " The previous live version is unchanged."
             : " Nothing was deployed."
@@ -676,15 +756,16 @@ export const PublishTab: React.FC<PublishTabProps> = ({
       />
       {noPublishPath ? (
         <div className={CONTENT}>
-          {/* Board 784:4480 — with no publish path there is nothing to say
-              about environments, changes or deploys: the panel states the one
-              fact that matters and offers the one action that changes it. */}
+          {/* Board 784:4480's shape — with no publish path there is nothing
+              to say about environments, changes or deploys: the panel states
+              the one fact that matters. */}
           <section className={SECTION}>
             <h2 className="tw:m-0 tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:text-[var(--bk-ink)]">
-              Connect Vercel to publish.
+              Publishing is turned off.
             </h2>
             <p className="tw:m-0 tw:mt-1 tw:text-[13px] tw:leading-normal tw:text-[var(--bk-ink-muted)]">
-              Buildrick deploys into your own Vercel account — we host nothing.
+              This build of the editor has publishing switched off, so nothing can be published from here. Connecting
+              Vercel won&apos;t change that.
             </p>
           </section>
         </div>
@@ -839,14 +920,68 @@ export const PublishTab: React.FC<PublishTabProps> = ({
                   View live site
                 </a>
               )}
-              {snapshot.lastDeploy && snapshot.lastDeploy.version > 1 && (
+              {snapshot.lastDeploy && snapshot.previousDeploy && (
+                /* A door of the one Compare (B8): the two deploys it names.
+                   It only switched to History, which opened on Session with
+                   no compare at all (REA P-1). */
                 <Button
                   color="light"
                   size="xs"
-                  onClick={() => composer?.emit("ui:switch-tab", { tab: "history" })}
+                  onClick={() => {
+                    const { lastDeploy, previousDeploy } = snapshot;
+                    if (!lastDeploy || !previousDeploy) return;
+                    composer?.emit(EVENTS.UI_COMPARE_OPEN, {
+                      left: { kind: "published", jobId: previousDeploy.jobId, version: previousDeploy.version },
+                      right: { kind: "published", jobId: lastDeploy.jobId, version: lastDeploy.version },
+                      from: "Publish",
+                    });
+                  }}
                   className={TEXT_LINK}
+                  data-testid="publish-compare-deploys"
                 >
-                  Compare v{snapshot.lastDeploy.version - 1} → v{snapshot.lastDeploy.version}
+                  Compare v{snapshot.previousDeploy.version} → v{snapshot.lastDeploy.version}
+                </Button>
+              )}
+            </div>
+          </section>
+        )}
+
+        {/* ER-T3 / O6 (decision 7): a live publish whose forms are still
+            switching over, or whose after-deploy step failed. The website
+            line comes first: the site IS live either way. */}
+        {liveFollowUp && (
+          <section className={`${SECTION} tw:px-2 tw:pb-4`} aria-label="After publishing" data-testid="publish-followup">
+            <p className={`${META} tw:text-[var(--bk-ink)]`}>Website live</p>
+            {publishJob?.postDeployError && (
+              <p className={`${META} tw:text-[var(--bk-error-text)]`} role="alert" data-testid="publish-postdeploy-failed">
+                {postDeployLabel(publishJob.postDeployError)} — the site is live without it.
+              </p>
+            )}
+            {publishJob?.formsStatus === "PENDING" && (
+              <p className={META} role="status" data-testid="publish-forms-pending">
+                {formsSlow ? "Updating forms… Taking longer than usual." : "Updating forms…"}
+              </p>
+            )}
+            {publishJob?.formsStatus === "FAILED" && (
+              <p className={`${META} tw:text-[var(--bk-error-text)]`} role="alert" data-testid="publish-forms-failed">
+                Forms couldn't update.{publishJob.formsError ? ` ${publishJob.formsError}` : ""} Submissions still go to the
+                previous forms.
+              </p>
+            )}
+            {publishJob?.retryError && (
+              <p className={`${META} tw:text-[var(--bk-error-text)]`} role="alert" data-testid="publish-retry-failed">
+                Retry didn't work: {publishJob.retryError.message}
+              </p>
+            )}
+            <div className="tw:mt-2 tw:flex tw:items-center tw:gap-4">
+              {publishJob?.formsStatus === "FAILED" && (
+                <Button color="light" size="xs" className="tw:h-7 tw:px-3" onClick={() => void publishJob.retryForms()} data-testid="publish-forms-retry">
+                  Retry form update
+                </Button>
+              )}
+              {publishJob?.postDeployError && (
+                <Button color="light" size="xs" className="tw:h-7 tw:px-3" onClick={() => void publishJob.retryPostDeploy()} data-testid="publish-postdeploy-retry">
+                  Retry {postDeployStepName(publishJob.postDeployError)}
                 </Button>
               )}
             </div>
@@ -928,11 +1063,17 @@ export const PublishTab: React.FC<PublishTabProps> = ({
             /* Two different facts wore one sentence. With no deploy to measure
                from, "Nothing has changed since the last deploy." is false. The
                never-published line states what the section claims to state —
-               what would go out if you published now. */
+               what would go out if you published now.
+               REA P-2: the rows are this session's undo stack, which is empty
+               after every load, so an empty list is not "nothing changed".
+               That claim is the lifecycle's (saved edits vs the last publish,
+               `nextMove === null`) — the same answer the CTA prints. */
             <p className={META}>
-              {snapshot.lastDeploy
-                ? "Nothing has changed since the last deploy."
-                : "Publishing will put the whole site live for the first time."}
+              {!snapshot.lastDeploy
+                ? "Publishing will put the whole site live for the first time."
+                : nextMove === null
+                  ? "Nothing has changed since the last deploy."
+                  : "No edits in this session. Publishing ships the site as it is saved now."}
             </p>
           )}
           </>
@@ -1001,10 +1142,9 @@ export const PublishTab: React.FC<PublishTabProps> = ({
         data-testid="publish-footer"
       >
         {noPublishPath ? (
-          /* Board 784:4480 puts the CTA here too — the panel body above
-             carries the sentence, this is the action. */
-          <Button onClick={openIntegrations} className="tw:w-full">
-            Connect Vercel
+          /* A disabled primary always says why; the body carries the why. */
+          <Button disabled className="tw:h-7 tw:w-auto tw:flex-none tw:self-start tw:px-3 tw:py-1.5 tw:text-[13px]">
+            Publish to production
           </Button>
         ) : (
           <>
@@ -1072,6 +1212,11 @@ export const PublishTab: React.FC<PublishTabProps> = ({
                 {ctaReason}
               </p>
             ) : null}
+            {serverBlockers && !isPublishing && (
+              <p className="tw:m-0 tw:text-[11px] tw:text-[var(--bk-error)] tw:leading-[1.4]" role="alert" data-testid="publish-server-blocked">
+                Publish stopped · {serverBlockers.length} new blocker{serverBlockers.length === 1 ? "" : "s"}: {serverBlockers.join(", ")}.
+              </p>
+            )}
             {blockedByChecks && !isPublishing && (
               <p className="tw:m-0 tw:text-[11px] tw:text-[var(--bk-error)] tw:leading-[1.4]" data-testid="publish-blocked-by-checks">
                 {blocking.map((c) => c.detail).join(" ")}

@@ -21,12 +21,12 @@ const ROWS: ReadonlyArray<[string, string]> = [
   ["Tab", "moves within the focused region, never between"],
   ["F6 / ⇧F6", "cycles between regions, 1 → 7 → back"],
   ["Esc", "steps out one level: drill-in → panel root → close → deselect"],
-  ["⌘K", "focuses the shell search — scope follows the open panel; jump-to when nothing is open"],
+  ["⌘K", "opens the command palette — panels, pages and actions"],
   ["A L P M D B", "rail panels — Add, Layers, Pages, Assets, CMS, Brand"],
   ["R", "Review panel"],
   ["C", "Comments · C · Esc leaves"],
   ["⌘S · save", "save now — autosave runs every second after you stop typing"],
-  ["⌘P / ⌘J", "preview · AI panel (⌘K finds pages)"],
+  ["⌘P", "preview (⌘K finds pages)"],
   ["⌘Z / ⌘⇧Z", "undo / redo, canvas-scoped"],
 ];
 
@@ -90,7 +90,7 @@ export function KeyboardLegend({ composer }: { composer: Composer | null }) {
           </div>
         ))}
         <p className="tw:m-0 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
-          Also: ⌃, opens Settings · ⌃H opens History · ⇧A opens Components · ⌘Y redoes. Conditional regions drop
+          Also: H opens History · Enter edits the selected text · ⇧A opens Components · ⌘Y redoes. Conditional regions drop
           out when their feature is off.
         </p>
       </div>

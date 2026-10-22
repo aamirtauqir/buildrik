@@ -55,8 +55,8 @@ describe("StyleEngine RAF batching", () => {
     vi.useRealTimers();
   });
 
-  it("batches 3 setProperty calls into a single toCSS() rebuild after RAF", () => {
-    const toCSSSpy = vi.spyOn(engine, "toCSS");
+  it("batches 3 setProperty calls into a single stylesheet rebuild after RAF", () => {
+    const toCSSSpy = vi.spyOn(engine, "generateResponsiveCSS");
 
     engine.setProperty('[data-buildrick-id="el-1"]', "color", "red");
     engine.setProperty('[data-buildrick-id="el-1"]', "font-size", "16px");
@@ -73,7 +73,7 @@ describe("StyleEngine RAF batching", () => {
   });
 
   it("flush() synchronously applies pending update", () => {
-    const toCSSSpy = vi.spyOn(engine, "toCSS");
+    const toCSSSpy = vi.spyOn(engine, "generateResponsiveCSS");
 
     engine.setProperty('[data-buildrick-id="el-1"]', "color", "red");
 
@@ -93,8 +93,8 @@ describe("StyleEngine RAF batching", () => {
     expect(styleEl.textContent).toContain("color: red");
   });
 
-  it("does not call toCSS() for reads via getStyles()", () => {
-    const toCSSSpy = vi.spyOn(engine, "toCSS");
+  it("does not rebuild the stylesheet for reads via getStyles()", () => {
+    const toCSSSpy = vi.spyOn(engine, "generateResponsiveCSS");
 
     engine.setProperty('[data-buildrick-id="el-1"]', "color", "red");
     const styles = engine.getStyles("el-1");
@@ -1017,21 +1017,31 @@ describe("StyleEngine.inheritStyles", () => {
   });
 });
 
-/* The editor's device preview is a narrowed canvas in a full-width page —
-   `@media (max-width: …)` never matches in the editor, so a tablet override
-   was stored, exported, and invisible on the canvas claiming to show Tablet
-   (found live 2026-08-14: engine held tablet font-size 28px, canvas rendered
-   the default). flush() re-emits the active breakpoint's rules without their
-   media queries, after the base rules; exports must never see that block. */
-describe("StyleEngine editor device preview", () => {
+/* The canvas sheet is the published cascade at the previewed breakpoint (D10,
+   D35). The canvas used to render an element's base styles inline, which beat
+   every stylesheet rule, so breakpoint and :hover rules were re-emitted
+   `!important` without media queries (found live 2026-08-14 and 2026-08-19,
+   L2-008). That made the canvas a different cascade from the published page.
+   Now the base is a sheet rule (`[data-buildrick-id]`, same specificity as the
+   published `.buildrick-<id>`), and the previewed breakpoint's layers follow
+   it unwrapped, in publish order, with no `!important`. */
+describe("StyleEngine canvas sheet — the published cascade at the previewed breakpoint", () => {
   let engine: StyleEngine;
   let composer: ReturnType<typeof makeComposer>;
+  const setDevice = (d: string) => {
+    (composer as unknown as { viewport: { setDeviceForTest: (d: string) => void } }).viewport.setDeviceForTest(d);
+    composer.emit(EVENTS.BREAKPOINT_CHANGED, d);
+  };
 
   beforeEach(() => {
     composer = makeComposer("desktop");
     engine = new StyleEngine(composer);
     const el = { getData: () => ({}), setBreakpointStyles: vi.fn() } as unknown as Element;
     (composer.elements.getElement as ReturnType<typeof vi.fn>).mockReturnValue(el);
+    (composer.elements as unknown as { getActivePageRootData: () => unknown }).getActivePageRootData = () => ({
+      id: "root",
+      children: [{ id: "el-1", styles: { "font-size": "48px", "--hide-mobile": "true" } }],
+    });
   });
 
   afterEach(() => {
@@ -1040,105 +1050,76 @@ describe("StyleEngine editor device preview", () => {
 
   const sheet = () => document.getElementById("aquibra-styles")!.textContent!;
 
-  it("desktop: breakpoint rules stay behind their media queries only", () => {
+  it("carries each element's base styles as a rule, ahead of the breakpoint rules", () => {
     engine.setBreakpointStyle("el-1", "tablet", { "font-size": "28px" });
+    setDevice("tablet");
     engine.flush();
 
-    const bare = sheet().split("@media")[0];
-    expect(bare).not.toContain("font-size: 28px");
-    expect(sheet()).toContain("@media (max-width: 1023px)");
+    const css = sheet();
+    expect(css).toContain('[data-buildrick-id="el-1"] {\n  font-size: 48px;');
+    expect(css.indexOf("48px")).toBeLessThan(css.indexOf("28px"));
   });
 
-  it("tablet: the override is re-emitted un-media'd so the canvas shows it", () => {
+  it("desktop: no breakpoint layer is applied", () => {
     engine.setBreakpointStyle("el-1", "tablet", { "font-size": "28px" });
-    (composer as unknown as { viewport: { setDeviceForTest: (d: string) => void } }).viewport.setDeviceForTest("tablet");
-    composer.emit(EVENTS.BREAKPOINT_CHANGED, "tablet");
     engine.flush();
-
-    expect(sheet()).toContain("editor device preview (tablet)");
-    const preview = sheet().split("editor device preview")[1];
-    expect(preview).toContain("font-size: 28px");
+    expect(sheet()).not.toContain("28px");
+    expect(sheet()).not.toContain("@media");
   });
 
-  /* …and the re-emitted rules have to BEAT the base ones. The canvas renders
-     an element's base styles inline, and inline beats any stylesheet, so the
-     block above was in the sheet and the canvas still drew the desktop value —
-     measured live 2026-08-19: heading set to 22px on Mobile, the rule present,
-     the canvas at 48px. The publish path avoids the collision by emitting base
-     styles as class rules; the canvas does not, so these carry !important. */
-  it("tablet: the re-emitted rule outranks the inline base style", () => {
+  it("tablet: the tablet layer applies unwrapped, without !important", () => {
     engine.setBreakpointStyle("el-1", "tablet", { "font-size": "28px" });
-    (composer as unknown as { viewport: { setDeviceForTest: (d: string) => void } }).viewport.setDeviceForTest("tablet");
-    composer.emit(EVENTS.BREAKPOINT_CHANGED, "tablet");
+    setDevice("tablet");
     engine.flush();
+    expect(sheet()).toContain("font-size: 28px;");
+    expect(sheet()).not.toContain("!important;\n");
+    expect(sheet()).not.toContain("@media (max-width: 1023px)");
+  });
 
-    const preview = sheet().split("editor device preview")[1];
-    expect(preview).toContain("font-size: 28px !important");
+  it("mobile: desktop-first — tablet layer first, then mobile", () => {
+    engine.setBreakpointStyle("el-1", "tablet", { "font-size": "28px" });
+    engine.setBreakpointStyle("el-1", "mobile", { "font-size": "20px" });
+    setDevice("mobile");
+    engine.flush();
+    const css = sheet();
+    expect(css.indexOf("28px")).toBeGreaterThan(-1);
+    expect(css.indexOf("20px")).toBeGreaterThan(css.indexOf("28px"));
+  });
+
+  it("switching back to desktop drops the breakpoint layers", () => {
+    engine.setBreakpointStyle("el-1", "tablet", { "font-size": "28px" });
+    setDevice("tablet");
+    engine.flush();
+    expect(sheet()).toContain("28px");
+    setDevice("desktop");
+    engine.flush();
+    expect(sheet()).not.toContain("28px");
+  });
+
+  it("hides an element only on the breakpoint it is hidden on", () => {
+    engine.flush();
+    expect(sheet()).not.toContain("display:none");
+    setDevice("mobile");
+    engine.flush();
+    expect(sheet()).toContain('[data-buildrick-id="el-1"]{display:none!important}');
+  });
+
+  /* L2-008: a :hover rule now wins over the base by specificity, as it does on
+     the published page — no !important needed. */
+  it("a state rule is written plain and after the base rule", () => {
+    engine.setRule('[data-buildrick-id="el-1"]', { "background-color": "#00aa00" }, { pseudo: ":hover" });
+    engine.flush();
+    const css = sheet();
+    expect(css).toContain('[data-buildrick-id="el-1"]:hover');
+    expect(css).toContain("background-color: #00aa00;");
+    expect(css).not.toContain("#00aa00 !important");
   });
 
   it("the exported CSS keeps its media queries and stays !important-free", () => {
     engine.setBreakpointStyle("el-1", "tablet", { "font-size": "28px" });
-    (composer as unknown as { viewport: { setDeviceForTest: (d: string) => void } }).viewport.setDeviceForTest("tablet");
-    composer.emit(EVENTS.BREAKPOINT_CHANGED, "tablet");
-
+    setDevice("tablet");
     const exported = engine.generateResponsiveCSS();
     expect(exported).toContain("@media (max-width: 1023px)");
     expect(exported).not.toContain("!important");
-    expect(exported).not.toContain("editor device preview");
-  });
-
-  it("mobile: desktop-first cascade — tablet rules first, then mobile", () => {
-    engine.setBreakpointStyle("el-1", "tablet", { "font-size": "28px" });
-    engine.setBreakpointStyle("el-1", "mobile", { "font-size": "20px" });
-    (composer as unknown as { viewport: { setDeviceForTest: (d: string) => void } }).viewport.setDeviceForTest("mobile");
-    composer.emit(EVENTS.BREAKPOINT_CHANGED, "mobile");
-    engine.flush();
-
-    const preview = sheet().split("editor device preview")[1];
-    expect(preview.indexOf("28px")).toBeGreaterThan(-1);
-    expect(preview.indexOf("20px")).toBeGreaterThan(preview.indexOf("28px"));
-  });
-
-  it("switching back to desktop removes the preview block", () => {
-    engine.setBreakpointStyle("el-1", "tablet", { "font-size": "28px" });
-    const v = (composer as unknown as { viewport: { setDeviceForTest: (d: string) => void } }).viewport;
-    v.setDeviceForTest("tablet");
-    composer.emit(EVENTS.BREAKPOINT_CHANGED, "tablet");
-    engine.flush();
-    expect(sheet()).toContain("editor device preview");
-
-    v.setDeviceForTest("desktop");
-    composer.emit(EVENTS.BREAKPOINT_CHANGED, "desktop");
-    engine.flush();
-    expect(sheet()).not.toContain("editor device preview");
-  });
-
-  /* L2-008: a :hover / :focus rule lost to the element's inline base style
-     (the canvas inlines base styles; inline beats any stylesheet rule), so a
-     hover fill never showed on the canvas. Same answer as the device block:
-     re-emitted !important, editor-only. */
-  it("a state rule is re-emitted !important so it beats the inline base style", () => {
-    engine.setRule('[data-buildrick-id="el-1"]', { "background-color": "#00aa00" }, { pseudo: ":hover" });
-    engine.flush();
-
-    const block = sheet().split("editor state preview")[1];
-    expect(block).toContain('[data-buildrick-id="el-1"]:hover');
-    expect(block).toContain("background-color: #00aa00 !important");
-  });
-
-  it("the exported CSS carries the state rule plain", () => {
-    engine.setRule('[data-buildrick-id="el-1"]', { "background-color": "#00aa00" }, { pseudo: ":hover" });
-    expect(engine.toCSS()).not.toContain("!important");
-    expect(engine.toCSS()).not.toContain("editor state preview");
-    expect(engine.generateCSS()).not.toContain("editor state preview");
-  });
-
-  it("exported CSS never contains the preview block", () => {
-    engine.setBreakpointStyle("el-1", "tablet", { "font-size": "28px" });
-    (composer as unknown as { viewport: { setDeviceForTest: (d: string) => void } }).viewport.setDeviceForTest("tablet");
-    composer.emit(EVENTS.BREAKPOINT_CHANGED, "tablet");
-
-    expect(engine.toCSS()).not.toContain("editor device preview");
-    expect(engine.generateCSS()).not.toContain("editor device preview");
   });
 });

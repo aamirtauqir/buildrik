@@ -67,6 +67,9 @@ export interface UsePageSettingsReturn {
   /** The host the published page sits on, without the scheme (`acme.com`,
    *  `proj.vercel.app`); null until something is known. */
   domain: string | null;
+  /** Whether the live deploy serves clean URLs (`/about`); until then the
+   *  page's URL is its `.html` file (BD-39 (4)). */
+  servesCleanUrls: boolean;
   /** The site's live URL, or null when it has never been published. Gates the
       slug-change warning: "existing links" can only exist if the site is
       reachable, which is a fact about the site rather than the page. */
@@ -82,12 +85,19 @@ export interface UsePageSettingsReturn {
   setShowDiscardConfirm: (v: boolean) => void;
 }
 
+/* Void elements never take a closing tag: `<meta …>` and `<link …>` without
+   a slash are valid HTML (a Google site-verification tag was refused). */
+const VOID_TAGS = new Set(["area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "source", "track", "wbr"]);
+
 function validateHeadCode(code: string): string | null {
   if (!code.trim()) return null;
-  const openTags = (code.match(/<[a-z][^/]*>/gi) ?? []).length;
-  const closeTags = (code.match(/<\/[a-z]+>/gi) ?? []).length;
-  const selfClosing = (code.match(/<[a-z][^>]*\/>/gi) ?? []).length;
-  if (openTags > closeTags + selfClosing) {
+  let openTags = 0;
+  let closeTags = 0;
+  for (const [tag, name] of code.matchAll(/<\/?([a-z][a-z0-9-]*)\b[^>]*>/gi)) {
+    if (tag.startsWith("</")) closeTags++;
+    else if (!VOID_TAGS.has(name.toLowerCase()) && !tag.endsWith("/>")) openTags++;
+  }
+  if (openTags > closeTags) {
     return "Unclosed HTML tag detected. Ensure all tags are properly closed.";
   }
   return null;
@@ -155,7 +165,7 @@ export function usePageSettings(
   const savedSnapshot = React.useRef<string>("");
 
   const siteId = React.useMemo(() => getSiteIdFromUrl(), []);
-  const getSiteOrigin = useSiteOrigin(composer, siteId);
+  const { getOrigin: getSiteOrigin, servesCleanUrls } = useSiteOrigin(composer, siteId);
 
   const applyPersistedState = React.useCallback((p: PageItem) => {
     const state = getPersistedState(p);
@@ -378,6 +388,7 @@ export function usePageSettings(
     setCustomHead,
     headCodeError,
     domain,
+    servesCleanUrls,
     publishedUrl,
     saveState,
     isDirty,

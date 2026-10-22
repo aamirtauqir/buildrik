@@ -125,7 +125,7 @@ export type SettingsNavDef =
 /** Sidebar order within each group. */
 export const SETTINGS_NAV: SettingsNavDef[] = [
   { id: "general", title: "General", subtitle: "The site's name, icons and author.", group: "site", kind: "screen" },
-  { id: "localization", title: "Languages", subtitle: "Default language and the languages the site is published in.", group: "site", kind: "screen" },
+  { id: "localization", title: "Languages", subtitle: "Default language and translations. Only the default publishes.", group: "site", kind: "screen" },
   { id: "branding", title: "Brand ↗", subtitle: "Colours, fonts, spacing and presets", group: "site", kind: "door" },
   { id: "seo", title: "SEO", subtitle: "Search defaults, social profiles and indexing.", group: "search-sharing", kind: "screen" },
   { id: "domains", title: "Domains", subtitle: "Custom domains, the primary address and DNS.", group: "publishing", kind: "screen" },
@@ -256,6 +256,13 @@ export const SAVE_ERROR_MESSAGES: Partial<Record<SettingsNavId, string>> = {
   headers: "Security headers were not saved. Your changes are still here. Review the values, then retry.",
   access: "Access settings were not saved. Your changes are still here. Review the values, then retry.",
 };
+
+/** Domains and Redirects act per row, straight to the server: a refused row
+ *  action is not a refused form, so it does not say "review the values". */
+export const ACTION_ERROR_MESSAGES = {
+  domains: "That domain change didn't go through. Try again.",
+  redirects: "That redirect change didn't go through. Try again.",
+} as const;
 
 /**
  * Workspace doors — dashboard pages, opened in a new tab. Only pages that

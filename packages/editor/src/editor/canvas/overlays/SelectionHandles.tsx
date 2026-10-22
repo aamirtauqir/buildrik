@@ -17,6 +17,8 @@ export interface SelectionHandlesProps {
   height: number;
   /** Callback when handle is dragged */
   onHandleMouseDown: (handle: HandlePosition, e: React.MouseEvent) => void;
+  /** Keyboard resize on a focused handle (BK-02): arrows by 1 px, ⇧ by 10. */
+  onHandleKeyResize?: (direction: "up" | "down" | "left" | "right", amount: number) => void;
 }
 
 const EDGE_SIZE = HANDLE_SIZE;
@@ -65,6 +67,13 @@ const edgeHandleStyle: React.CSSProperties = {
   borderRadius: "2px",
 };
 
+const ARROW_DIRECTIONS: Record<string, "up" | "down" | "left" | "right"> = {
+  ArrowUp: "up",
+  ArrowDown: "down",
+  ArrowLeft: "left",
+  ArrowRight: "right",
+};
+
 /**
  * SelectionHandles - Corner and edge resize handles
  */
@@ -74,7 +83,21 @@ export const SelectionHandles: React.FC<SelectionHandlesProps> = ({
   width,
   height,
   onHandleMouseDown,
+  onHandleKeyResize,
 }) => {
+  /* BK-02: Enter on a handle started a POINTER gesture from a keyboard event
+     with no coordinates — NaN sizes, saved and reloaded, and an open
+     transaction holding autosave. Arrows resize the focused element instead;
+     Enter and Space do nothing a handle cannot finish. */
+  const onKey = (e: React.KeyboardEvent) => {
+    const direction = ARROW_DIRECTIONS[e.key];
+    if (direction) {
+      e.preventDefault();
+      onHandleKeyResize?.(direction, e.shiftKey ? 10 : 1);
+    } else if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+    }
+  };
   /* 24 px, or what is left between the corner squares on a short element. */
   const sideEdgeHeight = Math.max(6, Math.min(24, height - SELECTION_HANDLE_SIZE * 2));
   return (
@@ -101,12 +124,7 @@ export const SelectionHandles: React.FC<SelectionHandlesProps> = ({
               pointerEvents: "auto",
             }}
             onMouseDown={(e) => onHandleMouseDown(handle, e)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                onHandleMouseDown(handle, e as unknown as React.MouseEvent);
-              }
-            }}
+            onKeyDown={onKey}
           />
         );
       })}
@@ -129,12 +147,7 @@ export const SelectionHandles: React.FC<SelectionHandlesProps> = ({
               pointerEvents: "auto",
             }}
             onMouseDown={(e) => onHandleMouseDown("n", e)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                onHandleMouseDown("n", e as unknown as React.MouseEvent);
-              }
-            }}
+            onKeyDown={onKey}
           />
           {/* S */}
           <div
@@ -151,12 +164,7 @@ export const SelectionHandles: React.FC<SelectionHandlesProps> = ({
               pointerEvents: "auto",
             }}
             onMouseDown={(e) => onHandleMouseDown("s", e)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                onHandleMouseDown("s", e as unknown as React.MouseEvent);
-              }
-            }}
+            onKeyDown={onKey}
           />
         </>
       )}
@@ -178,12 +186,7 @@ export const SelectionHandles: React.FC<SelectionHandlesProps> = ({
               pointerEvents: "auto",
             }}
             onMouseDown={(e) => onHandleMouseDown("w", e)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                onHandleMouseDown("w", e as unknown as React.MouseEvent);
-              }
-            }}
+            onKeyDown={onKey}
           />
           {/* E */}
           <div
@@ -200,12 +203,7 @@ export const SelectionHandles: React.FC<SelectionHandlesProps> = ({
               pointerEvents: "auto",
             }}
             onMouseDown={(e) => onHandleMouseDown("e", e)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                onHandleMouseDown("e", e as unknown as React.MouseEvent);
-              }
-            }}
+            onKeyDown={onKey}
           />
       </>
     </>

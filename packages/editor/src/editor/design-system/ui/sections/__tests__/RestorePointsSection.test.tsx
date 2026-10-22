@@ -44,7 +44,7 @@ describe("RestorePointsSection (BRP1-M10)", () => {
     api.rows = [];
     const u = render(<RestorePointsSection composer={null} />);
     expect(u.getByTestId("brand-restore-empty").textContent).toBe("No restore points yet");
-    expect(u.container.textContent).toContain("A restore point is created before a theme push, generator, dark-mode switch or logo import.");
+    expect(u.container.textContent).toContain("A restore point is saved before a theme push, a generator run, switching dark mode to Auto, or applying a brand from a logo or website.");
   });
 
   it("Restore restores once on a double click, says so, and refreshes the list", async () => {

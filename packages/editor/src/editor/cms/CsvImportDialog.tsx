@@ -88,7 +88,14 @@ export function CsvImportDialog({
   };
 
   const pickFile = async (file: File) => {
-    const text = await file.text();
+    let text: string;
+    try {
+      text = await file.text();
+    } catch {
+      /* C-19: an unreadable file was an unhandled rejection with no step change. */
+      setStep({ kind: "error", message: "Couldn't read this file." });
+      return;
+    }
     void runPreview(text);
   };
 

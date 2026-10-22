@@ -18,6 +18,7 @@
 import * as React from "react";
 import { Button, PanelHeader, SectionHeader, SkeletonBlock } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
+import { DataSourceConflictError } from "@/engine/data/DataManager";
 import type { ConditionExpression } from "@/shared/types/data";
 import {
   getCmsHydrationStatus,
@@ -26,6 +27,7 @@ import {
   type CmsHydrationStatus,
 } from "@/services/cmsSync";
 import { useContentPanel } from "./useContentPanel";
+import { isFeatureEnabled } from "@/shared/utils/featureFlags";
 import { cmsWorkspace, useCmsWorkspace } from "@/editor/cms/cmsWorkspaceStore";
 import {
   ConditionsView,
@@ -80,6 +82,10 @@ export const ContentTab: React.FC<ContentTabProps> = ({
   const panel = useContentPanel(composer);
   const workspace = useCmsWorkspace();
   const { view, setView, reload } = panel;
+  /* BD-39 (8): Data sources are session-only (nothing saves them), so they
+     are hidden this version unless the flag is on. This drawer is their one
+     door — RootView's row and its zero-state button. */
+  const showSources = isFeatureEnabled("cmsDataSources");
   const [pickedElementId, setPickedElementId] = React.useState<string | null>(null);
 
   // "+ New condition" pick flow — reuses the inspector's canvas pick mode.
@@ -106,8 +112,13 @@ export const ContentTab: React.FC<ContentTabProps> = ({
       composer.data.importSampleData(json);
       reload();
       return null;
-    } catch {
-      return "Not valid JSON — check the syntax and try again.";
+    } catch (err) {
+      if (err instanceof DataSourceConflictError) {
+        const names = err.ids.map((id) => `“${id}”`).join(", ");
+        return `${names} already ${err.ids.length === 1 ? "exists" : "exist"} as a source — rename ${err.ids.length === 1 ? "that key" : "those keys"} and try again. Nothing was added.`;
+      }
+      if (err instanceof SyntaxError) return "Not valid JSON — check the syntax and try again.";
+      return "Could not add the source — nothing was added.";
     }
   };
 
@@ -204,7 +215,7 @@ export const ContentTab: React.FC<ContentTabProps> = ({
         <RootView
           collections={panel.collections}
           recordCounts={panel.recordCounts}
-          sourcesCount={panel.sources.length}
+          sourcesCount={showSources ? panel.sources.length : 0}
           variablesCount={panel.variables.length}
           conditionsCount={panel.conditions.length}
           selectedCollectionId={workspace.collectionId}
@@ -212,7 +223,7 @@ export const ContentTab: React.FC<ContentTabProps> = ({
              the drawer; the drawer stays on its list. */
           onOpenCollection={(id) => cmsWorkspace.openCollection(id)}
           onCreateCollection={onCreateCollection}
-          onOpenSources={() => setView({ kind: "sources" })}
+          onOpenSources={showSources ? () => setView({ kind: "sources" }) : undefined}
           onOpenVariables={() => setView({ kind: "variables" })}
           onOpenConditions={() => setView({ kind: "conditions" })}
         />

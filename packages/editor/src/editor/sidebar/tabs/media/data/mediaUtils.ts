@@ -111,10 +111,10 @@ export function namePages(pages: string[]): string {
 }
 
 /** `v2 · Latest saved` / `v1 · Original` / `v2 · Saved` — a family member's
- * label, as the rail's VERSIONS rows and the Asset versions cards both print
- * it (Clone 3695:45529). `total` is the family's size: the highest index is
+ * label, as the rail's VERSIONS rows print it and the shared version list
+ * names each row (Clone 3695:45529). `total` is the family's size: the highest index is
  * the latest saved. */
-export function versionLabel(entry: VersionEntry, total: number): string {
+export function versionLabel(entry: Pick<VersionEntry, "index">, total: number): string {
   const kind = entry.index === 1 ? "Original" : entry.index === total ? "Latest saved" : "Saved";
   return `v${entry.index} · ${kind}`;
 }

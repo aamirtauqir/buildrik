@@ -37,7 +37,7 @@ describe("Clone 3737:44855 · Add locale", () => {
     expect(screen.getByTestId("set-loc-dialog-title")).toHaveTextContent("Add locale");
     expect(screen.getByTestId("set-loc-dialog-scope")).toHaveTextContent("Bella Cucina · Languages");
     expect(screen.getByTestId("set-loc-draft-note")).toHaveTextContent(
-      "Starts as a draft. Translate every required page before this locale can be published.",
+      "Starts as a draft. Only the default language publishes for now.",
     );
     const foot = screen.getByTestId("set-loc-dialog-foot");
     expect(foot.querySelectorAll("button")).toHaveLength(2);

@@ -1,7 +1,8 @@
 /**
- * B-1 fix — the real doors, not the hook in isolation: ⌘H (through
- * useEditorShortcuts) and UI_PANEL_OPEN (through useEditorEventListeners)
- * wired to the guarded sinks exactly as AquibraStudio wires them, with a
+ * B-1 fix — the real doors, not the hook in isolation: H (the rail letter,
+ * useSidebarKeyboard → ui:switch-tab, as LeftSidebar and StudioPanels route
+ * it; ⌘H was dropped by SC-12 / BD-39) and UI_PANEL_OPEN (through
+ * useEditorEventListeners) wired to the guarded sinks as AquibraStudio wires them, with a
  * dirty Settings entry in the shell registry → the confirm appears and the
  * tab does not change until "Leave and lose changes".
  *
@@ -14,6 +15,7 @@ import { shellDirty } from "../shellDirtyRegistry";
 import { useTabSwitchGuard } from "../hooks/useTabSwitchGuard";
 import { useEditorShortcuts } from "../hooks/useEditorShortcuts";
 import { useEditorEventListeners } from "../hooks/useEditorEventListeners";
+import { useSidebarKeyboard } from "@/editor/sidebar/useSidebarKeyboard";
 import { UnsavedTabSwitchDialog } from "../modals/UnsavedTabSwitchDialog";
 import { EVENTS } from "@/shared/constants/events";
 import type { Composer } from "@/engine/Composer";
@@ -56,12 +58,18 @@ function Harness({ composer }: { composer: ReturnType<typeof makeComposer> }) {
     setIsLeftPanelOpen: () => {},
   });
   const c = composer as unknown as Composer;
+  /* LeftSidebar: a rail letter emits ui:switch-tab; StudioPanels hands that
+     to the guarded setLeftPanelTab (AquibraStudio's onLeftPanelTabChange). */
+  useSidebarKeyboard((tab) => composer.emit(EVENTS.UI_SWITCH_TAB, { tab }));
+  const { setLeftPanelTab: guardedSet } = guarded;
+  React.useEffect(() => {
+    const onSwitch = (p?: unknown) => guardedSet((p as { tab: string }).tab);
+    composer.on(EVENTS.UI_SWITCH_TAB, onSwitch);
+    return () => composer.off(EVENTS.UI_SWITCH_TAB, onSwitch);
+  }, [composer, guardedSet]);
   useEditorShortcuts({
     composer: c,
     modals: { setShowShortcuts: vi.fn() },
-    saveProject: vi.fn(),
-    openLeftPanelToTab: guarded.openLeftPanelToTab,
-    openSiteSettings: () => guarded.openLeftPanelToTab("settings"),
   });
   useEditorEventListeners({
     composer: c,
@@ -94,11 +102,11 @@ describe("B-1 — real doors with a dirty Settings entry", () => {
     act(() => shellDirty.set("settings", false));
   });
 
-  it("⌘H prompts; the tab stays on Settings until Leave and lose changes", () => {
+  it("H prompts; the tab stays on Settings until Leave and lose changes", () => {
     act(() => shellDirty.set("settings", true));
     render(<Harness composer={makeComposer()} />);
     act(() => {
-      window.dispatchEvent(new KeyboardEvent("keydown", { key: "h", metaKey: true, cancelable: true, bubbles: true }));
+      window.dispatchEvent(new KeyboardEvent("keydown", { key: "h", cancelable: true, bubbles: true }));
     });
     expect(screen.getByTestId("tab-switch-unsaved")).toBeTruthy();
     expect(screen.getByTestId("tab").textContent).toBe("settings");
@@ -117,10 +125,10 @@ describe("B-1 — real doors with a dirty Settings entry", () => {
     expect(shellDirty.get()).toBe(true);
   });
 
-  it("clean registry: ⌘H switches straight through, no prompt", () => {
+  it("clean registry: H switches straight through, no prompt", () => {
     render(<Harness composer={makeComposer()} />);
     act(() => {
-      window.dispatchEvent(new KeyboardEvent("keydown", { key: "h", metaKey: true, cancelable: true, bubbles: true }));
+      window.dispatchEvent(new KeyboardEvent("keydown", { key: "h", cancelable: true, bubbles: true }));
     });
     expect(screen.queryByTestId("tab-switch-unsaved")).toBeNull();
     expect(screen.getByTestId("tab").textContent).toBe("history");

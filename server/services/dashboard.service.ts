@@ -4,7 +4,6 @@ import { isFeatureEnabled } from "@/server/services/feature-flag.service";
 import { siteScopeWhere } from "@/server/services/permission.service";
 import type {
   DashboardStats,
-  RecentSite,
   ActivityFeed,
   WorkspaceHealth,
 } from "@buildrik/shared/schemas/dashboard";
@@ -110,31 +109,6 @@ export async function getDashboardStats(
   };
 }
 
-export async function getRecentSites(
-  workspaceId: string,
-  userId: string,
-  limit = 4
-): Promise<RecentSite[]> {
-  const scope = await siteScopeWhere(prisma, userId, workspaceId);
-  const sites = await prisma.site.findMany({
-    where: { workspaceId, deletedAt: null, ...scope },
-    orderBy: { lastEditedAt: "desc" },
-    take: limit,
-    select: {
-      id: true,
-      name: true,
-      slug: true,
-      status: true,
-      thumbnail: true,
-      pages: true,
-      lastEditedAt: true,
-      publishedUrl: true,
-    },
-  });
-
-  return sites as RecentSite[];
-}
-
 export async function getActivityFeed(
   workspaceId: string,
   options: { userId?: string; excludeUserId?: string; limit?: number; offset?: number } = {}
@@ -219,136 +193,6 @@ export async function getActivityFeed(
     .map((label) => ({ label, entries: buckets[label] }));
 
   return { groups };
-}
-
-interface QuickActionInput {
-  siteCount: number;
-  hasPendingInvites: boolean;
-  isNearLimit: boolean;
-  isDunning: boolean;
-}
-
-interface QuickAction {
-  label: string;
-  href: string;
-  icon: string;
-  description: string;
-}
-
-export function getQuickActions(input: QuickActionInput): QuickAction[] {
-  if (input.isDunning) {
-    return [
-      {
-        label: "Update Payment",
-        href: "/dashboard/billing",
-        icon: "CreditCard",
-        description: "Update your payment method",
-      },
-      {
-        label: "View Billing",
-        href: "/dashboard/billing?tab=overview",
-        icon: "BarChart3",
-        description: "Review your billing details",
-      },
-      {
-        label: "Manage Sites",
-        href: "/dashboard/sites",
-        icon: "Settings",
-        description: "Manage your existing sites",
-      },
-      {
-        label: "Contact Support",
-        href: "/dashboard/help",
-        icon: "Headphones",
-        description: "Get help from our team",
-      },
-    ];
-  }
-
-  if (input.isNearLimit) {
-    return [
-      {
-        label: "New Site",
-        href: "/dashboard/sites/new",
-        icon: "Plus",
-        description: "Create a new site",
-      },
-      {
-        label: "Upgrade Plan",
-        href: "/dashboard/billing",
-        icon: "CreditCard",
-        description: "Unlock more sites and features",
-      },
-      {
-        label: "Manage Sites",
-        href: "/dashboard/sites",
-        icon: "Settings",
-        description: "Manage your existing sites",
-      },
-      {
-        label: "View Usage",
-        href: "/dashboard/billing?tab=usage",
-        icon: "BarChart3",
-        description: "Check your resource usage",
-      },
-    ];
-  }
-
-  if (input.siteCount === 0) {
-    return [
-      {
-        label: "Create Site",
-        href: "/dashboard/sites/new",
-        icon: "Plus",
-        description: "Build your first site",
-      },
-      {
-        label: "Set Up Profile",
-        href: "/dashboard/settings",
-        icon: "User",
-        description: "Complete your workspace profile",
-      },
-      {
-        label: "Explore Templates",
-        href: "/dashboard/sites/new?method=template",
-        icon: "LayoutTemplate",
-        description: "Start from a template",
-      },
-      {
-        label: "Invite Team",
-        href: "/dashboard/team",
-        icon: "UserPlus",
-        description: "Invite collaborators to your workspace",
-      },
-    ];
-  }
-
-  return [
-    {
-      label: "New Site",
-      href: "/dashboard/sites/new",
-      icon: "Plus",
-      description: "Create a new site",
-    },
-    {
-      label: "View Analytics",
-      href: "/dashboard/sites?view=analytics",
-      icon: "BarChart3",
-      description: "Check your site performance",
-    },
-    {
-      label: "Manage Domains",
-      href: "/dashboard/sites?view=domains",
-      icon: "Globe",
-      description: "Configure custom domains",
-    },
-    {
-      label: "Invite Member",
-      href: "/dashboard/team",
-      icon: "UserPlus",
-      description: "Add a team member",
-    },
-  ];
 }
 
 export async function getWorkspaceHealth(

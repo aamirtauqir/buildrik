@@ -7,7 +7,7 @@
  * "No pages yet" survived for months (PageList.test.tsx:55).
  *
  * What it protects now: the frame every board shares (the status line, the
- * ⋯ menu's Compare rounds / Round history, one primary button whose label is
+ * ⋯ menu's Compare with approved / Round history, one primary button whose label is
  * the state), the bodies that differ per board, and the behaviours the boards
  * imply — the re-send confirm REPLACING the primary, the revoke confirm being
  * inline and race-safe, resolve reaching the canvas.
@@ -112,11 +112,11 @@ describe("the frame every board shares (board 4418:115784)", () => {
     expect(screen.queryByRole("button", { name: /previous round|next round/i })).not.toBeInTheDocument();
   });
 
-  it("the panel ⋯ holds Compare rounds and Round history ›, as board 7071:79114 draws", async () => {
+  it("the panel ⋯ holds Compare with approved and Round history ›, as board 7071:79114 draws", async () => {
     const emit = vi.fn();
     renderTab({ composer: { on: vi.fn(), off: vi.fn(), emit, elements: { getAllPages: () => [] } } });
     fireEvent.click(await screen.findByTestId("review-round-menu"));
-    fireEvent.click(await screen.findByRole("menuitem", { name: "Compare rounds" }));
+    fireEvent.click(await screen.findByRole("menuitem", { name: "Compare with approved" }));
     expect(emit).toHaveBeenCalledWith("ui:compare-open", expect.objectContaining({ left: { kind: "approved" }, right: { kind: "current" } }));
     fireEvent.click(screen.getByTestId("review-round-menu"));
     expect(await screen.findByRole("menuitem", { name: "Round history ›" })).toBeInTheDocument();
@@ -295,6 +295,15 @@ describe("actions", () => {
     await waitFor(() => expect(resolveReviewComment).toHaveBeenCalledWith("c1", "RESOLVED"));
   });
 
+  it("a failed refresh after resolving says the list is stale (R-2)", async () => {
+    renderTab();
+    await screen.findByText(/hero photo is too dark/);
+    fetchReviewComments.mockRejectedValueOnce(new Error("network"));
+    const row = screen.getByText(/hero photo is too dark/).closest("[data-comment-row]") as HTMLElement;
+    fireEvent.click(within(row).getByRole("button", { name: /resolve/i }));
+    expect(await screen.findByText(/comment list didn't refresh/)).toBeInTheDocument();
+  });
+
   /* The canvas draws these same comments as pins and refetches on
      "comments:refresh". Nothing emitted it, so resolving greyed the row here
      and left the pin on the canvas open. */
@@ -321,6 +330,17 @@ describe("actions", () => {
     expect(onResend).not.toHaveBeenCalled();
     fireEvent.click(screen.getByRole("button", { name: "Send new review" }));
     await waitFor(() => expect(onResend).toHaveBeenCalled());
+  });
+
+  /* R1 R-1: a refused re-send used to be an unhandled rejection with no message. */
+  it("a failed re-send says so", async () => {
+    const onResend = vi.fn(() => Promise.reject(new Error("FORBIDDEN")));
+    renderTab({ onResend });
+    await screen.findByText(/hero photo is too dark/);
+    fireEvent.click(screen.getByTestId("review-round-menu"));
+    fireEvent.click(await screen.findByRole("menuitem", { name: "Re-send review link" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Send new review" }));
+    expect(await screen.findByText("Couldn't re-send. Try again.")).toBeInTheDocument();
   });
 
   /* Board 158:57 — while it is in flight the panel says which round is being
@@ -412,7 +432,7 @@ describe("actions", () => {
     fetchReviewComments.mockResolvedValue([]);
     renderTab({ onResend: undefined });
     fireEvent.click(await screen.findByTestId("review-round-menu"));
-    await screen.findByRole("menuitem", { name: "Compare rounds" });
+    await screen.findByRole("menuitem", { name: "Compare with approved" });
     expect(screen.queryByTestId("review-menu-resend")).not.toBeInTheDocument();
   });
 

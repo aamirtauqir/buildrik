@@ -53,6 +53,9 @@ export function RenameAssetModal({ item, libraryItems, onRename, onClose }: Rena
   const display = item.displayName ?? item.name;
   const [draft, setDraft] = React.useState(display);
   const [taken, setTaken] = React.useState(false);
+  /* The server refused the name (REA 2026-10-20 #14): the engine kept the
+     old one, so the modal stays open and says so instead of closing. */
+  const [failed, setFailed] = React.useState(false);
   const inputRef = React.useRef<HTMLInputElement>(null);
 
   /* Focus lands with the stem selected, so typing replaces the name and
@@ -80,7 +83,8 @@ export function RenameAssetModal({ item, libraryItems, onRename, onClose }: Rena
       setTaken(true);
       return;
     }
-    void onRename(item.key, stored).then(onClose);
+    setFailed(false);
+    void onRename(item.key, stored).then(onClose, () => setFailed(true));
   };
 
   if (taken) {
@@ -131,6 +135,11 @@ export function RenameAssetModal({ item, libraryItems, onRename, onClose }: Rena
             aria-label="File name"
             data-testid="mgr-rename-input"
           />
+          {failed && (
+            <p role="alert" className="tw:m-0 tw:mt-2 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-error)]" data-testid="mgr-rename-failed">
+              The new name was not saved — the server did not accept the change. The file keeps its old name. Try again.
+            </p>
+          )}
         </ModalBody>
         <div className={LIBRARY_MODAL_FOOT} data-testid="mgr-rename-foot">
           <Button size="xs" variant="secondary" className={LIBRARY_MODAL_BTN_GHOST} data-testid="mgr-rename-cancel" onClick={onClose}>

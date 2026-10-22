@@ -93,22 +93,6 @@ describe("composer.designSystem.setTokens", () => {
 });
 
 describe("token write paths route through setTokens (read-only refuses them all)", () => {
-  it("setDesignToken writes one step and refuses while read-only", () => {
-    const c = withTokens();
-    expect(c.designSystem.setDesignToken("color-primary", "#C2410C")).toBe("#C2410C");
-    expect(primary(c)).toBe("#C2410C");
-
-    c.designSystem.readOnly = true;
-    expect(c.designSystem.setDesignToken("color-primary", "#111111")).toBeNull();
-    expect(primary(c)).toBe("#C2410C");
-  });
-
-  it("setDesignToken edits a fresh site (no saved tokens) over the seed", () => {
-    const c = new Composer({} as never);
-    expect(c.designSystem.setDesignToken("color-primary", "#C2410C")).toBe("#C2410C");
-    expect(primary(c)).toBe("#C2410C");
-  });
-
   it("applyAutoFix refuses while read-only", () => {
     const c = withTokens();
     const before = c.getProjectSettings().designTokens;

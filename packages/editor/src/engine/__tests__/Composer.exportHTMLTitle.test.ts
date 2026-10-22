@@ -19,7 +19,7 @@ function composerWithPage(page: unknown): Composer {
   const c = Object.create(Composer.prototype) as Composer;
   Object.assign(c, {
     elements: { toHTML: () => "<div>hi</div>", getActivePage: () => page },
-    styles: { toCSS: () => "" },
+    styles: { generateResponsiveCSS: () => "" },
     getProjectSettings: () => ({}),
   });
   return c;

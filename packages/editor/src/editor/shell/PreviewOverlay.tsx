@@ -1,11 +1,17 @@
 /**
  * PreviewOverlay — in-shell preview (Figma shell state 7, board 65:211).
  *
- * The topbar stays; everything below it is replaced by a clean, sandboxed
- * render of the sanitized page HTML; "‹ Back to canvas" (or Esc) exits.
- * Replaces the old pop-up-window preview (which could be blocked and lost
- * the shell context). Same sanitize path as before — the iframe is fully
- * sandboxed and the HTML has been through sanitizeHTMLForPreview.
+ * The topbar stays; everything below it is replaced by a sandboxed render of
+ * the sanitized page HTML; "‹ Back to canvas" (or Esc) exits. Replaces the
+ * old pop-up-window preview (which could be blocked and lost the shell
+ * context). The HTML has been through sanitizeHTMLForPreview.
+ *
+ * BD-34 (2026-10-20): the frame RUNS scripts, so interactions behave as
+ * published — `sandbox="allow-scripts"` and never `allow-same-origin`, so the
+ * page gets an opaque origin: no editor cookies, storage or DOM. The only
+ * scripts in it are the editor's own: the interaction runtime (when the page
+ * uses interactions) and a bridge that posts Escape and link clicks up, since
+ * the shell can no longer reach into the frame.
  *
  * Board 807:8663 (`S3.8 · preview-responsive · mobile-device-frame`) adds the
  * responsive half: a device row under the topbar and, on a narrow device, the
@@ -35,18 +41,31 @@ import * as React from "react";
 import type { DeviceType } from "@/shared/types";
 import { Button, BreakpointSwitcher, Select, type Breakpoint } from "@/editor/chrome-ui";
 import { isModalOpen } from "@/editor/chrome-ui";
+import { writeClipboardText } from "@buildrik/shared/browser/clipboard";
+import { buildInteractionRuntimeScript, INTERACTION_ATTR } from "@/engine/export/interactionRuntime";
+import { injectPageRuntimes } from "@/engine/export/publishPostProcess";
 import { DeviceFramePreview } from "../canvas/DeviceFramePreview";
 import { PreviewShareModal } from "./PreviewShareModal";
+import { PreviewNotices } from "./PreviewNotices";
 
 interface PreviewOverlayProps {
-  /** Sanitized page HTML. null → overlay hidden. */
+  /** Sanitized page HTML of a finished build. null with no `status` → hidden. */
   html: string | null;
+  /** Unpublished records the page's collection lists leave out (REA #18). */
+  hiddenDrafts?: number;
+  /** Design decision 9: the build is running, or it failed. A preview that
+   *  failed used to show nothing at all — the promise rejected silently. */
+  status?: "building" | "error";
+  /** The failure's short cause. */
+  error?: string;
+  /** Failed builds in a row: the second says "Still failing". */
+  attempts?: number;
+  onRetry?: () => void;
   onDone: () => void;
   /** The site whose share link the Share button mints; no site, no button. */
   siteId?: string | null;
   /** Named in the share dialog (board 4418:165739). */
   siteName?: string | null;
-  pageName?: string | null;
   /** The site's pages: the preview's page menu, and where its internal links
    *  go (L5-051 — it showed one page, and a link blanked the frame). */
   pages?: ReadonlyArray<{ id: string; name: string; slug?: string; isHome?: boolean }>;
@@ -66,6 +85,42 @@ function pageForHref(
   const path = raw.split(/[?#]/)[0].replace(/^\.?\//, "").replace(/\/+$/, "").replace(/\.html$/i, "");
   if (path === "" || path === "index") return pages.find((p) => p.isHome)?.id ?? pages[0]?.id ?? null;
   return pages.find((p) => p.slug === path)?.id ?? null;
+}
+
+/** Tag on the frame bridge's messages. */
+const BRIDGE_SOURCE = "bk-preview";
+
+/* Runs inside the opaque-origin frame. Escape and link clicks never reach the
+   shell's listeners there, so the bridge posts them up; a click a site script
+   already handled (defaultPrevented) is left alone. */
+const BRIDGE_SCRIPT =
+  "<script>(function(){" +
+  `function post(m){m.source=${JSON.stringify(BRIDGE_SOURCE)};parent.postMessage(m,"*");}` +
+  'document.addEventListener("keydown",function(e){if(e.key==="Escape")post({type:"escape"});},true);' +
+  'document.addEventListener("click",function(e){if(e.defaultPrevented)return;var t=e.target,a=t&&t.closest?t.closest("a[href]"):null;' +
+  'if(!a)return;var h=a.getAttribute("href")||"";if(h.charAt(0)==="#")return;e.preventDefault();post({type:"link",href:h});});' +
+  "})();</script>";
+
+/* An image with no file chosen drew the browser's broken-image glyph and its
+   alt text; the canvas draws a placeholder box there, and so does the preview
+   (`content` replaces the glyph, as Canvas.css does).
+   PreviewNotices says the published site will not (REA #18). */
+const EMPTY_IMAGE_STYLE =
+  '<style>img:not([src]),img[src=""]{display:inline-block;min-width:120px;min-height:80px;' +
+  "content:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E\");background:rgba(128,128,128,.12);" +
+  "outline:1px dashed rgba(128,128,128,.5);outline-offset:-1px}</style>";
+
+/** The frame's document: the sanitized page plus the editor's own scripts,
+ *  before `</body>` when there is one — the widget runtimes the published page
+ *  gets (`injectPageRuntimes`, the publish post-process step), the interaction
+ *  runtime and the bridge — and the empty-image placeholder before `</head>`. */
+function previewDocument(sanitized: string): string {
+  const head = sanitized.indexOf("</head>");
+  const styled = head < 0 ? sanitized + EMPTY_IMAGE_STYLE : sanitized.slice(0, head) + EMPTY_IMAGE_STYLE + sanitized.slice(head);
+  const html = injectPageRuntimes(styled);
+  const scripts = (html.includes(INTERACTION_ATTR) ? buildInteractionRuntimeScript() : "") + BRIDGE_SCRIPT;
+  const end = html.lastIndexOf("</body>");
+  return end < 0 ? html + scripts : html.slice(0, end) + scripts + html.slice(end);
 }
 
 /* Board 4418:165611 (C5 G1-086): the preview is full-screen with its own
@@ -108,42 +163,67 @@ const SCREEN_FRAME_CLASS = "tw:w-full tw:h-full tw:border-0 tw:bg-[var(--bk-bg-e
 
 export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({
   html,
+  hiddenDrafts = 0,
+  status,
+  error,
+  attempts = 0,
+  onRetry,
   onDone,
   siteId,
   siteName,
-  pageName,
   pages = [],
   currentPageId,
   onShowPage,
 }) => {
   const [device, setDevice] = React.useState<Breakpoint>("desktop");
   const [shareOpen, setShareOpen] = React.useState(false);
+  /* S-8: the copy said nothing either way; the button now answers. */
+  const [errorCopied, setErrorCopied] = React.useState<boolean | null>(null);
   const pagesRef = React.useRef(pages);
   pagesRef.current = pages;
   const showPageRef = React.useRef(onShowPage);
   showPageRef.current = onShowPage;
 
-  /* Links in the frame. Nothing in it runs (no allow-scripts), so the shell
-     answers its clicks: a page of this site opens in the preview, another
-     site opens in a new tab, anything else stays put — it used to navigate
-     the srcdoc frame to nothing (L5-051). */
-  const onFrameLoad = React.useCallback((e: React.SyntheticEvent<HTMLIFrameElement>) => {
-    const doc = e.currentTarget.contentDocument;
-    if (!doc) return;
-    doc.addEventListener("click", (ev) => {
-      const link = (ev.target as Element | null)?.closest?.("a[href]");
-      if (!link) return;
-      const href = link.getAttribute("href") ?? "";
-      if (href.startsWith("#")) return;
-      ev.preventDefault();
-      const pageId = pageForHref(href, pagesRef.current);
-      if (pageId) showPageRef.current?.(pageId);
-      else if (/^https?:\/\//i.test(href)) window.open(href, "_blank", "noopener,noreferrer");
-    });
-  }, []);
+  const open = html != null || status != null;
+  const frameRef = React.useRef<HTMLIFrameElement>(null);
+  const srcDoc = React.useMemo(() => (html == null ? "" : previewDocument(html)), [html]);
+
+  /* The frame bridge's messages — only from this frame (site scripts run in
+     it, so the content is untrusted: it can close the preview, show a page
+     of this site, or open an http(s) link in a new tab, nothing else).
+     Decision 9: Escape closes even with focus inside the frame. Links: a
+     page of this site opens in the preview, another site in a new tab,
+     anything else stays put — it used to navigate the srcdoc frame to
+     nothing (L5-051). */
+  React.useEffect(() => {
+    if (!open) return;
+    const onMessage = (e: MessageEvent) => {
+      if (!frameRef.current || e.source !== frameRef.current.contentWindow) return;
+      const data: unknown = e.data;
+      if (typeof data !== "object" || data === null || (data as { source?: unknown }).source !== BRIDGE_SOURCE) return;
+      const { type, href } = data as { type?: unknown; href?: unknown };
+      if (type === "escape") {
+        if (!isModalOpen()) onDone();
+      } else if (type === "link" && typeof href === "string") {
+        const pageId = pageForHref(href, pagesRef.current);
+        if (pageId) showPageRef.current?.(pageId);
+        else if (/^https?:\/\//i.test(href)) window.open(href, "_blank", "noopener,noreferrer");
+      }
+    };
+    window.addEventListener("message", onMessage);
+    return () => window.removeEventListener("message", onMessage);
+  }, [open, onDone]);
+  const headingRef = React.useRef<HTMLHeadingElement>(null);
+  const backRef = React.useRef<HTMLButtonElement>(null);
+  /* Focus lands on what the overlay is saying: the state heading while it
+     builds or failed, the way back once the page is up. */
+  React.useEffect(() => {
+    if (!open) return;
+    (status ? headingRef.current : backRef.current)?.focus({ preventScroll: true });
+  }, [open, status]);
 
   React.useEffect(() => {
-    if (html == null) return;
+    if (!open) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
       /* The Share modal's own trap answers Escape (focus.ts `isModalOpen`
@@ -157,9 +237,9 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({
     };
     window.addEventListener("keydown", onKey, true);
     return () => window.removeEventListener("keydown", onKey, true);
-  }, [html, onDone]);
+  }, [open, onDone]);
 
-  if (html == null) return null;
+  if (!open) return null;
 
   /* `wide` and `desktop` have no bezel — DeviceFramePreview passes children
      straight through for them, which is also what `active` says here. */
@@ -173,7 +253,7 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({
       className={REGION_CLASS}
     >
       <div className={DEVICE_BAR_CLASS}>
-        <Button color="light" size="xs" onClick={onDone} className={BACK_CLASS} data-testid="preview-back">
+        <Button ref={backRef} color="light" size="xs" onClick={onDone} className={BACK_CLASS} data-testid="preview-back">
           ‹ Back to canvas
         </Button>
         <div className={DEVICE_BAR_INNER_CLASS}>
@@ -202,21 +282,64 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({
           )}
         </div>
       </div>
+      {!status && html != null && <PreviewNotices html={html} hiddenDrafts={hiddenDrafts} />}
       <div className={STAGE_CLASS}>
+        {status ? (
+          /* Never the last page's output: a stale frame read as the current
+             build (decision 9). */
+          <div className="tw:m-auto tw:flex tw:max-w-[420px] tw:flex-col tw:items-start tw:gap-2 tw:p-6" data-testid={`preview-${status}`}>
+            <h2
+              ref={headingRef}
+              tabIndex={-1}
+              className="tw:m-0 tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:text-[var(--bk-ink)] tw:outline-none"
+            >
+              {status === "building" ? "Building preview…" : attempts > 1 ? "Still failing" : "Preview couldn’t be built"}
+            </h2>
+            {status === "error" && (
+              <>
+                {error && <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-soft)]">{error}</p>}
+                <div className="tw:mt-2 tw:flex tw:gap-2">
+                  <Button size="xs" data-testid="preview-retry" onClick={onRetry}>
+                    Try again
+                  </Button>
+                  {attempts > 1 && error && (
+                    <Button
+                      size="xs"
+                      color="light"
+                      data-testid="preview-copy-error"
+                      onClick={() =>
+                        void writeClipboardText(error).then(
+                          () => setErrorCopied(true),
+                          () => setErrorCopied(false),
+                        )
+                      }
+                    >
+                      {errorCopied ? "Copied ✓" : errorCopied === false ? "Couldn't copy" : "Copy error details"}
+                    </Button>
+                  )}
+                  <Button size="xs" color="light" data-testid="preview-back-to-editor" onClick={onDone}>
+                    Back to editor
+                  </Button>
+                </div>
+              </>
+            )}
+          </div>
+        ) : (
         <DeviceFramePreview device={device as DeviceType} active={framed}>
           <iframe
+            ref={frameRef}
             title="Site preview"
-            /* No allow-scripts: nothing in the frame runs. allow-same-origin
-               only lets onFrameLoad answer its link clicks. */
-            sandbox="allow-same-origin"
-            srcDoc={html}
-            onLoad={onFrameLoad}
+            /* BD-34: scripts run, in an opaque origin — never add
+               allow-same-origin (it would hand site scripts the editor). */
+            sandbox="allow-scripts"
+            srcDoc={srcDoc}
             className={framed ? SCREEN_FRAME_CLASS : PAGE_FRAME_CLASS}
           />
         </DeviceFramePreview>
+        )}
       </div>
       {siteId && shareOpen && (
-        <PreviewShareModal open={shareOpen} onOpenChange={setShareOpen} siteId={siteId} siteName={siteName} pageName={pageName} />
+        <PreviewShareModal open={shareOpen} onOpenChange={setShareOpen} siteId={siteId} siteName={siteName} />
       )}
     </div>
   );

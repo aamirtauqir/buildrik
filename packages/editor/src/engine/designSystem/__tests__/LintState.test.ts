@@ -29,10 +29,35 @@ describe("LintState", () => {
     expect(state.isSuppressed("color.brand.primary")).toBe(false);
   });
 
-  it("persists suppression to localStorage", () => {
+  it("persists suppression per site", () => {
+    state.setSite("site-a");
     state.suppress("color.accent.yellow");
-    const next = new LintState();
-    expect(next.isSuppressed("color.accent.yellow")).toBe(true);
+    const sameSite = new LintState();
+    sameSite.setSite("site-a");
+    expect(sameSite.isSuppressed("color.accent.yellow")).toBe(true);
+  });
+
+  it("does not leak an Ignore to another site (B-1)", () => {
+    state.setSite("site-a");
+    state.suppress("color.accent.yellow");
+    const other = new LintState();
+    other.setSite("site-b");
+    expect(other.isSuppressed("color.accent.yellow")).toBe(false);
+    state.setSite("site-b");
+    expect(state.isSuppressed("color.accent.yellow")).toBe(false);
+  });
+
+  it("drops the old global list instead of applying it to a site", () => {
+    localStorage.setItem("buildrik:ds:lintSuppressions", JSON.stringify(["color.accent.yellow"]));
+    state.setSite("site-a");
+    expect(state.isSuppressed("color.accent.yellow")).toBe(false);
+    expect(localStorage.getItem("buildrik:ds:lintSuppressions")).toBeNull();
+  });
+
+  it("keeps suppressions in memory only until a site is set", () => {
+    state.suppress("color.accent.yellow");
+    expect(state.isSuppressed("color.accent.yellow")).toBe(true);
+    expect(localStorage.length).toBe(0);
   });
 
   it("returns visible issues (excludes suppressed)", () => {
@@ -57,8 +82,7 @@ describe("LintState", () => {
 /* Board 306:2217 draws a "Warnings suppressed" pill on the Brand root, and
    nothing could answer it — suppression was reachable and then invisible. */
 describe("LintState — how many tokens are hiding their warnings", () => {
-  /* Suppressions persist to localStorage and the constructor reads them back,
-     so a fresh instance is only fresh if the store is. */
+  /* Suppressions persist to localStorage per site; keep the store clean. */
   beforeEach(() => localStorage.clear());
 
   it("counts nothing when nothing is suppressed", () => {

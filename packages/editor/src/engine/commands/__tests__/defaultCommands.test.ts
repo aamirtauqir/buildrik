@@ -198,11 +198,46 @@ describe("clipboard", () => {
 
     run("paste");
 
-    expect(composer.elements.pasteElement).toHaveBeenCalledWith(
-      composer.clipboard![0],
-      target,
-      undefined,
-    );
+    expect(composer.elements.pasteElement).toHaveBeenCalledWith(composer.clipboard![0], target, 0);
+  });
+
+  /* Audit 2026-10-20 #15 (Webflow): a selected container takes the paste as
+     its LAST child; a selected non-container gets it as the next sibling —
+     even one the rules let hold it (a Button may hold an Image). */
+  it("pastes as the LAST child of a selected container", () => {
+    composer.clipboard = [{ type: "heading" }];
+    const box = makeElement("box", "container");
+    box.getChildren = () => [makeElement("a", "paragraph"), makeElement("b", "paragraph")];
+    composer.selection.getSelected.mockReturnValue(box);
+
+    run("paste");
+
+    expect(composer.elements.pasteElement).toHaveBeenCalledWith(composer.clipboard![0], box, 2);
+  });
+
+  it("pastes an Image AFTER a selected Button, not inside it", () => {
+    composer.clipboard = [{ type: "image" }];
+    const button = makeElement("btn", "button");
+    const parent = makeElement("el-parent", "container");
+    button.getParent = () => parent;
+    parent.getChildren = () => [button, makeElement("p", "paragraph")];
+    composer.selection.getSelected.mockReturnValue(button);
+
+    run("paste");
+
+    expect(composer.elements.pasteElement).toHaveBeenCalledWith(composer.clipboard![0], parent, 1);
+  });
+
+  it("keeps a multi-item paste into a container in clipboard order", () => {
+    composer.clipboard = [{ type: "heading" }, { type: "paragraph" }];
+    const box = makeElement("box", "container");
+    box.getChildren = () => [makeElement("a", "paragraph")];
+    composer.selection.getSelected.mockReturnValue(box);
+
+    run("paste");
+
+    expect(composer.elements.pasteElement).toHaveBeenNthCalledWith(1, composer.clipboard![0], box, 1);
+    expect(composer.elements.pasteElement).toHaveBeenNthCalledWith(2, composer.clipboard![1], box, 2);
   });
 
   it("pastes AFTER a leaf that cannot hold it, not inside it", () => {
@@ -451,11 +486,6 @@ describe("selection + toggles", () => {
     const ids = buildDefaultCommands(composer as unknown as Composer).map((c) => c.id);
     expect(ids).not.toContain("toggle-snap-to-grid");
   });
-
-  it("ui-open-* commands emit their toggle events on the captured composer", () => {
-    run("ui-open-ai");
-    expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_TOGGLE_AI);
-  });
 });
 
 describe("nudge guard", () => {
@@ -476,19 +506,12 @@ describe("nudge guard", () => {
   });
 });
 
+/* R1 I-2: the palette's Export HTML / Export JSON rows computed the export and
+   threw it away. Exporting is the exporter modal's job ("Open exporter"). */
 describe("export commands", () => {
-  it("export-html and export-json delegate to composer exporters", () => {
-    run("export-html");
-    expect(composer.exportHTML).toHaveBeenCalled();
-    run("export-json");
-    expect(composer.exportJSON).toHaveBeenCalled();
-  });
-
-  it("export-html / export-json carry no shortcut (keyboard-unreachable)", () => {
-    // Documented state backing the CommandCenter AUDIT it.todo: without a
-    // shortcut AND without any UI caller these registrations are dead.
-    expect(byId.get("export-html")?.shortcut).toBeUndefined();
-    expect(byId.get("export-json")?.shortcut).toBeUndefined();
+  it("registers no export rows that discard their output", () => {
+    expect(byId.has("export-html")).toBe(false);
+    expect(byId.has("export-json")).toBe(false);
   });
 });
 

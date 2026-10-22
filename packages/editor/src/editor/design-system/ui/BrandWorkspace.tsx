@@ -44,7 +44,7 @@
 import * as React from "react";
 import { BRAND_READ_ONLY_COPY, BRAND_READ_ONLY_FAILED_COPY } from "@/shared/constants/brandReadOnly";
 import { ChevronLeft } from "lucide-react";
-import { Button, IconButton, Menu, MenuItem, MenuLabel, MenuSeparator, Popover, Select, Tooltip, useToast } from "@/editor/chrome-ui";
+import { Button, IconButton, Menu, MenuItem, MenuLabel, MenuSeparator, Popover, Select, useToast } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine/Composer";
 import { EVENTS } from "@/shared/constants/events";
 import { resolveTokenLiteral, setTokenLiteral } from "@buildrik/shared/tokens";
@@ -75,7 +75,6 @@ import type { DesignToken, StylePreset, TokenKind } from "../types";
 import type { TokensForKindRegistry } from "../state/kindRegistry";
 import { generateColorTokenId, generateColorCssVar } from "../utils/exportUtils";
 import { DSModeProvider, useDSModeOptional } from "../state/DSModeContext";
-import { AIPromptModal } from "./AIPromptModal";
 import { TokenAddDialog } from "./modals/TokenAddDialog";
 import { SessionEditsPopover } from "./SessionEditsPopover";
 import { BrandPreview } from "./BrandPreview";
@@ -276,7 +275,6 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
   });
   const [showAddToken, setShowAddToken] = React.useState(false);
   const [spacingMenuOpen, setSpacingMenuOpen] = React.useState(false);
-  const [aiOpen, setAiOpen] = React.useState(false);
   const [classAddOpen, setClassAddOpen] = React.useState(false);
 
   /* What the live preview SHOWS (BRP1-M8): the Brand preview layer's tokens
@@ -294,6 +292,17 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
       composer.off(EVENTS.BRAND_PREVIEW_CHANGED, sync);
     };
   }, [composer]);
+  /* D36: ⌘Z here undoes Brand edits only. When the next undo is a canvas
+     change, say so instead of reverting something out of sight. */
+  React.useEffect(() => {
+    if (!composer || typeof composer.on !== "function") return;
+    const outOfScope = () =>
+      addToast({ description: "Nothing to undo in Brand. Canvas edits undo on the canvas.", tone: "info" });
+    composer.on(EVENTS.HISTORY_UNDO_OUT_OF_SCOPE, outOfScope);
+    return () => {
+      composer.off(EVENTS.HISTORY_UNDO_OUT_OF_SCOPE, outOfScope);
+    };
+  }, [composer, addToast]);
   const shownMode: "light" | "dark" = canvasPreview?.theme ?? "light";
   /* L4-021: the Light / Dark switch is PREVIEW-ONLY — a dark preview of the
      saved brand through the preview layer: never saved, never in ⌘Z, gone
@@ -387,7 +396,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
   React.useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
-      if (showAddToken || aiOpen || classAddOpen) return;
+      if (showAddToken || classAddOpen) return;
       /* An open popover, menu or dialog owns this Escape (the token card's ⋯
          menu, the font picker, the rename / replace dialogs). Leaving the
          workspace on the same keypress that closed a menu was found live. */
@@ -403,7 +412,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
        unmounts it before a later listener could see it was open. */
     window.addEventListener("keydown", handler, true);
     return () => window.removeEventListener("keydown", handler, true);
-  }, [showAddToken, aiOpen, classAddOpen, requestLeave]);
+  }, [showAddToken, classAddOpen, requestLeave]);
 
   // ─ Pane content ─
   const visibleColors = filterTokensByMode(color.tokens ?? [], isBeginner ? "beginner" : "pro");
@@ -509,17 +518,19 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
   }, [requestedToken, allTokens]);
   /* A value edit — light, and the dark value when the card sets one — is ONE
      write, so ⌘Z undoes it in one step (and Review changes lists one row). */
-  const changeToken = (id: string, value: string, darkValue?: string) => {
+  const changeToken = (id: string, value: string, darkValue?: string): boolean => {
     const tok = tokenById(id);
-    if (!tok) return;
+    if (!tok) return false;
     let next = allTokens;
     const write = (mode: "light" | "dark", v: string) => {
       if ((resolveTokenLiteral(next, id, mode) ?? "") !== v) next = setTokenLiteral(next, id, mode, v);
     };
     write("light", value);
     if (darkValue !== undefined) write("dark", darkValue);
-    if (next === allTokens) return;
-    if (!store.commit(next, "Edit token")) refused(`"${tok.name}"`);
+    if (next === allTokens) return true;
+    if (store.commit(next, "Edit token")) return true;
+    refused(`"${tok.name}"`);
+    return false;
   };
   const deleteToken = (id: string, opts?: { replaceWith?: string }) => {
     const tok = tokenById(id);
@@ -586,34 +597,6 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
             + Add token
           </Button>
         );
-      case "styles":
-      case "component-styles": {
-        /* 7316:82755 / 7316:82153's page action. Gated on the SAME flag that decides
-           whether an AIClient is built at all (useComposerInit.ts:132): with
-           it off the modal would open over a service with no client and answer
-           with AIAssistService's developer string. Blocked, never hidden, and
-           aria-disabled so the reason stays reachable by keyboard. */
-        const aiOn = isFeatureEnabled("dsAi");
-        const cta = (
-          <Button
-            type="button"
-            variant="secondary"
-            size="xs"
-            className={PAGE_ACTION}
-            onClick={aiOn ? () => setAiOpen(true) : undefined}
-            aria-disabled={aiOn ? undefined : "true"}
-            data-open-ai-assist
-            data-testid="brand-page-action"
-          >
-            ✦ Generate with AI
-          </Button>
-        );
-        return aiOn ? cta : (
-          <Tooltip content="Coming soon: AI component styles aren't available yet" placement="bottom" arrow={false}>
-            {cta}
-          </Tooltip>
-        );
-      }
       case "classes":
         return (
           <Button type="button" variant="secondary" size="xs" className={PAGE_ACTION} onClick={() => setClassAddOpen(true)} data-testid="brand-page-action">
@@ -1133,7 +1116,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
             <section aria-label="About restore points" className={SIDE_CARD} data-testid="brand-restore-guide">
               <p className={SIDE_CARD_TITLE}>Changes apply instantly</p>
               <p className={SIDE_CARD_BODY}>
-                Every edit updates your canvas. Use ⌘Z to undo, including changes made on the canvas.
+                Every edit updates your canvas. Use ⌘Z to undo your Brand changes; canvas edits undo on the canvas.
               </p>
               <p className={`${SIDE_CARD_BODY} tw:font-semibold tw:text-[var(--bk-ink)]`}>Primitives → Semantic tokens → Elements</p>
               <p className={SIDE_CARD_BODY}>
@@ -1198,18 +1181,6 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
           onAdd={handleAddToken}
         />
       )}
-      <AIPromptModal
-        open={aiOpen}
-        onOpenChange={setAiOpen}
-        service={composer?.aiAssistService ?? null}
-        /* No onAccept: there is nowhere for the schema to go yet. It is a
-           preset BINDING schema ({componentTypeId, variants, bindings}), not an
-           element tree, so ComponentManager.createComponent — which needs an
-           existing elementId — is the wrong target; the real home is the style
-           preset registries, and mapping into them is a feature, not a wiring.
-           Omitting the prop hides the Accept button, where before it rendered,
-           took the click and dropped the schema. */
-      />
     </div>
   );
 };

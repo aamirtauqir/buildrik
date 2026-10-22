@@ -8,7 +8,7 @@
  * three unrelated subtrees is exactly the coupling Composer-gateway rule 9
  * (`packages/editor/CLAUDE.md`) warns about. A tiny module-level store,
  * same shape as `cmsWorkspaceStore.ts`, lets each producer register its own
- * dirty state and lets every consumer (⌘H, ⇧A, the command palette,
+ * dirty state and lets every consumer (H, ⇧A, the command palette,
  * `ui:switch-tab`, `UI_PANEL_OPEN`, the rail, `beforeunload`) read one
  * boolean without a common ancestor threading anything.
  *

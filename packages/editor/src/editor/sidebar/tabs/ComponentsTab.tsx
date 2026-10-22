@@ -9,7 +9,8 @@
  */
 
 import * as React from "react";
-import { Button, ConfirmDialog, EmptyState, EmptyStateDesc, EmptyStateTitle, PanelBackRow, PanelFrame, SkeletonListItem, useToast } from "@/editor/chrome-ui";
+import { Button, ConfirmDialog, EmptyState, EmptyStateDesc, EmptyStateTitle, IconButton, PanelBackRow, PanelFrame, SkeletonListItem, useToast } from "@/editor/chrome-ui";
+import { Trash2 } from "lucide-react";
 import { PanelErrorState } from "../shared/PanelErrorState";
 import { ComponentDetailScreen, componentDeleteCopy } from "./component-library/ComponentDetailScreen";
 import { ComponentIcon } from "./component-library/ComponentIcon";
@@ -29,7 +30,6 @@ const SECTION_HEADER =
 
 export const ComponentsTab: React.FC<ComponentsTabProps> = ({
   composer,
-  compactMode = false,
   onCreateNew,
   onComponentSelect,
   selectedComponentId,
@@ -125,7 +125,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         <PanelErrorState
           title="Couldn't load your components."
           message="Your components are safe — only this list failed."
-          onRetry={() => state.setError(null)}
+          onRetry={state.retry}
         />
       </PanelFrame>
     );
@@ -141,7 +141,6 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         onBack={state.handleBackFromDetail}
         onBackToInstance={state.backToInstance}
         onClose={onClose}
-        onInsert={state.handleDetailInsert}
         onDelete={state.handleDetailDelete}
         onDetachedAll={(count) => {
           const { id, name } = state.detailComponent!;
@@ -155,29 +154,6 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
   // ── Empty state ───────────────────────────────────────────────────────────────
 
   if (state.components.length === 0) {
-    if (compactMode) {
-      /* Was bare unstyled markup — the audits' "fifth empty-state language".
-         The shared EmptyState is the only one. */
-      return (
-        <EmptyState
-          size="sm"
-          align="start"
-          body="No components saved yet."
-          action={
-            onCreateNew && (
-              <Button
-                variant="link"
-                size="xs"
-                onClick={onCreateNew}
-                title="Right-click any element to save as component"
-              >
-                + New
-              </Button>
-            )
-          }
-        />
-      );
-    }
     return (
       <PanelFrame className="tw:h-full">
         {backRow}
@@ -249,18 +225,25 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
   const renderRow = (component: (typeof state.components)[number], isLinked: boolean) => {
     const n = composer?.components?.getInstancesOfComponent?.(component.id)?.length || 0;
     const justDetached = detached?.id === component.id && n === 0;
+    /* P-6: the list's delete confirm had no opener — the only delete door was
+       inside the detail screen. The row now carries one too: a trash button
+       that takes the count's place on hover and keyboard focus (the board's
+       resting row stays "name · N on this site"), and Delete / Backspace on
+       a focused row, the keys the Pages list and the canvas use. Both open
+       the confirm below, which names the instances that will be detached. */
     return (
+      <div key={component.id} className="tw:group tw:relative tw:flex tw:items-center tw:hover:bg-[var(--bk-bg-subtle)]">
               <div
-                key={component.id}
                 role="button"
                 tabIndex={0}
                 draggable
-                className={`tw:flex tw:items-center tw:gap-2 tw:h-8 tw:px-4 tw:cursor-pointer tw:select-none tw:hover:bg-[var(--bk-bg-subtle)]${justDetached ? " tw:opacity-40" : ""}`}
+                className={`tw:flex tw:min-w-0 tw:flex-1 tw:items-center tw:gap-2 tw:h-8 tw:px-4 tw:cursor-pointer tw:select-none${justDetached ? " tw:opacity-40" : ""}`}
                 data-testid={`comp-row-${component.id}`}
                 onClick={() => state.handleViewDetail(component)}
                 onDragStart={(e) => state.handleDragStart(e, component)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " ") { e.preventDefault(); state.handleViewDetail(component); }
+                  if (e.key === "Delete" || e.key === "Backspace") { e.preventDefault(); state.handleDelete(component.id); }
                 }}
               >
                 <span
@@ -282,12 +265,22 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
                     "6 instances". The number is sample data; the words are the
                     label, and copy on screen is decided by the board. */}
                 <span
-                  className="tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]"
+                  className="tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)] tw:group-hover:invisible tw:group-focus-within:invisible"
                   data-testid={`comp-row-count-${component.id}`}
                 >
                   {justDetached ? "0 linked instances" : `${n} on this site${isLinked ? " · linked" : ""}`}
                 </span>
               </div>
+              <IconButton
+                label={`Delete ${component.name}`}
+                size="sm"
+                className="tw:absolute tw:right-3 tw:top-1 tw:opacity-0 tw:group-hover:opacity-100 tw:group-focus-within:opacity-100"
+                data-testid={`comp-row-delete-${component.id}`}
+                onClick={() => state.handleDelete(component.id)}
+              >
+                <Trash2 size={14} aria-hidden="true" />
+              </IconButton>
+      </div>
     );
   };
 
@@ -379,6 +372,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         )}
         confirmLabel="Delete"
         tone="destructive"
+        testId="comp-delete-confirm"
       />
     </PanelFrame>
   );

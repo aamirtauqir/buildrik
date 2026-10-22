@@ -16,7 +16,6 @@ import {
   listAssets,
   moveAsset,
   ownedBlobPrefix,
-  restoreAssetVersion,
   updateAsset,
 } from "@/server/services/media.service";
 import { AltTextError, applyAltTextToAsset, type AltTextErrorCode } from "@/server/services/alt-text.service";
@@ -38,7 +37,6 @@ import {
   moveAssetSchema,
   moveFolderSchema,
   renameFolderSchema,
-  restoreAssetVersionSchema,
   updateAssetSchema,
 } from "@buildrik/shared/schemas/media";
 
@@ -96,7 +94,7 @@ function translateStockError(e: unknown): never {
  *
  * Folders, assets, asset-versions, and storage quota. Editor consumers:
  *   - useMediaState: list + create + update + delete + move (asset & folder)
- *   - AssetDetailDrawer (Phase B): listAssetVersions, restoreAssetVersion
+ *   - AssetDetailDrawer (Phase B): listAssetVersions
  *   - ImageEditorModal save path: createAssetVersion
  *   - UploadZone state: checkStorageQuota for 80% warning + exhausted UI
  *
@@ -291,25 +289,6 @@ export const mediaRouter = router({
       }
     }),
 
-  restoreAssetVersion: protectedProcedure
-    .input(restoreAssetVersionSchema)
-    .mutation(async ({ ctx, input }) => {
-      try {
-        return await restoreAssetVersion(ctx.session.user.id, input);
-      } catch (e: unknown) {
-        if (e instanceof Error && e.message === "NOT_FOUND") {
-          throw new TRPCError({ code: "NOT_FOUND", message: "Version not found." });
-        }
-        // Defense-in-depth URL guard at restore (legacy versions).
-        if (e instanceof Error && e.message === "URL_CONFLICT") {
-          throw new TRPCError({
-            code: "CONFLICT",
-            message: "Asset version URL is owned by another user; cannot restore.",
-          });
-        }
-        rethrowPermission(e);
-      }
-    }),
 
   // ─── AI alt-text (P7) ───────────────────────────────────────────────────
 

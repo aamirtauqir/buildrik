@@ -26,9 +26,11 @@ vi.mock("@/shared/utils/runtimeEnv", () => ({ DASHBOARD_URL: "http://localhost:3
 
 const loadVersions = vi.fn();
 const saveVersion = vi.fn();
+const pruneVersions = vi.fn();
 vi.mock("@/engine/storage/VersionHistoryStorage", () => ({
   loadVersions: (...a: unknown[]) => loadVersions(...a),
   saveVersion: (...a: unknown[]) => saveVersion(...a),
+  pruneVersions: (...a: unknown[]) => pruneVersions(...a),
 }));
 
 import { hasServerStamp, markStampMigrationDone, recordServerStamp, stampMigrationDue } from "../syncRetryQueue";
@@ -277,6 +279,16 @@ describe("versionSync hydrate edge paths", () => {
     expect(saveVersion).toHaveBeenCalledTimes(2);
   });
 
+  it("H-8: what it pulls goes through the local cap, so a locally pruned auto-save does not come back", async () => {
+    pruneVersions.mockClear();
+    list.mockResolvedValueOnce([{ versionId: "a" }]);
+    loadVersions.mockResolvedValueOnce([]);
+    get.mockResolvedValueOnce({ id: "a" });
+    await hydrateVersionsFromServer({ maxVersions: 50 });
+    expect(pruneVersions).toHaveBeenCalledWith(expect.any(String), 50);
+    expect(pruneVersions.mock.invocationCallOrder[0]).toBeGreaterThan(saveVersion.mock.invocationCallOrder.at(-1)!);
+  });
+
   it("skips a version whose payload fetch returns null (not counted, not saved)", async () => {
     list.mockResolvedValueOnce([{ versionId: "a" }]);
     loadVersions.mockResolvedValueOnce([]);
@@ -294,8 +306,10 @@ describe("versionSync hydrate edge paths", () => {
   it("a failed hydrate warns + resolves 0 — never throws into editor open", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     list.mockRejectedValueOnce(new Error("offline"));
-    await expect(hydrateVersionsFromServer()).resolves.toBe(0);
+    const onError = vi.fn();
+    await expect(hydrateVersionsFromServer({ onError })).resolves.toBe(0);
     expect(warn).toHaveBeenCalledWith("[version-sync] hydrate from server failed", expect.any(Error));
+    expect(onError).toHaveBeenCalledWith(expect.any(Error)); // H-7: reported, not console-only
     warn.mockRestore();
   });
 

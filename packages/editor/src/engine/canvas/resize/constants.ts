@@ -71,9 +71,3 @@ export const ROTATION_CURSOR = "grab";
 
 /** Throttle interval for mouse move events (ms) */
 export const MOVE_THROTTLE_MS = 16; // ~60fps
-
-/** Rotation snap threshold in degrees */
-export const ROTATION_SNAP_THRESHOLD = 5;
-
-/** Default rotation snap angle when shift is held */
-export const SHIFT_ROTATION_SNAP_ANGLE = 15;

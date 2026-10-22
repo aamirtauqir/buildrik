@@ -75,22 +75,39 @@ export function CollectionSettingsPane({ composer, collection, records }: Collec
   const rename = async () => {
     if (!composer || error || !dirty) return;
     setSaving(true);
+    /* C-6: a refused rename used to end in silence (try/finally, no catch). */
+    let saved = false;
     try {
-      await composer.cms.collections.updateCollection(collection.id, { name: nextName, slug: nextSlug });
-      addToast({ tone: "success", title: "Collection renamed", description: nextName });
+      saved = (await composer.cms.collections.updateCollection(collection.id, { name: nextName, slug: nextSlug })) !== null;
+    } catch {
+      saved = false;
     } finally {
       setSaving(false);
     }
+    if (saved) addToast({ tone: "success", title: "Collection renamed", description: nextName });
+    else addToast({ tone: "error", title: `Could not rename “${collection.name}”`, description: "The name and slug are unchanged. Try again." });
   };
 
   const remove = async () => {
     if (!composer) return;
+    /* Delete FIRST, unbind after (REA 2026-10-20 #11a). The bindings used to
+       go before a delete that can fail — a failure left the collection in
+       place with its elements silently unbound, and said nothing. */
+    let deleted = false;
+    try {
+      deleted = await composer.cms.collections.deleteCollection(collection.id);
+    } catch {
+      deleted = false;
+    }
+    if (!deleted) {
+      addToast({ tone: "error", title: `Could not delete “${collection.name}”`, description: "The collection and its bindings are unchanged. Try again." });
+      return;
+    }
     const bindings = composer.cms.bindings;
     for (const elementId of boundElements) {
       for (const b of bindings.getBindings(elementId)) if (b.collectionId === collection.id) bindings.unbind(elementId, b.property);
       if (bindings.getCollectionBinding(elementId)?.collectionId === collection.id) bindings.unbindCollection(elementId);
     }
-    await composer.cms.collections.deleteCollection(collection.id);
     setConfirmDelete(false);
     cmsWorkspace.openCollection(null);
     addToast({ tone: "success", title: `“${collection.name}” deleted`, description: consequence.replace("Deleting removes", "Removed").replace("and unbinds", "and unbound") });

@@ -578,8 +578,7 @@ export const siteDetailRouter = router({
           if (e instanceof Error && e.message === "PASSWORD_REQUIRED")
             throw new TRPCError({ code: "BAD_REQUEST", message: "This workspace requires a password on every share link." });
           // Plan limits reached the client as a bare 500 (a password link on
-          // FREE, walk 2026-09-24). FORBIDDEN + the plan's reason, like the
-          // page limit in pages.create.
+          // FREE, walk 2026-09-24). FORBIDDEN + the plan's reason.
           if (e instanceof Error && e.message === "PASSWORD_LINKS_NOT_AVAILABLE")
             throw new TRPCError({ code: "FORBIDDEN", message: "Password-protected share links need the Pro plan or higher." });
           if (e instanceof Error && e.message === "EXPIRY_EXCEEDS_PLAN")

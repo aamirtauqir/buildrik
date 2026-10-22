@@ -62,7 +62,6 @@ const mocks = vi.hoisted(() => {
     restoreVersion: vi.fn(),
     deleteVersion: vi.fn(),
     compareWithDraft: vi.fn(),
-    updateAiSummary: vi.fn(),
     getVersion: vi.fn(),
   };
 });
@@ -77,7 +76,6 @@ vi.mock("@/shared/hooks/useVersionHistory", () => ({
     deleteVersion: mocks.deleteVersion,
     getVersion: mocks.getVersion,
     compareWithDraft: mocks.compareWithDraft,
-    updateAiSummary: mocks.updateAiSummary,
   }),
 }));
 
@@ -94,7 +92,6 @@ function makeVersion(overrides: Partial<NamedVersion> = {}): NamedVersion {
     isAutoCheckpoint: overrides.isAutoCheckpoint ?? false,
     projectId: overrides.projectId,
     visualSnapshot: overrides.visualSnapshot,
-    aiSummary: overrides.aiSummary,
     userId: overrides.userId,
   };
 }
@@ -146,7 +143,6 @@ beforeEach(() => {
   mocks.restoreVersion.mockReset();
   mocks.deleteVersion.mockReset();
   mocks.compareWithDraft.mockReset();
-  mocks.updateAiSummary.mockReset();
   mocks.getVersion.mockReset();
 });
 

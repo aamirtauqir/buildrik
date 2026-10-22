@@ -13,7 +13,6 @@ export interface CanvasProps {
   composer: Composer | null;
   device: DeviceType;
   zoom: number;
-  onAIRequest?: (payload: { elementId: string; elementType?: string }) => void;
   showSpacing?: boolean;
   showBadges?: boolean;
   showGuides?: boolean;
@@ -40,8 +39,6 @@ export interface CanvasProps {
   canUndo?: boolean;
   /** Whether a redo step is available (drives the footer toolbar's Redo). */
   canRedo?: boolean;
-  /** Open the image editor for a media element on the canvas (consumed by CanvasOverlayGroup) */
-  onOpenImageEditor?: (item: { key: string; src: string; name: string }) => void;
 }
 
 export interface CanvasRef {

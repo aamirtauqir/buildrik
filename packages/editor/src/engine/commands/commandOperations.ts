@@ -8,10 +8,14 @@
 
 import { snapToGrid } from "@/shared/utils/dragDrop";
 import { EVENTS } from "@/shared/constants/events";
-import { isValidBreakpoint } from "@/shared/constants/breakpoints";
+import { getBreakpointQuery, isValidBreakpoint } from "@/shared/constants/breakpoints";
+import { elementSelector } from "@/shared/utils/elementSelector";
+import type { PseudoStateId } from "@/shared/types";
+import { resolveStyle, type StyleLayerSource } from "../styles/ResolvedStyle";
 import type { BreakpointId } from "@/shared/types/breakpoints";
 import type { Composer } from "../Composer";
 import type { Element } from "../elements/Element";
+import { firstHeadingId } from "@buildrik/shared/content/contentIssues";
 
 /** Direction for z-index reordering */
 export type ReorderDirection = "forward" | "backward" | "front" | "back";
@@ -247,25 +251,42 @@ export function activeBreakpoint(composer: Pick<Composer, "device">): Breakpoint
   return device && isValidBreakpoint(device) ? device : "desktop";
 }
 
+/** One element's style layers, read from its own data and the composer's rules. */
+function styleLayers(composer: Pick<Composer, "styles"> | null | undefined, el: Element): StyleLayerSource {
+  // The id is read only when a breakpoint or state layer is asked for: a
+  // desktop/normal read needs the element's own styles and nothing else.
+  return {
+    base: () => ({ ...(el.getStyles?.() || {}) }),
+    breakpoint: (bp) => composer?.styles?.getBreakpointStyle(el.getId(), bp) ?? {},
+    state: (state, bp) =>
+      composer?.styles?.getRule(`${elementSelector(el.getId())}:${state}`, getBreakpointQuery(bp) ?? undefined)
+        ?.properties ?? {},
+  };
+}
+
 /**
- * The element's styles as they apply at `breakpoint`: the base, with that
- * breakpoint's override on top. The read side of setStyleAt.
+ * The element's styles as they apply at `breakpoint` (and, optionally, in a
+ * pseudo-state), by the published cascade — see ResolvedStyle. The read side
+ * of setStyleAt. Mobile includes the tablet layer, as a phone viewport also
+ * matches the tablet query; it used to read base + mobile only, so a tablet
+ * value the canvas showed on Mobile was missing from the inspector (BK-10).
  */
 export function stylesAt(
   composer: Pick<Composer, "styles"> | null | undefined,
   el: Element,
   breakpoint: BreakpointId,
+  state: PseudoStateId = "normal",
 ): Record<string, string> {
-  const base = { ...(el.getStyles?.() || {}) };
-  if (breakpoint === "desktop" || !composer?.styles) return base;
-  return { ...base, ...composer.styles.getBreakpointStyle(el.getId(), breakpoint) };
+  return resolveStyle(styleLayers(composer, el), breakpoint, state);
 }
 
 /**
  * Set (or, with "", remove) one style property at `breakpoint` — the element's
- * base styles on desktop, its override rule on tablet/mobile. The one branch
- * the Inspector and the canvas-direct writes share. No lock check and no
- * transaction: callers run it inside writeElement / writableElements.
+ * base styles on desktop, its override rule on tablet/mobile — or, with a
+ * pseudo `state`, in the element's `:state` rule at that breakpoint. The one
+ * branch the Inspector, paste-style and the canvas-direct writes share. No
+ * lock check and no transaction: callers run it inside writeElement /
+ * writableElements.
  */
 export function setStyleAt(
   composer: Pick<Composer, "styles"> | null | undefined,
@@ -273,8 +294,21 @@ export function setStyleAt(
   breakpoint: BreakpointId,
   property: string,
   value: string,
+  state: PseudoStateId = "normal",
 ): void {
-  if (breakpoint === "desktop") {
+  if (state !== "normal" && composer?.styles) {
+    const sel = elementSelector(el.getId());
+    const mq = breakpoint === "desktop" ? undefined : getBreakpointQuery(breakpoint) ?? undefined;
+    if (value === "") {
+      const existing = composer.styles.getRule(`${sel}:${state}`, mq);
+      if (!existing) return;
+      const props = { ...existing.properties };
+      delete props[property];
+      composer.styles.setRule(sel, props, { pseudo: `:${state}`, mediaQuery: mq, replace: true });
+    } else {
+      composer.styles.setRule(sel, { [property]: value }, { pseudo: `:${state}`, mediaQuery: mq });
+    }
+  } else if (breakpoint === "desktop") {
     if (value === "") el.removeStyle?.(property);
     else el.setStyle?.(property, value);
   } else if (value === "") {
@@ -311,7 +345,8 @@ export function writeCanvasStyles(
  * target. The ⋯ and canvas menu used `setStyles`, which replaced the whole
  * style map and wiped those properties, while ⌥⌘V merged — three doors, two
  * results. One transaction, so one undo takes the paste back. A locked
- * element is refused (P-1).
+ * element is refused (P-1). Written at the active breakpoint and in the
+ * pseudo-state the Inspector shows (BD-36) — where Inspector writes land.
  *
  * Returns how many properties were applied (0 when nothing was).
  */
@@ -319,8 +354,28 @@ export function pasteStyles(composer: Composer, element: Element): number {
   const clipboard = composer.styleClipboard;
   const keys = clipboard ? Object.keys(clipboard) : [];
   if (!clipboard || keys.length === 0) return 0;
+  /* At the active breakpoint, like every other style write: pasting on
+     Tablet used to write the base styles, changing Desktop. */
+  const breakpoint = activeBreakpoint(composer);
+  const state = composer.stylePseudoState;
   const ran = writeElement(composer, element, "paste-styles", (el) => {
-    for (const key of keys) el.setStyle(key, clipboard[key]);
+    for (const key of keys) setStyleAt(composer, el, breakpoint, key, clipboard[key], state);
   });
   return ran ? keys.length : 0;
+}
+
+/**
+ * "Make this H1" (BD-39 (6)) — the Issues panel's fix for the no-H1 warning,
+ * which stays (SEO never blocks a publish): the page's first heading becomes
+ * its h1, through the lock gate, as one undo step. False when the page has no
+ * heading element, or that heading is locked (the gate's toast says so). Its
+ * sibling rule — a Heading inserted on a page with no H1 becomes it — lives
+ * in the insert path (`blocks/blockRegistry.ts`).
+ */
+export function makeFirstHeadingH1(composer: Composer, pageId: string): boolean {
+  const rootId = composer.elements.getAllPages().find((p) => p.id === pageId)?.root?.id;
+  const root = rootId ? composer.elements.getElement(rootId) : undefined;
+  const headingId = root ? firstHeadingId(root.toJSON()) : null;
+  if (!headingId) return false;
+  return writeElement(composer, composer.elements.getElement(headingId), "make-h1", (el) => el.setTagName("h1"));
 }

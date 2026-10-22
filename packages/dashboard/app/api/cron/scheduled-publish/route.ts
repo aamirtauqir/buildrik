@@ -32,9 +32,12 @@ export async function GET(req: NextRequest) {
   for (const s of due) {
     try {
       /* No `pages` argument: the schedule stores WHEN, never a frozen copy of
-         the site. A publish scheduled on Monday should ship Friday's content —
-         storing pages at schedule time would quietly publish a stale snapshot,
-         which is the opposite of what someone scheduling a release wants. */
+         the site, and only the editor renders pages. With no server-side
+         renderer `startPublish` refuses it (NO_PAGES) before any job exists,
+         and the row records FAILED below — never "started" over a job that
+         was bound to die. New schedules are refused at creation for the same
+         reason (`schedulePublish`, NO_RENDERER); this sweep now only settles
+         rows written before that refusal (REA #29). */
       const job = await startPublish(s.siteId, s.createdBy);
       await markScheduleStarted(s.id, (job as { id: string }).id);
       started += 1;

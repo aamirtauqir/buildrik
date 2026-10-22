@@ -35,8 +35,6 @@ export interface UseVersionHistoryReturn {
   getVersion: (id: string) => NamedVersion | undefined;
   /** Compare the open draft with a saved version (draft → version) */
   compareWithDraft: (versionId: string) => Promise<CompareResult | null>;
-  /** Update AI summary for a version */
-  updateAiSummary: (versionId: string, summary: string) => Promise<void>;
 }
 
 export function useVersionHistory(composer: Composer | null): UseVersionHistoryReturn {
@@ -144,14 +142,6 @@ export function useVersionHistory(composer: Composer | null): UseVersionHistoryR
     [composer]
   );
 
-  const updateAiSummary = React.useCallback(
-    async (versionId: string, summary: string) => {
-      if (!composer?.versions) return;
-      await composer.versions.updateVersion(versionId, { aiSummary: summary });
-    },
-    [composer]
-  );
-
   const retryLoad = React.useCallback(() => {
     if (!composer?.versions?.reloadVersions) return;
     setLoadError(false);
@@ -171,6 +161,5 @@ export function useVersionHistory(composer: Composer | null): UseVersionHistoryR
     renameVersion,
     getVersion,
     compareWithDraft,
-    updateAiSummary,
   };
 }

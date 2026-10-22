@@ -6,7 +6,8 @@
  *
  * Also carries the asserts of the two deleted panel test files:
  *  - `KeyboardShortcutsPanel.zoom.test.ts` — the zoom rows name the chords
- *    CanvasFooterToolbar binds (⌘0 100% · ⌘1 fit · ⌘2 selection).
+ *    CanvasFooterToolbar binds (⇧0 / ⌘0 100% · ⇧1 fit · ⇧2 selection —
+ *    SC-12 / BD-39 moved them off ⌘1 / ⌘2, which switch browser tabs).
  *  - `helpChords.test.ts`'s "names both palettes" — there is ONE palette now,
  *    reached by ⌘K and ⌘⇧P.
  *
@@ -94,19 +95,19 @@ describe("KeyboardCheatSheet — the chords chrome binds", () => {
   const toolbar = readFileSync(join(__dirname, "..", "..", "CanvasFooterToolbar.tsx"), "utf8");
   const rowKeys = (id: string) => CHROME_CHORDS.find((r) => r.id === id)?.keys;
 
-  it("gives ⌘0 its real job", () => {
-    expect(rowKeys("view-zoom-100")).toBe("ctrl+0");
-    expect(toolbar).toMatch(/key === "0"[\s\S]{0,80}onZoomChange\(100\)/);
+  it("gives ⇧0 (⌘0 alias) its real job", () => {
+    expect(rowKeys("view-zoom-100")).toBe("shift+0 / ctrl+0");
+    expect(toolbar).toMatch(/code === "Digit0"[\s\S]{0,80}onZoomChange\(100\)/);
   });
 
   it("advertises fit under the chord that fits", () => {
-    expect(rowKeys("view-zoom-fit")).toBe("ctrl+1");
-    expect(toolbar).toMatch(/key === "1" && onFitToScreen/);
+    expect(rowKeys("view-zoom-fit")).toBe("shift+1");
+    expect(toolbar).toMatch(/code === "Digit1" && onFitToScreen/);
   });
 
   it("advertises zoom-to-selection", () => {
-    expect(rowKeys("view-zoom-selection")).toBe("ctrl+2");
-    expect(toolbar).toMatch(/key === "2" && onZoomToSelection/);
+    expect(rowKeys("view-zoom-selection")).toBe("shift+2");
+    expect(toolbar).toMatch(/code === "Digit2" && onZoomToSelection/);
   });
 
   it("lists ONE palette, reached by ⌘K and its ⌘⇧P alias", () => {

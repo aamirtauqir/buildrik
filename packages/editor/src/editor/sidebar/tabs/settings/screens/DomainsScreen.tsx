@@ -53,7 +53,7 @@ import {
   Screen,
   Section,
 } from "../shared";
-import { SAVE_ERROR_MESSAGES } from "../constants";
+import { ACTION_ERROR_MESSAGES } from "../constants";
 import { useServerLoad } from "../hooks/useServerLoad";
 import type { ScreenProps } from "../types";
 import { AddDomainDialog, type AddDomainSubmission } from "../components/AddDomainDialog";
@@ -315,7 +315,7 @@ export const DomainsScreen: React.FC<ScreenProps> = ({
     );
   }
 
-  const banner = saveError ?? (actionFailed ? SAVE_ERROR_MESSAGES.domains : null);
+  const banner = saveError ?? (actionFailed ? ACTION_ERROR_MESSAGES.domains : null);
   const addButton = (
     <Button
       type="button"

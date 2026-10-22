@@ -3,7 +3,7 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { encrypt, decrypt } from "@/lib/encryption";
 import { slugifyProjectName } from "@/lib/vercel";
-import { hasEverDeployed } from "@/server/services/publish.service";
+import { hasEverDeployed, servesCleanUrls } from "@/server/services/publish.service";
 import { isBrandTokensV2Enabled } from "@/server/services/brand-tokens";
 import { SITE_COLUMN_FIELDS } from "@buildrik/shared/schemas/site-column-fields";
 import {
@@ -186,8 +186,8 @@ export async function updateProjectSettings(siteId: string, patch: ProjectSettin
   });
 }
 
-export async function getSiteSettings(siteId: string) {
-  const site = await prisma.site.findUnique({
+export async function getSiteSettings(siteId: string, db: Prisma.TransactionClient = prisma) {
+  const site = await db.site.findUnique({
     where: { id: siteId },
     select: {
       id: true,
@@ -206,7 +206,7 @@ export async function getSiteSettings(siteId: string) {
      writes the PAGE's own settings JSON (`pages.settings.seo`), so the preview
      was permanently "Not set" no matter what anyone typed. Read the home page's
      SEO here and let the tab prefer it. */
-  const homePage = await prisma.page.findFirst({
+  const homePage = await db.page.findFirst({
     where: { siteId },
     orderBy: [{ isHomePage: "desc" }, { position: "asc" }],
     select: { name: true, seoTitle: true, seoDescription: true, settings: true },
@@ -241,6 +241,9 @@ export async function getSiteSettings(siteId: string) {
        unmigrated site may upgrade. */
     brandTokensV2: isBrandTokensV2Enabled(workspace.id),
     pageSeo,
+    /* BD-39 (4): the editor hands out `/about.html` links until the live
+       deploy serves clean URLs; this read is where it learns which. */
+    servesCleanUrls: await servesCleanUrls(siteId, db),
   };
 }
 

@@ -24,6 +24,7 @@
 
 import * as React from "react";
 import type { Composer } from "@/engine";
+import type { ToastInput } from "@/editor/chrome-ui";
 import type { ElementType, GrapesElement } from "@/shared/types";
 import { setMultiDragData } from "@/shared/utils/dragDrop";
 import { writableElements } from "@/engine/commands/commandOperations";
@@ -52,6 +53,8 @@ export interface UseCanvasElementDragOptions {
     scale: number
   ) => { x: number; y: number; snapLines: import("./useCanvasSnapping").SnapLine[] };
   onDropTargetChange?: (targetId: string | null) => void;
+  /** A Ctrl/Cmd-drag whose duplicate fails says so (ISS-C21). */
+  addToast?: (toast: ToastInput) => void;
 }
 
 export function useCanvasElementDrag({
@@ -62,7 +65,10 @@ export function useCanvasElementDrag({
   onSnapLinesChange,
   snapCalculator,
   onDropTargetChange,
+  addToast,
 }: UseCanvasElementDragOptions): void {
+  const addToastRef = React.useRef(addToast);
+  addToastRef.current = addToast;
   // Track the currently dragging element for cleanup
   const draggingElementRef = React.useRef<HTMLElement | null>(null);
   const isDraggingRef = React.useRef(false);
@@ -178,8 +184,9 @@ export function useCanvasElementDrag({
 
       const rootId = rootIdRef.current;
 
-      // Don't allow dragging root element
-      if (elementId === rootId) {
+      /* The root never drags. REA #12: a read-only composer (view mode, Time-travel) neither moves
+         nor clones — and a clone is written at dragstart, before any drop. */
+      if (elementId === rootId || composer.readOnly) {
         e.preventDefault();
         return;
       }
@@ -232,6 +239,10 @@ export function useCanvasElementDrag({
         } catch {
           composer.rollbackTransaction();
           isCloneModeRef.current = false;
+          addToastRef.current?.({
+            tone: "error",
+            description: "Couldn't duplicate this element. The drag moves the original instead.",
+          });
         }
       } else {
         isCloneModeRef.current = false;
@@ -373,7 +384,11 @@ export function useCanvasElementDrag({
 
       // Clean up the element that was being dragged
       if (draggableEl) {
-        draggableEl.style.opacity = "1";
+        /* Removed, not reset to "1": the canvas no longer re-renders its HTML
+           on a style change, so an inline opacity left here would override the
+           element's own opacity from then on. (`cursor: grab` is the canvas's
+           own drag affordance on every element — useElementDragDomSync.) */
+        draggableEl.style.removeProperty("opacity");
         draggableEl.style.cursor = "grab";
         draggableEl.classList.remove("bd-dragging");
         draggableEl.classList.remove("bd-clone-mode");
@@ -381,7 +396,7 @@ export function useCanvasElementDrag({
 
       // Also clean up via ref in case DOM was recreated during drag
       if (draggingElementRef.current && draggingElementRef.current !== draggableEl) {
-        draggingElementRef.current.style.opacity = "1";
+        draggingElementRef.current.style.removeProperty("opacity");
         draggingElementRef.current.style.cursor = "grab";
         draggingElementRef.current.classList.remove("bd-dragging");
         draggingElementRef.current.classList.remove("bd-clone-mode");

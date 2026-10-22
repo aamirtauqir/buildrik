@@ -19,11 +19,10 @@ function escapeXml(s: string): string {
  * tested in the editor for months — it only ran on the ZIP export, and the
  * publish payload carries pages, so nothing else ever reached the deploy.
  *
- * Entries use the uploaded filenames (about.html), because that is what the
- * deploy serves: the vercel.json we ship (publish-files.ts, Settings S3)
- * carries redirects and headers, not `cleanUrls`, and a sitemap of /about
- * would be a list of 404s. A page carrying its own noindex is left
- * out — a sitemap is a list of pages you want indexed.
+ * Entries are the clean URLs the deploy serves (/about, through
+ * pageCanonicalUrl): the vercel.json we ship sets `cleanUrls` (REA #26), so
+ * an `.html` entry would be a list of redirects. A page carrying its own
+ * noindex is left out — a sitemap is a list of pages you want indexed.
  */
 export function buildSitemapXml(
   origin: string,
@@ -47,4 +46,23 @@ export function buildSitemapXml(
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${entries}
 </urlset>`;
+}
+
+/**
+ * robots.txt for a site — the ONE builder, beside the sitemap it points at:
+ * the publish worker (lib/publish-files.ts) and the editor's ZIP export both
+ * call it. The site's custom rules if set, else a default driven by the
+ * indexing toggle — plus the sitemap pointer when indexing is on and the
+ * origin is known, unless the author wrote their own.
+ */
+export function buildRobotsTxt(input: {
+  robotsTxt: string | null | undefined;
+  allowIndexing: boolean;
+  origin: string | null;
+}): string {
+  const body = input.robotsTxt?.trim()
+    ? input.robotsTxt
+    : `User-agent: *\n${input.allowIndexing ? "Allow: /" : "Disallow: /"}\n`;
+  if (!input.allowIndexing || !input.origin || /^\s*sitemap:/im.test(body)) return body;
+  return `${body.endsWith("\n") ? body : `${body}\n`}\nSitemap: ${input.origin}/sitemap.xml\n`;
 }

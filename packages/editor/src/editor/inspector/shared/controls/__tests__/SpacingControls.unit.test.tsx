@@ -36,4 +36,12 @@ describe("SpacingBox · a side keeps its unit", () => {
     fireEvent.change(field, { target: { value: "12" } });
     expect(onPaddingChange).toHaveBeenLastCalledWith("bottom", "12px");
   });
+
+  it("a typed unit is kept: 2rem writes 2rem, 10% writes 10%", () => {
+    const { onPaddingChange, field } = renderBox({ ...zero, bottom: "0px" });
+    for (const v of ["2", "2r", "2re", "2rem"]) fireEvent.change(field, { target: { value: v } });
+    expect(onPaddingChange).toHaveBeenLastCalledWith("bottom", "2rem");
+    for (const v of ["1", "10", "10%"]) fireEvent.change(field, { target: { value: v } });
+    expect(onPaddingChange).toHaveBeenLastCalledWith("bottom", "10%");
+  });
 });

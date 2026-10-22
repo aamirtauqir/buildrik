@@ -104,8 +104,16 @@ export function FieldInspector({ composer, collection, collections, field, recor
   /* The addable types, plus whatever this field already is. */
   const types = (FIELD_TYPES as readonly string[]).includes(field.type) ? FIELD_TYPES : [...FIELD_TYPES, field.type];
 
+  /* C-6: a refused change used to be dropped by `void`; it now says so. */
+  const [saveFailed, setSaveFailed] = React.useState(false);
+  React.useEffect(() => setSaveFailed(false), [field.id]);
   const update = (updates: Partial<Omit<CMSField, "id">>) => {
-    if (composer) void composer.cms.collections.updateField(collection.id, field.id, updates);
+    if (!composer) return;
+    setSaveFailed(false);
+    composer.cms.collections
+      .updateField(collection.id, field.id, updates)
+      .then((saved) => setSaveFailed(saved === null))
+      .catch(() => setSaveFailed(true));
   };
   const commitName = () => {
     const next = name.trim();
@@ -201,6 +209,11 @@ export function FieldInspector({ composer, collection, collections, field, recor
         {keyError ? (
           <p className="tw:m-0 tw:pl-[96px] tw:text-[11px] tw:leading-4 tw:text-[var(--bk-error-text)]" role="alert" data-testid="cms-fi-key-error">
             {keyError}
+          </p>
+        ) : null}
+        {saveFailed ? (
+          <p className="tw:m-0 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-error-text)]" role="alert" data-testid="cms-fi-save-error">
+            Could not save that change to {field.name}. Try again.
           </p>
         ) : null}
         <div className={ROW}>

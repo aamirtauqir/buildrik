@@ -149,6 +149,7 @@ describe("Form Submission Service", () => {
       vi.mocked(prisma.formSubmission.count).mockResolvedValue(0);
       vi.mocked(prisma.site.findUnique).mockResolvedValue({
         workspaceId: "ws1", name: "Site", canonicalUrl: null, slug: "renamed", vercelProjectName: "buildrik-site-original",
+        status: "PUBLISHED", publishedUrl: "https://buildrik-site-original.vercel.app",
       } as any);
       vi.mocked(prisma.domain.findFirst).mockResolvedValue(null);
       vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({ workspace: { plan: "FREE" } } as any);
@@ -195,6 +196,52 @@ describe("Form Submission Service", () => {
 
       const result = await submitForm("s1", "fb1", { data: {} }, "1.2.3.4");
       expect(result.siteOrigin).toBe("https://mysite.example.com");
+    });
+
+    /* D10: the fallback for a rejected `_return` must never be a dead
+       deployment. The project origin counts only while the site is live, and
+       the URL it is live at comes before the slug-derived guess. */
+    it("an unpublished site's Vercel project is not an origin — the fallback is never a dead deployment", async () => {
+      const { submitForm } = await import("@/server/services/form-submission.service");
+      vi.mocked(prisma.formBlock.findFirst).mockResolvedValue({ id: "fb1", siteId: "s1", isActive: true } as never);
+      vi.mocked(prisma.formSubmission.count).mockResolvedValue(0);
+      vi.mocked(prisma.site.findUnique).mockResolvedValue({
+        workspaceId: "ws1", name: "Site", canonicalUrl: null, slug: "gone", vercelProjectName: "buildrik-site-gone",
+        status: "DRAFT", publishedUrl: null,
+      } as never);
+      vi.mocked(prisma.domain.findFirst).mockResolvedValue(null);
+      vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({ workspace: { plan: "FREE" } } as never);
+      vi.mocked(prisma.formSubmission.create).mockResolvedValue({ id: "sub-d10a" } as never);
+
+      const result = await submitForm(
+        "s1", "fb1", { data: {}, returnUrl: "https://buildrik-site-gone.vercel.app/contact" }, "1.2.3.4",
+      );
+      expect(result.returnUrl).toBeNull();
+      expect(result.siteOrigin).toBeNull();
+    });
+
+    it("a live site falls back to where it is published, and still accepts a _return from there", async () => {
+      const { submitForm } = await import("@/server/services/form-submission.service");
+      vi.mocked(prisma.formBlock.findFirst).mockResolvedValue({ id: "fb1", siteId: "s1", isActive: true } as never);
+      vi.mocked(prisma.formSubmission.count).mockResolvedValue(0);
+      vi.mocked(prisma.site.findUnique).mockResolvedValue({
+        workspaceId: "ws1", name: "Site", canonicalUrl: null, slug: "live", vercelProjectName: null,
+        status: "PUBLISHED", publishedUrl: "https://live-site.vercel.app",
+      } as never);
+      vi.mocked(prisma.domain.findFirst).mockResolvedValue(null);
+      vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({ workspace: { plan: "FREE" } } as never);
+      vi.mocked(prisma.formSubmission.create).mockResolvedValue({ id: "sub-d10b" } as never);
+
+      const rejected = await submitForm(
+        "s1", "fb1", { data: {}, returnUrl: "http://localhost:4000/contact" }, "1.2.3.4",
+      );
+      expect(rejected.returnUrl).toBeNull();
+      expect(rejected.siteOrigin).toBe("https://live-site.vercel.app");
+
+      const accepted = await submitForm(
+        "s1", "fb1", { data: {}, returnUrl: "https://live-site.vercel.app/contact" }, "1.2.3.4",
+      );
+      expect(accepted.returnUrl).toBe("https://live-site.vercel.app/contact");
     });
 
     it("logs (not swallows) a failed notification email — the submission is already saved", async () => {
@@ -356,7 +403,7 @@ describe("Form Submission Service", () => {
       vi.mocked(prisma.formSubmission.findMany).mockResolvedValue([
         { id: "sub1", data: { name: "John" }, isRead: false, createdAt: new Date() },
       ] as any);
-      const result = await listSubmissions({ siteId: "s1", page: 1, perPage: 20 });
+      const result = await listSubmissions({ siteId: "s1", page: 1, perPage: 20 }, { technical: true });
       expect(result.data).toHaveLength(1);
       expect(result.total).toBe(5);
     });
@@ -377,6 +424,20 @@ describe("Form Submission Service", () => {
       vi.mocked(prisma.formSubmission.delete).mockResolvedValue({ id: "sub1" } as any);
       await deleteSubmission("sub1");
       expect(prisma.formSubmission.delete).toHaveBeenCalledWith({ where: { id: "sub1" } });
+    });
+  });
+
+  /* D7: update/delete answer an EDITOR too — the visitor's IP and device
+     never ride back on them. */
+  describe("update/delete never return IP or device", () => {
+    it("strips both from the updated and the deleted row", async () => {
+      const { updateSubmission, deleteSubmission } = await import("@/server/services/form-submission.service");
+      const row = { id: "sub1", isRead: true, ip: "203.0.113.9", deviceInfo: "UA" };
+      vi.mocked(prisma.formSubmission.update).mockResolvedValue(row as never);
+      vi.mocked(prisma.formSubmission.delete).mockResolvedValue(row as never);
+      for (const r of [await updateSubmission({ id: "sub1", isRead: true }), await deleteSubmission("sub1")]) {
+        expect(r).toEqual({ id: "sub1", isRead: true });
+      }
     });
   });
 
@@ -401,7 +462,7 @@ describe("Form Submission Service", () => {
         { id: "s1sub", createdAt: new Date("2026-06-01"), data: { email: "a@b.com" }, formBlock: { name: "Contact" } },
       ] as any);
 
-      const csv = await exportSubmissions("s1", undefined, "csv");
+      const csv = await exportSubmissions("s1", undefined, "csv", { technical: true });
 
       expect(prisma.formSubmission.findMany).toHaveBeenCalledWith(
         expect.objectContaining({ where: { siteId: "s1" } }),
@@ -414,7 +475,7 @@ describe("Form Submission Service", () => {
     it("scopes to one form block when formBlockId is provided", async () => {
       const { exportSubmissions } = await import("@/server/services/form-submission.service");
       vi.mocked(prisma.formSubmission.findMany).mockResolvedValue([] as any);
-      await exportSubmissions("s1", "fb1", "csv");
+      await exportSubmissions("s1", "fb1", "csv", { technical: true });
       expect(prisma.formSubmission.findMany).toHaveBeenCalledWith(
         expect.objectContaining({ where: { siteId: "s1", formBlockId: "fb1" } }),
       );
@@ -431,12 +492,29 @@ describe("Form Submission Service", () => {
         },
       ] as any);
 
-      const csv = await exportSubmissions("s1", undefined, "csv");
+      const csv = await exportSubmissions("s1", undefined, "csv", { technical: true });
       // formula-leading cells get an apostrophe prefix inside the quotes
       expect(csv).toContain(`"'=cmd|' /C calc'!A0"`);
       expect(csv).toContain(`"'+SUM(1)"`);
       expect(csv).toContain(`"'=evil()"`); // header row too
       expect(csv).not.toMatch(/(^|,)"=/m); // no cell starts with a live "="
     });
+  });
+});
+
+describe("submitter IP and device below ADMIN (D7)", () => {
+  it("list and JSON export drop ip and deviceInfo without the technical grant; CSV never had them", async () => {
+    const { listSubmissions, exportSubmissions } = await import("@/server/services/form-submission.service");
+    const row = { id: "x", data: { email: "a@b.c" }, ip: "203.0.113.9", deviceInfo: "Mac", createdAt: new Date(), formBlock: { name: "F" } };
+    vi.mocked(prisma.formSubmission.count).mockResolvedValue(1);
+    vi.mocked(prisma.formSubmission.findMany).mockResolvedValue([row] as never);
+    const listed = await listSubmissions({ siteId: "s1", page: 1, perPage: 20 } as never, { technical: false });
+    expect(listed.data[0]).not.toHaveProperty("ip");
+    expect(listed.data[0]).not.toHaveProperty("deviceInfo");
+    const json = await exportSubmissions("s1", undefined, "json", { technical: false });
+    expect(json).not.toContain("203.0.113.9");
+    expect(json).not.toContain('"ip"');
+    const admin = await exportSubmissions("s1", undefined, "json", { technical: true });
+    expect(admin).toContain("203.0.113.9");
   });
 });

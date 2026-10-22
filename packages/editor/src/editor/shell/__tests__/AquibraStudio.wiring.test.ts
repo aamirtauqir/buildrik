@@ -74,10 +74,12 @@ describe("AquibraStudio — every tab-switch door passes through the guard", () 
     for (const [, prop, fn] of doors) expect({ prop, fn }).toEqual({ prop, fn: "guardedOpenLeftPanelToTab" });
   });
 
-  it("the keyboard shortcuts (⌘H, ⌘,) get the guarded sinks", () => {
+  /* SC-12 / BD-39: ⌘H is gone too, so the shortcut hook opens no tab at all;
+     History's H is a rail letter and goes through ui:switch-tab below. */
+  it("the keyboard shortcuts open no tab — ⌘, (owner Q4) and ⌘H (BD-39) are gone", () => {
     const shortcuts = source.match(/useEditorShortcuts\(\{[\s\S]*?\}\);/)?.[0] ?? "";
-    expect(shortcuts).toContain("openLeftPanelToTab: guardedOpenLeftPanelToTab");
-    expect(shortcuts).toContain('openSiteSettings: () => guardedOpenLeftPanelToTab("settings")');
+    expect(shortcuts).not.toContain("openLeftPanelToTab");
+    expect(shortcuts).not.toContain("openSiteSettings");
   });
 
   it("the composer listeners (UI_PANEL_OPEN, ui:switch-tab via StudioPanels) get the guarded sinks", () => {

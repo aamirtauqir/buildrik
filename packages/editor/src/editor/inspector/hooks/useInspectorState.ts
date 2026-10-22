@@ -10,6 +10,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import type { PseudoStateId } from "@/shared/types";
+import type { Composer } from "@/engine";
 
 // ============================================================================
 // TYPES
@@ -32,7 +33,10 @@ export interface InspectorState {
 /**
  * Hook to manage inspector panel UI state (pseudo-state selection).
  */
-export function useInspectorState(selectedElement: SelectedElement | null): InspectorState {
+export function useInspectorState(
+  selectedElement: SelectedElement | null,
+  composer?: Pick<Composer, "stylePseudoState"> | null,
+): InspectorState {
   const [currentPseudoState, setCurrentPseudoState] = useState<PseudoStateId>("normal");
 
   const elementId = selectedElement?.id;
@@ -42,6 +46,17 @@ export function useInspectorState(selectedElement: SelectedElement | null): Insp
   useEffect(() => {
     setCurrentPseudoState("normal");
   }, [elementId]);
+
+  /* BD-36: copy-style / paste-style use the layer the Inspector shows, so the
+     state is published on the composer; back to normal once no Inspector
+     shows one. */
+  useEffect(() => {
+    if (!composer) return;
+    composer.stylePseudoState = currentPseudoState;
+    return () => {
+      composer.stylePseudoState = "normal";
+    };
+  }, [composer, currentPseudoState]);
 
   const handleSetPseudoState = useCallback((state: PseudoStateId) => {
     setCurrentPseudoState(state);

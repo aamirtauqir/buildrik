@@ -7,6 +7,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 const checkSiteRoleMock = vi.fn();
+const getReviewSiteIdMock = vi.fn(async (..._a: unknown[]) => "site_of_review");
 const checkWorkspaceRoleMock = vi.fn();
 const getSiteWorkspaceMock = vi.fn();
 const submitMock = vi.fn();
@@ -53,6 +54,7 @@ vi.mock("@/server/services/review.service", () => ({
   listRounds: (...a: unknown[]) => listRoundsMock(...a),
   getApprovedSnapshot: (...a: unknown[]) => getApprovedSnapshotMock(...a),
   revokeReviewRound: (...a: unknown[]) => revokeReviewRoundMock(...a),
+  getReviewSiteId: (...a: unknown[]) => getReviewSiteIdMock(...a),
   ReviewError: class ReviewError extends Error {
     code: string;
     constructor(code: string, msg?: string) {
@@ -162,10 +164,22 @@ describe("reviews router", () => {
 
   it("resolve runs for an admin", async () => {
     checkWorkspaceRoleMock.mockResolvedValueOnce(undefined);
+    checkSiteRoleMock.mockResolvedValueOnce(undefined);
     resolveMock.mockResolvedValueOnce({ id: "r1", status: "APPROVED" });
     const caller = reviewsRouter.createCaller(makeCtx() as never);
     await expect(caller.resolve({ id: "r1", status: "APPROVED" })).resolves.toMatchObject({ status: "APPROVED" });
     expect(resolveMock).toHaveBeenCalledWith("ws_1", "r1", "APPROVED", "u_1");
+    expect(checkSiteRoleMock).toHaveBeenCalledWith(expect.anything(), "u_1", "site_of_review", "ADMIN");
+  });
+
+  /* BK-08: a workspace ADMIN capped to VIEWER on the review's site approved
+     it — and an approval unblocks that site's publish. */
+  it("resolve refuses an admin whose effective role on the review's site is below ADMIN", async () => {
+    checkWorkspaceRoleMock.mockResolvedValueOnce(undefined);
+    checkSiteRoleMock.mockRejectedValueOnce(new PermissionError("FORBIDDEN", "Insufficient permissions"));
+    const caller = reviewsRouter.createCaller(makeCtx() as never);
+    await expect(caller.resolve({ id: "r1", status: "APPROVED" })).rejects.toMatchObject({ code: "FORBIDDEN" });
+    expect(resolveMock).not.toHaveBeenCalled();
   });
 
   /* currentRound carries the live client-link token (post-Oct-1 R4), but the
@@ -247,7 +261,7 @@ describe("reviews router", () => {
     await expect(
       caller.revoke({ siteId: "s2", reviewId: "r1", expectedRevision: "rev-1" }),
     ).resolves.toEqual({ revoked: true });
-    expect(revokeReviewRoundMock).toHaveBeenCalledWith("ws_site_2", "r1", "rev-1");
+    expect(revokeReviewRoundMock).toHaveBeenCalledWith("ws_site_2", "s2", "r1", "rev-1");
   });
 
   it("status returns the EFFECTIVE editsRequireApproval (layerOn && raw) — false when the layer is off, even if the raw setting is true (PD-7/8)", async () => {

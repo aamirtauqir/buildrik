@@ -60,7 +60,7 @@ vi.mock("@/server/services/ai-generation.service", () => ({
 }));
 
 vi.mock("@/server/services/billing.service", () => ({
-  getBillingOverview: vi.fn(), getUsageDetails: vi.fn(), listInvoices: vi.fn(),
+  getBillingOverview: vi.fn(), listInvoices: vi.fn(),
   createCheckoutSession: (...a: unknown[]) => createCheckoutSessionMock(...a),
   createPortalSession: vi.fn(),
   cancelSubscription: (...a: unknown[]) => cancelSubscriptionMock(...a),

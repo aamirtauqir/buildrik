@@ -9,6 +9,7 @@ import type { Composer } from "@/engine/Composer";
 import type { Element } from "@/engine/elements/Element";
 import { createTestComposer, installEngineBrowserStubs, removeEngineBrowserStubs } from "@/engine/__tests__/test-utils/realComposer";
 import { applyStyleToPeers, findStylePeers } from "../stylePeers";
+import { elementSelector } from "@/shared/utils/elementSelector";
 
 beforeAll(installEngineBrowserStubs);
 afterAll(removeEngineBrowserStubs);
@@ -84,6 +85,16 @@ describe("applyStyleToPeers", () => {
     expect(c.elements.getElement(peer.getId())!.getContent()).toBe("Peer");
   });
 
+  /* The state path built its selector as `[data-buildrik-id=…]` (missing
+     "c"): it read no source rule and wrote peer rules no element matched. */
+  it("copies the hover rule to every peer, on the selector the canvas and publish use", () => {
+    const src = add("button");
+    const peer = add("button");
+    c.styles.setRule(elementSelector(src.getId()), { color: "rgb(255, 0, 0)" }, { pseudo: ":hover" });
+    expect(applyStyleToPeers(c, src, [peer], { breakpoint: "desktop", pseudo: "hover" })).toBe(1);
+    expect(c.styles.getRule(`${elementSelector(peer.getId())}:hover`)?.properties).toEqual({ color: "rgb(255, 0, 0)" });
+  });
+
   it("copies the breakpoint layer on a breakpoint", () => {
     const src = add("button");
     const peer = add("button");
@@ -91,6 +102,15 @@ describe("applyStyleToPeers", () => {
     applyStyleToPeers(c, src, [peer], { breakpoint: "tablet", pseudo: "normal" });
     expect(c.styles.getBreakpointStyle(peer.getId(), "tablet")).toEqual({ color: "rgb(0, 0, 255)" });
     expect(c.elements.getElement(peer.getId())!.getStyles().color).toBeUndefined();
+  });
+
+  it("copies a pseudo-state rule written the way the Inspector writes it (data-buildrick-id)", () => {
+    const src = add("button");
+    const peer = add("button");
+    c.styles.setRule(`[data-buildrick-id="${src.getId()}"]`, { color: "rgb(0, 128, 0)" }, { pseudo: ":hover" });
+    const n = applyStyleToPeers(c, src, [peer], { breakpoint: "desktop", pseudo: "hover" });
+    expect(n).toBe(1);
+    expect(c.styles.getRule(`[data-buildrick-id="${peer.getId()}"]:hover`)?.properties).toMatchObject({ color: "rgb(0, 128, 0)" });
   });
 
   it("copies typography, fill, border and effects only — keeps layout, size, spacing and position (board 31)", () => {

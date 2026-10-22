@@ -12,6 +12,7 @@ const publishMutate = vi.fn();
 const publishStatusQuery = vi.fn();
 const cancelMutate = vi.fn();
 const sitesGetQuery = vi.fn();
+const authorizeCodeExportQuery = vi.fn();
 
 vi.mock("../api-client", () => ({
   createBuildrikApiClient: () => ({
@@ -20,6 +21,7 @@ vi.mock("../api-client", () => ({
       publishStatus: { query: (...a: unknown[]) => publishStatusQuery(...a) },
       cancelPublish: { mutate: (...a: unknown[]) => cancelMutate(...a) },
       get: { query: (...a: unknown[]) => sitesGetQuery(...a) },
+      authorizeCodeExport: { query: (...a: unknown[]) => authorizeCodeExportQuery(...a) },
     },
   }),
 }));
@@ -28,10 +30,8 @@ const settledBaseline = vi.fn(() => Promise.resolve<string | null>("2026-09-20T1
 const raiseSaveConflict = vi.fn((err: unknown) =>
   /SAVE_CONFLICT:/.test(String(err)) ? new Error("SAVE_CONFLICT") : null,
 );
-const siteColumnsLoaded = vi.fn((_siteId: string) => true);
 const hasProjectLoaded = vi.fn((_siteId: string) => true);
 vi.mock("../BuildrikSyncProvider", () => ({
-  siteColumnsLoaded: (siteId: string) => siteColumnsLoaded(siteId),
   hasProjectLoaded: (siteId: string) => hasProjectLoaded(siteId),
   settledBaselineLastEditedAt: () => settledBaseline(),
   raiseSaveConflict: (e: unknown) => raiseSaveConflict(e),
@@ -42,10 +42,11 @@ import {
   fetchPublishStatus,
   cancelPublish,
   fetchSitePublishState,
+  authorizeCodeExport,
 } from "../PublishService";
 
 beforeEach(() => {
-  [publishMutate, publishStatusQuery, cancelMutate, sitesGetQuery].forEach((m) => m.mockReset());
+  [publishMutate, publishStatusQuery, cancelMutate, sitesGetQuery, authorizeCodeExportQuery].forEach((m) => m.mockReset());
 });
 
 describe("publishSite", () => {
@@ -88,17 +89,6 @@ describe("publishSite", () => {
     publishMutate.mockRejectedValueOnce(new Error("SAVE_CONFLICT:2026-09-20T10:05:00.000Z"));
     await expect(publishSite("site-1", [])).rejects.toThrow(/changed somewhere else/);
     expect(raiseSaveConflict).toHaveBeenCalled();
-  });
-
-  /* SA-01: the columns are the only source of the site's <head> settings; a
-     session whose settings read failed renders pages without them. */
-  it("refuses, before any request, while the site's settings have not loaded", async () => {
-    siteColumnsLoaded.mockReturnValueOnce(false);
-    await expect(publishSite("site-1", [{ path: "index.html", html: "<html></html>" }])).rejects.toThrow(
-      "Site settings didn't load. Reload the editor before publishing.",
-    );
-    expect(siteColumnsLoaded).toHaveBeenCalledWith("site-1");
-    expect(publishMutate).not.toHaveBeenCalled();
   });
 
   /* P1-2: a tab whose project never loaded shows the fallback; publishing it
@@ -156,6 +146,9 @@ describe("fetchPublishStatus", () => {
       publishedUrl: null,
       error: null,
       deploymentId: "dep-1",
+      formsStatus: null,
+      formsError: null,
+      failedPhase: null,
     });
   });
 
@@ -277,5 +270,34 @@ describe("fetchSitePublishState", () => {
       lastEditedAt: "2026-08-21T09:00:00.000Z",
     });
     expect((await fetchSitePublishState("site-1")).hasUnpublishedChanges).toBeNull();
+  });
+});
+
+describe("authorizeCodeExport", () => {
+  const trpcError = (code: string, message: string) => Object.assign(new Error(message), { data: { code } });
+
+  it("is 'allowed' when the server says yes", async () => {
+    authorizeCodeExportQuery.mockResolvedValueOnce({ allowed: true });
+    await expect(authorizeCodeExport("site-1")).resolves.toBe("allowed");
+    expect(authorizeCodeExportQuery).toHaveBeenCalledWith({ siteId: "site-1" });
+  });
+
+  it("is 'upgrade' only for the plan refusal", async () => {
+    authorizeCodeExportQuery.mockRejectedValueOnce(
+      trpcError("FORBIDDEN", "CODE_EXPORT_NOT_IN_PLAN: Downloading your site's code is a Pro feature."),
+    );
+    await expect(authorizeCodeExport("site-1")).resolves.toBe("upgrade");
+  });
+
+  it("is 'forbidden' for any other FORBIDDEN (a viewer, or not a member)", async () => {
+    authorizeCodeExportQuery.mockRejectedValueOnce(trpcError("FORBIDDEN", "Insufficient permissions"));
+    await expect(authorizeCodeExport("site-1")).resolves.toBe("forbidden");
+  });
+
+  it("throws network and other errors", async () => {
+    authorizeCodeExportQuery.mockRejectedValueOnce(trpcError("NOT_FOUND", "Site not found"));
+    await expect(authorizeCodeExport("site-1")).rejects.toThrow("Site not found");
+    authorizeCodeExportQuery.mockRejectedValueOnce(new TypeError("Failed to fetch"));
+    await expect(authorizeCodeExport("site-1")).rejects.toThrow("Failed to fetch");
   });
 });

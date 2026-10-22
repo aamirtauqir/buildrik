@@ -49,6 +49,8 @@ export function AddFieldDialog({
   const [options, setOptions] = React.useState<string[]>([]);
   const [clash, setClash] = React.useState<string | null>(null);
   const [busy, setBusy] = React.useState(false);
+  /* C-6: a refused add used to close nothing and say nothing. */
+  const [saveFailed, setSaveFailed] = React.useState(false);
 
   const taken = React.useMemo(() => new Set(collection.fields.map((f) => f.slug)), [collection.fields]);
   const nextName = name.trim();
@@ -66,6 +68,7 @@ export function AddFieldDialog({
       return;
     }
     setBusy(true);
+    setSaveFailed(false);
     try {
       await onAdd({
         name: nextName,
@@ -76,6 +79,8 @@ export function AddFieldDialog({
         ...(type === "multiselect" ? { options } : {}),
       });
       onClose();
+    } catch {
+      setSaveFailed(true);
     } finally {
       setBusy(false);
     }
@@ -193,6 +198,11 @@ export function AddFieldDialog({
         {keyError ? (
           <p className="tw:m-0 tw:pl-[96px] tw:text-[11px] tw:leading-4 tw:text-[var(--bk-error-text)]" role="alert" data-testid="cms-add-field-key-error">
             {keyError}
+          </p>
+        ) : null}
+        {saveFailed ? (
+          <p className="tw:m-0 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-error-text)]" role="alert" data-testid="cms-add-field-save-error">
+            Could not add the field — {collection.name} is unchanged. Try again.
           </p>
         ) : null}
         <div className={ROW}>

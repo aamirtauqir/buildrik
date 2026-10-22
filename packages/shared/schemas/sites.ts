@@ -64,6 +64,16 @@ export const transferSiteSchema = z.object({
   newOwnerId: z.string(),
 });
 
+/** `sites.authorizeCodeExport` — the server half of the Publish panel's
+ *  "Download code (ZIP)" Pro gate. */
+export const codeExportAccessSchema = z.object({
+  siteId: z.string().min(1),
+});
+
+/** Leads the FORBIDDEN message when the site's plan has no code export, so the
+ *  editor can tell "upgrade" apart from every other refusal. */
+export const CODE_EXPORT_NOT_IN_PLAN = "CODE_EXPORT_NOT_IN_PLAN";
+
 export const checkSlugSchema = z.object({
   slug: z
     .string()

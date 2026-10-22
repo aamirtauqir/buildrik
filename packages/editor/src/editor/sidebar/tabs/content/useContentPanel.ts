@@ -18,6 +18,7 @@ import {
   consumeDirectSync,
   isCmsConflictPending,
   markDirectSync,
+  syncEntryRestore,
   syncEntryUpsert,
   takeCmsInvalid,
 } from "@/services/cmsSync";
@@ -65,6 +66,9 @@ export interface UseContentPanelReturn {
     published: boolean,
   ) => Promise<SaveRecordResult>;
   deleteRecord: (recordId: string) => Promise<void>;
+  /** Undo of a delete: the record comes back under its own id. Rejects when
+   *  the server could not take it back — the record stays deleted. */
+  restoreRecord: (record: CMSContentItem) => Promise<void>;
   addField: (collectionId: string, field: Omit<CMSField, "id" | "order">) => Promise<void>;
   deleteField: (collectionId: string, fieldId: string) => Promise<void>;
   setVariables: (vars: SiteVariable[]) => void;
@@ -202,8 +206,7 @@ export function useContentPanel(composer: Composer | null): UseContentPanelRetur
 
     /* Sources live on DataManager, which is a DIFFERENT emitter. A source
        registered or updated from anywhere else left the Sources view showing
-       stale rows, and board 303:2083's "Watching for changes" is only true
-       because the panel really is watching. */
+       stale rows. */
     const dataEvents = [
       EVENTS.DATA_SOURCE_REGISTERED,
       EVENTS.DATA_SOURCE_UPDATED,
@@ -272,12 +275,36 @@ export function useContentPanel(composer: Composer | null): UseContentPanelRetur
     [composer, reload],
   );
 
+  const restoreRecord = React.useCallback(
+    async (record: CMSContentItem) => {
+      if (!composer) return;
+      /* Server first (REA 2026-10-20 #11a). Undo used to save the record as
+         NEW — a fresh id, so every reference and binding to it broke. The
+         server un-tombstones the same row; the local copy then comes back
+         under that id, marked so the event mirror does not POST it again. */
+      if (!(await syncEntryRestore(record))) throw new Error("CMS_RESTORE_FAILED");
+      markDirectSync("entry", record.id);
+      try {
+        await composer.cms.collections.createContentItem(record.collectionId, record.data, {
+          status: record.status,
+          id: record.id,
+        });
+      } finally {
+        consumeDirectSync("entry", record.id);
+      }
+      await loadRecords(record.collectionId);
+      reload();
+    },
+    [composer, loadRecords, reload],
+  );
+
   const addField = React.useCallback(
     async (collectionId: string, field: Omit<CMSField, "id" | "order">) => {
       if (!composer) return;
       const order = composer.cms.collections.getCollection(collectionId)?.fields.length ?? 0;
-      await composer.cms.collections.addField(collectionId, { ...field, order });
+      const added = await composer.cms.collections.addField(collectionId, { ...field, order });
       reload();
+      if (!added) throw new Error("The collection no longer exists.");
     },
     [composer, reload],
   );
@@ -339,6 +366,7 @@ export function useContentPanel(composer: Composer | null): UseContentPanelRetur
     loadRecords,
     saveRecord,
     deleteRecord,
+    restoreRecord,
     addField,
     deleteField,
     setVariables,

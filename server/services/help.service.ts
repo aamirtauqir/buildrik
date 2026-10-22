@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { HELP_CATEGORIES, type SupportTicketInput } from "@buildrik/shared/schemas/help";
+import { type SupportTicketInput } from "@buildrik/shared/schemas/help";
 import { sendTicketReceivedEmail } from "@/server/services/email.service";
 
 // SLA copy by plan — mirrors the confirmation UI (ticket-form SLA_BY_PLAN).
@@ -8,10 +8,6 @@ const SLA_COPY: Record<string, string> = {
   PRO: "You're on Pro: expect an email response within 48 hours.",
   BUSINESS: "You're on Business: priority response within 4 hours.",
 };
-
-export function listCategories() {
-  return HELP_CATEGORIES.map((c) => ({ ...c }));
-}
 
 export async function searchArticles(query: string) {
   return prisma.helpArticle.findMany({

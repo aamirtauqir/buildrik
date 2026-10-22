@@ -11,7 +11,6 @@ import type { ComponentDefinition } from "@/shared/types/components";
 import { takePendingMaster, type OpenMasterRequest } from "./openMasterRequest";
 import { deleteComponentWithUndo } from "./ComponentDetailScreen";
 import { useComponentList } from "./useComponentList";
-import { INSTANTIATE_TOASTS, instantiateComponentAtSelection } from "./instantiate";
 import type { ToastInput } from "@/editor/chrome-ui";
 
 const MAX_COMPONENTS = 100;
@@ -43,7 +42,7 @@ export function useComponentsState({
   onHelpClick,
 }: UseComponentsStateParams) {
   // v3 FC-10: the load + subscribe shape lives once, in useComponentList.
-  const { components, isLoaded, error, setError, library } = useComponentList(composer);
+  const { components, isLoaded, error, retry, library } = useComponentList(composer);
 
   // Use controlled selectedId if provided, otherwise internal state
   const [internalSelectedId, setInternalSelectedId] = React.useState<string | null>(null);
@@ -99,16 +98,6 @@ export function useComponentsState({
     []
   );
 
-  // Instantiate a component on canvas
-  const handleInstantiate = React.useCallback(
-    async (componentId: string) => {
-      if (!composer) return;
-      const { description, tone } = INSTANTIATE_TOASTS[await instantiateComponentAtSelection(composer, componentId)];
-      setPendingToast({ message: description, variant: tone });
-    },
-    [composer]
-  );
-
   // Delete a component — opens ConfirmDialog instead of native confirm()
   const handleDelete = React.useCallback(
     (componentId: string) => {
@@ -135,22 +124,6 @@ export function useComponentsState({
     setConfirmDelete(null);
     return toast;
   }, [composer, confirmDelete, setSelectedId]);
-
-  // Duplicate a component — real deep-clone via the engine (was a fake
-  // "here's how to do it manually" info modal while the detail screen used
-  // the real API).
-  const handleDuplicate = React.useCallback(
-    async (componentId: string) => {
-      if (!composer) return;
-      try {
-        await composer.components.duplicateComponent(componentId);
-        setPendingToast({ message: "Component duplicated", variant: "success" });
-      } catch {
-        setPendingToast({ message: "Couldn't duplicate component.", variant: "error" });
-      }
-    },
-    [composer]
-  );
 
   // Detail view navigation
   const handleViewDetail = React.useCallback(
@@ -204,10 +177,6 @@ export function useComponentsState({
     [returnInstance, composer, handleBackFromDetail],
   );
 
-  const handleDetailInsert = React.useCallback(() => {
-    // Optionally navigate back after insert
-  }, []);
-
   const handleDetailDelete = React.useCallback(() => {
     setDetailComponent(null);
   }, []);
@@ -239,13 +208,10 @@ export function useComponentsState({
     canCreateComponent,
     // Handlers
     handleDragStart,
-    handleInstantiate,
     handleDelete,
-    handleDuplicate,
     handleViewDetail,
     handleBackFromDetail,
     backToInstance,
-    handleDetailInsert,
     handleDetailDelete,
     // Dialog state (replaces native dialogs)
     confirmDelete,
@@ -256,7 +222,7 @@ export function useComponentsState({
     // Loading & Error
     isLoaded,
     error,
-    setError,
+    retry,
     // Limits
     isAtComponentLimit,
     maxComponents: MAX_COMPONENTS,

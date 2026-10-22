@@ -88,9 +88,10 @@ export async function mirrorUserTemplate(t: MyTemplateRow): Promise<boolean> {
 /**
  * Pull server templates into the local cache on open. ADDITIVE — only ids not
  * already local are appended, so a local unsynced template is never clobbered.
- * They surface on the next My-Templates read. Best-effort; never throws.
+ * They surface on the next My-Templates read. Best-effort; never throws — a
+ * failure is reported through `onError` so missing templates are not silent.
  */
-export async function hydrateUserTemplatesFromServer(): Promise<void> {
+export async function hydrateUserTemplatesFromServer(onError?: (e: unknown) => void): Promise<void> {
   const siteId = getSiteIdFromUrl();
   // No siteId means the standalone demo, where there is no server to be down.
   if (!siteId) return;
@@ -116,5 +117,6 @@ export async function hydrateUserTemplatesFromServer(): Promise<void> {
   } catch (e) {
     // eslint-disable-next-line no-console
     console.warn("[template-sync] hydrate from server failed", e);
+    onError?.(e);
   }
 }

@@ -25,7 +25,7 @@ import { Button } from "flowbite-react";
 /* The LOCAL Tooltip — see HelpTooltip.tsx. */
 import { Tooltip } from "./Tooltip";
 import { IconButton } from "./Icon";
-import { SaveStatus, type SaveState } from "./SaveStatus";
+import { SaveStatus, type SaveState, type SaveStatusProps } from "./SaveStatus";
 import { Presence, type PresenceProps } from "./Presence";
 
 /* Publish geometry (2026-08-03). Both Publish branches used to render a bare
@@ -134,6 +134,9 @@ export interface TopbarProps {
   onSaveClick?: () => void;
   /** The tooltip on a pill with nothing to click (offline). */
   saveHint?: string;
+  /** `stalled`: how long saving has been stuck (ms), and its panel. */
+  saveStalledFor?: number;
+  savePanel?: SaveStatusProps["panel"];
   /** The review round's current truth. Omit when no review is in flight. */
   review?: ReviewPill | null;
   /** The daily-loop cluster: Quick preview · Comments. */
@@ -183,7 +186,7 @@ const PUBLISH_LABEL: Record<PublishState, string> = {
 };
 
 export function Topbar({
-  siteName, pageName, onOpenPages, onPageCrumb, onExit, exitLabel = "‹ Exit", save, savedAt, onSaveClick, saveHint, review, tools, presence,
+  siteName, pageName, onOpenPages, onPageCrumb, onExit, exitLabel = "‹ Exit", save, savedAt, onSaveClick, saveHint, saveStalledFor, savePanel, review, tools, presence,
   unreadCount = 0, onOpenNotifications, publish = "ready", publishBusy, onPublish,
   publishBlockedReason, ctaLabel, ctaHint, action, menu,
 }: TopbarProps) {
@@ -271,7 +274,7 @@ export function Topbar({
       {/* Nothing in a read-only view can become unsaved, so "Saved · just now"
           is status about a machine the viewer is not operating. `save` is
           omitted there rather than rendering a permanently-green pill. */}
-      {save ? <SaveStatus state={save} savedAt={savedAt} onClick={onSaveClick} hint={saveHint} /> : null}
+      {save ? <SaveStatus state={save} savedAt={savedAt} onClick={onSaveClick} hint={saveHint} stalledFor={saveStalledFor} panel={savePanel} /> : null}
 
 
       {review ? (

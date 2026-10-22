@@ -16,6 +16,7 @@ import { omit } from "@shared/utils/helpers/object";
 import { getBuildrikClient } from "./api-client";
 import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
 import { getSiteIdFromUrl } from "./BuildrikSyncProvider";
+import { EVENTS } from "../shared/constants/events";
 import * as Storage from "../engine/cms/CollectionStorage";
 import type { CMSCollection, CMSContentItem, CMSField } from "../shared/types/cms";
 import {
@@ -136,11 +137,17 @@ function readOutbox(): Record<string, OutboxOp[]> {
   }
 }
 
+let outboxWriteWarned = false;
 function writeOutbox(box: Record<string, OutboxOp[]>): void {
   try {
     localStorage.setItem(OUTBOX_KEY, JSON.stringify(box));
-  } catch {
-    // Private mode / quota: the in-memory queue still retries this session.
+  } catch (e) {
+    /* Private mode / quota: the in-memory queue still retries this session and
+       the unload guard counts it, but nothing survives a reload — say so once. */
+    if (!outboxWriteWarned) {
+      outboxWriteWarned = true;
+      console.warn("[cms-sync] outbox not persisted; unsynced CMS changes will not survive a reload", e);
+    }
   }
 }
 
@@ -309,7 +316,7 @@ function classify(e: unknown): Outcome | null {
    *_DELETED event the sync layer listens to). */
 type CmsEngine = Pick<
   import("../engine/cms/CollectionManager").CollectionManager,
-  "forgetLocal" | "refreshFromStorage"
+  "forgetLocal" | "refreshFromStorage" | "emit"
 >;
 let engine: CmsEngine | null = null;
 export function bindCmsEngine(cm: CmsEngine | null): void {
@@ -423,16 +430,20 @@ function deleteAlreadyDone(e: unknown): never {
 
 export type CmsSyncErrorInfo = SyncRetryInfo;
 
-/** Subscribe to CMS sync failures. Returns an unsubscribe fn. */
-export function onCmsSyncError(cb: (info: CmsSyncErrorInfo) => void): () => void {
-  return queue.onError(cb);
+/** CMS changes still waiting to be sent: outstanding (queued, in flight, or in
+ *  the outbox from an earlier page load) and not parked on a conflict, which
+ *  only Keep mine / Use theirs can settle. The ONE number behind both the
+ *  publish gate's "Retry the sync" line and the sync-error toast — the toast
+ *  used to read the queue's own `size`, which left out the outbox and the
+ *  mirrors in flight, so it undercounted what publish refused on (C-16). */
+export function getCmsSyncPendingCount(keys: Set<string> = outstandingCmsKeys()): number {
+  return [...keys].filter((k) => !conflicted.has(k)).length;
 }
 
-/** How many CMS changes are queued for retry (not yet on the server). Excludes
- *  in-flight mirrors — use `cmsSyncBlocker` for the publish-gate count, which
- *  includes both queued and in-flight work. */
-export function getCmsSyncPendingCount(): number {
-  return queue.pendingCount();
+/** Subscribe to CMS sync failures. Returns an unsubscribe fn. `pending` is
+ *  `getCmsSyncPendingCount()`, the publish gate's count, not the queue's. */
+export function onCmsSyncError(cb: (info: CmsSyncErrorInfo) => void): () => void {
+  return queue.onError(() => cb({ pending: getCmsSyncPendingCount() }));
 }
 
 /* P0-B audit 2026-09-30 — the sheet's save needs to know whether the mirror
@@ -462,8 +473,8 @@ export function cmsSyncBlocker(): string | null {
     /* A conflicted change is outstanding too (it stays in the outbox), but
        "Retry the sync" cannot settle it — the user's choice does. Named
        apart (QA 2026-10-02). */
-    const waiting = [...keys].filter((k) => conflicted.has(k)).length;
-    const unsent = keys.size - waiting;
+    const unsent = getCmsSyncPendingCount(keys);
+    const waiting = keys.size - unsent;
     const parts: string[] = [];
     if (unsent > 0) {
       const noun = unsent === 1 ? "change hasn't" : "changes haven't";
@@ -838,8 +849,8 @@ async function takeServerCopy(siteId: string, kind: "collection" | "entry", id: 
  * here, then mirrored), the local copy goes, and the server's collection is
  * hydrated in — so a second "Blog" made on another device becomes the one
  * Blog with both devices' records, instead of a create 500ing forever.
- * Not covered: element bindings made to the local id in the window before
- * its first mirror; they still name it.
+ * Element bindings made to the local id in the window before its first
+ * mirror follow it to the server's id (CMS_COLLECTION_REKEYED, REA C-7).
  */
 async function adoptServerCollection(siteId: string, local: CMSCollection, serverId: string): Promise<void> {
   const key = `collectionUpsert:${local.id}`;
@@ -850,6 +861,7 @@ async function adoptServerCollection(siteId: string, local: CMSCollection, serve
   for (const item of moved) await Storage.saveContentItem(item);
   await Storage.deleteCollection(local.id);
   forgetRow(`collection:${local.id}`);
+  engine?.emit(EVENTS.CMS_COLLECTION_REKEYED, { from: local.id, to: serverId });
   forceServer.add(`collection:${serverId}`);
   await hydrateCmsFromServer();
   await Promise.all(moved.map((item) => syncEntryUpsert(item)));
@@ -969,6 +981,37 @@ export async function syncEntryDelete(id: string): Promise<void> {
       conflict: () => {},
     },
   );
+}
+
+/**
+ * Undo of a record delete, on the server (REA 2026-10-20 #11a): the record
+ * comes back under its own id, so references and bindings to it hold.
+ * Re-creating it would mint a new id, and upserting the old one is GONE (the
+ * row is a tombstone). A delete still queued never reached the server — it
+ * is simply dropped. Resolves false when the server could not be reached or
+ * refused; the caller then leaves the record deleted and says so.
+ */
+export async function syncEntryRestore(item: CMSContentItem): Promise<boolean> {
+  const siteId = getSiteIdFromUrl();
+  if (!siteId) return true;
+  const deleteKey = `entryDelete:${item.id}`;
+  if (queue.isPending(deleteKey)) {
+    queue.drop(deleteKey);
+    outboxRemove(siteId, deleteKey);
+    return true;
+  }
+  await queue.settled(deleteKey);
+  try {
+    const row = await client().cms.entries.restore.mutate({ siteId, id: item.id });
+    /* The un-tombstoning moved the row's updatedAt: without the new stamp the
+       next save of this record would CONFLICT against its own restore. */
+    if (row?.updatedAt) confirmServerCopy(`entry:${item.id}`, row.updatedAt, item.updatedAt);
+    return true;
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.warn("[cms-sync] entry restore failed", e);
+    return false;
+  }
 }
 
 /* One replay per site per page load at a time — React's dev double-mount runs

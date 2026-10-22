@@ -1,7 +1,6 @@
 import { createComposer, type Composer } from "@/engine";
 import { ExportEngine } from "@/engine/export";
 import { CMSExportResolver } from "@/engine/cms/CMSExportResolver";
-import { escapeStyleText } from "@buildrik/shared/schemas/element-markup";
 import type { ProjectData } from "@/shared/types/project";
 import type { CMSCollection, CMSContentItem } from "@/shared/types/cms";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
@@ -15,35 +14,20 @@ export interface PublishPage {
 }
 
 /**
- * Export all of the project's pages into the publish payload. SSOT for the
- * page-export map shared by the Topbar publish button (useExportHandlers) and
- * the AI privileged-action publish gate — both must produce identical pages.
+ * The publish payload's pages: every page file the export wrote. Each one
+ * carries its own CSS inline (`inlineStyles`) — the payload is `pages` only,
+ * so a linked styles.css would never reach the deployment (every published
+ * page used to link a stylesheet that 404'd and shipped with browser
+ * defaults), and each page carries only its own elements' rules (REA #25).
  */
-/**
- * Fold the multi-page export's single stylesheet into each page's head.
- *
- * Exported for its own test: the transformation has to be provable without
- * standing up a real project, because the bug it fixes is invisible until a
- * site is actually deployed.
- */
-export function inlinePublishStylesheet(
-  files: ReadonlyArray<{ name: string; content: string }>
-): PublishPage[] {
-  const css = files.find((f) => f.name === "styles.css")?.content ?? "";
-  const pages = files.filter((f) => f.name.endsWith(".html"));
-  if (!css) return pages.map((f) => ({ path: f.name, html: f.content }));
-  // The sheet goes inside a <style> on a visitor's page, so nothing in it may
-  // close that element; and it is inserted by a function, so a `$'` in the
-  // CSS is not read as a replacement pattern.
-  const styleTag = `  <style>${escapeStyleText(css)}</style>\n`;
-  return pages.map((f) => ({
-    path: f.name,
-    html: f.content.replace(/[ \t]*<link rel="stylesheet" href="styles\.css">\n?/, () => styleTag),
-  }));
+function publishPagesOf(files: ReadonlyArray<{ name: string; content: string }>): PublishPage[] {
+  return files.filter((f) => f.name.endsWith(".html")).map((f) => ({ path: f.name, html: f.content }));
 }
 
 async function exportPageFiles(composer: Composer) {
-  return (await new ExportEngine(composer).exportAllPages({ format: "html", minify: true, rootAbsoluteHrefs: true })).files;
+  return (
+    await new ExportEngine(composer).exportAllPages({ format: "html", minify: true, rootAbsoluteHrefs: true, inlineStyles: true })
+  ).files;
 }
 
 /** Collection ids the project's bindings read — field bindings and lists. */
@@ -63,6 +47,11 @@ function boundCollectionIds(project: ProjectData): string[] {
  *  blocked" — nothing failed, the publish never started. */
 export class PublishBlockedError extends Error {}
 
+/**
+ * Export all of the project's pages into the publish payload. SSOT for the
+ * page-export map shared by the Topbar publish button (useExportHandlers) and
+ * the AI privileged-action publish gate — both must produce identical pages.
+ */
 export async function exportPublishPages(composer: Composer): Promise<PublishPage[]> {
   const siteId = getSiteIdFromUrl();
   const project = composer.exportProject();
@@ -72,17 +61,7 @@ export async function exportPublishPages(composer: Composer): Promise<PublishPag
      this browser's store can hold rows another device deleted, edits that
      never synced, or a rename the server never saw (DM-01). */
   if (!siteId || collectionIds.length === 0) {
-    const files = await exportPageFiles(composer);
-    /* The multi-page export writes ONE styles.css and links it from every page,
-       and the publish payload carries pages only (`pages: [{ path, html }]`), so
-       that file never reached the deployment — the worker uploads the page HTML
-       plus robots.txt and nothing else. Every published page linked a stylesheet
-       that 404s, and the exported markup carries CLASSES rather than style
-       attributes, so the site shipped with browser defaults.
-
-       Inlining it needs no new transport: schema, server and worker unchanged.
-       Pages are capped at 2MB each and the stylesheet is a few KB. */
-    return inlinePublishStylesheet(files);
+    return publishPagesOf(await exportPageFiles(composer));
   }
   const blocker = cmsSyncBlocker();
   if (blocker) throw new PublishBlockedError(blocker);
@@ -141,8 +120,8 @@ export async function renderProjectPages(
     const files = await exportPageFiles(scratch);
     const byId = new Map(snapshot.pages.map((p) => [p.id, p]));
     const htmlFiles = files.filter((f) => f.name.endsWith(".html"));
-    // inlinePublishStylesheet keeps the html files' order, so index i is file i.
-    return inlinePublishStylesheet(files).map((page, i) => {
+    // publishPagesOf keeps the html files' order, so index i is file i.
+    return publishPagesOf(files).map((page, i) => {
       const source = byId.get(htmlFiles[i]?.pageId ?? "");
       return { ...page, name: source?.name ?? page.path, slug: source?.slug ?? "" };
     });
@@ -152,14 +131,47 @@ export async function renderProjectPages(
 }
 
 /**
- * The in-editor Preview's HTML: `exportHTML()` with CMS bindings resolved the
- * way the publish export resolves them (CMSExportResolver, static — text
- * semantics, the shared allowlist). `exportHTML()` alone writes each element's
- * STORED text, so a bound element previewed stale or blank while the canvas
- * showed its record (dashboard verify pass 3, DV3-3).
+ * The in-editor Preview's HTML: the page being edited, exactly as Publish
+ * ships it — the same multi-page export, the same inlined stylesheet. It was
+ * `exportHTML()`, a second document assembly, so Preview could disagree with
+ * the published page (REA #18). CMS bindings resolve the way that export
+ * resolves them (published records, from this browser's store).
+ *
+ * A page the export leaves out (Hidden or Password) is still previewed, from
+ * the single-page document: the user is looking at it, and it has no
+ * published twin to disagree with.
+ *
+ * `hiddenDrafts`: the records this page's collection lists leave out because
+ * they are not published — the canvas shows them, Preview and the live site
+ * do not, and Preview says so rather than dropping them silently.
  */
-export async function renderPreviewHtml(composer: Composer): Promise<string> {
+export async function renderPreviewHtml(composer: Composer): Promise<{ html: string; hiddenDrafts: number }> {
+  const html = await previewPageHtml(composer);
+  return { html, hiddenDrafts: await hiddenDraftCount(composer, html).catch(() => 0) };
+}
+
+async function previewPageHtml(composer: Composer): Promise<string> {
+  const pageId = composer.elements.getActivePage?.()?.id;
+  const files = await exportPageFiles(composer);
+  const index = files.filter((f) => f.name.endsWith(".html")).findIndex((f) => f.pageId === pageId);
+  if (index >= 0) return publishPagesOf(files)[index].html;
   const raw = composer.exportHTML().combined || "<!DOCTYPE html><html><body>No content</body></html>";
   // A resolve that throws previews the stored text, as before — never nothing.
   return new CMSExportResolver(composer).resolve(raw, { mode: "static" }).catch(() => raw);
+}
+
+/** Unpublished records of the collections bound to a list on this page. A
+ *  list's copies keep its element id, so the page's HTML says which lists it
+ *  has. */
+async function hiddenDraftCount(composer: Composer, html: string): Promise<number> {
+  const collections = new Set(
+    Object.entries(composer.cms.bindings.exportCollectionBindings())
+      .filter(([elementId]) => html.includes(`data-buildrick-id="${elementId}"`))
+      .map(([, binding]) => binding.collectionId),
+  );
+  let count = 0;
+  for (const id of collections) {
+    count += (await composer.cms.collections.getContentItems(id)).filter((i) => i.status !== "published").length;
+  }
+  return count;
 }

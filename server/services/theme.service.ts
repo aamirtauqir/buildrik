@@ -1,5 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { siteScopeWhere } from "@/server/services/permission.service";
 import { sanitizeProjectStyles } from "@/lib/sanitize-blocks";
 import { validateTokens, TOKENS_SCHEMA_VERSION, DarkModeSchema } from "@buildrik/shared/schemas/design-tokens";
 import type { DarkMode } from "@buildrik/shared/schemas/design-tokens";
@@ -203,9 +204,12 @@ async function readSourceTokens(workspaceId: string, sourceSiteId: string): Prom
 }
 
 /** Every site in the workspace with its push-relevant state (drives the UI). */
-export async function listThemeTargets(workspaceId: string): Promise<ThemeTarget[]> {
+export async function listThemeTargets(workspaceId: string, userId: string): Promise<ThemeTarget[]> {
+  /* BK-08: the sites this member may open — a member scoped to one site was
+     handed the name and lock state of every site in the workspace. */
+  const scope = await siteScopeWhere(prisma, userId, workspaceId);
   const rows = await prisma.site.findMany({
-    where: { workspaceId, deletedAt: null },
+    where: { workspaceId, deletedAt: null, ...scope },
     orderBy: { name: "asc" },
     select: { id: true, name: true, clientId: true, themeLocked: true, dsSchemaVersion: true },
   });
@@ -237,6 +241,7 @@ export async function setSiteThemeLock(
 export async function pushSharedTheme(
   workspaceId: string,
   siteIds?: string[],
+  actorId?: string,
 ): Promise<PushResult[]> {
   const theme = await requireTokenTheme(workspaceId);
 
@@ -292,6 +297,7 @@ export async function pushSharedTheme(
             projectSettings: withTokens(site.projectSettings, final.theme, pushed.version),
             dsSchemaVersion: site.dsSchemaVersion + 1,
             lastEditedAt: savedAt,
+            lastEditedById: actorId ?? null,
           },
         });
         if (claimed.count === 0) throw new Error("This site changed while pushing — push again.");
@@ -507,6 +513,7 @@ export async function previewSharedThemePush(
 export async function rollbackSiteTheme(
   workspaceId: string,
   siteId: string,
+  actorId?: string,
 ): Promise<{ rolledBackTo: Date }> {
   const site = await prisma.site.findFirst({
     where: { id: siteId, workspaceId },
@@ -545,6 +552,7 @@ export async function rollbackSiteTheme(
             }),
         dsSchemaVersion: site.dsSchemaVersion + 1,
         lastEditedAt: new Date(),
+        lastEditedById: actorId ?? null,
       },
     });
     if (claimed.count === 0) {
@@ -625,6 +633,7 @@ export async function rollbackTokenMigration(siteId: string): Promise<{ restored
       dsSchemaVersion: site.dsSchemaVersion + 1,
       tokensMigrationHold: true,
       lastEditedAt: new Date(),
+      lastEditedById: null,
     },
   });
   if (claimed.count === 0) {

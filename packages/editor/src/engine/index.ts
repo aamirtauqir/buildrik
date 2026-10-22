@@ -48,9 +48,6 @@ export { Viewport } from "./Viewport";
 // Page Routing
 export { PageRouter } from "./routing/PageRouter";
 
-// Plugin System
-export { PluginManager } from "./PluginManager";
-
 // Data Sources
 export { DataManager } from "./data/DataManager";
 export { TemplateEngine } from "./data/TemplateEngine";

@@ -65,8 +65,12 @@ describe("tabsConfig — Figma rail", () => {
   it("every off-rail panel keeps a keyboard shortcut (⌘K nav commands derive from config)", () => {
     // Off-rail reachability contract: ⌘K lists "Open {label} panel" for every
     // tab in GROUPED_TABS_CONFIG, and each off-rail tab keeps its shortcut.
-    for (const id of ["templates", "components", "settings", "publish", "history", "review"] as const) {
+    for (const id of ["templates", "components", "publish", "history", "review"] as const) {
       expect(getTabConfig(id)?.shortcut, `"${id}" must keep its shortcut`).toBeTruthy();
     }
+  });
+
+  it("Site settings has no letter — owner Q4 (SC-12): topbar button and ⌘K only", () => {
+    expect(getTabConfig("settings")?.shortcut).toBeUndefined();
   });
 });

@@ -16,13 +16,11 @@ import * as React from "react";
 import { PanelFrame, Button, ConfirmDialog, Menu, MenuItem, Popover, TextField } from "@/editor/chrome-ui";
 import { MoreHorizontal } from "lucide-react";
 import { useHistoryState } from "@/shared/hooks/useHistoryState";
-import { useAutoMilestone } from "@/shared/hooks/useAutoMilestone";
 import { VersionHistoryPanel } from "@/editor/panels/VersionHistoryPanel";
 import { useEditorRole } from "@/editor/shell/hooks/useEditorRole";
 import { SaveVersionFooter } from "@/editor/panels/version-history/SaveVersionFooter";
 import { PublishHistory } from "@/editor/shell/PublishHistory";
 import { ActivityView } from "./components/ActivityView";
-import { MilestoneSuggestionBanner } from "./components/MilestoneSuggestionBanner";
 import type { HistoryView, HistoryTabProps } from "./types";
 import { BackToActivityRow } from "../activity/BackToActivityRow";
 import { EVENTS } from "@/shared/constants/events";
@@ -141,15 +139,6 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
   const handleMatchCount = React.useCallback((shown: number, total: number) => setMatchCount({ shown, total }), []);
   const [menuOpen, setMenuOpen] = React.useState(false);
   const [confirmClear, setConfirmClear] = React.useState(false);
-
-  const {
-    suggestion: milestoneSuggestion,
-    isLoading: milestoneLoading,
-    dismiss: dismissMilestone,
-    accept: acceptMilestone,
-    edit: editMilestone,
-    isAvailable: milestoneAvailable,
-  } = useAutoMilestone(composer);
 
   /* Written back in the SAME vocabulary the key already used ("saves" |
      "changes" | "published" | "activity"), so a downgrade to a build
@@ -342,27 +331,16 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
         )}
 
         {activeView === "saves" && (
-          <>
-            {milestoneAvailable && milestoneSuggestion && (
-              <MilestoneSuggestionBanner
-                suggestion={milestoneSuggestion}
-                isLoading={milestoneLoading}
-                onAccept={acceptMilestone}
-                onDismiss={dismissMilestone}
-                onEdit={editMilestone}
-              />
-            )}
-            <VersionHistoryPanel
-              composer={composer}
-              searchQuery={searchQuery}
-              onMatchCount={handleMatchCount}
-              readOnly={isViewer}
-            />
-          </>
+          <VersionHistoryPanel
+            composer={composer}
+            searchQuery={searchQuery}
+            onMatchCount={handleMatchCount}
+            readOnly={isViewer}
+          />
         )}
 
-        {/* M2 — the published-version list's canonical home. Same component the
-            Publish panel embeds; rollback stays ADMIN-gated inside it. */}
+        {/* M2 — the published-version list's canonical home (HistoryTab is its
+            only host); rollback stays ADMIN-gated inside it. */}
         {activeView === "published" &&
           (siteId ? (
             <PublishHistory

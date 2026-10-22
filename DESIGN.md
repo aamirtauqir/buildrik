@@ -114,7 +114,7 @@ do NOT apply here):
 The editor chrome contains **zero pure-black or near-black surfaces**. This is the single most important visual rule after the accent rule.
 
 - No `#000`, `#0a0a0a`, `#14141f`, `#1F2937` (near-black navy), or any hex with all three RGB channels under `0x35` as a surface, background, or fill.
-- Text can be dark — darkest allowed is `#334155` (slate-700) — but never `#000` or `#1F2937`.
+- Text uses the generated ink ramp only — `--bk-ink` `#111827` (primary), `--bk-ink-soft` `#4B5563`, `--bk-ink-muted` `#6B7280` — never `#000`. The surface/fill limit above does not apply to text. (This line capped text at `#334155` slate-700 until 2026-10-15, while `tokens.generated.css` — the SSOT since the 2026-07-29 Flowbite re-base — set `--bk-ink: #111827`; design decision 12 made the generated tokens win.)
 - Account avatar, context menus, tooltips all follow this. The legacy `#1F2937` avatar pill is replaced by cobalt-on-white.
 - Icons inherit `currentColor` from the text scale. No independent "icon-only dark tone."
 
@@ -168,9 +168,11 @@ doc alone.
 
 Depth is communicated by nesting + hairline borders, not heavy shadows. The
 elevation scale is exactly three steps: `raised 0 1px 2px rgba(0,0,0,.08)`
-(knobs, chips) · `drag 0 4px 6px rgba(0,0,0,.10)` (picked-up state, menus,
-popovers) · `overlay 0 10px 15px rgba(0,0,0,.10)` (modals, command palette,
-floating drawers).
+(knobs, chips) · `drag 0 4px 6px rgba(0,0,0,.10)` (picked-up state) ·
+`overlay 0 10px 15px rgba(0,0,0,.10)` (modals, popovers, menus, command
+palette, floating drawers). Toasts carry a hairline border and no shadow.
+(Menus and popovers were listed under `drag` until 2026-10-15; chrome-ui's
+Popover has always drawn `--bk-shadow-overlay`.)
 
 ### Borders (Flowbite grays)
 
@@ -407,7 +409,7 @@ Rail is 60px, `--aqb-bg-panel` (`#F8FAFC`), three zones (Creation / Structure / 
 7. No colored left-border card treatment.
 8. No default font stacks. No specific named fallbacks (`Helvetica`, `Arial`, `system-ui`).
 9. Cards earn their existence. If it's not interactive, don't wrap it in a card.
-10. No shadows on flat surfaces. Depth is hairline borders + warm neutral layering. Only modals get elevation shadow.
+10. No shadows on flat surfaces. Depth is hairline borders + neutral layering. Anything floating takes its elevation from the three generated `--bk-shadow-*` steps and nothing else (see §Color · elevation): modals, popovers, menus and the command palette are `overlay`; toasts are border-only. (This rule said "Only modals get elevation shadow" until 2026-10-15, which every popover contradicted; design decision 12.)
 11. No category-colored accents (e.g., `--media-img: #3b82f6`). One accent only.
 12. No per-row action strips. Actions live in hover-reveal overflow menus.
 
