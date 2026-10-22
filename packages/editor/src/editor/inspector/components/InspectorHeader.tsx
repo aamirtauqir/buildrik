@@ -3,8 +3,7 @@
  *   1. the path — chrome-ui Breadcrumb, "Home › Hero › Heading": the page
  *      crumb clears the selection (→ Page panel), an ancestor crumb selects it
  *      (the Layers-click path);
- *   2. identity — type icon + editable name · ✦ AI (the panel's only AI door)
- *      · ⋯ (board 30) · ✕ "Hide inspector (⌘\)";
+ *   2. identity — type icon + editable name · ⋯ (board 30) · ✕ "Hide inspector (⌘\)";
  * 72 tall like every board: the identity row is 28 (the boards' 28px action
  * boxes). The status marks are their own row below it (StatusMarks).
  * Variants: `multi` (board 22): the name row reads "3 selected · Headings"
@@ -17,7 +16,7 @@
 import { X } from "lucide-react";
 import * as React from "react";
 import type { Composer, Element } from "@/engine";
-import { Breadcrumb, Button, IconButton, type BreadcrumbItem } from "@/editor/chrome-ui";
+import { Breadcrumb, IconButton, type BreadcrumbItem } from "@/editor/chrome-ui";
 import { getElementIcon } from "@/editor/shared/elementIcons";
 import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
 import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
@@ -102,16 +101,6 @@ export function InspectorHeader({ composer, element, selectedIds }: InspectorHea
             )}
           </span>
         </div>
-        <Button
-          type="button"
-          className="tw:h-6 tw:w-10 tw:shrink-0 tw:justify-center tw:rounded-[6px] tw:bg-[var(--bk-accent-tint)] tw:px-2 tw:text-[11px] tw:font-medium tw:text-[var(--bk-accent-text)] tw:whitespace-nowrap"
-          title="Ask AI about this element"
-          aria-label="Ask AI about this element"
-          data-testid="inspector-ai-chip"
-          onClick={() => composer?.emit("ui:switch-tab", { tab: "ai" })}
-        >
-          ✦ AI
-        </Button>
         <InspectorElementMenu composer={composer} selectedElementId={element.id} />
         <IconButton
           label="Hide inspector (⌘\)"

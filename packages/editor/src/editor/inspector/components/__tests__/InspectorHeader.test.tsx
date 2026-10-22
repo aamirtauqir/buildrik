@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 /**
  * InspectorHeader — board 1's header: the element path (crumbs go there),
- * icon + name, ✦ AI, ⋯, ✕ hide (⌘\). The status marks are their own row.
+ * icon + name, ⋯, ✕ hide (⌘\). The status marks are their own row.
  * Real Composer.
  *
  * @license BSD-3-Clause
@@ -62,13 +62,10 @@ describe("InspectorHeader", () => {
     expect(c.selection.getSelected()).toBeFalsy();
   });
 
-  it("carries ✦ AI, ⋯ and ✕ — and ✕ hides the inspector", () => {
+  it("carries ⋯ and ✕ — and ✕ hides the inspector", () => {
     const hide = vi.fn();
     c.on(EVENTS.UI_TOGGLE_INSPECTOR, hide);
     mount();
-    expect(screen.getByTestId("inspector-ai-chip")).toHaveTextContent("✦ AI");
-    /* Every board draws the chip 40 wide. */
-    expect(screen.getByTestId("inspector-ai-chip").className).toContain("tw:w-10");
     expect(screen.getByTestId("inspector-element-menu")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Hide inspector (⌘\\)" }));
     expect(hide).toHaveBeenCalled();
@@ -77,7 +74,7 @@ describe("InspectorHeader", () => {
   it("72 tall like the boards: the identity row is 28, and no status marks live inside it", () => {
     mount();
     const header = screen.getByTestId("inspector-header");
-    expect(screen.getByTestId("inspector-ai-chip").parentElement?.className).toContain("tw:min-h-7");
+    expect(header.querySelector('[class*="tw:min-h-7"]')).toBeTruthy();
     expect(header.querySelector('[data-testid="inspector-status-marks"]')).toBeNull();
   });
 
@@ -95,6 +92,12 @@ describe("InspectorHeader", () => {
     expect(nav.textContent).toBe("Home›Section");
     expect(nav.querySelector('[aria-current="page"]')?.textContent).toBe("Section");
     expect(screen.queryByTestId("inspector-type-icon")).toBeNull();
+  });
+
+  it("inspector-ai-chip does not render (owner: no AI in the UI)", () => {
+    mount();
+    expect(screen.queryByTestId("inspector-ai-chip")).toBeNull();
+    expect(screen.queryByRole("button", { name: /AI/ })).toBeNull();
   });
 
   it("single: the name row draws the type icon", () => {
