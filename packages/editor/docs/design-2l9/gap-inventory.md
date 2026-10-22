@@ -35,4 +35,20 @@ handoff-note and fixture frames became `out-of-scope`. Open rows:
 
 ## Owner decisions raised
 
-See the Review record's open questions; answers are recorded in this file when given.
+Asked 2026-10-22; the session ended before an answer was recorded, so the
+recommended default applies under the owner's /goal ("run the plan to the end")
+until the owner overrides. Each is marked **default, owner may override**.
+
+| # | Question | Applied | Source |
+|---|---|---|---|
+| OD-1 | Publish with a failing blocking check | **Blocked** — CTA disabled with "Fix {n} blocking issue(s) to publish" (board PB01–PB23); `lifecycle.ts:256` "Publish anyway" goes. Behaviour change → `authority: founder:od-1` once confirmed | default, owner may override |
+| OD-2 | Inspector Content tab | **Add it**: Content · Style · Behavior · Effects; L-B starts here | default, owner may override |
+| OD-3 | Rail entries (code 13, board 7) | **Board's 7**; every removed entry gets a named new home (topbar, site menu or ⌘K) in L-A's sub-plan; nothing deleted | default, owner may override |
+| OD-4 | PR #33 (editor AI removal) before design work | **Owner merges #33 first** when ready (2 prod migrations); design work does not wait — AI rows stay waiting on #33 | default, owner may override |
+
+Auto-decided by the lead (precedence rules, no owner input needed):
+- Undo buttons inside receipts/toasts (Brand, Assets, Templates, Components) stay only if they call the one composer history stack; a separate per-panel undo is removed (one-undo decision).
+- Deleting an in-use collection/field: behaviour follows the code (unbind then delete), `authority: code:unbind-on-delete`; the board's block copy is not adopted.
+- Deleted-site message: the server has `sites.restore` (`server/trpc/routers/sites.ts:15,212`), so the board's "restore from Recently deleted for 30 days" copy is correct and replaces the editor's "no trash" text (L-F / Task 1.6).
+- Brand "From logo or URL" is rule-based, not AI: stays behind `dsAi` per the code flag; board row `authority: code:dsai-flag`.
+- Page-switcher menu: plan's search, active check and "+ Add page" win on behaviour; board wins on visuals.
