@@ -78,3 +78,84 @@ test.describe("visual pin", () => {
     });
   }
 });
+
+/* design-2l9 Task 1.2 — the topbar at the three supported widths. Minimum
+   supported width is 1024: as the bar narrows only the site name gives way
+   (ellipsis, 80px floor); the History group, the longest review label
+   ("In review · 12 open") and ⋯ stay whole and inside the bar. */
+for (const viewport of [
+  { width: 1440, height: 900 },
+  { width: 1280, height: 720 },
+  { width: 1024, height: 768 },
+]) {
+  test.describe(`topbar-shell @ ${viewport.width}`, () => {
+    test.skip(!!process.env.CI, "visual pins are recorded on darwin only");
+    test.use({ viewport });
+
+    test("fits, wraps nothing, and matches its pin", async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.goto("/e2e/probe/probe.html?case=topbar-shell");
+      await expect(page.locator("#probe-root")).toHaveAttribute("data-probe-ready", "topbar-shell");
+      await page.evaluate(() => document.fonts.ready);
+      expect(await fontsLoadedStatus(page), "fonts must be loaded").toBe("loaded");
+      await stylesheetsSettled(page);
+
+      const geo = await page.evaluate(() => {
+        const box = (sel: string) => {
+          const r = document.querySelector(sel)!.getBoundingClientRect();
+          return { left: r.left, right: r.right, top: r.top, bottom: r.bottom, width: r.width, height: r.height };
+        };
+        const bar = document.querySelector('[data-testid="topbar"]')!;
+        const kids = [...bar.children].map((c) => {
+          const r = c.getBoundingClientRect();
+          return { height: r.height, right: r.right };
+        });
+        return {
+          bar: box('[data-testid="topbar"]'),
+          name: box('[data-testid="topbar-site-name"]'),
+          review: box('[data-testid="topbar-review-pill"]'),
+          reviewLabel: document.querySelector('[data-testid="topbar-review-label"]')!.textContent,
+          menu: box('[data-testid="topbar-site-menu"]'),
+          history: box('[data-testid="topbar-history"]'),
+          siteText: (() => {
+            const t = document.querySelector('[data-testid="topbar-crumb-site"] > span') as HTMLElement;
+            const cs = getComputedStyle(t);
+            return { scrollWidth: t.scrollWidth, clientWidth: t.clientWidth, overflow: cs.overflow, textOverflow: cs.textOverflow, textAlign: cs.textAlign, right: t.getBoundingClientRect().right };
+          })(),
+          kids,
+        };
+      });
+
+      expect(geo.bar.height).toBe(56);
+      expect(geo.reviewLabel).toBe("In review · 12 open");
+      for (const el of [geo.review, geo.menu, geo.history]) {
+        expect(el.left).toBeGreaterThanOrEqual(geo.bar.left);
+        expect(el.right).toBeLessThanOrEqual(geo.bar.right);
+        expect(el.top).toBeGreaterThanOrEqual(geo.bar.top);
+        expect(el.bottom).toBeLessThanOrEqual(geo.bar.bottom);
+      }
+      // Board: the pair is two 32px icon buttons, 4 apart.
+      expect(geo.history.width).toBe(68);
+      // The review pill is one 24px line; a wrapped label would double it.
+      expect(geo.review.height).toBe(24);
+      // No control wraps: every child of the bar is at most one control tall.
+      for (const k of geo.kids) expect(k.height).toBeLessThanOrEqual(32);
+      expect(geo.name.width).toBeGreaterThanOrEqual(80);
+      // The site name ellipsizes inside its crumb rather than clipping.
+      expect(geo.siteText.scrollWidth).toBeGreaterThanOrEqual(geo.siteText.clientWidth);
+      expect(geo.siteText.overflow).toBe("hidden");
+      expect(geo.siteText.textOverflow).toBe("ellipsis");
+      // A centred overflow clips both ends and draws no ellipsis.
+      expect(geo.siteText.textAlign).toBe("left");
+      expect(geo.siteText.right).toBeLessThanOrEqual(geo.name.right);
+
+      /* The bar itself, not the page: 0.002 of a 1024×768 page is 1,572
+         pixels — a whole re-flowed crumb fits inside that and passed. Of a
+         1024×56 bar it is 114. Overflow is asserted geometrically above. */
+      await expect(page.getByTestId("topbar")).toHaveScreenshot(`topbar-shell-${viewport.width}.png`, {
+        animations: "disabled",
+        maxDiffPixelRatio: 0.002,
+      });
+    });
+  });
+}

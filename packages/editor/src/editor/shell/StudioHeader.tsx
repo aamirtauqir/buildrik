@@ -33,7 +33,8 @@ import { useCollaboration } from "../canvas/hooks/useCollaboration";
 import { toPresenceUsers } from "../collaboration/PresenceIndicators";
 import { duplicateSite, getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import type { ReviewStatus } from "@/services/ReviewService";
-import { useRefetchOnFocus } from "@/shared/hooks";
+import { useHistoryState, useRefetchOnFocus } from "@/shared/hooks";
+import { formatChord } from "@/editor/canvas/controls/keyboardSheetRows";
 import { formatRelativeTime } from "@/shared/utils/relativeTime";
 import { EVENTS } from "@/shared/constants";
 import { isFeatureEnabled } from "@/shared/utils/featureFlags";
@@ -144,7 +145,15 @@ export interface StudioHeaderProps {
 }
 
 /**
- * The topbar's one review chip — board B3-01 `7569:190283` (C2, owner
+ * The topbar's review control — design 2L9 board `497:99433` (Task 1.2):
+ * "Request review" with no round; "In review · {n} open" while a round is
+ * out and the open count is known; "In review" when it is not (the status
+ * endpoint carries no count of its own — `openCommentCount` comes from
+ * `useLifecycle`, and is never invented). An approved round keeps its own
+ * label. The control is the entry point only: its click opens the existing
+ * Review flow, which owns the sending/sent/failed states.
+ *
+ * History of this chip — board B3-01 `7569:190283` (C2, owner
  * decision D3): the status VERB plus the one number that matters, in five
  * states: Not sent · Waiting · Sara · Changes requested · 2 · Approved ·
  * Approved · edited since. The sentence (who, when, opened-but-no-reply)
@@ -167,18 +176,19 @@ function reviewChip(
 ): Omit<ReviewPill, "onClick"> | null {
   if (!status.reviewsEnabled) return null;
   const who = status.reviewerName;
+  const inReview = openCount ? `In review · ${openCount} open` : "In review";
   switch (status.state) {
     case "none":
       return status.editsRequireApproval
-        ? { label: "Not sent", tone: "info", title: "Not sent for review yet" }
-        : { label: "Review", tone: "neutral", title: "Open Review" };
+        ? { label: "Request review", tone: "info", title: "Not sent for review yet" }
+        : { label: "Request review", tone: "neutral", title: "Open Review" };
     case "pending":
-      return { label: who ? `Waiting · ${who}` : "Waiting", tone: "info", title: `Sent to ${who ?? "your client"} — waiting on approval` };
+      return { label: inReview, tone: "info", title: `Sent to ${who ?? "your client"} — waiting on approval` };
     case "opened-not-acted":
-      return { label: who ? `Waiting · ${who}` : "Waiting", tone: "info", title: `${who ?? "Your client"} opened the review — no reply yet` };
+      return { label: inReview, tone: "info", title: `${who ?? "Your client"} opened the review — no reply yet` };
     case "changes-requested":
       return {
-        label: openCount ? `Changes requested · ${openCount}` : "Changes requested",
+        label: inReview,
         tone: "warning",
         title: `${who ?? "Your client"} asked for changes${openCount ? ` — ${openCount} open` : ""}`,
       };
@@ -187,6 +197,15 @@ function reviewChip(
     case "approved-edited-since":
       return { label: "Approved · edited since", tone: "warning", title: `${who ?? "Your client"} approved an earlier version — edited since` };
   }
+}
+
+/* The History group's tooltip chords, spelled by the keyboard sheet's own
+   formatter and tightened the way the palette and Activity view print them
+   ("⌘Z", "⇧⌘Z"; "Ctrl+Z", "Ctrl+Shift+Z" elsewhere). */
+function historyChords(): { undoChord: string; redoChord: string } {
+  const isMac = typeof navigator !== "undefined" && /Mac|iPod|iPhone|iPad/.test(navigator.platform);
+  const tight = (chord: string) => formatChord(chord, isMac).replace(/([⌘⇧⌥⌃])\+/g, "$1");
+  return { undoChord: tight("ctrl+z"), redoChord: tight(isMac ? "shift+ctrl+z" : "ctrl+shift+z") };
 }
 
 /**
@@ -769,6 +788,13 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   // F3: every review state opens the same door — the Review panel. `null`
   // (reviews disabled for this site) means no door at all — see reviewChip.
   const reviewChipResult = reviewChip(reviewStatus, openCommentCount);
+  /* The editor's ONE undo (design-2l9 Task 1.2, board 497:99433). State comes
+     from the composer's own history events through useHistoryState — never
+     from AquibraStudio — so it re-reads on a composer swap, a project load
+     (importProject emits only project:loaded) and a version restore. */
+  const { canUndo, canRedo, undo, redo } = useHistoryState(composer);
+  const history =
+    viewMode.readOnlyView || !composer ? null : { canUndo, canRedo, onUndo: undo, onRedo: redo, ...historyChords() };
   const review: ReviewPill | null = reviewChipResult ? { ...reviewChipResult, onClick: onOpenReview } : null;
 
   return (
@@ -798,6 +824,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
            view does not offer one — nothing in it can become unsaved. */
         onSaveClick={viewMode.readOnlyView ? undefined : savePillClick}
         saveHint={viewMode.readOnlyView ? undefined : savePillHint}
+        history={history}
         review={review}
         tools={tools}
         presence={
@@ -912,7 +939,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
           initialQuery={cmdQuery}
           /* FB-4: Review has no client gate today — hide its ⌘K row when the
              agency review layer is off (same flag the topbar pill already
-             reads for its own "Not sent" vs plain "Review" wording). */
+             reads for its own "Request review" wording). */
           reviewsEnabled={reviewStatus.reviewsEnabled}
         />
       ) : null}

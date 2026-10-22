@@ -251,7 +251,7 @@ test.describe("boot leaves the project clean", () => {
       expect(r!.saveStatus, `run ${i + 1}: boot triggered a save`).not.toBe("saving");
     }
 
-    /* Nothing to undo. The footer Undo control is the observable proxy for
+    /* Nothing to undo. The topbar Undo control is the observable proxy for
        `canUndo()`, which is `length > 1` — correct logic that was being fed a
        stack containing the app's own startup. A control that is ENABLED here
        means boot left undoable work behind, whatever it happens to undo. */
