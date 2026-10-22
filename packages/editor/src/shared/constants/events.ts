@@ -385,6 +385,10 @@ export const EVENTS = {
    *  the retired canvas palette's chord — and the Pages panel's ⌘K keycap
    *  come in through here. */
   UI_TOGGLE_COMMAND_PALETTE: "ui:toggle:command-palette",
+  /** Open or close the bottom bar's page switcher (⇧⌘O / Ctrl+Alt+O,
+   *  useEditorShortcuts; the ⌘K "Switch page…" row). The bottom bar owns the
+   *  open state. */
+  UI_TOGGLE_PAGE_SWITCHER: "ui:toggle:page-switcher",
   /** The site menu asked to take the site down. The Publish panel owns the
    *  one confirm, so the menu opens the panel and asks it rather than
    *  hosting a second dialog. */

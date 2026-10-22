@@ -148,6 +148,7 @@ export {
 } from "./Toast";
 export { Popover, Menu, MenuItem, MenuGroup, MenuLabel, MenuSeparator, POPOVER_BASE_CLASS } from "./Popover";
 export type { PopoverProps, PopoverPlacement, MenuProps, MenuItemProps } from "./Popover";
+export { PageSwitcherMenu, type PageSwitcherMenuProps } from "./PageSwitcherMenu";
 
 // ─────────────────────────────────────────────────────────────────────────
 // (b) The closed 2-wrapper set — spec §2(b). Never add a 3rd here without
