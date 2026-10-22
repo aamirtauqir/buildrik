@@ -110,6 +110,7 @@ import { PublishConfirmModal } from "@/editor/shell/modals/PublishConfirmModal";
 import { PageContextMenu } from "@/editor/sidebar/tabs/pages/components/PageContextMenu";
 import { PageSettingsDrawer } from "@/editor/sidebar/tabs/pages/page-settings/PageSettingsDrawer";
 import { Topbar } from "@/editor/chrome-ui";
+import { BreakpointSwitcher } from "@/editor/chrome-ui";
 import { SmartGuidesOverlay } from "@/editor/canvas/overlays";
 import type { SnapLine } from "@/editor/canvas/hooks";
 import { DropFeedbackOverlay } from "@/editor/canvas/overlays";
@@ -1945,6 +1946,13 @@ const CASES: Record<string, () => React.ReactElement> = {
         onUndo={() => {}}
         onRedo={() => {}}
       />
+    </div>
+  ),
+  /* 2L9 F1.07 (302:7348): the topbar breakpoint control, icon-only, Wide
+     enabled, Tablet chosen. */
+  "breakpoint-switcher": () => (
+    <div data-probe="breakpoint-switcher" style={{ padding: 24 }}>
+      <BreakpointSwitcher value="tablet" onChange={() => {}} includeWide />
     </div>
   ),
   "canvas-footer-toolbar": () => (

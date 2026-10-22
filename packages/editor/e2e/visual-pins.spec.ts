@@ -78,3 +78,31 @@ test.describe("visual pin", () => {
     });
   }
 });
+
+/* Plan 2026-10-22 (2L9), shared verification: a new component pin sets its
+   own viewport at the three supported widths. */
+for (const viewport of [
+  { width: 1440, height: 900 },
+  { width: 1280, height: 720 },
+  { width: 1024, height: 768 },
+]) {
+  test.describe(`visual pin @${viewport.width}`, () => {
+    test.skip(!!process.env.CI, "visual pins are recorded on darwin only");
+    test.use({ viewport });
+    test("breakpoint-switcher", async ({ page }) => {
+      const name = "breakpoint-switcher";
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.goto(`/e2e/probe/probe.html?case=${name}`);
+      await expect(page.locator("#probe-root")).toHaveAttribute("data-probe-ready", name);
+      expect(await fontsLoadedStatus(page), "fonts must be loaded").toBe("loaded");
+      await page.evaluate(() => document.fonts.ready);
+      await stylesheetsSettled(page);
+      await expect(page).toHaveScreenshot(`${name}-${viewport.width}.png`, {
+        fullPage: true,
+        animations: "disabled",
+        threshold: 0.02,
+        maxDiffPixelRatio: 0.002,
+      });
+    });
+  });
+}
