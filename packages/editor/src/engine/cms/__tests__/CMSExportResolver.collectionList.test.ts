@@ -47,11 +47,27 @@ describe("Collection list in export", () => {
   it("static: one card per published record, the template and placeholders gone", async () => {
     const { resolver } = await setup();
     const html = await resolver.resolve(PAGE, { mode: "static" });
-    expect(html.match(/data-buildrick-id="card"/g)).toHaveLength(2);
+    expect(html.match(/data-buildrick-copy-of="card"/g)).toHaveLength(2);
     expect(html).toContain("Margherita");
     expect(html).toContain("Quattro");
     expect(html).not.toContain("Unfinished");
     expect(html).not.toContain("{{item.name}}");
+  });
+
+  it("static: every element of every copy has its own id, keyed by its record", async () => {
+    const { resolver, menuId } = await setup();
+    const cms = (resolver as unknown as { composer: Composer }).composer.cms.collections;
+    const published = (await cms.queryContent({ collectionId: menuId, status: "published" })).items.map((i) => i.id);
+    const html = await resolver.resolve(PAGE, { mode: "static" });
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    const ids = Array.from(doc.querySelectorAll("[data-buildrick-id]")).map((el) => el.getAttribute("data-buildrick-id"));
+    expect(new Set(ids).size).toBe(ids.length);
+    expect(ids.sort()).toEqual(["list", ...published.flatMap((r) => [`card--${r}`, `t--${r}`])].sort());
+    // Each copy still names its template — and the marker never ships.
+    expect(doc.querySelectorAll('[data-buildrick-copy-of="t"]')).toHaveLength(2);
+    expect(html).not.toContain("data-cms-copy=");
+    // Deterministic: the same records publish the same ids.
+    expect(await resolver.resolve(PAGE, { mode: "static" })).toBe(html);
   });
 
   it("template: the loop wraps the list's children, not the list", async () => {
@@ -79,7 +95,7 @@ describe("a list child's binding resolves per copy (current item)", () => {
   it("publish: each copy shows its own record", async () => {
     const { resolver } = await bound();
     const html = await resolver.resolve(BOUND, { mode: "static" });
-    const titles = [...html.matchAll(/<h3 data-buildrick-id="t">([^<]*)<\/h3>/g)].map((m) => m[1]);
+    const titles = [...html.matchAll(/<h3 data-buildrick-id="t--[^"]+" data-buildrick-copy-of="t">([^<]*)<\/h3>/g)].map((m) => m[1]);
     expect(titles.sort()).toEqual(["Margherita", "Quattro"]);
     expect(html).not.toContain("data-cms-current-item");
   });
@@ -103,7 +119,7 @@ describe("a list child's binding resolves per copy (current item)", () => {
     )!;
     composer.cms.bindings.bindToField("t", menuId, pinned.id, "name", "content");
     const html = await resolver.resolve(BOUND, { mode: "static" });
-    const titles = [...html.matchAll(/<h3 data-buildrick-id="t">([^<]*)<\/h3>/g)].map((m) => m[1]);
+    const titles = [...html.matchAll(/<h3 data-buildrick-id="t--[^"]+" data-buildrick-copy-of="t">([^<]*)<\/h3>/g)].map((m) => m[1]);
     expect(titles).toEqual(["Quattro", "Quattro"]);
   });
 });

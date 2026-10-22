@@ -129,6 +129,16 @@ describe("wireForms", () => {
     expect(html).toContain(".value=location.href");
   });
 
+  /* A form inside a Collection list card: each copy has its own id
+     (`f1--<record>`), but every copy is still the one saved form block. */
+  it("posts a Collection list copy's form to the block it is a copy of", () => {
+    const copy = '<form data-buildrick-id="f1--rec1" data-buildrick-copy-of="f1"><input name="email"></form>';
+    const { html, forms } = wireForms(copy, opts, { f1: { successMessage: "Booked" } });
+    expect(html).toContain('action="https://app.buildrick.io/api/public/forms/site-1/f1"');
+    expect(html).toContain('data-success-message="Booked"');
+    expect(forms[0].blockId).toBe("f1");
+  });
+
   it("M2: the success-message script CSS.escapes the ?form= id before using it as a selector", () => {
     const { html } = wireForms(FORM, opts);
     expect(html).toContain("CSS.escape");

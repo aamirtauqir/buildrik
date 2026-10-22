@@ -4,7 +4,7 @@
  * @license BSD-3-Clause
  */
 
-import { CURRENT_ITEM_ATTR, followsContextRecord, RepeaterRenderer, richtextKeys, writeBoundValue } from "./RepeaterRenderer";
+import { CURRENT_ITEM_ATTR, followsContextRecord, keyCollectionCopies, RepeaterRenderer, richtextKeys, writeBoundValue } from "./RepeaterRenderer";
 import type { Composer } from "../Composer";
 import { URL_ATTRIBUTES } from "@buildrik/shared/schemas/element-markup";
 import { cmsRecordToken } from "@buildrik/shared/schemas/cms";
@@ -143,8 +143,9 @@ export class CMSExportResolver {
     await Promise.all(promises);
 
     clearItemPlaceholders(doc);
+    keyCollectionCopies(doc);
 
-    /* Editor-only state goes; the ID STAYS. `data-buildrick-id` is what the
+    /* Editor-only state goes; the ID STAYS (a list copy's re-keyed one). `data-buildrick-id` is what the
        StyleEngine's breakpoint rules target (`@media { [data-buildrick-id] }`)
        — stripping it leaves a deployed site unstyled at every breakpoint,
        which is a bug this export has already had once (ExportEngine:997). */

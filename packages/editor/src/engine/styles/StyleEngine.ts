@@ -404,6 +404,10 @@ export class StyleEngine {
        *  export passes one to leave out rules for elements that are not on
        *  the page (or not on the site at all). */
       keep?: (selector: string) => boolean;
+      /** Rewrites each written selector (after the class model's ladder).
+       *  The export passes one to key a Collection list's repeated elements
+       *  by their shared class — see renameElementSelectors. */
+      rename?: (selector: string) => string;
     },
   ): string {
     const opts = {
@@ -429,7 +433,7 @@ export class StyleEngine {
 
     rules.forEach((style) => {
       if (opts.keep && !opts.keep(style.selector)) return;
-      const css = this.generateStyleRule(style, undefined, classModel);
+      const css = this.generateStyleRule(style, undefined, classModel, opts.rename);
 
       if (!style.mediaQuery) {
         // Base/desktop styles
@@ -602,9 +606,10 @@ export class StyleEngine {
   /**
    * Generate a single style rule
    */
-  private generateStyleRule(style: StyleData, scope?: string, ladder = false): string {
+  private generateStyleRule(style: StyleData, scope?: string, ladder = false, rename?: (selector: string) => string): string {
     const layer = ladder ? selectorLayer(style.selector) : undefined;
-    const own = layer?.kind === "local" ? localSelector(layer.identity, "class", layer.pseudo) : style.selector;
+    const laddered = layer?.kind === "local" ? localSelector(layer.identity, "class", layer.pseudo) : style.selector;
+    const own = rename ? rename(laddered) : laddered;
     const selector = scope ? `${scope} ${own}` : own;
     // Exported into a published <style>: a declaration that could leave the
     // rule or the element is not written (A19-1 class).

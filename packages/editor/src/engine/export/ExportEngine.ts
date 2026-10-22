@@ -9,7 +9,7 @@ import { escapeStyleText, isSafeElementId } from "@buildrik/shared/schemas/eleme
 import { DarkModeSchema } from "@buildrik/shared/schemas/design-tokens";
 import type { PageData } from "@/shared/types";
 import { isPageLive, pageFileNames, resolveHomePageId } from "./pageFiles";
-import { elementIdsInSelector } from "@/shared/utils/elementSelector";
+import { elementIdsInSelector, renameElementSelectors } from "@/shared/utils/elementSelector";
 import type {
   ExportConfig,
   ExportResult,
@@ -415,7 +415,8 @@ export class ExportEngine {
       // appended these, and the order is the same for the same reason: base and
       // breakpoint rules share specificity, so the @media has to come later to
       // win at its viewport.
-      const responsive = this.composer.styles?.generateResponsiveCSS?.({ minify: cfg.minify }) ?? "";
+      const responsive =
+        this.composer.styles?.generateResponsiveCSS?.({ minify: cfg.minify, rename: this.repeatedElementRename(cfg.cssPrefix) }) ?? "";
       if (responsive) css += (cfg.minify ? "" : "\n") + responsive;
 
       // Emit @keyframes for any bd-anim-* animation referenced in the styles.
@@ -621,6 +622,26 @@ export class ExportEngine {
   }
 
   /**
+   * The StyleEngine selector rename for every element a Collection list
+   * repeats (its item template and all it holds), or undefined when the site
+   * has none. Each published copy gets its own `data-buildrick-id`
+   * (keyCollectionCopies), so those elements' rules are written against the
+   * class every copy shares — `.${prefix}<id>`, the base rules' own selector.
+   */
+  private repeatedElementRename(prefix: string): ((selector: string) => string) | undefined {
+    const lists = this.composer.cms?.bindings?.getAllCollectionBindings?.().filter((b) => b.repeat === "children") ?? [];
+    const ids = new Set<string>();
+    const collect = (el: ReturnType<typeof this.composer.elements.getElement>): void => {
+      if (!el) return;
+      ids.add(el.getId());
+      el.getChildren().forEach(collect);
+    };
+    for (const list of lists) this.composer.elements.getElement(list.elementId)?.getChildren().forEach(collect);
+    if (ids.size === 0) return undefined;
+    return (selector) => renameElementSelectors(selector, (id) => (ids.has(id) ? `.${prefix}${id}` : undefined));
+  }
+
+  /**
    * The published CSS for `scope` — every page (the shared stylesheet) or one
    * page (its inline <style>).
    */
@@ -645,7 +666,7 @@ export class ExportEngine {
       return named.length === 0 || named.some((id) => ids.has(id));
     };
     const responsiveCss =
-      this.composer.styles?.generateResponsiveCSS?.({ minify, keep }) ??
+      this.composer.styles?.generateResponsiveCSS?.({ minify, keep, rename: this.repeatedElementRename(this.config.cssPrefix) }) ??
       this.generateCSS({ ...this.config, minify });
     /* The site's own font rules. `generateCSS` emits these for the single file;
        this path emitted the LINKS that fetch the families and no rule that

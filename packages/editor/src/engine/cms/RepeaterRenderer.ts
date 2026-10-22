@@ -10,6 +10,7 @@ import { cmsRecordLabel, cmsRecordPath, cmsTextOf } from "@buildrik/shared/schem
 import { sanitizeRichtext } from "@/shared/utils/html/sanitization";
 import type { CMSContentItem } from "@/shared/types/cms";
 import type { Composer } from "../Composer";
+import { COPY_OF_ATTR } from "../export/publishPostProcess";
 import type { CMSCollectionBinding, CMSElementBinding } from "./CMSBindingManager";
 
 /** Elements whose content is raw text, never HTML text. */
@@ -25,6 +26,35 @@ const escapeRegExp = (s: string): string => s.replace(/[.*+?^${}()|[\]\\]/g, "\\
  * copy — and the export strips the marker.
  */
 export const CURRENT_ITEM_ATTR = "data-cms-current-item";
+
+/** Set, in an export, on each copy root a Collection list writes, valued
+ *  with the record's id; keyCollectionCopies reads it and removes it. */
+const COPY_ITEM_ATTR = "data-cms-copy";
+
+/**
+ * Give every element in each exported Collection list copy its own
+ * `data-buildrick-id`: `<template id>--<record id>`, nested lists appending
+ * theirs in turn. Every copy carried its template's ids, so one id named
+ * N elements — anchors, forms, interactions and assistive tech target one.
+ * The record id (not the position) keeps an id stable across publishes as
+ * records are added or reordered. The template's id stays on each copy as
+ * COPY_OF_ATTR — the form a card holds is still that one form block — and its
+ * styles reach every copy through the class they share (ExportEngine's
+ * repeatedElementRename). Runs after the binding passes, which look elements
+ * up by their template ids.
+ */
+export function keyCollectionCopies(doc: Document): void {
+  for (const copy of Array.from(doc.querySelectorAll<HTMLElement>(`[${COPY_ITEM_ATTR}]`))) {
+    const recordId = copy.getAttribute(COPY_ITEM_ATTR)!;
+    copy.removeAttribute(COPY_ITEM_ATTR);
+    for (const el of [copy, ...Array.from(copy.querySelectorAll("[data-buildrick-id]"))]) {
+      const id = el.getAttribute("data-buildrick-id");
+      if (!id) continue;
+      if (!el.hasAttribute(COPY_OF_ATTR)) el.setAttribute(COPY_OF_ATTR, id);
+      el.setAttribute("data-buildrick-id", `${id}--${recordId}`);
+    }
+  }
+}
 
 /** Does `binding` follow "the record on this page / in this list" rather than
  *  a pinned record? */
@@ -178,8 +208,12 @@ export class RepeaterRenderer {
         this.applyContext(node, context, binding, null, refs);
         this.applyCurrentItem(node, listEl, item, binding.collectionId, canvas);
         if (intoTemplate) continue;
-        if (canvas) node.setAttribute("data-cms-repeater-clone", String(index));
-        else this.clearUnresolved(node, binding.itemVar || "item");
+        if (canvas) {
+          node.setAttribute("data-cms-repeater-clone", String(index));
+        } else {
+          this.clearUnresolved(node, binding.itemVar || "item");
+          node.setAttribute(COPY_ITEM_ATTR, item.id);
+        }
         listEl.appendChild(node);
       }
     });
@@ -355,7 +389,7 @@ export class RepeaterRenderer {
     context: RepeaterContext,
     binding: CMSCollectionBinding,
     /** The clone root's new id, or null to keep every id (Collection list
-     *  copies share their template's ids — the breakpoint CSS selects on them). */
+     *  copies keep their template's ids until keyCollectionCopies). */
     cloneId: string | null,
     refs: ReferenceTables = new Map()
   ): void {
