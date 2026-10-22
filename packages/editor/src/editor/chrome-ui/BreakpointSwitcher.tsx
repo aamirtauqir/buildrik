@@ -1,19 +1,23 @@
 /**
  * BreakpointSwitcher — segmented viewport switcher (ported from vibcoder).
  *
- * Breakpoints are fixed by design: wide (1920+, opt-in) / desktop (1440) /
- * tablet (768) / mobile (375). This is the editor's canonical viewport
- * switcher, not a generic segmented control — don't grow it an `options`
- * array.
+ * Breakpoints are fixed by design: wide (1920, opt-in via `includeWide`) /
+ * desktop / tablet (768) / mobile (375). This is the editor's canonical
+ * viewport switcher, not a generic segmented control — don't grow it an
+ * `options` array.
  *
- * The icon-only default renders short text glyphs ("W" / "D" / "T" / "M");
- * callers can pass richer glyphs via the `glyphs` map. `labelled` renders
- * full breakpoint names instead.
+ * The default is icon-only (2L9 shell, F1.07 `302:7348`): one device icon
+ * per cell, no visible text, the name as the accessible label and the width
+ * in a tooltip. `glyphs` overrides the icons; `labelled` renders full names
+ * instead. The board says "Phone"; the code's "Mobile" is kept
+ * (authority: code:mobile-label).
  *
  * @license BSD-3-Clause
  */
 import React from "react";
-import { BREAKPOINTS, isValidBreakpoint } from "@/shared/constants/breakpoints";
+import { Monitor, Smartphone, Tablet, Tv, type LucideIcon } from "lucide-react";
+import { BREAKPOINTS, DEVICE_PREVIEW_SIZES } from "@/shared/constants/breakpoints";
+import { HintTooltip } from "./HintTooltip";
 
 export type Breakpoint = "wide" | "desktop" | "tablet" | "mobile";
 
@@ -21,43 +25,38 @@ export interface BreakpointSwitcherProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, "onChange" | "children"> {
   value: Breakpoint;
   onChange: (next: Breakpoint) => void;
-  /** When true, renders full breakpoint names instead of short glyphs. */
+  /** When true, renders full breakpoint names instead of icons. */
   labelled?: boolean;
   /** Muted text after each labelled cell's name — the preview draws the
    *  width it renders at ("Desktop 1320px", board 4418:165611). */
   sublabels?: Partial<Record<Breakpoint, string>>;
-  /** When true, prepends a "wide" (1920+) cell ahead of desktop/tablet/mobile. */
+  /** When true, prepends a "wide" (1920) cell ahead of desktop/tablet/mobile. */
   includeWide?: boolean;
-  /** Optional glyph map for a richer icon set (overrides default text glyphs). */
+  /** Optional glyph map overriding the default device icons. */
   glyphs?: Partial<Record<Breakpoint, React.ReactNode>>;
 }
 
 interface BreakpointEntry {
   id: Breakpoint;
-  glyph: string;
+  Icon: LucideIcon;
   label: string;
 }
 
 const CORE_BREAKPOINTS: ReadonlyArray<BreakpointEntry> = [
-  { id: "desktop", glyph: "D", label: "Desktop" },
-  { id: "tablet", glyph: "T", label: "Tablet" },
-  { id: "mobile", glyph: "M", label: "Mobile" },
+  { id: "desktop", Icon: Monitor, label: "Desktop" },
+  { id: "tablet", Icon: Tablet, label: "Tablet" },
+  { id: "mobile", Icon: Smartphone, label: "Mobile" },
 ];
 
-const WIDE_BREAKPOINT: BreakpointEntry = { id: "wide", glyph: "W", label: "Wide" };
+const WIDE_BREAKPOINT: BreakpointEntry = { id: "wide", Icon: Tv, label: "Wide" };
 
-/* Board 807:8069 draws each breakpoint with the width range it governs, and
-   the glyph-only switcher never said what "T" meant in pixels. The ranges
-   come from BREAKPOINTS (the media queries the exporter actually writes) —
-   NOT from the board's own 992/480 numbers, which would change generated CSS.
-   "wide" has no breakpoint config: it is a preview width whose style edits
-   fall back to desktop (ProInspector), so it says exactly that. */
+/* The width each cell previews, from DEVICE_PREVIEW_SIZES — the one table the
+   canvas frame reads, so the tooltip cannot disagree with the frame. Desktop
+   has no fixed width (it fills the column, floored at the desktop
+   breakpoint), so it says exactly that floor. */
 function widthHint(id: Breakpoint): string {
-  if (!isValidBreakpoint(id)) return "preview width, uses Desktop styles";
-  const { minWidth, maxWidth } = BREAKPOINTS[id];
-  if (maxWidth === undefined) return `\u2265${minWidth}px`;
-  if (minWidth === 0) return `\u2264${maxWidth}px`;
-  return `${minWidth}\u2013${maxWidth}px`;
+  const { width } = DEVICE_PREVIEW_SIZES[id];
+  return typeof width === "number" ? `${width}px` : `\u2265${BREAKPOINTS.desktop.minWidth}px`;
 }
 
 /* The well is gray-50, which is the ground board 807:8321 sits its chips on
@@ -104,26 +103,24 @@ export const BreakpointSwitcher = React.forwardRef<HTMLDivElement, BreakpointSwi
         {...rest}
       >
         {entries.map((bp) => (
-          <button
-            key={bp.id}
-            type="button"
-            /* Per-cell anchor. The component has two call sites — the canvas
-               toolbar and PreviewOverlay — but they are mutually exclusive
-               states of the app (preview REPLACES the editor), so a target can
-               never resolve to two cells at once. measure.mjs refuses an
-               ambiguous target, which is the backstop if that ever changes. */
-            data-testid={`bp-cell-${bp.id}`}
-            className={`${BTN_BASE_CLASS} ${labelled ? "tw:w-auto tw:px-3" : "tw:w-8"}`}
-            aria-pressed={value === bp.id}
-            aria-label={`${bp.label} (${widthHint(bp.id)})`}
-            title={`${bp.label} \u00b7 ${widthHint(bp.id)}`}
-            onClick={() => onChange(bp.id)}
-          >
-            {labelled ? bp.label : (glyphs?.[bp.id] ?? bp.glyph)}
-            {labelled && sublabels?.[bp.id] ? (
-              <span className="tw:ml-1 tw:font-normal tw:opacity-70">{sublabels[bp.id]}</span>
-            ) : null}
-          </button>
+          <HintTooltip key={bp.id} content={`${bp.label} \u00b7 ${widthHint(bp.id)}`}>
+            <button
+              type="button"
+              /* Per-cell anchor, read by tests and the conformance harness;
+                 measure.mjs refuses an ambiguous target if two switchers
+                 ever render at once. */
+              data-testid={`bp-cell-${bp.id}`}
+              className={`${BTN_BASE_CLASS} ${labelled ? "tw:w-auto tw:px-3" : "tw:w-8"}`}
+              aria-pressed={value === bp.id}
+              aria-label={bp.label}
+              onClick={() => onChange(bp.id)}
+            >
+              {labelled ? bp.label : (glyphs?.[bp.id] ?? <bp.Icon size={14} aria-hidden="true" />)}
+              {labelled && sublabels?.[bp.id] ? (
+                <span className="tw:ml-1 tw:font-normal tw:opacity-70">{sublabels[bp.id]}</span>
+              ) : null}
+            </button>
+          </HintTooltip>
         ))}
       </div>
     );
