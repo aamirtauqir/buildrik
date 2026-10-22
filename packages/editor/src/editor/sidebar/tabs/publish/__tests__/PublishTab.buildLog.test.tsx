@@ -62,6 +62,7 @@ const composer = {
 const failedJob = (steps: UsePublishJobResult["steps"]): UsePublishJobResult => ({
   uiState: "failed",
   jobId: "job-1",
+  deploymentId: null,
   progress: 20,
   publishedUrl: null,
   error: "Build error on Home — 3 unresolved links.",

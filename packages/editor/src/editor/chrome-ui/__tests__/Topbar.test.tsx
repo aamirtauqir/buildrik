@@ -160,9 +160,32 @@ describe("Topbar", () => {
     expect(btn.getAttribute("aria-disabled")).toBe("true");
   });
 
-  it("publish=anyway renames the action rather than hiding the block", () => {
-    render(<Topbar siteName="x" save="saved" publish="anyway" />);
-    expect(screen.getByRole("button", { name: "Publish anyway" })).toBeTruthy();
+  /* design-2l9 Task 1.7 — Publish as the publish tray's toggle. ("Publish
+     anyway" is gone with OD-1: blocking issues block, in the tray.) */
+  it("as the tray toggle it carries aria-expanded/aria-controls and stays pressable while busy", () => {
+    const onPublish = vi.fn();
+    const { rerender } = render(
+      <Topbar siteName="x" save="saved" publishExpanded={false} publishControls="publish-tray" onPublish={onPublish} />,
+    );
+    const btn = screen.getByTestId("topbar-publish");
+    expect(btn.getAttribute("aria-expanded")).toBe("false");
+    expect(btn.getAttribute("aria-controls")).toBeNull();
+    rerender(
+      <Topbar siteName="x" save="saved" publishExpanded publishControls="publish-tray" publishBusy onPublish={onPublish} />,
+    );
+    expect(btn.getAttribute("aria-expanded")).toBe("true");
+    expect(btn.getAttribute("aria-controls")).toBe("publish-tray");
+    expect(btn).not.toBeDisabled();
+    expect(btn.getAttribute("aria-busy")).toBe("true");
+    fireEvent.click(btn);
+    expect(onPublish).toHaveBeenCalledTimes(1);
+  });
+
+  it("without the toggle props it is a plain button: no aria-expanded, busy disables it", () => {
+    render(<Topbar siteName="x" save="saved" publishBusy />);
+    const btn = screen.getByTestId("topbar-publish");
+    expect(btn.hasAttribute("aria-expanded")).toBe(false);
+    expect(btn).toBeDisabled();
   });
 
   it("the review pill appears only when a round is in flight", () => {

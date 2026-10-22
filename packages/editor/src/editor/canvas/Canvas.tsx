@@ -385,14 +385,30 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       el.style.marginBottom = `${-el.offsetHeight * (1 - scale)}px`;
     }, [scale, device, canvasSize.width, canvasSize.height]);
 
+    /* The publish tray (design-2l9 Task 1.7) narrows the canvas column and
+       asks for the authored width to fit beside it — width only, 24 px clear
+       of each edge, and never zooming IN: a page that already fits stays at
+       the user's zoom. Board 499:2656 draws exactly this (46% at 740 px). */
+    const handleFitWidth = React.useCallback(() => {
+      const content = canvasRef.current;
+      const viewport = scrollRef.current;
+      if (!content || !viewport || !composer) return;
+      const cw = content.offsetWidth;
+      const room = viewport.clientWidth - 48;
+      if (!cw || room <= 0) return;
+      const current = composer.getState().zoom / 100;
+      if (cw * current <= room) return;
+      composer.setZoom(Math.floor((room / cw) * 100));
+    }, [composer]);
+
     React.useEffect(() => {
       if (!composer) return;
-      const handler = () => handleFitToScreen();
+      const handler = (data?: { widthOnly?: boolean }) => (data?.widthOnly ? handleFitWidth() : handleFitToScreen());
       composer.on(EVENTS.ZOOM_FIT, handler);
       return () => {
         composer.off(EVENTS.ZOOM_FIT, handler);
       };
-    }, [composer, handleFitToScreen]);
+    }, [composer, handleFitToScreen, handleFitWidth]);
 
     React.useEffect(() => {
       if (!composer) return;

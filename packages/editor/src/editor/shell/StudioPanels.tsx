@@ -54,6 +54,8 @@ import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { getEditorViewMode } from "@shared/utils/editorViewMode";
 import { useViewerChrome } from "./hooks/useEditorRole";
 import { ViewerRoleNotice } from "./ViewerRoleNotice";
+import { PublishTray } from "./PublishTray";
+import { publishTray, usePublishTray } from "./publishTrayStore";
 
 const CmsWorkspace = React.lazy(() => import("@/editor/cms/CmsWorkspace"));
 
@@ -470,13 +472,39 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
      promises — Back to canvas after a bound-element door, else the drawer
      closes and the canvas returns. */
   useColumnPanelEscape(cmsWorkspaceOpen, () => (cmsReturn ? backToCanvas() : onLeftPanelToggle?.()));
+  /* design-2l9 Task 1.7 — the publish tray docks in this column (boards
+     499:2656 / 233:2), wider than the inspector, and replaces whatever the
+     column held. One right-column mode at a time: opening the tray closes
+     Issues, AI and a column tab; opening one of those closes the tray. */
+  const trayState = usePublishTray();
+  const trayShown = trayState.open && !readOnlyView;
+  React.useEffect(() => {
+    if (!trayState.open) return;
+    if (issuesOpen) onCloseIssues?.();
+    if (rightColumnTab) onLeftPanelToggle?.();
+    setAiInInspector(false);
+    // Only on the tray's opening — the effect below handles the reverse.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [trayState.open]);
+  React.useEffect(() => {
+    /* The shell's publish door (AquibraStudio's requestPublish) still opens
+       the Publish panel once a publish starts. While the tray is open the
+       tray IS that surface — it shows the run — so the panel request is
+       folded into it instead of replacing it. */
+    if (trayState.open && rightColumnTab && activeTabId === "publish") {
+      onLeftPanelToggle?.();
+      return;
+    }
+    if (rightColumnTab || issuesOpen || aiInInspector) publishTray.close();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rightColumnTab, issuesOpen, aiInInspector]);
   const inspectorOpen = isInspectorColumnOpen({
     readOnlyView,
     viewerChrome,
     fullPage: effectiveFullPageMode,
     cmsWorkspaceOpen,
     inspectorShown,
-    columnModeOpen: rightColumnTab || issuesOpen || aiInInspector,
+    columnModeOpen: rightColumnTab || issuesOpen || aiInInspector || trayShown,
   });
   /* Board 36's "Show inspector ⌘\": only when the user hid the inspector and
      nothing else fills or replaces its column. */
@@ -485,7 +513,12 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   /* The inspector BODY (ProInspector) is on screen: its column is open and no
      mode (Issues · a column tab · AI) has replaced it. */
   const inspectorBodyShown =
-    !readOnlyView && inspectorOpen && !(issuesOpen && renderIssuesPanel) && !rightColumnTab && !aiInInspector;
+    !readOnlyView &&
+    inspectorOpen &&
+    !(issuesOpen && renderIssuesPanel) &&
+    !rightColumnTab &&
+    !aiInInspector &&
+    !trayShown;
 
   /* I-1: UI_INSPECTOR_FOCUS_SECTION ("Bind to CMS field…", "Add
      interaction", ⌘K Jump to property) is heard by the inspector body. With a
@@ -835,6 +868,8 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
         // board (2 lines + ✦ Ask AI); gating on selectedElement collapsed the
         // column to 1px, so that state rendered off-viewport, unseeable.
         inspectorOpen={inspectorOpen}
+        /* The tray's column is wider than the inspector's (board 499:2656). */
+        className={trayShown ? "tw:[--layout-inspector-width:var(--bk-size-task-host)]" : undefined}
         style={styles.container}
       >
         {/* Left Sidebar — merged rail + panel. Absent in view mode, except for
@@ -946,7 +981,15 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
           ) : null
         ) : (
         <LayoutShell.Inspector>
-          {issuesOpen && renderIssuesPanel ? (
+          {trayShown ? (
+            <PublishTray
+              composer={composer}
+              publishJob={publishJob}
+              nextMove={nextMove ?? null}
+              onRequestPublish={onRequestPublish}
+              issues={trayState.issues}
+            />
+          ) : issuesOpen && renderIssuesPanel ? (
             renderIssuesPanel(() => {
               onCloseIssues?.();
               setInspectorShown(true);

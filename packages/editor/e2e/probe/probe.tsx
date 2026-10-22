@@ -107,6 +107,8 @@ import type { UsePublishJobResult } from "@/editor/shell/hooks/usePublishJob";
 import type { PageItem } from "@/editor/sidebar/tabs/pages/types";
 import { PageSwitcher } from "@/editor/shell/PageSwitcher";
 import { LayoutShell } from "@/editor/rail/LayoutShell";
+import { PublishTray } from "@/editor/shell/PublishTray";
+import { deriveLifecycleState } from "@/editor/shell/lifecycle";
 import { NotificationPanel } from "@/editor/shell/NotificationPanel";
 import { PublishConfirmModal } from "@/editor/shell/modals/PublishConfirmModal";
 import { PageContextMenu } from "@/editor/sidebar/tabs/pages/components/PageContextMenu";
@@ -1922,6 +1924,66 @@ const CMS_STATUS_RECORDS: CMSContentItem[] = [
   }),
 ];
 
+/* ── Publish tray (design-2l9 Task 1.7) ─────────────────────────────────── */
+const TRAY_LIFE = {
+  reviewState: "none" as const,
+  reviewsEnabled: false,
+  editsRequireApproval: false,
+  isPublished: true,
+  hasUnpublishedChanges: true,
+  isViewer: false,
+  publishEnabled: true,
+  offline: false,
+  errorCount: 0,
+};
+
+const trayComposer = {
+  on: () => {},
+  off: () => {},
+  emit: () => {},
+  getState: () => ({ zoom: 100 }),
+  setZoom: () => {},
+  getProjectMetadata: () => ({ name: "Fieldwork Studio" }),
+  history: { getHistoryStack: () => [] },
+  elements: { getAllPages: () => [], getElement: () => null },
+  selection: { select: () => {} },
+} as unknown as React.ComponentProps<typeof PublishTray>["composer"];
+
+function publishTrayFrame(
+  probe: string,
+  o: { nextMove: ReturnType<typeof deriveLifecycleState>; issues?: Issue[]; job?: Partial<UsePublishJobResult> },
+): React.ReactElement {
+  const job: UsePublishJobResult = {
+    uiState: "idle",
+    jobId: null,
+    deploymentId: null,
+    progress: 0,
+    publishedUrl: "https://fieldwork.studio",
+    error: null,
+    steps: null,
+    blockedReason: null,
+    publish: async () => {},
+    cancel: async () => {},
+    track: () => {},
+    reset: () => {},
+    lastPublishedAt: null,
+    hasUnpublishedChanges: true,
+    dismissBlock: () => {},
+    unpublished: () => {},
+    pollLost: false,
+    ...o.job,
+  };
+  return (
+    <ToastProvider>
+      <div data-probe={probe} className="tw:fixed tw:inset-0 tw:bg-[var(--bk-bg-app)]">
+        <div className="tw:absolute tw:right-0 tw:top-14 tw:bottom-8 tw:w-[var(--bk-size-task-host)]">
+          <PublishTray composer={trayComposer} publishJob={job} nextMove={o.nextMove} onRequestPublish={() => {}} issues={o.issues ?? []} />
+        </div>
+      </div>
+    </ToastProvider>
+  );
+}
+
 const CASES: Record<string, () => React.ReactElement> = {
   // ── AI run states (boards 170:29 / 170:41 / 171:67) ─────────────────────
   "ai-thinking": () => aiHost("ai-thinking", agentPlan({ phase: "planning", steps: [] })),
@@ -2907,6 +2969,31 @@ const CASES: Record<string, () => React.ReactElement> = {
      width, carrying the longest review label and a site name long enough to
      have to give way. Pinned at 1024 / 1280 / 1440; at 1024 the review
      control and ⋯ must sit inside the bar with nothing wrapped. */
+  /* design-2l9 Task 1.7 — the publish tray, docked at the right edge of a
+     1440×900 frame the way board 499:2656 draws it (Task host / Publish,
+     360 × 812 under the 56 topbar). States: one blocking issue (B8-PB01),
+     a landed publish (B8-PB09) and a failed deploy with its ids (B8-PB10). */
+  "publish-tray-blocking": () => publishTrayFrame("publish-tray-blocking", {
+    nextMove: deriveLifecycleState({ ...TRAY_LIFE, errorCount: 1 }),
+    issues: [
+      { id: "i1", type: "error", message: "Collection list “Latest posts” has no source", elementId: "el-1" },
+      { id: "i2", type: "warning", message: "2 images have no alt text", elementId: "el-2" },
+    ],
+  }),
+  "publish-tray-success": () => publishTrayFrame("publish-tray-success", {
+    nextMove: null,
+    job: { uiState: "published", jobId: "cmv8job000001" },
+  }),
+  "publish-tray-failed": () => publishTrayFrame("publish-tray-failed", {
+    nextMove: deriveLifecycleState(TRAY_LIFE),
+    job: {
+      uiState: "failed",
+      jobId: "cmv8job000002",
+      deploymentId: "dpl_7Hq2mXc9",
+      error: "Vercel couldn't finish the deployment (timeout).",
+    },
+  }),
+
   "topbar-shell": () => (
     <div data-probe="topbar-shell" style={{ width: "100vw" }}>
       <Topbar

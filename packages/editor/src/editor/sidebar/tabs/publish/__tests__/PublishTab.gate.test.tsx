@@ -137,19 +137,19 @@ describe("PublishTab — doors that open", () => {
     expect(onRequestPublish).toHaveBeenCalledTimes(1);
   });
 
-  it("open errors: the banner counts them and its door is the Issues panel", async () => {
+  /* OD-1 (design 2L9): blocking issues block — the CTA is shut, the banner
+     says how many to fix and its door is the Issues panel. */
+  it("open errors: the banner counts them, its door is the Issues panel, and the CTA is shut", async () => {
     const move = moveAt({ reviewState: "approved", errorCount: 2 })!;
     const { onRequestPublish, emit } = renderTab(move);
     await waitFor(() => expect(screen.getByTestId("publish-gate-banner")).toBeTruthy());
-    expect(screen.getByTestId("publish-gate-reason").textContent).toBe(
-      "2 open errors will go live exactly as they are.",
-    );
+    expect(screen.getByTestId("publish-gate-reason").textContent).toBe("Fix 2 blocking issues to publish");
     // Not a check row — the errors are the Issues panel's, not the round's.
     expect(screen.queryByTestId("publish-check-approval")).toBeNull();
     fireEvent.click(screen.getByTestId("publish-gate-door"));
     expect(emit).toHaveBeenCalledWith(EVENTS.UI_OPEN_ISSUES, undefined);
     fireEvent.click(cta());
-    expect(onRequestPublish).toHaveBeenCalledTimes(1);
+    expect(onRequestPublish).not.toHaveBeenCalled();
   });
 
   it("approved: no banner, no row — the CTA opens the facts confirm and nothing else", async () => {

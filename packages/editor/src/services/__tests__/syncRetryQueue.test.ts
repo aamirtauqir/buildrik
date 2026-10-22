@@ -199,3 +199,75 @@ describe("SyncRetryQueue — one target, one write in flight, in order", () => {
     await expect(q.settled("nothing")).resolves.toBe(true);
   });
 });
+
+/* design-2l9 Task 1.7: the publish tray names what is stuck and why ("CMS
+   changes couldn't sync: {reason}", Open CMS at the failing record) and calls
+   a sync stuck after 5 failed attempts or 60 s — so the queue keeps the last
+   failure, its target and how long it has been failing. */
+describe("SyncRetryQueue — lastError and failedRecordId", () => {
+  it("start null and stay null after a first-time success", async () => {
+    const q = new SyncRetryQueue();
+    expect(q.lastError).toBeNull();
+    expect(q.failedRecordId).toBeNull();
+    await q.run("entryUpsert:r1", async () => undefined, () => {});
+    expect(q.lastError).toBeNull();
+    expect(q.failedRecordId).toBeNull();
+    expect(q.failedAttempts).toBe(0);
+  });
+
+  it("record the failing target, its reason, attempts and since", async () => {
+    vi.useFakeTimers();
+    try {
+      vi.setSystemTime(1_000);
+      const q = new SyncRetryQueue();
+      const task = vi.fn().mockRejectedValue(new Error("502 Bad Gateway"));
+      await q.run("entryUpsert:r1", task, () => {});
+      expect(q.lastError).toBe("502 Bad Gateway");
+      expect(q.failedRecordId).toBe("entryUpsert:r1");
+      expect(q.failedAttempts).toBe(1);
+      expect(q.failingSince).toBe(1_000);
+      vi.setSystemTime(5_000);
+      await q.retry();
+      await q.retry();
+      expect(q.failedAttempts).toBe(3);
+      expect(q.failingSince).toBe(1_000);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("clear when that target finally reaches the server", async () => {
+    const q = new SyncRetryQueue();
+    const task = vi.fn().mockRejectedValueOnce(new Error("down")).mockResolvedValueOnce(undefined);
+    await q.run("entryUpsert:r1", task, () => {});
+    expect(q.failedRecordId).toBe("entryUpsert:r1");
+    await q.retry();
+    expect(q.lastError).toBeNull();
+    expect(q.failedRecordId).toBeNull();
+    expect(q.failedAttempts).toBe(0);
+  });
+
+  it("clear when the failing target is dropped", async () => {
+    const q = new SyncRetryQueue();
+    await q.run("entryUpsert:r1", async () => { throw new Error("down"); }, () => {});
+    q.drop("entryUpsert:r1");
+    expect(q.lastError).toBeNull();
+    expect(q.failedRecordId).toBeNull();
+  });
+
+  it("follow the latest failing target; another target's success does not clear it", async () => {
+    const q = new SyncRetryQueue();
+    await q.run("entryUpsert:r1", async () => { throw new Error("first"); }, () => {});
+    await q.run("entryUpsert:r2", async () => { throw new Error("second"); }, () => {});
+    expect(q.failedRecordId).toBe("entryUpsert:r2");
+    expect(q.failedAttempts).toBe(1);
+    await q.run("entryUpsert:r3", async () => undefined, () => {});
+    expect(q.lastError).toBe("second");
+  });
+
+  it("a non-Error rejection still reads as text", async () => {
+    const q = new SyncRetryQueue();
+    await q.run("k", () => Promise.reject("offline"), () => {});
+    expect(q.lastError).toBe("offline");
+  });
+});
