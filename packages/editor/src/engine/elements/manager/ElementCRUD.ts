@@ -51,6 +51,9 @@ export class ElementCRUD {
     };
 
     const element = new Element(data, this.ctx.composer);
+    /* Refused while an edit lock holds: a detached element nothing registered,
+       so every write the caller then makes with it is refused in turn. */
+    if (this.ctx.composer.writeLocked) return element;
     this.ctx.elements.set(data.id, element);
 
     this.ctx.composer.emit(EVENTS.ELEMENT_CREATED, element);
@@ -77,6 +80,7 @@ export class ElementCRUD {
    * Add element to parent
    */
   addElement(element: Element, parentId: string, index?: number): boolean {
+    if (this.ctx.composer.writeLocked) return false;
     const asked = this.ctx.elements.get(parentId);
     if (!asked) return false;
     const place = resolvePlacement(element, asked, index);
@@ -94,6 +98,7 @@ export class ElementCRUD {
    * Remove element
    */
   removeElement(id: string): boolean {
+    if (this.ctx.composer.writeLocked) return false;
     const element = this.ctx.elements.get(id);
     if (!element) return false;
 
@@ -170,6 +175,7 @@ export class ElementCRUD {
    * Move element to new parent
    */
   moveElement(elementId: string, newParentId: string, index?: number): boolean {
+    if (this.ctx.composer.writeLocked) return false;
     const element = this.ctx.elements.get(elementId);
     const asked = this.ctx.elements.get(newParentId);
 
@@ -225,6 +231,7 @@ export class ElementCRUD {
    * Duplicate element
    */
   duplicateElement(id: string): Element | null {
+    if (this.ctx.composer.writeLocked) return null;
     const original = this.ctx.elements.get(id);
     if (!original) return null;
 
@@ -271,6 +278,7 @@ export class ElementCRUD {
    * has just removed (L2-015); every other caller pastes a fresh copy.
    */
   pasteElement(data: ElementData, target: Element, index?: number, announce = true, keepIds = false): Element | null {
+    if (this.ctx.composer.writeLocked) return null;
     if (!data) return null;
 
     // Clone with new IDs

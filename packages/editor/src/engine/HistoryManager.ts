@@ -93,7 +93,10 @@ export class HistoryManager {
 
   private setupListeners(): void {
     this.projectChangedHandler = () => {
-      if (!this.isRecording || this.isDestroyed) return;
+      /* A change announced while an edit lock holds is not a user step: the
+         engine refused it, or something bypassed the engine — either way it
+         must not become an undo entry. */
+      if (!this.isRecording || this.isDestroyed || this.composer.writeLocked) return;
 
       if (
         this.currentTransactionLabel &&
@@ -196,7 +199,7 @@ export class HistoryManager {
       this.currentTransactionLabel = undefined;
     }
 
-    if (!this.isRecording) return;
+    if (!this.isRecording || this.composer.writeLocked) return;
 
     const newState = this.captureSnapshot();
     const previousState = this.getCurrentState();
@@ -514,6 +517,7 @@ export class HistoryManager {
   // ─── Undo / Redo ────────────────────────────────────────────────────────────
 
   undo(): boolean {
+    if (this.composer.writeLocked) return false;
     // Commit any edit still inside the 500ms coalesce window before undoing.
     // Without this, an edit made just before Cmd+Z is never recorded, so undo
     // pops the PREVIOUS step and reverts both — losing the pending edit
@@ -637,6 +641,7 @@ export class HistoryManager {
   }
 
   redo(): boolean {
+    if (this.composer.writeLocked) return false;
     // A pending (uncommitted) edit branches history — commit it first so the
     // redo stack reflects reality. flushPending() clears the redo stack when
     // it records, which correctly invalidates a stale redo after a new edit.
@@ -786,6 +791,7 @@ export class HistoryManager {
    * Clears redo stack and replaces current state.
    */
   restoreEntry(entryId: string): boolean {
+    if (this.composer.writeLocked) return false;
     const entries = buildHistoryDisplayEntries(this.undoStack);
     const entry = entries.find((e) => e.id === entryId);
     if (!entry) return false;

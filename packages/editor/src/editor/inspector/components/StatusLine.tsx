@@ -65,3 +65,24 @@ export function StatusLine({ composer, elementId, locked, conflict }: StatusLine
     </div>
   );
 }
+
+/**
+ * The inspector's view-only line while the site has not loaded (Task 1.6) —
+ * a quiet echo of the load-error banner, in the board's words for the cause:
+ * B7-G02 "View only until the site loads", B7-G22 "View only · this site was
+ * deleted", B7-G18 "View only · your role changed". No action: the banner owns
+ * the way out.
+ */
+export function ViewOnlyLine({ cause }: { cause: "missing" | "forbidden" | "other" }) {
+  const text =
+    cause === "missing"
+      ? "View only · this site was deleted"
+      : cause === "forbidden"
+        ? "View only · your role changed"
+        : "View only until the site loads";
+  return (
+    <div role="status" data-testid="inspector-view-only" className={`${LINE} ${TONE.muted}`}>
+      <span className="tw:min-w-0">{text}</span>
+    </div>
+  );
+}

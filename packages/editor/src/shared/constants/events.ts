@@ -646,6 +646,9 @@ export const EVENTS = {
      user to start work has to hear this: the canvas was offering "Start blank"
      over a site whose every save is refused. */
   PROJECT_UNAVAILABLE: "project:unavailable",
+  /* The set of edit locks changed (`Composer.setEditLock`). Fires only when
+     the set actually changes; read `composer.readOnly` for the answer. */
+  EDIT_LOCK_CHANGED: "editlock:changed",
   /* A layer was renamed (or its name cleared). Custom names live in the
      layers panel's own per-page store, so anything else that shows an
      element's identity — the status bar — has no way to hear about a rename
@@ -865,6 +868,7 @@ export interface EventPayloads {
   [EVENTS.PROJECT_SAVING]: Record<string, never>;
   [EVENTS.PROJECT_LOAD_STATE]: { loading: boolean };
   [EVENTS.PROJECT_UNAVAILABLE]: { reason: "missing" };
+  [EVENTS.EDIT_LOCK_CHANGED]: { locks: import("../types").EditLockReason[]; readOnly: boolean };
   [EVENTS.ELEMENT_RENAMED]: { id: string; name: string | null };
   [EVENTS.PROJECT_LOADED]:
     | import("../types").ProjectData

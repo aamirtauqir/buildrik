@@ -1,7 +1,8 @@
 /**
  * InspectorFieldContext — what every field in the Inspector body needs to
  * know about the panel it sits in (R-DD-14, DD-18, DD-12):
- *   - read-only, and why (locked element, or a pending save conflict);
+ *   - read-only, and why (locked element, a pending save conflict, or an
+ *     engine edit lock);
  *   - which properties show "Mixed" across a multi-selection;
  *   - which properties are overridden, by what (breakpoint, :state, master),
  *     and how to reset one.
@@ -20,7 +21,9 @@ export type OverrideKind = "breakpoint" | "pseudo" | "master";
 
 export interface InspectorFieldContextValue {
   readOnly: boolean;
-  readOnlyReason: "locked" | "conflict" | null;
+  /** `not-loaded` / `view`: an engine edit lock (Task 1.6) — the site has not
+   *  loaded, or it is being viewed (view mode, time travel). */
+  readOnlyReason: "locked" | "conflict" | "not-loaded" | "view" | null;
   mixedKeys: ReadonlySet<string>;
   overrides: ReadonlyMap<string, readonly OverrideKind[]>;
   /** "Tablet", ":hover" — what an override dot names. */

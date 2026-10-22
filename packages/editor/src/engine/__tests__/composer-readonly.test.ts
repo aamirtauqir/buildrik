@@ -56,7 +56,7 @@ describe("Composer.readOnly", () => {
 
   it("ignores the Delete key when read-only", () => {
     const { composer } = setup();
-    composer.readOnly = true;
+    composer.setEditLock("view", true);
     pressDelete();
     expect(childCount(composer)).toBe(1);
   });

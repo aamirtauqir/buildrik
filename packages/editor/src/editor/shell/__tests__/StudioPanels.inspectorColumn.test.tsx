@@ -73,6 +73,7 @@ function makeComposer() {
   const handlers = new Map<string, Set<(p?: unknown) => void>>();
   return {
     readOnly: false,
+    setEditLock: vi.fn(),
     on: (ev: string, fn: (p?: unknown) => void) => {
       if (!handlers.has(ev)) handlers.set(ev, new Set());
       handlers.get(ev)!.add(fn);

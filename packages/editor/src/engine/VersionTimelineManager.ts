@@ -280,6 +280,7 @@ export class VersionTimelineManager {
    * Restore to a named version
    */
   async restoreVersion(versionId: string): Promise<boolean> {
+    if (this.composer.writeLocked) return false;
     const version = await this.getVersion(versionId);
     if (!version) return false;
 
