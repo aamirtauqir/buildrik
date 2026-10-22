@@ -306,7 +306,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
      KeybindingManager listens on window in the capture phase, so click-then-
      Delete still worked. One flag on the gateway closes every chord at once. */
   React.useEffect(() => {
-    if (composer) composer.readOnly = readOnlyView;
+    composer?.setEditLock("view", readOnlyView);
   }, [composer, readOnlyView]);
 
   /* useLayoutEffect, not useEffect: this class now drives LAYOUT as well as the

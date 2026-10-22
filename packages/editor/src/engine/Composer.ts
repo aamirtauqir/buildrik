@@ -13,6 +13,7 @@ import { EVENTS, THRESHOLDS, isNavigationOnlyChange } from "../shared/constants"
 import type {
   ComposerConfig,
   ComposerState,
+  EditLockReason,
   ProjectData,
   ProjectSettings,
   ExportOptions,
@@ -130,18 +131,24 @@ export class Composer extends EventEmitter {
   readonly commands!: CommandCenter;
 
   /**
-   * Read-only composer: every command that would change the document stands
-   * down (see MUTATING_COMMANDS in CommandCenter). Set by the chrome for client
-   * view, which is a VIEW — whoever is holding it is looking, not building.
+   * Why the document is not editable right now: `view` (client view, set by
+   * the chrome), `time-travel` (previewing history) and `not-loaded` (the
+   * site's project has not arrived, or failed to). Each owner sets and clears
+   * only its own reason through `setEditLock`, so one clearing cannot unlock
+   * another's — the old single boolean was saved and restored by hand, and a
+   * restore could put back a stale value.
    *
    * It lives here rather than in the chrome because KeybindingManager binds
    * keydown on WINDOW in the capture phase, so gating React handlers cannot
    * reach it: with the rail, inspector, inline edit and context menu all
    * withheld, click-then-Delete still removed an element and autosave still
    * wrote it. CLAUDE.md says the Composer is the single gateway to the engine;
-   * this is the gate.
+   * this is the gate. Every mutating manager entry point asks `writeLocked`.
    */
-  readOnly = false;
+  readonly editLocks: Set<EditLockReason> = new Set();
+  /** > 0 while importProject runs: a load is not an edit, and it has to land
+   *  while `not-loaded` holds (that lock clears only after it). */
+  private importDepth = 0;
   readonly selection!: SelectionManager;
   readonly history!: HistoryManager;
   readonly versions!: VersionTimelineManager;
@@ -281,7 +288,7 @@ export class Composer extends EventEmitter {
           : null;
       },
       setTokens: (next, label) => {
-        if (this.designSystem.readOnly) return false;
+        if (this.designSystem.readOnly || this.writeLocked) return false;
         const checked = validateTokens(next);
         if (!checked.ok) {
           console.warn(`[tokens] refused "${label}": ${checked.reason}`);
@@ -311,7 +318,7 @@ export class Composer extends EventEmitter {
         this.emit(EVENTS.BRAND_PREVIEW_CHANGED, undefined);
       },
       setDarkMode: (mode, label, tokens) => {
-        if (this.designSystem.readOnly) return false;
+        if (this.designSystem.readOnly || this.writeLocked) return false;
         this.beginTransaction(label);
         try {
           if (!this.designSystem.setTokens(tokens ?? this.mergedDesignTokens(), label)) return false;
@@ -331,7 +338,7 @@ export class Composer extends EventEmitter {
         );
       },
       applyConnect: (picks) => {
-        if (this.designSystem.readOnly) return 0;
+        if (this.designSystem.readOnly || this.writeLocked) return 0;
         const tokens = this.mergedDesignTokens();
         const byKey = new Map(this.designSystem.connectSuggestions().map((s) => [s.key, s]));
         const writes: Array<ConnectRef & { value: string }> = [];
@@ -680,6 +687,15 @@ export class Composer extends EventEmitter {
    * Import project data
    */
   importProject(data: ProjectData): void {
+    this.importDepth++;
+    try {
+      this.importProjectUnlocked(data);
+    } finally {
+      this.importDepth--;
+    }
+  }
+
+  private importProjectUnlocked(data: ProjectData): void {
     this.emit(EVENTS.PROJECT_LOADED, { importing: true, data });
     /* Every element is replaced below, so a selection made before the import
        points at detached objects: after "Restore to draft" a deleted element
@@ -980,6 +996,7 @@ ${html}${interactionScript}
    * Set project-wide settings (analytics, integrations, design tokens)
    */
   setProjectSettings(settings: ProjectSettings): void {
+    if (this.writeLocked) return;
     this.markDirty(); // Mark dirty BEFORE applyProjectSettings emits PROJECT_CHANGED
     this.applyProjectSettings(settings);
   }
@@ -1013,6 +1030,7 @@ ${html}${interactionScript}
    * Update project metadata
    */
   updateProjectMetadata(metadata: Partial<import("../shared/types").ProjectMetadata>): void {
+    if (this.writeLocked) return;
     this.projectMetadata = {
       ...this.projectMetadata,
       ...metadata,
@@ -1109,6 +1127,30 @@ ${html}${interactionScript}
     return this.initPromise ?? Promise.resolve();
   }
 
+  /** True while any edit lock holds. Read-only by construction: the lock
+   *  set is the only way to change it (`setEditLock`). */
+  get readOnly(): boolean {
+    return this.editLocks.size > 0;
+  }
+
+  /**
+   * The question every mutating engine entry point asks before it writes:
+   * an edit lock holds and this is not an import. A refused write returns
+   * without mutating and without PROJECT_CHANGED.
+   */
+  get writeLocked(): boolean {
+    return this.editLocks.size > 0 && this.importDepth === 0;
+  }
+
+  /** Hold (`on`) or release one lock reason. Emits EDIT_LOCK_CHANGED only
+   *  when the set actually changes. */
+  setEditLock(reason: EditLockReason, on: boolean): void {
+    if (this.editLocks.has(reason) === on) return;
+    if (on) this.editLocks.add(reason);
+    else this.editLocks.delete(reason);
+    this.emit(EVENTS.EDIT_LOCK_CHANGED, { locks: [...this.editLocks], readOnly: this.readOnly });
+  }
+
   /**
    * Check if project has unsaved changes
    */
@@ -1120,6 +1162,9 @@ ${html}${interactionScript}
    * Mark project as modified
    */
   markDirty(): void {
+    /* Backstop for a write path that reached here without asking: while
+       locked nothing is dirtied, so no autosave and no history record. */
+    if (this.writeLocked) return;
     /* Dev-only forensics, and LOAD-BEARING: `e2e/boot-clean.spec.ts` asserts
        against `__bkDirtyTrace` and fails as UNMEASURED if this is removed.
        A freshly loaded, untouched project was measured

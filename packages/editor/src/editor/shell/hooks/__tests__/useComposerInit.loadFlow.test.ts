@@ -65,6 +65,10 @@ const mockComposer = {
   },
   aliasResolver: { validate: vi.fn() },
   destroy: vi.fn(),
+  /* Edit locks are inert here; useComposerInit.editLock.test.ts runs them
+     with the engine's semantics. */
+  editLocks: new Set<string>(),
+  setEditLock: vi.fn(),
   designSystem: { readOnly: false, readOnlyReason: null as string | null, brandTokensV2: true },
 };
 

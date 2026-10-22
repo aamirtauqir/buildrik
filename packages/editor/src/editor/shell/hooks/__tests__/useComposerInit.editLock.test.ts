@@ -1,0 +1,189 @@
+/**
+ * The not-loaded edit lock, end to end through useComposerInit with a REAL
+ * Composer (Task 1.6).
+ *
+ * The composer is created and the whole editor mounted before the site's
+ * project arrives. Until this lock, anything typed or dropped in that window —
+ * or after a failed load — wrote into an empty composer, and autosave sent it
+ * over the real site. The lock is taken when the composer is created and
+ * released only once a load has landed.
+ *
+ * @license BSD-3-Clause
+ */
+import { renderHook, act, waitFor } from "@testing-library/react";
+import { describe, it, expect, vi, beforeAll, afterAll, beforeEach, afterEach } from "vitest";
+import { THRESHOLDS } from "@/shared/constants/config";
+import { EVENTS } from "@/shared/constants/events";
+import type { Composer } from "@/engine/Composer";
+import type { ProjectData } from "@/shared/types";
+import {
+  installEngineBrowserStubs,
+  removeEngineBrowserStubs,
+  createTestComposer,
+} from "@/engine/__tests__/test-utils/realComposer";
+import { useComposerInit, type UseComposerInitParams } from "../useComposerInit";
+
+const created = vi.hoisted(() => ({ composer: null as Composer | null }));
+
+vi.mock("@/engine", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/engine")>();
+  return {
+    ...actual,
+    createComposer: () => {
+      created.composer = createTestComposer();
+      return created.composer;
+    },
+  };
+});
+
+vi.mock("@/services/BuildrikSyncProvider", () => ({
+  loadCurrentUserId: vi.fn(() => Promise.resolve(null)),
+  getSiteIdFromUrl: vi.fn(() => "site-1"),
+  loadProject: vi.fn(),
+  loadServerMedia: vi.fn(() => Promise.resolve(null)),
+  saveProject: vi.fn(() => Promise.resolve({ success: true })),
+  keepStoredTokensOnSave: vi.fn(),
+  isSaveConflictPending: vi.fn(() => false),
+  SAVE_CONFLICT_EVENT: "buildrik:save-conflict",
+  SaveConflictError: class SaveConflictError extends Error {},
+}));
+
+vi.mock("@/services/AssetUploadService", () => ({ createRemoteAssetSync: vi.fn(() => ({})) }));
+
+import { loadProject, saveProject } from "@/services/BuildrikSyncProvider";
+
+const SITE: ProjectData = {
+  version: "1.0.0",
+  pages: [
+    {
+      id: "page-home",
+      name: "Home",
+      slug: "",
+      root: {
+        id: "root-home",
+        type: "container",
+        tagName: "div",
+        children: [{ id: "el-h1", type: "heading", tagName: "h1", content: "Real site", children: [] }],
+      },
+    },
+  ],
+} as unknown as ProjectData;
+
+function makeParams(): UseComposerInitParams {
+  return {
+    containerRef: { current: document.createElement("div") },
+    addToast: vi.fn(() => "toast"),
+    setCanUndo: vi.fn(),
+    setCanRedo: vi.fn(),
+    setDevice: vi.fn(),
+    setZoom: vi.fn(),
+    setShowExporter: vi.fn(),
+    setIsDirty: vi.fn(),
+    setSaveState: vi.fn(),
+    onLoadError: vi.fn(),
+  };
+}
+
+const settle = () => new Promise((r) => setTimeout(r, 0));
+const pastDebounce = () => new Promise((r) => setTimeout(r, THRESHOLDS.AUTOSAVE_DEBOUNCE + 100));
+
+async function mountAndWaitForReady(): Promise<{ composer: Composer; params: UseComposerInitParams }> {
+  const params = makeParams();
+  renderHook(() => useComposerInit(params));
+  const composer = created.composer!;
+  await act(async () => {
+    await composer.whenReady();
+    await settle();
+  });
+  return { composer, params };
+}
+
+beforeAll(() => installEngineBrowserStubs());
+afterAll(() => removeEngineBrowserStubs());
+beforeEach(() => {
+  localStorage.clear();
+  vi.mocked(saveProject).mockClear();
+  vi.mocked(loadProject).mockReset();
+});
+afterEach(() => {
+  created.composer = null;
+});
+
+describe("useComposerInit › not-loaded lock", () => {
+  it("is held from the moment the composer exists, before the load starts", () => {
+    vi.mocked(loadProject).mockReturnValue(new Promise(() => {}));
+    renderHook(() => useComposerInit(makeParams()));
+    expect(created.composer!.editLocks.has("not-loaded")).toBe(true);
+    expect(created.composer!.readOnly).toBe(true);
+  });
+
+  it("an edit attempted before the initial load resolves is refused and never reaches autosave", async () => {
+    let resolveLoad!: (p: ProjectData) => void;
+    vi.mocked(loadProject).mockReturnValue(new Promise((r) => (resolveLoad = r)) as never);
+    const { composer } = await mountAndWaitForReady();
+    expect(composer.isProjectLoading()).toBe(true);
+
+    const page = composer.elements.createPage("Typed during load");
+    composer.elements.importHTMLToActivePage("<p>dropped during load</p>");
+    expect(composer.elements.getPage(page.id)).toBeUndefined();
+    expect(composer.elements.getAllPages()).toHaveLength(0);
+    /* A write path that bypassed the engine and announced itself anyway. */
+    act(() => composer.emit(EVENTS.PROJECT_CHANGED, { type: "bypass" }));
+    await act(pastDebounce);
+    expect(composer.history.canUndo()).toBe(false);
+    expect(saveProject).not.toHaveBeenCalled();
+
+    await act(async () => {
+      resolveLoad(structuredClone(SITE));
+      await settle();
+    });
+    expect(composer.readOnly).toBe(false);
+    expect(composer.elements.getAllPages().map((p) => p.name)).toEqual(["Home"]);
+    expect(composer.history.canUndo()).toBe(false);
+    expect(saveProject).not.toHaveBeenCalled();
+  });
+
+  it("a failed load leaves the lock set; a successful retry clears it", async () => {
+    vi.mocked(loadProject).mockRejectedValueOnce(new Error("boom 500"));
+    const { composer, params } = await mountAndWaitForReady();
+    await act(settle);
+    expect(params.onLoadError).toHaveBeenCalledWith("network");
+    expect(composer.editLocks.has("not-loaded")).toBe(true);
+    composer.elements.createPage("Fallback edit");
+    expect(composer.elements.getAllPages()).toHaveLength(0);
+
+    vi.mocked(loadProject).mockResolvedValueOnce(structuredClone(SITE) as never);
+    await act(async () => {
+      composer.emit(EVENTS.PROJECT_LOAD_RETRY, undefined);
+      await settle();
+    });
+    await waitFor(() => expect(composer.editLocks.has("not-loaded")).toBe(false));
+    expect(composer.elements.getAllPages().map((p) => p.name)).toEqual(["Home"]);
+    expect(loadProject).toHaveBeenCalledTimes(2);
+  });
+
+  it("a retry never re-fetches over a site that already loaded", async () => {
+    vi.mocked(loadProject).mockResolvedValue(structuredClone(SITE) as never);
+    const { composer } = await mountAndWaitForReady();
+    await act(settle);
+    expect(composer.readOnly).toBe(false);
+    await act(async () => {
+      composer.emit(EVENTS.PROJECT_LOAD_RETRY, undefined);
+      await settle();
+    });
+    expect(loadProject).toHaveBeenCalledTimes(1);
+  });
+
+  it("a write that slipped onto the history before the load fails the load loudly instead of being replaced", async () => {
+    let resolveLoad!: (p: ProjectData) => void;
+    vi.mocked(loadProject).mockReturnValue(new Promise((r) => (resolveLoad = r)) as never);
+    const { composer, params } = await mountAndWaitForReady();
+    vi.spyOn(composer.history, "canUndo").mockReturnValue(true);
+    await act(async () => {
+      resolveLoad(structuredClone(SITE));
+      await settle();
+    });
+    expect(params.onLoadError).toHaveBeenCalledWith("network");
+    expect(composer.editLocks.has("not-loaded")).toBe(true);
+  });
+});

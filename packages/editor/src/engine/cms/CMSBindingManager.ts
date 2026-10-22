@@ -329,6 +329,7 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
     collectionId: string,
     options: Partial<Omit<CMSCollectionBinding, "elementId" | "collectionId">> = {}
   ): void {
+    if (this.composer.writeLocked) return;
     this.collectionBindings.set(elementId, {
       elementId,
       collectionId,
@@ -351,6 +352,7 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
    * records instead of blanks. Placeholders the author already aimed stay.
    */
   bindCollectionList(elementId: string, collectionId: string, options: { limit?: number } = {}): void {
+    if (this.composer.writeLocked) return;
     this.bindCollection(elementId, collectionId, { repeat: "children", limit: options.limit });
     const collection = this.cmsManager.getCollection(collectionId);
     const list = this.composer.elements.getElement(elementId);
@@ -380,6 +382,7 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
    * Unbind a collection from an element
    */
   unbindCollection(elementId: string): void {
+    if (this.composer.writeLocked) return;
     if (this.collectionBindings.has(elementId)) {
       this.collectionBindings.delete(elementId);
       this.composer.markDirty();

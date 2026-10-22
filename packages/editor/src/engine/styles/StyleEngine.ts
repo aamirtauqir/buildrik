@@ -89,6 +89,13 @@ export class StyleEngine {
 
     // Check if rule exists
     let style = this.findRule(fullSelector, options?.mediaQuery);
+    /* Refused while an edit lock holds: an unregistered copy of the rule as
+       it stands, so nothing the caller does with it reaches the sheet. */
+    if (this.composer.writeLocked) {
+      return style
+        ? { ...style, properties: { ...style.properties } }
+        : { id: generateId("style"), selector: fullSelector, properties: {}, mediaQuery: options?.mediaQuery, pseudo: options?.pseudo };
+    }
 
     if (style) {
       // Update existing rule
@@ -124,6 +131,7 @@ export class StyleEngine {
    * Remove a style rule
    */
   removeRule(selector: string, mediaQuery?: string): boolean {
+    if (this.composer.writeLocked) return false;
     const style = this.findRule(selector, mediaQuery);
     if (style) {
       this.styles.delete(style.id);
@@ -140,6 +148,7 @@ export class StyleEngine {
    * Set a single property on a selector
    */
   setProperty(selector: string, property: string, value: string): void {
+    if (this.composer.writeLocked) return;
     const style = this.findRule(selector) || this.setRule(selector, {});
     style.properties[property] = value;
     this.updateStylesheet();
@@ -151,6 +160,7 @@ export class StyleEngine {
    * Remove a property from a selector
    */
   removeProperty(selector: string, property: string): void {
+    if (this.composer.writeLocked) return;
     const style = this.findRule(selector);
     if (style && style.properties[property]) {
       delete style.properties[property];
@@ -191,6 +201,7 @@ export class StyleEngine {
     breakpoint: BreakpointId,
     styles: Record<string, string>
   ): void {
+    if (this.composer.writeLocked) return;
     if (!isValidBreakpoint(breakpoint)) {
       devWarn("StyleEngine", `Invalid breakpoint: ${breakpoint}`);
       return;
@@ -268,6 +279,7 @@ export class StyleEngine {
     breakpoint: BreakpointId,
     property: string
   ): void {
+    if (this.composer.writeLocked) return;
     if (!isValidBreakpoint(breakpoint)) {
       return;
     }
@@ -306,6 +318,7 @@ export class StyleEngine {
    * @param breakpoint - The breakpoint to clear
    */
   clearBreakpointStyles(elementId: string, breakpoint: BreakpointId): void {
+    if (this.composer.writeLocked) return;
     if (!isValidBreakpoint(breakpoint)) {
       return;
     }
@@ -718,6 +731,7 @@ export class StyleEngine {
    * Inherit styles from another element
    */
   inheritStyles(from: Element, to: Element, properties?: string[]): void {
+    if (this.composer.writeLocked) return;
     const fromStyles = this.getStyles(from.getId());
     const toStyles = this.getStyles(to.getId());
 
