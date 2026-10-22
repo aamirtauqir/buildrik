@@ -10,7 +10,7 @@
  *
  * @license BSD-3-Clause
  */
-import { renderHook, act, waitFor } from "@testing-library/react";
+import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeAll, afterAll, beforeEach, afterEach } from "vitest";
 import { THRESHOLDS } from "@/shared/constants/config";
 import { EVENTS } from "@/shared/constants/events";
@@ -143,7 +143,7 @@ describe("useComposerInit › not-loaded lock", () => {
     expect(saveProject).not.toHaveBeenCalled();
   });
 
-  it("a failed load leaves the lock set; a successful retry clears it", async () => {
+  it("a failed load leaves the lock set and nothing is seeded or saved", async () => {
     vi.mocked(loadProject).mockRejectedValueOnce(new Error("boom 500"));
     const { composer, params } = await mountAndWaitForReady();
     await act(settle);
@@ -151,27 +151,9 @@ describe("useComposerInit › not-loaded lock", () => {
     expect(composer.editLocks.has("not-loaded")).toBe(true);
     composer.elements.createPage("Fallback edit");
     expect(composer.elements.getAllPages()).toHaveLength(0);
-
-    vi.mocked(loadProject).mockResolvedValueOnce(structuredClone(SITE) as never);
-    await act(async () => {
-      composer.emit(EVENTS.PROJECT_LOAD_RETRY, undefined);
-      await settle();
-    });
-    await waitFor(() => expect(composer.editLocks.has("not-loaded")).toBe(false));
-    expect(composer.elements.getAllPages().map((p) => p.name)).toEqual(["Home"]);
-    expect(loadProject).toHaveBeenCalledTimes(2);
-  });
-
-  it("a retry never re-fetches over a site that already loaded", async () => {
-    vi.mocked(loadProject).mockResolvedValue(structuredClone(SITE) as never);
-    const { composer } = await mountAndWaitForReady();
-    await act(settle);
-    expect(composer.readOnly).toBe(false);
-    await act(async () => {
-      composer.emit(EVENTS.PROJECT_LOAD_RETRY, undefined);
-      await settle();
-    });
-    expect(loadProject).toHaveBeenCalledTimes(1);
+    act(() => composer.emit(EVENTS.PROJECT_CHANGED, { type: "bypass" }));
+    await act(pastDebounce);
+    expect(saveProject).not.toHaveBeenCalled();
   });
 
   it("a write that slipped onto the history before the load fails the load loudly instead of being replaced", async () => {

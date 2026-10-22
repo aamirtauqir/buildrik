@@ -273,14 +273,6 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
       loadFromLocalStorage(instance, projectConfig);
     };
 
-    /* A retry after a failed load (the load-error banner asks for one). Only
-       while the site is still not loaded — a loaded site is never re-fetched
-       over the work on screen. */
-    const loadRetryHandler = () => {
-      const siteId = getSiteIdFromUrl();
-      if (siteId && instance.editLocks.has("not-loaded")) loadFromServer(siteId);
-    };
-
     function loadFromServer(siteId: string) {
       instance.setProjectLoading(true);
       loadProject(siteId)
@@ -288,7 +280,8 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
           /* Every write is refused while not-loaded holds, so nothing can
              have reached the history before this import. If something did,
              a write path is bypassing the lock: fail the load loudly rather
-             than replace that state silently. */
+             than replace that state silently. (Today's Retry is a full page
+             reload; an in-place retry must come back through here.) */
           if (instance.history.canUndo() || instance.history.canRedo()) {
             throw new Error("EDIT_LOCK_BYPASSED: history recorded before the site loaded");
           }
@@ -593,7 +586,6 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
 
     // Register all event listeners with named handlers
     instance.on("composer:ready", composerReadyHandler);
-    instance.on(EVENTS.PROJECT_LOAD_RETRY, loadRetryHandler);
     instance.on("project:changed", projectChangedHandler);
     instance.on("history:recorded", historyRecordedHandler);
     instance.on("ui:toggle:exporter", toggleExporterHandler);
@@ -617,7 +609,6 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
     return () => {
       detachAdoption();
       instance.off("composer:ready", composerReadyHandler);
-      instance.off(EVENTS.PROJECT_LOAD_RETRY, loadRetryHandler);
       instance.off("project:changed", projectChangedHandler);
       instance.off("history:recorded", historyRecordedHandler);
       instance.off("ui:toggle:exporter", toggleExporterHandler);
