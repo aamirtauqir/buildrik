@@ -504,6 +504,36 @@ export function retryCmsSync(): Promise<void> {
   return queue.retry();
 }
 
+/** The CMS mirror that is failing, for the publish tray's stuck state
+ *  (design-2l9 Task 1.7): the server's reason, how long and how often it has
+ *  failed, and where Open CMS should land — the record's collection, plus the
+ *  record itself for an entry. `null` while nothing is failing. */
+export interface CmsSyncFailure {
+  reason: string;
+  attempts: number;
+  since: number;
+  open: { collectionId: string; recordId?: string } | null;
+}
+
+export function cmsSyncFailure(): CmsSyncFailure | null {
+  const key = queue.failedRecordId;
+  const reason = queue.lastError;
+  const since = queue.failingSince;
+  if (!key || reason === null || since === null) return null;
+  const sep = key.indexOf(":");
+  const op = key.slice(0, sep);
+  const id = key.slice(sep + 1);
+  const siteId = getSiteIdFromUrl();
+  const queued = siteId ? readOutbox()[siteId]?.find((o) => o.key === key) : undefined;
+  const open =
+    op.startsWith("collection")
+      ? { collectionId: id }
+      : queued?.op === "entryUpsert"
+        ? { collectionId: queued.item.collectionId, recordId: id }
+        : null;
+  return { reason, attempts: queue.failedAttempts, since, open };
+}
+
 /**
  * Cross-device load (E7 / C-4, PD-36): pull server collections + entries into
  * the engine's IndexedDB on editor open. SERVER-FIRST, on the server's clock:

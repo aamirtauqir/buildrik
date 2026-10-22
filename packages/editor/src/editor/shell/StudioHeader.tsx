@@ -50,6 +50,7 @@ import { SiteMenu } from "./SiteMenu";
 import { PermissionsHost } from "./PermissionsHost";
 import { TimeTravelHost } from "./TimeTravelHost";
 import { SaveFailedBanner } from "./SaveFailedBanner";
+import { publishTray, usePublishTrayOpen } from "./publishTrayStore";
 import { shellDirty, useShellDirty } from "./shellDirtyRegistry";
 import "./header.css";
 
@@ -121,9 +122,9 @@ export interface StudioHeaderProps {
   /** Export HTML as zip download */
   onExportHTML?: () => void;
 
-  /** The publish door. AquibraStudio's `requestPublish` — it routes on
-   *  `nextMove.gate` and opens the right dialog (errors confirm · stale
-   *  acknowledgement · facts confirm); this bar never publishes on its own. */
+  /** The publish door. AquibraStudio still passes it; since design-2l9
+   *  Task 1.7 the topbar's Publish is the publish tray's toggle, and the
+   *  tray (StudioPanels) calls the door from its one CTA. Not read here. */
   onVercelPublish?: () => void;
   /** True while a publish job is in flight */
   publishLoading?: boolean;
@@ -264,7 +265,6 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   onOpenConflict,
   onSave,
   onExportHTML,
-  onVercelPublish,
   publishLoading,
   publishedUrl,
   publishOutcome = null,
@@ -697,12 +697,24 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
      a review-blocked site rendering the ENABLED branch. `"anyway"` is gone:
      the derivation owns the error re-label, and it refuses to put an
      invitation on a button nobody can press. */
+  /* design-2l9 Task 1.7: a publish move is the tray's TOGGLE, and stays
+     pressable whatever blocks the publish — the tray holds the one CTA and
+     its reason, so the bar never shows a second, disabled Publish. Only the
+     review verbs (Send for review · Open feedback) keep the old shape: they
+     open the Review panel, and a blocked one says why on the button. */
+  const trayOpen = usePublishTrayOpen();
+  const isTrayToggle = !nextMove || nextMove.kind === "publish";
   const publish: PublishState =
-    publishOutcome === "published"
+    publishOutcome === "published" && !trayOpen
       ? "published"
-      : nextMove?.blockedReason
+      : !isTrayToggle && nextMove?.blockedReason
         ? "disabled"
         : "ready";
+  /* The tray reads the site's issues from here: they reach the shell only
+     through this component's props. */
+  React.useEffect(() => {
+    publishTray.setIssues(issues);
+  }, [issues]);
 
   // ── T5/F24 · the ONE announcement pipe (eng D5 — centralized) ────────────
   // SaveStatus is presentation-only; these two visually-hidden regions speak
@@ -742,13 +754,16 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
      `nextMove.gate`: the "Publish with N open errors?" confirm used to be this
      bar's private dialog, so the Publish panel's identical verb skipped it
      (B4 — one confirm door, both entrances). */
-  const handleCtaClick = React.useCallback(() => {
-    if (nextMove && nextMove.kind !== "publish") {
-      onOpenReview?.();
-      return;
-    }
-    onVercelPublish?.();
-  }, [nextMove, onOpenReview, onVercelPublish]);
+  const handleCtaClick = React.useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      if (nextMove && nextMove.kind !== "publish") {
+        onOpenReview?.();
+        return;
+      }
+      publishTray.toggle(e.currentTarget);
+    },
+    [nextMove, onOpenReview],
+  );
 
   // Plan §2/eng D12: the CONTAINER composes the tool cluster per role/view —
   // the bar renders exactly what it receives. View mode is itself a preview,
@@ -855,12 +870,13 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
         onOpenNotifications={() => setNotifOpen((v) => !v)}
         /* Publishing is the owner's act. It stayed visible in view mode
            because nothing here ever read readOnlyView for it. */
-        /* `nextMove === null` means the site has no next act — live, with
-           nothing waiting. The CTA is withheld there rather than showing a
-           Publish that would do nothing; the live chip below carries the
-           status that used to be implied by the button's presence. */
-        publish={isViewer ? "disabled" : viewMode.readOnlyView || !nextMove ? "hidden" : publish}
+        /* `nextMove === null` — live with nothing waiting — still shows
+           Publish: it opens the tray, which says "Up to date" (board PLAY
+           F4.22 `308:25079`) beside the live site and its links. */
+        publish={isViewer ? "disabled" : viewMode.readOnlyView ? "hidden" : publish}
         publishBusy={publishLoading}
+        publishExpanded={!isViewer && !viewMode.readOnlyView && isTrayToggle ? trayOpen : undefined}
+        publishControls="publish-tray"
         /* A viewer's reason is the lifecycle's own ("Viewers can't publish —
            ask an editor"); in view mode it rides the disabled CTA. */
         publishBlockedReason={nextMove?.blockedReason ?? undefined}

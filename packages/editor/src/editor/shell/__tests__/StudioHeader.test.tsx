@@ -100,6 +100,7 @@ vi.mock("../modals/CommandPalette", () => ({
 import { StudioHeader, type StudioHeaderProps } from "../StudioHeader";
 import { deriveLifecycleState } from "../lifecycle";
 import { shellDirty } from "../shellDirtyRegistry";
+import { publishTray } from "../publishTrayStore";
 import { isFeatureEnabled } from "@/shared/utils/featureFlags";
 import { getEditorViewMode } from "@/shared/utils/editorViewMode";
 import { submitForReview } from "@/services/ReviewService";
@@ -176,6 +177,7 @@ describe("StudioHeader", () => {
 
   afterEach(() => {
     cleanup();
+    publishTray.close();
     vi.clearAllMocks();
     roleState.role = null;
     collab.current = { ...COLLAB_IDLE };
@@ -357,69 +359,69 @@ describe("StudioHeader", () => {
     });
   });
 
-  describe("publish gating", () => {
-    it("flag off: Publish is blocked but focusable, with the reason in a tooltip", () => {
+  /* design-2l9 Task 1.7 — the topbar's Publish is the publish tray's TOGGLE.
+     The tray holds the one CTA and every reason it is shut (flag off,
+     offline, blocking issues — OD-1); the bar never shows a second, disabled
+     Publish beside it, and never publishes on its own. */
+  describe("publish is the tray toggle", () => {
+    const toggle = () => screen.getByTestId("topbar-publish");
+
+    it("flag off: still the toggle — the tray says why, not a disabled bar button", () => {
       render(<StudioHeader {...makeProps()} />);
-      const btn = screen.getByRole("button", { name: "Publish" });
-      expect(btn.getAttribute("aria-disabled")).toBe("true");
-      expect(btn).not.toBeDisabled();
-      fireEvent.focus(btn);
-      expect(screen.getByRole("tooltip").textContent).toMatch(/isn't switched on/);
+      expect(toggle().getAttribute("aria-disabled")).toBeNull();
+      expect(toggle().getAttribute("aria-expanded")).toBe("false");
     });
 
-    it("flag on: Publish is live and fires the publish job", () => {
+    it("a click opens the tray (aria-expanded) and never fires the publish door itself", () => {
       vi.mocked(isFeatureEnabled).mockReturnValue(true);
       const onVercelPublish = vi.fn();
       render(<StudioHeader {...makeProps({ onVercelPublish })} />);
-      fireEvent.click(screen.getByRole("button", { name: "Publish" }));
-      expect(onVercelPublish).toHaveBeenCalled();
+      fireEvent.click(toggle());
+      expect(publishTray.get().open).toBe(true);
+      expect(toggle().getAttribute("aria-expanded")).toBe("true");
+      expect(toggle().getAttribute("aria-controls")).toBe("publish-tray");
+      expect(onVercelPublish).not.toHaveBeenCalled();
     });
 
-    it("offline blocks publish with the reason reachable on focus", () => {
+    it("a second click closes it; the label does not change on open (no layout shift)", () => {
       vi.mocked(isFeatureEnabled).mockReturnValue(true);
-      render(<StudioHeader {...makeProps({ isOffline: true })} />);
-      const btn = screen.getByRole("button", { name: "Publish" });
-      expect(btn.getAttribute("aria-disabled")).toBe("true");
-      fireEvent.focus(btn);
-      /* Two tooltips exist offline — the save pill carries its own (B2) — so
-         the assert names the CTA's by its text. */
-      expect(screen.getByText("Can't publish while offline").closest('[role="tooltip"]')).not.toBeNull();
+      render(<StudioHeader {...makeProps()} />);
+      const before = toggle().textContent;
+      fireEvent.click(toggle());
+      expect(toggle().textContent).toBe(before);
+      fireEvent.click(toggle());
+      expect(publishTray.get().open).toBe(false);
+      expect(toggle().getAttribute("aria-expanded")).toBe("false");
     });
 
-    it("blocking errors turn it into Publish anyway rather than hiding it", async () => {
+    it("offline and blocking errors leave the toggle pressable and labelled Publish — no 'Publish anyway'", () => {
       vi.mocked(isFeatureEnabled).mockReturnValue(true);
       render(
         <StudioHeader
-          {...makeProps({ issues: [{ id: "1", type: "error", message: "x" }] as StudioHeaderProps["issues"] })}
+          {...makeProps({ isOffline: true, issues: [{ id: "1", type: "error", message: "x" }] as StudioHeaderProps["issues"] })}
         />,
       );
-      expect(await screen.findByRole("button", { name: "Publish anyway" })).toBeTruthy();
+      expect(toggle().textContent).toBe("Publish");
+      expect(toggle().getAttribute("aria-disabled")).toBeNull();
+      expect(screen.queryByRole("button", { name: "Publish anyway" })).toBeNull();
+    });
+
+    it("feeds the site's issues to the tray", () => {
+      vi.mocked(isFeatureEnabled).mockReturnValue(true);
+      const issues = [{ id: "1", type: "error", message: "x" }] as StudioHeaderProps["issues"];
+      render(<StudioHeader {...makeProps({ issues })} />);
+      expect(publishTray.get().issues).toEqual(issues);
+    });
+
+    it("live with nothing waiting still offers the toggle — the tray says Up to date", () => {
+      vi.mocked(isFeatureEnabled).mockReturnValue(true);
+      render(<StudioHeader {...makeProps({ nextMove: null, publishedUrl: "https://x.vercel.app" })} />);
+      expect(toggle().getAttribute("aria-expanded")).toBe("false");
     });
   });
 
   // ── B4 · one publish door ────────────────────────────────────────────────
   describe("the publish verb is a door, not a publish", () => {
-    /* The "Publish with N open errors?" confirm was this bar's private dialog,
-       so the Publish panel's identical verb skipped it. It is
-       PublishErrorsConfirmModal now, mounted by AquibraStudio, whose
-       `requestPublish` routes on `nextMove.gate` — this bar hands off and
-       opens nothing of its own (PublishErrorsConfirmModal.test.tsx). */
-    it("Publish anyway hands off to the shell's door — no dialog here", async () => {
-      vi.mocked(isFeatureEnabled).mockReturnValue(true);
-      const onVercelPublish = vi.fn();
-      render(
-        <StudioHeader
-          {...makeProps({
-            onVercelPublish,
-            issues: [{ id: "1", type: "error", message: "x" }] as StudioHeaderProps["issues"],
-          })}
-        />,
-      );
-      fireEvent.click(await screen.findByRole("button", { name: "Publish anyway" }));
-      expect(onVercelPublish).toHaveBeenCalledTimes(1);
-      expect(screen.queryByRole("dialog")).toBeNull();
-    });
-
     it("a review verb opens the Review panel instead", async () => {
       vi.mocked(isFeatureEnabled).mockReturnValue(true);
       const onVercelPublish = vi.fn();
@@ -441,7 +443,7 @@ describe("StudioHeader", () => {
 
   // ── T5 publish outcome (plan D10, eng D10/D11) ────────────────────────────
   describe("publish outcome flash", () => {
-    it("published flashes '✓ Published' and announces politely", () => {
+    it("published flashes '✓ Published' (tray closed) and announces politely", () => {
       vi.mocked(isFeatureEnabled).mockReturnValue(true);
       render(<StudioHeader {...makeProps({ publishOutcome: "published" })} />);
       const btn = screen.getByRole("button", { name: "✓ Published" });
@@ -460,14 +462,14 @@ describe("StudioHeader", () => {
   });
 
   describe("P6 viewer gating", () => {
-    it("a viewer sees Publish blocked with the reason, never hidden", () => {
+    /* Outside view mode a VIEWER's Publish is the tray toggle like
+       everyone's; the tray's CTA carries the role reason (board B8-PB19). */
+    it("a viewer outside view mode gets the tray toggle, never a hidden Publish", () => {
       vi.mocked(isFeatureEnabled).mockReturnValue(true);
       roleState.role = "VIEWER";
       render(<StudioHeader {...makeProps()} />);
       const btn = screen.getByRole("button", { name: "Publish" });
-      expect(btn.getAttribute("aria-disabled")).toBe("true");
-      fireEvent.focus(btn);
-      expect(screen.getByRole("tooltip").textContent).toBe("Viewers can't publish — ask an editor");
+      expect(btn.getAttribute("aria-expanded")).toBe("false");
     });
 
     it("an editor keeps publish enabled", () => {

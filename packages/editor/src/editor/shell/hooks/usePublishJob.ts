@@ -83,6 +83,10 @@ function classifyPublishBlock(msg: string): PublishBlockReason {
 export interface UsePublishJobResult {
   uiState: PublishUiState;
   jobId: string | null;
+  /** The Vercel deployment the job created, once it has one — a job that
+   *  failed after its upload started carries it too (`sites.publishStatus`
+   *  already returns it). Shown beside the job id when a deploy fails. */
+  deploymentId: string | null;
   progress: number;
   publishedUrl: string | null;
   error: string | null;
@@ -394,6 +398,7 @@ export function usePublishJob(): UsePublishJobResult {
     unpublished,
     uiState,
     jobId,
+    deploymentId: status?.deploymentId ?? null,
     progress: status?.progress ?? 0,
     publishedUrl: status?.publishedUrl ?? hydratedUrl,
     lastPublishedAt: hydrated?.lastPublishedAt ?? null,

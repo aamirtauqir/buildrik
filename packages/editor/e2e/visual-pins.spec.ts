@@ -159,3 +159,48 @@ for (const viewport of [
     });
   });
 }
+
+/* design-2l9 Task 1.7 — the publish tray docked at the right edge, 360 wide
+   (board 499:2656 "Task host / Publish"), in three states, at the three
+   supported widths. One CTA; its reason under it. */
+for (const viewport of [
+  { width: 1440, height: 900 },
+  { width: 1280, height: 720 },
+  { width: 1024, height: 768 },
+]) {
+  test.describe(`publish-tray @ ${viewport.width}`, () => {
+    test.skip(!!process.env.CI, "visual pins are recorded on darwin only");
+    test.use({ viewport });
+
+    for (const name of ["publish-tray-blocking", "publish-tray-success", "publish-tray-failed"] as const) {
+      test(name, async ({ page }) => {
+        await page.emulateMedia({ reducedMotion: "reduce" });
+        await page.goto(`/e2e/probe/probe.html?case=${name}`);
+        await expect(page.locator("#probe-root")).toHaveAttribute("data-probe-ready", name);
+        await page.evaluate(() => document.fonts.ready);
+        expect(await fontsLoadedStatus(page), "fonts must be loaded").toBe("loaded");
+        await stylesheetsSettled(page);
+
+        const geo = await page.evaluate(() => {
+          const tray = document.querySelector('[data-testid="publish-tray"]')!.getBoundingClientRect();
+          const ctas = document.querySelectorAll('[data-testid="publish-tray-cta"]').length;
+          return { width: tray.width, right: tray.right, ctas };
+        });
+        expect(geo.width).toBe(360);
+        expect(geo.right).toBe(viewport.width);
+        expect(geo.ctas).toBe(1);
+        if (name === "publish-tray-blocking") {
+          await expect(page.getByTestId("publish-tray-cta")).toBeDisabled();
+          await expect(page.getByTestId("publish-tray-reason")).toHaveText("Fix 1 blocking issue to publish");
+        }
+
+        await expect(page).toHaveScreenshot(`${name}-${viewport.width}.png`, {
+          fullPage: true,
+          animations: "disabled",
+          threshold: 0.02,
+          maxDiffPixelRatio: 0.002,
+        });
+      });
+    }
+  });
+}

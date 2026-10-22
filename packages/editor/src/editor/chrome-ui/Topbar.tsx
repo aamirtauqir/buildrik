@@ -80,7 +80,7 @@ const PREVIEW_BTN_CLASS =
    surfaces where publishing is not the viewer's to do. View mode is the
    case: the `action` slot used to hold SendForReview there and so replaced
    this button by accident; emptying the slot made Publish reappear. */
-export type PublishState = "ready" | "disabled" | "anyway" | "published" | "hidden";
+export type PublishState = "ready" | "disabled" | "published" | "hidden";
 
 /**
  * The tool cluster (plan §2, eng D12) — DATA props, never a node: the deleted
@@ -162,7 +162,16 @@ export interface TopbarProps {
   onOpenNotifications?: () => void;
   publish?: PublishState;
   publishBusy?: boolean;
-  onPublish?: () => void;
+  onPublish?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  /**
+   * Set when Publish is the publish tray's TOGGLE (design-2l9 Task 1.7):
+   * whether the tray is open. The button then carries `aria-expanded` and
+   * `aria-controls`, and stays pressable while a publish runs — the tray,
+   * not this button, shows the run and every reason the CTA is shut.
+   */
+  publishExpanded?: boolean;
+  /** The id of the surface the toggle opens. */
+  publishControls?: string;
   /** Why publish is blocked — surfaced as a tooltip on the still-focusable button. */
   publishBlockedReason?: string;
   /**
@@ -196,14 +205,13 @@ const PAGE_CRUMB_CLASS =
 const PUBLISH_LABEL: Record<PublishState, string> = {
   ready: "Publish",
   disabled: "Publish",
-  anyway: "Publish anyway",
   published: "✓ Published",
   hidden: "",
 };
 
 export function Topbar({
   siteName, pageName, onOpenPages, onPageCrumb, onExit, exitLabel = "‹ Exit", save, savedAt, onSaveClick, saveHint, history, review, tools, presence,
-  unreadCount = 0, onOpenNotifications, publish = "ready", publishBusy, onPublish,
+  unreadCount = 0, onOpenNotifications, publish = "ready", publishBusy, onPublish, publishExpanded, publishControls,
   publishBlockedReason, ctaLabel, ctaHint, action, menu,
 }: TopbarProps) {
   return (
@@ -397,8 +405,10 @@ export function Topbar({
           </Tooltip>
         ) : (
           <Button
-            disabled={publishBusy}
+            disabled={publishExpanded === undefined ? publishBusy : undefined}
             aria-busy={publishBusy || undefined}
+            aria-expanded={publishExpanded}
+            aria-controls={publishExpanded ? publishControls : undefined}
             onClick={onPublish}
             size="xs"
             title={ctaHint}
