@@ -9499,7 +9499,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Inspector chip opens the token (brandOpenRequest) but no \"‹ Back to Heading\" return to the row"
+   "verifiedNote": "L-D W2: requestBrandToken(…, { returnLabel }) → door \"‹ Back to {label}\", returns to the editor (element stays selected); lands on the token edit page. Reachable once REQUESTS D-13 (inspector passes the label) lands. Built, not compared."
   },
   {
    "nodeId": "210:36861",

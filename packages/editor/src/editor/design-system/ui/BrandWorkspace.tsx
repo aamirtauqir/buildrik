@@ -430,17 +430,17 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
 
   /* GAP-ST-T03: opened from Site settings, the door goes back there, to the
      screen it came from. Taken once on mount, like the page and token holds. */
-  const [settingsReturn] = React.useState(() => takeBrandReturn(composer));
+  const [brandReturn] = React.useState(() => takeBrandReturn(composer));
 
   /* `‹ Back` / Escape: nothing is staged, so nothing to guard (autosave,
      B6-B05's guard → authority code:autosave-no-leave-guard). */
   const requestLeave = React.useCallback(() => {
-    if (settingsReturn && composer) {
-      composer.emit(EVENTS.UI_PANEL_OPEN, settingsReturn.screen ? { panel: "settings", screen: settingsReturn.screen } : { panel: "settings" });
+    if (brandReturn?.to === "settings" && composer) {
+      composer.emit(EVENTS.UI_PANEL_OPEN, brandReturn.screen ? { panel: "settings", screen: brandReturn.screen } : { panel: "settings" });
       return;
     }
     onClose?.();
-  }, [onClose, settingsReturn, composer]);
+  }, [onClose, brandReturn, composer]);
 
   /* "Browse section blocks in Add ›" (B6-B26) leaves Brand for Add with
      BLOCKS open. */
@@ -1029,7 +1029,10 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
 
   /* The door out (B6-B01 "‹ Back to Editor · Home"; GAP-ST-T03 "‹ Back to
      Site settings" when Site settings opened Brand). */
-  const backLabel = settingsReturn ? "Back to Site settings" : editorPageName ? `Back to Editor · ${editorPageName}` : "Back to Editor";
+  const backLabel =
+    brandReturn?.to === "settings" ? "Back to Site settings"
+    : brandReturn?.to === "editor" ? `Back to ${brandReturn.label}`
+    : editorPageName ? `Back to Editor · ${editorPageName}` : "Back to Editor";
 
   const navList = (
     <nav className="tw:flex tw:flex-col tw:gap-4 tw:px-2 tw:pb-4 tw:pt-4" aria-label="Brand pages">

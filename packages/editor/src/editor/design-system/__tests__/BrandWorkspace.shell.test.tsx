@@ -18,7 +18,7 @@ import * as React from "react";
 import { getTabMode } from "@/editor/rail/tabsConfig";
 import { FullPageRouter } from "@/editor/sidebar/FullPageRouter";
 import type { Composer } from "@/engine";
-import { requestBrandReturn } from "@/editor/design-system/ui/brandOpenRequest";
+import { requestBrandReturn, requestBrandToken } from "@/editor/design-system/ui/brandOpenRequest";
 import {
   installDomShims,
   makeFakeComposer,
@@ -277,5 +277,24 @@ describe("BrandWorkspace › Colors drill-in (B6-B01 → B6-B02)", () => {
     fireEvent.click(utils.getByTestId("brand-back-colours"));
     expect(utils.queryByTestId("brand-token-edit")).toBeNull();
     expect(utils.getByTestId("brand-page-title").textContent).toMatch(/^Colors · \d+$/);
+  });
+});
+
+describe("BrandWorkspace › opened from the Inspector (B6-B31)", () => {
+  it("the door reads '‹ Back to <element>' and returns to the editor", async () => {
+    const composer = makeFakeComposer();
+    const onClose = vi.fn();
+    requestBrandToken(composer, "color-primary", { returnLabel: "Heading" });
+    const utils = renderWorkspace(composer, { onClose });
+    await waitFor(() => expect(utils.getByTestId("brand-token-edit")).toBeTruthy());
+    expect(utils.getByTestId("brand-back-link").textContent).toBe("Back to Heading");
+    fireEvent.click(utils.getByTestId("brand-back-link"));
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("without a label the chip opens Brand as before — the ordinary door", () => {
+    const composer = makeFakeComposer();
+    requestBrandToken(composer, "color-primary");
+    expect(renderWorkspace(composer).getByTestId("brand-back-link").textContent).toBe("Back to Editor");
   });
 });
