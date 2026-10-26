@@ -4707,7 +4707,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code \"Component\" section in Style with \"Edit master\"; board block above tabs: library·version, Variant, Edit main component ›, Reset · N ov…"
+   "verifiedNote": "Lane L-B A8 (built; copy and order checked against the dump, no board image): the instance block sits above the tabs — '◇ {name} · instance', 'Component library · v{n}', Variant, 'Edit main component ›', 'Reset to main component · {n} overrides', 'Detach instance'. Open: the field-level 'Font size · Local value · Desktop' source lines (IC05)."
   },
   {
    "nodeId": "241:17060",
@@ -4717,7 +4717,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Confirm copy \"Overrides on this instance will be discarded.\" vs board consequence list"
+   "verifiedNote": "Lane L-B A8 (built, not compared): Reset confirms with 'Reset {name} to main component?' / 'The {n} overrides on this instance will be discarded.'. Open: the board's per-property consequence list."
   },
   {
    "nodeId": "241:17608",
@@ -4726,8 +4726,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No disabled Reset with \"No overrides to reset\""
+   "verified": "drift-open",
+   "verifiedNote": "Lane L-B A8 (built, not compared): no overrides — Reset is disabled and 'No overrides to reset' shows."
   },
   {
    "nodeId": "241:18146",
@@ -4755,9 +4755,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
+   "authority": "code:detach-not-undoable",
    "verified": "drift-open",
-   "verifiedNote": "Code confirms detach in a dialog; board applies directly with \"detached · Undo\" toast"
+   "verifiedNote": "Lane L-B A8: Detach keeps its confirm. Detaching is not on the document history (engine drops the instance link outside it), so the board's direct Detach + Undo would leave no way back — REQUESTS #12."
   },
   {
    "nodeId": "241:19772",

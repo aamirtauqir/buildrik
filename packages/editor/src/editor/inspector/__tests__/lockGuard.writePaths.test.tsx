@@ -135,6 +135,7 @@ describe("P-1 — structure writers refuse a locked form / slider", () => {
     lock(form);
     render(<FormFieldsSection elementId={form.getId()} composer={composer} isOpen />);
     fireEvent.click(screen.getByRole("button", { name: "+ Add field" }));
+    fireEvent.click(screen.getByTestId("form-add-field-input"));
     fireEvent.click(screen.getAllByTestId("form-field-row")[0]);
     fireEvent.change(screen.getByRole("combobox", { name: "Type" }), { target: { value: "email" } });
     fireEvent.click(screen.getByRole("checkbox", { name: "Required" }));

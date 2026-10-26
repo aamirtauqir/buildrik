@@ -1,9 +1,11 @@
 /**
- * ComponentRow — the compact component row of Inspector v4 board 26 (DD-16):
- * "Variant" select · "Edit master" · ⋯ (Reset to master, Detach instance…).
- * The confirms are the ones the instance doors always had (reset 6979:77597,
- * detach 6887:78306); the P-1 lock gate and the read-only field context
- * (locked / save conflict) refuse the writes.
+ * ComponentRow — the instance identity block of 2L9 IC01/IC03 (above the
+ * tabs): "◇ {name} · instance", "Component library · v{n}", Variant, "Edit
+ * main component ›", "Reset to main component · {n} overrides" (disabled
+ * with "No overrides to reset"), "Detach instance". The confirms are the
+ * ones the instance doors always had (detach is not undoable, so it keeps
+ * its confirm — code wins over IC06); the P-1 lock gate and the read-only
+ * field context (locked / save conflict) refuse the writes.
  *
  * @license BSD-3-Clause
  */
@@ -97,7 +99,7 @@ const withVariants = () =>
     ] as never,
   });
 
-const openMore = () => fireEvent.click(screen.getByRole("button", { name: "Instance actions" }));
+const withOverrides = (n: number) => makeInstance({ overrides: Array.from({ length: n }, (_, i) => ({ op: "replace", path: `#/style/p${i}`, value: "x" })) } as never);
 
 describe("ComponentRow — board 26", () => {
   it("renders nothing when the element is not a component instance", () => {
@@ -105,13 +107,24 @@ describe("ComponentRow — board 26", () => {
     expect(container.querySelector('[data-testid="component-row"]')).toBeNull();
   });
 
-  it("draws Variant · Edit master · ⋯ — and nothing of the old band", () => {
-    renderRow(makeComposer({ component: makeComponent(), instance: makeInstance() }));
+  it("2L9 IC01: identity, source, Variant, Edit main component, Reset · n overrides, Detach — in that order", () => {
+    renderRow(makeComposer({ component: makeComponent({ version: 4 }), instance: withOverrides(3) }));
     const row = screen.getByTestId("component-row");
-    expect(screen.getByLabelText("Variant")).toBeTruthy();
-    expect(screen.getByTestId("component-edit-master").textContent).toBe("Edit master");
-    expect(screen.getByRole("button", { name: "Instance actions" })).toBeTruthy();
-    expect(row.textContent).not.toMatch(/VARIANT|Detach this instance|Edit master ·/);
+    const text = row.textContent ?? "";
+    const at = [
+      "◇ Reservation banner · instance", "Component library · v4", "Variant", "Edit main component ›",
+      "Reset to main component · 3 overrides", "Detach instance",
+    ].map((t) => text.indexOf(t));
+    expect(at.every((i) => i >= 0)).toBe(true);
+    expect([...at].sort((a, b) => a - b)).toEqual(at);
+    expect(screen.queryByRole("button", { name: "Instance actions" })).toBeNull();
+  });
+
+  it("IC03: no overrides — Reset is disabled and says why", () => {
+    renderRow(makeComposer({ component: makeComponent(), instance: makeInstance({ overrides: [] } as never) }));
+    expect(screen.getByTestId("component-reset")).toBeDisabled();
+    expect(screen.getByTestId("component-reset")).toHaveTextContent("Reset to main component");
+    expect(screen.getByTestId("component-reset-reason")).toHaveTextContent("No overrides to reset");
   });
 
   it("no variants: the select reads Default, its only choice", () => {
@@ -144,30 +157,21 @@ describe("ComponentRow — board 26", () => {
     expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_COMPONENTS_OPEN_MASTER, { componentId: "comp-1", instanceId: "el-1" });
   });
 
-  it("⋯ holds exactly Reset to master and Detach instance…", () => {
-    renderRow(makeComposer({ component: makeComponent(), instance: makeInstance() }));
-    openMore();
-    const items = [...screen.getByRole("menu").querySelectorAll('[role^="menuitem"]')].map((i) => i.textContent?.trim());
-    expect(items).toEqual(["Reset to master", "Detach instance…"]);
-  });
-
-  it("Reset to master confirms first, then resets", () => {
+  it("Reset to main component confirms first, then resets", () => {
     const resetInstance = vi.fn();
-    renderRow(makeComposer({ component: makeComponent(), instance: makeInstance(), resetInstance }));
-    openMore();
-    fireEvent.click(screen.getByRole("menuitem", { name: "Reset to master" }));
+    renderRow(makeComposer({ component: makeComponent(), instance: withOverrides(2), resetInstance }));
+    fireEvent.click(screen.getByTestId("component-reset"));
     expect(resetInstance).not.toHaveBeenCalled();
-    expect(screen.getByText("Reset Reservation banner to master?")).toBeTruthy();
-    expect(screen.getByText("Overrides on this instance will be discarded.")).toBeTruthy();
+    expect(screen.getByText("Reset Reservation banner to main component?")).toBeTruthy();
+    expect(screen.getByText("The 2 overrides on this instance will be discarded.")).toBeTruthy();
     fireEvent.click(screen.getByTestId("instance-reset-confirm-confirm"));
     expect(resetInstance).toHaveBeenCalledWith("el-1");
   });
 
-  it("Detach instance… confirms with the instance's path, then detaches", async () => {
+  it("Detach instance confirms with the instance's path (it cannot be undone), then detaches", async () => {
     const detachInstance = vi.fn(async () => true);
     renderRow(makeComposer({ component: makeComponent(), instance: makeInstance(), detachInstance }));
-    openMore();
-    fireEvent.click(screen.getByRole("menuitem", { name: "Detach instance…" }));
+    fireEvent.click(screen.getByTestId("component-detach"));
     expect(detachInstance).not.toHaveBeenCalled();
     expect(screen.getByText("Detach this Reservation banner instance?")).toBeTruthy();
     expect(screen.getByText(/^Home › Hero · This instance becomes an independent container/)).toBeTruthy();
@@ -179,18 +183,17 @@ describe("ComponentRow — board 26", () => {
 
   it("P-1: a locked instance refuses the reset even after the confirm", () => {
     const resetInstance = vi.fn();
-    const composer = makeComposer({ component: makeComponent(), instance: makeInstance(), resetInstance, locked: true });
+    const composer = makeComposer({ component: makeComponent(), instance: withOverrides(1), resetInstance, locked: true });
     renderRow(composer);
-    openMore();
-    fireEvent.click(screen.getByRole("menuitem", { name: "Reset to master" }));
+    fireEvent.click(screen.getByTestId("component-reset"));
     fireEvent.click(screen.getByTestId("instance-reset-confirm-confirm"));
     expect(resetInstance).not.toHaveBeenCalled();
     expect(composer.emit).toHaveBeenCalledWith(EVENTS.LOCKED_ELEMENTS_SKIPPED, undefined);
   });
 
-  it.each(["locked", "conflict"] as const)("read-only (%s): variant and ⋯ writes are off, Edit master stays", (reason) => {
+  it.each(["locked", "conflict"] as const)("read-only (%s): variant, reset and detach are off, Edit main component stays", (reason) => {
     const updateInstanceVariant = vi.fn();
-    const composer = makeComposer({ component: withVariants(), instance: makeInstance(), updateInstanceVariant });
+    const composer = makeComposer({ component: withVariants(), instance: withOverrides(1), updateInstanceVariant });
     renderRow(composer, readOnlyCtx(reason));
     // Read-only is not disabled (DD-18): legible, focusable, the change refused.
     const select = screen.getByLabelText("Variant") as HTMLSelectElement;
@@ -198,10 +201,12 @@ describe("ComponentRow — board 26", () => {
     expect(select.getAttribute("aria-readonly")).toBe("true");
     fireEvent.change(select, { target: { value: select.options[select.options.length - 1].value } });
     expect(updateInstanceVariant).not.toHaveBeenCalled();
-    openMore();
-    for (const name of ["Reset to master", "Detach instance…"]) {
-      expect(screen.getByRole("menuitem", { name }).getAttribute("aria-disabled")).toBe("true");
+    for (const id of ["component-reset", "component-detach"]) {
+      expect(screen.getByTestId(id).getAttribute("aria-disabled")).toBe("true");
+      fireEvent.click(screen.getByTestId(id));
     }
+    expect(screen.queryByTestId("instance-reset-confirm-confirm")).toBeNull();
+    expect(screen.queryByTestId("instance-detach-confirm-confirm")).toBeNull();
     fireEvent.click(screen.getByTestId("component-edit-master"));
     expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_COMPONENTS_OPEN_MASTER, { componentId: "comp-1", instanceId: "el-1" });
   });

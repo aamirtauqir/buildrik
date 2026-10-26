@@ -29,7 +29,6 @@ const CONTENT_ORDER: readonly SectionId[] = [
 ];
 
 const STYLE_ORDER: readonly SectionId[] = [
-  "component",
   "type-layout",
   "layout",
   "typography",

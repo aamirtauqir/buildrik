@@ -5,6 +5,7 @@
  *   header       — breadcrumb · icon + name · ✦ AI · ⋯ · ✕ · status marks
  *   status line  — why the panel is read-only (locked / save conflict)
  *   multi bar    — Align / Distribute / Group, when 2+ are selected (DD-12)
+ *   instance     — a component instance's identity block (2L9 IC01)
  *   tabs         — Content · Style · Behavior · Effects (2L9 page 04)
  *   context row  — State / breakpoint overrides, on Style and Effects only
  *                  (R-DD-14): Content and Behavior writes are breakpoint-
@@ -32,6 +33,7 @@ import { useProjectLoading } from "../shell/hooks/useProjectLoading";
 import { useSaveConflict } from "../shell/hooks/useSaveConflict";
 import { ApplyStyleDialog } from "./components/ApplyStyleDialog";
 import { ContextRow } from "./components/ContextRow";
+import { ComponentRow } from "./sections/ComponentRow";
 import { InspectorErrorBoundary } from "./components/InspectorErrorBoundary";
 import { InspectorHeader } from "./components/InspectorHeader";
 import { InspectorLoading } from "./components/InspectorLoading";
@@ -397,6 +399,10 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
         )}
         <StatusLine composer={composer} elementId={selectedElement.id} locked={locked} conflict={conflict} />
         {targetIds.length > 1 ? <MultiSelectBar composer={composer} selectedIds={targetIds} /> : null}
+        {/* 2L9 IC01: an instance's identity block sits above the tabs. */}
+        {targetIds.length <= 1 && composer?.components?.getInstanceByElementId?.(selectedElement.id) ? (
+          <ComponentRow composer={composer} elementId={selectedElement.id} />
+        ) : null}
         {agentRun.running ? (
           /* AI agent takeover (board 160:512) — the run replaces the
              controls; the selection is kept and restored when it ends. */

@@ -7,7 +7,6 @@
  *   - `_shared.tsx`    — types, defineSection, adapters (W1)
  *   - `type.tsx`       — the type block, Content or Style by body (W1)
  *   - `content.tsx`    — the Content tab (2L9 lane L-B)
- *   - `component.tsx`  — the component row (W1 → L2-D2)
  *   - `text.tsx`       — Typography, Text inside (L2-A)
  *   - `box.tsx`        — Layout, Size, Spacing, Fill, Border (L2-C)
  *   - `effects.tsx`    — the Effects tab (L2-C)
@@ -24,7 +23,6 @@ import type { AnySectionEntry, SectionId, ShouldRenderContext } from "./_shared"
 import { BEHAVIOUR_SECTIONS } from "./behaviour";
 import { CONTENT_SECTIONS } from "./content";
 import { BOX_SECTIONS } from "./box";
-import { COMPONENT_SECTIONS } from "./component";
 import { EFFECTS_SECTIONS } from "./effects";
 import { TEXT_SECTIONS } from "./text";
 import { TYPE_SECTIONS } from "./type";
@@ -46,7 +44,6 @@ export { adaptBaseStyleProps, adaptElementProps, defineSection, EMPTY_MIXED_KEYS
 // ============================================================================
 
 export const SECTION_REGISTRY: Record<SectionId, AnySectionEntry> = {
-  ...COMPONENT_SECTIONS,
   ...TYPE_SECTIONS,
   ...CONTENT_SECTIONS,
   ...TEXT_SECTIONS,

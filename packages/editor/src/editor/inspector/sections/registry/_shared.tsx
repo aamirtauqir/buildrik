@@ -71,7 +71,6 @@ export type SectionId =
   | "semantics"
   | "attributes"
   // Style — define → shape → paint (DD-15)
-  | "component"
   | "type-layout"
   | "layout"
   | "typography"
