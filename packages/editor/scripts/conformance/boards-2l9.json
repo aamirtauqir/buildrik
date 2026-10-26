@@ -9690,7 +9690,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No \"Discard this preview?\" dialog; preview is reverted silently on navigation/unmount"
+   "verifiedNote": "L-D W7: a nav move while a flow previews on the canvas (logo/URL, starter, scale, Dark Auto) asks \"Discard this preview?\" — \"You are previewing {what}. Opening {page} starts a different preview. Nothing has been applied yet.\", Keep previewing · Discard and continue. Built, not compared."
   },
   {
    "nodeId": "212:40091",

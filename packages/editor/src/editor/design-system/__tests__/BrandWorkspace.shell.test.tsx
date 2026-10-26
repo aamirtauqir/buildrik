@@ -298,3 +298,33 @@ describe("BrandWorkspace › opened from the Inspector (B6-B31)", () => {
     expect(renderWorkspace(composer).getByTestId("brand-back-link").textContent).toBe("Back to Editor");
   });
 });
+
+describe("BrandWorkspace › Discard this preview? (B6-B50)", () => {
+  it("leaving a page that is previewing asks first; Keep stays, Discard moves on and drops the preview", () => {
+    const composer = makeFakeComposer();
+    const utils = renderWorkspace(composer, { initialPage: "starters" });
+    fireEvent.click(utils.container.querySelector<HTMLElement>('[data-testid^="starter-row-"]')!);
+    const ds = composer.designSystem as unknown as { preview: unknown };
+    expect(ds.preview).not.toBeNull();
+
+    fireEvent.click(utils.getByTestId("brand-row-colour-mode"));
+    const dialog = utils.getByTestId("brand-discard-preview");
+    expect(dialog.textContent).toContain("Discard this preview?");
+    expect(dialog.textContent).toContain("You are previewing a starter. Opening Dark mode starts a different preview. Nothing has been applied yet.");
+    fireEvent.click(utils.getByTestId("brand-discard-keep"));
+    expect(utils.getByTestId("brand-page-title").textContent).toBe("Starters");
+    expect(ds.preview).not.toBeNull();
+
+    fireEvent.click(utils.getByTestId("brand-row-colour-mode"));
+    fireEvent.click(utils.getByTestId("brand-discard-continue"));
+    expect(utils.getByTestId("brand-page-title").textContent).toBe("Dark mode");
+    expect(ds.preview).toBeNull();
+  });
+
+  it("with nothing previewing the nav just moves", () => {
+    const utils = renderWorkspace(makeFakeComposer());
+    fireEvent.click(utils.getByTestId("brand-row-colour-mode"));
+    expect(utils.queryByTestId("brand-discard-preview")).toBeNull();
+    expect(utils.getByTestId("brand-page-title").textContent).toBe("Dark mode");
+  });
+});

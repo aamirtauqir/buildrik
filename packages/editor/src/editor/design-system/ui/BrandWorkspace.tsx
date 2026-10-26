@@ -38,7 +38,7 @@
 import * as React from "react";
 import { BRAND_READ_ONLY_COPY, BRAND_READ_ONLY_FAILED_COPY } from "@/shared/constants/brandReadOnly";
 import { ChevronLeft } from "lucide-react";
-import { Button, Popover, Tooltip, useToast } from "@/editor/chrome-ui";
+import { Button, Modal, Popover, Tooltip, useToast } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine/Composer";
 import { EVENTS } from "@/shared/constants/events";
 import { resolveTokenLiteral, setTokenLiteral } from "@buildrik/shared/tokens";
@@ -980,6 +980,31 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
     }
   };
 
+  /* B6-B50: leaving a page whose flow is previewing on the canvas (logo/URL,
+     a starter, the scale, Dark Auto) asks first — the preview would go with
+     the page. Read live, not from state: a flow clears its preview and moves
+     on in the same handler. The theme switch's own preview never asks. */
+  const [discardAsk, setDiscardAsk] = React.useState<BrandPageId | null>(null);
+  const flowPreviewing = () => {
+    const live = composer?.designSystem?.preview;
+    return Boolean(live && live.source !== "canvas" && !themePreview.active);
+  };
+  const requestPage = (id: BrandPageId) => {
+    if (id !== page && flowPreviewing()) {
+      setCompactNavOpen(false);
+      setDiscardAsk(id);
+      return;
+    }
+    openPage(id);
+  };
+  const PREVIEW_WHAT: Partial<Record<BrandPageId, string>> = {
+    [FROM_SOURCE]: "colors read from a website or logo",
+    starters: "a starter",
+    scale: "a color scale",
+    "colour-mode": "generated dark values",
+  };
+  const previewPages: readonly BrandPageId[] = [FROM_SOURCE, "starters", "scale", "colour-mode"];
+
   const currentRow = parentRow(page);
   const navRow = (id: NavId, label: string) => {
     const active = currentRow === id;
@@ -991,7 +1016,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
         size="xs"
         className={`${NAV_ROW}${active ? ` ${NAV_ROW_ON}` : ""}`}
         aria-current={active ? "page" : undefined}
-        onClick={() => openPage(id)}
+        onClick={() => requestPage(id)}
         data-section-id={id}
         data-testid={`brand-row-${id}`}
       >
@@ -1327,6 +1352,39 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
       </div>
       </div>
 
+      <Modal
+        open={discardAsk !== null}
+        onClose={() => setDiscardAsk(null)}
+        title="Discard this preview?"
+        testId="brand-discard-preview"
+        footer={
+          <>
+            <Button type="button" variant="secondary" size="xs" onClick={() => setDiscardAsk(null)} data-testid="brand-discard-keep">
+              Keep previewing
+            </Button>
+            <Button
+              type="button"
+              size="xs"
+              onClick={() => {
+                const next = discardAsk;
+                setDiscardAsk(null);
+                if (next) openPage(next);
+              }}
+              data-testid="brand-discard-continue"
+            >
+              Discard and continue
+            </Button>
+          </>
+        }
+      >
+        <p className="tw:m-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-soft)]">
+          You are previewing {PREVIEW_WHAT[page] ?? "a change"}.{" "}
+          {discardAsk && previewPages.includes(discardAsk)
+            ? `Opening ${pageLabel(discardAsk)} starts a different preview.`
+            : `Opening ${discardAsk ? pageLabel(discardAsk) : "another page"} ends it.`}{" "}
+          Nothing has been applied yet.
+        </p>
+      </Modal>
       <ClassAddDialog open={classAddOpen} composer={composer} onClose={() => setClassAddOpen(false)} />
 
       {addKind && (
