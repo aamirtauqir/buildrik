@@ -127,7 +127,7 @@ export function ImportRecordsButton({ importer }: { importer: RecordsImporter })
       data-testid="cms-ws-empty-import"
       onClick={importer.pick}
     >
-      Import JSON
+      Import JSON…
     </Button>
   );
 }

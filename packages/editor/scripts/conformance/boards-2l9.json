@@ -6974,7 +6974,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Board: status filter, sort menu, Columns, 4 visible tabs; code: search + header sort, Records/Fields + ⋯ menu (CmsWorkspace.tsx:64,358)"
+   "verifiedNote": "drift-open — L-C C3 built the four named tabs (Records · Fields · Dynamic pages · Collection settings); status filter, sort menu, Columns and pagination still missing. Not compared."
   },
   {
    "nodeId": "165:520",
@@ -6984,7 +6984,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Board: ‹ Blog records back, 4 tabs, always-on Preview (unsaved) pane; code: crumb, 3 tabs (:576), Preview ▸ toggle (:600)"
+   "verifiedNote": "built, not compared — L-C C3: sheet back \"‹ {name} records\" and four tabs incl. Collection settings; always-on Preview (unsaved) pane still a toggle (open)."
   },
   {
    "nodeId": "165:797",
@@ -7014,7 +7014,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Board: ‹ Blog records back, 4 tabs, always-on Preview (unsaved) pane; code: crumb, 3 tabs (:576), Preview ▸ toggle (:600)",
+   "verifiedNote": "built, not compared — L-C C3: sheet back \"‹ {name} records\" and four tabs incl. Collection settings; always-on Preview (unsaved) pane still a toggle (open).",
    "inheritsFrom": "165:520"
   },
   {
@@ -10650,7 +10650,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Copy \"Add your first record.\" vs board \"…or import existing records.\"; buttons Import CSV/JSON labels lack \"…\""
+   "verifiedNote": "built, not compared — L-C C3: \"Add your first record or import existing records.\", Import CSV… / Import JSON…."
   },
   {
    "nodeId": "254:74310",
@@ -10975,7 +10975,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Import CSV…/JSON… + disabled Sheets/Airtable present; board \"· Planned\" vs code \"Coming soon\""
+   "verifiedNote": "built, not compared — L-C C3: ⋯ keeps Import CSV… / Import JSON…, connectors read \"Planned\"; tabs moved to the row."
   },
   {
    "nodeId": "254:82329",

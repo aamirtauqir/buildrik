@@ -218,7 +218,8 @@ describe("CmsWorkspace · empty collection (4428:148905)", () => {
     cmsWorkspace.openCollection("col-1");
     render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
     expect(await screen.findByTestId("cms-ws-no-records")).toHaveTextContent("No records yet");
-    expect(screen.getByTestId("cms-ws-empty-import")).toHaveTextContent("Import JSON");
+    expect(screen.getByTestId("cms-ws-empty-import")).toHaveTextContent("Import JSON…");
+    expect(screen.getByTestId("cms-ws-no-records")).toHaveTextContent("Add your first record or import existing records.");
     expect(screen.getByTestId("cms-ws-hint")).toHaveTextContent("Add your first record");
   });
 
@@ -257,17 +258,23 @@ describe("CmsWorkspace · tabs and the collection ⋯ (7096:76270)", () => {
     );
   });
 
-  it("⋯ opens Dynamic pages and Settings, and offers Import JSON", async () => {
+  /* 2L9 165:2 — the four tabs are named in the row; ⋯ keeps the imports and
+     the planned connectors (254:82143). */
+  it("names Records · Fields · Dynamic pages · Collection settings, and ⋯ holds the imports", async () => {
     const { composer } = makeEngine({ collections: [MENU], items: [ITEM] });
     cmsWorkspace.openCollection("col-1");
     render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
-    fireEvent.click(await screen.findByTestId("cms-ws-more"));
-    expect(screen.getByTestId("cms-ws-menu-import")).toHaveTextContent("Import JSON…");
-    fireEvent.click(screen.getByTestId("cms-ws-menu-dynamic"));
+    const tabs = await screen.findAllByRole("tab");
+    expect(tabs.map((t) => t.textContent)).toEqual(["Records", "Fields", "Dynamic pages", "Collection settings"]);
+    fireEvent.click(screen.getByRole("tab", { name: "Dynamic pages" }));
     expect(cmsWorkspace.get().tab).toBe("dynamic-pages");
     expect(await screen.findByTestId("cms-ws-hint")).toHaveTextContent("Select a page");
-    fireEvent.click(screen.getByTestId("cms-ws-more"));
-    fireEvent.click(screen.getByTestId("cms-ws-menu-settings"));
+    fireEvent.click(screen.getByRole("tab", { name: "Collection settings" }));
     expect(cmsWorkspace.get().tab).toBe("settings");
+    fireEvent.click(screen.getByTestId("cms-ws-more"));
+    expect(screen.getByTestId("cms-ws-menu-import-csv")).toHaveTextContent("Import CSV…");
+    expect(screen.getByTestId("cms-ws-menu-import")).toHaveTextContent("Import JSON…");
+    expect(screen.getByTestId("cms-ws-menu-import-sheets")).toHaveTextContent("Planned");
+    expect(screen.queryByTestId("cms-ws-menu-dynamic")).toBeNull();
   });
 });

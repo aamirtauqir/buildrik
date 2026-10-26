@@ -14,6 +14,14 @@ import * as React from "react";
 
 export type CmsTab = "records" | "fields" | "dynamic-pages" | "settings";
 
+/** A collection's four tabs as the boards name them (165:2, 165:520). */
+export const CMS_TAB_LABEL: Record<CmsTab, string> = {
+  records: "Records",
+  fields: "Fields",
+  "dynamic-pages": "Dynamic pages",
+  settings: "Collection settings",
+};
+
 export interface CmsWorkspaceState {
   /** null → the workspace root ("CMS · <site>"). */
   collectionId: string | null;

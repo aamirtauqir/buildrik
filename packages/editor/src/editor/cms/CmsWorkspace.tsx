@@ -23,7 +23,7 @@ import { FieldsTable } from "./FieldsTable";
 import { FieldInspector } from "./FieldInspector";
 import { fieldUsage } from "./fieldUsage";
 import { AddFieldDialog } from "./AddFieldDialog";
-import { cmsWorkspace, useCmsWorkspace, type CmsTab } from "./cmsWorkspaceStore";
+import { CMS_TAB_LABEL, cmsWorkspace, useCmsWorkspace, type CmsTab } from "./cmsWorkspaceStore";
 import { RecordsTable, recordTitle } from "./RecordsTable";
 import { RecordSheet } from "./RecordSheet";
 import type { OpenMediaLibrary } from "./RecordFieldControl";
@@ -62,10 +62,8 @@ const TAB =
 
 /* A quiet 28-tall action at the header's start; a rule parts it from the title. */
 
-const TABS = [
-  { id: "records", label: "Records" },
-  { id: "fields", label: "Fields" },
-] as const;
+/* 165:2 — all four of a collection's tabs are named in the row. */
+const TABS = (Object.entries(CMS_TAB_LABEL) as [CmsTab, string][]).map(([id, label]) => ({ id, label }));
 
 /** The inspector-slot hint column (4428:140486 "Select a collection"). */
 function HintColumn({ title, hint, testId }: { title: string; hint: string; testId: string }) {
@@ -280,7 +278,7 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
       <div className="tw:flex tw:flex-col tw:items-center tw:pt-[132px] tw:text-center" data-testid="cms-ws-no-records">
         <Table2 size={20} className="tw:text-[var(--bk-ink-soft)]" aria-hidden="true" />
         <p className="tw:m-0 tw:mt-3 tw:text-[16px] tw:leading-6 tw:font-semibold tw:text-[var(--bk-ink)]">No records yet</p>
-        <p className="tw:m-0 tw:mt-2 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]">Add your first record.</p>
+        <p className="tw:m-0 tw:mt-2 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]">Add your first record or import existing records.</p>
         <div className="tw:mt-3 tw:flex tw:gap-2">
           <Button size="xs" className={`${PRIMARY} tw:h-8`} data-testid="cms-ws-empty-add" onClick={() => cmsWorkspace.openRecord("new")}>
             Add record
@@ -293,7 +291,7 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
             data-testid="cms-ws-empty-import-csv"
             onClick={() => setCsvImportOpen(true)}
           >
-            Import CSV
+            Import CSV…
           </Button>
         </div>
       </div>
@@ -356,9 +354,9 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
             tabClassName={TAB}
             data-testid="cms-ws-tabs"
           />
-          {/* 7096:76270 — the collection ⋯ holds the two tabs the row has no
-              room to name, plus Import JSON (B13): the Records modal it lived
-              in is retired, and a capability does not go quietly. */}
+          {/* 254:82143 — the collection ⋯ holds the imports (B13: the Records
+              modal they lived in is retired, and a capability does not go
+              quietly) and the connectors that are planned. */}
           <Popover
             open={menuOpen}
             onClose={() => setMenuOpen(false)}
@@ -367,7 +365,7 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
               <IconButton
                 label="Collection menu"
                 className="tw:size-10"
-                pressed={menuOpen || ws.tab === "dynamic-pages" || ws.tab === "settings"}
+                pressed={menuOpen}
                 data-testid="cms-ws-more"
                 onClick={() => setMenuOpen((v) => !v)}
               >
@@ -376,13 +374,6 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
             }
           >
             <Menu label="Collection menu">
-              <MenuItem selected={ws.tab === "dynamic-pages"} data-testid="cms-ws-menu-dynamic" onClick={() => { setMenuOpen(false); cmsWorkspace.setTab("dynamic-pages"); }}>
-                Dynamic pages
-              </MenuItem>
-              <MenuItem selected={ws.tab === "settings"} data-testid="cms-ws-menu-settings" onClick={() => { setMenuOpen(false); cmsWorkspace.setTab("settings"); }}>
-                Settings
-              </MenuItem>
-              <MenuSeparator />
               <MenuItem data-testid="cms-ws-menu-import-csv" onClick={() => { setMenuOpen(false); setCsvImportOpen(true); }}>
                 Import CSV…
               </MenuItem>
@@ -393,10 +384,11 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
                   exist in any env, plus a security review (fix-all round,
                   2026-09-25 decision) — a clear disabled row, not a dead
                   button that looks live. */}
-              <MenuItem disabled kbd="Coming soon" data-testid="cms-ws-menu-import-sheets">
+              <MenuSeparator />
+              <MenuItem disabled kbd="Planned" data-testid="cms-ws-menu-import-sheets">
                 Google Sheets
               </MenuItem>
-              <MenuItem disabled kbd="Coming soon" data-testid="cms-ws-menu-import-airtable">
+              <MenuItem disabled kbd="Planned" data-testid="cms-ws-menu-import-airtable">
                 Airtable
               </MenuItem>
             </Menu>

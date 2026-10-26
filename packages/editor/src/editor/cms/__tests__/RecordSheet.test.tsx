@@ -112,7 +112,7 @@ describe("RecordSheet", () => {
     const { composer } = mount();
     await openRow();
     expect(screen.getByTestId("cms-sheet-title")).toHaveTextContent("Margherita");
-    expect(screen.getByText("Menu items", { selector: "button" })).toBeInTheDocument();
+    expect(screen.getByTestId("cms-sheet-crumb")).toHaveTextContent("‹ Menu items records");
     expect(screen.getByTestId("cms-sheet-state")).toHaveTextContent("No unsaved changes on this record");
     expect(screen.getByTestId("cms-sheet-save")).toBeDisabled();
     fireEvent.change(screen.getByLabelText("Price *"), { target: { value: "$13" } });
@@ -132,7 +132,7 @@ describe("RecordSheet", () => {
     const { composer } = mount({ items: [] });
     fireEvent.click(await screen.findByTestId("cms-ws-add-record"));
     await screen.findByTestId("cms-sheet");
-    expect(screen.getByText("New record")).toBeInTheDocument();
+    expect(screen.getByTestId("cms-sheet-title")).toHaveTextContent("New Menu item");
     fireEvent.change(screen.getByLabelText("Name *"), { target: { value: "Diavola" } });
     fireEvent.click(screen.getByTestId("cms-sheet-save"));
     await waitFor(() =>
@@ -443,6 +443,12 @@ describe("RecordSheet · Leave without saving? with Save and leave (2L9 C1)", ()
     expect(screen.getByTestId("cms-discard-keep")).toHaveTextContent("Keep editing");
     expect(screen.getByTestId("cms-discard-confirm")).toHaveTextContent("Discard changes");
     expect(screen.getByTestId("cms-discard-save")).toHaveTextContent("Save and leave");
+  });
+
+  it("the sheet names all four tabs (165:520)", async () => {
+    mount();
+    await openRow();
+    expect(screen.getByTestId("cms-sheet-tab-settings")).toHaveTextContent("Collection settings");
   });
 
   it("names the tab the person is opening", async () => {

@@ -32,7 +32,7 @@ import { RecordPreview } from "./RecordPreview";
 import { RecordFieldControl, isEmptyValue, type OpenMediaLibrary } from "./RecordFieldControl";
 import { RecordTemplatePreviewDialog } from "./RecordTemplatePreviewDialog";
 import { applyCmsPattern, cmsSlugField, cmsSlugify } from "@buildrik/shared/schemas/cms";
-import { cmsWorkspace, type CmsTab, type CmsWorkspaceState } from "./cmsWorkspaceStore";
+import { CMS_TAB_LABEL, cmsWorkspace, type CmsTab, type CmsWorkspaceState } from "./cmsWorkspaceStore";
 import { shellDirty } from "@/editor/shell/shellDirtyRegistry";
 import { claimCmsConflict, isCmsConflictPending, type CmsConflict } from "@/services/cmsSync";
 
@@ -77,14 +77,6 @@ const NAV_TAB =
 
 const OFFLINE = "Saved on this device only. The server is offline — the change will sync when you reconnect.";
 const FAILED = "Couldn’t save this record. Your changes are still here — try again.";
-
-/** The record's tabs as the boards name them (165:520). */
-const TAB_LABEL: Record<CmsTab, string> = {
-  records: "Records",
-  fields: "Fields",
-  "dynamic-pages": "Dynamic pages",
-  settings: "Collection settings",
-};
 
 /** A way out of a dirty record: where it goes, and how the guard names it.
  *  `to` null → the guard names the record only (165:2184); `origin` → the
@@ -213,7 +205,7 @@ export function RecordSheet({
     if (next.collectionId !== collection.id) {
       return next.collectionId ? (composer?.cms.collections.getCollection(next.collectionId)?.name ?? null) : "CMS";
     }
-    return next.recordId === null && next.tab !== "records" ? TAB_LABEL[next.tab] : null;
+    return next.recordId === null && next.tab !== "records" ? CMS_TAB_LABEL[next.tab] : null;
   };
   /* UI-02: every other door out of this record — a drawer collection row, ⌘K,
      a table row, a tab — moves the workspace store, which asks here first. */
@@ -498,7 +490,8 @@ export function RecordSheet({
       ) : null}
 
       <div className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col tw:gap-2 tw:overflow-y-auto">
-        <nav className="tw:flex tw:h-9 tw:flex-none tw:items-center tw:gap-1 tw:px-4 tw:text-[13px] tw:leading-5" aria-label="Breadcrumb">
+        {/* 165:520 — one way back to the table, "‹ Blog records". */}
+        <nav className="tw:flex tw:h-9 tw:flex-none tw:items-center tw:px-4 tw:text-[13px] tw:leading-5" aria-label="Breadcrumb">
           <Button
             size="xs"
             variant="link"
@@ -506,19 +499,11 @@ export function RecordSheet({
             data-testid="cms-sheet-crumb"
             onClick={() => guard(onClose)}
           >
-            {collection.name}
+            ‹ {collection.name} records
           </Button>
-          <span className="tw:text-[var(--bk-gray-500)]">›</span>
-          <span className="tw:text-[var(--bk-ink)]">{crumb}</span>
         </nav>
         <div className="tw:flex tw:h-9 tw:flex-none tw:items-center tw:gap-1 tw:px-2" role="tablist" aria-label={`${collection.name} sections`}>
-          {(
-            [
-              ["records", "Records"],
-              ["fields", "Fields"],
-              ["dynamic-pages", "Dynamic pages"],
-            ] as const
-          ).map(([tab, label]) => (
+          {(Object.entries(CMS_TAB_LABEL) as [CmsTab, string][]).map(([tab, label]) => (
             <Button
               key={tab}
               role="tab"
@@ -526,7 +511,7 @@ export function RecordSheet({
               size="xs"
               className={`${NAV_TAB} ${tab === "records" ? "tw:border-[var(--bk-accent)] tw:text-[var(--bk-ink)]" : ""}`}
               data-testid={`cms-sheet-tab-${tab}`}
-              onClick={() => (tab === "records" ? guard(onClose) : guard(() => onOpenTab(tab), TAB_LABEL[tab]))}
+              onClick={() => (tab === "records" ? guard(onClose) : guard(() => onOpenTab(tab), label))}
             >
               {label}
             </Button>
