@@ -85,6 +85,8 @@ export const ReplaceModal: React.FC<ReplaceModalProps> = ({
     /* 2L9 223:44891 — "Replace Home with SaaS landing?", the CTA names the
        page again. */
     title={`Replace ${currentPageName || "this page"} with ${template.name}?`}
+    /* 223:44891 — a 720 dialog. */
+    width="xl"
     footer={
       <>
         <Button color="light" onClick={onCancel}>
@@ -111,7 +113,7 @@ export const ReplaceModal: React.FC<ReplaceModalProps> = ({
       {/* L2-026: a template saved from a page carries {{token…}} placeholders
           that apply resolves to this site's brand; a built-in one does not. */}
       {template.html?.includes("{{token.")
-        ? `${template.name} takes this site’s brand colors and fonts.`
+        ? `${template.name} uses this site’s Brand colors and fonts — your Brand is not changed.`
         : `${template.name} has its own colors and fonts — your Brand is not changed.`}
     </div>
     <Option

@@ -14,9 +14,9 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { CircleX, TriangleAlert } from "lucide-react";
+import { CircleX } from "lucide-react";
 import type { CMSCollection, CMSField } from "@/shared/types/cms";
-import { Button, ModalBody, ModalContent, ModalFooter, ModalRoot, ModalTitle, TextInput } from "@/editor/chrome-ui";
+import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalRoot, ModalTitle, TextInput } from "@/editor/chrome-ui";
 import { FIELD_TYPE_LABEL } from "./fieldTypes";
 import type { FieldUse } from "./fieldUsage";
 
@@ -115,33 +115,44 @@ export function DeleteFieldDialog({
       setBusy(false);
     }
   };
-  return frame(
-    "cms-field-delete",
-    "md",
-    busy ? `Deleting ${field.name}…` : `Delete ${field.name}?`,
-    <>
-      <div className={`${CALLOUT} tw:border-[color-mix(in_srgb,var(--bk-yellow-300)_45%,transparent)] tw:bg-[var(--bk-yellow-100)] tw:text-[var(--bk-warning-text)]`}>
-        <TriangleAlert size={12} className="tw:mt-0.5 tw:flex-none" aria-hidden="true" />
-        <span data-testid="cms-field-delete-impact">
-          {valueCount === 0
-            ? `No record has a value in ${field.name}.`
-            : `${valueCount} record${valueCount === 1 ? " has a" : "s have a"} value in ${field.name}.`}{" "}
-          {field.name} is a {type} field on the {collection.name} collection.
-        </span>
-      </div>
-      <p className="tw:m-0 tw:mt-3 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
+  /* 2L9 257:52890 — a 720 dialog: the count, then the typed confirmation. The
+     board's "stays in Recently deleted for 30 days" waits on the restore
+     server slice, so the sentence says the delete cannot be undone. */
+  return (
+    <Modal
+      open
+      onClose={busy ? () => undefined : onClose}
+      title={busy ? `Deleting ${field.name}…` : `Delete ${field.name}?`}
+      width="xl"
+      testId="cms-field-delete"
+      footer={
+        <>
+          <Button variant="secondary" className="tw:w-24" onClick={onClose} disabled={busy} data-testid="cms-field-delete-cancel">
+            Cancel
+          </Button>
+          <Button variant="danger" disabled={!armed || busy} onClick={() => void confirm()} data-testid="cms-field-delete-confirm">
+            {busy ? "Deleting…" : failed ? "Retry" : "Delete field"}
+          </Button>
+        </>
+      }
+    >
+      <p className="tw:m-0 tw:text-[12px] tw:leading-[18px]" data-testid="cms-field-delete-impact">
         {busy
           ? "The field stays available until the deletion finishes."
-          : "Records keep their other fields. This cannot be undone."}
+          : `${
+              valueCount === 0
+                ? `No record has a value in ${field.name}.`
+                : `${valueCount} record${valueCount === 1 ? " has a" : "s have a"} value in ${field.name}.`
+            } ${field.name} is a ${type} field; deleting it removes the field and its values. This cannot be undone.`}
       </p>
       {valueCount > 0 ? (
         <>
-          <label className="tw:mt-3 tw:block tw:text-[11px] tw:leading-4 tw:font-semibold tw:text-[var(--bk-ink)]" htmlFor="cms-field-delete-typed">
+          <label className="tw:mt-4 tw:block tw:text-[12px] tw:leading-[18px] tw:font-medium tw:text-[var(--bk-ink)]" htmlFor="cms-field-delete-typed">
             Type {valueCount} to confirm
           </label>
           <TextInput
             id="cms-field-delete-typed"
-            className="tw:mt-1.5"
+            className="tw:mt-2 tw:[&_input]:h-7 tw:[&_input]:rounded-[6px] tw:[&_input]:border-transparent tw:[&_input]:bg-[var(--bk-bg-subtle)] tw:[&_input]:text-[12px]"
             sizing="sm"
             autoComplete="off"
             value={typed}
@@ -157,14 +168,6 @@ export function DeleteFieldDialog({
           Couldn’t delete {field.name}. The field and its values are unchanged.
         </p>
       ) : null}
-    </>,
-    <>
-      <Button variant="secondary" onClick={onClose} disabled={busy} data-testid="cms-field-delete-cancel">
-        Cancel
-      </Button>
-      <Button variant="danger" disabled={!armed || busy} onClick={() => void confirm()} data-testid="cms-field-delete-confirm">
-        {busy ? "Deleting…" : failed ? "Retry" : "Delete field"}
-      </Button>
-    </>,
+    </Modal>
   );
 }

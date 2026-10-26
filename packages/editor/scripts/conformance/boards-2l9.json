@@ -7649,8 +7649,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — Tabs+search+Title/Status/Updated table built; no status filter, sort, Columns, pagination; no Author col. Excerpt cell overflows into Updated (\"helps |Just now\"). RecordsTable key warning. | prior: drift-open — L-C C3 built the four named tabs (Records · Fields · Dynamic pages · Collection settings); status filter, sort menu, Columns and pagination still missing. Not compared.",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (cms-workspace, 1145×812 vs board crop): header 'Blog · N records' + '+ Add record' 148×32 + ⋯; tinted tabs; toolbar search 520 / All statuses 180 / Updated · Newest 192 / Columns; head 40 tinted, Title·Status 216·Updated 176·Author; rows 40, excerpt truncates; footer '1–50 of N records' Previous/Next 112×32 — all within 4px. Header '‹ Back to Editor · Home' shows only with a return (shell).",
    "tier": "P1"
   },
   {
@@ -7660,8 +7660,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — Record opens as full sheet; back link ABOVE tabs (board: tabs then back+title row); no Preview (unsaved) pane (only 'Preview ▸' toggle); labels raw keys; Save 98x28 vs board 160x32. | prior: built, not compared — L-C C3: sheet back \"‹ {name} records\" and four tabs incl. Collection settings; always-on Preview (unsaved) pane still a toggle (open).",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (cms-workspace&record): record under the tabs; '‹ Blog records' 61 in, title, 'Changed since publish'; stacked 13/20 labels over 28 filled controls (label tops 184/256/…/644 = board); rich text box 116 tall with B·I·Link·Heading·List; 'Choose image…' 180×32; always-on Preview (unsaved) 260 wide; footer Cancel 96 / Save record 160 ×32.",
    "tier": "P1"
   },
   {
@@ -7671,8 +7671,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — Footer + button read 'Saving...' as board, but Cancel is disabled while saving (board: enabled); no preview pane; sheet header 'New Blog ×' not on board. | prior: built, not compared — L-C C1: Save button and footer read \"Saving…\" while a save runs (RecordSheet.tsx).",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (&hang=1): footer 'Saving…', Cancel enabled, 'Saving…' disabled 160×32; no sheet ✕ header.",
    "tier": "P1"
   },
   {
@@ -7682,8 +7682,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (cms-brand): unreachable live — 'Couldn’t save' banner only fires on a local-write exception (RecordSheet save catch). A forced server 500 on cms.entries.upsert is queued and shows the OFFLINE copy instead. | prior: built, not compared — L-C C5: banner \"Couldn’t save\" + \"Your edits are still here. Retry when you’re ready.\"; footer/button follow Play F2.17 (\"Couldn’t save · your draft is kept\", Retry save) where the two boards disagree (board: \"Retry\").",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (cms-workspace&record&fail=1): warning-tint banner over the fields 'Couldn’t save' / 'Your edits are still here. Retry when you’re ready.', footer 'Couldn’t save' (error) + Retry 160×32; field tops within 4px of the board.",
    "tier": "P1"
   },
   {
@@ -7693,8 +7693,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C C3: sheet back \"‹ {name} records\" and four tabs incl. Collection settings; always-on Preview (unsaved) pane still a toggle (open).",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (cms-workspace&record): record under the tabs; '‹ Blog records' 61 in, title, 'Changed since publish'; stacked 13/20 labels over 28 filled controls (label tops 184/256/…/644 = board); rich text box 116 tall with B·I·Link·Heading·List; 'Choose image…' 180×32; always-on Preview (unsaved) 260 wide; footer Cancel 96 / Save record 160 ×32.",
    "inheritsFrom": "165:520",
    "tier": "P1"
   },
@@ -7706,7 +7706,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — Banner copy matches, Save disabled matches. Banner sits above back link/tabs (y=109) instead of above fields; footer 'Not saved to the server yet' (red) vs board 'Offline · Not saved'. | prior: built, not compared — L-C C5: queued save shows banner \"You’re offline\" + \"Your edits are not saved to the server. Keep this tab open.\"; button stays Save record.",
+   "verifiedNote": "probe 2026-10-27: banner now sits over the fields and the footer reads 'Offline · Not saved'; the queued (offline) state cannot be produced in the probe — its save mirror has no server and reports reached.",
    "tier": "P1"
   },
   {
@@ -7715,9 +7715,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "board",
+   "authority": "code:whole-record-conflict",
    "verified": "drift-open",
-   "verifiedNote": "Code: whole-record Keep mine / Use theirs strip; board: banner + Review entry to field diff",
+   "verifiedNote": "built + probe-rendered 2026-10-27, no board shot in the dump: warning banner 'Changed elsewhere · Review the fields that changed before saving.' + Review over the fields; Review opens Keep mine / Use theirs (whole record — the per-field diff 165:2414 is not built).",
    "tier": "P1"
   },
   {
@@ -7728,7 +7728,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — Copy + 3 buttons match. Emphasis inverted: live primary=Save and leave, board primary=Keep editing. Dialog 560w at y=369 vs board 480w at y≈280. | prior: built, not compared — L-C C1: \"Leave without saving?\" names the record / destination tab or collection; Keep editing · Discard changes · Save and leave (RecordSheet.tsx). Origin label (\"Your destination is …\") waits on C2.",
+   "verifiedNote": "probe-compared 2026-10-27: Keep editing is the filled primary, Discard changes / Save and leave outlined, dialog 480 wide, copy matches. Open: dialog sits viewport-centred (board top ≈280) and its title is 20px vs board ≈16 — both chrome-ui Modal (REQUESTS C-16).",
    "tier": "P1"
   },
   {
@@ -7749,8 +7749,9 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Board adds Key column; columns Name/Type/Required/Used by otherwise match",
+   "verified": "drift-fixed",
+   "verifiedNote": "inherits 165:2917 (same Fields table, probe-compared 2026-10-27).",
+   "inheritsFrom": "165:2917",
    "tier": "P1"
   },
   {
@@ -7760,8 +7761,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — Locked state unreachable (no bound field). Field inspector: inline left labels vs stacked; no Key column in table; Required as Yes/No pills vs checkbox; no 'Show N usages' or Save field. | prior: drift-open — L-C D2: field inspector gains Default value, Placeholder, Help text; Key/type lock kept; \"Show N usages\" link and explicit Save field (code commits on blur, authority to decide) not built. Not compared.",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (cms-workspace&tab=fields, Title bound): table Name 192·Key(mono) 176·Type 160·Required 96·Used by (count) under a 40 tinted head, rows 40, selected accent wash; inspector 320 at x=825 under the tabs: Title, Display name / Key / Type stacked over 28 filled controls, 'Key and type are locked because this field is used.', 'Show N usages', Required checkbox, Placeholder, Help text, Save field (y 601 vs board 604). Default value and min/max rules (code) fold under 'Default and rules ›' below Save field.",
    "tier": "P1"
   },
   {
@@ -7772,7 +7773,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code lists uses inline in inspector; board separate \"Title · 4 usages\" list with ‹ Back to field",
+   "verifiedNote": "built + probe-rendered 2026-10-27 (no board shot): 'Show N usages' opens '{field} · N usages', one row per use (opens the element), '‹ Back to field'.",
    "tier": "P1"
   },
   {
@@ -8334,7 +8335,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — Copy matches board exactly. Same emphasis inversion as 165:2184 (Save and leave primary, Keep editing outlined); dialog 560w vs 480w. | prior: built, not compared — L-C C1: \"Leave without saving?\" names the record / destination tab or collection; Keep editing · Discard changes · Save and leave (RecordSheet.tsx). Origin label (\"Your destination is …\") waits on C2.",
+   "verifiedNote": "probe-compared 2026-10-27: Keep editing is the filled primary, Discard changes / Save and leave outlined, dialog 480 wide, copy matches. Open: dialog sits viewport-centred (board top ≈280) and its title is 20px vs board ≈16 — both chrome-ui Modal (REQUESTS C-16).",
    "tier": "P2"
   },
   {
@@ -8344,8 +8345,8 @@
    "family": "resources",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — Footer 'Saving...' + disabled 'Saving...' match, but secondary reads 'Stay here' (board 'Cancel'); header truncates 'Saving record... A clearer ...'. | prior: built, not compared — L-C C1: Save and leave shows \"Saving record…\" + Saving… + Stay here; success takes the chosen way out (RecordSheet.tsx).",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (&hang=1 after Save and leave to Fields): '‹ Blog records' stays; secondary reads Cancel; 'Saving…' disabled.",
    "tier": "P2"
   },
   {
@@ -8690,8 +8691,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (cms-brand): unreachable live — Record opened from a Heading binding ('‹ Heading · Title binding' origin) needs a bound template page; same blocker as 173:9757. | prior: built, not compared — L-C C2: record/workspace back reads \"‹ {origin}\" from CmsOpenRequest.origin and the guard says \"Your destination is {origin}.\"; live label waits on REQUESTS #11 (L-B passes origin).",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (cms-workspace&record&origin=Heading · Title binding): header '‹ Heading · Title binding' at x=66, title at 273 (board 66/273); clean record reads 'Preview' and footer 'Saved'.",
    "tier": "P1"
   },
   {
@@ -8702,7 +8703,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C C2: record/workspace back reads \"‹ {origin}\" from CmsOpenRequest.origin and the guard says \"Your destination is {origin}.\"; live label waits on REQUESTS #11 (L-B passes origin).",
+   "verifiedNote": "inherits 173:16169 (same record-from-binding layout); not separately compared.",
    "inheritsFrom": "173:16169",
    "tier": "P1"
   },
@@ -8713,8 +8714,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "built, not compared — L-C C1: Save and leave shows \"Saving record…\" + Saving… + Stay here; success takes the chosen way out (RecordSheet.tsx).",
+   "verified": "drift-open",
+   "verifiedNote": "built (2026-10-27): during Save and leave to the origin the header's way back reads 'Saving record…' and the footer Cancel/Saving…; no board shot in the dump to compare.",
    "tier": "P1"
   },
   {
@@ -8725,7 +8726,8 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C C2: record/workspace back reads \"‹ {origin}\" from CmsOpenRequest.origin and the guard says \"Your destination is {origin}.\"; live label waits on REQUESTS #11 (L-B passes origin).",
+   "verifiedNote": "inherits 173:16169 (same record-from-binding layout); not separately compared.",
+   "inheritsFrom": "173:16169",
    "tier": "P1"
   },
   {
@@ -8804,7 +8806,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C C1: Save and leave shows \"Saving record…\" + Saving… + Stay here; success takes the chosen way out (RecordSheet.tsx).",
+   "verifiedNote": "built (2026-10-27): during Save and leave to the origin the header's way back reads 'Saving record…' and the footer Cancel/Saving…; no board shot in the dump to compare.",
    "tier": "P1"
   },
   {
@@ -9002,8 +9004,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "built, not compared — L-C C1: Save and leave shows \"Saving record…\" + Saving… + Stay here; success takes the chosen way out (RecordSheet.tsx).",
+   "verified": "drift-open",
+   "verifiedNote": "built (2026-10-27): during Save and leave to the origin the header's way back reads 'Saving record…' and the footer Cancel/Saving…; no board shot in the dump to compare.",
    "tier": "P1"
   },
   {
@@ -11358,7 +11360,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — Title/checkbox/CTA match. Copy 'takes this site’s brand colors and fonts' vs board 'has its own colors and fonts' (header says 'Own colours'). Full-screen takeover, no shell/backup banner; 560 vs 720w | prior: built, not compared — L-C C7: \"Replace {page} with {template}?\", \"{page}’s N elements are removed and replaced. {template} has its own colors and fonts — your Brand is not changed.\" (saved token templates say they take the brand), \"Save a backup first (History › Saves)\", CTA \"Replace {page}\".",
+   "verifiedNote": "probe-compared 2026-10-27 (tpl-replace-confirm): 720 wide, title/body/checkbox/CTA copy = board for a template with its own colours; a template written on Brand tokens says it uses the site's Brand (code: resolveTokens). Open: Modal title 20 vs ≈16 and vertical placement (REQUESTS C-16); Templates as an in-place resource area (REQUESTS C-17).",
    "tier": "P2"
   },
   {
@@ -12177,9 +12179,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "board",
+   "authority": "code:no-restore-yet",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — 'Delete excerpt?', 'Type 1 to confirm', Cancel/Delete field built. Adds breadcrumb + yellow callout; 'cannot be undone' vs board 30-day Recently deleted. Dialog 560w y=303 vs 720w y≈128. | prior: built, not compared — L-C D4: \"Delete {field}? · N records have a value in {field}.\" + \"Type N to confirm\" + Delete field. The board's \"stay in Recently deleted for 30 days\" is not shown: restore is a later server slice, so the copy keeps \"This cannot be undone.\"",
+   "verifiedNote": "probe-compared 2026-10-27: 720 wide, 'Delete {field}?', count sentence, 'Type N to confirm' over a 28 filled input, Cancel 96 / Delete field; no breadcrumb or callout. Copy keeps 'This cannot be undone.' — the board's 30-day Recently deleted waits on the restore server slice. Open: Modal title size / placement (REQUESTS C-16).",
    "tier": "P2"
   },
   {
@@ -12188,9 +12190,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "board",
+   "authority": "code:no-restore-yet",
    "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C D4: \"Delete {field}? · N records have a value in {field}.\" + \"Type N to confirm\" + Delete field. The board's \"stay in Recently deleted for 30 days\" is not shown: restore is a later server slice, so the copy keeps \"This cannot be undone.\"",
+   "verifiedNote": "probe-compared 2026-10-27: 720 wide, 'Delete {field}?', count sentence, 'Type N to confirm' over a 28 filled input, Cancel 96 / Delete field; no breadcrumb or callout. Copy keeps 'This cannot be undone.' — the board's 30-day Recently deleted waits on the restore server slice. Open: Modal title size / placement (REQUESTS C-16).",
    "inheritsFrom": "257:52890",
    "tier": "P2"
   },

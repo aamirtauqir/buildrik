@@ -15,7 +15,7 @@ import * as React from "react";
 import { MoreHorizontal, Table2 } from "lucide-react";
 import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants";
-import { Button, IconButton, Menu, MenuItem, MenuSeparator, PanelSearch, Popover, Tabs, useToast } from "@/editor/chrome-ui";
+import { Button, IconButton, Menu, MenuItem, MenuSeparator, Popover, Tabs, useToast } from "@/editor/chrome-ui";
 import { useContentPanel } from "@/editor/sidebar/tabs/content/useContentPanel";
 import { DynamicPagesPane } from "./DynamicPagesPane";
 import { CollectionSettingsPane } from "./CollectionSettingsPane";
@@ -27,7 +27,6 @@ import { CMS_TAB_LABEL, cmsWorkspace, useCmsWorkspace, type CmsTab } from "./cms
 import { RecordsTable, recordTitle } from "./RecordsTable";
 import { RecordSheet } from "./RecordSheet";
 import type { OpenMediaLibrary } from "./RecordFieldControl";
-import { BACK } from "./paneStyles";
 import { ImportRecordsButton, useImportRecords } from "./useImportRecords";
 import { CsvImportDialog } from "./CsvImportDialog";
 import { onCmsGone } from "@/services/cmsSync";
@@ -48,23 +47,17 @@ export interface CmsWorkspaceProps {
   onBackToCanvas?: () => void;
 }
 
-const HEADER =
-  "tw:flex tw:h-14 tw:flex-none tw:items-center tw:gap-3 tw:px-5 tw:border-b tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)]";
-const TITLE = "tw:m-0 tw:text-[16px] tw:leading-6 tw:font-semibold tw:tracking-[-0.16px] tw:text-[var(--bk-ink)] tw:whitespace-nowrap";
+/* 2L9 165:2 — a 56 header on the page's 24 gutter: way back, "Blog · N
+   records", the tab's primary action and the collection ⋯. */
+const HEADER = "tw:flex tw:h-14 tw:flex-none tw:items-center tw:gap-6 tw:pl-6 tw:pr-4 tw:bg-[var(--bk-bg-panel)]";
+const TITLE = "tw:m-0 tw:text-[14px] tw:leading-5 tw:font-semibold tw:text-[var(--bk-ink)] tw:whitespace-nowrap";
 const META = "tw:text-[13px] tw:leading-5 tw:text-[var(--bk-gray-500)] tw:whitespace-nowrap";
 /* 4428:143466 — 28 tall, 12 inline, 13/20 medium. Same-property utilities so
    they displace flowbite's xs size. */
-const PRIMARY = "tw:h-7 tw:px-3 tw:py-1 tw:text-[13px] tw:leading-5 tw:font-medium tw:rounded-[6px]";
-const TAB_ROW =
-  "tw:flex tw:h-10 tw:flex-none tw:items-center tw:gap-1 tw:pl-3 tw:pr-5 tw:border-b tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)]";
-/* 7432:143178 — an underlined tab, not the shared pill: 40 tall, 10 inline,
-   13/20 medium, ink-soft; the selected one is accent with a 2px accent rule. */
-const TAB =
-  "tw:h-10 tw:rounded-none tw:px-2.5 tw:font-medium tw:leading-5 tw:text-[var(--bk-ink-soft)] tw:border-b-2 tw:border-transparent " +
-  "tw:hover:bg-transparent tw:aria-selected:bg-transparent tw:aria-selected:hover:bg-transparent " +
-  "tw:aria-selected:border-[var(--bk-accent)] tw:aria-selected:text-[var(--bk-accent-text)]";
-
-/* A quiet 28-tall action at the header's start; a rule parts it from the title. */
+const PRIMARY = "tw:h-8 tw:min-w-[148px] tw:px-4 tw:py-0 tw:text-[13px] tw:leading-5 tw:font-medium tw:rounded-[6px]";
+/* 165:2 — the four tabs are the shared tinted pills, 24 in, a 48 band. */
+const TAB_ROW = "tw:flex tw:h-12 tw:flex-none tw:items-center tw:pl-6 tw:pr-6 tw:bg-[var(--bk-bg-panel)]";
+const TAB = "tw:h-8 tw:min-w-[96px] tw:px-4 tw:font-medium";
 
 /* 165:2 — all four of a collection's tabs are named in the row. */
 const TABS = (Object.entries(CMS_TAB_LABEL) as [CmsTab, string][]).map(([id, label]) => ({ id, label }));
@@ -111,7 +104,6 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
   const [csvImportOpen, setCsvImportOpen] = React.useState(false);
   const [addingField, setAddingField] = React.useState(false);
   const [fieldId, setFieldId] = React.useState<string | null>(null);
-  const [query, setQuery] = React.useState("");
   const { loadRecords } = panel;
   /* CMS-01: the record a "new" sheet's first save created. A later save from
      the same sheet (Retry after a queued or refused write) updates it — the
@@ -126,17 +118,8 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
     if (collection) void loadRecords(collection.id);
   }, [collection?.id, loadRecords]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  /* 6819:59209 had the topbar field search an open collection ("Search Menu
-     items…"); owner decision 2026-10-03 moves it under the tab row, over the
-     records it filters. Leaving the collection drops the query, as handing
-     the topbar field back used to. */
-  const collectionName = collection?.name ?? null;
-  React.useEffect(() => {
-    setQuery("");
-  }, [collectionName]);
-
   /* A visit's way back ends with the visit (F2.06 origin). */
-  React.useEffect(() => () => cmsWorkspace.clearOrigin(), []);
+  React.useEffect(() => cmsWorkspace.holdVisit(), []);
 
   /* 4428:140486 — while the workspace covers the canvas the topbar crumb
      reads "<site> › CMS", not the page behind it. */
@@ -172,13 +155,33 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
   }, [composer, refKey, panel.recordCounts]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const importer = useImportRecords(composer, collection);
-  const back = onBackToCanvas ? (
-    <>
-      <Button color="light" size="xs" className={BACK} data-testid="cms-ws-back-to-canvas" onClick={onBackToCanvas}>
-        ‹ {ws.origin ?? "Back to canvas"}
-      </Button>
-      <span className="tw:h-5 tw:w-px tw:bg-[var(--bk-border)]" aria-hidden="true" />
-    </>
+  /* 165:2 "‹ Back to Editor · Home" / 173:16169 "‹ Heading · Title
+     binding" — through the open record's guard (cmsWorkspace.exit). */
+  /* 165:2 / 173:16169 — the way back sits 66 in; the title starts at 273
+     whether or not there is one. */
+  const back = ws.returning ? (
+    <span
+      className="tw:ml-[42px] tw:w-[183px] tw:flex-none tw:truncate tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]"
+      role="status"
+      data-testid="cms-sheet-returning"
+    >
+      Saving record…
+    </span>
+  ) : onBackToCanvas ? (
+    <Button
+      size="xs"
+      variant="link"
+      className="tw:ml-[42px] tw:h-auto tw:min-h-0 tw:w-[183px] tw:flex-none tw:justify-start tw:truncate tw:p-0 tw:text-[13px] tw:font-normal"
+      data-testid="cms-ws-back-to-canvas"
+      onClick={() =>
+        cmsWorkspace.exit(() => {
+          cmsWorkspace.openRecord(null);
+          onBackToCanvas();
+        })
+      }
+    >
+      ‹ {ws.origin ?? "Back to canvas"}
+    </Button>
   ) : null;
 
   if (!collection) {
@@ -356,7 +359,6 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
         key={collection.id}
         collection={collection}
         records={panel.records}
-        query={query}
         referenceLabels={referenceLabels}
         onOpenRecord={(id) => cmsWorkspace.openRecord(id)}
       />
@@ -371,8 +373,45 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
     body = null;
   }
 
+  /* 2L9 165:520 — an open record fills the workspace under its tabs. */
+  const sheetOpen = Boolean(ws.recordId && (ws.recordId === "new" || sheetRecord));
+  const sheet = sheetOpen ? (
+        <RecordSheet
+          key={ws.recordId}
+          composer={composer}
+          collection={collection}
+          record={sheetRecord}
+          gone={goneRecord !== null}
+          onClose={() => {
+            setGone(null);
+            cmsWorkspace.openRecord(null);
+          }}
+          origin={ws.origin}
+          onOpenTab={(tab) => cmsWorkspace.setTab(tab)}
+          onSave={async (data, published) => {
+            const isNew = ws.recordId === "new";
+            const { item, reached, conflict, invalid } = await panel.saveRecord(
+              collection.id,
+              isNew ? created.current : ws.recordId,
+              data,
+              published,
+            );
+            if (isNew && item) created.current = item.id;
+            return reached ? true : conflict ? "conflict" : invalid ? { refused: invalid } : false;
+          }}
+          onDelete={async (r) => {
+            await panel.deleteRecord(r.id);
+            await loadRecords(collection.id);
+          }}
+          onRestore={async (r) => {
+            await panel.saveRecord(collection.id, null, r.data, r.status === "published");
+          }}
+          onOpenMediaLibrary={onOpenMediaLibrary}
+        />
+  ) : null;
+
   const hint =
-    selectedField
+    selectedField || sheetOpen
       ? null
       : isEmpty
       ? { title: "Add your first record", hint: "It opens here for editing." }
@@ -390,23 +429,15 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
       <section className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:bg-[var(--bk-bg-panel)]">
         <header className={HEADER} data-testid="cms-ws-header">
           {back}
-          <h2 className={TITLE} data-testid="cms-ws-title">{collection.name}</h2>
-          <span className={META} data-testid="cms-ws-meta">
-            · {ws.tab === "fields" ? plural(collection.fields.length, "field") : plural(count, "record")}
-          </span>
+          <h2 className={TITLE} data-testid="cms-ws-title">
+            {collection.name}
+            <span className="tw:font-semibold" data-testid="cms-ws-meta">
+              {" · "}
+              {plural(count, "record")}
+            </span>
+          </h2>
           <span className="tw:flex-1" />
-          {primary}
-        </header>
-        <div className={TAB_ROW}>
-          <Tabs
-            tabs={TABS}
-            value={ws.tab}
-            onChange={(id) => cmsWorkspace.setTab(id as CmsTab)}
-            label={`${collection.name} sections`}
-            className="tw:p-0 tw:gap-1"
-            tabClassName={TAB}
-            data-testid="cms-ws-tabs"
-          />
+          {sheetOpen ? null : primary}
           {/* 254:82143 — the collection ⋯ holds the imports (B13: the Records
               modal they lived in is retired, and a capability does not go
               quietly) and the connectors that are planned. */}
@@ -417,12 +448,12 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
             trigger={
               <IconButton
                 label="Collection menu"
-                className="tw:size-10"
+                className="tw:size-8"
                 pressed={menuOpen}
                 data-testid="cms-ws-more"
                 onClick={() => setMenuOpen((v) => !v)}
               >
-                <MoreHorizontal size={20} />
+                <MoreHorizontal size={16} />
               </IconButton>
             }
           >
@@ -446,18 +477,40 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
               </MenuItem>
             </Menu>
           </Popover>
+        </header>
+        <div className={TAB_ROW}>
+          <Tabs
+            tabs={TABS}
+            value={ws.tab}
+            onChange={(id) => cmsWorkspace.setTab(id as CmsTab)}
+            label={`${collection.name} sections`}
+            className="tw:gap-2 tw:p-0"
+            tabClassName={TAB}
+            data-testid="cms-ws-tabs"
+          />
         </div>
         {importer.status}
-        {ws.tab === "records" && !isEmpty ? (
-          <PanelSearch
-            placeholder={`Search ${collection.name}…`}
-            value={query}
-            onChange={setQuery}
-            className="tw:max-w-[352px]"
-            data-testid="cms-ws-search"
-          />
-        ) : null}
-        <div className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col">{body}</div>
+        {/* 165:2917 — a selected field's settings (or a tab's hint) sit beside
+            the table, under the header and tabs. */}
+        <div className="tw:flex tw:min-h-0 tw:flex-1">
+          <div className="tw:flex tw:min-h-0 tw:min-w-0 tw:flex-1 tw:flex-col">{sheetOpen ? sheet : body}</div>
+          {selectedField ? (
+            <FieldInspector
+              composer={composer}
+              collection={collection}
+              collections={panel.collections}
+              field={selectedField}
+              records={panel.records}
+              uses={usage.get(selectedField.slug) ?? []}
+              onClose={() => setFieldId(null)}
+              onDeleteField={deleteField}
+              onOpenUse={openUse}
+              onSetDefault={fillDefault}
+              onChangeType={changeType}
+            />
+          ) : null}
+          {hint ? <HintColumn title={hint.title} hint={hint.hint} testId="cms-ws-hint" /> : null}
+        </div>
       </section>
       {addingField ? (
         <AddFieldDialog
@@ -465,21 +518,6 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
           onClose={() => setAddingField(false)}
           collections={panel.collections}
           onAdd={(field) => panel.addField(collection.id, field)}
-        />
-      ) : null}
-      {selectedField ? (
-        <FieldInspector
-          composer={composer}
-          collection={collection}
-          collections={panel.collections}
-          field={selectedField}
-          records={panel.records}
-          uses={usage.get(selectedField.slug) ?? []}
-          onClose={() => setFieldId(null)}
-          onDeleteField={deleteField}
-          onOpenUse={openUse}
-          onSetDefault={fillDefault}
-          onChangeType={changeType}
         />
       ) : null}
       {csvImportOpen ? (
@@ -493,52 +531,6 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
           onImported={() =>
             void Promise.resolve(composer?.cms.collections.refreshFromStorage()).then(() => loadRecords(collection.id))
           }
-        />
-      ) : null}
-      {hint ? <HintColumn title={hint.title} hint={hint.hint} testId="cms-ws-hint" /> : null}
-      {ws.recordId && (ws.recordId === "new" || sheetRecord) ? (
-        <RecordSheet
-          key={ws.recordId}
-          composer={composer}
-          collection={collection}
-          record={sheetRecord}
-          gone={goneRecord !== null}
-          onClose={() => {
-            setGone(null);
-            cmsWorkspace.openRecord(null);
-          }}
-          /* The sheet covers the workspace header: opened from an element
-             (Open record ›), its own back closes it and returns to the
-             canvas in one step (§13). */
-          onBackToCanvas={
-            onBackToCanvas
-              ? () => {
-                  cmsWorkspace.openRecord(null);
-                  onBackToCanvas();
-                }
-              : undefined
-          }
-          origin={ws.origin}
-          onOpenTab={(tab) => cmsWorkspace.setTab(tab)}
-          onSave={async (data, published) => {
-            const isNew = ws.recordId === "new";
-            const { item, reached, conflict, invalid } = await panel.saveRecord(
-              collection.id,
-              isNew ? created.current : ws.recordId,
-              data,
-              published,
-            );
-            if (isNew && item) created.current = item.id;
-            return reached ? true : conflict ? "conflict" : invalid ? { refused: invalid } : false;
-          }}
-          onDelete={async (r) => {
-            await panel.deleteRecord(r.id);
-            await loadRecords(collection.id);
-          }}
-          onRestore={async (r) => {
-            await panel.saveRecord(collection.id, null, r.data, r.status === "published");
-          }}
-          onOpenMediaLibrary={onOpenMediaLibrary}
         />
       ) : null}
       {importer.input}

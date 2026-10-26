@@ -47,7 +47,7 @@ async function openNewAndSave(composer: unknown) {
   fireEvent.change(await screen.findByLabelText(/Name/), { target: { value: "Hello" } });
   fireEvent.click(screen.getByTestId("cms-sheet-save"));
   /* Settled: queued (offline banner) or refused (the reason in the footer). */
-  await waitFor(() => expect(screen.getByTestId("cms-sheet-state").textContent).toMatch(/Not saved to the server yet|already uses/));
+  await waitFor(() => expect(screen.getByTestId("cms-sheet-state").textContent).toMatch(/Offline · Not saved|already uses/));
 }
 
 describe("a new record's second save after a queued one (CMS-01)", () => {
@@ -68,7 +68,7 @@ describe("a new record's second save after a queued one (CMS-01)", () => {
     render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
     fireEvent.click(await screen.findByTestId("cms-ws-add-record"));
     fireEvent.change(await screen.findByLabelText(/Name/), { target: { value: "Hello" } });
-    fireEvent.click(screen.getByLabelText("Published"));
+    fireEvent.click(screen.getByLabelText(/^Published/));
     fireEvent.click(screen.getByTestId("cms-sheet-save"));
     await waitFor(() => expect(composer.cms.collections.createContentItem).toHaveBeenCalled());
     expect(composer.cms.collections.createContentItem.mock.calls[0][2]).toMatchObject({ status: "published" });
