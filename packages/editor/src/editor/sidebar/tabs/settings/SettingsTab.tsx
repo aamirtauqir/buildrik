@@ -87,6 +87,7 @@ import {
 } from "./index";
 import { UnsavedSettingsDialog, type UnsavedGuardPhase } from "./components/UnsavedSettingsDialog";
 import { shellDirty } from "@/editor/shell/shellDirtyRegistry";
+import { requestBrandReturn } from "@/editor/design-system/ui/brandOpenRequest";
 import { searchSettings, type SearchEntry } from "./searchIndex";
 import type { ProjectSettings } from "@/shared/types/project";
 import {
@@ -379,6 +380,9 @@ export const SettingsTab: React.FC<
     (id: SettingsNavId) => {
       switch (id) {
         case "branding":
+          /* GAP-ST-T03 (D-11): Brand's door then reads "‹ Back to Site
+             settings" and returns to this screen. */
+          if (composer) requestBrandReturn(composer, { screen: currentScreen });
           onOpenDesignTab?.();
           return;
         default:
@@ -388,7 +392,7 @@ export const SettingsTab: React.FC<
           navigateTo(id);
       }
     },
-    [navigateTo, onOpenDesignTab],
+    [navigateTo, onOpenDesignTab, composer, currentScreen],
   );
 
   const requestNav = React.useCallback(

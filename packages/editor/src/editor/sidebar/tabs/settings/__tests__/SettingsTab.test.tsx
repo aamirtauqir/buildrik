@@ -255,6 +255,7 @@ vi.mock("../screens/RedirectsScreen", () => ({
 
 import { SettingsTab } from "../SettingsTab";
 import { shellDirty } from "@/editor/shell/shellDirtyRegistry";
+import { takeBrandReturn } from "@/editor/design-system/ui/brandOpenRequest";
 import { SettingsSaveCancelled, SettingsSaveError } from "@/services/BuildrikSyncProvider";
 
 afterEach(() => {
@@ -476,6 +477,15 @@ describe("SettingsTab — doors", () => {
     fireEvent.click(screen.getByTestId("set-nav-branding"));
     expect(onOpenDesignTab).toHaveBeenCalledTimes(1);
     expect(headTitle()).toBe("Overview");
+  });
+
+  it("Brand ↗ leaves a return to the screen it came from (GAP-ST-T03, D-11)", async () => {
+    const composer = makeComposer();
+    renderS(<SettingsTab composer={asComposer(composer)} onOpenDesignTab={vi.fn()} />);
+    fireEvent.click(screen.getByTestId("set-nav-seo"));
+    await waitFor(() => expect(headTitle()).toBe("SEO"));
+    fireEvent.click(screen.getByTestId("set-nav-branding"));
+    expect(takeBrandReturn(asComposer(composer) as never)).toEqual({ screen: "seo" });
   });
 
   it("the role foot opens the Permissions dialog for every known role", () => {

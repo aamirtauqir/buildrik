@@ -15125,7 +15125,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "L-D S1: BrandWorkspace door reads \"‹ Back to Site settings\" and reopens Settings at the screen it came from (requestBrandReturn); reachable once REQUESTS #11 lands in SettingsTab. Board's Undo|Redo in the Brand header not adopted (one undo). Built, not compared."
+   "verifiedNote": "L-D S1: BrandWorkspace door reads \"‹ Back to Site settings\" and reopens Settings at the screen it came from (requestBrandReturn); reachable once REQUESTS #11 lands in SettingsTab. Board's Undo|Redo in the Brand header not adopted (one undo). Built, not compared. Settings side done (L-E, D-11): Brand ↗ calls requestBrandReturn(composer, {screen}) before opening Brand."
   },
   {
    "nodeId": "277:27746",
@@ -15923,7 +15923,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "L-D S1: same door as 277:27516 (screen = the discarded Security draft's screen). Needs REQUESTS #11. Built, not compared."
+   "verifiedNote": "L-D S1: same door as 277:27516 (screen = the discarded Security draft's screen). Built, not compared. Settings side done (L-E, D-11): Brand ↗ calls requestBrandReturn(composer, {screen}) before opening Brand."
   },
   {
    "nodeId": "277:107940",
@@ -15933,7 +15933,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "L-D S1: same door as 277:27516. Needs REQUESTS #11. Built, not compared."
+   "verifiedNote": "L-D S1: same door as 277:27516. Built, not compared. Settings side done (L-E, D-11): Brand ↗ calls requestBrandReturn(composer, {screen}) before opening Brand."
   },
   {
    "nodeId": "277:336979",
@@ -18354,7 +18354,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "L-D S1: same door as 277:27516 (returns to Languages). Needs REQUESTS #11. Built, not compared."
+   "verifiedNote": "L-D S1: same door as 277:27516 (returns to Languages). Built, not compared. Settings side done (L-E, D-11): Brand ↗ calls requestBrandReturn(composer, {screen}) before opening Brand."
   },
   {
    "nodeId": "278:68065",
