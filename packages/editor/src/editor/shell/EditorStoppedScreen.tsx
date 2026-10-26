@@ -56,7 +56,7 @@ const EditorStoppedScreen: React.FC<{ code: string }> = ({ code }) => {
       data-testid="editor-stopped"
       className="tw:flex tw:h-screen tw:flex-col tw:items-center tw:justify-center tw:gap-3 tw:bg-[var(--bk-bg-panel)] tw:px-6 tw:text-center tw:text-[var(--bk-ink)] tw:[font-family:var(--bk-font-ui)]"
     >
-      <h2 id="editor-stopped-title" className="tw:m-0 tw:text-[18px] tw:font-semibold tw:leading-7">
+      <h2 id="editor-stopped-title" className="tw:m-0 tw:text-[16px] tw:font-semibold tw:leading-6">
         Something stopped the editor
       </h2>
       {unsaved ? (
