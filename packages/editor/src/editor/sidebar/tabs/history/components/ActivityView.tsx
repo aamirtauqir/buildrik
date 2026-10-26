@@ -60,6 +60,12 @@ function formatTime(ts: number): string {
 
 
 // Inline style objects hoisted so RowRenderer stays compact + stable identity.
+/* "Restore to here" sits at the row's right, shown on the hovered, focused or
+   j/k row (2L9 H01). */
+const RESTORE_BTN =
+  "tw:absolute tw:right-4 tw:top-2.5 tw:h-6 tw:min-h-0 tw:px-2 tw:invisible " +
+  "tw:group-hover:visible tw:group-focus-within:visible";
+
 const STYLE_DIFF_COUNT: React.CSSProperties = {
   marginLeft: 6,
   fontSize: 11,
@@ -409,7 +415,7 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
       const author = entry.userId?.trim() ? "you" : null;
 
       const rowClass = [
-        "entry-row",
+        "entry-row tw:group",
         isFocused && "focused",
         isExpanded && "expanded",
       ]
@@ -437,7 +443,7 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
               <div className="entry-label" data-testid={`history-change-label-${globalIndex}`}>
                 {entry.label}
               </div>
-              <div className="entry-meta">
+              <div className="entry-meta tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
                 <span className="entry-time" data-testid={`history-change-time-${globalIndex}`}>
                   {timeLabel}
                 </span>
@@ -449,7 +455,7 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
                     type="button"
                     color="light"
                     size="xs"
-                    className="entry-restore-btn tw:h-6 tw:min-h-0 tw:px-2"
+                    className={`entry-restore-btn ${RESTORE_BTN} ${isFocused ? "tw:visible" : ""}`}
                     aria-disabled="true"
                     onClick={(e) => e.stopPropagation()}
                     data-testid={`history-change-restore-${globalIndex}`}
@@ -464,7 +470,7 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
                   size="xs"
                   /* flowbite's Button is 40 tall; only a same-property
                      `tw:` utility survives twMerge (CLAUDE.md §Chrome). */
-                  className="entry-restore-btn tw:h-6 tw:min-h-0 tw:px-2"
+                  className={`entry-restore-btn ${RESTORE_BTN} ${isFocused ? "tw:visible" : ""}`}
                   onClick={(e) => {
                     e.stopPropagation();
                     requestRestore(entry.id);
@@ -625,7 +631,10 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
           </VariableSizeList>
         )}
       </div>
-      <p className="history-keys-hint" data-testid="history-keys-hint">
+      <p
+        className="tw:m-0 tw:border-t tw:border-[var(--bk-border)] tw:px-4 tw:py-2 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]"
+        data-testid="history-keys-hint"
+      >
         j / k to move · Enter to expand · Esc to collapse
       </p>
       {renderRestoreConfirm()}

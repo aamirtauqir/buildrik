@@ -275,25 +275,6 @@
   text-overflow: ellipsis;
 }
 
-.entry-meta {
-  font-size: 11px;
-  line-height: 16px;
-  color: var(--bk-ink-muted);
-}
-
-.entry-row .entry-restore-btn {
-  position: absolute;
-  right: var(--bk-space-16);
-  top: 10px;
-  visibility: hidden;
-}
-
-.entry-row:hover .entry-restore-btn,
-.entry-row.focused .entry-restore-btn,
-.entry-row:focus-within .entry-restore-btn {
-  visibility: visible;
-}
-
 .entry-time {
   font-family: var(--bk-font-mono);
   font-size: 11px;
@@ -301,15 +282,6 @@
   line-height: 16px;
   color: var(--bk-ink-muted);
   font-variant-numeric: tabular-nums;
-}
-
-.history-keys-hint {
-  margin: 0;
-  padding: var(--bk-space-8) var(--bk-space-16);
-  border-top: 1px solid var(--bk-border);
-  font-size: 11px;
-  line-height: 16px;
-  color: var(--bk-ink-muted);
 }
 
 .diff-preview {
