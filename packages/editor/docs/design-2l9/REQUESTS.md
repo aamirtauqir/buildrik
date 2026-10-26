@@ -19,6 +19,11 @@ Format: lane/task · file · change · board · why.
 
 ## Open — found on the live walk (2026-10-26)
 
+## Open — lane L-A (2026-10-26)
+
+10. **L-A · `shell/hooks/useBlockInsertion.ts:81-140`** · replace the inline smart-placement walk with `resolveInsertTarget(composer, def.elementType)` from `sidebar/tabs/build/insertTarget.ts` (same rules: selected container → end; text leaf → after it; Section's lone container slot; walk up; page root) · board 7:18981 · the Add panel's "Insert into Hero · At end" strip reads that resolver; until the hook calls it too there are two copies of one rule.
+11. **L-A · `shell/hooks/useBlockInsertion.ts` (insert toast)** · receipt copy "{Element} added to {Parent}" with the second line "Selected on canvas · Focus stays here" (and keep Undo) · boards 7:19448, 302:4542, 10:3787 · the receipt is raised in the lead-owned hook; the panel cannot set it.
+
 ## Closed
 
 9. ~~**L-A · canvas footer status** · the selection readout double-escapes HTML entities~~ · fixed in lane L-A: `getLayerPreview` (`panels/layers/data/layerUtils.ts`) decodes the stored HTML's entities once, so the footer readout and Layers row names print "Tom & Jerry". Test `layerUtils.test.ts › getLayerPreview`.

@@ -30,6 +30,9 @@ const renderTab = (props: Partial<BuildTabProps> = {}) =>
     </ToastProvider>,
   );
 
+/** Board 7:18981's three tabs — Elements · Blocks · Components. */
+const openTab = (name: "Elements" | "Blocks" | "Components") => fireEvent.click(screen.getByRole("tab", { name }));
+
 // The previous suite here asserted the PRE-board design — the "N blocks ·
 // N categories" subtitle, the BASIC/LAYOUT category rows, and a single-open
 // accordion. Board 137:2 carries none of them, and a test protecting removed
@@ -44,38 +47,44 @@ describe("BuildTab — board 137:2 taxonomy", () => {
 
   // TEMPLATES is OUT of Insert (founder, 2026-08-07) — templates own a full
   // flow (rail tab, Pages new-page, first-run) and never lived here.
-  /* Board 4428:140817 names the component groups by where they come from. */
-  it("renders the four source groups: ELEMENTS BLOCKS BUILT-IN COMPONENTS SAVED COMPONENTS — no TEMPLATES", () => {
+  /* design-2l9 board 7:18981 replaced the one long source list (137:2 /
+     4428:140817) with three tabs. Re-baseline: Add panel. */
+  it("draws the board's three tabs, Elements selected; Blocks and Components hold their own groups", () => {
     renderTab();
-    for (const label of ["ELEMENTS", "BLOCKS", "BUILT-IN COMPONENTS", "SAVED COMPONENTS"]) {
-      expect(screen.getByText(label)).toBeTruthy();
-    }
+    const tabs = screen.getAllByRole("tab").map((t) => t.textContent);
+    expect(tabs).toEqual(["Elements", "Blocks", "Components"]);
+    expect(screen.getByRole("tab", { name: "Elements" })).toHaveAttribute("aria-selected", "true");
+    expect(screen.queryByTestId("insert-group-blocks")).toBeNull();
+    openTab("Blocks");
+    expect(screen.getByTestId("insert-group-blocks")).toBeTruthy();
+    openTab("Components");
+    for (const label of ["BUILT-IN COMPONENTS", "SAVED COMPONENTS"]) expect(screen.getByText(label)).toBeTruthy();
     expect(screen.queryByText("TEMPLATES")).toBeNull();
   });
 
-  it("ELEMENTS is open by default (▾) with its rows mounted; BLOCKS is closed", () => {
+  it("Elements lists the catalog by category, open — \"Basic elements\" first", () => {
     renderTab();
-    expect(screen.getByTestId("insert-group-elements")).toHaveAttribute("aria-expanded", "true");
-    // A known element row is mounted…
-    expect(screen.getByText("Heading")).toBeTruthy();
-    // …and the closed BLOCKS group has no rows mounted.
-    expect(screen.getByTestId("insert-group-blocks")).toHaveAttribute("aria-expanded", "false");
+    const labels = Array.from(document.querySelectorAll('[data-testid^="insert-group-label-cat-"]')).map((e) => e.textContent);
+    expect(labels[0]).toBe("Basic elements");
+    expect(labels).toContain("Layout");
+    expect(screen.getByTestId("insert-group-cat-basic")).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByTestId("insert-el-Heading")).toBeTruthy();
     expect(screen.queryByTestId(/^insert-block-/)).toBeNull();
   });
 
-  it("groups toggle independently — opening BLOCKS keeps ELEMENTS open", () => {
+  it("groups fold independently — folding Layout keeps Basic elements open", () => {
     renderTab();
-    fireEvent.click(screen.getByTestId("insert-group-blocks"));
-    expect(screen.getByTestId("insert-group-blocks")).toHaveAttribute("aria-expanded", "true");
-    expect(screen.getByTestId("insert-group-elements")).toHaveAttribute("aria-expanded", "true");
-    // Scoped by testid: a BLOCK named "Heading" exists too once BLOCKS is open.
+    fireEvent.click(screen.getByTestId("insert-group-cat-layout"));
+    expect(screen.getByTestId("insert-group-cat-layout")).toHaveAttribute("aria-expanded", "false");
+    expect(screen.getByTestId("insert-group-cat-basic")).toHaveAttribute("aria-expanded", "true");
+    expect(screen.queryByTestId("insert-el-Section")).toBeNull();
     expect(screen.getByTestId("insert-el-Heading")).toBeTruthy();
   });
 
   it("clicking a BLOCKS row inserts through the same onBlockClick path elements use", () => {
     const onBlockClick = vi.fn();
     renderTab({ onBlockClick });
-    fireEvent.click(screen.getByTestId("insert-group-blocks"));
+    openTab("Blocks");
     const first = document.querySelector('[data-testid^="insert-block-"]') as HTMLElement;
     expect(first).toBeTruthy();
     fireEvent.click(first);
@@ -142,7 +151,7 @@ describe("BuildTab — SAVED COMPONENTS (G2-111)", () => {
   it("rows drag as a component id and draw a grip", () => {
     const { composer } = composerWith([{ id: "c1", name: "Menu card" }]);
     renderTab({ composer });
-    fireEvent.click(screen.getByTestId("insert-group-mine"));
+    openTab("Components");
     const row = screen.getByTestId("insert-mine-c1");
     expect(row).toHaveAttribute("draggable", "true");
     expect(screen.getByTestId("insert-row-grip-insert-mine-c1").textContent).toBe("⠿");
@@ -154,7 +163,7 @@ describe("BuildTab — SAVED COMPONENTS (G2-111)", () => {
   it("Manage components › opens the Components panel", () => {
     const { composer, emit } = composerWith([{ id: "c1", name: "Menu card" }]);
     renderTab({ composer });
-    fireEvent.click(screen.getByTestId("insert-group-mine"));
+    openTab("Components");
     fireEvent.click(screen.getByTestId("insert-mine-manage"));
     expect(emit).toHaveBeenCalledWith("ui:switch-tab", { tab: "components" });
   });
@@ -162,7 +171,7 @@ describe("BuildTab — SAVED COMPONENTS (G2-111)", () => {
   it("an empty group says how to save one", () => {
     const { composer } = composerWith([]);
     renderTab({ composer });
-    fireEvent.click(screen.getByTestId("insert-group-mine"));
+    openTab("Components");
     expect(screen.getByTestId("insert-mine-empty").textContent).toMatch(/No saved components yet/);
   });
 });
@@ -171,7 +180,7 @@ describe("BuildTab — SAVED COMPONENTS (G2-111)", () => {
    in the Element Picker modal). Recently inserted elements get a RECENT group
    (the modal's other list, kept; designer-notes). */
 describe("BuildTab — ★ FAVOURITES and RECENT (G2-115)", () => {
-  it("starring an element row adds a ★ FAVOURITES group above ELEMENTS, opened", () => {
+  it("starring an element row adds a ★ FAVOURITES group at the top of Elements, opened", () => {
     renderTab();
     expect(screen.queryByTestId("insert-group-favourites")).toBeNull();
     fireEvent.click(screen.getByTestId("insert-el-fav-Heading"));
@@ -189,8 +198,7 @@ describe("BuildTab — ★ FAVOURITES and RECENT (G2-115)", () => {
     renderTab({ onBlockClick });
     fireEvent.click(screen.getByTestId("insert-el-Heading"));
     expect(onBlockClick).toHaveBeenCalledTimes(1);
-    expect(screen.getByTestId("insert-group-recent")).toBeTruthy();
-    fireEvent.click(screen.getByTestId("insert-group-recent"));
+    expect(screen.getByTestId("insert-group-recent")).toHaveAttribute("aria-expanded", "true");
     fireEvent.click(screen.getByTestId("insert-recent-Heading"));
     expect(onBlockClick).toHaveBeenCalledTimes(2);
   });
@@ -201,8 +209,9 @@ describe("BuildTab — ✦ Generate a block with AI… (G2-117)", () => {
   const composer = () =>
     ({ on: vi.fn(), off: vi.fn(), emit: vi.fn(), selection: { getSelectedIds: () => [] }, elements: { getElement: () => null, getActivePage: () => ({ name: "Home", root: { id: "r" } }) } }) as never;
 
-  it("the row sits right above BLOCKS and opens the screen; ‹ Add returns", () => {
+  it("the row heads the Blocks tab and opens the screen; ‹ Add returns", () => {
     renderTab({ composer: composer() });
+    openTab("Blocks");
     const row = screen.getByTestId("insert-generate-block");
     expect(row.textContent).toBe("✦\u00a0\u00a0Generate a block with AI…");
     expect(row.nextElementSibling?.getAttribute("data-testid")).toBe("insert-section-blocks");
@@ -237,7 +246,7 @@ describe("BuildTab — block hover preview (4428:145110)", () => {
     vi.useFakeTimers();
     const onBlockClick = vi.fn();
     renderTab({ onBlockClick });
-    fireEvent.click(screen.getByTestId("insert-group-blocks"));
+    openTab("Blocks");
     fireEvent.mouseEnter(screen.getByTestId("insert-block-hero"));
     expect(screen.queryByTestId("insert-block-preview")).toBeNull();
     act(() => { vi.advanceTimersByTime(350); });
@@ -405,7 +414,7 @@ describe("BuildTab — search in its own field", () => {
    Brand colours and fonts." footnote (G2-110). The 40 rows that duplicated
    ELEMENTS are gone from the group (G2-107). */
 describe("BuildTab — BLOCKS as section cards (board 4428:140817)", () => {
-  const openBlocks = () => fireEvent.click(screen.getByTestId("insert-group-blocks"));
+  const openBlocks = () => openTab("Blocks");
 
   it("lists the registry's sections and nothing that duplicates an element", () => {
     renderTab();
@@ -462,6 +471,7 @@ describe("BuildTab — a BLOCKS request made before the panel mounts", () => {
         <BuildTab composer={composer as never} onBlockClick={vi.fn()} />
       </ToastProvider>,
     );
+    expect(screen.getByRole("tab", { name: "Blocks" })).toHaveAttribute("aria-selected", "true");
     expect(screen.getByTestId("insert-group-blocks")).toHaveAttribute("aria-expanded", "true");
     expect(composer.emit).toHaveBeenCalledWith("ui:insert-open-group", { group: "blocks" });
   });
@@ -481,11 +491,11 @@ describe("BuildTab — a BLOCKS request made before the panel mounts", () => {
       </ToastProvider>,
     );
     Element.prototype.scrollIntoView = orig;
-    expect(screen.getByTestId("insert-group-elements")).toHaveAttribute("aria-expanded", "false");
+    expect(screen.queryByTestId("insert-group-cat-basic")).toBeNull();
     expect(scrolled).toContain("insert-section-blocks");
   });
 
-  it("the request is consumed once — the next mount is back to ELEMENTS only", () => {
+  it("the request is consumed once — the next mount is back on Elements", () => {
     const composer = { on: vi.fn(), off: vi.fn(), emit: vi.fn(), selection: { getSelectedIds: () => [], getSelected: () => null, getAllSelected: () => [] }, elements: { getElement: () => null, getActivePage: () => null } };
     requestInsertGroup(composer as never, "blocks");
     const first = render(
@@ -499,7 +509,8 @@ describe("BuildTab — a BLOCKS request made before the panel mounts", () => {
         <BuildTab composer={composer as never} onBlockClick={vi.fn()} />
       </ToastProvider>,
     );
-    expect(screen.getByTestId("insert-group-blocks")).toHaveAttribute("aria-expanded", "false");
+    expect(screen.getByRole("tab", { name: "Elements" })).toHaveAttribute("aria-selected", "true");
+    expect(screen.queryByTestId("insert-group-blocks")).toBeNull();
   });
 });
 
@@ -508,7 +519,7 @@ describe("BuildTab — a BLOCKS request made before the panel mounts", () => {
 describe("BuildTab — BLOCKS to board 4428:140817", () => {
   it("lists the board's 8 blocks in order, two columns", () => {
     renderTab();
-    fireEvent.click(screen.getByTestId("insert-group-blocks"));
+    openTab("Blocks");
     expect(screen.getByTestId("insert-group-count-blocks").textContent).toBe("8");
     const labels = Array.from(document.querySelectorAll('[data-testid^="insert-block-label-"]')).map((e) => e.textContent);
     expect(labels).toEqual(["Hero", "Features", "Menu grid", "Testimonials", "CTA", "Contact", "Footer", "Navbar"]);
@@ -516,3 +527,51 @@ describe("BuildTab — BLOCKS to board 4428:140817", () => {
   });
 });
 
+
+/* Boards 7:18981 / 302:3965: the strip says where a click lands before it is
+   clicked — the same smart-placement rule useBlockInsertion applies. */
+describe("BuildTab — insert target strip (board 7:18981)", () => {
+  const el = (id: string, type: string, parent: unknown, kids: unknown[] = [], name?: string) => {
+    const node = {
+      getId: () => id,
+      getType: () => type,
+      getParent: () => parent,
+      getChildren: () => kids,
+      getChildCount: () => kids.length,
+      getCustomData: (k: string) => (k === "layerName" ? name : undefined),
+    };
+    return node;
+  };
+  const composerWith = (selectedId: string | null) => {
+    const root = el("root", "container", null);
+    const hero = el("hero", "section", root, [], "Hero");
+    const heading = el("h1", "heading", hero, [], "Headline");
+    const kids = [heading];
+    Object.assign(hero, { getChildren: () => kids, getChildCount: () => kids.length });
+    Object.assign(root, { getChildren: () => [hero], getChildCount: () => 1 });
+    const byId: Record<string, unknown> = { root, hero, h1: heading };
+    return {
+      on: vi.fn(), off: vi.fn(), emit: vi.fn(),
+      selection: { getSelectedIds: () => (selectedId ? [selectedId] : []) },
+      elements: { getActivePage: () => ({ name: "Home", root: { id: "root" } }), getElement: (id: string) => byId[id] },
+    } as never;
+  };
+
+  it("a selected container takes the insert at its end", () => {
+    renderTab({ composer: composerWith("hero") });
+    expect(screen.getByTestId("add-insert-target-name").textContent).toBe("Insert into Hero");
+    expect(screen.getByTestId("add-insert-target-path").textContent).toBe("Home / Hero · At end");
+  });
+
+  it("a selected text element is never the target — the insert goes after it", () => {
+    renderTab({ composer: composerWith("h1") });
+    expect(screen.getByTestId("add-insert-target-name").textContent).toBe("Insert into Hero");
+    expect(screen.getByTestId("add-insert-target-path").textContent).toBe("Home / Hero · after Headline");
+  });
+
+  it("nothing selected: the page, at the end", () => {
+    renderTab({ composer: composerWith(null) });
+    expect(screen.getByTestId("add-insert-target-name").textContent).toBe("Insert into Home");
+    expect(screen.getByTestId("add-insert-target-path").textContent).toBe("Home · At end");
+  });
+});

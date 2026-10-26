@@ -329,7 +329,9 @@ const ElementRows: React.FC<{
 /** Groups that list element rows. Their test ids are literal templates on
  *  the declaring lines so the conformance anchor check can see them. */
 type ElementRowGroup = "favourites" | "recent" | "elements";
-const isElementRowGroup = (id: InsertGroup["id"]): id is ElementRowGroup => id === "favourites" || id === "recent" || id === "elements";
+/* An Elements-tab category group ("cat-basic") lists element rows as ELEMENTS does. */
+const elementRowGroup = (id: InsertGroup["id"]): ElementRowGroup | null =>
+  id === "favourites" || id === "recent" || id === "elements" ? id : id.startsWith("cat-") ? "elements" : null;
 const elRowTestId = (g: ElementRowGroup, n: string) => (g === "favourites" ? `insert-fav-${n}` : g === "recent" ? `insert-recent-${n}` : `insert-el-${n}`);
 const elFavTestId = (g: ElementRowGroup, n: string) => (g === "favourites" ? `insert-fav-fav-${n}` : g === "recent" ? `insert-recent-fav-${n}` : `insert-el-fav-${n}`);
 
@@ -432,9 +434,9 @@ export const GroupSection: React.FC<GroupSectionProps> = ({
 }) => (
   <div data-testid={`insert-section-${group.id}`}>
     <HeaderRow group={group} isOpen={isOpen} onToggle={onToggle} />
-    {isOpen && isElementRowGroup(group.id) && elements && (
+    {isOpen && elementRowGroup(group.id) && elements && (
       <ElementRows
-        group={group.id}
+        group={elementRowGroup(group.id) ?? "elements"}
         elements={elements}
         favs={favs}
         onToggleFav={onToggleFav}
