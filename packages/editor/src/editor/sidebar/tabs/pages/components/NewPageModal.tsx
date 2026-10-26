@@ -78,7 +78,8 @@ export function NewPageModal({ composer }: { composer: Composer | null }) {
       pageId = composer.elements.createPage(trimmed).id;
     } catch (err) {
       console.error("[pages] create page failed", err);
-      setError("Couldn't add page right now. Try again.");
+      /* design-2l9 board 101:40412. */
+      setError(`Couldn’t create ${trimmed}. Nothing was changed. Try again.`);
       return;
     }
     if (addToNav) composer.elements.addPageToNavigation(pageId);
@@ -121,7 +122,7 @@ export function NewPageModal({ composer }: { composer: Composer | null }) {
             Cancel
           </Button>
           <Button size="xs" data-testid="new-page-create" disabled={!name.trim()} onClick={create}>
-            Create page
+            {error ? "Try again" : "Create page"}
           </Button>
         </>
       }
@@ -149,9 +150,15 @@ export function NewPageModal({ composer }: { composer: Composer | null }) {
               setError(null);
             }}
           />
+          {/* design-2l9 board 101:37542. */}
+          {!name.trim() && (
+            <span className="tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-error-text)]" data-testid="new-page-name-missing">
+              Name the page
+            </span>
+          )}
         </div>
         <div className="tw:flex tw:gap-4" role="radiogroup" aria-label="Start from">
-          {card("blank", <Square size={20} aria-hidden />, "Blank", "Empty canvas")}
+          {card("blank", <Square size={20} aria-hidden />, "Blank", "Start with an empty page.")}
           {card("template", <Grid3x3 size={20} aria-hidden />, "From template", `Pick from ${layoutCount} layouts`)}
         </div>
         <div className="tw:flex tw:items-center tw:gap-2">

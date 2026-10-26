@@ -677,7 +677,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code Blank/From template cards; board 'Fieldwork Studio · Create a page', source select, 'Choose template', '6 of 10 pages on Free'"
+   "verifiedNote": "L-A S10: Blank card hint 'Start with an empty page.' adopted. Still open: '{Site} · Create a page' subtitle, source select / 'Choose template', and the plan capacity line (needs a capacity source — sub-plan S13). Not compared."
   },
   {
    "nodeId": "101:36828",
@@ -698,7 +698,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Validation copy 'Name the page' differs"
+   "verifiedNote": "L-A S10 built, not compared: empty name shows 'Name the page' (Create stays disabled)."
   },
   {
    "nodeId": "101:38257",
@@ -738,7 +738,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code 'Couldn't add page right now. Try again.'; board 'Couldn’t create Services. Nothing was changed.'"
+   "verifiedNote": "L-A S10 built, not compared: 'Couldn’t create {Page}. Nothing was changed. Try again.' and the primary reads 'Try again'."
   },
   {
    "nodeId": "101:41127",
