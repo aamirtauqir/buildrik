@@ -132,6 +132,18 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value: ownValue, onChang
     return primaryFamily(value) || value;
   }, [value, uploadedFonts, field.mixed]);
 
+  /* 2L9 R01: where the family comes from, beside its name ("Inter · System"),
+     and the stack the element actually writes under the row. */
+  const source =
+    field.mixed || !value || value === "inherit" || /^var\(/.test(value)
+      ? null
+      : uploaded
+        ? "Uploaded"
+        : SYSTEM_FONTS.some((f) => f.value === value)
+          ? "System"
+          : "Google Fonts";
+  const stack = ownValue && !field.mixed && ownValue.includes(",") ? ownValue.replace(/'/g, "") : null;
+
   return (
     /* Board 1 reads "Font  [Inter]" — one row, label left, the same column
        every other row uses. It used to stack a "Font Family"
@@ -163,10 +175,18 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value: ownValue, onChang
         className="bdi-ddn tw:justify-between tw:text-left"
         style={{ fontFamily: field.mixed ? "inherit" : value || "inherit" }}
       >
-        <span className={field.mixed ? "tw:text-[var(--bk-ink-muted)]" : undefined}>{currentFontName}</span>
+        <span className={"tw:min-w-0 tw:truncate" + (field.mixed ? " tw:text-[var(--bk-ink-muted)]" : "")}>
+          {currentFontName}
+          {source ? <span className="tw:text-[var(--bk-ink-muted)] tw:[font-family:var(--bk-font-ui)]" data-testid="font-source"> · {source}</span> : null}
+        </span>
         {/* The field chevron every other select in the column draws. */}
         <ChevronDown size={12} aria-hidden="true" className="tw:flex-none tw:text-[var(--bk-ink-muted)]" />
       </Button>
+      {stack ? (
+        <p className="tw:col-span-full tw:m-0 tw:pb-1 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="font-applied-stack">
+          Applied stack: {stack}
+        </p>
+      ) : null}
       {/* Font Picker Dropdown */}
       {showFontPicker && (
         <FontPickerPanel

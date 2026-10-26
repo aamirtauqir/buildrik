@@ -5121,7 +5121,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Board \"Inter · System\" source label + \"Applied stack\"; code family name only"
+   "verifiedNote": "Lane L-B F1 (built, not compared — copy checked against the dump): the Font field reads '{family} · {source}' (System / Google Fonts / Uploaded) and the row adds 'Applied stack: {stack}' for a written stack. Open: 'Choose font' label on the trigger."
   },
   {
    "nodeId": "247:31047",
@@ -5352,7 +5352,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Board \"Inter · System\" source label + \"Applied stack\"; code family name only",
+   "verifiedNote": "Lane L-B F1 (built, not compared): source-aware font field — see 247:30567.",
    "inheritsFrom": "247:30567"
   },
   {
