@@ -7728,7 +7728,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "probe-compared 2026-10-27: Keep editing is the filled primary, Discard changes / Save and leave outlined, dialog 480 wide, copy matches. Open: dialog sits viewport-centred (board top ≈280) and its title is 20px vs board ≈16 — both chrome-ui Modal (REQUESTS C-16).",
+   "verifiedNote": "lead4 2026-10-27: C-16 closed in chrome-ui (ebb468e88) — Modal title 16/24, frame top at 31vh (279 on 900, probe-measured in tpl-replace-confirm / lf-session-dialog); this board not re-probed. | probe-compared 2026-10-27: Keep editing is the filled primary, Discard changes / Save and leave outlined, dialog 480 wide, copy matches. Open: dialog sits viewport-centred (board top ≈280) and its title is 20px vs board ≈16 — both chrome-ui Modal (REQUESTS C-16).",
    "tier": "P1"
   },
   {
@@ -8335,7 +8335,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "probe-compared 2026-10-27: Keep editing is the filled primary, Discard changes / Save and leave outlined, dialog 480 wide, copy matches. Open: dialog sits viewport-centred (board top ≈280) and its title is 20px vs board ≈16 — both chrome-ui Modal (REQUESTS C-16).",
+   "verifiedNote": "lead4 2026-10-27: C-16 closed in chrome-ui (ebb468e88) — Modal title 16/24, frame top at 31vh (279 on 900); this board not re-probed. | probe-compared 2026-10-27: Keep editing is the filled primary, Discard changes / Save and leave outlined, dialog 480 wide, copy matches. Open: dialog sits viewport-centred (board top ≈280) and its title is 20px vs board ≈16 — both chrome-ui Modal (REQUESTS C-16).",
    "tier": "P2"
   },
   {
@@ -11360,7 +11360,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "probe-compared 2026-10-27 (tpl-replace-confirm): 720 wide, title/body/checkbox/CTA copy = board for a template with its own colours; a template written on Brand tokens says it uses the site's Brand (code: resolveTokens). Open: Modal title 20 vs ≈16 and vertical placement (REQUESTS C-16); Templates as an in-place resource area (REQUESTS C-17).",
+   "verifiedNote": "lead4 2026-10-27: tpl-replace-confirm re-probed after C-16 (ebb468e88): frame 720×214 at x360 y279 (board 720×211 at y280), title 16/24 — title and placement closed; C-17 mount remains. | probe-compared 2026-10-27 (tpl-replace-confirm): 720 wide, title/body/checkbox/CTA copy = board for a template with its own colours; a template written on Brand tokens says it uses the site's Brand (code: resolveTokens). Open: Modal title 20 vs ≈16 and vertical placement (REQUESTS C-16); Templates as an in-place resource area (REQUESTS C-17).",
    "tier": "P2"
   },
   {
@@ -12181,7 +12181,7 @@
    "status": "active",
    "authority": "code:no-restore-yet",
    "verified": "drift-open",
-   "verifiedNote": "probe-compared 2026-10-27: 720 wide, 'Delete {field}?', count sentence, 'Type N to confirm' over a 28 filled input, Cancel 96 / Delete field; no breadcrumb or callout. Copy keeps 'This cannot be undone.' — the board's 30-day Recently deleted waits on the restore server slice. Open: Modal title size / placement (REQUESTS C-16).",
+   "verifiedNote": "lead4 2026-10-27: C-16 title 16/24 closed (ebb468e88); this board draws its tall dialog at top ≈128 while the 2L9 dialogs at large sit at 280 — chrome-ui places every dialog at 31vh (shrinking only when it would not fit), not re-probed. | probe-compared 2026-10-27: 720 wide, 'Delete {field}?', count sentence, 'Type N to confirm' over a 28 filled input, Cancel 96 / Delete field; no breadcrumb or callout. Copy keeps 'This cannot be undone.' — the board's 30-day Recently deleted waits on the restore server slice. Open: Modal title size / placement (REQUESTS C-16).",
    "tier": "P2"
   },
   {
@@ -21848,8 +21848,8 @@
    "family": "recovery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "probe-compared 2026-10-27 (lf-session-dialog): dialog 480×176 (board 480×176), title 16/24, body 13/20, Keep editing 112 · Try saving again 136 · Sign in ↗ 107 (board ≈111/137/108), 120 below the top — match; the save-failed strip now sits under the scrim (z-40) and is dimmed. Open: chrome-ui centres dialogs (top 362), the board puts them at top 280 (REQUESTS F-24).",
+   "verified": "drift-fixed",
+   "verifiedNote": "lead4 2026-10-27 re-probed lf-session-dialog after C-16/F-24 (ebb468e88): frame 480×176 at x480 y279 (board 480×176 at y280), title 16px — the open position item is closed. | probe-compared 2026-10-27 (lf-session-dialog): dialog 480×176 (board 480×176), title 16/24, body 13/20, Keep editing 112 · Try saving again 136 · Sign in ↗ 107 (board ≈111/137/108), 120 below the top — match; the save-failed strip now sits under the scrim (z-40) and is dimmed. Open: chrome-ui centres dialogs (top 362), the board puts them at top 280 (REQUESTS F-24).",
    "tier": "P2"
   },
   {
@@ -21968,9 +21968,9 @@
    "page": "07",
    "family": "recovery",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "probe-compared 2026-10-27 (lf-conflict, board PNG fetched): dialog 720×156 (board 720×156), title 16/24, body one line 13/20, Overwrite… 652/107 · Download a copy 767/141 · Reload latest… 916/140 filled (board 648/111 · 768/145 · 920/136) — match; Overwrite… now a bordered button, not a quiet link. Open: vertical position (chrome-ui centres at y372, board y280 — F-24); body names no author (code:conflict-no-author).",
+   "authority": "code:conflict-no-author",
+   "verified": "drift-fixed",
+   "verifiedNote": "lead4 2026-10-27 re-probed lf-conflict after C-16/F-24 (ebb468e88): frame 720×156 at x360 y279 (board y280), title 16px — position closed; the remaining no-author line is code authority. | probe-compared 2026-10-27 (lf-conflict, board PNG fetched): dialog 720×156 (board 720×156), title 16/24, body one line 13/20, Overwrite… 652/107 · Download a copy 767/141 · Reload latest… 916/140 filled (board 648/111 · 768/145 · 920/136) — match; Overwrite… now a bordered button, not a quiet link. Open: vertical position (chrome-ui centres at y372, board y280 — F-24); body names no author (code:conflict-no-author).",
    "tier": "P2"
   },
   {
