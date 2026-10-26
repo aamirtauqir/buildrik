@@ -1,0 +1,86 @@
+[
+ {
+  "nodeId": "7:18654",
+  "name": "J-F1.01 · Open existing Home",
+  "family": "editor",
+  "shot": "shots/7-18654.png",
+  "note": "Compared live 2026-10-26 (editor-inspector): DRIFT — Canvas bar at bottom y823 (board top y56-98), no device toggles; bottom bar lacks 'Saved · Details'. Container Content: Tag/ID only, no 'Container content' note or 'N child elements'. | prior: L-A S3 built, not compared: canvas bar 'Parent / Element' readout left (type + W × H in its tooltip), then '{width} px' (Page width popover), '{zoom}%', 'View' — no carets. Undo left in Phase 1. Copy unit-tested; geometry not compared."
+ },
+ {
+  "nodeId": "63:6393",
+  "name": "B3-P01 · Pages / manage without switching",
+  "family": "editor",
+  "shot": "shots/63-6393.png",
+  "note": "Compared live 2026-10-26 (editor-inspector): DRIFT — Rows lack path line (/, /about) and 'Current' tag; legend pinned to panel bottom (board under list); footer one row '+ Add page · From template · ⋯' vs full-width button + 2nd row. | prior: L-A S5 built, not compared: title 'Pages · {n}', Pages · Listings · Structure tabs under the search, root pages first, 'My folders · Only visible to you' (own tree), 'Collection pages' rows ({name}, '{pattern} · {n} pages', Open page → template page, Manage in CMS → CMS dynamic pages), legend '● mar"
+ },
+ {
+  "nodeId": "63:13820",
+  "name": "B3-P02 · About / page actions",
+  "family": "editor",
+  "shot": "shots/63-13820.png",
+  "note": "Compared live 2026-10-26 (editor-inspector): DRIFT — Menu 278 wide anchored at row (board 280) ok; adds 'Move to folder…', shortcuts and a disabled-reason line; 'Page settings' lacks '›'. | prior: L-A S6 built; menu widened to the board's 280 after a probe screenshot showed 'Replace layout with template…' wrapping at 224 (probe case pages-context-menu, port 5171, looked at by eye; board geometry not otherwise compared). Row order RTL-tested."
+ },
+ {
+  "nodeId": "63:15939",
+  "name": "B3-P05 · Page settings / SEO",
+  "family": "editor",
+  "shot": "shots/63-15939.png",
+  "note": "Compared live 2026-10-26 (editor-inspector): DRIFT — Modal 560×520 vs board 720×700; field order differs: URL slug first, Google preview last (board: preview + score first, then title, description, URL); SEO tab shows score badge. | prior: L-A S9 built, not compared: title '{Page} · Page settings', subtitle 'Editing {Page} · {Active} stays open on the canvas', foot Cancel · Save, override note 'These overrides affect this page only. Clear the title to use site defaults.'. Container stays the drawer (blocked:owner-page-settings-contain"
+ },
+ {
+  "nodeId": "67:11915",
+  "name": "B3-P25 · Home retained / page renamed",
+  "family": "editor",
+  "shot": "shots/67-11915.png",
+  "note": "Compared live 2026-10-26 (editor-inspector): DRIFT — Text Style tab: no Placement section; Typography adds Text style/Applied stack, Weight+Line height stacked not 2-col, Align as words; Spacing open box-model vs '2 set' row. | prior: Inherits the base canvas bar (7:18654), rebuilt by L-A S3; not compared."
+ },
+ {
+  "nodeId": "101:29978",
+  "name": "B3-P54 · New page / choose source",
+  "family": "editor",
+  "shot": "shots/101-29978.png",
+  "note": "Compared live 2026-10-26 (editor-inspector): DRIFT — Same 640 width, copy and '2 of 10 pages on Free' ok; no '{Site} · Create a page' subtitle; source as two 124px cards (board segmented pill), nav as toggle not checkbox. | prior: L-A wave 2 built, not compared: capacity line '{n} of {limit} pages on {Plan}' (billing.pagesPerSite added to siteDetail.settingsOverview through the full chain — shared schema, site-detail.service, test; the same limit saveProjectData enforces), From template note 'Choose a page template before cre"
+ },
+ {
+  "nodeId": "145:65011",
+  "name": "B3-C02 · Canvas / grid size and snap off",
+  "family": "editor",
+  "shot": "shots/145-65011.png",
+  "note": "Compared live 2026-10-26 (editor-inspector): DRIFT — Centered 480px modal (board: popover under View, ~360 wide, top-right of canvas, 'Close' link). Size input inline with presets (board own row). Copy matches. | prior: L-A S4 built, not compared: 'Grid and snapping' dialog — footnote, 'Show grid and snap' switch (grid overlay drives snap in Canvas.tsx), Grid size + 4/8/16 px, 'Whole number · 1–100 px', Cancel/Apply; draft until Apply."
+ },
+ {
+  "nodeId": "145:72343",
+  "name": "Return · Canvas / View menu",
+  "family": "editor",
+  "shot": "shots/145-72343.png",
+  "note": "Compared live 2026-10-26 (editor-inspector): DRIFT — Text Content: board textarea + B I U link + 'Changes save automatically.'; live 'Edit text on canvas' + one-line value with bind icon; no Editing state row; ID empty placeholder. | prior: Inherits the base canvas bar (7:18654), rebuilt by L-A S3; not compared."
+ },
+ {
+  "nodeId": "147:75914",
+  "name": "B3-L01 · Layers / stable tool with selection footer",
+  "family": "editor",
+  "shot": "shots/147-75914.png",
+  "note": "Compared live 2026-10-26 (editor-inspector): DRIFT — Footer copy matches ('575 layers · 1 selected') but adds 'Select' + info icon; no 'View' button beside search; no page-root 'Home' row with ⋯. | prior: L-A S2 built, not compared: footer '{N} layers · {K} selected' (layersFooterText, unit-tested against the board copy). Geometry not compared."
+ },
+ {
+  "nodeId": "147:76329",
+  "name": "B3-L02 · Layers / personal display preferences",
+  "family": "editor",
+  "shot": "shots/147-76329.png",
+  "note": "Compared live 2026-10-26 (editor-inspector): DRIFT — Popover lists same 5 toggles + footnote, but title 'Display' (board 'Layer display'), no Close button; opened via ⋯ › Display settings… not header 'View'. | prior: L-A S2 built, not compared: footnote 'Personal editor view. Live-site visibility is edited in the Inspector.' under the five toggles. The board opens it from a header 'View' control; the code keeps ⋯ › Display settings… (not moved)."
+ },
+ {
+  "nodeId": "147:77189",
+  "name": "B3-L04 · Layers / search results with parent paths",
+  "family": "editor",
+  "shot": "shots/147-77189.png",
+  "note": "Compared live 2026-10-26 (editor-inspector): DRIFT — Footer '575 layers · 11 matches' ok. Parent shown right-aligned one word ('Container') not path line under name; no '{n} matches in {N} layers' head, no end 'Clear search'. | prior: L-A wave 2 built, not compared: flat search results carry their ancestors ('Services › Card 1') after the name; footer '5,000 layers · 12 matches'. The board's list-head '12 matches in 5,000 layers' line and end-of-list Clear search are not drawn (Clear search sits in the field)."
+ },
+ {
+  "nodeId": "558:448976",
+  "name": "Overlay · Page switcher / B3-P28",
+  "family": "editor",
+  "shot": "shots/558-448976.png",
+  "note": "Compared live 2026-10-26 (editor-inspector): DRIFT — 260 wide ok; adds search field, 'Add page' row and ✓ on current; paths inline after name (board right-aligned); 'Manage pages ›' dark not blue; header no '+ N template'. | prior: phase1 (Task 1.3): Shell/PageSwitcherMenu not built; PageTabBar tabs today. ⌘P copy → code:shortcut-cmd-p-is-preview"
+ }
+]

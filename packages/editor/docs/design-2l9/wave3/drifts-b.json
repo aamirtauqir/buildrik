@@ -1,0 +1,86 @@
+[
+ {
+  "nodeId": "156:716",
+  "name": "B4-F01 · Contact form / canonical child list",
+  "family": "inspector",
+  "shot": "shots/156-716.png",
+  "note": "Compared live 2026-10-26 (editor-inspector): DRIFT — Field rows one line 'name · Type' + drag/›/⋯ (board 2-line name/summary); '+ Add field' right link (board full-width button); Semantics expanded, no Conditions row; no breadcrumb line. | prior: Lane L-B A1+A5 (built; copy checked against the dump, no board image): Fields on Content; each field row has a ⋯ menu (Move up / Move down / Delete — the field moves and goes with its label wrapper) and the list ends with '+ Add field' and 'Drag to reorder, or use a field’s menu.'. Open: row layout "
+ },
+ {
+  "nodeId": "156:1316",
+  "name": "B4-F02 · Email field / label, placeholder and submission key",
+  "family": "inspector",
+  "shot": "shots/156-1316.png",
+  "note": "Compared live 2026-10-26 (editor-inspector): DRIFT — Drill-in keeps form selected (header 'Form', board 'Email'); '‹ Form' left not centered; 'FIELD' uppercase; no Validation row; Semantics shows form's. Radio field used (no email field on QA site). | prior: Lane L-B A3 (built, not compared — no board image in the dump; copy and row order checked against the dump text): drill-in reads '‹ {form}' · Field · Type · Label · Placeholder · Name + 'Name is the key stored with each submission.' · Required · Default value · Validation (min/max length or min/max)"
+ },
+ {
+  "nodeId": "156:6055",
+  "name": "B4-F10 · Form delivery / Admin configuration",
+  "family": "inspector",
+  "shot": "shots/156-6055.png",
+  "note": "Compared live 2026-10-26 (editor-inspector): DRIFT — Sections/copy match; headings 'NOTIFICATIONS' etc uppercase and cramped; header 'Behavior · Form' (board 'Form settings · This form'); Visibility/Interactions expanded (board collapsed rows). | prior: Lane L-B A6 (built; copy checked against the dump, no board image): After submit · Then · Message · Notifications › Send to · Spam protection 'Applies on next publish' › 'Block automated submissions' · Form settings status 'Saved' · 'Saved separately from page edits; outside document Undo.'. The boa"
+ },
+ {
+  "nodeId": "161:13919",
+  "name": "B4-I12 · Text / device visibility and interactions",
+  "family": "inspector",
+  "shot": "shots/161-13919.png",
+  "note": "Compared live 2026-10-26 (editor-inspector): DRIFT — Copy/order ok; no '… › Hero › Text' breadcrumb; device checkboxes in one row (board stacked); no 'Data conditions' note; '+ Add interaction' right link not full-width button; extra CSS classes. | prior: Lane L-B A1+A7 (built; copy and order checked against the dump, no board image): Behavior tab · Visibility 'Show on these devices' Desktop/Tablet/Mobile · Interactions 'Plays on all breakpoints' · '+ Add interaction' · 'No interactions yet.'. Not drawn: 'Data conditions: Content › Conditions — both "
+ },
+ {
+  "nodeId": "161:14772",
+  "name": "B4-I14 · Interactions / presets first",
+  "family": "inspector",
+  "shot": "shots/161-14772.png",
+  "note": "Compared live 2026-10-26 (editor-inspector): DRIFT — Back link, title and 7 presets in board order match; 'Choose a trigger' / 'Plays when rendered (CSS)' are chevron rows not bordered/centered buttons; extra CSS classes section. | prior: Lane L-B A7b (built, not compared — copy checked against the dump): '+ Add interaction' opens a screen replacing the list — '‹ Back to Interactions', 'Add interaction', the seven presets in board order (each = trigger + animation preset of the existing model), 'Choose a trigger ›' (all triggers, gro"
+ },
+ {
+  "nodeId": "161:15179",
+  "name": "B4-I15 · Interaction / Fade in on scroll",
+  "family": "inspector",
+  "shot": "shots/161-15179.png",
+  "note": "Compared live 2026-10-26 (editor-inspector): DRIFT — No Animate/Repeat/When rows; 40px flowbite fields stacked vs compact label|value rows; duration 0.3 (board 0.6), Easing 'Select...'; no 'Interaction added · Undo' toast; Visibility still shown. | prior: Lane L-B A7c (built, not compared — copy checked against the dump): '‹ Back to Interactions', 'Play', 'More…', Trigger, Effect, Duration, Delay, Easing, 'Plays on all breakpoints'. Open: Animate (target), Repeat, When rows (the model's loop/target semantics are not surfaced yet), 'Interaction added "
+ },
+ {
+  "nodeId": "165:17822",
+  "name": "B4-I20 · Interaction / contextual commands",
+  "family": "inspector",
+  "shot": "shots/165-17822.png",
+  "note": "Compared live 2026-10-26 (editor-inspector): DRIFT — Menu has Duplicate/Disable/Delete but no 'Interaction actions' title or 'Close menu'; 218px dropdown under More… (board ~240 card left of inspector over canvas). | prior: Lane L-B A7c (built, not compared): More… opens 'Interaction actions' — Duplicate (copy after the original, opened), Disable / Enable, Delete."
+ },
+ {
+  "nodeId": "165:18662",
+  "name": "B4-I22 · Interaction / deleted with exact undo",
+  "family": "inspector",
+  "shot": "shots/165-18662.png",
+  "note": "Compared live 2026-10-26 (editor-inspector): DRIFT — List returns to 'No interactions yet.' correctly, but no 'Interaction deleted · Undo' toast (readToasts empty). | prior: Lane L-B A7 (built, not compared): after deleting the last interaction the list reads 'No interactions yet.'. Open: 'Interaction deleted · Undo' receipt (needs a toast route that works without a provider in the section's tests — A7b)."
+ },
+ {
+  "nodeId": "302:12190",
+  "name": "PLAY · F2.02 · Choose source",
+  "family": "play",
+  "shot": "shots/302-12190.png",
+  "note": "Compared live 2026-10-26 (editor-inspector): DRIFT — Opened via 'Bind text…' on a static page (no template page on QA site, so no 'This page's record'). Popover inside inspector, no ×; Site/Page tagged 'Planned' (board selectable). | prior: Lane L-B C-13 (built, not compared — copy checked against the dump): the type block's bindable property row has a Bind button that opens 'Choose source' — search 'Search sources or fields…', RECORD DATA (This page’s record · {Collection} on its template page, List item — off with 'Select an element "
+ },
+ {
+  "nodeId": "302:13946",
+  "name": "PLAY · F2.05 · Binding details",
+  "family": "play",
+  "shot": "shots/302-13946.png",
+  "note": "Compared live 2026-10-26 (editor-inspector): DRIFT — No live screenshot (overwritten when the Blog collection vanished). DOM read: binding shows inline (chip 'Blog.title', 'Dynamic bindings · 1 binding', 'Blog · title') — no binding detail screen. | prior: Lane L-B C-13 (built, not compared): binding detail replaces the Content tab — '‹ Back to Content', '{Property} binding', Source + Change…, context line, Record (specific record only), Format 'As written', If empty (stored as the binding's fallback), Preview, 'Open record ›' (C-11 origin '{element} "
+ },
+ {
+  "nodeId": "302:15235",
+  "name": "PLAY · F2.08 · Leave draft guard",
+  "family": "play",
+  "shot": "shots/302-15235.png",
+  "note": "Compared live 2026-10-26 (editor-inspector): DRIFT — Dialog 560 (board 640); body 'X has unsaved record edits.' not 'Your destination is …'; primary is Save and leave (board: Keep editing). Sheet: tabs under back link, no preview pane. | prior: built, not compared — L-C C1: \"Leave without saving?\" names the record / destination tab or collection; Keep editing · Discard changes · Save and leave (RecordSheet.tsx). Origin label (\"Your destination is …\") waits on C2."
+ },
+ {
+  "nodeId": "302:15605",
+  "name": "PLAY · F2.09 · Save and return pending",
+  "family": "play",
+  "shot": "shots/302-15605.png",
+  "note": "Compared live 2026-10-26 (editor-inspector): DRIFT — Pending copy matches ('Saving record…', footer 'Saving…', 'Stay here', disabled 'Saving…'), but header shows it inline before title; sheet lacks preview pane and board's field layout. | prior: built, not compared — L-C C1: Save and leave shows \"Saving record…\" + Saving… + Stay here; success takes the chosen way out (RecordSheet.tsx)."
+ }
+]

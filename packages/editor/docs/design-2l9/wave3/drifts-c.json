@@ -1,0 +1,142 @@
+[
+ {
+  "nodeId": "165:2",
+  "name": "B5-C01 · CMS / Blog records at scale",
+  "family": "cms",
+  "shot": "shots/165-2.png",
+  "note": "Compared live 2026-10-26 (cms-brand): DRIFT — Tabs+search+Title/Status/Updated table built; no status filter, sort, Columns, pagination; no Author col. Excerpt cell overflows into Updated (\"helps |Just now\"). RecordsTable key warning. | prior: drift-open — L-C C3 built the four named tabs (Records · Fields · Dynamic pages · Collection settings); status filter, sort menu, Columns and pagination still missing. Not compared."
+ },
+ {
+  "nodeId": "165:520",
+  "name": "B5-C02 · CMS / Record / unsaved edit",
+  "family": "cms",
+  "shot": "shots/165-520.png",
+  "note": "Compared live 2026-10-26 (cms-brand): DRIFT — Record opens as full sheet; back link ABOVE tabs (board: tabs then back+title row); no Preview (unsaved) pane (only 'Preview ▸' toggle); labels raw keys; Save 98x28 vs board 160x32. | prior: built, not compared — L-C C3: sheet back \"‹ {name} records\" and four tabs incl. Collection settings; always-on Preview (unsaved) pane still a toggle (open)."
+ },
+ {
+  "nodeId": "165:797",
+  "name": "B5-C03 · CMS / Record / saving",
+  "family": "cms",
+  "shot": "shots/165-797.png",
+  "note": "Compared live 2026-10-26 (cms-brand): DRIFT — Footer + button read 'Saving...' as board, but Cancel is disabled while saving (board: enabled); no preview pane; sheet header 'New Blog ×' not on board. | prior: built, not compared — L-C C1: Save button and footer read \"Saving…\" while a save runs (RecordSheet.tsx)."
+ },
+ {
+  "nodeId": "165:1072",
+  "name": "B5-C04 · CMS / Record / failed save with draft retained",
+  "family": "cms",
+  "shot": "shots/165-1072.png",
+  "note": "Compared live 2026-10-26 (cms-brand): unreachable live — 'Couldn’t save' banner only fires on a local-write exception (RecordSheet save catch). A forced server 500 on cms.entries.upsert is queued and shows the OFFLINE copy instead. | prior: built, not compared — L-C C5: banner \"Couldn’t save\" + \"Your edits are still here. Retry when you’re ready.\"; footer/button follow Play F2.17 (\"Couldn’t save · your draft is kept\", Retry save) where the two boards disagree (board: \"Retry\")."
+ },
+ {
+  "nodeId": "165:1625",
+  "name": "B5-C06 · CMS / Record / offline draft retained",
+  "family": "cms",
+  "shot": "shots/165-1625.png",
+  "note": "Compared live 2026-10-26 (cms-brand): DRIFT — Banner copy matches, Save disabled matches. Banner sits above back link/tabs (y=109) instead of above fields; footer 'Not saved to the server yet' (red) vs board 'Offline · Not saved'. | prior: built, not compared — L-C C5: queued save shows banner \"You’re offline\" + \"Your edits are not saved to the server. Keep this tab open.\"; button stays Save record."
+ },
+ {
+  "nodeId": "165:2184",
+  "name": "B5-C08 · CMS / record leave guard",
+  "family": "cms",
+  "shot": "shots/165-2184.png",
+  "note": "Compared live 2026-10-26 (cms-brand): DRIFT — Copy + 3 buttons match. Emphasis inverted: live primary=Save and leave, board primary=Keep editing. Dialog 560w at y=369 vs board 480w at y≈280. | prior: built, not compared — L-C C1: \"Leave without saving?\" names the record / destination tab or collection; Keep editing · Discard changes · Save and leave (RecordSheet.tsx). Origin label (\"Your destination is …\") waits on C2."
+ },
+ {
+  "nodeId": "165:2917",
+  "name": "B5-C11 · CMS / used field protected, display name editable",
+  "family": "cms",
+  "shot": "shots/165-2917.png",
+  "note": "Compared live 2026-10-26 (cms-brand): DRIFT — Locked state unreachable (no bound field). Field inspector: inline left labels vs stacked; no Key column in table; Required as Yes/No pills vs checkbox; no 'Show N usages' or Save field. | prior: drift-open — L-C D2: field inspector gains Default value, Placeholder, Help text; Key/type lock kept; \"Show N usages\" link and explicit Save field (code commits on blur, authority to decide) not built. Not compared."
+ },
+ {
+  "nodeId": "168:21408",
+  "name": "Guard · record to Fields",
+  "family": "resources",
+  "shot": "shots/168-21408.png",
+  "note": "Compared live 2026-10-26 (cms-brand): DRIFT — Copy matches board exactly. Same emphasis inversion as 165:2184 (Save and leave primary, Keep editing outlined); dialog 560w vs 480w. | prior: built, not compared — L-C C1: \"Leave without saving?\" names the record / destination tab or collection; Keep editing · Discard changes · Save and leave (RecordSheet.tsx). Origin label (\"Your destination is …\") waits on C2."
+ },
+ {
+  "nodeId": "168:21620",
+  "name": "Pending · save record then Fields",
+  "family": "resources",
+  "shot": "shots/168-21620.png",
+  "note": "Compared live 2026-10-26 (cms-brand): DRIFT — Footer 'Saving...' + disabled 'Saving...' match, but secondary reads 'Stay here' (board 'Cancel'); header truncates 'Saving record... A clearer ...'. | prior: built, not compared — L-C C1: Save and leave shows \"Saving record…\" + Saving… + Stay here; success takes the chosen way out (RecordSheet.tsx)."
+ },
+ {
+  "nodeId": "173:9757",
+  "name": "B5-D04 · Heading bound to this page’s Title",
+  "family": "cms",
+  "shot": "shots/173-9757.png",
+  "note": "Compared live 2026-10-26 (cms-brand): unreachable live — Needs a Blog dynamic template page with a heading bound to Blog.title. QA site has no collection/template; converting a shared QA page was not done (other agents' tabs raised 2 site conflicts). | prior: Lane L-B C-13 (built, not compared): bound — Dynamic bindings heads Content; the property row reads '{Collection} · {field}', the preview value and 'This page’s record · i of N'."
+ },
+ {
+  "nodeId": "173:10329",
+  "name": "B5-D05 · Title text / binding subview",
+  "family": "cms",
+  "shot": "shots/173-10329.png",
+  "note": "Compared live 2026-10-26 (cms-brand): unreachable live — Binding subview needs a bound heading on a collection template page; same blocker as 173:9757. | prior: Lane L-B C-13 (built, not compared): binding subview — see 302:13946."
+ },
+ {
+  "nodeId": "173:16169",
+  "name": "B5-D16 · CMS record / return to Heading binding",
+  "family": "cms",
+  "shot": "shots/173-16169.png",
+  "note": "Compared live 2026-10-26 (cms-brand): unreachable live — Record opened from a Heading binding ('‹ Heading · Title binding' origin) needs a bound template page; same blocker as 173:9757. | prior: built, not compared — L-C C2: record/workspace back reads \"‹ {origin}\" from CmsOpenRequest.origin and the guard says \"Your destination is {origin}.\"; live label waits on REQUESTS #11 (L-B passes origin)."
+ },
+ {
+  "nodeId": "215:43588",
+  "name": "B6-K02 · Components / This site with summary",
+  "family": "components",
+  "shot": "shots/215-43588.png",
+  "note": "Compared live 2026-10-26 (cms-brand): DRIFT — Reached by inserting Hero Section locally (discarded). Scopes are horizontal tabs in a drawer, not left nav; no thumbs/badges/⋯/side detail/Recently deleted; Sort caret overlaps 'used'. | prior: drift-open — L-C D7: scopes \"This page · N / This site · N / Component library · N\", Search components, Sort (Most used/Name/Newest), \"This site · N\" list with source + uses built in the drawer; full workspace nav, Import package…, Recently deleted, side detail pane and row ⋯ not built. Not compared"
+ },
+ {
+  "nodeId": "215:44300",
+  "name": "B6-K04 · Components / Component library, not on this site",
+  "family": "components",
+  "shot": "shots/215-44300.png",
+  "note": "Compared live 2026-10-26 (cms-brand): DRIFT — Library scope lists 'Not on this site'/'On this site'. No versions, Restricted row, sort, side detail. With 0 site components the manager shows 'No components yet' and hides library scope. | prior: drift-open — L-C D7: Component library scope lists shared masters with \"On this site / Not on this site\"; versions and Restricted state not built. Not compared."
+ },
+ {
+  "nodeId": "220:42592",
+  "name": "B6-K28 · Export Hero card / blocked by inaccessible image",
+  "family": "components",
+  "shot": "shots/220-42592.png",
+  "note": "Compared live 2026-10-26 (cms-brand): unreachable live — Blocked-by-inaccessible-image export state not built (no per-asset access data); rows have no ⋯/Export entry. | prior: drift-open — L-C D8: the blocked-by-inaccessible-image state is not built: the editor has no per-asset access data to know an image is from a site the person can't open."
+ },
+ {
+  "nodeId": "220:43545",
+  "name": "B6-K31 · Import package / choose file",
+  "family": "components",
+  "shot": "shots/220-43545.png",
+  "note": "Compared live 2026-10-26 (cms-brand): DRIFT — 3 steps (Choose file › Check › Import) vs board 6; no 'Drop a .brcomponent file here' dropzone or Selected row; dialog 560w centered y=307 vs 720w y≈120. | prior: built, not compared — L-C D9: \"Import components\" · steps · \"Add components from a .brcomponent package. Nothing is added until the last step.\" · Choose file · Selected line · limits line; refuses non-packages by name."
+ },
+ {
+  "nodeId": "222:47163",
+  "name": "B6-T10 · Create page failed / nothing was changed",
+  "family": "templates",
+  "shot": "shots/222-47163.png",
+  "note": "Compared live 2026-10-26 (cms-brand): unreachable live — CreatePageErrorModal fires only when importHTMLToActivePage throws locally; no network seam to force it. | prior: built, not compared — L-C C7: \"Couldn’t create the page · Nothing was changed. No empty page was left behind.\" — made true: a failed import now removes the page it made and its nav links (TemplatesTab.tsx)."
+ },
+ {
+  "nodeId": "223:44891",
+  "name": "B6-T12 · Replace Home / consequence confirm, backup on",
+  "family": "templates",
+  "shot": "shots/223-44891.png",
+  "note": "Compared live 2026-10-26 (cms-brand): DRIFT — Title/checkbox/CTA match. Copy 'takes this site’s brand colors and fonts' vs board 'has its own colors and fonts' (header says 'Own colours'). Full-screen takeover, no shell/backup banner; 560 vs 720w | prior: built, not compared — L-C C7: \"Replace {page} with {template}?\", \"{page}’s N elements are removed and replaced. {template} has its own colors and fonts — your Brand is not changed.\" (saved token templates say they take the brand), \"Save a backup first (History › Saves)\", CTA \"Replace {page}\"."
+ },
+ {
+  "nodeId": "257:52890",
+  "name": "B5-F29 · Delete Summary?",
+  "family": "cms",
+  "shot": "shots/257-52890.png",
+  "note": "Compared live 2026-10-26 (cms-brand): DRIFT — 'Delete excerpt?', 'Type 1 to confirm', Cancel/Delete field built. Adds breadcrumb + yellow callout; 'cannot be undone' vs board 30-day Recently deleted. Dialog 560w y=303 vs 720w y≈128. | prior: built, not compared — L-C D4: \"Delete {field}? · N records have a value in {field}.\" + \"Type N to confirm\" + Delete field. The board's \"stay in Recently deleted for 30 days\" is not shown: restore is a later server slice, so the copy keeps \"This cannot be undone.\""
+ },
+ {
+  "nodeId": "260:235689",
+  "name": "B5-V01 · CMS / Site variables / list and scope",
+  "family": "cms",
+  "shot": "shots/260-235689.png",
+  "note": "Compared live 2026-10-26 (cms-brand): DRIFT — Still a 280px drawer subview (main pane keeps showing Blog Fields); no 'Site variables' page header or '+ New variable' primary top-right; row = key/value/'0 placeholders'/⋯ matches. | prior: drift-open — L-C C4/D1: \"Site variables\" intro, per-variable \"N text placeholders\", \"Empty value\" built; still a drawer subview, not the workspace page. Not compared."
+ }
+]
