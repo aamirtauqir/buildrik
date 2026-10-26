@@ -19838,9 +19838,9 @@
    "page": "07",
    "family": "recovery",
    "status": "active",
-   "authority": "board",
+   "authority": "open:save-failed-copy-context",
    "verified": "drift-open",
-   "verifiedNote": "phase1: SaveStatus.tsx:67 \"Save failed — retry\" vs \"Couldn't save — Retry\"; SaveFailedBanner.tsx:74-77 card copy differs from strip"
+   "verifiedNote": "L-F W1: built, not compared. SaveFailedBanner is one strip: line + Retry. context=\"publish\" draws the board's \"Save before publishing. Your changes are kept.\"; without a context \"Couldn't save {where}. Your changes are kept.\" Exit and brand-refusal variants kept (code:tokens-invalid). StudioHeader passing the context is REQUESTS F-18."
   },
   {
    "nodeId": "10:2647",
@@ -20270,7 +20270,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "HistoryTab.tsx:33-37 Session/Saves/Published match; rows lack verb·target·place + \"Restore to here\" + j/k footer"
+   "verifiedNote": "L-F W2: built, not compared. Two-line Session rows (step, then \"time · you\"), Restore to here on the hovered / j-k row, j/k hint under the list. \"verb · target · place\" needs target + page on each history entry, which the engine does not record (code:history-entry-no-target, part); session markers (Opened Home, Undo history cleared) likewise have no data."
   },
   {
    "nodeId": "230:13557",
@@ -20280,7 +20280,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "ActivityView.tsx:361-375 \"Restore to {time}?\"/\"Restore, discard N changes\" vs named step + \"Restore to here\""
+   "verifiedNote": "L-F W2: built, not compared. Confirm titled Restore to “{step}”? · Cancel · Restore to here. Body says the later steps are removed and that this can’t be undone — the board's \"You can still undo the restore\" is false for restoreEntry (code:restore-truncates, part)."
   },
   {
    "nodeId": "230:14116",
@@ -20288,9 +20288,9 @@
    "page": "07",
    "family": "recovery",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Restore writes a row (TimeTravelHost.tsx:141) but not \"Restored to … · N later steps removed\""
+   "authority": "code:restore-truncates",
+   "verified": "no",
+   "verifiedNote": "L-F W2: history.restoreEntry truncates the undo stack and records no step, so there is no \"Restored to …\" row to draw. Making a restore an undoable step is an engine change (lead)."
   },
   {
    "nodeId": "230:14662",
@@ -20300,7 +20300,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "SavesFilter.tsx:36 All/Named/Auto-saves + Author submenu vs flat list; Save a version is a footer (HistoryTab.tsx:404)"
+   "verifiedNote": "L-F W3: built, not compared. \"Filter: All ▾\" chip with one flat menu (All · Named · Auto-saves · By <author>) and \"Save a version\" at the row's right (it was a footer). Row meta \"Named · Sam · Yesterday 17:20\" not yet adopted (row keeps time · relative · N changes; the N-changes door is code-ahead, kept)."
   },
   {
    "nodeId": "230:15227",
@@ -20310,7 +20310,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "VersionList.tsx:322 Restore to draft…; no inline Visual/Semantic compare in the row (CompareView.tsx:90 is a separate view)"
+   "verifiedNote": "L-F W3: not built. Details stay the \"Saved version\" modal (Compare with current · Restore this save…); the board's inline details (Visual/Semantic, \"3 pages changed · 12 elements\", Open comparison ›, Restore to draft, Rename, Delete) are a later slice."
   },
   {
    "nodeId": "230:15797",
@@ -20320,7 +20320,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "\"Before restoring\" checkpoint exists (TimeTravelHost.tsx:228); no \"Undo restore\" toast"
+   "verifiedNote": "L-F W4: built, not compared. Restore outcome is one surface: notice \"Draft restored from “{name}”.\" / \"“{safety save}” saved first.\" with Undo restore (toast only when there is no safety save to return to)."
   },
   {
    "nodeId": "230:16354",
@@ -20330,7 +20330,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Inline row confirm (VersionList.tsx:259) vs modal \"Delete “…”?\""
+   "verifiedNote": "L-F W3: built, not compared. Delete… opens ConfirmDialog \"Delete “{name}”?\" / \"This version can’t be restored after it’s deleted.\" · Cancel · Delete version (the inline row confirm is gone)."
   },
   {
    "nodeId": "230:16914",
@@ -20370,7 +20370,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "CompareHost.tsx:156-164 \"Compare\" + from/to pickers vs \"‹ Back to History · Compare · A → B · Visual/Semantic · Page\""
+   "verifiedNote": "L-F W4: built, not compared. Compare bar: \"‹ Back to {origin}\" at the left, title \"Compare · {left} → {right}\"; source pickers kept (code-ahead). Board's Visual | Semantic toggle vs code's Side by side / Overlay / List modes not reconciled (open)."
   },
   {
    "nodeId": "230:19126",
@@ -20380,7 +20380,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "TimeTravelHost.tsx:332 \"Restore to {time}?\" vs \"Restore to this point…\" + \"Showing … Nothing changes until you restore.\""
+   "verifiedNote": "L-F W4: built, not compared. \"Showing {time} · {step}. Nothing changes until you restore.\" and \"Restore to this point…\". Band keeps Exit (Time Travel also opens by shortcut outside History), no \"‹ Back to History\" title row."
   },
   {
    "nodeId": "230:19664",
@@ -20390,7 +20390,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "ActivityLogView.tsx:50-57 chips match; no Load more"
+   "verifiedNote": "L-F W5: built, not compared. Load more after a full page (SITE_ACTIVITY_PAGE_SIZE 30): activity.recent takes `before` (shared schema → listSiteActivity → router → ActivityService), rows older than the oldest shown are appended; a failed page says so under the button."
   },
   {
    "nodeId": "230:20217",
@@ -20400,7 +20400,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "BackToActivityRow.tsx:24 \"‹ Activity\" vs \"‹ Back to Activity\""
+   "verifiedNote": "L-F W5: built, not compared. \"‹ Back to Activity\" (was \"‹ Activity\") in History and Review."
   },
   {
    "nodeId": "230:20770",
@@ -20409,8 +20409,8 @@
    "family": "recovery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No offline note on Saves"
+   "verified": "drift-open",
+   "verifiedNote": "L-F W3: built, not compared. Offline: the list stays, a note reads \"Needs a connection to save, restore or delete versions. This list was loaded at HH:MM.\" and Save a version is aria-disabled with that reason."
   },
   {
    "nodeId": "230:21326",
@@ -20420,7 +20420,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "ActivityLogView.tsx:218-219 title matches; extra body line not on board"
+   "verifiedNote": "L-F W5: built, not compared. \"Couldn’t load activity\" + Retry; the extra body line is gone."
   },
   {
    "nodeId": "231:16144",
