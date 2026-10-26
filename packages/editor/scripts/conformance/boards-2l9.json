@@ -11,7 +11,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Canvas bar at bottom y823 (board top y56-98), no device toggles; bottom bar lacks 'Saved · Details'. Container Content: Tag/ID only, no 'Container content' note or 'N child elements'. | prior: L-A S3 built, not compared: canvas bar 'Parent / Element' readout left (type + W × H in its tooltip), then '{width} px' (Page width popover), '{zoom}%', 'View' — no carets. Undo left in Phase 1. Copy unit-tested; geometry not compared."
+   "verifiedNote": "probe-compared 2026-10-27 (case canvas-bar at the board's 800 column, shots/7-18654.png): bar CONTENTS match — 'Home / Hero' left, device toggles centred (24 square, tinted active), gray mono '1440 px' chip, outlined '52% ⌄' 82 wide, 'View'. Still open, not L-A's: bar position (top y56, lead3 — A-14), bottom bar 'Saved just now · Details' (lead), Container content note / 'N child elements' (inspector, L-B)."
   },
   {
    "nodeId": "7:18981",
@@ -1957,8 +1957,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Centered 480px modal (board: popover under View, ~360 wide, top-right of canvas, 'Close' link). Size input inline with presets (board own row). Copy matches. | prior: L-A S4 built, not compared: 'Grid and snapping' dialog — footnote, 'Show grid and snap' switch (grid overlay drives snap in Canvas.tsx), Grid size + 4/8/16 px, 'Whole number · 1–100 px', Cancel/Apply; draft until Apply."
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case canvas-grid-panel, board shots/145-65011.png): a 360×322 panel (board ~360×330) opened in the View popover's place, right edge on View; head 'Grid and snapping' + Close; note wraps two lines; 'Show grid and snap' switch; Grid size field full width 28 tall; 4/8/16 px presets 96×32 in one row; hint; Cancel · Apply 96×32 right. It opens ABOVE the bar until lead3 moves the bar to the top (REQUESTS A-14)."
   },
   {
    "nodeId": "145:65448",

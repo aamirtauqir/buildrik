@@ -2073,6 +2073,40 @@ const CASES: Record<string, () => React.ReactElement> = {
       <RecordsTable collection={CMS_STATUS_COLLECTION} records={CMS_STATUS_RECORDS} query="" onOpenRecord={() => {}} />
     </div>
   ),
+  /* design-2l9 board 145:65011 — Grid and snapping, the panel View opens in
+     its own place. The bar sits low in a 1440 frame so the panel opens above
+     it; the recipe clicks View, then Grid. */
+  /* design-2l9 board 7:18654 — the canvas bar's contents at the board's
+     ~800 canvas column: path, device toggles, width chip, zoom, View. */
+  "canvas-bar": () => (
+    <div data-probe="canvas-bar" style={{ width: 800 }}>
+      <CanvasFooterToolbar
+        overlays={{ guides: false, spacing: false, grid: false, rulers: false, badges: false, xray: false, outlines: false }}
+        zoom={52}
+        onOverlayChange={() => {}}
+        onZoomChange={() => {}}
+        device="desktop"
+        onDeviceChange={() => {}}
+        onCustomWidth={() => {}}
+        pageWidth={1440}
+        readout="Home / Hero"
+      />
+    </div>
+  ),
+  "canvas-grid-panel": () => (
+    <div data-probe="canvas-grid-panel" style={{ width: 1440, height: 900, display: "flex", alignItems: "flex-end", justifyContent: "flex-end" }}>
+      <div style={{ width: 900 }}>
+        <CanvasFooterToolbar
+          overlays={{ guides: false, spacing: false, grid: false, rulers: false, badges: false, xray: false, outlines: false }}
+          zoom={52}
+          onOverlayChange={() => {}}
+          onZoomChange={() => {}}
+          gridSize={7}
+          onGridSizeChange={() => {}}
+        />
+      </div>
+    </div>
+  ),
   "canvas-footer-toolbar": () => (
     <div data-probe="canvas-footer-toolbar">
       <CanvasFooterToolbar
