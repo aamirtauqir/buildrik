@@ -31,7 +31,7 @@ function mount(updatePage = vi.fn().mockResolvedValue(undefined)) {
 }
 
 const editTitle = (v = "Menu — Bella Cucina") =>
-  fireEvent.change(screen.getByLabelText("Meta title · page override"), { target: { value: v } });
+  fireEvent.change(screen.getByTestId("seo-input-title"), { target: { value: v } });
 
 afterEach(() => vi.useRealTimers());
 
@@ -63,7 +63,7 @@ describe("PageSettingsDrawer — Done / Cancel", () => {
     fireEvent.click(screen.getByTestId("pg-drawer-tabbtn-social"));
     expect(screen.queryByTestId("pages-unsaved-modal")).toBeNull();
     fireEvent.click(screen.getByTestId("pg-drawer-tabbtn-seo"));
-    expect(screen.getByLabelText("Meta title · page override")).toHaveValue("Menu — Bella Cucina");
+    expect(screen.getByTestId("seo-input-title")).toHaveValue("Menu — Bella Cucina");
   });
 
   it("Done saves once, closes, and toasts Page settings saved", async () => {
@@ -99,7 +99,7 @@ describe("PageSettingsDrawer — Done / Cancel", () => {
     fireEvent.click(screen.getByTestId("pg-drawer-done"));
     expect(await screen.findByTestId("pg-drawer-save-error")).toHaveTextContent("Couldn’t save page settings. Your changes are still here.");
     expect(onClose).not.toHaveBeenCalled();
-    expect(screen.getByLabelText("Meta title · page override")).toHaveValue("Menu — Bella Cucina");
+    expect(screen.getByTestId("seo-input-title")).toHaveValue("Menu — Bella Cucina");
     expect(screen.getByTestId("pg-drawer-done")).toHaveTextContent("Retry save");
     expect(screen.getByTestId("pg-drawer-subtitle")).toHaveTextContent("Menu · Unsaved settings changes");
   });

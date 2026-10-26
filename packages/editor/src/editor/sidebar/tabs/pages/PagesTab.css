@@ -453,132 +453,101 @@
   background: rgba(17, 24, 39, 0.6);
 }
 .bd-pg-drawer {
+  /* design-2l9 board 63:15939: a 720×700 dialog, radius 8. */
   position: fixed;
   z-index: 91;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  width: var(--bk-size-dialog-md);
-  height: 520px;
+  width: 720px;
+  height: min(700px, calc(100vh - 32px));
   display: flex;
   flex-direction: column;
   background: var(--bk-bg-card);
-  border-radius: 16px;
+  border-radius: var(--bk-radius-lg);
   box-shadow: var(--bk-shadow-overlay);
-  animation: bd-pg-drawer-in var(--bk-motion-base) var(--bk-ease-default);
 }
-@keyframes bd-pg-drawer-in{
-  from { transform: translate(-50%, calc(-50% + 8px)); opacity: 0; }
-  to   { transform: translate(-50%, -50%); opacity: 1; }}
-
+/* Title and ✕ on one 56-tall row over a hairline. */
 .bd-pg-drawer-hdr {
-  /* Board header: 16 semibold title, 14px gap, then the text-link tab row. */
   display: flex;
-  flex-direction: column;
-  gap: 14px;
-  padding: var(--bk-space-24) var(--bk-space-28) 0;
+  align-items: center;
+  gap: var(--bk-space-12);
+  height: 56px;
+  padding: 0 var(--bk-space-12) 0 var(--bk-space-20);
+  border-bottom: 1px solid var(--bk-border);
   flex-shrink: 0;
-  position: relative;
 }
-
-/* Board 2838:12107 — the header's ✕. Figma exports it as the third child of
-   the header's flex column; a close sits at the card's top-right corner, so
-   the header is the positioning context and the glyph is pinned to it. */
 .bd-pg-drawer-close {
-  position: absolute;
-  top: var(--bk-space-20);
-  right: var(--bk-space-20);
-  padding: var(--bk-space-4);
+  margin-left: auto;
+  padding: var(--bk-space-4) var(--bk-space-8);
   border: 0;
   background: transparent;
-  font: 400 13px var(--bk-font-ui);
+  font: 400 15px var(--bk-font-ui);
   line-height: 1;
-  color: var(--bk-ink-muted);
+  color: var(--bk-ink-soft);
   cursor: pointer;
-  transition: color 100ms;
 }
 .bd-pg-drawer-close:hover { color: var(--bk-ink); }
-
 .bd-pg-drawer-title {
-  font: 600 16px var(--bk-font-ui);
+  font: 600 14px var(--bk-font-ui);
   color: var(--bk-ink);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-
+/* The tabs: a segmented row, the active one a tinted 115×28 pill. */
 .bd-pg-drawer-tabs {
   display: flex;
-  gap: var(--bk-space-20);
+  gap: 0;
+  padding: var(--bk-space-8) var(--bk-space-8) 0;
   flex-shrink: 0;
 }
 .bd-pg-drawer-tab {
-  /* Board: bare 14px text links — active is blue-500 semibold, no underline. */
-  padding: 0;
+  width: 116px;
+  height: 28px;
+  justify-content: center;
   border: 0;
+  border-radius: var(--bk-radius-md);
   background: transparent;
-  font: 500 14px var(--bk-font-ui);
-  color: var(--bk-ink-muted);
+  font: 500 13px var(--bk-font-ui);
+  color: var(--bk-ink-soft);
   cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  transition: color 100ms;
 }
-/* :not() keeps this off the ACTIVE tab. A bare `:hover` is class+pseudo —
-   (0,2,0) — and beat `.bd-pg-drawer-tab--active` at (0,1,0), so the tab you
-   had just clicked went from board blue-500 to ink under the pointer that
-   clicked it. Measured, not read: the SEO board passed its active-tab colour
-   and the Social/Advanced boards failed it, because those two are reached by
-   a click and the cursor is still there. */
 .bd-pg-drawer-tab:not(.bd-pg-drawer-tab--active):hover { color: var(--bk-ink); }
-.bd-pg-drawer-tab--active { color: var(--bk-blue-500); font-weight: 600; }
-.bd-pg-drawer-tab-chip {
-  font: 500 var(--bk-text-11) var(--bk-font-mono);
-  padding: 1px 6px;
-  border-radius: var(--bk-radius-full);
-  color: var(--bk-warning);
-  background: var(--bk-warning-tint);
-}
-
+.bd-pg-drawer-tab--active { color: var(--bk-accent-text); background: var(--bk-accent-tint); }
 .bd-pg-drawer-body {
   flex: 1;
   overflow-y: auto;
-  padding: var(--bk-space-16) var(--bk-space-28) var(--bk-space-24);
+  padding: var(--bk-space-20) var(--bk-space-20) var(--bk-space-12);
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: var(--bk-space-8);
 }
-/* Board field labels: 13/500 ink-muted on all three S3.7 boards (302:1988,
-   302:2014, 302:2036 and their siblings). BK_LABEL_CLASS ships 12px ink-soft
-   and is a chrome-wide primitive measured against many other boards, so it is
-   NOT moved — the override is scoped to this drawer. Two classes deep on
-   purpose: a single-class rule ties `tw:text-xs` on specificity and loses on
-   source order. */
+/* Board field labels: 13/600 ink. Two classes deep so a `tw:` size on the
+   label primitive does not win on source order. */
 .bd-pg-drawer-body label {
   font-size: 13px;
-  font-weight: 500;
-  color: var(--bk-ink-muted);
+  font-weight: 600;
+  color: var(--bk-ink);
 }
-/* v3 boards 6887:73809 / 73848 / 73882: 32h fields, radius 6, 13px text
-   (the S3.7 boards drew 42h / radius 8 / 14px). */
-/* Every text-ish input, not just [type=text]: the OG image field is
-   `type="url"` and missed all three rules, so it shipped 10px shorter than
-   the two fields above it with a different radius and type size. */
-.bd-pg-drawer-body input:not([type="checkbox"]):not([type="radio"]) {
-  height: 32px;
+/* Board fields are filled gray, borderless, 28 tall, radius 6. */
+.bd-pg-drawer-body input:not([type="checkbox"]):not([type="radio"]),
+.bd-pg-drawer-body select,
+.bd-pg-drawer-body textarea {
+  min-height: 28px;
+  border-color: transparent;
   border-radius: var(--bk-radius-md);
+  background-color: var(--bk-gray-100);
   font-size: 13px;
 }
-.bd-pg-drawer-body textarea { border-radius: var(--bk-radius-md); font-size: 13px; }
-/* Decision #20 foot — Cancel · Done, right-aligned, under a hairline
-   (boards 6887:73809 / 73848 / 73882). */
+.bd-pg-drawer-body input:not([type="checkbox"]):not([type="radio"]),
+.bd-pg-drawer-body select { height: 28px; padding-block: 0; }
+/* Cancel · Save, right-aligned. */
 .bd-pg-drawer-foot {
   display: flex;
   justify-content: flex-end;
   gap: var(--bk-space-8);
-  padding: var(--bk-space-12) var(--bk-space-28);
-  border-top: 1px solid var(--bk-border);
+  padding: var(--bk-space-12) var(--bk-space-12) var(--bk-space-12);
   flex-shrink: 0;
 }
 

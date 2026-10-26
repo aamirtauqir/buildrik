@@ -172,8 +172,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Modal 560×520 vs board 720×700; field order differs: URL slug first, Google preview last (board: preview + score first, then title, description, URL); SEO tab shows score badge. | prior: L-A S9 built, not compared: title '{Page} · Page settings', subtitle 'Editing {Page} · {Active} stays open on the canvas', foot Cancel · Save, override note 'These overrides affect this page only. Clear the title to use site defaults.'. Container stays the drawer (blocked:owner-page-settings-contain"
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case pages-settings-seo, 1440×900, board shots/63-15939.png): dialog 720×700 at 360,100 (getBoundingClientRect); title row + ✕ over a hairline; SEO · Social · Advanced segmented with tinted active; body order subtitle → 'Search preview · SEO score n' + gray preview card → 'SEO title · n / 60 · Page override' → Description + 'n / 160' → Page URL '/slug' → Search indexing row (select 240×28 at x560) → Site SEO defaults → SEO score details → scope note; Cancel · Save. Filled gray borderless fields 28 tall. blocked:owner-page-settings-container resolved by the owner (board wins). Remaining: 'Write with AI'/'Regenerate' link waits on PR #33."
   },
   {
    "nodeId": "63:16507",
