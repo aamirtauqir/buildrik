@@ -19,4 +19,6 @@ Format: lane/task · file · change · board · why.
 
 ## Open — found on the live walk (2026-10-26)
 
-9. **L-A · canvas footer status** · the selection readout double-escapes HTML entities ("Heading · Tom &amp;amp; Jerry" for "Tom & Jerry") · — · present on `main`, not caused by design-2l9.
+## Closed
+
+9. ~~**L-A · canvas footer status** · the selection readout double-escapes HTML entities~~ · fixed in lane L-A: `getLayerPreview` (`panels/layers/data/layerUtils.ts`) decodes the stored HTML's entities once, so the footer readout and Layers row names print "Tom & Jerry". Test `layerUtils.test.ts › getLayerPreview`.
