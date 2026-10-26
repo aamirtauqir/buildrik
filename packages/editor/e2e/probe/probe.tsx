@@ -113,6 +113,7 @@ import { deriveLifecycleState } from "@/editor/shell/lifecycle";
 import { NotificationPanel } from "@/editor/shell/NotificationPanel";
 import { PublishConfirmModal } from "@/editor/shell/modals/PublishConfirmModal";
 import { PageContextMenu } from "@/editor/sidebar/tabs/pages/components/PageContextMenu";
+import { NewPageModal } from "@/editor/sidebar/tabs/pages/components/NewPageModal";
 import { PageSettingsDrawer } from "@/editor/sidebar/tabs/pages/page-settings/PageSettingsDrawer";
 import { Topbar, SiteMenuIcon, IconButton, BreakpointSwitcher } from "@/editor/chrome-ui";
 import { RecordsTable } from "@/editor/cms/RecordsTable";
@@ -805,6 +806,29 @@ function layersComposer(): Composer {
  * so that recipe reaches it with a click and a keypress, entirely through the
  * shipped keyboard path.
  */
+function NewPageProbe() {
+  const composer = React.useMemo(() => {
+    const handlers = new Map<string, Array<(d: unknown) => void>>();
+    return {
+      on: (ev: string, fn: (d: unknown) => void) => handlers.set(ev, [...(handlers.get(ev) ?? []), fn]),
+      off: () => {},
+      emit: (ev: string, d: unknown) => handlers.get(ev)?.forEach((fn) => fn(d)),
+      getProjectMetadata: () => ({ name: "Fieldwork Studio" }),
+      elements: { getAllPages: () => PAGES_FIXTURE },
+    };
+  }, []);
+  React.useEffect(() => {
+    composer.emit(EVENTS.UI_NEW_PAGE_REQUESTED, {});
+  }, [composer]);
+  return (
+    <div data-probe="new-page-dialog" style={{ width: 1440, height: 900 }}>
+      <ToastProvider>
+        <NewPageModal composer={composer as never} />
+      </ToastProvider>
+    </div>
+  );
+}
+
 function LayersProbe({ select }: { select?: string[] }) {
   const c = layersComposer();
   React.useEffect(() => {
@@ -2858,6 +2882,9 @@ const CASES: Record<string, () => React.ReactElement> = {
       })}
     </div>
   ),
+  /* design-2l9 board 101:29978 — New page, From template chosen. The modal
+     opens on UI_NEW_PAGE_REQUESTED; the fixture composer fires it on mount. */
+  "new-page-dialog": () => <NewPageProbe />,
   "pages-panel": () => (
     <div data-probe="pages-panel" style={{ width: 280, height: 812 }}>
       {/* One folder, because board 141:40 draws a result that names its owning

@@ -374,7 +374,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Text Style tab: no Placement section; Typography adds Text style/Applied stack, Weight+Line height stacked not 2-col, Align as words; Spacing open box-model vs '2 set' row. | prior: Inherits the base canvas bar (7:18654), rebuilt by L-A S3; not compared."
+   "verifiedNote": "Wave-3 drift is the inspector's Text Style tab (Placement section, Typography layout, Spacing row) — L-B's surface; the L-A parts of this board (canvas bar contents, Layers) are fixed in 7:18654 / 147:75914."
   },
   {
    "nodeId": "67:12583",
@@ -676,8 +676,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Same 640 width, copy and '2 of 10 pages on Free' ok; no '{Site} · Create a page' subtitle; source as two 124px cards (board segmented pill), nav as toggle not checkbox. | prior: L-A wave 2 built, not compared: capacity line '{n} of {limit} pages on {Plan}' (billing.pagesPerSite added to siteDetail.settingsOverview through the full chain — shared schema, site-detail.service, test; the same limit saveProjectData enforces), From template note 'Choose a page template before cre"
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case new-page-dialog, shots/101-29978.png): 640 wide; 'New page', '{Site} · Create a page'; Page name; Blank · From template as a 178-wide segmented row with the tinted choice; the source note; 'Add to site navigation' as a checkbox; Cancel · Choose template; no ✕. The capacity line is drawn from the server (not rendered in the probe: no site id). Title size is chrome-ui Modal's."
   },
   {
    "nodeId": "101:36828",
@@ -2126,7 +2126,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Text Content: board textarea + B I U link + 'Changes save automatically.'; live 'Edit text on canvas' + one-line value with bind icon; no Editing state row; ID empty placeholder. | prior: Inherits the base canvas bar (7:18654), rebuilt by L-A S3; not compared."
+   "verifiedNote": "Wave-3 drift is the inspector's Text Content tab (textarea + B I U link + 'Changes save automatically.', Editing row, ID placeholder) — L-B's surface. L-A's View menu half was handled in 145:64586."
   },
   {
    "nodeId": "145:72772",
@@ -3766,7 +3766,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — 260 wide ok; adds search field, 'Add page' row and ✓ on current; paths inline after name (board right-aligned); 'Manage pages ›' dark not blue; header no '+ N template'. | prior: phase1 (Task 1.3): Shell/PageSwitcherMenu not built; PageTabBar tabs today. ⌘P copy → code:shortcut-cmd-p-is-preview"
+   "verifiedNote": "Page switcher is lead-owned (shell/PageSwitcher.tsx, Task 1.3); the board's differences are filed as REQUESTS A-16."
   },
   {
    "nodeId": "558:449032",

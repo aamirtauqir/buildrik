@@ -30,6 +30,8 @@ A-14. **L-A → lead3 · canvas bar mount (`Canvas.tsx` footer container / the m
 
 A-15. **L-A → lead · `chrome-ui/PanelSearch.tsx`** · draw the panel search as the boards do — a gray-filled, borderless field (`--bk-gray-100`) with the glyph inset, not the outlined field · boards 63:6393 (Pages), 147:75914 (Layers), and the other drawers' search bands · the field is the shared chrome-ui primitive every drawer uses; restyling it from one lane would move every panel at once.
 
+A-16. **L-A → lead · `shell/PageSwitcher.tsx` (page switcher menu)** · to board 558:448976 (B3-P28): no search field and no "+ Add page" row; paths right-aligned in each row (not inline after the name); no ✓ on the current page (the board tints it); "Manage pages ›" in the accent blue; the header counts templates ("{n} pages + {m} template") · board 558:448976 · it is in L-A's wave-3 drift list but the component is lead-owned (Phase 1 Task 1.3). Note: the search and "+ Add page" were accepted plan obligations (Review Focus 1, 100 pages in ≤2 interactions) — the lead decides whether the board overrides them.
+
 ## Closed
 
 A-13. ~~page reorder as one composer history step~~ · `021c1b305`: `reorderPage` commits pending edits, records "Reorder pages" and commits it before returning (⌘Z / captureUndo undo exactly the move); `writeLocked` still refuses first. Decision: page FOLDER moves stay outside history (per-user, not in the document). Test `PageManager.reorderHistory.test.ts`.

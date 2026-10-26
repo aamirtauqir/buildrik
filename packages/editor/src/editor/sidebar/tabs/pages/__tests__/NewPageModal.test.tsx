@@ -50,27 +50,29 @@ function makeComposer() {
 beforeEach(() => addToast.mockClear());
 
 describe("NewPageModal", () => {
+  /* design-2l9 board 101:29978. Re-baseline: New page layout. */
   it("opens on UI_NEW_PAGE_REQUESTED with the board's fields, From template selected", () => {
     const { composer, request } = makeComposer();
     render(<NewPageModal composer={composer as never} />);
     expect(screen.queryByTestId("new-page-modal")).toBeNull();
     request();
     expect(screen.getByTestId("new-page-modal")).toHaveTextContent("New page");
+    expect(screen.getByTestId("new-page-subtitle")).toHaveTextContent("Create a page");
     expect(screen.getByLabelText("Page name")).toHaveValue("About");
-    expect(screen.getByTestId("new-page-source-blank")).toHaveTextContent("BlankStart with an empty page.");
-    expect(screen.getByTestId("new-page-source-template")).toHaveTextContent(/From templatePick from \d+ layouts/);
+    expect(screen.getByTestId("new-page-source-blank")).toHaveTextContent("Blank");
     expect(screen.getByTestId("new-page-source-template")).toHaveAttribute("aria-checked", "true");
-    // 6752:59256: ✕ in the head, and the navigation toggle ON by default.
-    expect(screen.getByTestId("modal-close-new-page-modal")).toBeInTheDocument();
-    expect(screen.getByText("Add to site navigation")).toBeInTheDocument();
-    expect(screen.getByRole("switch", { name: "Add to site navigation" })).toHaveAttribute("aria-checked", "true");
+    expect(screen.getByTestId("new-page-source-note")).toHaveTextContent("Choose a page template before creating the page.");
+    fireEvent.click(screen.getByTestId("new-page-source-blank"));
+    expect(screen.getByTestId("new-page-source-note")).toHaveTextContent("Start with an empty page.");
+    expect(screen.queryByTestId("modal-close-new-page-modal")).toBeNull();
+    expect(screen.getByRole("checkbox", { name: "Add to site navigation" })).toBeChecked();
   });
 
-  it("the ✕ closes without creating", () => {
+  it("Cancel closes without creating", () => {
     const { composer, request } = makeComposer();
     render(<NewPageModal composer={composer as never} />);
     request();
-    fireEvent.click(screen.getByTestId("modal-close-new-page-modal"));
+    fireEvent.click(screen.getByTestId("new-page-cancel"));
     expect(screen.queryByTestId("new-page-modal")).toBeNull();
     expect(composer.elements.createPage).not.toHaveBeenCalled();
   });
@@ -80,7 +82,7 @@ describe("NewPageModal", () => {
     render(<NewPageModal composer={composer as never} />);
     request();
     fireEvent.click(screen.getByTestId("new-page-source-blank"));
-    fireEvent.click(screen.getByRole("switch", { name: "Add to site navigation" }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "Add to site navigation" }));
     fireEvent.click(screen.getByTestId("new-page-create"));
     expect(composer.elements.createPage).toHaveBeenCalled();
     expect(composer.elements.addPageToNavigation).not.toHaveBeenCalled();

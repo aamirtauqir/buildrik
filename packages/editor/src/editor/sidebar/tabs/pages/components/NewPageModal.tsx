@@ -2,9 +2,11 @@
  * NewPageModal — decision #19 (v3 Q2b): Add page opens this modal instead of
  * creating "About" instantly and dropping into an inline rename.
  *
- * Boards 6752:59256 (From template selected — the resting state) and
- * 6752:59365 (Blank selected): Page name · Blank "Empty canvas" · From
- * template "Pick from N layouts" · Cancel · Create page. Create on Blank lands
+ * design-2l9 board 101:29978: "New page", "{Site} · Create a page", Page
+ * name, Blank · From template as a segmented row, what the source does next,
+ * an "Add to site navigation" checkbox, the capacity line, Cancel · Create
+ * page / Choose template — no ✕ (Esc and Cancel close). Was boards
+ * 6752:59256 / 6752:59365's cards. Create on Blank lands
  * on the new, empty page with "Page created" (6700:71154); Create on From
  * template opens the templates catalogue (4418:54134) carrying the name, and
  * creates nothing until a template is chosen there — leaving the catalogue
@@ -24,20 +26,16 @@ import * as React from "react";
 import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants/events";
 import { getDefaultPageName } from "@/shared/utils/pageUtils";
-import { Grid3x3, Square } from "lucide-react";
-import { BK_LABEL_CLASS, Button, Label, Modal, TextInput, ToggleSwitch, useToast } from "@/editor/chrome-ui";
-import { SITE_TEMPLATES, getMyTemplates } from "@/editor/sidebar/tabs/templates/templatesData";
+import { BK_LABEL_CLASS, Button, Checkbox, Label, Modal, TextInput, useToast } from "@/editor/chrome-ui";
 import { usePageCapacity, type PageCapacity } from "../usePageCapacity";
 
 type Source = "blank" | "template";
 
-/* 6752:59256 option card: ~124 tall, 16 inset, 20 glyph over a 13/600 title
-   and a 12 muted hint; picked = accent edge on the accent tint. */
-const CARD =
-  "tw:flex tw:h-[124px] tw:flex-1 tw:flex-col tw:items-start tw:justify-start tw:gap-3 tw:rounded-lg tw:border tw:border-solid " +
-  "tw:p-4 tw:text-left tw:font-normal tw:text-[var(--bk-ink)]";
-const CARD_ON = "tw:border-[var(--bk-accent)] tw:bg-[var(--bk-accent-tint)] tw:ring-1 tw:ring-[var(--bk-accent)]";
-const CARD_OFF = "tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)]";
+/* design-2l9 board 101:29978: the source is a two-chip segmented row,
+   178 wide each, the chosen one on the accent tint. */
+const SOURCE = "tw:h-8 tw:w-[178px] tw:justify-center tw:rounded-md tw:border-0 tw:text-[13px] tw:font-normal tw:focus:ring-0";
+const SOURCE_ON = "tw:bg-[var(--bk-accent-tint)] tw:text-[var(--bk-accent-text)] tw:enabled:hover:bg-[var(--bk-accent-tint)]";
+const SOURCE_OFF = "tw:bg-transparent tw:text-[var(--bk-ink)]";
 export function NewPageModal({ composer }: { composer: Composer | null }) {
   const { addToast } = useToast();
   const [open, setOpen] = React.useState(false);
@@ -67,10 +65,6 @@ export function NewPageModal({ composer }: { composer: Composer | null }) {
     };
   }, [composer]);
 
-  const layoutCount = React.useMemo(
-    () => (open ? SITE_TEMPLATES.filter((t) => t.type === "page").length + getMyTemplates().length : 0),
-    [open],
-  );
 
   const create = () => {
     const trimmed = name.trim();
@@ -96,24 +90,19 @@ export function NewPageModal({ composer }: { composer: Composer | null }) {
     addToast({ description: `${trimmed} created${addToNav ? " · Added to site navigation" : ""}`, tone: "success" });
   };
 
-  const card = (value: Source, icon: React.ReactNode, title: string, hint: string) => (
+  const sourceChip = (value: Source, title: string) => (
     <Button
       color="light"
       role="radio"
       aria-checked={source === value}
-      className={`${CARD} ${source === value ? CARD_ON : CARD_OFF}`}
+      className={`${SOURCE} ${source === value ? SOURCE_ON : SOURCE_OFF}`}
       data-testid={`new-page-source-${value}`}
       onClick={() => setSource(value)}
     >
-      <span className="tw:flex tw:flex-col tw:items-start tw:gap-3">
-        {icon}
-        <span className="tw:flex tw:flex-col tw:gap-1">
-          <span className="tw:block tw:text-[length:var(--bk-text-13)] tw:font-semibold tw:text-[var(--bk-ink)]">{title}</span>
-          <span className="tw:block tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-ink-muted)]">{hint}</span>
-        </span>
-      </span>
+      {title}
     </Button>
   );
+  const siteName = composer?.getProjectMetadata?.()?.name;
 
   return (
     <Modal
@@ -123,7 +112,6 @@ export function NewPageModal({ composer }: { composer: Composer | null }) {
       /* width/dialog-lg — board 6752:59256 draws this one at 640. */
       width="lg"
       testId="new-page-modal"
-      closeButton
       footer={
         <>
           <Button color="light" size="xs" data-testid="new-page-cancel" onClick={() => setOpen(false)}>
@@ -147,6 +135,10 @@ export function NewPageModal({ composer }: { composer: Composer | null }) {
           create();
         }}
       >
+        {/* Board 101:29978: "{Site} · Create a page" under the title. */}
+        <p className="tw:m-0 tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-ink-soft)]" data-testid="new-page-subtitle">
+          {siteName ? `${siteName} · Create a page` : "Create a page"}
+        </p>
         <div className="tw:flex tw:flex-col tw:gap-1">
           <Label htmlFor="new-page-name" className={BK_LABEL_CLASS}>
             Page name
@@ -170,29 +162,23 @@ export function NewPageModal({ composer }: { composer: Composer | null }) {
             </span>
           )}
         </div>
-        <div className="tw:flex tw:gap-4" role="radiogroup" aria-label="Start from">
-          {card("blank", <Square size={20} aria-hidden />, "Blank", "Start with an empty page.")}
-          {card("template", <Grid3x3 size={20} aria-hidden />, "From template", `Pick from ${layoutCount} layouts`)}
+        <div className="tw:flex tw:gap-0" role="radiogroup" aria-label="Start from">
+          {sourceChip("blank", "Blank")}
+          {sourceChip("template", "From template")}
         </div>
-        <div className="tw:flex tw:items-center tw:gap-2">
-          <ToggleSwitch
+        {/* What the chosen source does next (101:29978 / 101:37542). */}
+        <p className="tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-soft)]" data-testid="new-page-source-note">
+          {source === "template" ? "Choose a page template before creating the page." : "Start with an empty page."}
+        </p>
+        <label className="tw:flex tw:items-center tw:gap-2 tw:text-[length:var(--bk-text-13)] tw:text-[var(--bk-ink)]">
+          <Checkbox
             id="new-page-add-to-nav"
             checked={addToNav}
-            onChange={setAddToNav}
-            aria-labelledby="new-page-add-to-nav-label"
-            sizing="sm"
+            onChange={(e) => setAddToNav(e.target.checked)}
             data-testid="new-page-add-to-nav"
           />
-          <span id="new-page-add-to-nav-label" className="tw:text-[length:var(--bk-text-13)] tw:text-[var(--bk-ink)]">
-            Add to site navigation
-          </span>
-        </div>
-        {/* design-2l9 board 101:29978: From template picks a layout first. */}
-        {source === "template" && (
-          <p className="tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="new-page-template-note">
-            Choose a page template before creating the page.
-          </p>
-        )}
+          Add to site navigation
+        </label>
         <PageCapacityLine capacity={capacity} count={pageCount} atLimit={atLimit} />
         {error ? (
           <p role="alert" className="tw:m-0 tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-error)]">
