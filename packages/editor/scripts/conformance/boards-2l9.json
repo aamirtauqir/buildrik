@@ -9992,7 +9992,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Row name truncates (src/editor/sidebar/tabs/ComponentsTab.tsx:269) but has no full-name tooltip"
+   "verifiedNote": "built, not compared — L-C C9: row name carries a full-name tooltip; count reads \"N uses\" (+ \"· Component library\" for linked masters). Source/version line and ⋯ menu wait on the Components workspace slice."
   },
   {
    "nodeId": "217:44243",

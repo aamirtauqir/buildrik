@@ -1,6 +1,6 @@
 /**
  * Board 4418:142419: the manage list splits YOUR COMPONENTS from LINKED FROM
- * LIBRARY ("24 on this site · linked"), and lists only masters in scope on the
+ * LIBRARY ("24 uses · Component library", 2L9 217:43947), and lists only masters in scope on the
  * open page (G2-118).
  *
  * @license BSD-3-Clause
@@ -42,8 +42,8 @@ describe("ComponentsTab — YOUR COMPONENTS / LINKED FROM LIBRARY", () => {
     const section = await screen.findByTestId("comp-section-linked");
     expect(section.textContent).toBe("LINKED FROM LIBRARY1");
     expect(screen.getByTestId("comp-row-hdr")).toBeTruthy();
-    expect(within(screen.getByTestId("comp-row-btn")).getByTestId("comp-row-count-btn").textContent).toBe("24 on this site · linked");
-    expect(screen.getByTestId("comp-row-count-hdr").textContent).not.toMatch(/linked/);
+    expect(within(screen.getByTestId("comp-row-btn")).getByTestId("comp-row-count-btn").textContent).toBe("24 uses · Component library");
+    expect(screen.getByTestId("comp-row-count-hdr").textContent).not.toMatch(/Component library/);
     expect(screen.queryByTestId("comp-row-menu-hero")).toBeNull();
     // Rows are ordered: own section first, then the linked one.
     const order = [...document.querySelectorAll("[data-testid^='comp-row-'][role='button']")].map((n) => n.getAttribute("data-testid"));
