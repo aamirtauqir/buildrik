@@ -129,6 +129,12 @@ function navTitle(id: SettingsNavId): string {
   return SETTINGS_NAV.find((n) => n.id === id)?.title.replace(/ ↗$/, "") ?? id;
 }
 
+/** Screens whose board writes its own scope chip (B8-S07, B8-S10). */
+const SCOPE_LINE_FOR: Record<string, string> = {
+  localization: "Default locale: next publish · Locales: saved now",
+  redirects: "Rules saved now · reach visitors on next publish",
+};
+
 /** Offline is drawn per board: Security headers (SH04) and Analytics (AN07)
  *  put a banner over the cards and "· changes stay here"; every other footer
  *  screen only says it in the footer (General, S05). */
@@ -789,7 +795,7 @@ export const SettingsTab: React.FC<
     ? "Overview"
     : `${current.title.replace(/ ↗$/, "")}${screenHeader?.title ? ` / ${screenHeader.title}` : ""}`;
   const headScope = screenRules
-    ? SCOPE_LINE[screenRules.scope]
+    ? SCOPE_LINE_FOR[screenId as string] ?? SCOPE_LINE[screenRules.scope]
     : workspaceDoor
       ? workspaceScopeLine(workspaceName)
       : SCOPE_LINE.lifecycle;
