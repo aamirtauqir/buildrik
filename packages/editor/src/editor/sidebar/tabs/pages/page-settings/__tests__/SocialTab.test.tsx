@@ -143,4 +143,14 @@ describe("SocialTab preview card fallbacks", () => {
     render(<SocialTab s={s} />);
     expect(screen.getByText("acme.com")).toBeTruthy();
   });
+
+  /* design-2l9 board 63:16507. Re-baseline: Social tab copy. */
+  it("explains the fallbacks and names the fields as the board does", () => {
+    render(<SocialTab s={makeSettings()} />);
+    expect(screen.getByTestId("social-explainer")).toHaveTextContent("Empty social title uses SEO title; empty description uses the SEO description.");
+    expect(screen.getByTestId("social-label-title")).toHaveTextContent("Social title");
+    expect(screen.getByTestId("social-label-desc")).toHaveTextContent("Social description");
+    expect(screen.getByTestId("social-label-image")).toHaveTextContent("Social image URL");
+    expect(screen.getByText("Recommended: 1200 × 630. Clear the URL to remove the image.")).toBeInTheDocument();
+  });
 });

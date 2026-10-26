@@ -183,7 +183,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Modal vs drawer; board adds explainer + Social image URL field"
+   "verifiedNote": "L-A wave 2 built, not compared: explainer 'Empty social title uses SEO title; empty description uses the SEO description.' (true: SEOInjector ogTitle || title), labels Social title / Social description / Social image URL, helper 'Recommended: 1200 × 630. Clear the URL to remove the image.'. Container is the drawer (owner decision)."
   },
   {
    "nodeId": "63:17061",
@@ -1480,7 +1480,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code icon button 'Delete folder (pages kept)'; board menu 'Delete folder · keep page'"
+   "verifiedNote": "L-A wave 2: the folder's delete control reads 'Delete folder · keep page(s)'. The board's folder menu with 'Only you see this folder. Deleting it keeps {page} at the top level.' is not built (still an icon button). Not compared."
   },
   {
    "nodeId": "137:58206",
@@ -1489,8 +1489,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No organization receipts ('About moved to Studio · /about unchanged')"
+   "verified": "drift-open",
+   "verifiedNote": "L-A wave 2 built, not compared: receipt '{Folder} deleted · {pages} kept at top level'; no Undo (folders outside composer history, A-13)."
   },
   {
    "nodeId": "137:58919",

@@ -250,8 +250,9 @@ export const PageFolder: React.FC<Props> = ({
             <IconButton
               className="bd-pg-folder-act danger"
               size="sm"
-              title="Delete folder (pages kept)"
-              label={`Delete folder ${folder.name}`}
+              /* design-2l9 137:57493: "Delete folder · keep page(s)". */
+              title={`Delete folder · keep ${pages.length === 1 ? "page" : "pages"}`}
+              label={`Delete folder ${folder.name} · keep ${pages.length === 1 ? "its page" : "its pages"}`}
               onClick={(e) => {
                 e.stopPropagation();
                 onFolderDelete();

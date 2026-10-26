@@ -428,6 +428,25 @@ export const PagesTab: React.FC<PagesTabProps> = ({
     [movingPage, f, addToast],
   );
 
+  /* Board 137:58206: "{Folder} deleted · About kept at top level" — its
+     pages stay, at the top level. No Undo: folders are outside composer
+     history (A-13). */
+  const deleteFolder = React.useCallback(
+    (folderId: string) => {
+      const folder = f.folders.find((fd) => fd.id === folderId);
+      f.deleteFolder(folderId);
+      if (!folder) return;
+      const kept = folder.pageIds.map((id) => p.pages.find((pg) => pg.id === id)?.name).filter((n): n is string => !!n);
+      addToast({
+        description: kept.length
+          ? `${folder.name} deleted · ${listNames(kept)} kept at top level`
+          : `${folder.name} deleted`,
+        tone: "info",
+      });
+    },
+    [f, p.pages, addToast],
+  );
+
   /* Board 63:13820 "Save as template…": the save-template modal saves the
      ACTIVE page, so the row's page goes active first. */
   const saveAsTemplate = React.useCallback(
@@ -591,7 +610,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
             onRequestTemplates={onRequestTemplates}
             onFolderToggle={f.toggleCollapse}
             onFolderRename={f.renameFolder}
-            onFolderDelete={f.deleteFolder}
+            onFolderDelete={deleteFolder}
             onMovePageToFolder={f.movePageToFolder}
             onRemovePageFromFolder={f.removePageFromFolder}
             collectionPages={dynamicPages.collections}
