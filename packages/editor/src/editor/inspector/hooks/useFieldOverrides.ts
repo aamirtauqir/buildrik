@@ -29,6 +29,14 @@ import type { BreakpointId } from "@/shared/types/breakpoints";
 import { writeElement } from "@/engine/commands/commandOperations";
 import type { OverrideKind } from "../shared/controls/InspectorFieldContext";
 
+/** One property a layer overrides: its value there, and what removing it
+ *  reveals underneath (2L9 S13 / S15). */
+export interface OverrideEntry {
+  property: string;
+  value: string;
+  fallback: string;
+}
+
 export interface FieldOverrides {
   overrides: ReadonlyMap<string, readonly OverrideKind[]>;
   /** What each kind's dot names: "Tablet", ":hover", the component's name. */
@@ -40,6 +48,9 @@ export interface FieldOverrides {
   revertBreakpoint: () => void;
   /** Clear the current :state's rule ("Reset"). */
   resetPseudo: () => void;
+  /** The overridden properties of each layer, read when asked (the review
+   *  before Remove — S13 / S15). */
+  entries: (kind: "breakpoint" | "pseudo") => OverrideEntry[];
 }
 
 interface Read {
@@ -196,5 +207,23 @@ export function useFieldOverrides(
     [state.breakpoint.length, state.pseudo.length],
   );
 
-  return { overrides, labels, counts, resetOverride, revertBreakpoint, resetPseudo };
+  const entries = React.useCallback(
+    (kind: "breakpoint" | "pseudo"): OverrideEntry[] => {
+      const el = elementId ? composer?.elements.getElement(elementId) : null;
+      if (!composer?.styles || !el || !elementId) return [];
+      const base = (el.getStyles?.() ?? {}) as Record<string, string>;
+      if (kind === "breakpoint") {
+        if (breakpoint === "desktop") return [];
+        const layer = composer.styles.getBreakpointStyle(elementId, breakpoint) as Record<string, string>;
+        return Object.keys(layer).map((p) => ({ property: p, value: String(layer[p]), fallback: base[p] ?? "" }));
+      }
+      if (pseudoState === "normal") return [];
+      const rule = composer.styles.getRule(`${selectorOf(elementId)}:${pseudoState}`, mediaOf(breakpoint))?.properties ?? {};
+      const atBreakpoint = breakpoint === "desktop" ? {} : (composer.styles.getBreakpointStyle(elementId, breakpoint) as Record<string, string>);
+      return Object.keys(rule).map((p) => ({ property: p, value: String(rule[p]), fallback: atBreakpoint[p] ?? base[p] ?? "" }));
+    },
+    [composer, elementId, breakpoint, pseudoState],
+  );
+
+  return { overrides, labels, counts, resetOverride, revertBreakpoint, resetPseudo, entries };
 }

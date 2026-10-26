@@ -432,6 +432,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
                 breakpointName={breakpointName}
                 breakpointOverrideCount={fieldOverrides.counts.breakpoint}
                 onRevertBreakpoint={() => runDiscrete(fieldOverrides.revertBreakpoint)}
+                entries={fieldOverrides.entries}
               />
             ) : null}
             <div

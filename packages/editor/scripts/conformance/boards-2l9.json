@@ -5526,7 +5526,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Reset is a link; board lists the exact Hover properties before removal"
+   "verifiedNote": "Lane L-B S2 (built, not compared — copy checked against the dump): Reset opens 'Hover overrides · n set' with each property and value, 'Removing these n Hover properties reveals each property’s Default-state value. Other states stay unchanged.', 'Remove Hover overrides' / 'Keep overrides'."
   },
   {
    "nodeId": "255:88837",
@@ -5547,7 +5547,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Revert is a link; board lists properties + Desktop fallback values"
+   "verifiedNote": "Lane L-B S2 (built, not compared): Revert opens 'Tablet overrides · n set' with each property and value and 'Removing Tablet overrides reveals Desktop: {property value, …}. Other breakpoints and states are retained.' (board names the retained layers; the code does not count them), 'Remove Tablet overrides' / 'Keep overrides'."
   },
   {
    "nodeId": "255:89827",

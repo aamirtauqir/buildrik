@@ -53,3 +53,34 @@ describe("ContextRow", () => {
     expect(screen.queryByTestId("inspector-state-overrides")).toBeNull();
   });
 });
+
+describe("ContextRow — 2L9 S15 review before removal", () => {
+  it("Revert lists the Tablet properties and what Desktop shows; Keep overrides removes nothing", () => {
+    const onRevertBreakpoint = vi.fn();
+    render(
+      <ContextRow
+        state="normal"
+        stateOverrideCount={0}
+        onResetState={vi.fn()}
+        breakpointName="Tablet"
+        breakpointOverrideCount={2}
+        onRevertBreakpoint={onRevertBreakpoint}
+        entries={() => [
+          { property: "padding", value: "16px", fallback: "24px" },
+          { property: "border-radius", value: "8px", fallback: "12px" },
+        ]}
+      />,
+    );
+    fireEvent.click(screen.getByTestId("inspector-bp-revert"));
+    expect(screen.getAllByTestId("inspector-override-entry").map((e) => e.textContent)).toEqual(["Padding16 px", "Border radius8 px"]);
+    expect(screen.getByTestId("inspector-override-consequence")).toHaveTextContent(
+      "Removing Tablet overrides reveals Desktop: padding 24 px, border radius 12 px. Other breakpoints and states are retained.",
+    );
+    fireEvent.click(screen.getByTestId("inspector-override-keep"));
+    expect(onRevertBreakpoint).not.toHaveBeenCalled();
+    expect(screen.queryByTestId("inspector-override-review")).toBeNull();
+    fireEvent.click(screen.getByTestId("inspector-bp-revert"));
+    fireEvent.click(screen.getByRole("button", { name: "Remove Tablet overrides" }));
+    expect(onRevertBreakpoint).toHaveBeenCalledTimes(1);
+  });
+});
