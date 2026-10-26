@@ -316,9 +316,9 @@ export const PagesTab: React.FC<PagesTabProps> = ({
 
   // Bulk actions
   const handleBulkDuplicate = React.useCallback(() => {
-    bulk.selectedIds.forEach((id) => p.duplicatePage(id));
+    p.duplicatePages([...bulk.selectedIds]);
     bulk.clearSelection();
-  }, [bulk.selectedIds, p.duplicatePage, bulk.clearSelection]);
+  }, [bulk.selectedIds, p.duplicatePages, bulk.clearSelection]);
 
   /** Resolve what a bulk delete would actually remove, applying the same
    *  guards as the per-page path: never the home page, never the last one. */

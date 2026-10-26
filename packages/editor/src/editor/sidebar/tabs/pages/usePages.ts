@@ -71,6 +71,7 @@ export interface UsePagesReturn {
   // Actions (all guard-checked)
   selectPage: (pageId: string) => void;
   duplicatePage: (pageId: string) => void;
+  duplicatePages: (pageIds: readonly string[]) => void;
   deletePage: (pageId: string) => void;
   /** Bulk delete with one report (v3 4418:96537). Guards are the caller's. */
   deletePages: (pageIds: string[]) => void;
@@ -281,6 +282,33 @@ export function usePages(composer: Composer | null): UsePagesReturn {
     [composer, pages, addToast]
   );
 
+  /* design-2l9 board 139:50620: a bulk duplicate reports once — "3 pages
+     duplicated · Originals kept" — instead of one per-page toast each
+     replacing the last. */
+  const duplicatePages = React.useCallback(
+    (pageIds: readonly string[]) => {
+      if (!composer) return;
+      if (pageIds.length === 1) {
+        duplicatePage(pageIds[0]);
+        return;
+      }
+      let made = 0;
+      for (const id of pageIds) {
+        try {
+          if (composer.elements.duplicatePage(id)) made += 1;
+        } catch (err) {
+          console.error("[pages] duplicatePage failed", err);
+        }
+      }
+      addToast(
+        made === pageIds.length
+          ? { description: `${made} pages duplicated · Originals kept`, tone: "info", duration: 8000 }
+          : { description: `${made} of ${pageIds.length} pages duplicated · Originals kept`, tone: "warning", duration: 8000 },
+      );
+    },
+    [composer, duplicatePage, addToast]
+  );
+
   const deletePage = React.useCallback(
     (pageId: string) => {
       if (!composer) return;
@@ -450,6 +478,7 @@ export function usePages(composer: Composer | null): UsePagesReturn {
     closeSettings,
     selectPage,
     duplicatePage,
+    duplicatePages,
     deletePage,
     deletePages,
     setHomepage,

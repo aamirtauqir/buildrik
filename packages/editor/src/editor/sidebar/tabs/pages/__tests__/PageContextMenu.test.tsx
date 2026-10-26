@@ -185,9 +185,9 @@ describe("PageContextMenu — 6883:69130", () => {
     expect(screen.queryByTestId("pages-menu-delete-reason")).toBeNull();
   });
 
-  it("is 224 wide", () => {
+  it("is 280 wide (design-2l9 63:13820)", () => {
     render(<PageContextMenu {...baseProps} pageId="p2" />);
-    expect(screen.getByTestId("pages-context-menu").className).toContain("tw:w-56");
+    expect(screen.getByTestId("pages-context-menu").className).toContain("tw:w-70");
   });
 
   /* design-2l9 boards 63:13820 / 131:41791 / 137:55343. Re-baseline: page row

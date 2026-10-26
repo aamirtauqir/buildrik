@@ -40,7 +40,8 @@ describe("BulkToolbar", () => {
     render(<BulkToolbar {...baseProps} />);
     fireEvent.click(screen.getByText(/Move to/));
     expect(screen.getByText("Move 3 pages to…")).toBeInTheDocument();
-    expect(screen.getByText(/Menu, Contact and About · Choose a folder/)).toBeInTheDocument();
+    /* design-2l9 board 139:51389's line. Re-baseline: bulk Move dialog. */
+    expect(screen.getByText("Menu, Contact and About. Only your folder organization changes; page URLs and the homepage stay the same.")).toBeInTheDocument();
     expect(screen.getByText("Top level (no folder)")).toBeInTheDocument();
   });
 
@@ -48,7 +49,7 @@ describe("BulkToolbar", () => {
     const fn = vi.fn();
     render(<BulkToolbar {...baseProps} onMoveToFolder={fn} />);
     fireEvent.click(screen.getByText(/Move to…/));
-    fireEvent.click(screen.getByRole("button", { name: "Move to Marketing" }));
+    fireEvent.click(screen.getByRole("button", { name: "Move 3 pages" }));
     expect(fn).toHaveBeenCalledWith("f1");
   });
 
@@ -64,7 +65,7 @@ describe("BulkToolbar", () => {
     render(<BulkToolbar {...baseProps} onRemoveFromFolders={fn} />);
     fireEvent.click(screen.getByText(/Move to…/));
     fireEvent.click(screen.getByText("Top level (no folder)"));
-    fireEvent.click(screen.getByRole("button", { name: "Move to top level" }));
+    fireEvent.click(screen.getByRole("button", { name: "Move 3 pages" }));
     expect(fn).toHaveBeenCalledTimes(1);
   });
 

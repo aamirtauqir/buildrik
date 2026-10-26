@@ -143,7 +143,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-A S6 built, not compared: row menu in board order — Rename… · Duplicate · Set as homepage · Replace layout with template… · Save as template… · Move to folder… · Move up ⌥↑ · Move down ⌥↓ · Copy link · Page settings · Delete page (RTL order test). Remove from {folder} kept for folder members."
+   "verifiedNote": "L-A S6 built; menu widened to the board's 280 after a probe screenshot showed 'Replace layout with template…' wrapping at 224 (probe case pages-context-menu, port 5171, looked at by eye; board geometry not otherwise compared). Row order RTL-tested."
   },
   {
    "nodeId": "63:14567",
@@ -1561,7 +1561,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Board '3 pages duplicated · Originals kept'"
+   "verifiedNote": "L-A S8 built, not compared: one receipt '{n} pages duplicated · Originals kept' (usePages.duplicatePages) instead of one toast per page. Board's Undo not offered (duplicate is outside composer history — REQUESTS #13 family)."
   },
   {
    "nodeId": "139:51389",
@@ -1571,7 +1571,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Board body names pages + URL-unchanged note; button 'Move 3 pages'"
+   "verifiedNote": "L-A S8 built, not compared: 'Move {n} pages to…', '{names}. Only your folder organization changes; page URLs and the homepage stay the same.', primary 'Move {n} pages'."
   },
   {
    "nodeId": "139:52176",

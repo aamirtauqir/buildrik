@@ -107,7 +107,7 @@ export const PageContextMenu: React.FC<Props> = ({
   const style: React.CSSProperties = {
     position: "fixed",
     top: Math.min(y, window.innerHeight - 420),
-    left: Math.min(x, window.innerWidth - 232),
+    left: Math.min(x, window.innerWidth - 288),
     zIndex: 9999,
   };
 
@@ -129,8 +129,9 @@ export const PageContextMenu: React.FC<Props> = ({
        computed from the click, not from an anchor. */
     <div
       ref={menuRef}
-      /* 6883:69130 — the menu is 224 wide. */
-      className={`bd-pg-menu ${POPOVER_BASE_CLASS} tw:!fixed tw:w-56`}
+      /* design-2l9 63:13820 / 131:41791 — the menu is 280 wide (224 wrapped
+         "Replace layout with template…" onto two lines). */
+      className={`bd-pg-menu ${POPOVER_BASE_CLASS} tw:!fixed tw:w-70`}
       style={style}
       data-testid="pages-context-menu"
     >

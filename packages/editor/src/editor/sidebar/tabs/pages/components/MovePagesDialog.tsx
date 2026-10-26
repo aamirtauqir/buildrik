@@ -1,5 +1,6 @@
 /**
- * MovePagesDialog — v3 6887:77925 "Move 3 pages to…": one radio row per
+ * MovePagesDialog — "Move 3 pages to…" (v3 6887:77925; copy and the
+ * "Move 3 pages" primary from design-2l9 board 139:51389): one radio row per
  * folder, then "Top level (no folder)"; the primary names the choice
  * ("Move to Marketing"). It replaced the bulk bar's pop-up folder list, whose
  * "Remove from folder" row is the top-level choice here. The caller moves.
@@ -66,7 +67,9 @@ export function MovePagesDialog({ open, pageNames, folders, onMove, onClose, cur
           <Button size="xs" data-testid="pages-move-confirm" disabled={already} onClick={() => onMove(picked)}>
             {already
               ? pickedFolder ? `Already in ${pickedFolder.name}` : "Already at top level"
-              : pickedFolder ? `Move to ${pickedFolder.name}` : "Move to top level"}
+              : !single && count > 1
+                ? `Move ${count} pages`
+                : pickedFolder ? `Move to ${pickedFolder.name}` : "Move to top level"}
           </Button>
         </>
       }
@@ -76,7 +79,7 @@ export function MovePagesDialog({ open, pageNames, folders, onMove, onClose, cur
       <p className="tw:m-0 tw:mb-2 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-soft)]">
         {single
           ? `Choose where to organize ${single}. Folders are personal; only you see them. The page URL ${current!.url} stays unchanged.`
-          : `${listNames(pageNames)} · Choose a folder. URLs stay unchanged — folders are personal; only you see them.`}
+          : `${listNames(pageNames)}. Only your folder organization changes; page URLs and the homepage stay the same.`}
       </p>
       <div role="radiogroup" aria-label="Folders" className="tw:flex tw:flex-col">
         {targets.map((t) => (
