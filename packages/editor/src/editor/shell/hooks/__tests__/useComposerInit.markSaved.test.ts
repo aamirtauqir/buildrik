@@ -59,11 +59,6 @@ vi.mock("@/engine/cms", () => ({
   },
 }));
 vi.mock("@/services/AssetUploadService", () => ({ createRemoteAssetSync: vi.fn(() => ({})) }));
-const { dismissToastKey } = vi.hoisted(() => ({ dismissToastKey: vi.fn() }));
-vi.mock("@/editor/chrome-ui", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@/editor/chrome-ui")>()),
-  dismissToastKey,
-}));
 
 const syncSave = vi.fn(() => Promise.resolve({ success: true, savedAt: new Date() }));
 vi.mock("@/services/BuildrikSyncProvider", () => ({
@@ -201,41 +196,42 @@ describe("a page switch is not an edit", () => {
   });
 });
 
-/* L3-006: "Save failed · Could not save to dashboard" stayed on screen for ten
-   minutes under a header reading "Saved". The failure card is keyed, and the
-   next save that lands takes it down. */
-describe("a landed save clears the save-failed toast", () => {
-  it("keys the failure toast and dismisses that key when the next save lands", async () => {
+/* Owner 2026-10-26 (one error surface): a failed autosave raises no toast —
+   the save status says it (bottom bar "Couldn't save — Retry" and the slot's
+   one bar, both StudioHeader's, from this state), and the next save that
+   lands puts the status back (L3-006: a stale failure must not outlive it). */
+const lastSaveState = (p: ReturnType<typeof params>) => {
+  const last = vi.mocked(p.setSaveState).mock.calls.at(-1)![0] as unknown;
+  return typeof last === "function" ? (last as (s: object) => object)({ status: "saving" }) : last;
+};
+
+describe("a failed autosave is the save status, not a toast", () => {
+  it("says error with no toast, and a landed save clears it", async () => {
     const p = params();
     syncSave.mockImplementationOnce(() => Promise.reject(new Error("boom")));
     renderHook(() => useComposerInit(p));
     await autosave();
-    expect(p.addToast).toHaveBeenCalledWith(expect.objectContaining({ title: "Save failed", key: "save-failed" }));
-    expect(dismissToastKey).not.toHaveBeenCalled();
+    expect(lastSaveState(p)).toMatchObject({ status: "error", error: "boom" });
+    expect(p.addToast).not.toHaveBeenCalledWith(expect.objectContaining({ title: "Save failed" }));
 
     await autosave();
     expect(composer.markSaved).toHaveBeenCalledTimes(1);
-    expect(dismissToastKey).toHaveBeenCalledWith("save-failed");
+    expect(lastSaveState(p)).toMatchObject({ status: "idle", error: undefined });
   });
 });
 
-/* L3-013: the server refuses a save past the plan's page limit. The words say
-   so, and there is no Retry — the same snapshot is refused until a page goes. */
+/* L3-013: the server refuses a save past the plan's page limit. The message
+   rides the save status (the slot's bar names the limit and offers no Retry —
+   saveFailedBanner.test.ts); no toast. */
 describe("a save refused for the page limit", () => {
-  it("names the limit and offers no Retry", async () => {
+  it("keeps the server's words on the status and raises no toast", async () => {
     const p = params();
     syncSave.mockImplementation(() =>
       Promise.reject(new Error("PAGE_LIMIT: Your plan allows 10 pages per site. Delete a page, or upgrade, to keep saving.")),
     );
     renderHook(() => useComposerInit(p));
     await autosave();
-    expect(p.addToast).toHaveBeenCalledWith(
-      expect.objectContaining({
-        title: "Not saved — page limit reached",
-        description: "Your plan allows 10 pages per site. Delete a page, or upgrade, to keep saving.",
-      }),
-    );
-    const toast = (p.addToast as ReturnType<typeof vi.fn>).mock.calls.at(-1)?.[0] as { action?: unknown };
-    expect(toast.action).toBeUndefined();
+    expect(lastSaveState(p)).toMatchObject({ status: "error", error: expect.stringMatching(/^PAGE_LIMIT:/) });
+    expect(p.addToast).not.toHaveBeenCalled();
   });
 });

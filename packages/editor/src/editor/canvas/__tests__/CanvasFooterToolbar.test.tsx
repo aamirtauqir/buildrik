@@ -134,10 +134,19 @@ describe("CanvasFooterToolbar — the bar (board 7:18654)", () => {
     expect(screen.queryByRole("button", { name: /keyboard shortcuts/i })).toBeNull();
   });
 
-  it("controls read in board order: width, zoom, View — no carets", () => {
+  it("controls read in board order: devices, width, zoom ⌄, View", () => {
     renderToolbar({ device: "desktop", onDeviceChange: vi.fn(), onCustomWidth: vi.fn(), pageWidth: 1440, zoom: 52 });
-    const labels = screen.getAllByRole("button").map((b) => b.textContent);
-    expect(labels).toEqual(["1440 px", "52%", "View"]);
+    const labels = screen.getAllByRole("button").map((b) => b.getAttribute("aria-label") ?? b.textContent);
+    expect(labels).toEqual(["Desktop", "Tablet", "Mobile", "Page width 1440 px", "Zoom 52%", "View"]);
+    expect(screen.getByTestId("canvas-zoom-trigger").querySelector("svg")).not.toBeNull();
+  });
+
+  it("the device buttons switch the breakpoint; the active one is pressed", () => {
+    const onDeviceChange = vi.fn();
+    renderToolbar({ device: "desktop", onDeviceChange, onCustomWidth: vi.fn(), pageWidth: 1440 });
+    expect(screen.getByRole("button", { name: "Desktop" }).getAttribute("aria-pressed")).toBe("true");
+    fireEvent.click(screen.getByRole("button", { name: "Tablet" }));
+    expect(onDeviceChange).toHaveBeenCalledWith("tablet");
   });
 
   it("the zoom control opens the zoom rows with the current one checked", () => {

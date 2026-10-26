@@ -174,6 +174,14 @@ export interface GlobalBannerSlotProps {
   lead?: { id: string; render: (more: React.ReactNode) => React.ReactNode } | null;
 }
 
+/* Board B7-G02: the slot sits UNDER the topbar (y 56), above the workspace.
+   AquibraStudio mounts it before <header> in the DOM (REQUESTS F-11 moves
+   it); until then the shell places it with flex `order` — the studio root is
+   a flex column, the header keeps order 0, this slot is 1 and StudioPanels'
+   workspace is 2 — so the bar is drawn where the board puts it and pushes
+   the workspace down. Tab order still follows the DOM until F-11 lands. */
+const SLOT_CLASS = "tw:order-1 tw:flex-none";
+
 export const GlobalBannerSlot: React.FC<GlobalBannerSlotProps> = ({ lead }) => {
   useOfflineBanner();
   useNarrowWindowBanner();
@@ -182,7 +190,7 @@ export const GlobalBannerSlot: React.FC<GlobalBannerSlotProps> = ({ lead }) => {
   if (lead) {
     const rest = banners.filter((b) => b.id !== lead.id);
     return (
-      <div data-testid="global-banner-slot">
+      <div className={SLOT_CLASS} data-testid="global-banner-slot">
         {lead.render(<MoreConditions rest={rest} />)}
         <PhoneScreen />
       </div>
@@ -191,7 +199,7 @@ export const GlobalBannerSlot: React.FC<GlobalBannerSlotProps> = ({ lead }) => {
   if (banners.length === 0) return <PhoneScreen />;
   const [top, ...rest] = banners;
   return (
-    <div data-testid="global-banner-slot">
+    <div className={SLOT_CLASS} data-testid="global-banner-slot">
       <BannerBar banner={top} more={<MoreConditions rest={rest} />} />
       <PhoneScreen />
     </div>

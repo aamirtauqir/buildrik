@@ -1,10 +1,14 @@
 /**
- * CanvasFooterToolbar — the canvas status bar (design-2l9 boards 7:18654,
- * 145:64586): "Hero / Text · 1440 px · 52% · View".
+ * CanvasFooterToolbar — the canvas bar (design-2l9 boards 7:18654,
+ * 145:64586): "Hero / Text · [devices] · 1440 px · 52% ⌄ · View", across the
+ * TOP of the canvas column (the name is historical: it was docked at the
+ * bottom until the 2026-10-26 board pass).
  *
  * - Left: where the selection is, two levels — "{Parent} / {Element}", the
  *   page alone with nothing selected (useSelectionReadout). The type and
  *   W × H the bar used to print ride in its tooltip.
+ * - Centre: the device buttons — Desktop · Tablet · Mobile, icon-only, the
+ *   active one on the accent tint (BreakpointSwitcher `variant="bar"`).
  * - "{width} px" opens Page width (145:71013): presets + a custom width. It
  *   replaces View ▸ Breakpoint ▸ / Custom width….
  * - "{zoom}%" opens the zoom rows (fit, selection, presets).
@@ -20,7 +24,8 @@
  */
 
 import * as React from "react";
-import { Button, isModalOpen, Menu, MenuGroup, MenuItem, MenuLabel, Popover, type Breakpoint } from "@/editor/chrome-ui";
+import { BreakpointSwitcher, Button, isModalOpen, Menu, MenuGroup, MenuItem, MenuLabel, Popover, type Breakpoint } from "@/editor/chrome-ui";
+import { ChevronDown } from "lucide-react";
 import { stepZoom } from "@/shared/constants/canvas";
 import { GridSnapDialog } from "./controls/GridSnapDialog";
 import { PageWidthPanel } from "./controls/PageWidthPanel";
@@ -78,18 +83,19 @@ export interface CanvasFooterToolbarProps {
 }
 
 /**
- * The docked bar — one 44-tall row, the readout on the left and the three
- * controls on the right. `min-w-0` + a truncating readout keep it inside the
- * canvas column when the column is narrow.
- *
- * OWNER OVERRIDE 2026-10-03: docked flush to the canvas column's bottom edge
- * at full width — no radius, no shadow, no side border. The hairline on top
- * and the fill come from its container (`footerToolbarContainerStyles`).
+ * The bar — one 41-tall row (42 with its container's hairline, board
+ * 7:18654 y 56–98): readout · devices · width, zoom, View. A
+ * three-column grid holds the devices where the board puts them — measured
+ * on 7:18654, the group starts 409 into an 800 column, i.e. the side
+ * columns split the free width 1.44 : 1 — whatever the readout's length; `min-w-0` + a truncating readout keep it inside a narrow
+ * column. Flush to the column, full width — no radius, no shadow; the
+ * hairline below and the fill come from its container
+ * (`footerToolbarContainerStyles`).
  */
 const BAR =
-  "tw:flex tw:items-center tw:justify-start tw:gap-1 tw:h-[var(--bk-size-header)] tw:px-3 " +
+  "tw:grid tw:grid-cols-[minmax(0,1.44fr)_auto_minmax(0,1fr)] tw:items-center tw:gap-2 tw:h-[41px] tw:pl-1 " +
   "tw:bg-white tw:whitespace-nowrap tw:w-full tw:max-w-full tw:min-w-0";
-const GROUP = "tw:flex tw:flex-none tw:items-center tw:gap-1";
+const GROUP = "tw:flex tw:min-w-0 tw:items-center tw:justify-end tw:gap-1.5";
 
 /* Board 145:64586's own rows, in its order. */
 const VIEW_ROWS: readonly { key: keyof CanvasOverlayState; label: string; kbd?: string }[] = [
@@ -107,9 +113,18 @@ const MORE_VIEW_ROWS: readonly { key: keyof CanvasOverlayState; label: string; k
 const FOOTER_MENU = "tw:min-w-[224px] tw:[&_[role^=menuitem]]:h-[30px]";
 const VIEW_ZOOM_LEVELS = [50, 75, 100, 150, 200];
 
-/* The triggers are plain text on the bar, as the board draws them. */
-const BAR_TRIGGER =
-  "tw:inline-flex tw:items-center tw:gap-1 tw:h-7 tw:px-2.5 tw:py-1 tw:rounded tw:border tw:border-transparent tw:text-[11px] tw:whitespace-nowrap tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:font-medium tw:tabular-nums tw:hover:bg-[var(--bk-gray-100)]";
+/* Board 7:18654's three controls, each its own look:
+   "1440 px" a grey chip in the data face (Geist Mono, tabular);
+   "52% ⌄"  a bordered select-like box with a chevron;
+   "View"   plain text in ink. */
+const TRIGGER_BASE =
+  "tw:inline-flex tw:items-center tw:gap-1 tw:h-7 tw:rounded-md tw:whitespace-nowrap tw:text-[12px] tw:font-medium tw:tabular-nums";
+const WIDTH_TRIGGER =
+  `${TRIGGER_BASE} tw:px-2 tw:border tw:border-transparent tw:bg-[var(--bk-gray-100)] tw:text-[var(--bk-ink-soft)] tw:[font-family:var(--bk-font-mono)] tw:hover:bg-[var(--bk-gray-200)]`;
+const ZOOM_TRIGGER =
+  `${TRIGGER_BASE} tw:w-[83px] tw:justify-between tw:px-2.5 tw:border tw:border-[var(--bk-border)] tw:bg-white tw:text-[var(--bk-ink-soft)] tw:hover:bg-[var(--bk-gray-50)]`;
+const VIEW_TRIGGER =
+  `${TRIGGER_BASE} tw:px-1.5 tw:border tw:border-transparent tw:bg-transparent tw:text-[13px] tw:text-[var(--bk-ink)] tw:hover:bg-[var(--bk-gray-100)]`;
 
 // ============================================
 // Main Component
@@ -223,25 +238,30 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
     <div className={BAR}>
       {/* The left readout — where the selection is. */}
       <span
-        className="tw:min-w-0 tw:flex-1 tw:truncate tw:pr-2 tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-ink-muted)]"
+        className="tw:min-w-0 tw:truncate tw:pl-2 tw:pr-2 tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-ink-muted)]"
         title={readoutTitle ?? readout}
         data-testid="canvas-bar-readout"
       >
         {readout}
       </span>
+      {device && onDeviceChange ? (
+        <BreakpointSwitcher variant="bar" value={device} onChange={onDeviceChange} data-testid="canvas-bar-devices" />
+      ) : (
+        <span />
+      )}
       <div className={GROUP}>
         {/* "{width} px" — board 145:71013's Page width. */}
         {device && onDeviceChange && onCustomWidth && pageWidth ? (
           <Popover
             open={widthOpen}
             onClose={() => setWidthOpen(false)}
-            placement="top"
+            placement="bottom"
             label="Page width"
             trigger={
               <Button
                 type="button"
                 color="light"
-                className={BAR_TRIGGER}
+                className={WIDTH_TRIGGER}
                 aria-haspopup="dialog"
                 aria-expanded={widthOpen}
                 aria-label={`Page width ${pageWidth} px`}
@@ -265,13 +285,13 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
         <Popover
           open={zoomOpen}
           onClose={() => setZoomOpen(false)}
-          placement="top"
+          placement="bottom-end"
           label="Zoom"
           trigger={
             <Button
               type="button"
               color="light"
-              className={BAR_TRIGGER}
+              className={ZOOM_TRIGGER}
               aria-haspopup="menu"
               aria-expanded={zoomOpen}
               aria-label={`Zoom ${Math.round(zoom)}%`}
@@ -279,6 +299,7 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
               onClick={() => setZoomOpen((v) => !v)}
             >
               {Math.round(zoom)}%
+              <ChevronDown size={14} aria-hidden="true" className="tw:flex-none" />
             </Button>
           }
         >
@@ -315,18 +336,17 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
             ))}
           </Menu>
         </Popover>
-        {/* "View" — board 145:64586's Canvas view. Opens upward: the bar sits
-            at the bottom of the canvas. */}
+        {/* "View" — board 145:64586's Canvas view, opening down from the bar. */}
         <Popover
           open={viewOpen}
           onClose={() => setViewOpen(false)}
-          placement="top-end"
+          placement="bottom-end"
           label="Canvas view"
           trigger={
             <Button
               type="button"
               color="light"
-              className={BAR_TRIGGER}
+              className={VIEW_TRIGGER}
               aria-haspopup="menu"
               aria-expanded={viewOpen}
               aria-label="View"

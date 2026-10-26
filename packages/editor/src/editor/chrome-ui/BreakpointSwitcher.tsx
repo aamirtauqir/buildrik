@@ -34,6 +34,12 @@ export interface BreakpointSwitcherProps
   includeWide?: boolean;
   /** Optional glyph map overriding the default device icons. */
   glyphs?: Partial<Record<Breakpoint, React.ReactNode>>;
+  /**
+   * `bar` — the canvas bar's devices (2L9 board 7:18654 and every editor
+   * frame): no well, 28 px icon cells, the chosen device on the accent TINT
+   * with an accent glyph. The default is the segmented well.
+   */
+  variant?: "well" | "bar";
 }
 
 interface BreakpointEntry {
@@ -86,11 +92,21 @@ const BTN_BASE_CLASS =
   "tw:aria-[pressed=true]:bg-[var(--bk-accent)] tw:aria-[pressed=true]:text-white " +
   "tw:aria-[pressed=true]:font-semibold";
 
+/* Board 7:18654: plain 28×28 cells, 6 apart; selected = blue-100 ground
+   (measured #E1EFFE on the board) under an ink glyph; rest = ink-soft. */
+const BAR_WELL_CLASS = "tw:inline-flex tw:gap-1.5";
+const BAR_BTN_CLASS =
+  "tw:size-7 tw:rounded-md tw:border-0 tw:cursor-pointer tw:bg-transparent tw:text-[var(--bk-ink-soft)] " +
+  "tw:inline-flex tw:items-center tw:justify-center tw:[transition:var(--bk-transition-fast)] " +
+  "tw:hover:bg-[var(--bk-gray-100)] tw:hover:text-[var(--bk-ink)] tw:outline-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)] " +
+  "tw:aria-[pressed=true]:bg-[var(--bk-accent-subtle)] tw:aria-[pressed=true]:text-[var(--bk-ink)]";
+
 export const BreakpointSwitcher = React.forwardRef<HTMLDivElement, BreakpointSwitcherProps>(
   function BreakpointSwitcher(
-    { value, onChange, labelled = false, sublabels, includeWide = false, glyphs, className, ...rest },
+    { value, onChange, labelled = false, sublabels, includeWide = false, glyphs, variant = "well", className, ...rest },
     ref,
   ) {
+    const bar = variant === "bar";
     const entries: ReadonlyArray<BreakpointEntry> = includeWide
       ? [WIDE_BREAKPOINT, ...CORE_BREAKPOINTS]
       : CORE_BREAKPOINTS;
@@ -99,7 +115,7 @@ export const BreakpointSwitcher = React.forwardRef<HTMLDivElement, BreakpointSwi
         ref={ref}
         role="group"
         aria-label="Breakpoint"
-        className={[WELL_CLASS, className].filter(Boolean).join(" ")}
+        className={[bar ? BAR_WELL_CLASS : WELL_CLASS, className].filter(Boolean).join(" ")}
         {...rest}
       >
         {entries.map((bp) => (
@@ -110,12 +126,12 @@ export const BreakpointSwitcher = React.forwardRef<HTMLDivElement, BreakpointSwi
                  measure.mjs refuses an ambiguous target if two switchers
                  ever render at once. */
               data-testid={`bp-cell-${bp.id}`}
-              className={`${BTN_BASE_CLASS} ${labelled ? "tw:w-auto tw:px-3" : "tw:w-8"}`}
+              className={bar ? BAR_BTN_CLASS : `${BTN_BASE_CLASS} ${labelled ? "tw:w-auto tw:px-3" : "tw:w-8"}`}
               aria-pressed={value === bp.id}
               aria-label={bp.label}
               onClick={() => onChange(bp.id)}
             >
-              {labelled ? bp.label : (glyphs?.[bp.id] ?? <bp.Icon size={14} aria-hidden="true" />)}
+              {labelled ? bp.label : (glyphs?.[bp.id] ?? <bp.Icon size={bar ? 16 : 14} aria-hidden="true" />)}
               {labelled && sublabels?.[bp.id] ? (
                 <span className="tw:ml-1 tw:font-normal tw:opacity-70">{sublabels[bp.id]}</span>
               ) : null}

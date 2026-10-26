@@ -18,7 +18,7 @@
  */
 
 import * as React from "react";
-import { ToastInput, dismissToastKey } from "@/editor/chrome-ui";
+import { ToastInput } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
 import type { SaveState } from "./useStudioState";
 import {
@@ -36,9 +36,6 @@ import { EVENTS } from "@/shared/constants/events";
 import { BANNER_ID, clearGlobalBanner, showCantReachBanner, showRoleChangedBanner } from "@/editor/shell/globalBanners";
 import { downloadProject } from "@/editor/shell/workSnapshot";
 
-/** One "not saved" card for both save paths (manual and autosave); the next
- *  save that lands takes it down (L3-006). */
-export const SAVE_FAILED_TOAST_KEY = "save-failed";
 
 export interface UseSaveCallbackOptions {
   composer: Composer | null;
@@ -134,31 +131,6 @@ export type SaveOutcome = "saved" | "queued-offline" | "conflict" | "error";
 
 export type SaveProjectFn = () => Promise<SaveOutcome>;
 
-// Map raw composer error → user-friendly explanation. Pure helper kept
-// alongside the hook so future contributors see all save-error mapping
-// in one place.
-function explainSaveError(rawMessage: string): string {
-  /* L3-013: the plan's page limit — the server's words name the limit. */
-  if (rawMessage.startsWith("PAGE_LIMIT:")) return rawMessage.slice("PAGE_LIMIT:".length).trim();
-  /* I-2: the server refused a page that belongs to another site (sites.saveProject
-     BAD_REQUEST); retrying the same snapshot cannot succeed. */
-  if (rawMessage.includes("belongs to another site")) {
-    return "This save included a page from another site and was refused. Reload the site before editing.";
-  }
-  if (rawMessage.includes("network") || rawMessage.includes("fetch")) {
-    return "Network error — check your internet connection and try again.";
-  }
-  if (rawMessage.includes("storage") || rawMessage.includes("quota")) {
-    return "Storage full — try clearing browser data or exporting your project.";
-  }
-  if (rawMessage.includes("permission") || rawMessage.includes("denied")) {
-    return "Permission denied — try refreshing the page.";
-  }
-  if (rawMessage.includes("timeout")) {
-    return "Request timed out — the server may be busy, try again shortly.";
-  }
-  return "Could not save project.";
-}
 
 export function useSaveCallback({
   composer,
@@ -221,7 +193,6 @@ export function useSaveCallback({
         if (siteId) clearUnsaved(siteId);
         setSaveState({ status: "idle", lastSavedAt: Date.now(), error: undefined });
         setIsDirty(false);
-        dismissToastKey(SAVE_FAILED_TOAST_KEY);
         clearGlobalBanner(BANNER_ID.connection);
         addToast({
           title: "Saved",
@@ -383,15 +354,9 @@ export function useSaveCallback({
           }
           return "error";
         }
-        const userMessage = explainSaveError(errorMessage);
+        /* Owner 2026-10-26 (one error surface): the slot's save-failed bar
+           (StudioHeader) and the bottom bar say it, with Retry. No toast. */
         setSaveState((prev) => ({ ...prev, status: "error", error: errorMessage }));
-        addToast({
-          title: "Save failed",
-          description: userMessage,
-          tone: "error",
-          action: { label: "Retry", onClick: () => void save() },
-          key: SAVE_FAILED_TOAST_KEY,
-        });
         return "error";
       });
   }, [composer, addToast, setSaveState, setIsDirty, onAuthExpired]);

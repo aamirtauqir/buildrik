@@ -855,9 +855,13 @@ describe("useComposerInit — autosave conflict handling", () => {
       await vi.advanceTimersByTimeAsync(THRESHOLDS.AUTOSAVE_DEBOUNCE + 1);
     });
 
-    expect(params.addToast).toHaveBeenCalledWith(
-      expect.objectContaining({ title: "Save failed", tone: "error" }),
-    );
+    /* Owner 2026-10-26 (one error surface): the failure is the save status
+       (the slot's bar and the bottom bar read it), never a toast. */
+    expect(params.setSaveState).toHaveBeenCalled();
+    const last = vi.mocked(params.setSaveState).mock.calls.at(-1)![0];
+    const next = typeof last === "function" ? last({ status: "saving" } as never) : last;
+    expect(next).toMatchObject({ status: "error", error: "500 from dashboard" });
+    expect(vi.mocked(params.addToast).mock.calls.filter(([t]) => t.title === "Save failed")).toHaveLength(0);
   });
 
   /* L5-070: one failed save left "Save failed — retry" up for good — after a
@@ -888,7 +892,7 @@ describe("useComposerInit — autosave conflict handling", () => {
     });
     expect(syncSaveProject).toHaveBeenCalledTimes(3);
     expect(params.setIsDirty).toHaveBeenLastCalledWith(false);
-    expect(vi.mocked(params.addToast).mock.calls.filter(([t]) => t.title === "Save failed")).toHaveLength(1);
+    expect(vi.mocked(params.addToast).mock.calls.filter(([t]) => t.title === "Save failed")).toHaveLength(0);
 
     // Saved: no further attempts.
     await act(async () => {

@@ -97,6 +97,9 @@ vi.mock("../modals/CommandPalette", () => ({
   ),
 }));
 
+import { BottomBar } from "../BottomBar";
+import { GlobalBannerSlot } from "../GlobalBannerSlot";
+import { BANNER_ID, clearGlobalBanner } from "../globalBanners";
 import { StudioHeader, type StudioHeaderProps } from "../StudioHeader";
 import { deriveLifecycleState } from "../lifecycle";
 import { shellDirty } from "../shellDirtyRegistry";
@@ -187,7 +190,7 @@ describe("StudioHeader", () => {
     it("is a banner with exit, the site name and the site menu", () => {
       render(<StudioHeader {...makeProps()} />);
       expect(screen.getByRole("banner")).toBeTruthy();
-      expect(screen.getByRole("button", { name: "‹ Exit" })).toBeTruthy();
+      expect(screen.getByRole("button", { name: "Exit" })).toBeTruthy();
       expect(screen.getByRole("button", { name: "Site menu" })).toBeTruthy();
     });
 
@@ -229,35 +232,21 @@ describe("StudioHeader", () => {
 
     /* C5 G1-004 (boards 4418:126034 / :90494 / :123573): "Site › Page" —
        the site crumb opens the Pages panel; the page crumb is where you are. */
-    it("the breadcrumb: site opens Pages, page is the current crumb and closes the drawer", () => {
+    /* 2L9 497:99433: the site's name is identity, not navigation — plain
+       text, no crumb, no page; a labelled "Site settings" sits beside it. */
+    it("the site name is plain text and Site settings is a labelled door", () => {
+      const onOpenProjectSettings = vi.fn();
       const onOpenPages = vi.fn();
-      const onCloseDrawer = vi.fn();
       const composer = { on: vi.fn(), off: vi.fn(), emit: vi.fn(), elements: { getActivePage: () => ({ name: "Menu" }) } };
-      render(<StudioHeader {...makeProps({ onOpenPages, onCloseDrawer, composer: composer as never })} />);
-      expect(screen.getByTestId("topbar-crumb-page")).toHaveTextContent("Menu");
-      expect(screen.getByTestId("topbar-crumb-page").getAttribute("aria-current")).toBe("page");
-      fireEvent.click(screen.getByTestId("topbar-crumb-site"));
-      expect(onOpenPages).toHaveBeenCalled();
-      expect(onCloseDrawer).not.toHaveBeenCalled();
-      fireEvent.click(screen.getByTestId("topbar-crumb-page"));
-      expect(onCloseDrawer).toHaveBeenCalled();
-    });
-
-    /* 4428:140486 — a full-canvas view names the page crumb ("<site> › CMS")
-       through ui:crumb-context; null gives it back to the page. */
-    it("the page crumb follows ui:crumb-context", () => {
-      const handlers = new Map<string, (p: unknown) => void>();
-      const composer = {
-        on: vi.fn((ev: string, fn: (p: unknown) => void) => handlers.set(ev, fn)),
-        off: vi.fn(),
-        emit: vi.fn(),
-        elements: { getActivePage: () => ({ name: "Menu" }) },
-      };
-      render(<StudioHeader {...makeProps({ composer: composer as never })} />);
-      act(() => handlers.get("ui:crumb-context")?.({ label: "CMS" }));
-      expect(screen.getByTestId("topbar-crumb-page")).toHaveTextContent("CMS");
-      act(() => handlers.get("ui:crumb-context")?.(null));
-      expect(screen.getByTestId("topbar-crumb-page")).toHaveTextContent("Menu");
+      render(<StudioHeader {...makeProps({ onOpenProjectSettings, onOpenPages, composer: composer as never })} />);
+      const name = screen.getByTestId("topbar-site-name");
+      expect(name.tagName).toBe("SPAN");
+      expect(within(name).queryByRole("button")).toBeNull();
+      expect(screen.queryByTestId("topbar-crumb-page")).toBeNull();
+      expect(within(screen.getByTestId("topbar")).queryByText("Menu")).toBeNull();
+      fireEvent.click(screen.getByRole("button", { name: "Site settings" }));
+      expect(onOpenProjectSettings).toHaveBeenCalledTimes(1);
+      expect(onOpenPages).not.toHaveBeenCalled();
     });
 
     /* B6 / G1-019: the activity log opens in the editor (History ·
@@ -296,9 +285,21 @@ describe("StudioHeader", () => {
     });
   });
 
+  /* 2L9 497:99485: the save status left the topbar for the bottom bar.
+     StudioHeader still derives it; BottomBar shows it (saveStatusStore). */
   describe("save state", () => {
     const save = (overrides: Partial<StudioHeaderProps>) =>
-      render(<StudioHeader {...makeProps(overrides)} />);
+      render(
+        <>
+          <StudioHeader {...makeProps(overrides)} />
+          <BottomBar composer={null} pages={[]} resourceArea={false} onBackToEditor={() => {}} />
+        </>,
+      );
+
+    it("is not in the topbar any more", () => {
+      save({ saveStatus: "saving" });
+      expect(within(screen.getByTestId("topbar")).queryByText("Saving…")).toBeNull();
+    });
 
     it("saving", () => {
       save({ saveStatus: "saving" });
@@ -308,7 +309,7 @@ describe("StudioHeader", () => {
     it("a failed save becomes the retry button", () => {
       const onSave = vi.fn();
       save({ saveStatus: "error", onSave });
-      const pill = screen.getByRole("button", { name: /Save failed/ });
+      const pill = screen.getByRole("button", { name: /Couldn.t save — Retry/ });
       // eng D5: the pill carries no live region of its own — the header pipe speaks.
       expect(pill.getAttribute("aria-live")).toBeNull();
       fireEvent.click(pill);
@@ -334,18 +335,19 @@ describe("StudioHeader", () => {
        conflict, nothing (a tooltip) offline. ⌘S is the save. The per-state
        table is StudioHeader.savePill.test.tsx; this keeps the one assert the
        old "saves from the pill" case protected: the save is still reachable. */
-    it("unsaved work opens History from the pill — ⌘S is the save", () => {
+    it("unsaved work: Details opens History — ⌘S is the save", () => {
       const onSave = vi.fn();
       const onOpenHistory = vi.fn();
       save({ isDirty: true, onSave, onOpenHistory });
-      fireEvent.click(screen.getByRole("button", { name: /Unsaved changes/ }));
+      expect(screen.queryByRole("button", { name: /Unsaved changes/ })).toBeNull();
+      fireEvent.click(screen.getByRole("button", { name: "Details" }));
       expect(onOpenHistory).toHaveBeenCalledTimes(1);
       expect(onSave).not.toHaveBeenCalled();
     });
 
     it("clean and saved", () => {
       save({ lastSavedAt: Date.now() });
-      expect(screen.getByText("Saved").textContent).toBe("Saved just now");
+      expect(screen.getByText("Saved just now")).toBeTruthy();
     });
 
     it("offline outranks a save error — queued is not lost", () => {
@@ -574,7 +576,8 @@ describe("StudioHeader", () => {
       render(<StudioHeader {...makeProps({ onOpenReview, reviewStatus: reviewStatus({ state: "none", editsRequireApproval: false }) })} />);
       const door = screen.getByTestId("topbar-review-pill");
       expect(screen.getByTestId("topbar-review-label").textContent).toBe("Request review");
-      expect(screen.getByTestId("topbar-review-chevron").textContent).toBe("›");
+      /* 2L9 497:99433: text, not a pill — no chevron. */
+      expect(screen.queryByTestId("topbar-review-chevron")).toBeNull();
       fireEvent.click(door);
       expect(onOpenReview).toHaveBeenCalledTimes(1);
     });
@@ -879,7 +882,7 @@ describe("StudioHeader", () => {
 // ── F1 · dirty-exit guard (plan 2026-07-29, decisions 1A/2A/5A) ─────────────
 describe("F1 dirty-exit guard", () => {
   function exitBtn() {
-    return screen.getByRole("button", { name: "‹ Exit" });
+    return screen.getByRole("button", { name: "Exit" });
   }
 
   // jsdom's window.location is non-configurable — replace the whole object.
@@ -949,15 +952,22 @@ describe("F1 dirty-exit guard", () => {
   it("Save & leave: error outcome stays in the editor with the save-failed card; its retry leaves", async () => {
     const assign = stubLocation();
     const onSave = vi.fn(async () => "error" as "error" | "saved");
-    render(<StudioHeader {...makeProps({ isDirty: true, onSave })} />);
+    /* Owner 2026-10-26: the failure is the global slot's one bar. */
+    render(
+      <>
+        <GlobalBannerSlot />
+        <StudioHeader {...makeProps({ isDirty: true, onSave })} />
+      </>,
+    );
     fireEvent.click(exitBtn());
     fireEvent.click(screen.getByRole("button", { name: "Save & leave" }));
-    const card = await screen.findByTestId("save-failed-banner");
+    const card = await screen.findByTestId("global-banner");
     expect(card.textContent).toMatch(/Couldn't save .*You have not left the editor\./);
     expect(assign).not.toHaveBeenCalled();
     onSave.mockResolvedValue("saved");
     fireEvent.click(screen.getByRole("button", { name: "Retry save & leave" }));
     await waitFor(() => expect(assign).toHaveBeenCalled());
+    act(() => clearGlobalBanner(BANNER_ID.connection));
   });
 
   it("offline + dirty: Exit goes straight to the risky dialog (5A — never fake-save)", () => {
@@ -1091,7 +1101,7 @@ describe("exit dialog — stranded mirrors", () => {
     strandedMirrors = 2;
     const assign = stubLocation();
     render(<StudioHeader {...makeProps()} />);
-    fireEvent.click(screen.getByRole("button", { name: "‹ Exit" }));
+    fireEvent.click(screen.getByRole("button", { name: "Exit" }));
     expect(assign).not.toHaveBeenCalled();
     expect(screen.getByText("Some changes are only on this device")).toBeTruthy();
     const body = screen.getByText(/reached the server/).textContent ?? "";
@@ -1110,7 +1120,7 @@ describe("exit dialog — stranded mirrors", () => {
     strandedMirrors = 1;
     stubLocation();
     render(<StudioHeader {...makeProps()} />);
-    fireEvent.click(screen.getByRole("button", { name: "‹ Exit" }));
+    fireEvent.click(screen.getByRole("button", { name: "Exit" }));
     expect(screen.getByText(/hasn't reached the server/).textContent).toMatch(/1 change /);
   });
 
@@ -1118,7 +1128,7 @@ describe("exit dialog — stranded mirrors", () => {
     strandedMirrors = 0;
     const assign = stubLocation();
     render(<StudioHeader {...makeProps()} />);
-    fireEvent.click(screen.getByRole("button", { name: "‹ Exit" }));
+    fireEvent.click(screen.getByRole("button", { name: "Exit" }));
     expect(screen.queryByText("Some changes are only on this device")).toBeNull();
     expect(assign).toHaveBeenCalled();
   });
@@ -1152,16 +1162,13 @@ describe("F3 review pill", () => {
 // ── T8/D7 · status grammar ──────────────────────────────────────────────────
 describe("T8 status grammar", () => {
   /**
-   * The tone lives on the pill root, the label's direct parent (ReviewBadge
-   * renders exactly `<span/button className={pillClasses}><span>{label}</span></span>`).
-   * Checks the applied tone utility, not a deleted modifier class — "info"
-   * and "success" render byte-identical classes by design (T8/D7 rule 3), so
-   * this can only distinguish warning from not-warning, same as the visual
-   * result always could.
+   * The tone lives on the status root, the label's direct parent (ReviewBadge
+   * renders `<span/button className={classes}><span>{label}</span></span>`).
+   * 2L9 497:99433 draws the review status as text, so the tone is the text
+   * colour — the warning status token, not a Tailwind literal (#26).
    */
   const toneOf = (labelEl: HTMLElement) => labelEl.parentElement!.className;
-  /* #26: the warning tone is the status token, not a Tailwind literal. */
-  const isWarningTone = (labelEl: HTMLElement) => toneOf(labelEl).includes("tw:bg-[var(--bk-warning-tint)]");
+  const isWarningTone = (labelEl: HTMLElement) => toneOf(labelEl).includes("tw:text-[var(--bk-warning-text)]");
 
   const changesRequested = () =>
     reviewStatus({ state: "changes-requested", reviewerName: "Sara", at: new Date().toISOString() });
@@ -1319,7 +1326,7 @@ describe("F9 a11y", () => {
 
   it("⌘K is a no-op while a modal dialog owns the keyboard", () => {
     render(<StudioHeader {...makeProps({ isDirty: true })} />);
-    fireEvent.click(screen.getByRole("button", { name: "‹ Exit" }));
+    fireEvent.click(screen.getByRole("button", { name: "Exit" }));
     expect(screen.getByText("Leave with unsaved changes?")).toBeTruthy();
     fireEvent.keyDown(document, { key: "k", metaKey: true });
     expect(screen.queryByTestId("command-palette")).toBeNull();
