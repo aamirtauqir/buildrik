@@ -952,7 +952,8 @@ describe("F1 dirty-exit guard", () => {
   it("Save & leave: error outcome stays in the editor with the save-failed card; its retry leaves", async () => {
     const assign = stubLocation();
     const onSave = vi.fn(async () => "error" as "error" | "saved");
-    /* Owner 2026-10-26: the failure is the global slot's one bar. */
+    /* C05 10:2199: the failure is the canvas strip StudioHeader mounts, not
+       the slot's bar (one surface either way). */
     render(
       <>
         <GlobalBannerSlot />
@@ -961,7 +962,8 @@ describe("F1 dirty-exit guard", () => {
     );
     fireEvent.click(exitBtn());
     fireEvent.click(screen.getByRole("button", { name: "Save & leave" }));
-    const card = await screen.findByTestId("global-banner");
+    const card = await screen.findByTestId("save-failed-banner");
+    expect(screen.queryByTestId("global-banner")).toBeNull();
     expect(card.textContent).toMatch(/Couldn't save .*You have not left the editor\./);
     expect(assign).not.toHaveBeenCalled();
     onSave.mockResolvedValue("saved");

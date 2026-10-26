@@ -53,6 +53,7 @@ import { EditorStoppedBoundary } from "@/editor/shell/EditorStoppedScreen";
 import { registerWorkSnapshot } from "@/editor/shell/workSnapshot";
 import { setKeptWorkOffer } from "@/editor/shell/keptWorkOffer";
 import { RecoveryBanner } from "@/editor/shell/RecoveryBanner";
+import { SaveFailedStrip } from "@/editor/shell/SaveFailedStrip";
 import { SessionExpiredModal } from "@/editor/shell/modals/SessionExpiredModal";
 import { DEFAULT_ONBOARDING_STEPS } from "@/shared/constants/onboardingSteps";
 import { CanvasFooterToolbar } from "@/editor/canvas/CanvasFooterToolbar";
@@ -3085,14 +3086,6 @@ const CASES: Record<string, () => React.ReactElement> = {
     </div>
   ),
   /* Owner 2026-10-26 / board C05: a failed save is the global slot's one bar. */
-  "banner-save-failed": () => {
-    showGlobalBanner(saveFailedBanner({ where: "Fieldwork Studio · Home", retry: () => {} }));
-    return (
-      <div data-probe="banner-save-failed" style={{ width: "100vw" }}>
-        <GlobalBannerSlot />
-      </div>
-    );
-  },
   // ── Publish states (boards 784:4250 / 781:4489) ──────────────────────────
   "publish-publishing": () => (
     <div data-probe="publish-publishing">
@@ -4043,13 +4036,18 @@ Object.assign(CASES, {
   },
   /* lead3 wave 3 (owner: one error surface): the failed save is the slot's
      one bar under the topbar, not a canvas-column strip. */
+  /* C05 10:2199 — the strip 12 in from the canvas column, 12 under its bar
+     (the column starts under the topbar; the bar is 42 tall, 7:18654). */
   "lf-save-failed": () => {
     showGlobalBanner(saveFailedBanner({ where: "Fieldwork Studio · Home", retry: () => {} }));
     return (
       <div data-probe="lf-save-failed">
         {LF_TOPBAR}
         <GlobalBannerSlot />
-        {LF_COLUMN}
+        <div data-bk-toast-anchor="" style={{ position: "fixed", left: 342, top: 56, width: 798, height: 812, background: "var(--bk-bg-subtle)" }}>
+          <div data-testid="canvas-bar" style={{ height: 42, background: "var(--bk-bg-card)", borderBottom: "1px solid var(--bk-gray-200)" }} />
+        </div>
+        <SaveFailedStrip />
       </div>
     );
   },

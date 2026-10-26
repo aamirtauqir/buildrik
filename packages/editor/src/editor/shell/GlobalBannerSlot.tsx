@@ -186,7 +186,9 @@ export const GlobalBannerSlot: React.FC<GlobalBannerSlotProps> = ({ lead }) => {
   useOfflineBanner();
   useNarrowWindowBanner();
   useWorkspaceDeletionBanner();
-  const banners = useGlobalBanners();
+  /* A canvas-placed condition (the failed save, C05) is drawn by
+     SaveFailedStrip over the canvas column, not here. */
+  const banners = useGlobalBanners().filter((b) => b.placement !== "canvas");
   if (lead) {
     const rest = banners.filter((b) => b.id !== lead.id);
     return (

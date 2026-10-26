@@ -21771,8 +21771,8 @@
    "family": "recovery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Board C05 draws the save-failed strip inside the canvas column; owner direction 2026-10-26 is \"the board wins\", so the strip moves back there (one surface, no toast, no stacked banner). Lead had routed it through the global slot on an internal instruction, not an owner decision. | probe-compared 2026-10-27 (lead3, cases banner-save-failed + bottom-bar state=error): owner 2026-10-26 — one error surface. The failure is ONE bar in the global slot under the topbar ('✕ Couldn’t save <site> · <page>. Your changes are kept.' + Retry; full width, 40 tall — the board draws the strip in the canvas column, the owner routed it through the slot), the bottom bar says 'Couldn’t save — Ret",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (lead4, case lf-save-failed at 1440×900 with a 42-tall canvas bar at the column top, shots/10-2199.png side by side): strip at x354 y110 774×44 (board ≈353/112, 775×46) — 12 in from the canvas column, 12 under the canvas bar; ⚠ glyph, red 13/20 line, white bordered Retry 67×32 beside it (board ≈31 tall). One error surface: the strip draws the stored connection-id condition (SaveFailedStrip, placement canvas), so Can’t reach / Reconnecting replace it instead of stacking, the slot bar never repeats it, no toast; bottom bar says “Couldn’t save — Retry” (lead3 bottom-bar state=error). Line is the context-free “Couldn’t save <site> · <page>. Your changes are kept.” — the board’s publish wording is F-18 (open:save-failed-copy-context). Radius 8 vs the board’s ≈2 not changed.",
    "tier": "P2"
   },
   {

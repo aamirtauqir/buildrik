@@ -232,7 +232,7 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
   );
 
   return (
-    <div className={BAR}>
+    <div className={BAR} data-testid="canvas-bar">
       {/* The left readout — where the selection is. */}
       <div className={SIDE}>
         <span
