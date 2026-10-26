@@ -316,6 +316,25 @@ describe("PublishTray — deploy failed", () => {
     expect(cta()).toBeDisabled();
   });
 
+  it("Try again comes back when nothing followed the press (confirm cancelled)", () => {
+    vi.useFakeTimers();
+    try {
+      const { onRequestPublish } = renderTray({
+        publishJob: job({ uiState: "failed", jobId: "job-9", error: "Vercel timed out." }),
+      });
+      fireEvent.click(cta());
+      expect(cta()).toBeDisabled();
+      act(() => {
+        vi.advanceTimersByTime(3000);
+      });
+      expect(cta()).not.toBeDisabled();
+      fireEvent.click(cta());
+      expect(onRequestPublish).toHaveBeenCalledTimes(2);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("a failure after partial upload (deployment id present) asks for a NEW job through the door, never re-tracks the dead one", () => {
     const failed = job({ uiState: "failed", jobId: "job-9", deploymentId: "dpl_partial", error: "Upload interrupted." });
     const { onRequestPublish } = renderTray({ publishJob: failed });

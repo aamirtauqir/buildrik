@@ -71,7 +71,7 @@ function mount(over: Partial<StudioHeaderProps> = {}) {
 }
 
 
-function lockedComposer(locks: string[]) {
+function lockedComposer(locks: string[], canUndo = false) {
   const listeners = new Map<string, Set<() => void>>();
   return {
     editLocks: new Set(locks),
@@ -80,7 +80,7 @@ function lockedComposer(locks: string[]) {
     off: (e: string, fn: () => void) => { listeners.get(e)?.delete(fn); },
     emit: () => undefined,
     history: new Proxy(
-      { canUndo: () => false, canRedo: () => false, getHistoryStack: () => [], getRedoStack: () => [] },
+      { canUndo: () => canUndo, canRedo: () => false, getHistoryStack: () => [], getRedoStack: () => [] },
       { get: (target, key) => (key in target ? target[key as keyof typeof target] : () => undefined) },
     ),
     designSystem: { readOnly: false },
@@ -104,5 +104,10 @@ describe("StudioHeader with the not-loaded lock held", () => {
   it("a view lock alone keeps the normal save pill", () => {
     mount({ composer: lockedComposer(["view"]) as unknown as StudioHeaderProps["composer"] });
     expect(screen.queryByText("Not loaded · nothing saved yet")).toBeNull();
+  });
+
+  it("time travel disables topbar Undo even when history has a step", () => {
+    mount({ composer: lockedComposer(["time-travel"], true) as unknown as StudioHeaderProps["composer"] });
+    expect(screen.getByRole("button", { name: /^undo/i }).getAttribute("aria-disabled")).toBe("true");
   });
 });

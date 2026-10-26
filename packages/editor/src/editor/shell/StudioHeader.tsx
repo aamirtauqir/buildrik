@@ -650,7 +650,8 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
      chip as Saved. */
   /* The site never arrived (Task 1.6): the engine holds `not-loaded`, so
      nothing can be saved and nothing can be published (board B7-G02). */
-  const notLoaded = useEditLocks(composer).includes("not-loaded");
+  const editLocks = useEditLocks(composer);
+  const notLoaded = editLocks.includes("not-loaded");
   const save: SaveState = notLoaded
     ? "not-loaded"
     : offline
@@ -814,8 +815,19 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
      from AquibraStudio — so it re-reads on a composer swap, a project load
      (importProject emits only project:loaded) and a version restore. */
   const { canUndo, canRedo, undo, redo } = useHistoryState(composer);
+  /* The engine refuses undo/redo under any edit lock (time travel, a missing
+     site); offering them enabled would make a silent no-op. */
+  const historyLocked = editLocks.length > 0;
   const history =
-    viewMode.readOnlyView || !composer ? null : { canUndo, canRedo, onUndo: undo, onRedo: redo, ...historyChords() };
+    viewMode.readOnlyView || !composer
+      ? null
+      : {
+          canUndo: canUndo && !historyLocked,
+          canRedo: canRedo && !historyLocked,
+          onUndo: undo,
+          onRedo: redo,
+          ...historyChords(),
+        };
   const review: ReviewPill | null = reviewChipResult ? { ...reviewChipResult, onClick: onOpenReview } : null;
 
   return (

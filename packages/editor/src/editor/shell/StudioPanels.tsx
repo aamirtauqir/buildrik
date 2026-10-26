@@ -1079,7 +1079,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
               else if (cmsReturn) backToCanvas();
               else onLeftPanelToggle?.();
             }}
-            viewMode={readOnlyView}
           />
         </LayoutShell.Footer>
       </LayoutShell>

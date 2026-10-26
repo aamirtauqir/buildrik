@@ -409,20 +409,30 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
              2026-09-24). A project:changed schedules the autosave that
              persists it — once; the next load is at the target and skips. */
           if (migrated || tokensMigrated) instance.emit(EVENTS.PROJECT_CHANGED, { reason: "ds-migration" });
-          // Phase B3: hydrate media library from server. Additive — never
-          // throws. Returns null on offline/auth/unconfigured; we just
-          // keep going with engine-only state in that case.
-          const remote = await loadServerMedia(siteId);
-          if (remote) {
-            await instance.media.importServerAssets(remote.assets, remote.folders);
-            /* Hand the page's edges to the media domain. This pull is one
-               page; the drawer's "Load more" walks the rest, and it can only
-               do that if the cursor survives past this line. It used to be
-               discarded here, which is how a 200-asset cap became invisible.  */
-            instance.media.setServerPage({
-              nextCursor: remote.nextCursor,
-              total: remote.total ?? remote.assets.length,
-              loaded: remote.assets.length,
+          // Phase B3: hydrate media library from server. Additive.
+          // Returns null on offline/auth/unconfigured; we just keep going
+          // with engine-only state in that case. The site is already loaded
+          // and unlocked here, so a media failure must not fall into the
+          // load-failure catch below (banner + localStorage fallback over a
+          // loaded site): it is reported and the editor carries on.
+          try {
+            const remote = await loadServerMedia(siteId);
+            if (remote) {
+              await instance.media.importServerAssets(remote.assets, remote.folders);
+              /* Hand the page's edges to the media domain. This pull is one
+                 page; the drawer's "Load more" walks the rest, and it can only
+                 do that if the cursor survives past this line. It used to be
+                 discarded here, which is how a 200-asset cap became invisible.  */
+              instance.media.setServerPage({
+                nextCursor: remote.nextCursor,
+                total: remote.total ?? remote.assets.length,
+                loaded: remote.assets.length,
+              });
+            }
+          } catch (mediaError) {
+            captureError(mediaError instanceof Error ? mediaError : new Error(String(mediaError)), {
+              siteId,
+              phase: "media-hydration-after-load",
             });
           }
         })

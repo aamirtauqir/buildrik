@@ -65,6 +65,8 @@ const SERVER_CONTENT_LABELS = new Set<string>(Object.values(CONTENT_CHECK_LABELS
  *  failed attempts or this long failing. */
 const CMS_STUCK_ATTEMPTS = 5;
 const CMS_STUCK_MS = 60_000;
+/** How long a Try again / Check status press stays latched when nothing follows it. */
+const RETRY_LATCH_MS = 3000;
 
 export interface PublishTrayProps {
   composer: Composer | null;
@@ -247,10 +249,17 @@ export const PublishTray: React.FC<PublishTrayProps> = ({ composer, publishJob, 
   const vercelMissing = (checks?.checks ?? []).some((c) => c.label === VERCEL_CHECK_LABEL && c.status === "fail");
   const cta = trayCta({ nextMove, publishJob, wired: !!onRequestPublish, checkState, vercelMissing, cms });
 
-  /* Idempotent Try again / Check status: one press per failure. The latch
-     clears when the job moves on, so the next failure can be retried. */
+  /* Idempotent Try again / Check status: a second press while the first is in
+     flight does nothing. The latch clears when the job moves on — or after
+     RETRY_LATCH_MS when nothing happened (the publish confirm was cancelled,
+     or the re-poll failed again), so the button never stays dead. */
   const [retried, setRetried] = React.useState(false);
   React.useEffect(() => setRetried(false), [uiState, publishJob?.jobId]);
+  React.useEffect(() => {
+    if (!retried) return undefined;
+    const t = window.setTimeout(() => setRetried(false), RETRY_LATCH_MS);
+    return () => window.clearTimeout(t);
+  }, [retried]);
 
   const onCta = () => {
     if (cta.kind === "publish") onRequestPublish?.();

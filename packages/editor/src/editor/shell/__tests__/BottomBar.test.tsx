@@ -21,12 +21,13 @@ const PAGES = [
   { id: "about", name: "About", slug: "about", root: {} },
 ] as PageData[];
 
-function makeComposer({ readOnly = false } = {}) {
+function makeComposer({ locks = [] as string[] } = {}) {
   const handlers = new Map<string, Set<(p?: unknown) => void>>();
   let active = "home";
   const emit = vi.fn((ev: string, p?: unknown) => [...(handlers.get(ev) ?? [])].forEach((fn) => fn(p)));
   return {
-    readOnly,
+    editLocks: new Set(locks),
+    readOnly: locks.length > 0,
     on: (ev: string, fn: (p?: unknown) => void) => {
       if (!handlers.has(ev)) handlers.set(ev, new Set());
       handlers.get(ev)!.add(fn);
@@ -46,11 +47,10 @@ function makeComposer({ readOnly = false } = {}) {
 }
 type Fake = ReturnType<typeof makeComposer>;
 
-function Shell({ composer, resourceArea = false, onBack = () => {}, viewMode = false }: {
+function Shell({ composer, resourceArea = false, onBack = () => {} }: {
   composer: Fake;
   resourceArea?: boolean;
   onBack?: () => void;
-  viewMode?: boolean;
 }) {
   const c = composer as unknown as Composer;
   const modals = React.useMemo(() => ({ setShowShortcuts: () => {} }), []);
@@ -59,7 +59,7 @@ function Shell({ composer, resourceArea = false, onBack = () => {}, viewMode = f
   return (
     <>
       <input aria-label="Some field" />
-      <BottomBar composer={c} pages={pages} resourceArea={resourceArea} onBackToEditor={onBack} viewMode={viewMode} />
+      <BottomBar composer={c} pages={pages} resourceArea={resourceArea} onBackToEditor={onBack} />
     </>
   );
 }
@@ -129,15 +129,15 @@ describe("BottomBar — page switcher chord", () => {
     expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_PANEL_OPEN, { panel: "pages" });
   });
 
-  it('while the engine is read-only the switcher opens but rows are disabled with "Available when the site loads"', () => {
-    render(<Shell composer={makeComposer({ readOnly: true })} />);
+  it('while the site is not loaded the switcher opens but rows are disabled with "Available when the site loads"', () => {
+    render(<Shell composer={makeComposer({ locks: ["not-loaded"] })} />);
     fireEvent.click(screen.getByTestId("page-switcher-trigger"));
     expect(screen.getByTestId("page-switcher-disabled").textContent).toBe("Available when the site loads");
     expect(screen.getByTestId("page-switcher-row-about").getAttribute("aria-disabled")).toBe("true");
   });
 
-  it("view mode navigates: its read-only gate does not lock the rows", () => {
-    render(<Shell composer={makeComposer({ readOnly: true })} viewMode />);
+  it.each([["view"], ["time-travel"]])("a %s lock does not lock the rows: navigation is not a document write", (lock) => {
+    render(<Shell composer={makeComposer({ locks: [lock] })} />);
     fireEvent.click(screen.getByTestId("page-switcher-trigger"));
     expect(screen.queryByTestId("page-switcher-disabled")).toBeNull();
   });

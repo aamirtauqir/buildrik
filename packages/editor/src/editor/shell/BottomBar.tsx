@@ -18,6 +18,7 @@ import { Button } from "@/editor/chrome-ui";
 import { EVENTS } from "@/shared/constants/events";
 import type { PageSummary } from "@/shared/types";
 import { useActivePageId } from "@/editor/shared/useActivePageId";
+import { useEditLocks } from "@/editor/shared/useEditLocks";
 import { PageSwitcher } from "./PageSwitcher";
 
 export interface BottomBarProps {
@@ -26,12 +27,13 @@ export interface BottomBarProps {
   /** A resource area replaces the canvas: no switcher, a way back instead. */
   resourceArea: boolean;
   onBackToEditor: () => void;
-  /** View mode is navigation by design: its read-only engine gate does not
-   *  lock the switcher. */
-  viewMode: boolean;
 }
 
-export function BottomBar({ composer, pages, resourceArea, onBackToEditor, viewMode }: BottomBarProps) {
+export function BottomBar({ composer, pages, resourceArea, onBackToEditor }: BottomBarProps) {
+  /* Only a missing site disables navigation; view mode and time travel can
+     still switch pages (setActivePage is not a document write). */
+  const notLoaded = useEditLocks(composer).includes("not-loaded");
+
   const activePageId = useActivePageId(composer);
   const [open, setOpen] = React.useState(false);
 
@@ -79,8 +81,7 @@ export function BottomBar({ composer, pages, resourceArea, onBackToEditor, viewM
       onSelect={(id) => composer?.elements.setActivePage(id)}
       onManagePages={openPagesPanel}
       onAddPage={openPagesPanel}
-      /* Read when the menu renders: the engine gate has no change event yet. */
-      disabledReason={composer?.readOnly && !viewMode ? "Available when the site loads" : undefined}
+      disabledReason={notLoaded ? "Available when the site loads" : undefined}
     />
   );
 }
