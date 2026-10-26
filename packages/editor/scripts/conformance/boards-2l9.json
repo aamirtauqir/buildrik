@@ -14131,7 +14131,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/AnalyticsScreen.tsx:324 — load/error exist; \"Couldn’t load Analytics\" copy differs"
+   "verifiedNote": "Built, not compared (loading state): the load card reads 'Loading <screen>…'; the footer 'Loading settings…' (tested)."
   },
   {
    "nodeId": "252:47480",
@@ -14141,7 +14141,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/AnalyticsScreen.tsx:324 — load/error exist; \"Couldn’t load Analytics\" copy differs"
+   "verifiedNote": "Built, not compared (error state): 'Couldn’t load <screen>', 'The settings service did not respond. Your existing configuration has not changed.', Try again; footer 'Settings unavailable · Retry to continue' (tested)."
   },
   {
    "nodeId": "252:47733",
@@ -14151,7 +14151,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:786 — shell load/error exist; per-screen copy differs"
+   "verifiedNote": "Built, not compared (loading state): the load card reads 'Loading <screen>…'; the footer 'Loading settings…' (tested)."
   },
   {
    "nodeId": "252:47989",
@@ -14161,7 +14161,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:786 — shell load/error exist; per-screen copy differs"
+   "verifiedNote": "Built, not compared (error state): 'Couldn’t load <screen>', 'The settings service did not respond. Your existing configuration has not changed.', Try again; footer 'Settings unavailable · Retry to continue' (tested)."
   },
   {
    "nodeId": "252:48242",

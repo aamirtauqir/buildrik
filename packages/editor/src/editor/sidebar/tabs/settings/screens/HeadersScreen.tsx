@@ -207,9 +207,8 @@ export const HeadersScreen: React.FC<ScreenProps> = ({
       <Screen>
         <LoadCard
           title="Security headers"
-          line="CSP, X-Frame-Options, Referrer-Policy and HSTS."
           state={load.state}
-          errorLine="Couldn't load your headers. Check your connection, then try again."
+          errorLine="The settings service did not respond. Your existing configuration has not changed."
           onRetry={load.retry}
         />
       </Screen>

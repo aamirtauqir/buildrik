@@ -262,7 +262,6 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({
       <Screen>
         <LoadCard
           title="Custom code"
-          line="Head, body and CSS injections for this site."
           state={load.state}
           errorLine="Couldn't load your custom code. Check your connection, then try again."
           onRetry={load.retry}

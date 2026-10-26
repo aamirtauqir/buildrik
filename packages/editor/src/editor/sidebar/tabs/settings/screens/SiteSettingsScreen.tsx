@@ -386,8 +386,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
     return (
       <Screen>
         <LoadCard
-          title="Site identity"
-          line="Site name, author, favicon and touch icon."
+          title="General"
           state={load.state}
           errorLine="Couldn't load your site settings. Check your connection, then try again."
           onRetry={load.retry}

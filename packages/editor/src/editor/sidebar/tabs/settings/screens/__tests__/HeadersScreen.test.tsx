@@ -257,9 +257,8 @@ describe("HeadersScreen — the server states", () => {
     setup({ onLoadStateChange });
     const card = screen.getByTestId("set-load-card");
     expect(card).toHaveAttribute("data-state", "loading");
-    expect(screen.getByTestId("set-load-title")).toHaveTextContent("Security headers");
-    expect(screen.getByTestId("set-load-line")).toHaveTextContent("CSP, X-Frame-Options, Referrer-Policy and HSTS.");
-    expect(screen.getByTestId("set-load-state")).toHaveTextContent("Loading…");
+    // 2L9 B8-SH12 252:47733.
+    expect(screen.getByTestId("set-load-title")).toHaveTextContent("Loading Security headers…");
     expect(onLoadStateChange).toHaveBeenCalledWith("loading");
     expect(screen.queryByTestId("set-card-content-security-policy")).toBeNull();
     expect(screen.queryByTestId("set-hd-restore")).toBeNull();
@@ -271,7 +270,7 @@ describe("HeadersScreen — the server states", () => {
     setup({ onLoadStateChange });
     await waitFor(() => expect(screen.getByTestId("set-load-card")).toHaveAttribute("data-state", "error"));
     expect(screen.getByTestId("set-load-state")).toHaveTextContent(
-      "Couldn't load your headers. Check your connection, then try again.",
+      "The settings service did not respond. Your existing configuration has not changed.",
     );
     expect(onLoadStateChange).toHaveBeenCalledWith("error");
     fireEvent.click(screen.getByTestId("set-load-retry"));

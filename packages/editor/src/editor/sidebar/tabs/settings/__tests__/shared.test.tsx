@@ -131,19 +131,16 @@ describe("controls — density 32", () => {
 describe("LoadCard", () => {
   const props = {
     title: "Site identity",
-    line: "Site name, favicon, language and social profiles.",
     errorLine: "Couldn't load your site settings. Check your connection, then try again.",
   };
 
-  it("loading: eyebrow, line, `Loading…`, no button", () => {
+  it("loading: \"Loading <screen>…\", no button (2L9 B8-AN13)", () => {
     render(<LoadCard {...props} state="loading" />);
     const card = screen.getByTestId("set-load-card");
     expect(card.getAttribute("aria-busy")).toBe("true");
     expect(card.getAttribute("data-state")).toBe("loading");
-    expect(screen.getByTestId("set-load-title").textContent).toBe("Site identity");
-    expect(screen.getByTestId("set-load-title").className).toContain("tw:uppercase");
-    expect(screen.getByTestId("set-load-line").textContent).toBe(props.line);
-    expect(screen.getByText("Loading…")).toBeTruthy();
+    expect(screen.getByTestId("set-load-title").textContent).toBe("Loading Site identity…");
+    expect(screen.queryByTestId("set-load-state")).toBeNull();
     expect(screen.queryByTestId("set-load-retry")).toBeNull();
   });
 
@@ -151,6 +148,7 @@ describe("LoadCard", () => {
     const onRetry = vi.fn();
     render(<LoadCard {...props} state="error" onRetry={onRetry} />);
     expect(screen.getByRole("alert")).toBeTruthy();
+    expect(screen.getByTestId("set-load-title").textContent).toBe("Couldn’t load Site identity");
     expect(screen.getByText(props.errorLine)).toBeTruthy();
     const retry = screen.getByTestId("set-load-retry");
     expect(retry.textContent).toBe("Try again");

@@ -331,9 +331,8 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
       <Screen>
         <LoadCard
           title="Analytics"
-          line="GA4, GTM, Meta Pixel and Clarity keys."
           state={load.state}
-          errorLine="Couldn't load your analytics settings. Check your connection, then try again."
+          errorLine="The settings service did not respond. Your existing configuration has not changed."
           onRetry={load.retry}
         />
       </Screen>

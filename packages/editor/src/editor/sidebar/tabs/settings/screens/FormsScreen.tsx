@@ -68,7 +68,6 @@ interface SubmissionsPage {
 }
 
 const PER_PAGE = 20;
-const CARD_LINE = "What visitors sent through your forms.";
 
 let _client: ReturnType<typeof createBuildrikApiClient> | null = null;
 function getClient() {
@@ -334,7 +333,6 @@ export const FormsScreen: React.FC<ScreenProps> = ({ composer, projectId, onDirt
       <Screen>
         <LoadCard
           title="Form submissions"
-          line={CARD_LINE}
           state={formsState}
           errorLine="Couldn't load your forms. Check your connection, then try again."
           onRetry={() => setAttempt((n) => n + 1)}

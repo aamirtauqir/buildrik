@@ -1014,7 +1014,7 @@ describe("SettingsTab — a screen's own header action, and screens whose action
 // ─── Load states ──────────────────────────────────────────────────────────
 
 describe("SettingsTab — the footer follows the screen's load", () => {
-  it("Loading settings… and Settings could not load, Save disabled in both", async () => {
+  it("Loading settings… and Settings unavailable · Retry to continue, Save disabled in both", async () => {
     renderS(<SettingsTab composer={asComposer(makeComposer())} />);
     fireEvent.click(screen.getByTestId("set-nav-seo"));
     await waitFor(() => expect(headTitle()).toBe("SEO"));
@@ -1023,7 +1023,7 @@ describe("SettingsTab — the footer follows the screen's load", () => {
     expect(footStatus()).toBe("Loading settings…");
     expect(save().disabled).toBe(true);
     fireEvent.click(screen.getByText("go error"));
-    expect(footStatus()).toBe("Settings could not load");
+    expect(footStatus()).toBe("Settings unavailable · Retry to continue");
     expect(screen.getByTestId("set-foot-status").className).toContain("var(--bk-error)");
     expect(save().disabled).toBe(true);
     fireEvent.click(screen.getByText("go ready"));

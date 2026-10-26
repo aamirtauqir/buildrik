@@ -824,7 +824,7 @@ export const SettingsTab: React.FC<
       : loadState === "loading"
       ? { text: "Loading settings…", tone: "muted" }
       : loadState === "error"
-        ? { text: "Settings could not load", tone: "danger" }
+        ? { text: "Settings unavailable · Retry to continue", tone: "danger" }
         : footerMessage
           ? { text: footerMessage, tone: "muted" }
           : saveError

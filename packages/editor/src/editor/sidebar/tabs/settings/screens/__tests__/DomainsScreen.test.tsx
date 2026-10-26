@@ -399,11 +399,7 @@ describe("DomainsScreen — empty (3397:33034), loading (3397:32985), load-error
     d.list.query.mockReturnValue(new Promise((r) => { resolve = r; }));
     const onLoadStateChange = vi.fn();
     setup({ onLoadStateChange });
-    expect(screen.getByTestId("set-load-title")).toHaveTextContent("Custom domain");
-    expect(screen.getByTestId("set-load-line")).toHaveTextContent(
-      "Point your own domain at this site. DNS changes happen at your domain registrar.",
-    );
-    expect(screen.getByTestId("set-load-state")).toHaveTextContent("Loading…");
+    expect(screen.getByTestId("set-load-title")).toHaveTextContent("Loading Domains…");
     expect(onLoadStateChange).toHaveBeenLastCalledWith("loading");
     await act(async () => { resolve([bella()]); });
     await loaded();

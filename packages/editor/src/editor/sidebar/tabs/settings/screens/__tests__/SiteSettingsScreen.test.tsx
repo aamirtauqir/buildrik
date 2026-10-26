@@ -151,7 +151,7 @@ describe("General · 2L9 B8-S02 238:10283 — Site and Icons cards from the Site
     getMock.mockRejectedValueOnce(new Error("network"));
     setup();
     await waitFor(() => expect(screen.getByTestId("set-load-retry")).toBeInTheDocument());
-    expect(screen.getByTestId("set-load-title")).toHaveTextContent("Site identity");
+    expect(screen.getByTestId("set-load-title")).toHaveTextContent("Couldn’t load General");
     getMock.mockResolvedValueOnce(serverRow());
     fireEvent.click(screen.getByTestId("set-load-retry"));
     await loaded();

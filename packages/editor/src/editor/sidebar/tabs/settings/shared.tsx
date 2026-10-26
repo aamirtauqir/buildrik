@@ -377,35 +377,37 @@ export const Screen: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 // ─────────────────────────────────────────────────────────────────────────────
 
 export interface LoadCardProps {
-  /** Card eyebrow, e.g. `SITE IDENTITY`. */
+  /** The screen's name — "Analytics" reads "Loading Analytics…" / "Couldn’t load Analytics". */
   title: string;
-  /** What the card would hold, e.g. `Site name, favicon, language and social profiles.` */
-  line: string;
   state: "loading" | "error";
-  /** The failure line, e.g. `Couldn't load your site settings. Check your connection, then try again.` */
+  /** The failure's sentence under the heading. */
   errorLine: string;
   /** `Try again` — re-runs the screen's load. */
   onRetry?: () => void;
 }
 
-export const LoadCard: React.FC<LoadCardProps> = ({ title, line, state, errorLine, onRetry }) => (
+/** 2L9 B8-AN13/14, SH12/13 (252:47222…252:47989): "Loading <screen>…", or
+ *  "Couldn’t load <screen>", what happened, and Try again. */
+export const LoadCard: React.FC<LoadCardProps> = ({ title, state, errorLine, onRetry }) => (
   <section
-    className={`${SET_CARD} tw:flex tw:items-center tw:justify-between tw:gap-6 tw:p-4`}
+    className={`${SET_CARD} tw:flex tw:w-full tw:max-w-180 tw:items-center tw:justify-between tw:gap-6 tw:p-4`}
     role={state === "error" ? "alert" : "status"}
     aria-busy={state === "loading"}
     data-testid="set-load-card"
     data-state={state}
   >
-    <div className="tw:flex tw:min-w-0 tw:flex-col tw:gap-1.5">
-      <div className={SET_EYEBROW} data-testid="set-load-title">
-        {title}
+    <div className="tw:flex tw:min-w-0 tw:flex-col tw:gap-1">
+      <div
+        className="tw:text-[length:var(--bk-text-14)] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]"
+        data-testid="set-load-title"
+      >
+        {state === "loading" ? `Loading ${title}…` : `Couldn’t load ${title}`}
       </div>
-      <div className="tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-soft)]" data-testid="set-load-line">
-        {line}
-      </div>
-      <div className="tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="set-load-state">
-        {state === "loading" ? "Loading…" : errorLine}
-      </div>
+      {state === "error" ? (
+        <div className="tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="set-load-state">
+          {errorLine}
+        </div>
+      ) : null}
     </div>
     {state === "error" ? (
       <Button type="button" size="xs" className={SET_BTN} onClick={onRetry} data-testid="set-load-retry">

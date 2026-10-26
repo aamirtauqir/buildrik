@@ -145,9 +145,7 @@ describe("RedirectsScreen — gating + the load states (3397:33479 / 3397:33573)
 
     const card = screen.getByTestId("set-load-card");
     expect(card).toHaveAttribute("data-state", "loading");
-    expect(screen.getByTestId("set-load-title")).toHaveTextContent("Redirects");
-    expect(screen.getByTestId("set-load-line")).toHaveTextContent("Old URLs sent to new ones, and the 404 suggester.");
-    expect(screen.getByTestId("set-load-state")).toHaveTextContent("Loading…");
+    expect(screen.getByTestId("set-load-title")).toHaveTextContent("Loading Redirects…");
     expect(onLoadStateChange).toHaveBeenLastCalledWith("loading");
 
     await act(async () => releaseList(SEEDED));

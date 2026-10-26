@@ -169,7 +169,6 @@ const STATE_NOTICE =
   "tw:flex tw:flex-col tw:items-start tw:gap-2 tw:rounded-[var(--bk-radius-sm)] tw:px-4 tw:py-3 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]";
 
 const LOAD_TITLE = "Overview";
-const LOAD_LINE = "Where every setting stands.";
 const LOAD_ERROR = "Couldn't load the overview. Check your connection, then try again.";
 
 export const OverviewScreen: React.FC<OverviewScreenProps> = ({ projectId, siteName, onOpenScreen }) => {
@@ -204,7 +203,6 @@ export const OverviewScreen: React.FC<OverviewScreenProps> = ({ projectId, siteN
       <Screen>
         <LoadCard
           title={LOAD_TITLE}
-          line={LOAD_LINE}
           state={failed ? "error" : "loading"}
           errorLine={LOAD_ERROR}
           onRetry={() => setAttempt((n) => n + 1)}

@@ -341,9 +341,8 @@ describe("AnalyticsScreen — loading, load-error and save-error", () => {
     statusMock.mockReturnValue(new Promise((r) => { resolve = r; }));
     const onLoadStateChange = vi.fn();
     setup({ onLoadStateChange });
-    expect(screen.getByTestId("set-load-title")).toHaveTextContent("Analytics");
-    expect(screen.getByTestId("set-load-line")).toHaveTextContent("GA4, GTM, Meta Pixel and Clarity keys.");
-    expect(screen.getByTestId("set-load-state")).toHaveTextContent("Loading…");
+    // 2L9 B8-AN13 252:47222.
+    expect(screen.getByTestId("set-load-title")).toHaveTextContent("Loading Analytics…");
     expect(onLoadStateChange).toHaveBeenLastCalledWith("loading");
     expect(screen.queryByTestId("set-card-google-analytics")).toBeNull();
     await act(async () => { resolve(receiving()); });
@@ -357,7 +356,7 @@ describe("AnalyticsScreen — loading, load-error and save-error", () => {
     setup({ onLoadStateChange });
     await waitFor(() => expect(screen.getByTestId("set-load-retry")).toBeInTheDocument());
     expect(screen.getByTestId("set-load-state")).toHaveTextContent(
-      "Couldn't load your analytics settings. Check your connection, then try again.",
+      "The settings service did not respond. Your existing configuration has not changed.",
     );
     expect(onLoadStateChange).toHaveBeenLastCalledWith("error");
     fireEvent.click(screen.getByTestId("set-load-retry"));
