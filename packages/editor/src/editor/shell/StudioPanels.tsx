@@ -79,8 +79,11 @@ export interface StudioPanelsProps {
   } | null;
   device: DeviceType;
   onDeviceChange?: (device: DeviceType) => void;
-  /** Whether undo/redo steps are available — drives the canvas footer toolbar. */
+  /** @deprecated Read by nothing: Undo/Redo live in the topbar (Task 1.2),
+   *  which reads `useHistoryState`. Still passed by AquibraStudio (founder
+   *  WIP); delete with that call site (REQUESTS.md #1). */
   canUndo?: boolean;
+  /** @deprecated See `canUndo`. */
   canRedo?: boolean;
   zoom: number;
   onZoomChange: (zoom: number) => void;
@@ -230,8 +233,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   selectedElement,
   device,
   onDeviceChange,
-  canUndo,
-  canRedo,
   zoom,
   onZoomChange,
   isLeftPanelOpen,
@@ -937,8 +938,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
               onZoomChange={onZoomChange}
               onOverlayChange={onOverlayChange}
               onDeviceChange={onDeviceChange}
-              canUndo={canUndo}
-              canRedo={canRedo}
             />
             {/* Board 36: with the inspector hidden the canvas runs full width
                 and carries the way back at its top right. */}
