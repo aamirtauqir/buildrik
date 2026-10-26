@@ -18,7 +18,7 @@ import { getEditorViewMode } from "@/shared/utils/editorViewMode";
 import { NARROW_WINDOW_BANNER, clearGlobalBanner, showGlobalBanner, useGlobalBanners } from "./globalBanners";
 
 /** The width the editor is built for (DESIGN: desktop-only, 1024 minimum). */
-export const MIN_EDITOR_WIDTH = 1024;
+const MIN_EDITOR_WIDTH = 1024;
 const PHONE_MAX_WIDTH = 640;
 
 let narrowDismissed = false;
