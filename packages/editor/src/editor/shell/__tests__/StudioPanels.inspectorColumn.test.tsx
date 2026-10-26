@@ -438,6 +438,39 @@ describe("StudioPanels — the CMS workspace returns to the bound element (§13)
     expect(inspectorColumn().getAttribute("aria-hidden")).toBe("false");
   });
 
+  /* C-12 / Play F2.12 302:16675: the round trip ends on the binding the
+     door was opened from, not on the bare canvas. */
+  it("Back to canvas reopens the inspector on the originating binding", async () => {
+    const composer = selectingComposer(["el-1"]);
+    composer.selection.select(composer.live.get("el-1")!);
+    render(<Harness composer={composer as unknown as FakeComposer} leftPanelTab="layers" />);
+    act(() =>
+      composer.emit(EVENTS.UI_CMS_OPEN, {
+        collectionId: "col-1",
+        recordId: "rec-1",
+        binding: { section: "cms-binding", property: "title" },
+      }),
+    );
+    await screen.findByTestId("cms-workspace");
+    fireEvent.click(screen.getByRole("button", { name: "‹ Back to canvas" }));
+    await flushFrame();
+    await flushFrame();
+    expect(screen.getByTestId("pro-inspector").getAttribute("data-revealed")).toBe("cms-binding");
+    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("false");
+  });
+
+  it("a door without a binding returns to the bare canvas", async () => {
+    const composer = selectingComposer(["el-1"]);
+    composer.selection.select(composer.live.get("el-1")!);
+    render(<Harness composer={composer as unknown as FakeComposer} leftPanelTab="layers" />);
+    act(() => composer.emit(EVENTS.UI_CMS_OPEN, { collectionId: "col-1", recordId: "rec-1" }));
+    await screen.findByTestId("cms-workspace");
+    fireEvent.click(screen.getByRole("button", { name: "‹ Back to canvas" }));
+    await flushFrame();
+    await flushFrame();
+    expect(screen.getByTestId("pro-inspector").getAttribute("data-revealed")).toBe("");
+  });
+
   it("a drawer that was closed before the door is closed again", async () => {
     const composer = selectingComposer(["el-1"]);
     composer.selection.select(composer.live.get("el-1")!);

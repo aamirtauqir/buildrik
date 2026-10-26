@@ -168,7 +168,13 @@ interface CmsReturn {
   tab: string;
   drawerOpen: boolean;
   ids: string[];
+  /** The inspector binding the door was on, reopened on the way back (C-12). */
+  binding?: FocusSectionPayload;
 }
+
+/** A CMS door may name the inspector binding it was opened from, so "‹ Back to
+ *  canvas" ends on that binding (Play F2.12 `302:16675`). */
+type CmsDoorRequest = CmsOpenRequest & { binding?: FocusSectionPayload };
 
 /* Board 36 (7995:210885): a 188 × 28 panel action, 20 in from the canvas's
    top right, label and shortcut centred, 13/500 gray-700. */
@@ -466,6 +472,10 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
     onLeftPanelTabChange?.(back.tab, () => {
       if (!back.drawerOpen) onLeftPanelToggle?.();
       restoreSelection(composer, back.ids);
+      /* After the selection lands (a selection change drops a held focus
+         request) and the workspace has left the column. */
+      const binding = back.binding;
+      if (binding) requestAnimationFrame(() => composer.emit(EVENTS.UI_INSPECTOR_FOCUS_SECTION, binding));
     });
   }, [cmsReturn, composer, onLeftPanelTabChange, onLeftPanelToggle]);
   /* L1-027: Escape steps out of the CMS workspace, as the Help legend
@@ -662,10 +672,12 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
        collection ›) remembers where it was opened, so the workspace can offer
        "‹ Back to canvas". A request with nothing selected (⌘K) has no element
        to return to; one made from inside the workspace keeps the first. */
-    const openCms = (data: CmsOpenRequest) => {
+    const openCms = (data: CmsDoorRequest) => {
       const ids = composer.selection.getSelectedIds();
       const from: CmsReturn | null =
-        ids.length > 0 && !cmsWorkspaceOpen ? { tab: activeTabId, drawerOpen: isLeftPanelOpen, ids } : null;
+        ids.length > 0 && !cmsWorkspaceOpen
+          ? { tab: activeTabId, drawerOpen: isLeftPanelOpen, ids, binding: data.binding }
+          : null;
       onLeftPanelTabChange?.("content", () => {
         cmsWorkspace.openRequest(data);
         if (from) setCmsReturn(from);
