@@ -5,7 +5,8 @@
  * - Called by PagesTab when settingsPageId is set.
  * - usePageSettings owns ALL form state (same hook, new container).
  * - Decision #20 (boards 6887:73809/73848/73882, toast 6887:73801): Cancel ·
- *   Done in the foot, no autosave. The three tabs are one form — switching
+ *   Save in the foot (design-2l9 63:15939 names it Save; "Retry save" after a
+ *   failure, 63:18189), no autosave. The three tabs are one form — switching
  *   keeps the edits; Done saves once and closes with "Page settings saved";
  *   Cancel discards and closes. A failed Done keeps the dialog open.
  * - ⌘S saves without closing. ESC, the scrim and the header ✕ close through
@@ -58,6 +59,9 @@ export const PageSettingsDrawer: React.FC<Props> = (props) => (
 
 const PageSettingsCard: React.FC<Props> = ({ page, allPages, composer, onClose, initialTab, previousSlug }) => {
   const s = usePageSettings(composer, page, allPages);
+  /* The page open on the canvas, when it is another one. */
+  const active = allPages.find((pg) => pg.isActive);
+  const stays = active && active.id !== page.id ? active.name : null;
 
   /* A door's tab (`ui:pages-open-settings`) lands on open and whenever a new
      request arrives. Tab switches are unguarded now (#20), so it applies at once. */
@@ -133,8 +137,16 @@ const PageSettingsCard: React.FC<Props> = ({ page, allPages, composer, onClose, 
               two labels to anything walking the accessibility tree or the
               rendered copy. */}
           <div className="bd-pg-drawer-title" title={page.name} data-testid="pg-drawer-title">
-            {`Page settings — ${page.name}`}
+            {`${page.name} · Page settings`}
           </div>
+          {/* design-2l9 board 63:15939: which page is being edited and that the
+              canvas page stays where it is — and, dirty, that edits are unsaved
+              (63:18189). */}
+          <p className="tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="pg-drawer-subtitle">
+            {s.isDirty || s.saveState === "error"
+              ? `${page.name} · Unsaved settings changes${stays ? ` · ${stays} stays open` : ""}`
+              : `Editing ${page.name}${stays ? ` · ${stays} stays open on the canvas` : ""}`}
+          </p>
           <div className="bd-pg-drawer-tabs" role="tablist" aria-label="Settings sections">
             {TABS.map((tab) => (
               <Button
@@ -186,6 +198,15 @@ const PageSettingsCard: React.FC<Props> = ({ page, allPages, composer, onClose, 
             </div>
           )}
         </div>
+        {s.saveState === "error" && (
+          <p
+            role="alert"
+            className="tw:m-0 tw:px-5 tw:py-2 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-error-text)] tw:bg-[var(--bk-error-tint)]"
+            data-testid="pg-drawer-save-error"
+          >
+            Couldn’t save page settings. Your changes are still here.
+          </p>
+        )}
         <div className="bd-pg-drawer-foot" data-testid="pg-drawer-foot">
           <Button color="light" size="xs" data-testid="pg-drawer-cancel" onClick={handleCancel}>
             Cancel
@@ -197,7 +218,7 @@ const PageSettingsCard: React.FC<Props> = ({ page, allPages, composer, onClose, 
             aria-busy={s.saveState === "saving" || undefined}
             onClick={() => void handleDone()}
           >
-            Done
+            {s.saveState === "error" ? "Retry save" : "Save"}
           </Button>
         </div>
       </div>
@@ -205,6 +226,12 @@ const PageSettingsCard: React.FC<Props> = ({ page, allPages, composer, onClose, 
           the edits away and closes, Keep editing returns to the form. */}
       <UnsavedWarningModal
         isOpen={s.showDiscardConfirm}
+        pageName={page.name}
+        stays={stays}
+        onSaveAndLeave={async () => {
+          s.setShowDiscardConfirm(false);
+          if (await s.save()) close();
+        }}
         onDiscard={() => {
           s.discard();
           s.setShowDiscardConfirm(false);

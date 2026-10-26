@@ -16,26 +16,31 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { UnsavedWarningModal } from "../UnsavedWarningModal";
 
-describe("UnsavedWarningModal (board 1171:4820)", () => {
+const props = { pageName: "About", stays: "Home", onSaveAndLeave: vi.fn() };
+
+describe("UnsavedWarningModal (design-2l9 board 63:18758)", () => {
   /* #20 made the three tabs one form, so the prompt only guards CLOSING
      now — it says so instead of naming one tab's fields ("Leaving this tab"
      was about the retired tab-switch guard). */
-  it("asks about the page's unsaved changes on close, with the board's two actions", () => {
-    render(<UnsavedWarningModal isOpen onDiscard={vi.fn()} onCancel={vi.fn()} />);
-    expect(screen.getByText("Discard unsaved changes?")).toBeInTheDocument();
+  /* Re-baseline: the guard is "Leave without saving?" with three actions. */
+  it("names the page, and offers Keep editing · Discard changes · Save and leave", () => {
+    const onSaveAndLeave = vi.fn();
+    render(<UnsavedWarningModal isOpen onDiscard={vi.fn()} onCancel={vi.fn()} {...props} onSaveAndLeave={onSaveAndLeave} />);
+    expect(screen.getByText("Leave without saving?")).toBeInTheDocument();
     expect(screen.getByTestId("pages-unsaved-body")).toHaveTextContent(
-      "You changed this page's settings but didn't save. Closing throws those edits away.",
+      "You have unsaved page settings for About. Save or discard them to return to Pages, or keep editing. Home stays open.",
     );
     expect(screen.getByRole("button", { name: /keep editing/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /discard the unsaved changes/i })).toBeInTheDocument();
-    expect(screen.queryByText(/Save & Switch/i)).toBeNull();
+    fireEvent.click(screen.getByTestId("pages-unsaved-save"));
+    expect(onSaveAndLeave).toHaveBeenCalledTimes(1);
   });
 
   it("Keep editing cancels, Discard discards", () => {
     const onDiscard = vi.fn();
     const onCancel = vi.fn();
     render(
-      <UnsavedWarningModal isOpen onDiscard={onDiscard} onCancel={onCancel} />,
+      <UnsavedWarningModal isOpen onDiscard={onDiscard} onCancel={onCancel} {...props} />,
     );
     fireEvent.click(screen.getByRole("button", { name: /keep editing/i }));
     expect(onCancel).toHaveBeenCalledTimes(1);
@@ -47,7 +52,7 @@ describe("UnsavedWarningModal (board 1171:4820)", () => {
   // Enter away from a modal that just appeared.
   it("focus lands on Keep editing, not on Discard", () => {
     render(
-      <UnsavedWarningModal isOpen onDiscard={vi.fn()} onCancel={vi.fn()} />,
+      <UnsavedWarningModal isOpen onDiscard={vi.fn()} onCancel={vi.fn()} {...props} />,
     );
     expect(document.activeElement).toBe(
       screen.getByRole("button", { name: /keep editing/i }),

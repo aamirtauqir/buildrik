@@ -39,8 +39,8 @@ const renderCTA = () => {
 describe("CanvasEmptyCTA — board 4428:44164", () => {
   it("names the page's state and the three ways forward", () => {
     renderCTA();
-    expect(screen.getByText("This page is empty")).toBeInTheDocument();
-    expect(screen.getByText("Start with a template, drop a block, or describe your site.")).toBeInTheDocument();
+    expect(screen.getByText("Your page is ready")).toBeInTheDocument(); // design-2l9 101:42581 (re-baseline)
+    expect(screen.getByText("Use Add to insert elements or sections.")).toBeInTheDocument();
   });
 
   it("draws three template cards from the catalogue, each opening Templates", () => {

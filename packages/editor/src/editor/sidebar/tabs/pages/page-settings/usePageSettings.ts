@@ -14,7 +14,7 @@ import { useToast } from "@/editor/chrome-ui";
 import { EVENTS } from "@/shared/constants/events";
 import type { Composer } from "@/engine";
 import type { PageItem, DrawerTab } from "../types";
-import { calculateSeoScore, isPlaceholderSlug } from "../utils/seoScore";
+import { calculateSeoScore, isPlaceholderSlug, seoScoreBreakdown, type SeoScoreRow } from "../utils/seoScore";
 import { resolvePageTitle } from "@/engine/export/SEOInjector";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { useSiteOrigin } from "@/editor/shared/useSiteOrigin";
@@ -43,6 +43,8 @@ export interface UsePageSettingsReturn {
   setSlug: (v: string) => void;
   slugError: string | null;
   seoScore: number;
+  /** design-2l9 65:17860: the score's six parts, which it is the sum of. */
+  seoBreakdown: SeoScoreRow[];
   seoChecks: { titleSet: boolean; slugClean: boolean; indexingOn: boolean; descSet: boolean };
 
   ogTitle: string;
@@ -286,9 +288,9 @@ export function usePageSettings(
       });
       return true;
     } catch {
-      /* The dialog stays open with the edits; Done is the retry (#20). */
+      /* The dialog stays open with the edits and says so inline (design-2l9
+         63:18189); its primary becomes Retry save. */
       setSaveState("error");
-      addToast({ description: "Save failed — your changes are still here.", tone: "error" });
       return false;
     }
   }, [
@@ -327,6 +329,10 @@ export function usePageSettings(
     () => calculateSeoScore({ title: gradedTitle, desc: seoDesc, slug, allowIndex }),
     [gradedTitle, seoDesc, slug, allowIndex]
   );
+  const seoBreakdown = React.useMemo(
+    () => seoScoreBreakdown({ title: gradedTitle, desc: seoDesc, slug }),
+    [gradedTitle, seoDesc, slug]
+  );
   const seoChecks = {
     titleSet: gradedTitle.length >= 10,
     /* Green means the full "+30 pts" the panel advertises is actually earned.
@@ -362,6 +368,7 @@ export function usePageSettings(
     slugError,
     seoScore,
     seoChecks,
+    seoBreakdown,
     ogTitle,
     setOgTitle,
     ogDesc,

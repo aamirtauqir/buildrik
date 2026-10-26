@@ -44,6 +44,6 @@ describe("PageSettingsDrawer — ESC", () => {
     });
     escape();
     expect(onClose).not.toHaveBeenCalled();
-    expect(screen.getByText("Discard unsaved changes?")).toBeInTheDocument();
+    expect(screen.getByText("Leave without saving?")).toBeInTheDocument();
   });
 });

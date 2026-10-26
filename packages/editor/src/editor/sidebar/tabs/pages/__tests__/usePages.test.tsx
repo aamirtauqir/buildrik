@@ -239,12 +239,13 @@ describe("usePages commitRename", () => {
   });
 
   /* v3 4418:94200: a Keep-URL rename reports the kept URL, with Undo. */
-  it("reports “Renamed to X · URL /slug kept” with Undo on a Keep-URL rename", () => {
+  /* design-2l9 board 63:23182. Re-baseline: rename receipt. */
+  it("reports “X renamed · URL kept” with Undo on a Keep-URL rename", () => {
     const composer = createMockComposer({ pages: [pg("p1", "Home", { isHome: true }), pg("p2", "Menu")] });
     const { result } = setup(composer);
     act(() => result.current.commitRename("p2", "Our menu"));
     const toast = lastToast();
-    expect(toast?.description).toMatch(/^Renamed to Our menu · URL \/.+ kept$/);
+    expect(toast?.description).toBe("Our menu renamed · URL kept");
     expect(toast?.action?.label).toBe("Undo");
   });
 

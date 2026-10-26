@@ -25,6 +25,7 @@ function makeSettings(over: Partial<UsePageSettingsReturn> = {}): UsePageSetting
     slugError: null,
     seoScore: 100,
     seoChecks: { titleSet: true, slugClean: true, indexingOn: true, descSet: true },
+    seoBreakdown: [],
     ogTitle: "",
     setOgTitle: vi.fn(),
     ogDesc: "",
@@ -142,5 +143,15 @@ describe("SocialTab preview card fallbacks", () => {
     const s = makeSettings({ domain: "acme.com" });
     render(<SocialTab s={s} />);
     expect(screen.getByText("acme.com")).toBeTruthy();
+  });
+
+  /* design-2l9 board 63:16507. Re-baseline: Social tab copy. */
+  it("explains the fallbacks and names the fields as the board does", () => {
+    render(<SocialTab s={makeSettings()} />);
+    expect(screen.getByTestId("social-explainer")).toHaveTextContent("Empty social title uses SEO title; empty description uses the SEO description.");
+    expect(screen.getByTestId("social-label-title")).toHaveTextContent("Social title");
+    expect(screen.getByTestId("social-label-desc")).toHaveTextContent("Social description");
+    expect(screen.getByTestId("social-label-image")).toHaveTextContent("Social image URL");
+    expect(screen.getByText("Recommended: 1200 × 630. Clear the URL to remove the image.")).toBeInTheDocument();
   });
 });

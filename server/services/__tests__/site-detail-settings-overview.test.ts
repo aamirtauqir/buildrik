@@ -187,7 +187,7 @@ describe("getSettingsOverview — the seeded site", () => {
       access: { passwordSet: true, shareLinks: 2 },
       webhooks: { endpoints: 1, lastDelivery: "failed" },
       members: { used: 3, seats: 5 },
-      billing: { plan: "PRO", priceMonthly: 29 },
+      billing: { plan: "PRO", priceMonthly: 29, pagesPerSite: 30 },
       attention: [
         {
           kind: "locale-not-started",
@@ -252,7 +252,7 @@ describe("getSettingsOverview — the empty site", () => {
       access: { passwordSet: false, shareLinks: 0 },
       webhooks: { endpoints: 0, lastDelivery: null },
       members: { used: 0, seats: 1 },
-      billing: { plan: "FREE", priceMonthly: 0 },
+      billing: { plan: "FREE", priceMonthly: 0, pagesPerSite: 10 },
       attention: [],
     });
   });
@@ -445,13 +445,13 @@ describe("billing and members", () => {
   it("reports a yearly subscription as its monthly equivalent", async () => {
     setup({ ...emptySite, workspace: { plan: "PRO", deletionScheduledAt: null, subscription: { plan: "PRO", price: 27600, interval: "YEARLY" } } });
     const overview = await getSettingsOverview("s1");
-    expect(overview.billing).toEqual({ plan: "PRO", priceMonthly: 23 });
+    expect(overview.billing).toEqual({ plan: "PRO", priceMonthly: 23, pagesPerSite: 30 });
   });
 
   it("reads Stripe's own interval spelling", async () => {
     setup({ ...emptySite, workspace: { plan: "BUSINESS", deletionScheduledAt: null, subscription: { plan: "BUSINESS", price: 7900, interval: "month" } } });
     const overview = await getSettingsOverview("s1");
-    expect(overview.billing).toEqual({ plan: "BUSINESS", priceMonthly: 79 });
+    expect(overview.billing).toEqual({ plan: "BUSINESS", priceMonthly: 79, pagesPerSite: 50 });
     expect(overview.members.seats).toBe(25);
   });
 
@@ -459,7 +459,7 @@ describe("billing and members", () => {
     // customer.subscription.deleted leaves the row (CANCELLED, plan PRO) and drops the workspace to FREE.
     setup({ ...emptySite, workspace: { plan: "FREE", deletionScheduledAt: null, subscription: { plan: "PRO", price: 2900, interval: "MONTHLY" } } });
     const overview = await getSettingsOverview("s1");
-    expect(overview.billing).toEqual({ plan: "FREE", priceMonthly: 0 });
+    expect(overview.billing).toEqual({ plan: "FREE", priceMonthly: 0, pagesPerSite: 10 });
   });
 
   it("falls back to the plan's list price on an interval it cannot read", async () => {

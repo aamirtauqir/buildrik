@@ -110,9 +110,10 @@
     {
       "surface": "Canvas · blank page",
       "copy": "Start with a template, drop a block, or describe your site.",
-      "status": "ships",
-      "file": null,
-      "shipsInstead": null
+      "status": "superseded",
+      "file": "src/editor/canvas/CanvasEmptyCTA.tsx",
+      "shipsInstead": "Use Add to insert elements or sections.",
+      "note": "Superseded 2026-10-26 by the canonical design file 2L9OTGzBrL6kYmU18yA1c7 (owner decision 2026-10-22), board 101:42581: 'Your page is ready' / 'Use Add to insert elements or sections.'. The §5.7 line also named the AI door ('describe your site') that the no-AI-in-UI decision removes. Lane L-A."
     }
   ]
 }

@@ -227,3 +227,20 @@ done are the lead's integration checks (the lane does not start a Next dev serve
 Every row touched is `drift-open` "built, not compared" (or `code:` / `blocked:` where stated):
 no board screenshots exist locally and none were spent. One probe look (port 5171, cases
 insert-panel, pages-panel, canvas-footer-toolbar, pages-context-menu) caught the 224-px row menu.
+
+## Status — wave 2 (2026-10-26, merged feat/design-2l9 first)
+
+| Slice | State | Commit |
+|---|---|---|
+| S9 Page settings copy + guards (drawer kept) | built | e3f893e53 |
+| Listings columns + Structure header | built | af2194b73 |
+| S13 Plan capacity (full chain: schema → service → test → editor) | built; offline boards → `code:` | 6a96b2f04 |
+| Layers search paths, footer lock/dim state, rename receipt | built | 5f3116427 |
+| Social tab copy, folder delete receipt | built | 63728702a |
+| SEO score breakdown (one function behind score and rows) | built | e9e79b989 |
+| Advanced tab, empty page, page-created receipt | built | b426dd1b5 |
+| Offline close-guard variants | `code:page-settings-save-is-local` | (manifest) |
+
+Still open on page 03 for L-A: draft-retained / navigation-pending states (101:22426…), folder
+create inline copy, bulk-bar homepage reason, folder menu container, Listings 720 width,
+shared guides (S11) and page trash (S12).

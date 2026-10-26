@@ -12,6 +12,7 @@ import * as React from "react";
 import { Button } from "@/editor/chrome-ui";
 import type { PageItem } from "../types";
 import { pageRoute } from "../utils/slug";
+import type { CollectionPagesRow } from "../useDynamicPagesSummary";
 
 interface Node { segment: string; path: string; page: PageItem | null; children: Node[] }
 
@@ -36,6 +37,10 @@ export function buildRouteTree(pages: ReadonlyArray<PageItem>): Node {
 export interface SiteStructureTreeProps {
   pages: ReadonlyArray<PageItem>;
   onSelectPage: (id: string) => void;
+  /** The published host ("fieldwork.studio"), when the site has one. */
+  host?: string | null;
+  /** Pages CMS collections publish, by their URL pattern. */
+  collections?: readonly CollectionPagesRow[];
 }
 
 const Branch: React.FC<{ node: Node; depth: number; onSelectPage: (id: string) => void }> = ({ node, depth, onSelectPage }) => (
@@ -67,14 +72,37 @@ const Branch: React.FC<{ node: Node; depth: number; onSelectPage: (id: string) =
   </li>
 );
 
-export const SiteStructureTree: React.FC<SiteStructureTreeProps> = ({ pages, onSelectPage }) => {
+const MUTED = "tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
+
+/* design-2l9 board 63:21939: "URL structure", the host as the site root, the
+   route tree, the collection patterns, and a note that folders are not here. */
+export const SiteStructureTree: React.FC<SiteStructureTreeProps> = ({ pages, onSelectPage, host, collections = [] }) => {
   const tree = React.useMemo(() => buildRouteTree(pages), [pages]);
   return (
     <div className="tw:flex tw:h-full tw:min-h-0 tw:flex-col tw:gap-2 tw:overflow-auto tw:p-3" data-testid="pages-structure" aria-label="Site structure">
-      <p className="tw:m-0 tw:text-[12px] tw:text-[var(--bk-ink-soft)]">{pages.length} page{pages.length === 1 ? "" : "s"}, by route.</p>
+      <div className="tw:flex tw:flex-col" data-testid="pages-structure-head">
+        <span className="tw:text-[13px] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)]">URL structure</span>
+        <span className={MUTED}>
+          {host ? <span className="tw:[font-family:var(--bk-font-mono)]">{host}</span> : null}
+          {host ? " · " : ""}Site root
+        </span>
+      </div>
       <ul className="tw:m-0 tw:list-none tw:p-0" role="tree" aria-label="Pages by route">
         <Branch node={tree} depth={0} onSelectPage={onSelectPage} />
       </ul>
+      {collections.length > 0 && (
+        <ul className="tw:m-0 tw:list-none tw:p-0" aria-label="Collection pages by route" data-testid="pages-structure-collections">
+          {collections.map((c) => (
+            <li key={c.id} className="tw:flex tw:items-center tw:gap-2 tw:text-[12px]">
+              <span aria-hidden="true" className="tw:text-[var(--bk-ink-muted)]">·</span>
+              <span className="tw:text-[var(--bk-ink)]">{c.name}</span>
+              <span className="tw:text-[11px] tw:text-[var(--bk-ink-muted)] tw:[font-family:var(--bk-font-mono)]">{c.pattern}</span>
+              <span className={`${MUTED} tw:tabular-nums`}>{`${c.count} page${c.count === 1 ? "" : "s"}`}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+      <p className={`tw:m-0 ${MUTED}`}>This view follows page URLs. My folders stay in Pages.</p>
     </div>
   );
 };

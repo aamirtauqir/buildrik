@@ -27,6 +27,7 @@ import { getDefaultPageName } from "@/shared/utils/pageUtils";
 import { Grid3x3, Square } from "lucide-react";
 import { BK_LABEL_CLASS, Button, Label, Modal, TextInput, ToggleSwitch, useToast } from "@/editor/chrome-ui";
 import { SITE_TEMPLATES, getMyTemplates } from "@/editor/sidebar/tabs/templates/templatesData";
+import { usePageCapacity, type PageCapacity } from "../usePageCapacity";
 
 type Source = "blank" | "template";
 
@@ -44,6 +45,12 @@ export function NewPageModal({ composer }: { composer: Composer | null }) {
   const [source, setSource] = React.useState<Source>("template");
   const [addToNav, setAddToNav] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
+  const { capacity, retry: retryCapacity } = usePageCapacity(open);
+  const pageCount = open && composer ? composer.elements.getAllPages().length : 0;
+  const atLimit = capacity.state === "known" && capacity.limit !== -1 && pageCount >= capacity.limit;
+  /* A create waits for the limit, and stops at it — the server refuses a
+     save that adds a page past it (PAGE_LIMIT). */
+  const capacityBlocks = atLimit || capacity.state === "checking" || capacity.state === "unavailable";
 
   React.useEffect(() => {
     if (!composer) return;
@@ -85,7 +92,8 @@ export function NewPageModal({ composer }: { composer: Composer | null }) {
     if (addToNav) composer.elements.addPageToNavigation(pageId);
     composer.elements.setActivePage(pageId);
     setOpen(false);
-    addToast({ title: "Page created", description: `‘${trimmed}’ is ready.`, tone: "success" });
+    /* design-2l9 board 101:42581: "Services created · Added to site navigation". */
+    addToast({ description: `${trimmed} created${addToNav ? " · Added to site navigation" : ""}`, tone: "success" });
   };
 
   const card = (value: Source, icon: React.ReactNode, title: string, hint: string) => (
@@ -121,8 +129,13 @@ export function NewPageModal({ composer }: { composer: Composer | null }) {
           <Button color="light" size="xs" data-testid="new-page-cancel" onClick={() => setOpen(false)}>
             Cancel
           </Button>
-          <Button size="xs" data-testid="new-page-create" disabled={!name.trim()} onClick={create}>
-            {error ? "Try again" : "Create page"}
+          {capacity.state === "unavailable" && (
+            <Button color="light" size="xs" data-testid="new-page-capacity-retry" onClick={retryCapacity}>
+              Retry check
+            </Button>
+          )}
+          <Button size="xs" data-testid="new-page-create" disabled={!name.trim() || capacityBlocks} onClick={create}>
+            {error ? "Try again" : source === "template" ? "Choose template" : "Create page"}
           </Button>
         </>
       }
@@ -174,6 +187,13 @@ export function NewPageModal({ composer }: { composer: Composer | null }) {
             Add to site navigation
           </span>
         </div>
+        {/* design-2l9 board 101:29978: From template picks a layout first. */}
+        {source === "template" && (
+          <p className="tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="new-page-template-note">
+            Choose a page template before creating the page.
+          </p>
+        )}
+        <PageCapacityLine capacity={capacity} count={pageCount} atLimit={atLimit} />
         {error ? (
           <p role="alert" className="tw:m-0 tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-error)]">
             {error}
@@ -181,5 +201,27 @@ export function NewPageModal({ composer }: { composer: Composer | null }) {
         ) : null}
       </form>
     </Modal>
+  );
+}
+
+const LINE = "tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-4";
+
+/** Boards 101:29978 / 101:38257 / 101:38980 / 101:39695. */
+function PageCapacityLine({ capacity, count, atLimit }: { capacity: PageCapacity; count: number; atLimit: boolean }) {
+  if (capacity.state === "none" || (capacity.state === "known" && capacity.limit === -1)) return null;
+  const [head, body] =
+    capacity.state === "checking"
+      ? ["Checking page capacity…", "Wait for the current page limit before creating."]
+      : capacity.state === "unavailable"
+        ? ["Couldn’t check page capacity", "Your page name and navigation choice are retained."]
+        : [
+            `${count} of ${capacity.limit} pages on ${capacity.plan}`,
+            atLimit ? "Ask the workspace owner to upgrade, or remove an unused page before creating another." : null,
+          ];
+  return (
+    <div className="tw:flex tw:flex-col tw:gap-0.5" data-testid="new-page-capacity" role={capacity.state === "unavailable" || atLimit ? "status" : undefined}>
+      <p className={`${LINE} tw:tabular-nums ${atLimit || capacity.state === "unavailable" ? "tw:text-[var(--bk-ink)] tw:font-medium" : "tw:text-[var(--bk-ink-muted)]"}`}>{head}</p>
+      {body && <p className={`${LINE} tw:text-[var(--bk-ink-muted)]`}>{body}</p>}
+    </div>
   );
 }

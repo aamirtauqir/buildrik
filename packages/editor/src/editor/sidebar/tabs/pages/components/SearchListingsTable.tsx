@@ -1,14 +1,14 @@
 /**
- * SearchListingsTable — the Listings view of the Pages panel, board 141:207.
+ * SearchListingsTable — the Listings view of the Pages panel, design-2l9 board
+ * 63:21262: "Page and URL · SEO score · Visibility", one row per page, and
+ * the note "Search names and URLs. Scores match Page settings → SEO."
  *
- * The board draws a compact four-column table — PAGE | TITLE | DESC | SCORE —
- * with a caps header band, 32h rows, "Set"/"Missing" for the description and
- * a mono score, plus an "Open full listings ›" footer link that widens the
- * drawer (the 700 view is the "full" table).
- *
- * Every value derives from the live PageItem list — no new engine state. The
- * score is a deterministic rollup of the real SEO signals (title override,
- * description present, indexed, duplicate title), not a stored number.
+ * The score IS the Page settings SEO score (`calculateSeoScore`, the same
+ * function and inputs the SEO tab grades) — so it is printed only where the
+ * listing can know those inputs exactly: a page with its own SEO title. A page
+ * that inherits its title from the site's title pattern reads "—" here and
+ * shows its score in Page settings. (The old rollup had its own penalties and
+ * disagreed with the SEO tab.)
  *
  * @license BSD-3-Clause
  */
@@ -16,128 +16,111 @@
 import * as React from "react";
 import { Button } from "@/editor/chrome-ui";
 import type { PageItem } from "../types";
+import { calculateSeoScore } from "../utils/seoScore";
+import { pageRoute } from "../utils/slug";
+import { getStatusLabel } from "../utils/statusLabel";
 
 interface SearchListingsTableProps {
   pages: PageItem[];
   onEditPage: (pageId: string) => void;
-  /** Board 141:207 footer: widens the drawer to the full-table view. */
+  /** The Pages search, applied to names and URLs. */
+  search?: string;
+  /** Widens the drawer to the full-table view (code-ahead, kept). */
   onOpenFull?: () => void;
 }
 
-interface Row {
-  page: PageItem;
-  title: string;
-  hasDescription: boolean;
-  score: number;
-}
-
-/**
- * Deterministic score from the real SEO signals. 100 minus penalties:
- * no description −40, title falling back to the page name −15, duplicate
- * effective title −25, noIndex −20. Clamped at 0.
- */
-function buildRows(pages: PageItem[]): Row[] {
-  const effectiveTitles = pages.map((p) => (p.seo?.metaTitle?.trim() || p.name).toLowerCase());
-  const titleCounts = effectiveTitles.reduce<Record<string, number>>((acc, t) => {
-    acc[t] = (acc[t] ?? 0) + 1;
-    return acc;
-  }, {});
-
-  return pages.map((page, i) => {
-    const customTitle = page.seo?.metaTitle?.trim();
-    const customDesc = page.seo?.metaDescription?.trim();
-    let score = 100;
-    if (!customDesc) score -= 40;
-    if (!customTitle) score -= 15;
-    if (titleCounts[effectiveTitles[i]] > 1) score -= 25;
-    if (page.seo?.noIndex) score -= 20;
-    return {
-      page,
-      title: customTitle || page.name,
-      hasDescription: !!customDesc,
-      score: Math.max(0, score),
-    };
+/** The SEO tab's score for a page with its own SEO title; null otherwise. */
+export function listingScore(page: PageItem): number | null {
+  const title = page.seo?.metaTitle?.trim();
+  if (!title) return null;
+  return calculateSeoScore({
+    title,
+    desc: page.seo?.metaDescription?.trim() ?? "",
+    slug: page.slug,
+    allowIndex: !page.seo?.noIndex,
   });
 }
 
-/* Board 141:207 puts the four columns at x 16 / 110 / 210 / 276 in a 320
-   panel: 86, the rest, 58, 28 with 8 between. SCORE was 48 wide, which
-   pushed DESC 19 to the left of where the board draws it. */
-const GRID = "tw:grid tw:grid-cols-[86px_1fr_58px_28px] tw:items-center tw:gap-2 tw:px-4";
+/* The listing names a hidden page by its state alone. */
+const visibilityOf = (page: PageItem) =>
+  page.status === "hidden" ? "Hidden" : getStatusLabel(page.status ?? "live") ?? "Live";
+
+const GRID = "tw:grid tw:grid-cols-[1fr_72px_72px] tw:items-center tw:gap-2 tw:px-4";
 
 export const SearchListingsTable: React.FC<SearchListingsTableProps> = ({
   pages,
   onEditPage,
+  search = "",
   onOpenFull,
 }) => {
-  const rows = buildRows(pages);
+  const q = search.trim().toLowerCase();
+  const rows = q ? pages.filter((p) => p.name.toLowerCase().includes(q) || pageRoute(p).toLowerCase().includes(q)) : pages;
 
   return (
     <div className="tw:flex tw:flex-col tw:flex-1 tw:min-h-0" data-testid="pages-listings">
-      {/* Board header band: caps 11 on gray. */}
       <div
-        className={`${GRID} tw:h-7 tw:bg-[var(--bk-gray-50)] tw:text-[11px] tw:leading-4 tw:font-medium tw:tracking-[0.5px] tw:text-[var(--bk-ink-muted)]`}
+        className={`${GRID} tw:h-7 tw:bg-[var(--bk-gray-50)] tw:text-[11px] tw:leading-4 tw:font-medium tw:text-[var(--bk-ink-muted)]`}
         aria-hidden="true"
       >
-        <span>PAGE</span>
-        <span>TITLE</span>
-        <span>DESC</span>
-        <span className="tw:text-right">SCORE</span>
+        <span>Page and URL</span>
+        <span className="tw:text-right">SEO score</span>
+        <span>Visibility</span>
       </div>
 
       <div className="tw:flex-1 tw:min-h-0 tw:overflow-y-auto" role="table" aria-label="Search listings">
-        {rows.map(({ page, title, hasDescription, score }) => (
-          <div
-            key={page.id}
-            role="row"
-            tabIndex={0}
-            className={`${GRID} tw:h-8 tw:cursor-pointer tw:select-none hover:tw:bg-[var(--bk-bg-subtle)]`}
-            data-testid={`listing-row-${page.id}`}
-            onClick={() => onEditPage(page.id)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onEditPage(page.id); }
-            }}
-          >
-            <span className="tw:truncate tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">
-              {page.name}
-            </span>
-            <span className="tw:truncate tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]">
-              {title}
-            </span>
-            {hasDescription ? (
-              <span className="tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]">Set</span>
-            ) : (
-              <span className="tw:text-[13px] tw:leading-5 tw:text-[var(--bk-error)]">Missing</span>
-            )}
-            <span
-              className={`tw:text-right tw:font-[family-name:var(--bk-font-mono)] tw:text-[11px] tw:leading-4 tw:font-medium tw:tabular-nums ${
-                score < 50 ? "tw:text-[var(--bk-error)]" : "tw:text-[var(--bk-ink-soft)]"
-              }`}
+        {rows.map((page) => {
+          const score = listingScore(page);
+          return (
+            <div
+              key={page.id}
+              role="row"
+              tabIndex={0}
+              className={`${GRID} tw:h-11 tw:cursor-pointer tw:select-none hover:tw:bg-[var(--bk-bg-subtle)]`}
+              data-testid={`listing-row-${page.id}`}
+              onClick={() => onEditPage(page.id)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onEditPage(page.id); }
+              }}
             >
-              {score}
-            </span>
-          </div>
-        ))}
+              <span className="tw:flex tw:min-w-0 tw:flex-col">
+                <span className="tw:truncate tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">{page.name}</span>
+                <span className="tw:truncate tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)] tw:[font-family:var(--bk-font-mono)]">
+                  {pageRoute(page)}
+                </span>
+              </span>
+              <span
+                className={`tw:text-right tw:[font-family:var(--bk-font-mono)] tw:text-[11px] tw:leading-4 tw:font-medium tw:tabular-nums ${
+                  score !== null && score < 50 ? "tw:text-[var(--bk-error)]" : "tw:text-[var(--bk-ink-soft)]"
+                }`}
+                data-testid={`listing-score-${page.id}`}
+              >
+                {score ?? "—"}
+              </span>
+              <span className="tw:truncate tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)]" data-testid={`listing-visibility-${page.id}`}>
+                {visibilityOf(page)}
+              </span>
+            </div>
+          );
+        })}
       </div>
 
-      {/* Board footer: accent link — the 700 drawer is the full table. */}
-      {onOpenFull && (
-        /* Board 141:265 pins a 36-tall strip to the panel's bottom edge: 8,
-           a 20 link, 8. The link rendered 32 tall (flowbite's own height), so
-           the strip was 52. */
-        <div className="tw:px-4 tw:py-2 tw:shrink-0">
+      <div className="tw:flex tw:shrink-0 tw:flex-col tw:gap-1 tw:px-4 tw:py-2">
+        <p className="tw:m-0 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="listings-note">
+          Search names and URLs. Scores match Page settings → SEO.
+        </p>
+        {onOpenFull && (
           <Button
             color="light"
             size="xs"
             variant="link"
-            className="tw:h-5 tw:px-0"
+            className="tw:h-5 tw:self-start tw:px-0"
             data-testid="listings-open-full"
             onClick={onOpenFull}
           >
             Open full listings {"›"}
           </Button>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

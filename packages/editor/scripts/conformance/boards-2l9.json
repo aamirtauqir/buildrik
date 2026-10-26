@@ -173,7 +173,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Board 720×700 modal 'About · Page settings' + 'Home stays open' subtitle; code drawer 'Page settings — About'; SeoTab ✦ AI suggest (pr33)"
+   "verifiedNote": "L-A S9 built, not compared: title '{Page} · Page settings', subtitle 'Editing {Page} · {Active} stays open on the canvas', foot Cancel · Save, override note 'These overrides affect this page only. Clear the title to use site defaults.'. Container stays the drawer (blocked:owner-page-settings-container); SEO 'Write with AI' waits on PR #33."
   },
   {
    "nodeId": "63:16507",
@@ -183,7 +183,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Modal vs drawer; board adds explainer + Social image URL field"
+   "verifiedNote": "L-A wave 2 built, not compared: explainer 'Empty social title uses SEO title; empty description uses the SEO description.' (true: SEOInjector ogTitle || title), labels Social title / Social description / Social image URL, helper 'Recommended: 1200 × 630. Clear the URL to remove the image.'. Container is the drawer (owner decision)."
   },
   {
    "nodeId": "63:17061",
@@ -193,7 +193,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Board: Publish visibility Live, 'Search indexing: Indexed · Change in SEO', Head code · Pro; code has own indexing switch"
+   "verifiedNote": "L-A wave 2 built, not compared: 'Publish visibility', 'Live means this page is included on the next publish.', 'Search indexing: Indexed · Change in SEO' (readout — the switch lives once, in SEO), Follow links switch, 'Head code' with 'Changes apply on the next publish.' / 'Head code affects this page only and is sanitized before save.'. The board's '· Pro' tag is not drawn: head code is not plan-gated in code."
   },
   {
    "nodeId": "63:17617",
@@ -203,7 +203,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Copy matches; container (modal) and 'Later' vs 'Not now' differ"
+   "verifiedNote": "L-A S9: redirect offer's second action reads 'Later'. Container (modal vs drawer) is the open owner decision."
   },
   {
    "nodeId": "63:18189",
@@ -212,8 +212,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No 'Couldn’t save page settings. Your changes are still here.' + Retry save"
+   "verified": "drift-open",
+   "verifiedNote": "L-A S9 built, not compared: inline 'Couldn’t save page settings. Your changes are still here.', primary 'Retry save', subtitle '{Page} · Unsaved settings changes · {Active} stays open' (the failure toast is gone)."
   },
   {
    "nodeId": "63:18758",
@@ -223,7 +223,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code Keep editing/Discard; board 'Leave without saving?' + Save and leave (+offline/invalid variants)"
+   "verifiedNote": "L-A S9 built, not compared: 'Leave without saving?', 'You have unsaved page settings for {Page}. Save or discard them to return to Pages, or keep editing. {Active} stays open.', Keep editing · Discard changes · Save and leave (saves, then closes). Offline / invalid variants (101:24231, 101:29372) not built."
   },
   {
    "nodeId": "63:19334",
@@ -264,7 +264,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-A S5: Listings now opens from the tabs (back link removed); its columns (PAGE/TITLE/DESC vs board 'Page and URL · SEO score · Visibility' at 720) are not changed — still open."
+   "verifiedNote": "L-A wave 2 built, not compared: columns 'Page and URL · SEO score · Visibility' (URL under the name, 'Hidden' for hidden pages), note 'Search names and URLs. Scores match Page settings → SEO.', the Pages search filters names and URLs. The score is the SEO tab's own calculateSeoScore, printed where the page has its own SEO title, '—' otherwise (the old separate rollup disagreed with the SEO tab). Board draws the view 720 wide; the panel's width toggle is unchanged (Open full listings kept)."
   },
   {
    "nodeId": "63:21939",
@@ -274,7 +274,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-A S5: Structure now opens from the tabs (back link removed); board header 'URL structure · {domain} · Site root' + footnote still absent."
+   "verifiedNote": "L-A wave 2 built, not compared: 'URL structure', '{host} · Site root' (published host via useSiteOrigin), the route tree, collection rows '{name} {pattern} {n} pages', note 'This view follows page URLs. My folders stay in Pages.'"
   },
   {
    "nodeId": "63:22616",
@@ -294,7 +294,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Undo toast exists; board receipt copy 'Our story renamed · URL kept' + inline 'Page renamed. URL kept at /about.' differs"
+   "verifiedNote": "L-A wave 2 built, not compared: receipt '{Page} renamed · URL kept' + Undo. The inline 'Page renamed. URL kept at /about.' line is not drawn."
   },
   {
    "nodeId": "64:10927",
@@ -302,9 +302,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Undo toast exists; board receipt copy 'Our story renamed · URL kept' + inline 'Page renamed. URL kept at /about.' differs"
+   "authority": "code:update-url-opens-redirect-offer",
+   "verified": "no",
+   "verifiedNote": "An 'Update URL' rename lands in Page settings with the redirect offer for the old URL (G2-076, boards 6887:75724/75760) instead of a '… URL changed to /x' receipt. L-A wave 2."
   },
   {
    "nodeId": "64:18356",
@@ -334,7 +334,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code 4 checks (+30/+40 pts); board 6-row /100 breakdown dialog"
+   "verifiedNote": "L-A wave 2 built, not compared: SEO score details opens \"SEO score · {Page} · {n}/100\" and the six parts (Title length /20, URL format /20, Description length /30, Descriptive URL /10, Title ≥30 characters /10, Description ≥100 characters /10) — seoScoreBreakdown, which calculateSeoScore now sums, so the rows cannot disagree with the score. Inline in the drawer, not a separate dialog; Back to SEO closes it."
   },
   {
    "nodeId": "65:18435",
@@ -425,9 +425,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "code:pages-are-local-document",
    "verified": "no",
-   "verifiedNote": "No 'Needs a connection · Loaded pages can still be opened.' band"
+   "verifiedNote": "Board: 'Needs a connection · Loaded pages can still be opened.' In code every page is in the loaded document and page edits are local (ElementManager); offline saves are the shell's save-state concern (useSaveCallback), not a Pages restriction. Band not adopted. L-A wave 2."
   },
   {
    "nodeId": "94:15445",
@@ -468,9 +468,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Role notice exists (L-F); 'Managing pages needs Editor access' panel copy missing"
+   "authority": "blocked:viewer-pages-door-is-shell",
+   "verified": "no",
+   "verifiedNote": "'Managing pages needs Editor access · Use the bottom page tabs to browse this site.' — a viewer cannot open Pages (VIEWER_TABS; the gate is in the lead-owned shell tab switch), so the panel never renders for them; the message belongs with that gate or the role notice (L-F). L-A wave 2."
   },
   {
    "nodeId": "94:21526",
@@ -489,9 +489,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "code:pages-are-local-document",
    "verified": "no",
-   "verifiedNote": "Menu has no offline-disabled state"
+   "verifiedNote": "Offline page menu: every row acts on the local document (reorder, duplicate, rename are ElementManager writes), so none is disabled offline. L-A wave 2."
   },
   {
    "nodeId": "94:29621",
@@ -510,9 +510,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "code:page-settings-save-is-local",
    "verified": "no",
-   "verifiedNote": "No 'Needs a connection to save page settings' state"
+   "verifiedNote": "Page settings Save writes the local page (ElementManager.updatePage, synchronous); it reaches the server with the next autosave. 'Needs a connection to save page settings' would be untrue. L-A wave 2."
   },
   {
    "nodeId": "94:30772",
@@ -553,9 +553,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "code:pages-are-local-document",
    "verified": "no",
-   "verifiedNote": "No 'Needs a connection · Loaded pages can still be opened.' band"
+   "verifiedNote": "Inherits 94:14750's disposition (L-A wave 2)."
   },
   {
    "nodeId": "95:20851",
@@ -595,8 +595,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No 'Couldn’t save page settings. Your changes are still here.' + Retry save"
+   "verified": "drift-open",
+   "verifiedNote": "Same save-failed state as 63:18189 (L-A S9), not compared."
   },
   {
    "nodeId": "101:24231",
@@ -604,9 +604,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Code Keep editing/Discard; board 'Leave without saving?' + Save and leave (+offline/invalid variants)"
+   "authority": "code:page-settings-save-is-local",
+   "verified": "no",
+   "verifiedNote": "Offline variant of the close guard ('You’re offline. Reconnect to save page settings.'). Saving page settings is a local document write (ElementManager.updatePage) that reaches the server with the next autosave, so the online guard (Keep editing · Discard changes · Save and leave, built in wave 2) applies offline too. L-A wave 2."
   },
   {
    "nodeId": "101:24836",
@@ -665,9 +665,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Code Keep editing/Discard; board 'Leave without saving?' + Save and leave (+offline/invalid variants)"
+   "authority": "code:page-settings-save-is-local",
+   "verified": "no",
+   "verifiedNote": "600-px variant of 101:24231; same disposition. L-A wave 2."
   },
   {
    "nodeId": "101:29978",
@@ -677,7 +677,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-A S10: Blank card hint 'Start with an empty page.' adopted. Still open: '{Site} · Create a page' subtitle, source select / 'Choose template', and the plan capacity line (needs a capacity source — sub-plan S13). Not compared."
+   "verifiedNote": "L-A wave 2 built, not compared: capacity line '{n} of {limit} pages on {Plan}' (billing.pagesPerSite added to siteDetail.settingsOverview through the full chain — shared schema, site-detail.service, test; the same limit saveProjectData enforces), From template note 'Choose a page template before creating the page.' with primary 'Choose template'. Still open: '{Site} · Create a page' subtitle, source as a select."
   },
   {
    "nodeId": "101:36828",
@@ -707,8 +707,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No plan page-capacity readout/limit in editor"
+   "verified": "drift-open",
+   "verifiedNote": "L-A wave 2 built, not compared: '{n} of {n} pages on {Plan}' + 'Ask the workspace owner to upgrade, or remove an unused page before creating another.'; Create disabled (the server refuses a save past the limit)."
   },
   {
    "nodeId": "101:38980",
@@ -717,8 +717,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No capacity check state"
+   "verified": "drift-open",
+   "verifiedNote": "L-A wave 2 built, not compared: 'Checking page capacity…' / 'Wait for the current page limit before creating.'; Create disabled while checking."
   },
   {
    "nodeId": "101:39695",
@@ -727,8 +727,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No capacity error + Retry check"
+   "verified": "drift-open",
+   "verifiedNote": "L-A wave 2 built, not compared: 'Couldn’t check page capacity' / 'Your page name and navigation choice are retained.' + Retry check; Create waits for a known limit."
   },
   {
    "nodeId": "101:40412",
@@ -746,9 +746,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "code:page-create-is-local",
    "verified": "no",
-   "verifiedNote": "No offline state"
+   "verifiedNote": "New page creates a local page (ElementManager.createPage); offline it is created and saved on reconnect. The capacity check (101:39695 'Couldn’t check page capacity') is what an offline user sees instead. L-A wave 2."
   },
   {
    "nodeId": "101:41858",
@@ -768,7 +768,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Board 'Your page is ready · Use Add to insert…' + 'Services created · Added to site navigation'"
+   "verifiedNote": "L-A wave 2 built, not compared: empty canvas reads 'Your page is ready' / 'Use Add to insert elements or sections.' (template cards and actions kept, code-ahead); New page receipt '{Page} created · Added to site navigation'. Layers' 'Empty page · Add elements to begin' footer not drawn."
   },
   {
    "nodeId": "104:28892",
@@ -969,9 +969,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "code:pages-are-local-document",
    "verified": "no",
-   "verifiedNote": "No 'Needs a connection · Loaded pages can still be opened.' band"
+   "verifiedNote": "Inherits 94:14750's disposition (L-A wave 2)."
   },
   {
    "nodeId": "118:33757",
@@ -1480,7 +1480,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code icon button 'Delete folder (pages kept)'; board menu 'Delete folder · keep page'"
+   "verifiedNote": "L-A wave 2: the folder's delete control reads 'Delete folder · keep page(s)'. The board's folder menu with 'Only you see this folder. Deleting it keeps {page} at the top level.' is not built (still an icon button). Not compared."
   },
   {
    "nodeId": "137:58206",
@@ -1489,8 +1489,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No organization receipts ('About moved to Studio · /about unchanged')"
+   "verified": "drift-open",
+   "verifiedNote": "L-A wave 2 built, not compared: receipt '{Folder} deleted · {pages} kept at top level'; no Undo (folders outside composer history, A-13)."
   },
   {
    "nodeId": "137:58919",
@@ -2557,7 +2557,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code filtered tree w/ ancestors; board flat results 'Services › Card 1', '12 matches in 5,000 layers'"
+   "verifiedNote": "L-A wave 2 built, not compared: flat search results carry their ancestors ('Services › Card 1') after the name; footer '5,000 layers · 12 matches'. The board's list-head '12 matches in 5,000 layers' line and end-of-list Clear search are not drawn (Clear search sits in the field)."
   },
   {
    "nodeId": "147:77668",
@@ -2566,8 +2566,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Lock exists; no 'Locked by Hero' inheritance, reveal or unlock banner"
+   "verified": "drift-open",
+   "verifiedNote": "L-A wave 2: Layers footer '… · 1 selected · Locked by {Ancestor}' built. The inspector's 'Locked by Hero — unlock in Layers' / 'Show Hero in Layers' block is L-B's. Not compared."
   },
   {
    "nodeId": "147:78110",
@@ -2576,8 +2576,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Lock exists; no 'Locked by Hero' inheritance, reveal or unlock banner"
+   "verified": "drift-open",
+   "verifiedNote": "L-A wave 2: footer '… · 1 selected · Locked' built (board names it '{Hero} selected · Locked'); inspector unlock block is L-B's. Not compared."
   },
   {
    "nodeId": "147:78484",
@@ -2596,8 +2596,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Dimmed exists; no 'Dimmed in editor only · Show normally · Hide on live site…' banner"
+   "verified": "drift-open",
+   "verifiedNote": "L-A wave 2: footer '… · 1 selected · Dimmed' built; the inspector's 'Dimmed in editor only · Show normally · Hide on live site…' banner is L-B's. Not compared."
   },
   {
    "nodeId": "147:79328",
@@ -2607,7 +2607,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-A S2 built, not compared: 'No layers match “q”' / 'Search by name, type, tag or ID.' / Clear search (search really matches name, type, tag, id — useLayerSearch.itemMatches); footer '{N} layers · No matches'. 'Search everywhere' kept (code-ahead)."
+   "verifiedNote": "L-A S2 + wave 2, not compared: 'No layers match “q”' / 'Search by name, type, tag or ID.' / Clear search; footer '{N} layers · No matches'."
   },
   {
    "nodeId": "147:79728",
@@ -2617,7 +2617,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code filtered tree w/ ancestors; board flat results 'Services › Card 1', '12 matches in 5,000 layers'",
+   "verifiedNote": "Same search rows as 147:77189 (L-A wave 2), not compared.",
    "inheritsFrom": "147:77189"
   },
   {

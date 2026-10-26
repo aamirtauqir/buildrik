@@ -86,7 +86,7 @@ describe("NewPageModal", () => {
     expect(composer.elements.addPageToNavigation).not.toHaveBeenCalled();
   });
 
-  it("Blank → creates the named page, makes it active, toasts Page created", () => {
+  it("Blank → creates the named page, makes it active, and reports it (101:42581)", () => {
     const { composer, request } = makeComposer();
     render(<NewPageModal composer={composer as never} />);
     request();
@@ -97,7 +97,7 @@ describe("NewPageModal", () => {
     expect(composer.elements.setActivePage).toHaveBeenCalledWith("p2");
     expect(composer.elements.addPageToNavigation).toHaveBeenCalledWith("p2");
     expect(composer.emit).not.toHaveBeenCalledWith(EVENTS.UI_BROWSE_TEMPLATES, expect.anything());
-    expect(addToast).toHaveBeenCalledWith(expect.objectContaining({ title: "Page created" }));
+    expect(addToast).toHaveBeenCalledWith(expect.objectContaining({ description: expect.stringMatching(/ created · Added to site navigation$/) }));
     expect(screen.queryByTestId("new-page-modal")).toBeNull();
   });
 

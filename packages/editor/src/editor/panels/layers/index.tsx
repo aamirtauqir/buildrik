@@ -404,7 +404,7 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
   const matchCount = state.searchHook.countMatches(state.layers, state.actionsHook.customNames);
 
   /* Stats for LayersTab's count footer; `matches` while a filter is on
-     (147:77189 "12 matches in 5,000 layers"). */
+     (147:77189 "5,000 layers · 12 matches"). */
   const matches = state.searchHook.isSearching ? matchCount : null;
   /* Board 152:78614 "… · 1 selected inside Hero": the one selected row sits
      in a folded branch — name the outermost folded ancestor, the row a user
@@ -416,10 +416,25 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
     const folded = getAncestors(state.layers, id).find((a) => !expandedIds.has(a.id));
     return folded ? getDisplayName(folded.id, folded.type, state.actionsHook.customNames, folded.preview) : null;
   }, [selectedElement?.id, selectedCount, state.layers, expandedIds, state.actionsHook.customNames]);
+  /* Boards 147:77668 / 147:78110 / 147:78900: the one selected layer's state
+     — "Locked", "Locked by Hero" (a locked ancestor), "Dimmed". */
+  const selectionState = React.useMemo(() => {
+    const id = selectedElement?.id;
+    if (!id || selectedCount !== 1 || !composer) return null;
+    const el = composer.elements.getElement(id);
+    if (el?.isLocked?.()) return "Locked";
+    for (let p = el?.getParent?.(); p; p = p.getParent()) {
+      if (p.isLocked?.()) {
+        const item = findLayer(state.layers, p.getId());
+        return `Locked by ${item ? getDisplayName(item.id, item.type, state.actionsHook.customNames, item.preview) : "a parent"}`;
+      }
+    }
+    return state.hiddenIds.has(id) ? "Dimmed" : null;
+  }, [selectedElement?.id, selectedCount, composer, state.layers, state.hiddenIds, state.actionsHook.customNames]);
   React.useEffect(() => {
     if (!composer) return;
-    composer.emit("layers:stats-change", { total: totalCount, selected: selectedCount, matches, hiddenIn });
-  }, [composer, totalCount, selectedCount, matches, hiddenIn]);
+    composer.emit("layers:stats-change", { total: totalCount, selected: selectedCount, matches, hiddenIn, selectionState });
+  }, [composer, totalCount, selectedCount, matches, hiddenIn, selectionState]);
 
   // Board 143:2 (Layers · filtered): search results render FLAT — only the
   // matching rows, no indentation, no chevrons, no ancestor context. The
@@ -429,13 +444,17 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
     const q = state.search.toLowerCase();
     const names = state.actionsHook.customNames;
     const flat: typeof treeFiltered = [];
-    const walk = (items: typeof treeFiltered) => {
+    /* design-2l9 147:77189: each result names where it sits ("Services ›
+       Card 1") — its ancestors under the page. */
+    const walk = (items: typeof treeFiltered, path: string[]) => {
       for (const it of items) {
-        if (itemMatches(it, names, q)) flat.push({ ...it, children: [], depth: 0 });
-        walk(it.children as typeof treeFiltered);
+        if (itemMatches(it, names, q)) {
+          flat.push({ ...it, children: [], depth: 0, searchPath: path.length ? path.join(" › ") : undefined });
+        }
+        walk(it.children as typeof treeFiltered, [...path, getDisplayName(it.id, it.type, names, it.preview)]);
       }
     };
-    walk(treeFiltered);
+    walk(treeFiltered, []);
     return flat;
   }, [treeFiltered, state.searchHook.isSearching, state.search, state.actionsHook.customNames]);
 

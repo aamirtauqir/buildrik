@@ -320,6 +320,14 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
         ) : (
           <>
             <span className="bdc-lr-nm" data-testid={`layer-name-${layer.id}`}>{displayName}</span>
+            {layer.searchPath && (
+              <span
+                className="tw:min-w-0 tw:truncate tw:pl-2 tw:text-[11px] tw:text-[var(--bk-ink-muted)]"
+                data-testid={`layer-search-path-${layer.id}`}
+              >
+                {layer.searchPath}
+              </span>
+            )}
             {isInstance && (
               <span
                 className="bdc-lr-comp"

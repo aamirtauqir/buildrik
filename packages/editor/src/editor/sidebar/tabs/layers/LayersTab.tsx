@@ -73,20 +73,23 @@ const LAYERS_SEARCH_PLACEHOLDER = "Search layers…";
 const count = (n: number) => n.toLocaleString("en-US");
 
 /** The count band — boards 147:75914 ("8 layers · 1 selected"), 152:78614
- *  ("… · 1 selected inside Hero"), 147:77189 ("12 matches in 5,000 layers")
- *  and 147:79328 ("5,000 layers · No matches"). Selection mode keeps its
+ *  ("… · 1 selected inside Hero"), 147:77189 ("5,000 layers · 12 matches"),
+ *  147:79328 ("5,000 layers · No matches") and the selected layer's state,
+ *  147:77668 / 147:78900 ("… · Locked by Hero", "… · Dimmed"). Selection mode keeps its
  *  own "N selected" (it shares the band with Select all · Done). */
 export function layersFooterText(
-  stats: { total: number; selected: number; matches: number | null; hiddenIn?: string | null },
+  stats: { total: number; selected: number; matches: number | null; hiddenIn?: string | null; selectionState?: string | null },
   search: string,
   selecting: boolean,
 ): string {
   const layers = `${count(stats.total)} layer${stats.total === 1 ? "" : "s"}`;
   if (stats.matches !== null && search) {
-    return stats.matches === 0 ? `${layers} · No matches` : `${count(stats.matches)} match${stats.matches === 1 ? "" : "es"} in ${layers}`;
+    return `${layers} · ${stats.matches === 0 ? "No matches" : `${count(stats.matches)} match${stats.matches === 1 ? "" : "es"}`}`;
   }
   if (selecting && stats.selected > 0) return `${count(stats.selected)} selected`;
-  return `${layers} · ${count(stats.selected)} selected${stats.hiddenIn ? ` inside ${stats.hiddenIn}` : ""}`;
+  return `${layers} · ${count(stats.selected)} selected${stats.hiddenIn ? ` inside ${stats.hiddenIn}` : ""}${
+    stats.selectionState ? ` · ${stats.selectionState}` : ""
+  }`;
 }
 const DIM_SCOPE_TIP =
   "Dimming fades a layer in the editor only — it still publishes. To hide it on the site, use Visibility in the inspector.";
@@ -167,7 +170,7 @@ export const LayersTab: React.FC<LayersTabProps> = ({
   /* Raised by the tree boundary so the count footer, which is its sibling,
      can stand down with it. */
   const [treeFailed, setTreeFailed] = React.useState(false);
-  const [stats, setStats] = React.useState<{ total: number; selected: number; matches: number | null; hiddenIn?: string | null }>({
+  const [stats, setStats] = React.useState<{ total: number; selected: number; matches: number | null; hiddenIn?: string | null; selectionState?: string | null }>({
     total: 0,
     selected: 0,
     matches: null,
@@ -177,9 +180,9 @@ export const LayersTab: React.FC<LayersTabProps> = ({
   React.useEffect(() => {
     if (!composer) return;
     const onStats = (data: unknown) => {
-      const d = data as { total: number; selected: number; matches?: number | null; hiddenIn?: string | null };
+      const d = data as { total: number; selected: number; matches?: number | null; hiddenIn?: string | null; selectionState?: string | null };
       if (typeof d?.total === "number" && typeof d?.selected === "number") {
-        setStats({ total: d.total, selected: d.selected, matches: d.matches ?? null, hiddenIn: d.hiddenIn ?? null });
+        setStats({ total: d.total, selected: d.selected, matches: d.matches ?? null, hiddenIn: d.hiddenIn ?? null, selectionState: d.selectionState ?? null });
       }
     };
     composer.on("layers:stats-change", onStats);

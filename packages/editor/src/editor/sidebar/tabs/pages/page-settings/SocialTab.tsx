@@ -20,6 +20,11 @@ export const SocialTab: React.FC<Props> = ({ s }) => {
 
   return (
     <div className="tw:flex tw:flex-col tw:gap-[14px]">
+      {/* design-2l9 board 63:16507 — what an empty field falls back to
+          (SEOInjector: ogTitle || title, ogDescription || description). */}
+      <p className="tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-soft)]" data-testid="social-explainer">
+        Empty social title uses SEO title; empty description uses the SEO description.
+      </p>
       {/* OG card preview — prototype .og-card */}
       <div style={{ maxWidth: 420, background: "var(--bk-bg-card)", border: "1px solid var(--bk-border)", borderRadius: 6, overflow: "hidden" }}>
         <div style={{ width: "100%", aspectRatio: "1200 / 630", display: "grid", placeItems: "center", background: "var(--bk-bg-subtle)", position: "relative" }} role="img" aria-label="Open Graph image preview">
@@ -38,7 +43,7 @@ export const SocialTab: React.FC<Props> = ({ s }) => {
       {/* OG Title */}
       <div className="tw:flex tw:flex-col tw:gap-1.5" data-testid="social-field-title">
         <div className="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2">
-          <Label htmlFor="og-title" className={BK_LABEL_CLASS} data-testid="social-label-title">OG title</Label>
+          <Label htmlFor="og-title" className={BK_LABEL_CLASS} data-testid="social-label-title">Social title</Label>
           {/* Board 2838:12126 — 11/16 ink-muted. It had no line-height of its
               own and inherited the stack's. */}
           <span data-testid="social-count-title" style={{ font: "500 11px/16px var(--bk-font-mono)", color: "var(--bk-ink-muted)" }}>{s.ogTitle.length}/60</span>
@@ -50,12 +55,11 @@ export const SocialTab: React.FC<Props> = ({ s }) => {
           onChange={(e) => s.setOgTitle(e.target.value)}
           placeholder={s.effectiveTitle}
         />
-        <HelperText className={BK_HELPER_CLASS}>Title shown when the page is shared on social networks. Defaults to SEO title.</HelperText>
       </div>
       {/* OG Description */}
       <div className="tw:flex tw:flex-col tw:gap-1.5" data-testid="social-field-desc">
         <div className="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2">
-          <Label htmlFor="og-desc" className={BK_LABEL_CLASS} data-testid="social-label-desc">OG description</Label>
+          <Label htmlFor="og-desc" className={BK_LABEL_CLASS} data-testid="social-label-desc">Social description</Label>
           <span data-testid="social-count-desc" style={{ font: "500 11px/16px var(--bk-font-mono)", color: "var(--bk-ink-muted)" }}>{s.ogDesc.length}/160</span>
         </div>
         <Textarea
@@ -68,7 +72,7 @@ export const SocialTab: React.FC<Props> = ({ s }) => {
       </div>
       {/* OG Image URL */}
       <div className="tw:flex tw:flex-col tw:gap-1.5" data-testid="social-field-image">
-        <Label htmlFor="og-image" className={BK_LABEL_CLASS} data-testid="social-label-image">OG image</Label>
+        <Label htmlFor="og-image" className={BK_LABEL_CLASS} data-testid="social-label-image">Social image URL</Label>
         <TextInput
           id="og-image"
           data-testid="social-input-image"
@@ -77,7 +81,7 @@ export const SocialTab: React.FC<Props> = ({ s }) => {
           placeholder="https://…"
           type="url"
         />
-        <HelperText className={BK_HELPER_CLASS}>Recommended size: 1200×630. Appears in Facebook, Twitter/X, LinkedIn previews.</HelperText>
+        <HelperText className={BK_HELPER_CLASS}>Recommended: 1200 × 630. Clear the URL to remove the image.</HelperText>
       </div>
     </div>
   );
