@@ -10,17 +10,13 @@
 import * as React from "react";
 import { getBlockDefinitions, insertBlock } from "@/blocks/blockRegistry";
 import type { Composer } from "@/engine";
-import type { BlockData, ElementType } from "@/shared/types";
+import type { BlockData } from "@/shared/types";
 import { useToast } from "@/editor/chrome-ui";
 import { animateDropSuccess } from "@/shared/utils/dragDrop/animations";
-import {
-  canNestElement,
-  ELEMENT_CATEGORIES,
-  ElementCategory,
-  getSuggestedParents,
-} from "@/shared/utils/nesting";
+import { getSuggestedParents } from "@/shared/utils/nesting";
 import { writableElements } from "@/engine/commands/commandOperations";
 import { takeReplaceTarget } from "@/editor/sidebar/tabs/build/insertGroupRequest";
+import { resolveInsertTarget } from "@/editor/sidebar/tabs/build/insertTarget";
 import { elementLocation, getElementNameFromType } from "@/editor/canvas/utils/elementInfo";
 
 export interface UseBlockInsertionResult {
@@ -73,17 +69,6 @@ export function useBlockInsertion(composer: Composer | null): UseBlockInsertionR
           return;
         }
 
-        // Smart placement: walk up from the selected element looking for the
-        // nearest ancestor that can accept this block. Insert into selected if
-        // it is itself a valid container; otherwise insert as sibling at the
-        // ancestor's child list, after whichever descendant is on the
-        // selected element's path. If no ancestor accepts the block, fall
-        // back to the page root. This prevents silent-fail cascades where
-        // one-level lookups give up after a single rejection.
-        const selectedIds = composer.selection.getSelectedIds();
-        let parentId = root.getId();
-        let insertIndex: number | undefined = root.getChildCount();
-
         // "Replace with block…": the block goes where the marked element is.
         const replaceId = takeReplaceTarget(composer);
         const replaced = replaceId ? composer.elements.getElement(replaceId) : undefined;
@@ -93,64 +78,16 @@ export function useBlockInsertion(composer: Composer | null): UseBlockInsertionR
            (audit 2026-10-08 P1-3). */
         if (replaced && writableElements(composer, [replaced]).length === 0) return;
 
-        if (replaced && replacedParent) {
-          parentId = replacedParent.getId();
-          insertIndex = replacedParent.getChildIndex(replaced);
-        } else if (selectedIds.length === 1) {
-          const selectedEl = composer.elements.getElement(selectedIds[0]);
-          if (selectedEl) {
-            let candidate: ReturnType<typeof composer.elements.getElement> = selectedEl;
-            let childOnPath = selectedEl;
-            let isSelected = true;
+        /* Otherwise the Add panel's placement rule — the same resolver its
+           "Insert into Hero · At end" strip reads (board 7:18981), so the strip
+           and the insert cannot disagree. */
+        const target =
+          replaced && replacedParent
+            ? { parentId: replacedParent.getId(), index: replacedParent.getChildIndex(replaced) }
+            : resolveInsertTarget(composer, def.elementType) ?? { parentId: root.getId(), index: root.getChildCount() };
+        const { parentId } = target;
 
-            while (candidate) {
-              const candidateType = candidate.getType() as ElementType;
-              /* A selected text element (heading, paragraph, text, label) is
-                 never the target: the rules let it hold blocks, so Add → Divider
-                 produced <h2>Heading<hr></h2> (audit L1-001). The block goes
-                 after it instead. */
-              const textLeaf =
-                isSelected && (ELEMENT_CATEGORIES[candidateType] ?? []).includes(ElementCategory.TEXT);
-              const canContain = !textLeaf && canNestElement(def.elementType, candidateType);
-              /* L1-037: a Section's lone inner container is its content slot
-                 (the "Drop a block here" box) — the block goes in there, not
-                 beside it. */
-              const sectionKids = isSelected && candidateType === "section" ? candidate.getChildren() : [];
-              const slot = sectionKids.length === 1 && sectionKids[0].getType() === "container" ? sectionKids[0] : null;
-              if (slot && canNestElement(def.elementType, "container")) {
-                parentId = slot.getId();
-                insertIndex = slot.getChildCount?.() ?? 0;
-                break;
-              }
-              if (canContain) {
-                if (isSelected) {
-                  // Selected itself accepts the block: insert inside at end.
-                  parentId = candidate.getId();
-                  insertIndex = candidate.getChildCount?.() ?? 0;
-                } else {
-                  // Inserting as sibling of whichever descendant of candidate
-                  // sits on the selection path.
-                  const siblingIdx = candidate
-                    .getChildren()
-                    .findIndex((c) => c.getId() === childOnPath.getId());
-                  parentId = candidate.getId();
-                  insertIndex = siblingIdx >= 0 ? siblingIdx + 1 : candidate.getChildCount?.();
-                }
-                break;
-              }
-              // Walk up. getParent() returns Element | null; normalize to
-              // undefined so the loop guard (while candidate) exits cleanly.
-              childOnPath = candidate;
-              candidate = candidate.getParent() ?? undefined;
-              isSelected = false;
-            }
-            // candidate === null means nothing up to (and including) root
-            // accepts this block. The initial root-fallback parentId/insertIndex
-            // values are already set above, so the insert still tries.
-          }
-        }
-
-        const insertedId = insertBlock(composer, def, parentId, insertIndex);
+        const insertedId = insertBlock(composer, def, parentId, target.index);
         if (insertedId && replaced) composer.elements.removeElement(replaced.getId());
         if (insertedId) {
           const el = composer.elements.getElement(insertedId);

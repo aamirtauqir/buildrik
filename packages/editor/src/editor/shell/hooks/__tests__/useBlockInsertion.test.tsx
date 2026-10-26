@@ -21,7 +21,16 @@ const mocks = vi.hoisted(() => ({
   canNestElement: vi.fn(),
   getSuggestedParents: vi.fn(() => [] as string[]),
   animateDropSuccess: vi.fn(() => Promise.resolve()),
+  resolveInsertTarget: vi.fn(),
 }));
+
+/* A-10: one placement rule — the hook asks the same resolver the Add panel's
+   "Insert into Hero · At end" strip reads. The spy keeps the real rule. */
+vi.mock("@/editor/sidebar/tabs/build/insertTarget", async (importOriginal) => {
+  const real = await importOriginal<typeof import("@/editor/sidebar/tabs/build/insertTarget")>();
+  mocks.resolveInsertTarget.mockImplementation(real.resolveInsertTarget);
+  return { resolveInsertTarget: mocks.resolveInsertTarget };
+});
 
 vi.mock("@/editor/chrome-ui", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/editor/chrome-ui")>()),
@@ -184,6 +193,14 @@ describe("useBlockInsertion", () => {
     const { result } = mountHook();
     act(() => result.current.handleBlockClick(heroBlock));
     expect(composer.elements.removeElement).not.toHaveBeenCalled();
+  });
+
+  it("places the block where resolveInsertTarget says (the Add panel's strip rule)", () => {
+    const { result } = mountHook();
+    act(() => result.current.handleBlockClick(heroBlock));
+    expect(mocks.resolveInsertTarget).toHaveBeenCalledWith(composer, "section");
+    const target = mocks.resolveInsertTarget.mock.results.at(-1)?.value as { parentId: string; index: number };
+    expect(mocks.insertBlock).toHaveBeenCalledWith(composer, expect.anything(), target.parentId, target.index);
   });
 
   it("inserts at the page root end when nothing is selected", () => {
