@@ -1,0 +1,97 @@
+/**
+ * Form field model — what a form's field IS, read off the element tree, for
+ * Content › Fields (2L9 boards 156:716, 156:1316, 156:2506).
+ *
+ *   label        the visible label: a `<label for>` naming the field's id, or
+ *                the `<label>` just before it in the same parent (the Contact
+ *                form block's shape). Without one — a choice wrapped in its
+ *                label included, whose text is edited on the canvas — the
+ *                accessible name (`aria-label`) is the label.
+ *   placeholder  the hint inside an empty field — never the label (the bug
+ *                this file replaced: "Label" wrote `placeholder`).
+ *   name         the submission key; unique within the form.
+ *
+ * @license BSD-3-Clause
+ */
+
+import type { Element } from "@/engine/elements/Element";
+import { escapeHTML, unescapeHTML } from "@/shared/utils/html/encoding";
+
+const NOT_FIELDS = new Set(["submit", "button", "reset", "hidden", "image"]);
+
+const tagOf = (el: Element) => el.getTagName().toLowerCase();
+
+/** The form's fields, in document order. */
+export function formFields(form: Element): Element[] {
+  return form.getDescendants().filter((el) => {
+    const tag = tagOf(el);
+    if (tag === "textarea" || tag === "select") return true;
+    return tag === "input" && !NOT_FIELDS.has((el.getAttribute("type") ?? "text").toLowerCase());
+  });
+}
+
+/** "textarea", "select" or the input's type. */
+export const fieldType = (el: Element): string => {
+  const tag = tagOf(el);
+  return tag === "textarea" || tag === "select" ? tag : (el.getAttribute("type") ?? "text").toLowerCase();
+};
+
+/** The `<label>` element that names this field, if the tree has one. */
+function labelElementOf(form: Element, field: Element): Element | null {
+  const id = field.getAttribute("id");
+  if (id) {
+    const byFor = form.getDescendants().find((el) => tagOf(el) === "label" && el.getAttribute("for") === id);
+    if (byFor) return byFor;
+  }
+  const parent = field.getParent();
+  if (!parent) return null;
+  const siblings = parent.getChildren();
+  const before = siblings[siblings.indexOf(field) - 1];
+  return before && tagOf(before) === "label" && !before.getAttribute("for") ? before : null;
+}
+
+const textOf = (html: string) => unescapeHTML(html.replace(/<[^>]*>/g, "")).replace(/\u00a0/g, " ").trim();
+
+/** What the field's label reads; "" when it has none. */
+export function fieldLabelText(form: Element, field: Element): string {
+  const label = labelElementOf(form, field);
+  if (label) return textOf(label.getContent?.() ?? "");
+  return field.getAttribute("aria-label") ?? "";
+}
+
+/** Write the label: the `<label>`'s text when there is one, else the
+ *  accessible name. Empty removes the accessible name. */
+export function writeFieldLabel(form: Element, field: Element, text: string): void {
+  const label = labelElementOf(form, field);
+  const value = text.trim();
+  if (label) {
+    label.setContent(escapeHTML(value));
+    return;
+  }
+  if (value) field.setAttribute("aria-label", value);
+  else field.removeAttribute("aria-label");
+}
+
+/** Another field of the form already submits under `name`. */
+export function nameTaken(form: Element, field: Element, name: string): boolean {
+  const key = name.trim();
+  return Boolean(key) && formFields(form).some((el) => el !== field && el.getAttribute("name") === key);
+}
+
+/** The validation attributes a field type takes — what the browser checks on
+ *  submit. Length for text-like fields, a range for numbers and dates. */
+export function validationRows(type: string): readonly { attr: string; label: string }[] {
+  if (["text", "email", "tel", "url", "password", "search", "textarea"].includes(type)) {
+    return [
+      { attr: "minlength", label: "Min length" },
+      { attr: "maxlength", label: "Max length" },
+    ];
+  }
+  if (["number", "range", "date", "time", "datetime-local"].includes(type)) {
+    return [
+      { attr: "min", label: "Min" },
+      { attr: "max", label: "Max" },
+    ];
+  }
+  return [];
+}

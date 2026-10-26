@@ -3828,7 +3828,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Label row writes the placeholder attr; no separate Placeholder, Name (submission key), Default value, Validation rows"
+   "verifiedNote": "Lane L-B A3 (built, not compared — no board image in the dump; copy and row order checked against the dump text): drill-in reads '‹ {form}' · Field · Type · Label · Placeholder · Name + 'Name is the key stored with each submission.' · Required · Default value · Validation (min/max length or min/max). Label edits the field's <label> (for= or preceding sibling) else aria-label — never placeholder (bug at FormFieldsSection.tsx:172 fixed). Open: More settings, Conditions (REQUESTS #11), Advanced attributes for the field."
   },
   {
    "nodeId": "156:1911",
@@ -3838,7 +3838,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No submission-key uniqueness check or retained-draft error"
+   "verifiedNote": "Lane L-B A3 (built, not compared): a taken submission key is refused with '“{key}” is already used. Choose a unique submission key.' and the draft is kept (test FormFieldsAndSlides). Open: visual comparison."
   },
   {
    "nodeId": "156:2506",
@@ -3848,7 +3848,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Label row writes the placeholder attr; no separate Placeholder, Name (submission key), Default value, Validation rows",
+   "verifiedNote": "Lane L-B A3 (built, not compared): Label edits the associated <label> text ('Work email'). Open: 'Email label changed · All breakpoints · Undo' receipt.",
    "inheritsFrom": "156:1316"
   },
   {
@@ -3859,7 +3859,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code 6 types (Text, Email, Phone, Number, Date, Long text); board 13 incl. Select, Checkbox, Radio, Switch, Slider, Time, Color, Submit"
+   "verifiedNote": "Lane L-B A4 (built, not compared): '+ Add field' opens 'Add field' with the board's 13 types in order (Text … Submit); each inserts the Insert panel's block before the submit button (Submit goes last) and opens the new field."
   },
   {
    "nodeId": "156:3684",
@@ -3869,7 +3869,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Label row writes the placeholder attr; no separate Placeholder, Name (submission key), Default value, Validation rows",
+   "verifiedNote": "Lane L-B A4 (built, not compared): a new Text field is named 'field-N', labelled 'Field N', placeholder 'Your answer', and opens in the field editor. Open: 'Added to Contact form.' note and 'Text field added · All breakpoints · Undo' receipt.",
    "inheritsFrom": "156:1316"
   },
   {
