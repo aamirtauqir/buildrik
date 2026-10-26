@@ -96,22 +96,22 @@ describe("Field", () => {
 });
 
 describe("controls — density 32", () => {
-  it("Input is chrome-ui's 32-tall box and paints aria-invalid red", () => {
+  it("Input is the board's 28-tall box (2L9 density) and paints aria-invalid red", () => {
     render(<Input aria-invalid="true" data-testid="in" />);
     const input = screen.getByTestId("in");
-    expect(input.className).toContain("tw:h-8");
+    expect(input.className).toContain("tw:h-7");
     expect(input.className).toContain("tw:aria-invalid:border-[var(--bk-error)]");
     expect(input.className).toContain("tw:aria-invalid:focus:border-[var(--bk-error)]");
   });
 
-  it("Select is 32 tall on the radius-md, white on the border-input hairline", () => {
+  it("Select is 28 tall (2L9 density) on the radius-md, white on the border-input hairline", () => {
     render(
       <Select data-testid="sel">
         <option>English</option>
       </Select>,
     );
     const select = screen.getByTestId("sel");
-    expect(select.className).toContain("tw:h-8");
+    expect(select.className).toContain("tw:h-7");
     expect(select.className).toContain("tw:py-0");
     expect(select.className).toContain("tw:rounded-[var(--bk-radius-md)]");
     // 4418:127966 / 4418:128657: selects are NOT filled — white, like chrome-ui's base.

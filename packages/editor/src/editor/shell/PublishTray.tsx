@@ -27,8 +27,8 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Button, CopyButton, Progress, useFocusTrap } from "@/editor/chrome-ui";
-import { X } from "lucide-react";
+import { Button, CopyButton, Menu, MenuItem, Popover, Progress, useFocusTrap } from "@/editor/chrome-ui";
+import { MoreHorizontal, X } from "lucide-react";
 import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
@@ -52,7 +52,7 @@ import { formatRelativeTime } from "@/shared/utils/relativeTime";
 import { PUBLISH_CHECK_ISSUE } from "./hooks/useIssuesFeed";
 import type { UsePublishJobResult } from "./hooks/usePublishJob";
 import type { Issue } from "./hooks/useStudioState";
-import type { NextMove } from "./lifecycle";
+import { PUBLISH_REFUSAL, type NextMove } from "./lifecycle";
 import { publishTray } from "./publishTrayStore";
 
 /* The server's content rows ("Image alt text", "Links") run the same shared
@@ -196,7 +196,7 @@ function trayCta({ nextMove, publishJob, wired, checkState, vercelMissing, cms }
   if (ui === "failed" && publishJob?.pollLost && publishJob.jobId) return { kind: "check-status", label: "Check status" };
   if (ui === "failed" && publishJob?.error) return { kind: "retry", label: "Try again" };
   if (!wired) {
-    return { kind: "shut", label, reason: nextMove?.blockedReason ?? "Publishing isn’t switched on for this workspace yet" };
+    return { kind: "shut", label, reason: nextMove?.blockedReason ?? PUBLISH_REFUSAL.off };
   }
   if (cms.stuck) return { kind: "shut", label, reason: `CMS changes couldn't sync: ${cms.stuck.reason}` };
   if (cms.pending) return { kind: "shut", label, reason: "Saving CMS changes…" };
@@ -296,6 +296,13 @@ export const PublishTray: React.FC<PublishTrayProps> = ({ composer, publishJob, 
     );
 
   const running = uiState === "publishing";
+  /* B8-PB20: a workspace that cannot publish shows only the site's status;
+     B8-PB19/PB21: a viewer or a lost connection see what would change, but
+     no checks and no destination — none of it is theirs to act on now. */
+  const refusal = !onRequestPublish ? PUBLISH_REFUSAL.off : nextMove?.blockedReason ?? null;
+  const statusOnly = refusal === PUBLISH_REFUSAL.off;
+  const noChecks = statusOnly || refusal === PUBLISH_REFUSAL.viewer || refusal === PUBLISH_REFUSAL.offline;
+  const [moreOpen, setMoreOpen] = React.useState(false);
   const runningStep = (() => {
     const steps = publishJob?.steps;
     if (!running || !steps?.length) return null;
@@ -321,6 +328,39 @@ export const PublishTray: React.FC<PublishTrayProps> = ({ composer, publishJob, 
           </h2>
           <p className={`${META} tw:truncate`}>{siteName} · whole site</p>
         </div>
+        {/* B8-PB*: ⋯ before ✕ — publish history lives here (code-ahead, kept). */}
+        <Popover
+          open={moreOpen}
+          onClose={() => setMoreOpen(false)}
+          placement="bottom-end"
+          label="More publish actions"
+          trigger={
+            <Button
+              color="light"
+              size="xs"
+              aria-label="More publish actions"
+              aria-expanded={moreOpen}
+              onClick={() => setMoreOpen((v) => !v)}
+              className="tw:size-8 tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[var(--bk-ink-soft)]"
+              data-testid="publish-tray-more"
+            >
+              <MoreHorizontal size={16} aria-hidden="true" />
+            </Button>
+          }
+        >
+          <Menu label="More publish actions">
+            <MenuItem
+              onClick={() => {
+                setMoreOpen(false);
+                composer?.emit(EVENTS.UI_SWITCH_TAB, { tab: "history" });
+                close();
+              }}
+              data-testid="publish-tray-history"
+            >
+              Publish history
+            </MenuItem>
+          </Menu>
+        </Popover>
         <Button
           color="light"
           size="xs"
@@ -448,7 +488,7 @@ export const PublishTray: React.FC<PublishTrayProps> = ({ composer, publishJob, 
           </section>
         ) : null}
 
-        {running ? null : (
+        {running || statusOnly ? null : (
           <>
             <section className={SECTION} aria-label="What will change">
               <h3 className={HEAD}>What will change</h3>
@@ -464,6 +504,8 @@ export const PublishTray: React.FC<PublishTrayProps> = ({ composer, publishJob, 
               ) : null}
             </section>
 
+            {noChecks ? null : (
+            <>
             <section className={SECTION} aria-label="Checks">
               <div className="tw:flex tw:items-baseline tw:justify-between">
                 <h3 className={HEAD}>Checks</h3>
@@ -499,6 +541,8 @@ export const PublishTray: React.FC<PublishTrayProps> = ({ composer, publishJob, 
                 </Button>
               </div>
             </section>
+            </>
+            )}
           </>
         )}
       </div>
@@ -521,6 +565,15 @@ export const PublishTray: React.FC<PublishTrayProps> = ({ composer, publishJob, 
             {cta.reason}
           </p>
         ) : null}
+        {/* B8-PB*: the legal pages under the CTA. */}
+        <div className="tw:mt-3 tw:flex tw:gap-4" data-testid="publish-tray-legal">
+          <a href={`${DASHBOARD_URL}/privacy`} target="_blank" rel="noopener noreferrer" className="tw:text-[13px] tw:text-[var(--bk-accent)] tw:no-underline tw:hover:underline">
+            Privacy policy
+          </a>
+          <a href={`${DASHBOARD_URL}/terms`} target="_blank" rel="noopener noreferrer" className="tw:text-[13px] tw:text-[var(--bk-accent)] tw:no-underline tw:hover:underline">
+            Terms of service
+          </a>
+        </div>
       </div>
     </div>
   );

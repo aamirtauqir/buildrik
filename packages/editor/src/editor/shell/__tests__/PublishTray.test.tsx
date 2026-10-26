@@ -295,6 +295,39 @@ describe("PublishTray — states (B8-PB* copy)", () => {
   });
 });
 
+describe("PublishTray — outside refusals draw less (B8-PB19/20/21)", () => {
+  const sections = () => Array.from(document.querySelectorAll("section[aria-label]")).map((el) => el.getAttribute("aria-label"));
+
+  it("a workspace that cannot publish shows only the status card (PB20)", () => {
+    renderTray({ onRequestPublish: null });
+    expect(sections()).toEqual(["Site status"]);
+    expect(reason()).toBe("Publishing isn’t switched on for this workspace yet");
+  });
+
+  it("offline (PB21) and a viewer (PB19) see what would change, but no checks and no destination", () => {
+    renderTray({ nextMove: move({ offline: true }) });
+    expect(sections()).toEqual(["Site status", "What will change"]);
+    cleanup();
+    renderTray({ nextMove: move({ isViewer: true }) });
+    expect(sections()).toEqual(["Site status", "What will change"]);
+    expect(reason()).toBe("Publishing needs Editor access");
+  });
+
+  it("an ordinary tray keeps every section", () => {
+    renderTray();
+    expect(sections()).toEqual(["Site status", "What will change", "Checks", "Goes to"]);
+  });
+
+  it("⋯ opens Publish history, and the legal links sit under the CTA", () => {
+    const { composer } = renderTray();
+    fireEvent.click(screen.getByTestId("publish-tray-more"));
+    fireEvent.click(screen.getByTestId("publish-tray-history"));
+    expect(composer.emit).toHaveBeenCalledWith("ui:switch-tab", { tab: "history" });
+    const legal = screen.getByTestId("publish-tray-legal");
+    expect(legal.textContent).toBe("Privacy policyTerms of service");
+  });
+});
+
 describe("PublishTray — deploy failed", () => {
   it("shows the reason, the job id and the deployment id", () => {
     renderTray({

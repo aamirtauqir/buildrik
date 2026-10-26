@@ -14125,8 +14125,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): unreachable live — Publishing flag is on in this build, and the tray opens only via Publish (not clicked: QA workspace deploys for real). | prior: Copy now the board's ('Publishing isn’t switched on for this workspace yet', curly apostrophe) in lifecycle.ts and the tray fallback; built, not compared.",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27: shots/233-10827.png vs probe publish-tray (flag off) at 1440x900 — 360 tray, header Publish · \"<site> · whole site\" with ⋯ and ✕, only the status card (Live · domain, View live ↗, Copy link), disabled \"Publish changes\", \"Publishing isn’t switched on for this workspace yet\", Privacy policy · Terms of service. \"Published … · v12\" shows when a deploy exists (snapshot), absent in the probe.",
    "tier": "P1"
   },
   {
@@ -14137,7 +14137,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): unreachable live — Offline publish tray opens only via Publish; not clicked (QA workspace deploys for real). | prior: Copy now the board's ('Needs a connection') in lifecycle.ts publishBlocker; built, not compared.",
+   "verifiedNote": "probe-compared 2026-10-27 (still open): shots/233-11377.png vs probe publish-tray (offline) — status card + WHAT WILL CHANGE, no Checks / Goes to, \"Needs a connection\", legal links, ⋯. Not built: the board's per-page change chips and \"3 pages changed · 1 added · 0 removed\" counts (needs a draft-vs-live diff, inventory P-2) and \"See all ›\".",
    "tier": "P1"
   },
   {
@@ -14476,9 +14476,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Overview = 6 group cards in a 2-col grid; board's Pro-trial card and Live at/Languages/Search rows not built. Nav adds 'Brand ↗' and Pro/Free badges. | prior: Overview content open: the Pro-trial card and the board's Site/Languages/Search rows are not built (no trial in code yet — memory plans-free-pro-trial). Settings chrome now per board (compared 2026-10-26, probe SettingsTab on General at 1440x900 vs 238:10283/238:11495 screenshots): text-only 32px na",
+   "authority": "code:no-trial",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27: board PNG shots/238-9980.png vs probe SettingsTab on Overview (tRPC stubbed) at 1440x900 — Site card 720x228 (board 231) with Live at / Languages (\"English (default), Deutsch\") / Search (\"2 pages without a description\") rows and Domains ›/Languages ›/SEO › links; no scope chip; nav without Brand ↗ and plan pills. The Pro-trial card is not drawn: no trial exists in code (memory plans-free-pro-trial).",
    "tier": "P2"
   },
   {
@@ -14489,7 +14489,7 @@
    "status": "active",
    "authority": "code:no-tagline-field",
    "verified": "drift-fixed",
-   "verifiedNote": "Compared 2026-10-26 (wave 2) against get_metadata of 238:10283, probe SettingsTab on General at 1440x900: Site card 720x178 as drawn (Site name and Author stacked, labels 13/20), Icons card with rows \"Favicon · <file> · <w> × <h> · Replace…\" (240 label column, 140 button); the board draws Tagline, which has no Site column or project key — Author fills that slot (code). Kept in Advanced (undrawn): Favicon URL and the Languages link. Touch icon kept as a second Icons row (code-ahead). Remaining: controls 32 tall vs 28 (settings theme), footer state copy, Settings host (E-10).",
+   "verifiedNote": "Compared 2026-10-26 (wave 2) against get_metadata of 238:10283, probe SettingsTab on General at 1440x900: Site card 720x178 as drawn (Site name and Author stacked, labels 13/20), Icons card with rows \"Favicon · <file> · <w> × <h> · Replace…\" (240 label column, 140 button); the board draws Tagline, which has no Site column or project key — Author fills that slot (code). Kept in Advanced (undrawn): Favicon URL and the Languages link. Touch icon kept as a second Icons row (code-ahead). Remaining: controls 32 tall vs 28 (settings theme), footer state copy, Settings host (E-10). Wave 3: inputs 28 tall, Replace… as a link (probe 2026-10-27).",
    "tier": "P2"
   },
   {
@@ -14520,9 +14520,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Offline footer red 'Needs a connection · changes stay here, unsaved' (board black, em-dash copy); extra 'You're offline…' banner + global offline bar; Author not Tagline. | prior: Built, not compared (offline state): Settings reads navigator.onLine; offline keeps the edits, the footer says \"Needs a connection · changes stay here, unsaved\" (SH04/AN07 wording; S05 draws \"Needs a connection — your edits stay on this screen, unsaved\"), the banner \"You’re offline. Save settings ne",
+   "authority": "code:no-tagline-field",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27: shots/238-11192.png vs probe General with the context set offline at 1440x900 — footer \"Needs a connection — your edits stay on this screen, unsaved\" in ink, no banner (S05 draws none; SH04/AN07 keep theirs), Save settings disabled, Discard on; 28px inputs; Icons rows with an accent \"Replace…/Upload…\" link. Author in the Tagline slot (no tagline field); Touch icon row and the Advanced card kept (code-ahead).",
    "tier": "P2"
   },
   {
@@ -14620,8 +14620,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Uses GAP-FM07 copy ('…will be removed from … This cannot be undone.', 'Delete 2 permanently'); S14 draws 'Submissions can't be restored…' + ghost red 'Delete'. | prior: Built, not compared: bulk delete confirm — 'Delete {n} submission(s) permanently?' (copy per GAP-FM07, which supersedes S14's shorter body), Cancel · 'Delete {n} permanently', destructive, dialog-sm.",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27: shots/238-13898.png vs probe Form submissions (2 selected → Delete 2) — 480 dialog, \"Delete 2 submissions permanently?\", \"Submissions can’t be restored after they’re deleted.\", Cancel (focused) · outline \"Delete\" in error ink. Title 20 vs board ~16 (shared Modal title).",
    "tier": "P2"
   },
   {
@@ -14676,7 +14676,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): unreachable live — Needs an Editor-role account; the QA user is Owner on this site. | prior: Banner uses the shared 'Changing Domains needs Admin access.' (SH05/SH10 wording); the S19 board says 'Domains need Admin access. Ask an admin to change them.' — two board wordings for one banner, the newer SH family adopted. Built, not compared.",
+   "verifiedNote": "Wave 3: the Domains read-only banner now reads the board's 'Domains need Admin access. Ask an admin to change them.' (other screens keep 'Changing <Screen> needs <Role> access.'); not probe-rendered — the read-only state needs an Editor role the probe composer cannot carry.",
    "tier": "P2"
   },
   {
@@ -14686,8 +14686,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:1015 — search mode exists; result row \"Screen › Group › Field\" + Open › differ",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27: shots/238-15632.png (fetched wave 3) vs probe with \"site name\" typed — always-on 208x28 field, results card 720 in the pane (\"<n> results for “<q>”\", ruled rows 10 apart: path · description · Open ›), nav kept. Owner 2026-10-26: board over the 2026-10-04 Search Mode.",
    "tier": "P2"
   },
   {
@@ -14764,7 +14764,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — During Verify the button reads 'Checking…' but the status word stays 'Not verified'; board shows 'Checking status…' as the status line. | prior: Built, not compared: status words and Verify per AN01 (wave 2); detail lines as in code.",
+   "verifiedNote": "Wave 3: while Verify runs the status line reads 'Checking status…' and the button 'Checking…' (tested); not probe-compared (the probe composer carries no GA id).",
    "tier": "P3"
   },
   {
@@ -14775,7 +14775,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — 'Waiting for data' + 'Measurement ID verified on …' inline like the board, but Verify also opens a 'Format OK · no events yet' modal the board does not draw. | prior: Built, not compared: status words and Verify per AN01 (wave 2); detail lines as in code.",
+   "verifiedNote": "Wave 3: Verify no longer opens a dialog (the board draws none; ConnectionVerifiedDialog deleted); a fresh verification with no events reads 'No events received yet. Verification is an unsaved setting.' (tested); not probe-compared.",
    "tier": "P3"
   },
   {
@@ -14786,7 +14786,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): unreachable live — 'Receiving data' needs real tracker events for this site; none exist. | prior: Built, not compared: status words and Verify per AN01 (wave 2); detail lines as in code.",
+   "verifiedNote": "Wave 3: 'Receiving data' over 'Last received today at HH:MM · N events in the last 24 hours' (tested); unreachable live (no tracker events), not probe-compared.",
    "tier": "P3"
   },
   {
@@ -14808,7 +14808,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — 'Couldn't check status' + retry sentence, values kept: matches; error sentence is grey under the status word, board draws it red below the tracker note. | prior: Built, not compared (error state): a failed Verify shows \"Couldn’t check status\" / \"The status service did not respond. Try Verify again.\" in the status row; values kept (tested).",
+   "verifiedNote": "Wave 3: the failure sentence is error ink under the tracker note, as drawn (tested); not probe-compared.",
    "tier": "P3"
   },
   {
@@ -15748,8 +15748,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Copy matches ('Your selection and filters are unchanged.'; fixture line rightly absent); 'Back to submissions' is an outline button, board primary blue. | prior: Built, not compared: 'CSV ready' / '{n} submissions · {Form} · {View}. Your selection and filters are unchanged.' / Back to submissions; the file downloads (the board's 'Prototype fixture' line is not product copy). Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27: shots/272-24319.png vs probe Export CSV → 'CSV ready' — 640 dialog, '<n> submissions · <form> · <view>. Your selection and filters are unchanged.', primary 'Back to submissions'. The board's 'Prototype fixture' line is not product copy.",
    "tier": "P3"
   },
   {
@@ -15883,7 +15883,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Ack copy matches ('1 submission moved from Spam to Inbox.') but drawn as a bordered green banner 1091x40, board a plain green text line. | prior: Built, not compared: '{n} submission(s) moved from {Spam|Archived} to Inbox.' above the list.",
+   "verifiedNote": "Wave 3: the acknowledgement is a plain success-ink text line as drawn (was a bordered banner); built, not probe-compared.",
    "tier": "P3"
   },
   {
@@ -17507,7 +17507,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Spam tab, filter, Export/'Choose a form to configure' agree; helper 'Select a single form…' sits above the list (y=255), board puts it under 'Showing…'. Spam empty (data). | prior: Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (dataset) not walked.",
+   "verifiedNote": "Wave 3: 'Select a single form before configuring it in Inspector.' moved under the list as drawn; probe-checked position only (forms probe 2026-10-27); Spam data state not rendered.",
    "tier": "P3"
   },
   {
@@ -17853,8 +17853,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Filter change applies at once and clears the selection; the board's 'Filter submissions' confirm (Cancel · All forms · Contact) is not built. | prior: Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Filter) not walked.",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27: shots/277-345909.png vs probe Form submissions → the filter button (\"Form: All forms ▾\") opens \"Filter submissions\" — \"<View> view is kept. Change the form to update counts and CSV scope.\", Cancel · All forms · <each form>, the current one primary; a form change keeps the selection. Dialog 480 vs the board ~520 and the shared Modal title 20 vs ~16 (Modal sizes are chrome-ui).",
    "tier": "P3"
   },
   {
@@ -17874,9 +17874,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "open:board-conflict-csv-copy",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — 'CSV ready' layout matches; body says 'Your selection and filters are unchanged.' (board: 'Your filters and selection are kept.'); Back to submissions is outline, board primary. | prior: Built, not compared: 'CSV ready' / '{n} submissions · {Form} · {View}. Your selection and filters are unchanged.' / Back to submissions; the file downloads (the board's 'Prototype fixture' line is not product copy). Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server",
+   "verifiedNote": "Primary 'Back to submissions' now as drawn; body copy conflicts with 272:24319 ('Your filters and selection are kept.' vs 'Your selection and filters are unchanged.') — 272:24319's kept; owner to pick.",
    "tier": "P3"
   },
   {
@@ -17907,9 +17907,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "open:board-conflict-delete-confirm",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Title and body match; action reads 'Delete 2 permanently' in red destructive, board 'Delete permanently' in primary blue. | prior: Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Delete-confirm) not walked.",
+   "verifiedNote": "Boards disagree on one dialog: B8-S14 (P2) draws the short consequence copy with an outline red 'Delete'; GAP-FMC/FM07 draw the names + context and a primary 'Delete permanently'. S14 adopted (higher tier); owner to pick.",
    "tier": "P3"
   },
   {
@@ -19844,9 +19844,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Save and leave lands on Overview, no footer (as designed); Overview content is a 6-card group grid (325–1416px), not the board's Pro-trial card + Site rows. | prior: Built, not compared: after a save the footer reads 'Saved · applies on next publish' (publish-scope screens) until the next edit or screen, including on the screen a Save and leave lands on; Overview/doors have no footer (the board's 'Saved just now' is the shell bottom bar). The destination screen'",
+   "authority": "code:no-trial",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27: Save and leave lands on the Overview, now the board's Site card (same probe as 238:9980); no trial card (code:no-trial).",
    "tier": "P3"
   },
   {

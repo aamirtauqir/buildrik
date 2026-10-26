@@ -76,6 +76,12 @@ function setup(projectId: string | null = "s1") {
   return { composer, ...utils };
 }
 
+/* GAP-FMC 277:345909: the filter is a small dialog — Cancel · All forms · each form. */
+function pickForm(id: string) {
+  fireEvent.click(screen.getByTestId("set-forms-filter"));
+  fireEvent.click(screen.getByTestId(`set-forms-filter-${id}`));
+}
+
 describe("FormsScreen — gating + empty states", () => {
   it("shows the dashboard-only message with no projectId", () => {
     setup(null);
@@ -123,7 +129,7 @@ describe("FormsScreen — 238:13598 views, filter and rows", () => {
     expect(listSubs).toHaveBeenCalledWith({ siteId: "s1", page: 1, perPage: 20, isArchived: false, isSpam: false });
     expect(within(screen.getByTestId("set-forms-views")).getAllByRole("button").map((b) => b.textContent)).toEqual(["Inbox", "Spam", "Archived"]);
     expect(screen.getByTestId("set-forms-view-inbox")).toHaveAttribute("aria-pressed", "true");
-    expect((screen.getByTestId("set-forms-filter") as HTMLSelectElement).selectedOptions[0].textContent).toBe("Form: All forms");
+    expect(screen.getByTestId("set-forms-filter").textContent).toBe("Form: All forms");
     expect(screen.getByTestId("set-forms-count")).toHaveTextContent("Inbox · 2 submissions");
     expect(screen.getByText("Submissions · All forms")).toBeInTheDocument();
     const a = screen.getByTestId("set-forms-row-a");
@@ -150,7 +156,7 @@ describe("FormsScreen — 238:13598 views, filter and rows", () => {
     expect(configure).toHaveTextContent("Choose a form to configure");
     expect(configure).toBeDisabled();
     expect(screen.getByTestId("set-forms-configure-hint")).toHaveTextContent("Select a single form before configuring it in Inspector.");
-    fireEvent.change(screen.getByTestId("set-forms-filter"), { target: { value: "f1" } });
+    pickForm("f1");
     await waitFor(() => expect(listSubs).toHaveBeenLastCalledWith(expect.objectContaining({ formBlockId: "f1", page: 1 })));
     expect(screen.getByText("Submissions · Reservation")).toBeInTheDocument();
     expect(screen.queryByTestId("set-forms-configure-hint")).toBeNull();
@@ -164,7 +170,8 @@ describe("FormsScreen — 238:13598 views, filter and rows", () => {
     listBlocks.mockResolvedValue([block("f1", "Reservation", 1)]);
     listSubs.mockResolvedValue(pageOf([sub("a", { email: "x@y.co" })], 1));
     const { composer } = setup();
-    fireEvent.change(await screen.findByTestId("set-forms-filter"), { target: { value: "f1" } });
+    fireEvent.click(await screen.findByTestId("set-forms-filter"));
+    fireEvent.click(screen.getByTestId("set-forms-filter-f1"));
     fireEvent.click(await screen.findByText("Configure in Inspector"));
     expect(screen.getByTestId("set-save-error")).toHaveTextContent("Reservation is no longer on its page.");
     expect(composer.emit).not.toHaveBeenCalledWith(EVENTS.UI_SWITCH_TAB, expect.anything());
@@ -215,6 +222,22 @@ describe("FormsScreen — 238:13598 views, filter and rows", () => {
     await waitFor(() => expect(api.forms.updateSubmission.mutate).toHaveBeenCalledWith({ id: "a", isRead: true }));
   });
 
+  it("the form filter asks in a dialog, keeps the view, and a form change keeps the selection", async () => {
+    listBlocks.mockResolvedValue([block("f1", "Contact", 2)]);
+    listSubs.mockResolvedValue(pageOf([sub("a", { name: "Mara" }), sub("b", { name: "Jonas" })], 2));
+    setup();
+    fireEvent.click(await screen.findByTestId("set-forms-select-a"));
+    fireEvent.click(screen.getByTestId("set-forms-filter"));
+    expect(screen.getByText("Filter submissions")).toBeInTheDocument();
+    expect(screen.getByText("Inbox view is kept. Change the form to update counts and CSV scope.")).toBeInTheDocument();
+    const foot = screen.getByTestId("modal-foot-set-forms-filter-dialog");
+    expect(Array.from(foot.querySelectorAll("button")).map((b) => b.textContent)).toEqual(["Cancel", "All forms", "Contact"]);
+    fireEvent.click(screen.getByTestId("set-forms-filter-f1"));
+    await waitFor(() => expect(listSubs).toHaveBeenLastCalledWith(expect.objectContaining({ formBlockId: "f1" })));
+    await waitFor(() => expect(screen.getByTestId("set-forms-selected")).toHaveTextContent("1 selected"));
+    expect(screen.getByTestId("set-forms-filter").textContent).toBe("Form: Contact");
+  });
+
   it("Export CSV exports the current view and form, then says what it held (GAP-FM-Export)", async () => {
     Object.assign(URL, { createObjectURL: vi.fn(() => "blob:x"), revokeObjectURL: vi.fn() });
     const click = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => {});
@@ -222,7 +245,7 @@ describe("FormsScreen — 238:13598 views, filter and rows", () => {
     listSubs.mockResolvedValue(pageOf([sub("a", { email: "x@y.co" })], 1));
     setup();
     await screen.findByTestId("set-forms-table");
-    fireEvent.change(screen.getByTestId("set-forms-filter"), { target: { value: "f1" } });
+    pickForm("f1");
     fireEvent.click(screen.getByTestId("set-forms-view-spam"));
     await waitFor(() => expect(listSubs).toHaveBeenLastCalledWith(expect.objectContaining({ formBlockId: "f1", isSpam: true })));
     await waitFor(() => expect(screen.getByTestId("set-forms-export")).not.toBeDisabled());
@@ -303,11 +326,13 @@ describe("FormsScreen — bulk delete asks first (GAP-FM07–10)", () => {
     fireEvent.click(screen.getByTestId("set-forms-delete"));
   }
 
-  it("does NOT reach the server on the first click, and names what goes where", async () => {
+  it("does NOT reach the server on the first click; asks with B8-S14's copy, Cancel first", async () => {
     await ready();
     expect(api.forms.deleteSubmission.mutate).not.toHaveBeenCalled();
     expect(screen.getByText("Delete 2 submissions permanently?")).toBeInTheDocument();
-    expect(screen.getByText("Mara Lenz and Jonas Peters will be removed from All forms · Inbox. This cannot be undone.")).toBeInTheDocument();
+    expect(screen.getByText("Submissions can’t be restored after they’re deleted.")).toBeInTheDocument();
+    const foot = screen.getByTestId("modal-foot-set-forms-delete-confirm");
+    expect(Array.from(foot.querySelectorAll("button")).map((b) => b.textContent)).toEqual(["Cancel", "Delete"]);
   });
 
   it("Cancel leaves them; confirming deletes both and acknowledges (FM09)", async () => {
@@ -316,7 +341,7 @@ describe("FormsScreen — bulk delete asks first (GAP-FM07–10)", () => {
     await waitFor(() => expect(screen.queryByText("Delete 2 submissions permanently?")).toBeNull());
     expect(api.forms.deleteSubmission.mutate).not.toHaveBeenCalled();
     fireEvent.click(screen.getByTestId("set-forms-delete"));
-    fireEvent.click(screen.getByRole("button", { name: "Delete 2 permanently" }));
+    fireEvent.click(screen.getByTestId("set-forms-delete-ok"));
     await waitFor(() => expect(api.forms.deleteSubmission.mutate).toHaveBeenCalledTimes(2));
     expect(await screen.findByTestId("set-forms-ack")).toHaveTextContent("2 submissions permanently deleted.");
   });
@@ -325,7 +350,7 @@ describe("FormsScreen — bulk delete asks first (GAP-FM07–10)", () => {
     let release!: () => void;
     api.forms.deleteSubmission.mutate.mockImplementation(() => new Promise((r) => (release = () => r({}))));
     await ready();
-    fireEvent.click(screen.getByRole("button", { name: "Delete 2 permanently" }));
+    fireEvent.click(screen.getByTestId("set-forms-delete-ok"));
     expect(await screen.findByText("Deleting 2 submissions…")).toBeInTheDocument();
     expect(screen.getByText(/remain listed until deletion is confirmed/)).toBeInTheDocument();
     await act(async () => release());
@@ -334,7 +359,7 @@ describe("FormsScreen — bulk delete asks first (GAP-FM07–10)", () => {
   it("a failed delete keeps the selection and offers Try again (FM10)", async () => {
     api.forms.deleteSubmission.mutate.mockRejectedValue(new Error("503"));
     await ready();
-    fireEvent.click(screen.getByRole("button", { name: "Delete 2 permanently" }));
+    fireEvent.click(screen.getByTestId("set-forms-delete-ok"));
     expect(await screen.findByText("Couldn’t delete the submissions")).toBeInTheDocument();
     expect(screen.getByText("Both submissions are still in All forms · Inbox. Your selection is kept.")).toBeInTheDocument();
     expect(screen.getByTestId("set-forms-selected")).toHaveTextContent("2 selected");

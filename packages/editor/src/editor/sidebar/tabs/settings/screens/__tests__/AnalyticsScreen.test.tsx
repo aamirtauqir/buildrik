@@ -167,8 +167,8 @@ describe("AnalyticsScreen — Connection status and Last received data", () => {
     expect(statusMock).toHaveBeenCalledWith({ siteId: "s1" });
     const pill = screen.getByTestId("set-an-ga-status");
     expect(pill).toHaveTextContent("Receiving data");
-    expect(screen.getByTestId("set-an-ga-verified")).toHaveTextContent("Measurement ID verified on 2 Jul 2025");
-    expect(screen.getByTestId("set-an-ga-last")).toHaveTextContent("2 Jul 2025, 19:38 · 1,284 events in the last 24 hours");
+    // B8-AN04: one detail line under the status word.
+    expect(screen.getByTestId("set-an-ga-last")).toHaveTextContent("Last received 2 Jul 2025, 19:38 · 1,284 events in the last 24 hours");
   });
 
   it("Waiting for data when the id is verified but nothing has arrived", async () => {
@@ -177,8 +177,7 @@ describe("AnalyticsScreen — Connection status and Last received data", () => {
     await loaded();
     const pill = screen.getByTestId("set-an-ga-status");
     expect(pill).toHaveTextContent("Waiting for data");
-    expect(screen.getByTestId("set-an-ga-verified")).toBeInTheDocument();
-    expect(screen.getByTestId("set-an-ga-last")).toHaveTextContent(/^No events yet$/);
+    expect(screen.getByTestId("set-an-ga-verified")).toHaveTextContent("No events received yet · verified on 2 Jul 2025");
   });
 
   it("Not verified, no verified line, when the id was never verified", async () => {
@@ -210,7 +209,7 @@ describe("AnalyticsScreen — Connection status and Last received data", () => {
     setup({ projectId: null, settings: gaSettings({ verifiedAt: undefined }) });
     expect(statusMock).not.toHaveBeenCalled();
     expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("Not verified");
-    expect(screen.getByTestId("set-an-ga-last")).toHaveTextContent(/^No events yet$/);
+    expect(screen.queryByTestId("set-an-ga-last")).toBeNull();
   });
 });
 
@@ -224,10 +223,10 @@ describe("formatDay / formatDayTime / lastReceivedLine / connectionPill — pure
 
   it("builds the Last received data line, or No events yet", () => {
     expect(lastReceivedLine({ lastEventAt: new Date(2025, 6, 2, 19, 38).toISOString(), events24h: 1284 })).toBe(
-      "2 Jul 2025, 19:38 · 1,284 events in the last 24 hours",
+      "Last received 2 Jul 2025, 19:38 · 1,284 events in the last 24 hours",
     );
     expect(lastReceivedLine({ lastEventAt: new Date(2025, 6, 2, 19, 38).toISOString(), events24h: 1 })).toBe(
-      "2 Jul 2025, 19:38 · 1 event in the last 24 hours",
+      "Last received 2 Jul 2025, 19:38 · 1 event in the last 24 hours",
     );
     expect(lastReceivedLine({ lastEventAt: null, events24h: 0 })).toBe("No events yet");
     expect(lastReceivedLine(null)).toBe("No events yet");
@@ -243,10 +242,10 @@ describe("formatDay / formatDayTime / lastReceivedLine / connectionPill — pure
   });
 });
 
-describe("AnalyticsScreen — Verify and Connection verified (4256:26844)", () => {
+describe("AnalyticsScreen — Verify (B8-AN02/03/04/06)", () => {
   const verify = () => screen.getByTestId("set-an-ga-verify");
 
-  it("re-reads the status, stamps verifiedAt into the draft (dirty, not saved) and opens the dialog", async () => {
+  it("re-reads the status (Checking status… while it runs), stamps verifiedAt into the draft (dirty, not saved), no dialog", async () => {
     statusMock.mockResolvedValueOnce(silent());
     const onDirtyChange = vi.fn();
     const { composer } = setup({ onDirtyChange, settings: gaSettings({ verifiedAt: undefined }) });
@@ -254,24 +253,18 @@ describe("AnalyticsScreen — Verify and Connection verified (4256:26844)", () =
     expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("Not verified");
     expect(onDirtyChange).toHaveBeenLastCalledWith(false);
 
-    statusMock.mockResolvedValueOnce(receiving());
+    let release!: (v: unknown) => void;
+    statusMock.mockImplementationOnce(() => new Promise((r) => (release = r)));
     fireEvent.click(verify());
-    await waitFor(() => expect(screen.getByTestId("set-an-verified")).toBeInTheDocument());
+    expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("Checking status…");
+    expect(verify()).toHaveTextContent("Checking…");
+    await act(async () => release(receiving()));
+    await waitFor(() => expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("Receiving data"));
     expect(statusMock).toHaveBeenCalledTimes(2);
-    expect(screen.getByTestId("set-an-verified-line")).toHaveTextContent(
-      "G-4XQ2P7B1KD is receiving data. 1,284 events arrived in the last 24 hours.",
-    );
-    expect(document.activeElement).toBe(screen.getByTestId("set-an-verified-back"));
-
-    // Behind the dialog the rows already show the re-read and the stamp.
-    expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("Receiving data");
-    expect(screen.getByTestId("set-an-ga-verified")).toHaveTextContent(`Measurement ID verified on ${formatDay(new Date())}`);
+    expect(screen.queryByRole("dialog")).toBeNull();
     expect(screen.getByTestId("set-an-ga-last")).toHaveTextContent("1,284 events in the last 24 hours");
     expect(onDirtyChange).toHaveBeenLastCalledWith(true);
     expect(composer.setProjectSettings).not.toHaveBeenCalled();
-
-    fireEvent.click(screen.getByTestId("set-an-verified-back"));
-    expect(screen.queryByTestId("set-an-verified")).toBeNull();
   });
 
   it("the stamp is flushed on the next Save", async () => {
@@ -282,20 +275,19 @@ describe("AnalyticsScreen — Verify and Connection verified (4256:26844)", () =
     });
     await loaded();
     fireEvent.click(verify());
-    await waitFor(() => expect(screen.getByTestId("set-an-verified")).toBeInTheDocument());
+    await waitFor(() => expect(verify()).toHaveTextContent("Verify"));
     const settings = flush!() as { analytics: { googleAnalytics: { verifiedAt?: string } } };
     expect(settings.analytics.googleAnalytics.verifiedAt).toMatch(/^\d{4}-\d{2}-\d{2}T/);
     expect(composer.setProjectSettings).not.toHaveBeenCalled();
   });
 
-  it("says verified with nothing arrived when the re-read counts zero", async () => {
+  it("a verified id with nothing arrived says the verification is unsaved (B8-AN03)", async () => {
     statusMock.mockResolvedValue(silent());
     setup({ settings: gaSettings({ verifiedAt: undefined }) });
     await loaded();
     fireEvent.click(verify());
-    await waitFor(() => expect(screen.getByTestId("set-an-verified")).toBeInTheDocument());
-    expect(screen.getByTestId("set-an-verified-line")).toHaveTextContent(/^G-4XQ2P7B1KD has the right format\. No events have arrived yet\.$/);
-    expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("Waiting for data");
+    await waitFor(() => expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("Waiting for data"));
+    expect(screen.getByTestId("set-an-ga-verified")).toHaveTextContent("No events received yet. Verification is an unsaved setting.");
   });
 
   it("a malformed or empty id lands the cursor on the field and opens nothing", async () => {
@@ -307,7 +299,6 @@ describe("AnalyticsScreen — Verify and Connection verified (4256:26844)", () =
     fireEvent.change(gaInput(), { target: { value: "G-ABC" } });
     fireEvent.click(verify());
     expect(screen.getByTestId("set-an-ga-error")).toBeInTheDocument();
-    expect(screen.queryByTestId("set-an-verified")).toBeNull();
     expect(screen.queryByTestId("set-an-ga-verified")).toBeNull();
   });
 
@@ -318,7 +309,6 @@ describe("AnalyticsScreen — Verify and Connection verified (4256:26844)", () =
     fireEvent.click(verify());
     await waitFor(() => expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("Couldn’t check status"));
     expect(screen.getByTestId("set-an-ga-verify-error")).toHaveTextContent("The status service did not respond. Try Verify again.");
-    expect(screen.queryByTestId("set-an-verified")).toBeNull();
     // Nothing was stamped; the draft is untouched.
     expect(gaInput().value).toBe("G-4XQ2P7B1KD");
     statusMock.mockResolvedValue(silent());
@@ -329,9 +319,8 @@ describe("AnalyticsScreen — Verify and Connection verified (4256:26844)", () =
   it("without a projectId verifies the shape alone and reports no events", async () => {
     setup({ projectId: null, settings: gaSettings({ verifiedAt: undefined }) });
     fireEvent.click(verify());
-    await waitFor(() => expect(screen.getByTestId("set-an-verified")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("Waiting for data"));
     expect(statusMock).not.toHaveBeenCalled();
-    expect(screen.getByTestId("set-an-verified-line")).toHaveTextContent("has the right format. No events have arrived yet.");
   });
 });
 

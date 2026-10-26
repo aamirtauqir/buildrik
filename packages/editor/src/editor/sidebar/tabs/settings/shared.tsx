@@ -263,6 +263,8 @@ type InputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, "className">
 const SETTINGS_INPUT_THEME: NonNullable<CustomFlowbiteTheme["textInput"]> = {
   field: {
     input: {
+      /* 2L9 (owner 2026-10-26, board density): settings fields are 28 tall. */
+      sizes: { md: "tw:h-7 tw:py-0 tw:text-[13px]" },
       colors: {
         gray:
           "tw:bg-[var(--bk-gray-50)] tw:rounded-md! tw:border-[var(--bk-border-medium)] tw:focus:border-primary-700 tw:focus:ring-primary-700 " +
@@ -290,7 +292,7 @@ const SETTINGS_SELECT_THEME: NonNullable<CustomFlowbiteTheme["select"]> = {
   field: {
     select: {
       sizes: {
-        md: "tw:h-8 tw:py-0 tw:pl-3 tw:text-[length:var(--bk-text-13)]",
+        md: "tw:h-7 tw:py-0 tw:pl-3 tw:text-[length:var(--bk-text-13)]",
       },
       withAddon: {
         off: "tw:rounded-[var(--bk-radius-md)]",

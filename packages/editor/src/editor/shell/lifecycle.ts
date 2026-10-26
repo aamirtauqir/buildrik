@@ -234,11 +234,19 @@ function whoever(i: LifecycleInput): { subject: string; object: string; possessi
 /** Why publish is refused here, or null. Ordered: a workspace that cannot
  *  publish at all outranks a role that cannot, which outranks a dropped
  *  connection. */
+/** The refusals from outside the site (B8-PB19 233:10270, PB20, PB21): the
+ *  publish tray draws less for them — the switched-off workspace only its
+ *  status card, a viewer or a lost connection no checks and no destination. */
+export const PUBLISH_REFUSAL = {
+  off: "Publishing isn’t switched on for this workspace yet",
+  viewer: "Publishing needs Editor access",
+  offline: "Needs a connection",
+} as const;
+
 function publishBlocker(i: LifecycleInput): string | null {
-  if (!i.publishEnabled) return "Publishing isn’t switched on for this workspace yet";
-  /* B8-PB19 233:10270. */
-  if (i.isViewer) return "Publishing needs Editor access";
-  if (i.offline) return "Needs a connection";
+  if (!i.publishEnabled) return PUBLISH_REFUSAL.off;
+  if (i.isViewer) return PUBLISH_REFUSAL.viewer;
+  if (i.offline) return PUBLISH_REFUSAL.offline;
   if (i.saveConflict) return "Resolve the sync conflict before publishing";
   if (i.saveFailed) return "Save your changes before publishing — the last save failed";
   return null;

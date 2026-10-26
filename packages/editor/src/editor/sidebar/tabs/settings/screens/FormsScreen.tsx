@@ -30,12 +30,13 @@
 
 import * as React from "react";
 import { createBuildrikApiClient } from "@/services/api-client";
-import { LoadCard, SET_BTN, SET_CARD, SCREEN_EMPTY, SCREEN_SUCCESS, Screen, SaveErrorBanner, Select } from "../shared";
+import { LoadCard, SET_BTN, SET_CARD, SCREEN_EMPTY, Screen, SaveErrorBanner } from "../shared";
 import type { ScreenProps } from "../types";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { EVENTS } from "@/shared/constants/events";
 import { locateComment } from "@/editor/sidebar/tabs/review/locate";
 import { Button, Checkbox, ConfirmDialog, Modal } from "@/editor/chrome-ui";
+import { ChevronDown } from "lucide-react";
 
 interface FormBlockRow {
   id: string;
@@ -153,6 +154,8 @@ export const FormsScreen: React.FC<ScreenProps> = ({ composer, projectId, onDirt
   const [moveFailed, setMoveFailed] = React.useState<string[] | null>(null);
   const [moving, setMoving] = React.useState(false);
   /* GAP-FM-Export: the export's own dialog — preparing, ready (with what it held) or failed. */
+  /* GAP-FMC 277:345909: the form filter asks in a small dialog. */
+  const [filterOpen, setFilterOpen] = React.useState(false);
   const [exportState, setExportState] = React.useState<{ phase: "preparing" | "failed" } | { phase: "ready"; count: number } | null>(null);
 
   React.useEffect(() => {
@@ -222,7 +225,8 @@ export const FormsScreen: React.FC<ScreenProps> = ({ composer, projectId, onDirt
     if (next.view !== undefined) setView(next.view);
     if (next.form !== undefined) setFormFilter(next.form);
     setPage(1);
-    setSelected(new Set());
+    /* GAP-FMC Filter: a form change keeps the selection; a new view clears it. */
+    if (next.view !== undefined) setSelected(new Set());
     setExpandedId(null);
     setAck(null);
     setActionError(null);
@@ -393,11 +397,7 @@ export const FormsScreen: React.FC<ScreenProps> = ({ composer, projectId, onDirt
         confirmLabel: `Delete ${n} permanently`,
       };
     }
-    return {
-      title: `Delete ${plural(n, "submission")} permanently?`,
-      message: `${namesOf(deleteDialog.ids)} will be removed from ${where}. This cannot be undone.`,
-      confirmLabel: `Delete ${n} permanently`,
-    };
+    return null;
   })();
 
   return (
@@ -423,18 +423,19 @@ export const FormsScreen: React.FC<ScreenProps> = ({ composer, projectId, onDirt
       </div>
 
       <div className="tw:flex tw:items-center tw:gap-3">
-        <Select
+        <Button
+          type="button"
+          size="xs"
+          variant="secondary"
+          className={`${SET_BTN} tw:h-7 tw:w-60 tw:justify-between tw:bg-[var(--bk-bg-subtle)] tw:font-normal`}
+          aria-haspopup="dialog"
           aria-label="Filter submissions by form"
-          className="tw:w-60"
-          value={formFilter}
-          onChange={(e) => changeList({ form: e.target.value })}
+          onClick={() => setFilterOpen(true)}
           data-testid="set-forms-filter"
         >
-          <option value={ALL_FORMS}>Form: All forms</option>
-          {forms.map((f) => (
-            <option key={f.id} value={f.id}>{`Form: ${f.name}`}</option>
-          ))}
-        </Select>
+          <span className="tw:truncate">{`Form: ${chosenForm?.name ?? "All forms"}`}</span>
+          <ChevronDown size={14} aria-hidden />
+        </Button>
         <span className={INK_13} role="status" data-testid="set-forms-count">
           {submissions ? `${VIEW_LABEL[view]} · ${plural(submissions.total, "submission")}` : VIEW_LABEL[view]}
         </span>
@@ -462,14 +463,9 @@ export const FormsScreen: React.FC<ScreenProps> = ({ composer, projectId, onDirt
           {chosenForm ? "Configure in Inspector" : "Choose a form to configure"}
         </Button>
       </div>
-      {!chosenForm ? (
-        <p className={MUTED_12} data-testid="set-forms-configure-hint">
-          Select a single form before configuring it in Inspector.
-        </p>
-      ) : null}
 
       {ack ? (
-        <div className={SCREEN_SUCCESS} role="status" data-testid="set-forms-ack">
+        <div className="tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-success-text)]" role="status" data-testid="set-forms-ack">
           {ack}
         </div>
       ) : null}
@@ -627,12 +623,49 @@ export const FormsScreen: React.FC<ScreenProps> = ({ composer, projectId, onDirt
             ) : null}
           </div>
         ) : null}
+        {/* GAP-FMC 277:336979: the configure hint sits under the list. */}
+        {!chosenForm ? (
+          <p className={MUTED_12} data-testid="set-forms-configure-hint">
+            Select a single form before configuring it in Inspector.
+          </p>
+        ) : null}
       </section>
 
       <p className={`${MUTED_12} tw:mt-auto`} data-testid="set-forms-retention">
         Submissions are kept 365 days, then permanently deleted.
       </p>
 
+      {/* B8-S14 238:13898: the consequence confirm — Cancel first (the focus),
+          then an outline "Delete" in the error ink. */}
+      <Modal
+        open={deleteDialog?.phase === "confirm"}
+        onClose={() => setDeleteDialog(null)}
+        title={`Delete ${plural(deleteDialog?.ids.length ?? 0, "submission")} permanently?`}
+        width="sm"
+        dismissOnScrimClick={false}
+        testId="set-forms-delete-confirm"
+        footer={
+          <>
+            <Button type="button" size="xs" variant="secondary" className={SET_BTN} onClick={() => setDeleteDialog(null)} data-testid="set-forms-delete-cancel">
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              size="xs"
+              variant="secondary"
+              className={`${SET_BTN} tw:text-[var(--bk-error)]`}
+              onClick={() => {
+                if (deleteDialog) void deleteSelected(deleteDialog.ids);
+              }}
+              data-testid="set-forms-delete-ok"
+            >
+              Delete
+            </Button>
+          </>
+        }
+      >
+        <p className={MUTED_13}>Submissions can’t be restored after they’re deleted.</p>
+      </Modal>
       <ConfirmDialog
         open={dialog !== null}
         onClose={() => {
@@ -653,11 +686,11 @@ export const FormsScreen: React.FC<ScreenProps> = ({ composer, projectId, onDirt
         open={exportState?.phase === "preparing" || exportState?.phase === "ready"}
         onClose={() => setExportState(null)}
         title={exportState?.phase === "ready" ? "CSV ready" : "Preparing CSV…"}
-        width="sm"
+        width="lg"
         testId="set-forms-export-dialog"
         footer={
           exportState?.phase === "ready" ? (
-            <Button type="button" size="xs" variant="secondary" className={SET_BTN} onClick={() => setExportState(null)}>
+            <Button type="button" size="xs" className={SET_BTN} onClick={() => setExportState(null)}>
               Back to submissions
             </Button>
           ) : null
@@ -679,6 +712,38 @@ export const FormsScreen: React.FC<ScreenProps> = ({ composer, projectId, onDirt
         width="sm"
         testId="set-forms-export-failed"
       />
+      <Modal
+        open={filterOpen}
+        onClose={() => setFilterOpen(false)}
+        title="Filter submissions"
+        width="sm"
+        testId="set-forms-filter-dialog"
+        footer={
+          <>
+            <Button type="button" size="xs" variant="secondary" className={SET_BTN} onClick={() => setFilterOpen(false)}>
+              Cancel
+            </Button>
+            {[{ id: ALL_FORMS, name: "All forms" }, ...forms].map((f) => (
+              <Button
+                key={f.id || "all"}
+                type="button"
+                size="xs"
+                variant={f.id === formFilter ? undefined : "secondary"}
+                className={SET_BTN}
+                onClick={() => {
+                  setFilterOpen(false);
+                  if (f.id !== formFilter) changeList({ form: f.id });
+                }}
+                data-testid={`set-forms-filter-${f.id || "all"}`}
+              >
+                {f.name}
+              </Button>
+            ))}
+          </>
+        }
+      >
+        <p className={MUTED_13}>{`${VIEW_LABEL[view]} view is kept. Change the form to update counts and CSV scope.`}</p>
+      </Modal>
       <ConfirmDialog
         open={moveFailed !== null}
         onClose={() => setMoveFailed(null)}

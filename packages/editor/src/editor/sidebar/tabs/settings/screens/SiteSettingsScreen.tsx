@@ -105,10 +105,11 @@ async function uploadSiteIcon(siteId: string, file: File, context: "favicon" | "
 
 /* B8-S02 `Row / Favicon`: the label in a 240 column, "<file> · <w> × <h>"
    in 284, a 140 outline `Replace…` at the right; 49 tall. */
-const ICON_ROW = "tw:flex tw:min-h-12 tw:items-center tw:gap-3";
+const ICON_ROW = "tw:flex tw:min-h-12 tw:items-center tw:gap-3 tw:border-b tw:border-[var(--bk-border)]";
 const ICON_LABEL = "tw:w-60 tw:shrink-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]";
 const ICON_FILE = "tw:min-w-0 tw:flex-1 tw:truncate tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]";
-const ICON_BTN = "tw:w-35 tw:shrink-0";
+/* B8-S02/S05: "Replace…" is an accent text link in the 140 column, not a box. */
+const ICON_BTN = "tw:h-8 tw:w-35 tw:shrink-0 tw:justify-start tw:px-0 tw:text-[length:var(--bk-text-13)] tw:font-normal tw:no-underline tw:hover:underline";
 const STACK = "tw:flex tw:flex-col tw:gap-2.5";
 
 /** `favicon.png` from a stored URL (query and hash dropped), or the URL itself when it has no path. */
@@ -166,7 +167,7 @@ function IconUpload({ id, label, accept, value, busy, readOnly, onPick }: IconUp
         id={id}
         type="button"
         size="xs"
-        variant="secondary"
+        variant="link"
         className={ICON_BTN}
         disabled={busy || readOnly}
         onClick={() => fileRef.current?.click()}
