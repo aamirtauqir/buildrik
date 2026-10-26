@@ -19840,7 +19840,7 @@
    "status": "active",
    "authority": "open:save-failed-copy-context",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Strip 'Couldn't save s0-qa site · Home. Your changes are kept.' + Retry + Keep editing, plus a 'Save failed' toast and a 'Reconnecting…' bar at once. Board: one strip. | prior: L-F W1: built, not compared. SaveFailedBanner is one strip: line + Retry. context=\"publish\" draws the board's \"Save before publishing. Your changes are kept.\"; without a context \"Couldn't save {where}. Your changes are kept.\" Exit and brand-refusal variants kept (code:tokens-invalid). StudioHeader p"
+   "verifiedNote": "probe-compared 2026-10-27 (lf-save-failed): strip 354,112 774×44 (board 353,112 775×45), ⚠ + red 13px line, white Retry 686/67 right after the line (board 685/64), no Keep editing — match. It now steps aside while the session or can't-reach banner holds the slot. Open, lead: the 'Save failed' toast that fires with it (hooks, lead3) and the publish context (F-18)."
   },
   {
    "nodeId": "10:2647",
@@ -19880,7 +19880,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — At 1280x720 selection opens the Inspector floating over the canvas; board keeps it closed behind an 'Inspector' button. Insert strip OK; add receipt not built. | prior: L-A S1 built the 'Insert into Hero · At end' strip; receipt waits on REQUESTS #11; 1280 collapsed-Inspector mode is shell (lead). Not compared."
+   "verifiedNote": "Not in lane F's paths: the 1280-wide 'Inspector stays closed behind an Inspector button' layout is the shell's (StudioPanels, lead) and the add receipt is L-A's — REQUESTS F-25."
   },
   {
    "nodeId": "225:2297",
@@ -19900,7 +19900,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Copy + Download local copy/Retry match; banner sits above the topbar (y=0–54, board under it), adds Copy details and ×; canvas empty, not the read-only site. | prior: L-F S2: Download local copy added (workSnapshot; REQUESTS #15 registers the live project, else the kept unsaved copy). Leads the global slot. Placement under topbar REQUESTS #11. Built, not compared."
+   "verifiedNote": "probe-compared 2026-10-27 (lf-load-failed, 1440×900, board PNG): bar 0,56,1440×40 error tint, ✕ glyph, 13px red line at x39, Download local copy 1162/163×32 (board 1161/164), filled Retry 1335/81 (board 1336/79) — match. Copy details and the ✕ dismiss removed (not on the board). Open, not in lane paths: the live mount sits above the topbar (REQUESTS F-11) and the canvas shows no read-only site behind it (canvas/load path)."
   },
   {
    "nodeId": "225:3353",
@@ -19910,7 +19910,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Title, body ('Your 1 change is kept in this tab and in this browser') and buttons match; the save-failed strip renders above the scrim, undimmed. | prior: L-F S5: built, not compared. 480 dialog (size confirm), \"Sign in again to save\" + board body with the history count since the last save; \"and in this browser\" only when a kept copy exists (code truth). Keep editing · Try saving again · Sign in ↗ (primary). The labels list folded into the count (code"
+   "verifiedNote": "probe-compared 2026-10-27 (lf-session-dialog): dialog 480×176 (board 480×176), title 16/24, body 13/20, Keep editing 112 · Try saving again 136 · Sign in ↗ 107 (board ≈111/137/108), 120 below the top — match; the save-failed strip now sits under the scrim (z-40) and is dimmed. Open: chrome-ui centres dialogs (top 362), the board puts them at top 280 (REQUESTS F-24)."
   },
   {
    "nodeId": "225:3888",
@@ -19920,7 +19920,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Copy and Sign in ↗ match, but the banner spans the window above the topbar (y=0–56) and the 'Couldn't save… Retry · Keep editing' strip shows too. | prior: L-F S5: built, not compared. Keep editing (and Escape) leaves the G04 banner in the global slot with Sign in ↗; the next landed save (lastSavedAt) clears it."
+   "verifiedNote": "probe-compared 2026-10-27 (lf-session-banner): bar 0,56,1440×40, ✕ glyph, line, filled Sign in ↗ 1309/107 (board 1312/103) — match. The save-failed strip no longer shows while this banner is up. Open: live mount above the topbar (F-11)."
   },
   {
    "nodeId": "225:4416",
@@ -19950,7 +19950,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Kept work after a failed save + reload shows the old toast 'Some work never reached the server… Restore my edits', not the board's banner with Discard… · Restore. | prior: L-F S3: built, not compared. RecoveryBanner is the one surface: board copy (time as \"today 10:12\"), Discard… · Restore my edits. Dashboard kept copy arrives via keptWorkOffer (REQUESTS #16 retires the toast); local draft sentinel uses the same words."
+   "verifiedNote": "probe-compared 2026-10-27 (lf-recovery-older): strip flush at the canvas column top 342,100 798×56 (board 342,100 798×56), warning tint, 13/18 two lines at x356, Discard… 889/93 · Restore my edits 991/135 (board 883/97 · 987/138) — match. Open: the live app still shows the old toast until the load path publishes the keptWorkOffer (F-16a, lead3)."
   },
   {
    "nodeId": "225:6003",
@@ -19960,7 +19960,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Kept copy older than the server: the same toast still offers 'Restore my edits'; board says someone saved after and offers Download my copy only. | prior: L-F S3: built, not compared. Server newer → board line (author not in the contract: code:no-author) + Download my copy; Compare not offered until CompareHost has a kept-copy source (REQUESTS #16c)."
+   "verifiedNote": "probe-compared 2026-10-27 (lf-recovery-newer): strip geometry and line match; Download my copy 145 wide. Open: no Compare (the shared Compare has no kept-copy source, F-16c) and the live toast (F-16a)."
   },
   {
    "nodeId": "225:6532",
@@ -19970,7 +19970,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Server version check blocked: the same 'Restore my edits' toast; board says it can't be restored safely and offers Download my copy. | prior: L-F S3: built, not compared. Server unknown → board line + Download my copy; Compare as G08 (REQUESTS #16c)."
+   "verifiedNote": "probe-compared 2026-10-27 (lf-recovery-unknown): as G08 — strip and line match; no Compare (F-16c); live toast (F-16a)."
   },
   {
    "nodeId": "225:7061",

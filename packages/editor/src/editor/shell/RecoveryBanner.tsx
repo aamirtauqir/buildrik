@@ -33,12 +33,14 @@
 import * as React from "react";
 import { RecoveryManager } from "@/engine/recovery/RecoveryManager";
 import type { ProjectData } from "@shared/types";
-import { Button, ConfirmDialog } from "@/editor/chrome-ui";
+import { Button, ConfirmDialog, Portal } from "@/editor/chrome-ui";
 import { fetchSitePublishState } from "@/services/PublishService";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { clearUnsaved, takeOffScreenUnsaved } from "@/services/unsavedRecovery";
 import { setKeptWorkOffer, useKeptWorkOffer } from "./keptWorkOffer";
 import { downloadProject } from "./workSnapshot";
+import { BANNER_ACTION, BANNER_ACTION_SECONDARY } from "./GlobalBannerSlot";
+import { useCanvasColumnRect } from "./useCanvasColumnRect";
 
 export interface RecoveryBannerProps {
   /** Accepted from today's mount; the board's banner names no scope, so it is
@@ -101,11 +103,15 @@ interface Kept {
 
 type ServerState = "loading" | "older" | "newer" | "unknown";
 
+/* 2L9 B7-G07 225:5474: a 56 px warning strip flush across the top of the
+   canvas column — the line 13/18 in two lines at 14, the actions at the right,
+   14 in. Above the scrim of nothing: z-40, under the dialogs (z-50). */
 const BAR =
-  "tw:flex tw:flex-wrap tw:items-center tw:gap-3 tw:px-4 tw:py-2.5 tw:border-b tw:border-[var(--bk-border)] " +
-  "tw:bg-[var(--bk-accent-tint)] tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]";
-const QUIET =
-  "tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]";
+  "tw:fixed tw:z-40 tw:flex tw:min-h-14 tw:items-center tw:gap-3 tw:py-2 tw:pl-3.5 tw:pr-3.5 " +
+  "tw:bg-[var(--bk-warning-tint)] tw:text-[var(--bk-warning-text)] tw:text-[13px] tw:leading-[18px] " +
+  "tw:[font-family:var(--bk-font-ui)]";
+/** Without a canvas column (a full-page view covers it), under the topbar. */
+const NO_COLUMN = { left: 0, right: 0, top: 56 };
 
 export const RecoveryBanner: React.FC<RecoveryBannerProps> = ({
   reloadFn,
@@ -123,6 +129,7 @@ export const RecoveryBanner: React.FC<RecoveryBannerProps> = ({
   const [dismissed, setDismissed] = React.useState(false);
   const [confirmDiscard, setConfirmDiscard] = React.useState(false);
   const reload = reloadFn ?? (() => window.location.reload());
+  const col = useCanvasColumnRect(320);
 
   const kept: Kept | null = React.useMemo(() => {
     if (offer) {
@@ -199,23 +206,32 @@ export const RecoveryBanner: React.FC<RecoveryBannerProps> = ({
         : "Couldn’t check the server version, so your kept copy can’t be restored safely right now.";
 
   return (
-    <div className={BAR} role="status" aria-label="Unsaved work found" data-testid="recovery-banner" data-server={server.state}>
-      <p className="tw:m-0 tw:grow tw:basis-60">{message}</p>
-      <div className="tw:flex tw:items-center tw:gap-2">
-        {server.state === "older" ? (
-          <>
-            <Button color="light" size="xs" onClick={() => setConfirmDiscard(true)} className={QUIET}>
-              Discard…
+    <Portal>
+      <div
+        className={BAR}
+        style={col ? { left: col.left, top: col.top, width: col.width } : NO_COLUMN}
+        role="status"
+        aria-label="Unsaved work found"
+        data-testid="recovery-banner"
+        data-server={server.state}
+      >
+        <p className="tw:m-0 tw:min-w-0 tw:flex-1">{message}</p>
+        <div className="tw:flex tw:flex-none tw:items-center tw:gap-2">
+          {server.state === "older" ? (
+            <>
+              <Button color="light" size="xs" onClick={() => setConfirmDiscard(true)} className={BANNER_ACTION_SECONDARY}>
+                Discard…
+              </Button>
+              <Button size="xs" onClick={kept.restore} className={`${BANNER_ACTION} tw:px-4`}>
+                Restore my edits
+              </Button>
+            </>
+          ) : (
+            <Button color="light" size="xs" onClick={download} className={`${BANNER_ACTION_SECONDARY} tw:px-3`} data-testid="recovery-download">
+              Download my copy
             </Button>
-            <Button size="xs" onClick={kept.restore}>
-              Restore my edits
-            </Button>
-          </>
-        ) : (
-          <Button color="light" size="xs" onClick={download} data-testid="recovery-download">
-            Download my copy
-          </Button>
-        )}
+          )}
+        </div>
       </div>
       <ConfirmDialog
         open={confirmDiscard}
@@ -231,7 +247,7 @@ export const RecoveryBanner: React.FC<RecoveryBannerProps> = ({
         tone="destructive"
         testId="recovery-discard-confirm"
       />
-    </div>
+    </Portal>
   );
 };
 

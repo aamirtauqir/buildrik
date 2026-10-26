@@ -25,7 +25,7 @@
  */
 
 import * as React from "react";
-import { Button, ModalBody, ModalContent, ModalFooter, ModalRoot, ModalTitle, useToast } from "@/editor/chrome-ui";
+import { Button, ModalContent, ModalRoot, ModalTitle, useToast } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
@@ -52,6 +52,8 @@ function changesSince(composer: Composer | null, lastSavedAt: number | null): nu
     return 0;
   }
 }
+
+const DIALOG_ACTION = "tw:h-8 tw:min-h-0 tw:px-4 tw:py-0 tw:text-[13px] tw:leading-5 tw:font-medium";
 
 function signIn(): void {
   window.open(`${DASHBOARD_URL}/auth?reason=session-expired`, "_blank", "noopener");
@@ -115,31 +117,36 @@ export const SessionExpiredModal: React.FC<SessionExpiredModalProps> = ({
   const changes = count > 0 ? `Your ${count} ${count === 1 ? "change is" : "changes are"}` : "Your changes are";
   const where = keptInBrowser ? "in this tab and in this browser" : "in this tab";
 
+  /* 2L9 B7-G03 225:3353: 480 × 176 — 24 in, the title 16/24 semibold, the
+     body 13/20 two lines 16 under it, the three actions 32 tall 16 under that,
+     right-aligned. The shared ModalTitle / ModalBody insets made it 230 tall. */
   return (
     <ModalRoot open={open} onOpenChange={(o) => !o && keepEditing()}>
       <ModalContent size="confirm" srTitle="Sign in again to save">
-        <ModalTitle>Sign in again to save</ModalTitle>
-        <ModalBody>
-          <p className="tw:my-2 tw:text-[13px] tw:leading-normal tw:text-[var(--bk-ink-muted)]" data-testid="session-expired-body">
+        <div className="tw:flex tw:flex-col tw:gap-4 tw:p-6" data-testid="session-expired-dialog">
+          <ModalTitle inset={false} className="tw:m-0 tw:text-[16px] tw:leading-6 tw:font-semibold">
+            Sign in again to save
+          </ModalTitle>
+          <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-soft)]" data-testid="session-expired-body">
             Your session expired. {changes} kept {where}. Sign in again to save {count === 1 ? "it" : "them"}.
           </p>
           {retryFailed && (
-            <p role="alert" className="tw:my-2 tw:text-[12px] tw:text-[var(--bk-error-text)]">
+            <p role="alert" className="tw:m-0 tw:text-[12px] tw:text-[var(--bk-error-text)]">
               Still signed out — finish signing in first, then try again.
             </p>
           )}
-        </ModalBody>
-        <ModalFooter>
-          <Button color="light" size="sm" onClick={keepEditing}>
-            Keep editing
-          </Button>
-          <Button color="light" size="sm" disabled={retrying} onClick={retry}>
-            {retrying ? "Saving…" : "Try saving again"}
-          </Button>
-          <Button size="sm" onClick={signIn}>
-            Sign in ↗
-          </Button>
-        </ModalFooter>
+          <div className="tw:flex tw:justify-end tw:gap-2">
+            <Button color="light" size="sm" className={DIALOG_ACTION} onClick={keepEditing}>
+              Keep editing
+            </Button>
+            <Button color="light" size="sm" className={DIALOG_ACTION} disabled={retrying} onClick={retry}>
+              {retrying ? "Saving…" : "Try saving again"}
+            </Button>
+            <Button size="sm" className={`${DIALOG_ACTION} tw:px-6`} onClick={signIn}>
+              Sign in ↗
+            </Button>
+          </div>
+        </div>
       </ModalContent>
     </ModalRoot>
   );
