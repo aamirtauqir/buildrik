@@ -38,7 +38,7 @@
 import * as React from "react";
 import { BRAND_READ_ONLY_COPY, BRAND_READ_ONLY_FAILED_COPY } from "@/shared/constants/brandReadOnly";
 import { ChevronLeft } from "lucide-react";
-import { Button, Tooltip, useToast } from "@/editor/chrome-ui";
+import { Button, Popover, Tooltip, useToast } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine/Composer";
 import { EVENTS } from "@/shared/constants/events";
 import { resolveTokenLiteral, setTokenLiteral } from "@buildrik/shared/tokens";
@@ -274,6 +274,23 @@ function EditLock({ locked, children }: { locked: boolean; children: React.React
   );
 }
 
+/** Below the boards' 1440 frame (B6-B51 is drawn at 1280 × 640) the three
+ *  columns do not fit: nav 256 + preview 468 leave the pane too little. */
+const COMPACT_QUERY = "(max-width: 1439px)";
+function useCompactWidth(): boolean {
+  const query = () => (typeof window !== "undefined" && typeof window.matchMedia === "function" ? window.matchMedia(COMPACT_QUERY) : null);
+  const [compact, setCompact] = React.useState(() => query()?.matches ?? false);
+  React.useEffect(() => {
+    const mq = query();
+    if (!mq) return;
+    const sync = () => setCompact(mq.matches);
+    sync();
+    mq.addEventListener?.("change", sync);
+    return () => mq.removeEventListener?.("change", sync);
+  }, []);
+  return compact;
+}
+
 // ─── BrandWorkspace ───────────────────────────────────────────────────────────
 
 export interface BrandWorkspaceProps {
@@ -365,6 +382,10 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
   /* B6-B43: offline, edits still apply (autosave retries); restore points
      and reading a website need the server. */
   const online     = useOnline();
+  /* B6-B51…B53: under 1440 wide the nav and the preview fold away. */
+  const compact = useCompactWidth();
+  const [compactNavOpen, setCompactNavOpen] = React.useState(false);
+  const [compactPreview, setCompactPreview] = React.useState(false);
   /* "No brand set" (4418:49685): the site has never saved a token. */
   const isFirstLoad = !composer?.getProjectSettings()?.designTokens?.length;
 
@@ -487,6 +508,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
   /* A page change drops the selection — unless the move is FOR a token
      (Brand checks' Open), which lands on its page with its card open. */
   const openPage = (id: BrandPageId, tokenId: string | null = null) => {
+    setCompactNavOpen(false);
     setPage(id);
     setSelectedTokenId(tokenId);
     setUsageTokenId(null);
@@ -949,20 +971,8 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
      Site settings" when Site settings opened Brand). */
   const backLabel = settingsReturn ? "Back to Site settings" : editorPageName ? `Back to Editor · ${editorPageName}` : "Back to Editor";
 
-  return (
-    <div
-      data-ds-preview={shownMode}
-      data-testid="brand-panel"
-      className="tw:flex tw:h-full tw:min-h-0 tw:w-full tw:bg-[var(--bk-bg-panel)] tw:[font-family:var(--bk-font-ui)]"
-    >
-      {/* ── Nav: "Brand", then the three groups (B6-B01) ─────────────────── */}
-      <aside className="tw:flex tw:w-64 tw:shrink-0 tw:flex-col tw:overflow-y-auto tw:border-r tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)]">
-        <div className="tw:flex tw:flex-col tw:px-4 tw:pt-5" data-testid="brand-nav-head">
-          <h1 className="tw:m-0 tw:text-[length:var(--bk-text-20)] tw:font-semibold tw:leading-[30px] tw:text-[var(--bk-ink)]">
-            Brand
-          </h1>
-        </div>
-        <nav className="tw:flex tw:flex-col tw:gap-4 tw:px-2 tw:pb-4 tw:pt-4" aria-label="Brand pages">
+  const navList = (
+    <nav className="tw:flex tw:flex-col tw:gap-4 tw:px-2 tw:pb-4 tw:pt-4" aria-label="Brand pages">
           {NAV_GROUPS.map((g) => (
             <div key={g.label} className="tw:flex tw:flex-col tw:gap-0.5" role="group" aria-labelledby={`brand-nav-group-${g.label}`} data-testid="brand-nav-group">
               <p
@@ -975,7 +985,25 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
             </div>
           ))}
         </nav>
+  );
+
+  return (
+    <div
+      data-ds-preview={shownMode}
+      data-testid="brand-panel"
+      className="tw:flex tw:h-full tw:min-h-0 tw:w-full tw:bg-[var(--bk-bg-panel)] tw:[font-family:var(--bk-font-ui)]"
+    >
+      {/* ── Nav: "Brand", then the three groups (B6-B01) ─────────────────── */}
+      {!compact && (
+      <aside className="tw:flex tw:w-64 tw:shrink-0 tw:flex-col tw:overflow-y-auto tw:border-r tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)]">
+        <div className="tw:flex tw:flex-col tw:px-4 tw:pt-5" data-testid="brand-nav-head">
+          <h1 className="tw:m-0 tw:text-[length:var(--bk-text-20)] tw:font-semibold tw:leading-[30px] tw:text-[var(--bk-ink)]">
+            Brand
+          </h1>
+        </div>
+        {navList}
       </aside>
+      )}
 
       {/* ── Main: the door, the header (title · Review changes · Restore
            points, the strap under it), then pane + preview column. ──────── */}
@@ -1001,6 +1029,33 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
               >
                 {title}
               </h2>
+              {compact && (
+                /* B6-B51/B52: below 1440 the nav folds behind this button. */
+                <Popover
+                  open={compactNavOpen}
+                  onClose={() => setCompactNavOpen(false)}
+                  placement="bottom"
+                  label="Brand navigation"
+                  trigger={
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="xs"
+                      className={PAGE_ACTION}
+                      aria-expanded={compactNavOpen}
+                      onClick={() => setCompactNavOpen((v) => !v)}
+                      data-testid="brand-compact-nav"
+                    >
+                      Brand navigation
+                    </Button>
+                  }
+                >
+                  <div className="tw:w-64">
+                    <p className="tw:m-0 tw:px-4 tw:pt-3 tw:text-[length:var(--bk-text-14)] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]">Brand</p>
+                    {navList}
+                  </div>
+                </Popover>
+              )}
               {/* "Review changes" (spec §4): non-blocking, this session's
                   edits with Revert. No Undo / Redo here: the topbar's is the
                   one undo (GAP-ST boards draw a pair — not adopted). */}
@@ -1036,6 +1091,20 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
                   </>
                 }
               />
+              {compact && (
+                /* B6-B53: the preview takes the list's place, not a column. */
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="xs"
+                  className={`${PAGE_ACTION} tw:border-transparent tw:bg-transparent`}
+                  aria-pressed={compactPreview}
+                  onClick={() => setCompactPreview((v) => !v)}
+                  data-testid="brand-compact-preview"
+                >
+                  {compactPreview ? "Hide website preview" : "Show website preview"}
+                </Button>
+              )}
             </div>
             <p className="tw:m-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]" data-testid="brand-page-strap">
               {STRAP}
@@ -1044,7 +1113,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
         )}
       <div className={`tw:flex tw:min-h-0 tw:flex-1 tw:gap-8 ${isPanelPage ? "" : "tw:mt-5"}`}>
         {/* ── Pane ──────────────────────────────────────────────────────── */}
-        <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col" data-testid="brand-pane">
+        <div className={`tw:min-w-0 tw:flex-1 tw:flex-col ${compact && compactPreview && !isPanelPage ? "tw:hidden" : "tw:flex"}`} data-testid="brand-pane">
           {/* BRP1-M1 (8222:229015 / 229636 / 230245): a flat warning-tint
               strip, 12 in, 12/18 ink — no border, no radius — 20 over the body. */}
           {!online && !readOnly && (
@@ -1129,9 +1198,9 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
         </div>
 
         {/* ── Preview column ────────────────────────────────────────────── */}
-        {!isPanelPage && (
+        {!isPanelPage && (!compact || compactPreview) && (
         <aside
-          className="tw:flex tw:w-[468px] tw:shrink-0 tw:flex-col tw:gap-4 tw:overflow-y-auto tw:pb-4"
+          className={`tw:flex tw:flex-col tw:gap-4 tw:overflow-y-auto tw:pb-4 ${compact ? "tw:min-w-0 tw:flex-1" : "tw:w-[468px] tw:shrink-0"}`}
           data-testid="brand-preview-column"
         >
           {composer?.exportHTML ? (

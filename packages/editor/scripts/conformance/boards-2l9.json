@@ -9700,7 +9700,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No compact layout: fixed 256 nav + 468 preview; no \"Brand navigation\"/\"Show website preview\" toggles"
+   "verifiedNote": "L-D S10: under 1440 wide (matchMedia max-width 1439px) the nav folds behind \"Brand navigation\" and the preview behind \"Show website preview\". Built, not compared."
   },
   {
    "nodeId": "212:40324",
@@ -9710,7 +9710,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No compact layout: fixed 256 nav + 468 preview; no \"Brand navigation\"/\"Show website preview\" toggles"
+   "verifiedNote": "L-D S10: \"Brand navigation\" opens a popover with \"Brand\" + the three nav groups; choosing a row closes it. Built, not compared."
   },
   {
    "nodeId": "212:40564",
@@ -9720,7 +9720,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No compact layout: fixed 256 nav + 468 preview; no \"Brand navigation\"/\"Show website preview\" toggles"
+   "verifiedNote": "L-D S10: \"Show website preview\" swaps the list for the preview; label becomes \"Hide website preview\". Built, not compared."
   },
   {
    "nodeId": "213:39075",

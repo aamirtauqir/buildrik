@@ -223,3 +223,43 @@ describe("BrandWorkspace › offline (B6-B43)", () => {
     spy.mockRestore();
   });
 });
+
+describe("BrandWorkspace › compact under 1440 (B6-B51…B53)", () => {
+  function compactMedia() {
+    Object.defineProperty(window, "matchMedia", {
+      writable: true,
+      value: vi.fn().mockImplementation((q: string) => ({
+        matches: q === "(max-width: 1439px)", media: q,
+        addEventListener: vi.fn(), removeEventListener: vi.fn(),
+        addListener: vi.fn(), removeListener: vi.fn(), dispatchEvent: vi.fn(),
+      })),
+    });
+  }
+
+  it("folds the nav behind 'Brand navigation' and the preview behind 'Show website preview'", () => {
+    compactMedia();
+    const utils = renderWorkspace(makeFakeComposer());
+    expect(utils.queryAllByTestId("brand-nav-group")).toHaveLength(0);
+    expect(utils.queryByTestId("brand-preview-column")).toBeNull();
+
+    fireEvent.click(utils.getByTestId("brand-compact-nav"));
+    expect(utils.getAllByTestId("brand-nav-group")).toHaveLength(3);
+    fireEvent.click(utils.getByTestId("brand-row-starters"));
+    expect(utils.getByTestId("brand-page-title").textContent).toBe("Starters");
+    expect(utils.queryAllByTestId("brand-nav-group")).toHaveLength(0);
+
+    const toggle = utils.getByTestId("brand-compact-preview");
+    expect(toggle.textContent).toBe("Show website preview");
+    fireEvent.click(toggle);
+    expect(utils.getByTestId("brand-preview-column")).toBeTruthy();
+    expect(utils.getByTestId("brand-pane").className).toContain("tw:hidden");
+    expect(toggle.textContent).toBe("Hide website preview");
+  });
+
+  it("at 1440 nothing folds", () => {
+    const utils = renderWorkspace(makeFakeComposer());
+    expect(utils.queryByTestId("brand-compact-nav")).toBeNull();
+    expect(utils.getAllByTestId("brand-nav-group")).toHaveLength(3);
+    expect(utils.getByTestId("brand-preview-column")).toBeTruthy();
+  });
+});
