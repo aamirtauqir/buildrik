@@ -71,29 +71,36 @@ vi.mock("../hooks/useSettingsScreen", () => ({
   ),
 }));
 
-/* E3's three components, by the brief's prop contracts. */
+/* The guard, reduced to its prop contract: phase, the screen and where the move was going. */
 vi.mock("../components/UnsavedSettingsDialog", () => ({
   UnsavedSettingsDialog: ({
     open,
+    phase,
+    screenName,
+    destination,
     onKeepEditing,
     onDiscard,
-    onSaveAndContinue,
+    onSaveAndLeave,
   }: {
     open: boolean;
+    phase: string;
+    screenName: string;
+    destination: { kind: "leave" } | { kind: "screen"; name: string };
     onKeepEditing: () => void;
     onDiscard: () => void;
-    onSaveAndContinue: () => void;
+    onSaveAndLeave: () => void;
   }) =>
     open ? (
-      <div role="dialog" data-testid="set-unsaved">
+      <div role="dialog" data-testid="set-unsaved" data-phase={phase}>
+        <span data-testid="set-unsaved-names">{`${screenName} → ${destination.kind === "leave" ? "(leave)" : destination.name}`}</span>
         <button type="button" data-testid="set-unsaved-keep" onClick={onKeepEditing}>
           Keep editing
         </button>
         <button type="button" data-testid="set-unsaved-discard" onClick={onDiscard}>
           Discard changes
         </button>
-        <button type="button" data-testid="set-unsaved-save" onClick={onSaveAndContinue}>
-          Save and continue
+        <button type="button" data-testid="set-unsaved-save" onClick={onSaveAndLeave}>
+          Save and leave
         </button>
       </div>
     ) : null,
@@ -603,7 +610,70 @@ describe("SettingsTab — Unsaved settings", () => {
     expect(footStatus()).toBe("All changes saved");
   });
 
-  it("Save and continue (4418:165478) saves, then finishes the nav that raised the guard", async () => {
+  it("names the dirty screen and the destination (B8-GUARD), or the way out", async () => {
+    renderS(<SettingsTab composer={asComposer(makeComposer())} />);
+    await openGeneralAndEdit();
+    fireEvent.click(screen.getByTestId("set-nav-localization"));
+    expect(screen.getByTestId("set-unsaved-names").textContent).toBe("General → Languages");
+    expect(screen.getByTestId("set-unsaved").getAttribute("data-phase")).toBe("ask");
+    fireEvent.click(screen.getByTestId("set-unsaved-keep"));
+    fireEvent.click(screen.getByTestId("set-nav-billing"));
+    expect(screen.getByTestId("set-unsaved-names").textContent).toBe("General → Billing");
+    fireEvent.click(screen.getByTestId("set-unsaved-keep"));
+    fireEvent.click(screen.getByTestId("set-back"));
+    expect(screen.getByTestId("set-unsaved-names").textContent).toBe("General → (leave)");
+  });
+
+  it("Save and leave shows the save running (B8-SAVING); Stay in {Screen} keeps the user here when it lands", async () => {
+    let finish!: () => void;
+    const composer = makeComposer(() => new Promise<void>((r) => (finish = r)));
+    renderS(<SettingsTab composer={asComposer(composer)} />);
+    await openGeneralAndEdit();
+    fireEvent.click(screen.getByTestId("set-nav-seo"));
+    fireEvent.click(screen.getByTestId("set-unsaved-save"));
+    await waitFor(() => expect(screen.getByTestId("set-unsaved").getAttribute("data-phase")).toBe("saving"));
+    fireEvent.click(screen.getByTestId("set-unsaved-keep"));
+    expect(screen.queryByTestId("set-unsaved")).toBeNull();
+    await act(async () => finish());
+    await screen.findByText("Saved · applies on next publish");
+    expect(headTitle()).toBe("General");
+    expect(footStatus()).toBe("All changes saved");
+  });
+
+  it("a refused Save and leave turns the dialog to its failed phase (GAP-ST-E); Retry save and leave saves again and goes", async () => {
+    let attempt = 0;
+    const composer = makeComposer(() => (attempt++ === 0 ? Promise.reject(new Error("503")) : Promise.resolve()));
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    renderS(<SettingsTab composer={asComposer(composer)} />);
+    await openGeneralAndEdit();
+    fireEvent.click(screen.getByTestId("set-nav-seo"));
+    fireEvent.click(screen.getByTestId("set-unsaved-save"));
+    await waitFor(() => expect(screen.getByTestId("set-unsaved").getAttribute("data-phase")).toBe("failed"));
+    expect(screen.getByTestId("set-unsaved-names").textContent).toBe("General → SEO");
+    expect(headTitle()).toBe("General");
+    fireEvent.click(screen.getByTestId("set-unsaved-save"));
+    await waitFor(() => expect(headTitle()).toBe("SEO"));
+    expect(composer.saveProject).toHaveBeenCalledTimes(2);
+    expect(screen.queryByTestId("set-unsaved")).toBeNull();
+    errorSpy.mockRestore();
+  });
+
+  it("Keep editing after a refused Save and leave keeps the edits and the not-saved footer", async () => {
+    const composer = makeComposer(() => Promise.reject(new Error("503")));
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    renderS(<SettingsTab composer={asComposer(composer)} />);
+    await openGeneralAndEdit();
+    fireEvent.click(screen.getByTestId("set-back"));
+    fireEvent.click(screen.getByTestId("set-unsaved-save"));
+    await waitFor(() => expect(screen.getByTestId("set-unsaved").getAttribute("data-phase")).toBe("failed"));
+    fireEvent.click(screen.getByTestId("set-unsaved-keep"));
+    expect(screen.queryByTestId("set-unsaved")).toBeNull();
+    expect(footStatus()).toBe("Not saved");
+    expect(headTitle()).toBe("General");
+    errorSpy.mockRestore();
+  });
+
+  it("Save and leave saves, then finishes the nav that raised the guard", async () => {
     const composer = makeComposer();
     renderS(<SettingsTab composer={asComposer(composer)} />);
     await openGeneralAndEdit();
@@ -616,7 +686,7 @@ describe("SettingsTab — Unsaved settings", () => {
     expect(screen.queryByTestId("set-unsaved")).toBeNull();
   });
 
-  it("Save and continue on the way out saves, then leaves", async () => {
+  it("Save and leave on the way out saves, then leaves", async () => {
     const composer = makeComposer();
     const onClose = vi.fn();
     renderS(<SettingsTab composer={asComposer(composer)} onClose={onClose} />);
@@ -826,7 +896,7 @@ describe("SettingsTab — Save with a site id goes through the settings mutation
     errorSpy.mockRestore();
   });
 
-  it("a cancelled Save and continue closes the guard and stays on the screen, still unsaved", async () => {
+  it("a cancelled Save and leave closes the guard and stays on the screen, still unsaved", async () => {
     fakeSeo.save = () => Promise.reject(new SettingsSaveCancelled());
     renderS(<SettingsTab composer={asComposer(makeComposer())} projectId="site-1" />);
     await openSeoAndEdit();

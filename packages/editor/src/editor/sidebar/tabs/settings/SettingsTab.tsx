@@ -89,7 +89,7 @@ import {
   DangerZoneScreen,
   WorkspaceDoorScreen,
 } from "./index";
-import { UnsavedSettingsDialog } from "./components/UnsavedSettingsDialog";
+import { UnsavedSettingsDialog, type UnsavedGuardPhase } from "./components/UnsavedSettingsDialog";
 import { shellDirty } from "@/editor/shell/shellDirtyRegistry";
 import { searchSettings, type SearchEntry } from "./searchIndex";
 import type { ProjectSettings } from "@/shared/types/project";
@@ -126,6 +126,12 @@ const PLAN_LABEL: Record<PlanTier, string> = { starter: "Free", pro: "Pro", ente
 /** A flush's result as one shape: plain settings are a flush with no extra columns. */
 function asFlush(result: ProjectSettings | SettingsFlush): SettingsFlush {
   return "settings" in result ? result : { settings: result };
+}
+
+/** A nav id's name as the guard says it — "Languages", "Brand", "Billing". */
+function navTitle(id: SettingsNavId): string {
+  if (id === "overview") return "Overview";
+  return SETTINGS_NAV.find((n) => n.id === id)?.title.replace(/ ↗$/, "") ?? id;
 }
 
 function isScreenLocked(screenId: SettingsNavId, userPlan: PlanTier): boolean {
@@ -254,7 +260,7 @@ export const SettingsTab: React.FC<
   /* The ONE writer of the dirty flag: state (renders the footer), the ref
      (same-gesture click handlers) and this tab's shell-registry entry, all
      synchronously. The registry must not lag an effect behind: Discard /
-     Save and continue clear it and leave in the same handler, and the
+     Save and leave clear it and leave in the same handler, and the
      shell's tab-switch guard reads it as the leave lands (B-1). */
   const markScreenDirty = React.useCallback((dirty: boolean) => {
     setScreenIsDirty(dirty);
@@ -262,12 +268,22 @@ export const SettingsTab: React.FC<
     shellDirty.set("settings", dirty);
   }, []);
 
-  /* What the Unsaved settings dialog was raised for. Its Discard finishes
+  /* What the unsaved-changes guard was raised for. Its Discard finishes
      that intent — the door out, or the screen that was clicked — after the
      edits are rolled back. */
   type Pending = { kind: "leave" } | { kind: "nav"; id: SettingsNavId };
   const [guardOpen, setGuardOpen] = React.useState(false);
+  /* ask → saving (Save and leave) → failed (the save was refused) — 2L9 B8-GUARD / B8-SAVING / GAP-ST-E. */
+  const [guardPhase, setGuardPhase] = React.useState<UnsavedGuardPhase>("ask");
   const pendingRef = React.useRef<Pending | null>(null);
+  /* The dialog names where the guarded move was going; the ref alone would not re-render it. */
+  const [pending, setPending] = React.useState<Pending | null>(null);
+  const raiseGuard = React.useCallback((next: Pending) => {
+    pendingRef.current = next;
+    setPending(next);
+    setGuardPhase("ask");
+    setGuardOpen(true);
+  }, []);
   /* Search Mode (owner 2026-10-04): the sidebar's own state while it is up. */
   const [searchOpen, setSearchOpen] = React.useState(false);
   const [query, setQuery] = React.useState("");
@@ -391,23 +407,21 @@ export const SettingsTab: React.FC<
     (id: SettingsNavId) => {
       if (id === currentScreen) return;
       if (screenIsDirtyRef.current) {
-        pendingRef.current = { kind: "nav", id };
-        setGuardOpen(true);
+        raiseGuard({ kind: "nav", id });
         return;
       }
       performNav(id);
     },
-    [currentScreen, performNav],
+    [currentScreen, performNav, raiseGuard],
   );
 
   const requestLeave = React.useCallback(() => {
     if (screenIsDirtyRef.current) {
-      pendingRef.current = { kind: "leave" };
-      setGuardOpen(true);
+      raiseGuard({ kind: "leave" });
       return;
     }
     leave();
-  }, [leave]);
+  }, [leave, raiseGuard]);
 
   /* `openLeftPanelToTab("settings", <id>)`. An id matching no screen (an old
      link to the removed Integrations screen) is left alone rather than
@@ -496,6 +510,8 @@ export const SettingsTab: React.FC<
 
   // ─── The guard ────────────────────────────────────────────────────────
 
+  /* Keep editing, and — while the save runs — Stay in {Screen}: the
+     destination is dropped; a running save carries on and lands here. */
   const handleKeepEditing = React.useCallback(() => {
     pendingRef.current = null;
     setGuardOpen(false);
@@ -591,8 +607,19 @@ export const SettingsTab: React.FC<
   );
 
   /* `then` runs after a save succeeds: the Saved toast after the footer's
-     Save, the pending nav / exit after the guard's Save and continue. */
-  const handleSave = React.useCallback((then?: () => void) => {
+     Save, the pending nav / exit after the guard's Save and leave. */
+  const showSavedToast = React.useCallback(() => {
+    /* 4418:165469 / M19: a toast (bottom-left, dark), the change's scope and
+       the way to ship it. Publish opens the Publish panel — it does not
+       publish. */
+    addToast({
+      title: "Saved · applies on next publish",
+      description: "Your site settings are saved.",
+      action: { label: "Publish", onClick: () => composer?.emit(EVENTS.UI_PANEL_OPEN, { panel: "publish" }) },
+    });
+  }, [addToast, composer]);
+
+  const handleSave = React.useCallback((then?: () => void, onFailed?: () => void) => {
     if (saving) return;
     const failed = (err: unknown) => {
       /* Called off by the user (General's slug confirm → Cancel): nothing was
@@ -607,21 +634,14 @@ export const SettingsTab: React.FC<
       setServerFieldErrors(err instanceof SettingsSaveError && Object.keys(err.fieldErrors).length > 0 ? err.fieldErrors : undefined);
       setSaveError(SAVE_ERROR_MESSAGES[currentScreen] ??
         `Changes to ${current?.title ?? "settings"} were not saved. Your changes are still here. Review the values, then retry.`);
+      onFailed?.();
     };
     const succeeded = () => {
       setSaveError(null);
       setServerFieldErrors(undefined);
       markScreenDirty(false);
       if (then) then();
-      /* 4418:165469 / M19: a toast (bottom-left, dark), the change's scope and
-         the way to ship it. Publish opens the Publish panel — it does not
-         publish. */
-      else
-        addToast({
-          title: "Saved · applies on next publish",
-          description: "Your site settings are saved.",
-          action: { label: "Publish", onClick: () => composer?.emit(EVENTS.UI_PANEL_OPEN, { panel: "publish" }) },
-        });
+      else showSavedToast();
     };
     const screenHandler = screenSaveHandlerRef.current;
     let run: Promise<void> | void;
@@ -651,20 +671,30 @@ export const SettingsTab: React.FC<
     }
     setSaving(true);
     run.then(succeeded, failed).finally(() => setSaving(false));
-  }, [composer, current, currentScreen, saving, addToast, siteName, markScreenDirty, persistSettings]);
+  }, [current, currentScreen, saving, showSavedToast, markScreenDirty, persistSettings]);
 
-  /* The guard's Save and continue (4418:165478): save, then finish whatever
-     raised the guard. A failed save leaves the dialog down and the screen's
-     save-error banner up, with the edits still there. */
-  const handleSaveAndContinue = React.useCallback(() => {
-    const pending = pendingRef.current;
-    handleSave(() => {
-      pendingRef.current = null;
-      setGuardOpen(false);
-      if (!pending || pending.kind === "leave") leave();
-      else performNav(pending.id);
-    });
-  }, [handleSave, leave, performNav]);
+  /* The guard's Save and leave (B8-GUARD) and Retry save and leave
+     (GAP-ST-E): the dialog shows the save running, then finishes whatever
+     raised the guard — read at the END, so a Stay in {Screen} pressed while
+     the save ran keeps the user here (with the Saved toast). A refused save
+     turns the dialog to its failed phase, the destination kept, and the
+     screen's banner goes up behind it. */
+  const handleSaveAndLeave = React.useCallback(() => {
+    setGuardPhase("saving");
+    handleSave(
+      () => {
+        const target = pendingRef.current;
+        pendingRef.current = null;
+        setGuardOpen(false);
+        if (!target) showSavedToast();
+        else if (target.kind === "leave") leave();
+        else performNav(target.id);
+      },
+      () => {
+        if (pendingRef.current) setGuardPhase("failed");
+      },
+    );
+  }, [handleSave, leave, performNav, showSavedToast]);
 
   const openBilling = React.useCallback(() => {
     window.open(`${DASHBOARD_URL}${WORKSPACE_LINKS.billing}`, "_blank", "noopener,noreferrer");
@@ -1164,11 +1194,16 @@ export const SettingsTab: React.FC<
 
       <UnsavedSettingsDialog
         open={guardOpen}
-        siteName={siteName}
+        phase={guardPhase}
+        screenName={current?.title.replace(/ ↗$/, "") ?? "Overview"}
+        destination={
+          !pending || pending.kind === "leave"
+            ? { kind: "leave" }
+            : { kind: "screen", name: navTitle(pending.id) }
+        }
         onKeepEditing={handleKeepEditing}
         onDiscard={handleDiscard}
-        onSaveAndContinue={handleSaveAndContinue}
-        saving={saving}
+        onSaveAndLeave={handleSaveAndLeave}
       />
     </div>
   );

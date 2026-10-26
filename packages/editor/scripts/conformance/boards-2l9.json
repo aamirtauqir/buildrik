@@ -13236,8 +13236,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — \"Unsaved settings\"/\"Save and continue\" vs \"Leave without saving?\"/\"Save and…"
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared 2026-10-26: temporary probe case at 1440x900 (port 5175) vs board screenshot 238:11495: dialog 480x176, 16/600 title \"Leave without saving?\", body names screen + way out, Discard changes · Save and leave · Keep editing (primary, focused). Board names the changed field (\"the tagline\"); screens report dirty per screen, so the body names the screen. Shell/nav drift on the same board (Settings inside the editor shell, nav copy) is tracked separately (lane-E E4 + REQUESTS)."
   },
   {
    "nodeId": "238:11810",
@@ -13676,8 +13676,9 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — save-and-continue to pending nav exists; dialog copy differs"
+   "verified": "drift-fixed",
+   "verifiedNote": "Same dialog, different screen/destination (names come from the nav). Screen-specific extra lines (e.g. HSTS \"Only the HSTS draft is discarded\") are not drawn. Shell/nav drift on the same board (Settings inside the editor shell, nav copy) is tracked separately (lane-E E4 + REQUESTS).",
+   "inheritsFrom": "248:20642"
   },
   {
    "nodeId": "245:51515",
@@ -13917,8 +13918,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; board names the destination"
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared 2026-10-26: temporary probe case at 1440x900 (port 5175) vs board screenshot 248:20642 (ask phase, General → Languages): same box, copy \"Your {Screen} changes are unsaved. Continue to {Destination} after saving or discarding them.\" Shell/nav drift on the same board (Settings inside the editor shell, nav copy) is tracked separately (lane-E E4 + REQUESTS)."
   },
   {
    "nodeId": "248:20853",
@@ -13927,8 +13928,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — button \"Saving…\" only; board \"Saving General settings… · Stay in General\""
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared 2026-10-26: temporary probe case at 1440x900 (port 5175) vs board screenshot 248:20853: \"Saving {Screen} settings…\", destination line, one outline \"Stay in {Screen}\" (focused). Stay drops the destination; the running save lands on the screen (code: a save cannot be called off). Shell/nav drift on the same board (Settings inside the editor shell, nav copy) is tracked separately (lane-E E4 + REQUESTS)."
   },
   {
    "nodeId": "248:21107",
@@ -13937,8 +13938,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; board names the destination",
+   "verified": "drift-fixed",
+   "verifiedNote": "Same dialog, different screen/destination (names come from the nav). Screen-specific extra lines (e.g. HSTS \"Only the HSTS draft is discarded\") are not drawn. Shell/nav drift on the same board (Settings inside the editor shell, nav copy) is tracked separately (lane-E E4 + REQUESTS).",
    "inheritsFrom": "248:20642"
   },
   {
@@ -13949,7 +13950,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — button \"Saving…\" only; board \"Saving General settings… · Stay in General\""
+   "verifiedNote": "Built, not compared directly (loading state, no inheritance); same component and copy as 248:20853, which was compared."
   },
   {
    "nodeId": "248:21572",
@@ -13958,8 +13959,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; board names the destination",
+   "verified": "drift-fixed",
+   "verifiedNote": "Same dialog, different screen/destination (names come from the nav). Screen-specific extra lines (e.g. HSTS \"Only the HSTS draft is discarded\") are not drawn. Shell/nav drift on the same board (Settings inside the editor shell, nav copy) is tracked separately (lane-E E4 + REQUESTS).",
    "inheritsFrom": "248:20642"
   },
   {
@@ -13970,7 +13971,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — button \"Saving…\" only; board \"Saving General settings… · Stay in General\""
+   "verifiedNote": "Built, not compared directly (loading state, no inheritance); same component and copy as 248:20853, which was compared."
   },
   {
    "nodeId": "248:22037",
@@ -13979,8 +13980,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; board names the destination",
+   "verified": "drift-fixed",
+   "verifiedNote": "Same dialog, different screen/destination (names come from the nav). Screen-specific extra lines (e.g. HSTS \"Only the HSTS draft is discarded\") are not drawn. Shell/nav drift on the same board (Settings inside the editor shell, nav copy) is tracked separately (lane-E E4 + REQUESTS).",
    "inheritsFrom": "248:20642"
   },
   {
@@ -13991,7 +13992,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — button \"Saving…\" only; board \"Saving General settings… · Stay in General\""
+   "verifiedNote": "Built, not compared directly (loading state, no inheritance); same component and copy as 248:20853, which was compared."
   },
   {
    "nodeId": "248:22502",
@@ -14000,8 +14001,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; board names the destination",
+   "verified": "drift-fixed",
+   "verifiedNote": "Same dialog, different screen/destination (names come from the nav). Screen-specific extra lines (e.g. HSTS \"Only the HSTS draft is discarded\") are not drawn. Shell/nav drift on the same board (Settings inside the editor shell, nav copy) is tracked separately (lane-E E4 + REQUESTS).",
    "inheritsFrom": "248:20642"
   },
   {
@@ -14012,7 +14013,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — button \"Saving…\" only; board \"Saving General settings… · Stay in General\""
+   "verifiedNote": "Built, not compared directly (loading state, no inheritance); same component and copy as 248:20853, which was compared."
   },
   {
    "nodeId": "248:22967",
@@ -14021,8 +14022,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; board names the destination",
+   "verified": "drift-fixed",
+   "verifiedNote": "Same dialog, different screen/destination (names come from the nav). Screen-specific extra lines (e.g. HSTS \"Only the HSTS draft is discarded\") are not drawn. Shell/nav drift on the same board (Settings inside the editor shell, nav copy) is tracked separately (lane-E E4 + REQUESTS).",
    "inheritsFrom": "248:20642"
   },
   {
@@ -14033,7 +14034,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — button \"Saving…\" only; board \"Saving General settings… · Stay in General\""
+   "verifiedNote": "Built, not compared directly (loading state, no inheritance); same component and copy as 248:20853, which was compared."
   },
   {
    "nodeId": "248:23432",
@@ -14042,8 +14043,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; board names the destination",
+   "verified": "drift-fixed",
+   "verifiedNote": "Same dialog, different screen/destination (names come from the nav). Screen-specific extra lines (e.g. HSTS \"Only the HSTS draft is discarded\") are not drawn. Shell/nav drift on the same board (Settings inside the editor shell, nav copy) is tracked separately (lane-E E4 + REQUESTS).",
    "inheritsFrom": "248:20642"
   },
   {
@@ -14054,7 +14055,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — button \"Saving…\" only; board \"Saving General settings… · Stay in General\""
+   "verifiedNote": "Built, not compared directly (loading state, no inheritance); same component and copy as 248:20853, which was compared."
   },
   {
    "nodeId": "248:23901",
@@ -14063,8 +14064,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; board names the destination",
+   "verified": "drift-fixed",
+   "verifiedNote": "Same dialog, different screen/destination (names come from the nav). Screen-specific extra lines (e.g. HSTS \"Only the HSTS draft is discarded\") are not drawn. Shell/nav drift on the same board (Settings inside the editor shell, nav copy) is tracked separately (lane-E E4 + REQUESTS).",
    "inheritsFrom": "248:20642"
   },
   {
@@ -14075,7 +14076,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — button \"Saving…\" only; board \"Saving General settings… · Stay in General\""
+   "verifiedNote": "Built, not compared directly (loading state, no inheritance); same component and copy as 248:20853, which was compared."
   },
   {
    "nodeId": "248:24370",
@@ -14084,8 +14085,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; board names the destination",
+   "verified": "drift-fixed",
+   "verifiedNote": "Same dialog, different screen/destination (names come from the nav). Screen-specific extra lines (e.g. HSTS \"Only the HSTS draft is discarded\") are not drawn. Shell/nav drift on the same board (Settings inside the editor shell, nav copy) is tracked separately (lane-E E4 + REQUESTS).",
    "inheritsFrom": "248:20642"
   },
   {
@@ -14096,7 +14097,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — button \"Saving…\" only; board \"Saving General settings… · Stay in General\""
+   "verifiedNote": "Built, not compared directly (loading state, no inheritance); same component and copy as 248:20853, which was compared."
   },
   {
    "nodeId": "248:24839",
@@ -14105,8 +14106,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; board names the destination",
+   "verified": "drift-fixed",
+   "verifiedNote": "Same dialog, different screen/destination (names come from the nav). Screen-specific extra lines (e.g. HSTS \"Only the HSTS draft is discarded\") are not drawn. Shell/nav drift on the same board (Settings inside the editor shell, nav copy) is tracked separately (lane-E E4 + REQUESTS).",
    "inheritsFrom": "248:20642"
   },
   {
@@ -14117,7 +14118,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — button \"Saving…\" only; board \"Saving General settings… · Stay in General\""
+   "verifiedNote": "Built, not compared directly (loading state, no inheritance); same component and copy as 248:20853, which was compared."
   },
   {
    "nodeId": "252:47222",
@@ -15129,8 +15130,9 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs"
+   "verified": "drift-fixed",
+   "verifiedNote": "Same dialog, different screen/destination (names come from the nav). Screen-specific extra lines (e.g. HSTS \"Only the HSTS draft is discarded\") are not drawn. Shell/nav drift on the same board (Settings inside the editor shell, nav copy) is tracked separately (lane-E E4 + REQUESTS).",
+   "inheritsFrom": "248:20642"
   },
   {
    "nodeId": "277:27988",
@@ -15140,7 +15142,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button"
+   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm."
   },
   {
    "nodeId": "277:28233",
@@ -15149,8 +15151,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog"
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared 2026-10-26: temporary probe case at 1440x900 (port 5175) vs board screenshot 277:28233: \"Couldn't save {Screen}\", \"Your changes are still here. You have not left this screen.\", \"Requested destination: {Destination}. Retry uses this same destination.\", Keep editing (primary) · Retry save and leave. Board's HSTS-specific sentence is sample data. Footer \"Couldn't save — Retry\" copy not yet adopted (E4). Shell/nav drift on the same board (Settings inside the editor shell, nav copy) is tracked separately (lane-E E4 + REQUESTS)."
   },
   {
    "nodeId": "277:28527",
@@ -15159,9 +15161,9 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs",
-   "inheritsFrom": "277:27746"
+   "verified": "drift-fixed",
+   "verifiedNote": "Same dialog, different screen/destination (names come from the nav). Screen-specific extra lines (e.g. HSTS \"Only the HSTS draft is discarded\") are not drawn. Shell/nav drift on the same board (Settings inside the editor shell, nav copy) is tracked separately (lane-E E4 + REQUESTS).",
+   "inheritsFrom": "248:20642"
   },
   {
    "nodeId": "277:28769",
@@ -15171,7 +15173,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button"
+   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm."
   },
   {
    "nodeId": "277:29014",
@@ -15181,7 +15183,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog"
+   "verifiedNote": "Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared."
   },
   {
    "nodeId": "277:29308",
@@ -15190,9 +15192,9 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs",
-   "inheritsFrom": "277:27746"
+   "verified": "drift-fixed",
+   "verifiedNote": "Same dialog, different screen/destination (names come from the nav). Screen-specific extra lines (e.g. HSTS \"Only the HSTS draft is discarded\") are not drawn. Shell/nav drift on the same board (Settings inside the editor shell, nav copy) is tracked separately (lane-E E4 + REQUESTS).",
+   "inheritsFrom": "248:20642"
   },
   {
    "nodeId": "277:29551",
@@ -15202,7 +15204,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button"
+   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm."
   },
   {
    "nodeId": "277:29797",
@@ -15212,7 +15214,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog"
+   "verifiedNote": "Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared."
   },
   {
    "nodeId": "277:30094",
@@ -15221,9 +15223,9 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs",
-   "inheritsFrom": "277:27746"
+   "verified": "drift-fixed",
+   "verifiedNote": "Same dialog, different screen/destination (names come from the nav). Screen-specific extra lines (e.g. HSTS \"Only the HSTS draft is discarded\") are not drawn. Shell/nav drift on the same board (Settings inside the editor shell, nav copy) is tracked separately (lane-E E4 + REQUESTS).",
+   "inheritsFrom": "248:20642"
   },
   {
    "nodeId": "277:30337",
@@ -15233,7 +15235,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button"
+   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm."
   },
   {
    "nodeId": "277:30583",
@@ -15243,7 +15245,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog"
+   "verifiedNote": "Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared."
   },
   {
    "nodeId": "277:30880",
@@ -15252,9 +15254,9 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs",
-   "inheritsFrom": "277:27746"
+   "verified": "drift-fixed",
+   "verifiedNote": "Same dialog, different screen/destination (names come from the nav). Screen-specific extra lines (e.g. HSTS \"Only the HSTS draft is discarded\") are not drawn. Shell/nav drift on the same board (Settings inside the editor shell, nav copy) is tracked separately (lane-E E4 + REQUESTS).",
+   "inheritsFrom": "248:20642"
   },
   {
    "nodeId": "277:31124",
@@ -15264,7 +15266,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button"
+   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm."
   },
   {
    "nodeId": "277:31371",
@@ -15274,7 +15276,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog"
+   "verifiedNote": "Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared."
   },
   {
    "nodeId": "277:31671",
@@ -15283,9 +15285,9 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs",
-   "inheritsFrom": "277:27746"
+   "verified": "drift-fixed",
+   "verifiedNote": "Same dialog, different screen/destination (names come from the nav). Screen-specific extra lines (e.g. HSTS \"Only the HSTS draft is discarded\") are not drawn. Shell/nav drift on the same board (Settings inside the editor shell, nav copy) is tracked separately (lane-E E4 + REQUESTS).",
+   "inheritsFrom": "248:20642"
   },
   {
    "nodeId": "277:31915",
@@ -15295,7 +15297,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button"
+   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm."
   },
   {
    "nodeId": "277:32162",
@@ -15305,7 +15307,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog"
+   "verifiedNote": "Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared."
   },
   {
    "nodeId": "277:32462",
@@ -15314,9 +15316,9 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs",
-   "inheritsFrom": "277:27746"
+   "verified": "drift-fixed",
+   "verifiedNote": "Same dialog, different screen/destination (names come from the nav). Screen-specific extra lines (e.g. HSTS \"Only the HSTS draft is discarded\") are not drawn. Shell/nav drift on the same board (Settings inside the editor shell, nav copy) is tracked separately (lane-E E4 + REQUESTS).",
+   "inheritsFrom": "248:20642"
   },
   {
    "nodeId": "277:32706",
@@ -15326,7 +15328,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button"
+   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm."
   },
   {
    "nodeId": "277:32953",
@@ -15336,7 +15338,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog"
+   "verifiedNote": "Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared."
   },
   {
    "nodeId": "277:33253",
@@ -15345,9 +15347,9 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs",
-   "inheritsFrom": "277:27746"
+   "verified": "drift-fixed",
+   "verifiedNote": "Same dialog, different screen/destination (names come from the nav). Screen-specific extra lines (e.g. HSTS \"Only the HSTS draft is discarded\") are not drawn. Shell/nav drift on the same board (Settings inside the editor shell, nav copy) is tracked separately (lane-E E4 + REQUESTS).",
+   "inheritsFrom": "248:20642"
   },
   {
    "nodeId": "277:33497",
@@ -15357,7 +15359,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button"
+   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm."
   },
   {
    "nodeId": "277:33744",
@@ -15367,7 +15369,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog"
+   "verifiedNote": "Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared."
   },
   {
    "nodeId": "277:34044",
@@ -15376,9 +15378,9 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs",
-   "inheritsFrom": "277:27746"
+   "verified": "drift-fixed",
+   "verifiedNote": "Same dialog, different screen/destination (names come from the nav). Screen-specific extra lines (e.g. HSTS \"Only the HSTS draft is discarded\") are not drawn. Shell/nav drift on the same board (Settings inside the editor shell, nav copy) is tracked separately (lane-E E4 + REQUESTS).",
+   "inheritsFrom": "248:20642"
   },
   {
    "nodeId": "277:34288",
@@ -15388,7 +15390,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button"
+   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm."
   },
   {
    "nodeId": "277:34535",
@@ -15398,7 +15400,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog"
+   "verifiedNote": "Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared."
   },
   {
    "nodeId": "277:34835",
@@ -15407,9 +15409,9 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs",
-   "inheritsFrom": "277:27746"
+   "verified": "drift-fixed",
+   "verifiedNote": "Same dialog, different screen/destination (names come from the nav). Screen-specific extra lines (e.g. HSTS \"Only the HSTS draft is discarded\") are not drawn. Shell/nav drift on the same board (Settings inside the editor shell, nav copy) is tracked separately (lane-E E4 + REQUESTS).",
+   "inheritsFrom": "248:20642"
   },
   {
    "nodeId": "277:35080",
@@ -15419,7 +15421,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button"
+   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm."
   },
   {
    "nodeId": "277:35328",
@@ -15429,7 +15431,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog"
+   "verifiedNote": "Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared."
   },
   {
    "nodeId": "277:35631",
@@ -15438,9 +15440,9 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs",
-   "inheritsFrom": "277:27746"
+   "verified": "drift-fixed",
+   "verifiedNote": "Same dialog, different screen/destination (names come from the nav). Screen-specific extra lines (e.g. HSTS \"Only the HSTS draft is discarded\") are not drawn. Shell/nav drift on the same board (Settings inside the editor shell, nav copy) is tracked separately (lane-E E4 + REQUESTS).",
+   "inheritsFrom": "248:20642"
   },
   {
    "nodeId": "277:35876",
@@ -15450,7 +15452,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button"
+   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm."
   },
   {
    "nodeId": "277:36124",
@@ -15460,7 +15462,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog"
+   "verifiedNote": "Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared."
   },
   {
    "nodeId": "277:36427",
@@ -15469,9 +15471,9 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs",
-   "inheritsFrom": "277:27746"
+   "verified": "drift-fixed",
+   "verifiedNote": "Same dialog, different screen/destination (names come from the nav). Screen-specific extra lines (e.g. HSTS \"Only the HSTS draft is discarded\") are not drawn. Shell/nav drift on the same board (Settings inside the editor shell, nav copy) is tracked separately (lane-E E4 + REQUESTS).",
+   "inheritsFrom": "248:20642"
   },
   {
    "nodeId": "277:36672",
@@ -15481,7 +15483,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button"
+   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm."
   },
   {
    "nodeId": "277:36920",
@@ -15491,7 +15493,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog"
+   "verifiedNote": "Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared."
   },
   {
    "nodeId": "277:37223",
@@ -15500,9 +15502,9 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs",
-   "inheritsFrom": "277:27746"
+   "verified": "drift-fixed",
+   "verifiedNote": "Same dialog, different screen/destination (names come from the nav). Screen-specific extra lines (e.g. HSTS \"Only the HSTS draft is discarded\") are not drawn. Shell/nav drift on the same board (Settings inside the editor shell, nav copy) is tracked separately (lane-E E4 + REQUESTS).",
+   "inheritsFrom": "248:20642"
   },
   {
    "nodeId": "277:37468",
@@ -15512,7 +15514,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button"
+   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm."
   },
   {
    "nodeId": "277:37716",
@@ -15522,7 +15524,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog"
+   "verifiedNote": "Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared."
   },
   {
    "nodeId": "277:38019",
@@ -18357,9 +18359,9 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs",
-   "inheritsFrom": "277:27746"
+   "verified": "drift-fixed",
+   "verifiedNote": "Same dialog, different screen/destination (names come from the nav). Screen-specific extra lines (e.g. HSTS \"Only the HSTS draft is discarded\") are not drawn. Shell/nav drift on the same board (Settings inside the editor shell, nav copy) is tracked separately (lane-E E4 + REQUESTS).",
+   "inheritsFrom": "248:20642"
   },
   {
    "nodeId": "278:68277",
@@ -18369,7 +18371,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button"
+   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm."
   },
   {
    "nodeId": "278:68492",
@@ -18379,7 +18381,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog"
+   "verifiedNote": "Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared."
   },
   {
    "nodeId": "278:68754",
@@ -18388,9 +18390,9 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs",
-   "inheritsFrom": "277:27746"
+   "verified": "drift-fixed",
+   "verifiedNote": "Same dialog, different screen/destination (names come from the nav). Screen-specific extra lines (e.g. HSTS \"Only the HSTS draft is discarded\") are not drawn. Shell/nav drift on the same board (Settings inside the editor shell, nav copy) is tracked separately (lane-E E4 + REQUESTS).",
+   "inheritsFrom": "248:20642"
   },
   {
    "nodeId": "278:68967",
@@ -18400,7 +18402,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button"
+   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm."
   },
   {
    "nodeId": "278:69183",
@@ -18410,7 +18412,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog"
+   "verifiedNote": "Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared."
   },
   {
    "nodeId": "278:69448",
@@ -18419,9 +18421,9 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs",
-   "inheritsFrom": "277:27746"
+   "verified": "drift-fixed",
+   "verifiedNote": "Same dialog, different screen/destination (names come from the nav). Screen-specific extra lines (e.g. HSTS \"Only the HSTS draft is discarded\") are not drawn. Shell/nav drift on the same board (Settings inside the editor shell, nav copy) is tracked separately (lane-E E4 + REQUESTS).",
+   "inheritsFrom": "248:20642"
   },
   {
    "nodeId": "278:69662",
@@ -18431,7 +18433,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button"
+   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm."
   },
   {
    "nodeId": "278:69879",
@@ -18441,7 +18443,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog"
+   "verifiedNote": "Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared."
   },
   {
    "nodeId": "278:70147",
@@ -18450,9 +18452,9 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs",
-   "inheritsFrom": "277:27746"
+   "verified": "drift-fixed",
+   "verifiedNote": "Same dialog, different screen/destination (names come from the nav). Screen-specific extra lines (e.g. HSTS \"Only the HSTS draft is discarded\") are not drawn. Shell/nav drift on the same board (Settings inside the editor shell, nav copy) is tracked separately (lane-E E4 + REQUESTS).",
+   "inheritsFrom": "248:20642"
   },
   {
    "nodeId": "278:70362",
@@ -18462,7 +18464,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button"
+   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm."
   },
   {
    "nodeId": "278:70580",
@@ -18472,7 +18474,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog"
+   "verifiedNote": "Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared."
   },
   {
    "nodeId": "278:70851",
@@ -18481,9 +18483,9 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs",
-   "inheritsFrom": "277:27746"
+   "verified": "drift-fixed",
+   "verifiedNote": "Same dialog, different screen/destination (names come from the nav). Screen-specific extra lines (e.g. HSTS \"Only the HSTS draft is discarded\") are not drawn. Shell/nav drift on the same board (Settings inside the editor shell, nav copy) is tracked separately (lane-E E4 + REQUESTS).",
+   "inheritsFrom": "248:20642"
   },
   {
    "nodeId": "278:71067",
@@ -18493,7 +18495,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button"
+   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm."
   },
   {
    "nodeId": "278:71286",
@@ -18503,7 +18505,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog"
+   "verifiedNote": "Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared."
   },
   {
    "nodeId": "278:71560",
@@ -18512,9 +18514,9 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs",
-   "inheritsFrom": "277:27746"
+   "verified": "drift-fixed",
+   "verifiedNote": "Same dialog, different screen/destination (names come from the nav). Screen-specific extra lines (e.g. HSTS \"Only the HSTS draft is discarded\") are not drawn. Shell/nav drift on the same board (Settings inside the editor shell, nav copy) is tracked separately (lane-E E4 + REQUESTS).",
+   "inheritsFrom": "248:20642"
   },
   {
    "nodeId": "278:71777",
@@ -18524,7 +18526,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button"
+   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm."
   },
   {
    "nodeId": "278:71997",
@@ -18534,7 +18536,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog"
+   "verifiedNote": "Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared."
   },
   {
    "nodeId": "278:72274",
@@ -18543,9 +18545,9 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs",
-   "inheritsFrom": "277:27746"
+   "verified": "drift-fixed",
+   "verifiedNote": "Same dialog, different screen/destination (names come from the nav). Screen-specific extra lines (e.g. HSTS \"Only the HSTS draft is discarded\") are not drawn. Shell/nav drift on the same board (Settings inside the editor shell, nav copy) is tracked separately (lane-E E4 + REQUESTS).",
+   "inheritsFrom": "248:20642"
   },
   {
    "nodeId": "278:72492",
@@ -18555,7 +18557,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button"
+   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm."
   },
   {
    "nodeId": "278:72713",
@@ -18565,7 +18567,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog"
+   "verifiedNote": "Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared."
   },
   {
    "nodeId": "278:72993",
@@ -18574,9 +18576,9 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs",
-   "inheritsFrom": "277:27746"
+   "verified": "drift-fixed",
+   "verifiedNote": "Same dialog, different screen/destination (names come from the nav). Screen-specific extra lines (e.g. HSTS \"Only the HSTS draft is discarded\") are not drawn. Shell/nav drift on the same board (Settings inside the editor shell, nav copy) is tracked separately (lane-E E4 + REQUESTS).",
+   "inheritsFrom": "248:20642"
   },
   {
    "nodeId": "278:73212",
@@ -18586,7 +18588,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button"
+   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm."
   },
   {
    "nodeId": "278:73434",
@@ -18596,7 +18598,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog"
+   "verifiedNote": "Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared."
   },
   {
    "nodeId": "278:73717",
@@ -18605,9 +18607,9 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs",
-   "inheritsFrom": "277:27746"
+   "verified": "drift-fixed",
+   "verifiedNote": "Same dialog, different screen/destination (names come from the nav). Screen-specific extra lines (e.g. HSTS \"Only the HSTS draft is discarded\") are not drawn. Shell/nav drift on the same board (Settings inside the editor shell, nav copy) is tracked separately (lane-E E4 + REQUESTS).",
+   "inheritsFrom": "248:20642"
   },
   {
    "nodeId": "278:73937",
@@ -18617,7 +18619,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button"
+   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm."
   },
   {
    "nodeId": "278:74160",
@@ -18627,7 +18629,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog"
+   "verifiedNote": "Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared."
   },
   {
    "nodeId": "278:74446",
@@ -18636,9 +18638,9 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs",
-   "inheritsFrom": "277:27746"
+   "verified": "drift-fixed",
+   "verifiedNote": "Same dialog, different screen/destination (names come from the nav). Screen-specific extra lines (e.g. HSTS \"Only the HSTS draft is discarded\") are not drawn. Shell/nav drift on the same board (Settings inside the editor shell, nav copy) is tracked separately (lane-E E4 + REQUESTS).",
+   "inheritsFrom": "248:20642"
   },
   {
    "nodeId": "278:74667",
@@ -18648,7 +18650,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button"
+   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm."
   },
   {
    "nodeId": "278:74891",
@@ -18658,7 +18660,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog"
+   "verifiedNote": "Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared."
   },
   {
    "nodeId": "278:75180",
@@ -18667,9 +18669,9 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs",
-   "inheritsFrom": "277:27746"
+   "verified": "drift-fixed",
+   "verifiedNote": "Same dialog, different screen/destination (names come from the nav). Screen-specific extra lines (e.g. HSTS \"Only the HSTS draft is discarded\") are not drawn. Shell/nav drift on the same board (Settings inside the editor shell, nav copy) is tracked separately (lane-E E4 + REQUESTS).",
+   "inheritsFrom": "248:20642"
   },
   {
    "nodeId": "278:75402",
@@ -18679,7 +18681,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button"
+   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm."
   },
   {
    "nodeId": "278:75627",
@@ -18689,7 +18691,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog"
+   "verifiedNote": "Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared."
   },
   {
    "nodeId": "278:75919",
@@ -18698,9 +18700,9 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs",
-   "inheritsFrom": "277:27746"
+   "verified": "drift-fixed",
+   "verifiedNote": "Same dialog, different screen/destination (names come from the nav). Screen-specific extra lines (e.g. HSTS \"Only the HSTS draft is discarded\") are not drawn. Shell/nav drift on the same board (Settings inside the editor shell, nav copy) is tracked separately (lane-E E4 + REQUESTS).",
+   "inheritsFrom": "248:20642"
   },
   {
    "nodeId": "278:76142",
@@ -18710,7 +18712,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button"
+   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm."
   },
   {
    "nodeId": "278:76368",
@@ -18720,7 +18722,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog"
+   "verifiedNote": "Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared."
   },
   {
    "nodeId": "278:76663",
@@ -18729,9 +18731,9 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:60 — guard exists; destination-named copy differs",
-   "inheritsFrom": "277:27746"
+   "verified": "drift-fixed",
+   "verifiedNote": "Same dialog, different screen/destination (names come from the nav). Screen-specific extra lines (e.g. HSTS \"Only the HSTS draft is discarded\") are not drawn. Shell/nav drift on the same board (Settings inside the editor shell, nav copy) is tracked separately (lane-E E4 + REQUESTS).",
+   "inheritsFrom": "248:20642"
   },
   {
    "nodeId": "278:76887",
@@ -18741,7 +18743,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/UnsavedSettingsDialog.tsx:98 — pending state only on the button"
+   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm."
   },
   {
    "nodeId": "278:77114",
@@ -18751,7 +18753,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — failure keeps the screen; no \"Retry save and leave\" dialog"
+   "verifiedNote": "Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared."
   },
   {
    "nodeId": "278:77412",
