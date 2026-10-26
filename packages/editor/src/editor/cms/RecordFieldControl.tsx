@@ -180,6 +180,12 @@ export function RecordFieldControl({
     <div className={FIELD} data-testid={id}>
       {label}
       {input}
+      {/* The field's Help text (167:4135), under its control. */}
+      {f.helpText ? (
+        <span className="tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid={`${id}-help`}>
+          {f.helpText}
+        </span>
+      ) : null}
       {err}
     </div>
   );

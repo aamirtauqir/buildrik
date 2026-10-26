@@ -122,4 +122,36 @@ describe("AddFieldDialog", () => {
     fireEvent.click(screen.getByTestId("cms-add-field-save"));
     await waitFor(() => expect(onAdd).toHaveBeenCalledWith({ name: "Name", slug: "name-2", type: "text" }));
   });
+
+  it("takes a default value, length rules, placeholder and help text (167:4135)", async () => {
+    const { onAdd } = mount();
+    fireEvent.click(screen.getByTestId("cms-add-field-type-text"));
+    fireEvent.change(screen.getByTestId("cms-add-field-name"), { target: { value: "Subtitle" } });
+    fireEvent.change(screen.getByTestId("cms-add-field-default"), { target: { value: "Latest from the studio" } });
+    fireEvent.change(screen.getByTestId("cms-add-field-rule-maxLength"), { target: { value: "80" } });
+    fireEvent.change(screen.getByTestId("cms-add-field-placeholder"), { target: { value: "A short line" } });
+    fireEvent.change(screen.getByTestId("cms-add-field-help"), { target: { value: "Shown under the title" } });
+    fireEvent.click(screen.getByTestId("cms-add-field-save"));
+    await waitFor(() =>
+      expect(onAdd).toHaveBeenCalledWith({
+        name: "Subtitle",
+        slug: "subtitle",
+        type: "text",
+        validation: { maxLength: 80 },
+        defaultValue: "Latest from the studio",
+        placeholder: "A short line",
+        helpText: "Shown under the title",
+      }),
+    );
+  });
+
+  it("refuses a default the field's own rules would refuse", () => {
+    mount();
+    fireEvent.click(screen.getByTestId("cms-add-field-type-number"));
+    fireEvent.change(screen.getByTestId("cms-add-field-name"), { target: { value: "Minutes" } });
+    fireEvent.change(screen.getByTestId("cms-add-field-rule-max"), { target: { value: "60" } });
+    fireEvent.change(screen.getByTestId("cms-add-field-default"), { target: { value: "90" } });
+    expect(screen.getByTestId("cms-add-field-default-error")).toHaveTextContent("Default value must be at most 60");
+    expect(screen.getByTestId("cms-add-field-save")).toBeDisabled();
+  });
 });

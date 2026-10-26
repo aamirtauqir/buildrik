@@ -51,6 +51,38 @@ export const FIELD_TYPE_LABEL: Record<CMSFieldType, string> = {
   color: "Color",
 };
 
+/** The rules each type can carry (CMSFieldValidation, enforced on publish
+ *  by cmsValueError): numbers take a range, text a length. One list for
+ *  + Add field (167:4135 "Minimum length · Maximum length") and the field
+ *  inspector's VALIDATION. */
+export type FieldRuleKey = "min" | "max" | "minLength" | "maxLength";
+const LENGTH_RULES: ReadonlyArray<{ key: FieldRuleKey; label: string }> = [
+  { key: "minLength", label: "Minimum length" },
+  { key: "maxLength", label: "Maximum length" },
+];
+export const FIELD_RULES: Partial<Record<CMSFieldType, ReadonlyArray<{ key: FieldRuleKey; label: string }>>> = {
+  number: [{ key: "min", label: "Minimum" }, { key: "max", label: "Maximum" }],
+  text: LENGTH_RULES,
+  textarea: LENGTH_RULES,
+  richtext: LENGTH_RULES,
+  slug: LENGTH_RULES,
+  email: LENGTH_RULES,
+  url: LENGTH_RULES,
+};
+
+/** Types a person types a value into — the ones that take a Placeholder and
+ *  a typed Default value (167:4135). */
+export const TYPED_VALUE_TYPES: ReadonlySet<CMSFieldType> = new Set([
+  "text", "textarea", "email", "url", "slug", "number", "date", "datetime", "color",
+]);
+
+/** A typed default as the field stores it: a number field's is a number. */
+export function parseDefault(type: CMSFieldType, raw: string): unknown {
+  const t = raw.trim();
+  if (t === "") return undefined;
+  return type === "number" ? Number(t) : t;
+}
+
 /** Types whose values are chosen from a list the field carries. */
 export const OPTION_TYPES: ReadonlySet<CMSFieldType> = new Set(["select", "multiselect"]);
 

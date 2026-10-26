@@ -9,15 +9,17 @@
  * A key the collection already has stops at "Field key already exists"
  * (4418:164225), which offers a free one.
  *
- * Not built yet (board 167:4135): Default value, min/max length,
- * Placeholder, Help text — the field inspector holds the rules today.
+ * Then the field's settings (167:4135): Default value, the type's
+ * minimum / maximum, Placeholder and Help text — the same ones the field
+ * inspector edits later.
  *
  * @license BSD-3-Clause
  */
 import * as React from "react";
 import type { CMSCollection, CMSField, CMSFieldType } from "@/shared/types/cms";
 import { Button, Chip, Modal, Select, TextInput } from "@/editor/chrome-ui";
-import { FIELD_TYPES, FIELD_TYPE_LABEL, OPTION_TYPES, fieldKeyError, fieldKeyFrom, freeKey } from "./fieldTypes";
+import { FIELD_RULES, FIELD_TYPES, FIELD_TYPE_LABEL, OPTION_TYPES, TYPED_VALUE_TYPES, fieldKeyError, fieldKeyFrom, freeKey, parseDefault, type FieldRuleKey } from "./fieldTypes";
+import { cmsValueError } from "@buildrik/shared/schemas/cms";
 import { OptionsEditor } from "./OptionsEditor";
 
 const ROW = "tw:grid tw:grid-cols-[88px_1fr] tw:items-center tw:gap-2";
@@ -51,6 +53,10 @@ export function AddFieldDialog({
   const [clash, setClash] = React.useState<string | null>(null);
   const [busy, setBusy] = React.useState(false);
   const [failed, setFailed] = React.useState(false);
+  const [defaultRaw, setDefaultRaw] = React.useState("");
+  const [rules, setRules] = React.useState<Partial<Record<FieldRuleKey, string>>>({});
+  const [placeholder, setPlaceholder] = React.useState("");
+  const [helpText, setHelpText] = React.useState("");
 
   const taken = React.useMemo(() => new Set(collection.fields.map((f) => f.slug)), [collection.fields]);
   const nextName = name.trim();
@@ -60,9 +66,18 @@ export function AddFieldDialog({
      read under the key. */
   const keyError = nextKey ? fieldKeyError(nextKey, new Set()) : null;
   const label = type ? FIELD_TYPE_LABEL[type] : "";
+  const ruleValues = Object.fromEntries(
+    Object.entries(rules).flatMap(([k, v]) => (v && v.trim() !== "" && Number.isFinite(Number(v)) ? [[k, Number(v)]] : [])),
+  ) as Partial<Record<FieldRuleKey, number>>;
+  const validation = { ...(required ? { required: true } : {}), ...ruleValues };
+  const defaultValue = type ? parseDefault(type, defaultRaw) : undefined;
+  /* A default has to pass the field's own rules, or every new record starts
+     out unpublishable. */
+  const defaultError =
+    type && defaultValue !== undefined ? cmsValueError({ name: "Default value", slug: nextKey, type, validation }, defaultValue) : null;
 
   const save = async () => {
-    if (!type || !nextName || !nextKey || keyError || busy) return;
+    if (!type || !nextName || !nextKey || keyError || defaultError || busy) return;
     if (taken.has(nextKey)) {
       setClash(nextKey);
       return;
@@ -74,7 +89,10 @@ export function AddFieldDialog({
         name: nextName,
         slug: nextKey,
         type,
-        ...(required ? { validation: { required: true } } : {}),
+        ...(Object.keys(validation).length ? { validation } : {}),
+        ...(defaultValue !== undefined ? { defaultValue } : {}),
+        ...(placeholder.trim() ? { placeholder: placeholder.trim() } : {}),
+        ...(helpText.trim() ? { helpText: helpText.trim() } : {}),
         ...(type === "reference" ? { referenceCollection: target } : {}),
         ...(OPTION_TYPES.has(type) ? { options } : {}),
       });
@@ -164,7 +182,7 @@ export function AddFieldDialog({
           <Button variant="ghost" onClick={onClose} data-testid="cms-add-field-cancel">
             Cancel
           </Button>
-          <Button disabled={!nextName || !nextKey || Boolean(keyError) || busy} onClick={() => void save()} data-testid="cms-add-field-save">
+          <Button disabled={!nextName || !nextKey || Boolean(keyError) || Boolean(defaultError) || busy} onClick={() => void save()} data-testid="cms-add-field-save">
             {busy ? "Saving…" : failed ? "Retry" : "Add field"}
           </Button>
         </>
@@ -228,6 +246,41 @@ export function AddFieldDialog({
             <OptionsEditor id="cms-add-field-options" options={options} onChange={setOptions} live />
           </div>
         ) : null}
+        {TYPED_VALUE_TYPES.has(type) ? (
+          <div className={ROW}>
+            <label className={ROW_LABEL} htmlFor="cms-add-field-default">Default value</label>
+            <TextInput id="cms-add-field-default" sizing="sm" autoComplete="off" value={defaultRaw} onChange={(e) => setDefaultRaw(e.target.value)} data-testid="cms-add-field-default" />
+          </div>
+        ) : null}
+        {defaultError ? (
+          <p className="tw:m-0 tw:pl-[96px] tw:text-[11px] tw:leading-4 tw:text-[var(--bk-error-text)]" role="alert" data-testid="cms-add-field-default-error">
+            {defaultError}
+          </p>
+        ) : null}
+        {(FIELD_RULES[type] ?? []).map((r) => (
+          <div key={r.key} className={ROW}>
+            <label className={ROW_LABEL} htmlFor={`cms-add-field-rule-${r.key}`}>{r.label}</label>
+            <TextInput
+              id={`cms-add-field-rule-${r.key}`}
+              sizing="sm"
+              type="number"
+              placeholder="None"
+              value={rules[r.key] ?? ""}
+              onChange={(e) => setRules((p) => ({ ...p, [r.key]: e.target.value }))}
+              data-testid={`cms-add-field-rule-${r.key}`}
+            />
+          </div>
+        ))}
+        {TYPED_VALUE_TYPES.has(type) ? (
+          <div className={ROW}>
+            <label className={ROW_LABEL} htmlFor="cms-add-field-placeholder">Placeholder</label>
+            <TextInput id="cms-add-field-placeholder" sizing="sm" autoComplete="off" value={placeholder} onChange={(e) => setPlaceholder(e.target.value)} data-testid="cms-add-field-placeholder" />
+          </div>
+        ) : null}
+        <div className={ROW}>
+          <label className={ROW_LABEL} htmlFor="cms-add-field-help">Help text</label>
+          <TextInput id="cms-add-field-help" sizing="sm" autoComplete="off" value={helpText} onChange={(e) => setHelpText(e.target.value)} data-testid="cms-add-field-help" />
+        </div>
         <p className={`${NOTE} tw:mt-2`}>Existing records keep empty values until edited.</p>
         {failed ? (
           <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-error-text)]" role="alert" data-testid="cms-add-field-failed">

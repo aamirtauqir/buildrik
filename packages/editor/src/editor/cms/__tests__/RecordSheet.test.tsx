@@ -598,3 +598,16 @@ describe("RecordSheet · the way back names its origin (2L9 C2)", () => {
     expect(cmsWorkspace.get().origin).toBeNull();
   });
 });
+
+describe("RecordSheet · a field's Help text and Placeholder (2L9 D2, 167:4135)", () => {
+  it("shows the help under the control and the placeholder inside it", async () => {
+    const withHelp = {
+      ...MENU,
+      fields: MENU.fields.map((f) => (f.slug === "price" ? { ...f, helpText: "Include the currency", placeholder: "$0" } : f)),
+    } as CMSCollection;
+    mount({ collection: withHelp });
+    await openRow();
+    expect(screen.getByTestId("cms-field-price-help")).toHaveTextContent("Include the currency");
+    expect(screen.getByLabelText("Price *")).toHaveAttribute("placeholder", "$0");
+  });
+});

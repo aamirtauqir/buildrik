@@ -17,7 +17,7 @@ import type { Composer } from "@/engine";
 import type { CMSCollection, CMSContentItem, CMSField, CMSFieldType } from "@/shared/types/cms";
 import { Button, Chip, IconButton, Select, TextInput } from "@/editor/chrome-ui";
 import { cmsWorkspace } from "./cmsWorkspaceStore";
-import { FIELD_TYPES, FIELD_TYPE_LABEL, fieldKeyError } from "./fieldTypes";
+import { FIELD_RULES, FIELD_TYPES, FIELD_TYPE_LABEL, TYPED_VALUE_TYPES, fieldKeyError, parseDefault } from "./fieldTypes";
 import type { FieldUse } from "./fieldUsage";
 import { DeleteFieldDialog } from "./DeleteFieldDialog";
 import { OptionsEditor } from "./OptionsEditor";
@@ -36,15 +36,6 @@ const NOTE = "tw:m-0 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 /** The header glyph before the field name ("# Price"). */
 const TYPE_GLYPH: Record<string, string> = { number: "#", text: "T", textarea: "¶", richtext: "¶", image: "▣", boolean: "◐", date: "▦", reference: "↗", slug: "/", multiselect: "☰" };
 
-/** The rules each type can carry (CMSFieldValidation, enforced on publish by
- *  validateFieldValue): numbers take a range, text a length. */
-const RULES: Record<string, Array<{ key: "min" | "max" | "minLength" | "maxLength"; label: string }>> = {
-  number: [{ key: "min", label: "Min" }, { key: "max", label: "Max" }],
-  text: [{ key: "minLength", label: "Min length" }, { key: "maxLength", label: "Max length" }],
-  textarea: [{ key: "minLength", label: "Min length" }, { key: "maxLength", label: "Max length" }],
-  richtext: [{ key: "minLength", label: "Min length" }, { key: "maxLength", label: "Max length" }],
-  slug: [{ key: "minLength", label: "Min length" }, { key: "maxLength", label: "Max length" }],
-};
 
 /** One numeric rule, saved on blur / Enter; empty clears it. */
 function RuleInput({ id, value, onCommit }: { id: string; value: number | undefined; onCommit: (v: number | undefined) => void }) {
@@ -61,6 +52,28 @@ function RuleInput({ id, value, onCommit }: { id: string; value: number | undefi
       id={id}
       sizing="sm"
       type="number"
+      className={CONTROL}
+      placeholder="None"
+      value={draft}
+      onChange={(e) => setDraft(e.target.value)}
+      onBlur={commit}
+      onKeyDown={(e) => e.key === "Enter" && commit()}
+      data-testid={id}
+    />
+  );
+}
+
+/** A text setting, saved on blur / Enter; empty clears it. */
+function TextSetting({ id, value, onCommit }: { id: string; value: string; onCommit: (v: string) => void }) {
+  const [draft, setDraft] = React.useState(value);
+  React.useEffect(() => setDraft(value), [value]);
+  const commit = () => {
+    if (draft.trim() !== value) onCommit(draft.trim());
+  };
+  return (
+    <TextInput
+      id={id}
+      sizing="sm"
       className={CONTROL}
       placeholder="None"
       value={draft}
@@ -211,8 +224,30 @@ export function FieldInspector({ composer, collection, collections, field, recor
           </span>
         </div>
 
+        {/* 167:4135 — what a new record starts with and what the form shows. */}
+        {TYPED_VALUE_TYPES.has(field.type) ? (
+          <>
+            <div className={ROW}>
+              <label className={ROW_LABEL} htmlFor="cms-fi-default">Default value</label>
+              <TextSetting
+                id="cms-fi-default"
+                value={field.defaultValue === undefined || field.defaultValue === null ? "" : String(field.defaultValue)}
+                onCommit={(v) => update({ defaultValue: parseDefault(field.type, v) })}
+              />
+            </div>
+            <div className={ROW}>
+              <label className={ROW_LABEL} htmlFor="cms-fi-placeholder">Placeholder</label>
+              <TextSetting id="cms-fi-placeholder" value={field.placeholder ?? ""} onCommit={(v) => update({ placeholder: v || undefined })} />
+            </div>
+          </>
+        ) : null}
+        <div className={ROW}>
+          <label className={ROW_LABEL} htmlFor="cms-fi-help">Help text</label>
+          <TextSetting id="cms-fi-help" value={field.helpText ?? ""} onCommit={(v) => update({ helpText: v || undefined })} />
+        </div>
+
         <h4 className={`${SECTION} tw:mb-2 tw:mt-3`}>Validation</h4>
-        {(RULES[field.type] ?? []).map((r) => (
+        {(FIELD_RULES[field.type] ?? []).map((r) => (
           <div key={r.key} className={ROW}>
             <label className={ROW_LABEL} htmlFor={`cms-fi-rule-${r.key}`}>{r.label}</label>
             <RuleInput
@@ -222,7 +257,7 @@ export function FieldInspector({ composer, collection, collections, field, recor
             />
           </div>
         ))}
-        {RULES[field.type] ? null : (
+        {FIELD_RULES[field.type] ? null : (
           <p className={`${TEXT} tw:text-[var(--bk-ink-muted)]`} data-testid="cms-fi-rule-none">
             {FIELD_TYPE_LABEL[field.type] ?? field.type} fields take no rules beyond Required.
           </p>

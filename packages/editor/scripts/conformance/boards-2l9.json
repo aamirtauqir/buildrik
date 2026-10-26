@@ -7075,7 +7075,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Key/type lock when bound matches; board adds Placeholder, Help text, Show N usages, explicit Save field (code commits on blur)"
+   "verifiedNote": "drift-open — L-C D2: field inspector gains Default value, Placeholder, Help text; Key/type lock kept; \"Show N usages\" link and explicit Save field (code commits on blur, authority to decide) not built. Not compared."
   },
   {
    "nodeId": "165:3173",
@@ -7375,7 +7375,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
+   "verifiedNote": "built, not compared — L-C C6/D2: \"Add {type} field · {collection} · New field\", key hint, Default value (checked against the field's rules), Minimum/Maximum (length), Placeholder, Help text, Add field CTA."
   },
   {
    "nodeId": "167:4412",
@@ -7385,7 +7385,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
+   "verifiedNote": "built, not compared — L-C C6/D2: \"Add {type} field · {collection} · New field\", key hint, Default value (checked against the field's rules), Minimum/Maximum (length), Placeholder, Help text, Add field CTA."
   },
   {
    "nodeId": "167:4689",
@@ -7395,7 +7395,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
+   "verifiedNote": "built, not compared — L-C C6/D2: \"Add {type} field · {collection} · New field\", key hint, Default value (checked against the field's rules), Minimum/Maximum (length), Placeholder, Help text, Add field CTA."
   },
   {
    "nodeId": "167:4956",
@@ -7405,7 +7405,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
+   "verifiedNote": "built, not compared — L-C C6/D2: \"Add {type} field · {collection} · New field\", key hint, Default value (checked against the field's rules), Minimum/Maximum (length), Placeholder, Help text, Add field CTA."
   },
   {
    "nodeId": "167:5224",
@@ -7415,7 +7415,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
+   "verifiedNote": "built, not compared — L-C C6/D2: \"Add {type} field · {collection} · New field\", key hint, Default value (checked against the field's rules), Minimum/Maximum (length), Placeholder, Help text, Add field CTA."
   },
   {
    "nodeId": "167:5492",
@@ -7425,7 +7425,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
+   "verifiedNote": "built, not compared — L-C C6/D2: \"Add {type} field · {collection} · New field\", key hint, Default value (checked against the field's rules), Minimum/Maximum (length), Placeholder, Help text, Add field CTA."
   },
   {
    "nodeId": "167:5760",
@@ -7435,7 +7435,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
+   "verifiedNote": "built, not compared — L-C C6/D2: \"Add {type} field · {collection} · New field\", key hint, Default value (checked against the field's rules), Minimum/Maximum (length), Placeholder, Help text, Add field CTA."
   },
   {
    "nodeId": "167:6038",
@@ -7445,7 +7445,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
+   "verifiedNote": "built, not compared — L-C C6/D2: \"Add {type} field · {collection} · New field\", key hint, Default value (checked against the field's rules), Minimum/Maximum (length), Placeholder, Help text, Add field CTA."
   },
   {
    "nodeId": "167:6306",
@@ -7455,7 +7455,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
+   "verifiedNote": "built, not compared — L-C C6/D2: \"Add {type} field · {collection} · New field\", key hint, Default value (checked against the field's rules), Minimum/Maximum (length), Placeholder, Help text, Add field CTA."
   },
   {
    "nodeId": "167:6574",
@@ -7465,7 +7465,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
+   "verifiedNote": "built, not compared — L-C C6/D2: \"Add {type} field · {collection} · New field\", key hint, Default value (checked against the field's rules), Minimum/Maximum (length), Placeholder, Help text, Add field CTA."
   },
   {
    "nodeId": "167:6844",
@@ -7475,7 +7475,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
+   "verifiedNote": "built, not compared — L-C C6/D2: \"Add {type} field · {collection} · New field\", key hint, Default value (checked against the field's rules), Minimum/Maximum (length), Placeholder, Help text, Add field CTA."
   },
   {
    "nodeId": "167:7125",
@@ -7485,7 +7485,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
+   "verifiedNote": "built, not compared — L-C C6/D2: \"Add {type} field · {collection} · New field\", key hint, Default value (checked against the field's rules), Minimum/Maximum (length), Placeholder, Help text, Add field CTA."
   },
   {
    "nodeId": "167:7406",
@@ -7495,7 +7495,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
+   "verifiedNote": "built, not compared — L-C C6/D2: \"Add {type} field · {collection} · New field\", key hint, Default value (checked against the field's rules), Minimum/Maximum (length), Placeholder, Help text, Add field CTA."
   },
   {
    "nodeId": "167:7671",
@@ -7505,7 +7505,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
+   "verifiedNote": "built, not compared — L-C C6/D2: \"Add {type} field · {collection} · New field\", key hint, Default value (checked against the field's rules), Minimum/Maximum (length), Placeholder, Help text, Add field CTA."
   },
   {
    "nodeId": "167:7936",
@@ -7515,7 +7515,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
+   "verifiedNote": "built, not compared — L-C C6/D2: \"Add {type} field · {collection} · New field\", key hint, Default value (checked against the field's rules), Minimum/Maximum (length), Placeholder, Help text, Add field CTA."
   },
   {
    "nodeId": "167:8207",
@@ -7525,7 +7525,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
+   "verifiedNote": "built, not compared — L-C C6/D2: \"Add {type} field · {collection} · New field\", key hint, Default value (checked against the field's rules), Minimum/Maximum (length), Placeholder, Help text, Add field CTA."
   },
   {
    "nodeId": "167:8474",
