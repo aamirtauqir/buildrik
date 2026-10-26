@@ -76,6 +76,12 @@ function setup(projectId: string | null = "s1") {
   return { composer, ...utils };
 }
 
+/* GAP-FMC 277:345909: the filter is a small dialog — Cancel · All forms · each form. */
+function pickForm(id: string) {
+  fireEvent.click(screen.getByTestId("set-forms-filter"));
+  fireEvent.click(screen.getByTestId(`set-forms-filter-${id}`));
+}
+
 describe("FormsScreen — gating + empty states", () => {
   it("shows the dashboard-only message with no projectId", () => {
     setup(null);
@@ -123,7 +129,7 @@ describe("FormsScreen — 238:13598 views, filter and rows", () => {
     expect(listSubs).toHaveBeenCalledWith({ siteId: "s1", page: 1, perPage: 20, isArchived: false, isSpam: false });
     expect(within(screen.getByTestId("set-forms-views")).getAllByRole("button").map((b) => b.textContent)).toEqual(["Inbox", "Spam", "Archived"]);
     expect(screen.getByTestId("set-forms-view-inbox")).toHaveAttribute("aria-pressed", "true");
-    expect((screen.getByTestId("set-forms-filter") as HTMLSelectElement).selectedOptions[0].textContent).toBe("Form: All forms");
+    expect(screen.getByTestId("set-forms-filter").textContent).toBe("Form: All forms");
     expect(screen.getByTestId("set-forms-count")).toHaveTextContent("Inbox · 2 submissions");
     expect(screen.getByText("Submissions · All forms")).toBeInTheDocument();
     const a = screen.getByTestId("set-forms-row-a");
@@ -150,7 +156,7 @@ describe("FormsScreen — 238:13598 views, filter and rows", () => {
     expect(configure).toHaveTextContent("Choose a form to configure");
     expect(configure).toBeDisabled();
     expect(screen.getByTestId("set-forms-configure-hint")).toHaveTextContent("Select a single form before configuring it in Inspector.");
-    fireEvent.change(screen.getByTestId("set-forms-filter"), { target: { value: "f1" } });
+    pickForm("f1");
     await waitFor(() => expect(listSubs).toHaveBeenLastCalledWith(expect.objectContaining({ formBlockId: "f1", page: 1 })));
     expect(screen.getByText("Submissions · Reservation")).toBeInTheDocument();
     expect(screen.queryByTestId("set-forms-configure-hint")).toBeNull();
@@ -164,7 +170,8 @@ describe("FormsScreen — 238:13598 views, filter and rows", () => {
     listBlocks.mockResolvedValue([block("f1", "Reservation", 1)]);
     listSubs.mockResolvedValue(pageOf([sub("a", { email: "x@y.co" })], 1));
     const { composer } = setup();
-    fireEvent.change(await screen.findByTestId("set-forms-filter"), { target: { value: "f1" } });
+    fireEvent.click(await screen.findByTestId("set-forms-filter"));
+    fireEvent.click(screen.getByTestId("set-forms-filter-f1"));
     fireEvent.click(await screen.findByText("Configure in Inspector"));
     expect(screen.getByTestId("set-save-error")).toHaveTextContent("Reservation is no longer on its page.");
     expect(composer.emit).not.toHaveBeenCalledWith(EVENTS.UI_SWITCH_TAB, expect.anything());
@@ -215,6 +222,22 @@ describe("FormsScreen — 238:13598 views, filter and rows", () => {
     await waitFor(() => expect(api.forms.updateSubmission.mutate).toHaveBeenCalledWith({ id: "a", isRead: true }));
   });
 
+  it("the form filter asks in a dialog, keeps the view, and a form change keeps the selection", async () => {
+    listBlocks.mockResolvedValue([block("f1", "Contact", 2)]);
+    listSubs.mockResolvedValue(pageOf([sub("a", { name: "Mara" }), sub("b", { name: "Jonas" })], 2));
+    setup();
+    fireEvent.click(await screen.findByTestId("set-forms-select-a"));
+    fireEvent.click(screen.getByTestId("set-forms-filter"));
+    expect(screen.getByText("Filter submissions")).toBeInTheDocument();
+    expect(screen.getByText("Inbox view is kept. Change the form to update counts and CSV scope.")).toBeInTheDocument();
+    const foot = screen.getByTestId("modal-foot-set-forms-filter-dialog");
+    expect(Array.from(foot.querySelectorAll("button")).map((b) => b.textContent)).toEqual(["Cancel", "All forms", "Contact"]);
+    fireEvent.click(screen.getByTestId("set-forms-filter-f1"));
+    await waitFor(() => expect(listSubs).toHaveBeenLastCalledWith(expect.objectContaining({ formBlockId: "f1" })));
+    await waitFor(() => expect(screen.getByTestId("set-forms-selected")).toHaveTextContent("1 selected"));
+    expect(screen.getByTestId("set-forms-filter").textContent).toBe("Form: Contact");
+  });
+
   it("Export CSV exports the current view and form, then says what it held (GAP-FM-Export)", async () => {
     Object.assign(URL, { createObjectURL: vi.fn(() => "blob:x"), revokeObjectURL: vi.fn() });
     const click = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => {});
@@ -222,7 +245,7 @@ describe("FormsScreen — 238:13598 views, filter and rows", () => {
     listSubs.mockResolvedValue(pageOf([sub("a", { email: "x@y.co" })], 1));
     setup();
     await screen.findByTestId("set-forms-table");
-    fireEvent.change(screen.getByTestId("set-forms-filter"), { target: { value: "f1" } });
+    pickForm("f1");
     fireEvent.click(screen.getByTestId("set-forms-view-spam"));
     await waitFor(() => expect(listSubs).toHaveBeenLastCalledWith(expect.objectContaining({ formBlockId: "f1", isSpam: true })));
     await waitFor(() => expect(screen.getByTestId("set-forms-export")).not.toBeDisabled());

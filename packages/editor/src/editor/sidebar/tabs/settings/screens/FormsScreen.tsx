@@ -30,12 +30,13 @@
 
 import * as React from "react";
 import { createBuildrikApiClient } from "@/services/api-client";
-import { LoadCard, SET_BTN, SET_CARD, SCREEN_EMPTY, Screen, SaveErrorBanner, Select } from "../shared";
+import { LoadCard, SET_BTN, SET_CARD, SCREEN_EMPTY, Screen, SaveErrorBanner } from "../shared";
 import type { ScreenProps } from "../types";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { EVENTS } from "@/shared/constants/events";
 import { locateComment } from "@/editor/sidebar/tabs/review/locate";
 import { Button, Checkbox, ConfirmDialog, Modal } from "@/editor/chrome-ui";
+import { ChevronDown } from "lucide-react";
 
 interface FormBlockRow {
   id: string;
@@ -153,6 +154,8 @@ export const FormsScreen: React.FC<ScreenProps> = ({ composer, projectId, onDirt
   const [moveFailed, setMoveFailed] = React.useState<string[] | null>(null);
   const [moving, setMoving] = React.useState(false);
   /* GAP-FM-Export: the export's own dialog — preparing, ready (with what it held) or failed. */
+  /* GAP-FMC 277:345909: the form filter asks in a small dialog. */
+  const [filterOpen, setFilterOpen] = React.useState(false);
   const [exportState, setExportState] = React.useState<{ phase: "preparing" | "failed" } | { phase: "ready"; count: number } | null>(null);
 
   React.useEffect(() => {
@@ -222,7 +225,8 @@ export const FormsScreen: React.FC<ScreenProps> = ({ composer, projectId, onDirt
     if (next.view !== undefined) setView(next.view);
     if (next.form !== undefined) setFormFilter(next.form);
     setPage(1);
-    setSelected(new Set());
+    /* GAP-FMC Filter: a form change keeps the selection; a new view clears it. */
+    if (next.view !== undefined) setSelected(new Set());
     setExpandedId(null);
     setAck(null);
     setActionError(null);
@@ -419,18 +423,19 @@ export const FormsScreen: React.FC<ScreenProps> = ({ composer, projectId, onDirt
       </div>
 
       <div className="tw:flex tw:items-center tw:gap-3">
-        <Select
+        <Button
+          type="button"
+          size="xs"
+          variant="secondary"
+          className={`${SET_BTN} tw:h-7 tw:w-60 tw:justify-between tw:bg-[var(--bk-bg-subtle)] tw:font-normal`}
+          aria-haspopup="dialog"
           aria-label="Filter submissions by form"
-          className="tw:w-60"
-          value={formFilter}
-          onChange={(e) => changeList({ form: e.target.value })}
+          onClick={() => setFilterOpen(true)}
           data-testid="set-forms-filter"
         >
-          <option value={ALL_FORMS}>Form: All forms</option>
-          {forms.map((f) => (
-            <option key={f.id} value={f.id}>{`Form: ${f.name}`}</option>
-          ))}
-        </Select>
+          <span className="tw:truncate">{`Form: ${chosenForm?.name ?? "All forms"}`}</span>
+          <ChevronDown size={14} aria-hidden />
+        </Button>
         <span className={INK_13} role="status" data-testid="set-forms-count">
           {submissions ? `${VIEW_LABEL[view]} · ${plural(submissions.total, "submission")}` : VIEW_LABEL[view]}
         </span>
@@ -707,6 +712,38 @@ export const FormsScreen: React.FC<ScreenProps> = ({ composer, projectId, onDirt
         width="sm"
         testId="set-forms-export-failed"
       />
+      <Modal
+        open={filterOpen}
+        onClose={() => setFilterOpen(false)}
+        title="Filter submissions"
+        width="sm"
+        testId="set-forms-filter-dialog"
+        footer={
+          <>
+            <Button type="button" size="xs" variant="secondary" className={SET_BTN} onClick={() => setFilterOpen(false)}>
+              Cancel
+            </Button>
+            {[{ id: ALL_FORMS, name: "All forms" }, ...forms].map((f) => (
+              <Button
+                key={f.id || "all"}
+                type="button"
+                size="xs"
+                variant={f.id === formFilter ? undefined : "secondary"}
+                className={SET_BTN}
+                onClick={() => {
+                  setFilterOpen(false);
+                  if (f.id !== formFilter) changeList({ form: f.id });
+                }}
+                data-testid={`set-forms-filter-${f.id || "all"}`}
+              >
+                {f.name}
+              </Button>
+            ))}
+          </>
+        }
+      >
+        <p className={MUTED_13}>{`${VIEW_LABEL[view]} view is kept. Change the form to update counts and CSV scope.`}</p>
+      </Modal>
       <ConfirmDialog
         open={moveFailed !== null}
         onClose={() => setMoveFailed(null)}

@@ -16263,8 +16263,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Filter change applies at once and clears the selection; the board's 'Filter submissions' confirm (Cancel · All forms · Contact) is not built. | prior: Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Filter) not walked."
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27: shots/277-345909.png vs probe Form submissions → the filter button (\"Form: All forms ▾\") opens \"Filter submissions\" — \"<View> view is kept. Change the form to update counts and CSV scope.\", Cancel · All forms · <each form>, the current one primary; a form change keeps the selection. Dialog 480 vs the board ~520 and the shared Modal title 20 vs ~16 (Modal sizes are chrome-ui)."
   },
   {
    "nodeId": "277:346192",
