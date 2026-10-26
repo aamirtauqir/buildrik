@@ -100,7 +100,7 @@ const nth = (stem: string, i: number) => (i === 0 ? stem : `${stem}-${i}`);
 
 /** 2L9 B8-S09 238:12413: the row's status — "Primary · connected · SSL
  *  active", "Redirects to primary", "Waiting for DNS". */
-export function connectionLine(row: Pick<DomainRow, "status" | "sslStatus" | "isPrimary" | "kind">): string {
+function connectionLine(row: Pick<DomainRow, "status" | "sslStatus" | "isPrimary" | "kind">): string {
   if (row.status === "FAILED") return "DNS not found · check your records";
   if (row.status !== "VERIFIED") return "Waiting for DNS";
   const ssl = row.sslStatus === "ACTIVE" ? "SSL active" : "SSL pending";

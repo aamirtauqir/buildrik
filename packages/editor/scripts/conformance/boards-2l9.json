@@ -13437,7 +13437,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/AnalyticsScreen.tsx:376 — 4 providers + verify pill exist; tracker disclaimer, status copy, footer states dif…"
+   "verifiedNote": "Compared 2026-10-26 (wave 2) against get_metadata of 245:45159, probe SettingsTab on Analytics at 1440x900: GTM / Meta Pixel / Clarity cards 720x94 as drawn (label 192 · id · switch + Enabled/Off 104); Google Analytics adds status words (Not verified / Waiting for data / Receiving data) + Verify (148) and the tracker disclaimer. Still open: the GA card is 182 tall vs 158 — the code keeps the Last received line under the status (code-ahead, the tracker reading), which AN01 draws only in AN04."
   },
   {
    "nodeId": "245:45416",
@@ -13447,7 +13447,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/AnalyticsScreen.tsx:376 — 4 providers + verify pill exist; tracker disclaimer, status copy, footer states dif…"
+   "verifiedNote": "Built, not compared: status words and Verify per AN01 (wave 2); detail lines as in code."
   },
   {
    "nodeId": "245:45673",
@@ -13457,7 +13457,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/AnalyticsScreen.tsx:376 — 4 providers + verify pill exist; tracker disclaimer, status copy, footer states dif…"
+   "verifiedNote": "Built, not compared: status words and Verify per AN01 (wave 2); detail lines as in code."
   },
   {
    "nodeId": "245:45931",
@@ -13467,7 +13467,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/AnalyticsScreen.tsx:376 — 4 providers + verify pill exist; tracker disclaimer, status copy, footer states dif…"
+   "verifiedNote": "Built, not compared: status words and Verify per AN01 (wave 2); detail lines as in code."
   },
   {
    "nodeId": "245:46189",
@@ -13487,7 +13487,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/AnalyticsScreen.tsx:376 — 4 providers + verify pill exist; tracker disclaimer, status copy, footer states dif…"
+   "verifiedNote": "Built, not compared (error state): a failed Verify shows \"Couldn’t check status\" / \"The status service did not respond. Try Verify again.\" in the status row; values kept (tested)."
   },
   {
    "nodeId": "245:46707",
