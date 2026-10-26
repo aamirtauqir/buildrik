@@ -20350,7 +20350,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "PublishHistory.tsx:434 Republish v{n}… matches; \"Compare with current\" vs \"Compare with live\"; no Pruned row"
+   "verifiedNote": "L-F W6: built, not compared. An older release's ⋯ reads \"Compare with live\" and compares it with the live release; the live row keeps \"Compare with current\" (draft), as do the details overlay (code-ahead, kept). No Pruned row: the server keeps no pruned-release record (open)."
   },
   {
    "nodeId": "230:18022",
@@ -20358,9 +20358,9 @@
    "page": "07",
    "family": "recovery",
    "status": "active",
-   "authority": "board",
+   "authority": "code:republish-as-new-version",
    "verified": "drift-open",
-   "verifiedNote": "PublishHistory.tsx:663-672 \"Republish vN as vM?\" (code contract: new version) vs \"Republish v13 to <domain>?\""
+   "verifiedNote": "L-F W6: built, not compared. Title \"Republish v{n} to {domain}?\"; body \"The live site goes back to v{n}, published again as v{next}. Your current draft is not changed. v{live} stays in this list.\" — the board's copy plus the new version number the republish takes (behaviour is the code's); info block removed (not on the board)."
   },
   {
    "nodeId": "230:18582",
