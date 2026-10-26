@@ -54,6 +54,7 @@ import { registerWorkSnapshot } from "@/editor/shell/workSnapshot";
 import { setKeptWorkOffer } from "@/editor/shell/keptWorkOffer";
 import { RecoveryBanner } from "@/editor/shell/RecoveryBanner";
 import { SaveFailedStrip } from "@/editor/shell/SaveFailedStrip";
+import { FullPageRouter } from "@/editor/sidebar/FullPageRouter";
 import { SessionExpiredModal } from "@/editor/shell/modals/SessionExpiredModal";
 import { DEFAULT_ONBOARDING_STEPS } from "@/shared/constants/onboardingSteps";
 import { CanvasFooterToolbar } from "@/editor/canvas/CanvasFooterToolbar";
@@ -3073,6 +3074,23 @@ const CASES: Record<string, () => React.ReactElement> = {
       />
       <CreatePageSuccessModal pageName="Menu 2" onClose={() => {}} onOpenPageSettings={() => {}} />
       <CreatePageErrorModal onCancel={() => {}} onRetry={() => {}} />
+    </div>
+  ),
+  /* C-17 (222:43842 / 223:44891): Templates in the resource area — the real
+     FullPageRouter mount in the slot between the rail (56) and the bottom
+     bar (868), under the topbar (56). */
+  "templates-resource-area": () => (
+    <div data-probe="templates-resource-area">
+      <ToastProvider>
+        <div style={{ position: "fixed", inset: "0 0 auto 0", height: 56, background: "white", borderBottom: "1px solid var(--bk-border)" }} />
+        <div style={{ position: "fixed", left: 0, top: 56, width: 56, bottom: 32, borderRight: "1px solid var(--bk-border)" }} />
+        <div style={{ position: "fixed", left: 56, top: 56, right: 0, bottom: 32, display: "flex" }}>
+          <React.Suspense fallback={null}>
+            <FullPageRouter activeTab="templates" composer={layersComposer()} commonTabProps={{ onClose: () => {} }} />
+          </React.Suspense>
+        </div>
+        <div style={{ position: "fixed", left: 0, right: 0, bottom: 0, height: 32, borderTop: "1px solid var(--bk-border)" }} />
+      </ToastProvider>
     </div>
   ),
   // ── Page switcher (2L9 Shell/BottomBar 497:99485, menu 558:4419) ──────────

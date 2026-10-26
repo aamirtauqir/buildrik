@@ -11239,7 +11239,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Header, Show filter, search, inline Creating bar and cards differ; code sidebar name list",
+   "verifiedNote": "lead4 2026-10-27 (C-17): Templates is mounted in place as a resource area (FullPageRouter RESOURCE_HOST, like Assets/Settings/Brand) — probe templates-resource-area: tpl-host at x56 y56, 1384×812, between the rail and the bottom bar under the topbar, as the board draws it. The view’s own content (‘‹ Back to canvas’ nav, header, Show filter, cards) is still the old design — lane C’s rework. | Header, Show filter, search, inline Creating bar and cards differ; code sidebar name list",
    "tier": "P2"
   },
   {
@@ -11360,7 +11360,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "lead4 2026-10-27: tpl-replace-confirm re-probed after C-16 (ebb468e88): frame 720×214 at x360 y279 (board 720×211 at y280), title 16/24 — title and placement closed; C-17 mount remains. | probe-compared 2026-10-27 (tpl-replace-confirm): 720 wide, title/body/checkbox/CTA copy = board for a template with its own colours; a template written on Brand tokens says it uses the site's Brand (code: resolveTokens). Open: Modal title 20 vs ≈16 and vertical placement (REQUESTS C-16); Templates as an in-place resource area (REQUESTS C-17).",
+   "verifiedNote": "lead4 2026-10-27 (C-17): the Templates mount is in place now (tpl-host 56/56 1384×812); nav/header/cards remain lane C. | lead4 2026-10-27: tpl-replace-confirm re-probed after C-16 (ebb468e88): frame 720×214 at x360 y279 (board 720×211 at y280), title 16/24 — title and placement closed; C-17 mount remains. | probe-compared 2026-10-27 (tpl-replace-confirm): 720 wide, title/body/checkbox/CTA copy = board for a template with its own colours; a template written on Brand tokens says it uses the site's Brand (code: resolveTokens). Open: Modal title 20 vs ≈16 and vertical placement (REQUESTS C-16); Templates as an in-place resource area (REQUESTS C-17).",
    "tier": "P2"
   },
   {

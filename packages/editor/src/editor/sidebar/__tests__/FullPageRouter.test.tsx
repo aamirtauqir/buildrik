@@ -60,13 +60,14 @@ describe("FullPageRouter", () => {
     expect(await screen.findByTestId("fp-settings")).toHaveAttribute("data-design", "wired");
   });
 
-  /* design-2l9 C-10 / D-10 / E-10: Assets, Brand and Site settings are a
+  /* design-2l9 C-10 / D-10 / E-10 / C-17: Templates, Assets, Brand and Site settings are a
      resource area — they render where the router is mounted (LayoutShell's
      fullpage slot, beside the rail, between the topbar and the bottom bar),
      not into a full-viewport portal that covered the shell. */
   /* data-bk-surface="fullpage" is CommandCenter's keyboard guard: Assets and
      Settings own the keys; Brand must let ⌘Z reach the composer. */
   it.each([
+    ["templates", "tpl-host", "fp-templates", "fullpage"],
     ["assets", "mgr-host", "fp-library", "fullpage"],
     ["settings", "set-host", "fp-settings", "fullpage"],
     ["design", "brand-host", "fp-brand", null],
@@ -77,12 +78,6 @@ describe("FullPageRouter", () => {
     expect(host.getAttribute("data-bk-surface")).toBe(surface);
     expect(host.className).not.toContain("tw:fixed");
     expect(await screen.findByTestId(bodyId)).toBeInTheDocument();
-  });
-
-  it("Templates stays an edge-to-edge portal", async () => {
-    const { container } = renderRouter("templates");
-    const host = await screen.findByTestId("tpl-host");
-    expect(container.contains(host)).toBe(false);
   });
 });
 
