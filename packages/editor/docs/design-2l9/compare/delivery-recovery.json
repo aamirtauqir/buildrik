@@ -1,0 +1,142 @@
+{
+  "277:345909": {
+    "result": "drift",
+    "note": "Filter change applies at once and clears the selection; the board's 'Filter submissions' confirm (Cancel · All forms · Contact) is not built.",
+    "liveShot": "packages/editor/docs/design-2l9/compare/delivery-recovery/277-345909.png"
+  },
+  "277:346467": {
+    "result": "drift",
+    "note": "'CSV ready' layout matches; body says 'Your selection and filters are unchanged.' (board: 'Your filters and selection are kept.'); Back to submissions is outline, board primary.",
+    "liveShot": "packages/editor/docs/design-2l9/compare/delivery-recovery/277-346467.png"
+  },
+  "277:336979": {
+    "result": "drift",
+    "note": "Spam tab, filter, Export/'Choose a form to configure' agree; helper 'Select a single form…' sits above the list (y=255), board puts it under 'Showing…'. Spam empty (data).",
+    "liveShot": "packages/editor/docs/design-2l9/compare/delivery-recovery/277-336979.png"
+  },
+  "278:61847": {
+    "result": "drift",
+    "note": "Save and leave lands on Overview, no footer (as designed); Overview content is a 6-card group grid (325–1416px), not the board's Pro-trial card + Site rows.",
+    "liveShot": "packages/editor/docs/design-2l9/compare/delivery-recovery/278-61847.png"
+  },
+  "277:347031": {
+    "result": "drift",
+    "note": "Configure selects the Form and opens Content/Fields, but no '‹ Back to submissions · Form / Inbox' strip above the canvas.",
+    "liveShot": "packages/editor/docs/design-2l9/compare/delivery-recovery/277-347031.png"
+  },
+  "272:24319": {
+    "result": "drift",
+    "note": "Copy matches ('Your selection and filters are unchanged.'; fixture line rightly absent); 'Back to submissions' is an outline button, board primary blue.",
+    "liveShot": "packages/editor/docs/design-2l9/compare/delivery-recovery/277-346467.png"
+  },
+  "277:347389": {
+    "result": "drift",
+    "note": "Title and body match; action reads 'Delete 2 permanently' in red destructive, board 'Delete permanently' in primary blue.",
+    "liveShot": "packages/editor/docs/design-2l9/compare/delivery-recovery/277-347389.png"
+  },
+  "272:27440": {
+    "result": "drift",
+    "note": "Ack copy matches ('1 submission moved from Spam to Inbox.') but drawn as a bordered green banner 1091x40, board a plain green text line.",
+    "liveShot": "packages/editor/docs/design-2l9/compare/delivery-recovery/272-27440.png"
+  },
+  "233:10827": {
+    "result": "unreachable-live",
+    "note": "Publishing flag is on in this build, and the tray opens only via Publish (not clicked: QA workspace deploys for real).",
+    "liveShot": ""
+  },
+  "233:11377": {
+    "result": "unreachable-live",
+    "note": "Offline publish tray opens only via Publish; not clicked (QA workspace deploys for real).",
+    "liveShot": ""
+  },
+  "238:9980": {
+    "result": "drift",
+    "note": "Overview = 6 group cards in a 2-col grid; board's Pro-trial card and Live at/Languages/Search rows not built. Nav adds 'Brand ↗' and Pro/Free badges.",
+    "liveShot": "packages/editor/docs/design-2l9/compare/delivery-recovery/238-9980.png"
+  },
+  "238:11192": {
+    "result": "drift",
+    "note": "Offline footer red 'Needs a connection · changes stay here, unsaved' (board black, em-dash copy); extra 'You're offline…' banner + global offline bar; Author not Tagline.",
+    "liveShot": "packages/editor/docs/design-2l9/compare/delivery-recovery/238-11192.png"
+  },
+  "238:13898": {
+    "result": "drift",
+    "note": "Uses GAP-FM07 copy ('…will be removed from … This cannot be undone.', 'Delete 2 permanently'); S14 draws 'Submissions can't be restored…' + ghost red 'Delete'.",
+    "liveShot": "packages/editor/docs/design-2l9/compare/delivery-recovery/277-347389.png"
+  },
+  "238:15344": {
+    "result": "unreachable-live",
+    "note": "Needs an Editor-role account; the QA user is Owner on this site.",
+    "liveShot": ""
+  },
+  "245:45416": {
+    "result": "drift",
+    "note": "During Verify the button reads 'Checking…' but the status word stays 'Not verified'; board shows 'Checking status…' as the status line.",
+    "liveShot": "packages/editor/docs/design-2l9/compare/delivery-recovery/245-45416.png"
+  },
+  "245:45673": {
+    "result": "drift",
+    "note": "'Waiting for data' + 'Measurement ID verified on …' inline like the board, but Verify also opens a 'Format OK · no events yet' modal the board does not draw.",
+    "liveShot": "packages/editor/docs/design-2l9/compare/delivery-recovery/245-45673.png"
+  },
+  "245:45931": {
+    "result": "unreachable-live",
+    "note": "'Receiving data' needs real tracker events for this site; none exist.",
+    "liveShot": ""
+  },
+  "245:46449": {
+    "result": "drift",
+    "note": "'Couldn't check status' + retry sentence, values kept: matches; error sentence is grey under the status word, board draws it red below the tracker note.",
+    "liveShot": "packages/editor/docs/design-2l9/compare/delivery-recovery/245-46449.png"
+  },
+  "10:2199": {
+    "result": "drift",
+    "note": "Strip 'Couldn't save s0-qa site · Home. Your changes are kept.' + Retry + Keep editing, plus a 'Save failed' toast and a 'Reconnecting…' bar at once. Board: one strip.",
+    "liveShot": "packages/editor/docs/design-2l9/compare/delivery-recovery/10-2199.png"
+  },
+  "10:3787": {
+    "result": "drift",
+    "note": "At 1280x720 selection opens the Inspector floating over the canvas; board keeps it closed behind an 'Inspector' button. Insert strip OK; add receipt not built.",
+    "liveShot": "packages/editor/docs/design-2l9/compare/delivery-recovery/10-3787.png"
+  },
+  "225:2821": {
+    "result": "drift",
+    "note": "Copy + Download local copy/Retry match; banner sits above the topbar (y=0–54, board under it), adds Copy details and ×; canvas empty, not the read-only site.",
+    "liveShot": "packages/editor/docs/design-2l9/compare/delivery-recovery/225-2821.png"
+  },
+  "225:3353": {
+    "result": "drift",
+    "note": "Title, body ('Your 1 change is kept in this tab and in this browser') and buttons match; the save-failed strip renders above the scrim, undimmed.",
+    "liveShot": "packages/editor/docs/design-2l9/compare/delivery-recovery/225-3353.png"
+  },
+  "225:3888": {
+    "result": "drift",
+    "note": "Copy and Sign in ↗ match, but the banner spans the window above the topbar (y=0–56) and the 'Couldn't save… Retry · Keep editing' strip shows too.",
+    "liveShot": "packages/editor/docs/design-2l9/compare/delivery-recovery/225-3888.png"
+  },
+  "225:4416": {
+    "result": "match",
+    "note": "Toast 'Signed in again — 1 change saved' at the canvas bottom (664–1123px), banner cleared; matches the board.",
+    "liveShot": "packages/editor/docs/design-2l9/compare/delivery-recovery/225-4416.png"
+  },
+  "225:4941": {
+    "result": "unreachable-live",
+    "note": "Not built (REQUESTS F-22); no code path detects a different signed-in account.",
+    "liveShot": ""
+  },
+  "225:5474": {
+    "result": "drift",
+    "note": "Kept work after a failed save + reload shows the old toast 'Some work never reached the server… Restore my edits', not the board's banner with Discard… · Restore.",
+    "liveShot": "packages/editor/docs/design-2l9/compare/delivery-recovery/225-5474.png"
+  },
+  "225:6003": {
+    "result": "drift",
+    "note": "Kept copy older than the server: the same toast still offers 'Restore my edits'; board says someone saved after and offers Download my copy only.",
+    "liveShot": "packages/editor/docs/design-2l9/compare/delivery-recovery/225-6003.png"
+  },
+  "225:6532": {
+    "result": "drift",
+    "note": "Server version check blocked: the same 'Restore my edits' toast; board says it can't be restored safely and offers Download my copy.",
+    "liveShot": "packages/editor/docs/design-2l9/compare/delivery-recovery/225-6532.png"
+  }
+}

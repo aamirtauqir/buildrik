@@ -1,0 +1,132 @@
+{
+ "7:18654": {
+  "result": "drift",
+  "note": "Canvas bar at bottom y823 (board top y56-98), no device toggles; bottom bar lacks 'Saved · Details'. Container Content: Tag/ID only, no 'Container content' note or 'N child elements'.",
+  "liveShot": "packages/editor/docs/design-2l9/compare/editor-inspector/container-contenttab.png"
+ },
+ "67:11915": {
+  "result": "drift",
+  "note": "Text Style tab: no Placement section; Typography adds Text style/Applied stack, Weight+Line height stacked not 2-col, Align as words; Spacing open box-model vs '2 set' row.",
+  "liveShot": "packages/editor/docs/design-2l9/compare/editor-inspector/text-style.png"
+ },
+ "145:72343": {
+  "result": "drift",
+  "note": "Text Content: board textarea + B I U link + 'Changes save automatically.'; live 'Edit text on canvas' + one-line value with bind icon; no Editing state row; ID empty placeholder.",
+  "liveShot": "packages/editor/docs/design-2l9/compare/editor-inspector/text-content.png"
+ },
+ "147:75914": {
+  "result": "drift",
+  "note": "Footer copy matches ('575 layers · 1 selected') but adds 'Select' + info icon; no 'View' button beside search; no page-root 'Home' row with ⋯.",
+  "liveShot": "packages/editor/docs/design-2l9/compare/editor-inspector/text-content.png"
+ },
+ "147:76329": {
+  "result": "drift",
+  "note": "Popover lists same 5 toggles + footnote, but title 'Display' (board 'Layer display'), no Close button; opened via ⋯ › Display settings… not header 'View'.",
+  "liveShot": "packages/editor/docs/design-2l9/compare/editor-inspector/layers-display.png"
+ },
+ "147:77189": {
+  "result": "drift",
+  "note": "Footer '575 layers · 11 matches' ok. Parent shown right-aligned one word ('Container') not path line under name; no '{n} matches in {N} layers' head, no end 'Clear search'.",
+  "liveShot": "packages/editor/docs/design-2l9/compare/editor-inspector/layers-search.png"
+ },
+ "63:6393": {
+  "result": "drift",
+  "note": "Rows lack path line (/, /about) and 'Current' tag; legend pinned to panel bottom (board under list); footer one row '+ Add page · From template · ⋯' vs full-width button + 2nd row.",
+  "liveShot": "packages/editor/docs/design-2l9/compare/editor-inspector/pages.png"
+ },
+ "63:13820": {
+  "result": "drift",
+  "note": "Menu 278 wide anchored at row (board 280) ok; adds 'Move to folder…', shortcuts and a disabled-reason line; 'Page settings' lacks '›'.",
+  "liveShot": "packages/editor/docs/design-2l9/compare/editor-inspector/page-actions.png"
+ },
+ "63:15939": {
+  "result": "drift",
+  "note": "Modal 560×520 vs board 720×700; field order differs: URL slug first, Google preview last (board: preview + score first, then title, description, URL); SEO tab shows score badge.",
+  "liveShot": "packages/editor/docs/design-2l9/compare/editor-inspector/page-settings.png"
+ },
+ "101:29978": {
+  "result": "drift",
+  "note": "Same 640 width, copy and '2 of 10 pages on Free' ok; no '{Site} · Create a page' subtitle; source as two 124px cards (board segmented pill), nav as toggle not checkbox.",
+  "liveShot": "packages/editor/docs/design-2l9/compare/editor-inspector/new-page-template.png"
+ },
+ "558:448976": {
+  "result": "drift",
+  "note": "260 wide ok; adds search field, 'Add page' row and ✓ on current; paths inline after name (board right-aligned); 'Manage pages ›' dark not blue; header no '+ N template'.",
+  "liveShot": "packages/editor/docs/design-2l9/compare/editor-inspector/page-switcher.png"
+ },
+ "145:65011": {
+  "result": "drift",
+  "note": "Centered 480px modal (board: popover under View, ~360 wide, top-right of canvas, 'Close' link). Size input inline with presets (board own row). Copy matches.",
+  "liveShot": "packages/editor/docs/design-2l9/compare/editor-inspector/grid-dialog.png"
+ },
+ "156:716": {
+  "result": "drift",
+  "note": "Field rows one line 'name · Type' + drag/›/⋯ (board 2-line name/summary); '+ Add field' right link (board full-width button); Semantics expanded, no Conditions row; no breadcrumb line.",
+  "liveShot": "packages/editor/docs/design-2l9/compare/editor-inspector/form-content.png"
+ },
+ "161:13919": {
+  "result": "drift",
+  "note": "Copy/order ok; no '… › Hero › Text' breadcrumb; device checkboxes in one row (board stacked); no 'Data conditions' note; '+ Add interaction' right link not full-width button; extra CSS classes.",
+  "liveShot": "packages/editor/docs/design-2l9/compare/editor-inspector/text-behavior.png"
+ },
+ "156:1316": {
+  "result": "drift",
+  "note": "Drill-in keeps form selected (header 'Form', board 'Email'); '‹ Form' left not centered; 'FIELD' uppercase; no Validation row; Semantics shows form's. Radio field used (no email field on QA site).",
+  "liveShot": "packages/editor/docs/design-2l9/compare/editor-inspector/form-field-drill.png"
+ },
+ "156:6055": {
+  "result": "drift",
+  "note": "Sections/copy match; headings 'NOTIFICATIONS' etc uppercase and cramped; header 'Behavior · Form' (board 'Form settings · This form'); Visibility/Interactions expanded (board collapsed rows).",
+  "liveShot": "packages/editor/docs/design-2l9/compare/editor-inspector/form-behavior.png"
+ },
+ "161:14772": {
+  "result": "drift",
+  "note": "Back link, title and 7 presets in board order match; 'Choose a trigger' / 'Plays when rendered (CSS)' are chevron rows not bordered/centered buttons; extra CSS classes section.",
+  "liveShot": "packages/editor/docs/design-2l9/compare/editor-inspector/ix-presets.png"
+ },
+ "161:15179": {
+  "result": "drift",
+  "note": "No Animate/Repeat/When rows; 40px flowbite fields stacked vs compact label|value rows; duration 0.3 (board 0.6), Easing 'Select...'; no 'Interaction added · Undo' toast; Visibility still shown.",
+  "liveShot": "packages/editor/docs/design-2l9/compare/editor-inspector/ix-detail.png"
+ },
+ "165:17822": {
+  "result": "drift",
+  "note": "Menu has Duplicate/Disable/Delete but no 'Interaction actions' title or 'Close menu'; 218px dropdown under More… (board ~240 card left of inspector over canvas).",
+  "liveShot": "packages/editor/docs/design-2l9/compare/editor-inspector/ix-more.png"
+ },
+ "165:18662": {
+  "result": "drift",
+  "note": "List returns to 'No interactions yet.' correctly, but no 'Interaction deleted · Undo' toast (readToasts empty).",
+  "liveShot": "packages/editor/docs/design-2l9/compare/editor-inspector/ix-deleted.png"
+ },
+ "302:12190": {
+  "result": "drift",
+  "note": "Opened via 'Bind text…' on a static page (no template page on QA site, so no 'This page's record'). Popover inside inspector, no ×; Site/Page tagged 'Planned' (board selectable).",
+  "liveShot": "packages/editor/docs/design-2l9/compare/editor-inspector/choose-source.png"
+ },
+ "302:13946": {
+  "result": "drift",
+  "note": "No live screenshot (overwritten when the Blog collection vanished). DOM read: binding shows inline (chip 'Blog.title', 'Dynamic bindings · 1 binding', 'Blog · title') — no binding detail screen.",
+  "liveShot": ""
+ },
+ "302:15235": {
+  "result": "drift",
+  "note": "Dialog 560 (board 640); body 'X has unsaved record edits.' not 'Your destination is …'; primary is Save and leave (board: Keep editing). Sheet: tabs under back link, no preview pane.",
+  "liveShot": "packages/editor/docs/design-2l9/compare/editor-inspector/leave-guard.png"
+ },
+ "302:15605": {
+  "result": "drift",
+  "note": "Pending copy matches ('Saving record…', footer 'Saving…', 'Stay here', disabled 'Saving…'), but header shows it inline before title; sheet lacks preview pane and board's field layout.",
+  "liveShot": "packages/editor/docs/design-2l9/compare/editor-inspector/save-pending.png"
+ },
+ "500:342149": {
+  "result": "match",
+  "note": "Neutral 'Draft' tone measured 44×20, bg #F3F4F6, 12px/500, r4 = board 43×20 #F3F4F6. Success/Warning tones not reachable (only record is Draft).",
+  "liveShot": "packages/editor/docs/design-2l9/compare/editor-inspector/cms-blog.png"
+ },
+ "500:342702": {
+  "result": "drift",
+  "note": "Forced via aborted sites.get. Banner above topbar y0-54 (board below it y56-97) + extra 'Copy details'; canvas/layers empty; inspector only 'View only until the site loads'; status in topbar.",
+  "liveShot": "packages/editor/docs/design-2l9/compare/editor-inspector/load-failed.png"
+ }
+}

@@ -11,7 +11,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-A S3 built, not compared: canvas bar 'Parent / Element' readout left (type + W × H in its tooltip), then '{width} px' (Page width popover), '{zoom}%', 'View' — no carets. Undo left in Phase 1. Copy unit-tested; geometry not compared."
+   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Canvas bar at bottom y823 (board top y56-98), no device toggles; bottom bar lacks 'Saved · Details'. Container Content: Tag/ID only, no 'Container content' note or 'N child elements'. | prior: L-A S3 built, not compared: canvas bar 'Parent / Element' readout left (type + W × H in its tooltip), then '{width} px' (Page width popover), '{zoom}%', 'View' — no carets. Undo left in Phase 1. Copy unit-tested; geometry not compared."
   },
   {
    "nodeId": "7:18981",
@@ -133,7 +133,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-A S5 built, not compared: title 'Pages · {n}', Pages · Listings · Structure tabs under the search, root pages first, 'My folders · Only visible to you' (own tree), 'Collection pages' rows ({name}, '{pattern} · {n} pages', Open page → template page, Manage in CMS → CMS dynamic pages), legend '● marks a page with unsaved changes'. RTL-checked copy; geometry not compared. The '+N from collections ›' footer row is replaced by the block."
+   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Rows lack path line (/, /about) and 'Current' tag; legend pinned to panel bottom (board under list); footer one row '+ Add page · From template · ⋯' vs full-width button + 2nd row. | prior: L-A S5 built, not compared: title 'Pages · {n}', Pages · Listings · Structure tabs under the search, root pages first, 'My folders · Only visible to you' (own tree), 'Collection pages' rows ({name}, '{pattern} · {n} pages', Open page → template page, Manage in CMS → CMS dynamic pages), legend '● mar"
   },
   {
    "nodeId": "63:13820",
@@ -143,7 +143,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-A S6 built; menu widened to the board's 280 after a probe screenshot showed 'Replace layout with template…' wrapping at 224 (probe case pages-context-menu, port 5171, looked at by eye; board geometry not otherwise compared). Row order RTL-tested."
+   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Menu 278 wide anchored at row (board 280) ok; adds 'Move to folder…', shortcuts and a disabled-reason line; 'Page settings' lacks '›'. | prior: L-A S6 built; menu widened to the board's 280 after a probe screenshot showed 'Replace layout with template…' wrapping at 224 (probe case pages-context-menu, port 5171, looked at by eye; board geometry not otherwise compared). Row order RTL-tested."
   },
   {
    "nodeId": "63:14567",
@@ -173,7 +173,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-A S9 built, not compared: title '{Page} · Page settings', subtitle 'Editing {Page} · {Active} stays open on the canvas', foot Cancel · Save, override note 'These overrides affect this page only. Clear the title to use site defaults.'. Container stays the drawer (blocked:owner-page-settings-container); SEO 'Write with AI' waits on PR #33."
+   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Modal 560×520 vs board 720×700; field order differs: URL slug first, Google preview last (board: preview + score first, then title, description, URL); SEO tab shows score badge. | prior: L-A S9 built, not compared: title '{Page} · Page settings', subtitle 'Editing {Page} · {Active} stays open on the canvas', foot Cancel · Save, override note 'These overrides affect this page only. Clear the title to use site defaults.'. Container stays the drawer (blocked:owner-page-settings-contain"
   },
   {
    "nodeId": "63:16507",
@@ -374,7 +374,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Inherits the base canvas bar (7:18654), rebuilt by L-A S3; not compared."
+   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Text Style tab: no Placement section; Typography adds Text style/Applied stack, Weight+Line height stacked not 2-col, Align as words; Spacing open box-model vs '2 set' row. | prior: Inherits the base canvas bar (7:18654), rebuilt by L-A S3; not compared."
   },
   {
    "nodeId": "67:12583",
@@ -677,7 +677,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-A wave 2 built, not compared: capacity line '{n} of {limit} pages on {Plan}' (billing.pagesPerSite added to siteDetail.settingsOverview through the full chain — shared schema, site-detail.service, test; the same limit saveProjectData enforces), From template note 'Choose a page template before creating the page.' with primary 'Choose template'. Still open: '{Site} · Create a page' subtitle, source as a select."
+   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Same 640 width, copy and '2 of 10 pages on Free' ok; no '{Site} · Create a page' subtitle; source as two 124px cards (board segmented pill), nav as toggle not checkbox. | prior: L-A wave 2 built, not compared: capacity line '{n} of {limit} pages on {Plan}' (billing.pagesPerSite added to siteDetail.settingsOverview through the full chain — shared schema, site-detail.service, test; the same limit saveProjectData enforces), From template note 'Choose a page template before cre"
   },
   {
    "nodeId": "101:36828",
@@ -1958,7 +1958,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-A S4 built, not compared: 'Grid and snapping' dialog — footnote, 'Show grid and snap' switch (grid overlay drives snap in Canvas.tsx), Grid size + 4/8/16 px, 'Whole number · 1–100 px', Cancel/Apply; draft until Apply."
+   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Centered 480px modal (board: popover under View, ~360 wide, top-right of canvas, 'Close' link). Size input inline with presets (board own row). Copy matches. | prior: L-A S4 built, not compared: 'Grid and snapping' dialog — footnote, 'Show grid and snap' switch (grid overlay drives snap in Canvas.tsx), Grid size + 4/8/16 px, 'Whole number · 1–100 px', Cancel/Apply; draft until Apply."
   },
   {
    "nodeId": "145:65448",
@@ -2126,7 +2126,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Inherits the base canvas bar (7:18654), rebuilt by L-A S3; not compared."
+   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Text Content: board textarea + B I U link + 'Changes save automatically.'; live 'Edit text on canvas' + one-line value with bind icon; no Editing state row; ID empty placeholder. | prior: Inherits the base canvas bar (7:18654), rebuilt by L-A S3; not compared."
   },
   {
    "nodeId": "145:72772",
@@ -2527,7 +2527,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-A S2 built, not compared: footer '{N} layers · {K} selected' (layersFooterText, unit-tested against the board copy). Geometry not compared."
+   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Footer copy matches ('575 layers · 1 selected') but adds 'Select' + info icon; no 'View' button beside search; no page-root 'Home' row with ⋯. | prior: L-A S2 built, not compared: footer '{N} layers · {K} selected' (layersFooterText, unit-tested against the board copy). Geometry not compared."
   },
   {
    "nodeId": "147:76329",
@@ -2537,7 +2537,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-A S2 built, not compared: footnote 'Personal editor view. Live-site visibility is edited in the Inspector.' under the five toggles. The board opens it from a header 'View' control; the code keeps ⋯ › Display settings… (not moved)."
+   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Popover lists same 5 toggles + footnote, but title 'Display' (board 'Layer display'), no Close button; opened via ⋯ › Display settings… not header 'View'. | prior: L-A S2 built, not compared: footnote 'Personal editor view. Live-site visibility is edited in the Inspector.' under the five toggles. The board opens it from a header 'View' control; the code keeps ⋯ › Display settings… (not moved)."
   },
   {
    "nodeId": "147:76773",
@@ -2557,7 +2557,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-A wave 2 built, not compared: flat search results carry their ancestors ('Services › Card 1') after the name; footer '5,000 layers · 12 matches'. The board's list-head '12 matches in 5,000 layers' line and end-of-list Clear search are not drawn (Clear search sits in the field)."
+   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Footer '575 layers · 11 matches' ok. Parent shown right-aligned one word ('Container') not path line under name; no '{n} matches in {N} layers' head, no end 'Clear search'. | prior: L-A wave 2 built, not compared: flat search results carry their ancestors ('Services › Card 1') after the name; footer '5,000 layers · 12 matches'. The board's list-head '12 matches in 5,000 layers' line and end-of-list Clear search are not drawn (Clear search sits in the field)."
   },
   {
    "nodeId": "147:77668",
@@ -3765,8 +3765,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "phase1 (Task 1.3): Shell/PageSwitcherMenu not built; PageTabBar tabs today. ⌘P copy → code:shortcut-cmd-p-is-preview"
+   "verified": "drift-open",
+   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — 260 wide ok; adds search field, 'Add page' row and ✓ on current; paths inline after name (board right-aligned); 'Manage pages ›' dark not blue; header no '+ N template'. | prior: phase1 (Task 1.3): Shell/PageSwitcherMenu not built; PageTabBar tabs today. ⌘P copy → code:shortcut-cmd-p-is-preview"
   },
   {
    "nodeId": "558:449032",
@@ -3818,7 +3818,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Lane L-B A1+A5 (built; copy checked against the dump, no board image): Fields on Content; each field row has a ⋯ menu (Move up / Move down / Delete — the field moves and goes with its label wrapper) and the list ends with '+ Add field' and 'Drag to reorder, or use a field’s menu.'. Open: row layout (name / ⋯ / summary) not compared visually, the submit button listed as 'Submit button', Semantics 'Form' tag (A2 shows it), Conditions (REQUESTS #11)."
+   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Field rows one line 'name · Type' + drag/›/⋯ (board 2-line name/summary); '+ Add field' right link (board full-width button); Semantics expanded, no Conditions row; no breadcrumb line. | prior: Lane L-B A1+A5 (built; copy checked against the dump, no board image): Fields on Content; each field row has a ⋯ menu (Move up / Move down / Delete — the field moves and goes with its label wrapper) and the list ends with '+ Add field' and 'Drag to reorder, or use a field’s menu.'. Open: row layout "
   },
   {
    "nodeId": "156:1316",
@@ -3828,7 +3828,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Lane L-B A3 (built, not compared — no board image in the dump; copy and row order checked against the dump text): drill-in reads '‹ {form}' · Field · Type · Label · Placeholder · Name + 'Name is the key stored with each submission.' · Required · Default value · Validation (min/max length or min/max). Label edits the field's <label> (for= or preceding sibling) else aria-label — never placeholder (bug at FormFieldsSection.tsx:172 fixed). Open: More settings, Conditions (REQUESTS #11), Advanced attributes for the field."
+   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Drill-in keeps form selected (header 'Form', board 'Email'); '‹ Form' left not centered; 'FIELD' uppercase; no Validation row; Semantics shows form's. Radio field used (no email field on QA site). | prior: Lane L-B A3 (built, not compared — no board image in the dump; copy and row order checked against the dump text): drill-in reads '‹ {form}' · Field · Type · Label · Placeholder · Name + 'Name is the key stored with each submission.' · Required · Default value · Validation (min/max length or min/max)"
   },
   {
    "nodeId": "156:1911",
@@ -3911,7 +3911,7 @@
    "status": "active",
    "authority": "code:after-submit-live-on-save",
    "verified": "drift-open",
-   "verifiedNote": "Lane L-B A6 (built; copy checked against the dump, no board image): After submit · Then · Message · Notifications › Send to · Spam protection 'Applies on next publish' › 'Block automated submissions' · Form settings status 'Saved' · 'Saved separately from page edits; outside document Undo.'. The board's 'Applies on next publish' tag on After submit is NOT drawn: the public form route reads action/message/redirect from the server row at submit time, so they apply on save (code wins). 'This form starts collecting submissions after you publish.' not drawn (cannot tell published state). Header 'Form settings · This form' is REQUESTS #10's."
+   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Sections/copy match; headings 'NOTIFICATIONS' etc uppercase and cramped; header 'Behavior · Form' (board 'Form settings · This form'); Visibility/Interactions expanded (board collapsed rows). | prior: Lane L-B A6 (built; copy checked against the dump, no board image): After submit · Then · Message · Notifications › Send to · Spam protection 'Applies on next publish' › 'Block automated submissions' · Form settings status 'Saved' · 'Saved separately from page edits; outside document Undo.'. The boa"
   },
   {
    "nodeId": "156:6643",
@@ -4461,7 +4461,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Lane L-B A1+A7 (built; copy and order checked against the dump, no board image): Behavior tab · Visibility 'Show on these devices' Desktop/Tablet/Mobile · Interactions 'Plays on all breakpoints' · '+ Add interaction' · 'No interactions yet.'. Not drawn: 'Data conditions: Content › Conditions — both must pass.' (no conditions — REQUESTS #11). Header 'Behavior · Text' is REQUESTS #10's."
+   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Copy/order ok; no '… › Hero › Text' breadcrumb; device checkboxes in one row (board stacked); no 'Data conditions' note; '+ Add interaction' right link not full-width button; extra CSS classes. | prior: Lane L-B A1+A7 (built; copy and order checked against the dump, no board image): Behavior tab · Visibility 'Show on these devices' Desktop/Tablet/Mobile · Interactions 'Plays on all breakpoints' · '+ Add interaction' · 'No interactions yet.'. Not drawn: 'Data conditions: Content › Conditions — both "
   },
   {
    "nodeId": "161:14383",
@@ -4481,7 +4481,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Lane L-B A7b (built, not compared — copy checked against the dump): '+ Add interaction' opens a screen replacing the list — '‹ Back to Interactions', 'Add interaction', the seven presets in board order (each = trigger + animation preset of the existing model), 'Choose a trigger ›' (all triggers, grouped), 'Plays when rendered (CSS) ›' (the element's CSS entrance animation). Not drawn: Visibility above it (the section only owns Interactions)."
+   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Back link, title and 7 presets in board order match; 'Choose a trigger' / 'Plays when rendered (CSS)' are chevron rows not bordered/centered buttons; extra CSS classes section. | prior: Lane L-B A7b (built, not compared — copy checked against the dump): '+ Add interaction' opens a screen replacing the list — '‹ Back to Interactions', 'Add interaction', the seven presets in board order (each = trigger + animation preset of the existing model), 'Choose a trigger ›' (all triggers, gro"
   },
   {
    "nodeId": "161:15179",
@@ -4491,7 +4491,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Lane L-B A7c (built, not compared — copy checked against the dump): '‹ Back to Interactions', 'Play', 'More…', Trigger, Effect, Duration, Delay, Easing, 'Plays on all breakpoints'. Open: Animate (target), Repeat, When rows (the model's loop/target semantics are not surfaced yet), 'Interaction added · Undo' receipt."
+   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — No Animate/Repeat/When rows; 40px flowbite fields stacked vs compact label|value rows; duration 0.3 (board 0.6), Easing 'Select...'; no 'Interaction added · Undo' toast; Visibility still shown. | prior: Lane L-B A7c (built, not compared — copy checked against the dump): '‹ Back to Interactions', 'Play', 'More…', Trigger, Effect, Duration, Delay, Easing, 'Plays on all breakpoints'. Open: Animate (target), Repeat, When rows (the model's loop/target semantics are not surfaced yet), 'Interaction added "
   },
   {
    "nodeId": "161:15688",
@@ -4552,7 +4552,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Lane L-B A7c (built, not compared): More… opens 'Interaction actions' — Duplicate (copy after the original, opened), Disable / Enable, Delete."
+   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Menu has Duplicate/Disable/Delete but no 'Interaction actions' title or 'Close menu'; 218px dropdown under More… (board ~240 card left of inspector over canvas). | prior: Lane L-B A7c (built, not compared): More… opens 'Interaction actions' — Duplicate (copy after the original, opened), Disable / Enable, Delete."
   },
   {
    "nodeId": "165:18272",
@@ -4572,7 +4572,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Lane L-B A7 (built, not compared): after deleting the last interaction the list reads 'No interactions yet.'. Open: 'Interaction deleted · Undo' receipt (needs a toast route that works without a provider in the section's tests — A7b)."
+   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — List returns to 'No interactions yet.' correctly, but no 'Interaction deleted · Undo' toast (readToasts empty). | prior: Lane L-B A7 (built, not compared): after deleting the last interaction the list reads 'No interactions yet.'. Open: 'Interaction deleted · Undo' receipt (needs a toast route that works without a provider in the section's tests — A7b)."
   },
   {
    "nodeId": "165:19056",
@@ -6974,7 +6974,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "drift-open — L-C C3 built the four named tabs (Records · Fields · Dynamic pages · Collection settings); status filter, sort menu, Columns and pagination still missing. Not compared."
+   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — Tabs+search+Title/Status/Updated table built; no status filter, sort, Columns, pagination; no Author col. Excerpt cell overflows into Updated (\"helps |Just now\"). RecordsTable key warning. | prior: drift-open — L-C C3 built the four named tabs (Records · Fields · Dynamic pages · Collection settings); status filter, sort menu, Columns and pagination still missing. Not compared."
   },
   {
    "nodeId": "165:520",
@@ -6984,7 +6984,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C C3: sheet back \"‹ {name} records\" and four tabs incl. Collection settings; always-on Preview (unsaved) pane still a toggle (open)."
+   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — Record opens as full sheet; back link ABOVE tabs (board: tabs then back+title row); no Preview (unsaved) pane (only 'Preview ▸' toggle); labels raw keys; Save 98x28 vs board 160x32. | prior: built, not compared — L-C C3: sheet back \"‹ {name} records\" and four tabs incl. Collection settings; always-on Preview (unsaved) pane still a toggle (open)."
   },
   {
    "nodeId": "165:797",
@@ -6994,7 +6994,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C C1: Save button and footer read \"Saving…\" while a save runs (RecordSheet.tsx)."
+   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — Footer + button read 'Saving...' as board, but Cancel is disabled while saving (board: enabled); no preview pane; sheet header 'New Blog ×' not on board. | prior: built, not compared — L-C C1: Save button and footer read \"Saving…\" while a save runs (RecordSheet.tsx)."
   },
   {
    "nodeId": "165:1072",
@@ -7004,7 +7004,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C C5: banner \"Couldn’t save\" + \"Your edits are still here. Retry when you’re ready.\"; footer/button follow Play F2.17 (\"Couldn’t save · your draft is kept\", Retry save) where the two boards disagree (board: \"Retry\")."
+   "verifiedNote": "Compared live 2026-10-26 (cms-brand): unreachable live — 'Couldn’t save' banner only fires on a local-write exception (RecordSheet save catch). A forced server 500 on cms.entries.upsert is queued and shows the OFFLINE copy instead. | prior: built, not compared — L-C C5: banner \"Couldn’t save\" + \"Your edits are still here. Retry when you’re ready.\"; footer/button follow Play F2.17 (\"Couldn’t save · your draft is kept\", Retry save) where the two boards disagree (board: \"Retry\")."
   },
   {
    "nodeId": "165:1350",
@@ -7025,7 +7025,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C C5: queued save shows banner \"You’re offline\" + \"Your edits are not saved to the server. Keep this tab open.\"; button stays Save record."
+   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — Banner copy matches, Save disabled matches. Banner sits above back link/tabs (y=109) instead of above fields; footer 'Not saved to the server yet' (red) vs board 'Offline · Not saved'. | prior: built, not compared — L-C C5: queued save shows banner \"You’re offline\" + \"Your edits are not saved to the server. Keep this tab open.\"; button stays Save record."
   },
   {
    "nodeId": "165:1903",
@@ -7045,7 +7045,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C C1: \"Leave without saving?\" names the record / destination tab or collection; Keep editing · Discard changes · Save and leave (RecordSheet.tsx). Origin label (\"Your destination is …\") waits on C2."
+   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — Copy + 3 buttons match. Emphasis inverted: live primary=Save and leave, board primary=Keep editing. Dialog 560w at y=369 vs board 480w at y≈280. | prior: built, not compared — L-C C1: \"Leave without saving?\" names the record / destination tab or collection; Keep editing · Discard changes · Save and leave (RecordSheet.tsx). Origin label (\"Your destination is …\") waits on C2."
   },
   {
    "nodeId": "165:2414",
@@ -7075,7 +7075,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "drift-open — L-C D2: field inspector gains Default value, Placeholder, Help text; Key/type lock kept; \"Show N usages\" link and explicit Save field (code commits on blur, authority to decide) not built. Not compared."
+   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — Locked state unreachable (no bound field). Field inspector: inline left labels vs stacked; no Key column in table; Required as Yes/No pills vs checkbox; no 'Show N usages' or Save field. | prior: drift-open — L-C D2: field inspector gains Default value, Placeholder, Help text; Key/type lock kept; \"Show N usages\" link and explicit Save field (code commits on blur, authority to decide) not built. Not compared."
   },
   {
    "nodeId": "165:3173",
@@ -7596,7 +7596,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C C1: \"Leave without saving?\" names the record / destination tab or collection; Keep editing · Discard changes · Save and leave (RecordSheet.tsx). Origin label (\"Your destination is …\") waits on C2."
+   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — Copy matches board exactly. Same emphasis inversion as 165:2184 (Save and leave primary, Keep editing outlined); dialog 560w vs 480w. | prior: built, not compared — L-C C1: \"Leave without saving?\" names the record / destination tab or collection; Keep editing · Discard changes · Save and leave (RecordSheet.tsx). Origin label (\"Your destination is …\") waits on C2."
   },
   {
    "nodeId": "168:21620",
@@ -7605,8 +7605,8 @@
    "family": "resources",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "built, not compared — L-C C1: Save and leave shows \"Saving record…\" + Saving… + Stay here; success takes the chosen way out (RecordSheet.tsx)."
+   "verified": "drift-open",
+   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — Footer 'Saving...' + disabled 'Saving...' match, but secondary reads 'Stay here' (board 'Cancel'); header truncates 'Saving record... A clearer ...'. | prior: built, not compared — L-C C1: Save and leave shows \"Saving record…\" + Saving… + Stay here; success takes the chosen way out (RecordSheet.tsx)."
   },
   {
    "nodeId": "168:21848",
@@ -7789,7 +7789,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Lane L-B C-13 (built, not compared): bound — Dynamic bindings heads Content; the property row reads '{Collection} · {field}', the preview value and 'This page’s record · i of N'."
+   "verifiedNote": "Compared live 2026-10-26 (cms-brand): unreachable live — Needs a Blog dynamic template page with a heading bound to Blog.title. QA site has no collection/template; converting a shared QA page was not done (other agents' tabs raised 2 site conflicts). | prior: Lane L-B C-13 (built, not compared): bound — Dynamic bindings heads Content; the property row reads '{Collection} · {field}', the preview value and 'This page’s record · i of N'."
   },
   {
    "nodeId": "173:10329",
@@ -7799,7 +7799,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Lane L-B C-13 (built, not compared): binding subview — see 302:13946."
+   "verifiedNote": "Compared live 2026-10-26 (cms-brand): unreachable live — Binding subview needs a bound heading on a collection template page; same blocker as 173:9757. | prior: Lane L-B C-13 (built, not compared): binding subview — see 302:13946."
   },
   {
    "nodeId": "173:10713",
@@ -7921,7 +7921,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C C2: record/workspace back reads \"‹ {origin}\" from CmsOpenRequest.origin and the guard says \"Your destination is {origin}.\"; live label waits on REQUESTS #11 (L-B passes origin)."
+   "verifiedNote": "Compared live 2026-10-26 (cms-brand): unreachable live — Record opened from a Heading binding ('‹ Heading · Title binding' origin) needs a bound template page; same blocker as 173:9757. | prior: built, not compared — L-C C2: record/workspace back reads \"‹ {origin}\" from CmsOpenRequest.origin and the guard says \"Your destination is {origin}.\"; live label waits on REQUESTS #11 (L-B passes origin)."
   },
   {
    "nodeId": "173:16399",
@@ -9186,7 +9186,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-D S1 shell + W1 body: grouped cards (\"{n} semantic colors\", then other groups), name + \"Edit ›\", \"Light #…     Dark #…\", \"Used by n places · through aliases\"; no auto-opened token. Built, not compared."
+   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — Brand shell differs: back link and title on separate rows; bordered cards, round swatches; preview is a bordered 50%-zoom card, not a full-height grey column; nav Checks has no count. | prior: L-D S1 shell + W1 body: grouped cards (\"{n} semantic colors\", then other groups), name + \"Edit ›\", \"Light #…     Dark #…\", \"Used by n places · through aliases\"; no auto-opened token. Built, not compared."
   },
   {
    "nodeId": "203:34125",
@@ -9196,7 +9196,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-D W1: card opens the token's edit page in place of the list: \"‹ Colors\", reach note \"This changes n places across the site, including uses through aliases.\", then the token controls (light/dark pickers, used by, aliased by, token actions). Labels inside the controls keep \"Light value\"/\"Dark value\"; no \"Dark shade suggestions ▾\" / \"Literal value · no alias\" lines. Built, not compared."
+   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — Edit opens a token card (Change/Set/Used by/View) not board's Light/Dark hex fields + Picker, Used by/Aliased by links, Token actions. Reach note absent (0 uses). | prior: L-D W1: card opens the token's edit page in place of the list: \"‹ Colors\", reach note \"This changes n places across the site, including uses through aliases.\", then the token controls (light/dark pickers, used by, aliased by, token actions). Labels inside the controls keep \"Light value\"/\"Dark value\""
   },
   {
    "nodeId": "203:34679",
@@ -9217,7 +9217,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-D S8: \"Enter a valid hex color, such as #1A56DB. The token hasn’t changed.\" (ColorPicker). Drill-in layout open (B02). Built, not compared."
+   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — Error copy matches exactly. Shown in a picker popover (not inline field); popover bottom 891px runs under footer (868), Cancel/Apply half-hidden. | prior: L-D S8: \"Enter a valid hex color, such as #1A56DB. The token hasn’t changed.\" (ColorPicker). Drill-in layout open (B02). Built, not compared."
   },
   {
    "nodeId": "203:35106",
@@ -9227,7 +9227,7 @@
    "status": "active",
    "authority": "code:autosave-no-leave-guard",
    "verified": "no",
-   "verifiedNote": "Brand Part 1a spec §4: every Brand edit is a composer write saved by project autosave; leaving Brand is in-app navigation and discards nothing (the board says so). Pending/failed save lives in the bottom-bar status (Phase 1). No guard built."
+   "verifiedNote": "Compared live 2026-10-26 (cms-brand): unreachable live — Authority code:autosave-no-leave-guard: Brand edits autosave, no leave guard is built by decision. | prior: Brand Part 1a spec §4: every Brand edit is a composer write saved by project autosave; leaving Brand is in-app navigation and discards nothing (the board says so). Pending/failed save lives in the bottom-bar status (Phase 1). No guard built."
   },
   {
    "nodeId": "203:35333",
@@ -9248,7 +9248,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-D S6: \"Choose a starting point\" + \"Preview a palette before applying it to your site.\", › rows, \"From logo or URL ›\" last (dsAi only, authority for that row's gate: code:dsai-flag). Built, not compared."
+   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — Heading + strap copy match. Starters are 48px left-aligned rows in one card vs board 32px centered bordered buttons with gaps; 'From logo or URL' hidden (dsAi flag). | prior: L-D S6: \"Choose a starting point\" + \"Preview a palette before applying it to your site.\", › rows, \"From logo or URL ›\" last (dsAi only, authority for that row's gate: code:dsai-flag). Built, not compared."
   },
   {
    "nodeId": "203:36082",
@@ -9257,8 +9257,8 @@
    "family": "brand",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "L-D S6: row opens a preview through the Brand preview layer (no write): name, \"Preview only · Your Brand is unchanged\", \"{n} colors will change. Typography and spacing stay as they are.\", Cancel · Apply starter. \"Previewing {name}\" label over the preview not drawn. Built, not compared."
+   "verified": "drift-open",
+   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — Copy matches (name, 'Preview only · Your Brand is unchanged', N colors line, Cancel · Apply starter). No 'Previewing {name}' label; buttons 66/98w vs board 111/160w. | prior: L-D S6: row opens a preview through the Brand preview layer (no write): name, \"Preview only · Your Brand is unchanged\", \"{n} colors will change. Typography and spacing stay as they are.\", Cancel · Apply starter. \"Previewing {name}\" label over the preview not drawn. Built, not compared."
   },
   {
    "nodeId": "203:36613",
@@ -9267,8 +9267,8 @@
    "family": "brand",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "L-D S6: Apply → \"Preparing…\" + \"Creating “Before {name}” restore point. No Brand changes applied yet.\"; restore reason `starter` added to the shared schema (router test). Built, not compared."
+   "verified": "drift-open",
+   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — 'Preparing…' + restore-point copy match (create held, then aborted; nothing applied). Preparing button 91w vs board 160w; no 'Previewing' label; Brand shell drift. | prior: L-D S6: Apply → \"Preparing…\" + \"Creating “Before {name}” restore point. No Brand changes applied yet.\"; restore reason `starter` added to the shared schema (router test). Built, not compared."
   },
   {
    "nodeId": "203:36801",
@@ -9298,7 +9298,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-D W3: \"Mode · Off\", \"Website appearance\", \"Auto follows the visitor’s device appearance. Editor controls stay light.\", \"Turn on Auto…\"; per-token paired values are ColourModeSection's list below. Built, not compared."
+   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — 'Mode · Off' is a heading not a select; tokens listed as name/'No dark value'/Set rows, not light+dark hex pairs+Picker; 'Turn on Auto…' secondary at top (board primary at bottom); extra cards. | prior: L-D W3: \"Mode · Off\", \"Website appearance\", \"Auto follows the visitor’s device appearance. Editor controls stay light.\", \"Turn on Auto…\"; per-token paired values are ColourModeSection's list below. Built, not compared."
   },
   {
    "nodeId": "203:37790",
@@ -9329,7 +9329,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-D W4: ordinary page (header, strap, preview column) with Import | Export tabs; Import: \"Import tokens\", \"Choose JSON file\", \"Review compatible values and changes before applying.\", Update matching (+ code-ahead Add new only) with \"Matching values update. Tokens absent from the file are kept.\". Built, not compared."
+   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — Import | Export tabs vs one page with both sections; dashed dropzone vs button; Update matching/Add new only buttons vs select; extra 'or paste JSON'. | prior: L-D W4: ordinary page (header, strap, preview column) with Import | Export tabs; Import: \"Import tokens\", \"Choose JSON file\", \"Review compatible values and changes before applying.\", Update matching (+ code-ahead Add new only) with \"Matching values update. Tokens absent from the file are kept.\". Bui"
   },
   {
    "nodeId": "203:38814",
@@ -9429,7 +9429,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-D S1+W8: \"‹ Other kinds\", \"+ Add radius\", rows name · value · \"Used by n\" · ⋯. Rows sit in the token table (header band kept); the side card stays for the selected token (code-ahead: usage list, checks). Built, not compared."
+   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — '+ Add radius' secondary inline with '‹ Other kinds' (board: primary on own row); value plain text not input; header band + swatch col + side token card not on board. | prior: L-D S1+W8: \"‹ Other kinds\", \"+ Add radius\", rows name · value · \"Used by n\" · ⋯. Rows sit in the token table (header band kept); the side card stays for the selected token (code-ahead: usage list, checks). Built, not compared."
   },
   {
    "nodeId": "207:39439",
@@ -9750,7 +9750,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "drift-open — L-C D7: scopes \"This page · N / This site · N / Component library · N\", Search components, Sort (Most used/Name/Newest), \"This site · N\" list with source + uses built in the drawer; full workspace nav, Import package…, Recently deleted, side detail pane and row ⋯ not built. Not compared."
+   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — Reached by inserting Hero Section locally (discarded). Scopes are horizontal tabs in a drawer, not left nav; no thumbs/badges/⋯/side detail/Recently deleted; Sort caret overlaps 'used'. | prior: drift-open — L-C D7: scopes \"This page · N / This site · N / Component library · N\", Search components, Sort (Most used/Name/Newest), \"This site · N\" list with source + uses built in the drawer; full workspace nav, Import package…, Recently deleted, side detail pane and row ⋯ not built. Not compared"
   },
   {
    "nodeId": "215:43978",
@@ -9771,7 +9771,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "drift-open — L-C D7: Component library scope lists shared masters with \"On this site / Not on this site\"; versions and Restricted state not built. Not compared."
+   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — Library scope lists 'Not on this site'/'On this site'. No versions, Restricted row, sort, side detail. With 0 site components the manager shows 'No components yet' and hides library scope. | prior: drift-open — L-C D7: Component library scope lists shared masters with \"On this site / Not on this site\"; versions and Restricted state not built. Not compared."
   },
   {
    "nodeId": "215:44647",
@@ -10103,7 +10103,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "drift-open — L-C D8: the blocked-by-inaccessible-image state is not built: the editor has no per-asset access data to know an image is from a site the person can't open."
+   "verifiedNote": "Compared live 2026-10-26 (cms-brand): unreachable live — Blocked-by-inaccessible-image export state not built (no per-asset access data); rows have no ⋯/Export entry. | prior: drift-open — L-C D8: the blocked-by-inaccessible-image state is not built: the editor has no per-asset access data to know an image is from a site the person can't open."
   },
   {
    "nodeId": "220:42920",
@@ -10133,8 +10133,8 @@
    "family": "components",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "built, not compared — L-C D9: \"Import components\" · steps · \"Add components from a .brcomponent package. Nothing is added until the last step.\" · Choose file · Selected line · limits line; refuses non-packages by name."
+   "verified": "drift-open",
+   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — 3 steps (Choose file › Check › Import) vs board 6; no 'Drop a .brcomponent file here' dropzone or Selected row; dialog 560w centered y=307 vs 720w y≈120. | prior: built, not compared — L-C D9: \"Import components\" · steps · \"Add components from a .brcomponent package. Nothing is added until the last step.\" · Choose file · Selected line · limits line; refuses non-packages by name."
   },
   {
    "nodeId": "220:43877",
@@ -10328,7 +10328,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C C7: \"Couldn’t create the page · Nothing was changed. No empty page was left behind.\" — made true: a failed import now removes the page it made and its nav links (TemplatesTab.tsx)."
+   "verifiedNote": "Compared live 2026-10-26 (cms-brand): unreachable live — CreatePageErrorModal fires only when importHTMLToActivePage throws locally; no network seam to force it. | prior: built, not compared — L-C C7: \"Couldn’t create the page · Nothing was changed. No empty page was left behind.\" — made true: a failed import now removes the page it made and its nav links (TemplatesTab.tsx)."
   },
   {
    "nodeId": "222:47567",
@@ -10348,7 +10348,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C C7: \"Replace {page} with {template}?\", \"{page}’s N elements are removed and replaced. {template} has its own colors and fonts — your Brand is not changed.\" (saved token templates say they take the brand), \"Save a backup first (History › Saves)\", CTA \"Replace {page}\"."
+   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — Title/checkbox/CTA match. Copy 'takes this site’s brand colors and fonts' vs board 'has its own colors and fonts' (header says 'Own colours'). Full-screen takeover, no shell/backup banner; 560 vs 720w | prior: built, not compared — L-C C7: \"Replace {page} with {template}?\", \"{page}’s N elements are removed and replaced. {template} has its own colors and fonts — your Brand is not changed.\" (saved token templates say they take the brand), \"Save a backup first (History › Saves)\", CTA \"Replace {page}\"."
   },
   {
    "nodeId": "223:45184",
@@ -11095,7 +11095,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C D4: \"Delete {field}? · N records have a value in {field}.\" + \"Type N to confirm\" + Delete field. The board's \"stay in Recently deleted for 30 days\" is not shown: restore is a later server slice, so the copy keeps \"This cannot be undone.\""
+   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — 'Delete excerpt?', 'Type 1 to confirm', Cancel/Delete field built. Adds breadcrumb + yellow callout; 'cannot be undone' vs board 30-day Recently deleted. Dialog 560w y=303 vs 720w y≈128. | prior: built, not compared — L-C D4: \"Delete {field}? · N records have a value in {field}.\" + \"Type N to confirm\" + Delete field. The board's \"stay in Recently deleted for 30 days\" is not shown: restore is a later server slice, so the copy keeps \"This cannot be undone.\""
   },
   {
    "nodeId": "257:53085",
@@ -11746,7 +11746,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "drift-open — L-C C4/D1: \"Site variables\" intro, per-variable \"N text placeholders\", \"Empty value\" built; still a drawer subview, not the workspace page. Not compared."
+   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — Still a 280px drawer subview (main pane keeps showing Blog Fields); no 'Site variables' page header or '+ New variable' primary top-right; row = key/value/'0 placeholders'/⋯ matches. | prior: drift-open — L-C C4/D1: \"Site variables\" intro, per-variable \"N text placeholders\", \"Empty value\" built; still a drawer subview, not the workspace page. Not compared."
   },
   {
    "nodeId": "260:235928",
@@ -12867,7 +12867,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Copy now the board's ('Publishing isn’t switched on for this workspace yet', curly apostrophe) in lifecycle.ts and the tray fallback; built, not compared."
+   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): unreachable live — Publishing flag is on in this build, and the tray opens only via Publish (not clicked: QA workspace deploys for real). | prior: Copy now the board's ('Publishing isn’t switched on for this workspace yet', curly apostrophe) in lifecycle.ts and the tray fallback; built, not compared."
   },
   {
    "nodeId": "233:11377",
@@ -12877,7 +12877,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Copy now the board's ('Needs a connection') in lifecycle.ts publishBlocker; built, not compared."
+   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): unreachable live — Offline publish tray opens only via Publish; not clicked (QA workspace deploys for real). | prior: Copy now the board's ('Needs a connection') in lifecycle.ts publishBlocker; built, not compared."
   },
   {
    "nodeId": "233:11934",
@@ -13187,7 +13187,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Overview content open: the Pro-trial card and the board's Site/Languages/Search rows are not built (no trial in code yet — memory plans-free-pro-trial). Settings chrome now per board (compared 2026-10-26, probe SettingsTab on General at 1440x900 vs 238:10283/238:11495 screenshots): text-only 32px nav rows, Danger zone under Advanced, 'ORGANIZATION WORKSPACE ↗' with Members ↗ / Billing ↗ / Integrations ↗, 'Your role' + 'Permissions ›', 'Search settings' entry (Search Mode kept: owner 2026-10-04), '‹ Back to Editor · {page}' + 20/600 title in the pane header, scope chip, white body, 56px footer 'Unsaved changes' · Discard · Save settings. Still open: Settings is a full-page view, not inside the editor shell (REQUESTS), and Billing keeps its plan pill (code-ahead)."
+   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Overview = 6 group cards in a 2-col grid; board's Pro-trial card and Live at/Languages/Search rows not built. Nav adds 'Brand ↗' and Pro/Free badges. | prior: Overview content open: the Pro-trial card and the board's Site/Languages/Search rows are not built (no trial in code yet — memory plans-free-pro-trial). Settings chrome now per board (compared 2026-10-26, probe SettingsTab on General at 1440x900 vs 238:10283/238:11495 screenshots): text-only 32px na"
   },
   {
    "nodeId": "238:10283",
@@ -13227,7 +13227,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared (offline state): Settings reads navigator.onLine; offline keeps the edits, the footer says \"Needs a connection · changes stay here, unsaved\" (SH04/AN07 wording; S05 draws \"Needs a connection — your edits stay on this screen, unsaved\"), the banner \"You’re offline. Save settings needs a connection.\", Save disabled until online (tested). AN07 also draws \"Status unavailable offline\" for the tracker status — not built."
+   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Offline footer red 'Needs a connection · changes stay here, unsaved' (board black, em-dash copy); extra 'You're offline…' banner + global offline bar; Author not Tagline. | prior: Built, not compared (offline state): Settings reads navigator.onLine; offline keeps the edits, the footer says \"Needs a connection · changes stay here, unsaved\" (SH04/AN07 wording; S05 draws \"Needs a connection — your edits stay on this screen, unsaved\"), the banner \"You’re offline. Save settings ne"
   },
   {
    "nodeId": "238:11495",
@@ -13317,7 +13317,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared: bulk delete confirm — 'Delete {n} submission(s) permanently?' (copy per GAP-FM07, which supersedes S14's shorter body), Cancel · 'Delete {n} permanently', destructive, dialog-sm."
+   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Uses GAP-FM07 copy ('…will be removed from … This cannot be undone.', 'Delete 2 permanently'); S14 draws 'Submissions can't be restored…' + ghost red 'Delete'. | prior: Built, not compared: bulk delete confirm — 'Delete {n} submission(s) permanently?' (copy per GAP-FM07, which supersedes S14's shorter body), Cancel · 'Delete {n} permanently', destructive, dialog-sm."
   },
   {
    "nodeId": "238:14186",
@@ -13367,7 +13367,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Banner uses the shared 'Changing Domains needs Admin access.' (SH05/SH10 wording); the S19 board says 'Domains need Admin access. Ask an admin to change them.' — two board wordings for one banner, the newer SH family adopted. Built, not compared."
+   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): unreachable live — Needs an Editor-role account; the QA user is Owner on this site. | prior: Banner uses the shared 'Changing Domains needs Admin access.' (SH05/SH10 wording); the S19 board says 'Domains need Admin access. Ask an admin to change them.' — two board wordings for one banner, the newer SH family adopted. Built, not compared."
   },
   {
    "nodeId": "238:15632",
@@ -13447,7 +13447,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared: status words and Verify per AN01 (wave 2); detail lines as in code."
+   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — During Verify the button reads 'Checking…' but the status word stays 'Not verified'; board shows 'Checking status…' as the status line. | prior: Built, not compared: status words and Verify per AN01 (wave 2); detail lines as in code."
   },
   {
    "nodeId": "245:45673",
@@ -13457,7 +13457,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared: status words and Verify per AN01 (wave 2); detail lines as in code."
+   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — 'Waiting for data' + 'Measurement ID verified on …' inline like the board, but Verify also opens a 'Format OK · no events yet' modal the board does not draw. | prior: Built, not compared: status words and Verify per AN01 (wave 2); detail lines as in code."
   },
   {
    "nodeId": "245:45931",
@@ -13467,7 +13467,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared: status words and Verify per AN01 (wave 2); detail lines as in code."
+   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): unreachable live — 'Receiving data' needs real tracker events for this site; none exist. | prior: Built, not compared: status words and Verify per AN01 (wave 2); detail lines as in code."
   },
   {
    "nodeId": "245:46189",
@@ -13487,7 +13487,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared (error state): a failed Verify shows \"Couldn’t check status\" / \"The status service did not respond. Try Verify again.\" in the status row; values kept (tested)."
+   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — 'Couldn't check status' + retry sentence, values kept: matches; error sentence is grey under the status word, board draws it red below the tracker note. | prior: Built, not compared (error state): a failed Verify shows \"Couldn’t check status\" / \"The status service did not respond. Try Verify again.\" in the status row; values kept (tested)."
   },
   {
    "nodeId": "245:46707",
@@ -14345,7 +14345,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared: 'CSV ready' / '{n} submissions · {Form} · {View}. Your selection and filters are unchanged.' / Back to submissions; the file downloads (the board's 'Prototype fixture' line is not product copy). Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
+   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Copy matches ('Your selection and filters are unchanged.'; fixture line rightly absent); 'Back to submissions' is an outline button, board primary blue. | prior: Built, not compared: 'CSV ready' / '{n} submissions · {Form} · {View}. Your selection and filters are unchanged.' / Back to submissions; the file downloads (the board's 'Prototype fixture' line is not product copy). Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server"
   },
   {
    "nodeId": "272:24592",
@@ -14467,7 +14467,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared: '{n} submission(s) moved from {Spam|Archived} to Inbox.' above the list."
+   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Ack copy matches ('1 submission moved from Spam to Inbox.') but drawn as a bordered green banner 1091x40, board a plain green text line. | prior: Built, not compared: '{n} submission(s) moved from {Spam|Archived} to Inbox.' above the list."
   },
   {
    "nodeId": "272:27718",
@@ -15946,7 +15946,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (dataset) not walked."
+   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Spam tab, filter, Export/'Choose a form to configure' agree; helper 'Select a single form…' sits above the list (y=255), board puts it under 'Showing…'. Spam empty (data). | prior: Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (dataset) not walked."
   },
   {
    "nodeId": "277:337275",
@@ -16264,7 +16264,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Filter) not walked."
+   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Filter change applies at once and clears the selection; the board's 'Filter submissions' confirm (Cancel · All forms · Contact) is not built. | prior: Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Filter) not walked."
   },
   {
    "nodeId": "277:346192",
@@ -16284,7 +16284,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared: 'CSV ready' / '{n} submissions · {Form} · {View}. Your selection and filters are unchanged.' / Back to submissions; the file downloads (the board's 'Prototype fixture' line is not product copy). Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
+   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — 'CSV ready' layout matches; body says 'Your selection and filters are unchanged.' (board: 'Your filters and selection are kept.'); Back to submissions is outline, board primary. | prior: Built, not compared: 'CSV ready' / '{n} submissions · {Form} · {View}. Your selection and filters are unchanged.' / Back to submissions; the file downloads (the board's 'Prototype fixture' line is not product copy). Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server"
   },
   {
    "nodeId": "277:346746",
@@ -16304,7 +16304,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Configure) not walked."
+   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Configure selects the Form and opens Content/Fields, but no '‹ Back to submissions · Form / Inbox' strip above the canvas. | prior: Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Configure) not walked."
   },
   {
    "nodeId": "277:347389",
@@ -16314,7 +16314,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Delete-confirm) not walked."
+   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Title and body match; action reads 'Delete 2 permanently' in red destructive, board 'Delete permanently' in primary blue. | prior: Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Delete-confirm) not walked."
   },
   {
    "nodeId": "277:347673",
@@ -18083,7 +18083,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared: after a save the footer reads 'Saved · applies on next publish' (publish-scope screens) until the next edit or screen, including on the screen a Save and leave lands on; Overview/doors have no footer (the board's 'Saved just now' is the shell bottom bar). The destination screen's own content drift is tracked on its own rows."
+   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Save and leave lands on Overview, no footer (as designed); Overview content is a 6-card group grid (325–1416px), not the board's Pro-trial card + Site rows. | prior: Built, not compared: after a save the footer reads 'Saved · applies on next publish' (publish-scope screens) until the next edit or screen, including on the screen a Save and leave lands on; Overview/doors have no footer (the board's 'Saved just now' is the shell bottom bar). The destination screen'"
   },
   {
    "nodeId": "278:62059",
@@ -19840,7 +19840,7 @@
    "status": "active",
    "authority": "open:save-failed-copy-context",
    "verified": "drift-open",
-   "verifiedNote": "L-F W1: built, not compared. SaveFailedBanner is one strip: line + Retry. context=\"publish\" draws the board's \"Save before publishing. Your changes are kept.\"; without a context \"Couldn't save {where}. Your changes are kept.\" Exit and brand-refusal variants kept (code:tokens-invalid). StudioHeader passing the context is REQUESTS F-18."
+   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Strip 'Couldn't save s0-qa site · Home. Your changes are kept.' + Retry + Keep editing, plus a 'Save failed' toast and a 'Reconnecting…' bar at once. Board: one strip. | prior: L-F W1: built, not compared. SaveFailedBanner is one strip: line + Retry. context=\"publish\" draws the board's \"Save before publishing. Your changes are kept.\"; without a context \"Couldn't save {where}. Your changes are kept.\" Exit and brand-refusal variants kept (code:tokens-invalid). StudioHeader p"
   },
   {
    "nodeId": "10:2647",
@@ -19880,7 +19880,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-A S1 built the 'Insert into Hero · At end' strip; receipt waits on REQUESTS #11; 1280 collapsed-Inspector mode is shell (lead). Not compared."
+   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — At 1280x720 selection opens the Inspector floating over the canvas; board keeps it closed behind an 'Inspector' button. Insert strip OK; add receipt not built. | prior: L-A S1 built the 'Insert into Hero · At end' strip; receipt waits on REQUESTS #11; 1280 collapsed-Inspector mode is shell (lead). Not compared."
   },
   {
    "nodeId": "225:2297",
@@ -19900,7 +19900,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-F S2: Download local copy added (workSnapshot; REQUESTS #15 registers the live project, else the kept unsaved copy). Leads the global slot. Placement under topbar REQUESTS #11. Built, not compared."
+   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Copy + Download local copy/Retry match; banner sits above the topbar (y=0–54, board under it), adds Copy details and ×; canvas empty, not the read-only site. | prior: L-F S2: Download local copy added (workSnapshot; REQUESTS #15 registers the live project, else the kept unsaved copy). Leads the global slot. Placement under topbar REQUESTS #11. Built, not compared."
   },
   {
    "nodeId": "225:3353",
@@ -19910,7 +19910,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-F S5: built, not compared. 480 dialog (size confirm), \"Sign in again to save\" + board body with the history count since the last save; \"and in this browser\" only when a kept copy exists (code truth). Keep editing · Try saving again · Sign in ↗ (primary). The labels list folded into the count (code-ahead disposition)."
+   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Title, body ('Your 1 change is kept in this tab and in this browser') and buttons match; the save-failed strip renders above the scrim, undimmed. | prior: L-F S5: built, not compared. 480 dialog (size confirm), \"Sign in again to save\" + board body with the history count since the last save; \"and in this browser\" only when a kept copy exists (code truth). Keep editing · Try saving again · Sign in ↗ (primary). The labels list folded into the count (code"
   },
   {
    "nodeId": "225:3888",
@@ -19920,7 +19920,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-F S5: built, not compared. Keep editing (and Escape) leaves the G04 banner in the global slot with Sign in ↗; the next landed save (lastSavedAt) clears it."
+   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Copy and Sign in ↗ match, but the banner spans the window above the topbar (y=0–56) and the 'Couldn't save… Retry · Keep editing' strip shows too. | prior: L-F S5: built, not compared. Keep editing (and Escape) leaves the G04 banner in the global slot with Sign in ↗; the next landed save (lastSavedAt) clears it."
   },
   {
    "nodeId": "225:4416",
@@ -19929,8 +19929,8 @@
    "family": "recovery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-F W10: built, not compared. When the first save after a session expiry lands, SessionExpiredModal clears the G04 banner and toasts \"Signed in again — {n} changes saved\" (n = changes held when it expired)."
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): match. Toast 'Signed in again — 1 change saved' at the canvas bottom (664–1123px), banner cleared; matches the board."
   },
   {
    "nodeId": "225:4941",
@@ -19940,7 +19940,7 @@
    "status": "active",
    "authority": "blocked:save-user-check",
    "verified": "no",
-   "verifiedNote": "L-F W10: not built. Detecting a different account needs the save path (lead) and ideally a server expectedUserId — REQUESTS F-22. Today such a save goes through as the other account."
+   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): unreachable live — Not built (REQUESTS F-22); no code path detects a different signed-in account. | prior: L-F W10: not built. Detecting a different account needs the save path (lead) and ideally a server expectedUserId — REQUESTS F-22. Today such a save goes through as the other account."
   },
   {
    "nodeId": "225:5474",
@@ -19950,7 +19950,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-F S3: built, not compared. RecoveryBanner is the one surface: board copy (time as \"today 10:12\"), Discard… · Restore my edits. Dashboard kept copy arrives via keptWorkOffer (REQUESTS #16 retires the toast); local draft sentinel uses the same words."
+   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Kept work after a failed save + reload shows the old toast 'Some work never reached the server… Restore my edits', not the board's banner with Discard… · Restore. | prior: L-F S3: built, not compared. RecoveryBanner is the one surface: board copy (time as \"today 10:12\"), Discard… · Restore my edits. Dashboard kept copy arrives via keptWorkOffer (REQUESTS #16 retires the toast); local draft sentinel uses the same words."
   },
   {
    "nodeId": "225:6003",
@@ -19960,7 +19960,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-F S3: built, not compared. Server newer → board line (author not in the contract: code:no-author) + Download my copy; Compare not offered until CompareHost has a kept-copy source (REQUESTS #16c)."
+   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Kept copy older than the server: the same toast still offers 'Restore my edits'; board says someone saved after and offers Download my copy only. | prior: L-F S3: built, not compared. Server newer → board line (author not in the contract: code:no-author) + Download my copy; Compare not offered until CompareHost has a kept-copy source (REQUESTS #16c)."
   },
   {
    "nodeId": "225:6532",
@@ -19970,7 +19970,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-F S3: built, not compared. Server unknown → board line + Download my copy; Compare as G08 (REQUESTS #16c)."
+   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Server version check blocked: the same 'Restore my edits' toast; board says it can't be restored safely and offers Download my copy. | prior: L-F S3: built, not compared. Server unknown → board line + Download my copy; Compare as G08 (REQUESTS #16c)."
   },
   {
    "nodeId": "225:7061",
@@ -20881,7 +20881,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Lane L-B C-13 (built, not compared — copy checked against the dump): the type block's bindable property row has a Bind button that opens 'Choose source' — search 'Search sources or fields…', RECORD DATA (This page’s record · {Collection} on its template page, List item — off with 'Select an element inside a collection list' outside a list, Specific record 'Pin one record to this property'), SITE & PAGE (Site, Page), LIVE SOURCES (Date, URL parameter, Cookie). Site and Page are drawn 'Planned' with the live sources: the binding model reads CMS collections only (code wins on those two rows)."
+   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Opened via 'Bind text…' on a static page (no template page on QA site, so no 'This page's record'). Popover inside inspector, no ×; Site/Page tagged 'Planned' (board selectable). | prior: Lane L-B C-13 (built, not compared — copy checked against the dump): the type block's bindable property row has a Bind button that opens 'Choose source' — search 'Search sources or fields…', RECORD DATA (This page’s record · {Collection} on its template page, List item — off with 'Select an element "
   },
   {
    "nodeId": "302:12784",
@@ -20911,7 +20911,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Lane L-B C-13 (built, not compared): binding detail replaces the Content tab — '‹ Back to Content', '{Property} binding', Source + Change…, context line, Record (specific record only), Format 'As written', If empty (stored as the binding's fallback), Preview, 'Open record ›' (C-11 origin '{element} · {Property} binding'), 'Unbind — keep shown text', 'Keeps “…” as static text.'."
+   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — No live screenshot (overwritten when the Blog collection vanished). DOM read: binding shows inline (chip 'Blog.title', 'Dynamic bindings · 1 binding', 'Blog · title') — no binding detail screen. | prior: Lane L-B C-13 (built, not compared): binding detail replaces the Content tab — '‹ Back to Content', '{Property} binding', Source + Change…, context line, Record (specific record only), Format 'As written', If empty (stored as the binding's fallback), Preview, 'Open record ›' (C-11 origin '{element} "
   },
   {
    "nodeId": "302:14521",
@@ -20941,7 +20941,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C C1: \"Leave without saving?\" names the record / destination tab or collection; Keep editing · Discard changes · Save and leave (RecordSheet.tsx). Origin label (\"Your destination is …\") waits on C2."
+   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Dialog 560 (board 640); body 'X has unsaved record edits.' not 'Your destination is …'; primary is Save and leave (board: Keep editing). Sheet: tabs under back link, no preview pane. | prior: built, not compared — L-C C1: \"Leave without saving?\" names the record / destination tab or collection; Keep editing · Discard changes · Save and leave (RecordSheet.tsx). Origin label (\"Your destination is …\") waits on C2."
   },
   {
    "nodeId": "302:15605",
@@ -20951,7 +20951,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C C1: Save and leave shows \"Saving record…\" + Saving… + Stay here; success takes the chosen way out (RecordSheet.tsx)."
+   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Pending copy matches ('Saving record…', footer 'Saving…', 'Stay here', disabled 'Saving…'), but header shows it inline before title; sheet lacks preview pane and board's field layout. | prior: built, not compared — L-C C1: Save and leave shows \"Saving record…\" + Saving… + Stay here; success takes the chosen way out (RecordSheet.tsx)."
   },
   {
    "nodeId": "302:15961",
@@ -23291,8 +23291,8 @@
    "family": "shell-components",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "StatusBadge tones built (feat/design-2l9-cmsbadge), pinned in probe; not walked live. \"Changed since publish\" needs server publishedAt (REQUESTS.md #7)."
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): match. Neutral 'Draft' tone measured 44×20, bg #F3F4F6, 12px/500, r4 = board 43×20 #F3F4F6. Success/Warning tones not reachable (only record is Draft)."
   },
   {
    "nodeId": "500:342150",
@@ -23312,7 +23312,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Load-failed banner, lock and echoes built (feat/design-2l9-editlock); not walked live (needs a forced load failure). Banner slot under topbar is an AquibraStudio request (REQUESTS.md #4)."
+   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Forced via aborted sites.get. Banner above topbar y0-54 (board below it y56-97) + extra 'Copy details'; canvas/layers empty; inspector only 'View only until the site loads'; status in topbar. | prior: Load-failed banner, lock and echoes built (feat/design-2l9-editlock); not walked live (needs a forced load failure). Banner slot under topbar is an AquibraStudio request (REQUESTS.md #4)."
   },
   {
    "nodeId": "502:3556",
