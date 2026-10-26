@@ -98,6 +98,7 @@ import { DarkModeCard } from "./sections/DarkModeCard";
 import { ScaleGenerator } from "./sections/ScaleGenerator";
 import { RestorePointsSection } from "./sections/RestorePointsSection";
 import { useSiteDarkMode } from "../state/useSiteDarkMode";
+import { useOnline } from "../state/useOnline";
 import { useBrandPreview } from "../state/useBrandPreview";
 import { DarkModeSchema } from "@buildrik/shared/schemas/design-tokens";
 import type { BrandPreview as CanvasPreview } from "@/engine/designSystem/types";
@@ -361,6 +362,9 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
   const imagery    = useImageryRegistry();
   const store      = useProjectTokenStore();
   const readOnly   = store.readOnly;
+  /* B6-B43: offline, edits still apply (autosave retries); restore points
+     and reading a website need the server. */
+  const online     = useOnline();
   /* "No brand set" (4418:49685): the site has never saved a token. */
   const isFirstLoad = !composer?.getProjectSettings()?.designTokens?.length;
 
@@ -1008,18 +1012,28 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
                 disabled={readOnly}
                 extraActions={
                   /* Opening the list is a read, so it stays live on a
-                     read-only site (Restore does not). */
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="xs"
-                    className={`${PAGE_ACTION} tw:border-transparent tw:bg-transparent`}
-                    aria-current={page === "restore-points" ? "page" : undefined}
-                    onClick={() => openPage("restore-points")}
-                    data-testid="brand-restore-points-action"
-                  >
-                    Restore points
-                  </Button>
+                     read-only site (Restore does not) — but it is a server
+                     read: offline it waits, and says why (B6-B43). */
+                  <>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="xs"
+                      className={`${PAGE_ACTION} tw:border-transparent tw:bg-transparent`}
+                      aria-current={page === "restore-points" ? "page" : undefined}
+                      disabled={!online}
+                      aria-describedby={online ? undefined : "brand-restore-offline"}
+                      onClick={() => openPage("restore-points")}
+                      data-testid="brand-restore-points-action"
+                    >
+                      Restore points
+                    </Button>
+                    {!online && (
+                      <span id="brand-restore-offline" className="tw:text-[length:var(--bk-text-12)] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]">
+                        Restore points need a connection
+                      </span>
+                    )}
+                  </>
                 }
               />
             </div>
@@ -1033,6 +1047,15 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
         <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col" data-testid="brand-pane">
           {/* BRP1-M1 (8222:229015 / 229636 / 230245): a flat warning-tint
               strip, 12 in, 12/18 ink — no border, no radius — 20 over the body. */}
+          {!online && !readOnly && (
+            <div
+              role="status"
+              data-testid="brand-offline-banner"
+              className="tw:mb-5 tw:bg-[var(--bk-warning-tint)] tw:p-3 tw:text-[length:var(--bk-text-12)] tw:leading-[18px] tw:text-[var(--bk-ink)]"
+            >
+              You’re offline. Token edits still apply here and save when you reconnect. Restore points and reading a website need a connection.
+            </div>
+          )}
           {readOnly && (
             <div
               role="alert"

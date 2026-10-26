@@ -196,3 +196,30 @@ describe("BrandWorkspace › Review changes copy (B6-B41)", () => {
     expect(utils.getByTestId("brand-session-edits-list").querySelector("h3")?.textContent).toBe("Changes this session");
   });
 });
+
+describe("BrandWorkspace › offline (B6-B43)", () => {
+  it("says edits still apply; Restore points waits for a connection", () => {
+    const spy = vi.spyOn(navigator, "onLine", "get").mockReturnValue(false);
+    try {
+      const utils = renderWorkspace(makeFakeComposer());
+      expect(utils.getByTestId("brand-offline-banner").textContent).toBe(
+        "You’re offline. Token edits still apply here and save when you reconnect. Restore points and reading a website need a connection.",
+      );
+      expect((utils.getByTestId("brand-restore-points-action") as HTMLButtonElement).disabled).toBe(true);
+      expect(utils.getByText("Restore points need a connection")).toBeTruthy();
+    } finally {
+      spy.mockRestore();
+    }
+  });
+
+  it("back online, the banner goes", () => {
+    const spy = vi.spyOn(navigator, "onLine", "get").mockReturnValue(false);
+    const utils = renderWorkspace(makeFakeComposer());
+    spy.mockReturnValue(true);
+    act(() => {
+      window.dispatchEvent(new Event("online"));
+    });
+    expect(utils.queryByTestId("brand-offline-banner")).toBeNull();
+    spy.mockRestore();
+  });
+});

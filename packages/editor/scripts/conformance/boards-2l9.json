@@ -9619,7 +9619,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No offline banner (\"Token edits still apply here…\")"
+   "verifiedNote": "L-D S9: offline banner with the board copy (useOnline), Restore points disabled with \"Restore points need a connection\"; edits stay live. Built, not compared."
   },
   {
    "nodeId": "212:38369",
