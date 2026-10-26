@@ -239,7 +239,7 @@ export async function getSettingsOverview(siteId: string): Promise<SettingsOverv
     webhook,
     members,
   ] = await Promise.all([
-    prisma.page.findMany({ where: { siteId }, orderBy: { position: "asc" }, select: { ...SUGGESTION_PAGE_SELECT, translations: true } }),
+    prisma.page.findMany({ where: { siteId }, orderBy: { position: "asc" }, select: { ...SUGGESTION_PAGE_SELECT, translations: true, seoDescription: true, meta: true } }),
     prisma.domain.findFirst({ where: { siteId, isPrimary: true }, select: { domain: true } }),
     prisma.dnsRecord.findMany({
       where: { verified: false, domain: { siteId } },
@@ -349,8 +349,19 @@ export async function getSettingsOverview(siteId: string): Promise<SettingsOverv
       workspaceDeletionAt: site.workspace.deletionScheduledAt?.toISOString() ?? null,
     },
     general: { siteName: site.name, language: site.defaultLocale },
-    localization: { locales: site.enabledLocales.length, notStarted },
-    seo: { allowIndexing: site.allowIndexing, robotsTxtSet: filled(site.robotsTxt) },
+    localization: {
+      locales: site.enabledLocales.length,
+      notStarted,
+      codes: [site.defaultLocale, ...site.enabledLocales.filter((l) => l !== site.defaultLocale)],
+    },
+    seo: {
+      allowIndexing: site.allowIndexing,
+      robotsTxtSet: filled(site.robotsTxt),
+      // The page's description lives in `seoDescription`; older pages carry it in `meta.description`.
+      pagesWithoutDescription: pages.filter(
+        (p) => !filled(p.seoDescription) && !(isRecord(p.meta) && typeof p.meta.description === "string" && filled(p.meta.description)),
+      ).length,
+    },
     domains: { primary: primaryDomain?.domain ?? null, pendingDns: pendingDns.length },
     redirects: { rules: redirects.length, suggestions },
     analytics: { providers, receiving: analyticsDays > 0 },
