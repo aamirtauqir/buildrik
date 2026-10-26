@@ -62,14 +62,14 @@ export const SET_CARD =
 /** The line under the header — `Restoring a site version leaves this
  *  configuration unchanged.` (Security headers): 2L9 B8-SH01 draws it as a
  *  plain muted line over the cards, not a tinted strip. */
-export const SET_RESTORE_STRIP = "tw:m-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]";
+export const SET_RESTORE_STRIP = "tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 
 /** Label-left rows at the 180 label column (4418:127966 / 4418:128657) (the SEO screen's Indexing card
  *  set the shape; `Enable Google Analytics` wrapped at 144). `col-span-full`
  *  keeps each on its own line in the Section's grid. */
-export const SET_ROW = "tw:col-span-full tw:flex tw:items-center tw:gap-4";
+export const SET_ROW = "tw:col-span-full tw:flex tw:items-center tw:gap-3";
 export const SET_ROW_LABEL =
-  "tw:w-45 tw:shrink-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-soft)]";
+  "tw:w-48 tw:shrink-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-soft)]";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Tables and status pills — one shape for every Settings table (Locales,
@@ -132,12 +132,14 @@ export const Section: React.FC<SectionProps> = ({ title, desc, anchor, children 
   const cardId = stem ? `set-card-${stem}` : undefined;
   const cardTitleId = `set-card-title-${stem}`;
   return (
-    <section className={`${SET_CARD} tw:flex tw:flex-col tw:gap-5 tw:p-6`} data-testid={cardId}>
+    /* 2L9 B8-SH01 (245:47988): a 720 card, 16 in, the 14/600 title 8 above
+       its first field, fields 8 apart. */
+    <section className={`${SET_CARD} tw:flex tw:w-full tw:max-w-180 tw:flex-col tw:gap-2 tw:p-4`} data-testid={cardId}>
       {title || desc ? (
         <div className="tw:flex tw:flex-col tw:gap-1">
           {title ? (
             <h3
-              className="tw:m-0 tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:leading-6 tw:text-[var(--bk-ink)]"
+              className="tw:m-0 tw:text-[length:var(--bk-text-14)] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]"
               data-testid={cardTitleId}
             >
               {title}
@@ -150,7 +152,7 @@ export const Section: React.FC<SectionProps> = ({ title, desc, anchor, children 
       ) : null}
       {/* 3397:32011 — fields sit two to a row; anything that is not a Field
           (a table, a code well, a button row) takes the whole row. */}
-      <div className="tw:grid tw:grid-cols-2 tw:gap-6 tw:[&>*:not([data-set-field])]:col-span-full">
+      <div className="tw:grid tw:grid-cols-2 tw:gap-x-4 tw:gap-y-2 tw:[&>*:not([data-set-field])]:col-span-full">
         {children}
       </div>
     </section>

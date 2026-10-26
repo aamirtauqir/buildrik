@@ -25,11 +25,13 @@ describe("Section — the card", () => {
     const card = screen.getByTestId("set-card-site-identity");
     expect(card.tagName).toBe("SECTION");
     expect(card.className).toContain("tw:rounded-[var(--bk-radius-card)]");
-    expect(card.className).toContain("tw:p-6");
+    // 2L9 B8-SH01: a 720 card, 16 in, 14/600 title.
+    expect(card.className).toContain("tw:p-4");
+    expect(card.className).toContain("tw:max-w-180");
     const title = screen.getByTestId("set-card-title-site-identity");
     expect(title.textContent).toBe("Site identity");
     expect(title.className).toContain("tw:font-semibold");
-    expect(title.className).toContain("var(--bk-text-16)");
+    expect(title.className).toContain("var(--bk-text-14)");
     expect(screen.getByText("Name, favicon, language.")).toBeTruthy();
     const grid = screen.getByTestId("wide").parentElement as HTMLElement;
     expect(grid.className).toContain("tw:grid-cols-2");

@@ -13546,8 +13546,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared 2026-10-26 (probe SettingsTab on Security headers, tRPC stubbed, saved HSTS 86400, draft 1 year; vs the 277:28233 screenshot's screen): restore line plain, cards Content Security Policy · Browser policies (X-Frame-Options, Referrer-Policy) · HSTS (switch + 'Enabled', presets '1 year · 31536000 seconds', '<n> seconds (custom)') · Permissions-Policy, Max age note. Still open: card density — the shared settings Section draws 24 padding / 16 title where the board draws ~16 / 14 (every settings screen; not changed screen by screen). SH01 note 'Existing custom value retained. Changing presets is an explicit edit.' built (tested)."
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared 2026-10-26 (wave 2) against get_metadata of 245:47988 and the 277:28233 screenshot, probe SettingsTab on Security headers at 1440x900 (tRPC stubbed): nav 240 (search 208x28 @16, rows 32 @2 apart, groups 24), header 104 (back + title @12, scope chip 24 @52), 12/16 restore line @104, 720 cards 16 in with 14/600 titles, CSP/Permissions stacked (label over field), Browser policies/HSTS rows with a 192 label column + 12 gap, HSTS 158 tall as drawn, SH01 custom-value note. Remaining: controls 32 tall vs the board 28 (settings Input/Select theme, founder density-32) and the Settings host (E-10)."
   },
   {
    "nodeId": "245:48243",
@@ -13556,8 +13556,9 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared 2026-10-26 (probe SettingsTab on Security headers, tRPC stubbed, saved HSTS 86400, draft 1 year; vs the 277:28233 screenshot's screen): restore line plain, cards Content Security Policy · Browser policies (X-Frame-Options, Referrer-Policy) · HSTS (switch + 'Enabled', presets '1 year · 31536000 seconds', '<n> seconds (custom)') · Permissions-Policy, Max age note. Still open: card density — the shared settings Section draws 24 padding / 16 title where the board draws ~16 / 14 (every settings screen; not changed screen by screen). SH02 options built (tested); the board lists the custom value as '(current custom value)', the select shows '(custom)' — one label per option."
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared 2026-10-26 (probe SettingsTab on Security headers, tRPC stubbed, saved HSTS 86400, draft 1 year; vs the 277:28233 screenshot's screen): restore line plain, cards Content Security Policy · Browser policies (X-Frame-Options, Referrer-Policy) · HSTS (switch + 'Enabled', presets '1 year · 31536000 seconds', '<n> seconds (custom)') · Permissions-Policy, Max age note. Card density now matches (wave 2, see 245:47988).",
+   "inheritsFrom": "245:47988"
   },
   {
    "nodeId": "245:48510",
@@ -13596,8 +13597,9 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared 2026-10-26 (probe SettingsTab on Security headers, tRPC stubbed, saved HSTS 86400, draft 1 year; vs the 277:28233 screenshot's screen): restore line plain, cards Content Security Policy · Browser policies (X-Frame-Options, Referrer-Policy) · HSTS (switch + 'Enabled', presets '1 year · 31536000 seconds', '<n> seconds (custom)') · Permissions-Policy, Max age note. Still open: card density — the shared settings Section draws 24 padding / 16 title where the board draws ~16 / 14 (every settings screen; not changed screen by screen). SH06 'Unsaved choice: … Saved custom value: …' compared live. Footer 'Unsaved changes · HSTS max age' (field name) not built — screens report dirty per screen."
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared 2026-10-26 (probe SettingsTab on Security headers, tRPC stubbed, saved HSTS 86400, draft 1 year; vs the 277:28233 screenshot's screen): restore line plain, cards Content Security Policy · Browser policies (X-Frame-Options, Referrer-Policy) · HSTS (switch + 'Enabled', presets '1 year · 31536000 seconds', '<n> seconds (custom)') · Permissions-Policy, Max age note.  Footer 'Unsaved changes · HSTS max age' (field name) not built — screens report dirty per screen. Card density now matches (wave 2, see 245:47988).",
+   "inheritsFrom": "245:47988"
   },
   {
    "nodeId": "245:49535",
@@ -13727,8 +13729,9 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared 2026-10-26 (probe SettingsTab on Security headers, tRPC stubbed, saved HSTS 86400, draft 1 year; vs the 277:28233 screenshot's screen): restore line plain, cards Content Security Policy · Browser policies (X-Frame-Options, Referrer-Policy) · HSTS (switch + 'Enabled', presets '1 year · 31536000 seconds', '<n> seconds (custom)') · Permissions-Policy, Max age note. Still open: card density — the shared settings Section draws 24 padding / 16 title where the board draws ~16 / 14 (every settings screen; not changed screen by screen). SH11 'The chosen preset changes max age to … Save settings to apply.' built (tested)."
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared 2026-10-26 (probe SettingsTab on Security headers, tRPC stubbed, saved HSTS 86400, draft 1 year; vs the 277:28233 screenshot's screen): restore line plain, cards Content Security Policy · Browser policies (X-Frame-Options, Referrer-Policy) · HSTS (switch + 'Enabled', presets '1 year · 31536000 seconds', '<n> seconds (custom)') · Permissions-Policy, Max age note. ' built (tested). Card density now matches (wave 2, see 245:47988).",
+   "inheritsFrom": "245:47988"
   },
   {
    "nodeId": "248:16302",

@@ -160,7 +160,7 @@ const NAV_PILL =
 
 /* B8-S01's group label: 11px uppercase, muted, 8 above its rows. */
 const NAV_GROUP =
-  "tw:mt-2 tw:flex tw:h-6 tw:items-center tw:text-[length:var(--bk-text-11)] tw:font-medium tw:uppercase tw:leading-4 tw:text-[var(--bk-ink-muted)]";
+  "tw:flex tw:h-6 tw:items-center tw:text-[length:var(--bk-text-11)] tw:font-medium tw:uppercase tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 
 /* Search Mode's field: 36 tall, 12px, on the subtle fill until focused. */
 const INPUT_THEME = {
@@ -909,7 +909,7 @@ export const SettingsTab: React.FC<
   return (
     <div className="tw:flex tw:h-full tw:min-h-0 tw:w-full tw:bg-[var(--bk-bg-panel)] tw:[font-family:var(--bk-font-ui)]" data-testid="set-root">
       {/* ── Sidebar (M0, 8134:212121) ───────────────────────────────────── */}
-      <aside className="tw:flex tw:w-64 tw:shrink-0 tw:flex-col tw:border-r tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)]">
+      <aside className="tw:flex tw:w-60 tw:shrink-0 tw:flex-col tw:border-r tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)]">
         {searchOpen ? (
           /* Search Mode (owner 2026-10-04): the field and its ✕, then the results — nothing else. */
           <div className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col" data-testid="set-search-mode">
@@ -1010,7 +1010,7 @@ export const SettingsTab: React.FC<
                 type="button"
                 variant="ghost"
                 size="xs"
-                className={`${NAV_ROW} tw:shrink-0 tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink-muted)]`}
+                className={`${NAV_ROW} tw:h-7 tw:shrink-0 tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink-muted)]`}
                 onClick={openSearch}
                 aria-label="Search settings"
                 data-testid="set-search-mode-open"
@@ -1021,7 +1021,7 @@ export const SettingsTab: React.FC<
                 <span className="tw:min-w-0 tw:flex-1 tw:truncate">Search settings</span>
               </Button>
             </div>
-            <nav ref={navRef} className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col tw:overflow-y-auto tw:px-4 tw:pb-4 tw:pt-1" aria-label="Settings sections">
+            <nav ref={navRef} className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col tw:gap-0.5 tw:overflow-y-auto tw:px-4 tw:pb-4 tw:pt-0.5" aria-label="Settings sections">
               <Button
                 type="button"
                 variant="ghost"
@@ -1075,7 +1075,7 @@ export const SettingsTab: React.FC<
         {/* 2L9 B8-S02 (238:10283): "‹ Back to Editor · {page}" then the
             screen's title (20/600) on one line, the scope chip under it; the
             screen's own action or the plan gate's Upgrade at the right. */}
-        <header className="tw:flex tw:shrink-0 tw:items-start tw:justify-between tw:gap-3 tw:bg-[var(--bk-bg-panel)] tw:px-6 tw:pt-4 tw:pb-4">
+        <header className="tw:flex tw:h-26 tw:shrink-0 tw:items-start tw:justify-between tw:gap-3 tw:bg-[var(--bk-bg-panel)] tw:px-6 tw:pt-3">
           <div className="tw:flex tw:min-w-0 tw:flex-col tw:gap-2">
             <div className="tw:flex tw:min-w-0 tw:items-center tw:gap-5">
               {/* OWNER OVERRIDE 2026-10-04: a real link to the canvas, styled as
@@ -1127,7 +1127,7 @@ export const SettingsTab: React.FC<
 
         <div
           key={resetKey}
-          className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col tw:gap-4 tw:overflow-y-auto tw:bg-[var(--bk-bg-panel)] tw:px-6 tw:pt-2 tw:pb-6"
+          className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col tw:gap-3 tw:overflow-y-auto tw:bg-[var(--bk-bg-panel)] tw:px-6 tw:pb-6"
           data-testid="set-body"
         >
           {renderScreen()}

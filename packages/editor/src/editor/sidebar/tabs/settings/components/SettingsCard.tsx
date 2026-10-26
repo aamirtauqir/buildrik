@@ -34,12 +34,13 @@ export interface SettingsCardProps {
 
 const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
+/* 2L9 B8-S02 (238:10283): the 14/600 card title. */
 const TITLE =
-  "tw:m-0 tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:leading-6 tw:tracking-[-0.16px] tw:text-[var(--bk-ink)]";
+  "tw:m-0 tw:text-[length:var(--bk-text-14)] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]";
 /* The title as a button: no box, the title's own type, the token focus ring. */
 const TOGGLE =
-  "tw:h-6 tw:justify-start tw:rounded-[var(--bk-radius-sm)] tw:border-0 tw:bg-transparent tw:p-0 " +
-  "tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:leading-6 tw:tracking-[-0.16px] tw:text-[var(--bk-ink)] " +
+  "tw:h-5 tw:justify-start tw:rounded-[var(--bk-radius-sm)] tw:border-0 tw:bg-transparent tw:p-0 " +
+  "tw:text-[length:var(--bk-text-14)] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)] " +
   "tw:enabled:hover:bg-transparent tw:focus:ring-0 tw:focus:shadow-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
 
 export function SettingsCard({ title, anchor, open = true, onToggle, anchors, children }: SettingsCardProps) {
@@ -57,7 +58,8 @@ export function SettingsCard({ title, anchor, open = true, onToggle, anchors, ch
   const showBody = !collapsible || open;
   return (
     <section
-      className={`${SET_CARD} tw:flex tw:flex-col tw:gap-4 tw:p-6`}
+      /* B8-S02: a 720 card, 16 in, 10 between the title and each field. */
+      className={`${SET_CARD} tw:flex tw:w-full tw:max-w-180 tw:flex-col tw:gap-2.5 tw:p-4`}
       data-testid={`set-card-${stem}`}
       data-open={collapsible ? String(open) : undefined}
     >
