@@ -6,7 +6,8 @@
  * Each of those surfaces sits outside the composer — a banner, a dialog, the
  * crash screen that replaces the whole shell — so none of them can export the
  * project itself. The load path registers the one provider that can
- * (`registerWorkSnapshot(() => composer.exportProject())`); without it the
+ * (`registerWorkSnapshot({ project: () => composer.exportProject(), unsaved:
+ * () => isDirty })`); without it the
  * copy kept for a failed save (`bk-unsaved-v1-<site>`) is the work there is.
  * With neither there is nothing to download, and the surfaces offer no
  * button rather than one that saves an empty file.
@@ -16,7 +17,11 @@
 import type { ProjectData } from "@shared/types";
 import { readUnsaved } from "@/services/unsavedRecovery";
 
-type WorkProvider = () => ProjectData | null;
+export interface WorkProvider {
+  project: () => ProjectData | null;
+  /** Whether the work on screen holds changes the server does not have. */
+  unsaved?: () => boolean;
+}
 
 let provider: WorkProvider | null = null;
 
@@ -31,12 +36,24 @@ export function registerWorkSnapshot(next: WorkProvider): () => void {
 /** The work on screen, else the copy kept for this site, else null. */
 export function currentWork(siteId: string | null): ProjectData | null {
   try {
-    const live = provider?.();
+    const live = provider?.project();
     if (live) return live;
   } catch {
     /* A crashed shell can throw on export; the kept copy may still be there. */
   }
   return siteId ? (readUnsaved(siteId)?.project ?? null) : null;
+}
+
+/** Is there work the server does not have? The provider knows; without it a
+ *  copy kept for a failed save is the only evidence. */
+export function hasUnsavedWork(siteId: string | null): boolean {
+  try {
+    const known = provider?.unsaved?.();
+    if (typeof known === "boolean") return known;
+  } catch {
+    /* fall through to the kept copy */
+  }
+  return siteId ? readUnsaved(siteId) !== null : false;
 }
 
 /** Save `project` as a JSON file the editor can import again. */

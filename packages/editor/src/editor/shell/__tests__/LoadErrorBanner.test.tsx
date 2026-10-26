@@ -204,7 +204,7 @@ describe("LoadErrorBanner — the board's download per cause (G02 / G22 / G18)",
     ["missing", "Download changes"],
     ["forbidden", "Download them"],
   ] as const)("%s offers %s, which downloads the work on screen", (kind, label) => {
-    unregister = registerWorkSnapshot(() => work);
+    unregister = registerWorkSnapshot({ project: () => work });
     const createObjectURL = vi.fn(() => "blob:x");
     const revokeObjectURL = vi.fn();
     Object.assign(URL, { createObjectURL, revokeObjectURL });
