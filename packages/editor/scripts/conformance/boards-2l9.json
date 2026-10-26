@@ -2137,7 +2137,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-A S4 built, not compared: 'Canvas view' menu — Grid · {n} px › (dialog), Rulers ⌘R, Snap guides ⌘; — then Spacing/Badges/X-Ray kept under a rule (code-ahead). Still open: 'Rulers and guides…' list (S11, shared guides) and Show outlines / Focus mode (REQUESTS #12).",
+   "verifiedNote": "lead4 2026-10-27 (A-14): the View menu opens downward from the top bar (probe canvas-grid-panel, menu top 103, right edge 1140). | L-A S4 built, not compared: 'Canvas view' menu — Grid · {n} px › (dialog), Rulers ⌘R, Snap guides ⌘; — then Spacing/Badges/X-Ray kept under a rule (code-ahead). Still open: 'Rulers and guides…' list (S11, shared guides) and Show outlines / Focus mode (REQUESTS #12).",
    "tier": "P1"
   },
   {
@@ -2148,7 +2148,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-fixed",
-   "verifiedNote": "probe-compared 2026-10-27 (case canvas-grid-panel, board shots/145-65011.png): a 360×322 panel (board ~360×330) opened in the View popover's place, right edge on View; head 'Grid and snapping' + Close; note wraps two lines; 'Show grid and snap' switch; Grid size field full width 28 tall; 4/8/16 px presets 96×32 in one row; hint; Cancel · Apply 96×32 right. It opens ABOVE the bar until lead3 moves the bar to the top (REQUESTS A-14).",
+   "verifiedNote": "lead4 2026-10-27 (A-14): re-probed with the bar at the canvas column top (x342 y56, 798 wide): the panel opens downward, frame 778–1140 at y103, 362×324 (board 780–1140 at y103, 360×≈330); the popover padding no longer frames the panel. | probe-compared 2026-10-27 (case canvas-grid-panel, board shots/145-65011.png): a 360×322 panel (board ~360×330) opened in the View popover's place, right edge on View; head 'Grid and snapping' + Close; note wraps two lines; 'Show grid and snap' switch; Grid size field full width 28 tall; 4/8/16 px presets 96×32 in one row; hint; Cancel · Apply 96×32 right. It opens ABOVE the bar until lead3 moves the bar to the top (REQUESTS A-14).",
    "tier": "P1"
   },
   {
@@ -2299,7 +2299,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-A S3 built, not compared: Page width popover from the bar's '{width} px' — Width (px), presets 1920 · Wide … 375 · Mobile, 'Custom width: 240–2560 px.'. 'Saved for your editor on this site.' not drawn: the width is session-only (not persisted). Fluid Desktop stays on the topbar switcher; '1440 · Desktop' previews at 1440.",
+   "verifiedNote": "lead4 2026-10-27 (A-14): the Page width popover opens downward from the top bar. | L-A S3 built, not compared: Page width popover from the bar's '{width} px' — Width (px), presets 1920 · Wide … 375 · Mobile, 'Custom width: 240–2560 px.'. 'Saved for your editor on this site.' not drawn: the width is session-only (not persisted). Fluid Desktop stays on the topbar switcher; '1440 · Desktop' previews at 1440.",
    "tier": "P1"
   },
   {
