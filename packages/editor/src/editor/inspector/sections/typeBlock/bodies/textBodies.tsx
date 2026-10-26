@@ -2,12 +2,14 @@
  * Type-block bodies — text family: Heading, Text (+ paragraph), Link, Label,
  * Button (boards 1, 4, 5).
  *
- *   Heading — Level H1–H6 segmented (writes the tag, one Undo), Text style,
- *             Edit text on canvas.
- *   Text / Link / Label — Text style, Edit text on canvas.
+ *   Heading — Level H1–H6 segmented (writes the tag, one Undo), Edit text
+ *             on canvas.
+ *   Text / Link / Label — Edit text on canvas.
  *   Button  — Edit text on canvas, Type Button/Submit/Reset segmented,
- *             Disabled (box first, label beside). No Text style: a button's
- *             type lives in its closed "Text inside" (owner answer 1).
+ *             Disabled (box first, label beside).
+ *
+ * The block heads Content (2L9 page 04). The Brand "Text style" binding is a
+ * style write, so it heads Style › Typography (`typography/TextStyleRow`).
  *
  * The text itself is edited on the canvas, never in a textarea here; Open In,
  * Rel and a link's Title belong to the Link and Attributes sections (R-DD-9).
@@ -19,10 +21,7 @@ import * as React from "react";
 import type { TypeBlockBodyProps } from "@/editor/inspector/config/typeBlocks";
 import type { TypeBlockId } from "@/shared/constants/elementCapabilities";
 import { writableElements } from "@/engine/commands/commandOperations";
-import { ButtonGroup, SelectRow } from "@/editor/inspector/shared/controls";
-import { extractVarName, cssVarToTokenId, resolveTokenVar } from "@/editor/inspector/shared/tokenBindingDetection";
-import { useTypeRegistry } from "@/editor/design-system/state/TokenRegistryContext";
-import { typeStyleRows } from "@/editor/design-system/ui/sections/TypographySection";
+import { ButtonGroup } from "@/editor/inspector/shared/controls";
 import { runTxn, writeAttribute } from "../attributeWriter";
 import { isAttrOn, useElementRead } from "../blockRows";
 import { CheckRow } from "@/editor/inspector/shared/controls/CheckRow";
@@ -55,33 +54,6 @@ function LevelRow(props: TypeBlockBodyProps) {
     reread();
   };
   return <ButtonGroup label="Level" value={level} onChange={write} options={LEVELS} />;
-}
-
-/**
- * Text style — the Brand type styles are its font-size tokens (F-11), so a
- * style binds `font-size` to that token's var() (owner answer 4). "Custom"
- * unbinds to the size the token stood for, so nothing on the canvas moves.
- */
-function TextStyleRow({ styles, onChange }: TypeBlockBodyProps) {
-  const { tokens } = useTypeRegistry();
-  const options = React.useMemo(
-    () =>
-      typeStyleRows(tokens).map((row) => ({ value: row.id, label: row.name })),
-    [tokens],
-  );
-  const size = styles["font-size"] ?? "";
-  const varName = extractVarName(size);
-  const bound = varName ? cssVarToTokenId(varName) : null;
-  const value = bound && options.some((o) => o.value === bound) ? bound : "";
-  const choose = (id: string) => {
-    if (id) {
-      const token = tokens.find((t) => t.id === id);
-      if (token) onChange("font-size", `var(${token.cssVar})`);
-      return;
-    }
-    if (varName) onChange("font-size", resolveTokenVar(size) || size);
-  };
-  return <SelectRow label="Text style" value={value} onChange={choose} options={options} placeholder="Custom" property="font-size" />;
 }
 
 function ButtonTypeRow(props: TypeBlockBodyProps) {
@@ -124,16 +96,12 @@ function DisabledRow(props: TypeBlockBodyProps) {
 const Heading: React.FC<TypeBlockBodyProps> = (props) => (
   <>
     <LevelRow {...props} />
-    <TextStyleRow {...props} />
     <EditTextRow composer={props.composer} elementId={props.element.id} />
   </>
 );
 
 const TextBody: React.FC<TypeBlockBodyProps> = (props) => (
-  <>
-    <TextStyleRow {...props} />
-    <EditTextRow composer={props.composer} elementId={props.element.id} />
-  </>
+  <EditTextRow composer={props.composer} elementId={props.element.id} />
 );
 
 const ButtonBody: React.FC<TypeBlockBodyProps> = (props) => (

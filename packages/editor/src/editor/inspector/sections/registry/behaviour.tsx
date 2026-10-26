@@ -1,31 +1,24 @@
 /**
- * Behaviour registry entries (boards 2, 6, 18, 19, 20): the type's own
- * sections (Fields / After submit, Slides / Playback, Collection), then Link,
- * CMS binding, Visibility, Interactions (moved from Effects, Q1), CSS classes
- * and Attributes (closed, summary). Owned by lane L2-D1 after W1.
+ * Behavior registry entries (2L9 page 04: boards 161:13919, 156:6055,
+ * 249:71560): how the element acts — the type's own settings (Form
+ * settings, Playback), then Link (where a link goes; its text is Content),
+ * Visibility, Interactions and CSS classes. What the element says or is —
+ * Fields, Slides, Collection, CMS binding, Attributes — is Content
+ * (`./content.tsx`).
  *
  * @license BSD-3-Clause
  */
 
-import { adaptBaseStyleProps, adaptElementProps, defineSection, type AnySectionEntry, type SectionContext } from "./_shared";
+import { adaptBaseStyleProps, adaptElementProps, defineSection, ownSection as own, type AnySectionEntry, type SectionContext } from "./_shared";
 import { CSSClassesSection } from "../CSSClassesSection";
 import { LinkSection } from "../LinkSection";
-import { CmsBindingSection } from "../CmsBindingSection";
-import { CollectionListSection } from "../CollectionListSection";
-import { FormFieldsSection } from "../FormFieldsSection";
 import { FormAfterSubmitSection } from "../FormAfterSubmitSection";
-import { SlidesSection } from "../SlidesSection";
 import { SliderPlaybackSection } from "../SliderPlaybackSection";
 import { VisibilitySection } from "../VisibilitySection";
 import { InteractionsSection, type Interaction } from "../interactions";
-import { AttributesSection, attributesSummary } from "../attributes/AttributesSection";
-import type { BehaviourSectionId } from "@/shared/constants/elementCapabilities";
 import { IS_DEV_BUILD } from "@/shared/utils/runtimeEnv";
 import { writeElement } from "@/engine/commands/commandOperations";
 import type { AnimationConfig } from "@/shared/types/animations";
-
-const own = (id: BehaviourSectionId) => (caps: { behaviourSections: readonly BehaviourSectionId[] }) =>
-  caps.behaviourSections.includes(id);
 
 /** The element under the canvas selection, for the interaction preview. */
 const canvasNode = (id: string) => document.querySelector(`[data-buildrick-id="${id}"]`) as HTMLElement | null;
@@ -98,32 +91,12 @@ function adaptInteractions(ctx: SectionContext) {
 }
 
 export const BEHAVIOUR_SECTIONS: Record<string, AnySectionEntry> = {
-  "form-fields": defineSection({
-    tab: "behaviour",
-    title: "Fields",
-    open: "open",
-    capability: own("form-fields"),
-    Component: FormFieldsSection,
-    styleKeys: [],
-    adaptProps: adaptElementProps,
-  }),
-
   "form-settings": defineSection({
     tab: "behaviour",
     title: "After submit",
     open: "open",
     capability: own("form-settings"),
     Component: FormAfterSubmitSection,
-    styleKeys: [],
-    adaptProps: adaptElementProps,
-  }),
-
-  slides: defineSection({
-    tab: "behaviour",
-    title: "Slides",
-    open: "open",
-    capability: own("slides"),
-    Component: SlidesSection,
     styleKeys: [],
     adaptProps: adaptElementProps,
   }),
@@ -136,16 +109,6 @@ export const BEHAVIOUR_SECTIONS: Record<string, AnySectionEntry> = {
     Component: SliderPlaybackSection,
     styleKeys: [],
     adaptProps: adaptElementProps,
-  }),
-
-  collection: defineSection({
-    tab: "behaviour",
-    title: "Collection",
-    open: "open",
-    capability: own("collection"),
-    Component: CollectionListSection,
-    styleKeys: [],
-    adaptProps: (ctx) => ({ ...adaptElementProps(ctx), onOpenCreateCollection: ctx.onOpenCreateCollection }),
   }),
 
   link: defineSection({
@@ -161,16 +124,6 @@ export const BEHAVIOUR_SECTIONS: Record<string, AnySectionEntry> = {
       isOpen: ctx.isOpen,
       onToggle: ctx.onToggle,
     }),
-  }),
-
-  "cms-binding": defineSection({
-    tab: "behaviour",
-    title: "CMS binding",
-    open: "open",
-    capability: (caps) => caps.cmsBindable && !caps.isStructuralChild,
-    Component: CmsBindingSection,
-    styleKeys: [],
-    adaptProps: (ctx) => ({ ...adaptElementProps(ctx), onOpenCreateCollection: ctx.onOpenCreateCollection }),
   }),
 
   visibility: defineSection({
@@ -207,19 +160,4 @@ export const BEHAVIOUR_SECTIONS: Record<string, AnySectionEntry> = {
     }),
   }),
 
-  attributes: defineSection({
-    tab: "behaviour",
-    title: "Attributes",
-    open: "closed",
-    summary: (ctx) => attributesSummary(ctx.composer, ctx.selectedElement),
-    Component: AttributesSection,
-    styleKeys: [],
-    adaptProps: (ctx) => ({
-      composer: ctx.composer ?? null,
-      element: ctx.selectedElement,
-      targetIds: ctx.selectedIds,
-      isOpen: ctx.isOpen,
-      onToggle: ctx.onToggle,
-    }),
-  }),
 };

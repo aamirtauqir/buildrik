@@ -5,8 +5,10 @@
  *   header       — breadcrumb · icon + name · ✦ AI · ⋯ · ✕ · status marks
  *   status line  — why the panel is read-only (locked / save conflict)
  *   multi bar    — Align / Distribute / Group, when 2+ are selected (DD-12)
- *   tabs         — Style · Behaviour · Effects (DD-1, Q1)
- *   context row  — State / breakpoint, on Style and Effects only (R-DD-14)
+ *   tabs         — Content · Style · Behavior · Effects (2L9 page 04)
+ *   context row  — State / breakpoint overrides, on Style and Effects only
+ *                  (R-DD-14): Content and Behavior writes are breakpoint-
+ *                  and state-independent
  *   tab panel    — the tab's sections in their fixed order (InspectorTabContent)
  *
  * Nothing selected, or the page root selected → the Page panel (DD-13).
@@ -53,6 +55,7 @@ import { computeStatesWithOverrides } from "./config/pseudoOverrides";
 import { detectMixedValues, shownStylesAt } from "./shared/detectMixedValues";
 import { InspectorFieldContext, type InspectorFieldContextValue } from "./shared/controls/InspectorFieldContext";
 import { InspectorTabContent } from "./tabs/InspectorTabContent";
+import { openingTab } from "./config/sectionOrder";
 import "./styles/inspector.css";
 
 /** Three equal 100px tabs, 32 tall, the active one accent with a 2px
@@ -172,11 +175,12 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
   const { choices, setChoices } = useInspectorSections();
 
   /* The strip. A new element of the SAME type keeps the tab; a different
-     type starts on Style (DD-20) — its Behaviour tab holds other things. */
-  const [activeTab, setActiveTab] = React.useState<TabId>("style");
+     type starts on its opening tab (DD-20) — Content when it has something
+     defining there, else Style. */
+  const [activeTab, setActiveTab] = React.useState<TabId>(() => (selectedElement?.type ? openingTab(selectedElement.type) : "style"));
   const prevTypeRef = React.useRef(selectedElement?.type);
   React.useEffect(() => {
-    if (selectedElement?.type && selectedElement.type !== prevTypeRef.current) setActiveTab("style");
+    if (selectedElement?.type && selectedElement.type !== prevTypeRef.current) setActiveTab(openingTab(selectedElement.type));
     prevTypeRef.current = selectedElement?.type ?? prevTypeRef.current;
   }, [selectedElement?.type]);
 
@@ -358,7 +362,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     return withViewOnly(<ThemeToggleInspector composer={composer} />);
   }
 
-  const showContextRow = activeTab !== "behaviour";
+  const showContextRow = activeTab === "style" || activeTab === "effects";
 
   return withViewOnly(
     <InspectorFieldContext.Provider value={fieldContext}>
@@ -380,7 +384,12 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           selectedIds={targetIds}
           breakpointLabel={BREAKPOINTS[currentBreakpoint]?.name ?? currentBreakpoint}
           state={currentPseudoState}
-          onStateChange={setCurrentPseudoState}
+          onStateChange={(state) => {
+            setCurrentPseudoState(state);
+            /* A state is a Style / Effects layer: picking one from Content or
+               Behavior goes where its values are edited. */
+            if (state !== "normal" && activeTab !== "style" && activeTab !== "effects") setActiveTab("style");
+          }}
           statesWithOverrides={statesWithOverrides}
         />
         {targetIds.length > 1 ? null : (

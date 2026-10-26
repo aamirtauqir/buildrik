@@ -1,7 +1,7 @@
 /**
  * SizeSection — Width / Height as Fixed · Fill · Hug with readouts (board 1:
- * "Width · Fill [640 px]", "Height [Hug · Auto]"), no object-fit (→ Image
- * block), the item controls under a flex / grid parent, and the Page panel's
+ * "Width · Fill [640 px]", "Height [Hug · Auto]"), an image's Fit (2L9
+ * 36:2), the item controls under a flex / grid parent, and the Page panel's
  * one Max width row (board 21).
  *
  * @license BSD-3-Clause
@@ -112,9 +112,16 @@ describe("SizeSection — board 1's readouts", () => {
 });
 
 describe("SizeSection — what moved in and out", () => {
-  it("has no object-fit (the Image block owns it)", () => {
+  it("no Fit row unless the element is an image", () => {
     renderSize({ styles: { "object-fit": "cover" }, advancedExpanded: true, onAdvancedToggle: vi.fn() });
-    expect(screen.queryByLabelText(/object fit/i)).not.toBeInTheDocument();
+    expect(screen.queryByRole("radio", { name: "Cover" })).not.toBeInTheDocument();
+  });
+
+  it("an image's Fit (2L9 36:2: fit and dimensions are in Style) writes object-fit through the style path", () => {
+    const { onChange } = renderSize({ styles: { "object-fit": "cover" }, fit: true });
+    expect(screen.getByRole("radio", { name: "Cover" })).toHaveAttribute("aria-checked", "true");
+    fireEvent.click(screen.getByRole("radio", { name: "Contain" }));
+    expect(onChange).toHaveBeenCalledWith("object-fit", "contain");
   });
 
   it("min / max wait behind More settings", () => {

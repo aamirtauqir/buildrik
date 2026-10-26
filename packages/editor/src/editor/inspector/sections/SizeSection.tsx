@@ -22,7 +22,7 @@ import { BK_SELECT_BARE_VALUE_THEME, Button, Menu, MenuItem, Popover, Select } f
 import { useSpacingRegistry } from "@/editor/design-system/state/TokenRegistryContext";
 import { TokenPickerPopover } from "../shared/TokenPickerPopover";
 import { isTokenVar, resolveTokenVar } from "../shared/tokenBindingDetection";
-import { InputWithUnit, MoreSettingsToggle, Section } from "../shared/controls";
+import { ButtonGroup, InputWithUnit, MoreSettingsToggle, Section } from "../shared/controls";
 import { FieldDot } from "../shared/controls/FieldDot";
 import { useInspectorField } from "../shared/controls/InspectorFieldContext";
 import { CHAIN_BOUND, CHAIN_ROW, CHAIN_TRIGGER } from "../shared/controls/controlClasses";
@@ -310,6 +310,9 @@ export interface SizeSectionProps {
   variant?: "element" | "page";
   /** The parent is a flex / grid container: show the item controls. */
   parentLayout?: ParentLayout | null;
+  /** An image: its Fit (object-fit) row — "Image fit and dimensions are in
+   *  Style" (2L9 board 36:2). */
+  fit?: boolean;
   propertyStates?: Record<string, { hidden?: boolean; disabled?: boolean; reason?: string }>;
   isOpen?: boolean;
   onToggle?: (open: boolean) => void;
@@ -318,6 +321,12 @@ export interface SizeSectionProps {
   mixedKeys?: ReadonlySet<string>;
   isMultiSelect?: boolean;
 }
+
+const FIT_OPTIONS = [
+  { value: "cover", label: "Cover" },
+  { value: "contain", label: "Contain" },
+  { value: "fill", label: "Fill" },
+];
 
 const LIMITS = [
   { property: "min-width", label: "Min width" },
@@ -332,6 +341,7 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
   elementId,
   variant = "element",
   parentLayout = null,
+  fit = false,
   propertyStates = {},
   isOpen,
   onToggle,
@@ -364,6 +374,9 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
       )}
       {!hidden("height") && (
         <DimensionRow axis="height" value={styles.height || ""} measured={measured?.height ?? null} onChange={(v) => onChange("height", v)} />
+      )}
+      {fit && (
+        <ButtonGroup label="Fit" property="object-fit" value={styles["object-fit"] ?? ""} options={FIT_OPTIONS} onChange={(v) => onChange("object-fit", v)} />
       )}
       {parentLayout && <ItemControls parent={parentLayout} styles={styles} onChange={onChange} advanced={advancedExpanded} />}
       {advancedExpanded &&

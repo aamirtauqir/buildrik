@@ -23,9 +23,9 @@ describe("registry — per-section style slicing (Task 5)", () => {
     expect(typo!.styleKeys).not.toContain("width");
   });
 
-  it("Type entry's styleKeys includes font-size — the Text style row reads it from the slice", () => {
-    const type = SECTION_REGISTRY_LIST.find((e) => e.id === "type");
-    expect(type).toBeDefined();
-    expect(type!.styleKeys).toContain("font-size");
+  it("Typography carries font-size — its Text style row reads it from the slice", () => {
+    const typo = SECTION_REGISTRY_LIST.find((e) => e.id === "typography");
+    expect(typo!.styleKeys).toContain("font-size");
+    expect(SECTION_REGISTRY_LIST.find((e) => e.id === "type")!.styleKeys).not.toContain("font-size");
   });
 });

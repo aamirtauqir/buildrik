@@ -3798,7 +3798,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Board Content·Style·Behavior·Effects; code has no Content tab; page/multi contexts differ (spec specimen)"
+   "verifiedNote": "Lane L-B A1 (2026-10-26): tab strip now Content · Style · Behavior · Effects, type block on Content, Flex/Grid body + image Fit + Text style on Style — compared by probe screenshot (case inspector-panel, :5172) against the dump's copy for this board. Still open: header context line (REQUESTS #10), Semantics/Conditions/Advanced attributes (A2, REQUESTS #11), page/multi/locked/instance specimens."
   },
   {
    "nodeId": "39:9114",
@@ -3818,7 +3818,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Fields sits in Behaviour (config/sectionOrder.ts:29), board Content; no reorder hint/Move up·down menu; Semantics/Conditions rows missing"
+   "verifiedNote": "Lane L-B A1: Fields now on Content (probe-compared). Open: reorder hint / field menu (A5), Semantics (A2), Conditions (REQUESTS #11)."
   },
   {
    "nodeId": "156:1316",
@@ -4349,7 +4349,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "\"Edit text on canvas\" exists but in Style type block (config/sectionOrder.ts:17); Tag/ID Semantics, Conditions, Advanced attributes rows mi…"
+   "verifiedNote": "Lane L-B A1: Content tab exists and leads with the Text type block (Edit text on canvas) — probe-compared to dump copy. Open: Semantics (Tag, ID), Advanced attributes · N set (A2), Conditions (REQUESTS #11), header 'Content · All breakpoints' (REQUESTS #10)."
   },
   {
    "nodeId": "161:8940",
@@ -4461,7 +4461,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Board \"Show on these devices\", data-conditions note, \"Plays on all breakpoints\", \"No interactions yet\"; tab label Behavior vs code \"Behavio…"
+   "verifiedNote": "Lane L-B A1: Behavior tab label + Visibility, Interactions first (probe-compared). Open: 'Show on these devices', 'Plays on all breakpoints', 'No interactions yet.' copy (A7); header 'Behavior · {type}' (REQUESTS #10)."
   },
   {
    "nodeId": "161:14383",
@@ -19901,7 +19901,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "SessionExpiredModal.tsx:87-92 title \"Your session expired\" vs \"Sign in again to save\"; body copy differs; extra at-risk list"
+   "verifiedNote": "L-F S5: built, not compared. 480 dialog (size confirm), \"Sign in again to save\" + board body with the history count since the last save; \"and in this browser\" only when a kept copy exists (code truth). Keep editing · Try saving again · Sign in ↗ (primary). The labels list folded into the count (code-ahead disposition)."
   },
   {
    "nodeId": "225:3888",
@@ -19910,8 +19910,8 @@
    "family": "recovery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Mid-session 401 opens modal/toast (useComposerInit.ts:821-829); no persistent banner slot. LoadErrorBanner auth is load-time only"
+   "verified": "drift-open",
+   "verifiedNote": "L-F S5: built, not compared. Keep editing (and Escape) leaves the G04 banner in the global slot with Sign in ↗; the next landed save (lastSavedAt) clears it."
   },
   {
    "nodeId": "225:4416",

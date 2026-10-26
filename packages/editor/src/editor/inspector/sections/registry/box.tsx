@@ -69,11 +69,12 @@ export const BOX_SECTIONS: Record<string, AnySectionEntry> = {
     Component: SizeSection,
     advancedKey: "size",
     advancedProps: ["min-width", "max-width", "min-height", "max-height", "flex-shrink", "flex-basis", "order", "align-self", "justify-self"],
-    styleKeys: ["width", "height", "min-width", "min-height", "max-width", "max-height", ...ITEM_KEYS],
+    styleKeys: ["width", "height", "min-width", "min-height", "max-width", "max-height", "object-fit", ...ITEM_KEYS],
     adaptProps: (ctx) => ({
       ...adaptBaseStyleProps(ctx),
       elementId: ctx.selectedElement.id,
       variant: ctx.variant,
+      fit: ctx.caps.typeBlock === "image",
       parentLayout: ctx.cssContext.isFlexItem ? ("flex" as const) : ctx.cssContext.isGridItem ? ("grid" as const) : null,
       propertyStates: ctx.propertyStates,
       advancedExpanded: ctx.advancedExpanded,

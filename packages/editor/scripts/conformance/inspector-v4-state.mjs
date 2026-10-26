@@ -199,7 +199,7 @@ const RUNNER = String.raw`async (spec) => {
 
   /* 4. Tab. */
   if (spec.tab) {
-    const want = { style: ["Style"], behaviour: ["Behaviour", "Settings"], effects: ["Effects"] }[spec.tab];
+    const want = { style: ["Style"], behaviour: ["Behavior", "Behaviour", "Settings"], effects: ["Effects"] }[spec.tab];
     const strip = q("inspector-tab-strip") || document;
     const tabs = [...strip.querySelectorAll('[role="tab"]')];
     let done = false;

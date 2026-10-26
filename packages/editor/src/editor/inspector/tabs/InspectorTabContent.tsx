@@ -78,7 +78,7 @@ export function visibleSectionIds(tabId: TabId, types: readonly string[], ctx: S
     const entry = SECTION_REGISTRY[id];
     if (!entry || entry.tab !== tabId) return false;
     if (entry.capability && !allCaps.every((caps) => entry.capability!(caps))) return false;
-    if (id === "type" && new Set(allCaps.map((c) => c.typeBlock)).size > 1) return false;
+    if ((id === "type" || id === "type-layout") && new Set(allCaps.map((c) => c.typeBlock)).size > 1) return false;
     return entry.shouldRender ? entry.shouldRender(ctx) : true;
   });
 }

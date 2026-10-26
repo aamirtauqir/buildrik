@@ -88,7 +88,7 @@ const NO_OP_ADVANCED: UseAdvancedSettingsReturn = {
 };
 
 function renderTab(opts: {
-  tabId: "style" | "behaviour" | "effects";
+  tabId: "content" | "style" | "behaviour" | "effects";
   elementType: string;
   cssContext?: Partial<CssContext>;
   authored?: Record<string, string>;
@@ -122,14 +122,19 @@ const sectionNames = () =>
   screen.getAllByRole("button", { name: / section, (expanded|collapsed)$/ }).map((b) => b.getAttribute("aria-label")!.replace(/ section, .*/, ""));
 
 describe("InspectorTabContent — one order per tab, presence by capability", () => {
-  it("heading · Style: the type block leads, then Typography, Size, Spacing, Fill, Border (board 1)", () => {
+  it("heading · Content: the type block leads, then CMS binding, Attributes (2L9 161:8480)", () => {
+    renderTab({ tabId: "content", elementType: "heading" });
+    expect(sectionNames()).toEqual(["Heading", "CMS binding", "Attributes"]);
+  });
+
+  it("heading · Style: Typography, Size, Spacing, Fill, Border — no type block", () => {
     renderTab({ tabId: "style", elementType: "heading" });
-    expect(sectionNames()).toEqual(["Heading", "Typography", "Size", "Spacing", "Fill", "Border"]);
+    expect(sectionNames()).toEqual(["Typography", "Size", "Spacing", "Fill", "Border"]);
   });
 
   it("image · Style: no Typography, no Text inside", () => {
     renderTab({ tabId: "style", elementType: "image" });
-    expect(sectionNames()).toEqual(["Image", "Size", "Spacing", "Fill", "Border"]);
+    expect(sectionNames()).toEqual(["Size", "Spacing", "Fill", "Border"]);
   });
 
   it("a container set to flex gets no Flexbox section — Layout carries the flex controls (board 17)", () => {
@@ -138,20 +143,20 @@ describe("InspectorTabContent — one order per tab, presence by capability", ()
     expect(sectionNames()).not.toContain("Flexbox");
   });
 
-  it("Behaviour carries Interactions (Q1) and Visibility; Effects carries neither", () => {
+  it("Behavior carries Interactions (Q1) and Visibility; Effects carries neither", () => {
     const { unmount } = renderTab({ tabId: "effects", elementType: "container" });
     expect(sectionNames()).toEqual(["Opacity", "Shadow", "Filters", "Transform & motion", "Advanced"]);
     unmount();
     renderTab({ tabId: "behaviour", elementType: "container" });
-    expect(sectionNames()).toEqual(["Link", "Visibility", "Interactions", "CSS classes", "Attributes"]);
+    expect(sectionNames()).toEqual(["Link", "Visibility", "Interactions", "CSS classes"]);
   });
 
-  it("an image shows no Link; a heading shows CMS binding, no Link", () => {
+  it("an image shows no Link; a heading's Behavior has no Link and no CMS binding", () => {
     const { unmount } = renderTab({ tabId: "behaviour", elementType: "image" });
     expect(sectionNames()).not.toContain("Link");
     unmount();
     renderTab({ tabId: "behaviour", elementType: "heading" });
-    expect(sectionNames()).toEqual(["CMS binding", "Visibility", "Interactions", "CSS classes", "Attributes"]);
+    expect(sectionNames()).toEqual(["Visibility", "Interactions", "CSS classes"]);
   });
 
   it("a multi-selection shows only the sections every selected type has (DD-12)", () => {
@@ -186,7 +191,7 @@ describe("InspectorTabContent — display modes (DD-11)", () => {
     expect(onSetChoices).toHaveBeenCalledWith("heading", ["border"], "open");
   });
 
-  it("Attributes and Effects › Advanced arrive closed with their one-line summary", () => {
+  it("Effects › Advanced arrives closed with its one-line summary", () => {
     renderTab({ tabId: "effects", elementType: "heading" });
     expect(screen.getByTestId("inspector-summary-effects-advanced")).toHaveTextContent("Cursor: auto · Blend: normal");
   });
@@ -200,6 +205,6 @@ describe("InspectorTabContent — display modes (DD-11)", () => {
     const onSetChoices = vi.fn();
     renderTab({ tabId: "style", elementType: "heading", onSetChoices });
     fireEvent.click(screen.getByRole("button", { name: "Size section, expanded" }), { altKey: true });
-    expect(onSetChoices).toHaveBeenCalledWith("heading", ["type", "typography", "size", "spacing", "fill", "border"], "closed");
+    expect(onSetChoices).toHaveBeenCalledWith("heading", ["typography", "size", "spacing", "fill", "border"], "closed");
   });
 });

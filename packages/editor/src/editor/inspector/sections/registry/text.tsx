@@ -112,7 +112,7 @@ export const TEXT_SECTIONS: Record<string, AnySectionEntry> = {
     advancedKey: "typography",
     advancedProps: TYPOGRAPHY_ADVANCED,
     styleKeys: TYPOGRAPHY_KEYS,
-    adaptProps: adaptTypography,
+    adaptProps: (ctx) => ({ ...adaptTypography(ctx), textStyle: ctx.variant === "element" }),
   }),
 
   "text-inside": defineSection({

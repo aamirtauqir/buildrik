@@ -1,8 +1,8 @@
 /**
- * Type block — text family bodies (boards 1, 4, 5): Heading's Level
- * segmented (writes the tag, one Undo), the Text style row (binds font-size
- * to a Brand type-style token, owner answer 4), Edit text on canvas, and the
- * Button block (Type segmented, Disabled with its label beside the box).
+ * Type block — text family bodies (boards 1, 4, 5; Content tab, 2L9 page
+ * 04): Heading's Level segmented (writes the tag, one Undo), Edit text on
+ * canvas, and the Button block (Type segmented, Disabled with its label
+ * beside the box). No Text style: that binding is Style › Typography's.
  *
  * @license BSD-3-Clause
  */
@@ -55,9 +55,10 @@ describe("Heading (board 1)", () => {
     expect(document.querySelector("select option[value='h1']")).toBeNull();
   });
 
-  it("rows in board order: Level, Text style, then Edit text on canvas", () => {
+  it("rows in board order: Level, then Edit text on canvas; no Text style on Content", () => {
     mock("heading", { tagName: "h2" });
-    expect(rowLabels()).toEqual(["Level", "Text style"]);
+    expect(rowLabels()).toEqual(["Level"]);
+    expect(screen.queryByLabelText("Text style")).toBeNull();
     expect(screen.getByRole("button", { name: "Edit text on canvas" })).toBeInTheDocument();
   });
 
@@ -88,42 +89,10 @@ describe("Heading (board 1)", () => {
   });
 });
 
-describe("Text style (owner answer 4 — font-size bound to a Brand type-style token)", () => {
-  const textStyle = () => screen.getByLabelText("Text style") as HTMLSelectElement;
-
-  it("lists the Brand type styles by name, largest first", () => {
-    mock("heading");
-    const names = Array.from(textStyle().options).map((o) => o.textContent);
-    expect(names.slice(0, 4)).toEqual(["Custom", "Heading 1", "Heading 2", "Heading 3"]);
-    expect(names).toContain("Body text");
-  });
-
-  it("picking a style binds font-size to the token's var()", () => {
-    const { onChange } = mock("text");
-    fireEvent.change(textStyle(), { target: { value: "font-size-2xl" } });
-    expect(onChange).toHaveBeenCalledWith("font-size", "var(--buildrick-design-font-size-2xl)");
-  });
-
-  it("reads a bound font-size back as that style", () => {
-    mock("heading", {}, { "font-size": "var(--buildrick-design-font-size-base)" });
-    expect(textStyle().value).toBe("font-size-base");
-  });
-
-  it("an unbound size reads Custom; choosing Custom unbinds to the size it stood for", () => {
-    const { onChange } = mock("heading", {}, { "font-size": "var(--buildrick-design-font-size-lg)" });
-    document.documentElement.style.setProperty("--buildrick-design-font-size-lg", "18px");
-    fireEvent.change(textStyle(), { target: { value: "" } });
-    expect(onChange).toHaveBeenCalledWith("font-size", "18px");
-    cleanup();
-    mock("heading", {}, { "font-size": "32px" });
-    expect(textStyle().value).toBe("");
-  });
-});
-
 describe("Text (board 4) and the other text types", () => {
-  it.each(["text", "paragraph", "link", "label"])("%s: Text style + Edit text on canvas, no Level", (type) => {
+  it.each(["text", "paragraph", "link", "label"])("%s: Edit text on canvas, no Level, no Text style", (type) => {
     mock(type);
-    expect(rowLabels()).toEqual(["Text style"]);
+    expect(rowLabels()).toEqual([]);
     expect(screen.getByRole("button", { name: "Edit text on canvas" })).toBeInTheDocument();
     expect(screen.queryByTestId("inspector-field-level")).toBeNull();
   });

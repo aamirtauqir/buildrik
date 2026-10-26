@@ -31,7 +31,7 @@ const TYPES = [
   "form", "collection-list", "slider", "list-item", "divider", "spacer",
 ] as const;
 
-const TABS = ["Style", "Behaviour", "Effects"] as const;
+const TABS = ["Content", "Style", "Behavior", "Effects"] as const;
 
 /** Anywhere in the panel, on any tab (DD-5, DD-6a/6b, R-DD-9, DD-12). */
 const NEVER = [
@@ -75,19 +75,20 @@ const sectionNames = () =>
     .map((b) => b.getAttribute("aria-label")!.replace(/ section, .*/, ""));
 
 describe.each(TYPES)("MUST-NOT — %s", (type) => {
-  it("no removed control on any tab, no context row on Behaviour, no removed ⋯ row", () => {
+  it("no removed control on any tab, no context row on Content or Behavior, no removed ⋯ row", () => {
     mount(type);
     for (const tab of TABS) {
       fireEvent.click(within(screen.getByTestId("inspector-tab-strip")).getByRole("tab", { name: tab }));
       const text = panel().textContent ?? "";
       for (const re of NEVER) expect(text, `${type} · ${tab}: ${re}`).not.toMatch(re);
-      /* DD-14: no override Reset / Revert lines on Behaviour. (The state and
+      /* DD-14: no override Reset / Revert lines on Content or Behavior —
+         their writes do not depend on breakpoint or state. (The state and
          breakpoint themselves are the header's "Editing" row — 2L9 Task 1.4 —
          and the lines draw only when something is overridden.) */
-      if (tab === "Behaviour") expect(screen.queryByTestId("inspector-context-row"), `${type} · Behaviour`).toBeNull();
-      /* DD-10: CMS binding only on bindable types. */
-      if (tab === "Behaviour" && !BINDABLE_TYPES.has(type)) expect(sectionNames(), type).not.toContain("CMS binding");
-      /* Q1: Interactions lives on Behaviour, never Effects. */
+      if (tab === "Content" || tab === "Behavior") expect(screen.queryByTestId("inspector-context-row"), `${type} · ${tab}`).toBeNull();
+      /* DD-10: CMS binding only on bindable types (Content › CMS binding). */
+      if (!BINDABLE_TYPES.has(type)) expect(sectionNames(), `${type} · ${tab}`).not.toContain("CMS binding");
+      /* Q1: Interactions lives on Behavior, never Effects. */
       if (tab === "Effects") expect(sectionNames(), type).not.toContain("Interactions");
     }
     fireEvent.click(screen.getByTestId("inspector-element-menu"));
