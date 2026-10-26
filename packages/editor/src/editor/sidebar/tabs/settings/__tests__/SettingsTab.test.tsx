@@ -1467,3 +1467,17 @@ describe("SettingsTab — offline (2L9 B8-S05 / SH04)", () => {
     expect((screen.getByTestId("set-foot-save") as HTMLButtonElement).disabled).toBe(false);
   });
 });
+
+describe("SettingsTab — saving (2L9 B8-SH07 / AN08)", () => {
+  it("the footer says the save is running and the button reads Saving… until it lands", async () => {
+    let finish!: () => void;
+    renderS(<SettingsTab composer={asComposer(makeComposer(() => new Promise<void>((r) => (finish = r))))} />);
+    await openGeneralAndEdit();
+    fireEvent.click(screen.getByTestId("set-foot-save"));
+    await waitFor(() => expect(footStatus()).toBe("Saving settings…"));
+    expect(screen.getByTestId("set-foot-save").textContent).toBe("Saving…");
+    await act(async () => finish());
+    await waitFor(() => expect(footStatus()).toBe("Saved · applies on next publish"));
+    expect(screen.getByTestId("set-foot-save").textContent).toBe("Save settings");
+  });
+});

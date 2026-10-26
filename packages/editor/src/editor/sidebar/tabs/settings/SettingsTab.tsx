@@ -819,6 +819,8 @@ export const SettingsTab: React.FC<
   const footStatus: { text: string; tone: "muted" | "ink" | "danger" } =
     !online && loadState === "ready"
       ? { text: "Needs a connection · changes stay here, unsaved", tone: "danger" }
+      : saving
+      ? { text: "Saving settings…", tone: "muted" }
       : loadState === "loading"
       ? { text: "Loading settings…", tone: "muted" }
       : loadState === "error"
@@ -1190,7 +1192,7 @@ export const SettingsTab: React.FC<
               onClick={() => handleSave()}
               data-testid="set-foot-save"
             >
-              {saveError && !footerMessage ? "Retry save" : "Save settings"}
+              {saving ? "Saving…" : saveError && !footerMessage ? "Retry save" : "Save settings"}
             </Button>
           </footer>
         )}
