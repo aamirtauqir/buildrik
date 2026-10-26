@@ -2,10 +2,10 @@
  * ComponentRow — the instance identity block of 2L9 IC01/IC03 (above the
  * tabs): "◇ {name} · instance", "Component library · v{n}", Variant, "Edit
  * main component ›", "Reset to main component · {n} overrides" (disabled
- * with "No overrides to reset"), "Detach instance". The confirms are the
- * ones the instance doors always had (detach is not undoable, so it keeps
- * its confirm — code wins over IC06); the P-1 lock gate and the read-only
- * field context (locked / save conflict) refuse the writes.
+ * with "No overrides to reset"), "Detach instance". Reset keeps its confirm;
+ * Detach applies at once with a "{name} detached · Undo" receipt (IC06 —
+ * detaching is a document history step since B-12); the P-1 lock gate and
+ * the read-only field context (locked / save conflict) refuse the writes.
  *
  * @license BSD-3-Clause
  */
@@ -38,6 +38,7 @@ function makeComposer({
   resetInstance = vi.fn(),
   updateInstanceVariant = vi.fn(),
   detachInstance = vi.fn(async () => true),
+  undo = vi.fn(() => true),
 }: {
   component: ComponentDefinition | null;
   instance: ComponentInstance | null;
@@ -45,6 +46,7 @@ function makeComposer({
   resetInstance?: ReturnType<typeof vi.fn>;
   updateInstanceVariant?: ReturnType<typeof vi.fn>;
   detachInstance?: ReturnType<typeof vi.fn>;
+  undo?: ReturnType<typeof vi.fn>;
 }) {
   const hero = { getType: () => "section", getCustomData: (k: string) => (k === "layerName" ? "Hero" : undefined), getParent: () => root };
   const root = { getType: () => "root", getCustomData: () => undefined, getParent: () => null };
@@ -63,6 +65,7 @@ function makeComposer({
       resetInstance,
       detachInstance,
     },
+    history: { captureUndo: vi.fn(() => undo) },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } as any;
 }
@@ -168,17 +171,27 @@ describe("ComponentRow — board 26", () => {
     expect(resetInstance).toHaveBeenCalledWith("el-1");
   });
 
-  it("Detach instance confirms with the instance's path (it cannot be undone), then detaches", async () => {
+  it("2L9 IC06: Detach applies at once, says \"{name} detached\" and its Undo undoes that detach", async () => {
     const detachInstance = vi.fn(async () => true);
-    renderRow(makeComposer({ component: makeComponent(), instance: makeInstance(), detachInstance }));
+    const undo = vi.fn(() => true);
+    const composer = makeComposer({ component: makeComponent(), instance: makeInstance(), detachInstance, undo });
+    renderRow(composer);
     fireEvent.click(screen.getByTestId("component-detach"));
-    expect(detachInstance).not.toHaveBeenCalled();
-    expect(screen.getByText("Detach this Reservation banner instance?")).toBeTruthy();
-    expect(screen.getByText(/^Home › Hero · This instance becomes an independent container/)).toBeTruthy();
-    fireEvent.click(screen.getByTestId("instance-detach-confirm-confirm"));
     expect(detachInstance).toHaveBeenCalledWith("el-1");
-    /* L2-029: a successful detach says so. */
-    expect(await screen.findByText("Reservation banner instance detached")).toBeTruthy();
+    expect(screen.queryByText("Detach this Reservation banner instance?")).toBeNull();
+    expect(await screen.findByText("Reservation banner detached")).toBeTruthy();
+    // The Undo is bound to the detach (captureUndo after it landed), not to whatever is newest later.
+    expect(composer.history.captureUndo).toHaveBeenCalledTimes(1);
+    fireEvent.click(screen.getByRole("button", { name: "Undo" }));
+    expect(undo).toHaveBeenCalledTimes(1);
+  });
+
+  it("a detach that fails says so and offers no Undo", async () => {
+    const composer = makeComposer({ component: makeComponent(), instance: makeInstance(), detachInstance: vi.fn(async () => false) });
+    renderRow(composer);
+    fireEvent.click(screen.getByTestId("component-detach"));
+    expect(await screen.findByText("Couldn't detach this instance. It may already be detached.")).toBeTruthy();
+    expect(composer.history.captureUndo).not.toHaveBeenCalled();
   });
 
   it("P-1: a locked instance refuses the reset even after the confirm", () => {
@@ -193,7 +206,8 @@ describe("ComponentRow — board 26", () => {
 
   it.each(["locked", "conflict"] as const)("read-only (%s): variant, reset and detach are off, Edit main component stays", (reason) => {
     const updateInstanceVariant = vi.fn();
-    const composer = makeComposer({ component: withVariants(), instance: withOverrides(1), updateInstanceVariant });
+    const detachInstance = vi.fn(async () => true);
+    const composer = makeComposer({ component: withVariants(), instance: withOverrides(1), updateInstanceVariant, detachInstance });
     renderRow(composer, readOnlyCtx(reason));
     // Read-only is not disabled (DD-18): legible, focusable, the change refused.
     const select = screen.getByLabelText("Variant") as HTMLSelectElement;
@@ -206,7 +220,7 @@ describe("ComponentRow — board 26", () => {
       fireEvent.click(screen.getByTestId(id));
     }
     expect(screen.queryByTestId("instance-reset-confirm-confirm")).toBeNull();
-    expect(screen.queryByTestId("instance-detach-confirm-confirm")).toBeNull();
+    expect(detachInstance).not.toHaveBeenCalled();
     fireEvent.click(screen.getByTestId("component-edit-master"));
     expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_COMPONENTS_OPEN_MASTER, { componentId: "comp-1", instanceId: "el-1" });
   });

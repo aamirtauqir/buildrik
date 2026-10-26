@@ -4755,9 +4755,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "code:detach-not-undoable",
-   "verified": "drift-open",
-   "verifiedNote": "Lane L-B A8: Detach keeps its confirm. Detaching is not on the document history (engine drops the instance link outside it), so the board's direct Detach + Undo would leave no way back — REQUESTS #12."
+   "authority": "board",
+   "verified": "no",
+   "verifiedNote": "B-12 (lead): detach is one document history step; the Inspector's Detach applies directly with \"{name} detached · Undo\". Not yet compared live."
   },
   {
    "nodeId": "241:19772",
