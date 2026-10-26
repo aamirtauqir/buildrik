@@ -22,13 +22,14 @@ export const MODAL_FRAME_BASE_CLASS =
   "tw:max-h-[80vh] tw:max-w-[calc(100vw-32px)] tw:[font-family:var(--bk-font-ui)]";
 /* The dialog boards (7564:185450 delete folder, 6752:59256 New page, and
    every confirm since the 2026-09-20 DS pass): pad 24, gap 16, radius 12
-   (radius/card), a 20/30 semibold title, 14/20 ink body, and the action row
-   right-aligned INSIDE the padding — no footer strip, no rule above it. */
+   (radius/card), a 16/24 semibold title (2L9: 165:2184, 223:44891, 257:52890
+   — it was 20/30 before), 14/20 ink body, and the action row right-aligned
+   INSIDE the padding — no footer strip, no rule above it. */
 export const MODAL_HEAD_CLASS = "tw:flex tw:flex-col tw:gap-1 tw:pt-6 tw:px-6 tw:pb-4";
 /* The head's ✕: 32 square, centred 36 in from the top-right corner. */
 const MODAL_CLOSE_CLASS = "tw:absolute tw:top-5 tw:right-5 tw:text-[var(--bk-ink-muted)] tw:hover:text-[var(--bk-ink)]";
 export const MODAL_TITLE_CLASS =
-  "tw:text-[length:var(--bk-text-20)] tw:leading-[var(--bk-leading-30)] tw:tracking-[-0.24px] tw:font-semibold tw:text-[var(--bk-ink)]";
+  "tw:text-[length:var(--bk-text-16)] tw:leading-[var(--bk-leading-24)] tw:font-semibold tw:text-[var(--bk-ink)]";
 export const MODAL_SUBTITLE_CLASS = "tw:text-[length:var(--bk-text-13)] tw:text-[var(--bk-ink-muted)]";
 export const MODAL_BODY_CLASS =
   "tw:px-6 tw:pt-0 tw:pb-4 tw:overflow-auto tw:text-[length:var(--bk-text-14)] tw:leading-5 tw:text-[var(--bk-ink)]";
