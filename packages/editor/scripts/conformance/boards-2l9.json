@@ -20199,8 +20199,8 @@
    "family": "recovery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No <1024 px notice"
+   "verified": "drift-open",
+   "verifiedNote": "L-F W7: built, not compared. Under 1024 px the slot raises the info banner \"Buildrick is built for windows at least 1024 px wide — some panels will overlap.\" (✕ keeps it away for the session); never blocks."
   },
   {
    "nodeId": "227:15364",
@@ -20209,8 +20209,8 @@
    "family": "recovery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No phone gate"
+   "verified": "drift-open",
+   "verifiedNote": "L-F W7: built, not compared. Coarse pointer under 640 px: full-screen \"Buildrick needs a larger screen\" / board body / Open read-only anyway (→ ?view=readonly, where it is not shown again)."
   },
   {
    "nodeId": "227:15894",

@@ -9,8 +9,8 @@
  * "{n} more ⌄", a popover that lists each with its actions — nothing is
  * dropped, and nothing stacks three bars deep over the canvas.
  *
- * Offline is the one condition the slot produces itself: only the browser can
- * say it, and every surface that shows it should agree.
+ * Offline, a narrow window and a phone are the conditions the slot produces
+ * itself: only the browser can say them (`SmallScreen.tsx` for the last two).
  *
  * Bar look is board 297:2139 (`state-banner`), shared with the load-failed bar:
  * 14 medium on the tone's tint, 20/12 insets, radius 8, plain bordered actions.
@@ -28,6 +28,7 @@ import {
   type BannerTone,
   type GlobalBanner,
 } from "./globalBanners";
+import { PhoneScreen, useNarrowWindowBanner } from "./SmallScreen";
 
 /* `leading-[normal]`, not `leading-normal`: the second is Tailwind's 1.5,
    which computes to 21px, and board 297:2244 says the keyword. */
@@ -166,16 +167,23 @@ export interface GlobalBannerSlotProps {
 
 export const GlobalBannerSlot: React.FC<GlobalBannerSlotProps> = ({ lead }) => {
   useOfflineBanner();
+  useNarrowWindowBanner();
   const banners = useGlobalBanners();
   if (lead) {
     const rest = banners.filter((b) => b.id !== lead.id);
-    return <div data-testid="global-banner-slot">{lead.render(<MoreConditions rest={rest} />)}</div>;
+    return (
+      <div data-testid="global-banner-slot">
+        {lead.render(<MoreConditions rest={rest} />)}
+        <PhoneScreen />
+      </div>
+    );
   }
-  if (banners.length === 0) return null;
+  if (banners.length === 0) return <PhoneScreen />;
   const [top, ...rest] = banners;
   return (
     <div data-testid="global-banner-slot">
       <BannerBar banner={top} more={<MoreConditions rest={rest} />} />
+      <PhoneScreen />
     </div>
   );
 };

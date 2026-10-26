@@ -135,3 +135,31 @@ describe("GlobalBannerSlot — a lead bar (the load failure) outranks the store"
     expect(screen.getByTestId("global-banner-more").textContent).toContain("1 more");
   });
 });
+
+describe("GlobalBannerSlot — small screens (G32 / G33)", () => {
+  const setWidth = (w: number) => Object.defineProperty(window, "innerWidth", { configurable: true, value: w });
+  afterEach(() => setWidth(1024));
+
+  it("a window under 1024 px gets the info banner; it clears when wide again", () => {
+    setWidth(900);
+    render(<GlobalBannerSlot />);
+    expect(screen.getByText("Buildrick is built for windows at least 1024 px wide — some panels will overlap.")).toBeTruthy();
+    act(() => {
+      setWidth(1280);
+      window.dispatchEvent(new Event("resize"));
+    });
+    expect(screen.queryByTestId("global-banner")).toBeNull();
+  });
+
+  it("a phone gets the full-screen notice with Open read-only anyway", () => {
+    setWidth(390);
+    const matchMedia = vi.fn(() => ({ matches: true }));
+    Object.defineProperty(window, "matchMedia", { configurable: true, value: matchMedia });
+    const assign = vi.fn();
+    Object.defineProperty(window, "location", { configurable: true, value: { ...window.location, href: "https://app.test/edit/s1", assign } });
+    render(<GlobalBannerSlot />);
+    expect(screen.getByText("Buildrick needs a larger screen")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Open read-only anyway" }));
+    expect(assign).toHaveBeenCalledWith("https://app.test/edit/s1?view=readonly");
+  });
+});

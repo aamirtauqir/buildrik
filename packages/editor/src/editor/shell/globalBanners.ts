@@ -93,6 +93,11 @@ export const BANNER_ID = {
   otherTab: "other-tab",
   roleChanged: "role-changed",
   sessionExpired: "session-expired",
+  narrowWindow: "narrow-window",
+  roleRaised: "role-raised",
+  workspaceDeletion: "workspace-deletion",
+  newVersion: "new-version",
+  panelUpdated: "panel-updated",
 } as const;
 
 /** B7-G11 `225:7600`. Produced by the slot itself from the browser's online state. */
@@ -156,3 +161,11 @@ export function showSessionExpiredBanner(signIn: () => void): void {
     actions: [{ label: "Sign in ↗", onClick: signIn, testId: "banner-sign-in" }],
   });
 }
+
+/** B7-G32 `227:14836` — never blocks; produced by the slot from the window width. */
+export const NARROW_WINDOW_BANNER: GlobalBanner = {
+  id: BANNER_ID.narrowWindow,
+  tone: "info",
+  message: "Buildrick is built for windows at least 1024 px wide — some panels will overlap.",
+  dismissible: true,
+};
