@@ -50,6 +50,14 @@ import { getDefaultPageName } from "@/shared/utils/pageUtils";
 import { isAuthSaveError, isForbiddenSaveError, refuseForbiddenSave, SAVE_FAILED_TOAST_KEY } from "./useSaveCallback";
 import { getEditorViewMode } from "@shared/utils/editorViewMode";
 import { describeLoadFailure, setSiteLoadStatus, type SiteLoadErrorKind } from "../siteLoadStatus";
+import {
+  BANNER_ID,
+  clearGlobalBanner,
+  showCantReachBanner,
+  showReconnectingBanner,
+  showRoleChangedBanner,
+} from "@/editor/shell/globalBanners";
+import { downloadProject, registerWorkSnapshot } from "@/editor/shell/workSnapshot";
 
 export type ComposerOptions = Partial<ComposerConfig> & {
   project?: {
@@ -352,12 +360,11 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
              edits cannot be saved, so they are not offered back — they stay
              on this device for when the role returns. */
           if (unsaved && getEditorViewMode().readOnlyView) {
-            addToastRef.current?.({
-              title: "Some work never reached the server",
-              description:
-                "Your role no longer allows editing this site, so you're in view mode. The edits are kept in this browser — ask the owner, and they come back once you can edit again.",
-              tone: "warning",
-              duration: Infinity,
+            /* F-14 / board 227:7411: the role-changed banner. Its download
+               is the kept copy — the screen holds the server's. */
+            showRoleChangedBanner({
+              download: () => downloadProject(unsaved.project, "unsaved"),
+              askAdmin: () => instance.emit(EVENTS.UI_OPEN_PERMISSIONS),
             });
             setSaveState({ status: "idle", error: undefined });
           } else if (unsaved) {
@@ -619,12 +626,19 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
 
     setComposer(instance);
     onEditorRef.current?.(instance);
+    /* F-15: every "Download a copy" on page 07 (banners, dialogs, the crash
+       screen) reads the work from here — none of them holds the composer. */
+    const unregisterWork = registerWorkSnapshot({
+      project: () => instance.exportProject(),
+      unsaved: () => instance.isDirty(),
+    });
 
     // Adoption telemetry: report when the user undoes an AI edit ("ai-edit" label).
     const detachAdoption = attachAdoptionRevertListener(instance);
 
     // Cleanup: Remove all event listeners before destroying
     return () => {
+      unregisterWork();
       detachAdoption();
       instance.off("composer:ready", composerReadyHandler);
       instance.off("project:changed", projectChangedHandler);
@@ -685,14 +699,20 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
       retryAttempt += 1;
       retryTimer = setTimeout(() => {
         retryTimer = null;
-        handler();
+        retryNow();
       }, delay);
+    };
+    /* F-12 / board 225:8654: each retry of a queued save is "Reconnecting…"
+       in the slot. Offline, the slot's own offline banner says it already. */
+    const retryNow = () => {
+      if (retryTimer) clearTimeout(retryTimer);
+      retryTimer = null;
+      if (typeof navigator === "undefined" || navigator.onLine !== false) showReconnectingBanner();
+      handler();
     };
     const onOnline = () => {
       if (retryAttempt === 0) return;
-      if (retryTimer) clearTimeout(retryTimer);
-      retryTimer = null;
-      handler();
+      retryNow();
     };
 
     const handler = (payload?: unknown) => {
@@ -775,6 +795,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
             refusedTokens = null;
             clearRetry();
             dismissToastKey(SAVE_FAILED_TOAST_KEY);
+            clearGlobalBanner(BANNER_ID.connection);
             setSaveState({ status: "idle", lastSavedAt: Date.now(), error: undefined });
             setIsDirty(false);
           })
@@ -836,21 +857,12 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
                  no "offline" status in this state machine. */
               setSaveState((prev) => ({ ...prev, status: "error", error: message }));
               setIsDirty(true);
-              const retrying = retryAttempt > 0;
               if (siteId) scheduleRetry();
-              if (siteId && !retrying) {
-                addToast({
-                  /* Same words as the manual path for both branches, so one
-                     event cannot be named two different things depending on
-                     which path reported it. */
-                  title: isOffline ? "Offline — not saved" : "Couldn't reach the server — not saved",
-                  description: isOffline
-                    ? "Your changes are still open in this tab. Keep it open and save again once you're back online."
-                    : "Your changes are still open in this tab. Keep it open and try saving again.",
-                  tone: "warning",
-                  key: SAVE_FAILED_TOAST_KEY,
-                });
-              }
+              /* F-12 / boards 225:8126, 225:7600: the condition is the global
+                 banner slot's, not a toast the next toast replaces — online
+                 and unreachable is "Can't reach Buildrick" with Retry now;
+                 offline, the slot raises its own banner from the browser. */
+              if (siteId && !isOffline) showCantReachBanner(retryNow);
               return;
             }
             console.error("[BuildrikSync] auto-save failed:", message);
@@ -876,7 +888,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
               return;
             }
             if (isForbiddenSaveError(err)) {
-              refuseForbiddenSave({ siteId, composer, addToast, setIsDirty, setSaveState });
+              refuseForbiddenSave({ siteId, composer, setIsDirty, setSaveState });
               return;
             }
             const retrying = retryAttempt > 0;

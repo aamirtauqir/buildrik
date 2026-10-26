@@ -32,6 +32,9 @@ import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { fetchMyRole, invalidateMyRole, roleAtLeast } from "@/services/RoleService";
 import { clearUnsaved, keepUnsaved, takeOffScreenUnsaved } from "@/services/unsavedRecovery";
 import { navigateBypassingUnloadGuard } from "../unloadGuardBypass";
+import { EVENTS } from "@/shared/constants/events";
+import { BANNER_ID, clearGlobalBanner, showCantReachBanner, showRoleChangedBanner } from "@/editor/shell/globalBanners";
+import { downloadProject } from "@/editor/shell/workSnapshot";
 
 /** One "not saved" card for both save paths (manual and autosave); the next
  *  save that lands takes it down (L3-006). */
@@ -84,26 +87,27 @@ export function isForbiddenSaveError(err: unknown): boolean {
  * keepUnsaved — so the beforeunload guard does not put a Leave/Stay prompt
  * over the switch (review #5). The navigation waits a frame and a task, so
  * the guard has re-read the clean state. The explanation survives the reload
- * through that kept record: the view-mode load shows "Your role no longer
- * allows editing … the edits are kept in this browser" (useComposerInit).
+ * through that kept record: the view-mode load raises the same role-changed
+ * banner (useComposerInit).
+ *
+ * The refusal is the global banner slot's role-changed bar (F-14, board
+ * 227:7411) with the board's two actions, not a toast.
  */
 export function refuseForbiddenSave(opts: {
   siteId: string | null;
   composer: Composer;
-  addToast: (input: ToastInput) => string;
   setIsDirty: (dirty: boolean) => void;
   setSaveState: React.Dispatch<React.SetStateAction<SaveState>>;
   /** Injectable for tests; the real one replaces the location. */
   navigate?: (url: string) => void;
 }): void {
-  const { siteId, composer, addToast, setIsDirty, setSaveState } = opts;
+  const { siteId, composer, setIsDirty, setSaveState } = opts;
   const navigate = opts.navigate ?? ((url: string) => window.location.replace(url));
   if (siteId) keepUnsaved(siteId, composer.exportProject());
   invalidateMyRole();
-  addToast({
-    title: "You don't have access to save this site",
-    description: "Your role changed, or the site isn't yours to edit. Ask the owner.",
-    tone: "warning",
+  showRoleChangedBanner({
+    download: () => downloadProject(composer.exportProject(), "unsaved"),
+    askAdmin: () => composer.emit(EVENTS.UI_OPEN_PERMISSIONS),
   });
   void fetchMyRole().then((role) => {
     if (roleAtLeast(role, "EDITOR") !== false || !siteId) return;
@@ -218,6 +222,7 @@ export function useSaveCallback({
         setSaveState({ status: "idle", lastSavedAt: Date.now(), error: undefined });
         setIsDirty(false);
         dismissToastKey(SAVE_FAILED_TOAST_KEY);
+        clearGlobalBanner(BANNER_ID.connection);
         addToast({
           title: "Saved",
           description: "Project saved successfully",
@@ -284,24 +289,21 @@ export function useSaveCallback({
           setSaveState((prev) =>
             siteId ? { ...prev, status: "error", error: errorMessage } : { ...prev, status: "idle" },
           );
-          addToast(
-            siteId
-              ? {
-                  title: isOffline ? "Offline — not saved" : "Couldn't reach the server — not saved",
-                  description: isOffline
-                    ? "Your changes are still open in this tab. Keep it open and save again once you're back online."
-                    : "Your changes are still open in this tab. Keep it open and try saving again.",
-                  tone: "warning",
-                  key: SAVE_FAILED_TOAST_KEY,
-                }
-              : {
-                  title: isOffline
-                    ? "Offline — saved on this device"
-                    : "Couldn't reach the server — saved on this device",
-                  description: "Your edits are in this browser and will go up when they can.",
-                  tone: "info",
-                },
-          );
+          /* F-12 / boards 225:8126, 225:7600: with a siteId the condition is
+             the global banner slot's — "Can't reach Buildrick" with Retry now
+             while the browser is online; offline, the slot raises its own
+             banner from the browser's state, so this adds nothing. */
+          if (siteId) {
+            if (!isOffline) showCantReachBanner(() => void save());
+          } else {
+            addToast({
+              title: isOffline
+                ? "Offline — saved on this device"
+                : "Couldn't reach the server — saved on this device",
+              description: "Your edits are in this browser and will go up when they can.",
+              tone: "info",
+            });
+          }
           return siteId ? "error" : "queued-offline";
         }
         /* Board S1.5b — an expired session is not a failed save to retry. The
@@ -345,7 +347,7 @@ export function useSaveCallback({
            change nothing. Different truths, different surfaces. */
         if (isForbiddenSaveError(err)) {
           setSaveState((prev) => ({ ...prev, status: "error", error: errorMessage }));
-          refuseForbiddenSave({ siteId, composer, addToast, setIsDirty, setSaveState });
+          refuseForbiddenSave({ siteId, composer, setIsDirty, setSaveState });
           return "error";
         }
         if (isAuthSaveError(errorMessage)) {

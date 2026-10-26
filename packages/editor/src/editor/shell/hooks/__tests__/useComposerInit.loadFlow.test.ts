@@ -22,6 +22,7 @@ import { describe, it, expect, vi, beforeEach, afterEach, type Mock } from "vite
 import { THRESHOLDS } from "@/shared/constants/config";
 import { EVENTS } from "@/shared/constants/events";
 import { AUTOSAVE_RETRY_BASE_MS, useComposerInit, type UseComposerInitParams } from "../useComposerInit";
+import { BANNER_ID, clearGlobalBanner, useGlobalBanners } from "@/editor/shell/globalBanners";
 
 type EventHandler = (...args: unknown[]) => void;
 
@@ -393,6 +394,8 @@ describe("useComposerInit — siteId load flow (happy path)", () => {
   /* C-9: a member demoted mid-save is sent to view mode, where nothing can
      be saved — offering "Restore my edits" there would put back edits that
      can only be refused again. The record stays for when the role returns. */
+  /* F-14 / board 227:7411: said by the role-changed banner — Download them
+     (the kept copy) and Ask an admin, no Restore. */
   it("in view mode, says the work is kept but does not offer to restore it", async () => {
     vi.mocked(getSiteIdFromUrl).mockReturnValue("site-9");
     vi.mocked(loadProject).mockResolvedValue({ pages: [{ id: "p" }], styles: [] } as never);
@@ -413,9 +416,11 @@ describe("useComposerInit — siteId load flow (happy path)", () => {
         .mocked(params.addToast!)
         .mock.calls.map(([t]) => t)
         .find((t) => /never reached the server/i.test(t.title ?? ""));
-      expect(toast).toBeTruthy();
-      expect(toast!.action).toBeUndefined();
+      expect(toast).toBeUndefined();
+      const role = renderHook(() => useGlobalBanners()).result.current.find((b) => b.id === BANNER_ID.roleChanged);
+      expect(role?.actions?.map((a) => a.label)).toEqual(["Download them", "Ask an admin"]);
       expect(localStorage.getItem("bk-unsaved-v1-site-9")).not.toBeNull();
+      clearGlobalBanner(BANNER_ID.roleChanged);
     } finally {
       window.history.replaceState(null, "", before);
       localStorage.removeItem("bk-unsaved-v1-site-9");
