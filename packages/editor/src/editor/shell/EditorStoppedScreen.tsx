@@ -44,7 +44,7 @@ export function editorErrorCode(error: Error): string {
   return `${hex.slice(0, 4)}-${hex.slice(4)}`;
 }
 
-export const EditorStoppedScreen: React.FC<{ code: string }> = ({ code }) => {
+const EditorStoppedScreen: React.FC<{ code: string }> = ({ code }) => {
   const siteId = getSiteIdFromUrl();
   const work = currentWork(siteId);
   const unsaved = work !== null && hasUnsavedWork(siteId);

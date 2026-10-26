@@ -174,3 +174,19 @@ comparison; until then it stays `drift-open` with "built, not compared; copy mat
 
 - `blocked:owner-approval-code` — R-13 above.
 - `open:viewer-column-board` — which board draws the viewer inspector column.
+
+## Status (2026-10-26, end of first run)
+
+| Slice | Commit | Rows touched | State |
+|---|---|---|---|
+| S1 F5.04 preview failed | `f647cd0f9` | 307:16107, 307:15711, 307:16503, 310:23087 | built; panel re-send needs REQUESTS #10 |
+| S2 global banner slot | `6db7893c9` | 227:14297, 225:7600, 225:8126, 225:8654, 227:12711, 227:7411, 225:2821, 227:9531 | built; producers REQUESTS #11–#15 |
+| S3 kept-work recovery | `4c77be4fd` | 225:5474, 225:6003, 225:6532, 225:7061 | built; toast retirement + Compare source REQUESTS #16 |
+| S4 conflict dialog | `25389400a` | 225:9180, 225:9715, 225:10249, 225:10783 | built (no lead change needed) |
+| S5 session expired | `74a444737` | 225:3353, 225:3888 | built (no lead change needed) |
+| S6 editor stopped | `480eb22cc` | 227:11649 | built; mount swap REQUESTS #17 |
+| S7 save-failed strip (C05 `10:2199`) | — | — | **not started**: the board's line "Save before publishing. Your changes are kept." names a publish context the save-failed strip does not have (it also serves the exit path). `open:save-failed-copy-context` — lead/owner to confirm whether the line is publish-only before it is adopted. |
+
+Every touched row stays `drift-open` with "built, not compared": the dump has no board screenshots and
+no probe or live comparison was run in this lane (owner: light verification; no Next server in lanes).
+The lead's live walk on the integration branch is what moves them to `drift-fixed`.
