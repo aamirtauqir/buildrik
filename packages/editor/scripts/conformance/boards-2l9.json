@@ -20011,7 +20011,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "ConflictModal.tsx:70 title matches; body :79-80 differs; buttons Reload latest/Save a backup/Overwrite… vs board order + Download a copy"
+   "verifiedNote": "L-F S4: built, not compared. 720 dialog (size lg), board body with the server's time from SAVE_CONFLICT_EVENT (who/count not in the contract: code:conflict-no-author), buttons Overwrite… · Download a copy · Reload latest… (primary, opening focus). Download stays open (workSnapshot)."
   },
   {
    "nodeId": "225:9715",
@@ -20020,8 +20020,8 @@
    "family": "recovery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Reload latest runs immediately (ConflictModal.tsx:90); no class-b confirm"
+   "verified": "drift-open",
+   "verifiedNote": "L-F S4: built, not compared. Reload latest… → \"Reload the latest version?\" + board body · Cancel (focused) · Reload."
   },
   {
    "nodeId": "225:10249",
@@ -20031,7 +20031,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Inline warning ConflictModal.tsx:84-86 + \"Yes, overwrite\"; no \"Before overwrite\" save of the newer version"
+   "verifiedNote": "L-F S4: built, not compared. Overwrite… → board confirm; the server's copy is kept as Saves version \"Before overwrite\" via existing siteVersions.create (versionSync.keepBeforeOverwrite) before onOverwrite."
   },
   {
    "nodeId": "225:10783",
@@ -20040,8 +20040,8 @@
    "family": "recovery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No failure state when keeping the newer version fails"
+   "verified": "drift-open",
+   "verifiedNote": "L-F S4: built, not compared. keepBeforeOverwrite failure → \"Couldn’t keep the newer version — nothing was overwritten.\" · Cancel · Retry; onOverwrite not called."
   },
   {
    "nodeId": "227:7411",
