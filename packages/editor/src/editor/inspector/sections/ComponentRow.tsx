@@ -10,11 +10,10 @@
  *   Reset to main component · 3 overrides     (disabled: "No overrides to reset")
  *   Detach instance
  *
- * Reset and Detach keep their confirms. The board applies Detach directly
- * with an Undo receipt (IC06), but detaching is not on the document history
- * — the engine drops the instance link outside it — so without the confirm
- * nothing could bring the instance back (`code:detach-not-undoable`,
- * REQUESTS #12). Every write passes the P-1 lock gate, and none runs while
+ * Reset keeps its confirm. Detach applies directly with a "{name} detached ·
+ * Undo" receipt (IC06): since B-12 the engine records the detach as one
+ * document history step, and the receipt's Undo is bound to it
+ * (`history.captureUndo`). Every write passes the P-1 lock gate, and none runs while
  * the panel is read-only (locked / save conflict); Edit main component is
  * navigation and stays. Which fields the instance overrides is not listed
  * here — the fields carry their "Overrides master" dots.
@@ -27,7 +26,6 @@ import type { Composer } from "@/engine";
 import type { ComponentDefinition } from "@/shared/types/components";
 import { Button, ConfirmDialog, useToast } from "@/editor/chrome-ui";
 import { requestOpenMaster } from "@/editor/sidebar/tabs/component-library/openMasterRequest";
-import { elementLocation } from "@/editor/canvas/utils/elementInfo";
 import { canWrite } from "@/engine/commands/commandOperations";
 import { SelectRow } from "../shared/controls";
 import { NoteRow } from "./behaviourRows";
@@ -57,7 +55,7 @@ const ACTION =
 
 export const ComponentRow: React.FC<ComponentRowProps> = ({ composer, elementId }) => {
   const [info, setInfo] = React.useState<InstanceInfo | null>(null);
-  const [confirm, setConfirm] = React.useState<"reset" | "detach" | null>(null);
+  const [confirm, setConfirm] = React.useState<"reset" | null>(null);
   const { readOnly } = useInspectorField();
   const { addToast } = useToast();
 
@@ -92,13 +90,16 @@ export const ComponentRow: React.FC<ComponentRowProps> = ({ composer, elementId 
   };
 
   const detach = async () => {
-    setConfirm(null);
     if (!writable()) return;
     try {
       const ok = await composer.components.detachInstance(instanceId);
       if (ok) {
         setInfo(null);
-        addToast({ description: `${component.name} instance detached`, tone: "info" });
+        addToast({
+          description: `${component.name} detached`,
+          tone: "info",
+          action: { label: "Undo", onClick: composer.history.captureUndo() },
+        });
         return;
       }
       addToast({ description: "Couldn't detach this instance. It may already be detached.", tone: "error" });
@@ -164,20 +165,11 @@ export const ComponentRow: React.FC<ComponentRowProps> = ({ composer, elementId 
           className={ACTION}
           aria-disabled={readOnly || undefined}
           onClick={() => {
-            if (!readOnly) setConfirm("detach");
+            if (!readOnly) void detach();
           }}
         >
           Detach instance
         </Button>
-        <ConfirmDialog
-          open={confirm === "detach"}
-          onClose={() => setConfirm(null)}
-          onConfirm={() => void detach()}
-          title={`Detach this ${component.name} instance?`}
-          message={`${elementLocation(composer, instanceId)} · This instance becomes an independent container. Its content and appearance are kept; it will no longer follow updates to the ${component.name} main component.`}
-          confirmLabel="Detach instance"
-          testId="instance-detach-confirm"
-        />
         <ConfirmDialog
           open={confirm === "reset"}
           onClose={() => setConfirm(null)}

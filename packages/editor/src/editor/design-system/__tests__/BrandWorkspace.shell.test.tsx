@@ -35,7 +35,7 @@ describe("BrandWorkspace › the rail target", () => {
     expect(getTabMode("design")).toBe("fullpage");
   });
 
-  it("FullPageRouter mounts the workspace edge-to-edge in the overlay root, landing on Colours", async () => {
+  it("FullPageRouter mounts the workspace in the resource area, landing on Colours", async () => {
     const composer = makeFakeComposer();
     const onClose = vi.fn();
     const { container } = render(
@@ -51,10 +51,9 @@ describe("BrandWorkspace › the rail target", () => {
       ),
     );
     // Lazy-loaded, like Settings; the module is large enough to outlast the default 1 s.
-    const host = await screen.findByTestId("brand-host", {}, { timeout: 15000 });
-    // A portal, like Settings and the Asset library — not the fullpage slot.
-    expect(container.contains(host)).toBe(false);
-    expect(screen.getByTestId("brand-panel")).toBeTruthy();
+    expect(await screen.findByTestId("brand-panel", {}, { timeout: 15000 })).toBeTruthy();
+    // In place (the resource area beside the rail), like Settings and the Asset library — not a portal.
+    expect(container.contains(screen.getByTestId("brand-host"))).toBe(true);
     expect(screen.getByTestId("brand-page-title").textContent).toMatch(/^Colors · \d+$/);
     expect(screen.getByTestId("brand-row-colours").getAttribute("aria-current")).toBe("page");
     // The colour token list is the page.

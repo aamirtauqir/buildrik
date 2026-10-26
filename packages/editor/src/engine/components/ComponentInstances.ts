@@ -256,14 +256,8 @@ export function getInstancesOfComponent(
   );
 }
 
-/**
- * Detach an instance (convert to regular elements).
- */
-export async function detachInstance(
-  composer: Composer,
-  maps: InstanceMaps,
-  elementId: string
-): Promise<boolean> {
+/** Drop the instance link: the map entry and the element's `componentInstance`. */
+function unlinkInstance(composer: Composer, maps: InstanceMaps, elementId: string): boolean {
   const instance = maps.instances.get(elementId);
   if (!instance || instance.isDetached) return false;
 
@@ -289,7 +283,37 @@ export async function detachInstance(
 }
 
 /**
- * Detach all instances of a component. Returns the count detached.
+ * Detach an instance (convert to regular elements).
+ *
+ * One document history step (design-2l9 B-12): a pending edit is committed
+ * first, the detach is committed before returning, so ⌘Z — or a receipt's
+ * Undo — right after gives the instance back. Undo restores the element's
+ * `componentInstance` data and, through the restore's PROJECT_LOADED,
+ * `ComponentManager.rehydrateInstances` rebuilds the map entry from it.
+ */
+export async function detachInstance(
+  composer: Composer,
+  maps: InstanceMaps,
+  elementId: string
+): Promise<boolean> {
+  const instance = maps.instances.get(elementId);
+  if (!instance || instance.isDetached) return false;
+
+  composer.history?.flushPending();
+  composer.beginTransaction?.("Detach instance");
+  let detached = false;
+  try {
+    detached = unlinkInstance(composer, maps, elementId);
+  } finally {
+    composer.endTransaction?.();
+  }
+  composer.history?.flushPending();
+  return detached;
+}
+
+/**
+ * Detach all instances of a component. Returns the count detached. Part of
+ * the caller's step (deleting the component), not one step per instance.
  */
 export async function detachAllInstances(
   composer: Composer,
@@ -298,7 +322,7 @@ export async function detachAllInstances(
 ): Promise<number> {
   const instances = getInstancesOfComponent(maps, componentId);
   for (const instance of instances) {
-    await detachInstance(composer, maps, instance.elementId);
+    unlinkInstance(composer, maps, instance.elementId);
   }
   return instances.length;
 }

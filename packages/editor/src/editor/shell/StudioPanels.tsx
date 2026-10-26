@@ -863,7 +863,10 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
            (Founder call, 2026-08-23.) */
         drawerOpen={(!readOnlyView || viewerChrome) && isLeftPanelOpen && !effectiveFullPageMode && !rightColumnTab}
         drawerWidth={drawerWidth}
-        fullPageMode={!readOnlyView && effectiveFullPageMode && isLeftPanelOpen}
+        /* The fullpage slot hosts the resource area (Assets, Settings,
+           Brand — FullPageRouter shape 1), so its layout follows the slot's
+           content: mounted ⇔ fullpage, whether or not the drawer is open. */
+        fullPageMode={effectiveFullPageMode}
         // Open whenever not fullpage — the no-selection state is a DRAWN
         // board (2 lines + ✦ Ask AI); gating on selectedElement collapsed the
         // column to 1px, so that state rendered off-viewport, unseeable.
@@ -1037,12 +1040,11 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
         </LayoutShell.Inspector>
         )}
 
-        {/* FullPage View — Templates, Assets, Settings, Design (replaces canvas area).
-            Mounted ONLY in fullpage mode. It used to render on every tab and
-            rely on the slot's display:none, so the Media DRAWER kept a whole
-            second LibraryManager (and its media state) mounted invisibly —
-            and once the library became a portaled overlay (Clone
-            3695:45155) that invisible copy was on screen at boot. */}
+        {/* FullPage View — the resource area (Assets, Settings, Brand render
+            in this slot) and the Templates portal. Mounted ONLY in fullpage
+            mode. It used to render on every tab and rely on the slot's
+            display:none, so the Media DRAWER kept a whole second
+            LibraryManager (and its media state) mounted invisibly. */}
         {effectiveFullPageMode && (
         <LayoutShell.FullPage>
           <FullPageView

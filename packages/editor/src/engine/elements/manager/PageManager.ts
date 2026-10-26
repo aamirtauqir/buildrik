@@ -354,11 +354,20 @@ export class PageManager {
   /**
    * Reorder pages. `afterId === null` prepends.
    * Rebuilds the Map preserving every page, inserting `pageId` at the new position.
+   *
+   * One composer history step (design-2l9 A-13): the Pages receipts offer
+   * Undo, and there is one undo (topbar / ⌘Z). A pending edit is committed
+   * first so it is not coalesced into the move, and the move is committed
+   * before returning so an Undo pressed straight after undoes the move.
+   * Page FOLDERS are per-user and stored outside the document, so a folder
+   * move is not a document change and has no history entry.
    */
   reorderPage(pageId: string, afterId: string | null): boolean {
     if (this.ctx.composer.writeLocked) return false;
     if (!this.ctx.pages.has(pageId)) return false;
     if (afterId !== null && !this.ctx.pages.has(afterId)) return false;
+    const { composer } = this.ctx;
+    composer.history?.flushPending();
 
     const ids = Array.from(this.ctx.pages.keys()).filter((id) => id !== pageId);
     const insertIndex = afterId === null ? 0 : ids.indexOf(afterId) + 1;
@@ -373,7 +382,10 @@ export class PageManager {
     }
 
     const page = this.ctx.pages.get(pageId);
-    this.ctx.composer.emit(EVENTS.PROJECT_CHANGED, { type: "page:reordered", page });
+    composer.beginTransaction?.("Reorder pages");
+    composer.emit(EVENTS.PROJECT_CHANGED, { type: "page:reordered", page });
+    composer.endTransaction?.();
+    composer.history?.flushPending();
     return true;
   }
 
