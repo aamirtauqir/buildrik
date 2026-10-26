@@ -120,3 +120,23 @@ until the lead's live walk compares them.
 ## Owner decisions raised
 - `open:conditions-create-home` (above).
 - Recently deleted retention period (server slice): boards promise 30 days; the server soft-deletes with no stated retention. `blocked:owner-retention` for the copy until the slice.
+
+## Status (2026-10-26, end of wave 1)
+
+| Archetype | Commit | Rows touched | State |
+|---|---|---|---|
+| C1 leave guard + Save and leave | `4321b14a2` | 21 | built, not compared |
+| C2 return to origin | `d9ea0127a` | 5 | built; live label waits on REQUESTS #11/#12 |
+| C3 four tabs, ⋯ imports | `45214b27c` | 5 | built (165:2 filter/sort/Columns still open) |
+| C4 drawer RL01/RL02 (BD-39) | `6846d1563` | 7 | built (Site variables still a drawer subview) |
+| C5 record failed/offline banners | `0be9c31a1` | 3 | built |
+| C6 Add field types + states | `ff4fa4963` | 19 | built (Default/min/max/Placeholder/Help text open) |
+| C7 templates copy + no-empty-page rollback | `0a04adfb0` | 3 | built |
+| C9 component row tooltip + "N uses" | (this batch) | 1 | built |
+| C8 variable usages, C10 binding picker | — | — | not started (C10 is a request to L-B) |
+
+Every touched row keeps `verified: drift-open`/`no` with a "built, not compared"
+note: there are no board screenshots in the dump and no Figma calls were made, so
+the lead's live walk is the comparison. Two boards disagree on the record
+save-failed button (165:1072 "Retry" vs Play F2.17 "Retry save"); the play
+journey's wording was adopted and the note says so.
