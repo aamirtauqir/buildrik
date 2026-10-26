@@ -172,11 +172,16 @@ export function VersionHistoryPanel({
   /* The last restore, with its way back. A restore resets the undo stack and
      its only undo lived in an 8-second toast (L5-044), so it stays here, on
      the Saves panel, until dismissed or replaced by the next restore. */
-  const [lastRestore, setLastRestore] = React.useState<{ label: string; safetyId: string } | null>(null);
+  const [lastRestore, setLastRestore] = React.useState<{ label: string; sub: string; safetyId: string } | null>(null);
+  /* The safety save's name, for 2L9 H06's "“Before restoring” saved first." */
+  const savedAsRef = React.useRef<string | null>(null);
   React.useEffect(() => {
     if (!composer) return;
     const onPruned = (p: { removed: number; kept: number }) => setPruned(p);
-    const onRestoring = (p: { targetName: string; savedAs: string | null }) => setRestoring(p);
+    const onRestoring = (p: { targetName: string; savedAs: string | null }) => {
+      savedAsRef.current = p.savedAs;
+      setRestoring(p);
+    };
     const onRestored = (p?: { safetyVersionId?: string }) => {
       setRestoring(null);
       safetyIdRef.current = p?.safetyVersionId ?? null;
@@ -207,6 +212,7 @@ export function VersionHistoryPanel({
     setRestoringId(versionId);
     const target = versions.find((v) => v.id === versionId);
     safetyIdRef.current = null;
+    savedAsRef.current = null;
     try {
       const ok = await restoreVersion(versionId);
       if (!ok) {
@@ -221,9 +227,16 @@ export function VersionHistoryPanel({
       const safetyId = safetyIdRef.current;
       /* No target in this list = the Undo of a restore (its safety save was
          created after the list was read). */
-      const label = target ? `Restored to ${formatTime(target.createdAt)}` : "Restore undone";
-      addToast({ description: label, tone: "success", duration: 8000 });
-      setLastRestore(target && safetyId ? { label, safetyId } : null);
+      /* 2L9 B7-H06 230:15797: the outcome and its way back are one surface —
+         the notice when there is a safety save to return to, else a toast. */
+      const label = target ? `Draft restored from “${versionDisplayName(target)}”.` : "Restore undone";
+      const savedAs = savedAsRef.current;
+      const sub = savedAs ? `“${savedAs}” saved first.` : "Your work from before is kept as a save.";
+      if (target && safetyId) setLastRestore({ label, sub, safetyId });
+      else {
+        setLastRestore(null);
+        addToast({ description: label, tone: "success", duration: 8000 });
+      }
     } catch {
       pushToast("Restore failed", "error");
     } finally {
@@ -435,7 +448,7 @@ export function VersionHistoryPanel({
       {lastRestore && !restoring && (
         <div className={NOTICE_RESTORING} role="status" data-testid="history-undo-restore-notice">
           <strong className={NOTICE_STRONG}>{lastRestore.label}</strong>
-          <span className={NOTICE_SUB}>Your work from before is kept as a save.</span>
+          <span className={NOTICE_SUB}>{lastRestore.sub}</span>
           <span className="tw:flex tw:gap-2 tw:pt-1">
             <Button
               size="xs"

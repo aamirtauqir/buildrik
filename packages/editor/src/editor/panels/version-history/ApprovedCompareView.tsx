@@ -73,6 +73,10 @@ export interface ApprovedCompareViewProps {
   /** The one Compare's source pickers ("Opened from …" · [left ▾] → [right ▾],
    *  board 4418:115486), placed right after the bar's title. */
   sources?: React.ReactNode;
+  /** 2L9 B7-H11 `230:18582`: the way out names where it returns — "‹ Back to
+   *  History" at the bar's left — and the title names the pair. Absent, the
+   *  bar keeps "Compare" and the ✕ at its right. */
+  back?: { label: string; title: string };
 }
 
 const KIND: Record<CompareChangeKind, { icon: LucideIcon; className: string; label: string }> = {
@@ -180,6 +184,7 @@ export const ApprovedCompareView: React.FC<ApprovedCompareViewProps> = ({
   leftLabel,
   rightLabel,
   sources,
+  back,
 }) => {
   /* Controlled when the host passes both; otherwise self-managed, unchanged. */
   const [uncontrolledMode, setUncontrolledMode] = React.useState<Mode>("split");
@@ -241,7 +246,12 @@ export const ApprovedCompareView: React.FC<ApprovedCompareViewProps> = ({
           underneath — the same 1080-vs-280 placement question BLOCKERS B1 holds
           for the founder, showing up as a layout bug. */}
       <Toolbar className="tw:min-h-12 tw:bg-[var(--bk-bg-card)] tw:border-[var(--bk-gray-100)] tw:px-4" data-testid="compare-bar">
-        <span className={BAR_TITLE} data-testid="compare-title" id="compare-title">Compare</span>
+        {back && onBack ? (
+          <Button color="light" size="xs" onClick={onBack} className={CLOSE_BTN} data-testid="compare-close">
+            ‹ {back.label}
+          </Button>
+        ) : null}
+        <span className={BAR_TITLE} data-testid="compare-title" id="compare-title">{back ? back.title : "Compare"}</span>
         {sources}
         <div className={MODE_STRIP} role="group" aria-label="Compare mode" data-testid="compare-mode-strip">
           {(["split", "overlay", "list"] as Mode[]).map((m) => (
@@ -284,7 +294,7 @@ export const ApprovedCompareView: React.FC<ApprovedCompareViewProps> = ({
             <RefreshCw size={14} aria-hidden="true" />
           </Button>
         )}
-        {onBack && (
+        {onBack && !back && (
           <Button
             color="light"
             size="xs"

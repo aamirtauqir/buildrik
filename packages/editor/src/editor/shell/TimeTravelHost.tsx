@@ -269,7 +269,8 @@ export const TimeTravelHost: React.FC<{ composer: Composer | null }> = ({ compos
         ? `Now — the draft as it is · ← steps back through ${newest} change${newest === 1 ? "" : "s"} · Esc exits`
         : frame.status === "none"
           ? `No preview for ${where} — restore would be blind · Esc exits`
-          : `Previewing ${where} — nothing is written until you restore · Esc exits`;
+          : /* 2L9 B7-H12 230:19126 */
+            `Showing ${where}. Nothing changes until you restore. · Esc exits`;
 
   return (
     <Portal>
@@ -298,7 +299,7 @@ export const TimeTravelHost: React.FC<{ composer: Composer | null }> = ({ compos
               onClick={() => {}}
               data-testid="tt-restore"
             >
-              Restore…
+              Restore to this point…
             </Button>
           </Tooltip>
         ) : (
@@ -309,7 +310,7 @@ export const TimeTravelHost: React.FC<{ composer: Composer | null }> = ({ compos
             onClick={() => setConfirming(true)}
             data-testid="tt-restore"
           >
-            Restore…
+            Restore to this point…
           </Button>
         )}
       </div>

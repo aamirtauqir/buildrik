@@ -92,7 +92,7 @@ describe("TimeTravelHost", () => {
     fireEvent.keyDown(document, { key: "ArrowLeft" });
     fireEvent.keyDown(document, { key: "ArrowLeft" });
     expect(screen.getByTestId("tt-band")).toHaveAttribute("data-index", "0");
-    expect(screen.getByTestId("tt-band-text")).toHaveTextContent(/Previewing .*Added Heading — nothing is written until you restore/);
+    expect(screen.getByTestId("tt-band-text")).toHaveTextContent(/Showing .*Added Heading\. Nothing changes until you restore\./);
     expect(c.history.getEntrySnapshot).toHaveBeenLastCalledWith("e1");
     await waitFor(() => expect(screen.getByTestId("tt-preview")).toHaveAttribute("data-status", "ready"));
     // L4-031: rendered with the site's brand-token switch, not the engine default.
@@ -232,7 +232,7 @@ describe("TimeTravelHost", () => {
     render(<ToastProvider><TimeTravelHost composer={c as never} /></ToastProvider>);
     chord();
     fireEvent.keyDown(document, { key: "ArrowLeft" });
-    expect(screen.getByTestId("tt-band-text").textContent).toMatch(/^Previewing/);
+    expect(screen.getByTestId("tt-band-text").textContent).toMatch(/^Showing/);
     c.fire(EVENTS.HISTORY_RECORDED);
     expect(screen.queryByTestId("tt-band")).toBeNull();
   });
