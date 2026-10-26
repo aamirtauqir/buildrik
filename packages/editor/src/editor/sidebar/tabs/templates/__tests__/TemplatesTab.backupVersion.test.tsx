@@ -80,12 +80,12 @@ async function applyWithBackup() {
      and the safe option belongs on the default. This helper used to click it
      unconditionally, which under the new default turned backup OFF and made
      both tests below fail with an empty rename list. */
-  const checkbox = await screen.findByText(/save the current page as a backup version first/i);
+  const checkbox = await screen.findByText(/save a backup first/i);
   const control = checkbox.closest("label") ?? checkbox;
   const input = control.querySelector?.('input[type="checkbox"]') as HTMLInputElement | null;
   if (input && !input.checked) fireEvent.click(checkbox);
   if (input) expect(input.checked, "backup must be on before Replace").toBe(true);
-  const [replace] = await screen.findAllByRole("button", { name: /^replace page$/i });
+  const [replace] = await screen.findAllByRole("button", { name: /^replace home$/i });
   fireEvent.click(replace);
 }
 
@@ -104,7 +104,7 @@ describe("Templates — the backup is a History auto-version (C4 #25)", () => {
        whole catalogue took ~8 s and timed this test out under load. */
     fireEvent.click(await screen.findByTestId(`tpl-ws-item-${first.id}`));
     fireEvent.click(await screen.findByText("Replace page…"));
-    const label = await screen.findByText(/save the current page as a backup version first/i);
+    const label = await screen.findByText(/save a backup first/i);
     const input = (label.closest("label") ?? label).querySelector('input[type="checkbox"]') as HTMLInputElement | null;
     expect(input, "backup checkbox not found").not.toBeNull();
     expect(input!.checked).toBe(true);
@@ -142,20 +142,22 @@ describe("Templates — the backup is a History auto-version (C4 #25)", () => {
   });
 
   /* G2-100, board 4428:151964: the failure is a dialog, not a toast —
-     "<Page> backup could not be saved" · Cancel · Replace without a backup ·
+     "Couldn’t save a backup of <Page>" · Cancel · Replace without a backup ·
      Try the backup again. */
   async function failBackup(order: string[]) {
     const made = makeComposer(["Home"], order);
     made.composer.versions.autoCheckpoint.mockImplementationOnce(async () => null as never);
     render(<TemplatesTab composer={made.composer as never} />);
     await applyWithBackup();
-    await screen.findByText("Home backup could not be saved", undefined, { timeout: 5000 });
+    await screen.findByText("Couldn’t save a backup of Home", undefined, { timeout: 5000 });
     return made.composer;
   }
 
   it("a failed backup opens the Backup failed dialog (board 4428:151964)", async () => {
     await failBackup([]);
-    expect(screen.getByText(/Home has not been replaced\. Retry creating the backup, or go back and pick another layout\./)).toBeTruthy();
+    expect(
+      screen.getByText("Home has not been changed. You can try the backup again, or replace without one — then only Undo can bring Home back."),
+    ).toBeTruthy();
     for (const name of ["Cancel", "Replace without a backup", "Try the backup again"])
       expect(screen.getByRole("button", { name })).toBeTruthy();
   });
@@ -183,7 +185,7 @@ describe("Templates — the backup is a History auto-version (C4 #25)", () => {
     fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
     await new Promise((r) => setTimeout(r, 50));
     expect(order).not.toContain("apply");
-    expect(screen.queryByText("Home backup could not be saved")).toBeNull();
+    expect(screen.queryByText("Couldn’t save a backup of Home")).toBeNull();
   });
 
   it("says where the backup lives", async () => {
@@ -192,6 +194,6 @@ describe("Templates — the backup is a History auto-version (C4 #25)", () => {
     /* Decision #24: a template's row opens the in-view preview; Replace page… is the apply. */
     fireEvent.click(await screen.findByTestId(`tpl-ws-item-${SITE_TEMPLATES[0].id}`));
     fireEvent.click(await screen.findByText("Replace page…"));
-    expect(await screen.findByText("Keeps your work as a version in History › Saves.")).toBeTruthy();
+    expect(await screen.findByText("Save a backup first (History › Saves)")).toBeTruthy();
   });
 });

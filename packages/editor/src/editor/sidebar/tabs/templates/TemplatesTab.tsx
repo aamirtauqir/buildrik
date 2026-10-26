@@ -291,6 +291,9 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
       return;
     }
 
+    /* 222:47163 promises "No empty page was left behind": a page made for
+       this apply is taken back out if the import then fails. */
+    let madePage: { id: string; previousId: string | null } | null = null;
     try {
       // 1 — tokens
       setApplyStepIndex(0);
@@ -315,7 +318,9 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
            page replaced the page they were on, and left the new one empty.
            Walked live — Page 1 held "SaaS Landing", "Add as new page" with
            Portfolio, and Page 1 came back as Portfolio. */
+        const previousId = composer.elements.getActivePage()?.id ?? null;
         const created = composer.elements.createPage(newPageName ?? t.name);
+        madePage = { id: created.id, previousId };
         if (addToNavigation) composer.elements.addPageToNavigation(created.id);
         composer.elements.setActivePage?.(created.id);
       }
@@ -330,6 +335,15 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
       await paint();
       await paint();
     } catch (err) {
+      if (madePage) {
+        const { id, previousId } = madePage;
+        /* The nav links "Add to navigation" gave it point at nothing now. */
+        for (const el of composer.elements.getAllElements()) {
+          if (el.getAttribute("href") === `#page:${id}`) composer.elements.removeElement(el.getId());
+        }
+        composer.elements.deletePage(id);
+        if (previousId) composer.elements.setActivePage?.(previousId);
+      }
       const msg = err instanceof Error ? err.message : "Failed to apply";
       setCanRetry(true);
       setApplyError(msg);

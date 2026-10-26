@@ -10328,7 +10328,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Failure body copy differs; title matches"
+   "verifiedNote": "built, not compared — L-C C7: \"Couldn’t create the page · Nothing was changed. No empty page was left behind.\" — made true: a failed import now removes the page it made and its nav links (TemplatesTab.tsx)."
   },
   {
    "nodeId": "222:47567",
@@ -10348,7 +10348,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Confirm title/body/CTA (“Replace Home”) and backup checkbox copy differ"
+   "verifiedNote": "built, not compared — L-C C7: \"Replace {page} with {template}?\", \"{page}’s N elements are removed and replaced. {template} has its own colors and fonts — your Brand is not changed.\" (saved token templates say they take the brand), \"Save a backup first (History › Saves)\", CTA \"Replace {page}\"."
   },
   {
    "nodeId": "223:45184",
@@ -10358,7 +10358,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Buttons match; title and body copy differ"
+   "verifiedNote": "built, not compared — L-C C7: \"Couldn’t save a backup of {page}\" + board body; actions unchanged."
   },
   {
    "nodeId": "223:45479",
