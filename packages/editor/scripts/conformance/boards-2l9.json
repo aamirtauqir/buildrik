@@ -5405,7 +5405,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Board tabs + \"Loading project · Your saved content is still arriving…\"; code skeleton only when nothing selected"
+   "verifiedNote": "Lane L-B A9 (built, not compared): loading reads 'Loading project' / 'Your saved content is still arriving. Editing controls will appear when it is ready.' under the header bar. Open: the board also draws the (inert) tab strip and the header 'Loading {site}' (REQUESTS #10 territory)."
   },
   {
    "nodeId": "255:82909",
@@ -5425,7 +5425,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "\"Inspector Error\" vs \"Unable to display Inspector · … still selected\" + Try again"
+   "verifiedNote": "Lane L-B A9 (built, not compared): 'Unable to display Inspector' · '{name} is still selected. This display error has not changed your document.' · 'Try again' (test InspectorStates)."
   },
   {
    "nodeId": "255:83852",
@@ -5435,7 +5435,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Recovery must return original target + Style; boundary resets but tab/target not asserted"
+   "verifiedNote": "Lane L-B A9 (built, not compared): Try again re-renders the same target on the same tab — selection and tab live above the boundary (test InspectorStates)."
   },
   {
    "nodeId": "255:84358",
@@ -5455,7 +5455,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "\"Editing Desktop · Page appearance\" context; \"SEO & social\" vs \"SEO and social\"; ✦ AI on page header to remove (:236)"
+   "verifiedNote": "Lane L-B A9 (built, not compared): 'SEO and social' + 'Opens {page}’s Page settings. Appearance stays here.'. Open: '✦ AI' on the page header waits on PR #33 (blocked:pr33-ai-removal); header 'Editing Desktop · Page appearance'."
   },
   {
    "nodeId": "255:85352",
@@ -5465,7 +5465,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "\"Template applied!\" vs \"Template applied · The Studio template was applied to Home\" + Dismiss notice"
+   "verifiedNote": "Lane L-B A9 (built, not compared): 'Template applied' · 'The {template} template was applied to {page}.' · 'Dismiss notice' (forgets it). Open: page scoping — the stored notice carries no page id (the writer is TemplatesTab, L-C), so it still shows on every page for its 30 minutes."
   },
   {
    "nodeId": "255:85835",

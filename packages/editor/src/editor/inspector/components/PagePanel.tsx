@@ -8,7 +8,7 @@
  *   Size        Max width
  *   Typography  Font · Text colour
  *   Spacing     the margin / padding box
- *                                SEO & social ↗
+ *                                SEO and social ↗
  *   Your place here is kept
  *
  * No tabs, no context row, no Link / CMS / Visibility / Interactions. The
@@ -16,10 +16,10 @@
  * `ctx.variant = "page"` (each draws its own page subset), in the board's
  * order; every edit goes to the active page's root through useStyleHandlers,
  * so it is one undo step and passes the lock gate like any element edit.
- * "SEO & social" opens the page's settings on SEO; the Inspector stays
+ * "SEO and social" opens the page's settings on SEO; the Inspector stays
  * mounted, so closing them lands back here.
  *
- * The one-time "Template applied!" banner (a template was just applied)
+ * The one-time "Template applied" notice (a template was just applied)
  * sits on top.
  *
  * @license BSD-3-Clause
@@ -75,9 +75,10 @@ function usePageAndBreakpoint(composer: Composer | null | undefined): Breakpoint
   return device && isValidBreakpoint(device) ? device : "desktop";
 }
 
-/** The template just applied, for 30 minutes after (read once). */
-function useAppliedTemplate(): string | null {
-  const [name] = React.useState<string | null>(() => {
+/** The template just applied, for 30 minutes after (read once), and the
+ *  board's "Dismiss notice" (S07), which forgets it. */
+function useAppliedTemplate(): [string | null, () => void] {
+  const [name, setName] = React.useState<string | null>(() => {
     try {
       const stored = localStorage.getItem(TEMPLATE_KEY);
       if (!stored) return null;
@@ -95,7 +96,15 @@ function useAppliedTemplate(): string | null {
     }
     return null;
   });
-  return name;
+  const dismiss = React.useCallback(() => {
+    setName(null);
+    try {
+      localStorage.removeItem(TEMPLATE_KEY);
+    } catch {
+      /* storage unavailable — hidden for this mount */
+    }
+  }, []);
+  return [name, dismiss];
 }
 
 export function PagePanel({ composer }: PagePanelProps) {
@@ -118,7 +127,7 @@ export function PagePanel({ composer }: PagePanelProps) {
   );
   const overrides = useFieldOverrides(composer, root?.id, breakpoint);
   const { choices, setChoices } = useInspectorSections();
-  const appliedTemplate = useAppliedTemplate();
+  const [appliedTemplate, dismissTemplate] = useAppliedTemplate();
 
   const locked = Boolean(rootEl?.isLocked?.());
   const readOnly = locked || conflict.pending;
@@ -152,7 +161,7 @@ export function PagePanel({ composer }: PagePanelProps) {
   return (
     <InspectorFieldContext.Provider value={fieldContext}>
       <div className="bdi-panel" data-testid="inspector-page-panel" data-readonly={readOnly || undefined}>
-        {appliedTemplate ? <TemplateAppliedBanner composer={composer} name={appliedTemplate} /> : null}
+        {appliedTemplate ? <TemplateAppliedBanner name={appliedTemplate} pageName={page.name} onDismiss={dismissTemplate} /> : null}
         <PageHeader composer={composer} pageName={page.name} pageId={page.id} />
         <div className="bdi-panel-scroll">
           <div className="bdi-body">
@@ -204,11 +213,11 @@ export function PagePanel({ composer }: PagePanelProps) {
                 onClick={openSeo}
                 icon={<ExternalLink size={12} aria-hidden="true" className="tw:shrink-0" />}
               >
-                SEO &amp; social
+                SEO and social
               </ActionRow>
             </div>
             <div className="tw:px-4">
-              <NoteRow testId="inspector-page-note">Your place here is kept</NoteRow>
+              <NoteRow testId="inspector-page-note">Opens {page.name}’s Page settings. Appearance stays here.</NoteRow>
             </div>
           </div>
         </div>
@@ -285,22 +294,23 @@ function PageHeader({ composer, pageName, pageId }: { composer: Composer; pageNa
   );
 }
 
-/** Board 1175:4841 — shown for 30 minutes after a template is applied. */
-function TemplateAppliedBanner({ composer, name }: { composer: Composer; name: string }) {
+/** 2L9 S07 — shown for 30 minutes after a template is applied, until dismissed. */
+function TemplateAppliedBanner({ name, pageName, onDismiss }: { name: string; pageName: string; onDismiss: () => void }) {
   return (
     <div role="status" aria-live="polite" className="tw:px-3 tw:pt-3" data-testid="inspector-template-applied">
       <div className="tw:flex tw:w-full tw:flex-col tw:items-start tw:gap-1.5 tw:rounded-lg tw:bg-[var(--bk-success-tint)] tw:px-3 tw:py-2.5 tw:text-left">
-        <h3 className="tw:m-0 tw:text-[12px] tw:font-semibold tw:text-[var(--bk-success-text)]">Template applied!</h3>
-        <p className="tw:m-0 tw:text-[11px] tw:leading-normal tw:text-[var(--bk-ink-soft)]">{name}</p>
-        {/* `h-auto` beats flowbite's own `h-8` (same twMerge group), so the
-            padding sizes it to the board's 27. */}
+        <h3 className="tw:m-0 tw:text-[12px] tw:font-semibold tw:text-[var(--bk-success-text)]">Template applied</h3>
+        <p className="tw:m-0 tw:text-[11px] tw:leading-normal tw:text-[var(--bk-ink-soft)]">
+          The {name} template was applied to {pageName}.
+        </p>
         <Button
           size="xs"
-          onClick={() => composer.emit(EVENTS.UI_OPEN_DESIGN_PANEL, {})}
-          className="tw:inline-block tw:h-auto tw:min-h-6 tw:rounded-md tw:border-transparent tw:bg-[var(--bk-accent)] tw:px-3 tw:py-[7px] tw:text-center tw:text-[11px] tw:font-medium tw:text-white"
-          aria-label="Set brand colors in Global Styles"
+          color="light"
+          onClick={onDismiss}
+          data-testid="inspector-template-dismiss"
+          className="tw:h-6 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[11px] tw:font-medium tw:text-[var(--bk-accent-text)] tw:hover:bg-transparent tw:hover:underline"
         >
-          Set Brand Colors
+          Dismiss notice
         </Button>
       </div>
     </div>

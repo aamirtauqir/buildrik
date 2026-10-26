@@ -1,14 +1,13 @@
 /**
- * InspectorLoading — board 159:102 (Inspector · loading).
+ * InspectorLoading — board 159:102 / 2L9 S01 (Inspector · loading).
  *
- * What the right-hand panel shows while the site is still arriving: a title
- * and rows where the controls will be. It exists because the alternative was
+ * What the right-hand panel shows while the site is still arriving: the
+ * header bar and "Loading project · Your saved content is still arriving.
+ * Editing controls will appear when it is ready." (2L9 replaced the six
+ * field-shaped rows). It exists because the alternative was
  * worse than nothing — with no selection and no project yet, the panel said
  * "Select something on the canvas to edit it." over a canvas that had nothing
  * on it to select, which reads as "your site is empty".
- *
- * The row count is the board's shape, not a measurement: nothing here knows
- * what will be selected, or whether anything will be.
  *
  * The board's header reads "Section". That is sample data: the header this
  * stands in for (board 32:2) names the SELECTED element, and at this moment
@@ -23,9 +22,6 @@
 import * as React from "react";
 import { SkeletonBlock } from "@/editor/chrome-ui";
 
-/** Board 159:102 draws six rows, not seven. */
-const ROWS = 6;
-
 export function InspectorLoading(): React.ReactElement {
   return (
     <div
@@ -38,15 +34,14 @@ export function InspectorLoading(): React.ReactElement {
       <div className="tw:flex tw:h-12 tw:items-center tw:border-b tw:border-[var(--bk-border)] tw:px-4">
         <SkeletonBlock className="tw:h-2.5 tw:w-[52px]" />
       </div>
-      {/* 32-tall rows, butted together the way the board stacks them: an 88
-          label bar at the 16 gutter, then the field bar out to the matching
-          gutter on the right. */}
-      {Array.from({ length: ROWS }, (_, i) => (
-        <div key={i} className="tw:flex tw:h-8 tw:items-center tw:gap-2 tw:px-4">
-          <SkeletonBlock className="tw:h-2.5 tw:w-[88px] tw:shrink-0" />
-          <SkeletonBlock className="tw:h-2.5 tw:flex-1" />
+      {/* 2L9 S01: what is happening, not a field-shaped skeleton that reads
+          as controls about to appear with defaults in them. */}
+      <div className="tw:flex tw:flex-col tw:gap-1 tw:px-4 tw:py-3">
+        <div className="tw:text-[13px] tw:font-semibold tw:text-[var(--bk-ink)]">Loading project</div>
+        <div className="tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
+          Your saved content is still arriving. Editing controls will appear when it is ready.
         </div>
-      ))}
+      </div>
     </div>
   );
 }

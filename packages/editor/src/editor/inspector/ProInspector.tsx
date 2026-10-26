@@ -33,6 +33,7 @@ import { useProjectLoading } from "../shell/hooks/useProjectLoading";
 import { useSaveConflict } from "../shell/hooks/useSaveConflict";
 import { ApplyStyleDialog } from "./components/ApplyStyleDialog";
 import { ContextRow } from "./components/ContextRow";
+import { getLayerName } from "../panels/layers/hooks/layersPersistence";
 import { ComponentRow } from "./sections/ComponentRow";
 import { InspectorErrorBoundary } from "./components/InspectorErrorBoundary";
 import { InspectorHeader } from "./components/InspectorHeader";
@@ -447,7 +448,11 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
                 aria-label="Element properties"
                 aria-disabled={editLocks.length > 0 || undefined}
               >
-                <InspectorErrorBoundary>
+                <InspectorErrorBoundary
+                  targetName={
+                    getLayerName(composer?.elements.getElement(selectedElement.id)) ?? elementTypeLabel(selectedElement.type)
+                  }
+                >
                   <InspectorTabContent
                     tabId={activeTab}
                     composer={composer}

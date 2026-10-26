@@ -1,9 +1,9 @@
 /**
- * @lint-hex-policy: component-theme
- *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
- *
- * Inspector Error Boundary
- * Catches errors in inspector sections to prevent entire panel crashes
+ * Inspector Error Boundary — catches a render error in the tab's sections so
+ * the panel survives it (2L9 S03/S04): "Unable to display Inspector",
+ * "{name} is still selected. This display error has not changed your
+ * document.", Try again. The selection and the tab live above the boundary
+ * (ProInspector), so Try again returns to the same element on the same tab.
  * @license BSD-3-Clause
  */
 
@@ -16,11 +16,12 @@ interface InspectorErrorBoundaryProps {
   children: React.ReactNode;
   /** Optional fallback to render on error */
   fallback?: React.ReactNode;
+  /** The selected element's name, for "… is still selected". */
+  targetName?: string;
 }
 
 interface InspectorErrorBoundaryState {
   hasError: boolean;
-  message?: string;
 }
 
 /**
@@ -33,11 +34,11 @@ export class InspectorErrorBoundary extends React.Component<
 > {
   constructor(props: InspectorErrorBoundaryProps) {
     super(props);
-    this.state = { hasError: false, message: undefined };
+    this.state = { hasError: false };
   }
 
-  static getDerivedStateFromError(error: Error): InspectorErrorBoundaryState {
-    return { hasError: true, message: error?.message || "Unknown error" };
+  static getDerivedStateFromError(): InspectorErrorBoundaryState {
+    return { hasError: true };
   }
 
   componentDidCatch(error: Error, info: React.ErrorInfo): void {
@@ -53,33 +54,16 @@ export class InspectorErrorBoundary extends React.Component<
 
       return (
         <div
-          style={{
-            padding: 16,
-            margin: 12,
-            background: "var(--bk-error-tint)",
-            border: "1px solid var(--bk-error)",
-            borderRadius: 8,
-            color: "var(--bk-error)",
-          }}
+          role="alert"
+          className="tw:m-3 tw:flex tw:flex-col tw:items-start tw:gap-2 tw:rounded-lg tw:bg-[var(--bk-error-tint)] tw:p-3"
+          data-testid="inspector-error"
         >
-          <div className="tw:font-semibold tw:mb-2 tw:text-[13px]">Inspector Error</div>
-          <div style={{ fontSize: 12, color: "var(--bk-error)", marginBottom: 12 }}>
-            {this.state.message}
+          <div className="tw:text-[13px] tw:font-semibold tw:text-[var(--bk-error-text)]">Unable to display Inspector</div>
+          <div className="tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)]">
+            {this.props.targetName ? `${this.props.targetName} is still selected. ` : null}This display error has not changed your document.
           </div>
-          <Button
-            onClick={() => this.setState({ hasError: false, message: undefined })}
-            style={{
-              padding: "6px 12px",
-              background: "var(--bk-error-tint)",
-              border: "1px solid var(--bk-error)",
-              borderRadius: 4,
-              color: "var(--bk-error)",
-              fontSize: 12,
-              fontWeight: 500,
-              cursor: "pointer",
-            }}
-          >
-            Try Again
+          <Button size="xs" color="light" onClick={() => this.setState({ hasError: false })}>
+            Try again
           </Button>
         </div>
       );
