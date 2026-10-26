@@ -11095,7 +11095,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code untyped \"Delete this field? cannot be undone\"; board typed count + 30-day Recently deleted"
+   "verifiedNote": "built, not compared — L-C D4: \"Delete {field}? · N records have a value in {field}.\" + \"Type N to confirm\" + Delete field. The board's \"stay in Recently deleted for 30 days\" is not shown: restore is a later server slice, so the copy keeps \"This cannot be undone.\""
   },
   {
    "nodeId": "257:53085",
@@ -11105,7 +11105,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code untyped \"Delete this field? cannot be undone\"; board typed count + 30-day Recently deleted",
+   "verifiedNote": "built, not compared — L-C D4: \"Delete {field}? · N records have a value in {field}.\" + \"Type N to confirm\" + Delete field. The board's \"stay in Recently deleted for 30 days\" is not shown: restore is a later server slice, so the copy keeps \"This cannot be undone.\"",
    "inheritsFrom": "257:52890"
   },
   {
@@ -11116,7 +11116,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No pending state; delete is fire-and-toast"
+   "verifiedNote": "built, not compared — L-C D4: title \"Deleting {field}…\" + \"The field stays available until the deletion finishes.\"; refused delete keeps the dialog with Retry."
   },
   {
    "nodeId": "257:53466",

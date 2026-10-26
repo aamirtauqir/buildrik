@@ -237,8 +237,10 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
   const selectedField = ws.tab === "fields" ? collection.fields.find((f) => f.id === fieldId) ?? null : null;
   const deleteField = async (id: string) => {
     const field = collection.fields.find((f) => f.id === id);
-    setFieldId(null);
+    /* The dialog shows "Deleting {field}…" until this lands (257:53280);
+       a throw leaves it open with Retry. */
     await panel.deleteField(collection.id, id);
+    setFieldId(null);
     if (field) addToast({ tone: "success", title: "Field deleted", description: `${field.name} has been removed from ${collection.name}.` });
   };
   /* 257:53846 / 259:95932 — a default for a field becoming Required: saved on

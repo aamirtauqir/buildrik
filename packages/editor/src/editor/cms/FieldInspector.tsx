@@ -323,13 +323,10 @@ export function FieldInspector({ composer, collection, collections, field, recor
           field={field}
           uses={uses}
           onClose={() => setDeleting(false)}
-          onDelete={() => {
-            setDeleting(false);
-            void onDeleteField(field.id);
-          }}
+          onDelete={() => onDeleteField(field.id)}
           onOpenUse={onOpenUse}
           siteName={composer?.getProjectMetadata?.()?.name || "Untitled site"}
-          recordCount={records.length}
+          valueCount={records.filter((r) => !isEmptyCmsValue(r.data[field.slug])).length}
         />
       ) : null}
     </aside>

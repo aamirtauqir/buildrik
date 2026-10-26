@@ -154,12 +154,28 @@ describe("FieldInspector", () => {
     expect(screen.queryByTestId("cms-field-locked-open")).toBeNull();
   });
 
-  it("deletes an unused field after the confirm (4418:165425)", async () => {
+  /* 2L9 257:52890 · 257:53280 — the count of values at stake is typed back,
+     and the dialog stays with Retry when the delete is refused. */
+  it("deletes an unused field once the number of values is typed back", async () => {
     const { onDeleteField } = mount(1);
     fireEvent.click(screen.getByTestId("cms-fi-delete"));
-    expect(screen.getByTestId("cms-field-delete")).toHaveTextContent("Price is a Number field on the Menu items collection.");
+    expect(screen.getByText("Delete Price?")).toBeInTheDocument();
+    expect(screen.getByTestId("cms-field-delete-impact")).toHaveTextContent("1 record has a value in Price.");
+    expect(screen.getByText("Type 1 to confirm")).toBeInTheDocument();
+    expect(screen.getByTestId("cms-field-delete-confirm")).toBeDisabled();
+    fireEvent.change(screen.getByTestId("cms-field-delete-typed"), { target: { value: "1" } });
     fireEvent.click(screen.getByTestId("cms-field-delete-confirm"));
     await waitFor(() => expect(onDeleteField).toHaveBeenCalledWith("f2"));
+  });
+
+  it("a refused delete keeps the dialog with Retry", async () => {
+    const { onDeleteField } = mount(1);
+    onDeleteField.mockImplementationOnce(() => Promise.reject(new Error("500")));
+    fireEvent.click(screen.getByTestId("cms-fi-delete"));
+    fireEvent.change(screen.getByTestId("cms-field-delete-typed"), { target: { value: "1" } });
+    fireEvent.click(screen.getByTestId("cms-field-delete-confirm"));
+    expect(await screen.findByTestId("cms-field-delete-failed")).toHaveTextContent("Couldn’t delete Price. The field and its values are unchanged.");
+    expect(screen.getByTestId("cms-field-delete-confirm")).toHaveTextContent("Retry");
   });
 
   it("gives each type its own rules: text a length, a reference its collection, an image none", () => {
