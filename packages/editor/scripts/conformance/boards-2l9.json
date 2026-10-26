@@ -10103,7 +10103,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No component export (.brcomponent) anywhere in code"
+   "verifiedNote": "drift-open — L-C D8: the blocked-by-inaccessible-image state is not built: the editor has no per-asset access data to know an image is from a site the person can't open."
   },
   {
    "nodeId": "220:42920",
@@ -10113,7 +10113,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Export ready/download missing",
+   "verifiedNote": "built, not compared — L-C D8: \"Export {name}\" · \"Exporting main component … never changes, saves or publishes your site.\" · Included (Styles, Media and fonts — referenced by address, Nested components) · File \"{slug}.brcomponent · about N KB\" · Download package (ExportPackageDialog.tsx).",
    "inheritsFrom": "220:42592"
   },
   {
@@ -10124,7 +10124,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Download-started receipt missing"
+   "verifiedNote": "built, not compared — L-C D8: receipt toast \"Download started: {file}. Your site was not changed.\""
   },
   {
    "nodeId": "220:43545",
@@ -10134,7 +10134,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No component package import wizard"
+   "verifiedNote": "built, not compared — L-C D9: \"Import components\" · steps · \"Add components from a .brcomponent package. Nothing is added until the last step.\" · Choose file · Selected line · limits line; refuses non-packages by name."
   },
   {
    "nodeId": "220:43877",
@@ -10144,7 +10144,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Import roots/destination step missing",
+   "verifiedNote": "drift-open — L-C D9: not built — a package carries no scope choice (imports are site-wide) / no token or CMS links to map; the wizard has 3 steps, not 6.",
    "inheritsFrom": "220:43545"
   },
   {
@@ -10155,7 +10155,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Import check step missing",
+   "verifiedNote": "drift-open — L-C D9: Check step lists each master New / \"Already on this site · kept as is\"; access blocks and the capacity line are not built. Not compared.",
    "inheritsFrom": "220:43545"
   },
   {
@@ -10166,7 +10166,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Import map styles/CMS step missing",
+   "verifiedNote": "drift-open — L-C D9: not built — a package carries no scope choice (imports are site-wide) / no token or CMS links to map; the wizard has 3 steps, not 6.",
    "inheritsFrom": "220:43545"
   },
   {
@@ -10177,7 +10177,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Import review step missing",
+   "verifiedNote": "drift-open — L-C D9: not built — a package carries no scope choice (imports are site-wide) / no token or CMS links to map; the wizard has 3 steps, not 6.",
    "inheritsFrom": "220:43545"
   },
   {
@@ -10188,7 +10188,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Importing (non-cancellable) state missing"
+   "verifiedNote": "built, not compared — L-C D9: \"Importing N of M… Keep this window open.\""
   },
   {
    "nodeId": "220:45566",
@@ -10198,7 +10198,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Outcome-unknown receipt check missing"
+   "verifiedNote": "drift-open — L-C D9: a master that fails to add stops the import with \"{name} couldn’t be added. N of M were imported; Retry adds the rest.\"; the unknown-outcome receipt check (K37) needs a server import receipt and is not built."
   },
   {
    "nodeId": "220:45883",
@@ -10208,7 +10208,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Import receipt with Undo import missing"
+   "verifiedNote": "drift-open — L-C D9: receipt is a toast \"Imported N components from {file}. N already on this site were kept as they are.\"; Undo import (outside composer history) and Review imported resources not built."
   },
   {
    "nodeId": "220:46207",
@@ -10218,7 +10218,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Imported-but-insert-failed receipt missing"
+   "verifiedNote": "drift-open — L-C D9: a master that fails to add stops the import with \"{name} couldn’t be added. N of M were imported; Retry adds the rest.\"; the unknown-outcome receipt check (K37) needs a server import receipt and is not built."
   },
   {
    "nodeId": "221:43842",

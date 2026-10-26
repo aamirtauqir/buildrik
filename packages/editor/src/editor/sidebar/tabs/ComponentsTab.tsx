@@ -15,6 +15,7 @@ import { ComponentDetailScreen, componentDeleteCopy } from "./component-library/
 import { ComponentIcon } from "./component-library/ComponentIcon";
 import type { ComponentsTabProps } from "./component-library/types";
 import { useComponentsState } from "./component-library/useComponentsState";
+import { ImportPackageDialog } from "./component-library/ImportPackageDialog";
 
 import "./component-library/ComponentsTab.css";
 import { EVENTS } from "@/shared/constants";
@@ -55,6 +56,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
   const [scope, setScope] = React.useState<Scope>("site");
   const [query, setQuery] = React.useState("");
   const [sort, setSort] = React.useState<SortKey>("used");
+  const [importing, setImporting] = React.useState(false);
 
   // Board 4418:143126: the last Detach all, reported at the top of the list.
   const [detached, setDetached] = React.useState<{ id: string; name: string; count: number } | null>(null);
@@ -363,6 +365,9 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
             className="tw:flex-wrap tw:px-3 tw:pt-2"
             data-testid="comp-scopes"
           />
+          <Button variant="link" size="xs" className="tw:mx-4 tw:h-7 tw:p-0" onClick={() => setImporting(true)} data-testid="comp-import-open">
+            Import package…
+          </Button>
           <div className="tw:flex tw:items-center tw:gap-2 tw:px-3 tw:py-2">
             <PanelSearch placeholder="Search components" value={query} onChange={setQuery} className="tw:flex-1" data-testid="comp-search" />
             {scope !== "library" ? (
@@ -437,6 +442,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         </div>
       )}
       {/* ── Dialogs ─────────────────────────────────────────────────────────── */}
+      {importing ? <ImportPackageDialog composer={composer} onClose={() => setImporting(false)} /> : null}
       <ConfirmDialog
         open={!!state.confirmDelete}
         onClose={() => state.setConfirmDelete(null)}
