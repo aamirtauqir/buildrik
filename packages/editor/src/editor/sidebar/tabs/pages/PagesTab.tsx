@@ -44,6 +44,7 @@ import { useDirtyPages } from "@/editor/shared/useDirtyPages";
 import { SettingsErrorBoundary } from "./page-settings/SettingsErrorBoundary";
 import { usePages } from "./usePages";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
+import { useSiteOrigin } from "@/editor/shared/useSiteOrigin";
 import { useFolders } from "./useFolders";
 import { pageRoute } from "./utils/slug";
 import { useBulkSelect } from "./useBulkSelect";
@@ -113,6 +114,10 @@ export const PagesTab: React.FC<PagesTabProps> = ({
      every site shared one folder blob. The site is the thing folders belong
      to, and the URL is where the editor already gets it. */
   const folderScopeId = getSiteIdFromUrl();
+  /* The Structure view's root (board 63:21939): the published host. */
+  const getSiteOrigin = useSiteOrigin(composer, folderScopeId);
+  const siteOrigin = getSiteOrigin();
+  const siteHost = siteOrigin ? siteOrigin.replace(/^https?:\/\//, "").replace(/\/$/, "") : null;
   const livePageIds = React.useMemo(
     () => new Set(p.pages.map((pg) => pg.id)),
     [p.pages]
@@ -511,9 +516,10 @@ export const PagesTab: React.FC<PagesTabProps> = ({
           </>
         }
       />
-      {/* Only over the page list it filters — the listings and structure
-          views take no query, and a dead field over them would be a lie. */}
-      {(p.loadError || view === "pages") && (
+      {/* Over the views it filters — Pages and Listings (board 63:21262:
+          "Search names and URLs"). Structure takes no query, and a dead
+          field over it would be a lie. */}
+      {(p.loadError || view !== "structure") && (
         <PanelSearch placeholder="Search pages…" value={search} onChange={setSearch} data-testid="pages-search" />
       )}
       {/* Board 63:6393: the three views as tabs under the search (they were
@@ -532,7 +538,12 @@ export const PagesTab: React.FC<PagesTabProps> = ({
           a replacement for the whole panel body. */}
       <PanelFrame.Body noScroll>
           {view === "structure" && !p.loadError ? (
-            <SiteStructureTree pages={p.pages} onSelectPage={(id) => { p.selectPage(id); }} />
+            <SiteStructureTree
+              pages={p.pages}
+              onSelectPage={(id) => { p.selectPage(id); }}
+              host={siteHost}
+              collections={dynamicPages.collections}
+            />
           ) : view === "listings" && !p.loadError ? (
             /* PanelFrame.Body is `flex-1 min-h-0 overflow-hidden` — flex-1 as a
                CHILD, but it is not itself display:flex, so these two stack as
@@ -544,7 +555,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
                inert for the same reason — written for a flex parent it never
                had. */
             <div className="tw:flex tw:h-full tw:min-h-0 tw:flex-col">
-              <SearchListingsTable pages={p.pages} onEditPage={p.openSettings} onOpenFull={onExpandToggle} />
+              <SearchListingsTable pages={p.pages} onEditPage={p.openSettings} search={search} onOpenFull={onExpandToggle} />
             </div>
           ) : (
           <PageList

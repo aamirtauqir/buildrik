@@ -34,11 +34,26 @@ describe("buildRouteTree", () => {
 describe("SiteStructureTree", () => {
   it("renders every page by route and selects on click", () => {
     const onSelectPage = vi.fn();
-    render(<SiteStructureTree pages={PAGES} onSelectPage={onSelectPage} />);
-    expect(screen.getByText("4 pages, by route.")).toBeInTheDocument();
+    render(<SiteStructureTree pages={PAGES} onSelectPage={onSelectPage} host="fieldwork.studio" />);
+    /* design-2l9 board 63:21939. Re-baseline: Structure header. */
+    expect(screen.getByTestId("pages-structure-head")).toHaveTextContent("URL structurefieldwork.studio · Site root");
+    expect(screen.getByText("This view follows page URLs. My folders stay in Pages.")).toBeInTheDocument();
     expect(screen.getByText("/pricing/teams")).toBeInTheDocument();
     expect(screen.getByText(/\(no page\)/)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Teams" }));
     expect(onSelectPage).toHaveBeenCalledWith("teams");
+  });
+});
+
+describe("SiteStructureTree — collection routes", () => {
+  it("lists each collection's pattern and page count", () => {
+    render(
+      <SiteStructureTree
+        pages={PAGES}
+        onSelectPage={vi.fn()}
+        collections={[{ id: "blog", name: "Blog post", pattern: "/blog/{slug}", count: 20, templatePageId: null }]}
+      />,
+    );
+    expect(screen.getByTestId("pages-structure-collections")).toHaveTextContent("Blog post/blog/{slug}20 pages");
   });
 });
