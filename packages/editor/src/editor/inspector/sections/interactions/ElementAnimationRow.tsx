@@ -22,7 +22,7 @@ const TRIGGER_LABEL: Record<AnimationTrigger, string> = {
   click: "On click",
 };
 
-export const animationTriggerLabel = (a: AnimationConfig) => TRIGGER_LABEL[a.trigger] ?? a.trigger;
+const animationTriggerLabel = (a: AnimationConfig) => TRIGGER_LABEL[a.trigger] ?? a.trigger;
 
 /** "fadeInUp" → "Fade In Up" — the preset names the editor lists. */
 function presetLabel(type: string): string {

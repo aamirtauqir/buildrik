@@ -85,22 +85,24 @@ describe("layout", () => {
 });
 
 describe("Attributes", () => {
-  it("ID, title, tab index and the type's §17.H rows; a link has no Title", () => {
+  it("title, tab index and the type's §17.H rows — no ID (Semantics owns it); a link has no Title", () => {
     const el = makeMockElement({ id: "e1", type: "input" });
     const composer = makeMockComposer({ element: el });
     const { unmount } = render(
       <AttributesSection element={{ id: "e1", type: "input" }} targetIds={["e1"]} composer={composer as never} isOpen onToggle={() => {}} />
     );
-    for (const label of ["ID", "Title", "Tab index", "Read only", "Autocomplete"]) expect(screen.getByText(label)).toBeInTheDocument();
+    for (const label of ["Title", "Tab index", "Read only", "Autocomplete"]) expect(screen.getByText(label)).toBeInTheDocument();
+    expect(screen.queryByText("ID")).toBeNull();
+    expect(screen.getByRole("button", { name: /^Advanced attributes section/ })).toBeInTheDocument();
     unmount();
     render(<AttributesSection element={{ id: "e1", type: "link" }} targetIds={["e1"]} composer={composer as never} isOpen onToggle={() => {}} />);
     expect(screen.queryByText("Title")).toBeNull();
   });
 
-  it("summarises as the board does: id, then how many attributes", () => {
+  it("summarises as the 2L9 boards do: '{n} set', '0 set' included; the id is not counted", () => {
     const el = makeMockElement({ id: "e1", type: "heading", attrs: { id: "hero-title", title: "Hi" } });
     const composer = makeMockComposer({ element: el });
-    expect(attributesSummary(composer as never, { id: "e1", type: "heading" })).toBe("id: hero-title · 1 attribute");
-    expect(attributesSummary(makeMockComposer({ element: makeMockElement({ id: "e1" }) }) as never, { id: "e1", type: "heading" })).toBeNull();
+    expect(attributesSummary(composer as never, { id: "e1", type: "heading" })).toBe("1 set");
+    expect(attributesSummary(makeMockComposer({ element: makeMockElement({ id: "e1" }) }) as never, { id: "e1", type: "heading" })).toBe("0 set");
   });
 });

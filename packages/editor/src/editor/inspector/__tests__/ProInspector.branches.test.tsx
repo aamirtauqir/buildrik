@@ -3,7 +3,7 @@
  *   - no selection, project still loading → InspectorLoading (board 159:102)
  *   - no selection, or the page root → the Page panel (DD-13)
  *   - 2+ selected  → the SAME panel plus the multi bar (DD-12)
- *   - 1 selected   → full inspector body (Style · Behaviour · Effects strip)
+ *   - 1 selected   → full inspector body (Content · Style · Behavior · Effects)
  *
  * The heavy children are mocked as probes (same pattern as
  * ProInspector.createCollectionThreading.test.tsx) so we assert which branch
@@ -13,7 +13,7 @@
  */
 
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 
 vi.mock("../components/PagePanel", () => ({
   PagePanel: () => <div data-testid="page-panel" />,
@@ -143,5 +143,19 @@ describe("ProInspector — branch selection", () => {
     const panel = screen.getByRole("tabpanel", { name: "Style" });
     expect(tab.getAttribute("aria-controls")).toBe(panel.id);
     expect(panel.getAttribute("aria-labelledby")).toBe(tab.id);
+  });
+
+  it("2L9 page 04: four tabs; a text element opens on Content, a container on Style (LD-5)", () => {
+    const composer = makeComposer([makeElement("a"), makeElement("b")]);
+    const { rerender } = renderWithToast(<ProInspector selectedElement={{ id: "a", type: "heading", tagName: "h2" }} composer={composer} />);
+    expect(screen.getAllByRole("tab").map((t) => t.textContent)).toEqual(["Content", "Style", "Behavior", "Effects"]);
+    expect(screen.getByRole("tab", { name: "Content" })).toHaveAttribute("aria-selected", "true");
+    /* Same type keeps the tab the user chose (DD-20)… */
+    fireEvent.click(screen.getByRole("tab", { name: "Effects" }));
+    rerender(<ToastProvider><ProInspector selectedElement={{ id: "b", type: "heading", tagName: "h2" }} composer={composer} /></ToastProvider>);
+    expect(screen.getByRole("tab", { name: "Effects" })).toHaveAttribute("aria-selected", "true");
+    /* …a different type opens on its own opening tab. */
+    rerender(<ToastProvider><ProInspector selectedElement={{ id: "a", type: "box", tagName: "div" }} composer={composer} /></ToastProvider>);
+    expect(screen.getByRole("tab", { name: "Style" })).toHaveAttribute("aria-selected", "true");
   });
 });

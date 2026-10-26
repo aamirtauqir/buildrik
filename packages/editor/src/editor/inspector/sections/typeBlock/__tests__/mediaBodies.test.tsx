@@ -19,11 +19,11 @@ const rowLabels = (container: HTMLElement) =>
 describe("Image — board 8", () => {
   const image = { id: "img", type: "image" as const, tagName: "img", attributes: { src: "https://cdn.example/pasta-closeup.jpg", alt: "" } };
 
-  it("source row, Alt text + hint, Fit, Loading — in board order", () => {
+  it("source row, Alt text + hint, Loading — in board order; Fit is Style › Size's (2L9 36:2)", () => {
     const { container } = renderBlock(image);
     expect(screen.getByRole("button", { name: /^Image section/ })).toBeInTheDocument();
     expect(screen.getByTestId("inspector-source-name")).toHaveTextContent("pasta-closeup.jpg");
-    expect(rowLabels(container)).toEqual(["Alt text", "Fit", "Loading"]);
+    expect(rowLabels(container)).toEqual(["Alt text", "Loading"]);
     expect(screen.getByTestId("inspector-alt-hint")).toHaveTextContent("Add alt text so everyone can understand this image.");
     expect(screen.getByPlaceholderText("Describe this image")).toBeInTheDocument();
   });
@@ -35,13 +35,6 @@ describe("Image — board 8", () => {
     expect(screen.queryByTestId("inspector-alt-hint")).toBeNull();
     undo();
     expect(el().getAttribute("alt") ?? "").toBe("");
-  });
-
-  it("Fit writes object-fit through the style path", () => {
-    const { onChange } = renderBlock(image, { styles: { "object-fit": "cover" } });
-    expect(screen.getByRole("radio", { name: "Cover" })).toHaveAttribute("aria-checked", "true");
-    fireEvent.click(screen.getByRole("radio", { name: "Contain" }));
-    expect(onChange).toHaveBeenCalledWith("object-fit", "contain");
   });
 
   it("Replace picks an image in the drawer and writes src, through the lock gate", () => {

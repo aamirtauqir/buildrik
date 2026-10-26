@@ -36,6 +36,7 @@ const sectionCoverage: Record<string, SectionCoverage> = {
   typography: {
     files: [
       "../typography/index.tsx",
+      "../typography/TextStyleRow.tsx",
       "../typography/TypographyControls.tsx",
       "../typography/FontControls.tsx",
     ],
@@ -47,7 +48,8 @@ const sectionCoverage: Record<string, SectionCoverage> = {
       "../typography/FontControls.tsx",
     ],
   },
-  type: {
+  type: { files: ["../typeBlock/bodies/embedBodies.tsx"] },
+  "type-layout": {
     files: [
       "../typeBlock/bodies/layoutBodies.tsx",
       "../layout/FlexControls.tsx",

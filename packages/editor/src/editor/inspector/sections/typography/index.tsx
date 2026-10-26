@@ -1,7 +1,7 @@
 /**
  * Typography — Font, Font size, Line height, Weight, Colour, Align (boards 1,
  * 4), the rest behind More settings. The same body serves:
- *   - "Typography", open, on text types;
+ *   - "Typography", open, on text types, headed by the Brand "Text style";
  *   - "Text inside", closed with a one-line summary, on containers, buttons,
  *     form fields and widgets (board 17, owner answer 1) — the registry names
  *     the section and draws the summary;
@@ -17,6 +17,7 @@ import { Section, MoreSettingsToggle } from "@/editor/inspector/shared/controls"
 import { FontControls } from "./FontControls";
 import { FontPicker } from "./FontPicker";
 import { ADVANCED_TYPOGRAPHY_COUNT, TypographyControls } from "./TypographyControls";
+import { TextStyleRow } from "./TextStyleRow";
 
 // ============================================================================
 // TYPES
@@ -39,6 +40,8 @@ export interface TypographySectionProps {
   variant?: "element" | "page";
   /** What the element renders as where it sets nothing (Page panel: font, text colour). */
   inherited?: Readonly<Record<string, string>>;
+  /** Head the section with the Brand "Text style" row (text types). */
+  textStyle?: boolean;
 }
 
 // ============================================================================
@@ -56,12 +59,14 @@ export const TypographySection: React.FC<TypographySectionProps> = ({
   composer,
   variant = "element",
   inherited,
+  textStyle = false,
 }) => {
   const handleFontChange = React.useCallback((value: string) => onChange("font-family", value), [onChange]);
   const isPage = variant === "page";
 
   return (
     <Section title="Typography" isOpen={isOpen} onToggle={onToggle} id="inspector-section-typography">
+      {textStyle && <TextStyleRow styles={styles} onChange={onChange} />}
       <div className="tw:relative">
         <FontPicker value={styles["font-family"] || ""} onChange={handleFontChange} composer={composer} inheritedValue={inherited?.["font-family"]} />
       </div>

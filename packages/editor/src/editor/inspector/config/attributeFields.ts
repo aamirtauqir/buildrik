@@ -1,6 +1,6 @@
 /**
- * Attributes section rows (Inspector v4 §17.H "MAKE ADVANCED"): the
- * developer attributes every element carries — ID, title, tab index — and the
+ * Advanced attributes rows (Inspector v4 §17.H "MAKE ADVANCED"): the
+ * developer attributes every element carries — title, tab index — and the
  * per-type attributes the redesign moved out of the type block because they
  * are rarely changed (image decoding, video preload, input autocomplete /
  * read-only, textarea max length, form action / method / encoding).
@@ -14,8 +14,8 @@
 
 import type { PropertyConfig } from "../sections/typeBlock/PropertyField";
 
+/* The ID is Content › Semantics' (2L9 board 247:26594), not a row here. */
 const COMMON_ATTRIBUTE_FIELDS: readonly PropertyConfig[] = [
-  { id: "id", label: "ID", type: "text", placeholder: "element-id" },
   { id: "title", label: "Title", type: "text", placeholder: "Shown on hover" },
   { id: "tabindex", label: "Tab index", type: "text", placeholder: "0" },
 ];

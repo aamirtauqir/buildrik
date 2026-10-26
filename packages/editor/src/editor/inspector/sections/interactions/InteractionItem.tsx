@@ -29,7 +29,15 @@ export const InteractionItem: React.FC<InteractionItemProps> = ({ interaction, o
   const presetLabel =
     ANIMATION_PRESETS.find((p) => p.value === interaction.animation.preset)?.label ?? interaction.animation.preset;
 
-  return <PickRow label={triggerInfo.label} value={presetLabel} onOpen={onOpen} muted={!interaction.enabled} />;
+  /* 2L9 165:18272: a disabled interaction keeps its row, marked "Off · …". */
+  return (
+    <PickRow
+      label={triggerInfo.label}
+      value={interaction.enabled ? presetLabel : `Off · ${presetLabel}`}
+      onOpen={onOpen}
+      muted={!interaction.enabled}
+    />
+  );
 };
 
 export default InteractionItem;

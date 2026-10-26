@@ -3798,7 +3798,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Board Content·Style·Behavior·Effects; code has no Content tab; page/multi contexts differ (spec specimen)"
+   "verifiedNote": "Lane L-B A1 (2026-10-26): tab strip now Content · Style · Behavior · Effects, type block on Content, Flex/Grid body + image Fit + Text style on Style — compared by probe screenshot (case inspector-panel, :5172) against the dump's copy for this board. Still open: header context line (REQUESTS #10), Semantics/Conditions/Advanced attributes (A2, REQUESTS #11), page/multi/locked/instance specimens."
   },
   {
    "nodeId": "39:9114",
@@ -3818,7 +3818,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Fields sits in Behaviour (config/sectionOrder.ts:29), board Content; no reorder hint/Move up·down menu; Semantics/Conditions rows missing"
+   "verifiedNote": "Lane L-B A1+A5 (built; copy checked against the dump, no board image): Fields on Content; each field row has a ⋯ menu (Move up / Move down / Delete — the field moves and goes with its label wrapper) and the list ends with '+ Add field' and 'Drag to reorder, or use a field’s menu.'. Open: row layout (name / ⋯ / summary) not compared visually, the submit button listed as 'Submit button', Semantics 'Form' tag (A2 shows it), Conditions (REQUESTS #11)."
   },
   {
    "nodeId": "156:1316",
@@ -3828,7 +3828,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Label row writes the placeholder attr; no separate Placeholder, Name (submission key), Default value, Validation rows"
+   "verifiedNote": "Lane L-B A3 (built, not compared — no board image in the dump; copy and row order checked against the dump text): drill-in reads '‹ {form}' · Field · Type · Label · Placeholder · Name + 'Name is the key stored with each submission.' · Required · Default value · Validation (min/max length or min/max). Label edits the field's <label> (for= or preceding sibling) else aria-label — never placeholder (bug at FormFieldsSection.tsx:172 fixed). Open: More settings, Conditions (REQUESTS #11), Advanced attributes for the field."
   },
   {
    "nodeId": "156:1911",
@@ -3838,7 +3838,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No submission-key uniqueness check or retained-draft error"
+   "verifiedNote": "Lane L-B A3 (built, not compared): a taken submission key is refused with '“{key}” is already used. Choose a unique submission key.' and the draft is kept (test FormFieldsAndSlides). Open: visual comparison."
   },
   {
    "nodeId": "156:2506",
@@ -3848,7 +3848,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Label row writes the placeholder attr; no separate Placeholder, Name (submission key), Default value, Validation rows",
+   "verifiedNote": "Lane L-B A3 (built, not compared): Label edits the associated <label> text ('Work email'). Open: 'Email label changed · All breakpoints · Undo' receipt.",
    "inheritsFrom": "156:1316"
   },
   {
@@ -3859,7 +3859,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code 6 types (Text, Email, Phone, Number, Date, Long text); board 13 incl. Select, Checkbox, Radio, Switch, Slider, Time, Color, Submit"
+   "verifiedNote": "Lane L-B A4 (built, not compared): '+ Add field' opens 'Add field' with the board's 13 types in order (Text … Submit); each inserts the Insert panel's block before the submit button (Submit goes last) and opens the new field."
   },
   {
    "nodeId": "156:3684",
@@ -3869,7 +3869,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Label row writes the placeholder attr; no separate Placeholder, Name (submission key), Default value, Validation rows",
+   "verifiedNote": "Lane L-B A4 (built, not compared): a new Text field is named 'field-N', labelled 'Field N', placeholder 'Your answer', and opens in the field editor. Open: 'Added to Contact form.' note and 'Text field added · All breakpoints · Undo' receipt.",
    "inheritsFrom": "156:1316"
   },
   {
@@ -3880,7 +3880,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Fields sits in Behaviour (config/sectionOrder.ts:29), board Content; no reorder hint/Move up·down menu; Semantics/Conditions rows missing",
+   "verifiedNote": "Lane L-B A5 (built, not compared): an added field stays in the list in place (FormFieldsAndSlides tests). Open: visual comparison; submit row.",
    "inheritsFrom": "156:716"
   },
   {
@@ -3909,9 +3909,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
+   "authority": "code:after-submit-live-on-save",
    "verified": "drift-open",
-   "verifiedNote": "Board \"Form settings · This form\", \"Applies on next publish\" tags, status row + \"Saved separately…\" note; code After submit, no status row"
+   "verifiedNote": "Lane L-B A6 (built; copy checked against the dump, no board image): After submit · Then · Message · Notifications › Send to · Spam protection 'Applies on next publish' › 'Block automated submissions' · Form settings status 'Saved' · 'Saved separately from page edits; outside document Undo.'. The board's 'Applies on next publish' tag on After submit is NOT drawn: the public form route reads action/message/redirect from the server row at submit time, so they apply on save (code wins). 'This form starts collecting submissions after you publish.' not drawn (cannot tell published state). Header 'Form settings · This form' is REQUESTS #10's."
   },
   {
    "nodeId": "156:6643",
@@ -3921,7 +3921,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code \"Saving…\" note; board \"Form settings status · Saving…\" row"
+   "verifiedNote": "Lane L-B A6 (built, not compared): status row reads 'Saving…' while the write is in flight (test FormAfterSubmitSection)."
   },
   {
    "nodeId": "156:7230",
@@ -3931,7 +3931,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code shows raw error; board \"Couldn’t save — your message is still here\" + Retry"
+   "verifiedNote": "Lane L-B A6 (built, not compared): a failed save keeps the typed value, status 'Couldn’t save — your message is still here.' + Retry re-sends the same change (test F12)."
   },
   {
    "nodeId": "156:7819",
@@ -3941,7 +3941,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Board \"Form settings · This form\", \"Applies on next publish\" tags, status row + \"Saved separately…\" note; code After submit, no status row",
+   "verifiedNote": "Lane L-B A6 (built, not compared): acknowledged save reads 'Saved'.",
    "inheritsFrom": "156:6055"
   },
   {
@@ -3962,7 +3962,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code learns Admin-only from a FORBIDDEN save; board discloses up front, field disabled"
+   "verifiedNote": "Lane L-B A6 (built, not compared): after the server's FORBIDDEN, Send to is replaced by 'Changing Send to needs Admin access.'. The board discloses it up front; the editor does not know the site role before a save (authority stays board until a role read exists)."
   },
   {
    "nodeId": "156:9584",
@@ -3972,7 +3972,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "\"Loading…\" vs board \"Loading form settings…\""
+   "verifiedNote": "Lane L-B A6 (built, not compared): 'Loading form settings…'."
   },
   {
    "nodeId": "156:10131",
@@ -3982,7 +3982,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Board \"Form settings · This form\", \"Applies on next publish\" tags, status row + \"Saved separately…\" note; code After submit, no status row"
+   "verifiedNote": "Lane L-B A6 (built, not compared): Redirect with no destination reads 'Choose a destination to save'. Open: the page-or-URL picker 'Choose page or URL…' (F19, later slice)."
   },
   {
    "nodeId": "156:10723",
@@ -4349,7 +4349,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "\"Edit text on canvas\" exists but in Style type block (config/sectionOrder.ts:17); Tag/ID Semantics, Conditions, Advanced attributes rows mi…"
+   "verifiedNote": "Lane L-B A1+A2 (probe inspector-panel ?type=paragraph, :5172, against the dump's copy): Content · Text block (Edit text on canvas) · Semantics (Tag 'Paragraph', ID, 'Content and semantic changes apply to all breakpoints.') · Advanced attributes '0 set' — match. Still open: an unbound CMS binding section shows (board shows none until bound — A10), Conditions (REQUESTS #11), header 'Content · All breakpoints' (REQUESTS #10)."
   },
   {
    "nodeId": "161:8940",
@@ -4461,7 +4461,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Board \"Show on these devices\", data-conditions note, \"Plays on all breakpoints\", \"No interactions yet\"; tab label Behavior vs code \"Behavio…"
+   "verifiedNote": "Lane L-B A1+A7 (built; copy and order checked against the dump, no board image): Behavior tab · Visibility 'Show on these devices' Desktop/Tablet/Mobile · Interactions 'Plays on all breakpoints' · '+ Add interaction' · 'No interactions yet.'. Not drawn: 'Data conditions: Content › Conditions — both must pass.' (no conditions — REQUESTS #11). Header 'Behavior · Text' is REQUESTS #10's."
   },
   {
    "nodeId": "161:14383",
@@ -4491,7 +4491,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Board Trigger/Effect/Animate/Repeat/When rows, Play/More…, \"Interaction added · Undo\" toast"
+   "verifiedNote": "Lane L-B A7 (built, not compared): the interaction screen's back row reads '‹ Back to Interactions'. Open: Play / More…, Repeat / When rows, 'Interaction added · Undo' receipt."
   },
   {
    "nodeId": "161:15688",
@@ -4562,7 +4562,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Disable exists; board keeps config visible with disabled marker"
+   "verifiedNote": "Lane L-B A7 (built, not compared): a disabled interaction keeps its row, value 'Off · {effect}'. Open: 'Enable interaction' row action."
   },
   {
    "nodeId": "165:18662",
@@ -4572,7 +4572,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Delete exists; no \"Interaction deleted · Undo\" toast"
+   "verifiedNote": "Lane L-B A7 (built, not compared): after deleting the last interaction the list reads 'No interactions yet.'. Open: 'Interaction deleted · Undo' receipt (needs a toast route that works without a provider in the section's tests — A7b)."
   },
   {
    "nodeId": "165:19056",
@@ -4707,7 +4707,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code \"Component\" section in Style with \"Edit master\"; board block above tabs: library·version, Variant, Edit main component ›, Reset · N ov…"
+   "verifiedNote": "Lane L-B A8 (built; copy and order checked against the dump, no board image): the instance block sits above the tabs — '◇ {name} · instance', 'Component library · v{n}', Variant, 'Edit main component ›', 'Reset to main component · {n} overrides', 'Detach instance'. Open: the field-level 'Font size · Local value · Desktop' source lines (IC05)."
   },
   {
    "nodeId": "241:17060",
@@ -4717,7 +4717,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Confirm copy \"Overrides on this instance will be discarded.\" vs board consequence list"
+   "verifiedNote": "Lane L-B A8 (built, not compared): Reset confirms with 'Reset {name} to main component?' / 'The {n} overrides on this instance will be discarded.'. Open: the board's per-property consequence list."
   },
   {
    "nodeId": "241:17608",
@@ -4726,8 +4726,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No disabled Reset with \"No overrides to reset\""
+   "verified": "drift-open",
+   "verifiedNote": "Lane L-B A8 (built, not compared): no overrides — Reset is disabled and 'No overrides to reset' shows."
   },
   {
    "nodeId": "241:18146",
@@ -4755,9 +4755,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
+   "authority": "code:detach-not-undoable",
    "verified": "drift-open",
-   "verifiedNote": "Code confirms detach in a dialog; board applies directly with \"detached · Undo\" toast"
+   "verifiedNote": "Lane L-B A8: Detach keeps its confirm. Detaching is not on the document history (engine drops the instance link outside it), so the board's direct Detach + Undo would leave no way back — REQUESTS #12."
   },
   {
    "nodeId": "241:19772",
@@ -5041,7 +5041,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Attributes in Behaviour tab; board Content › Semantics + \"Custom attributes\", data-bk-id protected note"
+   "verifiedNote": "Lane L-B A2: Semantics Tag (heading H1–H6) + ID on Content; Title / Tab index / custom data-* under Advanced attributes (built, compared by probe for copy only). Open: Title/Tab index shown inside Semantics on the board, protected data-bk-id note, 'Change semantic tag' review (A12/A13)."
   },
   {
    "nodeId": "247:27113",
@@ -5405,7 +5405,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Board tabs + \"Loading project · Your saved content is still arriving…\"; code skeleton only when nothing selected"
+   "verifiedNote": "Lane L-B A9 (built, not compared): loading reads 'Loading project' / 'Your saved content is still arriving. Editing controls will appear when it is ready.' under the header bar. Open: the board also draws the (inert) tab strip and the header 'Loading {site}' (REQUESTS #10 territory)."
   },
   {
    "nodeId": "255:82909",
@@ -5425,7 +5425,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "\"Inspector Error\" vs \"Unable to display Inspector · … still selected\" + Try again"
+   "verifiedNote": "Lane L-B A9 (built, not compared): 'Unable to display Inspector' · '{name} is still selected. This display error has not changed your document.' · 'Try again' (test InspectorStates)."
   },
   {
    "nodeId": "255:83852",
@@ -5435,7 +5435,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Recovery must return original target + Style; boundary resets but tab/target not asserted"
+   "verifiedNote": "Lane L-B A9 (built, not compared): Try again re-renders the same target on the same tab — selection and tab live above the boundary (test InspectorStates)."
   },
   {
    "nodeId": "255:84358",
@@ -5455,7 +5455,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "\"Editing Desktop · Page appearance\" context; \"SEO & social\" vs \"SEO and social\"; ✦ AI on page header to remove (:236)"
+   "verifiedNote": "Lane L-B A9 (built, not compared): 'SEO and social' + 'Opens {page}’s Page settings. Appearance stays here.'. Open: '✦ AI' on the page header waits on PR #33 (blocked:pr33-ai-removal); header 'Editing Desktop · Page appearance'."
   },
   {
    "nodeId": "255:85352",
@@ -5465,7 +5465,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "\"Template applied!\" vs \"Template applied · The Studio template was applied to Home\" + Dismiss notice"
+   "verifiedNote": "Lane L-B A9 (built, not compared): 'Template applied' · 'The {template} template was applied to {page}.' · 'Dismiss notice' (forgets it). Open: page scoping — the stored notice carries no page id (the writer is TemplatesTab, L-C), so it still shows on every page for its 30 minutes."
   },
   {
    "nodeId": "255:85835",
@@ -19901,7 +19901,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "SessionExpiredModal.tsx:87-92 title \"Your session expired\" vs \"Sign in again to save\"; body copy differs; extra at-risk list"
+   "verifiedNote": "L-F S5: built, not compared. 480 dialog (size confirm), \"Sign in again to save\" + board body with the history count since the last save; \"and in this browser\" only when a kept copy exists (code truth). Keep editing · Try saving again · Sign in ↗ (primary). The labels list folded into the count (code-ahead disposition)."
   },
   {
    "nodeId": "225:3888",
@@ -19910,8 +19910,8 @@
    "family": "recovery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Mid-session 401 opens modal/toast (useComposerInit.ts:821-829); no persistent banner slot. LoadErrorBanner auth is load-time only"
+   "verified": "drift-open",
+   "verifiedNote": "L-F S5: built, not compared. Keep editing (and Escape) leaves the G04 banner in the global slot with Sign in ↗; the next landed save (lastSavedAt) clears it."
   },
   {
    "nodeId": "225:4416",
@@ -20131,7 +20131,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "StudioErrorBoundary AquibraStudio.tsx:98-147 \"Something went wrong\"/Reload; no error code, Download a copy, Back to sites"
+   "verifiedNote": "L-F S6: built, not compared. EditorStoppedBoundary/Screen: board title, unsaved line only when true, \"Error code XXXX-XX\" + copy (FNV hash, reported with captureError), Download a copy (primary when work exists) · Reload editor · Back to sites. Mount swap is REQUESTS #17."
   },
   {
    "nodeId": "227:12184",

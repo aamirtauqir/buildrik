@@ -3,8 +3,8 @@
  * analogy (no board, OQ-3) native Video and SVG / Icon.
  *
  *   Image  source row · Alt text + "Add alt text…" hint while empty ·
- *          Fit Cover / Contain / Fill (object-fit — the only writer since
- *          Size lost it) · Loading
+ *          Loading. Its Fit (object-fit) is a style, so it is Style › Size's
+ *          (2L9 board 36:2: "Image fit and dimensions are in Style").
  *   Audio  source row (Choose audio) · Show controls · Loop · Autoplay
  *   Video  source row · Poster image · Autoplay · Muted · Loop · Show
  *          controls · Plays inline, with board 9's warning while autoplay
@@ -13,8 +13,7 @@
  *          size, stroke
  *
  * Attribute rows write through `writeAttribute` (lock gate, one transaction
- * for the whole selection); Fit writes a style through the Inspector's style
- * path (`onChange`), so it follows breakpoint and state like every style.
+ * for the whole selection).
  *
  * @license BSD-3-Clause
  */
@@ -25,18 +24,12 @@ import type { IconConfig } from "@/shared/types/media";
 import type { TypeBlockBodyProps } from "@/editor/inspector/config/typeBlocks";
 import type { TypeBlockId } from "@/shared/constants/elementCapabilities";
 import { writableElements } from "@/engine/commands/commandOperations";
-import { ButtonGroup, InputRow, SelectRow } from "@/editor/inspector/shared/controls";
+import { InputRow, SelectRow } from "@/editor/inspector/shared/controls";
 import { SourceRow } from "../SourceRow";
 import { getCurrentIconConfig, handleIconSelectAction, handleVideoPosterChange, runTxn, writeAttribute } from "../attributeWriter";
 import { PropertyRows, type PropertyConfig } from "../PropertyField";
 import { Note, Warning, useElementVersion } from "./bodyRows";
 import { CheckRow } from "@/editor/inspector/shared/controls/CheckRow";
-
-const FIT_OPTIONS = [
-  { value: "cover", label: "Cover" },
-  { value: "contain", label: "Contain" },
-  { value: "fill", label: "Fill" },
-];
 
 const LOADING_OPTIONS = [
   { value: "lazy", label: "Lazy" },
@@ -70,7 +63,6 @@ const Image: React.FC<TypeBlockBodyProps> = (p) => {
       <Source {...p} />
       <InputRow label="Alt text" value={alt} placeholder="Describe this image" onChange={(v) => write("alt", v)} />
       {!alt.trim() && <Note testId="inspector-alt-hint">Add alt text so everyone can understand this image.</Note>}
-      <ButtonGroup label="Fit" property="object-fit" value={p.styles["object-fit"] ?? ""} options={FIT_OPTIONS} onChange={(v) => p.onChange("object-fit", v)} />
       <SelectRow label="Loading" value={read("loading") ?? ""} options={LOADING_OPTIONS} onChange={(v) => write("loading", v)} />
     </>
   );

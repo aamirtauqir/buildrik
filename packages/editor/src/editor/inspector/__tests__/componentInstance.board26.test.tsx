@@ -48,7 +48,10 @@ describe("board 26 — component instance", () => {
     expect(section("layout"), "a plain container keeps Layout").not.toBeNull();
     expect(section("text-inside"), "a plain container keeps Text inside").not.toBeNull();
     await show(id);
-    for (const s of ["component", "size", "spacing", "fill", "border"]) expect(section(s), s).not.toBeNull();
+    /* 2L9 IC01: the instance block sits above the tabs, before the strip. */
+    const block = screen.getByTestId("component-row");
+    expect(block.compareDocumentPosition(screen.getByTestId("inspector-tab-strip")) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    for (const s of ["size", "spacing", "fill", "border"]) expect(section(s), s).not.toBeNull();
     expect(section("layout")).toBeNull();
     expect(section("text-inside")).toBeNull();
   });

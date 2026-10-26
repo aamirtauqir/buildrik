@@ -8,15 +8,14 @@ import * as React from "react";
 import { Section } from "@/editor/inspector/shared/controls";
 import { AddInteractionPanel } from "./AddInteractionPanel";
 import { InteractionItem } from "./InteractionItem";
-import { ElementAnimationRow, ElementAnimationEditor, animationTriggerLabel } from "./ElementAnimationRow";
+import { ElementAnimationRow, ElementAnimationEditor } from "./ElementAnimationRow";
 import { InteractionEditor } from "./InteractionEditor";
-import { getTriggerInfo } from "./types";
 import { DEFAULT_ANIMATION_CONFIG } from "@/engine/interactions/types";
 import { DEFAULT_ANIMATION, type AnimationConfig } from "@/shared/types/animations";
 import { type Interaction, type InteractionTrigger, type InteractionsSectionProps } from "./types";
 import { Button } from "@/editor/chrome-ui";
 import { EVENTS } from "@/shared/constants/events";
-import { ActionRow } from "../behaviourRows";
+import { ActionRow, NoteRow } from "../behaviourRows";
 // Re-export types for external use
 export type { Interaction, InteractionTrigger, InteractionsSectionProps };
 
@@ -125,6 +124,8 @@ export const InteractionsSection: React.FC<InteractionsSectionProps> = ({
       ‹ {label}
     </Button>
   );
+  /* 2L9 161:15179: an interaction's screen goes "‹ Back to Interactions". */
+  const backToList = "Back to Interactions";
 
   return (
     <Section
@@ -139,7 +140,7 @@ export const InteractionsSection: React.FC<InteractionsSectionProps> = ({
       <div className="tw:flex tw:flex-col">
         {editing ? (
           <>
-            {back(getTriggerInfo(editing.trigger).label, () => setEditingId(null))}
+            {back(backToList, () => setEditingId(null))}
             <InteractionEditor
               interaction={editing}
               onUpdate={updateInteraction}
@@ -150,7 +151,7 @@ export const InteractionsSection: React.FC<InteractionsSectionProps> = ({
           </>
         ) : editingAnimation && onAnimationChange ? (
           <>
-            {back(animationTriggerLabel(editingAnimation), () => setAnimationOpen(false))}
+            {back(backToList, () => setAnimationOpen(false))}
             <ElementAnimationEditor
               animation={editingAnimation}
               onChange={(next) => {
@@ -162,6 +163,8 @@ export const InteractionsSection: React.FC<InteractionsSectionProps> = ({
           </>
         ) : (
           <>
+            {/* 2L9 161:13919: interactions are the element's, not a breakpoint's. */}
+            <NoteRow testId="interactions-all-breakpoints">Plays on all breakpoints</NoteRow>
             {animation && onAnimationChange ? (
               <ElementAnimationRow animation={animation} onOpen={() => setAnimationOpen(true)} />
             ) : null}
@@ -170,9 +173,12 @@ export const InteractionsSection: React.FC<InteractionsSectionProps> = ({
             ))}
 
             {!showAddPanel ? (
-              <ActionRow onClick={() => setShowAddPanel(true)} testId="interactions-add">
-                + Add interaction
-              </ActionRow>
+              <>
+                <ActionRow onClick={() => setShowAddPanel(true)} testId="interactions-add">
+                  + Add interaction
+                </ActionRow>
+                {interactions.length === 0 && !animation ? <NoteRow testId="interactions-empty">No interactions yet.</NoteRow> : null}
+              </>
             ) : (
               <AddInteractionPanel
                 onAdd={addInteraction}

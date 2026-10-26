@@ -16,7 +16,7 @@ import type {
 } from "@/shared/types/media";
 import type { CssContext, PropertyState } from "@/editor/inspector/config/cssContext";
 import type { SectionDisplayMode } from "@/editor/inspector/shared/controls/Section";
-import type { ElementCapabilities } from "@/shared/constants/elementCapabilities";
+import type { BehaviourSectionId, ElementCapabilities } from "@/shared/constants/elementCapabilities";
 import { masterOverrideProps } from "@/editor/inspector/hooks/useFieldOverrides";
 
 // ============================================================================
@@ -39,13 +39,21 @@ function pickKeys<T extends Record<string, unknown>>(
 // TAB & SECTION IDS
 // ============================================================================
 
-/** Inspector v4 tabs (DD-1, DD-4, Q1): Style · Behaviour · Effects. */
-export type TabId = "style" | "behaviour" | "effects";
+/**
+ * The four tabs of 2L9 page 04 (boards 36:2, 161:8480): Content · Style ·
+ * Behavior · Effects. Content holds what the element says and is (its text,
+ * source, fields, semantics, attributes) — written once for every
+ * breakpoint; Style and Effects hold how it looks at this breakpoint and
+ * state; Behavior how it acts. The id `behaviour` keeps the spelling of the
+ * capability table's `behaviourSections`; only the label is the board's.
+ */
+export type TabId = "content" | "style" | "behaviour" | "effects";
 
-/** The strip's labels, in board order (boards 1, 2, 3). */
+/** The strip's labels, in board order. */
 export const INSPECTOR_TABS: readonly { id: TabId; label: string }[] = [
+  { id: "content", label: "Content" },
   { id: "style", label: "Style" },
-  { id: "behaviour", label: "Behaviour" },
+  { id: "behaviour", label: "Behavior" },
   { id: "effects", label: "Effects" },
 ];
 
@@ -54,9 +62,16 @@ export const INSPECTOR_TABS: readonly { id: TabId; label: string }[] = [
  * order they render in is `config/sectionOrder.ts` (one list per tab).
  */
 export type SectionId =
-  // Style — define → shape → paint (DD-15)
-  | "component"
+  // Content
   | "type"
+  | "form-fields"
+  | "slides"
+  | "collection"
+  | "cms-binding"
+  | "semantics"
+  | "attributes"
+  // Style — define → shape → paint (DD-15)
+  | "type-layout"
   | "layout"
   | "typography"
   | "text-inside"
@@ -64,18 +79,13 @@ export type SectionId =
   | "spacing"
   | "fill"
   | "border"
-  // Behaviour
-  | "form-fields"
+  // Behavior
   | "form-settings"
-  | "slides"
   | "slider-settings"
-  | "collection"
   | "link"
-  | "cms-binding"
   | "visibility"
   | "interactions"
   | "css-classes"
-  | "attributes"
   // Effects
   | "opacity"
   | "shadow"
@@ -86,7 +96,7 @@ export type SectionId =
 /**
  * How a section arrives (DD-11), before the user opens or closes it:
  *   always — open (type block, Size, Spacing);
- *   open   — open (the Behaviour tab's primaries);
+ *   open   — open (the Content and Behavior primaries);
  *   valued — open when the element carries a value for it, else the one-row
  *            "+" header (Fill, Border, the Effects rows);
  *   closed — shut, with a one-line summary (Attributes, Text inside, Advanced).
@@ -172,6 +182,10 @@ export function shownOnInstanceRoot(ctx: ShouldRenderContext, keys: readonly str
   if (!ctx.composer?.components?.getInstanceByElementId?.(id)) return true;
   return masterOverrideProps(ctx.composer, id).some((p) => keys.includes(p));
 }
+
+/** Capability predicate: the type carries this one of its own sections
+ *  (Fields, Slides, Collection — boards 19, 20). */
+export const ownSection = (id: BehaviourSectionId) => (caps: ElementCapabilities) => caps.behaviourSections.includes(id);
 
 // ============================================================================
 // ENTRY TYPES
@@ -319,7 +333,7 @@ export function adaptBaseStyleProps(ctx: SectionContext): BaseStyleSectionProps 
   };
 }
 
-/** Props every non-style section (Behaviour) takes from the frame. */
+/** Props every non-style section (Content, Behavior) takes from the frame. */
 export function adaptElementProps(ctx: SectionContext): {
   elementId: string;
   composer: Composer | null;

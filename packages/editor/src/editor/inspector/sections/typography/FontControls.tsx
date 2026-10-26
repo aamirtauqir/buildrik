@@ -6,7 +6,7 @@
  *
  * The Page panel (board 21) shows only the text colour, as "Text colour".
  *
- * A font size bound to a Brand type style is bound from the type block's
+ * A font size bound to a Brand type style is bound from the section's
  * "Text style" row (owner answer 4) — the one door for that binding; the
  * field here shows the size it resolves to, and typing a size unbinds it.
  *

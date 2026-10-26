@@ -2,10 +2,10 @@
  * PagePanel — nothing selected, or the page root selected (DD-13, board 21).
  *
  * "Home · Page"; Fill (Background), Size (Max width), Typography (Font, Text
- * colour), Spacing, in that order; "SEO & social" → the page's settings on
- * SEO; "Your place here is kept"; no tabs, no context row, no Link / CMS /
+ * colour), Spacing, in that order; "SEO and social" → the page's settings on
+ * SEO; "Opens {page}’s Page settings. Appearance stays here."; no tabs, no context row, no Link / CMS /
  * Visibility / Interactions. Edits land on the page root in one undo step.
- * The "Template applied!" banner (board 1175:4841) moved in from the old
+ * The "Template applied" notice (board 1175:4841, 2L9 S07) moved in from the old
  * empty state and sits on top for 30 minutes after a template is applied.
  *
  * Real Composer.
@@ -123,13 +123,13 @@ describe("PagePanel — board 21", () => {
     }
   });
 
-  it("SEO & social opens the page's settings on SEO; the note says your place is kept", () => {
+  it("SEO and social opens the page's settings on SEO; the note says Appearance stays here (2L9 S06)", () => {
     const { composer, page } = setup();
     const emit = vi.spyOn(composer, "emit");
     fireEvent.click(screen.getByTestId("inspector-page-seo"));
     expect(emit).toHaveBeenCalledWith(EVENTS.UI_PAGES_OPEN_SETTINGS, { pageId: page.id, tab: "seo" });
-    expect(screen.getByTestId("inspector-page-seo")).toHaveTextContent("SEO & social");
-    expect(screen.getByTestId("inspector-page-note")).toHaveTextContent("Your place here is kept");
+    expect(screen.getByTestId("inspector-page-seo")).toHaveTextContent("SEO and social");
+    expect(screen.getByTestId("inspector-page-note")).toHaveTextContent("Opens Home’s Page settings. Appearance stays here.");
   });
 
   it("an edit writes the page root, one undo step", () => {
@@ -159,33 +159,33 @@ describe("PagePanel — board 21", () => {
 describe("PagePanel — template applied (board 1175:4841)", () => {
   const seed = (name: string, ts = Date.now()) => localStorage.setItem(KEY, JSON.stringify({ name, ts }));
 
-  it("shows the applied template's name over the page panel", () => {
+  it("2L9 S07: 'Template applied · The {name} template was applied to {page}.' over the page panel", () => {
     seed("Bistro Landing");
     setup();
-    expect(screen.getByText("Template applied!")).toBeInTheDocument();
-    expect(screen.getByText("Bistro Landing")).toBeInTheDocument();
+    expect(screen.getByText("Template applied")).toBeInTheDocument();
+    expect(screen.getByText("The Bistro Landing template was applied to Home.")).toBeInTheDocument();
     expect(screen.getByTestId("inspector-element-name")).toHaveTextContent("Home · Page");
   });
 
-  it("offers Set Brand Colors, routed to the design panel", () => {
+  it("Dismiss notice hides it and forgets it", () => {
     seed("Bistro Landing");
-    const { composer } = setup();
-    const emit = vi.spyOn(composer, "emit");
-    fireEvent.click(screen.getByRole("button", { name: /set brand colors/i }));
-    expect(emit).toHaveBeenCalledWith("ui:open-design-panel", {});
+    setup();
+    fireEvent.click(screen.getByTestId("inspector-template-dismiss"));
+    expect(screen.queryByTestId("inspector-template-applied")).toBeNull();
+    expect(localStorage.getItem(KEY)).toBeNull();
   });
 
   it("is gone once 30 minutes have passed, and the stale key is dropped", () => {
     seed("Bistro Landing", Date.now() - 31 * 60 * 1000);
     setup();
-    expect(screen.queryByText("Template applied!")).toBeNull();
+    expect(screen.queryByText("Template applied")).toBeNull();
     expect(localStorage.getItem(KEY)).toBeNull();
   });
 
   it("ignores a malformed stored value instead of throwing", () => {
     localStorage.setItem(KEY, "{not json");
     setup();
-    expect(screen.queryByText("Template applied!")).toBeNull();
+    expect(screen.queryByText("Template applied")).toBeNull();
     expect(localStorage.getItem(KEY)).toBeNull();
   });
 });

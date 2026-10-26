@@ -118,7 +118,7 @@ describe("Form › AFTER SUBMIT + PROTECTION", () => {
     fireEvent.blur(screen.getByLabelText("Message"));
     await new Promise((r) => setTimeout(r, 0));
     expect(api.forms.updateBlock.mutate).not.toHaveBeenCalled();
-    expect(screen.queryByText(/Only workspace Admins/)).not.toBeInTheDocument();
+    expect(screen.queryByTestId("form-after-submit-admin-only")).not.toBeInTheDocument();
   });
 
   it("saves the notify email on blur", async () => {
@@ -131,20 +131,23 @@ describe("Form › AFTER SUBMIT + PROTECTION", () => {
     ));
   });
 
-  it("board 19: Then · Message · Send to, then the note", async () => {
+  it("2L9 F10: Then · Message · Notifications › Send to · Spam protection › Block automated submissions · status · note", async () => {
     const { container } = render(<FormAfterSubmitSection elementId="f" composer={project()} isOpen />);
     await waitFor(() => screen.getByLabelText("Then"));
     expect((screen.getByLabelText("Then") as HTMLSelectElement).selectedOptions[0].textContent).toBe("Show message");
     const text = container.textContent ?? "";
-    const at = ["Then", "Message", "Send to", "Saved to your site straight away — not part of Undo. Changing Send to needs an admin."].map((t) => text.indexOf(t));
+    const at = [
+      "Then", "Message", "Notifications", "Send to", "Spam protection", "Applies on next publish", "Block automated submissions",
+      "Form settings status", "Saved", "Saved separately from page edits; outside document Undo.",
+    ].map((t) => text.indexOf(t));
     expect(at.every((i) => i >= 0)).toBe(true);
     expect([...at].sort((a, b) => a - b)).toEqual(at);
   });
 
   it("toggles spam protection", async () => {
     render(<FormAfterSubmitSection elementId="f" composer={project()} isOpen />);
-    await waitFor(() => screen.getByRole("checkbox", { name: "Spam protection" }));
-    fireEvent.click(screen.getByRole("checkbox", { name: "Spam protection" }));
+    await waitFor(() => screen.getByRole("checkbox", { name: "Block automated submissions" }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "Block automated submissions" }));
     await waitFor(() => expect(api.forms.updateBlock.mutate).toHaveBeenCalledWith(
       expect.objectContaining({ spamProtection: false }),
     ));
@@ -152,10 +155,10 @@ describe("Form › AFTER SUBMIT + PROTECTION", () => {
 
   it("M6: the spam protection toggle has an accessible name", async () => {
     render(<FormAfterSubmitSection elementId="f" composer={project()} isOpen />);
-    await waitFor(() => expect(screen.getByRole("checkbox", { name: "Spam protection" })).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByRole("checkbox", { name: "Block automated submissions" })).toBeInTheDocument());
   });
 
-  it("I4: a non-admin's notify-email edit is reverted and explained on FORBIDDEN", async () => {
+  it("I4 / F15: a non-admin's notify-email edit is reverted and Send to reads 'Changing Send to needs Admin access.'", async () => {
     api.forms.updateBlock.mutate.mockRejectedValueOnce(
       Object.assign(new Error("FORBIDDEN"), { data: { code: "FORBIDDEN" } }),
     );
@@ -165,9 +168,11 @@ describe("Form › AFTER SUBMIT + PROTECTION", () => {
     fireEvent.change(screen.getByLabelText("Send to"), { target: { value: "me@example.com" } });
     fireEvent.blur(screen.getByLabelText("Send to"));
 
-    await waitFor(() => expect(screen.getByText(/Only workspace Admins/)).toBeInTheDocument());
-    // Reverted — the field no longer shows the edit that was never actually saved.
-    expect((screen.getByLabelText("Send to") as HTMLInputElement).value).toBe("");
+    await waitFor(() => expect(screen.getByTestId("form-after-submit-admin-only")).toHaveTextContent("Changing Send to needs Admin access."));
+    // Reverted — nothing shows the edit that was never actually saved.
+    expect(screen.queryByLabelText("Send to")).toBeNull();
+    expect(screen.queryByDisplayValue("me@example.com")).toBeNull();
+    expect(screen.getByTestId("form-settings-status")).toHaveTextContent("Saved");
   });
 
   it("I4: other fields stay editable after a notify-email FORBIDDEN — the gate is per-field", async () => {
@@ -178,10 +183,10 @@ describe("Form › AFTER SUBMIT + PROTECTION", () => {
     await waitFor(() => screen.getByLabelText("Send to"));
     fireEvent.change(screen.getByLabelText("Send to"), { target: { value: "me@example.com" } });
     fireEvent.blur(screen.getByLabelText("Send to"));
-    await waitFor(() => expect(screen.getByText(/Only workspace Admins/)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByTestId("form-after-submit-admin-only")).toBeInTheDocument());
 
     api.forms.updateBlock.mutate.mockResolvedValue({});
-    fireEvent.click(screen.getByRole("checkbox", { name: "Spam protection" }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "Block automated submissions" }));
     await waitFor(() => expect(api.forms.updateBlock.mutate).toHaveBeenLastCalledWith(
       expect.objectContaining({ spamProtection: false }),
     ));
@@ -201,5 +206,33 @@ describe("Form › AFTER SUBMIT + PROTECTION", () => {
     fireEvent.blur(screen.getByLabelText("Send to"));
     await waitFor(() => expect(screen.getByText("Enter an email address like you@company.com")).toBeInTheDocument());
     expect(screen.queryByText(/notifyEmail:/)).toBeNull();
+  });
+
+  it("F12: a failed save keeps what was typed, says so, and Retry sends it again", async () => {
+    api.forms.updateBlock.mutate.mockRejectedValueOnce(new Error("Network down"));
+    render(<FormAfterSubmitSection elementId="f" composer={project()} isOpen />);
+    await waitFor(() => screen.getByLabelText("Message"));
+    fireEvent.change(screen.getByLabelText("Message"), { target: { value: "Thanks!" } });
+    fireEvent.blur(screen.getByLabelText("Message"));
+    await waitFor(() => expect(screen.getByTestId("form-settings-status")).toHaveTextContent("Couldn’t save — your message is still here."), { timeout: 5000 });
+    expect(screen.getByLabelText("Message")).toHaveValue("Thanks!");
+    api.forms.updateBlock.mutate.mockResolvedValueOnce({});
+    fireEvent.click(screen.getByTestId("form-settings-retry"));
+    await waitFor(() => expect(screen.getByTestId("form-settings-status")).toHaveTextContent("Saved"), { timeout: 5000 });
+    expect(api.forms.updateBlock.mutate).toHaveBeenCalledTimes(2);
+    expect(api.forms.updateBlock.mutate).toHaveBeenLastCalledWith(expect.objectContaining({ successMessage: "Thanks!" }));
+  });
+
+  it("F17: Redirect with no destination yet reads 'Choose a destination to save'", async () => {
+    render(<FormAfterSubmitSection elementId="f" composer={project()} isOpen />);
+    await waitFor(() => screen.getByLabelText("Then"));
+    fireEvent.change(screen.getByLabelText("Then"), { target: { value: "REDIRECT" } });
+    expect(screen.getByTestId("form-settings-status")).toHaveTextContent("Choose a destination to save");
+  });
+
+  it("F16: loading reads 'Loading form settings…'", () => {
+    api.forms.getBlock.query.mockReturnValue(new Promise(() => {}));
+    render(<FormAfterSubmitSection elementId="f" composer={project()} isOpen />);
+    expect(screen.getByText("Loading form settings…")).toBeInTheDocument();
   });
 });
