@@ -262,3 +262,20 @@ describe("BrandWorkspace › compact under 1440 (B6-B51…B53)", () => {
     expect(utils.getByTestId("brand-preview-column")).toBeTruthy();
   });
 });
+
+describe("BrandWorkspace › Colors drill-in (B6-B01 → B6-B02)", () => {
+  it("lands on the list with nothing open; a card opens its edit page in place, '‹ Colors' goes back", async () => {
+    const utils = renderWorkspace(makeFakeComposer());
+    expect(utils.queryByTestId("brand-token-edit")).toBeNull();
+    expect(utils.getByTestId("brand-page-actions").textContent).toContain("+ Add color");
+    fireEvent.click(await waitFor(() => utils.container.querySelector<HTMLElement>('[data-token-row="color-primary"]')!));
+    expect(utils.getByTestId("brand-page-title").textContent).toBe("Colors");
+    const edit = utils.getByTestId("brand-token-edit");
+    expect(utils.getByTestId("brand-preview-column").contains(utils.getByTestId("brand-token-menu"))).toBe(false);
+    expect(edit.contains(utils.getByTestId("brand-token-menu"))).toBe(true);
+    expect(utils.queryByTestId("brand-page-actions")).toBeNull();
+    fireEvent.click(utils.getByTestId("brand-back-colours"));
+    expect(utils.queryByTestId("brand-token-edit")).toBeNull();
+    expect(utils.getByTestId("brand-page-title").textContent).toMatch(/^Colors · \d+$/);
+  });
+});

@@ -75,7 +75,7 @@ import { SessionEditsPopover } from "./SessionEditsPopover";
 import { BrandPreview } from "./BrandPreview";
 import { BrandCard, BrandChevron, BrandRow } from "./BrandCard";
 import { BrandLivePreview } from "./BrandLivePreview";
-import { orderColourTokens } from "./colors/ColorTokenList";
+import { aliasedByCount } from "./colors/ColorTokenList";
 import { TokenDetailView } from "./sections/TokenDetailView";
 import { TokensSection } from "./sections/TokensSection";
 import { StylesSection } from "./sections/StylesSection";
@@ -537,7 +537,8 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
      card open. A token page with nothing selected (landing, a page change)
      selects its first row. */
   const firstRowId = (() => {
-    if (page === "colours") return orderColourTokens(visibleColors)[0]?.id;
+    /* Colors opens a token only on purpose ("Edit ›", B6-B02): no default. */
+    if (page === "colours") return undefined;
     if (page === "spacing") return spacing.tokens[0]?.id;
     if (page.startsWith("kind-")) return moreKindRegistry[page.slice(5) as MoreKind]?.tokens[0]?.id;
     return undefined;
@@ -627,7 +628,8 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
      The scale generator sits under Colors and keeps its title. */
   const checksLabel = lintIssues.length > 0 ? `Checks · ${lintIssues.length}` : "Checks";
   const title =
-    page === "colours" || page === "scale" ? `Colors · ${visibleColors.length}`
+    page === "colours" && selectedToken ? "Colors"
+    : page === "colours" || page === "scale" ? `Colors · ${visibleColors.length}`
     : page === "brand-checks" ? checksLabel
     : pageLabel(page);
 
@@ -636,6 +638,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
   const pageAction = (() => {
     switch (page) {
       case "colours":
+        if (selectedToken) return null;
         return (
           <>
             <Button type="button" variant="secondary" size="xs" className={PAGE_ACTION} onClick={() => setShowAddToken(true)} data-testid="brand-page-action">
@@ -773,6 +776,38 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
     }
   })();
 
+  /* The token's edit controls — the Colors drill-in's body (B6-B02), the
+     right column's card on the other token pages. */
+  const detailCard = (tok: DesignToken) => (
+            <TokenDetailView
+              key={tok.id}
+              token={tok}
+              composer={composer}
+              allTokens={allTokens}
+              mode={shownMode}
+              onValueChange={changeToken}
+              /* Same gate as rename (G3-138): type and spacing have no delete
+                 path; offering Delete for them was a silent no-op. */
+              onDelete={(() => {
+                const k = kindOf(tok);
+                return k === "color" || isMoreKind(k) ? deleteToken : undefined;
+              })()}
+              onReset={(() => {
+                const k = kindOf(tok);
+                return SEED_BY_ID.has(tok.id) && (k === "color" || isMoreKind(k)) ? resetToken : undefined;
+              })()}
+              /* Only colour and the generic kinds can rename; type and spacing
+                 have no rename path, and a Rename that silently did nothing
+                 was G3-137's defect — the item is disabled for them. */
+              onRename={(() => {
+                const k = kindOf(tok);
+                return k === "color" || isMoreKind(k) ? renameToken : undefined;
+              })()}
+              onDeleted={() => setSelectedTokenId(null)}
+              onGenerateScale={isSemanticColour(tok) ? openScale : undefined}
+            />
+  );
+
   const tokenPageProps = {
     onAddTokenClick: () => setShowAddToken(true),
     composer,
@@ -788,8 +823,33 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
 
   const renderPage = (): React.ReactNode => {
     switch (page) {
-      case "colours":
-        return <TokensSection {...tokenPageProps} openKind="color" />;
+      case "colours": {
+        if (!selectedToken) return <TokensSection {...tokenPageProps} openKind="color" />;
+        /* B6-B02: the token's edit page, in place of the list. */
+        const reach = composer?.designSystem?.tokenUsage?.getCount?.(selectedToken.id);
+        return (
+          <div className="tw:flex tw:max-w-[620px] tw:flex-col tw:gap-3" data-testid="brand-token-edit">
+            <Button
+              type="button"
+              variant="link"
+              size="xs"
+              className="tw:h-7 tw:self-start tw:px-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)] tw:enabled:hover:text-[var(--bk-accent)] tw:enabled:hover:no-underline"
+              onClick={() => setSelectedTokenId(null)}
+              data-testid="brand-back-colours"
+            >
+              ‹ Colors
+            </Button>
+            {typeof reach === "number" && reach > 0 && (
+              /* B6-B02 / B6-B30: what an edit here reaches, before it is made. */
+              <p className="tw:m-0 tw:bg-[var(--bk-accent-tint)] tw:p-3 tw:text-[length:var(--bk-text-12)] tw:leading-[18px] tw:text-[var(--bk-ink)]" data-testid="brand-token-reach">
+                This changes {reach} place{reach === 1 ? "" : "s"} across the site
+                {aliasedByCount(allTokens, selectedToken.id) > 0 ? ", including uses through aliases." : "."}
+              </p>
+            )}
+            {detailCard(selectedToken)}
+          </div>
+        );
+      }
       case "other-kinds":
         /* B6-B23: one row per kind, its page behind it. */
         return (
@@ -1268,37 +1328,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
               onClear={() => setUsageTokenId(null)}
             />
           )}
-          {isTokenPage && selectedToken && (
-            <EditLock locked={readOnly}>
-            <TokenDetailView
-              key={selectedToken.id}
-              token={selectedToken}
-              composer={composer}
-              allTokens={allTokens}
-              mode={shownMode}
-              onValueChange={changeToken}
-              /* Same gate as rename (G3-138): type and spacing have no delete
-                 path; offering Delete for them was a silent no-op. */
-              onDelete={(() => {
-                const k = kindOf(selectedToken);
-                return k === "color" || isMoreKind(k) ? deleteToken : undefined;
-              })()}
-              onReset={(() => {
-                const k = kindOf(selectedToken);
-                return SEED_BY_ID.has(selectedToken.id) && (k === "color" || isMoreKind(k)) ? resetToken : undefined;
-              })()}
-              /* Only colour and the generic kinds can rename; type and spacing
-                 have no rename path, and a Rename that silently did nothing
-                 was G3-137's defect — the item is disabled for them. */
-              onRename={(() => {
-                const k = kindOf(selectedToken);
-                return k === "color" || isMoreKind(k) ? renameToken : undefined;
-              })()}
-              onDeleted={() => setSelectedTokenId(null)}
-              onGenerateScale={isSemanticColour(selectedToken) ? openScale : undefined}
-            />
-            </EditLock>
-          )}
+          {isTokenPage && page !== "colours" && selectedToken && <EditLock locked={readOnly}>{detailCard(selectedToken)}</EditLock>}
         </aside>
         )}
       </div>

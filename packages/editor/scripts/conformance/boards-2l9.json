@@ -9186,7 +9186,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-D S1: nav grouped Tokens/Reusable styles/Tools, \"‹ Back to Editor · {page}\", title \"Colors · n\", strap, \"+ Add color\" · \"Generate scale\". Open: Edit › cards (deferred), resource-area mount (REQUESTS #10), Restore points ▾ popover (B39). Built, not compared."
+   "verifiedNote": "L-D S1 shell + W1 body: grouped cards (\"{n} semantic colors\", then other groups), name + \"Edit ›\", \"Light #…     Dark #…\", \"Used by n places · through aliases\"; no auto-opened token. Built, not compared."
   },
   {
    "nodeId": "203:34125",
@@ -9196,7 +9196,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Token card in preview column, not a \"‹ Colors\" drill-in with reach line; card tooltip says \"Edits stay in the draft until you Save\" (autosav"
+   "verifiedNote": "L-D W1: card opens the token's edit page in place of the list: \"‹ Colors\", reach note \"This changes n places across the site, including uses through aliases.\", then the token controls (light/dark pickers, used by, aliased by, token actions). Labels inside the controls keep \"Light value\"/\"Dark value\"; no \"Dark shade suggestions ▾\" / \"Literal value · no alias\" lines. Built, not compared."
   },
   {
    "nodeId": "203:34679",
@@ -9206,7 +9206,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Token card in preview column, not a \"‹ Colors\" drill-in with reach line; card tooltip says \"Edits stay in the draft until you Save\" (autosav",
+   "verifiedNote": "L-D W1: same edit page after a value change (one composer write, applies at once). Built, not compared.",
    "inheritsFrom": "203:34125"
   },
   {
@@ -9237,7 +9237,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Token card in preview column, not a \"‹ Colors\" drill-in with reach line; card tooltip says \"Edits stay in the draft until you Save\" (autosav",
+   "verifiedNote": "L-D W1: same edit page; saved state is the bottom-bar status (Phase 1). Draft ⓘ (\"Edits stay in the draft until you Save\") removed — contradicted autosave. Built, not compared.",
    "inheritsFrom": "203:34125"
   },
   {
@@ -9489,7 +9489,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No first-edit \"This changes 42 places across the site, including 30 through aliases\" note"
+   "verifiedNote": "L-D W1: reach note shown on the edit page before an edit (\"This changes n places across the site…\"); the board draws it on the list card after the first edit — not on the list. Built, not compared."
   },
   {
    "nodeId": "207:40997",

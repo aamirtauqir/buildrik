@@ -9,13 +9,12 @@
  *   │ Dark value   #76A9FA                    [Change]  │  → inline field
  *   │ Used by      34 elements                [View ›]  │  → element list
  *   │ ✓ Brand checks pass · 8.6:1 contrast on white     │  or △ issue + fixes
- *   │ ⓘ                                                 │  draft note
  *   └───────────────────────────────────────────────────┘
  *
- * The card is a SIBLING of the token table, not a drill-in: the workspace
- * owns which token is selected and mounts this beside the preview. There is
- * no back link; a row click swaps the token (the board's row reaction is
- * "set 7 variables", not "navigate").
+ * Where it mounts is the workspace's call: on Colors it is the body of the
+ * token's edit page ("‹ Colors" drill-in, 2L9 B6-B02); on the other token
+ * pages it is the card beside the preview. (Its draft ⓘ — "Edits stay in the
+ * draft until you Save" — went with 2L9: Brand autosaves.)
  *
  * Engine reads (unchanged): usage from `tokenUsage` ("tokenUsage:changed"),
  * findings from `lintState` ("lint:changed"), the reverse alias lookup from
@@ -31,7 +30,6 @@
  */
 
 import * as React from "react";
-import { Info } from "lucide-react";
 import { resolveTokenLiteral, type TokenUsageCount } from "@buildrik/shared/tokens";
 import type { Composer } from "@/engine/Composer";
 import type { DesignToken } from "@/editor/design-system/types";
@@ -47,7 +45,7 @@ import { FontFamilyPicker } from "./FontFamilyPicker";
 import { BrandFontPopover } from "./BrandFontPopover";
 import { TokenDeleteDialog } from "./TokenDeleteDialog";
 import { TokenRenameDialog } from "./TokenRenameDialog";
-import { Button, HintTooltip, IconButton, Menu, MenuItem, Popover, TextInput } from "@/editor/chrome-ui";
+import { Button, IconButton, Menu, MenuItem, Popover, TextInput } from "@/editor/chrome-ui";
 
 export interface TokenDetailViewProps {
   token: DesignToken;
@@ -689,14 +687,6 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
         )}
       </div>
 
-      {/* ⓘ — the draft note (7318:81119) */}
-      <div className="tw:mt-3 tw:flex">
-        <HintTooltip content="Edits stay in the draft until you Save. Publish to put them live." placement="bottom">
-          <IconButton label="About drafts" className="tw:size-5 tw:min-h-0 tw:min-w-0 tw:text-[var(--bk-ink-muted)]" data-testid="brand-token-draft-note">
-            <Info size={12} aria-hidden />
-          </IconButton>
-        </HintTooltip>
-      </div>
 
       <TokenRenameDialog
         open={renameOpen}
