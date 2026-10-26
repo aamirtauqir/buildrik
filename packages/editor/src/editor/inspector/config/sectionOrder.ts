@@ -19,11 +19,12 @@ import { capabilitiesFor } from "@/shared/constants/elementCapabilities";
    Semantics and the closed Advanced attributes (boards 161:8480, 156:716,
    247:26594). */
 const CONTENT_ORDER: readonly SectionId[] = [
+  /* B5-D04: a bound element's Dynamic bindings head the tab. */
+  "cms-binding",
   "type",
   "form-fields",
   "slides",
   "collection",
-  "cms-binding",
   "semantics",
   "attributes",
 ];

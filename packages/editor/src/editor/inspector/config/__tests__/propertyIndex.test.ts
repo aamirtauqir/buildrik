@@ -36,9 +36,9 @@ describe("buildPropertyIndex", () => {
     expect(labels.some((l) => l.startsWith("-"))).toBe(false);
   });
 
-  it("follows the type's capabilities — a Collection list offers Collection, not CMS binding", () => {
+  it("follows the type's capabilities — a Collection list offers Collection, not Dynamic bindings", () => {
     expect(find("collection-list", "Collection")).toHaveLength(1);
-    expect(find("collection-list", "CMS binding")).toHaveLength(0);
-    expect(find("heading", "CMS binding")).toHaveLength(1);
+    expect(find("collection-list", "Dynamic bindings")).toHaveLength(0);
+    expect(find("heading", "Dynamic bindings")).toHaveLength(1);
   });
 });

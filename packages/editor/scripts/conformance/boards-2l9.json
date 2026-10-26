@@ -7759,7 +7759,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Binding lives in Behaviour \"CMS binding\" (Static/From CMS); board puts it in Content as a property-owned binding entry"
+   "verifiedNote": "Lane L-B C-13 (built, not compared): unbound text shows its static value on the type block's 'Text' row with a Bind button; no Dynamic bindings section until bound."
   },
   {
    "nodeId": "173:9019",
@@ -7789,7 +7789,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Content \"Dynamic bindings\" row + Blog·title value + receipt \"Title bound… Undo\"; code: Behaviour Field select + preview line"
+   "verifiedNote": "Lane L-B C-13 (built, not compared): bound — Dynamic bindings heads Content; the property row reads '{Collection} · {field}', the preview value and 'This page’s record · i of N'."
   },
   {
    "nodeId": "173:10329",
@@ -7799,7 +7799,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Subview Source/Format/If empty/Preview/Open record/Unbind; no Format/If-empty UI (engine fallback CMSBindingManager.ts:49)"
+   "verifiedNote": "Lane L-B C-13 (built, not compared): binding subview — see 302:13946."
   },
   {
    "nodeId": "173:10713",
@@ -7860,7 +7860,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Empty value → fallback shown + status note; engine fallback (CMSBindingManager.ts:218) but no status row"
+   "verifiedNote": "Lane L-B C-13 (built, not compared): 'Binding status · Empty — showing fallback “…”.'."
   },
   {
    "nodeId": "173:13534",
@@ -7870,7 +7870,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "\"Loading Blog records…\" status; code shows \"…\" (CmsBindingSection.tsx:305)"
+   "verifiedNote": "Lane L-B C-13 (built, not compared): 'Loading…' preview and 'Binding status · Loading {Collection} records…'."
   },
   {
    "nodeId": "173:14104",
@@ -7880,7 +7880,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "\"Couldn't load Blog. Binding kept · Retry\"; code catch leaves preview null → \"…\" forever (CmsBindingSection.tsx:189)"
+   "verifiedNote": "Lane L-B C-13 (built, not compared): 'Preview unavailable', 'Couldn’t load {Collection}. Your binding is kept.' + Retry."
   },
   {
    "nodeId": "173:14676",
@@ -7890,7 +7890,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Field deleted → \"Choose field\"; code detects only deleted collection (CmsBindingSection.tsx:125,:284)"
+   "verifiedNote": "Lane L-B C-13 (built, not compared): '{field} no longer exists. Choose a field.' + Choose field (reopens Choose source)."
   },
   {
    "nodeId": "173:15249",
@@ -7900,7 +7900,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Field type changed to Image → \"Choose a text field\"; no type-drift check in code"
+   "verifiedNote": "Lane L-B C-13 (built, not compared): '{field} is now {Type}. Choose a text field.' + Choose field."
   },
   {
    "nodeId": "173:15823",
@@ -20878,7 +20878,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "No \"Choose source\" popover (Record data/List item/Specific record/Site & page/Live). Code: Collection+Field selects."
+   "verifiedNote": "Lane L-B C-13 (built, not compared — copy checked against the dump): the type block's bindable property row has a Bind button that opens 'Choose source' — search 'Search sources or fields…', RECORD DATA (This page’s record · {Collection} on its template page, List item — off with 'Select an element inside a collection list' outside a list, Specific record 'Pin one record to this property'), SITE & PAGE (Site, Page), LIVE SOURCES (Date, URL parameter, Cookie). Site and Page are drawn 'Planned' with the live sources: the binding model reads CMS collections only (code wins on those two rows)."
   },
   {
    "nodeId": "302:12784",
@@ -20908,7 +20908,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Binding subview: Open record/Unbind exist (CmsBindingSection.tsx:314); Format and If empty missing."
+   "verifiedNote": "Lane L-B C-13 (built, not compared): binding detail replaces the Content tab — '‹ Back to Content', '{Property} binding', Source + Change…, context line, Record (specific record only), Format 'As written', If empty (stored as the binding's fallback), Preview, 'Open record ›' (C-11 origin '{element} · {Property} binding'), 'Unbind — keep shown text', 'Keeps “…” as static text.'."
   },
   {
    "nodeId": "302:14521",
@@ -21018,7 +21018,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Binding summary subview \"1 binding · Text bindings are edited in Content\" missing."
+   "verifiedNote": "Lane L-B C-13 (built, not compared): Content › Dynamic bindings, drawn only while bound — '1 binding', '{Property} · {Collection}.{field} ›' opening the detail. Open: the board's property label reads the field's role ('Title text'); the row reads the element property ('Text')."
   },
   {
    "nodeId": "302:19069",

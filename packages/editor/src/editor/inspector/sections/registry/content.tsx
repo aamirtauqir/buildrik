@@ -49,9 +49,12 @@ export const CONTENT_SECTIONS: Record<string, AnySectionEntry> = {
 
   "cms-binding": defineSection({
     tab: "content",
-    title: "CMS binding",
+    title: "Dynamic bindings",
     open: "open",
     capability: (caps) => caps.cmsBindable && !caps.isStructuralChild,
+    /* Only while bound (B5-D01 draws none): a binding is made at its
+       property row in the type block (binding/BindingPropertyRow). */
+    shouldRender: (ctx) => Boolean(ctx.composer?.cms?.bindings?.getBindings?.(ctx.selectedElement.id)?.length),
     Component: CmsBindingSection,
     styleKeys: [],
     adaptProps: (ctx) => ({ ...adaptElementProps(ctx), onOpenCreateCollection: ctx.onOpenCreateCollection }),
