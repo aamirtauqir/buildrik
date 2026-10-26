@@ -17,7 +17,7 @@ import { getSuggestedParents } from "@/shared/utils/nesting";
 import { writableElements } from "@/engine/commands/commandOperations";
 import { takeReplaceTarget } from "@/editor/sidebar/tabs/build/insertGroupRequest";
 import { resolveInsertTarget } from "@/editor/sidebar/tabs/build/insertTarget";
-import { elementLocation, getElementNameFromType } from "@/editor/canvas/utils/elementInfo";
+import { getElementNameFromType } from "@/editor/canvas/utils/elementInfo";
 
 export interface UseBlockInsertionResult {
   handleBlockClick: (block: BlockData) => void;
@@ -83,8 +83,9 @@ export function useBlockInsertion(composer: Composer | null): UseBlockInsertionR
            and the insert cannot disagree. */
         const target =
           replaced && replacedParent
-            ? { parentId: replacedParent.getId(), index: replacedParent.getChildIndex(replaced) }
-            : resolveInsertTarget(composer, def.elementType) ?? { parentId: root.getId(), index: root.getChildCount() };
+            ? { parentId: replacedParent.getId(), index: replacedParent.getChildIndex(replaced), parentName: "" }
+            : resolveInsertTarget(composer, def.elementType) ??
+              { parentId: root.getId(), index: root.getChildCount(), parentName: page.name };
         const { parentId } = target;
 
         const insertedId = insertBlock(composer, def, parentId, target.index);
@@ -126,22 +127,26 @@ export function useBlockInsertion(composer: Composer | null): UseBlockInsertionR
             }, 100);
           }
 
-          /* Decision #16 / board 4428:145642 — "Hero added" with Undo. The
+          /* A-11 / boards 7:19448, 302:4542, 10:3787: the receipt names where
+             the block landed ("Text added to Hero"; the page at its root) and
+             that the selection moved while focus stayed in the panel. The
              toast store keeps one transient, so ten fast inserts show one
-             toast whose Undo is the last insert. */
-          /* Boards 4418:166733 / 4418:169389 name where an element landed
-             ("Heading added to Home › Hero › Content"); a section on the page
-             itself is just "Hero added" (4428:145642). */
-          const onPage = el?.getParent()?.getParent() == null;
-          addToast({
-            description: replaced
-              ? `${getElementNameFromType(replaced.getType())} replaced with ${block.label}`
-              : onPage
-                ? `${block.label} added`
-                : `${block.label} added to ${elementLocation(composer, insertedId)}`,
-            tone: "success",
-            action: { label: "Undo", onClick: composer.history.captureUndo() },
-          });
+             receipt whose Undo is the last insert. */
+          const undo = { label: "Undo", onClick: composer.history.captureUndo() };
+          addToast(
+            replaced
+              ? {
+                  description: `${getElementNameFromType(replaced.getType())} replaced with ${block.label}`,
+                  tone: "success",
+                  action: undo,
+                }
+              : {
+                  title: `${block.label} added to ${target.parentName}`,
+                  description: "Selected on canvas · Focus stays here",
+                  tone: "success",
+                  action: undo,
+                },
+          );
         } else {
           // Build contextual nesting error message
           const parentEl = composer.elements.getElement(parentId);

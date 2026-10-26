@@ -112,7 +112,7 @@ describe("useBlockInsertion", () => {
       endTransaction: vi.fn(),
       emit: vi.fn(),
       elements: {
-        getActivePage: vi.fn(() => ({ root: { id: "root-1" } })),
+        getActivePage: vi.fn(() => ({ name: "Home", root: { id: "root-1" } })),
         getElement: vi.fn((id: string) => elements.get(id) ?? null),
         removeElement: vi.fn(),
       },
@@ -216,12 +216,14 @@ describe("useBlockInsertion", () => {
       3 // root child count
     );
     expect(composer.selection.select).toHaveBeenCalledWith(elements.get("new-1"));
-    /* Decision #16 / board 4428:145642: "Hero added" with an Undo that
-       reverts the insert's own transaction. */
+    /* A-11 / boards 7:19448, 302:4542: the receipt names where the block
+       landed — at the page root that is the page — and says the selection
+       moved while focus did not. Undo reverts the insert's own transaction. */
     expect(mocks.addToast).toHaveBeenCalledWith(
       expect.objectContaining({
         tone: "success",
-        description: "Hero added",
+        title: "Hero added to Home",
+        description: "Selected on canvas · Focus stays here",
         action: expect.objectContaining({ label: "Undo" }),
       })
     );
@@ -253,6 +255,7 @@ describe("useBlockInsertion", () => {
     const parent = makeElement("par-1", "container", {
       getChildren: () => [{ getId: () => "other" }, { getId: () => "sel-1" }],
       getChildCount: () => 2,
+      getParent: () => elements.get("root-1") ?? null,
     });
     elements.set("par-1", parent);
     elements.set(
@@ -270,6 +273,9 @@ describe("useBlockInsertion", () => {
 
     // sel-1 is at index 1 inside par-1 → insert as its next sibling (index 2)
     expect(mocks.insertBlock).toHaveBeenCalledWith(composer, expect.anything(), "par-1", 2);
+    expect(mocks.addToast).toHaveBeenCalledWith(
+      expect.objectContaining({ title: "Hero added to Container", description: "Selected on canvas · Focus stays here" })
+    );
   });
 
   /* L1-001: with a Heading selected, Add → Divider produced <h2>Heading<hr></h2>
