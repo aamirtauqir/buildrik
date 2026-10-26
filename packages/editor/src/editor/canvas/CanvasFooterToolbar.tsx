@@ -11,7 +11,8 @@
  * - "View" opens Canvas view (145:64586): Grid · {n} px › (the Grid and
  *   snapping dialog, 145:65011), Rulers, Snap guides — then, under a rule,
  *   the code's Spacing · Badges · X-Ray toggles (kept, code-ahead). "Show
- *   outlines" and "Focus mode" wait on shell state (REQUESTS #12).
+ *   outlines" is the shell's preference (A-12); "Focus mode" waits on its
+ *   meaning (`open:focus-mode-meaning`).
  *
  * Undo / Redo left this bar for the topbar's History group (Task 1.2).
  *
@@ -37,6 +38,8 @@ export interface CanvasOverlayState {
   rulers: boolean;
   badges: boolean;
   xray: boolean;
+  /** Element outlines without X-Ray's wireframe (board 145:64586). */
+  outlines: boolean;
 }
 
 export interface CanvasFooterToolbarProps {
@@ -89,9 +92,10 @@ const BAR =
 const GROUP = "tw:flex tw:flex-none tw:items-center tw:gap-1";
 
 /* Board 145:64586's own rows, in its order. */
-const VIEW_ROWS: readonly { key: keyof CanvasOverlayState; label: string; kbd: string }[] = [
+const VIEW_ROWS: readonly { key: keyof CanvasOverlayState; label: string; kbd?: string }[] = [
   { key: "rulers", label: "Rulers", kbd: "⌘R" },
   { key: "guides", label: "Snap guides", kbd: "⌘;" },
+  { key: "outlines", label: "Show outlines" },
 ];
 /* The code's other overlays — not on the board, kept under a rule. */
 const MORE_VIEW_ROWS: readonly { key: keyof CanvasOverlayState; label: string; kbd: string }[] = [
@@ -200,7 +204,7 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
   const [zoomOpen, setZoomOpen] = React.useState(false);
   const [widthOpen, setWidthOpen] = React.useState(false);
 
-  const overlayRow = (row: { key: keyof CanvasOverlayState; label: string; kbd: string }) => (
+  const overlayRow = (row: { key: keyof CanvasOverlayState; label: string; kbd?: string }) => (
     <MenuItem
       key={row.key}
       selected={overlays[row.key]}

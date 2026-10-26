@@ -236,7 +236,8 @@ function whoever(i: LifecycleInput): { subject: string; object: string; possessi
  *  connection. */
 function publishBlocker(i: LifecycleInput): string | null {
   if (!i.publishEnabled) return "Publishing isn’t switched on for this workspace yet";
-  if (i.isViewer) return "Viewers can't publish — ask an editor";
+  /* B8-PB19 233:10270. */
+  if (i.isViewer) return "Publishing needs Editor access";
   if (i.offline) return "Needs a connection";
   if (i.saveConflict) return "Resolve the sync conflict before publishing";
   if (i.saveFailed) return "Save your changes before publishing — the last save failed";

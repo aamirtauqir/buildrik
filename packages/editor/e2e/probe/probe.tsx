@@ -2051,7 +2051,7 @@ const CASES: Record<string, () => React.ReactElement> = {
   "canvas-breakpoint-bar": () => (
     <div data-probe="canvas-breakpoint-bar" style={{ padding: 24, background: "var(--bk-gray-50)" }}>
       <CanvasFooterToolbar
-        overlays={{ guides: true, spacing: false, grid: false, rulers: false, badges: false, xray: false }}
+        overlays={{ guides: true, spacing: false, grid: false, rulers: false, badges: false, xray: false, outlines: false }}
         zoom={100}
         device="desktop"
         onDeviceChange={() => {}}
@@ -2076,7 +2076,7 @@ const CASES: Record<string, () => React.ReactElement> = {
   "canvas-footer-toolbar": () => (
     <div data-probe="canvas-footer-toolbar">
       <CanvasFooterToolbar
-        overlays={{ guides: true, spacing: false, grid: false, rulers: false, badges: false, xray: false }}
+        overlays={{ guides: true, spacing: false, grid: false, rulers: false, badges: false, xray: false, outlines: false }}
         zoom={100}
         onOverlayChange={() => {}}
         onZoomChange={() => {}}
@@ -2254,6 +2254,7 @@ const CASES: Record<string, () => React.ReactElement> = {
             element={{ id: el.getId(), type: el.getType() }}
             selectedIds={[el.getId()]}
             breakpointLabel="Desktop"
+            activeTab="style"
             state="normal"
             onStateChange={() => {}}
           />

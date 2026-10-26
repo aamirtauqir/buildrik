@@ -47,6 +47,7 @@ const baseProps = (over: Partial<Props> = {}): Props => ({
   element: { id: heading.getId(), type: "heading" },
   selectedIds: [heading.getId()],
   breakpointLabel: "Desktop",
+  activeTab: "style",
   state: "normal",
   onStateChange: () => {},
   ...over,
@@ -81,6 +82,30 @@ describe("InspectorHeader", () => {
     /* No second breakpoint readout anywhere in the header. */
     expect(screen.getByTestId("inspector-header").textContent?.match(/Desktop/g)).toHaveLength(1);
     expect(screen.queryAllByRole("combobox")).toHaveLength(1);
+  });
+
+  /* B-10 / boards 161:8480, 161:13919, 36:2: the context line follows the
+     tab. Content and Behavior writes are breakpoint- and state-independent,
+     so those tabs carry no state Select. */
+  describe("the context line follows the active tab (B-10)", () => {
+    it('Content reads "Content · All breakpoints", with no state Select', () => {
+      mount({ activeTab: "content" });
+      expect(rowOf("inspector-editing-row").textContent).toBe("Content · All breakpoints");
+      expect(screen.queryByRole("combobox")).toBeNull();
+      expect(rowOf("inspector-editing-row").className).toContain("tw:h-8");
+    });
+
+    it('Behavior reads "Behavior · {type}", with no state Select', () => {
+      mount({ activeTab: "behaviour" });
+      expect(rowOf("inspector-editing-row").textContent).toBe("Behavior · Heading");
+      expect(screen.queryByRole("combobox")).toBeNull();
+    });
+
+    it.each(["style", "effects"] as const)('%s keeps "Editing {breakpoint} · {state}" with the state Select', (tab) => {
+      mount({ activeTab: tab, breakpointLabel: "Tablet" });
+      expect(screen.getByTestId("inspector-breakpoint-prefix").textContent).toBe("Tablet ·");
+      expect(screen.getByRole("combobox", { name: "Editing" })).toBeTruthy();
+    });
   });
 
   it('the Editing select is reachable by Tab and labelled "Editing"', async () => {

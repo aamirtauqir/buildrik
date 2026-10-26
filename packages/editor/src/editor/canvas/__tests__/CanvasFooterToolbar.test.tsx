@@ -21,6 +21,7 @@ const ALL_OFF = {
   rulers: false,
   badges: false,
   xray: false,
+  outlines: false,
 };
 
 function renderToolbar(props: Partial<React.ComponentProps<typeof CanvasFooterToolbar>> = {}) {
@@ -67,7 +68,7 @@ describe("CanvasFooterToolbar — the View menu (board 145:64586)", () => {
     openMenu();
     expect(screen.getByText("Canvas view")).toBeTruthy();
     const rows = screen.getAllByRole("menuitemcheckbox").map((r) => r.textContent?.replace(/(⌘.*|›)$/, "").trim());
-    expect(rows).toEqual(["Grid · 7 px", "Rulers", "Snap guides", "Spacing", "Badges", "X-Ray"]);
+    expect(rows).toEqual(["Grid · 7 px", "Rulers", "Snap guides", "Show outlines", "Spacing", "Badges", "X-Ray"]);
     expect(screen.queryByTestId("canvas-view-breakpoint")).toBeNull();
     expect(screen.queryByTestId("canvas-view-zoom")).toBeNull();
   });
@@ -86,6 +87,16 @@ describe("CanvasFooterToolbar — the View menu (board 145:64586)", () => {
     fireEvent.click(screen.getByTestId("canvas-view-xray"));
     expect(onOverlayChange).toHaveBeenCalledWith("xray", false);
     expect(screen.queryByRole("menu")).toBeNull();
+  });
+
+  /* A-12: "Show outlines" — element outlines without X-Ray's wireframe — is a
+     board row (145:64586), toggled like the others. */
+  it("Show outlines toggles the outlines preference", () => {
+    const { onOverlayChange } = renderToolbar();
+    openMenu();
+    expect(screen.getByTestId("canvas-view-outlines").getAttribute("aria-checked")).toBe("false");
+    fireEvent.click(screen.getByTestId("canvas-view-outlines"));
+    expect(onOverlayChange).toHaveBeenCalledWith("outlines", true);
   });
 
   it("prints each row's chord", () => {

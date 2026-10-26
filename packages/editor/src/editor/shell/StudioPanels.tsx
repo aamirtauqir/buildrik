@@ -79,8 +79,11 @@ export interface StudioPanelsProps {
   } | null;
   device: DeviceType;
   onDeviceChange?: (device: DeviceType) => void;
-  /** Whether undo/redo steps are available — drives the canvas footer toolbar. */
+  /** @deprecated Read by nothing: Undo/Redo live in the topbar (Task 1.2),
+   *  which reads `useHistoryState`. Still passed by AquibraStudio (founder
+   *  WIP); delete with that call site (REQUESTS.md #1). */
   canUndo?: boolean;
+  /** @deprecated See `canUndo`. */
   canRedo?: boolean;
   zoom: number;
   onZoomChange: (zoom: number) => void;
@@ -152,6 +155,17 @@ export interface StudioPanelsProps {
 /** How long a section-focus request waits for the inspector body (m-1). */
 const PENDING_FOCUS_MS = 500;
 
+/* A-12 / board 145:64586 "Show outlines": a personal canvas-view preference
+   ("Personal editor view"), kept in this browser. */
+const OUTLINES_KEY = "bk-canvas-show-outlines";
+function readOutlines(): boolean {
+  try {
+    return localStorage.getItem(OUTLINES_KEY) === "true";
+  } catch {
+    return false;
+  }
+}
+
 /** Gives a held selection back after an escalation (P-5, §13). An element
  *  deleted meanwhile is not brought back. */
 function restoreSelection(composer: Composer, ids: readonly string[]): void {
@@ -168,7 +182,13 @@ interface CmsReturn {
   tab: string;
   drawerOpen: boolean;
   ids: string[];
+  /** The inspector binding the door was on, reopened on the way back (C-12). */
+  binding?: FocusSectionPayload;
 }
+
+/** A CMS door may name the inspector binding it was opened from, so "‹ Back to
+ *  canvas" ends on that binding (Play F2.12 `302:16675`). */
+type CmsDoorRequest = CmsOpenRequest & { binding?: FocusSectionPayload };
 
 /* Board 36 (7995:210885): a 188 × 28 panel action, 20 in from the canvas's
    top right, label and shortcut centred, 13/500 gray-700. */
@@ -224,8 +244,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   selectedElement,
   device,
   onDeviceChange,
-  canUndo,
-  canRedo,
   zoom,
   onZoomChange,
   isLeftPanelOpen,
@@ -452,6 +470,20 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
      column closes so the workspace spans both. */
   const cmsWorkspaceOpen = !readOnlyView && isLeftPanelOpen && railTab === "content";
   const [cmsReturn, setCmsReturn] = React.useState<CmsReturn | null>(null);
+  const [showOutlines, setShowOutlines] = React.useState(readOutlines);
+  /* Outlines are the shell's own preference; every other View row is the caller's. */
+  const handleOverlayChange = React.useCallback(
+    (overlay: keyof CanvasOverlayState, enabled: boolean) => {
+      if (overlay !== "outlines") return onOverlayChange?.(overlay, enabled);
+      setShowOutlines(enabled);
+      try {
+        localStorage.setItem(OUTLINES_KEY, String(enabled));
+      } catch {
+        /* Storage refused (private mode): the preference lasts this session. */
+      }
+    },
+    [onOverlayChange],
+  );
   /* Leaving the workspace any other way (the rail, a closed drawer) ends the
      visit: the return is not offered to a later, unrelated one. */
   const cmsWasOpen = React.useRef(cmsWorkspaceOpen);
@@ -466,6 +498,10 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
     onLeftPanelTabChange?.(back.tab, () => {
       if (!back.drawerOpen) onLeftPanelToggle?.();
       restoreSelection(composer, back.ids);
+      /* After the selection lands (a selection change drops a held focus
+         request) and the workspace has left the column. */
+      const binding = back.binding;
+      if (binding) requestAnimationFrame(() => composer.emit(EVENTS.UI_INSPECTOR_FOCUS_SECTION, binding));
     });
   }, [cmsReturn, composer, onLeftPanelTabChange, onLeftPanelToggle]);
   /* L1-027: Escape steps out of the CMS workspace, as the Help legend
@@ -662,10 +698,12 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
        collection ›) remembers where it was opened, so the workspace can offer
        "‹ Back to canvas". A request with nothing selected (⌘K) has no element
        to return to; one made from inside the workspace keeps the first. */
-    const openCms = (data: CmsOpenRequest) => {
+    const openCms = (data: CmsDoorRequest) => {
       const ids = composer.selection.getSelectedIds();
       const from: CmsReturn | null =
-        ids.length > 0 && !cmsWorkspaceOpen ? { tab: activeTabId, drawerOpen: isLeftPanelOpen, ids } : null;
+        ids.length > 0 && !cmsWorkspaceOpen
+          ? { tab: activeTabId, drawerOpen: isLeftPanelOpen, ids, binding: data.binding }
+          : null;
       onLeftPanelTabChange?.("content", () => {
         cmsWorkspace.openRequest(data);
         if (from) setCmsReturn(from);
@@ -923,13 +961,12 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
               showGrid={showGrid}
               showRulers={showRulers}
               showXRay={showXRay}
+              showOutlines={showOutlines}
               onAIRequest={onAIRequest}
               onOpenImageEditor={handleEditMedia}
               onZoomChange={onZoomChange}
-              onOverlayChange={onOverlayChange}
+              onOverlayChange={handleOverlayChange}
               onDeviceChange={onDeviceChange}
-              canUndo={canUndo}
-              canRedo={canRedo}
             />
             {/* Board 36: with the inspector hidden the canvas runs full width
                 and carries the way back at its top right. */}

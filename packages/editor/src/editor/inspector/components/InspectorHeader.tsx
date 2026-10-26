@@ -4,7 +4,10 @@
  *   2. Authored element state (32): "Editing" + a read-only `${breakpoint} ·`
  *      prefix + the state Select — together "Desktop · Default state". The
  *      topbar BreakpointSwitcher is the only breakpoint control; the prefix
- *      follows it.
+ *      follows it. That is the Style / Effects line; Content and Behavior
+ *      writes ignore breakpoint and state, so their line says so instead
+ *      ("Content · All breakpoints", "Behavior · Heading" — boards 161:8480,
+ *      161:13919, 36:2) and carries no Select.
  * 12 padding, 4 between rows: 84 tall. The element path (chrome-ui
  * Breadcrumb, "Home › Hero › Heading") is a third row on top — 104 tall —
  * ONLY while the current page is a collection template. It never depends on
@@ -28,6 +31,7 @@ import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
 import { EVENTS } from "@/shared/constants/events";
 import type { PseudoStateId } from "@/shared/types";
 import { pageFileNames } from "@/engine/export/pageFiles";
+import type { TabId } from "@/editor/inspector/sections/registry";
 import { ElementNameField } from "./ElementNameField";
 import { InspectorElementMenu } from "./InspectorElementMenu";
 
@@ -38,6 +42,8 @@ export interface InspectorHeaderProps {
   selectedIds: readonly string[];
   /** The topbar's breakpoint by name ("Desktop", "Tablet") — read-only here. */
   breakpointLabel: string;
+  /** The inspector tab on screen — the context line follows it. */
+  activeTab: TabId;
   /** The element state the Style / Effects writes land on. */
   state: PseudoStateId;
   onStateChange: (state: PseudoStateId) => void;
@@ -104,6 +110,7 @@ export function InspectorHeader({
   element,
   selectedIds,
   breakpointLabel,
+  activeTab,
   state,
   onStateChange,
   statesWithOverrides,
@@ -159,29 +166,37 @@ export function InspectorHeader({
         </IconButton>
       </div>
       <div className="tw:flex tw:h-8 tw:items-center tw:gap-2" data-testid="inspector-editing-row">
-        <Label htmlFor={stateId} className="tw:shrink-0 tw:text-[11px] tw:font-medium tw:leading-4 tw:text-[var(--bk-ink-muted)]">
-          Editing
-        </Label>
-        <span
-          className="tw:shrink-0 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)] tw:whitespace-nowrap"
-          data-testid="inspector-breakpoint-prefix"
-        >
-          {breakpointLabel} ·
-        </span>
-        <Select
-          id={stateId}
-          value={state}
-          onChange={(e) => onStateChange(e.target.value as PseudoStateId)}
-          theme={STATE_SELECT_THEME}
-          className="tw:min-w-0 tw:flex-1"
-          data-testid="inspector-state-select"
-        >
-          {STATES.map((s) => (
-            <option key={s.id} value={s.id}>
-              {statesWithOverrides?.has(s.id) ? `${s.label} · edited` : s.label}
-            </option>
-          ))}
-        </Select>
+        {activeTab === "content" || activeTab === "behaviour" ? (
+          <span className="tw:min-w-0 tw:truncate tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)]">
+            {activeTab === "content" ? "Content · All breakpoints" : `Behavior · ${typeLabel}`}
+          </span>
+        ) : (
+          <>
+            <Label htmlFor={stateId} className="tw:shrink-0 tw:text-[11px] tw:font-medium tw:leading-4 tw:text-[var(--bk-ink-muted)]">
+              Editing
+            </Label>
+            <span
+              className="tw:shrink-0 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)] tw:whitespace-nowrap"
+              data-testid="inspector-breakpoint-prefix"
+            >
+              {breakpointLabel} ·
+            </span>
+            <Select
+              id={stateId}
+              value={state}
+              onChange={(e) => onStateChange(e.target.value as PseudoStateId)}
+              theme={STATE_SELECT_THEME}
+              className="tw:min-w-0 tw:flex-1"
+              data-testid="inspector-state-select"
+            >
+              {STATES.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {statesWithOverrides?.has(s.id) ? `${s.label} · edited` : s.label}
+                </option>
+              ))}
+            </Select>
+          </>
+        )}
       </div>
     </div>
   );

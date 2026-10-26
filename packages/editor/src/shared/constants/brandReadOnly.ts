@@ -7,7 +7,9 @@ export const BRAND_READ_ONLY_FAILED = "failed";
 
 export const BRAND_READ_ONLY_COPY: Readonly<Record<string, string>> = {
   [BRAND_READ_ONLY_SWITCH_OFF]: "Brand editing is paused while we upgrade brand tokens.",
-  [BRAND_READ_ONLY_HELD]: "This site's brand was rolled back — editing is paused.",
+  /* B6-B46 212:38857: a hold, not a permission problem — the board says so. */
+  [BRAND_READ_ONLY_HELD]:
+    "Brand update is on hold. Your site keeps its current look. Editing resumes when the update finishes. This is not about your access.",
 };
 
 /** Notice for any other reason: the migration itself failed. */

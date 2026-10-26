@@ -386,13 +386,11 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           element={selectedElement}
           selectedIds={targetIds}
           breakpointLabel={BREAKPOINTS[currentBreakpoint]?.name ?? currentBreakpoint}
+          activeTab={activeTab}
           state={currentPseudoState}
-          onStateChange={(state) => {
-            setCurrentPseudoState(state);
-            /* A state is a Style / Effects layer: picking one from Content or
-               Behavior goes where its values are edited. */
-            if (state !== "normal" && activeTab !== "style" && activeTab !== "effects") setActiveTab("style");
-          }}
+          /* The state Select draws only on Style / Effects (B-10), where a
+             state's values are edited. */
+          onStateChange={setCurrentPseudoState}
           statesWithOverrides={statesWithOverrides}
         />
         {targetIds.length > 1 ? null : (

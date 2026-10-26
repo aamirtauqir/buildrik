@@ -365,7 +365,8 @@ describe("BrandWorkspace — Review changes (non-blocking, every Brand write thi
 describe("BrandWorkspace — read-only notice by reason", () => {
   it.each([
     ["switch_off", "Brand editing is paused while we upgrade brand tokens."],
-    ["held", "This site's brand was rolled back — editing is paused."],
+    /* D-12 / B6-B46 212:38857: a hold is not a permission problem. */
+    ["held", "Brand update is on hold. Your site keeps its current look. Editing resumes when the update finishes. This is not about your access."],
   ])("%s says its own thing", (readOnlyReason, copy) => {
     const utils = renderWorkspace(makeFakeComposer([], { readOnly: true, readOnlyReason }));
     expect(utils.getByTestId("brand-read-only-banner").textContent).toBe(copy);

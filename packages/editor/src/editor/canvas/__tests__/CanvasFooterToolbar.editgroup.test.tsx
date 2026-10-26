@@ -20,6 +20,7 @@ const overlays = {
   rulers: false,
   badges: false,
   xray: false,
+  outlines: false,
 };
 
 beforeAll(() => {

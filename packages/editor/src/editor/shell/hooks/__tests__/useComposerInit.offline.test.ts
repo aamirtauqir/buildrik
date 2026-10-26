@@ -16,6 +16,11 @@ import { TRPCClientError } from "@trpc/client";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { THRESHOLDS } from "@/shared/constants/config";
 import { useComposerInit, type UseComposerInitParams } from "../useComposerInit";
+import { BANNER_ID, clearGlobalBanner, useGlobalBanners } from "@/editor/shell/globalBanners";
+import { currentWork, hasUnsavedWork } from "@/editor/shell/workSnapshot";
+
+/* F-12 / F-14: connection and role conditions go to the global banner slot. */
+const banner = (id: string) => renderHook(() => useGlobalBanners()).result.current.find((b) => b.id === id);
 
 type Handler = (...args: unknown[]) => void;
 const handlers: Record<string, Handler[]> = {};
@@ -28,6 +33,8 @@ const composer = {
   loadProject: vi.fn(() => Promise.resolve(null)),
   importProject: vi.fn(),
   exportProject: vi.fn(() => ({})),
+  isDirty: vi.fn(() => false),
+  markSaved: vi.fn(),
   setProjectLoading: vi.fn(),
   isProjectLoading: vi.fn(() => false),
   elements: { getAllPages: vi.fn(() => [{ id: "p1" }]), createPage: vi.fn(), getElement: vi.fn() },
@@ -95,6 +102,7 @@ beforeEach(() => {
   composer.on.mockImplementation((e: string, h: Handler) => { (handlers[e] ??= []).push(h); });
   composer.emit.mockImplementation((e: string, ...a: unknown[]) => (handlers[e] ?? []).forEach((h) => h(...a)));
   vi.useFakeTimers();
+  Object.values(BANNER_ID).forEach(clearGlobalBanner);
 });
 afterEach(() => vi.useRealTimers());
 
@@ -115,41 +123,53 @@ const runAutosave = async (p: ReturnType<typeof params>) => {
 };
 
 describe("autosave while offline", () => {
-  it("says offline, not 'save failed', and keeps the work in the tab", async () => {
+  /* F-12 / board 225:7600: offline is the slot's own banner, raised from the
+     browser's online state — the save adds no toast and no second banner. */
+  it("adds no toast and no connection banner, and keeps the work in the tab", async () => {
     setOnline(false);
     const p = params();
     const toasts = await runAutosave(p);
 
-    expect(toasts.some((t) => t.title === "Offline — not saved")).toBe(true);
-    expect(toasts.some((t) => t.title === "Save failed")).toBe(false);
-    expect(toasts.find((t) => t.title === "Offline — not saved")?.description).toMatch(/back online/);
+    expect(toasts).toEqual([]);
+    expect(banner(BANNER_ID.connection)).toBeUndefined();
     // The edit is still dirty — it has not been persisted anywhere.
     expect(vi.mocked(p.setIsDirty!).mock.calls.some(([v]) => v === true)).toBe(true);
   });
 
-  it("does not call a server refusal 'offline' when the browser is online", async () => {
+  it("online, a transport failure is the 'Can't reach' banner with Retry now — not a toast", async () => {
     /* Measured live 2026-09-03 with navigator.onLine true at the moment of
-       failure: the toast read "Offline — not saved" and told the user to wait
-       until they were back online, which never arrives. The manual-save path
-       already split these two facts and its comment describes this exact bug;
-       autosave still ORed the regex with navigator. One rule, two copies, one
-       fixed. Both paths now use the same words for the same event. */
+       failure: the copy told the user to wait until they were back online,
+       which never arrives. Online and unreachable is board 225:8126. */
     setOnline(true);
     const p = params();
     const toasts = await runAutosave(p);
 
-    expect(toasts.some((t) => t.title === "Couldn't reach the server — not saved")).toBe(true);
-    expect(toasts.some((t) => t.title === "Offline — not saved")).toBe(false);
-    expect(
-      toasts.find((t) => t.title === "Couldn't reach the server — not saved")?.description,
-    ).toMatch(/try saving again/);
+    expect(toasts).toEqual([]);
+    expect(banner(BANNER_ID.connection)).toMatchObject({
+      tone: "warning",
+      message: "Can’t reach Buildrick. Your edits are kept and will save when it responds.",
+      actions: [expect.objectContaining({ label: "Retry now" })],
+    });
     expect(vi.mocked(p.setIsDirty!).mock.calls.some(([v]) => v === true)).toBe(true);
+  });
+
+  it("a scheduled retry says Reconnecting…, and a save that lands takes the banner down", async () => {
+    setOnline(true);
+    await runAutosave(params());
+    expect(banner(BANNER_ID.connection)?.message).toMatch(/^Can’t reach Buildrick/);
+    /* The first retry fires after its backoff (5 s), then the save debounce. */
+    await act(async () => { await vi.advanceTimersByTimeAsync(5000); });
+    expect(banner(BANNER_ID.connection)?.message).toBe("Reconnecting… saving your changes");
+    vi.mocked(syncSaveProject).mockResolvedValueOnce(undefined as never);
+    await act(async () => { await vi.advanceTimersByTimeAsync(THRESHOLDS.AUTOSAVE_DEBOUNCE + 1); });
+    expect(banner(BANNER_ID.connection)).toBeUndefined();
   });
 });
 
 /* A15-9: a role revoked mid-session refuses the autosave. The edit existed
    only in this tab — it is kept for the reload like a network failure's, and
-   the cached role that offered the edit is dropped. */
+   the cached role that offered the edit is dropped. F-14 / board 227:7411:
+   the refusal is the role-changed banner with the board's two actions. */
 describe("autosave refused with FORBIDDEN", () => {
   it("keeps the refused work recoverable and forgets the cached role", async () => {
     localStorage.removeItem("bk-unsaved-v1-site-1");
@@ -157,7 +177,8 @@ describe("autosave refused with FORBIDDEN", () => {
     const p = params();
     const toasts = await runAutosave(p);
 
-    expect(toasts.some((t) => t.title === "You don't have access to save this site")).toBe(true);
+    expect(toasts).toEqual([]);
+    expect(banner(BANNER_ID.roleChanged)?.actions?.map((a) => a.label)).toEqual(["Download them", "Ask an admin"]);
     expect(localStorage.getItem("bk-unsaved-v1-site-1")).not.toBeNull();
     expect(invalidateMyRole).toHaveBeenCalledTimes(1);
     localStorage.removeItem("bk-unsaved-v1-site-1");
@@ -176,11 +197,33 @@ describe("autosave refused with FORBIDDEN", () => {
         },
       }),
     );
-    const toasts = await runAutosave(params());
+    await runAutosave(params());
 
-    expect(toasts.some((t) => t.title === "You don't have access to save this site")).toBe(true);
+    expect(banner(BANNER_ID.roleChanged)).toBeDefined();
     expect(localStorage.getItem("bk-unsaved-v1-site-1")).not.toBeNull();
     localStorage.removeItem("bk-unsaved-v1-site-1");
+  });
+});
+
+/* F-15: every "Download a copy" on page 07 reads the work snapshot the load
+   path registers — the live project, and whether it holds unsaved changes. */
+describe("the work snapshot", () => {
+  it("is the live composer's while the hook is mounted, and gone after", () => {
+    localStorage.removeItem("bk-unsaved-v1-site-1");
+    composer.exportProject.mockReturnValue({ id: "live" } as never);
+    const view = renderHook(() => useComposerInit(params()));
+    expect(currentWork("site-1")).toEqual({ id: "live" });
+    view.unmount();
+    expect(currentWork("site-1")).toBeNull();
+    expect(hasUnsavedWork("site-1")).toBe(false);
+    composer.exportProject.mockReturnValue({} as never);
+  });
+
+  it("reports unsaved work from the composer's dirty state", () => {
+    renderHook(() => useComposerInit(params()));
+    expect(hasUnsavedWork("site-1")).toBe(false);
+    composer.isDirty.mockReturnValueOnce(true);
+    expect(hasUnsavedWork("site-1")).toBe(true);
   });
 });
 

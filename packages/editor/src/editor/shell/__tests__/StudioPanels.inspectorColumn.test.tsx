@@ -13,7 +13,14 @@ import * as React from "react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, act, cleanup, fireEvent } from "@testing-library/react";
 
-vi.mock("@/editor/canvas/Canvas", () => ({ Canvas: React.forwardRef(() => null) }));
+/* The Canvas stub keeps the props it was last given (A-12 reads them). */
+const canvasProps = vi.hoisted(() => ({ current: {} as Record<string, unknown> }));
+vi.mock("@/editor/canvas/Canvas", () => ({
+  Canvas: React.forwardRef((props: Record<string, unknown>) => {
+    canvasProps.current = props;
+    return null;
+  }),
+}));
 vi.mock("@/editor/sidebar/LeftSidebar", () => ({ LeftSidebar: () => null }));
 vi.mock("@/editor/sidebar/FullPageView", () => ({ FullPageView: () => null }));
 vi.mock("@/editor/sidebar/TabRouter", () => ({
@@ -438,6 +445,39 @@ describe("StudioPanels — the CMS workspace returns to the bound element (§13)
     expect(inspectorColumn().getAttribute("aria-hidden")).toBe("false");
   });
 
+  /* C-12 / Play F2.12 302:16675: the round trip ends on the binding the
+     door was opened from, not on the bare canvas. */
+  it("Back to canvas reopens the inspector on the originating binding", async () => {
+    const composer = selectingComposer(["el-1"]);
+    composer.selection.select(composer.live.get("el-1")!);
+    render(<Harness composer={composer as unknown as FakeComposer} leftPanelTab="layers" />);
+    act(() =>
+      composer.emit(EVENTS.UI_CMS_OPEN, {
+        collectionId: "col-1",
+        recordId: "rec-1",
+        binding: { section: "cms-binding", property: "title" },
+      }),
+    );
+    await screen.findByTestId("cms-workspace");
+    fireEvent.click(screen.getByRole("button", { name: "‹ Back to canvas" }));
+    await flushFrame();
+    await flushFrame();
+    expect(screen.getByTestId("pro-inspector").getAttribute("data-revealed")).toBe("cms-binding");
+    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("false");
+  });
+
+  it("a door without a binding returns to the bare canvas", async () => {
+    const composer = selectingComposer(["el-1"]);
+    composer.selection.select(composer.live.get("el-1")!);
+    render(<Harness composer={composer as unknown as FakeComposer} leftPanelTab="layers" />);
+    act(() => composer.emit(EVENTS.UI_CMS_OPEN, { collectionId: "col-1", recordId: "rec-1" }));
+    await screen.findByTestId("cms-workspace");
+    fireEvent.click(screen.getByRole("button", { name: "‹ Back to canvas" }));
+    await flushFrame();
+    await flushFrame();
+    expect(screen.getByTestId("pro-inspector").getAttribute("data-revealed")).toBe("");
+  });
+
   it("a drawer that was closed before the door is closed again", async () => {
     const composer = selectingComposer(["el-1"]);
     composer.selection.select(composer.live.get("el-1")!);
@@ -532,5 +572,26 @@ describe("StudioPanels — bottom bar in resource areas", () => {
     render(<Harness composer={composer as unknown as FakeComposer} leftPanelTab={tab} initialOpen={false} />);
     expect(screen.getByTestId("layout-shell").className).toContain("layout-shell--fullpage");
     expect(screen.getByTestId("bottom-bar-resource")).toBeTruthy();
+  });
+});
+
+/* A-12 / board 145:64586: "Show outlines" is the shell's canvas-view
+   preference — personal, kept across reloads, handed to the canvas (and so
+   to the footer's View menu). Other overlay rows still go to the caller. */
+describe("StudioPanels — the Show outlines preference (A-12)", () => {
+  type OverlayChange = (overlay: string, enabled: boolean) => void;
+  it("toggling outlines reaches the canvas and survives a remount; other rows pass through", () => {
+    const onOverlayChange = vi.fn();
+    const composer = makeComposer();
+    const view = render(<Harness composer={composer} onOverlayChange={onOverlayChange} />);
+    expect(canvasProps.current.showOutlines).toBe(false);
+    act(() => (canvasProps.current.onOverlayChange as OverlayChange)("outlines", true));
+    expect(canvasProps.current.showOutlines).toBe(true);
+    expect(onOverlayChange).not.toHaveBeenCalled();
+    act(() => (canvasProps.current.onOverlayChange as OverlayChange)("rulers", true));
+    expect(onOverlayChange).toHaveBeenCalledWith("rulers", true);
+    view.unmount();
+    render(<Harness composer={makeComposer()} />);
+    expect(canvasProps.current.showOutlines).toBe(true);
   });
 });

@@ -38,7 +38,7 @@ import { render as rtlRender, screen } from "@testing-library/react";
 import { CanvasFooterToolbar } from "../CanvasFooterToolbar";
 import { footerToolbarContainerStyles, wrapperStyles } from "../canvasStyles";
 
-const ALL_OFF = { guides: false, spacing: false, grid: false, rulers: false, badges: false, xray: false };
+const ALL_OFF = { guides: false, spacing: false, grid: false, rulers: false, badges: false, xray: false, outlines: false };
 
 beforeAll(() => {
   if (typeof globalThis.window !== "undefined" && !globalThis.window.matchMedia) {
