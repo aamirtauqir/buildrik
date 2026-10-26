@@ -79,6 +79,8 @@ const ACTION_DESCRIPTIONS: Record<string, string> = {
   "keyboard-reorder": "Reordered layer",
   reorder: "Reordered layer",
   "reorder-section": "Reordered section",
+  "reorder pages": "Reordered pages",
+  "detach instance": "Detached component instance",
   "move-layer-top": "Brought layer to front",
   "move-layer-bottom": "Sent layer to back",
   // Group / arrange
