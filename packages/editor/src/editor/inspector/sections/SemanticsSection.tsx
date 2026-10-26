@@ -16,7 +16,7 @@
 import * as React from "react";
 import type { Composer } from "@/engine";
 import { writableElements } from "@/engine/commands/commandOperations";
-import { ButtonGroup, ControlRow, Section } from "@/editor/inspector/shared/controls";
+import { ControlRow, Section, SelectRow } from "@/editor/inspector/shared/controls";
 import { runTxn } from "./typeBlock/attributeWriter";
 import { PropertyRows, type PropertyConfig } from "./typeBlock/PropertyField";
 import { Note, useElementVersion } from "./typeBlock/bodies/bodyRows";
@@ -28,8 +28,6 @@ export interface SemanticsSectionProps {
   isOpen: boolean;
   onToggle: () => void;
 }
-
-const LEVELS = ["h1", "h2", "h3", "h4", "h5", "h6"].map((v) => ({ value: v, label: v.toUpperCase() }));
 
 const ID_ROW: readonly PropertyConfig[] = [{ id: "id", label: "ID", type: "text", placeholder: "element-id" }];
 
@@ -70,19 +68,33 @@ export function tagLabel(tag: string): string {
   return TAG_NAMES[t] ?? (/^h[1-6]$/.test(t) ? `Heading ${t[1]}` : t);
 }
 
-function HeadingTagRow({ composer, element, targetIds }: Pick<SemanticsSectionProps, "composer" | "element" | "targetIds">) {
+/** The tags a type may switch between in place — the same element, the
+ *  same text, another native tag. Other types show their tag read-only. */
+const TAG_CHOICES: Readonly<Record<string, readonly string[]>> = {
+  heading: ["h1", "h2", "h3", "h4", "h5", "h6"],
+  text: ["p", "span", "div", "blockquote"],
+  paragraph: ["p", "span", "div", "blockquote"],
+};
+
+/** 2L9 161:8480 / 247:26594: Tag is a select ("Paragraph", "h2"), written
+ *  on every writable target in ONE transaction (one Undo, DD-12). */
+function TagRow({ composer, element, targetIds, choices }: Pick<SemanticsSectionProps, "composer" | "element" | "targetIds"> & { choices: readonly string[] }) {
   const [, reread] = React.useReducer((n: number) => n + 1, 0);
-  const level = composer?.elements.getElement(element.id)?.getTagName?.()?.toLowerCase() || "h2";
-  const write = (tag: string) => {
-    if (!composer) return;
+  const tag = composer?.elements.getElement(element.id)?.getTagName?.()?.toLowerCase() || choices[0];
+  const write = (next: string) => {
+    if (!composer || !next) return;
     const targets = writableElements(composer, targetIds.map((id) => composer.elements.getElement(id)));
     if (targets.length === 0) return;
-    runTxn(composer, "heading-level", () => {
-      for (const el of targets) el.setTagName(tag);
+    runTxn(composer, element.type === "heading" ? "heading-level" : "element-tag", () => {
+      for (const el of targets) el.setTagName(next);
     });
     reread();
   };
-  return <ButtonGroup label="Tag" value={level} onChange={write} options={LEVELS} />;
+  const options = (choices.includes(tag) ? choices : [tag, ...choices]).map((t) => ({
+    value: t,
+    label: element.type === "heading" ? t.toUpperCase() : tagLabel(t),
+  }));
+  return <SelectRow label="Tag" placeholder={null} value={tag} onChange={write} options={options} />;
 }
 
 export function SemanticsSection({ composer, element, targetIds, isOpen, onToggle }: SemanticsSectionProps) {
@@ -91,8 +103,8 @@ export function SemanticsSection({ composer, element, targetIds, isOpen, onToggl
   const single = targetIds.length <= 1;
   return (
     <Section title="Semantics" isOpen={isOpen} onToggle={onToggle} id="inspector-section-semantics">
-      {element.type === "heading" ? (
-        <HeadingTagRow composer={composer} element={element} targetIds={targetIds} />
+      {TAG_CHOICES[element.type] ? (
+        <TagRow composer={composer} element={element} targetIds={targetIds} choices={TAG_CHOICES[element.type]} />
       ) : single && tag ? (
         <ControlRow label="Tag">
           <span className="tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink)]" data-testid="inspector-semantics-tag">

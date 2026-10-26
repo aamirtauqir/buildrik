@@ -23,7 +23,7 @@ import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 const SUMMARY_KEYS = ["font-family", "font-size", "color"] as const;
 
 const TYPOGRAPHY_KEYS = ["font-family", "font-size", "font-weight", "font-style", "line-height", "letter-spacing", "color", "text-align", "text-transform", "text-decoration", "white-space", "word-break", "word-spacing", "text-indent", "vertical-align"];
-const TYPOGRAPHY_ADVANCED = ["font-style", "text-transform", "text-decoration", "letter-spacing", "word-spacing", "white-space", "word-break", "text-indent", "vertical-align"];
+const TYPOGRAPHY_ADVANCED = ["text-align", "font-style", "text-transform", "text-decoration", "letter-spacing", "word-spacing", "white-space", "word-break", "text-indent", "vertical-align"];
 
 const adaptTypography = (ctx: SectionContext) => ({
   ...adaptBaseStyleProps(ctx),

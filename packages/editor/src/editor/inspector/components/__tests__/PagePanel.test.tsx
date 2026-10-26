@@ -62,22 +62,22 @@ describe("PagePanel — board 21", () => {
       .map((n) => n.getAttribute("data-testid"))
       .filter((id): id is string => /^inspector-section-[a-z-]+$/.test(id ?? ""));
     expect([...new Set(ids)]).toEqual([
-      "inspector-section-fill",
+      "inspector-section-background",
       "inspector-section-size",
       "inspector-section-typography",
       "inspector-section-spacing",
     ]);
   });
 
-  it("each section shows the page's subset (Background · Max width · Font + Text colour)", () => {
+  it("each section shows the page's subset (Background › Color · Max width · Font + Text color — 2L9 S06)", () => {
     setup();
-    expect(within(screen.getByTestId("inspector-section-fill")).getByText("Background")).toBeInTheDocument();
+    expect(within(screen.getByTestId("inspector-section-background")).getByText("Color")).toBeInTheDocument();
     const size = screen.getByTestId("inspector-section-size");
     expect(within(size).getByText("Max width")).toBeInTheDocument();
     expect(within(size).queryByText("Width")).toBeNull();
     const type = screen.getByTestId("inspector-section-typography");
     expect(within(type).getByText("Font")).toBeInTheDocument();
-    expect(within(type).getByText("Text colour")).toBeInTheDocument();
+    expect(within(type).getByText("Text color")).toBeInTheDocument();
     expect(within(type).queryByText("Weight")).toBeNull();
   });
 
@@ -108,7 +108,7 @@ describe("PagePanel — board 21", () => {
 
   it("Fill is the one Background row — no More settings; Max width has no '0' placeholder", () => {
     setup();
-    const fill = screen.getByTestId("inspector-section-fill");
+    const fill = screen.getByTestId("inspector-section-background");
     expect(within(fill).queryByText(/More settings/)).toBeNull();
     const maxWidth = within(screen.getByTestId("inspector-section-size")).getByRole("textbox", { name: /max width/i });
     expect(maxWidth.getAttribute("placeholder") ?? "").toBe("");

@@ -18,7 +18,7 @@ const labels = (c: HTMLElement) => Array.from(c.querySelectorAll(".bdi-lb")).map
 describe("Typography section", () => {
   it("board 1's rows: Font, Font size, Line height, Weight, Colour, Align", () => {
     const { container } = render(<TypographySection styles={{}} onChange={vi.fn()} isOpen onAdvancedToggle={vi.fn()} />);
-    expect(labels(container)).toEqual(["Font", "Font size", "Line height", "Weight", "Colour", "Align"]);
+    expect(labels(container)).toEqual(["Font", "Font size", "Weight", "Line height", "Text color"]);
     expect(screen.getByRole("button", { name: /More settings/ })).toBeInTheDocument();
   });
 
@@ -29,7 +29,7 @@ describe("Typography section", () => {
 
   it("Page panel (board 21): Font and Text colour only, no More settings", () => {
     const { container } = render(<TypographySection styles={{}} onChange={vi.fn()} isOpen variant="page" onAdvancedToggle={vi.fn()} advancedExpanded />);
-    expect(labels(container)).toEqual(["Font", "Text colour"]);
+    expect(labels(container)).toEqual(["Font", "Text color"]);
     expect(screen.queryByRole("button", { name: /More settings/ })).toBeNull();
   });
 

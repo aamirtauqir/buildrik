@@ -133,12 +133,12 @@ describe("InspectorTabContent — one order per tab, presence by capability", ()
 
   it("heading · Style: Typography, Size, Spacing, Fill, Border — no type block", () => {
     renderTab({ tabId: "style", elementType: "heading" });
-    expect(sectionNames()).toEqual(["Typography", "Size", "Spacing", "Fill", "Border"]);
+    expect(sectionNames()).toEqual(["Typography", "Size", "Spacing", "Background", "Border"]);
   });
 
   it("image · Style: no Typography, no Text inside", () => {
     renderTab({ tabId: "style", elementType: "image" });
-    expect(sectionNames()).toEqual(["Size", "Spacing", "Fill", "Border"]);
+    expect(sectionNames()).toEqual(["Size", "Spacing", "Background", "Border"]);
   });
 
   it("a container set to flex gets no Flexbox section — Layout carries the flex controls (board 17)", () => {
@@ -166,7 +166,7 @@ describe("InspectorTabContent — one order per tab, presence by capability", ()
   it("a multi-selection shows only the sections every selected type has (DD-12)", () => {
     renderTab({ tabId: "style", elementType: "heading", selectedTypes: ["heading", "image"] });
     /* No shared type block, no Typography (the image has none). */
-    expect(sectionNames()).toEqual(["Size", "Spacing", "Fill", "Border"]);
+    expect(sectionNames()).toEqual(["Size", "Spacing", "Background", "Border"]);
   });
 
   it("an unknown stored type falls back to the container set without crashing", () => {
@@ -176,22 +176,17 @@ describe("InspectorTabContent — one order per tab, presence by capability", ()
 });
 
 describe("InspectorTabContent — display modes (DD-11)", () => {
-  it("Fill and Border arrive as '+' rows when the element carries no value", () => {
-    renderTab({ tabId: "style", elementType: "heading" });
-    expect(screen.getByTestId("inspector-add-fill")).toBeInTheDocument();
-    expect(screen.getByTestId("inspector-add-border")).toBeInTheDocument();
+  it("2L9 161:8940: Spacing, Background and Border arrive shut, summarised 'None' / 'n set'", () => {
+    renderTab({ tabId: "style", elementType: "heading", authored: { "padding-top": "8px", "padding-bottom": "8px" } });
+    expect(screen.getByTestId("inspector-summary-spacing")).toHaveTextContent("2 set");
+    expect(screen.getByTestId("inspector-summary-fill")).toHaveTextContent("None");
+    expect(screen.getByTestId("inspector-summary-border")).toHaveTextContent("None");
   });
 
-  it("a valued section arrives open", () => {
-    renderTab({ tabId: "style", elementType: "heading", authored: { "background-color": "#ff0000" } });
-    expect(screen.queryByTestId("inspector-add-fill")).toBeNull();
-    expect(screen.getByRole("button", { name: "Fill section, expanded" })).toBeInTheDocument();
-  });
-
-  it("the '+' records an open choice for this element type", () => {
+  it("opening a shut section records an open choice for this element type", () => {
     const onSetChoices = vi.fn();
     renderTab({ tabId: "style", elementType: "heading", onSetChoices });
-    fireEvent.click(screen.getByTestId("inspector-add-border"));
+    fireEvent.click(screen.getByRole("button", { name: "Border section, collapsed" }));
     expect(onSetChoices).toHaveBeenCalledWith("heading", ["border"], "open");
   });
 

@@ -98,15 +98,14 @@ export function BindingPropertyRow({ composer, elementId, onOpenCreateCollection
 
   const status = statusLine(state);
   if (!state.binding) {
+    /* 2L9 161:8480: the property's name, its bind button at the right; the
+       value itself is on the canvas (and in the image source row). */
     return (
-      <div className="bdi-row-ctrl" data-testid="binding-row">
-        <span className="bdi-lb">{label}</span>
-        <div className="bdi-row-content tw:flex tw:items-center tw:gap-1">
-          <span className="tw:min-w-0 tw:flex-1 tw:truncate tw:text-[12px] tw:text-[var(--bk-ink-soft)]" data-testid="binding-static-value">
-            {staticValue(composer, elementId, state.property)}
-          </span>
-          {picker(bindButton)}
-        </div>
+      <div className="tw:flex tw:h-8 tw:items-center tw:justify-between" data-testid="binding-row">
+        <span className="tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)]" title={staticValue(composer, elementId, state.property)}>
+          {label}
+        </span>
+        {picker(bindButton)}
       </div>
     );
   }

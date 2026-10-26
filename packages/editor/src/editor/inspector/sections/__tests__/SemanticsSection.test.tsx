@@ -31,15 +31,15 @@ function renderSection(c: Composer, id: string, type: string, targetIds: readonl
 }
 
 describe("Semantics", () => {
-  it("a heading's Tag is a segmented H1–H6; choosing one writes the tag and ONE Undo restores it", () => {
+  const tagSelect = () => screen.getByLabelText("Tag") as HTMLSelectElement;
+
+  it("a heading's Tag is a select H1–H6 (2L9 247:26594); choosing one writes the tag and ONE Undo restores it", () => {
     const { c, id } = setup("heading", { tagName: "h2" });
     renderSection(c, id, "heading");
-    const group = screen.getByTestId("inspector-field-tag");
-    expect(within(group).getAllByRole("radio").map((b) => b.textContent)).toEqual(["H1", "H2", "H3", "H4", "H5", "H6"]);
-    expect(within(group).getByRole("radio", { name: "H2" })).toHaveAttribute("aria-checked", "true");
-    fireEvent.click(screen.getByRole("radio", { name: "H4" }));
+    expect(Array.from(tagSelect().options).map((o) => o.textContent)).toEqual(["H1", "H2", "H3", "H4", "H5", "H6"]);
+    expect(tagSelect().value).toBe("h2");
+    fireEvent.change(tagSelect(), { target: { value: "h4" } });
     expect(c.elements.getElement(id)!.getTagName()).toBe("h4");
-    expect(screen.getByRole("radio", { name: "H4" })).toHaveAttribute("aria-checked", "true");
     c.history.flushPending();
     c.history.undo();
     expect(c.elements.getElement(id)!.getTagName()).toBe("h2");
@@ -49,15 +49,22 @@ describe("Semantics", () => {
     const { c, id } = setup("heading", { tagName: "h2" });
     c.elements.getElement(id)!.setLocked(true);
     renderSection(c, id, "heading");
-    fireEvent.click(screen.getByRole("radio", { name: "H5" }));
+    fireEvent.change(tagSelect(), { target: { value: "h5" } });
     expect(c.elements.getElement(id)!.getTagName()).toBe("h2");
   });
 
-  it("any other type shows its tag by name, read-only", () => {
+  it("a text's Tag is a select of text tags, named as the board does (161:8480: 'Paragraph')", () => {
     const { c, id } = setup("paragraph");
     renderSection(c, id, "paragraph");
-    expect(screen.getByTestId("inspector-semantics-tag")).toHaveTextContent("Paragraph");
-    expect(screen.queryByRole("radio")).toBeNull();
+    expect(tagSelect().selectedOptions[0].textContent).toBe("Paragraph");
+    fireEvent.change(tagSelect(), { target: { value: "blockquote" } });
+    expect(c.elements.getElement(id)!.getTagName()).toBe("blockquote");
+  });
+
+  it("any other type shows its tag by name, read-only", () => {
+    const { c, id } = setup("image");
+    renderSection(c, id, "image");
+    expect(screen.getByTestId("inspector-semantics-tag")).toHaveTextContent("Image");
   });
 
   it("ID writes the id attribute; the note says it applies to all breakpoints", () => {
@@ -72,7 +79,7 @@ describe("Semantics", () => {
     const { c, id } = setup("heading", { tagName: "h2" });
     renderSection(c, id, "heading", [id, "other"]);
     expect(screen.queryByPlaceholderText("element-id")).toBeNull();
-    expect(screen.getByTestId("inspector-field-tag")).toBeInTheDocument();
+    expect(tagSelect()).toBeInTheDocument();
   });
 
   it("names tags as the board does", () => {

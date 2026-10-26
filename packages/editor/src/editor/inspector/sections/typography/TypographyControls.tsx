@@ -17,11 +17,27 @@ interface TextControlsProps {
   isMultiSelect?: boolean;
 }
 
-export const ADVANCED_TYPOGRAPHY_COUNT = 9;
+export const ADVANCED_TYPOGRAPHY_COUNT = 10;
+
+/* 2L9 161:8940 draws no Align in the face; it heads More settings. */
+const ALIGN_OPTIONS = [
+  { value: "left", label: "Left" },
+  { value: "center", label: "Center" },
+  { value: "right", label: "Right" },
+];
 
 export const TypographyControls: React.FC<TextControlsProps> = ({ styles, onChange }) => {
   return (
     <>
+      <div className="tw:relative">
+        <ButtonGroup
+          label="Align"
+          value={styles["text-align"] || ""}
+          onChange={(v) => onChange("text-align", v)}
+          options={ALIGN_OPTIONS}
+          property="text-align"
+        />
+      </div>
       <div className="tw:relative">
         <ButtonGroup
           label="Transform"

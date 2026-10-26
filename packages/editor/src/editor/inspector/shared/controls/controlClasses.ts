@@ -70,7 +70,7 @@ export const SECTION_SUBTITLE =
  * `group` does what the comment described, and `group-focus-within` adds the
  * keyboard path the CSS version never had.
  */
-export const CHAIN_ROW = "tw:group tw:relative tw:flex tw:items-center";
+export const CHAIN_ROW = "tw:group tw:relative";
 /* `enabled:hover:bg-transparent` is not decoration. This is a flowbite Button,
    whose own `enabled:hover:bg-primary-800` is a HOVER variant — a bare
    `tw:bg-transparent` never contests it. MEASURED on the breakpoint-override

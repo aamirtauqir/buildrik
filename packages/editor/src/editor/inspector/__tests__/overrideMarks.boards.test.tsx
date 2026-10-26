@@ -45,6 +45,9 @@ describe("override marks — boards 27 / 28", () => {
     fireEvent.change(screen.getByRole("combobox", { name: "Editing" }), { target: { value: "hover" } });
     await act(async () => {});
     expect(screen.getByTestId("inspector-state-overrides").textContent).toContain("1 :hover override");
+    /* 2L9 161:8940: Background arrives shut, "1 set"; opening it shows the note. */
+    expect(screen.getByTestId("inspector-summary-fill")).toHaveTextContent("1 set");
+    fireEvent.click(screen.getByRole("button", { name: "Background section, collapsed" }));
     const fill = document.getElementById("inspector-section-fill")!;
     expect(within(fill).getByTestId("inspector-section-note").textContent).toBe("Overridden on :hover");
     /* The Colour row itself carries the dot (board 27 "Colour ●"). */
@@ -98,6 +101,9 @@ describe("override marks — boards 27 / 28", () => {
       </ToastProvider>
     );
     await act(async () => {});
+    /* Spacing arrives shut (2L9 161:8940); open it to reach the box. */
+    if (screen.queryByRole("tab", { name: "Style", selected: false })) fireEvent.click(screen.getByRole("tab", { name: "Style" }));
+    fireEvent.click(screen.getByRole("button", { name: "Spacing section, collapsed" }));
     const spacing = document.getElementById("inspector-section-spacing")!;
     const side = within(spacing).getByTestId("inspector-spacing-padding-top");
     expect(within(side).getByRole("button", { name: "Overrides master" })).toBeTruthy();

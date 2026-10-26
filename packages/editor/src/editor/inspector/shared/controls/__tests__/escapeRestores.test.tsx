@@ -78,10 +78,10 @@ describe("Escape restores the value the field had at focus", () => {
     expect(field).toHaveValue("");
   });
 
-  it("Width in Fill: typing makes it Fixed, Escape puts Fill back (not the readout as px)", () => {
+  it("a fixed Width: typing writes, Escape puts the value at focus back", () => {
     const writes: Array<[string, string]> = [];
     function Size() {
-      const [styles, setStyles] = React.useState<Record<string, string>>({});
+      const [styles, setStyles] = React.useState<Record<string, string>>({ width: "200px" });
       return (
         <SizeSection
           isOpen
@@ -100,14 +100,13 @@ describe("Escape restores the value the field had at focus", () => {
     }
     render(<Size />);
     const row = screen.getByTestId("inspector-size-width");
-    expect(row).toHaveAttribute("data-mode", "fill");
+    expect(row).toHaveAttribute("data-mode", "fixed");
     const input = within(row).getByRole("textbox", { name: /^Width/ });
     fireEvent.focus(input);
     fireEvent.change(input, { target: { value: "300" } });
-    expect(row).toHaveAttribute("data-mode", "fixed");
+    expect(writes.at(-1)).toEqual(["width", "300px"]);
     fireEvent.keyDown(input, { key: "Escape" });
-    expect(writes.at(-1)).toEqual(["width", ""]);
-    expect(row).toHaveAttribute("data-mode", "fill");
+    expect(writes.at(-1)).toEqual(["width", "200px"]);
   });
 });
 

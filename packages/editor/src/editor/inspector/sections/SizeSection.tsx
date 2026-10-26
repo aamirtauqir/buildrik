@@ -16,14 +16,13 @@
  * @license BSD-3-Clause
  */
 
-import { ChevronDown, Link2, Link2Off } from "lucide-react";
+import { Link2, Link2Off } from "lucide-react";
 import * as React from "react";
-import { BK_SELECT_BARE_VALUE_THEME, Button, Menu, MenuItem, Popover, Select } from "@/editor/chrome-ui";
+import { Button, Popover } from "@/editor/chrome-ui";
 import { useSpacingRegistry } from "@/editor/design-system/state/TokenRegistryContext";
 import { TokenPickerPopover } from "../shared/TokenPickerPopover";
 import { isTokenVar, resolveTokenVar } from "../shared/tokenBindingDetection";
-import { ButtonGroup, InputWithUnit, MoreSettingsToggle, Section } from "../shared/controls";
-import { FieldDot } from "../shared/controls/FieldDot";
+import { ButtonGroup, InputWithUnit, MoreSettingsToggle, Section, SelectRow } from "../shared/controls";
 import { useInspectorField } from "../shared/controls/InspectorFieldContext";
 import { CHAIN_BOUND, CHAIN_ROW, CHAIN_TRIGGER } from "../shared/controls/controlClasses";
 import { ItemControls, type ParentLayout } from "./layout/ItemControls";
@@ -162,14 +161,6 @@ function useRenderedSize(elementId: string | undefined): { width: number; height
 // DIMENSION ROW
 // ============================================================================
 
-const MODE_LABEL: Record<ConstraintType, string> = { fixed: "Fixed", fill: "Fill", hug: "Hug" };
-const MODES: ConstraintType[] = ["fixed", "fill", "hug"];
-
-const ROW = "bdi-row-ctrl";
-const MODE_BUTTON =
-  "bdi-lb tw:h-6 tw:min-w-0 tw:justify-start tw:gap-1 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[12px] tw:font-normal " +
-  "tw:text-[var(--bk-ink-muted)] tw:hover:bg-transparent tw:hover:text-[var(--bk-ink-soft)] tw:focus:ring-0 " +
-  "tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
 
 interface DimensionRowProps {
   axis: "width" | "height";
@@ -179,8 +170,15 @@ interface DimensionRowProps {
   onChange: (value: string) => void;
 }
 
+/** 2L9 161:8940: "Width mode [Fixed ▾]", then "Width [1312] px" while the
+ *  mode is Fixed — the number only exists for a fixed size. */
+const MODE_OPTIONS = [
+  { value: "fixed", label: "Fixed" },
+  { value: "fill", label: "Fill" },
+  { value: "hug", label: "Hug · Auto" },
+];
+
 function DimensionRow({ axis, value, measured, onChange }: DimensionRowProps) {
-  const [menuOpen, setMenuOpen] = React.useState(false);
   const field = useInspectorField(axis);
   const name = axis === "width" ? "Width" : "Height";
   /* Unset reads as what a block does: fills its width, hugs its height. */
@@ -191,108 +189,42 @@ function DimensionRow({ axis, value, measured, onChange }: DimensionRowProps) {
     const current = next === "fixed" && mode !== "fixed" && measured ? `${measured}px` : value;
     field.discrete(() => onChange(valueForConstraint(next, current)));
   };
-  /* What the property held when the field took focus: Escape after typing
-     into Fill puts Fill back, not the readout as a Fixed width. */
+  /* What the property held when the field took focus: Escape puts it back. */
   const atFocusRef = React.useRef(value);
-  const labelText = mode === "hug" ? name : `${name} · ${MODE_LABEL[mode]}`;
-  const readout = measured ? `${measured}px` : "100%";
 
   return (
-    <div className={`${ROW} tw:relative`} data-testid={`inspector-size-${axis}`} data-mode={mode}>
-      <span className="tw:inline-flex tw:items-center tw:min-w-0">
-        <Popover
-          open={menuOpen}
-          onClose={() => setMenuOpen(false)}
-          placement="bottom"
-          label={`${name} sizing`}
-          trigger={
-            <Button
-              size="xs"
-              color="light"
-              className={MODE_BUTTON}
-              aria-haspopup="menu"
-              aria-expanded={menuOpen}
-              aria-label={`${name} sizing: ${MODE_LABEL[mode]}`}
-              data-testid={`inspector-size-${axis}-mode`}
-              disabled={field.readOnly}
-              onClick={() => setMenuOpen((v) => !v)}
-            >
-              {labelText}
-            </Button>
-          }
+    <div className="tw:flex tw:flex-col" data-testid={`inspector-size-${axis}`} data-mode={mode}>
+      <SelectRow
+        label={`${name} mode`}
+        placeholder={null}
+        value={mode}
+        onChange={(v) => setMode(v as ConstraintType)}
+        options={MODE_OPTIONS}
+        property={axis}
+      />
+      {mode === "fixed" ? (
+        <div
+          className={CHAIN_ROW}
+          onFocusCapture={() => {
+            atFocusRef.current = value;
+          }}
         >
-          <Menu label={`${name} sizing`}>
-            {MODES.map((m) => (
-              <MenuItem
-                key={m}
-                radio
-                selected={m === mode}
-                data-testid={`inspector-size-${axis}-mode-${m}`}
-                onClick={() => {
-                  setMenuOpen(false);
-                  setMode(m);
-                }}
-              >
-                {MODE_LABEL[m]}
-              </MenuItem>
-            ))}
-          </Menu>
-        </Popover>
-        <FieldDot field={field} />
-      </span>
-      <div className="bdi-row-content">
-        {mode === "hug" ? (
-          <div className="bdi-ddn">
-            <Select
-              aria-label={`${name} sizing`}
-              className="bdi-v"
-              theme={BK_SELECT_BARE_VALUE_THEME}
-              disabled={field.readOnly}
-              value="hug"
-              onChange={(e) => setMode(e.target.value as ConstraintType)}
-            >
-              <option value="hug">Hug · Auto</option>
-              <option value="fill">Fill</option>
-              <option value="fixed">Fixed</option>
-            </Select>
-            <span className="bdi-c" aria-hidden="true">
-              <ChevronDown size={9} />
-            </span>
-          </div>
-        ) : (
-          <div className={CHAIN_ROW}>
-            <div
-              className="tw:flex-1 tw:min-w-0"
-              onFocusCapture={() => {
-                atFocusRef.current = value;
-              }}
-            >
-              <InputWithUnit
-                label=""
-                ariaLabel={name}
-                property={axis}
-                dot={false}
-                units={["px", "%", "rem", "vw", "vh"]}
-                value={mode === "fixed" ? value : readout}
-                /* Fill's number is a readout: leaving it untouched must not
-                   pin the element to its current size. */
-                onChange={(v) => {
-                  if (mode === "fill" && v === readout) return;
-                  onChange(v);
-                }}
-                onRevert={() => onChange(atFocusRef.current)}
-              />
+          <InputWithUnit
+            label={name}
+            property={axis}
+            units={["px", "%", "rem", "vw", "vh"]}
+            value={value}
+            onChange={onChange}
+            onRevert={() => onChange(atFocusRef.current)}
+          />
+          {!field.readOnly && (
+            /* Revealed on hover, left of the stepper and the unit select. */
+            <div className="tw:absolute tw:right-[76px] tw:top-1/2 tw:-translate-y-1/2 tw:z-[2]">
+              <ChainButton property={axis} value={value} onChange={onChange} />
             </div>
-            {mode === "fixed" && !field.readOnly && (
-              /* Revealed on hover, left of the stepper and the unit select —
-                 never over them (the field's number · stepper · unit). */
-              <div className="tw:absolute tw:right-[76px] tw:top-1/2 tw:-translate-y-1/2 tw:z-[2]">
-                <ChainButton property={axis} value={value} onChange={onChange} />
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      ) : null}
     </div>
   );
 }

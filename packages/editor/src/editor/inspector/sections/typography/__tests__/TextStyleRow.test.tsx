@@ -54,9 +54,9 @@ describe("Text style (owner answer 4 — font-size bound to a Brand type-style t
 });
 
 describe("where it lives", () => {
-  it("heads Typography when asked, and only then", () => {
-    const { container, unmount } = render(<TypographySection styles={{}} onChange={vi.fn()} isOpen textStyle />);
-    expect(container.querySelector(".bdi-lb")?.textContent?.trim()).toBe("Text style");
+  it("heads Typography's More settings when asked, and only then (2L9 161:8940)", () => {
+    const { unmount } = render(<TypographySection styles={{}} onChange={vi.fn()} isOpen textStyle advancedExpanded onAdvancedToggle={vi.fn()} />);
+    expect(screen.getByLabelText("Text style")).toBeInTheDocument();
     unmount();
     render(<TypographySection styles={{}} onChange={vi.fn()} isOpen />);
     expect(screen.queryByLabelText("Text style")).toBeNull();

@@ -10,7 +10,7 @@
  * @license BSD-3-Clause
  */
 
-import { adaptBaseStyleProps, defineSection, shownOnInstanceRoot, type AnySectionEntry } from "./_shared";
+import { adaptBaseStyleProps, defineSection, shownOnInstanceRoot, type AnySectionEntry, type ShouldRenderContext } from "./_shared";
 import { LayoutSection } from "../layout";
 import { SizeSection } from "../SizeSection";
 import { SpacingSection } from "../SpacingSection";
@@ -40,6 +40,23 @@ const LAYOUT_KEYS = [
   ...GAP_KEYS,
 ];
 const ITEM_KEYS = ["flex-grow", "flex-shrink", "flex-basis", "order", "align-self", "justify-self", "grid-column", "grid-row"];
+
+/** "2 set" / "None" — how many of a section's own properties the element
+ *  carries here (2L9 161:8940 draws Spacing, Background and Border shut
+ *  with this). */
+function setSummary(keys: readonly string[]) {
+  return (ctx: ShouldRenderContext): string => {
+    const n = keys.filter((k) => {
+      const v = ctx.authoredStyles[k];
+      return v !== undefined && v !== "" && v !== "none" && v !== "0" && v !== "0px";
+    }).length;
+    return n ? `${n} set` : "None";
+  };
+}
+
+const SPACING_KEYS = ["padding", "padding-top", "padding-right", "padding-bottom", "padding-left", "margin", "margin-top", "margin-right", "margin-bottom", "margin-left"];
+const FILL_KEYS = ["background", "background-color", "background-image", "background-size", "background-position", "background-repeat", "background-attachment", "background-blend-mode"];
+const BORDER_KEYS = ["border", "border-width", "border-style", "border-color", "border-top", "border-right", "border-bottom", "border-left", "outline-width", "outline-style", "outline-color", "outline-offset", "border-radius", "border-top-left-radius", "border-top-right-radius", "border-bottom-right-radius", "border-bottom-left-radius"];
 
 export const BOX_SECTIONS: Record<string, AnySectionEntry> = {
   layout: defineSection({
@@ -85,10 +102,11 @@ export const BOX_SECTIONS: Record<string, AnySectionEntry> = {
   spacing: defineSection({
     tab: "style",
     title: "Spacing",
-    open: "always",
+    open: "closed",
+    summary: setSummary(SPACING_KEYS),
     page: true,
     Component: SpacingSection,
-    styleKeys: ["padding", "padding-top", "padding-right", "padding-bottom", "padding-left", "margin", "margin-top", "margin-right", "margin-bottom", "margin-left"],
+    styleKeys: SPACING_KEYS,
     adaptProps: (ctx) => ({
       ...adaptBaseStyleProps(ctx),
       onBatchChange: ctx.onBatchChange,
@@ -98,13 +116,15 @@ export const BOX_SECTIONS: Record<string, AnySectionEntry> = {
 
   fill: defineSection({
     tab: "style",
-    title: "Fill",
-    open: "valued",
+    /* 2L9 161:8940 calls it Background. */
+    title: "Background",
+    open: "closed",
+    summary: setSummary(FILL_KEYS),
     page: true,
     Component: BackgroundSection,
     advancedKey: "fill",
     advancedProps: ["background-position", "background-size", "background-repeat", "background-attachment", "background-blend-mode"],
-    styleKeys: ["background", "background-color", "background-image", "background-size", "background-position", "background-repeat", "background-attachment", "background-blend-mode"],
+    styleKeys: FILL_KEYS,
     adaptProps: (ctx) => ({
       ...adaptBaseStyleProps(ctx),
       variant: ctx.variant,
@@ -118,11 +138,12 @@ export const BOX_SECTIONS: Record<string, AnySectionEntry> = {
   border: defineSection({
     tab: "style",
     title: "Border",
-    open: "valued",
+    open: "closed",
+    summary: setSummary(BORDER_KEYS),
     Component: BorderSection,
     advancedKey: "border",
     advancedProps: ["outline-width", "outline-style", "outline-color", "outline-offset"],
-    styleKeys: ["border", "border-width", "border-style", "border-color", "border-top", "border-right", "border-bottom", "border-left", "outline-width", "outline-style", "outline-color", "outline-offset", "border-radius", "border-top-left-radius", "border-top-right-radius", "border-bottom-right-radius", "border-bottom-left-radius"],
+    styleKeys: BORDER_KEYS,
     adaptProps: (ctx) => ({
       ...adaptBaseStyleProps(ctx),
       advancedExpanded: ctx.advancedExpanded,

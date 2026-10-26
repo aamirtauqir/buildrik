@@ -358,7 +358,7 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
   const control = (
     <div
       data-testid={label ? fieldTestId(label) : undefined}
-      className={`bdi-fld${invalid ? " invalid" : ""}${field.mixed ? " mixed" : ""}`}
+      className={`bdi-fld tw:group/fld${invalid ? " invalid" : ""}${field.mixed ? " mixed" : ""}`}
     >
       <TextInput
         type="text"
@@ -398,7 +398,12 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
         <>
           {/* Pointer shortcut for ↑ / ↓ on the field itself (the keyboard
               path, which also takes Shift for 10). Not a separate control. */}
-          <span className="bdi-step" aria-hidden="true">
+          {/* The board draws a number field plain: the stepper shows on hover
+              or while the field has focus. */}
+          <span
+            className="bdi-step tw:invisible tw:group-hover/fld:visible tw:group-focus-within/fld:visible"
+            aria-hidden="true"
+          >
             <span onMouseDown={(e) => e.preventDefault()} onClick={() => step(1)}>
               <ChevronUp size={10} />
             </span>

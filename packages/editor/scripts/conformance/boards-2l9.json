@@ -4765,8 +4765,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Lane L-B A1+A2 (probe inspector-panel ?type=paragraph, :5172, against the dump's copy): Content · Text block (Edit text on canvas) · Semantics (Tag 'Paragraph', ID, 'Content and semantic changes apply to all breakpoints.') · Advanced attributes '0 set' — match. Still open: an unbound CMS binding section shows (board shows none until bound — A10), Conditions (REQUESTS #11), header 'Content · All breakpoints' (REQUESTS #10).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B P1 (2026-10-27), probe inspector-panel ?type=text and ?type=heading on :5172, side by side with the board PNG: Content heading · 'Text' row with bind icon (the binding row now sits in the block; its value moved to the row's title) · full-width bordered 'Edit text on canvas' · Semantics with Tag as a Select (Paragraph/Span/Div/Blockquote, H1–H6 for headings) + ID + the all-breakpoints note · Advanced attributes '0 set'. Semantics opens when the element has an ID (as drawn, 'hero-intro'); without one it shuts with the tag as summary (156:716). Exceptions: Conditions row not drawn (code:conditions-not-built, REQUESTS B-11); breadcrumb '… › Hero › Text' is InspectorHeader (lead).",
    "tier": "P1"
   },
   {
@@ -4776,8 +4776,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Board Width mode/Height mode rows vs Fixed/Fill/Hug (sections/SizeSection.tsx:165); \"Background\" vs code \"Fill\"; \"2 set\" summaries",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B P1 (2026-10-27), probe ?type=heading Style tab on :5172 vs board PNG: Typography rows Font · Font size · Weight (words: Regular/Bold…) · Line height · Text color ('#' + uppercase hex); Align and Text style moved into More settings. Size as 'Width mode'/'Height mode' selects (Fixed/Fill/Hug · Auto) with a Width/Height value row only while Fixed. Spacing/Background/Border shut with 'n set'/'None'. Number steppers show on hover/focus only. Exceptions: Font keeps the source label + applied stack (R01); a 'More settings' disclosure stays under Typography and Size (code:advanced-properties-reachable — letter spacing, decoration, min/max, aspect have no other home); number field and unit select share one frame (shared InputWithUnit, not split per board); header context line is InspectorHeader (lead).",
    "tier": "P1"
   },
   {

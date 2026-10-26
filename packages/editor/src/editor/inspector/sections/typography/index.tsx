@@ -1,7 +1,9 @@
 /**
  * Typography — Font, Font size, Line height, Weight, Colour, Align (boards 1,
  * 4), the rest behind More settings. The same body serves:
- *   - "Typography", open, on text types, headed by the Brand "Text style";
+ *   - "Typography", open, on text types (Font, Font size, Weight, Line
+ *     height, Text color — 2L9 161:8940; Text style and Align under More
+ *     settings);
  *   - "Text inside", closed with a one-line summary, on containers, buttons,
  *     form fields and widgets (board 17, owner answer 1) — the registry names
  *     the section and draws the summary;
@@ -66,7 +68,6 @@ export const TypographySection: React.FC<TypographySectionProps> = ({
 
   return (
     <Section title="Typography" isOpen={isOpen} onToggle={onToggle} id="inspector-section-typography">
-      {textStyle && <TextStyleRow styles={styles} onChange={onChange} />}
       <div className="tw:relative">
         <FontPicker value={styles["font-family"] || ""} onChange={handleFontChange} composer={composer} inheritedValue={inherited?.["font-family"]} />
       </div>
@@ -81,11 +82,19 @@ export const TypographySection: React.FC<TypographySectionProps> = ({
       />
 
       {!isPage && advancedExpanded && (
-        <TypographyControls styles={styles} onChange={onChange} isMultiSelect={isMultiSelect} />
+        <>
+          {/* The Brand type-style binding, behind More settings (2L9 161:8940). */}
+          {textStyle && <TextStyleRow styles={styles} onChange={onChange} />}
+          <TypographyControls styles={styles} onChange={onChange} isMultiSelect={isMultiSelect} />
+        </>
       )}
 
       {!isPage && onAdvancedToggle && (
-        <MoreSettingsToggle isOpen={advancedExpanded} onToggle={() => onAdvancedToggle()} advancedCount={ADVANCED_TYPOGRAPHY_COUNT} />
+        <MoreSettingsToggle
+          isOpen={advancedExpanded}
+          onToggle={() => onAdvancedToggle()}
+          advancedCount={ADVANCED_TYPOGRAPHY_COUNT + (textStyle ? 1 : 0)}
+        />
       )}
     </Section>
   );

@@ -50,8 +50,10 @@ export function TypeBlockSection({ isOpen, onToggle, onOpenCreateCollection, ...
         </Button>
       ) : null}
       <Section title={caps.typeBlock === "input" ? "Field" : elementTypeLabel(body.element.type)} isOpen={isOpen} onToggle={onToggle} id="inspector-section-type">
-        <Body {...body} />
+        {/* 2L9 161:8480 / F2.02: the property's own row ("Text", its bind
+            button) heads the block; its controls follow. */}
         {bindable ? <BindingPropertyRow composer={body.composer} elementId={body.element.id} onOpenCreateCollection={onOpenCreateCollection} /> : null}
+        <Body {...body} />
       </Section>
     </>
   );

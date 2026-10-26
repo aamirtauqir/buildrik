@@ -26,12 +26,13 @@ export function EditTextRow({ composer, elementId }: EditTextRowProps) {
   const { readOnly } = useInspectorField();
   if (!composer) return null;
   return (
-    <div className="tw:flex tw:h-6 tw:items-center tw:justify-end" data-testid="inspector-text-content">
+    /* 2L9 161:8480: a full-width bordered button under the "Text" row. */
+    <div className="tw:flex tw:items-center tw:py-1" data-testid="inspector-text-content">
       <Button
         type="button"
         size="xs"
         color="light"
-        className="tw:h-6 tw:w-40 tw:justify-center tw:border-0 tw:bg-transparent tw:px-2 tw:text-[12px] tw:font-normal tw:text-[var(--bk-accent-text)] tw:hover:bg-[var(--bk-accent-tint)]"
+        className="tw:h-8 tw:w-full tw:justify-center tw:text-[13px] tw:font-normal tw:text-[var(--bk-ink)] tw:focus:ring-0"
         aria-disabled={readOnly || undefined}
         onClick={() => {
           if (!readOnly) composer.emit(EVENTS.UI_INLINE_EDIT_REQUEST, { elementId });

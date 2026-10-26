@@ -3,7 +3,7 @@
  * image behind the element. Empty = board 1's "Fill  +" row (the frame draws
  * it); "+" opens the Colour row. The Colour / Gradient / Image choice waits
  * behind More settings until a gradient or image is set. On the Page panel
- * the row reads "Background" (board 21).
+ * the section reads "Background" and its row "Color" (2L9 S06, 161:8940).
  */
 
 import * as React from "react";
@@ -15,7 +15,7 @@ import { Button, TextInput } from "@/editor/chrome-ui";
 
 const FIELD_LABEL = "tw:text-xs tw:font-medium tw:text-[var(--bk-ink-muted)]";
 export interface BackgroundSectionProps {
-  /** "page" names the colour row "Background" (board 21). */
+  /** "page": the Page panel's subset (board 21 / S06). */
   variant?: "element" | "page";
   styles: Record<string, string>;
   onChange: (property: string, value: string) => void;
@@ -116,7 +116,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
 
   return (
     <Section
-      title="Fill"
+      title="Background"
       preview={preview}
       isOpen={isOpen}
       onToggle={onToggle}
@@ -145,7 +145,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
       {bgType === "color" && (
         <div className="tw:relative">
           <ColorInput
-            label={variant === "page" ? "Background" : "Colour"}
+            label="Color"
             property="background-color"
             value={styles["background-color"] || shorthandColor}
             onChange={writeFill}

@@ -68,7 +68,7 @@ describe("ColorInput · DSBindingChip integration", () => {
     ).toBeNull();
     expect(container.querySelector('[aria-label^="Off-design-system value"]')).toBeNull();
     // The hex is still on screen, inside the field, which is the whole point.
-    expect(screen.getByDisplayValue("FFAA22")).toBeTruthy();
+    expect(screen.getByDisplayValue("#FFAA22")).toBeTruthy();
   });
 
   it("renders no chip when value is empty", () => {

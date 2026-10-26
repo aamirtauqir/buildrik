@@ -47,8 +47,9 @@ const rowLabels = () =>
 describe("Heading (board 1)", () => {
   it("only Edit text on canvas: the level is Content › Semantics' Tag (2L9 247:26594)", () => {
     mock("heading", { tagName: "h2" });
-    /* The bindable property row (C-13) is the block's only labelled row. */
-    expect(rowLabels()).toEqual(["Text"]);
+    /* The bindable property row (C-13) names the property, not a control. */
+    expect(rowLabels()).toEqual([]);
+    expect(screen.getByTestId("binding-row")).toHaveTextContent("Text");
     expect(screen.queryByTestId("inspector-field-level")).toBeNull();
     expect(screen.queryByLabelText("Text style")).toBeNull();
     expect(screen.getByRole("button", { name: "Edit text on canvas" })).toBeInTheDocument();
@@ -57,9 +58,9 @@ describe("Heading (board 1)", () => {
 
 describe("Text (board 4) and the other text types", () => {
   it.each([
-    ["text", ["Text"]],
-    ["paragraph", ["Text"]],
-    ["link", ["Link"]],
+    ["text", []],
+    ["paragraph", []],
+    ["link", []],
     ["label", []],
   ])("%s: Edit text on canvas, its bindable property row, no Level, no Text style", (type, labels) => {
     mock(type as string);

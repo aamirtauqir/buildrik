@@ -91,10 +91,10 @@ afterEach(() => {
 const row = (composer: unknown) => render(<BindingPropertyRow composer={composer as never} elementId="e1" />);
 
 describe("property row · static (B5-D01)", () => {
-  it("names the property, shows what the element says, and offers Bind", () => {
+  it("names the property (its value on hover) and offers Bind (2L9 161:8480)", () => {
     row(makeComposer());
     expect(screen.getByTestId("binding-row")).toHaveTextContent("Text");
-    expect(screen.getByTestId("binding-static-value")).toHaveTextContent("Our menu");
+    expect(screen.getByTitle("Our menu")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Bind text…" })).toBeInTheDocument();
   });
 });
