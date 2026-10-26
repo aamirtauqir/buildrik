@@ -35,6 +35,7 @@ const RESTORE_REASON_LABEL: Record<string, string> = {
   "dark-auto": "Dark mode Auto",
   logo: "Brand from logo",
   starter: "Before starter",
+  import: "Before import",
 };
 
 const pad = (n: number) => String(n).padStart(2, "0");

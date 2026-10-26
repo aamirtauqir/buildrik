@@ -9329,7 +9329,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "760 panel with drop zone + format radio + dark-strategy menu; board splits Import/Export, \"Update matching\" mode, Copy/Download .css"
+   "verifiedNote": "L-D W4: ordinary page (header, strap, preview column) with Import | Export tabs; Import: \"Import tokens\", \"Choose JSON file\", \"Review compatible values and changes before applying.\", Update matching (+ code-ahead Add new only) with \"Matching values update. Tokens absent from the file are kept.\". Built, not compared."
   },
   {
    "nodeId": "203:38814",
@@ -9339,7 +9339,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Dry-run card lists valid tokens; board breakdown Added/Modified/Skipped/Unsupported/Alias fidelity + \"Apply 8 valid\""
+   "verifiedNote": "L-D W4: dry run — \"{file} · Update matching\", \"{n} detected · {v} valid · {u} unsupported\", Added / Modified / Skipped / Unsupported, \"Preview only · Nothing has been applied\", Cancel · Apply {v} valid. No Alias fidelity row and no canvas preview of the import (not computed). Built, not compared."
   },
   {
    "nodeId": "203:39366",
@@ -9349,7 +9349,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No offline local-checkpoint confirm for import"
+   "verifiedNote": "L-D W4: offline Apply → Modal \"Apply with local recovery only?\" (\"You’re offline. A server restore point can’t be created.\" …), Cancel · Apply locally (no restore point; Undo still works). No separate local checkpoint exists. Built, not compared."
   },
   {
    "nodeId": "203:39584",
@@ -9669,7 +9669,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "760 panel with drop zone + format radio + dark-strategy menu; board splits Import/Export, \"Update matching\" mode, Copy/Download .css",
+   "verifiedNote": "L-D W4: Export tab — Format CSS variables | JSON tokens | Tailwind config, code, \"{n} tokens · includes dark values.\" / Tailwind \"can’t carry dark values; n are left out\", Copy · Download .css/.json/.js; Dark strategy menu kept on CSS (code-ahead). Built, not compared.",
    "inheritsFrom": "203:38272"
   },
   {
@@ -9680,7 +9680,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-D S5: receipt \"Imported {n} tokens. One Undo reverts the import.\" + Undo → composer.history.undo. Result card with counts open (deferred). Built, not compared."
+   "verifiedNote": "L-D S5+W4: result card \"Imported {file} · Update matching\", the same rows, \"Applied n of d, as shown in the preview. Restore point “Before import” was saved first.\" + receipt with Undo; `import` restore reason added to the shared schema. Built, not compared."
   },
   {
    "nodeId": "212:39840",

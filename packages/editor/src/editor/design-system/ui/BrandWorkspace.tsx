@@ -981,11 +981,8 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
         );
       case "export":
         return (
-          /* 4418:168885: a 760 panel centred in the main area — no page
-             header, no preview column. Its ✕ goes back to Colours. */
-          <div className="tw:mx-auto tw:w-full tw:max-w-[760px]">
-            <ExportSection onClose={() => openPage("colours")} />
-          </div>
+          /* B6-B15 / B6-B48: Import | Export tabs on an ordinary page. */
+          <ExportSection composer={composer} />
         );
       default: {
         const kind = page.slice("kind-".length) as MoreKind;
@@ -1022,8 +1019,6 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
     <ColorModeToggle theme={shownMode} onChange={setPreviewTheme} siteOff={siteDarkMode === "off"} locked={previewLocked} />
   ) : undefined;
 
-  /* Import / export is drawn as a panel, not a page with a preview. */
-  const isPanelPage = page === "export";
 
   const isTokenPage = page === "colours" || page === "fonts" || page === "styles" || page === "spacing" || page.startsWith("kind-");
 
@@ -1083,7 +1078,6 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
             {backLabel}
           </Button>
         </div>
-        {!isPanelPage && (
           <header className="tw:mt-4 tw:flex tw:shrink-0 tw:flex-col tw:gap-1" data-testid="brand-header">
             <div className="tw:flex tw:h-[30px] tw:items-center tw:gap-2">
               <h2
@@ -1173,10 +1167,9 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
               {STRAP}
             </p>
           </header>
-        )}
-      <div className={`tw:flex tw:min-h-0 tw:flex-1 tw:gap-8 ${isPanelPage ? "" : "tw:mt-5"}`}>
+      <div className={"tw:mt-5 tw:flex tw:min-h-0 tw:flex-1 tw:gap-8"}>
         {/* ── Pane ──────────────────────────────────────────────────────── */}
-        <div className={`tw:min-w-0 tw:flex-1 tw:flex-col ${compact && compactPreview && !isPanelPage ? "tw:hidden" : "tw:flex"}`} data-testid="brand-pane">
+        <div className={`tw:min-w-0 tw:flex-1 tw:flex-col ${compact && compactPreview ? "tw:hidden" : "tw:flex"}`} data-testid="brand-pane">
           {/* BRP1-M1 (8222:229015 / 229636 / 230245): a flat warning-tint
               strip, 12 in, 12/18 ink — no border, no radius — 20 over the body. */}
           {!online && !readOnly && (
@@ -1197,7 +1190,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
               {(store.readOnlyReason && BRAND_READ_ONLY_COPY[store.readOnlyReason]) || BRAND_READ_ONLY_FAILED_COPY}
             </div>
           )}
-          {!isPanelPage && (page.startsWith("kind-") || pageAction) && (
+          {(page.startsWith("kind-") || pageAction) && (
             <div className="tw:mb-4 tw:flex tw:shrink-0 tw:items-center tw:gap-2" data-testid="brand-page-actions">
               {page.startsWith("kind-") && (
                 <Button
@@ -1244,7 +1237,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
 
             {/* Import / export stays usable read-only: export is a read, and
                 an import is refused by the one write path (setTokens). */}
-            <EditLock locked={readOnly && !isPanelPage}>{renderPage()}</EditLock>
+            <EditLock locked={readOnly && page !== "export"}>{renderPage()}</EditLock>
             {usageToken && (
               /* 8224:231539: 16 under the table, the token's reach in one line —
                  held at the pane's foot, so a long table cannot push it out of view. */
@@ -1261,7 +1254,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
         </div>
 
         {/* ── Preview column ────────────────────────────────────────────── */}
-        {!isPanelPage && (!compact || compactPreview) && (
+        {(!compact || compactPreview) && (
         <aside
           className={`tw:flex tw:flex-col tw:gap-4 tw:overflow-y-auto tw:pb-4 ${compact ? "tw:min-w-0 tw:flex-1" : "tw:w-[468px] tw:shrink-0"}`}
           data-testid="brand-preview-column"

@@ -70,8 +70,8 @@ const CARD =
   "tw:hover:bg-[var(--bk-bg-subtle)] tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
 const MONO = "tw:[font-family:var(--bk-font-mono)] tw:tabular-nums tw:whitespace-pre";
 
-/** The table's row order — the workspace selects the first row by default. */
-export function orderColourTokens(tokens: readonly DesignToken[]): DesignToken[] {
+/** The cards' order: semantic first, then brand, surface, state, palette. */
+function orderColourTokens(tokens: readonly DesignToken[]): DesignToken[] {
   return [...tokens].sort((a, b) => {
     const ga = GROUP_ORDER.indexOf(a.group ?? "");
     const gb = GROUP_ORDER.indexOf(b.group ?? "");
