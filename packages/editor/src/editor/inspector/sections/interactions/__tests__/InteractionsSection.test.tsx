@@ -30,9 +30,12 @@ describe("InteractionsSection", () => {
     expect(container.firstChild).not.toBeNull();
   });
 
-  it("draws no empty-state paragraph — the board shows only + Add interaction", () => {
-    renderOpen({ interactions: [], onInteractionsChange: vi.fn() });
-    expect(screen.queryByText(/No interactions yet/i)).toBeNull();
+  it("2L9 161:13919: 'Plays on all breakpoints', + Add interaction, then 'No interactions yet.'", () => {
+    const { container } = renderOpen({ interactions: [], onInteractionsChange: vi.fn() });
+    const text = container.textContent ?? "";
+    const at = ["Plays on all breakpoints", "+ Add interaction", "No interactions yet."].map((t) => text.indexOf(t));
+    expect(at.every((i) => i >= 0)).toBe(true);
+    expect([...at].sort((a, b) => a - b)).toEqual(at);
   });
 
   it("a row reads trigger as the label, the animation as the value (board 2: On click  [Scroll to menu ▾])", () => {
@@ -135,6 +138,8 @@ describe("InteractionsSection", () => {
     act(() => {
       fireEvent.click(screen.getByText("On hover"));
     });
+    /* The new interaction opens; back to the list shows its row. */
+    fireEvent.click(screen.getByTestId("interactions-back"));
     expect(screen.getByRole("button", { name: /On hover/ })).toBeInTheDocument();
   });
 });
@@ -174,7 +179,7 @@ describe("InteractionsSection — the element animation row", () => {
     const hover = makeInteraction("hover");
     renderOpen({ interactions: [hover, makeInteraction("click")], onInteractionsChange: vi.fn() });
     fireEvent.click(screen.getByRole("button", { name: /On hover/ }));
-    expect(screen.getByTestId("interactions-back")).toHaveTextContent("‹ On hover");
+    expect(screen.getByTestId("interactions-back")).toHaveTextContent("‹ Back to Interactions");
     expect(screen.queryByRole("button", { name: /On click/ })).toBeNull();
     expect(screen.queryByText("+ Add interaction")).toBeNull();
     fireEvent.click(screen.getByTestId("interactions-back"));

@@ -50,7 +50,7 @@ describe("Interactions — creating a CSS animation", () => {
     expect(screen.queryByRole("button", { name: /Entrance animation/ })).toBeNull();
   });
 
-  it("add → its edit screen opens; back shows the row labelled by its trigger; export has the keyframes", async () => {
+  it("add → its edit screen opens; back ('‹ Back to Interactions', 2L9 161:15179) shows the row labelled by its trigger; export has the keyframes", async () => {
     const composer = project();
     const el = composer.elements.getElement("a1")!;
     const onAnimationChange = (a: AnimationConfig | null) => (a ? el.setAnimation(a) : el.clearAnimation());
@@ -61,7 +61,7 @@ describe("Interactions — creating a CSS animation", () => {
     openAdd();
     act(() => { fireEvent.click(screen.getByRole("button", { name: /Entrance animation/ })); });
     /* Lands on its edit screen: "‹ On page load" + the editor. */
-    expect(screen.getByTestId("interactions-back")).toHaveTextContent("‹ On page load");
+    expect(screen.getByTestId("interactions-back")).toHaveTextContent("‹ Back to Interactions");
     expect(screen.getByRole("button", { name: "Remove animation" })).toBeInTheDocument();
     fireEvent.click(screen.getByTestId("interactions-back"));
     expect(screen.getByRole("button", { name: /On page load/ })).toHaveTextContent("Fade In");

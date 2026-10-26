@@ -4461,7 +4461,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Lane L-B A1: Behavior tab label + Visibility, Interactions first (probe-compared). Open: 'Show on these devices', 'Plays on all breakpoints', 'No interactions yet.' copy (A7); header 'Behavior · {type}' (REQUESTS #10)."
+   "verifiedNote": "Lane L-B A1+A7 (built; copy and order checked against the dump, no board image): Behavior tab · Visibility 'Show on these devices' Desktop/Tablet/Mobile · Interactions 'Plays on all breakpoints' · '+ Add interaction' · 'No interactions yet.'. Not drawn: 'Data conditions: Content › Conditions — both must pass.' (no conditions — REQUESTS #11). Header 'Behavior · Text' is REQUESTS #10's."
   },
   {
    "nodeId": "161:14383",
@@ -4491,7 +4491,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Board Trigger/Effect/Animate/Repeat/When rows, Play/More…, \"Interaction added · Undo\" toast"
+   "verifiedNote": "Lane L-B A7 (built, not compared): the interaction screen's back row reads '‹ Back to Interactions'. Open: Play / More…, Repeat / When rows, 'Interaction added · Undo' receipt."
   },
   {
    "nodeId": "161:15688",
@@ -4562,7 +4562,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Disable exists; board keeps config visible with disabled marker"
+   "verifiedNote": "Lane L-B A7 (built, not compared): a disabled interaction keeps its row, value 'Off · {effect}'. Open: 'Enable interaction' row action."
   },
   {
    "nodeId": "165:18662",
@@ -4572,7 +4572,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Delete exists; no \"Interaction deleted · Undo\" toast"
+   "verifiedNote": "Lane L-B A7 (built, not compared): after deleting the last interaction the list reads 'No interactions yet.'. Open: 'Interaction deleted · Undo' receipt (needs a toast route that works without a provider in the section's tests — A7b)."
   },
   {
    "nodeId": "165:19056",

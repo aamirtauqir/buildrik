@@ -1,7 +1,9 @@
 /**
- * Visibility Section — Behaviour › Visibility (board 2): one checkbox per
- * breakpoint, "Desktop · Tablet · Mobile", ticked = shown there. Unticking
- * writes `--hide-<bp>: true`; ticking clears it.
+ * Visibility Section — Behavior › Visibility (board 2, 2L9 161:13919): "Show
+ * on these devices", one checkbox per breakpoint, "Desktop · Tablet ·
+ * Mobile", ticked = shown there. Unticking writes `--hide-<bp>: true`;
+ * ticking clears it. (The board's "Data conditions: Content › Conditions"
+ * note is not drawn: there are no conditions yet — REQUESTS #11.)
  *
  * @license BSD-3-Clause
  */
@@ -49,7 +51,10 @@ export const VisibilitySection: React.FC<VisibilitySectionProps> = ({
       id="inspector-section-visibility"
       preview={hiddenCount > 0 ? `hidden on ${hiddenCount}` : undefined}
     >
-      <div className="tw:flex tw:items-center tw:gap-1 tw:py-2" data-testid="visibility-show-on" role="group" aria-label="Show on">
+      <p className="tw:m-0 tw:pt-1 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)]" id="visibility-show-on-label">
+        Show on these devices
+      </p>
+      <div className="tw:flex tw:items-center tw:gap-1 tw:py-2" data-testid="visibility-show-on" role="group" aria-labelledby="visibility-show-on-label">
         {VISIBILITY_BREAKPOINTS.map((bp) => {
           const shown = isVisible(bp.id);
           const id = `visibility-${bp.id}`;
