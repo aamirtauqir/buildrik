@@ -9217,7 +9217,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Copy \"Enter a valid hex like #3B82F6\" vs board \"Enter a valid hex color, such as #1A56DB. The token hasn’t changed.\""
+   "verifiedNote": "L-D S8: \"Enter a valid hex color, such as #1A56DB. The token hasn’t changed.\" (ColorPicker). Drill-in layout open (B02). Built, not compared."
   },
   {
    "nodeId": "203:35106",
@@ -9469,7 +9469,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "\"Replace border before deleting?\" vs board \"Delete border?\" + \"Use instead\" select"
+   "verifiedNote": "L-D S8: \"Delete {name}?\", \"{name} is used in {n} places. Choose a compatible color to use there instead. You can undo this.\", \"Use instead\", Replace and delete. Built, not compared."
   },
   {
    "nodeId": "207:40532",
@@ -9479,7 +9479,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Unknown-usage refusal exists (\"Can’t delete …\", Try again); board title \"Can’t delete border yet\" + copy"
+   "verifiedNote": "L-D S8: \"Can’t delete {name} yet\", \"We can’t count where {name} is used right now, so deleting it could break pages. Try again in a moment.\", Close · Retry count. Built, not compared."
   },
   {
    "nodeId": "207:40771",
@@ -9599,7 +9599,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Popover exists with Revert; copy \"Edits in this session…\" vs board \"Changes this session\", \"Review changes · 3\""
+   "verifiedNote": "L-D S1/S8: trigger \"Review changes · n\" (no count at 0), list title \"Changes this session\", footer \"Revert is added to Undo history like any edit.\" Row shape (name, was → now) unchanged. Built, not compared."
   },
   {
    "nodeId": "212:37895",
@@ -9649,7 +9649,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Read-only banner exists; copy \"This site’s brand was rolled back — editing is paused.\" vs board \"on hold… not about your access\""
+   "verifiedNote": "Copy lives in src/shared/constants/brandReadOnly.ts (outside L-D) → REQUESTS #12. Board's title line \"Editing is paused while the Brand update is on hold\" + no Edit › on read-only rows still open."
   },
   {
    "nodeId": "212:39093",
@@ -10063,7 +10063,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "\"Can’t count right now\" rows + notice exist; board adds \"Retry count\" button and copy differs"
+   "verifiedNote": "L-D S8: notice \"We can’t count where colors are used right now. Editing still works; deleting is blocked until the count is back.\" + rows \"Can’t count right now\". Open: Retry count button (no recount API in the usage index). Built, not compared."
   },
   {
    "nodeId": "219:43113",
@@ -10083,7 +10083,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Hint \"Dark mode is off for this site\" vs board \"Dark mode is Off. Turn it on in Tools › Dark mode.\""
+   "verifiedNote": "L-D S8: Dark segment hint \"Dark mode is Off. Turn it on in Tools › Dark mode.\" (title tooltip). Built, not compared."
   },
   {
    "nodeId": "219:43600",

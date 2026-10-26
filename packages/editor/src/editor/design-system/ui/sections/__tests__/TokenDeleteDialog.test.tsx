@@ -46,24 +46,24 @@ describe("TokenDeleteDialog (BRP1-M6)", () => {
   it("in use → asks for a replacement; Replace and delete waits for a pick and sends it", () => {
     const p = open(14);
     expect(screen.getByTestId("brand-token-replace-modal")).toBeTruthy();
-    expect(screen.getByText("Replace Primary before deleting?")).toBeTruthy();
-    expect(screen.getByText("Primary is used by 14 elements. Choose a replacement so every element keeps a valid colour.")).toBeTruthy();
+    expect(screen.getByText("Delete Primary?")).toBeTruthy();
+    expect(screen.getByText("Primary is used in 14 places. Choose a compatible color to use there instead. You can undo this.")).toBeTruthy();
     const confirm = screen.getByRole("button", { name: "Replace and delete" });
     expect((confirm as HTMLButtonElement).disabled).toBe(true);
     const options = screen.getAllByRole("option").map((o) => o.textContent);
     expect(options).toEqual(["Link · Blue 600", "Text · #111827", "Blue 600 · #1C64F2"]);
     fireEvent.click(screen.getByRole("option", { name: "Link · Blue 600" }));
-    expect(screen.getByText("14 elements will use Link. Undo the replacement and deletion with one ⌘Z.")).toBeTruthy();
+    expect(screen.getByText("14 places will use Link. One Undo restores both.")).toBeTruthy();
     fireEvent.click(confirm);
     expect(p.onDelete).toHaveBeenCalledWith({ replaceWith: "color-link" });
   });
 
-  it("unknown → refused with the reason, nothing deleted; Try again re-counts", () => {
+  it("unknown → refused with the reason, nothing deleted; Retry count re-counts", () => {
     const p = open("unknown");
-    expect(screen.getByText("Can't delete Primary")).toBeTruthy();
-    expect(screen.getByText("We can't count usage right now. Nothing has been deleted. Try again when all site content can be checked.")).toBeTruthy();
+    expect(screen.getByText("Can’t delete Primary yet")).toBeTruthy();
+    expect(screen.getByText("We can’t count where Primary is used right now, so deleting it could break pages. Try again in a moment.")).toBeTruthy();
     expect(screen.queryByRole("button", { name: /delete/i })).toBeNull();
-    fireEvent.click(screen.getByRole("button", { name: "Try again" }));
+    fireEvent.click(screen.getByRole("button", { name: "Retry count" }));
     expect(p.onRetry).toHaveBeenCalledTimes(1);
     fireEvent.click(screen.getByRole("button", { name: "Close" }));
     expect(p.onClose).toHaveBeenCalled();

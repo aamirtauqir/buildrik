@@ -49,10 +49,10 @@ describe("ColorTokenList — usage column (BRP1-M5)", () => {
 
   it("prints the unknown state with no number, and the warning notice under the table", () => {
     const { getByTestId } = renderList([["color-primary", "unknown"], ["color-border", "unknown"]]);
-    expect(getByTestId("brand-token-used-color-primary").textContent).toBe("Can't count right now");
+    expect(getByTestId("brand-token-used-color-primary").textContent).toBe("Can’t count right now");
     expect(getByTestId("brand-token-used-color-primary").textContent).not.toMatch(/\d/);
     expect(getByTestId("brand-usage-unknown-notice").textContent).toBe(
-      "Can't count right now. Some site content couldn't be checked. Try again before deleting a token.",
+      "We can’t count where colors are used right now. Editing still works; deleting is blocked until the count is back.",
     );
   });
 

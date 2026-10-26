@@ -188,3 +188,11 @@ describe("BrandWorkspace › 2L9 shell (B6-B01, GAP-ST-T03)", () => {
     expect(names.filter((n) => /^(Undo|Redo)\b/.test(n))).toEqual([]);
   });
 });
+
+describe("BrandWorkspace › Review changes copy (B6-B41)", () => {
+  it("the list is 'Changes this session'", () => {
+    const utils = renderWorkspace(makeFakeComposer());
+    fireEvent.click(utils.getByTestId("brand-session-edits"));
+    expect(utils.getByTestId("brand-session-edits-list").querySelector("h3")?.textContent).toBe("Changes this session");
+  });
+});

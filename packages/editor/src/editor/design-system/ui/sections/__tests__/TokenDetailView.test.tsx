@@ -744,7 +744,7 @@ describe("TokenDetailView", () => {
       clickDelete(getByTestId);
       expect(onDelete).not.toHaveBeenCalled();
       const dialog = document.querySelector('[data-delete-state="unknown"]');
-      expect(dialog?.textContent).toMatch(/can't count usage right now/i);
+      expect(dialog?.textContent).toMatch(/can’t count where .* is used right now/i);
       expect(dialog?.textContent).not.toMatch(/\d+ elements?/);
       expect(document.querySelector("[data-replace-candidate]")).toBeNull();
     });

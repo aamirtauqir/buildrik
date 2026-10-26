@@ -190,7 +190,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
               </span>
               <span className="tw:flex tw:min-w-0 tw:items-center tw:pr-3" data-testid={`brand-token-used-${token.id}`}>
                 {usage === "unknown" ? (
-                  <span className={`tw:truncate ${USAGE_TEXT}`}>Can&apos;t count right now</span>
+                  <span className={`tw:truncate ${USAGE_TEXT}`}>Can’t count right now</span>
                 ) : usage > 0 && onShowUsage ? (
                   <Button
                     type="button"
@@ -222,7 +222,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
           data-testid="brand-usage-unknown-notice"
           className="tw:sticky tw:bottom-0 tw:mt-4 tw:mb-0 tw:bg-[var(--bk-warning-tint)] tw:p-3 tw:text-[length:var(--bk-text-12)] tw:leading-[18px] tw:text-[var(--bk-ink)]"
         >
-          Can&apos;t count right now. Some site content couldn&apos;t be checked. Try again before deleting a token.
+          We can’t count where colors are used right now. Editing still works; deleting is blocked until the count is back.
         </p>
       )}
     </div>

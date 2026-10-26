@@ -33,7 +33,7 @@ describe("ColorModeToggle (2-pill seg, preview-only)", () => {
     const u = render(<ColorModeToggle theme="light" onChange={vi.fn()} siteOff />);
     const dark = u.getByTestId("brand-colour-mode-seg-dark") as HTMLButtonElement;
     expect(dark.disabled).toBe(true);
-    expect(dark.getAttribute("title")).toBe("Dark mode is off for this site");
+    expect(dark.getAttribute("title")).toBe("Dark mode is Off. Turn it on in Tools › Dark mode.");
   });
 
   it("locked while another flow previews: both segments wait", () => {
