@@ -533,6 +533,16 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
         role="tree"
         aria-label="Page structure"
       >
+        {/* design-2l9 147:75914: the open page heads its tree. */}
+        {activePage && !state.searchHook.isSearching && (
+          <div className="tw:flex tw:h-8 tw:items-center tw:gap-2 tw:px-3 tw:text-[13px] tw:font-medium tw:text-[var(--bk-ink)]" data-testid="layers-page-row">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="tw:flex-none tw:text-[var(--bk-ink-soft)]">
+              <path d="M14 3H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V9z" />
+              <path d="M14 3v6h6" />
+            </svg>
+            <span className="tw:truncate">{activePage.name}</span>
+          </div>
+        )}
         {state.layers.length === 0 && <LayersEmptyState />}
 
         {state.searchHook.isSearching && filteredLayers.length === 0 && (
@@ -543,6 +553,12 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
           />
         )}
 
+        {/* design-2l9 147:77189: a head line over the results. */}
+        {state.searchHook.isSearching && filteredLayers.length > 0 && (
+          <p className="tw:m-0 tw:px-3 tw:pt-1 tw:pb-1 tw:text-[13px] tw:leading-5 tw:font-semibold tw:text-[var(--bk-ink)]" data-testid="layers-search-head">
+            {`${matchCount.toLocaleString("en-US")} match${matchCount === 1 ? "" : "es"} in ${totalCount.toLocaleString("en-US")} layers`}
+          </p>
+        )}
         {filteredLayers.map((layer) => (
           <LayerTreeItem
             key={layer.id}
@@ -579,6 +595,18 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
             selecting={selecting}
           />
         ))}
+        {state.searchHook.isSearching && filteredLayers.length > 0 && onClearSearch && (
+          <Button
+            type="button"
+            color="light"
+            size="xs"
+            data-testid="layers-search-clear"
+            className="tw:mx-3 tw:mt-2 tw:h-8 tw:px-3 tw:text-[13px] tw:font-normal tw:focus:ring-0"
+            onClick={onClearSearch}
+          >
+            Clear search
+          </Button>
+        )}
         {dropFeedback && (
           /* v3 4418:83699: the refusal is a dark card under the rows. */
           <div

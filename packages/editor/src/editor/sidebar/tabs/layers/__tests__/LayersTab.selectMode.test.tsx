@@ -63,40 +63,43 @@ function makeComposer() {
 }
 
 const panel = () => screen.getByTestId("layers-panel-mock");
+/* design-2l9 147:75914 draws the count alone; selection mode is entered from
+   ⋯ › Select mode (152:78185). Re-baseline: Layers footer. */
+const enterSelect = () => {
+  fireEvent.click(screen.getByTestId("layers-panel-menu"));
+  fireEvent.click(screen.getByTestId("layers-menu-select-mode"));
+};
 
 describe("Layers — selection mode", () => {
-  it("is off by default: the count, a Select button, no checkboxes", () => {
+  it("is off by default: the count alone, no checkboxes", () => {
     const { composer, stats } = makeComposer();
     render(<LayersTab composer={composer} onClose={vi.fn()} />);
     stats(96, 0);
     expect(screen.getByTestId("layers-count-text")).toHaveTextContent("96 layers");
-    expect(screen.getByRole("button", { name: "Select" })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Select" })).toBeNull();
     expect(panel().getAttribute("data-selecting")).toBe("false");
     expect(screen.queryByRole("button", { name: "Done" })).toBeNull();
     expect(screen.queryByRole("button", { name: "Select all" })).toBeNull();
-    expect(screen.getByTestId("layers-dim-info")).toBeTruthy();
+    expect(screen.queryByTestId("layers-dim-info")).toBeNull();
   });
 
-  it("Select turns the checkboxes on and becomes Done; nothing ticked → Select all only", () => {
+  it("Select mode turns the checkboxes on with Done; nothing ticked → Select all only", () => {
     const { composer, stats } = makeComposer();
     render(<LayersTab composer={composer} onClose={vi.fn()} />);
     stats(96, 0);
-    fireEvent.click(screen.getByRole("button", { name: "Select" }));
+    enterSelect();
     expect(panel().getAttribute("data-selecting")).toBe("true");
-    expect(screen.queryByRole("button", { name: "Select" })).toBeNull();
     expect(screen.getByRole("button", { name: "Done" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Select all" })).toBeTruthy();
     expect(screen.queryByRole("button", { name: "Deselect all" })).toBeNull();
     expect(screen.getByTestId("layers-count-text")).toHaveTextContent("96 layers");
-    // The dim-scope ⓘ stands down so the band has room for the actions.
-    expect(screen.queryByTestId("layers-dim-info")).toBeNull();
   });
 
   it("some ticked → both Select all and Deselect all, and the count reads 'N selected'", () => {
     const { composer, stats } = makeComposer();
     render(<LayersTab composer={composer} onClose={vi.fn()} />);
     stats(96, 0);
-    fireEvent.click(screen.getByRole("button", { name: "Select" }));
+    enterSelect();
     stats(96, 3);
     expect(screen.getByTestId("layers-count-text")).toHaveTextContent("3 selected");
     expect(screen.getByRole("button", { name: "Select all" })).toBeTruthy();
@@ -106,7 +109,7 @@ describe("Layers — selection mode", () => {
   it("all ticked → Deselect all only", () => {
     const { composer, stats } = makeComposer();
     render(<LayersTab composer={composer} onClose={vi.fn()} />);
-    fireEvent.click(screen.getByRole("button", { name: "Select" }));
+    enterSelect();
     stats(96, 96);
     expect(screen.queryByRole("button", { name: "Select all" })).toBeNull();
     expect(screen.getByRole("button", { name: "Deselect all" })).toBeTruthy();
@@ -115,7 +118,7 @@ describe("Layers — selection mode", () => {
   it("Select all asks the tree for every listed row; Deselect all clears the selection", () => {
     const { composer, emit, selection, stats } = makeComposer();
     render(<LayersTab composer={composer} onClose={vi.fn()} />);
-    fireEvent.click(screen.getByRole("button", { name: "Select" }));
+    enterSelect();
     stats(96, 3);
     fireEvent.click(screen.getByRole("button", { name: "Select all" }));
     expect(emit).toHaveBeenCalledWith("layers:select-all", {});
@@ -128,19 +131,19 @@ describe("Layers — selection mode", () => {
   it("Done leaves the mode and clears the ticks", () => {
     const { composer, selection, stats } = makeComposer();
     render(<LayersTab composer={composer} onClose={vi.fn()} />);
-    fireEvent.click(screen.getByRole("button", { name: "Select" }));
+    enterSelect();
     stats(96, 3);
     fireEvent.click(screen.getByRole("button", { name: "Done" }));
     expect(selection.clear).toHaveBeenCalled();
     expect(panel().getAttribute("data-selecting")).toBe("false");
-    expect(screen.getByRole("button", { name: "Select" })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Done" })).toBeNull();
   });
 
   it("Escape leaves the mode (and clears) without closing the drawer", () => {
     const onClose = vi.fn();
     const { composer, selection } = makeComposer();
     render(<LayersTab composer={composer} onClose={onClose} />);
-    fireEvent.click(screen.getByRole("button", { name: "Select" }));
+    enterSelect();
     fireEvent.keyDown(document.body, { key: "Escape" });
     expect(panel().getAttribute("data-selecting")).toBe("false");
     expect(selection.clear).toHaveBeenCalled();
@@ -153,7 +156,7 @@ describe("Layers — selection mode", () => {
   it("closing the drawer drops the mode", () => {
     const { composer } = makeComposer();
     const { rerender } = render(<LayersTab composer={composer} onClose={vi.fn()} isOpen />);
-    fireEvent.click(screen.getByRole("button", { name: "Select" }));
+    enterSelect();
     rerender(<LayersTab composer={composer} onClose={vi.fn()} isOpen={false} />);
     rerender(<LayersTab composer={composer} onClose={vi.fn()} isOpen />);
     expect(panel().getAttribute("data-selecting")).toBe("false");

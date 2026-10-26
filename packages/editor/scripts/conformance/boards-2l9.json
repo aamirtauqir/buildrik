@@ -2526,8 +2526,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Footer copy matches ('575 layers · 1 selected') but adds 'Select' + info icon; no 'View' button beside search; no page-root 'Home' row with ⋯. | prior: L-A S2 built, not compared: footer '{N} layers · {K} selected' (layersFooterText, unit-tested against the board copy). Geometry not compared."
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case layers-tree, 284 wide, shots/147-75914.png): search + 'View' beside it; the open page heads the tree (page glyph + name); children from x28 with 16px lucide chevrons; footer the count alone ('N layers · K selected' — Select and the ⓘ left the band; Select mode is in ⋯, the dim note in Layer display). Search field fill is chrome-ui PanelSearch (REQUESTS A-15); the page row's ⋯ is not drawn (no page actions in Layers)."
   },
   {
    "nodeId": "147:76329",
@@ -2536,8 +2536,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Popover lists same 5 toggles + footnote, but title 'Display' (board 'Layer display'), no Close button; opened via ⋯ › Display settings… not header 'View'. | prior: L-A S2 built, not compared: footnote 'Personal editor view. Live-site visibility is edited in the Inspector.' under the five toggles. The board opens it from a header 'View' control; the code keeps ⋯ › Display settings… (not moved)."
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (layers-tree → View, shots/147-76329.png): 'Layer display' 13/600 ink, five switches, the footnote, Close — taking the tree's place, opened by View beside the search (⋯ › Display settings… removed)."
   },
   {
    "nodeId": "147:76773",
@@ -2556,8 +2556,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Footer '575 layers · 11 matches' ok. Parent shown right-aligned one word ('Container') not path line under name; no '{n} matches in {N} layers' head, no end 'Clear search'. | prior: L-A wave 2 built, not compared: flat search results carry their ancestors ('Services › Card 1') after the name; footer '5,000 layers · 12 matches'. The board's list-head '12 matches in 5,000 layers' line and end-of-list Clear search are not drawn (Clear search sits in the field)."
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (layers-tree with a query, shots/147-77189.png): head '{n} matches in {N} layers' 13/600; each result's path on its own muted line under the row at x12; 'Clear search' after the list; footer '{N} layers · {n} matches'. The board's per-result chevron is not drawn (flat results have no children)."
   },
   {
    "nodeId": "147:77668",

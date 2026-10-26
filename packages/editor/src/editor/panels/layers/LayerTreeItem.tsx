@@ -5,6 +5,7 @@
  */
 
 import * as React from "react";
+import { ChevronDown } from "lucide-react";
 import { getEditorViewMode } from "@shared/utils/editorViewMode";
 import { useEditLocks } from "@/editor/shared/useEditLocks";
 import type { Composer } from "@/engine";
@@ -142,7 +143,11 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
      from the drawer edge — base 16, step 16. The first 16 is the selection
      checkbox's gutter (see LayerTreeItem.indent.test.tsx). */
   const rowStyle: React.CSSProperties = {
-    paddingLeft: `${16 + layer.depth * 16}px`,
+    /* design-2l9 147:75914: the page row sits at the top, so its children's
+       chevrons start at 28 (then 16 a level). */
+    paddingLeft: `${28 + layer.depth * 16}px`,
+    /* A search result carries its path on a second line (147:77189). */
+    ...(layer.searchPath ? { height: "auto", flexWrap: "wrap" } : {}),
   };
 
   const rowClassNames = [
@@ -276,7 +281,8 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
             if (hasChildren) onToggleExpand(layer.id);
           }}
         >
-          {"\u25BE"}
+          {/* design-2l9 147:75914: a 16px chevron (the closed row turns it). */}
+          <ChevronDown size={16} aria-hidden="true" />
         </Button>
 
         {/* Was a 12px solid ink-muted square (board 244:1580, the same call as
@@ -320,14 +326,6 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
         ) : (
           <>
             <span className="bdc-lr-nm" data-testid={`layer-name-${layer.id}`}>{displayName}</span>
-            {layer.searchPath && (
-              <span
-                className="tw:min-w-0 tw:truncate tw:pl-2 tw:text-[11px] tw:text-[var(--bk-ink-muted)]"
-                data-testid={`layer-search-path-${layer.id}`}
-              >
-                {layer.searchPath}
-              </span>
-            )}
             {isInstance && (
               <span
                 className="bdc-lr-comp"
@@ -424,6 +422,16 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
             )}
           </svg>
         </Button>
+        )}
+        {/* design-2l9 147:77189: a search result names where it sits on its
+            own line under the row ("Services › Card 1"). */}
+        {layer.searchPath && (
+          <span
+            className="tw:-ml-4 tw:basis-full tw:truncate tw:pb-1 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]"
+            data-testid={`layer-search-path-${layer.id}`}
+          >
+            {layer.searchPath}
+          </span>
         )}
       </div>
       {isExpanded && hasChildren && layer.children.map((child) => (

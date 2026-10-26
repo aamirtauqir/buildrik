@@ -15,8 +15,9 @@ import { describe, it, expect, vi } from "vitest";
 import { render, fireEvent } from "@testing-library/react";
 import { LayerTreeItem, type LayerTreeItemProps } from "../LayerTreeItem";
 
-/** Board 4418:81300, chevron x (relative to the drawer) by depth. */
-const BOARD_CHEVRON_X = [16, 32, 48];
+/** design-2l9 147:75914 (re-baseline from 4418:81300's 16/32/48): the page
+ *  row heads the tree, so depth 0's chevron sits at 28, then 16 a level. */
+const BOARD_CHEVRON_X = [28, 44, 60];
 
 const noop = () => {};
 function rowFor(depth: number, extra: Partial<LayerTreeItemProps> = {}) {
@@ -44,7 +45,7 @@ function rowFor(depth: number, extra: Partial<LayerTreeItemProps> = {}) {
   return container.querySelector('[role="treeitem"]') as HTMLElement;
 }
 
-describe("Layers indent ladder — board 4418:81300", () => {
+describe("Layers indent ladder — board 147:75914", () => {
   it("puts every depth's chevron where the board puts it", () => {
     expect(BOARD_CHEVRON_X.map((_, d) => rowFor(d).style.paddingLeft)).toEqual(BOARD_CHEVRON_X.map((x) => `${x}px`));
   });
@@ -63,7 +64,7 @@ describe("Layers indent ladder — board 4418:81300", () => {
     expect(box).not.toBeNull();
     expect(box.getAttribute("aria-label")).toBe("Select Container");
     expect(box.checked).toBe(false);
-    expect(row.style.paddingLeft).toBe("16px");
+    expect(row.style.paddingLeft).toBe("28px");
   });
 
   it("in selection mode a selected row is ticked — even a lone one", () => {

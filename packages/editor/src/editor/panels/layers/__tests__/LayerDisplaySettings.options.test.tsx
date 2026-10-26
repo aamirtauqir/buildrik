@@ -134,3 +134,20 @@ describe("LayersPanel — the options change the tree", () => {
     expect(screen.getByText(/^h[1-6]$/)).toBeInTheDocument();
   });
 });
+
+/* design-2l9 board 147:76329. Re-baseline: Layer display title + Close. */
+describe("LayerDisplaySettings — board 147:76329", () => {
+  it("is titled Layer display, ends with the footnote and Close", () => {
+    const onClose = vi.fn();
+    render(
+      <LayerDisplaySettings
+        prefs={{ showDimmed: true, showLockBadges: true, treeDensity: "comfortable", highlightCmsBound: false, showHtmlBadges: false } as LayerDisplayPrefs}
+        onChange={vi.fn()}
+        onClose={onClose}
+      />,
+    );
+    expect(screen.getByTestId("layers-display-title")).toHaveTextContent("Layer display");
+    fireEvent.click(screen.getByTestId("layers-display-close"));
+    expect(onClose).toHaveBeenCalled();
+  });
+});
