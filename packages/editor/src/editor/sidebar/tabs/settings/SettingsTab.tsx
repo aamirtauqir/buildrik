@@ -743,7 +743,9 @@ export const SettingsTab: React.FC<
       registerSaveHandler,
       registerFlushHandler,
       onLoadStateChange: setLoadState,
-      saveError,
+      /* B8-S04 / GAP-ST-E: a refused save is said in the footer, not in a
+         banner over the cards — screens get no save banner. */
+      saveError: null,
       registerHeaderAction,
       registerHeader,
       saveModel: SCREEN_SAVE_MODEL[screenId],
@@ -806,7 +808,7 @@ export const SettingsTab: React.FC<
         : footerMessage
           ? { text: footerMessage, tone: "muted" }
           : saveError
-            ? { text: "Couldn’t save", tone: "danger" }
+            ? { text: "Couldn’t save — Retry. Your edits are still here.", tone: "danger" }
             : screenIsDirty
               ? { text: "Unsaved changes", tone: "ink" }
               : savedAck && screenRules?.scope === "publish"
@@ -1004,7 +1006,8 @@ export const SettingsTab: React.FC<
               </h2>
             </div>
             {/* B8-S01: the Overview draws no scope chip. */}
-            {isOverview ? null : (
+            {/* B8-S01 / S16: the Overview and the Danger zone draw no scope chip. */}
+            {isOverview || screenRules?.scope === "lifecycle" ? null : (
               <p
                 className="tw:m-0 tw:w-fit tw:max-w-full tw:truncate tw:rounded-full tw:bg-[var(--bk-bg-subtle)] tw:px-2.5 tw:text-[length:var(--bk-text-12)] tw:leading-6 tw:text-[var(--bk-ink-soft)]"
                 data-testid="set-head-scope"
@@ -1097,6 +1100,8 @@ export const SettingsTab: React.FC<
             >
               {footStatus.text}
             </span>
+            {/* B8-SH07: while the save runs the footer is the status and Saving… only. */}
+            {saving ? null : (
             <Button
               type="button"
               variant="secondary"
@@ -1108,6 +1113,7 @@ export const SettingsTab: React.FC<
             >
               Discard
             </Button>
+            )}
             <Button
               type="button"
               size="xs"
@@ -1116,7 +1122,7 @@ export const SettingsTab: React.FC<
               onClick={() => handleSave()}
               data-testid="set-foot-save"
             >
-              {saving ? "Saving…" : saveError && !footerMessage ? "Retry save" : "Save settings"}
+              {saving ? "Saving…" : "Save settings"}
             </Button>
           </footer>
         )}

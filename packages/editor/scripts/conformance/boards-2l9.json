@@ -14509,9 +14509,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "General card content now as 238:10283 (Site / Icons). Settings chrome now per board (compared 2026-10-26, probe SettingsTab on General at 1440x900 vs 238:10283/238:11495 screenshots): text-only 32px nav rows, Danger zone under Advanced, 'ORGANIZATION WORKSPACE ↗' with Members ↗ / Billing ↗ / Integrations ↗, 'Your role' + 'Permissions ›', 'Search settings' entry (Search Mode kept: owner 2026-10-04), '‹ Back to Editor · {page}' + 20/600 title in the pane header, scope chip, white body, 56px footer 'Unsaved changes' · Discard · Save settings. Still open: Settings is a full-page view, not inside the editor shell (REQUESTS), and Billing keeps its plan pill (code-ahead).",
+   "authority": "code:no-tagline-field",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27: shots/238-10889.png vs probe (a refused save) — footer \"Couldn’t save — Retry. Your edits are still here.\" in error ink, Discard + \"Save settings\", no banner over the cards; General's cards as 238:10283 (Author in the Tagline slot).",
    "tier": "P2"
   },
   {
@@ -14641,9 +14641,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/DangerZoneScreen.tsx:104 — archive/transfer/delete + typed delete exist (DeleteSiteModal); copy differs",
+   "authority": "code:transfer-is-to-a-member",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27: shots/238-14472.png vs probe Danger zone at 1440x900 — one 720 card (255 vs board 247), ruled rows Archive site / Transfer site / Delete site with lines and links Archive · Transfer… · Delete site… (error ink), no scope chip. Transfer line says \"Move it to another member of this workspace.\" — the board's \"another workspace you own\" is not what transferSite does.",
    "tier": "P2"
   },
   {
@@ -14942,7 +14942,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared (saving state): footer 'Saving settings…', button 'Saving…' (tested).",
+   "verifiedNote": "Wave 3b: while saving the footer is 'Saving settings…' with only the disabled 'Saving…' (no Discard), as drawn (tested); the probe's save fails too fast to capture the state.",
    "tier": "P2"
   },
   {
@@ -17874,9 +17874,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "open:board-conflict-csv-copy",
+   "authority": "code:board-conflict-277-346467",
    "verified": "drift-open",
-   "verifiedNote": "Primary 'Back to submissions' now as drawn; body copy conflicts with 272:24319 ('Your filters and selection are kept.' vs 'Your selection and filters are unchanged.') — 272:24319's kept; owner to pick.",
+   "verifiedNote": "Board conflict kept as decided (coordinator 2026-10-27): 272:24319's body copy ('Your selection and filters are unchanged.') wins over this cell's ('Your filters and selection are kept.'); primary Back to submissions as drawn.",
    "tier": "P3"
   },
   {
@@ -17907,9 +17907,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "open:board-conflict-delete-confirm",
+   "authority": "code:board-conflict-277-347389",
    "verified": "drift-open",
-   "verifiedNote": "Boards disagree on one dialog: B8-S14 (P2) draws the short consequence copy with an outline red 'Delete'; GAP-FMC/FM07 draw the names + context and a primary 'Delete permanently'. S14 adopted (higher tier); owner to pick.",
+   "verifiedNote": "Board conflict kept as decided (coordinator 2026-10-27): B8-S14 238:13898 (P2) is the delete confirm — short consequence copy, outline red Delete; this GAP-FMC cell draws names + context and a primary 'Delete permanently'.",
    "tier": "P3"
   },
   {
