@@ -43,8 +43,10 @@ function set(next: CmsWorkspaceState): void {
 }
 
 /** Asked before a move that closes the open record; returns true when it
- *  took the move over (it calls `go` itself once the person agrees). */
-export type CmsLeaveGuard = (go: () => void) => boolean;
+ *  took the move over (it calls `go` itself once the person agrees). `next`
+ *  is where the move lands, so the guard can name it ("before opening
+ *  Fields", 168:21408). */
+export type CmsLeaveGuard = (go: () => void, next: CmsWorkspaceState) => boolean;
 let leaveGuard: CmsLeaveGuard | null = null;
 
 /**
@@ -57,7 +59,7 @@ let leaveGuard: CmsLeaveGuard | null = null;
 function navigate(next: CmsWorkspaceState): void {
   const closesRecord =
     state.recordId !== null && (next.recordId !== state.recordId || next.collectionId !== state.collectionId);
-  if (closesRecord && leaveGuard?.(() => set(next))) return;
+  if (closesRecord && leaveGuard?.(() => set(next), next)) return;
   set(next);
 }
 
