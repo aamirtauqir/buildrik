@@ -44,6 +44,21 @@ As in the master plan (`docs/superpowers/plans/2026-10-22-implement-2l9-design.m
 
 Rows closed this run are `drift-open` with notes ("built, not compared" where no image exists); none is marked `drift-fixed` because the dump carries copy and structure only. The lead's live walk is the comparison.
 
+## Status (wave 2, 2026-10-26)
+
+| Item | Commit | State |
+|---|---|---|
+| C-11 Open collection origin | `1db255b46` | done (the binding detail's Open record carries it too) |
+| C-13 Choose source · binding detail · Dynamic bindings (replaces A10) | `e8623d198` | done — Site / Page sources drawn "Planned" (`code:cms-sources-only`) |
+| A7b presets-first add | `7c3fd490c` | done |
+| A7c Play · More… actions · Trigger / Effect | `2f0a1daff` | done; Repeat / When / Animate rows, Undo receipts open |
+| P1 drafts "Last applied", custom expressions | `5c0cd02b3` | done |
+| P2 px ↔ rem / em conversion | `6ec24a1fb` | done; property-specific unit lists (I06) open |
+| F1 font source + applied stack | `61ec6b603` | done; R05 load failure, R06 stale target open |
+| B1 batch eligibility + Inspect rows | `9b42058c7` | done; per-section "Apply to n eligible" open |
+| S2 layer review before removal | `e94bc1396` | done |
+| manifest cleanup | `fffa7c08c` | 14 L-F recovery rows restored to base |
+
 ## Archetypes (ordered: Play-journey steps first, then the largest drift clusters)
 
 ### A1 · Tab chassis — Content · Style · Behavior · Effects  (~200 rows inherit; direct: 36:2, 161:8480, 156:716, 161:13919)

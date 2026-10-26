@@ -35,6 +35,8 @@ import { SectionFrameContext, type SectionFrame } from "../shared/controls/Secti
 import { InspectorFieldContext } from "../shared/controls/InspectorFieldContext";
 import { sectionOverrideMarks } from "../shared/controls/OverrideDot";
 import { capabilitiesFor } from "@/shared/constants/elementCapabilities";
+import { BindingDetail } from "../sections/binding/BindingDetail";
+import { openBindingDetail, useBindingDetail } from "../sections/binding/bindingDetailStore";
 
 // ============================================================================
 // TYPES
@@ -109,6 +111,9 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
   } = props;
 
   const field = React.useContext(InspectorFieldContext);
+  const detailFor = useBindingDetail();
+  /* Another element closes the binding detail (Play F2.05). */
+  React.useEffect(() => () => openBindingDetail(null), [selectedElement.id]);
   const type = selectedElement.type;
   const caps = capabilitiesFor(type);
   const isMultiSelect = selectedIds.length > 1;
@@ -132,6 +137,10 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
     mixedKeys: cssContext.mixedKeys,
     isMultiSelect,
   };
+
+  if (tabId === "content" && detailFor === selectedElement.id && selectedIds.length <= 1) {
+    return <BindingDetail composer={composer} elementId={selectedElement.id} onOpenCreateCollection={onOpenCreateCollection} />;
+  }
 
   const ids = visibleSectionIds(tabId, selectedTypes.length ? selectedTypes : [type], baseCtx);
   const modes = ids.map((id) => {

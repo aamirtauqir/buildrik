@@ -41,7 +41,7 @@ describe("MultiSelectBar — board 22", () => {
   it("rows in board order: Align, Distribute, Group, then the note", () => {
     setup(3);
     const bar = screen.getByTestId("inspector-multi-bar");
-    expect(bar.textContent).toMatch(/^Align.*Distribute.*Horizontal.*Vertical.*Group.*Edits apply to all 3\. One Undo restores all 3\.$/);
+    expect(bar.textContent).toMatch(/^Align.*Distribute.*Horizontal.*Vertical.*Group.*Edits apply to all 3\. One Undo restores all 3\..*Selection.*No DOM ID batch write\./);
   });
 
   it("six align actions, named for a screen reader; none stays lit", () => {
@@ -82,5 +82,22 @@ describe("MultiSelectBar — board 22", () => {
     setup(3, true);
     expect(screen.getByTestId("inspector-multi-group")).toBeDisabled();
     expect(screen.getByTitle("Group needs elements that share a parent")).toBeInTheDocument();
+  });
+
+  it("2L9 B01: a locked target is said to be excluded — 'n of N eligible'", () => {
+    const { composer, ids } = setup(3);
+    cleanup();
+    composer.elements.getElement(ids[2])!.setLocked(true);
+    render(<MultiSelectBar composer={composer} selectedIds={ids} />);
+    expect(screen.getByTestId("inspector-multi-note")).toHaveTextContent("2 of 3 eligible. Locked Heading 3 is excluded and remains unchanged.");
+  });
+
+  it("2L9 B01: Selection lists each target; Inspect narrows the selection to it", () => {
+    const { composer, ids } = setup(2);
+    const rows = screen.getAllByTestId("inspector-multi-inspect");
+    expect(rows.map((r) => r.textContent)).toEqual(["Inspect Heading 1", "Inspect Heading 2"]);
+    fireEvent.click(rows[1]);
+    expect(composer.selection.getSelectedIds()).toEqual([ids[1]]);
+    expect(screen.getByTestId("inspector-multi-identity-note")).toHaveTextContent("No DOM ID batch write. Choose one object for identity, binding and child-list tasks.");
   });
 });

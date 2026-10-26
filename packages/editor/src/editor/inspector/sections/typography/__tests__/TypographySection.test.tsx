@@ -33,9 +33,11 @@ describe("Typography section", () => {
     expect(screen.queryByRole("button", { name: /More settings/ })).toBeNull();
   });
 
-  it("the Font field reads the family, not its fallback stack", () => {
+  it("the Font field reads the family and its source, not its fallback stack", () => {
     render(<TypographySection styles={{ "font-family": "Inter, sans-serif" }} onChange={vi.fn()} isOpen />);
-    expect(screen.getByRole("button", { name: "Font family" }).textContent).toBe("Inter");
+    /* 2L9 R01: the family, then where it comes from; the written stack below. */
+    expect(screen.getByRole("button", { name: "Font family" }).textContent).toBe("Inter · Google Fonts");
+    expect(screen.getByTestId("font-applied-stack")).toHaveTextContent("Applied stack: Inter, sans-serif");
   });
 
   it("picking a font writes font-family", () => {

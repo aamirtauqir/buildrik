@@ -122,9 +122,9 @@ const sectionNames = () =>
   screen.getAllByRole("button", { name: / section, (expanded|collapsed)$/ }).map((b) => b.getAttribute("aria-label")!.replace(/ section, .*/, ""));
 
 describe("InspectorTabContent — one order per tab, presence by capability", () => {
-  it("heading · Content: the type block leads, then CMS binding, Attributes (2L9 161:8480)", () => {
+  it("heading · Content: the type block leads, then Semantics, Advanced attributes (2L9 161:8480)", () => {
     renderTab({ tabId: "content", elementType: "heading" });
-    expect(sectionNames()).toEqual(["Heading", "CMS binding", "Semantics", "Advanced attributes"]);
+    expect(sectionNames()).toEqual(["Heading", "Semantics", "Advanced attributes"]);
   });
 
   it("heading · Style: Typography, Size, Spacing, Fill, Border — no type block", () => {

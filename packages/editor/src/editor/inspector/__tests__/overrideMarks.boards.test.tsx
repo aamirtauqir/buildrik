@@ -49,7 +49,16 @@ describe("override marks — boards 27 / 28", () => {
     expect(within(fill).getByTestId("inspector-section-note").textContent).toBe("Overridden on :hover");
     /* The Colour row itself carries the dot (board 27 "Colour ●"). */
     expect(within(fill).getByTestId("inspector-override-dot-pseudo")).toBeTruthy();
+    /* 2L9 S13: Reset reviews the exact Hover properties before it removes. */
     act(() => fireEvent.click(screen.getByTestId("inspector-state-reset")));
+    const review = screen.getByTestId("inspector-override-review");
+    expect(review).toHaveTextContent("Hover overrides");
+    expect(review).toHaveTextContent("1 set");
+    expect(screen.getAllByTestId("inspector-override-entry").map((e) => e.textContent)).toEqual(["Background colorred"]);
+    expect(screen.getByTestId("inspector-override-consequence")).toHaveTextContent(
+      "Removing this 1 Hover property reveals each property’s Default-state value. Other states stay unchanged.",
+    );
+    act(() => fireEvent.click(screen.getByTestId("inspector-override-remove")));
     expect(screen.queryByTestId("inspector-state-overrides")).toBeNull();
     expect(screen.queryByTestId("inspector-section-note")).toBeNull();
   });
@@ -66,6 +75,10 @@ describe("override marks — boards 27 / 28", () => {
     expect(within(size).getByRole("img", { name: "Overridden on Tablet" })).toBeTruthy();
     expect(within(size).getByTestId("inspector-section-note").textContent).toBe("Overridden on Tablet");
     act(() => fireEvent.click(screen.getByTestId("inspector-bp-revert")));
+    /* 2L9 S15: the exact property and what Desktop shows under it. */
+    expect(screen.getByTestId("inspector-override-review")).toHaveTextContent("Tablet overrides");
+    expect(screen.getByTestId("inspector-override-consequence")).toHaveTextContent("Removing Tablet overrides reveals Desktop");
+    act(() => fireEvent.click(screen.getByTestId("inspector-override-remove")));
     expect(screen.queryByTestId("inspector-section-note")).toBeNull();
   });
 

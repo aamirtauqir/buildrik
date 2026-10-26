@@ -34,6 +34,7 @@ const adaptTypeBlock = (ctx: SectionContext) => ({
   onOpenIconPicker: ctx.onOpenIconPicker,
   isOpen: ctx.isOpen,
   onToggle: ctx.onToggle,
+  onOpenCreateCollection: ctx.onOpenCreateCollection,
 });
 
 export const TYPE_SECTIONS: Record<string, AnySectionEntry> = {

@@ -35,7 +35,7 @@ import { LinkSection } from "../sections/LinkSection";
 import { CSSClassesSection } from "../sections/CSSClassesSection";
 import { CollectionListSection } from "../sections/CollectionListSection";
 import { useFieldOverrides } from "../hooks/useFieldOverrides";
-import { CmsBindingSection } from "../sections/CmsBindingSection";
+import { BindingDetail } from "../sections/binding/BindingDetail";
 import { InspectorElementMenu } from "../components/InspectorElementMenu";
 import { useStyleHandlers } from "../hooks/useStyleHandlers";
 
@@ -256,11 +256,11 @@ describe("P-1 — CMS binding writers refuse a locked element", () => {
     expect(emit).toHaveBeenCalledWith(EVENTS.LOCKED_ELEMENTS_SKIPPED, undefined);
   });
 
-  it("CmsBindingSection: Unbind", () => {
+  it("BindingDetail: Unbind — keep shown text", () => {
     const { c, unbindAll } = cmsComposer(true);
-    render(<CmsBindingSection composer={c} elementId="list" isOpen />);
-    const unbind = screen.queryByRole("button", { name: "Unbind" });
-    if (!unbind) throw new Error("section did not render the bound state — fixture out of date");
+    render(<BindingDetail composer={c} elementId="list" />);
+    const unbind = screen.queryByRole("button", { name: "Unbind — keep shown text" });
+    if (!unbind) throw new Error("detail did not render the bound state — fixture out of date");
     fireEvent.click(unbind);
     expect(unbindAll).not.toHaveBeenCalled();
   });

@@ -44,12 +44,12 @@ describe("section order", () => {
     expect(INSPECTOR_TABS.map((t) => t.label)).toEqual(["Content", "Style", "Behavior", "Effects"]);
   });
 
-  it("161:8480 — Text · Content: the type block, CMS binding, Attributes", () => {
-    expect(titlesFor("content", "paragraph")).toEqual(["paragraph", "CMS binding", "Semantics", "Advanced attributes"]);
+  it("161:8480 — Text · Content: the type block, Semantics, Advanced attributes (Dynamic bindings only once bound)", () => {
+    expect(titlesFor("content", "paragraph")).toEqual(["paragraph", "Semantics", "Advanced attributes"]);
   });
 
   it("Heading · Content leads with its type block; Style has no type block", () => {
-    expect(titlesFor("content", "heading")).toEqual(["heading", "CMS binding", "Semantics", "Advanced attributes"]);
+    expect(titlesFor("content", "heading")).toEqual(["heading", "Semantics", "Advanced attributes"]);
     expect(titlesFor("style", "heading")).toEqual(["Typography", "Size", "Spacing", "Fill", "Border"]);
   });
 
@@ -62,7 +62,7 @@ describe("section order", () => {
   });
 
   it("249:71560 — Button / Link: text on Content, destination on Behavior", () => {
-    expect(titlesFor("content", "button")).toEqual(["button", "CMS binding", "Semantics", "Advanced attributes"]);
+    expect(titlesFor("content", "button")).toEqual(["button", "Semantics", "Advanced attributes"]);
     expect(titlesFor("behaviour", "button")).toEqual(["Link", "Visibility", "Interactions", "CSS classes"]);
     expect(titlesFor("behaviour", "link")).toEqual(["Link", "Visibility", "Interactions", "CSS classes"]);
   });
@@ -72,7 +72,7 @@ describe("section order", () => {
   });
 
   it("36:2 — Image · Content holds the source; fit and dimensions are Style's", () => {
-    expect(titlesFor("content", "image")).toEqual(["image", "CMS binding", "Semantics", "Advanced attributes"]);
+    expect(titlesFor("content", "image")).toEqual(["image", "Semantics", "Advanced attributes"]);
     expect(titlesFor("style", "image")).toEqual(["Size", "Spacing", "Fill", "Border"]);
   });
 

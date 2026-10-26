@@ -4369,7 +4369,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No inline \"Enter a non-negative number… Last applied: 24 px\"; draft not retained"
+   "verifiedNote": "Lane L-B P1 (built, not compared — copy checked against the dump): an unreadable entry keeps its draft in the field and says 'Enter a non-negative number and a supported unit. Last applied: 24 px.' (non-negative properties; others 'Enter a number and a supported unit. …'); a negative on a non-negative property is refused the same way."
   },
   {
    "nodeId": "161:10007",
@@ -4410,7 +4410,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No px→rem conversion on unit change"
+   "verifiedNote": "Lane L-B P2 (built, not compared): a unit change converts px ↔ rem / em at 16 px (24px → 1.5rem → 24px), keeping the rendered size; other pairs keep the number. Open: the board's conversion note line."
   },
   {
    "nodeId": "161:12005",
@@ -4420,7 +4420,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "calc() not shown as \"Custom value · Preserved as authored\""
+   "verifiedNote": "Lane L-B P1 (built, not compared): a calc() / clamp() / min() / max() value shows as authored, the row reads '{Label} · Custom value', no unit menu or stepper, note 'Preserved as authored. Enter an explicit supported value to replace it.'; focus + blur writes nothing; an explicit value replaces it."
   },
   {
    "nodeId": "161:12525",
@@ -4481,7 +4481,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code trigger groups under \"Choose Trigger\"; board presets first, then \"Choose a trigger ›\""
+   "verifiedNote": "Lane L-B A7b (built, not compared — copy checked against the dump): '+ Add interaction' opens a screen replacing the list — '‹ Back to Interactions', 'Add interaction', the seven presets in board order (each = trigger + animation preset of the existing model), 'Choose a trigger ›' (all triggers, grouped), 'Plays when rendered (CSS) ›' (the element's CSS entrance animation). Not drawn: Visibility above it (the section only owns Interactions)."
   },
   {
    "nodeId": "161:15179",
@@ -4491,7 +4491,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Lane L-B A7 (built, not compared): the interaction screen's back row reads '‹ Back to Interactions'. Open: Play / More…, Repeat / When rows, 'Interaction added · Undo' receipt."
+   "verifiedNote": "Lane L-B A7c (built, not compared — copy checked against the dump): '‹ Back to Interactions', 'Play', 'More…', Trigger, Effect, Duration, Delay, Easing, 'Plays on all breakpoints'. Open: Animate (target), Repeat, When rows (the model's loop/target semantics are not surfaced yet), 'Interaction added · Undo' receipt."
   },
   {
    "nodeId": "161:15688",
@@ -4552,7 +4552,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Inline Disable/Delete buttons; board \"Interaction actions\" menu Duplicate/Disable/Delete"
+   "verifiedNote": "Lane L-B A7c (built, not compared): More… opens 'Interaction actions' — Duplicate (copy after the original, opened), Disable / Enable, Delete."
   },
   {
    "nodeId": "165:18272",
@@ -4593,7 +4593,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Inline Disable/Delete buttons; board \"Interaction actions\" menu Duplicate/Disable/Delete",
+   "verifiedNote": "Lane L-B A7c (built, not compared): Interaction actions menu — see 165:17822.",
    "inheritsFrom": "165:17822"
   },
   {
@@ -5071,7 +5071,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Mixed detection exists; no \"2 of 3 eligible\", locked exclusion, per-target Inspect rows"
+   "verifiedNote": "Lane L-B B1 (built, not compared — copy checked against the dump): the multi bar says '2 of 3 eligible. Locked {name} is excluded and remains unchanged.' when a target is locked (writes already skip it), lists 'Selection · Inspect {name}' rows that narrow to one object, and ends 'No DOM ID batch write. Choose one object for identity, binding and child-list tasks.'. Open: the eligibility count in the header line (B-10, lead) and the per-section 'Typography eligibility' / 'Apply to 2 eligible headings' rows."
   },
   {
    "nodeId": "247:28584",
@@ -5121,7 +5121,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Board \"Inter · System\" source label + \"Applied stack\"; code family name only"
+   "verifiedNote": "Lane L-B F1 (built, not compared — copy checked against the dump): the Font field reads '{family} · {source}' (System / Google Fonts / Uploaded) and the row adds 'Applied stack: {stack}' for a written stack. Open: 'Choose font' label on the trigger."
   },
   {
    "nodeId": "247:31047",
@@ -5352,7 +5352,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Board \"Inter · System\" source label + \"Applied stack\"; code family name only",
+   "verifiedNote": "Lane L-B F1 (built, not compared): source-aware font field — see 247:30567.",
    "inheritsFrom": "247:30567"
   },
   {
@@ -5526,7 +5526,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Reset is a link; board lists the exact Hover properties before removal"
+   "verifiedNote": "Lane L-B S2 (built, not compared — copy checked against the dump): Reset opens 'Hover overrides · n set' with each property and value, 'Removing these n Hover properties reveals each property’s Default-state value. Other states stay unchanged.', 'Remove Hover overrides' / 'Keep overrides'."
   },
   {
    "nodeId": "255:88837",
@@ -5547,7 +5547,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Revert is a link; board lists properties + Desktop fallback values"
+   "verifiedNote": "Lane L-B S2 (built, not compared): Revert opens 'Tablet overrides · n set' with each property and value and 'Removing Tablet overrides reveals Desktop: {property value, …}. Other breakpoints and states are retained.' (board names the retained layers; the code does not count them), 'Remove Tablet overrides' / 'Keep overrides'."
   },
   {
    "nodeId": "255:89827",
@@ -6050,7 +6050,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code trigger groups under \"Choose Trigger\"; board presets first, then \"Choose a trigger ›\"",
+   "verifiedNote": "Lane L-B A7b (built, not compared): presets-first add screen — see 161:14772.",
    "inheritsFrom": "161:14772"
   },
   {
@@ -7759,7 +7759,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Binding lives in Behaviour \"CMS binding\" (Static/From CMS); board puts it in Content as a property-owned binding entry"
+   "verifiedNote": "Lane L-B C-13 (built, not compared): unbound text shows its static value on the type block's 'Text' row with a Bind button; no Dynamic bindings section until bound."
   },
   {
    "nodeId": "173:9019",
@@ -7789,7 +7789,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Content \"Dynamic bindings\" row + Blog·title value + receipt \"Title bound… Undo\"; code: Behaviour Field select + preview line"
+   "verifiedNote": "Lane L-B C-13 (built, not compared): bound — Dynamic bindings heads Content; the property row reads '{Collection} · {field}', the preview value and 'This page’s record · i of N'."
   },
   {
    "nodeId": "173:10329",
@@ -7799,7 +7799,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Subview Source/Format/If empty/Preview/Open record/Unbind; no Format/If-empty UI (engine fallback CMSBindingManager.ts:49)"
+   "verifiedNote": "Lane L-B C-13 (built, not compared): binding subview — see 302:13946."
   },
   {
    "nodeId": "173:10713",
@@ -7860,7 +7860,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Empty value → fallback shown + status note; engine fallback (CMSBindingManager.ts:218) but no status row"
+   "verifiedNote": "Lane L-B C-13 (built, not compared): 'Binding status · Empty — showing fallback “…”.'."
   },
   {
    "nodeId": "173:13534",
@@ -7870,7 +7870,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "\"Loading Blog records…\" status; code shows \"…\" (CmsBindingSection.tsx:305)"
+   "verifiedNote": "Lane L-B C-13 (built, not compared): 'Loading…' preview and 'Binding status · Loading {Collection} records…'."
   },
   {
    "nodeId": "173:14104",
@@ -7880,7 +7880,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "\"Couldn't load Blog. Binding kept · Retry\"; code catch leaves preview null → \"…\" forever (CmsBindingSection.tsx:189)"
+   "verifiedNote": "Lane L-B C-13 (built, not compared): 'Preview unavailable', 'Couldn’t load {Collection}. Your binding is kept.' + Retry."
   },
   {
    "nodeId": "173:14676",
@@ -7890,7 +7890,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Field deleted → \"Choose field\"; code detects only deleted collection (CmsBindingSection.tsx:125,:284)"
+   "verifiedNote": "Lane L-B C-13 (built, not compared): '{field} no longer exists. Choose a field.' + Choose field (reopens Choose source)."
   },
   {
    "nodeId": "173:15249",
@@ -7900,7 +7900,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Field type changed to Image → \"Choose a text field\"; no type-drift check in code"
+   "verifiedNote": "Lane L-B C-13 (built, not compared): '{field} is now {Type}. Choose a text field.' + Choose field."
   },
   {
    "nodeId": "173:15823",
@@ -20881,7 +20881,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "No \"Choose source\" popover (Record data/List item/Specific record/Site & page/Live). Code: Collection+Field selects."
+   "verifiedNote": "Lane L-B C-13 (built, not compared — copy checked against the dump): the type block's bindable property row has a Bind button that opens 'Choose source' — search 'Search sources or fields…', RECORD DATA (This page’s record · {Collection} on its template page, List item — off with 'Select an element inside a collection list' outside a list, Specific record 'Pin one record to this property'), SITE & PAGE (Site, Page), LIVE SOURCES (Date, URL parameter, Cookie). Site and Page are drawn 'Planned' with the live sources: the binding model reads CMS collections only (code wins on those two rows)."
   },
   {
    "nodeId": "302:12784",
@@ -20911,7 +20911,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Binding subview: Open record/Unbind exist (CmsBindingSection.tsx:314); Format and If empty missing."
+   "verifiedNote": "Lane L-B C-13 (built, not compared): binding detail replaces the Content tab — '‹ Back to Content', '{Property} binding', Source + Change…, context line, Record (specific record only), Format 'As written', If empty (stored as the binding's fallback), Preview, 'Open record ›' (C-11 origin '{element} · {Property} binding'), 'Unbind — keep shown text', 'Keeps “…” as static text.'."
   },
   {
    "nodeId": "302:14521",
@@ -21021,7 +21021,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Binding summary subview \"1 binding · Text bindings are edited in Content\" missing."
+   "verifiedNote": "Lane L-B C-13 (built, not compared): Content › Dynamic bindings, drawn only while bound — '1 binding', '{Property} · {Collection}.{field} ›' opening the detail. Open: the board's property label reads the field's role ('Title text'); the row reads the element property ('Text')."
   },
   {
    "nodeId": "302:19069",

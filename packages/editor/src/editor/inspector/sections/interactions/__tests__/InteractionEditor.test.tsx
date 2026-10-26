@@ -74,7 +74,8 @@ describe("InteractionEditor — timing writes (seconds ↔ ms)", () => {
 describe("InteractionEditor — select writes", () => {
   it("changing the animation type writes animation.type", () => {
     const { onUpdate, container } = setup();
-    const [animationSelect] = Array.from(container.querySelectorAll("select"));
+    /* [Trigger, Effect, Easing] — 2L9 I15 puts Trigger first. */
+    const [, animationSelect] = Array.from(container.querySelectorAll("select"));
     const nextValue = animationSelect.options[1].value;
     fireEvent.change(animationSelect, { target: { value: nextValue } });
     expect(onUpdate).toHaveBeenCalledWith(
@@ -87,7 +88,7 @@ describe("InteractionEditor — select writes", () => {
 
   it("changing the easing writes animation.easing", () => {
     const { onUpdate, container } = setup();
-    const easingSelect = Array.from(container.querySelectorAll("select"))[1];
+    const easingSelect = Array.from(container.querySelectorAll("select"))[2];
     const nextValue = easingSelect.options[1].value;
     fireEvent.change(easingSelect, { target: { value: nextValue } });
     expect(onUpdate).toHaveBeenCalledWith(
@@ -99,28 +100,41 @@ describe("InteractionEditor — select writes", () => {
   });
 });
 
-describe("InteractionEditor — actions", () => {
-  it("Preview fires onPreview with the interaction", () => {
+describe("InteractionEditor — actions (2L9 I15, I20)", () => {
+  const more = () => fireEvent.click(screen.getByRole("button", { name: "More…" }));
+
+  it("Play fires onPreview with the interaction", () => {
     const { onPreview, interaction } = setup();
-    fireEvent.click(screen.getByRole("button", { name: "Preview" }));
+    fireEvent.click(screen.getByRole("button", { name: "Play" }));
     expect(onPreview).toHaveBeenCalledWith(interaction);
   });
 
-  it("shows Disable for an enabled interaction and toggles it", () => {
+  it("More… holds Interaction actions: Disable for an enabled interaction, then Delete", () => {
     const { onToggleEnabled } = setup({ enabled: true });
-    fireEvent.click(screen.getByRole("button", { name: "Disable" }));
+    more();
+    expect(screen.getByRole("menu", { name: "Interaction actions" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("menuitem", { name: "Disable" }));
     expect(onToggleEnabled).toHaveBeenCalledWith("i1");
   });
 
-  it("shows Enable for a disabled interaction", () => {
+  it("a disabled interaction offers Enable and keeps its configuration visible (I21)", () => {
     setup({ enabled: false });
-    expect(screen.getByRole("button", { name: "Enable" })).toBeInTheDocument();
+    expect(screen.getByTestId("interaction-disabled")).toBeInTheDocument();
+    more();
+    expect(screen.getByRole("menuitem", { name: "Enable" })).toBeInTheDocument();
   });
 
   it("Delete fires onRemove", () => {
     const { onRemove } = setup();
-    fireEvent.click(screen.getByRole("button", { name: "Delete" }));
+    more();
+    fireEvent.click(screen.getByRole("menuitem", { name: "Delete" }));
     expect(onRemove).toHaveBeenCalledWith("i1");
+  });
+
+  it("Trigger changes the interaction's trigger", () => {
+    const { onUpdate } = setup();
+    fireEvent.change(screen.getByLabelText("Trigger"), { target: { value: "click" } });
+    expect(onUpdate).toHaveBeenCalledWith("i1", { trigger: "click" });
   });
 });
 

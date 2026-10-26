@@ -53,25 +53,38 @@ describe("InteractionsSection", () => {
     expect(matches.length).toBeGreaterThan(0);
   });
 
-  it("shows the trigger picker panel when Add Interaction is clicked", () => {
+  it("2L9 I14: + Add interaction opens presets first, in the board's order, then 'Choose a trigger ›'", () => {
     renderOpen({ interactions: [], onInteractionsChange: vi.fn() });
     fireEvent.click(screen.getByText(/\+ Add interaction/));
-    expect(screen.getByText("Choose Trigger")).toBeInTheDocument();
+    expect(screen.getAllByTestId("add-interaction-preset").map((b) => b.textContent)).toEqual([
+      "Fade in on scroll", "Slide up on scroll", "Fade in on page load", "Grow on hover", "Glow on hover", "Pulse on hover", "Press while held",
+    ]);
+    expect(screen.getByTestId("add-interaction-choose-trigger")).toHaveTextContent("Choose a trigger");
+    /* The add screen replaces the list. */
+    expect(screen.queryByText("No interactions yet.")).toBeNull();
   });
 
-  it("hides the picker panel when close button is clicked", () => {
+  it("a preset adds its trigger and animation", () => {
+    const onChange = vi.fn();
+    renderOpen({ interactions: [], onInteractionsChange: onChange });
+    fireEvent.click(screen.getByText(/\+ Add interaction/));
+    fireEvent.click(screen.getByText("Slide up on scroll"));
+    expect(onChange).toHaveBeenCalledWith([expect.objectContaining({ trigger: "scroll-into-view", animation: expect.objectContaining({ preset: "slideUp" }) })]);
+  });
+
+  it("‹ Back to Interactions leaves the add screen", () => {
     renderOpen({ interactions: [], onInteractionsChange: vi.fn() });
     fireEvent.click(screen.getByText(/\+ Add interaction/));
-    // The × close button rendered via &#215;
-    const closeBtn = screen.getByText("×");
-    fireEvent.click(closeBtn);
-    expect(screen.queryByText("Choose Trigger")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByTestId("add-interaction-back"));
+    expect(screen.queryByTestId("add-interaction")).not.toBeInTheDocument();
+    expect(screen.getByText("No interactions yet.")).toBeInTheDocument();
   });
 
   it("calls onInteractionsChange when a trigger is selected", () => {
     const onChange = vi.fn();
     renderOpen({ interactions: [], onInteractionsChange: onChange });
     fireEvent.click(screen.getByText(/\+ Add interaction/));
+    fireEvent.click(screen.getByText("Choose a trigger"));
     fireEvent.click(screen.getByText("On click"));
     expect(onChange).toHaveBeenCalledOnce();
     const [newList] = onChange.mock.calls[0] as [Interaction[]];
@@ -98,7 +111,8 @@ describe("InteractionsSection", () => {
     });
     // Expand the item to reveal the Delete button
     fireEvent.click(screen.getByText("On hover"));
-    fireEvent.click(screen.getByText("Delete"));
+    fireEvent.click(screen.getByRole("button", { name: "More…" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Delete" }));
     expect(onChange).toHaveBeenCalledWith([]);
   });
 
@@ -110,7 +124,8 @@ describe("InteractionsSection", () => {
       onInteractionsChange: onChange,
     });
     fireEvent.click(screen.getByText("On click"));
-    fireEvent.click(screen.getByText("Disable"));
+    fireEvent.click(screen.getByRole("button", { name: "More…" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Disable" }));
     expect(onChange).toHaveBeenCalledOnce();
     const [updated] = onChange.mock.calls[0] as [Interaction[]];
     expect(updated[0].enabled).toBe(false);
@@ -135,6 +150,7 @@ describe("InteractionsSection", () => {
       elementId: "el-1",
     });
     fireEvent.click(screen.getByText(/\+ Add interaction/));
+    fireEvent.click(screen.getByText("Choose a trigger"));
     act(() => {
       fireEvent.click(screen.getByText("On hover"));
     });
@@ -184,5 +200,18 @@ describe("InteractionsSection — the element animation row", () => {
     expect(screen.queryByText("+ Add interaction")).toBeNull();
     fireEvent.click(screen.getByTestId("interactions-back"));
     expect(screen.getByRole("button", { name: /On click/ })).toBeInTheDocument();
+  });
+
+  it("2L9 I20: Duplicate puts a copy after the original and opens it", () => {
+    const interaction = makeInteraction("hover");
+    const onChange = vi.fn();
+    renderOpen({ interactions: [interaction], onInteractionsChange: onChange });
+    fireEvent.click(screen.getByText("On hover"));
+    fireEvent.click(screen.getByRole("button", { name: "More…" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Duplicate" }));
+    const next = onChange.mock.calls[0][0];
+    expect(next).toHaveLength(2);
+    expect(next[1]).toMatchObject({ trigger: "hover", animation: interaction.animation });
+    expect(next[1].id).not.toBe(interaction.id);
   });
 });

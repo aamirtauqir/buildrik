@@ -18,7 +18,7 @@ function makeComposer(bound: { collectionId: string; limit?: number } | null = n
     off: vi.fn(),
     emit: vi.fn(),
     /* P-1: bind / unbind pass the lock gate, which reads the element. */
-    elements: { getElement: () => ({ isLocked: () => false }) },
+    elements: { getElement: () => ({ isLocked: () => false, getType: () => "collection-list", getCustomData: () => undefined }), getActivePage: () => ({ name: "Home" }) },
     beginTransaction: vi.fn(),
     endTransaction: vi.fn(),
     cms: {
@@ -102,11 +102,11 @@ describe("CollectionListSection", () => {
     expect([...at].sort((a, b) => a - b)).toEqual(at);
   });
 
-  it("Open collection › opens the CMS on the bound collection's table", () => {
+  it("Open collection › opens the CMS on the bound collection's table, naming where it came from (C-11)", () => {
     const { composer } = makeComposer({ collectionId: "menu" });
     renderSection(composer);
     fireEvent.click(screen.getByTestId("collection-open"));
-    expect(composer.emit).toHaveBeenCalledWith("ui:cms-open", { collectionId: "menu" });
+    expect(composer.emit).toHaveBeenCalledWith("ui:cms-open", expect.objectContaining({ collectionId: "menu", origin: expect.stringMatching(/ · /) }));
   });
 
   it("unbound: no Show items, no Open collection", () => {

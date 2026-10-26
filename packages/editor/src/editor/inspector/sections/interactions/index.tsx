@@ -10,7 +10,7 @@ import { AddInteractionPanel } from "./AddInteractionPanel";
 import { InteractionItem } from "./InteractionItem";
 import { ElementAnimationRow, ElementAnimationEditor } from "./ElementAnimationRow";
 import { InteractionEditor } from "./InteractionEditor";
-import { DEFAULT_ANIMATION_CONFIG } from "@/engine/interactions/types";
+import { DEFAULT_ANIMATION_CONFIG, type AnimationPreset } from "@/engine/interactions/types";
 import { DEFAULT_ANIMATION, type AnimationConfig } from "@/shared/types/animations";
 import { type Interaction, type InteractionTrigger, type InteractionsSectionProps } from "./types";
 import { Button } from "@/editor/chrome-ui";
@@ -75,11 +75,11 @@ export const InteractionsSection: React.FC<InteractionsSectionProps> = ({
   const [editingId, setEditingId] = React.useState<string | null>(null);
 
   // Add new interaction
-  const addInteraction = (trigger: InteractionTrigger) => {
+  const addInteraction = (trigger: InteractionTrigger, preset?: AnimationPreset) => {
     const newInteraction: Interaction = {
       id: `interaction-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
       trigger,
-      animation: { ...DEFAULT_ANIMATION_CONFIG },
+      animation: { ...DEFAULT_ANIMATION_CONFIG, ...(preset ? { preset } : {}) },
       enabled: true,
     };
 
@@ -97,6 +97,15 @@ export const InteractionsSection: React.FC<InteractionsSectionProps> = ({
   const removeInteraction = (id: string) => {
     onInteractionsChange(interactions.filter((i) => i.id !== id));
     if (editingId === id) setEditingId(null);
+  };
+
+  // Duplicate an interaction just after itself, and open the copy (I20)
+  const duplicateInteraction = (id: string) => {
+    const at = interactions.findIndex((i) => i.id === id);
+    if (at < 0) return;
+    const copy: Interaction = { ...interactions[at], id: `interaction-${Date.now()}-${Math.random().toString(36).slice(2, 7)}` };
+    onInteractionsChange([...interactions.slice(0, at + 1), copy, ...interactions.slice(at + 1)]);
+    setEditingId(copy.id);
   };
 
   // Toggle interaction enabled state
@@ -146,6 +155,7 @@ export const InteractionsSection: React.FC<InteractionsSectionProps> = ({
               onUpdate={updateInteraction}
               onRemove={removeInteraction}
               onToggleEnabled={toggleEnabled}
+              onDuplicate={duplicateInteraction}
               onPreview={onPreview}
             />
           </>
@@ -161,6 +171,13 @@ export const InteractionsSection: React.FC<InteractionsSectionProps> = ({
               onPreview={onAnimationPreview}
             />
           </>
+        ) : showAddPanel ? (
+          /* 2L9 I14: the add screen replaces the list. */
+          <AddInteractionPanel
+            onAdd={addInteraction}
+            onClose={() => setShowAddPanel(false)}
+            onAddAnimation={onAnimationChange && !animation ? addAnimation : undefined}
+          />
         ) : (
           <>
             {/* 2L9 161:13919: interactions are the element's, not a breakpoint's. */}
@@ -171,21 +188,10 @@ export const InteractionsSection: React.FC<InteractionsSectionProps> = ({
             {interactions.map((interaction) => (
               <InteractionItem key={interaction.id} interaction={interaction} onOpen={() => setEditingId(interaction.id)} />
             ))}
-
-            {!showAddPanel ? (
-              <>
-                <ActionRow onClick={() => setShowAddPanel(true)} testId="interactions-add">
-                  + Add interaction
-                </ActionRow>
-                {interactions.length === 0 && !animation ? <NoteRow testId="interactions-empty">No interactions yet.</NoteRow> : null}
-              </>
-            ) : (
-              <AddInteractionPanel
-                onAdd={addInteraction}
-                onClose={() => setShowAddPanel(false)}
-                onAddAnimation={onAnimationChange && !animation ? addAnimation : undefined}
-              />
-            )}
+            <ActionRow onClick={() => setShowAddPanel(true)} testId="interactions-add">
+              + Add interaction
+            </ActionRow>
+            {interactions.length === 0 && !animation ? <NoteRow testId="interactions-empty">No interactions yet.</NoteRow> : null}
           </>
         )}
       </div>

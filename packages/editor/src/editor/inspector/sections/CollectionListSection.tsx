@@ -14,6 +14,8 @@ import { ExternalLink } from "lucide-react";
 import { Section, SelectRow, InputWithUnit, type SectionTier } from "../shared/controls";
 import { ActionRow } from "./behaviourRows";
 import { canWrite } from "@/engine/commands/commandOperations";
+import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
+import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
 
 export interface CollectionListSectionProps {
   elementId: string;
@@ -88,7 +90,13 @@ export const CollectionListSection: React.FC<CollectionListSectionProps> = ({ el
             }}
           />
           <ActionRow
-            onClick={() => composer.emit(EVENTS.UI_CMS_OPEN, { collectionId: binding.collectionId })}
+            onClick={() => {
+              /* C-11: the CMS names where it came from ("‹ Home · Team list"). */
+              const el = composer.elements.getElement(elementId);
+              const page = composer.elements.getActivePage?.()?.name ?? "Page";
+              const origin = `${page} · ${getLayerName(el) ?? elementTypeLabel(el?.getType?.() ?? "collection-list")}`;
+              composer.emit(EVENTS.UI_CMS_OPEN, { collectionId: binding.collectionId, origin });
+            }}
             testId="collection-open"
             icon={<ExternalLink size={12} aria-hidden="true" className="tw:shrink-0" />}
           >

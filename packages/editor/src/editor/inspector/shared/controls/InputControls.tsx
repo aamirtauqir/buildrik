@@ -150,10 +150,47 @@ export interface InputWithUnitProps {
 
 const NO_UNITS: readonly string[] = [""];
 
-/** Board 34. The one message every number field shows for an entry it cannot read. */
-export const NUMBER_ERROR = "Enter a valid number. Choose the unit separately.";
-
 const KEYWORDS = new Set(["auto", "none", "inherit", "normal", "initial"]);
+
+/** Properties CSS refuses a negative for — the error says so (2L9 I03). */
+const NON_NEGATIVE = new Set([
+  "font-size", "line-height", "width", "height", "min-width", "min-height", "max-width", "max-height",
+  "padding", "padding-top", "padding-right", "padding-bottom", "padding-left",
+  "border-width", "border-radius", "border-top-left-radius", "border-top-right-radius", "border-bottom-right-radius", "border-bottom-left-radius",
+  "gap", "row-gap", "column-gap", "outline-width", "flex-basis",
+]);
+
+/**
+ * The message under an entry the field cannot read (2L9 I03): what it takes,
+ * then what the element still carries — "Enter a non-negative number and a
+ * supported unit. Last applied: 24 px." The entry itself stays in the field.
+ */
+function numberError(property: string | undefined, num: string, unit: string): string {
+  const takes = property && NON_NEGATIVE.has(property) ? "Enter a non-negative number and a supported unit." : "Enter a number and a supported unit.";
+  const last = KEYWORDS.has(unit) ? unit : num !== "" ? `${num}${unit ? ` ${unit}` : ""}` : "";
+  return last ? `${takes} Last applied: ${last}.` : takes;
+}
+
+/** px per rem / em — the root size the editor and export assume. */
+const ROOT_PX = 16;
+
+/**
+ * The same length in another unit (2L9 I07: 24px → 1.5rem), so a unit
+ * change keeps what the canvas shows. Only px ↔ rem / em converts exactly;
+ * between any other pair the number is kept (there is no fixed ratio).
+ */
+function convertUnit(n: number, from: string, to: string): string {
+  const relative = (u: string) => u === "rem" || u === "em";
+  let out = n;
+  if (from === "px" && relative(to)) out = n / ROOT_PX;
+  else if (relative(from) && to === "px") out = n * ROOT_PX;
+  return String(Math.round(out * 1000) / 1000);
+}
+
+/** A value the field cannot take apart — calc(), clamp(), min(), max() — kept
+ *  exactly as authored until an explicit value replaces it (2L9 I08). */
+const isCustomExpression = (value: string) => /^(calc|clamp|min|max)\(/i.test(value.trim());
+
 
 /** What a unit adds to the field's name ("Font size in pixels"). */
 const UNIT_WORDS: Record<string, string> = {
@@ -231,13 +268,15 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
      already carries it: restoring the text alone left 48px on a heading the
      user had backed out of (board 34 / L3-C: Escape restores). */
   const atFocusRef = React.useRef<string | null>(null);
-  const { num, unit } = splitValue(value, units);
+  const custom = isCustomExpression(value);
+  const { num, unit } = custom ? { num: value.trim(), unit: "" } : splitValue(value, units);
   const isKeyword = KEYWORDS.has(unit);
   const shown = isKeyword ? unit : num;
 
   const [text, setText] = React.useState(shown);
   const [invalid, setInvalid] = React.useState(false);
-  const errorId = useFieldError(invalid ? NUMBER_ERROR : null);
+  const error = invalid ? numberError(property, custom ? "" : num, unit) : null;
+  const errorId = useFieldError(error);
 
   /* A new value from outside (another element, an undo) replaces whatever
      is in the field, including an entry it could not read. */
@@ -259,7 +298,9 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
        resolves to, so reading that back on blur wrote "24px" over the token —
        which is also what undid an Escape the moment focus left. */
     if (text === shown && !invalid) return;
-    const next = parseEntry(text, units, unit);
+    const parsed = parseEntry(text, units, unit);
+    /* A negative where CSS takes none is refused like any other bad entry. */
+    const next = parsed !== null && property && NON_NEGATIVE.has(property) && parsed.startsWith("-") ? null : parsed;
     if (next === null) {
       setInvalid(true);
       return;
@@ -272,7 +313,7 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
   };
 
   const step = (delta: number) => {
-    if (field.readOnly || isKeyword || isTokenVar(value)) return;
+    if (field.readOnly || isKeyword || custom || isTokenVar(value)) return;
     const base = text === "" || invalid ? Number(num || 0) : Number(text);
     if (!Number.isFinite(base)) return;
     const next = String(Math.round((base + delta) * 100) / 100);
@@ -301,7 +342,7 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
   const onUnitChange = (next: string) => {
     if (field.readOnly) return;
     if (KEYWORDS.has(next)) onChange(next);
-    else if (num !== "" && NUMBER.test(num)) onChange(`${num}${next}`);
+    else if (num !== "" && NUMBER.test(num)) onChange(`${convertUnit(Number(num), unit, next)}${next}`);
   };
 
   /* The name is the row's label (or `ariaLabel`) plus the unit or "mixed
@@ -353,7 +394,7 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
         aria-invalid={invalid}
         aria-describedby={invalid ? errorId : undefined}
       />
-      {isKeyword ? null : (
+      {isKeyword || custom ? null : (
         <>
           {/* Pointer shortcut for ↑ / ↓ on the field itself (the keyboard
               path, which also takes Shift for 10). Not a separate control. */}
@@ -398,7 +439,7 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
     >
       {label ? (
         <label className="bdi-lb" data-testid={labelTestId(label)} htmlFor={inputId}>
-          <span id={ownName ? undefined : nameId}>{label}</span>
+          <span id={ownName ? undefined : nameId}>{custom ? `${label} · Custom value` : label}</span>
           <FieldDot field={field} />
         </label>
       ) : null}
@@ -416,7 +457,12 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
         ) : null}
         {control}
       </div>
-      <ErrorLine id={errorId} message={invalid ? NUMBER_ERROR : null} />
+      <ErrorLine id={errorId} message={error} />
+      {custom && !invalid ? (
+        <p className="tw:m-0 tw:pb-1 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="inspector-field-custom">
+          Preserved as authored. Enter an explicit supported value to replace it.
+        </p>
+      ) : null}
     </div>
   );
 };
