@@ -11,7 +11,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Canvas bar at bottom y823 (board top y56-98), no device toggles; bottom bar lacks 'Saved · Details'. Container Content: Tag/ID only, no 'Container content' note or 'N child elements'. | prior: L-A S3 built, not compared: canvas bar 'Parent / Element' readout left (type + W × H in its tooltip), then '{width} px' (Page width popover), '{zoom}%', 'View' — no carets. Undo left in Phase 1. Copy unit-tested; geometry not compared."
+   "verifiedNote": "lead3 2026-10-27: shell parts probe-compared — canvas bar moved to the top of the canvas column (case canvas-bar, 797 wide: readout · devices at 409 (board 409) on blue-100 · 1440 px chip 581/68 · 52% ⌄ 655/83 · View 744), bottom bar 'Saved just now · Details' (497:99485). Row stays open for the inspector Container-content part (lane B). | Compared live 2026-10-26 (editor-inspector): DRIFT — Canvas bar at bottom y823 (board top y56-98), no device toggles; bottom bar lacks 'Saved · Details'. Container Content: Tag/ID only, no 'Container content' note or 'N child elements'. | prior: L-A S3 built, not compared: canvas bar 'Parent / Element' readout left (type + W × H in its tooltip), then '{width} px' (Page width popover), '{zoom}%', 'View' — no carets. Undo left in Phase 1. Copy unit-tested; geometry not compared."
   },
   {
    "nodeId": "7:18981",
@@ -19838,9 +19838,9 @@
    "page": "07",
    "family": "recovery",
    "status": "active",
-   "authority": "open:save-failed-copy-context",
-   "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Strip 'Couldn't save s0-qa site · Home. Your changes are kept.' + Retry + Keep editing, plus a 'Save failed' toast and a 'Reconnecting…' bar at once. Board: one strip. | prior: L-F W1: built, not compared. SaveFailedBanner is one strip: line + Retry. context=\"publish\" draws the board's \"Save before publishing. Your changes are kept.\"; without a context \"Couldn't save {where}. Your changes are kept.\" Exit and brand-refusal variants kept (code:tokens-invalid). StudioHeader p"
+   "authority": "owner:one-error-surface",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (lead3, cases banner-save-failed + bottom-bar state=error): owner 2026-10-26 — one error surface. The failure is ONE bar in the global slot under the topbar ('✕ Couldn’t save <site> · <page>. Your changes are kept.' + Retry; full width, 40 tall — the board draws the strip in the canvas column, the owner routed it through the slot), the bottom bar says 'Couldn’t save — Retry', no toast (autosave + ⌘S toasts removed), the topbar carries no save label, and the bar shares the connection id so 'Reconnecting…'/'Can’t reach' replace it instead of stacking. SaveFailedBanner.tsx deleted; copy (refusal, page limit, deleted site, never loaded, foreign page, save-and-leave) in globalBanners.saveFailedBanner. context=publish copy not carried (F-18 open)."
   },
   {
    "nodeId": "10:2647",
@@ -19900,7 +19900,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Copy + Download local copy/Retry match; banner sits above the topbar (y=0–54, board under it), adds Copy details and ×; canvas empty, not the read-only site. | prior: L-F S2: Download local copy added (workSnapshot; REQUESTS #15 registers the live project, else the kept unsaved copy). Leads the global slot. Placement under topbar REQUESTS #11. Built, not compared."
+   "verifiedNote": "lead3 2026-10-27: slot now drawn under the topbar (y 56) via flex order from the shell; bar flat full width 40 tall with a leading ✕ (BANNER_BAR); save status 'Not loaded · nothing saved yet' in the bottom bar. Not compared live; Copy details / ✕ dismiss are LoadErrorBanner (L-F). | Compared live 2026-10-26 (delivery-recovery): DRIFT — Copy + Download local copy/Retry match; banner sits above the topbar (y=0–54, board under it), adds Copy details and ×; canvas empty, not the read-only site. | prior: L-F S2: Download local copy added (workSnapshot; REQUESTS #15 registers the live project, else the kept unsaved copy). Leads the global slot. Placement under topbar REQUESTS #11. Built, not compared."
   },
   {
    "nodeId": "225:3353",
@@ -19910,7 +19910,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Title, body ('Your 1 change is kept in this tab and in this browser') and buttons match; the save-failed strip renders above the scrim, undimmed. | prior: L-F S5: built, not compared. 480 dialog (size confirm), \"Sign in again to save\" + board body with the history count since the last save; \"and in this browser\" only when a kept copy exists (code truth). Keep editing · Try saving again · Sign in ↗ (primary). The labels list folded into the count (code"
+   "verifiedNote": "lead3 2026-10-27: the save-failed strip that sat above the scrim is gone — a signed-out save raises no save-failed bar, and the slot is in flow under the modal's scrim. Not compared live (needs the session-expired modal in a running editor). | Compared live 2026-10-26 (delivery-recovery): DRIFT — Title, body ('Your 1 change is kept in this tab and in this browser') and buttons match; the save-failed strip renders above the scrim, undimmed. | prior: L-F S5: built, not compared. 480 dialog (size confirm), \"Sign in again to save\" + board body with the history count since the last save; \"and in this browser\" only when a kept copy exists (code truth). Keep editing · Try saving again · Sign in ↗ (primary). The labels list folded into the count (code"
   },
   {
    "nodeId": "225:3888",
@@ -19920,7 +19920,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Copy and Sign in ↗ match, but the banner spans the window above the topbar (y=0–56) and the 'Couldn't save… Retry · Keep editing' strip shows too. | prior: L-F S5: built, not compared. Keep editing (and Escape) leaves the G04 banner in the global slot with Sign in ↗; the next landed save (lastSavedAt) clears it."
+   "verifiedNote": "lead3 2026-10-27: the extra 'Couldn’t save… Retry · Keep editing' strip no longer shows for a signed-out save; the slot is drawn under the topbar (flex order, REQUESTS F-11 for the DOM move). Not compared live. | Compared live 2026-10-26 (delivery-recovery): DRIFT — Copy and Sign in ↗ match, but the banner spans the window above the topbar (y=0–56) and the 'Couldn't save… Retry · Keep editing' strip shows too. | prior: L-F S5: built, not compared. Keep editing (and Escape) leaves the G04 banner in the global slot with Sign in ↗; the next landed save (lastSavedAt) clears it."
   },
   {
    "nodeId": "225:4416",
@@ -23200,9 +23200,9 @@
    "page": "improved",
    "family": "shell-components",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Live 2026-10-26: 56 tall, one Undo/Redo pair (68 wide), no overflow at 3 widths. Still open: board shows site name as plain text + labelled \"Site settings\" button (owner decision pending)."
+   "authority": "code:publish-toggle",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (lead3, case topbar-shell, 1440×56, getBoundingClientRect vs board boxes): Exit 13/48 · site name plain text 69/176 · 'Site settings' gear+label 253/140 → Site settings · History 401/68 · Preview 1215/82 · Publish 1305/82 · ⋯ 1395/32 — all ±0. Review status is text 110 wide (no pill/dot/chevron); it sits at 1017 not 977 because the board's 'users' button is presence, drawn only with the collab flag (code:collab-flag). Save status left the bar (497:99485). Publish stays the tray toggle on the tray board (OD-1/Task 1.7, code:publish-toggle); label 'Publish' (lifecycle's 'Publish changes' stays the tray CTA)."
   },
   {
    "nodeId": "497:99445",
@@ -23221,8 +23221,8 @@
    "family": "shell-components",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Live 2026-10-26: switcher bar matches. Still open: board puts \"Saved just now · Details\" in the bottom bar; code keeps it in the topbar (owner decision pending). Resource-area variant hidden under full-screen Brand/Settings."
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (lead3, case bottom-bar, 1440×32, states saved/error/not-loaded/saving + resource=1): left switcher chip (gray-100) + count; right '✓ Saved just now' at 1119 (board ~1121) in a 248 column, Ghost 'Details' 1367–1424 → History (the old save-pill click). States: 'Couldn’t save — Retry' (error tone, retries), 'Saving…', 'Not loaded · nothing saved yet' (loader glyph). Resource-area variant ends with the same pair. ⌘P → ⇧⌘O stays code:shortcut-cmd-p-is-preview."
   },
   {
    "nodeId": "497:339496",
@@ -23312,7 +23312,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Forced via aborted sites.get. Banner above topbar y0-54 (board below it y56-97) + extra 'Copy details'; canvas/layers empty; inspector only 'View only until the site loads'; status in topbar. | prior: Load-failed banner, lock and echoes built (feat/design-2l9-editlock); not walked live (needs a forced load failure). Banner slot under topbar is an AquibraStudio request (REQUESTS.md #4)."
+   "verifiedNote": "lead3 2026-10-27: banner under the topbar (shell flex order) and the status in the bottom bar ('Not loaded · nothing saved yet' · Details, probe bottom-bar state=not-loaded). Canvas/layers emptiness and Copy details are not shell. Not compared live. | Compared live 2026-10-26 (editor-inspector): DRIFT — Forced via aborted sites.get. Banner above topbar y0-54 (board below it y56-97) + extra 'Copy details'; canvas/layers empty; inspector only 'View only until the site loads'; status in topbar. | prior: Load-failed banner, lock and echoes built (feat/design-2l9-editlock); not walked live (needs a forced load failure). Banner slot under topbar is an AquibraStudio request (REQUESTS.md #4)."
   },
   {
    "nodeId": "502:3556",

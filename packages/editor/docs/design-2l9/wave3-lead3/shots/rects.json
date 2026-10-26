@@ -1,0 +1,424 @@
+{
+ "topbar-shell": [
+  {
+   "id": "topbar",
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 56
+  },
+  {
+   "id": "topbar-exit",
+   "x": 13,
+   "y": 12,
+   "w": 48,
+   "h": 32
+  },
+  {
+   "id": "topbar-site-name",
+   "x": 69,
+   "y": 18,
+   "w": 176,
+   "h": 20
+  },
+  {
+   "id": "topbar-site-settings",
+   "x": 253,
+   "y": 12,
+   "w": 140,
+   "h": 32
+  },
+  {
+   "id": "topbar-history",
+   "x": 401,
+   "y": 12,
+   "w": 68,
+   "h": 32
+  },
+  {
+   "id": "flowbite-tooltip-target",
+   "x": 401,
+   "y": 12,
+   "w": 32,
+   "h": 32
+  },
+  {
+   "id": "topbar-undo",
+   "x": 401,
+   "y": 12,
+   "w": 32,
+   "h": 32
+  },
+  {
+   "id": "flowbite-tooltip",
+   "x": 376,
+   "y": 52,
+   "w": 82,
+   "h": 30
+  },
+  {
+   "id": "flowbite-tooltip-target",
+   "x": 437,
+   "y": 12,
+   "w": 32,
+   "h": 32
+  },
+  {
+   "id": "topbar-redo",
+   "x": 437,
+   "y": 12,
+   "w": 32,
+   "h": 32
+  },
+  {
+   "id": "flowbite-tooltip",
+   "x": 398,
+   "y": 52,
+   "w": 109,
+   "h": 30
+  },
+  {
+   "id": "topbar-review-pill",
+   "x": 1017,
+   "y": 12,
+   "w": 110,
+   "h": 32
+  },
+  {
+   "id": "topbar-review-label",
+   "x": 1017,
+   "y": 18,
+   "w": 110,
+   "h": 20
+  },
+  {
+   "id": "Comments",
+   "x": 1135,
+   "y": 12,
+   "w": 32,
+   "h": 32
+  },
+  {
+   "id": "Notifications",
+   "x": 1175,
+   "y": 12,
+   "w": 32,
+   "h": 32
+  },
+  {
+   "id": "topbar-preview",
+   "x": 1215,
+   "y": 12,
+   "w": 82,
+   "h": 32
+  },
+  {
+   "id": "topbar-publish",
+   "x": 1305,
+   "y": 12,
+   "w": 82,
+   "h": 32
+  },
+  {
+   "id": "topbar-site-menu",
+   "x": 1395,
+   "y": 12,
+   "w": 32,
+   "h": 32
+  }
+ ],
+ "bottom-bar": [
+  {
+   "id": "page-switcher",
+   "x": 16,
+   "y": 869,
+   "w": 334,
+   "h": 32
+  },
+  {
+   "id": "page-switcher-trigger",
+   "x": 16,
+   "y": 873,
+   "w": 109,
+   "h": 24
+  },
+  {
+   "id": "page-switcher-count",
+   "x": 137,
+   "y": 877,
+   "w": 214,
+   "h": 16
+  },
+  {
+   "id": "bottom-bar-save",
+   "x": 1119,
+   "y": 873,
+   "w": 305,
+   "h": 24
+  },
+  {
+   "id": "save-status-saved",
+   "x": 1119,
+   "y": 873,
+   "w": 109,
+   "h": 24
+  },
+  {
+   "id": "bottom-bar-details",
+   "x": 1367,
+   "y": 873,
+   "w": 57,
+   "h": 24
+  }
+ ],
+ "bottom-bar_resource_1": [
+  {
+   "id": "bottom-bar-resource",
+   "x": 16,
+   "y": 873,
+   "w": 344,
+   "h": 24
+  },
+  {
+   "id": "bottom-bar-back-to-editor",
+   "x": 265,
+   "y": 873,
+   "w": 95,
+   "h": 24
+  },
+  {
+   "id": "bottom-bar-save",
+   "x": 1119,
+   "y": 873,
+   "w": 305,
+   "h": 24
+  },
+  {
+   "id": "save-status-saved",
+   "x": 1119,
+   "y": 873,
+   "w": 109,
+   "h": 24
+  },
+  {
+   "id": "bottom-bar-details",
+   "x": 1367,
+   "y": 873,
+   "w": 57,
+   "h": 24
+  }
+ ],
+ "bottom-bar_state_error": [
+  {
+   "id": "page-switcher",
+   "x": 16,
+   "y": 869,
+   "w": 334,
+   "h": 32
+  },
+  {
+   "id": "page-switcher-trigger",
+   "x": 16,
+   "y": 873,
+   "w": 109,
+   "h": 24
+  },
+  {
+   "id": "page-switcher-count",
+   "x": 137,
+   "y": 877,
+   "w": 214,
+   "h": 16
+  },
+  {
+   "id": "bottom-bar-save",
+   "x": 1119,
+   "y": 873,
+   "w": 305,
+   "h": 24
+  },
+  {
+   "id": "save-status-error",
+   "x": 1119,
+   "y": 873,
+   "w": 149,
+   "h": 24
+  },
+  {
+   "id": "bottom-bar-details",
+   "x": 1367,
+   "y": 873,
+   "w": 57,
+   "h": 24
+  }
+ ],
+ "bottom-bar_state_not-loaded": [
+  {
+   "id": "page-switcher",
+   "x": 16,
+   "y": 869,
+   "w": 334,
+   "h": 32
+  },
+  {
+   "id": "page-switcher-trigger",
+   "x": 16,
+   "y": 873,
+   "w": 109,
+   "h": 24
+  },
+  {
+   "id": "page-switcher-count",
+   "x": 137,
+   "y": 877,
+   "w": 214,
+   "h": 16
+  },
+  {
+   "id": "bottom-bar-save",
+   "x": 1119,
+   "y": 873,
+   "w": 305,
+   "h": 24
+  },
+  {
+   "id": "save-status-not-loaded",
+   "x": 1119,
+   "y": 873,
+   "w": 197,
+   "h": 24
+  },
+  {
+   "id": "bottom-bar-details",
+   "x": 1367,
+   "y": 873,
+   "w": 57,
+   "h": 24
+  }
+ ],
+ "bottom-bar_state_saving": [
+  {
+   "id": "page-switcher",
+   "x": 16,
+   "y": 869,
+   "w": 334,
+   "h": 32
+  },
+  {
+   "id": "page-switcher-trigger",
+   "x": 16,
+   "y": 873,
+   "w": 109,
+   "h": 24
+  },
+  {
+   "id": "page-switcher-count",
+   "x": 137,
+   "y": 877,
+   "w": 214,
+   "h": 16
+  },
+  {
+   "id": "bottom-bar-save",
+   "x": 1119,
+   "y": 873,
+   "w": 305,
+   "h": 24
+  },
+  {
+   "id": "save-status-saving",
+   "x": 1119,
+   "y": 873,
+   "w": 72,
+   "h": 24
+  },
+  {
+   "id": "bottom-bar-details",
+   "x": 1367,
+   "y": 873,
+   "w": 57,
+   "h": 24
+  }
+ ],
+ "canvas-bar": [
+  {
+   "id": "canvas-bar-readout",
+   "x": 4,
+   "y": 13,
+   "w": 397,
+   "h": 15
+  },
+  {
+   "id": "canvas-bar-devices",
+   "x": 409,
+   "y": 7,
+   "w": 96,
+   "h": 28
+  },
+  {
+   "id": "bp-cell-desktop",
+   "x": 409,
+   "y": 7,
+   "w": 28,
+   "h": 28
+  },
+  {
+   "id": "bp-cell-tablet",
+   "x": 443,
+   "y": 7,
+   "w": 28,
+   "h": 28
+  },
+  {
+   "id": "bp-cell-mobile",
+   "x": 477,
+   "y": 7,
+   "w": 28,
+   "h": 28
+  },
+  {
+   "id": "canvas-width-trigger",
+   "x": 581,
+   "y": 7,
+   "w": 68,
+   "h": 28
+  },
+  {
+   "id": "canvas-zoom-trigger",
+   "x": 655,
+   "y": 7,
+   "w": 83,
+   "h": 28
+  },
+  {
+   "id": "canvas-view-menu-trigger",
+   "x": 744,
+   "y": 7,
+   "w": 45,
+   "h": 28
+  }
+ ],
+ "banner-save-failed": [
+  {
+   "id": "global-banner-slot",
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 40
+  },
+  {
+   "id": "global-banner",
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 40
+  },
+  {
+   "id": "save-failed-retry",
+   "x": 1365,
+   "y": 5,
+   "w": 59,
+   "h": 30
+  }
+ ]
+}

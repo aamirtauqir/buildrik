@@ -107,6 +107,11 @@ import {
 import type { UsePublishJobResult } from "@/editor/shell/hooks/usePublishJob";
 import type { PageItem } from "@/editor/sidebar/tabs/pages/types";
 import { PageSwitcher } from "@/editor/shell/PageSwitcher";
+import { BottomBar } from "@/editor/shell/BottomBar";
+import { saveStatusStore } from "@/editor/shell/saveStatusStore";
+import { GlobalBannerSlot } from "@/editor/shell/GlobalBannerSlot";
+import { saveFailedBanner, showGlobalBanner } from "@/editor/shell/globalBanners";
+import type { SaveState } from "@/editor/chrome-ui";
 import { LayoutShell } from "@/editor/rail/LayoutShell";
 import { PublishTray } from "@/editor/shell/PublishTray";
 import { deriveLifecycleState } from "@/editor/shell/lifecycle";
@@ -1407,6 +1412,30 @@ function PageSwitcherProbe() {
           onManagePages={() => {}}
           onAddPage={() => {}}
         />
+      </LayoutShell.Footer>
+    </div>
+  );
+}
+
+/* 2L9 Shell/BottomBar 497:99485 (lead3, wave 3): the bar with the save
+   status the StudioHeader writes. `?state=` picks the save state, `?resource=1`
+   the Resource-area context. */
+function BottomBarProbe() {
+  const q = new URLSearchParams(location.search);
+  const state = (q.get("state") ?? "saved") as SaveState;
+  React.useState(() => {
+    saveStatusStore.set({
+      state,
+      savedAt: Date.now() - 5_000,
+      onClick: state === "error" ? () => {} : undefined,
+      onDetails: () => {},
+    });
+    return null;
+  });
+  return (
+    <div className="tw:fixed tw:inset-x-0 tw:bottom-0">
+      <LayoutShell.Footer>
+        <BottomBar composer={null} pages={SWITCHER_PAGES} resourceArea={q.get("resource") === "1"} onBackToEditor={() => {}} />
       </LayoutShell.Footer>
     </div>
   );
@@ -2854,6 +2883,39 @@ const CASES: Record<string, () => React.ReactElement> = {
       <PageSwitcherProbe />
     </div>
   ),
+  "bottom-bar": () => (
+    <div data-probe="bottom-bar">
+      <BottomBarProbe />
+    </div>
+  ),
+  /* 2L9 board 7:18654: the canvas bar across the top of a 797-wide canvas
+     column — "Home / Hero", devices, 1440 px, 52% ⌄, View. */
+  "canvas-bar": () => (
+    <div data-probe="canvas-bar" style={{ width: 797, background: "var(--bk-bg-subtle)", height: 200 }}>
+      <div style={{ display: "flex", alignItems: "center", background: "var(--bk-bg-card)", borderBottom: "1px solid var(--bk-gray-200)", paddingRight: 8 }}>
+        <CanvasFooterToolbar
+          overlays={{ guides: true, spacing: false, grid: false, rulers: false, badges: false, xray: false, outlines: false }}
+          zoom={52}
+          readout="Home / Hero"
+          device="desktop"
+          onDeviceChange={() => {}}
+          pageWidth={1440}
+          onCustomWidth={() => {}}
+          onOverlayChange={() => {}}
+          onZoomChange={() => {}}
+        />
+      </div>
+    </div>
+  ),
+  /* Owner 2026-10-26 / board C05: a failed save is the global slot's one bar. */
+  "banner-save-failed": () => {
+    showGlobalBanner(saveFailedBanner({ where: "Fieldwork Studio · Home", retry: () => {} }));
+    return (
+      <div data-probe="banner-save-failed" style={{ width: "100vw" }}>
+        <GlobalBannerSlot />
+      </div>
+    );
+  },
   // ── Publish states (boards 784:4250 / 781:4489) ──────────────────────────
   "publish-publishing": () => (
     <div data-probe="publish-publishing">
@@ -2973,9 +3035,6 @@ const CASES: Record<string, () => React.ReactElement> = {
             <Topbar
               siteName="Bella Cucina"
               onExit={() => {}}
-              save="saved"
-              savedAt={Date.now() - 2 * 60_000}
-              onSaveClick={() => {}}
               review={
                 state === "approved"
                   ? { label: "Approved", tone: "success", title: "Approved by Sara Whitfield · 2h ago", onClick: () => {} }
@@ -3021,18 +3080,13 @@ const CASES: Record<string, () => React.ReactElement> = {
   "topbar-shell": () => (
     <div data-probe="topbar-shell" style={{ width: "100vw" }}>
       <Topbar
-        siteName="Fieldwork Studio · Northgate Architecture Collective"
-        pageName="Home"
-        onOpenPages={() => {}}
-        onPageCrumb={() => {}}
+        siteName="Fieldwork Studio"
+        onOpenSiteSettings={() => {}}
         onExit={() => {}}
         history={{ canUndo: true, canRedo: false, onUndo: () => {}, onRedo: () => {}, undoChord: "⌘Z", redoChord: "⇧⌘Z" }}
-        save="saved"
-        savedAt={Date.now() - 2 * 60_000}
-        onSaveClick={() => {}}
-        review={{ label: "In review · 12 open", tone: "info", title: "Sent to Sara — waiting on approval", onClick: () => {} }}
+        review={{ label: "In review · 2 open", tone: "info", title: "Sent to Sara — waiting on approval", onClick: () => {} }}
         tools={{ onPreview: () => {}, onToggleComments: () => {}, commentsPressed: false }}
-        unreadCount={2}
+        unreadCount={0}
         onOpenNotifications={() => {}}
         onPublish={() => {}}
         menu={
