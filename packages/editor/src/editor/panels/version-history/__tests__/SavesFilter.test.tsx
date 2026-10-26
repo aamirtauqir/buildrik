@@ -49,27 +49,34 @@ describe("SavesFilter", () => {
     );
   }
 
-  it("Filter ▾ → Named, then Author: anyone ▾ → Sara", () => {
+  /* 2L9 B7-H04 230:14662 — one flat menu; the chip names the filter. */
+  it("Filter: All ▾ → Named, then By Sara", () => {
     const onChange = vi.fn();
     render(<Host onChange={onChange} />);
-    expect(screen.getByTestId("saves-filter")).toHaveTextContent("Filter ▾");
+    expect(screen.getByTestId("saves-filter")).toHaveTextContent("Filter: All ▾");
 
     fireEvent.click(screen.getByTestId("saves-filter"));
     expect(screen.getAllByRole("menuitem").map((m) => m.textContent)).toEqual([
       "All✓",
       "Named",
       "Auto-saves",
-      "Author: anyone ▾",
+      "By You",
+      "By Sara",
     ]);
     fireEvent.click(screen.getByRole("menuitem", { name: /^Named/ }));
     expect(onChange).toHaveBeenLastCalledWith({ kind: "named", author: null });
-    expect(screen.getByTestId("saves-filter")).toHaveTextContent("Named ▾");
+    expect(screen.getByTestId("saves-filter")).toHaveTextContent("Filter: Named ▾");
 
     fireEvent.click(screen.getByTestId("saves-filter"));
-    fireEvent.click(screen.getByTestId("saves-filter-author"));
-    expect(screen.getAllByRole("menuitem").map((m) => m.textContent)).toEqual(["Everyone✓", "You", "Sara"]);
-    fireEvent.click(screen.getByRole("menuitem", { name: /^Sara/ }));
-    expect(onChange).toHaveBeenLastCalledWith({ kind: "named", author: "u-sara" });
-    expect(screen.getByTestId("saves-filter")).toHaveTextContent("Named · Sara ▾");
+    fireEvent.click(screen.getByRole("menuitem", { name: /^By Sara/ }));
+    expect(onChange).toHaveBeenLastCalledWith({ kind: "all", author: "u-sara" });
+    expect(screen.getByTestId("saves-filter")).toHaveTextContent("Filter: By Sara ▾");
+  });
+
+  it("carries the row's action at its right", () => {
+    render(
+      <SavesFilter versions={LIST} currentUserId="me" value={ALL_SAVES} onChange={vi.fn()} action={<span>Save a version</span>} />,
+    );
+    expect(screen.getByTestId("saves-filter-row").lastElementChild?.textContent).toBe("Save a version");
   });
 });

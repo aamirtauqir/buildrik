@@ -20,6 +20,7 @@ import type { GroupedTabId } from "../rail/tabsConfig";
 import type { IconConfig } from "@/shared/types/media";
 import { InspectorErrorBoundary } from "../inspector/components/InspectorErrorBoundary";
 import { PanelSkeleton, SidebarErrorFallback } from "./SidebarFallbacks";
+import { PanelChunkBoundary } from "@/editor/shell/PanelChunkBoundary";
 import { FullPageRouter } from "./FullPageRouter";
 import type { SettingsOpenRequest } from "./tabs/settings/types";
 import type { TemplatesOpenRequest } from "./tabs/templates/TemplatesTab";
@@ -79,6 +80,7 @@ export const FullPageView: React.FC<FullPageViewProps> = ({
           <SidebarErrorFallback onRetry={() => setErrorKey((k) => k + 1)} />
         }
       >
+        <PanelChunkBoundary>
         <React.Suspense fallback={<PanelSkeleton />}>
           <FullPageRouter
             activeTab={activeTab}
@@ -93,6 +95,7 @@ export const FullPageView: React.FC<FullPageViewProps> = ({
             templatesOpen={templatesOpen}
           />
         </React.Suspense>
+        </PanelChunkBoundary>
       </InspectorErrorBoundary>
     </div>
   );

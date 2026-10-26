@@ -32,7 +32,7 @@ export interface HistoryTabProps {
    *  history" lands on Published instead of wherever the user last was. */
   initialView?: HistoryView;
   /** Opened by an Activity row (Activity is its own panel): draws
-   *  "‹ Activity" under the header until the user picks a tab. */
+   *  "‹ Back to Activity" under the header until the user picks a tab. */
   fromActivity?: boolean;
   /** The shell's publish job, forwarded to the Published view so boards
    *  184:37 / 184:45 / 453:4064 can run off one state. Null = no feed. */

@@ -7,9 +7,15 @@ import { z } from "zod";
  */
 export const siteActivityFilterSchema = z.enum(["all", "edits", "comments", "publish"]);
 
+/** Rows per page. A page this long may have more behind it ("Load more"). */
+export const SITE_ACTIVITY_PAGE_SIZE = 30;
+
 export const siteActivityInput = z.object({
   siteId: z.string().min(1),
   filter: siteActivityFilterSchema.default("all"),
+  /** "Load more" (2L9 B7-H13): only rows older than this — the oldest row the
+   *  editor already shows. Absent = the newest page. */
+  before: z.coerce.date().optional(),
 });
 
 export type SiteActivityFilter = z.infer<typeof siteActivityFilterSchema>;

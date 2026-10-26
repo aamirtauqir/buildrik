@@ -110,9 +110,6 @@ const MODAL_INSET = "tw:px-0";
 const CONFIRM_BODY = "tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]";
 /* Board 184:24's info block — the accent-tinted box under the sentence. 52
    tall: 8 of lead, a 12/18 line, 2, an 11/16 line, 8. */
-const INFO_BOX = "tw:mt-3 tw:rounded-lg tw:bg-[var(--bk-accent-tint)] tw:px-3 tw:py-2";
-const INFO_TITLE = "tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-accent-text)]";
-const INFO_META = "tw:m-0 tw:mt-0.5 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 /* Boards 184:45 / 453:4064 both open on a 32px status disc, centred. */
 const STATUS_DISC_WRAP = "tw:flex tw:justify-center tw:mb-3.5";
 const STATUS_DISC =
@@ -323,6 +320,7 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({
       {notice && <div className={NOTICE}>{notice}</div>}
       {rows.map((r, i) => {
         const isLive = i === 0 && Boolean(isPublished);
+        const liveRow = isPublished ? rows[0] : undefined;
         // rolledBackFrom is a job id — map it to that version's number for the label.
         const fromVersion = r.rolledBackFrom
           ? rows.find((x) => x.id === r.rolledBackFrom)?.version
@@ -392,7 +390,20 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({
                     >
                       View details
                     </MenuItem>
-                    {onCompareWithCurrent ? (
+                    {/* 2L9 B7-H09: an older release compares with the one that is
+                        live; the live row (or no live one) compares with the
+                        current draft, as before. */}
+                    {onCompare && liveRow && !isLive ? (
+                      <MenuItem
+                        className={ROW_MENU_ITEM}
+                        onClick={() => {
+                          setRowMenu(null);
+                          onCompare({ id: r.id, version: r.version }, { id: liveRow.id, version: liveRow.version });
+                        }}
+                      >
+                        Compare with live
+                      </MenuItem>
+                    ) : onCompareWithCurrent ? (
                       <MenuItem
                         className={ROW_MENU_ITEM}
                         onClick={() => {
@@ -660,26 +671,24 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({
         closeButton
         onClose={() => setConfirm(null)}
         onConfirm={() => void doRollback()}
-        title={confirm ? `Republish v${confirm.version} as v${nextVersion}?` : "Republish?"}
+        /* 2L9 B7-H10 230:18022: the title names where it goes; the body says
+           what the live site becomes, that the draft is untouched and that
+           the live version stays listed. Behaviour stays the code's — it
+           republishes as a new version (code:republish-as-new-version), so
+           the body names that number too. */
+        title={
+          confirm
+            ? `Republish v${confirm.version}${liveDomain ? ` to ${liveDomain}` : ""}?`
+            : "Republish?"
+        }
         message={
           <>
             <div className={MODAL_INSET}>
             <p className={CONFIRM_BODY} data-testid="publish-rollback-confirm-body">
-              This publishes v{confirm?.version} again as v{nextVersion}.
-              {liveVersion !== undefined
-                ? ` Your current v${liveVersion} stays in history`
-                : " Your current version stays in history"}{" "}
-              — nothing is deleted or rewritten.
+              The live site goes back to v{confirm?.version}, published again as v{nextVersion}. Your current draft is
+              not changed.
+              {liveVersion !== undefined ? ` v${liveVersion} stays in this list.` : ""}
             </p>
-            {/* Board 4418:73440's info block, in its words: the live version
-                stays in history, and the new entry carries its source. That
-                is the fact that makes a rollback safe to try. */}
-            <div className={INFO_BOX} data-testid="publish-rollback-info">
-              <p className={INFO_TITLE} data-testid="publish-rollback-info-title">Your current published version remains in history.</p>
-              <p className={INFO_META} data-testid="publish-rollback-info-meta">
-                v{nextVersion} will name v{confirm?.version} as its source.
-              </p>
-            </div>
             </div>
           </>
         }

@@ -19,7 +19,8 @@ import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 const fetchRecentActivity = vi.fn();
 vi.mock("@/services/ActivityService", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/services/ActivityService")>()),
-  fetchRecentActivity: (siteId: string, filter: string) => fetchRecentActivity(siteId, filter),
+  fetchRecentActivity: (siteId: string, filter: string, before?: string) =>
+    before === undefined ? fetchRecentActivity(siteId, filter) : fetchRecentActivity(siteId, filter, before),
 }));
 
 const SAMPLE_ROWS: ActivityEntry[] = [
@@ -91,7 +92,9 @@ describe("ActivityLogView — state machine", () => {
     fetchRecentActivity.mockRejectedValueOnce(new Error("network down"));
     renderView();
     const err = await screen.findByTestId("activity-error");
-    expect(err.textContent).toContain("Couldn't load activity");
+    expect(err.textContent).toContain("Couldn’t load activity");
+    /* 2L9 B7-H16: the title and Retry, no extra line. */
+    expect(err.textContent).not.toMatch(/on our side/);
     const retry = screen.getByText("Retry") as HTMLButtonElement;
     fetchRecentActivity.mockResolvedValueOnce(SAMPLE_ROWS);
     fireEvent.click(retry);
@@ -222,5 +225,34 @@ describe("ActivityLogView — rows are board 4418:140587", () => {
     expect(screen.getByTestId("activity-row-meta").textContent).toMatch(/^Sara · Today \d{2}:\d{2}$/);
     expect(screen.getByTestId("activity-row-open").textContent).toContain("›");
     expect(screen.queryByTestId("activity-kind")).toBeNull();
+  });
+});
+
+describe("ActivityLogView — Load more (2L9 B7-H13)", () => {
+  const page = (n: number, from = 0): ActivityEntry[] =>
+    Array.from({ length: n }, (_, i) => ({
+      id: `p${from + i}`,
+      kind: "edit" as const,
+      actorName: "Sara",
+      summary: `Row ${from + i}`,
+      actionUrl: null,
+      createdAt: new Date(Date.UTC(2026, 9, 26, 12, 0) - (from + i) * 60_000).toISOString(),
+    }));
+
+  it("a full page offers Load more, which asks for rows older than the oldest shown and appends them", async () => {
+    const first = page(30);
+    fetchRecentActivity.mockResolvedValueOnce(first).mockResolvedValueOnce(page(5, 30));
+    renderView();
+    fireEvent.click(await screen.findByTestId("activity-load-more"));
+    await waitFor(() => expect(screen.getAllByTestId("activity-row-open")).toHaveLength(35));
+    expect(fetchRecentActivity).toHaveBeenLastCalledWith("site_1", "all", first[29].createdAt);
+    expect(screen.queryByTestId("activity-load-more")).toBeNull();
+  });
+
+  it("a short page offers no Load more", async () => {
+    fetchRecentActivity.mockResolvedValueOnce(SAMPLE_ROWS);
+    renderView();
+    await screen.findByTestId("activity-rows");
+    expect(screen.queryByTestId("activity-load-more")).toBeNull();
   });
 });

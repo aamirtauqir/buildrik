@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import type { Prisma } from "@prisma/client";
-import type { SiteActivityEntry, SiteActivityFilter, SiteActivityKind } from "@buildrik/shared/schemas/activity";
+import { SITE_ACTIVITY_PAGE_SIZE, type SiteActivityEntry, type SiteActivityFilter, type SiteActivityKind } from "@buildrik/shared/schemas/activity";
 
 export type ActivityAction =
   | "site.settings.updated"
@@ -183,7 +183,8 @@ const COMMENT_EXCERPT = 80;
 export async function listSiteActivity(
   siteId: string,
   filter: SiteActivityFilter,
-  limit = 30,
+  limit = SITE_ACTIVITY_PAGE_SIZE,
+  before?: Date,
 ): Promise<SiteActivityEntry[]> {
   const logActions: Record<SiteActivityFilter, Prisma.ActivityLogWhereInput> = {
     all: {},
@@ -192,20 +193,22 @@ export async function listSiteActivity(
     publish: { action: { in: [...PUBLISH_ACTIONS] } },
   };
   const logWhere = logActions[filter];
+  /* A later page: strictly older than the oldest row already shown. */
+  const older = before ? { createdAt: { lt: before } } : {};
   // Headroom for the collapse below, so a run of repeats seldom shortens the page.
   const fetchSize = limit * 4;
   const readComments = filter === "all" || filter === "comments";
 
   const [logs, comments] = await Promise.all([
     prisma.activityLog.findMany({
-      where: { siteId, ...logWhere },
+      where: { siteId, ...logWhere, ...older },
       orderBy: { createdAt: "desc" },
       take: fetchSize,
       select: { id: true, action: true, description: true, actorId: true, createdAt: true },
     }),
     readComments
       ? prisma.comment.findMany({
-          where: { siteId },
+          where: { siteId, ...older },
           orderBy: { createdAt: "desc" },
           take: fetchSize,
           select: { id: true, body: true, authorId: true, createdAt: true, reviewer: { select: { name: true } } },

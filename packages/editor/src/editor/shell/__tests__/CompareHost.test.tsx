@@ -75,7 +75,9 @@ describe("CompareHost", () => {
     openOn({ left: { kind: "approved" }, right: { kind: "current" }, from: "Review" });
     const overlay = await screen.findByTestId("compare-overlay");
     await within(overlay).findByTestId("compare-pane-approved");
-    expect(within(overlay).getByTestId("compare-opened-from")).toHaveTextContent("Opened from Review");
+    /* 2L9 B7-H11: the way out names where it returns, the title the pair. */
+    expect(within(overlay).getByTestId("compare-close")).toHaveTextContent("‹ Back to Review");
+    expect(within(overlay).getByTestId("compare-title").textContent).toMatch(/^Compare · .+ → Current draft$/);
     expect((screen.getByLabelText("Compare from") as HTMLSelectElement).value).toBe("approved");
     expect((screen.getByLabelText("Compare to") as HTMLSelectElement).value).toBe("current");
     expect(screen.getByTestId("compare-pane-current-label")).toHaveTextContent("Current draft");

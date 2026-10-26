@@ -195,6 +195,8 @@ export interface SitePublishState {
    * max(lastEditedAt, cmsEditedAt), null when neither was ever set.
    */
   lastEditedAt: string | null;
+  /** When the site's workspace is scheduled for deletion (ISO), else null. */
+  workspaceDeletionAt?: string | null;
 }
 
 /**
@@ -212,7 +214,9 @@ export async function fetchSitePublishState(siteId: string): Promise<SitePublish
     lastPublishedAt?: string | Date | null;
     lastEditedAt?: string | Date | null;
     cmsEditedAt?: string | Date | null;
+    workspace?: { deletionScheduledAt?: string | Date | null } | null;
   };
+  const deletionAt = site.workspace?.deletionScheduledAt ? new Date(site.workspace.deletionScheduledAt) : null;
   const publishedAt = site.lastPublishedAt ? new Date(site.lastPublishedAt) : null;
   const editedAtRaw = site.lastEditedAt ? new Date(site.lastEditedAt) : null;
   const cmsEditedAt = site.cmsEditedAt ? new Date(site.cmsEditedAt) : null;
@@ -223,6 +227,7 @@ export async function fetchSitePublishState(siteId: string): Promise<SitePublish
     hasUnpublishedChanges: publishedAt && editedAt ? editedAt.getTime() > publishedAt.getTime() : null,
     lastPublishedAt: publishedAt ? publishedAt.toISOString() : null,
     lastEditedAt: editedAt ? editedAt.toISOString() : null,
+    workspaceDeletionAt: deletionAt ? deletionAt.toISOString() : null,
   };
 }
 

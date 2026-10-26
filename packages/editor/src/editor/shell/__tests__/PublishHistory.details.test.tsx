@@ -63,3 +63,20 @@ describe("publishTooltip (7045:77984)", () => {
     expect(publishTooltip(null, ["Home"])).toBe("First publish. Home is included.");
   });
 });
+
+describe("PublishHistory — Compare with live (2L9 B7-H09)", () => {
+  it("an older release's menu compares it with the live one", async () => {
+    const onCompare = vi.fn();
+    render(
+      <ToastProvider>
+        <PublishHistory siteId="s1" siteName="Bella Cucina" onCompare={onCompare} onCompareWithCurrent={vi.fn()} />
+      </ToastProvider>,
+    );
+    const rows = await screen.findAllByText(/^v\d+( · live)?$/);
+    const older = rows[1].closest("[data-version-row]") as HTMLElement;
+    fireEvent.click(within(older).getByRole("button", { name: /actions|more/i }));
+    fireEvent.click(await screen.findByRole("menuitem", { name: "Compare with live" }));
+    const [from, to] = onCompare.mock.calls[0];
+    expect(to.version).toBeGreaterThan(from.version);
+  });
+});

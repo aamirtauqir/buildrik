@@ -20,6 +20,7 @@ import { Button, HintTooltip, Menu, MenuGroup, MenuItem, MenuLabel, Popover, use
 import { useEditLocks } from "@/editor/shared/useEditLocks";
 import { InspectorErrorBoundary } from "../inspector/components/InspectorErrorBoundary";
 import { PanelSkeleton, SidebarErrorFallback } from "./SidebarFallbacks";
+import { PanelChunkBoundary } from "@/editor/shell/PanelChunkBoundary";
 import { TabRouter } from "./TabRouter";
 import { useRailTab } from "./tabs/media/data/assetPick";
 import { useSidebarKeyboard } from "./useSidebarKeyboard";
@@ -536,6 +537,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
                 must remount so the tab re-reads its initial screen. */}
             <div key={`${activeTab}:${activeSubTab ?? ""}`} className="ls-panel-animate">
               {hostedInColumn ? null : (
+              <PanelChunkBoundary>
               <React.Suspense fallback={<PanelSkeleton />}>
                 <TabRouter
                   activeTab={activeTab}
@@ -556,6 +558,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
                   reviewsEnabled={reviewsEnabled}
                 />
               </React.Suspense>
+              </PanelChunkBoundary>
               )}
             </div>
           </InspectorErrorBoundary>

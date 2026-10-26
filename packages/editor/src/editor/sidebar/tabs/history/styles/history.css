@@ -241,13 +241,12 @@
   color: var(--bk-accent);
 }
 
-/* Board 4418:73791 — a 44-tall, full-bleed Session row: "label · author"
-   12/18 ink at x16 y6, the time 11/16 mono muted at x(W-60) y7, one line,
-   nothing under it. (It carried a second meta line — relative time, author
-   chip, Current / Checkpoint / N-changes badges — and date bands above.) */
+/* 2L9 B7-H01 230:12999 — a 44-tall, full-bleed Session row of two lines:
+   the step (12/18 ink), then "time · you" (11/16 mono muted). "Restore to
+   here" sits at the right of the row the pointer or j/k is on. */
 .entry-row {
   position: relative;
-  padding: 6px var(--bk-space-16) 0;
+  padding: 5px var(--bk-space-16) 0;
   min-height: 44px;
   cursor: pointer;
   transition: background 150ms ease-out;
@@ -269,17 +268,11 @@
   font-weight: 400;
   color: var(--bk-ink);
   line-height: 18px;
-  /* stops 8 short of the time, which starts 60 from the row's right edge */
-  max-width: calc(100% - 52px);
+  /* stops short of Restore to here */
+  max-width: calc(100% - 112px);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.entry-row .entry-time-btn {
-  position: absolute;
-  left: calc(100% - 60px);
-  top: 7px;
 }
 
 .entry-time {
@@ -419,11 +412,6 @@
   border-color: var(--bk-border);
 }
 
-.version-row.delete-confirm {
-  background: var(--bk-error-tint);
-  border-color: rgba(239, 68, 68, 0.3);
-}
-
 .version-row-wrapper {
   display: block;
 }
@@ -481,8 +469,7 @@
 
 .version-row:hover .version-actions,
 .version-row:focus-within .version-actions,
-.version-row.expanded .version-actions,
-.version-row.delete-confirm .version-actions {
+.version-row.expanded .version-actions {
   opacity: 1;
   pointer-events: auto;
 }

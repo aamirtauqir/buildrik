@@ -190,3 +190,43 @@ comparison; until then it stays `drift-open` with "built, not compared; copy mat
 Every touched row stays `drift-open` with "built, not compared": the dump has no board screenshots and
 no probe or live comparison was run in this lane (owner: light verification; no Next server in lanes).
 The lead's live walk on the integration branch is what moves them to `drift-fixed`.
+
+## Wave 2 (coordinator, 2026-10-26) — after merging `feat/design-2l9` (F-12…F-15 closed by lead1)
+
+Not touched: `AquibraStudio.tsx`, `shell/hooks/*`, `StudioPanels.tsx`, `FullPageRouter.tsx`, `src/engine/`.
+F5.20–F5.33 stay `blocked:owner-approval-code`. Paths taken for this wave (assigned rows, no other lane
+owns them): `sidebar/tabs/history/`, `panels/version-history/`, `sidebar/tabs/activity/`,
+`shell/TimeTravelHost.tsx`, `shell/CompareHost.tsx`, `shell/NotificationPanel.tsx`; `shell/PublishHistory.tsx`
+(L-E's) for H09/H10 copy only.
+
+| # | Archetype | Rows | Files |
+|---|---|---|---|
+| W1 | Save-failed strip: board copy in the publish context + a context-free variant (`open:save-failed-copy-context` kept) | 10:2199 | `shell/SaveFailedBanner.tsx` |
+| W2 | History · Session rows: verb · target · place, inline Restore to here, step-named confirm, restored row | H01–H03 | `sidebar/tabs/history/components/ActivityView.tsx` |
+| W3 | History · Saves: flat filter, header Save a version, details, delete confirm dialog, offline note | H04, H05, H07, H15 | `SavesChrome.tsx`, `SavesFilter.tsx`, `VersionList.tsx`, `HistoryTab.tsx` |
+| W4 | Restore to draft + Undo restore; Compare and Time Travel chrome | H06, H11, H12 | `TimeTravelHost.tsx`, `CompareHost.tsx`, `CompareView.tsx` |
+| W5 | Activity: Load more (if the API has a cursor), Back to Activity, load error | H13, H14, H16 | `sidebar/tabs/activity/` |
+| W6 | Published: Compare with live, Republish confirm copy | H09, H10 | `shell/PublishHistory.tsx` |
+| W7 | Slot-owned conditions: narrow window banner, phone screen with Open read-only anyway | G32, G33 | `GlobalBannerSlot.tsx`, `globalBanners.ts` |
+| W8 | Condition banners: role raised, workspace deletion, new version (save first, then reload; stop on a failed save), panel updated | G19–G21, G23–G25, G27 | `globalBanners.ts`, new `shell/reloadAfterSaving.ts` |
+| W9 | Tab handoff: Edit here / editing moved / refused | G29, G30 | new `shell/tabHandoff.ts` (+ lead request for the mount) |
+| W10 | Notifications grouped This site / Other sites; signed in again / different account | G35, G05, G06 | `shell/NotificationPanel.tsx`, `modals/SessionExpiredModal.tsx` |
+
+Out of this lane's paths: G34 toast cap lives in `chrome-ui/Toast.tsx` (lead request). H08 needs RT-D1 server soft delete.
+
+### Wave 2 status (2026-10-26)
+
+| # | Commit | Rows | State |
+|---|---|---|---|
+| W1 | `7baa56b61` | 10:2199 | built; StudioHeader passes `context="publish"`: F-18; `open:save-failed-copy-context` stands |
+| W2 | `159cd3091`, `1b2fc6e89` | H01, H02 (built); H03 `code:restore-truncates` | entries carry no target/page (`code:history-entry-no-target`) |
+| W3 | `d9393c210` | H04, H07, H15 built; H05 inline details not built | |
+| W4 | `045238a5b` | H06, H11, H12 | Visual/Semantic vs Side by side/Overlay/List not reconciled |
+| W5 | `7d9de6672` | H13 (server `before` cursor, full chain), H14, H16 | |
+| W6 | `f53ed32b7` | H09, H10 (`code:republish-as-new-version`) | PublishHistory is L-E's path: copy + compare target only; no Pruned row |
+| W7 | `ce0ac688b` | G32, G33 | |
+| W8 | `ba096018b` | G19, G20, G21, G23, G24, G25, G27 | G19 producer F-19; G23–G25 producer F-20 |
+| W9 | `40a80206c` | G28, G29, G30 | mount F-21 |
+| W10 | `271efa605` | G05 built; G06 `blocked:save-user-check` (F-22); G34 `blocked:chrome-ui-toast` (F-23); G35 `open:notifications-other-sites` (owner decision 9) | |
+
+Not started: H05 inline details, H08 (needs RT-D1), F5.20–F5.33 (`blocked:owner-approval-code`).

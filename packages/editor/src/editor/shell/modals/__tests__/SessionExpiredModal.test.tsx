@@ -16,6 +16,7 @@ import { render, screen, fireEvent, waitFor, act, cleanup } from "@testing-libra
 import * as React from "react";
 import { SessionExpiredModal, type SessionExpiredModalProps } from "../SessionExpiredModal";
 import { GlobalBannerSlot } from "@/editor/shell/GlobalBannerSlot";
+import { ToastProvider } from "@/editor/chrome-ui";
 import { BANNER_ID, clearGlobalBanner } from "@/editor/shell/globalBanners";
 
 function makeComposer(entries: Array<{ label: string; timestamp: number }>) {
@@ -32,10 +33,10 @@ function renderModal(over: Partial<SessionExpiredModalProps> = {}) {
     ...over,
   };
   const view = render(
-    <>
+    <ToastProvider>
       <GlobalBannerSlot />
       <SessionExpiredModal {...props} />
-    </>,
+    </ToastProvider>,
   );
   return { props, ...view };
 }
@@ -130,11 +131,24 @@ describe("SessionExpiredModal — the persistent banner (G04)", () => {
     fireEvent.click(screen.getByRole("button", { name: "Keep editing" }));
     expect(screen.getByTestId("global-banner")).toBeInTheDocument();
     rerender(
-      <>
+      <ToastProvider>
         <GlobalBannerSlot />
         <SessionExpiredModal {...props} open={false} lastSavedAt={Date.now()} />
-      </>,
+      </ToastProvider>,
     );
     expect(screen.queryByTestId("global-banner")).toBeNull();
+  });
+
+  /* 2L9 B7-G05 225:4416 */
+  it("the save that lands says the session is back and how many changes went through", async () => {
+    const { props, rerender } = renderModal({ composer: makeComposer([{ label: "a", timestamp: 5 }, { label: "b", timestamp: 6 }]) });
+    fireEvent.click(screen.getByRole("button", { name: "Keep editing" }));
+    rerender(
+      <ToastProvider>
+        <GlobalBannerSlot />
+        <SessionExpiredModal {...props} open={false} lastSavedAt={Date.now()} />
+      </ToastProvider>,
+    );
+    expect(await screen.findByText("Signed in again — 2 changes saved")).toBeInTheDocument();
   });
 });

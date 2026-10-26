@@ -51,14 +51,19 @@ describe("activity.recent", () => {
 
     await expect(caller().recent({ siteId: "s1", filter: "publish" })).resolves.toEqual([{ id: "log:1" }]);
     expect(assertSiteAccessMock).toHaveBeenCalledWith(prisma, "u_1", "s1");
-    expect(listSiteActivityMock).toHaveBeenCalledWith("s1", "publish");
+    expect(listSiteActivityMock).toHaveBeenCalledWith("s1", "publish", undefined, undefined);
+  });
+
+  it("passes Load more's cursor through as a date (2L9 B7-H13)", async () => {
+    await caller().recent({ siteId: "s1", filter: "all", before: "2026-10-26T10:00:00.000Z" as unknown as Date });
+    expect(listSiteActivityMock).toHaveBeenCalledWith("s1", "all", undefined, new Date("2026-10-26T10:00:00.000Z"));
   });
 
   it("defaults the filter to all", async () => {
     assertSiteAccessMock.mockResolvedValueOnce(undefined);
     listSiteActivityMock.mockResolvedValueOnce([]);
     await caller().recent({ siteId: "s1" });
-    expect(listSiteActivityMock).toHaveBeenCalledWith("s1", "all");
+    expect(listSiteActivityMock).toHaveBeenCalledWith("s1", "all", undefined, undefined);
   });
 
   it("is FORBIDDEN for a non-member and never reaches the service", async () => {
