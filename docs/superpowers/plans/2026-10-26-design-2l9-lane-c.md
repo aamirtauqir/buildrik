@@ -162,3 +162,20 @@ bar restyle waits for the C-10 host.
 Not in this lane's paths: CMS collection-list query (filter / sort / pagination /
 related — `inspector/sections/CollectionListSection.tsx` is L-B's,
 `engine/cms/RepeaterRenderer.ts` is the lead's); filed as a request when reached.
+
+### Wave 2 status
+
+| # | Commit | State |
+|---|---|---|
+| D1 site-variable usages | `891ce02a2` | built; "Update N old placeholders" after rename not built |
+| D2 Add field default/rules/placeholder/help | `2a75e094f` | built; inspector "Show N usages" / explicit Save field not built |
+| D3 Required impact + default fill | `45591716f` | built; `code:required-checked-on-save`; "Required for new only" `blocked:owner-required-new-only` |
+| D4 field delete typed by count + pending/failed | `ca66c3e15` | built (no 30-day promise until restore ships) |
+| D5 type change preview / convert / clear | `8c3bb216f` | built; 257:52702 superseded; `code:type-moves-before-values` on 257:52512 |
+| D6 collection save + delete pending/failed | `684916a5e` | built; slug URL-impact confirm `code:collection-slug-not-in-urls` |
+| D7 components scopes, search, sort | `2287c5151` | built in the drawer; full workspace / detail pane / row ⋯ / Recently deleted not built |
+| D8/D9 .brcomponent export + import | `988113c4d` | built (3 of 6 import steps; no access blocks, Undo import, receipt check) |
+| in-use delete rows | `05dd64eb4` | `code:unbind-on-delete` (lead auto-decision) |
+
+Requests filed: C-14 (collection-list query → L-B / lead), C-15 (shared `{{site.key}}` grammar → lead).
+Owner decision raised: `blocked:owner-required-new-only`.
