@@ -42,3 +42,24 @@ export function takeBrandPageRequest(composer: Composer | null | undefined): str
   pendingPage.delete(composer);
   return page;
 }
+
+/** Where "‹ Back" goes when Brand was opened from Site settings (GAP-ST-T03:
+ *  "‹ Back to Site settings" returns to the screen the user left). */
+export interface BrandReturn {
+  screen?: string;
+}
+
+const pendingReturn = new WeakMap<Composer, BrandReturn>();
+
+/** Site settings' Branding row, before it switches to Brand. */
+export function requestBrandReturn(composer: Composer, ret: BrandReturn): void {
+  pendingReturn.set(composer, ret);
+}
+
+/** The return asked for before the workspace mounted, if any — read once. */
+export function takeBrandReturn(composer: Composer | null | undefined): BrandReturn | undefined {
+  if (!composer) return undefined;
+  const ret = pendingReturn.get(composer);
+  pendingReturn.delete(composer);
+  return ret;
+}

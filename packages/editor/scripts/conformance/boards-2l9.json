@@ -9186,7 +9186,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Shell: nav flat \"Colours…\" vs grouped Tokens/Reusable styles/Tools; \"Back to canvas\" vs \"‹ Back to Editor · Home\"; table vs Edit› cards; \"+ "
+   "verifiedNote": "L-D S1: nav grouped Tokens/Reusable styles/Tools, \"‹ Back to Editor · {page}\", title \"Colors · n\", strap, \"+ Add color\" · \"Generate scale\". Open: Edit › cards (deferred), resource-area mount (REQUESTS #10), Restore points ▾ popover (B39). Built, not compared."
   },
   {
    "nodeId": "203:34125",
@@ -9225,9 +9225,9 @@
    "page": "05",
    "family": "brand",
    "status": "active",
-   "authority": "board",
+   "authority": "code:autosave-no-leave-guard",
    "verified": "no",
-   "verifiedNote": "No leave guard: code contract is autosave, \"no leave guard\" (BrandWorkspace.tsx:34, :279). Pending/failed/offline save guard needs lane deci"
+   "verifiedNote": "Brand Part 1a spec §4: every Brand edit is a composer write saved by project autosave; leaving Brand is in-app navigation and discards nothing (the board says so). Pending/failed save lives in the bottom-bar status (Phase 1). No guard built."
   },
   {
    "nodeId": "203:35333",
@@ -9399,7 +9399,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "\"Fonts & type styles\" card; board Heading/Body font selects + font-size token rows with Used by; \"+ Add a font\" vs \"Manage site fonts ›\""
+   "verifiedNote": "L-D S1: nav/title \"Typography\", action \"Manage site fonts ›\". Open: Heading/Body font selects + font-size token rows (deferred). Not compared."
   },
   {
    "nodeId": "207:38727",
@@ -9419,7 +9419,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "11 kinds reached by a Select in Spacing header; board index page with one row + description per kind"
+   "verifiedNote": "L-D S1: Other kinds index, 11 rows with the board's descriptions + intro line. Built, not compared."
   },
   {
    "nodeId": "207:39217",
@@ -9429,7 +9429,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Kind list + side card; board \"‹ Other kinds\", \"+ Add radius\", row ⋯ menu Rename/Delete…"
+   "verifiedNote": "L-D S1: kind page has \"‹ Other kinds\" and \"+ Add radius\"; kind Select removed. Open: row ⋯ menu (B54). Built, not compared."
   },
   {
    "nodeId": "207:39439",
@@ -9449,7 +9449,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code splits Styles, Component styles, Presets pages (+ \"Generate with AI\" on Styles, PR#33 removes); board one read-only catalogue"
+   "verifiedNote": "L-D S1: one Type styles · Presets page (Type styles + Presets groups, read-only notes, \"Browse section blocks in Add ›\"); Component styles page folded in. ✦ Generate with AI kept until PR #33. Built, not compared."
   },
   {
    "nodeId": "207:40046",
@@ -9629,7 +9629,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "phase1: save-failed + retry lives in bottom-bar status; Brand has no own state"
+   "verifiedNote": "Not L-D: the board draws no Brand UI beyond the bottom-bar save status + Retry (Phase 1 / lead)."
   },
   {
    "nodeId": "212:38600",
@@ -9637,9 +9637,9 @@
    "page": "05",
    "family": "brand",
    "status": "active",
-   "authority": "board",
+   "authority": "code:autosave-no-leave-guard",
    "verified": "no",
-   "verifiedNote": "No leave guard: code contract is autosave, \"no leave guard\" (BrandWorkspace.tsx:34, :279). Pending/failed/offline save guard needs lane deci"
+   "verifiedNote": "As 203:35106 — save failure retries from the shell status; leaving Brand loses nothing. No guard built."
   },
   {
    "nodeId": "212:38857",
@@ -10051,9 +10051,9 @@
    "page": "05",
    "family": "brand",
    "status": "active",
-   "authority": "board",
+   "authority": "code:autosave-no-leave-guard",
    "verified": "no",
-   "verifiedNote": "No leave guard: code contract is autosave, \"no leave guard\" (BrandWorkspace.tsx:34, :279). Pending/failed/offline save guard needs lane deci"
+   "verifiedNote": "As 203:35106 — offline edits stay applied and retry; leaving Brand loses nothing. No guard built."
   },
   {
    "nodeId": "219:42880",
@@ -10093,7 +10093,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "phase1: topbar Undo tooltip naming last action belongs to Task 1.2 (one undo)"
+   "verifiedNote": "Not L-D: topbar Undo tooltip naming the last action is Task 1.2's control (lead)."
   },
   {
    "nodeId": "220:42592",
@@ -15120,7 +15120,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Brand has only \"‹ Back to canvas\" (design-system/ui/BrandWorkspace.tsx:254); no return to Site settings (L-D)"
+   "verifiedNote": "L-D S1: BrandWorkspace door reads \"‹ Back to Site settings\" and reopens Settings at the screen it came from (requestBrandReturn); reachable once REQUESTS #11 lands in SettingsTab. Board's Undo|Redo in the Brand header not adopted (one undo). Built, not compared."
   },
   {
    "nodeId": "277:27746",
@@ -15917,7 +15917,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Brand has only \"‹ Back to canvas\" (design-system/ui/BrandWorkspace.tsx:254); no return to Site settings (L-D)"
+   "verifiedNote": "L-D S1: same door as 277:27516 (screen = the discarded Security draft's screen). Needs REQUESTS #11. Built, not compared."
   },
   {
    "nodeId": "277:107940",
@@ -15927,7 +15927,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Brand has only \"‹ Back to canvas\" (design-system/ui/BrandWorkspace.tsx:254); no return to Site settings (L-D)"
+   "verifiedNote": "L-D S1: same door as 277:27516. Needs REQUESTS #11. Built, not compared."
   },
   {
    "nodeId": "277:336979",
@@ -18348,7 +18348,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Brand has only \"‹ Back to canvas\" (design-system/ui/BrandWorkspace.tsx:254); no return to Site settings (L-D)"
+   "verifiedNote": "L-D S1: same door as 277:27516 (returns to Languages). Needs REQUESTS #11. Built, not compared."
   },
   {
    "nodeId": "278:68065",

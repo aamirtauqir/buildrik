@@ -1,15 +1,13 @@
 /**
- * ReusableStylesSection — Brand › Styles, board 7316:82153.
+ * ReusableStylesSection — Brand › Type styles · Presets, board 2L9 B6-B26.
  *
- * The site's reusable styles in one card: the type styles ("Heading 1 /
- * Inter Bold 36/40", the same rows Fonts & type styles lists) and the preset
- * variants ("Button · primary / color-primary · radius 8"). A type style row
- * selects its token (the card opens in the right column); a preset row opens
- * Presets, where its bindings are listed. Caption "Reusable · N".
- *
- * This page was hidden under G3-142 ("no engine consumer"); the owner's
- * parity order (2026-09-24) puts it back as drawn — it lists what the site
- * already reuses, it does not invent a new style store.
+ * One read-only catalogue in two groups: Type styles ("Heading 1 / Inter
+ * Bold 36/40", built from the Typography tokens) and Presets ("Button ·
+ * primary / color-primary · radius 8"), then the door to the section blocks
+ * ("Browse section blocks in Add ›", which absorbed the old Component styles
+ * page — its rows only ever opened Add › Blocks). A type style row selects
+ * its token (the card opens in the right column); a preset row opens
+ * Presets, where its bindings are listed.
  *
  * @license BSD-3-Clause
  */
@@ -47,10 +45,6 @@ export function presetLine(preset: StylePreset, tokens: readonly DesignToken[]):
   return parts.join(" · ");
 }
 
-export function reusableStylesCount(typeTokens: readonly DesignToken[], presets: readonly StylePreset[]): number {
-  return typeStyleRows(typeTokens).length + presets.length;
-}
-
 export interface ReusableStylesSectionProps {
   typeTokens: readonly DesignToken[];
   allTokens: readonly DesignToken[];
@@ -58,7 +52,12 @@ export interface ReusableStylesSectionProps {
   selectedTokenId?: string | null;
   onSelectToken?: (tokenId: string) => void;
   onOpenPresets?: () => void;
+  /** "Browse section blocks in Add ›" — leaves Brand for Add › Blocks. */
+  onBrowseBlocks?: () => void;
 }
+
+const GROUP_TITLE = "tw:m-0 tw:text-[length:var(--bk-text-14)] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]";
+const GROUP_NOTE = "tw:m-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]";
 
 export const ReusableStylesSection: React.FC<ReusableStylesSectionProps> = ({
   typeTokens,
@@ -67,40 +66,59 @@ export const ReusableStylesSection: React.FC<ReusableStylesSectionProps> = ({
   selectedTokenId = null,
   onSelectToken,
   onOpenPresets,
+  onBrowseBlocks,
 }) => {
   const typeRows = typeStyleRows(typeTokens);
-  if (typeRows.length + presets.length === 0) {
-    return (
-      <p className="tw:m-0 tw:py-3 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]">
-        No reusable styles yet.
-      </p>
-    );
-  }
   return (
-    <BrandCard label="Styles" data-testid="brand-styles-list">
-      {typeRows.map((r) => (
-        <BrandRow
-          key={r.id}
-          data-style-row="type"
-          data-testid={`brand-style-row-${r.id}`}
-          selected={selectedTokenId === r.id}
-          onSelect={() => onSelectToken?.(r.id)}
-          trailing={<BrandChevron />}
-          name={r.name}
-          sub={r.line}
-        />
-      ))}
-      {presets.map((p) => (
-        <BrandRow
-          key={p.id}
-          data-style-row="preset"
-          data-testid={`brand-style-row-${p.id}`}
-          onSelect={() => onOpenPresets?.()}
-          trailing={<BrandChevron />}
-          name={`${CATEGORY[p.category] ?? p.category} · ${p.variant}`}
-          sub={presetLine(p, allTokens)}
-        />
-      ))}
-    </BrandCard>
+    <div className="tw:flex tw:flex-col tw:gap-6" data-testid="brand-styles-list">
+      <section className="tw:flex tw:flex-col tw:gap-2" aria-labelledby="brand-type-styles-title">
+        <p id="brand-type-styles-title" className={GROUP_TITLE}>Type styles</p>
+        <p className={GROUP_NOTE}>Read-only catalogue · built from Typography tokens</p>
+        {typeRows.length === 0 ? (
+          <p className={GROUP_NOTE}>No type styles yet.</p>
+        ) : (
+          <BrandCard label="Type styles">
+            {typeRows.map((r) => (
+              <BrandRow
+                key={r.id}
+                data-style-row="type"
+                data-testid={`brand-style-row-${r.id}`}
+                selected={selectedTokenId === r.id}
+                onSelect={() => onSelectToken?.(r.id)}
+                trailing={<BrandChevron />}
+                name={r.name}
+                sub={r.line}
+              />
+            ))}
+          </BrandCard>
+        )}
+      </section>
+      <section className="tw:flex tw:flex-col tw:gap-2" aria-labelledby="brand-presets-title">
+        <p id="brand-presets-title" className={GROUP_TITLE}>Presets</p>
+        <p className={GROUP_NOTE}>Read-only catalogue</p>
+        {presets.length === 0 ? (
+          <p className={GROUP_NOTE}>No presets yet.</p>
+        ) : (
+          <BrandCard label="Presets">
+            {presets.map((p) => (
+              <BrandRow
+                key={p.id}
+                data-style-row="preset"
+                data-testid={`brand-style-row-${p.id}`}
+                onSelect={() => onOpenPresets?.()}
+                trailing={<BrandChevron />}
+                name={`${CATEGORY[p.category] ?? p.category} · ${p.variant}`}
+                sub={presetLine(p, allTokens)}
+              />
+            ))}
+          </BrandCard>
+        )}
+      </section>
+      {onBrowseBlocks && (
+        <BrandCard label="Section blocks">
+          <BrandRow data-testid="brand-browse-blocks" onSelect={onBrowseBlocks} trailing={<BrandChevron />} name="Browse section blocks in Add" />
+        </BrandCard>
+      )}
+    </div>
   );
 };

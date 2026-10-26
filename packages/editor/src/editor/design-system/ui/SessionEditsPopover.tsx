@@ -99,7 +99,7 @@ export function SessionEditsPopover({
             disabled={disabled}
             data-testid="brand-session-edits"
           >
-            Review changes · {edits.length}
+            {edits.length > 0 ? `Review changes · ${edits.length}` : "Review changes"}
           </Button>
           {extraActions}
         </div>

@@ -17,7 +17,7 @@ describe("BrandWorkspace › Colour scale generator (BRP1-M9)", () => {
     const composer = makeFakeComposer(DEFAULT_TOKENS);
     const u = renderWorkspace(composer);
     act(() => { fireEvent.click(u.getByTestId("brand-generate-scale")); });
-    expect(u.getByTestId("brand-page-title").textContent).toBe("Colour scale generator");
+    expect(u.getByTestId("brand-page-title").textContent).toMatch(/^Colors · \d+$/);
     expect(u.getByTestId("brand-row-colours").getAttribute("aria-current")).toBe("page");
     expect((u.getByTestId("brand-scale-input") as HTMLInputElement).value.toUpperCase()).toBe("#1A56DB");
   });
@@ -30,7 +30,7 @@ describe("BrandWorkspace › Colour scale generator (BRP1-M9)", () => {
     act(() => { fireEvent.click(success); });
     act(() => { fireEvent.click(u.getByTestId("brand-token-menu")); });
     act(() => { fireEvent.click(u.getByTestId("brand-token-action-scale")); });
-    expect(u.getByTestId("brand-page-title").textContent).toBe("Colour scale generator");
+    expect(u.getByTestId("brand-page-title").textContent).toMatch(/^Colors · \d+$/);
     expect((u.getByTestId("brand-scale-input") as HTMLInputElement).value).toBe(resolveTokenLiteral(DEFAULT_TOKENS, "color-success", "light"));
   });
 });

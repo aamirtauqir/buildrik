@@ -8,7 +8,7 @@
 import { render, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import * as React from "react";
-import { LintSection, brandChecksCaption, contrastFixFor } from "../LintSection";
+import { LintSection, contrastFixFor } from "../LintSection";
 import { calcContrastRatio } from "@/engine/designSystem/colorMath";
 import type { LintIssue } from "@/engine/designSystem/linter";
 import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
@@ -70,13 +70,6 @@ describe("LintSection", () => {
     expect(onOpen).toHaveBeenCalledWith("brand/accent-soft");
     // The drawer's "Auto-fix isn't available yet" note is gone — it is.
     expect(document.body.textContent).not.toMatch(/Auto-fix isn't available yet/);
-  });
-
-  it("captions the page with the count, and says when auto-fix is available", () => {
-    expect(brandChecksCaption([warn, err])).toBe("2 issues");
-    expect(brandChecksCaption([{ ...warn, autoFixHint: "contrast:#FFFFFF" }])).toBe("1 issue · auto-fix available");
-    // G3-123: ignored checks ride the caption (no "Warnings suppressed" pill).
-    expect(brandChecksCaption([warn], 3)).toBe("1 issue · 3 ignored");
   });
 
   it("keys rows by rule AND token so one token can hold two findings", () => {

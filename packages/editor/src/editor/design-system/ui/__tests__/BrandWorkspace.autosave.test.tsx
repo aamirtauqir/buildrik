@@ -35,7 +35,7 @@ describe("BrandWorkspace — pages", () => {
   it("lands on Colours and switches pages directly", async () => {
     const composer = makeFakeComposer();
     const utils = renderWorkspace(composer);
-    expect(utils.getByTestId("brand-page-title").textContent).toBe("Colours");
+    expect(utils.getByTestId("brand-page-title").textContent).toMatch(/^Colors · \d+$/);
     expect(document.getElementById("design-section-colours")).toBeTruthy();
 
     openPage(utils, "presets");
@@ -44,26 +44,35 @@ describe("BrandWorkspace — pages", () => {
       expect(document.getElementById("design-section-colours")).toBeNull();
     });
     expect(utils.getByTestId("brand-page-title").textContent).toBe("Presets");
-    expect(utils.getByTestId("brand-row-presets").getAttribute("aria-current")).toBe("page");
+    // Presets is a drill-in of Type styles · Presets (B6-B26): that row stays current.
+    expect(utils.getByTestId("brand-row-styles").getAttribute("aria-current")).toBe("page");
   });
 
-  it("lists the board's nav in its order, Styles included, the other kinds on Spacing's switch", () => {
+  it("lists the board's nav in three groups (B6-B01); the other kinds sit under Other kinds › (B6-B23)", () => {
     const composer = makeFakeComposer();
     const utils = renderWorkspace(composer);
-    /* The label cell only — Colours carries its palette count beside it. */
-    const labels = Array.from(utils.container.querySelectorAll('[data-testid^="brand-row-label-"]')).map(
-      (r) => r.textContent?.trim(),
-    );
-    expect(labels).toEqual([
-      "Colours", "Colour mode", "Fonts & type styles", "Styles", "Component styles", "Classes",
-      "Presets", "Brand checks", "Starters", "Spacing", "Import / export",
+    const groups = utils.getAllByTestId("brand-nav-group").map((g) => [
+      g.querySelector("p")?.textContent,
+      ...Array.from(g.querySelectorAll('[data-testid^="brand-row-label-"]')).map((r) => r.textContent?.trim()),
+    ]);
+    expect(groups).toEqual([
+      ["Tokens", "Colors", "Typography", "Spacing", "Other kinds ›"],
+      ["Reusable styles", "Type styles · Presets", "Classes"],
+      ["Tools", "Dark mode", "Checks", "Starters", "Import / export"],
     ]);
     expect(utils.container.querySelector('[data-testid="brand-basic-note"]')).toBeNull();
-    fireEvent.click(utils.container.querySelector('[data-section-id="spacing"]')!);
-    fireEvent.change(utils.getByTestId("brand-kind-switch"), { target: { value: "kind-imagery" } });
+    fireEvent.click(utils.container.querySelector('[data-section-id="other-kinds"]')!);
+    expect(utils.getByTestId("brand-page-title").textContent).toBe("Other kinds");
+    const kinds = utils.getByTestId("brand-other-kinds");
+    expect(kinds.children).toHaveLength(11);
+    expect(kinds.textContent).toContain("ImageryImage ratios and treatments");
+    fireEvent.click(utils.getByTestId("brand-kind-row-imagery"));
     expect(utils.getByTestId("brand-page-title").textContent).toBe("Imagery");
-    // Spacing stays the current nav row on a kind page.
-    expect(utils.getByTestId("brand-row-spacing").getAttribute("aria-current")).toBe("page");
+    // Other kinds stays the current nav row on a kind page; its back link returns.
+    expect(utils.getByTestId("brand-row-other-kinds").getAttribute("aria-current")).toBe("page");
+    expect(utils.getByTestId("brand-page-action").textContent).toBe("+ Add imagery");
+    fireEvent.click(utils.getByTestId("brand-back-other-kinds"));
+    expect(utils.getByTestId("brand-page-title").textContent).toBe("Other kinds");
   });
 
   it("the edit survives the trip to another page and back", async () => {
@@ -162,7 +171,7 @@ describe("BrandWorkspace — Review changes (non-blocking, every Brand write thi
     const composer = makeFakeComposer();
     const utils = renderWorkspace(composer);
     // Drawn at 0 too (8222:230854): the empty list says so.
-    expect(utils.getByTestId("brand-session-edits").textContent).toBe("Review changes · 0");
+    expect(utils.getByTestId("brand-session-edits").textContent).toBe("Review changes");
     await openList(utils);
     expect(utils.getByText("No changes to review yet.")).toBeTruthy();
     fireEvent.click(utils.getByTestId("brand-session-close"));
@@ -187,7 +196,7 @@ describe("BrandWorkspace — Review changes (non-blocking, every Brand write thi
     const reverted = composer.settings.designTokens as DesignToken[];
     expect(reverted.map((t) => t.id).sort()).toEqual(seedIds);
     expect(resolveTokenLiteral(reverted, "color-primary", "light")).toBe(resolveTokenLiteral(DEFAULT_TOKENS, "color-primary", "light"));
-    await waitFor(() => expect(utils.getByTestId("brand-session-edits").textContent).toBe("Review changes · 0"));
+    await waitFor(() => expect(utils.getByTestId("brand-session-edits").textContent).toBe("Review changes"));
   });
 
   /* L4-026: ⌘Z put the tokens back, but the list still showed the edit under
@@ -206,7 +215,7 @@ describe("BrandWorkspace — Review changes (non-blocking, every Brand write thi
 
     // ⌘Z — the engine restores the settings snapshot and emits SETTINGS_CHANGE.
     act(() => (composer as unknown as { setProjectSettings: (s: object) => void }).setProjectSettings({ designTokens: before }));
-    await waitFor(() => expect(utils.getByTestId("brand-session-edits").textContent).toBe("Review changes · 0"));
+    await waitFor(() => expect(utils.getByTestId("brand-session-edits").textContent).toBe("Review changes"));
 
     act(() => (composer as unknown as { setProjectSettings: (s: object) => void }).setProjectSettings({ designTokens: edited }));
     await waitFor(() => expect(utils.getByTestId("brand-session-edits").textContent).toBe("Review changes · 1"));
@@ -258,7 +267,7 @@ describe("BrandWorkspace — Review changes (non-blocking, every Brand write thi
     fireEvent.click(second());
     openPage(utils, "colours");
     expect(utils.getByTestId("brand-session-edits").textContent).toBe(after1);
-    expect(after1).not.toBe("Review changes · 0");
+    expect(after1).not.toBe("Review changes");
   });
 
   it("an import is a row per token it added", async () => {

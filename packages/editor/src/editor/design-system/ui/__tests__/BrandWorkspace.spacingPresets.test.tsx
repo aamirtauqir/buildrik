@@ -38,8 +38,7 @@ describe("BrandWorkspace — Spacing presets menu", () => {
 
   it("the menu is Spacing's only — a kind page has none", () => {
     const utils = renderWorkspace(makeFakeComposer());
-    openPage(utils, "spacing");
-    fireEvent.change(utils.getByTestId("brand-kind-switch"), { target: { value: "kind-imagery" } });
+    openPage(utils, "kind-imagery");
     expect(utils.queryByTestId("brand-spacing-menu")).toBeNull();
   });
 });

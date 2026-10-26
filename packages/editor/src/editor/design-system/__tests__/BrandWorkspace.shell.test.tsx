@@ -18,6 +18,7 @@ import * as React from "react";
 import { getTabMode } from "@/editor/rail/tabsConfig";
 import { FullPageRouter } from "@/editor/sidebar/FullPageRouter";
 import type { Composer } from "@/engine";
+import { requestBrandReturn } from "@/editor/design-system/ui/brandOpenRequest";
 import {
   installDomShims,
   makeFakeComposer,
@@ -54,7 +55,7 @@ describe("BrandWorkspace › the rail target", () => {
     // A portal, like Settings and the Asset library — not the fullpage slot.
     expect(container.contains(host)).toBe(false);
     expect(screen.getByTestId("brand-panel")).toBeTruthy();
-    expect(screen.getByTestId("brand-page-title").textContent).toBe("Colours");
+    expect(screen.getByTestId("brand-page-title").textContent).toMatch(/^Colors · \d+$/);
     expect(screen.getByTestId("brand-row-colours").getAttribute("aria-current")).toBe("page");
     // The colour token list is the page.
     expect(document.getElementById("design-section-colours")).toBeTruthy();
@@ -71,7 +72,7 @@ describe("BrandWorkspace › the rail target", () => {
   });
 });
 
-describe("BrandWorkspace › ‹ Back to canvas (nothing staged, nothing to guard)", () => {
+describe("BrandWorkspace › ‹ Back to Editor (nothing staged, nothing to guard)", () => {
   it("leaves at once after an edit — the edit is already in the project", async () => {
     const composer = makeFakeComposer();
     const onClose = vi.fn();
@@ -154,4 +155,36 @@ describe("BrandWorkspace › first run", () => {
     expect(utils.queryByTestId("brand-tokens-first-load-banner")).toBeNull();
   });
 
+});
+
+describe("BrandWorkspace › 2L9 shell (B6-B01, GAP-ST-T03)", () => {
+  it("the door names the page the editor kept open", () => {
+    const composer = makeFakeComposer();
+    Object.assign(composer.elements as object, { getActivePage: () => ({ id: "p1", name: "About" }) });
+    const utils = renderWorkspace(composer);
+    expect(utils.getByTestId("brand-back-link").textContent).toBe("Back to Editor · About");
+  });
+
+  it("opened from Site settings, the door goes back to the screen it came from — and not to the canvas", () => {
+    const composer = makeFakeComposer();
+    const onClose = vi.fn();
+    requestBrandReturn(composer, { screen: "security" });
+    const utils = renderWorkspace(composer, { onClose });
+    expect(utils.getByTestId("brand-back-link").textContent).toBe("Back to Site settings");
+    fireEvent.click(utils.getByTestId("brand-back-link"));
+    expect(composer.emit).toHaveBeenCalledWith("panel:open", { panel: "settings", screen: "security" });
+    expect(onClose).not.toHaveBeenCalled();
+    // Read once: the next visit is an ordinary one.
+    utils.unmount();
+    expect(renderWorkspace(makeFakeComposer()).getByTestId("brand-back-link").textContent).toBe("Back to Editor");
+  });
+
+  it("every page carries the strap; the header has Review changes and Restore points, and no Undo / Redo (one undo)", () => {
+    const utils = renderWorkspace(makeFakeComposer());
+    expect(utils.getByTestId("brand-page-strap").textContent).toBe("Changes apply as you edit — undo any time");
+    expect(utils.getByTestId("brand-session-edits").textContent).toBe("Review changes");
+    expect(utils.getByTestId("brand-restore-points-action")).toBeTruthy();
+    const names = [...utils.getByTestId("brand-panel").querySelectorAll("button")].map((b) => b.textContent?.trim() ?? "");
+    expect(names.filter((n) => /^(Undo|Redo)\b/.test(n))).toEqual([]);
+  });
 });
