@@ -43,6 +43,9 @@ export interface LayerItem {
    *  heading is which (designer walk 2026-08-28); the copy is the identity.
    *  Never overrides a custom name. */
   preview?: string;
+  /** Search results only (design-2l9 board 147:77189): the row's ancestors,
+   *  "Services › Card 1", since a flat result list loses the tree. */
+  searchPath?: string;
   /** Whether this layer is a component instance */
   /** Breakpoint-specific visibility overrides */
   breakpointOverrides?: Record<string, { hidden?: boolean }>;

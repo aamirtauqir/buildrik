@@ -229,7 +229,8 @@ export function usePages(composer: Composer | null): UsePagesReturn {
         if (!updateUrl && before && before.name !== trimmed) {
           const undoRename = composer.history?.captureUndo?.();
           addToast({
-            description: before.isHome ? `Renamed to ${trimmed}` : `Renamed to ${trimmed} · URL /${before.slug} kept`,
+            /* design-2l9 board 63:23182: "Our story renamed · URL kept". */
+            description: before.isHome ? `${trimmed} renamed` : `${trimmed} renamed · URL kept`,
             tone: "info",
             duration: 8000,
             action: { label: "Undo", onClick: () => undoRename?.() },

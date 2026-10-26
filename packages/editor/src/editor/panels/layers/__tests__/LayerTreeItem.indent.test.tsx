@@ -83,3 +83,15 @@ describe("Layers indent ladder — board 4418:81300", () => {
     expect(onSelect).toHaveBeenCalledTimes(3);
   });
 });
+
+/* design-2l9 board 147:77189: a search result names where it sits. */
+describe("search result path", () => {
+  it("draws the ancestors after the name, and nothing outside search", () => {
+    const withPath = rowFor(0, {
+      layer: { id: "t1", type: "text", tagName: "p", depth: 0, children: [], searchPath: "Services › Card 1" },
+    } as Partial<LayerTreeItemProps>);
+    expect(withPath.querySelector('[data-testid="layer-search-path-t1"]')?.textContent).toBe("Services › Card 1");
+    const plain = rowFor(1);
+    expect(plain.querySelector('[data-testid^="layer-search-path-"]')).toBeNull();
+  });
+});

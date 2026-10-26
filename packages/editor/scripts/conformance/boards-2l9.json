@@ -294,7 +294,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Undo toast exists; board receipt copy 'Our story renamed · URL kept' + inline 'Page renamed. URL kept at /about.' differs"
+   "verifiedNote": "L-A wave 2 built, not compared: receipt '{Page} renamed · URL kept' + Undo. The inline 'Page renamed. URL kept at /about.' line is not drawn."
   },
   {
    "nodeId": "64:10927",
@@ -302,9 +302,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Undo toast exists; board receipt copy 'Our story renamed · URL kept' + inline 'Page renamed. URL kept at /about.' differs"
+   "authority": "code:update-url-opens-redirect-offer",
+   "verified": "no",
+   "verifiedNote": "An 'Update URL' rename lands in Page settings with the redirect offer for the old URL (G2-076, boards 6887:75724/75760) instead of a '… URL changed to /x' receipt. L-A wave 2."
   },
   {
    "nodeId": "64:18356",
@@ -2557,7 +2557,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code filtered tree w/ ancestors; board flat results 'Services › Card 1', '12 matches in 5,000 layers'"
+   "verifiedNote": "L-A wave 2 built, not compared: flat search results carry their ancestors ('Services › Card 1') after the name; footer '5,000 layers · 12 matches'. The board's list-head '12 matches in 5,000 layers' line and end-of-list Clear search are not drawn (Clear search sits in the field)."
   },
   {
    "nodeId": "147:77668",
@@ -2566,8 +2566,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Lock exists; no 'Locked by Hero' inheritance, reveal or unlock banner"
+   "verified": "drift-open",
+   "verifiedNote": "L-A wave 2: Layers footer '… · 1 selected · Locked by {Ancestor}' built. The inspector's 'Locked by Hero — unlock in Layers' / 'Show Hero in Layers' block is L-B's. Not compared."
   },
   {
    "nodeId": "147:78110",
@@ -2576,8 +2576,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Lock exists; no 'Locked by Hero' inheritance, reveal or unlock banner"
+   "verified": "drift-open",
+   "verifiedNote": "L-A wave 2: footer '… · 1 selected · Locked' built (board names it '{Hero} selected · Locked'); inspector unlock block is L-B's. Not compared."
   },
   {
    "nodeId": "147:78484",
@@ -2596,8 +2596,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Dimmed exists; no 'Dimmed in editor only · Show normally · Hide on live site…' banner"
+   "verified": "drift-open",
+   "verifiedNote": "L-A wave 2: footer '… · 1 selected · Dimmed' built; the inspector's 'Dimmed in editor only · Show normally · Hide on live site…' banner is L-B's. Not compared."
   },
   {
    "nodeId": "147:79328",
@@ -2607,7 +2607,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-A S2 built, not compared: 'No layers match “q”' / 'Search by name, type, tag or ID.' / Clear search (search really matches name, type, tag, id — useLayerSearch.itemMatches); footer '{N} layers · No matches'. 'Search everywhere' kept (code-ahead)."
+   "verifiedNote": "L-A S2 + wave 2, not compared: 'No layers match “q”' / 'Search by name, type, tag or ID.' / Clear search; footer '{N} layers · No matches'."
   },
   {
    "nodeId": "147:79728",
@@ -2617,7 +2617,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code filtered tree w/ ancestors; board flat results 'Services › Card 1', '12 matches in 5,000 layers'",
+   "verifiedNote": "Same search rows as 147:77189 (L-A wave 2), not compared.",
    "inheritsFrom": "147:77189"
   },
   {
