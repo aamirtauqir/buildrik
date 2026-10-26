@@ -1,5 +1,11 @@
 /**
- * UnsavedWarningModal — board 1171:4820.
+ * UnsavedWarningModal — design-2l9 board 63:18758 (B3-P10): "Leave without
+ * saving?", the page named, Keep editing · Discard changes · Save and leave.
+ * (Was board 1171:4820's two-button "Discard unsaved changes?". The drawer no
+ * longer autosaves — decision #20, Cancel · Save — so "save now" is a real
+ * choice again and the board's third button is back.)
+ *
+ * Earlier notes, kept for the reasoning on the safe default:
  *
  * The board names what is at stake instead of asking a generic question:
  * "Discard unsaved SEO changes?" over one line saying which fields were edited
@@ -34,6 +40,11 @@ interface Props {
   isOpen: boolean;
   onDiscard: () => void;
   onCancel: () => void;
+  /** The page whose settings are unsaved. */
+  pageName: string;
+  /** The page open on the canvas, when it is another one. */
+  stays?: string | null;
+  onSaveAndLeave: () => void;
 }
 
 const BTN = "tw:min-h-0 tw:rounded-md tw:px-3 tw:py-[7px] tw:text-[11px] tw:font-medium";
@@ -42,6 +53,9 @@ export const UnsavedWarningModal: React.FC<Props> = ({
   isOpen,
   onDiscard,
   onCancel,
+  pageName,
+  stays,
+  onSaveAndLeave,
 }) => {
   const keepRef = React.useRef<HTMLButtonElement>(null);
 
@@ -76,14 +90,13 @@ export const UnsavedWarningModal: React.FC<Props> = ({
                   `tw:text-[13px]` this file passed never applied and the
                   heading measured 14. Same defect found on ReviewModal today. */}
               <span data-testid="pages-unsaved-title" className="tw:text-[13px] tw:leading-[normal]">
-                Discard unsaved changes?
+                Leave without saving?
               </span>
             </ModalTitle>
 
             {/* `leading-[normal]` — 1171:4822. */}
             <p data-testid="pages-unsaved-body" className="tw:m-0 tw:text-[11px] tw:leading-[normal] tw:text-[var(--bk-ink-soft)]">
-              You changed this page&apos;s settings but didn&apos;t save. Closing throws those
-              edits away.
+              {`You have unsaved page settings for ${pageName}. Save or discard them to return to Pages, or keep editing.${stays ? ` ${stays} stays open.` : ""}`}
             </p>
 
             <div className="tw:flex tw:justify-end tw:gap-2" data-testid="pages-unsaved-foot">
@@ -103,6 +116,13 @@ export const UnsavedWarningModal: React.FC<Props> = ({
                 aria-label="Discard the unsaved changes and close"
               >
                 Discard changes
+              </Button>
+              <Button
+                className={`${BTN} tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-card)] tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-gray-100)]`}
+                onClick={onSaveAndLeave}
+                data-testid="pages-unsaved-save"
+              >
+                Save and leave
               </Button>
             </div>
           </div>

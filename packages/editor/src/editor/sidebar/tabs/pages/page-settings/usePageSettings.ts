@@ -286,9 +286,9 @@ export function usePageSettings(
       });
       return true;
     } catch {
-      /* The dialog stays open with the edits; Done is the retry (#20). */
+      /* The dialog stays open with the edits and says so inline (design-2l9
+         63:18189); its primary becomes Retry save. */
       setSaveState("error");
-      addToast({ description: "Save failed — your changes are still here.", tone: "error" });
       return false;
     }
   }, [

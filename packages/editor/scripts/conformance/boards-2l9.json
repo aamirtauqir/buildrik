@@ -173,7 +173,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Board 720×700 modal 'About · Page settings' + 'Home stays open' subtitle; code drawer 'Page settings — About'; SeoTab ✦ AI suggest (pr33)"
+   "verifiedNote": "L-A S9 built, not compared: title '{Page} · Page settings', subtitle 'Editing {Page} · {Active} stays open on the canvas', foot Cancel · Save, override note 'These overrides affect this page only. Clear the title to use site defaults.'. Container stays the drawer (blocked:owner-page-settings-container); SEO 'Write with AI' waits on PR #33."
   },
   {
    "nodeId": "63:16507",
@@ -203,7 +203,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Copy matches; container (modal) and 'Later' vs 'Not now' differ"
+   "verifiedNote": "L-A S9: redirect offer's second action reads 'Later'. Container (modal vs drawer) is the open owner decision."
   },
   {
    "nodeId": "63:18189",
@@ -212,8 +212,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No 'Couldn’t save page settings. Your changes are still here.' + Retry save"
+   "verified": "drift-open",
+   "verifiedNote": "L-A S9 built, not compared: inline 'Couldn’t save page settings. Your changes are still here.', primary 'Retry save', subtitle '{Page} · Unsaved settings changes · {Active} stays open' (the failure toast is gone)."
   },
   {
    "nodeId": "63:18758",
@@ -223,7 +223,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code Keep editing/Discard; board 'Leave without saving?' + Save and leave (+offline/invalid variants)"
+   "verifiedNote": "L-A S9 built, not compared: 'Leave without saving?', 'You have unsaved page settings for {Page}. Save or discard them to return to Pages, or keep editing. {Active} stays open.', Keep editing · Discard changes · Save and leave (saves, then closes). Offline / invalid variants (101:24231, 101:29372) not built."
   },
   {
    "nodeId": "63:19334",
@@ -595,8 +595,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No 'Couldn’t save page settings. Your changes are still here.' + Retry save"
+   "verified": "drift-open",
+   "verifiedNote": "Same save-failed state as 63:18189 (L-A S9), not compared."
   },
   {
    "nodeId": "101:24231",

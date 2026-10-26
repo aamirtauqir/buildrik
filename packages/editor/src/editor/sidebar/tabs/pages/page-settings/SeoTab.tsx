@@ -289,7 +289,7 @@ export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, onOpe
                 data-testid="page-seo-redirect-later"
                 onClick={() => setAnsweredChange(change)}
               >
-                Not now
+                Later
               </Button>
             </div>
           </div>
@@ -386,7 +386,7 @@ export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, onOpe
           <option value="noindex">Hidden · not in search</option>
         </Select>
         <p className={`tw:m-0 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink-soft)] ${UI}`} data-testid="seo-override-note">
-          {siteName ? `${siteName} · ` : ""}These overrides affect {page.name} only.
+          These overrides affect this page only. Clear the title to use site defaults.
         </p>
         {onOpenSiteDefaults && (
           <Button

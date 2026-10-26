@@ -51,7 +51,7 @@ describe("PagesTab — ui:pages-open-settings", () => {
   it("opens the named page's settings drawer on the SEO tab from the held request", async () => {
     mount({ pageId: "p2", tab: "seo" });
 
-    await waitFor(() => expect(screen.getByTestId("pg-drawer-title")).toHaveTextContent("Page settings — About"));
+    await waitFor(() => expect(screen.getByTestId("pg-drawer-title")).toHaveTextContent("About · Page settings"));
     await waitFor(() => expect(selectedTab()).toBe("seo"));
     expect(screen.getByRole("tabpanel", { name: "SEO settings" })).toBeInTheDocument();
   });
@@ -81,7 +81,7 @@ describe("PagesTab — ui:pages-open-settings", () => {
 
     act(() => composer._emit(DOOR, { pageId: "p2", tab: "seo" }));
 
-    expect(screen.getByTestId("pg-drawer-title")).toHaveTextContent("Page settings — About");
+    expect(screen.getByTestId("pg-drawer-title")).toHaveTextContent("About · Page settings");
     await waitFor(() => expect(selectedTab()).toBe("seo"));
     expect(screen.getByRole("tabpanel", { name: "SEO settings" })).toBeInTheDocument();
   });

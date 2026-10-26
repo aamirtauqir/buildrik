@@ -364,7 +364,7 @@ describe("SeoTab — the redirect offer after a saved slug change", () => {
       "URL changed from /about to /about-us. Add a redirect so old links keep working?",
     );
     expect(screen.getByTestId("page-seo-redirect-add")).toHaveTextContent("Add redirect");
-    expect(screen.getByTestId("page-seo-redirect-later")).toHaveTextContent("Not now");
+    expect(screen.getByTestId("page-seo-redirect-later")).toHaveTextContent("Later");
   });
 
   /* One emit, `ui:settings-open`: StudioPanels (always mounted) switches the
