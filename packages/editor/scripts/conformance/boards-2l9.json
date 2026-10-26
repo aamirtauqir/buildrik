@@ -23193,7 +23193,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "phase1 T1.2: Topbar.tsx shows site›page crumb + SaveStatus; board: Site settings label, History undo group, users icon, ⋯."
+   "verifiedNote": "Live 2026-10-26: 56 tall, one Undo/Redo pair (68 wide), no overflow at 3 widths. Still open: board shows site name as plain text + labelled \"Site settings\" button (owner decision pending)."
   },
   {
    "nodeId": "497:99445",
@@ -23213,7 +23213,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "phase1 T1.3: PageTabBar.tsx:85 tablist; board page switcher \"Home /\" + count + \"Saved just now · Details\"; resource-area variant."
+   "verifiedNote": "Live 2026-10-26: switcher bar matches. Still open: board puts \"Saved just now · Details\" in the bottom bar; code keeps it in the topbar (owner decision pending). Resource-area variant hidden under full-screen Brand/Settings."
   },
   {
    "nodeId": "497:339496",
@@ -23222,8 +23222,8 @@
    "family": "shell-components",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "phase1 T1.4: InspectorHeader.tsx:87 breadcrumb + Ask AI :108; board: type icon + name, \"Editing\", \"Desktop · Default state\"."
+   "verified": "drift-fixed",
+   "verifiedNote": "Live 2026-10-26 (preview, 1440×900, QA site): header 84px, \"Heading ⋯ ✕\" + \"Editing · Desktop · Default state\", AI chip gone. Branch feat/design-2l9-insphead."
   },
   {
    "nodeId": "497:339497",
@@ -23232,8 +23232,8 @@
    "family": "shell-components",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "phase1 T1.3 bottom switcher; Pages manager PagesTab.tsx:426 exists (Add page/From template/New folder AddPageButton.tsx:60)."
+   "verified": "drift-fixed",
+   "verifiedNote": "Live 2026-10-26: page tabs gone; bottom bar \"Home / ⌄ · 2 pages · ⇧⌘O to switch\"; no overflow at 1440/1280/1024."
   },
   {
    "nodeId": "498:634",
@@ -23261,9 +23261,9 @@
    "page": "improved",
    "family": "shell-components",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "phase1 T1.7: PublishTab.tsx sections differ; topbar must drop Publish while tray open; reason \"Fix 1 blocking issue to publish\"."
+   "authority": "founder:od-1",
+   "verified": "drift-fixed",
+   "verifiedNote": "Live 2026-10-23 (task agent): tray 360 wide, canvas fits with 53px spare, one CTA, Esc returns focus. Blocking state verified in probe pin only. OD-1 default (owner may override)."
   },
   {
    "nodeId": "499:3065",
@@ -23283,7 +23283,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "phase1: no StatusBadge in chrome-ui; RecordsTable.tsx:187 renders \"· Draft\" text. Tones Neutral/Success/Warning needed."
+   "verifiedNote": "StatusBadge tones built (feat/design-2l9-cmsbadge), pinned in probe; not walked live. \"Changed since publish\" needs server publishedAt (REQUESTS.md #7)."
   },
   {
    "nodeId": "500:342150",
@@ -23303,7 +23303,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "phase1 T1.6: LoadErrorBanner.tsx:99 copy differs; no \"Download local copy\"; no inspector view-only line; bottom \"Not loaded\"."
+   "verifiedNote": "Load-failed banner, lock and echoes built (feat/design-2l9-editlock); not walked live (needs a forced load failure). Banner slot under topbar is an AquibraStudio request (REQUESTS.md #4)."
   },
   {
    "nodeId": "502:3556",
@@ -23361,9 +23361,9 @@
    "page": "improved",
    "family": "shell-components",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "phase1 T1.3: chrome-ui/PageSwitcherMenu.tsx missing; plan adds search, check, \"+ Add page\"; board has neither."
+   "authority": "code:search-active-add-page",
+   "verified": "drift-fixed",
+   "verifiedNote": "Live 2026-10-26: ⇧⌘O opens the menu with search focused; plan adds search, active check and \"+ Add page\" over the board (behaviour → code/plan). Branch feat/design-2l9-switcher."
   }
  ]
 }
