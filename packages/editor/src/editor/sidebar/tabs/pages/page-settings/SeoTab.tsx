@@ -113,6 +113,7 @@ function trimTitle(raw: string, max = 60): string {
 
 export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, onOpenSiteDefaults }) => {
   const siteName = composer?.getProjectMetadata?.()?.name;
+  const [detailsOpen, setDetailsOpen] = React.useState(false);
   const domain = s.domain ?? "yoursite.com";
   /* An empty field ships the inherited title, so the counter measures that. */
   const countedTitle = s.seoTitle || s.inheritedTitle;
@@ -454,35 +455,32 @@ export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, onOpe
               <div className={`tw:text-[length:var(--bk-text-12)] tw:font-medium tw:text-[var(--bk-ink-soft)] ${UI}`}>
                 {s.seoScore >= 80 ? "Looks good" : "Needs work"}
               </div>
-              <div className="tw:grid tw:grid-cols-2 tw:gap-x-2.5 tw:gap-y-1 tw:mt-2">
-                {[
-                  // Point labels mirror calculateSeoScore's real max weights:
-                  // title 20 (+10 at ≥30 chars) = 30; slug 20 (+10 non-empty) = 30;
-                  // desc 30 (+10 at ≥100 chars) = 40; indexing is an all-or-nothing
-                  // gate (off → whole score 0), not an additive component.
-                  { label: "Page title", ok: s.seoChecks.titleSet, pts: "+30 pts" },
-                  { label: "Meta description", ok: s.seoChecks.descSet, pts: "+40 pts" },
-                  { label: "Clean URL slug", ok: s.seoChecks.slugClean, pts: "+30 pts" },
-                  { label: "Allow indexing", ok: s.seoChecks.indexingOn, pts: "Required" },
-                ].map((c) => (
-                  <div
-                    key={c.label}
-                    className={`tw:flex tw:items-center tw:gap-1.5 tw:text-[11px] ${UI} ${
-                      c.ok ? "tw:text-[var(--bk-ink)]" : "tw:text-[var(--bk-ink-muted)]"
-                    }`}
-                  >
-                    <span
-                      className={`tw:size-1.5 tw:rounded-full tw:flex-none ${
-                        c.ok ? "tw:bg-[var(--bk-success)]" : "tw:bg-[var(--bk-gray-400)]"
-                      }`}
-                    />
-                    <span>{c.label}</span>
-                    <span className={`tw:ml-auto tw:text-[length:var(--bk-text-11)] tw:font-medium tw:text-[var(--bk-ink-muted)] ${MONO}`}>{c.pts}</span>
-                  </div>
-                ))}
-              </div>
+              {/* design-2l9 board 65:17860: "SEO score details" opens the
+                  score's six parts — the numbers it is the sum of. */}
+              <Button
+                variant="link"
+                data-testid="seo-score-details"
+                aria-expanded={detailsOpen}
+                className={`tw:mt-1 tw:h-auto tw:min-h-0 tw:p-0 tw:text-[length:var(--bk-text-12)] tw:font-medium tw:text-[var(--bk-accent-text)] ${UI}`}
+                onClick={() => setDetailsOpen((v) => !v)}
+              >
+                {detailsOpen ? "Back to SEO" : "SEO score details"}
+              </Button>
             </div>
           </div>
+          {detailsOpen && (
+            <div className={`tw:flex tw:flex-col tw:gap-1 tw:p-3 ${CARD}`} data-testid="seo-score-breakdown">
+              <div className={`tw:text-[length:var(--bk-text-12)] tw:font-medium tw:text-[var(--bk-ink)] ${UI}`}>
+                {`SEO score · ${page.name} · ${s.seoScore}/100`}
+              </div>
+              {s.seoBreakdown.map((row) => (
+                <div key={row.label} className={`tw:flex tw:items-center tw:text-[11px] ${UI} tw:text-[var(--bk-ink-soft)]`}>
+                  <span>{`${row.label}:`}</span>
+                  <span className={`tw:ml-auto tw:tabular-nums ${MONO}`}>{`${row.earned}/${row.max}`}</span>
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* Reach 80+ banner — shown when score < 80 and indexing is on.
               ONE clause. A first version chained the slug reason on with a

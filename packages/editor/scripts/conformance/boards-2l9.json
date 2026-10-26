@@ -334,7 +334,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code 4 checks (+30/+40 pts); board 6-row /100 breakdown dialog"
+   "verifiedNote": "L-A wave 2 built, not compared: SEO score details opens \"SEO score · {Page} · {n}/100\" and the six parts (Title length /20, URL format /20, Description length /30, Descriptive URL /10, Title ≥30 characters /10, Description ≥100 characters /10) — seoScoreBreakdown, which calculateSeoScore now sums, so the rows cannot disagree with the score. Inline in the drawer, not a separate dialog; Back to SEO closes it."
   },
   {
    "nodeId": "65:18435",

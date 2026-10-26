@@ -27,6 +27,7 @@ function makeSettings(over: Partial<UsePageSettingsReturn> = {}): UsePageSetting
     slugError: null,
     seoScore: 100,
     seoChecks: { titleSet: true, slugClean: true, indexingOn: true, descSet: true },
+    seoBreakdown: [],
     ogTitle: "",
     setOgTitle: vi.fn(),
     ogDesc: "",

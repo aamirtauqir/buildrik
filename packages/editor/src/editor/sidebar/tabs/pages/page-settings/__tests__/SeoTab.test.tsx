@@ -42,6 +42,7 @@ function makeSettings(over: Partial<UsePageSettingsReturn> = {}): UsePageSetting
     slugError: null,
     seoScore: 100,
     seoChecks: { titleSet: true, slugClean: true, indexingOn: true, descSet: true },
+    seoBreakdown: [],
     ogTitle: "",
     setOgTitle: vi.fn(),
     ogDesc: "",
@@ -225,20 +226,26 @@ describe("SeoTab score card", () => {
     expect(screen.getByRole("note")).toHaveTextContent(/add a meta description/);
   });
 
-  // FIXED: the per-check point annotations now mirror calculateSeoScore's real
-  // max weights — title 20(+10 at ≥30)=30, slug 20(+10)=30, desc 30(+10 at
-  // ≥100)=40 (summing to 100), and indexing is an all-or-nothing gate labelled
-  // "Required", not the fictional "+40 pts".
-  it("check-point annotations reflect calculateSeoScore's real weights", () => {
-    const s = makeSettings({ seoScore: 100 });
-    render(<SeoTab s={s} page={makePage()} composer={null} />);
-    // title +30 and slug +30 both render this label.
-    expect(screen.getAllByText("+30 pts")).toHaveLength(2);
-    expect(screen.getByText("+40 pts")).toBeTruthy(); // Meta description
-    expect(screen.getByText("Required")).toBeTruthy(); // Allow indexing — a gate, not additive
-    // The old fictional labels are gone.
-    expect(screen.queryByText("+20 pts")).toBeNull();
-    expect(screen.queryByText("+10 pts")).toBeNull();
+  /* design-2l9 board 65:17860 replaces the four-check grid with the score's
+     own six parts. Re-baseline: SEO score display. */
+  it("SEO score details opens the score's six parts; Back to SEO closes them", () => {
+    const seoBreakdown = [
+      { label: "Title length", earned: 20, max: 20 },
+      { label: "URL format", earned: 20, max: 20 },
+      { label: "Description length", earned: 30, max: 30 },
+      { label: "Descriptive URL", earned: 10, max: 10 },
+      { label: "Title ≥30 characters", earned: 0, max: 10 },
+      { label: "Description ≥100 characters", earned: 0, max: 10 },
+    ];
+    render(<SeoTab s={makeSettings({ seoScore: 80, seoBreakdown })} page={makePage()} composer={null} />);
+    expect(screen.queryByTestId("seo-score-breakdown")).toBeNull();
+    fireEvent.click(screen.getByTestId("seo-score-details"));
+    const box = screen.getByTestId("seo-score-breakdown");
+    expect(box).toHaveTextContent(/SEO score · .+ · 80\/100/);
+    expect(box).toHaveTextContent("Title length:20/20");
+    expect(box).toHaveTextContent("Description ≥100 characters:0/10");
+    fireEvent.click(screen.getByTestId("seo-score-details"));
+    expect(screen.queryByTestId("seo-score-breakdown")).toBeNull();
   });
 
   it("hides the score card and shows the noIndex alert when allowIndex is false", () => {
