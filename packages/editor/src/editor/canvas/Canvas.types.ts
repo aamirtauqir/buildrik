@@ -20,6 +20,8 @@ export interface CanvasProps {
   showGrid?: boolean;
   showRulers?: boolean;
   showXRay?: boolean;
+  /** Element outlines without X-Ray's wireframe — the shell's "Show outlines" preference. */
+  showOutlines?: boolean;
   /** Show the canvas footer toolbar with overlays and zoom controls */
   showFooterToolbar?: boolean;
   /**

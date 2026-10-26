@@ -88,6 +88,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       showGrid = false,
       showRulers = false,
       showXRay = false,
+      showOutlines = false,
       showFooterToolbar = true,
       readOnly: readOnlyProp = false,
       onZoomChange,
@@ -829,6 +830,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
             data-testid="canvas"
             data-device={device}
             data-xray-mode={showXRay ? "true" : undefined}
+            data-outlines={showOutlines ? "true" : undefined}
             data-badges={showBadges ? "true" : undefined}
             data-drag-active={isDragOver ? "true" : undefined}
             data-invalid-drop={isDragOver && !isValidDrop ? "true" : undefined}
@@ -967,6 +969,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
                 rulers: showRulers,
                 badges: showBadges,
                 xray: showXRay,
+                outlines: showOutlines,
               }}
               zoom={zoom}
               onOverlayChange={onOverlayChange}

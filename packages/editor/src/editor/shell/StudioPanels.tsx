@@ -155,6 +155,17 @@ export interface StudioPanelsProps {
 /** How long a section-focus request waits for the inspector body (m-1). */
 const PENDING_FOCUS_MS = 500;
 
+/* A-12 / board 145:64586 "Show outlines": a personal canvas-view preference
+   ("Personal editor view"), kept in this browser. */
+const OUTLINES_KEY = "bk-canvas-show-outlines";
+function readOutlines(): boolean {
+  try {
+    return localStorage.getItem(OUTLINES_KEY) === "true";
+  } catch {
+    return false;
+  }
+}
+
 /** Gives a held selection back after an escalation (P-5, §13). An element
  *  deleted meanwhile is not brought back. */
 function restoreSelection(composer: Composer, ids: readonly string[]): void {
@@ -459,6 +470,20 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
      column closes so the workspace spans both. */
   const cmsWorkspaceOpen = !readOnlyView && isLeftPanelOpen && railTab === "content";
   const [cmsReturn, setCmsReturn] = React.useState<CmsReturn | null>(null);
+  const [showOutlines, setShowOutlines] = React.useState(readOutlines);
+  /* Outlines are the shell's own preference; every other View row is the caller's. */
+  const handleOverlayChange = React.useCallback(
+    (overlay: keyof CanvasOverlayState, enabled: boolean) => {
+      if (overlay !== "outlines") return onOverlayChange?.(overlay, enabled);
+      setShowOutlines(enabled);
+      try {
+        localStorage.setItem(OUTLINES_KEY, String(enabled));
+      } catch {
+        /* Storage refused (private mode): the preference lasts this session. */
+      }
+    },
+    [onOverlayChange],
+  );
   /* Leaving the workspace any other way (the rail, a closed drawer) ends the
      visit: the return is not offered to a later, unrelated one. */
   const cmsWasOpen = React.useRef(cmsWorkspaceOpen);
@@ -933,10 +958,11 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
               showGrid={showGrid}
               showRulers={showRulers}
               showXRay={showXRay}
+              showOutlines={showOutlines}
               onAIRequest={onAIRequest}
               onOpenImageEditor={handleEditMedia}
               onZoomChange={onZoomChange}
-              onOverlayChange={onOverlayChange}
+              onOverlayChange={handleOverlayChange}
               onDeviceChange={onDeviceChange}
             />
             {/* Board 36: with the inspector hidden the canvas runs full width

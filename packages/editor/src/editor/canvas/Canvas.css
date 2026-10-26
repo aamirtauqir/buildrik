@@ -643,6 +643,13 @@ button:hover > .bd-canvas-empty-cta__thumb {
   animation: settleElement 0.3s ease-out;
 }
 
+/* A-12 "Show outlines" (board 145:64586): every element's edge, the content
+   left as it is — X-Ray's outline without its wireframe. */
+.buildrik-canvas[data-outlines="true"] [data-buildrik-id] {
+  outline: 1px dashed var(--bk-border-medium);
+  outline-offset: -1px;
+}
+
 /* X-Ray — board 817:4649: "Wireframe mode. All fills become transparent,
    strokes become grey, images show placeholder. Reveals layout structure."
 

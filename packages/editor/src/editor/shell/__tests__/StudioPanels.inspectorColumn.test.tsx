@@ -13,7 +13,14 @@ import * as React from "react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, act, cleanup, fireEvent } from "@testing-library/react";
 
-vi.mock("@/editor/canvas/Canvas", () => ({ Canvas: React.forwardRef(() => null) }));
+/* The Canvas stub keeps the props it was last given (A-12 reads them). */
+const canvasProps = vi.hoisted(() => ({ current: {} as Record<string, unknown> }));
+vi.mock("@/editor/canvas/Canvas", () => ({
+  Canvas: React.forwardRef((props: Record<string, unknown>) => {
+    canvasProps.current = props;
+    return null;
+  }),
+}));
 vi.mock("@/editor/sidebar/LeftSidebar", () => ({ LeftSidebar: () => null }));
 vi.mock("@/editor/sidebar/FullPageView", () => ({ FullPageView: () => null }));
 vi.mock("@/editor/sidebar/TabRouter", () => ({
@@ -555,4 +562,25 @@ describe("StudioPanels — bottom bar in resource areas", () => {
       expect(screen.getByTestId("page-switcher-trigger").textContent).toContain("Home");
     },
   );
+});
+
+/* A-12 / board 145:64586: "Show outlines" is the shell's canvas-view
+   preference — personal, kept across reloads, handed to the canvas (and so
+   to the footer's View menu). Other overlay rows still go to the caller. */
+describe("StudioPanels — the Show outlines preference (A-12)", () => {
+  type OverlayChange = (overlay: string, enabled: boolean) => void;
+  it("toggling outlines reaches the canvas and survives a remount; other rows pass through", () => {
+    const onOverlayChange = vi.fn();
+    const composer = makeComposer();
+    const view = render(<Harness composer={composer} onOverlayChange={onOverlayChange} />);
+    expect(canvasProps.current.showOutlines).toBe(false);
+    act(() => (canvasProps.current.onOverlayChange as OverlayChange)("outlines", true));
+    expect(canvasProps.current.showOutlines).toBe(true);
+    expect(onOverlayChange).not.toHaveBeenCalled();
+    act(() => (canvasProps.current.onOverlayChange as OverlayChange)("rulers", true));
+    expect(onOverlayChange).toHaveBeenCalledWith("rulers", true);
+    view.unmount();
+    render(<Harness composer={makeComposer()} />);
+    expect(canvasProps.current.showOutlines).toBe(true);
+  });
 });
