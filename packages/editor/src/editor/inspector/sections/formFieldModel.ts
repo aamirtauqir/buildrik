@@ -14,6 +14,7 @@
  * @license BSD-3-Clause
  */
 
+import type { Composer } from "@/engine";
 import type { Element } from "@/engine/elements/Element";
 import { escapeHTML, unescapeHTML } from "@/shared/utils/html/encoding";
 
@@ -108,5 +109,39 @@ export function fieldUnit(form: Element, field: Element): Element {
     unit = p;
   }
   return unit;
+}
+
+/** What the Type row converts between: input types and the textarea. */
+export const FIELD_TYPES = [
+  { value: "text", label: "Text" },
+  { value: "email", label: "Email" },
+  { value: "tel", label: "Phone" },
+  { value: "number", label: "Number" },
+  { value: "date", label: "Date" },
+  { value: "textarea", label: "Textarea" },
+] as const;
+
+/** The form a field belongs to, if any. */
+export function formOf(field: Element): Element | null {
+  for (let p = field.getParent(); p; p = p.getParent()) if (p.getType?.() === "form" || p.getTagName().toLowerCase() === "form") return p;
+  return null;
+}
+
+/** Swap an input for a textarea (or back), keeping name / placeholder /
+ *  place. Returns the new element. Callers own the lock gate + transaction. */
+export function replaceField(composer: Composer, el: Element, type: string): Element | null {
+  const parent = el.getParent();
+  if (!parent) return null;
+  const index = parent.getChildIndex(el);
+  const attributes: Record<string, string> = {};
+  for (const name of ["name", "placeholder", "aria-label", "required", "id", "minlength", "maxlength"]) {
+    const v = el.getAttribute(name);
+    if (v !== undefined) attributes[name] = v;
+  }
+  if (type !== "textarea") attributes.type = type;
+  const next = composer.elements.createElement(type === "textarea" ? "textarea" : "input", { attributes });
+  composer.elements.removeElement(el.getId());
+  composer.elements.addElement(next, parent.getId(), index);
+  return next;
 }
 

@@ -3,7 +3,11 @@
  * @license BSD-3-Clause
  */
 
-import { render, screen, fireEvent, act } from "@testing-library/react";
+import { render as rtlRender, screen, fireEvent, act } from "@testing-library/react";
+import { ToastProvider } from "@/editor/chrome-ui";
+import * as React from "react";
+/* The section raises "Interaction added / deleted · Undo" receipts. */
+const render = (ui: React.ReactElement) => rtlRender(<ToastProvider>{ui}</ToastProvider>);
 import { EVENTS } from "@/shared/constants/events";
 import { describe, it, expect, vi } from "vitest";
 import { InteractionsSection } from "../index";
@@ -84,7 +88,7 @@ describe("InteractionsSection", () => {
     const onChange = vi.fn();
     renderOpen({ interactions: [], onInteractionsChange: onChange });
     fireEvent.click(screen.getByText(/\+ Add interaction/));
-    fireEvent.click(screen.getByText("Choose a trigger"));
+    fireEvent.click(screen.getByText("Choose a trigger ›"));
     fireEvent.click(screen.getByText("On click"));
     expect(onChange).toHaveBeenCalledOnce();
     const [newList] = onChange.mock.calls[0] as [Interaction[]];
@@ -150,7 +154,7 @@ describe("InteractionsSection", () => {
       elementId: "el-1",
     });
     fireEvent.click(screen.getByText(/\+ Add interaction/));
-    fireEvent.click(screen.getByText("Choose a trigger"));
+    fireEvent.click(screen.getByText("Choose a trigger ›"));
     act(() => {
       fireEvent.click(screen.getByText("On hover"));
     });
@@ -213,5 +217,20 @@ describe("InteractionsSection — the element animation row", () => {
     expect(next).toHaveLength(2);
     expect(next[1]).toMatchObject({ trigger: "hover", animation: interaction.animation });
     expect(next[1].id).not.toBe(interaction.id);
+  });
+
+  it("2L9 I15 / I22: a preset adds at 0.6 s Ease out and says 'Interaction added · Undo'; Undo is the document history's", async () => {
+    const onChange = vi.fn();
+    const undo = vi.fn();
+    const composer = { on: vi.fn(), off: vi.fn(), elements: { getElement: () => null }, history: { undo } };
+    renderOpen({ interactions: [], onInteractionsChange: onChange, composer: composer as never, elementId: "el-1" });
+    fireEvent.click(screen.getByText(/\+ Add interaction/));
+    fireEvent.click(screen.getByText("Fade in on scroll"));
+    expect(onChange).toHaveBeenCalledWith([
+      expect.objectContaining({ trigger: "scroll-into-view", animation: expect.objectContaining({ preset: "fadeIn", duration: 600, easing: "power2.out" }) }),
+    ]);
+    expect(await screen.findByText("Interaction added")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Undo" }));
+    expect(undo).toHaveBeenCalledTimes(1);
   });
 });

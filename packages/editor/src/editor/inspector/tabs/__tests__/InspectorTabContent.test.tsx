@@ -7,7 +7,11 @@
  * @license BSD-3-Clause
  */
 
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render as rtlRender, screen } from "@testing-library/react";
+import { ToastProvider } from "@/editor/chrome-ui";
+import * as React from "react";
+/* Interactions raises receipts through the toast provider. */
+const render = (ui: React.ReactElement) => rtlRender(<ToastProvider>{ui}</ToastProvider>);
 import { describe, expect, it, vi } from "vitest";
 import { InspectorTabContent } from "../InspectorTabContent";
 import type { UseAdvancedSettingsReturn } from "@/editor/inspector/hooks/useAdvancedSettings";
@@ -148,7 +152,7 @@ describe("InspectorTabContent — one order per tab, presence by capability", ()
     expect(sectionNames()).toEqual(["Opacity", "Shadow", "Filters", "Transform & motion", "Advanced"]);
     unmount();
     renderTab({ tabId: "behaviour", elementType: "container" });
-    expect(sectionNames()).toEqual(["Link", "Visibility", "Interactions", "CSS classes"]);
+    expect(sectionNames()).toEqual(["Link", "Visibility", "Interactions"]);
   });
 
   it("an image shows no Link; a heading's Behavior has no Link and no CMS binding", () => {
@@ -156,7 +160,7 @@ describe("InspectorTabContent — one order per tab, presence by capability", ()
     expect(sectionNames()).not.toContain("Link");
     unmount();
     renderTab({ tabId: "behaviour", elementType: "heading" });
-    expect(sectionNames()).toEqual(["Visibility", "Interactions", "CSS classes"]);
+    expect(sectionNames()).toEqual(["Visibility", "Interactions"]);
   });
 
   it("a multi-selection shows only the sections every selected type has (DD-12)", () => {

@@ -175,10 +175,22 @@ export const ANIMATION_PRESETS = [
   ...ANIMATION_PRESET_GROUPS.special,
 ];
 
+/** "easeOut" → "Ease out" (2L9 I15). */
+const easingLabel = (key: string) => {
+  const words = key.replace(/([A-Z])/g, " $1").toLowerCase();
+  return words.charAt(0).toUpperCase() + words.slice(1);
+};
+
 export const EASING_OPTIONS = Object.entries(GSAPEngine.EASINGS).map(([key, value]) => ({
   value,
-  label: key.charAt(0).toUpperCase() + key.slice(1),
+  label: easingLabel(key),
 }));
+
+/** The option an interaction's easing reads as: older interactions store the
+ *  name ("easeOut"), newer ones the GSAP string ("power2.out"). */
+export function easingValue(stored: string): string {
+  return (GSAPEngine.EASINGS as Record<string, string>)[stored] ?? stored;
+}
 
 // Get trigger display info
 export const getTriggerInfo = (trigger: InteractionTrigger) => {

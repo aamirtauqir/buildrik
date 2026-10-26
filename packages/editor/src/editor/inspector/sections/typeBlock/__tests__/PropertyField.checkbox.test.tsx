@@ -59,6 +59,7 @@ describe("boolean attribute checkboxes (P-11b)", () => {
   it("clicking the label toggles its own checkbox", () => {
     const { el } = setup("input");
     fireEvent.click(screen.getByText("Required"));
-    expect(el.setAttribute).toHaveBeenCalledWith("required", "true");
+    /* The Field block writes a boolean as HTML does: present and empty. */
+    expect(el.setAttribute).toHaveBeenCalledWith("required", "");
   });
 });

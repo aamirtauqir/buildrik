@@ -14,6 +14,9 @@ import { TYPE_BLOCKS, type TypeBlockBodyProps } from "@/editor/inspector/config/
 import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
 import { capabilitiesFor } from "@/shared/constants/elementCapabilities";
 import { BindingPropertyRow } from "../binding/BindingPropertyRow";
+import { Button } from "@/editor/chrome-ui";
+import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
+import { formOf } from "../formFieldModel";
 
 export interface TypeBlockSectionProps extends TypeBlockBodyProps {
   isOpen: boolean;
@@ -29,10 +32,27 @@ export function TypeBlockSection({ isOpen, onToggle, onOpenCreateCollection, ...
   /* 2L9 B5-D01: the bindable property is a row of the block itself; one
      element's binding, so a multi-selection gets none. */
   const bindable = caps.cmsBindable && !caps.isStructuralChild && body.targetIds.length <= 1;
+  /* 2L9 F02: a form's field is headed by "‹ {form}", above its block. */
+  const field = caps.typeBlock === "input" ? body.composer?.elements.getElement(body.element.id) : null;
+  const form = field ? formOf(field) : null;
   return (
-    <Section title={elementTypeLabel(body.element.type)} isOpen={isOpen} onToggle={onToggle} id="inspector-section-type">
-      <Body {...body} />
-      {bindable ? <BindingPropertyRow composer={body.composer} elementId={body.element.id} onOpenCreateCollection={onOpenCreateCollection} /> : null}
-    </Section>
+    <>
+      {form && body.composer ? (
+        <Button
+          type="button"
+          variant="link"
+          size="xs"
+          data-testid="field-back-to-form"
+          onClick={() => body.composer?.selection.select(form)}
+          className="tw:self-center tw:h-8 tw:w-full tw:justify-center tw:text-[12px] tw:font-normal"
+        >
+          ‹ {getLayerName(form) ?? "Form"}
+        </Button>
+      ) : null}
+      <Section title={caps.typeBlock === "input" ? "Field" : elementTypeLabel(body.element.type)} isOpen={isOpen} onToggle={onToggle} id="inspector-section-type">
+        <Body {...body} />
+        {bindable ? <BindingPropertyRow composer={body.composer} elementId={body.element.id} onOpenCreateCollection={onOpenCreateCollection} /> : null}
+      </Section>
+    </>
   );
 }

@@ -32,9 +32,13 @@ export interface CommitRowProps {
   /** Offered as the browser's own completion list (a datalist). */
   suggestions?: readonly string[];
   onPaste?: React.ClipboardEventHandler<HTMLInputElement>;
+  /** Label above a full-width field (2L9 F10's "Message"). */
+  stacked?: boolean;
+  /** Every keystroke's draft (a warning that reads what is being typed). */
+  onDraft?: (draft: string) => void;
 }
 
-export function CommitRow({ label, value, onCommit, placeholder, type, testId, clearOnCommit, suggestions, onPaste }: CommitRowProps) {
+export function CommitRow({ label, value, onCommit, placeholder, type, testId, clearOnCommit, suggestions, onPaste, stacked, onDraft }: CommitRowProps) {
   const { readOnly } = useInspectorField();
   const id = React.useId();
   const listId = `${id}-list`;
@@ -45,7 +49,7 @@ export function CommitRow({ label, value, onCommit, placeholder, type, testId, c
     if (clearOnCommit) setDraft("");
   };
   return (
-    <div className="bdi-row-ctrl" data-testid={testId}>
+    <div className={stacked ? "tw:flex tw:flex-col tw:gap-2 tw:py-2" : "bdi-row-ctrl"} data-testid={testId}>
       <label className="bdi-lb" htmlFor={id}>
         {label}
       </label>
@@ -58,7 +62,10 @@ export function CommitRow({ label, value, onCommit, placeholder, type, testId, c
           list={suggestions?.length ? listId : undefined}
           value={draft}
           placeholder={placeholder}
-          onChange={(e) => setDraft(e.target.value)}
+          onChange={(e) => {
+            setDraft(e.target.value);
+            onDraft?.(e.target.value);
+          }}
           onPaste={onPaste}
           onBlur={commit}
           onKeyDown={(e) => {

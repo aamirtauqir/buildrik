@@ -14,7 +14,8 @@ import { CollectionListSection } from "../CollectionListSection";
 import { FormFieldsSection } from "../FormFieldsSection";
 import { SlidesSection } from "../SlidesSection";
 import { AttributesSection, attributesSummary } from "../attributes/AttributesSection";
-import { SemanticsSection } from "../SemanticsSection";
+import { SemanticsSection, tagLabel } from "../SemanticsSection";
+import { ValidationSection, validationSummary } from "../ValidationSection";
 
 export const CONTENT_SECTIONS: Record<string, AnySectionEntry> = {
   "form-fields": defineSection({
@@ -60,12 +61,32 @@ export const CONTENT_SECTIONS: Record<string, AnySectionEntry> = {
     adaptProps: (ctx) => ({ ...adaptElementProps(ctx), onOpenCreateCollection: ctx.onOpenCreateCollection }),
   }),
 
+  /* 2L9 F02: a field's validation, shut with a summary under its block. */
+  validation: defineSection({
+    tab: "content",
+    title: "Validation",
+    open: "closed",
+    capability: (caps) => caps.typeBlock === "input",
+    summary: (ctx) => validationSummary(ctx.composer, ctx.selectedElement.id),
+    Component: ValidationSection,
+    styleKeys: [],
+    adaptProps: adaptElementProps,
+  }),
+
   /* Tag + ID. A multi-selection keeps it only for headings (one level for
      all); a tag or an id is one element's. */
   semantics: defineSection({
     tab: "content",
     title: "Semantics",
-    open: "open",
+    /* A form field's ID is in Advanced attributes — F02 draws no Semantics. */
+    capability: (caps) => caps.typeBlock !== "input",
+    /* 2L9: open with an ID (161:8480), else shut reading its tag (156:716). */
+    open: "set",
+    hasValue: (ctx) => Boolean(ctx.composer?.elements.getElement(ctx.selectedElement.id)?.getAttribute?.("id")),
+    summary: (ctx) => {
+      const tag = ctx.composer?.elements.getElement(ctx.selectedElement.id)?.getTagName?.();
+      return tag ? tagLabel(tag) : null;
+    },
     shouldRender: (ctx) =>
       ctx.selectedIds.length <= 1 || ctx.selectedIds.every((id) => ctx.composer?.elements.getElement(id)?.getType?.() === "heading"),
     Component: SemanticsSection,

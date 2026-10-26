@@ -51,7 +51,7 @@ describe("SECTION_REGISTRY — capability gates", () => {
   });
 
   it("universal sections declare no gate", () => {
-    for (const id of ["size", "spacing", "fill", "border", "visibility", "interactions", "css-classes", "attributes", "opacity"] as const) {
+    for (const id of ["size", "spacing", "fill", "border", "visibility", "interactions", "attributes", "opacity"] as const) {
       expect(SECTION_REGISTRY[id].capability, id).toBeUndefined();
       expect(SECTION_REGISTRY[id].shouldRender, id).toBeUndefined();
     }

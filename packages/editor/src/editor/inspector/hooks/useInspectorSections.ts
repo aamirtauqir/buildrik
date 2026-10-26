@@ -34,6 +34,7 @@ export function resolveDisplayMode(
   if (choice === "closed") return "summary";
   if (open === "always" || open === "open") return "open";
   if (open === "closed") return "summary";
+  if (open === "set") return hasValue ? "open" : "summary";
   return hasValue ? "open" : "empty";
 }
 

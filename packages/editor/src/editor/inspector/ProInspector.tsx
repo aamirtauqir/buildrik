@@ -63,11 +63,12 @@ import "./styles/inspector.css";
 
 /** Three equal 100px tabs, 32 tall, the active one accent with a 2px
  *  underline (board 1), merged over chrome-ui's pill tab via twMerge. */
+/* 2L9 page 04: the active tab is a tinted pill, not an underline; every
+   label reads in ink. */
 const INSPECTOR_TAB_CLASS =
-  "tw:flex-1 tw:h-8 tw:px-0 tw:rounded-none tw:text-[12px] tw:font-normal tw:text-[var(--bk-ink-muted)] tw:bg-transparent " +
-  "tw:border-b-2 tw:border-transparent tw:hover:bg-transparent " +
-  "tw:aria-selected:font-medium tw:aria-selected:text-[var(--bk-accent-text)] " +
-  "tw:aria-selected:bg-transparent tw:aria-selected:hover:bg-transparent tw:aria-selected:border-[var(--bk-accent)]";
+  "tw:flex-1 tw:h-8 tw:px-0 tw:rounded-[6px] tw:border-0 tw:text-[13px] tw:font-normal tw:text-[var(--bk-ink)] tw:bg-transparent " +
+  "tw:hover:bg-[var(--bk-bg-subtle)] " +
+  "tw:aria-selected:bg-[var(--bk-accent-tint)] tw:aria-selected:hover:bg-[var(--bk-accent-tint)]";
 
 
 // ============================================================================
@@ -419,7 +420,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
               label="Inspector tabs"
               panelId="inspector-tabpanel"
               data-testid="inspector-tab-strip"
-              className="tw:h-8 tw:p-0 tw:gap-0"
+              className="tw:h-10 tw:px-3 tw:py-1 tw:gap-1 tw:border-0"
               tabClassName={INSPECTOR_TAB_CLASS}
             />
             {showContextRow ? (

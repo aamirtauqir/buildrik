@@ -16,7 +16,7 @@
  */
 
 import * as React from "react";
-import { ChevronRight, type LucideIcon } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { Button } from "@/editor/chrome-ui";
 import type { AnimationPreset } from "@/engine/interactions/types";
 import { type InteractionTrigger, TRIGGER_GROUPS } from "./types";
@@ -48,18 +48,23 @@ const GROUP_LABELS: Record<string, string> = {
 };
 
 const ROW =
-  "tw:flex tw:h-7 tw:w-full tw:items-center tw:justify-start tw:gap-2 tw:rounded-[4px] tw:border-0 tw:bg-transparent tw:px-2 " +
-  "tw:text-[12px] tw:font-normal tw:leading-4 tw:text-[var(--bk-ink-soft)] tw:hover:bg-[var(--bk-bg-subtle)] tw:focus:ring-0";
+  "tw:flex tw:h-10 tw:w-full tw:items-center tw:justify-start tw:gap-2 tw:rounded-[4px] tw:border-0 tw:bg-transparent tw:px-1.5 " +
+  "tw:text-[12px] tw:font-normal tw:leading-4 tw:text-[var(--bk-ink)] tw:hover:bg-[var(--bk-bg-subtle)] tw:focus:ring-0";
 
 const BACK =
-  "tw:self-start tw:h-7 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[12px] tw:font-medium tw:text-[var(--bk-accent-text)] tw:hover:bg-transparent tw:hover:underline";
+  "tw:self-center tw:h-7 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[12px] tw:font-normal tw:text-[var(--bk-accent-text)] tw:hover:bg-transparent tw:hover:underline";
 
-function Row({ children, onClick, icon: Icon, more, testId }: { children: React.ReactNode; onClick: () => void; icon?: LucideIcon; more?: boolean; testId?: string }) {
+/* 2L9 I14: "Choose a trigger ›" is a full-width bordered button, "Plays
+   when rendered (CSS) ›" a centred text one. */
+const BORDERED = "tw:mt-1 tw:h-8 tw:w-full tw:text-[12px] tw:font-normal tw:text-[var(--bk-ink)] tw:focus:ring-0";
+const TEXT_CENTRED =
+  "tw:h-8 tw:w-full tw:border-0 tw:bg-transparent tw:text-[12px] tw:font-normal tw:text-[var(--bk-ink)] tw:hover:bg-[var(--bk-bg-subtle)] tw:focus:ring-0";
+
+function Row({ children, onClick, icon: Icon, testId }: { children: React.ReactNode; onClick: () => void; icon?: LucideIcon; testId?: string }) {
   return (
     <Button type="button" color="light" size="xs" className={ROW} onClick={onClick} data-testid={testId}>
       {Icon ? <Icon size={14} aria-hidden="true" className="tw:shrink-0" /> : null}
       <span className="tw:min-w-0 tw:flex-1 tw:truncate tw:text-left">{children}</span>
-      {more ? <ChevronRight size={12} aria-hidden="true" className="tw:shrink-0 tw:text-[var(--bk-ink-muted)]" /> : null}
     </Button>
   );
 }
@@ -71,7 +76,7 @@ export const AddInteractionPanel: React.FC<AddInteractionPanelProps> = ({ onAdd,
       <Button type="button" color="light" size="xs" className={BACK} onClick={triggers ? () => setTriggers(false) : onClose} data-testid="add-interaction-back">
         {triggers ? "‹ Add interaction" : "‹ Back to Interactions"}
       </Button>
-      <div className="tw:py-1 tw:text-[12px] tw:font-semibold tw:text-[var(--bk-ink)]">{triggers ? "Choose a trigger" : "Add interaction"}</div>
+      <div className="tw:py-1 tw:text-[12px] tw:font-semibold tw:text-[var(--bk-ink)]" data-testid="add-interaction-title">{triggers ? "Choose a trigger" : "Add interaction"}</div>
       {triggers ? (
         Object.entries(TRIGGER_GROUPS).map(([group, list]) => (
           <div key={group} role="group" aria-label={GROUP_LABELS[group] ?? group} className="tw:flex tw:flex-col tw:pb-1">
@@ -90,13 +95,13 @@ export const AddInteractionPanel: React.FC<AddInteractionPanelProps> = ({ onAdd,
               {p.label}
             </Row>
           ))}
-          <Row more onClick={() => setTriggers(true)} testId="add-interaction-choose-trigger">
-            Choose a trigger
-          </Row>
+          <Button type="button" color="light" size="xs" className={BORDERED} onClick={() => setTriggers(true)} data-testid="add-interaction-choose-trigger">
+            Choose a trigger ›
+          </Button>
           {onAddAnimation ? (
-            <Row more onClick={onAddAnimation} testId="add-interaction-css">
-              Plays when rendered (CSS)
-            </Row>
+            <Button type="button" color="light" size="xs" className={TEXT_CENTRED} onClick={onAddAnimation} data-testid="add-interaction-css">
+              Plays when rendered (CSS) ›
+            </Button>
           ) : null}
         </>
       )}

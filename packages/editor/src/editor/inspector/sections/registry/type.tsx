@@ -41,7 +41,8 @@ export const TYPE_SECTIONS: Record<string, AnySectionEntry> = {
   type: defineSection({
     tab: "content",
     title: "Type",
-    frameTitle: (ctx) => elementTypeLabel(ctx.selectedElement.type),
+    /* 2L9 F02: a form field's block reads "Field". */
+    frameTitle: (ctx) => (ctx.caps.typeBlock === "input" ? "Field" : elementTypeLabel(ctx.selectedElement.type)),
     open: "always",
     capability: (caps) => hasBody(caps) && !LAYOUT_TYPE_BLOCKS.has(caps.typeBlock!),
     Component: TypeBlockSection,

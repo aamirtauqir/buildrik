@@ -13,9 +13,10 @@ import { InteractionEditor } from "./InteractionEditor";
 import { DEFAULT_ANIMATION_CONFIG, type AnimationPreset } from "@/engine/interactions/types";
 import { DEFAULT_ANIMATION, type AnimationConfig } from "@/shared/types/animations";
 import { type Interaction, type InteractionTrigger, type InteractionsSectionProps } from "./types";
-import { Button } from "@/editor/chrome-ui";
+import { Button, useToast } from "@/editor/chrome-ui";
+import { closeSubview, openSubview } from "@/editor/inspector/tabs/subviewStore";
 import { EVENTS } from "@/shared/constants/events";
-import { ActionRow, NoteRow } from "../behaviourRows";
+import { NoteRow } from "../behaviourRows";
 // Re-export types for external use
 export type { Interaction, InteractionTrigger, InteractionsSectionProps };
 
@@ -73,19 +74,34 @@ export const InteractionsSection: React.FC<InteractionsSectionProps> = ({
     setAnimationOpen(true);
   };
   const [editingId, setEditingId] = React.useState<string | null>(null);
+  /* 2L9 I15: an open interaction is the Behavior tab's whole body. */
+  React.useEffect(() => {
+    if (!elementId) return;
+    if (editingId) openSubview({ kind: "interaction", elementId });
+    else closeSubview("interaction");
+  }, [editingId, elementId]);
+  React.useEffect(() => () => closeSubview("interaction"), []);
 
+  /* 2L9 I15 / I22: "Interaction added · Undo", "Interaction deleted · Undo"
+     — the Undo is the one document history's, so it undoes exactly that
+     write (the write is one history step, writeElement's transaction). */
+  const { addToast } = useToast();
+  const receipt = (description: string) =>
+    addToast({ description, ...(composer ? { action: { label: "Undo", onClick: () => composer.history.undo() } } : {}) });
   // Add new interaction
   const addInteraction = (trigger: InteractionTrigger, preset?: AnimationPreset) => {
     const newInteraction: Interaction = {
       id: `interaction-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
       trigger,
-      animation: { ...DEFAULT_ANIMATION_CONFIG, ...(preset ? { preset } : {}) },
+      /* The board's new interaction: 0.6 s, Ease out (2L9 I15). */
+      animation: { ...DEFAULT_ANIMATION_CONFIG, duration: 600, easing: "power2.out", ...(preset ? { preset } : {}) },
       enabled: true,
     };
 
     onInteractionsChange([...interactions, newInteraction]);
     setShowAddPanel(false);
     setEditingId(newInteraction.id);
+    receipt("Interaction added");
   };
 
   // Update interaction
@@ -97,6 +113,7 @@ export const InteractionsSection: React.FC<InteractionsSectionProps> = ({
   const removeInteraction = (id: string) => {
     onInteractionsChange(interactions.filter((i) => i.id !== id));
     if (editingId === id) setEditingId(null);
+    receipt("Interaction deleted");
   };
 
   // Duplicate an interaction just after itself, and open the copy (I20)
@@ -128,7 +145,7 @@ export const InteractionsSection: React.FC<InteractionsSectionProps> = ({
       size="xs"
       data-testid="interactions-back"
       onClick={onBack}
-      className="tw:self-start tw:h-7 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[length:var(--bk-text-12)] tw:font-medium tw:text-[var(--bk-accent-text)] tw:hover:bg-transparent tw:hover:underline"
+      className="tw:self-center tw:h-7 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[length:var(--bk-text-12)] tw:font-normal tw:text-[var(--bk-accent-text)] tw:hover:bg-transparent tw:hover:underline"
     >
       ‹ {label}
     </Button>
@@ -145,6 +162,7 @@ export const InteractionsSection: React.FC<InteractionsSectionProps> = ({
       onToggle={onToggle}
       tier={tier}
       id="inspector-section-interactions"
+      hideHeader={showAddPanel && !editing && !editingAnimation}
     >
       <div className="tw:flex tw:flex-col">
         {editing ? (
@@ -188,9 +206,17 @@ export const InteractionsSection: React.FC<InteractionsSectionProps> = ({
             {interactions.map((interaction) => (
               <InteractionItem key={interaction.id} interaction={interaction} onOpen={() => setEditingId(interaction.id)} />
             ))}
-            <ActionRow onClick={() => setShowAddPanel(true)} testId="interactions-add">
+            {/* 2L9 161:13919: a full-width bordered button. */}
+            <Button
+              type="button"
+              color="light"
+              size="xs"
+              data-testid="interactions-add"
+              onClick={() => setShowAddPanel(true)}
+              className="tw:my-1 tw:h-8 tw:w-full tw:text-[12px] tw:font-normal tw:text-[var(--bk-ink)] tw:focus:ring-0"
+            >
               + Add interaction
-            </ActionRow>
+            </Button>
             {interactions.length === 0 && !animation ? <NoteRow testId="interactions-empty">No interactions yet.</NoteRow> : null}
           </>
         )}

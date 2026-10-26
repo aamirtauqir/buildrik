@@ -72,23 +72,31 @@ describe("InteractionEditor — timing writes (seconds ↔ ms)", () => {
 });
 
 describe("InteractionEditor — select writes", () => {
-  it("changing the animation type writes animation.type", () => {
-    const { onUpdate, container } = setup();
-    /* [Trigger, Effect, Easing] — 2L9 I15 puts Trigger first. */
-    const [, animationSelect] = Array.from(container.querySelectorAll("select"));
-    const nextValue = animationSelect.options[1].value;
-    fireEvent.change(animationSelect, { target: { value: nextValue } });
-    expect(onUpdate).toHaveBeenCalledWith(
-      "i1",
-      expect.objectContaining({
-        animation: expect.objectContaining({ type: nextValue }),
-      })
-    );
+  it("changing the effect writes animation.preset", () => {
+    const { onUpdate } = setup();
+    const effect = screen.getByLabelText("Effect") as HTMLSelectElement;
+    const nextValue = effect.options[1].value;
+    fireEvent.change(effect, { target: { value: nextValue } });
+    expect(onUpdate).toHaveBeenCalledWith("i1", expect.objectContaining({ animation: expect.objectContaining({ preset: nextValue }) }));
+  });
+
+  it("2L9 I15: Animate and Repeat write target and loop", () => {
+    const { onUpdate } = setup();
+    fireEvent.change(screen.getByLabelText("Animate"), { target: { value: "parent" } });
+    expect(onUpdate).toHaveBeenCalledWith("i1", expect.objectContaining({ animation: expect.objectContaining({ target: "parent" }) }));
+    fireEvent.change(screen.getByLabelText("Repeat"), { target: { value: "-1" } });
+    expect(onUpdate).toHaveBeenCalledWith("i1", expect.objectContaining({ animation: expect.objectContaining({ loop: -1 }) }));
+  });
+
+  it("2L9 I15: an easing stored by name reads as its option ('easeOut' → Ease out)", () => {
+    setup({ animation: { ...makeInteraction().animation, easing: "easeOut" } });
+    const easing = screen.getByLabelText("Easing") as HTMLSelectElement;
+    expect(easing.selectedOptions[0]?.textContent).toBe("Ease out");
   });
 
   it("changing the easing writes animation.easing", () => {
     const { onUpdate, container } = setup();
-    const easingSelect = Array.from(container.querySelectorAll("select"))[2];
+    const easingSelect = screen.getByLabelText("Easing") as HTMLSelectElement;
     const nextValue = easingSelect.options[1].value;
     fireEvent.change(easingSelect, { target: { value: nextValue } });
     expect(onUpdate).toHaveBeenCalledWith(

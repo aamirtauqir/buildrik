@@ -1,24 +1,34 @@
 /**
  * Interaction Editor — one interaction's screen (2L9 boards 161:15179 I15,
- * 165:17822 I20): "Play" and "More…" (Interaction actions: Duplicate,
- * Disable / Enable, Delete) on top, then Trigger, Effect, Duration, Delay,
- * Easing, and "Plays on all breakpoints". A disabled interaction keeps its
- * configuration visible (I21).
+ * 165:17822 I20, 165:18272 I21), in the board's compact label | control rows:
+ *
+ *   [ Play ]            More…           → "Interaction actions" card beside
+ *   Trigger   [On scroll into view ▾]      the column: Duplicate · Disable ·
+ *   Effect    [Fade in ▾]                  Delete · Close menu
+ *   Animate   [This element ▾]
+ *   Duration  [0.6] s
+ *   Delay     [0]   s
+ *   Easing    [Ease out ▾]
+ *   Repeat    [Once ▾]
+ *   When      (•) Only the first time      (scroll triggers)
+ *             ( ) Every time it enters
+ *   Plays on all breakpoints
+ *
+ * Each row writes the model the runtime reads: Animate → `animation.target`
+ * (self / parent), Repeat → `animation.loop` (1, 2, 3, -1 = forever).
+ * When: the published runtime replays a scroll animation every time the
+ * element enters, so "Every time it enters" is what ships and "Only the
+ * first time" is offered disabled until the runtime can stop after one
+ * (`authority: code:scroll-replays-every-entry`, REQUESTS B-13).
+ *
  * @license BSD-3-Clause
  */
-
 import * as React from "react";
-import { SelectField } from "@/shared/forms";
 import type { AnimationPreset } from "@/engine/interactions/types";
-import { type Interaction, type InteractionTrigger, ANIMATION_PRESETS, EASING_OPTIONS, TRIGGER_GROUPS } from "./types";
-import { Button, Menu, MenuItem, Popover, TextInput } from "@/editor/chrome-ui";
+import { type Interaction, type InteractionTrigger, ANIMATION_PRESETS, EASING_OPTIONS, TRIGGER_GROUPS, easingValue } from "./types";
+import { Button, Menu, MenuItem, Popover, Radio, TextInput } from "@/editor/chrome-ui";
+import { ControlRow, SelectRow } from "@/editor/inspector/shared/controls";
 import { NoteRow } from "../behaviourRows";
-
-/** Every trigger, in the picker's order, for the Trigger row. */
-const TRIGGER_OPTIONS = Object.values(TRIGGER_GROUPS).flat().map(({ value, label }) => ({ value, label }));
-// ============================================================================
-// TYPES
-// ============================================================================
 
 export interface InteractionEditorProps {
   interaction: Interaction;
@@ -30,49 +40,27 @@ export interface InteractionEditorProps {
   onPreview?: (interaction: Interaction) => void;
 }
 
-// ============================================================================
-// STYLES
-// ============================================================================
+/** Every trigger, in the picker's order, for the Trigger row. */
+const TRIGGER_OPTIONS = Object.values(TRIGGER_GROUPS).flat().map(({ value, label }) => ({ value, label }));
 
-const styles = {
-  container: {
-    padding: 12,
-    borderTop: `1px solid ${"var(--bk-border)"}`,
-    display: "flex",
-    flexDirection: "column" as const,
-    gap: 12,
-  },
-  inputRow: {
-    display: "flex",
-    gap: 8,
-  },
-  inputWrapper: {
-    flex: 1,
-  },
-  label: {
-    display: "block",
-    fontSize: 12,
-    color: "var(--bk-ink-muted)",
-    marginBottom: 4,
-  },
-  input: {
-    width: "100%",
-    padding: "8px 10px",
-    background: "var(--bk-bg-card)",
-    border: `1px solid ${"var(--bk-border-medium)"}`,
-    borderRadius: 6,
-    color: "var(--bk-ink)",
-    fontSize: 13,
-  } as React.CSSProperties,
-  buttonRowSecondary: {
-    display: "flex",
-    gap: 8,
-  },
-};
+/** "Fade In" → "Fade in" (the board's sentence case). */
+const EFFECT_OPTIONS = ANIMATION_PRESETS.map((p) => ({ value: p.value, label: p.label.charAt(0) + p.label.slice(1).toLowerCase() }));
 
-// ============================================================================
-// COMPONENT
-// ============================================================================
+const ANIMATE_OPTIONS = [
+  { value: "self", label: "This element" },
+  { value: "parent", label: "Its parent" },
+];
+
+const REPEAT_OPTIONS = [
+  { value: "1", label: "Once" },
+  { value: "2", label: "Twice" },
+  { value: "3", label: "3 times" },
+  { value: "-1", label: "Forever" },
+];
+
+const SCROLL_TRIGGERS = new Set(["scroll-into-view", "scroll-out"]);
+
+const HALF = "tw:h-7 tw:flex-1 tw:text-[12px] tw:font-normal tw:focus:ring-0";
 
 /**
  * Seconds in the field, milliseconds stored (P-11c). While focused the field
@@ -83,11 +71,12 @@ const styles = {
  * the interaction.
  */
 const TimingInput: React.FC<{
+  label: string;
   storedMs: number;
   min: number;
   max: number;
   onCommit: (ms: number) => void;
-}> = ({ storedMs, min, max, onCommit }) => {
+}> = ({ label, storedMs, min, max, onCommit }) => {
   const [draft, setDraft] = React.useState<string | null>(null);
 
   const handleChange = (raw: string) => {
@@ -106,16 +95,30 @@ const TimingInput: React.FC<{
   };
 
   return (
-    <TextInput
-      type="number"
-      value={draft ?? storedMs / 1000}
-      onChange={(e) => handleChange(e.target.value)}
-      onBlur={handleBlur}
-      min={min}
-      max={max}
-      step={0.1}
-      style={styles.input}
-    />
+    <ControlRow label={label}>
+      <div className="tw:flex tw:min-w-0 tw:flex-1 tw:items-center tw:gap-1">
+        <TextInput
+          type="number"
+          sizing="sm"
+          aria-label={`${label} in seconds`}
+          value={draft ?? storedMs / 1000}
+          onChange={(e) => handleChange(e.target.value)}
+          onBlur={handleBlur}
+          min={min}
+          max={max}
+          step={0.1}
+          className="tw:min-w-0 tw:flex-1"
+        />
+        {/* The board's unit box. Seconds are the one unit timing takes, so it
+            is a readout, not a choice. */}
+        <span
+          aria-hidden="true"
+          className="tw:flex tw:h-7 tw:w-10 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-[4px] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-subtle)] tw:text-[12px] tw:text-[var(--bk-ink)]"
+        >
+          s
+        </span>
+      </div>
+    </ControlRow>
   );
 };
 
@@ -132,87 +135,97 @@ export const InteractionEditor: React.FC<InteractionEditorProps> = ({
     setMenuOpen(false);
     fn();
   };
-  const writeTiming = (key: "duration" | "delay", ms: number) => {
-    onUpdate(interaction.id, { animation: { ...interaction.animation, [key]: ms } });
-  };
-
-  const handleAnimationTypeChange = (value: string) => {
-    onUpdate(interaction.id, {
-      animation: { ...interaction.animation, preset: value as AnimationPreset },
-    });
-  };
-
-  const handleEasingChange = (value: string) => {
-    onUpdate(interaction.id, {
-      animation: { ...interaction.animation, easing: value },
-    });
-  };
+  const anim = interaction.animation;
+  const setAnimation = (patch: Partial<Interaction["animation"]>) => onUpdate(interaction.id, { animation: { ...anim, ...patch } });
 
   return (
-    <div style={styles.container}>
-      <div style={styles.buttonRowSecondary}>
-        <Button onClick={() => onPreview?.(interaction)} color="light" size="xs" style={{ flex: 1 }}>
+    <div className="tw:flex tw:flex-col tw:pt-1" data-testid="interaction-editor">
+      <div className="tw:flex tw:gap-2 tw:pb-1">
+        <Button onClick={() => onPreview?.(interaction)} color="light" size="xs" className="tw:h-7 tw:w-24 tw:shrink-0 tw:text-[12px] tw:font-normal tw:focus:ring-0">
           Play
         </Button>
         <Popover
           open={menuOpen}
           onClose={() => setMenuOpen(false)}
           placement="bottom-end"
+          beside=".layout-shell__inspector"
           label="Interaction actions"
+          className="tw:w-[240px] tw:p-1"
           trigger={
-            <Button color="light" size="xs" aria-haspopup="menu" aria-expanded={menuOpen} onClick={() => setMenuOpen((v) => !v)}>
+            <Button
+              color="light"
+              size="xs"
+              aria-haspopup="menu"
+              aria-expanded={menuOpen}
+              onClick={() => setMenuOpen((v) => !v)}
+              className={HALF + " tw:border-0 tw:bg-transparent tw:hover:bg-[var(--bk-bg-subtle)]"}
+            >
               More…
             </Button>
           }
         >
-          <Menu label="Interaction actions">
+          <div className="tw:px-2 tw:pb-1 tw:pt-1.5 tw:text-[12px] tw:font-semibold tw:text-[var(--bk-ink)]">Interaction actions</div>
+          <Menu label="Interaction actions" className="tw:min-w-0">
             {onDuplicate ? <MenuItem onClick={act(() => onDuplicate(interaction.id))}>Duplicate</MenuItem> : null}
             <MenuItem onClick={act(() => onToggleEnabled(interaction.id))}>{interaction.enabled ? "Disable" : "Enable"}</MenuItem>
-            <MenuItem danger onClick={act(() => onRemove(interaction.id))}>
-              Delete
+            <MenuItem onClick={act(() => onRemove(interaction.id))}>Delete</MenuItem>
+            <MenuItem className="tw:!justify-center" onClick={() => setMenuOpen(false)}>
+              Close menu
             </MenuItem>
           </Menu>
         </Popover>
       </div>
       {interaction.enabled ? null : <NoteRow testId="interaction-disabled">Off · this interaction does not play.</NoteRow>}
-      <SelectField
+      <SelectRow
         label="Trigger"
+        placeholder={null}
         value={interaction.trigger}
         onChange={(value) => onUpdate(interaction.id, { trigger: value as InteractionTrigger })}
         options={TRIGGER_OPTIONS}
       />
-      <SelectField
+      <SelectRow
         label="Effect"
-        value={interaction.animation.preset}
-        onChange={handleAnimationTypeChange}
-        options={ANIMATION_PRESETS}
+        placeholder={null}
+        value={anim.preset}
+        onChange={(value) => setAnimation({ preset: value as AnimationPreset })}
+        options={EFFECT_OPTIONS}
       />
-      <div style={styles.inputRow}>
-        <div style={styles.inputWrapper}>
-          <label style={styles.label}>Duration</label>
-          <TimingInput
-            storedMs={interaction.animation.duration}
-            min={0.1}
-            max={10}
-            onCommit={(ms) => writeTiming("duration", ms)}
-          />
-        </div>
-        <div style={styles.inputWrapper}>
-          <label style={styles.label}>Delay</label>
-          <TimingInput
-            storedMs={interaction.animation.delay}
-            min={0}
-            max={5}
-            onCommit={(ms) => writeTiming("delay", ms)}
-          />
-        </div>
-      </div>
-      <SelectField
+      <SelectRow
+        label="Animate"
+        placeholder={null}
+        value={anim.target === "parent" ? "parent" : "self"}
+        onChange={(value) => setAnimation({ target: value })}
+        options={ANIMATE_OPTIONS}
+      />
+      <TimingInput label="Duration" storedMs={anim.duration} min={0.1} max={10} onCommit={(ms) => setAnimation({ duration: ms })} />
+      <TimingInput label="Delay" storedMs={anim.delay} min={0} max={5} onCommit={(ms) => setAnimation({ delay: ms })} />
+      <SelectRow
         label="Easing"
-        value={interaction.animation.easing}
-        onChange={handleEasingChange}
+        placeholder={null}
+        value={easingValue(anim.easing)}
+        onChange={(value) => setAnimation({ easing: value })}
         options={EASING_OPTIONS}
       />
+      <SelectRow
+        label="Repeat"
+        placeholder={null}
+        value={String(anim.loop ?? 1)}
+        onChange={(value) => setAnimation({ loop: Number(value) })}
+        options={REPEAT_OPTIONS}
+      />
+      {SCROLL_TRIGGERS.has(interaction.trigger) ? (
+        <div role="radiogroup" aria-label="When" className="tw:flex tw:flex-col tw:gap-1 tw:pt-1" data-testid="interaction-when">
+          <span className="tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)]">When</span>
+          <label className="tw:flex tw:h-8 tw:items-center tw:gap-2 tw:rounded-[4px] tw:px-2 tw:text-[12px] tw:text-[var(--bk-ink-muted)]">
+            <Radio name={`when-${interaction.id}`} disabled checked={false} onChange={() => undefined} />
+            Only the first time
+          </label>
+          <label className="tw:flex tw:h-8 tw:items-center tw:gap-2 tw:rounded-[4px] tw:bg-[var(--bk-accent-tint)] tw:px-2 tw:text-[12px] tw:text-[var(--bk-ink)]">
+            <Radio name={`when-${interaction.id}`} checked readOnly />
+            Every time it enters
+          </label>
+        </div>
+      ) : null}
       <NoteRow testId="interaction-all-breakpoints">Plays on all breakpoints</NoteRow>
     </div>
   );

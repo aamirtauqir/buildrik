@@ -101,7 +101,17 @@ const TYPE_ATTRIBUTE_FIELDS: Readonly<Record<string, readonly PropertyConfig[]>>
 
 /** The Attributes rows for a type: its own §17.H rows, then the common ones
  *  (a link has no Title row — R-DD-9). */
+/** Form fields draw no Semantics section (2L9 F02), so their ID and their
+ *  less-used flags are here. */
+const FIELD_TYPES = new Set(["input", "textarea", "select", "upload"]);
+const FIELD_EXTRAS: readonly PropertyConfig[] = [
+  { id: "id", label: "ID", type: "text", placeholder: "element-id" },
+  { id: "disabled", label: "Disabled", type: "checkbox" },
+];
+const SELECT_EXTRAS: readonly PropertyConfig[] = [{ id: "multiple", label: "Multiple", type: "checkbox" }];
+
 export function attributeFieldsFor(type: string): readonly PropertyConfig[] {
   const common = type === "link" ? COMMON_ATTRIBUTE_FIELDS.filter((f) => f.id !== "title") : COMMON_ATTRIBUTE_FIELDS;
-  return [...common, ...(TYPE_ATTRIBUTE_FIELDS[type] ?? [])];
+  const field = FIELD_TYPES.has(type) ? [...FIELD_EXTRAS, ...(type === "select" ? SELECT_EXTRAS : [])] : [];
+  return [...field, ...common, ...(TYPE_ATTRIBUTE_FIELDS[type] ?? [])];
 }
