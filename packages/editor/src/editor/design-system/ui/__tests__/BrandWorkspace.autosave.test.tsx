@@ -25,6 +25,13 @@ import {
 import { resolveTokenLiteral, setTokenLiteral } from "@buildrik/shared/tokens";
 import { DEFAULT_TOKENS } from "@/engine/designSystem/defaultTokens";
 import type { DesignToken } from "@/engine/designSystem/types";
+import { STARTER_DS_REGISTRY } from "@/editor/design-system/starters";
+
+vi.mock("@/editor/design-system/state/useBrandRestorePoints", () => ({
+  takeRestorePoint: async () => true,
+  useBrandRestorePoints: () => ({ rows: [], status: "ready", refresh: () => {}, restore: async () => "failed" }),
+}));
+vi.mock("@/services/BuildrikSyncProvider", () => ({ getSiteIdFromUrl: () => "s1" }));
 
 beforeEach(installDomShims);
 
@@ -258,14 +265,16 @@ describe("BrandWorkspace — Review changes (non-blocking, every Brand write thi
   it("a write that changes nothing logs no row (re-applying the starter you are on)", async () => {
     const composer = makeFakeComposer();
     const utils = renderWorkspace(composer);
-    openPage(utils, "starters");
-    const second = () => utils.container.querySelectorAll<HTMLElement>('[role="radio"]')[1];
-    fireEvent.click(second());
-    openPage(utils, "colours");
+    const applySecond = async () => {
+      openPage(utils, "starters");
+      fireEvent.click(utils.getByTestId(`starter-row-${STARTER_DS_REGISTRY[1].id}`));
+      fireEvent.click(utils.getByTestId("starter-apply"));
+      // Applied → back on Colors (B6-B10).
+      await waitFor(() => expect(utils.getByTestId("brand-page-title").textContent).toMatch(/^Colors/));
+    };
+    await applySecond();
     const after1 = utils.getByTestId("brand-session-edits").textContent;
-    openPage(utils, "starters");
-    fireEvent.click(second());
-    openPage(utils, "colours");
+    await applySecond();
     expect(utils.getByTestId("brand-session-edits").textContent).toBe(after1);
     expect(after1).not.toBe("Review changes");
   });

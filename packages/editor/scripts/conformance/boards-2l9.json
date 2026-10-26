@@ -9248,7 +9248,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Rows apply on click; board lists \"From logo or URL ›\" as a 6th starter row (code: separate \"Your own brand\" card behind dsAi)"
+   "verifiedNote": "L-D S6: \"Choose a starting point\" + \"Preview a palette before applying it to your site.\", › rows, \"From logo or URL ›\" last (dsAi only, authority for that row's gate: code:dsai-flag). Built, not compared."
   },
   {
    "nodeId": "203:36082",
@@ -9258,7 +9258,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No starter preview: row click applies at once (StartersSection.tsx:81-82); no \"Preview only\" pane, Cancel/Apply"
+   "verifiedNote": "L-D S6: row opens a preview through the Brand preview layer (no write): name, \"Preview only · Your Brand is unchanged\", \"{n} colors will change. Typography and spacing stay as they are.\", Cancel · Apply starter. \"Previewing {name}\" label over the preview not drawn. Built, not compared."
   },
   {
    "nodeId": "203:36613",
@@ -9268,7 +9268,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No restore point before starter apply (useApplyStarter has none)"
+   "verifiedNote": "L-D S6: Apply → \"Preparing…\" + \"Creating “Before {name}” restore point. No Brand changes applied yet.\"; restore reason `starter` added to the shared schema (router test). Built, not compared."
   },
   {
    "nodeId": "203:36801",
@@ -9278,7 +9278,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Applies without receipt; board receipt carries an Undo button — conflicts with one-undo (topbar only, Task 1.2)"
+   "verifiedNote": "L-D S6: applied → Colors page + receipt \"Applied {name}. Restore point created.\" with Undo → composer.history.undo (one undo). Built, not compared."
   },
   {
    "nodeId": "203:37025",
@@ -9288,7 +9288,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No checkpoint step for starters, so no \"Couldn’t create a restore point\" error state"
+   "verifiedNote": "L-D S6: no restore point → \"Couldn’t create a restore point. Nothing was applied. Retry or cancel the preview.\", Cancel · Retry, nothing written. Built, not compared."
   },
   {
    "nodeId": "203:37214",

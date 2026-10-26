@@ -50,6 +50,12 @@ export function makeFakeComposer(designTokens: unknown[] = [], { readOnly = fals
     designSystem: {
       readOnly,
       readOnlyReason,
+      /* The Brand preview slot (starters, logo/URL, Dark Auto preview into it). */
+      preview: null as unknown,
+      setPreview(p: unknown) {
+        this.preview = p;
+        emit("brand:preview-changed");
+      },
       setTokens: vi.fn((next: unknown[], _label: string) => {
         if (readOnly || !validateTokens(next).ok) return false;
         Object.assign(settings, { designTokens: next, designTokensSchemaVersion: 6 });

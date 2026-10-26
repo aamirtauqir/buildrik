@@ -872,8 +872,14 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
       case "starters":
         return (
           <StartersSection
+            composer={composer}
             projectId={projectId}
             onOpenFromSource={isFeatureEnabled("dsAi") ? () => openPage(FROM_SOURCE) : undefined}
+            /* B6-B10: back on Colors with the receipt. */
+            onApplied={(name) => {
+              openPage("colours");
+              receipt(`Applied ${name}. Restore point created.`);
+            }}
           />
         );
       case FROM_SOURCE:

@@ -78,6 +78,13 @@ describe("theme.createBrandRestorePoint / brandRestorePoint (spec test 27)", () 
     expect(getBrandRestorePointMock).not.toHaveBeenCalled();
   });
 
+  it("accepts a starter restore point (2L9 B6-B09) and hands the reason to the service", async () => {
+    checkSiteRoleMock.mockResolvedValue(undefined);
+    createBrandRestorePointMock.mockResolvedValueOnce({ id: "r2", createdAt: new Date(1) });
+    await expect(caller().createBrandRestorePoint({ ...input, reason: "starter" })).resolves.toMatchObject({ id: "r2" });
+    expect(JSON.stringify(createBrandRestorePointMock.mock.calls[0])).toContain('"reason":"starter"');
+  });
+
   it("refuses server-only reasons at the schema", async () => {
     checkSiteRoleMock.mockResolvedValue(undefined);
     await expect(caller().createBrandRestorePoint({ ...input, reason: "migration" as never })).rejects.toMatchObject({ code: "BAD_REQUEST" });

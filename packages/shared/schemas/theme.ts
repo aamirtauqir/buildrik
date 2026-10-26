@@ -56,7 +56,8 @@ export type WorkspacePresetIdInput = z.infer<typeof workspacePresetIdInput>;
 
 // Brand Part 1c (spec §8): restore points the editor takes before a big brand
 // change. `migration` and `theme-push` rows are written by the server only.
-export const brandRestorePointReason = z.enum(["generator", "dark-auto", "logo"]);
+// `starter`: Brand › Starters takes one before applying (2L9 B6-B09).
+export const brandRestorePointReason = z.enum(["generator", "dark-auto", "logo", "starter"]);
 export const createBrandRestorePointInput = z.object({
   siteId: z.string().min(1),
   reason: brandRestorePointReason,
