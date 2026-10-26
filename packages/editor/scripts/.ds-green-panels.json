@@ -82,7 +82,6 @@
     "packages/editor/src/editor/sidebar/tabs/pages/page-settings/SettingsErrorBoundary.tsx",
     "packages/editor/src/editor/sidebar/tabs/pages/page-settings/UnsavedWarningModal.tsx",
     "packages/editor/src/editor/sidebar/tabs/settings/SettingsTab.tsx",
-    "packages/editor/src/editor/sidebar/tabs/settings/icons.tsx",
     "packages/editor/src/editor/sidebar/tabs/settings/screens/AccessScreen.tsx",
     "packages/editor/src/editor/sidebar/tabs/settings/screens/AdvancedScreen.tsx",
     "packages/editor/src/editor/sidebar/tabs/settings/screens/AnalyticsScreen.tsx",
