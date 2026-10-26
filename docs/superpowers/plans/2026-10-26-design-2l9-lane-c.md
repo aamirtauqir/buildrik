@@ -132,7 +132,7 @@ until the lead's live walk compares them.
 | C5 record failed/offline banners | `0be9c31a1` | 3 | built |
 | C6 Add field types + states | `ff4fa4963` | 19 | built (Default/min/max/Placeholder/Help text open) |
 | C7 templates copy + no-empty-page rollback | `0a04adfb0` | 3 | built |
-| C9 component row tooltip + "N uses" | (this batch) | 1 | built |
+| C9 component row tooltip + "N uses" | `4e5a0ea56` | 1 | built |
 | C8 variable usages, C10 binding picker | — | — | not started (C10 is a request to L-B) |
 
 Every touched row keeps `verified: drift-open`/`no` with a "built, not compared"
