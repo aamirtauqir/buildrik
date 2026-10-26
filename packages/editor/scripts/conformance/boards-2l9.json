@@ -3319,8 +3319,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No rail Help menu (Keyboard shortcuts · Getting started live in site menu)"
+   "verified": "drift-open",
+   "verifiedNote": "L-A S7 built, not compared: rail Help opens a menu 'Help' — 'Keyboard shortcuts ?' (the sheet) and 'Getting started' (tour replay); the Keyboard legend card it used to open is kept as a third row under a rule (code-ahead, OD-3). Rail = the board's 7 (Add, Layers, Pages, Assets, CMS, Brand, Help); off-rail homes recorded in rail/tabsConfig.ts."
   },
   {
    "nodeId": "263:255509",
@@ -3329,8 +3329,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No rail Help menu (Keyboard shortcuts · Getting started live in site menu)"
+   "verified": "drift-open",
+   "verifiedNote": "L-A S7 built, not compared: Getting started hidden while the 'view' edit lock holds and for a viewer (RTL)."
   },
   {
    "nodeId": "263:255899",
