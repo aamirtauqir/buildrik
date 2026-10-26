@@ -271,7 +271,7 @@ export const LayersTab: React.FC<LayersTabProps> = ({
               <MenuItem
                 data-testid="layers-collapse-to-selection"
                 disabled={stats.selected === 0}
-                onClick={runMenu(() => composer?.emit("layers:collapse-to-selection", {}))}
+                onClick={runMenu(() => composer?.emit(EVENTS.LAYERS_COLLAPSE_TO_SELECTION, {}))}
               >
                 Collapse to selection
               </MenuItem>

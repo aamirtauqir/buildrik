@@ -87,3 +87,37 @@ describe("useSelectionReadout — page root", () => {
     expect(result.current.label).toBe("Page · Home");
   });
 });
+
+/* design-2l9 board 7:18654: the bar's text is "{Parent} / {Element}". */
+describe("useSelectionReadout — path", () => {
+  const node = (type: string, layerName: string | undefined, parent: unknown, id: string) => ({
+    getId: () => id,
+    getType: () => type,
+    getContent: () => "",
+    getParent: () => parent,
+    getCustomData: (k: string) => (k === "layerName" ? layerName : undefined),
+  });
+  const composerAt = (selectedId: string | null) => {
+    const root = node("container", undefined, null, "root");
+    const hero = node("section", "Hero", root, "hero");
+    const text = node("text", "Text", hero, "t1");
+    const byId: Record<string, unknown> = { root, hero, t1: text };
+    return {
+      on: () => {}, off: () => {}, isProjectLoading: () => false,
+      selection: { getSelectedIds: () => (selectedId ? [selectedId] : []) },
+      elements: { getActivePage: () => ({ id: "p1", name: "Home", root: { id: "root" } }), getElement: (id: string) => byId[id] },
+    } as unknown as Composer;
+  };
+  const path = (id: string | null, type = "text") =>
+    renderHook(() => useSelectionReadout(composerAt(id), id ? { id, type } : null)).result.current.path;
+
+  it("an element inside a section reads Section / Element", () => {
+    expect(path("t1")).toBe("Hero / Text");
+  });
+  it("a section on the page reads Page / Section", () => {
+    expect(path("hero", "section")).toBe("Home / Hero");
+  });
+  it("nothing selected reads the page", () => {
+    expect(path(null)).toBe("Home");
+  });
+});

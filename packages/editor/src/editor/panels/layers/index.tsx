@@ -57,11 +57,11 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
     const onCollapseToSelection = () => collapseToSelection(selectedIds);
     composer.on("layers:expand-all", onExpand);
     composer.on("layers:collapse-all", onCollapse);
-    composer.on("layers:collapse-to-selection", onCollapseToSelection);
+    composer.on(EVENTS.LAYERS_COLLAPSE_TO_SELECTION, onCollapseToSelection);
     return () => {
       composer.off("layers:expand-all", onExpand);
       composer.off("layers:collapse-all", onCollapse);
-      composer.off("layers:collapse-to-selection", onCollapseToSelection);
+      composer.off(EVENTS.LAYERS_COLLAPSE_TO_SELECTION, onCollapseToSelection);
     };
   }, [composer, expandAll, collapseAll, collapseToSelection, selectedIds]);
 
