@@ -14,6 +14,6 @@ export const activityRouter = router({
       if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
       throw e;
     }
-    return listSiteActivity(input.siteId, input.filter);
+    return listSiteActivity(input.siteId, input.filter, undefined, input.before);
   }),
 });

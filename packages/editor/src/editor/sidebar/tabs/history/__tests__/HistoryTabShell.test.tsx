@@ -356,11 +356,11 @@ describe("HistoryTab — the Saves chrome waits for the list", () => {
 });
 
 describe("HistoryTab — opened by an Activity row, with the way back", () => {
-  it("draws ‹ Activity, which reopens the Activity panel", () => {
+  it("draws ‹ Back to Activity, which reopens the Activity panel", () => {
     const emit = vi.fn();
     renderTab({ initialView: "published", fromActivity: true, composer: { emit, on: () => {}, off: () => {} } as never });
     expect(screen.getByTestId("history-view-tab-published").getAttribute("aria-selected")).toBe("true");
-    fireEvent.click(screen.getByRole("button", { name: "‹ Activity" }));
+    fireEvent.click(screen.getByRole("button", { name: "‹ Back to Activity" }));
     expect(emit).toHaveBeenCalledWith(EVENTS.UI_PANEL_OPEN, { panel: "activity" });
   });
 

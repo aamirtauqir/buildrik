@@ -5,7 +5,7 @@
  * notifications popover's "View all activity ›".
  *
  * A row opens its subject in the editor and the landing panel draws
- * "‹ Activity" to come back: comments → Review, publishes → History ›
+ * "‹ Back to Activity" to come back: comments → Review, publishes → History ›
  * Published, edits → History › Session.
  *
  * @license BSD-3-Clause

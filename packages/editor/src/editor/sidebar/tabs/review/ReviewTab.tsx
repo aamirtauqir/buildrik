@@ -78,7 +78,7 @@ import {
 import { writeClipboardText } from "@buildrik/shared/browser/clipboard";
 
 export interface ReviewTabProps {
-  /** Opened from a History › Activity row: draw the "‹ Activity" row. */
+  /** Opened from a History › Activity row: draw the "‹ Back to Activity" row. */
   fromActivity?: boolean;
   isExpanded?: boolean;
   onExpandToggle?: () => void;
