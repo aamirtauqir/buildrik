@@ -26,6 +26,8 @@ Format: lane/task · file · change · board · why.
 
 12. **L-A · shell overlay state (`useStudioState` / `StudioPanels` → `Canvas` `overlays`)** · add two canvas view preferences, "Show outlines" (element outlines without X-Ray's wireframe) and "Focus mode" (board meaning to confirm: hide the side panels), and pass them to `CanvasFooterToolbar` · board 145:64586 · the View menu draws both rows; the overlay state lives in lead-owned shell hooks, so the lane cannot add them.
 
+13. **L-A · engine `PageManager.reorderPage` (and the personal-folder store)** · record a page reorder as one composer history step, so ⌘Z undoes it and the receipt can carry Undo; decide whether folder moves (per-user, outside the document) get an Undo at all · boards 137:53911, 137:59625, 127:38819, 131:41086 · the boards' receipts end in "Undo"; today reorder emits PROJECT_CHANGED with no history entry, and a panel-local undo would break the one-undo rule, so L-A ships the receipts without it.
+
 ## Closed
 
 9. ~~**L-A · canvas footer status** · the selection readout double-escapes HTML entities~~ · fixed in lane L-A: `getLayerPreview` (`panels/layers/data/layerUtils.ts`) decodes the stored HTML's entities once, so the footer readout and Layers row names print "Tom & Jerry". Test `layerUtils.test.ts › getLayerPreview`.

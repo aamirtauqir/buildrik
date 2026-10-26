@@ -4,6 +4,11 @@
  * ("Move to Marketing"). It replaced the bulk bar's pop-up folder list, whose
  * "Remove from folder" row is the top-level choice here. The caller moves.
  *
+ * One page (the row menu's "Move to folder…", design-2l9 boards 127:38098 /
+ * 131:40341) names it: "Move About to…", says its URL stays, and refuses the
+ * place it already is ("About is already at the top level. No change is
+ * needed." / "Already at top level").
+ *
  * @license BSD-3-Clause
  */
 import * as React from "react";
@@ -20,6 +25,8 @@ export interface MovePagesDialogProps {
   folders: FolderItem[];
   /** A folder id, or TOP_LEVEL. */
   onMove: (target: string) => void;
+  /** One page only: where it is now (folder id or TOP_LEVEL) and its URL. */
+  current?: { target: string; url: string };
   onClose: () => void;
 }
 
@@ -33,29 +40,33 @@ const FolderGlyph = () => (
   </svg>
 );
 
-export function MovePagesDialog({ open, pageNames, folders, onMove, onClose }: MovePagesDialogProps) {
+export function MovePagesDialog({ open, pageNames, folders, onMove, onClose, current }: MovePagesDialogProps) {
   const [picked, setPicked] = React.useState<string>(TOP_LEVEL);
   React.useEffect(() => {
-    if (open) setPicked(folders[0]?.id ?? TOP_LEVEL);
-  }, [open, folders]);
+    if (open) setPicked(folders.find((f) => f.id !== current?.target)?.id ?? TOP_LEVEL);
+  }, [open, folders, current?.target]);
 
   const count = pageNames.length;
   const targets = [...folders.map((f) => ({ id: f.id, name: f.name })), { id: TOP_LEVEL, name: "Top level (no folder)" }];
   const pickedFolder = folders.find((f) => f.id === picked);
+  const single = current && count === 1 ? pageNames[0] : null;
+  const already = single !== null && picked === current?.target;
 
   return (
     <Modal
       open={open}
       onClose={onClose}
-      title={`Move ${count} page${count === 1 ? "" : "s"} to…`}
+      title={single ? `Move ${single} to…` : `Move ${count} page${count === 1 ? "" : "s"} to…`}
       testId="pages-move-dialog"
       footer={
         <>
           <Button color="light" size="xs" onClick={onClose}>
             Cancel
           </Button>
-          <Button size="xs" data-testid="pages-move-confirm" onClick={() => onMove(picked)}>
-            {pickedFolder ? `Move to ${pickedFolder.name}` : "Move to top level"}
+          <Button size="xs" data-testid="pages-move-confirm" disabled={already} onClick={() => onMove(picked)}>
+            {already
+              ? pickedFolder ? `Already in ${pickedFolder.name}` : "Already at top level"
+              : pickedFolder ? `Move to ${pickedFolder.name}` : "Move to top level"}
           </Button>
         </>
       }
@@ -63,7 +74,9 @@ export function MovePagesDialog({ open, pageNames, folders, onMove, onClose }: M
       {/* The board says folders "live in this browser only"; they are kept per
           user on the server now, so the line says who sees them. */}
       <p className="tw:m-0 tw:mb-2 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-soft)]">
-        {listNames(pageNames)} · Choose a folder. URLs stay unchanged — folders are personal; only you see them.
+        {single
+          ? `Choose where to organize ${single}. Folders are personal; only you see them. The page URL ${current!.url} stays unchanged.`
+          : `${listNames(pageNames)} · Choose a folder. URLs stay unchanged — folders are personal; only you see them.`}
       </p>
       <div role="radiogroup" aria-label="Folders" className="tw:flex tw:flex-col">
         {targets.map((t) => (
@@ -74,6 +87,11 @@ export function MovePagesDialog({ open, pageNames, folders, onMove, onClose }: M
           </label>
         ))}
       </div>
+      {already && (
+        <p className="tw:m-0 tw:mt-2 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]" data-testid="pages-move-already">
+          {pickedFolder ? `${single} is already in ${pickedFolder.name}. No change is needed.` : `${single} is already at the top level. No change is needed.`}
+        </p>
+      )}
     </Modal>
   );
 }

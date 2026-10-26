@@ -11,14 +11,14 @@
 import * as React from "react";
 import { Button } from "@/editor/chrome-ui";
 import type { PageItem } from "../types";
+import { pageRoute } from "../utils/slug";
 
 interface Node { segment: string; path: string; page: PageItem | null; children: Node[] }
 
 export function buildRouteTree(pages: ReadonlyArray<PageItem>): Node {
   const root: Node = { segment: "", path: "/", page: null, children: [] };
-  const routeOf = (p: PageItem) => (p.isHome ? "/" : (p.route ?? `/${p.slug}`).replace(/\/+$/, "") || "/");
-  for (const p of [...pages].sort((a, b) => routeOf(a).localeCompare(routeOf(b)))) {
-    const route = routeOf(p);
+  for (const p of [...pages].sort((a, b) => pageRoute(a).localeCompare(pageRoute(b)))) {
+    const route = pageRoute(p);
     if (route === "/") { root.page = root.page ?? p; continue; }
     let node = root;
     let acc = "";

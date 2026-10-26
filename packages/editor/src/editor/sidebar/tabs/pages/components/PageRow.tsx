@@ -46,6 +46,8 @@ interface Props {
   onRenameCancel: () => void;
   onRenameStart: () => void;
   onContextMenu: (x: number, y: number) => void;
+  /** ⌥↑ / ⌥↓ — the row menu's Move up / Move down (board 137:55343). */
+  onMove?: (direction: -1 | 1) => void;
   /** Board 141:40 search results: the owning folder, shown muted right. */
   searchContext?: string;
   /** Board 140:21 / 1171:4729 — 8px warning dot when the page has unsaved edits. */
@@ -75,6 +77,7 @@ export const PageRow = React.memo<Props>(
     onRenameCancel,
     onRenameStart,
     onContextMenu,
+    onMove,
     searchContext,
     isDirty = false,
   }) => {
@@ -247,6 +250,10 @@ export const PageRow = React.memo<Props>(
           onKeyDown={(e) => {
             if (e.key === "Enter" && !isRenaming) onSelect();
             if (e.key === "F2" && !isRenaming) onRenameStart();
+            if (e.altKey && (e.key === "ArrowUp" || e.key === "ArrowDown") && onMove && !isRenaming) {
+              e.preventDefault();
+              onMove(e.key === "ArrowUp" ? -1 : 1);
+            }
             /* `!isRenaming` for the same reason as its two neighbours: the
                rename input sits INSIDE this row, so its keystrokes bubble
                here. Without the guard, every space typed into a page name was

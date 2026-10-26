@@ -143,7 +143,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code lacks Save as template…, Move to folder…, Move up/Move down; board order differs"
+   "verifiedNote": "L-A S6 built, not compared: row menu in board order — Rename… · Duplicate · Set as homepage · Replace layout with template… · Save as template… · Move to folder… · Move up ⌥↑ · Move down ⌥↓ · Copy link · Page settings · Delete page (RTL order test). Remove from {folder} kept for folder members."
   },
   {
    "nodeId": "63:14567",
@@ -1253,7 +1253,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Bulk dialog only; no per-page 'Move About to…' from row menu; 'already at top level' note missing"
+   "verifiedNote": "L-A S6 built, not compared: 'Move {Page} to…', 'Choose where to organize {Page}. Folders are personal; only you see them. The page URL {url} stays unchanged.', folders + 'Top level (no folder)', 'Move to {Folder}'."
   },
   {
    "nodeId": "127:38819",
@@ -1262,8 +1262,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No organization receipts ('About moved to Studio · /about unchanged')"
+   "verified": "drift-open",
+   "verifiedNote": "L-A S6: receipt '{Page} moved to {Folder} · {url} unchanged' built; the board's Undo is not offered — folders are not composer history (REQUESTS #13). Not compared."
   },
   {
    "nodeId": "127:39528",
@@ -1272,8 +1272,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Only 'Remove from folder'; no disabled Move up/down with reason"
+   "verified": "drift-open",
+   "verifiedNote": "L-A S6 built, not compared: in a folder Move up/down are disabled with 'Pages in a folder can’t be reordered.'"
   },
   {
    "nodeId": "127:40244",
@@ -1282,8 +1282,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No organization receipts ('About moved to Studio · /about unchanged')"
+   "verified": "drift-open",
+   "verifiedNote": "L-A S6: receipt '{Page} removed from {Folder} · Page kept' built (from the Move dialog's Top level); no Undo (REQUESTS #13). Not compared."
   },
   {
    "nodeId": "128:39389",
@@ -1323,7 +1323,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Bulk dialog only; no per-page 'Move About to…' from row menu; 'already at top level' note missing"
+   "verifiedNote": "L-A S6 built, not compared: '{Page} is already at the top level. No change is needed.' + disabled 'Already at top level'."
   },
   {
    "nodeId": "131:41086",
@@ -1332,8 +1332,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No organization receipts ('About moved to Studio · /about unchanged')"
+   "verified": "drift-open",
+   "verifiedNote": "L-A S6: receipt '{Page} moved to {Folder} · {url} unchanged' built; no Undo (REQUESTS #13)."
   },
   {
    "nodeId": "131:41791",
@@ -1343,7 +1343,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code lacks Save as template…, Move to folder…, Move up/Move down; board order differs",
+   "verifiedNote": "L-A S6 built, not compared: same menu (P120 variant).",
    "inheritsFrom": "63:13820"
   },
   {
@@ -1397,8 +1397,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Only 'Remove from folder'; no disabled Move up/down with reason"
+   "verified": "drift-open",
+   "verifiedNote": "L-A S6: folder member menu shows the disabled pair + reason and 'Remove from {Folder}'. The board's folder-scoped short menu ('About · In Studio') is the full menu here. Not compared."
   },
   {
    "nodeId": "137:52464",
@@ -1428,8 +1428,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No Move up ⌥↑ / Move down ⌥↓ commands, boundaries or position receipts (drag only)"
+   "verified": "drift-open",
+   "verifiedNote": "L-A S6 built: Move down reorders among top-level pages (rootMove, unit-tested), receipt '{Page} moved to position {n}'; no Undo — page order is not in composer history (REQUESTS #13)."
   },
   {
    "nodeId": "137:54622",
@@ -1449,8 +1449,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No Move up ⌥↑ / Move down ⌥↓ commands, boundaries or position receipts (drag only)"
+   "verified": "drift-open",
+   "verifiedNote": "L-A S6 built: Move up ⌥↑ / Move down ⌥↓ in the menu and as row chords (PageRow, top-level rows only)."
   },
   {
    "nodeId": "137:56060",
@@ -1459,8 +1459,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No Move up ⌥↑ / Move down ⌥↓ commands, boundaries or position receipts (drag only)"
+   "verified": "drift-open",
+   "verifiedNote": "L-A S6 built: '{Page} is the last top-level page.' with Move down disabled."
   },
   {
    "nodeId": "137:56781",
@@ -1469,8 +1469,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No Move up ⌥↑ / Move down ⌥↓ commands, boundaries or position receipts (drag only)"
+   "verified": "drift-open",
+   "verifiedNote": "L-A S6 built: '{Page} is the first top-level page.' with Move up disabled."
   },
   {
    "nodeId": "137:57493",
@@ -1510,8 +1510,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No Move up ⌥↑ / Move down ⌥↓ commands, boundaries or position receipts (drag only)"
+   "verified": "drift-open",
+   "verifiedNote": "L-A S6 built: '{Page} moved to position {n} · Still the homepage' when the homepage moves (homepage flag unchanged)."
   },
   {
    "nodeId": "139:47668",

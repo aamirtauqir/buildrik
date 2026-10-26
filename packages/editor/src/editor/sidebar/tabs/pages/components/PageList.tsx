@@ -62,6 +62,8 @@ interface Props {
   onBulkDelete: () => void;
   onClearSelection: () => void;
   onContextMenu: (id: string, x: number, y: number) => void;
+  /** ⌥↑ / ⌥↓ on a top-level row. */
+  onMovePage?: (id: string, direction: -1 | 1) => void;
   onRenameStart: (id: string) => void;
   onRenameCommit: (id: string, name: string, updateUrl?: boolean) => void;
   onRenameCancel: () => void;
@@ -105,6 +107,7 @@ export const PageList: React.FC<Props> = ({
   onBulkDelete,
   onClearSelection,
   onContextMenu,
+  onMovePage,
   onRenameStart,
   onRenameCommit,
   onRenameCancel,
@@ -276,6 +279,7 @@ export const PageList: React.FC<Props> = ({
                   onRenameCommit={(name, updateUrl) => onRenameCommit(page.id, name, updateUrl)}
                   onRenameCancel={onRenameCancel}
                   onContextMenu={(x, y) => onContextMenu(page.id, x, y)}
+                  onMove={!search && onMovePage ? (d) => onMovePage(page.id, d) : undefined}
                   searchContext={
                     search
                       ? folders.find((f) => f.id === pageToFolder.get(page.id))?.name

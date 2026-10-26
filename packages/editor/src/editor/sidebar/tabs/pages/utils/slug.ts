@@ -38,3 +38,9 @@ export function isSlugDuplicate(
   const duplicate = pages.find((p) => p.id !== currentPageId && p.slug === slug);
   return duplicate ? duplicate.name : false;
 }
+
+/** The URL a page answers at — "/" for the homepage, its route, else
+ *  "/{slug}" — as the structure view and the Move dialog print it. */
+export function pageRoute(p: { isHome?: boolean; route?: string; slug: string }): string {
+  return p.isHome ? "/" : (p.route ?? `/${p.slug}`).replace(/\/+$/, "") || "/";
+}
