@@ -212,3 +212,56 @@ describe("ContentTab", () => {
     cmsWorkspace.reset();
   });
 });
+
+/* 2L9 C8 (260:235689 · 260:238267 · 260:238513 · 260:238886) — each site
+   variable says how many text placeholders read it, lists them, and the
+   rename / delete dialogs name the placeholders they leave behind. */
+describe("Site variables · placeholder usages (2L9 C8)", () => {
+  const mountWithPhone = async () => {
+    localStorage.setItem("buildrick-site-variables-test-proj", JSON.stringify([{ key: "phone", value: "+44 20" }, { key: "empty", value: "" }]));
+    const engine = makeEngine();
+    engine.elements.push(
+      { getId: () => "t1", getType: () => "text", getContent: () => "Call {{site.phone}} or {{ site.phone }}", getDataBindings: () => ({}), getCustomData: () => undefined } as never,
+      { getId: () => "t2", getType: () => "heading", getContent: () => "Phone: {{site.phone}}", getDataBindings: () => ({}), getCustomData: () => undefined } as never,
+    );
+    render(<ContentTab composer={engine.composer as never} />);
+    fireEvent.click(await screen.findByText("Site variables"));
+    await screen.findByText("{{site.phone}}");
+    return engine;
+  };
+
+  it("counts the elements whose text uses each key", async () => {
+    await mountWithPhone();
+    expect(screen.getByTestId("content-var-count-phone")).toHaveTextContent("2 text placeholders");
+    expect(screen.getByTestId("content-var-count-empty")).toHaveTextContent("0 placeholders");
+    expect(screen.getByTestId("content-var-value-empty")).toHaveTextContent("Empty value");
+  });
+
+  it("Show usages lists them and opens the element", async () => {
+    const { composer } = await mountWithPhone();
+    fireEvent.click(screen.getByRole("button", { name: "Actions for phone" }));
+    fireEvent.click(screen.getByTestId("content-var-usages-phone"));
+    expect(await screen.findByText("phone · 2 text placeholders")).toBeInTheDocument();
+    expect(screen.getByText(/does not rewrite these placeholders/)).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId("content-var-use-1"));
+    expect(composer.selection.select).toHaveBeenCalled();
+  });
+
+  it("rename and delete name the placeholders they leave behind", async () => {
+    await mountWithPhone();
+    fireEvent.click(screen.getByRole("button", { name: "Actions for phone" }));
+    fireEvent.click(screen.getByTestId("content-var-rename-phone"));
+    expect(await screen.findByText("Rename phone?")).toBeInTheDocument();
+    expect(screen.getByTestId("content-var-rename-description")).toHaveTextContent(
+      "2 text placeholders still use {{site.phone}}. They will not automatically change to the new key.",
+    );
+    expect(screen.getByTestId("content-var-rename-save")).toHaveTextContent("Rename key");
+    fireEvent.click(screen.getByTestId("content-var-rename-cancel"));
+    fireEvent.click(screen.getByRole("button", { name: "Actions for phone" }));
+    fireEvent.click(screen.getByTestId("content-var-delete-phone"));
+    expect(await screen.findByTestId("content-var-delete-body")).toHaveTextContent(
+      "The variable and its value will be removed. 2 text placeholders still use {{site.phone}}; review those usages before publishing.",
+    );
+    expect(screen.getByTestId("content-var-delete-usages")).toBeInTheDocument();
+  });
+});

@@ -11746,7 +11746,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "drift-open — L-C C4: \"Site variables\" header + intro copy built; still a drawer subview (board: workspace page), no \"+ New variable\" in a header, no per-variable \"N text placeholders\" (C8). Not compared."
+   "verifiedNote": "drift-open — L-C C4/D1: \"Site variables\" intro, per-variable \"N text placeholders\", \"Empty value\" built; still a drawer subview, not the workspace page. Not compared."
   },
   {
    "nodeId": "260:235928",
@@ -11796,7 +11796,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "drift-open — L-C C4: \"Site variables\" header + intro copy built; still a drawer subview (board: workspace page), no \"+ New variable\" in a header, no per-variable \"N text placeholders\" (C8). Not compared.",
+   "verifiedNote": "drift-open — L-C C4/D1: \"Site variables\" intro, per-variable \"N text placeholders\", \"Empty value\" built; still a drawer subview, not the workspace page. Not compared.",
    "inheritsFrom": "260:235689"
   },
   {
@@ -11807,7 +11807,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "drift-open — L-C C4: \"Site variables\" header + intro copy built; still a drawer subview (board: workspace page), no \"+ New variable\" in a header, no per-variable \"N text placeholders\" (C8). Not compared.",
+   "verifiedNote": "drift-open — L-C C4/D1: \"Site variables\" intro, per-variable \"N text placeholders\", \"Empty value\" built; still a drawer subview, not the workspace page. Not compared.",
    "inheritsFrom": "260:235689"
   },
   {
@@ -11838,7 +11838,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Edit value/Rename/Delete…; board adds Show usages, \"Rename key…\""
+   "verifiedNote": "built, not compared — L-C D1: row ⋯ Edit value · Show usages · Rename key… · Delete…."
   },
   {
    "nodeId": "260:237910",
@@ -11858,7 +11858,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "drift-open — L-C C4: \"Site variables\" header + intro copy built; still a drawer subview (board: workspace page), no \"+ New variable\" in a header, no per-variable \"N text placeholders\" (C8). Not compared.",
+   "verifiedNote": "drift-open — L-C C4/D1: \"Site variables\" intro, per-variable \"N text placeholders\", \"Empty value\" built; still a drawer subview, not the workspace page. Not compared.",
    "inheritsFrom": "260:235689"
   },
   {
@@ -11869,7 +11869,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No placeholder usage count/list or stale-placeholder prompt"
+   "verifiedNote": "built, not compared — L-C D1: \"{key} · N text placeholders\" list (page / element, opens it) + \"Renaming or deleting the key does not rewrite these placeholders…\" (variableUsage.ts)."
   },
   {
    "nodeId": "260:238513",
@@ -11879,7 +11879,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Rename dialog lacks usage impact + Show usages"
+   "verifiedNote": "built, not compared — L-C D1: \"Rename {key}? · N text placeholders still use {{site.key}}. They will not automatically change…\", New key, Show usages, Rename key."
   },
   {
    "nodeId": "260:238707",
@@ -11889,7 +11889,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No placeholder usage count/list or stale-placeholder prompt"
+   "verifiedNote": "drift-open — L-C D1: per-row \"N text placeholders\" built; \"Update N old placeholders\" after a rename is not built. Not compared."
   },
   {
    "nodeId": "260:238886",
@@ -11899,7 +11899,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Delete confirm lacks placeholder impact + Show usages"
+   "verifiedNote": "built, not compared — L-C D1: \"Delete {key}? · The variable and its value will be removed. N text placeholders still use …; review those usages before publishing.\" + Show usages."
   },
   {
    "nodeId": "260:239074",
@@ -12647,7 +12647,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "drift-open — L-C C4: \"Site variables\" header + intro copy built; still a drawer subview (board: workspace page), no \"+ New variable\" in a header, no per-variable \"N text placeholders\" (C8). Not compared."
+   "verifiedNote": "drift-open — L-C C4/D1: \"Site variables\" intro, per-variable \"N text placeholders\", \"Empty value\" built; still a drawer subview, not the workspace page. Not compared."
   },
   {
    "nodeId": "424:337627",
