@@ -1,5 +1,5 @@
 /**
- * LocalizationScreen — Phase B Languages: 8135:214023 (default) and
+ * LocalizationScreen — 2L9 B8-S07 (238:11810), Phase B 8135:214023 and
  * 8135:214262 (remove-locale confirm). Default locale is a footer field;
  * Add / Remove write the enabled list at once (SA-16) and never carry the
  * staged default; Remove always asks first (owner 2026-10-04, overrides Q-B6);
@@ -12,7 +12,9 @@ import { render, screen, fireEvent, cleanup, waitFor, act } from "@testing-libra
 import * as React from "react";
 import { createMockComposer } from "@/editor/sidebar/__tests__/test-utils/mockComposer";
 
-const { api } = vi.hoisted(() => ({
+const { api, addToast, removeToast } = vi.hoisted(() => ({
+  addToast: vi.fn(() => "t1"),
+  removeToast: vi.fn(),
   api: {
     siteDetail: {
       settings: { get: { query: vi.fn() }, update: { mutate: vi.fn() } },
@@ -25,6 +27,11 @@ vi.mock("@/services/api-client", () => ({ getBuildrikClient: () => api }));
 vi.mock("@/services/BuildrikSyncProvider", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/services/BuildrikSyncProvider")>()),
   updateSiteColumns: (id: string, patch: Record<string, unknown>) => api.siteDetail.settings.update.mutate({ id, ...patch }),
+}));
+
+vi.mock("@/editor/chrome-ui", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/editor/chrome-ui")>()),
+  useToast: () => ({ addToast, removeToast }),
 }));
 
 import { LocalizationScreen } from "../LocalizationScreen";
@@ -47,20 +54,21 @@ beforeEach(() => {
   getMock.mockReset().mockResolvedValue(settingsRow());
   updateMock.mockReset().mockResolvedValue({});
   localesMock.mockReset().mockResolvedValue(summary());
+  addToast.mockClear();
+  removeToast.mockClear();
 });
 afterEach(() => cleanup());
 
-function setup(opts: { projectId?: string | null; saveError?: string | null; readOnly?: boolean } = {}) {
+function setup(opts: { projectId?: string | null; readOnly?: boolean } = {}) {
   const composer = Object.assign(
     createMockComposer({ projectSettings: { seo: { language: "en", siteName: "Acme" } }, projectMetadata: { name: "Bella Cucina" } }),
     { adoptSavedProjectSettings: vi.fn() },
   );
-  const props = { onDirtyChange: vi.fn(), registerSaveHandler: vi.fn(), onLoadStateChange: vi.fn() };
+  const props = { onDirtyChange: vi.fn(), registerSaveHandler: vi.fn(), onLoadStateChange: vi.fn(), registerFooterMessage: vi.fn() };
   render(
     <LocalizationScreen
       composer={composer}
       projectId={opts.projectId === undefined ? "s1" : opts.projectId}
-      saveError={opts.saveError}
       readOnly={opts.readOnly}
       {...props}
     />,
@@ -72,32 +80,31 @@ const loaded = () => waitFor(() => expect(screen.getByTestId("set-loc-table")).t
 const lastSave = (fn: { mock: { calls: unknown[][] } }) => fn.mock.calls[fn.mock.calls.length - 1]?.[0] as (() => Promise<void>) | null;
 
 describe("Languages · 8135:214023", () => {
-  it("draws Default locale and Locales: Saves immediately, Add locale, LOCALE · TRANSLATED PAGES rows", async () => {
+  it("2L9 238:11810: Default language card, then Languages as ruled rows with + Add language", async () => {
     setup();
     await loaded();
     expect(getMock).toHaveBeenCalledWith({ siteId: "s1" });
     expect(localesMock).toHaveBeenCalledWith({ siteId: "s1" });
-    expect(screen.getByTestId("set-card-title-default-locale")).toHaveTextContent("Default locale");
-    expect(screen.getByText("Save the default locale with Save below.")).toBeInTheDocument();
-    expect(screen.getByTestId("set-card-title-locales")).toHaveTextContent("Locales");
-    expect(screen.getByText("Saves immediately")).toBeInTheDocument();
-    expect(screen.getByTestId("set-loc-add")).toHaveTextContent("Add locale");
-    expect(screen.getByText("Locale")).toBeInTheDocument();
-    expect(screen.getByText("Translated pages")).toBeInTheDocument();
-    expect(screen.getByTestId("set-loc-row-open-fr")).toHaveTextContent("French (fr)");
-    expect(screen.getByTestId("set-loc-row-pages-fr")).toHaveTextContent("4 of 6");
-    expect(screen.getByTestId("set-loc-row-default-en")).toHaveTextContent("Default");
+    expect(screen.getByTestId("set-card-title-default-language")).toHaveTextContent("Default language");
+    expect(screen.getByText("Changing the default applies on the next publish.")).toBeInTheDocument();
+    expect(screen.getByTestId("set-card-title-languages")).toHaveTextContent("Languages");
+    expect(screen.queryByText("Saves immediately")).toBeNull();
+    expect(screen.queryByText("Translated pages")).toBeNull();
+    expect(screen.getByTestId("set-loc-add")).toHaveTextContent("+ Add language");
+    expect(screen.getByTestId("set-loc-row-open-fr")).toHaveTextContent("French");
+    expect(screen.getByTestId("set-loc-row-pages-en")).toHaveTextContent("Saved default · 6 pages translated");
+    expect(screen.getByTestId("set-loc-row-pages-fr")).toHaveTextContent("4 of 6 pages translated");
     expect(screen.queryByTestId("set-loc-row-remove-en")).toBeNull();
     expect(screen.getByTestId("set-loc-row-remove-fr")).toHaveTextContent("Remove");
     expect(screen.queryByText(/Auto-redirect/i)).toBeNull();
     expect(screen.queryByTestId("set-loc-restore")).toBeNull();
   });
 
-  it("the default select lists the enabled locales as `<Language> (<code>)`", async () => {
+  it("the default select lists the enabled locales by name", async () => {
     setup();
     await loaded();
     const options = Array.from((screen.getByTestId("set-loc-default") as HTMLSelectElement).options).map((o) => o.textContent);
-    expect(options).toEqual(["English (en)", "French (fr)", "Arabic (ar)"]);
+    expect(options).toEqual(["English", "French", "Arabic"]);
   });
 
   it("shows the dashboard-only message with no projectId and reads nothing", () => {
@@ -115,12 +122,13 @@ describe("Languages · 8135:214023", () => {
     await loaded();
   });
 
-  it("says per-language pages publish later in one muted line, not a strip (owner, 2026-10-04)", async () => {
+  it("the footnote says only the default is staged and publishing emits the default locale only", async () => {
     setup();
     await loaded();
     const note = screen.getByTestId("set-loc-publish-note");
     expect(note.tagName).toBe("P");
-    expect(note).toHaveTextContent("Per-language pages publish in a later release.");
+    expect(note).toHaveTextContent("Only the default language is staged.");
+    expect(note).toHaveTextContent("Publishing currently emits the default locale only.");
     expect(note.className).toContain("tw:text-[var(--bk-ink-muted)]");
     expect(note.className).not.toMatch(/tw:bg-|tw:border/);
   });
@@ -140,12 +148,15 @@ describe("Languages — the default locale is a footer field", () => {
     expect(lastSave(props.registerSaveHandler)).toBeNull();
     fireEvent.change(screen.getByTestId("set-loc-default"), { target: { value: "fr" } });
     expect(props.onDirtyChange).toHaveBeenLastCalledWith(true);
+    expect(screen.getByTestId("set-loc-row-pages-fr")).toHaveTextContent("Chosen default · unsaved · 4 of 6 pages translated");
+    expect(props.registerFooterMessage).toHaveBeenLastCalledWith("Unsaved default: French · saved default: English");
     const save = lastSave(props.registerSaveHandler)!;
     await act(async () => { await save(); });
     expect(updateMock).toHaveBeenCalledWith({ id: "s1", defaultLocale: "fr" });
     expect(composer.adoptSavedProjectSettings).toHaveBeenCalledWith(expect.objectContaining({ seo: expect.objectContaining({ language: "fr" }) }));
     expect(composer.setProjectSettings).not.toHaveBeenCalled();
     expect(props.onDirtyChange).toHaveBeenLastCalledWith(false);
+    expect(props.registerFooterMessage).toHaveBeenLastCalledWith(null);
   });
 
   it("a refused Save rejects and keeps the staged value", async () => {
@@ -195,6 +206,25 @@ describe("Languages — locales save immediately", () => {
     await waitFor(() => expect(screen.queryByTestId("set-loc-remove-confirm")).toBeNull());
     await waitFor(() => expect(screen.queryByTestId("set-loc-row-ar")).toBeNull());
     expect(localesMock).toHaveBeenCalledTimes(2);
+  });
+
+  it("238:11810: a removal toasts `<name> removed` with Undo, which adds it back once", async () => {
+    setup();
+    await loaded();
+    fireEvent.click(screen.getByTestId("set-loc-row-remove-ar"));
+    fireEvent.click(screen.getByTestId("set-loc-remove-ok"));
+    await waitFor(() => expect(addToast).toHaveBeenCalled());
+    const toast = (addToast.mock.calls[0] as unknown as [{ description: string; action: { label: string; onClick: () => void } }])[0];
+    expect(toast.description).toBe("Arabic removed");
+    expect(toast.action.label).toBe("Undo");
+    await waitFor(() => expect(screen.queryByTestId("set-loc-row-ar")).toBeNull());
+    act(() => {
+      toast.action.onClick();
+      toast.action.onClick();
+    });
+    await waitFor(() => expect(updateMock).toHaveBeenLastCalledWith({ id: "s1", enabledLocales: ["en", "fr", "ar"] }));
+    expect(updateMock).toHaveBeenCalledTimes(2);
+    expect(removeToast).toHaveBeenCalledWith("t1");
   });
 
   it("8135:214262: a locale with translations asks first, says they are kept, and Cancel writes nothing", async () => {

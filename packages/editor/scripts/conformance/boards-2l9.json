@@ -14542,9 +14542,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/LocalizationScreen.tsx:65 — staged default vs immediate locales; removal Undo + translated counts differ",
+   "authority": "code:remove-locale-asks-first",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27: LocalizationScreen.tsx — Default language card (Default select + next-publish note), Languages ruled rows (name 240 · Saved default / Chosen default · unsaved · n of N pages translated · gray Remove 140), + Add language, footnote, footer \"Unsaved default: X · saved default: Y\", \"<name> removed · Undo\" toast. Remove still confirms first (owner override 2026-10-04), so the footnote says \"saves at once\" not \"removed immediately\". Select fill is the shared Select (not per-screen).",
    "tier": "P2"
   },
   {

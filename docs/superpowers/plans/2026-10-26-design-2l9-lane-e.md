@@ -132,3 +132,23 @@ Probe-compared and `drift-fixed` (8): 233:10827 (PB20), 238:9980 (S01, `code:no-
 Built and tested, still `drift-open`: 233:11377 PB21 (change chips/counts need a draft-vs-live diff), 238:15344 S19 (read-only needs an Editor role in the probe), AN02/AN03/AN04/AN06 (probe composer has no GA id; AN04 needs tracker events), 272:27440 (Unspam ack), 277:336979 (FMC dataset).
 Owner questions: 277:347389 (`open:board-conflict-delete-confirm` — S14 vs FM07/FMC), 277:346467 (`open:board-conflict-csv-copy`).
 Not in lane paths: 277:347031 "‹ Back to submissions" strip over the canvas (request E-12).
+
+### Wave 3, round 2 — P2 Site settings (2026-10-27)
+
+Merged `feat/design-2l9` (`4d4690acb`) first. 8 more shots fetched (238-10889, 238-11810, 238-12118, 238-12721, 238-13017, 238-14186, 238-14472, 245-49535).
+
+Probe-compared and `drift-fixed` (7): 238:14472 S16 Danger zone (one card of ruled rows, link actions; `code:transfer-is-to-a-member`), 238:10889 S04 footer failure "Couldn’t save — Retry. Your edits are still here." with no banner (`code:no-tagline-field`), 238:12721 S10 Redirects (ruled rows, delete-at-once + Undo; `code:no-redirect-limit`), 238:13017 S11 Access (checkbox + plan line; `code:no-trial`), 238:12118 S08 SEO (pages strip, missing-description line, Planned analysis card), 238:11810 S07 Languages (Default language card, ruled rows with Saved / Chosen default · unsaved, footer "Unsaved default: X · saved default: Y", "<name> removed · Undo"; `code:remove-locale-asks-first` — the owner's 2026-10-04 always-confirm stays, so the footnote says "saves at once").
+Recorded, still open: 238:14186 S15 (`code:custom-code-refused-on-free` — the server refuses custom code on Free, so "saved but not published" cannot be drawn), 245:49535 SH07 (built + tested).
+Board conflicts recorded as code authority: 277:347389 `code:board-conflict-277-347389` (S14 delete confirm kept), 277:346467 `code:board-conflict-277-346467` (272:24319 CSV copy kept). Dialog title/width left to lead4 (C-16).
+Next P2 rows need a shot each (cap reached this round): S03 saving (238:10586), S17 typed delete (238:14765), S18 URL change copy (238:15056), SH04 offline (245:48768); S12 consequence confirm and S21 compact nav are unbuilt.
+
+### Server slice (not started) — PB21 draft-vs-live diff for the offline tray
+
+233:11377 draws "3 pages changed · 1 added · 0 removed" and per-page chips while **offline**, so the diff cannot be a server call at tray-open time. Shape: the server hands the editor a hash manifest of what is live while online; the editor diffs its own export against it locally.
+
+1. **Shared schema** (`packages/shared/schemas/publish.ts`): `liveManifestInput = z.object({ siteId })`; `LiveManifest = { jobId: string | null; publishedAt: Date | null; retained: boolean; pages: { path: string; sha256: string }[] }`. `jobId: null` = never published (every draft page is "added").
+2. **Service** (`server/services/publish.service.ts`): `getLiveManifest(siteId)` — latest COMPLETED `PublishBuildJob` that is not superseded by an unpublish; hash each retained `log.pages[].html` (sha256, utf8). HTML never leaves the service (same discipline as `getPublishDiff`). Pruned payload → `retained: false, pages: []`. Hash once at `completePublish` and store `log.manifest` so the read is O(pages) without re-hashing — optional second step.
+3. **Router** (`sites.ts`): `sites.liveManifest` query, EDITOR-gated like `publishedSnapshot`; domain errors → `NOT_FOUND`.
+4. **Client** (`publishTrayStore.ts` / PublishTray — lead-owned shell files, so via REQUESTS.md): fetch the manifest when the tray opens online and after every publish; keep the last one per site in memory + IndexedDB (`bk-live-manifest-v1`). The draft side hashes the same `ExportEngine` page HTML publish sends (Web Crypto `subtle.digest`), so "changed" means "the bytes that would deploy differ". Diff is pure: added / removed / changed / same per path, counts for the header line, chips for the list, "See all ›" opens the full list.
+5. **States**: no cached manifest + offline → "Changes can’t be counted offline" (no fake zeros); `retained: false` → counts hidden, list says "Last publish is older than the comparison window".
+6. **Tests**: service (hashing, pruned, never published, unpublished), router gate (VIEWER refused), pure diff function, tray offline-with-cache and offline-without-cache. Probe-compare against shots/233-11377.png.
