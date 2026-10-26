@@ -33,6 +33,24 @@ export interface PanelSearchProps {
   "data-testid"?: string;
 }
 
+/* 2L9 63:6393 (Pages), 147:75914 (Layers) and every drawer's search band: a
+   gray-100 fill with no edge, the glyph 8 in and the text at 32 (board
+   ≈8 / 33) — not the outlined field with its 12 / 40.
+   `colors.gray` replaces the base theme's (white + border) wholesale; the
+   focus ring stays the accent's. */
+const SEARCH_THEME = {
+  field: {
+    icon: { base: "tw:pl-2" },
+    input: {
+      base: "tw:pr-8",
+      withIcon: { on: "tw:pl-8" },
+      colors: {
+        gray: "tw:bg-[var(--bk-gray-100)] tw:rounded-md! tw:border-transparent tw:focus:border-primary-700 tw:focus:ring-primary-700",
+      },
+    },
+  },
+};
+
 /** The marker every panel search input carries. */
 export const PANEL_SEARCH_ATTR = "data-panel-search";
 
@@ -65,7 +83,7 @@ export const PanelSearch = React.forwardRef<HTMLInputElement, PanelSearchProps>(
         }}
         {...{ [PANEL_SEARCH_ATTR]: "" }}
         data-testid={`${testId}-input`}
-        theme={{ field: { input: { base: "tw:pr-8" } } }}
+        theme={SEARCH_THEME}
       />
       <span className="tw:absolute tw:right-5 tw:top-1/2 tw:flex tw:-translate-y-1/2 tw:items-center">
         {value ? (

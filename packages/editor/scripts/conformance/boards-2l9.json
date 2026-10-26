@@ -145,7 +145,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "probe-compared 2026-10-27 (case pages-manager, 284×812, shots/63-6393.png) for the list: rows 40+ tall with glyph, name over URL, 'Hidden from publish' third line, 'Current' tag on the tinted open row, ⋯ always drawn; legend under the rows; 'My folders' / 'Only visible to you' heading; folder row 'Studio · 1 page · Folder · ⋯' (no disclosure — the row toggles), member 'Legal /legal · In Studio'; Collection pages gray card with a white row and Open page · Manage in CMS; footer full-width '+ Add page' then From template · New folder. Not probe-rendered: the header 'Pages · n' and the gray-well view tabs (PagesTab needs a composer); search field fill is chrome-ui PanelSearch (REQUESTS A-15). The collection row's ⋯ is not drawn: it would have no actions.",
+   "verifiedNote": "lead4 2026-10-27 (A-15): PanelSearch is the boards’ field — gray-100 fill, no edge, radius 6, glyph 8 in, text at 32, 32 tall (probe layers-tree: computed bg rgb(243,244,246), border transparent, pl 32; board fill #F3F4F6, glyph ≈8, text ≈33). | probe-compared 2026-10-27 (case pages-manager, 284×812, shots/63-6393.png) for the list: rows 40+ tall with glyph, name over URL, 'Hidden from publish' third line, 'Current' tag on the tinted open row, ⋯ always drawn; legend under the rows; 'My folders' / 'Only visible to you' heading; folder row 'Studio · 1 page · Folder · ⋯' (no disclosure — the row toggles), member 'Legal /legal · In Studio'; Collection pages gray card with a white row and Open page · Manage in CMS; footer full-width '+ Add page' then From template · New folder. Not probe-rendered: the header 'Pages · n' and the gray-well view tabs (PagesTab needs a composer); search field fill is chrome-ui PanelSearch (REQUESTS A-15). The collection row's ⋯ is not drawn: it would have no actions.",
    "tier": "P1"
   },
   {
@@ -2770,7 +2770,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-fixed",
-   "verifiedNote": "probe-compared 2026-10-27 (case layers-tree, 284 wide, shots/147-75914.png): search + 'View' beside it; the open page heads the tree (page glyph + name); children from x28 with 16px lucide chevrons; footer the count alone ('N layers · K selected' — Select and the ⓘ left the band; Select mode is in ⋯, the dim note in Layer display). Search field fill is chrome-ui PanelSearch (REQUESTS A-15); the page row's ⋯ is not drawn (no page actions in Layers).",
+   "verifiedNote": "lead4 2026-10-27 (A-15): search field gray-filled and borderless, glyph 8 in / text 32 — probe layers-tree side by side with shots/147-75914.png; the band’s 16 inset (board ≈9–13) not changed. | probe-compared 2026-10-27 (case layers-tree, 284 wide, shots/147-75914.png): search + 'View' beside it; the open page heads the tree (page glyph + name); children from x28 with 16px lucide chevrons; footer the count alone ('N layers · K selected' — Select and the ⓘ left the band; Select mode is in ⋯, the dim note in Layer display). Search field fill is chrome-ui PanelSearch (REQUESTS A-15); the page row's ⋯ is not drawn (no page actions in Layers).",
    "tier": "P1"
   },
   {
