@@ -31,46 +31,52 @@ import {
 import { PhoneScreen, useNarrowWindowBanner } from "./SmallScreen";
 import { useWorkspaceDeletionBanner } from "./useWorkspaceDeletionBanner";
 
-/* `leading-[normal]`, not `leading-normal`: the second is Tailwind's 1.5,
-   which computes to 21px, and board 297:2244 says the keyword. */
+/* 2L9 B7-G02 225:2821 / G04 225:3888: a full-bleed 40 px bar under the
+   topbar — glyph at 13, the line at 40 in 13/20, the actions 32 tall at the
+   right, 24 in from the edge. (It was a rounded 20/12 card, board 297:2139.) */
 export const BANNER_BAR =
-  "tw:flex tw:flex-wrap tw:items-center tw:gap-3 tw:px-5 tw:py-3 tw:rounded-lg " +
-  "tw:text-sm tw:font-medium tw:leading-[normal] tw:[font-family:var(--bk-font-ui)]";
+  "tw:flex tw:h-10 tw:w-full tw:flex-none tw:items-center tw:gap-3 tw:pl-[13px] tw:pr-6 " +
+  "tw:text-[13px] tw:leading-5 tw:font-normal tw:[font-family:var(--bk-font-ui)]";
 export const BANNER_TONE: Record<BannerTone, string> = {
   error: "tw:bg-[var(--bk-error-tint)] tw:text-[var(--bk-error-text)]",
   warning: "tw:bg-[var(--bk-warning-tint)] tw:text-[var(--bk-warning-text)]",
   info: "tw:bg-[var(--bk-accent-tint)] tw:text-[var(--bk-accent-text)]",
 };
-/** Board 297:2246 — white surface, hairline, 13 on radius 6 with 12/6 insets.
- *  flowbite's `size="xs"` supplies h-8, text-xs and rounded-lg, each yielding
- *  only to a SAME-property utility — `h-auto` for the height. */
-export const BANNER_ACTION =
-  "tw:h-auto tw:px-3 tw:py-1.5 tw:rounded-md tw:text-[13px] tw:leading-[normal] tw:text-current";
+/** The bar's actions: 32 tall, 13 medium on radius 6 — the accent fill, 24
+ *  inset, for the bar's one primary (G02 Retry 79 wide, G04 Sign in 103);
+ *  white with a hairline, 16 inset, for the rest (Download local copy 164). */
+const ACTION_BASE = "tw:h-8 tw:min-h-0 tw:shrink-0 tw:py-0 tw:rounded-md tw:text-[13px] tw:leading-5 tw:font-medium";
+export const BANNER_ACTION = `${ACTION_BASE} tw:px-6`;
+export const BANNER_ACTION_SECONDARY = `${ACTION_BASE} tw:px-4 tw:border tw:border-[var(--bk-border)] tw:bg-white tw:text-[var(--bk-ink)]`;
 
-/** The board opens warning and info lines with a glyph; decorative — the
- *  role and the text already say it. Error lines carry the ✕ dismiss. */
-function ToneGlyph({ tone }: { tone: BannerTone }) {
-  if (tone === "warning") return <AlertTriangle size={14} aria-hidden="true" className="tw:shrink-0" />;
-  if (tone === "info") return <Info size={14} aria-hidden="true" className="tw:shrink-0" />;
-  return null;
+/** Every bar opens with its tone's glyph — ✕ error, ⚠ warning, ⓘ info.
+ *  Decorative: the role and the text already say it. */
+export function ToneGlyph({ tone }: { tone: BannerTone }) {
+  const Glyph = tone === "warning" ? AlertTriangle : tone === "info" ? Info : X;
+  return <Glyph size={14} aria-hidden="true" className="tw:shrink-0" />;
 }
 
-function BannerActions({ banner }: { banner: GlobalBanner }) {
+/** `inList`: a row behind "{n} more" (G31) — its actions are all plain and it
+ *  has no ✕; the popover is dismissed as a whole. */
+function BannerActions({ banner, inList = false }: { banner: GlobalBanner; inList?: boolean }) {
   return (
     <>
-      {banner.actions?.map((action) => (
-        <Button
-          key={action.label}
-          color="light"
-          size="xs"
-          onClick={action.onClick}
-          className={BANNER_ACTION}
-          data-testid={action.testId}
-        >
-          {action.label}
-        </Button>
-      ))}
-      {banner.dismissible ? (
+      {banner.actions?.map((action) => {
+        const primary = action.primary && !inList;
+        return (
+          <Button
+            key={action.label}
+            color={primary ? undefined : "light"}
+            size="xs"
+            onClick={action.onClick}
+            className={primary ? BANNER_ACTION : BANNER_ACTION_SECONDARY}
+            data-testid={action.testId}
+          >
+            {action.label}
+          </Button>
+        );
+      })}
+      {banner.dismissible && !inList ? (
         <IconButton label="Dismiss" size="sm" onClick={() => clearGlobalBanner(banner.id)} className="tw:text-current">
           <X size={14} aria-hidden="true" />
         </IconButton>
@@ -87,11 +93,11 @@ function BannerBar({ banner, more }: { banner: GlobalBanner; more: React.ReactNo
       data-testid="global-banner"
       data-banner-id={banner.id}
     >
-      <div className="tw:flex tw:grow tw:basis-60 tw:items-center tw:gap-2">
-        <ToneGlyph tone={banner.tone} />
-        <span>{banner.message}</span>
-      </div>
-      <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+      <ToneGlyph tone={banner.tone} />
+      <span className="tw:min-w-0 tw:flex-1 tw:truncate" title={banner.message}>
+        {banner.message}
+      </span>
+      <div className="tw:flex tw:flex-none tw:items-center tw:gap-2.5">
         <BannerActions banner={banner} />
         {more}
       </div>
@@ -117,7 +123,7 @@ function MoreConditions({ rest }: { rest: readonly GlobalBanner[] }) {
           size="xs"
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
-          className={`${BANNER_ACTION} tw:border-transparent tw:bg-transparent`}
+          className={`${BANNER_ACTION} tw:px-2! tw:border-transparent tw:bg-transparent! tw:text-[var(--bk-ink)]`}
           data-testid="global-banner-more"
         >
           {rest.length} more
@@ -125,16 +131,18 @@ function MoreConditions({ rest }: { rest: readonly GlobalBanner[] }) {
         </Button>
       }
     >
-      <ul className="tw:m-0 tw:flex tw:list-none tw:flex-col tw:gap-1 tw:p-0" data-testid="global-banner-more-list">
+      {/* B7-G31: plain rows on the popover's white — glyph, the line in ink
+          13/20, the row's actions at the right; no tone tint. */}
+      <ul className="tw:m-0 tw:flex tw:list-none tw:flex-col tw:p-0" data-testid="global-banner-more-list">
         {rest.map((banner) => (
           <li
             key={banner.id}
-            className={`tw:flex tw:flex-wrap tw:items-center tw:gap-2 tw:rounded-md tw:px-3 tw:py-2 ${BANNER_TONE[banner.tone]}`}
+            className="tw:flex tw:min-h-[42px] tw:items-center tw:gap-3 tw:py-1 tw:pl-3 tw:pr-1.5 tw:text-[var(--bk-ink)]"
             data-banner-id={banner.id}
           >
             <ToneGlyph tone={banner.tone} />
-            <span className="tw:grow tw:basis-60 tw:text-[13px]">{banner.message}</span>
-            <BannerActions banner={banner} />
+            <span className="tw:min-w-0 tw:flex-1 tw:text-[13px] tw:leading-5">{banner.summary ?? banner.message}</span>
+            <BannerActions banner={banner} inList />
           </li>
         ))}
       </ul>

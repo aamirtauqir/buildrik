@@ -46,6 +46,15 @@ import { OnboardingChecklist } from "@/editor/onboarding/OnboardingChecklist";
 import { AchievementPrompt } from "@/editor/onboarding/AchievementPrompt";
 import { SaveStatus } from "@/editor/chrome-ui";
 import { LoadErrorBanner } from "@/editor/shell/LoadErrorBanner";
+import { GlobalBannerSlot } from "@/editor/shell/GlobalBannerSlot";
+import { OFFLINE_BANNER, showGlobalBanner, showNewVersionBanner, showSessionExpiredBanner } from "@/editor/shell/globalBanners";
+import { createTabHandoff } from "@/editor/shell/tabHandoff";
+import { EditorStoppedBoundary } from "@/editor/shell/EditorStoppedScreen";
+import { registerWorkSnapshot } from "@/editor/shell/workSnapshot";
+import { setKeptWorkOffer } from "@/editor/shell/keptWorkOffer";
+import { RecoveryBanner } from "@/editor/shell/RecoveryBanner";
+import { SaveFailedBanner } from "@/editor/shell/SaveFailedBanner";
+import { SessionExpiredModal } from "@/editor/shell/modals/SessionExpiredModal";
 import { DEFAULT_ONBOARDING_STEPS } from "@/shared/constants/onboardingSteps";
 import { CanvasFooterToolbar } from "@/editor/canvas/CanvasFooterToolbar";
 import { PanelFrame } from "@/editor/chrome-ui";
@@ -3852,6 +3861,148 @@ if (name.startsWith("notifications-")) {
    so it is already loaded here. The pane wrapper (`.bd-set-pane-body`) is the
    part that lives in SettingsTab and would otherwise be missing, which is why
    the case mounts it by hand rather than styling a host div. */
+
+/* ── Lane L-F wave 3: page-07 recovery surfaces at the 2L9 boards' geometry.
+   Each case lays out the parts of the 1440×900 board the surface depends on
+   — the 56 px topbar, the canvas column at x342 y100 798×768 (Canvas marks it
+   `data-bk-toast-anchor`) — and mounts the real component. ─────────────── */
+const LF_TOPBAR = <div style={{ height: 56, background: "white", borderBottom: "1px solid var(--bk-border)" }} />;
+const LF_COLUMN = (
+  <div data-bk-toast-anchor="" style={{ position: "fixed", left: 342, top: 100, width: 798, height: 768, background: "var(--bk-bg-subtle)" }} />
+);
+const lfOffer = () =>
+  setKeptWorkOffer({
+    siteId: "s1",
+    at: new Date(Date.now() - 3_600_000).toISOString(),
+    project: { pages: [] } as never,
+    restore: () => {},
+  });
+const lfComposer = (n: number) =>
+  ({ history: { getHistoryStack: () => Array.from({ length: n }, (_, i) => ({ label: `step ${i}`, timestamp: i + 1 })) } }) as never;
+Object.assign(CASES, {
+  "lf-load-failed": () => {
+    registerWorkSnapshot({ project: () => ({ pages: [] }) as never });
+    return (
+      <ToastProvider>
+        <div data-probe="lf-load-failed" style={{ width: "100vw" }}>
+          {LF_TOPBAR}
+          <LoadErrorBanner kind="network" onRetry={() => {}} onSignIn={() => {}} onDismiss={() => {}} />
+        </div>
+      </ToastProvider>
+    );
+  },
+  "lf-session-banner": () => {
+    showSessionExpiredBanner(() => {});
+    return (
+      <ToastProvider>
+        <div data-probe="lf-session-banner" style={{ width: "100vw" }}>
+          {LF_TOPBAR}
+          <GlobalBannerSlot />
+        </div>
+      </ToastProvider>
+    );
+  },
+  "lf-save-failed": () => (
+    <div data-probe="lf-save-failed">
+      {LF_TOPBAR}
+      {LF_COLUMN}
+      <SaveFailedBanner where="Fieldwork Studio · Home" leaving={false} busy={false} context="publish" onRetry={() => {}} onKeepEditing={() => {}} />
+    </div>
+  ),
+  "lf-session-dialog": () => (
+    <ToastProvider>
+      <div data-probe="lf-session-dialog">
+        {LF_TOPBAR}
+        {LF_COLUMN}
+        <SaveFailedBanner where="Fieldwork Studio · Home" leaving={false} busy={false} onRetry={() => {}} onKeepEditing={() => {}} />
+        <SessionExpiredModal open composer={lfComposer(12)} lastSavedAt={null} onRetry={async () => "error"} onKeepEditing={() => {}} />
+      </div>
+    </ToastProvider>
+  ),
+  "lf-recovery-older": () => {
+    lfOffer();
+    return (
+      <div data-probe="lf-recovery-older">
+        {LF_TOPBAR}
+        {LF_COLUMN}
+        <RecoveryBanner localDraftShown={false} serverEditedAt={async () => new Date(0).toISOString()} />
+      </div>
+    );
+  },
+  "lf-recovery-newer": () => {
+    lfOffer();
+    return (
+      <div data-probe="lf-recovery-newer">
+        {LF_TOPBAR}
+        {LF_COLUMN}
+        <RecoveryBanner localDraftShown={false} serverEditedAt={async () => new Date(Date.now() + 60_000).toISOString()} />
+      </div>
+    );
+  },
+  "lf-conflict": () => (
+    <div data-probe="lf-conflict">
+      {LF_TOPBAR}
+      <ConflictModal open siteId={null} onReload={() => {}} onSaveBackup={() => {}} onOverwrite={() => {}} onClose={() => {}} />
+    </div>
+  ),
+  "lf-crash": () => {
+    registerWorkSnapshot({ project: () => ({ pages: [] }) as never, unsaved: () => true });
+    const Boom = (): React.ReactElement => {
+      throw new Error("probe: editor stopped");
+    };
+    return (
+      <ToastProvider>
+        <div data-probe="lf-crash">
+          <EditorStoppedBoundary>
+            <Boom />
+          </EditorStoppedBoundary>
+        </div>
+      </ToastProvider>
+    );
+  },
+  "lf-more": () => {
+    showSessionExpiredBanner(() => {});
+    showNewVersionBanner(() => {});
+    showGlobalBanner(OFFLINE_BANNER);
+    return (
+      <ToastProvider>
+        <div data-probe="lf-more" style={{ width: "100vw" }}>
+          {LF_TOPBAR}
+          <GlobalBannerSlot />
+        </div>
+      </ToastProvider>
+    );
+  },
+  "lf-handoff-moved": () => {
+    const channel = { postMessage: () => {}, close: () => {}, onmessage: null as ((e: MessageEvent) => void) | null };
+    const locks = new Set<string>();
+    createTabHandoff({
+      siteId: "s1",
+      composer: { editLocks: locks, setEditLock: (r: string, on: boolean) => void (on ? locks.add(r) : locks.delete(r)) } as never,
+      save: async () => "saved",
+      channel: channel as never,
+    });
+    setTimeout(() => channel.onmessage?.({ data: { kind: "claim", from: "other" } } as MessageEvent), 0);
+    return (
+      <ToastProvider>
+        <div data-probe="lf-handoff-moved" style={{ width: "100vw" }}>
+          {LF_TOPBAR}
+          <GlobalBannerSlot />
+        </div>
+      </ToastProvider>
+    );
+  },
+  "lf-recovery-unknown": () => {
+    lfOffer();
+    return (
+      <div data-probe="lf-recovery-unknown">
+        {LF_TOPBAR}
+        {LF_COLUMN}
+        <RecoveryBanner localDraftShown={false} serverEditedAt={async () => null} />
+      </div>
+    );
+  },
+});
 
 const render = CASES[name];
 const el = document.getElementById("probe-root")!;

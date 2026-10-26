@@ -25,11 +25,15 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Button, CopyButton } from "@/editor/chrome-ui";
+import { Copy } from "lucide-react";
+import { Button, IconButton } from "@/editor/chrome-ui";
+import { writeClipboardText } from "@buildrik/shared/browser/clipboard";
 import { captureError } from "@/shared/utils/errorTracking";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { currentWork, downloadProject, hasUnsavedWork } from "./workSnapshot";
+
+const ACTION = "tw:h-8 tw:min-h-0 tw:py-0 tw:text-[13px] tw:leading-5 tw:font-medium";
 
 /** "7F3A-21": six hex digits of an FNV-1a hash over what identifies the defect. */
 export function editorErrorCode(error: Error): string {
@@ -49,44 +53,53 @@ const EditorStoppedScreen: React.FC<{ code: string }> = ({ code }) => {
   const work = currentWork(siteId);
   const unsaved = work !== null && hasUnsavedWork(siteId);
   const reload = () => window.location.reload();
+  /* 2L9 B7-G26 227:11649: a 480 card centred on the subtle ground below the
+     56 px topbar row — 24 in, title 16/24, body 13/20, the error code in mono
+     12 with its copy glyph, then Download a copy (filled) · Reload editor ·
+     Back to sites (a link), all left-aligned. */
   return (
     <div
       role="alert"
       aria-labelledby="editor-stopped-title"
       data-testid="editor-stopped"
-      className="tw:flex tw:h-screen tw:flex-col tw:items-center tw:justify-center tw:gap-3 tw:bg-[var(--bk-bg-panel)] tw:px-6 tw:text-center tw:text-[var(--bk-ink)] tw:[font-family:var(--bk-font-ui)]"
+      className="tw:flex tw:h-screen tw:items-center tw:justify-center tw:bg-[var(--bk-bg-subtle)] tw:pt-14 tw:[font-family:var(--bk-font-ui)]"
     >
-      <h2 id="editor-stopped-title" className="tw:m-0 tw:text-[16px] tw:font-semibold tw:leading-6">
-        Something stopped the editor
-      </h2>
-      {unsaved ? (
-        <p className="tw:m-0 tw:text-[14px] tw:leading-5 tw:text-[var(--bk-ink-soft)]">
-          You have unsaved changes — download a copy before reloading.
-        </p>
-      ) : null}
-      <div className="tw:flex tw:items-center tw:gap-1 tw:text-[13px] tw:text-[var(--bk-ink-soft)]">
-        <span className="tw:[font-family:var(--bk-font-mono)] tw:tabular-nums" data-testid="editor-stopped-code">
-          Error code {code}
-        </span>
-        <CopyButton content={`Error code ${code}`} label="Copy" variant="ghost" size="sm" />
-      </div>
-      <div className="tw:mt-2 tw:flex tw:items-center tw:gap-2">
-        {work ? (
-          <Button size="sm" onClick={() => downloadProject(work, "recovered")} data-testid="editor-stopped-download">
-            Download a copy
-          </Button>
+      <div
+        className="tw:flex tw:w-[480px] tw:flex-col tw:items-start tw:gap-2 tw:rounded-lg tw:border tw:border-[var(--bk-border)] tw:bg-white tw:p-6 tw:text-[var(--bk-ink)]"
+        data-testid="editor-stopped-card"
+      >
+        <h2 id="editor-stopped-title" className="tw:m-0 tw:text-[16px] tw:font-semibold tw:leading-6">
+          Something stopped the editor
+        </h2>
+        {unsaved ? (
+          <p className="tw:m-0 tw:text-[13px] tw:leading-5">You have unsaved changes — download a copy before reloading.</p>
         ) : null}
-        <Button size="sm" color={work ? "light" : undefined} onClick={reload}>
-          Reload editor
-        </Button>
-        <Button
-          size="sm"
-          color="light"
-          onClick={() => window.location.assign(`${DASHBOARD_URL}/dashboard`)}
-          className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-accent-text)] tw:hover:underline"
-        >
-          Back to sites
-        </Button>
+        <div className="tw:flex tw:h-4 tw:items-center tw:gap-1 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)]">
+          <span className="tw:[font-family:var(--bk-font-mono)] tw:tabular-nums" data-testid="editor-stopped-code">
+            Error code {code}
+          </span>
+          <IconButton label="Copy error code" size="sm" onClick={() => void writeClipboardText(`Error code ${code}`).catch(() => {})}>
+            <Copy size={12} aria-hidden="true" />
+          </IconButton>
+        </div>
+        <div className="tw:mt-2 tw:flex tw:items-center tw:gap-2">
+          {work ? (
+            <Button size="sm" className={`${ACTION} tw:px-4`} onClick={() => downloadProject(work, "recovered")} data-testid="editor-stopped-download">
+              Download a copy
+            </Button>
+          ) : null}
+          <Button size="sm" color={work ? "light" : undefined} className={`${ACTION} tw:px-4`} onClick={reload}>
+            Reload editor
+          </Button>
+          <Button
+            size="sm"
+            color="light"
+            onClick={() => window.location.assign(`${DASHBOARD_URL}/dashboard`)}
+            className={`${ACTION} tw:ml-4 tw:px-0 tw:border-transparent tw:bg-transparent tw:text-[var(--bk-accent-text)] tw:hover:underline`}
+          >
+            Back to sites
+          </Button>
+        </div>
       </div>
     </div>
   );
