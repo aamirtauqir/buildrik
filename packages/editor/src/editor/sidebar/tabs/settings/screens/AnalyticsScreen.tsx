@@ -84,7 +84,7 @@ export function connectionPill(status: AnalyticsStatus | null, verifiedAt: strin
 }
 
 /** `1,284 events`. */
-export function eventsPhrase(n: number): string {
+function eventsPhrase(n: number): string {
   return `${n.toLocaleString("en-GB")} ${n === 1 ? "event" : "events"}`;
 }
 
