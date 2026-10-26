@@ -113,7 +113,7 @@ describe("RecordSheet", () => {
     await openRow();
     expect(screen.getByTestId("cms-sheet-title")).toHaveTextContent("Margherita");
     expect(screen.getByTestId("cms-sheet-crumb")).toHaveTextContent("‹ Menu items records");
-    expect(screen.getByTestId("cms-sheet-state")).toHaveTextContent("No unsaved changes");
+    expect(screen.getByTestId("cms-sheet-state")).toHaveTextContent("Saved");
     expect(screen.getByTestId("cms-sheet-save")).toBeDisabled();
     fireEvent.change(screen.getByLabelText("Price *"), { target: { value: "$13" } });
     expect(screen.getByTestId("cms-sheet-state")).toHaveTextContent("Unsaved changes");
@@ -365,11 +365,12 @@ describe("RecordSheet · Preview (unsaved) (2L9 165:520)", () => {
   it("is always beside the form and follows its current values", async () => {
     mount();
     await openRow();
-    expect(screen.getByTestId("cms-record-preview")).toHaveTextContent("Preview (unsaved)Reflects the values in this form.");
+    expect(screen.getByTestId("cms-record-preview")).toHaveTextContent("PreviewReflects the values in this form.");
     const card = screen.getByTestId("cms-record-preview-card");
     expect(card).toHaveTextContent("Margherita");
     fireEvent.change(screen.getByLabelText("Price *"), { target: { value: "$15" } });
     expect(card).toHaveTextContent("$15");
+    expect(screen.getByTestId("cms-record-preview")).toHaveTextContent("Preview (unsaved)");
     expect(screen.getByTestId("cms-sheet-preview-template")).toHaveTextContent("Preview saved record");
   });
 });
@@ -521,19 +522,19 @@ describe("RecordSheet · Leave without saving? with Save and leave (2L9 C1)", ()
     fireEvent.click(await screen.findByTestId("cms-discard-save"));
     fireEvent.click(await screen.findByTestId("cms-sheet-cancel-return"));
     expect(screen.queryByTestId("cms-sheet-return-paused")).toBeNull();
-    expect(screen.getByTestId("cms-sheet-save")).toHaveTextContent("Retry save");
+    expect(screen.getByTestId("cms-sheet-save")).toHaveTextContent("Retry");
     expect(cmsWorkspace.get()).toMatchObject({ recordId: "r1" });
   });
 
-  it("a failed plain save: banner Couldn’t save, footer keeps the draft, Retry save (165:1072 · F2.17)", async () => {
+  it("a failed plain save: banner Couldn’t save, footer Couldn’t save, Retry (165:1072)", async () => {
     const { composer } = await dirtyRecord();
     composer.cms.collections.updateContentItem.mockImplementationOnce(() => Promise.reject(new Error("500")));
     fireEvent.click(screen.getByTestId("cms-sheet-save"));
     expect(await screen.findByTestId("cms-sheet-save-banner")).toHaveTextContent(
       "Couldn’t saveYour edits are still here. Retry when you’re ready.",
     );
-    expect(screen.getByTestId("cms-sheet-state")).toHaveTextContent("Couldn’t save · your draft is kept");
-    expect(screen.getByTestId("cms-sheet-save")).toHaveTextContent("Retry save");
+    expect(screen.getByTestId("cms-sheet-state")).toHaveTextContent("Couldn’t save");
+    expect(screen.getByTestId("cms-sheet-save")).toHaveTextContent("Retry");
     expect((screen.getByLabelText("Price *") as HTMLInputElement).value).toBe("$13");
   });
 
@@ -594,7 +595,7 @@ describe("RecordSheet · the way back names its origin (2L9 C2)", () => {
     const { view } = mountFrom("Heading · Title binding");
     await screen.findByTestId("cms-sheet");
     view.unmount();
-    expect(cmsWorkspace.get().origin).toBeNull();
+    await waitFor(() => expect(cmsWorkspace.get().origin).toBeNull());
   });
 });
 

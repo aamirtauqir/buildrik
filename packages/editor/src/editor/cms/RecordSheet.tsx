@@ -399,6 +399,10 @@ export function RecordSheet({
   const statusBadge = record ? recordStatusBadge(record) : null;
   /* F2.09 — a way back to an element reads as the save while it runs. */
   const returning = returnTo !== null && saving && returnTo.origin === true;
+  React.useEffect(() => {
+    cmsWorkspace.setReturning(returning);
+    return () => cmsWorkspace.setReturning(false);
+  }, [returning]);
 
   return (
     /* 2L9 165:520 — the record fills the workspace under its tabs: a back +
@@ -419,11 +423,6 @@ export function RecordSheet({
       {/* 165:520 — "‹ Blog records" 61 in, the title 52 after it. */}
       <div className="tw:flex tw:h-12 tw:flex-none tw:items-center tw:pl-[61px] tw:pr-6">
         <div className="tw:flex tw:w-[884px] tw:min-w-0 tw:shrink tw:items-center tw:gap-[52px]">
-        {returning ? (
-          <span className="tw:flex-none tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]" role="status" data-testid="cms-sheet-returning">
-            Saving record…
-          </span>
-        ) : (
           <Button
             size="xs"
             variant="link"
@@ -433,7 +432,6 @@ export function RecordSheet({
           >
             ‹ {collection.name} records
           </Button>
-        )}
         <h3 className="tw:m-0 tw:min-w-0 tw:truncate tw:text-[14px] tw:leading-5 tw:font-semibold tw:text-[var(--bk-ink)]" data-testid="cms-sheet-title">
           {title}
         </h3>
@@ -478,14 +476,14 @@ export function RecordSheet({
             /* 165:1072 (failed) · 165:1625 (offline): the banner sits over the
                fields and says what happened to the edits. */
             <div
-              className={`tw:flex tw:flex-none tw:flex-col tw:gap-0.5 tw:rounded-[6px] tw:px-4 tw:py-2 ${saveError === OFFLINE ? "tw:bg-[var(--bk-warning-tint)]" : "tw:bg-[var(--bk-error-tint)]"}`}
+              className="tw:flex tw:flex-none tw:flex-col tw:gap-1 tw:rounded-[6px] tw:bg-[var(--bk-warning-tint)] tw:px-3 tw:py-3"
               role="alert"
               data-testid="cms-sheet-save-banner"
             >
-              <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)]">
+              <p className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:font-semibold tw:text-[var(--bk-warning-text)]">
                 {saveError === OFFLINE ? "You’re offline" : "Couldn’t save"}
               </p>
-              <p className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-soft)]">
+              <p className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-warning-text)]">
                 {saveError === OFFLINE ? OFFLINE : "Your edits are still here. Retry when you’re ready."}
               </p>
             </div>
@@ -537,6 +535,7 @@ export function RecordSheet({
           )}
         </div>
         <RecordPreview
+          dirty={dirty}
           collection={collection}
           form={form}
           title={title}
@@ -560,8 +559,8 @@ export function RecordSheet({
                   : paused
                     ? "Couldn’t save · return paused"
                     : saveError === FAILED
-                      ? /* F2.17 (308:18475) — the acceptance journey's wording. */
-                        "Couldn’t save · your draft is kept"
+                      ? /* 165:1072 — the banner above says the edits are kept. */
+                        "Couldn’t save"
                       : saveError === OFFLINE
                         ? "Offline · Not saved"
                         : saveError ??
@@ -570,7 +569,7 @@ export function RecordSheet({
                             : dirty
                               ? "Unsaved changes"
                               : record
-                                ? "No unsaved changes"
+                                ? /* 173:16169 */ "Saved"
                                 : "New record · nothing saved yet")}
           </span>
           {/* 6749:59940 — a new record says what Save needs and what it does. */}
@@ -597,7 +596,15 @@ export function RecordSheet({
           </Button>
         )}
         <Button size="xs" className={FOOT_BTN_PRIMARY} disabled={!canSave || (!dirty && !!record) || saving} data-testid="cms-sheet-save" onClick={() => void save()}>
-          {saving ? "Saving…" : paused ? "Retry and return" : saveError && saveError !== OFFLINE && !blocked ? "Retry save" : "Save record"}
+          {saving
+            ? "Saving…"
+            : paused
+              ? "Retry and return"
+              : saveError === FAILED && !blocked
+                ? "Retry"
+                : saveError && saveError !== OFFLINE && !blocked
+                  ? "Retry save"
+                  : "Save record"}
         </Button>
       </footer>
 

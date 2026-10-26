@@ -119,7 +119,7 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
   }, [collection?.id, loadRecords]); // eslint-disable-line react-hooks/exhaustive-deps
 
   /* A visit's way back ends with the visit (F2.06 origin). */
-  React.useEffect(() => () => cmsWorkspace.clearOrigin(), []);
+  React.useEffect(() => cmsWorkspace.holdVisit(), []);
 
   /* 4428:140486 — while the workspace covers the canvas the topbar crumb
      reads "<site> › CMS", not the page behind it. */
@@ -157,11 +157,21 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
   const importer = useImportRecords(composer, collection);
   /* 165:2 "‹ Back to Editor · Home" / 173:16169 "‹ Heading · Title
      binding" — through the open record's guard (cmsWorkspace.exit). */
-  const back = onBackToCanvas ? (
+  /* 165:2 / 173:16169 — the way back sits 66 in; the title starts at 273
+     whether or not there is one. */
+  const back = ws.returning ? (
+    <span
+      className="tw:ml-[42px] tw:w-[183px] tw:flex-none tw:truncate tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]"
+      role="status"
+      data-testid="cms-sheet-returning"
+    >
+      Saving record…
+    </span>
+  ) : onBackToCanvas ? (
     <Button
       size="xs"
       variant="link"
-      className="tw:h-auto tw:min-h-0 tw:flex-none tw:p-0 tw:text-[13px] tw:font-normal"
+      className="tw:ml-[42px] tw:h-auto tw:min-h-0 tw:w-[183px] tw:flex-none tw:justify-start tw:truncate tw:p-0 tw:text-[13px] tw:font-normal"
       data-testid="cms-ws-back-to-canvas"
       onClick={() =>
         cmsWorkspace.exit(() => {

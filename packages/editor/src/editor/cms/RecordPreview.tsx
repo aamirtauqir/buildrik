@@ -20,7 +20,10 @@ export function RecordPreview({
   form,
   title,
   onPreviewSaved,
+  dirty,
 }: {
+  /** "Preview (unsaved)" while the form differs from the saved record (165:520); "Preview" once it matches (173:16169). */
+  dirty: boolean;
   collection: CMSCollection;
   form: Record<string, unknown>;
   title: string;
@@ -44,7 +47,7 @@ export function RecordPreview({
       aria-label="Record preview"
       data-testid="cms-record-preview"
     >
-      <h4 className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:font-semibold tw:text-[var(--bk-ink)]">Preview (unsaved)</h4>
+      <h4 className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:font-semibold tw:text-[var(--bk-ink)]">{dirty ? "Preview (unsaved)" : "Preview"}</h4>
       <p className="tw:m-0 tw:mt-4 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">Reflects the values in this form.</p>
       <div className="tw:mt-5 tw:flex tw:flex-col tw:gap-4" data-testid="cms-record-preview-card">
         {src ? <img src={src} alt="" className="tw:h-32 tw:w-full tw:rounded-[6px] tw:object-cover" /> : null}

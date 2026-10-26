@@ -7003,8 +7003,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (cms-brand): unreachable live — 'Couldn’t save' banner only fires on a local-write exception (RecordSheet save catch). A forced server 500 on cms.entries.upsert is queued and shows the OFFLINE copy instead. | prior: built, not compared — L-C C5: banner \"Couldn’t save\" + \"Your edits are still here. Retry when you’re ready.\"; footer/button follow Play F2.17 (\"Couldn’t save · your draft is kept\", Retry save) where the two boards disagree (board: \"Retry\")."
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (cms-workspace&record&fail=1): warning-tint banner over the fields 'Couldn’t save' / 'Your edits are still here. Retry when you’re ready.', footer 'Couldn’t save' (error) + Retry 160×32; field tops within 4px of the board."
   },
   {
    "nodeId": "165:1350",
@@ -7920,8 +7920,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (cms-brand): unreachable live — Record opened from a Heading binding ('‹ Heading · Title binding' origin) needs a bound template page; same blocker as 173:9757. | prior: built, not compared — L-C C2: record/workspace back reads \"‹ {origin}\" from CmsOpenRequest.origin and the guard says \"Your destination is {origin}.\"; live label waits on REQUESTS #11 (L-B passes origin)."
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (cms-workspace&record&origin=Heading · Title binding): header '‹ Heading · Title binding' at x=66, title at 273 (board 66/273); clean record reads 'Preview' and footer 'Saved'."
   },
   {
    "nodeId": "173:16399",
@@ -7931,7 +7931,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C C2: record/workspace back reads \"‹ {origin}\" from CmsOpenRequest.origin and the guard says \"Your destination is {origin}.\"; live label waits on REQUESTS #11 (L-B passes origin).",
+   "verifiedNote": "inherits 173:16169 (same record-from-binding layout); not separately compared.",
    "inheritsFrom": "173:16169"
   },
   {
@@ -7941,8 +7941,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "built, not compared — L-C C1: Save and leave shows \"Saving record…\" + Saving… + Stay here; success takes the chosen way out (RecordSheet.tsx)."
+   "verified": "drift-open",
+   "verifiedNote": "built (2026-10-27): during Save and leave to the origin the header's way back reads 'Saving record…' and the footer Cancel/Saving…; no board shot in the dump to compare."
   },
   {
    "nodeId": "173:16863",
@@ -7952,7 +7952,8 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C C2: record/workspace back reads \"‹ {origin}\" from CmsOpenRequest.origin and the guard says \"Your destination is {origin}.\"; live label waits on REQUESTS #11 (L-B passes origin)."
+   "verifiedNote": "inherits 173:16169 (same record-from-binding layout); not separately compared.",
+   "inheritsFrom": "173:16169"
   },
   {
    "nodeId": "173:17098",
@@ -8024,7 +8025,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C C1: Save and leave shows \"Saving record…\" + Saving… + Stay here; success takes the chosen way out (RecordSheet.tsx)."
+   "verifiedNote": "built (2026-10-27): during Save and leave to the origin the header's way back reads 'Saving record…' and the footer Cancel/Saving…; no board shot in the dump to compare."
   },
   {
    "nodeId": "174:14111",
@@ -8204,8 +8205,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "built, not compared — L-C C1: Save and leave shows \"Saving record…\" + Saving… + Stay here; success takes the chosen way out (RecordSheet.tsx)."
+   "verified": "drift-open",
+   "verifiedNote": "built (2026-10-27): during Save and leave to the origin the header's way back reads 'Saving record…' and the footer Cancel/Saving…; no board shot in the dump to compare."
   },
   {
    "nodeId": "177:17091",

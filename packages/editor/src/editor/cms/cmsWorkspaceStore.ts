@@ -32,6 +32,9 @@ export interface CmsWorkspaceState {
    *  Title binding", 173:16169). Kept across moves inside the workspace;
    *  cleared when the workspace closes. */
   origin: string | null;
+  /** A Save and leave back to the origin is in flight: the header's way back
+   *  reads "Saving record…" (173:16635, Play F2.09). */
+  returning?: boolean;
 }
 
 /** `ui:cms-open` (EVENTS.UI_CMS_OPEN) — open a collection's table, and with
@@ -66,6 +69,7 @@ let leaveGuard: CmsLeaveGuard | null = null;
  *  from (the header's "‹ {origin}"); true when it took the exit over. */
 type CmsExitGuard = (go: () => void) => boolean;
 let exitGuard: CmsExitGuard | null = null;
+let visitHolders = 0;
 
 /**
  * Every move goes through here (UI-02). A move that closes the open record —
@@ -90,9 +94,18 @@ export const cmsWorkspace = {
   /** One write for both, so the table never renders a frame without its sheet. */
   openRequest: ({ collectionId, recordId, tab, origin }: CmsOpenRequest): void =>
     navigate({ collectionId, tab: tab ?? "records", recordId: recordId ?? null, origin: origin ?? state.origin }),
-  /** The visit ended (the workspace closed): its way back goes with it. */
-  clearOrigin: (): void => {
-    if (state.origin !== null) set({ ...state, origin: null });
+  /** A mounted workspace holds the visit open; the release ends it — and
+   *  its way back — unless another mount took over in the meantime (React's
+   *  StrictMode mounts, unmounts and remounts once in development, which
+   *  cleared the origin on the first render). */
+  holdVisit: (): (() => void) => {
+    visitHolders++;
+    return () => {
+      visitHolders--;
+      queueMicrotask(() => {
+        if (visitHolders === 0 && state.origin !== null) set({ ...state, origin: null });
+      });
+    };
   },
   /** The open record's guard (RecordSheet); returns its release. */
   setLeaveGuard: (guard: CmsLeaveGuard): (() => void) => {
@@ -100,6 +113,9 @@ export const cmsWorkspace = {
     return () => {
       if (leaveGuard === guard) leaveGuard = null;
     };
+  },
+  setReturning: (returning: boolean): void => {
+    if (Boolean(state.returning) !== returning) set({ ...state, returning });
   },
   /** The open record's guard on leaving the workspace; returns its release. */
   setExitGuard: (guard: CmsExitGuard): (() => void) => {

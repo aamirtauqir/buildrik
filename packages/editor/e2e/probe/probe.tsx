@@ -1927,7 +1927,11 @@ function CmsWorkspaceHost() {
       /* `&hang=1` holds a save open, for the saving states (165:797, 168:21620). */
       /* `&offline=1` returns the written record, so the server mirror runs and,
          with no server behind the probe, queues (165:1625). */
-      cms.collections.updateContentItem = q.get("hang")
+      cms.collections.updateContentItem = q.get("fail")
+        ? async () => {
+            throw new Error("500");
+          }
+        : q.get("hang")
         ? () => new Promise(() => {})
         : q.get("offline")
           ? async (id: string, u: Record<string, unknown>) => ({ ...CMS_WS_RECORDS.find((r) => r.id === id), ...u })
@@ -1945,13 +1949,14 @@ function CmsWorkspaceHost() {
       collectionId: "blog",
       recordId: q.get("record") ?? undefined,
       tab: (q.get("tab") as "fields" | null) ?? undefined,
+      origin: q.get("origin") ?? undefined,
     });
     return null;
   });
   return (
     <ToastProvider>
       <div data-probe="cms-workspace" className="tw:relative" style={{ width: 1145, height: 812 }}>
-        <CmsWorkspace composer={composer} />
+        <CmsWorkspace composer={composer} onBackToCanvas={q.get("back") || q.get("origin") ? () => {} : undefined} />
       </div>
     </ToastProvider>
   );
