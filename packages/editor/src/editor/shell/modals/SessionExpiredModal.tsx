@@ -25,13 +25,14 @@
  */
 
 import * as React from "react";
-import { Button, ModalBody, ModalContent, ModalFooter, ModalRoot, ModalTitle, useToast } from "@/editor/chrome-ui";
+import { Button, ModalContent, ModalRoot, ModalTitle, useToast } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { readUnsaved } from "@/services/unsavedRecovery";
 import type { SaveOutcome } from "../hooks/useSaveCallback";
 import { BANNER_ID, clearGlobalBanner, showSessionExpiredBanner } from "../globalBanners";
+import { DIALOG_ACTION, DIALOG_ACTIONS, DIALOG_BODY, DIALOG_FRAME, DIALOG_TITLE } from "./recoveryDialog";
 
 export interface SessionExpiredModalProps {
   open: boolean;
@@ -115,31 +116,34 @@ export const SessionExpiredModal: React.FC<SessionExpiredModalProps> = ({
   const changes = count > 0 ? `Your ${count} ${count === 1 ? "change is" : "changes are"}` : "Your changes are";
   const where = keptInBrowser ? "in this tab and in this browser" : "in this tab";
 
+  /* 2L9 B7-G03 225:3353: 480 × 176 in the recovery dialogs' layout. */
   return (
     <ModalRoot open={open} onOpenChange={(o) => !o && keepEditing()}>
       <ModalContent size="confirm" srTitle="Sign in again to save">
-        <ModalTitle>Sign in again to save</ModalTitle>
-        <ModalBody>
-          <p className="tw:my-2 tw:text-[13px] tw:leading-normal tw:text-[var(--bk-ink-muted)]" data-testid="session-expired-body">
+        <div className={DIALOG_FRAME} data-testid="session-expired-dialog">
+          <ModalTitle inset={false} className={DIALOG_TITLE}>
+            Sign in again to save
+          </ModalTitle>
+          <p className={DIALOG_BODY} data-testid="session-expired-body">
             Your session expired. {changes} kept {where}. Sign in again to save {count === 1 ? "it" : "them"}.
           </p>
           {retryFailed && (
-            <p role="alert" className="tw:my-2 tw:text-[12px] tw:text-[var(--bk-error-text)]">
+            <p role="alert" className="tw:m-0 tw:text-[12px] tw:text-[var(--bk-error-text)]">
               Still signed out — finish signing in first, then try again.
             </p>
           )}
-        </ModalBody>
-        <ModalFooter>
-          <Button color="light" size="sm" onClick={keepEditing}>
-            Keep editing
-          </Button>
-          <Button color="light" size="sm" disabled={retrying} onClick={retry}>
-            {retrying ? "Saving…" : "Try saving again"}
-          </Button>
-          <Button size="sm" onClick={signIn}>
-            Sign in ↗
-          </Button>
-        </ModalFooter>
+          <div className={DIALOG_ACTIONS}>
+            <Button color="light" size="sm" className={DIALOG_ACTION} onClick={keepEditing}>
+              Keep editing
+            </Button>
+            <Button color="light" size="sm" className={DIALOG_ACTION} disabled={retrying} onClick={retry}>
+              {retrying ? "Saving…" : "Try saving again"}
+            </Button>
+            <Button size="sm" className={`${DIALOG_ACTION} tw:px-6`} onClick={signIn}>
+              Sign in ↗
+            </Button>
+          </div>
+        </div>
       </ModalContent>
     </ModalRoot>
   );

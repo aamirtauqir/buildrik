@@ -22,10 +22,14 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
+import { AlertTriangle } from "lucide-react";
 import { Button, Portal } from "@/editor/chrome-ui";
+import { BANNER_ACTION_SECONDARY as ACTION } from "./GlobalBannerSlot";
+import { BANNER_ID, useGlobalBanners } from "./globalBanners";
+import { useCanvasColumnRect } from "./useCanvasColumnRect";
 
-/** The board's inset from the canvas column's edges. */
-const EDGE = 8;
+/** C05 `10:2199`: the strip sits 12 in from the canvas column's edges. */
+const EDGE = 12;
 /** Narrower than this the copy wraps a word per line — no column at all. */
 const MIN_WIDTH = 480;
 /** No usable canvas column means a full-page view covers it: clear the 256px
@@ -51,37 +55,26 @@ export const SaveFailedBanner: React.FC<{
   onRetry: () => void;
   onKeepEditing: () => void;
 }> = ({ where, leaving, busy, refusal, brandLocked = false, context, onRetry, onKeepEditing }) => {
-  const [col, setCol] = React.useState<DOMRect | null>(null);
-  React.useLayoutEffect(() => {
-    const el = document.querySelector("[data-bk-toast-anchor]");
-    /* Full-page views (Settings, Brand, Templates) cover the canvas column
-       and squeeze it without unmounting it — to 0 in Settings, to a 48px
-       sliver at x:0 in Brand (measured 2026-10-07: the banner 32px wide over
-       the Brand nav, one word per line). So "non-zero" is not the test; "can
-       hold the card" is, as in chrome-ui/Toast's measureAnchor. */
-    const update = () => {
-      const rect = el?.getBoundingClientRect() ?? null;
-      setCol(rect && rect.width - 2 * EDGE >= MIN_WIDTH ? rect : null);
-    };
-    update();
-    window.addEventListener("resize", update);
-    const ro = typeof ResizeObserver === "undefined" || !el ? null : new ResizeObserver(update);
-    if (el) ro?.observe(el);
-    return () => {
-      window.removeEventListener("resize", update);
-      ro?.disconnect();
-    };
-  }, []);
+  const col = useCanvasColumnRect(MIN_WIDTH + 2 * EDGE);
+  /* One signal per condition: a session that expired or a server that cannot
+     be reached already holds the banner slot, and this strip would only
+     repeat it under different words (2L9 G04 / G12 draw no strip). */
+  const banners = useGlobalBanners();
+  if (!refusal && !leaving && banners.some((b) => b.id === BANNER_ID.sessionExpired || b.id === BANNER_ID.connection)) {
+    return null;
+  }
 
   return (
     <Portal>
       <div
-        className="tw:fixed tw:z-[60] tw:flex tw:flex-wrap tw:items-center tw:gap-3 tw:rounded-[var(--bk-radius-md)] tw:bg-[var(--bk-error-tint)] tw:px-3 tw:py-2 tw:[font-family:var(--bk-font-ui)]"
+        /* Under the dialogs' scrim (z-50): a modal over the canvas dims it. */
+        className="tw:fixed tw:z-40 tw:flex tw:min-h-11 tw:items-center tw:gap-2 tw:rounded-[var(--bk-radius-md)] tw:bg-[var(--bk-error-tint)] tw:px-3 tw:py-1.5 tw:text-[var(--bk-error-text)] tw:[font-family:var(--bk-font-ui)]"
         style={col ? { left: col.left + EDGE, top: col.top + EDGE, width: col.width - 2 * EDGE } : FULL_PAGE_POSITION}
         role="alert"
         data-testid="save-failed-banner"
       >
-        <span className="tw:min-w-0 tw:grow tw:basis-60 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]" data-testid="save-failed-message">
+        <AlertTriangle size={14} aria-hidden="true" className="tw:shrink-0" />
+        <span className="tw:min-w-0 tw:text-[13px] tw:leading-5" data-testid="save-failed-message">
           {refusal
             ? brandLocked
               ? `Couldn't save ${where}. This site's brand was refused: ${refusal}. Your changes are kept in this browser — reload to keep editing.`
@@ -92,22 +85,33 @@ export const SaveFailedBanner: React.FC<{
                 ? "Save before publishing. Your changes are kept."
                 : `Couldn't save ${where}. Your changes are kept.`}
         </span>
-        <span className="tw:flex tw:shrink-0 tw:items-center tw:gap-2">
-          {refusal && !leaving ? null : (
-            <Button size="xs" className="tw:h-7" disabled={busy} aria-busy={busy || undefined} onClick={onRetry} data-testid="save-failed-retry">
-              {leaving ? "Retry save & leave" : "Retry"}
-            </Button>
-          )}
+        {refusal && !leaving ? null : (
           <Button
             color="light"
             size="xs"
-            className="tw:h-7 tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink)]"
+            className={ACTION}
+            disabled={busy}
+            aria-busy={busy || undefined}
+            onClick={onRetry}
+            data-testid="save-failed-retry"
+          >
+            {leaving ? "Retry save & leave" : "Retry"}
+          </Button>
+        )}
+        {/* The board's strip has one action. Keep editing stays only where
+            it means something the strip does not otherwise say: after a
+            failed exit, and for a refusal that Retry cannot fix. */}
+        {leaving || refusal ? (
+          <Button
+            color="light"
+            size="xs"
+            className="tw:h-8 tw:min-h-0 tw:shrink-0 tw:border-transparent tw:bg-transparent tw:px-2 tw:text-[13px] tw:text-current"
             onClick={onKeepEditing}
             data-testid="save-failed-keep"
           >
             Keep editing
           </Button>
-        </span>
+        ) : null}
       </div>
     </Portal>
   );

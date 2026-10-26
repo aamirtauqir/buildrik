@@ -25,6 +25,8 @@ export interface BannerAction {
   label: string;
   onClick: () => void;
   testId?: string;
+  /** The bar's one filled action (2L9 G02 Retry, G04 Sign in, G28 Edit here). */
+  primary?: boolean;
 }
 
 export interface GlobalBanner {
@@ -35,6 +37,8 @@ export interface GlobalBanner {
   actions?: readonly BannerAction[];
   /** Offer ✕. Conditions that clear themselves (offline) are not dismissible. */
   dismissible?: boolean;
+  /** The shorter line it reads behind "{n} more" (B7-G31 `227:14297`). */
+  summary?: string;
 }
 
 interface Entry {
@@ -106,6 +110,7 @@ export const OFFLINE_BANNER: GlobalBanner = {
   tone: "warning",
   message:
     "You’re offline. Page edits are kept in this browser; other changes need this tab open. Everything saves when you reconnect.",
+  summary: "You’re offline. Everything saves when you reconnect.",
 };
 
 /** B7-G12 `225:8126` — a save died in transport while the browser is online. */
@@ -136,7 +141,7 @@ export function showOtherTabBanner(editHere?: () => void): void {
     tone: "warning",
     message: "This site is also open in another tab. Edit in one tab at a time.",
     ...(editHere
-      ? { actions: [{ label: "Edit here", onClick: editHere, testId: "banner-edit-here" }] }
+      ? { actions: [{ label: "Edit here", onClick: editHere, testId: "banner-edit-here", primary: true }] }
       : { dismissible: true }),
   });
 }
@@ -160,7 +165,7 @@ export function showSessionExpiredBanner(signIn: () => void): void {
     id: BANNER_ID.sessionExpired,
     tone: "error",
     message: "Session expired — changes aren’t saving. They’re kept in this tab.",
-    actions: [{ label: "Sign in ↗", onClick: signIn, testId: "banner-sign-in" }],
+    actions: [{ label: "Sign in ↗", onClick: signIn, testId: "banner-sign-in", primary: true }],
   });
 }
 
@@ -178,7 +183,7 @@ export function showRoleRaisedBanner(reload: () => void): void {
     id: BANNER_ID.roleRaised,
     tone: "info",
     message: "You can edit this site now.",
-    actions: [{ label: "Reload to edit", onClick: reload, testId: "banner-reload-to-edit" }],
+    actions: [{ label: "Reload to edit", onClick: reload, testId: "banner-reload-to-edit", primary: true }],
     dismissible: true,
   });
 }
@@ -204,7 +209,7 @@ export function showNewVersionBanner(reload: () => void): void {
     id: BANNER_ID.newVersion,
     tone: "info",
     message: "A new version of Buildrik is ready.",
-    actions: [{ label: "Reload", onClick: reload, testId: "banner-new-version-reload" }],
+    actions: [{ label: "Reload", onClick: reload, testId: "banner-new-version-reload", primary: true }],
     dismissible: true,
   });
 }

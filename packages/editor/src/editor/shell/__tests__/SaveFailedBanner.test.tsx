@@ -23,7 +23,8 @@ describe("SaveFailedBanner", () => {
     );
     expect(screen.getByTestId("save-failed-message")).toHaveTextContent("Couldn't save My Site · Home. Your changes are kept.");
     expect(screen.getByTestId("save-failed-retry")).toHaveTextContent(/^Retry$/);
-    expect(screen.getByTestId("save-failed-keep")).toHaveTextContent("Keep editing");
+    /* The board's strip has one action. */
+    expect(screen.queryByTestId("save-failed-keep")).toBeNull();
   });
 
   it("in the publish context: the board's line", () => {
@@ -93,8 +94,9 @@ describe("SaveFailedBanner", () => {
     });
     render(<SaveFailedBanner where="Site · Home" leaving={false} busy={false} onRetry={vi.fn()} onKeepEditing={vi.fn()} />);
     const banner = screen.getByTestId("save-failed-banner");
-    expect(banner.style.left).toBe("308px");
-    expect(banner.style.width).toBe("784px");
+    /* 2L9 C05: 12 in from the column's edges. */
+    expect(banner.style.left).toBe("312px");
+    expect(banner.style.width).toBe("776px");
   });
 
   const anchorWithRect = (left: number, width: number) => {
@@ -119,9 +121,9 @@ describe("SaveFailedBanner", () => {
      256px nav at x:0 — the old 68px-left default sat on top of it. */
   const expectFullPageFallback = () => {
     const banner = screen.getByTestId("save-failed-banner");
-    expect(banner.style.left).toBe("264px");
-    expect(banner.style.top).toBe("8px");
-    expect(banner.style.right).toBe("8px");
+    expect(banner.style.left).toBe("268px");
+    expect(banner.style.top).toBe("12px");
+    expect(banner.style.right).toBe("12px");
     expect(banner.style.width).toBe("");
   };
 
