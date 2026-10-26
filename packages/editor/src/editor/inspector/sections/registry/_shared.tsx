@@ -68,6 +68,7 @@ export type SectionId =
   | "slides"
   | "collection"
   | "cms-binding"
+  | "semantics"
   | "attributes"
   // Style — define → shape → paint (DD-15)
   | "component"

@@ -16,13 +16,15 @@ import { SECTION_REGISTRY } from "../sections/registry";
 import { capabilitiesFor } from "@/shared/constants/elementCapabilities";
 
 /* 2L9 page 04: the defining block, the type's own lists, the binding, then
-   the closed attributes (boards 161:8480, 156:716, 247:26594). */
+   Semantics and the closed Advanced attributes (boards 161:8480, 156:716,
+   247:26594). */
 const CONTENT_ORDER: readonly SectionId[] = [
   "type",
   "form-fields",
   "slides",
   "collection",
   "cms-binding",
+  "semantics",
   "attributes",
 ];
 

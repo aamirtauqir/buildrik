@@ -4349,7 +4349,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Lane L-B A1: Content tab exists and leads with the Text type block (Edit text on canvas) — probe-compared to dump copy. Open: Semantics (Tag, ID), Advanced attributes · N set (A2), Conditions (REQUESTS #11), header 'Content · All breakpoints' (REQUESTS #10)."
+   "verifiedNote": "Lane L-B A1+A2 (probe inspector-panel ?type=paragraph, :5172, against the dump's copy): Content · Text block (Edit text on canvas) · Semantics (Tag 'Paragraph', ID, 'Content and semantic changes apply to all breakpoints.') · Advanced attributes '0 set' — match. Still open: an unbound CMS binding section shows (board shows none until bound — A10), Conditions (REQUESTS #11), header 'Content · All breakpoints' (REQUESTS #10)."
   },
   {
    "nodeId": "161:8940",
@@ -5041,7 +5041,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Attributes in Behaviour tab; board Content › Semantics + \"Custom attributes\", data-bk-id protected note"
+   "verifiedNote": "Lane L-B A2: Semantics Tag (heading H1–H6) + ID on Content; Title / Tab index / custom data-* under Advanced attributes (built, compared by probe for copy only). Open: Title/Tab index shown inside Semantics on the board, protected data-bk-id note, 'Change semantic tag' review (A12/A13)."
   },
   {
    "nodeId": "247:27113",
@@ -20131,7 +20131,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "StudioErrorBoundary AquibraStudio.tsx:98-147 \"Something went wrong\"/Reload; no error code, Download a copy, Back to sites"
+   "verifiedNote": "L-F S6: built, not compared. EditorStoppedBoundary/Screen: board title, unsaved line only when true, \"Error code XXXX-XX\" + copy (FNV hash, reported with captureError), Download a copy (primary when work exists) · Reload editor · Back to sites. Mount swap is REQUESTS #17."
   },
   {
    "nodeId": "227:12184",

@@ -2,9 +2,8 @@
  * Type-block bodies — text family: Heading, Text (+ paragraph), Link, Label,
  * Button (boards 1, 4, 5).
  *
- *   Heading — Level H1–H6 segmented (writes the tag, one Undo), Edit text
- *             on canvas.
- *   Text / Link / Label — Edit text on canvas.
+ *   Heading / Text / Link / Label — Edit text on canvas. A heading's level
+ *             is its tag: Content › Semantics (`../../SemanticsSection`).
  *   Button  — Edit text on canvas, Type Button/Submit/Reset segmented,
  *             Disabled (box first, label beside).
  *
@@ -20,14 +19,11 @@
 import * as React from "react";
 import type { TypeBlockBodyProps } from "@/editor/inspector/config/typeBlocks";
 import type { TypeBlockId } from "@/shared/constants/elementCapabilities";
-import { writableElements } from "@/engine/commands/commandOperations";
 import { ButtonGroup } from "@/editor/inspector/shared/controls";
-import { runTxn, writeAttribute } from "../attributeWriter";
+import { writeAttribute } from "../attributeWriter";
 import { isAttrOn, useElementRead } from "../blockRows";
 import { CheckRow } from "@/editor/inspector/shared/controls/CheckRow";
 import { EditTextRow } from "../EditTextRow";
-
-const LEVELS = ["h1", "h2", "h3", "h4", "h5", "h6"].map((v) => ({ value: v, label: v.toUpperCase() }));
 
 const BUTTON_TYPES = [
   { value: "button", label: "Button" },
@@ -38,23 +34,6 @@ const BUTTON_TYPES = [
 // ============================================================================
 // ROWS
 // ============================================================================
-
-/** Level — the heading's tag, written on every writable target in ONE
- *  transaction (one Undo, DD-12). */
-function LevelRow(props: TypeBlockBodyProps) {
-  const { composer, targetIds } = props;
-  const [level, reread] = useElementRead(props, (el) => el.getTagName?.()?.toLowerCase() || "h2", "h2");
-  const write = (tag: string) => {
-    if (!composer) return;
-    const targets = writableElements(composer, targetIds.map((id) => composer.elements.getElement(id)));
-    if (targets.length === 0) return;
-    runTxn(composer, "heading-level", () => {
-      for (const el of targets) el.setTagName(tag);
-    });
-    reread();
-  };
-  return <ButtonGroup label="Level" value={level} onChange={write} options={LEVELS} />;
-}
 
 function ButtonTypeRow(props: TypeBlockBodyProps) {
   const { composer, targetIds } = props;
@@ -93,13 +72,6 @@ function DisabledRow(props: TypeBlockBodyProps) {
 // BODIES
 // ============================================================================
 
-const Heading: React.FC<TypeBlockBodyProps> = (props) => (
-  <>
-    <LevelRow {...props} />
-    <EditTextRow composer={props.composer} elementId={props.element.id} />
-  </>
-);
-
 const TextBody: React.FC<TypeBlockBodyProps> = (props) => (
   <EditTextRow composer={props.composer} elementId={props.element.id} />
 );
@@ -113,7 +85,7 @@ const ButtonBody: React.FC<TypeBlockBodyProps> = (props) => (
 );
 
 export const TEXT_BODIES: Partial<Record<TypeBlockId, React.FC<TypeBlockBodyProps>>> = {
-  heading: Heading,
+  heading: TextBody,
   text: TextBody,
   link: TextBody,
   label: TextBody,

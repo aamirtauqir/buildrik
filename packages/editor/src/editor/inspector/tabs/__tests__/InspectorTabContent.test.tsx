@@ -124,7 +124,7 @@ const sectionNames = () =>
 describe("InspectorTabContent — one order per tab, presence by capability", () => {
   it("heading · Content: the type block leads, then CMS binding, Attributes (2L9 161:8480)", () => {
     renderTab({ tabId: "content", elementType: "heading" });
-    expect(sectionNames()).toEqual(["Heading", "CMS binding", "Attributes"]);
+    expect(sectionNames()).toEqual(["Heading", "CMS binding", "Semantics", "Advanced attributes"]);
   });
 
   it("heading · Style: Typography, Size, Spacing, Fill, Border — no type block", () => {

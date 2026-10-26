@@ -26,7 +26,7 @@ import {
 } from "@/engine/__tests__/test-utils/realComposer";
 import { ToastProvider } from "@/editor/chrome-ui";
 import { TypeBlockSection } from "../sections/typeBlock/TypeBlockSection";
-import { AttributesSection } from "../sections/attributes/AttributesSection";
+import { SemanticsSection } from "../sections/SemanticsSection";
 import { DataAttributeEditor } from "../sections/attributes/DataAttributeEditor";
 import { FormFieldsSection } from "../sections/FormFieldsSection";
 import { SliderPlaybackSection } from "../sections/SliderPlaybackSection";
@@ -74,10 +74,10 @@ describe("P-1 — attribute writers refuse a locked element", () => {
     expect(skipped).toHaveBeenCalled();
   });
 
-  it("Attributes: editing the element ID", () => {
+  it("Semantics: editing the element ID", () => {
     const img = add("image");
     lock(img);
-    render(<AttributesSection element={{ id: img.getId(), type: "image" }} targetIds={[img.getId()]} composer={composer} isOpen onToggle={() => {}} />);
+    render(<SemanticsSection element={{ id: img.getId(), type: "image" }} targetIds={[img.getId()]} composer={composer} isOpen onToggle={() => {}} />);
     fireEvent.change(screen.getByPlaceholderText("element-id"), { target: { value: "hero" } });
     expect(img.getAttribute("id")).toBeFalsy();
     expect(skipped).toHaveBeenCalled();

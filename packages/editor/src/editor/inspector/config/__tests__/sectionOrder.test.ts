@@ -45,11 +45,11 @@ describe("section order", () => {
   });
 
   it("161:8480 — Text · Content: the type block, CMS binding, Attributes", () => {
-    expect(titlesFor("content", "paragraph")).toEqual(["paragraph", "CMS binding", "Attributes"]);
+    expect(titlesFor("content", "paragraph")).toEqual(["paragraph", "CMS binding", "Semantics", "Advanced attributes"]);
   });
 
   it("Heading · Content leads with its type block; Style has no type block", () => {
-    expect(titlesFor("content", "heading")).toEqual(["heading", "CMS binding", "Attributes"]);
+    expect(titlesFor("content", "heading")).toEqual(["heading", "CMS binding", "Semantics", "Advanced attributes"]);
     expect(titlesFor("style", "heading")).toEqual(["Typography", "Size", "Spacing", "Fill", "Border"]);
   });
 
@@ -62,7 +62,7 @@ describe("section order", () => {
   });
 
   it("249:71560 — Button / Link: text on Content, destination on Behavior", () => {
-    expect(titlesFor("content", "button")).toEqual(["button", "CMS binding", "Attributes"]);
+    expect(titlesFor("content", "button")).toEqual(["button", "CMS binding", "Semantics", "Advanced attributes"]);
     expect(titlesFor("behaviour", "button")).toEqual(["Link", "Visibility", "Interactions", "CSS classes"]);
     expect(titlesFor("behaviour", "link")).toEqual(["Link", "Visibility", "Interactions", "CSS classes"]);
   });
@@ -72,18 +72,18 @@ describe("section order", () => {
   });
 
   it("36:2 — Image · Content holds the source; fit and dimensions are Style's", () => {
-    expect(titlesFor("content", "image")).toEqual(["image", "CMS binding", "Attributes"]);
+    expect(titlesFor("content", "image")).toEqual(["image", "CMS binding", "Semantics", "Advanced attributes"]);
     expect(titlesFor("style", "image")).toEqual(["Size", "Spacing", "Fill", "Border"]);
   });
 
   it("board 13 — Accordion · Style: no Layout; Text inside kept (owner answer 1)", () => {
     expect(titlesFor("style", "accordion")).toEqual(["Size", "Spacing", "Fill", "Border", "Text inside"]);
-    expect(titlesFor("content", "accordion")).toEqual(["accordion", "Attributes"]);
+    expect(titlesFor("content", "accordion")).toEqual(["accordion", "Semantics", "Advanced attributes"]);
   });
 
   it("board 16 — Flex · Style: the type block carries the layout; Content has none", () => {
     expect(titlesFor("style", "flex", { isFlexContainer: true })).toEqual(["flex", "Size", "Spacing", "Fill", "Border", "Text inside"]);
-    expect(titlesFor("content", "flex")).toEqual(["Attributes"]);
+    expect(titlesFor("content", "flex")).toEqual(["Semantics", "Advanced attributes"]);
   });
 
   it("board 17 — Container (grid) · Style: Text inside last, after Border", () => {
@@ -92,14 +92,14 @@ describe("section order", () => {
 
   it("board 18 — Section · Behavior: Link, no CMS binding", () => {
     expect(titlesFor("behaviour", "section")).toEqual(["Link", "Visibility", "Interactions", "CSS classes"]);
-    expect(titlesFor("content", "section")).toEqual(["Attributes"]);
+    expect(titlesFor("content", "section")).toEqual(["Semantics", "Advanced attributes"]);
   });
 
   it("156:716 / 156:6055 — Form: Fields on Content, Form settings on Behavior", () => {
-    expect(titlesFor("content", "form")).toEqual(["Fields", "Attributes"]);
+    expect(titlesFor("content", "form")).toEqual(["Fields", "Semantics", "Advanced attributes"]);
     expect(titlesFor("behaviour", "form")).toEqual(["After submit", "Visibility", "Interactions", "CSS classes"]);
-    expect(titlesFor("content", "collection-list")).toEqual(["Collection", "Attributes"]);
-    expect(titlesFor("content", "slider")).toEqual(["Slides", "Attributes"]);
+    expect(titlesFor("content", "collection-list")).toEqual(["Collection", "Semantics", "Advanced attributes"]);
+    expect(titlesFor("content", "slider")).toEqual(["Slides", "Semantics", "Advanced attributes"]);
     expect(titlesFor("behaviour", "slider")).toEqual(["Playback", "Visibility", "Interactions", "CSS classes"]);
   });
 
