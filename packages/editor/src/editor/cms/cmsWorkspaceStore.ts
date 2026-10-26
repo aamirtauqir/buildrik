@@ -14,12 +14,24 @@ import * as React from "react";
 
 export type CmsTab = "records" | "fields" | "dynamic-pages" | "settings";
 
+/** A collection's four tabs as the boards name them (165:2, 165:520). */
+export const CMS_TAB_LABEL: Record<CmsTab, string> = {
+  records: "Records",
+  fields: "Fields",
+  "dynamic-pages": "Dynamic pages",
+  settings: "Collection settings",
+};
+
 export interface CmsWorkspaceState {
   /** null → the workspace root ("CMS · <site>"). */
   collectionId: string | null;
   tab: CmsTab;
   /** The record open in the side sheet; "new" for an unsaved one. */
   recordId: string | null;
+  /** Where this visit came from, in the words of its way back ("Heading ·
+   *  Title binding", 173:16169). Kept across moves inside the workspace;
+   *  cleared when the workspace closes. */
+  origin: string | null;
 }
 
 /** `ui:cms-open` (EVENTS.UI_CMS_OPEN) — open a collection's table, and with
@@ -30,9 +42,11 @@ export interface CmsOpenRequest {
   collectionId: string;
   recordId?: string;
   tab?: CmsTab;
+  /** The element door's own name for the way back (Play F2.06). */
+  origin?: string;
 }
 
-const INITIAL: CmsWorkspaceState = { collectionId: null, tab: "records", recordId: null };
+const INITIAL: CmsWorkspaceState = { collectionId: null, tab: "records", recordId: null, origin: null };
 
 let state: CmsWorkspaceState = INITIAL;
 const listeners = new Set<() => void>();
@@ -43,8 +57,10 @@ function set(next: CmsWorkspaceState): void {
 }
 
 /** Asked before a move that closes the open record; returns true when it
- *  took the move over (it calls `go` itself once the person agrees). */
-export type CmsLeaveGuard = (go: () => void) => boolean;
+ *  took the move over (it calls `go` itself once the person agrees). `next`
+ *  is where the move lands, so the guard can name it ("before opening
+ *  Fields", 168:21408). */
+export type CmsLeaveGuard = (go: () => void, next: CmsWorkspaceState) => boolean;
 let leaveGuard: CmsLeaveGuard | null = null;
 
 /**
@@ -57,19 +73,23 @@ let leaveGuard: CmsLeaveGuard | null = null;
 function navigate(next: CmsWorkspaceState): void {
   const closesRecord =
     state.recordId !== null && (next.recordId !== state.recordId || next.collectionId !== state.collectionId);
-  if (closesRecord && leaveGuard?.(() => set(next))) return;
+  if (closesRecord && leaveGuard?.(() => set(next), next)) return;
   set(next);
 }
 
 export const cmsWorkspace = {
   get: (): CmsWorkspaceState => state,
   openCollection: (collectionId: string | null, tab: CmsTab = "records"): void =>
-    navigate({ collectionId, tab, recordId: null }),
+    navigate({ ...state, collectionId, tab, recordId: null }),
   setTab: (tab: CmsTab): void => navigate({ ...state, tab, recordId: null }),
   openRecord: (recordId: string | null): void => navigate({ ...state, tab: "records", recordId }),
   /** One write for both, so the table never renders a frame without its sheet. */
-  openRequest: ({ collectionId, recordId, tab }: CmsOpenRequest): void =>
-    navigate({ collectionId, tab: tab ?? "records", recordId: recordId ?? null }),
+  openRequest: ({ collectionId, recordId, tab, origin }: CmsOpenRequest): void =>
+    navigate({ collectionId, tab: tab ?? "records", recordId: recordId ?? null, origin: origin ?? state.origin }),
+  /** The visit ended (the workspace closed): its way back goes with it. */
+  clearOrigin: (): void => {
+    if (state.origin !== null) set({ ...state, origin: null });
+  },
   /** The open record's guard (RecordSheet); returns its release. */
   setLeaveGuard: (guard: CmsLeaveGuard): (() => void) => {
     leaveGuard = guard;

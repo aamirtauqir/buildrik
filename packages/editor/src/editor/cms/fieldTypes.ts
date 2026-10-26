@@ -1,8 +1,7 @@
 /**
  * The field types a person can add, in the Add field dialog's order
- * (4418:164208: Text · Number · Rich text · Image · Boolean · Reference ·
- * Slug, then the two the model also carries), and their prose names — the
- * slug is an identifier, a field list is read.
+ * (2L9 167:3871 — every type the schema stores, CMS_FIELD_TYPES), and their
+ * prose names — the slug is an identifier, a field list is read.
  *
  * Also the ONE field-key rule (CMS-03): the New collection modal, + Add field
  * and the field inspector all derive and check keys here. The setup modal
@@ -14,20 +13,46 @@
 import { CMS_FIELD_KEY_RE, CMS_RESERVED_FIELD_KEYS } from "@buildrik/shared/schemas/cms";
 import type { CMSField, CMSFieldType } from "@/shared/types/cms";
 
-export const FIELD_TYPES = ["text", "number", "richtext", "image", "boolean", "reference", "slug", "textarea", "date", "multiselect"] as const;
+export const FIELD_TYPES = [
+  "text",
+  "textarea",
+  "richtext",
+  "email",
+  "url",
+  "slug",
+  "number",
+  "date",
+  "datetime",
+  "boolean",
+  "select",
+  "multiselect",
+  "image",
+  "file",
+  "reference",
+  "color",
+] as const satisfies readonly CMSFieldType[];
 
-export const FIELD_TYPE_LABEL: Record<string, string> = {
+export const FIELD_TYPE_LABEL: Record<CMSFieldType, string> = {
   text: "Text",
   textarea: "Long text",
   richtext: "Rich text",
-  number: "Number",
-  boolean: "Boolean",
-  image: "Image",
-  date: "Date",
+  email: "Email",
+  url: "URL",
   slug: "Slug",
+  number: "Number",
+  date: "Date",
+  datetime: "Date & time",
+  boolean: "Yes/no",
+  select: "Option",
+  multiselect: "Options",
+  image: "Image",
+  file: "File",
   reference: "Reference",
-  multiselect: "Multi-select",
+  color: "Color",
 };
+
+/** Types whose values are chosen from a list the field carries. */
+export const OPTION_TYPES: ReadonlySet<CMSFieldType> = new Set(["select", "multiselect"]);
 
 /** A field's key from its name: "Unit price" → "unit-price". */
 export function fieldKeyFrom(name: string): string {

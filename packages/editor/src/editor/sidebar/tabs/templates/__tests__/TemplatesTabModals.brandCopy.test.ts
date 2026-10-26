@@ -26,8 +26,8 @@ describe("the template confirm says what applying one actually does", () => {
     expect(body).not.toContain("brand tokens are applied automatically");
   });
 
-  it("says the template brings its own colours", () => {
-    expect(modals).toContain("brand tokens are not");
+  it("says the template brings its own colours (2L9 223:44891)", () => {
+    expect(modals).toContain("has its own colors and fonts — your Brand is not changed.");
   });
 
   it("…and that is still true of the built-in templates", () => {

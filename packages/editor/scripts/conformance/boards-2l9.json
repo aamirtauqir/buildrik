@@ -6974,7 +6974,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Board: status filter, sort menu, Columns, 4 visible tabs; code: search + header sort, Records/Fields + ⋯ menu (CmsWorkspace.tsx:64,358)"
+   "verifiedNote": "drift-open — L-C C3 built the four named tabs (Records · Fields · Dynamic pages · Collection settings); status filter, sort menu, Columns and pagination still missing. Not compared."
   },
   {
    "nodeId": "165:520",
@@ -6984,7 +6984,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Board: ‹ Blog records back, 4 tabs, always-on Preview (unsaved) pane; code: crumb, 3 tabs (:576), Preview ▸ toggle (:600)"
+   "verifiedNote": "built, not compared — L-C C3: sheet back \"‹ {name} records\" and four tabs incl. Collection settings; always-on Preview (unsaved) pane still a toggle (open)."
   },
   {
    "nodeId": "165:797",
@@ -6994,7 +6994,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Save disabled while saving but label stays \"Save record\"; board shows \"Saving…\""
+   "verifiedNote": "built, not compared — L-C C1: Save button and footer read \"Saving…\" while a save runs (RecordSheet.tsx)."
   },
   {
    "nodeId": "165:1072",
@@ -7004,7 +7004,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code: footer state line + \"Retry save\" (:711); board: top banner \"Couldn’t save · edits still here\""
+   "verifiedNote": "built, not compared — L-C C5: banner \"Couldn’t save\" + \"Your edits are still here. Retry when you’re ready.\"; footer/button follow Play F2.17 (\"Couldn’t save · your draft is kept\", Retry save) where the two boards disagree (board: \"Retry\")."
   },
   {
    "nodeId": "165:1350",
@@ -7014,7 +7014,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Board: ‹ Blog records back, 4 tabs, always-on Preview (unsaved) pane; code: crumb, 3 tabs (:576), Preview ▸ toggle (:600)",
+   "verifiedNote": "built, not compared — L-C C3: sheet back \"‹ {name} records\" and four tabs incl. Collection settings; always-on Preview (unsaved) pane still a toggle (open).",
    "inheritsFrom": "165:520"
   },
   {
@@ -7025,7 +7025,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code saves to device with offline footer copy; board banner \"You’re offline · not saved to server\""
+   "verifiedNote": "built, not compared — L-C C5: queued save shows banner \"You’re offline\" + \"Your edits are not saved to the server. Keep this tab open.\"; button stays Save record."
   },
   {
    "nodeId": "165:1903",
@@ -7045,7 +7045,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code \"Discard record changes?\" Discard and leave/Keep editing; board \"Leave without saving?\" adds Save and leave"
+   "verifiedNote": "built, not compared — L-C C1: \"Leave without saving?\" names the record / destination tab or collection; Keep editing · Discard changes · Save and leave (RecordSheet.tsx). Origin label (\"Your destination is …\") waits on C2."
   },
   {
    "nodeId": "165:2414",
@@ -7365,7 +7365,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Picker offers 10 of 16 schema types (shared/schemas/cms.ts:20); labels Boolean→Yes/no, Multi-select→Options"
+   "verifiedNote": "built, not compared — L-C C6: \"Add field\" + \"Choose the kind of content this field stores.\", all 16 schema types in board order and names (fieldTypes.ts)."
   },
   {
    "nodeId": "167:4135",
@@ -7375,7 +7375,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code: Name/Required(+collection/options); board adds Key, Default value, min/max, Placeholder, Help text; title copy differs"
+   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
   },
   {
    "nodeId": "167:4412",
@@ -7385,7 +7385,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code: Name/Required(+collection/options); board adds Key, Default value, min/max, Placeholder, Help text; title copy differs"
+   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
   },
   {
    "nodeId": "167:4689",
@@ -7395,7 +7395,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code: Name/Required(+collection/options); board adds Key, Default value, min/max, Placeholder, Help text; title copy differs"
+   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
   },
   {
    "nodeId": "167:4956",
@@ -7405,7 +7405,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Email/URL/Date & time/Option/File/Color stored by schema but not offered in Add field"
+   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
   },
   {
    "nodeId": "167:5224",
@@ -7415,7 +7415,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Email/URL/Date & time/Option/File/Color stored by schema but not offered in Add field"
+   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
   },
   {
    "nodeId": "167:5492",
@@ -7425,7 +7425,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code: Name/Required(+collection/options); board adds Key, Default value, min/max, Placeholder, Help text; title copy differs"
+   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
   },
   {
    "nodeId": "167:5760",
@@ -7435,7 +7435,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code: Name/Required(+collection/options); board adds Key, Default value, min/max, Placeholder, Help text; title copy differs"
+   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
   },
   {
    "nodeId": "167:6038",
@@ -7445,7 +7445,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code: Name/Required(+collection/options); board adds Key, Default value, min/max, Placeholder, Help text; title copy differs"
+   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
   },
   {
    "nodeId": "167:6306",
@@ -7455,7 +7455,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Email/URL/Date & time/Option/File/Color stored by schema but not offered in Add field"
+   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
   },
   {
    "nodeId": "167:6574",
@@ -7465,7 +7465,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code: Name/Required(+collection/options); board adds Key, Default value, min/max, Placeholder, Help text; title copy differs"
+   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
   },
   {
    "nodeId": "167:6844",
@@ -7475,7 +7475,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Email/URL/Date & time/Option/File/Color stored by schema but not offered in Add field"
+   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
   },
   {
    "nodeId": "167:7125",
@@ -7485,7 +7485,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code: Name/Required(+collection/options); board adds Key, Default value, min/max, Placeholder, Help text; title copy differs"
+   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
   },
   {
    "nodeId": "167:7406",
@@ -7495,7 +7495,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code: Name/Required(+collection/options); board adds Key, Default value, min/max, Placeholder, Help text; title copy differs"
+   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
   },
   {
    "nodeId": "167:7671",
@@ -7505,7 +7505,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Email/URL/Date & time/Option/File/Color stored by schema but not offered in Add field"
+   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
   },
   {
    "nodeId": "167:7936",
@@ -7515,7 +7515,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code: Name/Required(+collection/options); board adds Key, Default value, min/max, Placeholder, Help text; title copy differs"
+   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
   },
   {
    "nodeId": "167:8207",
@@ -7525,7 +7525,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Email/URL/Date & time/Option/File/Color stored by schema but not offered in Add field"
+   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
   },
   {
    "nodeId": "167:8474",
@@ -7535,7 +7535,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Busy disables Save; label never becomes \"Saving…\""
+   "verifiedNote": "built, not compared — L-C C6: Add field reads Saving… while it saves (AddFieldDialog.tsx)."
   },
   {
    "nodeId": "167:8747",
@@ -7545,7 +7545,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No catch: failure not shown, no Retry, draft retention unhandled"
+   "verifiedNote": "built, not compared — L-C C6: refused add keeps the settings, \"Couldn’t save. Your field settings are still here.\" + Retry."
   },
   {
    "nodeId": "167:9021",
@@ -7596,7 +7596,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "RecordSheet.tsx:725 \"Discard record changes?\" Discard/Keep only; board \"Leave without saving?\" + Save and leave, names destination"
+   "verifiedNote": "built, not compared — L-C C1: \"Leave without saving?\" names the record / destination tab or collection; Keep editing · Discard changes · Save and leave (RecordSheet.tsx). Origin label (\"Your destination is …\") waits on C2."
   },
   {
    "nodeId": "168:21620",
@@ -7606,7 +7606,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No Save-and-leave path: RecordSheet.tsx:206 guard only discards or stays; pending Saving… then navigate absent"
+   "verifiedNote": "built, not compared — L-C C1: Save and leave shows \"Saving record…\" + Saving… + Stay here; success takes the chosen way out (RecordSheet.tsx)."
   },
   {
    "nodeId": "168:21848",
@@ -7616,7 +7616,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "RecordSheet.tsx:725 \"Discard record changes?\" Discard/Keep only; board \"Leave without saving?\" + Save and leave, names destination",
+   "verifiedNote": "built, not compared — L-C C1: \"Leave without saving?\" names the record / destination tab or collection; Keep editing · Discard changes · Save and leave (RecordSheet.tsx). Origin label (\"Your destination is …\") waits on C2.",
    "inheritsFrom": "168:21408"
   },
   {
@@ -7627,7 +7627,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No Save-and-leave path: RecordSheet.tsx:206 guard only discards or stays; pending Saving… then navigate absent"
+   "verifiedNote": "built, not compared — L-C C1: Save and leave shows \"Saving record…\" + Saving… + Stay here; success takes the chosen way out (RecordSheet.tsx)."
   },
   {
    "nodeId": "168:22290",
@@ -7637,7 +7637,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "RecordSheet.tsx:725 \"Discard record changes?\" Discard/Keep only; board \"Leave without saving?\" + Save and leave, names destination",
+   "verifiedNote": "built, not compared — L-C C1: \"Leave without saving?\" names the record / destination tab or collection; Keep editing · Discard changes · Save and leave (RecordSheet.tsx). Origin label (\"Your destination is …\") waits on C2.",
    "inheritsFrom": "168:21408"
   },
   {
@@ -7648,7 +7648,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No Save-and-leave path: RecordSheet.tsx:206 guard only discards or stays; pending Saving… then navigate absent"
+   "verifiedNote": "built, not compared — L-C C1: Save and leave shows \"Saving record…\" + Saving… + Stay here; success takes the chosen way out (RecordSheet.tsx)."
   },
   {
    "nodeId": "168:22734",
@@ -7658,7 +7658,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "RecordSheet.tsx:725 \"Discard record changes?\" Discard/Keep only; board \"Leave without saving?\" + Save and leave, names destination",
+   "verifiedNote": "built, not compared — L-C C1: \"Leave without saving?\" names the record / destination tab or collection; Keep editing · Discard changes · Save and leave (RecordSheet.tsx). Origin label (\"Your destination is …\") waits on C2.",
    "inheritsFrom": "168:21408"
   },
   {
@@ -7669,7 +7669,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No Save-and-leave path: RecordSheet.tsx:206 guard only discards or stays; pending Saving… then navigate absent"
+   "verifiedNote": "built, not compared — L-C C1: Save and leave shows \"Saving record…\" + Saving… + Stay here; success takes the chosen way out (RecordSheet.tsx)."
   },
   {
    "nodeId": "168:23180",
@@ -7921,7 +7921,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Record opened from binding: crumb \"‹ Heading · Title binding\"; code \"‹ Back to canvas\" (RecordSheet.tsx:521)"
+   "verifiedNote": "built, not compared — L-C C2: record/workspace back reads \"‹ {origin}\" from CmsOpenRequest.origin and the guard says \"Your destination is {origin}.\"; live label waits on REQUESTS #11 (L-B passes origin)."
   },
   {
    "nodeId": "173:16399",
@@ -7931,7 +7931,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Edited excerpt, Preview (unsaved); live form preview exists (RecordPreview.tsx:6)",
+   "verifiedNote": "built, not compared — L-C C2: record/workspace back reads \"‹ {origin}\" from CmsOpenRequest.origin and the guard says \"Your destination is {origin}.\"; live label waits on REQUESTS #11 (L-B passes origin).",
    "inheritsFrom": "173:16169"
   },
   {
@@ -7942,7 +7942,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Saving with pending return intention (\"Stay here\"); code has no return-intent state"
+   "verifiedNote": "built, not compared — L-C C1: Save and leave shows \"Saving record…\" + Saving… + Stay here; success takes the chosen way out (RecordSheet.tsx)."
   },
   {
    "nodeId": "173:16863",
@@ -7952,7 +7952,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Saved: \"Return to Heading when you're ready\" note; no return-intent copy in code"
+   "verifiedNote": "built, not compared — L-C C2: record/workspace back reads \"‹ {origin}\" from CmsOpenRequest.origin and the guard says \"Your destination is {origin}.\"; live label waits on REQUESTS #11 (L-B passes origin)."
   },
   {
    "nodeId": "173:17098",
@@ -7962,7 +7962,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Guard names destination + Save and leave; code \"Discard record changes?\" Keep editing/Discard only (RecordSheet.tsx:725)"
+   "verifiedNote": "built, not compared — L-C C1: \"Leave without saving?\" names the record / destination tab or collection; Keep editing · Discard changes · Save and leave (RecordSheet.tsx). Origin label (\"Your destination is …\") waits on C2."
   },
   {
    "nodeId": "173:17364",
@@ -8024,7 +8024,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Saving, stay in record; code saving state exists (RecordSheet.tsx:155) but copy/placement differ"
+   "verifiedNote": "built, not compared — L-C C1: Save and leave shows \"Saving record…\" + Saving… + Stay here; success takes the chosen way out (RecordSheet.tsx)."
   },
   {
    "nodeId": "174:14111",
@@ -8034,7 +8034,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Save failed, return paused + \"Retry and return\"; code failure copy (RecordSheet.tsx:326) has no paused return"
+   "verifiedNote": "built, not compared — L-C C1: failed Save and leave keeps edits, \"Your edits are still here. Return to X is paused.\", footer \"Couldn’t save · return paused\", Cancel · Retry and return."
   },
   {
    "nodeId": "176:17207",
@@ -8205,7 +8205,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Return cancelled while save pending; no return-intent state in code"
+   "verifiedNote": "built, not compared — L-C C1: Save and leave shows \"Saving record…\" + Saving… + Stay here; success takes the chosen way out (RecordSheet.tsx)."
   },
   {
    "nodeId": "177:17091",
@@ -8641,7 +8641,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Open collection exists (CollectionListSection.tsx:91); back reads \"‹ Back to canvas\" (CmsWorkspace.tsx:172), not origin list"
+   "verifiedNote": "built, not compared — L-C C2: record/workspace back reads \"‹ {origin}\" from CmsOpenRequest.origin and the guard says \"Your destination is {origin}.\"; live label waits on REQUESTS #11 (L-B passes origin)."
   },
   {
    "nodeId": "189:28673",
@@ -9992,7 +9992,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Row name truncates (src/editor/sidebar/tabs/ComponentsTab.tsx:269) but has no full-name tooltip"
+   "verifiedNote": "built, not compared — L-C C9: row name carries a full-name tooltip; count reads \"N uses\" (+ \"· Component library\" for linked masters). Source/version line and ⋯ menu wait on the Components workspace slice."
   },
   {
    "nodeId": "217:44243",
@@ -10328,7 +10328,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Failure body copy differs; title matches"
+   "verifiedNote": "built, not compared — L-C C7: \"Couldn’t create the page · Nothing was changed. No empty page was left behind.\" — made true: a failed import now removes the page it made and its nav links (TemplatesTab.tsx)."
   },
   {
    "nodeId": "222:47567",
@@ -10348,7 +10348,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Confirm title/body/CTA (“Replace Home”) and backup checkbox copy differ"
+   "verifiedNote": "built, not compared — L-C C7: \"Replace {page} with {template}?\", \"{page}’s N elements are removed and replaced. {template} has its own colors and fonts — your Brand is not changed.\" (saved token templates say they take the brand), \"Save a backup first (History › Saves)\", CTA \"Replace {page}\"."
   },
   {
    "nodeId": "223:45184",
@@ -10358,7 +10358,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Buttons match; title and body copy differ"
+   "verifiedNote": "built, not compared — L-C C7: \"Couldn’t save a backup of {page}\" + board body; actions unchanged."
   },
   {
    "nodeId": "223:45479",
@@ -10650,7 +10650,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Copy \"Add your first record.\" vs board \"…or import existing records.\"; buttons Import CSV/JSON labels lack \"…\""
+   "verifiedNote": "built, not compared — L-C C3: \"Add your first record or import existing records.\", Import CSV… / Import JSON…."
   },
   {
    "nodeId": "254:74310",
@@ -10954,7 +10954,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Save disabled while saving but label stays \"Save record\"; board shows \"Saving…\""
+   "verifiedNote": "built, not compared — L-C C1: Save button and footer read \"Saving…\" while a save runs (RecordSheet.tsx)."
   },
   {
    "nodeId": "254:81923",
@@ -10964,7 +10964,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code \"Discard record changes?\" Discard and leave/Keep editing; board \"Leave without saving?\" adds Save and leave",
+   "verifiedNote": "built, not compared — L-C C1: \"Leave without saving?\" names the record / destination tab or collection; Keep editing · Discard changes · Save and leave (RecordSheet.tsx). Origin label (\"Your destination is …\") waits on C2.",
    "inheritsFrom": "165:2184"
   },
   {
@@ -10975,7 +10975,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Import CSV…/JSON… + disabled Sheets/Airtable present; board \"· Planned\" vs code \"Coming soon\""
+   "verifiedNote": "built, not compared — L-C C3: ⋯ keeps Import CSV… / Import JSON…, connectors read \"Planned\"; tabs moved to the row."
   },
   {
    "nodeId": "254:82329",
@@ -11746,7 +11746,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Variables in drawer subview \"Variables\"; board workspace page, intro copy, placeholder counts"
+   "verifiedNote": "drift-open — L-C C4: \"Site variables\" header + intro copy built; still a drawer subview (board: workspace page), no \"+ New variable\" in a header, no per-variable \"N text placeholders\" (C8). Not compared."
   },
   {
    "nodeId": "260:235928",
@@ -11756,7 +11756,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Empty copy/location differ"
+   "verifiedNote": "built, not compared — L-C C4: intro + \"No variables yet. Add a key and value to start.\"; drawer subview, not the workspace page."
   },
   {
    "nodeId": "260:236147",
@@ -11796,7 +11796,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Variables in drawer subview \"Variables\"; board workspace page, intro copy, placeholder counts",
+   "verifiedNote": "drift-open — L-C C4: \"Site variables\" header + intro copy built; still a drawer subview (board: workspace page), no \"+ New variable\" in a header, no per-variable \"N text placeholders\" (C8). Not compared.",
    "inheritsFrom": "260:235689"
   },
   {
@@ -11807,7 +11807,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Variables in drawer subview \"Variables\"; board workspace page, intro copy, placeholder counts",
+   "verifiedNote": "drift-open — L-C C4: \"Site variables\" header + intro copy built; still a drawer subview (board: workspace page), no \"+ New variable\" in a header, no per-variable \"N text placeholders\" (C8). Not compared.",
    "inheritsFrom": "260:235689"
   },
   {
@@ -11858,7 +11858,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Variables in drawer subview \"Variables\"; board workspace page, intro copy, placeholder counts",
+   "verifiedNote": "drift-open — L-C C4: \"Site variables\" header + intro copy built; still a drawer subview (board: workspace page), no \"+ New variable\" in a header, no per-variable \"N text placeholders\" (C8). Not compared.",
    "inheritsFrom": "260:235689"
   },
   {
@@ -12637,7 +12637,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "ContentViews.tsx:268 still shows Sources (BD-39 hides); \"Variables\" vs \"Site variables\"; no Recently deleted / Back to Editor rows"
+   "verifiedNote": "built, not compared — L-C C4: drawer Data = Site variables · Conditions · Recently deleted (disabled, \"Planned\" until the server restore slice); Sources hidden by SOURCES_IN_RELEASE (BD-39). Drawer \"‹ Back to Editor · Home\" is the Phase-1 bottom bar."
   },
   {
    "nodeId": "424:337452",
@@ -12647,7 +12647,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "VariablesView ContentViews.tsx:461: header \"Variables\", no per-variable placeholder count; Sources not hidden"
+   "verifiedNote": "drift-open — L-C C4: \"Site variables\" header + intro copy built; still a drawer subview (board: workspace page), no \"+ New variable\" in a header, no per-variable \"N text placeholders\" (C8). Not compared."
   },
   {
    "nodeId": "424:337627",
@@ -20932,7 +20932,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Leave guard is \"Discard record changes?\" Discard/Keep (RecordSheet.tsx:722); no \"Save and leave\"."
+   "verifiedNote": "built, not compared — L-C C1: \"Leave without saving?\" names the record / destination tab or collection; Keep editing · Discard changes · Save and leave (RecordSheet.tsx). Origin label (\"Your destination is …\") waits on C2."
   },
   {
    "nodeId": "302:15605",
@@ -20942,7 +20942,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "No save-and-return: return target is \"‹ Back to canvas\" (RecordSheet.tsx:521), not the binding."
+   "verifiedNote": "built, not compared — L-C C1: Save and leave shows \"Saving record…\" + Saving… + Stay here; success takes the chosen way out (RecordSheet.tsx)."
   },
   {
    "nodeId": "302:15961",
@@ -20972,7 +20972,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Return to exact binding subview missing; back lands on canvas."
+   "verifiedNote": "drift-open — L-C C2 built the record side (origin label, Save and leave back); landing on the same binding subview waits on REQUESTS #12 (lead, StudioPanels backToCanvas)."
   },
   {
    "nodeId": "302:17250",
@@ -20992,7 +20992,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Save failure keeps draft (RecordSheet.tsx:326) but \"Retry and return\" path missing (depends F2.09)."
+   "verifiedNote": "built, not compared — L-C C1: failed Save and leave keeps edits, \"Your edits are still here. Return to X is paused.\", footer \"Couldn’t save · return paused\", Cancel · Retry and return."
   },
   {
    "nodeId": "302:18174",
@@ -21002,7 +21002,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Cancel-return-while-saving state missing (depends F2.09)."
+   "verifiedNote": "built, not compared — L-C C1: Stay here during Save and leave shows \"Return cancelled. Your record save is still in progress.\"; record stays open."
   },
   {
    "nodeId": "302:18532",
@@ -21664,7 +21664,7 @@
    "status": "active",
    "authority": "board",
    "verified": "match",
-   "verifiedNote": "Save failed, draft kept, stay in record (RecordSheet.tsx:326)."
+   "verifiedNote": "built, not compared — L-C C5: footer \"Couldn’t save · your draft is kept\" + Retry save; sheet stays open with edits (RecordSheet.tsx)."
   },
   {
    "nodeId": "308:18838",

@@ -112,7 +112,7 @@ describe("RecordSheet", () => {
     const { composer } = mount();
     await openRow();
     expect(screen.getByTestId("cms-sheet-title")).toHaveTextContent("Margherita");
-    expect(screen.getByText("Menu items", { selector: "button" })).toBeInTheDocument();
+    expect(screen.getByTestId("cms-sheet-crumb")).toHaveTextContent("‹ Menu items records");
     expect(screen.getByTestId("cms-sheet-state")).toHaveTextContent("No unsaved changes on this record");
     expect(screen.getByTestId("cms-sheet-save")).toBeDisabled();
     fireEvent.change(screen.getByLabelText("Price *"), { target: { value: "$13" } });
@@ -132,7 +132,7 @@ describe("RecordSheet", () => {
     const { composer } = mount({ items: [] });
     fireEvent.click(await screen.findByTestId("cms-ws-add-record"));
     await screen.findByTestId("cms-sheet");
-    expect(screen.getByText("New record")).toBeInTheDocument();
+    expect(screen.getByTestId("cms-sheet-title")).toHaveTextContent("New Menu item");
     fireEvent.change(screen.getByLabelText("Name *"), { target: { value: "Diavola" } });
     fireEvent.click(screen.getByTestId("cms-sheet-save"));
     await waitFor(() =>
@@ -151,11 +151,13 @@ describe("RecordSheet", () => {
     await openRow();
     fireEvent.change(screen.getByLabelText("Price *"), { target: { value: "$13" } });
     fireEvent.click(screen.getByTestId("cms-sheet-save"));
-    await waitFor(() =>
-      expect(screen.getByTestId("cms-sheet-state")).toHaveTextContent(/Saved on this device only/i),
+    /* 165:1625 — "You're offline" + what happened to the edits. */
+    await waitFor(() => expect(screen.getByTestId("cms-sheet-save-banner")).toHaveTextContent("You’re offline"));
+    expect(screen.getByTestId("cms-sheet-save-banner")).toHaveTextContent(
+      "Your edits are not saved to the server. Keep this tab open.",
     );
     expect(screen.getByTestId("cms-sheet")).toBeInTheDocument();
-    expect(screen.getByTestId("cms-sheet-save")).toHaveTextContent("Retry save");
+    expect(screen.getByTestId("cms-sheet-save")).toHaveTextContent("Save record");
   });
 
   /* 8139:217560 — a save the server refused because another device changed
@@ -288,17 +290,17 @@ describe("RecordSheet", () => {
     await openRow();
     fireEvent.change(screen.getByLabelText("Price *"), { target: { value: "$99" } });
     fireEvent.click(screen.getByTestId("cms-sheet-close"));
-    expect(await screen.findByText("Discard record changes?")).toBeInTheDocument();
+    expect(await screen.findByText("Leave without saving?")).toBeInTheDocument();
     fireEvent.click(screen.getByText("Keep editing"));
     expect(screen.getByTestId("cms-sheet")).toBeInTheDocument();
     fireEvent.click(screen.getByTestId("cms-sheet-close"));
-    fireEvent.click(await screen.findByText("Discard and leave"));
+    fireEvent.click(await screen.findByText("Discard changes"));
     await waitFor(() => expect(screen.queryByTestId("cms-sheet")).toBeNull());
   });
 
   /* B-1 fix: the shell's "Leave anyway" runs this sheet's discard,
      so a switch away really does drop the edits it promised to drop, and
-     the sheet's own "Discard and leave" clears the entry before it leaves. */
+     the sheet's own "Discard changes" clears the entry before it leaves. */
   it("registers its dirt with the shell; the shell's discard resets the fields and the entry", async () => {
     mount();
     await openRow();
@@ -309,12 +311,12 @@ describe("RecordSheet", () => {
     expect((screen.getByLabelText("Price *") as HTMLInputElement).value).toBe("$12");
   });
 
-  it("its own Discard and leave clears the shell entry before leaving", async () => {
+  it("its own Discard changes clears the shell entry before leaving", async () => {
     mount();
     await openRow();
     fireEvent.change(screen.getByLabelText("Price *"), { target: { value: "$99" } });
     fireEvent.click(screen.getByTestId("cms-sheet-close"));
-    fireEvent.click(await screen.findByText("Discard and leave"));
+    fireEvent.click(await screen.findByText("Discard changes"));
     expect(shellDirty.get()).toBe(false);
   });
 
@@ -406,7 +408,7 @@ describe("RecordSheet · every door out asks first (UI-02)", () => {
     await openRow();
     fireEvent.change(screen.getByLabelText(/^Name/), { target: { value: "Changed" } });
     act(() => cmsWorkspace.openCollection("col-2"));
-    expect(await screen.findByText("Discard record changes?")).toBeInTheDocument();
+    expect(await screen.findByText("Leave without saving?")).toBeInTheDocument();
     expect(cmsWorkspace.get()).toMatchObject({ collectionId: "col-1", recordId: "r1" });
     fireEvent.click(screen.getByTestId("cms-discard-keep"));
     expect(cmsWorkspace.get().recordId).toBe("r1");
@@ -420,6 +422,179 @@ describe("RecordSheet · every door out asks first (UI-02)", () => {
     await openRow();
     act(() => cmsWorkspace.openCollection("col-2"));
     expect(cmsWorkspace.get()).toMatchObject({ collectionId: "col-2", recordId: null });
-    expect(screen.queryByText("Discard record changes?")).toBeNull();
+    expect(screen.queryByText("Leave without saving?")).toBeNull();
+  });
+});
+
+/* design-2l9 C1 — the leave guard names where the person is going and offers
+   Save and leave (165:2184 · 168:21408 · 168:21620 · 174:14111; Play F2.08,
+   F2.09, F2.14, F2.15). */
+describe("RecordSheet · Leave without saving? with Save and leave (2L9 C1)", () => {
+  const dirtyRecord = async () => {
+    const engine = mount();
+    await openRow();
+    fireEvent.change(screen.getByLabelText("Price *"), { target: { value: "$13" } });
+    return engine;
+  };
+
+  it("names the record when the way out has no named destination", async () => {
+    await dirtyRecord();
+    fireEvent.click(screen.getByTestId("cms-sheet-close"));
+    expect(await screen.findByText("Leave without saving?")).toBeInTheDocument();
+    expect(screen.getByTestId("cms-discard-body")).toHaveTextContent("Margherita has unsaved record edits.");
+    expect(screen.getByTestId("cms-discard-keep")).toHaveTextContent("Keep editing");
+    expect(screen.getByTestId("cms-discard-confirm")).toHaveTextContent("Discard changes");
+    expect(screen.getByTestId("cms-discard-save")).toHaveTextContent("Save and leave");
+  });
+
+  it("the sheet names all four tabs (165:520)", async () => {
+    mount();
+    await openRow();
+    expect(screen.getByTestId("cms-sheet-tab-settings")).toHaveTextContent("Collection settings");
+  });
+
+  it("names the tab the person is opening", async () => {
+    await dirtyRecord();
+    fireEvent.click(screen.getByTestId("cms-sheet-tab-fields"));
+    expect(await screen.findByTestId("cms-discard-body")).toHaveTextContent(
+      "Save or discard the edits to “Margherita” before opening Fields.",
+    );
+  });
+
+  it("names the destination of a workspace move (another collection)", async () => {
+    await dirtyRecord();
+    act(() => cmsWorkspace.setTab("dynamic-pages"));
+    expect(await screen.findByTestId("cms-discard-body")).toHaveTextContent("before opening Dynamic pages.");
+  });
+
+  it("Save and leave saves, then takes the chosen way out", async () => {
+    const { composer } = await dirtyRecord();
+    fireEvent.click(screen.getByTestId("cms-sheet-tab-fields"));
+    fireEvent.click(await screen.findByTestId("cms-discard-save"));
+    await waitFor(() =>
+      expect(composer.cms.collections.updateContentItem).toHaveBeenCalledWith(
+        "r1",
+        expect.objectContaining({ data: expect.objectContaining({ price: "$13" }) }),
+      ),
+    );
+    await waitFor(() => expect(cmsWorkspace.get()).toMatchObject({ tab: "fields", recordId: null }));
+    expect(await screen.findByText("Record saved · Menu items")).toBeInTheDocument();
+  });
+
+  it("while the save runs: Saving record…, Saving…, and Stay here keeps the record open", async () => {
+    let finish: (v: boolean) => void = () => undefined;
+    syncMock.mockImplementationOnce(() => new Promise<boolean>((r) => (finish = r)));
+    await dirtyRecord();
+    fireEvent.click(screen.getByTestId("cms-sheet-tab-fields"));
+    fireEvent.click(await screen.findByTestId("cms-discard-save"));
+    expect(await screen.findByTestId("cms-sheet-returning")).toHaveTextContent("Saving record…");
+    expect(screen.getByTestId("cms-sheet-save")).toHaveTextContent("Saving…");
+    expect(screen.getByTestId("cms-sheet-save")).toBeDisabled();
+    fireEvent.click(screen.getByTestId("cms-sheet-stay"));
+    expect(screen.getByTestId("cms-sheet-return-cancelled")).toHaveTextContent(
+      "Return cancelled. Your record save is still in progress.",
+    );
+    await act(async () => finish(true));
+    await waitFor(() => expect(screen.queryByTestId("cms-sheet-return-cancelled")).toBeNull());
+    expect(screen.getByTestId("cms-sheet")).toBeInTheDocument();
+    expect(cmsWorkspace.get()).toMatchObject({ tab: "records", recordId: "r1" });
+  });
+
+  it("a save that fails pauses the way out; Retry and return leaves once it lands", async () => {
+    const { composer } = await dirtyRecord();
+    composer.cms.collections.updateContentItem.mockImplementationOnce(() => Promise.reject(new Error("500")));
+    fireEvent.click(screen.getByTestId("cms-sheet-tab-fields"));
+    fireEvent.click(await screen.findByTestId("cms-discard-save"));
+    expect(await screen.findByTestId("cms-sheet-return-paused")).toHaveTextContent(
+      "Your edits are still here. Return to Fields is paused.",
+    );
+    expect(screen.getByTestId("cms-sheet-state")).toHaveTextContent("Couldn’t save · return paused");
+    expect(screen.getByTestId("cms-sheet-save")).toHaveTextContent("Retry and return");
+    expect((screen.getByLabelText("Price *") as HTMLInputElement).value).toBe("$13");
+    fireEvent.click(screen.getByTestId("cms-sheet-save"));
+    await waitFor(() => expect(cmsWorkspace.get()).toMatchObject({ tab: "fields", recordId: null }));
+  });
+
+  it("Cancel on a paused way out drops it and keeps the record open with its edits", async () => {
+    const { composer } = await dirtyRecord();
+    composer.cms.collections.updateContentItem.mockImplementationOnce(() => Promise.reject(new Error("500")));
+    fireEvent.click(screen.getByTestId("cms-sheet-tab-fields"));
+    fireEvent.click(await screen.findByTestId("cms-discard-save"));
+    fireEvent.click(await screen.findByTestId("cms-sheet-cancel-return"));
+    expect(screen.queryByTestId("cms-sheet-return-paused")).toBeNull();
+    expect(screen.getByTestId("cms-sheet-save")).toHaveTextContent("Retry save");
+    expect(cmsWorkspace.get()).toMatchObject({ recordId: "r1" });
+  });
+
+  it("a failed plain save: banner Couldn’t save, footer keeps the draft, Retry save (165:1072 · F2.17)", async () => {
+    const { composer } = await dirtyRecord();
+    composer.cms.collections.updateContentItem.mockImplementationOnce(() => Promise.reject(new Error("500")));
+    fireEvent.click(screen.getByTestId("cms-sheet-save"));
+    expect(await screen.findByTestId("cms-sheet-save-banner")).toHaveTextContent(
+      "Couldn’t saveYour edits are still here. Retry when you’re ready.",
+    );
+    expect(screen.getByTestId("cms-sheet-state")).toHaveTextContent("Couldn’t save · your draft is kept");
+    expect(screen.getByTestId("cms-sheet-save")).toHaveTextContent("Retry save");
+    expect((screen.getByLabelText("Price *") as HTMLInputElement).value).toBe("$13");
+  });
+
+  it("a plain save reads Saving… while it runs (165:797)", async () => {
+    let finish: (v: boolean) => void = () => undefined;
+    syncMock.mockImplementationOnce(() => new Promise<boolean>((r) => (finish = r)));
+    await dirtyRecord();
+    fireEvent.click(screen.getByTestId("cms-sheet-save"));
+    await waitFor(() => expect(screen.getByTestId("cms-sheet-save")).toHaveTextContent("Saving…"));
+    expect(screen.getByTestId("cms-sheet-state")).toHaveTextContent("Saving…");
+    await act(async () => finish(true));
+  });
+});
+
+/* design-2l9 C2 — a record opened from an element names its way back
+   (173:16169 "‹ Heading · Title binding"; Play F2.06/F2.08). */
+describe("RecordSheet · the way back names its origin (2L9 C2)", () => {
+  const mountFrom = (origin?: string) => {
+    const engine = makeEngine({ collections: [MENU], items: [MARGHERITA] });
+    const back = vi.fn();
+    cmsWorkspace.openRequest({ collectionId: "col-1", recordId: "r1", origin });
+    const view = render(
+      <ToastProvider>
+        <CmsWorkspace composer={engine.composer as never} onBackToCanvas={back} />
+      </ToastProvider>,
+    );
+    return { back, view };
+  };
+
+  it("reads ‹ <origin> and the guard names it as the destination", async () => {
+    const { back } = mountFrom("Heading · Title binding");
+    const btn = await screen.findByTestId("cms-sheet-back-to-canvas");
+    expect(btn).toHaveTextContent("‹ Heading · Title binding");
+    fireEvent.change(screen.getByLabelText("Price *"), { target: { value: "$13" } });
+    fireEvent.click(btn);
+    expect(await screen.findByTestId("cms-discard-body")).toHaveTextContent("Your destination is Heading · Title binding.");
+    fireEvent.click(screen.getByTestId("cms-discard-save"));
+    await waitFor(() => expect(back).toHaveBeenCalled());
+  });
+
+  it("a failed save on the way back pauses it under the origin's name", async () => {
+    mountFrom("Heading · Title binding");
+    fireEvent.change(await screen.findByLabelText("Price *"), { target: { value: "$13" } });
+    syncMock.mockImplementationOnce(async () => false);
+    fireEvent.click(screen.getByTestId("cms-sheet-back-to-canvas"));
+    fireEvent.click(await screen.findByTestId("cms-discard-save"));
+    expect(await screen.findByTestId("cms-sheet-return-paused")).toHaveTextContent(
+      "Your edits are still here. Return to Heading is paused.",
+    );
+  });
+
+  it("without an origin it stays ‹ Back to canvas", async () => {
+    mountFrom();
+    expect(await screen.findByTestId("cms-sheet-back-to-canvas")).toHaveTextContent("‹ Back to canvas");
+  });
+
+  it("the origin goes when the workspace closes", async () => {
+    const { view } = mountFrom("Heading · Title binding");
+    await screen.findByTestId("cms-sheet");
+    view.unmount();
+    expect(cmsWorkspace.get().origin).toBeNull();
   });
 });

@@ -263,8 +263,10 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
                   if (e.key === "Enter" || e.key === " ") { e.preventDefault(); state.handleViewDetail(component); }
                 }}
               >
+                {/* 2L9 217:43947 — a cut-off name is read in full on hover. */}
                 <span
                   className="tw:min-w-0 tw:truncate tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]"
+                  title={component.name}
                   data-testid={`comp-row-name-${component.id}`}
                 >
                   {component.name}
@@ -278,14 +280,14 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
                   </span>
                 )}
                 <span className="tw:flex-1" aria-hidden="true" />
-                {/* Board 641:2564 writes the count as "6 on this site", not
-                    "6 instances". The number is sample data; the words are the
-                    label, and copy on screen is decided by the board. */}
+                {/* 2L9 217:43947 writes the count as "12 uses" and names a
+                    library master's source ("Component library"). The number
+                    is sample data; the words are the label. */}
                 <span
                   className="tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]"
                   data-testid={`comp-row-count-${component.id}`}
                 >
-                  {justDetached ? "0 linked instances" : `${n} on this site${isLinked ? " · linked" : ""}`}
+                  {justDetached ? "0 linked instances" : `${n} ${n === 1 ? "use" : "uses"}${isLinked ? " · Component library" : ""}`}
                 </span>
               </div>
     );

@@ -1,7 +1,8 @@
 /**
  * RecordSheet — a record's editor, laid wide over the records table
  * (4428:144760; new record 6749:59940; required-missing 5940:148412; save
- * failed 5940:148777; discard guard 6879:67190; record ⋯ 7103:76270;
+ * failed 5940:148777; leave guard with Save and leave 165:2184 / F2.08–F2.15;
+ * record ⋯ 7103:76270;
  * conflict 8139:217560; record / collection deleted 8139:217711 · 8139:217890).
  *
  * The fields pair up two to a row in the collection's own order; long text
@@ -23,38 +24,17 @@ import { MoreHorizontal, TriangleAlert, X } from "lucide-react";
 import type { Composer } from "@/engine";
 import type { CMSCollection, CMSContentItem, CMSField } from "@/shared/types/cms";
 import { CMSValidationError } from "@/engine/cms/CollectionManager";
-import {
-  Button,
-  Chip,
-  IconButton,
-  Menu,
-  MenuItem,
-  Modal,
-  Popover,
-  Select,
-  Textarea,
-  TextInput,
-  ToggleSwitch,
-  useToast,
-} from "@/editor/chrome-ui";
-import type { MediaAsset, MediaAssetType } from "@/shared/types/media";
+import { Button, IconButton, Menu, MenuItem, Modal, Popover, ToggleSwitch, useToast } from "@/editor/chrome-ui";
 import { fieldDefault } from "@/editor/sidebar/tabs/content/contentPanelUtils";
 import { recordTitle } from "./RecordsTable";
 import { TypedDeleteDialog } from "./TypedDeleteDialog";
 import { RecordPreview } from "./RecordPreview";
-import { RichTextField } from "./RichTextField";
-import { ReferenceField } from "./ReferenceField";
+import { RecordFieldControl, isEmptyValue, type OpenMediaLibrary } from "./RecordFieldControl";
 import { RecordTemplatePreviewDialog } from "./RecordTemplatePreviewDialog";
-import { applyCmsPattern, cmsSlugField, cmsSlugify, cmsValueError } from "@buildrik/shared/schemas/cms";
-import { cmsWorkspace, type CmsTab } from "./cmsWorkspaceStore";
+import { applyCmsPattern, cmsSlugField, cmsSlugify } from "@buildrik/shared/schemas/cms";
+import { CMS_TAB_LABEL, cmsWorkspace, type CmsTab, type CmsWorkspaceState } from "./cmsWorkspaceStore";
 import { shellDirty } from "@/editor/shell/shellDirtyRegistry";
 import { claimCmsConflict, isCmsConflictPending, type CmsConflict } from "@/services/cmsSync";
-
-export type OpenMediaLibrary = (
-  allowedTypes: MediaAssetType[],
-  onSelect: (asset: MediaAsset) => void,
-  forLabel?: string,
-) => void;
 
 export interface RecordSheetProps {
   composer: Composer | null;
@@ -62,9 +42,12 @@ export interface RecordSheetProps {
   /** null → a new record. */
   record: CMSContentItem | null;
   onClose: () => void;
-  /** Opened from an element (§13 Open record ›): "‹ Back to canvas" leads the
+  /** Opened from an element (§13 Open record ›): the way back leads the
    *  sheet's header — it covers the workspace's own. Absent, not drawn. */
   onBackToCanvas?: () => void;
+  /** The door's name for that way back ("Heading · Title binding",
+   *  173:16169); absent → "Back to canvas". */
+  origin?: string | null;
   /** The sheet's own Records · Fields · Dynamic pages row leaves the sheet. */
   onOpenTab: (tab: CmsTab) => void;
   /** Resolve when the save has either reached the server (true), been
@@ -85,13 +68,6 @@ export interface RecordSheetProps {
   gone?: boolean;
 }
 
-const LABEL = "tw:block tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
-const FIELD = "tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:gap-1";
-const ERROR = "tw:text-[11px] tw:leading-4 tw:text-[var(--bk-error-text)]";
-/* 4428:144760 control: 32 tall, 10 inline, 13/20, radius 6. */
-const CONTROL =
-  "tw:[&_input]:h-8 tw:[&_input]:py-0 tw:[&_input]:pl-2.5 tw:[&_input]:text-[13px] tw:[&_input]:rounded-[6px] " +
-  "tw:[&_select]:h-8 tw:[&_select]:py-0 tw:[&_select]:pl-2.5 tw:[&_select]:text-[13px] tw:[&_select]:rounded-[6px]";
 const SMALL_BTN = "tw:h-7 tw:px-3 tw:py-1 tw:text-[13px] tw:leading-5 tw:font-medium tw:rounded-[6px]";
 /* 8139:217692 — the conflict choice: 32 tall, 12 inline, 13/20 medium. */
 const CHOICE_BTN = "tw:h-8 tw:px-3 tw:py-1 tw:text-[13px] tw:leading-5 tw:font-medium tw:rounded-[6px]";
@@ -99,16 +75,23 @@ const NAV_TAB =
   "tw:h-7 tw:min-h-0 tw:rounded-none tw:border-0 tw:border-b-2 tw:border-transparent tw:bg-transparent tw:px-2.5 tw:py-0 tw:text-[13px] " +
   "tw:font-medium tw:leading-5 tw:text-[var(--bk-gray-700)] tw:shadow-none tw:enabled:hover:bg-transparent tw:enabled:hover:text-[var(--bk-ink)] tw:focus:ring-0";
 
-const OFFLINE = "Saved on this device only. The server is offline — the change will sync when you reconnect.";
+/* 165:1625 — the queued mirror: the change is on this device, not the server. */
+const OFFLINE = "Your edits are not saved to the server. Keep this tab open.";
+const FAILED = "Couldn’t save this record. Your changes are still here — try again.";
+
+/** A way out of a dirty record: where it goes, and how the guard names it.
+ *  `to` null → the guard names the record only (165:2184); `origin` → the
+ *  destination is an element back in the editor (173:17098). */
+interface LeaveIntent {
+  go: () => void;
+  to: string | null;
+  origin?: boolean;
+}
 
 const WIDE: ReadonlySet<CMSField["type"]> = new Set(["textarea", "richtext", "image", "file", "multiselect"]);
 
 function blank(fields: CMSField[]): Record<string, unknown> {
   return Object.fromEntries(fields.map((f) => [f.slug, fieldDefault(f)]));
-}
-
-function isEmpty(v: unknown): boolean {
-  return v === undefined || v === null || (typeof v === "string" && v.trim() === "");
 }
 
 /** Pair short fields two to a row; wide ones stand alone. */
@@ -137,6 +120,7 @@ export function RecordSheet({
   record,
   onClose,
   onBackToCanvas,
+  origin = null,
   onOpenTab,
   onSave,
   onDelete,
@@ -154,7 +138,19 @@ export function RecordSheet({
   const [published, setPublished] = React.useState(initialPublished);
   const [saving, setSaving] = React.useState(false);
   const [saveError, setSaveError] = React.useState<string | null>(null);
-  const [leaveTo, setLeaveTo] = React.useState<null | (() => void)>(null);
+  const [leaveTo, setLeaveTo] = React.useState<LeaveIntent | null>(null);
+  /* F2.09 — "Save and leave" holds the way out while the save runs; a save
+     that does not reach the server pauses it (F2.14); "Stay here" drops it and
+     lets the save finish in place (F2.15). The ref is what the save reads when
+     it settles, so Stay here during the save is seen. */
+  const [returnTo, setReturnTo] = React.useState<LeaveIntent | null>(null);
+  const returnRef = React.useRef<LeaveIntent | null>(null);
+  const holdReturn = (intent: LeaveIntent | null) => {
+    returnRef.current = intent;
+    setReturnTo(intent);
+  };
+  const [returnCancelled, setReturnCancelled] = React.useState(false);
+  const stayRef = React.useRef(false);
   /* The safe answer takes focus: the Modal focuses its first control, which in
      the board's order is Discard — Enter would throw the edits away. */
   const keepRef = React.useRef<HTMLButtonElement | null>(null);
@@ -187,7 +183,7 @@ export function RecordSheet({
   const dirty =
     published !== initialPublished ||
     collection.fields.some((f) => JSON.stringify(form[f.slug] ?? "") !== JSON.stringify(initial[f.slug] ?? ""));
-  const missing = collection.fields.filter((f) => f.validation?.required && isEmpty(form[f.slug]));
+  const missing = collection.fields.filter((f) => f.validation?.required && isEmptyValue(form[f.slug]));
   /* UI-08: a collection with no fields has nothing to store — Save made an
      empty record. */
   const noFields = collection.fields.length === 0;
@@ -203,16 +199,26 @@ export function RecordSheet({
     go();
   };
   /* A deleted record has nothing left to discard: its edit is already lost. */
-  const guard = (go: () => void) => (dirty && !gone ? setLeaveTo(() => go) : leave(go));
+  const guard = (go: () => void, to: string | null = null, toOrigin = false) =>
+    dirty && !gone ? setLeaveTo({ go, to, origin: toOrigin }) : leave(go);
+  /* Where a workspace move lands, in the guard's words (168:21408 · 168:21848 · 168:22290). */
+  const destinationOf = (next: CmsWorkspaceState): string | null => {
+    if (next.collectionId !== collection.id) {
+      return next.collectionId ? (composer?.cms.collections.getCollection(next.collectionId)?.name ?? null) : "CMS";
+    }
+    return next.recordId === null && next.tab !== "records" ? CMS_TAB_LABEL[next.tab] : null;
+  };
   /* UI-02: every other door out of this record — a drawer collection row, ⌘K,
      a table row, a tab — moves the workspace store, which asks here first. */
   const stillDirty = React.useRef(false);
   stillDirty.current = dirty && !gone;
+  const destinationRef = React.useRef(destinationOf);
+  destinationRef.current = destinationOf;
   React.useEffect(
     () =>
-      cmsWorkspace.setLeaveGuard((go) => {
+      cmsWorkspace.setLeaveGuard((go, next) => {
         if (leaving$.current || !stillDirty.current) return false;
-        setLeaveTo(() => go);
+        setLeaveTo({ go, to: destinationRef.current(next) });
         return true;
       }),
     [],
@@ -268,7 +274,22 @@ export function RecordSheet({
       title: `Record saved · ${collection.name}`,
       description: "Changes to this record are live in the CMS. Published pages using this record will refresh on next build.",
     });
-    leave(onClose);
+    const back = returnRef.current;
+    holdReturn(null);
+    setReturnCancelled(false);
+    /* Stay here (F2.15): the save finished, the record stays open. A new
+       record has no row to stay on, so it closes as any save does. */
+    if (stayRef.current && record) {
+      stayRef.current = false;
+      return;
+    }
+    stayRef.current = false;
+    leave(back ? back.go : onClose);
+  };
+  const stayHere = () => {
+    holdReturn(null);
+    stayRef.current = true;
+    setReturnCancelled(true);
   };
 
   /* Keep mine re-sends this device's copy; it can conflict again (the claim
@@ -282,7 +303,9 @@ export function RecordSheet({
       if (choice === "useTheirs") {
         await c.useTheirs();
         settleConflict();
-        leave(onClose);
+        const back = returnRef.current;
+        holdReturn(null);
+        leave(back ? back.go : onClose);
         return;
       }
       const landed = await c.keepMine();
@@ -320,13 +343,11 @@ export function RecordSheet({
       /* A published record is validated against the collection's rules
          (CollectionManager.updateContentItem); anything else is the save
          itself failing — say so where the save button is (5940:148777). */
-      setSaveError(
-        e instanceof CMSValidationError
-          ? e.message
-          : "Couldn’t save this record. Your changes are still here — try again.",
-      );
+      setSaveError(e instanceof CMSValidationError ? e.message : FAILED);
     } finally {
       setSaving(false);
+      setReturnCancelled(false);
+      stayRef.current = false;
     }
   };
 
@@ -360,7 +381,14 @@ export function RecordSheet({
   const autoSlug = !record && slugKey !== null && collection.fields.some((f) => f.slug === nameSlug);
   const [slugTouched, setSlugTouched] = React.useState(false);
   const nameField = collection.fields.find((f) => f.slug === nameSlug);
-  const nameMissing = Boolean(nameField) && isEmpty(form[nameSlug]);
+  const nameMissing = Boolean(nameField) && isEmptyValue(form[nameSlug]);
+  const canSave = !blocked && !noFields && !(!record && nameMissing);
+  /* F2.14 — the save behind "Save and leave" did not land: the edits stay,
+     the way out waits for Retry and return. */
+  const paused = returnTo !== null && saveError !== null && !saving;
+  /* "Return to Heading" (174:14111): an element origin is named by its first
+     part, a CMS place in full. */
+  const pausedTo = returnTo?.to ? (returnTo.origin ? returnTo.to.split(" · ")[0] : returnTo.to) : null;
   const set = (slug: string, v: unknown) => {
     if (slug === slugKey) setSlugTouched(true);
     setForm((p) => ({
@@ -370,136 +398,19 @@ export function RecordSheet({
     }));
   };
 
-  const control = (f: CMSField) => {
-    const id = `cms-field-${f.slug}`;
-    const v = form[f.slug];
-    const label = (
-      <label className={LABEL} htmlFor={id} id={`${id}-label`}>
-        {f.name}
-        {f.validation?.required ? " *" : ""}
-      </label>
-    );
-    /* Per-field rules run live (§10c) — the shared validator, so the sheet
-       says what the server would refuse: a slug's format, a number, a URL… */
-    const problem = isEmpty(v)
-      ? f.validation?.required && (published || saveError)
-        ? `${f.name} is required to publish`
-        : null
-      : cmsValueError(f, v);
-    const err = problem ? (
-      <span className={ERROR} data-testid={`cms-field-error-${f.slug}`}>{problem}</span>
-    ) : null;
-    if (f.type === "image") {
-      const src = typeof v === "string" ? v : "";
-      return (
-        <div className="tw:flex tw:flex-col tw:gap-1 tw:px-3" key={f.id} data-testid={id}>
-          <span className="tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink)]">{f.name}</span>
-          {src ? (
-            <span className="tw:flex tw:items-center tw:gap-2">
-              <img src={src} alt="" className="tw:size-10 tw:rounded tw:object-cover" />
-              <span className="tw:truncate tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-soft)]">{src.split("/").pop()}</span>
-            </span>
-          ) : (
-            <span className="tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink)]">No image yet · use Choose image</span>
-          )}
-          <span className="tw:flex tw:gap-2">
-            <Button
-              size="xs"
-              variant="secondary"
-              className={SMALL_BTN}
-              disabled={!onOpenMediaLibrary}
-              data-testid={`${id}-choose`}
-              onClick={() =>
-                onOpenMediaLibrary?.(["image"], (asset) => set(f.slug, asset.src), `${crumb} · ${f.name}`)
-              }
-            >
-              Choose image
-            </Button>
-            {src ? (
-              <Button size="xs" variant="ghost" className={SMALL_BTN} data-testid={`${id}-clear`} onClick={() => set(f.slug, "")}>
-                Remove
-              </Button>
-            ) : null}
-          </span>
-          {err}
-        </div>
-      );
-    }
-    let input: React.ReactNode;
-    if (f.type === "richtext") {
-      input = <RichTextField id={id} labelId={`${id}-label`} value={typeof v === "string" ? v : ""} onChange={(html) => set(f.slug, html)} />;
-    } else if (f.type === "textarea") {
-      input = (
-        <Textarea
-          id={id}
-          rows={2}
-          className="tw:min-h-[58px] tw:rounded-[6px] tw:bg-[var(--bk-bg-panel)] tw:px-2.5 tw:py-2 tw:text-[13px] tw:leading-5"
-          value={String(v ?? "")}
-          onChange={(e) => set(f.slug, e.target.value)}
-        />
-      );
-    } else if (f.type === "multiselect") {
-      /* PD-1: a chip per option; the value is the list of chosen options
-         (a text box here stored "a,b" over the array — UI-07). */
-      const chosen = Array.isArray(v) ? (v as string[]) : [];
-      input = f.options?.length ? (
-        <span className="tw:flex tw:flex-wrap tw:gap-1" role="group" aria-labelledby={`${id}-label`} data-testid={`${id}-chips`}>
-          {f.options.map((o) => (
-            <Chip
-              key={o}
-              label={o}
-              selected={chosen.includes(o)}
-              onClick={() => set(f.slug, chosen.includes(o) ? chosen.filter((x) => x !== o) : [...chosen, o])}
-            />
-          ))}
-        </span>
-      ) : (
-        <span className="tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">No options yet · add them in Fields</span>
-      );
-    } else if (f.type === "reference") {
-      input = <ReferenceField id={id} composer={composer} field={f} value={v} className={CONTROL} onChange={(rid) => set(f.slug, rid)} />;
-    } else if (f.type === "boolean") {
-      input = (
-        <Select id={id} sizing="sm" className={CONTROL} value={v ? "yes" : "no"} onChange={(e) => set(f.slug, e.target.value === "yes")}>
-          <option value="no">No</option>
-          <option value="yes">Yes</option>
-        </Select>
-      );
-    } else if (f.type === "select" && f.options?.length) {
-      input = (
-        <Select id={id} sizing="sm" className={CONTROL} value={String(v ?? "")} onChange={(e) => set(f.slug, e.target.value)}>
-          <option value="">—</option>
-          {f.options.map((o) => (
-            <option key={o} value={o}>
-              {o}
-            </option>
-          ))}
-        </Select>
-      );
-    } else {
-      const type = f.type === "number" ? "number" : f.type === "date" ? "date" : f.type === "datetime" ? "datetime-local" : f.type === "email" ? "email" : f.type === "url" ? "url" : "text";
-      input = (
-        <TextInput
-          id={id}
-          type={type}
-          sizing="sm"
-          className={CONTROL}
-          placeholder={autoSlug && f.slug === slugKey ? "auto from name" : f.placeholder}
-          value={v === undefined || v === null ? "" : String(v)}
-          onChange={(e) =>
-            set(f.slug, f.type === "number" ? (e.target.value === "" ? undefined : Number(e.target.value)) : e.target.value)
-          }
-        />
-      );
-    }
-    return (
-      <div className={FIELD} key={f.id} data-testid={id}>
-        {label}
-        {input}
-        {err}
-      </div>
-    );
-  };
+  const control = (f: CMSField) => (
+    <RecordFieldControl
+      key={f.id}
+      field={f}
+      value={form[f.slug]}
+      onChange={(v) => set(f.slug, v)}
+      composer={composer}
+      showRequired={published || saveError !== null}
+      placeholder={autoSlug && f.slug === slugKey ? "auto from name" : f.placeholder}
+      pickLabel={`${crumb} · ${f.name}`}
+      onOpenMediaLibrary={onOpenMediaLibrary}
+    />
+  );
 
   return (
     <div
@@ -516,9 +427,20 @@ export function RecordSheet({
     >
       <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:gap-2 tw:px-8 tw:pb-3">
       <header className="tw:flex tw:h-11 tw:w-[280px] tw:flex-none tw:items-center tw:gap-2 tw:px-4">
-        {onBackToCanvas ? (
-          <Button color="light" size="xs" className={`${BACK} tw:flex-none`} data-testid="cms-sheet-back-to-canvas" onClick={() => guard(onBackToCanvas)}>
-            ‹ Back to canvas
+        {returnTo && saving ? (
+          /* F2.09 — the way out is underway: it reads as the save, not a link. */
+          <span className="tw:flex-none tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]" role="status" data-testid="cms-sheet-returning">
+            Saving record…
+          </span>
+        ) : onBackToCanvas ? (
+          <Button
+            color="light"
+            size="xs"
+            className={`${BACK} tw:min-w-0 tw:flex-none tw:truncate`}
+            data-testid="cms-sheet-back-to-canvas"
+            onClick={() => guard(onBackToCanvas, origin, origin !== null)}
+          >
+            ‹ {origin ?? "Back to canvas"}
           </Button>
         ) : null}
         <h3 className="tw:m-0 tw:min-w-0 tw:flex-1 tw:truncate tw:text-[14px] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)]" data-testid="cms-sheet-title">
@@ -555,9 +477,37 @@ export function RecordSheet({
           <X size={16} />
         </IconButton>
       </header>
+      {paused ? (
+        <div className="tw:flex tw:flex-none tw:flex-col tw:gap-0.5 tw:rounded-[6px] tw:bg-[var(--bk-error-tint)] tw:px-4 tw:py-2" role="alert" data-testid="cms-sheet-return-paused">
+          <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">
+            {pausedTo ? `Your edits are still here. Return to ${pausedTo} is paused.` : "Your edits are still here. Leaving is paused."}
+          </p>
+          {saveError !== FAILED ? <p className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-error-text)]">{saveError}</p> : null}
+        </div>
+      ) : (saveError === FAILED || saveError === OFFLINE) && !blocked && !saving ? (
+        /* 165:1072 (failed) · 165:1625 (offline): the banner says what
+           happened to the edits; the footer keeps the action. */
+        <div
+          className={`tw:flex tw:flex-none tw:flex-col tw:gap-0.5 tw:rounded-[6px] tw:px-4 tw:py-2 ${saveError === OFFLINE ? "tw:bg-[var(--bk-warning-tint)]" : "tw:bg-[var(--bk-error-tint)]"}`}
+          role="alert"
+          data-testid="cms-sheet-save-banner"
+        >
+          <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)]">
+            {saveError === OFFLINE ? "You’re offline" : "Couldn’t save"}
+          </p>
+          <p className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-soft)]">
+            {saveError === OFFLINE ? OFFLINE : "Your edits are still here. Retry when you’re ready."}
+          </p>
+        </div>
+      ) : returnCancelled && saving ? (
+        <p className="tw:m-0 tw:flex-none tw:px-4 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]" role="status" data-testid="cms-sheet-return-cancelled">
+          Return cancelled. Your record save is still in progress.
+        </p>
+      ) : null}
 
       <div className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col tw:gap-2 tw:overflow-y-auto">
-        <nav className="tw:flex tw:h-9 tw:flex-none tw:items-center tw:gap-1 tw:px-4 tw:text-[13px] tw:leading-5" aria-label="Breadcrumb">
+        {/* 165:520 — one way back to the table, "‹ Blog records". */}
+        <nav className="tw:flex tw:h-9 tw:flex-none tw:items-center tw:px-4 tw:text-[13px] tw:leading-5" aria-label="Breadcrumb">
           <Button
             size="xs"
             variant="link"
@@ -565,19 +515,11 @@ export function RecordSheet({
             data-testid="cms-sheet-crumb"
             onClick={() => guard(onClose)}
           >
-            {collection.name}
+            ‹ {collection.name} records
           </Button>
-          <span className="tw:text-[var(--bk-gray-500)]">›</span>
-          <span className="tw:text-[var(--bk-ink)]">{crumb}</span>
         </nav>
         <div className="tw:flex tw:h-9 tw:flex-none tw:items-center tw:gap-1 tw:px-2" role="tablist" aria-label={`${collection.name} sections`}>
-          {(
-            [
-              ["records", "Records"],
-              ["fields", "Fields"],
-              ["dynamic-pages", "Dynamic pages"],
-            ] as const
-          ).map(([tab, label]) => (
+          {(Object.entries(CMS_TAB_LABEL) as [CmsTab, string][]).map(([tab, label]) => (
             <Button
               key={tab}
               role="tab"
@@ -585,7 +527,7 @@ export function RecordSheet({
               size="xs"
               className={`${NAV_TAB} ${tab === "records" ? "tw:border-[var(--bk-accent)] tw:text-[var(--bk-ink)]" : ""}`}
               data-testid={`cms-sheet-tab-${tab}`}
-              onClick={() => (tab === "records" ? guard(onClose) : guard(() => onOpenTab(tab)))}
+              onClick={() => (tab === "records" ? guard(onClose) : guard(() => onOpenTab(tab), label))}
             >
               {label}
             </Button>
@@ -680,13 +622,22 @@ export function RecordSheet({
           <span className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
             <span
               className={`tw:text-[12px] tw:leading-[18px] tw:font-medium ${saveError && !blocked ? "tw:text-[var(--bk-error-text)]" : "tw:text-[var(--bk-ink)]"}`}
-              role={saveError && !blocked ? "alert" : undefined}
+              role={saveError && !blocked && !paused && saveError !== FAILED && saveError !== OFFLINE ? "alert" : undefined}
               data-testid="cms-sheet-state"
             >
               {gone
                 ? "Your change to it wasn't saved."
                 : conflict
                   ? "Your changes are waiting for a conflict choice."
+                  : saving
+                    ? "Saving…"
+                  : paused
+                    ? "Couldn’t save · return paused"
+                  : saveError === FAILED
+                    ? /* F2.17 (308:18475) — the acceptance journey's wording. */
+                      "Couldn’t save · your draft is kept"
+                  : saveError === OFFLINE
+                    ? "Not saved to the server yet"
                   : saveError ??
                     (noFields
                       ? "Add a field to this collection before saving a record."
@@ -704,11 +655,27 @@ export function RecordSheet({
               </span>
             ) : null}
           </span>
-          <Button size="xs" variant="secondary" className={SMALL_BTN} data-testid="cms-sheet-cancel" onClick={() => guard(onClose)}>
-            Cancel
-          </Button>
-          <Button size="xs" className={SMALL_BTN} disabled={blocked || noFields || (!dirty && !!record) || (!record && nameMissing) || saving} data-testid="cms-sheet-save" onClick={() => void save()}>
-            {saveError && !blocked ? "Retry save" : "Save record"}
+          {returnTo && saving ? (
+            <Button size="xs" variant="secondary" className={SMALL_BTN} data-testid="cms-sheet-stay" onClick={stayHere}>
+              Stay here
+            </Button>
+          ) : paused ? (
+            <Button size="xs" variant="secondary" className={SMALL_BTN} data-testid="cms-sheet-cancel-return" onClick={() => holdReturn(null)}>
+              Cancel
+            </Button>
+          ) : (
+            <Button size="xs" variant="secondary" className={SMALL_BTN} data-testid="cms-sheet-cancel" disabled={saving} onClick={() => guard(onClose)}>
+              Cancel
+            </Button>
+          )}
+          <Button size="xs" className={SMALL_BTN} disabled={!canSave || (!dirty && !!record) || saving} data-testid="cms-sheet-save" onClick={() => void save()}>
+            {saving
+              ? "Saving…"
+              : paused
+                ? "Retry and return"
+                : saveError && saveError !== OFFLINE && !blocked
+                    ? "Retry save"
+                    : "Save record"}
           </Button>
         </div>
       </footer>
@@ -717,34 +684,54 @@ export function RecordSheet({
         <RecordPreview collection={collection} record={record} form={form} title={title} onDelete={record ? () => void remove() : undefined} />
       ) : null}
 
-      {/* 6879:67190 — the danger action first, the safe one last; "Keep
-          editing" takes focus, and Escape / the scrim give the same answer. */}
+      {/* 165:2184 · 168:21408 · 173:17098 — "Keep editing" takes focus, and
+          Escape / the scrim give the same answer; "Save and leave" saves, then
+          takes the way out the person chose. */}
       <Modal
         open={leaveTo !== null}
         onClose={() => setLeaveTo(null)}
-        title="Discard record changes?"
+        title="Leave without saving?"
         kind="form"
         testId="cms-discard"
         footer={
           <>
+            <Button ref={keepRef} variant="ghost" onClick={() => setLeaveTo(null)} data-testid="cms-discard-keep">
+              Keep editing
+            </Button>
             <Button
-              variant="danger"
+              variant="secondary"
               onClick={() => {
-                const go = leaveTo;
+                const intent = leaveTo;
                 setLeaveTo(null);
-                if (go) leave(go);
+                if (intent) leave(intent.go);
               }}
               data-testid="cms-discard-confirm"
             >
-              Discard and leave
+              Discard changes
             </Button>
-            <Button ref={keepRef} variant="secondary" onClick={() => setLeaveTo(null)} data-testid="cms-discard-keep">
-              Keep editing
+            <Button
+              disabled={!canSave}
+              onClick={() => {
+                const intent = leaveTo;
+                setLeaveTo(null);
+                if (!intent) return;
+                holdReturn(intent);
+                void save();
+              }}
+              data-testid="cms-discard-save"
+            >
+              Save and leave
             </Button>
           </>
         }
       >
-        <p className="tw:m-0">{`${crumb} has unsaved changes. Keep editing to finish them, or discard the edits and leave the record.`}</p>
+        <p className="tw:m-0" data-testid="cms-discard-body">
+          {leaveTo?.origin && leaveTo.to
+            ? `Your destination is ${leaveTo.to}.`
+            : leaveTo?.to
+              ? `Save or discard the edits to “${crumb}” before opening ${leaveTo.to}.`
+              : `${crumb} has unsaved record edits.`}
+        </p>
       </Modal>
       {record ? (
         <TypedDeleteDialog

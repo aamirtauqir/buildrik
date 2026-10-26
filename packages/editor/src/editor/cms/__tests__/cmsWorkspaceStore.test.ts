@@ -13,7 +13,7 @@ describe("cmsWorkspace.openRequest", () => {
   it("opens the collection's table, leaving whatever tab or sheet was open", () => {
     cmsWorkspace.openCollection("col-a", "settings");
     cmsWorkspace.openRequest({ collectionId: "col-b" });
-    expect(cmsWorkspace.get()).toEqual({ collectionId: "col-b", tab: "records", recordId: null });
+    expect(cmsWorkspace.get()).toEqual({ collectionId: "col-b", tab: "records", recordId: null, origin: null });
   });
 
   it("with a recordId opens the sheet on it, notifying once", () => {
@@ -21,7 +21,7 @@ describe("cmsWorkspace.openRequest", () => {
     const off = cmsWorkspace.subscribe(l);
     cmsWorkspace.openRequest({ collectionId: "col-b", recordId: "rec-7" });
     off();
-    expect(cmsWorkspace.get()).toEqual({ collectionId: "col-b", tab: "records", recordId: "rec-7" });
+    expect(cmsWorkspace.get()).toEqual({ collectionId: "col-b", tab: "records", recordId: "rec-7", origin: null });
     expect(l).toHaveBeenCalledTimes(1);
   });
 });

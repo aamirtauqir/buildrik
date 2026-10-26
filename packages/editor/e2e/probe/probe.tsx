@@ -41,7 +41,7 @@ import "@/editor/chrome-ui/flowbiteStore";
 import "@/themes/fonts.css";
 import "@/themes/default.css";
 
-import { RootView } from "@/editor/sidebar/tabs/content/ContentViews";
+import { RootView } from "@/editor/sidebar/tabs/content/ContentRootView";
 import { OnboardingChecklist } from "@/editor/onboarding/OnboardingChecklist";
 import { AchievementPrompt } from "@/editor/onboarding/AchievementPrompt";
 import { SaveStatus } from "@/editor/chrome-ui";

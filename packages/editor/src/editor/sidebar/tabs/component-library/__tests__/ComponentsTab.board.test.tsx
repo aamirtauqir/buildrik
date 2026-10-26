@@ -41,7 +41,9 @@ describe("ComponentsTab — board 4418:142419", () => {
       "Manage saved masters for this site. Insert places an instance; edits to a master affect its instances.",
     );
     expect(screen.getByTestId("comp-section-header").textContent).toBe("YOUR COMPONENTS2");
-    expect(screen.getByTestId("comp-row-hdr").textContent).toBe("Site header6 on this site");
+    expect(screen.getByTestId("comp-row-hdr").textContent).toBe("Site header6 uses");
+    /* 2L9 217:43947 — the full name on hover, however the row truncates it. */
+    expect(screen.getByTestId("comp-row-name-hdr")).toHaveAttribute("title", "Site header");
     expect(screen.getByTestId("comp-footer").textContent).toBe("+ Create component");
   });
 

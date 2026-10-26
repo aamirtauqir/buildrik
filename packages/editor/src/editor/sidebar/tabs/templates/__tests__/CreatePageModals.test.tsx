@@ -49,15 +49,16 @@ describe("create page from template (boards 1169:4725, 4418:54243)", () => {
     expect(screen.queryByRole("button", { name: /go to page/i })).not.toBeInTheDocument();
   });
 
-  it("the failure reassures that nothing of theirs changed, and says what broke when it knows", () => {
+  it("the failure reassures that nothing of theirs changed, and says what broke when it knows (2L9 222:47163)", () => {
     render(<CreatePageErrorModal onCancel={vi.fn()} onRetry={vi.fn()} />);
-    expect(screen.getByText(/Couldn't create the page/)).toBeInTheDocument();
-    expect(screen.getByText(/Your pages are unchanged\./)).toBeInTheDocument();
+    expect(screen.getByText("Couldn’t create the page")).toBeInTheDocument();
+    expect(screen.getByText("Nothing was changed. No empty page was left behind.")).toBeInTheDocument();
+    expect(screen.queryByTestId("tpl-create-error-reason")).toBeNull();
 
     cleanup();
     render(
       <CreatePageErrorModal reason="Template has no content." onCancel={vi.fn()} onRetry={vi.fn()} />,
     );
-    expect(screen.getByText(/Template has no content\. Your pages are unchanged\./)).toBeInTheDocument();
+    expect(screen.getByTestId("tpl-create-error-reason")).toHaveTextContent("Template has no content.");
   });
 });

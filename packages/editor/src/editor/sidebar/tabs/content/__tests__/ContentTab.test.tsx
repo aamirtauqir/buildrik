@@ -10,6 +10,7 @@ import * as React from "react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent, cleanup, waitFor, act, within } from "@testing-library/react";
 import { ContentTab } from "../ContentTab";
+import { SOURCES_IN_RELEASE } from "../ContentRootView";
 import { cmsWorkspace } from "@/editor/cms/cmsWorkspaceStore";
 import { makeEngine, MENU, ITEM } from "@/editor/cms/__tests__/fakeCmsEngine";
 import { CMSValidationError } from "@/engine/cms/CollectionManager";
@@ -25,12 +26,14 @@ describe("ContentTab", () => {
     expect(screen.getByRole("button", { name: "Create a collection" })).toBeInTheDocument();
   });
 
-  it("A-17/A09-8: the zero state also offers the Sources/Variables/Conditions doors it owns", async () => {
+  it("A-17/A09-8: the zero state also offers the Site variables/Conditions doors it owns; Sources is hidden (BD-39)", async () => {
     const { composer } = makeEngine();
     render(<ContentTab composer={composer as never} onCreateCollection={vi.fn()} />);
     await screen.findByTestId("content-empty");
-    fireEvent.click(screen.getByTestId("content-empty-sources"));
-    expect(await screen.findByRole("button", { name: "+ Connect a source" })).toBeInTheDocument();
+    expect(screen.queryByTestId("content-empty-sources")).toBeNull();
+    fireEvent.click(screen.getByTestId("content-empty-variables"));
+    expect(await screen.findByTestId("content-vars-intro")).toHaveTextContent("Use one value across your site");
+    expect(screen.getByTestId("content-vars-empty")).toHaveTextContent("No variables yet. Add a key and value to start.");
   });
 
   it("root lists collections with record counts and the Data rows", async () => {
@@ -38,9 +41,14 @@ describe("ContentTab", () => {
     render(<ContentTab composer={composer as never} />);
     expect(await screen.findByText("Menu items")).toBeInTheDocument();
     await waitFor(() => expect(screen.getAllByText("1").length).toBeGreaterThan(0)); // record count
-    for (const row of ["Sources", "Variables", "Conditions"]) {
+    /* RL01 (424:337006): Site variables · Conditions · Recently deleted
+       (Planned until restore ships); Sources hidden by BD-39. */
+    for (const row of ["Site variables", "Conditions", "Recently deleted"]) {
       expect(screen.getByText(row)).toBeInTheDocument();
     }
+    expect(screen.queryByText("Sources")).toBeNull();
+    expect(screen.getByTestId("content-recently-deleted")).toHaveAttribute("aria-disabled", "true");
+    expect(screen.getByTestId("content-recently-deleted")).toHaveTextContent("Planned");
   });
 
   it("root rows carry the board 148:2 leading glyph, and 'New collection' is a row, not a button", async () => {
@@ -52,7 +60,7 @@ describe("ContentTab", () => {
     // Every List row (collections + the three Data rows) now fills the icon
     // slot board 232:6 calls out — this used to render blank, which read as
     // the label starting 24px further left than its board.
-    for (const label of ["Menu items", "Sources", "Variables", "Conditions"]) {
+    for (const label of ["Menu items", "Site variables", "Conditions"]) {
       const row = screen.getByText(label).closest('[role="button"]');
       expect(row?.querySelector("svg")).toBeTruthy();
     }
@@ -72,7 +80,7 @@ describe("ContentTab", () => {
     );
     const { composer, sources } = makeEngine();
     render(<ContentTab composer={composer as never} />);
-    fireEvent.click(await screen.findByText("Variables"));
+    fireEvent.click(await screen.findByText("Site variables"));
     expect(await screen.findByText("{{site.name}}")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "+ New variable" }));
     fireEvent.change(screen.getByLabelText("Variable key"), { target: { value: "phone" } });
@@ -158,7 +166,9 @@ describe("ContentTab", () => {
     );
   });
 
-  it("says it is watching only when there is a source to watch (board 303:2083)", async () => {
+  /* BD-39: Sources has no door while the release constant is off; these
+     come back with it. */
+  it.skipIf(!SOURCES_IN_RELEASE)("says it is watching only when there is a source to watch (board 303:2083)", async () => {
     const { composer } = makeEngine({ collections: [MENU], items: [] });
     render(<ContentTab composer={composer as never} />);
     fireEvent.click(await screen.findByText("Sources"));
@@ -167,7 +177,9 @@ describe("ContentTab", () => {
     expect(screen.queryByTestId("sources-watching")).toBeNull();
   });
 
-  it("sources: JSON import goes through importSampleData; bad JSON shows the error", async () => {
+  /* BD-39: Sources has no door while the release constant is off; these
+     come back with it. */
+  it.skipIf(!SOURCES_IN_RELEASE)("sources: JSON import goes through importSampleData; bad JSON shows the error", async () => {
     const { composer } = makeEngine({ collections: [MENU], items: [] });
     render(<ContentTab composer={composer as never} />);
     fireEvent.click(await screen.findByText("Sources"));
@@ -196,7 +208,7 @@ describe("ContentTab", () => {
     expect(cmsWorkspace.get()).toMatchObject({ collectionId: "col-1", tab: "records", recordId: null });
     // the drawer stays on its list, with the open collection marked
     await waitFor(() => expect(screen.getByTestId("content-collection-col-1")).toHaveAttribute("aria-current", "true"));
-    expect(screen.getByTestId("content-open-sources")).toBeInTheDocument();
+    expect(screen.getByTestId("content-open-variables")).toBeInTheDocument();
     cmsWorkspace.reset();
   });
 });

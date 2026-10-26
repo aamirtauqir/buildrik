@@ -17,13 +17,14 @@ import { join } from "node:path";
 const views = readFileSync(join(__dirname, "..", "ContentViews.tsx"), "utf8");
 const hook = readFileSync(join(__dirname, "..", "useContentPanel.ts"), "utf8");
 const exporter = readFileSync(join(__dirname, "..", "..", "..", "..", "..", "engine", "export", "ExportEngine.ts"), "utf8");
-const emptyState =
-  views.slice(views.indexOf("No variables yet")).split("</div>")[0].replace(/\s+/g, " ");
+/* RL02 (424:337452): the promise now sits in the always-on intro. */
+const intro =
+  views.slice(views.indexOf("Use one value across your site")).split("</div>")[0].replace(/\s+/g, " ");
 
-describe("Variables empty state", () => {
-  it("promises the published page, and admits the canvas shows braces", () => {
-    expect(emptyState).toMatch(/published page shows the value/i);
-    expect(emptyState).toMatch(/canvas shows the braces/i);
+describe("Site variables intro", () => {
+  it("promises the published pages, and admits the canvas keeps the placeholder", () => {
+    expect(intro).toMatch(/Published pages show the value/);
+    expect(intro).toMatch(/the canvas keeps the placeholder/);
   });
 
   it("matches the code: saved in the project, substituted by the export", () => {

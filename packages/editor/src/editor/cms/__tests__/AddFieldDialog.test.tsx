@@ -1,6 +1,6 @@
 /**
- * + Add field: type list (4418:164208) → Configure <Type> field (4418:164219…
- * :164260) → key clash (4418:164225).
+ * + Add field: type list (2L9 167:3871) → Add <type> field (167:4135…) →
+ * key clash (4418:164225); saving (167:8474) and a refused save (167:8747).
  *
  * @license BSD-3-Clause
  */
@@ -23,12 +23,49 @@ function mount() {
 }
 
 describe("AddFieldDialog", () => {
+  it("offers every type the schema stores, in the board's order and names (167:3871)", () => {
+    mount();
+    const rows = Array.from(screen.getByTestId("cms-add-field-types").querySelectorAll("button")).map((b) => b.textContent);
+    expect(rows).toEqual([
+      "Text", "Long text", "Rich text", "Email", "URL", "Slug", "Number", "Date", "Date & time",
+      "Yes/no", "Option", "Options", "Image", "File", "Reference", "Color",
+    ]);
+  });
+
+  it("an Option field carries its options too", async () => {
+    const { onAdd } = mount();
+    fireEvent.click(screen.getByTestId("cms-add-field-type-select"));
+    fireEvent.change(screen.getByTestId("cms-add-field-name"), { target: { value: "Course" } });
+    fireEvent.change(screen.getByTestId("cms-add-field-options"), { target: { value: "Starter\nMain" } });
+    fireEvent.click(screen.getByTestId("cms-add-field-save"));
+    await waitFor(() => expect(onAdd).toHaveBeenCalledWith({ name: "Course", slug: "course", type: "select", options: ["Starter", "Main"] }));
+  });
+
+  it("reads Saving… while it saves; a refused save keeps the settings and offers Retry (167:8474 · 167:8747)", async () => {
+    let reject: (e: Error) => void = () => undefined;
+    const onAdd = vi.fn(() => new Promise<void>((_, r) => (reject = r)));
+    const onClose = vi.fn();
+    render(<AddFieldDialog collection={MENU} collections={[MENU]} onClose={onClose} onAdd={onAdd} />);
+    fireEvent.click(screen.getByTestId("cms-add-field-type-textarea"));
+    expect(screen.getByText("Add long text field")).toBeInTheDocument();
+    fireEvent.change(screen.getByTestId("cms-add-field-name"), { target: { value: "Summary" } });
+    fireEvent.click(screen.getByTestId("cms-add-field-save"));
+    expect(screen.getByTestId("cms-add-field-save")).toHaveTextContent("Saving…");
+    reject(new Error("500"));
+    expect(await screen.findByTestId("cms-add-field-failed")).toHaveTextContent("Couldn’t save. Your field settings are still here.");
+    expect(screen.getByTestId("cms-add-field-save")).toHaveTextContent("Retry");
+    expect(screen.getByTestId("cms-add-field-name")).toHaveValue("Summary");
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
   it("lists the types, then configures the chosen one; the key follows the name", async () => {
     const { onAdd, onClose } = mount();
-    expect(screen.getByText("Add field · Menu items")).toBeInTheDocument();
+    expect(screen.getByText("Add field")).toBeInTheDocument();
+    expect(screen.getByText("Choose the kind of content this field stores.")).toBeInTheDocument();
     fireEvent.click(screen.getByTestId("cms-add-field-type-number"));
-    expect(screen.getByText("Configure Number field")).toBeInTheDocument();
-    expect(screen.getByText("Menu items / Number field")).toBeInTheDocument();
+    expect(screen.getByText("Add number field")).toBeInTheDocument();
+    expect(screen.getByText("Menu items · New field")).toBeInTheDocument();
+    expect(screen.getByTestId("cms-add-field-key-hint")).toHaveTextContent("Used in bindings and patterns. Must be unique in Menu items.");
     expect(screen.getByText("Existing records keep empty values until edited.")).toBeInTheDocument();
     fireEvent.change(screen.getByTestId("cms-add-field-name"), { target: { value: "Cooking time" } });
     expect(screen.getByTestId("cms-add-field-key")).toHaveValue("cooking-time");

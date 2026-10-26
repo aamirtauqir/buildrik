@@ -27,9 +27,9 @@ import {
 } from "@/services/cmsSync";
 import { useContentPanel } from "./useContentPanel";
 import { cmsWorkspace, useCmsWorkspace } from "@/editor/cms/cmsWorkspaceStore";
+import { RootView } from "./ContentRootView";
 import {
   ConditionsView,
-  RootView,
   CONTENT_BODY,
   SECTION_H,
   SourcesView,
