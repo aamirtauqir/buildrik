@@ -20,6 +20,8 @@ import { cmsWorkspace } from "./cmsWorkspaceStore";
 import { FIELD_RULES, FIELD_TYPES, FIELD_TYPE_LABEL, TYPED_VALUE_TYPES, fieldKeyError, parseDefault } from "./fieldTypes";
 import type { FieldUse } from "./fieldUsage";
 import { DeleteFieldDialog } from "./DeleteFieldDialog";
+import { RequiredImpactDialog } from "./RequiredImpactDialog";
+import { isEmptyCmsValue } from "@buildrik/shared/schemas/cms";
 import { OptionsEditor } from "./OptionsEditor";
 import { SECTION } from "./paneStyles";
 
@@ -96,9 +98,14 @@ export interface FieldInspectorProps {
   onClose: () => void;
   onDeleteField: (fieldId: string) => Promise<void>;
   onOpenUse: (elementId: string) => void;
+  /** Required's "Set a default value" (257:53846): saves the default, fills
+   *  the empty published records, turns Required on; resolves with the count. */
+  onSetDefault: (field: CMSField, value: unknown) => Promise<number>;
 }
 
-export function FieldInspector({ composer, collection, collections, field, records, uses, onClose, onDeleteField, onOpenUse }: FieldInspectorProps) {
+export function FieldInspector({ composer, collection, collections, field, records, uses, onClose, onDeleteField, onOpenUse, onSetDefault }: FieldInspectorProps) {
+  const [askingRequired, setAskingRequired] = React.useState(false);
+  const emptyPublished = records.filter((r) => r.status === "published" && isEmptyCmsValue(r.data[field.slug])).length;
   const [name, setName] = React.useState(field.name);
   const [key, setKey] = React.useState(field.slug);
   const [deleting, setDeleting] = React.useState(false);
@@ -219,7 +226,12 @@ export function FieldInspector({ composer, collection, collections, field, recor
         <div className={ROW}>
           <span className={ROW_LABEL}>Required</span>
           <span className="tw:flex tw:gap-1" role="group" aria-label="Required">
-            <Chip label="Yes" selected={Boolean(field.validation?.required)} onClick={() => update({ validation: { ...field.validation, required: true } })} data-testid="cms-fi-required-yes" />
+            <Chip label="Yes" selected={Boolean(field.validation?.required)} onClick={() => {
+                if (field.validation?.required) return;
+                /* 257:53654 — published records that leave it empty are named first. */
+                if (emptyPublished > 0) setAskingRequired(true);
+                else update({ validation: { ...field.validation, required: true } });
+              }} data-testid="cms-fi-required-yes" />
             <Chip label="No" selected={!field.validation?.required} onClick={() => update({ validation: { ...field.validation, required: false } })} data-testid="cms-fi-required-no" />
           </span>
         </div>
@@ -296,6 +308,15 @@ export function FieldInspector({ composer, collection, collections, field, recor
           Back to Fields
         </Button>
       </footer>
+      {askingRequired ? (
+        <RequiredImpactDialog
+          field={field}
+          emptyCount={emptyPublished}
+          onClose={() => setAskingRequired(false)}
+          onMakeRequired={() => update({ validation: { ...field.validation, required: true } })}
+          onSetDefault={(value) => onSetDefault(field, value)}
+        />
+      ) : null}
       {deleting ? (
         <DeleteFieldDialog
           collection={collection}

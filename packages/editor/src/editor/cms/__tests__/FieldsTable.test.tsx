@@ -72,6 +72,7 @@ describe("FieldInspector", () => {
     const field = MENU.fields[fieldIdx];
     const onDeleteField = vi.fn(() => Promise.resolve());
     const onOpenUse = vi.fn();
+    const onSetDefault = vi.fn(() => Promise.resolve(1));
     render(
       <FieldInspector
         composer={e.composer as never}
@@ -83,11 +84,36 @@ describe("FieldInspector", () => {
         onClose={() => {}}
         onDeleteField={onDeleteField}
         onOpenUse={onOpenUse}
+        onSetDefault={onSetDefault}
       />,
     );
     const updateField = (e.composer.cms.collections as unknown as { updateField: ReturnType<typeof vi.fn> }).updateField;
-    return { updateField, onDeleteField, onOpenUse };
+    return { updateField, onDeleteField, onOpenUse, onSetDefault };
   }
+
+  /* 2L9 257:53654 / 257:53846 — Required on a field published records leave
+     empty asks first; the copy says what the code does (they stay published). */
+  it("Required on a field published records leave empty asks first, and can set a default", async () => {
+    const { updateField, onSetDefault } = mount(2);
+    fireEvent.click(screen.getByTestId("cms-fi-required-yes"));
+    expect(screen.getByText("Make Slug required?")).toBeInTheDocument();
+    expect(screen.getByTestId("cms-required-impact-body")).toHaveTextContent(
+      "1 published record has no Slug value. They stay published as they are; each needs a value the next time it is saved as published.",
+    );
+    expect(updateField).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByTestId("cms-required-set-default"));
+    expect(screen.getByText("Default Slug value")).toBeInTheDocument();
+    fireEvent.change(screen.getByTestId("cms-required-default-input"), { target: { value: "menu" } });
+    fireEvent.click(screen.getByTestId("cms-required-default-save"));
+    await waitFor(() => expect(onSetDefault).toHaveBeenCalledWith(MENU.fields[2], "menu"));
+  });
+
+  it("Make required in the dialog turns it on without a default", () => {
+    const { updateField } = mount(2);
+    fireEvent.click(screen.getByTestId("cms-fi-required-yes"));
+    fireEvent.click(screen.getByTestId("cms-required-confirm"));
+    expect(updateField).toHaveBeenCalledWith("col-1", "f3", { validation: { required: true } });
+  });
 
   it("edits name, key and required of an unbound field; summarises its rule", () => {
     const { updateField } = mount(1);
@@ -149,7 +175,7 @@ describe("FieldInspector", () => {
     const show = (i: number) =>
       render(
         <FieldInspector composer={e.composer as never} collection={col} collections={[col, TEAM]} field={col.fields[i]} records={[]} uses={[]}
-          onClose={() => {}} onDeleteField={vi.fn()} onOpenUse={vi.fn()} />,
+          onClose={() => {}} onDeleteField={vi.fn()} onOpenUse={vi.fn()} onSetDefault={vi.fn()} />,
       );
     show(0);
     fireEvent.change(screen.getByTestId("cms-fi-rule-maxLength"), { target: { value: "140" } });

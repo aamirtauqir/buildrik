@@ -7564,9 +7564,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "board",
+   "authority": "code:required-checked-on-save",
    "verified": "no",
-   "verifiedNote": "Required toggles instantly; no impact dialog, new-records-only rule or default-value backfill"
+   "verifiedNote": "built, not compared — L-C D3: \"Make {field} required? · N published records have no {field} value.\" Cancel · Set a default value · Make required. Code checks Required when a record is saved as published, so the copy says they stay published (board: \"skipped on the next publish\")."
   },
   {
    "nodeId": "168:20773",
@@ -11134,9 +11134,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "board",
+   "authority": "code:required-checked-on-save",
    "verified": "no",
-   "verifiedNote": "Required toggles instantly; no impact dialog, new-records-only rule or default-value backfill"
+   "verifiedNote": "built, not compared — L-C D3: \"Make {field} required? · N published records have no {field} value.\" Cancel · Set a default value · Make required. Code checks Required when a record is saved as published, so the copy says they stay published (board: \"skipped on the next publish\")."
   },
   {
    "nodeId": "257:53846",
@@ -11146,7 +11146,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Required toggles instantly; no impact dialog, new-records-only rule or default-value backfill"
+   "verifiedNote": "built, not compared — L-C D3: \"Default {field} value · Apply a default to the N published records that have no value. Existing values will be kept.\" Save default (Saving… / Retry)."
   },
   {
    "nodeId": "257:54041",
@@ -11154,9 +11154,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-required-new-only",
    "verified": "no",
-   "verifiedNote": "Required toggles instantly; no impact dialog, new-records-only rule or default-value backfill"
+   "verifiedNote": "L-C D3: \"Required for new records only\" has no rule in the shared validator (cmsValueError); needs an owner call and a validator change through the full chain."
   },
   {
    "nodeId": "257:54274",
@@ -11166,7 +11166,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Required toggles instantly; no impact dialog, new-records-only rule or default-value backfill"
+   "verifiedNote": "drift-open — L-C D3: Save default reads Saving… while the default is written; the board's separate \"Saving {field}… Waiting for the server\" panel is not built. Not compared."
   },
   {
    "nodeId": "257:54485",
@@ -11714,9 +11714,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-required-new-only",
    "verified": "no",
-   "verifiedNote": "Required toggles instantly; no impact dialog, new-records-only rule or default-value backfill"
+   "verifiedNote": "L-C D3: \"Required for new records only\" has no rule in the shared validator (cmsValueError); needs an owner call and a validator change through the full chain."
   },
   {
    "nodeId": "259:95932",
@@ -11726,7 +11726,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Required toggles instantly; no impact dialog, new-records-only rule or default-value backfill"
+   "verifiedNote": "built, not compared — L-C D3: toast \"{field} is required · Default saved to N previously empty published records. Existing values were kept.\" (toast, not an inline line)."
   },
   {
    "nodeId": "259:96112",

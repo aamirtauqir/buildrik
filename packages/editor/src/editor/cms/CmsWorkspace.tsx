@@ -31,7 +31,8 @@ import { BACK } from "./paneStyles";
 import { ImportRecordsButton, useImportRecords } from "./useImportRecords";
 import { CsvImportDialog } from "./CsvImportDialog";
 import { onCmsGone } from "@/services/cmsSync";
-import type { CMSCollection, CMSContentItem } from "@/shared/types/cms";
+import type { CMSCollection, CMSContentItem, CMSField } from "@/shared/types/cms";
+import { isEmptyCmsValue } from "@buildrik/shared/schemas/cms";
 
 export interface CmsWorkspaceProps {
   composer: Composer | null;
@@ -240,6 +241,28 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
     await panel.deleteField(collection.id, id);
     if (field) addToast({ tone: "success", title: "Field deleted", description: `${field.name} has been removed from ${collection.name}.` });
   };
+  /* 257:53846 / 259:95932 — a default for a field becoming Required: saved on
+     the field, written into each published record that has no value, then
+     Required goes on. Existing values are kept. */
+  const fillDefault = async (field: CMSField, value: unknown): Promise<number> => {
+    if (!composer) return 0;
+    const empty = panel.records.filter((r) => r.status === "published" && isEmptyCmsValue(r.data[field.slug]));
+    await composer.cms.collections.updateField(collection.id, field.id, { defaultValue: value });
+    for (const r of empty) {
+      await panel.saveRecord(collection.id, r.id, { ...r.data, [field.slug]: value }, true);
+    }
+    await composer.cms.collections.updateField(collection.id, field.id, {
+      defaultValue: value,
+      validation: { ...field.validation, required: true },
+    });
+    await loadRecords(collection.id);
+    addToast({
+      tone: "success",
+      title: `${field.name} is required`,
+      description: `Default saved to ${empty.length} previously empty published record${empty.length === 1 ? "" : "s"}. Existing values were kept.`,
+    });
+    return empty.length;
+  };
   /* "Open the binding" — select the bound element and go back to the canvas. */
   const openUse = (elementId: string) => {
     const el = composer?.elements.getElement(elementId);
@@ -425,6 +448,7 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
           onClose={() => setFieldId(null)}
           onDeleteField={deleteField}
           onOpenUse={openUse}
+          onSetDefault={fillDefault}
         />
       ) : null}
       {csvImportOpen ? (
