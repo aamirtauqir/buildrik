@@ -95,7 +95,7 @@ const permissions = () => screen.getByTestId("set-hd-permissions") as HTMLInputE
 const optionsOf = (select: HTMLSelectElement) => Array.from(select.options).map((o) => [o.text, o.value]);
 
 describe("HeadersScreen — the frame's strip and cards", () => {
-  it("reads the Site row, then draws the strip and the five cards in the frame's order", async () => {
+  it("reads the Site row, then draws the strip and the four cards in the board's order (B8-SH01)", async () => {
     setup();
     await loaded();
     expect(getMock).toHaveBeenCalledWith({ siteId: "s1" });
@@ -105,16 +105,14 @@ describe("HeadersScreen — the frame's strip and cards", () => {
     const cards = screen.getAllByRole("heading", { level: 3 }).map((h) => h.textContent);
     expect(cards).toEqual([
       "Content Security Policy",
-      "X-Frame-Options",
-      "Referrer-Policy",
-      "HSTS (HTTP Strict Transport Security)",
+      "Browser policies",
+      "HSTS",
       "Permissions-Policy",
     ]);
     for (const slug of [
       "content-security-policy",
-      "x-frame-options",
-      "referrer-policy",
-      "hsts-http-strict-transport-security",
+      "browser-policies",
+      "hsts",
       "permissions-policy",
     ]) {
       expect(screen.getByTestId(`set-card-${slug}`)).toBeInTheDocument();
@@ -125,8 +123,8 @@ describe("HeadersScreen — the frame's strip and cards", () => {
     setup();
     await loaded();
     expect(screen.getByLabelText("CSP header value")).toBe(csp());
-    expect(within(screen.getByTestId("set-card-x-frame-options")).getByLabelText("Policy")).toBe(xfo());
-    expect(within(screen.getByTestId("set-card-referrer-policy")).getByLabelText("Policy")).toBe(referrer());
+    expect(within(screen.getByTestId("set-card-browser-policies")).getByLabelText("X-Frame-Options")).toBe(xfo());
+    expect(within(screen.getByTestId("set-card-browser-policies")).getByLabelText("Referrer-Policy")).toBe(referrer());
     expect(screen.getByRole("switch", { name: "Enable HSTS" })).toBe(hstsEnable());
     expect(screen.getByLabelText("Max age")).toBe(hstsMax());
     expect(screen.getByLabelText("Header value")).toBe(permissions());
@@ -152,7 +150,7 @@ describe("HeadersScreen — the frame's strip and cards", () => {
     expect(referrer().value).toBe("strict-origin-when-cross-origin");
     expect(hstsEnable()).toHaveAttribute("aria-checked", "true");
     expect(hstsMax().value).toBe("63072000");
-    expect(hstsMax().selectedOptions[0].text).toBe("2 years (recommended)");
+    expect(hstsMax().selectedOptions[0].text).toBe("2 years · 63072000 seconds");
     expect(hstsMax()).toBeEnabled();
     expect(permissions().value).toBe("camera=(), microphone=()");
   });
@@ -192,28 +190,49 @@ describe("HeadersScreen — the frame's strip and cards", () => {
       ["Not set", ""],
     ]);
     expect(optionsOf(hstsMax())).toEqual([
-      ["1 month", "2592000"],
-      ["6 months", "15552000"],
-      ["1 year", "31536000"],
-      ["2 years (recommended)", "63072000"],
+      ["1 month · 2592000 seconds", "2592000"],
+      ["6 months · 15552000 seconds", "15552000"],
+      ["1 year · 31536000 seconds", "31536000"],
+      ["2 years · 63072000 seconds", "63072000"],
     ]);
   });
 
-  it("shows a stored max age the list does not carry as `<n> seconds`, and saves it back unsnapped", async () => {
+  it("shows a stored max age the presets do not carry as `<n> seconds (custom)`, and saves it back unsnapped", async () => {
     getMock.mockResolvedValue({ ...row(), hstsMaxAge: 300 });
     const { box, register } = saveHandlerSpy();
     setup({ registerSaveHandler: register });
     await loaded();
     expect(hstsEnable()).toHaveAttribute("aria-checked", "true");
     expect(hstsMax().value).toBe("300");
-    expect(hstsMax().selectedOptions[0].text).toBe("300 seconds");
+    expect(hstsMax().selectedOptions[0].text).toBe("300 seconds (custom)");
     expect(optionsOf(hstsMax())).toHaveLength(5);
+    expect(screen.getByTestId("set-hd-hsts-note")).toHaveTextContent("Existing custom value retained. Changing presets is an explicit edit.");
     fireEvent.change(csp(), { target: { value: "default-src 'none'" } });
     await waitFor(() => expect(box.current).not.toBeNull());
     await act(async () => {
       await box.current!();
     });
     expect(updateMock).toHaveBeenCalledWith(expect.objectContaining({ hstsMaxAge: 300 }));
+  });
+
+  it("an unsaved preset over a saved custom value says both (B8-SH06), and the custom value stays choosable", async () => {
+    getMock.mockResolvedValue({ ...row(), hstsMaxAge: 86400 });
+    setup();
+    await loaded();
+    fireEvent.change(hstsMax(), { target: { value: "31536000" } });
+    expect(screen.getByTestId("set-hd-hsts-note")).toHaveTextContent(
+      "Unsaved choice: 31536000 seconds. Saved custom value: 86400 seconds.",
+    );
+    expect(optionsOf(hstsMax())[0]).toEqual(["86400 seconds (custom)", "86400"]);
+  });
+
+  it("an unsaved preset over a saved preset says what it changes (B8-SH11)", async () => {
+    setup();
+    await loaded();
+    fireEvent.change(hstsMax(), { target: { value: "31536000" } });
+    expect(screen.getByTestId("set-hd-hsts-note")).toHaveTextContent(
+      "The chosen preset changes max age to 31536000 seconds. Save settings to apply.",
+    );
   });
 
   it("a value the server's enum does not carry reads as Not set rather than an option that is not there", async () => {
