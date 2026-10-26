@@ -12866,8 +12866,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): unreachable live — Publishing flag is on in this build, and the tray opens only via Publish (not clicked: QA workspace deploys for real). | prior: Copy now the board's ('Publishing isn’t switched on for this workspace yet', curly apostrophe) in lifecycle.ts and the tray fallback; built, not compared."
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27: shots/233-10827.png vs probe publish-tray (flag off) at 1440x900 — 360 tray, header Publish · \"<site> · whole site\" with ⋯ and ✕, only the status card (Live · domain, View live ↗, Copy link), disabled \"Publish changes\", \"Publishing isn’t switched on for this workspace yet\", Privacy policy · Terms of service. \"Published … · v12\" shows when a deploy exists (snapshot), absent in the probe."
   },
   {
    "nodeId": "233:11377",
@@ -12877,7 +12877,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): unreachable live — Offline publish tray opens only via Publish; not clicked (QA workspace deploys for real). | prior: Copy now the board's ('Needs a connection') in lifecycle.ts publishBlocker; built, not compared."
+   "verifiedNote": "probe-compared 2026-10-27 (still open): shots/233-11377.png vs probe publish-tray (offline) — status card + WHAT WILL CHANGE, no Checks / Goes to, \"Needs a connection\", legal links, ⋯. Not built: the board's per-page change chips and \"3 pages changed · 1 added · 0 removed\" counts (needs a draft-vs-live diff, inventory P-2) and \"See all ›\"."
   },
   {
    "nodeId": "233:11934",
