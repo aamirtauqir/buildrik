@@ -50,16 +50,20 @@ function engine() {
 afterEach(() => cleanup());
 
 describe("FieldsTable", () => {
-  it("lists type, Yes/No required and what uses each field — this collection's bindings and the URL pattern", () => {
+  /* 2L9 165:2917 — Name · Key · Type · Required · Used by (a count; the names on hover). */
+  it("lists key, type, Yes/No required and how many things use each field", () => {
     const { composer } = engine();
     const onSelect = vi.fn();
     render(<FieldsTable collection={MENU} usage={fieldUsage(composer as never, MENU)} selectedId="f2" onSelect={onSelect} />);
     expect(screen.getByTestId("cms-field-type-f2")).toHaveTextContent("Number");
     expect(screen.getByTestId("cms-field-req-f1")).toHaveTextContent("Yes");
     expect(screen.getByTestId("cms-field-req-f2")).toHaveTextContent("No");
-    expect(screen.getByTestId("cms-field-used-f1")).toHaveTextContent("Menu card");
-    expect(screen.getByTestId("cms-field-used-f2")).toHaveTextContent(/^$/);
-    expect(screen.getByTestId("cms-field-used-f3")).toHaveTextContent("Dynamic pages");
+    expect(screen.getAllByRole("columnheader").map((h) => h.textContent)).toEqual(["Name", "Key", "Type", "Required", "Used by"]);
+    expect(screen.getByTestId("cms-field-key-f2")).toHaveTextContent("price");
+    expect(screen.getByTestId("cms-field-used-f1")).toHaveTextContent("1");
+    expect(screen.getByTestId("cms-field-used-f1")).toHaveAttribute("title", "Menu card");
+    expect(screen.getByTestId("cms-field-used-f2")).toHaveTextContent("0");
+    expect(screen.getByTestId("cms-field-used-f3")).toHaveAttribute("title", "Dynamic pages");
     expect(screen.getByTestId("cms-field-f2")).toHaveAttribute("aria-selected", "true");
     fireEvent.click(screen.getByTestId("cms-field-f3"));
     expect(onSelect).toHaveBeenCalledWith("f3");
@@ -97,7 +101,8 @@ describe("FieldInspector", () => {
      empty asks first; the copy says what the code does (they stay published). */
   it("Required on a field published records leave empty asks first, and can set a default", async () => {
     const { updateField, onSetDefault } = mount(2);
-    fireEvent.click(screen.getByTestId("cms-fi-required-yes"));
+    fireEvent.click(screen.getByTestId("cms-fi-required"));
+    fireEvent.click(screen.getByTestId("cms-fi-save"));
     expect(screen.getByText("Make Slug required?")).toBeInTheDocument();
     expect(screen.getByTestId("cms-required-impact-body")).toHaveTextContent(
       "1 published record has no Slug value. They stay published as they are; each needs a value the next time it is saved as published.",
@@ -107,7 +112,7 @@ describe("FieldInspector", () => {
     expect(screen.getByText("Default Slug value")).toBeInTheDocument();
     fireEvent.change(screen.getByTestId("cms-required-default-input"), { target: { value: "menu" } });
     fireEvent.click(screen.getByTestId("cms-required-default-save"));
-    await waitFor(() => expect(onSetDefault).toHaveBeenCalledWith(MENU.fields[2], "menu"));
+    await waitFor(() => expect(onSetDefault).toHaveBeenCalledWith(expect.objectContaining({ id: "f3" }), "menu"));
   });
 
   /* 2L9 257:51318 — a type change over stored values previews them first. */
@@ -137,27 +142,35 @@ describe("FieldInspector", () => {
 
   it("Make required in the dialog turns it on without a default", () => {
     const { updateField } = mount(2);
-    fireEvent.click(screen.getByTestId("cms-fi-required-yes"));
+    fireEvent.click(screen.getByTestId("cms-fi-required"));
+    fireEvent.click(screen.getByTestId("cms-fi-save"));
     fireEvent.click(screen.getByTestId("cms-required-confirm"));
     expect(updateField).toHaveBeenCalledWith("col-1", "f3", { validation: { required: true } });
   });
 
-  it("edits name, key and required of an unbound field; summarises its rule", () => {
+  /* 165:2917 — edits wait for Save field. */
+  it("edits name, key, required and rules, and saves them together with Save field", () => {
     const { updateField } = mount(1);
+    expect(screen.getByTestId("cms-fi-save")).toBeDisabled();
+    fireEvent.click(screen.getByTestId("cms-fi-more"));
     expect(screen.getByTestId("cms-fi-rule-min")).toHaveValue(0);
     fireEvent.change(screen.getByTestId("cms-fi-rule-max"), { target: { value: "99" } });
-    fireEvent.blur(screen.getByTestId("cms-fi-rule-max"));
-    expect(updateField).toHaveBeenCalledWith("col-1", "f2", { validation: { min: 0, max: 99 } });
     fireEvent.change(screen.getByTestId("cms-fi-name"), { target: { value: "Cost" } });
-    fireEvent.blur(screen.getByTestId("cms-fi-name"));
-    expect(updateField).toHaveBeenCalledWith("col-1", "f2", { name: "Cost" });
     fireEvent.change(screen.getByTestId("cms-fi-key"), { target: { value: "name" } });
     expect(screen.getByTestId("cms-fi-key-error")).toHaveTextContent("already has the key name");
+    expect(screen.getByTestId("cms-fi-save")).toBeDisabled();
     fireEvent.change(screen.getByTestId("cms-fi-key"), { target: { value: "cost" } });
-    fireEvent.blur(screen.getByTestId("cms-fi-key"));
-    expect(updateField).toHaveBeenCalledWith("col-1", "f2", { slug: "cost" });
-    fireEvent.click(screen.getByTestId("cms-fi-required-yes"));
-    expect(updateField).toHaveBeenCalledWith("col-1", "f2", { validation: { min: 0, required: true } });
+    fireEvent.click(screen.getByTestId("cms-fi-required"));
+    expect(updateField).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByTestId("cms-fi-save"));
+    expect(updateField).toHaveBeenCalledWith("col-1", "f2", {
+      name: "Cost",
+      slug: "cost",
+      placeholder: undefined,
+      helpText: undefined,
+      defaultValue: undefined,
+      validation: { min: 0, max: 99, required: true },
+    });
     expect(screen.queryByTestId("cms-fi-collection")).toBeNull();
   });
 
@@ -165,6 +178,8 @@ describe("FieldInspector", () => {
     const { onDeleteField, onOpenUse } = mount(0);
     expect(screen.getByTestId("cms-fi-key")).toBeDisabled();
     expect(screen.getByTestId("cms-fi-type")).toBeDisabled();
+    expect(screen.getByTestId("cms-fi-locked")).toHaveTextContent("Key and type are locked because this field is used.");
+    fireEvent.click(screen.getByTestId("cms-fi-show-uses"));
     expect(screen.getByTestId("cms-fi-uses")).toHaveTextContent("Menu card");
     fireEvent.click(screen.getByTestId("cms-fi-delete"));
     expect(screen.getByTestId("cms-field-locked")).toHaveTextContent("Cannot delete — field is bound");
@@ -221,9 +236,10 @@ describe("FieldInspector", () => {
           onClose={() => {}} onDeleteField={vi.fn()} onOpenUse={vi.fn()} onSetDefault={vi.fn()} onChangeType={vi.fn()} />,
       );
     show(0);
+    fireEvent.click(screen.getByTestId("cms-fi-more"));
     fireEvent.change(screen.getByTestId("cms-fi-rule-maxLength"), { target: { value: "140" } });
-    fireEvent.blur(screen.getByTestId("cms-fi-rule-maxLength"));
-    expect(updateField).toHaveBeenCalledWith("col-1", "t", { validation: { maxLength: 140 } });
+    fireEvent.click(screen.getByTestId("cms-fi-save"));
+    expect(updateField).toHaveBeenCalledWith("col-1", "t", expect.objectContaining({ validation: { maxLength: 140, minLength: undefined, required: false } }));
     cleanup();
     show(1);
     expect(screen.getByTestId("cms-fi-collection")).toHaveValue("col-2");
@@ -231,6 +247,6 @@ describe("FieldInspector", () => {
     expect(updateField).toHaveBeenCalledWith("col-1", "r", { referenceCollection: "col-1" });
     cleanup();
     show(2);
-    expect(screen.getByTestId("cms-fi-rule-none")).toHaveTextContent("Image fields take no rules beyond Required.");
+    expect(screen.queryByTestId("cms-fi-more")).toBeNull();
   });
 });

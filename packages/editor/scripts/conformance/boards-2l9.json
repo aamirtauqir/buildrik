@@ -7074,8 +7074,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — Locked state unreachable (no bound field). Field inspector: inline left labels vs stacked; no Key column in table; Required as Yes/No pills vs checkbox; no 'Show N usages' or Save field. | prior: drift-open — L-C D2: field inspector gains Default value, Placeholder, Help text; Key/type lock kept; \"Show N usages\" link and explicit Save field (code commits on blur, authority to decide) not built. Not compared."
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (cms-workspace&tab=fields, Title bound): table Name 192·Key(mono) 176·Type 160·Required 96·Used by (count) under a 40 tinted head, rows 40, selected accent wash; inspector 320 at x=825 under the tabs: Title, Display name / Key / Type stacked over 28 filled controls, 'Key and type are locked because this field is used.', 'Show N usages', Required checkbox, Placeholder, Help text, Save field (y 601 vs board 604). Default value and min/max rules (code) fold under 'Default and rules ›' below Save field."
   },
   {
    "nodeId": "165:3173",
@@ -11093,9 +11093,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "board",
+   "authority": "code:no-restore-yet",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — 'Delete excerpt?', 'Type 1 to confirm', Cancel/Delete field built. Adds breadcrumb + yellow callout; 'cannot be undone' vs board 30-day Recently deleted. Dialog 560w y=303 vs 720w y≈128. | prior: built, not compared — L-C D4: \"Delete {field}? · N records have a value in {field}.\" + \"Type N to confirm\" + Delete field. The board's \"stay in Recently deleted for 30 days\" is not shown: restore is a later server slice, so the copy keeps \"This cannot be undone.\""
+   "verifiedNote": "probe-compared 2026-10-27: 720 wide, 'Delete {field}?', count sentence, 'Type N to confirm' over a 28 filled input, Cancel 96 / Delete field; no breadcrumb or callout. Copy keeps 'This cannot be undone.' — the board's 30-day Recently deleted waits on the restore server slice. Open: Modal title size / placement (REQUESTS C-16)."
   },
   {
    "nodeId": "257:53085",
@@ -11103,9 +11103,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "board",
+   "authority": "code:no-restore-yet",
    "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C D4: \"Delete {field}? · N records have a value in {field}.\" + \"Type N to confirm\" + Delete field. The board's \"stay in Recently deleted for 30 days\" is not shown: restore is a later server slice, so the copy keeps \"This cannot be undone.\"",
+   "verifiedNote": "probe-compared 2026-10-27: 720 wide, 'Delete {field}?', count sentence, 'Type N to confirm' over a 28 filled input, Cancel 96 / Delete field; no breadcrumb or callout. Copy keeps 'This cannot be undone.' — the board's 30-day Recently deleted waits on the restore server slice. Open: Modal title size / placement (REQUESTS C-16).",
    "inheritsFrom": "257:52890"
   },
   {

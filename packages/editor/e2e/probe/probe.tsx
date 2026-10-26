@@ -1932,14 +1932,20 @@ function CmsWorkspaceHost() {
         : q.get("offline")
           ? async (id: string, u: Record<string, unknown>) => ({ ...CMS_WS_RECORDS.find((r) => r.id === id), ...u })
           : async () => null;
-      (base.cms as Record<string, unknown>).bindings = { export: () => ({}), getAllCollectionBindings: () => [] };
+      /* The Title field is bound once, so the field inspector draws its lock (165:2917). */
+      const bound = { "el-hero-title": [{ collectionId: "blog", fieldSlug: "title", property: "content" }] };
+      (base.cms as Record<string, unknown>).bindings = { export: () => bound, getAllCollectionBindings: () => [] };
       return base as unknown as Composer;
     },
     [],
   );
   React.useState(() => {
     cmsWorkspace.reset();
-    cmsWorkspace.openRequest({ collectionId: "blog", recordId: q.get("record") ?? undefined });
+    cmsWorkspace.openRequest({
+      collectionId: "blog",
+      recordId: q.get("record") ?? undefined,
+      tab: (q.get("tab") as "fields" | null) ?? undefined,
+    });
     return null;
   });
   return (

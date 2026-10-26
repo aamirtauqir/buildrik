@@ -1,92 +1,44 @@
 /**
  * FieldInspector — the Fields tab's right column with a field selected
- * (6103:52202): FIELD (Name · Type · Key · Required), VALIDATION, USED BY,
- * the binding note, Open affected record, Delete field, Back to Fields.
+ * (2L9 B5-C11 165:2917): the field's name as the heading, then Display name,
+ * Key and Type stacked over filled controls, "Key and type are locked
+ * because this field is used." with "Show N usages", Required, Placeholder,
+ * Help text and one "Save field".
  *
- * Key and Type are locked while something is bound to the field — the note
- * under USED BY says why. A key change moves every record's value with it
- * (CollectionManager.updateField). VALIDATION edits the rules the type can
- * carry — a number's range, text's length — which publish enforces; a
- * reference also names its collection.
+ * Edits wait for Save field (the board's explicit save). A type change over
+ * stored values goes through its own preview (TypeChangeDialog); turning
+ * Required on over empty published records asks first (RequiredImpactDialog).
+ * Beyond the board, kept from the code: a reference's collection, an option
+ * field's options, the default value, the type's min/max rules, the usage
+ * list behind "Show N usages", Open affected record and Delete field.
  *
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { X } from "lucide-react";
 import type { Composer } from "@/engine";
 import type { CMSCollection, CMSContentItem, CMSField, CMSFieldType } from "@/shared/types/cms";
-import { Button, Chip, IconButton, Select, TextInput } from "@/editor/chrome-ui";
+import { Button, Checkbox, Select, TextInput } from "@/editor/chrome-ui";
 import { cmsWorkspace } from "./cmsWorkspaceStore";
-import { FIELD_RULES, FIELD_TYPES, FIELD_TYPE_LABEL, TYPED_VALUE_TYPES, fieldKeyError, parseDefault } from "./fieldTypes";
+import { FIELD_RULES, FIELD_TYPES, FIELD_TYPE_LABEL, TYPED_VALUE_TYPES, fieldKeyError, parseDefault, type FieldRuleKey } from "./fieldTypes";
 import type { FieldUse } from "./fieldUsage";
 import { DeleteFieldDialog } from "./DeleteFieldDialog";
 import { RequiredImpactDialog } from "./RequiredImpactDialog";
 import { TypeChangeDialog, type TypeChangeMode } from "./TypeChangeDialog";
 import { isEmptyCmsValue } from "@buildrik/shared/schemas/cms";
 import { OptionsEditor } from "./OptionsEditor";
-import { SECTION } from "./paneStyles";
 
+/* 165:2917 — a 320 column on 16 gutters. */
 const ASIDE =
-  "tw:flex tw:w-[var(--bk-size-inspector)] tw:flex-none tw:flex-col tw:border-l tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)]";
-/* 6103:52202: an 88px label column, controls 28 tall on a 32 pitch. */
-const ROW = "tw:grid tw:grid-cols-[88px_1fr] tw:items-center tw:gap-2";
-const ROW_LABEL = "tw:text-right tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-soft)]";
+  "tw:flex tw:w-[320px] tw:flex-none tw:flex-col tw:bg-[var(--bk-bg-panel)]";
+const STACK = "tw:flex tw:flex-col tw:gap-2";
+const LABEL = "tw:text-[12px] tw:leading-[18px] tw:font-medium tw:text-[var(--bk-ink)]";
 const CONTROL =
-  "tw:[&_input]:h-7 tw:[&_input]:py-0 tw:[&_input]:pl-2 tw:[&_input]:text-[12px] tw:[&_input]:rounded-[6px] " +
-  "tw:[&_select]:h-7 tw:[&_select]:py-0 tw:[&_select]:pl-2 tw:[&_select]:text-[12px] tw:[&_select]:rounded-[6px]";
-const TEXT = "tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]";
+  "tw:[&_input]:h-7 tw:[&_input]:py-0 tw:[&_input]:pl-2.5 tw:[&_input]:text-[12px] tw:[&_input]:rounded-[6px] " +
+  "tw:[&_input]:bg-[var(--bk-bg-subtle)] tw:[&_input]:border-transparent " +
+  "tw:[&_select]:h-7 tw:[&_select]:py-0 tw:[&_select]:pl-2.5 tw:[&_select]:text-[12px] tw:[&_select]:rounded-[6px] " +
+  "tw:[&_select]:bg-[var(--bk-bg-subtle)] tw:[&_select]:border-transparent";
 const NOTE = "tw:m-0 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
-/** The header glyph before the field name ("# Price"). */
-const TYPE_GLYPH: Record<string, string> = { number: "#", text: "T", textarea: "¶", richtext: "¶", image: "▣", boolean: "◐", date: "▦", reference: "↗", slug: "/", multiselect: "☰" };
-
-
-/** One numeric rule, saved on blur / Enter; empty clears it. */
-function RuleInput({ id, value, onCommit }: { id: string; value: number | undefined; onCommit: (v: number | undefined) => void }) {
-  const [draft, setDraft] = React.useState(value === undefined ? "" : String(value));
-  React.useEffect(() => setDraft(value === undefined ? "" : String(value)), [value]);
-  const commit = () => {
-    const t = draft.trim();
-    const next = t === "" ? undefined : Number(t);
-    if (next !== undefined && Number.isNaN(next)) return setDraft(value === undefined ? "" : String(value));
-    if (next !== value) onCommit(next);
-  };
-  return (
-    <TextInput
-      id={id}
-      sizing="sm"
-      type="number"
-      className={CONTROL}
-      placeholder="None"
-      value={draft}
-      onChange={(e) => setDraft(e.target.value)}
-      onBlur={commit}
-      onKeyDown={(e) => e.key === "Enter" && commit()}
-      data-testid={id}
-    />
-  );
-}
-
-/** A text setting, saved on blur / Enter; empty clears it. */
-function TextSetting({ id, value, onCommit }: { id: string; value: string; onCommit: (v: string) => void }) {
-  const [draft, setDraft] = React.useState(value);
-  React.useEffect(() => setDraft(value), [value]);
-  const commit = () => {
-    if (draft.trim() !== value) onCommit(draft.trim());
-  };
-  return (
-    <TextInput
-      id={id}
-      sizing="sm"
-      className={CONTROL}
-      placeholder="None"
-      value={draft}
-      onChange={(e) => setDraft(e.target.value)}
-      onBlur={commit}
-      onKeyDown={(e) => e.key === "Enter" && commit()}
-      data-testid={id}
-    />
-  );
-}
+const TEXT = "tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]";
 
 export interface FieldInspectorProps {
   composer: Composer | null;
@@ -96,6 +48,7 @@ export interface FieldInspectorProps {
   field: CMSField;
   records: CMSContentItem[];
   uses: FieldUse[];
+  /** Escape steps out of the field. */
   onClose: () => void;
   onDeleteField: (fieldId: string) => Promise<void>;
   onOpenUse: (elementId: string) => void;
@@ -106,70 +59,109 @@ export interface FieldInspectorProps {
   onChangeType: (field: CMSField, to: CMSFieldType, mode: TypeChangeMode) => Promise<void>;
 }
 
+const text = (v: unknown) => (v === undefined || v === null ? "" : String(v));
+
 export function FieldInspector({ composer, collection, collections, field, records, uses, onClose, onDeleteField, onOpenUse, onSetDefault, onChangeType }: FieldInspectorProps) {
   const [askingRequired, setAskingRequired] = React.useState(false);
   const [retyping, setRetyping] = React.useState<CMSFieldType | null>(null);
+  const [deleting, setDeleting] = React.useState(false);
+  const [showUses, setShowUses] = React.useState(false);
+  const [showMore, setShowMore] = React.useState(false);
   const holdsValues = records.some((r) => !isEmptyCmsValue(r.data[field.slug]));
   const emptyPublished = records.filter((r) => r.status === "published" && isEmptyCmsValue(r.data[field.slug])).length;
-  const [name, setName] = React.useState(field.name);
-  const [key, setKey] = React.useState(field.slug);
-  const [deleting, setDeleting] = React.useState(false);
-  React.useEffect(() => setName(field.name), [field.id, field.name]);
-  React.useEffect(() => setKey(field.slug), [field.id, field.slug]);
+
+  /* The draft Save field commits, reset whenever another field (or a saved
+     version of this one) comes in. */
+  const initial = React.useMemo(
+    () => ({
+      name: field.name,
+      key: field.slug,
+      required: Boolean(field.validation?.required),
+      placeholder: field.placeholder ?? "",
+      helpText: field.helpText ?? "",
+      defaultValue: text(field.defaultValue),
+      rules: Object.fromEntries((FIELD_RULES[field.type] ?? []).map((r) => [r.key, text(field.validation?.[r.key])])) as Partial<Record<FieldRuleKey, string>>,
+    }),
+    [field],
+  );
+  const [draft, setDraft] = React.useState(initial);
+  React.useEffect(() => setDraft(initial), [initial]);
+  const set = <K extends keyof typeof initial>(k: K, v: (typeof initial)[K]) => setDraft((d) => ({ ...d, [k]: v }));
 
   const bound = uses.length > 0;
-  const nextKey = key.trim();
+  const nextName = draft.name.trim();
+  const nextKey = draft.key.trim();
   const keyError =
     nextKey === field.slug
       ? null
       : collection.fields.some((f) => f.id !== field.id && f.slug === nextKey)
         ? `${collection.name} already has the key ${nextKey}.`
         : fieldKeyError(nextKey, new Set());
-  const affected = records.find((r) => r.data[field.slug] != null && r.data[field.slug] !== "");
+  const rules = Object.fromEntries(
+    Object.entries(draft.rules).map(([k, v]) => [k, v && v.trim() !== "" && Number.isFinite(Number(v)) ? Number(v) : undefined]),
+  ) as Partial<Record<FieldRuleKey, number>>;
+  const dirty = JSON.stringify(draft) !== JSON.stringify(initial);
+  const canSave = dirty && nextName !== "" && !keyError;
+  const affected = records.find((r) => !isEmptyCmsValue(r.data[field.slug]));
   /* The addable types, plus whatever this field already is. */
   const types = (FIELD_TYPES as readonly string[]).includes(field.type) ? FIELD_TYPES : [...FIELD_TYPES, field.type];
 
   const update = (updates: Partial<Omit<CMSField, "id">>) => {
     if (composer) void composer.cms.collections.updateField(collection.id, field.id, updates);
   };
-  const commitName = () => {
-    const next = name.trim();
-    if (!next) setName(field.name);
-    else if (next !== field.name) update({ name: next });
-  };
-  const commitKey = () => {
-    if (keyError) return;
-    if (nextKey !== field.slug) update({ slug: nextKey });
+  const changes = (required: boolean): Partial<Omit<CMSField, "id">> => ({
+    ...(nextName !== field.name ? { name: nextName } : {}),
+    ...(nextKey !== field.slug ? { slug: nextKey } : {}),
+    placeholder: draft.placeholder.trim() || undefined,
+    helpText: draft.helpText.trim() || undefined,
+    defaultValue: parseDefault(field.type, draft.defaultValue),
+    validation: { ...field.validation, ...rules, required },
+  });
+  const save = () => {
+    if (!canSave) return;
+    /* 257:53654 — published records that leave it empty are named first. */
+    if (draft.required && !field.validation?.required && emptyPublished > 0) {
+      setAskingRequired(true);
+      return;
+    }
+    update(changes(draft.required));
   };
 
   return (
-    <aside className={ASIDE} data-testid="cms-field-inspector">
-      <header className="tw:flex tw:h-11 tw:flex-none tw:items-center tw:gap-2 tw:px-4">
-        <h3 className="tw:m-0 tw:flex-1 tw:truncate tw:text-[14px] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]" data-testid="cms-field-inspector-title">
-          <span className="tw:mr-1 tw:text-[var(--bk-ink-soft)]" aria-hidden="true">{TYPE_GLYPH[field.type] ?? "•"}</span>
+    <aside
+      className={ASIDE}
+      data-testid="cms-field-inspector"
+      onKeyDown={(e) => {
+        if (e.key === "Escape") onClose();
+      }}
+    >
+      <div className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col tw:gap-3.5 tw:overflow-y-auto tw:px-4 tw:pb-4 tw:pt-2.5">
+        <h3 className="tw:m-0 tw:truncate tw:text-[13px] tw:leading-5 tw:font-semibold tw:text-[var(--bk-ink)]" data-testid="cms-field-inspector-title">
           {field.name}
         </h3>
-        <IconButton label="Close field settings" size="sm" onClick={onClose} data-testid="cms-field-inspector-close">
-          <X size={16} />
-        </IconButton>
-      </header>
-      <div className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col tw:gap-1 tw:overflow-y-auto tw:px-4 tw:pb-3">
-        <h4 className={`${SECTION} tw:mb-2 tw:mt-2`}>Field</h4>
-        <div className={ROW}>
-          <label className={ROW_LABEL} htmlFor="cms-fi-name">Name</label>
-          <TextInput
-            id="cms-fi-name"
-            sizing="sm"
-            className={CONTROL}
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            onBlur={commitName}
-            onKeyDown={(e) => e.key === "Enter" && commitName()}
-            data-testid="cms-fi-name"
-          />
+        <div className={STACK}>
+          <label className={LABEL} htmlFor="cms-fi-name">Display name</label>
+          <TextInput id="cms-fi-name" sizing="sm" className={CONTROL} value={draft.name} onChange={(e) => set("name", e.target.value)} data-testid="cms-fi-name" />
         </div>
-        <div className={ROW}>
-          <label className={ROW_LABEL} htmlFor="cms-fi-type">Type</label>
+        <div className={STACK}>
+          <label className={LABEL} htmlFor="cms-fi-key">Key</label>
+          <TextInput
+            id="cms-fi-key"
+            sizing="sm"
+            className={`${CONTROL} tw:[&_input]:[font-family:var(--bk-font-mono)]`}
+            value={draft.key}
+            disabled={bound}
+            onChange={(e) => set("key", e.target.value)}
+            data-testid="cms-fi-key"
+          />
+          {keyError ? (
+            <p className="tw:m-0 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-error-text)]" role="alert" data-testid="cms-fi-key-error">
+              {keyError}
+            </p>
+          ) : null}
+        </div>
+        <div className={STACK}>
+          <label className={LABEL} htmlFor="cms-fi-type">Type</label>
           <Select
             id="cms-fi-type"
             sizing="sm"
@@ -188,24 +180,13 @@ export function FieldInspector({ composer, collection, collections, field, recor
               <option key={t} value={t}>{FIELD_TYPE_LABEL[t] ?? t}</option>
             ))}
           </Select>
-        </div>
-        <div className={ROW}>
-          <label className={ROW_LABEL} htmlFor="cms-fi-key">Key</label>
-          <TextInput
-            id="cms-fi-key"
-            sizing="sm"
-            className={`${CONTROL} tw:[&_input]:[font-family:var(--bk-font-mono)]`}
-            value={key}
-            disabled={bound}
-            onChange={(e) => setKey(e.target.value)}
-            onBlur={commitKey}
-            onKeyDown={(e) => e.key === "Enter" && commitKey()}
-            data-testid="cms-fi-key"
-          />
+          {bound ? (
+            <p className={NOTE} data-testid="cms-fi-locked">Key and type are locked because this field is used.</p>
+          ) : null}
         </div>
         {field.type === "reference" ? (
-          <div className={ROW}>
-            <label className={ROW_LABEL} htmlFor="cms-fi-collection">Collection</label>
+          <div className={STACK}>
+            <label className={LABEL} htmlFor="cms-fi-collection">Collection</label>
             <Select
               id="cms-fi-collection"
               sizing="sm"
@@ -223,101 +204,95 @@ export function FieldInspector({ composer, collection, collections, field, recor
           </div>
         ) : null}
         {field.type === "multiselect" || field.type === "select" ? (
-          <div className={`${ROW} tw:items-start`}>
-            <label className={`${ROW_LABEL} tw:pt-1.5`} htmlFor="cms-fi-options">Options</label>
+          <div className={STACK}>
+            <label className={LABEL} htmlFor="cms-fi-options">Options</label>
             <OptionsEditor id="cms-fi-options" options={field.options ?? []} onChange={(next) => update({ options: next })} />
           </div>
         ) : null}
-        {keyError ? (
-          <p className="tw:m-0 tw:pl-[96px] tw:text-[11px] tw:leading-4 tw:text-[var(--bk-error-text)]" role="alert" data-testid="cms-fi-key-error">
-            {keyError}
-          </p>
+        {bound ? (
+          <div className="tw:flex tw:flex-col tw:items-center tw:gap-2 tw:py-2">
+            <Button size="xs" variant="link" className="tw:h-auto tw:min-h-0 tw:p-0 tw:text-[12px] tw:font-medium" aria-expanded={showUses} onClick={() => setShowUses((v) => !v)} data-testid="cms-fi-show-uses">
+              Show {uses.length} usage{uses.length === 1 ? "" : "s"}
+            </Button>
+            {showUses ? (
+              <ul className="tw:m-0 tw:flex tw:w-full tw:list-none tw:flex-col tw:gap-1 tw:p-0" data-testid="cms-fi-uses">
+                {uses.map((u, i) => (
+                  <li key={`${u.label}-${i}`} className={TEXT}>
+                    {u.elementId ? (
+                      <Button size="xs" variant="link" className="tw:h-auto tw:min-h-0 tw:p-0 tw:text-[12px] tw:font-normal" onClick={() => onOpenUse(u.elementId!)}>
+                        {u.label}
+                      </Button>
+                    ) : (
+                      u.label
+                    )}
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </div>
         ) : null}
-        <div className={ROW}>
-          <span className={ROW_LABEL}>Required</span>
-          <span className="tw:flex tw:gap-1" role="group" aria-label="Required">
-            <Chip label="Yes" selected={Boolean(field.validation?.required)} onClick={() => {
-                if (field.validation?.required) return;
-                /* 257:53654 — published records that leave it empty are named first. */
-                if (emptyPublished > 0) setAskingRequired(true);
-                else update({ validation: { ...field.validation, required: true } });
-              }} data-testid="cms-fi-required-yes" />
-            <Chip label="No" selected={!field.validation?.required} onClick={() => update({ validation: { ...field.validation, required: false } })} data-testid="cms-fi-required-no" />
-          </span>
-        </div>
-
-        {/* 167:4135 — what a new record starts with and what the form shows. */}
+        <label className="tw:flex tw:items-center tw:gap-2 tw:py-1 tw:pl-3 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]">
+          <Checkbox checked={draft.required} onChange={(e) => set("required", e.target.checked)} data-testid="cms-fi-required" />
+          Required
+        </label>
         {TYPED_VALUE_TYPES.has(field.type) ? (
+          <div className={STACK}>
+            <label className={LABEL} htmlFor="cms-fi-placeholder">Placeholder</label>
+            <TextInput id="cms-fi-placeholder" sizing="sm" className={CONTROL} value={draft.placeholder} onChange={(e) => set("placeholder", e.target.value)} data-testid="cms-fi-placeholder" />
+          </div>
+        ) : null}
+        <div className={STACK}>
+          <label className={LABEL} htmlFor="cms-fi-help">Help text</label>
+          <TextInput id="cms-fi-help" sizing="sm" className={CONTROL} value={draft.helpText} onChange={(e) => set("helpText", e.target.value)} data-testid="cms-fi-help" />
+        </div>
+        <Button className="tw:h-8 tw:w-full tw:text-[13px] tw:font-medium" disabled={!canSave} onClick={save} data-testid="cms-fi-save">
+          Save field
+        </Button>
+        {/* Beyond the board: the default and the type's rules, folded under
+            Save field so the board's column reads as drawn. */}
+        {TYPED_VALUE_TYPES.has(field.type) || (FIELD_RULES[field.type] ?? []).length > 0 ? (
+          <Button size="xs" variant="link" className="tw:h-auto tw:min-h-0 tw:self-start tw:p-0 tw:text-[12px] tw:font-medium" aria-expanded={showMore} onClick={() => setShowMore((v) => !v)} data-testid="cms-fi-more">
+            {showMore ? "Hide default and rules" : "Default and rules ›"}
+          </Button>
+        ) : null}
+        {showMore ? (
           <>
-            <div className={ROW}>
-              <label className={ROW_LABEL} htmlFor="cms-fi-default">Default value</label>
-              <TextSetting
-                id="cms-fi-default"
-                value={field.defaultValue === undefined || field.defaultValue === null ? "" : String(field.defaultValue)}
-                onCommit={(v) => update({ defaultValue: parseDefault(field.type, v) })}
-              />
-            </div>
-            <div className={ROW}>
-              <label className={ROW_LABEL} htmlFor="cms-fi-placeholder">Placeholder</label>
-              <TextSetting id="cms-fi-placeholder" value={field.placeholder ?? ""} onCommit={(v) => update({ placeholder: v || undefined })} />
-            </div>
+            {TYPED_VALUE_TYPES.has(field.type) ? (
+              <div className={STACK}>
+                <label className={LABEL} htmlFor="cms-fi-default">Default value</label>
+                <TextInput id="cms-fi-default" sizing="sm" className={CONTROL} value={draft.defaultValue} onChange={(e) => set("defaultValue", e.target.value)} data-testid="cms-fi-default" />
+              </div>
+            ) : null}
+            {(FIELD_RULES[field.type] ?? []).map((r) => (
+              <div key={r.key} className={STACK}>
+                <label className={LABEL} htmlFor={`cms-fi-rule-${r.key}`}>{r.label}</label>
+                <TextInput
+                  id={`cms-fi-rule-${r.key}`}
+                  sizing="sm"
+                  type="number"
+                  placeholder="None"
+                  className={CONTROL}
+                  value={draft.rules[r.key] ?? ""}
+                  onChange={(e) => setDraft((d) => ({ ...d, rules: { ...d.rules, [r.key]: e.target.value } }))}
+                  data-testid={`cms-fi-rule-${r.key}`}
+                />
+              </div>
+            ))}
           </>
         ) : null}
-        <div className={ROW}>
-          <label className={ROW_LABEL} htmlFor="cms-fi-help">Help text</label>
-          <TextSetting id="cms-fi-help" value={field.helpText ?? ""} onCommit={(v) => update({ helpText: v || undefined })} />
-        </div>
-
-        <h4 className={`${SECTION} tw:mb-2 tw:mt-3`}>Validation</h4>
-        {(FIELD_RULES[field.type] ?? []).map((r) => (
-          <div key={r.key} className={ROW}>
-            <label className={ROW_LABEL} htmlFor={`cms-fi-rule-${r.key}`}>{r.label}</label>
-            <RuleInput
-              id={`cms-fi-rule-${r.key}`}
-              value={field.validation?.[r.key]}
-              onCommit={(v) => update({ validation: { ...field.validation, [r.key]: v } })}
-            />
-          </div>
-        ))}
-        {FIELD_RULES[field.type] ? null : (
-          <p className={`${TEXT} tw:text-[var(--bk-ink-muted)]`} data-testid="cms-fi-rule-none">
-            {FIELD_TYPE_LABEL[field.type] ?? field.type} fields take no rules beyond Required.
-          </p>
-        )}
-
-        <h4 className={`${SECTION} tw:mb-2 tw:mt-3`}>Used by</h4>
-        {bound ? (
-          <ul className="tw:m-0 tw:flex tw:list-none tw:flex-col tw:gap-2 tw:p-0" data-testid="cms-fi-uses">
-            {uses.map((u, i) => (
-              <li key={`${u.label}-${i}`} className={TEXT}>{u.label}</li>
-            ))}
-          </ul>
-        ) : (
-          <p className={`${TEXT} tw:text-[var(--bk-ink-muted)]`} data-testid="cms-fi-uses-none">Nothing is bound to this field.</p>
-        )}
-        <p className={`${NOTE} tw:mt-2`}>Field keys and types with active bindings must be kept to protect the existing template.</p>
-        <div className="tw:mt-3 tw:flex tw:flex-col tw:items-start tw:gap-2">
+        <div className="tw:flex tw:items-center tw:justify-between tw:gap-2">
           {affected ? (
-            <Button
-              size="xs"
-              color="light"
-              className="tw:h-7 tw:border-transparent tw:bg-transparent tw:px-2 tw:text-[12px]"
-              onClick={() => cmsWorkspace.openRecord(affected.id)}
-              data-testid="cms-fi-open-record"
-            >
+            <Button size="xs" variant="link" className="tw:h-auto tw:min-h-0 tw:p-0 tw:text-[12px] tw:font-normal" onClick={() => cmsWorkspace.openRecord(affected.id)} data-testid="cms-fi-open-record">
               Open affected record
             </Button>
-          ) : null}
-          <Button size="xs" variant="danger" className="tw:h-7 tw:px-3 tw:text-[12px]" onClick={() => setDeleting(true)} data-testid="cms-fi-delete">
-            Delete field
+          ) : (
+            <span />
+          )}
+          <Button size="xs" variant="link" className="tw:h-auto tw:min-h-0 tw:p-0 tw:text-[12px] tw:font-normal tw:text-[var(--bk-error-text)]" onClick={() => setDeleting(true)} data-testid="cms-fi-delete">
+            Delete field…
           </Button>
         </div>
       </div>
-      <footer className="tw:flex tw:h-12 tw:flex-none tw:items-center tw:border-t tw:border-[var(--bk-border)] tw:px-4">
-        <Button size="xs" color="light" className="tw:h-7 tw:border-transparent tw:bg-transparent tw:px-2 tw:text-[12px]" onClick={onClose} data-testid="cms-fi-back">
-          Back to Fields
-        </Button>
-      </footer>
       {retyping ? (
         <TypeChangeDialog
           collection={collection}
@@ -333,8 +308,12 @@ export function FieldInspector({ composer, collection, collections, field, recor
           field={field}
           emptyCount={emptyPublished}
           onClose={() => setAskingRequired(false)}
-          onMakeRequired={() => update({ validation: { ...field.validation, required: true } })}
-          onSetDefault={(value) => onSetDefault(field, value)}
+          onMakeRequired={() => update(changes(true))}
+          onSetDefault={(value) => {
+            const saved = changes(false);
+            update(saved);
+            return onSetDefault({ ...field, ...saved } as CMSField, value);
+          }}
         />
       ) : null}
       {deleting ? (

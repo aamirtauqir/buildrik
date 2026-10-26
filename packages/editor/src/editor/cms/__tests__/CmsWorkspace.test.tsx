@@ -252,7 +252,8 @@ describe("CmsWorkspace · tabs and the collection ⋯ (7096:76270)", () => {
     render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
     fireEvent.click(await screen.findByRole("tab", { name: "Fields" }));
     expect(await screen.findByText("Published?")).toBeInTheDocument();
-    expect(screen.getByTestId("cms-ws-meta")).toHaveTextContent(`· ${MENU.fields.length} field`);
+    /* 165:2917 — the header keeps the record count on every tab. */
+    expect(screen.getByTestId("cms-ws-meta")).toHaveTextContent("· 0 records");
     fireEvent.click(screen.getByTestId("cms-ws-add-field"));
     fireEvent.click(screen.getByTestId("cms-add-field-type-text"));
     fireEvent.change(screen.getByTestId("cms-add-field-name"), { target: { value: "Photo URL" } });
@@ -298,7 +299,8 @@ describe("CmsWorkspace · tabs and the collection ⋯ (7096:76270)", () => {
     cmsWorkspace.openCollection("col-1", "fields");
     render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
     fireEvent.click(await screen.findByTestId("cms-field-fs"));
-    fireEvent.click(screen.getByTestId("cms-fi-required-yes"));
+    fireEvent.click(screen.getByTestId("cms-fi-required"));
+    fireEvent.click(screen.getByTestId("cms-fi-save"));
     expect(screen.getByTestId("cms-required-impact-body")).toHaveTextContent("1 published record has no Subtitle value.");
     fireEvent.click(screen.getByTestId("cms-required-set-default"));
     fireEvent.change(screen.getByTestId("cms-required-default-input"), { target: { value: "Latest" } });

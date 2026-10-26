@@ -423,7 +423,7 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
             {collection.name}
             <span className="tw:font-semibold" data-testid="cms-ws-meta">
               {" · "}
-              {ws.tab === "fields" ? plural(collection.fields.length, "field") : plural(count, "record")}
+              {plural(count, "record")}
             </span>
           </h2>
           <span className="tw:flex-1" />
@@ -480,7 +480,27 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
           />
         </div>
         {importer.status}
-        <div className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col">{sheetOpen ? sheet : body}</div>
+        {/* 165:2917 — a selected field's settings (or a tab's hint) sit beside
+            the table, under the header and tabs. */}
+        <div className="tw:flex tw:min-h-0 tw:flex-1">
+          <div className="tw:flex tw:min-h-0 tw:min-w-0 tw:flex-1 tw:flex-col">{sheetOpen ? sheet : body}</div>
+          {selectedField ? (
+            <FieldInspector
+              composer={composer}
+              collection={collection}
+              collections={panel.collections}
+              field={selectedField}
+              records={panel.records}
+              uses={usage.get(selectedField.slug) ?? []}
+              onClose={() => setFieldId(null)}
+              onDeleteField={deleteField}
+              onOpenUse={openUse}
+              onSetDefault={fillDefault}
+              onChangeType={changeType}
+            />
+          ) : null}
+          {hint ? <HintColumn title={hint.title} hint={hint.hint} testId="cms-ws-hint" /> : null}
+        </div>
       </section>
       {addingField ? (
         <AddFieldDialog
@@ -488,21 +508,6 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
           onClose={() => setAddingField(false)}
           collections={panel.collections}
           onAdd={(field) => panel.addField(collection.id, field)}
-        />
-      ) : null}
-      {selectedField ? (
-        <FieldInspector
-          composer={composer}
-          collection={collection}
-          collections={panel.collections}
-          field={selectedField}
-          records={panel.records}
-          uses={usage.get(selectedField.slug) ?? []}
-          onClose={() => setFieldId(null)}
-          onDeleteField={deleteField}
-          onOpenUse={openUse}
-          onSetDefault={fillDefault}
-          onChangeType={changeType}
         />
       ) : null}
       {csvImportOpen ? (
@@ -518,7 +523,6 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
           }
         />
       ) : null}
-      {hint ? <HintColumn title={hint.title} hint={hint.hint} testId="cms-ws-hint" /> : null}
       {importer.input}
     </div>
   );
