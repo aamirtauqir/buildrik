@@ -90,32 +90,27 @@ describe("AdvancedTab visibility", () => {
     expect(screen.queryByText(/reachable via direct URL/)).toBeNull();
   });
 
-  it("shows the publicly-accessible helper text for live only", () => {
+  /* design-2l9 board 63:17061. Re-baseline: Advanced tab copy. */
+  it("names Publish visibility and says what Live means", () => {
     render(<AdvancedTab s={makeSettings({ visibility: "live" })} />);
-    expect(screen.getByText("Page is publicly accessible.")).toBeTruthy();
+    expect(screen.getByText("Publish visibility")).toBeTruthy();
+    expect(screen.getByText("Live means this page is included on the next publish.")).toBeTruthy();
   });
 });
 
 // ── Indexing ─────────────────────────────────────────────────────────────────
 
 describe("AdvancedTab indexing switches", () => {
-  it("reflects allowIndex / allowFollow as switch checked state", () => {
-    // flowbite's ToggleSwitch is a <button role="switch" aria-checked>, not
-    // an <input> — the checked state lives in aria-checked now.
-    render(<AdvancedTab s={makeSettings({ allowIndex: true, allowFollow: false })} />);
-    expect(
-      screen.getByRole("switch", { name: "Allow indexing" }).getAttribute("aria-checked")
-    ).toBe("true");
-    expect(
-      screen.getByRole("switch", { name: "Follow links" }).getAttribute("aria-checked")
-    ).toBe("false");
-  });
-
-  it("toggles allowIndex to the opposite of its current value", () => {
-    const s = makeSettings({ allowIndex: true });
+  /* design-2l9 board 63:17061: indexing is switched in SEO; Advanced reads
+     it out and links there — one control, one home. */
+  it("reads indexing out and sends Change in SEO to the SEO tab", () => {
+    const s = makeSettings({ allowIndex: true, allowFollow: false });
     render(<AdvancedTab s={s} />);
-    fireEvent.click(screen.getByRole("switch", { name: "Allow indexing" }));
-    expect(s.setAllowIndex).toHaveBeenCalledWith(false);
+    expect(screen.getByTestId("adv-indexing")).toHaveTextContent("Search indexing: Indexed");
+    expect(screen.queryByRole("switch", { name: "Allow indexing" })).toBeNull();
+    fireEvent.click(screen.getByTestId("adv-indexing-change"));
+    expect(s.setActiveTab).toHaveBeenCalledWith("seo");
+    expect(screen.getByRole("switch", { name: "Follow links" }).getAttribute("aria-checked")).toBe("false");
   });
 
   it("toggles allowFollow to the opposite of its current value", () => {

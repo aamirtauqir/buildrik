@@ -92,7 +92,8 @@ export function NewPageModal({ composer }: { composer: Composer | null }) {
     if (addToNav) composer.elements.addPageToNavigation(pageId);
     composer.elements.setActivePage(pageId);
     setOpen(false);
-    addToast({ title: "Page created", description: `‘${trimmed}’ is ready.`, tone: "success" });
+    /* design-2l9 board 101:42581: "Services created · Added to site navigation". */
+    addToast({ description: `${trimmed} created${addToNav ? " · Added to site navigation" : ""}`, tone: "success" });
   };
 
   const card = (value: Source, icon: React.ReactNode, title: string, hint: string) => (

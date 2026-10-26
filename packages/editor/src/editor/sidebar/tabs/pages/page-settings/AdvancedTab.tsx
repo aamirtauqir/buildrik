@@ -21,7 +21,7 @@ export const AdvancedTab: React.FC<Props> = ({ s }) => {
       {/* Visibility */}
       <div className="tw:flex tw:flex-col tw:gap-2" data-testid="adv-field-visibility">
         <div data-testid="adv-label-visibility" style={{ font: "600 11px var(--bk-font-ui)", color: "var(--bk-ink)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
-          Visibility
+          Publish visibility
         </div>
         <div style={{ display: "inline-flex", padding: 2, background: "var(--bk-bg-subtle)", border: "1px solid var(--bk-border)", borderRadius: 4 }} role="radiogroup" aria-label="Page visibility">
           {(["live", "hidden"] as const).map((v) => (
@@ -53,20 +53,24 @@ export const AdvancedTab: React.FC<Props> = ({ s }) => {
           <HelperText className={BK_HELPER_CLASS}>Not published. Hidden pages are left out of the deploy.</HelperText>
         )}
         {s.visibility === "live" && (
-          <HelperText className={BK_HELPER_CLASS}>Page is publicly accessible.</HelperText>
+          <HelperText className={BK_HELPER_CLASS}>Live means this page is included on the next publish.</HelperText>
         )}
       </div>
-      {/* Indexing */}
+      {/* Indexing — design-2l9 board 63:17061: one home for the switch (the SEO
+          tab's "Search indexing"); here it is a readout with the way there. */}
       <div className="tw:flex tw:flex-col tw:gap-2">
-        <div style={{ font: "600 11px var(--bk-font-ui)", color: "var(--bk-ink)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
-          Search Engine Indexing
-        </div>
-        <div className="tw:flex tw:flex-nowrap tw:items-center tw:justify-between tw:gap-2">
-          <div className="tw:flex tw:flex-col tw:gap-1">
-            <Label className={BK_LABEL_CLASS}>Allow indexing</Label>
-            <HelperText className={BK_HELPER_CLASS}>Let search engines list this page in results.</HelperText>
-          </div>
-          <ToggleSwitch checked={s.allowIndex} onChange={() => s.setAllowIndex(!s.allowIndex)} aria-label="Allow indexing" />
+        <div className="tw:flex tw:items-center tw:gap-2" data-testid="adv-indexing">
+          <span className="tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-ink)]">
+            {`Search indexing: ${s.allowIndex ? "Indexed" : "Hidden"}`}
+          </span>
+          <Button
+            variant="link"
+            data-testid="adv-indexing-change"
+            className="tw:h-auto tw:min-h-0 tw:p-0 tw:text-[length:var(--bk-text-12)] tw:font-medium tw:text-[var(--bk-accent-text)]"
+            onClick={() => s.setActiveTab("seo")}
+          >
+            Change in SEO
+          </Button>
         </div>
         <div className="tw:flex tw:flex-nowrap tw:items-center tw:justify-between tw:gap-2">
           <div className="tw:flex tw:flex-col tw:gap-1">
@@ -79,7 +83,7 @@ export const AdvancedTab: React.FC<Props> = ({ s }) => {
       {/* Head code */}
       <div className="tw:flex tw:flex-col tw:gap-2">
         <div style={{ font: "600 11px var(--bk-font-ui)", color: "var(--bk-ink)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
-          Custom &lt;head&gt; code
+          Head code
         </div>
         <Textarea
           data-testid="adv-input-head"
@@ -93,7 +97,8 @@ export const AdvancedTab: React.FC<Props> = ({ s }) => {
           style={{ minHeight: 100, fontFamily: "var(--bk-font-mono)", fontSize: "11.5px", lineHeight: 1.4 }}
         />
         {s.headCodeError && <HelperText color="red" className={BK_HELPER_ERROR_CLASS}>{s.headCodeError}</HelperText>}
-        <HelperText className={BK_HELPER_CLASS}>Injected into the &lt;head&gt; of this page only. Sanitized before save.</HelperText>
+        <HelperText className={BK_HELPER_CLASS}>Changes apply on the next publish.</HelperText>
+        <HelperText className={BK_HELPER_CLASS}>Head code affects this page only and is sanitized before save.</HelperText>
       </div>
     </div>
   );

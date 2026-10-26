@@ -193,7 +193,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Board: Publish visibility Live, 'Search indexing: Indexed · Change in SEO', Head code · Pro; code has own indexing switch"
+   "verifiedNote": "L-A wave 2 built, not compared: 'Publish visibility', 'Live means this page is included on the next publish.', 'Search indexing: Indexed · Change in SEO' (readout — the switch lives once, in SEO), Follow links switch, 'Head code' with 'Changes apply on the next publish.' / 'Head code affects this page only and is sanitized before save.'. The board's '· Pro' tag is not drawn: head code is not plan-gated in code."
   },
   {
    "nodeId": "63:17617",
@@ -468,9 +468,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Role notice exists (L-F); 'Managing pages needs Editor access' panel copy missing"
+   "authority": "blocked:viewer-pages-door-is-shell",
+   "verified": "no",
+   "verifiedNote": "'Managing pages needs Editor access · Use the bottom page tabs to browse this site.' — a viewer cannot open Pages (VIEWER_TABS; the gate is in the lead-owned shell tab switch), so the panel never renders for them; the message belongs with that gate or the role notice (L-F). L-A wave 2."
   },
   {
    "nodeId": "94:21526",
@@ -768,7 +768,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Board 'Your page is ready · Use Add to insert…' + 'Services created · Added to site navigation'"
+   "verifiedNote": "L-A wave 2 built, not compared: empty canvas reads 'Your page is ready' / 'Use Add to insert elements or sections.' (template cards and actions kept, code-ahead); New page receipt '{Page} created · Added to site navigation'. Layers' 'Empty page · Add elements to begin' footer not drawn."
   },
   {
    "nodeId": "104:28892",

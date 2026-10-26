@@ -1,5 +1,9 @@
 /**
- * CanvasEmptyCTA — board 4428:44164 (Canvas · empty page · About).
+ * CanvasEmptyCTA — board 4428:44164 (Canvas · empty page · About); title and
+ * sentence from design-2l9 board 101:42581 ("Your page is ready" / "Use Add
+ * to insert elements or sections."). The template cards and the four actions
+ * stay (code-ahead: the 2L9 board draws no doors, and these are the empty
+ * page's only ones).
  *
  * The board draws an empty page as five things, top to bottom: the title
  * ("This page is empty"), one sentence naming the three ways forward, a row
@@ -83,10 +87,10 @@ export function CanvasEmptyCTA({
     >
       <>
           <p className="bd-canvas-empty-cta__title" data-testid="canvas-empty-cta-title">
-            This page is empty
+            Your page is ready
           </p>
           <p className="bd-canvas-empty-cta__subtitle" data-testid="canvas-empty-cta-subtitle">
-            Start with a template, drop a block, or describe your site.
+            Use Add to insert elements or sections.
           </p>
           <ul className="bd-canvas-empty-cta__cards" data-testid="canvas-empty-cta-cards">
             {cards.map((t) => (
