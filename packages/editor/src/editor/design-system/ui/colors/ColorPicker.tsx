@@ -332,7 +332,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
           </span>
         </div>
         {hexError && (
-          <div className="tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-error-text)]">Enter a valid hex like #3B82F6</div>
+          <div className="tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-error-text)]">Enter a valid hex color, such as #1A56DB. The token hasn’t changed.</div>
         )}
         {showAlphaWarning && (
           <div className="tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-warning-text)]">

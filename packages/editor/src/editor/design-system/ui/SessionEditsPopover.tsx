@@ -99,7 +99,7 @@ export function SessionEditsPopover({
             disabled={disabled}
             data-testid="brand-session-edits"
           >
-            Review changes · {edits.length}
+            {edits.length > 0 ? `Review changes · ${edits.length}` : "Review changes"}
           </Button>
           {extraActions}
         </div>
@@ -107,11 +107,9 @@ export function SessionEditsPopover({
     >
       <div className="tw:flex tw:max-h-[640px] tw:flex-col tw:gap-3 tw:overflow-y-auto tw:p-2" data-testid="brand-session-edits-list">
         <h3 className="tw:m-0 tw:text-[length:var(--bk-text-20)] tw:font-semibold tw:leading-[30px] tw:tracking-[-0.24px] tw:text-[var(--bk-ink)]">
-          Review changes
+          Changes this session
         </h3>
-        <p className={SMALL}>
-          {edits.length === 0 ? "No changes to review yet." : "Edits in this session. Each edit is one ⌘Z step."}
-        </p>
+        {edits.length === 0 && <p className={SMALL}>No changes to review yet.</p>}
         {edits.map((e) => {
           const { title, lines } = describeEdit(e);
           return (
@@ -141,6 +139,7 @@ export function SessionEditsPopover({
             </div>
           );
         })}
+        {edits.length > 0 && <p className={SMALL}>Revert is added to Undo history like any edit.</p>}
         <div>
           <Button type="button" variant="ghost" size="xs" className={ACTION} onClick={() => setOpen(false)} data-testid="brand-session-close">
             Close

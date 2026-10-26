@@ -18,6 +18,7 @@ import * as React from "react";
 import { getTabMode } from "@/editor/rail/tabsConfig";
 import { FullPageRouter } from "@/editor/sidebar/FullPageRouter";
 import type { Composer } from "@/engine";
+import { requestBrandReturn } from "@/editor/design-system/ui/brandOpenRequest";
 import {
   installDomShims,
   makeFakeComposer,
@@ -54,7 +55,7 @@ describe("BrandWorkspace › the rail target", () => {
     // A portal, like Settings and the Asset library — not the fullpage slot.
     expect(container.contains(host)).toBe(false);
     expect(screen.getByTestId("brand-panel")).toBeTruthy();
-    expect(screen.getByTestId("brand-page-title").textContent).toBe("Colours");
+    expect(screen.getByTestId("brand-page-title").textContent).toMatch(/^Colors · \d+$/);
     expect(screen.getByTestId("brand-row-colours").getAttribute("aria-current")).toBe("page");
     // The colour token list is the page.
     expect(document.getElementById("design-section-colours")).toBeTruthy();
@@ -71,7 +72,7 @@ describe("BrandWorkspace › the rail target", () => {
   });
 });
 
-describe("BrandWorkspace › ‹ Back to canvas (nothing staged, nothing to guard)", () => {
+describe("BrandWorkspace › ‹ Back to Editor (nothing staged, nothing to guard)", () => {
   it("leaves at once after an edit — the edit is already in the project", async () => {
     const composer = makeFakeComposer();
     const onClose = vi.fn();
@@ -154,4 +155,111 @@ describe("BrandWorkspace › first run", () => {
     expect(utils.queryByTestId("brand-tokens-first-load-banner")).toBeNull();
   });
 
+});
+
+describe("BrandWorkspace › 2L9 shell (B6-B01, GAP-ST-T03)", () => {
+  it("the door names the page the editor kept open", () => {
+    const composer = makeFakeComposer();
+    Object.assign(composer.elements as object, { getActivePage: () => ({ id: "p1", name: "About" }) });
+    const utils = renderWorkspace(composer);
+    expect(utils.getByTestId("brand-back-link").textContent).toBe("Back to Editor · About");
+  });
+
+  it("opened from Site settings, the door goes back to the screen it came from — and not to the canvas", () => {
+    const composer = makeFakeComposer();
+    const onClose = vi.fn();
+    requestBrandReturn(composer, { screen: "security" });
+    const utils = renderWorkspace(composer, { onClose });
+    expect(utils.getByTestId("brand-back-link").textContent).toBe("Back to Site settings");
+    fireEvent.click(utils.getByTestId("brand-back-link"));
+    expect(composer.emit).toHaveBeenCalledWith("panel:open", { panel: "settings", screen: "security" });
+    expect(onClose).not.toHaveBeenCalled();
+    // Read once: the next visit is an ordinary one.
+    utils.unmount();
+    expect(renderWorkspace(makeFakeComposer()).getByTestId("brand-back-link").textContent).toBe("Back to Editor");
+  });
+
+  it("every page carries the strap; the header has Review changes and Restore points, and no Undo / Redo (one undo)", () => {
+    const utils = renderWorkspace(makeFakeComposer());
+    expect(utils.getByTestId("brand-page-strap").textContent).toBe("Changes apply as you edit — undo any time");
+    expect(utils.getByTestId("brand-session-edits").textContent).toBe("Review changes");
+    expect(utils.getByTestId("brand-restore-points-action")).toBeTruthy();
+    const names = [...utils.getByTestId("brand-panel").querySelectorAll("button")].map((b) => b.textContent?.trim() ?? "");
+    expect(names.filter((n) => /^(Undo|Redo)\b/.test(n))).toEqual([]);
+  });
+});
+
+describe("BrandWorkspace › Review changes copy (B6-B41)", () => {
+  it("the list is 'Changes this session'", () => {
+    const utils = renderWorkspace(makeFakeComposer());
+    fireEvent.click(utils.getByTestId("brand-session-edits"));
+    expect(utils.getByTestId("brand-session-edits-list").querySelector("h3")?.textContent).toBe("Changes this session");
+  });
+});
+
+describe("BrandWorkspace › offline (B6-B43)", () => {
+  it("says edits still apply; Restore points waits for a connection", () => {
+    const spy = vi.spyOn(navigator, "onLine", "get").mockReturnValue(false);
+    try {
+      const utils = renderWorkspace(makeFakeComposer());
+      expect(utils.getByTestId("brand-offline-banner").textContent).toBe(
+        "You’re offline. Token edits still apply here and save when you reconnect. Restore points and reading a website need a connection.",
+      );
+      expect((utils.getByTestId("brand-restore-points-action") as HTMLButtonElement).disabled).toBe(true);
+      expect(utils.getByText("Restore points need a connection")).toBeTruthy();
+    } finally {
+      spy.mockRestore();
+    }
+  });
+
+  it("back online, the banner goes", () => {
+    const spy = vi.spyOn(navigator, "onLine", "get").mockReturnValue(false);
+    const utils = renderWorkspace(makeFakeComposer());
+    spy.mockReturnValue(true);
+    act(() => {
+      window.dispatchEvent(new Event("online"));
+    });
+    expect(utils.queryByTestId("brand-offline-banner")).toBeNull();
+    spy.mockRestore();
+  });
+});
+
+describe("BrandWorkspace › compact under 1440 (B6-B51…B53)", () => {
+  function compactMedia() {
+    Object.defineProperty(window, "matchMedia", {
+      writable: true,
+      value: vi.fn().mockImplementation((q: string) => ({
+        matches: q === "(max-width: 1439px)", media: q,
+        addEventListener: vi.fn(), removeEventListener: vi.fn(),
+        addListener: vi.fn(), removeListener: vi.fn(), dispatchEvent: vi.fn(),
+      })),
+    });
+  }
+
+  it("folds the nav behind 'Brand navigation' and the preview behind 'Show website preview'", () => {
+    compactMedia();
+    const utils = renderWorkspace(makeFakeComposer());
+    expect(utils.queryAllByTestId("brand-nav-group")).toHaveLength(0);
+    expect(utils.queryByTestId("brand-preview-column")).toBeNull();
+
+    fireEvent.click(utils.getByTestId("brand-compact-nav"));
+    expect(utils.getAllByTestId("brand-nav-group")).toHaveLength(3);
+    fireEvent.click(utils.getByTestId("brand-row-starters"));
+    expect(utils.getByTestId("brand-page-title").textContent).toBe("Starters");
+    expect(utils.queryAllByTestId("brand-nav-group")).toHaveLength(0);
+
+    const toggle = utils.getByTestId("brand-compact-preview");
+    expect(toggle.textContent).toBe("Show website preview");
+    fireEvent.click(toggle);
+    expect(utils.getByTestId("brand-preview-column")).toBeTruthy();
+    expect(utils.getByTestId("brand-pane").className).toContain("tw:hidden");
+    expect(toggle.textContent).toBe("Hide website preview");
+  });
+
+  it("at 1440 nothing folds", () => {
+    const utils = renderWorkspace(makeFakeComposer());
+    expect(utils.queryByTestId("brand-compact-nav")).toBeNull();
+    expect(utils.getAllByTestId("brand-nav-group")).toHaveLength(3);
+    expect(utils.getByTestId("brand-preview-column")).toBeTruthy();
+  });
 });

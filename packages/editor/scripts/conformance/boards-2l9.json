@@ -9186,7 +9186,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Shell: nav flat \"Colours…\" vs grouped Tokens/Reusable styles/Tools; \"Back to canvas\" vs \"‹ Back to Editor · Home\"; table vs Edit› cards; \"+ "
+   "verifiedNote": "L-D S1: nav grouped Tokens/Reusable styles/Tools, \"‹ Back to Editor · {page}\", title \"Colors · n\", strap, \"+ Add color\" · \"Generate scale\". Open: Edit › cards (deferred), resource-area mount (REQUESTS #10), Restore points ▾ popover (B39). Built, not compared."
   },
   {
    "nodeId": "203:34125",
@@ -9217,7 +9217,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Copy \"Enter a valid hex like #3B82F6\" vs board \"Enter a valid hex color, such as #1A56DB. The token hasn’t changed.\""
+   "verifiedNote": "L-D S8: \"Enter a valid hex color, such as #1A56DB. The token hasn’t changed.\" (ColorPicker). Drill-in layout open (B02). Built, not compared."
   },
   {
    "nodeId": "203:35106",
@@ -9225,9 +9225,9 @@
    "page": "05",
    "family": "brand",
    "status": "active",
-   "authority": "board",
+   "authority": "code:autosave-no-leave-guard",
    "verified": "no",
-   "verifiedNote": "No leave guard: code contract is autosave, \"no leave guard\" (BrandWorkspace.tsx:34, :279). Pending/failed/offline save guard needs lane deci"
+   "verifiedNote": "Brand Part 1a spec §4: every Brand edit is a composer write saved by project autosave; leaving Brand is in-app navigation and discards nothing (the board says so). Pending/failed save lives in the bottom-bar status (Phase 1). No guard built."
   },
   {
    "nodeId": "203:35333",
@@ -9248,7 +9248,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Rows apply on click; board lists \"From logo or URL ›\" as a 6th starter row (code: separate \"Your own brand\" card behind dsAi)"
+   "verifiedNote": "L-D S6: \"Choose a starting point\" + \"Preview a palette before applying it to your site.\", › rows, \"From logo or URL ›\" last (dsAi only, authority for that row's gate: code:dsai-flag). Built, not compared."
   },
   {
    "nodeId": "203:36082",
@@ -9258,7 +9258,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No starter preview: row click applies at once (StartersSection.tsx:81-82); no \"Preview only\" pane, Cancel/Apply"
+   "verifiedNote": "L-D S6: row opens a preview through the Brand preview layer (no write): name, \"Preview only · Your Brand is unchanged\", \"{n} colors will change. Typography and spacing stay as they are.\", Cancel · Apply starter. \"Previewing {name}\" label over the preview not drawn. Built, not compared."
   },
   {
    "nodeId": "203:36613",
@@ -9268,7 +9268,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No restore point before starter apply (useApplyStarter has none)"
+   "verifiedNote": "L-D S6: Apply → \"Preparing…\" + \"Creating “Before {name}” restore point. No Brand changes applied yet.\"; restore reason `starter` added to the shared schema (router test). Built, not compared."
   },
   {
    "nodeId": "203:36801",
@@ -9278,7 +9278,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Applies without receipt; board receipt carries an Undo button — conflicts with one-undo (topbar only, Task 1.2)"
+   "verifiedNote": "L-D S6: applied → Colors page + receipt \"Applied {name}. Restore point created.\" with Undo → composer.history.undo (one undo). Built, not compared."
   },
   {
    "nodeId": "203:37025",
@@ -9288,7 +9288,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No checkpoint step for starters, so no \"Couldn’t create a restore point\" error state"
+   "verifiedNote": "L-D S6: no restore point → \"Couldn’t create a restore point. Nothing was applied. Retry or cancel the preview.\", Cancel · Retry, nothing written. Built, not compared."
   },
   {
    "nodeId": "203:37214",
@@ -9379,7 +9379,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Toast \"Tokens connected · Undo ⌘Z\" vs receipt with Undo button (one-undo conflict) over remaining finding"
+   "verifiedNote": "L-D S5: receipt \"Connected {n} color usages.\" + Undo → composer.history.undo (one undo). No \"Before connect\" restore point exists (1b OQ-4), so that clause is not claimed. Findings list part open (B18). Built, not compared."
   },
   {
    "nodeId": "203:40929",
@@ -9399,7 +9399,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "\"Fonts & type styles\" card; board Heading/Body font selects + font-size token rows with Used by; \"+ Add a font\" vs \"Manage site fonts ›\""
+   "verifiedNote": "L-D S1: nav/title \"Typography\", action \"Manage site fonts ›\". Open: Heading/Body font selects + font-size token rows (deferred). Not compared."
   },
   {
    "nodeId": "207:38727",
@@ -9409,7 +9409,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Presets in ⋯ menu (Compact · 2px…) vs board segmented Compact/Normal/Spacious + Reset to defaults"
+   "verifiedNote": "L-D S3: Compact/Normal/Spacious segmented (aria-pressed) + Reset to defaults + board note; ⋯ menu removed. \"+ Add spacing\" kept (code-ahead). Built, not compared."
   },
   {
    "nodeId": "207:38995",
@@ -9419,7 +9419,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "11 kinds reached by a Select in Spacing header; board index page with one row + description per kind"
+   "verifiedNote": "L-D S1: Other kinds index, 11 rows with the board's descriptions + intro line. Built, not compared."
   },
   {
    "nodeId": "207:39217",
@@ -9429,7 +9429,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Kind list + side card; board \"‹ Other kinds\", \"+ Add radius\", row ⋯ menu Rename/Delete…"
+   "verifiedNote": "L-D S1: kind page has \"‹ Other kinds\" and \"+ Add radius\"; kind Select removed. Open: row ⋯ menu (B54). Built, not compared."
   },
   {
    "nodeId": "207:39439",
@@ -9449,7 +9449,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code splits Styles, Component styles, Presets pages (+ \"Generate with AI\" on Styles, PR#33 removes); board one read-only catalogue"
+   "verifiedNote": "L-D S1: one Type styles · Presets page (Type styles + Presets groups, read-only notes, \"Browse section blocks in Add ›\"); Component styles page folded in. ✦ Generate with AI kept until PR #33. Built, not compared."
   },
   {
    "nodeId": "207:40046",
@@ -9469,7 +9469,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "\"Replace border before deleting?\" vs board \"Delete border?\" + \"Use instead\" select"
+   "verifiedNote": "L-D S8: \"Delete {name}?\", \"{name} is used in {n} places. Choose a compatible color to use there instead. You can undo this.\", \"Use instead\", Replace and delete. Built, not compared."
   },
   {
    "nodeId": "207:40532",
@@ -9479,7 +9479,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Unknown-usage refusal exists (\"Can’t delete …\", Try again); board title \"Can’t delete border yet\" + copy"
+   "verifiedNote": "L-D S8: \"Can’t delete {name} yet\", \"We can’t count where {name} is used right now, so deleting it could break pages. Try again in a moment.\", Close · Retry count. Built, not compared."
   },
   {
    "nodeId": "207:40771",
@@ -9507,9 +9507,9 @@
    "page": "05",
    "family": "brand",
    "status": "active",
-   "authority": "board",
+   "authority": "code:dsai-flag",
    "verified": "drift-open",
-   "verifiedNote": "Not AI (deterministic extract; PR#33 keeps it) but gated by dsAi flag. Copy: \"Start with your brand\"/\"Website URL\" vs board \"Get colors and "
+   "verifiedNote": "Gate: behind the dsAi flag (rule-based extraction, not AI; PR #33 keeps it) — authority code:dsai-flag. L-D S7: \"From logo or URL\" + board intro, URL field + \"Get colors and fonts\", \"or\", \"Upload a logo (PNG or SVG)\" · \"Read in your browser\" (drop target kept). Starters list under it not drawn on this page. Built, not compared."
   },
   {
    "nodeId": "210:37078",
@@ -9517,9 +9517,9 @@
    "page": "05",
    "family": "brand",
    "status": "active",
-   "authority": "board",
+   "authority": "code:dsai-flag",
    "verified": "drift-open",
-   "verifiedNote": "Loading \"Finding your brand…\" progressbar vs board \"Reading… up to 20 seconds\" + Cancel"
+   "verifiedNote": "Gate: behind the dsAi flag (rule-based extraction, not AI; PR #33 keeps it) — authority code:dsai-flag. L-D S7: \"Reading…\" + \"Reading {host}. This can take up to 20 seconds. Nothing changes until you apply.\" + Cancel. Built, not compared."
   },
   {
    "nodeId": "210:37301",
@@ -9527,9 +9527,9 @@
    "page": "05",
    "family": "brand",
    "status": "active",
-   "authority": "board",
+   "authority": "code:dsai-flag",
    "verified": "drift-open",
-   "verifiedNote": "Copy \"This address can’t be used\" vs board \"fieldwork.studio didn’t allow us to read it…\""
+   "verifiedNote": "Gate: behind the dsAi flag (rule-based extraction, not AI; PR #33 keeps it) — authority code:dsai-flag. L-D S7: \"{host} didn’t allow us to read it. Upload your logo instead, or try another address. Nothing was changed.\" Built, not compared."
   },
   {
    "nodeId": "210:37520",
@@ -9537,9 +9537,9 @@
    "page": "05",
    "family": "brand",
    "status": "active",
-   "authority": "board",
+   "authority": "code:dsai-flag",
    "verified": "drift-open",
-   "verifiedNote": "Copy \"That site took too long to answer\" vs board \"This took too long and was stopped…\" + Try again"
+   "verifiedNote": "Gate: behind the dsAi flag (rule-based extraction, not AI; PR #33 keeps it) — authority code:dsai-flag. L-D S7: \"This took too long and was stopped. Nothing was changed. Try again, or upload your logo.\" + Try again. Built, not compared."
   },
   {
    "nodeId": "210:37740",
@@ -9547,9 +9547,9 @@
    "page": "05",
    "family": "brand",
    "status": "active",
-   "authority": "board",
+   "authority": "code:dsai-flag",
    "verified": "drift-open",
-   "verifiedNote": "\"Preview extracted brand\" vs board \"Result from …\" token→value rows with Used by, Light/Dark locked note"
+   "verifiedNote": "Gate: behind the dsAi flag (rule-based extraction, not AI; PR #33 keeps it) — authority code:dsai-flag. L-D S7: title \"Result from {host}\", \"Found {n} colors and {m} fonts. They map to your existing tokens.\", restore-point line, Cancel · Apply. Token→value rows with Used by still chips (open). Built, not compared."
   },
   {
    "nodeId": "210:37943",
@@ -9557,9 +9557,9 @@
    "page": "05",
    "family": "brand",
    "status": "active",
-   "authority": "board",
+   "authority": "code:dsai-flag",
    "verified": "drift-open",
-   "verifiedNote": "Success strip + toast \"Brand applied · Undo ⌘Z\" vs receipt Undo button (one-undo conflict)"
+   "verifiedNote": "Gate: behind the dsAi flag (rule-based extraction, not AI; PR #33 keeps it) — authority code:dsai-flag. L-D S5 receipt with Undo → composer.history.undo. Built, not compared."
   },
   {
    "nodeId": "210:38222",
@@ -9567,9 +9567,9 @@
    "page": "05",
    "family": "brand",
    "status": "active",
-   "authority": "board",
+   "authority": "code:dsai-flag",
    "verified": "no",
-   "verifiedNote": "No offline state for website read"
+   "verifiedNote": "Gate: behind the dsAi flag (rule-based extraction, not AI; PR #33 keeps it) — authority code:dsai-flag. L-D S7: offline → \"Needs a connection to read a website. You can still upload a logo; it is read in your browser.\", website read disabled, logo live (useOnline). Built, not compared."
   },
   {
    "nodeId": "210:38443",
@@ -9589,7 +9589,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Toast \"Brand restored · Undo ⌘Z\" vs receipt with count + Undo button (one-undo conflict)"
+   "verifiedNote": "L-D S5: receipt \"Restored “{point}”.\" + Undo → composer.history.undo. Places count not available client-side, dropped. Built, not compared."
   },
   {
    "nodeId": "210:38897",
@@ -9599,7 +9599,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Popover exists with Revert; copy \"Edits in this session…\" vs board \"Changes this session\", \"Review changes · 3\""
+   "verifiedNote": "L-D S1/S8: trigger \"Review changes · n\" (no count at 0), list title \"Changes this session\", footer \"Revert is added to Undo history like any edit.\" Row shape (name, was → now) unchanged. Built, not compared."
   },
   {
    "nodeId": "212:37895",
@@ -9619,7 +9619,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No offline banner (\"Token edits still apply here…\")"
+   "verifiedNote": "L-D S9: offline banner with the board copy (useOnline), Restore points disabled with \"Restore points need a connection\"; edits stay live. Built, not compared."
   },
   {
    "nodeId": "212:38369",
@@ -9629,7 +9629,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "phase1: save-failed + retry lives in bottom-bar status; Brand has no own state"
+   "verifiedNote": "Not L-D: the board draws no Brand UI beyond the bottom-bar save status + Retry (Phase 1 / lead)."
   },
   {
    "nodeId": "212:38600",
@@ -9637,9 +9637,9 @@
    "page": "05",
    "family": "brand",
    "status": "active",
-   "authority": "board",
+   "authority": "code:autosave-no-leave-guard",
    "verified": "no",
-   "verifiedNote": "No leave guard: code contract is autosave, \"no leave guard\" (BrandWorkspace.tsx:34, :279). Pending/failed/offline save guard needs lane deci"
+   "verifiedNote": "As 203:35106 — save failure retries from the shell status; leaving Brand loses nothing. No guard built."
   },
   {
    "nodeId": "212:38857",
@@ -9649,7 +9649,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Read-only banner exists; copy \"This site’s brand was rolled back — editing is paused.\" vs board \"on hold… not about your access\""
+   "verifiedNote": "Copy lives in src/shared/constants/brandReadOnly.ts (outside L-D) → REQUESTS #12. Board's title line \"Editing is paused while the Brand update is on hold\" + no Edit › on read-only rows still open."
   },
   {
    "nodeId": "212:39093",
@@ -9680,7 +9680,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Toast only; board result card with counts matching dry-run + receipt Undo (one-undo conflict)"
+   "verifiedNote": "L-D S5: receipt \"Imported {n} tokens. One Undo reverts the import.\" + Undo → composer.history.undo. Result card with counts open (deferred). Built, not compared."
   },
   {
    "nodeId": "212:39840",
@@ -9700,7 +9700,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No compact layout: fixed 256 nav + 468 preview; no \"Brand navigation\"/\"Show website preview\" toggles"
+   "verifiedNote": "L-D S10: under 1440 wide (matchMedia max-width 1439px) the nav folds behind \"Brand navigation\" and the preview behind \"Show website preview\". Built, not compared."
   },
   {
    "nodeId": "212:40324",
@@ -9710,7 +9710,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No compact layout: fixed 256 nav + 468 preview; no \"Brand navigation\"/\"Show website preview\" toggles"
+   "verifiedNote": "L-D S10: \"Brand navigation\" opens a popover with \"Brand\" + the three nav groups; choosing a row closes it. Built, not compared."
   },
   {
    "nodeId": "212:40564",
@@ -9720,7 +9720,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No compact layout: fixed 256 nav + 468 preview; no \"Brand navigation\"/\"Show website preview\" toggles"
+   "verifiedNote": "L-D S10: \"Show website preview\" swaps the list for the preview; label becomes \"Hide website preview\". Built, not compared."
   },
   {
    "nodeId": "213:39075",
@@ -10051,9 +10051,9 @@
    "page": "05",
    "family": "brand",
    "status": "active",
-   "authority": "board",
+   "authority": "code:autosave-no-leave-guard",
    "verified": "no",
-   "verifiedNote": "No leave guard: code contract is autosave, \"no leave guard\" (BrandWorkspace.tsx:34, :279). Pending/failed/offline save guard needs lane deci"
+   "verifiedNote": "As 203:35106 — offline edits stay applied and retry; leaving Brand loses nothing. No guard built."
   },
   {
    "nodeId": "219:42880",
@@ -10063,7 +10063,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "\"Can’t count right now\" rows + notice exist; board adds \"Retry count\" button and copy differs"
+   "verifiedNote": "L-D S8: notice \"We can’t count where colors are used right now. Editing still works; deleting is blocked until the count is back.\" + rows \"Can’t count right now\". Open: Retry count button (no recount API in the usage index). Built, not compared."
   },
   {
    "nodeId": "219:43113",
@@ -10083,7 +10083,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Hint \"Dark mode is off for this site\" vs board \"Dark mode is Off. Turn it on in Tools › Dark mode.\""
+   "verifiedNote": "L-D S8: Dark segment hint \"Dark mode is Off. Turn it on in Tools › Dark mode.\" (title tooltip). Built, not compared."
   },
   {
    "nodeId": "219:43600",
@@ -10093,7 +10093,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "phase1: topbar Undo tooltip naming last action belongs to Task 1.2 (one undo)"
+   "verifiedNote": "Not L-D: topbar Undo tooltip naming the last action is Task 1.2's control (lead)."
   },
   {
    "nodeId": "220:42592",
@@ -15120,7 +15120,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Brand has only \"‹ Back to canvas\" (design-system/ui/BrandWorkspace.tsx:254); no return to Site settings (L-D)"
+   "verifiedNote": "L-D S1: BrandWorkspace door reads \"‹ Back to Site settings\" and reopens Settings at the screen it came from (requestBrandReturn); reachable once REQUESTS #11 lands in SettingsTab. Board's Undo|Redo in the Brand header not adopted (one undo). Built, not compared."
   },
   {
    "nodeId": "277:27746",
@@ -15917,7 +15917,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Brand has only \"‹ Back to canvas\" (design-system/ui/BrandWorkspace.tsx:254); no return to Site settings (L-D)"
+   "verifiedNote": "L-D S1: same door as 277:27516 (screen = the discarded Security draft's screen). Needs REQUESTS #11. Built, not compared."
   },
   {
    "nodeId": "277:107940",
@@ -15927,7 +15927,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Brand has only \"‹ Back to canvas\" (design-system/ui/BrandWorkspace.tsx:254); no return to Site settings (L-D)"
+   "verifiedNote": "L-D S1: same door as 277:27516. Needs REQUESTS #11. Built, not compared."
   },
   {
    "nodeId": "277:336979",
@@ -18348,7 +18348,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Brand has only \"‹ Back to canvas\" (design-system/ui/BrandWorkspace.tsx:254); no return to Site settings (L-D)"
+   "verifiedNote": "L-D S1: same door as 277:27516 (returns to Languages). Needs REQUESTS #11. Built, not compared."
   },
   {
    "nodeId": "278:68065",

@@ -28,7 +28,7 @@ import {
   useRadiusRegistry, useShadowRegistry, useMotionRegistry,
   useBorderRegistry, useOpacityRegistry, useZindexRegistry,
   useBreakpointRegistry, useGridRegistry, useSizingRegistry,
-  useIconRegistry, useImageryRegistry,
+  useIconRegistry, useImageryRegistry, useProjectTokenStore,
 } from "@/editor/design-system/state/TokenRegistryContext";
 import type { DesignToken } from "@/editor/design-system/types";
 /* Was `"replace" | "keep-mine" | "keep-theirs"`. `handleApply` filtered on
@@ -121,6 +121,7 @@ export const ImportCard: React.FC = () => {
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const apply = useImportTokens();
+  const { undo } = useProjectTokenStore();
   const { addToast } = useToast();
 
   // Snapshot of the union of current tokens — drives the diff calc. Reading
@@ -220,13 +221,15 @@ export const ImportCard: React.FC = () => {
       addToast({ title: "Import failed", description: "Nothing was imported — the brand can't be changed right now.", tone: "error" });
       return;
     }
+    /* B6-B49's receipt; its Undo is the one undo (composer.history). The
+       skipped ids stay named — "2 skipped" alone named nothing to act on. */
+    const imported = stats.modified + stats.added;
     addToast({
-      /* `ImportStats.skipped` has always carried the ids; the toast reported
-         only its length, so "2 skipped" named nothing the user could act on. */
       description:
-        `Imported · ${stats.modified} modified · ${stats.added} added` +
-        (stats.skipped.length ? ` · skipped ${stats.skipped.join(", ")}` : ""),
+        `Imported ${imported} token${imported === 1 ? "" : "s"}. One Undo reverts the import.` +
+        (stats.skipped.length ? ` Skipped ${stats.skipped.join(", ")}.` : ""),
       tone: "success",
+      action: { label: "Undo", onClick: () => { undo(); } },
     });
     handleCancel();
   };

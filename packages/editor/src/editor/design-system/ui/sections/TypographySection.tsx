@@ -109,16 +109,6 @@ export function typeStyleRows(source: readonly DesignToken[]): Array<{ id: strin
     });
 }
 
-/** "N roles · M active fonts" — the page header's caption. */
-export function fontsCaption(tokens: readonly DesignToken[]): string {
-  const families = new Set(
-    FONT_SLOTS.map(({ id }) => familyOf(resolveTokenLiteral(tokens, id, "light") ?? "").toLowerCase())
-      .filter(Boolean),
-  );
-  const roles = FONT_SLOTS.filter(({ id }) => tokens.some((t) => t.id === id)).length;
-  return `${roles} role${roles === 1 ? "" : "s"} · ${families.size} active font${families.size === 1 ? "" : "s"}`;
-}
-
 
 
 /** `"Inter Tight"` and `Inter Tight, sans-serif` both name the same family. */

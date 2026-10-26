@@ -10,7 +10,7 @@
  * — never saved, never in the undo history. It used to call
  * `composer.colorMode.set`, which persisted a global, all-sites preference.
  * The site's Dark mode (Off / Auto) is the separate, saved setting; while it
- * is Off the Dark segment is disabled with "Dark mode is off for this site"
+ * is Off the Dark segment is disabled with "Dark mode is Off. Turn it on in Tools › Dark mode." (B6-B61)
  * (an Off site publishes light only). The workspace owns the state.
  *
  * @license BSD-3-Clause
@@ -28,7 +28,7 @@ export interface ColorModeToggleProps {
   locked?: boolean;
 }
 
-const OFF_HINT = "Dark mode is off for this site";
+const OFF_HINT = "Dark mode is Off. Turn it on in Tools › Dark mode.";
 
 export const ColorModeToggle: React.FC<ColorModeToggleProps> = ({ theme, onChange, siteOff, locked = false }) => (
   <div

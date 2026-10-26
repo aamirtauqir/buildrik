@@ -56,7 +56,7 @@ describe("BrandWorkspace › Import / export", () => {
     expect(utils.queryByTestId("brand-preview-column")).toBeNull();
     expect(utils.getByTestId("import-drop-zone").textContent).toContain("Drop tokens.json — JSON only");
     fireEvent.click(utils.getByTestId("brand-io-close"));
-    expect(utils.getByTestId("brand-page-title").textContent).toBe("Colours");
+    expect(utils.getByTestId("brand-page-title").textContent).toMatch(/^Colors · \d+$/);
   });
 
   it("4418:168885: Dark strategy, EXPORT and IMPORT share one panel, above the preview", async () => {
@@ -94,7 +94,7 @@ describe("BrandWorkspace › Import / export", () => {
     await importViaPaste(utils, COLOR_PAYLOAD("color-primary", "Primary", "#FF00AA"));
 
     // G3-123: no status pill band — the import toast says it.
-    expect(await utils.findByText(/^Imported · /)).toBeTruthy();
+    expect(await utils.findByText(/^Imported \d+ tokens?\. One Undo reverts the import\./)).toBeTruthy();
     expect(utils.queryByTestId("brand-section-status-imported")).toBeNull();
     expect(utils.queryByTestId("brand-section-status")).toBeNull();
     expect(composer.designSystem.setTokens).toHaveBeenCalledTimes(1);
@@ -162,7 +162,8 @@ describe("BrandWorkspace › Presets (StylesSection drill-in)", () => {
   });
 });
 
-describe("BrandWorkspace › Component styles — AI assist entry", () => {
+/* blocked:pr33-ai-removal — the entry stays on Type styles · Presets until PR #33 deletes it. */
+describe("BrandWorkspace › Type styles · Presets — AI assist entry", () => {
   function makeAiComposer() {
     const composer = makeFakeComposer();
     const events = new EventEmitter();
@@ -175,7 +176,7 @@ describe("BrandWorkspace › Component styles — AI assist entry", () => {
 
   function openComponents(utils: ReturnType<typeof renderWorkspace>) {
     act(() => {
-      openPage(utils, "component-styles");
+      openPage(utils, "styles");
     });
     return utils.container.querySelector<HTMLButtonElement>("[data-open-ai-assist]")!;
   }
@@ -308,14 +309,13 @@ describe("BrandWorkspace › the Light / Dark switch is preview-only (L4-021, BR
   });
 });
 
-describe("BrandWorkspace › Component styles — a section row hands off to Add › Blocks", () => {
+describe("BrandWorkspace › Type styles · Presets — Browse section blocks in Add › (B6-B26)", () => {
   it("clean: closes Brand, switches to Add and asks for BLOCKS", () => {
     const composer = makeFakeComposer();
     const onClose = vi.fn();
     const utils = renderWorkspace(composer, { onClose });
-    act(() => openPage(utils, "component-styles"));
-    const row = utils.container.querySelector<HTMLElement>("[data-section-row]")!;
-    fireEvent.click(row);
+    act(() => openPage(utils, "styles"));
+    fireEvent.click(utils.getByTestId("brand-browse-blocks"));
     expect(onClose).toHaveBeenCalledTimes(1);
     expect(composer.emit).toHaveBeenCalledWith("ui:switch-tab", { tab: "add" });
     expect(composer.emit).toHaveBeenCalledWith("ui:insert-open-group", { group: "blocks" });
@@ -327,8 +327,8 @@ describe("BrandWorkspace › Component styles — a section row hands off to Add
     const utils = await renderOnRadius(composer, { onClose });
     fireEvent.change(utils.radiusInput, { target: { value: "10px" } });
     fireEvent.blur(utils.radiusInput);
-    act(() => openPage(utils, "component-styles"));
-    fireEvent.click(utils.container.querySelector<HTMLElement>("[data-section-row]")!);
+    act(() => openPage(utils, "styles"));
+    fireEvent.click(utils.getByTestId("brand-browse-blocks"));
     expect(onClose).toHaveBeenCalledTimes(1);
     expect(composer.emit).toHaveBeenCalledWith("ui:switch-tab", { tab: "add" });
   });
@@ -345,16 +345,16 @@ describe("BrandWorkspace — opens on a requested token", () => {
     // Read once: a second mount lands on the default page.
     utils.unmount();
     const again = renderWorkspace(composer);
-    expect(again.getByTestId("brand-page-title").textContent).toBe("Colours");
+    expect(again.getByTestId("brand-page-title").textContent).toMatch(/^Colors · \d+$/);
   });
 });
 
-describe("BrandWorkspace › Brand from logo or website (BRP1-M11)", () => {
+describe("BrandWorkspace › From logo or URL (BRP1-M11, behind dsAi — authority code:dsai-flag)", () => {
   it("Starters opens it behind dsAi; the Starters row stays current and the guide card sits in the preview column", async () => {
     const utils = renderWorkspace(makeFakeComposer());
     openPage(utils, "starters");
     fireEvent.click(await waitFor(() => utils.getByTestId("starter-row-from-source")));
-    expect(utils.getByTestId("brand-page-title").textContent).toBe("Brand from logo or website");
+    expect(utils.getByTestId("brand-page-title").textContent).toBe("From logo or URL");
     expect(utils.getByTestId("brand-row-starters").getAttribute("aria-current")).toBe("page");
     expect(utils.getByTestId("brand-from-source")).toBeTruthy();
     expect(utils.getByTestId("brand-from-source-guide")).toBeTruthy();
@@ -366,17 +366,11 @@ describe("BrandWorkspace › Brand from logo or website (BRP1-M11)", () => {
     openPage(utils, "starters");
     await waitFor(() => utils.getByTestId("starter-list"));
     expect(utils.queryByTestId("starter-row-from-source")).toBeNull();
-    openPage(utils, "colours");
-    expect(utils.queryByTestId("brand-colours-from-source")).toBeNull();
   });
 
-  it("Colours' actions row offers it as 'From logo or URL' (8222:232627)", () => {
+  it("Colors draws only the board's two actions — the door is Starters' (B6-B01, B6-B07)", () => {
     const utils = renderWorkspace(makeFakeComposer());
-    const action = utils.getByTestId("brand-colours-from-source");
-    expect(action.textContent).toBe("From logo or URL");
-    expect(utils.getByTestId("brand-colours-actions").lastElementChild).toBe(action);
-    fireEvent.click(action);
-    expect(utils.getByTestId("brand-page-title").textContent).toBe("Brand from logo or website");
-    expect(utils.getByTestId("brand-from-source")).toBeTruthy();
+    const actions = utils.getByTestId("brand-page-actions");
+    expect([...actions.querySelectorAll("button")].map((b) => b.textContent)).toEqual(["+ Add color", "Generate scale"]);
   });
 });

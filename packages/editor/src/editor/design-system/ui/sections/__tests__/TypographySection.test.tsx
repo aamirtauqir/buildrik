@@ -12,7 +12,7 @@
 import { render, screen, cleanup, fireEvent } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { TypographySection, fontsCaption } from "../TypographySection";
+import { TypographySection } from "../TypographySection";
 import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
 
 const TOKENS = [
@@ -190,12 +190,5 @@ describe("Brand · Fonts & type styles — the board's card (7316:81551)", () =>
     render(<TypographySection composer={makeComposer([])} tokens={WITH_SIZES} onSelectToken={onSelectToken} />);
     fireEvent.click(screen.getByTestId("brand-type-row-font-body"));
     expect(onSelectToken).toHaveBeenCalledWith("font-body");
-  });
-
-  it("captions the page: roles and distinct active fonts", () => {
-    expect(fontsCaption(TOKENS)).toBe("3 roles · 3 active fonts");
-    expect(fontsCaption([...TOKENS.slice(0, 2), v6Token({ id: "font-mono", value: "Inter" })])).toBe(
-      "3 roles · 2 active fonts",
-    );
   });
 });

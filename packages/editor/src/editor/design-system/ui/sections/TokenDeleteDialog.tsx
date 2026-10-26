@@ -107,9 +107,9 @@ export const TokenDeleteDialog: React.FC<TokenDeleteDialogProps> = ({
   if (usage === "unknown") {
     body = (
       <>
-        <p className={TITLE} id={titleId}>Can&apos;t delete {name}</p>
+        <p className={TITLE} id={titleId}>Can’t delete {name} yet</p>
         <p className={COPY}>
-          We can&apos;t count usage right now. Nothing has been deleted. Try again when all site content can be checked.
+          We can’t count where {name} is used right now, so deleting it could break pages. Try again in a moment.
         </p>
         {actions(
           <>
@@ -117,7 +117,7 @@ export const TokenDeleteDialog: React.FC<TokenDeleteDialogProps> = ({
               Close
             </Button>
             <Button type="button" variant="secondary" size="xs" className={SECONDARY} onClick={onRetry} data-testid="brand-token-delete-retry">
-              Try again
+              Retry count
             </Button>
           </>,
         )}
@@ -141,16 +141,16 @@ export const TokenDeleteDialog: React.FC<TokenDeleteDialogProps> = ({
       </>
     );
   } else {
-    const elements = `${usage} element${usage === 1 ? "" : "s"}`;
+    const elements = `${usage} place${usage === 1 ? "" : "s"}`;
     body = (
       <>
-        <p className={TITLE} id={titleId}>Replace {name} before deleting?</p>
+        <p className={TITLE} id={titleId}>Delete {name}?</p>
         <p className={COPY}>
-          {name} is used by {elements}. Choose a replacement so every element keeps a valid {isColour ? "colour" : "value"}.
+          {name} is used in {elements}. Choose a compatible {isColour ? "color" : "value"} to use there instead. You can undo this.
         </p>
         <div className="tw:flex tw:w-full tw:flex-col tw:gap-1">
           <span className="tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink-soft)]" id={`${listId}-label`}>
-            Replace with
+            Use instead
           </span>
           {/* 8224:232259: a 32-tall select-like field; its options open
               under it (8228:232587), open by default — the list is the pick. */}
@@ -207,7 +207,7 @@ export const TokenDeleteDialog: React.FC<TokenDeleteDialogProps> = ({
         )}
         {picked && (
           <p className={COPY}>
-            {elements} will use {nameOf(picked)}. Undo the replacement and deletion with one ⌘Z.
+            {elements[0].toUpperCase() + elements.slice(1)} will use {nameOf(picked)}. One Undo restores both.
           </p>
         )}
         {actions(
