@@ -13266,8 +13266,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/DomainsScreen.tsx:141 — cards/DNS view differ; Make primary + Undo present"
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared 2026-10-26 (wave 2) against the 238:12413 screenshot, probe SettingsTab on Domains at 1440x900 (tRPC stubbed with the board shape: primary, redirect, waiting): one Domains card (720, ruled rows: name · \"Primary · connected · SSL active\" / \"Redirects to primary\" / \"Waiting for DNS\" · Make primary / Check again), \"+ Add domain\", a DNS records card for the waiting domain with \"Add these at your DNS provider. Editing DNS here is Planned.\", toast \"<domain> is now primary\" with Undo. Kept: Manage DNS on each row (owner 2026-10-04: Force HTTPS, Remove). Not drawn: \"checked 2 min ago\" (the domain row carries no last-check time)."
   },
   {
    "nodeId": "238:12721",

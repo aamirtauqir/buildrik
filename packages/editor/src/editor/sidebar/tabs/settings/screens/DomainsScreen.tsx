@@ -8,14 +8,15 @@
  * immediately"). The rows come from `domains.list` on open; none → the one
  * empty card, and right after a remove that card carries `<domain> removed…`.
  *
- * The list (8136:214348): one card per domain, primary first — the name, the
- * PRIMARY badge on the primary, its connection line (`Connected · SSL
- * active`), `Set as primary` on every other domain (→ 8136:214574 →
- * `domains.setPrimary`, ADMIN, verified domains only) and `Manage DNS`; under
- * the cards `Add a domain` (→ AddDomainDialog → `domains.connect`).
- * 8136:214348 draws only `Set as primary` on a non-primary card; `Manage DNS`
- * stays there too by owner decision (2026-10-04) — it is the only way to a
- * non-primary domain's records, Force HTTPS and Remove.
+ * The list (2L9 B8-S09 238:12413): one `Domains` card, primary first, a
+ * ruled row per domain — the name, its status ("Primary · connected · SSL
+ * active", "Redirects to primary", "Waiting for DNS"), and one action: `Make
+ * primary` on a verified domain (→ SetPrimaryDomainDialog →
+ * `domains.setPrimary`, then a toast "<domain> is now primary" with Undo),
+ * `Check again` on one still waiting (`domains.check`). `+ Add domain` closes
+ * the card (→ AddDomainDialog → `domains.connect`). A second card lists the
+ * DNS records of the first domain still waiting. `Manage DNS` stays on every
+ * row by owner decision (2026-10-04) — the only way to Force HTTPS and Remove.
  *
  * `Manage DNS` opens the domain's own view (the header reads `Domains /
  * <domain>`): the Custom domain card — status, `Force HTTPS` (writes
@@ -32,7 +33,7 @@
  */
 
 import * as React from "react";
-import { Button, TextInput, ToggleSwitch } from "@/editor/chrome-ui";
+import { Button, TextInput, ToggleSwitch, useToast } from "@/editor/chrome-ui";
 import { getBuildrikClient } from "@/services/api-client";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { useEditorRole } from "@/editor/shell/hooks/useEditorRole";
@@ -97,11 +98,15 @@ const primaryFirst = (rows: DomainRow[]): DomainRow[] =>
  *  bare ids the search registry points at; the rest stay unique. */
 const nth = (stem: string, i: number) => (i === 0 ? stem : `${stem}-${i}`);
 
-/** 8136:214348's line under each name: where the domain is, and its certificate. */
-function connectionLine(row: Pick<DomainRow, "status" | "sslStatus">): string {
-  if (row.status === "VERIFIED") return `Connected · ${row.sslStatus === "ACTIVE" ? "SSL active" : "SSL pending"}`;
+/** 2L9 B8-S09 238:12413: the row's status — "Primary · connected · SSL
+ *  active", "Redirects to primary", "Waiting for DNS". */
+export function connectionLine(row: Pick<DomainRow, "status" | "sslStatus" | "isPrimary" | "kind">): string {
   if (row.status === "FAILED") return "DNS not found · check your records";
-  return "Waiting for DNS · not connected yet";
+  if (row.status !== "VERIFIED") return "Waiting for DNS";
+  const ssl = row.sslStatus === "ACTIVE" ? "SSL active" : "SSL pending";
+  if (row.isPrimary) return `Primary · connected · ${ssl}`;
+  if (row.kind === "REDIRECT") return "Redirects to primary";
+  return `Connected · ${ssl}`;
 }
 
 /** The server's sentence for a refused set-primary, else ours. */
@@ -124,16 +129,18 @@ const StatusPill: React.FC<{ status: string; "data-testid"?: string }> = ({ stat
 
 const LINE = "tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-soft)]";
 
-/* 8136:214348: a card per domain — 24 in, 16 between the name and its row. */
-const DOMAIN_CARD = `${SET_CARD} tw:flex tw:flex-col tw:gap-4 tw:p-6`;
-const DOMAIN_NAME =
-  "tw:m-0 tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:leading-6 tw:tracking-[-0.16px] tw:text-[var(--bk-ink)]";
-const DOMAIN_LINE = "tw:min-w-0 tw:flex-1 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]";
-/* The board's PRIMARY badge: the accent on its tint, not a status tone. */
-const PRIMARY_BADGE =
-  "tw:inline-flex tw:h-5.5 tw:shrink-0 tw:items-center tw:rounded-full tw:border tw:border-[var(--bk-accent)] tw:bg-[var(--bk-accent-tint)] " +
-  "tw:px-2 tw:text-[length:var(--bk-text-11)] tw:font-medium tw:uppercase tw:leading-4 tw:text-[var(--bk-accent)]";
-/* The row's actions are text buttons — ink 13/500, no box (8136:214538). */
+/* 2L9 B8-S09: one `Domains` card — a hairline-ruled row per domain (name ·
+   status · one action), then `+ Add domain`; a second card lists the DNS
+   records of the first domain still waiting for DNS. */
+const LIST_CARD = `${SET_CARD} tw:flex tw:w-full tw:max-w-180 tw:flex-col tw:p-4`;
+const CARD_TITLE = "tw:m-0 tw:mb-1 tw:text-[length:var(--bk-text-14)] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]";
+const LIST_ROW =
+  "tw:grid tw:min-h-12 tw:grid-cols-[240px_minmax(0,1fr)_auto] tw:items-center tw:gap-3 tw:border-b tw:border-[var(--bk-border)] tw:py-2";
+const ROW_NAME = "tw:truncate tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]";
+const DOMAIN_LINE = "tw:min-w-0 tw:truncate tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]";
+/* The row's actions are accent text links (B8-S09 "Make primary", "Check again"). */
+const ROW_LINK = "tw:h-8 tw:shrink-0 tw:px-0 tw:text-[length:var(--bk-text-13)] tw:font-normal tw:no-underline tw:hover:underline";
+/* The Manage DNS view's back link — ink, no box. */
 const ROW_ACTION = `${SET_BTN} tw:shrink-0 tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-bg-subtle)]`;
 
 // ─── Screen ──────────────────────────────────────────────────────────────────
@@ -149,6 +156,7 @@ export const DomainsScreen: React.FC<ScreenProps> = ({
   readOnly,
 }) => {
   const role = useEditorRole();
+  const { addToast } = useToast();
   // null role = unknown → don't gate in chrome; the server still enforces.
   const canManage = !readOnly && roleAtLeast(role, "ADMIN") !== false;
   const siteName = composer?.getProjectMetadata?.()?.name ?? "";
@@ -265,15 +273,34 @@ export const DomainsScreen: React.FC<ScreenProps> = ({
     }
   };
 
+  /* B8-S09: "<domain> is now primary · Undo" — Undo makes the previous
+     primary primary again through the same mutation. */
   const setPrimary = async () => {
     const target = primaryTarget;
     if (!target || !projectId) return;
+    const previous = rows.find((r) => r.isPrimary && r.id !== target.id) ?? null;
     setBusy({ kind: "primary", id: target.id });
     setPrimaryError(null);
     try {
       await api().setPrimary.mutate({ id: target.id, siteId: projectId });
       setPrimaryTarget(null);
       await relist();
+      addToast({
+        description: `${target.domain} is now primary`,
+        ...(previous
+          ? {
+              action: {
+                label: "Undo",
+                onClick: () => {
+                  void api()
+                    .setPrimary.mutate({ id: previous.id, siteId: projectId })
+                    .then(relist, () => setActionFailed(true));
+                },
+              },
+              duration: 8000,
+            }
+          : {}),
+      });
     } catch (e) {
       setPrimaryError(refusal(e));
     } finally {
@@ -329,6 +356,22 @@ export const DomainsScreen: React.FC<ScreenProps> = ({
       Add a domain
     </Button>
   );
+  const addLink = (
+    <Button
+      type="button"
+      variant="link"
+      size="xs"
+      className={`${ROW_LINK} tw:mt-2 tw:w-fit tw:px-3`}
+      disabled={!canManage}
+      title={canManage ? undefined : ADMIN_REASON}
+      onClick={() => setAddOpen(true)}
+      data-testid="set-dom-add"
+    >
+      + Add domain
+    </Button>
+  );
+  /* The DNS card follows the first domain still waiting for DNS. */
+  const waiting = rows.find((r) => r.status !== "VERIFIED") ?? null;
 
   const dialogs = (
     <>
@@ -516,51 +559,83 @@ export const DomainsScreen: React.FC<ScreenProps> = ({
               {removedDomain} removed.
             </div>
           ) : null}
-          {rows.map((row, i) => (
-            <section key={row.id} className={DOMAIN_CARD} data-testid={`set-dom-item-${row.id}`}>
-              <h3 className={DOMAIN_NAME} id={i === 0 ? "dom-domain" : undefined}>
-                {row.domain}
-              </h3>
-              <div className="tw:flex tw:min-h-8 tw:items-center tw:gap-4">
-                {row.isPrimary ? (
-                  <span className={PRIMARY_BADGE} id={i === 0 ? "dom-primary" : undefined} data-testid={`set-dom-primary-${row.id}`}>
-                    Primary
-                  </span>
-                ) : null}
-                <span className={DOMAIN_LINE} data-testid={`set-dom-line-${row.id}`}>
+          <section className={LIST_CARD} data-testid="set-card-domains">
+            <h3 className={CARD_TITLE}>Domains</h3>
+            {rows.map((row, i) => (
+              <div key={row.id} className={LIST_ROW} data-testid={`set-dom-item-${row.id}`}>
+                <span className={ROW_NAME} id={i === 0 ? "dom-domain" : undefined}>
+                  {row.domain}
+                </span>
+                <span className={DOMAIN_LINE} id={row.isPrimary && i === 0 ? "dom-primary" : undefined} data-testid={`set-dom-line-${row.id}`}>
                   {connectionLine(row)}
                 </span>
-                {row.isPrimary ? null : (
+                <span className="tw:flex tw:items-center tw:gap-4">
+                  {row.isPrimary ? null : row.status === "VERIFIED" ? (
+                    <Button
+                      type="button"
+                      variant="link"
+                      size="xs"
+                      className={ROW_LINK}
+                      disabled={!canManage}
+                      title={canManage ? undefined : ADMIN_REASON}
+                      onClick={() => {
+                        setPrimaryError(null);
+                        setPrimaryTarget(row);
+                      }}
+                      data-testid={`set-dom-make-primary-${row.id}`}
+                    >
+                      Make primary
+                    </Button>
+                  ) : (
+                    <Button
+                      type="button"
+                      variant="link"
+                      size="xs"
+                      className={ROW_LINK}
+                      disabled={isBusy("check", row.id)}
+                      onClick={() => void checkDns(row)}
+                      data-testid={`set-dom-check-again-${row.id}`}
+                    >
+                      {isBusy("check", row.id) ? "Checking…" : "Check again"}
+                    </Button>
+                  )}
+                  {/* Owner 2026-10-04: Manage DNS stays — the only way to a
+                      domain's Force HTTPS and Remove (undrawn on 2L9). */}
                   <Button
                     type="button"
+                    variant="link"
                     size="xs"
-                    variant="ghost"
-                    className={ROW_ACTION}
-                    disabled={!canManage || row.status !== "VERIFIED"}
-                    title={!canManage ? ADMIN_REASON : row.status !== "VERIFIED" ? VERIFY_FIRST : undefined}
-                    onClick={() => {
-                      setPrimaryError(null);
-                      setPrimaryTarget(row);
-                    }}
-                    data-testid={`set-dom-make-primary-${row.id}`}
+                    className={`${ROW_LINK} tw:text-[var(--bk-ink-muted)]`}
+                    onClick={() => setManagingId(row.id)}
+                    data-testid={`set-dom-manage-${row.id}`}
                   >
-                    Set as primary
+                    Manage DNS
                   </Button>
-                )}
-                <Button
-                  type="button"
-                  size="xs"
-                  variant="ghost"
-                  className={ROW_ACTION}
-                  onClick={() => setManagingId(row.id)}
-                  data-testid={`set-dom-manage-${row.id}`}
-                >
-                  Manage DNS
-                </Button>
+                </span>
               </div>
+            ))}
+            {addLink}
+          </section>
+          {waiting ? (
+            <section className={LIST_CARD} data-testid="set-card-dns-waiting">
+              <h3 className={CARD_TITLE}>{`DNS records for ${waiting.domain}`}</h3>
+              <p className="tw:m-0 tw:mb-1 tw:text-[length:var(--bk-text-12)] tw:leading-5 tw:text-[var(--bk-ink-muted)]">
+                Add these at your DNS provider. Editing DNS here is Planned.
+              </p>
+              {waiting.dnsRecords.map((rec, j) => (
+                <div
+                  key={`${rec.type}-${rec.host}-${j}`}
+                  className="tw:grid tw:min-h-11 tw:grid-cols-[240px_minmax(0,1fr)] tw:items-center tw:gap-3 tw:border-b tw:border-[var(--bk-border)] tw:text-[length:var(--bk-text-13)] tw:leading-5"
+                  data-testid={`set-dom-waiting-row-${j}`}
+                >
+                  <span className="tw:whitespace-pre tw:text-[var(--bk-ink)]">{`${rec.type}   ${rec.host}`}</span>
+                  <span className="tw:truncate tw:text-[var(--bk-ink-muted)]" title={rec.value}>
+                    {rec.value}
+                  </span>
+                </div>
+              ))}
             </section>
-          ))}
-          {addButton}
+          ) : null}
         </>
       )}
       {dialogs}

@@ -1,7 +1,7 @@
 /**
  * DomainsScreen tests — 8136:214348 (several) / 8136:214574 (set-primary
  * confirm): one card per domain, primary first, with its PRIMARY badge and
- * connection line; `Set as primary` → confirm → `domains.setPrimary` → re-list;
+ * connection line; `Make primary` → confirm → `domains.setPrimary` → re-list;
  * `Manage DNS` → the domain's own view (Custom domain + DNS records cards:
  * Force HTTPS → update, Check DNS → check, Remove → confirm → remove); `Add a
  * domain` under the cards → AddDomainDialog → connect → re-list; the empty
@@ -13,6 +13,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent, act, waitFor, cleanup, within } from "@testing-library/react";
 import * as React from "react";
 import { createMockComposer } from "@/editor/sidebar/__tests__/test-utils/mockComposer";
+import { ToastProvider } from "@/editor/chrome-ui";
 
 const { api } = vi.hoisted(() => ({
   api: {
@@ -106,6 +107,7 @@ function setup(
       saveError={opts.saveError}
       readOnly={opts.readOnly}
     />,
+    { wrapper: ToastProvider },
   );
   return { composer, ...utils };
 }
@@ -120,34 +122,44 @@ async function manage(id = "dom1") {
   await waitFor(() => expect(screen.getByTestId(`set-dom-card-${id}`)).toBeInTheDocument());
 }
 
-describe("DomainsScreen — 8136:214348, one card per domain", () => {
-  it("lists the domains primary first: name, PRIMARY badge, connection line, Set as primary on the others, Manage DNS on each", async () => {
-    d.list.query.mockResolvedValue([{ ...shop(), status: "VERIFIED", sslStatus: "ACTIVE" }, bella()]);
+describe("DomainsScreen — 2L9 B8-S09 238:12413, one Domains card", () => {
+  it("lists the domains primary first in one card: name, status line, Make primary on a verified other, Manage DNS on each", async () => {
+    d.list.query.mockResolvedValue([
+      { ...shop(), status: "VERIFIED", sslStatus: "ACTIVE" },
+      bella(),
+      { ...shop(), id: "dom3", domain: "www.bellacucina.com", status: "VERIFIED", kind: "REDIRECT" },
+    ]);
     setup();
     await loaded();
+    const card = screen.getByTestId("set-card-domains");
+    expect(within(card).getByRole("heading").textContent).toBe("Domains");
     const items = screen.getAllByTestId(/^set-dom-item-/);
-    expect(items.map((c) => c.getAttribute("data-testid"))).toEqual(["set-dom-item-dom1", "set-dom-item-dom2"]);
+    expect(items.map((c) => c.getAttribute("data-testid"))).toEqual(["set-dom-item-dom1", "set-dom-item-dom2", "set-dom-item-dom3"]);
     expect(items[0]).toHaveTextContent("bellacucina.com");
-    expect(screen.getByTestId("set-dom-primary-dom1")).toHaveTextContent("Primary");
-    expect(screen.getByTestId("set-dom-primary-dom1").id).toBe("dom-primary");
-    expect(screen.queryByTestId("set-dom-primary-dom2")).toBeNull();
-    expect(screen.getByTestId("set-dom-line-dom1")).toHaveTextContent("Connected · SSL active");
+    expect(screen.getByTestId("set-dom-line-dom1")).toHaveTextContent("Primary · connected · SSL active");
+    expect(screen.getByTestId("set-dom-line-dom1").id).toBe("dom-primary");
+    expect(screen.getByTestId("set-dom-line-dom3")).toHaveTextContent("Redirects to primary");
     expect(screen.queryByTestId("set-dom-make-primary-dom1")).toBeNull();
-    expect(screen.getByTestId("set-dom-make-primary-dom2")).toHaveTextContent("Set as primary");
+    expect(screen.getByTestId("set-dom-make-primary-dom2")).toHaveTextContent("Make primary");
     expect(screen.getByTestId("set-dom-manage-dom1")).toHaveTextContent("Manage DNS");
-    expect(screen.getByTestId("set-dom-manage-dom2")).toHaveTextContent("Manage DNS");
-    expect(screen.getByTestId("set-dom-add")).toHaveTextContent("Add a domain");
+    expect(screen.getByTestId("set-dom-add")).toHaveTextContent("+ Add domain");
+    expect(screen.queryByTestId("set-card-dns-waiting")).toBeNull();
     expect(screen.queryByTestId("set-dom-card-dom1")).toBeNull();
     expect(d.list.query).toHaveBeenCalledWith({ siteId: "s1" });
   });
 
-  it("says where a domain that is not connected stands, and keeps Set as primary off until it is verified", async () => {
+  it("a domain still waiting for DNS says so, offers Check again, and its records get their own card", async () => {
     d.list.query.mockResolvedValue([bella(), shop()]);
     setup();
     await loaded();
-    expect(screen.getByTestId("set-dom-line-dom2")).toHaveTextContent("Waiting for DNS · not connected yet");
-    expect(screen.getByTestId("set-dom-make-primary-dom2")).toBeDisabled();
-    expect(screen.getByTestId("set-dom-make-primary-dom2")).toHaveAttribute("title", "Verify this domain before making it primary");
+    expect(screen.getByTestId("set-dom-line-dom2")).toHaveTextContent("Waiting for DNS");
+    expect(screen.queryByTestId("set-dom-make-primary-dom2")).toBeNull();
+    const waiting = screen.getByTestId("set-card-dns-waiting");
+    expect(within(waiting).getByRole("heading").textContent).toBe("DNS records for shop.bellacucina.com");
+    expect(waiting).toHaveTextContent("Add these at your DNS provider. Editing DNS here is Planned.");
+    expect(screen.getByTestId("set-dom-waiting-row-0")).toHaveTextContent("cname.vercel-dns.com");
+    fireEvent.click(screen.getByTestId("set-dom-check-again-dom2"));
+    await waitFor(() => expect(d.check.mutate).toHaveBeenCalledWith({ id: "dom2", siteId: "s1" }));
   });
 
   it("Manage DNS opens the domain's view: the Custom domain and DNS records cards, the header naming the domain", async () => {
@@ -196,7 +208,7 @@ describe("DomainsScreen — 8136:214348, one card per domain", () => {
     expect(onDirtyChange).not.toHaveBeenCalledWith(true);
   });
 
-  it("read-only disables Add a domain and Set as primary", async () => {
+  it("read-only disables Add domain and Make primary", async () => {
     d.list.query.mockResolvedValue([bella(), { ...shop(), status: "VERIFIED" }]);
     setup({ readOnly: true });
     await loaded();
@@ -205,7 +217,7 @@ describe("DomainsScreen — 8136:214348, one card per domain", () => {
   });
 });
 
-describe("DomainsScreen — Set as primary → 8136:214574", () => {
+describe("DomainsScreen — Make primary → 8136:214574", () => {
   it("names the domain in the confirm; Cancel changes nothing", async () => {
     d.list.query.mockResolvedValue([bella(), { ...shop(), status: "VERIFIED" }]);
     setup();
@@ -220,7 +232,7 @@ describe("DomainsScreen — Set as primary → 8136:214574", () => {
     expect(d.setPrimary.mutate).not.toHaveBeenCalled();
   });
 
-  it("confirm runs domains.setPrimary and the badge moves with the re-list", async () => {
+  it("confirm runs domains.setPrimary, the primary line moves with the re-list, and the toast's Undo sets the old primary back", async () => {
     d.list.query.mockResolvedValue([bella(), { ...shop(), status: "VERIFIED" }]);
     d.setPrimary.mutate.mockImplementation(async () => {
       d.list.query.mockResolvedValue([{ ...shop(), status: "VERIFIED", isPrimary: true }, bella({ isPrimary: false })]);
@@ -231,9 +243,12 @@ describe("DomainsScreen — Set as primary → 8136:214574", () => {
     fireEvent.click(screen.getByTestId("set-dom-make-primary-dom2"));
     fireEvent.click(screen.getByTestId("set-dom-primary-ok"));
     await waitFor(() => expect(d.setPrimary.mutate).toHaveBeenCalledWith({ id: "dom2", siteId: "s1" }));
-    await waitFor(() => expect(screen.getByTestId("set-dom-primary-dom2")).toBeInTheDocument());
-    expect(screen.queryByTestId("set-dom-primary-dom1")).toBeNull();
+    await waitFor(() => expect(screen.getByTestId("set-dom-line-dom2")).toHaveTextContent("Primary · connected"));
+    expect(screen.getByTestId("set-dom-line-dom1")).not.toHaveTextContent("Primary");
     expect(screen.queryByTestId("set-dom-primary-confirm")).toBeNull();
+    expect(await screen.findByText("shop.bellacucina.com is now primary")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Undo" }));
+    await waitFor(() => expect(d.setPrimary.mutate).toHaveBeenLastCalledWith({ id: "dom1", siteId: "s1" }));
   });
 
   it("a refusal stays in the dialog with the server's sentence", async () => {
