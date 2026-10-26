@@ -22,7 +22,7 @@ import { recordTitle } from "@/editor/cms/RecordsTable";
 import { useInspectorField } from "@/editor/inspector/shared/controls/InspectorFieldContext";
 import { ActionRow, NoteRow } from "../behaviourRows";
 import { ChooseSourcePicker } from "./ChooseSourcePicker";
-import { openBindingDetail } from "./bindingDetailStore";
+import { openSubview } from "@/editor/inspector/tabs/subviewStore";
 import { PROPERTY_LABEL, useCmsBinding, type CmsBindingState } from "./useCmsBinding";
 
 /** "Blog · title" — the source as the row names it. */
@@ -121,11 +121,11 @@ export function BindingPropertyRow({ composer, elementId, onOpenCreateCollection
           aria-label={`${label} binding · ${sourceLabel(state)} — open binding`}
           data-testid="binding-open"
           className="bdi-row-content tw:flex tw:cursor-pointer tw:items-start tw:gap-1 tw:rounded-[4px] tw:hover:bg-[var(--bk-bg-subtle)] tw:focus-visible:outline-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]"
-          onClick={() => openBindingDetail(elementId)}
+          onClick={() => openSubview({ kind: "binding", elementId })}
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.key === " ") {
               e.preventDefault();
-              openBindingDetail(elementId);
+              openSubview({ kind: "binding", elementId });
             }
           }}
         >

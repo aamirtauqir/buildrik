@@ -74,6 +74,8 @@ import { CMSCollectionSetupModal } from "@/editor/shell/modals/CMSCollectionSetu
 import { LayersTab } from "@/editor/sidebar/tabs/layers/LayersTab";
 import { InspectorHeader } from "@/editor/inspector/components/InspectorHeader";
 import { ProInspector } from "@/editor/inspector/ProInspector";
+import { useComposerSelection } from "@/editor/canvas/hooks/useComposerSelection";
+import { getBlockById, insertBlock } from "@/blocks/blockRegistry";
 import { Composer } from "@/engine/Composer";
 import { LayersLoadError, LayersNoResults } from "@/editor/panels/layers/components/LayersStateBlocks";
 import { Row as InsertRow } from "@/editor/sidebar/tabs/build/components/GroupSection";
@@ -2273,22 +2275,30 @@ const CASES: Record<string, () => React.ReactElement> = {
   },
   // ── Inspector body (2L9 page 04, lane L-B) ───────────────────────────────
   // The real ProInspector on a fresh composer in the 300 column, one element
-  // of `?type=` (default heading) on a Home page. `?tab=` clicks that tab.
+  // of `?type=` (default heading) on a Home page — or, with `?block=`, that
+  // Insert block (`contact-form` → a form with labelled fields). The panel
+  // follows the composer's selection, so opening a field shows the field.
   "inspector-panel": () => {
     const q = new URLSearchParams(location.search);
     const type = q.get("type") ?? "heading";
     const c = new Composer({} as never);
     const page = c.elements.createPage("Home");
     c.elements.setActivePage(page.id);
-    const el = c.elements.createElement(type as never, { content: "Thoughtful design." } as never);
-    c.elements.addElement(el, page.root.id);
+    const blockId = q.get("block");
+    const block = blockId ? getBlockById(blockId) : undefined;
+    const id = block ? insertBlock(c, block, page.root.id) : undefined;
+    const el = id ? c.elements.getElement(id)! : c.elements.createElement(type as never, { content: "Thoughtful design." } as never);
+    if (!id) c.elements.addElement(el, page.root.id);
     c.selection.select(el);
-    const tab = q.get("tab");
-    if (tab) requestAnimationFrame(() => (document.querySelector(`[role="tab"][id$="-tab-${tab}"]`) as HTMLElement | null)?.click());
+    function Host() {
+      const { selectedElement } = useComposerSelection({ composer: c });
+      const sel = selectedElement ?? el;
+      return <ProInspector composer={c} selectedElement={{ id: sel.getId(), type: sel.getType(), tagName: sel.getTagName() }} />;
+    }
     return (
       <ToastProvider>
         <div data-probe="inspector-panel" className="tw:flex tw:h-[860px] tw:w-[300px] tw:flex-col tw:bg-white">
-          <ProInspector composer={c} selectedElement={{ id: el.getId(), type: el.getType(), tagName: el.getTagName() }} />
+          <Host />
         </div>
       </ToastProvider>
     );

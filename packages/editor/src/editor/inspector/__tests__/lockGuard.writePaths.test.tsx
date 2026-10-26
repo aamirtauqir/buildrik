@@ -129,20 +129,30 @@ describe("P-1 — attribute writers refuse a locked element", () => {
 });
 
 describe("P-1 — structure writers refuse a locked form / slider", () => {
-  it("FormFieldsSection: changing a field's type, Required, and adding a field", () => {
+  it("FormFieldsSection: adding a field and deleting one", () => {
     const form = add("form");
     add("input", { attributes: { type: "text", name: "name", placeholder: "Name" } }, form.getId());
     lock(form);
     render(<FormFieldsSection elementId={form.getId()} composer={composer} isOpen />);
     fireEvent.click(screen.getByRole("button", { name: "+ Add field" }));
     fireEvent.click(screen.getByTestId("form-add-field-input"));
-    fireEvent.click(screen.getAllByTestId("form-field-row")[0]);
+    fireEvent.click(screen.getByRole("button", { name: "Name actions" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Delete" }));
+    expect(form.getChildren()).toHaveLength(1);
+    expect(skipped).toHaveBeenCalled();
+  });
+
+  it("Field block: changing a locked field's type and Required", () => {
+    const form = add("form");
+    const field = add("input", { attributes: { type: "text", name: "name" } }, form.getId());
+    lock(field);
+    render(
+      <TypeBlockSection composer={composer} element={{ id: field.getId(), type: "input" }} targetIds={[field.getId()]} styles={{}} onChange={() => {}} onBatchChange={() => {}} isOpen onToggle={() => {}} />,
+    );
     fireEvent.change(screen.getByRole("combobox", { name: "Type" }), { target: { value: "email" } });
     fireEvent.click(screen.getByRole("checkbox", { name: "Required" }));
-    const fields = form.getChildren();
-    expect(fields).toHaveLength(1);
-    expect(fields[0].getAttribute("type")).toBe("text");
-    expect(fields[0].getAttribute("required")).toBeUndefined();
+    expect(field.getAttribute("type")).toBe("text");
+    expect(field.getAttribute("required")).toBeUndefined();
     expect(skipped).toHaveBeenCalled();
   });
 

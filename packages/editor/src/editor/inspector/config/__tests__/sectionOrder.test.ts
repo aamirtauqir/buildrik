@@ -54,7 +54,7 @@ describe("section order", () => {
   });
 
   it("161:13919 — Heading · Behavior: Visibility, Interactions; no Link", () => {
-    expect(titlesFor("behaviour", "heading")).toEqual(["Visibility", "Interactions", "CSS classes"]);
+    expect(titlesFor("behaviour", "heading")).toEqual(["Visibility", "Interactions"]);
   });
 
   it("board 3 — Effects: no Interactions", () => {
@@ -63,8 +63,8 @@ describe("section order", () => {
 
   it("249:71560 — Button / Link: text on Content, destination on Behavior", () => {
     expect(titlesFor("content", "button")).toEqual(["button", "Semantics", "Advanced attributes"]);
-    expect(titlesFor("behaviour", "button")).toEqual(["Link", "Visibility", "Interactions", "CSS classes"]);
-    expect(titlesFor("behaviour", "link")).toEqual(["Link", "Visibility", "Interactions", "CSS classes"]);
+    expect(titlesFor("behaviour", "button")).toEqual(["Link", "Visibility", "Interactions"]);
+    expect(titlesFor("behaviour", "link")).toEqual(["Link", "Visibility", "Interactions"]);
   });
 
   it("board 5 — Button · Style: Text inside (owner answer 1), no Typography", () => {
@@ -91,16 +91,16 @@ describe("section order", () => {
   });
 
   it("board 18 — Section · Behavior: Link, no CMS binding", () => {
-    expect(titlesFor("behaviour", "section")).toEqual(["Link", "Visibility", "Interactions", "CSS classes"]);
+    expect(titlesFor("behaviour", "section")).toEqual(["Link", "Visibility", "Interactions"]);
     expect(titlesFor("content", "section")).toEqual(["Semantics", "Advanced attributes"]);
   });
 
   it("156:716 / 156:6055 — Form: Fields on Content, Form settings on Behavior", () => {
     expect(titlesFor("content", "form")).toEqual(["Fields", "Semantics", "Advanced attributes"]);
-    expect(titlesFor("behaviour", "form")).toEqual(["After submit", "Visibility", "Interactions", "CSS classes"]);
+    expect(titlesFor("behaviour", "form")).toEqual(["After submit", "Visibility", "Interactions"]);
     expect(titlesFor("content", "collection-list")).toEqual(["Collection", "Semantics", "Advanced attributes"]);
     expect(titlesFor("content", "slider")).toEqual(["Slides", "Semantics", "Advanced attributes"]);
-    expect(titlesFor("behaviour", "slider")).toEqual(["Playback", "Visibility", "Interactions", "CSS classes"]);
+    expect(titlesFor("behaviour", "slider")).toEqual(["Playback", "Visibility", "Interactions"]);
   });
 
   it("a type opens on Content when it has something defining there, else on Style (LD-5)", () => {

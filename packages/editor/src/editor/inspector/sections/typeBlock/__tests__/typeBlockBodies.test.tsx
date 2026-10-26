@@ -85,18 +85,18 @@ describe("layout", () => {
 });
 
 describe("Attributes", () => {
-  it("title, tab index and the type's §17.H rows — no ID (Semantics owns it); a link has no Title", () => {
+  it("title, tab index and the type's §17.H rows; a form field also has its ID and Disabled here (no Semantics on a field); a link has no Title", () => {
     const el = makeMockElement({ id: "e1", type: "input" });
     const composer = makeMockComposer({ element: el });
     const { unmount } = render(
       <AttributesSection element={{ id: "e1", type: "input" }} targetIds={["e1"]} composer={composer as never} isOpen onToggle={() => {}} />
     );
-    for (const label of ["Title", "Tab index", "Read only", "Autocomplete"]) expect(screen.getByText(label)).toBeInTheDocument();
-    expect(screen.queryByText("ID")).toBeNull();
+    for (const label of ["ID", "Disabled", "Title", "Tab index", "Read only", "Autocomplete"]) expect(screen.getByText(label)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /^Advanced attributes section/ })).toBeInTheDocument();
     unmount();
     render(<AttributesSection element={{ id: "e1", type: "link" }} targetIds={["e1"]} composer={composer as never} isOpen onToggle={() => {}} />);
     expect(screen.queryByText("Title")).toBeNull();
+    expect(screen.queryByText("ID")).toBeNull();
   });
 
   it("summarises as the 2L9 boards do: '{n} set', '0 set' included; the id is not counted", () => {

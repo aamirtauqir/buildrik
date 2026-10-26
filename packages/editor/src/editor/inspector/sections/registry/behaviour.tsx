@@ -2,7 +2,9 @@
  * Behavior registry entries (2L9 page 04: boards 161:13919, 156:6055,
  * 249:71560): how the element acts — the type's own settings (Form
  * settings, Playback), then Link (where a link goes; its text is Content),
- * Visibility, Interactions and CSS classes. What the element says or is —
+ * Visibility and Interactions. CSS classes sit inside Content › Advanced
+ * attributes (no 2L9 board draws them as a section; class-first is
+ * pending). What the element says or is —
  * Fields, Slides, Collection, CMS binding, Attributes — is Content
  * (`./content.tsx`).
  *
@@ -10,7 +12,6 @@
  */
 
 import { adaptBaseStyleProps, adaptElementProps, defineSection, ownSection as own, type AnySectionEntry, type SectionContext } from "./_shared";
-import { CSSClassesSection } from "../CSSClassesSection";
 import { LinkSection } from "../LinkSection";
 import { FormAfterSubmitSection } from "../FormAfterSubmitSection";
 import { SliderPlaybackSection } from "../SliderPlaybackSection";
@@ -145,19 +146,4 @@ export const BEHAVIOUR_SECTIONS: Record<string, AnySectionEntry> = {
     styleKeys: [],
     adaptProps: adaptInteractions,
   }),
-
-  "css-classes": defineSection({
-    tab: "behaviour",
-    title: "CSS classes",
-    open: "open",
-    Component: CSSClassesSection,
-    styleKeys: [],
-    adaptProps: (ctx) => ({
-      selectedElement: ctx.selectedElement,
-      composer: ctx.composer,
-      isOpen: ctx.isOpen,
-      onToggle: ctx.onToggle,
-    }),
-  }),
-
 };

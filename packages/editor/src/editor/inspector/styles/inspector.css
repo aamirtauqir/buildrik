@@ -175,8 +175,9 @@
 /* v3: the label at 400 (size, face and muted ink come from .bdi-bpr). */
 .bdi-bpr .bdi-bpr-label { font-weight: 400; }
 /* ── Body ─────────────────────────────────────────────── */
+/* 2L9 page 04: the first section title sits 8 below the tab strip. */
 .bdi-body {
-  padding: 0;
+  padding: var(--bk-space-8) 0 0;
 }
 
 /* ── Section (Inspector v4, board 1) ─────────────────────
@@ -184,8 +185,10 @@
    in Section.tsx; this block only draws what a utility cannot: the rule
    between sections. An open or summarised section starts with a hairline;
    an empty "+" row does not (board 1: "Fill  +" / "Border  +"). */
+/* 2L9 page 04: sections are separated by space, not rules. */
 .bdi-sec {
-  border-top: 1px solid var(--bk-border);
+  border-top: none;
+  padding-bottom: var(--bk-space-8);
 }
 .bdi-sec.empty {
   border-top: none;
@@ -237,20 +240,23 @@
 }
 
 /* ── Sub-label inside section body ────────────────────── */
+/* 2L9 F02 / F10: a group inside a section is headed like a section —
+   "Field", "Notifications" — 13 semibold ink, sentence case. */
 .bdi-sub-label {
-  font: 600 var(--bk-text-11) var(--bk-font-ui);
-  letter-spacing: 0.08em;
-  color: var(--bk-ink-muted);
-  text-transform: uppercase;
+  font: 600 13px/16px var(--bk-font-ui);
+  color: var(--bk-ink);
+  padding-top: var(--bk-space-8);
 }
 
 /* ── Property row ─────────────────────────────────────── */
+/* 2L9 36:2 geometry: 300 − 24 padding − 88 label − 8 gap = 180 control;
+   rows step 40 (boards I15, F02), controls stay 28 inside them. */
 .bdi-row-ctrl {
   display: grid;
-  grid-template-columns: 108px minmax(0, 1fr);
+  grid-template-columns: 88px minmax(0, 1fr);
   align-items: center;
   column-gap: var(--bk-space-8);
-  min-height: var(--bk-size-row-dense);
+  min-height: var(--bk-size-control-lg);
 }
 /* A segmented row is 32 (board 1: Level, Align; board 16: Direction). With
    more than four options the track takes the room (Level: label 64). */

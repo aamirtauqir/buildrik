@@ -4181,9 +4181,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Field rows one line 'name · Type' + drag/›/⋯ (board 2-line name/summary); '+ Add field' right link (board full-width button); Semantics expanded, no Conditions row; no breadcrumb line. | prior: Lane L-B A1+A5 (built; copy checked against the dump, no board image): Fields on Content; each field row has a ⋯ menu (Move up / Move down / Delete — the field moves and goes with its label wrapper) and the list ends with '+ Add field' and 'Drag to reorder, or use a field’s menu.'. Open: row layout ",
+   "authority": "code:conditions-not-built",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (?block=contact-form): Fields as two-line rows (name / 'Type · Required') with ⋯, submit row 'Submit button', full-width '+ Add field', reorder note, closed 'Semantics · Form', 'Advanced attributes · n set'. No Conditions row (B-11). Opening a field selects it.",
    "tier": "P1"
   },
   {
@@ -4192,9 +4192,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Drill-in keeps form selected (header 'Form', board 'Email'); '‹ Form' left not centered; 'FIELD' uppercase; no Validation row; Semantics shows form's. Radio field used (no email field on QA site). | prior: Lane L-B A3 (built, not compared — no board image in the dump; copy and row order checked against the dump text): drill-in reads '‹ {form}' · Field · Type · Label · Placeholder · Name + 'Name is the key stored with each submission.' · Required · Default value · Validation (min/max length or min/max)",
+   "authority": "code:conditions-not-built",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (contact form → Email): field selected; centred '‹ Form' above 'Field'; Type, Label, Placeholder, Name + note, Required box, Default value at 40 px rows; closed 'Validation · More settings', 'Advanced attributes'. No Conditions row (B-11). Header name reads the layer name ('Input' in the probe) — header is the lead's.",
    "tier": "P1"
   },
   {
@@ -4285,7 +4285,7 @@
    "status": "active",
    "authority": "code:after-submit-live-on-save",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Sections/copy match; headings 'NOTIFICATIONS' etc uppercase and cramped; header 'Behavior · Form' (board 'Form settings · This form'); Visibility/Interactions expanded (board collapsed rows). | prior: Lane L-B A6 (built; copy checked against the dump, no board image): After submit · Then · Message · Notifications › Send to · Spam protection 'Applies on next publish' › 'Block automated submissions' · Form settings status 'Saved' · 'Saved separately from page edits; outside document Undo.'. The boa",
+   "verifiedNote": "Built 2026-10-27 (not renderable in the probe — form settings load from the server): sub-groups headed like sections ('Notifications', 'Spam protection', 'Form settings status'), stacked 'Message', plain section titles. Header 'Form settings · This form' is the lead's; Visibility/Interactions collapsed on a form left as on other types.",
    "tier": "P1"
   },
   {
@@ -4887,9 +4887,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Copy/order ok; no '… › Hero › Text' breadcrumb; device checkboxes in one row (board stacked); no 'Data conditions' note; '+ Add interaction' right link not full-width button; extra CSS classes. | prior: Lane L-B A1+A7 (built; copy and order checked against the dump, no board image): Behavior tab · Visibility 'Show on these devices' Desktop/Tablet/Mobile · Interactions 'Plays on all breakpoints' · '+ Add interaction' · 'No interactions yet.'. Not drawn: 'Data conditions: Content › Conditions — both ",
+   "authority": "code:conditions-not-built",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (inspector-panel ?type=paragraph, Behavior, 300 col vs board crop): plain section titles, pill tabs, stacked device checkboxes (40 px rows), 'Plays on all breakpoints', full-width '+ Add interaction', 'No interactions yet.', no CSS classes section. Not drawn: 'Data conditions: Content › Conditions…' — no conditions exist (B-11). Header breadcrumb is the lead's.",
    "tier": "P1"
   },
   {
@@ -4909,9 +4909,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Back link, title and 7 presets in board order match; 'Choose a trigger' / 'Plays when rendered (CSS)' are chevron rows not bordered/centered buttons; extra CSS classes section. | prior: Lane L-B A7b (built, not compared — copy checked against the dump): '+ Add interaction' opens a screen replacing the list — '‹ Back to Interactions', 'Add interaction', the seven presets in board order (each = trigger + animation preset of the existing model), 'Choose a trigger ›' (all triggers, gro",
+   "authority": "code:conditions-not-built",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27: add screen replaces the Interactions header — centred '‹ Back to Interactions', 'Add interaction', 7 presets at 40 px, bordered full-width 'Choose a trigger ›', centred 'Plays when rendered (CSS) ›'. Same Conditions-note exception as 161:13919.",
    "tier": "P1"
   },
   {
@@ -4920,9 +4920,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — No Animate/Repeat/When rows; 40px flowbite fields stacked vs compact label|value rows; duration 0.3 (board 0.6), Easing 'Select...'; no 'Interaction added · Undo' toast; Visibility still shown. | prior: Lane L-B A7c (built, not compared — copy checked against the dump): '‹ Back to Interactions', 'Play', 'More…', Trigger, Effect, Duration, Delay, Easing, 'Plays on all breakpoints'. Open: Animate (target), Repeat, When rows (the model's loop/target semantics are not surfaced yet), 'Interaction added ",
+   "authority": "code:scroll-replays-every-entry",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (getBoundingClientRect: rows 40 px, label 88 / control 180): only Interactions on Behavior while open; centred back; Play 96 + More…; Trigger, Effect, Animate, Duration 0.6 s, Delay 0 s, Easing 'Ease out', Repeat 'Once', When radios, 'Plays on all breakpoints'; 'Interaction added · Undo' toast (composer history). Code wins on When: the runtime replays every entry, so 'Only the first time' is disabled until B-13.",
    "tier": "P1"
   },
   {
@@ -4989,7 +4989,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Menu has Duplicate/Disable/Delete but no 'Interaction actions' title or 'Close menu'; 218px dropdown under More… (board ~240 card left of inspector over canvas). | prior: Lane L-B A7c (built, not compared): More… opens 'Interaction actions' — Duplicate (copy after the original, opened), Disable / Enable, Delete.",
+   "verifiedNote": "probe-compared 2026-10-27 for content: 'Interaction actions' card title, Duplicate · Disable · Delete · centred 'Close menu', 240 wide. Placement beside the column over the canvas (beside='.layout-shell__inspector') cannot be shown in the probe (no shell) — open until the lead's live walk.",
    "tier": "P1"
   },
   {
@@ -5010,8 +5010,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — List returns to 'No interactions yet.' correctly, but no 'Interaction deleted · Undo' toast (readToasts empty). | prior: Lane L-B A7 (built, not compared): after deleting the last interaction the list reads 'No interactions yet.'. Open: 'Interaction deleted · Undo' receipt (needs a toast route that works without a provider in the section's tests — A7b).",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27: after Delete the list reads 'No interactions yet.' and the toast 'Interaction deleted · Undo' shows; Undo runs composer.history.undo (test).",
    "tier": "P3"
   },
   {
@@ -22915,7 +22915,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Opened via 'Bind text…' on a static page (no template page on QA site, so no 'This page's record'). Popover inside inspector, no ×; Site/Page tagged 'Planned' (board selectable). | prior: Lane L-B C-13 (built, not compared — copy checked against the dump): the type block's bindable property row has a Bind button that opens 'Choose source' — search 'Search sources or fields…', RECORD DATA (This page’s record · {Collection} on its template page, List item — off with 'Select an element ",
+   "verifiedNote": "Built 2026-10-27, not renderable in the probe (needs a CMS store): Choose source is a 280 card beside the column with × and the board's groups. Site and Page stay 'Planned' — the binding model reads collections only (code). The board's Content layout (Text · Tag · 'Title text' box) differs from the type-block row model — open.",
    "tier": "P1"
   },
   {
@@ -22948,7 +22948,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — No live screenshot (overwritten when the Blog collection vanished). DOM read: binding shows inline (chip 'Blog.title', 'Dynamic bindings · 1 binding', 'Blog · title') — no binding detail screen. | prior: Lane L-B C-13 (built, not compared): binding detail replaces the Content tab — '‹ Back to Content', '{Property} binding', Source + Change…, context line, Record (specific record only), Format 'As written', If empty (stored as the binding's fallback), Preview, 'Open record ›' (C-11 origin '{element} ",
+   "verifiedNote": "Built 2026-10-27, not renderable in the probe (needs a CMS store): centred '‹ Back to Content', '{Property} binding', Source as a select-looking box (opens Choose source), Format box 'As written', If empty, stacked Preview, centred 'Open record ›', full-width 'Unbind — keep shown text', note.",
    "tier": "P1"
   },
   {
@@ -22981,7 +22981,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Dialog 560 (board 640); body 'X has unsaved record edits.' not 'Your destination is …'; primary is Save and leave (board: Keep editing). Sheet: tabs under back link, no preview pane. | prior: built, not compared — L-C C1: \"Leave without saving?\" names the record / destination tab or collection; Keep editing · Discard changes · Save and leave (RecordSheet.tsx). Origin label (\"Your destination is …\") waits on C2.",
+   "verifiedNote": "Not L-B's surface: the leave-draft dialog is the CMS record sheet (cms/RecordSheet.tsx, lane L-C). Listed in drifts-b by its Play journey; handed back.",
    "tier": "P1"
   },
   {
@@ -22992,7 +22992,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Pending copy matches ('Saving record…', footer 'Saving…', 'Stay here', disabled 'Saving…'), but header shows it inline before title; sheet lacks preview pane and board's field layout. | prior: built, not compared — L-C C1: Save and leave shows \"Saving record…\" + Saving… + Stay here; success takes the chosen way out (RecordSheet.tsx).",
+   "verifiedNote": "Not L-B's surface: the record sheet's saving state (cms/RecordSheet.tsx, lane L-C). Handed back.",
    "tier": "P1"
   },
   {

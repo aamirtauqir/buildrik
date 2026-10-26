@@ -94,9 +94,9 @@ describe("Section header", () => {
     );
   });
 
-  /* Boards 1 and 3: an empty "+" row has nothing to disclose — no chevron,
-     the title keeps the chevron's column. */
-  it("an empty \"+\" row draws no chevron; an open section does", () => {
+  /* 2L9 page 04: only a CLOSED section shows ›; an open one and an empty
+     "+" row show none. */
+  it("an empty \"+\" row and an open section draw no chevron; a closed one does", () => {
     const frame = (displayMode: SectionFrame["displayMode"]): SectionFrame => ({
       sectionId: "fill",
       title: "Fill",
@@ -114,6 +114,14 @@ describe("Section header", () => {
     expect(screen.getByRole("button", { name: "Add fill" })).toBeInTheDocument();
     rerender(
       <SectionFrameContext.Provider value={frame("open")}>
+        <Section title="Fill">
+          <div>content</div>
+        </Section>
+      </SectionFrameContext.Provider>,
+    );
+    expect(container.querySelector(".bdi-chev")).toBeNull();
+    rerender(
+      <SectionFrameContext.Provider value={frame("summary")}>
         <Section title="Fill">
           <div>content</div>
         </Section>

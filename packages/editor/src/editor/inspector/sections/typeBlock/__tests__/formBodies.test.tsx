@@ -1,5 +1,5 @@
 /**
- * Type block — form field bodies (boards 14, 15): Input's six rows, and the
+ * Type block — form field bodies (2L9 F02, board 15): the Field block, and the
  * Checkbox block (Q2: titled "Checkbox", never "Container") whose Name,
  * Checked by default and Required write the INNER <input> — the attribute a
  * submitted form actually reads — through the parent's lock gate, one Undo.
@@ -52,27 +52,27 @@ describe("Input (board 14)", () => {
     return { el, composer };
   }
 
-  it("six rows in board order: Input type, Name, Placeholder, Default, Required, Disabled", () => {
+  it("2L9 F02: the Field block — Type, Label, Placeholder, Name + its note, Required, Default value", () => {
     mock();
-    inOrder(blockText(), ["Input type", "Name", "Placeholder", "Default", "Required", "Disabled"]);
-    expect(screen.getByLabelText("Input type")).toBeInTheDocument();
-    for (const l of ["Name", "Placeholder", "Default"]) expect(screen.getByLabelText(l)).toBeInTheDocument();
+    expect(document.querySelector("#inspector-section-type")?.textContent).toMatch(/^Field/);
+    inOrder(blockText(), ["Type", "Label", "Placeholder", "Name", "Name is the key stored with each submission.", "Required", "Default value"]);
+    for (const l of ["Type", "Label", "Placeholder", "Name", "Default value"]) expect(screen.getByLabelText(l)).toBeInTheDocument();
+    /* Disabled is an Advanced attribute now (no board draws it here). */
+    expect(screen.queryByRole("checkbox", { name: "Disabled" })).toBeNull();
   });
 
-  it("Required and Disabled are boxes with their label beside them", () => {
+  it("Required is a box with its label beside it, and writes the field", () => {
     const { el } = mock({ required: "" });
     expect(screen.getByRole("checkbox", { name: "Required" })).toBeChecked();
-    expect(screen.getByRole("checkbox", { name: "Disabled" })).not.toBeChecked();
-    expect(screen.getByTestId("inspector-row-required").textContent?.trim()).toBe("Required");
-    fireEvent.click(screen.getByText("Disabled"));
-    expect(el.setAttribute).toHaveBeenCalledWith("disabled", "true");
+    fireEvent.click(screen.getByRole("checkbox", { name: "Required" }));
+    expect(el.removeAttribute).toHaveBeenCalledWith("required");
   });
 
-  it("the input type writes the type attribute in one transaction", () => {
+  it("the type writes the type attribute in one transaction", () => {
     const { el, composer } = mock();
-    fireEvent.change(screen.getByLabelText("Input type"), { target: { value: "email" } });
+    fireEvent.change(screen.getByLabelText("Type"), { target: { value: "email" } });
     expect(el.setAttribute).toHaveBeenCalledWith("type", "email");
-    expect(composer.beginTransaction).toHaveBeenCalledWith("element-prop-change");
+    expect(composer.beginTransaction).toHaveBeenCalledWith("field-type");
   });
 
   it("Select keeps its options rows (no board — by analogy)", () => {

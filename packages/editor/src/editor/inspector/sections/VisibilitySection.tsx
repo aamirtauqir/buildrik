@@ -51,15 +51,16 @@ export const VisibilitySection: React.FC<VisibilitySectionProps> = ({
       id="inspector-section-visibility"
       preview={hiddenCount > 0 ? `hidden on ${hiddenCount}` : undefined}
     >
-      <p className="tw:m-0 tw:pt-1 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)]" id="visibility-show-on-label">
+      <p className="tw:m-0 tw:pt-1 tw:pb-1 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]" id="visibility-show-on-label">
         Show on these devices
       </p>
-      <div className="tw:flex tw:items-center tw:gap-1 tw:py-2" data-testid="visibility-show-on" role="group" aria-labelledby="visibility-show-on-label">
+      {/* 2L9 161:13919: one device per row, stacked. */}
+      <div className="tw:flex tw:flex-col tw:pl-2" data-testid="visibility-show-on" role="group" aria-labelledby="visibility-show-on-label">
         {VISIBILITY_BREAKPOINTS.map((bp) => {
           const shown = isVisible(bp.id);
           const id = `visibility-${bp.id}`;
           return (
-            <span key={bp.id} className="tw:flex tw:items-center tw:gap-1 tw:w-[84px]">
+            <span key={bp.id} className="tw:flex tw:h-10 tw:items-center tw:gap-3">
               <Checkbox
                 id={id}
                 data-testid={`visibility-check-${bp.id}`}
@@ -74,7 +75,7 @@ export const VisibilitySection: React.FC<VisibilitySectionProps> = ({
                   a pointer over a locked box read as editable (QA 2026-10-02). */}
               <label
                 htmlFor={id}
-                className={`${readOnly ? "tw:cursor-default" : "tw:cursor-pointer"} tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)]`}
+                className={`${readOnly ? "tw:cursor-default" : "tw:cursor-pointer"} tw:text-[13px] tw:font-normal tw:leading-4 tw:text-[var(--bk-ink)]`}
               >
                 {bp.label}
               </label>

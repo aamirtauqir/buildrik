@@ -7,7 +7,11 @@
  *
  * @license BSD-3-Clause
  */
-import { render, screen, fireEvent, act } from "@testing-library/react";
+import { render as rtlRender, screen, fireEvent, act } from "@testing-library/react";
+import { ToastProvider } from "@/editor/chrome-ui";
+import * as React from "react";
+/* The section raises "Interaction added / deleted · Undo" receipts. */
+const render = (ui: React.ReactElement) => rtlRender(<ToastProvider>{ui}</ToastProvider>);
 import { describe, it, expect, vi, beforeAll } from "vitest";
 import { InteractionsSection } from "../index";
 import { DEFAULT_ANIMATION } from "@/shared/types/animations";

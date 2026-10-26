@@ -20,7 +20,7 @@
  * @license BSD-3-Clause
  */
 
-import { ChevronDown, ChevronRight, Plus } from "lucide-react";
+import { ChevronRight, Plus } from "lucide-react";
 import * as React from "react";
 import { IconButton } from "@/editor/chrome-ui";
 import { useInspectorField } from "./InspectorFieldContext";
@@ -110,6 +110,9 @@ export interface SectionProps {
   action?: React.ReactNode;
   /** Retained for the section files that still pass it; draws nothing. */
   tier?: SectionTier;
+  /** Draw no header row — a section showing a screen that heads itself
+   *  (2L9 I14: the add-interaction screen's "‹ Back to Interactions"). */
+  hideHeader?: boolean;
   children: React.ReactNode;
 }
 
@@ -117,15 +120,18 @@ export interface SectionProps {
 // COMPONENT
 // ============================================================================
 
+/* 2L9 page 04: a section is headed by its plain title — 13/semibold ink,
+   no chevron, no rule above; a closed section's one-line summary sits at the
+   row's right ("Advanced attributes  0 set"). The title still toggles. */
 const HEADER_CLASS =
-  "bdi-sec-h tw:flex tw:items-center tw:gap-2 tw:h-8 tw:px-3 tw:cursor-pointer tw:select-none";
+  "bdi-sec-h tw:flex tw:items-center tw:gap-2 tw:h-10 tw:px-3 tw:cursor-pointer tw:select-none";
 const TOGGLE_CLASS =
   "tw:flex-1 tw:min-w-0 tw:flex tw:items-center tw:gap-2 tw:h-7 tw:rounded-[4px] tw:cursor-pointer tw:text-left " +
   "tw:focus-visible:outline-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
 const NAME_CLASS =
-  "bdi-sec-name tw:min-w-0 tw:truncate tw:text-[12px] tw:leading-4 tw:font-medium tw:text-[var(--bk-ink-soft)]";
+  "bdi-sec-name tw:min-w-0 tw:truncate tw:text-[13px] tw:leading-4 tw:font-semibold tw:text-[var(--bk-ink)]";
 const SUMMARY_CLASS =
-  "tw:m-0 tw:px-4 tw:pb-2 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)] tw:truncate";
+  "tw:m-0 tw:ml-auto tw:shrink-0 tw:pl-2 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)] tw:truncate tw:max-w-[50%]";
 
 export const Section: React.FC<SectionProps> = ({
   title: ownTitle,
@@ -135,6 +141,7 @@ export const Section: React.FC<SectionProps> = ({
   id: ownId,
   preview,
   action,
+  hideHeader = false,
   children,
 }) => {
   const frame = React.useContext(SectionFrameContext);
@@ -182,7 +189,6 @@ export const Section: React.FC<SectionProps> = ({
   const slug = title.toLowerCase().replace(/\s+/g, "-");
   const contentId = `section-content-${slug}`;
   const summary = mode === "summary" ? (frame?.summary ?? preview ?? null) : null;
-  const Chevron = isOpen ? ChevronDown : ChevronRight;
 
   return (
     <div
@@ -195,7 +201,7 @@ export const Section: React.FC<SectionProps> = ({
       {/* The row is a container; the toggle carries the button role and any
           action is its SIBLING, never its child (axe nested-interactive).
           Gate 24 keeps raw <button> out of chrome, so the role sits on a span. */}
-      <div className={HEADER_CLASS} data-testid={`inspector-sechead-${slug}`}>
+      <div className={HEADER_CLASS} data-testid={`inspector-sechead-${slug}`} hidden={hideHeader || undefined}>
         <span
           role="button"
           tabIndex={0}
@@ -211,17 +217,17 @@ export const Section: React.FC<SectionProps> = ({
           aria-controls={contentId}
           aria-label={`${title} section, ${isOpen ? "expanded" : "collapsed"}`}
         >
-          {/* An empty "+" row has nothing to disclose: no chevron, the title
-              stays in the chevron's column (boards 1, 3). */}
-          {mode === "empty" ? (
-            <span aria-hidden="true" className="tw:w-3 tw:shrink-0" />
-          ) : (
-            <Chevron size={12} aria-hidden="true" className="bdi-chev tw:shrink-0 tw:text-[var(--bk-ink-muted)]" />
-          )}
+          {/* 2L9: a closed section shows › before its title; an open one none. */}
+          {mode === "summary" ? <ChevronRight size={14} aria-hidden="true" className="bdi-chev tw:shrink-0 tw:text-[var(--bk-ink)]" /> : null}
           <span className={NAME_CLASS} data-testid={`inspector-secname-${slug}`}>
             {title}
           </span>
           {frame?.headerDot}
+          {summary ? (
+            <span className={SUMMARY_CLASS} data-testid={`inspector-summary-${frame?.sectionId ?? slug}`}>
+              {summary}
+            </span>
+          ) : null}
         </span>
         {mode === "empty" ? (
           <IconButton
@@ -237,11 +243,6 @@ export const Section: React.FC<SectionProps> = ({
           <span className="tw:inline-flex tw:items-center tw:shrink-0">{action}</span>
         ) : null}
       </div>
-      {summary ? (
-        <p className={SUMMARY_CLASS} data-testid={`inspector-summary-${frame?.sectionId ?? slug}`}>
-          {summary}
-        </p>
-      ) : null}
       {isOpen && (
         <div id={contentId} className="bdi-sec-body">
           {/* A Section nested in this body is its own, unframed disclosure. */}

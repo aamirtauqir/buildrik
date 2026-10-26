@@ -25,6 +25,7 @@ const CONTENT_ORDER: readonly SectionId[] = [
   "form-fields",
   "slides",
   "collection",
+  "validation",
   "semantics",
   "attributes",
 ];
@@ -49,7 +50,6 @@ const BEHAVIOUR_ORDER: readonly SectionId[] = [
   "link",
   "visibility",
   "interactions",
-  "css-classes",
 ];
 
 const EFFECTS_ORDER: readonly SectionId[] = [

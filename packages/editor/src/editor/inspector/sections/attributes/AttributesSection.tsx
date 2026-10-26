@@ -13,6 +13,7 @@ import { Section } from "@/editor/inspector/shared/controls";
 import { attributeFieldsFor } from "@/editor/inspector/config/attributeFields";
 import { PropertyRows } from "../typeBlock/PropertyField";
 import { DataAttributeEditor } from "./DataAttributeEditor";
+import { CSSClassesSection } from "../CSSClassesSection";
 
 export interface AttributesSectionProps {
   composer: Composer | null;
@@ -34,12 +35,17 @@ export function attributesSummary(composer: Composer | null | undefined, element
 
 export function AttributesSection({ composer, element, targetIds, isOpen, onToggle }: AttributesSectionProps) {
   const rows = React.useMemo(() => attributeFieldsFor(element.type), [element.type]);
+  const [classesOpen, setClassesOpen] = React.useState(false);
   return (
     <Section title="Advanced attributes" isOpen={isOpen} onToggle={onToggle} id="inspector-section-attributes">
       <PropertyRows composer={composer} element={element} targetIds={targetIds} rows={rows} />
       <div className="tw:pt-2" data-testid="inspector-data-attributes">
         <DataAttributeEditor elementId={element.id} composer={composer} />
       </div>
+      {/* CSS classes live here, not as a tab section — no 2L9 board draws
+          them there, and the class-first model that will place them is
+          pending (blocked:owner-class-first). Closed until opened. */}
+      <CSSClassesSection selectedElement={element} composer={composer} isOpen={classesOpen} onToggle={setClassesOpen} />
     </Section>
   );
 }

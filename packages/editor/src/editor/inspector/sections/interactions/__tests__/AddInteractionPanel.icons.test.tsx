@@ -11,7 +11,7 @@ import { AddInteractionPanel } from "../AddInteractionPanel";
 describe("AddInteractionPanel — trigger icons", () => {
   it("draws an svg glyph per trigger and no emoji", () => {
     const { container } = render(<AddInteractionPanel onAdd={vi.fn()} onClose={vi.fn()} />);
-    fireEvent.click(screen.getByText("Choose a trigger"));
+    fireEvent.click(screen.getByText("Choose a trigger ›"));
     expect(container.querySelectorAll("button svg").length).toBeGreaterThanOrEqual(14);
     expect(container.textContent ?? "").not.toMatch(/\p{Extended_Pictographic}/u);
   });

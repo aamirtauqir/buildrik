@@ -206,6 +206,7 @@ export const FormAfterSubmitSection: React.FC<FormAfterSubmitSectionProps> = ({
           />
           {settings.successAction === "MESSAGE" ? (
             <CommitRow
+              stacked
               label="Message"
               placeholder="Thanks — your message was sent."
               value={settings.successMessage ?? ""}

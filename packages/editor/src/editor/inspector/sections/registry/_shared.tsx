@@ -68,6 +68,7 @@ export type SectionId =
   | "slides"
   | "collection"
   | "cms-binding"
+  | "validation"
   | "semantics"
   | "attributes"
   // Style — define → shape → paint (DD-15)
@@ -85,7 +86,6 @@ export type SectionId =
   | "link"
   | "visibility"
   | "interactions"
-  | "css-classes"
   // Effects
   | "opacity"
   | "shadow"
@@ -99,9 +99,11 @@ export type SectionId =
  *   open   — open (the Content and Behavior primaries);
  *   valued — open when the element carries a value for it, else the one-row
  *            "+" header (Fill, Border, the Effects rows);
- *   closed — shut, with a one-line summary (Attributes, Text inside, Advanced).
+ *   closed — shut, with a one-line summary (Attributes, Text inside, Advanced);
+ *   set    — open when the element carries a value for it, else shut with
+ *            its summary (2L9: Semantics opens on an ID, else reads "Form").
  */
-export type SectionOpen = "always" | "open" | "valued" | "closed";
+export type SectionOpen = "always" | "open" | "valued" | "closed" | "set";
 
 // ============================================================================
 // CONTEXT SHAPES

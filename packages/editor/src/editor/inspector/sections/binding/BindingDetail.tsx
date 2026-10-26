@@ -4,7 +4,7 @@
  *
  *   ‹ Back to Content
  *   Text binding
- *   Source     Blog · title                    (Change… reopens Choose source)
+ *   Source     [Blog · title ▾]                (reopens Choose source)
  *              This page’s record · each page shows its own
  *   Record     [A clearer point of view ▾]     (a specific record only)
  *   Format     As written
@@ -21,6 +21,7 @@
  *
  * @license BSD-3-Clause
  */
+import { ChevronDown } from "lucide-react";
 import * as React from "react";
 import type { Composer } from "@/engine";
 import { Button } from "@/editor/chrome-ui";
@@ -30,13 +31,17 @@ import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
 import { recordTitle } from "@/editor/cms/RecordsTable";
 import { ControlRow, SelectRow } from "@/editor/inspector/shared/controls";
 import { useInspectorField } from "@/editor/inspector/shared/controls/InspectorFieldContext";
-import { ActionRow, CommitRow, NoteRow } from "../behaviourRows";
+import { CommitRow, NoteRow } from "../behaviourRows";
 import { ChooseSourcePicker } from "./ChooseSourcePicker";
-import { openBindingDetail } from "./bindingDetailStore";
+import { closeSubview } from "@/editor/inspector/tabs/subviewStore";
 import { contextLine, sourceLabel, statusLine } from "./BindingPropertyRow";
 import { PROPERTY_LABEL, useCmsBinding } from "./useCmsBinding";
 
 const VALUE = "tw:min-w-0 tw:truncate tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink)]";
+/* A 28-tall box drawn like the column's selects (2L9 F2.05). */
+const SELECTISH =
+  "tw:flex tw:h-7 tw:w-full tw:items-center tw:gap-1 tw:rounded-[4px] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-subtle)] " +
+  "tw:px-2 tw:text-[12px] tw:font-normal tw:text-[var(--bk-ink)] tw:focus:ring-0";
 
 /** "Heading · Text binding" — where Open record should return to (C-11). */
 function bindingOrigin(composer: Composer, elementId: string, property: string): string {
@@ -56,11 +61,11 @@ export function BindingDetail({ composer, elementId, onOpenCreateCollection }: B
   const { readOnly } = useInspectorField();
   const [picking, setPicking] = React.useState(false);
   const label = PROPERTY_LABEL[state.property];
-  const back = () => openBindingDetail(null);
+  const back = () => closeSubview("binding");
 
   /* The binding went away (unbound here or undone elsewhere): back to Content. */
   React.useEffect(() => {
-    if (!state.binding) openBindingDetail(null);
+    if (!state.binding) closeSubview("binding");
   }, [state.binding]);
   if (!composer || !state.binding) return null;
 
@@ -83,38 +88,39 @@ export function BindingDetail({ composer, elementId, onOpenCreateCollection }: B
         size="xs"
         data-testid="binding-detail-back"
         onClick={back}
-        className="tw:self-start tw:h-7 tw:px-0 tw:text-[12px] tw:font-medium"
+        className="tw:self-center tw:h-7 tw:px-0 tw:text-[12px] tw:font-normal"
       >
         ‹ Back to Content
       </Button>
-      <h3 className="tw:m-0 tw:py-1 tw:text-[13px] tw:font-semibold tw:text-[var(--bk-ink)]">{label} binding</h3>
+      <h3 className="tw:m-0 tw:pb-1 tw:pt-3 tw:text-[13px] tw:font-semibold tw:text-[var(--bk-ink)]">{label} binding</h3>
+      {/* 2L9 F2.05: the source reads like a select; it opens Choose source. */}
       <ControlRow label="Source">
-        <div className="tw:flex tw:min-w-0 tw:flex-1 tw:items-center tw:gap-1">
-          <span className={VALUE + " tw:flex-1"} data-testid="binding-detail-source">
-            {sourceLabel(state)}
-          </span>
-          <ChooseSourcePicker
-            state={state}
-            open={picking}
-            onClose={() => setPicking(false)}
-            onOpenCreateCollection={onOpenCreateCollection}
-            trigger={
-              <Button
-                type="button"
-                variant="link"
-                size="xs"
-                data-testid="binding-change-source"
-                aria-disabled={readOnly || undefined}
-                onClick={() => {
-                  if (!readOnly) setPicking((v) => !v);
-                }}
-                className="tw:h-6 tw:px-1 tw:text-[12px]"
-              >
-                Change…
-              </Button>
-            }
-          />
-        </div>
+        <ChooseSourcePicker
+          state={state}
+          open={picking}
+          onClose={() => setPicking(false)}
+          onOpenCreateCollection={onOpenCreateCollection}
+          trigger={
+            <Button
+              type="button"
+              color="light"
+              size="xs"
+              data-testid="binding-change-source"
+              aria-label={`Change source · ${sourceLabel(state)}`}
+              aria-haspopup="menu"
+              aria-disabled={readOnly || undefined}
+              onClick={() => {
+                if (!readOnly) setPicking((v) => !v);
+              }}
+              className={SELECTISH}
+            >
+              <span className="tw:min-w-0 tw:flex-1 tw:truncate tw:text-left" data-testid="binding-detail-source">
+                {sourceLabel(state)}
+              </span>
+              <ChevronDown size={12} aria-hidden="true" className="tw:shrink-0 tw:text-[var(--bk-ink-muted)]" />
+            </Button>
+          }
+        />
       </ControlRow>
       <NoteRow testId="binding-detail-context">{contextLine(state, true)}</NoteRow>
       {state.context === "record" && state.collection ? (
@@ -131,9 +137,10 @@ export function BindingDetail({ composer, elementId, onOpenCreateCollection }: B
           }))}
         />
       ) : null}
+      {/* One format today: publish writes the value as written. */}
       <ControlRow label="Format">
-        <span className={VALUE} data-testid="binding-detail-format">
-          As written
+        <span className={SELECTISH} data-testid="binding-detail-format">
+          <span className="tw:flex-1">As written</span>
         </span>
       </ControlRow>
       <CommitRow
@@ -145,27 +152,40 @@ export function BindingDetail({ composer, elementId, onOpenCreateCollection }: B
         }}
         testId="binding-detail-fallback"
       />
-      <ControlRow label="Preview">
+      <div className="tw:flex tw:flex-col tw:gap-2 tw:py-2">
+        <span className="bdi-lb">Preview</span>
         <span className={VALUE} data-testid="binding-detail-preview">
           {state.status?.kind === "loading" ? "Loading…" : shown || "—"}
         </span>
-      </ControlRow>
+      </div>
       {status ? (
         <NoteRow tone={state.status?.kind === "empty-fallback" || state.status?.kind === "loading" ? "muted" : "error"} testId="binding-detail-status">
           {status}
         </NoteRow>
       ) : null}
-      <ActionRow onClick={openRecord} disabled={!state.preview?.record} testId="binding-open-record">
+      <Button
+        type="button"
+        variant="link"
+        size="xs"
+        onClick={openRecord}
+        disabled={!state.preview?.record}
+        data-testid="binding-open-record"
+        className="tw:self-center tw:h-8 tw:text-[12px] tw:font-normal"
+      >
         Open record ›
-      </ActionRow>
-      <ActionRow
+      </Button>
+      <Button
+        type="button"
+        color="light"
+        size="xs"
         onClick={() => {
           if (!readOnly) state.unbind();
         }}
-        testId="binding-unbind"
+        data-testid="binding-unbind"
+        className="tw:mt-1 tw:h-8 tw:w-full tw:text-[12px] tw:font-normal tw:text-[var(--bk-ink)] tw:focus:ring-0"
       >
         Unbind — keep shown text
-      </ActionRow>
+      </Button>
       {shown ? <NoteRow testId="binding-unbind-note">Keeps “{shown}” as static text.</NoteRow> : null}
     </div>
   );

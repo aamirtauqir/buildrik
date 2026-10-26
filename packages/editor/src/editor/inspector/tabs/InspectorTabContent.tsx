@@ -36,7 +36,7 @@ import { InspectorFieldContext } from "../shared/controls/InspectorFieldContext"
 import { sectionOverrideMarks } from "../shared/controls/OverrideDot";
 import { capabilitiesFor } from "@/shared/constants/elementCapabilities";
 import { BindingDetail } from "../sections/binding/BindingDetail";
-import { openBindingDetail, useBindingDetail } from "../sections/binding/bindingDetailStore";
+import { openSubview, useSubview } from "./subviewStore";
 
 // ============================================================================
 // TYPES
@@ -111,9 +111,10 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
   } = props;
 
   const field = React.useContext(InspectorFieldContext);
-  const detailFor = useBindingDetail();
-  /* Another element closes the binding detail (Play F2.05). */
-  React.useEffect(() => () => openBindingDetail(null), [selectedElement.id]);
+  const subview = useSubview();
+  /* Another element closes any subview (Play F2.05, 2L9 I15). */
+  React.useEffect(() => () => openSubview(null), [selectedElement.id]);
+  const subviewHere = subview?.elementId === selectedElement.id && selectedIds.length <= 1 ? subview.kind : null;
   const type = selectedElement.type;
   const caps = capabilitiesFor(type);
   const isMultiSelect = selectedIds.length > 1;
@@ -138,11 +139,13 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
     isMultiSelect,
   };
 
-  if (tabId === "content" && detailFor === selectedElement.id && selectedIds.length <= 1) {
+  if (tabId === "content" && subviewHere === "binding") {
     return <BindingDetail composer={composer} elementId={selectedElement.id} onOpenCreateCollection={onOpenCreateCollection} />;
   }
 
-  const ids = visibleSectionIds(tabId, selectedTypes.length ? selectedTypes : [type], baseCtx);
+  const all = visibleSectionIds(tabId, selectedTypes.length ? selectedTypes : [type], baseCtx);
+  /* An open interaction is the Behavior tab's whole body (2L9 I15). */
+  const ids = tabId === "behaviour" && subviewHere === "interaction" ? all.filter((id) => id === "interactions") : all;
   const modes = ids.map((id) => {
     const entry = SECTION_REGISTRY[id];
     return resolveDisplayMode(entry.open, sectionHasValue(id, baseCtx), choices[`${type}:${id}`]);

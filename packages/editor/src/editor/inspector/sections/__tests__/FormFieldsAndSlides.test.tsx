@@ -1,7 +1,8 @@
 /**
- * Boards 4428:141878 (Form › FIELDS) and 4428:142450 (Slider › SLIDES), on the
- * real Composer: rows mirror the children; the type select, "+ Add field",
- * "+ Add slide" and the slide ⋯ edit the tree.
+ * 2L9 Form › Fields (156:716) + the selected field's Field block (156:1316),
+ * and board 4428:142450 (Slider › SLIDES), on the real Composer: rows mirror
+ * the children; the Field rows, "+ Add field", "+ Add slide" and the ⋯
+ * menus edit the tree.
  *
  * @license BSD-3-Clause
  */
@@ -11,6 +12,7 @@ import { Composer } from "@/engine/Composer";
 import { FormFieldsSection } from "../FormFieldsSection";
 import { formFields } from "../formFieldModel";
 import { SlidesSection } from "../SlidesSection";
+import { TypeBlockSection } from "../typeBlock/TypeBlockSection";
 
 beforeAll(() => {
   HTMLCanvasElement.prototype.getContext = (() => ({
@@ -32,7 +34,7 @@ function project(children: unknown[]) {
 const input = (id: string, type: string, placeholder: string, extra: Record<string, string> = {}) =>
   ({ id, type: "input", tagName: "input", attributes: { type, placeholder, name: id, ...extra }, children: [] });
 
-describe("Form › FIELDS", () => {
+describe("Form › FIELDS (2L9 156:716)", () => {
   const make = () =>
     project([{ id: "f", type: "form", tagName: "form", children: [
       input("name", "text", "Name", { required: "" }), input("email", "email", "Email"),
@@ -40,27 +42,28 @@ describe("Form › FIELDS", () => {
       { id: "go", type: "button", tagName: "button", content: "Send", attributes: { type: "submit" }, children: [] },
     ] }]);
 
-  it("one row per field, 'Label · Type · Required' (board 19); the submit button is not a field", () => {
+  const rowTexts = () =>
+    screen.getAllByTestId("form-field-row").map((r) => [
+      r.querySelector("[data-testid=form-field-name]")?.textContent,
+      r.querySelector("[data-testid=form-field-summary]")?.textContent,
+    ]);
+
+  it("two lines per field — name, then 'Type · Required' — and the submit button last", () => {
     render(<FormFieldsSection elementId="f" composer={make()} isOpen />);
-    const rows = screen.getAllByTestId("form-field-row");
-    expect(rows.map((r) => r.textContent)).toEqual(["Name · Text · Required", "Email · Email", "Message · Textarea"]);
-    expect(screen.getByText("Fields")).toBeInTheDocument();
+    expect(rowTexts()).toEqual([
+      ["Name", "Text · Required"],
+      ["Email", "Email"],
+      ["Message", "Textarea"],
+      ["Send", "Submit button"],
+    ]);
+    expect(screen.getByTestId("form-add-field")).toHaveTextContent("+ Add field");
   });
 
-  it("opening a row drills in; the Type select rewrites the input, and swaps it for a textarea", () => {
+  it("opening a field selects it (its own Content is the Field block — 156:1316)", () => {
     const composer = make();
     render(<FormFieldsSection elementId="f" composer={composer} isOpen />);
-    fireEvent.click(screen.getAllByTestId("form-field-row")[0]);
-    act(() => { fireEvent.change(screen.getByRole("combobox", { name: "Type" }), { target: { value: "tel" } }); });
-    expect(composer.elements.getElement("name")?.getAttribute("type")).toBe("tel");
-    fireEvent.click(screen.getByTestId("form-field-back"));
     fireEvent.click(screen.getAllByTestId("form-field-row")[1]);
-    act(() => { fireEvent.change(screen.getByRole("combobox", { name: "Type" }), { target: { value: "textarea" } }); });
-    const fields = formFields(composer.elements.getElement("f")!);
-    expect(fields.map((el) => el.getTagName().toLowerCase())).toEqual(["input", "textarea", "textarea"]);
-    expect(fields[1].getAttribute("placeholder")).toBe("Email");
-    /* the editor follows the swapped field */
-    expect(screen.getByRole("combobox", { name: "Type" })).toHaveValue("textarea");
+    expect(composer.selection.getSelectedIds()).toEqual(["email"]);
   });
 
   const commit = (label: string, value: string) => {
@@ -68,67 +71,6 @@ describe("Form › FIELDS", () => {
     fireEvent.change(field, { target: { value } });
     act(() => { fireEvent.keyDown(field, { key: "Enter" }); });
   };
-
-  it("2L9 156:1316 — the field's rows in board order", () => {
-    render(<FormFieldsSection elementId="f" composer={make()} isOpen />);
-    fireEvent.click(screen.getAllByTestId("form-field-row")[1]);
-    const labels = Array.from(screen.getByTestId("form-field-editor").querySelectorAll(".bdi-lb, .bdi-sub-label, label")).map((l) => l.textContent?.trim());
-    expect(labels.filter((t, i, all) => t && all.indexOf(t) === i)).toEqual([
-      "Field", "Type", "Label", "Placeholder", "Name", "Required", "Default value", "Validation", "Min length", "Max length",
-    ]);
-    expect(screen.getByTestId("form-field-back")).toHaveTextContent("‹ Form");
-    expect(screen.getByTestId("form-field-name-note")).toHaveTextContent("Name is the key stored with each submission.");
-  });
-
-  it("Label no longer writes the placeholder: without a <label> it is the accessible name; Placeholder is its own row", () => {
-    const composer = make();
-    render(<FormFieldsSection elementId="f" composer={composer} isOpen />);
-    fireEvent.click(screen.getAllByTestId("form-field-row")[1]);
-    commit("Label", "Your email");
-    expect(composer.elements.getElement("email")?.getAttribute("aria-label")).toBe("Your email");
-    expect(composer.elements.getElement("email")?.getAttribute("placeholder")).toBe("Email");
-    commit("Placeholder", "you@example.com");
-    expect(composer.elements.getElement("email")?.getAttribute("placeholder")).toBe("you@example.com");
-  });
-
-  it("Label edits the field's own <label> when the form has one (Contact form shape)", () => {
-    const composer = project([{ id: "f", type: "form", tagName: "form", children: [
-      { id: "w", type: "container", tagName: "div", children: [
-        { id: "lab", type: "label", tagName: "label", content: "Email", children: [] },
-        input("email", "email", "you@example.com"),
-      ] },
-    ] }]);
-    render(<FormFieldsSection elementId="f" composer={composer} isOpen />);
-    expect(screen.getAllByTestId("form-field-row")[0]).toHaveTextContent("Email · Email");
-    fireEvent.click(screen.getAllByTestId("form-field-row")[0]);
-    expect(screen.getByLabelText("Label")).toHaveValue("Email");
-    commit("Label", "Work email");
-    expect(composer.elements.getElement("lab")?.getContent()).toBe("Work email");
-    expect(composer.elements.getElement("email")?.getAttribute("placeholder")).toBe("you@example.com");
-  });
-
-  it("Name: a key another field uses is refused with the board's message, the draft kept (156:1911)", () => {
-    const composer = make();
-    render(<FormFieldsSection elementId="f" composer={composer} isOpen />);
-    fireEvent.click(screen.getAllByTestId("form-field-row")[1]);
-    commit("Name", "name");
-    expect(composer.elements.getElement("email")?.getAttribute("name")).toBe("email");
-    expect(screen.getByTestId("form-field-name-error")).toHaveTextContent("“name” is already used. Choose a unique submission key.");
-    expect(screen.getByLabelText("Name")).toHaveValue("name");
-    commit("Name", "work_email");
-    expect(composer.elements.getElement("email")?.getAttribute("name")).toBe("work_email");
-    expect(screen.queryByTestId("form-field-name-error")).toBeNull();
-  });
-
-  it("Default value and Validation write the field's attributes", () => {
-    const composer = make();
-    render(<FormFieldsSection elementId="f" composer={composer} isOpen />);
-    fireEvent.click(screen.getAllByTestId("form-field-row")[0]);
-    commit("Default value", "Ada");
-    commit("Max length", "80");
-    expect(composer.elements.getElement("name")?.getAttribute("value")).toBe("Ada");
-    expect(composer.elements.getElement("name")?.getAttribute("maxlength")).toBe("80");
-  });
 
   it("2L9 156:716 — a field's ⋯ moves it up / down and deletes it; the reorder note says so", () => {
     const composer = make();
@@ -145,7 +87,6 @@ describe("Form › FIELDS", () => {
     expect(screen.getByRole("menuitem", { name: "Move down" })).toBeDisabled();
     act(() => { fireEvent.click(screen.getByRole("menuitem", { name: "Delete" })); });
     expect(composer.elements.getElement("msg")).toBeUndefined();
-    expect(screen.getAllByTestId("form-field-row")).toHaveLength(2);
   });
 
   it("a field wrapped with its label moves and goes with the label (Contact form shape)", () => {
@@ -164,44 +105,27 @@ describe("Form › FIELDS", () => {
     expect(composer.elements.getElement("l-b")).toBeUndefined();
   });
 
-  it("Label and Required write the field, one undo step each", () => {
-    const composer = make();
-    render(<FormFieldsSection elementId="f" composer={composer} isOpen />);
-    fireEvent.click(screen.getAllByTestId("form-field-row")[1]);
-    commit("Label", "Your email");
-    expect(composer.elements.getElement("email")?.getAttribute("aria-label")).toBe("Your email");
-    composer.history.flushPending?.();
-    act(() => { fireEvent.click(screen.getByRole("checkbox", { name: "Required" })); });
-    expect(composer.elements.getElement("email")?.getAttribute("required")).toBe("");
-    composer.history.flushPending?.();
-    act(() => { composer.history.undo(); });
-    expect(composer.elements.getElement("email")?.getAttribute("required")).toBeUndefined();
-    expect(composer.elements.getElement("email")?.getAttribute("aria-label")).toBe("Your email");
-  });
-
   it("2L9 156:3109 — + Add field lists the board's 13 types, in its order", () => {
     render(<FormFieldsSection elementId="f" composer={make()} isOpen />);
     fireEvent.click(screen.getByTestId("form-add-field"));
     const items = Array.from(screen.getByRole("group", { name: "Add field" }).children).map((b) => b.textContent);
     expect(items).toEqual(["Text", "Email", "Number", "Textarea", "Select", "Checkbox", "Radio", "Switch", "Slider", "Date", "Time", "Color", "Submit"]);
     fireEvent.click(screen.getByTestId("form-add-field-back"));
-    expect(screen.getAllByTestId("form-field-row")).toHaveLength(3);
+    expect(screen.getAllByTestId("form-field-row")).toHaveLength(4);
   });
 
-  it("Text adds an input before the submit button, named and labelled as the board's new field, and opens it (156:3684)", () => {
+  it("Text adds an input before the submit button, named and labelled as the board's new field, and selects it (156:3684)", () => {
     const composer = make();
     render(<FormFieldsSection elementId="f" composer={composer} isOpen />);
     fireEvent.click(screen.getByTestId("form-add-field"));
     act(() => { fireEvent.click(screen.getByTestId("form-add-field-input")); });
     const kids = composer.elements.getElement("f")!.getChildren();
     expect(kids).toHaveLength(5);
-    expect(kids[3].getTagName().toLowerCase()).toBe("input");
     expect(kids[3].getAttribute("name")).toBe("field-4");
     expect(kids[3].getAttribute("placeholder")).toBe("Your answer");
+    expect(kids[3].getAttribute("aria-label")).toBe("Field 4");
     expect(kids[4].getId()).toBe("go");
-    expect(screen.getByLabelText("Label")).toHaveValue("Field 4");
-    fireEvent.click(screen.getByTestId("form-field-back"));
-    expect(screen.getAllByTestId("form-field-row")).toHaveLength(4);
+    expect(composer.selection.getSelectedIds()).toEqual([kids[3].getId()]);
   });
 
   it.each([
@@ -214,13 +138,96 @@ describe("Form › FIELDS", () => {
     render(<FormFieldsSection elementId="f" composer={composer} isOpen />);
     fireEvent.click(screen.getByTestId("form-add-field"));
     act(() => { fireEvent.click(screen.getByTestId(`form-add-field-${blockId}`)); });
-    fireEvent.click(screen.getByTestId("form-field-back"));
-    const rows = screen.getAllByTestId("form-field-row");
-    expect(rows).toHaveLength(4);
-    expect(rows[3].textContent).toContain(label);
-    /* still before the submit button */
+    const rows = rowTexts();
+    expect(rows).toHaveLength(5);
+    expect(rows[3][1]).toContain(label);
     const kids = composer.elements.getElement("f")!.getChildren();
     expect(kids[kids.length - 1].getId()).toBe("go");
+  });
+
+  describe("the Field block of a selected field (2L9 156:1316)", () => {
+    const field = (composer: Composer, id: string) =>
+      render(
+        <TypeBlockSection
+          composer={composer}
+          element={{ id, type: composer.elements.getElement(id)!.getType() }}
+          targetIds={[id]}
+          styles={{}}
+          onChange={() => {}}
+          onBatchChange={() => {}}
+          isOpen
+          onToggle={() => {}}
+        />,
+      );
+
+    it("'‹ {form}' above 'Field'; Type · Label · Placeholder · Name + note · Required · Default value", () => {
+      const composer = make();
+      field(composer, "email");
+      expect(screen.getByTestId("field-back-to-form")).toHaveTextContent("‹ Form");
+      const text = document.getElementById("inspector-section-type")!.textContent ?? "";
+      const at = ["Field", "Type", "Label", "Placeholder", "Name", "Name is the key stored with each submission.", "Required", "Default value"].map((t) => text.indexOf(t));
+      expect(at.every((i) => i >= 0)).toBe(true);
+      expect([...at].sort((a, b) => a - b)).toEqual(at);
+      fireEvent.click(screen.getByTestId("field-back-to-form"));
+      expect(composer.selection.getSelectedIds()).toEqual(["f"]);
+    });
+
+    it("Label is the accessible name without a <label>; Placeholder is its own row", () => {
+      const composer = make();
+      field(composer, "email");
+      commit("Label", "Your email");
+      expect(composer.elements.getElement("email")?.getAttribute("aria-label")).toBe("Your email");
+      expect(composer.elements.getElement("email")?.getAttribute("placeholder")).toBe("Email");
+      commit("Placeholder", "you@example.com");
+      expect(composer.elements.getElement("email")?.getAttribute("placeholder")).toBe("you@example.com");
+    });
+
+    it("Label edits the field's own <label> (Contact form shape)", () => {
+      const composer = project([{ id: "f", type: "form", tagName: "form", children: [
+        { id: "w", type: "container", tagName: "div", children: [
+          { id: "lab", type: "label", tagName: "label", content: "Email", children: [] },
+          input("email", "email", "you@example.com"),
+        ] },
+      ] }]);
+      field(composer, "email");
+      expect(screen.getByLabelText("Label")).toHaveValue("Email");
+      commit("Label", "Work email");
+      expect(composer.elements.getElement("lab")?.getContent()).toBe("Work email");
+    });
+
+    it("Name: a key another field uses is refused with the board's message, the draft kept (156:1911)", () => {
+      const composer = make();
+      field(composer, "email");
+      commit("Name", "name");
+      expect(composer.elements.getElement("email")?.getAttribute("name")).toBe("email");
+      expect(screen.getByTestId("form-field-name-error")).toHaveTextContent("“name” is already used. Choose a unique submission key.");
+      commit("Name", "work_email");
+      expect(composer.elements.getElement("email")?.getAttribute("name")).toBe("work_email");
+    });
+
+    it("Type swaps an input for a textarea and the selection follows it", () => {
+      const composer = make();
+      field(composer, "email");
+      act(() => { fireEvent.change(screen.getByLabelText("Type"), { target: { value: "textarea" } }); });
+      const fields = formFields(composer.elements.getElement("f")!);
+      expect(fields[1].getTagName().toLowerCase()).toBe("textarea");
+      expect(fields[1].getAttribute("placeholder")).toBe("Email");
+      expect(composer.selection.getSelectedIds()).toEqual([fields[1].getId()]);
+    });
+
+    it("Default value and Required write the field, one undo step each", () => {
+      const composer = make();
+      field(composer, "email");
+      commit("Default value", "Ada");
+      expect(composer.elements.getElement("email")?.getAttribute("value")).toBe("Ada");
+      composer.history.flushPending?.();
+      act(() => { fireEvent.click(screen.getByRole("checkbox", { name: "Required" })); });
+      expect(composer.elements.getElement("email")?.getAttribute("required")).toBe("");
+      composer.history.flushPending?.();
+      act(() => { composer.history.undo(); });
+      expect(composer.elements.getElement("email")?.getAttribute("required")).toBeUndefined();
+      expect(composer.elements.getElement("email")?.getAttribute("value")).toBe("Ada");
+    });
   });
 });
 
