@@ -47,7 +47,7 @@ function mount(c = fakeComposer()) {
 const url = () => screen.getByLabelText("Website URL");
 async function extract(value = "https://acme.test") {
   fireEvent.change(url(), { target: { value } });
-  await act(async () => { fireEvent.click(screen.getByRole("button", { name: "Extract brand" })); });
+  await act(async () => { fireEvent.click(screen.getByRole("button", { name: "Get colors and fonts" })); });
 }
 
 const URL_RESULT = {
@@ -65,14 +65,29 @@ beforeEach(() => {
 });
 
 describe("BrandFromSource (BRP1-M11)", () => {
-  it("source: a logo drop zone and a website field", () => {
+  it("source (B6-B32): the website field first, then 'or' and the logo upload", () => {
     mount();
-    expect(screen.getByText("Start with your brand")).toBeTruthy();
-    expect(screen.getByText("Drop your logo here")).toBeTruthy();
-    expect(screen.getByText("PNG, JPG or SVG")).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Choose file" })).toBeTruthy();
-    expect(screen.getByText("Or use a website")).toBeTruthy();
+    expect(screen.getByText("From logo or URL")).toBeTruthy();
+    expect(screen.getByText("Start from your existing website or logo. You see a preview before anything changes.")).toBeTruthy();
     expect(url()).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Get colors and fonts" })).toBeTruthy();
+    expect(screen.getByText("or")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Upload a logo (PNG or SVG)" })).toBeTruthy();
+    expect(screen.getByText("Read in your browser")).toBeTruthy();
+  });
+
+  it("offline (B6-B38): reading a website waits for a connection; the logo still works", () => {
+    const spy = vi.spyOn(navigator, "onLine", "get").mockReturnValue(false);
+    try {
+      mount();
+      expect(screen.getByTestId("brand-source-offline").textContent).toBe(
+        "Needs a connection to read a website. You can still upload a logo; it is read in your browser.",
+      );
+      expect((screen.getByRole("button", { name: "Get colors and fonts" }) as HTMLButtonElement).disabled).toBe(true);
+      expect((screen.getByRole("button", { name: "Upload a logo (PNG or SVG)" }) as HTMLButtonElement).disabled).toBe(false);
+    } finally {
+      spy.mockRestore();
+    }
   });
 
   it("loading: names the site, and Cancel goes back without applying the late answer", async () => {
@@ -81,11 +96,11 @@ describe("BrandFromSource (BRP1-M11)", () => {
     const { c } = mount();
     await extract();
     expect(mutate).toHaveBeenCalledWith({ siteId: "s1", url: "https://acme.test" });
-    expect(screen.getByText("Finding your brand…")).toBeTruthy();
-    expect(screen.getByText("Extracting colours and fonts from acme.test.")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Reading…" })).toBeTruthy();
+    expect(screen.getByText("Reading acme.test. This can take up to 20 seconds. Nothing changes until you apply.")).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
     await act(async () => { resolve(URL_RESULT); });
-    expect(screen.getByText("Drop your logo here")).toBeTruthy();
+    expect(screen.getByText("Read in your browser")).toBeTruthy();
     expect(c.designSystem.preview).toBeNull();
   });
 
@@ -93,7 +108,8 @@ describe("BrandFromSource (BRP1-M11)", () => {
     mutate.mockResolvedValueOnce(URL_RESULT);
     const { c } = mount();
     await extract();
-    expect(screen.getByText("Preview extracted brand")).toBeTruthy();
+    expect(screen.getByText("Result from acme.test")).toBeTruthy();
+    expect(screen.getByText(/^Found \d+ colors and 2 fonts\. They map to your existing tokens\.$/)).toBeTruthy();
     expect(screen.getByTestId("brand-source-chips").textContent).toContain("Primary · #C2410C");
     expect(screen.getByText("Headings: Playfair Display · Body: Inter")).toBeTruthy();
     expect(screen.getByText("Replaced Tiempos Headline with Playfair Display")).toBeTruthy();
@@ -118,18 +134,18 @@ describe("BrandFromSource (BRP1-M11)", () => {
     mutate.mockRejectedValueOnce(new Error("TIMEOUT: That site took too long to answer"));
     mount();
     await extract();
-    expect(screen.getByText("That site took too long to answer")).toBeTruthy();
+    expect(screen.getByText("This took too long and was stopped. Nothing was changed. Try again, or upload your logo.")).toBeTruthy();
     mutate.mockResolvedValueOnce(URL_RESULT);
     await act(async () => { fireEvent.click(screen.getByRole("button", { name: "Try again" })); });
     expect(mutate).toHaveBeenCalledTimes(2);
-    expect(screen.getByText("Preview extracted brand")).toBeTruthy();
+    expect(screen.getByText("Result from acme.test")).toBeTruthy();
   });
 
   it("address-refused: an internal or invalid address is refused with the board's copy", async () => {
     mutate.mockRejectedValueOnce(new Error("BLOCKED: This address can't be used"));
     mount();
     await extract("http://127.0.0.1");
-    expect(screen.getByText("This address can't be used")).toBeTruthy();
+    expect(screen.getByText("127.0.0.1 didn’t allow us to read it. Upload your logo instead, or try another address. Nothing was changed.")).toBeTruthy();
     expect(screen.getByText("Enter a public website address starting with https:// or http://.")).toBeTruthy();
     expect((url() as HTMLInputElement).value).toBe("http://127.0.0.1");
   });
@@ -141,7 +157,7 @@ describe("BrandFromSource (BRP1-M11)", () => {
     const { c } = mount();
     await extract();
     c.calls.length = 0;
-    const confirm = screen.getByRole("button", { name: "Confirm" });
+    const confirm = screen.getByRole("button", { name: "Apply" });
     fireEvent.click(confirm);
     fireEvent.click(confirm);
     await act(async () => { release(true); });
@@ -157,7 +173,7 @@ describe("BrandFromSource (BRP1-M11)", () => {
     takeRestorePoint.mockResolvedValueOnce(false);
     const { c } = mount();
     await extract();
-    await act(async () => { fireEvent.click(screen.getByRole("button", { name: "Confirm" })); });
+    await act(async () => { fireEvent.click(screen.getByRole("button", { name: "Apply" })); });
     expect(screen.getByText("We couldn't save a restore point — nothing was changed.")).toBeTruthy();
     expect(c.designSystem.setTokens).not.toHaveBeenCalled();
   });

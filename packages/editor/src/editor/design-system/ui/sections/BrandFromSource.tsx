@@ -35,6 +35,7 @@ import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { decodeLogoColors } from "@/editor/design-system/utils/decodeLogo";
 import { takeRestorePoint } from "@/editor/design-system/state/useBrandRestorePoints";
 import { useProjectTokenStore } from "@/editor/design-system/state/TokenRegistryContext";
+import { useOnline } from "@/editor/design-system/state/useOnline";
 import { useBrandPreview } from "@/editor/design-system/state/useBrandPreview";
 import { useGuardedApply } from "@/editor/design-system/state/useGuardedApply";
 
@@ -109,8 +110,10 @@ const COPY = {
   restoreFailed: "We couldn't save a restore point — nothing was changed.",
   unsupported: "Use a PNG, JPG or SVG logo",
   tooBig: "That logo is too big — use one under 5 MB (SVG under 1 MB)",
-  refused: "This address can't be used",
-  timeout: "That site took too long to answer",
+  /* B6-B34 / B6-B35, in the board's words. */
+  refused: (host: string) => `${host || "That site"} didn’t allow us to read it. Upload your logo instead, or try another address. Nothing was changed.`,
+  timeout: "This took too long and was stopped. Nothing was changed. Try again, or upload your logo.",
+  offline: "Needs a connection to read a website. You can still upload a logo; it is read in your browser.",
 };
 
 const errorMessage = (e: unknown) => (e instanceof Error ? e.message : String(e));
@@ -137,6 +140,7 @@ export const BrandFromSource: React.FC<BrandFromSourceProps> = ({ composer }) =>
   /* What the current preview was read from — the receipt names it (B6-B37). */
   const readFrom = React.useRef("");
   const { undo } = useProjectTokenStore();
+  const online = useOnline();
 
   const savedTokens = (): DesignToken[] => {
     const s = composer?.getProjectSettings();
@@ -182,7 +186,7 @@ export const BrandFromSource: React.FC<BrandFromSourceProps> = ({ composer }) =>
   const readSite = async (address: string) => {
     const siteId = getSiteIdFromUrl();
     if (!siteId) {
-      setState({ kind: "source", notice: { tone: "error", text: COPY.refused }, refused: true });
+      setState({ kind: "source", notice: { tone: "error", text: COPY.refused("") }, refused: true });
       return;
     }
     const id = ++request.current;
@@ -205,7 +209,7 @@ export const BrandFromSource: React.FC<BrandFromSourceProps> = ({ composer }) =>
       if (message.startsWith("TIMEOUT:")) {
         setState({ kind: "source", notice: { tone: "warning", text: COPY.timeout }, retry: address });
       } else {
-        setState({ kind: "source", notice: { tone: "error", text: COPY.refused }, refused: true });
+        setState({ kind: "source", notice: { tone: "error", text: COPY.refused(host) }, refused: true });
       }
     }
   };
@@ -243,41 +247,6 @@ export const BrandFromSource: React.FC<BrandFromSourceProps> = ({ composer }) =>
 
   const source = (s: Extract<State, { kind: "source" }>) => (
     <>
-      <div
-        data-testid="brand-source-drop"
-        onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-        onDragLeave={() => setDragOver(false)}
-        onDrop={(e) => {
-          e.preventDefault();
-          setDragOver(false);
-          const f = e.dataTransfer.files?.[0];
-          if (f) void readLogo(f);
-        }}
-        className={`tw:flex tw:w-full tw:flex-col tw:items-start tw:gap-3 tw:rounded-[var(--bk-radius-md)] tw:border tw:p-6 ${
-          dragOver ? "tw:border-[var(--bk-accent)] tw:bg-[var(--bk-accent-tint)]" : "tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-card)]"
-        }`}
-      >
-        <p className="tw:m-0 tw:text-[length:var(--bk-text-16)] tw:font-semibold tw:leading-6 tw:tracking-[-0.16px] tw:text-[var(--bk-ink)]">
-          Drop your logo here
-        </p>
-        <p className={`${SMALL} tw:text-[var(--bk-ink-muted)]`}>PNG, JPG or SVG</p>
-        <Button type="button" variant="secondary" size="xs" onClick={() => fileRef.current?.click()}>
-          Choose file
-        </Button>
-        <TextInput
-          ref={fileRef}
-          type="file"
-          accept="image/png,image/jpeg,image/webp,image/svg+xml"
-          className="tw:hidden"
-          aria-label="Upload a logo"
-          onChange={(e) => {
-            const f = e.target.files?.[0];
-            if (f) void readLogo(f);
-            e.target.value = "";
-          }}
-        />
-      </div>
-      <p className={`${SMALL} tw:text-[var(--bk-ink-muted)]`}>Or use a website</p>
       <label className="tw:flex tw:w-full tw:flex-col tw:gap-1">
         <span className={FIELD_LABEL}>Website URL</span>
         <TextInput
@@ -292,9 +261,47 @@ export const BrandFromSource: React.FC<BrandFromSourceProps> = ({ composer }) =>
           data-testid="brand-source-url"
         />
       </label>
-      <Button type="button" size="xs" onClick={() => (url.trim() ? void readSite(url.trim()) : urlRef.current?.focus())}>
-        Extract brand
+      <Button
+        type="button"
+        size="xs"
+        disabled={!online}
+        onClick={() => (url.trim() ? void readSite(url.trim()) : urlRef.current?.focus())}
+      >
+        Get colors and fonts
       </Button>
+      {!online && <NoticeStrip tone="warning" text={COPY.offline} testId="brand-source-offline" />}
+      <p className={`${SMALL} tw:text-[var(--bk-ink-muted)]`}>or</p>
+      <div
+        data-testid="brand-source-drop"
+        onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setDragOver(false);
+          const f = e.dataTransfer.files?.[0];
+          if (f) void readLogo(f);
+        }}
+        className={`tw:flex tw:w-full tw:flex-col tw:items-start tw:gap-2 tw:rounded-[var(--bk-radius-md)] tw:border tw:p-4 ${
+          dragOver ? "tw:border-[var(--bk-accent)] tw:bg-[var(--bk-accent-tint)]" : "tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-card)]"
+        }`}
+      >
+        <Button type="button" variant="secondary" size="xs" onClick={() => fileRef.current?.click()}>
+          Upload a logo (PNG or SVG)
+        </Button>
+        <p className={`${SMALL} tw:text-[var(--bk-ink-muted)]`}>Read in your browser</p>
+        <TextInput
+          ref={fileRef}
+          type="file"
+          accept="image/png,image/jpeg,image/webp,image/svg+xml"
+          className="tw:hidden"
+          aria-label="Upload a logo"
+          onChange={(e) => {
+            const f = e.target.files?.[0];
+            if (f) void readLogo(f);
+            e.target.value = "";
+          }}
+        />
+      </div>
       {s.notice && <NoticeStrip {...s.notice} testId="brand-source-notice" />}
       {s.retry && (
         <Button type="button" variant="secondary" size="xs" onClick={() => void readSite(s.retry!)}>
@@ -335,14 +342,17 @@ export const BrandFromSource: React.FC<BrandFromSourceProps> = ({ composer }) =>
       { label: "Text", value: hex("color-text") },
       { label: "Surface", value: hex("color-surface") },
     ].filter((c) => c.value);
+    const fontCount = new Set([fonts.heading?.family, fonts.body?.family].filter(Boolean)).size;
     const replaced = [fonts.heading, fonts.body].filter(
       (f, i, all): f is { family: string; replaced: string } =>
         Boolean(f?.replaced) && all.findIndex((g) => g?.replaced === f?.replaced) === i,
     );
     return (
       <>
-        <h3 className={TITLE}>Preview extracted brand</h3>
-        <p className={`${SMALL} tw:text-[var(--bk-ink-soft)]`}>Review colours and fonts before applying them.</p>
+        <h3 className={TITLE}>{readFrom.current ? `Result from ${readFrom.current}` : "Result"}</h3>
+        <p className={`${SMALL} tw:text-[var(--bk-ink-soft)]`}>
+          {`Found ${chips.length} color${chips.length === 1 ? "" : "s"} and ${fontCount} font${fontCount === 1 ? "" : "s"}. They map to your existing tokens.`}
+        </p>
         <div className="tw:flex tw:items-center tw:gap-2" aria-hidden="true">
           {chips.map((c) => (
             <span
@@ -374,18 +384,23 @@ export const BrandFromSource: React.FC<BrandFromSourceProps> = ({ composer }) =>
 
   return (
     <section
-      aria-label="Start with your brand"
+      aria-label="From logo or URL"
       data-testid="brand-from-source"
       data-state={state.kind}
       className="tw:flex tw:w-full tw:max-w-[620px] tw:flex-col tw:items-start tw:gap-3 tw:rounded-[var(--bk-radius-md)] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-card)] tw:p-4"
     >
-      <h2 className={TITLE}>Start with your brand</h2>
+      {(state.kind === "source" || state.kind === "loading") && (
+        <>
+          <h2 className={TITLE}>From logo or URL</h2>
+          <p className={`${SMALL} tw:text-[var(--bk-ink-soft)]`}>Start from your existing website or logo. You see a preview before anything changes.</p>
+        </>
+      )}
       {state.kind === "source" && source(state)}
       {state.kind === "loading" && (
         <>
-          <h3 className={TITLE}>Finding your brand…</h3>
-          <p className={`${SMALL} tw:text-[var(--bk-ink-soft)]`}>{`Extracting colours and fonts from ${state.from}.`}</p>
-          <div className="tw:h-1 tw:w-full tw:overflow-hidden tw:bg-[var(--bk-bg-subtle)]" role="progressbar" aria-label="Finding your brand">
+          <Button type="button" size="xs" disabled>Reading…</Button>
+          <p className={`${SMALL} tw:text-[var(--bk-ink-soft)]`}>{`Reading ${state.from}. This can take up to 20 seconds. Nothing changes until you apply.`}</p>
+          <div className="tw:h-1 tw:w-full tw:overflow-hidden tw:bg-[var(--bk-bg-subtle)]" role="progressbar" aria-label={`Reading ${state.from}`}>
             <div className="tw:h-1 tw:w-[42%] tw:bg-[var(--bk-accent)]" />
           </div>
           <Button type="button" variant="secondary" size="xs" onClick={cancel}>
@@ -397,7 +412,7 @@ export const BrandFromSource: React.FC<BrandFromSourceProps> = ({ composer }) =>
         <>
           {summary(state.roles, state.fonts)}
           {state.failed && <NoticeStrip tone="error" text={COPY.restoreFailed} testId="brand-source-notice" />}
-          <p className={`${SMALL} tw:text-[var(--bk-ink-muted)]`}>Confirm creates a restore point. Undo the whole change with one ⌘Z.</p>
+          <p className={`${SMALL} tw:text-[var(--bk-ink-muted)]`}>Apply saves a restore point “Before from logo or URL” first. One Undo reverts everything.</p>
           <div className="tw:flex tw:items-center tw:gap-2">
             <Button type="button" variant="secondary" size="xs" onClick={cancel}>
               Cancel
@@ -408,7 +423,7 @@ export const BrandFromSource: React.FC<BrandFromSourceProps> = ({ composer }) =>
               disabled={guard.busy}
               onClick={() => void confirm(state.roles, state.fonts)}
             >
-              Confirm
+              Apply
             </Button>
           </div>
         </>

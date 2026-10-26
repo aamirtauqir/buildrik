@@ -9507,9 +9507,9 @@
    "page": "05",
    "family": "brand",
    "status": "active",
-   "authority": "board",
+   "authority": "code:dsai-flag",
    "verified": "drift-open",
-   "verifiedNote": "Not AI (deterministic extract; PR#33 keeps it) but gated by dsAi flag. Copy: \"Start with your brand\"/\"Website URL\" vs board \"Get colors and "
+   "verifiedNote": "Gate: behind the dsAi flag (rule-based extraction, not AI; PR #33 keeps it) — authority code:dsai-flag. L-D S7: \"From logo or URL\" + board intro, URL field + \"Get colors and fonts\", \"or\", \"Upload a logo (PNG or SVG)\" · \"Read in your browser\" (drop target kept). Starters list under it not drawn on this page. Built, not compared."
   },
   {
    "nodeId": "210:37078",
@@ -9517,9 +9517,9 @@
    "page": "05",
    "family": "brand",
    "status": "active",
-   "authority": "board",
+   "authority": "code:dsai-flag",
    "verified": "drift-open",
-   "verifiedNote": "Loading \"Finding your brand…\" progressbar vs board \"Reading… up to 20 seconds\" + Cancel"
+   "verifiedNote": "Gate: behind the dsAi flag (rule-based extraction, not AI; PR #33 keeps it) — authority code:dsai-flag. L-D S7: \"Reading…\" + \"Reading {host}. This can take up to 20 seconds. Nothing changes until you apply.\" + Cancel. Built, not compared."
   },
   {
    "nodeId": "210:37301",
@@ -9527,9 +9527,9 @@
    "page": "05",
    "family": "brand",
    "status": "active",
-   "authority": "board",
+   "authority": "code:dsai-flag",
    "verified": "drift-open",
-   "verifiedNote": "Copy \"This address can’t be used\" vs board \"fieldwork.studio didn’t allow us to read it…\""
+   "verifiedNote": "Gate: behind the dsAi flag (rule-based extraction, not AI; PR #33 keeps it) — authority code:dsai-flag. L-D S7: \"{host} didn’t allow us to read it. Upload your logo instead, or try another address. Nothing was changed.\" Built, not compared."
   },
   {
    "nodeId": "210:37520",
@@ -9537,9 +9537,9 @@
    "page": "05",
    "family": "brand",
    "status": "active",
-   "authority": "board",
+   "authority": "code:dsai-flag",
    "verified": "drift-open",
-   "verifiedNote": "Copy \"That site took too long to answer\" vs board \"This took too long and was stopped…\" + Try again"
+   "verifiedNote": "Gate: behind the dsAi flag (rule-based extraction, not AI; PR #33 keeps it) — authority code:dsai-flag. L-D S7: \"This took too long and was stopped. Nothing was changed. Try again, or upload your logo.\" + Try again. Built, not compared."
   },
   {
    "nodeId": "210:37740",
@@ -9547,9 +9547,9 @@
    "page": "05",
    "family": "brand",
    "status": "active",
-   "authority": "board",
+   "authority": "code:dsai-flag",
    "verified": "drift-open",
-   "verifiedNote": "\"Preview extracted brand\" vs board \"Result from …\" token→value rows with Used by, Light/Dark locked note"
+   "verifiedNote": "Gate: behind the dsAi flag (rule-based extraction, not AI; PR #33 keeps it) — authority code:dsai-flag. L-D S7: title \"Result from {host}\", \"Found {n} colors and {m} fonts. They map to your existing tokens.\", restore-point line, Cancel · Apply. Token→value rows with Used by still chips (open). Built, not compared."
   },
   {
    "nodeId": "210:37943",
@@ -9557,9 +9557,9 @@
    "page": "05",
    "family": "brand",
    "status": "active",
-   "authority": "board",
+   "authority": "code:dsai-flag",
    "verified": "drift-open",
-   "verifiedNote": "L-D S5: receipt \"Brand updated from {host}. Restore point “Before from logo or URL” saved.\" + Undo → composer.history.undo. Result rows open (B36). Built, not compared."
+   "verifiedNote": "Gate: behind the dsAi flag (rule-based extraction, not AI; PR #33 keeps it) — authority code:dsai-flag. L-D S5 receipt with Undo → composer.history.undo. Built, not compared."
   },
   {
    "nodeId": "210:38222",
@@ -9567,9 +9567,9 @@
    "page": "05",
    "family": "brand",
    "status": "active",
-   "authority": "board",
+   "authority": "code:dsai-flag",
    "verified": "no",
-   "verifiedNote": "No offline state for website read"
+   "verifiedNote": "Gate: behind the dsAi flag (rule-based extraction, not AI; PR #33 keeps it) — authority code:dsai-flag. L-D S7: offline → \"Needs a connection to read a website. You can still upload a logo; it is read in your browser.\", website read disabled, logo live (useOnline). Built, not compared."
   },
   {
    "nodeId": "210:38443",
