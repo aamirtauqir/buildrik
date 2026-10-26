@@ -4491,7 +4491,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Lane L-B A7 (built, not compared): the interaction screen's back row reads '‹ Back to Interactions'. Open: Play / More…, Repeat / When rows, 'Interaction added · Undo' receipt."
+   "verifiedNote": "Lane L-B A7c (built, not compared — copy checked against the dump): '‹ Back to Interactions', 'Play', 'More…', Trigger, Effect, Duration, Delay, Easing, 'Plays on all breakpoints'. Open: Animate (target), Repeat, When rows (the model's loop/target semantics are not surfaced yet), 'Interaction added · Undo' receipt."
   },
   {
    "nodeId": "161:15688",
@@ -4552,7 +4552,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Inline Disable/Delete buttons; board \"Interaction actions\" menu Duplicate/Disable/Delete"
+   "verifiedNote": "Lane L-B A7c (built, not compared): More… opens 'Interaction actions' — Duplicate (copy after the original, opened), Disable / Enable, Delete."
   },
   {
    "nodeId": "165:18272",
@@ -4593,7 +4593,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Inline Disable/Delete buttons; board \"Interaction actions\" menu Duplicate/Disable/Delete",
+   "verifiedNote": "Lane L-B A7c (built, not compared): Interaction actions menu — see 165:17822.",
    "inheritsFrom": "165:17822"
   },
   {
@@ -19835,9 +19835,9 @@
    "page": "07",
    "family": "recovery",
    "status": "active",
-   "authority": "board",
+   "authority": "open:save-failed-copy-context",
    "verified": "drift-open",
-   "verifiedNote": "phase1: SaveStatus.tsx:67 \"Save failed — retry\" vs \"Couldn't save — Retry\"; SaveFailedBanner.tsx:74-77 card copy differs from strip"
+   "verifiedNote": "L-F W1: built, not compared. SaveFailedBanner is one strip: line + Retry. context=\"publish\" draws the board's \"Save before publishing. Your changes are kept.\"; without a context \"Couldn't save {where}. Your changes are kept.\" Exit and brand-refusal variants kept (code:tokens-invalid). StudioHeader passing the context is REQUESTS F-18."
   },
   {
    "nodeId": "10:2647",
@@ -20267,7 +20267,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "HistoryTab.tsx:33-37 Session/Saves/Published match; rows lack verb·target·place + \"Restore to here\" + j/k footer"
+   "verifiedNote": "L-F W2: built, not compared. Two-line Session rows (step, then \"time · you\"), Restore to here on the hovered / j-k row, j/k hint under the list. \"verb · target · place\" needs target + page on each history entry, which the engine does not record (code:history-entry-no-target, part); session markers (Opened Home, Undo history cleared) likewise have no data."
   },
   {
    "nodeId": "230:13557",
@@ -20277,7 +20277,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "ActivityView.tsx:361-375 \"Restore to {time}?\"/\"Restore, discard N changes\" vs named step + \"Restore to here\""
+   "verifiedNote": "L-F W2: built, not compared. Confirm titled Restore to “{step}”? · Cancel · Restore to here. Body says the later steps are removed and that this can’t be undone — the board's \"You can still undo the restore\" is false for restoreEntry (code:restore-truncates, part)."
   },
   {
    "nodeId": "230:14116",
@@ -20285,9 +20285,9 @@
    "page": "07",
    "family": "recovery",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Restore writes a row (TimeTravelHost.tsx:141) but not \"Restored to … · N later steps removed\""
+   "authority": "code:restore-truncates",
+   "verified": "no",
+   "verifiedNote": "L-F W2: history.restoreEntry truncates the undo stack and records no step, so there is no \"Restored to …\" row to draw. Making a restore an undoable step is an engine change (lead)."
   },
   {
    "nodeId": "230:14662",

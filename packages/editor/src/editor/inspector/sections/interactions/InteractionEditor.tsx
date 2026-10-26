@@ -1,14 +1,21 @@
 /**
- * Interaction Editor Component
- * Editor panel for configuring a single interaction's animation settings
+ * Interaction Editor — one interaction's screen (2L9 boards 161:15179 I15,
+ * 165:17822 I20): "Play" and "More…" (Interaction actions: Duplicate,
+ * Disable / Enable, Delete) on top, then Trigger, Effect, Duration, Delay,
+ * Easing, and "Plays on all breakpoints". A disabled interaction keeps its
+ * configuration visible (I21).
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
 import { SelectField } from "@/shared/forms";
 import type { AnimationPreset } from "@/engine/interactions/types";
-import { type Interaction, ANIMATION_PRESETS, EASING_OPTIONS } from "./types";
-import { Button, TextInput } from "@/editor/chrome-ui";
+import { type Interaction, type InteractionTrigger, ANIMATION_PRESETS, EASING_OPTIONS, TRIGGER_GROUPS } from "./types";
+import { Button, Menu, MenuItem, Popover, TextInput } from "@/editor/chrome-ui";
+import { NoteRow } from "../behaviourRows";
+
+/** Every trigger, in the picker's order, for the Trigger row. */
+const TRIGGER_OPTIONS = Object.values(TRIGGER_GROUPS).flat().map(({ value, label }) => ({ value, label }));
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -18,6 +25,8 @@ export interface InteractionEditorProps {
   onUpdate: (id: string, updates: Partial<Interaction>) => void;
   onRemove: (id: string) => void;
   onToggleEnabled: (id: string) => void;
+  /** Interaction actions › Duplicate (I20). */
+  onDuplicate?: (id: string) => void;
   onPreview?: (interaction: Interaction) => void;
 }
 
@@ -55,11 +64,6 @@ const styles = {
     color: "var(--bk-ink)",
     fontSize: 13,
   } as React.CSSProperties,
-  buttonRow: {
-    display: "flex",
-    gap: 8,
-    marginTop: 8,
-  },
   buttonRowSecondary: {
     display: "flex",
     gap: 8,
@@ -120,8 +124,14 @@ export const InteractionEditor: React.FC<InteractionEditorProps> = ({
   onUpdate,
   onRemove,
   onToggleEnabled,
+  onDuplicate,
   onPreview,
 }) => {
+  const [menuOpen, setMenuOpen] = React.useState(false);
+  const act = (fn: () => void) => () => {
+    setMenuOpen(false);
+    fn();
+  };
   const writeTiming = (key: "duration" | "delay", ms: number) => {
     onUpdate(interaction.id, { animation: { ...interaction.animation, [key]: ms } });
   };
@@ -140,8 +150,39 @@ export const InteractionEditor: React.FC<InteractionEditorProps> = ({
 
   return (
     <div style={styles.container}>
+      <div style={styles.buttonRowSecondary}>
+        <Button onClick={() => onPreview?.(interaction)} color="light" size="xs" style={{ flex: 1 }}>
+          Play
+        </Button>
+        <Popover
+          open={menuOpen}
+          onClose={() => setMenuOpen(false)}
+          placement="bottom-end"
+          label="Interaction actions"
+          trigger={
+            <Button color="light" size="xs" aria-haspopup="menu" aria-expanded={menuOpen} onClick={() => setMenuOpen((v) => !v)}>
+              More…
+            </Button>
+          }
+        >
+          <Menu label="Interaction actions">
+            {onDuplicate ? <MenuItem onClick={act(() => onDuplicate(interaction.id))}>Duplicate</MenuItem> : null}
+            <MenuItem onClick={act(() => onToggleEnabled(interaction.id))}>{interaction.enabled ? "Disable" : "Enable"}</MenuItem>
+            <MenuItem danger onClick={act(() => onRemove(interaction.id))}>
+              Delete
+            </MenuItem>
+          </Menu>
+        </Popover>
+      </div>
+      {interaction.enabled ? null : <NoteRow testId="interaction-disabled">Off · this interaction does not play.</NoteRow>}
       <SelectField
-        label="Animation"
+        label="Trigger"
+        value={interaction.trigger}
+        onChange={(value) => onUpdate(interaction.id, { trigger: value as InteractionTrigger })}
+        options={TRIGGER_OPTIONS}
+      />
+      <SelectField
+        label="Effect"
         value={interaction.animation.preset}
         onChange={handleAnimationTypeChange}
         options={ANIMATION_PRESETS}
@@ -172,37 +213,7 @@ export const InteractionEditor: React.FC<InteractionEditorProps> = ({
         onChange={handleEasingChange}
         options={EASING_OPTIONS}
       />
-      <div style={styles.buttonRow}>
-        <Button
-          onClick={() => onPreview?.(interaction)}
-          color="light"
-          size="xs"
-          style={{ flex: 1 }}
-        >
-          Preview
-        </Button>
-        {/* Timeline button removed 2026-05-18 — its onOpenTimeline handler
-         * was a console.warn("not yet implemented") stub. No timeline view
-         * exists in the editor. See memory project_animation_audit_20260518.md. */}
-      </div>
-      <div style={styles.buttonRowSecondary}>
-        <Button
-          onClick={() => onToggleEnabled(interaction.id)}
-          color="light"
-          size="xs"
-          style={{ flex: 1 }}
-        >
-          {interaction.enabled ? "Disable" : "Enable"}
-        </Button>
-        <Button
-          onClick={() => onRemove(interaction.id)}
-          color="red"
-          size="xs"
-          style={{ flex: 1 }}
-        >
-          Delete
-        </Button>
-      </div>
+      <NoteRow testId="interaction-all-breakpoints">Plays on all breakpoints</NoteRow>
     </div>
   );
 };

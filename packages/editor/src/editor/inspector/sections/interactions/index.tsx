@@ -99,6 +99,15 @@ export const InteractionsSection: React.FC<InteractionsSectionProps> = ({
     if (editingId === id) setEditingId(null);
   };
 
+  // Duplicate an interaction just after itself, and open the copy (I20)
+  const duplicateInteraction = (id: string) => {
+    const at = interactions.findIndex((i) => i.id === id);
+    if (at < 0) return;
+    const copy: Interaction = { ...interactions[at], id: `interaction-${Date.now()}-${Math.random().toString(36).slice(2, 7)}` };
+    onInteractionsChange([...interactions.slice(0, at + 1), copy, ...interactions.slice(at + 1)]);
+    setEditingId(copy.id);
+  };
+
   // Toggle interaction enabled state
   const toggleEnabled = (id: string) => {
     onInteractionsChange(
@@ -146,6 +155,7 @@ export const InteractionsSection: React.FC<InteractionsSectionProps> = ({
               onUpdate={updateInteraction}
               onRemove={removeInteraction}
               onToggleEnabled={toggleEnabled}
+              onDuplicate={duplicateInteraction}
               onPreview={onPreview}
             />
           </>

@@ -111,7 +111,8 @@ describe("InteractionsSection", () => {
     });
     // Expand the item to reveal the Delete button
     fireEvent.click(screen.getByText("On hover"));
-    fireEvent.click(screen.getByText("Delete"));
+    fireEvent.click(screen.getByRole("button", { name: "More…" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Delete" }));
     expect(onChange).toHaveBeenCalledWith([]);
   });
 
@@ -123,7 +124,8 @@ describe("InteractionsSection", () => {
       onInteractionsChange: onChange,
     });
     fireEvent.click(screen.getByText("On click"));
-    fireEvent.click(screen.getByText("Disable"));
+    fireEvent.click(screen.getByRole("button", { name: "More…" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Disable" }));
     expect(onChange).toHaveBeenCalledOnce();
     const [updated] = onChange.mock.calls[0] as [Interaction[]];
     expect(updated[0].enabled).toBe(false);
@@ -198,5 +200,18 @@ describe("InteractionsSection — the element animation row", () => {
     expect(screen.queryByText("+ Add interaction")).toBeNull();
     fireEvent.click(screen.getByTestId("interactions-back"));
     expect(screen.getByRole("button", { name: /On click/ })).toBeInTheDocument();
+  });
+
+  it("2L9 I20: Duplicate puts a copy after the original and opens it", () => {
+    const interaction = makeInteraction("hover");
+    const onChange = vi.fn();
+    renderOpen({ interactions: [interaction], onInteractionsChange: onChange });
+    fireEvent.click(screen.getByText("On hover"));
+    fireEvent.click(screen.getByRole("button", { name: "More…" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Duplicate" }));
+    const next = onChange.mock.calls[0][0];
+    expect(next).toHaveLength(2);
+    expect(next[1]).toMatchObject({ trigger: "hover", animation: interaction.animation });
+    expect(next[1].id).not.toBe(interaction.id);
   });
 });
