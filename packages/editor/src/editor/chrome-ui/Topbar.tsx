@@ -9,8 +9,11 @@
  * Everything the old one did beyond that (command palette, publish dropdown,
  * review submission, feature flags) belongs to the container, not the bar.
  *
- * The ten children below ARE the component — exit, name, save, review,
- * spacer, tools, presence, notifications, publish, menu — in that order.
+ * 2L9 `Shell/Topbar` 497:99433 (1440×56), left → right, 8 apart: Exit ·
+ * the site's name as plain text (identity, not navigation) · "Site settings"
+ * (icon + label) · History (Undo · Redo) · flexible space · the review
+ * status · Comments · presence · notifications · Preview · Publish · ⋯.
+ * The save status is not here: it lives in the bottom bar (497:99485).
  * `tools` is the ONE bounded cluster (plan §2: Quick preview · Comments,
  * typed as data props; the IssueChip and the Live chip left the bar in C3 —
  * Issues opens from the site menu and ⌘K, the live URL is a site-menu row). There is deliberately no `extra` node
@@ -22,11 +25,10 @@
  */
 import React from "react";
 import { Button } from "flowbite-react";
-import { Redo, Undo } from "lucide-react";
+import { Bell, MessageSquare, Redo, Settings, Undo } from "lucide-react";
 /* The LOCAL Tooltip — see HelpTooltip.tsx. */
 import { Tooltip } from "./Tooltip";
 import { IconButton } from "./Icon";
-import { SaveStatus, type SaveState } from "./SaveStatus";
 import { Presence, type PresenceProps } from "./Presence";
 
 /* Publish geometry (2026-08-03). Both Publish branches used to render a bare
@@ -42,7 +44,9 @@ import { Presence, type PresenceProps } from "./Presence";
    the same node fixes its height at 32 — so it is carried as a box-model value
    the explicit height overrides, which is what Figma is doing too. */
 /* Board 4418:123573 (v3 IA): Publish at 13/500. */
-const PUBLISH_BTN_CLASS = "tw:flex-none tw:h-8 tw:px-4 tw:py-2.5 tw:text-[13px] tw:leading-5 tw:font-medium";
+/* Board 497:99433: Publish is 82 wide. A longer verb ("Send for review")
+   grows it rather than clipping. */
+const PUBLISH_BTN_CLASS = "tw:flex-none tw:h-8 tw:min-w-[82px] tw:px-4 tw:py-2.5 tw:text-[13px] tw:leading-5 tw:font-medium";
 
 /* Exit geometry + colour (2026-08-03), from board 681:26 `btn/exit`: 28 tall,
    10 horizontal padding, 12px REGULAR, ink at gray-900. It rendered 32 / 12 /
@@ -58,18 +62,24 @@ const PUBLISH_BTN_CLASS = "tw:flex-none tw:h-8 tw:px-4 tw:py-2.5 tw:text-[13px] 
 
    Scoped to this button on purpose: the shared ghost class is used widely, and re-inking
    every ghost button in the editor is not what the topbar board says. */
-/* Board 4418:123573 (v3 IA): Exit is 13/500 in gray-700. */
+/* Board 497:99433: Exit is a 48×32 Ghost, "Exit" with no chevron. */
 const EXIT_BTN_CLASS =
-  "tw:border-transparent tw:bg-transparent tw:h-7 tw:px-2.5 tw:text-[13px] tw:font-medium " +
-  "tw:text-[var(--bk-gray-700)] tw:enabled:hover:bg-[var(--bk-gray-100)]";
+  "tw:border-transparent tw:bg-transparent tw:h-8 tw:min-w-12 tw:px-2.5 tw:text-[13px] tw:font-medium " +
+  "tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-gray-100)]";
+
+/* Board 497:99433 `Site settings / visible labeled entry`: 140×32, the gear
+   then the label, drawn without a border on the bar. */
+const SITE_SETTINGS_BTN_CLASS =
+  "tw:flex-none tw:h-8 tw:w-[140px] tw:justify-start tw:gap-3.5 tw:px-3 tw:border-transparent tw:bg-transparent " +
+  "tw:text-[13px] tw:font-medium tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-gray-100)]";
 
 /* The topbar carries no search field in any state (OWNER DECISIONS
    2026-10-03): the resting ⌘K button went first — ⌘K / Ctrl+K is the
    palette's door — and then the drawer-owned field (board 4418:100087 and its
    siblings), which moved into each panel as chrome-ui's PanelSearch. */
-/* Board 4418:123573: Preview is a 76×32 bordered TEXT button, not an eye. */
+/* Board 497:99433: Preview is an 82×32 Secondary TEXT button, not an eye. */
 const PREVIEW_BTN_CLASS =
-  "tw:flex-none tw:h-8 tw:w-[76px] tw:px-0 tw:text-[13px] tw:font-medium tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-card)] tw:text-[var(--bk-ink)]";
+  "tw:flex-none tw:h-8 tw:w-[82px] tw:px-0 tw:text-[13px] tw:font-medium tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-card)] tw:text-[var(--bk-ink)]";
 
 /**
  * `published` is the 2-second success transient after a publish lands (plan
@@ -122,16 +132,11 @@ export interface TopbarHistory {
 }
 
 export interface TopbarProps {
+  /** The site's name — identity, not navigation (board 497:99433). */
   siteName: string;
-  /** The page being edited — the crumb after the site (board 4418:123573:
-   *  "Bella Cucina › Home"). Omit for no page crumb. */
-  pageName?: string | null;
-  /** The site crumb's click — board 4418:126034's hotspot/crumb-site opens
-   *  the Pages panel (4418:90494). Omit and the site name is plain text. */
-  onOpenPages?: () => void;
-  /** The page crumb's click — hotspot/crumb-page lands on the base shell
-   *  (4418:123573: drawer closed). Omit and the page is plain text. */
-  onPageCrumb?: () => void;
+  /** "Site settings" — the visible, labelled door to the site's settings.
+   *  Omit where settings are not the viewer's (view mode). */
+  onOpenSiteSettings?: () => void;
   onExit?: () => void;
   /**
    * What the leftmost control says and does. In view mode it leaves the MODE,
@@ -140,17 +145,6 @@ export interface TopbarProps {
    * while getting back to editing was one row inside a ⋯ menu.
    */
   exitLabel?: string;
-  /** Omit to render no save indicator at all — view mode, where nothing can
-      become unsaved and the pill would be status about a machine the viewer is
-      not operating. */
-  save?: SaveState;
-  savedAt?: number;
-  /** The save pill's click — the container routes it by state (B2): History
-   *  for saved/saving/unsaved, a retry for error, the recovery dialog for a
-   *  conflict. Omit for offline, where `saveHint` carries the reason. */
-  onSaveClick?: () => void;
-  /** The tooltip on a pill with nothing to click (offline). */
-  saveHint?: string;
   /** Undo / Redo. Omit where nothing can be edited (view mode). */
   history?: TopbarHistory | null;
   /** The review round's current truth. Omit when no review is in flight. */
@@ -194,14 +188,6 @@ export interface TopbarProps {
   menu?: React.ReactNode;
 }
 
-const CRUMB_CLASS =
-  "tw:h-auto tw:min-w-0 tw:truncate tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[14px] tw:leading-5 " +
-  "tw:font-medium tw:text-[var(--bk-accent)] tw:hover:underline tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
-
-const PAGE_CRUMB_CLASS =
-  "tw:h-auto tw:shrink-0 tw:max-w-[160px] tw:min-w-0 tw:truncate tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[14px] tw:leading-5 " +
-  "tw:font-medium tw:text-[var(--bk-ink)] tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
-
 const PUBLISH_LABEL: Record<PublishState, string> = {
   ready: "Publish",
   disabled: "Publish",
@@ -210,7 +196,7 @@ const PUBLISH_LABEL: Record<PublishState, string> = {
 };
 
 export function Topbar({
-  siteName, pageName, onOpenPages, onPageCrumb, onExit, exitLabel = "‹ Exit", save, savedAt, onSaveClick, saveHint, history, review, tools, presence,
+  siteName, onOpenSiteSettings, onExit, exitLabel = "Exit", history, review, tools, presence,
   unreadCount = 0, onOpenNotifications, publish = "ready", publishBusy, onPublish, publishExpanded, publishControls,
   publishBlockedReason, ctaLabel, ctaHint, action, menu,
 }: TopbarProps) {
@@ -223,13 +209,9 @@ export function Topbar({
       // (StudioHeader.tsx), so the id is unambiguous.
       data-testid="topbar"
       className={
-        /* The bar measures itself so the compact tiers of plan §7 key off the
-           space it actually has, not the viewport — the shell's rails eat
-           into it. `tw:@container` sets `container-type: inline-size`;
-           SaveStatus's own `tw:@max-[1200px]:hidden` (its timestamp) keys
-           off this ancestor. */
-        "tw:flex tw:items-center tw:gap-3 tw:h-[var(--bk-size-topbar)] tw:flex-none tw:@container " +
-        "tw:px-3 tw:bg-white tw:border-b tw:border-[var(--bk-gray-100)] " +
+        /* Board 497:99433: 56 tall, children 8 apart, 13 in from each edge. */
+        "tw:flex tw:items-center tw:gap-2 tw:h-[var(--bk-size-topbar)] tw:flex-none " +
+        "tw:px-[13px] tw:bg-white tw:border-b tw:border-[var(--bk-gray-100)] " +
         "tw:[font-family:var(--bk-font-ui)] tw:text-[13px] tw:text-[var(--bk-ink)]"
       }
     >
@@ -237,95 +219,47 @@ export function Topbar({
         {exitLabel}
       </Button>
 
-      {/* 680:11 on all three topbar frames — 681:26 (which shell-default
-          measures) and 682:4576 / 682:4651 on the S5 flow frames — is a FIXED
-          200 column at 14/20. It shipped 13px in a 120..200 elastic box, so
-          the site's own name read at the size of the controls around it and
-          the whole bar re-laid itself when the name changed length. */}
-      {/* The breadcrumb (C5 G1-004): the site in accent opens the Pages
-          panel; the page crumb returns to the base shell. Board 4418:123573
-          puts the shell search at x356, so the crumb column is 267 (it was
-          681:26's 200). */}
+      {/* Board 497:99433 `Site identity / not navigation`: the name as plain
+          text in a 176 column — not a crumb, not a button. */}
       <span
         /* Narrow-width rule (design-2l9 Task 1.2): this column is the ONE
            thing that gives way as the bar narrows — it ellipsizes down to
-           80px (full name in the crumb's title) while every other control
-           keeps its size, so at the 1024 minimum nothing wraps or clips. */
-        className="tw:flex tw:items-center tw:gap-1 tw:text-[14px] tw:leading-5 tw:font-medium tw:w-[267px] tw:shrink tw:min-w-[80px] tw:whitespace-nowrap"
+           80px (full name in its title) while every other control keeps its
+           size, so at the 1024 minimum nothing wraps or clips. */
+        className="tw:w-[176px] tw:shrink tw:min-w-[80px] tw:truncate tw:whitespace-nowrap tw:px-1 tw:text-[13px] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)]"
+        title={siteName}
         data-testid="topbar-site-name"
       >
-        {onOpenPages ? (
-          <Button
-            color="light"
-            size="xs"
-            onClick={onOpenPages}
-            className={CRUMB_CLASS}
-            title={siteName}
-            data-testid="topbar-crumb-site"
-          >
-            {/* text-overflow does nothing on the button itself (it is a flex
-                container), so the ellipsis lives on this inner block — the
-                1024px pin caught the name clipping at both ends instead —
-                and left-aligned, because the button centres text and a
-                centred overflow clips both ends with no ellipsis. */}
-            <span className="tw:min-w-0 tw:truncate tw:text-left">{siteName}</span>
-          </Button>
-        ) : (
-          <span className="tw:min-w-0 tw:truncate tw:text-[var(--bk-ink)]" title={siteName}>
-            {siteName}
-          </span>
-        )}
-        {pageName ? (
-          <>
-            <span aria-hidden="true" className="tw:flex-none tw:text-[var(--bk-ink-muted)]">›</span>
-            {onPageCrumb ? (
-              <Button
-                color="light"
-                size="xs"
-                onClick={onPageCrumb}
-                aria-current="page"
-                className={PAGE_CRUMB_CLASS}
-                title={pageName}
-                data-testid="topbar-crumb-page"
-              >
-                <span className="tw:min-w-0 tw:truncate tw:text-left">{pageName}</span>
-              </Button>
-            ) : (
-              <span
-                aria-current="page"
-                className="tw:shrink-0 tw:max-w-[160px] tw:min-w-0 tw:truncate tw:text-[var(--bk-ink)]"
-                title={pageName}
-                data-testid="topbar-crumb-page"
-              >
-                {pageName}
-              </span>
-            )}
-          </>
-        ) : null}
+        {siteName}
       </span>
+
+      {onOpenSiteSettings ? (
+        <Button
+          color="light"
+          size="xs"
+          onClick={onOpenSiteSettings}
+          className={SITE_SETTINGS_BTN_CLASS}
+          data-testid="topbar-site-settings"
+        >
+          <Settings size={16} aria-hidden="true" className="tw:flex-none" />
+          Site settings
+        </Button>
+      ) : null}
 
       {history ? <HistoryGroup {...history} /> : null}
 
-      {/* Nothing in a read-only view can become unsaved, so "Saved · just now"
-          is status about a machine the viewer is not operating. `save` is
-          omitted there rather than rendering a permanently-green pill. */}
-      {save ? <SaveStatus state={save} savedAt={savedAt} onClick={onSaveClick} hint={saveHint} className="tw:flex-none" /> : null}
-
+      <span className="tw:flex-1" />
 
       {review ? (
         <ReviewBadge {...review} />
       ) : null}
 
-      {/* Board 4418:123573: the comments toggle sits with the review chip. */}
+      {/* Board 497:99433: Comments (message-square) follows the review status. */}
       {tools?.onToggleComments ? (
         <IconButton label="Comments" pressed={Boolean(tools.commentsPressed)} onClick={tools.onToggleComments}>
-          <CommentIcon />
+          <MessageSquare size={16} aria-hidden="true" />
         </IconButton>
       ) : null}
-
-
-      <span className="tw:flex-1" />
-
 
       {presence ? <Presence {...presence} className="tw:flex-none" /> : null}
 
@@ -334,7 +268,7 @@ export function Topbar({
           label={unreadCount > 0 ? `Notifications, ${unreadCount} unread` : "Notifications"}
           onClick={onOpenNotifications}
         >
-          <BellIcon />
+          <Bell size={16} aria-hidden="true" />
         </IconButton>
         {unreadCount > 0 ? (
           /* Board 4418:123573: a count badge, not a dot. */
@@ -425,37 +359,28 @@ export function Topbar({
   );
 }
 
+/* Board 497:99433 `In review · 2`: the review status is TEXT — 13 medium,
+   no pill, no dot, no chevron — in a 32 tall hit area. The tone survives
+   only as the text colour (neutral/info ink-soft; warning and success their
+   accessible status tokens), because "Changes requested" and "Approved"
+   still need to read differently from "In review" (authority:
+   code:review-tones). */
 const REVIEW_BASE_CLASS =
-  "tw:flex-none tw:inline-flex tw:items-center tw:gap-1 tw:h-6 tw:px-2 tw:border-0 tw:rounded-full " +
-  "tw:text-xs tw:font-medium tw:whitespace-nowrap";
+  "tw:flex-none tw:inline-flex tw:items-center tw:h-8 tw:px-0 tw:border-0 tw:rounded tw:bg-transparent " +
+  "tw:text-[13px] tw:leading-5 tw:font-medium tw:whitespace-nowrap";
 
-/* Board B3-01 7569:190283, decision #26 (C2): tones via the status tokens —
-   warning-tint for Changes requested, success-tint for Approved, neutral
-   otherwise. (T8/D7 rule 3 had `success` on the neutral surface; the chip
-   set's tone variants were drawn since, and the container still demotes a
-   warning chip to neutral when two louder ambers are on the bar.) */
 const REVIEW_TONE_CLASS: Record<ReviewTone, string> = {
-  /* Board 4418:123573: the permanent door — white, hairline border, accent. */
-  neutral: "tw:bg-[var(--bk-bg-card)] tw:text-[var(--bk-accent)] tw:[box-shadow:inset_0_0_0_1px_var(--bk-border)]",
-  info: "tw:bg-[var(--bk-gray-100)] tw:text-[var(--bk-ink-soft)]",
-  success: "tw:bg-[var(--bk-success-tint)] tw:text-[var(--bk-success-text)]",
-  warning: "tw:bg-[var(--bk-warning-tint)] tw:text-[var(--bk-warning-text)]",
+  neutral: "tw:text-[var(--bk-ink-soft)]",
+  info: "tw:text-[var(--bk-ink-soft)]",
+  success: "tw:text-[var(--bk-success-text)]",
+  warning: "tw:text-[var(--bk-warning-text)]",
 };
 
-/* Board 4418:123573: a status dot leads, a › trails. The door with no round
-   has nothing to report, so no dot. */
-const REVIEW_DOT_CLASS: Record<ReviewTone, string | null> = {
-  neutral: null,
-  info: "tw:bg-[var(--bk-gray-500)]",
-  success: "tw:bg-[var(--bk-success)]",
-  warning: "tw:bg-[var(--bk-warning)]",
-};
-
-/* F23: reviewer names are unbounded — cap the pill, keep the truth in `title`. */
-const REVIEW_LABEL_CLASS = "tw:max-w-[140px] tw:overflow-hidden tw:text-ellipsis tw:whitespace-nowrap";
+/* F23: reviewer names are unbounded — cap the label, keep the truth in `title`. */
+const REVIEW_LABEL_CLASS = "tw:max-w-[180px] tw:overflow-hidden tw:text-ellipsis tw:whitespace-nowrap";
 
 /**
- * A clickable pill when there is somewhere to go, plain text when there is not.
+ * A button when there is somewhere to go, plain text when there is not.
  * A button that does nothing is worse than a label that never claimed to.
  */
 function ReviewBadge({ label, tone, title, onClick }: ReviewPill) {
@@ -467,18 +392,15 @@ function ReviewBadge({ label, tone, title, onClick }: ReviewPill) {
       </span>
     );
   }
-  const dot = REVIEW_DOT_CLASS[tone];
   return (
     <button
       type="button"
-      className={`${className} tw:cursor-pointer tw:outline-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]`}
+      className={`${className} tw:cursor-pointer tw:outline-none tw:hover:bg-[var(--bk-gray-100)] tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]`}
       title={title ?? label}
       onClick={onClick}
       data-testid="topbar-review-pill"
     >
-      {dot ? <span className={`tw:size-1.5 tw:flex-none tw:rounded-full ${dot}`} aria-hidden="true" /> : null}
       <span className={REVIEW_LABEL_CLASS} data-testid="topbar-review-label">{label}</span>
-      <span aria-hidden="true" data-testid="topbar-review-chevron">›</span>
     </button>
   );
 }
@@ -516,27 +438,11 @@ function HistoryGroup({ canUndo, canRedo, onUndo, onRedo, undoChord, redoChord }
   );
 }
 
-/* Inline 24px glyphs matching the Figma icon components 681:4338 / 681:4343.
-   Eye/Comment/Spinner: Figma nodes pending T1 (as-built ledger pattern). */
-function CommentIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-      <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" />
-    </svg>
-  );
-}
+/* Inline 24px glyph — Figma node pending T1 (as-built ledger pattern). */
 function SpinnerIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
       <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-    </svg>
-  );
-}
-function BellIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-      <path d="M10.268 21a2 2 0 0 0 3.464 0" />
-      <path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326" />
     </svg>
   );
 }

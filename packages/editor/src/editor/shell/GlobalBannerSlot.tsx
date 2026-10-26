@@ -31,11 +31,13 @@ import {
 import { PhoneScreen, useNarrowWindowBanner } from "./SmallScreen";
 import { useWorkspaceDeletionBanner } from "./useWorkspaceDeletionBanner";
 
-/* `leading-[normal]`, not `leading-normal`: the second is Tailwind's 1.5,
-   which computes to 21px, and board 297:2244 says the keyword. */
+/* Board B7-G02 225:2821 (2L9): the bar runs the full window width under the
+   topbar, 40 tall, square, 16 in from the edges, 13 medium text, the
+   actions at the right. (It was board 297:2139's inset 8-radius card.)
+   `leading-[normal]`, not `leading-normal`: the second is Tailwind's 1.5. */
 export const BANNER_BAR =
-  "tw:flex tw:flex-wrap tw:items-center tw:gap-3 tw:px-5 tw:py-3 tw:rounded-lg " +
-  "tw:text-sm tw:font-medium tw:leading-[normal] tw:[font-family:var(--bk-font-ui)]";
+  "tw:flex tw:flex-wrap tw:items-center tw:gap-3 tw:min-h-10 tw:px-4 tw:py-1 " +
+  "tw:text-[13px] tw:font-medium tw:leading-[normal] tw:[font-family:var(--bk-font-ui)]";
 export const BANNER_TONE: Record<BannerTone, string> = {
   error: "tw:bg-[var(--bk-error-tint)] tw:text-[var(--bk-error-text)]",
   warning: "tw:bg-[var(--bk-warning-tint)] tw:text-[var(--bk-warning-text)]",
@@ -47,9 +49,10 @@ export const BANNER_TONE: Record<BannerTone, string> = {
 export const BANNER_ACTION =
   "tw:h-auto tw:px-3 tw:py-1.5 tw:rounded-md tw:text-[13px] tw:leading-[normal] tw:text-current";
 
-/** The board opens warning and info lines with a glyph; decorative — the
- *  role and the text already say it. Error lines carry the ✕ dismiss. */
+/** The board opens every line with a glyph (B7-G02: ✕ for an error);
+ *  decorative — the role and the text already say it. */
 function ToneGlyph({ tone }: { tone: BannerTone }) {
+  if (tone === "error") return <X size={14} aria-hidden="true" className="tw:shrink-0" />;
   if (tone === "warning") return <AlertTriangle size={14} aria-hidden="true" className="tw:shrink-0" />;
   if (tone === "info") return <Info size={14} aria-hidden="true" className="tw:shrink-0" />;
   return null;
@@ -166,6 +169,14 @@ export interface GlobalBannerSlotProps {
   lead?: { id: string; render: (more: React.ReactNode) => React.ReactNode } | null;
 }
 
+/* Board B7-G02: the slot sits UNDER the topbar (y 56), above the workspace.
+   AquibraStudio mounts it before <header> in the DOM (REQUESTS F-11 moves
+   it); until then the shell places it with flex `order` — the studio root is
+   a flex column, the header keeps order 0, this slot is 1 and StudioPanels'
+   workspace is 2 — so the bar is drawn where the board puts it and pushes
+   the workspace down. Tab order still follows the DOM until F-11 lands. */
+const SLOT_CLASS = "tw:order-1 tw:flex-none";
+
 export const GlobalBannerSlot: React.FC<GlobalBannerSlotProps> = ({ lead }) => {
   useOfflineBanner();
   useNarrowWindowBanner();
@@ -174,7 +185,7 @@ export const GlobalBannerSlot: React.FC<GlobalBannerSlotProps> = ({ lead }) => {
   if (lead) {
     const rest = banners.filter((b) => b.id !== lead.id);
     return (
-      <div data-testid="global-banner-slot">
+      <div className={SLOT_CLASS} data-testid="global-banner-slot">
         {lead.render(<MoreConditions rest={rest} />)}
         <PhoneScreen />
       </div>
@@ -183,7 +194,7 @@ export const GlobalBannerSlot: React.FC<GlobalBannerSlotProps> = ({ lead }) => {
   if (banners.length === 0) return <PhoneScreen />;
   const [top, ...rest] = banners;
   return (
-    <div data-testid="global-banner-slot">
+    <div className={SLOT_CLASS} data-testid="global-banner-slot">
       <BannerBar banner={top} more={<MoreConditions rest={rest} />} />
       <PhoneScreen />
     </div>

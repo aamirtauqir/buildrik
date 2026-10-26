@@ -7,7 +7,7 @@
  */
 
 import * as React from "react";
-import { ToastInput, dismissToast, dismissToastKey } from "@/editor/chrome-ui";
+import { ToastInput, dismissToast } from "@/editor/chrome-ui";
 import { createComposer, Composer } from "@/engine";
 import { ProductCollectionService } from "@/engine/cms";
 import { THRESHOLDS } from "@/shared/constants/config";
@@ -47,7 +47,7 @@ import { IS_DEV_BUILD, DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { ComponentSchemaAIClient } from "@/engine/designSystem/services";
 import { getAiSubscriptionClient } from "@/services/ai/subscriptionClient";
 import { getDefaultPageName } from "@/shared/utils/pageUtils";
-import { isAuthSaveError, isForbiddenSaveError, refuseForbiddenSave, SAVE_FAILED_TOAST_KEY } from "./useSaveCallback";
+import { isAuthSaveError, isForbiddenSaveError, refuseForbiddenSave } from "./useSaveCallback";
 import { getEditorViewMode } from "@shared/utils/editorViewMode";
 import { describeLoadFailure, setSiteLoadStatus, type SiteLoadErrorKind } from "../siteLoadStatus";
 import {
@@ -794,7 +794,6 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
             if (siteId) clearUnsaved(siteId);
             refusedTokens = null;
             clearRetry();
-            dismissToastKey(SAVE_FAILED_TOAST_KEY);
             clearGlobalBanner(BANNER_ID.connection);
             setSaveState({ status: "idle", lastSavedAt: Date.now(), error: undefined });
             setIsDirty(false);
@@ -891,49 +890,12 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
               refuseForbiddenSave({ siteId, composer, setIsDirty, setSaveState });
               return;
             }
-            const retrying = retryAttempt > 0;
+            /* Owner 2026-10-26 (one error surface): the failure is the
+               global slot's save-failed bar (StudioHeader, from this
+               status and message — its words cover a page limit, a deleted
+               site and a site that never loaded) and the bottom bar's
+               "Couldn't save — Retry". No toast. */
             if (siteId && isRetryableSaveError(err, message)) scheduleRetry();
-            if (siteId && !retrying) {
-              /* A save refused because the project never loaded is not a
-                 failed request — it is the guard that stops autosave from
-                 overwriting the real site with the fallback. Say so, and
-                 offer the only action that helps. */
-              const notLoaded = message.includes("PROJECT_NOT_LOADED");
-              // Deleted is not "not loaded yet" — no reload will fix it.
-              const gone = message.includes("SITE_MISSING");
-              /* L3-013: over the plan's page limit. The server's words name
-                 the limit; a Retry would send the same refused snapshot. */
-              if (message.startsWith("PAGE_LIMIT:")) {
-                addToast({
-                  title: "Not saved — page limit reached",
-                  description: message.slice("PAGE_LIMIT:".length).trim(),
-                  tone: "error",
-                  key: SAVE_FAILED_TOAST_KEY,
-                });
-                return;
-              }
-              addToast({
-                title: gone
-                  ? "This site isn't there anymore"
-                  : notLoaded
-                    ? "Not saved — this site never loaded"
-                    : "Save failed",
-                description: gone
-                  ? "It was deleted, or it isn't yours to open — either way nothing can be saved to it."
-                  : notLoaded
-                    ? "Autosave is held back so it can't overwrite the stored pages. Reload to get the real site."
-                    : "Could not save to dashboard. Changes are unsaved.",
-                tone: notLoaded ? "warning" : "error",
-                key: SAVE_FAILED_TOAST_KEY,
-                ...(notLoaded && !gone
-                  ? { action: { label: "Reload", onClick: () => window.location.reload() } }
-                  : !gone
-                    ? /* Board 7574:194162: a failed save offers "Retry now" —
-                         it schedules the same autosave again. */
-                      { action: { label: "Retry now", onClick: handler } }
-                    : {}),
-              });
-            }
           });
       }, THRESHOLDS.AUTOSAVE_DEBOUNCE);
     };

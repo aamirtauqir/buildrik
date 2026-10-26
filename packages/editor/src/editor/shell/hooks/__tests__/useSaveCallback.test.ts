@@ -232,13 +232,11 @@ describe("useSaveCallback", () => {
     }
   });
 
-  it.each([
-    ["storage quota exceeded", "Storage full"],
-    ["permission denied", "Permission denied"],
-    ["request timeout", "Request timed out"],
-    ["something weird", "Could not save project"],
-  ])("maps error '%s' to friendly hint '%s'", async (raw, hint) => {
-    opts.saveProject.mockRejectedValueOnce(new Error(raw));
+  /* Owner 2026-10-26 (one error surface): a failed ⌘S is the save status —
+     the slot's bar and the bottom bar's "Couldn't save — Retry" read it
+     (copy per reason: saveFailedBanner.test.ts). No toast. */
+  it("a failed save is the status error with the raw message, and raises no toast", async () => {
+    opts.saveProject.mockRejectedValueOnce(new Error("request timeout"));
     const { result } = renderHook(() =>
       useSaveCallback({
         composer: opts.composer,
@@ -247,16 +245,16 @@ describe("useSaveCallback", () => {
         setIsDirty: opts.setIsDirty,
       }),
     );
+    let outcome: string | undefined;
     await act(async () => {
-      result.current();
+      outcome = await result.current();
       await flushMicrotasks();
     });
-    expect(opts.addToast).toHaveBeenCalledWith(
-      expect.objectContaining({
-        tone: "error",
-        description: expect.stringContaining(hint),
-      }),
-    );
+    expect(outcome).toBe("error");
+    const last = opts.setSaveState.mock.calls.at(-1)![0] as unknown;
+    const next = typeof last === "function" ? (last as (s: object) => object)({}) : last;
+    expect(next).toMatchObject({ status: "error", error: "request timeout" });
+    expect(opts.addToast).not.toHaveBeenCalledWith(expect.objectContaining({ tone: "error" }));
   });
 
   it("falls back to 'Unknown error' when err.message is missing", async () => {
@@ -284,40 +282,6 @@ describe("useSaveCallback", () => {
       status: "saving",
     });
     expect(errorState).toMatchObject({ status: "saving" });
-  });
-
-  it("Retry toast action re-invokes save", async () => {
-    opts.saveProject.mockRejectedValueOnce(new Error("boom"));
-    const { result } = renderHook(() =>
-      useSaveCallback({
-        composer: opts.composer,
-        addToast: opts.addToast,
-        setSaveState: opts.setSaveState,
-        setIsDirty: opts.setIsDirty,
-      }),
-    );
-    await act(async () => {
-      result.current();
-      await flushMicrotasks();
-    });
-
-    expect(opts.saveProject).toHaveBeenCalledTimes(1);
-
-    // Pull the action.onClick from the error toast call
-    const errorToast = opts.addToast.mock.calls.find(
-      (c) => (c[0] as { tone?: string }).tone === "error",
-    );
-    expect(errorToast).toBeDefined();
-    const action = (errorToast![0] as { action?: { onClick: () => void } }).action;
-    expect(action?.onClick).toBeTypeOf("function");
-
-    // Retry — succeeds this time
-    opts.saveProject.mockResolvedValueOnce(undefined);
-    await act(async () => {
-      action!.onClick();
-      await flushMicrotasks();
-    });
-    expect(opts.saveProject).toHaveBeenCalledTimes(2);
   });
 });
 
@@ -578,13 +542,16 @@ describe("useSaveCallback — an expired session is not a retryable save failure
       await flushMicrotasks();
     });
     expect(invalidateMyRole.mock.calls.length).toBe(roleInvalidationsBefore);
-    const toast = opts.addToast.mock.calls.at(-1)?.[0] as { title: string; description: string };
-    expect(toast.title).toBe("Save failed");
-    expect(toast.description).toMatch(/another site/i);
-    expect(toast.description).toMatch(/reload/i);
+    /* The words are the slot bar's (saveFailedBanner: "…another site… Reload
+       the site…"), read from the status; no toast. */
+    const last = opts.setSaveState.mock.calls.at(-1)![0] as unknown;
+    const next = (typeof last === "function" ? (last as (s: object) => object)({}) : last) as { status: string; error: string };
+    expect(next.status).toBe("error");
+    expect(next.error).toMatch(/belongs to another site/);
+    expect(opts.addToast).not.toHaveBeenCalled();
   });
 
-  it("a plain failure still gets Retry", async () => {
+  it("a plain failure is the error status (its Retry is the status's and the slot's), no toast", async () => {
     const opts = makeOpts();
     opts.saveProject.mockRejectedValueOnce(new Error("boom"));
     const { result } = renderHook(() =>
@@ -599,12 +566,10 @@ describe("useSaveCallback — an expired session is not a retryable save failure
       await result.current();
       await flushMicrotasks();
     });
-    const toast = opts.addToast.mock.calls.at(-1)?.[0] as {
-      title: string;
-      action?: { label: string };
-    };
-    expect(toast.title).toBe("Save failed");
-    expect(toast.action?.label).toBe("Retry");
+    const last = opts.setSaveState.mock.calls.at(-1)![0] as unknown;
+    const next = typeof last === "function" ? (last as (s: object) => object)({}) : last;
+    expect(next).toMatchObject({ status: "error", error: "boom" });
+    expect(opts.addToast).not.toHaveBeenCalled();
   });
 });
 

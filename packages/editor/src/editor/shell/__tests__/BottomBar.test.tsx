@@ -15,6 +15,7 @@ import type { PageData } from "@/shared/types";
 import { useEditorShortcuts } from "../hooks/useEditorShortcuts";
 import { usePageSummaries } from "../usePageSummaries";
 import { BottomBar } from "../BottomBar";
+import { saveStatusStore } from "../saveStatusStore";
 
 const PAGES = [
   { id: "home", name: "Home", isHome: true, root: {} },
@@ -156,5 +157,19 @@ describe("BottomBar — resource area", () => {
     expect(menu()).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "‹ Back to Editor" }));
     expect(onBack).toHaveBeenCalledTimes(1);
+  });
+});
+
+/* 2L9 497:99485: both contexts end with the save status and "Details". */
+describe("BottomBar — save status + Details", () => {
+  it("shows what StudioHeader wrote, and Details opens History", () => {
+    const onDetails = vi.fn();
+    act(() => saveStatusStore.set({ state: "saved", savedAt: Date.now(), onDetails }));
+    render(<BottomBar composer={null} pages={[]} resourceArea onBackToEditor={() => {}} />);
+    expect(screen.getByText("Saved just now")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Details" }));
+    expect(onDetails).toHaveBeenCalledTimes(1);
+    act(() => saveStatusStore.set(null));
+    expect(screen.queryByTestId("bottom-bar-save")).toBeNull();
   });
 });

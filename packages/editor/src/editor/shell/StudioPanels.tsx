@@ -909,8 +909,10 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
         // board (2 lines + ✦ Ask AI); gating on selectedElement collapsed the
         // column to 1px, so that state rendered off-viewport, unseeable.
         inspectorOpen={inspectorOpen}
-        /* The tray's column is wider than the inspector's (board 499:2656). */
-        className={trayShown ? "tw:[--layout-inspector-width:var(--bk-size-task-host)]" : undefined}
+        /* The tray's column is wider than the inspector's (board 499:2656).
+           `order-2`: after the global banner slot (order 1), which sits under
+           the topbar — see GlobalBannerSlot's SLOT_CLASS. */
+        className={trayShown ? "tw:order-2 tw:[--layout-inspector-width:var(--bk-size-task-host)]" : "tw:order-2"}
         style={styles.container}
       >
         {/* Left Sidebar — merged rail + panel. Absent in view mode, except for

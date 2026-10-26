@@ -1,11 +1,12 @@
 /**
- * StudioHeader — the save pill's click, by state (B2, decision #23; G1-005).
+ * StudioHeader → the bottom bar's save status, by state (2L9 497:99485; B2).
  *
- * The pill used to save for `unsaved`/`error` and be inert otherwise. The
- * board's status dot opens History and the owner kept ⌘S as the save, so the
- * container now routes the click:
- *   saved · saving · unsaved → History
- *   error                    → retry the save
+ * The status left the topbar for the bottom bar ("✓ Saved just now" +
+ * "Details"). StudioHeader derives it; BottomBar shows it. History is the
+ * "Details" door now; the status itself is clickable only where the state is
+ * the fix:
+ *   saved · saving · unsaved → plain text; Details → History
+ *   error                    → "Couldn't save — Retry" retries the save
  *   conflict                 → the recovery dialog (B1-01 7563:197963)
  *   offline                  → no navigation; the reason is a tooltip
  *
@@ -49,6 +50,7 @@ vi.mock("@/editor/canvas/hooks/useCollaboration", () => ({
 vi.mock("../modals/CommandPalette", () => ({ CommandPalette: () => null }));
 
 import { StudioHeader, type StudioHeaderProps } from "../StudioHeader";
+import { BottomBar } from "../BottomBar";
 
 function mount(over: Partial<StudioHeaderProps> = {}) {
   const props = {
@@ -69,37 +71,33 @@ function mount(over: Partial<StudioHeaderProps> = {}) {
     nextMove: null,
     ...over,
   };
-  render(<StudioHeader {...props} />);
+  render(
+    <>
+      <StudioHeader {...props} />
+      <BottomBar composer={null} pages={[]} resourceArea={false} onBackToEditor={() => {}} />
+    </>,
+  );
   return props;
 }
 
 afterEach(cleanup);
 
-describe("the save pill's click, by state", () => {
-  it("saved → History", () => {
-    const p = mount({ lastSavedAt: Date.now() });
-    /* Board 4418:123573: the settled pill reads "History ›". */
-    fireEvent.click(screen.getByRole("button", { name: /^History ›/ }));
-    expect(p.onOpenHistory).toHaveBeenCalledTimes(1);
-    expect(p.onSave).not.toHaveBeenCalled();
-  });
-
-  it("saving → History", () => {
-    const p = mount({ saveStatus: "saving" });
-    fireEvent.click(screen.getByRole("button", { name: "Saving…" }));
-    expect(p.onOpenHistory).toHaveBeenCalledTimes(1);
-  });
-
-  it("unsaved → History (⌘S is the save, not the pill)", () => {
-    const p = mount({ isDirty: true });
-    fireEvent.click(screen.getByRole("button", { name: "Unsaved changes" }));
+describe("the save status's click, by state", () => {
+  it.each([
+    ["saved", { lastSavedAt: Date.now() }, "Saved just now"],
+    ["saving", { saveStatus: "saving" as const }, "Saving…"],
+    ["unsaved", { isDirty: true }, "Unsaved changes"],
+  ] as const)("%s → plain text; Details opens History (⌘S is the save)", (_s, over, copy) => {
+    const p = mount(over);
+    expect(screen.getByText(copy).closest("button")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Details" }));
     expect(p.onOpenHistory).toHaveBeenCalledTimes(1);
     expect(p.onSave).not.toHaveBeenCalled();
   });
 
   it("error → retries the save", () => {
     const p = mount({ saveStatus: "error" });
-    fireEvent.click(screen.getByRole("button", { name: /Save failed/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Couldn.t save — Retry/ }));
     expect(p.onSave).toHaveBeenCalledTimes(1);
     expect(p.onOpenHistory).not.toHaveBeenCalled();
   });
@@ -115,7 +113,7 @@ describe("the save pill's click, by state", () => {
   it("offline → no button, no navigation; the reason is a tooltip", () => {
     const p = mount({ isOffline: true, isDirty: true });
     expect(screen.queryByRole("button", { name: /Offline/ })).toBeNull();
-    const pill = screen.getByText("Offline — not saved");
+    const pill = screen.getByTestId("save-status-offline");
     expect(pill.tagName).toBe("SPAN");
     fireEvent.click(pill);
     expect(p.onOpenHistory).not.toHaveBeenCalled();
@@ -128,7 +126,7 @@ describe("the save pill's click, by state", () => {
     for (const saveStatus of ["conflict", "error"] as const) {
       cleanup();
       const p = mount({ isOffline: true, saveStatus });
-      expect(screen.queryByRole("button", { name: /Conflict|Save failed|Offline/ })).toBeNull();
+      expect(screen.queryByRole("button", { name: /Conflict|Couldn.t save|Offline/ })).toBeNull();
       expect(p.onOpenConflict).not.toHaveBeenCalled();
     }
   });

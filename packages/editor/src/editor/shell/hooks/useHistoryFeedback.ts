@@ -123,6 +123,9 @@ const ACTION_DESCRIPTIONS: Record<string, string> = {
   "replace across selected pages": "Replaced media across pages",
   "instance-sync": "Synced component instances",
   "variant-change": "Changed variant",
+  "detach instance": "Detached instance",
+  // Pages
+  "reorder pages": "Reordered pages",
 };
 
 /**

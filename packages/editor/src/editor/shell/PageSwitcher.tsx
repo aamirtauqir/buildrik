@@ -76,7 +76,7 @@ export function PageSwitcher({
             ref={triggerRef}
             variant="ghost"
             size="xs"
-            className="tw:my-1 tw:h-6 tw:min-w-0 tw:gap-1.5 tw:px-1.5 tw:text-[12px] tw:font-medium tw:text-[var(--bk-ink)]"
+            className="tw:my-1 tw:h-6 tw:min-w-0 tw:gap-1.5 tw:px-1.5 tw:bg-[var(--bk-gray-100)] tw:text-[12px] tw:font-medium tw:text-[var(--bk-ink)]"
             aria-haspopup="dialog"
             aria-expanded={open}
             aria-keyshortcuts={mac ? "Shift+Meta+O" : "Control+Alt+O"}

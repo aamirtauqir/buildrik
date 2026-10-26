@@ -2,7 +2,7 @@
  * StudioHeader while the site is not loaded (design-2l9 Task 1.6).
  *
  * The engine holds the `not-loaded` edit lock until a load lands; the topbar
- * echoes it: the save pill reads "Not loaded · nothing saved yet" (board
+ * echoes it: the save status (bottom bar) reads "Not loaded · nothing saved yet" (board
  * B7-G02) and Publish is not offered, because there is nothing to publish.
  *
  *
@@ -45,6 +45,7 @@ vi.mock("@/editor/canvas/hooks/useCollaboration", () => ({
 }));
 vi.mock("../modals/CommandPalette", () => ({ CommandPalette: () => null }));
 
+import { saveStatusStore } from "../saveStatusStore";
 import { StudioHeader, type StudioHeaderProps } from "../StudioHeader";
 
 function mount(over: Partial<StudioHeaderProps> = {}) {
@@ -91,9 +92,9 @@ function lockedComposer(locks: string[], canUndo = false) {
 afterEach(cleanup);
 
 describe("StudioHeader with the not-loaded lock held", () => {
-  it('save pill reads "Not loaded · nothing saved yet"', () => {
+  it('the bottom bar\'s save status reads "Not loaded · nothing saved yet"', () => {
     mount({ composer: lockedComposer(["not-loaded"]) as unknown as StudioHeaderProps["composer"] });
-    expect(screen.getByText("Not loaded · nothing saved yet")).toBeTruthy();
+    expect(saveStatusStore.get()?.state).toBe("not-loaded");
   });
 
   it("offers no Publish control", () => {
@@ -101,9 +102,9 @@ describe("StudioHeader with the not-loaded lock held", () => {
     expect(screen.queryByRole("button", { name: /publish/i })).toBeNull();
   });
 
-  it("a view lock alone keeps the normal save pill", () => {
+  it("a view lock alone keeps the normal save status", () => {
     mount({ composer: lockedComposer(["view"]) as unknown as StudioHeaderProps["composer"] });
-    expect(screen.queryByText("Not loaded · nothing saved yet")).toBeNull();
+    expect(saveStatusStore.get()?.state).not.toBe("not-loaded");
   });
 
   it("time travel disables topbar Undo even when history has a step", () => {

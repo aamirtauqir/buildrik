@@ -108,6 +108,78 @@ export const OFFLINE_BANNER: GlobalBanner = {
     "You’re offline. Page edits are kept in this browser; other changes need this tab open. Everything saves when you reconnect.",
 };
 
+/**
+ * A failed save (C05 `10:2199`), in the slot rather than a strip of its own
+ * (owner 2026-10-26: one error surface at a time). It takes the CONNECTION
+ * id on purpose: "Couldn't save", "Can't reach Buildrik" and "Reconnecting…"
+ * are one condition — the edits are not reaching the server — so whichever
+ * was said last is the one bar, never three. The save status in the bottom
+ * bar says it too ("Couldn't save — Retry"); no toast does.
+ *
+ * The server's reason picks the words: a refused brand, a page limit, a
+ * deleted site and a site that never loaded are not connection problems, so
+ * they offer no Retry (it would send the same refused save).
+ */
+export interface SaveFailedInput {
+  /** "<site> · <page>". */
+  where: string;
+  /** The save pipeline's error message, if any. */
+  error?: string;
+  /** The failed save was the exit's (Save & leave) — the retry then leaves. */
+  leaving?: boolean;
+  /** Brand is read-only this session: a refusal points at Reload. */
+  brandLocked?: boolean;
+  retry: () => void;
+  /** Leaving only: stay, and put the bar away. */
+  keepEditing?: () => void;
+}
+
+export function saveFailedBanner({ where, error = "", leaving = false, brandLocked = false, retry, keepEditing }: SaveFailedInput): GlobalBanner {
+  const retryAction: BannerAction = { label: leaving ? "Retry save & leave" : "Retry", onClick: retry, testId: "save-failed-retry" };
+  const keep: BannerAction[] = leaving && keepEditing ? [{ label: "Keep editing", onClick: keepEditing, testId: "save-failed-keep" }] : [];
+  const base = { id: BANNER_ID.connection, tone: "error" as const };
+  if (error.startsWith("TOKENS_INVALID:")) {
+    const refusal = error.slice("TOKENS_INVALID:".length).trim();
+    return {
+      ...base,
+      message: brandLocked
+        ? `Couldn't save ${where}. This site's brand was refused: ${refusal}. Your changes are kept in this browser — reload to keep editing.`
+        : `Couldn't save ${where}. The brand change was refused: ${refusal}. Your changes are kept in this browser — undo the last brand change, then keep editing.`,
+      actions: leaving ? [retryAction, ...keep] : [],
+    };
+  }
+  if (error.startsWith("PAGE_LIMIT:")) {
+    return { ...base, message: `Not saved — page limit reached. ${error.slice("PAGE_LIMIT:".length).trim()}`, actions: keep };
+  }
+  /* I-2: the server refused a page that belongs to another site; the same
+     snapshot cannot succeed. */
+  if (error.includes("belongs to another site")) {
+    return { ...base, message: "This save included a page from another site and was refused. Reload the site before editing.", actions: keep };
+  }
+  if (error.includes("SITE_MISSING")) {
+    return {
+      ...base,
+      message: "This site isn't there anymore. It was deleted, or it isn't yours to open — nothing can be saved to it.",
+      actions: keep,
+    };
+  }
+  if (error.includes("PROJECT_NOT_LOADED")) {
+    return {
+      ...base,
+      tone: "warning",
+      message: "Not saved — this site never loaded. Autosave is held back so it can't overwrite the stored pages.",
+      actions: [{ label: "Reload", onClick: () => window.location.reload(), testId: "save-failed-reload" }, ...keep],
+    };
+  }
+  return {
+    ...base,
+    message: leaving
+      ? `Couldn't save ${where}. Your changes are kept. You have not left the editor.`
+      : `Couldn't save ${where}. Your changes are kept.`,
+    actions: [retryAction, ...keep],
+  };
+}
+
 /** B7-G12 `225:8126` — a save died in transport while the browser is online. */
 export function showCantReachBanner(retryNow: () => void): void {
   showGlobalBanner({
