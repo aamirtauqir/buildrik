@@ -26,13 +26,16 @@ const baseProps = {
 };
 
 describe("ColorTokenList — the Colours table (7315:80955)", () => {
-  it("draws the board's four column headers (USAGE per BRP1-M5)", () => {
-    const { getAllByRole } = render(
-      <ColorTokenList tokens={[makeToken("color-primary", "Primary", "#1a56db")]} {...baseProps} />,
-    );
-    expect(getAllByRole("columnheader").map((h) => h.textContent).filter(Boolean)).toEqual([
-      "Token", "Light", "Dark", "Usage",
-    ]);
+  it("draws one card per colour under its group heading, ending in 'Edit ›' (B6-B01)", () => {
+    const tokens = [
+      makeToken("color-primary", "Primary", "#1a56db", { group: "semantic", dark: "#60a5fa" }),
+      makeToken("color-text", "Text", "#111827", { group: "semantic" }),
+    ];
+    const { getByTestId } = render(<ColorTokenList tokens={tokens} {...baseProps} />);
+    expect(getByTestId("brand-colour-group-semantic").textContent).toBe("2 semantic colors");
+    const card = getByTestId("brand-token-row-color-primary");
+    expect(card.textContent).toContain("Edit ›");
+    expect(card.textContent).toContain("Light #1A56DB     Dark #60A5FA");
   });
 
   it("renders one row per token, keyed by id", () => {
@@ -62,7 +65,7 @@ describe("ColorTokenList — the Colours table (7315:80955)", () => {
     expect(getByTestId("brand-token-dark-color-pale").textContent).toBe("—");
   });
 
-  it("clicking a row selects it — onSelectToken with the id, not a drill-in", () => {
+  it("clicking a card opens it — onSelectToken with the id (the workspace drills in, B6-B02)", () => {
     const onSelectToken = vi.fn();
     const { getByTestId } = render(
       <ColorTokenList tokens={[makeToken("color-primary", "Primary", "#1A56DB")]} {...baseProps} onSelectToken={onSelectToken} />,
@@ -83,8 +86,8 @@ describe("ColorTokenList — the Colours table (7315:80955)", () => {
   it("marks the selected row", () => {
     const tokens = [makeToken("color-primary", "Primary", "#1A56DB"), makeToken("color-text", "Text", "#111827")];
     const { getByTestId } = render(<ColorTokenList tokens={tokens} {...baseProps} selectedTokenId="color-text" />);
-    expect(getByTestId("brand-token-row-color-text").getAttribute("aria-selected")).toBe("true");
-    expect(getByTestId("brand-token-row-color-primary").getAttribute("aria-selected")).toBe("false");
+    expect(getByTestId("brand-token-row-color-text").getAttribute("aria-pressed")).toBe("true");
+    expect(getByTestId("brand-token-row-color-primary").getAttribute("aria-pressed")).toBe("false");
   });
 
   it("orders the semantic and brand tokens before surface and the primitive scale", () => {

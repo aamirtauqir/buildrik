@@ -104,3 +104,13 @@ Per slice: targeted vitest; before each commit batch `npx tsc --noEmit > /tmp/ts
 = 0 and `pnpm run verify:ds` (cwd `packages/editor`). No board screenshots exist in the dump, so
 rows stay `drift-open` with "built, not compared" unless compared live by the lead; probe pins
 (port 5174) only for new visual states.
+
+## Status — wave 2 (2026-10-26)
+
+Wave 1 (S1–S10, minus S4 folded into S1) and wave 2 shipped every archetype above except the
+lifecycle states owned by the lead (B42/B56/B57, closed in `FullPageRouter` by lead2). Built,
+not compared: no board screenshots exist in the dump, so rows stay `drift-open` / `no` with
+"built, not compared" until a live walk. Still open by design: B44, B62 (shell), B27
+(class-first), B47 (first run); B31 needs REQUESTS D-13 (the inspector passing the element
+label). Code wins, recorded on the rows: Connect takes no restore point (OQ-4), the scale has
+11 steps and re-points its role, seed tokens reset instead of delete (OQ-7).

@@ -13,9 +13,14 @@ import { EVENTS } from "@/shared/constants/events";
 
 const pending = new WeakMap<Composer, string>();
 const pendingPage = new WeakMap<Composer, string>();
+const pendingReturn = new WeakMap<Composer, BrandReturn>();
 
-export function requestBrandToken(composer: Composer, tokenId: string): void {
+/** `returnLabel` — the inspector's chip names what it came from ("Heading"):
+ *  Brand's door then reads "‹ Back to Heading" and returns to the editor with
+ *  that element still selected (2L9 B6-B31). */
+export function requestBrandToken(composer: Composer, tokenId: string, opts: { returnLabel?: string } = {}): void {
   pending.set(composer, tokenId);
+  if (opts.returnLabel) pendingReturn.set(composer, { to: "editor", label: opts.returnLabel });
   composer.emit(EVENTS.UI_OPEN_DESIGN_PANEL, { tokenId });
 }
 
@@ -43,17 +48,14 @@ export function takeBrandPageRequest(composer: Composer | null | undefined): str
   return page;
 }
 
-/** Where "‹ Back" goes when Brand was opened from Site settings (GAP-ST-T03:
- *  "‹ Back to Site settings" returns to the screen the user left). */
-export interface BrandReturn {
-  screen?: string;
-}
-
-const pendingReturn = new WeakMap<Composer, BrandReturn>();
+/** Where "‹ Back" goes when Brand was opened from somewhere other than the
+ *  rail: Site settings (GAP-ST-T03 — back to the screen the user left), or an
+ *  inspector chip (B6-B31 — back to the editor, named by the element). */
+export type BrandReturn = { to: "settings"; screen?: string } | { to: "editor"; label: string };
 
 /** Site settings' Branding row, before it switches to Brand. */
-export function requestBrandReturn(composer: Composer, ret: BrandReturn): void {
-  pendingReturn.set(composer, ret);
+export function requestBrandReturn(composer: Composer, ret: { screen?: string }): void {
+  pendingReturn.set(composer, { to: "settings", screen: ret.screen });
 }
 
 /** The return asked for before the workspace mounted, if any — read once. */

@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 /**
- * BRP1-M8 — Dark mode Off / Auto, the missing-dark preview flow, and the
- * disabled Dark preview on an Off site.
+ * 2L9 B6-B12…B14 — Mode · Off / Auto, the Turn-on-Auto confirm and its
+ * missing-dark preview, and the disabled Dark preview on an Off site.
  */
 import * as React from "react";
 import { render, fireEvent, act, waitFor } from "@testing-library/react";
@@ -75,35 +75,41 @@ beforeEach(() => {
   take.mockImplementation(async () => true);
 });
 
-describe("DarkModeCard (BRP1-M8)", () => {
-  it("off: the board's copy; Auto with nothing missing takes a restore point, then switches with no tokens", async () => {
+describe("DarkModeCard (2L9 B6-B12…B14)", () => {
+  it("off: 'Mode · Off', the board's copy; Turn on Auto… asks first, then restore point → one setDarkMode", async () => {
     expect(proposeMissingDarks(FILLED).filled).toEqual([]);
     const c = fake(FILLED);
     const u = mount(c);
-    expect(u.getByTestId("brand-dark-mode-note").textContent).toBe("Dark mode is off for this site.");
-    expect(u.getByTestId("brand-dark-mode-off").getAttribute("aria-pressed")).toBe("true");
-    await act(async () => { fireEvent.click(u.getByTestId("brand-dark-mode-auto")); });
+    expect(u.getByTestId("brand-dark-mode-state").textContent).toBe("Mode · Off");
+    expect(u.getByText("Auto follows the visitor’s device appearance. Editor controls stay light.")).toBeTruthy();
+    expect(u.getByTestId("brand-dark-mode-auto").textContent).toBe("Turn on Auto…");
+    fireEvent.click(u.getByTestId("brand-dark-mode-auto"));
+    const dialog = u.getByTestId("brand-dark-mode-dialog");
+    expect(dialog.textContent).toContain("Turn on automatic dark mode?");
+    expect(dialog.textContent).toMatch(/already have dark values\. No new values are needed\./);
+    expect(dialog.textContent).toContain("A restore point is created first. Auto and any generated dark values apply as one Undo step.");
+    expect(u.queryByTestId("brand-dark-mode-preview")).toBeNull();
+    expect(c.designSystem.setDarkMode).not.toHaveBeenCalled();
+    await act(async () => { fireEvent.click(u.getByTestId("brand-dark-mode-confirm")); });
     await waitFor(() => expect(c.designSystem.setDarkMode).toHaveBeenCalledTimes(1));
     expect(take).toHaveBeenCalledWith(c, "s1", "dark-auto");
     expect(c.designSystem.setDarkMode.mock.calls[0]).toEqual(["auto", "Turn on dark mode"]);
-    expect(u.getByTestId("brand-dark-mode-auto").getAttribute("aria-pressed")).toBe("true");
+    expect(u.getByTestId("brand-dark-mode-state").textContent).toBe("Mode · Auto");
+    expect(u.queryByTestId("brand-dark-mode-dialog")).toBeNull();
   });
 
-  it("generated-aliases lists exactly the token without a dark value, with its proposed dark", () => {
+  it("the confirm lists exactly the token without a dark value, with its proposed dark", () => {
     const c = fake([...FILLED, custom]);
     const u = mount(c);
     fireEvent.click(u.getByTestId("brand-dark-mode-auto"));
-    const expected = resolveTokenLiteral(proposeMissingDarks([...FILLED, custom]).tokens, "color-brand-x", "dark");
-    expect(expected).toBe("#F17953");
     const row = u.getByTestId("brand-dark-alias-color-brand-x");
     expect(row.getAttribute("data-hex")).toBe("#F17953");
     expect(row.textContent).toBe("Brand X → #F17953");
-    expect(u.container.querySelectorAll("[data-testid^='brand-dark-alias-']")).toHaveLength(1);
+    expect(u.container.ownerDocument.querySelectorAll("[data-testid^='brand-dark-alias-']")).toHaveLength(1);
     expect(c.designSystem.setDarkMode).not.toHaveBeenCalled();
-    expect(u.getByTestId("brand-dark-mode-auto").getAttribute("aria-pressed")).toBe("false");
   });
 
-  it("Preview in dark paints the proposal dark; Confirm → restore point → clear → one setDarkMode with the filled tokens", async () => {
+  it("Preview in dark paints the proposal dark; Turn on Auto → restore point → clear → one setDarkMode with the filled tokens", async () => {
     let release!: (v: boolean) => void;
     take.mockImplementation(() => new Promise<boolean>((r) => { release = r; }));
     const c = fake([...FILLED, custom]);
@@ -124,7 +130,7 @@ describe("DarkModeCard (BRP1-M8)", () => {
     expect(c.designSystem.preview).toBeNull();
   });
 
-  it("Cancel clears the preview, writes nothing, and the setting reads Off", () => {
+  it("Cancel clears the preview, writes nothing, and the mode reads Off", () => {
     const c = fake([...FILLED, custom]);
     const u = mount(c);
     fireEvent.click(u.getByTestId("brand-dark-mode-auto"));
@@ -132,7 +138,7 @@ describe("DarkModeCard (BRP1-M8)", () => {
     fireEvent.click(u.getByTestId("brand-dark-mode-cancel"));
     expect(c.designSystem.preview).toBeNull();
     expect(c.designSystem.setDarkMode).not.toHaveBeenCalled();
-    expect(u.getByTestId("brand-dark-mode-off").getAttribute("aria-pressed")).toBe("true");
+    expect(u.getByTestId("brand-dark-mode-state").textContent).toBe("Mode · Off");
   });
 
   it("unmounting mid-preview puts the saved brand back", () => {
@@ -149,7 +155,6 @@ describe("DarkModeCard (BRP1-M8)", () => {
     const c = fake([...FILLED, custom]);
     const u = mount(c);
     fireEvent.click(u.getByTestId("brand-dark-mode-auto"));
-    fireEvent.click(u.getByTestId("brand-dark-mode-preview"));
     await act(async () => { fireEvent.click(u.getByTestId("brand-dark-mode-confirm")); });
     expect(u.getByTestId("brand-dark-mode-error").textContent).toBe("We couldn't save a restore point — nothing was changed.");
     expect(c.designSystem.setDarkMode).not.toHaveBeenCalled();
@@ -159,7 +164,7 @@ describe("DarkModeCard (BRP1-M8)", () => {
   it("Auto → Off switches with no restore point (OQ-7)", () => {
     const c = fake(DEFAULT_TOKENS, "auto");
     const u = mount(c);
-    expect(u.getByTestId("brand-dark-mode-note").textContent).toBe("Your site has light and dark values.");
+    expect(u.getByTestId("brand-dark-mode-state").textContent).toBe("Mode · Auto");
     fireEvent.click(u.getByTestId("brand-dark-mode-off"));
     expect(c.designSystem.setDarkMode).toHaveBeenCalledWith("off", "Turn off dark mode");
     expect(take).not.toHaveBeenCalled();
@@ -179,21 +184,5 @@ describe("DarkModeCard (BRP1-M8)", () => {
     off.unmount();
     const auto = mount(fake(DEFAULT_TOKENS, "auto"));
     expect((auto.getByTestId("brand-dark-mode-preview-dark") as HTMLButtonElement).disabled).toBe(false);
-  });
-});
-
-describe("DarkModeCard — Off mid-flow", () => {
-  it("is Cancel while the generated values are shown", () => {
-    const c = fake([...proposeMissingDarks(DEFAULT_TOKENS).tokens, {
-      id: "color-brand-y", name: "Brand Y", kind: "color", layer: "semantic", modes: { light: { value: "#0E7490" } },
-      category: "colors", cssVar: "--buildrick-design-color-brand-y", type: "color",
-    }]);
-    const u = mount(c);
-    fireEvent.click(u.getByTestId("brand-dark-mode-auto"));
-    fireEvent.click(u.getByTestId("brand-dark-mode-preview"));
-    fireEvent.click(u.getByTestId("brand-dark-mode-off"));
-    expect(c.designSystem.preview).toBeNull();
-    expect(c.designSystem.setDarkMode).not.toHaveBeenCalled();
-    expect(u.getByTestId("brand-dark-mode-off").getAttribute("aria-pressed")).toBe("true");
   });
 });

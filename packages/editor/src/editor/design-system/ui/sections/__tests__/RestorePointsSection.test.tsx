@@ -28,23 +28,23 @@ beforeEach(() => {
   api.restore.mockReset();
 });
 
-describe("RestorePointsSection (BRP1-M10)", () => {
+describe("RestorePointsSection (2L9 B6-B39, BRP1-M10)", () => {
   it("lists each point newest first with the board's reason and time", () => {
     const u = render(<RestorePointsSection composer={null} />);
     const rows = [...u.container.querySelectorAll("[data-testid^='brand-restore-row-']")];
     expect(rows.map((r) => r.getAttribute("data-testid"))).toEqual(["brand-restore-row-b", "brand-restore-row-a", "brand-restore-row-z"]);
-    expect(rows[0].textContent).toContain("Generator");
-    expect(rows[0].textContent).toContain("Today, 14:32");
-    expect(rows[1].textContent).toContain("Dark mode Auto");
-    expect(rows[1].textContent).toContain("Yesterday, 16:40");
-    expect(rows[2].textContent).toContain("Theme push");
+    expect(rows[0].textContent).toContain("Before generate scale");
+    expect(rows[0].textContent).toContain("Today 14:32");
+    expect(rows[1].textContent).toContain("Before dark mode Auto");
+    expect(rows[1].textContent).toContain("Yesterday 16:40");
+    expect(rows[2].textContent).toContain("Before theme push");
   });
 
   it("empty: the board's empty copy", () => {
     api.rows = [];
     const u = render(<RestorePointsSection composer={null} />);
     expect(u.getByTestId("brand-restore-empty").textContent).toBe("No restore points yet");
-    expect(u.container.textContent).toContain("A restore point is created before a theme push, generator, dark-mode switch or logo import.");
+    expect(u.container.textContent).toContain("A restore point is created before a theme push, generator, dark-mode switch, starter, import or logo import.");
   });
 
   it("Restore restores once on a double click, says so, and refreshes the list", async () => {
@@ -82,6 +82,6 @@ describe("RestorePointsSection (BRP1-M10)", () => {
   });
 
   it("formats older points by date", () => {
-    expect(restorePointTime(new Date(2026, 9, 6, 9, 5), new Date(2026, 9, 9, 12, 0))).toBe("6 Oct, 09:05");
+    expect(restorePointTime(new Date(2026, 9, 6, 9, 5), new Date(2026, 9, 9, 12, 0))).toBe("6 Oct 09:05");
   });
 });

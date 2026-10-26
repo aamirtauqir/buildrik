@@ -1,5 +1,6 @@
 /**
- * ConnectTokensCheck — Brand › Brand checks › Connect to tokens, board BRP1-M7:
+ * ConnectTokensCheck — Brand › Checks › Connect to Brand colors (2L9 B6-B19;
+ * states from BRP1-M7):
  *
  *   8224:234362  suggestions         "#1A56DB · 14 elements → Primary" · Change
  *   8224:234982  choose-token        "Two tokens match #1A56DB. Choose one."
@@ -15,8 +16,8 @@
  * user's pick (a row left without one is not connected); Primary wins a tie
  * it is part of. Apply is
  * `designSystem.applyConnect` — ONE transaction, one ⌘Z — and takes no restore
- * point (owner, OQ-4), so the board's "Apply creates a restore point" line
- * reads "Apply is one ⌘Z step." here.
+ * point (owner, OQ-4), so 2L9 B6-B19's "Creates a “Before connect” restore
+ * point first. Applies in one Undo step." reads "Applies in one Undo step."
  *
  * Preview is a highlight, not a repaint: every target equals the raw value by
  * construction, so the page would look the same. The highlight is cleared on
@@ -108,14 +109,14 @@ export const ConnectTokensCheck: React.FC<ConnectTokensCheckProps> = ({ composer
 
   if (suggestions.length === 0) {
     return (
-      <section aria-label="Connect to tokens" className={CARD} data-testid="brand-connect-check" data-connect-state="empty">
+      <section aria-label="Connect to Brand colors" className={CARD} data-testid="brand-connect-check" data-connect-state="empty">
         <p className={TITLE}>Nothing to connect</p>
-        <p className={COPY}>Connect raw values to semantic tokens without changing how your site looks.</p>
+        <p className={COPY}>Connections update references. The rendered color stays the same.</p>
         <p className="tw:m-0 tw:text-[length:var(--bk-text-14)] tw:font-medium tw:leading-5 tw:text-[var(--bk-ink)]">
           No unconnected values match your tokens.
         </p>
         <Button type="button" variant="secondary" size="xs" className={`${SMALL_ACTION} tw:text-[var(--bk-gray-700)]`} onClick={onBack}>
-          Back to colours
+          Back to Colors
         </Button>
       </section>
     );
@@ -124,9 +125,9 @@ export const ConnectTokensCheck: React.FC<ConnectTokensCheckProps> = ({ composer
   const chooser = choosing ? suggestions.find((s) => s.key === choosing) : undefined;
 
   return (
-    <section aria-label="Connect to tokens" className={CARD} data-testid="brand-connect-check" data-connect-state={phase}>
-      <p className={TITLE}>Connect exact matches</p>
-      <p className={COPY}>Connect raw values to semantic tokens without changing how your site looks.</p>
+    <section aria-label="Connect to Brand colors" className={CARD} data-testid="brand-connect-check" data-connect-state={phase}>
+      <p className={TITLE}>Connect to Brand colors</p>
+      <p className={COPY}>Connections update references. The rendered color stays the same.</p>
       {suggestions.map((s) => {
         const target = picks[s.key];
         return (
@@ -138,7 +139,10 @@ export const ConnectTokensCheck: React.FC<ConnectTokensCheckProps> = ({ composer
               style={s.kind === "color" ? { background: s.value } : undefined}
             />
             <p className={ROW_TEXT}>
-              {displayValue(s.value)} · {plural(s.elementCount, "element")} → {target ? nameOf(target) : "Choose a token"}
+              {displayValue(s.value)} → {target ? nameOf(target) : "Choose a token"}
+              <span className="tw:block tw:text-[length:var(--bk-text-12)] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]">
+                {plural(s.elementCount, s.kind === "color" ? "literal color usage" : "literal usage")}
+              </span>
             </p>
             {/* The boards keep Change on the rows while previewing (it goes back
                 to choosing); once applied there is nothing left to change. */}
@@ -214,14 +218,14 @@ export const ConnectTokensCheck: React.FC<ConnectTokensCheckProps> = ({ composer
       {phase === "preview" && (
         <>
           <p className={`${NOTICE} tw:w-full tw:bg-[var(--bk-accent-tint)]`} role="status" data-testid="brand-connect-preview-notice">
-            Preview only · Your colours are unchanged. Confirm to connect {plural(elementIds.length, "element")}.
+            Preview only · Your colors are unchanged.
           </p>
           <div className="tw:flex tw:items-center tw:gap-2">
             <Button type="button" variant="secondary" size="xs" className={`${SMALL_ACTION} tw:text-[var(--bk-gray-700)]`} onClick={cancel}>
               Cancel
             </Button>
             <Button type="button" variant="primary" size="xs" className={SMALL_ACTION} onClick={apply} data-testid="brand-connect-apply">
-              Apply
+              Apply {plural(elementIds.length, "connection")}
             </Button>
           </div>
         </>
@@ -233,7 +237,7 @@ export const ConnectTokensCheck: React.FC<ConnectTokensCheckProps> = ({ composer
         </p>
       ) : (
         <p className={`${COPY} tw:text-[var(--bk-ink-muted)]`} data-testid="brand-connect-note">
-          Apply is one ⌘Z step.
+          Applies in one Undo step.
         </p>
       )}
     </section>

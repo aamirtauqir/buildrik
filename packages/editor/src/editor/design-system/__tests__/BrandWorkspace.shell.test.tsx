@@ -18,7 +18,7 @@ import * as React from "react";
 import { getTabMode } from "@/editor/rail/tabsConfig";
 import { FullPageRouter } from "@/editor/sidebar/FullPageRouter";
 import type { Composer } from "@/engine";
-import { requestBrandReturn } from "@/editor/design-system/ui/brandOpenRequest";
+import { requestBrandReturn, requestBrandToken } from "@/editor/design-system/ui/brandOpenRequest";
 import {
   installDomShims,
   makeFakeComposer,
@@ -260,5 +260,71 @@ describe("BrandWorkspace › compact under 1440 (B6-B51…B53)", () => {
     expect(utils.queryByTestId("brand-compact-nav")).toBeNull();
     expect(utils.getAllByTestId("brand-nav-group")).toHaveLength(3);
     expect(utils.getByTestId("brand-preview-column")).toBeTruthy();
+  });
+});
+
+describe("BrandWorkspace › Colors drill-in (B6-B01 → B6-B02)", () => {
+  it("lands on the list with nothing open; a card opens its edit page in place, '‹ Colors' goes back", async () => {
+    const utils = renderWorkspace(makeFakeComposer());
+    expect(utils.queryByTestId("brand-token-edit")).toBeNull();
+    expect(utils.getByTestId("brand-page-actions").textContent).toContain("+ Add color");
+    fireEvent.click(await waitFor(() => utils.container.querySelector<HTMLElement>('[data-token-row="color-primary"]')!));
+    expect(utils.getByTestId("brand-page-title").textContent).toBe("Colors");
+    const edit = utils.getByTestId("brand-token-edit");
+    expect(utils.getByTestId("brand-preview-column").contains(utils.getByTestId("brand-token-menu"))).toBe(false);
+    expect(edit.contains(utils.getByTestId("brand-token-menu"))).toBe(true);
+    expect(utils.queryByTestId("brand-page-actions")).toBeNull();
+    fireEvent.click(utils.getByTestId("brand-back-colours"));
+    expect(utils.queryByTestId("brand-token-edit")).toBeNull();
+    expect(utils.getByTestId("brand-page-title").textContent).toMatch(/^Colors · \d+$/);
+  });
+});
+
+describe("BrandWorkspace › opened from the Inspector (B6-B31)", () => {
+  it("the door reads '‹ Back to <element>' and returns to the editor", async () => {
+    const composer = makeFakeComposer();
+    const onClose = vi.fn();
+    requestBrandToken(composer, "color-primary", { returnLabel: "Heading" });
+    const utils = renderWorkspace(composer, { onClose });
+    await waitFor(() => expect(utils.getByTestId("brand-token-edit")).toBeTruthy());
+    expect(utils.getByTestId("brand-back-link").textContent).toBe("Back to Heading");
+    fireEvent.click(utils.getByTestId("brand-back-link"));
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("without a label the chip opens Brand as before — the ordinary door", () => {
+    const composer = makeFakeComposer();
+    requestBrandToken(composer, "color-primary");
+    expect(renderWorkspace(composer).getByTestId("brand-back-link").textContent).toBe("Back to Editor");
+  });
+});
+
+describe("BrandWorkspace › Discard this preview? (B6-B50)", () => {
+  it("leaving a page that is previewing asks first; Keep stays, Discard moves on and drops the preview", () => {
+    const composer = makeFakeComposer();
+    const utils = renderWorkspace(composer, { initialPage: "starters" });
+    fireEvent.click(utils.container.querySelector<HTMLElement>('[data-testid^="starter-row-"]')!);
+    const ds = composer.designSystem as unknown as { preview: unknown };
+    expect(ds.preview).not.toBeNull();
+
+    fireEvent.click(utils.getByTestId("brand-row-colour-mode"));
+    const dialog = utils.getByTestId("brand-discard-preview");
+    expect(dialog.textContent).toContain("Discard this preview?");
+    expect(dialog.textContent).toContain("You are previewing a starter. Opening Dark mode starts a different preview. Nothing has been applied yet.");
+    fireEvent.click(utils.getByTestId("brand-discard-keep"));
+    expect(utils.getByTestId("brand-page-title").textContent).toBe("Starters");
+    expect(ds.preview).not.toBeNull();
+
+    fireEvent.click(utils.getByTestId("brand-row-colour-mode"));
+    fireEvent.click(utils.getByTestId("brand-discard-continue"));
+    expect(utils.getByTestId("brand-page-title").textContent).toBe("Dark mode");
+    expect(ds.preview).toBeNull();
+  });
+
+  it("with nothing previewing the nav just moves", () => {
+    const utils = renderWorkspace(makeFakeComposer());
+    fireEvent.click(utils.getByTestId("brand-row-colour-mode"));
+    expect(utils.queryByTestId("brand-discard-preview")).toBeNull();
+    expect(utils.getByTestId("brand-page-title").textContent).toBe("Dark mode");
   });
 });

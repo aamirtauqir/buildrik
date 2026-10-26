@@ -48,9 +48,11 @@ export interface ScaleGeneratorProps {
   roleId: string;
   /** After the scale is written — the workspace's toast. */
   onApplied?: () => void;
+  /** "‹ Colors" (B6-B60). */
+  onBack?: () => void;
 }
 
-export const ScaleGenerator: React.FC<ScaleGeneratorProps> = ({ composer, roleId, onApplied }) => {
+export const ScaleGenerator: React.FC<ScaleGeneratorProps> = ({ composer, roleId, onApplied, onBack }) => {
   const store = useProjectTokenStore();
   const preview = useBrandPreview(composer ?? null);
   const guard = useGuardedApply();
@@ -69,6 +71,9 @@ export const ScaleGenerator: React.FC<ScaleGeneratorProps> = ({ composer, roleId
     const t = landing.tokens.find((x) => x.id === `${landing.prefix}-${step}`);
     return t ? t.name : `${roleName} ${step}`;
   };
+  const first = SCALE_STEPS[0];
+  const last = SCALE_STEPS[SCALE_STEPS.length - 1];
+  const count = SCALE_STEPS.length;
   const hexAt = (s: ColorScale, step: number) => s.hexes[SCALE_STEPS.indexOf(step as (typeof SCALE_STEPS)[number])];
 
   const edit = (value: string) => {
@@ -118,7 +123,23 @@ export const ScaleGenerator: React.FC<ScaleGeneratorProps> = ({ composer, roleId
 
   return (
     <section aria-label="Colour scale generator" className={CARD} data-testid="brand-scale-generator" data-scale-state={phase}>
-      <p className={TITLE}>One colour → full scale</p>
+      {onBack && (
+        <Button
+          type="button"
+          variant="link"
+          size="xs"
+          className="tw:h-7 tw:self-start tw:px-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)] tw:enabled:hover:text-[var(--bk-accent)] tw:enabled:hover:no-underline"
+          onClick={onBack}
+          data-testid="brand-scale-back"
+        >
+          ‹ Colors
+        </Button>
+      )}
+      <p className={TITLE} data-testid="brand-scale-title">Generate a scale from {roleName}</p>
+      <p className={LINE} data-testid="brand-scale-intro">
+        Creates {stepName(first)} … {stepName(last)}
+        {scale ? ` from ${hexAt(scale, scale.pickedStep)}` : ""}. {roleName} then uses the step that matches. Nothing is added until you apply.
+      </p>
       <div className="tw:flex tw:w-full tw:flex-col tw:gap-1">
         <Label htmlFor="brand-scale-input" className="tw:text-[length:var(--bk-text-11)] tw:font-normal tw:leading-4 tw:text-[var(--bk-ink-soft)]">
           Brand colour
@@ -168,7 +189,9 @@ export const ScaleGenerator: React.FC<ScaleGeneratorProps> = ({ composer, roleId
           <p className={LINE} data-testid="brand-scale-dark">
             {roleName} · Dark → {stepName(scale.darkStep)} · {hexAt(scale, scale.darkStep)}
           </p>
-          <p className={LINE}>11 primitive values with light and dark semantic aliases.</p>
+          <p className={LINE} data-testid="brand-scale-count">
+            {count} new color tokens · names {stepName(first)} to {stepName(last)}
+          </p>
         </>
       ) : (
         <span
@@ -205,7 +228,7 @@ export const ScaleGenerator: React.FC<ScaleGeneratorProps> = ({ composer, roleId
         <>
           {!error && (
             <p className={`${NOTICE} tw:w-full tw:bg-[var(--bk-accent-tint)]`} role="status">
-              Preview only · Confirm creates a restore point. One ⌘Z restores the previous brand.
+              Preview only · Adding creates a restore point first. One Undo restores the previous brand.
             </p>
           )}
           <div className="tw:flex tw:items-center tw:gap-2">
@@ -226,7 +249,7 @@ export const ScaleGenerator: React.FC<ScaleGeneratorProps> = ({ composer, roleId
                 disabled={guard.busy}
                 data-testid="brand-scale-confirm"
               >
-                {error ? "Retry" : "Confirm"}
+                {error ? "Retry" : `Add ${count} tokens`}
               </Button>
             )}
           </div>

@@ -288,7 +288,7 @@ describe("BrandWorkspace — Review changes (non-blocking, every Brand write thi
       target: { value: JSON.stringify([{ id: "color-imported", name: "Imported", value: "#00FF99", category: "colors", cssVar: "--buildrick-design-color-imported", type: "color", kind: "color" }]) },
     });
     fireEvent.click(utils.getByText(/^Parse$/i));
-    fireEvent.click(await utils.findByText(/Apply 1 valid only/i));
+    fireEvent.click(await utils.findByText(/^Apply 1 valid$/));
 
     openPage(utils, "colours");
     await openList(utils);

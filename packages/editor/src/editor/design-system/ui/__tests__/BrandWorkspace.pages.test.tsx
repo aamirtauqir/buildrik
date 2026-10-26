@@ -38,51 +38,27 @@ const COLOR_PAYLOAD = (id: string, name: string, value: string) =>
   ]);
 
 /* D4 rewrite: drop-zone primary, paste textarea collapsed. Expand paste →
-   Parse → "Apply N valid only". */
+   Parse → "Apply N valid". */
 async function importViaPaste(utils: ReturnType<typeof renderWorkspace>, payload: string) {
   fireEvent.click(utils.getByText(/or paste JSON/i));
   fireEvent.change(utils.getByLabelText(/Paste JSON/i), { target: { value: payload } });
   fireEvent.click(utils.getByText(/^Parse$/i));
-  await utils.findByText(/Apply 1 valid only/i);
-  fireEvent.click(utils.getByText(/Apply 1 valid only/i));
+  await utils.findByText(/^Apply 1 valid$/);
+  fireEvent.click(utils.getByText(/^Apply 1 valid$/));
 }
 
 describe("BrandWorkspace › Import / export", () => {
-  it("4418:168885: a panel with its own title and ✕ — no page header, no preview column", async () => {
+  it("B6-B15: an ordinary page — header, strap, preview column — with Import | Export tabs", async () => {
     const utils = renderWorkspace(makeFakeComposer());
     openPage(utils, "export");
-    const card = await waitFor(() => utils.getByTestId("brand-io-card"));
-    expect(card.contains(utils.getByTestId("brand-page-title"))).toBe(true);
-    expect(utils.queryByTestId("brand-preview-column")).toBeNull();
-    expect(utils.getByTestId("import-drop-zone").textContent).toContain("Drop tokens.json — JSON only");
-    fireEvent.click(utils.getByTestId("brand-io-close"));
-    expect(utils.getByTestId("brand-page-title").textContent).toMatch(/^Colors · \d+$/);
-  });
-
-  it("4418:168885: Dark strategy, EXPORT and IMPORT share one panel, above the preview", async () => {
-    const utils = renderWorkspace(makeFakeComposer());
-    openPage(utils, "export");
-    const card = await waitFor(() => utils.getByTestId("brand-io-card"));
-    expect(card.contains(utils.getByTestId("brand-export-dark-row"))).toBe(true);
-    expect(card.contains(utils.getByTestId("brand-export-head"))).toBe(true);
-    expect(card.contains(utils.getByTestId("brand-import-head"))).toBe(true);
-    const preview = utils.getByTestId("export-preview");
-    // 4418:168885: the Preview sits inside the panel, after IMPORT.
-    expect(card.contains(preview)).toBe(true);
-    expect(utils.getByTestId("brand-import-head").compareDocumentPosition(preview) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-  });
-
-  it("shows the import card + export preview", async () => {
-    const composer = makeFakeComposer();
-    const utils = renderWorkspace(composer);
-    openPage(utils, "export");
-
-    await waitFor(() => {
-      expect(utils.getByTestId("export-preview")).toBeTruthy();
-    });
-    // Board 153:120 heads the block "IMPORT", a caps section header matching EXPORT.
-    expect(utils.getAllByText("IMPORT").length).toBeGreaterThan(0);
-    expect(utils.getByText(/Custom properties/i)).toBeTruthy();
+    await waitFor(() => utils.getByTestId("brand-io-card"));
+    expect(utils.getByTestId("brand-page-title").textContent).toBe("Import / export");
+    expect(utils.getByTestId("brand-page-strap")).toBeTruthy();
+    expect(utils.getByTestId("brand-preview-column")).toBeTruthy();
+    expect(utils.getByTestId("brand-import-head").textContent).toBe("Import tokens");
+    expect(utils.getByTestId("import-drop-zone").textContent).toContain("Choose JSON file");
+    fireEvent.click(utils.getByTestId("brand-io-tab-export"));
+    expect(utils.getByTestId("export-preview")).toBeTruthy();
   });
 
   it("import writes a modified colour token to the site at once — one write, no draft", async () => {
@@ -117,16 +93,11 @@ describe("BrandWorkspace › Import / export", () => {
   /* C5 G3-149: the greyed "Figma Variables JSON — Coming soon" row is gone
      (4418:168885 omits it); the three live formats each keep a Download. */
   it("offers three formats and no Figma row", async () => {
-    const composer = makeFakeComposer();
-    const utils = renderWorkspace(composer);
+    const utils = renderWorkspace(makeFakeComposer());
     openPage(utils, "export");
-
-    await waitFor(() => expect(utils.getByTestId("format-row-css")).toBeTruthy());
+    fireEvent.click(await waitFor(() => utils.getByTestId("brand-io-tab-export")));
     expect(utils.container.textContent).not.toMatch(/Figma Variables JSON|Coming soon/);
-    expect(utils.container.querySelector('[data-download-format="figma"]')).toBeNull();
-    for (const id of ["css", "json", "tailwind"]) {
-      expect(utils.container.querySelector(`[data-download-format="${id}"]`)).toBeTruthy();
-    }
+    for (const id of ["css", "json", "tailwind"]) expect(utils.getByTestId(`format-row-${id}`)).toBeTruthy();
   });
 });
 
