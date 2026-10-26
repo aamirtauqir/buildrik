@@ -134,19 +134,16 @@ describe("CanvasFooterToolbar — the bar (board 7:18654)", () => {
     expect(screen.queryByRole("button", { name: /keyboard shortcuts/i })).toBeNull();
   });
 
-  it("controls read in board order: devices, width, zoom ⌄, View", () => {
-    renderToolbar({ device: "desktop", onDeviceChange: vi.fn(), onCustomWidth: vi.fn(), pageWidth: 1440, zoom: 52 });
+  /* Board 7:18654: device toggles centred, then width chip, zoom, View.
+     Re-baseline: canvas bar contents (the devices joined it). */
+  it("controls read in board order: devices, width, zoom, View", () => {
+    const onDeviceChange = vi.fn();
+    renderToolbar({ device: "desktop", onDeviceChange, onCustomWidth: vi.fn(), pageWidth: 1440, zoom: 52 });
     const labels = screen.getAllByRole("button").map((b) => b.getAttribute("aria-label") ?? b.textContent);
     expect(labels).toEqual(["Desktop", "Tablet", "Mobile", "Page width 1440 px", "Zoom 52%", "View"]);
-    expect(screen.getByTestId("canvas-zoom-trigger").querySelector("svg")).not.toBeNull();
-  });
-
-  it("the device buttons switch the breakpoint; the active one is pressed", () => {
-    const onDeviceChange = vi.fn();
-    renderToolbar({ device: "desktop", onDeviceChange, onCustomWidth: vi.fn(), pageWidth: 1440 });
-    expect(screen.getByRole("button", { name: "Desktop" }).getAttribute("aria-pressed")).toBe("true");
-    fireEvent.click(screen.getByRole("button", { name: "Tablet" }));
-    expect(onDeviceChange).toHaveBeenCalledWith("tablet");
+    expect(screen.getByTestId("bp-cell-desktop")).toHaveAttribute("aria-pressed", "true");
+    fireEvent.click(screen.getByTestId("bp-cell-mobile"));
+    expect(onDeviceChange).toHaveBeenCalledWith("mobile");
   });
 
   it("the zoom control opens the zoom rows with the current one checked", () => {
@@ -215,6 +212,17 @@ describe("CanvasFooterToolbar — Grid and snapping", () => {
     fireEvent.click(screen.getByTestId("grid-snap-apply"));
     expect(onGridSizeChange).toHaveBeenCalledWith(16);
     expect(onOverlayChange).toHaveBeenCalledWith("grid", true);
+  });
+
+  /* Board 145:65011: a panel in the View popover's place with Close — not a
+     modal. Re-baseline: Grid and snapping container. */
+  it("opens as a panel in place of the View menu; Close dismisses it", () => {
+    openGrid({ gridSize: 8, onGridSizeChange: vi.fn() });
+    expect(screen.queryByTestId("canvas-view-menu")).toBeNull();
+    expect(screen.queryByRole("dialog", { name: "Grid and snapping" })).toBeTruthy();
+    expect(document.querySelector('[data-testid="modal-grid-snap-dialog"]')).toBeNull();
+    fireEvent.click(screen.getByTestId("grid-snap-close"));
+    expect(screen.queryByTestId("grid-snap-dialog")).toBeNull();
   });
 
   it("a fractional size is refused with the board's message; the grid stays", () => {

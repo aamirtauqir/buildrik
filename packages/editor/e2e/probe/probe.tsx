@@ -127,6 +127,7 @@ import { deriveLifecycleState } from "@/editor/shell/lifecycle";
 import { NotificationPanel } from "@/editor/shell/NotificationPanel";
 import { PublishConfirmModal } from "@/editor/shell/modals/PublishConfirmModal";
 import { PageContextMenu } from "@/editor/sidebar/tabs/pages/components/PageContextMenu";
+import { NewPageModal } from "@/editor/sidebar/tabs/pages/components/NewPageModal";
 import { PageSettingsDrawer } from "@/editor/sidebar/tabs/pages/page-settings/PageSettingsDrawer";
 import { Topbar, SiteMenuIcon, IconButton, BreakpointSwitcher } from "@/editor/chrome-ui";
 import { RecordsTable } from "@/editor/cms/RecordsTable";
@@ -819,6 +820,29 @@ function layersComposer(): Composer {
  * so that recipe reaches it with a click and a keypress, entirely through the
  * shipped keyboard path.
  */
+function NewPageProbe() {
+  const composer = React.useMemo(() => {
+    const handlers = new Map<string, Array<(d: unknown) => void>>();
+    return {
+      on: (ev: string, fn: (d: unknown) => void) => handlers.set(ev, [...(handlers.get(ev) ?? []), fn]),
+      off: () => {},
+      emit: (ev: string, d: unknown) => handlers.get(ev)?.forEach((fn) => fn(d)),
+      getProjectMetadata: () => ({ name: "Fieldwork Studio" }),
+      elements: { getAllPages: () => PAGES_FIXTURE },
+    };
+  }, []);
+  React.useEffect(() => {
+    composer.emit(EVENTS.UI_NEW_PAGE_REQUESTED, {});
+  }, [composer]);
+  return (
+    <div data-probe="new-page-dialog" style={{ width: 1440, height: 900 }}>
+      <ToastProvider>
+        <NewPageModal composer={composer as never} />
+      </ToastProvider>
+    </div>
+  );
+}
+
 function LayersProbe({ select }: { select?: string[] }) {
   const c = layersComposer();
   React.useEffect(() => {
@@ -2111,6 +2135,40 @@ const CASES: Record<string, () => React.ReactElement> = {
       <RecordsTable collection={CMS_STATUS_COLLECTION} records={CMS_STATUS_RECORDS} query="" onOpenRecord={() => {}} />
     </div>
   ),
+  /* design-2l9 board 145:65011 — Grid and snapping, the panel View opens in
+     its own place. The bar sits low in a 1440 frame so the panel opens above
+     it; the recipe clicks View, then Grid. */
+  /* design-2l9 board 7:18654 — the canvas bar's contents at the board's
+     ~800 canvas column: path, device toggles, width chip, zoom, View. */
+  "canvas-bar": () => (
+    <div data-probe="canvas-bar" style={{ width: 800 }}>
+      <CanvasFooterToolbar
+        overlays={{ guides: false, spacing: false, grid: false, rulers: false, badges: false, xray: false, outlines: false }}
+        zoom={52}
+        onOverlayChange={() => {}}
+        onZoomChange={() => {}}
+        device="desktop"
+        onDeviceChange={() => {}}
+        onCustomWidth={() => {}}
+        pageWidth={1440}
+        readout="Home / Hero"
+      />
+    </div>
+  ),
+  "canvas-grid-panel": () => (
+    <div data-probe="canvas-grid-panel" style={{ width: 1440, height: 900, display: "flex", alignItems: "flex-end", justifyContent: "flex-end" }}>
+      <div style={{ width: 900 }}>
+        <CanvasFooterToolbar
+          overlays={{ guides: false, spacing: false, grid: false, rulers: false, badges: false, xray: false, outlines: false }}
+          zoom={52}
+          onOverlayChange={() => {}}
+          onZoomChange={() => {}}
+          gridSize={7}
+          onGridSizeChange={() => {}}
+        />
+      </div>
+    </div>
+  ),
   "canvas-footer-toolbar": () => (
     <div data-probe="canvas-footer-toolbar">
       <CanvasFooterToolbar
@@ -2848,6 +2906,31 @@ const CASES: Record<string, () => React.ReactElement> = {
      measure.mjs refuses. The 812 host is the board's own frame — the
      Add-page foot pins to the bottom, so without a stated height it would be
      measured wherever the content happened to end. */
+  /* design-2l9 board 63:6393 — the manager's list as the board draws it:
+     root pages (Home open, Contact hidden), My folders with Studio › Legal,
+     a Collection pages card, the two-row footer. 284 wide like the board. */
+  "pages-manager": () => (
+    <div data-probe="pages-manager" style={{ width: 284, height: 812 }}>
+      {pagesPanel({
+        pages: [
+          PAGE("home", "Home", { isHome: true, isActive: true }),
+          PAGE("about", "About"),
+          PAGE("work", "Work"),
+          PAGE("contact", "Contact", { status: "hidden" }),
+          PAGE("legal", "Legal"),
+        ],
+        folders: [{ id: "studio", name: "Studio", pageIds: ["legal"], collapsed: false }],
+        pageToFolder: new Map([["legal", "studio"]]),
+        collectionPages: [{ id: "blog", name: "Blog post", pattern: "/blog/{slug}", count: 20, templatePageId: "home" }],
+        onOpenTemplatePage: () => {},
+        onManageCollection: () => {},
+        onRequestTemplates: () => {},
+      })}
+    </div>
+  ),
+  /* design-2l9 board 101:29978 — New page, From template chosen. The modal
+     opens on UI_NEW_PAGE_REQUESTED; the fixture composer fires it on mount. */
+  "new-page-dialog": () => <NewPageProbe />,
   "pages-panel": () => (
     <div data-probe="pages-panel" style={{ width: 280, height: 812 }}>
       {/* One folder, because board 141:40 draws a result that names its owning
@@ -2903,25 +2986,6 @@ const CASES: Record<string, () => React.ReactElement> = {
   "bottom-bar": () => (
     <div data-probe="bottom-bar">
       <BottomBarProbe />
-    </div>
-  ),
-  /* 2L9 board 7:18654: the canvas bar across the top of a 797-wide canvas
-     column — "Home / Hero", devices, 1440 px, 52% ⌄, View. */
-  "canvas-bar": () => (
-    <div data-probe="canvas-bar" style={{ width: 797, background: "var(--bk-bg-subtle)", height: 200 }}>
-      <div style={{ display: "flex", alignItems: "center", background: "var(--bk-bg-card)", borderBottom: "1px solid var(--bk-gray-200)", paddingRight: 8 }}>
-        <CanvasFooterToolbar
-          overlays={{ guides: true, spacing: false, grid: false, rulers: false, badges: false, xray: false, outlines: false }}
-          zoom={52}
-          readout="Home / Hero"
-          device="desktop"
-          onDeviceChange={() => {}}
-          pageWidth={1440}
-          onCustomWidth={() => {}}
-          onOverlayChange={() => {}}
-          onZoomChange={() => {}}
-        />
-      </div>
     </div>
   ),
   /* Owner 2026-10-26 / board C05: a failed save is the global slot's one bar. */

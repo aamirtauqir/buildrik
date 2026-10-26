@@ -11,7 +11,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "lead3 2026-10-27: shell parts probe-compared — canvas bar moved to the top of the canvas column (case canvas-bar, 797 wide: readout · devices at 409 (board 409) on blue-100 · 1440 px chip 581/68 · 52% ⌄ 655/83 · View 744), bottom bar 'Saved just now · Details' (497:99485). Row stays open for the inspector Container-content part (lane B). | Compared live 2026-10-26 (editor-inspector): DRIFT — Canvas bar at bottom y823 (board top y56-98), no device toggles; bottom bar lacks 'Saved · Details'. Container Content: Tag/ID only, no 'Container content' note or 'N child elements'. | prior: L-A S3 built, not compared: canvas bar 'Parent / Element' readout left (type + W × H in its tooltip), then '{width} px' (Page width popover), '{zoom}%', 'View' — no carets. Undo left in Phase 1. Copy unit-tested; geometry not compared.",
+   "verifiedNote": "probe-compared 2026-10-27 (case canvas-bar at the board's 800 column, shots/7-18654.png): bar CONTENTS match — 'Home / Hero' left, device toggles centred (24 square, tinted active), gray mono '1440 px' chip, outlined '52% ⌄' 82 wide, 'View'. Still open, not L-A's: bar position (top y56, lead3 — A-14), bottom bar 'Saved just now · Details' (lead), Container content note / 'N child elements' (inspector, L-B).",
    "tier": "P1"
   },
   {
@@ -145,7 +145,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Rows lack path line (/, /about) and 'Current' tag; legend pinned to panel bottom (board under list); footer one row '+ Add page · From template · ⋯' vs full-width button + 2nd row. | prior: L-A S5 built, not compared: title 'Pages · {n}', Pages · Listings · Structure tabs under the search, root pages first, 'My folders · Only visible to you' (own tree), 'Collection pages' rows ({name}, '{pattern} · {n} pages', Open page → template page, Manage in CMS → CMS dynamic pages), legend '● mar",
+   "verifiedNote": "probe-compared 2026-10-27 (case pages-manager, 284×812, shots/63-6393.png) for the list: rows 40+ tall with glyph, name over URL, 'Hidden from publish' third line, 'Current' tag on the tinted open row, ⋯ always drawn; legend under the rows; 'My folders' / 'Only visible to you' heading; folder row 'Studio · 1 page · Folder · ⋯' (no disclosure — the row toggles), member 'Legal /legal · In Studio'; Collection pages gray card with a white row and Open page · Manage in CMS; footer full-width '+ Add page' then From template · New folder. Not probe-rendered: the header 'Pages · n' and the gray-well view tabs (PagesTab needs a composer); search field fill is chrome-ui PanelSearch (REQUESTS A-15). The collection row's ⋯ is not drawn: it would have no actions.",
    "tier": "P1"
   },
   {
@@ -155,8 +155,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Menu 278 wide anchored at row (board 280) ok; adds 'Move to folder…', shortcuts and a disabled-reason line; 'Page settings' lacks '›'. | prior: L-A S6 built; menu widened to the board's 280 after a probe screenshot showed 'Replace layout with template…' wrapping at 224 (probe case pages-context-menu, port 5171, looked at by eye; board geometry not otherwise compared). Row order RTL-tested.",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case pages-context-menu, shots/63-13820.png): 280 wide, 32 row pitch, bare labels in board order, no chord hints, no rule, Page settings ›, Delete page in the menu ink. The 11th row Move to folder… is board 131:41791 (P120) — the later board of the same menu; P02 predates folders.",
    "tier": "P1"
   },
   {
@@ -188,8 +188,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Modal 560×520 vs board 720×700; field order differs: URL slug first, Google preview last (board: preview + score first, then title, description, URL); SEO tab shows score badge. | prior: L-A S9 built, not compared: title '{Page} · Page settings', subtitle 'Editing {Page} · {Active} stays open on the canvas', foot Cancel · Save, override note 'These overrides affect this page only. Clear the title to use site defaults.'. Container stays the drawer (blocked:owner-page-settings-contain",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case pages-settings-seo, 1440×900, board shots/63-15939.png): dialog 720×700 at 360,100 (getBoundingClientRect); title row + ✕ over a hairline; SEO · Social · Advanced segmented with tinted active; body order subtitle → 'Search preview · SEO score n' + gray preview card → 'SEO title · n / 60 · Page override' → Description + 'n / 160' → Page URL '/slug' → Search indexing row (select 240×28 at x560) → Site SEO defaults → SEO score details → scope note; Cancel · Save. Filled gray borderless fields 28 tall. blocked:owner-page-settings-container resolved by the owner (board wins). Remaining: 'Write with AI'/'Regenerate' link waits on PR #33.",
    "tier": "P1"
   },
   {
@@ -410,7 +410,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Text Style tab: no Placement section; Typography adds Text style/Applied stack, Weight+Line height stacked not 2-col, Align as words; Spacing open box-model vs '2 set' row. | prior: Inherits the base canvas bar (7:18654), rebuilt by L-A S3; not compared.",
+   "verifiedNote": "Wave-3 drift is the inspector's Text Style tab (Placement section, Typography layout, Spacing row) — L-B's surface; the L-A parts of this board (canvas bar contents, Layers) are fixed in 7:18654 / 147:75914.",
    "tier": "P1"
   },
   {
@@ -741,8 +741,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Same 640 width, copy and '2 of 10 pages on Free' ok; no '{Site} · Create a page' subtitle; source as two 124px cards (board segmented pill), nav as toggle not checkbox. | prior: L-A wave 2 built, not compared: capacity line '{n} of {limit} pages on {Plan}' (billing.pagesPerSite added to siteDetail.settingsOverview through the full chain — shared schema, site-detail.service, test; the same limit saveProjectData enforces), From template note 'Choose a page template before cre",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case new-page-dialog, shots/101-29978.png): 640 wide; 'New page', '{Site} · Create a page'; Page name; Blank · From template as a 178-wide segmented row with the tinted choice; the source note; 'Add to site navigation' as a checkbox; Cancel · Choose template; no ✕. The capacity line is drawn from the server (not rendered in the probe: no site id). Title size is chrome-ui Modal's.",
    "tier": "P1"
   },
   {
@@ -1624,7 +1624,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-A wave 2: the folder's delete control reads 'Delete folder · keep page(s)'. The board's folder menu with 'Only you see this folder. Deleting it keeps {page} at the top level.' is not built (still an icon button). Not compared.",
+   "verifiedNote": "L-A wave 3 built: the folder's ⋯ opens '{Folder}', 'Only you see this folder. Deleting it keeps {pages} at the top level.', Rename folder… (code's, kept), 'Delete folder · keep page(s)'. Not probe-compared (no board PNG).",
    "tier": "P1"
   },
   {
@@ -2147,8 +2147,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Centered 480px modal (board: popover under View, ~360 wide, top-right of canvas, 'Close' link). Size input inline with presets (board own row). Copy matches. | prior: L-A S4 built, not compared: 'Grid and snapping' dialog — footnote, 'Show grid and snap' switch (grid overlay drives snap in Canvas.tsx), Grid size + 4/8/16 px, 'Whole number · 1–100 px', Cancel/Apply; draft until Apply.",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case canvas-grid-panel, board shots/145-65011.png): a 360×322 panel (board ~360×330) opened in the View popover's place, right edge on View; head 'Grid and snapping' + Close; note wraps two lines; 'Show grid and snap' switch; Grid size field full width 28 tall; 4/8/16 px presets 96×32 in one row; hint; Cancel · Apply 96×32 right. It opens ABOVE the bar until lead3 moves the bar to the top (REQUESTS A-14).",
    "tier": "P1"
   },
   {
@@ -2332,7 +2332,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Text Content: board textarea + B I U link + 'Changes save automatically.'; live 'Edit text on canvas' + one-line value with bind icon; no Editing state row; ID empty placeholder. | prior: Inherits the base canvas bar (7:18654), rebuilt by L-A S3; not compared.",
+   "verifiedNote": "Wave-3 drift is the inspector's Text Content tab (textarea + B I U link + 'Changes save automatically.', Editing row, ID placeholder) — L-B's surface. L-A's View menu half was handled in 145:64586.",
    "tier": "P1"
   },
   {
@@ -2769,8 +2769,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Footer copy matches ('575 layers · 1 selected') but adds 'Select' + info icon; no 'View' button beside search; no page-root 'Home' row with ⋯. | prior: L-A S2 built, not compared: footer '{N} layers · {K} selected' (layersFooterText, unit-tested against the board copy). Geometry not compared.",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case layers-tree, 284 wide, shots/147-75914.png): search + 'View' beside it; the open page heads the tree (page glyph + name); children from x28 with 16px lucide chevrons; footer the count alone ('N layers · K selected' — Select and the ⓘ left the band; Select mode is in ⋯, the dim note in Layer display). Search field fill is chrome-ui PanelSearch (REQUESTS A-15); the page row's ⋯ is not drawn (no page actions in Layers).",
    "tier": "P1"
   },
   {
@@ -2780,8 +2780,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Popover lists same 5 toggles + footnote, but title 'Display' (board 'Layer display'), no Close button; opened via ⋯ › Display settings… not header 'View'. | prior: L-A S2 built, not compared: footnote 'Personal editor view. Live-site visibility is edited in the Inspector.' under the five toggles. The board opens it from a header 'View' control; the code keeps ⋯ › Display settings… (not moved).",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (layers-tree → View, shots/147-76329.png): 'Layer display' 13/600 ink, five switches, the footnote, Close — taking the tree's place, opened by View beside the search (⋯ › Display settings… removed).",
    "tier": "P1"
   },
   {
@@ -2802,8 +2802,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Footer '575 layers · 11 matches' ok. Parent shown right-aligned one word ('Container') not path line under name; no '{n} matches in {N} layers' head, no end 'Clear search'. | prior: L-A wave 2 built, not compared: flat search results carry their ancestors ('Services › Card 1') after the name; footer '5,000 layers · 12 matches'. The board's list-head '12 matches in 5,000 layers' line and end-of-list Clear search are not drawn (Clear search sits in the field).",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (layers-tree with a query, shots/147-77189.png): head '{n} matches in {N} layers' 13/600; each result's path on its own muted line under the row at x12; 'Clear search' after the list; footer '{N} layers · {n} matches'. The board's per-result chevron is not drawn (flat results have no children).",
    "tier": "P1"
   },
   {
@@ -4126,7 +4126,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — 260 wide ok; adds search field, 'Add page' row and ✓ on current; paths inline after name (board right-aligned); 'Manage pages ›' dark not blue; header no '+ N template'. | prior: phase1 (Task 1.3): Shell/PageSwitcherMenu not built; PageTabBar tabs today. ⌘P copy → code:shortcut-cmd-p-is-preview",
+   "verifiedNote": "Page switcher is lead-owned (shell/PageSwitcher.tsx, Task 1.3); the board's differences are filed as REQUESTS A-16.",
    "tier": "P1"
   },
   {
@@ -21768,9 +21768,9 @@
    "page": "07",
    "family": "recovery",
    "status": "active",
-   "authority": "owner:one-error-surface",
-   "verified": "drift-fixed",
-   "verifiedNote": "probe-compared 2026-10-27 (lead3, cases banner-save-failed + bottom-bar state=error): owner 2026-10-26 — one error surface. The failure is ONE bar in the global slot under the topbar ('✕ Couldn’t save <site> · <page>. Your changes are kept.' + Retry; full width, 40 tall — the board draws the strip in the canvas column, the owner routed it through the slot), the bottom bar says 'Couldn’t save — Retry', no toast (autosave + ⌘S toasts removed), the topbar carries no save label, and the bar shares the connection id so 'Reconnecting…'/'Can’t reach' replace it instead of stacking. SaveFailedBanner.tsx deleted (this supersedes L-F's 2026-10-27 canvas-column strip lf-save-failed, which hid itself while the slot held a connection/session bar — the owner's item 4 routes the failure through the slot); copy (refusal, page limit, deleted site, never loaded, foreign page, save-and-leave) in globalBanners.saveFailedBanner. context=publish copy not carried (F-18 open).",
+   "authority": "board",
+   "verified": "drift-open",
+   "verifiedNote": "Board C05 draws the save-failed strip inside the canvas column; owner direction 2026-10-26 is \"the board wins\", so the strip moves back there (one surface, no toast, no stacked banner). Lead had routed it through the global slot on an internal instruction, not an owner decision. | probe-compared 2026-10-27 (lead3, cases banner-save-failed + bottom-bar state=error): owner 2026-10-26 — one error surface. The failure is ONE bar in the global slot under the topbar ('✕ Couldn’t save <site> · <page>. Your changes are kept.' + Retry; full width, 40 tall — the board draws the strip in the canvas column, the owner routed it through the slot), the bottom bar says 'Couldn’t save — Ret",
    "tier": "P2"
   },
   {

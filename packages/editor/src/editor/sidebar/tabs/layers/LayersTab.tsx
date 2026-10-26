@@ -8,7 +8,7 @@
  */
 
 import * as React from "react";
-import { Button, IconButton, Menu, MenuItem, MenuSeparator, PanelFrame, PanelSearch, Popover, Tooltip, isPanelSearchInput } from "@/editor/chrome-ui";
+import { Button, IconButton, Menu, MenuItem, MenuSeparator, PanelFrame, PanelSearch, Popover, isPanelSearchInput } from "@/editor/chrome-ui";
 import { useComposerSelection } from "@/editor/canvas/hooks/useComposerSelection";
 import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants/events";
@@ -91,11 +91,7 @@ export function layersFooterText(
     stats.selectionState ? ` · ${stats.selectionState}` : ""
   }`;
 }
-const DIM_SCOPE_TIP =
-  "Dimming fades a layer in the editor only — it still publishes. To hide it on the site, use Visibility in the inspector.";
-/* The footer's ⓘ: a 20 square ghost at the right edge of the 32 band. */
-const DIM_INFO_BTN = "tw:size-5 tw:min-h-0 tw:p-0 tw:text-[var(--bk-ink-muted)]";
-/* Select · Select all · Deselect all · Done — text actions in the 32 band,
+/* Select all · Deselect all · Done — text actions in the 32 band,
    12px so they sit one step above the 11px count they qualify. */
 const SELECT_BTN = "tw:min-h-0 tw:h-6 tw:p-0 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:font-medium";
 
@@ -282,12 +278,6 @@ export const LayersTab: React.FC<LayersTabProps> = ({
                 Select mode
               </MenuItem>
               <MenuSeparator />
-              <MenuItem
-                data-testid="layers-display-settings-toggle"
-                onClick={runMenu(() => setDisplaySettingsOpen((v) => !v))}
-              >
-                Display settings…
-              </MenuItem>
               {onExpandToggle && (
                 <MenuItem data-testid="layers-wide-view" onClick={runMenu(onExpandToggle)}>
                   {isExpanded ? "Narrow panel" : "Widen panel"}
@@ -297,7 +287,27 @@ export const LayersTab: React.FC<LayersTabProps> = ({
           </Popover>
         }
       />
-      <PanelSearch placeholder={LAYERS_SEARCH_PLACEHOLDER} value={search} onChange={setSearch} data-testid="layers-search" />
+      {/* design-2l9 147:75914 / 147:76329: the search, and "View" beside it
+          opening the personal display settings. */}
+      <div className="tw:flex tw:items-center tw:pr-2">
+        <div className="tw:min-w-0 tw:flex-1">
+          <PanelSearch placeholder={LAYERS_SEARCH_PLACEHOLDER} value={search} onChange={setSearch} data-testid="layers-search" />
+        </div>
+        <Button
+          type="button"
+          color="light"
+          size="xs"
+          aria-expanded={displaySettingsOpen}
+          data-testid="layers-view-toggle"
+          /* The panel closes on an outside mousedown; this control toggles it
+             itself, so its own mousedown must not count as outside. */
+          onMouseDown={(e) => e.stopPropagation()}
+          className="tw:h-8 tw:flex-none tw:border-transparent tw:bg-transparent tw:px-2 tw:text-[13px] tw:font-medium tw:text-[var(--bk-ink)] tw:focus:ring-0"
+          onClick={() => setDisplaySettingsOpen((v) => !v)}
+        >
+          View
+        </Button>
+      </div>
       <div className="bdc-pbody bdc-pbody-scroll">
         {/* `composer` alone is not "ready": useComposerInit sets it
             synchronously in the effect body, before the site fetch even
@@ -335,10 +345,9 @@ export const LayersTab: React.FC<LayersTabProps> = ({
           <span data-testid="layers-count-text" className="tw:min-w-0 tw:truncate">
             {layersFooterText(stats, search, selecting)}
           </span>
-          {/* Select (owner decision 2026-10-03): the door into selection mode,
-              beside the count it changes. In the mode: Select all while any
-              row is unticked, Deselect all while any is ticked (both when
-              some are), and Done to leave. */}
+          {/* Selection mode (entered from ⋯ › Select mode — design-2l9
+              147:75914 draws the count alone): Select all while any row is
+              unticked, Deselect all while any is ticked, Done to leave. */}
           <span className="tw:ml-3 tw:flex tw:flex-none tw:items-center tw:gap-3">
             {selecting ? (
               <>
@@ -368,35 +377,8 @@ export const LayersTab: React.FC<LayersTabProps> = ({
                   Done
                 </Button>
               </>
-            ) : (
-              <Button
-                variant="link"
-                size="xs"
-                className={SELECT_BTN}
-                data-testid="layers-select-mode"
-                onClick={() => setSelecting(true)}
-              >
-                Select
-              </Button>
-            )}
+            ) : null}
           </span>
-          {/* 4418:79546 "ⓘ · dim scope": what the row eye does — the canvas
-              dims the element for you; the published site still shows it.
-              Stood down in selection mode, where the band needs its width
-              for "N selected · Select all · Deselect all · Done" (measured
-              live: Done ended flush against it, 0px apart) and dimming is not the subject. */}
-          {!selecting && (
-            <span className="tw:ml-auto tw:flex">
-              <Tooltip content={DIM_SCOPE_TIP} placement="top" arrow={false} className="tw:max-w-60 tw:whitespace-normal">
-                <IconButton label="About dimmed layers" data-testid="layers-dim-info" className={DIM_INFO_BTN}>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                    <circle cx="12" cy="12" r="10" />
-                    <path d="M12 16v-4M12 8h.01" />
-                  </svg>
-                </IconButton>
-              </Tooltip>
-            </span>
-          )}
         </div>
       )}
     </PanelFrame>

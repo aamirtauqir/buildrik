@@ -20,13 +20,14 @@ import type { CollectionPagesRow } from "../useDynamicPagesSummary";
 import { AddPageButton } from "./AddPageButton";
 import { BulkToolbar } from "./BulkToolbar";
 import { PageFolder } from "./PageFolder";
-import { PageRow } from "./PageRow";
+import { PageRow, ROW_SUB, ROW_TAG } from "./PageRow";
 
 /* Board 63:6393's two-part section headings ("My folders · Only visible to
    you", "Collection pages"). */
-const SECTION_HEAD = "tw:flex tw:items-baseline tw:gap-2 tw:px-4 tw:pt-3 tw:pb-1";
-const SECTION_TITLE = "tw:text-[11px] tw:leading-4 tw:font-medium tw:text-[var(--bk-ink-soft)]";
-const SECTION_SUB = "tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
+const SECTION_HEAD = "tw:flex tw:flex-col tw:px-3 tw:pt-3 tw:pb-1";
+const SECTION_TITLE = "tw:text-[13px] tw:leading-5 tw:font-semibold tw:text-[var(--bk-ink)]";
+const SECTION_SUB = "tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
+const LEGEND = "tw:m-0 tw:px-3 tw:pt-1 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 
 interface Props {
   pages: PageItem[];
@@ -288,6 +289,15 @@ export const PageList: React.FC<Props> = ({
                 />
               ))}
             </div>
+            {/* Board 63:6393's legend sits under the page rows; a search puts
+                its match count there instead (4418:92256). */}
+            {!loadError && (
+              <p className={LEGEND} data-testid="pages-legend">
+                {search
+                  ? `${visible.length} of ${pages.length} pages match “${search}”`
+                  : "● marks a page with unsaved changes"}
+              </p>
+            )}
             {/* Board 63:6393: root pages first, then the personal folders under
                 their own heading — a second tree, since a tree owns only
                 treeitems and the heading is not one. */}
@@ -336,19 +346,27 @@ export const PageList: React.FC<Props> = ({
                 <div className={SECTION_HEAD}>
                   <span className={SECTION_TITLE}>Collection pages</span>
                 </div>
+                {/* Board 63:6393: a gray card per collection — a white row
+                    (glyph, name over pattern, page count) and its two doors. */}
                 {collectionPages.map((c) => (
-                  <div key={c.id} className="tw:flex tw:flex-col tw:gap-0.5 tw:px-4 tw:pt-1 tw:pb-2" data-testid={`pages-collection-${c.id}`}>
-                    <div className="tw:flex tw:min-w-0 tw:flex-col">
-                      <span className="tw:truncate tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">{c.name}</span>
-                      <span className="tw:text-[11px] tw:leading-4 tw:[font-family:var(--bk-font-mono)] tw:tabular-nums tw:text-[var(--bk-ink-muted)]">
-                        {`${c.pattern} · ${c.count} page${c.count === 1 ? "" : "s"}`}
+                  <div key={c.id} className="tw:mx-3 tw:flex tw:flex-col tw:gap-1 tw:rounded-md tw:bg-[var(--bk-gray-100)] tw:p-2" data-testid={`pages-collection-${c.id}`}>
+                    <div className="tw:flex tw:items-center tw:gap-2 tw:rounded-md tw:bg-[var(--bk-bg-card)] tw:px-2 tw:py-1">
+                      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="tw:flex-none tw:text-[var(--bk-ink-soft)]">
+                        <path d="M14 3H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V9z" />
+                        <path d="M14 3v6h6" />
+                      </svg>
+                      <span className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
+                        <span className="tw:truncate tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">{c.name}</span>
+                        <span className={ROW_SUB}>{c.pattern}</span>
                       </span>
+                      <span className={`${ROW_TAG} tw:tabular-nums`}>{`${c.count} page${c.count === 1 ? "" : "s"}`}</span>
                     </div>
-                    <div className="tw:flex tw:gap-3">
+                    <div className="tw:flex">
                       {c.templatePageId && onOpenTemplatePage && (
                         <Button
                           variant="link"
                           size="xs"
+                          className="tw:flex-1 tw:justify-center"
                           data-testid={`pages-collection-open-${c.id}`}
                           onClick={() => onOpenTemplatePage(c.templatePageId!)}
                         >
@@ -359,6 +377,7 @@ export const PageList: React.FC<Props> = ({
                         <Button
                           variant="link"
                           size="xs"
+                          className="tw:flex-1 tw:justify-center"
                           data-testid={`pages-collection-manage-${c.id}`}
                           onClick={() => onManageCollection(c.id)}
                         >
@@ -404,15 +423,6 @@ export const PageList: React.FC<Props> = ({
           active the bottom band IS the bulk bar — otherwise "+  Add page". */}
       {selectedIds.size === 0 && (
         <div className="bd-pg-footer" data-testid="pages-footer">
-          {/* Board 63:6393's legend over the Add band; a search puts its
-              match count there instead (4418:92256). */}
-          {!loadError && (
-            <p className="bd-pg-legend" data-testid="pages-legend">
-              {search
-                ? `${visible.length} of ${pages.length} pages match “${search}”`
-                : "● marks a page with unsaved changes"}
-            </p>
-          )}
           <AddPageButton onAddBlank={onAddPage} onFromTemplate={onRequestTemplates} onAddFolder={onAddFolder} />
         </div>
       )}

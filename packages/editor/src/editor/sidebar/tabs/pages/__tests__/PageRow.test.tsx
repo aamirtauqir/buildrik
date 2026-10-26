@@ -36,13 +36,15 @@ describe("PageRow", () => {
     expect(container.querySelector(".bd-pg-row-slug")).toBeNull();
   });
 
-  it("home draws the roof glyph; a plain page draws no icon", () => {
-    const { container: h } = render(<PageRow page={home} {...baseProps} />);
+  /* design-2l9 63:6393: every row has a glyph and its URL under the name;
+     the open page is tagged Current. Re-baseline: page rows. */
+  it("every row draws a glyph, the URL under its name, and Current on the open page", () => {
+    const { container: h } = render(<PageRow page={{ ...home, isActive: true }} {...baseProps} />);
     expect(h.querySelector(".bd-pg-row-icon")).not.toBeNull();
-    const { container: p } = render(
-      <PageRow page={{ ...home, isHome: false }} {...baseProps} />,
-    );
-    expect(p.querySelector(".bd-pg-row-icon")).toBeNull();
+    expect(h.querySelector(`[data-testid="page-row-path-${home.id}"]`)?.textContent).toBe("/");
+    expect(h.querySelector(`[data-testid="page-row-incontext-${home.id}"]`)?.textContent).toBe("Current");
+    const { container: p } = render(<PageRow page={{ ...home, isHome: false, isActive: false }} {...baseProps} />);
+    expect(p.querySelector(".bd-pg-row-icon")).not.toBeNull();
   });
 
   it("every row leads with the always-visible checkbox (board 140:12)", () => {

@@ -1,17 +1,13 @@
-import { IconButton, Menu, MenuItem, POPOVER_BASE_CLASS, Button} from "@/editor/chrome-ui";
+import { Button } from "@/editor/chrome-ui";
 /**
- * AddPageButton — sticky cobalt CTA in pages footer.
- *
- * "From template" is a visible sibling of "+ Add page" (founder call
- * 2026-08-28): buried in the ⋮ overflow, the template route was invisible —
- * this walk's own probe missed it there. The overflow (⋮) keeps only
- * "New folder".
+ * AddPageButton — the Pages footer, design-2l9 board 63:6393: a full-width
+ * outlined "+ Add page", and under it "From template" and "New folder" side
+ * by side. (New folder sat in a ⋯ overflow; the board draws it in the open.)
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { useClickOutside } from "@/shared/hooks";
 
 export interface AddPageButtonProps {
   onAddBlank: () => void;
@@ -19,84 +15,35 @@ export interface AddPageButtonProps {
   onAddFolder?: () => void;
 }
 
-export const AddPageButton: React.FC<AddPageButtonProps> = ({
-  onAddBlank,
-  onFromTemplate,
-  onAddFolder,
-}) => {
-  const [menuOpen, setMenuOpen] = React.useState(false);
-  const wrapRef = React.useRef<HTMLDivElement>(null);
+const SECONDARY =
+  "tw:h-7 tw:flex-1 tw:justify-center tw:border-transparent tw:bg-transparent tw:text-[13px] tw:font-normal tw:text-[var(--bk-ink)] tw:focus:ring-0 tw:enabled:hover:bg-[var(--bk-bg-subtle)]";
 
-  useClickOutside(wrapRef, () => setMenuOpen(false), { enabled: menuOpen });
-
-  const hasOverflow = !!onAddFolder;
-
-  /* gap 12, not 4 — at 4px "+ Add page" and "From template" read as one
-     run-on phrase (designer walk 2026-08-28). */
-  return (
-    <div ref={wrapRef} className="tw:flex tw:items-center tw:gap-3 tw:relative">
-      {/* Board 140:38-39: "+  Add page" is a plain accent text link — no
-          filled pill. */}
-      <Button
-        type="button"
-        color="light"
-        size="xs"
-        onClick={onAddBlank}
-        aria-label="Add new page"
-        variant="link"
-        className="tw:font-medium"
-        data-testid="pages-add-page"
-      >
-        +&nbsp;&nbsp;Add page
-      </Button>
-      {onFromTemplate && (
-        <Button
-          type="button"
-          color="light"
-          size="xs"
-          onClick={onFromTemplate}
-          variant="link" className="tw:text-[var(--bk-ink-soft)] tw:enabled:hover:text-[var(--bk-ink)]"
-        >
-          From template
-        </Button>
-      )}
-      {hasOverflow && (
-        <>
-          <IconButton
-            label="More add options"
-            size="sm"
-            onClick={() => setMenuOpen((o) => !o)}
-            aria-expanded={menuOpen}
-            aria-haspopup="menu"
-          >
-            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style={{ width: 14, height: 14 }}>
-              <circle cx="5" cy="12" r="1.6" />
-              <circle cx="12" cy="12" r="1.6" />
-              <circle cx="19" cy="12" r="1.6" />
-            </svg>
-          </IconButton>
-          {menuOpen && (
-            <div
-              className={POPOVER_BASE_CLASS}
-              role="presentation"
-              style={{ position: "absolute", bottom: "calc(100% + 4px)", right: 0, zIndex: 10 }}
-            >
-              <Menu label="More add options">
-                {onAddFolder && (
-                  <MenuItem
-                    onClick={() => {
-                      onAddFolder();
-                      setMenuOpen(false);
-                    }}
-                  >
-                    New folder
-                  </MenuItem>
-                )}
-              </Menu>
-            </div>
-          )}
-        </>
-      )}
-    </div>
-  );
-};
+export const AddPageButton: React.FC<AddPageButtonProps> = ({ onAddBlank, onFromTemplate, onAddFolder }) => (
+  <div className="tw:flex tw:flex-col tw:gap-1 tw:px-2 tw:py-2">
+    <Button
+      type="button"
+      color="light"
+      size="xs"
+      onClick={onAddBlank}
+      aria-label="Add new page"
+      data-testid="pages-add-page"
+      className="tw:h-8 tw:w-full tw:justify-center tw:rounded-md tw:text-[13px] tw:font-normal tw:text-[var(--bk-ink)] tw:focus:ring-0"
+    >
+      + Add page
+    </Button>
+    {(onFromTemplate || onAddFolder) && (
+      <div className="tw:flex">
+        {onFromTemplate && (
+          <Button type="button" color="light" size="xs" onClick={onFromTemplate} className={SECONDARY} data-testid="pages-from-template">
+            From template
+          </Button>
+        )}
+        {onAddFolder && (
+          <Button type="button" color="light" size="xs" onClick={onAddFolder} className={SECONDARY} data-testid="pages-new-folder">
+            New folder
+          </Button>
+        )}
+      </div>
+    )}
+  </div>
+);

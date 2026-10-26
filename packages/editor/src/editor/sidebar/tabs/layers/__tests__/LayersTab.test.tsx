@@ -148,9 +148,15 @@ describe("LayersTab — header ⋯ menu", () => {
     document.body.removeChild(pickFlag);
   });
 
-  it("4418:79546 — the count footer carries the ⓘ dim-scope explainer", () => {
+  /* design-2l9 147:75914 / 147:76329: "View" beside the search opens the
+     display settings ("Layer display" … Close). Re-baseline. */
+  it("View beside the search toggles the display settings", () => {
     render(<LayersTab composer={null} />);
-    expect(screen.getByLabelText("About dimmed layers")).toBeTruthy();
+    const view = screen.getByTestId("layers-view-toggle");
+    expect(view).toHaveTextContent("View");
+    expect(view).toHaveAttribute("aria-expanded", "false");
+    fireEvent.click(view);
+    expect(view).toHaveAttribute("aria-expanded", "true");
   });
 
   it("the 700 wide view survives as a ⋯ row (no header button on the v3 board)", () => {
@@ -162,14 +168,16 @@ describe("LayersTab — header ⋯ menu", () => {
     expect(onExpandToggle).toHaveBeenCalledTimes(1);
   });
 
-  it("⋯ opens Expand all · Collapse all · Display settings…", () => {
+  it("⋯ opens the board's tree commands (152:78185)", () => {
     render(<LayersTab composer={null} />);
     expect(screen.queryByTestId("layers-expand-all")).toBeNull();
     fireEvent.click(screen.getByTestId("layers-panel-menu"));
     expect(screen.getByRole("menu", { name: "Layers options" })).toBeTruthy();
     expect(screen.getByTestId("layers-expand-all")).toHaveTextContent("Expand all");
     expect(screen.getByTestId("layers-collapse-all")).toHaveTextContent("Collapse all");
-    expect(screen.getByTestId("layers-display-settings-toggle")).toHaveTextContent("Display settings…");
+    expect(screen.getByTestId("layers-collapse-to-selection")).toHaveTextContent("Collapse to selection");
+    expect(screen.getByTestId("layers-menu-select-mode")).toHaveTextContent("Select mode");
+    expect(screen.queryByTestId("layers-display-settings-toggle")).toBeNull();
   });
 
   it("Expand all / Collapse all reach the tree through the composer, and the menu closes", () => {
