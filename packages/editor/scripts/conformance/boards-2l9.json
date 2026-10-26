@@ -3818,7 +3818,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Lane L-B A1: Fields now on Content (probe-compared). Open: reorder hint / field menu (A5), Semantics (A2), Conditions (REQUESTS #11)."
+   "verifiedNote": "Lane L-B A1+A5 (built; copy checked against the dump, no board image): Fields on Content; each field row has a ⋯ menu (Move up / Move down / Delete — the field moves and goes with its label wrapper) and the list ends with '+ Add field' and 'Drag to reorder, or use a field’s menu.'. Open: row layout (name / ⋯ / summary) not compared visually, the submit button listed as 'Submit button', Semantics 'Form' tag (A2 shows it), Conditions (REQUESTS #11)."
   },
   {
    "nodeId": "156:1316",
@@ -3880,7 +3880,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Fields sits in Behaviour (config/sectionOrder.ts:29), board Content; no reorder hint/Move up·down menu; Semantics/Conditions rows missing",
+   "verifiedNote": "Lane L-B A5 (built, not compared): an added field stays in the list in place (FormFieldsAndSlides tests). Open: visual comparison; submit row.",
    "inheritsFrom": "156:716"
   },
   {

@@ -95,3 +95,18 @@ export function validationRows(type: string): readonly { attr: string; label: st
   }
   return [];
 }
+
+/**
+ * What moves or goes with a field: the field, or the wrapper it shares with
+ * nothing else but its label (the Contact form's `<div><label/><input/></div>`)
+ * — moving the input alone would leave its label behind.
+ */
+export function fieldUnit(form: Element, field: Element): Element {
+  let unit = field;
+  for (let p = field.getParent(); p && p !== form; p = p.getParent()) {
+    if (formFields(p).length !== 1) break;
+    unit = p;
+  }
+  return unit;
+}
+

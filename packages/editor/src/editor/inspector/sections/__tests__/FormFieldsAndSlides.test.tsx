@@ -130,6 +130,40 @@ describe("Form › FIELDS", () => {
     expect(composer.elements.getElement("name")?.getAttribute("maxlength")).toBe("80");
   });
 
+  it("2L9 156:716 — a field's ⋯ moves it up / down and deletes it; the reorder note says so", () => {
+    const composer = make();
+    render(<FormFieldsSection elementId="f" composer={composer} isOpen />);
+    expect(screen.getByTestId("form-fields-reorder-note")).toHaveTextContent("Drag to reorder, or use a field’s menu.");
+    fireEvent.click(screen.getByRole("button", { name: "Name actions" }));
+    expect(screen.getByRole("menuitem", { name: "Move up" })).toBeDisabled();
+    act(() => { fireEvent.click(screen.getByRole("menuitem", { name: "Move down" })); });
+    expect(formFields(composer.elements.getElement("f")!).map((el) => el.getId())).toEqual(["email", "name", "msg"]);
+    fireEvent.click(screen.getByRole("button", { name: "Name actions" }));
+    act(() => { fireEvent.click(screen.getByRole("menuitem", { name: "Move up" })); });
+    expect(formFields(composer.elements.getElement("f")!).map((el) => el.getId())).toEqual(["name", "email", "msg"]);
+    fireEvent.click(screen.getByRole("button", { name: "Message actions" }));
+    expect(screen.getByRole("menuitem", { name: "Move down" })).toBeDisabled();
+    act(() => { fireEvent.click(screen.getByRole("menuitem", { name: "Delete" })); });
+    expect(composer.elements.getElement("msg")).toBeUndefined();
+    expect(screen.getAllByTestId("form-field-row")).toHaveLength(2);
+  });
+
+  it("a field wrapped with its label moves and goes with the label (Contact form shape)", () => {
+    const wrap = (id: string, label: string) => ({ id: `w-${id}`, type: "container", tagName: "div", children: [
+      { id: `l-${id}`, type: "label", tagName: "label", content: label, children: [] },
+      input(id, "text", ""),
+    ] });
+    const composer = project([{ id: "f", type: "form", tagName: "form", children: [wrap("a", "A"), wrap("b", "B")] }]);
+    render(<FormFieldsSection elementId="f" composer={composer} isOpen />);
+    fireEvent.click(screen.getByRole("button", { name: "A actions" }));
+    act(() => { fireEvent.click(screen.getByRole("menuitem", { name: "Move down" })); });
+    expect(composer.elements.getElement("f")!.getChildren().map((el) => el.getId())).toEqual(["w-b", "w-a"]);
+    fireEvent.click(screen.getByRole("button", { name: "B actions" }));
+    act(() => { fireEvent.click(screen.getByRole("menuitem", { name: "Delete" })); });
+    expect(composer.elements.getElement("w-b")).toBeUndefined();
+    expect(composer.elements.getElement("l-b")).toBeUndefined();
+  });
+
   it("Label and Required write the field, one undo step each", () => {
     const composer = make();
     render(<FormFieldsSection elementId="f" composer={composer} isOpen />);

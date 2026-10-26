@@ -18,14 +18,14 @@ import type { Composer } from "@/engine";
 import type { Element } from "@/engine/elements/Element";
 import { EVENTS } from "@/shared/constants/events";
 import { ChevronRight, GripVertical } from "lucide-react";
-import { Button } from "@/editor/chrome-ui";
+import { Button, Menu, MenuItem, Popover } from "@/editor/chrome-ui";
 import { Section, SelectRow, SubSectionTitle, type SectionTier } from "../shared/controls";
 import { ActionRow, CommitRow, NoteRow } from "./behaviourRows";
 import { CheckRow } from "../shared/controls/CheckRow";
 import { writeElement } from "@/engine/commands/commandOperations";
 import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
 import { handleTextareaDefaultChange } from "./typeBlock/attributeWriter";
-import { fieldLabelText, fieldType, formFields, nameTaken, validationRows, writeFieldLabel } from "./formFieldModel";
+import { fieldLabelText, fieldType, fieldUnit, formFields, nameTaken, validationRows, writeFieldLabel } from "./formFieldModel";
 import { getBlockById, insertBlock } from "@/blocks/blockRegistry";
 
 export interface FormFieldsSectionProps {
@@ -115,6 +115,48 @@ const ROW =
   "tw:flex tw:items-center tw:gap-1.5 tw:h-7 tw:px-2 tw:rounded-[4px] tw:cursor-pointer tw:select-none " +
   "tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)] tw:hover:bg-[var(--bk-bg-subtle)] " +
   "tw:focus-visible:outline-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
+
+/** A field row's ⋯ — the keyboard route to the drag reorder (2L9 156:716:
+ *  "Drag to reorder, or use a field's menu."). */
+function FieldMenu({ label, onUp, onDown, onDelete }: { label: string; onUp?: () => void; onDown?: () => void; onDelete: () => void }) {
+  const [open, setOpen] = React.useState(false);
+  const run = (fn?: () => void) => () => {
+    setOpen(false);
+    fn?.();
+  };
+  return (
+    <Popover
+      open={open}
+      onClose={() => setOpen(false)}
+      placement="bottom-end"
+      label={`${label} actions`}
+      trigger={
+        <Button
+          type="button"
+          color="alternative"
+          size="xs"
+          aria-label={`${label} actions`}
+          onClick={() => setOpen((v) => !v)}
+          className="tw:h-6 tw:w-6 tw:shrink-0 tw:border-0 tw:bg-transparent tw:p-0 tw:text-[var(--bk-ink-muted)] tw:hover:bg-[var(--bk-gray-100)]"
+        >
+          ⋯
+        </Button>
+      }
+    >
+      <Menu label={`${label} actions`}>
+        <MenuItem disabled={!onUp} onClick={run(onUp)}>
+          Move up
+        </MenuItem>
+        <MenuItem disabled={!onDown} onClick={run(onDown)}>
+          Move down
+        </MenuItem>
+        <MenuItem danger onClick={run(onDelete)}>
+          Delete
+        </MenuItem>
+      </Menu>
+    </Popover>
+  );
+}
 
 export const FormFieldsSection: React.FC<FormFieldsSectionProps> = ({ elementId, composer, isOpen, onToggle, tier = "tertiary" }) => {
   const [, refresh] = React.useReducer((n: number) => n + 1, 0);
@@ -217,6 +259,26 @@ export const FormFieldsSection: React.FC<FormFieldsSectionProps> = ({ elementId,
     });
     if (added) setOpenId(added);
   };
+
+  /** Move a field past its neighbour — the two units, when they share a
+   *  parent. The index is a slot in the list as it stands (before b, or
+   *  after it when moving down). */
+  const swapWith = (el: Element, other: Element | undefined, down: boolean) => {
+    if (!other) return undefined;
+    const a = fieldUnit(form, el);
+    const b = fieldUnit(form, other);
+    const parent = a.getParent();
+    if (!parent || parent !== b.getParent()) return undefined;
+    return () =>
+      writeElement(composer, form, "form-field-move", () => {
+        composer.elements.moveElement(a.getId(), parent.getId(), parent.getChildIndex(b) + (down ? 1 : 0));
+      });
+  };
+
+  const removeField = (el: Element) =>
+    writeElement(composer, form, "form-field-delete", () => {
+      composer.elements.removeElement(fieldUnit(form, el).getId());
+    });
 
   const dropOn = (target: Element) => {
     const moving = dragId ? composer.elements.getElement(dragId) : null;
@@ -336,19 +398,9 @@ export const FormFieldsSection: React.FC<FormFieldsSectionProps> = ({ elementId,
           {fields.map((el, i) => (
             <div
               key={el.getId()}
-              role="button"
-              tabIndex={0}
-              className={ROW}
-              data-testid="form-field-row"
-              aria-label={`${fieldSummary(form, el, i)} — edit field`}
+              className="tw:flex tw:items-center tw:gap-0.5"
+              data-testid="form-field-item"
               draggable
-              onClick={() => setOpenId(el.getId())}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  setOpenId(el.getId());
-                }
-              }}
               onDragStart={(e) => {
                 setDragId(el.getId());
                 e.dataTransfer.effectAllowed = "move";
@@ -359,14 +411,36 @@ export const FormFieldsSection: React.FC<FormFieldsSectionProps> = ({ elementId,
                 dropOn(el);
               }}
             >
-              <GripVertical size={12} aria-hidden="true" className="tw:shrink-0 tw:cursor-grab tw:text-[var(--bk-ink-muted)]" />
-              <span className="tw:min-w-0 tw:flex-1 tw:truncate">{fieldSummary(form, el, i)}</span>
-              <ChevronRight size={12} aria-hidden="true" className="tw:shrink-0 tw:text-[var(--bk-ink-muted)]" />
+              <div
+                role="button"
+                tabIndex={0}
+                className={ROW + " tw:min-w-0 tw:flex-1"}
+                data-testid="form-field-row"
+                aria-label={`${fieldSummary(form, el, i)} — edit field`}
+                onClick={() => setOpenId(el.getId())}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setOpenId(el.getId());
+                  }
+                }}
+              >
+                <GripVertical size={12} aria-hidden="true" className="tw:shrink-0 tw:cursor-grab tw:text-[var(--bk-ink-muted)]" />
+                <span className="tw:min-w-0 tw:flex-1 tw:truncate">{fieldSummary(form, el, i)}</span>
+                <ChevronRight size={12} aria-hidden="true" className="tw:shrink-0 tw:text-[var(--bk-ink-muted)]" />
+              </div>
+              <FieldMenu
+                label={fieldName(form, el, i)}
+                onUp={swapWith(el, fields[i - 1], false)}
+                onDown={swapWith(el, fields[i + 1], true)}
+                onDelete={() => removeField(el)}
+              />
             </div>
           ))}
           <ActionRow onClick={() => setAdding(true)} testId="form-add-field">
             + Add field
           </ActionRow>
+          {fields.length > 1 && <NoteRow testId="form-fields-reorder-note">Drag to reorder, or use a field’s menu.</NoteRow>}
         </>
       )}
     </Section>
