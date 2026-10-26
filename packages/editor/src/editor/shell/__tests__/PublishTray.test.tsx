@@ -291,7 +291,7 @@ describe("PublishTray — states (B8-PB* copy)", () => {
 
   it("an outside block (offline) speaks before the issue count", () => {
     renderTray({ nextMove: move({ offline: true, errorCount: 2 }) });
-    expect(reason()).toBe("Can't publish while offline");
+    expect(reason()).toBe("Needs a connection");
   });
 });
 

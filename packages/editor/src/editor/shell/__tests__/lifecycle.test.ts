@@ -133,7 +133,7 @@ describe("deriveLifecycleState — off the happy path", () => {
     const move = deriveLifecycleState(
       at({ reviewsEnabled: null, editsRequireApproval: null, reviewStatusFailed: true, offline: true }),
     );
-    expect(move?.blockedReason).toBe("Can't publish while offline");
+    expect(move?.blockedReason).toBe("Needs a connection");
   });
 
   it("a server too old to send the flags does not block publishing forever", () => {
@@ -170,19 +170,19 @@ describe("deriveLifecycleState — off the happy path", () => {
     // Viewer/offline/flag-off do not depend on the review flags — those answers
     // are final at first paint and must not be replaced by "checking…".
     expect(deriveLifecycleState(at({ reviewsEnabled: null, offline: true }))?.blockedReason).toBe(
-      "Can't publish while offline",
+      "Needs a connection",
     );
   });
 
   it("a blocked publish is shown with its reason, never withheld", () => {
     const cases: Array<[Partial<LifecycleInput>, string]> = [
-      [{ publishEnabled: false }, "Publishing isn't switched on for this workspace yet"],
+      [{ publishEnabled: false }, "Publishing isn’t switched on for this workspace yet"],
       [{ isViewer: true }, "Viewers can't publish — ask an editor"],
       [{ saveConflict: true }, "Resolve the sync conflict before publishing"],
       /* L5-060: publish exports the live canvas, so after a failed save it
          would ship edits no stored project or version holds. */
       [{ saveFailed: true }, "Save your changes before publishing — the last save failed"],
-      [{ offline: true }, "Can't publish while offline"],
+      [{ offline: true }, "Needs a connection"],
     ];
     for (const [over, reason] of cases) {
       const move = deriveLifecycleState(at({ reviewState: "approved", ...over }));
@@ -222,7 +222,7 @@ describe("deriveLifecycleState — off the happy path", () => {
   it("a real block outranks the blocking-issues line — one refusal, not two", () => {
     const move = deriveLifecycleState(at({ reviewState: "approved", errorCount: 2, offline: true }));
     expect(move?.label).toBe("Publish");
-    expect(move?.blockedReason).toBe("Can't publish while offline");
+    expect(move?.blockedReason).toBe("Needs a connection");
   });
 
   it("a blocked publish still says what is waiting to ship", () => {

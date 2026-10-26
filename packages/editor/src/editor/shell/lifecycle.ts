@@ -235,9 +235,9 @@ function whoever(i: LifecycleInput): { subject: string; object: string; possessi
  *  publish at all outranks a role that cannot, which outranks a dropped
  *  connection. */
 function publishBlocker(i: LifecycleInput): string | null {
-  if (!i.publishEnabled) return "Publishing isn't switched on for this workspace yet";
+  if (!i.publishEnabled) return "Publishing isn’t switched on for this workspace yet";
   if (i.isViewer) return "Viewers can't publish — ask an editor";
-  if (i.offline) return "Can't publish while offline";
+  if (i.offline) return "Needs a connection";
   if (i.saveConflict) return "Resolve the sync conflict before publishing";
   if (i.saveFailed) return "Save your changes before publishing — the last save failed";
   return null;

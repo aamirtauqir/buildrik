@@ -146,7 +146,6 @@ describe("OverviewScreen — the frame", () => {
       "set-ov-group-publishing",
       "set-ov-group-visitors",
       "set-ov-group-advanced",
-      "set-ov-group-danger-zone",
       "set-ov-group-workspace",
     ]);
     const card = (g: string) => screen.getByTestId(`set-ov-group-${g}`);
@@ -157,10 +156,10 @@ describe("OverviewScreen — the frame", () => {
     expect(line("search-sharing")).toBe("SEO");
     expect(line("publishing")).toBe("Domains · Redirects · Access");
     expect(line("visitors")).toBe("Analytics · Form submissions");
-    expect(line("advanced")).toBe("Custom code · Security headers");
-    expect(line("danger-zone")).toBe("Archive · Transfer · Delete site");
+    // 2L9 B8-S01: the Danger zone is a row under Advanced.
+    expect(line("advanced")).toBe("Custom code · Security headers · Archive · Transfer · Delete site");
     expect(within(card("workspace")).getByRole("heading").textContent).toBe("Workspace");
-    expect(line("workspace")).toBe("Members · Billing · Integrations & webhooks");
+    expect(line("workspace")).toBe("Members ↗ · Billing ↗ · Integrations ↗");
     expect(screen.queryByTestId("set-ov-row-export")).toBeNull();
     expect(screen.queryByTestId("set-ov-row-integrations")).toBeNull();
 

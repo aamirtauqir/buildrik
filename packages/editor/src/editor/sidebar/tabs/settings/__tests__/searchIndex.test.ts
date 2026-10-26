@@ -51,7 +51,8 @@ describe("SETTINGS_SEARCH_INDEX", () => {
   it("lists every nav row once, in sidebar order — no Export, no Integrations (PD-2)", () => {
     expect(sections.map((s) => s.screen)).toEqual(NAV_ORDER);
     expect(sections.map((s) => s.screen)).toEqual(SETTINGS_NAV.map((n) => n.id));
-    expect(sections.some((s) => /export|^integrations$/i.test(s.title))).toBe(false);
+    // PD-2: no Export and no Integrations SCREEN — the Integrations row is the workspace door (`webhooks`).
+    expect(sections.some((s) => /^(export|integrations)$/.test(s.screen))).toBe(false);
   });
 
   it("takes each section's title, subtitle and group from the nav itself", () => {
@@ -76,7 +77,7 @@ describe("SETTINGS_SEARCH_INDEX", () => {
       "Danger zone",
       "Members",
       "Billing",
-      "Integrations & webhooks",
+      "Integrations",
     ]);
   });
 

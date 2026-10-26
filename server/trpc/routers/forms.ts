@@ -12,6 +12,7 @@ import {
 } from "@/server/services/form-submission.service";
 import {
   listSubmissionsSchema,
+  exportSubmissionsSchema,
   updateSubmissionSchema,
   getFormBlockSchema,
   updateFormBlockSchema,
@@ -89,13 +90,10 @@ export const formsRouter = router({
     }),
 
   exportSubmissions: protectedProcedure
-    .input(z.object({
-      siteId: z.string(),
-      formBlockId: z.string().optional(),
-      format: z.enum(["csv", "json"]),
-    }))
+    .input(exportSubmissionsSchema)
     .query(async ({ ctx, input }) => {
       await guardSite(ctx.prisma, ctx.session.user.id, input.siteId);
-      return exportSubmissions(input.siteId, input.formBlockId, input.format);
+      const { siteId, formBlockId, format, isSpam, isArchived } = input;
+      return exportSubmissions(siteId, formBlockId, format, { isSpam, isArchived });
     }),
 });

@@ -1,11 +1,9 @@
 /**
- * Security headers — 4418:128374 (Clone 3397:32602): the amber restore strip,
- * then one card per response header the published site sends — Content
- * Security Policy (a mono well beside its side label), X-Frame-Options and
- * Referrer-Policy (a `Policy` select each) and HSTS (`Enable HSTS` with a
- * `Max age` under it). Permissions-Policy sits below them: the frame does
- * not draw it, but `Site.permissionsPolicy` exists and no other screen edits
- * it, so the code's row stays as the fifth card.
+ * Security headers — 2L9 B8-SH01…SH11 (245:47988…248:16058): the restore
+ * line, then Content Security Policy (a mono well beside its side label),
+ * Browser policies (X-Frame-Options and Referrer-Policy, a select each), HSTS
+ * (`Enable HSTS` with `Max age` under it, presets as "1 year · 31536000
+ * seconds") and Permissions-Policy.
  *
  * The five columns come off the Site row on open (3397:33335 loading,
  * 3397:33383 load-error with Try again). Edits stay here until Save, when
@@ -13,8 +11,9 @@
  * — a refusal throws `SettingsSaveError`, the shell's banner (3397:33431) sits
  * over the strip and each refused column is said under its control. HSTS is stored as
  * seconds in `hstsMaxAge`: the toggle off writes null; a stored value the
- * Max age list does not carry is shown as `<n> seconds`, never snapped to
- * the nearest preset.
+ * presets do not carry stays "<n> seconds (custom)", never snapped to the
+ * nearest preset, and the line under Max age says what is kept or what an
+ * unsaved choice changes.
  *
  * @license BSD-3-Clause
  */
@@ -56,14 +55,14 @@ const REFERRER_POLICIES = [
   "unsafe-url",
 ] as const satisfies readonly ReferrerPolicy[];
 
-/* The Max age list the frame draws (3397:32602: `2 years (recommended)`),
-   storing seconds. Two years is what the toggle turns on to. */
+/* The Max age presets (2L9 B8-SH02 245:48243: "1 year · 31536000
+   seconds"), storing seconds. Two years is what the toggle turns on to. */
 const HSTS_MAX_AGES: ReadonlyArray<{ label: string; seconds: number }> = [
   { label: "1 month", seconds: 2592000 },
   { label: "6 months", seconds: 15552000 },
   { label: "1 year", seconds: 31536000 },
-  { label: "2 years (recommended)", seconds: 63072000 },
-];
+  { label: "2 years", seconds: 63072000 },
+].map((p) => ({ ...p, label: `${p.label} · ${p.seconds} seconds` }));
 const HSTS_DEFAULT_MAX_AGE = 63072000;
 
 /** What this screen reads off `siteDetail.settings.get`. */
@@ -105,6 +104,8 @@ const Row: React.FC<{
 };
 
 const CONTROL = "tw:min-w-0 tw:flex-1";
+/* B8-SH01/SH06: the Max age note, 12 muted, from the card's left edge. */
+const HSTS_NOTE = "tw:col-span-full tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 
 /** A column the server refused on the last Save, under its row at the control's column. */
 const FieldError: React.FC<{ message?: string }> = ({ message }) =>
@@ -213,12 +214,26 @@ export const HeadersScreen: React.FC<ScreenProps> = ({
     );
   }
 
-  /* A stored max-age the list does not carry (300 from the old testing
-     preset, say) is shown as its own `<n> seconds` option, so opening the
-     screen changes nothing. */
-  const maxAges = HSTS_MAX_AGES.some((p) => p.seconds === hstsMaxAge)
-    ? HSTS_MAX_AGES
-    : [{ label: `${hstsMaxAge} seconds`, seconds: hstsMaxAge }, ...HSTS_MAX_AGES];
+  /* A stored max-age the presets do not carry (86400, 300 from the old
+     testing preset) stays its own "<n> seconds (custom)" option at the top
+     (B8-SH01/SH02), so opening the screen changes nothing and the custom
+     value can still be chosen back after trying a preset. */
+  const savedMaxAge: number | null = saved ? (JSON.parse(saved) as { hstsMaxAge: number | null }).hstsMaxAge : null;
+  const savedIsCustom = savedMaxAge !== null && !HSTS_MAX_AGES.some((p) => p.seconds === savedMaxAge);
+  const customAge = savedIsCustom ? savedMaxAge : HSTS_MAX_AGES.some((p) => p.seconds === hstsMaxAge) ? null : hstsMaxAge;
+  const maxAges =
+    customAge === null ? HSTS_MAX_AGES : [{ label: `${customAge} seconds (custom)`, seconds: customAge }, ...HSTS_MAX_AGES];
+  /* The line under Max age: what is kept, or what the unsaved choice changes
+     (B8-SH01 / SH06 / SH11). */
+  const maxAgeNote = !hstsEnabled
+    ? null
+    : savedIsCustom && hstsMaxAge === savedMaxAge
+      ? "Existing custom value retained. Changing presets is an explicit edit."
+      : savedIsCustom
+        ? `Unsaved choice: ${hstsMaxAge} seconds. Saved custom value: ${savedMaxAge} seconds.`
+        : savedMaxAge !== hstsMaxAge
+          ? `The chosen preset changes max age to ${hstsMaxAge} seconds. Save settings to apply.`
+          : null;
 
   return (
     <Screen>
@@ -247,8 +262,9 @@ export const HeadersScreen: React.FC<ScreenProps> = ({
         <FieldError message={fieldErrors?.cspPolicy} />
       </Section>
 
-      <Section title="X-Frame-Options">
-        <Row stem="x-frame-policy" label="Policy" htmlFor="set-hd-xfo">
+      {/* B8-SH01: the two browser policies share one card. */}
+      <Section title="Browser policies">
+        <Row stem="x-frame-policy" label="X-Frame-Options" htmlFor="set-hd-xfo">
           <Select
             id="set-hd-xfo"
             className={CONTROL}
@@ -266,10 +282,7 @@ export const HeadersScreen: React.FC<ScreenProps> = ({
             <option value="">Not set</option>
           </Select>
         </Row>
-      </Section>
-
-      <Section title="Referrer-Policy">
-        <Row stem="referrer-policy" label="Policy" htmlFor="set-hd-referrer">
+        <Row stem="referrer-policy" label="Referrer-Policy" htmlFor="set-hd-referrer">
           <Select
             id="set-hd-referrer"
             className={CONTROL}
@@ -289,18 +302,24 @@ export const HeadersScreen: React.FC<ScreenProps> = ({
         </Row>
       </Section>
 
-      <Section title="HSTS (HTTP Strict Transport Security)">
+      <Section title="HSTS">
         <Row stem="enable-hsts" label="Enable HSTS">
-          <ToggleSwitch
-            id="set-hd-hsts-enable"
-            checked={hstsEnabled}
-            onChange={(next) => {
-              setHstsEnabled(next);
-            }}
-            aria-labelledby="enable-hsts-label"
-            sizing="md"
-            data-testid="set-hd-hsts-enable"
-          />
+          <div className="tw:flex tw:items-center tw:gap-3">
+            <ToggleSwitch
+              id="set-hd-hsts-enable"
+              checked={hstsEnabled}
+              onChange={(next) => {
+                setHstsEnabled(next);
+              }}
+              aria-labelledby="enable-hsts-label"
+              sizing="md"
+              data-testid="set-hd-hsts-enable"
+            />
+            {/* B8-SH01: the switch says its state beside it. */}
+            <span className="tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]" aria-hidden>
+              {hstsEnabled ? "Enabled" : "Off"}
+            </span>
+          </div>
         </Row>
         <Row stem="max-age" label="Max age" htmlFor="set-hd-hsts-max">
           <Select
@@ -320,15 +339,15 @@ export const HeadersScreen: React.FC<ScreenProps> = ({
             ))}
           </Select>
         </Row>
+        {maxAgeNote ? (
+          <p className={HSTS_NOTE} data-testid="set-hd-hsts-note">
+            {maxAgeNote}
+          </p>
+        ) : null}
         <FieldError message={fieldErrors?.hstsMaxAge} />
       </Section>
 
-      {/* Not on 3397:32602 — kept because the Site column exists and nothing
-          else edits it (phase3-brief.md, "Headers"). */}
-      <Section
-        title="Permissions-Policy"
-        desc="Which browser features (camera, microphone, geolocation) the published site may use."
-      >
+      <Section title="Permissions-Policy">
         <Row stem="header-value" label="Header value" htmlFor="set-hd-permissions">
           <div className={CONTROL}>
             <Input
