@@ -89,11 +89,8 @@ export function EmptyState({
 interface VersionRowProps {
   version: NamedVersion;
   isRestoring: boolean;
-  isDeleteConfirm: boolean;
   onRestore: () => void;
   onDeleteRequest: () => void;
-  onDeleteConfirm: () => void;
-  onDeleteCancel: () => void;
   onCompare: () => void;
   onDetails: () => void;
   /** Board 6930:82577's "Name this version…" — persists via siteVersions.rename. */
@@ -108,11 +105,8 @@ interface VersionRowProps {
 export function VersionRow({
   version,
   isRestoring,
-  isDeleteConfirm,
   onRestore,
   onDeleteRequest,
-  onDeleteConfirm,
-  onDeleteCancel,
   onCompare,
   onDetails,
   onRename,
@@ -169,7 +163,7 @@ export function VersionRow({
     <div className="version-row-wrapper">
       <div
         ref={rowRef}
-        className={`version-row${isDeleteConfirm ? " delete-confirm" : ""}`}
+        className="version-row"
         aria-label={`Version "${versionDisplayName(version)}" from ${relative}`}
         role="listitem"
         onMouseEnter={handleMouseEnter}
@@ -178,7 +172,7 @@ export function VersionRow({
            ⋯. A click on the row (not on one of its controls) opens the
            save's details, whose footer compares or restores it. */
         onClick={(e) => {
-          if (isRenaming || isDeleteConfirm) return;
+          if (isRenaming) return;
           if ((e.target as HTMLElement).closest("button, input, [role='menu']")) return;
           onDetails();
         }}
@@ -251,20 +245,7 @@ export function VersionRow({
           </div>
 
           <div className="version-actions">
-            {isDeleteConfirm ? (
-              <>
-                <Button
-                  onClick={onDeleteConfirm}
-                  className="action-btn danger"
-                  aria-label="Confirm delete"
-                >
-                  Delete
-                </Button>
-                <Button onClick={onDeleteCancel} className="action-btn" aria-label="Cancel">
-                  ×
-                </Button>
-              </>
-            ) : (
+            {
               /* Board 6930:82577 — a save's actions live in its ⋯: Rename,
                  Restore to draft…, Compare with current, Delete. */
               <Popover
@@ -346,7 +327,7 @@ export function VersionRow({
                   </MenuItem>
                 </Menu>
               </Popover>
-            )}
+            }
           </div>
         </div>
       </div>
@@ -369,11 +350,8 @@ export interface VersionListProps {
   /** Total count of versions before filtering — drives empty-state copy. */
   totalCount: number;
   restoringId: string | null;
-  deleteConfirmId: string | null;
   onRestoreRequest: (versionId: string) => void;
   onDeleteRequest: (versionId: string) => void;
-  onDeleteConfirm: (versionId: string) => void;
-  onDeleteCancel: () => void;
   onCompare: (versionId: string) => void;
   onDetails: (versionId: string) => void;
   /** Board 6930:82577's "Name this version…". */
@@ -388,11 +366,8 @@ export function VersionList({
   filteredVersions,
   totalCount,
   restoringId,
-  deleteConfirmId,
   onRestoreRequest,
   onDeleteRequest,
-  onDeleteConfirm,
-  onDeleteCancel,
   onCompare,
   onDetails,
   onRename,
@@ -460,11 +435,8 @@ export function VersionList({
           <VersionRow
             version={v}
             isRestoring={restoringId === v.id}
-            isDeleteConfirm={deleteConfirmId === v.id}
             onRestore={() => onRestoreRequest(v.id)}
             onDeleteRequest={() => onDeleteRequest(v.id)}
-            onDeleteConfirm={() => onDeleteConfirm(v.id)}
-            onDeleteCancel={onDeleteCancel}
             onCompare={() => onCompare(v.id)}
             onDetails={() => onDetails(v.id)}
             onRename={(name) => onRename(v.id, name)}
@@ -478,11 +450,8 @@ export function VersionList({
       flatRows,
       changeCounts,
       restoringId,
-      deleteConfirmId,
       onRestoreRequest,
       onDeleteRequest,
-      onDeleteConfirm,
-      onDeleteCancel,
       onCompare,
       onDetails,
       onRename,

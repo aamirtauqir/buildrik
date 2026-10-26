@@ -167,7 +167,7 @@ describe("VersionHistoryPanel — save form branches", () => {
     const Panel = await loadPanel();
     render(<Panel composer={makeComposer()} />);
 
-    fireEvent.click(screen.getByRole("button", { name: "+ Save a version" }));
+    fireEvent.click(screen.getByRole("button", { name: "Save a version" }));
     const input = await screen.findByLabelText("Version name");
     fireEvent.change(input, { target: { value: "Draft name" } });
     fireEvent.keyDown(input, { key: "Escape" });
@@ -176,7 +176,7 @@ describe("VersionHistoryPanel — save form branches", () => {
     expect(mocks.createVersion).not.toHaveBeenCalled();
 
     // Reopen — the previously typed name must be gone.
-    fireEvent.click(screen.getByRole("button", { name: "+ Save a version" }));
+    fireEvent.click(screen.getByRole("button", { name: "Save a version" }));
     const reopened = await screen.findByLabelText("Version name");
     expect((reopened as HTMLInputElement).value).toBe("");
   });
@@ -185,7 +185,7 @@ describe("VersionHistoryPanel — save form branches", () => {
     const Panel = await loadPanel();
     render(<Panel composer={makeComposer()} />);
 
-    fireEvent.click(screen.getByRole("button", { name: "+ Save a version" }));
+    fireEvent.click(screen.getByRole("button", { name: "Save a version" }));
     await screen.findByLabelText("Version name");
     fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
 
@@ -197,7 +197,7 @@ describe("VersionHistoryPanel — save form branches", () => {
     const Panel = await loadPanel();
     render(<Panel composer={makeComposer()} />);
 
-    fireEvent.click(screen.getByRole("button", { name: "+ Save a version" }));
+    fireEvent.click(screen.getByRole("button", { name: "Save a version" }));
     const input = await screen.findByLabelText("Version name");
     fireEvent.change(input, { target: { value: "   " } });
 
@@ -215,7 +215,7 @@ describe("VersionHistoryPanel — save form branches", () => {
     const Panel = await loadPanel();
     render(<Panel composer={makeComposer()} />);
 
-    fireEvent.click(screen.getByRole("button", { name: "+ Save a version" }));
+    fireEvent.click(screen.getByRole("button", { name: "Save a version" }));
     const input = await screen.findByLabelText("Version name");
     fireEvent.change(input, { target: { value: "Doomed" } });
     fireEvent.keyDown(input, { key: "Enter" });
@@ -230,7 +230,7 @@ describe("VersionHistoryPanel — save form branches", () => {
     const Panel = await loadPanel();
     render(<Panel composer={makeComposer()} />);
 
-    fireEvent.click(screen.getByRole("button", { name: "+ Save a version" }));
+    fireEvent.click(screen.getByRole("button", { name: "Save a version" }));
     const input = await screen.findByLabelText("Version name");
     fireEvent.change(input, { target: { value: "Milestone 2" } });
     fireEvent.click(screen.getByRole("button", { name: "Save version" }));
@@ -346,17 +346,17 @@ describe("VersionHistoryPanel — restore branches", () => {
 // ─── Delete branches ──────────────────────────────────────────────────
 
 describe("VersionHistoryPanel — delete branches", () => {
-  it("row-inline Cancel aborts without calling deleteVersion", async () => {
+  it("the confirm's Cancel aborts without calling deleteVersion", async () => {
     mocks.state.versions = [makeVersion({ id: "v1", name: "Keep me" })];
     const Panel = await loadPanel();
     render(<Panel composer={makeComposer()} />);
 
     openSaveMenu("Keep me");
     fireEvent.click(screen.getByLabelText('Delete "Keep me"'));
-    await screen.findByLabelText("Confirm delete");
-    fireEvent.click(screen.getByLabelText("Cancel"));
+    await screen.findByRole("button", { name: "Delete version" });
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
 
-    expect(screen.queryByLabelText("Confirm delete")).toBeNull();
+    expect(screen.queryByRole("button", { name: "Delete version" })).toBeNull();
     // Normal row actions are back.
     openSaveMenu("Keep me");
     expect(screen.getByLabelText('Compare "Keep me"')).toBeTruthy();
@@ -371,7 +371,7 @@ describe("VersionHistoryPanel — delete branches", () => {
 
     openSaveMenu("Sticky");
     fireEvent.click(screen.getByLabelText('Delete "Sticky"'));
-    fireEvent.click(await screen.findByLabelText("Confirm delete"));
+    fireEvent.click(await screen.findByRole("button", { name: "Delete version" }));
 
     expect(await screen.findByText("Delete failed")).toBeTruthy();
   });
@@ -384,7 +384,7 @@ describe("VersionHistoryPanel — delete branches", () => {
 
     openSaveMenu("Old draft");
     fireEvent.click(screen.getByLabelText('Delete "Old draft"'));
-    fireEvent.click(await screen.findByLabelText("Confirm delete"));
+    fireEvent.click(await screen.findByRole("button", { name: "Delete version" }));
 
     expect(await screen.findByText("Deleted Old draft")).toBeTruthy();
   });
@@ -405,7 +405,7 @@ describe("VersionHistoryPanel — delete branches", () => {
 
     openSaveMenu("Older");
     fireEvent.click(screen.getByLabelText('Delete "Older"'));
-    fireEvent.click(await screen.findByLabelText("Confirm delete"));
+    fireEvent.click(await screen.findByRole("button", { name: "Delete version" }));
 
     await waitFor(() => {
       expect(mocks.deleteVersion).toHaveBeenCalledWith("older");

@@ -440,11 +440,6 @@
   border-color: var(--bk-border);
 }
 
-.version-row.delete-confirm {
-  background: var(--bk-error-tint);
-  border-color: rgba(239, 68, 68, 0.3);
-}
-
 .version-row-wrapper {
   display: block;
 }
@@ -502,8 +497,7 @@
 
 .version-row:hover .version-actions,
 .version-row:focus-within .version-actions,
-.version-row.expanded .version-actions,
-.version-row.delete-confirm .version-actions {
+.version-row.expanded .version-actions {
   opacity: 1;
   pointer-events: auto;
 }

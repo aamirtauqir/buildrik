@@ -4,6 +4,10 @@
  * Author: anyone ▾), whose author row turns the popover into the author list
  * (6930:79873: Everyone · <names>). G1-075; also closes G2-170.
  *
+ * 2L9 B7-H04 `230:14662` (L-F W3): one flat menu — All · Named · Auto-saves ·
+ * By <author> — under a chip that names the filter ("Filter: All ▾"), and the
+ * row carries "Save a version" at its right (`action`).
+ *
  * @license BSD-3-Clause
  */
 import * as React from "react";
@@ -35,7 +39,7 @@ export function applySavesFilter(versions: NamedVersion[], f: SavesFilterValue):
 
 const KIND_LABEL: Record<SavesKind, string> = { all: "All", named: "Named", auto: "Auto-saves" };
 
-const ROW = "tw:flex tw:h-[30px] tw:flex-none tw:items-center tw:justify-end tw:pl-4 tw:pr-3 tw:py-0.5";
+const ROW = "tw:flex tw:h-[34px] tw:flex-none tw:items-center tw:justify-between tw:gap-2 tw:pl-4 tw:pr-3 tw:py-0.5";
 const CHIP =
   "tw:h-6 tw:min-h-0 tw:rounded tw:border tw:border-[var(--bk-border)] tw:bg-transparent tw:px-2 tw:py-0 " +
   "tw:text-[12px] tw:font-normal tw:text-[var(--bk-ink)] tw:focus:ring-0 tw:focus-visible:shadow-[var(--bk-shadow-focus)]";
@@ -47,9 +51,10 @@ export const SavesFilter: React.FC<{
   currentUserId: string | null;
   value: SavesFilterValue;
   onChange: (next: SavesFilterValue) => void;
-}> = ({ versions, currentUserId, value, onChange }) => {
+  /** The row's right-hand action ("Save a version"). */
+  action?: React.ReactNode;
+}> = ({ versions, currentUserId, value, onChange, action }) => {
   const [open, setOpen] = React.useState(false);
-  const [authors, setAuthors] = React.useState(false);
 
   const authorOptions = React.useMemo(() => {
     const seen = new Map<string, string>();
@@ -60,15 +65,13 @@ export const SavesFilter: React.FC<{
     return [...seen];
   }, [versions, currentUserId]);
 
-  const authorName = value.author ? authorOptions.find(([id]) => id === value.author)?.[1] ?? "Unknown author" : "anyone";
-  const active = value.kind !== "all" || value.author !== null;
-  const chipText = active
-    ? `${[value.kind !== "all" ? KIND_LABEL[value.kind] : null, value.author ? authorName : null].filter(Boolean).join(" · ")} ▾`
-    : "Filter ▾";
+  const authorName = value.author ? authorOptions.find(([id]) => id === value.author)?.[1] ?? "Unknown author" : null;
+  const chipText = `Filter: ${authorName ? `By ${authorName}` : KIND_LABEL[value.kind]} ▾`;
 
-  const close = () => {
-    setOpen(false);
-    setAuthors(false);
+  const close = () => setOpen(false);
+  const pick = (next: SavesFilterValue) => {
+    onChange(next);
+    close();
   };
   const tick = (on: boolean) => (on ? "✓" : undefined);
 
@@ -87,37 +90,27 @@ export const SavesFilter: React.FC<{
             className={CHIP}
             aria-haspopup="menu"
             aria-expanded={open}
-            onClick={() => (open ? close() : setOpen(true))}
+            onClick={() => setOpen((v) => !v)}
             data-testid="saves-filter"
           >
             {chipText}
           </Button>
         }
       >
-        {authors ? (
-          <Menu label="Author" className="tw:w-[200px]">
-            <MenuItem className={ITEM} kbd={tick(value.author === null)} onClick={() => { onChange({ ...value, author: null }); close(); }}>
-              Everyone
+        <Menu label="Filter saves" className="tw:w-[200px]">
+          {(["all", "named", "auto"] as const).map((k) => (
+            <MenuItem key={k} className={ITEM} kbd={tick(value.author === null && value.kind === k)} onClick={() => pick({ kind: k, author: null })}>
+              {KIND_LABEL[k]}
             </MenuItem>
-            {authorOptions.map(([id, label]) => (
-              <MenuItem key={id} className={ITEM} kbd={tick(value.author === id)} onClick={() => { onChange({ ...value, author: id }); close(); }}>
-                {label}
-              </MenuItem>
-            ))}
-          </Menu>
-        ) : (
-          <Menu label="Filter saves" className="tw:w-[200px]">
-            {(["all", "named", "auto"] as const).map((k) => (
-              <MenuItem key={k} className={ITEM} kbd={tick(value.kind === k)} onClick={() => { onChange({ ...value, kind: k }); close(); }}>
-                {KIND_LABEL[k]}
-              </MenuItem>
-            ))}
-            <MenuItem className={ITEM} onClick={() => setAuthors(true)} data-testid="saves-filter-author">
-              Author: {authorName} ▾
+          ))}
+          {authorOptions.map(([id, label]) => (
+            <MenuItem key={id} className={ITEM} kbd={tick(value.author === id)} onClick={() => pick({ kind: "all", author: id })} data-testid="saves-filter-author">
+              By {label}
             </MenuItem>
-          </Menu>
-        )}
+          ))}
+        </Menu>
       </Popover>
+      {action}
     </div>
   );
 };
