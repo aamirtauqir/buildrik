@@ -141,23 +141,22 @@ export function getMarqueeStyles(marquee: {
   };
 }
 
-/* The footer toolbar's dock. Boards 5936:44788 / 4428:44164 floated the bar
-   inset 16 from the canvas's sides and 56 above its bottom edge, over the
-   page; OWNER OVERRIDE 2026-10-03 docks it: an in-flow, full-width strip at
-   the bottom of the canvas wrapper (a flex column — see `wrapperStyles`), so
-   the scroll viewport ends where the bar begins and the last part of the page
-   can always be scrolled into view. The negative inline/bottom margins cancel
-   the wrapper's 24px padding so the strip runs edge to edge and flush to the
-   column's bottom. */
+/* The canvas bar's dock. 2L9 boards (7:18654 and every editor frame) draw it
+   at the TOP of the canvas column, full width, under the topbar: an in-flow
+   strip ahead of the scroll viewport in the wrapper's flex column (see
+   `wrapperStyles`). The negative top/inline margins cancel the wrapper's
+   24px padding so the strip runs edge to edge and flush to the column's top;
+   the bottom margin gives the page back its 24px. (Docked at the bottom
+   from the 2026-10-03 owner override until the 2026-10-26 board pass.) */
 export const footerToolbarContainerStyles: React.CSSProperties = {
   flex: "none",
-  margin: "var(--bk-space-24) calc(-1 * var(--bk-space-24)) calc(-1 * var(--bk-space-24))",
+  margin: "calc(-1 * var(--bk-space-24)) calc(-1 * var(--bk-space-24)) var(--bk-space-24)",
   paddingRight: "var(--bk-space-8)",
   display: "flex",
   alignItems: "center",
   gap: "var(--bk-space-8)",
   background: "var(--bk-bg-card)",
-  borderTop: "1px solid var(--bk-gray-200)",
+  borderBottom: "1px solid var(--bk-gray-200)",
   position: "relative",
   zIndex: Z_LAYERS.floatingToolbar,
   pointerEvents: "auto",

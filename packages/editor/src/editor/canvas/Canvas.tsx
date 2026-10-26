@@ -763,9 +763,10 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
        mouse-move stay: selection changes nothing when there is no inspector to
        drive, and comment pinning needs the pointer. */
     return (
-      /* data-bk-toast-anchor / -floor: toasts sit 16px in from this column's
-         right and 16px above the footer toolbar (owner decision 2026-10-03,
-         Settings / CMS toast boards) — chrome-ui/Toast measures both. */
+      /* data-bk-toast-anchor: toasts sit 16px in from this column's right and
+         bottom (owner decision 2026-10-03, Settings / CMS toast boards) —
+         chrome-ui/Toast measures it. The canvas bar is at the top now, so
+         there is no floor above the column's bottom. */
       <div
         ref={wrapperRef}
         tabIndex={0}
@@ -774,6 +775,60 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
         style={wrapperStyles}
         data-bk-toast-anchor=""
       >
+        {/* The canvas bar (2L9 boards 7:18654, 497:339497 …): at the TOP of
+            the canvas column, under the topbar — readout · devices · width ·
+            zoom · View. It was docked at the bottom (owner override
+            2026-10-03); the 2L9 boards draw it here (owner 2026-10-26: every
+            difference follows the board). */}
+        {showFooterToolbar && onZoomChange && onOverlayChange && (
+          <div style={footerToolbarContainerStyles}>
+            <CanvasFooterToolbar
+              overlays={{
+                guides: showGuides,
+                spacing: showSpacing,
+                grid: showGrid,
+                rulers: showRulers,
+                badges: showBadges,
+                xray: showXRay,
+                outlines: showOutlines,
+              }}
+              zoom={zoom}
+              onOverlayChange={onOverlayChange}
+              onZoomChange={onZoomChange}
+              onFitToScreen={handleFitToScreen}
+              onZoomToSelection={handleZoomToSelection}
+              gridSize={gridSize}
+              onGridSizeChange={composer ? (size) => composer.setGridSize(size) : undefined}
+              readout={readoutPath}
+              readoutTitle={readoutDims ? `${readoutLabel} · ${readoutDims}` : readoutLabel}
+              pageWidth={activeCustomWidth ?? (frameWidth || undefined)}
+              device={device}
+              onDeviceChange={
+                onDeviceChange
+                  ? (d) => {
+                      setCustomWidth(null);
+                      onDeviceChange(d);
+                    }
+                  : undefined
+              }
+              customWidth={activeCustomWidth}
+              onCustomWidth={
+                onDeviceChange
+                  ? (width) => {
+                      const bp = getBreakpointForWidth(width);
+                      if (bp !== device) onDeviceChange(bp);
+                      setCustomWidth({ width, device: bp });
+                    }
+                  : undefined
+              }
+            />
+            <DeviceFrameToggle
+              active={deviceFrameActive}
+              onToggle={() => setDeviceFrameActive((v) => !v)}
+              device={device}
+            />
+          </div>
+        )}
         <div ref={scrollRef} className="bd-canvas-scroll">
         <DeviceFramePreview device={device} active={deviceFrameActive}>
         {/* A column only when the width label is drawn under the page; on
@@ -958,56 +1013,6 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
         </DeviceFramePreview>
         </div>
 
-        {/* Canvas Footer Toolbar - Overlays & Zoom (IA Redesign 2026) */}
-        {showFooterToolbar && onZoomChange && onOverlayChange && (
-          <div style={footerToolbarContainerStyles} data-bk-toast-floor="">
-            <CanvasFooterToolbar
-              overlays={{
-                guides: showGuides,
-                spacing: showSpacing,
-                grid: showGrid,
-                rulers: showRulers,
-                badges: showBadges,
-                xray: showXRay,
-                outlines: showOutlines,
-              }}
-              zoom={zoom}
-              onOverlayChange={onOverlayChange}
-              onZoomChange={onZoomChange}
-              onFitToScreen={handleFitToScreen}
-              onZoomToSelection={handleZoomToSelection}
-              gridSize={gridSize}
-              onGridSizeChange={composer ? (size) => composer.setGridSize(size) : undefined}
-              readout={readoutPath}
-              readoutTitle={readoutDims ? `${readoutLabel} · ${readoutDims}` : readoutLabel}
-              pageWidth={activeCustomWidth ?? (frameWidth || undefined)}
-              device={device}
-              onDeviceChange={
-                onDeviceChange
-                  ? (d) => {
-                      setCustomWidth(null);
-                      onDeviceChange(d);
-                    }
-                  : undefined
-              }
-              customWidth={activeCustomWidth}
-              onCustomWidth={
-                onDeviceChange
-                  ? (width) => {
-                      const bp = getBreakpointForWidth(width);
-                      if (bp !== device) onDeviceChange(bp);
-                      setCustomWidth({ width, device: bp });
-                    }
-                  : undefined
-              }
-            />
-            <DeviceFrameToggle
-              active={deviceFrameActive}
-              onToggle={() => setDeviceFrameActive((v) => !v)}
-              device={device}
-            />
-          </div>
-        )}
 
         {contextMenu && menuData && (
           <ElementContextMenu
