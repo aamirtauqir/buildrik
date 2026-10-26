@@ -37,6 +37,8 @@ export interface GlobalBanner {
   actions?: readonly BannerAction[];
   /** Offer ✕. Conditions that clear themselves (offline) are not dismissible. */
   dismissible?: boolean;
+  /** The shorter line it reads behind "{n} more" (B7-G31 `227:14297`). */
+  summary?: string;
 }
 
 interface Entry {
@@ -108,6 +110,7 @@ export const OFFLINE_BANNER: GlobalBanner = {
   tone: "warning",
   message:
     "You’re offline. Page edits are kept in this browser; other changes need this tab open. Everything saves when you reconnect.",
+  summary: "You’re offline. Everything saves when you reconnect.",
 };
 
 /** B7-G12 `225:8126` — a save died in transport while the browser is online. */

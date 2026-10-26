@@ -95,7 +95,7 @@ export function createTabHandoff({ siteId, composer, save, channel }: TabHandoff
       id: BANNER_ID.otherTab,
       tone: "warning",
       message: "Editing moved to another tab. This tab is view only; your changes were saved first.",
-      actions: [{ label: "Edit here instead", onClick: claim, testId: "banner-edit-here-instead", primary: true }],
+      actions: [{ label: "Edit here instead", onClick: claim, testId: "banner-edit-here-instead" }],
     });
     ch.postMessage({ kind: "released", from: tab, to } satisfies HandoffMessage);
   };

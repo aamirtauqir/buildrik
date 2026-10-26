@@ -19980,7 +19980,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-F S3: built, not compared. Discard… opens ConfirmDialog \"Delete the kept copy?\" / board body · Cancel · Delete copy (destructive); dashboard discard clears the copy without the conflict latch."
+   "verifiedNote": "probe-compared 2026-10-27 (lf-discard): 480×156 (board 480×154), Cancel focused 93 · Delete copy white with red text 124 (board 98 · 118); it was a red-filled ConfirmDialog. Open: vertical position (F-24)."
   },
   {
    "nodeId": "225:7600",
@@ -20020,7 +20020,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-F S4: built, not compared. 720 dialog (size lg), board body with the server's time from SAVE_CONFLICT_EVENT (who/count not in the contract: code:conflict-no-author), buttons Overwrite… · Download a copy · Reload latest… (primary, opening focus). Download stays open (workSnapshot)."
+   "verifiedNote": "probe-compared 2026-10-27 (lf-conflict, board PNG fetched): dialog 720×156 (board 720×156), title 16/24, body one line 13/20, Overwrite… 652/107 · Download a copy 767/141 · Reload latest… 916/140 filled (board 648/111 · 768/145 · 920/136) — match; Overwrite… now a bordered button, not a quiet link. Open: vertical position (chrome-ui centres at y372, board y280 — F-24); body names no author (code:conflict-no-author)."
   },
   {
    "nodeId": "225:9715",
@@ -20030,7 +20030,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-F S4: built, not compared. Reload latest… → \"Reload the latest version?\" + board body · Cancel (focused) · Reload."
+   "verifiedNote": "probe-compared 2026-10-27 (lf-conflict-reload): 480×176 (board 480×176), Cancel 93 (focused) · Reload 91 filled (board 98 · 97, within 6). Open: vertical position (F-24)."
   },
   {
    "nodeId": "225:10249",
@@ -20040,7 +20040,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-F S4: built, not compared. Overwrite… → board confirm; the server's copy is kept as Saves version \"Before overwrite\" via existing siteVersions.create (versionSync.keepBeforeOverwrite) before onOverwrite."
+   "verifiedNote": "probe-compared 2026-10-27 (lf-conflict-overwrite): 480×176, Cancel 93 · Overwrite 111 white (board 98 · 113; it was a red fill). Open: vertical position (F-24)."
   },
   {
    "nodeId": "225:10783",
@@ -20138,9 +20138,9 @@
    "page": "07",
    "family": "recovery",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-F S6: built, not compared. EditorStoppedBoundary/Screen: board title, unsaved line only when true, \"Error code XXXX-XX\" + copy (FNV hash, reported with captureError), Download a copy (primary when work exists) · Reload editor · Back to sites. Mount swap is REQUESTS #17."
+   "authority": "code:crash-replaces-shell",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (lf-crash): 480×174 card at 480,391 (board 481,389 478×176) on the subtle ground; title 16/24, unsaved line, mono error code with copy glyph, Download a copy 505/139 filled · Reload editor 652/116 · Back to sites link 792/81 (board 505/143 · 657/119 · 800/82). The board keeps the topbar above it; the boundary replaces the whole shell that stopped (code:crash-replaces-shell)."
   },
   {
    "nodeId": "227:12184",
@@ -20170,7 +20170,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-F W9: built, not compared. tabHandoff.ts: on a claim the editing tab saves first, takes the engine \"view\" lock and says \"Editing moved to another tab. This tab is view only; your changes were saved first.\" · Edit here instead. Mount is REQUESTS F-21. The inspector's \"View only · editing moved to another tab\" line is not drawn (inspector is L-B's)."
+   "verifiedNote": "probe-compared 2026-10-27 (lf-handoff-moved): warning bar 0,56 1440×40, Edit here instead white 1278/138 (board 1275/140; it was filled). Open: hook mount F-21, slot placement F-11; the canvas 'View only · editing moved to another tab' line is not in lane F's paths."
   },
   {
    "nodeId": "227:13769",
@@ -20190,7 +20190,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-F S2: built, not compared. GlobalBannerSlot (shell/GlobalBannerSlot.tsx + globalBanners.ts): one bar, most serious first (error > warning > info), the rest behind \"{n} more ⌄\" popover with their actions. Live at today's LoadErrorBanner mount; under-topbar placement is REQUESTS #11."
+   "verifiedNote": "probe-compared 2026-10-27 (lf-more, offline emulated): bar + Sign in ↗ 1220/107 + '2 more ⌄' text 1337 (board 1216/103 · 1343), popover rows plain on white 42 tall with the shorter offline line and a white Reload (board), no ✕ in the list — match. Open: live mount above the topbar (F-11)."
   },
   {
    "nodeId": "227:14836",

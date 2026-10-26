@@ -47,7 +47,9 @@ import { AchievementPrompt } from "@/editor/onboarding/AchievementPrompt";
 import { SaveStatus } from "@/editor/chrome-ui";
 import { LoadErrorBanner } from "@/editor/shell/LoadErrorBanner";
 import { GlobalBannerSlot } from "@/editor/shell/GlobalBannerSlot";
-import { showSessionExpiredBanner } from "@/editor/shell/globalBanners";
+import { OFFLINE_BANNER, showGlobalBanner, showNewVersionBanner, showSessionExpiredBanner } from "@/editor/shell/globalBanners";
+import { createTabHandoff } from "@/editor/shell/tabHandoff";
+import { EditorStoppedBoundary } from "@/editor/shell/EditorStoppedScreen";
 import { registerWorkSnapshot } from "@/editor/shell/workSnapshot";
 import { setKeptWorkOffer } from "@/editor/shell/keptWorkOffer";
 import { RecoveryBanner } from "@/editor/shell/RecoveryBanner";
@@ -3852,6 +3854,59 @@ Object.assign(CASES, {
         {LF_COLUMN}
         <RecoveryBanner localDraftShown={false} serverEditedAt={async () => new Date(Date.now() + 60_000).toISOString()} />
       </div>
+    );
+  },
+  "lf-conflict": () => (
+    <div data-probe="lf-conflict">
+      {LF_TOPBAR}
+      <ConflictModal open siteId={null} onReload={() => {}} onSaveBackup={() => {}} onOverwrite={() => {}} onClose={() => {}} />
+    </div>
+  ),
+  "lf-crash": () => {
+    registerWorkSnapshot({ project: () => ({ pages: [] }) as never, unsaved: () => true });
+    const Boom = (): React.ReactElement => {
+      throw new Error("probe: editor stopped");
+    };
+    return (
+      <ToastProvider>
+        <div data-probe="lf-crash">
+          <EditorStoppedBoundary>
+            <Boom />
+          </EditorStoppedBoundary>
+        </div>
+      </ToastProvider>
+    );
+  },
+  "lf-more": () => {
+    showSessionExpiredBanner(() => {});
+    showNewVersionBanner(() => {});
+    showGlobalBanner(OFFLINE_BANNER);
+    return (
+      <ToastProvider>
+        <div data-probe="lf-more" style={{ width: "100vw" }}>
+          {LF_TOPBAR}
+          <GlobalBannerSlot />
+        </div>
+      </ToastProvider>
+    );
+  },
+  "lf-handoff-moved": () => {
+    const channel = { postMessage: () => {}, close: () => {}, onmessage: null as ((e: MessageEvent) => void) | null };
+    const locks = new Set<string>();
+    createTabHandoff({
+      siteId: "s1",
+      composer: { editLocks: locks, setEditLock: (r: string, on: boolean) => void (on ? locks.add(r) : locks.delete(r)) } as never,
+      save: async () => "saved",
+      channel: channel as never,
+    });
+    setTimeout(() => channel.onmessage?.({ data: { kind: "claim", from: "other" } } as MessageEvent), 0);
+    return (
+      <ToastProvider>
+        <div data-probe="lf-handoff-moved" style={{ width: "100vw" }}>
+          {LF_TOPBAR}
+          <GlobalBannerSlot />
+        </div>
+      </ToastProvider>
     );
   },
   "lf-recovery-unknown": () => {

@@ -35,18 +35,12 @@
  */
 
 import * as React from "react";
-import {
-  Button,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalTitle,
-  OverlayMount,
-} from "@/editor/chrome-ui";
+import { Button, ModalContent, ModalTitle, OverlayMount } from "@/editor/chrome-ui";
 import { discardUnsaved, resumeKeepingUnsaved } from "@/services/unsavedRecovery";
 import { SAVE_CONFLICT_EVENT } from "@/services/BuildrikSyncProvider";
 import { keepBeforeOverwrite } from "@/services/versionSync";
 import { currentWork, downloadProject } from "../workSnapshot";
+import { CONFIRM_ACTION, DIALOG_ACTION, DIALOG_ACTIONS, DIALOG_BODY, DIALOG_FRAME, DIALOG_TITLE } from "./recoveryDialog";
 
 export interface ConflictModalProps {
   open: boolean;
@@ -63,9 +57,7 @@ export interface ConflictModalProps {
 }
 
 const TITLE_ID = "conflict-modal-title";
-const BODY = "tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-soft)]";
-const QUIET =
-  "tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]";
+const BODY = DIALOG_BODY;
 
 const TIME = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit" });
 
@@ -144,8 +136,8 @@ export function ConflictModal({ open, siteId, onReload, onSaveBackup, onOverwrit
     body = <p className={BODY}>Your changes in this tab will be replaced. A download, if you started one, isn’t checked.</p>;
     actions = (
       <>
-        <Button color="light" onClick={() => setStep("choose")} data-autofocus>Cancel</Button>
-        <Button onClick={reload} data-testid="conflict-reload-confirm">Reload</Button>
+        <Button color="light" size="sm" className={CONFIRM_ACTION} onClick={() => setStep("choose")} data-autofocus>Cancel</Button>
+        <Button size="sm" className={CONFIRM_ACTION} onClick={reload} data-testid="conflict-reload-confirm">Reload</Button>
       </>
     );
   } else if (step === "overwrite" || step === "overwriting" || step === "overwrite-failed") {
@@ -156,7 +148,7 @@ export function ConflictModal({ open, siteId, onReload, onSaveBackup, onOverwrit
           {from} is kept in History › Saves as “Before overwrite” first. Then your changes replace it.
         </p>
         {step === "overwrite-failed" ? (
-          <p role="alert" className="tw:mt-2.5 tw:mb-0 tw:text-[13px] tw:text-[var(--bk-error-text)]" data-testid="conflict-overwrite-failed">
+          <p role="alert" className="tw:mt-2 tw:mb-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-error-text)]" data-testid="conflict-overwrite-failed">
             Couldn’t keep the newer version — nothing was overwritten.
           </p>
         ) : null}
@@ -165,8 +157,18 @@ export function ConflictModal({ open, siteId, onReload, onSaveBackup, onOverwrit
     const busy = step === "overwriting";
     actions = (
       <>
-        <Button color="light" onClick={() => setStep("choose")} disabled={busy} data-autofocus>Cancel</Button>
-        <Button color="red" onClick={() => void overwrite()} disabled={busy} aria-busy={busy || undefined} data-testid="conflict-overwrite-confirm">
+        <Button color="light" size="sm" className={CONFIRM_ACTION} onClick={() => setStep("choose")} disabled={busy} data-autofocus>Cancel</Button>
+        {/* 2L9 G16 draws Overwrite white: the newer version is kept first, so
+            it is a decision, not a deletion. G17's Retry is the filled one. */}
+        <Button
+          color={step === "overwrite-failed" ? undefined : "light"}
+          size="sm"
+          className={CONFIRM_ACTION}
+          onClick={() => void overwrite()}
+          disabled={busy}
+          aria-busy={busy || undefined}
+          data-testid="conflict-overwrite-confirm"
+        >
           {step === "overwrite-failed" ? "Retry" : busy ? "Keeping the newer version…" : "Overwrite"}
         </Button>
       </>
@@ -185,20 +187,23 @@ export function ConflictModal({ open, siteId, onReload, onSaveBackup, onOverwrit
     actions = (
       <>
         {brandFormat ? null : (
-          <Button color="light" onClick={() => setStep("overwrite")} className={QUIET}>Overwrite…</Button>
+          <Button color="light" size="sm" className={DIALOG_ACTION} onClick={() => setStep("overwrite")}>Overwrite…</Button>
         )}
-        <Button color="light" onClick={download}>Download a copy</Button>
-        <Button onClick={() => setStep("reload")} data-autofocus>Reload latest…</Button>
+        <Button color="light" size="sm" className={DIALOG_ACTION} onClick={download}>Download a copy</Button>
+        <Button size="sm" className={`${DIALOG_ACTION} tw:px-6`} onClick={() => setStep("reload")} data-autofocus>Reload latest…</Button>
       </>
     );
   }
 
   return (
     <OverlayMount open={open} onClose={onClose} dismissOnScrimClick={false} labelledBy={TITLE_ID}>
-      <ModalContent size="lg" data-testid="conflict-modal" data-step={step}>
-        <ModalTitle id={TITLE_ID} data-testid="conflict-title">{title}</ModalTitle>
-        <ModalBody>{body}</ModalBody>
-        <ModalFooter data-testid="conflict-actions">{actions}</ModalFooter>
+      {/* 2L9: the choice is 720 wide (G14), each confirm 480 (G15–G17). */}
+      <ModalContent size={step === "choose" ? "lg" : "confirm"} data-testid="conflict-modal" data-step={step}>
+        <div className={DIALOG_FRAME}>
+          <ModalTitle inset={false} id={TITLE_ID} className={DIALOG_TITLE} data-testid="conflict-title">{title}</ModalTitle>
+          <div>{body}</div>
+          <div className={DIALOG_ACTIONS} data-testid="conflict-actions">{actions}</div>
+        </div>
       </ModalContent>
     </OverlayMount>
   );

@@ -32,6 +32,7 @@ import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { readUnsaved } from "@/services/unsavedRecovery";
 import type { SaveOutcome } from "../hooks/useSaveCallback";
 import { BANNER_ID, clearGlobalBanner, showSessionExpiredBanner } from "../globalBanners";
+import { DIALOG_ACTION, DIALOG_ACTIONS, DIALOG_BODY, DIALOG_FRAME, DIALOG_TITLE } from "./recoveryDialog";
 
 export interface SessionExpiredModalProps {
   open: boolean;
@@ -52,8 +53,6 @@ function changesSince(composer: Composer | null, lastSavedAt: number | null): nu
     return 0;
   }
 }
-
-const DIALOG_ACTION = "tw:h-8 tw:min-h-0 tw:px-4 tw:py-0 tw:text-[13px] tw:leading-5 tw:font-medium";
 
 function signIn(): void {
   window.open(`${DASHBOARD_URL}/auth?reason=session-expired`, "_blank", "noopener");
@@ -117,17 +116,15 @@ export const SessionExpiredModal: React.FC<SessionExpiredModalProps> = ({
   const changes = count > 0 ? `Your ${count} ${count === 1 ? "change is" : "changes are"}` : "Your changes are";
   const where = keptInBrowser ? "in this tab and in this browser" : "in this tab";
 
-  /* 2L9 B7-G03 225:3353: 480 × 176 — 24 in, the title 16/24 semibold, the
-     body 13/20 two lines 16 under it, the three actions 32 tall 16 under that,
-     right-aligned. The shared ModalTitle / ModalBody insets made it 230 tall. */
+  /* 2L9 B7-G03 225:3353: 480 × 176 in the recovery dialogs' layout. */
   return (
     <ModalRoot open={open} onOpenChange={(o) => !o && keepEditing()}>
       <ModalContent size="confirm" srTitle="Sign in again to save">
-        <div className="tw:flex tw:flex-col tw:gap-4 tw:p-6" data-testid="session-expired-dialog">
-          <ModalTitle inset={false} className="tw:m-0 tw:text-[16px] tw:leading-6 tw:font-semibold">
+        <div className={DIALOG_FRAME} data-testid="session-expired-dialog">
+          <ModalTitle inset={false} className={DIALOG_TITLE}>
             Sign in again to save
           </ModalTitle>
-          <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-soft)]" data-testid="session-expired-body">
+          <p className={DIALOG_BODY} data-testid="session-expired-body">
             Your session expired. {changes} kept {where}. Sign in again to save {count === 1 ? "it" : "them"}.
           </p>
           {retryFailed && (
@@ -135,7 +132,7 @@ export const SessionExpiredModal: React.FC<SessionExpiredModalProps> = ({
               Still signed out — finish signing in first, then try again.
             </p>
           )}
-          <div className="tw:flex tw:justify-end tw:gap-2">
+          <div className={DIALOG_ACTIONS}>
             <Button color="light" size="sm" className={DIALOG_ACTION} onClick={keepEditing}>
               Keep editing
             </Button>

@@ -33,7 +33,7 @@
 import * as React from "react";
 import { RecoveryManager } from "@/engine/recovery/RecoveryManager";
 import type { ProjectData } from "@shared/types";
-import { Button, ConfirmDialog, Portal } from "@/editor/chrome-ui";
+import { Button, ModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/chrome-ui";
 import { fetchSitePublishState } from "@/services/PublishService";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { clearUnsaved, takeOffScreenUnsaved } from "@/services/unsavedRecovery";
@@ -41,6 +41,7 @@ import { setKeptWorkOffer, useKeptWorkOffer } from "./keptWorkOffer";
 import { downloadProject } from "./workSnapshot";
 import { BANNER_ACTION, BANNER_ACTION_SECONDARY } from "./GlobalBannerSlot";
 import { useCanvasColumnRect } from "./useCanvasColumnRect";
+import { CONFIRM_ACTION, DIALOG_ACTIONS, DIALOG_BODY, DIALOG_FRAME, DIALOG_TITLE } from "./modals/recoveryDialog";
 
 export interface RecoveryBannerProps {
   /** Accepted from today's mount; the board's banner names no scope, so it is
@@ -233,20 +234,35 @@ export const RecoveryBanner: React.FC<RecoveryBannerProps> = ({
           )}
         </div>
       </div>
-      <ConfirmDialog
-        open={confirmDiscard}
-        onClose={() => setConfirmDiscard(false)}
-        onConfirm={() => {
-          setConfirmDiscard(false);
-          kept.discard();
-        }}
-        title="Delete the kept copy?"
-        message="This can’t be undone. The site stays as it was last saved."
-        confirmLabel="Delete copy"
-        cancelLabel="Cancel"
-        tone="destructive"
-        testId="recovery-discard-confirm"
-      />
+      {/* B7-G10 225:7061: 480 wide in the recovery dialogs' layout, Cancel
+          focused, "Delete copy" white with red text (not a red fill). */}
+      <ModalRoot open={confirmDiscard} onOpenChange={(o) => !o && setConfirmDiscard(false)}>
+        <ModalContent size="confirm" data-testid="recovery-discard-confirm">
+          <div className={DIALOG_FRAME}>
+            <ModalTitle inset={false} className={DIALOG_TITLE}>
+              Delete the kept copy?
+            </ModalTitle>
+            <p className={DIALOG_BODY}>This can’t be undone. The site stays as it was last saved.</p>
+            <div className={DIALOG_ACTIONS}>
+              <Button color="light" size="sm" className={CONFIRM_ACTION} onClick={() => setConfirmDiscard(false)} data-autofocus>
+                Cancel
+              </Button>
+              <Button
+                color="light"
+                size="sm"
+                className={`${CONFIRM_ACTION} tw:text-[var(--bk-error-text)]`}
+                onClick={() => {
+                  setConfirmDiscard(false);
+                  kept.discard();
+                }}
+                data-testid="recovery-discard-confirm-confirm"
+              >
+                Delete copy
+              </Button>
+            </div>
+          </div>
+        </ModalContent>
+      </ModalRoot>
     </Portal>
   );
 };

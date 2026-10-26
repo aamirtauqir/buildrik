@@ -56,22 +56,27 @@ export function ToneGlyph({ tone }: { tone: BannerTone }) {
   return <Glyph size={14} aria-hidden="true" className="tw:shrink-0" />;
 }
 
-function BannerActions({ banner }: { banner: GlobalBanner }) {
+/** `inList`: a row behind "{n} more" (G31) — its actions are all plain and it
+ *  has no ✕; the popover is dismissed as a whole. */
+function BannerActions({ banner, inList = false }: { banner: GlobalBanner; inList?: boolean }) {
   return (
     <>
-      {banner.actions?.map((action) => (
-        <Button
-          key={action.label}
-          color={action.primary ? undefined : "light"}
-          size="xs"
-          onClick={action.onClick}
-          className={action.primary ? BANNER_ACTION : BANNER_ACTION_SECONDARY}
-          data-testid={action.testId}
-        >
-          {action.label}
-        </Button>
-      ))}
-      {banner.dismissible ? (
+      {banner.actions?.map((action) => {
+        const primary = action.primary && !inList;
+        return (
+          <Button
+            key={action.label}
+            color={primary ? undefined : "light"}
+            size="xs"
+            onClick={action.onClick}
+            className={primary ? BANNER_ACTION : BANNER_ACTION_SECONDARY}
+            data-testid={action.testId}
+          >
+            {action.label}
+          </Button>
+        );
+      })}
+      {banner.dismissible && !inList ? (
         <IconButton label="Dismiss" size="sm" onClick={() => clearGlobalBanner(banner.id)} className="tw:text-current">
           <X size={14} aria-hidden="true" />
         </IconButton>
@@ -118,7 +123,7 @@ function MoreConditions({ rest }: { rest: readonly GlobalBanner[] }) {
           size="xs"
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
-          className={`${BANNER_ACTION} tw:px-2! tw:border-transparent tw:bg-transparent tw:text-current`}
+          className={`${BANNER_ACTION} tw:px-2! tw:border-transparent tw:bg-transparent! tw:text-[var(--bk-ink)]`}
           data-testid="global-banner-more"
         >
           {rest.length} more
@@ -126,16 +131,18 @@ function MoreConditions({ rest }: { rest: readonly GlobalBanner[] }) {
         </Button>
       }
     >
-      <ul className="tw:m-0 tw:flex tw:list-none tw:flex-col tw:gap-1 tw:p-0" data-testid="global-banner-more-list">
+      {/* B7-G31: plain rows on the popover's white — glyph, the line in ink
+          13/20, the row's actions at the right; no tone tint. */}
+      <ul className="tw:m-0 tw:flex tw:list-none tw:flex-col tw:p-0" data-testid="global-banner-more-list">
         {rest.map((banner) => (
           <li
             key={banner.id}
-            className={`tw:flex tw:flex-wrap tw:items-center tw:gap-2 tw:rounded-md tw:px-3 tw:py-2 ${BANNER_TONE[banner.tone]}`}
+            className="tw:flex tw:min-h-[42px] tw:items-center tw:gap-3 tw:py-1 tw:pl-3 tw:pr-1.5 tw:text-[var(--bk-ink)]"
             data-banner-id={banner.id}
           >
             <ToneGlyph tone={banner.tone} />
-            <span className="tw:grow tw:basis-60 tw:text-[13px]">{banner.message}</span>
-            <BannerActions banner={banner} />
+            <span className="tw:min-w-0 tw:flex-1 tw:text-[13px] tw:leading-5">{banner.summary ?? banner.message}</span>
+            <BannerActions banner={banner} inList />
           </li>
         ))}
       </ul>
