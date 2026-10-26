@@ -1,9 +1,16 @@
 /**
- * Form › After submit — board 19: Then (Show message / Redirect), Message or
- * Redirect to, Send to, and the note "Saved to your site straight away — not
- * part of Undo. Changing Send to needs an admin." Spam protection (the
- * honeypot switch) is kept under Send to; board 19 does not draw it, but it is
- * a live setting and dropping it would drop a capability. The Fields rows
+ * Behavior › After submit — 2L9 boards 156:6055 (F10) … 156:10131 (F17):
+ * Then (Show message / Redirect), Message or Redirect to; Notifications ›
+ * Send to; Spam protection › "Block automated submissions" (Applies on next
+ * publish — the honeypot field is written into the published form); the
+ * Form settings status row (Saved / Saving… / "Couldn’t save — your message
+ * is still here." + Retry / "Choose a destination to save") and the note
+ * "Saved separately from page edits; outside document Undo."
+ *
+ * The board also tags After submit "Applies on next publish". The code says
+ * otherwise — the public form route reads the action, message and redirect
+ * from the server row at submit time, so they apply on save — so that tag is
+ * not drawn (`authority: code:after-submit-live-on-save`). The Fields rows
  * (`FormFieldsSection.tsx`) edit the form's own children; these rows edit the
  * form's server-side FormBlock row (`forms.getBlock` / `forms.updateBlock`) —
  * what happens once a visitor submits: show a message or redirect, who gets
@@ -25,9 +32,16 @@
  *
  * `notifyEmail` requires the ADMIN site role server-side (same precedent as
  * the outbound-webhook gate, `account.ts` integrations.add — reading who a
- * form's submissions get emailed to is a data-exfil surface). A non-admin's
- * edit is reverted on the FORBIDDEN the server sends back; every other field
- * here stays EDITOR-writable.
+ * form's submissions get emailed to is a data-exfil surface). The editor does
+ * not know the role up front: a non-admin's edit is reverted on the
+ * FORBIDDEN the server sends back, and the row then reads the board's
+ * "Changing Send to needs Admin access." (F15); every other field here stays
+ * EDITOR-writable.
+ *
+ * A failed save keeps what the user typed (F12): the row is not reverted,
+ * the status says so and Retry sends the same change again. A refusal the
+ * server explains (a Zod message) shows that sentence instead — retrying it
+ * would fail the same way.
  *
  * @license BSD-3-Clause
  */
@@ -36,8 +50,8 @@ import type { Composer } from "@/engine";
 import { getBuildrikClient } from "@/services/api-client";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
-import { Section, SelectRow, type SectionTier } from "../shared/controls";
-import { CommitRow, NoteRow } from "./behaviourRows";
+import { Section, SelectRow, SubSectionTitle, type SectionTier } from "../shared/controls";
+import { ActionRow, CommitRow, NoteRow } from "./behaviourRows";
 import { CheckRow } from "../shared/controls/CheckRow";
 
 export interface FormAfterSubmitSectionProps {
@@ -59,6 +73,13 @@ interface Settings {
 /** Validated together server-side — always travel together in one call. */
 const LINKED_FIELDS = new Set<keyof Settings>(["successAction", "redirectUrl"]);
 
+type Status =
+  | { kind: "saved" }
+  | { kind: "saving" }
+  | { kind: "incomplete" }
+  | { kind: "failed"; retry: () => void }
+  | { kind: "refused"; message: string };
+
 function isForbidden(e: unknown): boolean {
   return e instanceof Error && (e as { data?: { code?: string } }).data?.code === "FORBIDDEN";
 }
@@ -79,13 +100,14 @@ export const FormAfterSubmitSection: React.FC<FormAfterSubmitSectionProps> = ({
   tier = "tertiary",
 }) => {
   const [settings, setSettings] = React.useState<Settings | null>(null);
-  const [error, setError] = React.useState<string | null>(null);
-  const [saving, setSaving] = React.useState(false);
+  const [loadError, setLoadError] = React.useState<string | null>(null);
+  const [status, setStatus] = React.useState<Status>({ kind: "saved" });
+  /* Learned from a FORBIDDEN: Send to is Admin-only for this user. */
+  const [adminOnly, setAdminOnly] = React.useState(false);
   const projectId = React.useMemo(() => getSiteIdFromUrl(), []);
-  // A failed save reverts `settings`, but the optimistic update and the
-  // revert can land in one render — the text rows would see no change and
-  // keep the draft. Bumping this remounts them (`key`) so a revert is
-  // actually visible, not just true in state.
+  // A FORBIDDEN reverts Send to, but the optimistic update and the revert can
+  // land in one render — the text row would see no change and keep the
+  // draft. Bumping this remounts it (`key`) so the revert is visible.
   const [revertToken, setRevertToken] = React.useState(0);
 
   const form = composer?.elements.getElement(elementId);
@@ -94,19 +116,46 @@ export const FormAfterSubmitSection: React.FC<FormAfterSubmitSectionProps> = ({
     let cancelled = false;
     if (!projectId || !elementId) return;
     setSettings(null);
-    setError(null);
+    setLoadError(null);
+    setStatus({ kind: "saved" });
     getBuildrikClient(DASHBOARD_URL)
       .forms.getBlock.query({ siteId: projectId, blockId: elementId })
       .then((s) => {
         if (!cancelled) setSettings(s);
       })
       .catch((e) => {
-        if (!cancelled) setError(e instanceof Error ? e.message : "Failed to load form settings.");
+        if (!cancelled) setLoadError(e instanceof Error ? e.message : "Failed to load form settings.");
       });
     return () => {
       cancelled = true;
     };
   }, [projectId, elementId]);
+
+  /** One write to the server row. `previousNotify` is what Send to goes back
+   *  to if the server refuses it as Admin-only. */
+  const send = (payload: Partial<Settings>, previousNotify: string | null) => {
+    if (!projectId) return;
+    setStatus({ kind: "saving" });
+    // The wire schema takes `string | undefined`, not `null` — the local
+    // Settings shape mirrors the server's read shape (`null` = "unset").
+    const wire = Object.fromEntries(Object.entries(payload).map(([k, v]) => [k, v === null ? undefined : v]));
+    getBuildrikClient(DASHBOARD_URL)
+      .forms.updateBlock.mutate({ siteId: projectId, blockId: elementId, ...wire })
+      .then(() => setStatus({ kind: "saved" }))
+      .catch((e) => {
+        if (isForbidden(e) && "notifyEmail" in payload) {
+          setSettings((s) => (s ? { ...s, notifyEmail: previousNotify } : s));
+          setRevertToken((n) => n + 1);
+          setAdminOnly(true);
+          setStatus({ kind: "saved" });
+          return;
+        }
+        /* L3-028: the field's own sentence, not "notifyEmail: …" — the
+           formatter's structured issues carry it without the key. */
+        const message = (e as { data?: { zodIssues?: Array<{ message: string }> } }).data?.zodIssues?.[0]?.message;
+        setStatus(message ? { kind: "refused", message } : { kind: "failed", retry: () => send(payload, previousNotify) });
+      });
+  };
 
   const save = (patch: Partial<Settings>) => {
     if (!projectId || !settings) return;
@@ -115,12 +164,9 @@ export const FormAfterSubmitSection: React.FC<FormAfterSubmitSectionProps> = ({
     // through, or re-blurring an already-saved value) must not fire a
     // write — for `notifyEmail` specifically, an EDITOR would otherwise
     // hit a server FORBIDDEN having never touched the value.
-    const changed = Object.entries(patch).some(
-      ([k, v]) => !valuesEqual(v, settings[k as keyof Settings]),
-    );
+    const changed = Object.entries(patch).some(([k, v]) => !valuesEqual(v, settings[k as keyof Settings]));
     if (!changed) return;
 
-    const prev = settings;
     const next = { ...settings, ...patch };
     setSettings(next);
 
@@ -128,39 +174,16 @@ export const FormAfterSubmitSection: React.FC<FormAfterSubmitSectionProps> = ({
     // current values whenever either is touched, so an edit to one never
     // strands the other at a stale value on the row.
     const linked = Object.keys(patch).some((k) => LINKED_FIELDS.has(k as keyof Settings));
-    const payload: Partial<Settings> = linked
-      ? { ...patch, successAction: next.successAction, redirectUrl: next.redirectUrl }
-      : { ...patch };
+    const payload: Partial<Settings> = linked ? { ...patch, successAction: next.successAction, redirectUrl: next.redirectUrl } : { ...patch };
 
     // A REDIRECT with no URL yet — the instant after switching the select,
     // before the URL field has been typed into — is genuinely incomplete.
     // Don't send it (the schema would reject it anyway); wait for the URL.
-    if (linked && next.successAction === "REDIRECT" && !next.redirectUrl) return;
-
-    setSaving(true);
-    setError(null);
-    // The wire schema takes `string | undefined`, not `null` — the local
-    // Settings shape mirrors the server's read shape (`null` = "unset").
-    const wire = Object.fromEntries(
-      Object.entries(payload).map(([k, v]) => [k, v === null ? undefined : v]),
-    );
-    getBuildrikClient(DASHBOARD_URL)
-      .forms.updateBlock.mutate({ siteId: projectId, blockId: elementId, ...wire })
-      .catch((e) => {
-        // Revert the optimistic update — otherwise the UI keeps showing a
-        // value that was never actually saved (exactly I1's failure mode).
-        setSettings(prev);
-        setRevertToken((n) => n + 1);
-        setError(
-          isForbidden(e) && "notifyEmail" in patch
-            ? "Only workspace Admins can change the notification email."
-            : /* L3-028: the field's own sentence, not "notifyEmail: …" —
-                 the formatter's structured issues carry it without the key. */
-              ((e as { data?: { zodIssues?: Array<{ message: string }> } }).data?.zodIssues?.[0]?.message ??
-                (e instanceof Error ? e.message : "Failed to save.")),
-        );
-      })
-      .finally(() => setSaving(false));
+    if (linked && next.successAction === "REDIRECT" && !next.redirectUrl) {
+      setStatus({ kind: "incomplete" });
+      return;
+    }
+    send(payload, settings.notifyEmail);
   };
 
   if (!composer || !form) return null;
@@ -170,7 +193,7 @@ export const FormAfterSubmitSection: React.FC<FormAfterSubmitSectionProps> = ({
       {!projectId ? (
         <NoteRow>Open this site from the dashboard to edit form settings.</NoteRow>
       ) : !settings ? (
-        <NoteRow tone={error ? "error" : "muted"}>{error ?? "Loading…"}</NoteRow>
+        <NoteRow tone={loadError ? "error" : "muted"}>{loadError ?? "Loading form settings…"}</NoteRow>
       ) : (
         <>
           <SelectRow
@@ -183,7 +206,6 @@ export const FormAfterSubmitSection: React.FC<FormAfterSubmitSectionProps> = ({
           />
           {settings.successAction === "MESSAGE" ? (
             <CommitRow
-              key={`message-${revertToken}`}
               label="Message"
               placeholder="Thanks — your message was sent."
               value={settings.successMessage ?? ""}
@@ -191,7 +213,6 @@ export const FormAfterSubmitSection: React.FC<FormAfterSubmitSectionProps> = ({
             />
           ) : (
             <CommitRow
-              key={`redirect-${revertToken}`}
               label="Redirect to"
               type="text"
               placeholder="/thanks or https://example.com/thanks"
@@ -199,25 +220,59 @@ export const FormAfterSubmitSection: React.FC<FormAfterSubmitSectionProps> = ({
               onCommit={(v) => save({ redirectUrl: v })}
             />
           )}
-          <CommitRow
-            key={`notify-email-${revertToken}`}
-            label="Send to"
-            type="email"
-            placeholder="you@company.com"
-            value={settings.notifyEmail ?? ""}
-            onCommit={(v) => save({ notifyEmail: v })}
+          <SubSectionTitle>Notifications</SubSectionTitle>
+          {adminOnly ? (
+            <NoteRow testId="form-after-submit-admin-only">Changing Send to needs Admin access.</NoteRow>
+          ) : (
+            <CommitRow
+              key={`notify-email-${revertToken}`}
+              label="Send to"
+              type="email"
+              placeholder="you@company.com"
+              value={settings.notifyEmail ?? ""}
+              onCommit={(v) => save({ notifyEmail: v })}
+            />
+          )}
+          <SubSectionTitle>Spam protection</SubSectionTitle>
+          <NoteRow testId="form-spam-next-publish">Applies on next publish</NoteRow>
+          <CheckRow
+            label="Block automated submissions"
+            checked={settings.spamProtection}
+            onChange={(checked) => save({ spamProtection: checked })}
           />
-          <CheckRow label="Spam protection" checked={settings.spamProtection} onChange={(checked) => save({ spamProtection: checked })} />
-          {error ? (
-            <NoteRow tone="error">{error}</NoteRow>
-          ) : saving ? (
-            <NoteRow>Saving…</NoteRow>
-          ) : null}
-          <NoteRow testId="form-after-submit-note">
-            Saved to your site straight away — not part of Undo. Changing Send to needs an admin.
-          </NoteRow>
+          <SubSectionTitle>Form settings status</SubSectionTitle>
+          <FormSettingsStatus status={status} />
+          <NoteRow testId="form-after-submit-note">Saved separately from page edits; outside document Undo.</NoteRow>
         </>
       )}
     </Section>
   );
 };
+
+function FormSettingsStatus({ status }: { status: Status }) {
+  switch (status.kind) {
+    case "saving":
+      return <NoteRow testId="form-settings-status">Saving…</NoteRow>;
+    case "incomplete":
+      return <NoteRow testId="form-settings-status">Choose a destination to save</NoteRow>;
+    case "refused":
+      return (
+        <NoteRow tone="error" testId="form-settings-status">
+          {status.message}
+        </NoteRow>
+      );
+    case "failed":
+      return (
+        <>
+          <NoteRow tone="error" testId="form-settings-status">
+            Couldn’t save — your message is still here.
+          </NoteRow>
+          <ActionRow onClick={status.retry} testId="form-settings-retry">
+            Retry
+          </ActionRow>
+        </>
+      );
+    default:
+      return <NoteRow testId="form-settings-status">Saved</NoteRow>;
+  }
+}

@@ -3909,9 +3909,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
+   "authority": "code:after-submit-live-on-save",
    "verified": "drift-open",
-   "verifiedNote": "Board \"Form settings · This form\", \"Applies on next publish\" tags, status row + \"Saved separately…\" note; code After submit, no status row"
+   "verifiedNote": "Lane L-B A6 (built; copy checked against the dump, no board image): After submit · Then · Message · Notifications › Send to · Spam protection 'Applies on next publish' › 'Block automated submissions' · Form settings status 'Saved' · 'Saved separately from page edits; outside document Undo.'. The board's 'Applies on next publish' tag on After submit is NOT drawn: the public form route reads action/message/redirect from the server row at submit time, so they apply on save (code wins). 'This form starts collecting submissions after you publish.' not drawn (cannot tell published state). Header 'Form settings · This form' is REQUESTS #10's."
   },
   {
    "nodeId": "156:6643",
@@ -3921,7 +3921,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code \"Saving…\" note; board \"Form settings status · Saving…\" row"
+   "verifiedNote": "Lane L-B A6 (built, not compared): status row reads 'Saving…' while the write is in flight (test FormAfterSubmitSection)."
   },
   {
    "nodeId": "156:7230",
@@ -3931,7 +3931,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code shows raw error; board \"Couldn’t save — your message is still here\" + Retry"
+   "verifiedNote": "Lane L-B A6 (built, not compared): a failed save keeps the typed value, status 'Couldn’t save — your message is still here.' + Retry re-sends the same change (test F12)."
   },
   {
    "nodeId": "156:7819",
@@ -3941,7 +3941,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Board \"Form settings · This form\", \"Applies on next publish\" tags, status row + \"Saved separately…\" note; code After submit, no status row",
+   "verifiedNote": "Lane L-B A6 (built, not compared): acknowledged save reads 'Saved'.",
    "inheritsFrom": "156:6055"
   },
   {
@@ -3962,7 +3962,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code learns Admin-only from a FORBIDDEN save; board discloses up front, field disabled"
+   "verifiedNote": "Lane L-B A6 (built, not compared): after the server's FORBIDDEN, Send to is replaced by 'Changing Send to needs Admin access.'. The board discloses it up front; the editor does not know the site role before a save (authority stays board until a role read exists)."
   },
   {
    "nodeId": "156:9584",
@@ -3972,7 +3972,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "\"Loading…\" vs board \"Loading form settings…\""
+   "verifiedNote": "Lane L-B A6 (built, not compared): 'Loading form settings…'."
   },
   {
    "nodeId": "156:10131",
@@ -3982,7 +3982,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Board \"Form settings · This form\", \"Applies on next publish\" tags, status row + \"Saved separately…\" note; code After submit, no status row"
+   "verifiedNote": "Lane L-B A6 (built, not compared): Redirect with no destination reads 'Choose a destination to save'. Open: the page-or-URL picker 'Choose page or URL…' (F19, later slice)."
   },
   {
    "nodeId": "156:10723",
