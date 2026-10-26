@@ -29,6 +29,7 @@ import {
   type GlobalBanner,
 } from "./globalBanners";
 import { PhoneScreen, useNarrowWindowBanner } from "./SmallScreen";
+import { useWorkspaceDeletionBanner } from "./useWorkspaceDeletionBanner";
 
 /* `leading-[normal]`, not `leading-normal`: the second is Tailwind's 1.5,
    which computes to 21px, and board 297:2244 says the keyword. */
@@ -168,6 +169,7 @@ export interface GlobalBannerSlotProps {
 export const GlobalBannerSlot: React.FC<GlobalBannerSlotProps> = ({ lead }) => {
   useOfflineBanner();
   useNarrowWindowBanner();
+  useWorkspaceDeletionBanner();
   const banners = useGlobalBanners();
   if (lead) {
     const rest = banners.filter((b) => b.id !== lead.id);

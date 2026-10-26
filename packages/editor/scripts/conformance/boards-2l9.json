@@ -20069,8 +20069,8 @@
    "family": "recovery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No role-raised detection or \"Reload to edit\" banner"
+   "verified": "drift-open",
+   "verifiedNote": "L-F W8: showRoleRaisedBanner (\"You can edit this site now.\" · Reload to edit · ✕) built; the role re-read that produces it is REQUESTS F-19. Built, not compared."
   },
   {
    "nodeId": "227:8473",
@@ -20079,8 +20079,8 @@
    "family": "recovery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No workspace-deletion state in editor"
+   "verified": "drift-open",
+   "verifiedNote": "L-F W8: built, not compared. sites.get now carries workspace.deletionScheduledAt; the slot raises \"This workspace will be deleted on {d MMM}. Publishing is off.\" with Cancel deletion ↗ (dashboard) for the owner."
   },
   {
    "nodeId": "227:9003",
@@ -20089,8 +20089,8 @@
    "family": "recovery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No workspace-deletion state in editor"
+   "verified": "drift-open",
+   "verifiedNote": "L-F W8: built, not compared. Non-owners get the same line + \"Ask the owner to cancel it.\", no action."
   },
   {
    "nodeId": "227:9531",
@@ -20109,8 +20109,8 @@
    "family": "recovery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No build-version detection"
+   "verified": "drift-open",
+   "verifiedNote": "L-F W8: showNewVersionBanner built; nothing detects a new build yet (REQUESTS F-20). Built, not compared."
   },
   {
    "nodeId": "227:10593",
@@ -20119,8 +20119,8 @@
    "family": "recovery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No build-version detection"
+   "verified": "drift-open",
+   "verifiedNote": "L-F W8: reloadAfterSaving says \"Saving first… then reloading on {page} with your panels as they are.\" and reloads only after the save lands. Producer REQUESTS F-20. Built, not compared."
   },
   {
    "nodeId": "227:11119",
@@ -20129,8 +20129,8 @@
    "family": "recovery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No build-version detection"
+   "verified": "drift-open",
+   "verifiedNote": "L-F W8: a failed save stops the reload: \"Couldn’t save, so we didn’t reload. Nothing was lost.\" · Download a copy · Stay. Producer REQUESTS F-20. Built, not compared."
   },
   {
    "nodeId": "227:11649",
@@ -20149,8 +20149,8 @@
    "family": "recovery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No per-panel chunk-load recovery"
+   "verified": "drift-open",
+   "verifiedNote": "L-F W8: built, not compared. PanelChunkBoundary around the drawer and full-page panels: a chunk-load error shows \"This part of the editor was updated. Reload to use it.\" · Reload · \"Everything else keeps working.\"; other errors go to the panel's own boundary."
   },
   {
    "nodeId": "227:12711",

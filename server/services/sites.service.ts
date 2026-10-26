@@ -391,7 +391,13 @@ export function redactSitePassword<T extends { publishedPassword: string | null 
 export async function getSite(siteId: string) {
   const site = await prisma.site.findFirst({
     where: { id: siteId, deletedAt: null },
-    include: { folder: true, sourceTemplate: { select: { id: true, name: true } } },
+    include: {
+      folder: true,
+      sourceTemplate: { select: { id: true, name: true } },
+      /* The editor's "This workspace will be deleted on …" banner (2L9
+         B7-G20/G21): publishing is already refused while it is set. */
+      workspace: { select: { deletionScheduledAt: true } },
+    },
   });
   return site ? redactSitePassword(site) : null;
 }

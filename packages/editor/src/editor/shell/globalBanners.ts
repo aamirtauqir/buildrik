@@ -169,3 +169,40 @@ export const NARROW_WINDOW_BANNER: GlobalBanner = {
   message: "Buildrick is built for windows at least 1024 px wide — some panels will overlap.",
   dismissible: true,
 };
+
+/** B7-G19 `227:7943` — the role went up mid-session; editing needs a reload. */
+export function showRoleRaisedBanner(reload: () => void): void {
+  showGlobalBanner({
+    id: BANNER_ID.roleRaised,
+    tone: "info",
+    message: "You can edit this site now.",
+    actions: [{ label: "Reload to edit", onClick: reload, testId: "banner-reload-to-edit" }],
+    dismissible: true,
+  });
+}
+
+const DELETION_DAY = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short" });
+
+/** B7-G20 `227:8473` (owner: Cancel deletion) / G21 `227:9003` (others: ask the owner). */
+export function showWorkspaceDeletionBanner(at: Date, cancel: (() => void) | null): void {
+  const base = `This workspace will be deleted on ${DELETION_DAY.format(at)}. Publishing is off.`;
+  showGlobalBanner({
+    id: BANNER_ID.workspaceDeletion,
+    tone: "info",
+    message: cancel ? base : `${base} Ask the owner to cancel it.`,
+    actions: cancel ? [{ label: "Cancel deletion ↗", onClick: cancel, testId: "banner-cancel-deletion" }] : [],
+    dismissible: true,
+  });
+}
+
+/** B7-G23 `227:10063` — a newer editor build is deployed. Reload saves first
+ *  (`reloadAfterSaving`), so the action is the caller's. */
+export function showNewVersionBanner(reload: () => void): void {
+  showGlobalBanner({
+    id: BANNER_ID.newVersion,
+    tone: "info",
+    message: "A new version of Buildrik is ready.",
+    actions: [{ label: "Reload", onClick: reload, testId: "banner-new-version-reload" }],
+    dismissible: true,
+  });
+}
