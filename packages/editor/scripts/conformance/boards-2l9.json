@@ -9429,7 +9429,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-D S1: kind page has \"‹ Other kinds\" and \"+ Add radius\"; kind Select removed. Open: row ⋯ menu (B54). Built, not compared."
+   "verifiedNote": "L-D S1+W8: \"‹ Other kinds\", \"+ Add radius\", rows name · value · \"Used by n\" · ⋯. Rows sit in the token table (header band kept); the side card stays for the selected token (code-ahead: usage list, checks). Built, not compared."
   },
   {
    "nodeId": "207:39439",
@@ -9439,7 +9439,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "No inline length validation copy found (\"Use a length such as 8px…\"); value edit is in token card"
+   "verifiedNote": "L-D W8: the value edits in place; an invalid length stays in the field with \"Use a length such as 8px or 0.5rem. Nothing was changed.\" (opacity / z-index get their own message), nothing written. Built, not compared."
   },
   {
    "nodeId": "207:39789",
@@ -10012,7 +10012,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Kind list + side card; board \"‹ Other kinds\", \"+ Add radius\", row ⋯ menu Rename/Delete…",
+   "verifiedNote": "L-D W8: row ⋯ → Rename · Delete… (the delete / replace dialog); a seed token's menu reads Reset to default instead (owner OQ-7: seeds merge back). Built, not compared.",
    "inheritsFrom": "207:39217"
   },
   {
@@ -10023,7 +10023,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Rename is a modal \"Rename token ID\" (TokenRenameDialog), board renames inline with Enter/Esc"
+   "verifiedNote": "L-D W8: Rename inline in the row; help \"Enter to rename · Esc to cancel. References update automatically; n places keep their look.\", bad ids refused in place. Built, not compared."
   },
   {
    "nodeId": "219:42151",

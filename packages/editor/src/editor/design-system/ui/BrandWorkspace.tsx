@@ -77,6 +77,7 @@ import { BrandCard, BrandChevron, BrandRow } from "./BrandCard";
 import { BrandLivePreview } from "./BrandLivePreview";
 import { aliasedByCount } from "./colors/ColorTokenList";
 import { TokenDetailView } from "./sections/TokenDetailView";
+import { TokenDeleteDialog } from "./sections/TokenDeleteDialog";
 import { TokensSection } from "./sections/TokensSection";
 import { StylesSection } from "./sections/StylesSection";
 import { ReusableStylesSection } from "./sections/ReusableStylesSection";
@@ -167,6 +168,29 @@ const MORE_KINDS = [
 ] as const satisfies ReadonlyArray<{ kind: TokenKind; label: string; description: string }>;
 
 type MoreKind = (typeof MORE_KINDS)[number]["kind"];
+
+const LENGTH = /^-?(\d+\.?\d*|\.\d+)(px|rem|em|%|vw|vh|ch)$|^0$/;
+/** Why `value` cannot be a `kind` token's value (B6-B25: "Use a length such
+ *  as 8px or 0.5rem. Nothing was changed."), or null when it can. */
+function kindValueError(kind: MoreKind, value: string): string | null {
+  if (!value) return "Enter a value. Nothing was changed.";
+  switch (kind) {
+    case "radius":
+    case "border":
+    case "sizing":
+    case "icon":
+    case "breakpoint":
+      return LENGTH.test(value) ? null : "Use a length such as 8px or 0.5rem. Nothing was changed.";
+    case "opacity": {
+      const n = Number(value);
+      return value.trim() !== "" && Number.isFinite(n) && n >= 0 && n <= 1 ? null : "Use a number from 0 to 1, such as 0.6. Nothing was changed.";
+    }
+    case "zindex":
+      return /^-?\d+$/.test(value) ? null : "Use a whole number, such as 10. Nothing was changed.";
+    default:
+      return null;
+  }
+}
 /* Pages with no nav row of their own; the row named in `parentRow` stays
    current on them:
    "connect"          — Connect to Brand colors (BRP1-M7), under Checks;
@@ -388,6 +412,10 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
   const compact = useCompactWidth();
   const [compactNavOpen, setCompactNavOpen] = React.useState(false);
   const [restoreOpen, setRestoreOpen] = React.useState(false);
+  /* B6-B54: a kind row's "Delete…" — the same delete / replace dialog the
+     token card uses. `deleteCount` re-reads the usage on Retry count. */
+  const [deleteFor, setDeleteFor] = React.useState<string | null>(null);
+  const [, setDeleteCount] = React.useState(0);
   const [compactPreview, setCompactPreview] = React.useState(false);
   /* "No brand set" (4418:49685): the site has never saved a token. */
   const isFirstLoad = !composer?.getProjectSettings()?.designTokens?.length;
@@ -975,7 +1003,21 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
         );
       default: {
         const kind = page.slice("kind-".length) as MoreKind;
-        return <TokensSection {...tokenPageProps} openKind={kind} />;
+        return (
+          <TokensSection
+            {...tokenPageProps}
+            openKind={kind}
+            kindActions={{
+              validate: (v) => kindValueError(kind, v),
+              onValueChange: (id, v) => changeToken(id, v),
+              onRename: renameToken,
+              onDelete: setDeleteFor,
+              onReset: resetToken,
+              isSeed: (id) => SEED_BY_ID.has(id),
+              takenIds: allTokens.map((t) => t.id),
+            }}
+          />
+        );
       }
     }
   };
@@ -1385,6 +1427,20 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
           Nothing has been applied yet.
         </p>
       </Modal>
+      {deleteFor && tokenById(deleteFor) && (
+        <TokenDeleteDialog
+          open
+          token={tokenById(deleteFor)!}
+          usage={composer?.designSystem?.tokenUsage?.getCount?.(deleteFor) ?? 0}
+          allTokens={allTokens}
+          onClose={() => setDeleteFor(null)}
+          onDelete={(opts) => {
+            deleteToken(deleteFor, opts);
+            setDeleteFor(null);
+          }}
+          onRetry={() => setDeleteCount((n) => n + 1)}
+        />
+      )}
       <ClassAddDialog open={classAddOpen} composer={composer} onClose={() => setClassAddOpen(false)} />
 
       {addKind && (
