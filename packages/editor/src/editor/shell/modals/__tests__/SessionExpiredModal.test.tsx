@@ -15,8 +15,8 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent, waitFor, act, cleanup } from "@testing-library/react";
 import * as React from "react";
 import { SessionExpiredModal, type SessionExpiredModalProps } from "../SessionExpiredModal";
-import { GlobalBannerSlot } from "../../GlobalBannerSlot";
-import { BANNER_ID, clearGlobalBanner } from "../../globalBanners";
+import { GlobalBannerSlot } from "@/editor/shell/GlobalBannerSlot";
+import { BANNER_ID, clearGlobalBanner } from "@/editor/shell/globalBanners";
 
 function makeComposer(entries: Array<{ label: string; timestamp: number }>) {
   return { history: { getHistoryStack: () => entries } } as never;
