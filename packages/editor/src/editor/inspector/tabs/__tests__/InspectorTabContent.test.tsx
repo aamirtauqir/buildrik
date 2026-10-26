@@ -141,9 +141,9 @@ describe("InspectorTabContent — one order per tab, presence by capability", ()
     expect(sectionNames()).toEqual(["Size", "Spacing", "Background", "Border"]);
   });
 
-  it("a container set to flex gets no Flexbox section — Layout carries the flex controls (board 17)", () => {
+  it("a container set to flex gets no Flexbox section — Children layout carries the flex controls (board 17, 247:21216)", () => {
     renderTab({ tabId: "style", elementType: "container", cssContext: { display: "flex", isFlexContainer: true } });
-    expect(sectionNames()[0]).toBe("Layout");
+    expect(sectionNames()[0]).toBe("Children layout");
     expect(sectionNames()).not.toContain("Flexbox");
   });
 
@@ -171,7 +171,7 @@ describe("InspectorTabContent — one order per tab, presence by capability", ()
 
   it("an unknown stored type falls back to the container set without crashing", () => {
     renderTab({ tabId: "style", elementType: "nonexistent-widget-xyz" });
-    expect(sectionNames()[0]).toBe("Layout");
+    expect(sectionNames()[0]).toBe("Children layout");
   });
 });
 

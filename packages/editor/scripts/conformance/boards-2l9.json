@@ -4161,7 +4161,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Lane L-B A1 (2026-10-26): tab strip now Content · Style · Behavior · Effects, type block on Content, Flex/Grid body + image Fit + Text style on Style — compared by probe screenshot (case inspector-panel, :5172) against the dump's copy for this board. Still open: header context line (REQUESTS #10), Semantics/Conditions/Advanced attributes (A2, REQUESTS #11), page/multi/locked/instance specimens.",
+   "verifiedNote": "Lane L-B P1 (2026-10-27): Container layout specimen probe-compared — Children layout with Display/Direction/Justify/Align items/Gap selects + More settings, Size Width/Height mode, Spacing/Background/Border shut with 'n set' (board says 'Fill'; 161:8940 says Background — the later page-04 board followed). Direction reads 'Row' (247:21216) where this specimen says 'Horizontal'. Text content specimen matches 161:8480 except Conditions (B-11). Still open: image content, effects/precision, page/no-selection, multi-selection, locked and component-instance specimens not yet re-compared this wave.",
    "tier": "P1"
   },
   {
@@ -5415,8 +5415,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Board \"Children layout\"/\"Placement\"/\"Advanced layout\" groups, Row/Column gap, Align lines; code one \"Layout\" section",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B P1 (2026-10-27), probe inspector-panel ?type=container&styles={flex, wrap, space-between, center, align-content start, row-gap 24, column-gap 32, relative, 3 advanced} on :5172, side by side with the board PNG: 'Children layout' · Display/Direction/Wrap/Justify/Align items/Align lines as selects · Row gap/Column gap · 'Placement' (13/semibold) · Position · Z-index · 'Advanced layout  3 set' shut. Exceptions: a relative/absolute element keeps its offset cross under Z-index (code:offsets-reachable — top/right/bottom/left have no other writer); a non-wrapping container or one gap value keeps 'More settings' for Wrap / Row & Column gap (36:2 draws that state).",
    "tier": "P1"
   },
   {

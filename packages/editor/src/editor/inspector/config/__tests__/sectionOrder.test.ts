@@ -86,8 +86,8 @@ describe("section order", () => {
     expect(titlesFor("content", "flex")).toEqual(["Semantics", "Advanced attributes"]);
   });
 
-  it("board 17 — Container (grid) · Style: Text inside last, after Border", () => {
-    expect(titlesFor("style", "container", { isGridContainer: true })).toEqual(["Layout", "Size", "Spacing", "Background", "Border", "Text inside"]);
+  it("board 17 — Container (grid) · Style: Text inside last, after Border; Advanced layout under Children layout (247:21216)", () => {
+    expect(titlesFor("style", "container", { isGridContainer: true })).toEqual(["Children layout", "Advanced layout", "Size", "Spacing", "Background", "Border", "Text inside"]);
   });
 
   it("board 18 — Section · Behavior: Link, no CMS binding", () => {

@@ -11,7 +11,7 @@
  */
 
 import { adaptBaseStyleProps, defineSection, shownOnInstanceRoot, type AnySectionEntry, type ShouldRenderContext } from "./_shared";
-import { LayoutSection } from "../layout";
+import { LayoutAdvancedSection, LayoutSection } from "../layout";
 import { SizeSection } from "../SizeSection";
 import { SpacingSection } from "../SpacingSection";
 import { BackgroundSection } from "../BackgroundSection";
@@ -28,17 +28,11 @@ const LAYOUT_KEYS = [
   "bottom",
   "left",
   "z-index",
-  "overflow",
-  "overflow-x",
-  "overflow-y",
-  "box-sizing",
-  "float",
-  "clear",
-  "visibility",
   ...FLEX_KEYS,
   ...GRID_KEYS,
   ...GAP_KEYS,
 ];
+const LAYOUT_ADVANCED_KEYS = ["overflow", "overflow-x", "overflow-y", "box-sizing", "float", "clear", "visibility"];
 const ITEM_KEYS = ["flex-grow", "flex-shrink", "flex-basis", "order", "align-self", "justify-self", "grid-column", "grid-row"];
 
 /** "2 set" / "None" — how many of a section's own properties the element
@@ -61,13 +55,14 @@ const BORDER_KEYS = ["border", "border-width", "border-style", "border-color", "
 export const BOX_SECTIONS: Record<string, AnySectionEntry> = {
   layout: defineSection({
     tab: "style",
-    title: "Layout",
+    /* 2L9 247:21216, 36:2. */
+    title: "Children layout",
     open: "always",
     capability: (caps) => caps.layout,
     shouldRender: (ctx) => shownOnInstanceRoot(ctx, LAYOUT_KEYS),
     Component: LayoutSection,
     advancedKey: "layout",
-    advancedProps: ["overflow", "overflow-x", "overflow-y", "box-sizing", "float", "clear", "visibility"],
+    advancedProps: ["grid-template-rows", "grid-auto-flow"],
     styleKeys: LAYOUT_KEYS,
     adaptProps: (ctx) => ({
       ...adaptBaseStyleProps(ctx),
@@ -76,6 +71,18 @@ export const BOX_SECTIONS: Record<string, AnySectionEntry> = {
       advancedExpanded: ctx.advancedExpanded,
       onAdvancedToggle: ctx.onAdvancedToggle,
     }),
+  }),
+
+  "layout-advanced": defineSection({
+    tab: "style",
+    title: "Advanced layout",
+    open: "closed",
+    summary: setSummary(LAYOUT_ADVANCED_KEYS),
+    capability: (caps) => caps.layout,
+    shouldRender: (ctx) => shownOnInstanceRoot(ctx, LAYOUT_ADVANCED_KEYS),
+    Component: LayoutAdvancedSection,
+    styleKeys: LAYOUT_ADVANCED_KEYS,
+    adaptProps: adaptBaseStyleProps,
   }),
 
   size: defineSection({

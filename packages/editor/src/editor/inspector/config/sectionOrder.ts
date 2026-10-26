@@ -33,6 +33,8 @@ const CONTENT_ORDER: readonly SectionId[] = [
 const STYLE_ORDER: readonly SectionId[] = [
   "type-layout",
   "layout",
+  /* 2L9 247:21216: "Advanced layout · n set" right under Children layout. */
+  "layout-advanced",
   "typography",
   "size",
   "spacing",

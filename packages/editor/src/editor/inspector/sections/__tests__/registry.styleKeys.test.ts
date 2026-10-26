@@ -17,10 +17,9 @@ interface SectionCoverage {
 
 const sectionCoverage: Record<string, SectionCoverage> = {
   size: { files: ["../SizeSection.tsx", "../layout/ItemControls.tsx"] },
+  "layout-advanced": { files: ["../layout/OverflowVisibilityControls.tsx"] },
   layout: {
     files: [
-      "../layout/index.tsx",
-      "../layout/OverflowVisibilityControls.tsx",
       "../layout/PositionControls.tsx",
       "../layout/DisplayControls.tsx",
       "../layout/FlexControls.tsx",

@@ -144,8 +144,9 @@ describe("auto-expand against the registry the inspector actually uses", () => {
     expect(result.current.isExpanded("typography")).toBe(true);
   });
 
-  it("opens Layout for overflow, which its advanced block draws — not for z-index, which sits with Position on the face (board 17)", () => {
-    expect(render({ "overflow-x": "scroll" }, real).result.current.isExpanded("layout")).toBe(true);
+  it("opens Layout for a grid's rows, which its More settings draws — not for overflow (Advanced layout, 2L9 247:21216) or z-index (Placement, on the face)", () => {
+    expect(render({ "grid-template-rows": "1fr 1fr" }, real).result.current.isExpanded("layout")).toBe(true);
+    expect(render({ "overflow-x": "scroll" }, real).result.current.isExpanded("layout")).toBe(false);
     expect(render({ "z-index": "10" }, real).result.current.isExpanded("layout")).toBe(false);
   });
 

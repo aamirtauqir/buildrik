@@ -1,12 +1,13 @@
 /**
- * Layout Section — a container's layout (board 17): Display Block · Flex ·
- * Grid · None; the flex controls when Display is Flex, Columns + Gap when it
- * is Grid; Position.
+ * Layout — 2L9 247:21216 / 36:2 "Children layout": Display, then the flex
+ * rows (Direction · Wrap · Justify · Align items · Align lines · gaps) or
+ * the grid controls, then "Placement" (Position · Z-index · offsets).
+ * More settings holds what a flex container shows only once it is used
+ * (Wrap, Row / Column gap) and the grid's extras.
  *
- * Replaces the old Flexbox and Grid sections (D-10/11): a container's flex or
- * grid settings live here, the same controls the Flex / Grid type blocks use
- * (`FlexControls`, `GridControls`). Width / Height left for Size (DD-9).
- * More settings: the inline display modes, overflow, visibility & float.
+ * Overflow, visibility and float are their own closed section, "Advanced
+ * layout · n set" (`LayoutAdvancedSection`). Width / Height left for Size
+ * (DD-9).
  *
  * @license BSD-3-Clause
  */
@@ -18,6 +19,7 @@ import { DisplayControls } from "./DisplayControls";
 import { FlexControls } from "./FlexControls";
 import { GridControls } from "./GridControls";
 import { OverflowControls, VisibilityFloatControls } from "./OverflowVisibilityControls";
+import type { BaseStyleSectionProps } from "../registry/_shared";
 import { PositionControls } from "./PositionControls";
 
 export interface LayoutSectionProps {
@@ -27,12 +29,16 @@ export interface LayoutSectionProps {
   propertyStates?: Record<string, { hidden?: boolean; disabled?: boolean; reason?: string }>;
   isOpen?: boolean;
   onToggle?: (open: boolean) => void;
-  /** Layout's More settings (inline modes, overflow, visibility & float). */
+  /** Layout's More settings (Wrap, Row / Column gap, the grid's extras). */
   advancedExpanded?: boolean;
   onAdvancedToggle?: () => void;
   mixedKeys?: ReadonlySet<string>;
   isMultiSelect?: boolean;
 }
+
+/* 2L9 247:21216: "Placement" heads its rows like a section title (13 /
+   semibold ink), not the uppercase sub-heading. */
+const GROUP_TITLE = "tw:mt-3 tw:mb-1 tw:text-[13px] tw:leading-4 tw:font-semibold tw:text-[var(--bk-ink)]";
 
 const FLEX = new Set(["flex", "inline-flex"]);
 const GRID = new Set(["grid", "inline-grid"]);
@@ -48,23 +54,31 @@ export const LayoutSection: React.FC<LayoutSectionProps> = ({
   onAdvancedToggle,
 }) => {
   const display = styles.display || "";
+  const flex = FLEX.has(display);
+  const grid = GRID.has(display);
+  /* A wrapping flex container with its own row / column gap already shows
+     everything More settings would add (247:21216 draws no toggle). */
+  const flexHidesSome = (styles["flex-wrap"] || "nowrap") === "nowrap" || !(styles["row-gap"] || styles["column-gap"]);
   return (
-    <Section title="Layout" isOpen={isOpen} onToggle={onToggle} id="inspector-section-layout">
-      <DisplayControls display={display} onChange={onChange} advanced={advancedExpanded} />
-      {FLEX.has(display) && <FlexControls styles={styles} onChange={onChange} onBatchChange={onBatchChange} advanced={advancedExpanded} />}
-      {GRID.has(display) && <GridControls styles={styles} onChange={onChange} advanced={advancedExpanded} />}
+    <Section title="Children layout" isOpen={isOpen} onToggle={onToggle} id="inspector-section-layout">
+      <DisplayControls display={display} onChange={onChange} />
+      {flex && <FlexControls variant="rows" styles={styles} onChange={onChange} onBatchChange={onBatchChange} advanced={advancedExpanded} />}
+      {grid && <GridControls styles={styles} onChange={onChange} advanced={advancedExpanded} />}
+      {((flex && flexHidesSome) || grid) && onAdvancedToggle && <MoreSettingsToggle isOpen={advancedExpanded} onToggle={() => onAdvancedToggle()} />}
+      <div className={GROUP_TITLE}>Placement</div>
       <PositionControls styles={styles} onChange={onChange} propertyStates={propertyStates} />
-      {advancedExpanded && (
-        <>
-          <div className={SECTION_SUBTITLE}>Overflow</div>
-          <OverflowControls styles={styles} onChange={onChange} />
-          <div className={SECTION_SUBTITLE}>Visibility & Float</div>
-          <VisibilityFloatControls styles={styles} onChange={onChange} />
-        </>
-      )}
-      {onAdvancedToggle && <MoreSettingsToggle isOpen={advancedExpanded} onToggle={() => onAdvancedToggle()} />}
     </Section>
   );
 };
+
+/** 2L9 247:21216 "Advanced layout · 3 set": overflow, visibility & float. */
+export const LayoutAdvancedSection: React.FC<BaseStyleSectionProps> = ({ styles, onChange, isOpen, onToggle }) => (
+  <Section title="Advanced layout" isOpen={isOpen} onToggle={onToggle} id="inspector-section-layout-advanced">
+    <div className={SECTION_SUBTITLE}>Overflow</div>
+    <OverflowControls styles={styles} onChange={onChange} />
+    <div className={SECTION_SUBTITLE}>Visibility & Float</div>
+    <VisibilityFloatControls styles={styles} onChange={onChange} />
+  </Section>
+);
 
 export default LayoutSection;
