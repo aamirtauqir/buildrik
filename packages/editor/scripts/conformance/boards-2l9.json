@@ -604,9 +604,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Code Keep editing/Discard; board 'Leave without saving?' + Save and leave (+offline/invalid variants)"
+   "authority": "code:page-settings-save-is-local",
+   "verified": "no",
+   "verifiedNote": "Offline variant of the close guard ('You’re offline. Reconnect to save page settings.'). Saving page settings is a local document write (ElementManager.updatePage) that reaches the server with the next autosave, so the online guard (Keep editing · Discard changes · Save and leave, built in wave 2) applies offline too. L-A wave 2."
   },
   {
    "nodeId": "101:24836",
@@ -665,9 +665,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Code Keep editing/Discard; board 'Leave without saving?' + Save and leave (+offline/invalid variants)"
+   "authority": "code:page-settings-save-is-local",
+   "verified": "no",
+   "verifiedNote": "600-px variant of 101:24231; same disposition. L-A wave 2."
   },
   {
    "nodeId": "101:29978",
