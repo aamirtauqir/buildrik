@@ -7115,7 +7115,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Board: slug URL-impact line, Add redirects, Save collection, Show usages; code: name/slug, Source, Danger zone (:129)"
+   "verifiedNote": "drift-open — L-C D6: action reads Save collection (Saving… / Retry / Saved); slug URL-impact line, Add redirects, Show usages not built (slug is not in URLs in code). Not compared."
   },
   {
    "nodeId": "165:4137",
@@ -11326,7 +11326,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Board: slug URL-impact line, Add redirects, Save collection, Show usages; code: name/slug, Source, Danger zone (:129)"
+   "verifiedNote": "drift-open — L-C D6: action reads Save collection (Saving… / Retry / Saved); slug URL-impact line, Add redirects, Show usages not built (slug is not in URLs in code). Not compared."
   },
   {
    "nodeId": "257:57832",
@@ -11377,7 +11377,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code only disables confirm while busy; board shows \"Deleting Blog…\" waiting state"
+   "verifiedNote": "built, not compared — L-C D6: typed delete reads \"Deleting {name}…\" + \"Waiting for the server. {name} is unchanged until the delete is confirmed.\" (TypedDeleteDialog)."
   },
   {
    "nodeId": "257:58823",
@@ -11387,7 +11387,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No failure/Retry state for collection delete"
+   "verifiedNote": "built, not compared — L-C D6: refused delete keeps the dialog: \"Couldn’t delete {name} · {name}, its records and bindings are unchanged.\" + Retry; bindings are now unbound only after the delete lands."
   },
   {
    "nodeId": "257:59011",
@@ -11654,9 +11654,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "board",
+   "authority": "code:collection-slug-not-in-urls",
    "verified": "no",
-   "verifiedNote": "No URL-impact confirm, pending, failed-draft or acknowledged states for slug save"
+   "verifiedNote": "L-C D6: the collection slug is not part of any page URL in code (URLs come from Dynamic pages' pageSlugPattern), so the board's \"N live URLs will move from /blog/ to /journal/\" confirm is not adopted; Save collection saves directly."
   },
   {
    "nodeId": "259:94780",
@@ -11666,7 +11666,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No URL-impact confirm, pending, failed-draft or acknowledged states for slug save"
+   "verifiedNote": "built, not compared — L-C D6: Save collection reads Saving… while it saves (board: \"Saving collection slug…\" panel)."
   },
   {
    "nodeId": "259:94976",
@@ -11676,7 +11676,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No URL-impact confirm, pending, failed-draft or acknowledged states for slug save"
+   "verifiedNote": "built, not compared — L-C D6: refused save keeps the draft, \"Couldn’t save the collection. Your draft is still here; the saved name and slug remain …\" + Retry."
   },
   {
    "nodeId": "259:95177",
@@ -11684,9 +11684,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "board",
+   "authority": "code:collection-slug-not-in-urls",
    "verified": "no",
-   "verifiedNote": "No URL-impact confirm, pending, failed-draft or acknowledged states for slug save"
+   "verifiedNote": "built, not compared — L-C D6: landed save reads Saved (toast \"Collection saved\"); no URL-change line because the slug is not in URLs."
   },
   {
    "nodeId": "259:95361",
