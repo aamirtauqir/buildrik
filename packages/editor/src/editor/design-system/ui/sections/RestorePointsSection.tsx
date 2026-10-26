@@ -1,8 +1,9 @@
 /**
- * RestorePointsSection — Brand › Restore points, board BRP1-M10:
+ * RestorePointsSection — Brand's "Restore points ▾" popover (2L9 B6-B39;
+ * states from BRP1-M10):
  *
- *   8224:244521  list      "Brand restore points", one row per point: what
- *                          made it and when, Restore
+ *   list      "Restore points", one row per point: what it was taken before
+ *             ("Before import") and when ("Today 14:12"), Restore
  *   8224:245178  empty     "No restore points yet" and what makes one
  *   8224:245787  restored  the list, plus the receipt "Restored “<point>”." with Undo (the one undo)
  *
@@ -27,27 +28,26 @@ import { useGuardedApply } from "@/editor/design-system/state/useGuardedApply";
 import { NOTICE, SMALL_ACTION } from "./UsageHighlight";
 import { CARD, COPY, TITLE } from "./ConnectTokensCheck";
 
-/** What made a point, as the board writes it. Unknown reasons read "Brand change". */
+/** What a point was taken before, as B6-B39 writes it. Unknown reasons read "Brand change". */
 const RESTORE_REASON_LABEL: Record<string, string> = {
-  "theme-push": "Theme push",
-  migration: "Brand upgrade",
-  generator: "Generator",
-  "dark-auto": "Dark mode Auto",
-  logo: "Brand from logo",
+  "theme-push": "Before theme push",
+  migration: "Before brand upgrade",
+  generator: "Before generate scale",
+  "dark-auto": "Before dark mode Auto",
+  logo: "Before from logo or URL",
   starter: "Before starter",
   import: "Before import",
 };
-
 const pad = (n: number) => String(n).padStart(2, "0");
 
-/** "Today, 14:32" · "Yesterday, 16:40" · "6 Oct, 09:15" (local time). */
+/** "Today 14:32" · "Yesterday 16:40" · "6 Oct 09:15" (local time, B6-B39). */
 export function restorePointTime(at: Date, now: Date = new Date()): string {
   const day = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
   const diff = Math.round((day(now) - day(at)) / 86_400_000);
   const time = `${pad(at.getHours())}:${pad(at.getMinutes())}`;
-  if (diff === 0) return `Today, ${time}`;
-  if (diff === 1) return `Yesterday, ${time}`;
-  return `${at.getDate()} ${at.toLocaleString("en-GB", { month: "short" })}, ${time}`;
+  if (diff === 0) return `Today ${time}`;
+  if (diff === 1) return `Yesterday ${time}`;
+  return `${at.getDate()} ${at.toLocaleString("en-GB", { month: "short" })} ${time}`;
 }
 
 export interface RestorePointsSectionProps {
@@ -76,8 +76,8 @@ export const RestorePointsSection: React.FC<RestorePointsSectionProps> = ({ comp
 
   return (
     <section aria-label="Brand restore points" className={CARD} data-testid="brand-restore-points" data-restore-state={points.status}>
-      <p className={TITLE}>Brand restore points</p>
-      <p className={COPY}>Restore a previous brand in one ⌘Z step. Your page content is kept.</p>
+      <p className={TITLE}>Restore points</p>
+      <p className={COPY}>Restoring replaces Brand values with the saved checkpoint. It is one step you can undo.</p>
       {points.status === "error" ? (
         <>
           <p className={`${NOTICE} tw:w-full tw:bg-[var(--bk-error-tint)]`} role="alert" data-testid="brand-restore-load-error">
@@ -90,7 +90,7 @@ export const RestorePointsSection: React.FC<RestorePointsSectionProps> = ({ comp
       ) : points.status === "ready" && points.rows.length === 0 ? (
         <>
           <p className={TITLE} data-testid="brand-restore-empty">No restore points yet</p>
-          <p className={COPY}>A restore point is created before a theme push, generator, dark-mode switch or logo import.</p>
+          <p className={COPY}>A restore point is created before a theme push, generator, dark-mode switch, starter, import or logo import.</p>
         </>
       ) : (
         <ul className="tw:m-0 tw:flex tw:w-full tw:list-none tw:flex-col tw:gap-3 tw:p-0" aria-busy={points.status === "loading" || undefined}>

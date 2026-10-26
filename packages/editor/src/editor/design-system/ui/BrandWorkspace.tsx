@@ -175,12 +175,12 @@ type MoreKind = (typeof MORE_KINDS)[number]["kind"];
    "presets"          — the catalogue's preset drill-in, under
                         Type styles · Presets (B6-B26);
    "kind-*"           — under Other kinds;
-   "restore-points"   — the header's action; no row is current on it. */
+   (Restore points is the header's popover, B6-B39 — not a page.) */
 const FROM_SOURCE = "brand-from-source";
-type SubPageId = "connect" | typeof FROM_SOURCE | "scale" | "restore-points" | "presets";
+type SubPageId = "connect" | typeof FROM_SOURCE | "scale" | "presets";
 export type BrandPageId = NavId | `kind-${MoreKind}` | SubPageId;
 
-const SUB_PAGES: readonly SubPageId[] = ["connect", FROM_SOURCE, "scale", "restore-points", "presets"];
+const SUB_PAGES: readonly SubPageId[] = ["connect", FROM_SOURCE, "scale", "presets"];
 
 const LANDING: BrandPageId = "colours";
 
@@ -199,14 +199,12 @@ function parentRow(page: BrandPageId): BrandPageId | null {
   if (page === FROM_SOURCE) return "starters";
   if (page === "scale") return "colours";
   if (page === "presets") return "styles";
-  if (page === "restore-points") return null;
   return page;
 }
 
 function pageLabel(id: BrandPageId): string {
   if (id === "connect") return "Connect to Brand colors";
   if (id === FROM_SOURCE) return "From logo or URL";
-  if (id === "restore-points") return "Restore points";
   if (id === "presets") return "Presets";
   if (id === "other-kinds") return "Other kinds";
   for (const g of NAV_GROUPS) for (const n of g.rows) if (n.id === id) return n.label;
@@ -389,6 +387,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
   /* B6-B51…B53: under 1440 wide the nav and the preview fold away. */
   const compact = useCompactWidth();
   const [compactNavOpen, setCompactNavOpen] = React.useState(false);
+  const [restoreOpen, setRestoreOpen] = React.useState(false);
   const [compactPreview, setCompactPreview] = React.useState(false);
   /* "No brand set" (4418:49685): the site has never saved a token. */
   const isFirstLoad = !composer?.getProjectSettings()?.designTokens?.length;
@@ -945,15 +944,6 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
             onApplied={(n) => receipt(`Connected ${n} color usage${n === 1 ? "" : "s"}.`)}
           />
         );
-      case "restore-points":
-        return (
-          <RestorePointsSection
-            composer={composer}
-            /* 8224:245787's toast. */
-            onRestored={(label) => receipt(`Restored “${label}”.`)}
-            onFailed={() => refused("That restore point")}
-          />
-        );
       case "starters":
         return (
           <StartersSection
@@ -1126,19 +1116,40 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
                      read-only site (Restore does not) — but it is a server
                      read: offline it waits, and says why (B6-B43). */
                   <>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="xs"
-                      className={`${PAGE_ACTION} tw:border-transparent tw:bg-transparent`}
-                      aria-current={page === "restore-points" ? "page" : undefined}
-                      disabled={!online}
-                      aria-describedby={online ? undefined : "brand-restore-offline"}
-                      onClick={() => openPage("restore-points")}
-                      data-testid="brand-restore-points-action"
+                    <Popover
+                      open={restoreOpen}
+                      onClose={() => setRestoreOpen(false)}
+                      placement="bottom-end"
+                      label="Restore points"
+                      trigger={
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="xs"
+                          className={`${PAGE_ACTION} tw:border-transparent tw:bg-transparent`}
+                          aria-expanded={restoreOpen}
+                          aria-haspopup="dialog"
+                          disabled={!online}
+                          aria-describedby={online ? undefined : "brand-restore-offline"}
+                          onClick={() => setRestoreOpen((v) => !v)}
+                          data-testid="brand-restore-points-action"
+                        >
+                          Restore points ▾
+                        </Button>
+                      }
                     >
-                      Restore points
-                    </Button>
+                      {/* B6-B39: the checkpoints in a popover off the header. */}
+                      <div className="tw:w-[420px]">
+                        <RestorePointsSection
+                          composer={composer}
+                          onRestored={(label) => {
+                            setRestoreOpen(false);
+                            receipt(`Restored “${label}”.`);
+                          }}
+                          onFailed={() => refused("That restore point")}
+                        />
+                      </div>
+                    </Popover>
                     {!online && (
                       <span id="brand-restore-offline" className="tw:text-[length:var(--bk-text-12)] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]">
                         Restore points need a connection
@@ -1294,19 +1305,6 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
               <p className={SIDE_CARD_TITLE}>Preview before applying</p>
               <p className={SIDE_CARD_BODY}>
                 Explore the result on your canvas. Confirm or Apply commits the whole change as one ⌘Z step.
-              </p>
-              <p className={`${SIDE_CARD_BODY} tw:font-semibold tw:text-[var(--bk-ink)]`}>Primitives → Semantic tokens → Elements</p>
-              <p className={SIDE_CARD_BODY}>
-                Edit Primary to change only Primary. Edit its palette value to update every token that uses it.
-              </p>
-            </section>
-          )}
-          {page === "restore-points" && (
-            /* 8224:244521's guidance card under the preview. */
-            <section aria-label="About restore points" className={SIDE_CARD} data-testid="brand-restore-guide">
-              <p className={SIDE_CARD_TITLE}>Changes apply instantly</p>
-              <p className={SIDE_CARD_BODY}>
-                Every edit updates your canvas. Use ⌘Z to undo, including changes made on the canvas.
               </p>
               <p className={`${SIDE_CARD_BODY} tw:font-semibold tw:text-[var(--bk-ink)]`}>Primitives → Semantic tokens → Elements</p>
               <p className={SIDE_CARD_BODY}>

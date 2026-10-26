@@ -9579,7 +9579,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Restore points is a page (header action), board a \"Restore points ▾\" popover"
+   "verifiedNote": "L-D W6: \"Restore points ▾\" opens a popover off the header (no page): \"Restore points\", \"Restoring replaces Brand values with the saved checkpoint. It is one step you can undo.\", rows \"Before …\" + \"Today 14:12\" + Restore. No token/place count per row (the list API returns reason + time only). Built, not compared."
   },
   {
    "nodeId": "210:38670",
