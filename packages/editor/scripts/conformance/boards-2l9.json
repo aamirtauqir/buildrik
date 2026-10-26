@@ -5071,7 +5071,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Mixed detection exists; no \"2 of 3 eligible\", locked exclusion, per-target Inspect rows"
+   "verifiedNote": "Lane L-B B1 (built, not compared — copy checked against the dump): the multi bar says '2 of 3 eligible. Locked {name} is excluded and remains unchanged.' when a target is locked (writes already skip it), lists 'Selection · Inspect {name}' rows that narrow to one object, and ends 'No DOM ID batch write. Choose one object for identity, binding and child-list tasks.'. Open: the eligibility count in the header line (B-10, lead) and the per-section 'Typography eligibility' / 'Apply to 2 eligible headings' rows."
   },
   {
    "nodeId": "247:28584",
