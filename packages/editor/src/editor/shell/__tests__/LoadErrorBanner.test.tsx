@@ -13,6 +13,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ToastProvider } from "@/editor/chrome-ui";
 import { LoadErrorBanner, loadErrorDetails } from "../LoadErrorBanner";
 import { setSiteLoadStatus, type SiteLoadFailure } from "../siteLoadStatus";
+import { registerWorkSnapshot } from "../workSnapshot";
+import { showOtherTabBanner, clearGlobalBanner, BANNER_ID } from "../globalBanners";
 
 const writeClipboardText = vi.hoisted(() => vi.fn(() => Promise.resolve()));
 vi.mock("@buildrik/shared/browser/clipboard", () => ({ writeClipboardText }));
@@ -189,5 +191,48 @@ describe("LoadErrorBanner — Copy details", () => {
       "Error code: HTTP 502\nRequest id: none sent",
     );
     expect(loadErrorDetails("offline", null)).toBe("Error code: offline\nRequest id: none sent");
+  });
+});
+
+describe("LoadErrorBanner — the board's download per cause (G02 / G22 / G18)", () => {
+  const work = { pages: [] } as never;
+  let unregister: () => void = () => {};
+  afterEach(() => unregister());
+
+  it.each([
+    ["network", "Download local copy"],
+    ["missing", "Download changes"],
+    ["forbidden", "Download them"],
+  ] as const)("%s offers %s, which downloads the work on screen", (kind, label) => {
+    unregister = registerWorkSnapshot({ project: () => work });
+    const createObjectURL = vi.fn(() => "blob:x");
+    const revokeObjectURL = vi.fn();
+    Object.assign(URL, { createObjectURL, revokeObjectURL });
+    renderBanner({ kind });
+    fireEvent.click(screen.getByRole("button", { name: label }));
+    expect(createObjectURL).toHaveBeenCalledTimes(1);
+  });
+
+  it("offers no download when there is no work to save", () => {
+    renderBanner({ kind: "network" });
+    expect(screen.queryByTestId("load-error-download")).toBeNull();
+  });
+
+  it("no access offers Ask an admin, which opens the permissions", () => {
+    renderBanner({ kind: "forbidden" });
+    fireEvent.click(screen.getByRole("button", { name: "Ask an admin" }));
+    expect(screen.getByTestId("permissions-modal")).toBeTruthy();
+  });
+});
+
+describe("LoadErrorBanner — leads the one banner slot (G31)", () => {
+  afterEach(() => act(() => clearGlobalBanner(BANNER_ID.otherTab)));
+
+  it("other conditions wait behind N more instead of a second bar", () => {
+    renderBanner({ kind: "network" });
+    act(() => showOtherTabBanner());
+    expect(screen.getAllByTestId("load-error-banner")).toHaveLength(1);
+    expect(screen.queryByTestId("global-banner")).toBeNull();
+    expect(screen.getByTestId("global-banner-more").textContent).toContain("1 more");
   });
 });

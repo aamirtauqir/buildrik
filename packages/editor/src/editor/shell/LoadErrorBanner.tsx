@@ -26,6 +26,15 @@
  * tone's tint, 20/12 insets, radius 8, plain bordered actions (the accent fill
  * is reserved for the one CTA per screen, Button 9:102).
  *
+ * L-F (2026-10-26): the bar is the lead entry of the one global banner slot
+ * (`GlobalBannerSlot`, board G31), so the other conditions wait behind its
+ * "{n} more ⌄" instead of stacking. `LoadErrorBanner` is that composition,
+ * mounted where AquibraStudio already mounts it. The download the board pairs
+ * with each cause (G02 Download local copy, G22 Download changes, G18
+ * Download them) saves the work there is (`workSnapshot`); with none, no
+ * button. G18's "Ask an admin" opens the Permissions dialog — there is no
+ * access-request API (`authority: code:no-access-request-api`).
+ *
  * @license BSD-3-Clause
  */
 
@@ -33,7 +42,12 @@ import * as React from "react";
 import { X } from "lucide-react";
 import { Button, CopyButton, IconButton } from "@/editor/chrome-ui";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
+import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { useSiteLoadStatus, type SiteLoadErrorKind, type SiteLoadFailure } from "./siteLoadStatus";
+import { BANNER_ACTION as ACTION, BANNER_BAR as BAR, BANNER_TONE, GlobalBannerSlot } from "./GlobalBannerSlot";
+import { BANNER_ID } from "./globalBanners";
+import { currentWork, downloadProject } from "./workSnapshot";
+import { PermissionsModal } from "./modals/PermissionsModal";
 
 export type LoadErrorKind = SiteLoadErrorKind | null;
 
@@ -68,20 +82,12 @@ const RETRYABLE: ReadonlySet<SiteLoadErrorKind> = new Set(["network", "offline",
 const RETRY_BACKOFF_MS: readonly number[] = [1000, 2000, 4000];
 const MAX_RETRIES = RETRY_BACKOFF_MS.length;
 
-/* `leading-[normal]`, not `leading-normal`: the second is Tailwind's 1.5,
-   which computes to 21px, and board 297:2244 says the keyword. */
-const BAR =
-  "tw:flex tw:flex-wrap tw:items-center tw:gap-3 tw:px-5 tw:py-3 tw:rounded-lg " +
-  "tw:text-sm tw:font-medium tw:leading-[normal] tw:[font-family:var(--bk-font-ui)]";
-const TONE = {
-  error: "tw:bg-[var(--bk-error-tint)] tw:text-[var(--bk-error-text)]",
-  warning: "tw:bg-[var(--bk-warning-tint)] tw:text-[var(--bk-warning-text)]",
+/** The board's download label per cause; causes it pairs with none get none. */
+const DOWNLOAD_LABEL: Partial<Record<SiteLoadErrorKind, string>> = {
+  network: "Download local copy",
+  missing: "Download changes",
+  forbidden: "Download them",
 };
-
-/** Board 297:2246 — white surface, hairline, 13 on radius 6 with 12/6 insets.
- *  flowbite's `size="xs"` supplies h-8, text-xs and rounded-lg, each yielding
- *  only to a SAME-property utility — `h-auto` for the height. */
-const ACTION = "tw:h-auto tw:px-3 tw:py-1.5 tw:rounded-md tw:text-[13px] tw:leading-[normal] tw:text-current";
 
 /** What support needs to find this request: code and request id, no more. */
 export function loadErrorDetails(kind: SiteLoadErrorKind, failure: SiteLoadFailure | null): string {
@@ -89,8 +95,15 @@ export function loadErrorDetails(kind: SiteLoadErrorKind, failure: SiteLoadFailu
   return `Error code: ${code}\nRequest id: ${failure?.requestId ?? "none sent"}`;
 }
 
-export const LoadErrorBanner: React.FC<LoadErrorBannerProps> = ({ kind, onRetry, onSignIn, onDismiss }) => {
+const LoadErrorBar: React.FC<LoadErrorBannerProps & { kind: SiteLoadErrorKind; more: React.ReactNode }> = ({
+  kind,
+  onRetry,
+  onSignIn,
+  onDismiss,
+  more,
+}) => {
   const { failure, retry } = useSiteLoadStatus();
+  const [permissionsOpen, setPermissionsOpen] = React.useState(false);
   /* Board 294:1992's "Reconnecting…" state, on the control. The ref, not the
      state, is what refuses a second click: two clicks in one frame both read
      the old state. */
@@ -106,8 +119,6 @@ export const LoadErrorBanner: React.FC<LoadErrorBannerProps> = ({ kind, onRetry,
       if (timerRef.current) clearTimeout(timerRef.current);
     };
   }, []);
-
-  if (!kind) return null;
 
   const exhausted = failedRetries >= MAX_RETRIES;
   const canRetry = RETRYABLE.has(kind) && !exhausted;
@@ -138,11 +149,13 @@ export const LoadErrorBanner: React.FC<LoadErrorBannerProps> = ({ kind, onRetry,
   };
 
   const reload = () => window.location.reload();
+  const downloadLabel = DOWNLOAD_LABEL[kind];
+  const work = downloadLabel ? currentWork(getSiteIdFromUrl()) : null;
   const toDashboard = () => window.location.assign(`${DASHBOARD_URL}/dashboard`);
 
   return (
     <div
-      className={`${BAR} ${kind === "forbidden" ? TONE.warning : TONE.error}`}
+      className={`${BAR} ${kind === "forbidden" ? BANNER_TONE.warning : BANNER_TONE.error}`}
       role="alert"
       aria-label={LABEL[kind]}
       data-testid="load-error-banner"
@@ -163,6 +176,28 @@ export const LoadErrorBanner: React.FC<LoadErrorBannerProps> = ({ kind, onRetry,
       </div>
       <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
         <CopyButton content={loadErrorDetails(kind, failure)} label="Copy details" className={ACTION} />
+        {work && downloadLabel ? (
+          <Button
+            color="light"
+            size="xs"
+            onClick={() => downloadProject(work, "local-copy")}
+            className={ACTION}
+            data-testid="load-error-download"
+          >
+            {downloadLabel}
+          </Button>
+        ) : null}
+        {kind === "forbidden" ? (
+          <Button
+            color="light"
+            size="xs"
+            onClick={() => setPermissionsOpen(true)}
+            className={ACTION}
+            data-testid="load-error-ask-admin"
+          >
+            Ask an admin
+          </Button>
+        ) : null}
         {kind === "auth" ? (
           <Button color="light" size="xs" onClick={onSignIn} className={ACTION}>
             Sign in ↗
@@ -193,14 +228,32 @@ export const LoadErrorBanner: React.FC<LoadErrorBannerProps> = ({ kind, onRetry,
             {busy ? "Reconnecting…" : "Retry"}
           </Button>
         ) : null}
+        {more}
         {onDismiss ? (
           <IconButton label="Dismiss" size="sm" onClick={onDismiss} className="tw:text-current">
             <X size={14} aria-hidden="true" />
           </IconButton>
         ) : null}
       </div>
+      {kind === "forbidden" ? (
+        <PermissionsModal open={permissionsOpen} role="VIEWER" onClose={() => setPermissionsOpen(false)} />
+      ) : null}
     </div>
   );
 };
+
+/** The global banner slot, led by the load failure when there is one. */
+export const LoadErrorBanner: React.FC<LoadErrorBannerProps> = ({ kind, ...props }) => (
+  <GlobalBannerSlot
+    lead={
+      kind
+        ? {
+            id: kind === "offline" ? BANNER_ID.offline : `load-${kind}`,
+            render: (more) => <LoadErrorBar kind={kind} {...props} more={more} />,
+          }
+        : null
+    }
+  />
+);
 
 export default LoadErrorBanner;

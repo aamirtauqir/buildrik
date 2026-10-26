@@ -261,7 +261,7 @@ describe("Re-send from the panel carries the round's client forward", () => {
     mount(makeComposer(), { onResend });
     await openResend();
     fireEvent.click(await screen.findByRole("button", { name: "Send new review" }));
-    await waitFor(() => expect(onResend).toHaveBeenCalledWith("client@example.test"));
+    await waitFor(() => expect(onResend).toHaveBeenCalledWith("client@example.test", { preview: true }));
   });
 
   it("passes undefined for an internal round, which stays internal", async () => {
@@ -271,7 +271,7 @@ describe("Re-send from the panel carries the round's client forward", () => {
     mount(makeComposer(), { onResend });
     await openResend();
     fireEvent.click(await screen.findByRole("button", { name: "Send new review" }));
-    await waitFor(() => expect(onResend).toHaveBeenCalledWith(undefined));
+    await waitFor(() => expect(onResend).toHaveBeenCalledWith(undefined, { preview: true }));
   });
 
   it("reloads the round after the re-send lands", async () => {
@@ -285,5 +285,24 @@ describe("Re-send from the panel carries the round's client forward", () => {
     expect(await screen.findByText(/Sending round 2…/)).toBeTruthy();
     release();
     await waitFor(() => expect(fetchCurrentRound).toHaveBeenCalledTimes(2));
+  });
+});
+
+describe("Re-send — Play F5.04: a failed preview sends nothing and asks", () => {
+  it("offers Send without preview, which re-sends with preview off", async () => {
+    const { ReviewPreviewError } = await import("@/editor/shell/reviewSend");
+    const onResend = vi
+      .fn()
+      .mockRejectedValueOnce(new ReviewPreviewError(new Error("render")))
+      .mockResolvedValueOnce(undefined);
+    fetchCurrentRound.mockResolvedValue(round({ openCommentCount: 0 }));
+    fetchReviewComments.mockResolvedValue([]);
+    mount(makeComposer(), { onResend });
+    await openResend();
+    fireEvent.click(await screen.findByRole("button", { name: "Send new review" }));
+    expect(await screen.findByText("We couldn’t render a preview")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Send without preview" }));
+    await waitFor(() => expect(onResend).toHaveBeenLastCalledWith("client@example.test", { preview: false }));
+    await waitFor(() => expect(screen.queryByText("We couldn’t render a preview")).toBeNull());
   });
 });

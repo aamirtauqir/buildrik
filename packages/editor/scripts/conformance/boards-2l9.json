@@ -19897,7 +19897,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "phase1 Task 1.6: LoadErrorBanner.tsx:100 copy differs; no Download local copy; mounted above header (AquibraStudio.tsx:668)"
+   "verifiedNote": "L-F S2: Download local copy added (workSnapshot; REQUESTS #15 registers the live project, else the kept unsaved copy). Leads the global slot. Placement under topbar REQUESTS #11. Built, not compared."
   },
   {
    "nodeId": "225:3353",
@@ -19947,7 +19947,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Two surfaces: RecoveryBanner.tsx:132 \"Recovered your work…\" and toast useComposerInit.ts:333-350; board one banner + Discard…"
+   "verifiedNote": "L-F S3: built, not compared. RecoveryBanner is the one surface: board copy (time as \"today 10:12\"), Discard… · Restore my edits. Dashboard kept copy arrives via keptWorkOffer (REQUESTS #16 retires the toast); local draft sentinel uses the same words."
   },
   {
    "nodeId": "225:6003",
@@ -19956,8 +19956,8 @@
    "family": "recovery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "RecoveryBanner.tsx:116 hides when server newer; no Download my copy / Compare banner"
+   "verified": "drift-open",
+   "verifiedNote": "L-F S3: built, not compared. Server newer → board line (author not in the contract: code:no-author) + Download my copy; Compare not offered until CompareHost has a kept-copy source (REQUESTS #16c)."
   },
   {
    "nodeId": "225:6532",
@@ -19966,8 +19966,8 @@
    "family": "recovery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "RecoveryBanner.tsx:116 hides when server time unknown; board shows banner with Download/Compare"
+   "verified": "drift-open",
+   "verifiedNote": "L-F S3: built, not compared. Server unknown → board line + Download my copy; Compare as G08 (REQUESTS #16c)."
   },
   {
    "nodeId": "225:7061",
@@ -19976,8 +19976,8 @@
    "family": "recovery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Discard & reload is immediate (RecoveryBanner.tsx:120-127); no \"Delete the kept copy?\" confirm"
+   "verified": "drift-open",
+   "verifiedNote": "L-F S3: built, not compared. Discard… opens ConfirmDialog \"Delete the kept copy?\" / board body · Cancel · Delete copy (destructive); dashboard discard clears the copy without the conflict latch."
   },
   {
    "nodeId": "225:7600",
@@ -19987,7 +19987,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Offline is a toast (useComposerInit.ts:800) + SaveStatus pill, not the global warning banner"
+   "verifiedNote": "L-F S2: built, not compared. Slot raises the G11 banner from online/offline itself, board copy. The save path's offline toast still fires until REQUESTS #12."
   },
   {
    "nodeId": "225:8126",
@@ -19997,7 +19997,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Toast \"Couldn't reach the server — not saved\" (useComposerInit.ts:800); board banner + Retry now"
+   "verifiedNote": "L-F S2: showCantReachBanner (board copy + Retry now) ready; producer swap is REQUESTS #12. Built, not compared."
   },
   {
    "nodeId": "225:8654",
@@ -20006,8 +20006,8 @@
    "family": "recovery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "scheduleRetry runs silently; no \"Reconnecting… saving N changes\" banner"
+   "verified": "drift-open",
+   "verifiedNote": "L-F S2: showReconnectingBanner (\"Reconnecting… saving {n} changes\", count optional) ready; producer is REQUESTS #12. Built, not compared."
   },
   {
    "nodeId": "225:9180",
@@ -20017,7 +20017,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "ConflictModal.tsx:70 title matches; body :79-80 differs; buttons Reload latest/Save a backup/Overwrite… vs board order + Download a copy"
+   "verifiedNote": "L-F S4: built, not compared. 720 dialog (size lg), board body with the server's time from SAVE_CONFLICT_EVENT (who/count not in the contract: code:conflict-no-author), buttons Overwrite… · Download a copy · Reload latest… (primary, opening focus). Download stays open (workSnapshot)."
   },
   {
    "nodeId": "225:9715",
@@ -20026,8 +20026,8 @@
    "family": "recovery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Reload latest runs immediately (ConflictModal.tsx:90); no class-b confirm"
+   "verified": "drift-open",
+   "verifiedNote": "L-F S4: built, not compared. Reload latest… → \"Reload the latest version?\" + board body · Cancel (focused) · Reload."
   },
   {
    "nodeId": "225:10249",
@@ -20037,7 +20037,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Inline warning ConflictModal.tsx:84-86 + \"Yes, overwrite\"; no \"Before overwrite\" save of the newer version"
+   "verifiedNote": "L-F S4: built, not compared. Overwrite… → board confirm; the server's copy is kept as Saves version \"Before overwrite\" via existing siteVersions.create (versionSync.keepBeforeOverwrite) before onOverwrite."
   },
   {
    "nodeId": "225:10783",
@@ -20046,8 +20046,8 @@
    "family": "recovery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No failure state when keeping the newer version fails"
+   "verified": "drift-open",
+   "verifiedNote": "L-F S4: built, not compared. keepBeforeOverwrite failure → \"Couldn’t keep the newer version — nothing was overwritten.\" · Cancel · Retry; onOverwrite not called."
   },
   {
    "nodeId": "227:7411",
@@ -20057,7 +20057,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Role refusal is a toast (useSaveCallback.ts:105; useComposerInit.ts:325-332); board banner + Download/Ask an admin"
+   "verifiedNote": "L-F S2: showRoleChangedBanner (copy + Download them + Ask an admin) ready, REQUESTS #14; load-time forbidden bar has both actions (Ask an admin opens Permissions, code:no-access-request-api). Built, not compared."
   },
   {
    "nodeId": "227:7943",
@@ -20097,7 +20097,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "phase1 Task 1.6: LoadErrorBanner.tsx:97 says no trash; board + DangerZoneScreen.tsx:326 say Recently deleted 30 days"
+   "verifiedNote": "L-F S2: Download changes added (as G02). Built, not compared."
   },
   {
    "nodeId": "227:10063",
@@ -20157,7 +20157,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "useOtherTabNotice.ts:33-40 persistent toast; board warning banner + \"Edit here\""
+   "verifiedNote": "L-F S2: showOtherTabBanner (board copy) ready, REQUESTS #13 swaps the toast. \"Edit here\" waits on the tab handoff (G29/G30); dismissible meanwhile. Built, not compared."
   },
   {
    "nodeId": "227:13239",
@@ -20186,8 +20186,8 @@
    "family": "recovery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No single banner slot with \"N more\" stacking"
+   "verified": "drift-open",
+   "verifiedNote": "L-F S2: built, not compared. GlobalBannerSlot (shell/GlobalBannerSlot.tsx + globalBanners.ts): one bar, most serious first (error > warning > info), the rest behind \"{n} more ⌄\" popover with their actions. Live at today's LoadErrorBanner mount; under-topbar placement is REQUESTS #11."
   },
   {
    "nodeId": "227:14836",
@@ -21320,7 +21320,7 @@
    "status": "active",
    "authority": "board",
    "verified": "match",
-   "verifiedNote": "Sending state renders snapshot first (SendForReview.tsx:58)."
+   "verifiedNote": "L-F S1: preparing state adopts board copy \"Preparing the review preview…\" / \"Creating the frozen Round {n} snapshot. Nothing has been sent yet.\" (ReviewSentModal). Step executable; built, not compared."
   },
   {
    "nodeId": "307:16107",
@@ -21330,7 +21330,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Preview failure auto-sends without preview (SendForReview.tsx:110); no Try again / Send without preview choice."
+   "verifiedNote": "L-F S1: built, not compared. A render failure now sends nothing and opens ReviewSentModal `preview-failed` (board copy, Cancel · Send without preview · Try again) from SendForReview (shell/reviewSend.ts). Panel re-send path shows the same dialog once AquibraStudio.resendReview throws ReviewPreviewError (REQUESTS #10)."
   },
   {
    "nodeId": "307:16503",
@@ -21340,7 +21340,7 @@
    "status": "active",
    "authority": "board",
    "verified": "match",
-   "verifiedNote": "\"Sending…\" (SendForReview.tsx:60)."
+   "verifiedNote": "L-F S1: \"Sending Round {n}…\" / \"The frozen preview is ready…\" (ReviewSentModal). Step executable; built, not compared."
   },
   {
    "nodeId": "307:16899",
@@ -21800,7 +21800,7 @@
    "status": "active",
    "authority": "board",
    "verified": "match",
-   "verifiedNote": "Send proceeds without preview (SendForReview.tsx:110)."
+   "verifiedNote": "L-F S1: reached only by the designer's \"Send without preview\" now; copy \"No preview will be included…\" (ReviewSentModal). Built, not compared."
   },
   {
    "nodeId": "310:23367",

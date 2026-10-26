@@ -9,6 +9,10 @@
  * link with Copy and Open; the shipped surface drew it only when the mail
  * bounced.
  *
+ * 2L9 Play F5 (2026-10-26) adds the two steps before the send: `preparing`
+ * (F5.03 `307:15711`) and `preview-failed` (F5.04 `307:16107`), and names the
+ * round while sending (F5.05 `307:16503`, F5.42 `310:23087`).
+ *
  * Board geometry (each modal centred on 1440x900):
  *   sending  modal/Sending      440x168 @ 500,366 — spinner + one line
  *   sent     modal/Sent         560x268 @ 440,316 — link row, Emailed-to, 1 button
@@ -25,7 +29,9 @@ import * as React from "react";
 import { Button, ModalRoot, ModalContent, ModalTitle, Spinner, TYPE_BODY_CLASS, TYPE_HINT_CLASS } from "@/editor/chrome-ui";
 import { writeClipboardText } from "@buildrik/shared/browser/clipboard";
 
-export type ReviewSendState = "sending" | "sent" | "email-failed";
+/** `preparing` renders the frozen snapshot; `preview-failed` stops there with
+ *  nothing sent (Play F5.03 / F5.04, 2L9 `307:15711` / `307:16107`). */
+export type ReviewSendState = "preparing" | "preview-failed" | "sending" | "sent" | "email-failed";
 
 export interface ReviewSentModalProps {
   state: ReviewSendState | null;
@@ -38,6 +44,14 @@ export interface ReviewSentModalProps {
   onClose: () => void;
   /** Error state offers a retry of the email. */
   onResend?: () => void;
+  /** The round this send creates, for "Sending Round {n}…". Unknown → generic copy. */
+  roundNumber?: number | null;
+  /** Whether the send carries the frozen preview (F5.05) or goes without (F5.42). */
+  withPreview?: boolean;
+  /** preview-failed: render the preview again. */
+  onRetryPreview?: () => void;
+  /** preview-failed: send the round with no preview. */
+  onSendWithoutPreview?: () => void;
 }
 
 /* The ramp, not hand-picked sizes — `gate:design-debt-ratchet` caught a 17px
@@ -54,6 +68,7 @@ const LINK_TEXT =
 
 export const ReviewSentModal: React.FC<ReviewSentModalProps> = ({
   state, reviewUrl, invitedEmail, versionLabel, onClose, onResend,
+  roundNumber, withPreview = true, onRetryPreview, onSendWithoutPreview,
 }) => {
   const [copied, setCopied] = React.useState(false);
   React.useEffect(() => { setCopied(false); }, [state]);
@@ -79,13 +94,57 @@ export const ReviewSentModal: React.FC<ReviewSentModalProps> = ({
     </div>
   ) : null;
 
-  if (state === "sending") {
+  const round = roundNumber ? `Round ${roundNumber}` : null;
+
+  if (state === "preparing" || state === "sending") {
+    /* Play F5.03 / F5.05 / F5.42: what is happening, and — before the send —
+       that nothing has gone out yet. */
+    const title =
+      state === "preparing" ? "Preparing the review preview…" : round ? `Sending ${round}…` : "Sending for review…";
+    const line =
+      state === "preparing"
+        ? `Creating the frozen ${round ?? "review"} snapshot. Nothing has been sent yet.`
+        : withPreview
+          ? "The frozen preview is ready. Waiting for the review and invitation outcome."
+          : "No preview will be included. Waiting for the review and invitation outcome.";
     return (
       <ModalRoot open onOpenChange={() => { /* busy: not dismissible */ }}>
-        <ModalContent size="question" srTitle="Creating review link">
-          <div className="tw:flex tw:flex-col tw:items-center tw:gap-4 tw:px-6 tw:py-8">
+        <ModalContent size="question" srTitle={title}>
+          <div className="tw:flex tw:flex-col tw:items-center tw:gap-4 tw:px-6 tw:py-8" aria-busy="true">
             <Spinner size="md" />
-            <p className={SUB}>Creating review link…</p>
+            <div className="tw:flex tw:flex-col tw:items-center tw:gap-1 tw:text-center">
+              <p className={`tw:m-0 ${TYPE_BODY_CLASS} tw:font-medium tw:text-[var(--bk-ink)]`}>{title}</p>
+              <p className={SUB}>{line}</p>
+            </div>
+          </div>
+        </ModalContent>
+      </ModalRoot>
+    );
+  }
+
+  if (state === "preview-failed") {
+    /* Play F5.04: the render failed, so the send stops and the designer
+       chooses — it used to go out without a preview, unasked. */
+    return (
+      <ModalRoot open onOpenChange={(next) => { if (!next) onClose(); }}>
+        <ModalContent size="form" srTitle="We couldn’t render a preview">
+          <div className="tw:flex tw:flex-col tw:gap-3 tw:p-6" data-testid="review-preview-failed">
+            <ModalTitle inset={false}>We couldn’t render a preview</ModalTitle>
+            <p className={SUB}>Your client would see no pages. Nothing was sent. Your email and note are kept.</p>
+            <div className="tw:mt-2 tw:flex tw:justify-end tw:gap-2">
+              <Button
+                color="light"
+                size="xs"
+                onClick={onClose}
+                className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
+              >
+                Cancel
+              </Button>
+              {onSendWithoutPreview ? (
+                <Button color="light" size="xs" onClick={onSendWithoutPreview}>Send without preview</Button>
+              ) : null}
+              {onRetryPreview ? <Button size="xs" onClick={onRetryPreview}>Try again</Button> : null}
+            </div>
           </div>
         </ModalContent>
       </ModalRoot>
