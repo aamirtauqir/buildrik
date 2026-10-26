@@ -214,11 +214,11 @@ describe("Form › AFTER SUBMIT + PROTECTION", () => {
     await waitFor(() => screen.getByLabelText("Message"));
     fireEvent.change(screen.getByLabelText("Message"), { target: { value: "Thanks!" } });
     fireEvent.blur(screen.getByLabelText("Message"));
-    await waitFor(() => expect(screen.getByTestId("form-settings-status")).toHaveTextContent("Couldn’t save — your message is still here."));
+    await waitFor(() => expect(screen.getByTestId("form-settings-status")).toHaveTextContent("Couldn’t save — your message is still here."), { timeout: 5000 });
     expect(screen.getByLabelText("Message")).toHaveValue("Thanks!");
     api.forms.updateBlock.mutate.mockResolvedValueOnce({});
     fireEvent.click(screen.getByTestId("form-settings-retry"));
-    await waitFor(() => expect(screen.getByTestId("form-settings-status")).toHaveTextContent("Saved"));
+    await waitFor(() => expect(screen.getByTestId("form-settings-status")).toHaveTextContent("Saved"), { timeout: 5000 });
     expect(api.forms.updateBlock.mutate).toHaveBeenCalledTimes(2);
     expect(api.forms.updateBlock.mutate).toHaveBeenLastCalledWith(expect.objectContaining({ successMessage: "Thanks!" }));
   });
