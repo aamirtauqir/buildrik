@@ -19941,7 +19941,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Two surfaces: RecoveryBanner.tsx:132 \"Recovered your work…\" and toast useComposerInit.ts:333-350; board one banner + Discard…"
+   "verifiedNote": "L-F S3: built, not compared. RecoveryBanner is the one surface: board copy (time as \"today 10:12\"), Discard… · Restore my edits. Dashboard kept copy arrives via keptWorkOffer (REQUESTS #16 retires the toast); local draft sentinel uses the same words."
   },
   {
    "nodeId": "225:6003",
@@ -19950,8 +19950,8 @@
    "family": "recovery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "RecoveryBanner.tsx:116 hides when server newer; no Download my copy / Compare banner"
+   "verified": "drift-open",
+   "verifiedNote": "L-F S3: built, not compared. Server newer → board line (author not in the contract: code:no-author) + Download my copy; Compare not offered until CompareHost has a kept-copy source (REQUESTS #16c)."
   },
   {
    "nodeId": "225:6532",
@@ -19960,8 +19960,8 @@
    "family": "recovery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "RecoveryBanner.tsx:116 hides when server time unknown; board shows banner with Download/Compare"
+   "verified": "drift-open",
+   "verifiedNote": "L-F S3: built, not compared. Server unknown → board line + Download my copy; Compare as G08 (REQUESTS #16c)."
   },
   {
    "nodeId": "225:7061",
@@ -19970,8 +19970,8 @@
    "family": "recovery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Discard & reload is immediate (RecoveryBanner.tsx:120-127); no \"Delete the kept copy?\" confirm"
+   "verified": "drift-open",
+   "verifiedNote": "L-F S3: built, not compared. Discard… opens ConfirmDialog \"Delete the kept copy?\" / board body · Cancel · Delete copy (destructive); dashboard discard clears the copy without the conflict latch."
   },
   {
    "nodeId": "225:7600",
