@@ -13316,8 +13316,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Uses GAP-FM07 copy ('…will be removed from … This cannot be undone.', 'Delete 2 permanently'); S14 draws 'Submissions can't be restored…' + ghost red 'Delete'. | prior: Built, not compared: bulk delete confirm — 'Delete {n} submission(s) permanently?' (copy per GAP-FM07, which supersedes S14's shorter body), Cancel · 'Delete {n} permanently', destructive, dialog-sm."
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27: shots/238-13898.png vs probe Form submissions (2 selected → Delete 2) — 480 dialog, \"Delete 2 submissions permanently?\", \"Submissions can’t be restored after they’re deleted.\", Cancel (focused) · outline \"Delete\" in error ink. Title 20 vs board ~16 (shared Modal title)."
   },
   {
    "nodeId": "238:14186",
@@ -14344,8 +14344,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Copy matches ('Your selection and filters are unchanged.'; fixture line rightly absent); 'Back to submissions' is an outline button, board primary blue. | prior: Built, not compared: 'CSV ready' / '{n} submissions · {Form} · {View}. Your selection and filters are unchanged.' / Back to submissions; the file downloads (the board's 'Prototype fixture' line is not product copy). Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server"
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27: shots/272-24319.png vs probe Export CSV → 'CSV ready' — 640 dialog, '<n> submissions · <form> · <view>. Your selection and filters are unchanged.', primary 'Back to submissions'. The board's 'Prototype fixture' line is not product copy."
   },
   {
    "nodeId": "272:24592",
@@ -14467,7 +14467,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Ack copy matches ('1 submission moved from Spam to Inbox.') but drawn as a bordered green banner 1091x40, board a plain green text line. | prior: Built, not compared: '{n} submission(s) moved from {Spam|Archived} to Inbox.' above the list."
+   "verifiedNote": "Wave 3: the acknowledgement is a plain success-ink text line as drawn (was a bordered banner); built, not probe-compared."
   },
   {
    "nodeId": "272:27718",
@@ -15946,7 +15946,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Spam tab, filter, Export/'Choose a form to configure' agree; helper 'Select a single form…' sits above the list (y=255), board puts it under 'Showing…'. Spam empty (data). | prior: Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (dataset) not walked."
+   "verifiedNote": "Wave 3: 'Select a single form before configuring it in Inspector.' moved under the list as drawn; probe-checked position only (forms probe 2026-10-27); Spam data state not rendered."
   },
   {
    "nodeId": "277:337275",
@@ -16282,9 +16282,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "open:board-conflict-csv-copy",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — 'CSV ready' layout matches; body says 'Your selection and filters are unchanged.' (board: 'Your filters and selection are kept.'); Back to submissions is outline, board primary. | prior: Built, not compared: 'CSV ready' / '{n} submissions · {Form} · {View}. Your selection and filters are unchanged.' / Back to submissions; the file downloads (the board's 'Prototype fixture' line is not product copy). Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server"
+   "verifiedNote": "Primary 'Back to submissions' now as drawn; body copy conflicts with 272:24319 ('Your filters and selection are kept.' vs 'Your selection and filters are unchanged.') — 272:24319's kept; owner to pick."
   },
   {
    "nodeId": "277:346746",
@@ -16312,9 +16312,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "open:board-conflict-delete-confirm",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Title and body match; action reads 'Delete 2 permanently' in red destructive, board 'Delete permanently' in primary blue. | prior: Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Delete-confirm) not walked."
+   "verifiedNote": "Boards disagree on one dialog: B8-S14 (P2) draws the short consequence copy with an outline red 'Delete'; GAP-FMC/FM07 draw the names + context and a primary 'Delete permanently'. S14 adopted (higher tier); owner to pick."
   },
   {
    "nodeId": "277:347673",

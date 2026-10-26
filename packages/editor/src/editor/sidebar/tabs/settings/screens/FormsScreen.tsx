@@ -30,7 +30,7 @@
 
 import * as React from "react";
 import { createBuildrikApiClient } from "@/services/api-client";
-import { LoadCard, SET_BTN, SET_CARD, SCREEN_EMPTY, SCREEN_SUCCESS, Screen, SaveErrorBanner, Select } from "../shared";
+import { LoadCard, SET_BTN, SET_CARD, SCREEN_EMPTY, Screen, SaveErrorBanner, Select } from "../shared";
 import type { ScreenProps } from "../types";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { EVENTS } from "@/shared/constants/events";
@@ -393,11 +393,7 @@ export const FormsScreen: React.FC<ScreenProps> = ({ composer, projectId, onDirt
         confirmLabel: `Delete ${n} permanently`,
       };
     }
-    return {
-      title: `Delete ${plural(n, "submission")} permanently?`,
-      message: `${namesOf(deleteDialog.ids)} will be removed from ${where}. This cannot be undone.`,
-      confirmLabel: `Delete ${n} permanently`,
-    };
+    return null;
   })();
 
   return (
@@ -462,14 +458,9 @@ export const FormsScreen: React.FC<ScreenProps> = ({ composer, projectId, onDirt
           {chosenForm ? "Configure in Inspector" : "Choose a form to configure"}
         </Button>
       </div>
-      {!chosenForm ? (
-        <p className={MUTED_12} data-testid="set-forms-configure-hint">
-          Select a single form before configuring it in Inspector.
-        </p>
-      ) : null}
 
       {ack ? (
-        <div className={SCREEN_SUCCESS} role="status" data-testid="set-forms-ack">
+        <div className="tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-success-text)]" role="status" data-testid="set-forms-ack">
           {ack}
         </div>
       ) : null}
@@ -627,12 +618,49 @@ export const FormsScreen: React.FC<ScreenProps> = ({ composer, projectId, onDirt
             ) : null}
           </div>
         ) : null}
+        {/* GAP-FMC 277:336979: the configure hint sits under the list. */}
+        {!chosenForm ? (
+          <p className={MUTED_12} data-testid="set-forms-configure-hint">
+            Select a single form before configuring it in Inspector.
+          </p>
+        ) : null}
       </section>
 
       <p className={`${MUTED_12} tw:mt-auto`} data-testid="set-forms-retention">
         Submissions are kept 365 days, then permanently deleted.
       </p>
 
+      {/* B8-S14 238:13898: the consequence confirm — Cancel first (the focus),
+          then an outline "Delete" in the error ink. */}
+      <Modal
+        open={deleteDialog?.phase === "confirm"}
+        onClose={() => setDeleteDialog(null)}
+        title={`Delete ${plural(deleteDialog?.ids.length ?? 0, "submission")} permanently?`}
+        width="sm"
+        dismissOnScrimClick={false}
+        testId="set-forms-delete-confirm"
+        footer={
+          <>
+            <Button type="button" size="xs" variant="secondary" className={SET_BTN} onClick={() => setDeleteDialog(null)} data-testid="set-forms-delete-cancel">
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              size="xs"
+              variant="secondary"
+              className={`${SET_BTN} tw:text-[var(--bk-error)]`}
+              onClick={() => {
+                if (deleteDialog) void deleteSelected(deleteDialog.ids);
+              }}
+              data-testid="set-forms-delete-ok"
+            >
+              Delete
+            </Button>
+          </>
+        }
+      >
+        <p className={MUTED_13}>Submissions can’t be restored after they’re deleted.</p>
+      </Modal>
       <ConfirmDialog
         open={dialog !== null}
         onClose={() => {
@@ -653,11 +681,11 @@ export const FormsScreen: React.FC<ScreenProps> = ({ composer, projectId, onDirt
         open={exportState?.phase === "preparing" || exportState?.phase === "ready"}
         onClose={() => setExportState(null)}
         title={exportState?.phase === "ready" ? "CSV ready" : "Preparing CSV…"}
-        width="sm"
+        width="lg"
         testId="set-forms-export-dialog"
         footer={
           exportState?.phase === "ready" ? (
-            <Button type="button" size="xs" variant="secondary" className={SET_BTN} onClick={() => setExportState(null)}>
+            <Button type="button" size="xs" className={SET_BTN} onClick={() => setExportState(null)}>
               Back to submissions
             </Button>
           ) : null

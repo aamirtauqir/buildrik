@@ -303,11 +303,13 @@ describe("FormsScreen — bulk delete asks first (GAP-FM07–10)", () => {
     fireEvent.click(screen.getByTestId("set-forms-delete"));
   }
 
-  it("does NOT reach the server on the first click, and names what goes where", async () => {
+  it("does NOT reach the server on the first click; asks with B8-S14's copy, Cancel first", async () => {
     await ready();
     expect(api.forms.deleteSubmission.mutate).not.toHaveBeenCalled();
     expect(screen.getByText("Delete 2 submissions permanently?")).toBeInTheDocument();
-    expect(screen.getByText("Mara Lenz and Jonas Peters will be removed from All forms · Inbox. This cannot be undone.")).toBeInTheDocument();
+    expect(screen.getByText("Submissions can’t be restored after they’re deleted.")).toBeInTheDocument();
+    const foot = screen.getByTestId("modal-foot-set-forms-delete-confirm");
+    expect(Array.from(foot.querySelectorAll("button")).map((b) => b.textContent)).toEqual(["Cancel", "Delete"]);
   });
 
   it("Cancel leaves them; confirming deletes both and acknowledges (FM09)", async () => {
@@ -316,7 +318,7 @@ describe("FormsScreen — bulk delete asks first (GAP-FM07–10)", () => {
     await waitFor(() => expect(screen.queryByText("Delete 2 submissions permanently?")).toBeNull());
     expect(api.forms.deleteSubmission.mutate).not.toHaveBeenCalled();
     fireEvent.click(screen.getByTestId("set-forms-delete"));
-    fireEvent.click(screen.getByRole("button", { name: "Delete 2 permanently" }));
+    fireEvent.click(screen.getByTestId("set-forms-delete-ok"));
     await waitFor(() => expect(api.forms.deleteSubmission.mutate).toHaveBeenCalledTimes(2));
     expect(await screen.findByTestId("set-forms-ack")).toHaveTextContent("2 submissions permanently deleted.");
   });
@@ -325,7 +327,7 @@ describe("FormsScreen — bulk delete asks first (GAP-FM07–10)", () => {
     let release!: () => void;
     api.forms.deleteSubmission.mutate.mockImplementation(() => new Promise((r) => (release = () => r({}))));
     await ready();
-    fireEvent.click(screen.getByRole("button", { name: "Delete 2 permanently" }));
+    fireEvent.click(screen.getByTestId("set-forms-delete-ok"));
     expect(await screen.findByText("Deleting 2 submissions…")).toBeInTheDocument();
     expect(screen.getByText(/remain listed until deletion is confirmed/)).toBeInTheDocument();
     await act(async () => release());
@@ -334,7 +336,7 @@ describe("FormsScreen — bulk delete asks first (GAP-FM07–10)", () => {
   it("a failed delete keeps the selection and offers Try again (FM10)", async () => {
     api.forms.deleteSubmission.mutate.mockRejectedValue(new Error("503"));
     await ready();
-    fireEvent.click(screen.getByRole("button", { name: "Delete 2 permanently" }));
+    fireEvent.click(screen.getByTestId("set-forms-delete-ok"));
     expect(await screen.findByText("Couldn’t delete the submissions")).toBeInTheDocument();
     expect(screen.getByText("Both submissions are still in All forms · Inbox. Your selection is kept.")).toBeInTheDocument();
     expect(screen.getByTestId("set-forms-selected")).toHaveTextContent("2 selected");
