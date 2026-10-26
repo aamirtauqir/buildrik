@@ -82,4 +82,11 @@ describe("census", () => {
     expect(out.families.editor).toEqual({ total: 1, done: 0 });
     expect(out.families.cms).toEqual({ total: 1, done: 1 });
   });
+
+  it("--tier counts and lists only that tier's rows", () => {
+    const r = run({ boards: [row({ tier: "P1" }), row({ nodeId: "2:2", tier: "P3" })] }, ["--tier", "P1", "--json"]);
+    const out = JSON.parse(r.stdout);
+    expect(out.open.map((o) => o.nodeId)).toEqual(["1:1"]);
+    expect(out.tiers).toEqual({ P1: { total: 1, done: 0 } });
+  });
 });
