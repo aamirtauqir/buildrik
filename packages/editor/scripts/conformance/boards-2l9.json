@@ -13306,8 +13306,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/FormsScreen.tsx:92 — single all-forms inbox; no form filter, bulk select, \"Delete n\""
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared 2026-10-26: SettingsTab on Form submissions in a temporary probe case (1440x900, port 5175, tRPC stubbed via page.route; Contact filter, 2 rows selected) vs board screenshot: views Inbox·Spam·Archived (current filled), \"Form: Contact\" select + \"Inbox · 24 submissions\" + Export CSV + Configure in Inspector, \"Submissions · Contact\", bordered 64px rows (checkbox \"Select {from}\" · \"{from} · {form}\" · message over \"{d Mon} · {View}\"), \"2 selected\" · \"Delete 2\", \"Showing 3 of 24 · sorted newest first\", retention line. Kept from code: Prev/Next paging over 20 (code-ahead). Pane body ground is gray-50 vs board white (E4). Settings host/nav drift on the same board is tracked separately (lane-E E4 + REQUESTS)."
   },
   {
    "nodeId": "238:13898",
@@ -13317,7 +13317,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/FormsScreen.tsx:92 — single all-forms inbox; no form filter, bulk select, \"Delete n\""
+   "verifiedNote": "Built, not compared: bulk delete confirm — 'Delete {n} submission(s) permanently?' (copy per GAP-FM07, which supersedes S14's shorter body), Cancel · 'Delete {n} permanently', destructive, dialog-sm."
   },
   {
    "nodeId": "238:14186",
@@ -14227,8 +14227,9 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "no Spam/Archived views or form filter (server listSubmissions supports them)"
+   "verified": "drift-fixed",
+   "verifiedNote": "Same screen in the Spam / Archived view: count line and row status follow the view; the selection bar adds Unspam / Unarchive. Settings host/nav drift on the same board is tracked separately (lane-E E4 + REQUESTS).",
+   "inheritsFrom": "238:13598"
   },
   {
    "nodeId": "272:21455",
@@ -14237,8 +14238,9 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "no Spam/Archived views or form filter (server listSubmissions supports them)"
+   "verified": "drift-fixed",
+   "verifiedNote": "Same screen in the Spam / Archived view: count line and row status follow the view; the selection bar adds Unspam / Unarchive. Settings host/nav drift on the same board is tracked separately (lane-E E4 + REQUESTS).",
+   "inheritsFrom": "238:13598"
   },
   {
    "nodeId": "272:21754",
@@ -14247,8 +14249,9 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "no Spam/Archived views or form filter (server listSubmissions supports them)"
+   "verified": "drift-fixed",
+   "verifiedNote": "Same screen, different selection/filter state (0 selected; All forms → \"Choose a form to configure\" + \"Select a single form before configuring it in Inspector.\"). Settings host/nav drift on the same board is tracked separately (lane-E E4 + REQUESTS).",
+   "inheritsFrom": "238:13598"
   },
   {
    "nodeId": "272:22068",
@@ -14257,8 +14260,9 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/FormsScreen.tsx:92 — all-forms inbox + detail + delete exist; per-form header, bulk select, counts differ"
+   "verified": "drift-fixed",
+   "verifiedNote": "Same screen, different selection/filter state (0 selected; All forms → \"Choose a form to configure\" + \"Select a single form before configuring it in Inspector.\"). Settings host/nav drift on the same board is tracked separately (lane-E E4 + REQUESTS).",
+   "inheritsFrom": "238:13598"
   },
   {
    "nodeId": "272:22382",
@@ -14267,8 +14271,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "no Spam/Archived views or form filter (server listSubmissions supports them)"
+   "verified": "drift-open",
+   "verifiedNote": "Built differently: the form filter is the settings Select (native options 'Form: All forms' / 'Form: {name}'); the board's 'Filter submissions' popover with its explanatory line and Cancel is not drawn. Lead/owner: popover vs select."
   },
   {
    "nodeId": "272:22660",
@@ -14278,7 +14282,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/FormsScreen.tsx:92 — all-forms inbox + detail + delete exist; per-form header, bulk select, counts differ"
+   "verifiedNote": "Not adopted yet: the detail opens inline under the row (fields, Mark spam, Archive); the board opens it as its own view with 'Back to submissions'."
   },
   {
    "nodeId": "272:22932",
@@ -14288,7 +14292,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/FormsScreen.tsx:92 — all-forms inbox + detail + delete exist; per-form header, bulk select, counts differ"
+   "verifiedNote": "Built, not compared: 'Delete 2 submissions permanently?' / '{names} will be removed from {Form} · {View}. This cannot be undone.' / Cancel · 'Delete 2 permanently'."
   },
   {
    "nodeId": "272:23206",
@@ -14298,7 +14302,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/FormsScreen.tsx:188 — error line exists; selection-kept + pending states differ"
+   "verifiedNote": "Built, not compared (pending state): 'Deleting {n} submissions…' + 'remain listed until deletion is confirmed. No Undo is offered…'. No 'Check status' — deletes are synchronous per-row mutations; nothing to poll."
   },
   {
    "nodeId": "272:23475",
@@ -14308,7 +14312,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/FormsScreen.tsx:92 — all-forms inbox + detail + delete exist; per-form header, bulk select, counts differ"
+   "verifiedNote": "Built, not compared: acknowledgement '{n} submissions permanently deleted.' above the list; selection cleared."
   },
   {
    "nodeId": "272:23770",
@@ -14318,7 +14322,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/FormsScreen.tsx:188 — error line exists; selection-kept + pending states differ"
+   "verifiedNote": "Built, not compared (error state): 'Couldn’t delete the submissions' / '{Both|n} submissions are still in {Form} · {View}. Your selection is kept.' / Cancel · Try again; failed rows stay selected."
   },
   {
    "nodeId": "272:24050",
@@ -14327,8 +14331,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "view-aware export needs server (exportSubmissions has no view, server/trpc/routers/forms.ts:91)"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (pending): 'Preparing CSV…' dialog with '{Form} · {View} · {n} submissions. All matching rows will be exported, including those not selected.' No 'Check status' — the export is one synchronous query. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "272:24319",
@@ -14337,8 +14341,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "view-aware export needs server (exportSubmissions has no view, server/trpc/routers/forms.ts:91)"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: 'CSV ready' / '{n} submissions · {Form} · {View}. Your selection and filters are unchanged.' / Back to submissions; the file downloads (the board's 'Prototype fixture' line is not product copy). Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "272:24592",
@@ -14347,8 +14351,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "view-aware export needs server (exportSubmissions has no view, server/trpc/routers/forms.ts:91)"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (error state): 'Couldn’t export submissions' / 'No CSV was created. Your filters and selection are kept.' / Cancel · Try again. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "272:24871",
@@ -14357,8 +14361,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "view-aware export needs server (exportSubmissions has no view, server/trpc/routers/forms.ts:91)"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (pending): 'Preparing CSV…' dialog with '{Form} · {View} · {n} submissions. All matching rows will be exported, including those not selected.' No 'Check status' — the export is one synchronous query. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "272:25119",
@@ -14367,8 +14371,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "view-aware export needs server (exportSubmissions has no view, server/trpc/routers/forms.ts:91)",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: 'CSV ready' / '{n} submissions · {Form} · {View}. Your selection and filters are unchanged.' / Back to submissions; the file downloads (the board's 'Prototype fixture' line is not product copy). Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice).",
    "inheritsFrom": "272:24319"
   },
   {
@@ -14378,8 +14382,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "view-aware export needs server (exportSubmissions has no view, server/trpc/routers/forms.ts:91)"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (error state): 'Couldn’t export submissions' / 'No CSV was created. Your filters and selection are kept.' / Cancel · Try again. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "272:25629",
@@ -14388,8 +14392,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "view-aware export needs server (exportSubmissions has no view, server/trpc/routers/forms.ts:91)"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (pending): 'Preparing CSV…' dialog with '{Form} · {View} · {n} submissions. All matching rows will be exported, including those not selected.' No 'Check status' — the export is one synchronous query. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "272:25877",
@@ -14398,8 +14402,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "view-aware export needs server (exportSubmissions has no view, server/trpc/routers/forms.ts:91)",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: 'CSV ready' / '{n} submissions · {Form} · {View}. Your selection and filters are unchanged.' / Back to submissions; the file downloads (the board's 'Prototype fixture' line is not product copy). Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice).",
    "inheritsFrom": "272:24319"
   },
   {
@@ -14409,8 +14413,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "view-aware export needs server (exportSubmissions has no view, server/trpc/routers/forms.ts:91)"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (error state): 'Couldn’t export submissions' / 'No CSV was created. Your filters and selection are kept.' / Cancel · Try again. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "272:26387",
@@ -14420,7 +14424,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/FormsScreen.tsx:192 — Export CSV exists; preparing/ready/failed copy differs"
+   "verifiedNote": "Built, not compared (pending): 'Preparing CSV…' dialog with '{Form} · {View} · {n} submissions. All matching rows will be exported, including those not selected.' No 'Check status' — the export is one synchronous query. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "272:26650",
@@ -14430,7 +14434,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/FormsScreen.tsx:192 — Export CSV exists; preparing/ready/failed copy differs"
+   "verifiedNote": "Built, not compared: 'CSV ready' / '{n} submissions · {Form} · {View}. Your selection and filters are unchanged.' / Back to submissions; the file downloads (the board's 'Prototype fixture' line is not product copy). Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "272:26917",
@@ -14440,7 +14444,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/FormsScreen.tsx:192 — Export CSV exists; preparing/ready/failed copy differs"
+   "verifiedNote": "Built, not compared (error state): 'Couldn’t export submissions' / 'No CSV was created. Your filters and selection are kept.' / Cancel · Try again. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "272:27190",
@@ -14449,8 +14453,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "no Unspam/Unarchive actions (updateSubmission supports isSpam/isArchived)"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (pending): the Unspam/Unarchive button reads 'Unspam {n} submission(s)…' while it runs; the board's pending dialog ('stays in Spam until the server confirms') is not drawn."
   },
   {
    "nodeId": "272:27440",
@@ -14459,8 +14463,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "no Unspam/Unarchive actions (updateSubmission supports isSpam/isArchived)"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: '{n} submission(s) moved from {Spam|Archived} to Inbox.' above the list."
   },
   {
    "nodeId": "272:27718",
@@ -14469,8 +14473,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "no Unspam/Unarchive actions (updateSubmission supports isSpam/isArchived)"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (error state): 'Couldn’t move the submission(s)' / 'The submission is still in {View}. Your selection is kept.' / Cancel · Try again."
   },
   {
    "nodeId": "272:27978",
@@ -14479,8 +14483,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "no Unspam/Unarchive actions (updateSubmission supports isSpam/isArchived)"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (pending): the Unspam/Unarchive button reads 'Unspam {n} submission(s)…' while it runs; the board's pending dialog ('stays in Spam until the server confirms') is not drawn."
   },
   {
    "nodeId": "272:28228",
@@ -14489,8 +14493,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "no Unspam/Unarchive actions (updateSubmission supports isSpam/isArchived)",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: '{n} submission(s) moved from {Spam|Archived} to Inbox.' above the list.",
    "inheritsFrom": "272:27440"
   },
   {
@@ -14500,8 +14504,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "no Unspam/Unarchive actions (updateSubmission supports isSpam/isArchived)"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (error state): 'Couldn’t move the submission(s)' / 'The submission is still in {View}. Your selection is kept.' / Cancel · Try again."
   },
   {
    "nodeId": "272:28766",
@@ -14511,7 +14515,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/FormsScreen.tsx:7 — Configure in Inspector exists; no \"‹ Back to submissions\" return"
+   "verifiedNote": "Not built: '‹ Back to submissions · {Form} / {View}' return band in the Inspector after Configure needs the Inspector/shell (not lane-E paths) — request candidate."
   },
   {
    "nodeId": "272:29123",
@@ -15938,8 +15942,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (dataset) not walked."
   },
   {
    "nodeId": "277:337275",
@@ -15948,8 +15952,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (dataset) not walked.",
    "inheritsFrom": "277:336979"
   },
   {
@@ -15959,8 +15963,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (dataset) not walked.",
    "inheritsFrom": "277:336979"
   },
   {
@@ -15970,8 +15974,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (dataset) not walked.",
    "inheritsFrom": "277:336979"
   },
   {
@@ -15981,8 +15985,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (dataset) not walked.",
    "inheritsFrom": "277:336979"
   },
   {
@@ -15992,8 +15996,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (dataset) not walked.",
    "inheritsFrom": "277:336979"
   },
   {
@@ -16003,8 +16007,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (dataset) not walked.",
    "inheritsFrom": "277:336979"
   },
   {
@@ -16014,8 +16018,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (dataset) not walked.",
    "inheritsFrom": "277:336979"
   },
   {
@@ -16025,8 +16029,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (dataset) not walked.",
    "inheritsFrom": "277:336979"
   },
   {
@@ -16036,8 +16040,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (dataset) not walked.",
    "inheritsFrom": "277:336979"
   },
   {
@@ -16047,8 +16051,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (dataset) not walked.",
    "inheritsFrom": "277:336979"
   },
   {
@@ -16058,8 +16062,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (dataset) not walked.",
    "inheritsFrom": "277:336979"
   },
   {
@@ -16069,8 +16073,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (dataset) not walked.",
    "inheritsFrom": "277:336979"
   },
   {
@@ -16080,8 +16084,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (dataset) not walked.",
    "inheritsFrom": "277:336979"
   },
   {
@@ -16091,8 +16095,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (dataset) not walked.",
    "inheritsFrom": "277:336979"
   },
   {
@@ -16102,8 +16106,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (dataset) not walked.",
    "inheritsFrom": "277:336979"
   },
   {
@@ -16113,8 +16117,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (dataset) not walked.",
    "inheritsFrom": "277:336979"
   },
   {
@@ -16124,8 +16128,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (dataset) not walked.",
    "inheritsFrom": "277:336979"
   },
   {
@@ -16135,8 +16139,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (dataset) not walked.",
    "inheritsFrom": "277:336979"
   },
   {
@@ -16146,8 +16150,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (dataset) not walked.",
    "inheritsFrom": "277:336979"
   },
   {
@@ -16157,8 +16161,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (dataset) not walked.",
    "inheritsFrom": "277:336979"
   },
   {
@@ -16168,8 +16172,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (dataset) not walked.",
    "inheritsFrom": "277:336979"
   },
   {
@@ -16179,8 +16183,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (dataset) not walked.",
    "inheritsFrom": "277:336979"
   },
   {
@@ -16190,8 +16194,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (dataset) not walked.",
    "inheritsFrom": "277:336979"
   },
   {
@@ -16201,8 +16205,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (dataset) not walked.",
    "inheritsFrom": "277:336979"
   },
   {
@@ -16212,8 +16216,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (dataset) not walked.",
    "inheritsFrom": "277:336979"
   },
   {
@@ -16223,8 +16227,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (dataset) not walked.",
    "inheritsFrom": "277:336979"
   },
   {
@@ -16234,8 +16238,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (dataset) not walked.",
    "inheritsFrom": "277:336979"
   },
   {
@@ -16245,8 +16249,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (dataset) not walked.",
    "inheritsFrom": "277:336979"
   },
   {
@@ -16256,8 +16260,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Filter) not walked."
   },
   {
    "nodeId": "277:346192",
@@ -16266,8 +16270,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (pending): 'Preparing CSV…' dialog with '{Form} · {View} · {n} submissions. All matching rows will be exported, including those not selected.' No 'Check status' — the export is one synchronous query. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:346467",
@@ -16276,8 +16280,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: 'CSV ready' / '{n} submissions · {Form} · {View}. Your selection and filters are unchanged.' / Back to submissions; the file downloads (the board's 'Prototype fixture' line is not product copy). Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:346746",
@@ -16286,8 +16290,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (error state): 'Couldn’t export submissions' / 'No CSV was created. Your filters and selection are kept.' / Cancel · Try again. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:347031",
@@ -16296,8 +16300,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Configure) not walked."
   },
   {
    "nodeId": "277:347389",
@@ -16306,8 +16310,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Delete-confirm) not walked."
   },
   {
    "nodeId": "277:347673",
@@ -16316,8 +16320,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Delete-pending) not walked."
   },
   {
    "nodeId": "277:347952",
@@ -16326,8 +16330,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Delete-failed) not walked."
   },
   {
    "nodeId": "277:348244",
@@ -16336,8 +16340,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Filter) not walked.",
    "inheritsFrom": "277:345909"
   },
   {
@@ -16347,8 +16351,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (pending): 'Preparing CSV…' dialog with '{Form} · {View} · {n} submissions. All matching rows will be exported, including those not selected.' No 'Check status' — the export is one synchronous query. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:348760",
@@ -16357,8 +16361,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: 'CSV ready' / '{n} submissions · {Form} · {View}. Your selection and filters are unchanged.' / Back to submissions; the file downloads (the board's 'Prototype fixture' line is not product copy). Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice).",
    "inheritsFrom": "277:346467"
   },
   {
@@ -16368,8 +16372,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (error state): 'Couldn’t export submissions' / 'No CSV was created. Your filters and selection are kept.' / Cancel · Try again. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:349282",
@@ -16378,8 +16382,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Configure) not walked.",
    "inheritsFrom": "277:347031"
   },
   {
@@ -16389,8 +16393,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Delete-confirm) not walked.",
    "inheritsFrom": "277:347389"
   },
   {
@@ -16400,8 +16404,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Delete-pending) not walked."
   },
   {
    "nodeId": "277:350161",
@@ -16410,8 +16414,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Delete-failed) not walked."
   },
   {
    "nodeId": "277:350433",
@@ -16420,8 +16424,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Filter) not walked.",
    "inheritsFrom": "277:345909"
   },
   {
@@ -16431,8 +16435,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (pending): 'Preparing CSV…' dialog with '{Form} · {View} · {n} submissions. All matching rows will be exported, including those not selected.' No 'Check status' — the export is one synchronous query. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:350949",
@@ -16441,8 +16445,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: 'CSV ready' / '{n} submissions · {Form} · {View}. Your selection and filters are unchanged.' / Back to submissions; the file downloads (the board's 'Prototype fixture' line is not product copy). Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice).",
    "inheritsFrom": "277:346467"
   },
   {
@@ -16452,8 +16456,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (error state): 'Couldn’t export submissions' / 'No CSV was created. Your filters and selection are kept.' / Cancel · Try again. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:351471",
@@ -16462,8 +16466,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Configure) not walked.",
    "inheritsFrom": "277:347031"
   },
   {
@@ -16473,8 +16477,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Delete-confirm) not walked.",
    "inheritsFrom": "277:347389"
   },
   {
@@ -16484,8 +16488,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Delete-pending) not walked."
   },
   {
    "nodeId": "277:352350",
@@ -16494,8 +16498,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Delete-failed) not walked."
   },
   {
    "nodeId": "277:352622",
@@ -16504,8 +16508,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Filter) not walked.",
    "inheritsFrom": "277:345909"
   },
   {
@@ -16515,8 +16519,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (pending): 'Preparing CSV…' dialog with '{Form} · {View} · {n} submissions. All matching rows will be exported, including those not selected.' No 'Check status' — the export is one synchronous query. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:353168",
@@ -16525,8 +16529,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: 'CSV ready' / '{n} submissions · {Form} · {View}. Your selection and filters are unchanged.' / Back to submissions; the file downloads (the board's 'Prototype fixture' line is not product copy). Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice).",
    "inheritsFrom": "277:346467"
   },
   {
@@ -16536,8 +16540,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (error state): 'Couldn’t export submissions' / 'No CSV was created. Your filters and selection are kept.' / Cancel · Try again. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:353724",
@@ -16546,8 +16550,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Filter) not walked.",
    "inheritsFrom": "277:345909"
   },
   {
@@ -16557,8 +16561,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (pending): 'Preparing CSV…' dialog with '{Form} · {View} · {n} submissions. All matching rows will be exported, including those not selected.' No 'Check status' — the export is one synchronous query. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:354234",
@@ -16567,8 +16571,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: 'CSV ready' / '{n} submissions · {Form} · {View}. Your selection and filters are unchanged.' / Back to submissions; the file downloads (the board's 'Prototype fixture' line is not product copy). Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice).",
    "inheritsFrom": "277:346467"
   },
   {
@@ -16578,8 +16582,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (error state): 'Couldn’t export submissions' / 'No CSV was created. Your filters and selection are kept.' / Cancel · Try again. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:354754",
@@ -16588,8 +16592,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Filter) not walked.",
    "inheritsFrom": "277:345909"
   },
   {
@@ -16599,8 +16603,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (pending): 'Preparing CSV…' dialog with '{Form} · {View} · {n} submissions. All matching rows will be exported, including those not selected.' No 'Check status' — the export is one synchronous query. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:355264",
@@ -16609,8 +16613,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: 'CSV ready' / '{n} submissions · {Form} · {View}. Your selection and filters are unchanged.' / Back to submissions; the file downloads (the board's 'Prototype fixture' line is not product copy). Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice).",
    "inheritsFrom": "277:346467"
   },
   {
@@ -16620,8 +16624,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (error state): 'Couldn’t export submissions' / 'No CSV was created. Your filters and selection are kept.' / Cancel · Try again. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:355784",
@@ -16630,8 +16634,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Filter) not walked.",
    "inheritsFrom": "277:345909"
   },
   {
@@ -16641,8 +16645,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (pending): 'Preparing CSV…' dialog with '{Form} · {View} · {n} submissions. All matching rows will be exported, including those not selected.' No 'Check status' — the export is one synchronous query. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:356292",
@@ -16651,8 +16655,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: 'CSV ready' / '{n} submissions · {Form} · {View}. Your selection and filters are unchanged.' / Back to submissions; the file downloads (the board's 'Prototype fixture' line is not product copy). Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice).",
    "inheritsFrom": "277:346467"
   },
   {
@@ -16662,8 +16666,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (error state): 'Couldn’t export submissions' / 'No CSV was created. Your filters and selection are kept.' / Cancel · Try again. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:356806",
@@ -16672,8 +16676,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Configure) not walked.",
    "inheritsFrom": "277:347031"
   },
   {
@@ -16683,8 +16687,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Filter) not walked.",
    "inheritsFrom": "277:345909"
   },
   {
@@ -16694,8 +16698,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (pending): 'Preparing CSV…' dialog with '{Form} · {View} · {n} submissions. All matching rows will be exported, including those not selected.' No 'Check status' — the export is one synchronous query. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:357678",
@@ -16704,8 +16708,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: 'CSV ready' / '{n} submissions · {Form} · {View}. Your selection and filters are unchanged.' / Back to submissions; the file downloads (the board's 'Prototype fixture' line is not product copy). Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice).",
    "inheritsFrom": "277:346467"
   },
   {
@@ -16715,8 +16719,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (error state): 'Couldn’t export submissions' / 'No CSV was created. Your filters and selection are kept.' / Cancel · Try again. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:358196",
@@ -16725,8 +16729,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Configure) not walked.",
    "inheritsFrom": "277:347031"
   },
   {
@@ -16736,8 +16740,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Filter) not walked.",
    "inheritsFrom": "277:345909"
   },
   {
@@ -16747,8 +16751,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (pending): 'Preparing CSV…' dialog with '{Form} · {View} · {n} submissions. All matching rows will be exported, including those not selected.' No 'Check status' — the export is one synchronous query. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:359068",
@@ -16757,8 +16761,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: 'CSV ready' / '{n} submissions · {Form} · {View}. Your selection and filters are unchanged.' / Back to submissions; the file downloads (the board's 'Prototype fixture' line is not product copy). Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice).",
    "inheritsFrom": "277:346467"
   },
   {
@@ -16768,8 +16772,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (error state): 'Couldn’t export submissions' / 'No CSV was created. Your filters and selection are kept.' / Cancel · Try again. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:359586",
@@ -16778,8 +16782,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Configure) not walked.",
    "inheritsFrom": "277:347031"
   },
   {
@@ -16789,8 +16793,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Filter) not walked.",
    "inheritsFrom": "277:345909"
   },
   {
@@ -16800,8 +16804,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (pending): 'Preparing CSV…' dialog with '{Form} · {View} · {n} submissions. All matching rows will be exported, including those not selected.' No 'Check status' — the export is one synchronous query. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:360494",
@@ -16810,8 +16814,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: 'CSV ready' / '{n} submissions · {Form} · {View}. Your selection and filters are unchanged.' / Back to submissions; the file downloads (the board's 'Prototype fixture' line is not product copy). Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice).",
    "inheritsFrom": "277:346467"
   },
   {
@@ -16821,8 +16825,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (error state): 'Couldn’t export submissions' / 'No CSV was created. Your filters and selection are kept.' / Cancel · Try again. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:361052",
@@ -16831,8 +16835,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Filter) not walked.",
    "inheritsFrom": "277:345909"
   },
   {
@@ -16842,8 +16846,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (pending): 'Preparing CSV…' dialog with '{Form} · {View} · {n} submissions. All matching rows will be exported, including those not selected.' No 'Check status' — the export is one synchronous query. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:361564",
@@ -16852,8 +16856,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: 'CSV ready' / '{n} submissions · {Form} · {View}. Your selection and filters are unchanged.' / Back to submissions; the file downloads (the board's 'Prototype fixture' line is not product copy). Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice).",
    "inheritsFrom": "277:346467"
   },
   {
@@ -16863,8 +16867,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (error state): 'Couldn’t export submissions' / 'No CSV was created. Your filters and selection are kept.' / Cancel · Try again. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:362086",
@@ -16873,8 +16877,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Filter) not walked.",
    "inheritsFrom": "277:345909"
   },
   {
@@ -16884,8 +16888,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (pending): 'Preparing CSV…' dialog with '{Form} · {View} · {n} submissions. All matching rows will be exported, including those not selected.' No 'Check status' — the export is one synchronous query. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:362598",
@@ -16894,8 +16898,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: 'CSV ready' / '{n} submissions · {Form} · {View}. Your selection and filters are unchanged.' / Back to submissions; the file downloads (the board's 'Prototype fixture' line is not product copy). Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice).",
    "inheritsFrom": "277:346467"
   },
   {
@@ -16905,8 +16909,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (error state): 'Couldn’t export submissions' / 'No CSV was created. Your filters and selection are kept.' / Cancel · Try again. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:363120",
@@ -16915,8 +16919,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Filter) not walked.",
    "inheritsFrom": "277:345909"
   },
   {
@@ -16926,8 +16930,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (pending): 'Preparing CSV…' dialog with '{Form} · {View} · {n} submissions. All matching rows will be exported, including those not selected.' No 'Check status' — the export is one synchronous query. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:363672",
@@ -16936,8 +16940,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: 'CSV ready' / '{n} submissions · {Form} · {View}. Your selection and filters are unchanged.' / Back to submissions; the file downloads (the board's 'Prototype fixture' line is not product copy). Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice).",
    "inheritsFrom": "277:346467"
   },
   {
@@ -16947,8 +16951,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (error state): 'Couldn’t export submissions' / 'No CSV was created. Your filters and selection are kept.' / Cancel · Try again. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:364230",
@@ -16957,8 +16961,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Configure) not walked.",
    "inheritsFrom": "277:347031"
   },
   {
@@ -16968,8 +16972,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Filter) not walked.",
    "inheritsFrom": "277:345909"
   },
   {
@@ -16979,8 +16983,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (pending): 'Preparing CSV…' dialog with '{Form} · {View} · {n} submissions. All matching rows will be exported, including those not selected.' No 'Check status' — the export is one synchronous query. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:365086",
@@ -16989,8 +16993,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: 'CSV ready' / '{n} submissions · {Form} · {View}. Your selection and filters are unchanged.' / Back to submissions; the file downloads (the board's 'Prototype fixture' line is not product copy). Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice).",
    "inheritsFrom": "277:346467"
   },
   {
@@ -17000,8 +17004,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (error state): 'Couldn’t export submissions' / 'No CSV was created. Your filters and selection are kept.' / Cancel · Try again. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:365588",
@@ -17010,8 +17014,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Configure) not walked.",
    "inheritsFrom": "277:347031"
   },
   {
@@ -17021,8 +17025,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Filter) not walked.",
    "inheritsFrom": "277:345909"
   },
   {
@@ -17032,8 +17036,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (pending): 'Preparing CSV…' dialog with '{Form} · {View} · {n} submissions. All matching rows will be exported, including those not selected.' No 'Check status' — the export is one synchronous query. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:366460",
@@ -17042,8 +17046,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: 'CSV ready' / '{n} submissions · {Form} · {View}. Your selection and filters are unchanged.' / Back to submissions; the file downloads (the board's 'Prototype fixture' line is not product copy). Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice).",
    "inheritsFrom": "277:346467"
   },
   {
@@ -17053,8 +17057,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (error state): 'Couldn’t export submissions' / 'No CSV was created. Your filters and selection are kept.' / Cancel · Try again. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:366978",
@@ -17063,8 +17067,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Configure) not walked.",
    "inheritsFrom": "277:347031"
   },
   {
@@ -17074,8 +17078,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Filter) not walked.",
    "inheritsFrom": "277:345909"
   },
   {
@@ -17085,8 +17089,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (pending): 'Preparing CSV…' dialog with '{Form} · {View} · {n} submissions. All matching rows will be exported, including those not selected.' No 'Check status' — the export is one synchronous query. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:367890",
@@ -17095,8 +17099,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: 'CSV ready' / '{n} submissions · {Form} · {View}. Your selection and filters are unchanged.' / Back to submissions; the file downloads (the board's 'Prototype fixture' line is not product copy). Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice).",
    "inheritsFrom": "277:346467"
   },
   {
@@ -17106,8 +17110,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (error state): 'Couldn’t export submissions' / 'No CSV was created. Your filters and selection are kept.' / Cancel · Try again. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:368452",
@@ -17116,8 +17120,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Filter) not walked.",
    "inheritsFrom": "277:345909"
   },
   {
@@ -17127,8 +17131,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (pending): 'Preparing CSV…' dialog with '{Form} · {View} · {n} submissions. All matching rows will be exported, including those not selected.' No 'Check status' — the export is one synchronous query. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:368948",
@@ -17137,8 +17141,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: 'CSV ready' / '{n} submissions · {Form} · {View}. Your selection and filters are unchanged.' / Back to submissions; the file downloads (the board's 'Prototype fixture' line is not product copy). Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice).",
    "inheritsFrom": "277:346467"
   },
   {
@@ -17148,8 +17152,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (error state): 'Couldn’t export submissions' / 'No CSV was created. Your filters and selection are kept.' / Cancel · Try again. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:369454",
@@ -17158,8 +17162,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Filter) not walked.",
    "inheritsFrom": "277:345909"
   },
   {
@@ -17169,8 +17173,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (pending): 'Preparing CSV…' dialog with '{Form} · {View} · {n} submissions. All matching rows will be exported, including those not selected.' No 'Check status' — the export is one synchronous query. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:369966",
@@ -17179,8 +17183,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: 'CSV ready' / '{n} submissions · {Form} · {View}. Your selection and filters are unchanged.' / Back to submissions; the file downloads (the board's 'Prototype fixture' line is not product copy). Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice).",
    "inheritsFrom": "277:346467"
   },
   {
@@ -17190,8 +17194,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (error state): 'Couldn’t export submissions' / 'No CSV was created. Your filters and selection are kept.' / Cancel · Try again. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:370488",
@@ -17200,8 +17204,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Filter) not walked.",
    "inheritsFrom": "277:345909"
   },
   {
@@ -17211,8 +17215,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (pending): 'Preparing CSV…' dialog with '{Form} · {View} · {n} submissions. All matching rows will be exported, including those not selected.' No 'Check status' — the export is one synchronous query. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:371040",
@@ -17221,8 +17225,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: 'CSV ready' / '{n} submissions · {Form} · {View}. Your selection and filters are unchanged.' / Back to submissions; the file downloads (the board's 'Prototype fixture' line is not product copy). Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice).",
    "inheritsFrom": "277:346467"
   },
   {
@@ -17232,8 +17236,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (error state): 'Couldn’t export submissions' / 'No CSV was created. Your filters and selection are kept.' / Cancel · Try again. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:371598",
@@ -17242,8 +17246,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Configure) not walked.",
    "inheritsFrom": "277:347031"
   },
   {
@@ -17253,8 +17257,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Filter) not walked.",
    "inheritsFrom": "277:345909"
   },
   {
@@ -17264,8 +17268,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (pending): 'Preparing CSV…' dialog with '{Form} · {View} · {n} submissions. All matching rows will be exported, including those not selected.' No 'Check status' — the export is one synchronous query. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:372470",
@@ -17274,8 +17278,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: 'CSV ready' / '{n} submissions · {Form} · {View}. Your selection and filters are unchanged.' / Back to submissions; the file downloads (the board's 'Prototype fixture' line is not product copy). Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice).",
    "inheritsFrom": "277:346467"
   },
   {
@@ -17285,8 +17289,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (error state): 'Couldn’t export submissions' / 'No CSV was created. Your filters and selection are kept.' / Cancel · Try again. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:372988",
@@ -17295,8 +17299,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Configure) not walked.",
    "inheritsFrom": "277:347031"
   },
   {
@@ -17306,8 +17310,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Filter) not walked.",
    "inheritsFrom": "277:345909"
   },
   {
@@ -17317,8 +17321,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (pending): 'Preparing CSV…' dialog with '{Form} · {View} · {n} submissions. All matching rows will be exported, including those not selected.' No 'Check status' — the export is one synchronous query. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:373844",
@@ -17327,8 +17331,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: 'CSV ready' / '{n} submissions · {Form} · {View}. Your selection and filters are unchanged.' / Back to submissions; the file downloads (the board's 'Prototype fixture' line is not product copy). Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice).",
    "inheritsFrom": "277:346467"
   },
   {
@@ -17338,8 +17342,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (error state): 'Couldn’t export submissions' / 'No CSV was created. Your filters and selection are kept.' / Cancel · Try again. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:374346",
@@ -17348,8 +17352,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Configure) not walked.",
    "inheritsFrom": "277:347031"
   },
   {
@@ -17359,8 +17363,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Filter) not walked.",
    "inheritsFrom": "277:345909"
   },
   {
@@ -17370,8 +17374,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (pending): 'Preparing CSV…' dialog with '{Form} · {View} · {n} submissions. All matching rows will be exported, including those not selected.' No 'Check status' — the export is one synchronous query. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:375258",
@@ -17380,8 +17384,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: 'CSV ready' / '{n} submissions · {Form} · {View}. Your selection and filters are unchanged.' / Back to submissions; the file downloads (the board's 'Prototype fixture' line is not product copy). Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice).",
    "inheritsFrom": "277:346467"
   },
   {
@@ -17391,8 +17395,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (error state): 'Couldn’t export submissions' / 'No CSV was created. Your filters and selection are kept.' / Cancel · Try again. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:375820",
@@ -17401,8 +17405,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Filter) not walked.",
    "inheritsFrom": "277:345909"
   },
   {
@@ -17412,8 +17416,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (pending): 'Preparing CSV…' dialog with '{Form} · {View} · {n} submissions. All matching rows will be exported, including those not selected.' No 'Check status' — the export is one synchronous query. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:376332",
@@ -17422,8 +17426,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: 'CSV ready' / '{n} submissions · {Form} · {View}. Your selection and filters are unchanged.' / Back to submissions; the file downloads (the board's 'Prototype fixture' line is not product copy). Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice).",
    "inheritsFrom": "277:346467"
   },
   {
@@ -17433,8 +17437,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (error state): 'Couldn’t export submissions' / 'No CSV was created. Your filters and selection are kept.' / Cancel · Try again. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:376854",
@@ -17443,8 +17447,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Filter) not walked.",
    "inheritsFrom": "277:345909"
   },
   {
@@ -17454,8 +17458,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (pending): 'Preparing CSV…' dialog with '{Form} · {View} · {n} submissions. All matching rows will be exported, including those not selected.' No 'Check status' — the export is one synchronous query. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:377350",
@@ -17464,8 +17468,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: 'CSV ready' / '{n} submissions · {Form} · {View}. Your selection and filters are unchanged.' / Back to submissions; the file downloads (the board's 'Prototype fixture' line is not product copy). Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice).",
    "inheritsFrom": "277:346467"
   },
   {
@@ -17475,8 +17479,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (error state): 'Couldn’t export submissions' / 'No CSV was created. Your filters and selection are kept.' / Cancel · Try again. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:377856",
@@ -17485,8 +17489,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Filter) not walked.",
    "inheritsFrom": "277:345909"
   },
   {
@@ -17496,8 +17500,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (pending): 'Preparing CSV…' dialog with '{Form} · {View} · {n} submissions. All matching rows will be exported, including those not selected.' No 'Check status' — the export is one synchronous query. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:378404",
@@ -17506,8 +17510,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: 'CSV ready' / '{n} submissions · {Form} · {View}. Your selection and filters are unchanged.' / Back to submissions; the file downloads (the board's 'Prototype fixture' line is not product copy). Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice).",
    "inheritsFrom": "277:346467"
   },
   {
@@ -17517,8 +17521,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (error state): 'Couldn’t export submissions' / 'No CSV was created. Your filters and selection are kept.' / Cancel · Try again. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:378958",
@@ -17527,8 +17531,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Configure) not walked.",
    "inheritsFrom": "277:347031"
   },
   {
@@ -17538,8 +17542,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Filter) not walked.",
    "inheritsFrom": "277:345909"
   },
   {
@@ -17549,8 +17553,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (pending): 'Preparing CSV…' dialog with '{Form} · {View} · {n} submissions. All matching rows will be exported, including those not selected.' No 'Check status' — the export is one synchronous query. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:379814",
@@ -17559,8 +17563,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: 'CSV ready' / '{n} submissions · {Form} · {View}. Your selection and filters are unchanged.' / Back to submissions; the file downloads (the board's 'Prototype fixture' line is not product copy). Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice).",
    "inheritsFrom": "277:346467"
   },
   {
@@ -17570,8 +17574,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (error state): 'Couldn’t export submissions' / 'No CSV was created. Your filters and selection are kept.' / Cancel · Try again. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:380316",
@@ -17580,8 +17584,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Configure) not walked.",
    "inheritsFrom": "277:347031"
   },
   {
@@ -17591,8 +17595,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Filter) not walked.",
    "inheritsFrom": "277:345909"
   },
   {
@@ -17602,8 +17606,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (pending): 'Preparing CSV…' dialog with '{Form} · {View} · {n} submissions. All matching rows will be exported, including those not selected.' No 'Check status' — the export is one synchronous query. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:381188",
@@ -17612,8 +17616,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: 'CSV ready' / '{n} submissions · {Form} · {View}. Your selection and filters are unchanged.' / Back to submissions; the file downloads (the board's 'Prototype fixture' line is not product copy). Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice).",
    "inheritsFrom": "277:346467"
   },
   {
@@ -17623,8 +17627,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (error state): 'Couldn’t export submissions' / 'No CSV was created. Your filters and selection are kept.' / Cancel · Try again. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:381706",
@@ -17633,8 +17637,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Configure) not walked.",
    "inheritsFrom": "277:347031"
   },
   {
@@ -17644,8 +17648,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Filter) not walked.",
    "inheritsFrom": "277:345909"
   },
   {
@@ -17655,8 +17659,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (pending): 'Preparing CSV…' dialog with '{Form} · {View} · {n} submissions. All matching rows will be exported, including those not selected.' No 'Check status' — the export is one synchronous query. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:382614",
@@ -17665,8 +17669,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: 'CSV ready' / '{n} submissions · {Form} · {View}. Your selection and filters are unchanged.' / Back to submissions; the file downloads (the board's 'Prototype fixture' line is not product copy). Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice).",
    "inheritsFrom": "277:346467"
   },
   {
@@ -17676,8 +17680,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (error state): 'Couldn’t export submissions' / 'No CSV was created. Your filters and selection are kept.' / Cancel · Try again. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:383172",
@@ -17686,8 +17690,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Filter) not walked.",
    "inheritsFrom": "277:345909"
   },
   {
@@ -17697,8 +17701,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (pending): 'Preparing CSV…' dialog with '{Form} · {View} · {n} submissions. All matching rows will be exported, including those not selected.' No 'Check status' — the export is one synchronous query. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:383668",
@@ -17707,8 +17711,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: 'CSV ready' / '{n} submissions · {Form} · {View}. Your selection and filters are unchanged.' / Back to submissions; the file downloads (the board's 'Prototype fixture' line is not product copy). Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice).",
    "inheritsFrom": "277:346467"
   },
   {
@@ -17718,8 +17722,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (error state): 'Couldn’t export submissions' / 'No CSV was created. Your filters and selection are kept.' / Cancel · Try again. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:384174",
@@ -17728,8 +17732,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Filter) not walked.",
    "inheritsFrom": "277:345909"
   },
   {
@@ -17739,8 +17743,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (pending): 'Preparing CSV…' dialog with '{Form} · {View} · {n} submissions. All matching rows will be exported, including those not selected.' No 'Check status' — the export is one synchronous query. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:384686",
@@ -17749,8 +17753,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: 'CSV ready' / '{n} submissions · {Form} · {View}. Your selection and filters are unchanged.' / Back to submissions; the file downloads (the board's 'Prototype fixture' line is not product copy). Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice).",
    "inheritsFrom": "277:346467"
   },
   {
@@ -17760,8 +17764,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (error state): 'Couldn’t export submissions' / 'No CSV was created. Your filters and selection are kept.' / Cancel · Try again. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:385208",
@@ -17770,8 +17774,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Filter) not walked.",
    "inheritsFrom": "277:345909"
   },
   {
@@ -17781,8 +17785,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (pending): 'Preparing CSV…' dialog with '{Form} · {View} · {n} submissions. All matching rows will be exported, including those not selected.' No 'Check status' — the export is one synchronous query. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:385756",
@@ -17791,8 +17795,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: 'CSV ready' / '{n} submissions · {Form} · {View}. Your selection and filters are unchanged.' / Back to submissions; the file downloads (the board's 'Prototype fixture' line is not product copy). Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice).",
    "inheritsFrom": "277:346467"
   },
   {
@@ -17802,8 +17806,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (error state): 'Couldn’t export submissions' / 'No CSV was created. Your filters and selection are kept.' / Cancel · Try again. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:386310",
@@ -17812,8 +17816,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Configure) not walked.",
    "inheritsFrom": "277:347031"
   },
   {
@@ -17823,8 +17827,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Filter) not walked.",
    "inheritsFrom": "277:345909"
   },
   {
@@ -17834,8 +17838,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (pending): 'Preparing CSV…' dialog with '{Form} · {View} · {n} submissions. All matching rows will be exported, including those not selected.' No 'Check status' — the export is one synchronous query. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:387182",
@@ -17844,8 +17848,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: 'CSV ready' / '{n} submissions · {Form} · {View}. Your selection and filters are unchanged.' / Back to submissions; the file downloads (the board's 'Prototype fixture' line is not product copy). Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice).",
    "inheritsFrom": "277:346467"
   },
   {
@@ -17855,8 +17859,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (error state): 'Couldn’t export submissions' / 'No CSV was created. Your filters and selection are kept.' / Cancel · Try again. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:387700",
@@ -17865,8 +17869,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Configure) not walked.",
    "inheritsFrom": "277:347031"
   },
   {
@@ -17876,8 +17880,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Filter) not walked.",
    "inheritsFrom": "277:345909"
   },
   {
@@ -17887,8 +17891,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (pending): 'Preparing CSV…' dialog with '{Form} · {View} · {n} submissions. All matching rows will be exported, including those not selected.' No 'Check status' — the export is one synchronous query. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:388556",
@@ -17897,8 +17901,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: 'CSV ready' / '{n} submissions · {Form} · {View}. Your selection and filters are unchanged.' / Back to submissions; the file downloads (the board's 'Prototype fixture' line is not product copy). Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice).",
    "inheritsFrom": "277:346467"
   },
   {
@@ -17908,8 +17912,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (error state): 'Couldn’t export submissions' / 'No CSV was created. Your filters and selection are kept.' / Cancel · Try again. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:389058",
@@ -17918,8 +17922,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Configure) not walked.",
    "inheritsFrom": "277:347031"
   },
   {
@@ -17929,8 +17933,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Filter) not walked.",
    "inheritsFrom": "277:345909"
   },
   {
@@ -17940,8 +17944,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (pending): 'Preparing CSV…' dialog with '{Form} · {View} · {n} submissions. All matching rows will be exported, including those not selected.' No 'Check status' — the export is one synchronous query. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:389966",
@@ -17950,8 +17954,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: 'CSV ready' / '{n} submissions · {Form} · {View}. Your selection and filters are unchanged.' / Back to submissions; the file downloads (the board's 'Prototype fixture' line is not product copy). Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice).",
    "inheritsFrom": "277:346467"
   },
   {
@@ -17961,8 +17965,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (error state): 'Couldn’t export submissions' / 'No CSV was created. Your filters and selection are kept.' / Cancel · Try again. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:390524",
@@ -17971,8 +17975,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Filter) not walked.",
    "inheritsFrom": "277:345909"
   },
   {
@@ -17982,8 +17986,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (pending): 'Preparing CSV…' dialog with '{Form} · {View} · {n} submissions. All matching rows will be exported, including those not selected.' No 'Check status' — the export is one synchronous query. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:391036",
@@ -17992,8 +17996,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: 'CSV ready' / '{n} submissions · {Form} · {View}. Your selection and filters are unchanged.' / Back to submissions; the file downloads (the board's 'Prototype fixture' line is not product copy). Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice).",
    "inheritsFrom": "277:346467"
   },
   {
@@ -18003,8 +18007,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (error state): 'Couldn’t export submissions' / 'No CSV was created. Your filters and selection are kept.' / Cancel · Try again. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:391558",
@@ -18013,8 +18017,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Filter) not walked.",
    "inheritsFrom": "277:345909"
   },
   {
@@ -18024,8 +18028,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (pending): 'Preparing CSV…' dialog with '{Form} · {View} · {n} submissions. All matching rows will be exported, including those not selected.' No 'Check status' — the export is one synchronous query. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:392054",
@@ -18034,8 +18038,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent",
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: 'CSV ready' / '{n} submissions · {Form} · {View}. Your selection and filters are unchanged.' / Back to submissions; the file downloads (the board's 'Prototype fixture' line is not product copy). Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice).",
    "inheritsFrom": "277:346467"
   },
   {
@@ -18045,8 +18049,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (error state): 'Couldn’t export submissions' / 'No CSV was created. Your filters and selection are kept.' / Cancel · Try again. Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice)."
   },
   {
    "nodeId": "277:392558",
@@ -18055,8 +18059,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (No-selection-export) not walked."
   },
   {
    "nodeId": "277:392836",
@@ -18956,8 +18960,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Zero-selection-filter) not walked."
   },
   {
    "nodeId": "279:137695",
@@ -18966,8 +18970,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "filter/view/export context grid; views, form filter, view-aware export absent"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Zero-selection-configure) not walked."
   },
   {
    "nodeId": "280:70080",
