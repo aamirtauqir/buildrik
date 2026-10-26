@@ -20160,7 +20160,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-F S2: showOtherTabBanner (board copy) ready, REQUESTS #13 swaps the toast. \"Edit here\" waits on the tab handoff (G29/G30); dismissible meanwhile. Built, not compared."
+   "verifiedNote": "L-F W9: built, not compared. showOtherTabBanner(editHere) offers \"Edit here\" when a tab handoff is wired (REQUESTS F-21); dismissible without one."
   },
   {
    "nodeId": "227:13239",
@@ -20169,8 +20169,8 @@
    "family": "recovery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No tab handoff / read-only-here state"
+   "verified": "drift-open",
+   "verifiedNote": "L-F W9: built, not compared. tabHandoff.ts: on a claim the editing tab saves first, takes the engine \"view\" lock and says \"Editing moved to another tab. This tab is view only; your changes were saved first.\" · Edit here instead. Mount is REQUESTS F-21. The inspector's \"View only · editing moved to another tab\" line is not drawn (inspector is L-B's)."
   },
   {
    "nodeId": "227:13769",
@@ -20179,8 +20179,8 @@
    "family": "recovery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No tab handoff"
+   "verified": "drift-open",
+   "verifiedNote": "L-F W9: built, not compared. A failed save refuses: \"The other tab couldn’t save — finish there first. Nothing turned read-only.\" · Edit here (retry). Mount is REQUESTS F-21."
   },
   {
    "nodeId": "227:14297",

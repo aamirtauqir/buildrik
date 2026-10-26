@@ -128,14 +128,16 @@ export function showReconnectingBanner(pendingChanges?: number): void {
   showGlobalBanner({ id: BANNER_ID.connection, tone: "warning", message: `Reconnecting… saving ${what}` });
 }
 
-/** B7-G28 `227:12711`. "Edit here" needs the tab handoff (G29/G30), which
- *  does not exist yet; until then the notice is dismissible. */
-export function showOtherTabBanner(): void {
+/** B7-G28 `227:12711`. With a tab handoff (`tabHandoff.ts`) the notice offers
+ *  "Edit here"; without one it can only be dismissed. */
+export function showOtherTabBanner(editHere?: () => void): void {
   showGlobalBanner({
     id: BANNER_ID.otherTab,
     tone: "warning",
     message: "This site is also open in another tab. Edit in one tab at a time.",
-    dismissible: true,
+    ...(editHere
+      ? { actions: [{ label: "Edit here", onClick: editHere, testId: "banner-edit-here" }] }
+      : { dismissible: true }),
   });
 }
 
