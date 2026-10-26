@@ -18,13 +18,14 @@
  *
  * Keep editing (and Escape / the scrim, which map to it) leaves the G04
  * banner in the global slot — "changes aren't saving" stays on screen while
- * edits keep queueing — and the next save that lands clears it.
+ * edits keep queueing — and the next save that lands clears it, saying
+ * "Signed in again — N changes saved" (B7-G05 `225:4416`).
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { Button, ModalBody, ModalContent, ModalFooter, ModalRoot, ModalTitle } from "@/editor/chrome-ui";
+import { Button, ModalBody, ModalContent, ModalFooter, ModalRoot, ModalTitle, useToast } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
@@ -69,10 +70,29 @@ export const SessionExpiredModal: React.FC<SessionExpiredModalProps> = ({
   const siteId = getSiteIdFromUrl();
   const keptInBrowser = open && siteId !== null && readUnsaved(siteId) !== null;
 
-  /* A save that lands means the session is back: the G04 banner goes. */
+  const { addToast } = useToast();
+  /* The changes held when the session expired, until a save lands. */
+  const heldRef = React.useRef<number | null>(null);
+  React.useEffect(() => {
+    if (open && heldRef.current === null) heldRef.current = count;
+  }, [open, count]);
+
+  /* A save that lands means the session is back: the G04 banner goes, and
+     G05 says what went through. */
+  const savedAtRef = React.useRef(lastSavedAt);
   React.useEffect(() => {
     clearGlobalBanner(BANNER_ID.sessionExpired);
-  }, [lastSavedAt]);
+    const advanced = lastSavedAt !== null && lastSavedAt !== savedAtRef.current;
+    savedAtRef.current = lastSavedAt;
+    const held = heldRef.current;
+    if (!advanced || held === null) return;
+    heldRef.current = null;
+    addToast({
+      tone: "success",
+      description:
+        held > 0 ? `Signed in again — ${held} ${held === 1 ? "change" : "changes"} saved` : "Signed in again — your changes are saved",
+    });
+  }, [lastSavedAt, addToast]);
 
   const keepEditing = () => {
     showSessionExpiredBanner(signIn);

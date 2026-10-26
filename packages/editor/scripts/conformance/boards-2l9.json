@@ -19929,8 +19929,8 @@
    "family": "recovery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No auto-resend after same-user sign-in; retry is manual (SessionExpiredModal.tsx:71)"
+   "verified": "drift-open",
+   "verifiedNote": "L-F W10: built, not compared. When the first save after a session expiry lands, SessionExpiredModal clears the G04 banner and toasts \"Signed in again — {n} changes saved\" (n = changes held when it expired)."
   },
   {
    "nodeId": "225:4941",
@@ -19938,9 +19938,9 @@
    "page": "07",
    "family": "recovery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:save-user-check",
    "verified": "no",
-   "verifiedNote": "No account-identity check before resend"
+   "verifiedNote": "L-F W10: not built. Detecting a different account needs the save path (lead) and ideally a server expectedUserId — REQUESTS F-22. Today such a save goes through as the other account."
   },
   {
    "nodeId": "225:5474",
@@ -20218,9 +20218,9 @@
    "page": "07",
    "family": "recovery",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "chrome-ui/Toast.tsx:325 stacks all toasts; no ≤1 transient + ≤2 persistent cap or \"+N more\""
+   "authority": "blocked:chrome-ui-toast",
+   "verified": "no",
+   "verifiedNote": "L-F W10: the toast cap lives in chrome-ui/Toast.tsx, outside the lane's paths — REQUESTS F-23."
   },
   {
    "nodeId": "227:16435",
@@ -20228,9 +20228,9 @@
    "page": "07",
    "family": "recovery",
    "status": "active",
-   "authority": "board",
+   "authority": "open:notifications-other-sites",
    "verified": "drift-open",
-   "verifiedNote": "NotificationPanel.tsx:206-218 header+Mark all read match; grouped by day, not This site / Other sites"
+   "verifiedNote": "L-F W10: not built. The board groups This site / Other sites; owner decision 9 narrows the editor bell to the open site (NotificationService.siteScope). Owner to choose before it is built."
   },
   {
    "nodeId": "227:16980",
