@@ -34,6 +34,7 @@ import { toPresenceUsers } from "../collaboration/PresenceIndicators";
 import { duplicateSite, getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import type { ReviewStatus } from "@/services/ReviewService";
 import { useHistoryState, useRefetchOnFocus } from "@/shared/hooks";
+import { useEditLocks } from "@/editor/shared/useEditLocks";
 import { formatChord } from "@/editor/canvas/controls/keyboardSheetRows";
 import { formatRelativeTime } from "@/shared/utils/relativeTime";
 import { EVENTS } from "@/shared/constants";
@@ -647,7 +648,12 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   /* SaveStatus has carried a "conflict" state — label, amber pill, dot — that
      this derivation could not produce, so board 66:640's condition showed the
      chip as Saved. */
-  const save: SaveState = offline
+  /* The site never arrived (Task 1.6): the engine holds `not-loaded`, so
+     nothing can be saved and nothing can be published (board B7-G02). */
+  const notLoaded = useEditLocks(composer).includes("not-loaded");
+  const save: SaveState = notLoaded
+    ? "not-loaded"
+    : offline
     ? "offline"
     : saveStatus === "saving"
       ? "saving"
@@ -873,7 +879,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
         /* `nextMove === null` — live with nothing waiting — still shows
            Publish: it opens the tray, which says "Up to date" (board PLAY
            F4.22 `308:25079`) beside the live site and its links. */
-        publish={isViewer ? "disabled" : viewMode.readOnlyView ? "hidden" : publish}
+        publish={isViewer ? "disabled" : viewMode.readOnlyView || notLoaded ? "hidden" : publish}
         publishBusy={publishLoading}
         publishExpanded={!isViewer && !viewMode.readOnlyView && isTrayToggle ? trayOpen : undefined}
         publishControls="publish-tray"
