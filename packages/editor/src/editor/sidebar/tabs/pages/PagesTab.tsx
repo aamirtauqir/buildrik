@@ -27,6 +27,7 @@ import {
   PanelFrame,
   PanelSearch,
   Popover,
+  Tabs,
 } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants/events";
@@ -46,6 +47,13 @@ import { useBulkSelect } from "./useBulkSelect";
 import { useDynamicPagesSummary } from "./useDynamicPagesSummary";
 import { pageFileNames } from "@/engine/export";
 import "./PagesTab.css";
+
+type PageView = "pages" | "listings" | "structure";
+const PAGE_VIEWS: ReadonlyArray<{ id: PageView; label: string }> = [
+  { id: "pages", label: "Pages" },
+  { id: "listings", label: "Listings" },
+  { id: "structure", label: "Structure" },
+];
 
 export interface PagesTabProps {
   composer: Composer | null;
@@ -94,10 +102,10 @@ export const PagesTab: React.FC<PagesTabProps> = ({
      Read-only hint row only — opening a collection's own Dynamic pages tab
      is still where the pattern/template are edited. */
   const dynamicPages = useDynamicPagesSummary(composer);
-  const openDynamicPages = React.useCallback(() => {
-    if (!dynamicPages.collectionId) return;
-    composer?.emit(EVENTS.UI_CMS_OPEN, { collectionId: dynamicPages.collectionId, tab: "dynamic-pages" });
-  }, [composer, dynamicPages.collectionId]);
+  const manageCollection = React.useCallback(
+    (collectionId: string) => composer?.emit(EVENTS.UI_CMS_OPEN, { collectionId, tab: "dynamic-pages" }),
+    [composer],
+  );
 
   // Prune stale folder references when pages are deleted
   React.useEffect(() => {
@@ -151,7 +159,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
   // Redesign P4 (50-pages): the panel has two views — the page tree ("Pages")
   // and the whole-site search-listings table ("Search listings"). Default to the
   // tree; the table is the SEO-at-a-glance view that scales past a few pages.
-  const [view, setView] = React.useState<"pages" | "listings" | "structure">("pages");
+  const [view, setView] = React.useState<PageView>("pages");
 
   /* Board 7069:79383 "Pages · Panel menu (⋯)": Select pages… · Show structure ·
      Reload, plus the Listings row (EP-11, 7576:197553). Listings and Structure
@@ -357,7 +365,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
       {/* v3 4418:90494 header: the ⋯ panel menu rides in the header's
           `actions` slot. No ⌘K keycap — the topbar field is the ⌘K door. */}
       <PanelFrame.Header
-        title="Pages"
+        title={`Pages · ${p.pages.length}`}
         onHelpClick={onHelpClick}
         onClose={onClose}
         actions={
@@ -425,12 +433,23 @@ export const PagesTab: React.FC<PagesTabProps> = ({
       {(p.loadError || view === "pages") && (
         <PanelSearch placeholder="Search pages…" value={search} onChange={setSearch} data-testid="pages-search" />
       )}
+      {/* Board 63:6393: the three views as tabs under the search (they were
+          ⋯ rows only; the ⋯ keeps them too, as board 65:17148 draws). */}
+      {!p.loadError && (
+        <Tabs
+          label="Pages view"
+          tabs={PAGE_VIEWS}
+          value={view}
+          onChange={(id) => setView(id as PageView)}
+          data-testid="pages-view-tabs"
+        />
+      )}
       {/* Board 141:165 keeps the search band and the Add-page footer either
           side of the error, so the error is a BODY state inside PageList — not
           a replacement for the whole panel body. */}
       <PanelFrame.Body noScroll>
           {view === "structure" && !p.loadError ? (
-            <SiteStructureTree pages={p.pages} onSelectPage={(id) => { p.selectPage(id); }} onBack={() => setView("pages")} />
+            <SiteStructureTree pages={p.pages} onSelectPage={(id) => { p.selectPage(id); }} />
           ) : view === "listings" && !p.loadError ? (
             /* PanelFrame.Body is `flex-1 min-h-0 overflow-hidden` — flex-1 as a
                CHILD, but it is not itself display:flex, so these two stack as
@@ -442,15 +461,6 @@ export const PagesTab: React.FC<PagesTabProps> = ({
                inert for the same reason — written for a flex parent it never
                had. */
             <div className="tw:flex tw:h-full tw:min-h-0 tw:flex-col">
-              <Button
-                color="light"
-                size="xs"
-                className="bd-pg-listings-back"
-                data-testid="pages-listings-back"
-                onClick={() => setView("pages")}
-              >
-                {"\u2039"} Pages
-              </Button>
               <SearchListingsTable pages={p.pages} onEditPage={p.openSettings} onOpenFull={onExpandToggle} />
             </div>
           ) : (
@@ -489,8 +499,10 @@ export const PagesTab: React.FC<PagesTabProps> = ({
             onFolderDelete={f.deleteFolder}
             onMovePageToFolder={f.movePageToFolder}
             onRemovePageFromFolder={f.removePageFromFolder}
-            dynamicPagesCount={dynamicPages.count}
-            onOpenDynamicPages={openDynamicPages}
+            collectionPages={dynamicPages.collections}
+            onOpenTemplatePage={p.selectPage}
+            onManageCollection={manageCollection}
+            onClearSearch={() => setSearch("")}
           />
           )}
       </PanelFrame.Body>

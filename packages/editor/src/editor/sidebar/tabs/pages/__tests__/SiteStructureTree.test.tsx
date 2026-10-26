@@ -34,7 +34,7 @@ describe("buildRouteTree", () => {
 describe("SiteStructureTree", () => {
   it("renders every page by route and selects on click", () => {
     const onSelectPage = vi.fn();
-    render(<SiteStructureTree pages={PAGES} onSelectPage={onSelectPage} onBack={vi.fn()} />);
+    render(<SiteStructureTree pages={PAGES} onSelectPage={onSelectPage} />);
     expect(screen.getByText("4 pages, by route.")).toBeInTheDocument();
     expect(screen.getByText("/pricing/teams")).toBeInTheDocument();
     expect(screen.getByText(/\(no page\)/)).toBeInTheDocument();

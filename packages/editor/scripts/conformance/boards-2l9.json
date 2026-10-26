@@ -133,7 +133,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "No Pages|Listings|Structure switch (views in ⋯ menu); folders render before root pages; no 'Collection pages' block (Open page/Manage in CMS"
+   "verifiedNote": "L-A S5 built, not compared: title 'Pages · {n}', Pages · Listings · Structure tabs under the search, root pages first, 'My folders · Only visible to you' (own tree), 'Collection pages' rows ({name}, '{pattern} · {n} pages', Open page → template page, Manage in CMS → CMS dynamic pages), legend '● marks a page with unsaved changes'. RTL-checked copy; geometry not compared. The '+N from collections ›' footer row is replaced by the block."
   },
   {
    "nodeId": "63:13820",
@@ -264,7 +264,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code columns PAGE/TITLE/DESC; board 'Page and URL · SEO score · Visibility' at 720 wide"
+   "verifiedNote": "L-A S5: Listings now opens from the tabs (back link removed); its columns (PAGE/TITLE/DESC vs board 'Page and URL · SEO score · Visibility' at 720) are not changed — still open."
   },
   {
    "nodeId": "63:21939",
@@ -274,7 +274,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Route tree exists; board header 'URL structure · fieldwork.studio · Site root' + footnote absent"
+   "verifiedNote": "L-A S5: Structure now opens from the tabs (back link removed); board header 'URL structure · {domain} · Site root' + footnote still absent."
   },
   {
    "nodeId": "63:22616",
@@ -284,7 +284,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code 'No pages match your search.'; board 'No pages match “q”' + Clear search"
+   "verifiedNote": "L-A S5 built, not compared: 'No pages match “q”' + Clear search; 'Search everywhere' kept below it (code-ahead)."
   },
   {
    "nodeId": "63:23182",
@@ -324,7 +324,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code: Select pages·Listings·Show structure·Reload·Widen panel; board adds 'Recently deleted'. Widen panel = code-ahead"
+   "verifiedNote": "L-A S5: ⋯ keeps Select pages… · Listings · Show structure · Reload (+ Widen panel, code-ahead). 'Recently deleted' waits on page trash (sub-plan S12, server)."
   },
   {
    "nodeId": "65:17860",

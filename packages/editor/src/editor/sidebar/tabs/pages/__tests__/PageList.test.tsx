@@ -91,11 +91,15 @@ describe("PageList", () => {
 
   /* v3 4418:95333: the query comes from the topbar field; nothing matching
      is the shared state block with a hand-off to ⌘K. */
-  it("renders the no-results block with Search everywhere when the query matches nothing", () => {
+  /* design-2l9 board 63:22616: "No pages match “q”" + Clear search; the ⌘K
+     hand-off stays below it (code-ahead). Re-baseline: Pages no-results. */
+  it("names the failed query, clears it, and keeps Search everywhere", () => {
     const onSearchEverywhere = vi.fn();
-    render(<PageList {...makeProps({ search: "zzznomatch", onSearchEverywhere })} />);
-    expect(screen.getByText("Nothing here yet")).toBeInTheDocument();
-    expect(screen.getByText("No pages match your search.")).toBeInTheDocument();
+    const onClearSearch = vi.fn();
+    render(<PageList {...makeProps({ search: "zzznomatch", onSearchEverywhere, onClearSearch })} />);
+    expect(screen.getByText("No pages match “zzznomatch”")).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId("pages-no-results-clear"));
+    expect(onClearSearch).toHaveBeenCalledTimes(1);
     fireEvent.click(screen.getByTestId("pages-search-everywhere"));
     expect(onSearchEverywhere).toHaveBeenCalledWith("zzznomatch");
     expect(screen.getByTestId("pages-legend")).toHaveTextContent("0 of 2 pages match “zzznomatch”");
@@ -106,9 +110,9 @@ describe("PageList", () => {
     expect(screen.getByTestId("pages-legend")).toHaveTextContent("1 of 2 pages match “ab”");
   });
 
-  it("draws the legend over the Add band when not searching (4418:90494)", () => {
+  it("draws the board's legend over the Add band when not searching (63:6393)", () => {
     render(<PageList {...makeProps()} />);
-    expect(screen.getByTestId("pages-legend")).toHaveTextContent(/homepage · ● unpublished changes/);
+    expect(screen.getByTestId("pages-legend")).toHaveTextContent("● marks a page with unsaved changes");
   });
 
   it("renders drop indicator placeholder with .bd-pg-drop-indicator", () => {
@@ -181,42 +185,34 @@ describe("PageList — drag reorder lands on the half it is dropped on", () => {
   });
 });
 
-describe("PageList — FC-1 (fix-all 2026-09-25): CMS-generated pages hint", () => {
-  it("renders no row when dynamicPagesCount is 0 (default)", () => {
+/* design-2l9 board 63:6393: root pages, then "My folders · Only visible to
+   you", then "Collection pages" — the pages a CMS collection publishes (FC-1),
+   each with Open page and Manage in CMS. Re-baseline: Pages manager. */
+describe("PageList — sections (board 63:6393)", () => {
+  const blog = { id: "blog", name: "Blog post", pattern: "/blog/{slug}", count: 20, templatePageId: "p2" };
+
+  it("no Collection pages block without page-generating collections", () => {
     render(<PageList {...makeProps()} />);
-    expect(screen.queryByTestId("pages-dynamic-pages-row")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("pages-collections")).not.toBeInTheDocument();
   });
 
-  it("renders '+N from collections ›' when dynamicPagesCount > 0, and opens it on click", () => {
-    const onOpenDynamicPages = vi.fn();
-    render(<PageList {...makeProps({ dynamicPagesCount: 4, onOpenDynamicPages })} />);
-    const row = screen.getByTestId("pages-dynamic-pages-row");
-    expect(row).toHaveTextContent("+4 from collections");
-    expect(row).toHaveTextContent("›");
-    fireEvent.click(row);
-    expect(onOpenDynamicPages).toHaveBeenCalledTimes(1);
+  it("lists each collection with its pattern and count; Open page and Manage in CMS act on it", () => {
+    const onOpenTemplatePage = vi.fn();
+    const onManageCollection = vi.fn();
+    render(<PageList {...makeProps({ collectionPages: [blog], onOpenTemplatePage, onManageCollection })} />);
+    const row = screen.getByTestId("pages-collection-blog");
+    expect(row).toHaveTextContent("Blog post");
+    expect(row).toHaveTextContent("/blog/{slug} · 20 pages");
+    fireEvent.click(screen.getByTestId("pages-collection-open-blog"));
+    expect(onOpenTemplatePage).toHaveBeenCalledWith("p2");
+    fireEvent.click(screen.getByTestId("pages-collection-manage-blog"));
+    expect(onManageCollection).toHaveBeenCalledWith("blog");
   });
 
-  /* X-6 (verify pass 3): the row rendered as a sibling AFTER the list, and
-     `.bd-pg-footer` is absolutely positioned over the shell's bottom edge —
-     measured at 1440×900 the row sat at y 870–900 under the footer's 824–900,
-     elementFromPoint returned "From template", a real click timed out. jsdom
-     has no layout, so this pins the structure that makes it reachable: the
-     row is part of the footer band, above the legend. */
-  it("sits inside the footer band, above the legend, not under it", () => {
-    render(<PageList {...makeProps({ dynamicPagesCount: 1 })} />);
-    const footer = screen.getByTestId("pages-footer");
-    const row = screen.getByTestId("pages-dynamic-pages-row");
-    expect(footer).toContainElement(row);
-    expect(footer.firstElementChild).toBe(row);
-  });
-
-  it("hides the row during a bulk selection", () => {
-    render(
-      <PageList
-        {...makeProps({ dynamicPagesCount: 2, selectedIds: new Set(["p1"]) })}
-      />,
-    );
-    expect(screen.queryByTestId("pages-dynamic-pages-row")).not.toBeInTheDocument();
+  it("is not part of the page tree and hides while searching", () => {
+    const { rerender } = render(<PageList {...makeProps({ collectionPages: [blog] })} />);
+    expect(screen.getByRole("tree", { name: "Pages" })).not.toContainElement(screen.getByTestId("pages-collections"));
+    rerender(<PageList {...makeProps({ collectionPages: [blog], search: "ab" })} />);
+    expect(screen.queryByTestId("pages-collections")).not.toBeInTheDocument();
   });
 });
