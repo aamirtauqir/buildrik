@@ -190,3 +190,26 @@ comparison; until then it stays `drift-open` with "built, not compared; copy mat
 Every touched row stays `drift-open` with "built, not compared": the dump has no board screenshots and
 no probe or live comparison was run in this lane (owner: light verification; no Next server in lanes).
 The lead's live walk on the integration branch is what moves them to `drift-fixed`.
+
+## Wave 2 (coordinator, 2026-10-26) — after merging `feat/design-2l9` (F-12…F-15 closed by lead1)
+
+Not touched: `AquibraStudio.tsx`, `shell/hooks/*`, `StudioPanels.tsx`, `FullPageRouter.tsx`, `src/engine/`.
+F5.20–F5.33 stay `blocked:owner-approval-code`. Paths taken for this wave (assigned rows, no other lane
+owns them): `sidebar/tabs/history/`, `panels/version-history/`, `sidebar/tabs/activity/`,
+`shell/TimeTravelHost.tsx`, `shell/CompareHost.tsx`, `shell/NotificationPanel.tsx`; `shell/PublishHistory.tsx`
+(L-E's) for H09/H10 copy only.
+
+| # | Archetype | Rows | Files |
+|---|---|---|---|
+| W1 | Save-failed strip: board copy in the publish context + a context-free variant (`open:save-failed-copy-context` kept) | 10:2199 | `shell/SaveFailedBanner.tsx` |
+| W2 | History · Session rows: verb · target · place, inline Restore to here, step-named confirm, restored row | H01–H03 | `sidebar/tabs/history/components/ActivityView.tsx` |
+| W3 | History · Saves: flat filter, header Save a version, details, delete confirm dialog, offline note | H04, H05, H07, H15 | `SavesChrome.tsx`, `SavesFilter.tsx`, `VersionList.tsx`, `HistoryTab.tsx` |
+| W4 | Restore to draft + Undo restore; Compare and Time Travel chrome | H06, H11, H12 | `TimeTravelHost.tsx`, `CompareHost.tsx`, `CompareView.tsx` |
+| W5 | Activity: Load more (if the API has a cursor), Back to Activity, load error | H13, H14, H16 | `sidebar/tabs/activity/` |
+| W6 | Published: Compare with live, Republish confirm copy | H09, H10 | `shell/PublishHistory.tsx` |
+| W7 | Slot-owned conditions: narrow window banner, phone screen with Open read-only anyway | G32, G33 | `GlobalBannerSlot.tsx`, `globalBanners.ts` |
+| W8 | Condition banners: role raised, workspace deletion, new version (save first, then reload; stop on a failed save), panel updated | G19–G21, G23–G25, G27 | `globalBanners.ts`, new `shell/reloadAfterSaving.ts` |
+| W9 | Tab handoff: Edit here / editing moved / refused | G29, G30 | new `shell/tabHandoff.ts` (+ lead request for the mount) |
+| W10 | Notifications grouped This site / Other sites; signed in again / different account | G35, G05, G06 | `shell/NotificationPanel.tsx`, `modals/SessionExpiredModal.tsx` |
+
+Out of this lane's paths: G34 toast cap lives in `chrome-ui/Toast.tsx` (lead request). H08 needs RT-D1 server soft delete.
