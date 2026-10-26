@@ -4481,7 +4481,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code trigger groups under \"Choose Trigger\"; board presets first, then \"Choose a trigger ›\""
+   "verifiedNote": "Lane L-B A7b (built, not compared — copy checked against the dump): '+ Add interaction' opens a screen replacing the list — '‹ Back to Interactions', 'Add interaction', the seven presets in board order (each = trigger + animation preset of the existing model), 'Choose a trigger ›' (all triggers, grouped), 'Plays when rendered (CSS) ›' (the element's CSS entrance animation). Not drawn: Visibility above it (the section only owns Interactions)."
   },
   {
    "nodeId": "161:15179",
@@ -6050,7 +6050,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code trigger groups under \"Choose Trigger\"; board presets first, then \"Choose a trigger ›\"",
+   "verifiedNote": "Lane L-B A7b (built, not compared): presets-first add screen — see 161:14772.",
    "inheritsFrom": "161:14772"
   },
   {

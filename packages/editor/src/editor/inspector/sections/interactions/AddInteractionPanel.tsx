@@ -1,150 +1,107 @@
 /**
- * Add Interaction Panel Component
- * Panel for selecting and adding new interaction triggers
+ * Add interaction — presets first (2L9 boards 161:14772 I14, 271:129231
+ * G17):
+ *
+ *   ‹ Back to Interactions
+ *   Add interaction
+ *   Fade in on scroll · Slide up on scroll · Fade in on page load ·
+ *   Grow on hover · Glow on hover · Pulse on hover · Press while held
+ *   Choose a trigger ›              → every trigger, grouped (the old panel)
+ *   Plays when rendered (CSS) ›     → the element's CSS entrance animation
+ *
+ * A preset is one trigger + one animation preset of the existing model —
+ * nothing a trigger-first add could not make, just named.
+ *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import type { LucideIcon } from "lucide-react";
-import { type InteractionTrigger, TRIGGER_GROUPS } from "./types";
+import { ChevronRight, type LucideIcon } from "lucide-react";
 import { Button } from "@/editor/chrome-ui";
-// ============================================================================
-// TYPES
-// ============================================================================
+import type { AnimationPreset } from "@/engine/interactions/types";
+import { type InteractionTrigger, TRIGGER_GROUPS } from "./types";
 
 export interface AddInteractionPanelProps {
-  onAdd: (trigger: InteractionTrigger) => void;
+  onAdd: (trigger: InteractionTrigger, preset?: AnimationPreset) => void;
   onClose: () => void;
   /** The element's CSS animation (G2-157 folded its section into this list).
    *  Present only while the element has none — one animation per element. */
   onAddAnimation?: () => void;
 }
 
-// ============================================================================
-// CONSTANTS
-// ============================================================================
+/** I14's presets, in its order: trigger + animation preset. */
+const PRESETS: readonly { label: string; trigger: InteractionTrigger; preset: AnimationPreset }[] = [
+  { label: "Fade in on scroll", trigger: "scroll-into-view", preset: "fadeIn" },
+  { label: "Slide up on scroll", trigger: "scroll-into-view", preset: "slideUp" },
+  { label: "Fade in on page load", trigger: "page-load", preset: "fadeIn" },
+  { label: "Grow on hover", trigger: "hover", preset: "scaleUp" },
+  { label: "Glow on hover", trigger: "hover", preset: "glow" },
+  { label: "Pulse on hover", trigger: "hover", preset: "pulse" },
+  { label: "Press while held", trigger: "active", preset: "scaleDown" },
+];
 
 const GROUP_LABELS: Record<string, string> = {
-  element: "Element Triggers",
-  page: "Page Triggers",
-  scroll: "Scroll Triggers",
-  mouse: "Mouse Triggers",
+  element: "Element",
+  page: "Page",
+  scroll: "Scroll",
+  mouse: "Mouse",
 };
 
-// ============================================================================
-// STYLES
-// ============================================================================
+const ROW =
+  "tw:flex tw:h-7 tw:w-full tw:items-center tw:justify-start tw:gap-2 tw:rounded-[4px] tw:border-0 tw:bg-transparent tw:px-2 " +
+  "tw:text-[12px] tw:font-normal tw:leading-4 tw:text-[var(--bk-ink-soft)] tw:hover:bg-[var(--bk-bg-subtle)] tw:focus:ring-0";
 
-const styles = {
-  container: {
-    background: "var(--bk-bg-card)",
-    borderRadius: 8,
-    padding: 12,
-  },
-  header: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 12,
-  },
-  title: {
-    fontSize: 12,
-    fontWeight: 600,
-    color: "var(--bk-ink)",
-  },
-  closeButton: {
-    background: "none",
-    border: "none",
-    color: "var(--bk-ink-muted)",
-    cursor: "pointer",
-    fontSize: 16,
-  } as React.CSSProperties,
-  groupContainer: {
-    marginBottom: 12,
-  },
-  groupLabel: {
-    fontSize: 12,
-    fontWeight: 600,
-    textTransform: "uppercase" as const,
-    color: "var(--bk-ink-muted)",
-    marginBottom: 6,
-  },
-  triggerGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(2, 1fr)",
-    gap: 6,
-  },
-  triggerButton: {
-    display: "flex",
-    alignItems: "center",
-    gap: 6,
-    padding: "8px 10px",
-    background: "var(--bk-bg-subtle)",
-    border: "none",
-    borderRadius: 6,
-    color: "var(--bk-ink-soft)",
-    fontSize: 12,
-    cursor: "pointer",
-    transition: "all 0.15s ease",
-  } as React.CSSProperties,
-};
+const BACK =
+  "tw:self-start tw:h-7 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[12px] tw:font-medium tw:text-[var(--bk-accent-text)] tw:hover:bg-transparent tw:hover:underline";
 
-// ============================================================================
-// SUB-COMPONENTS
-// ============================================================================
-
-interface TriggerGroupProps {
-  groupName: string;
-  triggers: Array<{ value: string; label: string; icon: LucideIcon }>;
-  onAdd: (trigger: InteractionTrigger) => void;
+function Row({ children, onClick, icon: Icon, more, testId }: { children: React.ReactNode; onClick: () => void; icon?: LucideIcon; more?: boolean; testId?: string }) {
+  return (
+    <Button type="button" color="light" size="xs" className={ROW} onClick={onClick} data-testid={testId}>
+      {Icon ? <Icon size={14} aria-hidden="true" className="tw:shrink-0" /> : null}
+      <span className="tw:min-w-0 tw:flex-1 tw:truncate tw:text-left">{children}</span>
+      {more ? <ChevronRight size={12} aria-hidden="true" className="tw:shrink-0 tw:text-[var(--bk-ink-muted)]" /> : null}
+    </Button>
+  );
 }
 
-const TriggerGroup: React.FC<TriggerGroupProps> = ({ groupName, triggers, onAdd }) => (
-  <div style={styles.groupContainer}>
-    <div style={styles.groupLabel}>{GROUP_LABELS[groupName] || groupName}</div>
-    <div style={styles.triggerGrid}>
-      {triggers.map((trigger) => (
-        <Button
-          key={trigger.value}
-          onClick={() => onAdd(trigger.value as InteractionTrigger)}
-          style={styles.triggerButton}
-        >
-          <trigger.icon size={14} aria-hidden="true" />
-          <span>{trigger.label}</span>
-        </Button>
-      ))}
-    </div>
-  </div>
-);
-
-// ============================================================================
-// COMPONENT
-// ============================================================================
-
-export const AddInteractionPanel: React.FC<AddInteractionPanelProps> = ({ onAdd, onClose, onAddAnimation }) => (
-  <div style={styles.container}>
-    <div style={styles.header}>
-      <span style={styles.title}>Choose Trigger</span>
-      <Button onClick={onClose} style={styles.closeButton}>
-        &#215;
+export const AddInteractionPanel: React.FC<AddInteractionPanelProps> = ({ onAdd, onClose, onAddAnimation }) => {
+  const [triggers, setTriggers] = React.useState(false);
+  return (
+    <div className="tw:flex tw:flex-col" data-testid="add-interaction">
+      <Button type="button" color="light" size="xs" className={BACK} onClick={triggers ? () => setTriggers(false) : onClose} data-testid="add-interaction-back">
+        {triggers ? "‹ Add interaction" : "‹ Back to Interactions"}
       </Button>
+      <div className="tw:py-1 tw:text-[12px] tw:font-semibold tw:text-[var(--bk-ink)]">{triggers ? "Choose a trigger" : "Add interaction"}</div>
+      {triggers ? (
+        Object.entries(TRIGGER_GROUPS).map(([group, list]) => (
+          <div key={group} role="group" aria-label={GROUP_LABELS[group] ?? group} className="tw:flex tw:flex-col tw:pb-1">
+            <div className="tw:px-2 tw:pt-1 tw:text-[11px] tw:font-medium tw:text-[var(--bk-ink-muted)]">{GROUP_LABELS[group] ?? group}</div>
+            {list.map((t) => (
+              <Row key={t.value} icon={t.icon} onClick={() => onAdd(t.value as InteractionTrigger)}>
+                {t.label}
+              </Row>
+            ))}
+          </div>
+        ))
+      ) : (
+        <>
+          {PRESETS.map((p) => (
+            <Row key={p.label} onClick={() => onAdd(p.trigger, p.preset)} testId="add-interaction-preset">
+              {p.label}
+            </Row>
+          ))}
+          <Row more onClick={() => setTriggers(true)} testId="add-interaction-choose-trigger">
+            Choose a trigger
+          </Row>
+          {onAddAnimation ? (
+            <Row more onClick={onAddAnimation} testId="add-interaction-css">
+              Plays when rendered (CSS)
+            </Row>
+          ) : null}
+        </>
+      )}
     </div>
-
-    {Object.entries(TRIGGER_GROUPS).map(([groupName, triggers]) => (
-      <TriggerGroup key={groupName} groupName={groupName} triggers={triggers} onAdd={onAdd} />
-    ))}
-
-    {onAddAnimation ? (
-      <div style={styles.groupContainer}>
-        <div style={styles.groupLabel}>CSS Animation</div>
-        <div style={styles.triggerGrid}>
-          <Button onClick={onAddAnimation} style={styles.triggerButton}>
-            <span>Entrance animation…</span>
-          </Button>
-        </div>
-      </div>
-    ) : null}
-  </div>
-);
+  );
+};
 
 export default AddInteractionPanel;
