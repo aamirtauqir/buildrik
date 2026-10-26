@@ -42,9 +42,12 @@ export interface RecordSheetProps {
   /** null → a new record. */
   record: CMSContentItem | null;
   onClose: () => void;
-  /** Opened from an element (§13 Open record ›): "‹ Back to canvas" leads the
+  /** Opened from an element (§13 Open record ›): the way back leads the
    *  sheet's header — it covers the workspace's own. Absent, not drawn. */
   onBackToCanvas?: () => void;
+  /** The door's name for that way back ("Heading · Title binding",
+   *  173:16169); absent → "Back to canvas". */
+  origin?: string | null;
   /** The sheet's own Records · Fields · Dynamic pages row leaves the sheet. */
   onOpenTab: (tab: CmsTab) => void;
   /** Resolve when the save has either reached the server (true), been
@@ -124,6 +127,7 @@ export function RecordSheet({
   record,
   onClose,
   onBackToCanvas,
+  origin = null,
   onOpenTab,
   onSave,
   onDelete,
@@ -202,7 +206,8 @@ export function RecordSheet({
     go();
   };
   /* A deleted record has nothing left to discard: its edit is already lost. */
-  const guard = (go: () => void, to: string | null = null) => (dirty && !gone ? setLeaveTo({ go, to }) : leave(go));
+  const guard = (go: () => void, to: string | null = null, toOrigin = false) =>
+    dirty && !gone ? setLeaveTo({ go, to, origin: toOrigin }) : leave(go);
   /* Where a workspace move lands, in the guard's words (168:21408 · 168:21848 · 168:22290). */
   const destinationOf = (next: CmsWorkspaceState): string | null => {
     if (next.collectionId !== collection.id) {
@@ -435,8 +440,14 @@ export function RecordSheet({
             Saving record…
           </span>
         ) : onBackToCanvas ? (
-          <Button color="light" size="xs" className={`${BACK} tw:flex-none`} data-testid="cms-sheet-back-to-canvas" onClick={() => guard(onBackToCanvas)}>
-            ‹ Back to canvas
+          <Button
+            color="light"
+            size="xs"
+            className={`${BACK} tw:min-w-0 tw:flex-none tw:truncate`}
+            data-testid="cms-sheet-back-to-canvas"
+            onClick={() => guard(onBackToCanvas, origin, origin !== null)}
+          >
+            ‹ {origin ?? "Back to canvas"}
           </Button>
         ) : null}
         <h3 className="tw:m-0 tw:min-w-0 tw:flex-1 tw:truncate tw:text-[14px] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)]" data-testid="cms-sheet-title">

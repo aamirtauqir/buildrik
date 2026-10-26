@@ -133,6 +133,9 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
     setQuery("");
   }, [collectionName]);
 
+  /* A visit's way back ends with the visit (F2.06 origin). */
+  React.useEffect(() => () => cmsWorkspace.clearOrigin(), []);
+
   /* 4428:140486 — while the workspace covers the canvas the topbar crumb
      reads "<site> › CMS", not the page behind it. */
   React.useEffect(() => {
@@ -170,7 +173,7 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
   const back = onBackToCanvas ? (
     <>
       <Button color="light" size="xs" className={BACK} data-testid="cms-ws-back-to-canvas" onClick={onBackToCanvas}>
-        ‹ Back to canvas
+        ‹ {ws.origin ?? "Back to canvas"}
       </Button>
       <span className="tw:h-5 tw:w-px tw:bg-[var(--bk-border)]" aria-hidden="true" />
     </>
@@ -468,6 +471,7 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
                 }
               : undefined
           }
+          origin={ws.origin}
           onOpenTab={(tab) => cmsWorkspace.setTab(tab)}
           onSave={async (data, published) => {
             const isNew = ws.recordId === "new";

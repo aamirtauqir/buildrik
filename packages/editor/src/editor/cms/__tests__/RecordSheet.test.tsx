@@ -528,3 +528,53 @@ describe("RecordSheet · Leave without saving? with Save and leave (2L9 C1)", ()
     await act(async () => finish(true));
   });
 });
+
+/* design-2l9 C2 — a record opened from an element names its way back
+   (173:16169 "‹ Heading · Title binding"; Play F2.06/F2.08). */
+describe("RecordSheet · the way back names its origin (2L9 C2)", () => {
+  const mountFrom = (origin?: string) => {
+    const engine = makeEngine({ collections: [MENU], items: [MARGHERITA] });
+    const back = vi.fn();
+    cmsWorkspace.openRequest({ collectionId: "col-1", recordId: "r1", origin });
+    const view = render(
+      <ToastProvider>
+        <CmsWorkspace composer={engine.composer as never} onBackToCanvas={back} />
+      </ToastProvider>,
+    );
+    return { back, view };
+  };
+
+  it("reads ‹ <origin> and the guard names it as the destination", async () => {
+    const { back } = mountFrom("Heading · Title binding");
+    const btn = await screen.findByTestId("cms-sheet-back-to-canvas");
+    expect(btn).toHaveTextContent("‹ Heading · Title binding");
+    fireEvent.change(screen.getByLabelText("Price *"), { target: { value: "$13" } });
+    fireEvent.click(btn);
+    expect(await screen.findByTestId("cms-discard-body")).toHaveTextContent("Your destination is Heading · Title binding.");
+    fireEvent.click(screen.getByTestId("cms-discard-save"));
+    await waitFor(() => expect(back).toHaveBeenCalled());
+  });
+
+  it("a failed save on the way back pauses it under the origin's name", async () => {
+    mountFrom("Heading · Title binding");
+    fireEvent.change(await screen.findByLabelText("Price *"), { target: { value: "$13" } });
+    syncMock.mockImplementationOnce(async () => false);
+    fireEvent.click(screen.getByTestId("cms-sheet-back-to-canvas"));
+    fireEvent.click(await screen.findByTestId("cms-discard-save"));
+    expect(await screen.findByTestId("cms-sheet-return-paused")).toHaveTextContent(
+      "Your edits are still here. Return to Heading is paused.",
+    );
+  });
+
+  it("without an origin it stays ‹ Back to canvas", async () => {
+    mountFrom();
+    expect(await screen.findByTestId("cms-sheet-back-to-canvas")).toHaveTextContent("‹ Back to canvas");
+  });
+
+  it("the origin goes when the workspace closes", async () => {
+    const { view } = mountFrom("Heading · Title binding");
+    await screen.findByTestId("cms-sheet");
+    view.unmount();
+    expect(cmsWorkspace.get().origin).toBeNull();
+  });
+});

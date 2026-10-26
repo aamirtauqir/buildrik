@@ -7921,7 +7921,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Record opened from binding: crumb \"‹ Heading · Title binding\"; code \"‹ Back to canvas\" (RecordSheet.tsx:521)"
+   "verifiedNote": "built, not compared — L-C C2: record/workspace back reads \"‹ {origin}\" from CmsOpenRequest.origin and the guard says \"Your destination is {origin}.\"; live label waits on REQUESTS #11 (L-B passes origin)."
   },
   {
    "nodeId": "173:16399",
@@ -7931,7 +7931,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Edited excerpt, Preview (unsaved); live form preview exists (RecordPreview.tsx:6)",
+   "verifiedNote": "built, not compared — L-C C2: record/workspace back reads \"‹ {origin}\" from CmsOpenRequest.origin and the guard says \"Your destination is {origin}.\"; live label waits on REQUESTS #11 (L-B passes origin).",
    "inheritsFrom": "173:16169"
   },
   {
@@ -7952,7 +7952,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Saved: \"Return to Heading when you're ready\" note; no return-intent copy in code"
+   "verifiedNote": "built, not compared — L-C C2: record/workspace back reads \"‹ {origin}\" from CmsOpenRequest.origin and the guard says \"Your destination is {origin}.\"; live label waits on REQUESTS #11 (L-B passes origin)."
   },
   {
    "nodeId": "173:17098",
@@ -8641,7 +8641,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Open collection exists (CollectionListSection.tsx:91); back reads \"‹ Back to canvas\" (CmsWorkspace.tsx:172), not origin list"
+   "verifiedNote": "built, not compared — L-C C2: record/workspace back reads \"‹ {origin}\" from CmsOpenRequest.origin and the guard says \"Your destination is {origin}.\"; live label waits on REQUESTS #11 (L-B passes origin)."
   },
   {
    "nodeId": "189:28673",
@@ -20972,7 +20972,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Return to exact binding subview missing; back lands on canvas."
+   "verifiedNote": "drift-open — L-C C2 built the record side (origin label, Save and leave back); landing on the same binding subview waits on REQUESTS #12 (lead, StudioPanels backToCanvas)."
   },
   {
    "nodeId": "302:17250",
