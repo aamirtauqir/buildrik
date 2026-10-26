@@ -28,6 +28,22 @@ As in the master plan (`docs/superpowers/plans/2026-10-22-implement-2l9-design.m
 - **LD-5 Opening tab.** A new element type opens on **Content** when its Content tab has a defining block (type block body or Fields/Slides/Collection), else on **Style** (containers, sections: the boards' container specimens are Style). Same-type selection keeps the tab (DD-20 unchanged). The override context row (State chip · Reset · Revert) shows on Style and Effects only.
 - **LD-6 No placeholder rows.** "Conditions · None" is not drawn until conditions exist (engine + export runtime, see Later). Drawing a row that cannot do anything is a fake.
 
+## Status (2026-10-26, end of run 1)
+
+| Archetype | Commit | State |
+|---|---|---|
+| A1 tab chassis | `018a05669` | done — probe-compared (case `inspector-panel`) against dump copy |
+| A2 Semantics + Advanced attributes | `5c1e28467` | done — probe-compared for copy |
+| A3 field detail + A4 13 types | `54d14f143` | done — built, not compared (no board images in the dump) |
+| A5 field ⋯ menu | `6e85220fa` | done — built, not compared; submit row "Submit button" open |
+| A6 form settings | `306ea026b` | done — `code:after-submit-live-on-save` |
+| A7 Behavior copy | `686c08c6b` | part 1 done; presets-first add panel, actions menu, Undo receipts open (A7b) |
+| A8 instance block | `609bffcac` | done — `code:detach-not-undoable` (REQUESTS #12) |
+| A9 states | `99a1b5928` | done — page-scoped template notice open (writer is L-C's TemplatesTab) |
+| A10 Dynamic bindings | — | not started: the board binds at the property row ("Title text · Blog.title") with a read-only "Dynamic bindings · N binding" summary; that is a model change, not a retitle |
+
+Rows closed this run are `drift-open` with notes ("built, not compared" where no image exists); none is marked `drift-fixed` because the dump carries copy and structure only. The lead's live walk is the comparison.
+
 ## Archetypes (ordered: Play-journey steps first, then the largest drift clusters)
 
 ### A1 · Tab chassis — Content · Style · Behavior · Effects  (~200 rows inherit; direct: 36:2, 161:8480, 156:716, 161:13919)
