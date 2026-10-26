@@ -895,8 +895,8 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
         publishBusy={publishLoading}
         publishExpanded={!isViewer && !viewMode.readOnlyView && isTrayToggle ? trayOpen : undefined}
         publishControls="publish-tray"
-        /* A viewer's reason is the lifecycle's own ("Viewers can't publish —
-           ask an editor"); in view mode it rides the disabled CTA. */
+        /* A viewer's reason is the lifecycle's own ("Publishing needs Editor
+           access"); in view mode it rides the disabled CTA. */
         publishBlockedReason={nextMove?.blockedReason ?? undefined}
         ctaLabel={isViewer ? nextMove?.label ?? "Publish" : nextMove?.label}
         ctaHint={nextMove?.hint}

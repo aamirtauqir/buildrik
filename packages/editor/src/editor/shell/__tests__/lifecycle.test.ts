@@ -177,7 +177,7 @@ describe("deriveLifecycleState — off the happy path", () => {
   it("a blocked publish is shown with its reason, never withheld", () => {
     const cases: Array<[Partial<LifecycleInput>, string]> = [
       [{ publishEnabled: false }, "Publishing isn’t switched on for this workspace yet"],
-      [{ isViewer: true }, "Viewers can't publish — ask an editor"],
+      [{ isViewer: true }, "Publishing needs Editor access"],
       [{ saveConflict: true }, "Resolve the sync conflict before publishing"],
       /* L5-060: publish exports the live canvas, so after a failed save it
          would ship edits no stored project or version holds. */

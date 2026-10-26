@@ -170,7 +170,7 @@ describe("PublishTab — the other shut doors", () => {
     const { onRequestPublish } = renderTab(move);
     await waitFor(() => expect(screen.getByTestId("publish-cta-reason")).toBeTruthy());
     expect(cta().disabled).toBe(true);
-    expect(screen.getByTestId("publish-cta-reason").textContent).toBe("Viewers can't publish — ask an editor");
+    expect(screen.getByTestId("publish-cta-reason").textContent).toBe("Publishing needs Editor access");
     expect(screen.queryByTestId("publish-gate-banner")).toBeNull();
     fireEvent.click(cta());
     expect(onRequestPublish).not.toHaveBeenCalled();

@@ -493,7 +493,7 @@ describe("StudioHeader", () => {
       const btn = screen.getByRole("button", { name: "Publish" });
       expect(btn.getAttribute("aria-disabled")).toBe("true");
       fireEvent.focus(btn);
-      expect(screen.getByRole("tooltip").textContent).toBe("Viewers can't publish — ask an editor");
+      expect(screen.getByRole("tooltip").textContent).toBe("Publishing needs Editor access");
     });
 
     it("an owner's own view mode stays the bare preview bar", () => {
