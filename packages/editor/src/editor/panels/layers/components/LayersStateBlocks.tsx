@@ -1,7 +1,7 @@
 /**
  * Layers panel state blocks — v3 boards 4418:83074 (loading), 4418:83295
- * (load-error), 4418:83498 (no-results: "No matching layers" + Clear search,
- * L2-031, owner 2026-10-10). The blocks themselves are shared
+ * (load-error), 4418:83498 (no-results; copy from design-2l9 board 147:79328: "No layers match “q”" +
+ * Clear search). The blocks themselves are shared
  * with Pages (`@/editor/shared/PanelStates`); these bind the Layers copy and
  * the testIds the conformance recipes measure.
  *
@@ -31,8 +31,8 @@ export const LayersNoResults: React.FC<{
 }> = ({ search, onSearchEverywhere, onClear }) => (
   <PanelNoResults
     search={search}
-    title="No matching layers"
-    message="Try a different name, or clear the search."
+    title={`No layers match “${search}”`}
+    message="Search by name, type, tag or ID."
     onClear={onClear}
     testId="layers-no-results"
     everywhereTestId="layers-search-everywhere"

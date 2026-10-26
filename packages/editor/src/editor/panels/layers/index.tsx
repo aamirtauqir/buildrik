@@ -18,7 +18,7 @@ import { useLayerContextActions } from "./hooks/useLayerContextActions";
 import { useLayersState } from "./hooks/useLayersState";
 import { LayerTreeItem } from "./LayerTreeItem";
 import { itemMatches } from "./hooks/useLayerSearch";
-import { findById as findLayer, flattenTree, getDisplayName } from "./data/layerUtils";
+import { findById as findLayer, flattenTree, getAncestors, getDisplayName } from "./data/layerUtils";
 import { LayersNoResults } from "./components/LayersStateBlocks";
 import type { LayersPanelProps } from "./types";
 import { Button, ConfirmDialog, useToast } from "@/editor/chrome-ui";
@@ -48,18 +48,22 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
   }, [search, stateSearch, setSearch]);
 
   // Expand/collapse-all from LayersTab
-  const { expandAll, collapseAll } = state.treeHook;
+  const { expandAll, collapseAll, collapseToSelection } = state.treeHook;
+  const { selectedIds } = state.selectionHook;
   React.useEffect(() => {
     if (!composer) return;
     const onExpand = () => expandAll();
     const onCollapse = () => collapseAll();
+    const onCollapseToSelection = () => collapseToSelection(selectedIds);
     composer.on("layers:expand-all", onExpand);
     composer.on("layers:collapse-all", onCollapse);
+    composer.on("layers:collapse-to-selection", onCollapseToSelection);
     return () => {
       composer.off("layers:expand-all", onExpand);
       composer.off("layers:collapse-all", onCollapse);
+      composer.off("layers:collapse-to-selection", onCollapseToSelection);
     };
-  }, [composer, expandAll, collapseAll]);
+  }, [composer, expandAll, collapseAll, collapseToSelection, selectedIds]);
 
   const totalCount = state.treeHook.totalCount;
   const selectedCount = state.selectionHook.selectedIds.size;
@@ -400,12 +404,22 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
   const matchCount = state.searchHook.countMatches(state.layers, state.actionsHook.customNames);
 
   /* Stats for LayersTab's count footer; `matches` while a filter is on
-     (4418:79355 "1 of 12 layers match “button”"). */
+     (147:77189 "12 matches in 5,000 layers"). */
   const matches = state.searchHook.isSearching ? matchCount : null;
+  /* Board 152:78614 "… · 1 selected inside Hero": the one selected row sits
+     in a folded branch — name the outermost folded ancestor, the row a user
+     would open to find it. */
+  const { expandedIds } = state.treeHook;
+  const hiddenIn = React.useMemo(() => {
+    const id = selectedElement?.id;
+    if (!id || selectedCount !== 1) return null;
+    const folded = getAncestors(state.layers, id).find((a) => !expandedIds.has(a.id));
+    return folded ? getDisplayName(folded.id, folded.type, state.actionsHook.customNames, folded.preview) : null;
+  }, [selectedElement?.id, selectedCount, state.layers, expandedIds, state.actionsHook.customNames]);
   React.useEffect(() => {
     if (!composer) return;
-    composer.emit("layers:stats-change", { total: totalCount, selected: selectedCount, matches });
-  }, [composer, totalCount, selectedCount, matches]);
+    composer.emit("layers:stats-change", { total: totalCount, selected: selectedCount, matches, hiddenIn });
+  }, [composer, totalCount, selectedCount, matches, hiddenIn]);
 
   // Board 143:2 (Layers · filtered): search results render FLAT — only the
   // matching rows, no indentation, no chevrons, no ancestor context. The

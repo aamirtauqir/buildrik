@@ -2527,7 +2527,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code footer 'N layers'/'N selected of M'; board 'N layers · 1 selected' (+ 'inside Hero')"
+   "verifiedNote": "L-A S2 built, not compared: footer '{N} layers · {K} selected' (layersFooterText, unit-tested against the board copy). Geometry not compared."
   },
   {
    "nodeId": "147:76329",
@@ -2537,7 +2537,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Five toggles match; footnote 'Personal editor view. Live-site visibility is edited in the Inspector.' missing"
+   "verifiedNote": "L-A S2 built, not compared: footnote 'Personal editor view. Live-site visibility is edited in the Inspector.' under the five toggles. The board opens it from a header 'View' control; the code keeps ⋯ › Display settings… (not moved)."
   },
   {
    "nodeId": "147:76773",
@@ -2545,9 +2545,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-layers-footer-variant",
    "verified": "drift-open",
-   "verifiedNote": "Density exists; footer '8 layers · Compact rows' missing"
+   "verifiedNote": "Board prints '8 layers · Compact rows' in place of the selection count; the L family elsewhere prints '· K selected'. L-A applies the selection count; owner to choose (sub-plan blocked:owner-layers-footer-variant)."
   },
   {
    "nodeId": "147:77189",
@@ -2607,7 +2607,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Board 'No layers match “q”' + hint + Clear search"
+   "verifiedNote": "L-A S2 built, not compared: 'No layers match “q”' / 'Search by name, type, tag or ID.' / Clear search (search really matches name, type, tag, id — useLayerSearch.itemMatches); footer '{N} layers · No matches'. 'Search everywhere' kept (code-ahead)."
   },
   {
    "nodeId": "147:79728",
@@ -2628,7 +2628,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code Expand/Collapse all·Display settings·Widen; board adds Collapse to selection, Select mode"
+   "verifiedNote": "L-A S2 built, not compared: ⋯ adds 'Collapse to selection' (only the selection's ancestors stay open; disabled with nothing selected) and 'Select mode'. Widen panel kept (code-ahead)."
   },
   {
    "nodeId": "152:78614",
@@ -2638,7 +2638,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code footer 'N layers'/'N selected of M'; board 'N layers · 1 selected' (+ 'inside Hero')",
+   "verifiedNote": "L-A S2 built, not compared: '… · 1 selected inside {outermost folded ancestor}' from the panel's expanded set.",
    "inheritsFrom": "147:75914"
   },
   {
@@ -2649,7 +2649,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code footer 'N layers'/'N selected of M'; board 'N layers · 1 selected' (+ 'inside Hero')",
+   "verifiedNote": "L-A S2 built, not compared: shares the 147:75914 footer.",
    "inheritsFrom": "147:75914"
   },
   {
@@ -2671,7 +2671,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Five toggles match; footnote 'Personal editor view. Live-site visibility is edited in the Inspector.' missing",
+   "verifiedNote": "L-A S2: same popover as 147:76329, built, not compared.",
    "inheritsFrom": "147:76329"
   },
   {
@@ -20772,7 +20772,7 @@
    "status": "active",
    "authority": "board",
    "verified": "match",
-   "verifiedNote": "Select Text in Layers: LayersTab selection. Footer copy \"N layers\" vs board \"8 elements · Home\"."
+   "verifiedNote": "Select Text in Layers: LayersTab selection. L-A S2: footer now reads \"{N} layers · {K} selected\" (L-family copy); this play board prints \"8 elements · Home\" — blocked:owner-layers-footer-variant in the lane sub-plan."
   },
   {
    "nodeId": "302:5844",
