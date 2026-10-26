@@ -9750,7 +9750,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "src/editor/sidebar/tabs/ComponentsTab.tsx:297 single list (YOUR/LINKED) no nav/search/sort/version/uses badges; detail is drill-in not side…"
+   "verifiedNote": "drift-open — L-C D7: scopes \"This page · N / This site · N / Component library · N\", Search components, Sort (Most used/Name/Newest), \"This site · N\" list with source + uses built in the drawer; full workspace nav, Import package…, Recently deleted, side detail pane and row ⋯ not built. Not compared."
   },
   {
    "nodeId": "215:43978",
@@ -9760,7 +9760,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "No This page nav filter; page scope exists only at create (src/editor/shell/modals/CreateComponentModal.tsx:150)",
+   "verifiedNote": "drift-open — L-C D7: scopes \"This page · N / This site · N / Component library · N\", Search components, Sort (Most used/Name/Newest), \"This site · N\" list with source + uses built in the drawer; full workspace nav, Import package…, Recently deleted, side detail pane and row ⋯ not built. Not compared.",
    "inheritsFrom": "215:43588"
   },
   {
@@ -9771,7 +9771,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Library rows only in Add FROM LIBRARY (build/components/GroupSection.tsx:500); no versions, Restricted state or library view"
+   "verifiedNote": "drift-open — L-C D7: Component library scope lists shared masters with \"On this site / Not on this site\"; versions and Restricted state not built. Not compared."
   },
   {
    "nodeId": "215:44647",
@@ -9982,7 +9982,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Site-wide empty \"No components yet.\" (src/editor/sidebar/tabs/ComponentsTab.tsx:195); no per-page empty state"
+   "verifiedNote": "built, not compared — L-C D7: This page scope empty: \"No components on this page yet\" + the board's how-to sentence."
   },
   {
    "nodeId": "217:43947",

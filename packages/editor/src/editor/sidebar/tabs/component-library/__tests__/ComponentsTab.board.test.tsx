@@ -30,17 +30,17 @@ function mount(components: never[]) {
 }
 
 describe("ComponentsTab — board 4418:142419", () => {
-  it("draws the back row, intro, counted section header and chevron-less rows", async () => {
+  it("draws the back row, the scopes, a counted section header and chevron-less rows", async () => {
     const composer = mount([c("hdr", "Site header"), c("ftr", "Footer")]);
     const back = await screen.findByTestId("comp-back-row");
     expect(back.textContent?.replace(/\s+/g, " ")).toBe("‹ Add");
     fireEvent.click(back);
     expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_SWITCH_TAB, { tab: "add" });
 
-    expect(screen.getByTestId("comp-intro").textContent).toBe(
-      "Manage saved masters for this site. Insert places an instance; edits to a master affect its instances.",
-    );
-    expect(screen.getByTestId("comp-section-header").textContent).toBe("YOUR COMPONENTS2");
+    /* 2L9 215:43588 — scopes with counts, then "This site · N" (no intro). */
+    expect(screen.queryByTestId("comp-intro")).toBeNull();
+    expect(screen.getAllByRole("tab").map((t) => t.textContent)).toEqual(["This page · 0", "This site · 2", "Component library · 0"]);
+    expect(screen.getByTestId("comp-section-header").textContent).toBe("This site · 2");
     expect(screen.getByTestId("comp-row-hdr").textContent).toBe("Site header6 uses");
     /* 2L9 217:43947 — the full name on hover, however the row truncates it. */
     expect(screen.getByTestId("comp-row-name-hdr")).toHaveAttribute("title", "Site header");
