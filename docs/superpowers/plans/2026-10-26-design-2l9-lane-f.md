@@ -213,3 +213,20 @@ owns them): `sidebar/tabs/history/`, `panels/version-history/`, `sidebar/tabs/ac
 | W10 | Notifications grouped This site / Other sites; signed in again / different account | G35, G05, G06 | `shell/NotificationPanel.tsx`, `modals/SessionExpiredModal.tsx` |
 
 Out of this lane's paths: G34 toast cap lives in `chrome-ui/Toast.tsx` (lead request). H08 needs RT-D1 server soft delete.
+
+### Wave 2 status (2026-10-26)
+
+| # | Commit | Rows | State |
+|---|---|---|---|
+| W1 | `7baa56b61` | 10:2199 | built; StudioHeader passes `context="publish"`: F-18; `open:save-failed-copy-context` stands |
+| W2 | `159cd3091`, `1b2fc6e89` | H01, H02 (built); H03 `code:restore-truncates` | entries carry no target/page (`code:history-entry-no-target`) |
+| W3 | `d9393c210` | H04, H07, H15 built; H05 inline details not built | |
+| W4 | `045238a5b` | H06, H11, H12 | Visual/Semantic vs Side by side/Overlay/List not reconciled |
+| W5 | `7d9de6672` | H13 (server `before` cursor, full chain), H14, H16 | |
+| W6 | `f53ed32b7` | H09, H10 (`code:republish-as-new-version`) | PublishHistory is L-E's path: copy + compare target only; no Pruned row |
+| W7 | `ce0ac688b` | G32, G33 | |
+| W8 | `ba096018b` | G19, G20, G21, G23, G24, G25, G27 | G19 producer F-19; G23–G25 producer F-20 |
+| W9 | `40a80206c` | G28, G29, G30 | mount F-21 |
+| W10 | `271efa605` | G05 built; G06 `blocked:save-user-check` (F-22); G34 `blocked:chrome-ui-toast` (F-23); G35 `open:notifications-other-sites` (owner decision 9) | |
+
+Not started: H05 inline details, H08 (needs RT-D1), F5.20–F5.33 (`blocked:owner-approval-code`).
