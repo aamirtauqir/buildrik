@@ -35,14 +35,18 @@ export interface RecordFieldControlProps {
   onOpenMediaLibrary?: OpenMediaLibrary;
 }
 
-const LABEL = "tw:block tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
-const FIELD = "tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:gap-1";
+/* 2L9 165:520 — a 13/20 medium label over a 28-tall filled control, 12/16. */
+const LABEL = "tw:block tw:text-[13px] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)]";
+const FIELD = "tw:flex tw:min-w-0 tw:flex-col tw:gap-2";
 const ERROR = "tw:text-[11px] tw:leading-4 tw:text-[var(--bk-error-text)]";
-/* 4428:144760 control: 32 tall, 10 inline, 13/20, radius 6. */
 const CONTROL =
-  "tw:[&_input]:h-8 tw:[&_input]:py-0 tw:[&_input]:pl-2.5 tw:[&_input]:text-[13px] tw:[&_input]:rounded-[6px] " +
-  "tw:[&_select]:h-8 tw:[&_select]:py-0 tw:[&_select]:pl-2.5 tw:[&_select]:text-[13px] tw:[&_select]:rounded-[6px]";
-const SMALL_BTN = "tw:h-7 tw:px-3 tw:py-1 tw:text-[13px] tw:leading-5 tw:font-medium tw:rounded-[6px]";
+  "tw:[&_input]:h-7 tw:[&_input]:py-0 tw:[&_input]:pl-2.5 tw:[&_input]:text-[12px] tw:[&_input]:rounded-[6px] " +
+  "tw:[&_input]:bg-[var(--bk-bg-subtle)] tw:[&_input]:border-transparent " +
+  "tw:[&_select]:h-7 tw:[&_select]:py-0 tw:[&_select]:pl-2.5 tw:[&_select]:text-[12px] tw:[&_select]:rounded-[6px] " +
+  "tw:[&_select]:bg-[var(--bk-bg-subtle)] tw:[&_select]:border-transparent";
+/* 165:520 "Choose image…" — 180 × 32, outlined. */
+const CHOOSE_BTN = "tw:h-8 tw:w-[180px] tw:px-3 tw:py-0 tw:text-[13px] tw:leading-5 tw:font-medium tw:rounded-[6px]";
+const SMALL_BTN = "tw:h-8 tw:px-3 tw:py-0 tw:text-[13px] tw:leading-5 tw:font-medium tw:rounded-[6px]";
 
 export function isEmptyValue(v: unknown): boolean {
   return v === undefined || v === null || (typeof v === "string" && v.trim() === "");
@@ -78,26 +82,24 @@ export function RecordFieldControl({
   if (f.type === "image") {
     const src = typeof v === "string" ? v : "";
     return (
-      <div className="tw:flex tw:flex-col tw:gap-1 tw:px-3" data-testid={id}>
-        <span className="tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink)]">{f.name}</span>
+      <div className={FIELD} data-testid={id}>
+        <span className={LABEL}>{f.name}</span>
         {src ? (
           <span className="tw:flex tw:items-center tw:gap-2">
             <img src={src} alt="" className="tw:size-10 tw:rounded tw:object-cover" />
-            <span className="tw:truncate tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-soft)]">{src.split("/").pop()}</span>
+            <span className="tw:truncate tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)]">{src.split("/").pop()}</span>
           </span>
-        ) : (
-          <span className="tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink)]">No image yet · use Choose image</span>
-        )}
+        ) : null}
         <span className="tw:flex tw:gap-2">
           <Button
             size="xs"
             variant="secondary"
-            className={SMALL_BTN}
+            className={CHOOSE_BTN}
             disabled={!onOpenMediaLibrary}
             data-testid={`${id}-choose`}
             onClick={() => onOpenMediaLibrary?.(["image"], (asset) => onChange(asset.src), pickLabel)}
           >
-            Choose image
+            Choose image…
           </Button>
           {src ? (
             <Button size="xs" variant="ghost" className={SMALL_BTN} data-testid={`${id}-clear`} onClick={() => onChange("")}>
@@ -117,7 +119,7 @@ export function RecordFieldControl({
       <Textarea
         id={id}
         rows={2}
-        className="tw:min-h-[58px] tw:rounded-[6px] tw:bg-[var(--bk-bg-panel)] tw:px-2.5 tw:py-2 tw:text-[13px] tw:leading-5"
+        className="tw:min-h-[58px] tw:rounded-[6px] tw:border-transparent tw:bg-[var(--bk-bg-subtle)] tw:px-2.5 tw:py-2 tw:text-[12px] tw:leading-[18px]"
         value={String(v ?? "")}
         onChange={(e) => onChange(e.target.value)}
       />

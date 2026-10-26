@@ -62,6 +62,10 @@ function set(next: CmsWorkspaceState): void {
  *  Fields", 168:21408). */
 export type CmsLeaveGuard = (go: () => void, next: CmsWorkspaceState) => boolean;
 let leaveGuard: CmsLeaveGuard | null = null;
+/** Asked before the workspace itself is left for the element it was opened
+ *  from (the header's "‹ {origin}"); true when it took the exit over. */
+type CmsExitGuard = (go: () => void) => boolean;
+let exitGuard: CmsExitGuard | null = null;
 
 /**
  * Every move goes through here (UI-02). A move that closes the open record —
@@ -96,6 +100,17 @@ export const cmsWorkspace = {
     return () => {
       if (leaveGuard === guard) leaveGuard = null;
     };
+  },
+  /** The open record's guard on leaving the workspace; returns its release. */
+  setExitGuard: (guard: CmsExitGuard): (() => void) => {
+    exitGuard = guard;
+    return () => {
+      if (exitGuard === guard) exitGuard = null;
+    };
+  },
+  /** Leave the workspace — through the open record's guard when there is one. */
+  exit: (go: () => void): void => {
+    if (!exitGuard?.(go)) go();
   },
   reset: (): void => set(INITIAL),
   subscribe: (l: () => void): (() => void) => {

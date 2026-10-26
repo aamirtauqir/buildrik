@@ -37,16 +37,17 @@ const records: CMSContentItem[] = [
 ];
 
 describe("RecordsTable · stored fields without a slug", () => {
-  it("renders with no sort (null) instead of crashing", () => {
-    render(<RecordsTable collection={storedCollection} records={records} query="" onOpenRecord={() => {}} />);
+  /* 2L9 165:2 — the default order is "Updated · Newest": only Updated sorts. */
+  it("renders slugless fields without crashing, sorted Updated · Newest", () => {
+    render(<RecordsTable collection={storedCollection} records={records} onOpenRecord={() => {}} />);
     expect(screen.getByTestId("cms-table")).toBeTruthy();
-    for (const header of screen.getAllByRole("columnheader")) {
-      expect(header.getAttribute("aria-sort")).toBe("none");
-    }
+    expect(screen.getByTestId("cms-records-sort")).toHaveValue("updated-desc");
+    const sorted = screen.getAllByRole("columnheader").filter((h) => h.getAttribute("aria-sort") !== "none");
+    expect(sorted.map((h) => h.textContent)).toEqual(["Updated"]);
   });
 
   it("sorting by Updated leaves the slugless columns unsorted", () => {
-    render(<RecordsTable collection={storedCollection} records={records} query="" onOpenRecord={() => {}} />);
+    render(<RecordsTable collection={storedCollection} records={records} onOpenRecord={() => {}} />);
     fireEvent.click(screen.getByTestId("cms-th-__updated"));
     const sorted = screen.getAllByRole("columnheader").filter((h) => h.getAttribute("aria-sort") !== "none");
     expect(sorted).toHaveLength(1);
@@ -85,7 +86,7 @@ describe("CmsRecordsTable · status column", () => {
     render(
       <RecordsTable
         collection={collection}
-        query=""
+       
         onOpenRecord={() => {}}
         records={[
           rec("d", { status: "draft" }),
@@ -107,7 +108,7 @@ describe("CmsRecordsTable · status column", () => {
 
   it("each badge carries its status text (state is never colour-only)", () => {
     const records = CMS_RECORD_STATUSES.map((status) => rec(status, { status }));
-    render(<RecordsTable collection={collection} query="" onOpenRecord={() => {}} records={records} />);
+    render(<RecordsTable collection={collection} onOpenRecord={() => {}} records={records} />);
     for (const r of records) expect(badge(r.id).textContent?.trim()).not.toBe("");
   });
 
@@ -119,7 +120,7 @@ describe("CmsRecordsTable · status column", () => {
     }
     const odd = { ...rec("o", {}), status: "scheduled" } as unknown as CMSContentItem;
     expect(recordStatusBadge(odd)).toEqual({ label: "scheduled", tone: "neutral" });
-    render(<RecordsTable collection={collection} query="" onOpenRecord={() => {}} records={[odd]} />);
+    render(<RecordsTable collection={collection} onOpenRecord={() => {}} records={[odd]} />);
     expect(badge("o")).toHaveTextContent("scheduled");
     expect(badge("o").getAttribute("data-tone")).toBe("neutral");
   });
@@ -160,5 +161,47 @@ describe("CmsRecordsTable · badge tone contrast ≥4.5:1", () => {
     const r = ratio(tokenColor[fg], tokenColor[bg]);
     expect(r).toBeGreaterThanOrEqual(4.5);
     expect(r).toBeCloseTo(expected, 1);
+  });
+});
+
+/* 2L9 165:2 — the toolbar's status filter and named orders, the footer's
+   range and Previous / Next, and no React key warning from the head row. */
+describe("RecordsTable · toolbar and footer (2L9 165:2)", () => {
+  const blog = {
+    id: "blog",
+    name: "Blog",
+    slug: "blog",
+    displayField: "title",
+    fields: [
+      { id: "t", name: "Title", slug: "title", type: "text", order: 0 },
+      { id: "a", name: "Author", slug: "author", type: "select", order: 1, options: ["Ali", "Sara"] },
+    ],
+  } as unknown as CMSCollection;
+  const at = (h: number) => new Date(Date.UTC(2026, 9, 26, h)).toISOString();
+  const rows: CMSContentItem[] = [
+    { id: "a", collectionId: "blog", data: { title: "Beta", author: "Ali" }, status: "published", createdAt: "", updatedAt: at(9) },
+    { id: "b", collectionId: "blog", data: { title: "Alpha", author: "Sara" }, status: "draft", createdAt: "", updatedAt: at(11) },
+  ];
+  const order = () => screen.getAllByTestId(/^cms-row-[ab]$/).map((r) => r.getAttribute("data-testid"));
+
+  it("filters by status, orders by the named sorts, and counts in the footer", () => {
+    const errors: string[] = [];
+    const spy = console.error;
+    console.error = (...a: unknown[]) => errors.push(String(a[0]));
+    try {
+      render(<RecordsTable collection={blog} records={rows} onOpenRecord={() => {}} />);
+    } finally {
+      console.error = spy;
+    }
+    expect(errors.filter((e) => e.includes("unique \"key\""))).toEqual([]);
+    expect(screen.getAllByRole("columnheader").map((h) => h.textContent)).toEqual(["Title", "Status", "Updated", "Author"]);
+    expect(order()).toEqual(["cms-row-b", "cms-row-a"]);
+    fireEvent.change(screen.getByTestId("cms-records-sort"), { target: { value: "title-desc" } });
+    expect(order()).toEqual(["cms-row-a", "cms-row-b"]);
+    fireEvent.change(screen.getByTestId("cms-records-status-filter"), { target: { value: "Draft" } });
+    expect(order()).toEqual(["cms-row-b"]);
+    expect(screen.getByTestId("cms-pager-range")).toHaveTextContent("1–1 of 1 record");
+    expect(screen.getByTestId("cms-pager-prev")).toBeDisabled();
+    expect(screen.getByTestId("cms-pager-next")).toBeDisabled();
   });
 });

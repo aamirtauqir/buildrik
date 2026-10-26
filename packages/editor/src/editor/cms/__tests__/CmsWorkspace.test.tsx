@@ -8,7 +8,7 @@
  */
 import * as React from "react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, fireEvent, cleanup, waitFor, within } from "@testing-library/react";
+import { render, screen, fireEvent, cleanup, waitFor, within, act } from "@testing-library/react";
 import type { CMSCollection, CMSContentItem } from "@/shared/types/cms";
 import { EVENTS } from "@/shared/constants";
 import { ToastProvider } from "@/editor/chrome-ui";
@@ -80,7 +80,9 @@ describe("CmsWorkspace · root (4428:140486)", () => {
 });
 
 describe("CmsWorkspace · records table (4428:143182)", () => {
-  it("draws the display field, Status (2L9 165:2), the short fields and Updated — long text and media stay in the sheet", async () => {
+  /* 2L9 165:2 — Title · Status · Updated, then one field column (a choice
+     field first); Columns adds the rest. */
+  it("draws Title, Status, Updated and one field column; Columns picks more", async () => {
     const { composer } = makeEngine({
       collections: [FULL],
       items: [rec("r1", { name: "Margherita", price: "$12", category: "Pizza", available: true, description: "Tomato" })],
@@ -89,14 +91,16 @@ describe("CmsWorkspace · records table (4428:143182)", () => {
     render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
     const table = await screen.findByTestId("cms-table");
     const heads = within(table).getAllByRole("columnheader").map((h) => h.textContent);
-    expect(heads).toEqual(["Name", "Status", "Price", "Category", "Available", "Updated"]);
+    expect(heads).toEqual(["Title", "Status", "Updated", "Available"]);
     const row = await screen.findByTestId("cms-row-r1");
     expect(row).toHaveTextContent("Margherita");
     expect(row).toHaveTextContent("Yes");
     expect(row).not.toHaveTextContent("Tomato");
     expect(row).toHaveTextContent("2h ago");
-    expect(screen.getByTestId("cms-ws-title")).toHaveTextContent("Menu items");
-    expect(screen.getByTestId("cms-ws-meta")).toHaveTextContent("· 1 record");
+    expect(screen.getByTestId("cms-ws-title")).toHaveTextContent("Menu items · 1 record");
+    fireEvent.click(screen.getByTestId("cms-records-columns"));
+    fireEvent.click(screen.getByTestId("cms-records-column-price"));
+    expect(within(table).getAllByRole("columnheader").map((h) => h.textContent)).toEqual(["Title", "Status", "Updated", "Price", "Available"]);
     // a full-width table: no hint column
     expect(screen.queryByTestId("cms-ws-hint")).toBeNull();
   });
@@ -105,7 +109,10 @@ describe("CmsWorkspace · records table (4428:143182)", () => {
     const { composer } = makeEngine({ collections: [FULL], items: [rec("r1", { name: "Tiramisu", category: "Dessert" })] });
     cmsWorkspace.openCollection("col-1");
     render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
-    expect(await screen.findByTestId("cms-row-r1")).toHaveTextContent("Price required");
+    await screen.findByTestId("cms-row-r1");
+    fireEvent.click(screen.getByTestId("cms-records-columns"));
+    fireEvent.click(screen.getByTestId("cms-records-column-price"));
+    expect(screen.getByTestId("cms-row-r1")).toHaveTextContent("Price required");
   });
 
   it("sorts on a column head, ascending then descending", async () => {
@@ -161,8 +168,8 @@ describe("CmsWorkspace · records table (4428:143182)", () => {
     render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
     fireEvent.click(await screen.findByTestId("cms-row-r1"));
     expect(cmsWorkspace.get().recordId).toBe("r1");
-    cmsWorkspace.openRecord(null);
-    fireEvent.click(screen.getByTestId("cms-ws-add-record"));
+    act(() => cmsWorkspace.openRecord(null));
+    fireEvent.click(await screen.findByTestId("cms-ws-add-record"));
     expect(cmsWorkspace.get().recordId).toBe("new");
   });
 });
@@ -182,14 +189,14 @@ describe("CmsWorkspace · Back to canvas (§13)", () => {
     expect(onBack).toHaveBeenCalledTimes(1);
   });
 
-  it("Open record: the sheet carries ‹ Back to canvas — one step closes it and goes back", async () => {
+  it("Open record: the header's ‹ Back to canvas closes the record and goes back in one step", async () => {
     const { composer } = makeEngine({ collections: [FULL], items: [rec("r1", { name: "Margherita" })] });
     cmsWorkspace.openCollection("col-1");
     cmsWorkspace.openRecord("r1");
     const onBack = vi.fn();
     render(<ToastProvider><CmsWorkspace composer={composer as never} onBackToCanvas={onBack} /></ToastProvider>);
-    const sheet = await screen.findByTestId("cms-sheet");
-    fireEvent.click(within(sheet).getByRole("button", { name: "‹ Back to canvas" }));
+    await screen.findByTestId("cms-sheet");
+    fireEvent.click(screen.getByRole("button", { name: "‹ Back to canvas" }));
     expect(onBack).toHaveBeenCalledTimes(1);
     expect(cmsWorkspace.get().recordId).toBeNull();
   });

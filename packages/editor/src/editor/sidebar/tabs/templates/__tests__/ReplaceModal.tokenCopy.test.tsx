@@ -40,7 +40,7 @@ describe("ReplaceModal — what happens to brand tokens", () => {
 
   it("a saved template (token placeholders) picks up this site's brand", () => {
     modal('<section style="color:{{token.color.primary}}">Hi</section>');
-    expect(screen.getByText(/Bistro takes this site’s brand colors and fonts\./)).toBeTruthy();
-    expect(screen.queryByText(/your Brand is not changed/)).toBeNull();
+    expect(screen.getByText(/Bistro uses this site’s Brand colors and fonts — your Brand is not changed\./)).toBeTruthy();
+    expect(screen.queryByText(/has its own colors/)).toBeNull();
   });
 });

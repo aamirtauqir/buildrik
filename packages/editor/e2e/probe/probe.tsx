@@ -116,6 +116,9 @@ import { PageContextMenu } from "@/editor/sidebar/tabs/pages/components/PageCont
 import { PageSettingsDrawer } from "@/editor/sidebar/tabs/pages/page-settings/PageSettingsDrawer";
 import { Topbar, SiteMenuIcon, IconButton, BreakpointSwitcher } from "@/editor/chrome-ui";
 import { RecordsTable } from "@/editor/cms/RecordsTable";
+import { CmsWorkspace } from "@/editor/cms/CmsWorkspace";
+import { ReplaceModal } from "@/editor/sidebar/tabs/templates/TemplatesTabModals";
+import { cmsWorkspace } from "@/editor/cms/cmsWorkspaceStore";
 import type { CMSCollection, CMSContentItem } from "@/shared/types/cms";
 import { SmartGuidesOverlay } from "@/editor/canvas/overlays";
 import type { SnapLine } from "@/editor/canvas/hooks";
@@ -1881,6 +1884,73 @@ function contentComposer({
   } as unknown as Composer;
 }
 
+/* 2L9 page 05 CMS boards (165:2, 165:520, 165:2184…): the workspace at the
+   board's size — 1145 × 812 is the canvas column of a 1440 × 900 frame
+   (rail 56 + drawer 239 to the left, topbar 56 above, bottom bar 32 below).
+   `?record=<id|new>` opens a record. */
+const CMS_WS_FIELDS = [
+  { id: "f-title", name: "Title", slug: "title", type: "text", order: 0, validation: { required: true } },
+  { id: "f-slug", name: "Slug", slug: "slug", type: "slug", order: 1, validation: { required: true } },
+  { id: "f-excerpt", name: "Excerpt", slug: "excerpt", type: "text", order: 2 },
+  { id: "f-body", name: "Body", slug: "body", type: "richtext", order: 3 },
+  { id: "f-cover", name: "Cover image", slug: "cover", type: "image", order: 4 },
+  { id: "f-author", name: "Author", slug: "author", type: "select", order: 5, options: ["Ali", "Sara"] },
+  { id: "f-category", name: "Category", slug: "category", type: "select", order: 6, options: ["Design", "Studio"] },
+  { id: "f-date", name: "Published on", slug: "published-on", type: "datetime", order: 7 },
+];
+const CMS_WS_COLLECTION = { id: "blog", name: "Blog", slug: "blog", displayField: "title", fields: CMS_WS_FIELDS };
+const CMS_WS_NOW = Date.parse("2026-10-26T12:00:00Z");
+const CMS_WS_RECORDS = Array.from({ length: 64 }, (_, i) => ({
+  id: `post-${i + 1}`,
+  collectionId: "blog",
+  status: i % 5 === 1 || i % 5 === 4 ? "draft" : "published",
+  createdAt: new Date(CMS_WS_NOW - (i + 2) * 3_600_000).toISOString(),
+  updatedAt: new Date(CMS_WS_NOW - (i + 1) * 3_600_000).toISOString(),
+  ...(i === 0 ? { publishedAt: new Date(CMS_WS_NOW - 30 * 3_600_000).toISOString() } : {}),
+  data: {
+    title: i === 0 ? "A note on clear choices" : `Studio note ${i + 1}`,
+    slug: i === 0 ? "a-note-on-clear-choices" : `studio-note-${i + 1}`,
+    excerpt: "Plain choices help people see what matters and move forward with the work.",
+    body: "<p>Clear choices create confident experiences.</p><p>This note shares how a studio brings clarity to complex products.</p>",
+    author: i % 2 ? "Sara" : "Ali",
+    category: "Design",
+  },
+}));
+
+function CmsWorkspaceHost() {
+  const q = new URLSearchParams(location.search);
+  const composer = React.useMemo(
+    () => {
+      const base = contentComposer({ collections: [CMS_WS_COLLECTION], records: [] }) as unknown as Record<string, unknown>;
+      const cms = base.cms as { collections: Record<string, unknown> };
+      cms.collections.getContentItems = async (id: string) => (id === "blog" ? CMS_WS_RECORDS : []);
+      /* `&hang=1` holds a save open, for the saving states (165:797, 168:21620). */
+      /* `&offline=1` returns the written record, so the server mirror runs and,
+         with no server behind the probe, queues (165:1625). */
+      cms.collections.updateContentItem = q.get("hang")
+        ? () => new Promise(() => {})
+        : q.get("offline")
+          ? async (id: string, u: Record<string, unknown>) => ({ ...CMS_WS_RECORDS.find((r) => r.id === id), ...u })
+          : async () => null;
+      (base.cms as Record<string, unknown>).bindings = { export: () => ({}), getAllCollectionBindings: () => [] };
+      return base as unknown as Composer;
+    },
+    [],
+  );
+  React.useState(() => {
+    cmsWorkspace.reset();
+    cmsWorkspace.openRequest({ collectionId: "blog", recordId: q.get("record") ?? undefined });
+    return null;
+  });
+  return (
+    <ToastProvider>
+      <div data-probe="cms-workspace" className="tw:relative" style={{ width: 1145, height: 812 }}>
+        <CmsWorkspace composer={composer} />
+      </div>
+    </ToastProvider>
+  );
+}
+
 /** 812 tall and 280 wide — the drawer this panel ships in, and the board's own
  *  frame. Without a real height `CONTENT_BODY`'s `h-full` collapses and every
  *  `flex-1` region measures its content instead of its column. */
@@ -2070,7 +2140,22 @@ const CASES: Record<string, () => React.ReactElement> = {
   /* 2L9 board 165:2: the records table's Status column, one row per tone. */
   "cms-records-status": () => (
     <div data-probe="cms-records-status" style={{ display: "flex", height: 240, width: 900 }}>
-      <RecordsTable collection={CMS_STATUS_COLLECTION} records={CMS_STATUS_RECORDS} query="" onOpenRecord={() => {}} />
+      <RecordsTable collection={CMS_STATUS_COLLECTION} records={CMS_STATUS_RECORDS} onOpenRecord={() => {}} />
+    </div>
+  ),
+  "cms-workspace": () => <CmsWorkspaceHost />,
+  /* 2L9 223:44891 — the Replace confirm over a built-in template. */
+  "tpl-replace-confirm": () => (
+    <div data-probe="tpl-replace-confirm">
+      <ReplaceModal
+        template={{ id: "saas", name: "SaaS landing", html: "<section style=\"color:#111827\">Hi</section>" } as never}
+        currentPageName="Home"
+        currentPageCount={34}
+        backupCurrentPage
+        onBackupChange={() => {}}
+        onCancel={() => {}}
+        onApply={() => {}}
+      />
     </div>
   ),
   "canvas-footer-toolbar": () => (

@@ -5,15 +5,13 @@
  * sanitized here on every input, and again on the server before it is stored
  * (DM-10), to the same list.
  *
- * The record boards draw a rich text field as the textarea box (4428:144760
- * Description); no board draws its toolbar, so the four marks sit in a 24px
- * row of chrome-ui IconButtons above that box (C1 ledger: missing boards).
+ * 2L9 165:520 draws it as one filled box: a row of text marks — B · I ·
+ * Link · Heading · List — over the text.
  *
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Bold, Italic, Link2, List } from "lucide-react";
-import { Button, IconButton, TextInput } from "@/editor/chrome-ui";
+import { Button, TextInput } from "@/editor/chrome-ui";
 import { sanitizeRichtext } from "@/shared/utils/html/sanitization";
 
 export interface RichTextFieldProps {
@@ -23,9 +21,14 @@ export interface RichTextFieldProps {
   onChange: (html: string) => void;
 }
 
+const FRAME =
+  "tw:mt-2 tw:flex tw:flex-col tw:gap-2 tw:rounded-[6px] tw:bg-[var(--bk-bg-subtle)] tw:px-3 tw:py-3 tw:focus-within:[box-shadow:var(--bk-shadow-focus)]";
+const MARK =
+  "tw:h-6 tw:min-h-0 tw:min-w-0 tw:border-0 tw:bg-transparent tw:px-0 tw:py-0 tw:text-[13px] tw:leading-5 tw:font-medium " +
+  "tw:text-[var(--bk-ink)] tw:enabled:hover:bg-transparent tw:enabled:hover:text-[var(--bk-accent-text)] tw:focus:ring-0";
 const BOX =
-  "tw:min-h-[58px] tw:rounded-[6px] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:px-2.5 tw:py-2 " +
-  "tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)] tw:outline-none tw:focus:[box-shadow:var(--bk-shadow-focus)] " +
+  "tw:min-h-[56px] tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)] tw:outline-none " +
+  "tw:[&_p]:m-0 tw:[&_p+p]:mt-5 tw:[&_h3]:m-0 tw:[&_h3]:text-[15px] tw:[&_h3]:font-semibold " +
   "tw:[&_ul]:list-disc tw:[&_ul]:pl-5 tw:[&_ol]:list-decimal tw:[&_ol]:pl-5 tw:[&_a]:text-[var(--bk-accent-text)] tw:[&_a]:underline";
 
 /** Run a formatting command on the box's selection (no-op where the browser has none). */
@@ -64,19 +67,30 @@ export function RichTextField({ id, labelId, value, onChange }: RichTextFieldPro
 
   return (
     <div className="tw:flex tw:flex-col tw:gap-1" data-testid={`${id}-richtext`}>
-      <div className="tw:flex tw:items-center tw:gap-1" role="toolbar" aria-label="Text formatting">
-        <IconButton size="sm" label="Bold" onMouseDown={(e) => e.preventDefault()} onClick={() => run("bold")}>
-          <Bold size={14} />
-        </IconButton>
-        <IconButton size="sm" label="Italic" onMouseDown={(e) => e.preventDefault()} onClick={() => run("italic")}>
-          <Italic size={14} />
-        </IconButton>
-        <IconButton size="sm" label="Bulleted list" onMouseDown={(e) => e.preventDefault()} onClick={() => run("insertUnorderedList")}>
-          <List size={14} />
-        </IconButton>
-        <IconButton size="sm" label="Link" pressed={linking} onMouseDown={(e) => e.preventDefault()} onClick={() => setLinking((v) => !v)}>
-          <Link2 size={14} />
-        </IconButton>
+      <div className={FRAME}>
+      <div className="tw:flex tw:items-center tw:gap-4" role="toolbar" aria-label="Text formatting">
+        {(
+          [
+            ["B", "Bold", () => run("bold")],
+            ["I", "Italic", () => run("italic")],
+            ["Link", "Link", () => setLinking((v) => !v)],
+            ["Heading", "Heading", () => run("formatBlock", "h3")],
+            ["List", "Bulleted list", () => run("insertUnorderedList")],
+          ] as const
+        ).map(([text, label, act]) => (
+          <Button
+            key={label}
+            size="xs"
+            color="light"
+            aria-label={label}
+            aria-pressed={label === "Link" ? linking : undefined}
+            className={MARK}
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={act}
+          >
+            {text}
+          </Button>
+        ))}
       </div>
       {linking ? (
         <div className="tw:flex tw:items-center tw:gap-2">
@@ -114,6 +128,7 @@ export function RichTextField({ id, labelId, value, onChange }: RichTextFieldPro
         onInput={emit}
         onBlur={emit}
       />
+      </div>
     </div>
   );
 }

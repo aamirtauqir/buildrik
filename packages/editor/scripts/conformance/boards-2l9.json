@@ -6973,8 +6973,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — Tabs+search+Title/Status/Updated table built; no status filter, sort, Columns, pagination; no Author col. Excerpt cell overflows into Updated (\"helps |Just now\"). RecordsTable key warning. | prior: drift-open — L-C C3 built the four named tabs (Records · Fields · Dynamic pages · Collection settings); status filter, sort menu, Columns and pagination still missing. Not compared."
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (cms-workspace, 1145×812 vs board crop): header 'Blog · N records' + '+ Add record' 148×32 + ⋯; tinted tabs; toolbar search 520 / All statuses 180 / Updated · Newest 192 / Columns; head 40 tinted, Title·Status 216·Updated 176·Author; rows 40, excerpt truncates; footer '1–50 of N records' Previous/Next 112×32 — all within 4px. Header '‹ Back to Editor · Home' shows only with a return (shell)."
   },
   {
    "nodeId": "165:520",
@@ -6983,8 +6983,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — Record opens as full sheet; back link ABOVE tabs (board: tabs then back+title row); no Preview (unsaved) pane (only 'Preview ▸' toggle); labels raw keys; Save 98x28 vs board 160x32. | prior: built, not compared — L-C C3: sheet back \"‹ {name} records\" and four tabs incl. Collection settings; always-on Preview (unsaved) pane still a toggle (open)."
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (cms-workspace&record): record under the tabs; '‹ Blog records' 61 in, title, 'Changed since publish'; stacked 13/20 labels over 28 filled controls (label tops 184/256/…/644 = board); rich text box 116 tall with B·I·Link·Heading·List; 'Choose image…' 180×32; always-on Preview (unsaved) 260 wide; footer Cancel 96 / Save record 160 ×32."
   },
   {
    "nodeId": "165:797",
@@ -6993,8 +6993,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — Footer + button read 'Saving...' as board, but Cancel is disabled while saving (board: enabled); no preview pane; sheet header 'New Blog ×' not on board. | prior: built, not compared — L-C C1: Save button and footer read \"Saving…\" while a save runs (RecordSheet.tsx)."
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (&hang=1): footer 'Saving…', Cancel enabled, 'Saving…' disabled 160×32; no sheet ✕ header."
   },
   {
    "nodeId": "165:1072",
@@ -7013,8 +7013,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C C3: sheet back \"‹ {name} records\" and four tabs incl. Collection settings; always-on Preview (unsaved) pane still a toggle (open).",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (cms-workspace&record): record under the tabs; '‹ Blog records' 61 in, title, 'Changed since publish'; stacked 13/20 labels over 28 filled controls (label tops 184/256/…/644 = board); rich text box 116 tall with B·I·Link·Heading·List; 'Choose image…' 180×32; always-on Preview (unsaved) 260 wide; footer Cancel 96 / Save record 160 ×32.",
    "inheritsFrom": "165:520"
   },
   {
@@ -7025,7 +7025,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — Banner copy matches, Save disabled matches. Banner sits above back link/tabs (y=109) instead of above fields; footer 'Not saved to the server yet' (red) vs board 'Offline · Not saved'. | prior: built, not compared — L-C C5: queued save shows banner \"You’re offline\" + \"Your edits are not saved to the server. Keep this tab open.\"; button stays Save record."
+   "verifiedNote": "probe 2026-10-27: banner now sits over the fields and the footer reads 'Offline · Not saved'; the queued (offline) state cannot be produced in the probe — its save mirror has no server and reports reached."
   },
   {
    "nodeId": "165:1903",
@@ -7045,7 +7045,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — Copy + 3 buttons match. Emphasis inverted: live primary=Save and leave, board primary=Keep editing. Dialog 560w at y=369 vs board 480w at y≈280. | prior: built, not compared — L-C C1: \"Leave without saving?\" names the record / destination tab or collection; Keep editing · Discard changes · Save and leave (RecordSheet.tsx). Origin label (\"Your destination is …\") waits on C2."
+   "verifiedNote": "probe-compared 2026-10-27: Keep editing is the filled primary, Discard changes / Save and leave outlined, dialog 480 wide, copy matches. Open: dialog sits viewport-centred (board top ≈280) and its title is 20px vs board ≈16 — both chrome-ui Modal (REQUESTS C-16)."
   },
   {
    "nodeId": "165:2414",
@@ -7596,7 +7596,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — Copy matches board exactly. Same emphasis inversion as 165:2184 (Save and leave primary, Keep editing outlined); dialog 560w vs 480w. | prior: built, not compared — L-C C1: \"Leave without saving?\" names the record / destination tab or collection; Keep editing · Discard changes · Save and leave (RecordSheet.tsx). Origin label (\"Your destination is …\") waits on C2."
+   "verifiedNote": "probe-compared 2026-10-27: Keep editing is the filled primary, Discard changes / Save and leave outlined, dialog 480 wide, copy matches. Open: dialog sits viewport-centred (board top ≈280) and its title is 20px vs board ≈16 — both chrome-ui Modal (REQUESTS C-16)."
   },
   {
    "nodeId": "168:21620",
@@ -7605,8 +7605,8 @@
    "family": "resources",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — Footer 'Saving...' + disabled 'Saving...' match, but secondary reads 'Stay here' (board 'Cancel'); header truncates 'Saving record... A clearer ...'. | prior: built, not compared — L-C C1: Save and leave shows \"Saving record…\" + Saving… + Stay here; success takes the chosen way out (RecordSheet.tsx)."
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (&hang=1 after Save and leave to Fields): '‹ Blog records' stays; secondary reads Cancel; 'Saving…' disabled."
   },
   {
    "nodeId": "168:21848",
@@ -10348,7 +10348,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — Title/checkbox/CTA match. Copy 'takes this site’s brand colors and fonts' vs board 'has its own colors and fonts' (header says 'Own colours'). Full-screen takeover, no shell/backup banner; 560 vs 720w | prior: built, not compared — L-C C7: \"Replace {page} with {template}?\", \"{page}’s N elements are removed and replaced. {template} has its own colors and fonts — your Brand is not changed.\" (saved token templates say they take the brand), \"Save a backup first (History › Saves)\", CTA \"Replace {page}\"."
+   "verifiedNote": "probe-compared 2026-10-27 (tpl-replace-confirm): 720 wide, title/body/checkbox/CTA copy = board for a template with its own colours; a template written on Brand tokens says it uses the site's Brand (code: resolveTokens). Open: Modal title 20 vs ≈16 and vertical placement (REQUESTS C-16); Templates as an in-place resource area (REQUESTS C-17)."
   },
   {
    "nodeId": "223:45184",

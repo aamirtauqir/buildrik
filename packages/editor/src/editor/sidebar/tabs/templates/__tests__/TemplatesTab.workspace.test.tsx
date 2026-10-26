@@ -80,7 +80,7 @@ describe("Templates — full-canvas view (decision #24)", () => {
     fireEvent.click(screen.getByTestId(`tpl-ws-item-${t.id}`));
     const preview = screen.getByTestId("tpl-ws-preview");
     expect(preview).toHaveTextContent(t.name);
-    expect(preview).toHaveTextContent("Page template");
+    expect(preview).toHaveTextContent("your Brand is not changed");
     expect(within(preview).getByRole("button", { name: "Create page" })).toBeInTheDocument();
     expect(within(preview).getByRole("button", { name: "Replace page…" })).toBeInTheDocument();
     expect(screen.queryByRole("dialog")).toBeNull();

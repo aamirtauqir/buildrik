@@ -82,7 +82,13 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
         <div className="tw:flex tw:min-w-0 tw:flex-col tw:gap-1">
           <h2 className="tw:m-0 tw:text-[length:var(--bk-text-24)] tw:leading-8 tw:font-semibold tw:text-[var(--bk-ink)]">{template.name}</h2>
           <p className="tw:m-0 tw:text-[length:var(--bk-text-13)] tw:text-[var(--bk-ink-muted)]" data-testid="tpl-ws-preview-kind">
-            {isSaved ? "Saved template · Styles captured with it" : "Page template · Own colours and typography"}
+            {/* 222:44591 — what the template does to colours, true per template:
+                one written on Brand tokens takes this site's Brand. */}
+            {isSaved
+              ? "Saved template · Styles captured with it"
+              : template.html?.includes("{{token.")
+                ? "Uses your Brand colors and fonts — your Brand is not changed"
+                : "Has its own colors and fonts — your Brand is not changed"}
           </p>
           {usedOn.length > 0 && (
             <p className="tw:m-0 tw:flex tw:flex-wrap tw:items-center tw:gap-1 tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-ink-soft)]" data-testid="tpl-ws-used-on">
