@@ -32,6 +32,9 @@ export function CollectionSettingsPane({ composer, collection, records }: Collec
   const [name, setName] = React.useState(collection.name);
   const [slug, setSlug] = React.useState(collection.slug);
   const [saving, setSaving] = React.useState(false);
+  /* 259:94976 / 259:95177 — a save the server refused keeps the draft and
+     says what is still saved; a landed one says Saved until the next edit. */
+  const [saveState, setSaveState] = React.useState<"idle" | "failed" | "saved">("idle");
   const [confirmDelete, setConfirmDelete] = React.useState(false);
   React.useEffect(() => setName(collection.name), [collection.name]);
   React.useEffect(() => setSlug(collection.slug), [collection.slug]);
@@ -75,9 +78,13 @@ export function CollectionSettingsPane({ composer, collection, records }: Collec
   const rename = async () => {
     if (!composer || error || !dirty) return;
     setSaving(true);
+    setSaveState("idle");
     try {
       await composer.cms.collections.updateCollection(collection.id, { name: nextName, slug: nextSlug });
-      addToast({ tone: "success", title: "Collection renamed", description: nextName });
+      setSaveState("saved");
+      addToast({ tone: "success", title: "Collection saved", description: nextName });
+    } catch {
+      setSaveState("failed");
     } finally {
       setSaving(false);
     }
@@ -85,12 +92,14 @@ export function CollectionSettingsPane({ composer, collection, records }: Collec
 
   const remove = async () => {
     if (!composer) return;
+    /* Delete first: a refused delete leaves the bindings as they were, which
+       is what the failure copy promises (257:58823). */
+    if (!(await composer.cms.collections.deleteCollection(collection.id))) throw new Error("refused");
     const bindings = composer.cms.bindings;
     for (const elementId of boundElements) {
       for (const b of bindings.getBindings(elementId)) if (b.collectionId === collection.id) bindings.unbind(elementId, b.property);
       if (bindings.getCollectionBinding(elementId)?.collectionId === collection.id) bindings.unbindCollection(elementId);
     }
-    await composer.cms.collections.deleteCollection(collection.id);
     setConfirmDelete(false);
     cmsWorkspace.openCollection(null);
     addToast({ tone: "success", title: `“${collection.name}” deleted`, description: consequence.replace("Deleting removes", "Removed").replace("and unbinds", "and unbound") });
@@ -110,9 +119,14 @@ export function CollectionSettingsPane({ composer, collection, records }: Collec
       {error && dirty ? (
         <span className={WARN} data-testid="cms-settings-error">{error}</span>
       ) : null}
+      {saveState === "failed" && dirty ? (
+        <p className={`${WARN} tw:m-0`} role="alert" data-testid="cms-settings-save-failed">
+          Couldn’t save the collection. Your draft is still here; the saved name and slug remain {collection.name} · {collection.slug}.
+        </p>
+      ) : null}
       <div>
-        <Button size="xs" variant="secondary" className={ACTION} disabled={Boolean(error && dirty) || saving} onClick={() => void rename()} data-testid="cms-settings-rename">
-          Rename
+        <Button size="xs" variant="secondary" className={ACTION} disabled={Boolean(error && dirty) || saving || !dirty} onClick={() => void rename()} data-testid="cms-settings-rename">
+          {saving ? "Saving…" : saveState === "failed" && dirty ? "Retry" : saveState === "saved" && !dirty ? "Saved" : "Save collection"}
         </Button>
       </div>
 

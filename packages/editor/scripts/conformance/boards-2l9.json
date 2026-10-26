@@ -7075,7 +7075,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Key/type lock when bound matches; board adds Placeholder, Help text, Show N usages, explicit Save field (code commits on blur)"
+   "verifiedNote": "drift-open — L-C D2: field inspector gains Default value, Placeholder, Help text; Key/type lock kept; \"Show N usages\" link and explicit Save field (code commits on blur, authority to decide) not built. Not compared."
   },
   {
    "nodeId": "165:3173",
@@ -7115,7 +7115,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Board: slug URL-impact line, Add redirects, Save collection, Show usages; code: name/slug, Source, Danger zone (:129)"
+   "verifiedNote": "drift-open — L-C D6: action reads Save collection (Saving… / Retry / Saved); slug URL-impact line, Add redirects, Show usages not built (slug is not in URLs in code). Not compared."
   },
   {
    "nodeId": "165:4137",
@@ -7375,7 +7375,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
+   "verifiedNote": "built, not compared — L-C C6/D2: \"Add {type} field · {collection} · New field\", key hint, Default value (checked against the field's rules), Minimum/Maximum (length), Placeholder, Help text, Add field CTA."
   },
   {
    "nodeId": "167:4412",
@@ -7385,7 +7385,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
+   "verifiedNote": "built, not compared — L-C C6/D2: \"Add {type} field · {collection} · New field\", key hint, Default value (checked against the field's rules), Minimum/Maximum (length), Placeholder, Help text, Add field CTA."
   },
   {
    "nodeId": "167:4689",
@@ -7395,7 +7395,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
+   "verifiedNote": "built, not compared — L-C C6/D2: \"Add {type} field · {collection} · New field\", key hint, Default value (checked against the field's rules), Minimum/Maximum (length), Placeholder, Help text, Add field CTA."
   },
   {
    "nodeId": "167:4956",
@@ -7405,7 +7405,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
+   "verifiedNote": "built, not compared — L-C C6/D2: \"Add {type} field · {collection} · New field\", key hint, Default value (checked against the field's rules), Minimum/Maximum (length), Placeholder, Help text, Add field CTA."
   },
   {
    "nodeId": "167:5224",
@@ -7415,7 +7415,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
+   "verifiedNote": "built, not compared — L-C C6/D2: \"Add {type} field · {collection} · New field\", key hint, Default value (checked against the field's rules), Minimum/Maximum (length), Placeholder, Help text, Add field CTA."
   },
   {
    "nodeId": "167:5492",
@@ -7425,7 +7425,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
+   "verifiedNote": "built, not compared — L-C C6/D2: \"Add {type} field · {collection} · New field\", key hint, Default value (checked against the field's rules), Minimum/Maximum (length), Placeholder, Help text, Add field CTA."
   },
   {
    "nodeId": "167:5760",
@@ -7435,7 +7435,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
+   "verifiedNote": "built, not compared — L-C C6/D2: \"Add {type} field · {collection} · New field\", key hint, Default value (checked against the field's rules), Minimum/Maximum (length), Placeholder, Help text, Add field CTA."
   },
   {
    "nodeId": "167:6038",
@@ -7445,7 +7445,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
+   "verifiedNote": "built, not compared — L-C C6/D2: \"Add {type} field · {collection} · New field\", key hint, Default value (checked against the field's rules), Minimum/Maximum (length), Placeholder, Help text, Add field CTA."
   },
   {
    "nodeId": "167:6306",
@@ -7455,7 +7455,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
+   "verifiedNote": "built, not compared — L-C C6/D2: \"Add {type} field · {collection} · New field\", key hint, Default value (checked against the field's rules), Minimum/Maximum (length), Placeholder, Help text, Add field CTA."
   },
   {
    "nodeId": "167:6574",
@@ -7465,7 +7465,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
+   "verifiedNote": "built, not compared — L-C C6/D2: \"Add {type} field · {collection} · New field\", key hint, Default value (checked against the field's rules), Minimum/Maximum (length), Placeholder, Help text, Add field CTA."
   },
   {
    "nodeId": "167:6844",
@@ -7475,7 +7475,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
+   "verifiedNote": "built, not compared — L-C C6/D2: \"Add {type} field · {collection} · New field\", key hint, Default value (checked against the field's rules), Minimum/Maximum (length), Placeholder, Help text, Add field CTA."
   },
   {
    "nodeId": "167:7125",
@@ -7485,7 +7485,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
+   "verifiedNote": "built, not compared — L-C C6/D2: \"Add {type} field · {collection} · New field\", key hint, Default value (checked against the field's rules), Minimum/Maximum (length), Placeholder, Help text, Add field CTA."
   },
   {
    "nodeId": "167:7406",
@@ -7495,7 +7495,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
+   "verifiedNote": "built, not compared — L-C C6/D2: \"Add {type} field · {collection} · New field\", key hint, Default value (checked against the field's rules), Minimum/Maximum (length), Placeholder, Help text, Add field CTA."
   },
   {
    "nodeId": "167:7671",
@@ -7505,7 +7505,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
+   "verifiedNote": "built, not compared — L-C C6/D2: \"Add {type} field · {collection} · New field\", key hint, Default value (checked against the field's rules), Minimum/Maximum (length), Placeholder, Help text, Add field CTA."
   },
   {
    "nodeId": "167:7936",
@@ -7515,7 +7515,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
+   "verifiedNote": "built, not compared — L-C C6/D2: \"Add {type} field · {collection} · New field\", key hint, Default value (checked against the field's rules), Minimum/Maximum (length), Placeholder, Help text, Add field CTA."
   },
   {
    "nodeId": "167:8207",
@@ -7525,7 +7525,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
+   "verifiedNote": "built, not compared — L-C C6/D2: \"Add {type} field · {collection} · New field\", key hint, Default value (checked against the field's rules), Minimum/Maximum (length), Placeholder, Help text, Add field CTA."
   },
   {
    "nodeId": "167:8474",
@@ -7564,9 +7564,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "board",
+   "authority": "code:required-checked-on-save",
    "verified": "no",
-   "verifiedNote": "Required toggles instantly; no impact dialog, new-records-only rule or default-value backfill"
+   "verifiedNote": "built, not compared — L-C D3: \"Make {field} required? · N published records have no {field} value.\" Cancel · Set a default value · Make required. Code checks Required when a record is saved as published, so the copy says they stay published (board: \"skipped on the next publish\")."
   },
   {
    "nodeId": "168:20773",
@@ -9750,7 +9750,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "src/editor/sidebar/tabs/ComponentsTab.tsx:297 single list (YOUR/LINKED) no nav/search/sort/version/uses badges; detail is drill-in not side…"
+   "verifiedNote": "drift-open — L-C D7: scopes \"This page · N / This site · N / Component library · N\", Search components, Sort (Most used/Name/Newest), \"This site · N\" list with source + uses built in the drawer; full workspace nav, Import package…, Recently deleted, side detail pane and row ⋯ not built. Not compared."
   },
   {
    "nodeId": "215:43978",
@@ -9760,7 +9760,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "No This page nav filter; page scope exists only at create (src/editor/shell/modals/CreateComponentModal.tsx:150)",
+   "verifiedNote": "drift-open — L-C D7: scopes \"This page · N / This site · N / Component library · N\", Search components, Sort (Most used/Name/Newest), \"This site · N\" list with source + uses built in the drawer; full workspace nav, Import package…, Recently deleted, side detail pane and row ⋯ not built. Not compared.",
    "inheritsFrom": "215:43588"
   },
   {
@@ -9771,7 +9771,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Library rows only in Add FROM LIBRARY (build/components/GroupSection.tsx:500); no versions, Restricted state or library view"
+   "verifiedNote": "drift-open — L-C D7: Component library scope lists shared masters with \"On this site / Not on this site\"; versions and Restricted state not built. Not compared."
   },
   {
    "nodeId": "215:44647",
@@ -9982,7 +9982,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Site-wide empty \"No components yet.\" (src/editor/sidebar/tabs/ComponentsTab.tsx:195); no per-page empty state"
+   "verifiedNote": "built, not compared — L-C D7: This page scope empty: \"No components on this page yet\" + the board's how-to sentence."
   },
   {
    "nodeId": "217:43947",
@@ -10103,7 +10103,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No component export (.brcomponent) anywhere in code"
+   "verifiedNote": "drift-open — L-C D8: the blocked-by-inaccessible-image state is not built: the editor has no per-asset access data to know an image is from a site the person can't open."
   },
   {
    "nodeId": "220:42920",
@@ -10113,7 +10113,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Export ready/download missing",
+   "verifiedNote": "built, not compared — L-C D8: \"Export {name}\" · \"Exporting main component … never changes, saves or publishes your site.\" · Included (Styles, Media and fonts — referenced by address, Nested components) · File \"{slug}.brcomponent · about N KB\" · Download package (ExportPackageDialog.tsx).",
    "inheritsFrom": "220:42592"
   },
   {
@@ -10124,7 +10124,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Download-started receipt missing"
+   "verifiedNote": "built, not compared — L-C D8: receipt toast \"Download started: {file}. Your site was not changed.\""
   },
   {
    "nodeId": "220:43545",
@@ -10134,7 +10134,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No component package import wizard"
+   "verifiedNote": "built, not compared — L-C D9: \"Import components\" · steps · \"Add components from a .brcomponent package. Nothing is added until the last step.\" · Choose file · Selected line · limits line; refuses non-packages by name."
   },
   {
    "nodeId": "220:43877",
@@ -10144,7 +10144,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Import roots/destination step missing",
+   "verifiedNote": "drift-open — L-C D9: not built — a package carries no scope choice (imports are site-wide) / no token or CMS links to map; the wizard has 3 steps, not 6.",
    "inheritsFrom": "220:43545"
   },
   {
@@ -10155,7 +10155,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Import check step missing",
+   "verifiedNote": "drift-open — L-C D9: Check step lists each master New / \"Already on this site · kept as is\"; access blocks and the capacity line are not built. Not compared.",
    "inheritsFrom": "220:43545"
   },
   {
@@ -10166,7 +10166,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Import map styles/CMS step missing",
+   "verifiedNote": "drift-open — L-C D9: not built — a package carries no scope choice (imports are site-wide) / no token or CMS links to map; the wizard has 3 steps, not 6.",
    "inheritsFrom": "220:43545"
   },
   {
@@ -10177,7 +10177,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Import review step missing",
+   "verifiedNote": "drift-open — L-C D9: not built — a package carries no scope choice (imports are site-wide) / no token or CMS links to map; the wizard has 3 steps, not 6.",
    "inheritsFrom": "220:43545"
   },
   {
@@ -10188,7 +10188,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Importing (non-cancellable) state missing"
+   "verifiedNote": "built, not compared — L-C D9: \"Importing N of M… Keep this window open.\""
   },
   {
    "nodeId": "220:45566",
@@ -10198,7 +10198,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Outcome-unknown receipt check missing"
+   "verifiedNote": "drift-open — L-C D9: a master that fails to add stops the import with \"{name} couldn’t be added. N of M were imported; Retry adds the rest.\"; the unknown-outcome receipt check (K37) needs a server import receipt and is not built."
   },
   {
    "nodeId": "220:45883",
@@ -10208,7 +10208,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Import receipt with Undo import missing"
+   "verifiedNote": "drift-open — L-C D9: receipt is a toast \"Imported N components from {file}. N already on this site were kept as they are.\"; Undo import (outside composer history) and Review imported resources not built."
   },
   {
    "nodeId": "220:46207",
@@ -10218,7 +10218,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Imported-but-insert-failed receipt missing"
+   "verifiedNote": "drift-open — L-C D9: a master that fails to add stops the import with \"{name} couldn’t be added. N of M were imported; Retry adds the rest.\"; the unknown-outcome receipt check (K37) needs a server import receipt and is not built."
   },
   {
    "nodeId": "221:43842",
@@ -11015,7 +11015,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Type Select changes type instantly; no conversion preview/clear/ack/refusal flow (server conversion is an SC-9 dependency)"
+   "verifiedNote": "built, not compared — L-C D5: \"Change {field} type\" preview rows \"old → new\" / \"can’t convert\", \"Lossless conversion · Values remain intact.\", Cancel · Clear values… · Convert N values (TypeChangeDialog.tsx)."
   },
   {
    "nodeId": "257:51516",
@@ -11025,7 +11025,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Type Select changes type instantly; no conversion preview/clear/ack/refusal flow (server conversion is an SC-9 dependency)"
+   "verifiedNote": "built, not compared — L-C D5: \"Clear {field} values? · N records will lose their {field} value. This cannot be reversed by document Undo.\" + Type N to confirm + Clear N values."
   },
   {
    "nodeId": "257:51711",
@@ -11035,7 +11035,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Type Select changes type instantly; no conversion preview/clear/ack/refusal flow (server conversion is an SC-9 dependency)"
+   "verifiedNote": "built, not compared — L-C D5: \"Clear {field} values? · N records will lose their {field} value. This cannot be reversed by document Undo.\" + Type N to confirm + Clear N values."
   },
   {
    "nodeId": "257:51906",
@@ -11045,7 +11045,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Type Select changes type instantly; no conversion preview/clear/ack/refusal flow (server conversion is an SC-9 dependency)"
+   "verifiedNote": "built, not compared — L-C D5: \"Converting {field}…\" / \"Clearing {field} values…\" while values are written."
   },
   {
    "nodeId": "257:52092",
@@ -11055,7 +11055,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Type Select changes type instantly; no conversion preview/clear/ack/refusal flow (server conversion is an SC-9 dependency)"
+   "verifiedNote": "built, not compared — L-C D5: \"Converting {field}…\" / \"Clearing {field} values…\" while values are written."
   },
   {
    "nodeId": "257:52278",
@@ -11065,7 +11065,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Type Select changes type instantly; no conversion preview/clear/ack/refusal flow (server conversion is an SC-9 dependency)"
+   "verifiedNote": "built, not compared — L-C D5: toast \"{field} converted · N values converted and saved.\" (board: inline line under Type)."
   },
   {
    "nodeId": "257:52512",
@@ -11073,9 +11073,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "board",
+   "authority": "code:type-moves-before-values",
    "verified": "no",
-   "verifiedNote": "Type Select changes type instantly; no conversion preview/clear/ack/refusal flow (server conversion is an SC-9 dependency)"
+   "verifiedNote": "built, not compared — L-C D5: \"Couldn’t change {field}\" + Retry. The type moves before the values (a published record's save is checked against the new type), so the copy says some values may still need converting — not the board's \"all values unchanged\"."
   },
   {
    "nodeId": "257:52702",
@@ -11083,9 +11083,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:257:51318",
    "verified": "no",
-   "verifiedNote": "Type Select changes type instantly; no conversion preview/clear/ack/refusal flow (server conversion is an SC-9 dependency)"
+   "verifiedNote": "L-C D5: the interim \"Type change unavailable\" board is superseded by the preview/convert flow, which is built."
   },
   {
    "nodeId": "257:52890",
@@ -11095,7 +11095,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code untyped \"Delete this field? cannot be undone\"; board typed count + 30-day Recently deleted"
+   "verifiedNote": "built, not compared — L-C D4: \"Delete {field}? · N records have a value in {field}.\" + \"Type N to confirm\" + Delete field. The board's \"stay in Recently deleted for 30 days\" is not shown: restore is a later server slice, so the copy keeps \"This cannot be undone.\""
   },
   {
    "nodeId": "257:53085",
@@ -11105,7 +11105,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code untyped \"Delete this field? cannot be undone\"; board typed count + 30-day Recently deleted",
+   "verifiedNote": "built, not compared — L-C D4: \"Delete {field}? · N records have a value in {field}.\" + \"Type N to confirm\" + Delete field. The board's \"stay in Recently deleted for 30 days\" is not shown: restore is a later server slice, so the copy keeps \"This cannot be undone.\"",
    "inheritsFrom": "257:52890"
   },
   {
@@ -11116,7 +11116,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No pending state; delete is fire-and-toast"
+   "verifiedNote": "built, not compared — L-C D4: title \"Deleting {field}…\" + \"The field stays available until the deletion finishes.\"; refused delete keeps the dialog with Retry."
   },
   {
    "nodeId": "257:53466",
@@ -11124,9 +11124,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "board",
+   "authority": "code:unbind-on-delete",
    "verified": "drift-open",
-   "verifiedNote": "Interim board refuses delete of valued fields; code hard-deletes — behaviour conflict, owner"
+   "verifiedNote": "Lead auto-decision: a field with values deletes after the value count is typed back (D4); bound fields stay locked (\"Cannot delete — field is bound\"). The board's refusal for valued fields is not adopted."
   },
   {
    "nodeId": "257:53654",
@@ -11134,9 +11134,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "board",
+   "authority": "code:required-checked-on-save",
    "verified": "no",
-   "verifiedNote": "Required toggles instantly; no impact dialog, new-records-only rule or default-value backfill"
+   "verifiedNote": "built, not compared — L-C D3: \"Make {field} required? · N published records have no {field} value.\" Cancel · Set a default value · Make required. Code checks Required when a record is saved as published, so the copy says they stay published (board: \"skipped on the next publish\")."
   },
   {
    "nodeId": "257:53846",
@@ -11146,7 +11146,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Required toggles instantly; no impact dialog, new-records-only rule or default-value backfill"
+   "verifiedNote": "built, not compared — L-C D3: \"Default {field} value · Apply a default to the N published records that have no value. Existing values will be kept.\" Save default (Saving… / Retry)."
   },
   {
    "nodeId": "257:54041",
@@ -11154,9 +11154,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-required-new-only",
    "verified": "no",
-   "verifiedNote": "Required toggles instantly; no impact dialog, new-records-only rule or default-value backfill"
+   "verifiedNote": "L-C D3: \"Required for new records only\" has no rule in the shared validator (cmsValueError); needs an owner call and a validator change through the full chain."
   },
   {
    "nodeId": "257:54274",
@@ -11166,7 +11166,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Required toggles instantly; no impact dialog, new-records-only rule or default-value backfill"
+   "verifiedNote": "drift-open — L-C D3: Save default reads Saving… while the default is written; the board's separate \"Saving {field}… Waiting for the server\" panel is not built. Not compared."
   },
   {
    "nodeId": "257:54485",
@@ -11326,7 +11326,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Board: slug URL-impact line, Add redirects, Save collection, Show usages; code: name/slug, Source, Danger zone (:129)"
+   "verifiedNote": "drift-open — L-C D6: action reads Save collection (Saving… / Retry / Saved); slug URL-impact line, Add redirects, Show usages not built (slug is not in URLs in code). Not compared."
   },
   {
    "nodeId": "257:57832",
@@ -11334,9 +11334,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "board",
+   "authority": "code:unbind-on-delete",
    "verified": "no",
-   "verifiedNote": "Board blocks delete while used; code unbinds elements then deletes — behaviour conflict, code contract wins pending owner"
+   "verifiedNote": "Lead auto-decision: deleting an in-use collection unbinds its elements (each keeps what it shows) then deletes; the Danger zone and typed dialog name the elements it unbinds (CollectionSettingsPane.tsx). The board's block is not adopted."
   },
   {
    "nodeId": "257:58023",
@@ -11344,9 +11344,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "board",
+   "authority": "code:unbind-on-delete",
    "verified": "no",
-   "verifiedNote": "Board blocks delete while used; code unbinds elements then deletes — behaviour conflict, code contract wins pending owner"
+   "verifiedNote": "Lead auto-decision: deleting an in-use collection unbinds its elements (each keeps what it shows) then deletes; the Danger zone and typed dialog name the elements it unbinds (CollectionSettingsPane.tsx). The board's block is not adopted."
   },
   {
    "nodeId": "257:58253",
@@ -11377,7 +11377,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code only disables confirm while busy; board shows \"Deleting Blog…\" waiting state"
+   "verifiedNote": "built, not compared — L-C D6: typed delete reads \"Deleting {name}…\" + \"Waiting for the server. {name} is unchanged until the delete is confirmed.\" (TypedDeleteDialog)."
   },
   {
    "nodeId": "257:58823",
@@ -11387,7 +11387,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No failure/Retry state for collection delete"
+   "verifiedNote": "built, not compared — L-C D6: refused delete keeps the dialog: \"Couldn’t delete {name} · {name}, its records and bindings are unchanged.\" + Retry; bindings are now unbound only after the delete lands."
   },
   {
    "nodeId": "257:59011",
@@ -11437,7 +11437,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Type Select changes type instantly; no conversion preview/clear/ack/refusal flow (server conversion is an SC-9 dependency)"
+   "verifiedNote": "built, not compared — L-C D5: toast \"{field} converted · N values converted and saved.\" (board: inline line under Type)."
   },
   {
    "nodeId": "259:90449",
@@ -11654,9 +11654,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "board",
+   "authority": "code:collection-slug-not-in-urls",
    "verified": "no",
-   "verifiedNote": "No URL-impact confirm, pending, failed-draft or acknowledged states for slug save"
+   "verifiedNote": "L-C D6: the collection slug is not part of any page URL in code (URLs come from Dynamic pages' pageSlugPattern), so the board's \"N live URLs will move from /blog/ to /journal/\" confirm is not adopted; Save collection saves directly."
   },
   {
    "nodeId": "259:94780",
@@ -11666,7 +11666,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No URL-impact confirm, pending, failed-draft or acknowledged states for slug save"
+   "verifiedNote": "built, not compared — L-C D6: Save collection reads Saving… while it saves (board: \"Saving collection slug…\" panel)."
   },
   {
    "nodeId": "259:94976",
@@ -11676,7 +11676,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No URL-impact confirm, pending, failed-draft or acknowledged states for slug save"
+   "verifiedNote": "built, not compared — L-C D6: refused save keeps the draft, \"Couldn’t save the collection. Your draft is still here; the saved name and slug remain …\" + Retry."
   },
   {
    "nodeId": "259:95177",
@@ -11684,9 +11684,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "board",
+   "authority": "code:collection-slug-not-in-urls",
    "verified": "no",
-   "verifiedNote": "No URL-impact confirm, pending, failed-draft or acknowledged states for slug save"
+   "verifiedNote": "built, not compared — L-C D6: landed save reads Saved (toast \"Collection saved\"); no URL-change line because the slug is not in URLs."
   },
   {
    "nodeId": "259:95361",
@@ -11706,7 +11706,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Type Select changes type instantly; no conversion preview/clear/ack/refusal flow (server conversion is an SC-9 dependency)"
+   "verifiedNote": "built, not compared — L-C D5: toast \"N values cleared · {field} is now {type}.\""
   },
   {
    "nodeId": "259:95758",
@@ -11714,9 +11714,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-required-new-only",
    "verified": "no",
-   "verifiedNote": "Required toggles instantly; no impact dialog, new-records-only rule or default-value backfill"
+   "verifiedNote": "L-C D3: \"Required for new records only\" has no rule in the shared validator (cmsValueError); needs an owner call and a validator change through the full chain."
   },
   {
    "nodeId": "259:95932",
@@ -11726,7 +11726,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Required toggles instantly; no impact dialog, new-records-only rule or default-value backfill"
+   "verifiedNote": "built, not compared — L-C D3: toast \"{field} is required · Default saved to N previously empty published records. Existing values were kept.\" (toast, not an inline line)."
   },
   {
    "nodeId": "259:96112",
@@ -11746,7 +11746,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "drift-open — L-C C4: \"Site variables\" header + intro copy built; still a drawer subview (board: workspace page), no \"+ New variable\" in a header, no per-variable \"N text placeholders\" (C8). Not compared."
+   "verifiedNote": "drift-open — L-C C4/D1: \"Site variables\" intro, per-variable \"N text placeholders\", \"Empty value\" built; still a drawer subview, not the workspace page. Not compared."
   },
   {
    "nodeId": "260:235928",
@@ -11796,7 +11796,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "drift-open — L-C C4: \"Site variables\" header + intro copy built; still a drawer subview (board: workspace page), no \"+ New variable\" in a header, no per-variable \"N text placeholders\" (C8). Not compared.",
+   "verifiedNote": "drift-open — L-C C4/D1: \"Site variables\" intro, per-variable \"N text placeholders\", \"Empty value\" built; still a drawer subview, not the workspace page. Not compared.",
    "inheritsFrom": "260:235689"
   },
   {
@@ -11807,7 +11807,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "drift-open — L-C C4: \"Site variables\" header + intro copy built; still a drawer subview (board: workspace page), no \"+ New variable\" in a header, no per-variable \"N text placeholders\" (C8). Not compared.",
+   "verifiedNote": "drift-open — L-C C4/D1: \"Site variables\" intro, per-variable \"N text placeholders\", \"Empty value\" built; still a drawer subview, not the workspace page. Not compared.",
    "inheritsFrom": "260:235689"
   },
   {
@@ -11838,7 +11838,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Edit value/Rename/Delete…; board adds Show usages, \"Rename key…\""
+   "verifiedNote": "built, not compared — L-C D1: row ⋯ Edit value · Show usages · Rename key… · Delete…."
   },
   {
    "nodeId": "260:237910",
@@ -11858,7 +11858,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "drift-open — L-C C4: \"Site variables\" header + intro copy built; still a drawer subview (board: workspace page), no \"+ New variable\" in a header, no per-variable \"N text placeholders\" (C8). Not compared.",
+   "verifiedNote": "drift-open — L-C C4/D1: \"Site variables\" intro, per-variable \"N text placeholders\", \"Empty value\" built; still a drawer subview, not the workspace page. Not compared.",
    "inheritsFrom": "260:235689"
   },
   {
@@ -11869,7 +11869,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No placeholder usage count/list or stale-placeholder prompt"
+   "verifiedNote": "built, not compared — L-C D1: \"{key} · N text placeholders\" list (page / element, opens it) + \"Renaming or deleting the key does not rewrite these placeholders…\" (variableUsage.ts)."
   },
   {
    "nodeId": "260:238513",
@@ -11879,7 +11879,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Rename dialog lacks usage impact + Show usages"
+   "verifiedNote": "built, not compared — L-C D1: \"Rename {key}? · N text placeholders still use {{site.key}}. They will not automatically change…\", New key, Show usages, Rename key."
   },
   {
    "nodeId": "260:238707",
@@ -11889,7 +11889,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No placeholder usage count/list or stale-placeholder prompt"
+   "verifiedNote": "drift-open — L-C D1: per-row \"N text placeholders\" built; \"Update N old placeholders\" after a rename is not built. Not compared."
   },
   {
    "nodeId": "260:238886",
@@ -11899,7 +11899,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Delete confirm lacks placeholder impact + Show usages"
+   "verifiedNote": "built, not compared — L-C D1: \"Delete {key}? · The variable and its value will be removed. N text placeholders still use …; review those usages before publishing.\" + Show usages."
   },
   {
    "nodeId": "260:239074",
@@ -12647,7 +12647,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "drift-open — L-C C4: \"Site variables\" header + intro copy built; still a drawer subview (board: workspace page), no \"+ New variable\" in a header, no per-variable \"N text placeholders\" (C8). Not compared."
+   "verifiedNote": "drift-open — L-C C4/D1: \"Site variables\" intro, per-variable \"N text placeholders\", \"Empty value\" built; still a drawer subview, not the workspace page. Not compared."
   },
   {
    "nodeId": "424:337627",

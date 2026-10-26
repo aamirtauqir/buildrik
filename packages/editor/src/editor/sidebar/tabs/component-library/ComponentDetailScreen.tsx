@@ -15,6 +15,7 @@ import type { Composer } from "@/engine";
 import type { ComponentDefinition } from "@/shared/types/components";
 import { ELEMENT_TYPE_LABELS } from "@/shared/constants/elementTypeLabels";
 import { captureComponentThumbnail } from "./captureComponentThumbnail";
+import { ExportPackageDialog } from "./ExportPackageDialog";
 import { INSTANTIATE_TOASTS, instantiateComponentAtSelection } from "./instantiate";
 /* Same "switch page, then select + scroll to the element" seam Review's
    Locate row uses (`locateComment`'s own header: "the REGRESSION-guarded
@@ -118,6 +119,7 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
 
 
   const [showDetachAll, setShowDetachAll] = React.useState(false);
+  const [exporting, setExporting] = React.useState(false);
   const [renaming, setRenaming] = React.useState(false);
   const [draftName, setDraftName] = React.useState(component.name);
   /* The back row's (and Escape's) one level up. */
@@ -363,6 +365,15 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
           >
             Duplicate master
           </Button>
+          {/* 2L9 220:42920 — a .brcomponent of this master and the ones nested in it. */}
+          <Button
+            color="light"
+            onClick={() => setExporting(true)}
+            data-testid="component-export"
+            className={`${BTN_28} tw:bg-white tw:border-[var(--bk-border)] tw:text-[var(--bk-gray-700)]`}
+          >
+            Export package…
+          </Button>
           <Button color="red" onClick={handleDelete} data-testid="component-delete" className={BTN_28}>
             Delete {component.name} master
           </Button>
@@ -473,6 +484,9 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
         message={`They become independent elements and keep their content and appearance; they will no longer follow updates to the ${component.name} master.`}
         confirmLabel="Detach all"
       />
+      {exporting ? (
+        <ExportPackageDialog component={component} all={composer?.components?.getAllComponents() ?? [component]} onClose={() => setExporting(false)} />
+      ) : null}
     </div>
   );
 };

@@ -84,7 +84,7 @@ describe("CollectionSettingsPane", () => {
 
   /* CMS-06: the delete warned only about records and left every bound
      element bound to nothing. */
-  it("names the bound elements it will unbind, and unbinds them before the delete", async () => {
+  it("names the bound elements it will unbind, and unbinds them once the delete lands", async () => {
     const engine = makeEngine({
       collections: [MENU, TEAM],
       items: [rec("a")],
@@ -101,8 +101,45 @@ describe("CollectionSettingsPane", () => {
     fireEvent.change(screen.getByPlaceholderText("Click to type DELETE"), { target: { value: "DELETE" } });
     fireEvent.click(screen.getByTestId("cms-delete-collection-confirm"));
     await waitFor(() => expect(engine.composer.cms.collections.deleteCollection).toHaveBeenCalledWith("col-1"));
-    expect(engine.composer.cms.bindings.unbind).toHaveBeenCalledWith("h1", "content");
+    await waitFor(() => expect(engine.composer.cms.bindings.unbind).toHaveBeenCalledWith("h1", "content"));
     expect(engine.composer.cms.bindings.unbind).not.toHaveBeenCalledWith("h2", expect.anything());
     expect(engine.composer.cms.bindings.unbindCollection).toHaveBeenCalledWith("list");
+  });
+
+  /* 2L9 257:58639 / 257:58823 — pending, then a refused delete keeps the
+     dialog, touches no binding, and offers Retry. */
+  it("a refused delete keeps the dialog with Retry and leaves the bindings", async () => {
+    const engine = makeEngine({
+      collections: [MENU],
+      items: [],
+      bindings: { h1: [{ collectionId: "col-1", fieldSlug: "slug", property: "content" }] },
+    });
+    engine.composer.cms.collections.deleteCollection.mockImplementationOnce(() => Promise.resolve(false));
+    render(
+      <ToastProvider>
+        <CollectionSettingsPane composer={engine.composer as never} collection={MENU} records={[]} />
+      </ToastProvider>,
+    );
+    fireEvent.click(screen.getByTestId("cms-settings-delete"));
+    fireEvent.change(screen.getByPlaceholderText("Click to type DELETE"), { target: { value: "DELETE" } });
+    fireEvent.click(screen.getByTestId("cms-delete-collection-confirm"));
+    expect(await screen.findByText(`Couldn’t delete ${MENU.name}`)).toBeInTheDocument();
+    expect(screen.getByTestId("cms-delete-collection-body")).toHaveTextContent(`${MENU.name}, its records and bindings are unchanged.`);
+    expect(screen.getByTestId("cms-delete-collection-confirm")).toHaveTextContent("Retry");
+    expect(engine.composer.cms.bindings.unbind).not.toHaveBeenCalled();
+  });
+
+  /* 2L9 259:94976 / 259:95177 — Save collection; a refused save keeps the draft. */
+  it("Save collection: a refused save keeps the draft and says what is saved", async () => {
+    const { updateCollection } = mount(MENU, []);
+    updateCollection.mockImplementationOnce(() => Promise.reject(new Error("500")));
+    fireEvent.change(screen.getByTestId("cms-settings-slug"), { target: { value: "dishes" } });
+    expect(screen.getByTestId("cms-settings-rename")).toHaveTextContent("Save collection");
+    fireEvent.click(screen.getByTestId("cms-settings-rename"));
+    expect(await screen.findByTestId("cms-settings-save-failed")).toHaveTextContent(
+      `Couldn’t save the collection. Your draft is still here; the saved name and slug remain ${MENU.name} · ${MENU.slug}.`,
+    );
+    expect(screen.getByTestId("cms-settings-slug")).toHaveValue("dishes");
+    expect(screen.getByTestId("cms-settings-rename")).toHaveTextContent("Retry");
   });
 });

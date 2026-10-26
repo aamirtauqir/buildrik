@@ -26,6 +26,7 @@ import {
   type CmsHydrationStatus,
 } from "@/services/cmsSync";
 import { useContentPanel } from "./useContentPanel";
+import { variableUsage } from "./variableUsage";
 import { cmsWorkspace, useCmsWorkspace } from "@/editor/cms/cmsWorkspaceStore";
 import { RootView } from "./ContentRootView";
 import {
@@ -234,6 +235,12 @@ export const ContentTab: React.FC<ContentTabProps> = ({
           variables={panel.variables}
           onBack={() => setView({ kind: "root" })}
           onChange={panel.setVariables}
+          usages={variableUsage(composer)}
+          onOpenUse={(id) => {
+            /* The element is on the canvas, which the CMS workspace covers. */
+            selectElement(id);
+            composer?.emit("ui:switch-tab", { tab: "layers" });
+          }}
         />
       );
       break;

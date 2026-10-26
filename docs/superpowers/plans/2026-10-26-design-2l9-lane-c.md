@@ -140,3 +140,42 @@ note: there are no board screenshots in the dump and no Figma calls were made, s
 the lead's live walk is the comparison. Two boards disagree on the record
 save-failed button (165:1072 "Retry" vs Play F2.17 "Retry save"); the play
 journey's wording was adopted and the note says so.
+
+## Wave 2 (2026-10-26, after merging `feat/design-2l9`)
+
+Lead routing: C-10 (Assets host) → lead2, C-12 → lead1, C-11/C-13 → L-B; this lane
+does not touch those files. Recovery/restore stays a later server slice. Assets top
+bar restyle waits for the C-10 host.
+
+| # | Archetype | Files | Board copy adopted | Rows |
+|---|---|---|---|---|
+| D1 | Site variable usages (C8) | `sidebar/tabs/content/*` | "N text placeholders" / "0 placeholders"; usages list "Renaming or deleting the key does not rewrite these placeholders…"; rename "Rename {key}? · N text placeholders still use {{site.key}}…"; delete "Delete {key}? · The variable and its value will be removed. N text placeholders still use …" | 260:238267, 260:238707, 260:238513, 260:238886, 260:235689 group |
+| D2 | Add field rules: Default value, min/max, Placeholder, Help text | `cms/AddFieldDialog.tsx`, `FieldInspector.tsx`, `RecordFieldControl.tsx` | 167:4135 rows "Default value · Minimum length · Maximum length · Placeholder · Help text" (CMSField already carries them; schema is passthrough) | 167:4135 group (16) |
+| D3 | Required impact + default backfill | `cms/FieldInspector.tsx`, new `cms/RequiredImpactDialog.tsx` | "Make {field} required? · N published records have no {field} value…" · Set a default value → "Default {field} value · Apply a default to the N published records that have no value. Existing values will be kept." · Save default; receipt "Default saved to N previously empty published records. Existing values were kept." Behaviour: code re-checks Required only when a record is saved as published, so existing published records are not skipped — copy says so (`authority: code:required-checked-on-save`); "Required for new only" is not a rule the validator has → owner decision | 167:9237, 257:53654, 257:53846, 259:95932 (+ 257:54041, 259:95758 blocked:owner-required-new-only) |
+| D4 | Field delete typed by value count + pending | `cms/DeleteFieldDialog.tsx`, `CmsWorkspace.tsx` | "Delete {field}? · N records have a value in {field}." (no 30-day promise until recovery ships) · "Type N to confirm" · Delete field · "Deleting {field}…" | 257:52890, 257:53085, 257:53280 |
+| D5 | Field type change preview + convert / clear | `cms/FieldInspector.tsx`, new `cms/TypeChangeDialog.tsx` | "Change {field} type" preview rows "old → new", "Lossless conversion" / "N values can't convert"; Cancel · Clear values… (typed "Type N to confirm", "Clear N values") · Convert N values; "Converting {field}…"; "Couldn’t change {field}" + Retry | 257:51318 … 259:95573 (10) |
+| D6 | Collection slug URL impact + delete pending/failed | `cms/CollectionSettingsPane.tsx`, `TypedDeleteDialog.tsx` | K31–K34 slug confirm "Change {name} URLs? · N live URLs will move from /a/ to /b/ …" Keep editing · Review redirects · Save slug; K26 "Deleting {name}…"; K27 "Couldn’t delete {name} · {name}, its records and document bindings are unchanged." Retry | 259:94578, 259:94780, 259:94976, 259:95177, 257:58639, 257:58823 |
+| D7 | Components workspace: scope nav (This page / This site / Component library), search, sort, per-page empty | `sidebar/tabs/ComponentsTab.tsx` | K02/K03/K25 | 215:43588, 215:43978, 217:43651 |
+| D8 | Components export package | `sidebar/tabs/component-library/*` | K27–K29 export | 220:42592 group |
+| D9 | Components import package | `sidebar/tabs/component-library/*` | K30+ import | 220:43545 group |
+
+Not in this lane's paths: CMS collection-list query (filter / sort / pagination /
+related — `inspector/sections/CollectionListSection.tsx` is L-B's,
+`engine/cms/RepeaterRenderer.ts` is the lead's); filed as a request when reached.
+
+### Wave 2 status
+
+| # | Commit | State |
+|---|---|---|
+| D1 site-variable usages | `891ce02a2` | built; "Update N old placeholders" after rename not built |
+| D2 Add field default/rules/placeholder/help | `2a75e094f` | built; inspector "Show N usages" / explicit Save field not built |
+| D3 Required impact + default fill | `45591716f` | built; `code:required-checked-on-save`; "Required for new only" `blocked:owner-required-new-only` |
+| D4 field delete typed by count + pending/failed | `ca66c3e15` | built (no 30-day promise until restore ships) |
+| D5 type change preview / convert / clear | `8c3bb216f` | built; 257:52702 superseded; `code:type-moves-before-values` on 257:52512 |
+| D6 collection save + delete pending/failed | `684916a5e` | built; slug URL-impact confirm `code:collection-slug-not-in-urls` |
+| D7 components scopes, search, sort | `2287c5151` | built in the drawer; full workspace / detail pane / row ⋯ / Recently deleted not built |
+| D8/D9 .brcomponent export + import | `988113c4d` | built (3 of 6 import steps; no access blocks, Undo import, receipt check) |
+| in-use delete rows | `05dd64eb4` | `code:unbind-on-delete` (lead auto-decision) |
+
+Requests filed: C-14 (collection-list query → L-B / lead), C-15 (shared `{{site.key}}` grammar → lead).
+Owner decision raised: `blocked:owner-required-new-only`.

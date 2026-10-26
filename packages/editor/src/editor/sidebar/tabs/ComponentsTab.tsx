@@ -9,12 +9,13 @@
  */
 
 import * as React from "react";
-import { Button, ConfirmDialog, EmptyState, EmptyStateDesc, EmptyStateTitle, PanelBackRow, PanelFrame, SkeletonListItem, useToast } from "@/editor/chrome-ui";
+import { Button, ConfirmDialog, EmptyState, EmptyStateDesc, EmptyStateTitle, PanelBackRow, PanelFrame, PanelSearch, Select, SkeletonListItem, Tabs, useToast } from "@/editor/chrome-ui";
 import { PanelErrorState } from "../shared/PanelErrorState";
 import { ComponentDetailScreen, componentDeleteCopy } from "./component-library/ComponentDetailScreen";
 import { ComponentIcon } from "./component-library/ComponentIcon";
 import type { ComponentsTabProps } from "./component-library/types";
 import { useComponentsState } from "./component-library/useComponentsState";
+import { ImportPackageDialog } from "./component-library/ImportPackageDialog";
 
 import "./component-library/ComponentsTab.css";
 import { EVENTS } from "@/shared/constants";
@@ -23,6 +24,11 @@ export type { ComponentsTabProps };
 
 /** Masters created since this page loaded are badged New (board 4418:166980). */
 const isNew = (createdAt: number) => createdAt >= performance.timeOrigin;
+
+/** 2L9 215:43588 — the workspace's three places a master can live. */
+type Scope = "page" | "site" | "library";
+/** "Sort: Most used ▾" (215:43588) plus the two orders a list of names needs. */
+type SortKey = "used" | "name" | "newest";
 
 const SECTION_HEADER =
   "tw:flex tw:items-center tw:gap-2 tw:h-7 tw:px-4 tw:text-[11px] tw:leading-4 tw:font-medium tw:text-[var(--bk-ink-muted)]";
@@ -47,6 +53,10 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
     onHelpClick,
   });
   const { addToast } = useToast();
+  const [scope, setScope] = React.useState<Scope>("site");
+  const [query, setQuery] = React.useState("");
+  const [sort, setSort] = React.useState<SortKey>("used");
+  const [importing, setImporting] = React.useState(false);
 
   // Board 4418:143126: the last Detach all, reported at the top of the list.
   const [detached, setDetached] = React.useState<{ id: string; name: string; count: number } | null>(null);
@@ -241,13 +251,27 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
 
   // ── Main list view ────────────────────────────────────────────────────────────
 
-  /* Board 4418:142419: YOUR COMPONENTS, then LINKED FROM LIBRARY — masters this
-     site shares with other sites of the workspace ("24 on this site · linked"). */
+  /* 2L9 215:43588 / 215:43978 — This page · This site · Component library,
+     each with its count; search and sort apply to the list shown. A linked
+     master lists under This site with its source named. */
   const linkedIds = new Set(library.filter((l) => l.onThisSite).map((l) => l.componentId));
-  const own = state.components.filter((c) => !linkedIds.has(c.id));
-  const linked = state.components.filter((c) => linkedIds.has(c.id));
+  const uses = (id: string) => composer?.components?.getInstancesOfComponent?.(id)?.length || 0;
+  const onPage = state.components.filter((c) => c.pageId);
+  const onSite = state.components.filter((c) => !c.pageId);
+  const needle = query.trim().toLowerCase();
+  const shown = (scope === "page" ? onPage : onSite)
+    .filter((c) => !needle || c.name.toLowerCase().includes(needle))
+    .sort((a, b) =>
+      sort === "name" ? a.name.localeCompare(b.name) : sort === "newest" ? b.createdAt - a.createdAt : uses(b.id) - uses(a.id),
+    );
+  const libraryShown = library.filter((l) => !needle || l.name.toLowerCase().includes(needle));
+  const SCOPES = [
+    { id: "page", label: `This page · ${onPage.length}` },
+    { id: "site", label: `This site · ${onSite.length}` },
+    { id: "library", label: `Component library · ${library.length}` },
+  ] as const;
   const renderRow = (component: (typeof state.components)[number], isLinked: boolean) => {
-    const n = composer?.components?.getInstancesOfComponent?.(component.id)?.length || 0;
+    const n = uses(component.id);
     const justDetached = detached?.id === component.id && n === 0;
     return (
               <div
@@ -333,21 +357,70 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
               </p>
             </div>
           )}
-          <p className="tw:m-0 tw:px-3 tw:py-2 tw:text-[11px] tw:leading-[normal] tw:text-[var(--bk-ink)]" data-testid="comp-intro">
-            Manage saved masters for this site. Insert places an instance; edits to a master affect its instances.
-          </p>
-          <div className={SECTION_HEADER} data-testid="comp-section-header">
-            <span className="tw:flex-1 tw:tracking-[0.88px]">YOUR COMPONENTS</span>
-            <span className="tw:[font-family:var(--bk-font-mono)]">{own.length}</span>
+          <Tabs
+            tabs={SCOPES}
+            value={scope}
+            onChange={(id) => setScope(id as Scope)}
+            label="Components"
+            className="tw:flex-wrap tw:px-3 tw:pt-2"
+            data-testid="comp-scopes"
+          />
+          <Button variant="link" size="xs" className="tw:mx-4 tw:h-7 tw:p-0" onClick={() => setImporting(true)} data-testid="comp-import-open">
+            Import package…
+          </Button>
+          <div className="tw:flex tw:items-center tw:gap-2 tw:px-3 tw:py-2">
+            <PanelSearch placeholder="Search components" value={query} onChange={setQuery} className="tw:flex-1" data-testid="comp-search" />
+            {scope !== "library" ? (
+              <Select sizing="sm" aria-label="Sort" value={sort} onChange={(e) => setSort(e.target.value as SortKey)} data-testid="comp-sort">
+                <option value="used">Sort: Most used</option>
+                <option value="name">Sort: Name</option>
+                <option value="newest">Sort: Newest</option>
+              </Select>
+            ) : null}
           </div>
-          {own.map((component) => renderRow(component, false))}
-          {linked.length > 0 && (
+          {scope === "library" ? (
             <>
-              <div className={SECTION_HEADER} data-testid="comp-section-linked">
-                <span className="tw:flex-1 tw:tracking-[0.88px]">LINKED FROM LIBRARY</span>
-                <span className="tw:[font-family:var(--bk-font-mono)]">{linked.length}</span>
+              <div className={SECTION_HEADER} data-testid="comp-section-header">
+                <span className="tw:flex-1">Component library · {libraryShown.length}</span>
               </div>
-              {linked.map((component) => renderRow(component, true))}
+              {libraryShown.map((l) => (
+                <div key={l.componentId} className="tw:flex tw:h-8 tw:items-center tw:gap-2 tw:px-4" data-testid={`comp-lib-${l.componentId}`}>
+                  <span className="tw:min-w-0 tw:truncate tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]" title={l.name}>
+                    {l.name}
+                  </span>
+                  <span className="tw:flex-1" aria-hidden="true" />
+                  <span className="tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
+                    {l.onThisSite ? "On this site" : "Not on this site"}
+                  </span>
+                </div>
+              ))}
+              {library.length === 0 ? (
+                <p className="tw:m-0 tw:px-4 tw:py-2 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]" data-testid="comp-empty-library">
+                  No components are shared across this workspace yet.
+                </p>
+              ) : null}
+            </>
+          ) : (
+            <>
+              <div className={SECTION_HEADER} data-testid="comp-section-header">
+                <span className="tw:flex-1">{scope === "page" ? "This page" : "This site"} · {shown.length}</span>
+              </div>
+              {shown.map((component) => renderRow(component, linkedIds.has(component.id)))}
+              {scope === "page" && onPage.length === 0 ? (
+                /* 217:43651 */
+                <div className="tw:flex tw:flex-col tw:gap-1 tw:px-4 tw:py-2" data-testid="comp-empty-page">
+                  <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)]">No components on this page yet</p>
+                  <p className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]">
+                    Select a section on the canvas and choose Save as component… in Layers or the Inspector. Choose This page to keep it
+                    here only.
+                  </p>
+                </div>
+              ) : null}
+              {needle && shown.length === 0 && (scope === "site" ? onSite : onPage).length > 0 ? (
+                <p className="tw:m-0 tw:px-4 tw:py-2 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]" data-testid="comp-no-match">
+                  No components match “{query.trim()}”.
+                </p>
+              ) : null}
             </>
           )}
         </div>
@@ -369,6 +442,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         </div>
       )}
       {/* ── Dialogs ─────────────────────────────────────────────────────────── */}
+      {importing ? <ImportPackageDialog composer={composer} onClose={() => setImporting(false)} /> : null}
       <ConfirmDialog
         open={!!state.confirmDelete}
         onClose={() => state.setConfirmDelete(null)}

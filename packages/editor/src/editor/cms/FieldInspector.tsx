@@ -17,9 +17,12 @@ import type { Composer } from "@/engine";
 import type { CMSCollection, CMSContentItem, CMSField, CMSFieldType } from "@/shared/types/cms";
 import { Button, Chip, IconButton, Select, TextInput } from "@/editor/chrome-ui";
 import { cmsWorkspace } from "./cmsWorkspaceStore";
-import { FIELD_TYPES, FIELD_TYPE_LABEL, fieldKeyError } from "./fieldTypes";
+import { FIELD_RULES, FIELD_TYPES, FIELD_TYPE_LABEL, TYPED_VALUE_TYPES, fieldKeyError, parseDefault } from "./fieldTypes";
 import type { FieldUse } from "./fieldUsage";
 import { DeleteFieldDialog } from "./DeleteFieldDialog";
+import { RequiredImpactDialog } from "./RequiredImpactDialog";
+import { TypeChangeDialog, type TypeChangeMode } from "./TypeChangeDialog";
+import { isEmptyCmsValue } from "@buildrik/shared/schemas/cms";
 import { OptionsEditor } from "./OptionsEditor";
 import { SECTION } from "./paneStyles";
 
@@ -36,15 +39,6 @@ const NOTE = "tw:m-0 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 /** The header glyph before the field name ("# Price"). */
 const TYPE_GLYPH: Record<string, string> = { number: "#", text: "T", textarea: "¶", richtext: "¶", image: "▣", boolean: "◐", date: "▦", reference: "↗", slug: "/", multiselect: "☰" };
 
-/** The rules each type can carry (CMSFieldValidation, enforced on publish by
- *  validateFieldValue): numbers take a range, text a length. */
-const RULES: Record<string, Array<{ key: "min" | "max" | "minLength" | "maxLength"; label: string }>> = {
-  number: [{ key: "min", label: "Min" }, { key: "max", label: "Max" }],
-  text: [{ key: "minLength", label: "Min length" }, { key: "maxLength", label: "Max length" }],
-  textarea: [{ key: "minLength", label: "Min length" }, { key: "maxLength", label: "Max length" }],
-  richtext: [{ key: "minLength", label: "Min length" }, { key: "maxLength", label: "Max length" }],
-  slug: [{ key: "minLength", label: "Min length" }, { key: "maxLength", label: "Max length" }],
-};
 
 /** One numeric rule, saved on blur / Enter; empty clears it. */
 function RuleInput({ id, value, onCommit }: { id: string; value: number | undefined; onCommit: (v: number | undefined) => void }) {
@@ -72,6 +66,28 @@ function RuleInput({ id, value, onCommit }: { id: string; value: number | undefi
   );
 }
 
+/** A text setting, saved on blur / Enter; empty clears it. */
+function TextSetting({ id, value, onCommit }: { id: string; value: string; onCommit: (v: string) => void }) {
+  const [draft, setDraft] = React.useState(value);
+  React.useEffect(() => setDraft(value), [value]);
+  const commit = () => {
+    if (draft.trim() !== value) onCommit(draft.trim());
+  };
+  return (
+    <TextInput
+      id={id}
+      sizing="sm"
+      className={CONTROL}
+      placeholder="None"
+      value={draft}
+      onChange={(e) => setDraft(e.target.value)}
+      onBlur={commit}
+      onKeyDown={(e) => e.key === "Enter" && commit()}
+      data-testid={id}
+    />
+  );
+}
+
 export interface FieldInspectorProps {
   composer: Composer | null;
   collection: CMSCollection;
@@ -83,9 +99,18 @@ export interface FieldInspectorProps {
   onClose: () => void;
   onDeleteField: (fieldId: string) => Promise<void>;
   onOpenUse: (elementId: string) => void;
+  /** Required's "Set a default value" (257:53846): saves the default, fills
+   *  the empty published records, turns Required on; resolves with the count. */
+  onSetDefault: (field: CMSField, value: unknown) => Promise<number>;
+  /** A type change over stored values (257:51318): converts or clears them. */
+  onChangeType: (field: CMSField, to: CMSFieldType, mode: TypeChangeMode) => Promise<void>;
 }
 
-export function FieldInspector({ composer, collection, collections, field, records, uses, onClose, onDeleteField, onOpenUse }: FieldInspectorProps) {
+export function FieldInspector({ composer, collection, collections, field, records, uses, onClose, onDeleteField, onOpenUse, onSetDefault, onChangeType }: FieldInspectorProps) {
+  const [askingRequired, setAskingRequired] = React.useState(false);
+  const [retyping, setRetyping] = React.useState<CMSFieldType | null>(null);
+  const holdsValues = records.some((r) => !isEmptyCmsValue(r.data[field.slug]));
+  const emptyPublished = records.filter((r) => r.status === "published" && isEmptyCmsValue(r.data[field.slug])).length;
   const [name, setName] = React.useState(field.name);
   const [key, setKey] = React.useState(field.slug);
   const [deleting, setDeleting] = React.useState(false);
@@ -151,7 +176,12 @@ export function FieldInspector({ composer, collection, collections, field, recor
             className={CONTROL}
             value={field.type}
             disabled={bound}
-            onChange={(e) => update({ type: e.target.value as CMSFieldType })}
+            onChange={(e) => {
+              const to = e.target.value as CMSFieldType;
+              /* 257:51318 — stored values are previewed before the type moves. */
+              if (holdsValues) setRetyping(to);
+              else update({ type: to });
+            }}
             data-testid="cms-fi-type"
           >
             {types.map((t) => (
@@ -206,13 +236,40 @@ export function FieldInspector({ composer, collection, collections, field, recor
         <div className={ROW}>
           <span className={ROW_LABEL}>Required</span>
           <span className="tw:flex tw:gap-1" role="group" aria-label="Required">
-            <Chip label="Yes" selected={Boolean(field.validation?.required)} onClick={() => update({ validation: { ...field.validation, required: true } })} data-testid="cms-fi-required-yes" />
+            <Chip label="Yes" selected={Boolean(field.validation?.required)} onClick={() => {
+                if (field.validation?.required) return;
+                /* 257:53654 — published records that leave it empty are named first. */
+                if (emptyPublished > 0) setAskingRequired(true);
+                else update({ validation: { ...field.validation, required: true } });
+              }} data-testid="cms-fi-required-yes" />
             <Chip label="No" selected={!field.validation?.required} onClick={() => update({ validation: { ...field.validation, required: false } })} data-testid="cms-fi-required-no" />
           </span>
         </div>
 
+        {/* 167:4135 — what a new record starts with and what the form shows. */}
+        {TYPED_VALUE_TYPES.has(field.type) ? (
+          <>
+            <div className={ROW}>
+              <label className={ROW_LABEL} htmlFor="cms-fi-default">Default value</label>
+              <TextSetting
+                id="cms-fi-default"
+                value={field.defaultValue === undefined || field.defaultValue === null ? "" : String(field.defaultValue)}
+                onCommit={(v) => update({ defaultValue: parseDefault(field.type, v) })}
+              />
+            </div>
+            <div className={ROW}>
+              <label className={ROW_LABEL} htmlFor="cms-fi-placeholder">Placeholder</label>
+              <TextSetting id="cms-fi-placeholder" value={field.placeholder ?? ""} onCommit={(v) => update({ placeholder: v || undefined })} />
+            </div>
+          </>
+        ) : null}
+        <div className={ROW}>
+          <label className={ROW_LABEL} htmlFor="cms-fi-help">Help text</label>
+          <TextSetting id="cms-fi-help" value={field.helpText ?? ""} onCommit={(v) => update({ helpText: v || undefined })} />
+        </div>
+
         <h4 className={`${SECTION} tw:mb-2 tw:mt-3`}>Validation</h4>
-        {(RULES[field.type] ?? []).map((r) => (
+        {(FIELD_RULES[field.type] ?? []).map((r) => (
           <div key={r.key} className={ROW}>
             <label className={ROW_LABEL} htmlFor={`cms-fi-rule-${r.key}`}>{r.label}</label>
             <RuleInput
@@ -222,7 +279,7 @@ export function FieldInspector({ composer, collection, collections, field, recor
             />
           </div>
         ))}
-        {RULES[field.type] ? null : (
+        {FIELD_RULES[field.type] ? null : (
           <p className={`${TEXT} tw:text-[var(--bk-ink-muted)]`} data-testid="cms-fi-rule-none">
             {FIELD_TYPE_LABEL[field.type] ?? field.type} fields take no rules beyond Required.
           </p>
@@ -261,19 +318,35 @@ export function FieldInspector({ composer, collection, collections, field, recor
           Back to Fields
         </Button>
       </footer>
+      {retyping ? (
+        <TypeChangeDialog
+          collection={collection}
+          field={field}
+          to={retyping}
+          records={records}
+          onClose={() => setRetyping(null)}
+          onApply={(mode) => onChangeType(field, retyping, mode)}
+        />
+      ) : null}
+      {askingRequired ? (
+        <RequiredImpactDialog
+          field={field}
+          emptyCount={emptyPublished}
+          onClose={() => setAskingRequired(false)}
+          onMakeRequired={() => update({ validation: { ...field.validation, required: true } })}
+          onSetDefault={(value) => onSetDefault(field, value)}
+        />
+      ) : null}
       {deleting ? (
         <DeleteFieldDialog
           collection={collection}
           field={field}
           uses={uses}
           onClose={() => setDeleting(false)}
-          onDelete={() => {
-            setDeleting(false);
-            void onDeleteField(field.id);
-          }}
+          onDelete={() => onDeleteField(field.id)}
           onOpenUse={onOpenUse}
           siteName={composer?.getProjectMetadata?.()?.name || "Untitled site"}
-          recordCount={records.length}
+          valueCount={records.filter((r) => !isEmptyCmsValue(r.data[field.slug])).length}
         />
       ) : null}
     </aside>

@@ -129,6 +129,12 @@ export function makeEngine(opts?: {
         }),
         addField: vi.fn(() => Promise.resolve(null)),
         deleteField: vi.fn(() => Promise.resolve(true)),
+        updateField: vi.fn((cid: string, fid: string, updates: Record<string, unknown>) => {
+          collections = collections.map((c) =>
+            c.id === cid ? { ...c, fields: c.fields.map((f) => (f.id === fid ? { ...f, ...updates } : f)) } : c,
+          );
+          return Promise.resolve(true);
+        }),
         /* Mutates the array the getters read from, so a save is observable the
            way it is in the engine — a spy that only records the call would pass
            even if the panel never re-read the collection. */

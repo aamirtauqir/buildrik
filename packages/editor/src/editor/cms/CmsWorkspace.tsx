@@ -31,7 +31,11 @@ import { BACK } from "./paneStyles";
 import { ImportRecordsButton, useImportRecords } from "./useImportRecords";
 import { CsvImportDialog } from "./CsvImportDialog";
 import { onCmsGone } from "@/services/cmsSync";
-import type { CMSCollection, CMSContentItem } from "@/shared/types/cms";
+import type { CMSCollection, CMSContentItem, CMSField, CMSFieldType } from "@/shared/types/cms";
+import type { TypeChangeMode } from "./TypeChangeDialog";
+import { planConversion } from "./fieldConversion";
+import { FIELD_TYPE_LABEL } from "./fieldTypes";
+import { isEmptyCmsValue } from "@buildrik/shared/schemas/cms";
 
 export interface CmsWorkspaceProps {
   composer: Composer | null;
@@ -236,9 +240,58 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
   const selectedField = ws.tab === "fields" ? collection.fields.find((f) => f.id === fieldId) ?? null : null;
   const deleteField = async (id: string) => {
     const field = collection.fields.find((f) => f.id === id);
-    setFieldId(null);
+    /* The dialog shows "Deleting {field}…" until this lands (257:53280);
+       a throw leaves it open with Retry. */
     await panel.deleteField(collection.id, id);
+    setFieldId(null);
     if (field) addToast({ tone: "success", title: "Field deleted", description: `${field.name} has been removed from ${collection.name}.` });
+  };
+  /* 257:53846 / 259:95932 — a default for a field becoming Required: saved on
+     the field, written into each published record that has no value, then
+     Required goes on. Existing values are kept. */
+  const fillDefault = async (field: CMSField, value: unknown): Promise<number> => {
+    if (!composer) return 0;
+    const empty = panel.records.filter((r) => r.status === "published" && isEmptyCmsValue(r.data[field.slug]));
+    await composer.cms.collections.updateField(collection.id, field.id, { defaultValue: value });
+    for (const r of empty) {
+      await panel.saveRecord(collection.id, r.id, { ...r.data, [field.slug]: value }, true);
+    }
+    await composer.cms.collections.updateField(collection.id, field.id, {
+      defaultValue: value,
+      validation: { ...field.validation, required: true },
+    });
+    await loadRecords(collection.id);
+    addToast({
+      tone: "success",
+      title: `${field.name} is required`,
+      description: `Default saved to ${empty.length} previously empty published record${empty.length === 1 ? "" : "s"}. Existing values were kept.`,
+    });
+    return empty.length;
+  };
+  /* 257:51318 / 257:52278 / 259:95573 — the type moves first (so a
+     published record's save is checked against it), then each stored value
+     is written converted, or cleared. A refused write rejects; the dialog
+     offers Retry, which plans again from what is stored now. */
+  const changeType = async (field: CMSField, to: CMSFieldType, mode: TypeChangeMode): Promise<void> => {
+    if (!composer) return;
+    const plan = planConversion(field, panel.records, to);
+    if (field.type !== to) await composer.cms.collections.updateField(collection.id, field.id, { type: to });
+    const writes: Array<[CMSContentItem, unknown]> =
+      mode === "convert" ? plan.converts.map((c) => [c.record, c.value]) : plan.touched.map((r) => [r, undefined]);
+    for (const [record, value] of writes) {
+      const data = { ...record.data };
+      if (value === undefined) delete data[field.slug];
+      else data[field.slug] = value;
+      const result = await panel.saveRecord(collection.id, record.id, data, record.status === "published");
+      if (result.invalid || result.conflict) throw new Error(result.invalid ?? "conflict");
+    }
+    await loadRecords(collection.id);
+    const n = writes.length;
+    addToast({
+      tone: "success",
+      title: mode === "convert" ? `${field.name} converted` : `${n} value${n === 1 ? "" : "s"} cleared`,
+      description: mode === "convert" ? `${n} value${n === 1 ? "" : "s"} converted and saved.` : `${field.name} is now ${FIELD_TYPE_LABEL[to]}.`,
+    });
   };
   /* "Open the binding" — select the bound element and go back to the canvas. */
   const openUse = (elementId: string) => {
@@ -425,6 +478,8 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
           onClose={() => setFieldId(null)}
           onDeleteField={deleteField}
           onOpenUse={openUse}
+          onSetDefault={fillDefault}
+          onChangeType={changeType}
         />
       ) : null}
       {csvImportOpen ? (

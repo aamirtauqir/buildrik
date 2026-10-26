@@ -20,10 +20,18 @@ export function RenameDialog({
   validate,
   onSave,
   testId,
+  description,
+  saveLabel = "Rename",
+  aside,
 }: {
   open: boolean;
   onClose: () => void;
   title: string;
+  /** What the rename does not change (260:238513 — placeholders keep the old key). */
+  description?: React.ReactNode;
+  saveLabel?: string;
+  /** A secondary way out between Cancel and save ("Show usages"). */
+  aside?: { label: string; onClick: () => void };
   label: string;
   initial: string;
   /** An error sentence for the trimmed value, or null when it can be saved. */
@@ -53,12 +61,22 @@ export function RenameDialog({
           <Button variant="secondary" onClick={onClose} data-testid={`${testId}-cancel`}>
             Cancel
           </Button>
+          {aside ? (
+            <Button variant="ghost" onClick={aside.onClick} data-testid={`${testId}-aside`}>
+              {aside.label}
+            </Button>
+          ) : null}
           <Button disabled={!canSave} onClick={save} data-testid={`${testId}-save`}>
-            Rename
+            {saveLabel}
           </Button>
         </>
       }
     >
+      {description ? (
+        <p className="tw:m-0 tw:mb-2" data-testid={`${testId}-description`}>
+          {description}
+        </p>
+      ) : null}
       <label className={LABEL} htmlFor={`${testId}-input`}>
         {label}
       </label>

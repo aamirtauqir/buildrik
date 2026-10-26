@@ -15,6 +15,7 @@ import * as React from "react";
 import {
   ConfirmDialog,
   Button,
+  Modal,
   IconButton,
   Popover,
   Menu,
@@ -28,6 +29,7 @@ import type { SiteVariable } from "@/shared/types/project";
 import { conditionSummary, isValidVariableKey } from "./contentPanelUtils";
 import type { ConditionRow } from "./useContentPanel";
 import { ConnectSourceDialog, RenameDialog, ResyncJsonDialog } from "./DataRowDialogs";
+import { placeholderCount, type VariableUse } from "./variableUsage";
 
 /** The panel column. Exported because ContentTab wraps these views in it. */
 export const CONTENT_BODY = "tw:flex tw:flex-col tw:h-full tw:min-h-0";
@@ -312,11 +314,17 @@ export function VariablesView({
   variables,
   onBack,
   onChange,
+  usages = new Map(),
+  onOpenUse,
 }: {
   variables: SiteVariable[];
   onBack: () => void;
   onChange: (vars: SiteVariable[]) => void;
+  /** Where each key is typed as {{site.<key>}} (260:238267). */
+  usages?: Map<string, VariableUse[]>;
+  onOpenUse?: (elementId: string) => void;
 }) {
+  const [showing, setShowing] = React.useState<string | null>(null);
   const [adding, setAdding] = React.useState(false);
   const [key, setKey] = React.useState("");
   const [value, setValue] = React.useState("");
@@ -327,6 +335,39 @@ export function VariablesView({
   const [deleting, setDeleting] = React.useState<string | null>(null);
   const keyError = key.trim() !== "" && !isValidVariableKey(key.trim());
   const dupError = variables.some((v) => v.key === key.trim());
+  const usesOf = (k: string) => usages.get(k) ?? [];
+  const placeholdersOf = (k: string) => {
+    const n = usesOf(k).length;
+    return n === 0 ? null : `${placeholderCount(n)} still use${n === 1 ? "s" : ""} {{site.${k}}}`;
+  };
+
+  if (showing !== null) {
+    /* 260:238267 — one key's placeholders, each opening its element. */
+    const list = usesOf(showing);
+    return (
+      <div className={CONTENT_BODY} data-testid="content-var-usages">
+        <Crumb label="Site variables" onClick={() => setShowing(null)} />
+        <div className={SCROLL}>
+          <p className="tw:m-0 tw:px-4 tw:py-2 tw:text-[13px] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)]">
+            {showing} · {placeholderCount(list.length)}
+          </p>
+          {list.map((u, i) => (
+            <Row
+              key={`${u.elementId}-${i}`}
+              interactive={Boolean(onOpenUse)}
+              onClick={onOpenUse ? () => onOpenUse(u.elementId) : undefined}
+              data-testid={`content-var-use-${i}`}
+            >
+              <span className="tw:truncate tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">{u.label}</span>
+            </Row>
+          ))}
+          <p className={INLINE_HINT}>
+            Renaming or deleting the key does not rewrite these placeholders. Update each usage to keep published text correct.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={CONTENT_BODY}>
@@ -369,8 +410,10 @@ export function VariablesView({
                   }}
                 />
               ) : (
-                <span className={SUB} data-testid={`content-var-value-${v.key}`}>{v.value || "—"}</span>
+                <span className={SUB} data-testid={`content-var-value-${v.key}`}>{v.value || "Empty value"}</span>
               )}
+              {/* 260:235689 — how many text placeholders read this key. */}
+              <span className={SUB} data-testid={`content-var-count-${v.key}`}>{placeholderCount(usesOf(v.key).length)}</span>
             </span>
             <span className={ROW_ACTIONS}>
               {editKey === v.key ? (
@@ -407,8 +450,11 @@ export function VariablesView({
                     <MenuItem data-testid={`content-var-edit-${v.key}`} onClick={() => { setMenuFor(null); setEditKey(v.key); setEditValue(v.value); }}>
                       Edit value
                     </MenuItem>
+                    <MenuItem data-testid={`content-var-usages-${v.key}`} onClick={() => { setMenuFor(null); setShowing(v.key); }}>
+                      Show usages
+                    </MenuItem>
                     <MenuItem data-testid={`content-var-rename-${v.key}`} onClick={() => { setMenuFor(null); setRenaming(v.key); }}>
-                      Rename
+                      Rename key…
                     </MenuItem>
                     <MenuItem danger data-testid={`content-var-delete-${v.key}`} onClick={() => { setMenuFor(null); setDeleting(v.key); }}>
                       Delete…
@@ -467,8 +513,11 @@ export function VariablesView({
         key={renaming}
         open
         onClose={() => setRenaming(null)}
-        title="Rename variable"
-        label="Key"
+        title={`Rename ${renaming}?`}
+        description={placeholdersOf(renaming) ? `${placeholdersOf(renaming)}. They will not automatically change to the new key.` : undefined}
+        aside={usesOf(renaming).length ? { label: "Show usages", onClick: () => { setShowing(renaming); setRenaming(null); } } : undefined}
+        saveLabel="Rename key"
+        label="New key"
         initial={renaming}
         validate={(next) =>
           !isValidVariableKey(next)
@@ -481,18 +530,40 @@ export function VariablesView({
         testId="content-var-rename"
       />
       ) : null}
-      <ConfirmDialog
+      {/* 260:238886 — the delete names the placeholders it leaves behind. */}
+      <Modal
         open={deleting != null}
         onClose={() => setDeleting(null)}
-        onConfirm={() => {
-          onChange(variables.filter((x) => x.key !== deleting));
-          setDeleting(null);
-        }}
-        title={`Delete {{site.${deleting ?? ""}}}?`}
-        message="The variable and its value are removed."
-        confirmLabel="Delete variable"
-        tone="destructive"
-      />
+        title={`Delete ${deleting ?? ""}?`}
+        testId="content-var-delete"
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setDeleting(null)}>
+              Cancel
+            </Button>
+            {deleting && usesOf(deleting).length ? (
+              <Button variant="ghost" data-testid="content-var-delete-usages" onClick={() => { setShowing(deleting); setDeleting(null); }}>
+                Show usages
+              </Button>
+            ) : null}
+            <Button
+              variant="danger"
+              data-testid="content-var-delete-confirm"
+              onClick={() => {
+                onChange(variables.filter((x) => x.key !== deleting));
+                setDeleting(null);
+              }}
+            >
+              Delete variable
+            </Button>
+          </>
+        }
+      >
+        <p className="tw:m-0" data-testid="content-var-delete-body">
+          The variable and its value will be removed.
+          {deleting && placeholdersOf(deleting) ? ` ${placeholdersOf(deleting)}; review those usages before publishing.` : ""}
+        </p>
+      </Modal>
     </div>
   );
 }
