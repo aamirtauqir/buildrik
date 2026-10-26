@@ -12,26 +12,17 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Braces, Database, GitBranch, Table2 } from "lucide-react";
 import {
   ConfirmDialog,
   Button,
-  EmptyState,
-  EmptyStateActions,
-  EmptyStateDesc,
   IconButton,
   Popover,
   Menu,
   MenuItem,
-  ListRow,
   Row,
-  SectionHeader,
-  ROW_ICON_CLASS,
-  ROW_LABEL_CLASS,
   Select,
   TextInput,
 } from "@/editor/chrome-ui";
-import type { CMSCollection, CMSContentItem, CMSField } from "@/shared/types/cms";
 import type { ConditionExpression, ConditionOperator, DataSource } from "@/shared/types/data";
 import type { SiteVariable } from "@/shared/types/project";
 import { conditionSummary, isValidVariableKey } from "./contentPanelUtils";
@@ -53,7 +44,9 @@ export const CONTENT_BODY = "tw:flex tw:flex-col tw:h-full tw:min-h-0";
  *  this constant, so the shared primitive keeps whatever its own boards say. */
 export const SECTION_H = "tw:h-[var(--bk-size-row)] tw:leading-4";
 
-const SCROLL = "tw:flex-1 tw:min-h-0 tw:overflow-y-auto";
+/** The scrolling body under a view's header. */
+export const SCROLL = "tw:flex-1 tw:min-h-0 tw:overflow-y-auto";
+
 /** A text button that reads as a link: breadcrumbs and every "+ New …".
  *
  *  `border-0` is the one that matters, and it is NOT interchangeable with
@@ -126,149 +119,6 @@ function Crumb({ label, onClick }: { label: string; onClick: () => void }) {
     <Button className={`${LINK_BTN} tw:mx-4 tw:my-0.5 tw:self-start tw:justify-start`} onClick={onClick} aria-label={`Back to ${label}`} data-testid="content-crumb">
       ‹ {label}
     </Button>
-  );
-}
-
-/* ── Root (148:2) + empty (149:7) ────────────────────────────────────────── */
-
-export function RootView({
-  collections,
-  recordCounts,
-  sourcesCount,
-  variablesCount,
-  conditionsCount,
-  selectedCollectionId,
-  onOpenCollection,
-  onCreateCollection,
-  onOpenSources,
-  onOpenVariables,
-  onOpenConditions,
-}: {
-  collections: CMSCollection[];
-  recordCounts: Record<string, number>;
-  sourcesCount: number;
-  variablesCount: number;
-  conditionsCount: number;
-  selectedCollectionId?: string | null;
-  onOpenCollection: (id: string) => void;
-  onCreateCollection?: () => void;
-  onOpenSources: () => void;
-  onOpenVariables: () => void;
-  onOpenConditions: () => void;
-}) {
-  if (collections.length === 0 && sourcesCount === 0 && variablesCount === 0 && conditionsCount === 0) {
-    return (
-      /*
-        Board 149:7 draws this block composed, not with the default slots:
-        the copy is 13/20 over 272, and the call to action is ACCENT TEXT.
-        EmptyState's shared body class is 12px and its `action` slot takes a
-        filled Button, so the defaults gave a 12px line under a solid blue
-        CTA. The Button doc on the same page is explicit — primary is the ONE
-        filled accent button per screen — and an empty panel inviting you in
-        is not where that one gets spent. Media's empty state (145:406) draws
-        its two calls to action the same way.
-      */
-      <EmptyState
-        /* 149:46 — a 160-tall block at the TOP of the panel, not a column that
-           fills it. `flex-1` centred the two lines in whatever height the
-           drawer had (~768 live), which put the invitation halfway down an
-           otherwise blank panel and ~300px below where the board draws it. */
-        className="tw:h-40"
-        data-testid="content-empty"
-      >
-        <EmptyStateDesc className="tw:max-w-[272px] tw:text-[13px] tw:leading-5" data-testid="content-empty-desc">
-          {/* One source literal, deliberately: gate:copy greps src/ for the exact
-              string from the design doc, so wrapping it across two JSX lines
-              reads to that gate as the line having been deleted. */}
-          Collections turn a spreadsheet into pages — one page per row, updated when the data changes.
-        </EmptyStateDesc>
-        {/* A-17/A09-8: the zero state offered only Create a collection — the
-            Sources/Variables/Conditions doors this tab also owns had no way
-            in until the user first created a collection. All three routes
-            are wired regardless of collection count. */}
-        <EmptyStateActions>
-          {onCreateCollection ? (
-            <Button
-              color="light"
-              size="xs"
-              variant="link" className="tw:min-h-6 tw:font-normal"
-              data-testid="content-empty-cta"
-              onClick={onCreateCollection}
-            >
-              Create a collection
-            </Button>
-          ) : null}
-          <Button
-            color="light"
-            size="xs"
-            variant="link" className="tw:min-h-6 tw:font-normal"
-            data-testid="content-empty-sources"
-            onClick={onOpenSources}
-          >
-            Open Sources
-          </Button>
-          <Button
-            color="light"
-            size="xs"
-            variant="link" className="tw:min-h-6 tw:font-normal"
-            data-testid="content-empty-variables"
-            onClick={onOpenVariables}
-          >
-            Open Variables
-          </Button>
-          <Button
-            color="light"
-            size="xs"
-            variant="link" className="tw:min-h-6 tw:font-normal"
-            data-testid="content-empty-conditions"
-            onClick={onOpenConditions}
-          >
-            Open Conditions
-          </Button>
-        </EmptyStateActions>
-      </EmptyState>
-    );
-  }
-  return (
-    <div className={SCROLL}>
-      {/* Board 148:2 — the group header is 32-tall with a tint wash, not the
-          shared List section's plain 28. The arbitrary bracket sorts after
-          the named `h-7` scale utility in the compiled sheet and so wins
-          regardless of class order (same trick as AssetDetailOverlay's alt
-          input) rather than trusting an equal-specificity `h-8` to win. */}
-      <SectionHeader tint className={SECTION_H} count={collections.length} data-testid="content-section-collections">Collections</SectionHeader>
-      {collections.map((c) => (
-        <ListRow
-          key={c.id}
-          icon={<Table2 size={16} />}
-          label={c.name}
-          count={recordCounts[c.id] ?? "—"}
-          chevron
-          selected={c.id === selectedCollectionId}
-          aria-current={c.id === selectedCollectionId ? "true" : undefined}
-          data-testid={`content-collection-${c.id}`}
-          onClick={() => onOpenCollection(c.id)}
-        />
-      ))}
-      {/* Board 148:20 — a bare row, not a button: "+" sits in the icon column
-          (12/400 ink-muted) and "New collection" is the 13/400 accent-text
-          label, flush with every List row above it. The old small inset
-          Button (mx-4, its own 48h before this fix) never matched that. */}
-      {onCreateCollection && (
-        <Row interactive onClick={onCreateCollection} data-testid="content-new-collection" aria-label="New collection">
-          <span className={`${ROW_ICON_CLASS} tw:text-[length:var(--bk-text-12)] tw:leading-[18px]`} aria-hidden="true" data-testid="content-new-collection-plus">
-            +
-          </span>
-          <span className={`${ROW_LABEL_CLASS} tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-accent-text)]`} data-testid="content-new-collection-label">
-            New collection
-          </span>
-        </Row>
-      )}
-      <SectionHeader tint className={SECTION_H} data-testid="content-section-data">Data</SectionHeader>
-      <ListRow icon={<Database size={16} />} label="Sources" count={sourcesCount} chevron data-testid="content-open-sources" onClick={onOpenSources} />
-      <ListRow icon={<Braces size={16} />} label="Variables" count={variablesCount} chevron data-testid="content-open-variables" onClick={onOpenVariables} />
-      <ListRow icon={<GitBranch size={16} />} label="Conditions" count={conditionsCount} chevron data-testid="content-open-conditions" onClick={onOpenConditions} />
-    </div>
   );
 }
 
@@ -480,20 +330,23 @@ export function VariablesView({
 
   return (
     <div className={CONTENT_BODY}>
-      <Crumb label="Variables" onClick={onBack} />
+      <Crumb label="Site variables" onClick={onBack} />
       <div className={SCROLL}>
-        {/* Every other screen in this panel says what an empty list means —
-            "No data source connected", "No records yet". Variables said
-            nothing at all, so an empty Variables screen was one blue link on
-            white with no clue what a variable is for. */}
+        {/* RL02 (424:337452) — the intro says what a variable is for, list or
+            no list. Variables are saved with the project and the export
+            writes their value wherever {{site.<key>}} appears in text
+            (G3-075); the canvas keeps the braces as typed — say so. */}
+        <div className="tw:flex tw:flex-col tw:gap-1 tw:px-4 tw:py-3" data-testid="content-vars-intro">
+          <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)]">Use one value across your site</p>
+          <p className={`${SUB} tw:m-0`}>
+            Type <span className={MONO}>{"{{site.key}}"}</span> in text. Published pages show the value; the canvas keeps the
+            placeholder. Changes are saved with your site.
+          </p>
+        </div>
         {variables.length === 0 && !adding && (
-          /* Variables are saved with the project and the export writes their
-             value wherever {{site.<key>}} appears in text (G3-075). The canvas
-             still shows the braces as typed — say so. */
-          <div className={`${SUB} tw:p-3`}>
-            No variables yet. Write a value once, then type{" "}
-            <span className={MONO}>{"{{site.name}}"}</span> in any text: the
-            published page shows the value; the canvas shows the braces.
+          /* 260:235928 */
+          <div className={`${SUB} tw:px-4 tw:pb-3`} data-testid="content-vars-empty">
+            No variables yet. Add a key and value to start.
           </div>
         )}
         {variables.map((v) => (

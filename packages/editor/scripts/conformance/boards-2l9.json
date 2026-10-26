@@ -11746,7 +11746,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Variables in drawer subview \"Variables\"; board workspace page, intro copy, placeholder counts"
+   "verifiedNote": "drift-open — L-C C4: \"Site variables\" header + intro copy built; still a drawer subview (board: workspace page), no \"+ New variable\" in a header, no per-variable \"N text placeholders\" (C8). Not compared."
   },
   {
    "nodeId": "260:235928",
@@ -11756,7 +11756,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Empty copy/location differ"
+   "verifiedNote": "built, not compared — L-C C4: intro + \"No variables yet. Add a key and value to start.\"; drawer subview, not the workspace page."
   },
   {
    "nodeId": "260:236147",
@@ -11796,7 +11796,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Variables in drawer subview \"Variables\"; board workspace page, intro copy, placeholder counts",
+   "verifiedNote": "drift-open — L-C C4: \"Site variables\" header + intro copy built; still a drawer subview (board: workspace page), no \"+ New variable\" in a header, no per-variable \"N text placeholders\" (C8). Not compared.",
    "inheritsFrom": "260:235689"
   },
   {
@@ -11807,7 +11807,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Variables in drawer subview \"Variables\"; board workspace page, intro copy, placeholder counts",
+   "verifiedNote": "drift-open — L-C C4: \"Site variables\" header + intro copy built; still a drawer subview (board: workspace page), no \"+ New variable\" in a header, no per-variable \"N text placeholders\" (C8). Not compared.",
    "inheritsFrom": "260:235689"
   },
   {
@@ -11858,7 +11858,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Variables in drawer subview \"Variables\"; board workspace page, intro copy, placeholder counts",
+   "verifiedNote": "drift-open — L-C C4: \"Site variables\" header + intro copy built; still a drawer subview (board: workspace page), no \"+ New variable\" in a header, no per-variable \"N text placeholders\" (C8). Not compared.",
    "inheritsFrom": "260:235689"
   },
   {
@@ -12637,7 +12637,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "ContentViews.tsx:268 still shows Sources (BD-39 hides); \"Variables\" vs \"Site variables\"; no Recently deleted / Back to Editor rows"
+   "verifiedNote": "built, not compared — L-C C4: drawer Data = Site variables · Conditions · Recently deleted (disabled, \"Planned\" until the server restore slice); Sources hidden by SOURCES_IN_RELEASE (BD-39). Drawer \"‹ Back to Editor · Home\" is the Phase-1 bottom bar."
   },
   {
    "nodeId": "424:337452",
@@ -12647,7 +12647,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "VariablesView ContentViews.tsx:461: header \"Variables\", no per-variable placeholder count; Sources not hidden"
+   "verifiedNote": "drift-open — L-C C4: \"Site variables\" header + intro copy built; still a drawer subview (board: workspace page), no \"+ New variable\" in a header, no per-variable \"N text placeholders\" (C8). Not compared."
   },
   {
    "nodeId": "424:337627",
