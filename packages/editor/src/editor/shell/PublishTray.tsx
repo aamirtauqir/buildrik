@@ -196,7 +196,7 @@ function trayCta({ nextMove, publishJob, wired, checkState, vercelMissing, cms }
   if (ui === "failed" && publishJob?.pollLost && publishJob.jobId) return { kind: "check-status", label: "Check status" };
   if (ui === "failed" && publishJob?.error) return { kind: "retry", label: "Try again" };
   if (!wired) {
-    return { kind: "shut", label, reason: nextMove?.blockedReason ?? "Publishing isn't switched on for this workspace yet" };
+    return { kind: "shut", label, reason: nextMove?.blockedReason ?? "Publishing isn’t switched on for this workspace yet" };
   }
   if (cms.stuck) return { kind: "shut", label, reason: `CMS changes couldn't sync: ${cms.stuck.reason}` };
   if (cms.pending) return { kind: "shut", label, reason: "Saving CMS changes…" };

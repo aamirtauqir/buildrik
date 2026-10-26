@@ -12857,7 +12857,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "shell/lifecycle.ts:237 — PB20 copy matches; PB19/PB21 copy differs (\"Publishing needs Editor access\", \"Needs a connection\"); tray T1.7"
+   "verifiedNote": "Board 'Publishing needs Editor access' vs code 'Viewers can't publish — ask an editor': waits on REQUESTS #13 (a lead-owned test pins the old copy)."
   },
   {
    "nodeId": "233:10827",
@@ -12867,7 +12867,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "shell/lifecycle.ts:237 — PB20 copy matches; PB19/PB21 copy differs (\"Publishing needs Editor access\", \"Needs a connection\"); tray T1.7"
+   "verifiedNote": "Copy now the board's ('Publishing isn’t switched on for this workspace yet', curly apostrophe) in lifecycle.ts and the tray fallback; built, not compared."
   },
   {
    "nodeId": "233:11377",
@@ -12877,7 +12877,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "shell/lifecycle.ts:237 — PB20 copy matches; PB19/PB21 copy differs (\"Publishing needs Editor access\", \"Needs a connection\"); tray T1.7"
+   "verifiedNote": "Copy now the board's ('Needs a connection') in lifecycle.ts publishBlocker; built, not compared."
   },
   {
    "nodeId": "233:11934",
