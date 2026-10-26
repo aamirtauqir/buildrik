@@ -2254,6 +2254,7 @@ const CASES: Record<string, () => React.ReactElement> = {
             element={{ id: el.getId(), type: el.getType() }}
             selectedIds={[el.getId()]}
             breakpointLabel="Desktop"
+            activeTab="style"
             state="normal"
             onStateChange={() => {}}
           />
