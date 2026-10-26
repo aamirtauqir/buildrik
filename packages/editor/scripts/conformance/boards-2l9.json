@@ -425,9 +425,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "code:pages-are-local-document",
    "verified": "no",
-   "verifiedNote": "No 'Needs a connection · Loaded pages can still be opened.' band"
+   "verifiedNote": "Board: 'Needs a connection · Loaded pages can still be opened.' In code every page is in the loaded document and page edits are local (ElementManager); offline saves are the shell's save-state concern (useSaveCallback), not a Pages restriction. Band not adopted. L-A wave 2."
   },
   {
    "nodeId": "94:15445",
@@ -489,9 +489,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "code:pages-are-local-document",
    "verified": "no",
-   "verifiedNote": "Menu has no offline-disabled state"
+   "verifiedNote": "Offline page menu: every row acts on the local document (reorder, duplicate, rename are ElementManager writes), so none is disabled offline. L-A wave 2."
   },
   {
    "nodeId": "94:29621",
@@ -510,9 +510,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "code:page-settings-save-is-local",
    "verified": "no",
-   "verifiedNote": "No 'Needs a connection to save page settings' state"
+   "verifiedNote": "Page settings Save writes the local page (ElementManager.updatePage, synchronous); it reaches the server with the next autosave. 'Needs a connection to save page settings' would be untrue. L-A wave 2."
   },
   {
    "nodeId": "94:30772",
@@ -553,9 +553,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "code:pages-are-local-document",
    "verified": "no",
-   "verifiedNote": "No 'Needs a connection · Loaded pages can still be opened.' band"
+   "verifiedNote": "Inherits 94:14750's disposition (L-A wave 2)."
   },
   {
    "nodeId": "95:20851",
@@ -677,7 +677,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-A S10: Blank card hint 'Start with an empty page.' adopted. Still open: '{Site} · Create a page' subtitle, source select / 'Choose template', and the plan capacity line (needs a capacity source — sub-plan S13). Not compared."
+   "verifiedNote": "L-A wave 2 built, not compared: capacity line '{n} of {limit} pages on {Plan}' (billing.pagesPerSite added to siteDetail.settingsOverview through the full chain — shared schema, site-detail.service, test; the same limit saveProjectData enforces), From template note 'Choose a page template before creating the page.' with primary 'Choose template'. Still open: '{Site} · Create a page' subtitle, source as a select."
   },
   {
    "nodeId": "101:36828",
@@ -707,8 +707,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No plan page-capacity readout/limit in editor"
+   "verified": "drift-open",
+   "verifiedNote": "L-A wave 2 built, not compared: '{n} of {n} pages on {Plan}' + 'Ask the workspace owner to upgrade, or remove an unused page before creating another.'; Create disabled (the server refuses a save past the limit)."
   },
   {
    "nodeId": "101:38980",
@@ -717,8 +717,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No capacity check state"
+   "verified": "drift-open",
+   "verifiedNote": "L-A wave 2 built, not compared: 'Checking page capacity…' / 'Wait for the current page limit before creating.'; Create disabled while checking."
   },
   {
    "nodeId": "101:39695",
@@ -727,8 +727,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No capacity error + Retry check"
+   "verified": "drift-open",
+   "verifiedNote": "L-A wave 2 built, not compared: 'Couldn’t check page capacity' / 'Your page name and navigation choice are retained.' + Retry check; Create waits for a known limit."
   },
   {
    "nodeId": "101:40412",
@@ -746,9 +746,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "code:page-create-is-local",
    "verified": "no",
-   "verifiedNote": "No offline state"
+   "verifiedNote": "New page creates a local page (ElementManager.createPage); offline it is created and saved on reconnect. The capacity check (101:39695 'Couldn’t check page capacity') is what an offline user sees instead. L-A wave 2."
   },
   {
    "nodeId": "101:41858",
@@ -969,9 +969,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "code:pages-are-local-document",
    "verified": "no",
-   "verifiedNote": "No 'Needs a connection · Loaded pages can still be opened.' band"
+   "verifiedNote": "Inherits 94:14750's disposition (L-A wave 2)."
   },
   {
    "nodeId": "118:33757",

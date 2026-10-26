@@ -360,7 +360,7 @@ export const settingsOverviewSchema = z.object({
   access: z.object({ passwordSet: z.boolean(), shareLinks: z.number() }),           // active share links
   webhooks: z.object({ endpoints: z.number(), lastDelivery: z.enum(["ok", "failed"]).nullable() }),
   members: z.object({ used: z.number(), seats: z.number() }),
-  billing: z.object({ plan: z.string(), priceMonthly: z.number() }),
+  billing: z.object({ plan: z.string(), priceMonthly: z.number(), pagesPerSite: z.number() }),   // pagesPerSite -1 = unlimited
   attention: z.array(z.object({
     kind: z.enum(["locale-not-started", "dns-pending", "webhook-failed"]),
     title: z.string(), detail: z.string(), section: z.string(),               // section = the nav id to open

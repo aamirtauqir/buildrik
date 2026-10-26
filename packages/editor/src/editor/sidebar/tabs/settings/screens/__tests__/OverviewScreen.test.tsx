@@ -35,7 +35,7 @@ const full: SettingsOverview = {
   access: { passwordSet: true, shareLinks: 2 },
   webhooks: { endpoints: 1, lastDelivery: "failed" },
   members: { used: 3, seats: 5 },
-  billing: { plan: "PRO", priceMonthly: 24 },
+  billing: { plan: "PRO", priceMonthly: 24, pagesPerSite: 30 },
   attention: [
     { kind: "locale-not-started", title: "Arabic locale has no translated pages", detail: "0 of 6 pages · not started", section: "localization" },
     { kind: "dns-pending", title: "One DNS record is still pending", detail: "TXT _buildrick for bellacucina.com", section: "domains" },
@@ -57,7 +57,7 @@ const empty: SettingsOverview = {
   access: { passwordSet: false, shareLinks: 0 },
   webhooks: { endpoints: 0, lastDelivery: null },
   members: { used: 1, seats: 1 },
-  billing: { plan: "FREE", priceMonthly: 0 },
+  billing: { plan: "FREE", priceMonthly: 0, pagesPerSite: 10 },
   attention: [],
 };
 

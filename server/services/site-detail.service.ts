@@ -360,7 +360,10 @@ export async function getSettingsOverview(siteId: string): Promise<SettingsOverv
     access: { passwordSet: Boolean(site.publishedPassword), shareLinks },
     webhooks: { endpoints: webhook ? 1 : 0, lastDelivery: lastDeliveryStatus },
     members: { used: members, seats: Number(limits.teamMembers) },
-    billing: { plan, priceMonthly },
+    /* pagesPerSite: the editor's New page names its capacity ("6 of 10 pages
+       on Free", design-2l9 101:29978) from the same limit saveProjectData
+       enforces (sites.service assertPageLimit). -1 = unlimited. */
+    billing: { plan, priceMonthly, pagesPerSite: Number(limits.pagesPerSite) },
     attention,
   };
 }
