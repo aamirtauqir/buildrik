@@ -37,11 +37,13 @@ describe("override marks — boards 27 / 28", () => {
     const { c, id, view } = mount("button");
     c.styles.setRule(`[data-buildrick-id="${id}"]`, { "background-color": "red" }, { pseudo: ":hover" });
     render(view());
-    /* Picking a state from Content (where a button opens) goes to Style. */
+    /* A button opens on Content, whose context line has no state Select
+       (B-10: content writes ignore state) — the state is picked on Style. */
     expect(screen.getByRole("tab", { name: "Content" })).toHaveAttribute("aria-selected", "true");
+    expect(screen.queryByRole("combobox", { name: "Editing" })).toBeNull();
+    fireEvent.click(screen.getByRole("tab", { name: "Style" }));
     fireEvent.change(screen.getByRole("combobox", { name: "Editing" }), { target: { value: "hover" } });
     await act(async () => {});
-    expect(screen.getByRole("tab", { name: "Style" })).toHaveAttribute("aria-selected", "true");
     expect(screen.getByTestId("inspector-state-overrides").textContent).toContain("1 :hover override");
     const fill = document.getElementById("inspector-section-fill")!;
     expect(within(fill).getByTestId("inspector-section-note").textContent).toBe("Overridden on :hover");
