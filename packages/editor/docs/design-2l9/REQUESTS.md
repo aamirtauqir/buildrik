@@ -20,3 +20,8 @@ Format: lane/task · file · change · board · why.
 ## Open — found on the live walk (2026-10-26)
 
 9. **L-A · canvas footer status** · the selection readout double-escapes HTML entities ("Heading · Tom &amp;amp; Jerry" for "Tom & Jerry") · — · present on `main`, not caused by design-2l9.
+
+## Open — lane L-B (Inspector)
+
+10. **L-B · `inspector/components/InspectorHeader.tsx`** · the context line follows the active tab: Content → "Content · All breakpoints", Behavior → "Behavior · {type}", Style / Effects keep "Editing {breakpoint} · {state}" (the state Select only on those two). Needs an `activeTab` prop (ProInspector passes it; L-B adds the prop at the call site when the header accepts it) · boards 161:8480, 161:13919, 36:2 · content and behaviour writes are breakpoint- and state-independent, so the state Select on those tabs misleads.
+11. **L-B · `src/engine/` (element conditions)** · an element-level conditions model (show/hide by a record field, "both must pass" with device visibility) persisted on the element and honoured by the export runtime, so Content › Conditions can exist · boards D04–D10 (`255:94411`…), the Conditions row of every Content board · there is no conditions data today; the Inspector draws no Conditions row until there is (no placeholder rows).
