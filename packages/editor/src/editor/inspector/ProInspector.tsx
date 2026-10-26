@@ -21,7 +21,7 @@ import type { Composer, Element } from "@/engine";
 import { isValidBreakpoint, BREAKPOINTS } from "@/shared/constants/breakpoints";
 import { EVENTS } from "@/shared/constants/events";
 import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
-import type { DeviceType, PseudoStateId } from "@/shared/types";
+import type { DeviceType } from "@/shared/types";
 import type { BreakpointId } from "@/shared/types/breakpoints";
 import type { IconConfig, MediaAsset, MediaAssetType } from "@/shared/types/media";
 import { Tabs } from "@/editor/chrome-ui";
@@ -37,7 +37,9 @@ import { MultiSelectBar } from "./components/MultiSelectBar";
 import { PagePanel } from "./components/PagePanel";
 import { ThemeToggleInspector } from "./components/ThemeToggleInspector";
 import { THEME_TOGGLE_ATTR } from "@/engine/export/themeToggleRuntime";
-import { StatusLine } from "./components/StatusLine";
+import { StatusLine, ViewOnlyLine } from "./components/StatusLine";
+import { useEditLocks } from "../shared/useEditLocks";
+import { useSiteLoadStatus } from "../shell/siteLoadStatus";
 import { StatusMarks } from "./components/StatusMarks";
 import { useInspectorState, useStyleHandlers, useInspectorSections } from "./hooks";
 import { useAdvancedSettings } from "./hooks/useAdvancedSettings";
@@ -235,18 +237,31 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
   const fieldOverrides = useFieldOverrides(composer, selectedElement?.id, currentBreakpoint, currentPseudoState);
   const breakpointName = currentBreakpoint === "desktop" ? null : BREAKPOINTS[currentBreakpoint]?.name ?? currentBreakpoint;
 
-  const readOnly = locked || conflict.pending;
+  /* The engine refuses every write while an edit lock holds (Task 1.6); the
+     fields say so instead of taking input that goes nowhere. */
+  const editLocks = useEditLocks(composer);
+  const notLoaded = editLocks.includes("not-loaded");
+  const loadFailure = useSiteLoadStatus().failure;
+  const readOnly = locked || conflict.pending || editLocks.length > 0;
   const fieldContext = React.useMemo<InspectorFieldContextValue>(
     () => ({
       readOnly,
-      readOnlyReason: conflict.pending ? "conflict" : locked ? "locked" : null,
+      readOnlyReason: conflict.pending
+        ? "conflict"
+        : locked
+          ? "locked"
+          : notLoaded
+            ? "not-loaded"
+            : editLocks.length > 0
+              ? "view"
+              : null,
       mixedKeys,
       overrides: fieldOverrides.overrides,
       overrideLabels: fieldOverrides.labels,
       resetOverride: (property, kind) => runDiscrete(() => fieldOverrides.resetOverride(property, kind)),
       runDiscrete,
     }),
-    [readOnly, conflict.pending, locked, mixedKeys, fieldOverrides, runDiscrete]
+    [readOnly, conflict.pending, locked, notLoaded, editLocks, mixedKeys, fieldOverrides, runDiscrete]
   );
 
   /* Scroll persistence per element (P-7b). The scroll listener is the only
@@ -313,7 +328,26 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
   /* Board 159:102 — while the site is still arriving there is nothing to
      select; an empty canvas message would read as "your site is empty". */
   if (projectLoading && !selectedElement) return <InspectorLoading />;
-  if (!selectedElement) return <PagePanel composer={composer} />;
+
+  /* Above whatever the column shows — the page panel or an element — once the
+     load has given up rather than while it is still on its way. */
+  const viewOnly =
+    notLoaded && !projectLoading ? (
+      <ViewOnlyLine
+        cause={loadFailure?.kind === "missing" ? "missing" : loadFailure?.kind === "forbidden" ? "forbidden" : "other"}
+      />
+    ) : null;
+  const withViewOnly = (node: React.ReactNode) =>
+    viewOnly ? (
+      <div className="tw:flex tw:flex-col tw:h-full tw:min-h-0">
+        {viewOnly}
+        <div className="tw:flex tw:flex-col tw:flex-1 tw:min-h-0">{node}</div>
+      </div>
+    ) : (
+      node
+    );
+
+  if (!selectedElement) return withViewOnly(<PagePanel composer={composer} />);
   /* BRP1-M12: a theme toggle's look and behaviour are the site's Brand and
      Dark mode — its inspector says so instead of offering element styles. */
   if (
@@ -321,12 +355,12 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     targetIds.length <= 1 &&
     composer.elements?.getElement?.(selectedElement.id)?.getAttribute?.(THEME_TOGGLE_ATTR) !== undefined
   ) {
-    return <ThemeToggleInspector composer={composer} />;
+    return withViewOnly(<ThemeToggleInspector composer={composer} />);
   }
 
   const showContextRow = activeTab !== "behaviour";
 
-  return (
+  return withViewOnly(
     <InspectorFieldContext.Provider value={fieldContext}>
       <div className="bdi-panel" data-testid="inspector-panel" data-readonly={readOnly || undefined}>
         <ApplyStyleDialog
@@ -340,7 +374,15 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
         <div role="status" aria-live="polite" aria-atomic="true" className="bdi-sr-only">
           {elementTypeLabel(selectedElement.type)} selected
         </div>
-        <InspectorHeader composer={composer} element={selectedElement} selectedIds={targetIds} />
+        <InspectorHeader
+          composer={composer}
+          element={selectedElement}
+          selectedIds={targetIds}
+          breakpointLabel={BREAKPOINTS[currentBreakpoint]?.name ?? currentBreakpoint}
+          state={currentPseudoState}
+          onStateChange={setCurrentPseudoState}
+          statesWithOverrides={statesWithOverrides}
+        />
         {targetIds.length > 1 ? null : (
           <StatusMarks composer={composer} elementId={selectedElement.id} binding={binding} locked={locked} />
         )}
@@ -369,8 +411,6 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
             {showContextRow ? (
               <ContextRow
                 state={currentPseudoState}
-                onStateChange={(s: PseudoStateId) => setCurrentPseudoState(s)}
-                statesWithOverrides={statesWithOverrides}
                 stateOverrideCount={fieldOverrides.counts.pseudo}
                 onResetState={() => runDiscrete(fieldOverrides.resetPseudo)}
                 breakpointName={breakpointName}
@@ -385,7 +425,13 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
               id="inspector-tabpanel"
               aria-labelledby={`inspector-tabpanel-tab-${activeTab}`}
             >
-              <div className="bdi-body">
+              <div
+                className="bdi-body"
+                /* A group, so the disabled state has a role that carries it. */
+                role="group"
+                aria-label="Element properties"
+                aria-disabled={editLocks.length > 0 || undefined}
+              >
                 <InspectorErrorBoundary>
                   <InspectorTabContent
                     tabId={activeTab}

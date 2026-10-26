@@ -23,7 +23,7 @@
 import * as React from "react";
 import { ModalBody, ModalClose, ModalContent, ModalRoot, ModalTitle, TextInput } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
-import { buildSheetGroups, formatKeys, type SheetGroup } from "./keyboardSheetRows";
+import { buildSheetGroups, formatKeys, rowKeys, type SheetGroup } from "./keyboardSheetRows";
 
 export interface KeyboardCheatSheetProps {
   isOpen: boolean;
@@ -66,8 +66,8 @@ function filterGroups(groups: SheetGroup[], query: string, isMac: boolean): Shee
       rows: g.rows.filter(
         (r) =>
           r.description.toLowerCase().includes(q) ||
-          r.keys.toLowerCase().includes(q) ||
-          formatKeys(r.keys, isMac).toLowerCase().includes(q) ||
+          rowKeys(r, isMac).toLowerCase().includes(q) ||
+          formatKeys(rowKeys(r, isMac), isMac).toLowerCase().includes(q) ||
           g.title.toLowerCase().includes(q),
       ),
     }))
@@ -157,7 +157,7 @@ export const KeyboardCheatSheet: React.FC<KeyboardCheatSheetProps> = ({ isOpen, 
                       >
                         {row.description}
                       </span>
-                      <KeyChip keys={row.keys} testId={`kb-badge-${slug(row.description)}`} isMac={isMac} />
+                      <KeyChip keys={rowKeys(row, isMac)} testId={`kb-badge-${slug(row.description)}`} isMac={isMac} />
                     </div>
                   ))}
                 </div>

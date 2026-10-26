@@ -37,7 +37,18 @@ function makeComposer() {
     { id: "e2", index: 2, timestamp: t - 1000, label: "Added Text", type: "patch", changes: [], userId: null },
     { id: "e1", index: 1, timestamp: t - 2000, label: "Added Heading", type: "patch", changes: [], userId: null },
   ];
+  /* The engine's lock semantics (Composer.setEditLock): a set of reasons,
+     read-only while any holds. */
+  const editLocks = new Set<string>();
   return {
+    editLocks,
+    setEditLock: vi.fn((reason: string, on: boolean) => {
+      if (on) editLocks.add(reason);
+      else editLocks.delete(reason);
+    }),
+    get readOnly() {
+      return editLocks.size > 0;
+    },
     on: (e: string, fn: () => void) => (handlers[e] ||= []).push(fn),
     off: () => {},
     emit: vi.fn(),
@@ -94,16 +105,17 @@ describe("TimeTravelHost", () => {
   // mutable, so a click/Delete during time-travel reached the live canvas
   // hidden underneath the band — the element count changed with no visible
   // change on screen.
-  it("goes read-only while active and restores the prior value on exit", async () => {
+  it("goes read-only while active and releases its lock on exit", async () => {
     renderProjectPages.mockResolvedValue([{ path: "index.html", html: "<h1>then</h1>", name: "Home", slug: "" }]);
     const frameEl = document.createElement("div");
     frameEl.className = "buildrick-canvas";
     document.body.appendChild(frameEl);
-    const c = { ...makeComposer(), readOnly: false };
+    const c = makeComposer();
     render(<ToastProvider><TimeTravelHost composer={c as never} /></ToastProvider>);
     expect(c.readOnly).toBe(false);
     c.fire(EVENTS.UI_TIME_TRAVEL_TOGGLE);
     expect(c.readOnly).toBe(true);
+    expect([...c.editLocks]).toEqual(["time-travel"]);
     fireEvent.keyDown(document, { key: "ArrowLeft" });
     await waitFor(() => expect(screen.getByTestId("tt-preview")).toHaveAttribute("data-status", "ready"));
     expect(screen.getByTestId("tt-preview").className).not.toMatch(/pointer-events-none/);
@@ -112,13 +124,33 @@ describe("TimeTravelHost", () => {
     frameEl.remove();
   });
 
-  it("does not clobber a readOnly composer (view mode) that was already true before it opened", () => {
-    const c = { ...makeComposer(), readOnly: true };
+  it("does not clobber another lock (view mode) that was already held before it opened", () => {
+    const c = makeComposer();
+    c.setEditLock("view", true);
     render(<ToastProvider><TimeTravelHost composer={c as never} /></ToastProvider>);
     c.fire(EVENTS.UI_TIME_TRAVEL_TOGGLE);
     expect(c.readOnly).toBe(true);
     fireEvent.keyDown(document, { key: "Escape" });
-    expect(c.readOnly).toBe(true);
+    expect([...c.editLocks]).toEqual(["view"]);
+  });
+
+  /* The old save/restore of the previous boolean: a lock taken WHILE the band
+     was open was overwritten by the stale value on exit, and a save taken
+     while another lock held put that lock back after it had been released. */
+  it("save then restore while not-loaded is held leaves no stray view lock", async () => {
+    renderProjectPages.mockResolvedValue([]);
+    const c = makeComposer();
+    c.setEditLock("not-loaded", true);
+    render(<ToastProvider><TimeTravelHost composer={c as never} /></ToastProvider>);
+    chord();
+    expect([...c.editLocks].sort()).toEqual(["not-loaded", "time-travel"]);
+    fireEvent.keyDown(document, { key: "ArrowLeft" });
+    fireEvent.click(screen.getByTestId("tt-restore"));
+    fireEvent.click(screen.getByTestId("tt-confirm-restore"));
+    await waitFor(() => expect(c.history.restoreEntry).toHaveBeenCalledWith("e2"));
+    expect([...c.editLocks]).toEqual(["not-loaded"]);
+    c.setEditLock("not-loaded", false);
+    expect(c.readOnly).toBe(false);
   });
 
   it("Restore… asks (76095), saves a version first, then restores that point", async () => {

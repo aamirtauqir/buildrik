@@ -36,9 +36,11 @@ export interface CanvasProps {
   onOverlayChange?: (overlay: keyof CanvasOverlayState, enabled: boolean) => void;
   /** Change the active device/breakpoint (from the footer toolbar's switcher). */
   onDeviceChange?: (device: DeviceType) => void;
-  /** Whether an undo step is available (drives the footer toolbar's Undo). */
+  /** @deprecated Read by nothing since Undo/Redo moved to the topbar
+   *  (design-2l9 Task 1.2). Kept only because StudioPanels still passes it;
+   *  delete with that call site. */
   canUndo?: boolean;
-  /** Whether a redo step is available (drives the footer toolbar's Redo). */
+  /** @deprecated See `canUndo`. */
   canRedo?: boolean;
   /** Open the image editor for a media element on the canvas (consumed by CanvasOverlayGroup) */
   onOpenImageEditor?: (item: { key: string; src: string; name: string }) => void;

@@ -1,8 +1,8 @@
 /**
  * CanvasFooterToolbar - the canvas status bar's edit + view controls.
  *
- * CONTROLS:
- * - Undo / Redo (moved off the topbar)
+ * CONTROLS (Undo / Redo left this bar for the topbar's History group —
+ * design-2l9 Task 1.2, owner decision "one undo"):
  * - ONE "View ▾" menu holding the six overlay toggles — board 5930:44801
  *   (Canvas · View menu): Snap guides · Spacing · Grid · Rulers · Badges ·
  *   X-Ray as check rows, each with its chord (G2-037: "one contextual
@@ -19,21 +19,18 @@
  *
  * Layout:
  * ┌────────────────────────────────────────────────────────────────┐
- * │  [↶] [↷]  [View ▾]  [100% ▾]            Section · Hero · 680 × 250 │
+ * │  [View ▾]  [100% ▾]                      Section · Hero · 680 × 250 │
  * └────────────────────────────────────────────────────────────────┘
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { Redo, Undo } from "lucide-react";
 import { Button, isModalOpen, Menu, MenuGroup, MenuItem, MenuLabel, Popover, TextInput, Tooltip, type Breakpoint } from "@/editor/chrome-ui";
 import { BREAKPOINTS } from "@/shared/constants/breakpoints";
 import { stepZoom } from "@/shared/constants/canvas";
 import { CustomWidthModal } from "./controls/CustomWidthModal";
-// Undo/redo/device switching moved OFF the topbar and onto this canvas toolbar
-// (Figma contract §2: viewport + edit controls belong to the canvas, the topbar
-// stays minimal). Device values are the chrome-ui Breakpoint union.
+// Device values are the chrome-ui Breakpoint union.
 export type FooterDevice = Breakpoint;
 
 // ============================================
@@ -68,14 +65,6 @@ export interface CanvasFooterToolbarProps {
   device?: FooterDevice;
   /** Change the active device/breakpoint. */
   onDeviceChange?: (device: FooterDevice) => void;
-  /** Whether an undo step is available. When onUndo is provided, undo renders. */
-  canUndo?: boolean;
-  /** Whether a redo step is available. */
-  canRedo?: boolean;
-  /** Perform undo. */
-  onUndo?: () => void;
-  /** Perform redo. */
-  onRedo?: () => void;
   /** Preview width set by "Custom width…", or null for the device's own. */
   customWidth?: number | null;
   /** Apply a custom preview width (board 5930:44824). */
@@ -88,25 +77,8 @@ export interface CanvasFooterToolbarProps {
   onGridSizeChange?: (size: number) => void;
 }
 
-// ============================================
-// Icons — lucide (DQ-017: the undo/redo glyphs were lucide's own paths,
-// hand-copied into inline SVGs at an off-scale 15px)
-// ============================================
-
-/* The six overlay glyphs that used to sit in this block are gone with the
-   icon-only toggles — board 199:205 labels them in words. Recover from git
-   history if a future surface needs them. */
-
-/** Square icon control in the bar — undo/redo/help all share this box. The
- *  board draws a disabled ↶ ↷ as a muted glyph with no fill, so the Button's
- *  disabled fill is cleared. */
-const EDIT_BTN =
-  "tw:inline-flex tw:items-center tw:justify-center tw:size-7 tw:p-0 tw:rounded " +
-  "tw:border tw:border-transparent tw:bg-transparent tw:disabled:bg-transparent tw:text-[var(--bk-ink-soft)] " +
-  "tw:hover:bg-[var(--bk-gray-100)] tw:hover:text-[var(--bk-ink)]";
-
 /**
- * The docked bar — one 44-tall row: ↶ ↷ · View ▾ · 100% ▾ on the left, the
+ * The docked bar — one 44-tall row: View ▾ · 100% ▾ on the left, the
  * selection readout ("Section · Hero · 680 × 250") at the right end.
  * Breakpoints live in View ▸ Breakpoint; shortcuts in Help. `min-w-0` + a
  * truncating readout keep it inside the canvas column when the column is
@@ -173,10 +145,6 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
   onZoomToSelection,
   device,
   onDeviceChange,
-  canUndo,
-  canRedo,
-  onUndo,
-  onRedo,
   customWidth,
   onCustomWidth,
   readout,
@@ -250,7 +218,6 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [overlays, onOverlayChange, onZoomChange, onFitToScreen, onZoomToSelection, zoom]);
 
-  const showEditGroup = Boolean(onUndo || onRedo);
   const [viewOpen, setViewOpenState] = React.useState(false);
   /* Board 5930:44801's last two rows open their own lists in place —
      5930:44781 (Breakpoint) and 7048:78112 (Zoom). */
@@ -300,41 +267,6 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
 
   return (
     <div className={BAR}>
-      {/* Edit + viewport group — undo/redo + device switcher (moved off topbar) */}
-      {showEditGroup && (
-        <>
-          <div className={GROUP}>
-            {onUndo && (
-              <Tooltip content="Undo · ⌘Z" placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
-                <Button
-                  type="button"
-                  color="light"
-                  className={EDIT_BTN}
-                  onClick={onUndo}
-                  disabled={canUndo === false}
-                  aria-label="Undo"
-                >
-                  <Undo size={16} aria-hidden="true" />
-                </Button>
-              </Tooltip>
-            )}
-            {onRedo && (
-              <Tooltip content="Redo · ⌘⇧Z" placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
-                <Button
-                  type="button"
-                  color="light"
-                  className={EDIT_BTN}
-                  onClick={onRedo}
-                  disabled={canRedo === false}
-                  aria-label="Redo"
-                >
-                  <Redo size={16} aria-hidden="true" />
-                </Button>
-              </Tooltip>
-            )}
-          </div>
-        </>
-      )}
       {/* View menu — board 5930:44801. Opens upward: the bar sits at the
           bottom of the canvas. A row click toggles its overlay and closes
           (the board's SV + CLOSE). */}

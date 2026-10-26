@@ -19,7 +19,6 @@ vi.mock("@/editor/sidebar/FullPageView", () => ({ FullPageView: () => null }));
 vi.mock("@/editor/sidebar/TabRouter", () => ({
   TabRouter: ({ activeTab }: { activeTab: string }) => <div data-testid={`column-tab-${activeTab}`} />,
 }));
-vi.mock("../PageTabBar", () => ({ PageTabBar: () => null }));
 vi.mock("@/editor/cms/CmsWorkspace", () => ({
   default: ({ onBackToCanvas }: { onBackToCanvas?: () => void }) => (
     <div data-testid="cms-workspace">
@@ -38,7 +37,11 @@ vi.mock("@/editor/design-system/ui/ProjectTokensApplier", () => ({ ProjectTokens
 vi.mock("../hooks/useBlockInsertion", () => ({ useBlockInsertion: () => ({ handleBlockClick: () => {} }) }));
 vi.mock("../hooks/useClipboardToasts", () => ({ useClipboardToasts: () => {} }));
 vi.mock("../hooks/useAltTextAutoTrigger", () => ({ useAltTextAutoTrigger: () => {} }));
-vi.mock("@/editor/sidebar/tabs/pages/usePageCommands", () => ({ usePageJumpList: () => [], usePageCommands: () => {} }));
+vi.mock("@/editor/sidebar/tabs/pages/usePageCommands", () => ({ usePageCommands: () => {} }));
+/* The real BottomBar renders; the shell's page list is one page, "Home". */
+vi.mock("../usePageSummaries", () => ({
+  usePageSummaries: () => [{ id: "home", name: "Home", slug: "/", kind: "static", isHome: true, dirty: false, depth: 0 }],
+}));
 vi.mock("@/services/BuildrikSyncProvider", () => ({ getSiteIdFromUrl: () => "site-1" }));
 vi.mock("@shared/utils/editorViewMode", () => ({ getEditorViewMode: () => ({ readOnlyView: false }) }));
 vi.mock("../hooks/useEditorRole", () => ({ useViewerChrome: () => false }));
@@ -73,6 +76,7 @@ function makeComposer() {
   const handlers = new Map<string, Set<(p?: unknown) => void>>();
   return {
     readOnly: false,
+    setEditLock: vi.fn(),
     on: (ev: string, fn: (p?: unknown) => void) => {
       if (!handlers.has(ev)) handlers.set(ev, new Set());
       handlers.get(ev)!.add(fn);
@@ -80,7 +84,7 @@ function makeComposer() {
     off: (ev: string, fn: (p?: unknown) => void) => handlers.get(ev)?.delete(fn),
     emit: (ev: string, p?: unknown) => [...(handlers.get(ev) ?? [])].forEach((fn) => fn(p)),
     selection: { clear: vi.fn(), select: vi.fn() },
-    elements: { getElement: () => null },
+    elements: { getElement: () => null, getActivePage: () => ({ id: "home" }) },
   };
 }
 type FakeComposer = ReturnType<typeof makeComposer>;
@@ -106,7 +110,7 @@ function selectingComposer(ids: string[]) {
     ...base,
     selection,
     live,
-    elements: { getElement: (id: string) => live.get(id) ?? null },
+    elements: { getElement: (id: string) => live.get(id) ?? null, getActivePage: () => ({ id: "home" }) },
   };
 }
 
@@ -488,4 +492,34 @@ describe("StudioPanels — the CMS workspace returns to the bound element (§13)
     await screen.findByTestId("cms-workspace");
     expect(screen.queryByRole("button", { name: "‹ Back to canvas" })).toBeNull();
   });
+});
+
+/* 2L9 Shell/BottomBar Context=Resource area (497:99474): while CMS, Brand,
+   Settings or Assets cover the canvas, the bottom bar drops the page switcher
+   and says the page is still open, with the way back. */
+describe("StudioPanels — bottom bar in resource areas", () => {
+  it("the editor shows the page switcher in the bottom bar", () => {
+    render(<Harness composer={makeComposer()} />);
+    expect(screen.getByTestId("page-switcher-trigger")).toBeTruthy();
+    expect(screen.queryByTestId("bottom-bar-resource")).toBeNull();
+  });
+
+  it.each(["content", "design", "settings"])(
+    "resource area %s renders no page switcher; ‹ Back to Editor returns to Home",
+    async (tab) => {
+      const composer = selectingComposer([]);
+      render(<Harness composer={composer as unknown as FakeComposer} leftPanelTab="layers" />);
+      act(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab }));
+      const bar = await screen.findByTestId("bottom-bar-resource");
+      expect(screen.queryByTestId("page-switcher-trigger")).toBeNull();
+      expect(bar.textContent).toBe("Editor keeps Home open — return with‹ Back to Editor");
+
+      fireEvent.click(screen.getByRole("button", { name: "‹ Back to Editor" }));
+
+      expect(screen.queryByTestId("bottom-bar-resource")).toBeNull();
+      expect(screen.queryByTestId("cms-workspace")).toBeNull();
+      expect(screen.getByTestId("layout-shell").className).not.toContain("layout-shell--fullpage");
+      expect(screen.getByTestId("page-switcher-trigger").textContent).toContain("Home");
+    },
+  );
 });

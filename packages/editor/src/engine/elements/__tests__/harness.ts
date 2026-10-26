@@ -30,6 +30,8 @@ export interface FakeComposer {
   markDirty: Mock;
   beginTransaction: Mock;
   endTransaction: Mock;
+  /** Unlocked composer: a derived sync is a plain call. */
+  runDerivedSync: <T>(sync: () => T) => T;
   selection: FakeSelection;
   /** Optional ComponentManager facade — tests wire what they need. */
   components?: {
@@ -47,6 +49,7 @@ export function makeEngine(): { composer: FakeComposer; manager: ElementManager 
     markDirty: vi.fn(),
     beginTransaction: vi.fn(),
     endTransaction: vi.fn(),
+    runDerivedSync: <T>(sync: () => T): T => sync(),
     selection: {
       getSelected: vi.fn(() => null),
       getAllSelected: vi.fn(() => []),

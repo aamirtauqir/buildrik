@@ -403,3 +403,37 @@ describe("CMS outbox — storage unavailable", () => {
     expect(cmsSyncBlocker()).toBeNull();
   });
 });
+
+/* design-2l9 Task 1.7 — the publish tray's "CMS changes couldn't sync" state
+   reads the failing mirror: its reason, and where Open CMS lands. */
+describe("cmsSyncFailure — what is stuck and where to open it", () => {
+  it("is null while nothing is failing", async () => {
+    const { cmsSyncFailure, syncEntryUpsert } = await pageLoad();
+    expect(cmsSyncFailure()).toBeNull();
+    await syncEntryUpsert(item("r1"));
+    expect(cmsSyncFailure()).toBeNull();
+  });
+
+  it("names a failing entry with its collection and record, and counts retries", async () => {
+    const { cmsSyncFailure, syncEntryUpsert, retryCmsSync } = await pageLoad();
+    entUpsert.mockRejectedValue(offline());
+    await syncEntryUpsert(item("r1"));
+    expect(cmsSyncFailure()).toMatchObject({
+      reason: "Failed to fetch",
+      attempts: 1,
+      open: { collectionId: "c1", recordId: "r1" },
+    });
+    await retryCmsSync();
+    expect(cmsSyncFailure()?.attempts).toBe(2);
+    entUpsert.mockResolvedValue({ updatedAt: "2026-10-02T12:00:00.000Z" });
+    await retryCmsSync();
+    expect(cmsSyncFailure()).toBeNull();
+  });
+
+  it("opens a failing collection at the collection itself", async () => {
+    const { cmsSyncFailure, syncCollectionUpsert } = await pageLoad();
+    colUpsert.mockRejectedValue(offline());
+    await syncCollectionUpsert(collection("c9"));
+    expect(cmsSyncFailure()?.open).toEqual({ collectionId: "c9" });
+  });
+});

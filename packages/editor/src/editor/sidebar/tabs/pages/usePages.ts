@@ -30,6 +30,7 @@ import { writeClipboardText } from "@buildrik/shared/browser/clipboard";
 import { pageFileNames } from "@/engine/export/pageFiles";
 import { pageCanonicalUrl } from "@buildrik/shared/seo/urls";
 import { useActivePageId } from "@/editor/shared/useActivePageId";
+import { pageSlug } from "@/editor/shell/usePageSummaries";
 
 /** A page's stored visibility → its panel status. Unset is "live" (what the
  *  deploy does with it). C4 #26: a "password" stored before Password pages
@@ -127,7 +128,7 @@ export function usePages(composer: Composer | null): UsePagesReturn {
           raw.map((p) => ({
             id: p.id,
             name: p.name,
-            slug: p.slug ?? (p.name ? slugify(p.name) : undefined) ?? p.id,
+            slug: pageSlug(p),
             route: (
               composer as { router?: { getPath?: (id: string) => string | undefined } }
             ).router?.getPath?.(p.id),
@@ -171,7 +172,8 @@ export function usePages(composer: Composer | null): UsePagesReturn {
        "This site has one page". Closing and reopening the panel showed both
        pages, which is how it was caught. The delete dialog promises "You can
        undo immediately after", so the stale list reads as the undo failing.
-       PageTabBar and useLayerTree already listen to both for the same reason.
+       The shell's usePageSummaries and useLayerTree listen to both for the
+       same reason.
        `syncOnLoad` ignores the payload: an import has no page:* type to
        filter on, and every import can change the whole list. */
     const syncOnLoad = () => {

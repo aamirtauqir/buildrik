@@ -25,6 +25,9 @@ describe("SaveStatus", () => {
        this pill promised a local copy while the announcement beside it said
        "changes not saved". */
     ["offline", "Offline — not saved"],
+    /* Task 1.6, board B7-G02: the site never loaded — about this session,
+       not the stored site. Never "Saved". */
+    ["not-loaded", "Not loaded · nothing saved yet"],
   ] as const)("renders the %s truth", (state, copy) => {
     render(<SaveStatus state={state} />);
     expect(screen.getByText(copy)).toBeTruthy();

@@ -17,7 +17,10 @@ import { formatRelativeTime } from "@/shared/utils/relativeTime";
 /* The LOCAL Tooltip — see HelpTooltip.tsx. */
 import { Tooltip } from "./Tooltip";
 
-export type SaveState = "saved" | "saving" | "unsaved" | "conflict" | "offline" | "error";
+/** `not-loaded` (Task 1.6, board B7-G02): the site never arrived, so this
+ *  session has saved nothing and can save nothing — it describes the session,
+ *  not the stored site, which is untouched. */
+export type SaveState = "saved" | "saving" | "unsaved" | "conflict" | "offline" | "error" | "not-loaded";
 
 export interface SaveStatusProps extends React.HTMLAttributes<HTMLSpanElement> {
   state: SaveState;
@@ -65,6 +68,7 @@ const COPY: Record<Exclude<SaveState, "saved">, string> = {
      The announcement was the true one. */
   offline: "Offline — not saved",
   error: "Save failed — retry",
+  "not-loaded": "Not loaded · nothing saved yet",
 };
 
 /* `leading-[normal]` is the board's value (all five label nodes on 813:4836)
@@ -97,6 +101,8 @@ const STATE_CLASS: Record<SaveState, string> = {
   conflict: "tw:bg-[var(--bk-warning-tint)] tw:text-[var(--bk-warning-text)]",
   offline: "tw:bg-[var(--bk-warning-tint)] tw:text-[var(--bk-warning-text)]",
   error: "tw:bg-[var(--bk-error-tint)] tw:text-[var(--bk-error-text)]",
+  /* A quiet echo: the load-error banner is the signal, so this is neutral. */
+  "not-loaded": "tw:bg-transparent tw:text-[var(--bk-ink-soft)]",
 };
 
 /* Dots follow the text, and off-ramp Tailwind literals (green-500, yellow-500,
@@ -109,6 +115,7 @@ const DOT_CLASS: Record<SaveState, string> = {
   conflict: "tw:bg-[var(--bk-warning)]",
   offline: "tw:bg-[var(--bk-warning)]",
   error: "tw:bg-[var(--bk-error)]",
+  "not-loaded": "tw:bg-[var(--bk-gray-500)]",
 };
 
 export function SaveStatus({ state, savedAt, onClick, hint, className, ...rest }: SaveStatusProps) {

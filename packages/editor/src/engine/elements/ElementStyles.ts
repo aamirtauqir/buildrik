@@ -36,6 +36,7 @@ export class ElementStyles {
   }
 
   setAttribute(name: string, value: string): void {
+  if (this.getComposer().writeLocked) return;
     const data = this.getData();
     if (!data.attributes) {
       data.attributes = {};
@@ -55,6 +56,7 @@ export class ElementStyles {
   }
 
   removeAttribute(name: string): void {
+  if (this.getComposer().writeLocked) return;
     const data = this.getData();
     if (data.attributes) {
       delete data.attributes[name];
@@ -83,6 +85,7 @@ export class ElementStyles {
   // ============================================
 
   addClass(className: string): void {
+  if (this.getComposer().writeLocked) return;
     const data = this.getData();
     if (!data.classes) {
       data.classes = [];
@@ -95,6 +98,7 @@ export class ElementStyles {
   }
 
   removeClass(className: string): void {
+  if (this.getComposer().writeLocked) return;
     const data = this.getData();
     if (data.classes) {
       const index = data.classes.indexOf(className);
@@ -115,6 +119,7 @@ export class ElementStyles {
   }
 
   setClasses(classes: string[]): void {
+  if (this.getComposer().writeLocked) return;
     this.getData().classes = [...classes];
     this.getComposer().emit(EVENTS.ELEMENT_UPDATED, this.getSelf());
     this.getComposer().markDirty();
@@ -129,6 +134,7 @@ export class ElementStyles {
   }
 
   setStyle(property: string, value: string): void {
+  if (this.getComposer().writeLocked) return;
     const data = this.getData();
     if (!data.styles) {
       data.styles = {};
@@ -160,6 +166,7 @@ export class ElementStyles {
   }
 
   removeStyle(property: string): void {
+  if (this.getComposer().writeLocked) return;
     const data = this.getData();
     if (data.styles) {
       delete data.styles[property];
@@ -183,6 +190,7 @@ export class ElementStyles {
   }
 
   setStyles(styles: Record<string, string>): void {
+  if (this.getComposer().writeLocked) return;
     this.getData().styles = { ...styles };
     this.getComposer().emit(EVENTS.STYLE_CHANGED, { elementId: this.getElementId(), styles });
     this.getComposer().emit(EVENTS.ELEMENT_UPDATED, this.getSelf());
@@ -198,6 +206,7 @@ export class ElementStyles {
   }
 
   setTrait(name: string, value: TraitValue): void {
+  if (this.getComposer().writeLocked) return;
     const data = this.getData();
     if (!data.traits) {
       data.traits = [];

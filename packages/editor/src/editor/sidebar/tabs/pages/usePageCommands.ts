@@ -10,11 +10,11 @@
  * mount and unregisters on unmount, TabRouter mounts only the active tab —
  * which meant "Go to <page>" only showed up in ⌘K while the Pages drawer
  * happened to be open, unlike Layers/Assets/Records/Templates rows, all of
- * which register from something always-mounted. `usePageJumpList` below is
- * the shell's own minimal page-list read (id/name/isHome only — none of
- * usePages' rename/duplicate/delete/settings state, which the shell has no
- * business owning) so the SHELL can call this hook once, unconditionally.
- * PagesTab no longer calls it.
+ * which register from something always-mounted. The shell's own page list
+ * (`shell/usePageSummaries`, which also feeds the bottom-bar page switcher —
+ * none of usePages' rename/duplicate/delete/settings state, which the shell
+ * has no business owning) lets the SHELL call this hook once,
+ * unconditionally. PagesTab no longer calls it.
  *
  * Re-registered whenever the page list changes, so a page renamed or added
  * shows up on the next ⌘K.
@@ -28,41 +28,15 @@ import { EVENTS } from "@/shared/constants/events";
 
 export const PAGE_COMMAND_GROUP = "Pages";
 export const NEW_PAGE_COMMAND_ID = "page-new";
+const SWITCH_PAGE_COMMAND_ID = "page-switcher";
 export const goToPageCommandId = (pageId: string) => `page-go-${pageId}`;
 
-/** The slice of `PageItem` a ⌘K row needs — id/name/isHome only, so the
- *  shell doesn't have to run all of usePages' CRUD/rename/settings state
- *  just to keep the palette current. */
+/** The slice of a page a ⌘K row needs. The shell passes its PageSummary
+ *  list (`usePageSummaries`), which is a superset. */
 export interface PageJumpEntry {
   id: string;
   name: string;
   isHome?: boolean;
-}
-
-/** Shell-level minimal page list: id/name/isHome, re-synced on the same two
- *  events usePages listens to (page:* mutations + a full project load/undo).
- *  No CRUD, no rename state — those stay Pages-panel-only. */
-export function usePageJumpList(composer: Composer | null): PageJumpEntry[] {
-  const [pages, setPages] = React.useState<PageJumpEntry[]>([]);
-  React.useEffect(() => {
-    if (!composer) return;
-    const sync = () => {
-      setPages(
-        composer.elements.getAllPages().map((p) => ({ id: p.id, name: p.name, isHome: p.isHome })),
-      );
-    };
-    sync();
-    const handler = (payload?: { type?: string }) => {
-      if (!payload?.type || payload.type.startsWith("page:")) sync();
-    };
-    composer.on(EVENTS.PROJECT_CHANGED, handler);
-    composer.on(EVENTS.PROJECT_LOADED, sync);
-    return () => {
-      composer.off(EVENTS.PROJECT_CHANGED, handler);
-      composer.off(EVENTS.PROJECT_LOADED, sync);
-    };
-  }, [composer]);
-  return pages;
 }
 
 export function usePageCommands(
@@ -92,6 +66,8 @@ export function usePageCommands(
       ids.push(id);
     };
     register(NEW_PAGE_COMMAND_ID, "New page", () => addRef.current());
+    /* The bottom bar's page switcher (⇧⌘O / Ctrl+Alt+O). */
+    register(SWITCH_PAGE_COMMAND_ID, "Switch page…", () => composer.emit(EVENTS.UI_TOGGLE_PAGE_SWITCHER, {}));
     for (const pg of pages) {
       register(goToPageCommandId(pg.id), `Go to ${pg.name}${pg.isHome ? " (home)" : ""}`, () =>
         selectRef.current(pg.id),

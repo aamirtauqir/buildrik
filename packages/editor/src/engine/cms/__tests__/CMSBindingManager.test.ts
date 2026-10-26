@@ -41,6 +41,7 @@ function makeComposer(elements: Record<string, ElementStub> = {}) {
     data: { on: vi.fn(), off: dataOff },
     markDirty,
     emit,
+    runDerivedSync: <T>(sync: () => T): T => sync(),
     elements: { getElement: (id: string) => elements[id] ?? null },
   } as unknown as Composer;
   return { composer, emit, markDirty, dataOff };

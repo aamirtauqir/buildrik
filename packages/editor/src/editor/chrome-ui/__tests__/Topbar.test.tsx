@@ -18,10 +18,84 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import * as React from "react";
+import { render, screen, fireEvent, within, cleanup } from "@testing-library/react";
 import { Topbar, Drawer, RightPanel, Rail, RailItem, Footer } from "../index";
 
 describe("Topbar", () => {
+  /* design-2l9 board 497:99433 · `History / one undo for the whole editor`. */
+  describe("History group", () => {
+    const history = (o: Partial<React.ComponentProps<typeof Topbar>["history"] & object> = {}) => ({
+      canUndo: true,
+      canRedo: true,
+      onUndo: vi.fn(),
+      onRedo: vi.fn(),
+      undoChord: "⌘Z",
+      redoChord: "⇧⌘Z",
+      ...o,
+    });
+
+    it("sits right after the site identity, as a labelled group of two icon buttons", () => {
+      render(<Topbar siteName="x" save="saved" history={history()} />);
+      const group = screen.getByRole("group", { name: "History" });
+      expect(screen.getByTestId("topbar-site-name").nextElementSibling).toBe(group);
+      expect(within(group).getAllByRole("button").map((b) => b.getAttribute("aria-label"))).toEqual(["Undo", "Redo"]);
+    });
+
+    const tips = () => screen.getAllByRole("tooltip").map((t) => t.textContent);
+
+    it("Undo tooltip \"Undo (⌘Z)\" and Redo \"Redo (⇧⌘Z)\" from the chords it is given", () => {
+      render(<Topbar siteName="x" save="saved" history={history()} />);
+      expect(tips()).toEqual(expect.arrayContaining(["Undo (⌘Z)", "Redo (⇧⌘Z)"]));
+    });
+
+    it("unavailable: aria-disabled, still focusable, click is a no-op, tooltip says why", () => {
+      const h = history({ canUndo: false, canRedo: false });
+      render(<Topbar siteName="x" save="saved" history={h} />);
+      const undo = screen.getByRole("button", { name: "Undo" });
+      expect(undo.getAttribute("aria-disabled")).toBe("true");
+      expect(undo).not.toBeDisabled();
+      undo.focus();
+      expect(undo).toHaveFocus();
+      fireEvent.click(undo);
+      expect(h.onUndo).not.toHaveBeenCalled();
+      expect(tips()).toEqual(expect.arrayContaining(["Nothing to undo", "Nothing to redo"]));
+    });
+
+    it("available: clicks run the callbacks", () => {
+      const h = history();
+      render(<Topbar siteName="x" save="saved" history={h} />);
+      fireEvent.click(screen.getByRole("button", { name: "Undo" }));
+      fireEvent.click(screen.getByRole("button", { name: "Redo" }));
+      expect(h.onUndo).toHaveBeenCalledTimes(1);
+      expect(h.onRedo).toHaveBeenCalledTimes(1);
+    });
+
+    it("Tab order: exit → History (Undo, Redo) → the rest", () => {
+      render(<Topbar siteName="x" save="saved" history={history()} />);
+      const buttons = within(screen.getByRole("banner")).getAllByRole("button");
+      const names = buttons.map((b) => b.getAttribute("aria-label") ?? b.textContent);
+      expect(names.indexOf("Undo")).toBe(names.indexOf("‹ Exit") + 1);
+      expect(names.indexOf("Redo")).toBe(names.indexOf("Undo") + 1);
+    });
+
+    it("no history prop, no group", () => {
+      render(<Topbar siteName="x" save="saved" />);
+      expect(screen.queryByRole("group", { name: "History" })).toBeNull();
+    });
+  });
+
+  /* Narrow-width rule: the site name is the only column that gives way. */
+  it("the site-name column shrinks to an 80px floor; every other control is flex-none", () => {
+    render(<Topbar siteName="x" save="saved" review={{ label: "In review · 12 open", tone: "info", onClick: vi.fn() }} onPublish={vi.fn()} tools={{ onPreview: vi.fn() }} />);
+    const name = screen.getByTestId("topbar-site-name");
+    expect(name.className).toContain("tw:shrink");
+    expect(name.className).toContain("tw:min-w-[80px]");
+    for (const el of [screen.getByTestId("topbar-exit"), screen.getByTestId("topbar-review-pill"), screen.getByTestId("topbar-preview"), screen.getByTestId("topbar-publish")]) {
+      expect(el.className).toContain("tw:flex-none");
+    }
+  });
+
   it("is a banner carrying the site name", () => {
     render(<Topbar siteName="Bella Cucina" save="saved" />);
     expect(screen.getByRole("banner")).toBeTruthy();
@@ -86,9 +160,32 @@ describe("Topbar", () => {
     expect(btn.getAttribute("aria-disabled")).toBe("true");
   });
 
-  it("publish=anyway renames the action rather than hiding the block", () => {
-    render(<Topbar siteName="x" save="saved" publish="anyway" />);
-    expect(screen.getByRole("button", { name: "Publish anyway" })).toBeTruthy();
+  /* design-2l9 Task 1.7 — Publish as the publish tray's toggle. ("Publish
+     anyway" is gone with OD-1: blocking issues block, in the tray.) */
+  it("as the tray toggle it carries aria-expanded/aria-controls and stays pressable while busy", () => {
+    const onPublish = vi.fn();
+    const { rerender } = render(
+      <Topbar siteName="x" save="saved" publishExpanded={false} publishControls="publish-tray" onPublish={onPublish} />,
+    );
+    const btn = screen.getByTestId("topbar-publish");
+    expect(btn.getAttribute("aria-expanded")).toBe("false");
+    expect(btn.getAttribute("aria-controls")).toBeNull();
+    rerender(
+      <Topbar siteName="x" save="saved" publishExpanded publishControls="publish-tray" publishBusy onPublish={onPublish} />,
+    );
+    expect(btn.getAttribute("aria-expanded")).toBe("true");
+    expect(btn.getAttribute("aria-controls")).toBe("publish-tray");
+    expect(btn).not.toBeDisabled();
+    expect(btn.getAttribute("aria-busy")).toBe("true");
+    fireEvent.click(btn);
+    expect(onPublish).toHaveBeenCalledTimes(1);
+  });
+
+  it("without the toggle props it is a plain button: no aria-expanded, busy disables it", () => {
+    render(<Topbar siteName="x" save="saved" publishBusy />);
+    const btn = screen.getByTestId("topbar-publish");
+    expect(btn.hasAttribute("aria-expanded")).toBe(false);
+    expect(btn).toBeDisabled();
   });
 
   it("the review pill appears only when a round is in flight", () => {

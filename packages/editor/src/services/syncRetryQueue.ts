@@ -59,6 +59,11 @@ export class SyncRetryQueue {
   private subscribers = new Set<(info: SyncRetryInfo) => void>();
   /** The op running per target — the next one for it waits (see `run`). */
   private inFlight = new Map<string, Promise<boolean>>();
+  /* The most recent failure, kept so a surface can say WHAT is stuck and
+     WHY (publish tray, design-2l9 Task 1.7: "CMS changes couldn't sync:
+     {reason}" with an Open CMS door at the failing record). Cleared when that
+     target reaches the server or is dropped. */
+  private failure: { key: string; message: string; attempts: number; since: number } | null = null;
 
   constructor() {
     if (typeof window !== "undefined") {
@@ -87,6 +92,28 @@ export class SyncRetryQueue {
    *  state diff has not propagated. */
   outstandingCount(): number {
     return this.outstandingKeys().length;
+  }
+
+  /** Why the latest failed mirror failed — `null` once it reached the server
+   *  or was dropped. */
+  get lastError(): string | null {
+    return this.failure?.message ?? null;
+  }
+
+  /** The target key (`<op>:<id>`) of that failure, so a surface can open the
+   *  record it belongs to. `null` alongside `lastError`. */
+  get failedRecordId(): string | null {
+    return this.failure?.key ?? null;
+  }
+
+  /** How many times in a row that target has failed. */
+  get failedAttempts(): number {
+    return this.failure?.attempts ?? 0;
+  }
+
+  /** When that target first failed in its current run of failures (epoch ms). */
+  get failingSince(): number | null {
+    return this.failure?.since ?? null;
   }
 
   /** The targets behind `outstandingCount` — a key both queued and in flight
@@ -123,6 +150,7 @@ export class SyncRetryQueue {
        NOT notify, because nothing was queued under the delete's own key. The
        queue reached zero and the permanent "not on the server" notice stayed
        up over an empty queue. (Codex review, 2026-08-24.) */
+    if (this.failure?.key === key) this.failure = null;
     if (this.queue.delete(key)) this.notify();
   }
 
@@ -177,6 +205,7 @@ export class SyncRetryQueue {
   ): Promise<boolean> {
     try {
       await task();
+      if (this.failure?.key === key) this.failure = null;
       /* Notify only when this actually cleared something. Subscribers put a
          permanent "not on the server" toast on screen; when the queue drains —
          by this retry, or by the `online` handler replaying it with no UI
@@ -187,6 +216,11 @@ export class SyncRetryQueue {
       return true;
     } catch (e) {
       onWarn(e);
+      const message = e instanceof Error ? e.message : String(e);
+      this.failure =
+        this.failure?.key === key
+          ? { ...this.failure, message, attempts: this.failure.attempts + 1 }
+          : { key, message, attempts: 1, since: Date.now() };
       this.queue.set(key, () => this.run(key, task, onWarn));
       this.notify();
       return false;

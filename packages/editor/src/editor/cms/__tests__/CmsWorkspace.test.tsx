@@ -80,7 +80,7 @@ describe("CmsWorkspace · root (4428:140486)", () => {
 });
 
 describe("CmsWorkspace · records table (4428:143182)", () => {
-  it("draws the display field, the short fields and Updated — long text and media stay in the sheet", async () => {
+  it("draws the display field, Status (2L9 165:2), the short fields and Updated — long text and media stay in the sheet", async () => {
     const { composer } = makeEngine({
       collections: [FULL],
       items: [rec("r1", { name: "Margherita", price: "$12", category: "Pizza", available: true, description: "Tomato" })],
@@ -89,7 +89,7 @@ describe("CmsWorkspace · records table (4428:143182)", () => {
     render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
     const table = await screen.findByTestId("cms-table");
     const heads = within(table).getAllByRole("columnheader").map((h) => h.textContent);
-    expect(heads).toEqual(["Name", "Price", "Category", "Available", "Updated"]);
+    expect(heads).toEqual(["Name", "Status", "Price", "Category", "Available", "Updated"]);
     const row = await screen.findByTestId("cms-row-r1");
     expect(row).toHaveTextContent("Margherita");
     expect(row).toHaveTextContent("Yes");

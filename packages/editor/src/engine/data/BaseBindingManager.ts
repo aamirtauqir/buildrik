@@ -82,6 +82,7 @@ export abstract class BaseBindingManager<T extends BindingWithData> {
    * Bind (or replace) a binding for an element keyed by getBindingKey().
    */
   bind(elementId: string, binding: T, historyLabel?: string): void {
+    if (this.composer.writeLocked) return;
     /* A person binding from the inspector passes a label: the change is then
        one undo step. Bindings ARE in the history snapshot now
        (Composer.exportProject writes cmsBindings, importProject restores them,
@@ -133,6 +134,7 @@ export abstract class BaseBindingManager<T extends BindingWithData> {
    * Unbind a specific key for an element.
    */
   unbind(elementId: string, key: string): void {
+    if (this.composer.writeLocked) return;
     const elementBindings = this.bindings.get(elementId);
     if (!elementBindings) return;
 
@@ -155,6 +157,7 @@ export abstract class BaseBindingManager<T extends BindingWithData> {
    * Unbind everything for an element.
    */
   unbindAll(elementId: string, historyLabel?: string): void {
+    if (this.composer.writeLocked) return;
     if (historyLabel) this.composer.history?.flushPending?.();
     this.bindings.delete(elementId);
     this.composer.emit(EVENTS.BINDING_REMOVED, { elementId });

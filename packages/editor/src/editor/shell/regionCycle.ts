@@ -1,7 +1,10 @@
 /**
  * regionCycle — F6 / ⇧F6 region navigation (Figma keyboard board 58:2):
  * "cycles between regions, 1 → 7 → back"; conditional regions drop out of the
- * cycle when hidden (page tabs on a one-page site, the drawer when closed).
+ * cycle when hidden (the page switcher in a resource area, the drawer when
+ * closed). A region nested in one already listed is visited once: the page
+ * switcher sits inside the footer, so the footer stands in for it only where
+ * the switcher is absent.
  *
  * Pure DOM helpers — the shortcut wiring lives in useEditorShortcuts.
  *
@@ -15,7 +18,7 @@ const REGION_SELECTORS: readonly string[] = [
   '[role="banner"]', // 1 topbar
   ".ls-rail", // 2 rail
   ".ls-panel:not(.ls-panel--closed)", // 3 drawer (drops out when closed)
-  '[role="tablist"][aria-label="Site pages"]', // 4 page tabs (drops out on 1-page sites)
+  '[data-region="page-switcher"]', // 4 page switcher (bottom bar; absent in resource areas)
   "#layout-canvas", // 5 canvas (drops out in fullpage mode)
   ".layout-shell__fullpage", // 5b fullpage view — replaces canvas+inspector
   ".bdi-panel", // 6 inspector (drops out with no selection)
@@ -52,7 +55,7 @@ export function visibleRegions(root: ParentNode = document): HTMLElement[] {
   const out: HTMLElement[] = [];
   for (const sel of REGION_SELECTORS) {
     const el = root.querySelector<HTMLElement>(sel);
-    if (el && isVisible(el)) out.push(el);
+    if (el && isVisible(el) && !out.some((r) => r.contains(el) || el.contains(r))) out.push(el);
   }
   return out;
 }
@@ -60,9 +63,10 @@ export function visibleRegions(root: ParentNode = document): HTMLElement[] {
 const FOCUSABLE =
   'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
 
-/** Focus a region: its first focusable child, or the region itself. */
+/** Focus a region: itself when it is a control (the page switcher), else its
+ *  first focusable child, else the region made focusable. */
 function focusRegion(region: HTMLElement): void {
-  const target = region.querySelector<HTMLElement>(FOCUSABLE);
+  const target = region.matches(FOCUSABLE) ? region : region.querySelector<HTMLElement>(FOCUSABLE);
   if (target) {
     target.focus();
     return;

@@ -38,6 +38,10 @@ const composer = {
   aliasResolver: { validate: vi.fn(), resolve: vi.fn(), getChain: vi.fn() },
   designSystem: { readOnly: false, readOnlyReason: null, brandTokensV2: true },
   destroy: vi.fn(),
+  /* Edit locks are inert here; useComposerInit.editLock.test.ts runs them
+     with the engine's semantics. */
+  editLocks: new Set<string>(),
+  setEditLock: vi.fn(),
 };
 
 vi.mock("@/engine", () => ({ createComposer: vi.fn(() => composer), Composer: class {} }));

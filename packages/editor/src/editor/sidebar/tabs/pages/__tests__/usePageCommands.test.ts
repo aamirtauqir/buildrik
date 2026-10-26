@@ -1,5 +1,5 @@
 /**
- * usePageCommands — the "New page"/"Go to <page>" rows in the one ⌘K
+ * usePageCommands — the "New page"/"Switch page…"/"Go to <page>" rows in the one ⌘K
  * palette, registered for exactly as long as the CALLER stays mounted.
  *
  * v3 FC-2 (2026-09-25): the caller is the shell now (StudioPanels), not the
@@ -12,6 +12,7 @@ import { renderHook } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { CommandCenter } from "@/engine/commands/CommandCenter";
 import type { Composer } from "@/engine";
+import { EVENTS } from "@/shared/constants/events";
 import type { PageItem } from "../types";
 import { usePageCommands, NEW_PAGE_COMMAND_ID, goToPageCommandId, PAGE_COMMAND_GROUP } from "../usePageCommands";
 
@@ -35,7 +36,8 @@ describe("usePageCommands", () => {
     const { unmount } = renderHook(() => usePageCommands(composer, pages, selectPage, addPage));
 
     const ids = composer.commands.getAll().filter((c) => c.group === PAGE_COMMAND_GROUP).map((c) => c.id);
-    expect(ids).toEqual([NEW_PAGE_COMMAND_ID, goToPageCommandId("p-home"), goToPageCommandId("p-about")]);
+    expect(ids).toEqual([NEW_PAGE_COMMAND_ID, "page-switcher", goToPageCommandId("p-home"), goToPageCommandId("p-about")]);
+    expect(composer.commands.get("page-switcher")?.label).toBe("Switch page…");
     expect(composer.commands.get(goToPageCommandId("p-home"))?.label).toBe("Go to Home (home)");
     expect(composer.commands.get(goToPageCommandId("p-about"))?.label).toBe("Go to About");
 
@@ -43,6 +45,8 @@ describe("usePageCommands", () => {
     expect(selectPage).toHaveBeenCalledWith("p-about");
     composer.commands.run(NEW_PAGE_COMMAND_ID);
     expect(addPage).toHaveBeenCalledTimes(1);
+    composer.commands.run("page-switcher");
+    expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_TOGGLE_PAGE_SWITCHER, {});
 
     unmount();
     expect(composer.commands.getAll().some((c) => c.group === PAGE_COMMAND_GROUP)).toBe(false);
@@ -56,7 +60,7 @@ describe("usePageCommands", () => {
     );
     rerender({ list: [pages[0], { id: "p-about", name: "Team" } as PageItem] });
     expect(composer.commands.get(goToPageCommandId("p-about"))?.label).toBe("Go to Team");
-    expect(composer.commands.getAll().filter((c) => c.group === PAGE_COMMAND_GROUP)).toHaveLength(3);
+    expect(composer.commands.getAll().filter((c) => c.group === PAGE_COMMAND_GROUP)).toHaveLength(4);
   });
 
   it("a new callback identity does not re-register — the latest callback still runs", () => {

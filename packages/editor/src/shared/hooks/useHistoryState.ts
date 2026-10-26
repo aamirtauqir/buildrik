@@ -52,18 +52,25 @@ export function useHistoryState(composer: Composer | null): UseHistoryStateRetur
     // Initial load
     updateState();
 
-    // Listen for history changes
-    composer.on(EVENTS.HISTORY_RECORDED, updateState);
-    composer.on(EVENTS.HISTORY_UNDO, updateState);
-    composer.on(EVENTS.HISTORY_REDO, updateState);
-    composer.on(EVENTS.HISTORY_CLEARED, updateState);
+    /* Every event after which canUndo()/canRedo() may have changed.
+       `importProject` (project load, undo/redo internals, version restore)
+       emits only project:loaded, and version restore adds version:restored —
+       neither is a history:* event, and without them the topbar's Undo kept
+       whatever the last history event left it as. HISTORY_UNRECORDED: a
+       change made outside history; HISTORY_CHANGED: the declared catch-all. */
+    const events = [
+      EVENTS.HISTORY_RECORDED,
+      EVENTS.HISTORY_UNDO,
+      EVENTS.HISTORY_REDO,
+      EVENTS.HISTORY_CLEARED,
+      EVENTS.HISTORY_CHANGED,
+      EVENTS.HISTORY_UNRECORDED,
+      EVENTS.PROJECT_LOADED,
+      EVENTS.VERSION_RESTORED,
+    ];
+    events.forEach((e) => composer.on(e, updateState));
 
-    return () => {
-      composer.off(EVENTS.HISTORY_RECORDED, updateState);
-      composer.off(EVENTS.HISTORY_UNDO, updateState);
-      composer.off(EVENTS.HISTORY_REDO, updateState);
-      composer.off(EVENTS.HISTORY_CLEARED, updateState);
-    };
+    return () => events.forEach((e) => composer.off(e, updateState));
   }, [composer]);
 
   const undo = React.useCallback(() => {

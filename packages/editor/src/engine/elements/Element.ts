@@ -144,6 +144,7 @@ export class Element {
   }
 
   setContent(content: string): void {
+  if (this.composer.writeLocked) return;
     this.data.content = content;
     // L2-005: text typed into an instance is an override like a style, or the
     // next master update re-clones over it without a word.
@@ -153,12 +154,14 @@ export class Element {
   }
 
   setTagName(tagName: string): void {
+  if (this.composer.writeLocked) return;
     this.data.tagName = tagName;
     this.composer.emit(EVENTS.ELEMENT_UPDATED, this);
     this.composer.markDirty();
   }
 
   setLocked(locked: boolean): void {
+  if (this.composer.writeLocked) return;
     this.data.locked = locked;
     this.composer.emit(EVENTS.ELEMENT_UPDATED, this);
     this.composer.markDirty();
@@ -351,6 +354,7 @@ export class Element {
   // ============================================
 
   setData(key: string, value: unknown): void {
+  if (this.composer.writeLocked) return;
     if (!this.data.data) {
       this.data.data = {};
     }
@@ -367,6 +371,7 @@ export class Element {
    * from setData(), which writes into the custom-data bag (data.data).
    */
   setBreakpointStyles(styles: BreakpointStyles): void {
+  if (this.composer.writeLocked) return;
     this.data.breakpointStyles = styles;
   }
 

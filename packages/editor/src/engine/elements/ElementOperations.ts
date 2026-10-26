@@ -63,6 +63,8 @@ export class ElementOperations {
    * Wrap this element in a new container
    */
   wrap(tagName: string, attributes?: Record<string, string>): Element {
+  /* Refused: nothing is wrapped, so the element is its own outermost box. */
+    if (this.getComposer().writeLocked) return this.getSelf();
     const self = this.getSelf();
     // IMPORTANT: Save old parent and index BEFORE any modifications
     const oldParent = this.getParentRef();
@@ -100,6 +102,7 @@ export class ElementOperations {
    * Unwrap this element, moving children to parent
    */
   unwrap(): Element[] {
+  if (this.getComposer().writeLocked) return [];
     const parent = this.getParentRef();
     if (!parent) return [];
 
@@ -138,6 +141,7 @@ export class ElementOperations {
    * Replace this element with another
    */
   replaceWith(element: Element): void {
+  if (this.getComposer().writeLocked) return;
     const parent = this.getParentRef();
     if (!parent) return;
 
@@ -210,6 +214,7 @@ export class ElementOperations {
    * Set animation configuration for this element
    */
   setAnimation(config: AnimationConfig): void {
+  if (this.getComposer().writeLocked) return;
     const data = this.getData();
     if (!data.data) {
       data.data = {};
@@ -228,6 +233,7 @@ export class ElementOperations {
    * Clear animation from this element
    */
   clearAnimation(): void {
+  if (this.getComposer().writeLocked) return;
     const data = this.getData();
     if (data.data?.animation) {
       delete data.data.animation;
@@ -260,6 +266,7 @@ export class ElementOperations {
 
   /** Set interactions for this element (accepts any array, UI handles typing) */
   setInteractions(interactions: unknown[]): void {
+  if (this.getComposer().writeLocked) return;
     const data = this.getData();
     if (!data.data) {
       data.data = {};
@@ -276,6 +283,7 @@ export class ElementOperations {
 
   /** Clear all interactions from this element */
   clearInteractions(): void {
+  if (this.getComposer().writeLocked) return;
     const data = this.getData();
     if (data.data?.interactions) {
       delete data.data.interactions;
@@ -292,6 +300,7 @@ export class ElementOperations {
    * Set data binding for a property
    */
   setDataBinding(property: string, binding: DataBinding): void {
+  if (this.getComposer().writeLocked) return;
     this.dataBindings.set(property, binding);
     this.getComposer().emit(EVENTS.ELEMENT_BINDING_SET, {
       element: this.getSelf(),
@@ -323,6 +332,7 @@ export class ElementOperations {
    * Remove data binding
    */
   removeDataBinding(property: string): void {
+  if (this.getComposer().writeLocked) return;
     if (this.dataBindings.has(property)) {
       this.dataBindings.delete(property);
       this.getComposer().emit(EVENTS.ELEMENT_BINDING_REMOVED, {

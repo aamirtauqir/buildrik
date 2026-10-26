@@ -88,6 +88,7 @@ export class InteractionManager {
     animation?: Partial<InteractionAnimationConfig>,
     name?: string
   ): Interaction | null {
+    if (this.composer.writeLocked) return null;
     const element = this.composer.elements.getElement(elementId);
     if (!element) return null;
 
@@ -113,6 +114,7 @@ export class InteractionManager {
     interactionId: string,
     updates: Partial<Omit<Interaction, "id">>
   ): Interaction | null {
+    if (this.composer.writeLocked) return null;
     const element = this.composer.elements.getElement(elementId);
     if (!element) return null;
 
@@ -138,6 +140,7 @@ export class InteractionManager {
 
   /** Remove an interaction from an element */
   removeInteraction(elementId: string, interactionId: string): boolean {
+    if (this.composer.writeLocked) return false;
     const element = this.composer.elements.getElement(elementId);
     if (!element) return false;
 
@@ -156,6 +159,7 @@ export class InteractionManager {
 
   /** Clear all interactions from an element */
   clearInteractions(elementId: string): void {
+    if (this.composer.writeLocked) return;
     const element = this.composer.elements.getElement(elementId);
     if (!element) return;
 
@@ -172,6 +176,7 @@ export class InteractionManager {
 
   /** Toggle interaction enabled state */
   toggleInteraction(elementId: string, interactionId: string): boolean {
+    if (this.composer.writeLocked) return false;
     const interaction = this.getInteraction(elementId, interactionId);
     if (!interaction) return false;
 
@@ -192,6 +197,7 @@ export class InteractionManager {
 
   /** Duplicate an interaction */
   duplicateInteraction(elementId: string, interactionId: string): Interaction | null {
+    if (this.composer.writeLocked) return null;
     const interaction = this.getInteraction(elementId, interactionId);
     if (!interaction) return null;
 
@@ -233,6 +239,7 @@ export class InteractionManager {
 
   /** Move interaction to new position */
   reorderInteraction(elementId: string, interactionId: string, newIndex: number): boolean {
+    if (this.composer.writeLocked) return false;
     const element = this.composer.elements.getElement(elementId);
     if (!element) return false;
 

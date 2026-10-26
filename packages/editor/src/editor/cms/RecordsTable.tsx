@@ -1,8 +1,9 @@
 /**
  * RecordsTable — a collection's records as a table (board 4428:143182).
  *
- * Columns come off the collection's own fields: the display field first, then
- * the next short fields in the user's order, then a fixed "Updated". Long-form
+ * Columns come off the collection's own fields: the display field first, a
+ * fixed "Status" (2L9 board 165:2), then the next short fields in the user's
+ * order, then a fixed "Updated". Long-form
  * and media fields (description, rich text, photo) and the slug are left to
  * the record sheet — the board draws Name · Price · Category · Available ·
  * Updated from a collection that also holds Description, Slug and Photo.
@@ -16,9 +17,10 @@
  */
 import * as React from "react";
 import type { CMSCollection, CMSContentItem, CMSField } from "@/shared/types/cms";
-import { Button, IconButton } from "@/editor/chrome-ui";
+import { Badge, Button, IconButton } from "@/editor/chrome-ui";
 import { formatRelativeTime } from "@/shared/utils/relativeTime";
-import { cmsRecordLabel } from "@buildrik/shared/schemas/cms";
+import { cmsRecordLabel, type CmsRecordStatus } from "@buildrik/shared/schemas/cms";
+import type { ColorToken } from "@/themes/tokens.generated";
 import { ChevronLeft, ChevronRight, TriangleAlert } from "lucide-react";
 
 export const PAGE_SIZE = 50;
@@ -52,6 +54,43 @@ const ROW =
   "tw:cursor-pointer tw:hover:bg-[var(--bk-gray-50)] tw:focus-visible:outline-none tw:focus-visible:[box-shadow:inset_var(--bk-shadow-focus)]";
 const CELL = "tw:flex tw:h-10 tw:flex-none tw:items-center tw:gap-1.5 tw:overflow-hidden tw:pr-3 tw:text-[13px] tw:leading-5 tw:whitespace-nowrap";
 const CELL_SOFT = `${CELL} tw:text-[var(--bk-ink-soft)]`;
+
+/* StatusBadge (2L9 500:342149): 20 tall, a tinted pill whose text always
+   names the state, so it never rests on colour alone. Each tone names its
+   token pair once; the class string spells the same tokens literally,
+   because Tailwind only compiles class names it can read in source. */
+export type StatusTone = "neutral" | "success" | "warning";
+const BADGE =
+  "tw:h-5 tw:rounded-[var(--bk-radius-sm)] tw:px-2 tw:py-0 tw:text-[length:var(--bk-text-12)] tw:font-medium tw:leading-4 tw:whitespace-nowrap";
+export const STATUS_TONES: Record<StatusTone, { fg: ColorToken; bg: ColorToken; className: string }> = {
+  neutral: { fg: "ink-soft", bg: "bg-subtle", className: "tw:text-[var(--bk-ink-soft)] tw:bg-[var(--bk-bg-subtle)]" },
+  success: { fg: "success-text", bg: "success-tint", className: "tw:text-[var(--bk-success-text)] tw:bg-[var(--bk-success-tint)]" },
+  warning: { fg: "warning-text", bg: "warning-tint", className: "tw:text-[var(--bk-warning-text)] tw:bg-[var(--bk-warning-tint)]" },
+};
+
+/** One badge per status in the CMS record schema (CMS_RECORD_STATUSES). */
+const STATUS_BADGES: Record<CmsRecordStatus, { label: string; tone: StatusTone }> = {
+  draft: { label: "Draft", tone: "neutral" },
+  published: { label: "Published", tone: "success" },
+  archived: { label: "Archived", tone: "neutral" },
+};
+
+/** A record's status badge. "Changed since publish" is a published record
+ *  edited after its publish stamp; server rows carry no stamp, so they read
+ *  Published. A status the schema does not know shows its raw label. */
+export function recordStatusBadge(record: CMSContentItem): { label: string; tone: StatusTone } {
+  const status: string = record.status;
+  if (
+    status === "published" &&
+    record.publishedAt &&
+    Date.parse(record.updatedAt) > Date.parse(record.publishedAt)
+  ) {
+    return { label: "Changed since publish", tone: "warning" };
+  }
+  return Object.prototype.hasOwnProperty.call(STATUS_BADGES, status)
+    ? STATUS_BADGES[record.status]
+    : { label: status, tone: "neutral" };
+}
 
 export interface RecordsTableProps {
   collection: CMSCollection;
@@ -115,8 +154,9 @@ export function RecordsTable({ collection, records, query, onOpenRecord, referen
         )
       : records;
     const sortField = sort ? collection.fields.find((f) => f.slug === sort.key) : undefined;
-    if (!sort || (sort.key !== "__updated" && !sortField)) return matched;
+    if (!sort || (sort.key !== "__updated" && sort.key !== "__status" && !sortField)) return matched;
     const read = (r: CMSContentItem): string | number => {
+      if (sort.key === "__status") return recordStatusBadge(r).label.toLowerCase();
       if (sort.key === "__updated" || !sortField) return Date.parse(r.updatedAt) || 0;
       const v = r.data[sort.key];
       return typeof v === "number" ? v : cell(sortField, v).toLowerCase();
@@ -157,10 +197,20 @@ export function RecordsTable({ collection, records, query, onOpenRecord, referen
     );
   };
 
+  const statusBadge = (r: CMSContentItem) => {
+    const { label, tone } = recordStatusBadge(r);
+    return (
+      <Badge className={`${BADGE} ${STATUS_TONES[tone].className}`} data-tone={tone} data-testid={`cms-row-status-${r.id}`}>
+        {label}
+      </Badge>
+    );
+  };
+
   return (
     <div className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col" role="table" aria-label={`${collection.name} records`} data-testid="cms-table">
       <div className={HEAD_ROW} role="row">
         {nameField ? head(nameField.slug, nameField.name, "tw:w-[240px]") : null}
+        {head("__status", "Status", "tw:w-[160px]")}
         {extra.map((f, i) => head(f.slug, f.name, FIELD_WIDTHS[i]))}
         {head("__updated", "Updated", "tw:w-[150px]")}
       </div>
@@ -182,11 +232,9 @@ export function RecordsTable({ collection, records, query, onOpenRecord, referen
           >
             <div role="cell" className={`${CELL} tw:w-[240px] tw:font-medium tw:text-[var(--bk-ink)]`}>
               {recordTitle(collection, r)}
-              {r.status === "draft" ? (
-                <span className="tw:text-[12px] tw:font-normal tw:text-[var(--bk-ink-muted)]" data-testid={`cms-row-draft-${r.id}`}>
-                  · Draft
-                </span>
-              ) : null}
+            </div>
+            <div role="cell" className={`${CELL} tw:w-[160px]`}>
+              {statusBadge(r)}
             </div>
             {extra.map((f, i) => (
               <div key={f.id} role="cell" className={`${CELL_SOFT} ${FIELD_WIDTHS[i]}`}>
