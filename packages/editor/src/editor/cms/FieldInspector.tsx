@@ -38,7 +38,6 @@ const CONTROL =
   "tw:[&_select]:h-7 tw:[&_select]:py-0 tw:[&_select]:pl-2.5 tw:[&_select]:text-[12px] tw:[&_select]:rounded-[6px] " +
   "tw:[&_select]:bg-[var(--bk-bg-subtle)] tw:[&_select]:border-transparent";
 const NOTE = "tw:m-0 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
-const TEXT = "tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]";
 
 export interface FieldInspectorProps {
   composer: Composer | null;
@@ -127,6 +126,35 @@ export function FieldInspector({ composer, collection, collections, field, recor
     update(changes(draft.required));
   };
 
+  if (showUses) {
+    /* 165:3173 — "{field} · N usages", one row per use, "‹ Back to field". */
+    return (
+      <aside className={ASIDE} data-testid="cms-field-inspector">
+        <div className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col tw:gap-3 tw:overflow-y-auto tw:px-4 tw:pb-4 tw:pt-2.5">
+          <h3 className="tw:m-0 tw:text-[13px] tw:leading-5 tw:font-semibold tw:text-[var(--bk-ink)]">
+            {field.name} · {uses.length} usage{uses.length === 1 ? "" : "s"}
+          </h3>
+          <ul className="tw:m-0 tw:flex tw:list-none tw:flex-col tw:gap-1 tw:p-0" data-testid="cms-fi-uses">
+            {uses.map((u, i) => (
+              <li key={`${u.label}-${i}`}>
+                {u.elementId ? (
+                  <Button size="xs" color="light" className="tw:h-8 tw:w-full tw:justify-start tw:border-0 tw:bg-[var(--bk-bg-subtle)] tw:px-3 tw:text-[12px] tw:font-normal" onClick={() => onOpenUse(u.elementId!)}>
+                    {u.label}
+                  </Button>
+                ) : (
+                  <span className="tw:flex tw:h-8 tw:items-center tw:rounded-[6px] tw:bg-[var(--bk-bg-subtle)] tw:px-3 tw:text-[12px] tw:text-[var(--bk-ink)]">{u.label}</span>
+                )}
+              </li>
+            ))}
+          </ul>
+          <Button size="xs" variant="link" className="tw:h-auto tw:min-h-0 tw:self-start tw:p-0 tw:text-[12px] tw:font-medium" onClick={() => setShowUses(false)} data-testid="cms-fi-back-to-field">
+            ‹ Back to field
+          </Button>
+        </div>
+      </aside>
+    );
+  }
+
   return (
     <aside
       className={ASIDE}
@@ -210,25 +238,10 @@ export function FieldInspector({ composer, collection, collections, field, recor
           </div>
         ) : null}
         {bound ? (
-          <div className="tw:flex tw:flex-col tw:items-center tw:gap-2 tw:py-2">
-            <Button size="xs" variant="link" className="tw:h-auto tw:min-h-0 tw:p-0 tw:text-[12px] tw:font-medium" aria-expanded={showUses} onClick={() => setShowUses((v) => !v)} data-testid="cms-fi-show-uses">
+          <div className="tw:flex tw:justify-center tw:py-2">
+            <Button size="xs" variant="link" className="tw:h-auto tw:min-h-0 tw:p-0 tw:text-[12px] tw:font-medium" onClick={() => setShowUses(true)} data-testid="cms-fi-show-uses">
               Show {uses.length} usage{uses.length === 1 ? "" : "s"}
             </Button>
-            {showUses ? (
-              <ul className="tw:m-0 tw:flex tw:w-full tw:list-none tw:flex-col tw:gap-1 tw:p-0" data-testid="cms-fi-uses">
-                {uses.map((u, i) => (
-                  <li key={`${u.label}-${i}`} className={TEXT}>
-                    {u.elementId ? (
-                      <Button size="xs" variant="link" className="tw:h-auto tw:min-h-0 tw:p-0 tw:text-[12px] tw:font-normal" onClick={() => onOpenUse(u.elementId!)}>
-                        {u.label}
-                      </Button>
-                    ) : (
-                      u.label
-                    )}
-                  </li>
-                ))}
-              </ul>
-            ) : null}
           </div>
         ) : null}
         <label className="tw:flex tw:items-center tw:gap-2 tw:py-1 tw:pl-3 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]">

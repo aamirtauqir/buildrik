@@ -179,8 +179,11 @@ describe("FieldInspector", () => {
     expect(screen.getByTestId("cms-fi-key")).toBeDisabled();
     expect(screen.getByTestId("cms-fi-type")).toBeDisabled();
     expect(screen.getByTestId("cms-fi-locked")).toHaveTextContent("Key and type are locked because this field is used.");
+    /* 165:3173 — the usages open as their own view with "‹ Back to field". */
     fireEvent.click(screen.getByTestId("cms-fi-show-uses"));
+    expect(screen.getByText("Name · 1 usage")).toBeInTheDocument();
     expect(screen.getByTestId("cms-fi-uses")).toHaveTextContent("Menu card");
+    fireEvent.click(screen.getByTestId("cms-fi-back-to-field"));
     fireEvent.click(screen.getByTestId("cms-fi-delete"));
     expect(screen.getByTestId("cms-field-locked")).toHaveTextContent("Cannot delete — field is bound");
     expect(screen.getByTestId("cms-field-locked-uses")).toHaveTextContent("Menu card › Name");

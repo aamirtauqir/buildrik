@@ -189,7 +189,9 @@ describe("RecordSheet", () => {
     mount();
     await saveAnEdit();
     const banner = await screen.findByTestId("cms-sheet-conflict");
-    expect(banner).toHaveTextContent("Someone else changed this record. Choose Keep mine or Use theirs.");
+    /* 2L9 165:1903 — "Changed elsewhere" over the fields; Review opens the choice. */
+    expect(banner).toHaveTextContent("Changed elsewhereReview the fields that changed before saving.");
+    fireEvent.click(screen.getByTestId("cms-sheet-conflict-review"));
     expect(screen.getByTestId("cms-sheet-keep-mine")).toHaveTextContent("Keep mine");
     expect(screen.getByTestId("cms-sheet-use-theirs")).toHaveTextContent("Use theirs");
     expect(screen.getByTestId("cms-sheet-eligibility")).toHaveTextContent("Resolve the conflict before publishing");
@@ -207,7 +209,8 @@ describe("RecordSheet", () => {
     let choice = conflictOnSave();
     mount();
     await saveAnEdit();
-    fireEvent.click(await screen.findByTestId("cms-sheet-use-theirs"));
+    fireEvent.click(await screen.findByTestId("cms-sheet-conflict-review"));
+    fireEvent.click(screen.getByTestId("cms-sheet-use-theirs"));
     await waitFor(() => expect(screen.queryByTestId("cms-sheet")).toBeNull());
     expect(choice.useTheirs).toHaveBeenCalledTimes(1);
     expect(choice.keepMine).not.toHaveBeenCalled();
@@ -215,7 +218,8 @@ describe("RecordSheet", () => {
     choice = conflictOnSave();
     await saveAnEdit("$14");
     conflictMock.mockImplementation(() => false);
-    fireEvent.click(await screen.findByTestId("cms-sheet-keep-mine"));
+    fireEvent.click(await screen.findByTestId("cms-sheet-conflict-review"));
+    fireEvent.click(screen.getByTestId("cms-sheet-keep-mine"));
     await waitFor(() => expect(screen.queryByTestId("cms-sheet")).toBeNull());
     expect(choice.keepMine).toHaveBeenCalledTimes(1);
     expect(await screen.findByText("Record saved · Menu items")).toBeInTheDocument();

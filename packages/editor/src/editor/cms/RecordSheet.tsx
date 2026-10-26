@@ -213,6 +213,7 @@ export function RecordSheet({
      toast. Closing the sheet with the choice still open hands it back to the
      toast (claimCmsConflict's release). */
   const [conflict, setConflict] = React.useState<CmsConflict | null>(null);
+  const [reviewing, setReviewing] = React.useState(false);
   const [resolving, setResolving] = React.useState(false);
   const conflictRef = React.useRef<CmsConflict | null>(null);
   const recordId = record?.id ?? null;
@@ -226,6 +227,7 @@ export function RecordSheet({
   }, [recordId]);
   const settleConflict = () => {
     conflictRef.current = null;
+    setReviewing(false);
     setConflict(null);
   };
 
@@ -493,23 +495,36 @@ export function RecordSheet({
             </p>
           ) : null}
 
-          {[...collection.fields].sort((a, b) => a.order - b.order).map(control)}
-
           {conflict && !gone ? (
-            <div className="tw:flex tw:flex-none tw:flex-col tw:gap-2 tw:rounded-[6px] tw:bg-[var(--bk-warning-tint)] tw:px-4 tw:py-3" role="alert" data-testid="cms-sheet-conflict">
-              <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">
-                Someone else changed this record. Choose Keep mine or Use theirs.
-              </p>
-              <div className="tw:flex tw:h-8 tw:items-center tw:gap-2">
-                <Button size="sm" variant="ghost" className={CHOICE_BTN} disabled={resolving} data-testid="cms-sheet-keep-mine" onClick={() => void choose("keepMine")}>
-                  Keep mine
-                </Button>
-                <Button size="sm" className={CHOICE_BTN} disabled={resolving} data-testid="cms-sheet-use-theirs" onClick={() => void choose("useTheirs")}>
-                  Use theirs
-                </Button>
+            /* 165:1903 — "Changed elsewhere" over the fields; Review opens the
+               whole-record choice (a per-field diff, 165:2414, is not built). */
+            <div className="tw:flex tw:flex-none tw:items-start tw:gap-3 tw:rounded-[6px] tw:bg-[var(--bk-warning-tint)] tw:px-3 tw:py-3" role="alert" data-testid="cms-sheet-conflict">
+              <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:gap-1">
+                <p className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:font-semibold tw:text-[var(--bk-warning-text)]">Changed elsewhere</p>
+                <p className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-warning-text)]">
+                  {reviewing ? "Someone else changed this record. Keep your version or use theirs." : "Review the fields that changed before saving."}
+                </p>
+                {reviewing ? (
+                  <div className="tw:mt-1 tw:flex tw:h-8 tw:items-center tw:gap-2">
+                    <Button size="sm" variant="secondary" className={CHOICE_BTN} disabled={resolving} data-testid="cms-sheet-keep-mine" onClick={() => void choose("keepMine")}>
+                      Keep mine
+                    </Button>
+                    <Button size="sm" className={CHOICE_BTN} disabled={resolving} data-testid="cms-sheet-use-theirs" onClick={() => void choose("useTheirs")}>
+                      Use theirs
+                    </Button>
+                  </div>
+                ) : null}
               </div>
+              {reviewing ? null : (
+                <Button size="xs" variant="secondary" className="tw:h-8 tw:px-4 tw:text-[13px] tw:font-medium" onClick={() => setReviewing(true)} data-testid="cms-sheet-conflict-review">
+                  Review
+                </Button>
+              )}
             </div>
           ) : null}
+
+          {[...collection.fields].sort((a, b) => a.order - b.order).map(control)}
+
 
           {/* The publishing switch closes the form (165:2184's "Published —
               included in the next site publish · Eligible for publishing"). */}

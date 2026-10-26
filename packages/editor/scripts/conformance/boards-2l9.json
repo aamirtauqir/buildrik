@@ -7033,9 +7033,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "board",
+   "authority": "code:whole-record-conflict",
    "verified": "drift-open",
-   "verifiedNote": "Code: whole-record Keep mine / Use theirs strip; board: banner + Review entry to field diff"
+   "verifiedNote": "built + probe-rendered 2026-10-27, no board shot in the dump: warning banner 'Changed elsewhere · Review the fields that changed before saving.' + Review over the fields; Review opens Keep mine / Use theirs (whole record — the per-field diff 165:2414 is not built)."
   },
   {
    "nodeId": "165:2184",
@@ -7064,8 +7064,9 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Board adds Key column; columns Name/Type/Required/Used by otherwise match"
+   "verified": "drift-fixed",
+   "verifiedNote": "inherits 165:2917 (same Fields table, probe-compared 2026-10-27).",
+   "inheritsFrom": "165:2917"
   },
   {
    "nodeId": "165:2917",
@@ -7085,7 +7086,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code lists uses inline in inspector; board separate \"Title · 4 usages\" list with ‹ Back to field"
+   "verifiedNote": "built + probe-rendered 2026-10-27 (no board shot): 'Show N usages' opens '{field} · N usages', one row per use (opens the element), '‹ Back to field'."
   },
   {
    "nodeId": "165:3432",
