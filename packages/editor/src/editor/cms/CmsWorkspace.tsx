@@ -31,7 +31,10 @@ import { BACK } from "./paneStyles";
 import { ImportRecordsButton, useImportRecords } from "./useImportRecords";
 import { CsvImportDialog } from "./CsvImportDialog";
 import { onCmsGone } from "@/services/cmsSync";
-import type { CMSCollection, CMSContentItem, CMSField } from "@/shared/types/cms";
+import type { CMSCollection, CMSContentItem, CMSField, CMSFieldType } from "@/shared/types/cms";
+import type { TypeChangeMode } from "./TypeChangeDialog";
+import { planConversion } from "./fieldConversion";
+import { FIELD_TYPE_LABEL } from "./fieldTypes";
 import { isEmptyCmsValue } from "@buildrik/shared/schemas/cms";
 
 export interface CmsWorkspaceProps {
@@ -265,6 +268,31 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
     });
     return empty.length;
   };
+  /* 257:51318 / 257:52278 / 259:95573 — the type moves first (so a
+     published record's save is checked against it), then each stored value
+     is written converted, or cleared. A refused write rejects; the dialog
+     offers Retry, which plans again from what is stored now. */
+  const changeType = async (field: CMSField, to: CMSFieldType, mode: TypeChangeMode): Promise<void> => {
+    if (!composer) return;
+    const plan = planConversion(field, panel.records, to);
+    if (field.type !== to) await composer.cms.collections.updateField(collection.id, field.id, { type: to });
+    const writes: Array<[CMSContentItem, unknown]> =
+      mode === "convert" ? plan.converts.map((c) => [c.record, c.value]) : plan.touched.map((r) => [r, undefined]);
+    for (const [record, value] of writes) {
+      const data = { ...record.data };
+      if (value === undefined) delete data[field.slug];
+      else data[field.slug] = value;
+      const result = await panel.saveRecord(collection.id, record.id, data, record.status === "published");
+      if (result.invalid || result.conflict) throw new Error(result.invalid ?? "conflict");
+    }
+    await loadRecords(collection.id);
+    const n = writes.length;
+    addToast({
+      tone: "success",
+      title: mode === "convert" ? `${field.name} converted` : `${n} value${n === 1 ? "" : "s"} cleared`,
+      description: mode === "convert" ? `${n} value${n === 1 ? "" : "s"} converted and saved.` : `${field.name} is now ${FIELD_TYPE_LABEL[to]}.`,
+    });
+  };
   /* "Open the binding" — select the bound element and go back to the canvas. */
   const openUse = (elementId: string) => {
     const el = composer?.elements.getElement(elementId);
@@ -451,6 +479,7 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
           onDeleteField={deleteField}
           onOpenUse={openUse}
           onSetDefault={fillDefault}
+          onChangeType={changeType}
         />
       ) : null}
       {csvImportOpen ? (

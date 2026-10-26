@@ -306,4 +306,23 @@ describe("CmsWorkspace · tabs and the collection ⋯ (7096:76270)", () => {
     expect(writes).toEqual(["a"]);
     expect(await screen.findByText(/Default saved to 1 previously empty published record\. Existing values were kept\./)).toBeInTheDocument();
   });
+
+  /* 2L9 257:51318 → 257:52278 — the type moves, then each value is written converted. */
+  it("Convert moves the type and writes each value converted", async () => {
+    const items = [
+      { ...ITEM, id: "a", data: { ...ITEM.data, price: "12" } },
+      { ...ITEM, id: "b", status: "draft" as const, data: { ...ITEM.data, price: "7" } },
+    ];
+    const { composer } = makeEngine({ collections: [MENU], items });
+    cmsWorkspace.openCollection("col-1", "fields");
+    render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
+    fireEvent.click(await screen.findByTestId("cms-field-f2"));
+    fireEvent.change(screen.getByTestId("cms-fi-type"), { target: { value: "number" } });
+    fireEvent.click(await screen.findByTestId("cms-type-change-convert"));
+    await waitFor(() => expect(composer.cms.collections.updateField).toHaveBeenCalledWith("col-1", "f2", { type: "number" }));
+    await waitFor(() => expect(composer.cms.collections.updateContentItem).toHaveBeenCalledTimes(2));
+    const written = composer.cms.collections.updateContentItem.mock.calls.map((c) => [c[0], (c[1] as { data: Record<string, unknown> }).data.price]);
+    expect(written).toEqual([["a", 12], ["b", 7]]);
+    expect(await screen.findByText("2 values converted and saved.")).toBeInTheDocument();
+  });
 });

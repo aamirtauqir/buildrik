@@ -21,6 +21,7 @@ import { FIELD_RULES, FIELD_TYPES, FIELD_TYPE_LABEL, TYPED_VALUE_TYPES, fieldKey
 import type { FieldUse } from "./fieldUsage";
 import { DeleteFieldDialog } from "./DeleteFieldDialog";
 import { RequiredImpactDialog } from "./RequiredImpactDialog";
+import { TypeChangeDialog, type TypeChangeMode } from "./TypeChangeDialog";
 import { isEmptyCmsValue } from "@buildrik/shared/schemas/cms";
 import { OptionsEditor } from "./OptionsEditor";
 import { SECTION } from "./paneStyles";
@@ -101,10 +102,14 @@ export interface FieldInspectorProps {
   /** Required's "Set a default value" (257:53846): saves the default, fills
    *  the empty published records, turns Required on; resolves with the count. */
   onSetDefault: (field: CMSField, value: unknown) => Promise<number>;
+  /** A type change over stored values (257:51318): converts or clears them. */
+  onChangeType: (field: CMSField, to: CMSFieldType, mode: TypeChangeMode) => Promise<void>;
 }
 
-export function FieldInspector({ composer, collection, collections, field, records, uses, onClose, onDeleteField, onOpenUse, onSetDefault }: FieldInspectorProps) {
+export function FieldInspector({ composer, collection, collections, field, records, uses, onClose, onDeleteField, onOpenUse, onSetDefault, onChangeType }: FieldInspectorProps) {
   const [askingRequired, setAskingRequired] = React.useState(false);
+  const [retyping, setRetyping] = React.useState<CMSFieldType | null>(null);
+  const holdsValues = records.some((r) => !isEmptyCmsValue(r.data[field.slug]));
   const emptyPublished = records.filter((r) => r.status === "published" && isEmptyCmsValue(r.data[field.slug])).length;
   const [name, setName] = React.useState(field.name);
   const [key, setKey] = React.useState(field.slug);
@@ -171,7 +176,12 @@ export function FieldInspector({ composer, collection, collections, field, recor
             className={CONTROL}
             value={field.type}
             disabled={bound}
-            onChange={(e) => update({ type: e.target.value as CMSFieldType })}
+            onChange={(e) => {
+              const to = e.target.value as CMSFieldType;
+              /* 257:51318 — stored values are previewed before the type moves. */
+              if (holdsValues) setRetyping(to);
+              else update({ type: to });
+            }}
             data-testid="cms-fi-type"
           >
             {types.map((t) => (
@@ -308,6 +318,16 @@ export function FieldInspector({ composer, collection, collections, field, recor
           Back to Fields
         </Button>
       </footer>
+      {retyping ? (
+        <TypeChangeDialog
+          collection={collection}
+          field={field}
+          to={retyping}
+          records={records}
+          onClose={() => setRetyping(null)}
+          onApply={(mode) => onChangeType(field, retyping, mode)}
+        />
+      ) : null}
       {askingRequired ? (
         <RequiredImpactDialog
           field={field}

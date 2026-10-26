@@ -11015,7 +11015,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Type Select changes type instantly; no conversion preview/clear/ack/refusal flow (server conversion is an SC-9 dependency)"
+   "verifiedNote": "built, not compared — L-C D5: \"Change {field} type\" preview rows \"old → new\" / \"can’t convert\", \"Lossless conversion · Values remain intact.\", Cancel · Clear values… · Convert N values (TypeChangeDialog.tsx)."
   },
   {
    "nodeId": "257:51516",
@@ -11025,7 +11025,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Type Select changes type instantly; no conversion preview/clear/ack/refusal flow (server conversion is an SC-9 dependency)"
+   "verifiedNote": "built, not compared — L-C D5: \"Clear {field} values? · N records will lose their {field} value. This cannot be reversed by document Undo.\" + Type N to confirm + Clear N values."
   },
   {
    "nodeId": "257:51711",
@@ -11035,7 +11035,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Type Select changes type instantly; no conversion preview/clear/ack/refusal flow (server conversion is an SC-9 dependency)"
+   "verifiedNote": "built, not compared — L-C D5: \"Clear {field} values? · N records will lose their {field} value. This cannot be reversed by document Undo.\" + Type N to confirm + Clear N values."
   },
   {
    "nodeId": "257:51906",
@@ -11045,7 +11045,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Type Select changes type instantly; no conversion preview/clear/ack/refusal flow (server conversion is an SC-9 dependency)"
+   "verifiedNote": "built, not compared — L-C D5: \"Converting {field}…\" / \"Clearing {field} values…\" while values are written."
   },
   {
    "nodeId": "257:52092",
@@ -11055,7 +11055,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Type Select changes type instantly; no conversion preview/clear/ack/refusal flow (server conversion is an SC-9 dependency)"
+   "verifiedNote": "built, not compared — L-C D5: \"Converting {field}…\" / \"Clearing {field} values…\" while values are written."
   },
   {
    "nodeId": "257:52278",
@@ -11065,7 +11065,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Type Select changes type instantly; no conversion preview/clear/ack/refusal flow (server conversion is an SC-9 dependency)"
+   "verifiedNote": "built, not compared — L-C D5: toast \"{field} converted · N values converted and saved.\" (board: inline line under Type)."
   },
   {
    "nodeId": "257:52512",
@@ -11073,9 +11073,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "board",
+   "authority": "code:type-moves-before-values",
    "verified": "no",
-   "verifiedNote": "Type Select changes type instantly; no conversion preview/clear/ack/refusal flow (server conversion is an SC-9 dependency)"
+   "verifiedNote": "built, not compared — L-C D5: \"Couldn’t change {field}\" + Retry. The type moves before the values (a published record's save is checked against the new type), so the copy says some values may still need converting — not the board's \"all values unchanged\"."
   },
   {
    "nodeId": "257:52702",
@@ -11083,9 +11083,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:257:51318",
    "verified": "no",
-   "verifiedNote": "Type Select changes type instantly; no conversion preview/clear/ack/refusal flow (server conversion is an SC-9 dependency)"
+   "verifiedNote": "L-C D5: the interim \"Type change unavailable\" board is superseded by the preview/convert flow, which is built."
   },
   {
    "nodeId": "257:52890",
@@ -11437,7 +11437,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Type Select changes type instantly; no conversion preview/clear/ack/refusal flow (server conversion is an SC-9 dependency)"
+   "verifiedNote": "built, not compared — L-C D5: toast \"{field} converted · N values converted and saved.\" (board: inline line under Type)."
   },
   {
    "nodeId": "259:90449",
@@ -11706,7 +11706,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Type Select changes type instantly; no conversion preview/clear/ack/refusal flow (server conversion is an SC-9 dependency)"
+   "verifiedNote": "built, not compared — L-C D5: toast \"N values cleared · {field} is now {type}.\""
   },
   {
    "nodeId": "259:95758",

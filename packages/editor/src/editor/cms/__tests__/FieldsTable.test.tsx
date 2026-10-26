@@ -73,6 +73,7 @@ describe("FieldInspector", () => {
     const onDeleteField = vi.fn(() => Promise.resolve());
     const onOpenUse = vi.fn();
     const onSetDefault = vi.fn(() => Promise.resolve(1));
+    const onChangeType = vi.fn(() => Promise.resolve());
     render(
       <FieldInspector
         composer={e.composer as never}
@@ -85,10 +86,11 @@ describe("FieldInspector", () => {
         onDeleteField={onDeleteField}
         onOpenUse={onOpenUse}
         onSetDefault={onSetDefault}
+        onChangeType={onChangeType}
       />,
     );
     const updateField = (e.composer.cms.collections as unknown as { updateField: ReturnType<typeof vi.fn> }).updateField;
-    return { updateField, onDeleteField, onOpenUse, onSetDefault };
+    return { updateField, onDeleteField, onOpenUse, onSetDefault, onChangeType };
   }
 
   /* 2L9 257:53654 / 257:53846 — Required on a field published records leave
@@ -106,6 +108,31 @@ describe("FieldInspector", () => {
     fireEvent.change(screen.getByTestId("cms-required-default-input"), { target: { value: "menu" } });
     fireEvent.click(screen.getByTestId("cms-required-default-save"));
     await waitFor(() => expect(onSetDefault).toHaveBeenCalledWith(MENU.fields[2], "menu"));
+  });
+
+  /* 2L9 257:51318 — a type change over stored values previews them first. */
+  it("a type change over stored values previews them, then converts", async () => {
+    const { updateField, onChangeType } = mount(1);
+    fireEvent.change(screen.getByTestId("cms-fi-type"), { target: { value: "text" } });
+    expect(updateField).not.toHaveBeenCalled();
+    expect(screen.getByText("Change Price type")).toBeInTheDocument();
+    expect(screen.getByTestId("cms-type-change-preview")).toHaveTextContent("Margherita12 → “12”");
+    expect(screen.getByTestId("cms-type-change-summary")).toHaveTextContent("Lossless conversion · Values remain intact.");
+    fireEvent.click(screen.getByTestId("cms-type-change-convert"));
+    await waitFor(() => expect(onChangeType).toHaveBeenCalledWith(MENU.fields[1], "text", "convert"));
+  });
+
+  it("values that can't convert block Convert; Clear values… asks for the count typed back", async () => {
+    const { onChangeType } = mount(1);
+    fireEvent.change(screen.getByTestId("cms-fi-type"), { target: { value: "boolean" } });
+    expect(screen.getByTestId("cms-type-change-summary")).toHaveTextContent("1 of 1 values can’t become Yes/no.");
+    expect(screen.getByTestId("cms-type-change-convert")).toBeDisabled();
+    fireEvent.click(screen.getByTestId("cms-type-change-clear-start"));
+    expect(screen.getByText("Clear Price values?")).toBeInTheDocument();
+    expect(screen.getByText(/This cannot be reversed by document Undo\./)).toBeInTheDocument();
+    fireEvent.change(screen.getByTestId("cms-type-change-typed"), { target: { value: "1" } });
+    fireEvent.click(screen.getByTestId("cms-type-change-clear-confirm"));
+    await waitFor(() => expect(onChangeType).toHaveBeenCalledWith(MENU.fields[1], "boolean", "clear"));
   });
 
   it("Make required in the dialog turns it on without a default", () => {
@@ -191,7 +218,7 @@ describe("FieldInspector", () => {
     const show = (i: number) =>
       render(
         <FieldInspector composer={e.composer as never} collection={col} collections={[col, TEAM]} field={col.fields[i]} records={[]} uses={[]}
-          onClose={() => {}} onDeleteField={vi.fn()} onOpenUse={vi.fn()} onSetDefault={vi.fn()} />,
+          onClose={() => {}} onDeleteField={vi.fn()} onOpenUse={vi.fn()} onSetDefault={vi.fn()} onChangeType={vi.fn()} />,
       );
     show(0);
     fireEvent.change(screen.getByTestId("cms-fi-rule-maxLength"), { target: { value: "140" } });
