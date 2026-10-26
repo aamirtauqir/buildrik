@@ -80,3 +80,26 @@ No row is `code-ahead`; these code capabilities are undrawn and are kept:
 
 ## Verification
 Per slice: targeted vitest; before each commit batch `npx tsc --noEmit > /tmp/tsc-e.log; echo $?` = 0 and `pnpm run verify:ds` (cwd `packages/editor`). Rows move to `drift-fixed` only after a compare (board screenshot vs a probe render); otherwise they stay `drift-open` with "built, not compared".
+
+---
+
+## Status — 2026-10-26 (batch 1 stopped at the ~10-commit mark)
+
+| Archetype | Commit | Rows | Result |
+|---|---|---|---|
+| E1–E3 unsaved guard (ask · saving · failed, "Retry save and leave") | `2c358f499` | 100 | 4 archetypes drift-fixed (probe vs board shots), 36 ask siblings inherit; saving/failed siblings built, not compared |
+| E6 server: `forms.exportSubmissions` takes the view (shared schema → router → service, tests) | `3c8f8c916` | — | full chain; dashboard export unchanged |
+| E5 form submissions: views, filter, bulk select, delete/move states, view-aware export | `17ccd00fc` | ≈350 | S13 drift-fixed (probe, tRPC stubbed), FM01–04 inherit; state and FMC grid rows built, not compared |
+| E4 settings nav, pane header, footer | `85d295d32` | shared by every settings row | compared on General; S01/S02–S04 stay open on their own card content |
+| ACK: footer "Saved · applies on next publish", carried to the Save-and-leave destination | `07c493741` | 27 | built, not compared |
+| PB20/PB21 refusal copy (lifecycle.ts, tray) | `881048db4` | 2 | built; PB19 waits on REQUESTS #13 |
+| Security headers (Browser policies card, HSTS presets/custom/notes) | `bdd7634e6` | 4 | compared on 277:28233's screen; shared card density left open |
+| Read-only banner "Changing {Screen} needs {Role} access." | `9a2edbf6e` | 3 | built, not compared |
+
+Manifest: 375 page-06 rows touched; 45 `drift-fixed` (5 compared directly, 40 via `inheritsFrom`); the rest `drift-open` with what was built and what was not compared.
+
+Requests filed: #10 Settings host inside the editor shell, #11 drop `settings/icons.tsx` from `.ds-green-panels.json` so the dead `NAV_ICONS` can go, #12 Inspector "‹ Back to submissions" band (FM11), #13 viewer publish copy pinned by the lead's StudioHeader test.
+
+Owner decisions open: `blocked:owner-search-mode` (S20 draws an always-on field with results in the pane; owner override 2026-10-04 kept); FM05 popover vs native select; GAP-ST-W saving-as-footer vs the B8-SAVING dialog (one shape adopted).
+
+Next batch (not started): shared settings card density (Section 24→16 padding, 16→14 title — every screen), Analytics (AN ×10 + load states), Languages staged default (S07, GAP-ST-L ×8), workspace door copy (GAP-ST-ORG ×9), load-card copy per screen (AN13-14, SH12-13), offline states (S05, AN07, SH04), FM06 detail as its own view, Overview trial card (blocked on trial in code), publish-from-Settings (GAP-ST-P*), compact 1280 nav, Publish tray residuals (PB13, PB16-17, PB22), Export dialog (EX), Issues (IS).
