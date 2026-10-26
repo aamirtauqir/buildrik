@@ -9359,7 +9359,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Findings show Fix/Open only; Ignore lives on token card (TokenDetailView.tsx:671); no \"Show ignored · N\"; \"Unconnected color\" not a lint row"
+   "verifiedNote": "L-D W5: finding rows read label (\"Missing dark value\") over the finding's sentence, each with Open · Fix (when hinted) · Ignore; \"Show ignored · N\" lists ignored tokens with Restore; Run checks in the header. No \"Unconnected color\" lint rule (Connect to Brand colors stays a door under the list). Built, not compared."
   },
   {
    "nodeId": "203:40130",
@@ -9369,7 +9369,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "\"Connect exact matches\" page vs \"Connect to Brand colors\" captured-scope sheet, \"Apply 3 connections\""
+   "verifiedNote": "L-D W5: \"Connect to Brand colors\", \"Connections update references. The rendered color stays the same.\", rows \"#value → token\" over \"n literal color usages\", Apply n connections, \"Applies in one Undo step.\". Code wins on scope (site-wide, not one section) and on no \"Before connect\" restore point (owner OQ-4). Built, not compared."
   },
   {
    "nodeId": "203:40662",

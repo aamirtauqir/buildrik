@@ -42,11 +42,12 @@ function setup(suggestions: ConnectSuggestion[], applyResult = 3) {
 }
 
 describe("ConnectTokensCheck (BRP1-M7)", () => {
-  it("lists each suggestion as `value · N elements → token`", () => {
+  it("lists each suggestion as `value → token` over its usage count (2L9 B6-B19)", () => {
     setup([PRIMARY, TEXT]);
-    expect(screen.getByText("Connect exact matches")).toBeTruthy();
+    expect(screen.getByText("Connect to Brand colors")).toBeTruthy();
+    expect(screen.getByText("Connections update references. The rendered color stays the same.")).toBeTruthy();
     const rows = screen.getAllByTestId(/^brand-connect-row-/).map((r) => r.querySelector("p")?.textContent);
-    expect(rows).toEqual(["#1A56DB · 2 elements → Primary", "#111827 · 1 element → Text"]);
+    expect(rows).toEqual(["#1A56DB → Primary2 literal color usages", "#111827 → Text1 literal color usage"]);
   });
 
   it("a tie has no target until the user picks one; Preview waits for the pick", () => {
@@ -65,7 +66,7 @@ describe("ConnectTokensCheck (BRP1-M7)", () => {
     expect(screen.getByText("Two tokens match #1A56DB. Choose one.")).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Action · #1A56DB" }));
     fireEvent.click(screen.getByRole("button", { name: "Preview on canvas" }));
-    fireEvent.click(screen.getByRole("button", { name: "Apply" }));
+    fireEvent.click(screen.getByTestId("brand-connect-apply"));
     expect(applyConnect).toHaveBeenCalledWith([{ key: "color|#1a56db", tokenId: "color-action" }]);
   });
 
@@ -74,7 +75,7 @@ describe("ConnectTokensCheck (BRP1-M7)", () => {
     fireEvent.click(screen.getByRole("button", { name: "Preview on canvas" }));
     expect(onPreview).toHaveBeenLastCalledWith(["a", "b", "c"]);
     expect(screen.getByTestId("brand-connect-preview-notice").textContent).toBe(
-      "Preview only · Your colours are unchanged. Confirm to connect 3 elements.",
+      "Preview only · Your colors are unchanged.",
     );
     fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
     expect(onPreview).toHaveBeenLastCalledWith(null);
@@ -91,7 +92,7 @@ describe("ConnectTokensCheck (BRP1-M7)", () => {
   it("Apply calls applyConnect once with the picks, even on a double click, then reports the result", () => {
     const { applyConnect, onPreview, onApplied } = setup([PRIMARY, TEXT], 3);
     fireEvent.click(screen.getByRole("button", { name: "Preview on canvas" }));
-    const apply = screen.getByRole("button", { name: "Apply" });
+    const apply = screen.getByTestId("brand-connect-apply");
     act(() => {
       fireEvent.click(apply);
       fireEvent.click(apply);
@@ -106,17 +107,17 @@ describe("ConnectTokensCheck (BRP1-M7)", () => {
     expect(onApplied).toHaveBeenCalledWith(3);
   });
 
-  it("names no restore point: Apply is one ⌘Z step (owner, OQ-4)", () => {
+  it('names no restore point: "Applies in one Undo step." (owner, OQ-4)', () => {
     setup([PRIMARY]);
-    expect(screen.getByTestId("brand-connect-note").textContent).toBe("Apply is one ⌘Z step.");
+    expect(screen.getByTestId("brand-connect-note").textContent).toBe("Applies in one Undo step.");
     expect(document.body.textContent).not.toMatch(/restore point/i);
   });
 
-  it("nothing to connect: the board's empty state with Back to colours", () => {
+  it("nothing to connect: the board's empty state with Back to Colors", () => {
     const { onBack } = setup([]);
     expect(screen.getByText("Nothing to connect")).toBeTruthy();
     expect(screen.getByText("No unconnected values match your tokens.")).toBeTruthy();
-    fireEvent.click(screen.getByRole("button", { name: "Back to colours" }));
+    fireEvent.click(screen.getByRole("button", { name: "Back to Colors" }));
     expect(onBack).toHaveBeenCalled();
   });
 });

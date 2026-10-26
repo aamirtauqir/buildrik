@@ -314,10 +314,14 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
   /* Shared with DSLintBanner via `useDSLint` so the row count, the banner and
      the Brand checks page can never disagree. */
   const lintIssues = useDSLint(composer);
-  /* Ignored (suppressed) checks, named in the Brand checks caption (G3-123:
-     no pill band). Read here rather than stored: `useDSLint` re-renders this
-     component whenever `lint:changed` fires, every suppress and unsuppress. */
-  const suppressedCount = composer?.designSystem?.lintState?.suppressedCount?.() ?? 0;
+  /* Ignored (suppressed) checks — Checks' "Show ignored · N" (B6-B18). Read
+     here rather than stored: `useDSLint` re-renders this component whenever
+     `lint:changed` fires, every suppress and unsuppress. */
+  const lintState = composer?.designSystem?.lintState;
+  const ignoredChecks = (lintState?.suppressedIds?.() ?? []).map((tokenId) => {
+    const first = lintState?.getIssues(tokenId)[0];
+    return { tokenId, rule: first?.type, message: first?.message };
+  });
   const [page, setPage] = React.useState<BrandPageId>(() => {
     const requested = takeBrandPageRequest(composer) ?? initialPage;
     return requested && isPageId(requested) ? requested : LANDING;
@@ -692,10 +696,8 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
         );
       case "brand-checks":
         /* 7316:84555's page action. The checks also run by themselves on
-           every edit; this runs them now (useDSLint's one trigger). The
-           ignored count (B6-B18 "Show ignored · 1") rides beside it. */
+           every edit; this runs them now (useDSLint's one trigger). */
         return (
-          <>
             <Button
               type="button"
               variant="secondary"
@@ -706,12 +708,6 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
             >
               Run checks
             </Button>
-            {suppressedCount > 0 && (
-              <span className="tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]" data-testid="brand-checks-ignored">
-                Ignored · {suppressedCount}
-              </span>
-            )}
-          </>
         );
       case "spacing":
         /* B6-B22: the three presets as one segmented control, then Reset to
@@ -933,6 +929,9 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
             }}
             onOpen={openToken}
             onConnect={() => openPage("connect")}
+            onIgnore={lintState ? (id) => lintState.suppress(id) : undefined}
+            ignored={ignoredChecks}
+            onRestore={lintState ? (id) => lintState.unsuppress(id) : undefined}
           />
         );
       case "connect":
