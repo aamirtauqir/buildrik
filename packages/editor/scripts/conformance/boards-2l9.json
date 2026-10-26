@@ -11124,9 +11124,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "board",
+   "authority": "code:unbind-on-delete",
    "verified": "drift-open",
-   "verifiedNote": "Interim board refuses delete of valued fields; code hard-deletes — behaviour conflict, owner"
+   "verifiedNote": "Lead auto-decision: a field with values deletes after the value count is typed back (D4); bound fields stay locked (\"Cannot delete — field is bound\"). The board's refusal for valued fields is not adopted."
   },
   {
    "nodeId": "257:53654",
@@ -11334,9 +11334,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "board",
+   "authority": "code:unbind-on-delete",
    "verified": "no",
-   "verifiedNote": "Board blocks delete while used; code unbinds elements then deletes — behaviour conflict, code contract wins pending owner"
+   "verifiedNote": "Lead auto-decision: deleting an in-use collection unbinds its elements (each keeps what it shows) then deletes; the Danger zone and typed dialog name the elements it unbinds (CollectionSettingsPane.tsx). The board's block is not adopted."
   },
   {
    "nodeId": "257:58023",
@@ -11344,9 +11344,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "board",
+   "authority": "code:unbind-on-delete",
    "verified": "no",
-   "verifiedNote": "Board blocks delete while used; code unbinds elements then deletes — behaviour conflict, code contract wins pending owner"
+   "verifiedNote": "Lead auto-decision: deleting an in-use collection unbinds its elements (each keeps what it shows) then deletes; the Danger zone and typed dialog name the elements it unbinds (CollectionSettingsPane.tsx). The board's block is not adopted."
   },
   {
    "nodeId": "257:58253",
