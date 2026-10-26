@@ -206,3 +206,24 @@ shortcuts sheet, preview, share preview, page switcher (lead / Phase 1); inline 
 Each slice: targeted vitest green; `npx tsc --noEmit` exit 0; `pnpm run verify:ds` green before
 each commit batch; manifest rows updated in the same commit. Play F1/F3 live walk and every-03-row
 done are the lead's integration checks (the lane does not start a Next dev server).
+
+## Status — wave 1 (2026-10-26, stopped at ~10 archetype commits per the lane brief)
+
+| Slice | State | Commit |
+|---|---|---|
+| S0 REQUESTS #9 readout escaping | done | e4fc60d84 |
+| S1 Add panel tabs + insert target | built, receipt waits on #11 | f575c101e |
+| S2 Layers footer / no-matches / footnote / commands | built | ca78c68da |
+| S3 Canvas bar + Page width | built | a47dadd4d |
+| S4 Canvas view menu + Grid and snapping | built; Show outlines / Focus mode wait on #12 | a47dadd4d |
+| S5 Pages manager layout | built; Listings columns and Structure header still open | bd62b8997 |
+| S6 Page row menu (template, folder, move) | built; receipts without Undo (#13) | 4e611f5b3 |
+| S7 Rail Help menu (OD-3) | built | 7bcf256f0 |
+| S8 Bulk duplicate / bulk Move copy | partly (bar "Clear", homepage reason and folder-menu copy not drawn in the dump — not done) | 9520119cd |
+| S9 Page settings copy and guards | not started | — |
+| S10 New page dialog copy | partly (subtitle, source select, capacity open) | 7aecf408f |
+| S11–S14 | later slices, not started | — |
+
+Every row touched is `drift-open` "built, not compared" (or `code:` / `blocked:` where stated):
+no board screenshots exist locally and none were spent. One probe look (port 5171, cases
+insert-panel, pages-panel, canvas-footer-toolbar, pages-context-menu) caught the 224-px row menu.
