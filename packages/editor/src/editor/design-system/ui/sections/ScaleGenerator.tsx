@@ -8,8 +8,8 @@
  *                                 Cancel · Preview
  *   8224:243206  preview          the same, the canvas repainted, Cancel · Confirm
  *   8224:243869  confirmed        "<Role> scale added. <Role> now uses your
- *                                 colour." + the toast "Colour scale applied ·
- *                                 Undo ⌘Z"
+ *                                 colour." + the receipt "Color scale added." with
+ *                                 Undo (the one undo)
  *
  * The swatches are the generator's (`generateColorScale`), never the board's
  * samples; the picked colour is kept EXACTLY at its nearest step. Every

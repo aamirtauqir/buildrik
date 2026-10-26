@@ -34,6 +34,7 @@ import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { decodeLogoColors } from "@/editor/design-system/utils/decodeLogo";
 import { takeRestorePoint } from "@/editor/design-system/state/useBrandRestorePoints";
+import { useProjectTokenStore } from "@/editor/design-system/state/TokenRegistryContext";
 import { useBrandPreview } from "@/editor/design-system/state/useBrandPreview";
 import { useGuardedApply } from "@/editor/design-system/state/useGuardedApply";
 
@@ -133,6 +134,9 @@ export const BrandFromSource: React.FC<BrandFromSourceProps> = ({ composer }) =>
   const urlRef = React.useRef<HTMLInputElement>(null);
   /* A late answer to a cancelled or superseded request is dropped. */
   const request = React.useRef(0);
+  /* What the current preview was read from — the receipt names it (B6-B37). */
+  const readFrom = React.useRef("");
+  const { undo } = useProjectTokenStore();
 
   const savedTokens = (): DesignToken[] => {
     const s = composer?.getProjectSettings();
@@ -162,6 +166,7 @@ export const BrandFromSource: React.FC<BrandFromSourceProps> = ({ composer }) =>
 
   const readLogo = async (file: File) => {
     const id = ++request.current;
+    readFrom.current = file.name;
     setState({ kind: "loading", from: file.name });
     try {
       const colours = await decodeLogoColors(file);
@@ -183,6 +188,7 @@ export const BrandFromSource: React.FC<BrandFromSourceProps> = ({ composer }) =>
     const id = ++request.current;
     let host = address;
     try { host = new URL(address).host || address; } catch { /* the server refuses it */ }
+    readFrom.current = host;
     setState({ kind: "loading", from: host });
     try {
       const result = await getBuildrikClient(DASHBOARD_URL).theme.extractBrandFromUrl.mutate({ siteId, url: address });
@@ -224,7 +230,12 @@ export const BrandFromSource: React.FC<BrandFromSourceProps> = ({ composer }) =>
         return false;
       }
       setState({ kind: "confirmed", roles, fonts });
-      addToast({ description: "Brand applied · Undo ⌘Z" });
+      /* B6-B37's receipt: its Undo is the one undo (composer.history). */
+      addToast({
+        description: `Brand updated from ${readFrom.current || "your logo"}. Restore point “Before from logo or URL” saved.`,
+        tone: "success",
+        action: { label: "Undo", onClick: () => { undo(); } },
+      });
       return true;
     });
 

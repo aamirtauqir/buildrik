@@ -391,6 +391,10 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
     k === "color" ? color : k === "spacing" ? spacing : k && isMoreKind(k) ? moreKindRegistry[k] : null;
   /* A refused write (read-only, or a set that would not validate) changed
      nothing — say so rather than letting the edit look applied. */
+  /* A receipt (B6-B10/B20/B40): what happened, and "Undo" — the one undo,
+     composer.history, never a Brand-local stack. */
+  const receipt = (description: string) =>
+    addToast({ description, tone: "success", action: { label: "Undo", onClick: () => { store.undo(); } } });
   const refused = (what: string) => addToast({ description: `${what} wasn't applied — nothing was changed.`, tone: "error" });
   const handleAddToken = (token: DesignToken) => {
     setShowAddToken(false);
@@ -572,10 +576,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
     /* 8224:233678 "replaced": the toast names both and the one undo. */
     const replacement = opts?.replaceWith ? tokenById(opts.replaceWith) : undefined;
     if (replacement) {
-      addToast({
-        description: `${tok.friendlyName ?? tok.name} replaced with ${replacement.friendlyName ?? replacement.name} · Undo ⌘Z`,
-        tone: "info",
-      });
+      receipt(`${tok.friendlyName ?? tok.name} replaced with ${replacement.friendlyName ?? replacement.name}.`);
     }
   };
   const resetToken = (id: string) => {
@@ -585,7 +586,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
     if (!store.commit(allTokens.map((t) => (t.id === id ? seed : t)), "Reset token")) {
       return refused(`Resetting "${tok.name}"`);
     }
-    addToast({ description: `${tok.friendlyName ?? tok.name} reset to default · Undo ⌘Z`, tone: "info" });
+    receipt(`${tok.friendlyName ?? tok.name} reset to default.`);
   };
   const renameToken = (id: string, newId: string) => {
     const tok = tokenById(id);
@@ -791,7 +792,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
             composer={composer}
             roleId={scaleRole}
             /* 8224:243869's toast. */
-            onApplied={() => addToast({ description: "Colour scale applied · Undo ⌘Z", tone: "info" })}
+            onApplied={() => receipt("Color scale added.")}
           />
         );
       case "colour-mode":
@@ -856,7 +857,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
             onPreview={setConnectIds}
             onBack={() => openPage("colours")}
             /* 8224:236236's toast. */
-            onApplied={() => addToast({ description: "Tokens connected · Undo ⌘Z", tone: "info" })}
+            onApplied={(n) => receipt(`Connected ${n} color usage${n === 1 ? "" : "s"}.`)}
           />
         );
       case "restore-points":
@@ -864,7 +865,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
           <RestorePointsSection
             composer={composer}
             /* 8224:245787's toast. */
-            onRestored={() => addToast({ description: "Brand restored · Undo ⌘Z", tone: "info" })}
+            onRestored={(label) => receipt(`Restored “${label}”.`)}
             onFailed={() => refused("That restore point")}
           />
         );

@@ -94,7 +94,7 @@ describe("BrandWorkspace › Import / export", () => {
     await importViaPaste(utils, COLOR_PAYLOAD("color-primary", "Primary", "#FF00AA"));
 
     // G3-123: no status pill band — the import toast says it.
-    expect(await utils.findByText(/^Imported · /)).toBeTruthy();
+    expect(await utils.findByText(/^Imported \d+ tokens?\. One Undo reverts the import\./)).toBeTruthy();
     expect(utils.queryByTestId("brand-section-status-imported")).toBeNull();
     expect(utils.queryByTestId("brand-section-status")).toBeNull();
     expect(composer.designSystem.setTokens).toHaveBeenCalledTimes(1);

@@ -9379,7 +9379,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Toast \"Tokens connected · Undo ⌘Z\" vs receipt with Undo button (one-undo conflict) over remaining finding"
+   "verifiedNote": "L-D S5: receipt \"Connected {n} color usages.\" + Undo → composer.history.undo (one undo). No \"Before connect\" restore point exists (1b OQ-4), so that clause is not claimed. Findings list part open (B18). Built, not compared."
   },
   {
    "nodeId": "203:40929",
@@ -9559,7 +9559,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Success strip + toast \"Brand applied · Undo ⌘Z\" vs receipt Undo button (one-undo conflict)"
+   "verifiedNote": "L-D S5: receipt \"Brand updated from {host}. Restore point “Before from logo or URL” saved.\" + Undo → composer.history.undo. Result rows open (B36). Built, not compared."
   },
   {
    "nodeId": "210:38222",
@@ -9589,7 +9589,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Toast \"Brand restored · Undo ⌘Z\" vs receipt with count + Undo button (one-undo conflict)"
+   "verifiedNote": "L-D S5: receipt \"Restored “{point}”.\" + Undo → composer.history.undo. Places count not available client-side, dropped. Built, not compared."
   },
   {
    "nodeId": "210:38897",
@@ -9680,7 +9680,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Toast only; board result card with counts matching dry-run + receipt Undo (one-undo conflict)"
+   "verifiedNote": "L-D S5: receipt \"Imported {n} tokens. One Undo reverts the import.\" + Undo → composer.history.undo. Result card with counts open (deferred). Built, not compared."
   },
   {
    "nodeId": "212:39840",

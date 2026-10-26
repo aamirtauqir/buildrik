@@ -335,6 +335,8 @@ describe("BrandWorkspace — Review changes (non-blocking, every Brand write thi
     const seed = DEFAULT_TOKENS.find((t) => t.id === "color-primary")!;
     const edited = setTokenLiteral(DEFAULT_TOKENS, "color-primary", "light", "#C2410C");
     const composer = makeFakeComposer();
+    const undo = vi.fn(() => true);
+    Object.assign(composer, { history: { undo } });
     composer.settings.designTokens = edited;
     composer.settings.designTokensSchemaVersion = 6;
     const utils = renderWorkspace(composer);
@@ -344,7 +346,10 @@ describe("BrandWorkspace — Review changes (non-blocking, every Brand write thi
     fireEvent.click(utils.getByRole("menuitem", { name: "Reset to default" }));
     const saved = composer.settings.designTokens as DesignToken[];
     expect(saved.find((t) => t.id === "color-primary")).toEqual(seed);
-    expect(await utils.findByText(/reset to default · Undo ⌘Z/)).toBeTruthy();
+    // The receipt's Undo is the one undo (composer.history), not a Brand stack.
+    expect(await utils.findByText(/reset to default\.$/)).toBeTruthy();
+    fireEvent.click(utils.getByRole("button", { name: "Undo" }));
+    expect(undo).toHaveBeenCalledTimes(1);
   });
 });
 

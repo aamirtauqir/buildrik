@@ -4,7 +4,7 @@
  *   8224:244521  list      "Brand restore points", one row per point: what
  *                          made it and when, Restore
  *   8224:245178  empty     "No restore points yet" and what makes one
- *   8224:245787  restored  the list, plus the toast "Brand restored · Undo ⌘Z"
+ *   8224:245787  restored  the list, plus the receipt "Restored “<point>”." with Undo (the one undo)
  *
  * Restore is `useBrandRestorePoints().restore` — the point's tokens (migrated,
  * laid over the seed, in-use tokens kept) and its Dark mode in ONE
@@ -50,8 +50,8 @@ export function restorePointTime(at: Date, now: Date = new Date()): string {
 
 export interface RestorePointsSectionProps {
   composer: Composer | null | undefined;
-  /** After a point is restored — the workspace's toast. */
-  onRestored?: () => void;
+  /** After a point is restored — the workspace's receipt, given the point's label. */
+  onRestored?: (label: string) => void;
   /** A refused or failed restore — nothing was changed. */
   onFailed?: () => void;
 }
@@ -63,7 +63,8 @@ export const RestorePointsSection: React.FC<RestorePointsSectionProps> = ({ comp
     guard.run(async () => {
       const result = await points.restore(id);
       if (result === "restored") {
-        onRestored?.();
+        const reason = points.rows.find((r) => r.id === id)?.reason ?? "";
+        onRestored?.(RESTORE_REASON_LABEL[reason] ?? "Brand change");
         points.refresh();
         return true;
       }
