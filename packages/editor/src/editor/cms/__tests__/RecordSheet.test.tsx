@@ -151,11 +151,13 @@ describe("RecordSheet", () => {
     await openRow();
     fireEvent.change(screen.getByLabelText("Price *"), { target: { value: "$13" } });
     fireEvent.click(screen.getByTestId("cms-sheet-save"));
-    await waitFor(() =>
-      expect(screen.getByTestId("cms-sheet-state")).toHaveTextContent(/Saved on this device only/i),
+    /* 165:1625 — "You're offline" + what happened to the edits. */
+    await waitFor(() => expect(screen.getByTestId("cms-sheet-save-banner")).toHaveTextContent("You’re offline"));
+    expect(screen.getByTestId("cms-sheet-save-banner")).toHaveTextContent(
+      "Your edits are not saved to the server. Keep this tab open.",
     );
     expect(screen.getByTestId("cms-sheet")).toBeInTheDocument();
-    expect(screen.getByTestId("cms-sheet-save")).toHaveTextContent("Retry save");
+    expect(screen.getByTestId("cms-sheet-save")).toHaveTextContent("Save record");
   });
 
   /* 8139:217560 — a save the server refused because another device changed
@@ -522,6 +524,18 @@ describe("RecordSheet · Leave without saving? with Save and leave (2L9 C1)", ()
     expect(screen.queryByTestId("cms-sheet-return-paused")).toBeNull();
     expect(screen.getByTestId("cms-sheet-save")).toHaveTextContent("Retry save");
     expect(cmsWorkspace.get()).toMatchObject({ recordId: "r1" });
+  });
+
+  it("a failed plain save: banner Couldn’t save, footer keeps the draft, Retry save (165:1072 · F2.17)", async () => {
+    const { composer } = await dirtyRecord();
+    composer.cms.collections.updateContentItem.mockImplementationOnce(() => Promise.reject(new Error("500")));
+    fireEvent.click(screen.getByTestId("cms-sheet-save"));
+    expect(await screen.findByTestId("cms-sheet-save-banner")).toHaveTextContent(
+      "Couldn’t saveYour edits are still here. Retry when you’re ready.",
+    );
+    expect(screen.getByTestId("cms-sheet-state")).toHaveTextContent("Couldn’t save · your draft is kept");
+    expect(screen.getByTestId("cms-sheet-save")).toHaveTextContent("Retry save");
+    expect((screen.getByLabelText("Price *") as HTMLInputElement).value).toBe("$13");
   });
 
   it("a plain save reads Saving… while it runs (165:797)", async () => {

@@ -75,7 +75,8 @@ const NAV_TAB =
   "tw:h-7 tw:min-h-0 tw:rounded-none tw:border-0 tw:border-b-2 tw:border-transparent tw:bg-transparent tw:px-2.5 tw:py-0 tw:text-[13px] " +
   "tw:font-medium tw:leading-5 tw:text-[var(--bk-gray-700)] tw:shadow-none tw:enabled:hover:bg-transparent tw:enabled:hover:text-[var(--bk-ink)] tw:focus:ring-0";
 
-const OFFLINE = "Saved on this device only. The server is offline — the change will sync when you reconnect.";
+/* 165:1625 — the queued mirror: the change is on this device, not the server. */
+const OFFLINE = "Your edits are not saved to the server. Keep this tab open.";
 const FAILED = "Couldn’t save this record. Your changes are still here — try again.";
 
 /** A way out of a dirty record: where it goes, and how the guard names it.
@@ -483,6 +484,21 @@ export function RecordSheet({
           </p>
           {saveError !== FAILED ? <p className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-error-text)]">{saveError}</p> : null}
         </div>
+      ) : (saveError === FAILED || saveError === OFFLINE) && !blocked && !saving ? (
+        /* 165:1072 (failed) · 165:1625 (offline): the banner says what
+           happened to the edits; the footer keeps the action. */
+        <div
+          className={`tw:flex tw:flex-none tw:flex-col tw:gap-0.5 tw:rounded-[6px] tw:px-4 tw:py-2 ${saveError === OFFLINE ? "tw:bg-[var(--bk-warning-tint)]" : "tw:bg-[var(--bk-error-tint)]"}`}
+          role="alert"
+          data-testid="cms-sheet-save-banner"
+        >
+          <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)]">
+            {saveError === OFFLINE ? "You’re offline" : "Couldn’t save"}
+          </p>
+          <p className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-soft)]">
+            {saveError === OFFLINE ? OFFLINE : "Your edits are still here. Retry when you’re ready."}
+          </p>
+        </div>
       ) : returnCancelled && saving ? (
         <p className="tw:m-0 tw:flex-none tw:px-4 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]" role="status" data-testid="cms-sheet-return-cancelled">
           Return cancelled. Your record save is still in progress.
@@ -606,7 +622,7 @@ export function RecordSheet({
           <span className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
             <span
               className={`tw:text-[12px] tw:leading-[18px] tw:font-medium ${saveError && !blocked ? "tw:text-[var(--bk-error-text)]" : "tw:text-[var(--bk-ink)]"}`}
-              role={saveError && !blocked && !paused ? "alert" : undefined}
+              role={saveError && !blocked && !paused && saveError !== FAILED && saveError !== OFFLINE ? "alert" : undefined}
               data-testid="cms-sheet-state"
             >
               {gone
@@ -617,6 +633,11 @@ export function RecordSheet({
                     ? "Saving…"
                   : paused
                     ? "Couldn’t save · return paused"
+                  : saveError === FAILED
+                    ? /* F2.17 (308:18475) — the acceptance journey's wording. */
+                      "Couldn’t save · your draft is kept"
+                  : saveError === OFFLINE
+                    ? "Not saved to the server yet"
                   : saveError ??
                     (noFields
                       ? "Add a field to this collection before saving a record."
@@ -648,7 +669,13 @@ export function RecordSheet({
             </Button>
           )}
           <Button size="xs" className={SMALL_BTN} disabled={!canSave || (!dirty && !!record) || saving} data-testid="cms-sheet-save" onClick={() => void save()}>
-            {saving ? "Saving…" : paused ? "Retry and return" : saveError && !blocked ? "Retry save" : "Save record"}
+            {saving
+              ? "Saving…"
+              : paused
+                ? "Retry and return"
+                : saveError && saveError !== OFFLINE && !blocked
+                    ? "Retry save"
+                    : "Save record"}
           </Button>
         </div>
       </footer>

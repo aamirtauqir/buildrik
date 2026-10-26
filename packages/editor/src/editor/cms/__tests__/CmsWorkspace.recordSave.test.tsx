@@ -46,10 +46,11 @@ async function openNewAndSave(composer: unknown) {
   fireEvent.click(await screen.findByTestId("cms-ws-add-record"));
   fireEvent.change(await screen.findByLabelText(/Name/), { target: { value: "Hello" } });
   fireEvent.click(screen.getByTestId("cms-sheet-save"));
-  await waitFor(() => expect(screen.getByTestId("cms-sheet-save").textContent).toMatch(/Retry save/));
+  /* Settled: queued (offline banner) or refused (the reason in the footer). */
+  await waitFor(() => expect(screen.getByTestId("cms-sheet-state").textContent).toMatch(/Not saved to the server yet|already uses/));
 }
 
-describe("a new record's Retry save (CMS-01)", () => {
+describe("a new record's second save after a queued one (CMS-01)", () => {
   it("updates the record the first save created instead of creating another", async () => {
     const { composer } = makeEngine({ collections: [COL] });
     await openNewAndSave(composer);

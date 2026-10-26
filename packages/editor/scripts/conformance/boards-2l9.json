@@ -7004,7 +7004,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code: footer state line + \"Retry save\" (:711); board: top banner \"Couldn’t save · edits still here\""
+   "verifiedNote": "built, not compared — L-C C5: banner \"Couldn’t save\" + \"Your edits are still here. Retry when you’re ready.\"; footer/button follow Play F2.17 (\"Couldn’t save · your draft is kept\", Retry save) where the two boards disagree (board: \"Retry\")."
   },
   {
    "nodeId": "165:1350",
@@ -7025,7 +7025,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code saves to device with offline footer copy; board banner \"You’re offline · not saved to server\""
+   "verifiedNote": "built, not compared — L-C C5: queued save shows banner \"You’re offline\" + \"Your edits are not saved to the server. Keep this tab open.\"; button stays Save record."
   },
   {
    "nodeId": "165:1903",
@@ -21664,7 +21664,7 @@
    "status": "active",
    "authority": "board",
    "verified": "match",
-   "verifiedNote": "Save failed, draft kept, stay in record (RecordSheet.tsx:326)."
+   "verifiedNote": "built, not compared — L-C C5: footer \"Couldn’t save · your draft is kept\" + Retry save; sheet stays open with edits (RecordSheet.tsx)."
   },
   {
    "nodeId": "308:18838",
