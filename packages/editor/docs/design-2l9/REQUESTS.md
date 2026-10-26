@@ -20,3 +20,7 @@ Format: lane/task · file · change · board · why.
 ## Open — found on the live walk (2026-10-26)
 
 9. **L-A · canvas footer status** · the selection readout double-escapes HTML entities ("Heading · Tom &amp;amp; Jerry" for "Tom & Jerry") · — · present on `main`, not caused by design-2l9.
+
+## Open — lane L-F (2026-10-26)
+
+10. **L-F S1 · AquibraStudio.tsx `resendReview` (:519)** · replace its body with `sendReviewRound(composer, { email: clientEmail }, { preview: options?.preview ?? true })` from `shell/reviewSend.ts`, taking `(clientEmail?, options?: { preview: boolean })`; widen `TabRouter.onResendReview` to the same signature · Play F5.04 `307:16107` · a failed render must throw `ReviewPreviewError` so ReviewTab asks "Try again / Send without preview"; today the panel re-send still sends with no preview, unasked.

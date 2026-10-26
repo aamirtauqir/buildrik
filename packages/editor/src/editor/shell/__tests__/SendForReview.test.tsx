@@ -6,7 +6,7 @@
  * state-change trigger would miss.
  */
 import * as React from "react";
-import { render, screen, fireEvent, cleanup, act, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, cleanup, act, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/services/ReviewService", () => ({
@@ -22,6 +22,7 @@ vi.mock("../exportPublishPages", () => ({
 
 import { SendForReview } from "../SendForReview";
 import { submitForReview } from "@/services/ReviewService";
+import { exportPublishPages } from "../exportPublishPages";
 
 afterEach(() => {
   cleanup();
@@ -130,5 +131,53 @@ describe("SendForReview (F4)", () => {
     });
     expect(screen.getByRole("button", { name: "Send again" })).toBeTruthy();
     vi.useRealTimers();
+  });
+});
+
+describe("SendForReview — Play F5.04: a failed preview sends nothing and asks", () => {
+  const composer = { emit: vi.fn() } as never;
+  const failOnce = () =>
+    (exportPublishPages as unknown as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error("render"));
+
+  it("stops before the send and offers Cancel / Try again / Send without preview", async () => {
+    failOnce();
+    render(<SendForReview composer={composer} roundNumber={3} />);
+    sendNow();
+    expect(await screen.findByText("We couldn’t render a preview")).toBeTruthy();
+    expect(submitForReview).not.toHaveBeenCalled();
+    expect(screen.getByRole("button", { name: "Try again" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Send without preview" })).toBeTruthy();
+  });
+
+  it("Send without preview submits with no snapshot", async () => {
+    failOnce();
+    render(<SendForReview composer={composer} />);
+    sendNow();
+    fireEvent.click(await screen.findByRole("button", { name: "Send without preview" }));
+    await waitFor(() => expect(submitForReview).toHaveBeenCalledTimes(1));
+    expect((submitForReview as unknown as ReturnType<typeof vi.fn>).mock.calls[0][3]).toBeUndefined();
+  });
+
+  it("Try again renders the preview again and sends it", async () => {
+    failOnce();
+    render(<SendForReview composer={composer} />);
+    sendNow();
+    fireEvent.click(await screen.findByRole("button", { name: "Try again" }));
+    await waitFor(() => expect(submitForReview).toHaveBeenCalledTimes(1));
+    expect(exportPublishPages).toHaveBeenCalledTimes(2);
+    expect((submitForReview as unknown as ReturnType<typeof vi.fn>).mock.calls[0][3]).toEqual([]);
+  });
+
+  it("Cancel keeps the form and what was typed", async () => {
+    failOnce();
+    render(<SendForReview composer={composer} />);
+    fireEvent.click(screen.getByRole("button", { name: "Send for review" }));
+    fireEvent.change(screen.getByLabelText("Client email"), { target: { value: "lena@example.test" } });
+    fireEvent.click(screen.getByRole("button", { name: "Send" }));
+    const failed = await screen.findByTestId("review-preview-failed");
+    fireEvent.click(within(failed).getByRole("button", { name: "Cancel" }));
+    await waitFor(() => expect(screen.queryByText("We couldn’t render a preview")).toBeNull());
+    expect((screen.getByLabelText("Client email") as HTMLInputElement).value).toBe("lena@example.test");
+    expect(submitForReview).not.toHaveBeenCalled();
   });
 });

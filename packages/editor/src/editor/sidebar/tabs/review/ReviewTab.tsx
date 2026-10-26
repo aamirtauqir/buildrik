@@ -52,6 +52,8 @@ import {
   useToast,
 } from "@/editor/chrome-ui";
 import { SendForReview } from "@/editor/shell/SendForReview";
+import { ReviewPreviewError } from "@/editor/shell/reviewSend";
+import { ReviewSentModal } from "@/editor/shell/modals/ReviewSentModal";
 import { useEditorRole } from "@/editor/shell/hooks/useEditorRole";
 import { EVENTS } from "@/shared/constants/events";
 import { anchorId, locateComment } from "./locate";
@@ -87,7 +89,13 @@ export interface ReviewTabProps {
   /** A re-send goes to whoever the round was sent to. The panel passes the
    *  round's `invitedEmail`; without it `submitReview` mints no token and the
    *  new round is invisible to the client — measured 2026-08-25. */
-  onResend?: (clientEmail?: string) => Promise<{ inviteEmailSent: boolean | null } | void>;
+  /** `preview: false` sends without the frozen preview — the designer's
+   *  choice after a render failure (Play F5.04), which the shell reports by
+   *  throwing `ReviewPreviewError` (`shell/reviewSend.ts`). */
+  onResend?: (
+    clientEmail?: string,
+    options?: { preview: boolean },
+  ) => Promise<{ inviteEmailSent: boolean | null } | void>;
   /** Composer for the orphan-comment events (Detached group + reattach) and
    *  for page names — the boards label groups "OPEN · HOME", not by page id. */
   composer?: import("@/engine").Composer | null;
@@ -194,6 +202,8 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
   /* Board 4418:115766 — the comment being re-attached through the picker. */
   const [reattaching, setReattaching] = React.useState<ReviewComment | null>(null);
   const [resending, setResending] = React.useState(false);
+  /** The re-send's preview render failed; nothing was sent (F5.04). */
+  const [resendPreviewFailed, setResendPreviewFailed] = React.useState(false);
   const [notice, setNotice] = React.useState<string | null>(null);
   /* The banner's walk (retired ReviewBar's "Next ›"): steps through the OPEN
      comments in server order, switching page and selecting each anchor via
@@ -339,15 +349,16 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
     }
   };
 
-  const doResend = async () => {
+  const doResend = async (preview = true) => {
     setConfirmResend(false);
+    setResendPreviewFailed(false);
     if (!onResend) return;
     setResending(true);
     try {
       // Carry the round's client forward. `submitReview` only mints a token
       // when it is given an email, so a re-send without this produced a round
       // with `token: null` that the client could never open.
-      const outcome = await onResend(round?.invitedEmail ?? undefined);
+      const outcome = await onResend(round?.invitedEmail ?? undefined, { preview });
       await reload();
       /* The round lands either way — a mail failure must never fail the
          re-send. Saying nothing is what made a misconfigured SMTP look
@@ -357,6 +368,9 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
           ? "Round created — but the invite email didn't go out. Send your client the link yourself."
           : null,
       );
+    } catch (err) {
+      if (!(err instanceof ReviewPreviewError)) throw err;
+      setResendPreviewFailed(true);
     } finally {
       setResending(false);
     }
@@ -844,6 +858,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
       composer={composer ?? null}
       disabledReason={isViewer ? "Viewers can't send for review — ask an editor" : undefined}
       reviewStatus={round ? { at: round.revision } : null}
+      roundNumber={round ? round.roundNumber + 1 : 1}
       onSent={(outcome) => {
         /* The panel keeps this, not SendForReview — that component is
            unmounted by the very reload this triggers. */
@@ -1169,6 +1184,15 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
           composer?.emit("comments:refresh", {});
         }}
         onPickOnCanvas={reattaching ? () => composer?.emit("comments:reattach-start", { id: reattaching.id }) : undefined}
+      />
+
+      {/* Play F5.04 — the re-send's preview failed and nothing went out. */}
+      <ReviewSentModal
+        state={resendPreviewFailed ? "preview-failed" : null}
+        roundNumber={round.roundNumber + 1}
+        onClose={() => setResendPreviewFailed(false)}
+        onRetryPreview={() => void doResend(true)}
+        onSendWithoutPreview={() => void doResend(false)}
       />
 
       {/* Board 4418:120052 — the re-send confirm is a modal (G1-058), from the

@@ -21314,7 +21314,7 @@
    "status": "active",
    "authority": "board",
    "verified": "match",
-   "verifiedNote": "Sending state renders snapshot first (SendForReview.tsx:58)."
+   "verifiedNote": "L-F S1: preparing state adopts board copy \"Preparing the review preview…\" / \"Creating the frozen Round {n} snapshot. Nothing has been sent yet.\" (ReviewSentModal). Step executable; built, not compared."
   },
   {
    "nodeId": "307:16107",
@@ -21324,7 +21324,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Preview failure auto-sends without preview (SendForReview.tsx:110); no Try again / Send without preview choice."
+   "verifiedNote": "L-F S1: built, not compared. A render failure now sends nothing and opens ReviewSentModal `preview-failed` (board copy, Cancel · Send without preview · Try again) from SendForReview (shell/reviewSend.ts). Panel re-send path shows the same dialog once AquibraStudio.resendReview throws ReviewPreviewError (REQUESTS #10)."
   },
   {
    "nodeId": "307:16503",
@@ -21334,7 +21334,7 @@
    "status": "active",
    "authority": "board",
    "verified": "match",
-   "verifiedNote": "\"Sending…\" (SendForReview.tsx:60)."
+   "verifiedNote": "L-F S1: \"Sending Round {n}…\" / \"The frozen preview is ready…\" (ReviewSentModal). Step executable; built, not compared."
   },
   {
    "nodeId": "307:16899",
@@ -21794,7 +21794,7 @@
    "status": "active",
    "authority": "board",
    "verified": "match",
-   "verifiedNote": "Send proceeds without preview (SendForReview.tsx:110)."
+   "verifiedNote": "L-F S1: reached only by the designer's \"Send without preview\" now; copy \"No preview will be included…\" (ReviewSentModal). Built, not compared."
   },
   {
    "nodeId": "310:23367",
