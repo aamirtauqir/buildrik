@@ -117,7 +117,7 @@ export function createTabHandoff({ siteId, composer, save, channel }: TabHandoff
         id: BANNER_ID.otherTab,
         tone: "warning",
         message: "The other tab couldn’t save — finish there first. Nothing turned read-only.",
-        actions: [{ label: "Edit here", onClick: claim, testId: "banner-edit-here" }],
+        actions: [{ label: "Edit here", onClick: claim, testId: "banner-edit-here", primary: true }],
       });
     }
   };

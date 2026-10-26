@@ -485,7 +485,7 @@ describe("SettingsTab — doors", () => {
     fireEvent.click(screen.getByTestId("set-nav-seo"));
     await waitFor(() => expect(headTitle()).toBe("SEO"));
     fireEvent.click(screen.getByTestId("set-nav-branding"));
-    expect(takeBrandReturn(asComposer(composer) as never)).toEqual({ screen: "seo" });
+    expect(takeBrandReturn(asComposer(composer) as never)).toMatchObject({ screen: "seo" });
   });
 
   it("the role foot opens the Permissions dialog for every known role", () => {

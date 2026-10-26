@@ -11,7 +11,7 @@ import * as React from "react";
 import { render, screen, fireEvent, cleanup, act } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ToastProvider } from "@/editor/chrome-ui";
-import { LoadErrorBanner, loadErrorDetails } from "../LoadErrorBanner";
+import { LoadErrorBanner } from "../LoadErrorBanner";
 import { setSiteLoadStatus, type SiteLoadFailure } from "../siteLoadStatus";
 import { registerWorkSnapshot } from "../workSnapshot";
 import { showOtherTabBanner, clearGlobalBanner, BANNER_ID } from "../globalBanners";
@@ -91,11 +91,13 @@ describe("LoadErrorBanner — cause and copy", () => {
     expect(screen.getByRole("button", { name: /^retry$/i })).toBeInTheDocument();
   });
 
-  it("the ✕ dismisses", () => {
-    const onDismiss = vi.fn();
-    renderBanner({ kind: "network", onDismiss });
-    fireEvent.click(screen.getByRole("button", { name: "Dismiss" }));
-    expect(onDismiss).toHaveBeenCalled();
+  /* 2L9 B7-G02 225:2821 — the bar carries the line, Download local copy and
+     the filled Retry, and nothing else: no Copy details, no ✕ dismiss. */
+  it("draws only the board's controls", () => {
+    renderBanner({ kind: "network" });
+    expect(screen.queryByRole("button", { name: /copy details/i })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Dismiss" })).toBeNull();
+    expect(screen.getByTestId("load-error-banner").className).toMatch(/tw:h-10/);
   });
 });
 
@@ -145,7 +147,7 @@ describe("LoadErrorBanner — Retry", () => {
 
     expect(screen.queryByRole("button", { name: /reload page/i })).toBeNull();
     await press(1000);
-    expect(screen.getByTestId("load-error-attempts").textContent).toBe("Retry 1 of 3 didn’t load.");
+    expect(screen.getByTestId("load-error-attempts").textContent?.trim()).toBe("Retry 1 of 3 didn’t load.");
     expect(screen.getByRole("button", { name: /reload page/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /^retry$/i })).toBeInTheDocument();
 
@@ -173,24 +175,6 @@ describe("LoadErrorBanner — Retry", () => {
       vi.advanceTimersByTime(1000);
     });
     expect(onDismiss).toHaveBeenCalledTimes(1);
-  });
-});
-
-describe("LoadErrorBanner — Copy details", () => {
-  it("copies the error code and the request id, and nothing else", async () => {
-    setSiteLoadStatus({ failure: failure({ url: "https://app.example/api/trpc/sites.get?token=secret" }), retry: null });
-    renderBanner({ kind: "network" });
-    await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: /copy details/i }));
-    });
-    expect(writeClipboardText).toHaveBeenCalledWith("Error code: INTERNAL_SERVER_ERROR\nRequest id: req-42");
-  });
-
-  it("without a server code it names the status, and says when no request id was sent", () => {
-    expect(loadErrorDetails("network", failure({ code: null, status: 502, requestId: null }))).toBe(
-      "Error code: HTTP 502\nRequest id: none sent",
-    );
-    expect(loadErrorDetails("offline", null)).toBe("Error code: offline\nRequest id: none sent");
   });
 });
 

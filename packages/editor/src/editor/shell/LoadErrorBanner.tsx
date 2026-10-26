@@ -18,13 +18,14 @@
  * the only honest actions are a page reload and the dashboard. With no
  * published retry it falls back to `onRetry` (a page reload).
  *
- * "Copy details" carries the error code and the server's request id — what
- * support needs to find the request — and nothing else: never a URL, never a
- * token.
- *
- * Board 297:2139 (`state-banner`) is the visual contract: 14 medium on the
- * tone's tint, 20/12 insets, radius 8, plain bordered actions (the accent fill
- * is reserved for the one CTA per screen, Button 9:102).
+ * Wave 3 (owner: the board wins on visuals): B7-G02 `225:2821` draws the
+ * full-bleed 40 px bar — ✕ glyph, the line, "Download local copy" and the
+ * filled Retry — and nothing else, so "Copy details" and the trailing ✕
+ * dismiss are gone (the request id still reaches the Sentry report). A
+ * retry's attempt count rides the same line. For an expired session the
+ * board's one action is Sign in; Retry stays beside it, unfilled, because
+ * nothing else re-runs the load after signing in elsewhere
+ * (`code:auth-retry-after-sign-in`).
  *
  * L-F (2026-10-26): the bar is the lead entry of the one global banner slot
  * (`GlobalBannerSlot`, board G31), so the other conditions wait behind its
@@ -39,12 +40,18 @@
  */
 
 import * as React from "react";
-import { X } from "lucide-react";
-import { Button, CopyButton, IconButton } from "@/editor/chrome-ui";
+import { Button } from "@/editor/chrome-ui";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
-import { useSiteLoadStatus, type SiteLoadErrorKind, type SiteLoadFailure } from "./siteLoadStatus";
-import { BANNER_ACTION as ACTION, BANNER_BAR as BAR, BANNER_TONE, GlobalBannerSlot } from "./GlobalBannerSlot";
+import { useSiteLoadStatus, type SiteLoadErrorKind } from "./siteLoadStatus";
+import {
+  BANNER_ACTION as ACTION,
+  BANNER_ACTION_SECONDARY as ACTION_SECONDARY,
+  BANNER_BAR as BAR,
+  BANNER_TONE,
+  GlobalBannerSlot,
+  ToneGlyph,
+} from "./GlobalBannerSlot";
 import { BANNER_ID } from "./globalBanners";
 import { currentWork, downloadProject } from "./workSnapshot";
 import { PermissionsModal } from "./modals/PermissionsModal";
@@ -89,12 +96,6 @@ const DOWNLOAD_LABEL: Partial<Record<SiteLoadErrorKind, string>> = {
   forbidden: "Download them",
 };
 
-/** What support needs to find this request: code and request id, no more. */
-export function loadErrorDetails(kind: SiteLoadErrorKind, failure: SiteLoadFailure | null): string {
-  const code = failure?.code ?? (failure?.status ? `HTTP ${failure.status}` : kind);
-  return `Error code: ${code}\nRequest id: ${failure?.requestId ?? "none sent"}`;
-}
-
 const LoadErrorBar: React.FC<LoadErrorBannerProps & { kind: SiteLoadErrorKind; more: React.ReactNode }> = ({
   kind,
   onRetry,
@@ -102,7 +103,7 @@ const LoadErrorBar: React.FC<LoadErrorBannerProps & { kind: SiteLoadErrorKind; m
   onDismiss,
   more,
 }) => {
-  const { failure, retry } = useSiteLoadStatus();
+  const { retry } = useSiteLoadStatus();
   const [permissionsOpen, setPermissionsOpen] = React.useState(false);
   /* Board 294:1992's "Reconnecting…" state, on the control. The ref, not the
      state, is what refuses a second click: two clicks in one frame both read
@@ -153,35 +154,34 @@ const LoadErrorBar: React.FC<LoadErrorBannerProps & { kind: SiteLoadErrorKind; m
   const work = downloadLabel ? currentWork(getSiteIdFromUrl()) : null;
   const toDashboard = () => window.location.assign(`${DASHBOARD_URL}/dashboard`);
 
+  const tone = kind === "forbidden" ? "warning" : "error";
+  const attempts =
+    failedRetries > 0
+      ? exhausted
+        ? ` Tried ${MAX_RETRIES} times — it still didn’t load.`
+        : ` Retry ${failedRetries} of ${MAX_RETRIES} didn’t load.`
+      : "";
+
   return (
     <div
-      className={`${BAR} ${kind === "forbidden" ? BANNER_TONE.warning : BANNER_TONE.error}`}
+      className={`${BAR} ${BANNER_TONE[tone]}`}
       role="alert"
       aria-label={LABEL[kind]}
       data-testid="load-error-banner"
       data-kind={kind}
     >
-      <div className="tw:grow tw:basis-60" data-testid="load-error-message">
-        {/* Board 227:7411 opens the warning line with a glyph. Decorative —
-            the role and the label already name it. */}
-        {kind === "forbidden" ? <span aria-hidden="true">⚠&nbsp;&nbsp;</span> : null}
+      <ToneGlyph tone={tone} />
+      <span className="tw:min-w-0 tw:flex-1 tw:truncate" data-testid="load-error-message" title={COPY[kind] + attempts}>
         {COPY[kind]}
-        {failedRetries > 0 ? (
-          <span className="tw:block tw:mt-1 tw:text-[13px] tw:font-normal" data-testid="load-error-attempts">
-            {exhausted
-              ? `Tried ${MAX_RETRIES} times — it still didn’t load.`
-              : `Retry ${failedRetries} of ${MAX_RETRIES} didn’t load.`}
-          </span>
-        ) : null}
-      </div>
-      <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-        <CopyButton content={loadErrorDetails(kind, failure)} label="Copy details" className={ACTION} />
+        {attempts ? <span data-testid="load-error-attempts">{attempts}</span> : null}
+      </span>
+      <div className="tw:flex tw:flex-none tw:items-center tw:gap-2.5">
         {work && downloadLabel ? (
           <Button
             color="light"
             size="xs"
             onClick={() => downloadProject(work, "local-copy")}
-            className={ACTION}
+            className={ACTION_SECONDARY}
             data-testid="load-error-download"
           >
             {downloadLabel}
@@ -192,48 +192,43 @@ const LoadErrorBar: React.FC<LoadErrorBannerProps & { kind: SiteLoadErrorKind; m
             color="light"
             size="xs"
             onClick={() => setPermissionsOpen(true)}
-            className={ACTION}
+            className={ACTION_SECONDARY}
             data-testid="load-error-ask-admin"
           >
             Ask an admin
           </Button>
         ) : null}
-        {kind === "auth" ? (
-          <Button color="light" size="xs" onClick={onSignIn} className={ACTION}>
-            Sign in ↗
-          </Button>
-        ) : null}
         {failedRetries > 0 ? (
-          <Button color="light" size="xs" onClick={reload} className={ACTION} data-testid="load-error-reload">
+          <Button color="light" size="xs" onClick={reload} className={ACTION_SECONDARY} data-testid="load-error-reload">
             Reload page
           </Button>
         ) : null}
         {showLeaveActions ? (
-          <Button color="light" size="xs" onClick={toDashboard} className={ACTION} data-testid="load-error-dashboard">
+          <Button color="light" size="xs" onClick={toDashboard} className={ACTION_SECONDARY} data-testid="load-error-dashboard">
             {kind === "missing" ? "Go to dashboard ↗" : "Back to dashboard"}
           </Button>
         ) : null}
         {canRetry ? (
           <Button
-            color="light"
+            color={kind === "auth" ? "light" : undefined}
             size="xs"
             disabled={busy}
             aria-busy={busy}
             /* Button 9:102: a disabled control names the reason. */
             title={busy ? "Reaching the server — this usually takes a moment." : undefined}
             onClick={runRetry}
-            className={ACTION}
+            className={kind === "auth" ? ACTION_SECONDARY : ACTION}
             data-testid="load-error-retry"
           >
             {busy ? "Reconnecting…" : "Retry"}
           </Button>
         ) : null}
-        {more}
-        {onDismiss ? (
-          <IconButton label="Dismiss" size="sm" onClick={onDismiss} className="tw:text-current">
-            <X size={14} aria-hidden="true" />
-          </IconButton>
+        {kind === "auth" ? (
+          <Button size="xs" onClick={onSignIn} className={ACTION}>
+            Sign in ↗
+          </Button>
         ) : null}
+        {more}
       </div>
       {kind === "forbidden" ? (
         <PermissionsModal open={permissionsOpen} role="VIEWER" onClose={() => setPermissionsOpen(false)} />

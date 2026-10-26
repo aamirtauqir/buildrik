@@ -79,6 +79,8 @@ const ACTION_DESCRIPTIONS: Record<string, string> = {
   "keyboard-reorder": "Reordered layer",
   reorder: "Reordered layer",
   "reorder-section": "Reordered section",
+  "reorder pages": "Reordered pages",
+  "detach instance": "Detached component instance",
   "move-layer-top": "Brought layer to front",
   "move-layer-bottom": "Sent layer to back",
   // Group / arrange
@@ -123,9 +125,6 @@ const ACTION_DESCRIPTIONS: Record<string, string> = {
   "replace across selected pages": "Replaced media across pages",
   "instance-sync": "Synced component instances",
   "variant-change": "Changed variant",
-  "detach instance": "Detached instance",
-  // Pages
-  "reorder pages": "Reordered pages",
 };
 
 /**
