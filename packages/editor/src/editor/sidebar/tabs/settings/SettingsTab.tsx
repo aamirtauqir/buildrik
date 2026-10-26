@@ -719,7 +719,13 @@ export const SettingsTab: React.FC<
     if (!readOnly || !screenRules || !current || screenId === "danger-zone") return screenNode;
     return (
       <>
-        <ReadOnlyBanner message={`Changing ${current.title} needs ${ROLE_LABEL[screenRules.minRole]} access.`} />
+        <ReadOnlyBanner
+          message={
+            screenId === "domains"
+              ? /* B8-S19 238:15344 draws Domains' own sentence. */ "Domains need Admin access. Ask an admin to change them."
+              : `Changing ${current.title} needs ${ROLE_LABEL[screenRules.minRole]} access.`
+          }
+        />
         {/* A disabled fieldset disables every native control inside it; its
             cards sit 16 apart, as on the editable screen (set-body's gap). */}
         <fieldset disabled className="tw:m-0 tw:flex tw:min-w-0 tw:flex-col tw:gap-4 tw:border-0 tw:p-0" data-testid="set-readonly-screen">

@@ -13367,7 +13367,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): unreachable live — Needs an Editor-role account; the QA user is Owner on this site. | prior: Banner uses the shared 'Changing Domains needs Admin access.' (SH05/SH10 wording); the S19 board says 'Domains need Admin access. Ask an admin to change them.' — two board wordings for one banner, the newer SH family adopted. Built, not compared."
+   "verifiedNote": "Wave 3: the Domains read-only banner now reads the board's 'Domains need Admin access. Ask an admin to change them.' (other screens keep 'Changing <Screen> needs <Role> access.'); not probe-rendered — the read-only state needs an Editor role the probe composer cannot carry."
   },
   {
    "nodeId": "238:15632",
@@ -13447,7 +13447,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — During Verify the button reads 'Checking…' but the status word stays 'Not verified'; board shows 'Checking status…' as the status line. | prior: Built, not compared: status words and Verify per AN01 (wave 2); detail lines as in code."
+   "verifiedNote": "Wave 3: while Verify runs the status line reads 'Checking status…' and the button 'Checking…' (tested); not probe-compared (the probe composer carries no GA id)."
   },
   {
    "nodeId": "245:45673",
@@ -13457,7 +13457,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — 'Waiting for data' + 'Measurement ID verified on …' inline like the board, but Verify also opens a 'Format OK · no events yet' modal the board does not draw. | prior: Built, not compared: status words and Verify per AN01 (wave 2); detail lines as in code."
+   "verifiedNote": "Wave 3: Verify no longer opens a dialog (the board draws none; ConnectionVerifiedDialog deleted); a fresh verification with no events reads 'No events received yet. Verification is an unsaved setting.' (tested); not probe-compared."
   },
   {
    "nodeId": "245:45931",
@@ -13467,7 +13467,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): unreachable live — 'Receiving data' needs real tracker events for this site; none exist. | prior: Built, not compared: status words and Verify per AN01 (wave 2); detail lines as in code."
+   "verifiedNote": "Wave 3: 'Receiving data' over 'Last received today at HH:MM · N events in the last 24 hours' (tested); unreachable live (no tracker events), not probe-compared."
   },
   {
    "nodeId": "245:46189",
@@ -13487,7 +13487,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — 'Couldn't check status' + retry sentence, values kept: matches; error sentence is grey under the status word, board draws it red below the tracker note. | prior: Built, not compared (error state): a failed Verify shows \"Couldn’t check status\" / \"The status service did not respond. Try Verify again.\" in the status row; values kept (tested)."
+   "verifiedNote": "Wave 3: the failure sentence is error ink under the tracker note, as drawn (tested); not probe-compared."
   },
   {
    "nodeId": "245:46707",

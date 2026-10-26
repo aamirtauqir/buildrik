@@ -16,8 +16,9 @@
  * §5; GA's Data API is OAuth, `blocked:external` — read on open (3953:49515
  * loading, 3953:49670 load-error) and again on Verify, which checks the id's
  * shape, stamps `verifiedAt` into the draft (flushed on the next Save — no
- * mutation of its own, phase2-backend §1) and opens Connection verified
- * (4256:26844). A malformed id shows its provider's sentence under the field
+ * mutation of its own, phase2-backend §1); the status row says what it
+ * found (B8-AN02 "Checking status…", AN03, AN04) — no dialog, the board draws
+ * none. A malformed id shows its provider's sentence under the field
  * and holds Save (3397:34148); a refused save shows the banner (3951:26455).
  *
  * @license BSD-3-Clause
@@ -29,7 +30,6 @@ import { getBuildrikClient } from "@/services/api-client";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { devError } from "@/shared/utils/devLogger";
 import { Input, LoadCard, SCREEN_FIELD_ERROR, SET_BTN, SaveErrorBanner, Screen, Section } from "../shared";
-import { ConnectionVerifiedDialog, eventsPhrase } from "../components/ConnectionVerifiedDialog";
 import { useSettingsScreen } from "../hooks/useSettingsScreen";
 import { useServerLoad } from "../hooks/useServerLoad";
 import type { ScreenProps } from "../types";
@@ -83,10 +83,19 @@ export function connectionPill(status: AnalyticsStatus | null, verifiedAt: strin
   return verifiedAt ? "NO DATA YET" : "NOT VERIFIED";
 }
 
+/** `1,284 events`. */
+export function eventsPhrase(n: number): string {
+  return `${n.toLocaleString("en-GB")} ${n === 1 ? "event" : "events"}`;
+}
+
 /** The Last received data line: `2 Jul 2025, 19:38 · 1,284 events in the last 24 hours` or `No events yet`. */
 export function lastReceivedLine(status: AnalyticsStatus | null): string {
   if (!status?.lastEventAt) return "No events yet";
-  return `${formatDayTime(status.lastEventAt)} · ${eventsPhrase(status.events24h)} in the last 24 hours`;
+  const at = new Date(status.lastEventAt);
+  const today = new Date();
+  const when =
+    at.toDateString() === today.toDateString() ? `today at ${two(at.getHours())}:${two(at.getMinutes())}` : formatDayTime(at);
+  return `Last received ${when} · ${eventsPhrase(status.events24h)} in the last 24 hours`;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -183,8 +192,6 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
   const [verifying, setVerifying] = React.useState(false);
   /* B8-AN06: a status re-read that fails says so in place; the values stay. */
   const [verifyFailed, setVerifyFailed] = React.useState(false);
-  /** The Connection verified dialog's subject, while it is open. */
-  const [verified, setVerified] = React.useState<{ id: string; events24h: number } | null>(null);
   const gaInputRef = React.useRef<HTMLInputElement>(null);
 
   /* Dirty is a difference from what is stored, so a field typed back to its
@@ -248,7 +255,7 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
   const pixelShown = shown(pixelError, "facebookPixel.pixelId");
   const clarityShown = shown(clarityError, "microsoftClarity.projectId");
 
-  /* Verify (4256:26844): the id's shape, then the tracker's status read
+  /* Verify: the id's shape, then the tracker's status read
      again, then `verifiedAt` into the draft — the next Save carries it. A
      malformed or empty id just lands the cursor on the field (its sentence is
      already under it); a failed re-read says "Couldn't check status" in the
@@ -264,7 +271,6 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
       const next = projectId ? await getBuildrikClient(DASHBOARD_URL).siteDetail.analyticsStatus.query({ siteId: projectId }) : status;
       setStatus(next);
       setGaVerifiedAt(new Date().toISOString());
-      setVerified({ id: gaId, events24h: next?.events24h ?? 0 });
     } catch (error: unknown) {
       devError("settings", `analytics status re-read failed for site ${projectId}`, error);
       setVerifyFailed(true);
@@ -377,18 +383,22 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
             </div>
           )}
         </ProviderRow>
+        {/* B8-AN01…AN06: the status word over one detail line, Verify at the right;
+            the tracker note; a failed check's sentence in error ink under it. */}
         <div className="tw:col-span-full tw:flex tw:min-h-8 tw:items-center tw:gap-3" data-testid="set-field-connection-status">
-          <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
+          <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col" data-testid="set-field-last-received-data">
             <span className="tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]" role="status" data-testid="set-an-ga-status">
-              {verifyFailed ? "Couldn’t check status" : STATUS_WORDS[pill]}
+              {verifying ? "Checking status…" : verifyFailed ? "Couldn’t check status" : STATUS_WORDS[pill]}
             </span>
-            {verifyFailed ? (
-              <span className={NOTE} data-testid="set-an-ga-verify-error">
-                The status service did not respond. Try Verify again.
+            {verifying || verifyFailed ? null : pill === "RECEIVING DATA" ? (
+              <span className={NOTE} data-testid="set-an-ga-last">
+                {lastReceivedLine(status)}
               </span>
-            ) : gaVerifiedAt ? (
+            ) : pill === "NO DATA YET" ? (
               <span className={NOTE} data-testid="set-an-ga-verified">
-                Measurement ID verified on {formatDay(gaVerifiedAt)}
+                {gaVerifiedAt !== stored.gaVerifiedAt
+                  ? "No events received yet. Verification is an unsaved setting."
+                  : `No events received yet · verified on ${formatDay(gaVerifiedAt!)}`}
               </span>
             ) : null}
           </div>
@@ -404,12 +414,14 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
             {verifying ? "Checking…" : "Verify"}
           </Button>
         </div>
-        <p className={`${NOTE} tw:col-span-full`} data-testid="set-field-last-received-data">
-          <span data-testid="set-an-ga-last">{lastReceivedLine(status)}</span>
-        </p>
         <p className={`${NOTE} tw:col-span-full`} data-testid="set-an-ga-disclaimer">
           Buildrick tracker status; this does not confirm Google Analytics delivery.
         </p>
+        {verifyFailed ? (
+          <p className="tw:col-span-full tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-error)]" role="alert" data-testid="set-an-ga-verify-error">
+            The status service did not respond. Try Verify again.
+          </p>
+        ) : null}
       </Section>
 
       <Section title="Google Tag Manager">
@@ -505,12 +517,6 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
         </ProviderRow>
       </Section>
 
-      <ConnectionVerifiedDialog
-        open={verified !== null}
-        id={verified?.id ?? ""}
-        events24h={verified?.events24h ?? 0}
-        onBack={() => setVerified(null)}
-      />
     </Screen>
   );
 };
