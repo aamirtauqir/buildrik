@@ -242,7 +242,13 @@ export const SettingsTab: React.FC<
      synchronously. The registry must not lag an effect behind: Discard /
      Save and leave clear it and leave in the same handler, and the
      shell's tab-switch guard reads it as the leave lands (B-1). */
+  /* GAP-ST-T01 / GAP-ST-ACK: after a save the footer says so ("Saved ·
+     applies on next publish") until the next edit or screen — including on
+     the screen a Save and leave lands on (`carryAckRef`, read by the reset). */
+  const [savedAck, setSavedAck] = React.useState(false);
+  const carryAckRef = React.useRef(false);
   const markScreenDirty = React.useCallback((dirty: boolean) => {
+    if (dirty) setSavedAck(false);
     setScreenIsDirty(dirty);
     screenIsDirtyRef.current = dirty;
     shellDirty.set("settings", dirty);
@@ -320,6 +326,8 @@ export const SettingsTab: React.FC<
      the register, on mount and on a screen change alike. */
   React.useLayoutEffect(() => {
     markScreenDirty(false);
+    setSavedAck(carryAckRef.current);
+    carryAckRef.current = false;
     setGuardOpen(false);
     setSaveError(null);
     setLoadState("ready");
@@ -620,6 +628,7 @@ export const SettingsTab: React.FC<
       setSaveError(null);
       setServerFieldErrors(undefined);
       markScreenDirty(false);
+      setSavedAck(true);
       if (then) then();
       else showSavedToast();
     };
@@ -668,7 +677,11 @@ export const SettingsTab: React.FC<
         setGuardOpen(false);
         if (!target) showSavedToast();
         else if (target.kind === "leave") leave();
-        else performNav(target.id);
+        else {
+          /* Only a settings screen re-renders the footer; a door (Brand ↗) leaves it be. */
+          carryAckRef.current = isSettingsPaneId(target.id);
+          performNav(target.id);
+        }
       },
       () => {
         if (pendingRef.current) setGuardPhase("failed");
@@ -798,7 +811,9 @@ export const SettingsTab: React.FC<
             ? { text: "Couldn’t save", tone: "danger" }
             : screenIsDirty
               ? { text: "Unsaved changes", tone: "ink" }
-              : { text: "All changes saved", tone: "muted" };
+              : savedAck && screenRules?.scope === "publish"
+                ? { text: "Saved · applies on next publish", tone: "muted" }
+                : { text: "All changes saved", tone: "muted" };
   /* The footer is there while something waits to be saved, a save failed, or
      a footer screen's read is pending or failed — never on the Overview, a
      locked or read-only screen. An immediate screen gets it only while it

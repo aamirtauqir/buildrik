@@ -15105,7 +15105,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — lands on destination after save; ack copy differs"
+   "verifiedNote": "Built, not compared: after a save the footer reads 'Saved · applies on next publish' (publish-scope screens) until the next edit or screen, including on the screen a Save and leave lands on; Overview/doors have no footer (the board's 'Saved just now' is the shell bottom bar). The destination screen's own content drift is tracked on its own rows."
   },
   {
    "nodeId": "277:27321",
@@ -15115,7 +15115,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — lands on destination after save; ack copy differs"
+   "verifiedNote": "Built, not compared: after a save the footer reads 'Saved · applies on next publish' (publish-scope screens) until the next edit or screen, including on the screen a Save and leave lands on; Overview/doors have no footer (the board's 'Saved just now' is the shell bottom bar). The destination screen's own content drift is tracked on its own rows."
   },
   {
    "nodeId": "277:27516",
@@ -18080,7 +18080,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — navigates after ack; destination screens carry their own drifts"
+   "verifiedNote": "Built, not compared: after a save the footer reads 'Saved · applies on next publish' (publish-scope screens) until the next edit or screen, including on the screen a Save and leave lands on; Overview/doors have no footer (the board's 'Saved just now' is the shell bottom bar). The destination screen's own content drift is tracked on its own rows."
   },
   {
    "nodeId": "278:62059",
@@ -18090,7 +18090,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — navigates after ack; destination screens carry their own drifts",
+   "verifiedNote": "Built, not compared: after a save the footer reads 'Saved · applies on next publish' (publish-scope screens) until the next edit or screen, including on the screen a Save and leave lands on; Overview/doors have no footer (the board's 'Saved just now' is the shell bottom bar). The destination screen's own content drift is tracked on its own rows.",
    "inheritsFrom": "278:61847"
   },
   {
@@ -18101,7 +18101,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — navigates after ack; destination screens carry their own drifts",
+   "verifiedNote": "Built, not compared: after a save the footer reads 'Saved · applies on next publish' (publish-scope screens) until the next edit or screen, including on the screen a Save and leave lands on; Overview/doors have no footer (the board's 'Saved just now' is the shell bottom bar). The destination screen's own content drift is tracked on its own rows.",
    "inheritsFrom": "278:61847"
   },
   {
@@ -18112,7 +18112,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — navigates after ack; destination screens carry their own drifts",
+   "verifiedNote": "Built, not compared: after a save the footer reads 'Saved · applies on next publish' (publish-scope screens) until the next edit or screen, including on the screen a Save and leave lands on; Overview/doors have no footer (the board's 'Saved just now' is the shell bottom bar). The destination screen's own content drift is tracked on its own rows.",
    "inheritsFrom": "278:61847"
   },
   {
@@ -18123,7 +18123,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — navigates after ack; destination screens carry their own drifts",
+   "verifiedNote": "Built, not compared: after a save the footer reads 'Saved · applies on next publish' (publish-scope screens) until the next edit or screen, including on the screen a Save and leave lands on; Overview/doors have no footer (the board's 'Saved just now' is the shell bottom bar). The destination screen's own content drift is tracked on its own rows.",
    "inheritsFrom": "278:61847"
   },
   {
@@ -18134,7 +18134,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — navigates after ack; destination screens carry their own drifts",
+   "verifiedNote": "Built, not compared: after a save the footer reads 'Saved · applies on next publish' (publish-scope screens) until the next edit or screen, including on the screen a Save and leave lands on; Overview/doors have no footer (the board's 'Saved just now' is the shell bottom bar). The destination screen's own content drift is tracked on its own rows.",
    "inheritsFrom": "278:61847"
   },
   {
@@ -18145,7 +18145,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — navigates after ack; destination screens carry their own drifts",
+   "verifiedNote": "Built, not compared: after a save the footer reads 'Saved · applies on next publish' (publish-scope screens) until the next edit or screen, including on the screen a Save and leave lands on; Overview/doors have no footer (the board's 'Saved just now' is the shell bottom bar). The destination screen's own content drift is tracked on its own rows.",
    "inheritsFrom": "278:61847"
   },
   {
@@ -18156,7 +18156,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — navigates after ack; destination screens carry their own drifts",
+   "verifiedNote": "Built, not compared: after a save the footer reads 'Saved · applies on next publish' (publish-scope screens) until the next edit or screen, including on the screen a Save and leave lands on; Overview/doors have no footer (the board's 'Saved just now' is the shell bottom bar). The destination screen's own content drift is tracked on its own rows.",
    "inheritsFrom": "278:61847"
   },
   {
@@ -18167,7 +18167,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — navigates after ack; destination screens carry their own drifts",
+   "verifiedNote": "Built, not compared: after a save the footer reads 'Saved · applies on next publish' (publish-scope screens) until the next edit or screen, including on the screen a Save and leave lands on; Overview/doors have no footer (the board's 'Saved just now' is the shell bottom bar). The destination screen's own content drift is tracked on its own rows.",
    "inheritsFrom": "278:61847"
   },
   {
@@ -18178,7 +18178,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — navigates after ack; destination screens carry their own drifts",
+   "verifiedNote": "Built, not compared: after a save the footer reads 'Saved · applies on next publish' (publish-scope screens) until the next edit or screen, including on the screen a Save and leave lands on; Overview/doors have no footer (the board's 'Saved just now' is the shell bottom bar). The destination screen's own content drift is tracked on its own rows.",
    "inheritsFrom": "278:61847"
   },
   {
@@ -18189,7 +18189,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — navigates after ack; destination screens carry their own drifts",
+   "verifiedNote": "Built, not compared: after a save the footer reads 'Saved · applies on next publish' (publish-scope screens) until the next edit or screen, including on the screen a Save and leave lands on; Overview/doors have no footer (the board's 'Saved just now' is the shell bottom bar). The destination screen's own content drift is tracked on its own rows.",
    "inheritsFrom": "278:61847"
   },
   {
@@ -18200,7 +18200,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — navigates after ack; destination screens carry their own drifts",
+   "verifiedNote": "Built, not compared: after a save the footer reads 'Saved · applies on next publish' (publish-scope screens) until the next edit or screen, including on the screen a Save and leave lands on; Overview/doors have no footer (the board's 'Saved just now' is the shell bottom bar). The destination screen's own content drift is tracked on its own rows.",
    "inheritsFrom": "278:61847"
   },
   {
@@ -18211,7 +18211,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — navigates after ack; destination screens carry their own drifts",
+   "verifiedNote": "Built, not compared: after a save the footer reads 'Saved · applies on next publish' (publish-scope screens) until the next edit or screen, including on the screen a Save and leave lands on; Overview/doors have no footer (the board's 'Saved just now' is the shell bottom bar). The destination screen's own content drift is tracked on its own rows.",
    "inheritsFrom": "278:61847"
   },
   {
@@ -18222,7 +18222,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — navigates after ack; destination screens carry their own drifts",
+   "verifiedNote": "Built, not compared: after a save the footer reads 'Saved · applies on next publish' (publish-scope screens) until the next edit or screen, including on the screen a Save and leave lands on; Overview/doors have no footer (the board's 'Saved just now' is the shell bottom bar). The destination screen's own content drift is tracked on its own rows.",
    "inheritsFrom": "278:61847"
   },
   {
@@ -18233,7 +18233,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — navigates after ack; destination screens carry their own drifts",
+   "verifiedNote": "Built, not compared: after a save the footer reads 'Saved · applies on next publish' (publish-scope screens) until the next edit or screen, including on the screen a Save and leave lands on; Overview/doors have no footer (the board's 'Saved just now' is the shell bottom bar). The destination screen's own content drift is tracked on its own rows.",
    "inheritsFrom": "278:61847"
   },
   {
@@ -18244,7 +18244,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — navigates after ack; destination screens carry their own drifts",
+   "verifiedNote": "Built, not compared: after a save the footer reads 'Saved · applies on next publish' (publish-scope screens) until the next edit or screen, including on the screen a Save and leave lands on; Overview/doors have no footer (the board's 'Saved just now' is the shell bottom bar). The destination screen's own content drift is tracked on its own rows.",
    "inheritsFrom": "278:61847"
   },
   {
@@ -18255,7 +18255,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — navigates after ack; destination screens carry their own drifts",
+   "verifiedNote": "Built, not compared: after a save the footer reads 'Saved · applies on next publish' (publish-scope screens) until the next edit or screen, including on the screen a Save and leave lands on; Overview/doors have no footer (the board's 'Saved just now' is the shell bottom bar). The destination screen's own content drift is tracked on its own rows.",
    "inheritsFrom": "278:61847"
   },
   {
@@ -18266,7 +18266,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — navigates after ack; destination screens carry their own drifts",
+   "verifiedNote": "Built, not compared: after a save the footer reads 'Saved · applies on next publish' (publish-scope screens) until the next edit or screen, including on the screen a Save and leave lands on; Overview/doors have no footer (the board's 'Saved just now' is the shell bottom bar). The destination screen's own content drift is tracked on its own rows.",
    "inheritsFrom": "278:61847"
   },
   {
@@ -18277,7 +18277,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — navigates after ack; destination screens carry their own drifts",
+   "verifiedNote": "Built, not compared: after a save the footer reads 'Saved · applies on next publish' (publish-scope screens) until the next edit or screen, including on the screen a Save and leave lands on; Overview/doors have no footer (the board's 'Saved just now' is the shell bottom bar). The destination screen's own content drift is tracked on its own rows.",
    "inheritsFrom": "278:61847"
   },
   {
@@ -18288,7 +18288,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — navigates after ack; destination screens carry their own drifts",
+   "verifiedNote": "Built, not compared: after a save the footer reads 'Saved · applies on next publish' (publish-scope screens) until the next edit or screen, including on the screen a Save and leave lands on; Overview/doors have no footer (the board's 'Saved just now' is the shell bottom bar). The destination screen's own content drift is tracked on its own rows.",
    "inheritsFrom": "278:61847"
   },
   {
@@ -18299,7 +18299,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — navigates after ack; destination screens carry their own drifts",
+   "verifiedNote": "Built, not compared: after a save the footer reads 'Saved · applies on next publish' (publish-scope screens) until the next edit or screen, including on the screen a Save and leave lands on; Overview/doors have no footer (the board's 'Saved just now' is the shell bottom bar). The destination screen's own content drift is tracked on its own rows.",
    "inheritsFrom": "278:61847"
   },
   {
@@ -18310,7 +18310,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — navigates after ack; destination screens carry their own drifts",
+   "verifiedNote": "Built, not compared: after a save the footer reads 'Saved · applies on next publish' (publish-scope screens) until the next edit or screen, including on the screen a Save and leave lands on; Overview/doors have no footer (the board's 'Saved just now' is the shell bottom bar). The destination screen's own content drift is tracked on its own rows.",
    "inheritsFrom": "278:61847"
   },
   {
@@ -18321,7 +18321,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — navigates after ack; destination screens carry their own drifts",
+   "verifiedNote": "Built, not compared: after a save the footer reads 'Saved · applies on next publish' (publish-scope screens) until the next edit or screen, including on the screen a Save and leave lands on; Overview/doors have no footer (the board's 'Saved just now' is the shell bottom bar). The destination screen's own content drift is tracked on its own rows.",
    "inheritsFrom": "278:61847"
   },
   {
@@ -18332,7 +18332,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — navigates after ack; destination screens carry their own drifts",
+   "verifiedNote": "Built, not compared: after a save the footer reads 'Saved · applies on next publish' (publish-scope screens) until the next edit or screen, including on the screen a Save and leave lands on; Overview/doors have no footer (the board's 'Saved just now' is the shell bottom bar). The destination screen's own content drift is tracked on its own rows.",
    "inheritsFrom": "278:61847"
   },
   {
@@ -18343,7 +18343,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:659 — navigates after ack; destination screens carry their own drifts",
+   "verifiedNote": "Built, not compared: after a save the footer reads 'Saved · applies on next publish' (publish-scope screens) until the next edit or screen, including on the screen a Save and leave lands on; Overview/doors have no footer (the board's 'Saved just now' is the shell bottom bar). The destination screen's own content drift is tracked on its own rows.",
    "inheritsFrom": "278:61847"
   },
   {

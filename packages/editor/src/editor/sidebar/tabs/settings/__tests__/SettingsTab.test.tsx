@@ -643,9 +643,9 @@ describe("SettingsTab — Unsaved settings", () => {
     fireEvent.click(screen.getByTestId("set-unsaved-keep"));
     expect(screen.queryByTestId("set-unsaved")).toBeNull();
     await act(async () => finish());
-    await screen.findByText("Saved · applies on next publish");
+    await screen.findByText("Your site settings are saved.");
     expect(headTitle()).toBe("General");
-    expect(footStatus()).toBe("All changes saved");
+    expect(footStatus()).toBe("Saved · applies on next publish");
   });
 
   it("a refused Save and leave turns the dialog to its failed phase (GAP-ST-E); Retry save and leave saves again and goes", async () => {
@@ -690,8 +690,21 @@ describe("SettingsTab — Unsaved settings", () => {
     await waitFor(() => expect(headTitle()).toBe("SEO"));
     expect(composer.saveProject).toHaveBeenCalledTimes(1);
     // No Saved toast on the way through — the nav is the answer.
-    expect(screen.queryByText("Saved · applies on next publish")).toBeNull();
+    expect(screen.queryByText("Your site settings are saved.")).toBeNull();
     expect(screen.queryByTestId("set-unsaved")).toBeNull();
+  });
+
+  it("the screen Save and leave lands on acknowledges the save (GAP-ST-ACK); the next edit clears it", async () => {
+    renderS(<SettingsTab composer={asComposer(makeComposer())} />);
+    await openGeneralAndEdit();
+    fireEvent.click(screen.getByTestId("set-nav-seo"));
+    fireEvent.click(screen.getByTestId("set-unsaved-save"));
+    await waitFor(() => expect(headTitle()).toBe("SEO"));
+    expect(footStatus()).toBe("Saved · applies on next publish");
+    fireEvent.change(screen.getByLabelText("Meta title"), { target: { value: "x" } });
+    await waitFor(() => expect(footStatus()).toBe("Unsaved changes"));
+    fireEvent.click(screen.getByTestId("set-foot-discard"));
+    await waitFor(() => expect(footStatus()).toBe("All changes saved"));
   });
 
   it("Save and leave on the way out saves, then leaves", async () => {
@@ -745,13 +758,13 @@ describe("SettingsTab — Save changes", () => {
     renderS(<SettingsTab composer={asComposer(composer)} />);
     await openGeneralAndEdit();
     fireEvent.click(screen.getByTestId("set-foot-save"));
-    await screen.findByText("Saved · applies on next publish");
+    await screen.findByText("Your site settings are saved.");
     expect(composer.setProjectSettings).toHaveBeenCalledWith(
       expect.objectContaining({ seo: expect.objectContaining({ siteName: "Edited Site" }) }),
     );
     expect(composer.saveProject).toHaveBeenCalledTimes(1);
-    // Settled: nothing left to save.
-    expect(footStatus()).toBe("All changes saved");
+    // Settled, and the footer says so (GAP-ST-T01).
+    expect(footStatus()).toBe("Saved · applies on next publish");
     // M19: Publish opens the Publish panel — it does not publish.
     fireEvent.click(screen.getByText("Publish"));
     expect(composer.emit).toHaveBeenCalledWith("panel:open", { panel: "publish" });
@@ -773,12 +786,12 @@ describe("SettingsTab — Save changes", () => {
     expect(screen.getByTestId("set-save-error").textContent).toBe(
       "SEO settings were not saved. Your changes are still here. Review the values, then retry.",
     );
-    expect(screen.queryByText("Saved · applies on next publish")).toBeNull();
+    expect(screen.queryByText("Your site settings are saved.")).toBeNull();
     fireEvent.click(screen.getByTestId("set-foot-save"));
-    await screen.findByText("Saved · applies on next publish");
+    await screen.findByText("Your site settings are saved.");
     expect(composer.saveProject).toHaveBeenCalledTimes(2);
     expect(screen.queryByTestId("set-save-error")).toBeNull();
-    expect(footStatus()).toBe("All changes saved");
+    expect(footStatus()).toBe("Saved · applies on next publish");
     errorSpy.mockRestore();
   });
 });
@@ -805,7 +818,7 @@ describe("SettingsTab — Save with a site id goes through the settings mutation
     renderS(<SettingsTab composer={asComposer(composer)} projectId="site-1" />);
     await openSeoAndEdit();
     fireEvent.click(screen.getByTestId("set-foot-save"));
-    await screen.findByText("Saved · applies on next publish");
+    await screen.findByText("Your site settings are saved.");
     expect(sync.saveSiteSettings).toHaveBeenCalledTimes(1);
     expect(sync.saveSiteSettings).toHaveBeenCalledWith("site-1", { columns: { metaTitle: "x" }, projectSettings: null, unrouted: false });
     expect(sync.saveProject).not.toHaveBeenCalled();
@@ -830,7 +843,7 @@ describe("SettingsTab — Save with a site id goes through the settings mutation
     expect(screen.getByTestId("fake-seo-field-error").textContent).toBe("Too long");
     expect(composer.adoptSavedProjectSettings).not.toHaveBeenCalled();
     fireEvent.click(screen.getByTestId("set-foot-save"));
-    await screen.findByText("Saved · applies on next publish");
+    await screen.findByText("Your site settings are saved.");
     expect(sync.saveSiteSettings).toHaveBeenCalledTimes(2);
     expect(screen.queryByTestId("fake-seo-field-error")).toBeNull();
     errorSpy.mockRestore();
@@ -841,7 +854,7 @@ describe("SettingsTab — Save with a site id goes through the settings mutation
     renderS(<SettingsTab composer={asComposer(composer)} projectId="site-1" />);
     await openSeoAndEdit("Twitter handle", "@bella");
     fireEvent.click(screen.getByTestId("set-foot-save"));
-    await screen.findByText("Saved · applies on next publish");
+    await screen.findByText("Your site settings are saved.");
     expect(sync.saveSiteSettings).toHaveBeenCalledWith("site-1", { columns: {}, projectSettings: null, unrouted: true });
     expect(composer.setProjectSettings).toHaveBeenCalledWith({ seo: { siteName: "Test Site", twitterHandle: "@bella" } });
     expect(composer.adoptSavedProjectSettings).not.toHaveBeenCalled();
@@ -854,7 +867,7 @@ describe("SettingsTab — Save with a site id goes through the settings mutation
     renderS(<SettingsTab composer={asComposer(composer)} projectId="site-1" />);
     await openSeoAndEdit();
     fireEvent.click(screen.getByTestId("set-foot-save"));
-    await screen.findByText("Saved · applies on next publish");
+    await screen.findByText("Your site settings are saved.");
     expect(sync.saveSiteSettings).toHaveBeenCalledTimes(1);
     expect(sync.saveSiteSettings).toHaveBeenCalledWith("site-1", {
       columns: { metaTitle: "x", slug: "bella-two" },
@@ -882,7 +895,7 @@ describe("SettingsTab — Save with a site id goes through the settings mutation
     // Confirmed this time: the save goes, slug and all.
     fakeSeo.extra = { columns: { slug: "bella-two" }, gate: Promise.resolve(true) };
     fireEvent.click(screen.getByTestId("set-foot-save"));
-    await screen.findByText("Saved · applies on next publish");
+    await screen.findByText("Your site settings are saved.");
     expect(sync.saveSiteSettings).toHaveBeenCalledWith("site-1", expect.objectContaining({ columns: { metaTitle: "x", slug: "bella-two" } }));
     fakeSeo.extra = null;
   });
@@ -899,7 +912,7 @@ describe("SettingsTab — Save with a site id goes through the settings mutation
     expect(footStatus()).toBe("Unsaved changes");
     expect(screen.getByTestId("set-foot-save").textContent).toBe("Save settings");
     expect(screen.queryByTestId("set-save-error")).toBeNull();
-    expect(screen.queryByText("Saved · applies on next publish")).toBeNull();
+    expect(screen.queryByText("Your site settings are saved.")).toBeNull();
     expect(errorSpy).not.toHaveBeenCalled();
     errorSpy.mockRestore();
   });
