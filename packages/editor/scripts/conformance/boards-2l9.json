@@ -4410,7 +4410,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No px→rem conversion on unit change"
+   "verifiedNote": "Lane L-B P2 (built, not compared): a unit change converts px ↔ rem / em at 16 px (24px → 1.5rem → 24px), keeping the rendered size; other pairs keep the number. Open: the board's conversion note line."
   },
   {
    "nodeId": "161:12005",

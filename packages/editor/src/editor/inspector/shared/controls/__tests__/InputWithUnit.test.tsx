@@ -7,7 +7,7 @@
  * @license BSD-3-Clause
  */
 
-import { render, screen, fireEvent } from "@testing-library/react";
+import { cleanup, render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import * as React from "react";
 import { InputWithUnit, parseEntry } from "../InputControls";
@@ -263,5 +263,23 @@ describe("InputWithUnit — 2L9 precision (I03, I08)", () => {
     fireEvent.change(input, { target: { value: "320px" } });
     fireEvent.keyDown(input, { key: "Enter" });
     expect(onChange).toHaveBeenCalledWith("320px");
+  });
+});
+
+describe("InputWithUnit — 2L9 I07 unit conversion", () => {
+  it("px → rem keeps the size the canvas shows: 24px becomes 1.5rem", () => {
+    const { onChange } = renderInput({ label: "Font size", value: "24px", units: ["px", "rem", "em", "%"] });
+    fireEvent.change(screen.getByRole("combobox", { name: "Font size unit" }), { target: { value: "rem" } });
+    expect(onChange).toHaveBeenCalledWith("1.5rem");
+  });
+
+  it("rem → px converts back; px → % keeps the number (no fixed ratio)", () => {
+    const { onChange } = renderInput({ label: "Font size", value: "1.5rem", units: ["px", "rem", "%"] });
+    fireEvent.change(screen.getByRole("combobox", { name: "Font size unit" }), { target: { value: "px" } });
+    expect(onChange).toHaveBeenCalledWith("24px");
+    cleanup();
+    const second = renderInput({ value: "10px", units: ["px", "%"] });
+    fireEvent.change(screen.getByRole("combobox", { name: "Width unit" }), { target: { value: "%" } });
+    expect(second.onChange).toHaveBeenCalledWith("10%");
   });
 });

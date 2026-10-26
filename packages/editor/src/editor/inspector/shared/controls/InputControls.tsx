@@ -171,6 +171,22 @@ function numberError(property: string | undefined, num: string, unit: string): s
   return last ? `${takes} Last applied: ${last}.` : takes;
 }
 
+/** px per rem / em — the root size the editor and export assume. */
+const ROOT_PX = 16;
+
+/**
+ * The same length in another unit (2L9 I07: 24px → 1.5rem), so a unit
+ * change keeps what the canvas shows. Only px ↔ rem / em converts exactly;
+ * between any other pair the number is kept (there is no fixed ratio).
+ */
+function convertUnit(n: number, from: string, to: string): string {
+  const relative = (u: string) => u === "rem" || u === "em";
+  let out = n;
+  if (from === "px" && relative(to)) out = n / ROOT_PX;
+  else if (relative(from) && to === "px") out = n * ROOT_PX;
+  return String(Math.round(out * 1000) / 1000);
+}
+
 /** A value the field cannot take apart — calc(), clamp(), min(), max() — kept
  *  exactly as authored until an explicit value replaces it (2L9 I08). */
 const isCustomExpression = (value: string) => /^(calc|clamp|min|max)\(/i.test(value.trim());
@@ -326,7 +342,7 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
   const onUnitChange = (next: string) => {
     if (field.readOnly) return;
     if (KEYWORDS.has(next)) onChange(next);
-    else if (num !== "" && NUMBER.test(num)) onChange(`${num}${next}`);
+    else if (num !== "" && NUMBER.test(num)) onChange(`${convertUnit(Number(num), unit, next)}${next}`);
   };
 
   /* The name is the row's label (or `ariaLabel`) plus the unit or "mixed

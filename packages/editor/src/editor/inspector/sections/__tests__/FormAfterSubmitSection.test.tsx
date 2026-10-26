@@ -209,14 +209,17 @@ describe("Form › AFTER SUBMIT + PROTECTION", () => {
   });
 
   it("F12: a failed save keeps what was typed, says so, and Retry sends it again", async () => {
-    api.forms.updateBlock.mutate.mockRejectedValueOnce(new Error("Network down"));
+    /* Persistent, not Once: a Once queued by an earlier test that never
+       reached its write would be consumed here instead. */
+    api.forms.updateBlock.mutate.mockReset();
+    api.forms.updateBlock.mutate.mockRejectedValue(new Error("Network down"));
     render(<FormAfterSubmitSection elementId="f" composer={project()} isOpen />);
     await waitFor(() => screen.getByLabelText("Message"));
     fireEvent.change(screen.getByLabelText("Message"), { target: { value: "Thanks!" } });
     fireEvent.blur(screen.getByLabelText("Message"));
     await waitFor(() => expect(screen.getByTestId("form-settings-status")).toHaveTextContent("Couldn’t save — your message is still here."), { timeout: 5000 });
     expect(screen.getByLabelText("Message")).toHaveValue("Thanks!");
-    api.forms.updateBlock.mutate.mockResolvedValueOnce({});
+    api.forms.updateBlock.mutate.mockResolvedValue({});
     fireEvent.click(screen.getByTestId("form-settings-retry"));
     await waitFor(() => expect(screen.getByTestId("form-settings-status")).toHaveTextContent("Saved"), { timeout: 5000 });
     expect(api.forms.updateBlock.mutate).toHaveBeenCalledTimes(2);
