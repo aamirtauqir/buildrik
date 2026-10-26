@@ -1442,3 +1442,28 @@ describe("SettingsTab — workspace doors", () => {
     openSpy.mockRestore();
   });
 });
+
+describe("SettingsTab — offline (2L9 B8-S05 / SH04)", () => {
+  afterEach(() => {
+    Object.defineProperty(navigator, "onLine", { configurable: true, get: () => true });
+  });
+
+  it("keeps the edits, says Save needs a connection and turns Save off until the network is back", async () => {
+    renderS(<SettingsTab composer={asComposer(makeComposer())} />);
+    await openGeneralAndEdit();
+    Object.defineProperty(navigator, "onLine", { configurable: true, get: () => false });
+    act(() => {
+      window.dispatchEvent(new Event("offline"));
+    });
+    expect(footStatus()).toBe("Needs a connection · changes stay here, unsaved");
+    expect(screen.getByTestId("set-offline").textContent).toBe("You’re offline. Save settings needs a connection.");
+    expect((screen.getByTestId("set-foot-save") as HTMLButtonElement).disabled).toBe(true);
+    Object.defineProperty(navigator, "onLine", { configurable: true, get: () => true });
+    act(() => {
+      window.dispatchEvent(new Event("online"));
+    });
+    expect(footStatus()).toBe("Unsaved changes");
+    expect(screen.queryByTestId("set-offline")).toBeNull();
+    expect((screen.getByTestId("set-foot-save") as HTMLButtonElement).disabled).toBe(false);
+  });
+});

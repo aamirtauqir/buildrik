@@ -131,6 +131,17 @@ function navTitle(id: SettingsNavId): string {
   return SETTINGS_NAV.find((n) => n.id === id)?.title.replace(/ ↗$/, "") ?? id;
 }
 
+/** The browser's connection — B8-S05 / SH04: Save needs one; the edits wait. */
+function subscribeOnline(notify: () => void) {
+  window.addEventListener("online", notify);
+  window.addEventListener("offline", notify);
+  return () => {
+    window.removeEventListener("online", notify);
+    window.removeEventListener("offline", notify);
+  };
+}
+const readOnline = () => navigator.onLine;
+
 function isScreenLocked(screenId: SettingsNavId, userPlan: PlanTier): boolean {
   const required = isSettingsScreenId(screenId) ? SCREEN_PLAN_REQUIREMENTS[screenId] : undefined;
   if (!required) return false;
@@ -804,8 +815,11 @@ export const SettingsTab: React.FC<
       : SCOPE_LINE.lifecycle;
 
   const immediate = screenRules?.saveModel === "immediate";
+  const online = React.useSyncExternalStore(subscribeOnline, readOnline, () => true);
   const footStatus: { text: string; tone: "muted" | "ink" | "danger" } =
-    loadState === "loading"
+    !online && loadState === "ready"
+      ? { text: "Needs a connection · changes stay here, unsaved", tone: "danger" }
+      : loadState === "loading"
       ? { text: "Loading settings…", tone: "muted" }
       : loadState === "error"
         ? { text: "Settings could not load", tone: "danger" }
@@ -1130,6 +1144,16 @@ export const SettingsTab: React.FC<
           className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col tw:gap-3 tw:overflow-y-auto tw:bg-[var(--bk-bg-panel)] tw:px-6 tw:pb-6"
           data-testid="set-body"
         >
+          {!online && showFooter ? (
+            /* B8-SH04 245:48768: the screen stays; only Save waits for the network. */
+            <div
+              role="status"
+              className="tw:w-full tw:max-w-180 tw:shrink-0 tw:rounded-[var(--bk-radius-sm)] tw:bg-[var(--bk-warning-tint)] tw:px-4 tw:py-3 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-warning-text)]"
+              data-testid="set-offline"
+            >
+              You’re offline. Save settings needs a connection.
+            </div>
+          ) : null}
           {renderScreen()}
         </div>
 
@@ -1162,7 +1186,7 @@ export const SettingsTab: React.FC<
               type="button"
               size="xs"
               className={`${SET_BTN} tw:px-6`}
-              disabled={loadState !== "ready" || saving || clientFieldErrors !== null || (!screenIsDirty && !saveError)}
+              disabled={!online || loadState !== "ready" || saving || clientFieldErrors !== null || (!screenIsDirty && !saveError)}
               onClick={() => handleSave()}
               data-testid="set-foot-save"
             >

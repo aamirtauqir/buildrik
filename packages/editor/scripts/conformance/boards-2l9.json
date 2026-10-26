@@ -13226,8 +13226,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "no offline detection in Settings"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (offline state): Settings reads navigator.onLine; offline keeps the edits, the footer says \"Needs a connection · changes stay here, unsaved\" (SH04/AN07 wording; S05 draws \"Needs a connection — your edits stay on this screen, unsaved\"), the banner \"You’re offline. Save settings needs a connection.\", Save disabled until online (tested). AN07 also draws \"Status unavailable offline\" for the tracker status — not built."
   },
   {
    "nodeId": "238:11495",
@@ -13496,8 +13496,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "no offline state"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (offline state): Settings reads navigator.onLine; offline keeps the edits, the footer says \"Needs a connection · changes stay here, unsaved\" (SH04/AN07 wording; S05 draws \"Needs a connection — your edits stay on this screen, unsaved\"), the banner \"You’re offline. Save settings needs a connection.\", Save disabled until online (tested). AN07 also draws \"Status unavailable offline\" for the tracker status — not built."
   },
   {
    "nodeId": "245:46965",
@@ -13577,8 +13577,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "no offline state"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (offline state): Settings reads navigator.onLine; offline keeps the edits, the footer says \"Needs a connection · changes stay here, unsaved\" (SH04/AN07 wording; S05 draws \"Needs a connection — your edits stay on this screen, unsaved\"), the banner \"You’re offline. Save settings needs a connection.\", Save disabled until online (tested). AN07 also draws \"Status unavailable offline\" for the tracker status — not built."
   },
   {
    "nodeId": "245:49024",
