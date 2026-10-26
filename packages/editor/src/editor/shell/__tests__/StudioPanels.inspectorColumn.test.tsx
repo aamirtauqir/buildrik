@@ -522,4 +522,15 @@ describe("StudioPanels — bottom bar in resource areas", () => {
       expect(screen.getByTestId("page-switcher-trigger").textContent).toContain("Home");
     },
   );
+
+  /* C-10 / D-10 / E-10: Brand, Settings and Assets render in the fullpage
+     slot, not a window-wide portal — so the slot has to be in fullpage mode
+     whenever one of them is the active surface, drawer open or not (Settings
+     stays the active tab when the drawer is closed under it). */
+  it.each(["design", "settings"])("%s keeps the resource-area layout with the drawer closed", (tab) => {
+    const composer = selectingComposer([]);
+    render(<Harness composer={composer as unknown as FakeComposer} leftPanelTab={tab} initialOpen={false} />);
+    expect(screen.getByTestId("layout-shell").className).toContain("layout-shell--fullpage");
+    expect(screen.getByTestId("bottom-bar-resource")).toBeTruthy();
+  });
 });
