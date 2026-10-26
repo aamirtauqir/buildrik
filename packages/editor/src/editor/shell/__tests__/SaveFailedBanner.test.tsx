@@ -16,13 +16,29 @@ afterEach(() => {
 });
 
 describe("SaveFailedBanner", () => {
-  it("renders the retry/keep-editing copy and doors", () => {
+  /* 2L9 C05 10:2199 — one strip, the line and its Retry. */
+  it("without a context: what failed, that the changes are kept, Retry", () => {
     render(
       <SaveFailedBanner where="My Site · Home" leaving={false} busy={false} onRetry={vi.fn()} onKeepEditing={vi.fn()} />,
     );
-    expect(screen.getByText("Couldn't save My Site · Home")).toBeInTheDocument();
-    expect(screen.getByTestId("save-failed-retry")).toHaveTextContent("Retry save");
+    expect(screen.getByTestId("save-failed-message")).toHaveTextContent("Couldn't save My Site · Home. Your changes are kept.");
+    expect(screen.getByTestId("save-failed-retry")).toHaveTextContent(/^Retry$/);
     expect(screen.getByTestId("save-failed-keep")).toHaveTextContent("Keep editing");
+  });
+
+  it("in the publish context: the board's line", () => {
+    render(
+      <SaveFailedBanner where="My Site · Home" leaving={false} busy={false} context="publish" onRetry={vi.fn()} onKeepEditing={vi.fn()} />,
+    );
+    expect(screen.getByTestId("save-failed-message")).toHaveTextContent(/^Save before publishing\. Your changes are kept\.$/);
+  });
+
+  it("a failed save-and-leave says the user is still here, and its retry leaves", () => {
+    render(
+      <SaveFailedBanner where="My Site · Home" leaving busy={false} onRetry={vi.fn()} onKeepEditing={vi.fn()} />,
+    );
+    expect(screen.getByTestId("save-failed-message")).toHaveTextContent(/You have not left the editor\.$/);
+    expect(screen.getByTestId("save-failed-retry")).toHaveTextContent("Retry save & leave");
   });
 
   it("names a brand refusal instead of blaming the connection, and offers no pointless retry (I1)", () => {
