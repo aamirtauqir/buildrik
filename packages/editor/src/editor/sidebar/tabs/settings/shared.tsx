@@ -234,7 +234,7 @@ export const Field: React.FC<FieldProps> = ({ label, hint, htmlFor, anchor, span
       data-testid={`set-field-${stem}`}
     >
       <label
-        className="tw:flex tw:flex-wrap tw:items-baseline tw:gap-1 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink)]"
+        className="tw:flex tw:flex-wrap tw:items-baseline tw:gap-1 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]"
         htmlFor={htmlFor}
         data-testid={`set-field-label-${stem}`}
       >

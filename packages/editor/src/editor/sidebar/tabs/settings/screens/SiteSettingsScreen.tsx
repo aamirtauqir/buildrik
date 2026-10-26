@@ -1,9 +1,10 @@
 /**
- * General — 8135:212718 (default) · 8135:212966 (Advanced open) ·
- * 8135:213221 (slug taken) · 8135:213477 (slug format) · 8135:213733 (slug
- * confirm): the site's identity in one card — name, author, favicon and touch
- * icon (upload + preview), the favicon URL, and a link to Languages for the
- * site language — and a collapsed `Advanced` card holding the URL slug.
+ * General — 2L9 B8-S02 238:10283: a `Site` card (Site name, then Author in
+ * the board's second-field slot — the board draws a Tagline, which has no
+ * column or project key: `authority: code:no-tagline-field`) and an `Icons`
+ * card whose rows read "Favicon · favicon.png · 32 × 32 · Replace…". The
+ * collapsed `Advanced` card holds the URL slug and, kept from the earlier
+ * layout (undrawn on 2L9), the favicon URL and the link to Languages.
  *
  * Values come from the Site row on open (`siteDetail.settings.get`; load card
  * while it reads, Try again when it fails). Edits stay here until Save:
@@ -102,82 +103,91 @@ async function uploadSiteIcon(siteId: string, file: File, context: "favicon" | "
   return (await client.upload.confirm.mutate({ fileId })).cdnUrl;
 }
 
-const ICON_LABEL = "tw:m-0 tw:text-[length:var(--bk-text-12)] tw:font-medium tw:leading-5 tw:text-[var(--bk-ink)]";
-const ICON_HINT = "tw:text-[length:var(--bk-text-11)] tw:leading-5 tw:text-[var(--bk-ink-muted)]";
-/* 8135:212925 `Button · Upload favicon`: ghost, 32 tall, 12 in, 13/500;
-   8134:212323 draws it disabled as grey text, no fill. */
-const UPLOAD_BTN =
-  "tw:h-8 tw:rounded-[var(--bk-radius-md)] tw:border-0 tw:bg-transparent tw:px-3 tw:text-[length:var(--bk-text-13)] tw:font-medium " +
-  "tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-bg-subtle)] tw:disabled:bg-transparent tw:disabled:text-[var(--bk-gray-400)] " +
-  "tw:focus:ring-0 tw:focus:shadow-none " +
-  "tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
-const FIELD_ROW = "tw:grid tw:grid-cols-2 tw:gap-x-6 tw:gap-y-4";
+/* B8-S02 `Row / Favicon`: the label in a 240 column, "<file> · <w> × <h>"
+   in 284, a 140 outline `Replace…` at the right; 49 tall. */
+const ICON_ROW = "tw:flex tw:min-h-12 tw:items-center tw:gap-3";
+const ICON_LABEL = "tw:w-60 tw:shrink-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]";
+const ICON_FILE = "tw:min-w-0 tw:flex-1 tw:truncate tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]";
+const ICON_BTN = "tw:w-35 tw:shrink-0";
+const STACK = "tw:flex tw:flex-col tw:gap-2.5";
 
-function initialsOf(name: string): string {
-  const words = name.trim().split(/\s+/).filter(Boolean);
-  return ((words[0]?.[0] ?? "") + (words[1]?.[0] ?? words[0]?.[1] ?? "")).toUpperCase();
+/** `favicon.png` from a stored URL (query and hash dropped), or the URL itself when it has no path. */
+export function fileNameOf(url: string): string {
+  try {
+    const path = new URL(url, "https://x.invalid").pathname;
+    const last = decodeURIComponent(path.split("/").filter(Boolean).pop() ?? "");
+    return last || url;
+  } catch {
+    return url;
+  }
+}
+
+/** The image's natural size once it loads — "32 × 32" on the row. */
+function useImageSize(src: string): { w: number; h: number } | null {
+  const [size, setSize] = React.useState<{ w: number; h: number } | null>(null);
+  React.useEffect(() => {
+    setSize(null);
+    if (!src) return;
+    const img = new Image();
+    let live = true;
+    img.onload = () => {
+      if (live && img.naturalWidth) setSize({ w: img.naturalWidth, h: img.naturalHeight });
+    };
+    img.src = src;
+    return () => {
+      live = false;
+    };
+  }, [src]);
+  return size;
 }
 
 interface IconUploadProps {
   id: string;
   label: string;
-  hint: string;
-  button: string;
   accept: string;
   value: string;
-  initials: string;
   busy: boolean;
-  /** Read-only (role below ADMIN): the upload stays in view, disabled (8134:212323). */
+  /** Read-only (role below ADMIN): the button stays in view, disabled. */
   readOnly?: boolean;
   onPick(file: File): void;
 }
 
-/** 8135:212920 `Favicon` / 8135:212935 `Touch icon`: label, a 40 preview tile, the upload button, the format hint. */
-function IconUpload({ id, label, hint, button, accept, value, initials, busy, readOnly, onPick }: IconUploadProps) {
+/** One `Icons` row: what is set and the way to change it. */
+function IconUpload({ id, label, accept, value, busy, readOnly, onPick }: IconUploadProps) {
   const fileRef = React.useRef<HTMLInputElement>(null);
+  const size = useImageSize(value);
   return (
-    <div className="tw:flex tw:min-w-0 tw:flex-col tw:gap-2" data-testid={`set-field-${id}`}>
-      <p className={ICON_LABEL}>{label}</p>
-      <div className="tw:flex tw:h-10 tw:items-center tw:gap-3">
-        <div
-          className="tw:flex tw:size-10 tw:shrink-0 tw:items-center tw:justify-center tw:overflow-hidden tw:rounded-[var(--bk-radius-lg)] tw:bg-[var(--bk-accent-tint)]"
-          data-testid={`set-${id}-preview`}
-        >
-          {value ? (
-            <img src={value} alt="" className="tw:size-full tw:object-contain" />
-          ) : (
-            <span className="tw:text-[length:var(--bk-text-13)] tw:font-semibold tw:leading-5 tw:text-[var(--bk-accent)]">
-              {initials}
-            </span>
-          )}
-        </div>
-        <Button
-          id={id}
-          type="button"
-          size="xs"
-          variant="ghost"
-          className={UPLOAD_BTN}
-          disabled={busy || readOnly}
-          onClick={() => fileRef.current?.click()}
-          data-testid={`set-${id}-upload`}
-        >
-          {busy ? "Uploading…" : button}
-        </Button>
-        <span className={ICON_HINT}>{hint}</span>
-        <TextInput
-          ref={fileRef}
-          type="file"
-          accept={accept}
-          className="tw:hidden"
-          tabIndex={-1}
-          data-testid={`set-${id}-file`}
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            e.target.value = "";
-            if (file) onPick(file);
-          }}
-        />
-      </div>
+    <div className={ICON_ROW} data-testid={`set-field-${id}`}>
+      <span className={ICON_LABEL}>{label}</span>
+      <span className={ICON_FILE} data-testid={`set-${id}-file-line`}>
+        {value ? `${fileNameOf(value)}${size ? ` · ${size.w} × ${size.h}` : ""}` : "Not set"}
+      </span>
+      <Button
+        id={id}
+        type="button"
+        size="xs"
+        variant="secondary"
+        className={ICON_BTN}
+        disabled={busy || readOnly}
+        onClick={() => fileRef.current?.click()}
+        aria-label={`${value ? "Replace" : "Upload"} ${label.toLowerCase()}`}
+        data-testid={`set-${id}-upload`}
+      >
+        {busy ? "Uploading…" : value ? "Replace…" : "Upload…"}
+      </Button>
+      <TextInput
+        ref={fileRef}
+        type="file"
+        accept={accept}
+        className="tw:hidden"
+        tabIndex={-1}
+        data-testid={`set-${id}-file`}
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          e.target.value = "";
+          if (file) onPick(file);
+        }}
+      />
     </div>
   );
 }
@@ -386,7 +396,6 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
     );
   }
 
-  const initials = initialsOf(siteName);
   const liveHost = liveHostOf(composer?.getProjectMetadata?.()?.publishedUrl);
   const faviconError = fieldErrors?.["seo.favicon"];
   const onlySlugRefused = !!fieldErrors?.slug && Object.keys(fieldErrors).length === 1;
@@ -397,9 +406,9 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
       {/* 8135:213221: a taken slug is said on its field and in the footer, not in a banner. */}
       {saveError && !onlySlugRefused ? <SaveErrorBanner message={saveError} /> : null}
 
-      <SettingsCard title="Site identity">
-        <div className={FIELD_ROW}>
-          <Field label="Site name" htmlFor="site-name" siteColumn="seo.siteName">
+      <SettingsCard title="Site">
+        <div className={STACK}>
+          <Field label="Site name" htmlFor="site-name" siteColumn="seo.siteName" span="full">
             <Input
               id="site-name"
               type="text"
@@ -415,7 +424,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
               </div>
             )}
           </Field>
-          <Field label="Author" htmlFor="site-author">
+          <Field label="Author" htmlFor="site-author" span="full">
             <Input
               id="site-author"
               type="text"
@@ -427,16 +436,15 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
             />
           </Field>
         </div>
+      </SettingsCard>
 
-        <div className={FIELD_ROW}>
+      <SettingsCard title="Icons">
+        <div>
           <IconUpload
             id="favicon"
             label="Favicon"
-            hint="ICO, PNG or SVG"
-            button="Upload favicon"
             accept="image/x-icon,image/png,image/svg+xml,.ico"
             value={favicon}
-            initials={initials}
             busy={uploading === "favicon"}
             readOnly={readOnly}
             onPick={(file) => void pickIcon(file, "favicon")}
@@ -444,11 +452,8 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
           <IconUpload
             id="touch-icon"
             label="Touch icon"
-            hint="PNG · 180×180 recommended"
-            button="Upload touch icon"
             accept="image/png"
             value={touchIcon}
-            initials={initials}
             busy={uploading === "touch-icon"}
             readOnly={readOnly}
             onPick={(file) => void pickIcon(file, "touch-icon")}
@@ -459,7 +464,42 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
             {uploadError ?? touchIconError}
           </div>
         ) : null}
+      </SettingsCard>
 
+      <SettingsCard title="Advanced" open={advancedOpen} onToggle={setAdvancedOpen} anchors={["site-slug", "favicon-url"]}>
+        <Field label="Site URL slug" htmlFor="site-slug" span="full">
+          <Input
+            id="site-slug"
+            type="text"
+            value={slug}
+            aria-invalid={slugMessage ? true : undefined}
+            onChange={(e) => {
+              setSlug(e.target.value);
+            }}
+          />
+        </Field>
+        <p className="tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-5 tw:text-[var(--bk-ink-muted)]">
+          Use lowercase letters, numbers and hyphens.
+        </p>
+        <p
+          className="tw:m-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]"
+          data-testid="set-general-default-url"
+        >
+          {liveHost
+            ? `Current default URL · ${liveHost}`
+            : "Current default URL · not published yet — your first publish takes it from this slug"}
+        </p>
+        {slugMessage ? (
+          <p
+            role="alert"
+            className="tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-5 tw:text-[var(--bk-red-700)]"
+            data-testid="set-general-slug-error"
+          >
+            {slugMessage}
+          </p>
+        ) : null}
+
+        {/* Kept from the earlier layout; 2L9 does not draw it. */}
         <Field label="Favicon URL" htmlFor="favicon-url" siteColumn="seo.favicon" span="full">
           <Input
             id="favicon-url"
@@ -493,40 +533,6 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({
         >
           {`${localeLabel(language)} (${language}) · Manage in Languages ›`}
         </Button>
-      </SettingsCard>
-
-      <SettingsCard title="Advanced" open={advancedOpen} onToggle={setAdvancedOpen} anchors={["site-slug"]}>
-        <Field label="Site URL slug" htmlFor="site-slug" span="full">
-          <Input
-            id="site-slug"
-            type="text"
-            value={slug}
-            aria-invalid={slugMessage ? true : undefined}
-            onChange={(e) => {
-              setSlug(e.target.value);
-            }}
-          />
-        </Field>
-        <p className="tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-5 tw:text-[var(--bk-ink-muted)]">
-          Use lowercase letters, numbers and hyphens.
-        </p>
-        <p
-          className="tw:m-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]"
-          data-testid="set-general-default-url"
-        >
-          {liveHost
-            ? `Current default URL · ${liveHost}`
-            : "Current default URL · not published yet — your first publish takes it from this slug"}
-        </p>
-        {slugMessage ? (
-          <p
-            role="alert"
-            className="tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-5 tw:text-[var(--bk-red-700)]"
-            data-testid="set-general-slug-error"
-          >
-            {slugMessage}
-          </p>
-        ) : null}
       </SettingsCard>
 
       <SlugChangeDialog

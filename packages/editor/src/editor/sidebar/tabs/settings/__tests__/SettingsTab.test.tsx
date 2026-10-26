@@ -414,7 +414,7 @@ describe("SettingsTab — the shell", () => {
     expect(footStatus()).toBe("All changes saved");
     expect((screen.getByTestId("set-foot-save") as HTMLButtonElement).disabled).toBe(true);
     expect((screen.getByTestId("set-foot-discard") as HTMLButtonElement).disabled).toBe(true);
-    expect(screen.getByTestId("set-card-site-identity")).toBeTruthy();
+    expect(screen.getByTestId("set-card-site")).toBeTruthy();
   });
 
   it("the plan gate puts Upgrade in the header and the locked card in the body", async () => {
@@ -732,6 +732,8 @@ describe("SettingsTab — Unsaved settings", () => {
     const composer = makeComposer();
     renderS(<SettingsTab composer={asComposer(composer)} />);
     await openGeneralAndEdit();
+    // 2L9: the Languages link moved into General's Advanced card.
+    fireEvent.click(screen.getByTestId("set-card-toggle-advanced"));
     fireEvent.click(screen.getByTestId("set-general-language"));
     expect(await screen.findByTestId("set-unsaved")).toBeTruthy();
     expect(headTitle()).toBe("General");
@@ -743,6 +745,7 @@ describe("SettingsTab — Unsaved settings", () => {
   it("the same link on a clean screen goes straight there", async () => {
     renderS(<SettingsTab composer={asComposer(makeComposer())} />);
     fireEvent.click(screen.getByTestId("set-nav-general"));
+    fireEvent.click(await screen.findByTestId("set-card-toggle-advanced"));
     fireEvent.click(await screen.findByTestId("set-general-language"));
     await waitFor(() => expect(headTitle()).toBe("Languages"));
     expect(screen.queryByTestId("set-unsaved")).toBeNull();

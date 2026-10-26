@@ -61,7 +61,7 @@ describe("Section — the card", () => {
 });
 
 describe("Field", () => {
-  it("labels its control at 11 (4418:128657) and can span the row", () => {
+  it("labels its control at 13/20 (2L9 B8-S02 238:10283) and can span the row", () => {
     render(
       <>
         <Field label="Meta title" htmlFor="seo-meta-title">
@@ -74,7 +74,7 @@ describe("Field", () => {
     );
     const label = screen.getByTestId("set-field-label-meta-title");
     expect(label.getAttribute("for")).toBe("seo-meta-title");
-    expect(label.className).toContain("var(--bk-text-11)");
+    expect(label.className).toContain("var(--bk-text-13)");
     expect(screen.getByTestId("set-field-meta-title").className).not.toContain("tw:col-span-full");
     expect(screen.getByTestId("set-field-head-scripts").className).toContain("tw:col-span-full");
   });
