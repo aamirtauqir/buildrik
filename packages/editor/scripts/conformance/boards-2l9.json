@@ -9298,7 +9298,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Auto|Off card + per-token list; copy differs (\"Auto follows each visitor’s device…\"), no \"Mode · Off\" + \"Turn on Auto…\" paired-value list"
+   "verifiedNote": "L-D W3: \"Mode · Off\", \"Website appearance\", \"Auto follows the visitor’s device appearance. Editor controls stay light.\", \"Turn on Auto…\"; per-token paired values are ColourModeSection's list below. Built, not compared."
   },
   {
    "nodeId": "203:37790",
@@ -9308,7 +9308,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No impact-preview dialog: Auto applies directly with restore point (DarkModeCard.tsx:85)"
+   "verifiedNote": "L-D W3: Modal \"Turn on automatic dark mode?\" — \"Your n semantic colors already have dark values. No new values are needed.\" (or the generated list + Preview in dark), \"A restore point is created first. Auto and any generated dark values apply as one Undo step.\", Cancel · Turn on Auto. Built, not compared."
   },
   {
    "nodeId": "203:38036",
@@ -9318,7 +9318,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Auto|Off card + per-token list; copy differs (\"Auto follows each visitor’s device…\"), no \"Mode · Off\" + \"Turn on Auto…\" paired-value list",
+   "verifiedNote": "L-D W3: \"Mode · Auto\" with \"Turn off Auto\" (board still draws \"Turn on Auto…\" — kept the code's way back to Off). Built, not compared.",
    "inheritsFrom": "203:37214"
   },
   {
