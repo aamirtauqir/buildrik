@@ -61,7 +61,7 @@ describe("SAVED COMPONENTS — scope", () => {
       { id: "there", name: "Menu hero", pageId: "page-menu" },
     ]);
     renderTab(composer);
-    fireEvent.click(screen.getByTestId("insert-group-mine"));
+    fireEvent.click(screen.getByRole("tab", { name: "Components" }));
     await waitFor(() => expect(sync.fetchComponentLibrary).toHaveBeenCalled());
     expect(screen.getByTestId("insert-mine-site")).toBeTruthy();
     expect(screen.getByTestId("insert-mine-here")).toBeTruthy();
@@ -77,7 +77,7 @@ describe("FROM LIBRARY", () => {
     ]);
     const { composer } = makeComposer([{ id: "mine", name: "Site header" }, { id: "btn", name: "Button / primary" }]);
     renderTab(composer);
-    fireEvent.click(screen.getByTestId("insert-group-mine"));
+    fireEvent.click(screen.getByRole("tab", { name: "Components" }));
     await screen.findByTestId("insert-library-label");
     expect(screen.getByTestId("insert-library-label").textContent).toBe("FROM LIBRARY");
     expect(screen.getByTestId("insert-library-btn")).toBeTruthy();
@@ -91,7 +91,7 @@ describe("FROM LIBRARY", () => {
     sync.fetchLibraryComponent.mockResolvedValue({ id: "price", name: "Price row" });
     const { composer, components } = makeComposer([]);
     renderTab(composer);
-    fireEvent.click(screen.getByTestId("insert-group-mine"));
+    fireEvent.click(screen.getByRole("tab", { name: "Components" }));
     fireEvent.click(await screen.findByTestId("insert-library-price"));
     await waitFor(() => expect(components.instantiateComponent).toHaveBeenCalledWith("price", "root"));
     expect(sync.fetchLibraryComponent).toHaveBeenCalledWith("price");
@@ -102,7 +102,7 @@ describe("FROM LIBRARY", () => {
     sync.fetchComponentLibrary.mockResolvedValue([{ componentId: "btn", name: "Button / primary", siteCount: 3, onThisSite: true }]);
     const { composer, components } = makeComposer([{ id: "btn", name: "Button / primary" }]);
     renderTab(composer);
-    fireEvent.click(screen.getByTestId("insert-group-mine"));
+    fireEvent.click(screen.getByRole("tab", { name: "Components" }));
     fireEvent.click(await screen.findByTestId("insert-library-btn"));
     await waitFor(() => expect(components.instantiateComponent).toHaveBeenCalledWith("btn", "root"));
     expect(sync.fetchLibraryComponent).not.toHaveBeenCalled();
@@ -115,7 +115,7 @@ describe("FROM LIBRARY", () => {
     const { composer, components } = makeComposer([]);
     components.adoptLibraryComponent.mockRejectedValueOnce(new Error("LIBRARY_MASTER_MALFORMED"));
     renderTab(composer);
-    fireEvent.click(screen.getByTestId("insert-group-mine"));
+    fireEvent.click(screen.getByRole("tab", { name: "Components" }));
     fireEvent.click(await screen.findByTestId("insert-library-price"));
     expect(await screen.findByText("This library component is damaged and can't be added.")).toBeTruthy();
     expect(screen.queryByText("Couldn't add component. Try again.")).toBeNull();

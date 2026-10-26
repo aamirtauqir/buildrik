@@ -3192,6 +3192,10 @@ const CASES: Record<string, () => React.ReactElement> = {
         onCopyLink={() => {}}
         onSettings={() => {}}
         onRemoveFromFolder={() => {}}
+        onSaveAsTemplate={() => {}}
+        onMoveToFolder={() => {}}
+        onMove={() => {}}
+        rootPosition={{ index: 1, count: PAGES_FIXTURE.length }}
       />
     </div>
   ),

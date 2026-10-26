@@ -21,6 +21,7 @@ import { EVENTS } from "@/shared/constants/events";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { getBuildrikClient } from "@/services/api-client";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
+import { pageFileNames } from "@/engine/export";
 
 function client() {
   return getBuildrikClient(DASHBOARD_URL);
@@ -35,9 +36,23 @@ export interface DynamicPagesSummary {
   /** Each page-generating collection's own count — the template page's
    *  delete confirm names what stops publishing (EDT-057). */
   byCollection: Record<string, number>;
+  /** The Pages manager's "Collection pages" block (design-2l9 board 63:6393):
+   *  one row per page-generating collection, its URL pattern, how many pages
+   *  it publishes and the page it uses as a template. */
+  collections: CollectionPagesRow[];
 }
 
-const EMPTY: DynamicPagesSummary = { count: 0, collectionId: null, byCollection: {} };
+export interface CollectionPagesRow {
+  id: string;
+  name: string;
+  /** "/blog/{slug}" — the collection's pattern, always rooted. */
+  pattern: string;
+  count: number;
+  /** The page whose layout every record page uses; null when none is set. */
+  templatePageId: string | null;
+}
+
+const EMPTY: DynamicPagesSummary = { count: 0, collectionId: null, byCollection: {}, collections: [] };
 
 export function useDynamicPagesSummary(composer: Composer | null): DynamicPagesSummary {
   const [summary, setSummary] = React.useState<DynamicPagesSummary>(EMPTY);
@@ -71,10 +86,19 @@ export function useDynamicPagesSummary(composer: Composer | null): DynamicPagesS
         )
       ).then((results) => {
         if (cancelled) return;
+        const byCollection = Object.fromEntries(results.map((r) => [r.id, r.count]));
+        const pageByFile = new Map([...pageFileNames(composer.elements?.getAllPages?.() ?? [])].map(([id, file]) => [file, id]));
         setSummary({
           count: results.reduce((sum, r) => sum + r.count, 0),
           collectionId: results.find((r) => r.count > 0)?.id ?? null,
-          byCollection: Object.fromEntries(results.map((r) => [r.id, r.count])),
+          byCollection,
+          collections: pageCollections.map((c) => ({
+            id: c.id,
+            name: c.name,
+            pattern: c.pageSlugPattern!.startsWith("/") ? c.pageSlugPattern! : `/${c.pageSlugPattern}`,
+            count: byCollection[c.id] ?? 0,
+            templatePageId: (c.pageTemplatePath && pageByFile.get(c.pageTemplatePath)) || null,
+          })),
         });
       });
     };

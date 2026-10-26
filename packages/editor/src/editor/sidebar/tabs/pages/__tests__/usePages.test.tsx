@@ -362,6 +362,19 @@ describe("usePages duplicatePage", () => {
   });
 });
 
+/* design-2l9 board 139:50620: a bulk duplicate reports once. */
+describe("usePages duplicatePages", () => {
+  it("duplicates each and says so once — originals kept", () => {
+    const composer = createMockComposer({ pages: [pg("p1", "Home"), pg("p2", "About"), pg("p3", "Work")] });
+    const { result } = setup(composer);
+    addToastMock.mockClear();
+    act(() => result.current.duplicatePages(["p1", "p2", "p3"]));
+    expect(composer.elements.duplicatePage).toHaveBeenCalledTimes(3);
+    expect(addToastMock).toHaveBeenCalledTimes(1);
+    expect(lastToast()?.description).toBe("3 pages duplicated · Originals kept");
+  });
+});
+
 describe("usePages deletePages", () => {
   /* v3 4418:96537 — one toast per action. */
   it("deletes every page and reports once, naming them, with one Undo", () => {

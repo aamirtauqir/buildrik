@@ -16,7 +16,8 @@ import type { GroupedTabId, GroupedTabConfig } from "../rail/tabsConfig";
 import { getTabConfig, getFigmaRailGroups, RAIL_FIGMA_IDS, VIEWER_TABS } from "../rail/tabsConfig";
 import type { BlockData } from "@/shared/types";
 import type { PageSettingsOpenRequest } from "./tabs/pages/types";
-import { Button, HintTooltip, useToast } from "@/editor/chrome-ui";
+import { Button, HintTooltip, Menu, MenuGroup, MenuItem, MenuLabel, Popover, useToast } from "@/editor/chrome-ui";
+import { useEditLocks } from "@/editor/shared/useEditLocks";
 import { InspectorErrorBoundary } from "../inspector/components/InspectorErrorBoundary";
 import { PanelSkeleton, SidebarErrorFallback } from "./SidebarFallbacks";
 import { TabRouter } from "./TabRouter";
@@ -249,6 +250,54 @@ function FigmaRail({
 }
 
 // ============================================
+// Rail Help menu (design-2l9 263:255084)
+// ============================================
+
+function RailHelpMenu({ composer, showTour }: { composer: Composer | null; showTour: boolean }) {
+  const [open, setOpen] = React.useState(false);
+  const close = () => setOpen(false);
+  return (
+    <Popover
+      open={open}
+      onClose={() => setOpen(false)}
+      placement="right-end"
+      label="Help"
+      trigger={
+        <Button
+          color="light"
+          className="ls-btn ls-btn--labeled"
+          onClick={() => setOpen((v) => !v)}
+          aria-label="Help"
+          aria-haspopup="menu"
+          aria-expanded={open}
+          data-testid="rail-help"
+        >
+          <HelpCircle size={20} />
+          <span className="ls-btn__label">Help</span>
+        </Button>
+      }
+    >
+      <Menu label="Help" data-testid="rail-help-menu" className="tw:w-60">
+        <MenuLabel>Help</MenuLabel>
+        <MenuItem kbd="?" data-testid="rail-help-shortcuts" onClick={() => { close(); composer?.emit(EVENTS.UI_TOGGLE_CHEAT_SHEET, {}); }}>
+          Keyboard shortcuts
+        </MenuItem>
+        {showTour && (
+          <MenuItem data-testid="rail-help-getting-started" onClick={() => { close(); composer?.emit(EVENTS.UI_ONBOARDING_REPLAY, {}); }}>
+            Getting started
+          </MenuItem>
+        )}
+        <MenuGroup>
+          <MenuItem data-testid="rail-help-legend" onClick={() => { close(); composer?.emit(EVENTS.UI_TOGGLE_KEYBOARD_LEGEND, {}); }}>
+            Keyboard legend
+          </MenuItem>
+        </MenuGroup>
+      </Menu>
+    </Popover>
+  );
+}
+
+// ============================================
 // LeftSidebar Component
 // ============================================
 
@@ -276,6 +325,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
 }) => {
   const navRef = React.useRef<HTMLElement>(null);
   const railTab = useRailTab(activeTab);
+  const editLocks = useEditLocks(composer);
   const panelContentRef = React.useRef<HTMLDivElement>(null);
   const [errorKey, setErrorKey] = React.useState(0);
 
@@ -445,21 +495,12 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
 
         <div className="ls-spacer" />
 
-        {/* Every v3 shell board ends the rail with "? Help" (C5 G1-089). It
-            opens the Keyboard legend card (4418:126882), whose "All shortcuts
-            ›" is the door to the one sheet (B7) — not a tab; the drawer stays. */}
-        <HintTooltip content="Keyboard shortcuts · ?" placement="right">
-          <Button
-            color="light"
-            className="ls-btn ls-btn--labeled"
-            onClick={() => composer?.emit(EVENTS.UI_TOGGLE_KEYBOARD_LEGEND, {})}
-            aria-label="Help — keyboard shortcuts"
-            data-testid="rail-help"
-          >
-            <HelpCircle size={20} />
-            <span className="ls-btn__label">Help</span>
-          </Button>
-        </HintTooltip>
+        {/* design-2l9 boards 263:255084 / 263:255509: the rail's seventh
+            item, "Help", opens a two-row menu — Keyboard shortcuts (the one
+            sheet, ?) and Getting started (the tour; not in view mode or for
+            a viewer). The Keyboard legend card it used to open stays below
+            them (code-ahead, OD-3: nothing loses its door). */}
+        <RailHelpMenu composer={composer} showTour={!viewerChrome && !editLocks.includes("view")} />
       </nav>
       {/* Panel */}
       <div

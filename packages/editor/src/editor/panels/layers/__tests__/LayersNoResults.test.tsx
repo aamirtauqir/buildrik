@@ -1,7 +1,7 @@
 /**
- * v3 board 4418:83498 (Layers · no results), redrawn 2026-10-10 for L2-031:
- * the state glyph, "No matching layers", "Try a different name, or clear the
- * search.", a "Clear search" button, and the outlined hand-off to ⌘K,
+ * design-2l9 board 147:79328 (Layers · no search matches): the state glyph,
+ * "No layers match “q”", "Search by name, type, tag or ID.", a "Clear
+ * search" button, and (kept, code-ahead) the outlined hand-off to ⌘K,
  * "Search everywhere for “carousel”". The empty tree ("No layers yet") no
  * longer shares this heading.
  *
@@ -17,9 +17,9 @@ describe("LayersNoResults", () => {
     const onSearchEverywhere = vi.fn();
     const onClear = vi.fn();
     render(<LayersNoResults search="carousel" onSearchEverywhere={onSearchEverywhere} onClear={onClear} />);
-    expect(screen.getByTestId("layers-no-results-title")).toHaveTextContent("No matching layers");
+    expect(screen.getByTestId("layers-no-results-title")).toHaveTextContent("No layers match “carousel”");
     expect(screen.getByTestId("layers-no-results")).not.toHaveTextContent("Nothing here yet");
-    expect(screen.getByTestId("layers-no-results-text")).toHaveTextContent("Try a different name, or clear the search.");
+    expect(screen.getByTestId("layers-no-results-text")).toHaveTextContent("Search by name, type, tag or ID.");
     fireEvent.click(screen.getByRole("button", { name: "Clear search" }));
     expect(onClear).toHaveBeenCalledTimes(1);
     fireEvent.click(screen.getByRole("button", { name: "Search everywhere for “carousel”" }));

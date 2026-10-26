@@ -15,7 +15,7 @@
 
 import { PasteHtmlModal } from "./PasteHtmlModal";
 import * as React from "react";
-import { Button, IconButton, Menu, MenuItem, PanelFrame, PanelSearch, Popover } from "@/editor/chrome-ui";
+import { Button, IconButton, Menu, MenuItem, PanelFrame, PanelSearch, Popover, Tabs } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
 import type { BlockData } from "@/shared/types";
 import { useBuildTab } from "./hooks/useBuildTab";
@@ -26,13 +26,26 @@ import { SearchResults } from "./components/SearchResults";
 import { useInsertDrag } from "@/editor/canvas/insertDrag";
 import { takePendingGenerate, takePendingInsertGroup, takePendingPasteHtml } from "./insertGroupRequest";
 import { GenerateBlockScreen } from "./components/GenerateBlockScreen";
-import { buildInsertGroups, blockRows, componentRows, type InsertGroupId } from "./catalog/groups";
+import { addTabOf, buildInsertGroups, blockRows, componentRows, elementCategoryGroups, type AddTabId, type InsertGroup, type InsertGroupId } from "./catalog/groups";
+import type { FlatElEntry } from "./catalog/types";
+import { InsertTargetStrip } from "./components/InsertTargetStrip";
+import { CATALOG } from "./catalog/catalog";
 import { EVENTS } from "@/shared/constants";
 import type { ComponentDefinition } from "@/shared/types/components";
 import { useComponentList } from "../component-library/useComponentList";
 import { INSTANTIATE_TOASTS, instantiateComponentAtSelection } from "../component-library/instantiate";
 import { fetchLibraryComponent } from "@/services/componentSync";
 import "./BuildTab.css";
+
+const ADD_TABS: ReadonlyArray<{ id: AddTabId; label: string }> = [
+  { id: "elements", label: "Elements" },
+  { id: "blocks", label: "Blocks" },
+  { id: "components", label: "Components" },
+];
+
+const DEFAULT_OPEN_GROUPS: InsertGroupId[] = [
+  "favourites", "recent", ...CATALOG.map((c) => `cat-${c.id}` as const), "blocks", "components", "mine",
+];
 
 export interface BuildTabProps {
   composer: Composer | null;
@@ -70,13 +83,19 @@ export const BuildTab: React.FC<BuildTabProps> = ({
   // above it, the asked-for group sat off-screen.
   const [asked] = React.useState(() => (composer ? takePendingInsertGroup(composer) : undefined));
   const [scrollTarget, setScrollTarget] = React.useState<InsertGroupId | null>(asked ?? null);
+  /* Board 7:18981: Elements · Blocks · Components. A door that asks for a
+     group lands on that group's tab. */
+  const [addTab, setAddTab] = React.useState<AddTabId>(() => (asked ? addTabOf(asked) : "elements"));
+  /* Board 7:18981 draws its groups open under each tab; every group still
+     folds. A door that asks for one group opens that group alone. */
   const [openGroups, setOpenGroups] = React.useState<Set<InsertGroupId>>(() =>
-    new Set<InsertGroupId>(asked ? [asked] : ["favourites", "elements"]),
+    new Set<InsertGroupId>(asked ? [asked] : DEFAULT_OPEN_GROUPS),
   );
   React.useEffect(() => {
     if (!composer) return;
     const open = ({ group }: { group: InsertGroupId }) => {
       takePendingInsertGroup(composer);
+      setAddTab(addTabOf(group));
       setOpenGroups(new Set([group]));
       setScrollTarget(group);
     };
@@ -113,6 +132,14 @@ export const BuildTab: React.FC<BuildTabProps> = ({
     () => buildInsertGroups(composer?.components ? mine.length + library.length : null, tab.favs.size, tab.recents.length, tab.allElements.length),
     [composer, mine.length, library.length, tab.favs.size, tab.recents.length, tab.allElements.length],
   );
+  /* Elements tab: ★ Favourites and Recent (while they have rows), then the
+     catalog's categories. ELEMENTS' one flat group is the categories now. */
+  const categories = React.useMemo(() => elementCategoryGroups(tab.allElements), [tab.allElements]);
+  const tabGroups = React.useMemo((): Array<InsertGroup & { elements?: FlatElEntry[] }> => {
+    if (addTab === "elements") return [...groups.filter((g) => g.id === "favourites" || g.id === "recent"), ...categories];
+    if (addTab === "blocks") return groups.filter((g) => g.id === "blocks");
+    return groups.filter((g) => g.id === "components" || g.id === "mine");
+  }, [addTab, groups, categories]);
 
   // MINE row click — the same instantiate contract the Components surface
   // uses: selected element is the parent, else the active page root.
@@ -277,6 +304,18 @@ export const BuildTab: React.FC<BuildTabProps> = ({
         shortcut="⌘F"
         data-testid="add-search"
       />
+      {/* Board 7:18981: the three sources as tabs under the search. A query
+          searches all three, so the tabs stand down while it runs. */}
+      {!isSearching && (
+        <Tabs
+          label="Add"
+          tabs={ADD_TABS}
+          value={addTab}
+          onChange={(id) => setAddTab(id as AddTabId)}
+          panelId="add-panel-tabpanel"
+          data-testid="add-tabs"
+        />
+      )}
 
       <div className="bld-content" ref={panelRef}>
         {isSearching ? (
@@ -293,17 +332,15 @@ export const BuildTab: React.FC<BuildTabProps> = ({
             />
           </div>
         ) : (
-          <div className="bld-scroll">
-            {/* Board 137:2: source taxonomy, not element-type categories.
-                ELEMENTS/BLOCKS render inline; the navigate groups open their
-                owning tabs. Blocks insert through the SAME onBlockClick path
-                elements use — BlockDefinition extends BlockData. */}
-            {groups.map((g) => (
+          <div className="bld-scroll" role="tabpanel" id="add-panel-tabpanel" aria-labelledby={`add-panel-tabpanel-tab-${addTab}`}>
+            <InsertTargetStrip composer={composer} />
+            {/* Blocks insert through the SAME onBlockClick path elements use —
+                BlockDefinition extends BlockData. */}
+            {tabGroups.map((g) => (
               <React.Fragment key={g.id}>
               {/* Boards 4418:100299 / 102121: "✦  Generate a block with AI…"
-                  follows the open ELEMENTS rows, right above BLOCKS; with
-                  ELEMENTS collapsed (6887:79760) it is not drawn (G2-117). */}
-              {g.id === "blocks" && composer && openGroups.has("elements") && (
+                  heads BLOCKS (G2-117). Removed by PR #33 (no AI in the UI). */}
+              {g.id === "blocks" && composer && (
                 <div
                   role="button"
                   tabIndex={0}
@@ -322,13 +359,12 @@ export const BuildTab: React.FC<BuildTabProps> = ({
                 isOpen={openGroups.has(g.id)}
                 onToggle={() => toggleGroup(g)}
                 elements={
-                  g.id === "elements"
-                    ? tab.allElements
-                    : g.id === "favourites"
+                  g.elements ??
+                  (g.id === "favourites"
                       ? tab.allElements.filter((el) => tab.favs.has(el.name))
                       : g.id === "recent"
                         ? tab.recents.flatMap((n) => tab.allElements.find((el) => el.name === n) ?? [])
-                        : undefined
+                        : undefined)
                 }
                 favs={tab.favs}
                 onToggleFav={tab.toggleFav}
@@ -348,8 +384,8 @@ export const BuildTab: React.FC<BuildTabProps> = ({
               </React.Fragment>
             ))}
             {/* Boards 6887:79760 / 4418:102121: "Page templates ›" closes the
-                list — whole-page layouts live in Templates. */}
-            {composer && (
+                block list — whole-page layouts live in Templates. */}
+            {composer && addTab === "blocks" && (
               <Button
                 color="light"
                 data-testid="insert-page-templates"

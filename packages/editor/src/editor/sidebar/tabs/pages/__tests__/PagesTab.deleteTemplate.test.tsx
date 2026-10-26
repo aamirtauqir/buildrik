@@ -16,7 +16,7 @@ import PagesTab from "../PagesTab";
 import type { DynamicPagesSummary } from "../useDynamicPagesSummary";
 
 const summary = vi.hoisted(() => {
-  const value: DynamicPagesSummary = { count: 2, collectionId: "posts", byCollection: { posts: 2 } };
+  const value: DynamicPagesSummary = { count: 2, collectionId: "posts", byCollection: { posts: 2 }, collections: [] };
   return { value };
 });
 vi.mock("../useDynamicPagesSummary", () => ({ useDynamicPagesSummary: () => summary.value }));
@@ -52,13 +52,13 @@ describe("PagesTab — deleting a collection's template page (EDT-057)", () => {
   });
 
   it("says one record page in the singular", () => {
-    summary.value = { count: 1, collectionId: "posts", byCollection: { posts: 1 } };
+    summary.value = { count: 1, collectionId: "posts", byCollection: { posts: 1 }, collections: [] };
     mount([POSTS]);
     expect(askToDelete("Post template")).toHaveTextContent("its 1 record page stops publishing.");
   });
 
   it("names the collection without a number when the count has not arrived", () => {
-    summary.value = { count: 0, collectionId: null, byCollection: {} };
+    summary.value = { count: 0, collectionId: null, byCollection: {}, collections: [] };
     mount([POSTS]);
     expect(askToDelete("Post template")).toHaveTextContent("It is the template for Posts — its record pages stop publishing.");
   });

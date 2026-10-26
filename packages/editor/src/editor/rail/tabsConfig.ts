@@ -287,6 +287,11 @@ export function getTabConfig(tabId: GroupedTabId): GroupedTabConfig | undefined 
 //   publish    → topbar Publish button
 //   history    → topbar ⋯ site menu ("Version history")
 //
+// design-2l9 (Figma 2L9OTGzBrL6kYmU18yA1c7, page 03, OD-3 default): the board
+// rail is these six plus "Help" at the foot (LeftSidebar's RailHelpMenu, board
+// 263:255084). The off-rail homes above are unchanged; Activity is the site
+// menu's "Activity log" + ⌘K, Review the topbar review chip + R.
+//
 // It is the one rail (the legacy zone rail and the E3 tool rail were deleted
 // with C5 G1-095). It reads GROUPED_TABS_CONFIG and never mutates it.
 

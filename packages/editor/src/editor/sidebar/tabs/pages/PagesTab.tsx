@@ -27,12 +27,15 @@ import {
   PanelFrame,
   PanelSearch,
   Popover,
+  Tabs,
+  useToast,
 } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants/events";
 import { listNames } from "@shared/utils/helpers/string";
 import type { DrawerTab, PageSettingsOpenRequest } from "./types";
 import { PageContextMenu } from "./components/PageContextMenu";
+import { MovePagesDialog, TOP_LEVEL } from "./components/MovePagesDialog";
 import { PageList } from "./components/PageList";
 import { SiteStructureTree } from "./components/SiteStructureTree";
 import { SearchListingsTable } from "./components/SearchListingsTable";
@@ -42,10 +45,39 @@ import { SettingsErrorBoundary } from "./page-settings/SettingsErrorBoundary";
 import { usePages } from "./usePages";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { useFolders } from "./useFolders";
+import { pageRoute } from "./utils/slug";
 import { useBulkSelect } from "./useBulkSelect";
 import { useDynamicPagesSummary } from "./useDynamicPagesSummary";
 import { pageFileNames } from "@/engine/export";
 import "./PagesTab.css";
+
+type PageView = "pages" | "listings" | "structure";
+const PAGE_VIEWS: ReadonlyArray<{ id: PageView; label: string }> = [
+  { id: "pages", label: "Pages" },
+  { id: "listings", label: "Listings" },
+  { id: "structure", label: "Structure" },
+];
+
+/**
+ * One place up or down among the top-level pages, as the engine's "put it
+ * after <id>" (null = first). Moving up lands after whatever precedes the
+ * previous top-level page in SITE order, so folder members keep their
+ * places. Null at either end.
+ */
+export function rootMove(
+  siteOrder: readonly string[],
+  rootIds: readonly string[],
+  pageId: string,
+  direction: -1 | 1,
+): { afterId: string | null; position: number } | null {
+  const i = rootIds.indexOf(pageId);
+  const j = i + direction;
+  if (i < 0 || j < 0 || j >= rootIds.length) return null;
+  if (direction === 1) return { afterId: rootIds[j], position: j + 1 };
+  const order = siteOrder.filter((id) => id !== pageId);
+  const at = order.indexOf(rootIds[j]);
+  return { afterId: at > 0 ? order[at - 1] : null, position: j + 1 };
+}
 
 export interface PagesTabProps {
   composer: Composer | null;
@@ -94,10 +126,10 @@ export const PagesTab: React.FC<PagesTabProps> = ({
      Read-only hint row only — opening a collection's own Dynamic pages tab
      is still where the pattern/template are edited. */
   const dynamicPages = useDynamicPagesSummary(composer);
-  const openDynamicPages = React.useCallback(() => {
-    if (!dynamicPages.collectionId) return;
-    composer?.emit(EVENTS.UI_CMS_OPEN, { collectionId: dynamicPages.collectionId, tab: "dynamic-pages" });
-  }, [composer, dynamicPages.collectionId]);
+  const manageCollection = React.useCallback(
+    (collectionId: string) => composer?.emit(EVENTS.UI_CMS_OPEN, { collectionId, tab: "dynamic-pages" }),
+    [composer],
+  );
 
   // Prune stale folder references when pages are deleted
   React.useEffect(() => {
@@ -151,7 +183,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
   // Redesign P4 (50-pages): the panel has two views — the page tree ("Pages")
   // and the whole-site search-listings table ("Search listings"). Default to the
   // tree; the table is the SEO-at-a-glance view that scales past a few pages.
-  const [view, setView] = React.useState<"pages" | "listings" | "structure">("pages");
+  const [view, setView] = React.useState<PageView>("pages");
 
   /* Board 7069:79383 "Pages · Panel menu (⋯)": Select pages… · Show structure ·
      Reload, plus the Listings row (EP-11, 7576:197553). Listings and Structure
@@ -284,9 +316,9 @@ export const PagesTab: React.FC<PagesTabProps> = ({
 
   // Bulk actions
   const handleBulkDuplicate = React.useCallback(() => {
-    bulk.selectedIds.forEach((id) => p.duplicatePage(id));
+    p.duplicatePages([...bulk.selectedIds]);
     bulk.clearSelection();
-  }, [bulk.selectedIds, p.duplicatePage, bulk.clearSelection]);
+  }, [bulk.selectedIds, p.duplicatePages, bulk.clearSelection]);
 
   /** Resolve what a bulk delete would actually remove, applying the same
    *  guards as the per-page path: never the home page, never the last one. */
@@ -343,7 +375,66 @@ export const PagesTab: React.FC<PagesTabProps> = ({
     bulk.clearSelection();
   }, [bulk.selectedIds, f.removePageFromFolder, bulk.clearSelection]);
 
+  /* Boards 137:53911 / 137:59625: one place up or down among the TOP-LEVEL
+     pages (folder members are not ordered). The engine orders the whole site
+     ("after <id>"), so moving above the previous top-level page lands after
+     whatever precedes it in site order. Page order is not in the composer's
+     history, so the receipt carries no Undo (REQUESTS #13). */
+  const { addToast } = useToast();
+  const rootIds = React.useMemo(
+    () => p.pages.filter((pg) => !f.pageToFolder.has(pg.id)).map((pg) => pg.id),
+    [p.pages, f.pageToFolder],
+  );
+  const movePage = React.useCallback(
+    (pageId: string, direction: -1 | 1) => {
+      const page = p.pages.find((pg) => pg.id === pageId);
+      const move = rootMove(p.pages.map((pg) => pg.id), rootIds, pageId, direction);
+      if (!composer || !page || !move) return;
+      if (!composer.elements.reorderPage(pageId, move.afterId)) return;
+      addToast({
+        description: `${page.name} moved to position ${move.position}${page.isHome ? " · Still the homepage" : ""}`,
+        tone: "info",
+      });
+    },
+    [composer, p.pages, rootIds, addToast],
+  );
+
+  /* Board 131:41791 "Move to folder…" — the one-page Move dialog. */
+  const [movingPageId, setMovingPageId] = React.useState<string | null>(null);
+  const movingPage = p.pages.find((pg) => pg.id === movingPageId);
+  const moveToTarget = React.useCallback(
+    (target: string) => {
+      const page = movingPage;
+      setMovingPageId(null);
+      if (!page) return;
+      const from = f.folders.find((fd) => fd.id === f.pageToFolder.get(page.id));
+      const to = f.folders.find((fd) => fd.id === target);
+      if (target === TOP_LEVEL) f.removePageFromFolder(page.id);
+      else f.movePageToFolder(page.id, target);
+      /* Boards 131:41086 / 127:40244 (no Undo: folders are not composer
+         history — REQUESTS #13). */
+      addToast({
+        description: to
+          ? `${page.name} moved to ${to.name} · ${pageRoute(page)} unchanged`
+          : `${page.name} removed from ${from?.name ?? "its folder"} · Page kept`,
+        tone: "info",
+      });
+    },
+    [movingPage, f, addToast],
+  );
+
+  /* Board 63:13820 "Save as template…": the save-template modal saves the
+     ACTIVE page, so the row's page goes active first. */
+  const saveAsTemplate = React.useCallback(
+    (pageId: string) => {
+      p.selectPage(pageId);
+      composer?.emit(EVENTS.TEMPLATE_SAVE_REQUESTED, {});
+    },
+    [p, composer],
+  );
+
   const menuFolderId = p.contextMenu ? f.pageToFolder.get(p.contextMenu.pageId) : undefined;
+  const menuRootIndex = p.contextMenu ? rootIds.indexOf(p.contextMenu.pageId) : -1;
   const menuFolderName = f.folders.find((fd) => fd.id === menuFolderId)?.name;
 
   return (
@@ -357,7 +448,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
       {/* v3 4418:90494 header: the ⋯ panel menu rides in the header's
           `actions` slot. No ⌘K keycap — the topbar field is the ⌘K door. */}
       <PanelFrame.Header
-        title="Pages"
+        title={`Pages · ${p.pages.length}`}
         onHelpClick={onHelpClick}
         onClose={onClose}
         actions={
@@ -425,12 +516,23 @@ export const PagesTab: React.FC<PagesTabProps> = ({
       {(p.loadError || view === "pages") && (
         <PanelSearch placeholder="Search pages…" value={search} onChange={setSearch} data-testid="pages-search" />
       )}
+      {/* Board 63:6393: the three views as tabs under the search (they were
+          ⋯ rows only; the ⋯ keeps them too, as board 65:17148 draws). */}
+      {!p.loadError && (
+        <Tabs
+          label="Pages view"
+          tabs={PAGE_VIEWS}
+          value={view}
+          onChange={(id) => setView(id as PageView)}
+          data-testid="pages-view-tabs"
+        />
+      )}
       {/* Board 141:165 keeps the search band and the Add-page footer either
           side of the error, so the error is a BODY state inside PageList — not
           a replacement for the whole panel body. */}
       <PanelFrame.Body noScroll>
           {view === "structure" && !p.loadError ? (
-            <SiteStructureTree pages={p.pages} onSelectPage={(id) => { p.selectPage(id); }} onBack={() => setView("pages")} />
+            <SiteStructureTree pages={p.pages} onSelectPage={(id) => { p.selectPage(id); }} />
           ) : view === "listings" && !p.loadError ? (
             /* PanelFrame.Body is `flex-1 min-h-0 overflow-hidden` — flex-1 as a
                CHILD, but it is not itself display:flex, so these two stack as
@@ -442,15 +544,6 @@ export const PagesTab: React.FC<PagesTabProps> = ({
                inert for the same reason — written for a flex parent it never
                had. */
             <div className="tw:flex tw:h-full tw:min-h-0 tw:flex-col">
-              <Button
-                color="light"
-                size="xs"
-                className="bd-pg-listings-back"
-                data-testid="pages-listings-back"
-                onClick={() => setView("pages")}
-              >
-                {"\u2039"} Pages
-              </Button>
               <SearchListingsTable pages={p.pages} onEditPage={p.openSettings} onOpenFull={onExpandToggle} />
             </div>
           ) : (
@@ -479,6 +572,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
             onBulkDelete={handleBulkDelete}
             onClearSelection={leaveSelectMode}
             onContextMenu={p.openContextMenu}
+            onMovePage={movePage}
             dirtyPages={dirtyPages}
             onRenameStart={p.startRename}
             onRenameCommit={handleRenameCommit}
@@ -489,8 +583,10 @@ export const PagesTab: React.FC<PagesTabProps> = ({
             onFolderDelete={f.deleteFolder}
             onMovePageToFolder={f.movePageToFolder}
             onRemovePageFromFolder={f.removePageFromFolder}
-            dynamicPagesCount={dynamicPages.count}
-            onOpenDynamicPages={openDynamicPages}
+            collectionPages={dynamicPages.collections}
+            onOpenTemplatePage={p.selectPage}
+            onManageCollection={manageCollection}
+            onClearSearch={() => setSearch("")}
           />
           )}
       </PanelFrame.Body>
@@ -511,8 +607,20 @@ export const PagesTab: React.FC<PagesTabProps> = ({
           onSettings={p.openSettings}
           folderName={menuFolderName}
           onRemoveFromFolder={f.removePageFromFolder}
+          onSaveAsTemplate={saveAsTemplate}
+          onMoveToFolder={setMovingPageId}
+          onMove={movePage}
+          rootPosition={menuRootIndex >= 0 ? { index: menuRootIndex, count: rootIds.length } : null}
         />
       )}
+      <MovePagesDialog
+        open={!!movingPage}
+        pageNames={movingPage ? [movingPage.name] : []}
+        folders={f.folders}
+        current={movingPage ? { target: f.pageToFolder.get(movingPage.id) ?? TOP_LEVEL, url: pageRoute(movingPage) } : undefined}
+        onMove={moveToTarget}
+        onClose={() => setMovingPageId(null)}
+      />
       {/* Delete confirmation dialog */}
       <ConfirmDialog
         open={!!deleteTargetId}

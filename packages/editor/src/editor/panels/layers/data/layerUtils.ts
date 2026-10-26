@@ -10,13 +10,23 @@ const PREVIEWABLE = new Set([
   "text", "heading", "paragraph", "button", "link", "label", "quote", "list-item",
 ]);
 
+/* Content is HTML, so "Tom & Jerry" is stored as "Tom &amp; Jerry"; React
+   would print the entity literally (REQUESTS #9). Decoded once, as text —
+   DOMParser runs no script and loads nothing. */
+function decodeEntities(html: string): string {
+  if (!html.includes("&") || typeof DOMParser === "undefined") return html;
+  return new DOMParser().parseFromString(html, "text/html").documentElement.textContent ?? html;
+}
+
 /** The first words of a text-ish layer's copy — the name Layers shows for an
  *  unnamed layer, and the canvas bar readout with it. */
 export function getLayerPreview(
   element: { getType(): string; getContent?(): string } | null | undefined,
 ): string | undefined {
   if (!element || !PREVIEWABLE.has(element.getType())) return undefined;
-  const raw = (element.getContent?.() ?? "").replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+  const raw = decodeEntities((element.getContent?.() ?? "").replace(/<[^>]*>/g, " "))
+    .replace(/\s+/g, " ")
+    .trim();
   if (!raw) return undefined;
   return raw.length > 32 ? `${raw.slice(0, 32)}…` : raw;
 }

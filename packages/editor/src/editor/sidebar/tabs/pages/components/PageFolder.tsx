@@ -13,7 +13,7 @@
  */
 
 import * as React from "react";
-import { IconButton, TextInput, Tooltip } from "@/editor/chrome-ui";
+import { IconButton, TextInput } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
 import type { FolderItem, PageItem } from "../types";
 import { PageRow } from "./PageRow";
@@ -21,12 +21,9 @@ import { PageRow } from "./PageRow";
 /* v3 7069:78978 "folders tooltip (ⓘ)". The board says "This browser only";
    folders now live on the server per user (useFolders), so the copy says who
    sees them instead of where they are kept. */
-const FOLDERS_TIP = "Personal folders · Only you see these; URLs stay unchanged.";
 
 interface Props {
   folder: FolderItem;
-  /** v3 4418:90494 draws the ⓘ on the first folder only — one explainer. */
-  explainFolders?: boolean;
   pages: PageItem[];
   allPages: PageItem[];
   composer: Composer | null;
@@ -51,7 +48,6 @@ interface Props {
 
 export const PageFolder: React.FC<Props> = ({
   folder,
-  explainFolders = false,
   pages,
   allPages,
   composer,
@@ -229,16 +225,6 @@ export const PageFolder: React.FC<Props> = ({
             </span>
           )}
 
-          {explainFolders && (
-            <Tooltip content={FOLDERS_TIP} placement="bottom" arrow={false} className="tw:max-w-60 tw:whitespace-normal">
-              <span className="bd-pg-folder-info" data-testid="pages-folders-info" tabIndex={0} aria-label={FOLDERS_TIP}>
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
-                  <circle cx="12" cy="12" r="10" />
-                  <path d="M12 16v-4M12 8h.01" />
-                </svg>
-              </span>
-            </Tooltip>
-          )}
           {/* v3 4418:90494: "3 pages", 11px muted, straight after the name. */}
           <span className="bd-pg-folder-count" aria-label={`${pages.length} pages in folder`}>
             {pages.length} page{pages.length === 1 ? "" : "s"}

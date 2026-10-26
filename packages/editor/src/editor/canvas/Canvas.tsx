@@ -191,7 +191,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       const el = selectedId && composer ? composer.elements.getElement(selectedId) : null;
       return el ? { id: selectedId as string, type: el.getType?.() ?? "element" } : null;
     }, [composer, selectedId]);
-    const { label: readoutLabel, dims: readoutDims } = useSelectionReadout(composer, selectedForReadout);
+    const { label: readoutLabel, dims: readoutDims, path: readoutPath } = useSelectionReadout(composer, selectedForReadout);
 
     const { spacingIndicators } = useCanvasIndicators({
       composer,
@@ -741,6 +741,20 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       ? { width: `${activeCustomWidth}px`, height: DEVICE_SIZES[device].height }
       : DEVICE_SIZES[device];
     const showWidthLabel = device !== "desktop" || activeCustomWidth !== null;
+    /* The bar's "{width} px" (board 7:18654): the frame's own width — fluid
+       Desktop fills the column, so it is read, not looked up. offsetWidth is
+       pre-zoom, the authored width. */
+    const [frameWidth, setFrameWidth] = React.useState(0);
+    React.useEffect(() => {
+      const el = frameRef.current;
+      if (!el) return;
+      const read = () => setFrameWidth(Math.round(el.offsetWidth));
+      read();
+      if (typeof ResizeObserver === "undefined") return;
+      const ro = new ResizeObserver(read);
+      ro.observe(el);
+      return () => ro.disconnect();
+    }, [device, activeCustomWidth, deviceFrameActive]);
     const emptyCtaSpan = useVisibleFrameSpan(scrollRef, frameRef, isCanvasEmpty && !readOnly && !startedBlank);
 
     /* readOnly withholds every handler that can change the document — inline
@@ -961,7 +975,9 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
               onZoomToSelection={handleZoomToSelection}
               gridSize={gridSize}
               onGridSizeChange={composer ? (size) => composer.setGridSize(size) : undefined}
-              readout={readoutDims ? `${readoutLabel} · ${readoutDims}` : readoutLabel}
+              readout={readoutPath}
+              readoutTitle={readoutDims ? `${readoutLabel} · ${readoutDims}` : readoutLabel}
+              pageWidth={activeCustomWidth ?? (frameWidth || undefined)}
               device={device}
               onDeviceChange={
                 onDeviceChange

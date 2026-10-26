@@ -69,6 +69,25 @@ export interface LayersTabProps {
 }
 
 const LAYERS_SEARCH_PLACEHOLDER = "Search layers…";
+
+const count = (n: number) => n.toLocaleString("en-US");
+
+/** The count band — boards 147:75914 ("8 layers · 1 selected"), 152:78614
+ *  ("… · 1 selected inside Hero"), 147:77189 ("12 matches in 5,000 layers")
+ *  and 147:79328 ("5,000 layers · No matches"). Selection mode keeps its
+ *  own "N selected" (it shares the band with Select all · Done). */
+export function layersFooterText(
+  stats: { total: number; selected: number; matches: number | null; hiddenIn?: string | null },
+  search: string,
+  selecting: boolean,
+): string {
+  const layers = `${count(stats.total)} layer${stats.total === 1 ? "" : "s"}`;
+  if (stats.matches !== null && search) {
+    return stats.matches === 0 ? `${layers} · No matches` : `${count(stats.matches)} match${stats.matches === 1 ? "" : "es"} in ${layers}`;
+  }
+  if (selecting && stats.selected > 0) return `${count(stats.selected)} selected`;
+  return `${layers} · ${count(stats.selected)} selected${stats.hiddenIn ? ` inside ${stats.hiddenIn}` : ""}`;
+}
 const DIM_SCOPE_TIP =
   "Dimming fades a layer in the editor only — it still publishes. To hide it on the site, use Visibility in the inspector.";
 /* The footer's ⓘ: a 20 square ghost at the right edge of the 32 band. */
@@ -148,7 +167,7 @@ export const LayersTab: React.FC<LayersTabProps> = ({
   /* Raised by the tree boundary so the count footer, which is its sibling,
      can stand down with it. */
   const [treeFailed, setTreeFailed] = React.useState(false);
-  const [stats, setStats] = React.useState<{ total: number; selected: number; matches: number | null }>({
+  const [stats, setStats] = React.useState<{ total: number; selected: number; matches: number | null; hiddenIn?: string | null }>({
     total: 0,
     selected: 0,
     matches: null,
@@ -158,9 +177,9 @@ export const LayersTab: React.FC<LayersTabProps> = ({
   React.useEffect(() => {
     if (!composer) return;
     const onStats = (data: unknown) => {
-      const d = data as { total: number; selected: number; matches?: number | null };
+      const d = data as { total: number; selected: number; matches?: number | null; hiddenIn?: string | null };
       if (typeof d?.total === "number" && typeof d?.selected === "number") {
-        setStats({ total: d.total, selected: d.selected, matches: d.matches ?? null });
+        setStats({ total: d.total, selected: d.selected, matches: d.matches ?? null, hiddenIn: d.hiddenIn ?? null });
       }
     };
     composer.on("layers:stats-change", onStats);
@@ -247,6 +266,18 @@ export const LayersTab: React.FC<LayersTabProps> = ({
               <MenuItem data-testid="layers-collapse-all" onClick={runMenu(() => composer?.emit("layers:collapse-all", {}))}>
                 Collapse all
               </MenuItem>
+              {/* Board 152:78185: fold everything but the selection's path,
+                  and the door into selection mode. */}
+              <MenuItem
+                data-testid="layers-collapse-to-selection"
+                disabled={stats.selected === 0}
+                onClick={runMenu(() => composer?.emit(EVENTS.LAYERS_COLLAPSE_TO_SELECTION, {}))}
+              >
+                Collapse to selection
+              </MenuItem>
+              <MenuItem data-testid="layers-menu-select-mode" onClick={runMenu(() => setSelecting(true))}>
+                Select mode
+              </MenuItem>
               <MenuSeparator />
               <MenuItem
                 data-testid="layers-display-settings-toggle"
@@ -299,13 +330,7 @@ export const LayersTab: React.FC<LayersTabProps> = ({
           {/* The span is the board's own second node (142:59 inside 142:58):
               the band carries the height, the run carries the type. */}
           <span data-testid="layers-count-text" className="tw:min-w-0 tw:truncate">
-            {stats.matches !== null && search
-              ? `${stats.matches} of ${stats.total} layers match “${search}”`
-              : selecting && stats.selected > 0
-                ? `${stats.selected} selected`
-                : stats.selected >= 2
-                  ? `${stats.selected} selected of ${stats.total}`
-                  : `${stats.total} layer${stats.total === 1 ? "" : "s"}`}
+            {layersFooterText(stats, search, selecting)}
           </span>
           {/* Select (owner decision 2026-10-03): the door into selection mode,
               beside the count it changes. In the mode: Select all while any

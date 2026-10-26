@@ -52,6 +52,10 @@ export function LayerDisplaySettings({ prefs, onChange, onClose }: LayerDisplayS
           </span>
         </div>
       ))}
+      {/* Board 147:76329: these are the editor's view of the tree, not the site. */}
+      <p className="tw:m-0 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="layers-display-note">
+        Personal editor view. Live-site visibility is edited in the Inspector.
+      </p>
     </div>
   );
 }

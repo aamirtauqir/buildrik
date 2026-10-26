@@ -1,7 +1,7 @@
 /**
  * C4 #19 — Add page = New-page modal with template choice (v3 Q2b), replacing
  * instant add + inline rename. Boards 6752:59256 (From template selected) and
- * 6752:59365 (Blank selected): Page name · Blank "Empty canvas" · From template
+ * 6752:59365 (Blank selected): Page name · Blank "Start with an empty page." (design-2l9 101:29978) · From template
  * "Pick from N layouts" · Cancel · Create page. Blank → the page is created,
  * made active, toast "Page created" (6700:71154). From template → the page is
  * created and the templates catalogue opens on it (4418:54134). Every Add-page
@@ -57,7 +57,7 @@ describe("NewPageModal", () => {
     request();
     expect(screen.getByTestId("new-page-modal")).toHaveTextContent("New page");
     expect(screen.getByLabelText("Page name")).toHaveValue("About");
-    expect(screen.getByTestId("new-page-source-blank")).toHaveTextContent("BlankEmpty canvas");
+    expect(screen.getByTestId("new-page-source-blank")).toHaveTextContent("BlankStart with an empty page.");
     expect(screen.getByTestId("new-page-source-template")).toHaveTextContent(/From templatePick from \d+ layouts/);
     expect(screen.getByTestId("new-page-source-template")).toHaveAttribute("aria-checked", "true");
     // 6752:59256: ✕ in the head, and the navigation toggle ON by default.
@@ -137,7 +137,19 @@ describe("NewPageModal", () => {
     request();
     fireEvent.click(screen.getByTestId("new-page-source-blank"));
     fireEvent.click(screen.getByTestId("new-page-create"));
-    expect(screen.getByRole("alert")).toHaveTextContent("Couldn't add page right now. Try again.");
+    /* design-2l9 board 101:40412. Re-baseline: new page copy. */
+    const name = (screen.getByTestId("new-page-name") as HTMLInputElement).value;
+    expect(screen.getByRole("alert")).toHaveTextContent(`Couldn’t create ${name}. Nothing was changed. Try again.`);
+    expect(screen.getByTestId("new-page-create")).toHaveTextContent("Try again");
     expect(screen.getByTestId("new-page-modal")).toBeInTheDocument();
+  });
+
+  it("an empty name says so (101:37542)", () => {
+    const { request, composer } = makeComposer();
+    render(<NewPageModal composer={composer as never} />);
+    request();
+    fireEvent.change(screen.getByTestId("new-page-name"), { target: { value: "  " } });
+    expect(screen.getByTestId("new-page-name-missing")).toHaveTextContent("Name the page");
+    expect(screen.getByTestId("new-page-create")).toBeDisabled();
   });
 });

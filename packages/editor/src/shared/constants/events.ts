@@ -658,6 +658,9 @@ export const EVENTS = {
      element's identity — the status bar — has no way to hear about a rename
      without this. `name: null` means "back to the type label". */
   ELEMENT_RENAMED: "element:renamed",
+  /* Layers ⋯ › Collapse to selection (design-2l9 board 152:78185): the tree
+     folds to the selection's ancestors. LayersTab asks, the panel folds. */
+  LAYERS_COLLAPSE_TO_SELECTION: "layers:collapse-to-selection",
 
   // ============================================
   // OT Engine Events
@@ -874,6 +877,7 @@ export interface EventPayloads {
   [EVENTS.PROJECT_UNAVAILABLE]: { reason: "missing" };
   [EVENTS.EDIT_LOCK_CHANGED]: { locks: import("../types").EditLockReason[]; readOnly: boolean };
   [EVENTS.ELEMENT_RENAMED]: { id: string; name: string | null };
+  [EVENTS.LAYERS_COLLAPSE_TO_SELECTION]: Record<string, never>;
   [EVENTS.PROJECT_LOADED]:
     | import("../types").ProjectData
     | {
