@@ -28,6 +28,8 @@ F-15b. **lead · AquibraStudio.tsx `onSaveBackup` (:~818)** · `downloadProject(
 
 A-14. **L-A → lead3 · canvas bar mount (`Canvas.tsx` footer container / the move to the top)** · when the bar moves to the canvas top (board 7:18654, y56–98), flip its three popovers from `placement="top"/"top-end"` to `"bottom"/"bottom-end"` (Page width, Zoom, View — the Grid and snapping panel opens in the View popover) · boards 7:18654, 145:64586, 145:65011 · L-A wave 3 put the board's contents in the bar (device toggles centred via chrome-ui BreakpointSwitcher, gray width chip, outlined "52% ⌄", View) and leaves position/mount to lead3; the placements live in `CanvasFooterToolbar.tsx` and are the only line that has to change with the move. L-A will make that edit itself if lead3 prefers — say so here.
 
+A-15. **L-A → lead · `chrome-ui/PanelSearch.tsx`** · draw the panel search as the boards do — a gray-filled, borderless field (`--bk-gray-100`) with the glyph inset, not the outlined field · boards 63:6393 (Pages), 147:75914 (Layers), and the other drawers' search bands · the field is the shared chrome-ui primitive every drawer uses; restyling it from one lane would move every panel at once.
+
 ## Closed
 
 A-13. ~~page reorder as one composer history step~~ · `021c1b305`: `reorderPage` commits pending edits, records "Reorder pages" and commits it before returning (⌘Z / captureUndo undo exactly the move); `writeLocked` still refuses first. Decision: page FOLDER moves stay outside history (per-user, not in the document). Test `PageManager.reorderHistory.test.ts`.

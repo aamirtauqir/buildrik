@@ -93,7 +93,8 @@ describe("PageFolder (flat model)", () => {
     ).not.toBeNull();
   });
 
-  it("clicking disclosure invokes onToggle", () => {
+  /* design-2l9 63:6393 draws no disclosure: the row is the toggle. */
+  it("clicking the folder row invokes onToggle", () => {
     const onToggle = vi.fn();
     const { container } = render(
       <PageFolder
@@ -103,10 +104,9 @@ describe("PageFolder (flat model)", () => {
         onToggle={onToggle}
       />,
     );
-    const disclosure = screen.getByLabelText(
-      "Collapse Marketing",
-    ) as HTMLElement;
-    fireEvent.click(disclosure);
+    const row = container.querySelector(".folder-row") as HTMLElement;
+    expect(row).toHaveAttribute("aria-expanded", "true");
+    fireEvent.click(row);
     expect(onToggle).toHaveBeenCalled();
   });
 

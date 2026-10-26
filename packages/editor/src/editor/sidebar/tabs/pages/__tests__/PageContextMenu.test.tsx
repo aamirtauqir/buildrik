@@ -192,14 +192,13 @@ describe("PageContextMenu — 6883:69130", () => {
 
   /* design-2l9 boards 63:13820 / 131:41791 / 137:55343. Re-baseline: page row
      menu (was Rename… → Page settings… with no move or template rows). */
-  it("lists the board's rows in its order", () => {
+  it("lists the board's rows in its order, bare — no chord hints (63:13820)", () => {
     render(<PageContextMenu pageId="p2" {...baseProps} />);
-    const rows = screen.getAllByRole("menuitem").map((r) => r.textContent?.replace(/(F2|⌘D|⌥↑|⌥↓|⌫)$/, "").trim());
+    const rows = screen.getAllByRole("menuitem").map((r) => r.textContent?.trim());
     expect(rows).toEqual([
       "Rename…", "Duplicate", "Set as homepage", "Replace layout with template…", "Save as template…",
-      "Move to folder…", "Move up", "Move down", "Copy link", "Page settings", "Delete page",
+      "Move to folder…", "Move up", "Move down", "Copy link", "Page settings ›", "Delete page",
     ]);
-    expect(screen.getByTestId("pages-menu-move-up").textContent).toContain("⌥↑");
   });
 
   it("Move up / down call the move with a direction; Save as template and Move to folder pass the page", () => {

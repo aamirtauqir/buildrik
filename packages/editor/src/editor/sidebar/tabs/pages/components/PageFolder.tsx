@@ -13,10 +13,11 @@
  */
 
 import * as React from "react";
-import { IconButton, TextInput } from "@/editor/chrome-ui";
+import { IconButton, Menu, MenuItem, MenuLabel, Popover, TextInput } from "@/editor/chrome-ui";
+import { listNames } from "@shared/utils/helpers/string";
 import type { Composer } from "@/engine";
 import type { FolderItem, PageItem } from "../types";
-import { PageRow } from "./PageRow";
+import { PageRow, ROW_SUB, ROW_TAG } from "./PageRow";
 
 /* v3 7069:78978 "folders tooltip (ⓘ)". The board says "This browser only";
    folders now live on the server per user (useFolders), so the copy says who
@@ -69,6 +70,7 @@ export const PageFolder: React.FC<Props> = ({
   startRenaming = false,
 }) => {
   const [isDragOver, setIsDragOver] = React.useState(false);
+  const [menuOpen, setMenuOpen] = React.useState(false);
   const [isRenamingFolder, setIsRenamingFolder] = React.useState(startRenaming);
   const [renameValue, setRenameValue] = React.useState(folder.name);
   const renameInputRef = React.useRef<HTMLInputElement>(null);
@@ -133,6 +135,11 @@ export const PageFolder: React.FC<Props> = ({
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
+          /* design-2l9 63:6393 draws no disclosure: the folder row itself
+             opens and closes (aria-expanded carries the state). */
+          onClick={() => {
+            if (!isRenamingFolder) onToggle();
+          }}
           onKeyDown={(e) => {
             /* Not while renaming: the folder's rename input sits inside this
                row, so its keystrokes bubble here. Without the guard a space
@@ -170,25 +177,10 @@ export const PageFolder: React.FC<Props> = ({
               <path d="M5 12l5 5L20 7" />
             </svg>
           </div>
-          <IconButton
-            size="sm"
-            label={isExpanded ? `Collapse ${folder.name}` : `Expand ${folder.name}`}
-            onClick={(e) => {
-              e.stopPropagation();
-              onToggle();
-            }}
-            className="bd-pg-row-chev"
-          >
-            {/* v3 4418:90494: the disclosure is Inter's small ▾ / ▸ in a 12×16
-                slot — drawn, because the glyph falls back to a much larger
-                one in other fonts. */}
-            <svg width="5" height="5" viewBox="0 0 6 6" fill="currentColor" aria-hidden="true" className={isExpanded ? "" : "tw:-rotate-90"}>
-              <path d="M0 1.5h6L3 5z" />
-            </svg>
-          </IconButton>
+
 
           <span className="bd-pg-row-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ width: 12, height: 12 }}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" />
             </svg>
           </span>
@@ -213,58 +205,80 @@ export const PageFolder: React.FC<Props> = ({
               aria-label="Rename folder"
             />
           ) : (
-            <span
-              className="bd-pg-row-name bd-pg-folder-name"
-              title={folder.name}
-              onDoubleClick={(e) => {
-                e.stopPropagation();
-                setIsRenamingFolder(true);
-              }}
-            >
-              {folder.name}
+            /* Board 63:6393: the folder's name over its page count. */
+            <span className="tw:flex tw:min-w-0 tw:flex-col">
+              <span
+                className="bd-pg-row-name bd-pg-folder-name"
+                title={folder.name}
+                onDoubleClick={(e) => {
+                  e.stopPropagation();
+                  setIsRenamingFolder(true);
+                }}
+              >
+                {folder.name}
+              </span>
+              <span className={ROW_SUB} aria-label={`${pages.length} pages in folder`}>
+                {pages.length} page{pages.length === 1 ? "" : "s"}
+              </span>
             </span>
           )}
-
-          {/* v3 4418:90494: "3 pages", 11px muted, straight after the name. */}
-          <span className="bd-pg-folder-count" aria-label={`${pages.length} pages in folder`}>
-            {pages.length} page{pages.length === 1 ? "" : "s"}
-          </span>
           <span className="tw:flex-1" aria-hidden="true" />
+          <span className={ROW_TAG}>Folder</span>
 
-          <div className="bd-pg-folder-actions">
-            <IconButton
-              className="bd-pg-folder-act"
-              size="sm"
-              title="Rename folder"
-              label={`Rename folder ${folder.name}`}
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsRenamingFolder(true);
-              }}
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true" style={{ width: 12, height: 12 }}>
-                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
-                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
-              </svg>
-            </IconButton>
-            <IconButton
-              className="bd-pg-folder-act danger"
-              size="sm"
-              /* design-2l9 137:57493: "Delete folder · keep page(s)". */
-              title={`Delete folder · keep ${pages.length === 1 ? "page" : "pages"}`}
-              label={`Delete folder ${folder.name} · keep ${pages.length === 1 ? "its page" : "its pages"}`}
-              onClick={(e) => {
-                e.stopPropagation();
-                onFolderDelete();
-              }}
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true" style={{ width: 12, height: 12 }}>
-                <polyline points="3 6 5 6 21 6" />
-                <path d="M19 6l-1 14H6L5 6" />
-                <path d="M10 11v6M14 11v6" />
-              </svg>
-            </IconButton>
-          </div>
+          {/* Board 137:57493: the folder's ⋯ menu — what deleting it does,
+              then the action (Rename is the code's, kept). */}
+          <Popover
+            open={menuOpen}
+            onClose={() => setMenuOpen(false)}
+            placement="bottom-end"
+            label={`${folder.name} options`}
+            trigger={
+              <IconButton
+                className="bd-pg-row-overflow"
+                size="sm"
+                label={`More options for ${folder.name}`}
+                aria-haspopup="menu"
+                aria-expanded={menuOpen}
+                data-testid={`pages-folder-menu-${folder.id}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setMenuOpen((v) => !v);
+                }}
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style={{ width: 14, height: 14 }}>
+                  <circle cx="5" cy="12" r="1.6" />
+                  <circle cx="12" cy="12" r="1.6" />
+                  <circle cx="19" cy="12" r="1.6" />
+                </svg>
+              </IconButton>
+            }
+          >
+            <Menu label={`${folder.name} options`} className="tw:w-64">
+              <MenuLabel>{folder.name}</MenuLabel>
+              <p className="tw:m-0 tw:px-2 tw:pb-1.5 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink-muted)] tw:whitespace-normal">
+                {`Only you see this folder. Deleting it keeps ${pages.length ? listNames(pages.map((p) => p.name)) : "nothing"} at the top level.`}
+              </p>
+              <MenuItem
+                data-testid={`pages-folder-rename-${folder.id}`}
+                onClick={() => {
+                  setMenuOpen(false);
+                  setIsRenamingFolder(true);
+                }}
+              >
+                Rename folder…
+              </MenuItem>
+              <MenuItem
+                danger
+                data-testid={`pages-folder-delete-${folder.id}`}
+                onClick={() => {
+                  setMenuOpen(false);
+                  onFolderDelete();
+                }}
+              >
+                {`Delete folder · keep ${pages.length === 1 ? "page" : "pages"}`}
+              </MenuItem>
+            </Menu>
+          </Popover>
         </div>
       </div>
       {isExpanded && pages.length > 0 && (
@@ -286,6 +300,7 @@ export const PageFolder: React.FC<Props> = ({
                 onRenameCommit={(name, updateUrl) => onRenameCommit(page.id, name, updateUrl)}
                 onRenameCancel={onRenameCancel}
                 onContextMenu={(x, y) => onContextMenu(page.id, x, y)}
+                searchContext={folder.name}
                 draggable
                 nested
               />

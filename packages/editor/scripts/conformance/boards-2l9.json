@@ -133,7 +133,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Rows lack path line (/, /about) and 'Current' tag; legend pinned to panel bottom (board under list); footer one row '+ Add page · From template · ⋯' vs full-width button + 2nd row. | prior: L-A S5 built, not compared: title 'Pages · {n}', Pages · Listings · Structure tabs under the search, root pages first, 'My folders · Only visible to you' (own tree), 'Collection pages' rows ({name}, '{pattern} · {n} pages', Open page → template page, Manage in CMS → CMS dynamic pages), legend '● mar"
+   "verifiedNote": "probe-compared 2026-10-27 (case pages-manager, 284×812, shots/63-6393.png) for the list: rows 40+ tall with glyph, name over URL, 'Hidden from publish' third line, 'Current' tag on the tinted open row, ⋯ always drawn; legend under the rows; 'My folders' / 'Only visible to you' heading; folder row 'Studio · 1 page · Folder · ⋯' (no disclosure — the row toggles), member 'Legal /legal · In Studio'; Collection pages gray card with a white row and Open page · Manage in CMS; footer full-width '+ Add page' then From template · New folder. Not probe-rendered: the header 'Pages · n' and the gray-well view tabs (PagesTab needs a composer); search field fill is chrome-ui PanelSearch (REQUESTS A-15). The collection row's ⋯ is not drawn: it would have no actions."
   },
   {
    "nodeId": "63:13820",
@@ -142,8 +142,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (editor-inspector): DRIFT — Menu 278 wide anchored at row (board 280) ok; adds 'Move to folder…', shortcuts and a disabled-reason line; 'Page settings' lacks '›'. | prior: L-A S6 built; menu widened to the board's 280 after a probe screenshot showed 'Replace layout with template…' wrapping at 224 (probe case pages-context-menu, port 5171, looked at by eye; board geometry not otherwise compared). Row order RTL-tested."
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case pages-context-menu, shots/63-13820.png): 280 wide, 32 row pitch, bare labels in board order, no chord hints, no rule, Page settings ›, Delete page in the menu ink. The 11th row Move to folder… is board 131:41791 (P120) — the later board of the same menu; P02 predates folders."
   },
   {
    "nodeId": "63:14567",
@@ -1480,7 +1480,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-A wave 2: the folder's delete control reads 'Delete folder · keep page(s)'. The board's folder menu with 'Only you see this folder. Deleting it keeps {page} at the top level.' is not built (still an icon button). Not compared."
+   "verifiedNote": "L-A wave 3 built: the folder's ⋯ opens '{Folder}', 'Only you see this folder. Deleting it keeps {pages} at the top level.', Rename folder… (code's, kept), 'Delete folder · keep page(s)'. Not probe-compared (no board PNG)."
   },
   {
    "nodeId": "137:58206",

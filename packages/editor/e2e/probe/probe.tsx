@@ -2836,6 +2836,28 @@ const CASES: Record<string, () => React.ReactElement> = {
      measure.mjs refuses. The 812 host is the board's own frame — the
      Add-page foot pins to the bottom, so without a stated height it would be
      measured wherever the content happened to end. */
+  /* design-2l9 board 63:6393 — the manager's list as the board draws it:
+     root pages (Home open, Contact hidden), My folders with Studio › Legal,
+     a Collection pages card, the two-row footer. 284 wide like the board. */
+  "pages-manager": () => (
+    <div data-probe="pages-manager" style={{ width: 284, height: 812 }}>
+      {pagesPanel({
+        pages: [
+          PAGE("home", "Home", { isHome: true, isActive: true }),
+          PAGE("about", "About"),
+          PAGE("work", "Work"),
+          PAGE("contact", "Contact", { status: "hidden" }),
+          PAGE("legal", "Legal"),
+        ],
+        folders: [{ id: "studio", name: "Studio", pageIds: ["legal"], collapsed: false }],
+        pageToFolder: new Map([["legal", "studio"]]),
+        collectionPages: [{ id: "blog", name: "Blog post", pattern: "/blog/{slug}", count: 20, templatePageId: "home" }],
+        onOpenTemplatePage: () => {},
+        onManageCollection: () => {},
+        onRequestTemplates: () => {},
+      })}
+    </div>
+  ),
   "pages-panel": () => (
     <div data-probe="pages-panel" style={{ width: 280, height: 812 }}>
       {/* One folder, because board 141:40 draws a result that names its owning

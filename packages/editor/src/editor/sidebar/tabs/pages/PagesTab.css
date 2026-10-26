@@ -10,8 +10,8 @@
 .bd-pg-panel {
   /* File-local design knobs — keep the four most-coupled dimensions in one place
      so density tweaks and footer-clearance edits stay coherent. */
-  --pg-row-h: 32px;        /* board 140:2 — uniform; see PagesTab.rowHeight.test.ts */
-  --pg-row-h-active: 32px;
+  --pg-row-h: 40px;        /* design-2l9 63:6393 — two-line rows; PagesTab.rowHeight.test.ts */
+  --pg-row-h-active: 40px;
   --pg-icon-box: 24px;
   --pg-icon-glyph: 12px;
   --pg-footer-clearance: 120px;
@@ -82,9 +82,10 @@
   align-items: center;
   /* v3 4418:90494 row grid: 24 checkbox slot at 12, then 12 disclosure,
      16 icon, label — 4 apart; pills end 16 in. */
-  gap: var(--bk-space-4);
-  padding: 0 var(--bk-space-16) 0 var(--bk-space-12);
-  border-radius: 4px;
+  gap: var(--bk-space-8);
+  margin: 0 var(--bk-space-12);
+  padding: var(--bk-space-4) var(--bk-space-8);
+  border-radius: var(--bk-radius-md);
   cursor: pointer;
   user-select: none;
   color: var(--bk-ink);
@@ -95,9 +96,11 @@
    bar (4418:90494 / 4418:165158 draw Home open and untinted) — the page tabs
    and the crumb say which page is open; tint means SELECTED here. */
 .bd-pg-row:hover { background: var(--bk-bg-subtle); color: var(--bk-ink); }
+/* design-2l9 63:6393: the open page is tinted (its tag says "Current"). */
+.bd-pg-row.active { background: var(--bk-accent-tint); }
 
 /* ─── ROW VARIANTS ────────────────────────────────────────────────────── */
-.bd-pg-row.nested { padding-left: 28px; }
+.bd-pg-row.nested { padding-left: var(--bk-space-24); }
 .bd-pg-row.folder-row .bd-pg-row-icon { color: var(--bk-ink-muted); }
 /* Board 141:78 tints every SELECTED row, not just its checkbox: the three
    rows the bulk bar is counting all sit on accent-tint. Without it the only
@@ -122,7 +125,7 @@
   background: var(--bk-bg-card);
   transition: 100ms;
 }
-.bd-pg-panel:not(.bulk-mode) .bd-pg-row-checkbox { visibility: hidden; }
+.bd-pg-panel:not(.bulk-mode) .bd-pg-row-checkbox { display: none; }
 .bd-pg-row-checkbox svg { width: 10px; height: 10px; color: var(--bk-accent-on); opacity: 0; }
 .bd-pg-row.selected .bd-pg-row-checkbox svg { opacity: 1; }
 /* Folder-row checkbox states — board 140:11-12 + Checkbox 12:26 mixed rule. */
@@ -178,7 +181,7 @@
   display: grid;
   place-items: center;
 }
-.bd-pg-row-icon svg { width: var(--pg-icon-glyph); height: var(--pg-icon-glyph); }
+.bd-pg-row-icon svg { width: 16px; height: 16px; }
 
 /* Rename input + its validation error. `.bd-pg-row-name` below has had a rule
    since the Pages arc; these two never did, so renaming a page showed a default
@@ -254,49 +257,20 @@
   width: var(--pg-icon-box); height: var(--pg-icon-box);
   min-width: var(--pg-icon-box); min-height: 0;
   padding: 0;
-  display: none;
+  /* design-2l9 63:6393: every row's ⋯ is always drawn. */
+  display: grid;
   place-items: center;
   border-radius: 4px;
-  color: var(--bk-ink-muted);
+  color: var(--bk-ink-soft);
   flex-shrink: 0;
   background: transparent;
   border: 0;
   cursor: pointer;
 }
-.bd-pg-row:hover .bd-pg-row-overflow { display: grid; }
 .bd-pg-row-overflow:hover { background: rgba(15,23,42,0.06); color: var(--bk-ink); }
 .bd-pg-row-overflow svg { width: var(--pg-icon-glyph); height: var(--pg-icon-glyph); }
 
 /* ─── HOME CHIP + STATUS CHIP ─────────────────────────────────────────── */
-.bd-pg-home-chip,
-.bd-pg-chip {
-  /* 4418:93381 row "Contact" (7469:170014): a 22-tall pill, 8 inset, 11/16
-     Regular — not the old 16-tall medium chip. */
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  height: 22px;
-  padding: 0 var(--bk-space-8);
-  border-radius: var(--bk-radius-full);
-  font: 400 var(--bk-text-11)/16px var(--bk-font-ui);
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-.bd-pg-home-chip {
-  background: var(--bk-accent-tint);
-  color: var(--bk-accent);
-}
-.bd-pg-chip.live      { background: var(--bk-success-tint); color: var(--bk-success-text); }
-.bd-pg-chip.draft     { background: var(--bk-bg-subtle); color: var(--bk-ink-soft); }
-.bd-pg-chip.scheduled { background: var(--bk-warning-tint); color: var(--bk-warning-text); }
-.bd-pg-chip.hidden    { background: var(--bk-bg-subtle); color: var(--bk-ink-soft); } /* contrast-fix per design review */
-.bd-pg-chip.error     { background: var(--bk-error-tint); color: var(--bk-error); }
-.bd-pg-chip .dot,
-.bd-pg-home-chip .dot {
-  width: 4px; height: 4px;
-  border-radius: var(--bk-radius-full);
-  background: currentColor;
-}
 
 /* ─── DROP INDICATOR ──────────────────────────────────────────────────── */
 .bd-pg-drop-indicator {
@@ -312,35 +286,6 @@
 /* ─── FOLDER ──────────────────────────────────────────────────────────── */
 .bd-pg-folder { display: block; }
 .bd-pg-folder-children { padding-left: 0; }
-.bd-pg-folder-count {
-  flex-shrink: 0;
-  color: var(--bk-ink-muted);
-  font: 400 11px/16px var(--bk-font-ui);
-}
-.bd-pg-folder-actions {
-  display: none;
-  gap: 2px;
-  margin-left: 2px;
-}
-.bd-pg-row.folder-row:hover .bd-pg-folder-actions { display: inline-flex; }
-.bd-pg-folder-act {
-  display: inline-grid;
-  place-items: center;
-  width: var(--pg-icon-box);
-  height: var(--pg-icon-box);
-  padding: 0;
-  border: 0;
-  border-radius: 4px;
-  background: transparent;
-  color: var(--bk-ink-muted);
-  cursor: pointer;
-}
-.bd-pg-folder-act:hover {
-  background: rgba(15, 23, 42, 0.06);
-  color: var(--bk-ink);
-}
-.bd-pg-folder-act.danger:hover { color: var(--bk-error); }
-.bd-pg-folder-act svg { width: var(--pg-icon-glyph); height: var(--pg-icon-glyph); }
 .bd-pg-page-wrap { position: relative; }
 .bd-pg-page-eject {
   position: absolute;
@@ -387,24 +332,13 @@
 
 /* ─── FOOTER ──────────────────────────────────────────────────────────── */
 .bd-pg-footer {
-  /* v3 4418:90494: the legend (or a search's match count) over a 36-tall
-     band with a top rule, "+ Add page" 16 in. */
+  /* design-2l9 63:6393: "+ Add page" full width, then From template ·
+     New folder — pinned to the panel's foot (the legend sits under the rows). */
   position: absolute;
   bottom: 0; left: 0; right: 0;
   display: flex;
   flex-direction: column;
   background: var(--bk-bg-panel);
-}
-.bd-pg-footer > :last-child {
-  height: 36px;
-  padding: 0 var(--bk-space-16);
-  border-top: 1px solid var(--bk-border);
-}
-.bd-pg-legend {
-  margin: 0;
-  padding: 0 var(--bk-space-16) var(--bk-space-8);
-  font: 400 11px/16px var(--bk-font-ui);
-  color: var(--bk-gray-500);
 }
 
 /* ─── BULK TOOLBAR (dark floating pill) ───────────────────────────────── */
@@ -634,9 +568,3 @@
    The folder a page lives in is real information, not a disabled control.
    `ink-muted` (4.83:1) matches its secondary role and clears AA. Founder call
    2026-09-08; size and line box unchanged. */
-.bd-pg-row-incontext {
-  flex-shrink: 0;
-  /* v3 4418:92256: same 13/20 as the name it qualifies. */
-  font: 400 13px/20px var(--bk-font-ui);
-  color: var(--bk-ink-muted);
-}

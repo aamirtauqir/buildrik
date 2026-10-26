@@ -550,6 +550,9 @@ export const PagesTab: React.FC<PagesTabProps> = ({
           value={view}
           onChange={(id) => setView(id as PageView)}
           data-testid="pages-view-tabs"
+          /* Board 63:6393: a gray well, the chosen view on a white chip. */
+          className="tw:mx-3 tw:my-2 tw:gap-0 tw:rounded-md tw:bg-[var(--bk-gray-100)] tw:p-0.5"
+          tabClassName="tw:h-7 tw:flex-1 tw:px-0 tw:text-[13px] tw:text-[var(--bk-ink-soft)] tw:aria-selected:bg-[var(--bk-bg-card)] tw:aria-selected:text-[var(--bk-ink)] tw:aria-selected:hover:bg-[var(--bk-bg-card)] tw:aria-selected:[box-shadow:var(--bk-shadow-raised)]"
         />
       )}
       {/* Board 141:165 keeps the search band and the Add-page footer either

@@ -102,7 +102,6 @@ describe("PageList", () => {
     expect(onClearSearch).toHaveBeenCalledTimes(1);
     fireEvent.click(screen.getByTestId("pages-search-everywhere"));
     expect(onSearchEverywhere).toHaveBeenCalledWith("zzznomatch");
-    expect(screen.getByTestId("pages-legend")).toHaveTextContent("0 of 2 pages match “zzznomatch”");
   });
 
   it("puts the match count where the legend sits while searching (4418:92256)", () => {
@@ -202,7 +201,7 @@ describe("PageList — sections (board 63:6393)", () => {
     render(<PageList {...makeProps({ collectionPages: [blog], onOpenTemplatePage, onManageCollection })} />);
     const row = screen.getByTestId("pages-collection-blog");
     expect(row).toHaveTextContent("Blog post");
-    expect(row).toHaveTextContent("/blog/{slug} · 20 pages");
+    expect(row).toHaveTextContent("/blog/{slug}20 pages");
     fireEvent.click(screen.getByTestId("pages-collection-open-blog"));
     expect(onOpenTemplatePage).toHaveBeenCalledWith("p2");
     fireEvent.click(screen.getByTestId("pages-collection-manage-blog"));

@@ -6,6 +6,9 @@
  * - "Delete page" is DISABLED (not hidden) when: page is homepage OR only page
  * - Keyboard: Escape closes here; <Menu> owns ↑↓/Home/End roving and, unlike
  *   the hand-rolled version this replaced, SKIPS the disabled Delete item
+ * - design-2l9 board 63:13820 draws the menu bare: no chord hints (F2, ⌘D,
+ *   ⌥↑/⌥↓, ⌫ still work on the row), no rule, "Page settings ›", and Delete
+ *   page in the menu's own ink.
  * - design-2l9 boards 63:13820 / 131:41791 / 137:55343: Save as template… ·
  *   Move to folder… · Move up ⌥↑ / Move down ⌥↓ join the menu in the board's
  *   order; a move that cannot happen is disabled and says why (137:56060,
@@ -16,7 +19,7 @@
 
 import * as React from "react";
 import type { PageItem } from "../types";
-import { Menu, MenuItem, MenuSeparator, POPOVER_BASE_CLASS, Portal } from "@/editor/chrome-ui";
+import { Menu, MenuItem, POPOVER_BASE_CLASS, Portal } from "@/editor/chrome-ui";
 
 /* A disabled row shows no tooltip, so its reason is a line in the menu. */
 const MENU_NOTE = "tw:m-0 tw:px-2 tw:pt-1 tw:pb-1.5 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
@@ -136,17 +139,11 @@ export const PageContextMenu: React.FC<Props> = ({
       data-testid="pages-context-menu"
     >
       <Menu label={`Options for ${page?.name ?? "page"}`} onKeyDown={handleKeyDown}>
-        {/* Board 1171:4753 labels — sentence case, ellipsis on the two that
-            open something. Its 2026-09 revision ALSO draws the chord beside
-            the three items that have one (2838:12148/12149/12150), which is
-            what the row's own F2 / ⌘D / ⌫ already do; this comment used to
-            say the board drew none. MenuItem has carried a `kbd` slot the
-            whole time. ⌘, opens Page settings from the row but the board
-            leaves that item bare, so it stays bare. */}
-        <MenuItem kbd="F2" data-testid="pages-menu-rename" onClick={() => act(() => onRename(pageId))}>
+        {/* design-2l9 63:13820: bare labels, in the board's order. */}
+        <MenuItem data-testid="pages-menu-rename" onClick={() => act(() => onRename(pageId))}>
           Rename…
         </MenuItem>
-        <MenuItem kbd="⌘D" data-testid="pages-menu-duplicate" onClick={() => act(() => onDuplicate(pageId))}>
+        <MenuItem data-testid="pages-menu-duplicate" onClick={() => act(() => onDuplicate(pageId))}>
           Duplicate
         </MenuItem>
         {!isHome && (
@@ -164,7 +161,6 @@ export const PageContextMenu: React.FC<Props> = ({
           Move to folder…
         </MenuItem>
         <MenuItem
-          kbd="⌥↑"
           disabled={rootPosition === null || isFirst}
           data-testid="pages-menu-move-up"
           onClick={() => act(() => onMove(pageId, -1))}
@@ -172,7 +168,6 @@ export const PageContextMenu: React.FC<Props> = ({
           Move up
         </MenuItem>
         <MenuItem
-          kbd="⌥↓"
           disabled={rootPosition === null || isLast}
           data-testid="pages-menu-move-down"
           onClick={() => act(() => onMove(pageId, 1))}
@@ -188,19 +183,16 @@ export const PageContextMenu: React.FC<Props> = ({
           Copy link
         </MenuItem>
         <MenuItem data-testid="pages-menu-settings" onClick={() => act(() => onSettings(pageId))}>
-          Page settings
+          Page settings ›
         </MenuItem>
         {folderName && (
           <MenuItem data-testid="pages-menu-remove-folder" onClick={() => act(() => onRemoveFromFolder(pageId))}>
             Remove from {folderName}
           </MenuItem>
         )}
-        <MenuSeparator />
         <MenuItem
-          danger
           disabled={deleteDisabled}
           title={deleteTooltip}
-          kbd="⌫"
           data-testid="pages-menu-delete"
           onClick={() => act(() => onDelete(pageId))}
         >
