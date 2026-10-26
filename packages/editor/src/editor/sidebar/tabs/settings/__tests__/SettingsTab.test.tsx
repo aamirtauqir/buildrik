@@ -1384,8 +1384,9 @@ describe("SettingsTab — offline (2L9 B8-S05 / SH04)", () => {
     act(() => {
       window.dispatchEvent(new Event("offline"));
     });
-    expect(footStatus()).toBe("Needs a connection · changes stay here, unsaved");
-    expect(screen.getByTestId("set-offline").textContent).toBe("You’re offline. Save settings needs a connection.");
+    // General draws it in the footer only (B8-S05); Security/Analytics add the banner (SH04/AN07).
+    expect(footStatus()).toBe("Needs a connection — your edits stay on this screen, unsaved");
+    expect(screen.queryByTestId("set-offline")).toBeNull();
     expect((screen.getByTestId("set-foot-save") as HTMLButtonElement).disabled).toBe(true);
     Object.defineProperty(navigator, "onLine", { configurable: true, get: () => true });
     act(() => {

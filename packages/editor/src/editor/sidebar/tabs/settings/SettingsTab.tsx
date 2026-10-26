@@ -129,6 +129,11 @@ function navTitle(id: SettingsNavId): string {
   return SETTINGS_NAV.find((n) => n.id === id)?.title.replace(/ ↗$/, "") ?? id;
 }
 
+/** Offline is drawn per board: Security headers (SH04) and Analytics (AN07)
+ *  put a banner over the cards and "· changes stay here"; every other footer
+ *  screen only says it in the footer (General, S05). */
+const OFFLINE_BANNER_SCREENS: ReadonlySet<string> = new Set(["headers", "analytics"]);
+
 /** The browser's connection — B8-S05 / SH04: Save needs one; the edits wait. */
 function subscribeOnline(notify: () => void) {
   window.addEventListener("online", notify);
@@ -785,7 +790,7 @@ export const SettingsTab: React.FC<
   const online = React.useSyncExternalStore(subscribeOnline, readOnline, () => true);
   const footStatus: { text: string; tone: "muted" | "ink" | "danger" } =
     !online && loadState === "ready"
-      ? { text: "Needs a connection · changes stay here, unsaved", tone: "danger" }
+      ? { text: OFFLINE_BANNER_SCREENS.has(currentScreen) ? "Needs a connection · changes stay here, unsaved" : "Needs a connection — your edits stay on this screen, unsaved", tone: "ink" }
       : saving
       ? { text: "Saving settings…", tone: "muted" }
       : loadState === "loading"
@@ -1021,7 +1026,7 @@ export const SettingsTab: React.FC<
           className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col tw:gap-3 tw:overflow-y-auto tw:bg-[var(--bk-bg-panel)] tw:px-6 tw:pb-6"
           data-testid="set-body"
         >
-          {!online && showFooter ? (
+          {!online && showFooter && OFFLINE_BANNER_SCREENS.has(currentScreen) ? (
             /* B8-SH04 245:48768: the screen stays; only Save waits for the network. */
             <div
               role="status"

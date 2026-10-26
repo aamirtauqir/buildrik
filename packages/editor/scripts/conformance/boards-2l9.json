@@ -13197,7 +13197,7 @@
    "status": "active",
    "authority": "code:no-tagline-field",
    "verified": "drift-fixed",
-   "verifiedNote": "Compared 2026-10-26 (wave 2) against get_metadata of 238:10283, probe SettingsTab on General at 1440x900: Site card 720x178 as drawn (Site name and Author stacked, labels 13/20), Icons card with rows \"Favicon · <file> · <w> × <h> · Replace…\" (240 label column, 140 button); the board draws Tagline, which has no Site column or project key — Author fills that slot (code). Kept in Advanced (undrawn): Favicon URL and the Languages link. Touch icon kept as a second Icons row (code-ahead). Remaining: controls 32 tall vs 28 (settings theme), footer state copy, Settings host (E-10)."
+   "verifiedNote": "Compared 2026-10-26 (wave 2) against get_metadata of 238:10283, probe SettingsTab on General at 1440x900: Site card 720x178 as drawn (Site name and Author stacked, labels 13/20), Icons card with rows \"Favicon · <file> · <w> × <h> · Replace…\" (240 label column, 140 button); the board draws Tagline, which has no Site column or project key — Author fills that slot (code). Kept in Advanced (undrawn): Favicon URL and the Languages link. Touch icon kept as a second Icons row (code-ahead). Remaining: controls 32 tall vs 28 (settings theme), footer state copy, Settings host (E-10). Wave 3: inputs 28 tall, Replace… as a link (probe 2026-10-27)."
   },
   {
    "nodeId": "238:10586",
@@ -13225,9 +13225,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Offline footer red 'Needs a connection · changes stay here, unsaved' (board black, em-dash copy); extra 'You're offline…' banner + global offline bar; Author not Tagline. | prior: Built, not compared (offline state): Settings reads navigator.onLine; offline keeps the edits, the footer says \"Needs a connection · changes stay here, unsaved\" (SH04/AN07 wording; S05 draws \"Needs a connection — your edits stay on this screen, unsaved\"), the banner \"You’re offline. Save settings ne"
+   "authority": "code:no-tagline-field",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27: shots/238-11192.png vs probe General with the context set offline at 1440x900 — footer \"Needs a connection — your edits stay on this screen, unsaved\" in ink, no banner (S05 draws none; SH04/AN07 keep theirs), Save settings disabled, Discard on; 28px inputs; Icons rows with an accent \"Replace…/Upload…\" link. Author in the Tagline slot (no tagline field); Touch icon row and the Advanced card kept (code-ahead)."
   },
   {
    "nodeId": "238:11495",
