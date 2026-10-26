@@ -38,7 +38,7 @@
 import * as React from "react";
 import { BRAND_READ_ONLY_COPY, BRAND_READ_ONLY_FAILED_COPY } from "@/shared/constants/brandReadOnly";
 import { ChevronLeft } from "lucide-react";
-import { Button, IconButton, Menu, MenuItem, MenuLabel, MenuSeparator, Popover, Tooltip, useToast } from "@/editor/chrome-ui";
+import { Button, Tooltip, useToast } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine/Composer";
 import { EVENTS } from "@/shared/constants/events";
 import { resolveTokenLiteral, setTokenLiteral } from "@buildrik/shared/tokens";
@@ -230,12 +230,18 @@ const NAV_ROW_ON =
   "tw:bg-[var(--bk-accent-tint)] tw:font-medium tw:text-[var(--bk-accent)] " +
   "tw:enabled:hover:bg-[var(--bk-accent-tint)] tw:enabled:hover:text-[var(--bk-accent)]";
 /* The header's page action (7315:80955 "+ Add token": 28 tall, 13px, hairline). */
-/* Spacing's ⋯ menu: the three presets on the 4px grid (spacingRegistry). */
+/* B6-B22: the three presets on the 4px grid (spacingRegistry), segmented. */
 const SPACING_PRESETS: [SpacingPreset, string][] = [
-  ["compact", "Compact · 2px"],
-  ["normal", "Normal · 4px"],
-  ["spacious", "Spacious · 6px"],
+  ["compact", "Compact"],
+  ["normal", "Normal"],
+  ["spacious", "Spacious"],
 ];
+const SEG_TRACK =
+  "tw:box-border tw:inline-flex tw:h-7 tw:items-center tw:gap-0.5 tw:rounded-[var(--bk-radius-md)] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:p-px";
+const SEG_ITEM =
+  "tw:h-6 tw:min-h-0 tw:rounded-[var(--bk-radius-sm)] tw:border-0 tw:px-3 tw:text-[length:var(--bk-text-13)] tw:font-medium tw:leading-5 tw:focus:ring-0 tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
+const SEG_ITEM_ON = "tw:bg-[var(--bk-gray-100)] tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-gray-100)]";
+const SEG_ITEM_OFF = "tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:enabled:hover:bg-[var(--bk-bg-subtle)]";
 
 /* The disabled look is spelled out: on a read-only site the action is
    disabled by its EditLock fieldset, not by its own prop, and flowbite only
@@ -299,7 +305,6 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
     return requested && isPageId(requested) ? requested : LANDING;
   });
   const [showAddToken, setShowAddToken] = React.useState(false);
-  const [spacingMenuOpen, setSpacingMenuOpen] = React.useState(false);
   const [aiOpen, setAiOpen] = React.useState(false);
   const [classAddOpen, setClassAddOpen] = React.useState(false);
 
@@ -679,54 +684,45 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
           </>
         );
       case "spacing":
+        /* B6-B22: the three presets as one segmented control, then Reset to
+           defaults; each is one write. "+ Add spacing" is code-ahead (the
+           board adds none) and stays. */
         return (
           <>
+            <div role="group" aria-label="Spacing preset" className={SEG_TRACK} data-testid="brand-spacing-presets">
+              {SPACING_PRESETS.map(([p, label]) => (
+                <Button
+                  key={p}
+                  type="button"
+                  color="light"
+                  size="xs"
+                  aria-pressed={spacing.activePreset === p}
+                  className={`${SEG_ITEM} ${spacing.activePreset === p ? SEG_ITEM_ON : SEG_ITEM_OFF}`}
+                  onClick={() => {
+                    if (!spacing.applyPreset(p)) refused("The spacing preset");
+                  }}
+                  data-testid={`spacing-preset-${p}`}
+                >
+                  {label}
+                </Button>
+              ))}
+            </div>
+            <Button
+              type="button"
+              variant="ghost"
+              size="xs"
+              className={`${PAGE_ACTION} tw:border-transparent tw:bg-transparent`}
+              onClick={() => {
+                if (spacing.resetToDefaults()) addToast({ description: "Spacing reset to defaults.", tone: "info" });
+                else refused("Resetting spacing");
+              }}
+              data-testid="spacing-reset-defaults"
+            >
+              Reset to defaults
+            </Button>
             <Button type="button" variant="secondary" size="xs" className={PAGE_ACTION} onClick={() => setShowAddToken(true)} data-testid="brand-page-action">
               + Add spacing
             </Button>
-            {/* Owner ruling 2026-09-24: applying a whole preset comes back
-                (removed in 91ab74b33 for parity) — in a menu, so the page
-                still draws no chips (7576:197036). Each action is one write. */}
-            <Popover
-              open={spacingMenuOpen}
-              onClose={() => setSpacingMenuOpen(false)}
-              placement="bottom-end"
-              label="Spacing actions"
-              trigger={
-                <IconButton label="Spacing actions" onClick={() => setSpacingMenuOpen((v) => !v)} data-testid="brand-spacing-menu">
-                  ⋯
-                </IconButton>
-              }
-            >
-              <Menu label="Spacing actions">
-                <MenuLabel>Apply preset</MenuLabel>
-                {SPACING_PRESETS.map(([p, label]) => (
-                  <MenuItem
-                    key={p}
-                    radio
-                    selected={spacing.activePreset === p}
-                    onClick={() => {
-                      setSpacingMenuOpen(false);
-                      if (!spacing.applyPreset(p)) refused("The spacing preset");
-                    }}
-                    data-testid={`spacing-preset-${p}`}
-                  >
-                    {label}
-                  </MenuItem>
-                ))}
-                <MenuSeparator />
-                <MenuItem
-                  onClick={() => {
-                    setSpacingMenuOpen(false);
-                    if (spacing.resetToDefaults()) addToast({ description: "Spacing reset to defaults.", tone: "info" });
-                    else refused("Resetting spacing");
-                  }}
-                  data-testid="spacing-reset-defaults"
-                >
-                  Reset to defaults
-                </MenuItem>
-              </Menu>
-            </Popover>
           </>
         );
       case "fonts":
@@ -882,7 +878,14 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
       case FROM_SOURCE:
         return <BrandFromSource composer={composer ?? null} />;
       case "spacing":
-        return <TokensSection {...tokenPageProps} openKind="spacing" />;
+        return (
+          <>
+            <p className="tw:m-0 tw:mb-3 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]" data-testid="brand-spacing-note">
+              Spacing steps can be changed but not renamed or deleted.
+            </p>
+            <TokensSection {...tokenPageProps} openKind="spacing" />
+          </>
+        );
       case "export":
         return (
           /* 4418:168885: a 760 panel centred in the main area — no page

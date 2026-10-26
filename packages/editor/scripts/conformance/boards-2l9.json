@@ -9409,7 +9409,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Presets in ⋯ menu (Compact · 2px…) vs board segmented Compact/Normal/Spacious + Reset to defaults"
+   "verifiedNote": "L-D S3: Compact/Normal/Spacious segmented (aria-pressed) + Reset to defaults + board note; ⋯ menu removed. \"+ Add spacing\" kept (code-ahead). Built, not compared."
   },
   {
    "nodeId": "207:38995",
