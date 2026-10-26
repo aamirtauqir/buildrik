@@ -5,6 +5,15 @@
  *   4418:73791: "label · author" left, the time in mono right (a restore)
  *   diff-preview with diff-item rows (operation icon + property + change-type badge)
  *
+ * 2L9 B7-H01 `230:12999` / H02 `230:13557` (L-F W2): two lines per row — the
+ * step, then "time · you" — and "Restore to here" on the row the pointer or
+ * j/k is on (it was the timestamp, a control that did not look like one). The
+ * confirm names the step. The board's "verb · target · place" needs the target
+ * and page on each history entry, which the engine does not record
+ * (`authority: code:history-entry-no-target`); the board's "You can still undo
+ * the restore" is not said — `restoreEntry` truncates the stack for good
+ * (`code:restore-truncates`, also why H03's "Restored to …" row is absent).
+ *
  * @license BSD-3-Clause
  */
 
@@ -43,24 +52,14 @@ const CANVAS_ID = "editor-canvas";
 const CROSSFADE_MS = 300;
 
 
+const capitalize = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
+
 function formatTime(ts: number): string {
   return new Date(ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 
 
 // Inline style objects hoisted so RowRenderer stays compact + stable identity.
-const STYLE_TIME_BTN: React.CSSProperties = {
-  background: "transparent",
-  border: "none",
-  padding: 0,
-  margin: 0,
-  font: "inherit",
-  color: "inherit",
-  cursor: "pointer",
-  display: "inline-flex",
-  alignItems: "center",
-};
-
 const STYLE_DIFF_COUNT: React.CSSProperties = {
   marginLeft: 6,
   fontSize: 11,
@@ -349,31 +348,26 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
     const { discarded } = pendingRestore;
     const losses: string[] = [];
     if (discarded > 0) {
-      losses.push(`${discarded} later change${discarded === 1 ? "" : "s"}`);
+      losses.push(`the ${discarded} later step${discarded === 1 ? "" : "s"}`);
     }
     if (canRedo) losses.push("everything you can currently redo");
     const unsaved = losses.length > 0 && composer?.isDirty() === true;
+    const plural = losses.length > 1 || discarded > 1;
 
     return (
       <ConfirmDialog
         open
         tone="destructive"
-        title={`Restore to ${pendingRestore.time}?`}
+        title={`Restore to “${pendingRestore.label}”?`}
         message={
           <>
-            This rewinds the project to <strong>{pendingRestore.label}</strong> at{" "}
-            {pendingRestore.time}.{" "}
             {losses.length > 0
-              ? `It permanently discards ${losses.join(" and ")}.`
-              : "Nothing later is discarded."}
+              ? `${capitalize(losses.join(" and "))} ${plural ? "are" : "is"} removed from this session. This can’t be undone.`
+              : "Nothing later is removed."}
             {unsaved ? " Some of that work has not been saved yet." : ""}
           </>
         }
-        confirmLabel={
-          discarded > 0
-            ? `Restore, discard ${discarded} change${discarded === 1 ? "" : "s"}`
-            : `Restore to ${pendingRestore.time}`
-        }
+        confirmLabel="Restore to here"
         onClose={() => setPendingRestoreId(null)}
         onConfirm={() => {
           setPendingRestoreId(null);
@@ -411,8 +405,8 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
          every entry with the signed-in user — so a stamped entry is always the
          viewer's own. `userId` is an account id (a cuid), never a name: it was
          drawn as its first letter in a chip, i.e. a meaningless "C". Board
-         4418:73791's "label · author" reads "· You" here. */
-      const author = entry.userId?.trim() ? "You" : null;
+         2L9 H01's meta line reads "10:42 · you". */
+      const author = entry.userId?.trim() ? "you" : null;
 
       const rowClass = [
         "entry-row",
@@ -441,42 +435,45 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
           >
             <div className="entry-row-main">
               <div className="entry-label" data-testid={`history-change-label-${globalIndex}`}>
-                {author ? `${entry.label} · ${author}` : entry.label}
+                {entry.label}
+              </div>
+              <div className="entry-meta">
+                <span className="entry-time" data-testid={`history-change-time-${globalIndex}`}>
+                  {timeLabel}
+                </span>
+                {author ? ` · ${author}` : null}
               </div>
               {readOnly ? (
                 <Tooltip content="Viewers can't restore — ask an editor" placement="top" arrow={false}>
                   <Button
                     type="button"
-                    className="entry-time-btn tw:h-4 tw:min-h-0"
+                    color="light"
+                    size="xs"
+                    className="entry-restore-btn tw:h-6 tw:min-h-0 tw:px-2"
                     aria-disabled="true"
                     onClick={(e) => e.stopPropagation()}
-                    aria-label={`Restore the project to ${timeLabel}`}
-                    style={STYLE_TIME_BTN}
+                    data-testid={`history-change-restore-${globalIndex}`}
                   >
-                    <span className="entry-time" data-testid={`history-change-time-${globalIndex}`}>
-                      {timeLabel}
-                    </span>
+                    Restore to here
                   </Button>
                 </Tooltip>
               ) : (
-              <Button
-                type="button"
-                /* flowbite's Button is 40 tall and a plain class cannot
-                   reach it — only a same-property `tw:` utility survives
-                   twMerge (CLAUDE.md §Chrome). */
-                className="entry-time-btn tw:h-4 tw:min-h-0"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  requestRestore(entry.id);
-                }}
-                aria-label={`Restore the project to ${timeLabel}`}
-                title={`Restore the project to ${timeLabel} — discards every later change`}
-                style={STYLE_TIME_BTN}
-              >
-                <span className="entry-time" data-testid={`history-change-time-${globalIndex}`}>
-                  {timeLabel}
-                </span>
-              </Button>
+                <Button
+                  type="button"
+                  color="light"
+                  size="xs"
+                  /* flowbite's Button is 40 tall; only a same-property
+                     `tw:` utility survives twMerge (CLAUDE.md §Chrome). */
+                  className="entry-restore-btn tw:h-6 tw:min-h-0 tw:px-2"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    requestRestore(entry.id);
+                  }}
+                  title="Restore to here — removes every later step"
+                  data-testid={`history-change-restore-${globalIndex}`}
+                >
+                  Restore to here
+                </Button>
               )}
             </div>
 
@@ -628,6 +625,9 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
           </VariableSizeList>
         )}
       </div>
+      <p className="history-keys-hint" data-testid="history-keys-hint">
+        j / k to move · Enter to expand · Esc to collapse
+      </p>
       {renderRestoreConfirm()}
     </div>
   );

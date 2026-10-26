@@ -7,7 +7,7 @@
  * and the Time-Travel trigger.
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent, cleanup } from "@testing-library/react";
+import { render, screen, fireEvent, within, cleanup } from "@testing-library/react";
 import type { HistoryDisplayEntry } from "@/engine/historyTypes";
 import { ActivityView } from "../ActivityView";
 
@@ -151,7 +151,7 @@ describe("ActivityView — restoring from a timestamp is confirmed", () => {
       setHistory(twoEntries(), false);
       const { container } = render(<ActivityView composer={composer as never} />);
 
-      const timeButtons = container.querySelectorAll(".entry-time-btn");
+      const timeButtons = container.querySelectorAll(".entry-restore-btn");
       expect(timeButtons.length).toBe(2);
 
       // Second row = one step back; restoring it discards the newer change.
@@ -160,9 +160,11 @@ describe("ActivityView — restoring from a timestamp is confirmed", () => {
 
       // A confirmation naming the loss stands between the click and the engine.
       const dialog = screen.getByRole("dialog");
-      expect(dialog.textContent).toMatch(/permanently discards 1 later change/);
+      /* 2L9 H02: the confirm names the step and what is removed. */
+      expect(dialog.textContent).toMatch(/Restore to “Move heading”\?/);
+      expect(dialog.textContent).toMatch(/The 1 later step is removed from this session\. This can’t be undone\./);
 
-      fireEvent.click(screen.getByRole("button", { name: /^Restore, discard 1 change$/ }));
+      fireEvent.click(within(dialog).getByRole("button", { name: "Restore to here" }));
       expect(composer.history.restoreEntry).toHaveBeenCalledTimes(1);
       expect(composer.history.restoreEntry).toHaveBeenCalledWith("h1");
     } finally {
@@ -177,7 +179,7 @@ describe("ActivityView — restoring from a timestamp is confirmed", () => {
       setHistory(twoEntries(), false);
       const { container } = render(<ActivityView composer={composer as never} />);
 
-      fireEvent.click(container.querySelectorAll(".entry-time-btn")[1]);
+      fireEvent.click(container.querySelectorAll(".entry-restore-btn")[1]);
       fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
 
       expect(composer.history.restoreEntry).not.toHaveBeenCalled();
@@ -193,21 +195,21 @@ describe("ActivityView — restoring from a timestamp is confirmed", () => {
       setHistory(twoEntries(), false);
       const { container } = render(<ActivityView composer={makeComposer() as never} />);
 
-      const label = container.querySelector(".entry-time-btn")?.getAttribute("aria-label") ?? "";
+      const label = container.querySelector(".entry-restore-btn")?.textContent ?? "";
       expect(label).not.toMatch(/jump/i);
-      expect(label).toMatch(/restore/i);
+      expect(label).toBe("Restore to here");
     } finally {
       restore();
     }
   });
 });
 
-/* Board 4418:73791 — the Session list is plain 44-tall rows: "label · author"
-   at the left, the time in mono at the right. No date bands, no badges, no
-   relative time, no keyboard-hint footer. The row still expands to its diff
-   and the time is still the (confirmed) restore. */
-describe("ActivityView — Session rows are board 4418:73791", () => {
-  it("draws label · author and the time, with none of the old row furniture", () => {
+/* 2L9 B7-H01 230:12999 — two lines per row: the step, then "time · you";
+   no date bands, badges or relative time; the j/k hint under the list. The
+   row still expands to its diff, and Restore to here is the (confirmed)
+   restore. */
+describe("ActivityView — Session rows are board 2L9 H01", () => {
+  it("draws the step, then time · you, with none of the old row furniture", () => {
     const restore = withHeight(400);
     try {
       setHistory([
@@ -215,13 +217,14 @@ describe("ActivityView — Session rows are board 4418:73791", () => {
         entry({ id: "h1", label: "Move heading" }),
       ]);
       const view = renderView();
-      expect(screen.getByTestId("history-change-label-0").textContent).toBe("Hero copy edited · You");
+      expect(screen.getByTestId("history-change-label-0").textContent).toBe("Hero copy edited");
+      expect(screen.getByTestId("history-change-0").querySelector(".entry-meta")?.textContent).toMatch(/^\d{1,2}:\d{2} · you$/);
       // the first row is not drawn highlighted before anything picks it
       expect(screen.getByTestId("history-change-0").className).not.toMatch(/focused/);
       expect(screen.getByTestId("history-change-label-1").textContent).toBe("Move heading");
       expect(screen.getByTestId("history-change-time-0").textContent).toMatch(/\d{1,2}:\d{2}/);
       expect(view.container.querySelector(".date-group-header")).toBeNull();
-      expect(view.container.querySelector(".keyboard-hints")).toBeNull();
+      expect(screen.getByTestId("history-keys-hint").textContent).toBe("j / k to move · Enter to expand · Esc to collapse");
       expect(view.container.querySelector(".entry-badge")).toBeNull();
       expect(screen.queryByText("Current")).toBeNull();
       expect(screen.queryByText(/ago$|Just now/)).toBeNull();
@@ -262,7 +265,7 @@ describe("ActivityView — FC-9 (fix-all 2026-09-25): readOnly disables Restore"
       setHistory([entry({ id: "h1", label: "Move heading" })], false);
       const { container } = render(<ActivityView composer={composer as never} readOnly />);
 
-      const timeBtn = container.querySelector(".entry-time-btn") as HTMLElement;
+      const timeBtn = container.querySelector(".entry-restore-btn") as HTMLElement;
       expect(timeBtn).toHaveAttribute("aria-disabled", "true");
       fireEvent.click(timeBtn);
       expect(composer.history.restoreEntry).not.toHaveBeenCalled();
@@ -280,7 +283,7 @@ describe("ActivityView — FC-9 (fix-all 2026-09-25): readOnly disables Restore"
       setHistory([entry({ id: "h1", label: "Move heading" })], false);
       const { container } = render(<ActivityView composer={composer as never} />);
 
-      const timeBtn = container.querySelector(".entry-time-btn") as HTMLElement;
+      const timeBtn = container.querySelector(".entry-restore-btn") as HTMLElement;
       expect(timeBtn).not.toHaveAttribute("aria-disabled");
     } finally {
       restore();
