@@ -900,6 +900,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
             key={scaleRole}
             composer={composer}
             roleId={scaleRole}
+            onBack={() => openPage("colours")}
             /* 8224:243869's toast. */
             onApplied={() => receipt("Color scale added.")}
           />

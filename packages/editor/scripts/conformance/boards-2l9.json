@@ -10073,7 +10073,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "\"One colour → full scale\", 11 primitives; board \"Generate a scale from primary\", 10 tokens primary-50…900, \"Add 10 tokens\""
+   "verifiedNote": "L-D W9: \"‹ Colors\", \"Generate a scale from {role}\", \"Creates {role} 50 … {role} 950 from #… . {role} then uses the step that matches. Nothing is added until you apply.\", \"11 new color tokens · names … to …\", preview, \"Add 11 tokens\". Code wins on 11 steps 50–950 (generator) and on the role re-pointing to its step, so the board's \"Existing tokens are not changed\" is not claimed. Built, not compared."
   },
   {
    "nodeId": "219:43368",
