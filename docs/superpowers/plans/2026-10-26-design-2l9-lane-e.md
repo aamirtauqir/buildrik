@@ -122,3 +122,13 @@ Merged `feat/design-2l9` first (`34e7f0eee`). D-11 done.
 Not done this wave — **per-field settings conflict (CF01–03)** needs a server precondition first: `siteDetail.settings.get` returns `updatedAt`, `updateSiteSettingsSchema` takes `expectedUpdatedAt`, the service refuses a stale write with CONFLICT carrying the server values (updateMany precondition, the CMS pattern), then each screen offers Keep mine / Use theirs per changed field. Full chain + tests; next batch.
 
 Still open: controls 32 tall vs the board's 28 (settings Input/Select theme — a density decision), Languages staged default (S07, GAP-ST-L), workspace door copy (GAP-ST-ORG), FM06 detail view, compact 1280 nav, publish-from-Settings (GAP-ST-P*), Overview trial card.
+
+## Status — wave 3 (2026-10-27, "fix every difference"; P1 → P2 → P3)
+
+Merged `feat/design-2l9` (`0087471ac`) first. Probe port 5175, cases kept uncommitted; helper scripts in the scratchpad `wave3-e/`. One extra board fetched (shots/238-15632.png).
+
+Probe-compared and `drift-fixed` (8): 233:10827 (PB20), 238:9980 (S01, `code:no-trial`), 278:61847 (ACK → Overview), 238:15632 (S20 search), 238:11192 (S05 offline), 238:13898 (S14), 272:24319 (CSV ready), 277:345909 (filter dialog).
+
+Built and tested, still `drift-open`: 233:11377 PB21 (change chips/counts need a draft-vs-live diff), 238:15344 S19 (read-only needs an Editor role in the probe), AN02/AN03/AN04/AN06 (probe composer has no GA id; AN04 needs tracker events), 272:27440 (Unspam ack), 277:336979 (FMC dataset).
+Owner questions: 277:347389 (`open:board-conflict-delete-confirm` — S14 vs FM07/FMC), 277:346467 (`open:board-conflict-csv-copy`).
+Not in lane paths: 277:347031 "‹ Back to submissions" strip over the canvas (request E-12).
