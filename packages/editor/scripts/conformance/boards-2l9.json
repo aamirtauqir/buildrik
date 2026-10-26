@@ -13187,7 +13187,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/OverviewScreen.tsx:175 — plan card exists, trial card missing; settings is a full-page portal (FullPageRouter…"
+   "verifiedNote": "Overview content open: the Pro-trial card and the board's Site/Languages/Search rows are not built (no trial in code yet — memory plans-free-pro-trial). Settings chrome now per board (compared 2026-10-26, probe SettingsTab on General at 1440x900 vs 238:10283/238:11495 screenshots): text-only 32px nav rows, Danger zone under Advanced, 'ORGANIZATION WORKSPACE ↗' with Members ↗ / Billing ↗ / Integrations ↗, 'Your role' + 'Permissions ›', 'Search settings' entry (Search Mode kept: owner 2026-10-04), '‹ Back to Editor · {page}' + 20/600 title in the pane header, scope chip, white body, 56px footer 'Unsaved changes' · Discard · Save settings. Still open: Settings is a full-page view, not inside the editor shell (REQUESTS), and Billing keeps its plan pill (code-ahead)."
   },
   {
    "nodeId": "238:10283",
@@ -13197,7 +13197,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:1157 — footer \"Save\" vs \"Save settings\"; scope chip copy; \"Back to canvas\" vs \"‹ Back to Editor · Hom…"
+   "verifiedNote": "General card content open: the board's Site (name, tagline) / Icons cards vs the code's Site identity card (no tagline field in the settings schema). Settings chrome now per board (compared 2026-10-26, probe SettingsTab on General at 1440x900 vs 238:10283/238:11495 screenshots): text-only 32px nav rows, Danger zone under Advanced, 'ORGANIZATION WORKSPACE ↗' with Members ↗ / Billing ↗ / Integrations ↗, 'Your role' + 'Permissions ›', 'Search settings' entry (Search Mode kept: owner 2026-10-04), '‹ Back to Editor · {page}' + 20/600 title in the pane header, scope chip, white body, 56px footer 'Unsaved changes' · Discard · Save settings. Still open: Settings is a full-page view, not inside the editor shell (REQUESTS), and Billing keeps its plan pill (code-ahead)."
   },
   {
    "nodeId": "238:10586",
@@ -13207,7 +13207,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:1157 — footer \"Save\" vs \"Save settings\"; scope chip copy; \"Back to canvas\" vs \"‹ Back to Editor · Hom…"
+   "verifiedNote": "General staged-save sibling; card content open as 238:10283. Settings chrome now per board (compared 2026-10-26, probe SettingsTab on General at 1440x900 vs 238:10283/238:11495 screenshots): text-only 32px nav rows, Danger zone under Advanced, 'ORGANIZATION WORKSPACE ↗' with Members ↗ / Billing ↗ / Integrations ↗, 'Your role' + 'Permissions ›', 'Search settings' entry (Search Mode kept: owner 2026-10-04), '‹ Back to Editor · {page}' + 20/600 title in the pane header, scope chip, white body, 56px footer 'Unsaved changes' · Discard · Save settings. Still open: Settings is a full-page view, not inside the editor shell (REQUESTS), and Billing keeps its plan pill (code-ahead)."
   },
   {
    "nodeId": "238:10889",
@@ -13217,7 +13217,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:1157 — footer \"Save\" vs \"Save settings\"; scope chip copy; \"Back to canvas\" vs \"‹ Back to Editor · Hom…"
+   "verifiedNote": "General staged-save sibling; card content open as 238:10283. Settings chrome now per board (compared 2026-10-26, probe SettingsTab on General at 1440x900 vs 238:10283/238:11495 screenshots): text-only 32px nav rows, Danger zone under Advanced, 'ORGANIZATION WORKSPACE ↗' with Members ↗ / Billing ↗ / Integrations ↗, 'Your role' + 'Permissions ›', 'Search settings' entry (Search Mode kept: owner 2026-10-04), '‹ Back to Editor · {page}' + 20/600 title in the pane header, scope chip, white body, 56px footer 'Unsaved changes' · Discard · Save settings. Still open: Settings is a full-page view, not inside the editor shell (REQUESTS), and Billing keeps its plan pill (code-ahead)."
   },
   {
    "nodeId": "238:11192",

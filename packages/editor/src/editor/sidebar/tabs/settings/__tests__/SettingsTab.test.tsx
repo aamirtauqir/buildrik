@@ -306,11 +306,12 @@ async function openGeneralAndEdit() {
 // ─── Shell ────────────────────────────────────────────────────────────────
 
 describe("SettingsTab — the shell", () => {
-  it("draws the sidebar: Back to canvas, Settings, the site, Overview, the §25 groups and the workspace doors", () => {
+  it("draws the sidebar (B8-S01): Search settings, Overview, the groups, the workspace doors; the way back is in the pane header", () => {
     renderS(<SettingsTab composer={asComposer(makeComposer())} userPlan="enterprise" />);
-    expect(screen.getByTestId("set-back").textContent).toContain("Back to canvas");
-    expect(screen.getByTestId("set-title").textContent).toBe("Settings");
-    expect(screen.getByTestId("set-site").textContent).toBe("Bella Cucina");
+    expect(screen.getByTestId("set-back").textContent).toBe("Back to Editor");
+    expect(screen.queryByTestId("set-title")).toBeNull();
+    expect(screen.queryByTestId("set-site")).toBeNull();
+    expect(screen.getByTestId("set-search-mode-open").textContent).toBe("Search settings");
     const nav = screen.getByRole("navigation", { name: /settings sections/i });
     const rows = Array.from(nav.querySelectorAll('[data-testid^="set-nav-"]'))
       .map((el) => el.getAttribute("data-testid")!)
@@ -338,8 +339,10 @@ describe("SettingsTab — the shell", () => {
     expect(text("seo")).toBe("SEO");
     expect(text("forms")).toBe("Form submissions");
     expect(text("headers")).toBe("Security headers");
-    expect(text("webhooks")).toBe("Integrations & webhooks");
-    expect(text("billing")).toBe("BillingBusiness");
+    expect(text("members")).toBe("Members ↗");
+    expect(text("webhooks")).toBe("Integrations ↗");
+    // Code-ahead (kept): Billing carries the plan.
+    expect(text("billing")).toBe("Billing ↗Business");
     // PD-2 / §24: no Integrations screen, no Export row.
     expect(screen.queryByTestId("set-nav-integrations")).toBeNull();
     expect(screen.queryByTestId("set-nav-export")).toBeNull();
@@ -350,11 +353,10 @@ describe("SettingsTab — the shell", () => {
       "Publishing",
       "Visitors",
       "Advanced",
-      "Danger zone",
-      "Managed in workspace settings ↗",
+      "Organization workspace ↗",
     ]);
-    // M0: the workspace doors sit under a separator, the label carrying ↗.
-    expect(screen.getByTestId("set-nav-group-workspace").previousElementSibling?.tagName).toBe("HR");
+    // B8-S01: the Danger zone is a row under Advanced; no separator before the workspace group.
+    expect(screen.getByTestId("set-nav-group-workspace").previousElementSibling?.tagName).not.toBe("HR");
     expect(screen.getByTestId("set-nav-overview").getAttribute("aria-current")).toBe("page");
     // Owner 2026-10-04: no always-on field — a Search entry opens Search Mode.
     expect(screen.queryByRole("searchbox", { name: "Search site settings" })).toBeNull();
@@ -401,7 +403,7 @@ describe("SettingsTab — the shell", () => {
     renderS(<SettingsTab composer={asComposer(makeComposer())} />);
     fireEvent.click(screen.getByTestId("set-nav-general"));
     await waitFor(() => expect(headTitle()).toBe("General"));
-    expect(screen.getByTestId("set-head-scope").textContent).toBe("Bella Cucina · all pages · applies on next publish");
+    expect(screen.getByTestId("set-head-scope").textContent).toBe("Applies on next publish");
     expect(screen.queryByTestId("set-head-sub")).toBeNull();
     const row = screen.getByTestId("set-nav-general");
     expect(row.getAttribute("aria-current")).toBe("page");
@@ -506,17 +508,23 @@ describe("SettingsTab — doors", () => {
   });
 });
 
-describe("SettingsTab — Back to canvas is a link (owner 2026-10-04)", () => {
+describe("SettingsTab — Back to Editor is a link (owner 2026-10-04)", () => {
   afterEach(() => window.history.replaceState(null, "", "/"));
 
   it("is an anchor to the editor's canvas URL — this URL without ?settings=", () => {
     window.history.replaceState(null, "", "/edit/site-1?settings=access");
     renderS(<SettingsTab composer={asComposer(makeComposer())} />);
-    const back = screen.getByRole("link", { name: /Back to canvas/ });
+    const back = screen.getByRole("link", { name: /Back to Editor/ });
     expect(back).toBe(screen.getByTestId("set-back"));
     expect(back.tagName).toBe("A");
     expect(back.getAttribute("href")).toBe("/edit/site-1");
-    expect(back.textContent).toContain("Back to canvas");
+    expect(back.textContent).toBe("Back to Editor");
+  });
+
+  it("names the page the editor keeps open (B8-S02 \"‹ Back to Editor · Home\")", () => {
+    const composer = { ...makeComposer(), elements: { getActivePage: () => ({ id: "p1", name: "Home" }) } };
+    renderS(<SettingsTab composer={asComposer(composer as FakeComposer)} />);
+    expect(screen.getByTestId("set-back").textContent).toBe("Back to Editor · Home");
   });
 
   it("a plain click stays in the page and closes Settings; ⌘ / Ctrl-click is left to the browser", () => {
@@ -668,7 +676,7 @@ describe("SettingsTab — Unsaved settings", () => {
     await waitFor(() => expect(screen.getByTestId("set-unsaved").getAttribute("data-phase")).toBe("failed"));
     fireEvent.click(screen.getByTestId("set-unsaved-keep"));
     expect(screen.queryByTestId("set-unsaved")).toBeNull();
-    expect(footStatus()).toBe("Not saved");
+    expect(footStatus()).toBe("Couldn’t save");
     expect(headTitle()).toBe("General");
     errorSpy.mockRestore();
   });
@@ -759,7 +767,7 @@ describe("SettingsTab — Save changes", () => {
     fireEvent.change(screen.getByLabelText("Meta title"), { target: { value: "x" } });
     await waitFor(() => expect(footStatus()).toBe("Unsaved changes"));
     fireEvent.click(screen.getByTestId("set-foot-save"));
-    await waitFor(() => expect(footStatus()).toBe("Not saved"));
+    await waitFor(() => expect(footStatus()).toBe("Couldn’t save"));
     expect(screen.getByTestId("set-foot-status").className).toContain("var(--bk-error)");
     expect(screen.getByTestId("set-foot-save").textContent).toBe("Retry save");
     expect(screen.getByTestId("set-save-error").textContent).toBe(
@@ -815,7 +823,7 @@ describe("SettingsTab — Save with a site id goes through the settings mutation
     renderS(<SettingsTab composer={asComposer(composer)} projectId="site-1" />);
     await openSeoAndEdit();
     fireEvent.click(screen.getByTestId("set-foot-save"));
-    await waitFor(() => expect(footStatus()).toBe("Not saved"));
+    await waitFor(() => expect(footStatus()).toBe("Couldn’t save"));
     expect(screen.getByTestId("set-save-error").textContent).toBe(
       "SEO settings were not saved. Your changes are still here. Review the values, then retry.",
     );
@@ -889,7 +897,7 @@ describe("SettingsTab — Save with a site id goes through the settings mutation
     fireEvent.click(screen.getByTestId("set-foot-save"));
     await waitFor(() => expect((screen.getByTestId("set-foot-save") as HTMLButtonElement).disabled).toBe(false));
     expect(footStatus()).toBe("Unsaved changes");
-    expect(screen.getByTestId("set-foot-save").textContent).toBe("Save");
+    expect(screen.getByTestId("set-foot-save").textContent).toBe("Save settings");
     expect(screen.queryByTestId("set-save-error")).toBeNull();
     expect(screen.queryByText("Saved · applies on next publish")).toBeNull();
     expect(errorSpy).not.toHaveBeenCalled();
@@ -1030,8 +1038,8 @@ describe("SettingsTab — Search Mode (owner 2026-10-04, overrides 6816:60270 / 
     expect(screen.queryByTestId("set-nav-overview")).toBeNull();
     expect(screen.queryByTestId("set-nav-members")).toBeNull();
     expect(screen.queryByTestId("set-role")).toBeNull();
-    expect(screen.queryByTestId("set-back")).toBeNull();
-    expect(screen.queryByTestId("set-title")).toBeNull();
+    // The way back lives in the pane header (B8-S02), so it stays.
+    expect(screen.getByTestId("set-back")).toBeTruthy();
     role.value = null;
   });
 
@@ -1300,7 +1308,7 @@ describe("SettingsTab — read-only below the screen's role", () => {
     expect(screen.queryByTestId("set-readonly-screen")).toBeNull();
     expect(screen.queryByTestId("set-foot-save")).toBeNull();
     // 8137:216600 / 216834: the lifecycle scope line, not "Live immediately".
-    expect(screen.getByTestId("set-head-scope").textContent).toBe("Bella Cucina · site lifecycle · changes apply immediately");
+    expect(screen.getByTestId("set-head-scope").textContent).toBe("Site lifecycle · changes apply immediately");
   });
 
   it("a read-only screen shows no header action", async () => {
@@ -1392,14 +1400,14 @@ describe("SettingsTab — its registry entry is honest at every door", () => {
 
 /* 8139:217358: a workspace row opens its door card in the pane. */
 describe("SettingsTab — workspace doors", () => {
-  it("Integrations & webhooks: the row is current, the card names the workspace, Open leaves for the dashboard, Close returns", async () => {
+  it("Integrations: the row is current, the card names the workspace, Open leaves for the dashboard, Close returns", async () => {
     const openSpy = vi.spyOn(window, "open").mockImplementation(() => null);
     renderS(<SettingsTab composer={asComposer(makeComposer())} />);
     fireEvent.click(screen.getByTestId("set-nav-webhooks"));
-    await waitFor(() => expect(headTitle()).toBe("Integrations & webhooks"));
+    await waitFor(() => expect(headTitle()).toBe("Integrations"));
     expect(screen.getByTestId("set-nav-webhooks").getAttribute("aria-current")).toBe("page");
     expect(screen.getByTestId("set-head-scope").textContent).toBe("Your workspace · all sites · managed in workspace settings");
-    expect(screen.getByTestId("set-door-webhooks").textContent).toContain("Your workspace · Integrations & webhooks");
+    expect(screen.getByTestId("set-door-webhooks").textContent).toContain("Your workspace · Integrations");
     expect(screen.queryByTestId("set-foot-save")).toBeNull();
     fireEvent.click(screen.getByTestId("set-door-open"));
     expect(String(openSpy.mock.calls[0][0])).toMatch(/\/dashboard\/settings\/integrations$/);

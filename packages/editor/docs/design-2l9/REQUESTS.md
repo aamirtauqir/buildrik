@@ -20,3 +20,9 @@ Format: lane/task · file · change · board · why.
 ## Open — found on the live walk (2026-10-26)
 
 9. **L-A · canvas footer status** · the selection readout double-escapes HTML entities ("Heading · Tom &amp;amp; Jerry" for "Tom & Jerry") · — · present on `main`, not caused by design-2l9.
+
+## Open — lane L-E (2026-10-26)
+
+10. **L-E · `sidebar/FullPageRouter.tsx:160` / `shell/StudioPanels.tsx`** · render Site settings inside the editor shell (Topbar 56, Rail, bottom bar "Editor keeps {page} open — return with ‹ Back to Editor") instead of a full-screen portal · boards B8-S01 238:9980, B8-S02 238:10283 and every page-06 settings board · SettingsTab already draws the board's nav, pane header ("‹ Back to Editor · {page}") and footer; only the host differs.
+11. **L-E · `scripts/.ds-green-panels.json:85`** · drop `sidebar/tabs/settings/icons.tsx` from the list so the lane can delete the file (and its `export *` in `settings/index.ts`) · B8-S01 238:9980 draws text-only nav rows · `NAV_ICONS` has no consumer since the nav lost its glyphs (dead export, CLAUDE.md "No dead code").
+12. **L-E · Inspector header / shell** · after Form submissions › "Configure in Inspector", show "‹ Back to submissions · {Form} / {View}" and return to the same Settings view · board GAP-FM11 272:28766 · the Inspector and shell are not lane-E paths.

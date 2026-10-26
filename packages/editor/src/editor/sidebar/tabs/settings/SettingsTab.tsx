@@ -1,27 +1,24 @@
 /**
- * SettingsTab — the Settings shell around whichever screen is open (Phase B
- * IA, proposal §25 / plan M0; visuals stay the existing shell's until the M0
- * boards land).
+ * SettingsTab — the Settings shell around whichever screen is open (2L9
+ * page 06, B8-S01 238:9980 / B8-S02 238:10283).
  *
  *   ┌ sidebar 256 ─────────┬ pane ─────────────────────────────────────────┐
- *   │ ‹ Back to canvas     │ Group / Screen               [action | Upgrade]│
- *   │ Settings             │ <site> · all pages · applies on next publish   │
- *   │ <site>               │ subtitle                                       │
- *   │ ⌕ Search             │                                                │
- *   │ ▸ Overview           ├────────────────────────────────────────────────┤
- *   │ SITE · SEARCH & …    │ [read-only banner] the screen's cards          │
- *   │ … DANGER ZONE        ├────────────────────────────────────────────────┤
- *   │ ── Managed in        │ Discard  Save   status   (only when needed)    │
- *   │    workspace ↗       │                                                │
- *   │ Your role · Perms    │                                                │
+ *   │ ⌕ Search settings    │ ‹ Back to Editor · Home   Screen  [action]     │
+ *   │ Overview             │ (Applies on next publish)                      │
+ *   │ SITE · SEARCH & …    ├────────────────────────────────────────────────┤
+ *   │ … ADVANCED           │ [read-only banner] the screen's cards          │
+ *   │ ORGANIZATION         ├────────────────────────────────────────────────┤
+ *   │ WORKSPACE ↗          │ status            Discard  Save settings       │
+ *   │ Your role: Admin     │                                                │
+ *   │ Permissions ›        │                                                │
  *   └──────────────────────┴────────────────────────────────────────────────┘
  *
  * The shell owns: the nav and its doors (Brand ↗ → the Brand panel; Members /
- * Billing / Integrations & webhooks → the dashboard), the scope line, the
+ * Billing / Integrations → the dashboard), the scope chip, the
  * read-only state (`SCREEN_MIN_ROLE`), the plan gate's `Upgrade`, the footer
  * and its states, the save path (BE-3: the settings mutations, never
  * `sites.saveProject`), the Saved toast, field errors, and the Unsaved
- * settings guard (Back to canvas / Escape / any nav click while dirty). The
+ * settings guard (Back to Editor / Escape / any nav click while dirty). The
  * screen owns its cards, its load card and its save-error banner.
  *
  * Search Mode — OWNER OVERRIDE 2026-10-04 (boards 6816:60270 / 8134:212121
@@ -61,13 +58,12 @@ import {
   SCREEN_MIN_ROLE,
   SCREEN_SAVE_MODEL,
   SCREEN_SCOPE,
-  scopeLine,
+  SCOPE_LINE,
   workspaceScopeLine,
   WORKSPACE_LINKS,
   SAVE_ERROR_MESSAGES,
   isSettingsScreenId,
   isSettingsPaneId,
-  NAV_ICONS,
   SET_BTN,
   SET_HEAD_BTN,
   SET_EYEBROW,
@@ -142,18 +138,18 @@ function isScreenLocked(screenId: SettingsNavId, userPlan: PlanTier): boolean {
 
 // ─── Row chrome ──────────────────────────────────────────────────────────────
 
-/* M0 (4418:144988, drawn on 8134:212121): 32-tall rows, 8 in, a 20 icon
-   slot 8 from a 12px label; the current row sits on the accent tint with a
-   14/600 accent label. `size="xs"` gives the Button its 32; everything else
-   is replaced per property through twMerge. */
+/* 2L9 B8-S01 (238:9980): 32-tall text rows, 12 in from the group label's
+   edge, no glyph; the current row sits on the accent tint. `size="xs"` gives
+   the Button its 32; everything else is replaced per property through
+   twMerge. */
 const NAV_ROW =
-  "tw:flex tw:h-8 tw:w-full tw:items-center tw:justify-start tw:gap-2 tw:rounded-[var(--bk-radius-lg)] tw:border-0 " +
-  "tw:bg-transparent tw:px-2 tw:py-1.5 tw:text-left tw:text-[length:var(--bk-text-12)] tw:font-normal tw:leading-5 " +
+  "tw:flex tw:h-8 tw:w-full tw:items-center tw:justify-start tw:gap-2 tw:rounded-[var(--bk-radius-sm)] tw:border-0 " +
+  "tw:bg-transparent tw:pl-3 tw:pr-2 tw:py-1.5 tw:text-left tw:text-[length:var(--bk-text-13)] tw:font-normal tw:leading-5 " +
   "tw:text-[var(--bk-ink)] tw:no-underline tw:enabled:hover:bg-[var(--bk-bg-subtle)] tw:hover:bg-[var(--bk-bg-subtle)] " +
   "tw:focus:ring-0 tw:focus:[box-shadow:none] tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
 const NAV_ROW_ON =
-  "tw:bg-[var(--bk-accent-tint)] tw:text-[length:var(--bk-text-14)] tw:font-semibold tw:text-[var(--bk-accent)] " +
-  "tw:enabled:hover:bg-[var(--bk-accent-tint)] tw:enabled:hover:text-[var(--bk-accent)]";
+  "tw:bg-[var(--bk-accent-tint)] tw:font-medium tw:text-[var(--bk-ink)] " +
+  "tw:enabled:hover:bg-[var(--bk-accent-tint)]";
 
 /* M0's pill — Billing's plan, a locked row's "Pro": 22 tall, accent hairline
    on the accent tint, 11/500. */
@@ -161,8 +157,9 @@ const NAV_PILL =
   "tw:inline-flex tw:h-5.5 tw:shrink-0 tw:items-center tw:rounded-full tw:border tw:border-[var(--bk-accent)] tw:bg-[var(--bk-accent-tint)] tw:px-2 tw:py-0 " +
   "tw:text-[length:var(--bk-text-11)] tw:font-medium tw:leading-4 tw:text-[var(--bk-accent)]";
 
-/* M0's group label: 24 tall, 8 in, 11px uppercase in ink. */
-const NAV_GROUP = "tw:flex tw:h-6 tw:items-center tw:pl-2 tw:text-[length:var(--bk-text-11)] tw:uppercase tw:leading-4 tw:text-[var(--bk-ink)]";
+/* B8-S01's group label: 11px uppercase, muted, 8 above its rows. */
+const NAV_GROUP =
+  "tw:mt-2 tw:flex tw:h-6 tw:items-center tw:text-[length:var(--bk-text-11)] tw:font-medium tw:uppercase tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 
 /* Search Mode's field: 36 tall, 12px, on the subtle fill until focused. */
 const INPUT_THEME = {
@@ -177,23 +174,6 @@ const INPUT_THEME = {
       },
     },
   },
-};
-
-const NavRowIcon: React.FC<{ id: SettingsNavId }> = ({ id }) => {
-  /* 4418:127313 marks Overview with a dot, not a glyph. */
-  if (id === "overview") {
-    return (
-      <span className="tw:flex tw:size-5 tw:shrink-0 tw:items-center tw:justify-center" aria-hidden>
-        <span className="tw:size-1.5 tw:rounded-full tw:bg-current" />
-      </span>
-    );
-  }
-  const Icon = NAV_ICONS[id];
-  return (
-    <span className="tw:flex tw:size-5 tw:shrink-0 tw:items-center tw:justify-center" aria-hidden>
-      <Icon size={18} />
-    </span>
-  );
 };
 
 // ─── Component ───────────────────────────────────────────────────────────────
@@ -721,7 +701,7 @@ export const SettingsTab: React.FC<
   const renderScreen = (): React.ReactNode => {
     if (workspaceDoor && current) {
       return (
-        <WorkspaceDoorScreen door={workspaceDoor} title={current.title} workspaceName={workspaceName} onClose={() => requestNav("overview")} />
+        <WorkspaceDoorScreen door={workspaceDoor} title={current.title.replace(/ ↗$/, "")} workspaceName={workspaceName} onClose={() => requestNav("overview")} />
       );
     }
     if (!screenId) return <OverviewScreen projectId={projectId} siteName={siteName} onOpenScreen={requestNav} />;
@@ -801,13 +781,13 @@ export const SettingsTab: React.FC<
     ? "Overview"
     : `${current.title.replace(/ ↗$/, "")}${screenHeader?.title ? ` / ${screenHeader.title}` : ""}`;
   const headScope = screenRules
-    ? scopeLine(screenRules.scope, siteName)
+    ? SCOPE_LINE[screenRules.scope]
     : workspaceDoor
       ? workspaceScopeLine(workspaceName)
-      : scopeLine("lifecycle", siteName);
+      : SCOPE_LINE.lifecycle;
 
   const immediate = screenRules?.saveModel === "immediate";
-  const footStatus: { text: string; tone: "muted" | "danger" } =
+  const footStatus: { text: string; tone: "muted" | "ink" | "danger" } =
     loadState === "loading"
       ? { text: "Loading settings…", tone: "muted" }
       : loadState === "error"
@@ -815,9 +795,9 @@ export const SettingsTab: React.FC<
         : footerMessage
           ? { text: footerMessage, tone: "muted" }
           : saveError
-            ? { text: "Not saved", tone: "danger" }
+            ? { text: "Couldn’t save", tone: "danger" }
             : screenIsDirty
-              ? { text: "Unsaved changes", tone: "muted" }
+              ? { text: "Unsaved changes", tone: "ink" }
               : { text: "All changes saved", tone: "muted" };
   /* The footer is there while something waits to be saved, a save failed, or
      a footer screen's read is pending or failed — never on the Overview, a
@@ -825,14 +805,18 @@ export const SettingsTab: React.FC<
      still holds an edit (Redirects' 404 switch, until it applies at once). */
   const showFooter =
     !!screenRules && !locked && !readOnly && (!immediate || screenIsDirty || !!saveError);
+  /* B8-S02: "Unsaved changes" sits in ink; a screen's own note stays muted. */
   const FOOT_TONE = {
     muted: "tw:text-[var(--bk-ink-muted)]",
+    ink: "tw:text-[var(--bk-ink)]",
     danger: "tw:text-[var(--bk-error)]",
   } as const;
 
   // ─── Sidebar rows ─────────────────────────────────────────────────────
 
-  /* Back to canvas's href: this editor's own URL without the Settings deep
+  /* The page the editor keeps open behind Settings — "‹ Back to Editor · Home". */
+  const pageName = composer?.elements?.getActivePage?.()?.name ?? null;
+  /* Back to Editor's href: this editor's own URL without the Settings deep
      link (`/edit/<siteId>?settings=…` → `/edit/<siteId>`). */
   const canvasHref = (() => {
     const url = new URL(window.location.href);
@@ -888,7 +872,6 @@ export const SettingsTab: React.FC<
         onClick={() => requestNav(n.id)}
         data-testid={`set-nav-${n.id}`}
       >
-        <NavRowIcon id={n.id} />
         <span className="tw:min-w-0 tw:flex-1 tw:truncate" data-locked={rowLocked || undefined}>{n.title}</span>
         {/* M0: a plan-locked row says so before it is opened; Billing carries the plan. */}
         {rowLocked ? (
@@ -999,38 +982,7 @@ export const SettingsTab: React.FC<
           </div>
         ) : (
           <>
-            <div className="tw:flex tw:shrink-0 tw:flex-col tw:px-4 tw:pt-3">
-              {/* OWNER OVERRIDE 2026-10-04 (M0 4418:144988 / 8134:212121 draw a
-                  quiet button; to update): a real link to the canvas, styled as
-                  the text link. A plain click stays in the page and goes
-                  through the Unsaved guard; ⌘/Ctrl/Shift-click and middle-click
-                  are the browser's — the canvas in a new tab or window. */}
-              <Button
-                href={canvasHref}
-                variant="link"
-                size="xs"
-                className="tw:h-8 tw:w-54 tw:justify-center tw:gap-0.5 tw:px-3 tw:text-[length:var(--bk-text-13)] tw:font-medium tw:leading-5 tw:no-underline tw:hover:underline"
-                onClick={(e: React.MouseEvent<HTMLElement>) => {
-                  if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-                  e.preventDefault();
-                  requestLeave();
-                }}
-                data-testid="set-back"
-              >
-                <ChevronLeft size={12} aria-hidden />
-                Back to canvas
-              </Button>
-              <h2
-                className="tw:m-0 tw:mt-2.5 tw:text-[length:var(--bk-text-24)] tw:font-semibold tw:leading-8 tw:tracking-[-0.015em] tw:text-[var(--bk-ink)]"
-                data-testid="set-title"
-              >
-                Settings
-              </h2>
-              <div className="tw:truncate tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-gray-500)]" data-testid="set-site">
-                {siteName}
-              </div>
-            </div>
-            <div className="tw:shrink-0 tw:px-4 tw:pt-3">
+            <div className="tw:shrink-0 tw:px-4 tw:pt-4">
               {/* Owner 2026-10-04: the entry into Search Mode, where the always-on field was (6816:60270).
                   Outside the scrolling nav, so it is always in reach and opening it
                   never moves the nav scroll Search Mode gives back. */}
@@ -1047,7 +999,7 @@ export const SettingsTab: React.FC<
                 <span className="tw:flex tw:size-5 tw:shrink-0 tw:items-center tw:justify-center" aria-hidden>
                   <SearchIcon size={16} />
                 </span>
-                <span className="tw:min-w-0 tw:flex-1 tw:truncate">Search</span>
+                <span className="tw:min-w-0 tw:flex-1 tw:truncate">Search settings</span>
               </Button>
             </div>
             <nav ref={navRef} className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col tw:overflow-y-auto tw:px-4 tw:pb-4 tw:pt-1" aria-label="Settings sections">
@@ -1060,53 +1012,38 @@ export const SettingsTab: React.FC<
                 onClick={() => requestNav("overview")}
                 data-testid="set-nav-overview"
               >
-                <NavRowIcon id="overview" />
                 <span className="tw:min-w-0 tw:flex-1 tw:truncate">Overview</span>
               </Button>
               {SETTINGS_NAV_GROUP_ORDER.map((group) => {
                 const rows = SETTINGS_NAV.filter((n) => n.group === group);
                 if (rows.length === 0) return null;
-                /* M0: the workspace doors sit apart, under a separator, as
-                   "Managed in workspace settings ↗" — they are not this site's. */
-                if (group === "workspace") {
-                  return (
-                    <React.Fragment key={group}>
-                      <hr className="tw:my-0 tw:h-px tw:w-full tw:shrink-0 tw:border-0 tw:bg-[var(--bk-border)]" aria-hidden />
-                      <div
-                        className="tw:flex tw:h-10 tw:shrink-0 tw:items-center tw:pl-2 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink)]"
-                        data-testid={`set-nav-group-${group}`}
-                      >
-                        {`${SETTINGS_NAV_GROUPS[group]} ↗`}
-                      </div>
-                      {rows.map(renderRow)}
-                    </React.Fragment>
-                  );
-                }
+                /* B8-S01: the workspace doors are the last group, "ORGANIZATION
+                   WORKSPACE ↗" — they leave for the dashboard, not this site. */
                 return (
                   <React.Fragment key={group}>
                     <div className={`${NAV_GROUP} tw:shrink-0`} data-testid={`set-nav-group-${group}`}>
-                      {SETTINGS_NAV_GROUPS[group]}
+                      {group === "workspace" ? `${SETTINGS_NAV_GROUPS[group]} ↗` : SETTINGS_NAV_GROUPS[group]}
                     </div>
                     {rows.map(renderRow)}
                   </React.Fragment>
                 );
               })}
             </nav>
-            {/* S5 Q1: every role sees who they are and can open what that allows
-                (the Permissions dialog, PermissionsHost). Not on the M0 board —
-                an owner decision (2026-10-02) the board predates. */}
+            {/* S5 Q1 / B8-S01: who you are, then the way to what that allows
+                (the Permissions dialog, PermissionsHost), on two lines. */}
             {editorRole ? (
-              <div className="tw:flex tw:shrink-0 tw:items-center tw:gap-1 tw:border-t tw:border-[var(--bk-border)] tw:px-6 tw:py-2 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="set-role">
-                <span>{`Your role: ${editorRole.charAt(0)}${editorRole.slice(1).toLowerCase()}`}</span>
-                <span aria-hidden>·</span>
+              <div className="tw:flex tw:shrink-0 tw:flex-col tw:items-start tw:gap-2 tw:px-4 tw:pt-2 tw:pb-4" data-testid="set-role">
+                <span className="tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
+                  {`Your role: ${editorRole.charAt(0)}${editorRole.slice(1).toLowerCase()}`}
+                </span>
                 <Button
                   type="button"
                   variant="link"
-                  className="tw:h-auto tw:min-h-0 tw:px-0 tw:text-[length:var(--bk-text-11)] tw:leading-4"
+                  className="tw:h-auto tw:min-h-0 tw:px-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:no-underline tw:hover:underline"
                   onClick={() => composer?.emit(EVENTS.UI_OPEN_PERMISSIONS, undefined)}
                   data-testid="set-role-permissions"
                 >
-                  Permissions
+                  Permissions ›
                 </Button>
               </div>
             ) : null}
@@ -1116,18 +1053,42 @@ export const SettingsTab: React.FC<
 
       {/* ── Pane ────────────────────────────────────────────────────────── */}
       <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
-        {/* 8134:212121: a 112 white band — the screen's title (20/28) and the
-            scope line under it (M1); the screen's own action or the plan
-            gate's Upgrade at the right. */}
-        <header className="tw:flex tw:h-28 tw:shrink-0 tw:items-start tw:justify-between tw:gap-3 tw:bg-[var(--bk-bg-panel)] tw:px-12 tw:pt-6">
-          <div className="tw:flex tw:min-w-0 tw:flex-col tw:gap-1">
-            <h2
-              className="tw:m-0 tw:truncate tw:text-[length:var(--bk-text-20)] tw:font-semibold tw:leading-7 tw:tracking-[-0.24px] tw:text-[var(--bk-ink)]"
-              data-testid="set-head-title"
+        {/* 2L9 B8-S02 (238:10283): "‹ Back to Editor · {page}" then the
+            screen's title (20/600) on one line, the scope chip under it; the
+            screen's own action or the plan gate's Upgrade at the right. */}
+        <header className="tw:flex tw:shrink-0 tw:items-start tw:justify-between tw:gap-3 tw:bg-[var(--bk-bg-panel)] tw:px-6 tw:pt-4 tw:pb-4">
+          <div className="tw:flex tw:min-w-0 tw:flex-col tw:gap-2">
+            <div className="tw:flex tw:min-w-0 tw:items-center tw:gap-5">
+              {/* OWNER OVERRIDE 2026-10-04: a real link to the canvas, styled as
+                  the text link. A plain click stays in the page and goes
+                  through the unsaved-changes guard; ⌘/Ctrl/Shift-click and
+                  middle-click are the browser's — the canvas in a new tab. */}
+              <Button
+                href={canvasHref}
+                variant="link"
+                size="xs"
+                className="tw:h-8 tw:shrink-0 tw:gap-0.5 tw:px-0 tw:text-[length:var(--bk-text-13)] tw:font-normal tw:leading-5 tw:no-underline tw:hover:underline"
+                onClick={(e: React.MouseEvent<HTMLElement>) => {
+                  if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+                  e.preventDefault();
+                  requestLeave();
+                }}
+                data-testid="set-back"
+              >
+                <ChevronLeft size={12} aria-hidden />
+                {pageName ? `Back to Editor · ${pageName}` : "Back to Editor"}
+              </Button>
+              <h2
+                className="tw:m-0 tw:truncate tw:text-[length:var(--bk-text-20)] tw:font-semibold tw:leading-7 tw:tracking-[-0.24px] tw:text-[var(--bk-ink)]"
+                data-testid="set-head-title"
+              >
+                {headTitle}
+              </h2>
+            </div>
+            <p
+              className="tw:m-0 tw:w-fit tw:max-w-full tw:truncate tw:rounded-full tw:bg-[var(--bk-bg-subtle)] tw:px-2.5 tw:text-[length:var(--bk-text-12)] tw:leading-6 tw:text-[var(--bk-ink-soft)]"
+              data-testid="set-head-scope"
             >
-              {headTitle}
-            </h2>
-            <p className="tw:m-0 tw:truncate tw:text-[length:var(--bk-text-12)] tw:leading-5 tw:text-[var(--bk-gray-500)]" data-testid="set-head-scope">
               {headScope}
             </p>
             {screenHeader?.subtitle ? (
@@ -1147,7 +1108,7 @@ export const SettingsTab: React.FC<
 
         <div
           key={resetKey}
-          className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col tw:gap-4 tw:overflow-y-auto tw:bg-[var(--bk-gray-50)] tw:px-12 tw:py-6"
+          className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col tw:gap-4 tw:overflow-y-auto tw:bg-[var(--bk-bg-panel)] tw:px-6 tw:pt-2 tw:pb-6"
           data-testid="set-body"
         >
           {renderScreen()}
@@ -1159,9 +1120,9 @@ export const SettingsTab: React.FC<
             door, a locked or read-only screen; an immediate screen gets it
             only while it still holds an edit. */}
         {!showFooter ? null : (
-          <footer className="tw:flex tw:h-11 tw:shrink-0 tw:items-center tw:justify-end tw:gap-2 tw:border-t tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:px-4">
+          <footer className="tw:flex tw:h-14 tw:shrink-0 tw:items-center tw:justify-end tw:gap-2 tw:border-t tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:px-6">
             <span
-              className={`tw:min-w-0 tw:flex-1 tw:text-[length:var(--bk-text-12)] tw:leading-[18px] ${FOOT_TONE[footStatus.tone]}`}
+              className={`tw:min-w-0 tw:flex-1 tw:text-[length:var(--bk-text-13)] tw:leading-5 ${FOOT_TONE[footStatus.tone]}`}
               role="status"
               data-testid="set-foot-status"
             >
@@ -1169,9 +1130,9 @@ export const SettingsTab: React.FC<
             </span>
             <Button
               type="button"
-              variant="ghost"
+              variant="secondary"
               size="xs"
-              className={`${SET_BTN} tw:h-7 tw:px-3 tw:text-[var(--bk-gray-700)]`}
+              className={`${SET_BTN} tw:px-6`}
               disabled={!screenIsDirty && !saveError}
               onClick={rollBack}
               data-testid="set-foot-discard"
@@ -1181,12 +1142,12 @@ export const SettingsTab: React.FC<
             <Button
               type="button"
               size="xs"
-              className={`${SET_BTN} tw:h-7 tw:px-3`}
+              className={`${SET_BTN} tw:px-6`}
               disabled={loadState !== "ready" || saving || clientFieldErrors !== null || (!screenIsDirty && !saveError)}
               onClick={() => handleSave()}
               data-testid="set-foot-save"
             >
-              {saveError && !footerMessage ? "Retry save" : "Save"}
+              {saveError && !footerMessage ? "Retry save" : "Save settings"}
             </Button>
           </footer>
         )}
