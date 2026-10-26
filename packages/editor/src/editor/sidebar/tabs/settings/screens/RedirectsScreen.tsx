@@ -75,7 +75,6 @@ export interface RedirectRow {
 
 const asType = (type: string): RedirectType => (type === "302" ? "302" : "301");
 
-const CARD_LINE = "Old URLs sent to new ones, and the 404 suggester.";
 
 const asPath = (slug: string) => (slug.startsWith("/") ? slug : `/${slug}`);
 
@@ -414,7 +413,6 @@ export const RedirectsScreen: React.FC<RedirectsScreenProps> = ({
       <Screen>
         <LoadCard
           title="Redirects"
-          line={CARD_LINE}
           state={load.state}
           errorLine="Couldn't load your redirects. Check your connection, then try again."
           onRetry={load.retry}

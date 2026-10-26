@@ -82,10 +82,10 @@ function setup(opts: {
   return { composer, ...utils };
 }
 
-const gaInput = () => screen.getByLabelText("Google Analytics ID") as HTMLInputElement;
-const gtmInput = () => screen.getByLabelText("GTM Container ID") as HTMLInputElement;
+const gaInput = () => screen.getByLabelText("Measurement ID") as HTMLInputElement;
+const gtmInput = () => screen.getByLabelText("Container ID") as HTMLInputElement;
 const pixelInput = () => screen.getByLabelText("Pixel ID") as HTMLInputElement;
-const clarityInput = () => screen.getByLabelText("Clarity Project ID") as HTMLInputElement;
+const clarityInput = () => screen.getByLabelText("Project ID") as HTMLInputElement;
 const gaSwitch = () => screen.getByRole("switch", { name: "Enable Google Analytics" });
 const pixelSwitch = () => screen.getByRole("switch", { name: "Enable Meta Pixel" });
 
@@ -95,7 +95,7 @@ describe("AnalyticsScreen — the frame's cards and rows", () => {
   /* G3-108: 4418:127827 draws four cards. The Cookie Consent switch recorded
      a flag nothing reads (no banner, no export effect) — hidden until wired;
      the stored value is kept on the flush. */
-  it("draws the board's four cards in order, each with its label-left rows — no Consent card", async () => {
+  it("draws the board's four cards in order (B8-AN01), one provider row each — no Consent card", async () => {
     setup();
     await loaded();
     const cards = screen.getAllByRole("heading", { level: 3 }).map((h) => h.textContent);
@@ -103,15 +103,18 @@ describe("AnalyticsScreen — the frame's cards and rows", () => {
     expect(screen.queryByRole("switch", { name: "Cookie Consent" })).toBeNull();
 
     const ga = within(screen.getByTestId("set-card-google-analytics"));
-    expect(ga.getByTestId("set-field-label-enable-google-analytics")).toHaveTextContent("Enable Google Analytics");
-    expect(ga.getByTestId("set-field-label-google-analytics-id")).toHaveTextContent("Google Analytics ID");
-    expect(ga.getByTestId("set-field-label-connection-status")).toHaveTextContent("Connection status");
-    expect(ga.getByTestId("set-field-label-last-received-data")).toHaveTextContent("Last received data");
-    expect(ga.getByTestId("set-an-ga-verify")).toHaveTextContent("Check data is arriving");
+    expect(ga.getByTestId("set-field-label-google-analytics-id")).toHaveTextContent("Measurement ID");
+    expect(ga.getByTestId("set-field-google-analytics-id")).toHaveTextContent("Off");
+    expect(ga.getByTestId("set-field-connection-status")).toBeInTheDocument();
+    expect(ga.getByTestId("set-field-last-received-data")).toBeInTheDocument();
+    expect(ga.getByTestId("set-an-ga-verify")).toHaveTextContent("Verify");
+    expect(ga.getByTestId("set-an-ga-disclaimer")).toHaveTextContent(
+      "Buildrick tracker status; this does not confirm Google Analytics delivery.",
+    );
 
-    expect(screen.getByTestId("set-field-label-gtm-container-id")).toHaveTextContent("GTM Container ID");
+    expect(screen.getByTestId("set-field-label-gtm-container-id")).toHaveTextContent("Container ID");
     expect(screen.getByTestId("set-field-label-pixel-id")).toHaveTextContent("Pixel ID");
-    expect(screen.getByTestId("set-field-label-clarity-project-id")).toHaveTextContent("Clarity Project ID");
+    expect(screen.getByTestId("set-field-label-clarity-project-id")).toHaveTextContent("Project ID");
   });
 
   it("gives every control the id Search lands on, and the brief's testids", async () => {
@@ -158,40 +161,38 @@ describe("AnalyticsScreen — the frame's cards and rows", () => {
 });
 
 describe("AnalyticsScreen — Connection status and Last received data", () => {
-  it("RECEIVING DATA (green) with the verified line and the frame's last-received shape", async () => {
+  it("Receiving data with the verified line and the frame's last-received shape", async () => {
     setup({ settings: gaSettings() });
     await loaded();
     expect(statusMock).toHaveBeenCalledWith({ siteId: "s1" });
     const pill = screen.getByTestId("set-an-ga-status");
-    expect(pill).toHaveTextContent("RECEIVING DATA");
-    expect(pill).toHaveClass("tw:bg-[var(--bk-success-tint)]");
+    expect(pill).toHaveTextContent("Receiving data");
     expect(screen.getByTestId("set-an-ga-verified")).toHaveTextContent("Measurement ID verified on 2 Jul 2025");
     expect(screen.getByTestId("set-an-ga-last")).toHaveTextContent("2 Jul 2025, 19:38 · 1,284 events in the last 24 hours");
   });
 
-  it("NO DATA YET (grey) when the id is verified but nothing has arrived", async () => {
+  it("Waiting for data when the id is verified but nothing has arrived", async () => {
     statusMock.mockResolvedValue(silent());
     setup({ settings: gaSettings() });
     await loaded();
     const pill = screen.getByTestId("set-an-ga-status");
-    expect(pill).toHaveTextContent("NO DATA YET");
-    expect(pill).toHaveClass("tw:bg-[var(--bk-bg-subtle)]");
+    expect(pill).toHaveTextContent("Waiting for data");
     expect(screen.getByTestId("set-an-ga-verified")).toBeInTheDocument();
     expect(screen.getByTestId("set-an-ga-last")).toHaveTextContent(/^No events yet$/);
   });
 
-  it("NOT VERIFIED (grey), no verified line, when the id was never verified", async () => {
+  it("Not verified, no verified line, when the id was never verified", async () => {
     statusMock.mockResolvedValue(silent());
     setup({ settings: gaSettings({ verifiedAt: undefined }) });
     await loaded();
-    expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("NOT VERIFIED");
+    expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("Not verified");
     expect(screen.queryByTestId("set-an-ga-verified")).toBeNull();
   });
 
   it("events in the last 24 hours mean RECEIVING DATA even before a Verify — they are the tracker's", async () => {
     setup({ settings: gaSettings({ verifiedAt: undefined }) });
     await loaded();
-    expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("RECEIVING DATA");
+    expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("Receiving data");
     expect(screen.queryByTestId("set-an-ga-verified")).toBeNull();
   });
 
@@ -199,16 +200,16 @@ describe("AnalyticsScreen — Connection status and Last received data", () => {
     statusMock.mockResolvedValue(silent());
     setup({ settings: gaSettings() });
     await loaded();
-    expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("NO DATA YET");
+    expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("Waiting for data");
     fireEvent.change(gaInput(), { target: { value: "G-4XQ2P7B1KE" } });
-    expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("NOT VERIFIED");
+    expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("Not verified");
     expect(screen.queryByTestId("set-an-ga-verified")).toBeNull();
   });
 
   it("without a projectId requests nothing and reports the honest empty state", () => {
     setup({ projectId: null, settings: gaSettings({ verifiedAt: undefined }) });
     expect(statusMock).not.toHaveBeenCalled();
-    expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("NOT VERIFIED");
+    expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("Not verified");
     expect(screen.getByTestId("set-an-ga-last")).toHaveTextContent(/^No events yet$/);
   });
 });
@@ -250,7 +251,7 @@ describe("AnalyticsScreen — Verify and Connection verified (4256:26844)", () =
     const onDirtyChange = vi.fn();
     const { composer } = setup({ onDirtyChange, settings: gaSettings({ verifiedAt: undefined }) });
     await loaded();
-    expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("NOT VERIFIED");
+    expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("Not verified");
     expect(onDirtyChange).toHaveBeenLastCalledWith(false);
 
     statusMock.mockResolvedValueOnce(receiving());
@@ -263,7 +264,7 @@ describe("AnalyticsScreen — Verify and Connection verified (4256:26844)", () =
     expect(document.activeElement).toBe(screen.getByTestId("set-an-verified-back"));
 
     // Behind the dialog the rows already show the re-read and the stamp.
-    expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("RECEIVING DATA");
+    expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("Receiving data");
     expect(screen.getByTestId("set-an-ga-verified")).toHaveTextContent(`Measurement ID verified on ${formatDay(new Date())}`);
     expect(screen.getByTestId("set-an-ga-last")).toHaveTextContent("1,284 events in the last 24 hours");
     expect(onDirtyChange).toHaveBeenLastCalledWith(true);
@@ -294,7 +295,7 @@ describe("AnalyticsScreen — Verify and Connection verified (4256:26844)", () =
     fireEvent.click(verify());
     await waitFor(() => expect(screen.getByTestId("set-an-verified")).toBeInTheDocument());
     expect(screen.getByTestId("set-an-verified-line")).toHaveTextContent(/^G-4XQ2P7B1KD has the right format\. No events have arrived yet\.$/);
-    expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("NO DATA YET");
+    expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("Waiting for data");
   });
 
   it("a malformed or empty id lands the cursor on the field and opens nothing", async () => {
@@ -310,19 +311,19 @@ describe("AnalyticsScreen — Verify and Connection verified (4256:26844)", () =
     expect(screen.queryByTestId("set-an-ga-verified")).toBeNull();
   });
 
-  it("a failed re-read is the load-error card, not a dialog", async () => {
+  it("a failed re-read says so in the status row (B8-AN06), not a dialog; the values stay", async () => {
     setup({ settings: gaSettings({ verifiedAt: undefined }) });
     await loaded();
     statusMock.mockRejectedValue(new Error("network"));
     fireEvent.click(verify());
-    await waitFor(() => expect(screen.getByTestId("set-load-retry")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("Couldn’t check status"));
+    expect(screen.getByTestId("set-an-ga-verify-error")).toHaveTextContent("The status service did not respond. Try Verify again.");
     expect(screen.queryByTestId("set-an-verified")).toBeNull();
-    statusMock.mockResolvedValue(silent());
-    fireEvent.click(screen.getByTestId("set-load-retry"));
-    await loaded();
-    // The draft survived the detour; nothing was stamped.
+    // Nothing was stamped; the draft is untouched.
     expect(gaInput().value).toBe("G-4XQ2P7B1KD");
-    expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("NOT VERIFIED");
+    statusMock.mockResolvedValue(silent());
+    fireEvent.click(verify());
+    await waitFor(() => expect(screen.getByTestId("set-an-ga-status")).toHaveTextContent("Waiting for data"));
   });
 
   it("without a projectId verifies the shape alone and reports no events", async () => {
@@ -340,9 +341,8 @@ describe("AnalyticsScreen — loading, load-error and save-error", () => {
     statusMock.mockReturnValue(new Promise((r) => { resolve = r; }));
     const onLoadStateChange = vi.fn();
     setup({ onLoadStateChange });
-    expect(screen.getByTestId("set-load-title")).toHaveTextContent("Analytics");
-    expect(screen.getByTestId("set-load-line")).toHaveTextContent("GA4, GTM, Meta Pixel and Clarity keys.");
-    expect(screen.getByTestId("set-load-state")).toHaveTextContent("Loading…");
+    // 2L9 B8-AN13 252:47222.
+    expect(screen.getByTestId("set-load-title")).toHaveTextContent("Loading Analytics…");
     expect(onLoadStateChange).toHaveBeenLastCalledWith("loading");
     expect(screen.queryByTestId("set-card-google-analytics")).toBeNull();
     await act(async () => { resolve(receiving()); });
@@ -356,7 +356,7 @@ describe("AnalyticsScreen — loading, load-error and save-error", () => {
     setup({ onLoadStateChange });
     await waitFor(() => expect(screen.getByTestId("set-load-retry")).toBeInTheDocument());
     expect(screen.getByTestId("set-load-state")).toHaveTextContent(
-      "Couldn't load your analytics settings. Check your connection, then try again.",
+      "The settings service did not respond. Your existing configuration has not changed.",
     );
     expect(onLoadStateChange).toHaveBeenLastCalledWith("error");
     fireEvent.click(screen.getByTestId("set-load-retry"));

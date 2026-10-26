@@ -13195,9 +13195,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "General card content open: the board's Site (name, tagline) / Icons cards vs the code's Site identity card (no tagline field in the settings schema). Settings chrome now per board (compared 2026-10-26, probe SettingsTab on General at 1440x900 vs 238:10283/238:11495 screenshots): text-only 32px nav rows, Danger zone under Advanced, 'ORGANIZATION WORKSPACE ↗' with Members ↗ / Billing ↗ / Integrations ↗, 'Your role' + 'Permissions ›', 'Search settings' entry (Search Mode kept: owner 2026-10-04), '‹ Back to Editor · {page}' + 20/600 title in the pane header, scope chip, white body, 56px footer 'Unsaved changes' · Discard · Save settings. Still open: Settings is a full-page view, not inside the editor shell (REQUESTS), and Billing keeps its plan pill (code-ahead)."
+   "authority": "code:no-tagline-field",
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared 2026-10-26 (wave 2) against get_metadata of 238:10283, probe SettingsTab on General at 1440x900: Site card 720x178 as drawn (Site name and Author stacked, labels 13/20), Icons card with rows \"Favicon · <file> · <w> × <h> · Replace…\" (240 label column, 140 button); the board draws Tagline, which has no Site column or project key — Author fills that slot (code). Kept in Advanced (undrawn): Favicon URL and the Languages link. Touch icon kept as a second Icons row (code-ahead). Remaining: controls 32 tall vs 28 (settings theme), footer state copy, Settings host (E-10)."
   },
   {
    "nodeId": "238:10586",
@@ -13207,7 +13207,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "General staged-save sibling; card content open as 238:10283. Settings chrome now per board (compared 2026-10-26, probe SettingsTab on General at 1440x900 vs 238:10283/238:11495 screenshots): text-only 32px nav rows, Danger zone under Advanced, 'ORGANIZATION WORKSPACE ↗' with Members ↗ / Billing ↗ / Integrations ↗, 'Your role' + 'Permissions ›', 'Search settings' entry (Search Mode kept: owner 2026-10-04), '‹ Back to Editor · {page}' + 20/600 title in the pane header, scope chip, white body, 56px footer 'Unsaved changes' · Discard · Save settings. Still open: Settings is a full-page view, not inside the editor shell (REQUESTS), and Billing keeps its plan pill (code-ahead)."
+   "verifiedNote": "Saving state: footer 'Saving settings…', button 'Saving…' (tested), not compared. General card content now as 238:10283 (Site / Icons). Settings chrome now per board (compared 2026-10-26, probe SettingsTab on General at 1440x900 vs 238:10283/238:11495 screenshots): text-only 32px nav rows, Danger zone under Advanced, 'ORGANIZATION WORKSPACE ↗' with Members ↗ / Billing ↗ / Integrations ↗, 'Your role' + 'Permissions ›', 'Search settings' entry (Search Mode kept: owner 2026-10-04), '‹ Back to Editor · {page}' + 20/600 title in the pane header, scope chip, white body, 56px footer 'Unsaved changes' · Discard · Save settings. Still open: Settings is a full-page view, not inside the editor shell (REQUESTS), and Billing keeps its plan pill (code-ahead)."
   },
   {
    "nodeId": "238:10889",
@@ -13217,7 +13217,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "General staged-save sibling; card content open as 238:10283. Settings chrome now per board (compared 2026-10-26, probe SettingsTab on General at 1440x900 vs 238:10283/238:11495 screenshots): text-only 32px nav rows, Danger zone under Advanced, 'ORGANIZATION WORKSPACE ↗' with Members ↗ / Billing ↗ / Integrations ↗, 'Your role' + 'Permissions ›', 'Search settings' entry (Search Mode kept: owner 2026-10-04), '‹ Back to Editor · {page}' + 20/600 title in the pane header, scope chip, white body, 56px footer 'Unsaved changes' · Discard · Save settings. Still open: Settings is a full-page view, not inside the editor shell (REQUESTS), and Billing keeps its plan pill (code-ahead)."
+   "verifiedNote": "General card content now as 238:10283 (Site / Icons). Settings chrome now per board (compared 2026-10-26, probe SettingsTab on General at 1440x900 vs 238:10283/238:11495 screenshots): text-only 32px nav rows, Danger zone under Advanced, 'ORGANIZATION WORKSPACE ↗' with Members ↗ / Billing ↗ / Integrations ↗, 'Your role' + 'Permissions ›', 'Search settings' entry (Search Mode kept: owner 2026-10-04), '‹ Back to Editor · {page}' + 20/600 title in the pane header, scope chip, white body, 56px footer 'Unsaved changes' · Discard · Save settings. Still open: Settings is a full-page view, not inside the editor shell (REQUESTS), and Billing keeps its plan pill (code-ahead)."
   },
   {
    "nodeId": "238:11192",
@@ -13226,8 +13226,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "no offline detection in Settings"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (offline state): Settings reads navigator.onLine; offline keeps the edits, the footer says \"Needs a connection · changes stay here, unsaved\" (SH04/AN07 wording; S05 draws \"Needs a connection — your edits stay on this screen, unsaved\"), the banner \"You’re offline. Save settings needs a connection.\", Save disabled until online (tested). AN07 also draws \"Status unavailable offline\" for the tracker status — not built."
   },
   {
    "nodeId": "238:11495",
@@ -13266,8 +13266,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/DomainsScreen.tsx:141 — cards/DNS view differ; Make primary + Undo present"
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared 2026-10-26 (wave 2) against the 238:12413 screenshot, probe SettingsTab on Domains at 1440x900 (tRPC stubbed with the board shape: primary, redirect, waiting): one Domains card (720, ruled rows: name · \"Primary · connected · SSL active\" / \"Redirects to primary\" / \"Waiting for DNS\" · Make primary / Check again), \"+ Add domain\", a DNS records card for the waiting domain with \"Add these at your DNS provider. Editing DNS here is Planned.\", toast \"<domain> is now primary\" with Undo. Kept: Manage DNS on each row (owner 2026-10-04: Force HTTPS, Remove). Not drawn: \"checked 2 min ago\" (the domain row carries no last-check time)."
   },
   {
    "nodeId": "238:12721",
@@ -13437,7 +13437,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/AnalyticsScreen.tsx:376 — 4 providers + verify pill exist; tracker disclaimer, status copy, footer states dif…"
+   "verifiedNote": "Compared 2026-10-26 (wave 2) against get_metadata of 245:45159, probe SettingsTab on Analytics at 1440x900: GTM / Meta Pixel / Clarity cards 720x94 as drawn (label 192 · id · switch + Enabled/Off 104); Google Analytics adds status words (Not verified / Waiting for data / Receiving data) + Verify (148) and the tracker disclaimer. Still open: the GA card is 182 tall vs 158 — the code keeps the Last received line under the status (code-ahead, the tracker reading), which AN01 draws only in AN04."
   },
   {
    "nodeId": "245:45416",
@@ -13447,7 +13447,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/AnalyticsScreen.tsx:376 — 4 providers + verify pill exist; tracker disclaimer, status copy, footer states dif…"
+   "verifiedNote": "Built, not compared: status words and Verify per AN01 (wave 2); detail lines as in code."
   },
   {
    "nodeId": "245:45673",
@@ -13457,7 +13457,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/AnalyticsScreen.tsx:376 — 4 providers + verify pill exist; tracker disclaimer, status copy, footer states dif…"
+   "verifiedNote": "Built, not compared: status words and Verify per AN01 (wave 2); detail lines as in code."
   },
   {
    "nodeId": "245:45931",
@@ -13467,7 +13467,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/AnalyticsScreen.tsx:376 — 4 providers + verify pill exist; tracker disclaimer, status copy, footer states dif…"
+   "verifiedNote": "Built, not compared: status words and Verify per AN01 (wave 2); detail lines as in code."
   },
   {
    "nodeId": "245:46189",
@@ -13487,7 +13487,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/AnalyticsScreen.tsx:376 — 4 providers + verify pill exist; tracker disclaimer, status copy, footer states dif…"
+   "verifiedNote": "Built, not compared (error state): a failed Verify shows \"Couldn’t check status\" / \"The status service did not respond. Try Verify again.\" in the status row; values kept (tested)."
   },
   {
    "nodeId": "245:46707",
@@ -13496,8 +13496,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "no offline state"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (offline state): Settings reads navigator.onLine; offline keeps the edits, the footer says \"Needs a connection · changes stay here, unsaved\" (SH04/AN07 wording; S05 draws \"Needs a connection — your edits stay on this screen, unsaved\"), the banner \"You’re offline. Save settings needs a connection.\", Save disabled until online (tested). AN07 also draws \"Status unavailable offline\" for the tracker status — not built."
   },
   {
    "nodeId": "245:46965",
@@ -13507,7 +13507,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/AnalyticsScreen.tsx:376 — 4 providers + verify pill exist; tracker disclaimer, status copy, footer states dif…"
+   "verifiedNote": "Built, not compared (saving state): footer 'Saving settings…', button 'Saving…' (tested)."
   },
   {
    "nodeId": "245:47222",
@@ -13546,8 +13546,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared 2026-10-26 (probe SettingsTab on Security headers, tRPC stubbed, saved HSTS 86400, draft 1 year; vs the 277:28233 screenshot's screen): restore line plain, cards Content Security Policy · Browser policies (X-Frame-Options, Referrer-Policy) · HSTS (switch + 'Enabled', presets '1 year · 31536000 seconds', '<n> seconds (custom)') · Permissions-Policy, Max age note. Still open: card density — the shared settings Section draws 24 padding / 16 title where the board draws ~16 / 14 (every settings screen; not changed screen by screen). SH01 note 'Existing custom value retained. Changing presets is an explicit edit.' built (tested)."
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared 2026-10-26 (wave 2) against get_metadata of 245:47988 and the 277:28233 screenshot, probe SettingsTab on Security headers at 1440x900 (tRPC stubbed): nav 240 (search 208x28 @16, rows 32 @2 apart, groups 24), header 104 (back + title @12, scope chip 24 @52), 12/16 restore line @104, 720 cards 16 in with 14/600 titles, CSP/Permissions stacked (label over field), Browser policies/HSTS rows with a 192 label column + 12 gap, HSTS 158 tall as drawn, SH01 custom-value note. Remaining: controls 32 tall vs the board 28 (settings Input/Select theme, founder density-32) and the Settings host (E-10)."
   },
   {
    "nodeId": "245:48243",
@@ -13556,8 +13556,9 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared 2026-10-26 (probe SettingsTab on Security headers, tRPC stubbed, saved HSTS 86400, draft 1 year; vs the 277:28233 screenshot's screen): restore line plain, cards Content Security Policy · Browser policies (X-Frame-Options, Referrer-Policy) · HSTS (switch + 'Enabled', presets '1 year · 31536000 seconds', '<n> seconds (custom)') · Permissions-Policy, Max age note. Still open: card density — the shared settings Section draws 24 padding / 16 title where the board draws ~16 / 14 (every settings screen; not changed screen by screen). SH02 options built (tested); the board lists the custom value as '(current custom value)', the select shows '(custom)' — one label per option."
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared 2026-10-26 (probe SettingsTab on Security headers, tRPC stubbed, saved HSTS 86400, draft 1 year; vs the 277:28233 screenshot's screen): restore line plain, cards Content Security Policy · Browser policies (X-Frame-Options, Referrer-Policy) · HSTS (switch + 'Enabled', presets '1 year · 31536000 seconds', '<n> seconds (custom)') · Permissions-Policy, Max age note. Card density now matches (wave 2, see 245:47988).",
+   "inheritsFrom": "245:47988"
   },
   {
    "nodeId": "245:48510",
@@ -13565,9 +13566,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "code:server-field-message",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/HeadersScreen.tsx:117 — fields exist; \"Browser policies\" group, HSTS \"1 year · 31536000 seconds\" labels, cust…"
+   "verifiedNote": "A refused policy shows the server's own sentence under its field (more specific than the board's generic 'The server rejected this policy…'); footer 'Couldn’t save' + Retry save. Code wins on the message; built, not compared."
   },
   {
    "nodeId": "245:48768",
@@ -13576,8 +13577,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "no offline state"
+   "verified": "drift-open",
+   "verifiedNote": "Built, not compared (offline state): Settings reads navigator.onLine; offline keeps the edits, the footer says \"Needs a connection · changes stay here, unsaved\" (SH04/AN07 wording; S05 draws \"Needs a connection — your edits stay on this screen, unsaved\"), the banner \"You’re offline. Save settings needs a connection.\", Save disabled until online (tested). AN07 also draws \"Status unavailable offline\" for the tracker status — not built."
   },
   {
    "nodeId": "245:49024",
@@ -13596,8 +13597,9 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared 2026-10-26 (probe SettingsTab on Security headers, tRPC stubbed, saved HSTS 86400, draft 1 year; vs the 277:28233 screenshot's screen): restore line plain, cards Content Security Policy · Browser policies (X-Frame-Options, Referrer-Policy) · HSTS (switch + 'Enabled', presets '1 year · 31536000 seconds', '<n> seconds (custom)') · Permissions-Policy, Max age note. Still open: card density — the shared settings Section draws 24 padding / 16 title where the board draws ~16 / 14 (every settings screen; not changed screen by screen). SH06 'Unsaved choice: … Saved custom value: …' compared live. Footer 'Unsaved changes · HSTS max age' (field name) not built — screens report dirty per screen."
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared 2026-10-26 (probe SettingsTab on Security headers, tRPC stubbed, saved HSTS 86400, draft 1 year; vs the 277:28233 screenshot's screen): restore line plain, cards Content Security Policy · Browser policies (X-Frame-Options, Referrer-Policy) · HSTS (switch + 'Enabled', presets '1 year · 31536000 seconds', '<n> seconds (custom)') · Permissions-Policy, Max age note.  Footer 'Unsaved changes · HSTS max age' (field name) not built — screens report dirty per screen. Card density now matches (wave 2, see 245:47988).",
+   "inheritsFrom": "245:47988"
   },
   {
    "nodeId": "245:49535",
@@ -13607,7 +13609,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/HeadersScreen.tsx:117 — fields exist; \"Browser policies\" group, HSTS \"1 year · 31536000 seconds\" labels, cust…"
+   "verifiedNote": "Built, not compared (saving state): footer 'Saving settings…', button 'Saving…' (tested)."
   },
   {
    "nodeId": "245:49790",
@@ -13727,8 +13729,9 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared 2026-10-26 (probe SettingsTab on Security headers, tRPC stubbed, saved HSTS 86400, draft 1 year; vs the 277:28233 screenshot's screen): restore line plain, cards Content Security Policy · Browser policies (X-Frame-Options, Referrer-Policy) · HSTS (switch + 'Enabled', presets '1 year · 31536000 seconds', '<n> seconds (custom)') · Permissions-Policy, Max age note. Still open: card density — the shared settings Section draws 24 padding / 16 title where the board draws ~16 / 14 (every settings screen; not changed screen by screen). SH11 'The chosen preset changes max age to … Save settings to apply.' built (tested)."
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared 2026-10-26 (probe SettingsTab on Security headers, tRPC stubbed, saved HSTS 86400, draft 1 year; vs the 277:28233 screenshot's screen): restore line plain, cards Content Security Policy · Browser policies (X-Frame-Options, Referrer-Policy) · HSTS (switch + 'Enabled', presets '1 year · 31536000 seconds', '<n> seconds (custom)') · Permissions-Policy, Max age note. ' built (tested). Card density now matches (wave 2, see 245:47988).",
+   "inheritsFrom": "245:47988"
   },
   {
    "nodeId": "248:16302",
@@ -14128,7 +14131,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/AnalyticsScreen.tsx:324 — load/error exist; \"Couldn’t load Analytics\" copy differs"
+   "verifiedNote": "Built, not compared (loading state): the load card reads 'Loading <screen>…'; the footer 'Loading settings…' (tested)."
   },
   {
    "nodeId": "252:47480",
@@ -14138,7 +14141,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/AnalyticsScreen.tsx:324 — load/error exist; \"Couldn’t load Analytics\" copy differs"
+   "verifiedNote": "Built, not compared (error state): 'Couldn’t load <screen>', 'The settings service did not respond. Your existing configuration has not changed.', Try again; footer 'Settings unavailable · Retry to continue' (tested)."
   },
   {
    "nodeId": "252:47733",
@@ -14148,7 +14151,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:786 — shell load/error exist; per-screen copy differs"
+   "verifiedNote": "Built, not compared (loading state): the load card reads 'Loading <screen>…'; the footer 'Loading settings…' (tested)."
   },
   {
    "nodeId": "252:47989",
@@ -14158,7 +14161,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:786 — shell load/error exist; per-screen copy differs"
+   "verifiedNote": "Built, not compared (error state): 'Couldn’t load <screen>', 'The settings service did not respond. Your existing configuration has not changed.', Try again; footer 'Settings unavailable · Retry to continue' (tested)."
   },
   {
    "nodeId": "252:48242",
@@ -15125,7 +15128,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "L-D S1: BrandWorkspace door reads \"‹ Back to Site settings\" and reopens Settings at the screen it came from (requestBrandReturn); reachable once REQUESTS #11 lands in SettingsTab. Board's Undo|Redo in the Brand header not adopted (one undo). Built, not compared."
+   "verifiedNote": "L-D S1: BrandWorkspace door reads \"‹ Back to Site settings\" and reopens Settings at the screen it came from (requestBrandReturn); reachable once REQUESTS #11 lands in SettingsTab. Board's Undo|Redo in the Brand header not adopted (one undo). Built, not compared. Settings side done (L-E, D-11): Brand ↗ calls requestBrandReturn(composer, {screen}) before opening Brand."
   },
   {
    "nodeId": "277:27746",
@@ -15923,7 +15926,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "L-D S1: same door as 277:27516 (screen = the discarded Security draft's screen). Needs REQUESTS #11. Built, not compared."
+   "verifiedNote": "L-D S1: same door as 277:27516 (screen = the discarded Security draft's screen). Built, not compared. Settings side done (L-E, D-11): Brand ↗ calls requestBrandReturn(composer, {screen}) before opening Brand."
   },
   {
    "nodeId": "277:107940",
@@ -15933,7 +15936,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "L-D S1: same door as 277:27516. Needs REQUESTS #11. Built, not compared."
+   "verifiedNote": "L-D S1: same door as 277:27516. Built, not compared. Settings side done (L-E, D-11): Brand ↗ calls requestBrandReturn(composer, {screen}) before opening Brand."
   },
   {
    "nodeId": "277:336979",
@@ -18354,7 +18357,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "L-D S1: same door as 277:27516 (returns to Languages). Needs REQUESTS #11. Built, not compared."
+   "verifiedNote": "L-D S1: same door as 277:27516 (returns to Languages). Built, not compared. Settings side done (L-E, D-11): Brand ↗ calls requestBrandReturn(composer, {screen}) before opening Brand."
   },
   {
    "nodeId": "278:68065",

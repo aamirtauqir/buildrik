@@ -181,8 +181,7 @@ export const AccessScreen: React.FC<ScreenProps> = ({
     return (
       <Screen>
         <LoadCard
-          title="Password protection"
-          line="Keep the published site private behind a password."
+          title="Access"
           state={load.state}
           errorLine="Couldn't load your access settings. Check your connection, then try again."
           onRetry={load.retry}

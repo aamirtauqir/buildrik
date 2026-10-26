@@ -82,11 +82,13 @@ const Row: React.FC<{
   stem: string;
   label: string;
   htmlFor?: string;
+  /** B8-SH01: the free-text headers (CSP, Permissions-Policy) put the label over a full-width field. */
+  stacked?: boolean;
   children: React.ReactNode;
-}> = ({ stem, label, htmlFor, children }) => {
+}> = ({ stem, label, htmlFor, stacked = false, children }) => {
   return (
     <div
-      className="tw:col-span-full tw:flex tw:min-h-8 tw:items-center tw:gap-4"
+      className={stacked ? "tw:col-span-full tw:flex tw:flex-col tw:gap-1" : "tw:col-span-full tw:flex tw:min-h-8 tw:items-center tw:gap-3"}
       data-testid={`set-field-${stem}`}
     >
       {htmlFor ? (
@@ -108,9 +110,9 @@ const CONTROL = "tw:min-w-0 tw:flex-1";
 const HSTS_NOTE = "tw:col-span-full tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 
 /** A column the server refused on the last Save, under its row at the control's column. */
-const FieldError: React.FC<{ message?: string }> = ({ message }) =>
+const FieldError: React.FC<{ message?: string; stacked?: boolean }> = ({ message, stacked = false }) =>
   message ? (
-    <div role="alert" className={`${SCREEN_FIELD_ERROR} tw:col-span-full tw:pl-49`}>
+    <div role="alert" className={`${SCREEN_FIELD_ERROR} tw:col-span-full${stacked ? "" : " tw:pl-51"}`}>
       {message}
     </div>
   ) : null;
@@ -205,9 +207,8 @@ export const HeadersScreen: React.FC<ScreenProps> = ({
       <Screen>
         <LoadCard
           title="Security headers"
-          line="CSP, X-Frame-Options, Referrer-Policy and HSTS."
           state={load.state}
-          errorLine="Couldn't load your headers. Check your connection, then try again."
+          errorLine="The settings service did not respond. Your existing configuration has not changed."
           onRetry={load.retry}
         />
       </Screen>
@@ -244,8 +245,8 @@ export const HeadersScreen: React.FC<ScreenProps> = ({
       </div>
 
       <Section title="Content Security Policy">
-        <Row stem="csp-header-value" label="CSP header value" htmlFor="set-hd-csp">
-          <div className="tw:w-130 tw:shrink-0">
+        <Row stem="csp-header-value" label="CSP header value" htmlFor="set-hd-csp" stacked>
+          <div className="tw:w-full">
             <Textarea
               id="set-hd-csp"
               value={csp}
@@ -254,12 +255,12 @@ export const HeadersScreen: React.FC<ScreenProps> = ({
               }}
               placeholder="default-src 'self'"
               spellCheck={false}
-              className="tw:min-h-9 tw:resize-y tw:border-[var(--bk-border-medium)] tw:px-3 tw:py-2.5 tw:[field-sizing:content] tw:[font-family:var(--bk-font-mono)] tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-soft)]"
+              className="tw:min-h-7 tw:resize-y tw:border-[var(--bk-border-medium)] tw:px-3 tw:py-1.5 tw:[field-sizing:content] tw:[font-family:var(--bk-font-mono)] tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-soft)]"
               data-testid="set-hd-csp"
             />
           </div>
         </Row>
-        <FieldError message={fieldErrors?.cspPolicy} />
+        <FieldError message={fieldErrors?.cspPolicy} stacked />
       </Section>
 
       {/* B8-SH01: the two browser policies share one card. */}
@@ -348,7 +349,7 @@ export const HeadersScreen: React.FC<ScreenProps> = ({
       </Section>
 
       <Section title="Permissions-Policy">
-        <Row stem="header-value" label="Header value" htmlFor="set-hd-permissions">
+        <Row stem="header-value" label="Header value" htmlFor="set-hd-permissions" stacked>
           <div className={CONTROL}>
             <Input
               id="set-hd-permissions"
@@ -362,7 +363,7 @@ export const HeadersScreen: React.FC<ScreenProps> = ({
             />
           </div>
         </Row>
-        <FieldError message={fieldErrors?.permissionsPolicy} />
+        <FieldError message={fieldErrors?.permissionsPolicy} stacked />
       </Section>
     </Screen>
   );

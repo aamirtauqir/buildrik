@@ -259,7 +259,6 @@ export const SeoScreen: React.FC<ScreenProps> = ({
       <Screen>
         <LoadCard
           title="SEO"
-          line="Search defaults, social profiles and indexing."
           state={load.state}
           errorLine="Couldn't load your SEO settings. Check your connection, then try again."
           onRetry={load.retry}

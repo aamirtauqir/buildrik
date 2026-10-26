@@ -87,6 +87,7 @@ import {
 } from "./index";
 import { UnsavedSettingsDialog, type UnsavedGuardPhase } from "./components/UnsavedSettingsDialog";
 import { shellDirty } from "@/editor/shell/shellDirtyRegistry";
+import { requestBrandReturn } from "@/editor/design-system/ui/brandOpenRequest";
 import { searchSettings, type SearchEntry } from "./searchIndex";
 import type { ProjectSettings } from "@/shared/types/project";
 import {
@@ -130,6 +131,17 @@ function navTitle(id: SettingsNavId): string {
   return SETTINGS_NAV.find((n) => n.id === id)?.title.replace(/ ↗$/, "") ?? id;
 }
 
+/** The browser's connection — B8-S05 / SH04: Save needs one; the edits wait. */
+function subscribeOnline(notify: () => void) {
+  window.addEventListener("online", notify);
+  window.addEventListener("offline", notify);
+  return () => {
+    window.removeEventListener("online", notify);
+    window.removeEventListener("offline", notify);
+  };
+}
+const readOnline = () => navigator.onLine;
+
 function isScreenLocked(screenId: SettingsNavId, userPlan: PlanTier): boolean {
   const required = isSettingsScreenId(screenId) ? SCREEN_PLAN_REQUIREMENTS[screenId] : undefined;
   if (!required) return false;
@@ -159,7 +171,7 @@ const NAV_PILL =
 
 /* B8-S01's group label: 11px uppercase, muted, 8 above its rows. */
 const NAV_GROUP =
-  "tw:mt-2 tw:flex tw:h-6 tw:items-center tw:text-[length:var(--bk-text-11)] tw:font-medium tw:uppercase tw:leading-4 tw:text-[var(--bk-ink-muted)]";
+  "tw:flex tw:h-6 tw:items-center tw:text-[length:var(--bk-text-11)] tw:font-medium tw:uppercase tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 
 /* Search Mode's field: 36 tall, 12px, on the subtle fill until focused. */
 const INPUT_THEME = {
@@ -379,6 +391,9 @@ export const SettingsTab: React.FC<
     (id: SettingsNavId) => {
       switch (id) {
         case "branding":
+          /* GAP-ST-T03 (D-11): Brand's door then reads "‹ Back to Site
+             settings" and returns to this screen. */
+          if (composer) requestBrandReturn(composer, { screen: currentScreen });
           onOpenDesignTab?.();
           return;
         default:
@@ -388,7 +403,7 @@ export const SettingsTab: React.FC<
           navigateTo(id);
       }
     },
-    [navigateTo, onOpenDesignTab],
+    [navigateTo, onOpenDesignTab, composer, currentScreen],
   );
 
   const requestNav = React.useCallback(
@@ -800,11 +815,16 @@ export const SettingsTab: React.FC<
       : SCOPE_LINE.lifecycle;
 
   const immediate = screenRules?.saveModel === "immediate";
+  const online = React.useSyncExternalStore(subscribeOnline, readOnline, () => true);
   const footStatus: { text: string; tone: "muted" | "ink" | "danger" } =
-    loadState === "loading"
+    !online && loadState === "ready"
+      ? { text: "Needs a connection · changes stay here, unsaved", tone: "danger" }
+      : saving
+      ? { text: "Saving settings…", tone: "muted" }
+      : loadState === "loading"
       ? { text: "Loading settings…", tone: "muted" }
       : loadState === "error"
-        ? { text: "Settings could not load", tone: "danger" }
+        ? { text: "Settings unavailable · Retry to continue", tone: "danger" }
         : footerMessage
           ? { text: footerMessage, tone: "muted" }
           : saveError
@@ -905,7 +925,7 @@ export const SettingsTab: React.FC<
   return (
     <div className="tw:flex tw:h-full tw:min-h-0 tw:w-full tw:bg-[var(--bk-bg-panel)] tw:[font-family:var(--bk-font-ui)]" data-testid="set-root">
       {/* ── Sidebar (M0, 8134:212121) ───────────────────────────────────── */}
-      <aside className="tw:flex tw:w-64 tw:shrink-0 tw:flex-col tw:border-r tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)]">
+      <aside className="tw:flex tw:w-60 tw:shrink-0 tw:flex-col tw:border-r tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)]">
         {searchOpen ? (
           /* Search Mode (owner 2026-10-04): the field and its ✕, then the results — nothing else. */
           <div className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col" data-testid="set-search-mode">
@@ -1006,7 +1026,7 @@ export const SettingsTab: React.FC<
                 type="button"
                 variant="ghost"
                 size="xs"
-                className={`${NAV_ROW} tw:shrink-0 tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink-muted)]`}
+                className={`${NAV_ROW} tw:h-7 tw:shrink-0 tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink-muted)]`}
                 onClick={openSearch}
                 aria-label="Search settings"
                 data-testid="set-search-mode-open"
@@ -1017,7 +1037,7 @@ export const SettingsTab: React.FC<
                 <span className="tw:min-w-0 tw:flex-1 tw:truncate">Search settings</span>
               </Button>
             </div>
-            <nav ref={navRef} className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col tw:overflow-y-auto tw:px-4 tw:pb-4 tw:pt-1" aria-label="Settings sections">
+            <nav ref={navRef} className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col tw:gap-0.5 tw:overflow-y-auto tw:px-4 tw:pb-4 tw:pt-0.5" aria-label="Settings sections">
               <Button
                 type="button"
                 variant="ghost"
@@ -1071,7 +1091,7 @@ export const SettingsTab: React.FC<
         {/* 2L9 B8-S02 (238:10283): "‹ Back to Editor · {page}" then the
             screen's title (20/600) on one line, the scope chip under it; the
             screen's own action or the plan gate's Upgrade at the right. */}
-        <header className="tw:flex tw:shrink-0 tw:items-start tw:justify-between tw:gap-3 tw:bg-[var(--bk-bg-panel)] tw:px-6 tw:pt-4 tw:pb-4">
+        <header className="tw:flex tw:h-26 tw:shrink-0 tw:items-start tw:justify-between tw:gap-3 tw:bg-[var(--bk-bg-panel)] tw:px-6 tw:pt-3">
           <div className="tw:flex tw:min-w-0 tw:flex-col tw:gap-2">
             <div className="tw:flex tw:min-w-0 tw:items-center tw:gap-5">
               {/* OWNER OVERRIDE 2026-10-04: a real link to the canvas, styled as
@@ -1123,9 +1143,19 @@ export const SettingsTab: React.FC<
 
         <div
           key={resetKey}
-          className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col tw:gap-4 tw:overflow-y-auto tw:bg-[var(--bk-bg-panel)] tw:px-6 tw:pt-2 tw:pb-6"
+          className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col tw:gap-3 tw:overflow-y-auto tw:bg-[var(--bk-bg-panel)] tw:px-6 tw:pb-6"
           data-testid="set-body"
         >
+          {!online && showFooter ? (
+            /* B8-SH04 245:48768: the screen stays; only Save waits for the network. */
+            <div
+              role="status"
+              className="tw:w-full tw:max-w-180 tw:shrink-0 tw:rounded-[var(--bk-radius-sm)] tw:bg-[var(--bk-warning-tint)] tw:px-4 tw:py-3 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-warning-text)]"
+              data-testid="set-offline"
+            >
+              You’re offline. Save settings needs a connection.
+            </div>
+          ) : null}
           {renderScreen()}
         </div>
 
@@ -1158,11 +1188,11 @@ export const SettingsTab: React.FC<
               type="button"
               size="xs"
               className={`${SET_BTN} tw:px-6`}
-              disabled={loadState !== "ready" || saving || clientFieldErrors !== null || (!screenIsDirty && !saveError)}
+              disabled={!online || loadState !== "ready" || saving || clientFieldErrors !== null || (!screenIsDirty && !saveError)}
               onClick={() => handleSave()}
               data-testid="set-foot-save"
             >
-              {saveError && !footerMessage ? "Retry save" : "Save settings"}
+              {saving ? "Saving…" : saveError && !footerMessage ? "Retry save" : "Save settings"}
             </Button>
           </footer>
         )}

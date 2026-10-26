@@ -110,7 +110,7 @@ describe("Languages · 8135:214023", () => {
     localesMock.mockRejectedValueOnce(new Error("network"));
     setup();
     await waitFor(() => expect(screen.getByTestId("set-load-retry")).toBeInTheDocument());
-    expect(screen.getByTestId("set-load-title")).toHaveTextContent("Languages");
+    expect(screen.getByTestId("set-load-title")).toHaveTextContent("Couldn’t load Languages");
     fireEvent.click(screen.getByTestId("set-load-retry"));
     await loaded();
   });

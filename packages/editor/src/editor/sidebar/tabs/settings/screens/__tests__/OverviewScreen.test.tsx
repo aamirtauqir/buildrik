@@ -84,8 +84,7 @@ describe("OverviewScreen — load states", () => {
     render(<OverviewScreen siteName="Bella Cucina" projectId="site-1" onOpenScreen={vi.fn()} />);
     expect(query).toHaveBeenCalledWith({ siteId: "site-1" });
     expect(screen.getByTestId("set-load-card").getAttribute("data-state")).toBe("loading");
-    expect(screen.getByTestId("set-load-title").textContent).toBe("Overview");
-    expect(screen.getByTestId("set-load-line").textContent).toBe("Where every setting stands.");
+    expect(screen.getByTestId("set-load-title").textContent).toBe("Loading Overview…");
     pending.resolve(full);
     await screen.findByTestId("set-ov-group-site");
   });

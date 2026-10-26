@@ -255,6 +255,7 @@ vi.mock("../screens/RedirectsScreen", () => ({
 
 import { SettingsTab } from "../SettingsTab";
 import { shellDirty } from "@/editor/shell/shellDirtyRegistry";
+import { takeBrandReturn } from "@/editor/design-system/ui/brandOpenRequest";
 import { SettingsSaveCancelled, SettingsSaveError } from "@/services/BuildrikSyncProvider";
 
 afterEach(() => {
@@ -413,7 +414,7 @@ describe("SettingsTab — the shell", () => {
     expect(footStatus()).toBe("All changes saved");
     expect((screen.getByTestId("set-foot-save") as HTMLButtonElement).disabled).toBe(true);
     expect((screen.getByTestId("set-foot-discard") as HTMLButtonElement).disabled).toBe(true);
-    expect(screen.getByTestId("set-card-site-identity")).toBeTruthy();
+    expect(screen.getByTestId("set-card-site")).toBeTruthy();
   });
 
   it("the plan gate puts Upgrade in the header and the locked card in the body", async () => {
@@ -476,6 +477,15 @@ describe("SettingsTab — doors", () => {
     fireEvent.click(screen.getByTestId("set-nav-branding"));
     expect(onOpenDesignTab).toHaveBeenCalledTimes(1);
     expect(headTitle()).toBe("Overview");
+  });
+
+  it("Brand ↗ leaves a return to the screen it came from (GAP-ST-T03, D-11)", async () => {
+    const composer = makeComposer();
+    renderS(<SettingsTab composer={asComposer(composer)} onOpenDesignTab={vi.fn()} />);
+    fireEvent.click(screen.getByTestId("set-nav-seo"));
+    await waitFor(() => expect(headTitle()).toBe("SEO"));
+    fireEvent.click(screen.getByTestId("set-nav-branding"));
+    expect(takeBrandReturn(asComposer(composer) as never)).toEqual({ screen: "seo" });
   });
 
   it("the role foot opens the Permissions dialog for every known role", () => {
@@ -722,6 +732,8 @@ describe("SettingsTab — Unsaved settings", () => {
     const composer = makeComposer();
     renderS(<SettingsTab composer={asComposer(composer)} />);
     await openGeneralAndEdit();
+    // 2L9: the Languages link moved into General's Advanced card.
+    fireEvent.click(screen.getByTestId("set-card-toggle-advanced"));
     fireEvent.click(screen.getByTestId("set-general-language"));
     expect(await screen.findByTestId("set-unsaved")).toBeTruthy();
     expect(headTitle()).toBe("General");
@@ -733,6 +745,7 @@ describe("SettingsTab — Unsaved settings", () => {
   it("the same link on a clean screen goes straight there", async () => {
     renderS(<SettingsTab composer={asComposer(makeComposer())} />);
     fireEvent.click(screen.getByTestId("set-nav-general"));
+    fireEvent.click(await screen.findByTestId("set-card-toggle-advanced"));
     fireEvent.click(await screen.findByTestId("set-general-language"));
     await waitFor(() => expect(headTitle()).toBe("Languages"));
     expect(screen.queryByTestId("set-unsaved")).toBeNull();
@@ -1001,7 +1014,7 @@ describe("SettingsTab — a screen's own header action, and screens whose action
 // ─── Load states ──────────────────────────────────────────────────────────
 
 describe("SettingsTab — the footer follows the screen's load", () => {
-  it("Loading settings… and Settings could not load, Save disabled in both", async () => {
+  it("Loading settings… and Settings unavailable · Retry to continue, Save disabled in both", async () => {
     renderS(<SettingsTab composer={asComposer(makeComposer())} />);
     fireEvent.click(screen.getByTestId("set-nav-seo"));
     await waitFor(() => expect(headTitle()).toBe("SEO"));
@@ -1010,7 +1023,7 @@ describe("SettingsTab — the footer follows the screen's load", () => {
     expect(footStatus()).toBe("Loading settings…");
     expect(save().disabled).toBe(true);
     fireEvent.click(screen.getByText("go error"));
-    expect(footStatus()).toBe("Settings could not load");
+    expect(footStatus()).toBe("Settings unavailable · Retry to continue");
     expect(screen.getByTestId("set-foot-status").className).toContain("var(--bk-error)");
     expect(save().disabled).toBe(true);
     fireEvent.click(screen.getByText("go ready"));
@@ -1427,5 +1440,44 @@ describe("SettingsTab — workspace doors", () => {
     fireEvent.click(screen.getByTestId("set-door-close"));
     await waitFor(() => expect(headTitle()).toBe("Overview"));
     openSpy.mockRestore();
+  });
+});
+
+describe("SettingsTab — offline (2L9 B8-S05 / SH04)", () => {
+  afterEach(() => {
+    Object.defineProperty(navigator, "onLine", { configurable: true, get: () => true });
+  });
+
+  it("keeps the edits, says Save needs a connection and turns Save off until the network is back", async () => {
+    renderS(<SettingsTab composer={asComposer(makeComposer())} />);
+    await openGeneralAndEdit();
+    Object.defineProperty(navigator, "onLine", { configurable: true, get: () => false });
+    act(() => {
+      window.dispatchEvent(new Event("offline"));
+    });
+    expect(footStatus()).toBe("Needs a connection · changes stay here, unsaved");
+    expect(screen.getByTestId("set-offline").textContent).toBe("You’re offline. Save settings needs a connection.");
+    expect((screen.getByTestId("set-foot-save") as HTMLButtonElement).disabled).toBe(true);
+    Object.defineProperty(navigator, "onLine", { configurable: true, get: () => true });
+    act(() => {
+      window.dispatchEvent(new Event("online"));
+    });
+    expect(footStatus()).toBe("Unsaved changes");
+    expect(screen.queryByTestId("set-offline")).toBeNull();
+    expect((screen.getByTestId("set-foot-save") as HTMLButtonElement).disabled).toBe(false);
+  });
+});
+
+describe("SettingsTab — saving (2L9 B8-SH07 / AN08)", () => {
+  it("the footer says the save is running and the button reads Saving… until it lands", async () => {
+    let finish!: () => void;
+    renderS(<SettingsTab composer={asComposer(makeComposer(() => new Promise<void>((r) => (finish = r))))} />);
+    await openGeneralAndEdit();
+    fireEvent.click(screen.getByTestId("set-foot-save"));
+    await waitFor(() => expect(footStatus()).toBe("Saving settings…"));
+    expect(screen.getByTestId("set-foot-save").textContent).toBe("Saving…");
+    await act(async () => finish());
+    await waitFor(() => expect(footStatus()).toBe("Saved · applies on next publish"));
+    expect(screen.getByTestId("set-foot-save").textContent).toBe("Save settings");
   });
 });

@@ -25,11 +25,13 @@ describe("Section — the card", () => {
     const card = screen.getByTestId("set-card-site-identity");
     expect(card.tagName).toBe("SECTION");
     expect(card.className).toContain("tw:rounded-[var(--bk-radius-card)]");
-    expect(card.className).toContain("tw:p-6");
+    // 2L9 B8-SH01: a 720 card, 16 in, 14/600 title.
+    expect(card.className).toContain("tw:p-4");
+    expect(card.className).toContain("tw:max-w-180");
     const title = screen.getByTestId("set-card-title-site-identity");
     expect(title.textContent).toBe("Site identity");
     expect(title.className).toContain("tw:font-semibold");
-    expect(title.className).toContain("var(--bk-text-16)");
+    expect(title.className).toContain("var(--bk-text-14)");
     expect(screen.getByText("Name, favicon, language.")).toBeTruthy();
     const grid = screen.getByTestId("wide").parentElement as HTMLElement;
     expect(grid.className).toContain("tw:grid-cols-2");
@@ -59,7 +61,7 @@ describe("Section — the card", () => {
 });
 
 describe("Field", () => {
-  it("labels its control at 11 (4418:128657) and can span the row", () => {
+  it("labels its control at 13/20 (2L9 B8-S02 238:10283) and can span the row", () => {
     render(
       <>
         <Field label="Meta title" htmlFor="seo-meta-title">
@@ -72,7 +74,7 @@ describe("Field", () => {
     );
     const label = screen.getByTestId("set-field-label-meta-title");
     expect(label.getAttribute("for")).toBe("seo-meta-title");
-    expect(label.className).toContain("var(--bk-text-11)");
+    expect(label.className).toContain("var(--bk-text-13)");
     expect(screen.getByTestId("set-field-meta-title").className).not.toContain("tw:col-span-full");
     expect(screen.getByTestId("set-field-head-scripts").className).toContain("tw:col-span-full");
   });
@@ -129,19 +131,16 @@ describe("controls — density 32", () => {
 describe("LoadCard", () => {
   const props = {
     title: "Site identity",
-    line: "Site name, favicon, language and social profiles.",
     errorLine: "Couldn't load your site settings. Check your connection, then try again.",
   };
 
-  it("loading: eyebrow, line, `Loading…`, no button", () => {
+  it("loading: \"Loading <screen>…\", no button (2L9 B8-AN13)", () => {
     render(<LoadCard {...props} state="loading" />);
     const card = screen.getByTestId("set-load-card");
     expect(card.getAttribute("aria-busy")).toBe("true");
     expect(card.getAttribute("data-state")).toBe("loading");
-    expect(screen.getByTestId("set-load-title").textContent).toBe("Site identity");
-    expect(screen.getByTestId("set-load-title").className).toContain("tw:uppercase");
-    expect(screen.getByTestId("set-load-line").textContent).toBe(props.line);
-    expect(screen.getByText("Loading…")).toBeTruthy();
+    expect(screen.getByTestId("set-load-title").textContent).toBe("Loading Site identity…");
+    expect(screen.queryByTestId("set-load-state")).toBeNull();
     expect(screen.queryByTestId("set-load-retry")).toBeNull();
   });
 
@@ -149,6 +148,7 @@ describe("LoadCard", () => {
     const onRetry = vi.fn();
     render(<LoadCard {...props} state="error" onRetry={onRetry} />);
     expect(screen.getByRole("alert")).toBeTruthy();
+    expect(screen.getByTestId("set-load-title").textContent).toBe("Couldn’t load Site identity");
     expect(screen.getByText(props.errorLine)).toBeTruthy();
     const retry = screen.getByTestId("set-load-retry");
     expect(retry.textContent).toBe("Try again");

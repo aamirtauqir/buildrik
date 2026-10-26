@@ -103,3 +103,22 @@ Requests filed: #10 Settings host inside the editor shell, #11 drop `settings/ic
 Owner decisions open: `blocked:owner-search-mode` (S20 draws an always-on field with results in the pane; owner override 2026-10-04 kept); FM05 popover vs native select; GAP-ST-W saving-as-footer vs the B8-SAVING dialog (one shape adopted).
 
 Next batch (not started): shared settings card density (Section 24→16 padding, 16→14 title — every screen), Analytics (AN ×10 + load states), Languages staged default (S07, GAP-ST-L ×8), workspace door copy (GAP-ST-ORG ×9), load-card copy per screen (AN13-14, SH12-13), offline states (S05, AN07, SH04), FM06 detail as its own view, Overview trial card (blocked on trial in code), publish-from-Settings (GAP-ST-P*), compact 1280 nav, Publish tray residuals (PB13, PB16-17, PB22), Export dialog (EX), Issues (IS).
+
+## Status — wave 2 (2026-10-26)
+
+Merged `feat/design-2l9` first (`34e7f0eee`). D-11 done.
+
+| Archetype | Commit | Result |
+|---|---|---|
+| D-11 Brand ↗ leaves a return (`requestBrandReturn`) | `7fe3fb071` | tested; L-D rows noted |
+| Card and shell geometry (nav 240, header 104, 720 cards, 16 in, 14/600 titles, 192 label column) | `92963a371` | measured from get_metadata 245:47988 / 238:10283; SH01 drift-fixed, SH02/SH06/SH11 inherit |
+| General: Site + Icons cards | `c7eb7b41c` | 238:10283 drift-fixed (`code:no-tagline-field`), Site card 720x178 as drawn |
+| Domains: one ruled card, DNS card, primary toast with Undo | `2b47901fd` | 238:12413 drift-fixed |
+| Analytics provider rows, status words, Verify failure in place | `3f69ed8d1` | GTM/Pixel/Clarity cards match; GA card 24px taller (Last received line kept) |
+| Offline: edits kept, Save held | `3ba207512` | S05/AN07/SH04 built, not compared |
+| Saving footer state | `d58bb83b8` | SH07/AN08 built; SH03 `code:server-field-message` |
+| Load card per AN13/14, SH12/13 | `74e2ddd43` | built, not compared |
+
+Not done this wave — **per-field settings conflict (CF01–03)** needs a server precondition first: `siteDetail.settings.get` returns `updatedAt`, `updateSiteSettingsSchema` takes `expectedUpdatedAt`, the service refuses a stale write with CONFLICT carrying the server values (updateMany precondition, the CMS pattern), then each screen offers Keep mine / Use theirs per changed field. Full chain + tests; next batch.
+
+Still open: controls 32 tall vs the board's 28 (settings Input/Select theme — a density decision), Languages staged default (S07, GAP-ST-L), workspace door copy (GAP-ST-ORG), FM06 detail view, compact 1280 nav, publish-from-Settings (GAP-ST-P*), Overview trial card.
