@@ -18,7 +18,8 @@
  */
 import * as React from "react";
 import type { CMSCollection, CMSField } from "@/shared/types/cms";
-import { Menu, MenuGroup, MenuItem, MenuLabel, Popover, TextInput } from "@/editor/chrome-ui";
+import { X } from "lucide-react";
+import { IconButton, Menu, MenuGroup, MenuItem, MenuLabel, Popover, TextInput } from "@/editor/chrome-ui";
 import { FIELD_TYPE_LABEL } from "@/editor/cms/fieldTypes";
 import { FIELD_TYPES_FOR, type CmsBindingState } from "./useCmsBinding";
 
@@ -196,9 +197,15 @@ export function ChooseSourcePicker({ state, open, onClose, trigger, onOpenCreate
   }
 
   return (
-    <Popover open={open} onClose={onClose} placement="bottom-end" label="Choose source" trigger={trigger} portal className="tw:w-[280px] tw:p-1">
+    /* 2L9 F2.02: a 280 card beside the column, over the canvas. */
+    <Popover open={open} onClose={onClose} placement="bottom-end" label="Choose source" trigger={trigger} beside=".layout-shell__inspector" className="tw:w-[280px] tw:p-1">
       <div className="tw:flex tw:flex-col tw:gap-1" data-testid="choose-source">
-        <div className="tw:px-2 tw:pt-1 tw:text-[13px] tw:font-semibold tw:text-[var(--bk-ink)]">Choose source</div>
+        <div className="tw:flex tw:items-center tw:justify-between tw:px-2 tw:pt-1">
+          <span className="tw:text-[13px] tw:font-semibold tw:text-[var(--bk-ink)]">Choose source</span>
+          <IconButton label="Close" size="sm" onClick={onClose} data-testid="choose-source-close" className="tw:size-6 tw:text-[var(--bk-ink-muted)]">
+            <X size={14} aria-hidden="true" />
+          </IconButton>
+        </div>
         {step.kind === "sources" ? (
           <div className="tw:px-1">
             <TextInput

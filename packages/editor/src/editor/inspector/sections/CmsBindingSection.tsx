@@ -23,7 +23,7 @@ import { Section, type SectionTier } from "../shared/controls";
 import { useInspectorField } from "../shared/controls/InspectorFieldContext";
 import { ActionRow, NoteRow } from "./behaviourRows";
 import { ChooseSourcePicker } from "./binding/ChooseSourcePicker";
-import { openBindingDetail } from "./binding/bindingDetailStore";
+import { openSubview } from "@/editor/inspector/tabs/subviewStore";
 import { PROPERTY_LABEL, useCmsBinding } from "./binding/useCmsBinding";
 
 export interface CmsBindingSectionProps {
@@ -91,11 +91,11 @@ export const CmsBindingSection: React.FC<CmsBindingSectionProps> = ({ elementId,
             tabIndex={0}
             className={ROW}
             data-testid="cms-binding-summary-row"
-            onClick={() => openBindingDetail(elementId)}
+            onClick={() => openSubview({ kind: "binding", elementId })}
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
-                openBindingDetail(elementId);
+                openSubview({ kind: "binding", elementId });
               }
             }}
           >

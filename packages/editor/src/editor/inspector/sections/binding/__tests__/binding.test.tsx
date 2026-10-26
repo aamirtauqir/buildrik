@@ -14,7 +14,7 @@ import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, fireEvent, cleanup, waitFor, act } from "@testing-library/react";
 import { BindingPropertyRow } from "../BindingPropertyRow";
 import { BindingDetail } from "../BindingDetail";
-import { openBindingDetail, useBindingDetail } from "../bindingDetailStore";
+import { closeSubview, openSubview, useSubview } from "@/editor/inspector/tabs/subviewStore";
 import { CmsBindingSection } from "@/editor/inspector/sections/CmsBindingSection";
 
 const MENU = {
@@ -85,7 +85,7 @@ const BOUND = [{ collectionId: "col-1", itemId: "r1", fieldSlug: "name", propert
 
 afterEach(() => {
   cleanup();
-  act(() => openBindingDetail(null));
+  act(() => closeSubview("binding"));
 });
 
 const row = (composer: unknown) => render(<BindingPropertyRow composer={composer as never} elementId="e1" />);
@@ -155,7 +155,7 @@ describe("property row · bound (B5-D04, D11, D13, D14)", () => {
     await waitFor(() => expect(screen.getByTestId("binding-preview")).toHaveTextContent("Cacio e pepe"));
     expect(screen.getByTestId("binding-context")).toHaveTextContent("Specific record");
     function Probe() {
-      return <span data-testid="open-for">{useBindingDetail() ?? ""}</span>;
+      return <span data-testid="open-for">{useSubview()?.elementId ?? ""}</span>;
     }
     render(<Probe />);
     fireEvent.click(screen.getByTestId("binding-open"));
@@ -202,7 +202,7 @@ describe("binding detail (Play F2.05)", () => {
 
   it("If empty stores a fallback on the same binding; Unbind keeps the text and closes the detail", async () => {
     const composer = makeComposer({ initial: BOUND });
-    act(() => openBindingDetail("e1"));
+    act(() => openSubview({ kind: "binding", elementId: "e1" }));
     render(<BindingDetail composer={composer as never} elementId="e1" />);
     const input = screen.getByLabelText("If empty");
     fireEvent.change(input, { target: { value: "Untitled dish" } });
@@ -215,7 +215,7 @@ describe("binding detail (Play F2.05)", () => {
     });
     expect(composer.cms.bindings.unbindAll).toHaveBeenCalled();
     function Probe() {
-      return <span data-testid="open-for">{useBindingDetail() ?? "none"}</span>;
+      return <span data-testid="open-for">{useSubview()?.elementId ?? "none"}</span>;
     }
     render(<Probe />);
     expect(screen.getByTestId("open-for")).toHaveTextContent("none");
