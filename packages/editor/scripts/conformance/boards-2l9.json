@@ -7365,7 +7365,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Picker offers 10 of 16 schema types (shared/schemas/cms.ts:20); labels Boolean→Yes/no, Multi-select→Options"
+   "verifiedNote": "built, not compared — L-C C6: \"Add field\" + \"Choose the kind of content this field stores.\", all 16 schema types in board order and names (fieldTypes.ts)."
   },
   {
    "nodeId": "167:4135",
@@ -7375,7 +7375,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code: Name/Required(+collection/options); board adds Key, Default value, min/max, Placeholder, Help text; title copy differs"
+   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
   },
   {
    "nodeId": "167:4412",
@@ -7385,7 +7385,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code: Name/Required(+collection/options); board adds Key, Default value, min/max, Placeholder, Help text; title copy differs"
+   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
   },
   {
    "nodeId": "167:4689",
@@ -7395,7 +7395,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code: Name/Required(+collection/options); board adds Key, Default value, min/max, Placeholder, Help text; title copy differs"
+   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
   },
   {
    "nodeId": "167:4956",
@@ -7405,7 +7405,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Email/URL/Date & time/Option/File/Color stored by schema but not offered in Add field"
+   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
   },
   {
    "nodeId": "167:5224",
@@ -7415,7 +7415,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Email/URL/Date & time/Option/File/Color stored by schema but not offered in Add field"
+   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
   },
   {
    "nodeId": "167:5492",
@@ -7425,7 +7425,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code: Name/Required(+collection/options); board adds Key, Default value, min/max, Placeholder, Help text; title copy differs"
+   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
   },
   {
    "nodeId": "167:5760",
@@ -7435,7 +7435,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code: Name/Required(+collection/options); board adds Key, Default value, min/max, Placeholder, Help text; title copy differs"
+   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
   },
   {
    "nodeId": "167:6038",
@@ -7445,7 +7445,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code: Name/Required(+collection/options); board adds Key, Default value, min/max, Placeholder, Help text; title copy differs"
+   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
   },
   {
    "nodeId": "167:6306",
@@ -7455,7 +7455,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Email/URL/Date & time/Option/File/Color stored by schema but not offered in Add field"
+   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
   },
   {
    "nodeId": "167:6574",
@@ -7465,7 +7465,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code: Name/Required(+collection/options); board adds Key, Default value, min/max, Placeholder, Help text; title copy differs"
+   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
   },
   {
    "nodeId": "167:6844",
@@ -7475,7 +7475,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Email/URL/Date & time/Option/File/Color stored by schema but not offered in Add field"
+   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
   },
   {
    "nodeId": "167:7125",
@@ -7485,7 +7485,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code: Name/Required(+collection/options); board adds Key, Default value, min/max, Placeholder, Help text; title copy differs"
+   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
   },
   {
    "nodeId": "167:7406",
@@ -7495,7 +7495,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code: Name/Required(+collection/options); board adds Key, Default value, min/max, Placeholder, Help text; title copy differs"
+   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
   },
   {
    "nodeId": "167:7671",
@@ -7505,7 +7505,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Email/URL/Date & time/Option/File/Color stored by schema but not offered in Add field"
+   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
   },
   {
    "nodeId": "167:7936",
@@ -7515,7 +7515,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code: Name/Required(+collection/options); board adds Key, Default value, min/max, Placeholder, Help text; title copy differs"
+   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
   },
   {
    "nodeId": "167:8207",
@@ -7525,7 +7525,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Email/URL/Date & time/Option/File/Color stored by schema but not offered in Add field"
+   "verifiedNote": "drift-open — L-C C6: \"Add {type} field\" · \"{collection} · New field\", key hint, Add field CTA built; Default value, min/max length, Placeholder, Help text still missing. Not compared."
   },
   {
    "nodeId": "167:8474",
@@ -7535,7 +7535,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Busy disables Save; label never becomes \"Saving…\""
+   "verifiedNote": "built, not compared — L-C C6: Add field reads Saving… while it saves (AddFieldDialog.tsx)."
   },
   {
    "nodeId": "167:8747",
@@ -7545,7 +7545,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No catch: failure not shown, no Retry, draft retention unhandled"
+   "verifiedNote": "built, not compared — L-C C6: refused add keeps the settings, \"Couldn’t save. Your field settings are still here.\" + Retry."
   },
   {
    "nodeId": "167:9021",

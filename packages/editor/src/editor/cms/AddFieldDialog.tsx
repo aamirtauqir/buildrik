@@ -1,22 +1,23 @@
 /**
  * AddFieldDialog — the two steps of + Add field:
- *  1. "Add field · <collection>" (4418:164208) — the type list;
- *  2. "Configure <Type> field" (4418:164219 text, :164230 number, :164236
- *     rich text, :164242 image, :164248 boolean, :164254 reference, :164260
- *     slug) — Name, Key, Required, and for a reference the collection it
- *     points at; "Existing records keep empty values until edited."
+ *  1. "Add field" (2L9 167:3871) — every type the schema stores;
+ *  2. "Add <type> field · <collection> · New field" (167:4135…) — Name, Key,
+ *     Required, and for a reference the collection it points at, for an
+ *     option type its options; "Existing records keep empty values until
+ *     edited." Save reads Saving… (167:8474); a refused save keeps the
+ *     settings and offers Retry (167:8747).
  * A key the collection already has stops at "Field key already exists"
  * (4418:164225), which offers a free one.
  *
- * Long text and Date have no boards; they stay in the list after Slug
- * because the add form always offered them.
+ * Not built yet (board 167:4135): Default value, min/max length,
+ * Placeholder, Help text — the field inspector holds the rules today.
  *
  * @license BSD-3-Clause
  */
 import * as React from "react";
 import type { CMSCollection, CMSField, CMSFieldType } from "@/shared/types/cms";
 import { Button, Chip, Modal, Select, TextInput } from "@/editor/chrome-ui";
-import { FIELD_TYPES, FIELD_TYPE_LABEL, fieldKeyError, fieldKeyFrom, freeKey } from "./fieldTypes";
+import { FIELD_TYPES, FIELD_TYPE_LABEL, OPTION_TYPES, fieldKeyError, fieldKeyFrom, freeKey } from "./fieldTypes";
 import { OptionsEditor } from "./OptionsEditor";
 
 const ROW = "tw:grid tw:grid-cols-[88px_1fr] tw:items-center tw:gap-2";
@@ -49,6 +50,7 @@ export function AddFieldDialog({
   const [options, setOptions] = React.useState<string[]>([]);
   const [clash, setClash] = React.useState<string | null>(null);
   const [busy, setBusy] = React.useState(false);
+  const [failed, setFailed] = React.useState(false);
 
   const taken = React.useMemo(() => new Set(collection.fields.map((f) => f.slug)), [collection.fields]);
   const nextName = name.trim();
@@ -57,7 +59,7 @@ export function AddFieldDialog({
   /* The clash has its own dialog (4418:164225); format and reserved names
      read under the key. */
   const keyError = nextKey ? fieldKeyError(nextKey, new Set()) : null;
-  const label = type ? FIELD_TYPE_LABEL[type] ?? type : "";
+  const label = type ? FIELD_TYPE_LABEL[type] : "";
 
   const save = async () => {
     if (!type || !nextName || !nextKey || keyError || busy) return;
@@ -66,6 +68,7 @@ export function AddFieldDialog({
       return;
     }
     setBusy(true);
+    setFailed(false);
     try {
       await onAdd({
         name: nextName,
@@ -73,9 +76,12 @@ export function AddFieldDialog({
         type,
         ...(required ? { validation: { required: true } } : {}),
         ...(type === "reference" ? { referenceCollection: target } : {}),
-        ...(type === "multiselect" ? { options } : {}),
+        ...(OPTION_TYPES.has(type) ? { options } : {}),
       });
       onClose();
+    } catch {
+      /* 167:8747 — the dialog stays with everything typed into it. */
+      setFailed(true);
     } finally {
       setBusy(false);
     }
@@ -118,7 +124,7 @@ export function AddFieldDialog({
       <Modal
         open
         onClose={onClose}
-        title={`Add field · ${collection.name}`}
+        title="Add field"
         kind="form"
         testId="cms-add-field"
         footer={
@@ -128,10 +134,10 @@ export function AddFieldDialog({
         }
       >
         {/* 4418:164208 draws the prompt as body copy (14 ink), not a muted subtitle. */}
-        <p className="tw:m-0 tw:mb-2">Choose the type of content this field will store.</p>
+        <p className="tw:m-0 tw:mb-2">Choose the kind of content this field stores.</p>
         <div className="tw:flex tw:flex-col" data-testid="cms-add-field-types">
           {FIELD_TYPES.map((t) => (
-            <Button key={t} color="light" size="xs" className={TYPE_ROW} onClick={() => setType(t as CMSFieldType)} data-testid={`cms-add-field-type-${t}`}>
+            <Button key={t} color="light" size="xs" className={TYPE_ROW} onClick={() => setType(t)} data-testid={`cms-add-field-type-${t}`}>
               {FIELD_TYPE_LABEL[t]}
             </Button>
           ))}
@@ -144,7 +150,8 @@ export function AddFieldDialog({
     <Modal
       open
       onClose={onClose}
-      title={`Configure ${label} field`}
+      title={`Add ${label.toLowerCase()} field`}
+      subtitle={`${collection.name} · New field`}
       kind="form"
       dirty={nextName !== ""}
       testId="cms-add-field"
@@ -158,13 +165,12 @@ export function AddFieldDialog({
             Cancel
           </Button>
           <Button disabled={!nextName || !nextKey || Boolean(keyError) || busy} onClick={() => void save()} data-testid="cms-add-field-save">
-            Save field
+            {busy ? "Saving…" : failed ? "Retry" : "Add field"}
           </Button>
         </>
       }
     >
       <div className="tw:flex tw:flex-col tw:gap-2">
-        <p className="tw:m-0">{`${collection.name} / ${label} field`}</p>
         <div className={ROW}>
           <label className={ROW_LABEL} htmlFor="cms-add-field-name">Name</label>
           <TextInput
@@ -194,7 +200,11 @@ export function AddFieldDialog({
           <p className="tw:m-0 tw:pl-[96px] tw:text-[11px] tw:leading-4 tw:text-[var(--bk-error-text)]" role="alert" data-testid="cms-add-field-key-error">
             {keyError}
           </p>
-        ) : null}
+        ) : (
+          <p className="tw:m-0 tw:pl-[96px] tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="cms-add-field-key-hint">
+            Used in bindings and patterns. Must be unique in {collection.name}.
+          </p>
+        )}
         <div className={ROW}>
           <span className={ROW_LABEL}>Required</span>
           <span className="tw:flex tw:gap-1" role="group" aria-label="Required">
@@ -212,13 +222,18 @@ export function AddFieldDialog({
             </Select>
           </div>
         ) : null}
-        {type === "multiselect" ? (
+        {OPTION_TYPES.has(type) ? (
           <div className={`${ROW} tw:items-start`}>
             <label className={`${ROW_LABEL} tw:pt-1.5`} htmlFor="cms-add-field-options">Options</label>
             <OptionsEditor id="cms-add-field-options" options={options} onChange={setOptions} live />
           </div>
         ) : null}
         <p className={`${NOTE} tw:mt-2`}>Existing records keep empty values until edited.</p>
+        {failed ? (
+          <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-error-text)]" role="alert" data-testid="cms-add-field-failed">
+            Couldn’t save. Your field settings are still here.
+          </p>
+        ) : null}
       </div>
     </Modal>
   );

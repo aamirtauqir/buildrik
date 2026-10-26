@@ -149,8 +149,8 @@ export function RecordFieldControl({
         <option value="yes">Yes</option>
       </Select>
     );
-  } else if (f.type === "select" && f.options?.length) {
-    input = (
+  } else if (f.type === "select") {
+    input = f.options?.length ? (
       <Select id={id} sizing="sm" className={CONTROL} value={String(v ?? "")} onChange={(e) => onChange(e.target.value)}>
         <option value="">—</option>
         {f.options.map((o) => (
@@ -159,6 +159,8 @@ export function RecordFieldControl({
           </option>
         ))}
       </Select>
+    ) : (
+      <span className="tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">No options yet · add them in Fields</span>
     );
   } else {
     const type = f.type === "number" ? "number" : f.type === "date" ? "date" : f.type === "datetime" ? "datetime-local" : f.type === "email" ? "email" : f.type === "url" ? "url" : "text";
