@@ -255,7 +255,7 @@ export const DangerZoneScreen: React.FC<ScreenProps> = ({
 
   return (
     <Screen>
-      {notice ? <ReadOnlyBanner who="the workspace owner" screen="Danger zone" message={notice} /> : null}
+      {notice ? <ReadOnlyBanner message={notice} /> : null}
       {banner ? <SaveErrorBanner message={banner} /> : null}
 
       <ActionCard

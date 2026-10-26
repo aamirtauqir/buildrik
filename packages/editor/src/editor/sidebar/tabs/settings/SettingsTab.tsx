@@ -114,8 +114,8 @@ const SETTINGS_SCREENS = [
   ...SETTINGS_NAV.flatMap((n) => (n.kind === "door" ? [] : [{ id: n.id, title: n.title }])),
 ];
 
-/** "Only admins can change …" — who the read-only banner names. */
-const ROLE_NOUN = { VIEWER: "viewers", EDITOR: "editors", DESIGNER: "editors", ADMIN: "admins", OWNER: "the workspace owner" } as const;
+/** "Changing General needs Admin access." (2L9 B8-SH05 / SH10) — the role the read-only banner names. */
+const ROLE_LABEL = { VIEWER: "Viewer", EDITOR: "Editor", DESIGNER: "Editor", ADMIN: "Admin", OWNER: "Owner" } as const;
 
 const PLAN_LABEL: Record<PlanTier, string> = { starter: "Free", pro: "Pro", enterprise: "Business" };
 
@@ -732,7 +732,7 @@ export const SettingsTab: React.FC<
     if (!readOnly || !screenRules || !current || screenId === "danger-zone") return screenNode;
     return (
       <>
-        <ReadOnlyBanner who={ROLE_NOUN[screenRules.minRole]} screen={current.title} />
+        <ReadOnlyBanner message={`Changing ${current.title} needs ${ROLE_LABEL[screenRules.minRole]} access.`} />
         {/* A disabled fieldset disables every native control inside it; its
             cards sit 16 apart, as on the editable screen (set-body's gap). */}
         <fieldset disabled className="tw:m-0 tw:flex tw:min-w-0 tw:flex-col tw:gap-4 tw:border-0 tw:p-0" data-testid="set-readonly-screen">

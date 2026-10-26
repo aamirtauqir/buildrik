@@ -1287,7 +1287,7 @@ describe("SettingsTab — read-only below the screen's role", () => {
     renderS(<SettingsTab composer={asComposer(makeComposer())} />);
     fireEvent.click(screen.getByTestId("set-nav-general"));
     const siteName = (await screen.findByLabelText("Site name")) as HTMLInputElement;
-    expect(screen.getByTestId("set-readonly").textContent).toBe("Only admins can change General");
+    expect(screen.getByTestId("set-readonly").textContent).toBe("Changing General needs Admin access.");
     expect(siteName.matches(":disabled")).toBe(true);
     // Said once, in the notice — not again under each field (8134:212323).
     expect(screen.queryByTestId("set-admin-only")).toBeNull();
@@ -1300,7 +1300,7 @@ describe("SettingsTab — read-only below the screen's role", () => {
     renderS(<SettingsTab composer={asComposer(makeComposer())} />);
     fireEvent.click(screen.getByTestId("set-nav-headers"));
     await waitFor(() => expect(headTitle()).toBe("Security headers"));
-    expect(screen.getByTestId("set-readonly").textContent).toBe("Only admins can change Security headers");
+    expect(screen.getByTestId("set-readonly").textContent).toBe("Changing Security headers needs Admin access.");
     expect(screen.getByTestId("set-readonly-screen").matches(":disabled")).toBe(true);
     expect(screen.queryByTestId("set-foot-save")).toBeNull();
   });

@@ -13367,7 +13367,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:712 — ReadOnlyBanner exists; copy \"Domains need Admin access…\" differs"
+   "verifiedNote": "Banner uses the shared 'Changing Domains needs Admin access.' (SH05/SH10 wording); the S19 board says 'Domains need Admin access. Ask an admin to change them.' — two board wordings for one banner, the newer SH family adopted. Built, not compared."
   },
   {
    "nodeId": "238:15632",
@@ -13587,7 +13587,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/HeadersScreen.tsx:117 — fields exist; \"Browser policies\" group, HSTS \"1 year · 31536000 seconds\" labels, cust…"
+   "verifiedNote": "Banner now 'Changing {Screen} needs {Role} access.' (tested); built, not compared. The board's footer echo of the same line is not drawn — a read-only screen has no footer in code."
   },
   {
    "nodeId": "245:49280",
@@ -13718,7 +13718,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/HeadersScreen.tsx:117 — fields exist; \"Browser policies\" group, HSTS \"1 year · 31536000 seconds\" labels, cust…"
+   "verifiedNote": "Banner now 'Changing General needs Admin access.' (tested); built, not compared. General's card content drift as 238:10283."
   },
   {
    "nodeId": "248:16058",
