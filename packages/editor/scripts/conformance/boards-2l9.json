@@ -4124,9 +4124,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Page switcher is lead-owned (shell/PageSwitcher.tsx, Task 1.3); the board's differences are filed as REQUESTS A-16.",
+   "authority": "code:search-add-page",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (lead4, case page-switcher&open=1&active=about, 1440×900, side by side with shots/558-448976.png): panel 260, rows 246×32 on a 34 pitch (board 246×32/34); header ‘Pages · 5 + 1 template’ 12 regular muted; file glyph 24 (16×20 ink) gray-600 on every row incl. Home (board ≈18×22 #4B5563; Home keeps its ‘Homepage’ accessible name); name left 13 ink, path right-aligned 12 muted; current page tinted blue-100 (225,239,254 = board) with no check; ‘Templates’ 12 regular under a gray-200 hairline; ‘Manage pages ›’ in the accent. Kept against the board: the search field (focused on open) and ‘+ Add page’ — plan Review Focus 1, 100 pages in ≤2 interactions (code:search-add-page). Keyboard/hover highlight is a gray-100 hover, not the old blue-50 + bar.",
    "tier": "P1"
   },
   {

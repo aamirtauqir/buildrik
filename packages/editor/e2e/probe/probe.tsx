@@ -1436,7 +1436,7 @@ const SWITCHER_PAGES: PageSummary[] = [
 
 function PageSwitcherProbe() {
   const [open, setOpen] = React.useState(() => new URLSearchParams(location.search).get("open") === "1");
-  const [active, setActive] = React.useState("home");
+  const [active, setActive] = React.useState(() => new URLSearchParams(location.search).get("active") ?? "home");
   return (
     <div className="tw:fixed tw:inset-x-0 tw:bottom-0">
       <LayoutShell.Footer>
@@ -3086,7 +3086,6 @@ const CASES: Record<string, () => React.ReactElement> = {
       <BottomBarProbe />
     </div>
   ),
-  /* Owner 2026-10-26 / board C05: a failed save is the global slot's one bar. */
   // ── Publish states (boards 784:4250 / 781:4489) ──────────────────────────
   "publish-publishing": () => (
     <div data-probe="publish-publishing">
