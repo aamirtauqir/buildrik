@@ -680,7 +680,7 @@ describe("SettingsTab — Unsaved settings", () => {
     await waitFor(() => expect(screen.getByTestId("set-unsaved").getAttribute("data-phase")).toBe("failed"));
     fireEvent.click(screen.getByTestId("set-unsaved-keep"));
     expect(screen.queryByTestId("set-unsaved")).toBeNull();
-    expect(footStatus()).toBe("Couldn’t save");
+    expect(footStatus()).toBe("Couldn’t save — Retry. Your edits are still here.");
     expect(headTitle()).toBe("General");
     errorSpy.mockRestore();
   });
@@ -787,12 +787,11 @@ describe("SettingsTab — Save changes", () => {
     fireEvent.change(screen.getByLabelText("Meta title"), { target: { value: "x" } });
     await waitFor(() => expect(footStatus()).toBe("Unsaved changes"));
     fireEvent.click(screen.getByTestId("set-foot-save"));
-    await waitFor(() => expect(footStatus()).toBe("Couldn’t save"));
+    await waitFor(() => expect(footStatus()).toBe("Couldn’t save — Retry. Your edits are still here."));
     expect(screen.getByTestId("set-foot-status").className).toContain("var(--bk-error)");
-    expect(screen.getByTestId("set-foot-save").textContent).toBe("Retry save");
-    expect(screen.getByTestId("set-save-error").textContent).toBe(
-      "SEO settings were not saved. Your changes are still here. Review the values, then retry.",
-    );
+    // B8-S04: said in the footer only — no banner, the primary stays "Save settings".
+    expect(screen.getByTestId("set-foot-save").textContent).toBe("Save settings");
+    expect(screen.queryByTestId("set-save-error")).toBeNull();
     expect(screen.queryByText("Your site settings are saved.")).toBeNull();
     fireEvent.click(screen.getByTestId("set-foot-save"));
     await screen.findByText("Your site settings are saved.");
@@ -843,10 +842,8 @@ describe("SettingsTab — Save with a site id goes through the settings mutation
     renderS(<SettingsTab composer={asComposer(composer)} projectId="site-1" />);
     await openSeoAndEdit();
     fireEvent.click(screen.getByTestId("set-foot-save"));
-    await waitFor(() => expect(footStatus()).toBe("Couldn’t save"));
-    expect(screen.getByTestId("set-save-error").textContent).toBe(
-      "SEO settings were not saved. Your changes are still here. Review the values, then retry.",
-    );
+    await waitFor(() => expect(footStatus()).toBe("Couldn’t save — Retry. Your edits are still here."));
+    expect(screen.queryByTestId("set-save-error")).toBeNull();
     expect(screen.getByTestId("fake-seo-field-error").textContent).toBe("Too long");
     expect(composer.adoptSavedProjectSettings).not.toHaveBeenCalled();
     fireEvent.click(screen.getByTestId("set-foot-save"));
@@ -1262,8 +1259,8 @@ describe("SettingsTab — read-only below the screen's role", () => {
     // its own notice and disables each action itself — no shell fieldset.
     expect(screen.queryByTestId("set-readonly-screen")).toBeNull();
     expect(screen.queryByTestId("set-foot-save")).toBeNull();
-    // 8137:216600 / 216834: the lifecycle scope line, not "Live immediately".
-    expect(screen.getByTestId("set-head-scope").textContent).toBe("Site lifecycle · changes apply immediately");
+    // 2L9 B8-S16: the Danger zone draws no scope chip.
+    expect(screen.queryByTestId("set-head-scope")).toBeNull();
   });
 
   it("a read-only screen shows no header action", async () => {
@@ -1406,6 +1403,8 @@ describe("SettingsTab — saving (2L9 B8-SH07 / AN08)", () => {
     fireEvent.click(screen.getByTestId("set-foot-save"));
     await waitFor(() => expect(footStatus()).toBe("Saving settings…"));
     expect(screen.getByTestId("set-foot-save").textContent).toBe("Saving…");
+    // B8-SH07: no Discard while the save runs.
+    expect(screen.queryByTestId("set-foot-discard")).toBeNull();
     await act(async () => finish());
     await waitFor(() => expect(footStatus()).toBe("Saved · applies on next publish"));
     expect(screen.getByTestId("set-foot-save").textContent).toBe("Save settings");

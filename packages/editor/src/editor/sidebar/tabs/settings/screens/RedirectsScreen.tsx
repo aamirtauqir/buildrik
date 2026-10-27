@@ -7,12 +7,13 @@
  * Everything here applies as it happens (`immediate`): the rules and the
  * suggestions come from `redirects.list` + `redirects.suggestions` on open.
  * The header carries `Import CSV` · `Export CSV` · `Add redirect`
- * (`registerHeaderAction`). Card **Redirect rules**: FROM · TO · TYPE and
- * `Edit · Delete` per row — Edit opens RedirectDialog (update / delete inside
- * it), Delete asks first (DeleteRedirectDialog — OWNER OVERRIDE 2026-10-04;
- * 8136:215838 draws a delete at once, board to update), then removes the
- * rule and the toast offers `Undo`, which creates the same rule again. The
- * Edit dialog's delete ends in the same toast. Import is all-or-nothing on the server
+ * (`registerHeaderAction`; Import and Export are code-ahead — 2L9 B8-S10
+ * draws neither). Card **Redirects · n** (B8-S10 238:12721): a ruled row per
+ * rule — "from → to" (opens RedirectDialog to edit), "301 · permanent", and
+ * `Delete`, which removes the rule at once (owner 2026-10-26: the board over
+ * the 2026-10-04 ask-first) with a "Redirect deleted · Undo" toast that
+ * creates the same rule again; `+ Add redirect` closes the card. The Edit
+ * dialog's delete still asks first and ends in the same toast. Import is all-or-nothing on the server
  * (RedirectCsvDialog → `redirects.import_csv`; the toast says how many were
  * created); Export downloads `redirects.export_csv`. Card **404 suggester**:
  * `Suggest redirects from 404s` writes `projectSettings.redirects
@@ -49,7 +50,6 @@ import { SAVE_ERROR_MESSAGES } from "../constants";
 import { useServerLoad } from "../hooks/useServerLoad";
 import { useSettingsScreen } from "../hooks/useSettingsScreen";
 import { RedirectCsvDialog } from "../components/RedirectCsvDialog";
-import { DeleteRedirectDialog } from "../components/DeleteRedirectDialog";
 import type { RedirectRepair, ScreenProps } from "../types";
 import { RedirectDialog, type RedirectDraft } from "../components/RedirectDialog";
 import { RedirectRepairCard } from "../components/RedirectRepairCard";
@@ -107,12 +107,12 @@ const HEAD_GHOST =
   `${HEAD_BTN} tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-bg-subtle)] ` +
   "tw:disabled:bg-transparent tw:disabled:text-[var(--bk-gray-400)]";
 
-/* The rules table (8136:214826): FROM 320 · TO 400 · TYPE 100 · actions 184,
-   12 apart; an 11px caps header row 28 high, rows 40 high, no rules between. */
-const RULES_GRID = "tw:grid tw:grid-cols-[320px_400px_100px_184px] tw:items-center tw:gap-x-3";
-const RULES_HEAD = `${RULES_GRID} tw:h-7 tw:text-[length:var(--bk-text-11)] tw:font-medium tw:uppercase tw:leading-5 tw:text-[var(--bk-ink-muted)]`;
-const RULES_ROW = `${RULES_GRID} tw:h-10 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]`;
-/* `Edit · Delete` — the link Button as it comes: accent text, 13, no box. */
+/* B8-S10: ruled 48 rows — the rule (240), its type (muted), Delete (140). */
+const RULE_ROW = "tw:flex tw:min-h-12 tw:items-center tw:gap-3 tw:border-b tw:border-[var(--bk-border)]";
+const RULE_LINK =
+  "tw:h-8 tw:w-60 tw:shrink-0 tw:justify-start tw:truncate tw:px-0 tw:text-[length:var(--bk-text-13)] tw:font-normal tw:text-[var(--bk-ink)] tw:no-underline tw:hover:underline";
+const RULE_ACTION = "tw:h-8 tw:w-35 tw:shrink-0 tw:justify-start tw:px-0 tw:text-[length:var(--bk-text-13)] tw:font-normal tw:no-underline tw:hover:underline";
+const typeLine = (type: string) => (type === "302" ? "302 · temporary" : "301 · permanent");
 
 /** A browser download of `text` as `name`. */
 function download(name: string, text: string) {
@@ -176,7 +176,6 @@ export const RedirectsScreen: React.FC<RedirectsScreenProps> = ({
   const [rows, setRows] = React.useState<RedirectRow[]>([]);
   const [suggestions, setSuggestions] = React.useState<RedirectSuggestion[]>([]);
   const [dialog, setDialog] = React.useState<Dialog>(null);
-  const [confirmDelete, setConfirmDelete] = React.useState<RedirectRow | null>(null);
   const [accepting, setAccepting] = React.useState<number | null>(null);
   const [actionFailed, setActionFailed] = React.useState(false);
 
@@ -261,11 +260,6 @@ export const RedirectsScreen: React.FC<RedirectsScreenProps> = ({
         >
           {exporting ? "Exporting…" : "Export CSV"}
         </Button>
-        {hasRows ? (
-          <Button type="button" size="xs" className={HEAD_BTN} onClick={() => setDialog({ mode: "add" })} data-testid="set-rd-add">
-            Add redirect
-          </Button>
-        ) : null}
       </div>,
     );
     return () => registerHeaderAction(null);
@@ -292,8 +286,8 @@ export const RedirectsScreen: React.FC<RedirectsScreenProps> = ({
        Undo would post the restored rule again (409, "not saved" banner). */
     let undone = false;
     const toastId = addToast({
-      title: `Redirect ${row.fromPath} → ${row.toUrl} deleted`,
-      description: "You can undo this deletion.",
+      description: "Redirect deleted",
+      duration: 8000,
       action: {
         label: "Undo",
         onClick: () => {
@@ -321,7 +315,7 @@ export const RedirectsScreen: React.FC<RedirectsScreenProps> = ({
     await relist();
   };
 
-  // A row's Delete, once confirmed: a refusal is the banner.
+  // A row's Delete — at once, with Undo in the toast: a refusal is the banner.
   const deleteRow = async (row: RedirectRow) => {
     setActionFailed(false);
     try {
@@ -441,60 +435,53 @@ export const RedirectsScreen: React.FC<RedirectsScreenProps> = ({
         />
       ) : null}
 
-      <Section title="Redirect rules">
+      <Section title={`Redirects · ${rows.length}`} anchor="redirect-rules">
         {!hasRows ? (
           <div className="tw:flex tw:flex-col tw:items-start tw:gap-3" data-testid="set-rd-empty">
             <div className={LINE}>No redirects yet. Add one to send an old URL to a new one, or import a CSV.</div>
-            <Button type="button" size="xs" className={SET_BTN} onClick={() => setDialog({ mode: "add" })} data-testid="set-rd-add">
-              Add redirect
-            </Button>
           </div>
         ) : (
-          <div role="table" id="rd-rules" aria-label="Redirect rules" data-testid="set-rd-table">
-            <div role="row" className={RULES_HEAD}>
-              <span role="columnheader">From</span>
-              <span role="columnheader">To</span>
-              <span role="columnheader">Type</span>
-              <span role="columnheader">
-                <span className="tw:sr-only">Actions</span>
-              </span>
-            </div>
+          <div id="rd-rules" aria-label="Redirect rules" className="tw:flex tw:flex-col tw:gap-2.5" data-testid="set-rd-table">
             {rows.map((row) => (
-              <div role="row" key={row.id} className={RULES_ROW} data-testid={`set-rd-row-${row.id}`}>
-                <span role="cell" className="tw:truncate" title={row.fromPath}>
-                  {row.fromPath}
-                </span>
-                <span role="cell" className="tw:truncate" title={row.toUrl}>
-                  {row.toUrl}
-                </span>
-                <span role="cell">{row.type}</span>
-                <span role="cell" className="tw:flex tw:items-center tw:gap-1 tw:text-[length:var(--bk-text-13)] tw:text-[var(--bk-accent)]">
-                  <Button
-                    type="button"
-                    size="xs"
-                    variant="link"
-                    onClick={() => setDialog({ mode: "edit", row })}
-                    aria-label={`Edit redirect from ${row.fromPath}`}
-                    data-testid={`set-rd-edit-${row.id}`}
-                  >
-                    Edit
-                  </Button>
-                  <span aria-hidden="true">·</span>
-                  <Button
-                    type="button"
-                    size="xs"
-                    variant="link"
-                    onClick={() => setConfirmDelete(row)}
-                    aria-label={`Delete redirect from ${row.fromPath}`}
-                    data-testid={`set-rd-delete-${row.id}`}
-                  >
-                    Delete
-                  </Button>
-                </span>
+              <div key={row.id} className={RULE_ROW} data-testid={`set-rd-row-${row.id}`}>
+                <Button
+                  type="button"
+                  size="xs"
+                  variant="link"
+                  className={RULE_LINK}
+                  title={`${row.fromPath} → ${row.toUrl}`}
+                  onClick={() => setDialog({ mode: "edit", row })}
+                  aria-label={`Edit redirect from ${row.fromPath}`}
+                  data-testid={`set-rd-edit-${row.id}`}
+                >
+                  <span className="tw:truncate">{`${row.fromPath} → ${row.toUrl}`}</span>
+                </Button>
+                <span className="tw:min-w-0 tw:flex-1 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]">{typeLine(row.type)}</span>
+                <Button
+                  type="button"
+                  size="xs"
+                  variant="link"
+                  className={RULE_ACTION}
+                  onClick={() => void deleteRow(row)}
+                  aria-label={`Delete redirect from ${row.fromPath}`}
+                  data-testid={`set-rd-delete-${row.id}`}
+                >
+                  Delete
+                </Button>
               </div>
             ))}
           </div>
         )}
+        <Button
+          type="button"
+          size="xs"
+          variant="link"
+          className={`${RULE_ACTION} tw:mt-2 tw:w-fit tw:px-3`}
+          onClick={() => setDialog({ mode: "add" })}
+          data-testid="set-rd-add"
+        >
+          + Add redirect
+        </Button>
       </Section>
 
       <Section title="404 suggester">
@@ -550,15 +537,7 @@ export const RedirectsScreen: React.FC<RedirectsScreenProps> = ({
         onDelete={dialog?.mode === "edit" ? deleteFromDialog : undefined}
         onCancel={() => setDialog(null)}
       />
-      <DeleteRedirectDialog
-        rule={confirmDelete}
-        onCancel={() => setConfirmDelete(null)}
-        onConfirm={() => {
-          const row = confirmDelete;
-          setConfirmDelete(null);
-          if (row) void deleteRow(row);
-        }}
-      />
+
       <RedirectCsvDialog open={csvOpen} onImport={importCsv} onCancel={() => setCsvOpen(false)} />
     </Screen>
   );

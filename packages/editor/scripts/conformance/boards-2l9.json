@@ -14509,9 +14509,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "General card content now as 238:10283 (Site / Icons). Settings chrome now per board (compared 2026-10-26, probe SettingsTab on General at 1440x900 vs 238:10283/238:11495 screenshots): text-only 32px nav rows, Danger zone under Advanced, 'ORGANIZATION WORKSPACE ↗' with Members ↗ / Billing ↗ / Integrations ↗, 'Your role' + 'Permissions ›', 'Search settings' entry (Search Mode kept: owner 2026-10-04), '‹ Back to Editor · {page}' + 20/600 title in the pane header, scope chip, white body, 56px footer 'Unsaved changes' · Discard · Save settings. Still open: Settings is a full-page view, not inside the editor shell (REQUESTS), and Billing keeps its plan pill (code-ahead).",
+   "authority": "code:no-tagline-field",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27: shots/238-10889.png vs probe (a refused save) — footer \"Couldn’t save — Retry. Your edits are still here.\" in error ink, Discard + \"Save settings\", no banner over the cards; General's cards as 238:10283 (Author in the Tagline slot).",
    "tier": "P2"
   },
   {
@@ -14542,9 +14542,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/LocalizationScreen.tsx:65 — staged default vs immediate locales; removal Undo + translated counts differ",
+   "authority": "code:remove-locale-asks-first",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27: LocalizationScreen.tsx — Default language card (Default select + next-publish note), Languages ruled rows (name 240 · Saved default / Chosen default · unsaved · n of N pages translated · gray Remove 140), + Add language, footnote, footer \"Unsaved default: X · saved default: Y\", \"<name> removed · Undo\" toast. Remove still confirms first (owner override 2026-10-04), so the footnote says \"saves at once\" not \"removed immediately\". Select fill is the shared Select (not per-screen).",
    "tier": "P2"
   },
   {
@@ -14554,8 +14554,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/SeoScreen.tsx:101 — no Page settings link, no \"SEO analysis · Planned\"",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27: shots/238-12118.png vs probe SEO — muted \"Site-wide defaults. Pages can override them in Page settings ›\", Defaults card with Title / Description stacked and \"2 pages have no description of their own.\" (settingsOverview), \"SEO analysis · Planned / Reserved for a later version.\". Kept below (code-ahead): the Open Graph image field in Defaults, Social profiles, Indexing.",
    "tier": "P2"
   },
   {
@@ -14575,9 +14575,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/RedirectsScreen.tsx:286 — delete + Undo exist; \"Redirects · 3 of 100\" header, scope copy differ",
+   "authority": "code:no-redirect-limit",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27: shots/238-12721.png vs probe Redirects — chip \"Rules saved now · reach visitors on next publish\", a 720 card of ruled rows \"from → to · 301 · permanent · Delete\", \"+ Add redirect\"; Delete acts at once with a \"Redirect deleted · Undo\" toast (owner 2026-10-26 over the 2026-10-04 ask-first). Title reads \"Redirects · n\" — the board's \"3 of 100\" names a limit the server does not have. Kept (code-ahead): Import/Export CSV in the header, the 404 suggester card.",
    "tier": "P2"
   },
   {
@@ -14586,9 +14586,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/AccessScreen.tsx:201 — password card exists; checkbox copy + trial line differ",
+   "authority": "code:no-trial",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27: shots/238-13017.png vs probe Access — 720 card \"Password protection\", checkbox \"Ask visitors for a password\", Password field when on, accent plan line; the board's \"Pro · included in your trial\" reads \"Pro · included in your plan\" (no trial). A stored password is never shown back: \"A password is set\" with Change/Remove (code). Share links card kept (code-ahead).",
    "tier": "P2"
   },
   {
@@ -14630,9 +14630,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "code:custom-code-refused-on-free",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/AdvancedScreen.tsx:151 — \"Saved · not published on Free\" line missing",
+   "verifiedNote": "Board B8-S15 draws custom code saved on Free ('Saved · not published on Free'); the server refuses custom code on FREE (site-settings.service CUSTOM_CODE_NOT_AVAILABLE), so the screen keeps its Pro lock — the board's state cannot happen. Board shot shots/238-14186.png.",
    "tier": "P2"
   },
   {
@@ -14641,9 +14641,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/DangerZoneScreen.tsx:104 — archive/transfer/delete + typed delete exist (DeleteSiteModal); copy differs",
+   "authority": "code:transfer-is-to-a-member",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27: shots/238-14472.png vs probe Danger zone at 1440x900 — one 720 card (255 vs board 247), ruled rows Archive site / Transfer site / Delete site with lines and links Archive · Transfer… · Delete site… (error ink), no scope chip. Transfer line says \"Move it to another member of this workspace.\" — the board's \"another workspace you own\" is not what transferSite does.",
    "tier": "P2"
   },
   {
@@ -14942,7 +14942,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared (saving state): footer 'Saving settings…', button 'Saving…' (tested).",
+   "verifiedNote": "Wave 3b: while saving the footer is 'Saving settings…' with only the disabled 'Saving…' (no Discard), as drawn (tested); the probe's save fails too fast to capture the state.",
    "tier": "P2"
   },
   {
@@ -17874,9 +17874,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "open:board-conflict-csv-copy",
+   "authority": "code:board-conflict-277-346467",
    "verified": "drift-open",
-   "verifiedNote": "Primary 'Back to submissions' now as drawn; body copy conflicts with 272:24319 ('Your filters and selection are kept.' vs 'Your selection and filters are unchanged.') — 272:24319's kept; owner to pick.",
+   "verifiedNote": "Board conflict kept as decided (coordinator 2026-10-27): 272:24319's body copy ('Your selection and filters are unchanged.') wins over this cell's ('Your filters and selection are kept.'); primary Back to submissions as drawn.",
    "tier": "P3"
   },
   {
@@ -17907,9 +17907,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "open:board-conflict-delete-confirm",
+   "authority": "code:board-conflict-277-347389",
    "verified": "drift-open",
-   "verifiedNote": "Boards disagree on one dialog: B8-S14 (P2) draws the short consequence copy with an outline red 'Delete'; GAP-FMC/FM07 draw the names + context and a primary 'Delete permanently'. S14 adopted (higher tier); owner to pick.",
+   "verifiedNote": "Board conflict kept as decided (coordinator 2026-10-27): B8-S14 238:13898 (P2) is the delete confirm — short consequence copy, outline red Delete; this GAP-FMC cell draws names + context and a primary 'Delete permanently'.",
    "tier": "P3"
   },
   {

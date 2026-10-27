@@ -55,13 +55,14 @@ describe("AccessScreen — a password is stored (8136:216089)", () => {
   it("owner 2026-10-04: draws the switch on, 'A password is set' with Change and Remove — no field until Change — and the publish note", async () => {
     setup();
     await loaded();
-    expect(screen.getByText("Password protection · Pro")).toBeInTheDocument();
-    expect(screen.getByTestId("set-access-toggle")).toHaveAttribute("aria-checked", "true");
+    expect(screen.getByText("Password protection")).toBeInTheDocument();
+    expect(screen.getByLabelText("Ask visitors for a password")).toBe(screen.getByTestId("set-access-toggle"));
+    expect(screen.getByTestId("set-access-toggle")).toBeChecked();
     expect(screen.getByTestId("set-access-is-set")).toHaveTextContent("A password is set");
     expect(screen.getByTestId("set-access-change")).toHaveTextContent("Change");
     expect(screen.getByTestId("set-access-remove")).toHaveTextContent("Remove");
     expect(screen.queryByLabelText("New password")).toBeNull();
-    expect(screen.getByText("Applies on next publish")).toBeInTheDocument();
+    expect(screen.getByTestId("set-access-plan")).toHaveTextContent("Pro · included in your plan");
     expect(get).toHaveBeenCalledWith({ siteId: "s1" });
     // The stored value is never on screen.
     expect(document.querySelector("input[type=password]")).toBeNull();
@@ -115,7 +116,7 @@ describe("AccessScreen — a password is stored (8136:216089)", () => {
     const { save } = setup();
     await loaded();
     fireEvent.click(screen.getByTestId("set-access-remove"));
-    expect(screen.getByTestId("set-access-toggle")).toHaveAttribute("aria-checked", "false");
+    expect(screen.getByTestId("set-access-toggle")).not.toBeChecked();
     expect(screen.getByTestId("set-access-off")).toHaveTextContent("Password protection will be off after the next publish.");
     expect(screen.queryByLabelText("New password")).toBeNull();
     await save();
@@ -143,18 +144,16 @@ describe("AccessScreen — a password is stored (8136:216089)", () => {
 describe("AccessScreen — no password stored (8136:216535)", () => {
   beforeEach(() => get.mockResolvedValue({ hasPublishedPassword: false }));
 
-  it("owner 2026-10-04: off, the card says what password protection is for", async () => {
+  it("2L9 B8-S11 draws no purpose line under the title", async () => {
     setup();
     await loaded();
-    expect(screen.getByTestId("set-access-purpose")).toHaveTextContent(
-      "Visitors must enter a password before they can see the published site. Useful for client previews and staging.",
-    );
+    expect(screen.queryByTestId("set-access-purpose")).toBeNull();
   });
 
   it("switching on asks for a Password at once (focused), refuses Save until one is typed, then saves it", async () => {
     const { registerFieldErrors, save } = setup();
     await loaded();
-    expect(screen.getByTestId("set-access-toggle")).toHaveAttribute("aria-checked", "false");
+    expect(screen.getByTestId("set-access-toggle")).not.toBeChecked();
     expect(screen.getByTestId("set-access-off")).toHaveTextContent("Anyone with the address can view the published site.");
     expect(screen.queryByLabelText("Password")).toBeNull();
     fireEvent.click(screen.getByTestId("set-access-toggle"));
