@@ -18,9 +18,9 @@ import type { MediaAsset, MediaAssetType } from "@/shared/types/media";
 import { extractGradientUI, composeGradient, deriveBgType, DEFAULT_GRADIENT_STOPS } from "@/shared/utils/parsers/gradientHelpers";
 import { parseGradient } from "@/shared/utils/parsers/gradientParser";
 import { rgbToHex } from "@/shared/utils/parsers/colorConversionBasic";
-import { ButtonGroup, Section, ColorInput, SelectRow, InputRow, type SectionTier } from "../shared/controls";
+import { AuthoredValue, countWord, ButtonGroup, Section, ColorInput, SelectRow, InputRow, type SectionTier } from "../shared/controls";
 import { GROUP_TITLE, WIDE_BUTTON } from "../shared/controls/controlClasses";
-import { BK_SELECT_BARE_VALUE_THEME, Button, Select, Textarea, TextInput } from "@/editor/chrome-ui";
+import { BK_SELECT_BARE_VALUE_THEME, Button, Select, TextInput } from "@/editor/chrome-ui";
 import { NoteRow } from "./behaviourRows";
 
 const FIELD_LABEL = "tw:text-xs tw:font-medium tw:text-[var(--bk-ink-muted)]";
@@ -108,49 +108,6 @@ const BLEND_OPTIONS = [
   { value: "difference", label: "Difference" },
 ];
 
-const COUNT_WORDS = ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"];
-
-/** 247:23966: a gradient the two-stop controls cannot hold, kept as saved. */
-function SavedGradient({ value, stops, onReplace, onEdit }: { value: string; stops: number; onReplace: () => void; onEdit: (next: string) => void }) {
-  const [draft, setDraft] = React.useState<string | null>(null);
-  return (
-    <div data-testid="inspector-fill-saved-gradient">
-      <div className={`${FIELD_LABEL} tw:mb-1`}>Saved gradient</div>
-      {draft === null ? (
-        <p className="tw:m-0 tw:rounded-[4px] tw:bg-[var(--bk-bg-subtle)] tw:px-2 tw:py-2 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)] tw:break-words">
-          {value}
-        </p>
-      ) : (
-        <Textarea
-          aria-label="Custom gradient"
-          rows={3}
-          autoFocus
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Escape") setDraft(null);
-          }}
-          onBlur={() => {
-            if (draft.trim() && parseGradient(draft)) onEdit(draft.trim());
-            setDraft(null);
-          }}
-          className="tw:text-[12px] tw:[font-family:var(--bk-font-mono)]"
-        />
-      )}
-      <NoteRow>
-        {COUNT_WORDS[stops] ?? stops} stops retained. Two-stop controls cannot losslessly edit this value.
-      </NoteRow>
-      <div className="tw:flex tw:flex-col tw:gap-2">
-        <Button color="light" size="xs" className={WIDE_BUTTON} onClick={() => setDraft(value)}>
-          Edit custom gradient
-        </Button>
-        <Button color="light" size="xs" className={WIDE_BUTTON} onClick={onReplace}>
-          Replace with two-stop gradient
-        </Button>
-      </div>
-    </div>
-  );
-}
 
 export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
   variant = "element",
@@ -275,23 +232,35 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
       )}
 
       {bgType === "gradient" && saved && (
-        <SavedGradient
+        <AuthoredValue
+          testId="inspector-fill-saved-gradient"
+          caption="Saved gradient"
           value={gradientSource}
-          stops={saved.stops.length}
-          onEdit={writeGradient}
-          onReplace={() => {
-            const first = saved.stops[0]?.color;
-            const last = saved.stops[saved.stops.length - 1]?.color;
-            writeGradient(
-              composeGradient({
-                type: saved.type === "radial" ? "radial" : "linear",
-                angle: saved.type === "linear" ? saved.angle : 90,
-                color1: first ? rgbToHex(first) : color1,
-                color2: last ? rgbToHex(last) : color2,
-              }),
-            );
-          }}
-        />
+          note={`${countWord(saved.stops.length)} stops retained. Two-stop controls cannot losslessly edit this value.`}
+          editLabel="Edit custom gradient"
+          accept={(next) => Boolean(parseGradient(next))}
+          onCommit={writeGradient}
+        >
+          <Button
+            color="light"
+            size="xs"
+            className={WIDE_BUTTON}
+            onClick={() => {
+              const first = saved.stops[0]?.color;
+              const last = saved.stops[saved.stops.length - 1]?.color;
+              writeGradient(
+                composeGradient({
+                  type: saved.type === "radial" ? "radial" : "linear",
+                  angle: saved.type === "linear" ? saved.angle : 90,
+                  color1: first ? rgbToHex(first) : color1,
+                  color2: last ? rgbToHex(last) : color2,
+                }),
+              );
+            }}
+          >
+            Replace with two-stop gradient
+          </Button>
+        </AuthoredValue>
       )}
 
       {bgType === "gradient" && !saved && (

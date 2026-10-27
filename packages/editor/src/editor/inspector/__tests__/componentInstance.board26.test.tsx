@@ -64,12 +64,10 @@ describe("board 26 — component instance", () => {
     expect(section("text-inside")).toBeNull();
   });
 
-  it("the status mark is its own row between the header and the tabs", async () => {
+  it("the instance is named once — by its block, in the accent, with no duplicate status mark (2L9 IC01)", async () => {
     const { id, show } = await setup();
     await show(id);
-    const marks = screen.getByTestId("inspector-status-marks");
-    expect(screen.getByTestId("inspector-header").contains(marks)).toBe(false);
-    expect(marks.previousElementSibling).toBe(screen.getByTestId("inspector-header"));
-    expect(screen.getByTestId("inspector-mark-component")).toHaveTextContent("Component: Reservation banner");
+    expect(screen.queryByTestId("inspector-mark-component")).toBeNull();
+    expect(screen.getByTestId("component-identity")).toHaveTextContent("Reservation banner · instance");
   });
 });

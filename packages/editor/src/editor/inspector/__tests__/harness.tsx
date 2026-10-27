@@ -124,7 +124,7 @@ export function makeMockComposer(opts: MockComposerOptions = {}) {
       setRule: vi.fn(),
       getGlobalClasses: vi.fn(() => opts.globalClasses ?? []),
     },
-    history: { push: vi.fn() },
+    history: { push: vi.fn(), captureUndo: vi.fn(() => vi.fn()) },
     commands: { run: vi.fn() },
     isProjectLoading: vi.fn(() => false),
     beginTransaction: vi.fn(),

@@ -14,10 +14,14 @@
  *
  * @license BSD-3-Clause
  */
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render as rtlRender, screen, fireEvent } from "@testing-library/react";
+import { ToastProvider } from "@/editor/chrome-ui";
 import { describe, it, expect } from "vitest";
 import { TypeBlockSection } from "../TypeBlockSection";
 import { makeMockElement, makeMockComposer } from "@/editor/inspector/__tests__/harness";
+
+/* The Field block's Type change answers with a receipt toast (2L9 F30). */
+const render = (ui: React.ReactElement) => rtlRender(ui, { wrapper: ToastProvider });
 
 function setup(type = "input") {
   const el = makeMockElement({ id: "e1", type });

@@ -144,11 +144,15 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
   }
 
   const all = visibleSectionIds(tabId, selectedTypes.length ? selectedTypes : [type], baseCtx);
-  /* An open interaction is the Behavior tab's whole body (2L9 I15). */
-  const ids = tabId === "behaviour" && subviewHere === "interaction" ? all.filter((id) => id === "interactions") : all;
+  /* An open interaction is the Behavior tab's whole body (2L9 I15); a
+     form's Add field list is the Content tab's (156:3109). */
+  const only =
+    tabId === "behaviour" && subviewHere === "interaction" ? "interactions" : tabId === "content" && subviewHere === "add-field" ? "form-fields" : null;
+  const ids = only ? all.filter((id) => id === only) : all;
   const modes = ids.map((id) => {
     const entry = SECTION_REGISTRY[id];
-    return resolveDisplayMode(entry.open, sectionHasValue(id, baseCtx), choices[`${type}:${id}`]);
+    const open = typeof entry.open === "function" ? entry.open(baseCtx) : entry.open;
+    return resolveDisplayMode(open, sectionHasValue(id, baseCtx), choices[`${type}:${id}`]);
   });
   /* ⌥-click (DD-22): everything shut when anything is open, else all open. */
   const toggleAll = () => onSetChoices(type, ids, modes.some((m) => m === "open") ? "closed" : "open");

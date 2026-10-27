@@ -30,6 +30,9 @@ import { canWrite } from "@/engine/commands/commandOperations";
 import { SelectRow } from "../shared/controls";
 import { NoteRow } from "./behaviourRows";
 import { useInspectorField } from "../shared/controls/InspectorFieldContext";
+import { WIDE_BUTTON } from "../shared/controls/controlClasses";
+import { EVENTS } from "@/shared/constants/events";
+import { Diamond } from "lucide-react";
 
 interface ComponentRowProps {
   composer: Composer | null;
@@ -47,6 +50,8 @@ interface InstanceInfo {
 /* A component with no variants still reads its one choice (board 26). */
 const NO_VARIANTS = [{ value: "", label: "Default" }];
 
+const REFRESH_EVENTS = [EVENTS.COMPONENT_UPDATED, EVENTS.INSTANCE_DETACHED, EVENTS.COMPONENT_DELETED, EVENTS.ELEMENT_UPDATED] as const;
+
 /* One full-width text action per row, left-aligned (IC01). */
 const ACTION =
   "tw:h-7 tw:w-full tw:justify-start tw:rounded-[4px] tw:border-0 tw:bg-transparent tw:px-0 " +
@@ -60,18 +65,28 @@ export const ComponentRow: React.FC<ComponentRowProps> = ({ composer, elementId 
   const { addToast } = useToast();
 
   React.useEffect(() => {
-    const instance = composer && elementId ? composer.components?.getInstanceByElementId(elementId) : null;
-    const component = instance ? composer?.components?.getComponent(instance.componentId) : null;
-    setInfo(
-      instance && component
-        ? {
-            component,
-            instanceId: instance.elementId,
-            currentVariant: instance.variantSelection?.variantId ?? null,
-            overrides: instance.overrides?.length ?? 0,
-          }
-        : null,
-    );
+    const read = () => {
+      const instance = composer && elementId ? composer.components?.getInstanceByElementId(elementId) : null;
+      const component = instance ? composer?.components?.getComponent(instance.componentId) : null;
+      setInfo(
+        instance && component
+          ? {
+              component,
+              instanceId: instance.elementId,
+              currentVariant: instance.variantSelection?.variantId ?? null,
+              overrides: instance.overrides?.length ?? 0,
+            }
+          : null,
+      );
+    };
+    read();
+    if (!composer) return;
+    /* A rename of the main component, a detach elsewhere, a new override:
+       the block reads them as they happen (L2-028). */
+    for (const evt of REFRESH_EVENTS) composer.on(evt, read);
+    return () => {
+      for (const evt of REFRESH_EVENTS) composer.off(evt, read);
+    };
   }, [composer, elementId]);
 
   if (!composer || !info) return null;
@@ -122,10 +137,15 @@ export const ComponentRow: React.FC<ComponentRowProps> = ({ composer, elementId 
       role="group"
       aria-label={`${component.name} instance`}
     >
-        <div className="tw:truncate tw:text-[13px] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]" data-testid="component-identity">
-          ◇ {component.name} · instance
+        {/* IC01: the identity in the accent, its source muted under it. */}
+        <div
+          className="tw:flex tw:min-w-0 tw:items-center tw:gap-1.5 tw:text-[14px] tw:font-semibold tw:leading-5 tw:text-[var(--bk-accent-text)]"
+          data-testid="component-identity"
+        >
+          <Diamond size={14} aria-hidden="true" className="tw:shrink-0" />
+          <span className="tw:truncate">{component.name} · instance</span>
         </div>
-        <div className="tw:pb-1 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="component-source">
+        <div className="tw:pb-1 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="component-source">
           Component library · v{component.version}
         </div>
         <SelectRow
@@ -148,7 +168,7 @@ export const ComponentRow: React.FC<ComponentRowProps> = ({ composer, elementId 
           color="light"
           size="xs"
           data-testid="component-reset"
-          className={ACTION}
+          className={`${WIDE_BUTTON} tw:my-1`}
           disabled={overrides === 0}
           aria-disabled={readOnly || undefined}
           onClick={() => {

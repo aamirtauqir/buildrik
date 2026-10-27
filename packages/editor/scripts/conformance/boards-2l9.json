@@ -4227,8 +4227,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Lane L-B A4 (built, not compared): '+ Add field' opens 'Add field' with the board's 13 types in order (Text … Submit); each inserts the Insert panel's block before the submit button (Submit goes last) and opens the new field.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B P1 round 2 (2026-10-27), probe ?block=contact-form → '+ Add field', side by side with the board PNG: 'Add field' heads the tab (the Fields header and the other Content sections give way — a Content subview, like an open interaction), centred '‹ {form}' back link, the 13 types centred at a 40 px pitch (title 152 / back 192 / Text 232 / Email 272, board 228/269/309/349 — same pitch). The back link reads the form's layer name ('Contact form' is board sample; the probe's form is unnamed → 'Form'). Section hideHeader now actually hides (its row's tw:flex beat [hidden]).",
    "tier": "P1"
   },
   {
@@ -4284,8 +4284,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "code:after-submit-live-on-save",
-   "verified": "drift-open",
-   "verifiedNote": "Built 2026-10-27 (not renderable in the probe — form settings load from the server): sub-groups headed like sections ('Notifications', 'Spam protection', 'Form settings status'), stacked 'Message', plain section titles. Header 'Form settings · This form' is the lead's; Visibility/Interactions collapsed on a form left as on other types.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B P1 round 2, now renderable (probe formBlock stub), side by side: Then 'Show message', 'Message' as a 13 / muted label over a 36 px grey box, Send to, Spam protection + note + box, Form settings status 'Saved' + the outside-Undo note, Visibility · All devices and Interactions · None shut. Exceptions: no 'Applies on next publish' under After submit (code:after-submit-live-on-save); no 'This form starts collecting submissions after you publish.' (code:publish-state-unknown — the editor does not know whether this form's site has been published).",
    "tier": "P1"
   },
   {
@@ -4385,8 +4385,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Redirect is a free-text CommitRow (FormAfterSubmitSection.tsx:195); no shared page picker, URL check, atomic save",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B P1 round 2, probe ?block=contact-form&siteId=…&formBlock={REDIRECT, no URL} (tRPC stub), Behavior tab, side by side: Then 'Redirect'; 'Redirect to' is one select 'Choose page or URL…' over the site's pages (value = the page's served path, '/' or '/<slug>.html' from pageFileNames) plus 'Custom URL…' (opens a URL row; a loaded outside URL reads as Custom); Notifications / Spam protection / Form settings status as 13-semibold groups; status 'Choose a destination to save' also when the row loads that way; Visibility 'All devices' and Interactions 'None' shut under a form's own settings. Exception: no 'Applies on next publish' under After submit (code:after-submit-live-on-save).",
    "tier": "P1"
   },
   {
@@ -4854,8 +4854,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Shadow Outer/Inner rows vs layered list; Filters do not show \"Authored value\" custom compound (effects/FiltersSection.tsx:23)",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B P1 round 2, probe ?type=text with opacity 1, a 1-layer shadow, filter 'blur(4px) saturate(1.2) blur(1px)', transform + transition, Effects tab, side by side: Opacity one field; Shadow '1 layer' with X offset · Y offset · Blur · Spread · Color ('#111827 / 12%') · Inset; Filters 'Custom' with 'Authored value', 'Two blur functions are preserved in their original order.', 'Edit custom value'; 'Transform and transition · 2 set' shut; 'Advanced effects · None'. Before this the sliders showed 'Blur 4px' and any edit dropped saturate() and the second blur (data loss). Exceptions: Opacity's field keeps its % unit cell; an 'Add layer' button stays under the layers (code:layers-reachable — a second shadow layer has no other writer).",
    "tier": "P1"
   },
   {
@@ -4865,8 +4865,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No exact-expression filter editing that keeps sequence",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B P1 round 2: same column as 161:12525, compared side by side; 'Edit custom value' turns the authored value into a text box, written on blur exactly as typed (sequence kept), Escape keeps the old value — unit-tested. The board's beside-the-column editing card is not drawn: the edit happens in place (code:inline-authored-edit, one AuthoredValue control shared with Background's saved gradient).",
    "tier": "P1"
   },
   {
@@ -4989,7 +4989,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "probe-compared 2026-10-27 for content: 'Interaction actions' card title, Duplicate · Disable · Delete · centred 'Close menu', 240 wide. Placement beside the column over the canvas (beside='.layout-shell__inspector') cannot be shown in the probe (no shell) — open until the lead's live walk.",
+   "verifiedNote": "probe-compared 2026-10-27 for content: 'Interaction actions' card title, Duplicate · Disable · Delete · 'Close menu' — now actually centred (its tw:!justify-center did nothing on MenuItem's label span; fixed round 2). Placement beside the column over the canvas (beside='.layout-shell__inspector') cannot be shown in the probe (no shell) — open until the lead's live walk.",
    "tier": "P1"
   },
   {
@@ -5045,8 +5045,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Type select swaps immediately; no Field type menu or \"applied · Undo\" toast",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B P1 round 2, probe contact form → first field → Type, side by side: Type is a full-width select-styled row that opens the 'Field type' card (title, the types, a centred Cancel) beside the column; rows below unchanged from F02 at a 40 px pitch. Exception: the card lists every type the field can be, where the board shows only the lossless pair (code:all-types-reachable — narrowing it would drop Number / Date / File … as choices with no other writer). Card placement beside the column over the canvas is not visible in the probe (no shell).",
    "tier": "P1"
   },
   {
@@ -5057,7 +5057,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Type select swaps immediately; no Field type menu or \"applied · Undo\" toast",
+   "verifiedNote": "Lane L-B P1 round 2 (built, not compared — no board image fetched this round; copy from the dump): a type change applies at once with the receipt 'Field type changed to Text' and Undo bound to that history step (history.captureUndo) — unit-tested on a real Composer, Undo restores the type. The receipt's position (bottom right, 460 wide) is the shell's toast.",
    "inheritsFrom": "170:121692",
    "tier": "P1"
   },
@@ -5158,8 +5158,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Lane L-B A8 (built; copy and order checked against the dump, no board image): the instance block sits above the tabs — '◇ {name} · instance', 'Component library · v{n}', Variant, 'Edit main component ›', 'Reset to main component · {n} overrides', 'Detach instance'. Open: the field-level 'Font size · Local value · Desktop' source lines (IC05).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B P1 round 2, probe ?type=container&instance=Hero card (createComponent + instantiate), side by side for the identity block: '◇ Hero card · instance' in the accent with a diamond glyph, 'Component library · v{n}' muted, Variant, 'Edit main component ›', 'Reset to main component · n overrides' as a full-width bordered button (disabled + 'No overrides to reset' at 0), 'Detach instance'. The duplicate 'Component: {name}' status mark is gone (the block names it; the rename refresh moved with it). Exceptions: the board's Style body (Placement, two-column Typography) is the older page-04 vocabulary and contradicts board 26 (an instance root draws no Layout / Text inside) and 161:8940's rows — not followed; the probe's instance has no overrides (styles set directly are not recorded as instance patches).",
    "tier": "P1"
   },
   {
@@ -5203,7 +5203,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Override dot exists; board section count \"2 overrides\", \"Remove Tablet override\", \"Falls back to Desktop\" missing",
+   "verifiedNote": "Lane L-B P1 round 2: board fetched and the instance block compared (same as 241:16522). Still open: the per-section override header 'Spacing · 2 overrides', the overridden row with 'Remove Tablet override' and 'Falls back to Desktop: 24 px', and the source line '· 2 Tablet overrides' — the breakpoint-override detail is not built in the section (today: the field's override dot + the section note).",
    "tier": "P1"
   },
   {

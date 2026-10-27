@@ -50,7 +50,9 @@ import type { Composer } from "@/engine";
 import { getBuildrikClient } from "@/services/api-client";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
-import { Section, SelectRow, SubSectionTitle, type SectionTier } from "../shared/controls";
+import { Section, SelectRow, type SectionTier } from "../shared/controls";
+import { GROUP_TITLE } from "../shared/controls/controlClasses";
+import { pageFileNames } from "@/engine/export/pageFiles";
 import { ActionRow, CommitRow, NoteRow } from "./behaviourRows";
 import { CheckRow } from "../shared/controls/CheckRow";
 
@@ -90,6 +92,42 @@ function isForbidden(e: unknown): boolean {
 function valuesEqual(a: unknown, b: unknown): boolean {
   const normalize = (v: unknown) => (v === null || v === undefined || v === "" ? "" : v);
   return normalize(a) === normalize(b);
+}
+
+const CUSTOM = "__custom";
+
+/** A page's served path, as the published site writes it (`pageFileNames`):
+ *  the home page is "/", every other "/<slug>.html". */
+const pagePath = (file: string) => (file === "index.html" ? "/" : `/${file}`);
+
+/**
+ * "Redirect to" (2L9 156:11319, F19): the site's pages in one select, the
+ * same list a link chooses from, then "Custom URL…" for anything else — a
+ * value that is not one of the pages is a custom URL.
+ */
+function RedirectRow({ composer, value, onCommit }: { composer: Composer | null; value: string; onCommit: (v: string) => void }) {
+  const pages = composer?.elements.getAllPages() ?? [];
+  const files = pageFileNames(pages);
+  const options = pages.map((p) => ({ value: pagePath(files.get(p.id) ?? "index.html"), label: p.name }));
+  const onPage = options.some((o) => o.value === value);
+  const [custom, setCustom] = React.useState(Boolean(value) && !onPage);
+  return (
+    <>
+      <SelectRow
+        label="Redirect to"
+        value={custom ? CUSTOM : onPage ? value : ""}
+        placeholder="Choose page or URL…"
+        options={[...options, { value: CUSTOM, label: "Custom URL…" }]}
+        onChange={(v) => {
+          setCustom(v === CUSTOM);
+          if (v && v !== CUSTOM) onCommit(v);
+        }}
+      />
+      {custom && (
+        <CommitRow label="URL" type="text" placeholder="https://example.com/thanks" value={onPage ? "" : value} onCommit={onCommit} />
+      )}
+    </>
+  );
 }
 
 export const FormAfterSubmitSection: React.FC<FormAfterSubmitSectionProps> = ({
@@ -213,15 +251,9 @@ export const FormAfterSubmitSection: React.FC<FormAfterSubmitSectionProps> = ({
               onCommit={(v) => save({ successMessage: v })}
             />
           ) : (
-            <CommitRow
-              label="Redirect to"
-              type="text"
-              placeholder="/thanks or https://example.com/thanks"
-              value={settings.redirectUrl ?? ""}
-              onCommit={(v) => save({ redirectUrl: v })}
-            />
+            <RedirectRow composer={composer} value={settings.redirectUrl ?? ""} onCommit={(v) => save({ redirectUrl: v })} />
           )}
-          <SubSectionTitle>Notifications</SubSectionTitle>
+          <div className={GROUP_TITLE}>Notifications</div>
           {adminOnly ? (
             <NoteRow testId="form-after-submit-admin-only">Changing Send to needs Admin access.</NoteRow>
           ) : (
@@ -234,15 +266,19 @@ export const FormAfterSubmitSection: React.FC<FormAfterSubmitSectionProps> = ({
               onCommit={(v) => save({ notifyEmail: v })}
             />
           )}
-          <SubSectionTitle>Spam protection</SubSectionTitle>
+          <div className={GROUP_TITLE}>Spam protection</div>
           <NoteRow testId="form-spam-next-publish">Applies on next publish</NoteRow>
           <CheckRow
             label="Block automated submissions"
             checked={settings.spamProtection}
             onChange={(checked) => save({ spamProtection: checked })}
           />
-          <SubSectionTitle>Form settings status</SubSectionTitle>
-          <FormSettingsStatus status={status} />
+          <div className={GROUP_TITLE}>Form settings status</div>
+          {/* A Redirect with no destination is not saved, whether it was just
+              chosen or loaded that way (156:11319). */}
+          <FormSettingsStatus
+            status={status.kind === "saved" && settings.successAction === "REDIRECT" && !settings.redirectUrl ? { kind: "incomplete" } : status}
+          />
           <NoteRow testId="form-after-submit-note">Saved separately from page edits; outside document Undo.</NoteRow>
         </>
       )}

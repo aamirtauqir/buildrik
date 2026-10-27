@@ -12,7 +12,8 @@ import type { Composer } from "@/engine";
 import type { Element } from "@/engine/elements/Element";
 import { EVENTS } from "@/shared/constants/events";
 import { Button, Menu, MenuItem, Popover } from "@/editor/chrome-ui";
-import { Section, SubSectionTitle, type SectionTier } from "../shared/controls";
+import { Section, type SectionTier } from "../shared/controls";
+import { closeSubview, openSubview, useSubview } from "../tabs/subviewStore";
 import { NoteRow } from "./behaviourRows";
 import { writeElement } from "@/engine/commands/commandOperations";
 import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
@@ -79,9 +80,10 @@ const fieldSummary = (form: Element, el: Element, i: number) =>
 const ROW =
   "tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:justify-center tw:h-[52px] tw:px-1 tw:rounded-[4px] tw:cursor-pointer tw:select-none " +
   "tw:hover:bg-[var(--bk-bg-subtle)] tw:focus-visible:outline-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
+/* 2L9 156:3109: the types centred, 40 apart, 13 / ink. */
 const ADD_ROW =
-  "tw:flex tw:items-center tw:gap-1.5 tw:h-7 tw:px-2 tw:rounded-[4px] tw:cursor-pointer tw:select-none " +
-  "tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)] tw:hover:bg-[var(--bk-bg-subtle)] " +
+  "tw:flex tw:items-center tw:justify-center tw:h-10 tw:px-2 tw:rounded-[4px] tw:cursor-pointer tw:select-none " +
+  "tw:text-[13px] tw:leading-4 tw:text-[var(--bk-ink)] tw:hover:bg-[var(--bk-bg-subtle)] " +
   "tw:focus-visible:outline-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
 
 /** A field row's ⋯ — the keyboard route to the drag reorder (2L9 156:716:
@@ -129,7 +131,10 @@ function FieldMenu({ label, onUp, onDown, onDelete }: { label: string; onUp?: ()
 export const FormFieldsSection: React.FC<FormFieldsSectionProps> = ({ elementId, composer, isOpen, onToggle, tier = "tertiary" }) => {
   const [, refresh] = React.useReducer((n: number) => n + 1, 0);
   const [dragId, setDragId] = React.useState<string | null>(null);
-  const [adding, setAdding] = React.useState(false);
+  /* The Add field list is a Content subview: it replaces the tab's body. */
+  const subview = useSubview();
+  const adding = subview?.kind === "add-field" && subview.elementId === elementId;
+  const setAdding = (on: boolean) => (on ? openSubview({ kind: "add-field", elementId }) : closeSubview("add-field"));
   React.useEffect(() => {
     if (!composer) return;
     const evts = [EVENTS.ELEMENT_UPDATED, EVENTS.ELEMENT_CREATED, EVENTS.ELEMENT_DELETED, EVENTS.ELEMENT_MOVED] as const;
@@ -138,7 +143,6 @@ export const FormFieldsSection: React.FC<FormFieldsSectionProps> = ({ elementId,
       for (const e of evts) composer.off(e, refresh);
     };
   }, [composer]);
-  React.useEffect(() => setAdding(false), [elementId]);
 
   const form = composer?.elements.getElement(elementId);
   if (!composer || !form) return null;
@@ -259,20 +263,22 @@ export const FormFieldsSection: React.FC<FormFieldsSectionProps> = ({ elementId,
   );
 
   return (
-    <Section title="Fields" icon="List" isOpen={isOpen} onToggle={onToggle} tier={tier} id="inspector-section-form-fields">
+    <Section title="Fields" icon="List" isOpen={isOpen} onToggle={onToggle} tier={tier} id="inspector-section-form-fields" hideHeader={adding}>
       {adding ? (
         <div className="tw:flex tw:flex-col" data-testid="form-add-field-menu">
+          <div className="tw:flex tw:items-center tw:h-10 tw:text-[13px] tw:leading-4 tw:font-semibold tw:text-[var(--bk-ink)]" data-testid="form-add-field-title">
+            Add field
+          </div>
           <Button
             type="button"
             variant="link"
             size="xs"
             data-testid="form-add-field-back"
             onClick={() => setAdding(false)}
-            className="tw:self-center tw:h-7 tw:text-[12px] tw:font-normal"
+            className="tw:self-center tw:h-10 tw:text-[13px] tw:font-normal"
           >
             ‹ {getLayerName(form) ?? "Form"}
           </Button>
-          <SubSectionTitle>Add field</SubSectionTitle>
           <div role="group" aria-label="Add field" className="tw:flex tw:flex-col">
             {ADD_FIELD_TYPES.map((t) => (
               <div

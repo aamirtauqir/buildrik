@@ -147,9 +147,13 @@ describe("P-1 — structure writers refuse a locked form / slider", () => {
     const field = add("input", { attributes: { type: "text", name: "name" } }, form.getId());
     lock(field);
     render(
-      <TypeBlockSection composer={composer} element={{ id: field.getId(), type: "input" }} targetIds={[field.getId()]} styles={{}} onChange={() => {}} onBatchChange={() => {}} isOpen onToggle={() => {}} />,
+      <ToastProvider>
+        <TypeBlockSection composer={composer} element={{ id: field.getId(), type: "input" }} targetIds={[field.getId()]} styles={{}} onChange={() => {}} onBatchChange={() => {}} isOpen onToggle={() => {}} />
+      </ToastProvider>,
     );
-    fireEvent.change(screen.getByRole("combobox", { name: "Type" }), { target: { value: "email" } });
+    /* Type is the "Field type" card (2L9 170:121692). */
+    fireEvent.click(screen.getByTestId("form-field-type"));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Email" }));
     fireEvent.click(screen.getByRole("checkbox", { name: "Required" }));
     expect(field.getAttribute("type")).toBe("text");
     expect(field.getAttribute("required")).toBeUndefined();

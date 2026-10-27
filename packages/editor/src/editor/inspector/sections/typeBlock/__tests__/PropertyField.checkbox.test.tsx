@@ -7,11 +7,15 @@
  *
  * @license BSD-3-Clause
  */
-import { render, screen, fireEvent, cleanup } from "@testing-library/react";
+import { render as rtlRender, screen, fireEvent, cleanup } from "@testing-library/react";
+import { ToastProvider } from "@/editor/chrome-ui";
 import { afterEach, describe, expect, it } from "vitest";
 import { TypeBlockSection } from "../TypeBlockSection";
 import { AttributesSection } from "@/editor/inspector/sections/attributes/AttributesSection";
 import { makeMockElement, makeMockComposer } from "@/editor/inspector/__tests__/harness";
+
+/* The Field block's Type change answers with a receipt toast (2L9 F30). */
+const render = (ui: React.ReactElement) => rtlRender(ui, { wrapper: ToastProvider });
 
 function setup(type: string, attrs: Record<string, string> = {}) {
   const el = makeMockElement({ id: "e1", type, attrs });

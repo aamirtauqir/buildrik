@@ -105,6 +105,22 @@ const withVariants = () =>
 const withOverrides = (n: number) => makeInstance({ overrides: Array.from({ length: n }, (_, i) => ({ op: "replace", path: `#/style/p${i}`, value: "x" })) } as never);
 
 describe("ComponentRow — board 26", () => {
+  /* L2-028 (moved here with the name, from StatusMarks): a rename of the
+     main component shows without a reselect. */
+  it("follows a main-component rename", () => {
+    const component = makeComponent({ name: "Audit Feature Card" });
+    const composer = makeComposer({ component, instance: makeInstance() });
+    const handlers: Array<() => void> = [];
+    composer.on = vi.fn((evt: string, fn: () => void) => {
+      if (evt === EVENTS.COMPONENT_UPDATED) handlers.push(fn);
+    });
+    renderRow(composer);
+    expect(screen.getByTestId("component-identity")).toHaveTextContent("Audit Feature Card · instance");
+    composer.components.getComponent = vi.fn(() => ({ ...component, name: "Audit Card Renamed" }));
+    React.act(() => handlers.forEach((h) => h()));
+    expect(screen.getByTestId("component-identity")).toHaveTextContent("Audit Card Renamed · instance");
+  });
+
   it("renders nothing when the element is not a component instance", () => {
     const { container } = renderRow(makeComposer({ component: null, instance: null }));
     expect(container.querySelector('[data-testid="component-row"]')).toBeNull();
@@ -115,7 +131,7 @@ describe("ComponentRow — board 26", () => {
     const row = screen.getByTestId("component-row");
     const text = row.textContent ?? "";
     const at = [
-      "◇ Reservation banner · instance", "Component library · v4", "Variant", "Edit main component ›",
+      "Reservation banner · instance", "Component library · v4", "Variant", "Edit main component ›",
       "Reset to main component · 3 overrides", "Detach instance",
     ].map((t) => text.indexOf(t));
     expect(at.every((i) => i >= 0)).toBe(true);

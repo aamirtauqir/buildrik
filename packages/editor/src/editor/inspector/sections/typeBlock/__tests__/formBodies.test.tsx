@@ -7,12 +7,16 @@
  * @license BSD-3-Clause
  */
 
-import { render, screen, fireEvent, cleanup } from "@testing-library/react";
+import { render as rtlRender, screen, fireEvent, cleanup } from "@testing-library/react";
+import { ToastProvider } from "@/editor/chrome-ui";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { TypeBlockSection } from "../TypeBlockSection";
 import { makeMockComposer, makeMockElement } from "@/editor/inspector/__tests__/harness";
 import { createTestComposer, installEngineBrowserStubs, removeEngineBrowserStubs } from "@/engine/__tests__/test-utils/realComposer";
 import type { Composer } from "@/engine/Composer";
+
+/* The Field block's Type change answers with a receipt toast (2L9 F30). */
+const render = (ui: React.ReactElement) => rtlRender(ui, { wrapper: ToastProvider });
 
 beforeAll(installEngineBrowserStubs);
 afterAll(removeEngineBrowserStubs);
@@ -56,7 +60,9 @@ describe("Input (board 14)", () => {
     mock();
     expect(document.querySelector("#inspector-section-type")?.textContent).toMatch(/^Field/);
     inOrder(blockText(), ["Type", "Label", "Placeholder", "Name", "Name is the key stored with each submission.", "Required", "Default value"]);
-    for (const l of ["Type", "Label", "Placeholder", "Name", "Default value"]) expect(screen.getByLabelText(l)).toBeInTheDocument();
+    for (const l of ["Label", "Placeholder", "Name", "Default value"]) expect(screen.getByLabelText(l)).toBeInTheDocument();
+    /* Type opens the "Field type" card (2L9 170:121692). */
+    expect(screen.getByTestId("form-field-type")).toHaveTextContent("Text");
     /* Disabled is an Advanced attribute now (no board draws it here). */
     expect(screen.queryByRole("checkbox", { name: "Disabled" })).toBeNull();
   });
@@ -70,7 +76,8 @@ describe("Input (board 14)", () => {
 
   it("the type writes the type attribute in one transaction", () => {
     const { el, composer } = mock();
-    fireEvent.change(screen.getByLabelText("Type"), { target: { value: "email" } });
+    fireEvent.click(screen.getByTestId("form-field-type"));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Email" }));
     expect(el.setAttribute).toHaveBeenCalledWith("type", "email");
     expect(composer.beginTransaction).toHaveBeenCalledWith("field-type");
   });

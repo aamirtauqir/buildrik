@@ -6,13 +6,17 @@
  *
  * @license BSD-3-Clause
  */
-import { render, screen, fireEvent, act } from "@testing-library/react";
+import { render as rtlRender, screen, fireEvent, act } from "@testing-library/react";
+import { ToastProvider } from "@/editor/chrome-ui";
 import { describe, it, expect, beforeAll } from "vitest";
 import { Composer } from "@/engine/Composer";
 import { FormFieldsSection } from "../FormFieldsSection";
 import { formFields } from "../formFieldModel";
 import { SlidesSection } from "../SlidesSection";
 import { TypeBlockSection } from "../typeBlock/TypeBlockSection";
+
+/* The Field block's Type change answers with a receipt toast (2L9 F30). */
+const render = (ui: React.ReactElement) => rtlRender(ui, { wrapper: ToastProvider });
 
 beforeAll(() => {
   HTMLCanvasElement.prototype.getContext = (() => ({
@@ -208,11 +212,25 @@ describe("Form › FIELDS (2L9 156:716)", () => {
     it("Type swaps an input for a textarea and the selection follows it", () => {
       const composer = make();
       field(composer, "email");
-      act(() => { fireEvent.change(screen.getByLabelText("Type"), { target: { value: "textarea" } }); });
+      fireEvent.click(screen.getByTestId("form-field-type"));
+      act(() => { fireEvent.click(screen.getByRole("menuitem", { name: "Textarea" })); });
       const fields = formFields(composer.elements.getElement("f")!);
       expect(fields[1].getTagName().toLowerCase()).toBe("textarea");
       expect(fields[1].getAttribute("placeholder")).toBe("Email");
       expect(composer.selection.getSelectedIds()).toEqual([fields[1].getId()]);
+    });
+
+    it("2L9 F29/F30: the Field type card lists the types and Cancel; a change applies with 'Field type changed to Text · Undo'", () => {
+      const composer = make();
+      field(composer, "email");
+      fireEvent.click(screen.getByTestId("form-field-type"));
+      expect(screen.getByText("Field type", { selector: "div" })).toBeInTheDocument();
+      expect(screen.getByRole("menuitem", { name: "Cancel" })).toBeInTheDocument();
+      act(() => { fireEvent.click(screen.getByRole("menuitem", { name: "Text" })); });
+      expect(composer.elements.getElement("email")?.getAttribute("type")).toBe("text");
+      expect(screen.getByText("Field type changed to Text")).toBeInTheDocument();
+      act(() => { fireEvent.click(screen.getByRole("button", { name: "Undo" })); });
+      expect(composer.elements.getElement("email")?.getAttribute("type")).toBe("email");
     });
 
     it("Default value and Required write the field, one undo step each", () => {

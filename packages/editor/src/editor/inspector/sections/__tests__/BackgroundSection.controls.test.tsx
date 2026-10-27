@@ -147,14 +147,14 @@ describe("BackgroundSection — a gradient of more than two stops is kept (247:2
   it("Edit custom gradient writes the edited text on blur, and nothing for text that is not a gradient", () => {
     const { onChange } = renderBg({ styles: { background: THREE } });
     fireEvent.click(screen.getByRole("button", { name: "Edit custom gradient" }));
-    const box = screen.getByRole("textbox", { name: "Custom gradient" });
+    const box = screen.getByRole("textbox", { name: "Saved gradient" });
     fireEvent.change(box, { target: { value: "not a gradient" } });
     fireEvent.blur(box);
     expect(onChange).not.toHaveBeenCalled();
     fireEvent.click(screen.getByRole("button", { name: "Edit custom gradient" }));
     const next = "linear-gradient(90deg, #000000 0%, #888888 50%, #ffffff 100%)";
-    fireEvent.change(screen.getByRole("textbox", { name: "Custom gradient" }), { target: { value: next } });
-    fireEvent.blur(screen.getByRole("textbox", { name: "Custom gradient" }));
+    fireEvent.change(screen.getByRole("textbox", { name: "Saved gradient" }), { target: { value: next } });
+    fireEvent.blur(screen.getByRole("textbox", { name: "Saved gradient" }));
     expect(onChange).toHaveBeenCalledWith("background", next);
   });
 });

@@ -83,8 +83,10 @@ describe("Form › AFTER SUBMIT + PROTECTION", () => {
     fireEvent.change(screen.getByLabelText("Then"), { target: { value: "REDIRECT" } });
     await waitFor(() => screen.getByLabelText("Redirect to"));
 
-    fireEvent.change(screen.getByLabelText("Redirect to"), { target: { value: "https://example.com/thanks" } });
-    fireEvent.blur(screen.getByLabelText("Redirect to"));
+    /* 156:11319: the select's "Custom URL…" opens the URL row. */
+    fireEvent.change(screen.getByLabelText("Redirect to"), { target: { value: "__custom" } });
+    fireEvent.change(screen.getByLabelText("URL"), { target: { value: "https://example.com/thanks" } });
+    fireEvent.blur(screen.getByLabelText("URL"));
     await waitFor(() => expect(api.forms.updateBlock.mutate).toHaveBeenCalledWith(
       expect.objectContaining({
         siteId: "s1",
@@ -231,6 +233,30 @@ describe("Form › AFTER SUBMIT + PROTECTION", () => {
     await waitFor(() => screen.getByLabelText("Then"));
     fireEvent.change(screen.getByLabelText("Then"), { target: { value: "REDIRECT" } });
     expect(screen.getByTestId("form-settings-status")).toHaveTextContent("Choose a destination to save");
+  });
+
+  it("F19: Redirect to lists the site's pages, writes a page's served path, and keeps an outside URL as Custom", async () => {
+    const composer = project();
+    composer.elements.createPage("Thanks");
+    const thanks = composer.elements.getAllPages().find((p) => p.name === "Thanks")!;
+    composer.elements.updatePage?.(thanks.id, { slug: "thanks" } as never);
+    render(<FormAfterSubmitSection elementId="f" composer={composer} isOpen />);
+    await waitFor(() => screen.getByLabelText("Then"));
+    fireEvent.change(screen.getByLabelText("Then"), { target: { value: "REDIRECT" } });
+    const select = screen.getByLabelText("Redirect to") as HTMLSelectElement;
+    expect(Array.from(select.options).map((o) => o.textContent)).toEqual(expect.arrayContaining(["Home", "Thanks", "Custom URL…"]));
+    const thanksPath = Array.from(select.options).find((o) => o.textContent === "Thanks")!.value;
+    fireEvent.change(select, { target: { value: thanksPath } });
+    await waitFor(() => expect(api.forms.updateBlock.mutate).toHaveBeenCalledWith(expect.objectContaining({ successAction: "REDIRECT", redirectUrl: thanksPath })));
+    expect(thanksPath).toMatch(/^\/.+\.html$/);
+  });
+
+  it("F19: a loaded outside URL reads as Custom URL with its value", async () => {
+    api.forms.getBlock.query.mockResolvedValue({ ...defaults, successAction: "REDIRECT", redirectUrl: "https://example.com/thanks" });
+    render(<FormAfterSubmitSection elementId="f" composer={project()} isOpen />);
+    await waitFor(() => screen.getByLabelText("Redirect to"));
+    expect(screen.getByLabelText("Redirect to")).toHaveValue("__custom");
+    expect(screen.getByLabelText("URL")).toHaveValue("https://example.com/thanks");
   });
 
   it("F16: loading reads 'Loading form settings…'", () => {

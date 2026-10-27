@@ -50,13 +50,14 @@ export function CommitRow({ label, value, onCommit, placeholder, type, testId, c
   };
   return (
     <div className={stacked ? "tw:flex tw:flex-col tw:gap-2 tw:py-2" : "bdi-row-ctrl"} data-testid={testId}>
-      <label className="bdi-lb" htmlFor={id}>
+      {/* Stacked (2L9 156:6055 "Message"): a 13 / muted label over a 36 tall box. */}
+      <label className={stacked ? "tw:text-[13px] tw:leading-4 tw:font-normal tw:text-[var(--bk-ink-muted)]" : "bdi-lb"} htmlFor={id}>
         {label}
       </label>
       <div className="bdi-row-content">
         <TextField
           id={id}
-          className="bdi-text"
+          className={stacked ? "tw:bg-[var(--bk-bg-subtle)]! tw:rounded-[4px]! tw:border-[var(--bk-border)]!" : "bdi-text"}
           readOnly={readOnly}
           type={type}
           list={suggestions?.length ? listId : undefined}
