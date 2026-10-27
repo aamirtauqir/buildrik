@@ -187,42 +187,30 @@ export const PageList: React.FC<Props> = ({
     );
   }
 
-  const showSelectAll = selectedIds.size > 0;
-  const allSelected = selectedIds.size === pages.length && pages.length > 0;
+  /* Board 139:47668 draws no "Select all" band; ⌘A / Ctrl+A in the list
+     still ticks every page once a selection has started. */
+  const selectAll = (e: React.KeyboardEvent) => {
+    if (selectedIds.size === 0 || !(e.metaKey || e.ctrlKey) || e.key.toLowerCase() !== "a") return;
+    if ((e.target as HTMLElement).closest("input, textarea, [contenteditable='true']")) return;
+    e.preventDefault();
+    pages.forEach((p) => {
+      if (!selectedIds.has(p.id)) onToggleSelect(p.id, {} as React.MouseEvent);
+    });
+  };
 
   return (
-    <div className="bd-pg-list-shell">
-      {showSelectAll && (
-        <div
-          className="bd-pg-selectall"
-          role="button"
-          tabIndex={0}
-          aria-label={`Select all ${pages.length} pages`}
-          onClick={() => {
-            if (allSelected) {
-              onClearSelection();
-            } else {
-              pages.forEach((p) => {
-                if (!selectedIds.has(p.id)) onToggleSelect(p.id, {} as React.MouseEvent);
-              });
-            }
-          }}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") (e.currentTarget as HTMLElement).click();
-          }}
-        >
-          <span
-            className={`bd-pg-selectall-checkbox${allSelected ? " on" : ""}`}
-            aria-hidden="true"
-          >
-            {allSelected ? (
-              <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
-                <polyline points="4 12 10 18 20 6" />
-              </svg>
-            ) : null}
-          </span>
-          <span>Select all ({pages.length} page{pages.length !== 1 ? "s" : ""})</span>
-        </div>
+    <div className="bd-pg-list-shell" onKeyDown={selectAll}>
+      {selectedIds.size >= 1 && (
+        <BulkToolbar
+          selectedCount={selectedIds.size}
+          selectedNames={pages.filter((p) => selectedIds.has(p.id)).map((p) => p.name)}
+          folders={folders}
+          onDuplicate={onBulkDuplicate}
+          onMoveToFolder={onBulkMoveToFolder}
+          onRemoveFromFolders={onBulkRemoveFromFolders}
+          onDelete={onBulkDelete}
+          onClear={onClearSelection}
+        />
       )}
       {/* Board 141:203 draws the error as a full-width band between the search
           row and the Add-page foot — a SIBLING of the tree, not a child of it.
@@ -406,26 +394,10 @@ export const PageList: React.FC<Props> = ({
         <div className="bd-pg-drop-indicator" aria-hidden="true" />
       </div>
       )}
-      {/* Board 141:78: the band appears with ANY checkbox selection —
-          it replaces the Add-page footer. */}
-      {selectedIds.size >= 1 && (
-        <BulkToolbar
-          selectedCount={selectedIds.size}
-          selectedNames={pages.filter((p) => selectedIds.has(p.id)).map((p) => p.name)}
-          folders={folders}
-          onDuplicate={onBulkDuplicate}
-          onMoveToFolder={onBulkMoveToFolder}
-          onRemoveFromFolders={onBulkRemoveFromFolders}
-          onDelete={onBulkDelete}
-        />
-      )}
-      {/* Board 140:38 footer vs board 141:78: when a bulk selection is
-          active the bottom band IS the bulk bar — otherwise "+  Add page". */}
-      {selectedIds.size === 0 && (
-        <div className="bd-pg-footer" data-testid="pages-footer">
-          <AddPageButton onAddBlank={onAddPage} onFromTemplate={onRequestTemplates} onAddFolder={onAddFolder} />
-        </div>
-      )}
+      {/* Board 139:47668: the footer stays while pages are ticked. */}
+      <div className="bd-pg-footer" data-testid="pages-footer">
+        <AddPageButton onAddBlank={onAddPage} onFromTemplate={onRequestTemplates} onAddFolder={onAddFolder} />
+      </div>
     </div>
   );
 };

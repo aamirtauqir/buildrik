@@ -28,7 +28,9 @@ L3-2. **lead3 (wave 3) · AquibraStudio.tsx (banner slot DOM order)** · same mo
 
 A-17. **L-A → owner · Pages "order commands" menu** · boards 137:55343 / 137:56060 / 137:56781 (B3-P130–132) draw a separate 280-wide menu beside the row — the page's name as its title, Move up ⌥↑, Move down ⌥↓ (disabled + reason at a boundary), Close menu — but no board shows what opens it: the row ⋯ opens the full menu (63:13820), which already carries Move up / Move down with the boundary reasons. Which control opens the order-commands menu (a drag handle, a key, a "Reorder…" item)? Until answered the moves stay in the row menu and the three rows stay drift-open.
 
-A-18. **L-A → lead · `shell/StudioPanels.tsx` (Pages drawer width)** · in the Listings view the Pages drawer is 720 wide, floating over the canvas with the canvas still visible to its right (board 63:21262: x56–776) · StudioPanels passes `isExpanded={false}` / `onExpandToggle={() => {}}`, so nothing can widen it from the tab. PagesTab knows the view: a `view === "listings"` callback (or honouring `onExpandToggle`) is all the tab needs. The table is built and probe-compared at 720.
+A-18. ~~**L-A → lead · Pages drawer width for Listings**~~ · closed by L-A without a shell change: LeftSidebar already passes a working `onExpandToggle` (280 ↔ 700) through TabRouter's commonTabProps; PagesTab now widens on entering Listings and narrows on leaving if it widened (test PagesTab.listingsWidth). 700 vs the board's ~720 is LeftSidebar's `panelWidthOverride`.
+
+A-19. **L-A → lead · `chrome-ui/PanelFrame` header + PanelSearch band** · boards 63:6393 / 63:21262 / 7:18981 draw the drawer header 56 tall (title baseline ~28, rule at 56); PanelFrame.Header is 44, so every drawer body sits 12px high. The search band insets its field 12 on the boards, 16 in code. Shared by every drawer — one lane should not move them all.
 
 
 

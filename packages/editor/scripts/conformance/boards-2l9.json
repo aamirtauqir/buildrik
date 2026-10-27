@@ -144,8 +144,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "lead4 2026-10-27 (A-15): PanelSearch is the boards’ field — gray-100 fill, no edge, radius 6, glyph 8 in, text at 32, 32 tall (probe layers-tree: computed bg rgb(243,244,246), border transparent, pl 32; board fill #F3F4F6, glyph ≈8, text ≈33). | probe-compared 2026-10-27 (case pages-manager, 284×812, shots/63-6393.png) for the list: rows 40+ tall with glyph, name over URL, 'Hidden from publish' third line, 'Current' tag on the tinted open row, ⋯ always drawn; legend under the rows; 'My folders' / 'Only visible to you' heading; folder row 'Studio · 1 page · Folder · ⋯' (no disclosure — the row toggles), member 'Legal /legal · In Studio'; Collection pages gray card with a white row and Open page · Manage in CMS; footer full-width '+ Add page' then From template · New folder. Not probe-rendered: the header 'Pages · n' and the gray-well view tabs (PagesTab needs a composer); search field fill is chrome-ui PanelSearch (REQUESTS A-15). The collection row's ⋯ is not drawn: it would have no actions.",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case pages-tab: the real PagesTab on a real Composer, 284×812, shots/63-6393.png) for the whole panel: 'Pages · 5' + ⋯ + ✕, search band, Pages · Listings · Structure as a gray well with the chosen view on a white chip at inset 12, rows (glyph, name over URL, 'Current' on the tinted open row, ⋯), legend, footer '+ Add page' over From template · New folder. Earlier probe (pages-manager) covered folders and the Collection pages card. Open, shared chrome-ui (REQUESTS A-19): header 44 tall vs the board's 56, search field inset 16 vs 12.",
    "tier": "P1"
   },
   {
@@ -289,7 +289,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-fixed",
-   "verifiedNote": "probe-compared 2026-10-27 (case pages-listings, real PagesTab on a real Composer at 720 wide, board shots/63-21262.png): 40-tall header 13/600 ink, columns at x476 SEO score / x556 Visibility / ⋯ (board same), 52-tall rows with Home roof / page glyph, name 13 over URL 12 sans, score/visibility 13px, row ⋯ opens the page menu, note under the last row, Pages footer (+ Add page / From template / New folder) kept under the listing. Dead 'Open full listings ›' removed (the shell's toggle is a no-op). Open: the drawer widening to 720 over the canvas is the shell's (REQUESTS A-18); vertical offset of 9px is the shared PanelFrame header (44 vs board 56).",
+   "verifiedNote": "probe-compared 2026-10-27 (case pages-listings, real PagesTab on a real Composer at 720 wide, board shots/63-21262.png): 40-tall header 13/600 ink, columns at x476 SEO score / x556 Visibility / ⋯ (board same), 52-tall rows with Home roof / page glyph, name 13 over URL 12 sans, score/visibility 13px, row ⋯ opens the page menu, note under the last row, Pages footer kept under the listing. Entering Listings widens the drawer (LeftSidebar's expand, 700 vs board ~720) and leaving narrows it again (PagesTab.listingsWidth test); the separate 'Open full listings ›' link is gone. Open: 9px vertical offset is the shared PanelFrame header (REQUESTS A-19).",
    "tier": "P1"
   },
   {
@@ -1668,8 +1668,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Board adds 'Clear' to the bar; code relies on header Done",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case pages-bulk-select, board shots/139-47668.png): the bulk band moved from a dark bottom bar to a gray-100 band under the view tabs, 66 tall (board 63): '3 selected' 13/600 + Clear (ends the selection), then Duplicate · Move to… · Delete (error red) as three equal actions; the Pages footer stays; the header keeps ⋯ while pages are ticked (Done only in select mode with nothing ticked). The 'Select all (n pages)' band is not drawn — ⌘A / Ctrl+A in the list still ticks every page.",
    "tier": "P1"
   },
   {

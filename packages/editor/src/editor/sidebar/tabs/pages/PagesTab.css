@@ -25,36 +25,6 @@
 
 /* PanelShell.Header owns header chrome; no .bd-pg-header rules needed. */
 
-.bd-pg-selectall {
-  display: flex;
-  align-items: center;
-  gap: var(--bk-space-8);
-  height: 28px;
-  padding: 0 var(--bk-space-12);
-  margin: 0 6px var(--bk-space-4);
-  border-radius: 4px;
-  background: var(--bk-bg-subtle);
-  cursor: pointer;
-  font: 500 var(--bk-text-12) var(--bk-font-ui);
-  /* ink-soft, not ink-muted: measured 4.39:1 on this band's own bg-subtle
-     ground, under the 4.5 floor. No board draws this row — it is the code's
-     own affordance — so nothing was traded away by raising it. */
-  color: var(--bk-ink-soft);
-}
-.bd-pg-selectall:hover { background: rgba(15, 23, 42, 0.06); color: var(--bk-ink); }
-.bd-pg-selectall-checkbox {
-  width: 14px; height: 14px;
-  display: grid;
-  place-items: center;
-  border-radius: 3px;
-  border: 1.5px solid var(--bk-border-medium);
-  background: var(--bk-bg-card);
-}
-.bd-pg-selectall-checkbox.on {
-  background: var(--bk-accent);
-  border-color: var(--bk-accent);
-  color: var(--bk-accent-on);
-}
 /* .bd-pg-add-ghost (+ :hover) removed 2026-05-24 — JSX consumer deleted
    in earlier Pages refactor; CSS left orphan. */
 
@@ -341,45 +311,6 @@
   background: var(--bk-bg-panel);
 }
 
-/* ─── BULK TOOLBAR (dark floating pill) ───────────────────────────────── */
-.bd-pg-bulk-toolbar {
-  /* Board 141:119: a full-width 44-tall band on ink pinned at the bottom — it
-     takes the footer's place while a selection is active. */
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  align-items: center;
-  gap: var(--bk-space-8);
-  height: 44px; padding: 0 var(--bk-space-16);
-  background: var(--bk-ink);
-  /* Board 141:119 sets the type and the ink on the BAND, not on the count —
-     every label on it is 12/18 card-white, and the count was the only child
-     that said so. */
-  color: var(--bk-bg-card);
-  font: 400 12px/18px var(--bk-font-ui);
-  z-index: 10;
-}
-.bd-pg-bulk-count {
-  white-space: nowrap;
-}
-.bd-pg-bulk-count b { color: var(--bk-bg-card); font-weight: 500; }
-.bd-pg-bulk-toolbar button {
-  /* Board 141:120-123: plain 12px card-white text actions on the ink band. */
-  padding: var(--bk-space-4) var(--bk-space-8);
-  border-radius: var(--bk-radius-md);
-  background: transparent;
-  color: var(--bk-bg-card);
-  border: 0;
-  font: 400 12px/18px var(--bk-font-ui);
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background 100ms;
-}
-.bd-pg-bulk-toolbar button:hover { background: var(--bk-gray-700); color: var(--bk-bg-card); }
-.bd-pg-bulk-toolbar button.danger { color: var(--bk-red-500); }
-.bd-pg-bulk-toolbar button.danger:hover { background: var(--bk-gray-700); color: var(--bk-red-500); }
 .bd-pg-drawer-scrim {
   position: fixed;
   inset: 0;
@@ -509,7 +440,6 @@
 /* ─── A11Y FOCUS RING ─────────────────────────────────────────────────── */
 .bd-pg-row:focus-visible,
 .bd-pg-row-overflow:focus-visible,
-.bd-pg-bulk-toolbar button:focus-visible,
 .bd-pg-drawer-back:focus-visible,
 .bd-pg-drawer-save:focus-visible,
 .bd-pg-drawer-tab:focus-visible {

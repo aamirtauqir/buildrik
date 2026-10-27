@@ -190,6 +190,24 @@ export const PagesTab: React.FC<PagesTabProps> = ({
   // and the whole-site search-listings table ("Search listings"). Default to the
   // tree; the table is the SEO-at-a-glance view that scales past a few pages.
   const [view, setView] = React.useState<PageView>("pages");
+  /* Board 63:21262 draws Listings in the wide drawer, Pages and Structure in
+     the narrow one. Only a CHANGE of view moves the width, and the drawer
+     narrows again only if Listings widened it — "Narrow panel" / "Widen
+     panel" in ⋯ still win while a view is showing. */
+  const viewRef = React.useRef(view);
+  const widenedForListings = React.useRef(false);
+  React.useEffect(() => {
+    if (viewRef.current === view) return;
+    viewRef.current = view;
+    if (!onExpandToggle) return;
+    if (view === "listings" && !isExpanded) {
+      widenedForListings.current = true;
+      onExpandToggle();
+    } else if (view !== "listings" && isExpanded && widenedForListings.current) {
+      widenedForListings.current = false;
+      onExpandToggle();
+    }
+  }, [view, isExpanded, onExpandToggle]);
 
   /* Board 7069:79383 "Pages · Panel menu (⋯)": Select pages… · Show structure ·
      Reload, plus the Listings row (EP-11, 7576:197553). Listings and Structure
@@ -478,7 +496,10 @@ export const PagesTab: React.FC<PagesTabProps> = ({
         onClose={onClose}
         actions={
           <>
-            {bulkMode ? (
+            {/* Board 139:47668: with pages ticked the header keeps ⋯ and the
+                bulk band's Clear ends the selection; Done is select mode
+                with nothing ticked yet. */}
+            {bulkMode && !bulk.hasSelection ? (
               /* v3 7069:78984: select mode swaps the ⋯ for "Done". */
               <Button
                 color="light"
