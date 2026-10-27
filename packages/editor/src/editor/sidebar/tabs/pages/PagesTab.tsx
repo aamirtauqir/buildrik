@@ -403,7 +403,8 @@ export const PagesTab: React.FC<PagesTabProps> = ({
      pages (folder members are not ordered). The engine orders the whole site
      ("after <id>"), so moving above the previous top-level page lands after
      whatever precedes it in site order. Page order is not in the composer's
-     history, so the receipt carries no Undo (REQUESTS #13). */
+     history, so the receipt's Undo puts the page back after its old
+     neighbour itself. */
   const { addToast } = useToast();
   const rootIds = React.useMemo(
     () => p.pages.filter((pg) => !f.pageToFolder.has(pg.id)).map((pg) => pg.id),
@@ -412,12 +413,17 @@ export const PagesTab: React.FC<PagesTabProps> = ({
   const movePage = React.useCallback(
     (pageId: string, direction: -1 | 1) => {
       const page = p.pages.find((pg) => pg.id === pageId);
-      const move = rootMove(p.pages.map((pg) => pg.id), rootIds, pageId, direction);
+      const order = p.pages.map((pg) => pg.id);
+      const move = rootMove(order, rootIds, pageId, direction);
       if (!composer || !page || !move) return;
+      /* Where it sat, so Undo can put it back (boards 137:53911 / 137:59625). */
+      const at = order.indexOf(pageId);
+      const wasAfter = at > 0 ? order[at - 1] : null;
       if (!composer.elements.reorderPage(pageId, move.afterId)) return;
       addToast({
         description: `${page.name} moved to position ${move.position}${page.isHome ? " · Still the homepage" : ""}`,
         tone: "info",
+        action: { label: "Undo", onClick: () => { composer.elements.reorderPage(pageId, wasAfter); } },
       });
     },
     [composer, p.pages, rootIds, addToast],

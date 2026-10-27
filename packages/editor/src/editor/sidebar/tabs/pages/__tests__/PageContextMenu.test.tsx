@@ -192,12 +192,13 @@ describe("PageContextMenu — 6883:69130", () => {
 
   /* design-2l9 boards 63:13820 / 131:41791 / 137:55343. Re-baseline: page row
      menu (was Rename… → Page settings… with no move or template rows). */
-  it("lists the board's rows in its order, bare — no chord hints (63:13820)", () => {
+  // re-baseline: page row menu — owner A-17: Move up / Move down carry ⌥↑ / ⌥↓ (boards 137:55343 / 137:56781); the rest stays bare (63:13820).
+  it("lists the board's rows in its order; only the order commands show chords", () => {
     render(<PageContextMenu pageId="p2" {...baseProps} />);
     const rows = screen.getAllByRole("menuitem").map((r) => r.textContent?.trim());
     expect(rows).toEqual([
       "Rename…", "Duplicate", "Set as homepage", "Replace layout with template…", "Save as template…",
-      "Move to folder…", "Move up", "Move down", "Copy link", "Page settings ›", "Delete page",
+      "Move to folder…", "Move up⌥↑", "Move down⌥↓", "Copy link", "Page settings ›", "Delete page",
     ]);
   });
 
@@ -227,5 +228,16 @@ describe("PageContextMenu — 6883:69130", () => {
     expect(screen.getByTestId("pages-menu-move-reason").textContent).toBe("About is the last top-level page.");
     rerender(<PageContextMenu pageId="p2" {...baseProps} rootPosition={null} folderName="Studio" />);
     expect(screen.getByTestId("pages-menu-move-reason").textContent).toBe("Pages in a folder can’t be reordered.");
+  });
+
+  it("puts the reason under the move it blocks (137:56781 first · 137:56060 last)", () => {
+    const follows = (a: Element, b: Element) => !!(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
+    const { rerender } = render(<PageContextMenu pageId="p1" {...baseProps} rootPosition={{ index: 0, count: 3 }} />);
+    let reason = screen.getByTestId("pages-menu-move-reason");
+    expect(follows(screen.getByTestId("pages-menu-move-up"), reason)).toBe(true);
+    expect(follows(reason, screen.getByTestId("pages-menu-move-down"))).toBe(true);
+    rerender(<PageContextMenu pageId="p2" {...baseProps} rootPosition={{ index: 2, count: 3 }} />);
+    reason = screen.getByTestId("pages-menu-move-reason");
+    expect(follows(screen.getByTestId("pages-menu-move-down"), reason)).toBe(true);
   });
 });
