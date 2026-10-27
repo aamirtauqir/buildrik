@@ -64,9 +64,10 @@ export const PanelSearch = React.forwardRef<HTMLInputElement, PanelSearchProps>(
   ref,
 ) {
   return (
-    /* 4px grid: 16 in from the drawer edges like the header and rows, 8 above
-       and below — a 48 band holding the 32-tall input. */
-    <div className={["tw:relative tw:flex-none tw:px-4 tw:py-2", className].filter(Boolean).join(" ")} data-testid={testId}>
+    /* design-2l9 drawers (63:6393, 147:75914): 12 in from the drawer edges
+       like the header title, 8 above and below — a 48 band holding the
+       32-tall input. REQUESTS A-19. */
+    <div className={["tw:relative tw:flex-none tw:px-3 tw:py-2", className].filter(Boolean).join(" ")} data-testid={testId}>
       <TextInput
         ref={ref}
         type="text"
@@ -85,7 +86,7 @@ export const PanelSearch = React.forwardRef<HTMLInputElement, PanelSearchProps>(
         data-testid={`${testId}-input`}
         theme={SEARCH_THEME}
       />
-      <span className="tw:absolute tw:right-5 tw:top-1/2 tw:flex tw:-translate-y-1/2 tw:items-center">
+      <span className="tw:absolute tw:right-4 tw:top-1/2 tw:flex tw:-translate-y-1/2 tw:items-center">
         {value ? (
           <IconButton
             label="Clear search"

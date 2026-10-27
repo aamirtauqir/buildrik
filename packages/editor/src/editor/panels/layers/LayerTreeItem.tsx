@@ -143,9 +143,10 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
      from the drawer edge — base 16, step 16. The first 16 is the selection
      checkbox's gutter (see LayerTreeItem.indent.test.tsx). */
   const rowStyle: React.CSSProperties = {
-    /* design-2l9 147:75914: the page row sits at the top, so its children's
-       chevrons start at 28 (then 16 a level). */
-    paddingLeft: `${28 + layer.depth * 16}px`,
+    /* design-2l9 147:75914 / 152:78614 (measured 2026-10-27): under the page
+       row, depth 0's chevron is CENTRED at 28 — a 16 box from 20 — then 16 a
+       level. */
+    paddingLeft: `${20 + layer.depth * 16}px`,
     /* A search result carries its path on a second line (147:77189). */
     ...(layer.searchPath ? { height: "auto", flexWrap: "wrap" } : {}),
   };

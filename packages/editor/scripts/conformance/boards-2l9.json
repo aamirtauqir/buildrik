@@ -22,7 +22,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-fixed",
-   "verifiedNote": "probe-compared 2026-10-27 (case add-panel-target, real Composer with Hero selected, board shots/7-18981.png): 'Search elements' (no ellipsis, no ⌘F chip — the shortcut still works); Elements · Blocks · Components as a segmented control on a gray card at y101, 256×32, active tab white; 'Insert into Hero' / 'Home / Hero · At end' as the card's lower half (13/12px), card 84 tall like the board; category headers 12/600 ink, 20 tall, no chevron or count (▸ only when collapsed), first at y186 (board 186); rows 32 tall, inset 12, rounded 6, icon at 24. Row list is the code catalog (board's sample order not conformed). Open: panel ✕ in the header comes from the shell's onClose (StudioPanels, not L-A); PanelSearch inset 16 vs board ~10 is the shared chrome-ui field (lead4).",
+   "verifiedNote": "probe-compared 2026-10-27 (case add-panel-target, real Composer with Hero selected, board shots/7-18981.png): 'Search elements' (no ellipsis, no ⌘F chip — the shortcut still works); Elements · Blocks · Components as a segmented control on a gray card at y101, 256×32, active tab white; 'Insert into Hero' / 'Home / Hero · At end' as the card's lower half (13/12px), card 84 tall like the board; category headers 12/600 ink, 20 tall, no chevron or count (▸ only when collapsed), first at y186 (board 186); rows 32 tall, inset 12, rounded 6, icon at 24. Row list is the code catalog (board's sample order not conformed). Open: panel ✕ in the header comes from the shell's onClose (StudioPanels, not L-A); search field now 12 in (A-19) vs the board's ~8.",
    "tier": "P1"
   },
   {
@@ -145,7 +145,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-fixed",
-   "verifiedNote": "probe-compared 2026-10-27 (case pages-tab: the real PagesTab on a real Composer, 284×812, shots/63-6393.png) for the whole panel: 'Pages · 5' + ⋯ + ✕, search band, Pages · Listings · Structure as a gray well with the chosen view on a white chip at inset 12, rows (glyph, name over URL, 'Current' on the tinted open row, ⋯), legend, footer '+ Add page' over From template · New folder. Earlier probe (pages-manager) covered folders and the Collection pages card. Open, shared chrome-ui (REQUESTS A-19): header 44 tall vs the board's 56, search field inset 16 vs 12.",
+   "verifiedNote": "probe-compared 2026-10-27 (case pages-tab: the real PagesTab on a real Composer, 284×812, shots/63-6393.png) for the whole panel: 'Pages · 5' + ⋯ + ✕, search band, Pages · Listings · Structure as a gray well with the chosen view on a white chip at inset 12, rows (glyph, name over URL, 'Current' on the tinted open row, ⋯), legend, footer '+ Add page' over From template · New folder. Earlier probe (pages-manager) covered folders and the Collection pages card. A-19 (2026-10-27, case pages-shell — the real LayoutShell + LeftSidebar, measured at 1440 and 1024): the boards' drawer head is 44-equivalent with NO rule under it (the earlier '56' was the topbar's), title 12 in, search field 12 in (Add's board ~8) — now title 12, field 12, rule gone; every drawer fits at 1024 with no horizontal overflow.",
    "tier": "P1"
   },
   {
@@ -221,8 +221,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-A S9: redirect offer's second action reads 'Later'. Container (modal vs drawer) is the open owner decision.",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case pages-settings-redirect: About renamed 'Our story', previousSlug about; board shots/63-17617.png): the redirect offer moved from a card beside Page URL to a plain line under Search indexing — 'URL changed from /about to /our-story. Add a redirect so old links keep working?' 12px soft ink, outlined white 'Add redirect' + 'Later' — in Site SEO defaults' place while it is open; SEO score details and the scope note follow. Not conformed: the '▷ Regenerate' AI link beside SEO title is not on the board (owner's no-AI-in-UI call, flagged in the report).",
    "tier": "P1"
   },
   {
@@ -276,8 +276,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "No Pages|Listings|Structure switch (views in ⋯ menu); folders render before root pages; no 'Collection pages' block (Open page/Manage in CMS",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case pages-restored: About deleted, then the pre-delete snapshot imported back — the same importProject ⌘Z runs; board shots/63-20585.png): under the list 'About restored. Page settings and URL retained.' 12px soft ink and the accent link 'Open About in Editor', which opens the page and clears the note (PagesTab.restored test). New: PagesTab notices a page that leaves and returns.",
    "inheritsFrom": "63:6393",
    "tier": "P1"
   },
@@ -289,7 +289,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-fixed",
-   "verifiedNote": "probe-compared 2026-10-27 (case pages-listings, real PagesTab on a real Composer at 720 wide, board shots/63-21262.png): 40-tall header 13/600 ink, columns at x476 SEO score / x556 Visibility / ⋯ (board same), 52-tall rows with Home roof / page glyph, name 13 over URL 12 sans, score/visibility 13px, row ⋯ opens the page menu, note under the last row, Pages footer kept under the listing. Entering Listings widens the drawer (LeftSidebar's expand, 700 vs board ~720) and leaving narrows it again (PagesTab.listingsWidth test); the separate 'Open full listings ›' link is gone. Open: 9px vertical offset is the shared PanelFrame header (REQUESTS A-19).",
+   "verifiedNote": "probe-compared 2026-10-27 (case pages-listings, real PagesTab on a real Composer at 720 wide, board shots/63-21262.png): 40-tall header 13/600 ink, columns at x476 SEO score / x556 Visibility / ⋯ (board same), 52-tall rows with Home roof / page glyph, name 13 over URL 12 sans, score/visibility 13px, row ⋯ opens the page menu, note under the last row, Pages footer kept under the listing. Entering Listings widens the drawer (LeftSidebar's expand, now 720 and floating over the canvas like the board — the canvas keeps its place; measured at 1440 and 1024) and leaving narrows it again (PagesTab.listingsWidth test); the separate 'Open full listings ›' link is gone. The 9px offset read earlier was a crop error; the drawer head matches (A-19).",
    "tier": "P1"
   },
   {
@@ -490,8 +490,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "No Pages|Listings|Structure switch (views in ⋯ menu); folders render before root pages; no 'Collection pages' block (Open page/Manage in CMS",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case pages-hundred: 100 real pages on a real Composer, 284×812; board shots/94-15802.png): 'Pages · 100', long names and URLs truncate with an ellipsis before the ⋯, the list scrolls between the tabs and the pinned footer. Inherits 63:6393 (fixed).",
    "inheritsFrom": "63:6393",
    "tier": "P1"
   },
@@ -502,8 +502,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "No Pages|Listings|Structure switch (views in ⋯ menu); folders render before root pages; no 'Collection pages' block (Open page/Manage in CMS",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case pages-hundred at 284×512 — the drawer of a 1440×600 window; board shots/94-18181.png): six rows visible, footer (+ Add page / From template · New folder) pinned at the bottom, nothing overflows.",
    "inheritsFrom": "63:6393",
    "tier": "P1"
   },
@@ -752,8 +752,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Code Blank/From template cards; board 'Fieldwork Studio · Create a page', source select, 'Choose template', '6 of 10 pages on Free'",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case new-page-dialog, name typed; board shots/101-36828.png): the dialog now opens on Blank (was From template) — 'Start with an empty page.', Create page. Create page 107 wide vs the board's ~208 (label-driven); capacity line not in the probe (no plan).",
    "inheritsFrom": "101:29978",
    "tier": "P1"
   },
@@ -775,8 +775,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-A wave 2 built, not compared: '{n} of {n} pages on {Plan}' + 'Ask the workspace owner to upgrade, or remove an unused page before creating another.'; Create disabled (the server refuses a save past the limit).",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case new-page-dialog with the capacity query answered by a routed tRPC stub, limit = page count; board shots/101-38257.png): at the limit the count line ('n of n pages on Free') is error red, regular, and 'Ask the workspace owner to upgrade, or remove an unused page before creating another.' sits 12 below in soft ink; Create page disabled.",
    "tier": "P1"
   },
   {
@@ -1756,8 +1756,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Board adds 'Clear' to the bar; code relies on header Done",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case pages-bulk-short: three ticked in a 512-tall drawer; board shots/139-53653.png): the gray bulk band ('3 selected' · Clear, Duplicate · Move to… · Delete) stays under the tabs, the list scrolls, the footer stays pinned. Inherits 139:47668 (fixed).",
    "inheritsFrom": "139:47668",
    "tier": "P1"
   },
@@ -2891,8 +2891,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-A S2 built, not compared: '… · 1 selected inside {outermost folded ancestor}' from the panel's expanded set.",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case layers-collapsed-selection: the real LayersTab on a real Composer, heading selected, branches folded; board shots/152-78614.png): rows 32 tall (Compact rows now OFF by default, as 147:76329 draws), chevron centred at 28, name at 68 (board 69), chevron · glyph · name 8 apart; footer a gray-100 band, text 12 in: '8 layers · 1 selected inside Section' (board '… inside Hero'). Not drawn: the board's ⋯ on the page row — no page action is defined for Layers.",
    "inheritsFrom": "147:75914",
    "tier": "P1"
   },

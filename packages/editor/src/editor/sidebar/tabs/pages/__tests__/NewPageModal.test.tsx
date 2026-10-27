@@ -60,10 +60,11 @@ describe("NewPageModal", () => {
     expect(screen.getByTestId("new-page-subtitle")).toHaveTextContent("Create a page");
     expect(screen.getByLabelText("Page name")).toHaveValue("About");
     expect(screen.getByTestId("new-page-source-blank")).toHaveTextContent("Blank");
-    expect(screen.getByTestId("new-page-source-template")).toHaveAttribute("aria-checked", "true");
-    expect(screen.getByTestId("new-page-source-note")).toHaveTextContent("Choose a page template before creating the page.");
-    fireEvent.click(screen.getByTestId("new-page-source-blank"));
+    // re-baseline: New page — 2L9 101:36828 opens on Blank.
+    expect(screen.getByTestId("new-page-source-blank")).toHaveAttribute("aria-checked", "true");
     expect(screen.getByTestId("new-page-source-note")).toHaveTextContent("Start with an empty page.");
+    fireEvent.click(screen.getByTestId("new-page-source-template"));
+    expect(screen.getByTestId("new-page-source-note")).toHaveTextContent("Choose a page template before creating the page.");
     expect(screen.queryByTestId("modal-close-new-page-modal")).toBeNull();
     expect(screen.getByRole("checkbox", { name: "Add to site navigation" })).toBeChecked();
   });
@@ -111,6 +112,7 @@ describe("NewPageModal", () => {
     const { composer, request } = makeComposer();
     render(<NewPageModal composer={composer as never} />);
     request();
+    fireEvent.click(screen.getByTestId("new-page-source-template"));
     fireEvent.change(screen.getByLabelText("Page name"), { target: { value: "Our menu" } });
     fireEvent.click(screen.getByTestId("new-page-create"));
     expect(composer.elements.createPage).not.toHaveBeenCalled();

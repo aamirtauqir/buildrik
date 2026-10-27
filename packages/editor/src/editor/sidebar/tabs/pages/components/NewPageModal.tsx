@@ -40,7 +40,8 @@ export function NewPageModal({ composer }: { composer: Composer | null }) {
   const { addToast } = useToast();
   const [open, setOpen] = React.useState(false);
   const [name, setName] = React.useState("");
-  const [source, setSource] = React.useState<Source>("template");
+  /* design-2l9 101:36828 "New page / Blank default". */
+  const [source, setSource] = React.useState<Source>("blank");
   const [addToNav, setAddToNav] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
   const { capacity, retry: retryCapacity } = usePageCapacity(open);
@@ -54,7 +55,7 @@ export function NewPageModal({ composer }: { composer: Composer | null }) {
     if (!composer) return;
     const onRequest = () => {
       setName(getDefaultPageName(composer.elements.getAllPages()));
-      setSource("template");
+      setSource("blank");
       setAddToNav(true);
       setError(null);
       setOpen(true);
@@ -209,8 +210,21 @@ function PageCapacityLine({ capacity, count, atLimit }: { capacity: PageCapacity
           ];
   return (
     <div className="tw:flex tw:flex-col tw:gap-0.5" data-testid="new-page-capacity" role={capacity.state === "unavailable" || atLimit ? "status" : undefined}>
-      <p className={`${LINE} tw:tabular-nums ${atLimit || capacity.state === "unavailable" ? "tw:text-[var(--bk-ink)] tw:font-medium" : "tw:text-[var(--bk-ink-muted)]"}`}>{head}</p>
-      {body && <p className={`${LINE} tw:text-[var(--bk-ink-muted)]`}>{body}</p>}
+      {/* 101:38257: at the limit the count turns red and the way out sits a
+          line apart, in soft ink. */}
+      <p
+        className={`${LINE} tw:tabular-nums ${
+          atLimit
+            ? "tw:text-[var(--bk-error-text)]"
+            : capacity.state === "unavailable"
+              ? "tw:text-[var(--bk-ink)] tw:font-medium"
+              : "tw:text-[var(--bk-ink-muted)]"
+        }`}
+        data-testid="new-page-capacity-head"
+      >
+        {head}
+      </p>
+      {body && <p className={`${LINE} ${atLimit ? "tw:mt-3 tw:text-[var(--bk-ink-soft)]" : "tw:text-[var(--bk-ink-muted)]"}`}>{body}</p>}
     </div>
   );
 }

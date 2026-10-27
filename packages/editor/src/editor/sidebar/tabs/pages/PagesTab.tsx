@@ -107,6 +107,25 @@ export const PagesTab: React.FC<PagesTabProps> = ({
   openSettingsRequest,
 }) => {
   const p = usePages(composer);
+  /* Board 63:20585: a page that leaves the list and comes back (⌘Z after a
+     delete) is named under the list — "About restored. Page settings and URL
+     retained." — until another page is opened. */
+  const [restored, setRestored] = React.useState<{ id: string; name: string } | null>(null);
+  const seen = React.useRef<{ ids: Set<string>; gone: Set<string> }>({ ids: new Set(), gone: new Set() });
+  React.useEffect(() => {
+    const now = new Set(p.pages.map((pg) => pg.id));
+    const { ids, gone } = seen.current;
+    for (const id of ids) {
+      if (!now.has(id)) gone.add(id);
+    }
+    for (const pg of p.pages) {
+      if (gone.has(pg.id)) {
+        gone.delete(pg.id);
+        setRestored({ id: pg.id, name: pg.name });
+      }
+    }
+    seen.current.ids = now;
+  }, [p.pages]);
 
   // Folders — sidebar-only, localStorage-persisted
   /* This read was `(composer as { id?: string })?.id`, and Composer has no
@@ -625,6 +644,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
           ) : (
           <PageList
             pages={p.pages}
+            restored={restored}
             renamingPageId={p.renamingPageId}
             nameError={nameError}
             loadError={p.loadError}
@@ -639,7 +659,10 @@ export const PagesTab: React.FC<PagesTabProps> = ({
             onAddPage={requestNewPage}
             onAddFolder={() => setNewFolderId(f.createFolder("New Folder"))}
             newFolderId={newFolderId}
-            onSelectPage={p.selectPage}
+            onSelectPage={(id) => {
+              setRestored(null);
+              p.selectPage(id);
+            }}
             onToggleSelect={handleToggleSelect}
             onBulkDuplicate={handleBulkDuplicate}
             onBulkMoveToFolder={handleBulkMoveToFolder}

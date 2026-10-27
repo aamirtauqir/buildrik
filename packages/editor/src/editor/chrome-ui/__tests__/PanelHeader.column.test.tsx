@@ -17,6 +17,9 @@ describe("PanelHeader size from its host", () => {
     expect(cls).toContain("tw:h-11");
     expect(cls).toContain("tw:text-[length:var(--bk-text-14)]");
     expect(cls).toContain("tw:text-[var(--bk-ink)]");
+    // re-baseline: drawer header — design-2l9 63:6393 / 147:75914: title 12 in, no rule under the head (A-19).
+    expect(cls).toContain("tw:pl-3");
+    expect(cls).not.toContain("tw:border-b");
   });
   it("a column host gives the 44/13 ink header", () => {
     render(

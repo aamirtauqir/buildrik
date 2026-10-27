@@ -16,8 +16,9 @@ import { render, fireEvent } from "@testing-library/react";
 import { LayerTreeItem, type LayerTreeItemProps } from "../LayerTreeItem";
 
 /** design-2l9 147:75914 (re-baseline from 4418:81300's 16/32/48): the page
- *  row heads the tree, so depth 0's chevron sits at 28, then 16 a level. */
-const BOARD_CHEVRON_X = [28, 44, 60];
+ *  row heads the tree, so depth 0's chevron box starts at 20 (centred at 28,
+ *  re-baseline: Layers rows, 2L9 152:78614), then 16 a level. */
+const BOARD_CHEVRON_X = [20, 36, 52];
 
 const noop = () => {};
 function rowFor(depth: number, extra: Partial<LayerTreeItemProps> = {}) {
@@ -64,7 +65,7 @@ describe("Layers indent ladder — board 147:75914", () => {
     expect(box).not.toBeNull();
     expect(box.getAttribute("aria-label")).toBe("Select Container");
     expect(box.checked).toBe(false);
-    expect(row.style.paddingLeft).toBe("28px");
+    expect(row.style.paddingLeft).toBe("20px");
   });
 
   it("in selection mode a selected row is ticked — even a lone one", () => {

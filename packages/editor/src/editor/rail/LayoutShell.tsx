@@ -102,7 +102,8 @@ Drawer.displayName = "LayoutShell.Drawer";
 const Sidebar: React.FC<SlotProps> = ({ children, className = "", style }) => (
   <aside
     data-tour-target="left-sidebar"
-    className={`layout-shell__sidebar ${className}`}
+    /* A widened drawer (LeftSidebar's ls-panel--wide) spills over the canvas. */
+    className={`layout-shell__sidebar tw:has-[.ls-panel--wide]:overflow-visible! ${className}`}
     style={style}
     role="navigation"
     aria-label="Editor sidebar"
