@@ -1,23 +1,25 @@
 /**
- * CreateComponentModal — board 4418:142143 (C5 G1-098; owner rule: the board
- * wins on anything visual).
+ * CreateComponentModal — 2L9 271:125321 (G05) / 271:125668 (G06):
  *
  *   Create component
- *   Selected: <Page> › <Name> (<type>). Creating a master converts this
- *   <Name> into its first instance. Nothing else changes unless you opt in below.
- *   Name   [ … ]
- *   Scope  [ This site ▾ ]
- *   ☐ Also convert N other matching <Name> groups on this page
- *                                        Cancel · Create component
+ *   <Name> on <Page> becomes the first instance.
+ *   Name
+ *   [ Hero heading                              ]
+ *   Where it can be used
+ *   [ ● Component library ]  Reusable on every site in this workspace.
+ *   [ ○ This page         ]  Only on <Page>.
+ *   No matching groups on <Page>.      (or: ☐ Also convert N other matching …)
+ *   84 of 100 components
+ *                         Cancel · Create and share component | Create component
  *
- * The board's three fields are the whole form. Description, category, tags,
- * variant presets and the "Pre-fill from DS styles" toggle are gone (the
- * pre-fill keeps its default, ON). Scope is This site / This page (popover
- * 6971:77663): a page-scoped master is stored with the active page's id and
- * offered only on that page (ComponentManager.getComponentsForPage). "Matching" is an identical copy of the selection on
- * this page (engine/components/matchingGroups) — the only kind that becomes
- * an instance with nothing on screen changing; the registry holds the active
- * page only, which is why the sentence says page, not site.
+ * "Component library" is the site-wide master: the server mirrors every
+ * site's masters into the workspace library (`siteComponents.library`), so
+ * it is offered to the other sites of the workspace. "This page" stores the
+ * active page's id and is offered only there
+ * (ComponentManager.getComponentsForPage). "Matching" is an identical copy of
+ * the selection on this page (engine/components/matchingGroups). The usage
+ * line is the masters this site holds against the manager's limit
+ * (DEFAULT_COMPONENT_CONFIG.maxComponents, the drawer's isAtComponentLimit).
  *
  * @license BSD-3-Clause
  */
@@ -31,7 +33,6 @@ import {
   ModalFooter,
   ModalRoot,
   ModalTitle,
-  Select,
   TextInput,
   useToast,
 } from "@/editor/chrome-ui";
@@ -39,6 +40,7 @@ import type { Composer } from "@/engine";
 import { findMatchingElements } from "@/engine/components/matchingGroups";
 import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
 import { EVENTS } from "@/shared/constants";
+import { DEFAULT_COMPONENT_CONFIG } from "@/shared/types/components";
 
 export interface CreateComponentModalProps {
   isOpen: boolean;
@@ -64,6 +66,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({ isOp
   const [scope, setScope] = React.useState<"site" | "page">("site");
   const [isCreating, setIsCreating] = React.useState(false);
 
+  const used = isOpen && composer ? composer.components.getAllComponents().length : 0;
   const matches = React.useMemo(
     () => (isOpen && composer && elementId ? findMatchingElements(composer, elementId) : []),
     [isOpen, composer, elementId],
@@ -95,13 +98,12 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({ isOp
         ...(convertMatching ? matches : []),
       ]);
       const others = converted - 1;
-      // Board 4418:166980: "Hero created as a component", then the drawer
-      // shows Components with the new master badged New.
+      // 2L9 G13 / G14: "Hero heading component created.", then Components.
       addToast({
         description:
           others > 0
-            ? `${component.name} created as a component · ${others} matching group${others === 1 ? "" : "s"} converted`
-            : `${component.name} created as a component`,
+            ? `${component.name} component created · ${others} matching group${others === 1 ? "" : "s"} converted.`
+            : `${component.name} component created.`,
       });
       composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "components" });
       onClose();
@@ -120,56 +122,53 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({ isOp
         </ModalTitle>
         <ModalBody>
           <p className={LEAD} data-testid="create-component-lead">
-            Selected: {pageName ? `${pageName} › ` : ""}
-            {defaultName} ({type}). Creating a master converts this {defaultName} into its first instance.
-            Nothing else changes unless you opt in below.
+            {defaultName}
+            {pageName ? ` on ${pageName}` : ""} becomes the first instance.
           </p>
-          <div className={ROW}>
-            <label htmlFor="create-component-name" className={LABEL}>
-              Name
-            </label>
-            <TextInput
-              id="create-component-name"
-              sizing="sm"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && name.trim()) void handleSubmit();
-              }}
-              autoFocus
-              data-testid="create-component-name"
-              className="tw:w-[240px]"
-            />
+          <label htmlFor="create-component-name" className={LABEL}>
+            Name
+          </label>
+          <TextInput
+            id="create-component-name"
+            sizing="sm"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && name.trim()) void handleSubmit();
+            }}
+            autoFocus
+            data-testid="create-component-name"
+            className="tw:mb-4 tw:w-full"
+          />
+          <div className={LABEL} id="create-component-scope-label">
+            Where it can be used
           </div>
-          <div className={ROW}>
-            <label htmlFor="create-component-scope" className={LABEL}>
-              Scope
-            </label>
-            <Select
-              id="create-component-scope"
-              sizing="sm"
-              value={scope}
-              onChange={(e) => setScope(e.target.value === "page" ? "page" : "site")}
-              className="tw:w-[240px]"
-              data-testid="create-component-scope"
-            >
-              <option value="site">This site</option>
-              {activePage ? <option value="page">This page</option> : null}
-            </Select>
+          <div role="radiogroup" aria-labelledby="create-component-scope-label" className="tw:flex tw:flex-col" data-testid="create-component-scope">
+            <ScopeOption checked={scope === "site"} onPick={() => setScope("site")} label="Component library" caption="Reusable on every site in this workspace." />
+            {activePage ? (
+              <ScopeOption checked={scope === "page"} onPick={() => setScope("page")} label="This page" caption={`Only on ${pageName}.`} />
+            ) : null}
           </div>
           {matches.length > 0 ? (
             <label className={CHECK_ROW} data-testid="create-component-convert">
               <Checkbox checked={convertMatching} onChange={(e) => setConvertMatching(e.target.checked)} />
-              Also convert {matches.length} other matching {defaultName} group{matches.length === 1 ? "" : "s"} on this page
+              Also convert {matches.length} other matching {defaultName} group{matches.length === 1 ? "" : "s"} on {pageName || "this page"}
             </label>
-          ) : null}
+          ) : (
+            <p className={NOTE} data-testid="create-component-no-matches">
+              No matching groups on {pageName || "this page"}.
+            </p>
+          )}
+          <p className={NOTE} data-testid="create-component-usage">
+            {used} of {DEFAULT_COMPONENT_CONFIG.maxComponents} components
+          </p>
         </ModalBody>
         <ModalFooter divided>
-          <Button color="light" size="xs" className="tw:border-transparent tw:bg-transparent" data-testid="create-component-cancel" onClick={onClose} disabled={isCreating}>
+          <Button color="light" size="xs" className="tw:w-[72px]" data-testid="create-component-cancel" onClick={onClose} disabled={isCreating}>
             Cancel
           </Button>
-          <Button size="xs" data-testid="create-component-submit" onClick={() => void handleSubmit()} disabled={!name.trim() || isCreating}>
-            {isCreating ? "Creating…" : "Create component"}
+          <Button size="xs" className="tw:min-w-[184px]" data-testid="create-component-submit" onClick={() => void handleSubmit()} disabled={!name.trim() || isCreating}>
+            {isCreating ? "Creating…" : scope === "site" ? "Create and share component" : "Create component"}
           </Button>
         </ModalFooter>
       </ModalContent>
@@ -177,12 +176,34 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({ isOp
   );
 };
 
-/* Board 4418:142143: 12/18 muted lead; a 152px label column at 13/20 soft,
-   240px controls; 12px between rows; no ✕ (Esc and Cancel close); Cancel is
-   borderless. */
-const LEAD = "tw:m-0 tw:mb-3 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]";
-const ROW = "tw:flex tw:items-center tw:gap-3 tw:mb-3";
-const LABEL = "tw:w-[152px] tw:flex-none tw:text-[13px] tw:text-[var(--bk-ink-soft)]";
-const CHECK_ROW = "tw:flex tw:items-center tw:gap-2 tw:text-[13px] tw:text-[var(--bk-ink-soft)] tw:cursor-pointer";
+/** One scope as the board draws it: a full-width bordered option, its
+ *  radio dot and name centred, its caption under it (G05 / G06). */
+function ScopeOption({ checked, onPick, label, caption }: { checked: boolean; onPick: () => void; label: string; caption: string }) {
+  return (
+    <>
+      <Button
+        color="light"
+        size="xs"
+        role="radio"
+        aria-checked={checked}
+        onClick={onPick}
+        className="tw:h-8 tw:w-full tw:justify-center tw:gap-1.5 tw:text-[13px] tw:font-normal tw:text-[var(--bk-ink)] tw:focus:ring-0"
+      >
+        <span
+          aria-hidden="true"
+          className={`tw:inline-block tw:size-2 tw:rounded-full tw:border tw:border-[var(--bk-ink)] ${checked ? "tw:bg-[var(--bk-ink)]" : ""}`}
+        />
+        {label}
+      </Button>
+      <p className={NOTE}>{caption}</p>
+    </>
+  );
+}
+
+/* 2L9 G05: a 13 / ink lead, labels above their fields, 12 / muted notes. */
+const LEAD = "tw:m-0 tw:mb-4 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]";
+const LABEL = "tw:mb-2 tw:block tw:text-[13px] tw:font-medium tw:text-[var(--bk-ink)]";
+const NOTE = "tw:m-0 tw:py-2 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
+const CHECK_ROW = "tw:flex tw:items-center tw:gap-2 tw:py-2 tw:text-[13px] tw:text-[var(--bk-ink-soft)] tw:cursor-pointer";
 
 export default CreateComponentModal;

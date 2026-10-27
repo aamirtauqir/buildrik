@@ -71,6 +71,8 @@ export type SectionId =
   | "validation"
   | "table-structure"
   | "table-accessibility"
+  | "table-cell"
+  | "table-wrapper"
   | "semantics"
   | "attributes"
   // Style — define → shape → paint (DD-15)

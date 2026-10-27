@@ -1,8 +1,9 @@
 // @vitest-environment jsdom
 /**
- * CreateComponentModal — board 4418:142143 (C5 G1-098): Name · Scope ·
- * "Also convert N matching groups", and the master converts the selection
- * into its first instance.
+ * CreateComponentModal — 2L9 271:125321 (G05) / 271:125668 (G06): Name,
+ * "Where it can be used" (Component library / This page), the matching-groups
+ * line, the usage line, and the master converts the selection into its first
+ * instance.
  *
  * @license BSD-3-Clause
  */
@@ -27,7 +28,7 @@ function makeComposer(createComponent = vi.fn().mockResolvedValue({ id: "c1", na
   return {
     composer: {
       emit: vi.fn(),
-      components: { createComponent, adoptInstances },
+      components: { createComponent, adoptInstances, getAllComponents: () => Array.from({ length: 84 }) },
       elements: { getElement: () => el, getActivePage: () => ({ id: "page-home", name: "Home" }) },
     } as never,
     createComponent,
@@ -47,24 +48,27 @@ beforeEach(() => {
   findMatching.mockReset().mockReturnValue([]);
 });
 
-describe("CreateComponentModal — board 4418:142143", () => {
-  it("draws exactly the board's form: lead, Name, Scope (This site), Cancel · Create component", () => {
+const scopeOption = (name: string) => screen.getByRole("radio", { name });
+
+describe("CreateComponentModal — 2L9 G05 / G06", () => {
+  it("draws the board's form: lead, Name, Where it can be used (Component library first), no matches, usage, Cancel · Create and share component", () => {
     const { composer } = makeComposer();
     renderModal(composer);
     expect(screen.getByTestId("create-component-title")).toHaveTextContent("Create component");
-    // The dialog title is the Modal default — 16/600 since the 2L9 dialogs (C-16).
     expect(screen.getByTestId("create-component-title").className).toContain("--bk-text-16");
-    expect(screen.getByTestId("create-component-title").className).not.toContain("--bk-text-20");
-    expect(screen.getByTestId("create-component-lead")).toHaveTextContent(
-      /^Selected: Home › .+ \(section\)\. Creating a master converts this .+ into its first instance\. Nothing else changes unless you opt in below\.$/,
-    );
+    expect(screen.getByTestId("create-component-lead")).toHaveTextContent(/^.+ on Home becomes the first instance\.$/);
     expect(screen.getByLabelText("Name")).toBeInTheDocument();
-    expect((screen.getByLabelText("Scope") as HTMLSelectElement).selectedOptions[0].textContent).toBe("This site");
-    for (const gone of ["Description", "Category", "Tags", "variant", "Pre-fill"]) {
+    expect(screen.getByText("Where it can be used")).toBeInTheDocument();
+    expect(scopeOption("Component library")).toHaveAttribute("aria-checked", "true");
+    expect(scopeOption("This page")).toHaveAttribute("aria-checked", "false");
+    expect(screen.getByText("Reusable on every site in this workspace.")).toBeInTheDocument();
+    expect(screen.getByText("Only on Home.")).toBeInTheDocument();
+    expect(screen.getByTestId("create-component-no-matches")).toHaveTextContent("No matching groups on Home.");
+    expect(screen.getByTestId("create-component-usage")).toHaveTextContent("84 of 100 components");
+    for (const gone of ["Description", "Category", "Tags", "variant", "Pre-fill", "Scope"]) {
       expect(screen.queryByText(new RegExp(gone, "i"))).toBeNull();
     }
-    expect(screen.getByRole("button", { name: "Create component" })).toBeInTheDocument();
-    // Board footer 7431:145583: top rule, 16px vertical padding.
+    expect(screen.getByRole("button", { name: "Create and share component" })).toBeInTheDocument();
     expect(screen.getByTestId("create-component-cancel").parentElement?.className).toContain("tw:border-t");
   });
 
@@ -72,28 +76,28 @@ describe("CreateComponentModal — board 4418:142143", () => {
     const { composer } = makeComposer();
     findMatching.mockReturnValue(["el-2", "el-3"]);
     renderModal(composer);
-    expect(screen.getByTestId("create-component-convert")).toHaveTextContent(/Also convert 2 other matching .+ groups on this page/);
+    expect(screen.getByTestId("create-component-convert")).toHaveTextContent(/Also convert 2 other matching .+ groups on Home/);
+    expect(screen.queryByTestId("create-component-no-matches")).toBeNull();
   });
 
-  it("creates, converts the selection into the first instance, and only the opted-in matches", async () => {
+  it("creates in the library, converts the selection into the first instance, and only the opted-in matches", async () => {
     const { composer, createComponent, adoptInstances } = makeComposer();
     findMatching.mockReturnValue(["el-2", "el-3"]);
     const { onClose } = renderModal(composer);
     fireEvent.change(screen.getByLabelText("Name"), { target: { value: "  Hero card " } });
-    fireEvent.click(screen.getByRole("button", { name: "Create component" }));
+    fireEvent.click(screen.getByRole("button", { name: "Create and share component" }));
     await waitFor(() => expect(onClose).toHaveBeenCalled());
     expect(createComponent).toHaveBeenCalledWith("Hero card", "el-1", { prefillFromDs: true, pageId: null });
     expect(adoptInstances).toHaveBeenCalledWith("c1", ["el-1"]);
   });
 
-  /* Board 4418:166980: "Hero created as a component" (no tone dot), and the
-     drawer turns to Components, where the new master carries a New badge. */
-  it("says '{name} created as a component' and opens the Components drawer", async () => {
+  /* G13 / G14: "Hero heading component created.", then Components. */
+  it("says '{name} component created.' and opens the Components drawer", async () => {
     const { composer } = makeComposer();
     const { onClose } = renderModal(composer);
-    fireEvent.click(screen.getByRole("button", { name: "Create component" }));
+    fireEvent.click(screen.getByRole("button", { name: "Create and share component" }));
     await waitFor(() => expect(onClose).toHaveBeenCalled());
-    expect(addToastMock).toHaveBeenCalledWith({ description: "Hero created as a component" });
+    expect(addToastMock).toHaveBeenCalledWith({ description: "Hero component created." });
     expect((composer as unknown as { emit: ReturnType<typeof vi.fn> }).emit).toHaveBeenCalledWith("ui:switch-tab", { tab: "components" });
   });
 
@@ -102,7 +106,7 @@ describe("CreateComponentModal — board 4418:142143", () => {
     findMatching.mockReturnValue(["el-2"]);
     const { onClose } = renderModal(composer);
     fireEvent.click(screen.getByTestId("create-component-convert").querySelector("input")!);
-    fireEvent.click(screen.getByRole("button", { name: "Create component" }));
+    fireEvent.click(screen.getByRole("button", { name: "Create and share component" }));
     await waitFor(() => expect(onClose).toHaveBeenCalled());
     expect(adoptInstances).toHaveBeenCalledWith("c1", ["el-1", "el-2"]);
   });
@@ -111,20 +115,19 @@ describe("CreateComponentModal — board 4418:142143", () => {
     const { composer } = makeComposer(vi.fn().mockResolvedValue(null));
     const { onClose } = renderModal(composer);
     fireEvent.change(screen.getByLabelText("Name"), { target: { value: "   " } });
-    expect(screen.getByRole("button", { name: "Create component" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Create and share component" })).toBeDisabled();
     fireEvent.change(screen.getByLabelText("Name"), { target: { value: "Hero" } });
-    fireEvent.click(screen.getByRole("button", { name: "Create component" }));
+    fireEvent.click(screen.getByRole("button", { name: "Create and share component" }));
     await waitFor(() => expect(addToastMock).toHaveBeenCalledWith(expect.objectContaining({ tone: "error" })));
     expect(onClose).not.toHaveBeenCalled();
   });
 
-  /* Popover 6971:77663: This site / This page. */
-  it("Scope offers This site and This page; This page scopes the master to the open page", async () => {
+  /* G06: This page chosen — the primary reads "Create component" and the master is the page's. */
+  it("This page scopes the master to the open page, and the primary reads Create component", async () => {
     const { composer, createComponent } = makeComposer();
     const { onClose } = renderModal(composer);
-    const scope = screen.getByLabelText("Scope") as HTMLSelectElement;
-    expect([...scope.options].map((o) => o.textContent)).toEqual(["This site", "This page"]);
-    fireEvent.change(scope, { target: { value: "page" } });
+    fireEvent.click(scopeOption("This page"));
+    expect(scopeOption("This page")).toHaveAttribute("aria-checked", "true");
     fireEvent.click(screen.getByRole("button", { name: "Create component" }));
     await waitFor(() => expect(onClose).toHaveBeenCalled());
     expect(createComponent).toHaveBeenCalledWith("Hero", "el-1", { prefillFromDs: true, pageId: "page-home" });

@@ -4362,8 +4362,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Lane L-B A6 (built, not compared): Redirect with no destination reads 'Choose a destination to save'. Open: the page-or-URL picker 'Choose page or URL…' (F19, later slice).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B P1 round 5, board PNG fetched: the same state as F19 156:11319 (drift-fixed, probe formBlock REDIRECT without a URL) — Redirect · 'Choose page or URL…' · Notifications · Spam protection · 'Choose a destination to save' · note · Visibility All devices · Interactions None — compared side by side with that probe shot. Exception: no 'Applies on next publish' under After submit (code:after-submit-live-on-save).",
    "tier": "P1"
   },
   {
@@ -5301,9 +5301,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:engine-modal-link",
    "verified": "no",
-   "verifiedNote": "Lane L-B P1 round 4: board PNG fetched. Needs a persisted trigger → dialog link in the engine before the Inspector can draw 'Modal relationship' — REQUESTS B-17 (lead).",
+   "verifiedNote": "Lead, round 5: the trigger ↔ dialog link is a new engine data model, out of scope while only 2 agents run (REQUESTS B-17, deferred). Board PNG fetched round 4.",
    "tier": "P1"
   },
   {
@@ -5334,9 +5334,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:engine-modal-link",
    "verified": "no",
-   "verifiedNote": "No modal trigger↔dialog link, local insertion or close policy UI",
+   "verifiedNote": "Lead, round 5: needs the engine's trigger ↔ dialog link (REQUESTS B-17, deferred).",
    "inheritsFrom": "245:39899",
    "tier": "P1"
   },
@@ -5380,8 +5380,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "table is a plain container (elementCapabilities.ts:173); no rows/cols/caption/merged-cell UI",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B P1 round 5, probe ?block=table → Edit A1 → Content, side by side: 'Cell' — Native tag td / th, full-width 'Edit cell content' (selects the cell's text), Column span / Row span ('1 · implicit', written as colspan / rowspan), the board's note, 'Back to {table}' — then 'Header associations' (its note, Scope on a th, Headers). Exceptions: a cell opens on Style (its type is a container, DD-20 picks by type) where the board shows Content; Semantics / Advanced attributes stay under it (code); the header name and 'Back to table' read the layer name ('B2 · Duration', 'Services table' are sample).",
    "inheritsFrom": "245:42929",
    "tier": "P1"
   },
@@ -5392,8 +5392,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "table is a plain container (elementCapabilities.ts:173); no rows/cols/caption/merged-cell UI",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B P1 round 5, probe ?block=table → Inspect scroll wrapper → Style, side by side: 'Wrapper layout' first — Width, Overflow X, Overflow Y, the note 'These values belong to the wrapper. Table cells keep native table layout.', 'Back to {table}'. Exceptions: the wrapper's other Style sections follow (it is a container); the Table block stores its overflow as camelCase 'overflowX', which the Inspector reads as unset — a block-data defect (blocks/, not L-B's).",
    "inheritsFrom": "245:42929",
    "tier": "P1"
   },
@@ -5912,9 +5912,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:engine-modal-link",
    "verified": "no",
-   "verifiedNote": "No modal trigger↔dialog link, local insertion or close policy UI",
+   "verifiedNote": "Lead, round 5: needs the engine's trigger ↔ dialog link (REQUESTS B-17, deferred).",
    "inheritsFrom": "245:39899",
    "tier": "P1"
   },
@@ -6496,8 +6496,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Lane L-B P1 round 4: board PNG fetched. The dialog is shell/modals/CreateComponentModal.tsx (not L-B's path) — the full spec is REQUESTS B-16 (lead). Data already supports both scopes (pageId).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B P1 round 5 (cleared to own shell/modals/CreateComponentModal.tsx), probe case create-component (a 'Hero heading' on Home), side by side with the board PNG at 1024: 'Create component', 'Hero heading on Home becomes the first instance.', Name above a full-width field, 'Where it can be used' with full-width options '● Component library' ('Reusable on every site in this workspace.' — site masters are mirrored into the workspace library, siteComponents.library) and '○ This page' ('Only on Home.'), 'No matching groups on Home.' (or the convert box when identical groups exist), the usage line '{n} of 100 components' (the site's masters against DEFAULT_COMPONENT_CONFIG.maxComponents — the drawer's isAtComponentLimit), Cancel · 'Create and share component'. Dialog 480 wide as the board's. Exception: the footer keeps the DS form-dialog rule (L5-V3).",
    "tier": "P1"
   },
   {
@@ -6507,8 +6507,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Save as component… opens existing dialog; no \"Where it can be used\" Library/This page scope, pending/failure states",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B P1 round 5, probe create-component → This page, side by side: the page option checked, the primary reads 'Create component', the master is stored with the page's id (unit-tested). Footer rule as G05.",
    "inheritsFrom": "271:125321",
    "tier": "P1"
   },
@@ -6586,7 +6586,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Save as component… opens existing dialog; no \"Where it can be used\" Library/This page scope, pending/failure states",
+   "verifiedNote": "Lane L-B P1 round 5, board PNG fetched: the receipt now reads '{name} component created.' (unit-tested). Open: the owning detail page (Components › This page › Hero heading, Used on, 'The selected heading is now the first instance…') is the component library's full page — L-C's surface; and the receipt has no Undo (code:create-not-a-history-step — createComponent / adoptInstances record no document history step to undo).",
    "inheritsFrom": "271:125321",
    "tier": "P1"
   },
@@ -6598,7 +6598,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Save as component… opens existing dialog; no \"Where it can be used\" Library/This page scope, pending/failure states",
+   "verifiedNote": "Lane L-B P1 round 5, board PNG fetched: as G13 for a library master (receipt copy done; the detail page is L-C's; no Undo — code:create-not-a-history-step).",
    "inheritsFrom": "271:125321",
    "tier": "P1"
   },
@@ -6610,7 +6610,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Save as component… opens existing dialog; no \"Where it can be used\" Library/This page scope, pending/failure states",
+   "verifiedNote": "Lane L-B P1 round 5, board PNG fetched: the instance's Style tab draws 'Selector · Editing This element only' (class-first — owner decision pending) and a 'Component' group (Main · Scope 'This page · Home' · Overrides · Edit main component). The Inspector carries the instance identity above the tabs (IC01 241:16522, drift-fixed); its source line now says the scope ('This page · Home · v1' / 'Component library · v1', unit-tested). Open: the two boards place the instance facts differently (IC01 above the tabs, G15 a Style group) — needs a lead call.",
    "inheritsFrom": "271:125321",
    "tier": "P1"
   },
@@ -6622,7 +6622,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Save as component… opens existing dialog; no \"Where it can be used\" Library/This page scope, pending/failure states",
+   "verifiedNote": "Lane L-B P1 round 5, board PNG fetched: as G15 with Scope 'Component library' (the source line reads it). Open on the same IC01-vs-G16 placement call.",
    "inheritsFrom": "271:125321",
    "tier": "P1"
   },

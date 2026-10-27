@@ -146,7 +146,9 @@ export const ComponentRow: React.FC<ComponentRowProps> = ({ composer, elementId 
           <span className="tw:truncate">{component.name} · instance</span>
         </div>
         <div className="tw:pb-1 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="component-source">
-          Component library · v{component.version}
+          {/* G15 / G16: where the master can be used — the library, or this page. */}
+          {component.pageId ? `This page · ${composer.elements.getAllPages().find((p) => p.id === component.pageId)?.name ?? "page"}` : "Component library"} · v
+          {component.version}
         </div>
         <SelectRow
           label="Variant"

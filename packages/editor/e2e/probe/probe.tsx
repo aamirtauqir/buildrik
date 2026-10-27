@@ -18,6 +18,7 @@
  *
  * @license BSD-3-Clause
  */
+import { CreateComponentModal } from "@/editor/shell/modals/CreateComponentModal";
 import * as React from "react";
 import { createRoot } from "react-dom/client";
 // fonts.css before default.css, and imported here rather than from default.css
@@ -2600,6 +2601,22 @@ const CASES: Record<string, () => React.ReactElement> = {
   // of `?type=` (default heading) on a Home page — or, with `?block=`, that
   // Insert block (`contact-form` → a form with labelled fields). The panel
   // follows the composer's selection, so opening a field shows the field.
+  // 2L9 G05 / G06 — the Create component dialog over a "Hero heading" on Home.
+  "create-component": () => {
+    const c = new Composer({} as never);
+    const page = c.elements.createPage("Home");
+    c.elements.setActivePage(page.id);
+    const el = c.elements.createElement("heading" as never, { content: "Thoughtful design." } as never);
+    c.elements.addElement(el, page.root.id);
+    el.setData("layerName", "Hero heading");
+    return (
+      <ToastProvider>
+        <div data-probe="create-component">
+          <CreateComponentModal isOpen onClose={() => {}} composer={c} elementId={el.getId()} />
+        </div>
+      </ToastProvider>
+    );
+  },
   "inspector-panel": () => {
     const q = new URLSearchParams(location.search);
     const type = q.get("type") ?? "heading";

@@ -7,10 +7,10 @@
  * @license BSD-3-Clause
  */
 import { fireEvent, render, screen } from "@testing-library/react";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { createTestComposer, installEngineBrowserStubs, removeEngineBrowserStubs } from "@/engine/__tests__/test-utils/realComposer";
 import { getBlockById, insertBlock } from "@/blocks/blockRegistry";
-import { TableAccessibilitySection, TableStructureSection } from "../TableSections";
+import { TableAccessibilitySection, TableCellSection, TableStructureSection, TableWrapperSection, isTableCell, isTableWrapper } from "../TableSections";
 import { openingTab } from "@/editor/inspector/config/sectionOrder";
 
 beforeAll(installEngineBrowserStubs);
@@ -71,5 +71,41 @@ describe("Table · Accessibility", () => {
     fireEvent.change(screen.getByLabelText("Caption"), { target: { value: "" } });
     fireEvent.blur(screen.getByLabelText("Caption"));
     expect(table().getChildren().some((el) => tag(el) === "caption")).toBe(false);
+  });
+});
+
+const firstBodyCell = (table: { getChildren(): Array<{ getTagName(): string; getChildren(): unknown[] }> }) =>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (table.getChildren().find((el) => tag(el) === "tbody") as any).getChildren()[0].getChildren()[0];
+
+describe("Table · Cell (245:43495)", () => {
+  it("a td: Native tag, spans written as attributes, Back to the table", () => {
+    const { c, table } = setup();
+    const cell = firstBodyCell(table());
+    expect(isTableCell(cell)).toBe(true);
+    render(<TableCellSection composer={c} elementId={cell.getId()} isOpen />);
+    expect(screen.getByLabelText("Native tag")).toHaveValue("td");
+    fireEvent.change(screen.getByLabelText("Column span"), { target: { value: "2" } });
+    fireEvent.blur(screen.getByLabelText("Column span"));
+    expect(c.elements.getElement(cell.getId())!.getAttribute("colspan")).toBe("2");
+    fireEvent.change(screen.getByLabelText("Native tag"), { target: { value: "th" } });
+    expect(tag(c.elements.getElement(cell.getId())!)).toBe("th");
+    expect(screen.getByLabelText("Scope")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /^Back to/ }));
+    expect(c.selection.getSelectedIds()).toEqual([table().getId()]);
+  });
+});
+
+describe("Table · Wrapper layout (245:44049)", () => {
+  it("the wrapper's Width and Overflow write its own styles; Back to the table", () => {
+    const { c, table } = setup();
+    const wrapper = table().getParent()!;
+    expect(isTableWrapper(wrapper)).toBe(true);
+    const onChange = vi.fn();
+    render(<TableWrapperSection composer={c} elementId={wrapper.getId()} styles={{ width: "100%" }} onChange={onChange} isOpen />);
+    fireEvent.change(screen.getByLabelText("Overflow X"), { target: { value: "auto" } });
+    expect(onChange).toHaveBeenCalledWith("overflow-x", "auto");
+    fireEvent.click(screen.getByRole("button", { name: /^Back to/ }));
+    expect(c.selection.getSelectedIds()).toEqual([table().getId()]);
   });
 });

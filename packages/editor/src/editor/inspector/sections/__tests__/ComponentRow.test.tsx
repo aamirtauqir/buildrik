@@ -57,6 +57,7 @@ function makeComposer({
     elements: {
       getElement: () => ({ getParent: () => hero, isLocked: () => locked }),
       getActivePage: () => ({ name: "Home" }),
+      getAllPages: () => [{ id: "page-home", name: "Home" }],
     },
     components: {
       getInstanceByElementId: vi.fn(() => instance),
@@ -105,6 +106,11 @@ const withVariants = () =>
 const withOverrides = (n: number) => makeInstance({ overrides: Array.from({ length: n }, (_, i) => ({ op: "replace", path: `#/style/p${i}`, value: "x" })) } as never);
 
 describe("ComponentRow — board 26", () => {
+  it("2L9 G15 / G16: the source line says where the master can be used — 'This page · Home' or 'Component library'", () => {
+    renderRow(makeComposer({ component: makeComponent({ pageId: "page-home" }), instance: makeInstance() }));
+    expect(screen.getByTestId("component-source")).toHaveTextContent("This page · Home · v1");
+  });
+
   /* L2-028 (moved here with the name, from StatusMarks): a rename of the
      main component shows without a reselect. */
   it("follows a main-component rename", () => {
