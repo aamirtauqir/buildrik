@@ -154,7 +154,11 @@ export function usePageSettings(
   const [headCodeError, setHeadCodeError] = React.useState<string | null>(null);
   const [saveState, setSaveState] = React.useState<SaveState>("clean");
 
-  const savedSnapshot = React.useRef<string>("");
+  /* State, not a ref: isDirty has to recompute when the snapshot moves. As a
+     ref, a page whose persisted fields all equal the hook's initial ("" / defaults
+     — a Home with an empty slug) changed no state when applied, nothing
+     re-rendered, and the form read dirty against the empty first snapshot. */
+  const [savedSnapshot, setSavedSnapshot] = React.useState<string>("");
 
   const siteId = React.useMemo(() => getSiteIdFromUrl(), []);
   const getSiteOrigin = useSiteOrigin(composer, siteId);
@@ -174,7 +178,7 @@ export function usePageSettings(
     setCustomHead(state.customHead);
     setHeadCodeError(null);
     setSaveState("clean");
-    savedSnapshot.current = JSON.stringify(state);
+    setSavedSnapshot(JSON.stringify(state));
   }, []);
 
   React.useEffect(() => {
@@ -197,9 +201,10 @@ export function usePageSettings(
       allowFollow,
       customHead,
     });
-    return current !== savedSnapshot.current;
+    return current !== savedSnapshot;
   }, [
     page,
+    savedSnapshot,
     seoTitle,
     seoDesc,
     slug,
@@ -268,7 +273,7 @@ export function usePageSettings(
         },
       });
       setSaveState("clean");
-      savedSnapshot.current = JSON.stringify({
+      setSavedSnapshot(JSON.stringify({
         seoTitle,
         seoDesc,
         slug,
@@ -279,7 +284,7 @@ export function usePageSettings(
         allowIndex,
         allowFollow,
         customHead,
-      });
+      }));
       /* 6887:73801 — the saved toast carries its way on: Manage pages. */
       addToast({
         description: "Page settings saved",
