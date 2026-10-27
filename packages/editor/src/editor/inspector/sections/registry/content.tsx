@@ -8,7 +8,7 @@
  * @license BSD-3-Clause
  */
 
-import { TableAccessibilitySection, TableStructureSection } from "../TableSections";
+import { isTableCell, TableAccessibilitySection, TableCellSection, TableStructureSection } from "../TableSections";
 import { adaptElementProps, defineSection, ownSection as own, type AnySectionEntry } from "./_shared";
 import { CmsBindingSection } from "../CmsBindingSection";
 import { CollectionListSection } from "../CollectionListSection";
@@ -93,6 +93,17 @@ export const CONTENT_SECTIONS: Record<string, AnySectionEntry> = {
     open: "always",
     shouldRender: (ctx) => ctx.selectedElement.type === "table" && ctx.selectedIds.length <= 1,
     Component: TableAccessibilitySection,
+    styleKeys: [],
+    adaptProps: (ctx) => ({ composer: ctx.composer ?? null, elementId: ctx.selectedElement.id, isOpen: ctx.isOpen, onToggle: ctx.onToggle }),
+  }),
+
+  /* 2L9 245:43495: a td / th inside a table. */
+  "table-cell": defineSection({
+    tab: "content",
+    title: "Cell",
+    open: "always",
+    shouldRender: (ctx) => ctx.selectedIds.length <= 1 && isTableCell(ctx.composer?.elements.getElement(ctx.selectedElement.id)),
+    Component: TableCellSection,
     styleKeys: [],
     adaptProps: (ctx) => ({ composer: ctx.composer ?? null, elementId: ctx.selectedElement.id, isOpen: ctx.isOpen, onToggle: ctx.onToggle }),
   }),

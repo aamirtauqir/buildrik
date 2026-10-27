@@ -29,11 +29,14 @@ const CONTENT_ORDER: readonly SectionId[] = [
   /* 2L9 245:42929: a table's Structure and Accessibility. */
   "table-structure",
   "table-accessibility",
+  "table-cell",
   "semantics",
   "attributes",
 ];
 
 const STYLE_ORDER: readonly SectionId[] = [
+  /* 2L9 245:44049: a table's scroll wrapper leads with its own layout. */
+  "table-wrapper",
   "type-layout",
   "layout",
   /* 2L9 247:21216: "Advanced layout · n set" right under Children layout. */

@@ -12,7 +12,12 @@
  *                  Add copies cell type and appearance only. …
  *   Accessibility  Caption [ … ]                its <caption>, made / removed
  *
- * Every write passes the lock gate on the table (P-1) and is one Undo.
+ * A cell (245:43495, C14) gets "Cell" — Native tag td / th, Edit cell
+ * content, Column / Row span, Back to the table — and "Header associations"
+ * (Scope on a th, Headers). The scroll wrapper (245:44049, C15) gets
+ * "Wrapper layout" on Style — Width, Overflow X / Y, Back to the table.
+ *
+ * Every write passes the lock gate (P-1) and is one Undo.
  *
  * @license BSD-3-Clause
  */
@@ -22,7 +27,10 @@ import type { Composer } from "@/engine";
 import type { Element } from "@/engine/elements/Element";
 import { writeElement } from "@/engine/commands/commandOperations";
 import { Button } from "@/editor/chrome-ui";
-import { Section, type SectionTier } from "../shared/controls";
+import { InputWithUnit, Section, SelectRow, type SectionTier } from "../shared/controls";
+import { GROUP_TITLE } from "../shared/controls/controlClasses";
+import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
+import type { BaseStyleSectionProps } from "./registry/_shared";
 import { WIDE_BUTTON } from "../shared/controls/controlClasses";
 import { CommitRow, NoteRow } from "./behaviourRows";
 import { EVENTS } from "@/shared/constants/events";
@@ -163,6 +171,106 @@ export const TableAccessibilitySection: React.FC<TableSectionProps> = ({ compose
   return (
     <Section title="Accessibility" isOpen={isOpen} onToggle={onToggle} tier={tier} id="inspector-section-table-accessibility">
       <CommitRow label="Caption" value={caption ? textOf(caption) : ""} placeholder="Describe this table" onCommit={writeCaption} testId="table-caption" />
+    </Section>
+  );
+};
+
+/** The table a cell or wrapper belongs to: an ancestor, or the wrapper's child. */
+function tableOf(el: Element | null | undefined): Element | null {
+  for (let at = el?.getParent() ?? null; at; at = at.getParent()) if (at.getType() === "table") return at;
+  return el?.getChildren().find((c) => c.getType() === "table") ?? null;
+}
+
+const isCellTag = (el: Element | null | undefined) => Boolean(el) && (tag(el!) === "td" || tag(el!) === "th");
+
+/** Is this a table cell — a td / th inside a table? */
+export const isTableCell = (el: Element | null | undefined) => isCellTag(el) && Boolean(tableOf(el));
+/** Is this a table's scroll wrapper — the div holding a table? */
+export const isTableWrapper = (el: Element | null | undefined) =>
+  Boolean(el) && tag(el!) === "div" && (el!.getChildren().some((c) => c.getType() === "table"));
+
+function BackToTable({ composer, table }: { composer: Composer; table: Element | null }) {
+  if (!table) return null;
+  return (
+    <Button color="light" size="xs" className={WIDE_BUTTON} onClick={() => composer.selection.select(table)}>
+      Back to {getLayerName(table) ?? "table"}
+    </Button>
+  );
+}
+
+const SCOPES = [
+  { value: "col", label: "Column" },
+  { value: "row", label: "Row" },
+  { value: "colgroup", label: "Column group" },
+  { value: "rowgroup", label: "Row group" },
+];
+
+export const TableCellSection: React.FC<TableSectionProps> = ({ composer, elementId, isOpen, onToggle, tier }) => {
+  useTreeVersion(composer);
+  const cell = composer?.elements.getElement(elementId);
+  if (!composer || !cell) return null;
+  const write = (label: string, fn: () => void) => writeElement(composer, cell, label, fn);
+  const setAttr = (name: string) => (value: string) =>
+    write(`cell-${name}`, () => {
+      if (value.trim()) cell.setAttribute(name, value.trim());
+      else cell.removeAttribute(name);
+    });
+  const content = cell.getChildren()[0];
+  const isHeader = tag(cell) === "th";
+  return (
+    <Section title="Cell" isOpen={isOpen} onToggle={onToggle} tier={tier} id="inspector-section-table-cell">
+      <SelectRow
+        label="Native tag"
+        placeholder={null}
+        value={tag(cell)}
+        options={[
+          { value: "td", label: "td" },
+          { value: "th", label: "th" },
+        ]}
+        onChange={(v) => write("cell-tag", () => cell.setTagName(v))}
+      />
+      {content ? (
+        <Button color="light" size="xs" className={WIDE_BUTTON} onClick={() => composer.selection.select(content)}>
+          Edit cell content
+        </Button>
+      ) : null}
+      <CommitRow label="Column span" value={cell.getAttribute("colspan") ?? ""} placeholder="1 · implicit" onCommit={setAttr("colspan")} testId="cell-colspan" />
+      <CommitRow label="Row span" value={cell.getAttribute("rowspan") ?? ""} placeholder="1 · implicit" onCommit={setAttr("rowspan")} testId="cell-rowspan" />
+      <NoteRow>Remove span differs from Set 1. Row span 0 means to the end of this row group.</NoteRow>
+      <BackToTable composer={composer} table={tableOf(cell)} />
+      <div className={GROUP_TITLE}>Header associations</div>
+      <NoteRow>Scope is available only for a th header. Existing headers references are preserved.</NoteRow>
+      {isHeader ? (
+        <SelectRow label="Scope" value={cell.getAttribute("scope") ?? ""} placeholder="Auto" options={SCOPES} onChange={setAttr("scope")} />
+      ) : null}
+      <CommitRow label="Headers" value={cell.getAttribute("headers") ?? ""} placeholder="header ids" onCommit={setAttr("headers")} testId="cell-headers" />
+    </Section>
+  );
+};
+
+const OVERFLOW = [
+  { value: "visible", label: "Visible" },
+  { value: "auto", label: "Auto" },
+  { value: "scroll", label: "Scroll" },
+  { value: "hidden", label: "Hidden" },
+];
+
+export const TableWrapperSection: React.FC<BaseStyleSectionProps & { composer?: Composer | null; elementId: string }> = ({
+  styles,
+  onChange,
+  isOpen,
+  onToggle,
+  composer,
+  elementId,
+}) => {
+  const wrapper = composer?.elements.getElement(elementId);
+  return (
+    <Section title="Wrapper layout" isOpen={isOpen} onToggle={onToggle} id="inspector-section-table-wrapper">
+      <InputWithUnit label="Width" property="width" units={["%", "px", "rem", "vw"]} value={styles.width || ""} onChange={(v) => onChange("width", v)} />
+      <SelectRow label="Overflow X" property="overflow-x" value={styles["overflow-x"] || "visible"} options={OVERFLOW} onChange={(v) => onChange("overflow-x", v)} />
+      <SelectRow label="Overflow Y" property="overflow-y" value={styles["overflow-y"] || "visible"} options={OVERFLOW} onChange={(v) => onChange("overflow-y", v)} />
+      <NoteRow>These values belong to the wrapper. Table cells keep native table layout.</NoteRow>
+      {composer ? <BackToTable composer={composer} table={tableOf(wrapper)} /> : null}
     </Section>
   );
 };
