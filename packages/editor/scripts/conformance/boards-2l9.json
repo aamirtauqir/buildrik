@@ -764,8 +764,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-A S10 built, not compared: empty name shows 'Name the page' (Create stays disabled).",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case new-page-dialog, Blank chosen, name cleared; board shots/101-37542.png): 640 dialog, 'Fieldwork Studio · Create a page', Page name field now red-bordered (aria-invalid, described by 'Name the page'), Blank/From template chips, 'Start with an empty page.', Add to site navigation, Cancel + disabled Create page. Not conformed: the board's gray field fill is the shared chrome-ui TextInput theme (white); Create page 107 wide vs board ~208 (label-driven). Capacity line not in the probe (no plan).",
    "tier": "P1"
   },
   {
