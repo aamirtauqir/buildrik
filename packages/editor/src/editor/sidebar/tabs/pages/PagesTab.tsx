@@ -38,6 +38,7 @@ import { PageContextMenu } from "./components/PageContextMenu";
 import { MovePagesDialog, TOP_LEVEL } from "./components/MovePagesDialog";
 import { PageList } from "./components/PageList";
 import { SiteStructureTree } from "./components/SiteStructureTree";
+import { AddPageButton } from "./components/AddPageButton";
 import { SearchListingsTable } from "./components/SearchListingsTable";
 import { PageSettingsDrawer } from "./page-settings/PageSettingsDrawer";
 import { useDirtyPages } from "@/editor/shared/useDirtyPages";
@@ -577,7 +578,16 @@ export const PagesTab: React.FC<PagesTabProps> = ({
                inert for the same reason — written for a flex parent it never
                had. */
             <div className="tw:flex tw:h-full tw:min-h-0 tw:flex-col">
-              <SearchListingsTable pages={p.pages} onEditPage={p.openSettings} search={search} onOpenFull={onExpandToggle} />
+              <SearchListingsTable pages={p.pages} onEditPage={p.openSettings} onRowMenu={p.openContextMenu} search={search} />
+              {/* Board 63:21262 keeps the Pages footer under the listing. A new
+                  folder only shows in the Pages view, so it goes there. */}
+              <div className="bd-pg-footer" data-testid="pages-footer">
+                <AddPageButton
+                  onAddBlank={requestNewPage}
+                  onFromTemplate={onRequestTemplates}
+                  onAddFolder={() => { setView("pages"); setNewFolderId(f.createFolder("New Folder")); }}
+                />
+              </div>
             </div>
           ) : (
           <PageList

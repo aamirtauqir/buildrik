@@ -383,13 +383,16 @@
 .bd-pg-drawer-scrim {
   position: fixed;
   inset: 0;
-  z-index: 90;
+  z-index: var(--bk-z-overlay);
   background: rgba(17, 24, 39, 0.6);
 }
 .bd-pg-drawer {
   /* design-2l9 board 63:15939: a 720×700 dialog, radius 8. */
   position: fixed;
-  z-index: 91;
+  /* The overlay layer, with its scrim: the leave guard (a chrome-ui modal,
+     whose overlay is on this same layer) mounts later and so draws over this
+     dialog — at 91 it sat hidden behind it. */
+  z-index: var(--bk-z-overlay);
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
@@ -452,7 +455,7 @@
 .bd-pg-drawer-body {
   flex: 1;
   overflow-y: auto;
-  padding: var(--bk-space-20) var(--bk-space-20) var(--bk-space-12);
+  padding: var(--bk-space-20) var(--bk-space-24) var(--bk-space-12);
   display: flex;
   flex-direction: column;
   gap: var(--bk-space-8);

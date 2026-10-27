@@ -26,6 +26,10 @@ L3-2. **lead3 (wave 3) · AquibraStudio.tsx (banner slot DOM order)** · same mo
 
 ## Open — lane L-A (2026-10-26)
 
+A-17. **L-A → owner · Pages "order commands" menu** · boards 137:55343 / 137:56060 / 137:56781 (B3-P130–132) draw a separate 280-wide menu beside the row — the page's name as its title, Move up ⌥↑, Move down ⌥↓ (disabled + reason at a boundary), Close menu — but no board shows what opens it: the row ⋯ opens the full menu (63:13820), which already carries Move up / Move down with the boundary reasons. Which control opens the order-commands menu (a drag handle, a key, a "Reorder…" item)? Until answered the moves stay in the row menu and the three rows stay drift-open.
+
+A-18. **L-A → lead · `shell/StudioPanels.tsx` (Pages drawer width)** · in the Listings view the Pages drawer is 720 wide, floating over the canvas with the canvas still visible to its right (board 63:21262: x56–776) · StudioPanels passes `isExpanded={false}` / `onExpandToggle={() => {}}`, so nothing can widen it from the tab. PagesTab knows the view: a `view === "listings"` callback (or honouring `onExpandToggle`) is all the tab needs. The table is built and probe-compared at 720.
+
 
 
 

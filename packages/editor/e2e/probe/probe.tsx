@@ -94,6 +94,9 @@ import { ComponentsTab } from "@/editor/sidebar/tabs/ComponentsTab";
 import { ComponentDetailScreen } from "@/editor/sidebar/tabs/component-library/ComponentDetailScreen";
 import { DSModeProvider } from "@/editor/design-system/state/DSModeContext";
 import { LayerTreeItem } from "@/editor/panels/layers/LayerTreeItem";
+import { renameElement } from "@/editor/panels/layers/hooks/layersPersistence";
+import { PagesTab } from "@/editor/sidebar/tabs/pages/PagesTab";
+import { MovePagesDialog, TOP_LEVEL } from "@/editor/sidebar/tabs/pages/components/MovePagesDialog";
 import type { LayerItem } from "@/editor/panels/layers/types";
 import { HistoryTab } from "@/editor/sidebar/tabs/history/HistoryTab";
 import { MilestoneSuggestionBanner } from "@/editor/sidebar/tabs/history/components/MilestoneSuggestionBanner";
@@ -793,6 +796,32 @@ const LAYERS_SEED = [
 ];
 
 let _layersComposer: Composer | null = null;
+function listingsComposer(): Composer {
+  const c = new Composer({} as never);
+  for (const [name, slug] of [["Home", ""], ["About", "about"], ["Work", "work"], ["Contact", "contact"], ["Legal", "legal"]]) {
+    const page = c.elements.createPage(name, { slug } as never);
+    if (name === "Home") {
+      c.elements.setHomePage(page.id);
+      c.elements.setActivePage(page.id);
+    }
+  }
+  return c;
+}
+
+function addTargetComposer(): Composer {
+  const c = new Composer({} as never);
+  const page = c.elements.createPage("Home", {
+    id: "ax-page",
+    root: { id: "ax-root", type: "container", tagName: "div", classes: ["buildrick-page-root"], children: [] },
+  });
+  c.elements.setActivePage(page.id);
+  const hero = c.elements.createElement("section" as never, { id: "ax-hero" });
+  c.elements.addElement(hero, page.root.id);
+  renameElement(c, "ax-hero", "Hero");
+  c.selection.select(c.elements.getElement("ax-hero") ?? null);
+  return c;
+}
+
 function layersComposer(): Composer {
   if (_layersComposer) return _layersComposer;
   const c = new Composer({} as never);
@@ -2545,6 +2574,17 @@ const CASES: Record<string, () => React.ReactElement> = {
       </ToastProvider>
     </div>
   ),
+  /* Add panel with a target, board 7:18981: a real Composer with "Hero"
+     selected, so the insert-target strip reads "Insert into Hero". */
+  "add-panel-target": () => (
+    <div data-probe="add-panel-target">
+      <ToastProvider>
+        <div className="tw:flex tw:h-[812px] tw:w-70 tw:flex-col tw:overflow-hidden tw:bg-white">
+          <BuildTab composer={addTargetComposer()} onExpandToggle={() => {}} onClose={() => {}} />
+        </div>
+      </ToastProvider>
+    </div>
+  ),
   // ── Components · library (board 641:2546) ────────────────────────────────
   // onExpandToggle + onClose are what put the panel in `isStandaloneMode`, and
   // therefore what draws the 44h header the board opens with; onHelpClick is
@@ -3027,6 +3067,15 @@ const CASES: Record<string, () => React.ReactElement> = {
       })}
     </div>
   ),
+  /* design-2l9 board 63:21262 — the manager's Listings view, 720 wide as the
+     board draws it, on a real Composer (the recipe clicks the Listings tab). */
+  "pages-listings": () => (
+    <div data-probe="pages-listings" style={{ width: 720, height: 812, display: "flex" }}>
+      <ToastProvider>
+        <PagesTab composer={listingsComposer()} onClose={() => {}} />
+      </ToastProvider>
+    </div>
+  ),
   /* design-2l9 board 101:29978 — New page, From template chosen. The modal
      opens on UI_NEW_PAGE_REQUESTED; the fixture composer fires it on mount. */
   "new-page-dialog": () => <NewPageProbe />,
@@ -3499,6 +3548,46 @@ const CASES: Record<string, () => React.ReactElement> = {
         </div>
       ),
     ]),
+  ),
+
+  /* design-2l9 board 127:38098 — the row menu's "Move to folder…" for About. */
+  "pages-move-one": () => (
+    <div data-probe="pages-move-one" style={{ width: 1440, height: 900 }}>
+      <MovePagesDialog
+        open
+        pageNames={["About"]}
+        folders={[
+          { id: "client", name: "Client projects", pageIds: [] } as never,
+          { id: "studio", name: "Studio", pageIds: ["legal"] } as never,
+        ]}
+        current={{ target: TOP_LEVEL, url: "/about" }}
+        onMove={() => {}}
+        onClose={() => {}}
+      />
+    </div>
+  ),
+  /* design-2l9 board 63:18189 — page settings whose save is refused. The
+     composer stub refuses the one write the save makes; the recipe edits the
+     title and presses Save. */
+  "pages-settings-save-failed": () => (
+    <div data-probe="pages-settings-save-failed" style={{ width: 1440, height: 900, background: "var(--bk-gray-900)" }}>
+      <ToastProvider>
+        <PageSettingsDrawer
+          page={PAGE_SETTINGS_FIXTURE}
+          allPages={[PAGE_SETTINGS_FIXTURE, ...PAGES_FIXTURE.slice(1)]}
+          composer={{
+            on: () => {},
+            off: () => {},
+            emit: () => {},
+            elements: {
+              updatePage: () => Promise.reject(new Error("refused")),
+              getAllPages: () => [],
+            },
+          } as never}
+          onClose={() => {}}
+        />
+      </ToastProvider>
+    </div>
   ),
 
   /* Board 815:4608 — the four smart-guide scenarios. A guide only exists

@@ -50,12 +50,12 @@ export function InsertTargetStrip({ composer }: { composer: Composer | null }) {
     <div
       data-testid="add-insert-target"
       aria-live="polite"
-      className="tw:mx-3 tw:mb-2 tw:flex tw:flex-col tw:gap-0.5 tw:rounded-md tw:bg-[var(--bk-bg-subtle)] tw:px-3 tw:py-2"
+      className="tw:flex tw:flex-col tw:gap-0.5 tw:px-2 tw:pt-2 tw:pb-1.5"
     >
-      <span className="tw:truncate tw:text-[12px] tw:leading-4 tw:font-medium tw:text-[var(--bk-ink)]" data-testid="add-insert-target-name">
+      <span className="tw:truncate tw:text-[13px] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)]" data-testid="add-insert-target-name">
         {`Insert into ${target.parentName}`}
       </span>
-      <span className="tw:truncate tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="add-insert-target-path" title={target.path}>
+      <span className="tw:truncate tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="add-insert-target-path" title={target.path}>
         {`${target.path} · ${target.afterName ? `after ${target.afterName}` : "At end"}`}
       </span>
     </div>

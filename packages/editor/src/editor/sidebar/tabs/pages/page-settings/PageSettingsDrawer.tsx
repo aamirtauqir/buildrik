@@ -189,7 +189,8 @@ const PageSettingsCard: React.FC<Props> = ({ page, allPages, composer, onClose, 
             </div>
           )}
         </div>
-        {s.saveState === "error" && (
+        {/* The SEO tab says it in its form (63:18189); the other two here. */}
+        {s.saveState === "error" && s.activeTab !== "seo" && (
           <p
             role="alert"
             className="tw:m-0 tw:px-5 tw:py-2 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-error-text)] tw:bg-[var(--bk-error-tint)]"

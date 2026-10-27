@@ -21,8 +21,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-A S1 built, not compared: Elements · Blocks · Components tabs (chrome-ui Tabs), 'Insert into {Parent}' / '{Page} / {Path} · At end|after {X}' strip, Elements grouped by category ('Basic elements' first). Copy checked against the dump in RTL; geometry not compared. Receipt toast is REQUESTS #11 (useBlockInsertion, lead-owned).",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case add-panel-target, real Composer with Hero selected, board shots/7-18981.png): 'Search elements' (no ellipsis, no ⌘F chip — the shortcut still works); Elements · Blocks · Components as a segmented control on a gray card at y101, 256×32, active tab white; 'Insert into Hero' / 'Home / Hero · At end' as the card's lower half (13/12px), card 84 tall like the board; category headers 12/600 ink, 20 tall, no chevron or count (▸ only when collapsed), first at y186 (board 186); rows 32 tall, inset 12, rounded 6, icon at 24. Row list is the code catalog (board's sample order not conformed). Open: panel ✕ in the header comes from the shell's onClose (StudioPanels, not L-A); PanelSearch inset 16 vs board ~10 is the shared chrome-ui field (lead4).",
    "tier": "P1"
   },
   {
@@ -199,8 +199,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-A wave 2 built, not compared: explainer 'Empty social title uses SEO title; empty description uses the SEO description.' (true: SEOInjector ogTitle || title), labels Social title / Social description / Social image URL, helper 'Recommended: 1200 × 630. Clear the URL to remove the image.'. Container is the drawer (owner decision).",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (page-settings dialog, Social tab, board shots/63-16507.png): explainer line; 'Social title · n / 60' + input; Social description textarea with n / 160 under it; 'Social image' 240×124 gray preview (1200 × 630); 'Social image URL' + rule. OG share-card mock removed.",
    "tier": "P1"
   },
   {
@@ -210,8 +210,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-A wave 2 built, not compared: 'Publish visibility', 'Live means this page is included on the next publish.', 'Search indexing: Indexed · Change in SEO' (readout — the switch lives once, in SEO), Follow links switch, 'Head code' with 'Changes apply on the next publish.' / 'Head code affects this page only and is sanitized before save.'. The board's '· Pro' tag is not drawn: head code is not plan-gated in code.",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (Advanced tab, board shots/63-17061.png): Publish visibility select Live/Hidden + helper; 'Search indexing: Indexed' + 'Change in SEO' link (switches to SEO tab); Follow links select; Head code textarea + two rules. Board's '· Pro' on Head code not drawn: code:head-code-not-gated.",
    "tier": "P1"
   },
   {
@@ -232,8 +232,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-A S9 built, not compared: inline 'Couldn’t save page settings. Your changes are still here.', primary 'Retry save', subtitle '{Page} · Unsaved settings changes · {Active} stays open' (the failure toast is gone).",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case pages-settings-save-failed, board shots/63-18189.png): red 'Couldn’t save page settings. Your changes are still here.' inline between Site SEO defaults and SEO score details on the SEO tab (band kept for other tabs); title label reads 'Unsaved override' while dirty; footer Retry save. Board's breadcrumb suffix '· Home stays open' is sample context, not drawn.",
    "tier": "P1"
   },
   {
@@ -243,8 +243,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-A S9 built, not compared: 'Leave without saving?', 'You have unsaved page settings for {Page}. Save or discard them to return to Pages, or keep editing. {Active} stays open.', Keep editing · Discard changes · Save and leave (saves, then closes). Offline / invalid variants (101:24231, 101:29372) not built.",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (board shots/63-18758.png): leave guard was rendering BEHIND the dialog (drawer z 90/91 vs overlay 50) — drawer+scrim moved to --bk-z-overlay, stacking test added. Guard now 480 wide, 16px scale title (board 15), 13px body, left-aligned 32px buttons, neutral Discard.",
    "tier": "P1"
   },
   {
@@ -288,8 +288,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-A wave 2 built, not compared: columns 'Page and URL · SEO score · Visibility' (URL under the name, 'Hidden' for hidden pages), note 'Search names and URLs. Scores match Page settings → SEO.', the Pages search filters names and URLs. The score is the SEO tab's own calculateSeoScore, printed where the page has its own SEO title, '—' otherwise (the old separate rollup disagreed with the SEO tab). Board draws the view 720 wide; the panel's width toggle is unchanged (Open full listings kept).",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case pages-listings, real PagesTab on a real Composer at 720 wide, board shots/63-21262.png): 40-tall header 13/600 ink, columns at x476 SEO score / x556 Visibility / ⋯ (board same), 52-tall rows with Home roof / page glyph, name 13 over URL 12 sans, score/visibility 13px, row ⋯ opens the page menu, note under the last row, Pages footer (+ Add page / From template / New folder) kept under the listing. Dead 'Open full listings ›' removed (the shell's toggle is a no-op). Open: the drawer widening to 720 over the canvas is the shell's (REQUESTS A-18); vertical offset of 9px is the shared PanelFrame header (44 vs board 56).",
    "tier": "P1"
   },
   {
@@ -1374,8 +1374,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-A S6 built, not compared: 'Move {Page} to…', 'Choose where to organize {Page}. Folders are personal; only you see them. The page URL {url} stays unchanged.', folders + 'Top level (no folder)', 'Move to {Folder}'.",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case pages-move-one, board shots/127-38098.png): dialog 480×300 (board 480×302) via Modal width sm; body 13px two lines; choices radio + name only (folder glyph removed), 32 tall on a 40 pitch, picked one a blue-50 pill fitting its label, unchecked radios outlined; Cancel / 'Move to Client projects' 32 tall, right. Primary 175 wide vs board ~208 (label-driven).",
    "tier": "P1"
   },
   {
@@ -1591,7 +1591,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-A S6 built: Move up ⌥↑ / Move down ⌥↓ in the menu and as row chords (PageRow, top-level rows only).",
+   "verifiedNote": "L-A S6 built: Move up ⌥↑ / Move down ⌥↓ in the row menu and as row chords. Board's separate 'order commands' menu (title · Move up · Move down · Close menu) has no drawn entry point — REQUESTS A-17 (owner).",
    "tier": "P1"
   },
   {

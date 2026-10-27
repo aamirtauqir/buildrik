@@ -31,15 +31,12 @@ export interface MovePagesDialogProps {
   onClose: () => void;
 }
 
-/* 6887:77925 row: 36 tall, radius 6, no border; the picked one on blue-50. */
-const ROW = "tw:flex tw:h-9 tw:cursor-pointer tw:items-center tw:gap-2 tw:rounded-md tw:px-2 tw:text-[13px] tw:text-[var(--bk-ink)]";
+/* design-2l9 127:38098: a 32-tall choice on a 40 pitch, radio + name only;
+   the picked one is a blue-50 pill that fits its label. */
+const ROW = "tw:flex tw:h-8 tw:w-fit tw:cursor-pointer tw:items-center tw:gap-3 tw:rounded-md tw:px-2 tw:text-[13px] tw:text-[var(--bk-ink)]";
 const ROW_PICKED = "tw:bg-[var(--bk-accent-tint)]";
-
-const FolderGlyph = () => (
-  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true" className="tw:text-[var(--bk-ink-muted)]">
-    <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" />
-  </svg>
-);
+const RADIO = "tw:border-[var(--bk-ink-muted)] tw:bg-[var(--bk-bg-card)]";
+const BTN = "tw:h-8 tw:min-h-0 tw:px-5 tw:text-[13px]";
 
 export function MovePagesDialog({ open, pageNames, folders, onMove, onClose, current }: MovePagesDialogProps) {
   const [picked, setPicked] = React.useState<string>(TOP_LEVEL);
@@ -58,13 +55,14 @@ export function MovePagesDialog({ open, pageNames, folders, onMove, onClose, cur
       open={open}
       onClose={onClose}
       title={single ? `Move ${single} to…` : `Move ${count} page${count === 1 ? "" : "s"} to…`}
+      width="sm"
       testId="pages-move-dialog"
       footer={
         <>
-          <Button color="light" size="xs" onClick={onClose}>
+          <Button color="light" size="xs" className={BTN} onClick={onClose}>
             Cancel
           </Button>
-          <Button size="xs" data-testid="pages-move-confirm" disabled={already} onClick={() => onMove(picked)}>
+          <Button size="xs" className={BTN} data-testid="pages-move-confirm" disabled={already} onClick={() => onMove(picked)}>
             {already
               ? pickedFolder ? `Already in ${pickedFolder.name}` : "Already at top level"
               : !single && count > 1
@@ -76,16 +74,15 @@ export function MovePagesDialog({ open, pageNames, folders, onMove, onClose, cur
     >
       {/* The board says folders "live in this browser only"; they are kept per
           user on the server now, so the line says who sees them. */}
-      <p className="tw:m-0 tw:mb-2 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-soft)]">
+      <p className="tw:m-0 tw:mb-3 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-soft)]">
         {single
           ? `Choose where to organize ${single}. Folders are personal; only you see them. The page URL ${current!.url} stays unchanged.`
           : `${listNames(pageNames)}. Only your folder organization changes; page URLs and the homepage stay the same.`}
       </p>
-      <div role="radiogroup" aria-label="Folders" className="tw:flex tw:flex-col">
+      <div role="radiogroup" aria-label="Folders" className="tw:flex tw:flex-col tw:gap-2">
         {targets.map((t) => (
           <label key={t.id || "top"} className={`${ROW} ${picked === t.id ? ROW_PICKED : ""}`}>
-            <Radio color="blue" name="move-pages" value={t.id} checked={picked === t.id} onChange={() => setPicked(t.id)} />
-            {t.id !== TOP_LEVEL && <FolderGlyph />}
+            <Radio color="blue" className={RADIO} name="move-pages" value={t.id} checked={picked === t.id} onChange={() => setPicked(t.id)} />
             <span>{t.name}</span>
           </label>
         ))}
