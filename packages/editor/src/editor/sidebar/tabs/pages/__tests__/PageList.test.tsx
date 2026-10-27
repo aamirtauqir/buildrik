@@ -91,17 +91,15 @@ describe("PageList", () => {
 
   /* v3 4418:95333: the query comes from the topbar field; nothing matching
      is the shared state block with a hand-off to ⌘K. */
-  /* design-2l9 board 63:22616: "No pages match “q”" + Clear search; the ⌘K
-     hand-off stays below it (code-ahead). Re-baseline: Pages no-results. */
-  it("names the failed query, clears it, and keeps Search everywhere", () => {
-    const onSearchEverywhere = vi.fn();
+  /* design-2l9 board 63:22616: "No pages match “q”" + Clear search and
+     nothing else. Re-baseline: Pages no-results (the ⌘K hand-off is gone). */
+  it("names the failed query and clears it", () => {
     const onClearSearch = vi.fn();
-    render(<PageList {...makeProps({ search: "zzznomatch", onSearchEverywhere, onClearSearch })} />);
+    render(<PageList {...makeProps({ search: "zzznomatch", onClearSearch })} />);
     expect(screen.getByText("No pages match “zzznomatch”")).toBeInTheDocument();
     fireEvent.click(screen.getByTestId("pages-no-results-clear"));
     expect(onClearSearch).toHaveBeenCalledTimes(1);
-    fireEvent.click(screen.getByTestId("pages-search-everywhere"));
-    expect(onSearchEverywhere).toHaveBeenCalledWith("zzznomatch");
+    expect(screen.queryByText(/Search everywhere/)).toBeNull();
   });
 
   it("puts the match count where the legend sits while searching (4418:92256)", () => {

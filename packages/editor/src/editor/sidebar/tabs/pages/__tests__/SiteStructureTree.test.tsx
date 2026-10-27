@@ -31,22 +31,39 @@ describe("buildRouteTree", () => {
   });
 });
 
+// re-baseline: Structure — board 63:21939 draws the host as the root and every page as a row.
 describe("SiteStructureTree", () => {
-  it("renders every page by route and selects on click", () => {
+  it("draws URL structure, the host as the site root, and every page by route; a row selects", () => {
     const onSelectPage = vi.fn();
     render(<SiteStructureTree pages={PAGES} onSelectPage={onSelectPage} host="fieldwork.studio" />);
-    /* design-2l9 board 63:21939. Re-baseline: Structure header. */
-    expect(screen.getByTestId("pages-structure-head")).toHaveTextContent("URL structurefieldwork.studio · Site root");
+    expect(screen.getByTestId("pages-structure-head")).toHaveTextContent("URL structure");
+    expect(screen.getByTestId("structure-root")).toHaveTextContent("fieldwork.studioSite root");
     expect(screen.getByText("This view follows page URLs. My folders stay in Pages.")).toBeInTheDocument();
-    expect(screen.getByText("/pricing/teams")).toBeInTheDocument();
-    expect(screen.getByText(/\(no page\)/)).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Teams" }));
+    expect(screen.getByTestId("structure-page-home")).toHaveTextContent("Home/");
+    expect(screen.getByTestId("structure-page-teams")).toHaveTextContent("Teams/pricing/teams");
+    expect(screen.getByTestId("structure-segment-help")).toHaveTextContent("Help/help");
+    fireEvent.click(screen.getByTestId("structure-page-teams"));
     expect(onSelectPage).toHaveBeenCalledWith("teams");
+  });
+
+  it("the row ⋯ opens the page menu without selecting the page", () => {
+    const onSelectPage = vi.fn();
+    const onRowMenu = vi.fn();
+    render(<SiteStructureTree pages={PAGES} onSelectPage={onSelectPage} onRowMenu={onRowMenu} />);
+    fireEvent.click(screen.getByRole("button", { name: "More options for Teams" }));
+    expect(onRowMenu).toHaveBeenCalledWith("teams", expect.any(Number), expect.any(Number));
+    expect(onSelectPage).not.toHaveBeenCalled();
+  });
+
+  it("filters names and URLs with the Pages search", () => {
+    render(<SiteStructureTree pages={PAGES} onSelectPage={vi.fn()} search="faq" />);
+    expect(screen.getByTestId("structure-page-faq")).toBeInTheDocument();
+    expect(screen.queryByTestId("structure-page-pricing")).toBeNull();
   });
 });
 
 describe("SiteStructureTree — collection routes", () => {
-  it("lists each collection's pattern and page count", () => {
+  it("puts each collection under its URL segment with its page count", () => {
     render(
       <SiteStructureTree
         pages={PAGES}
@@ -54,6 +71,7 @@ describe("SiteStructureTree — collection routes", () => {
         collections={[{ id: "blog", name: "Blog post", pattern: "/blog/{slug}", count: 20, templatePageId: null }]}
       />,
     );
-    expect(screen.getByTestId("pages-structure-collections")).toHaveTextContent("Blog post/blog/{slug}20 pages");
+    expect(screen.getByTestId("structure-segment-blog")).toHaveTextContent("Blog/blog");
+    expect(screen.getByTestId("structure-collection-blog")).toHaveTextContent("Blog post/blog/{slug}20 pages");
   });
 });

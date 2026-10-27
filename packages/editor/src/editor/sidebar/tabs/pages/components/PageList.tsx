@@ -13,7 +13,7 @@
 
 import * as React from "react";
 import { EmptyState, EmptyStateActions, EmptyStateDesc, EmptyStateTitle, Button } from "@/editor/chrome-ui";
-import { PanelLoadError, PanelLoadingSkeleton, PanelNoResults } from "@/editor/shared/PanelStates";
+import { PanelLoadError, PanelLoadingSkeleton } from "@/editor/shared/PanelStates";
 import type { Composer } from "@/engine";
 import type { FolderItem, PageItem } from "../types";
 import type { CollectionPagesRow } from "../useDynamicPagesSummary";
@@ -40,8 +40,6 @@ interface Props {
   selectedIds: Set<string>;
   /** The topbar filter (v3 4418:92256) — empty when not searching. */
   search?: string;
-  /** "Search everywhere" on the no-results block hands the query to ⌘K. */
-  onSearchEverywhere?: (query: string) => void;
   /** Board 63:22616's "Clear search". */
   onClearSearch?: () => void;
   /** Pages with unsaved edits — board 140:21's dirty ●. */
@@ -91,7 +89,6 @@ export const PageList: React.FC<Props> = ({
   pageToFolder,
   selectedIds,
   search = "",
-  onSearchEverywhere,
   onClearSearch,
   dirtyPages,
   loadError,
@@ -228,15 +225,20 @@ export const PageList: React.FC<Props> = ({
       ) : (
       <div className="bd-pg-list">
         {visible.length === 0 && search ? (
-          <PanelNoResults
-            search={search}
-            message={`No pages match “${search}”`}
-            testId="pages-no-results"
-            everywhereTestId="pages-search-everywhere"
-            actionOffset="tw:mt-2"
-            onClear={onClearSearch}
-            onSearchEverywhere={onSearchEverywhere}
-          />
+          /* design-2l9 board 63:22616: the failed query as a heading and an
+             outlined Clear search, left-aligned — no icon, no ⌘K hand-off. */
+          <div className="tw:flex tw:flex-col tw:items-start tw:gap-3 tw:px-3 tw:pt-2" role="status" data-testid="pages-no-results">
+            <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:font-semibold tw:text-[var(--bk-ink)]">{`No pages match “${search}”`}</p>
+            <Button
+              color="light"
+              size="xs"
+              className="tw:h-8 tw:min-h-0 tw:px-3 tw:text-[13px] tw:font-normal tw:text-[var(--bk-ink)] tw:focus:ring-0"
+              data-testid="pages-no-results-clear"
+              onClick={onClearSearch}
+            >
+              Clear search
+            </Button>
+          </div>
         ) : (
           <>
             {/* Only treeitems inside the tree. The one-page note below carries

@@ -299,8 +299,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-A wave 2 built, not compared: 'URL structure', '{host} · Site root' (published host via useSiteOrigin), the route tree, collection rows '{name} {pattern} {n} pages', note 'This view follows page URLs. My folders stay in Pages.'",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case pages-tab → Structure, board shots/63-21939.png): search kept over Structure and now filters it by name and URL; 'URL structure' 13/600; host row (glyph, 'fieldwork.studio' / 'Site root'; 'Site' when unpublished) at the root; every page one step in as a 52-tall row (Home roof / page glyph, name over URL, ⋯ = page menu) in site order; a segment with no page drawn as a folder ('Blog /blog') with collection patterns under it ('Blog post /blog/{slug} · 20 pages', unit-tested — the probe has no CMS); note under the tree; Pages footer kept. Host row ⋯ / collection ⋯ not drawn: neither would have actions.",
    "tier": "P1"
   },
   {
@@ -310,8 +310,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-A S5 built, not compared: 'No pages match “q”' + Clear search; 'Search everywhere' kept below it (code-ahead).",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case pages-tab with 'zzzz' typed, board shots/63-22616.png): left-aligned 'No pages match “zzzz”' 13/600 at x12 and an outlined 32-tall Clear search under it; icon, 'Nothing here yet' and the ⌘K 'Search everywhere' hand-off removed (⌘K itself still opens the palette).",
    "tier": "P1"
   },
   {

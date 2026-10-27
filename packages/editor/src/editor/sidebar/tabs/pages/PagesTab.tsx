@@ -557,12 +557,9 @@ export const PagesTab: React.FC<PagesTabProps> = ({
           </>
         }
       />
-      {/* Over the views it filters — Pages and Listings (board 63:21262:
-          "Search names and URLs"). Structure takes no query, and a dead
-          field over it would be a lie. */}
-      {(p.loadError || view !== "structure") && (
-        <PanelSearch placeholder="Search pages…" value={search} onChange={setSearch} data-testid="pages-search" />
-      )}
+      {/* Over all three views (boards 63:6393 / 63:21262 / 63:21939): it
+          filters names and URLs in each. */}
+      <PanelSearch placeholder="Search pages…" value={search} onChange={setSearch} data-testid="pages-search" />
       {/* Board 63:6393: the three views as tabs under the search (they were
           ⋯ rows only; the ⋯ keeps them too, as board 65:17148 draws). */}
       {!p.loadError && (
@@ -582,12 +579,24 @@ export const PagesTab: React.FC<PagesTabProps> = ({
           a replacement for the whole panel body. */}
       <PanelFrame.Body noScroll>
           {view === "structure" && !p.loadError ? (
-            <SiteStructureTree
-              pages={p.pages}
-              onSelectPage={(id) => { p.selectPage(id); }}
-              host={siteHost}
-              collections={dynamicPages.collections}
-            />
+            <div className="tw:flex tw:h-full tw:min-h-0 tw:flex-col">
+              <SiteStructureTree
+                pages={p.pages}
+                onSelectPage={(id) => { p.selectPage(id); }}
+                onRowMenu={p.openContextMenu}
+                host={siteHost}
+                collections={dynamicPages.collections}
+                search={search}
+              />
+              {/* Board 63:21939 keeps the Pages footer under the tree too. */}
+              <div className="bd-pg-footer" data-testid="pages-footer">
+                <AddPageButton
+                  onAddBlank={requestNewPage}
+                  onFromTemplate={onRequestTemplates}
+                  onAddFolder={() => { setView("pages"); setNewFolderId(f.createFolder("New Folder")); }}
+                />
+              </div>
+            </div>
           ) : view === "listings" && !p.loadError ? (
             /* PanelFrame.Body is `flex-1 min-h-0 overflow-hidden` — flex-1 as a
                CHILD, but it is not itself display:flex, so these two stack as
@@ -624,7 +633,6 @@ export const PagesTab: React.FC<PagesTabProps> = ({
             pageToFolder={f.pageToFolder}
             selectedIds={bulk.selectedIds}
             search={search}
-            onSearchEverywhere={composer ? (query) => composer.emit(EVENTS.UI_TOGGLE_COMMAND_PALETTE, { query }) : undefined}
             onAddPage={requestNewPage}
             onAddFolder={() => setNewFolderId(f.createFolder("New Folder"))}
             newFolderId={newFolderId}
