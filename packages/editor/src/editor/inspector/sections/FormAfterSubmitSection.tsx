@@ -50,10 +50,11 @@ import type { Composer } from "@/engine";
 import { getBuildrikClient } from "@/services/api-client";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
+import { Button } from "@/editor/chrome-ui";
 import { Section, SelectRow, type SectionTier } from "../shared/controls";
 import { GROUP_TITLE } from "../shared/controls/controlClasses";
 import { pageFileNames } from "@/engine/export/pageFiles";
-import { ActionRow, CommitRow, NoteRow } from "./behaviourRows";
+import { CommitRow, NoteRow } from "./behaviourRows";
 import { CheckRow } from "../shared/controls/CheckRow";
 
 export interface FormAfterSubmitSectionProps {
@@ -299,14 +300,21 @@ function FormSettingsStatus({ status }: { status: Status }) {
         </NoteRow>
       );
     case "failed":
+      /* 156:7230: a red line (no band) and a bordered Retry under it. */
       return (
         <>
-          <NoteRow tone="error" testId="form-settings-status">
+          <p role="alert" data-testid="form-settings-status" className="tw:m-0 tw:py-2 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-error-text)]">
             Couldn’t save — your message is still here.
-          </NoteRow>
-          <ActionRow onClick={status.retry} testId="form-settings-retry">
+          </p>
+          <Button
+            color="light"
+            size="xs"
+            data-testid="form-settings-retry"
+            onClick={status.retry}
+            className="tw:h-8 tw:w-24 tw:text-[13px] tw:font-normal tw:text-[var(--bk-ink)] tw:focus:ring-0"
+          >
             Retry
-          </ActionRow>
+          </Button>
         </>
       );
     default:

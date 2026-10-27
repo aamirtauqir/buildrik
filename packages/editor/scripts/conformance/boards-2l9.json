@@ -4295,8 +4295,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Lane L-B A6 (built, not compared): status row reads 'Saving…' while the write is in flight (test FormAfterSubmitSection).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B P1 round 4 (2026-10-27), probe ?block=contact-form&siteId&formBlock&formMode=saving (save never answers), Message edited, Behavior tab, side by side with the board PNG: Form settings status 'Saving…' with the outside-Undo note, the rest as F10. Exception: no 'Applies on next publish' under After submit (code:after-submit-live-on-save).",
    "tier": "P1"
   },
   {
@@ -4306,8 +4306,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Lane L-B A6 (built, not compared): a failed save keeps the typed value, status 'Couldn’t save — your message is still here.' + Retry re-sends the same change (test F12).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B P1 round 4, probe formMode=fail (save rejects as a network failure), Message edited, side by side: the typed message stays, status 'Couldn’t save — your message is still here.' as a red line (no tinted band — changed this round) with a bordered 96-wide 'Retry' under it (was a centred link), then the note. Exception: no 'Applies on next publish' under After submit (code:after-submit-live-on-save).",
    "tier": "P1"
   },
   {
@@ -4340,8 +4340,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Lane L-B A6 (built, not compared): after the server's FORBIDDEN, Send to is replaced by 'Changing Send to needs Admin access.'. The board discloses it up front; the editor does not know the site role before a save (authority stays board until a role read exists).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B P1 round 4, probe formMode=forbidden (save answers FORBIDDEN), Send to edited, side by side: Send to reverts and Notifications reads 'Changing Send to needs Admin access.'; status 'Saved'. Exception as F10 (Applies on next publish).",
    "tier": "P1"
   },
   {
@@ -4351,8 +4351,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Lane L-B A6 (built, not compared): 'Loading form settings…'.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B P1 round 4, probe formMode=pending (load never answers), side by side: After submit reads 'Loading form settings…'. Exceptions: no 'Applies on next publish' (code:after-submit-live-on-save); Visibility · All devices and Interactions · None still draw under it (code:visibility-not-form-row — they do not depend on the form's server row; the board's specimen leaves them out).",
    "tier": "P1"
   },
   {
@@ -5303,7 +5303,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No modal trigger↔dialog link, local insertion or close policy UI",
+   "verifiedNote": "Lane L-B P1 round 4: board PNG fetched. Needs a persisted trigger → dialog link in the engine before the Inspector can draw 'Modal relationship' — REQUESTS B-17 (lead).",
    "tier": "P1"
   },
   {
@@ -5369,8 +5369,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "table is a plain container (elementCapabilities.ts:173); no rows/cols/caption/merged-cell UI",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B P1 round 4, probe ?block=table (the real Table block tree), side by side: a table opens on Content with 'Structure' — Body rows / Columns counted from tbody/thead, full-width 'Add blank row' (copies the last body row's cells, tag + appearance, no content, one transaction), 'Edit A1 · {first header}' (selects that cell), 'Inspect scroll wrapper' (selects div.table-wrapper), the board's note — and 'Accessibility · Caption' (writes a first-child <caption>, removes it when cleared). Exceptions: the counts read, they do not resize (code:rows-grow-by-add — a shrink would delete content); 'Edit' names the first body cell, the board's 'B2' is sample; Semantics and Advanced attributes stay below (code).",
    "tier": "P1"
   },
   {
@@ -5981,7 +5981,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Lane L-B A9 (built, not compared): 'SEO and social' + 'Opens {page}’s Page settings. Appearance stays here.'. Open: '✦ AI' on the page header waits on PR #33 (blocked:pr33-ai-removal); header 'Editing Desktop · Page appearance'.",
+   "verifiedNote": "Lane L-B A9 (built, not compared): 'SEO and social' + 'Opens {page}’s Page settings. Appearance stays here.'. Round 4: the page header's '✦ AI' / 'Ask AI about this page' entry point is removed (binding rule: no AI entry points in the editor UI; server endpoints kept). Open: compare against the board image; header 'Editing Desktop · Page appearance' is InspectorHeader (lead).",
    "tier": "P1"
   },
   {
@@ -6058,8 +6058,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Lane L-B S2 (built, not compared — copy checked against the dump): Reset opens 'Hover overrides · n set' with each property and value, 'Removing these n Hover properties reveals each property’s Default-state value. Other states stay unchanged.', 'Remove Hover overrides' / 'Keep overrides'.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B P1 round 4, probe ?type=heading&hoverStyles={color, opacity .8}, header state → Hover, Reset, side by side: 'Hover overrides · 2 set', Color with its swatch + '#1946E5', Opacity '80%', the consequence, full-width primary 'Remove Hover overrides' and 'Keep overrides' — the tab's whole body.",
    "tier": "P1"
   },
   {
@@ -6081,8 +6081,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Lane L-B S2 (built, not compared): Revert opens 'Tablet overrides · n set' with each property and value and 'Removing Tablet overrides reveals Desktop: {property value, …}. Other breakpoints and states are retained.' (board names the retained layers; the code does not count them), 'Remove Tablet overrides' / 'Keep overrides'.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B P1 round 4, probe ?bp=tablet&bpStyles={padding 16, radius 8} → Revert, side by side: the review is the Style tab's whole body (a tab subview now), 'Tablet overrides · 2 set', Padding / Radius as label + value rows, the consequence 'Removing Tablet overrides reveals Desktop: padding 24 px, radius 12 px. …', full-width primary 'Remove Tablet overrides'. Exceptions: 'Keep overrides' stays under it (code:review-dismiss — the board draws no way back); the consequence says 'Other breakpoints and states are retained.' where the board names them (code:retained-layers-not-counted).",
    "tier": "P1"
   },
   {
@@ -6497,7 +6497,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Save as component… opens existing dialog; no \"Where it can be used\" Library/This page scope, pending/failure states",
+   "verifiedNote": "Lane L-B P1 round 4: board PNG fetched. The dialog is shell/modals/CreateComponentModal.tsx (not L-B's path) — the full spec is REQUESTS B-16 (lead). Data already supports both scopes (pageId).",
    "tier": "P1"
   },
   {
@@ -22916,8 +22916,8 @@
    "family": "play",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Built 2026-10-27, not renderable in the probe (needs a CMS store): Choose source is a 280 card beside the column with × and the board's groups. Site and Page stay 'Planned' — the binding model reads collections only (code). The board's Content layout (Text · Tag · 'Title text' box) differs from the type-block row model — open.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B P1 round 4, probe ?type=heading&cms=unbound → 'Bind title text…', side by side: 'Choose source' card with × and search, Record data (List item off with its reason, Specific record), Site & page, Live sources. Exceptions: Site / Page / live sources read 'Planned' (code — the binding model reads collections only); 'This page’s record' shows only on a collection's template page (the board's heading is on one); the Content layout behind it follows 161:8480 ('Title text' row + bind icon, Edit text on canvas). Placement beside the column is not visible in the probe.",
    "tier": "P1"
   },
   {
@@ -22949,8 +22949,8 @@
    "family": "play",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Built 2026-10-27, not renderable in the probe (needs a CMS store): centred '‹ Back to Content', '{Property} binding', Source as a select-looking box (opens Choose source), Format box 'As written', If empty, stacked Preview, centred 'Open record ›', full-width 'Unbind — keep shown text', note.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B P1 round 4, probe ?type=heading&cms=1 → summary → detail, side by side with the board PNG: centred '‹ Back to Content' (13, 40 tall), 'Title text binding', Source as a full-width select-looking box (opens Choose source), the context line, Format 'As written' with its chevron, If empty, 'Preview' muted over the value at 14 regular, centred 'Open record ›', full-width 'Unbind — keep shown text', the keeps-note. Differences are sample/context only: the board's heading sits on a template page ('This page’s record · each page shows its own'); the probe's is a specific record, which adds the Record row.",
    "tier": "P1"
   },
   {
@@ -23071,7 +23071,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Lane L-B P1 round 3, board PNG fetched (not compared live — the probe has no CMS store): the board draws Dynamic bindings as a subview — centred '‹ Back to Content', 'Dynamic bindings · 1 binding', centred 'Title text · Blog.title ›', note 'Text bindings are edited in Content.' — where C-13 draws it as a Content section while bound. Open: subview form + note; the property label reads the field's role ('Title text').",
+   "verifiedNote": "Lane L-B P1 round 4, now compared live — the probe stubs CMS data (?cms=1: a 'Blog' collection in the browser's IndexedDB, the heading's text bound to Title): 'Dynamic bindings · 1 binding' (count at the header's right), the centred accent link 'Title text · Blog.title ›', 'Text bindings are edited in Content.' — match. A heading's text is now named 'Title text' everywhere the binding is (row, summary, detail; F2.01 / F2.05 / F2.16). Still open, one difference: the board shows the summary as a subview with '‹ Back to Content' and nothing under it; the code heads the Content tab with it while the Heading block stays below (B5-D04).",
    "tier": "P1"
   },
   {

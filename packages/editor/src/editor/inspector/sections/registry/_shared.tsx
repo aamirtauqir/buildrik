@@ -69,6 +69,8 @@ export type SectionId =
   | "collection"
   | "cms-binding"
   | "validation"
+  | "table-structure"
+  | "table-accessibility"
   | "semantics"
   | "attributes"
   // Style — define → shape → paint (DD-15)

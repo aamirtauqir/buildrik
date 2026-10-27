@@ -8,6 +8,7 @@
  * @license BSD-3-Clause
  */
 
+import { TableAccessibilitySection, TableStructureSection } from "../TableSections";
 import { adaptElementProps, defineSection, ownSection as own, type AnySectionEntry } from "./_shared";
 import { CmsBindingSection } from "../CmsBindingSection";
 import { CollectionListSection } from "../CollectionListSection";
@@ -75,6 +76,27 @@ export const CONTENT_SECTIONS: Record<string, AnySectionEntry> = {
 
   /* Tag + ID. A multi-selection keeps it only for headings (one level for
      all); a tag or an id is one element's. */
+  /* 2L9 245:42929: a table's structure and caption, from its own tree. */
+  "table-structure": defineSection({
+    tab: "content",
+    title: "Structure",
+    open: "always",
+    shouldRender: (ctx) => ctx.selectedElement.type === "table" && ctx.selectedIds.length <= 1,
+    Component: TableStructureSection,
+    styleKeys: [],
+    adaptProps: (ctx) => ({ composer: ctx.composer ?? null, elementId: ctx.selectedElement.id, isOpen: ctx.isOpen, onToggle: ctx.onToggle }),
+  }),
+
+  "table-accessibility": defineSection({
+    tab: "content",
+    title: "Accessibility",
+    open: "always",
+    shouldRender: (ctx) => ctx.selectedElement.type === "table" && ctx.selectedIds.length <= 1,
+    Component: TableAccessibilitySection,
+    styleKeys: [],
+    adaptProps: (ctx) => ({ composer: ctx.composer ?? null, elementId: ctx.selectedElement.id, isOpen: ctx.isOpen, onToggle: ctx.onToggle }),
+  }),
+
   semantics: defineSection({
     tab: "content",
     title: "Semantics",

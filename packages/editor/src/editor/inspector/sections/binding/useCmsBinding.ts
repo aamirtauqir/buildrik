@@ -62,6 +62,9 @@ export type BindingStatus =
 
 export interface CmsBindingState {
   property: BoundProperty;
+  /** The property as the boards name it: "Text", a heading's "Title text"
+   *  (2L9 F2.01 / F2.16), "Image", "Link". */
+  label: string;
   collections: CMSCollection[];
   binding: {
     collectionId: string;
@@ -128,7 +131,9 @@ export function useCmsBinding(composer: Composer | null | undefined, elementId: 
   const collections: CMSCollection[] = composer?.cms?.collections?.getAllCollections?.() ?? [];
   const missing = Boolean(binding) && !collections.some((c) => c.id === binding?.collectionId);
   const collection = binding && !missing ? collections.find((c) => c.id === binding.collectionId) ?? null : null;
-  const property = boundProperty(composer?.elements.getElement(elementId)?.getType?.());
+  const elementType = composer?.elements.getElement(elementId)?.getType?.();
+  const property = boundProperty(elementType);
+  const label = property === "content" && elementType === "heading" ? "Title text" : PROPERTY_LABEL[property];
   const field = collection && binding ? collection.fields.find((f) => f.slug === binding.fieldSlug) ?? null : null;
 
   const { listCollection, templateCollection } = React.useMemo(() => {
@@ -227,6 +232,7 @@ export function useCmsBinding(composer: Composer | null | undefined, elementId: 
 
   return {
     property,
+    label,
     collections,
     binding,
     missing,
