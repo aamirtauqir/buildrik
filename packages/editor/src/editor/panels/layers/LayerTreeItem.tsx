@@ -425,10 +425,10 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
         </Button>
         )}
         {/* design-2l9 147:77189: a search result names where it sits on its
-            own line under the row ("Services › Card 1"). */}
+            own line under the row ("Services › Card 1"), 12 in. */}
         {layer.searchPath && (
           <span
-            className="tw:-ml-4 tw:basis-full tw:truncate tw:pb-1 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]"
+            className="tw:-ml-2 tw:basis-full tw:truncate tw:pb-1 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]"
             data-testid={`layer-search-path-${layer.id}`}
           >
             {layer.searchPath}

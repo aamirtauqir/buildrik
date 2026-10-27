@@ -2803,7 +2803,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-fixed",
-   "verifiedNote": "probe-compared 2026-10-27 (layers-tree with a query, shots/147-77189.png): head '{n} matches in {N} layers' 13/600; each result's path on its own muted line under the row at x12; 'Clear search' after the list; footer '{N} layers · {n} matches'. The board's per-result chevron is not drawn (flat results have no children).",
+   "verifiedNote": "Re-compared 2026-10-27 against 147:79728's probe (same rows): results keep the chevron slot and the path sits on its own line 12 in — the earlier 'flat rows' reading of this board was wrong (the board draws ›).",
    "tier": "P1"
   },
   {
@@ -2868,8 +2868,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Same search rows as 147:77189 (L-A wave 2), not compared.",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case layers-5000, 'Text' typed, 280×512; board shots/147-79728.png): head 'n matches in 5,000 layers' 13/600 at y≈110 (board 108), each result keeps its chevron slot at depth 0 with the path on its own line 12 in (was flat rows, path at 4), footer '5,000 layers · n matches'. Not conformed: the probe finds 13 — search also matches the element TYPE, so the Text-type 'Eyebrow' counts (code behaviour); the selected result keeps its tint where the board shows none.",
    "inheritsFrom": "147:77189",
    "tier": "P1"
   },
@@ -2915,8 +2915,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Code footer 'N layers'/'N selected of M'; board 'N layers · 1 selected' (+ 'inside Hero')",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case layers-5000: 5,000 real layers on a real Composer, Hero's Text selected, drawer 280×512 = a 1440×600 window; board shots/152-79448.png): '5,000 layers · 1 selected' footer band; page row at y100–132 (board centre 117 — 8 now sits between the search band and the tree); the selected row is an accent-tint pill inset 12, radius 6, with no 2px bar (was full-bleed + bar); placeholder 'Search layers' (no ellipsis). Glyphs are the per-type icons (code).",
    "inheritsFrom": "147:75914",
    "tier": "P1"
   },

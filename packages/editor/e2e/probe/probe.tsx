@@ -871,6 +871,50 @@ function hundredComposer(): Composer {
   return c;
 }
 
+/**
+ * 5,000 layers, shaped like the boards: Navigation · Hero (Eyebrow, Headline,
+ * Text, Explore our work) · Selected work · Footer at the top, twelve layers
+ * named "Text" spread through nested groups, and plain filler to make up the
+ * count. Hero's Text is selected (152:79448).
+ */
+function layers5000Composer(): Composer {
+  const c = new Composer({} as never);
+  const page = c.elements.createPage("Home", { id: "l5-page" } as never);
+  c.elements.setActivePage(page.id);
+  let n = 0;
+  const add = (type: string, name: string, parent: string): string => {
+    const id = `l5-${n++}`;
+    c.elements.addElement(c.elements.createElement(type as never, { id }), parent);
+    renameElement(c, id, name);
+    return id;
+  };
+  const root = page.root.id;
+  add("section", "Navigation", root);
+  const hero = add("section", "Hero", root);
+  add("text", "Eyebrow", hero);
+  add("heading", "Headline", hero);
+  const heroText = add("text", "Text", hero);
+  add("button", "Explore our work", hero);
+  const work = add("section", "Selected work", root);
+  const footer = add("section", "Footer", root);
+  add("text", "Text", add("container", "Newsletter", footer));
+  const groups: Array<[string, string[]]> = [
+    ["Services", ["Card 1", "Card 2", "Card 3"]],
+    ["Work", ["Project intro", "Project outro"]],
+    ["Testimonials", ["Quote 1", "Quote 2", "Quote 3", "Quote 4", "Quote 5"]],
+  ];
+  for (const [g, cards] of groups) {
+    const gid = add("container", g, work);
+    for (const card of cards) add("text", "Text", add("container", card, gid));
+  }
+  for (let g = 1; n < 5000; g++) {
+    const gid = add("container", `Group ${g}`, work);
+    for (let i = 1; i <= 24 && n < 5000; i++) add("container", `Item ${g}.${i}`, gid);
+  }
+  c.selection.select(c.elements.getElement(heroText) ?? null);
+  return c;
+}
+
 function addTargetComposer(): Composer {
   const c = new Composer({} as never);
   const page = c.elements.createPage("Home", {
@@ -2644,6 +2688,18 @@ const CASES: Record<string, () => React.ReactElement> = {
   ),
   /* Layers drawer, boards 142:2 / 143:2 / 143:295 / 1082:4589 / 1171:4829.
      One case per state because the state is engine state, not a click. */
+  /* design-2l9 152:79448 / 147:79728 — the 5,000-layer fixture in a
+     1440 × 600 window's drawer (the recipe sets the height; 147:79728 types
+     "Text" into the search). */
+  "layers-5000": () => (
+    <div data-probe="layers-5000">
+      <ToastProvider>
+        <div className="tw:flex tw:w-70 tw:flex-col tw:overflow-hidden tw:bg-white" style={{ height: "100vh" }}>
+          <LayersTab composer={layers5000Composer()} onClose={() => {}} />
+        </div>
+      </ToastProvider>
+    </div>
+  ),
   "layers-tree": () => (
     <div data-probe="layers-tree"><LayersProbe /></div>
   ),
