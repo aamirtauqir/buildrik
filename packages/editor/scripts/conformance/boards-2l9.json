@@ -5470,8 +5470,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Two-stop Color 1/2 only; no 3-stop \"Custom gradient\" preservation; image options exist (:346)",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B P1 (2026-10-27), probe inspector-panel ?type=container with a 3-stop linear-gradient, and with an image fill, on :5172, side by side with the board PNG: paint kind is the open header's select ('Custom gradient' for a many-stop gradient); 'Saved gradient' box with the value as saved, 'Three stops retained. Two-stop controls cannot losslessly edit this value.', 'Edit custom gradient' (text edit, written on blur only when it parses) and 'Replace with two-stop gradient' (first + last stop, angle kept); 'Image fill options' Source · Size · Position ('Center center') · Repeat ('No repeat') · Attachment · Blend on the face; the footnote. Before this a 3-stop gradient was shown as the default #1A56DB→#22C55E pair and any edit rewrote it (data loss). Exceptions: the section title stays 'Background' (161:8940, the page-04 board this one contradicts with 'Fill'); a gradient + image on the same element shows one kind at a time (code:one-paint-kind — deriveBgType models one layer; the board's specimen shows both).",
    "tier": "P1"
   },
   {

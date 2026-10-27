@@ -154,16 +154,12 @@ export const BOX_SECTIONS: Record<string, AnySectionEntry> = {
     summary: setSummary(FILL_KEYS),
     page: true,
     Component: BackgroundSection,
-    advancedKey: "fill",
-    advancedProps: ["background-position", "background-size", "background-repeat", "background-attachment", "background-blend-mode"],
     styleKeys: FILL_KEYS,
     adaptProps: (ctx) => ({
       ...adaptBaseStyleProps(ctx),
       variant: ctx.variant,
       onBatchChange: ctx.onBatchChange,
       onOpenMediaLibrary: ctx.onOpenMediaLibrary,
-      advancedExpanded: ctx.advancedExpanded,
-      onAdvancedToggle: ctx.onAdvancedToggle,
     }),
   }),
 

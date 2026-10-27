@@ -1,19 +1,30 @@
 /**
- * Fill Section (registry id `fill`, boards 1, 21, 27) — colour, gradient or
- * image behind the element. Empty = board 1's "Fill  +" row (the frame draws
- * it); "+" opens the Colour row. The Colour / Gradient / Image choice waits
- * behind More settings until a gradient or image is set. On the Page panel
- * the section reads "Background" and its row "Color" (2L9 S06, 161:8940).
+ * Background Section (registry id `fill`) — colour, gradient or image behind
+ * the element (2L9 161:8940, 247:23966).
+ *
+ * The paint kind is the open header's select (Color · Gradient · Image, and
+ * "Custom gradient" for a gradient the two-stop controls cannot hold);
+ * choosing one replaces the old fill (X-1). A gradient of more than two
+ * stops is shown as saved, never re-read into Color 1 / Color 2 — it is
+ * kept until the user edits it as text or replaces it with a two-stop one.
+ * An image draws "Image fill options": Source, Size, Position, Repeat,
+ * Attachment, Blend. On the Page panel the section is the one "Color" row
+ * (2L9 S06).
  */
 
 import * as React from "react";
 import type { Composer } from "@/engine";
 import type { MediaAsset, MediaAssetType } from "@/shared/types/media";
 import { extractGradientUI, composeGradient, deriveBgType, DEFAULT_GRADIENT_STOPS } from "@/shared/utils/parsers/gradientHelpers";
-import { Section, ColorInput, SelectRow, InputRow, MoreSettingsToggle, type SectionTier } from "../shared/controls";
-import { Button, TextInput } from "@/editor/chrome-ui";
+import { parseGradient } from "@/shared/utils/parsers/gradientParser";
+import { rgbToHex } from "@/shared/utils/parsers/colorConversionBasic";
+import { ButtonGroup, Section, ColorInput, SelectRow, InputRow, type SectionTier } from "../shared/controls";
+import { GROUP_TITLE, WIDE_BUTTON } from "../shared/controls/controlClasses";
+import { BK_SELECT_BARE_VALUE_THEME, Button, Select, Textarea, TextInput } from "@/editor/chrome-ui";
+import { NoteRow } from "./behaviourRows";
 
 const FIELD_LABEL = "tw:text-xs tw:font-medium tw:text-[var(--bk-ink-muted)]";
+
 export interface BackgroundSectionProps {
   /** "page": the Page panel's subset (board 21 / S06). */
   variant?: "element" | "page";
@@ -33,14 +44,112 @@ export interface BackgroundSectionProps {
   onToggle?: (open: boolean) => void;
   /** Visual weight tier — threaded from the registry-driven renderer. */
   tier?: SectionTier;
-  /** Whether advanced settings (size/position/repeat/attachment for image bg) are expanded */
-  advancedExpanded?: boolean;
-  /** Called when the More settings toggle is clicked */
-  onAdvancedToggle?: () => void;
   mixedKeys?: ReadonlySet<string>;
   isMultiSelect?: boolean;
   /** Threaded so the colour chips can jump to the Design panel. */
   composer?: Composer | null;
+}
+
+type Kind = "color" | "gradient" | "image";
+
+const KINDS: ReadonlyArray<{ value: Kind; label: string }> = [
+  { value: "color", label: "Color" },
+  { value: "gradient", label: "Gradient" },
+  { value: "image", label: "Image" },
+];
+
+const SIZE_OPTIONS = [
+  { value: "auto", label: "Auto" },
+  { value: "cover", label: "Cover" },
+  { value: "contain", label: "Contain" },
+  { value: "100% 100%", label: "Stretch" },
+];
+
+const POSITION_OPTIONS = ["top", "center", "bottom"].flatMap((v) =>
+  ["left", "center", "right"].map((h) => ({ value: `${h} ${v}`, label: `${v[0].toUpperCase()}${v.slice(1)} ${h}` })),
+);
+
+/** `center`, `top`, `left top`… → the select's "horizontal vertical" value;
+ *  unset is CSS's initial top-left. A length / percentage stays as written. */
+function positionValue(raw: string): string {
+  const words = raw.trim().split(/\s+/).filter(Boolean);
+  if (words.length === 0) return "left top";
+  if (words.length > 2 || words.some((w) => /\d/.test(w))) return raw;
+  let horizontal = "center";
+  let vertical = "center";
+  for (const w of words) {
+    if (w === "left" || w === "right") horizontal = w;
+    else if (w === "top" || w === "bottom") vertical = w;
+  }
+  return `${horizontal} ${vertical}`;
+}
+
+const REPEAT_OPTIONS = [
+  { value: "no-repeat", label: "No repeat" },
+  { value: "repeat", label: "Repeat" },
+  { value: "repeat-x", label: "Repeat horizontally" },
+  { value: "repeat-y", label: "Repeat vertically" },
+];
+
+const ATTACHMENT_OPTIONS = [
+  { value: "scroll", label: "Scroll" },
+  { value: "fixed", label: "Fixed (parallax)" },
+  { value: "local", label: "Local" },
+];
+
+const BLEND_OPTIONS = [
+  { value: "normal", label: "Normal" },
+  { value: "multiply", label: "Multiply" },
+  { value: "screen", label: "Screen" },
+  { value: "overlay", label: "Overlay" },
+  { value: "darken", label: "Darken" },
+  { value: "lighten", label: "Lighten" },
+  { value: "color-dodge", label: "Color dodge" },
+  { value: "difference", label: "Difference" },
+];
+
+const COUNT_WORDS = ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"];
+
+/** 247:23966: a gradient the two-stop controls cannot hold, kept as saved. */
+function SavedGradient({ value, stops, onReplace, onEdit }: { value: string; stops: number; onReplace: () => void; onEdit: (next: string) => void }) {
+  const [draft, setDraft] = React.useState<string | null>(null);
+  return (
+    <div data-testid="inspector-fill-saved-gradient">
+      <div className={`${FIELD_LABEL} tw:mb-1`}>Saved gradient</div>
+      {draft === null ? (
+        <p className="tw:m-0 tw:rounded-[4px] tw:bg-[var(--bk-bg-subtle)] tw:px-2 tw:py-2 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)] tw:break-words">
+          {value}
+        </p>
+      ) : (
+        <Textarea
+          aria-label="Custom gradient"
+          rows={3}
+          autoFocus
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Escape") setDraft(null);
+          }}
+          onBlur={() => {
+            if (draft.trim() && parseGradient(draft)) onEdit(draft.trim());
+            setDraft(null);
+          }}
+          className="tw:text-[12px] tw:[font-family:var(--bk-font-mono)]"
+        />
+      )}
+      <NoteRow>
+        {COUNT_WORDS[stops] ?? stops} stops retained. Two-stop controls cannot losslessly edit this value.
+      </NoteRow>
+      <div className="tw:flex tw:flex-col tw:gap-2">
+        <Button color="light" size="xs" className={WIDE_BUTTON} onClick={() => setDraft(value)}>
+          Edit custom gradient
+        </Button>
+        <Button color="light" size="xs" className={WIDE_BUTTON} onClick={onReplace}>
+          Replace with two-stop gradient
+        </Button>
+      </div>
+    </div>
+  );
 }
 
 export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
@@ -52,20 +161,21 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
   isOpen,
   onToggle,
   tier = "primary",
-  advancedExpanded = false,
-  onAdvancedToggle,
-  isMultiSelect,
   composer,
 }) => {
-  const [bgType, setBgType] = React.useState<"color" | "gradient" | "image">(() => deriveBgType(styles));
+  const [bgType, setBgType] = React.useState<Kind>(() => deriveBgType(styles));
 
   React.useEffect(() => {
     setBgType(deriveBgType(styles));
   }, [styles.background, styles["background-image"]]);
 
-  const gradientUI = bgType === "gradient" ? extractGradientUI(styles.background || styles["background-image"] || "") : null;
+  const gradientSource = styles.background || styles["background-image"] || "";
+  const gradientUI = bgType === "gradient" ? extractGradientUI(gradientSource) : null;
+  const saved = gradientUI?.isOpaque ? parseGradient(gradientSource) : null;
   const color1 = gradientUI?.color1 || DEFAULT_GRADIENT_STOPS.color1;
   const color2 = gradientUI?.color2 || DEFAULT_GRADIENT_STOPS.color2;
+  const gradientType = (gradientUI?.gradientType || "linear") as "linear" | "radial";
+  const angle = gradientUI?.angle ?? 90;
 
   /* A plain colour can sit on the `background` shorthand (imports, templates).
      Fill shows it, and a Fill write clears it: otherwise the shorthand keeps
@@ -83,11 +193,19 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
     if (value && styles.background) writeMany({ background: "", "background-image": value });
     else onChange("background-image", value);
   };
+  /* A gradient lives on `background`; one that arrived on background-image
+     (imports) moves there on its first write. */
+  const writeGradient = (value: string) => {
+    if (styles["background-image"] && /gradient\(/.test(styles["background-image"])) writeMany({ "background-image": "", background: value });
+    else onChange("background", value);
+  };
+  const gradient = (over: Partial<{ type: "linear" | "radial"; angle: number; color1: string; color2: string }>) =>
+    writeGradient(composeGradient({ type: gradientType, angle, color1, color2, ...over }));
 
-  /* Switching the type replaces the old fill (X-1): a gradient left on
+  /* Choosing a kind replaces the old fill (X-1): a gradient left on
      `background` kept covering a newly chosen colour. Image waits for an
      image to be chosen (writeImage) before dropping a gradient. */
-  const chooseType = (type: "color" | "gradient" | "image") => {
+  const chooseType = (type: Kind) => {
     setBgType(type);
     if (type === bgType) return;
     const hasImage = Boolean(styles["background-image"]);
@@ -102,8 +220,6 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
     }
   };
 
-  // Compute color preview from styles — mock shows a small swatch chip as the
-  // collapsed-state indicator for Background.
   const bgColor = styles["background-color"] || styles["background"];
   const preview = bgColor ? (
     <span
@@ -114,159 +230,108 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
     />
   ) : undefined;
 
+  const kindValue = saved ? "custom" : bgType;
+  const kindPicker =
+    variant === "page" ? undefined : (
+      <Select
+        aria-label="Paint kind"
+        sizing="sm"
+        theme={BK_SELECT_BARE_VALUE_THEME}
+        className="tw:text-[12px] tw:text-[var(--bk-ink-soft)]"
+        value={kindValue}
+        onChange={(e) => chooseType(e.target.value as Kind)}
+      >
+        {saved && (
+          <option value="custom" disabled>
+            Custom gradient
+          </option>
+        )}
+        {KINDS.map((k) => (
+          <option key={k.value} value={k.value}>
+            {k.label}
+          </option>
+        ))}
+      </Select>
+    );
+
   return (
     <Section
       title="Background"
       preview={preview}
+      action={kindPicker}
       isOpen={isOpen}
       onToggle={onToggle}
       tier={tier}
       id="inspector-section-fill"
     >
-      {/* Background Type Selector — segmented. Board 7056:78695 opens a
-          colour background as the one Fill row; the Color / Gradient / Image
-          choice waits behind More settings until a gradient or image is set. */}
-      {(bgType !== "color" || advancedExpanded) && (
-      <div className="bdi-seg tw:mb-1.5">
-        {(["color", "gradient", "image"] as const).map((type) => (
-          <Button
-            key={type}
-            type="button"
-            onClick={() => chooseType(type)}
-            className={`tw:capitalize ${bgType === type ? "on" : ""}`}
-            aria-pressed={bgType === type}
-          >
-            {type}
-          </Button>
-        ))}
-      </div>
-      )}
-      {/* Color Background */}
       {bgType === "color" && (
-        <div className="tw:relative">
-          <ColorInput
-            label="Color"
-            property="background-color"
-            value={styles["background-color"] || shorthandColor}
-            onChange={writeFill}
-            composer={composer}
-          />
-        </div>
+        <ColorInput
+          label="Color"
+          property="background-color"
+          value={styles["background-color"] || shorthandColor}
+          onChange={writeFill}
+          composer={composer}
+        />
       )}
-      {/* The Page panel's Fill is the one Background row (board 21). */}
-      {bgType === "color" && onAdvancedToggle && variant !== "page" && (
-        <MoreSettingsToggle isOpen={advancedExpanded} onToggle={() => onAdvancedToggle()} advancedCount={2} />
+
+      {bgType === "gradient" && saved && (
+        <SavedGradient
+          value={gradientSource}
+          stops={saved.stops.length}
+          onEdit={writeGradient}
+          onReplace={() => {
+            const first = saved.stops[0]?.color;
+            const last = saved.stops[saved.stops.length - 1]?.color;
+            writeGradient(
+              composeGradient({
+                type: saved.type === "radial" ? "radial" : "linear",
+                angle: saved.type === "linear" ? saved.angle : 90,
+                color1: first ? rgbToHex(first) : color1,
+                color2: last ? rgbToHex(last) : color2,
+              }),
+            );
+          }}
+        />
       )}
-      {/* Gradient Background */}
-      {bgType === "gradient" && (
+
+      {bgType === "gradient" && !saved && (
         <>
-          {/* One labelled row, like every other row in the panel. It used to
-              be a caption over two 44px gradient tiles — the only pair of
-              picture-buttons in a column of fields. */}
-          <div className="bdi-row-ctrl">
-            <label className="bdi-lb">Type</label>
-            <div className="bdi-seg">
-              <Button
-                type="button"
-                aria-pressed={(gradientUI?.gradientType || "linear") === "linear"}
-                className={(gradientUI?.gradientType || "linear") === "linear" ? "on" : ""}
-                onClick={() =>
-                  onChange(
-                    "background",
-                    composeGradient({
-                      type: "linear",
-                      angle: gradientUI?.angle ?? 90,
-                      color1,
-                      color2,
-                    })
-                  )
-                }
-              >
-                Linear
-              </Button>
-              <Button
-                type="button"
-                aria-pressed={gradientUI?.gradientType === "radial"}
-                className={gradientUI?.gradientType === "radial" ? "on" : ""}
-                onClick={() =>
-                  onChange(
-                    "background",
-                    composeGradient({
-                      type: "radial",
-                      angle: gradientUI?.angle ?? 90,
-                      color1,
-                      color2,
-                    })
-                  )
-                }
-              >
-                Radial
-              </Button>
-            </div>
-          </div>
-
-          {/* Gradient Colors */}
-          <ColorInput
-            label="Color 1"
-            value={color1}
-            onChange={(v) => {
-              const result = composeGradient({
-                type: (gradientUI?.gradientType || "linear") as "linear" | "radial",
-                angle: gradientUI?.angle ?? 90,
-                color1: v,
-                color2,
-              });
-              onChange("background", result);
-            }}
-            composer={composer}
+          <ButtonGroup
+            label="Type"
+            property="background"
+            value={gradientType}
+            options={[
+              { value: "linear", label: "Linear" },
+              { value: "radial", label: "Radial" },
+            ]}
+            onChange={(v) => gradient({ type: v as "linear" | "radial" })}
           />
-          <ColorInput
-            label="Color 2"
-            value={color2}
-            onChange={(v) => {
-              const result = composeGradient({
-                type: (gradientUI?.gradientType || "linear") as "linear" | "radial",
-                angle: gradientUI?.angle ?? 90,
-                color1,
-                color2: v,
-              });
-              onChange("background", result);
-            }}
-            composer={composer}
-          />
-
-          {/* Gradient Angle (for linear) */}
-          {(gradientUI?.gradientType !== "radial") && (
+          <ColorInput label="Color 1" value={color1} onChange={(v) => gradient({ color1: v })} composer={composer} />
+          <ColorInput label="Color 2" value={color2} onChange={(v) => gradient({ color2: v })} composer={composer} />
+          {gradientType !== "radial" && (
             <div className="tw:flex tw:items-center tw:gap-2 tw:mb-3">
               <label className={`${FIELD_LABEL} tw:min-w-[70px]`}>Angle</label>
               <TextInput
                 type="range"
                 min="0"
                 max="360"
-                value={gradientUI?.angle ?? 90}
-                onChange={(e) => {
-                  const result = composeGradient({
-                    type: "linear",
-                    angle: Number(e.target.value),
-                    color1,
-                    color2,
-                  });
-                  onChange("background", result);
-                }}
+                value={angle}
+                onChange={(e) => gradient({ type: "linear", angle: Number(e.target.value) })}
                 className="tw:flex-1"
               />
-              <span className={`${FIELD_LABEL} tw:min-w-10`}>{gradientUI?.angle ?? 90}°</span>
+              <span className={`${FIELD_LABEL} tw:min-w-10`}>{angle}°</span>
             </div>
           )}
         </>
       )}
-      {/* Image Background */}
+
       {bgType === "image" && (
         <>
-          <div className="tw:flex tw:items-end tw:gap-2 tw:mb-3">
+          <div className={GROUP_TITLE}>Image fill options</div>
+          <div className="tw:flex tw:items-end tw:gap-2">
             <div className="tw:relative tw:flex-1">
               <InputRow
-                label="Image URL"
+                label="Source"
                 property="background-image"
                 value={styles["background-image"]?.replace(/url\(['"]?|['"]?\)/g, "") || ""}
                 onChange={(v) => writeImage(v ? `url('${v}')` : "")}
@@ -287,103 +352,45 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
               </Button>
             )}
           </div>
-
-          {/* ─── Advanced: size/position/repeat/attachment (behind More settings) ─── */}
-          {advancedExpanded && (
-            <>
-              <div className="tw:relative">
-                <SelectRow
-                  property="background-size"
-                  label="Size"
-                  value={styles["background-size"] || ""}
-                  onChange={(v) => onChange("background-size", v)}
-                  options={[
-                    { value: "auto", label: "Auto" },
-                    { value: "cover", label: "Cover" },
-                    { value: "contain", label: "Contain" },
-                    { value: "100% 100%", label: "Stretch" },
-                  ]}
-                />
-              </div>
-
-              <div className="tw:relative">
-                <SelectRow
-                  property="background-position"
-                  label="Position"
-                  value={styles["background-position"] || ""}
-                  onChange={(v) => onChange("background-position", v)}
-                  options={[
-                    { value: "center", label: "Center" },
-                    { value: "top", label: "Top" },
-                    { value: "bottom", label: "Bottom" },
-                    { value: "left", label: "Left" },
-                    { value: "right", label: "Right" },
-                    { value: "top left", label: "Top Left" },
-                    { value: "top right", label: "Top Right" },
-                    { value: "bottom left", label: "Bottom Left" },
-                    { value: "bottom right", label: "Bottom Right" },
-                  ]}
-                />
-              </div>
-
-              <div className="tw:relative">
-                <SelectRow
-                  property="background-repeat"
-                  label="Repeat"
-                  value={styles["background-repeat"] || ""}
-                  onChange={(v) => onChange("background-repeat", v)}
-                  options={[
-                    { value: "no-repeat", label: "No Repeat" },
-                    { value: "repeat", label: "Repeat" },
-                    { value: "repeat-x", label: "Repeat X" },
-                    { value: "repeat-y", label: "Repeat Y" },
-                  ]}
-                />
-              </div>
-
-              <SelectRow
-                property="background-attachment"
-                label="Attachment"
-                value={styles["background-attachment"] || ""}
-                onChange={(v) => onChange("background-attachment", v)}
-                options={[
-                  { value: "scroll", label: "Scroll" },
-                  { value: "fixed", label: "Fixed (Parallax)" },
-                  { value: "local", label: "Local" },
-                ]}
-              />
-
-              <SelectRow
-                property="background-blend-mode"
-                label="Blend Mode"
-                value={styles["background-blend-mode"] || ""}
-                onChange={(v) => onChange("background-blend-mode", v)}
-                options={[
-                  { value: "normal", label: "Normal" },
-                  { value: "multiply", label: "Multiply" },
-                  { value: "screen", label: "Screen" },
-                  { value: "overlay", label: "Overlay" },
-                  { value: "darken", label: "Darken" },
-                  { value: "lighten", label: "Lighten" },
-                  { value: "color-dodge", label: "Color Dodge" },
-                  { value: "difference", label: "Difference" },
-                ]}
-              />
-            </>
-          )}
-
-          {/* Progressive disclosure toggle for image bg */}
-          {onAdvancedToggle && (
-            <MoreSettingsToggle
-              isOpen={advancedExpanded}
-              onToggle={() => onAdvancedToggle()}
-              advancedCount={4}
-            />
-          )}
+          <SelectRow
+            property="background-size"
+            label="Size"
+            value={styles["background-size"] || "auto"}
+            onChange={(v) => onChange("background-size", v)}
+            options={SIZE_OPTIONS}
+          />
+          <SelectRow
+            property="background-position"
+            label="Position"
+            value={positionValue(styles["background-position"] || "")}
+            onChange={(v) => onChange("background-position", v)}
+            options={POSITION_OPTIONS}
+          />
+          <SelectRow
+            property="background-repeat"
+            label="Repeat"
+            value={styles["background-repeat"] || "repeat"}
+            onChange={(v) => onChange("background-repeat", v)}
+            options={REPEAT_OPTIONS}
+          />
+          <SelectRow
+            property="background-attachment"
+            label="Attachment"
+            value={styles["background-attachment"] || "scroll"}
+            onChange={(v) => onChange("background-attachment", v)}
+            options={ATTACHMENT_OPTIONS}
+          />
+          <SelectRow
+            property="background-blend-mode"
+            label="Blend"
+            value={styles["background-blend-mode"] || "normal"}
+            onChange={(v) => onChange("background-blend-mode", v)}
+            options={BLEND_OPTIONS}
+          />
         </>
       )}
+
+      {variant !== "page" && <NoteRow>Choosing a paint kind is an explicit replacement at this layer.</NoteRow>}
     </Section>
   );
 };
-
-export default BackgroundSection;

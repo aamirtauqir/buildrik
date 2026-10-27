@@ -154,9 +154,9 @@ describe("auto-expand against the registry the inspector actually uses", () => {
     expect(render({ "flex-basis": "200px" }, real).result.current.isExpanded("size")).toBe(false);
   });
 
-  it("opens Fill for background-blend-mode", () => {
+  it("Fill has no More settings to open — its image options are on the face (2L9 247:23966)", () => {
     const { result } = render({ "background-blend-mode": "multiply" }, real);
-    expect(result.current.isExpanded("fill")).toBe(true);
+    expect(result.current.isExpanded("fill")).toBe(false);
   });
 
   it("opens Size for min-width and Border for a side's own border — not for the outline, which Border shows on its face once set (247:24493)", () => {

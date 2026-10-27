@@ -36,7 +36,7 @@ type Batch = (changes: Record<string, string>) => void;
 type SectionProps = { styles: Record<string, string>; onChange: Write; onBatchChange: Batch };
 
 const SECTIONS: Record<string, React.FC<SectionProps>> = {
-  Background: (p) => <BackgroundSection {...p} isOpen advancedExpanded onAdvancedToggle={() => {}} />,
+  Background: (p) => <BackgroundSection {...p} isOpen />,
   Border: (p) => <BorderSection {...p} isOpen advancedExpanded onAdvancedToggle={() => {}} />,
   Opacity: (p) => <OpacitySection {...p} isOpen />,
   Shadow: (p) => <ShadowSection {...p} isOpen />,
@@ -121,8 +121,8 @@ describe("P-3 guard — no Inspector style write carries an editor chrome token"
   it("Background · Gradient → Linear writes a site-safe gradient (the walk is not vacuous)", () => {
     const writes: string[] = [];
     const { container, getByRole } = render(<Host Section={SECTIONS.Background} initial={{}} writes={writes} />);
-    fireEvent.click(getByRole("button", { name: "gradient" }));
-    fireEvent.click(getByRole("button", { name: "Linear" }));
+    fireEvent.change(getByRole("combobox", { name: "Paint kind" }), { target: { value: "gradient" } });
+    fireEvent.click(getByRole("radio", { name: "Linear" }));
     exercise(container);
     expect(writes.some((w) => /^background: (linear|radial)-gradient\(/.test(w))).toBe(true);
     expect(writes.filter((w) => w.includes("--bk-"))).toEqual([]);
