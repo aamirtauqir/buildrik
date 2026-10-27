@@ -37,6 +37,8 @@ A-18. **L-A → lead · `shell/StudioPanels.tsx` (Pages drawer width)** · in th
 
 ## Closed
 
+B-14. **L-B → lead · `shell/RecoveryBanner.tsx`** · `top: 56` literal pushed Gate 14 to 139 — **Closed 2026-10-27: uses `var(--bk-size-topbar)`; Gate 14 now 137, baseline lowered.**
+
 A-17. **L-A → owner · Pages "order commands" menu** · boards 137:55343 / 137:56060 / 137:56781 (B3-P130–132) draw a separate 280-wide menu beside the row — the page's name as its title, Move up ⌥↑, Move down ⌥↓ (disabled + reason at a boundary), Close menu — but no board shows what opens it: the row ⋯ opens the full menu (63:13820), which already carries Move up / Move down with the boundary reasons. Which control opens the order-commands menu (a drag handle, a key, a "Reorder…" item)? Until answered the moves stay in the row menu and the three rows stay drift-open. — **Closed 2026-10-27, owner: no separate menu; covered by the row ⋯ menu (`founder:order-commands-in-row-menu`).**
 
 A-13. ~~page reorder as one composer history step~~ · `021c1b305`: `reorderPage` commits pending edits, records "Reorder pages" and commits it before returning (⌘Z / captureUndo undo exactly the move); `writeLocked` still refuses first. Decision: page FOLDER moves stay outside history (per-user, not in the document). Test `PageManager.reorderHistory.test.ts`.

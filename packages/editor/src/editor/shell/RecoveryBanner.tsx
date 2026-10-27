@@ -112,7 +112,7 @@ const BAR =
   "tw:bg-[var(--bk-warning-tint)] tw:text-[var(--bk-warning-text)] tw:text-[13px] tw:leading-[18px] " +
   "tw:[font-family:var(--bk-font-ui)]";
 /** Without a canvas column (a full-page view covers it), under the topbar. */
-const NO_COLUMN = { left: 0, right: 0, top: 56 };
+const NO_COLUMN = { left: 0, right: 0, top: "var(--bk-size-topbar)" };
 
 export const RecoveryBanner: React.FC<RecoveryBannerProps> = ({
   reloadFn,
