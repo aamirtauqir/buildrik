@@ -3,11 +3,17 @@
  * 558:4419, 260 wide: a 26 header, 32 rows on a 2px rhythm, a "Templates"
  * group under a hairline, then the actions).
  *
- * Behaviour the board does not draw, from the plan (Task 1.3): a search field
- * that is always there and focused on open, filtering by name and slug; a
- * check glyph and `aria-current="page"` on the active page; "+ Add page" above
- * "Manage pages ›". The list scrolls inside a 400px panel while the search and
- * the actions stay put.
+ * Board 558:448976 (B3-P28): a 12 regular header counting templates, file
+ * glyphs (Home too), the path right-aligned in each row, the current page
+ * tinted blue-100 with no check, a 12 "Templates" label under a gray-200
+ * hairline, "Manage pages ›" in the accent.
+ *
+ * Behaviour the board does not draw, from the plan (Task 1.3, Review Focus 1
+ * — 100 pages in ≤2 interactions; manifest `authority: code:search-add-page`):
+ * a search field that is always there and focused on open, filtering by name
+ * and slug, and "+ Add page" above "Manage pages ›". `aria-current="page"`
+ * marks the active page. The list scrolls inside a 400px panel while the
+ * search and the actions stay put.
  *
  * Keyboard (combobox + listbox): ↑/↓ move the highlighted row, Enter opens it.
  * Focus on open, Escape and outside clicks belong to the portalled Popover
@@ -16,7 +22,7 @@
  * @license BSD-3-Clause
  */
 import React from "react";
-import { Check, File, House, Plus, Search } from "lucide-react";
+import { File, Plus, Search } from "lucide-react";
 import type { PageSummary } from "@/shared/types";
 import { TextInput } from "./TextInput";
 import { Row, ROW_ICON_CLASS, ROW_LABEL_CLASS } from "./Row";
@@ -101,33 +107,34 @@ export function PageSwitcherMenu({
         aria-label={template ? `${p.collectionName ?? p.name} · ${p.slug}` : undefined}
         title={disabledReason}
         data-testid={`page-switcher-row-${p.id}`}
-        className="tw:px-2! tw:rounded-md tw:aria-selected:before:hidden"
+        className={`${OPTION_CLASS} ${active ? CURRENT_CLASS : HIGHLIGHT_CLASS}`}
         onMouseEnter={() => setHighlight(p.id)}
         onClick={() => choose(p.id)}
       >
         {p.depth ? <span aria-hidden="true" className={`tw:flex-none ${INDENT[Math.min(p.depth, INDENT.length - 1)]}`} /> : null}
+        {/* The board draws Home with the same file glyph as every page; the
+            home role stays in its accessible name. */}
         {p.isHome ? (
-          <span className={ROW_ICON_CLASS} role="img" aria-label="Homepage">
-            <House size={14} aria-hidden="true" />
+          <span className={GLYPH_CLASS} role="img" aria-label="Homepage">
+            <File size={24} aria-hidden="true" />
           </span>
         ) : (
-          <span className={ROW_ICON_CLASS} aria-hidden="true">
-            <File size={14} />
+          <span className={GLYPH_CLASS} aria-hidden="true">
+            <File size={24} />
           </span>
         )}
-        <span className={`${ROW_LABEL_CLASS} tw:flex-none tw:max-w-[60%]`}>{template ? (p.collectionName ?? p.name) : p.name}</span>
-        <span className="tw:min-w-0 tw:flex-1 tw:truncate tw:text-[12px] tw:text-[var(--bk-ink-muted)]">{p.slug}</span>
+        <span className={ROW_LABEL_CLASS}>{template ? (p.collectionName ?? p.name) : p.name}</span>
+        <span className="tw:min-w-0 tw:max-w-[50%] tw:flex-none tw:truncate tw:text-right tw:text-[12px] tw:text-[var(--bk-ink-muted)]">{p.slug}</span>
         {p.dirty ? (
           <span role="img" aria-label="unsaved changes" className="tw:size-1.5 tw:flex-none tw:rounded-full tw:bg-[var(--bk-warning)]" />
         ) : null}
-        {active ? <Check size={14} aria-hidden="true" className="tw:flex-none tw:text-[var(--bk-accent)]" /> : null}
       </Row>
     );
   };
 
   return (
     <div className="tw:flex tw:max-h-[386px] tw:w-[246px] tw:flex-col" data-testid="page-switcher-menu">
-      <div className="tw:flex tw:h-[26px] tw:flex-none tw:items-center tw:px-2 tw:text-[11px] tw:font-semibold tw:text-[var(--bk-ink-muted)]">
+      <div className="tw:flex tw:h-[26px] tw:flex-none tw:items-center tw:px-2 tw:text-[12px] tw:text-[var(--bk-ink-muted)]">
         {header}
       </div>
       <div className="tw:flex-none tw:pb-1">
@@ -165,7 +172,7 @@ export function PageSwitcherMenu({
         {shownTemplates.length ? (
           <div role="group" aria-label="Templates" className="tw:flex tw:flex-col tw:gap-0.5">
             <div role="presentation" className={DIVIDER} />
-            <div role="presentation" className="tw:flex tw:h-5 tw:items-center tw:px-2 tw:text-[11px] tw:font-semibold tw:text-[var(--bk-ink-muted)]">
+            <div role="presentation" className="tw:flex tw:h-5 tw:items-center tw:px-2 tw:text-[12px] tw:text-[var(--bk-ink-muted)]">
               Templates
             </div>
             {shownTemplates.map(option)}
@@ -186,7 +193,7 @@ export function PageSwitcherMenu({
           <span className={ROW_LABEL_CLASS}>Add page</span>
         </Row>
         <Row interactive className="tw:px-2! tw:rounded-md" data-testid="page-switcher-manage" onClick={onManagePages}>
-          <span className={ROW_LABEL_CLASS}>Manage pages ›</span>
+          <span className={`${ROW_LABEL_CLASS} tw:text-[var(--bk-accent-text)]`}>Manage pages ›</span>
         </Row>
       </div>
     </div>
@@ -195,7 +202,16 @@ export function PageSwitcherMenu({
 
 /** 16px per nesting level, capped at three. */
 const INDENT = ["", "tw:w-4", "tw:w-8", "tw:w-12"];
-const DIVIDER = "tw:my-px tw:h-px tw:flex-none tw:bg-[var(--bk-gray-100)]";
+const DIVIDER = "tw:my-px tw:h-px tw:flex-none tw:bg-[var(--bk-gray-200)]";
+/* Row's aria-selected look (blue-50 + accent text + 3px bar) is the
+   keyboard/hover highlight here, so it is drawn as a plain hover: the
+   board's only tint is the current page's. `!` because Row concatenates
+   classes (no twMerge) and these restate BASE's own properties. */
+const OPTION_CLASS = "tw:px-2! tw:gap-2.5! tw:rounded-md tw:aria-selected:before:hidden tw:aria-selected:text-[var(--bk-ink)]!";
+const HIGHLIGHT_CLASS = "tw:aria-selected:bg-[var(--bk-gray-100)]!";
+const CURRENT_CLASS = "tw:bg-[var(--bk-blue-100)]!";
+/* 24 file glyph (16×20 ink) in gray-600 — board ≈18×22, #4B5563. */
+const GLYPH_CLASS = "tw:flex-none tw:inline-flex tw:text-[var(--bk-gray-600)]";
 
 function SearchIcon(props: React.SVGProps<SVGSVGElement>) {
   return <Search size={14} aria-hidden="true" {...props} />;

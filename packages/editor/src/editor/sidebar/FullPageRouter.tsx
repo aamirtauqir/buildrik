@@ -13,7 +13,8 @@
  * the editing chrome, all close on their own Escape) but they are NOT
  * interchangeable — each is load-bearing for a different reason:
  *
- * 1. Resource area (Assets · Settings · Brand — the in-place cases below;
+ * 1. Resource area (Assets · Settings · Brand · Templates — the in-place
+ *    cases below;
  *    CMS is the same family, see 2). Rendered where this router is mounted:
  *    LayoutShell's fullpage slot, which spans the drawer, canvas and
  *    inspector columns while the canvas stays mounted (visibility:hidden)
@@ -26,8 +27,9 @@
  *    (Until design-2l9 C-10/D-10/E-10 these portaled a `fixed inset-0` host
  *    over the whole window, rail and topbar included.)
  *
- *    Templates is the one remaining edge-to-edge portal (`tpl-host`): its
- *    board (4418:54134) still draws it over the whole window.
+ *    Templates joined them in design-2l9 C-17: the 2L9 boards (222:43842,
+ *    223:44891) draw it in place — topbar, rail and the bottom bar's
+ *    "‹ Back to Editor" stay. (It was an edge-to-edge portal, 4418:54134.)
  *
  * 2. CMS canvas region (`cmsWorkspaceOpen`, StudioPanels.tsx). Rendered
  *    in-place inside `LayoutShell.Canvas` (`tw:absolute tw:inset-0` over the
@@ -59,7 +61,7 @@ import type { EditsSnapshot } from "@shared/types/media";
 import type { Composer } from "@/engine";
 import type { GroupedTabId } from "../rail/tabsConfig";
 import type { IconConfig } from "@/shared/types/media";
-import { Button, Portal, SkeletonBlock } from "@/editor/chrome-ui";
+import { Button, SkeletonBlock } from "@/editor/chrome-ui";
 import { InspectorErrorBoundary } from "../inspector/components/InspectorErrorBoundary";
 import type { SettingsOpenRequest } from "./tabs/settings/types";
 import type { TemplatesOpenRequest } from "./tabs/templates/TemplatesTab";
@@ -182,32 +184,24 @@ export const FullPageRouter: React.FC<FullPageRouterProps> = ({
   templatesOpen,
 }) => {
   switch (activeTab) {
-    /* Decision #24 — board 4418:54134 is edge-to-edge: the view's own
-       sidebar carries `‹ Back to canvas`. A portal (the view owns its Escape
-       and its dialogs). */
+    /* Templates (222:43842, 223:44891 — C-17), Assets (B6-A01 199:37199),
+       Site settings (B8-S01 238:9980) and Brand (B6-B01) are the resource
+       area (shape 1 above): in place, inside the shell. Each owns its Escape,
+       its guard and its dialogs; Templates, Assets and Settings also own the
+       keyboard (data-bk-surface, CommandCenter). */
     case "templates":
       return (
-        <Portal>
-          <div
-            className="tw:fixed tw:inset-0 tw:z-[var(--bk-z-overlay)] tw:bg-[var(--bk-bg-panel)]"
-            data-testid="tpl-host"
-            data-bk-surface="fullpage"
-          >
-            <TemplatesTab
-              composer={composer}
-              onTemplateUsed={onSwitchToAdd}
-              onSwitchTab={onTemplatesSwitchTab}
-              request={templatesOpen}
-              onClose={commonTabProps.onClose}
-            />
-          </div>
-        </Portal>
+        <div className={RESOURCE_HOST} data-testid="tpl-host" data-bk-surface="fullpage">
+          <TemplatesTab
+            composer={composer}
+            onTemplateUsed={onSwitchToAdd}
+            onSwitchTab={onTemplatesSwitchTab}
+            request={templatesOpen}
+            onClose={commonTabProps.onClose}
+          />
+        </div>
       );
 
-    /* Assets (B6-A01 199:37199), Site settings (B8-S01 238:9980) and Brand
-       (B6-B01) are the resource area (shape 1 above): in place, inside the
-       shell. Each owns its Escape, its guard and its dialogs; Assets and
-       Settings also own the keyboard (data-bk-surface, CommandCenter). */
     case "assets":
       return composer ? (
         <div className={RESOURCE_HOST} data-testid="mgr-host" data-bk-surface="fullpage">

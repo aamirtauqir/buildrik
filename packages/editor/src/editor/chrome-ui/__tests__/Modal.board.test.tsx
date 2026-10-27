@@ -1,7 +1,9 @@
 /**
  * Modal — the dialog boards' frame (width/dialog-md 560, pad 24, radius 12,
- * 20/600 title, 32px right-aligned buttons with no footer strip). Measured on
- * 7564:185450 (Assets · delete folder?) and 6752:59256 (New page, 640).
+ * 16/600 title, 32px right-aligned buttons with no footer strip). Measured on
+ * 7564:185450 (Assets · delete folder?) and 6752:59256 (New page, 640); the
+ * title size and the high placement re-measured on the 2L9 dialogs (165:2184,
+ * 223:44891 — C-16 / F-24).
  *
  * @license BSD-3-Clause
  */
@@ -13,7 +15,7 @@ import { ConfirmDialog, Modal, ModalRoot, ModalContent, ModalFooter } from "../i
 const frame = () => screen.getByRole("dialog").querySelector<HTMLElement>("[data-testid=m]")!;
 
 describe("Modal — board frame", () => {
-  it("is 560 wide with 24 padding, a 20/600 title and a borderless right-aligned foot", () => {
+  it("is 560 wide with 24 padding, a 16/600 title and a borderless right-aligned foot", () => {
     render(
       <Modal open onClose={() => {}} title="Delete “Icons”?" testId="m" footer={<button type="button">Delete</button>}>
         The folder is empty.
@@ -23,8 +25,8 @@ describe("Modal — board frame", () => {
     expect(f.className).toContain("tw:w-[var(--bk-size-dialog-md)]");
     expect(f.className).toContain("tw:rounded-[var(--bk-radius-card)]");
     const title = screen.getByText("Delete “Icons”?");
-    expect(title.className).toContain("tw:text-[length:var(--bk-text-20)]");
-    expect(title.className).toContain("tw:leading-[var(--bk-leading-30)]");
+    expect(title.className).toContain("tw:text-[length:var(--bk-text-16)]");
+    expect(title.className).toContain("tw:leading-[var(--bk-leading-24)]");
     expect(title.parentElement!.className).toContain("tw:px-6");
     expect(title.parentElement!.className).toContain("tw:pt-6");
     const body = screen.getByText("The folder is empty.");
@@ -36,6 +38,18 @@ describe("Modal — board frame", () => {
     expect(foot.className).toContain("tw:pb-6");
     expect(foot.className).not.toContain("tw:border-t");
     expect(foot.className).toContain("tw:[&_button]:h-8");
+  });
+
+  /* 2L9 dialogs sit high: top 280 on a 900 window, not the viewport centre.
+     A 31vh spacer above the frame (shrinking when a tall dialog would not
+     fit) — probe-measured 279 in tpl-replace-confirm. */
+  it("places the dialog high (31vh spacer), not viewport-centred", () => {
+    render(<Modal open onClose={() => {}} title="Leave?" testId="m" />);
+    const scrim = screen.getByTestId("overlay-scrim");
+    expect(scrim.className).toContain("tw:before:basis-[31vh]");
+    expect(scrim.className).toContain("tw:flex-col");
+    expect(scrim.className).not.toContain("tw:items-center tw:justify-center");
+    expect(scrim.className).not.toContain("tw:justify-center");
   });
 
   /* Form dialogs draw the DS "Footer" (7431:145583 on 4418:142143): a top rule

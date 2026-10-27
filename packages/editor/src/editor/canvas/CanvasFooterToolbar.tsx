@@ -108,6 +108,10 @@ const MORE_VIEW_ROWS: readonly { key: keyof CanvasOverlayState; label: string; k
   { key: "xray", label: "X-Ray", kbd: "⌘⇧X" },
 ];
 
+/* The bar's popovers open downward, 5 under the bar's bottom edge (145:65011:
+   the panel's top at 103 under a bar ending at 98) — 8 more than Popover's
+   own 4 from the trigger. */
+const POPOVER_UNDER_BAR = "tw:mt-2";
 const FOOTER_MENU = "tw:min-w-[224px] tw:[&_[role^=menuitem]]:h-[30px]";
 const VIEW_ZOOM_LEVELS = [50, 75, 100, 150, 200];
 
@@ -232,7 +236,7 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
   );
 
   return (
-    <div className={BAR}>
+    <div className={BAR} data-testid="canvas-bar">
       {/* The left readout — where the selection is. */}
       <div className={SIDE}>
         <span
@@ -259,7 +263,8 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
           <Popover
             open={widthOpen}
             onClose={() => setWidthOpen(false)}
-            placement="top"
+            placement="bottom"
+            className={POPOVER_UNDER_BAR}
             label="Page width"
             trigger={
               <Button
@@ -289,7 +294,8 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
         <Popover
           open={zoomOpen}
           onClose={() => setZoomOpen(false)}
-          placement="top"
+          placement="bottom"
+          className={POPOVER_UNDER_BAR}
           label="Zoom"
           trigger={
             <Button
@@ -340,15 +346,18 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
             ))}
           </Menu>
         </Popover>
-        {/* "View" — board 145:64586's Canvas view. Opens upward: the bar sits
-            at the bottom of the canvas. */}
+        {/* "View" — board 145:64586's Canvas view. Opens downward: the bar
+            sits at the top of the canvas column (7:18654). */}
         <Popover
           open={viewOpen || gridOpen}
           onClose={() => {
             setViewOpen(false);
             setGridOpen(false);
           }}
-          placement="top-end"
+          placement="bottom-end"
+          /* The Grid panel is its own framed surface (145:65011, 360 wide):
+             no popover padding around it. */
+          className={gridOpen ? `${POPOVER_UNDER_BAR} tw:p-0!` : POPOVER_UNDER_BAR}
           label="Canvas view"
           trigger={
             <Button

@@ -186,12 +186,17 @@ describe("PageSwitcher", () => {
     expect(screen.getByText("Pages · 5 + 1 template")).toBeTruthy();
   });
 
-  it('active row has aria-current="page" and a check glyph; others do not', () => {
+  /* 2L9 558:448976: the current page is tinted blue-100, no check glyph. */
+  it('active row has aria-current="page" and the blue-100 tint, no check; others do not', () => {
     render(<Harness activePageId="work" />);
     openMenu();
-    expect(screen.getByTestId("page-switcher-row-work").getAttribute("aria-current")).toBe("page");
-    expect(screen.getByTestId("page-switcher-row-work").querySelector("svg.lucide-check")).not.toBeNull();
-    expect(screen.getByTestId("page-switcher-row-home").getAttribute("aria-current")).toBeNull();
+    const work = screen.getByTestId("page-switcher-row-work");
+    expect(work.getAttribute("aria-current")).toBe("page");
+    expect(work.className).toContain("tw:bg-[var(--bk-blue-100)]!");
+    expect(work.querySelector("svg.lucide-check")).toBeNull();
+    const home = screen.getByTestId("page-switcher-row-home");
+    expect(home.getAttribute("aria-current")).toBeNull();
+    expect(home.className).not.toContain("--bk-blue-100");
   });
 
   it("static pages are indented by depth", () => {

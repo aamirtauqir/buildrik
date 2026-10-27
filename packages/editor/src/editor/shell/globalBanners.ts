@@ -39,6 +39,9 @@ export interface GlobalBanner {
   dismissible?: boolean;
   /** The shorter line it reads behind "{n} more" (B7-G31 `227:14297`). */
   summary?: string;
+  /** Drawn as the strip over the canvas column (C05 `10:2199`,
+   *  `SaveFailedStrip`) instead of the slot's bar. */
+  placement?: "canvas";
 }
 
 interface Entry {
@@ -114,12 +117,13 @@ export const OFFLINE_BANNER: GlobalBanner = {
 };
 
 /**
- * A failed save (C05 `10:2199`), in the slot rather than a strip of its own
- * (owner 2026-10-26: one error surface at a time). It takes the CONNECTION
- * id on purpose: "Couldn't save", "Can't reach Buildrik" and "Reconnecting…"
- * are one condition — the edits are not reaching the server — so whichever
- * was said last is the one bar, never three. The save status in the bottom
- * bar says it too ("Couldn't save — Retry"); no toast does.
+ * A failed save (C05 `10:2199`): the board's strip over the canvas column
+ * (`placement: "canvas"`, drawn by `SaveFailedStrip`, not the slot's bar).
+ * One error surface at a time (owner 2026-10-26): it takes the CONNECTION
+ * id on purpose — "Couldn't save", "Can't reach Buildrik" and "Reconnecting…"
+ * are one condition, the edits are not reaching the server — so whichever
+ * was said last is the one surface, never three. The save status in the
+ * bottom bar says it too ("Couldn't save — Retry"); no toast does.
  *
  * The server's reason picks the words: a refused brand, a page limit, a
  * deleted site and a site that never loaded are not connection problems, so
@@ -142,7 +146,7 @@ export interface SaveFailedInput {
 export function saveFailedBanner({ where, error = "", leaving = false, brandLocked = false, retry, keepEditing }: SaveFailedInput): GlobalBanner {
   const retryAction: BannerAction = { label: leaving ? "Retry save & leave" : "Retry", onClick: retry, testId: "save-failed-retry" };
   const keep: BannerAction[] = leaving && keepEditing ? [{ label: "Keep editing", onClick: keepEditing, testId: "save-failed-keep" }] : [];
-  const base = { id: BANNER_ID.connection, tone: "error" as const };
+  const base = { id: BANNER_ID.connection, tone: "error" as const, placement: "canvas" as const };
   if (error.startsWith("TOKENS_INVALID:")) {
     const refusal = error.slice("TOKENS_INVALID:".length).trim();
     return {

@@ -15,12 +15,19 @@ import { createPortal } from "react-dom";
 import { useFocusTrap } from "./focus";
 import { getOverlayRoot } from "./OverlayRoot";
 
-/* center/top each supply their own align-items — same-property values can't
+/* center/top each supply their own layout — same-property values can't
    be additive (Tailwind utilities of equal specificity have no
-   className-order-to-cascade-order guarantee, see Row/PanelFrame precedent). */
+   className-order-to-cascade-order guarantee, see Row/PanelFrame precedent).
+   "center" is the 2L9 dialog placement, not the viewport centre: every
+   dialog board puts the frame's top at 280 on a 900 window (G03 225:3353,
+   G14 225:9180, 165:2184, 223:44891 — C-16 / F-24). A column with a
+   31vh spacer above (it shrinks first when a tall dialog would not fit)
+   and a growing one below. */
 const SCRIM_ALIGN_CLASS: Record<"center" | "top", string> = {
-  center: "tw:items-center",
-  top: "tw:items-start tw:pt-[12vh]",
+  center:
+    "tw:flex-col tw:items-center tw:justify-start tw:pb-4 tw:before:content-[''] tw:before:shrink tw:before:basis-[31vh] tw:before:min-h-4 " +
+    "tw:after:content-[''] tw:after:grow",
+  top: "tw:justify-center tw:items-start tw:pt-[12vh]",
 };
 
 export interface OverlayMountProps {
@@ -57,7 +64,7 @@ export function OverlayMount({
 
   return createPortal(
     <div
-      className={["tw:fixed tw:inset-0 tw:z-50 tw:bg-[var(--bk-alpha-ink-50)] tw:flex tw:justify-center", SCRIM_ALIGN_CLASS[align]]
+      className={["tw:fixed tw:inset-0 tw:z-50 tw:bg-[var(--bk-alpha-ink-50)] tw:flex", SCRIM_ALIGN_CLASS[align]]
         .filter(Boolean)
         .join(" ")}
       data-testid="overlay-scrim"

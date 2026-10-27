@@ -22,6 +22,14 @@ function Harness({ shortcut, onOuterKey }: { shortcut?: string; onOuterKey?: (k:
 }
 
 describe("PanelSearch", () => {
+  it("is the boards' gray-filled, borderless field, not the outlined one (2L9 63:6393)", () => {
+    render(<Harness />);
+    const cls = screen.getByRole("textbox", { name: "Search things…" }).className;
+    expect(cls).toContain("tw:bg-[var(--bk-gray-100)]");
+    expect(cls).toContain("tw:border-transparent");
+    expect(cls).not.toContain("tw:bg-white");
+  });
+
   it("is a text input named by its placeholder and marked as a panel search", () => {
     render(<Harness />);
     const input = screen.getByRole("textbox", { name: "Search things…" });

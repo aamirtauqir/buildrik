@@ -53,6 +53,8 @@ import { EditorStoppedBoundary } from "@/editor/shell/EditorStoppedScreen";
 import { registerWorkSnapshot } from "@/editor/shell/workSnapshot";
 import { setKeptWorkOffer } from "@/editor/shell/keptWorkOffer";
 import { RecoveryBanner } from "@/editor/shell/RecoveryBanner";
+import { SaveFailedStrip } from "@/editor/shell/SaveFailedStrip";
+import { FullPageRouter } from "@/editor/sidebar/FullPageRouter";
 import { SessionExpiredModal } from "@/editor/shell/modals/SessionExpiredModal";
 import { DEFAULT_ONBOARDING_STEPS } from "@/shared/constants/onboardingSteps";
 import { CanvasFooterToolbar } from "@/editor/canvas/CanvasFooterToolbar";
@@ -1435,7 +1437,7 @@ const SWITCHER_PAGES: PageSummary[] = [
 
 function PageSwitcherProbe() {
   const [open, setOpen] = React.useState(() => new URLSearchParams(location.search).get("open") === "1");
-  const [active, setActive] = React.useState("home");
+  const [active, setActive] = React.useState(() => new URLSearchParams(location.search).get("active") ?? "home");
   return (
     <div className="tw:fixed tw:inset-x-0 tw:bottom-0">
       <LayoutShell.Footer>
@@ -2232,8 +2234,9 @@ const CASES: Record<string, () => React.ReactElement> = {
     </div>
   ),
   /* design-2l9 board 145:65011 — Grid and snapping, the panel View opens in
-     its own place. The bar sits low in a 1440 frame so the panel opens above
-     it; the recipe clicks View, then Grid. */
+     its own place. The bar sits at the canvas column's top (x342 y56, 798
+     wide, 7:18654) so the panel opens below it; the recipe clicks View,
+     then Grid. */
   /* design-2l9 board 7:18654 — the canvas bar's contents at the board's
      ~800 canvas column: path, device toggles, width chip, zoom, View. */
   "canvas-bar": () => (
@@ -2252,8 +2255,8 @@ const CASES: Record<string, () => React.ReactElement> = {
     </div>
   ),
   "canvas-grid-panel": () => (
-    <div data-probe="canvas-grid-panel" style={{ width: 1440, height: 900, display: "flex", alignItems: "flex-end", justifyContent: "flex-end" }}>
-      <div style={{ width: 900 }}>
+    <div data-probe="canvas-grid-panel" style={{ width: 1440, height: 900, position: "relative" }}>
+      <div style={{ position: "absolute", left: 342, top: 56, width: 798 }}>
         <CanvasFooterToolbar
           overlays={{ guides: false, spacing: false, grid: false, rulers: false, badges: false, xray: false, outlines: false }}
           zoom={52}
@@ -3073,6 +3076,23 @@ const CASES: Record<string, () => React.ReactElement> = {
       <CreatePageErrorModal onCancel={() => {}} onRetry={() => {}} />
     </div>
   ),
+  /* C-17 (222:43842 / 223:44891): Templates in the resource area — the real
+     FullPageRouter mount in the slot between the rail (56) and the bottom
+     bar (868), under the topbar (56). */
+  "templates-resource-area": () => (
+    <div data-probe="templates-resource-area">
+      <ToastProvider>
+        <div style={{ position: "fixed", inset: "0 0 auto 0", height: 56, background: "white", borderBottom: "1px solid var(--bk-border)" }} />
+        <div style={{ position: "fixed", left: 0, top: 56, width: 56, bottom: 32, borderRight: "1px solid var(--bk-border)" }} />
+        <div style={{ position: "fixed", left: 56, top: 56, right: 0, bottom: 32, display: "flex" }}>
+          <React.Suspense fallback={null}>
+            <FullPageRouter activeTab="templates" composer={layersComposer()} commonTabProps={{ onClose: () => {} }} />
+          </React.Suspense>
+        </div>
+        <div style={{ position: "fixed", left: 0, right: 0, bottom: 0, height: 32, borderTop: "1px solid var(--bk-border)" }} />
+      </ToastProvider>
+    </div>
+  ),
   // ── Page switcher (2L9 Shell/BottomBar 497:99485, menu 558:4419) ──────────
   "page-switcher": () => (
     <div data-probe="page-switcher">
@@ -3084,15 +3104,6 @@ const CASES: Record<string, () => React.ReactElement> = {
       <BottomBarProbe />
     </div>
   ),
-  /* Owner 2026-10-26 / board C05: a failed save is the global slot's one bar. */
-  "banner-save-failed": () => {
-    showGlobalBanner(saveFailedBanner({ where: "Fieldwork Studio · Home", retry: () => {} }));
-    return (
-      <div data-probe="banner-save-failed" style={{ width: "100vw" }}>
-        <GlobalBannerSlot />
-      </div>
-    );
-  },
   // ── Publish states (boards 784:4250 / 781:4489) ──────────────────────────
   "publish-publishing": () => (
     <div data-probe="publish-publishing">
@@ -4043,13 +4054,18 @@ Object.assign(CASES, {
   },
   /* lead3 wave 3 (owner: one error surface): the failed save is the slot's
      one bar under the topbar, not a canvas-column strip. */
+  /* C05 10:2199 — the strip 12 in from the canvas column, 12 under its bar
+     (the column starts under the topbar; the bar is 42 tall, 7:18654). */
   "lf-save-failed": () => {
     showGlobalBanner(saveFailedBanner({ where: "Fieldwork Studio · Home", retry: () => {} }));
     return (
       <div data-probe="lf-save-failed">
         {LF_TOPBAR}
         <GlobalBannerSlot />
-        {LF_COLUMN}
+        <div data-bk-toast-anchor="" style={{ position: "fixed", left: 342, top: 56, width: 798, height: 812, background: "var(--bk-bg-subtle)" }}>
+          <div data-testid="canvas-bar" style={{ height: 42, background: "var(--bk-bg-card)", borderBottom: "1px solid var(--bk-gray-200)" }} />
+        </div>
+        <SaveFailedStrip />
       </div>
     );
   },

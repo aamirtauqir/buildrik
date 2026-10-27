@@ -145,7 +145,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "probe-compared 2026-10-27 (case pages-manager, 284×812, shots/63-6393.png) for the list: rows 40+ tall with glyph, name over URL, 'Hidden from publish' third line, 'Current' tag on the tinted open row, ⋯ always drawn; legend under the rows; 'My folders' / 'Only visible to you' heading; folder row 'Studio · 1 page · Folder · ⋯' (no disclosure — the row toggles), member 'Legal /legal · In Studio'; Collection pages gray card with a white row and Open page · Manage in CMS; footer full-width '+ Add page' then From template · New folder. Not probe-rendered: the header 'Pages · n' and the gray-well view tabs (PagesTab needs a composer); search field fill is chrome-ui PanelSearch (REQUESTS A-15). The collection row's ⋯ is not drawn: it would have no actions.",
+   "verifiedNote": "lead4 2026-10-27 (A-15): PanelSearch is the boards’ field — gray-100 fill, no edge, radius 6, glyph 8 in, text at 32, 32 tall (probe layers-tree: computed bg rgb(243,244,246), border transparent, pl 32; board fill #F3F4F6, glyph ≈8, text ≈33). | probe-compared 2026-10-27 (case pages-manager, 284×812, shots/63-6393.png) for the list: rows 40+ tall with glyph, name over URL, 'Hidden from publish' third line, 'Current' tag on the tinted open row, ⋯ always drawn; legend under the rows; 'My folders' / 'Only visible to you' heading; folder row 'Studio · 1 page · Folder · ⋯' (no disclosure — the row toggles), member 'Legal /legal · In Studio'; Collection pages gray card with a white row and Open page · Manage in CMS; footer full-width '+ Add page' then From template · New folder. Not probe-rendered: the header 'Pages · n' and the gray-well view tabs (PagesTab needs a composer); search field fill is chrome-ui PanelSearch (REQUESTS A-15). The collection row's ⋯ is not drawn: it would have no actions.",
    "tier": "P1"
   },
   {
@@ -2137,7 +2137,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-A S4 built, not compared: 'Canvas view' menu — Grid · {n} px › (dialog), Rulers ⌘R, Snap guides ⌘; — then Spacing/Badges/X-Ray kept under a rule (code-ahead). Still open: 'Rulers and guides…' list (S11, shared guides) and Show outlines / Focus mode (REQUESTS #12).",
+   "verifiedNote": "lead4 2026-10-27 (A-14): the View menu opens downward from the top bar (probe canvas-grid-panel, menu top 103, right edge 1140). | L-A S4 built, not compared: 'Canvas view' menu — Grid · {n} px › (dialog), Rulers ⌘R, Snap guides ⌘; — then Spacing/Badges/X-Ray kept under a rule (code-ahead). Still open: 'Rulers and guides…' list (S11, shared guides) and Show outlines / Focus mode (REQUESTS #12).",
    "tier": "P1"
   },
   {
@@ -2148,7 +2148,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-fixed",
-   "verifiedNote": "probe-compared 2026-10-27 (case canvas-grid-panel, board shots/145-65011.png): a 360×322 panel (board ~360×330) opened in the View popover's place, right edge on View; head 'Grid and snapping' + Close; note wraps two lines; 'Show grid and snap' switch; Grid size field full width 28 tall; 4/8/16 px presets 96×32 in one row; hint; Cancel · Apply 96×32 right. It opens ABOVE the bar until lead3 moves the bar to the top (REQUESTS A-14).",
+   "verifiedNote": "lead4 2026-10-27 (A-14): re-probed with the bar at the canvas column top (x342 y56, 798 wide): the panel opens downward, frame 778–1140 at y103, 362×324 (board 780–1140 at y103, 360×≈330); the popover padding no longer frames the panel. | probe-compared 2026-10-27 (case canvas-grid-panel, board shots/145-65011.png): a 360×322 panel (board ~360×330) opened in the View popover's place, right edge on View; head 'Grid and snapping' + Close; note wraps two lines; 'Show grid and snap' switch; Grid size field full width 28 tall; 4/8/16 px presets 96×32 in one row; hint; Cancel · Apply 96×32 right. It opens ABOVE the bar until lead3 moves the bar to the top (REQUESTS A-14).",
    "tier": "P1"
   },
   {
@@ -2299,7 +2299,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-A S3 built, not compared: Page width popover from the bar's '{width} px' — Width (px), presets 1920 · Wide … 375 · Mobile, 'Custom width: 240–2560 px.'. 'Saved for your editor on this site.' not drawn: the width is session-only (not persisted). Fluid Desktop stays on the topbar switcher; '1440 · Desktop' previews at 1440.",
+   "verifiedNote": "lead4 2026-10-27 (A-14): the Page width popover opens downward from the top bar. | L-A S3 built, not compared: Page width popover from the bar's '{width} px' — Width (px), presets 1920 · Wide … 375 · Mobile, 'Custom width: 240–2560 px.'. 'Saved for your editor on this site.' not drawn: the width is session-only (not persisted). Fluid Desktop stays on the topbar switcher; '1440 · Desktop' previews at 1440.",
    "tier": "P1"
   },
   {
@@ -2770,7 +2770,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-fixed",
-   "verifiedNote": "probe-compared 2026-10-27 (case layers-tree, 284 wide, shots/147-75914.png): search + 'View' beside it; the open page heads the tree (page glyph + name); children from x28 with 16px lucide chevrons; footer the count alone ('N layers · K selected' — Select and the ⓘ left the band; Select mode is in ⋯, the dim note in Layer display). Search field fill is chrome-ui PanelSearch (REQUESTS A-15); the page row's ⋯ is not drawn (no page actions in Layers).",
+   "verifiedNote": "lead4 2026-10-27 (A-15): search field gray-filled and borderless, glyph 8 in / text 32 — probe layers-tree side by side with shots/147-75914.png; the band’s 16 inset (board ≈9–13) not changed. | probe-compared 2026-10-27 (case layers-tree, 284 wide, shots/147-75914.png): search + 'View' beside it; the open page heads the tree (page glyph + name); children from x28 with 16px lucide chevrons; footer the count alone ('N layers · K selected' — Select and the ⓘ left the band; Select mode is in ⋯, the dim note in Layer display). Search field fill is chrome-ui PanelSearch (REQUESTS A-15); the page row's ⋯ is not drawn (no page actions in Layers).",
    "tier": "P1"
   },
   {
@@ -4124,9 +4124,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Page switcher is lead-owned (shell/PageSwitcher.tsx, Task 1.3); the board's differences are filed as REQUESTS A-16.",
+   "authority": "code:search-add-page",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (lead4, case page-switcher&open=1&active=about, 1440×900, side by side with shots/558-448976.png): panel 260, rows 246×32 on a 34 pitch (board 246×32/34); header ‘Pages · 5 + 1 template’ 12 regular muted; file glyph 24 (16×20 ink) gray-600 on every row incl. Home (board ≈18×22 #4B5563; Home keeps its ‘Homepage’ accessible name); name left 13 ink, path right-aligned 12 muted; current page tinted blue-100 (225,239,254 = board) with no check; ‘Templates’ 12 regular under a gray-200 hairline; ‘Manage pages ›’ in the accent. Kept against the board: the search field (focused on open) and ‘+ Add page’ — plan Review Focus 1, 100 pages in ≤2 interactions (code:search-add-page). Keyboard/hover highlight is a gray-100 hover, not the old blue-50 + bar.",
    "tier": "P1"
   },
   {
@@ -7728,7 +7728,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "probe-compared 2026-10-27: Keep editing is the filled primary, Discard changes / Save and leave outlined, dialog 480 wide, copy matches. Open: dialog sits viewport-centred (board top ≈280) and its title is 20px vs board ≈16 — both chrome-ui Modal (REQUESTS C-16).",
+   "verifiedNote": "lead4 2026-10-27: C-16 closed in chrome-ui (ebb468e88) — Modal title 16/24, frame top at 31vh (279 on 900, probe-measured in tpl-replace-confirm / lf-session-dialog); this board not re-probed. | probe-compared 2026-10-27: Keep editing is the filled primary, Discard changes / Save and leave outlined, dialog 480 wide, copy matches. Open: dialog sits viewport-centred (board top ≈280) and its title is 20px vs board ≈16 — both chrome-ui Modal (REQUESTS C-16).",
    "tier": "P1"
   },
   {
@@ -8335,7 +8335,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "probe-compared 2026-10-27: Keep editing is the filled primary, Discard changes / Save and leave outlined, dialog 480 wide, copy matches. Open: dialog sits viewport-centred (board top ≈280) and its title is 20px vs board ≈16 — both chrome-ui Modal (REQUESTS C-16).",
+   "verifiedNote": "lead4 2026-10-27: C-16 closed in chrome-ui (ebb468e88) — Modal title 16/24, frame top at 31vh (279 on 900); this board not re-probed. | probe-compared 2026-10-27: Keep editing is the filled primary, Discard changes / Save and leave outlined, dialog 480 wide, copy matches. Open: dialog sits viewport-centred (board top ≈280) and its title is 20px vs board ≈16 — both chrome-ui Modal (REQUESTS C-16).",
    "tier": "P2"
   },
   {
@@ -11239,7 +11239,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Header, Show filter, search, inline Creating bar and cards differ; code sidebar name list",
+   "verifiedNote": "lead4 2026-10-27 (C-17): Templates is mounted in place as a resource area (FullPageRouter RESOURCE_HOST, like Assets/Settings/Brand) — probe templates-resource-area: tpl-host at x56 y56, 1384×812, between the rail and the bottom bar under the topbar, as the board draws it. The view’s own content (‘‹ Back to canvas’ nav, header, Show filter, cards) is still the old design — lane C’s rework. | Header, Show filter, search, inline Creating bar and cards differ; code sidebar name list",
    "tier": "P2"
   },
   {
@@ -11360,7 +11360,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "probe-compared 2026-10-27 (tpl-replace-confirm): 720 wide, title/body/checkbox/CTA copy = board for a template with its own colours; a template written on Brand tokens says it uses the site's Brand (code: resolveTokens). Open: Modal title 20 vs ≈16 and vertical placement (REQUESTS C-16); Templates as an in-place resource area (REQUESTS C-17).",
+   "verifiedNote": "lead4 2026-10-27 (C-17): the Templates mount is in place now (tpl-host 56/56 1384×812); nav/header/cards remain lane C. | lead4 2026-10-27: tpl-replace-confirm re-probed after C-16 (ebb468e88): frame 720×214 at x360 y279 (board 720×211 at y280), title 16/24 — title and placement closed; C-17 mount remains. | probe-compared 2026-10-27 (tpl-replace-confirm): 720 wide, title/body/checkbox/CTA copy = board for a template with its own colours; a template written on Brand tokens says it uses the site's Brand (code: resolveTokens). Open: Modal title 20 vs ≈16 and vertical placement (REQUESTS C-16); Templates as an in-place resource area (REQUESTS C-17).",
    "tier": "P2"
   },
   {
@@ -12181,7 +12181,7 @@
    "status": "active",
    "authority": "code:no-restore-yet",
    "verified": "drift-open",
-   "verifiedNote": "probe-compared 2026-10-27: 720 wide, 'Delete {field}?', count sentence, 'Type N to confirm' over a 28 filled input, Cancel 96 / Delete field; no breadcrumb or callout. Copy keeps 'This cannot be undone.' — the board's 30-day Recently deleted waits on the restore server slice. Open: Modal title size / placement (REQUESTS C-16).",
+   "verifiedNote": "lead4 2026-10-27: C-16 title 16/24 closed (ebb468e88); this board draws its tall dialog at top ≈128 while the 2L9 dialogs at large sit at 280 — chrome-ui places every dialog at 31vh (shrinking only when it would not fit), not re-probed. | probe-compared 2026-10-27: 720 wide, 'Delete {field}?', count sentence, 'Type N to confirm' over a 28 filled input, Cancel 96 / Delete field; no breadcrumb or callout. Copy keeps 'This cannot be undone.' — the board's 30-day Recently deleted waits on the restore server slice. Open: Modal title size / placement (REQUESTS C-16).",
    "tier": "P2"
   },
   {
@@ -21771,8 +21771,8 @@
    "family": "recovery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Board C05 draws the save-failed strip inside the canvas column; owner direction 2026-10-26 is \"the board wins\", so the strip moves back there (one surface, no toast, no stacked banner). Lead had routed it through the global slot on an internal instruction, not an owner decision. | probe-compared 2026-10-27 (lead3, cases banner-save-failed + bottom-bar state=error): owner 2026-10-26 — one error surface. The failure is ONE bar in the global slot under the topbar ('✕ Couldn’t save <site> · <page>. Your changes are kept.' + Retry; full width, 40 tall — the board draws the strip in the canvas column, the owner routed it through the slot), the bottom bar says 'Couldn’t save — Ret",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (lead4, case lf-save-failed at 1440×900 with a 42-tall canvas bar at the column top, shots/10-2199.png side by side): strip at x354 y110 774×44 (board ≈353/112, 775×46) — 12 in from the canvas column, 12 under the canvas bar; ⚠ glyph, red 13/20 line, white bordered Retry 67×32 beside it (board ≈31 tall). One error surface: the strip draws the stored connection-id condition (SaveFailedStrip, placement canvas), so Can’t reach / Reconnecting replace it instead of stacking, the slot bar never repeats it, no toast; bottom bar says “Couldn’t save — Retry” (lead3 bottom-bar state=error). Line is the context-free “Couldn’t save <site> · <page>. Your changes are kept.” — the board’s publish wording is F-18 (open:save-failed-copy-context). Radius 8 vs the board’s ≈2 not changed.",
    "tier": "P2"
   },
   {
@@ -21848,8 +21848,8 @@
    "family": "recovery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "probe-compared 2026-10-27 (lf-session-dialog): dialog 480×176 (board 480×176), title 16/24, body 13/20, Keep editing 112 · Try saving again 136 · Sign in ↗ 107 (board ≈111/137/108), 120 below the top — match; the save-failed strip now sits under the scrim (z-40) and is dimmed. Open: chrome-ui centres dialogs (top 362), the board puts them at top 280 (REQUESTS F-24).",
+   "verified": "drift-fixed",
+   "verifiedNote": "lead4 2026-10-27 re-probed lf-session-dialog after C-16/F-24 (ebb468e88): frame 480×176 at x480 y279 (board 480×176 at y280), title 16px — the open position item is closed. | probe-compared 2026-10-27 (lf-session-dialog): dialog 480×176 (board 480×176), title 16/24, body 13/20, Keep editing 112 · Try saving again 136 · Sign in ↗ 107 (board ≈111/137/108), 120 below the top — match; the save-failed strip now sits under the scrim (z-40) and is dimmed. Open: chrome-ui centres dialogs (top 362), the board puts them at top 280 (REQUESTS F-24).",
    "tier": "P2"
   },
   {
@@ -21968,9 +21968,9 @@
    "page": "07",
    "family": "recovery",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "probe-compared 2026-10-27 (lf-conflict, board PNG fetched): dialog 720×156 (board 720×156), title 16/24, body one line 13/20, Overwrite… 652/107 · Download a copy 767/141 · Reload latest… 916/140 filled (board 648/111 · 768/145 · 920/136) — match; Overwrite… now a bordered button, not a quiet link. Open: vertical position (chrome-ui centres at y372, board y280 — F-24); body names no author (code:conflict-no-author).",
+   "authority": "code:conflict-no-author",
+   "verified": "drift-fixed",
+   "verifiedNote": "lead4 2026-10-27 re-probed lf-conflict after C-16/F-24 (ebb468e88): frame 720×156 at x360 y279 (board y280), title 16px — position closed; the remaining no-author line is code authority. | probe-compared 2026-10-27 (lf-conflict, board PNG fetched): dialog 720×156 (board 720×156), title 16/24, body one line 13/20, Overwrite… 652/107 · Download a copy 767/141 · Reload latest… 916/140 filled (board 648/111 · 768/145 · 920/136) — match; Overwrite… now a bordered button, not a quiet link. Open: vertical position (chrome-ui centres at y372, board y280 — F-24); body names no author (code:conflict-no-author).",
    "tier": "P2"
   },
   {

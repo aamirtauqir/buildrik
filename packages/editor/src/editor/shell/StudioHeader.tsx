@@ -51,6 +51,7 @@ import { SiteMenu } from "./SiteMenu";
 import { PermissionsHost } from "./PermissionsHost";
 import { TimeTravelHost } from "./TimeTravelHost";
 import { BANNER_ID, clearGlobalBanner, saveFailedBanner, showGlobalBanner } from "./globalBanners";
+import { SaveFailedStrip } from "./SaveFailedStrip";
 import { isAuthSaveError } from "./hooks/useSaveCallback";
 import { publishTray, usePublishTrayOpen } from "./publishTrayStore";
 import { shellDirty, useShellDirty } from "./shellDirtyRegistry";
@@ -523,12 +524,13 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
     }
   }, [exitDialog, onSave]);
 
-  /* ── Save failed (C05 10:2199) — one bar in the global banner slot ──────
+  /* ── Save failed (C05 10:2199) — one strip over the canvas column ───────
      Owner 2026-10-26: a failed save showed a strip, a toast, a Reconnecting…
-     bar and a red topbar label at once. Now it is the slot's connection bar
+     bar and a red topbar label at once. Now it is one stored condition
      (`saveFailedBanner`: the same id as can't-reach / reconnecting, so the
-     latest of the three is the one bar) and the bottom bar's "Couldn't save
-     — Retry". A signed-out save says nothing here: the session-expired
+     latest of the three is the one surface) drawn as the board's strip
+     (`SaveFailedStrip`), plus the bottom bar's "Couldn't save — Retry". A
+     signed-out save says nothing here: the session-expired
      dialog and its banner own that condition (B7-G03/G04). */
   const [leaveAfterSave, setLeaveAfterSave] = React.useState<(() => void) | null>(null);
   const retrySave = React.useCallback(async () => {
@@ -886,6 +888,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
       <div className="bk-sr-only" aria-live="assertive" data-testid="bk-announce-assertive">
         {alertMsg}
       </div>
+      <SaveFailedStrip />
       <Topbar
         siteName={siteName}
         /* Board 497:99433: a labelled "Site settings" in the bar. A view has
