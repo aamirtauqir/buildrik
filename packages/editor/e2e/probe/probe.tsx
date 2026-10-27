@@ -3076,6 +3076,15 @@ const CASES: Record<string, () => React.ReactElement> = {
       })}
     </div>
   ),
+  /* design-2l9 board 63:6393 — the whole Pages manager (header, search, view
+     tabs, list, footer): the real PagesTab, 284 wide like the board. */
+  "pages-tab": () => (
+    <div data-probe="pages-tab" style={{ width: 284, height: 812, display: "flex" }}>
+      <ToastProvider>
+        <PagesTab composer={listingsComposer()} onClose={() => {}} onRequestTemplates={() => {}} />
+      </ToastProvider>
+    </div>
+  ),
   /* design-2l9 board 63:21262 — the manager's Listings view, 720 wide as the
      board draws it, on a real Composer (the recipe clicks the Listings tab). */
   "pages-listings": () => (
@@ -3573,6 +3582,20 @@ const CASES: Record<string, () => React.ReactElement> = {
         onMove={() => {}}
         onClose={() => {}}
       />
+    </div>
+  ),
+  /* design-2l9 board 65:17860 — SEO score details over Page settings (the
+     recipe clicks "SEO score details"). */
+  "pages-settings-score": () => (
+    <div data-probe="pages-settings-score" style={{ width: 1440, height: 900, background: "var(--bk-gray-900)" }}>
+      <ToastProvider>
+        <PageSettingsDrawer
+          page={PAGE_SETTINGS_FIXTURE}
+          allPages={[PAGE_SETTINGS_FIXTURE, ...PAGES_FIXTURE.slice(1)]}
+          composer={null}
+          onClose={() => {}}
+        />
+      </ToastProvider>
     </div>
   ),
   /* design-2l9 board 63:18189 — page settings whose save is refused. The

@@ -27,7 +27,9 @@ L3-2. **lead3 (wave 3) · AquibraStudio.tsx (banner slot DOM order)** · same mo
 ## Open — lane L-A (2026-10-26)
 
 
-A-18. **L-A → lead · `shell/StudioPanels.tsx` (Pages drawer width)** · in the Listings view the Pages drawer is 720 wide, floating over the canvas with the canvas still visible to its right (board 63:21262: x56–776) · StudioPanels passes `isExpanded={false}` / `onExpandToggle={() => {}}`, so nothing can widen it from the tab. PagesTab knows the view: a `view === "listings"` callback (or honouring `onExpandToggle`) is all the tab needs. The table is built and probe-compared at 720.
+A-18. ~~**L-A → lead · Pages drawer width for Listings**~~ · closed by L-A without a shell change: LeftSidebar already passes a working `onExpandToggle` (280 ↔ 700) through TabRouter's commonTabProps; PagesTab now widens on entering Listings and narrows on leaving if it widened (test PagesTab.listingsWidth). 700 vs the board's ~720 is LeftSidebar's `panelWidthOverride`.
+
+A-19. **L-A → lead · `chrome-ui/PanelFrame` header + PanelSearch band** · boards 63:6393 / 63:21262 / 7:18981 draw the drawer header 56 tall (title baseline ~28, rule at 56); PanelFrame.Header is 44, so every drawer body sits 12px high. The search band insets its field 12 on the boards, 16 in code. Shared by every drawer — one lane should not move them all.
 
 
 

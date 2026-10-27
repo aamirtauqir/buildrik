@@ -19,14 +19,17 @@ const baseProps = {
   onMoveToFolder: vi.fn(),
   onRemoveFromFolders: vi.fn(),
   onDelete: vi.fn(),
+  onClear: vi.fn(),
 };
 
 describe("BulkToolbar", () => {
-  it("renders count with tabular className", () => {
-    const { container } = render(<BulkToolbar {...baseProps} />);
-    expect(screen.getByText("3")).toBeInTheDocument();
-    expect(screen.getByText(/selected/)).toBeInTheDocument();
-    expect(container.querySelector(".bd-pg-bulk-count.tabular")).not.toBeNull();
+  // re-baseline: Pages bulk band — board 139:47668: "3 selected" with Clear, then the three actions.
+  it("reads 'n selected' and Clear ends the selection", () => {
+    const onClear = vi.fn();
+    render(<BulkToolbar {...baseProps} onClear={onClear} />);
+    expect(screen.getByTestId("pages-bulk-count")).toHaveTextContent("3 selected");
+    fireEvent.click(screen.getByTestId("pages-bulk-clear"));
+    expect(onClear).toHaveBeenCalledTimes(1);
   });
 
   it("does NOT render disabled Publish or Unpublish buttons (anti-slop)", () => {
@@ -69,17 +72,14 @@ describe("BulkToolbar", () => {
     expect(fn).toHaveBeenCalledTimes(1);
   });
 
-  it("Delete button has danger class", () => {
-    const { container } = render(<BulkToolbar {...baseProps} />);
-    const danger = container.querySelector("button.danger");
-    expect(danger?.textContent).toMatch(/Delete/);
+  it("Delete reads in the error red", () => {
+    render(<BulkToolbar {...baseProps} />);
+    expect(screen.getByRole("button", { name: "Delete" }).className).toContain("tw:text-[var(--bk-error)]");
   });
 
-  it("toolbar root has class .bd-pg-bulk-toolbar with role toolbar", () => {
-    const { container } = render(<BulkToolbar {...baseProps} />);
-    const toolbar = container.querySelector(".bd-pg-bulk-toolbar");
-    expect(toolbar).not.toBeNull();
-    expect(toolbar?.getAttribute("role")).toBe("toolbar");
+  it("is a toolbar named by its count", () => {
+    render(<BulkToolbar {...baseProps} />);
+    expect(screen.getByRole("toolbar", { name: "3 pages selected" })).toBeInTheDocument();
   });
 
   it("does not render legacy pg-bulk__* classes", () => {

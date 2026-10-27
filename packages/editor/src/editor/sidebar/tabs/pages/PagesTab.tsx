@@ -23,7 +23,6 @@ import {
   IconButton,
   Menu,
   MenuItem,
-  MenuSeparator,
   PanelFrame,
   PanelSearch,
   Popover,
@@ -190,6 +189,24 @@ export const PagesTab: React.FC<PagesTabProps> = ({
   // and the whole-site search-listings table ("Search listings"). Default to the
   // tree; the table is the SEO-at-a-glance view that scales past a few pages.
   const [view, setView] = React.useState<PageView>("pages");
+  /* Board 63:21262 draws Listings in the wide drawer, Pages and Structure in
+     the narrow one. Only a CHANGE of view moves the width, and the drawer
+     narrows again only if Listings widened it — "Narrow panel" / "Widen
+     panel" in ⋯ still win while a view is showing. */
+  const viewRef = React.useRef(view);
+  const widenedForListings = React.useRef(false);
+  React.useEffect(() => {
+    if (viewRef.current === view) return;
+    viewRef.current = view;
+    if (!onExpandToggle) return;
+    if (view === "listings" && !isExpanded) {
+      widenedForListings.current = true;
+      onExpandToggle();
+    } else if (view !== "listings" && isExpanded && widenedForListings.current) {
+      widenedForListings.current = false;
+      onExpandToggle();
+    }
+  }, [view, isExpanded, onExpandToggle]);
 
   /* Board 7069:79383 "Pages · Panel menu (⋯)": Select pages… · Show structure ·
      Reload, plus the Listings row (EP-11, 7576:197553). Listings and Structure
@@ -385,7 +402,8 @@ export const PagesTab: React.FC<PagesTabProps> = ({
      pages (folder members are not ordered). The engine orders the whole site
      ("after <id>"), so moving above the previous top-level page lands after
      whatever precedes it in site order. Page order is not in the composer's
-     history, so the receipt carries no Undo (REQUESTS #13). */
+     history, so the receipt's Undo puts the page back after its old
+     neighbour itself. */
   const { addToast } = useToast();
   const rootIds = React.useMemo(
     () => p.pages.filter((pg) => !f.pageToFolder.has(pg.id)).map((pg) => pg.id),
@@ -394,12 +412,17 @@ export const PagesTab: React.FC<PagesTabProps> = ({
   const movePage = React.useCallback(
     (pageId: string, direction: -1 | 1) => {
       const page = p.pages.find((pg) => pg.id === pageId);
-      const move = rootMove(p.pages.map((pg) => pg.id), rootIds, pageId, direction);
+      const order = p.pages.map((pg) => pg.id);
+      const move = rootMove(order, rootIds, pageId, direction);
       if (!composer || !page || !move) return;
+      /* Where it sat, so Undo can put it back (boards 137:53911 / 137:59625). */
+      const at = order.indexOf(pageId);
+      const wasAfter = at > 0 ? order[at - 1] : null;
       if (!composer.elements.reorderPage(pageId, move.afterId)) return;
       addToast({
         description: `${page.name} moved to position ${move.position}${page.isHome ? " · Still the homepage" : ""}`,
         tone: "info",
+        action: { label: "Undo", onClick: () => { composer.elements.reorderPage(pageId, wasAfter); } },
       });
     },
     [composer, p.pages, rootIds, addToast],
@@ -478,7 +501,10 @@ export const PagesTab: React.FC<PagesTabProps> = ({
         onClose={onClose}
         actions={
           <>
-            {bulkMode ? (
+            {/* Board 139:47668: with pages ticked the header keeps ⋯ and the
+                bulk band's Clear ends the selection; Done is select mode
+                with nothing ticked yet. */}
+            {bulkMode && !bulk.hasSelection ? (
               /* v3 7069:78984: select mode swaps the ⋯ for "Done". */
               <Button
                 color="light"
@@ -494,6 +520,9 @@ export const PagesTab: React.FC<PagesTabProps> = ({
               open={menuOpen}
               onClose={() => setMenuOpen(false)}
               placement="bottom-end"
+              /* End-aligned on ⋯ it would start 42px into the rail; the board
+                 starts it at the drawer's left edge. */
+              className="tw:-mr-[42px]"
               label="Pages options"
               trigger={
                 <IconButton
@@ -507,11 +536,12 @@ export const PagesTab: React.FC<PagesTabProps> = ({
                 </IconButton>
               }
             >
-              {/* v3 7069:79383: Select pages… · Listings · Show structure, a
-                  rule, Reload. The board's ⌘R hint is not drawn — ⌘R is the
-                  browser's reload and nothing here binds it. "Widen panel"
-                  is the header's old expand button, as in Layers. */}
-              <Menu label="Pages options" className="tw:w-56">
+              {/* design-2l9 board 65:17148: Select pages… · Listings · Show
+                  structure · Reload, no rule, 280 wide from the drawer's left
+                  edge. Listings widens the drawer by itself, so the old
+                  "Widen panel" row is gone. The board's "Recently deleted"
+                  is the page trash (P3, not built). */}
+              <Menu label="Pages options" className="tw:-mx-2 tw:w-[276px]">
                 <MenuItem data-testid="pages-menu-select" onClick={runMenu(() => setSelectMode(true))}>
                   Select pages…
                 </MenuItem>
@@ -521,27 +551,18 @@ export const PagesTab: React.FC<PagesTabProps> = ({
                 <MenuItem data-testid="pages-open-structure" onClick={runMenu(() => setView("structure"))}>
                   Show structure
                 </MenuItem>
-                <MenuSeparator />
                 <MenuItem data-testid="pages-menu-reload" onClick={runMenu(p.retrySync)}>
                   Reload
                 </MenuItem>
-                {onExpandToggle && (
-                  <MenuItem data-testid="pages-wide-view" onClick={runMenu(onExpandToggle)}>
-                    {isExpanded ? "Narrow panel" : "Widen panel"}
-                  </MenuItem>
-                )}
               </Menu>
             </Popover>
             )}
           </>
         }
       />
-      {/* Over the views it filters — Pages and Listings (board 63:21262:
-          "Search names and URLs"). Structure takes no query, and a dead
-          field over it would be a lie. */}
-      {(p.loadError || view !== "structure") && (
-        <PanelSearch placeholder="Search pages…" value={search} onChange={setSearch} data-testid="pages-search" />
-      )}
+      {/* Over all three views (boards 63:6393 / 63:21262 / 63:21939): it
+          filters names and URLs in each. */}
+      <PanelSearch placeholder="Search pages…" value={search} onChange={setSearch} data-testid="pages-search" />
       {/* Board 63:6393: the three views as tabs under the search (they were
           ⋯ rows only; the ⋯ keeps them too, as board 65:17148 draws). */}
       {!p.loadError && (
@@ -561,12 +582,24 @@ export const PagesTab: React.FC<PagesTabProps> = ({
           a replacement for the whole panel body. */}
       <PanelFrame.Body noScroll>
           {view === "structure" && !p.loadError ? (
-            <SiteStructureTree
-              pages={p.pages}
-              onSelectPage={(id) => { p.selectPage(id); }}
-              host={siteHost}
-              collections={dynamicPages.collections}
-            />
+            <div className="tw:flex tw:h-full tw:min-h-0 tw:flex-col">
+              <SiteStructureTree
+                pages={p.pages}
+                onSelectPage={(id) => { p.selectPage(id); }}
+                onRowMenu={p.openContextMenu}
+                host={siteHost}
+                collections={dynamicPages.collections}
+                search={search}
+              />
+              {/* Board 63:21939 keeps the Pages footer under the tree too. */}
+              <div className="bd-pg-footer" data-testid="pages-footer">
+                <AddPageButton
+                  onAddBlank={requestNewPage}
+                  onFromTemplate={onRequestTemplates}
+                  onAddFolder={() => { setView("pages"); setNewFolderId(f.createFolder("New Folder")); }}
+                />
+              </div>
+            </div>
           ) : view === "listings" && !p.loadError ? (
             /* PanelFrame.Body is `flex-1 min-h-0 overflow-hidden` — flex-1 as a
                CHILD, but it is not itself display:flex, so these two stack as
@@ -603,7 +636,6 @@ export const PagesTab: React.FC<PagesTabProps> = ({
             pageToFolder={f.pageToFolder}
             selectedIds={bulk.selectedIds}
             search={search}
-            onSearchEverywhere={composer ? (query) => composer.emit(EVENTS.UI_TOGGLE_COMMAND_PALETTE, { query }) : undefined}
             onAddPage={requestNewPage}
             onAddFolder={() => setNewFolderId(f.createFolder("New Folder"))}
             newFolderId={newFolderId}

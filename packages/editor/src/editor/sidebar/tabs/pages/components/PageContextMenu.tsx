@@ -7,8 +7,9 @@
  * - Keyboard: Escape closes here; <Menu> owns ↑↓/Home/End roving and, unlike
  *   the hand-rolled version this replaced, SKIPS the disabled Delete item
  * - design-2l9 board 63:13820 draws the menu bare: no chord hints (F2, ⌘D,
- *   ⌥↑/⌥↓, ⌫ still work on the row), no rule, "Page settings ›", and Delete
- *   page in the menu's own ink.
+ *   ⌫ still work on the row), no rule, "Page settings ›", and Delete page in
+ *   the menu's own ink. Move up / Move down carry ⌥↑ / ⌥↓ as the order boards
+ *   draw them (owner A-17).
  * - design-2l9 boards 63:13820 / 131:41791 / 137:55343: Save as template… ·
  *   Move to folder… · Move up ⌥↑ / Move down ⌥↓ join the menu in the board's
  *   order; a move that cannot happen is disabled and says why (137:56060,
@@ -160,21 +161,31 @@ export const PageContextMenu: React.FC<Props> = ({
         <MenuItem data-testid="pages-menu-move-folder" onClick={() => act(() => onMoveToFolder(pageId))}>
           Move to folder…
         </MenuItem>
+        {/* Owner decision A-17 (boards 137:55343 / 137:56060 / 137:56781):
+            the order commands live here, with their chords, and a boundary's
+            reason sits under the move it blocks. */}
         <MenuItem
+          kbd="⌥↑"
           disabled={rootPosition === null || isFirst}
           data-testid="pages-menu-move-up"
           onClick={() => act(() => onMove(pageId, -1))}
         >
           Move up
         </MenuItem>
+        {moveReason && (rootPosition === null || isFirst) && (
+          <p className={MENU_NOTE} data-testid="pages-menu-move-reason">
+            {moveReason}
+          </p>
+        )}
         <MenuItem
+          kbd="⌥↓"
           disabled={rootPosition === null || isLast}
           data-testid="pages-menu-move-down"
           onClick={() => act(() => onMove(pageId, 1))}
         >
           Move down
         </MenuItem>
-        {moveReason && (
+        {moveReason && rootPosition !== null && !isFirst && (
           <p className={MENU_NOTE} data-testid="pages-menu-move-reason">
             {moveReason}
           </p>

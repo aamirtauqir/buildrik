@@ -144,8 +144,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "lead4 2026-10-27 (A-15): PanelSearch is the boards’ field — gray-100 fill, no edge, radius 6, glyph 8 in, text at 32, 32 tall (probe layers-tree: computed bg rgb(243,244,246), border transparent, pl 32; board fill #F3F4F6, glyph ≈8, text ≈33). | probe-compared 2026-10-27 (case pages-manager, 284×812, shots/63-6393.png) for the list: rows 40+ tall with glyph, name over URL, 'Hidden from publish' third line, 'Current' tag on the tinted open row, ⋯ always drawn; legend under the rows; 'My folders' / 'Only visible to you' heading; folder row 'Studio · 1 page · Folder · ⋯' (no disclosure — the row toggles), member 'Legal /legal · In Studio'; Collection pages gray card with a white row and Open page · Manage in CMS; footer full-width '+ Add page' then From template · New folder. Not probe-rendered: the header 'Pages · n' and the gray-well view tabs (PagesTab needs a composer); search field fill is chrome-ui PanelSearch (REQUESTS A-15). The collection row's ⋯ is not drawn: it would have no actions.",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case pages-tab: the real PagesTab on a real Composer, 284×812, shots/63-6393.png) for the whole panel: 'Pages · 5' + ⋯ + ✕, search band, Pages · Listings · Structure as a gray well with the chosen view on a white chip at inset 12, rows (glyph, name over URL, 'Current' on the tinted open row, ⋯), legend, footer '+ Add page' over From template · New folder. Earlier probe (pages-manager) covered folders and the Collection pages card. Open, shared chrome-ui (REQUESTS A-19): header 44 tall vs the board's 56, search field inset 16 vs 12.",
    "tier": "P1"
   },
   {
@@ -289,7 +289,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-fixed",
-   "verifiedNote": "probe-compared 2026-10-27 (case pages-listings, real PagesTab on a real Composer at 720 wide, board shots/63-21262.png): 40-tall header 13/600 ink, columns at x476 SEO score / x556 Visibility / ⋯ (board same), 52-tall rows with Home roof / page glyph, name 13 over URL 12 sans, score/visibility 13px, row ⋯ opens the page menu, note under the last row, Pages footer (+ Add page / From template / New folder) kept under the listing. Dead 'Open full listings ›' removed (the shell's toggle is a no-op). Open: the drawer widening to 720 over the canvas is the shell's (REQUESTS A-18); vertical offset of 9px is the shared PanelFrame header (44 vs board 56).",
+   "verifiedNote": "probe-compared 2026-10-27 (case pages-listings, real PagesTab on a real Composer at 720 wide, board shots/63-21262.png): 40-tall header 13/600 ink, columns at x476 SEO score / x556 Visibility / ⋯ (board same), 52-tall rows with Home roof / page glyph, name 13 over URL 12 sans, score/visibility 13px, row ⋯ opens the page menu, note under the last row, Pages footer kept under the listing. Entering Listings widens the drawer (LeftSidebar's expand, 700 vs board ~720) and leaving narrows it again (PagesTab.listingsWidth test); the separate 'Open full listings ›' link is gone. Open: 9px vertical offset is the shared PanelFrame header (REQUESTS A-19).",
    "tier": "P1"
   },
   {
@@ -299,8 +299,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-A wave 2 built, not compared: 'URL structure', '{host} · Site root' (published host via useSiteOrigin), the route tree, collection rows '{name} {pattern} {n} pages', note 'This view follows page URLs. My folders stay in Pages.'",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case pages-tab → Structure, board shots/63-21939.png): search kept over Structure and now filters it by name and URL; 'URL structure' 13/600; host row (glyph, 'fieldwork.studio' / 'Site root'; 'Site' when unpublished) at the root; every page one step in as a 52-tall row (Home roof / page glyph, name over URL, ⋯ = page menu) in site order; a segment with no page drawn as a folder ('Blog /blog') with collection patterns under it ('Blog post /blog/{slug} · 20 pages', unit-tested — the probe has no CMS); note under the tree; Pages footer kept. Host row ⋯ / collection ⋯ not drawn: neither would have actions.",
    "tier": "P1"
   },
   {
@@ -310,8 +310,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-A S5 built, not compared: 'No pages match “q”' + Clear search; 'Search everywhere' kept below it (code-ahead).",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case pages-tab with 'zzzz' typed, board shots/63-22616.png): left-aligned 'No pages match “zzzz”' 13/600 at x12 and an outlined 32-tall Clear search under it; icon, 'Nothing here yet' and the ⌘K 'Search everywhere' hand-off removed (⌘K itself still opens the palette).",
    "tier": "P1"
   },
   {
@@ -354,8 +354,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-A S5: ⋯ keeps Select pages… · Listings · Show structure · Reload (+ Widen panel, code-ahead). 'Recently deleted' waits on page trash (sub-plan S12, server).",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case pages-tab with the drawer at x56 as in the shell, ⋯ clicked; board shots/65-17148.png): menu 278 wide from the drawer's left edge (x56, board 56) under the header, rows 32, text inset 13 (board 12): Select pages… · Listings · Show structure · Reload, no rule; 'Widen panel' removed (Listings widens the drawer itself). Board's 'Recently deleted' is the page trash — P3, not built, so not drawn.",
    "tier": "P1"
   },
   {
@@ -365,8 +365,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-A wave 2 built, not compared: SEO score details opens \"SEO score · {Page} · {n}/100\" and the six parts (Title length /20, URL format /20, Description length /30, Descriptive URL /10, Title ≥30 characters /10, Description ≥100 characters /10) — seoScoreBreakdown, which calculateSeoScore now sums, so the rows cannot disagree with the score. Inline in the drawer, not a separate dialog; Back to SEO closes it.",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case pages-settings-score, board shots/65-17860.png): SEO score details opens a 480 dialog over Page settings (was an inline gray box): 'SEO score · {page} · n/100' title, six 'Part: n/max' lines 13px soft ink, 'Back to SEO' link closes it. Dialog 480×240 (board 480×256).",
    "tier": "P1"
   },
   {
@@ -764,8 +764,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-A S10 built, not compared: empty name shows 'Name the page' (Create stays disabled).",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case new-page-dialog, Blank chosen, name cleared; board shots/101-37542.png): 640 dialog, 'Fieldwork Studio · Create a page', Page name field now red-bordered (aria-invalid, described by 'Name the page'), Blank/From template chips, 'Start with an empty page.', Add to site navigation, Cancel + disabled Create page. Not conformed: the board's gray field fill is the shared chrome-ui TextInput theme (white); Create page 107 wide vs board ~208 (label-driven). Capacity line not in the probe (no plan).",
    "tier": "P1"
   },
   {
@@ -1668,8 +1668,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Board adds 'Clear' to the bar; code relies on header Done",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case pages-bulk-select, board shots/139-47668.png): the bulk band moved from a dark bottom bar to a gray-100 band under the view tabs, 66 tall (board 63): '3 selected' 13/600 + Clear (ends the selection), then Duplicate · Move to… · Delete (error red) as three equal actions; the Pages footer stays; the header keeps ⋯ while pages are ticked (Done only in select mode with nothing ticked). The 'Select all (n pages)' band is not drawn — ⌘A / Ctrl+A in the list still ticks every page.",
    "tier": "P1"
   },
   {

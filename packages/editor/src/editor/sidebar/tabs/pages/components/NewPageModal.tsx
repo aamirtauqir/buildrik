@@ -147,6 +147,9 @@ export function NewPageModal({ composer }: { composer: Composer | null }) {
             id="new-page-name"
             data-testid="new-page-name"
             placeholder="About us"
+            /* 101:37542 draws the empty field red, with its reason under it. */
+            aria-invalid={!name.trim() || undefined}
+            aria-describedby={!name.trim() ? "new-page-name-missing" : undefined}
             value={name}
             autoFocus
             onFocus={(e) => e.currentTarget.select()}
@@ -157,7 +160,7 @@ export function NewPageModal({ composer }: { composer: Composer | null }) {
           />
           {/* design-2l9 board 101:37542. */}
           {!name.trim() && (
-            <span className="tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-error-text)]" data-testid="new-page-name-missing">
+            <span id="new-page-name-missing" className="tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-error-text)]" data-testid="new-page-name-missing">
               Name the page
             </span>
           )}
