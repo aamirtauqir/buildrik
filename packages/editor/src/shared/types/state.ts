@@ -33,6 +33,10 @@ export interface ComposerState {
 
 export type DeviceType = "desktop" | "tablet" | "mobile" | "wide";
 
+/** Why the document is not editable right now. Several can hold at once;
+ *  the composer is read-only while any does (`Composer.editLocks`). */
+export type EditLockReason = "view" | "time-travel" | "not-loaded";
+
 /**
  * Device configuration for viewport preview
  */

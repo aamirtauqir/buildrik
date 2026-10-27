@@ -49,6 +49,7 @@ import { getAiSubscriptionClient } from "@/services/ai/subscriptionClient";
 import { getDefaultPageName } from "@/shared/utils/pageUtils";
 import { isAuthSaveError, isForbiddenSaveError, refuseForbiddenSave, SAVE_FAILED_TOAST_KEY } from "./useSaveCallback";
 import { getEditorViewMode } from "@shared/utils/editorViewMode";
+import { describeLoadFailure, setSiteLoadStatus, type SiteLoadErrorKind } from "../siteLoadStatus";
 
 export type ComposerOptions = Partial<ComposerConfig> & {
   project?: {
@@ -78,7 +79,7 @@ export interface UseComposerInitParams {
   /** S1.5: surface a dashboard load failure as a persistent banner instead of
    *  a transient toast. `auth` = session expired, `network` = generic failure.
    *  When wired, it replaces the toast; when omitted, the toast is kept (back-compat). */
-  onLoadError?: (kind: "auth" | "network" | "missing" | "forbidden") => void;
+  onLoadError?: (kind: SiteLoadErrorKind) => void;
   /** Board 813:4870: a mid-session 401 during AUTOSAVE opens the blocking
    *  recovery surface. Same back-compat shape as onLoadError. */
   onAuthExpired?: () => void;
@@ -220,6 +221,11 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
       remoteSync,
       aiClient,
     } as ComposerConfig);
+    /* Nothing is editable until the project is in: an edit made against the
+       empty composer while the fetch is in flight would be autosaved over the
+       real site, and one made after a failed load would replace it. Cleared
+       only once a load has landed (loadFromServer, loadFromLocalStorage). */
+    instance.setEditLock("not-loaded", true);
 
     // Store event handlers for proper cleanup
     const composerReadyHandler = () => {
@@ -259,132 +265,157 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
            templates" over someone's existing site until this fetch lands.
            Board 65:412 gives that window its own treatment; the flag is what
            the canvas and footer read to draw it. Cleared in .finally() so a
-           failed load leaves a usable editor, never a permanent skeleton. */
-        instance.setProjectLoading(true);
-        loadProject(siteId)
-          .then(async (data) => {
-            // A.1 integration: run DS schema migrations on the loaded payload
-            // before importing into the engine. Runner is pure w.r.t. DOM and
-            // writes a localStorage snapshot/marker for crash-resume. Failure
-            // surfaces a toast and falls through with un-migrated data so the
-            // editor still loads — DS migrations are forward-fix, not load-gating.
-            // The run-then-import step is shared with the migration modal's
-            // Restore / Retry (A2), so a re-run lands tokens the way this does.
-            /* Token migration (v1–v5 → v6) is part of the imported project, so
-               it lands before history starts recording: ⌘Z after load cannot
-               revert it. */
-            /* Before the import: the canvas, export and publish emit from
-               it, and a pre-v6 site must not be migrated in memory while
-               the server's switch is off for it (I3). */
-            instance.designSystem.brandTokensV2 = data.brandTokensV2 === true;
-            const tokenLoad = data.settings
-              ? loadTokensSafely(data.settings, siteId, {
-                  switchOn: data.brandTokensV2 === true,
-                  hold: data.tokensMigrationHold ?? false,
-                })
-              : null;
-            const loaded: ProjectData =
-              tokenLoad && tokenLoad.settings !== data.settings ? { ...data, settings: tokenLoad.settings } : data;
-            const tokensMigrated = loaded !== data;
-            let migrated = false;
-            try {
-              migrated = importMigratedProject(instance, loaded, siteId);
-              if (tokenLoad?.migrated) {
-                console.info("[tokens] migrated", { siteId });
-                instance.emit(EVENTS.DESIGN_SYSTEM_MIGRATED, { siteId });
-              }
-            } catch (err) {
-              console.error("[BuildrikSync] DS migration failed:", err);
-              addToastRef.current({
-                title: "Project update failed",
-                description: "Could not update design system schema. Loaded as-is.",
-                tone: "warning",
-              });
-              instance.importProject(loaded);
+           failed load never leaves a permanent skeleton (it stays read-only:
+           the not-loaded lock holds until a load lands). */
+        void loadFromServer(siteId);
+        return;
+      }
+
+      loadFromLocalStorage(instance, projectConfig);
+    };
+
+    /* Resolves true once the site is in. `retry` is the banner's in-place
+       Retry: the same path, minus the fallback the first failure ran. */
+    function loadFromServer(siteId: string, retry = false): Promise<boolean> {
+      instance.setProjectLoading(true);
+      return loadProject(siteId)
+        .then(async (data) => {
+          /* Every write is refused while not-loaded holds, so nothing can
+             have reached the history before this import. If something did,
+             a write path is bypassing the lock: fail the load loudly rather
+             than replace that state silently. (Today's Retry is a full page
+             reload, or the banner's in-place retry, which comes through here.) */
+          if (instance.history.canUndo() || instance.history.canRedo()) {
+            throw new Error("EDIT_LOCK_BYPASSED: history recorded before the site loaded");
+          }
+          // A.1 integration: run DS schema migrations on the loaded payload
+          // before importing into the engine. Runner is pure w.r.t. DOM and
+          // writes a localStorage snapshot/marker for crash-resume. Failure
+          // surfaces a toast and falls through with un-migrated data so the
+          // editor still loads — DS migrations are forward-fix, not load-gating.
+          // The run-then-import step is shared with the migration modal's
+          // Restore / Retry (A2), so a re-run lands tokens the way this does.
+          /* Token migration (v1–v5 → v6) is part of the imported project, so
+             it lands before history starts recording: ⌘Z after load cannot
+             revert it. */
+          /* Before the import: the canvas, export and publish emit from
+             it, and a pre-v6 site must not be migrated in memory while
+             the server's switch is off for it (I3). */
+          instance.designSystem.brandTokensV2 = data.brandTokensV2 === true;
+          const tokenLoad = data.settings
+            ? loadTokensSafely(data.settings, siteId, {
+                switchOn: data.brandTokensV2 === true,
+                hold: data.tokensMigrationHold ?? false,
+              })
+            : null;
+          const loaded: ProjectData =
+            tokenLoad && tokenLoad.settings !== data.settings ? { ...data, settings: tokenLoad.settings } : data;
+          const tokensMigrated = loaded !== data;
+          let migrated = false;
+          try {
+            migrated = importMigratedProject(instance, loaded, siteId);
+            if (tokenLoad?.migrated) {
+              console.info("[tokens] migrated", { siteId });
+              instance.emit(EVENTS.DESIGN_SYSTEM_MIGRATED, { siteId });
             }
-            if (tokenLoad?.readOnly) {
-              instance.designSystem.readOnly = true;
-              instance.designSystem.readOnlyReason = tokenLoad.reason ?? null;
-              instance.emit(EVENTS.DESIGN_SYSTEM_READ_ONLY, { reason: tokenLoad.reason ?? "token migration failed" });
-              /* Invalid STORED v6 rows: sending them back would get every save
-                 refused TOKENS_INVALID. The other read-only causes send a
-                 pre-v6 set the server keeps unchanged, so they still save it. */
-              if (tokenLoad.reason === BRAND_READ_ONLY_FAILED) keepStoredTokensOnSave(siteId);
-            }
-            // P1-3 (iter 16): seed saveState so topbar shows "Saved · just now"
-            // instead of "Not saved" on fresh load. The just-loaded state IS
-            // the persisted state; without this seed lastSavedAt stays null
-            // and the indicator falsely warns of unsaved work.
-            /* — unless a save failed before this reload. Then the just-loaded
-               state is the persisted state and NOT all the user's work, and
-               seeding "Saved · just now" over the gap is the lie that turned a
-               warned failure into a silent loss. Measured: edit, save blocked,
-               reload, edit gone, topbar green. */
-            const unsaved = readUnsaved(siteId);
-            /* In view mode (a member demoted mid-save lands here, C-9) the
-               edits cannot be saved, so they are not offered back — they stay
-               on this device for when the role returns. */
-            if (unsaved && getEditorViewMode().readOnlyView) {
-              addToastRef.current?.({
-                title: "Some work never reached the server",
-                description:
-                  "Your role no longer allows editing this site, so you're in view mode. The edits are kept in this browser — ask the owner, and they come back once you can edit again.",
-                tone: "warning",
-                duration: Infinity,
-              });
-              setSaveState({ status: "idle", error: undefined });
-            } else if (unsaved) {
-              markUnsavedOffScreen(siteId);
-              setSaveState({
-                status: "error",
-                error: "This site has edits that never reached the server.",
-              });
-              const recoveryToast = addToastRef.current?.({
-                title: "Some work never reached the server",
-                description:
-                  "A save failed before this page was reloaded. The version on screen is the server's. Restoring puts your unsaved edits back so you can save them again.",
-                tone: "warning",
-                /* Never applied automatically. Importing a stored project over
-                   a freshly loaded one is this codebase's documented data-loss
-                   precondition, so the choice is the user's. */
-                action: {
-                  label: "Restore my edits",
-                  onClick: () => {
-                    /* Handed over once; Retry may already have taken it. The
-                       copy stays kept until a save of it is confirmed. */
-                    const kept = takeOffScreenUnsaved(siteId);
-                    if (!kept) return;
-                    instance.importProject(kept.project);
-                    setIsDirty(true);
-                    setSaveState({ status: "idle", error: undefined });
-                    /* L5-075: the import emits only PROJECT_LOADED, which
-                       autosave does not follow, so the restored edits sat
-                       under "Unsaved changes" until some other edit. This
-                       schedules their save. */
-                    instance.emit(EVENTS.PROJECT_CHANGED, { reason: "restore-unsaved" });
-                  },
+          } catch (err) {
+            console.error("[BuildrikSync] DS migration failed:", err);
+            addToastRef.current({
+              title: "Project update failed",
+              description: "Could not update design system schema. Loaded as-is.",
+              tone: "warning",
+            });
+            instance.importProject(loaded);
+          }
+          instance.setEditLock("not-loaded", false);
+          setSiteLoadStatus(null);
+          if (tokenLoad?.readOnly) {
+            instance.designSystem.readOnly = true;
+            instance.designSystem.readOnlyReason = tokenLoad.reason ?? null;
+            instance.emit(EVENTS.DESIGN_SYSTEM_READ_ONLY, { reason: tokenLoad.reason ?? "token migration failed" });
+            /* Invalid STORED v6 rows: sending them back would get every save
+               refused TOKENS_INVALID. The other read-only causes send a
+               pre-v6 set the server keeps unchanged, so they still save it. */
+            if (tokenLoad.reason === BRAND_READ_ONLY_FAILED) keepStoredTokensOnSave(siteId);
+          }
+          // P1-3 (iter 16): seed saveState so topbar shows "Saved · just now"
+          // instead of "Not saved" on fresh load. The just-loaded state IS
+          // the persisted state; without this seed lastSavedAt stays null
+          // and the indicator falsely warns of unsaved work.
+          /* — unless a save failed before this reload. Then the just-loaded
+             state is the persisted state and NOT all the user's work, and
+             seeding "Saved · just now" over the gap is the lie that turned a
+             warned failure into a silent loss. Measured: edit, save blocked,
+             reload, edit gone, topbar green. */
+          const unsaved = readUnsaved(siteId);
+          /* In view mode (a member demoted mid-save lands here, C-9) the
+             edits cannot be saved, so they are not offered back — they stay
+             on this device for when the role returns. */
+          if (unsaved && getEditorViewMode().readOnlyView) {
+            addToastRef.current?.({
+              title: "Some work never reached the server",
+              description:
+                "Your role no longer allows editing this site, so you're in view mode. The edits are kept in this browser — ask the owner, and they come back once you can edit again.",
+              tone: "warning",
+              duration: Infinity,
+            });
+            setSaveState({ status: "idle", error: undefined });
+          } else if (unsaved) {
+            markUnsavedOffScreen(siteId);
+            setSaveState({
+              status: "error",
+              error: "This site has edits that never reached the server.",
+            });
+            const recoveryToast = addToastRef.current?.({
+              title: "Some work never reached the server",
+              description:
+                "A save failed before this page was reloaded. The version on screen is the server's. Restoring puts your unsaved edits back so you can save them again.",
+              tone: "warning",
+              /* Never applied automatically. Importing a stored project over
+                 a freshly loaded one is this codebase's documented data-loss
+                 precondition, so the choice is the user's. */
+              action: {
+                label: "Restore my edits",
+                onClick: () => {
+                  /* Handed over once; Retry may already have taken it. The
+                     copy stays kept until a save of it is confirmed. */
+                  const kept = takeOffScreenUnsaved(siteId);
+                  if (!kept) return;
+                  instance.importProject(kept.project);
+                  setIsDirty(true);
+                  setSaveState({ status: "idle", error: undefined });
+                  /* L5-075: the import emits only PROJECT_LOADED, which
+                     autosave does not follow, so the restored edits sat
+                     under "Unsaved changes" until some other edit. This
+                     schedules their save. */
+                  instance.emit(EVENTS.PROJECT_CHANGED, { reason: "restore-unsaved" });
                 },
-                duration: Infinity,
-              });
-              /* EDT-018: the offer is spent once the copy is handed over —
-                 by Restore, or by a manual Retry that restores it first
-                 (useSaveCallback) — or discarded. A warning toast does not
-                 dismiss on its action, so it stood over the saved work
-                 inviting a second, empty restore. */
-              if (recoveryToast) onOffScreenSettled(siteId, () => dismissToast(recoveryToast));
-            } else {
-              setSaveState({ status: "idle", lastSavedAt: Date.now(), error: undefined });
-            }
-            setIsDirty(false);
-            /* A migration that moved the version is an unsaved change: left
-               clean, its dsSchemaVersion never reached the server and the
-               "Updating your project" modal returned on every open (walk A2,
-               2026-09-24). A project:changed schedules the autosave that
-               persists it — once; the next load is at the target and skips. */
-            if (migrated || tokensMigrated) instance.emit(EVENTS.PROJECT_CHANGED, { reason: "ds-migration" });
-            // Phase B3: hydrate media library from server. Additive — never
-            // throws. Returns null on offline/auth/unconfigured; we just
-            // keep going with engine-only state in that case.
+              },
+              duration: Infinity,
+            });
+            /* EDT-018: the offer is spent once the copy is handed over —
+               by Restore, or by a manual Retry that restores it first
+               (useSaveCallback) — or discarded. A warning toast does not
+               dismiss on its action, so it stood over the saved work
+               inviting a second, empty restore. */
+            if (recoveryToast) onOffScreenSettled(siteId, () => dismissToast(recoveryToast));
+          } else {
+            setSaveState({ status: "idle", lastSavedAt: Date.now(), error: undefined });
+          }
+          setIsDirty(false);
+          /* A migration that moved the version is an unsaved change: left
+             clean, its dsSchemaVersion never reached the server and the
+             "Updating your project" modal returned on every open (walk A2,
+             2026-09-24). A project:changed schedules the autosave that
+             persists it — once; the next load is at the target and skips. */
+          if (migrated || tokensMigrated) instance.emit(EVENTS.PROJECT_CHANGED, { reason: "ds-migration" });
+          // Phase B3: hydrate media library from server. Additive.
+          // Returns null on offline/auth/unconfigured; we just keep going
+          // with engine-only state in that case. The site is already loaded
+          // and unlocked here, so a media failure must not fall into the
+          // load-failure catch below (banner + localStorage fallback over a
+          // loaded site): it is reported and the editor carries on.
+          try {
             const remote = await loadServerMedia(siteId);
             if (remote) {
               await instance.media.importServerAssets(remote.assets, remote.folders);
@@ -398,64 +429,70 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
                 loaded: remote.assets.length,
               });
             }
-          })
-          .catch((err) => {
-            console.error("[BuildrikSync] load failed:", err);
-            // Distinguish an auth failure from a generic load failure. On
-            // UNAUTHORIZED the generic "falling back to local" message is
-            // misleading — the user has a real site on the server they can't
-            // see because they are signed out. Point them at sign-in instead.
-            const isAuth =
-              err instanceof Error && /unauthorized/i.test(err.message);
-            /* NOT_FOUND is not a blip. The site is deleted or the link is
-               stale, so no retry will ever succeed and no save will ever land
-               — the editor was offering a blank canvas and "Start blank" to
-               someone whose work could not be stored anywhere. */
-            const isMissing =
-              err instanceof Error && /not_found/i.test(err.message);
-            /* FORBIDDEN fell through to "network", so a role refusal on load
-               got "You're seeing local changes for now" and a Retry that can
-               never succeed. This file already imports the helper for the
-               autosave path (:34); the load path just never used it. */
-            const isForbidden = isForbiddenSaveError(err);
-            // S1.5: prefer a persistent banner over a transient toast when the
-            // shell wired onLoadError; the toast stays as the back-compat path.
-            if (isMissing) {
-              // The canvas invites work ("Start blank") and cannot see the
-              // banner; it has to hear that this site is not coming back.
-              instance.emit(EVENTS.PROJECT_UNAVAILABLE, { reason: "missing" });
-            }
-            if (onLoadErrorRef.current) {
-              onLoadErrorRef.current(isAuth ? "auth" : isMissing ? "missing" : isForbidden ? "forbidden" : "network");
-            } else if (isAuth) {
-              addToastRef.current({
-                title: "Session expired",
-                description:
-                  "Sign in to load this site from the dashboard.",
-                tone: "warning",
-                action: {
-                  label: "Sign in",
-                  onClick: () => {
-                    window.location.href = `${DASHBOARD_URL}/auth`;
-                  },
+          } catch (mediaError) {
+            captureError(mediaError instanceof Error ? mediaError : new Error(String(mediaError)), {
+              siteId,
+              phase: "media-hydration-after-load",
+            });
+          }
+        })
+        .then(() => true)
+        .catch((err) => {
+          console.error("[BuildrikSync] load failed:", err);
+          /* One classification (offline, auth, missing, forbidden, network)
+             for the banner, the inspector line and the report. Offline is
+             asked of the browser at the moment of failure: a fetch that never
+             left reads as a generic network error otherwise. */
+          const failure = describeLoadFailure(err, typeof navigator === "undefined" || navigator.onLine !== false);
+          /* Status and the server's request id, so a report can be matched to
+             the server log. The URL has no query string (a tRPC GET carries its
+             input there) and nothing here reads a token. */
+          captureError(new Error(`Site load failed: ${failure.code ?? failure.status ?? failure.kind}`), {
+            kind: failure.kind,
+            status: failure.status,
+            code: failure.code,
+            requestId: failure.requestId,
+            url: failure.url,
+            retry,
+          });
+          setSiteLoadStatus({ failure, retry: () => loadFromServer(siteId, true) });
+          if (failure.kind === "missing") {
+            // The canvas invites work ("Start blank") and cannot see the
+            // banner; it has to hear that this site is not coming back.
+            instance.emit(EVENTS.PROJECT_UNAVAILABLE, { reason: "missing" });
+          }
+          // S1.5: prefer a persistent banner over a transient toast when the
+          // shell wired onLoadError; the toast stays as the back-compat path.
+          if (onLoadErrorRef.current) {
+            onLoadErrorRef.current(failure.kind);
+          } else if (failure.kind === "auth") {
+            addToastRef.current({
+              title: "Session expired",
+              description:
+                "Sign in to load this site from the dashboard.",
+              tone: "warning",
+              action: {
+                label: "Sign in",
+                onClick: () => {
+                  window.location.href = `${DASHBOARD_URL}/auth`;
                 },
-              });
-            } else {
-              addToastRef.current({
-                title: "Load failed",
-                description:
-                  "Could not load this site from the dashboard. Reload to try again.",
-                tone: "warning",
-              });
-            }
-            loadFromLocalStorage(instance, projectConfig);
-          })
-          .finally(() => instance.setProjectLoading(false));
-        return;
-      }
-
-      loadFromLocalStorage(instance, projectConfig);
-    };
+              },
+            });
+          } else {
+            addToastRef.current({
+              title: "Load failed",
+              description:
+                "Could not load this site from the dashboard. Reload to try again.",
+              tone: "warning",
+            });
+          }
+          /* The fallback ran with the first failure; a retry has nothing new
+             to fall back to. */
+          if (!retry) loadFromLocalStorage(instance, projectConfig);
+          return false;
+        })
+        .finally(() => instance.setProjectLoading(false));
+    }
 
     function loadFromLocalStorage(
       inst: Composer,
@@ -475,6 +512,10 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
           });
         })
         .finally(() => {
+          /* The siteless demo's project IS this local one, so its load ends
+             here. After a failed SITE load this is only a fallback view: the
+             site is still not loaded and stays locked (its seeding is refused). */
+          if (!getSiteIdFromUrl()) inst.setEditLock("not-loaded", false);
           if (loadedFromStorage) return;
           try {
             const savedRaw = localStorage.getItem("buildrick-project");
@@ -592,6 +633,8 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
       instance.off("ui:toggle:ai", toggleAIHandler);
       instance.off(EVENTS.BREAKPOINT_CHANGED, deviceChangedHandler);
       instance.off(EVENTS.VIEWPORT_ZOOM, zoomChangedHandler);
+      // Its retry re-runs a load into this composer, which is going away.
+      setSiteLoadStatus(null);
       instance.destroy();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -654,6 +697,9 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
 
     const handler = (payload?: unknown) => {
       if (readOnlyView) return;
+      /* The site never loaded: there is nothing of the user's to save, and
+         saving what is on screen would replace the real site. */
+      if (composer.editLocks.has("not-loaded")) return;
       /* L-3: `project:changed` also fires on `page:activated`, i.e. merely
          looking at another page. That is not an edit: it neither dirties the
          project nor sends a save (the same filter the per-page dirty markers

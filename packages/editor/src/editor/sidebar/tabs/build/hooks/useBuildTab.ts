@@ -4,6 +4,7 @@
  */
 
 import * as React from "react";
+import { useEditLocks } from "@/editor/shared/useEditLocks";
 import type { Composer } from "@/engine";
 import type { BlockData } from "@/shared/types";
 import { STORAGE_KEYS } from "@/shared/constants/storageKeys";
@@ -195,16 +196,22 @@ export function useBuildTab(
     [composer],
   );
 
+  /* Task 1.6: while an edit lock holds the drop would be refused, so the drag
+     does not start — no ghost, no insert cue, no "recent" entry. */
+  const editLocked = useEditLocks(composer).length > 0;
+
   const handleDragStart: DragStartFn = React.useCallback((e, el) => {
+    if (editLocked) return e.preventDefault();
     setBlockPayload(e, { id: el.blockId, label: el.name, category: el.catId });
     noteRecent(el.name);
     announceDrag(el.name);
-  }, [noteRecent, announceDrag]);
+  }, [editLocked, noteRecent, announceDrag]);
 
   const handleBlockDragStart: BlockDragStartFn = React.useCallback((e, block) => {
+    if (editLocked) return e.preventDefault();
     setBlockPayload(e, { id: block.id, label: block.label, category: block.category });
     announceDrag(block.label);
-  }, [announceDrag]);
+  }, [editLocked, announceDrag]);
 
   const handleElClick: ElClickFn = React.useCallback(
     (el) => {

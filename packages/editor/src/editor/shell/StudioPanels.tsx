@@ -33,7 +33,7 @@ import { FullPageView } from "../sidebar/FullPageView";
 import type { SettingsOpenRequest } from "../sidebar/tabs/settings/types";
 import type { TemplatesOpenRequest } from "@/editor/sidebar/tabs/templates/TemplatesTab";
 import type { PageSettingsOpenRequest } from "../sidebar/tabs/pages/types";
-import { usePageCommands, usePageJumpList } from "../sidebar/tabs/pages/usePageCommands";
+import { usePageCommands } from "../sidebar/tabs/pages/usePageCommands";
 import { cmsWorkspace, type CmsOpenRequest } from "@/editor/cms/cmsWorkspaceStore";
 import { TokenRegistryProvider, DSModeProvider, StylePresetRegistryProvider } from "@/editor/design-system";
 import { MigrationProgressMount } from "@/editor/design-system/ui/MigrationProgressMount";
@@ -44,7 +44,8 @@ import { useBlockInsertion } from "./hooks/useBlockInsertion";
 import { useClipboardToasts } from "./hooks/useClipboardToasts";
 import { useConnectOfferToast } from "./hooks/useConnectOfferToast";
 import { useAltTextAutoTrigger } from "./hooks/useAltTextAutoTrigger";
-import { PageTabBar } from "./PageTabBar";
+import { BottomBar } from "./BottomBar";
+import { usePageSummaries } from "./usePageSummaries";
 import { RightColumnPanel } from "./RightColumnPanel";
 import { useColumnPanelEscape } from "./hooks/useColumnPanelEscape";
 import type { NextMove } from "./lifecycle";
@@ -53,6 +54,8 @@ import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { getEditorViewMode } from "@shared/utils/editorViewMode";
 import { useViewerChrome } from "./hooks/useEditorRole";
 import { ViewerRoleNotice } from "./ViewerRoleNotice";
+import { PublishTray } from "./PublishTray";
+import { publishTray, usePublishTray } from "./publishTrayStore";
 
 const CmsWorkspace = React.lazy(() => import("@/editor/cms/CmsWorkspace"));
 
@@ -277,10 +280,10 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   /* v3 FC-2: page-jump ⌘K rows registered from the shell — always present,
      like Layers/Assets/Records/Templates — instead of only while the Pages
      drawer happens to be mounted (PagesTab no longer calls this). */
-  const pageJumpList = usePageJumpList(composer);
+  const pageSummaries = usePageSummaries(composer);
   usePageCommands(
     composer,
-    pageJumpList,
+    pageSummaries,
     React.useCallback((id: string) => composer?.elements.setActivePage(id), [composer]),
     React.useCallback(() => composer?.emit(EVENTS.UI_NEW_PAGE_REQUESTED, {}), [composer]),
   );
@@ -306,7 +309,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
      KeybindingManager listens on window in the capture phase, so click-then-
      Delete still worked. One flag on the gateway closes every chord at once. */
   React.useEffect(() => {
-    if (composer) composer.readOnly = readOnlyView;
+    composer?.setEditLock("view", readOnlyView);
   }, [composer, readOnlyView]);
 
   /* useLayoutEffect, not useEffect: this class now drives LAYOUT as well as the
@@ -469,13 +472,39 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
      promises — Back to canvas after a bound-element door, else the drawer
      closes and the canvas returns. */
   useColumnPanelEscape(cmsWorkspaceOpen, () => (cmsReturn ? backToCanvas() : onLeftPanelToggle?.()));
+  /* design-2l9 Task 1.7 — the publish tray docks in this column (boards
+     499:2656 / 233:2), wider than the inspector, and replaces whatever the
+     column held. One right-column mode at a time: opening the tray closes
+     Issues, AI and a column tab; opening one of those closes the tray. */
+  const trayState = usePublishTray();
+  const trayShown = trayState.open && !readOnlyView;
+  React.useEffect(() => {
+    if (!trayState.open) return;
+    if (issuesOpen) onCloseIssues?.();
+    if (rightColumnTab) onLeftPanelToggle?.();
+    setAiInInspector(false);
+    // Only on the tray's opening — the effect below handles the reverse.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [trayState.open]);
+  React.useEffect(() => {
+    /* The shell's publish door (AquibraStudio's requestPublish) still opens
+       the Publish panel once a publish starts. While the tray is open the
+       tray IS that surface — it shows the run — so the panel request is
+       folded into it instead of replacing it. */
+    if (trayState.open && rightColumnTab && activeTabId === "publish") {
+      onLeftPanelToggle?.();
+      return;
+    }
+    if (rightColumnTab || issuesOpen || aiInInspector) publishTray.close();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rightColumnTab, issuesOpen, aiInInspector]);
   const inspectorOpen = isInspectorColumnOpen({
     readOnlyView,
     viewerChrome,
     fullPage: effectiveFullPageMode,
     cmsWorkspaceOpen,
     inspectorShown,
-    columnModeOpen: rightColumnTab || issuesOpen || aiInInspector,
+    columnModeOpen: rightColumnTab || issuesOpen || aiInInspector || trayShown,
   });
   /* Board 36's "Show inspector ⌘\": only when the user hid the inspector and
      nothing else fills or replaces its column. */
@@ -484,7 +513,12 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   /* The inspector BODY (ProInspector) is on screen: its column is open and no
      mode (Issues · a column tab · AI) has replaced it. */
   const inspectorBodyShown =
-    !readOnlyView && inspectorOpen && !(issuesOpen && renderIssuesPanel) && !rightColumnTab && !aiInInspector;
+    !readOnlyView &&
+    inspectorOpen &&
+    !(issuesOpen && renderIssuesPanel) &&
+    !rightColumnTab &&
+    !aiInInspector &&
+    !trayShown;
 
   /* I-1: UI_INSPECTOR_FOCUS_SECTION ("Bind to CMS field…", "Add
      interaction", ⌘K Jump to property) is heard by the inspector body. With a
@@ -834,6 +868,8 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
         // board (2 lines + ✦ Ask AI); gating on selectedElement collapsed the
         // column to 1px, so that state rendered off-viewport, unseeable.
         inspectorOpen={inspectorOpen}
+        /* The tray's column is wider than the inspector's (board 499:2656). */
+        className={trayShown ? "tw:[--layout-inspector-width:var(--bk-size-task-host)]" : undefined}
         style={styles.container}
       >
         {/* Left Sidebar — merged rail + panel. Absent in view mode, except for
@@ -867,8 +903,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
 
         {/* Canvas Area — main editing surface */}
         <LayoutShell.Canvas>
-          {/* Board 4418:123573: the page tabs head the canvas column. */}
-          <PageTabBar composer={composer} />
           <div style={styles.canvasPattern} />
           <div ref={composerContainerRef} style={styles.canvasContent}>
             <Canvas
@@ -947,7 +981,15 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
           ) : null
         ) : (
         <LayoutShell.Inspector>
-          {issuesOpen && renderIssuesPanel ? (
+          {trayShown ? (
+            <PublishTray
+              composer={composer}
+              publishJob={publishJob}
+              nextMove={nextMove ?? null}
+              onRequestPublish={onRequestPublish}
+              issues={trayState.issues}
+            />
+          ) : issuesOpen && renderIssuesPanel ? (
             renderIssuesPanel(() => {
               onCloseIssues?.();
               setInspectorShown(true);
@@ -1024,6 +1066,21 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
           />
         </LayoutShell.FullPage>
         )}
+
+        {/* 2L9 Shell/BottomBar (497:99485): the page switcher across the
+            bottom, or — while a resource area covers the canvas — the way back. */}
+        <LayoutShell.Footer>
+          <BottomBar
+            composer={composer}
+            pages={pageSummaries}
+            resourceArea={(!readOnlyView && effectiveFullPageMode) || cmsWorkspaceOpen}
+            onBackToEditor={() => {
+              if (!cmsWorkspaceOpen) handleFullPageClose();
+              else if (cmsReturn) backToCanvas();
+              else onLeftPanelToggle?.();
+            }}
+          />
+        </LayoutShell.Footer>
       </LayoutShell>
 
       {/* Clone 3686:42317 — Site fonts. Mounted once, here, and opened by

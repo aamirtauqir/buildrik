@@ -108,6 +108,7 @@ export const size = {
   "drawer": 280,
   "panel-right": 300,
   "inspector": 300,
+  "task-host": 360,
   "nav": 240,
   "footer": 32,
   "sidebar": 256,

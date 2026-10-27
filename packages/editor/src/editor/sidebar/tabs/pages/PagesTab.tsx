@@ -133,7 +133,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
   const [nameError, setNameError] = React.useState<string | null>(null);
 
   /* v3 FC-2 (2026-09-25): the panel's ⌘K rows (New page · Go to <page>) now
-     register from the SHELL (usePageJumpList + usePageCommands, called once
+     register from the SHELL (usePageSummaries + usePageCommands, called once
      in StudioPanels) so they're in the palette whether or not this panel is
      mounted — like Layers/Assets/Records/Templates. The panel-local palette
      and its own ⌘K listener are still gone — decision #38, TODOS.md:393. */

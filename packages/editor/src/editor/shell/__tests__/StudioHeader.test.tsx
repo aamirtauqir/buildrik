@@ -100,6 +100,7 @@ vi.mock("../modals/CommandPalette", () => ({
 import { StudioHeader, type StudioHeaderProps } from "../StudioHeader";
 import { deriveLifecycleState } from "../lifecycle";
 import { shellDirty } from "../shellDirtyRegistry";
+import { publishTray } from "../publishTrayStore";
 import { isFeatureEnabled } from "@/shared/utils/featureFlags";
 import { getEditorViewMode } from "@/shared/utils/editorViewMode";
 import { submitForReview } from "@/services/ReviewService";
@@ -176,6 +177,7 @@ describe("StudioHeader", () => {
 
   afterEach(() => {
     cleanup();
+    publishTray.close();
     vi.clearAllMocks();
     roleState.role = null;
     collab.current = { ...COLLAB_IDLE };
@@ -357,69 +359,69 @@ describe("StudioHeader", () => {
     });
   });
 
-  describe("publish gating", () => {
-    it("flag off: Publish is blocked but focusable, with the reason in a tooltip", () => {
+  /* design-2l9 Task 1.7 — the topbar's Publish is the publish tray's TOGGLE.
+     The tray holds the one CTA and every reason it is shut (flag off,
+     offline, blocking issues — OD-1); the bar never shows a second, disabled
+     Publish beside it, and never publishes on its own. */
+  describe("publish is the tray toggle", () => {
+    const toggle = () => screen.getByTestId("topbar-publish");
+
+    it("flag off: still the toggle — the tray says why, not a disabled bar button", () => {
       render(<StudioHeader {...makeProps()} />);
-      const btn = screen.getByRole("button", { name: "Publish" });
-      expect(btn.getAttribute("aria-disabled")).toBe("true");
-      expect(btn).not.toBeDisabled();
-      fireEvent.focus(btn);
-      expect(screen.getByRole("tooltip").textContent).toMatch(/isn't switched on/);
+      expect(toggle().getAttribute("aria-disabled")).toBeNull();
+      expect(toggle().getAttribute("aria-expanded")).toBe("false");
     });
 
-    it("flag on: Publish is live and fires the publish job", () => {
+    it("a click opens the tray (aria-expanded) and never fires the publish door itself", () => {
       vi.mocked(isFeatureEnabled).mockReturnValue(true);
       const onVercelPublish = vi.fn();
       render(<StudioHeader {...makeProps({ onVercelPublish })} />);
-      fireEvent.click(screen.getByRole("button", { name: "Publish" }));
-      expect(onVercelPublish).toHaveBeenCalled();
+      fireEvent.click(toggle());
+      expect(publishTray.get().open).toBe(true);
+      expect(toggle().getAttribute("aria-expanded")).toBe("true");
+      expect(toggle().getAttribute("aria-controls")).toBe("publish-tray");
+      expect(onVercelPublish).not.toHaveBeenCalled();
     });
 
-    it("offline blocks publish with the reason reachable on focus", () => {
+    it("a second click closes it; the label does not change on open (no layout shift)", () => {
       vi.mocked(isFeatureEnabled).mockReturnValue(true);
-      render(<StudioHeader {...makeProps({ isOffline: true })} />);
-      const btn = screen.getByRole("button", { name: "Publish" });
-      expect(btn.getAttribute("aria-disabled")).toBe("true");
-      fireEvent.focus(btn);
-      /* Two tooltips exist offline — the save pill carries its own (B2) — so
-         the assert names the CTA's by its text. */
-      expect(screen.getByText("Can't publish while offline").closest('[role="tooltip"]')).not.toBeNull();
+      render(<StudioHeader {...makeProps()} />);
+      const before = toggle().textContent;
+      fireEvent.click(toggle());
+      expect(toggle().textContent).toBe(before);
+      fireEvent.click(toggle());
+      expect(publishTray.get().open).toBe(false);
+      expect(toggle().getAttribute("aria-expanded")).toBe("false");
     });
 
-    it("blocking errors turn it into Publish anyway rather than hiding it", async () => {
+    it("offline and blocking errors leave the toggle pressable and labelled Publish — no 'Publish anyway'", () => {
       vi.mocked(isFeatureEnabled).mockReturnValue(true);
       render(
         <StudioHeader
-          {...makeProps({ issues: [{ id: "1", type: "error", message: "x" }] as StudioHeaderProps["issues"] })}
+          {...makeProps({ isOffline: true, issues: [{ id: "1", type: "error", message: "x" }] as StudioHeaderProps["issues"] })}
         />,
       );
-      expect(await screen.findByRole("button", { name: "Publish anyway" })).toBeTruthy();
+      expect(toggle().textContent).toBe("Publish");
+      expect(toggle().getAttribute("aria-disabled")).toBeNull();
+      expect(screen.queryByRole("button", { name: "Publish anyway" })).toBeNull();
+    });
+
+    it("feeds the site's issues to the tray", () => {
+      vi.mocked(isFeatureEnabled).mockReturnValue(true);
+      const issues = [{ id: "1", type: "error", message: "x" }] as StudioHeaderProps["issues"];
+      render(<StudioHeader {...makeProps({ issues })} />);
+      expect(publishTray.get().issues).toEqual(issues);
+    });
+
+    it("live with nothing waiting still offers the toggle — the tray says Up to date", () => {
+      vi.mocked(isFeatureEnabled).mockReturnValue(true);
+      render(<StudioHeader {...makeProps({ nextMove: null, publishedUrl: "https://x.vercel.app" })} />);
+      expect(toggle().getAttribute("aria-expanded")).toBe("false");
     });
   });
 
   // ── B4 · one publish door ────────────────────────────────────────────────
   describe("the publish verb is a door, not a publish", () => {
-    /* The "Publish with N open errors?" confirm was this bar's private dialog,
-       so the Publish panel's identical verb skipped it. It is
-       PublishErrorsConfirmModal now, mounted by AquibraStudio, whose
-       `requestPublish` routes on `nextMove.gate` — this bar hands off and
-       opens nothing of its own (PublishErrorsConfirmModal.test.tsx). */
-    it("Publish anyway hands off to the shell's door — no dialog here", async () => {
-      vi.mocked(isFeatureEnabled).mockReturnValue(true);
-      const onVercelPublish = vi.fn();
-      render(
-        <StudioHeader
-          {...makeProps({
-            onVercelPublish,
-            issues: [{ id: "1", type: "error", message: "x" }] as StudioHeaderProps["issues"],
-          })}
-        />,
-      );
-      fireEvent.click(await screen.findByRole("button", { name: "Publish anyway" }));
-      expect(onVercelPublish).toHaveBeenCalledTimes(1);
-      expect(screen.queryByRole("dialog")).toBeNull();
-    });
-
     it("a review verb opens the Review panel instead", async () => {
       vi.mocked(isFeatureEnabled).mockReturnValue(true);
       const onVercelPublish = vi.fn();
@@ -441,7 +443,7 @@ describe("StudioHeader", () => {
 
   // ── T5 publish outcome (plan D10, eng D10/D11) ────────────────────────────
   describe("publish outcome flash", () => {
-    it("published flashes '✓ Published' and announces politely", () => {
+    it("published flashes '✓ Published' (tray closed) and announces politely", () => {
       vi.mocked(isFeatureEnabled).mockReturnValue(true);
       render(<StudioHeader {...makeProps({ publishOutcome: "published" })} />);
       const btn = screen.getByRole("button", { name: "✓ Published" });
@@ -460,14 +462,14 @@ describe("StudioHeader", () => {
   });
 
   describe("P6 viewer gating", () => {
-    it("a viewer sees Publish blocked with the reason, never hidden", () => {
+    /* Outside view mode a VIEWER's Publish is the tray toggle like
+       everyone's; the tray's CTA carries the role reason (board B8-PB19). */
+    it("a viewer outside view mode gets the tray toggle, never a hidden Publish", () => {
       vi.mocked(isFeatureEnabled).mockReturnValue(true);
       roleState.role = "VIEWER";
       render(<StudioHeader {...makeProps()} />);
       const btn = screen.getByRole("button", { name: "Publish" });
-      expect(btn.getAttribute("aria-disabled")).toBe("true");
-      fireEvent.focus(btn);
-      expect(screen.getByRole("tooltip").textContent).toBe("Viewers can't publish — ask an editor");
+      expect(btn.getAttribute("aria-expanded")).toBe("false");
     });
 
     it("an editor keeps publish enabled", () => {
@@ -509,12 +511,21 @@ describe("StudioHeader", () => {
     });
   });
 
-  /* Board B3-01 7569:190283 (C2): the chip is the status VERB plus the one
-     number that matters; the sentence rides in `title`. */
-  describe("review status chip", () => {
-    it("a pending round reads 'Waiting · <name>'", () => {
+  /* design-2l9 board 497:99433 (Task 1.2): "Request review" with no round,
+     "In review · {n} open" while a round is out and the count is known,
+     "In review" when it is not; the sentence rides in `title`. */
+  describe("Topbar review control", () => {
+    it("a pending round with no known count reads 'In review'", () => {
       render(<StudioHeader {...makeProps({ reviewStatus: reviewStatus({ state: "pending", reviewerName: "Sara" }) })} />);
-      expect(screen.getByText("Waiting · Sara")).toBeTruthy();
+      expect(screen.getByTestId("topbar-review-label").textContent).toBe("In review");
+      expect(screen.getByTestId("topbar-review-pill").getAttribute("title")).toBe("Sent to Sara — waiting on approval");
+    });
+
+    it("an open count reads 'In review · {n} open'", () => {
+      render(
+        <StudioHeader {...makeProps({ reviewStatus: reviewStatus({ state: "pending", reviewerName: "Sara" }), openCommentCount: 12 })} />,
+      );
+      expect(screen.getByTestId("topbar-review-label").textContent).toBe("In review · 12 open");
     });
 
     it("an approval reads 'Approved' with who and when in the title", () => {
@@ -529,22 +540,23 @@ describe("StudioHeader", () => {
       expect(screen.getByTestId("topbar-review-pill").getAttribute("title")).toMatch(/^Approved by Sara · /);
     });
 
-    it("changes requested carries the open count", () => {
+    it("changes requested carries the open count, and says so in the title", () => {
       render(
         <StudioHeader
           {...makeProps({ reviewStatus: reviewStatus({ state: "changes-requested", reviewerName: "Sara" }), openCommentCount: 2 })}
         />,
       );
-      expect(screen.getByText("Changes requested · 2")).toBeTruthy();
+      expect(screen.getByText("In review · 2 open")).toBeTruthy();
+      expect(screen.getByTestId("topbar-review-pill").getAttribute("title")).toBe("Sara asked for changes — 2 open");
     });
 
-    it("no count is a verb alone, never '· 0'", () => {
+    it("no count is 'In review' alone, never '· 0 open'", () => {
       render(
         <StudioHeader
           {...makeProps({ reviewStatus: reviewStatus({ state: "changes-requested", reviewerName: "Sara" }), openCommentCount: 0 })}
         />,
       );
-      expect(screen.getByText("Changes requested")).toBeTruthy();
+      expect(screen.getByTestId("topbar-review-label").textContent).toBe("In review");
     });
 
     it("edited since approval says so", () => {
@@ -552,16 +564,16 @@ describe("StudioHeader", () => {
       expect(screen.getByText("Approved · edited since")).toBeTruthy();
     });
 
-    it("'Not sent' only where a send is the site's next act (an approval workspace)", () => {
+    it("no round in an approval workspace reads 'Request review'", () => {
       render(<StudioHeader {...makeProps({ reviewStatus: reviewStatus({ state: "none", editsRequireApproval: true }) })} />);
-      expect(screen.getByText("Not sent")).toBeTruthy();
+      expect(screen.getByTestId("topbar-review-label").textContent).toBe("Request review");
     });
 
-    it("no round: the Review door is still there, and opens the Review panel (board 4418:123573)", () => {
+    it("no round: 'Request review' is the entry point, and opens the existing Review flow", () => {
       const onOpenReview = vi.fn();
       render(<StudioHeader {...makeProps({ onOpenReview, reviewStatus: reviewStatus({ state: "none", editsRequireApproval: false }) })} />);
       const door = screen.getByTestId("topbar-review-pill");
-      expect(screen.getByTestId("topbar-review-label").textContent).toBe("Review");
+      expect(screen.getByTestId("topbar-review-label").textContent).toBe("Request review");
       expect(screen.getByTestId("topbar-review-chevron").textContent).toBe("›");
       fireEvent.click(door);
       expect(onOpenReview).toHaveBeenCalledTimes(1);
@@ -1121,7 +1133,7 @@ describe("F3 review pill", () => {
         {...makeProps({ onOpenReview, reviewStatus: reviewStatus({ state: "pending", at: new Date().toISOString() }) })}
       />,
     );
-    const pill = await screen.findByRole("button", { name: "Waiting" });
+    const pill = await screen.findByRole("button", { name: "In review" });
     fireEvent.click(pill);
     expect(onOpenReview).toHaveBeenCalled();
   });
@@ -1156,7 +1168,7 @@ describe("T8 status grammar", () => {
 
   it("a blocking review keeps the warning tone when it is the only amber", async () => {
     render(<StudioHeader {...makeProps({ reviewStatus: changesRequested() })} />);
-    const label = await screen.findByText("Changes requested");
+    const label = await screen.findByText("In review");
     expect(isWarningTone(label)).toBe(true);
   });
 
@@ -1209,7 +1221,7 @@ describe("T8 status grammar", () => {
         })}
       />,
     );
-    const label = await screen.findByText("Changes requested");
+    const label = await screen.findByText("In review");
     expect(isWarningTone(label)).toBe(true);
   });
 });
@@ -1311,5 +1323,112 @@ describe("F9 a11y", () => {
     expect(screen.getByText("Leave with unsaved changes?")).toBeTruthy();
     fireEvent.keyDown(document, { key: "k", metaKey: true });
     expect(screen.queryByTestId("command-palette")).toBeNull();
+  });
+});
+
+// ── design-2l9 Task 1.2 · the editor's one undo ─────────────────────────────
+describe("StudioHeader · History group", () => {
+  /* A composer stub with a real event bus and a controllable history. The
+     header reads canUndo()/canRedo() and nothing else from history. */
+  function makeComposer() {
+    const handlers = new Map<string, Set<(...args: unknown[]) => void>>();
+    const state = { canUndo: false, canRedo: false };
+    const composer = {
+      on: vi.fn((ev: string, fn: (...args: unknown[]) => void) => {
+        if (!handlers.has(ev)) handlers.set(ev, new Set());
+        handlers.get(ev)!.add(fn);
+      }),
+      off: vi.fn((ev: string, fn: (...args: unknown[]) => void) => {
+        handlers.get(ev)?.delete(fn);
+      }),
+      emit: (ev: string) => {
+        handlers.get(ev)?.forEach((fn) => fn());
+      },
+      getProjectMetadata: vi.fn(() => ({ name: "Acme" })),
+      history: {
+        canUndo: () => state.canUndo,
+        canRedo: () => state.canRedo,
+        undo: vi.fn(),
+        redo: vi.fn(),
+        getHistoryStack: () => [],
+      },
+    };
+    return { composer, state };
+  }
+  const asComposer = (c: ReturnType<typeof makeComposer>["composer"]) => c as unknown as StudioHeaderProps["composer"];
+  const undoBtn = () => within(screen.getByTestId("topbar-history")).getByRole("button", { name: "Undo" });
+  const redoBtn = () => within(screen.getByTestId("topbar-history")).getByRole("button", { name: "Redo" });
+
+  beforeEach(() => setViewMode({}));
+  afterEach(() => {
+    cleanup();
+    vi.clearAllMocks();
+  });
+
+  it("renders exactly one Undo and one Redo, inside the topbar History group; disabled when history is empty; enabled after a history:recorded event", () => {
+    const { composer, state } = makeComposer();
+    render(<StudioHeader {...makeProps({ composer: asComposer(composer) })} />);
+    expect(screen.getAllByRole("button", { name: "Undo" })).toHaveLength(1);
+    expect(screen.getAllByRole("button", { name: "Redo" })).toHaveLength(1);
+    expect(within(screen.getByRole("banner")).getByRole("group", { name: "History" })).toBe(screen.getByTestId("topbar-history"));
+    expect(undoBtn().getAttribute("aria-disabled")).toBe("true");
+    expect(redoBtn().getAttribute("aria-disabled")).toBe("true");
+    fireEvent.click(undoBtn());
+    expect(composer.history.undo).not.toHaveBeenCalled();
+
+    state.canUndo = true;
+    act(() => composer.emit("history:recorded"));
+    expect(undoBtn().getAttribute("aria-disabled")).toBeNull();
+    fireEvent.click(undoBtn());
+    expect(composer.history.undo).toHaveBeenCalledTimes(1);
+  });
+
+  it("disabled again after history:cleared", () => {
+    const { composer, state } = makeComposer();
+    state.canUndo = true;
+    render(<StudioHeader {...makeProps({ composer: asComposer(composer) })} />);
+    expect(undoBtn().getAttribute("aria-disabled")).toBeNull();
+    state.canUndo = false;
+    act(() => composer.emit("history:cleared"));
+    expect(undoBtn().getAttribute("aria-disabled")).toBe("true");
+  });
+
+  it("re-reads canUndo/canRedo on history:changed", () => {
+    const { composer, state } = makeComposer();
+    render(<StudioHeader {...makeProps({ composer: asComposer(composer) })} />);
+    state.canRedo = true;
+    act(() => composer.emit("history:changed"));
+    expect(redoBtn().getAttribute("aria-disabled")).toBeNull();
+    fireEvent.click(redoBtn());
+    expect(composer.history.redo).toHaveBeenCalledTimes(1);
+  });
+
+  /* importProject — project load, undo/redo internals, version restore —
+     emits ONLY project:loaded (Composer.importProject); a restore adds
+     version:restored. Neither is a history:* event. */
+  it("re-reads canUndo/canRedo when the composer instance changes and after importProject / version restore, even if no history event fires", () => {
+    const first = makeComposer();
+    const { rerender } = render(<StudioHeader {...makeProps({ composer: asComposer(first.composer) })} />);
+    expect(undoBtn().getAttribute("aria-disabled")).toBe("true");
+
+    const second = makeComposer();
+    second.state.canUndo = true;
+    rerender(<StudioHeader {...makeProps({ composer: asComposer(second.composer) })} />);
+    expect(undoBtn().getAttribute("aria-disabled")).toBeNull();
+
+    second.state.canUndo = false;
+    act(() => second.composer.emit("project:loaded"));
+    expect(undoBtn().getAttribute("aria-disabled")).toBe("true");
+
+    second.state.canRedo = true;
+    act(() => second.composer.emit("version:restored"));
+    expect(redoBtn().getAttribute("aria-disabled")).toBeNull();
+  });
+
+  it("view mode carries no History group — nothing there can be undone", () => {
+    setViewMode({ readOnlyView: true });
+    const { composer } = makeComposer();
+    render(<StudioHeader {...makeProps({ composer: asComposer(composer) })} />);
+    expect(screen.queryByTestId("topbar-history")).toBeNull();
   });
 });

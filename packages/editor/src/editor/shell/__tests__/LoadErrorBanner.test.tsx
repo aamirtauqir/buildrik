@@ -1,114 +1,193 @@
 /**
- * LoadErrorBanner (S1.5) — a persistent, actionable surface when loading the
- * site from the dashboard fails. Unlike the old disappearing toast, it stays
- * until the user acts: auth failure offers Sign in + Retry; a network failure
- * offers Retry. Reads error≠dismissed-and-forgotten (design DF5 sibling).
+ * LoadErrorBanner (S1.5, Task 1.6) — the one primary signal that the site did
+ * not load: the board's copy per cause, announced, with a Retry that re-runs
+ * the load in place (1 s / 2 s / 4 s, at most three), then a page reload and
+ * the dashboard, and "Copy details" that carries a code and a request id only.
+ *
+ * Rewritten for Task 1.6: the old suite pinned the "there is no trash" copy,
+ * which the server contradicts (`sites.restore`, Recently deleted for 30 days).
  */
 import * as React from "react";
-import { render, screen, fireEvent, cleanup } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
-import { LoadErrorBanner } from "../LoadErrorBanner";
+import { render, screen, fireEvent, cleanup, act } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { ToastProvider } from "@/editor/chrome-ui";
+import { LoadErrorBanner, loadErrorDetails } from "../LoadErrorBanner";
+import { setSiteLoadStatus, type SiteLoadFailure } from "../siteLoadStatus";
+
+const writeClipboardText = vi.hoisted(() => vi.fn(() => Promise.resolve()));
+vi.mock("@buildrik/shared/browser/clipboard", () => ({ writeClipboardText }));
 
 function renderBanner(props: Partial<React.ComponentProps<typeof LoadErrorBanner>> = {}) {
   return render(
-    <LoadErrorBanner kind={null} onRetry={vi.fn()} onSignIn={vi.fn()} {...props} />,
+    <ToastProvider>
+      <LoadErrorBanner kind={null} onRetry={vi.fn()} onSignIn={vi.fn()} onDismiss={vi.fn()} {...props} />
+    </ToastProvider>,
   );
 }
 
-afterEach(cleanup);
+const failure = (over: Partial<SiteLoadFailure> = {}): SiteLoadFailure => ({
+  kind: "network",
+  status: 500,
+  code: "INTERNAL_SERVER_ERROR",
+  requestId: "req-42",
+  url: "https://app.example/api/trpc/sites.get",
+  ...over,
+});
 
-describe("LoadErrorBanner", () => {
+beforeEach(() => vi.useFakeTimers());
+afterEach(() => {
+  cleanup();
+  setSiteLoadStatus(null);
+  vi.useRealTimers();
+  writeClipboardText.mockClear();
+});
+
+describe("LoadErrorBanner — cause and copy", () => {
   it("renders nothing when there is no error", () => {
-    const { container } = renderBanner();
-    expect(container).toBeEmptyDOMElement();
+    renderBanner();
+    expect(screen.queryByTestId("load-error-banner")).toBeNull();
   });
 
-  it("auth failure offers Sign in + Retry", () => {
+  it("is announced: role=alert, named by the cause", () => {
+    renderBanner({ kind: "network" });
+    expect(screen.getByRole("alert", { name: "Load failed" })).toBeInTheDocument();
+  });
+
+  it.each([
+    ["network", "Couldn’t load this site. You can look around; editing waits until it loads."],
+    ["offline", "You’re offline. Your saved work is safe."],
+    ["auth", "Session expired — changes aren’t saving. They’re kept in this tab."],
+    [
+      "missing",
+      "This site was deleted. Your unsaved changes are kept in this browser. A site owner can restore it from Recently deleted for 30 days.",
+    ],
+    ["forbidden", "Your role changed to Viewer — editing is off. Changes that weren’t saved are kept in this browser."],
+  ] as const)("%s says the board's words", (kind, copy) => {
+    renderBanner({ kind });
+    expect(screen.getByTestId("load-error-message").textContent).toContain(copy);
+  });
+
+  it("a deleted site offers the dashboard, not a Retry that cannot work, and no 'no trash' line", () => {
+    renderBanner({ kind: "missing" });
+    expect(screen.queryByRole("button", { name: /^retry$/i })).toBeNull();
+    expect(screen.getByRole("button", { name: /go to dashboard/i })).toBeInTheDocument();
+    expect(screen.queryByText(/no trash/i)).toBeNull();
+  });
+
+  it("no access offers Back to dashboard and no Retry, in the warning tone", () => {
+    renderBanner({ kind: "forbidden" });
+    expect(screen.getByTestId("load-error-banner")).toHaveAttribute("data-kind", "forbidden");
+    expect(screen.queryByRole("button", { name: /^retry$/i })).toBeNull();
+    expect(screen.getByRole("button", { name: /back to dashboard/i })).toBeInTheDocument();
+  });
+
+  it("session expired offers Sign in and Retry", () => {
     const onSignIn = vi.fn();
-    const onRetry = vi.fn();
-    renderBanner({ kind: "auth", onSignIn, onRetry });
-    expect(screen.getByText(/session expired/i)).toBeInTheDocument();
+    renderBanner({ kind: "auth", onSignIn });
     fireEvent.click(screen.getByRole("button", { name: /sign in/i }));
     expect(onSignIn).toHaveBeenCalled();
-    fireEvent.click(screen.getByRole("button", { name: /retry/i }));
-    expect(onRetry).toHaveBeenCalled();
+    expect(screen.getByRole("button", { name: /^retry$/i })).toBeInTheDocument();
   });
 
-  /* A deleted site is not a blip. Walked live against a trashed site: the
-     editor loaded a blank "Page 1", the banner said "you're seeing local
-     changes for now", and the canvas invited the user to Start blank —
-     while every save was refused. */
-  it("a missing site says so, and does not offer a Retry that cannot work", () => {
-    const onRetry = vi.fn();
-    const onSignIn = vi.fn();
-    renderBanner({ kind: "missing", onRetry, onSignIn });
-    expect(screen.getByText(/isn't there anymore/i)).toBeInTheDocument();
-    expect(screen.getByText(/nothing you do here can be saved/i)).toBeInTheDocument();
-    /* No trash is offered, because there is none: deleteSite soft-deletes for a
-       purge cron, nothing restores it, and the delete dialog says the action
-       cannot be undone. */
-    expect(screen.queryByText(/trash to restore from/i)).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /restore/i })).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /^retry$/i })).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: /go to dashboard/i }));
-    expect(onSignIn).toHaveBeenCalled();
-    expect(onRetry).not.toHaveBeenCalled();
+  it("the ✕ dismisses", () => {
+    const onDismiss = vi.fn();
+    renderBanner({ kind: "network", onDismiss });
+    fireEvent.click(screen.getByRole("button", { name: "Dismiss" }));
+    expect(onDismiss).toHaveBeenCalled();
   });
+});
 
-  it("does not tell a missing site it is seeing local changes for now", () => {
-    renderBanner({ kind: "missing" });
-    expect(screen.queryByText(/local changes for now/i)).not.toBeInTheDocument();
-  });
-
-  it("network failure offers Retry and does not offer Sign in", () => {
-    const onRetry = vi.fn();
-    renderBanner({ kind: "network", onRetry });
-    expect(screen.getByText(/couldn't load/i)).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /sign in/i })).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: /retry/i }));
-    expect(onRetry).toHaveBeenCalled();
-  });
-
-  /* Board 294:1992 draws "Reconnecting…" as a full-screen takeover. The state
-     is real; the takeover is not built, because the shipped load error is a
-     banner over the LIVE shell — the local changes underneath stay editable —
-     and hiding the whole editor to say "reconnecting" hides the work it exists
-     to protect. Retry is a whole-page reload, and until now it said nothing
-     while it ran, which reads as a dead button. */
-  it("says it is reconnecting while the retry runs", () => {
+describe("LoadErrorBanner — Retry", () => {
+  it("with no in-place retry published, Retry falls back to onRetry (a reload) once", () => {
     const onRetry = vi.fn();
     renderBanner({ kind: "network", onRetry });
     fireEvent.click(screen.getByRole("button", { name: /^retry$/i }));
-    expect(onRetry).toHaveBeenCalledTimes(1);
-
     const busy = screen.getByRole("button", { name: /reconnecting/i });
     expect(busy).toHaveAttribute("aria-busy", "true");
     expect(busy).toBeDisabled();
-    /* 9:102: disabled without a stated reason is a bug. */
     expect(busy).toHaveAttribute("title", expect.stringMatching(/reaching the server/i));
-  });
-
-  it("a second click cannot stack another reload", () => {
-    const onRetry = vi.fn();
-    renderBanner({ kind: "network", onRetry });
-    fireEvent.click(screen.getByRole("button", { name: /^retry$/i }));
-    fireEvent.click(screen.getByRole("button", { name: /reconnecting/i }));
+    fireEvent.click(busy);
     expect(onRetry).toHaveBeenCalledTimes(1);
   });
 
-  it("the auth banner's retry gets the same state", () => {
-    renderBanner({ kind: "auth" });
+  it("re-runs the load in place after the backoff, and ignores repeat clicks while busy", async () => {
+    const retry = vi.fn(() => Promise.resolve(false));
+    setSiteLoadStatus({ failure: failure(), retry });
+    const onRetry = vi.fn();
+    renderBanner({ kind: "network", onRetry });
+
     fireEvent.click(screen.getByRole("button", { name: /^retry$/i }));
-    expect(screen.getByRole("button", { name: /reconnecting/i })).toBeDisabled();
-    /* Sign in opens a new tab and is not the thing being waited on. */
-    expect(screen.getByRole("button", { name: /sign in/i })).not.toBeDisabled();
+    fireEvent.click(screen.getByRole("button", { name: /reconnecting/i }));
+    await act(async () => {
+      vi.advanceTimersByTime(999);
+    });
+    expect(retry).not.toHaveBeenCalled();
+    await act(async () => {
+      vi.advanceTimersByTime(1);
+    });
+    expect(retry).toHaveBeenCalledTimes(1);
+    expect(onRetry).not.toHaveBeenCalled();
   });
 
-  /* L1-008 (live 2026-10-09): a site session no longer falls back to a local
-     copy, so "you're seeing local changes" was false for network and auth. */
-  it.each(["network", "auth"] as const)("a %s failure does not promise local changes", (kind) => {
-    renderBanner({ kind });
-    expect(screen.queryByText(/local changes/i)).not.toBeInTheDocument();
-    expect(screen.getByTestId("load-error-message").textContent).toMatch(/not saved until it loads/);
+  it("a second failure shows the attempt count and Reload page; after three, Retry gives way to Reload page and Back to dashboard", async () => {
+    const retry = vi.fn(() => Promise.resolve(false));
+    setSiteLoadStatus({ failure: failure(), retry });
+    renderBanner({ kind: "network" });
+
+    const press = async (wait: number) => {
+      fireEvent.click(screen.getByRole("button", { name: /^retry$/i }));
+      await act(async () => {
+        vi.advanceTimersByTime(wait);
+      });
+    };
+
+    expect(screen.queryByRole("button", { name: /reload page/i })).toBeNull();
+    await press(1000);
+    expect(screen.getByTestId("load-error-attempts").textContent).toBe("Retry 1 of 3 didn’t load.");
+    expect(screen.getByRole("button", { name: /reload page/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /^retry$/i })).toBeInTheDocument();
+
+    await press(1999);
+    expect(retry).toHaveBeenCalledTimes(1);
+    await act(async () => {
+      vi.advanceTimersByTime(1);
+    });
+    expect(retry).toHaveBeenCalledTimes(2);
+
+    await press(4000);
+    expect(retry).toHaveBeenCalledTimes(3);
+    expect(screen.queryByRole("button", { name: /^retry$/i })).toBeNull();
+    expect(screen.getByRole("button", { name: /reload page/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /back to dashboard/i })).toBeInTheDocument();
+    expect(screen.getByTestId("load-error-attempts").textContent).toMatch(/Tried 3 times/);
+  });
+
+  it("a retry that lands dismisses the banner", async () => {
+    setSiteLoadStatus({ failure: failure(), retry: () => Promise.resolve(true) });
+    const onDismiss = vi.fn();
+    renderBanner({ kind: "network", onDismiss });
+    fireEvent.click(screen.getByRole("button", { name: /^retry$/i }));
+    await act(async () => {
+      vi.advanceTimersByTime(1000);
+    });
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("LoadErrorBanner — Copy details", () => {
+  it("copies the error code and the request id, and nothing else", async () => {
+    setSiteLoadStatus({ failure: failure({ url: "https://app.example/api/trpc/sites.get?token=secret" }), retry: null });
+    renderBanner({ kind: "network" });
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: /copy details/i }));
+    });
+    expect(writeClipboardText).toHaveBeenCalledWith("Error code: INTERNAL_SERVER_ERROR\nRequest id: req-42");
+  });
+
+  it("without a server code it names the status, and says when no request id was sent", () => {
+    expect(loadErrorDetails("network", failure({ code: null, status: 502, requestId: null }))).toBe(
+      "Error code: HTTP 502\nRequest id: none sent",
+    );
+    expect(loadErrorDetails("offline", null)).toBe("Error code: offline\nRequest id: none sent");
   });
 });

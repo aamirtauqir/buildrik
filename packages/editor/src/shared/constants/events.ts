@@ -385,6 +385,10 @@ export const EVENTS = {
    *  the retired canvas palette's chord — and the Pages panel's ⌘K keycap
    *  come in through here. */
   UI_TOGGLE_COMMAND_PALETTE: "ui:toggle:command-palette",
+  /** Open or close the bottom bar's page switcher (⇧⌘O / Ctrl+Alt+O,
+   *  useEditorShortcuts; the ⌘K "Switch page…" row). The bottom bar owns the
+   *  open state. */
+  UI_TOGGLE_PAGE_SWITCHER: "ui:toggle:page-switcher",
   /** The site menu asked to take the site down. The Publish panel owns the
    *  one confirm, so the menu opens the panel and asks it rather than
    *  hosting a second dialog. */
@@ -646,6 +650,9 @@ export const EVENTS = {
      user to start work has to hear this: the canvas was offering "Start blank"
      over a site whose every save is refused. */
   PROJECT_UNAVAILABLE: "project:unavailable",
+  /* The set of edit locks changed (`Composer.setEditLock`). Fires only when
+     the set actually changes; read `composer.readOnly` for the answer. */
+  EDIT_LOCK_CHANGED: "editlock:changed",
   /* A layer was renamed (or its name cleared). Custom names live in the
      layers panel's own per-page store, so anything else that shows an
      element's identity — the status bar — has no way to hear about a rename
@@ -865,6 +872,7 @@ export interface EventPayloads {
   [EVENTS.PROJECT_SAVING]: Record<string, never>;
   [EVENTS.PROJECT_LOAD_STATE]: { loading: boolean };
   [EVENTS.PROJECT_UNAVAILABLE]: { reason: "missing" };
+  [EVENTS.EDIT_LOCK_CHANGED]: { locks: import("../types").EditLockReason[]; readOnly: boolean };
   [EVENTS.ELEMENT_RENAMED]: { id: string; name: string | null };
   [EVENTS.PROJECT_LOADED]:
     | import("../types").ProjectData

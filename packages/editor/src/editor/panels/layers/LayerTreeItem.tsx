@@ -6,6 +6,7 @@
 
 import * as React from "react";
 import { getEditorViewMode } from "@shared/utils/editorViewMode";
+import { useEditLocks } from "@/editor/shared/useEditLocks";
 import type { Composer } from "@/engine";
 import type { LayerItem, DragState, LayerDisplayPrefs } from "./types";
 import { getDisplayName } from "./data/layerUtils";
@@ -106,7 +107,10 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
      2026-09-24). The page root itself is not a row. */
   /* View mode (a VIEWER, board 4418:126059): Layers is for inspection —
      select and expand only; no drag, rename, context menu, eye or lock. */
-  const readOnly = getEditorViewMode().readOnlyView;
+  /* View mode by URL, or any engine edit lock — a row that drags or renames
+     into a refused write offers what cannot happen. */
+  const editLocked = useEditLocks(composer).length > 0;
+  const readOnly = getEditorViewMode().readOnlyView || editLocked;
   const canDrag = !!(composer && !isLocked && !readOnly);
 
   // Board 1082:4739 (Layers · component-instance): ONE diamond badge sits

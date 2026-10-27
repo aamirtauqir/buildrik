@@ -22,6 +22,7 @@
  */
 import React from "react";
 import { Button } from "flowbite-react";
+import { Redo, Undo } from "lucide-react";
 /* The LOCAL Tooltip — see HelpTooltip.tsx. */
 import { Tooltip } from "./Tooltip";
 import { IconButton } from "./Icon";
@@ -41,7 +42,7 @@ import { Presence, type PresenceProps } from "./Presence";
    the same node fixes its height at 32 — so it is carried as a box-model value
    the explicit height overrides, which is what Figma is doing too. */
 /* Board 4418:123573 (v3 IA): Publish at 13/500. */
-const PUBLISH_BTN_CLASS = "tw:h-8 tw:px-4 tw:py-2.5 tw:text-[13px] tw:leading-5 tw:font-medium";
+const PUBLISH_BTN_CLASS = "tw:flex-none tw:h-8 tw:px-4 tw:py-2.5 tw:text-[13px] tw:leading-5 tw:font-medium";
 
 /* Exit geometry + colour (2026-08-03), from board 681:26 `btn/exit`: 28 tall,
    10 horizontal padding, 12px REGULAR, ink at gray-900. It rendered 32 / 12 /
@@ -68,7 +69,7 @@ const EXIT_BTN_CLASS =
    siblings), which moved into each panel as chrome-ui's PanelSearch. */
 /* Board 4418:123573: Preview is a 76×32 bordered TEXT button, not an eye. */
 const PREVIEW_BTN_CLASS =
-  "tw:h-8 tw:w-[76px] tw:px-0 tw:text-[13px] tw:font-medium tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-card)] tw:text-[var(--bk-ink)]";
+  "tw:flex-none tw:h-8 tw:w-[76px] tw:px-0 tw:text-[13px] tw:font-medium tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-card)] tw:text-[var(--bk-ink)]";
 
 /**
  * `published` is the 2-second success transient after a publish lands (plan
@@ -79,7 +80,7 @@ const PREVIEW_BTN_CLASS =
    surfaces where publishing is not the viewer's to do. View mode is the
    case: the `action` slot used to hold SendForReview there and so replaced
    this button by accident; emptying the slot made Publish reappear. */
-export type PublishState = "ready" | "disabled" | "anyway" | "published" | "hidden";
+export type PublishState = "ready" | "disabled" | "published" | "hidden";
 
 /**
  * The tool cluster (plan §2, eng D12) — DATA props, never a node: the deleted
@@ -102,6 +103,22 @@ export interface ReviewPill {
   tone: ReviewTone;
   title?: string;
   onClick?: () => void;
+}
+
+/**
+ * The topbar's History group — board 497:99433 `History / one undo for the
+ * whole editor`: an Undo + Redo icon pair, no text, the editor's only undo
+ * controls (owner decision "one undo"). The container owns the composer and
+ * the platform chord text; the bar only draws.
+ */
+export interface TopbarHistory {
+  canUndo: boolean;
+  canRedo: boolean;
+  onUndo: () => void;
+  onRedo: () => void;
+  /** Formatted chords, e.g. "⌘Z" / "⇧⌘Z" on macOS, "Ctrl+Z" elsewhere. */
+  undoChord: string;
+  redoChord: string;
 }
 
 export interface TopbarProps {
@@ -134,6 +151,8 @@ export interface TopbarProps {
   onSaveClick?: () => void;
   /** The tooltip on a pill with nothing to click (offline). */
   saveHint?: string;
+  /** Undo / Redo. Omit where nothing can be edited (view mode). */
+  history?: TopbarHistory | null;
   /** The review round's current truth. Omit when no review is in flight. */
   review?: ReviewPill | null;
   /** The daily-loop cluster: Quick preview · Comments. */
@@ -143,7 +162,16 @@ export interface TopbarProps {
   onOpenNotifications?: () => void;
   publish?: PublishState;
   publishBusy?: boolean;
-  onPublish?: () => void;
+  onPublish?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  /**
+   * Set when Publish is the publish tray's TOGGLE (design-2l9 Task 1.7):
+   * whether the tray is open. The button then carries `aria-expanded` and
+   * `aria-controls`, and stays pressable while a publish runs — the tray,
+   * not this button, shows the run and every reason the CTA is shut.
+   */
+  publishExpanded?: boolean;
+  /** The id of the surface the toggle opens. */
+  publishControls?: string;
   /** Why publish is blocked — surfaced as a tooltip on the still-focusable button. */
   publishBlockedReason?: string;
   /**
@@ -171,20 +199,19 @@ const CRUMB_CLASS =
   "tw:font-medium tw:text-[var(--bk-accent)] tw:hover:underline tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
 
 const PAGE_CRUMB_CLASS =
-  "tw:h-auto tw:min-w-0 tw:truncate tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[14px] tw:leading-5 " +
+  "tw:h-auto tw:shrink-0 tw:max-w-[160px] tw:min-w-0 tw:truncate tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[14px] tw:leading-5 " +
   "tw:font-medium tw:text-[var(--bk-ink)] tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
 
 const PUBLISH_LABEL: Record<PublishState, string> = {
   ready: "Publish",
   disabled: "Publish",
-  anyway: "Publish anyway",
   published: "✓ Published",
   hidden: "",
 };
 
 export function Topbar({
-  siteName, pageName, onOpenPages, onPageCrumb, onExit, exitLabel = "‹ Exit", save, savedAt, onSaveClick, saveHint, review, tools, presence,
-  unreadCount = 0, onOpenNotifications, publish = "ready", publishBusy, onPublish,
+  siteName, pageName, onOpenPages, onPageCrumb, onExit, exitLabel = "‹ Exit", save, savedAt, onSaveClick, saveHint, history, review, tools, presence,
+  unreadCount = 0, onOpenNotifications, publish = "ready", publishBusy, onPublish, publishExpanded, publishControls,
   publishBlockedReason, ctaLabel, ctaHint, action, menu,
 }: TopbarProps) {
   return (
@@ -206,7 +233,7 @@ export function Topbar({
         "tw:[font-family:var(--bk-font-ui)] tw:text-[13px] tw:text-[var(--bk-ink)]"
       }
     >
-      <Button color="light" size="xs" onClick={onExit} className={EXIT_BTN_CLASS} data-testid="topbar-exit">
+      <Button color="light" size="xs" onClick={onExit} className={`tw:flex-none ${EXIT_BTN_CLASS}`} data-testid="topbar-exit">
         {exitLabel}
       </Button>
 
@@ -220,7 +247,11 @@ export function Topbar({
           puts the shell search at x356, so the crumb column is 267 (it was
           681:26's 200). */}
       <span
-        className="tw:flex tw:items-center tw:gap-1 tw:text-[14px] tw:leading-5 tw:font-medium tw:w-[267px] tw:shrink tw:min-w-0 tw:whitespace-nowrap"
+        /* Narrow-width rule (design-2l9 Task 1.2): this column is the ONE
+           thing that gives way as the bar narrows — it ellipsizes down to
+           80px (full name in the crumb's title) while every other control
+           keeps its size, so at the 1024 minimum nothing wraps or clips. */
+        className="tw:flex tw:items-center tw:gap-1 tw:text-[14px] tw:leading-5 tw:font-medium tw:w-[267px] tw:shrink tw:min-w-[80px] tw:whitespace-nowrap"
         data-testid="topbar-site-name"
       >
         {onOpenPages ? (
@@ -232,7 +263,12 @@ export function Topbar({
             title={siteName}
             data-testid="topbar-crumb-site"
           >
-            {siteName}
+            {/* text-overflow does nothing on the button itself (it is a flex
+                container), so the ellipsis lives on this inner block — the
+                1024px pin caught the name clipping at both ends instead —
+                and left-aligned, because the button centres text and a
+                centred overflow clips both ends with no ellipsis. */}
+            <span className="tw:min-w-0 tw:truncate tw:text-left">{siteName}</span>
           </Button>
         ) : (
           <span className="tw:min-w-0 tw:truncate tw:text-[var(--bk-ink)]" title={siteName}>
@@ -252,12 +288,12 @@ export function Topbar({
                 title={pageName}
                 data-testid="topbar-crumb-page"
               >
-                {pageName}
+                <span className="tw:min-w-0 tw:truncate tw:text-left">{pageName}</span>
               </Button>
             ) : (
               <span
                 aria-current="page"
-                className="tw:min-w-0 tw:truncate tw:text-[var(--bk-ink)]"
+                className="tw:shrink-0 tw:max-w-[160px] tw:min-w-0 tw:truncate tw:text-[var(--bk-ink)]"
                 title={pageName}
                 data-testid="topbar-crumb-page"
               >
@@ -268,10 +304,12 @@ export function Topbar({
         ) : null}
       </span>
 
+      {history ? <HistoryGroup {...history} /> : null}
+
       {/* Nothing in a read-only view can become unsaved, so "Saved · just now"
           is status about a machine the viewer is not operating. `save` is
           omitted there rather than rendering a permanently-green pill. */}
-      {save ? <SaveStatus state={save} savedAt={savedAt} onClick={onSaveClick} hint={saveHint} /> : null}
+      {save ? <SaveStatus state={save} savedAt={savedAt} onClick={onSaveClick} hint={saveHint} className="tw:flex-none" /> : null}
 
 
       {review ? (
@@ -289,7 +327,7 @@ export function Topbar({
       <span className="tw:flex-1" />
 
 
-      {presence ? <Presence {...presence} /> : null}
+      {presence ? <Presence {...presence} className="tw:flex-none" /> : null}
 
       <span className="tw:relative tw:inline-flex tw:flex-none">
         <IconButton
@@ -367,8 +405,10 @@ export function Topbar({
           </Tooltip>
         ) : (
           <Button
-            disabled={publishBusy}
+            disabled={publishExpanded === undefined ? publishBusy : undefined}
             aria-busy={publishBusy || undefined}
+            aria-expanded={publishExpanded}
+            aria-controls={publishExpanded ? publishControls : undefined}
             onClick={onPublish}
             size="xs"
             title={ctaHint}
@@ -386,7 +426,7 @@ export function Topbar({
 }
 
 const REVIEW_BASE_CLASS =
-  "tw:inline-flex tw:items-center tw:gap-1 tw:h-6 tw:px-2 tw:border-0 tw:rounded-full " +
+  "tw:flex-none tw:inline-flex tw:items-center tw:gap-1 tw:h-6 tw:px-2 tw:border-0 tw:rounded-full " +
   "tw:text-xs tw:font-medium tw:whitespace-nowrap";
 
 /* Board B3-01 7569:190283, decision #26 (C2): tones via the status tokens —
@@ -440,6 +480,39 @@ function ReviewBadge({ label, tone, title, onClick }: ReviewPill) {
       <span className={REVIEW_LABEL_CLASS} data-testid="topbar-review-label">{label}</span>
       <span aria-hidden="true" data-testid="topbar-review-chevron">›</span>
     </button>
+  );
+}
+
+/* Board 497:99433: the pair sits 68 wide — two 32px icon buttons, 4 apart.
+   Unavailable is aria-disabled, not native disabled, so the button stays
+   focusable and hoverable and its "Nothing to undo" tooltip is reachable;
+   the click guard covers Enter/Space, which route through click. */
+const HISTORY_BTN_DISABLED_CLASS =
+  "tw:aria-disabled:opacity-50 tw:aria-disabled:cursor-not-allowed " +
+  "tw:aria-disabled:hover:bg-transparent tw:aria-disabled:hover:text-[var(--bk-ink-soft)]";
+
+function HistoryGroup({ canUndo, canRedo, onUndo, onRedo, undoChord, redoChord }: TopbarHistory) {
+  const rows = [
+    { key: "undo", label: "Undo", can: canUndo, run: onUndo, tip: canUndo ? `Undo (${undoChord})` : "Nothing to undo", glyph: <Undo size={16} aria-hidden="true" /> },
+    { key: "redo", label: "Redo", can: canRedo, run: onRedo, tip: canRedo ? `Redo (${redoChord})` : "Nothing to redo", glyph: <Redo size={16} aria-hidden="true" /> },
+  ];
+  return (
+    <span role="group" aria-label="History" className="tw:flex tw:flex-none tw:items-center tw:gap-1" data-testid="topbar-history">
+      {rows.map((row) => (
+        <Tooltip key={row.key} content={row.tip} placement="bottom" arrow={false}>
+          <IconButton
+            label={row.label}
+            title={undefined}
+            aria-disabled={row.can ? undefined : "true"}
+            onClick={row.can ? row.run : undefined}
+            className={HISTORY_BTN_DISABLED_CLASS}
+            data-testid={`topbar-${row.key}`}
+          >
+            {row.glyph}
+          </IconButton>
+        </Tooltip>
+      ))}
+    </span>
   );
 }
 

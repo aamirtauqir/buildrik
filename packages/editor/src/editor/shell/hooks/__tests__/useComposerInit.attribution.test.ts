@@ -47,6 +47,10 @@ const mockComposer = {
   cms: { collections: { setProjectId: vi.fn() } },
   migration: { run: vi.fn(({ project, currentVersion }) => ({ project, newVersion: currentVersion })) },
   destroy: vi.fn(),
+  /* Edit locks are inert here; useComposerInit.editLock.test.ts runs them
+     with the engine's semantics. */
+  editLocks: new Set<string>(),
+  setEditLock: vi.fn(),
 };
 
 vi.mock("@/engine", () => ({

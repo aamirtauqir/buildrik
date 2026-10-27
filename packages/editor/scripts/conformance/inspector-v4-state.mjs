@@ -32,7 +32,8 @@
  *
  * INTENDED v4 TESTIDS (the build plan names the components, not the ids).
  * W1 either ships these or edits this file in the same commit:
- *   inspector-state-chip · inspector-state-opt-<base|hover|focus|active|disabled>
+ *   inspector-state-select (2L9 Task 1.4: the header's native "Editing" select,
+ *     option values normal|hover|focus|active|disabled; was the v4 state chip)
  *   inspector-element-menu (kept) · inspector-menu-<ElementActionId>
  *     (duplicate, copy-style, paste-style, apply-style-to-page, reset-style,
  *      save-as-component, lock, delete — board 30, INSPECTOR_MENU)
@@ -216,11 +217,26 @@ const RUNNER = String.raw`async (spec) => {
 
   /* 5. Pseudo state (board 27) / state menu (board 32). */
   if (spec.state || spec.stateMenu) {
-    let trigger = q("inspector-state-chip"), via = "v4";
-    if (!trigger) { trigger = q("inspector-state-pill"); via = "pre-v4"; }
-    if (!trigger) note("state-menu", false, "none");
-    else {
-      trigger.click(); await sleep(300);
+    /* 2L9 Task 1.4: the state menu is the header's native select — there is
+       no open state to reach, so stateMenu only checks it is there. */
+    const select = q("inspector-state-select");
+    let via = "2l9", pill = null;
+    if (!select) { pill = q("inspector-state-pill"); via = "pre-v4"; }
+    if (!select && !pill) note("state-menu", false, "none");
+    else if (select) {
+      note("state-menu:open", true, via);
+      if (spec.state) {
+        const value = spec.state === "base" ? "normal" : spec.state;
+        const ok = [...select.options].some((o) => o.value === value);
+        if (ok) {
+          select.value = value;
+          select.dispatchEvent(new Event("change", { bubbles: true }));
+          await sleep(500);
+        }
+        note("state:" + spec.state, ok, via);
+      }
+    } else {
+      pill.click(); await sleep(300);
       note("state-menu:open", Boolean(document.querySelector('[data-testid^="inspector-state-opt-"]')), via);
       if (spec.state) {
         const opt = q("inspector-state-opt-" + spec.state);

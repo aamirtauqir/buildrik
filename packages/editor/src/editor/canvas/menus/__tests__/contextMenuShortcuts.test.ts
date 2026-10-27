@@ -148,10 +148,10 @@ describe("context menu shortcut column", () => {
      and ← is the one that selects the parent — so following the tooltip moved
      the element in the tree. */
   it("prints no tooltip chord the app does not honour as printed", () => {
-    // The selection toolbar (5936:44788) prints no chords in tooltips; the
-    // footer toolbar still does.
-    // Undo ⌘Z + Redo ⌘⇧Z (the "?" help button left the bar, 5936:44788).
-    expect(tooltipChords.length).toBeGreaterThanOrEqual(2);
+    // Neither canvas toolbar prints a chord in a tooltip any more: the footer's
+    // Undo ⌘Z / Redo ⌘⇧Z moved to the topbar (design-2l9 Task 1.2, one undo),
+    // whose tooltips come from the shortcuts-sheet formatter and are pinned in
+    // Topbar.test.tsx. This still guards any chord a canvas tooltip prints later.
     const wrong = tooltipChords
       .map((t) => ({ ...t, chord: keys.normalizeShortcut(chordFromGlyphs(t.raw)) }))
       .map((t) => ({ ...t, commandId: keys.findCommandId(t.chord) }))

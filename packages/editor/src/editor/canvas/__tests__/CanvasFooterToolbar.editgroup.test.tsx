@@ -1,18 +1,16 @@
 // @vitest-environment jsdom
 /**
- * CanvasFooterToolbar — edit + viewport group.
+ * CanvasFooterToolbar — no edit group.
  *
- * Guards the Figma-contract §2 move: Undo/Redo (breakpoints now in View ▸ Breakpoint)
- * left the topbar and now live on this canvas toolbar. Also the anti-orphan
- * guard for the toolbar itself — before F1, StudioPanels swallowed onZoomChange/
- * onOverlayChange, so the toolbar never rendered in the studio. These specs pin
- * that the toolbar renders its controls when wired, and hides the edit group
- * cleanly when it is not (so partial wiring can't render an empty divider).
+ * Undo/Redo sat on this bar from the Figma-contract §2 move until design-2l9
+ * Task 1.2 put the editor's one undo in the topbar. Also the anti-orphan guard
+ * for the toolbar itself — before F1, StudioPanels swallowed onZoomChange/
+ * onOverlayChange, so the toolbar never rendered in the studio.
  */
 
 import * as React from "react";
 import { describe, it, expect, vi, beforeAll } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { CanvasFooterToolbar } from "../CanvasFooterToolbar";
 
 const overlays = {
@@ -42,8 +40,10 @@ beforeAll(() => {
   }
 });
 
-describe("CanvasFooterToolbar — edit + viewport group", () => {
-  it("renders Undo/Redo + device switcher when wired (controls left the topbar)", () => {
+describe("CanvasFooterToolbar", () => {
+  /* design-2l9 Task 1.2 (owner decision "one undo"): Undo/Redo live only in
+     the topbar's History group. The footer used to carry the pair. */
+  it("renders no undo/redo controls", () => {
     render(
       <CanvasFooterToolbar
         overlays={overlays}
@@ -52,52 +52,11 @@ describe("CanvasFooterToolbar — edit + viewport group", () => {
         onZoomChange={vi.fn()}
         device="desktop"
         onDeviceChange={vi.fn()}
-        canUndo
-        canRedo
-        onUndo={vi.fn()}
-        onRedo={vi.fn()}
       />,
     );
-    expect(screen.getByRole("button", { name: "Undo" })).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Redo" })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: /undo/i })).toBeNull();
+    expect(screen.queryByRole("button", { name: /redo/i })).toBeNull();
     // Board 5936:44788: breakpoints moved into View ▸ Breakpoint — no W/D/T/M here.
-    expect(screen.queryByRole("group", { name: "Device breakpoint" })).toBeNull();
-  });
-
-  it("Undo/Redo fire their callbacks; disabled state respects canUndo/canRedo", () => {
-    const onUndo = vi.fn();
-    const onRedo = vi.fn();
-    render(
-      <CanvasFooterToolbar
-        overlays={overlays}
-        zoom={100}
-        onOverlayChange={vi.fn()}
-        onZoomChange={vi.fn()}
-        canUndo={false}
-        canRedo
-        onUndo={onUndo}
-        onRedo={onRedo}
-      />,
-    );
-    const undo = screen.getByRole("button", { name: "Undo" }) as HTMLButtonElement;
-    const redo = screen.getByRole("button", { name: "Redo" }) as HTMLButtonElement;
-    expect(undo.disabled).toBe(true); // canUndo=false
-    expect(redo.disabled).toBe(false);
-    fireEvent.click(redo);
-    expect(onRedo).toHaveBeenCalledTimes(1);
-  });
-
-  it("hides the edit group entirely when no edit controls are wired", () => {
-    render(
-      <CanvasFooterToolbar
-        overlays={overlays}
-        zoom={100}
-        onOverlayChange={vi.fn()}
-        onZoomChange={vi.fn()}
-      />,
-    );
-    expect(screen.queryByRole("button", { name: "Undo" })).toBeNull();
-    expect(screen.queryByRole("button", { name: "Redo" })).toBeNull();
     expect(screen.queryByRole("group", { name: "Device breakpoint" })).toBeNull();
     // the View menu still renders — the toolbar itself is intact
     expect(screen.getByRole("button", { name: "View" })).toBeTruthy();

@@ -63,6 +63,7 @@ import { ToastProvider, useToast } from "@/editor/chrome-ui";
 import { ContentTab } from "@/editor/sidebar/tabs/content/ContentTab";
 import { CMSCollectionSetupModal } from "@/editor/shell/modals/CMSCollectionSetupModal";
 import { LayersTab } from "@/editor/sidebar/tabs/layers/LayersTab";
+import { InspectorHeader } from "@/editor/inspector/components/InspectorHeader";
 import { Composer } from "@/engine/Composer";
 import { LayersLoadError, LayersNoResults } from "@/editor/panels/layers/components/LayersStateBlocks";
 import { Row as InsertRow } from "@/editor/sidebar/tabs/build/components/GroupSection";
@@ -104,12 +105,17 @@ import {
 } from "@/editor/sidebar/tabs/templates/TemplatesTabModals";
 import type { UsePublishJobResult } from "@/editor/shell/hooks/usePublishJob";
 import type { PageItem } from "@/editor/sidebar/tabs/pages/types";
-import { PageTabBar } from "@/editor/shell/PageTabBar";
+import { PageSwitcher } from "@/editor/shell/PageSwitcher";
+import { LayoutShell } from "@/editor/rail/LayoutShell";
+import { PublishTray } from "@/editor/shell/PublishTray";
+import { deriveLifecycleState } from "@/editor/shell/lifecycle";
 import { NotificationPanel } from "@/editor/shell/NotificationPanel";
 import { PublishConfirmModal } from "@/editor/shell/modals/PublishConfirmModal";
 import { PageContextMenu } from "@/editor/sidebar/tabs/pages/components/PageContextMenu";
 import { PageSettingsDrawer } from "@/editor/sidebar/tabs/pages/page-settings/PageSettingsDrawer";
-import { Topbar } from "@/editor/chrome-ui";
+import { Topbar, SiteMenuIcon, IconButton, BreakpointSwitcher } from "@/editor/chrome-ui";
+import { RecordsTable } from "@/editor/cms/RecordsTable";
+import type { CMSCollection, CMSContentItem } from "@/shared/types/cms";
 import { SmartGuidesOverlay } from "@/editor/canvas/overlays";
 import type { SnapLine } from "@/editor/canvas/hooks";
 import { DropFeedbackOverlay } from "@/editor/canvas/overlays";
@@ -127,7 +133,7 @@ import {
   FormsScreen,
   LocalizationScreen,
 } from "@/editor/sidebar/tabs/settings/screens";
-import type { PageData } from "@/shared/types";
+import type { PageSummary } from "@/shared/types";
 import { ReviewTab } from "@/editor/sidebar/tabs/review/ReviewTab";
 import { PublishGateModal, type PublishGateReason } from "@/editor/shell/modals/PublishGateModal";
 import { StaleApprovalModal } from "@/editor/shell/modals/StaleApprovalModal";
@@ -1355,39 +1361,54 @@ const reviewHost = (name: string, children: React.ReactNode) => (
 );
 
 /**
- * Page-tab-bar fixture (board 435:2348).
- *
- * PageTabBar returns null without a composer — the whole bar IS the page list —
- * so a stub answers the two reads it makes and the two events it subscribes to.
- * The dirty dot is deliberately absent: `useDirtyPages` keeps its state in a
- * per-composer store fed by real engine events, and faking one would measure a
- * store this fixture wrote rather than the one the editor keeps.
+ * Page switcher fixture (2L9 Shell/BottomBar 497:99485 + Shell/PageSwitcherMenu
+ * 558:4419): five static pages, one collection template, Home active and
+ * dirty. `?open=1` opens the menu. Rendered in the shell's bottom band
+ * (LayoutShell's footer slot) at the bottom of the viewport, where the menu
+ * opens upward.
  */
-const TAB_PAGE = (id: string, name: string, over: Partial<PageData> = {}): PageData =>
-  ({ id, name, slug: name.toLowerCase(), root: { id: `r-${id}`, type: "container" }, ...over }) as PageData;
+const SWITCHER_PAGE = (id: string, name: string, slug: string, over: Partial<PageSummary> = {}): PageSummary => ({
+  id,
+  name,
+  slug,
+  kind: "static",
+  isHome: false,
+  dirty: false,
+  depth: 0,
+  ...over,
+});
 
-const TAB_PAGES: PageData[] = [
-  TAB_PAGE("home", "Home", { isHome: true }),
-  TAB_PAGE("about", "About"),
-  TAB_PAGE("pricing", "Pricing"),
+const SWITCHER_PAGES: PageSummary[] = [
+  SWITCHER_PAGE("home", "Home", "/", { isHome: true, dirty: true }),
+  SWITCHER_PAGE("about", "About", "/about"),
+  SWITCHER_PAGE("work", "Work", "/work"),
+  SWITCHER_PAGE("contact", "Contact", "/contact"),
+  SWITCHER_PAGE("legal", "Legal", "/legal"),
+  SWITCHER_PAGE("blog-post", "Blog post template", "/blog/:slug", {
+    kind: "template",
+    collectionId: "c-blog",
+    collectionName: "Blog post",
+  }),
 ];
 
-function tabBarStub() {
-  return {
-    on: () => {},
-    off: () => {},
-    emit: () => {},
-    elements: {
-      getAllPages: () => TAB_PAGES,
-      getActivePage: () => TAB_PAGES[0],
-      setActivePage: () => {},
-      createPage: () => {},
-      updatePage: () => {},
-      duplicatePage: () => true,
-      deletePage: () => {},
-      setHomePage: () => {},
-    },
-  } as unknown as Composer;
+function PageSwitcherProbe() {
+  const [open, setOpen] = React.useState(() => new URLSearchParams(location.search).get("open") === "1");
+  const [active, setActive] = React.useState("home");
+  return (
+    <div className="tw:fixed tw:inset-x-0 tw:bottom-0">
+      <LayoutShell.Footer>
+        <PageSwitcher
+          pages={SWITCHER_PAGES}
+          activePageId={active}
+          open={open}
+          onOpenChange={setOpen}
+          onSelect={setActive}
+          onManagePages={() => {}}
+          onAddPage={() => {}}
+        />
+      </LayoutShell.Footer>
+    </div>
+  );
 }
 
 const APPLY_STEPS = [
@@ -1870,6 +1891,99 @@ function ContentPanelHost({ probe, composer }: { probe: string; composer: Compos
   );
 }
 
+const CMS_STATUS_COLLECTION: CMSCollection = {
+  id: "probe-blog",
+  name: "Blog",
+  slug: "blog",
+  displayField: "title",
+  fields: [{ id: "title", slug: "title", name: "Title", type: "text", order: 0 }],
+  createdAt: "2026-10-01T00:00:00.000Z",
+  updatedAt: "2026-10-01T00:00:00.000Z",
+};
+/* Stamped at render so the Updated column reads the same relative time on
+   every run; the changed row's publish stamp sits a minute earlier. */
+const CMS_PROBE_NOW = Date.now();
+const cmsProbeRecord = (id: string, title: string, extra: Partial<CMSContentItem>): CMSContentItem => ({
+  id,
+  collectionId: "probe-blog",
+  data: { title },
+  status: "draft",
+  createdAt: new Date(CMS_PROBE_NOW).toISOString(),
+  updatedAt: new Date(CMS_PROBE_NOW).toISOString(),
+  ...extra,
+});
+const CMS_STATUS_RECORDS: CMSContentItem[] = [
+  cmsProbeRecord("r1", "A clearer point of view", {
+    status: "published",
+    publishedAt: new Date(CMS_PROBE_NOW - 60_000).toISOString(),
+  }),
+  cmsProbeRecord("r2", "How we design for trust", { status: "draft" }),
+  cmsProbeRecord("r3", "A studio built around people", {
+    status: "published",
+    publishedAt: new Date(CMS_PROBE_NOW).toISOString(),
+  }),
+];
+
+/* ── Publish tray (design-2l9 Task 1.7) ─────────────────────────────────── */
+const TRAY_LIFE = {
+  reviewState: "none" as const,
+  reviewsEnabled: false,
+  editsRequireApproval: false,
+  isPublished: true,
+  hasUnpublishedChanges: true,
+  isViewer: false,
+  publishEnabled: true,
+  offline: false,
+  errorCount: 0,
+};
+
+const trayComposer = {
+  on: () => {},
+  off: () => {},
+  emit: () => {},
+  getState: () => ({ zoom: 100 }),
+  setZoom: () => {},
+  getProjectMetadata: () => ({ name: "Fieldwork Studio" }),
+  history: { getHistoryStack: () => [] },
+  elements: { getAllPages: () => [], getElement: () => null },
+  selection: { select: () => {} },
+} as unknown as React.ComponentProps<typeof PublishTray>["composer"];
+
+function publishTrayFrame(
+  probe: string,
+  o: { nextMove: ReturnType<typeof deriveLifecycleState>; issues?: Issue[]; job?: Partial<UsePublishJobResult> },
+): React.ReactElement {
+  const job: UsePublishJobResult = {
+    uiState: "idle",
+    jobId: null,
+    deploymentId: null,
+    progress: 0,
+    publishedUrl: "https://fieldwork.studio",
+    error: null,
+    steps: null,
+    blockedReason: null,
+    publish: async () => {},
+    cancel: async () => {},
+    track: () => {},
+    reset: () => {},
+    lastPublishedAt: null,
+    hasUnpublishedChanges: true,
+    dismissBlock: () => {},
+    unpublished: () => {},
+    pollLost: false,
+    ...o.job,
+  };
+  return (
+    <ToastProvider>
+      <div data-probe={probe} className="tw:fixed tw:inset-0 tw:bg-[var(--bk-bg-app)]">
+        <div className="tw:absolute tw:right-0 tw:top-14 tw:bottom-8 tw:w-[var(--bk-size-task-host)]">
+          <PublishTray composer={trayComposer} publishJob={job} nextMove={o.nextMove} onRequestPublish={() => {}} issues={o.issues ?? []} />
+        </div>
+      </div>
+    </ToastProvider>
+  );
+}
+
 const CASES: Record<string, () => React.ReactElement> = {
   // ── AI run states (boards 170:29 / 170:41 / 171:67) ─────────────────────
   "ai-thinking": () => aiHost("ai-thinking", agentPlan({ phase: "planning", steps: [] })),
@@ -1942,9 +2056,20 @@ const CASES: Record<string, () => React.ReactElement> = {
         onDeviceChange={() => {}}
         onOverlayChange={() => {}}
         onZoomChange={() => {}}
-        onUndo={() => {}}
-        onRedo={() => {}}
       />
+    </div>
+  ),
+  /* 2L9 F1.07 (302:7348): the topbar breakpoint control, icon-only, Wide
+     enabled, Tablet chosen. */
+  "breakpoint-switcher": () => (
+    <div data-probe="breakpoint-switcher" style={{ padding: 24 }}>
+      <BreakpointSwitcher value="tablet" onChange={() => {}} includeWide />
+    </div>
+  ),
+  /* 2L9 board 165:2: the records table's Status column, one row per tone. */
+  "cms-records-status": () => (
+    <div data-probe="cms-records-status" style={{ display: "flex", height: 240, width: 900 }}>
+      <RecordsTable collection={CMS_STATUS_COLLECTION} records={CMS_STATUS_RECORDS} query="" onOpenRecord={() => {}} />
     </div>
   ),
   "canvas-footer-toolbar": () => (
@@ -1954,8 +2079,6 @@ const CASES: Record<string, () => React.ReactElement> = {
         zoom={100}
         onOverlayChange={() => {}}
         onZoomChange={() => {}}
-        onUndo={() => {}}
-        onRedo={() => {}}
       />
     </div>
   ),
@@ -2114,6 +2237,29 @@ const CASES: Record<string, () => React.ReactElement> = {
       <ContentTab composer={null} hydrationStatus="error" onClose={() => {}} />
     </div>
   ),
+  // ── Shell/InspectorHeader (2L9 497:339496, plan Task 1.4) ────────────────
+  // The real header on the real layers composer, in the inspector's 300 column:
+  // "Text"-style target row + "Editing · Desktop · Default state". Home is not
+  // a collection template, so this is the 84 variant (no element path).
+  "inspector-header": () => {
+    const c = layersComposer();
+    const el = c.elements.getElement("lx-heading")!;
+    c.selection.select(el);
+    return (
+      <ToastProvider>
+        <div data-probe="inspector-header" className="tw:w-[300px] tw:bg-white">
+          <InspectorHeader
+            composer={c}
+            element={{ id: el.getId(), type: el.getType() }}
+            selectedIds={[el.getId()]}
+            breakpointLabel="Desktop"
+            state="normal"
+            onStateChange={() => {}}
+          />
+        </div>
+      </ToastProvider>
+    );
+  },
   // ── Layers states (boards 775:4130 / 781:4217 / 782:4260) ────────────────
   // Loading is the REAL path (composer null = editor boot), so the case mounts
   // the whole tab. Error/no-results need a throwing tree or a live search —
@@ -2678,12 +2824,10 @@ const CASES: Record<string, () => React.ReactElement> = {
       <CreatePageErrorModal onCancel={() => {}} onRetry={() => {}} />
     </div>
   ),
-  // ── Page tab bar (board 435:2348) ────────────────────────────────────────
-  "pages-page-tab-bar": () => (
-    <div data-probe="pages-page-tab-bar">
-      <ToastProvider>
-        <PageTabBar composer={tabBarStub()} />
-      </ToastProvider>
+  // ── Page switcher (2L9 Shell/BottomBar 497:99485, menu 558:4419) ──────────
+  "page-switcher": () => (
+    <div data-probe="page-switcher">
+      <PageSwitcherProbe />
     </div>
   ),
   // ── Publish states (boards 784:4250 / 781:4489) ──────────────────────────
@@ -2819,6 +2963,61 @@ const CASES: Record<string, () => React.ReactElement> = {
         );
       },
     ]),
+  ),
+
+  /* design-2l9 board 497:99433 (Task 1.2): the whole topbar at the page's
+     width, carrying the longest review label and a site name long enough to
+     have to give way. Pinned at 1024 / 1280 / 1440; at 1024 the review
+     control and ⋯ must sit inside the bar with nothing wrapped. */
+  /* design-2l9 Task 1.7 — the publish tray, docked at the right edge of a
+     1440×900 frame the way board 499:2656 draws it (Task host / Publish,
+     360 × 812 under the 56 topbar). States: one blocking issue (B8-PB01),
+     a landed publish (B8-PB09) and a failed deploy with its ids (B8-PB10). */
+  "publish-tray-blocking": () => publishTrayFrame("publish-tray-blocking", {
+    nextMove: deriveLifecycleState({ ...TRAY_LIFE, errorCount: 1 }),
+    issues: [
+      { id: "i1", type: "error", message: "Collection list “Latest posts” has no source", elementId: "el-1" },
+      { id: "i2", type: "warning", message: "2 images have no alt text", elementId: "el-2" },
+    ],
+  }),
+  "publish-tray-success": () => publishTrayFrame("publish-tray-success", {
+    nextMove: null,
+    job: { uiState: "published", jobId: "cmv8job000001" },
+  }),
+  "publish-tray-failed": () => publishTrayFrame("publish-tray-failed", {
+    nextMove: deriveLifecycleState(TRAY_LIFE),
+    job: {
+      uiState: "failed",
+      jobId: "cmv8job000002",
+      deploymentId: "dpl_7Hq2mXc9",
+      error: "Vercel couldn't finish the deployment (timeout).",
+    },
+  }),
+
+  "topbar-shell": () => (
+    <div data-probe="topbar-shell" style={{ width: "100vw" }}>
+      <Topbar
+        siteName="Fieldwork Studio · Northgate Architecture Collective"
+        pageName="Home"
+        onOpenPages={() => {}}
+        onPageCrumb={() => {}}
+        onExit={() => {}}
+        history={{ canUndo: true, canRedo: false, onUndo: () => {}, onRedo: () => {}, undoChord: "⌘Z", redoChord: "⇧⌘Z" }}
+        save="saved"
+        savedAt={Date.now() - 2 * 60_000}
+        onSaveClick={() => {}}
+        review={{ label: "In review · 12 open", tone: "info", title: "Sent to Sara — waiting on approval", onClick: () => {} }}
+        tools={{ onPreview: () => {}, onToggleComments: () => {}, commentsPressed: false }}
+        unreadCount={2}
+        onOpenNotifications={() => {}}
+        onPublish={() => {}}
+        menu={
+          <IconButton label="Site menu" data-testid="topbar-site-menu">
+            <SiteMenuIcon />
+          </IconButton>
+        }
+      />
+    </div>
   ),
 
   "notifications-jump-target-deleted": () => {
