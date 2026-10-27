@@ -2892,7 +2892,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-fixed",
-   "verifiedNote": "probe-compared 2026-10-27 (case layers-collapsed-selection: the real LayersTab on a real Composer, heading selected, branches folded; board shots/152-78614.png): rows 32 tall (Compact rows now OFF by default, as 147:76329 draws), chevron centred at 28, name at 68 (board 69), chevron · glyph · name 8 apart; footer a gray-100 band, text 12 in: '8 layers · 1 selected inside Section' (board '… inside Hero'). Not drawn: the board's ⋯ on the page row — no page action is defined for Layers.",
+   "verifiedNote": "probe-compared 2026-10-27 (case layers-collapsed-selection: the real LayersTab on a real Composer, heading selected, branches folded; board shots/152-78614.png): rows 32 tall (Compact rows now OFF by default, as 147:76329 draws), chevron centred at 28, name at 68 (board 69), chevron · glyph · name 8 apart; footer a gray-100 band, text 12 in: '8 layers · 1 selected inside Section' (board '… inside Hero'). Not drawn: the board's ⋯ on the page row — no page action is defined for Layers. Decision (coordinator, round 4): the 32-tall default STANDS under the owner's 2026-10-26 ruling that the board wins on visuals — it supersedes the 2026-08-28 compact founder call.",
    "inheritsFrom": "147:75914",
    "tier": "P1"
   },

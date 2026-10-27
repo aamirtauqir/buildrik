@@ -153,35 +153,3 @@ export const CONTENT_TYPE_PROMPTS: Record<ContentType, (topic: string) => string
     "Include their role, expertise, background, and a personal touch (hobby or fun fact). " +
     "Keep it professional yet personable. 2-3 sentences.",
 };
-
-/**
- * Builds an enhanced prompt by combining content type instructions,
- * tone presets, and the user's topic.
- *
- * Optimized to reduce token usage while maintaining quality.
- */
-export function buildEnhancedPrompt(
-  topic: string,
-  contentType: ContentType,
-  tone: ToneType
-): string {
-  const contentPrompt = CONTENT_TYPE_PROMPTS[contentType]?.(topic) || topic;
-  const toneInstruction = TONE_INSTRUCTIONS[tone];
-
-  // Compact format to reduce tokens
-  return toneInstruction ? `${contentPrompt}\n\nTone: ${toneInstruction}` : contentPrompt;
-}
-
-/**
- * Type guard to check if a string is a valid ContentType
- */
-export function isValidContentType(type: string): type is ContentType {
-  return type in CONTENT_TYPE_PROMPTS;
-}
-
-/**
- * Type guard to check if a string is a valid ToneType
- */
-export function isValidTone(tone: string): tone is ToneType {
-  return tone in TONE_INSTRUCTIONS;
-}

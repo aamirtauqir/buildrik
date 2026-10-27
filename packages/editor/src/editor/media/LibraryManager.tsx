@@ -46,7 +46,6 @@ import { AssetDetailsPanel } from "./components/AssetDetailsPanel";
 import { AssetGrid } from "./components/AssetGrid";
 import { formatBytes } from "@shared/utils/helpers/number";
 import { formatQuotaSize } from "@/editor/sidebar/tabs/media/components/StorageQuotaBar";
-import { regenerateAltText } from "@/services/AltTextService";
 import { createAssetVersion } from "@/services/MediaVersionService";
 import "./LibraryManager.css";
 
@@ -984,8 +983,6 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
               generatedMetadata: undefined,
             });
           }}
-          // Regenerate is an explicit ask to REPLACE the current text.
-          onRegenerateAltText={(key) => regenerateAltText(composer.media, key, key)}
         />
       </div>
       {/* ═══ STATUS BAR ═══ */}
