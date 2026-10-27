@@ -288,8 +288,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-A wave 2 built, not compared: columns 'Page and URL · SEO score · Visibility' (URL under the name, 'Hidden' for hidden pages), note 'Search names and URLs. Scores match Page settings → SEO.', the Pages search filters names and URLs. The score is the SEO tab's own calculateSeoScore, printed where the page has its own SEO title, '—' otherwise (the old separate rollup disagreed with the SEO tab). Board draws the view 720 wide; the panel's width toggle is unchanged (Open full listings kept).",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case pages-listings, real PagesTab on a real Composer at 720 wide, board shots/63-21262.png): 40-tall header 13/600 ink, columns at x476 SEO score / x556 Visibility / ⋯ (board same), 52-tall rows with Home roof / page glyph, name 13 over URL 12 sans, score/visibility 13px, row ⋯ opens the page menu, note under the last row, Pages footer (+ Add page / From template / New folder) kept under the listing. Dead 'Open full listings ›' removed (the shell's toggle is a no-op). Open: the drawer widening to 720 over the canvas is the shell's (REQUESTS A-18); vertical offset of 9px is the shared PanelFrame header (44 vs board 56).",
    "tier": "P1"
   },
   {
@@ -1374,8 +1374,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-A S6 built, not compared: 'Move {Page} to…', 'Choose where to organize {Page}. Folders are personal; only you see them. The page URL {url} stays unchanged.', folders + 'Top level (no folder)', 'Move to {Folder}'.",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case pages-move-one, board shots/127-38098.png): dialog 480×300 (board 480×302) via Modal width sm; body 13px two lines; choices radio + name only (folder glyph removed), 32 tall on a 40 pitch, picked one a blue-50 pill fitting its label, unchecked radios outlined; Cancel / 'Move to Client projects' 32 tall, right. Primary 175 wide vs board ~208 (label-driven).",
    "tier": "P1"
   },
   {
@@ -1591,7 +1591,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-A S6 built: Move up ⌥↑ / Move down ⌥↓ in the menu and as row chords (PageRow, top-level rows only).",
+   "verifiedNote": "L-A S6 built: Move up ⌥↑ / Move down ⌥↓ in the row menu and as row chords. Board's separate 'order commands' menu (title · Move up · Move down · Close menu) has no drawn entry point — REQUESTS A-17 (owner).",
    "tier": "P1"
   },
   {

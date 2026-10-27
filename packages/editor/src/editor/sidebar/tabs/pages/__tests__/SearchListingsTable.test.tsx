@@ -3,7 +3,7 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { SearchListingsTable, listingScore } from "../components/SearchListingsTable";
 import { calculateSeoScore } from "../utils/seoScore";
@@ -17,7 +17,7 @@ const pages: PageItem[] = [
 
 describe("SearchListingsTable", () => {
   it("draws the board's columns, the URL under the name, and the note", () => {
-    render(<SearchListingsTable pages={pages} onEditPage={vi.fn()} />);
+    render(<SearchListingsTable pages={pages} onEditPage={vi.fn()} onRowMenu={vi.fn()} />);
     expect(screen.getByText("Page and URL")).toBeInTheDocument();
     expect(screen.getByText("SEO score")).toBeInTheDocument();
     expect(screen.getByText("Visibility")).toBeInTheDocument();
@@ -28,7 +28,7 @@ describe("SearchListingsTable", () => {
   });
 
   it("prints the SEO tab's own score where the page has its own title, — otherwise", () => {
-    render(<SearchListingsTable pages={pages} onEditPage={vi.fn()} />);
+    render(<SearchListingsTable pages={pages} onEditPage={vi.fn()} onRowMenu={vi.fn()} />);
     const expected = calculateSeoScore({
       title: "About our studio — Fieldwork",
       desc: "Independent design, thoughtful work and lasting partnerships.",
@@ -41,8 +41,18 @@ describe("SearchListingsTable", () => {
   });
 
   it("filters by name and URL", () => {
-    render(<SearchListingsTable pages={pages} onEditPage={vi.fn()} search="/cont" />);
+    render(<SearchListingsTable pages={pages} onEditPage={vi.fn()} onRowMenu={vi.fn()} search="/cont" />);
     expect(screen.queryByTestId("listing-row-about")).toBeNull();
     expect(screen.getByTestId("listing-row-contact")).toBeInTheDocument();
+  });
+
+  // re-baseline: Listings — board 63:21262 gives every row its ⋯, the same page menu as the Pages view.
+  it("opens the page menu from a row's ⋯ without opening its settings", () => {
+    const onEditPage = vi.fn();
+    const onRowMenu = vi.fn();
+    render(<SearchListingsTable pages={pages} onEditPage={onEditPage} onRowMenu={onRowMenu} />);
+    fireEvent.click(screen.getByTestId("listing-menu-about"));
+    expect(onRowMenu).toHaveBeenCalledWith("about", expect.any(Number), expect.any(Number));
+    expect(onEditPage).not.toHaveBeenCalled();
   });
 });
