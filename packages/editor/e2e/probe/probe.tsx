@@ -3501,6 +3501,30 @@ const CASES: Record<string, () => React.ReactElement> = {
     ]),
   ),
 
+  /* design-2l9 board 63:18189 — page settings whose save is refused. The
+     composer stub refuses the one write the save makes; the recipe edits the
+     title and presses Save. */
+  "pages-settings-save-failed": () => (
+    <div data-probe="pages-settings-save-failed" style={{ width: 1440, height: 900, background: "var(--bk-gray-900)" }}>
+      <ToastProvider>
+        <PageSettingsDrawer
+          page={PAGE_SETTINGS_FIXTURE}
+          allPages={[PAGE_SETTINGS_FIXTURE, ...PAGES_FIXTURE.slice(1)]}
+          composer={{
+            on: () => {},
+            off: () => {},
+            emit: () => {},
+            elements: {
+              updatePage: () => Promise.reject(new Error("refused")),
+              getAllPages: () => [],
+            },
+          } as never}
+          onClose={() => {}}
+        />
+      </ToastProvider>
+    </div>
+  ),
+
   /* Board 815:4608 — the four smart-guide scenarios. A guide only exists
      mid-drag, and `calculateSnapping` reads sibling geometry out of a real
      canvas DOM, so driving it would measure the fixture's rectangles rather

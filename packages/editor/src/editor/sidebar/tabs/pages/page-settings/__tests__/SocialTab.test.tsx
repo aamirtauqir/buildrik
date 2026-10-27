@@ -89,39 +89,19 @@ describe("SocialTab OG fields", () => {
   it("shows OG title/description char counters", () => {
     const s = makeSettings({ ogTitle: "abc", ogDesc: "de" });
     render(<SocialTab s={s} />);
-    expect(screen.getByText("3/60")).toBeTruthy();
-    expect(screen.getByText("2/160")).toBeTruthy();
+    /* design-2l9 63:16507: the title count rides in its label. */
+    expect(screen.getByTestId("social-label-title")).toHaveTextContent("Social title · 3 / 60");
+    expect(screen.getByTestId("social-count-desc")).toHaveTextContent("2 / 160");
   });
 });
 
-describe("SocialTab preview card fallbacks", () => {
-  /* og:title ships as `ogTitle || <the page's resolved title>` (SEOInjector),
-     so with no OG title the card shows the effective title — which, for a
-     page with no title of its own, is the inherited site default (D1), not
-     page.name. */
-  it("falls back to the effective (shipped) title when ogTitle is empty", () => {
-    const own = makeSettings({ ogTitle: "", seoTitle: "SEO Fallback Title", effectiveTitle: "SEO Fallback Title" });
-    const { rerender } = render(<SocialTab s={own} />);
-    expect(screen.getByText("SEO Fallback Title")).toBeTruthy();
-
+/* design-2l9 board 63:16507 draws the image preview alone (the share-card
+   title/description/domain mock is gone). Re-baseline: Social tab. */
+describe("SocialTab image preview", () => {
+  it("the title field's placeholder is the title that ships when it is empty", () => {
     const inherited = makeSettings({ ogTitle: "", seoTitle: "", inheritedTitle: "Bella Default Title", effectiveTitle: "Bella Default Title" });
-    rerender(<SocialTab s={inherited} />);
-    expect(screen.getByText("Bella Default Title")).toBeTruthy();
-    expect(screen.queryByText("Landing Page")).toBeNull();
+    render(<SocialTab s={inherited} />);
     expect((document.getElementById("og-title") as HTMLInputElement).placeholder).toBe("Bella Default Title");
-  });
-
-  it("prefers ogTitle over seoTitle in the preview", () => {
-    const s = makeSettings({ ogTitle: "OG Wins", seoTitle: "SEO Loses" });
-    render(<SocialTab s={s} />);
-    expect(screen.getByText("OG Wins")).toBeTruthy();
-    expect(screen.queryByText("SEO Loses")).toBeNull();
-  });
-
-  it("shows the placeholder description prompt when no description is available", () => {
-    const s = makeSettings({ ogDesc: "", seoDesc: "" });
-    render(<SocialTab s={s} />);
-    expect(screen.getByText("Add a description to preview here")).toBeTruthy();
   });
 
   it("renders the OG image in the preview when an image URL is set", () => {
@@ -137,12 +117,6 @@ describe("SocialTab preview card fallbacks", () => {
     const s = makeSettings({ ogImageUrl: null });
     render(<SocialTab s={s} />);
     expect(screen.getByText("1200 × 630")).toBeTruthy();
-  });
-
-  it("uses the custom domain in the preview when provided", () => {
-    const s = makeSettings({ domain: "acme.com" });
-    render(<SocialTab s={s} />);
-    expect(screen.getByText("acme.com")).toBeTruthy();
   });
 
   /* design-2l9 board 63:16507. Re-baseline: Social tab copy. */

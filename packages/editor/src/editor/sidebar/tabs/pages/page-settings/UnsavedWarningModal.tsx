@@ -29,6 +29,7 @@ import { Button, ModalBody, ModalContent as BaseModalContent, ModalRoot, ModalTi
 // runtime. The cast bypasses the narrowed type without changing behavior.
 type ModalContentEscapeProps = {
   size?: "question" | "lg" | "xl";
+  className?: string;
   onOpenAutoFocus?: (e: { preventDefault: () => void }) => void;
   "data-testid"?: string;
   children: React.ReactNode;
@@ -47,7 +48,7 @@ interface Props {
   onSaveAndLeave: () => void;
 }
 
-const BTN = "tw:min-h-0 tw:rounded-md tw:px-3 tw:py-[7px] tw:text-[11px] tw:font-medium";
+const BTN = "tw:h-8 tw:min-h-0 tw:rounded-md tw:px-3.5 tw:text-[13px] tw:font-medium";
 
 export const UnsavedWarningModal: React.FC<Props> = ({
   isOpen,
@@ -67,6 +68,9 @@ export const UnsavedWarningModal: React.FC<Props> = ({
            720, so a two-line confirm was wider than the Brand review modal
            that lists every staged token change. */
         size="question"
+        /* design-2l9 63:18758: a 480-wide card. Important: the size class
+           is a plain join, not a merge. */
+        className="tw:!w-[480px]"
         data-testid="pages-unsaved-modal"
         onOpenAutoFocus={(e) => {
           // Focus the SAFE action — the destructive one should never be one
@@ -78,7 +82,7 @@ export const UnsavedWarningModal: React.FC<Props> = ({
         }}
       >
         <ModalBody>
-          <div className="tw:flex tw:flex-col tw:gap-2.5">
+          <div className="tw:flex tw:flex-col tw:gap-3 tw:px-2 tw:pt-4 tw:pb-2">
             {/* `inset={false}`: this title already sits inside ModalBody's own
                 16px inset, and ModalTitle's default adds pl-5/pr-12/pt-4 — the
                 exact double-inset its `inset` prop exists to prevent. */}
@@ -89,17 +93,17 @@ export const UnsavedWarningModal: React.FC<Props> = ({
                   two classes, one property, resolved by stylesheet order. The
                   `tw:text-[13px]` this file passed never applied and the
                   heading measured 14. Same defect found on ReviewModal today. */}
-              <span data-testid="pages-unsaved-title" className="tw:text-[13px] tw:leading-[normal]">
+              <span data-testid="pages-unsaved-title" className="tw:text-[length:var(--bk-text-16)] tw:leading-[normal]">
                 Leave without saving?
               </span>
             </ModalTitle>
 
             {/* `leading-[normal]` — 1171:4822. */}
-            <p data-testid="pages-unsaved-body" className="tw:m-0 tw:text-[11px] tw:leading-[normal] tw:text-[var(--bk-ink-soft)]">
+            <p data-testid="pages-unsaved-body" className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-soft)]">
               {`You have unsaved page settings for ${pageName}. Save or discard them to return to Pages, or keep editing.${stays ? ` ${stays} stays open.` : ""}`}
             </p>
 
-            <div className="tw:flex tw:justify-end tw:gap-2" data-testid="pages-unsaved-foot">
+            <div className="tw:flex tw:justify-start tw:gap-2" data-testid="pages-unsaved-foot">
               <Button
                 ref={keepRef}
                 className={`${BTN} tw:border-0 tw:bg-[var(--bk-accent)] tw:text-[var(--bk-accent-on)] tw:enabled:hover:bg-[var(--bk-accent-hover)]`}
@@ -110,7 +114,7 @@ export const UnsavedWarningModal: React.FC<Props> = ({
                 Keep editing
               </Button>
               <Button
-                className={`${BTN} tw:border tw:border-[var(--bk-error)] tw:bg-[var(--bk-bg-card)] tw:text-[var(--bk-error-text,var(--bk-error))] tw:enabled:hover:bg-[var(--bk-error-tint)]`}
+                className={`${BTN} tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-card)] tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-gray-100)]`}
                 onClick={onDiscard}
                 data-testid="pages-unsaved-discard"
                 aria-label="Discard the unsaved changes and close"

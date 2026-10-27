@@ -201,7 +201,7 @@ export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, onOpe
       <div className={FIELD} data-testid="seo-field-title">
         <div className={FIELD_HEAD}>
           <Label htmlFor="seo-title" className={BK_LABEL_CLASS} data-testid="seo-label-title">
-            {`SEO title · ${countedTitle.length} / 60 · ${s.seoTitle ? "Page override" : "Site default"}`}
+            {`SEO title · ${countedTitle.length} / 60 · ${s.seoTitle ? (s.isDirty ? "Unsaved override" : "Page override") : "Site default"}`}
           </Label>
           <Button
             color="light"
@@ -392,6 +392,12 @@ export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, onOpe
         >
           Site SEO defaults
         </Button>
+      )}
+      {/* design-2l9 63:18189: a refused save is said here, in the form. */}
+      {s.saveState === "error" && (
+        <p role="alert" className={`tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-error-text)] ${UI}`} data-testid="pg-drawer-save-error">
+          Couldn’t save page settings. Your changes are still here.
+        </p>
       )}
       <Button
         variant="link"

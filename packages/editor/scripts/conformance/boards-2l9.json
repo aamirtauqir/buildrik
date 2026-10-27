@@ -199,8 +199,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-A wave 2 built, not compared: explainer 'Empty social title uses SEO title; empty description uses the SEO description.' (true: SEOInjector ogTitle || title), labels Social title / Social description / Social image URL, helper 'Recommended: 1200 × 630. Clear the URL to remove the image.'. Container is the drawer (owner decision).",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (page-settings dialog, Social tab, board shots/63-16507.png): explainer line; 'Social title · n / 60' + input; Social description textarea with n / 160 under it; 'Social image' 240×124 gray preview (1200 × 630); 'Social image URL' + rule. OG share-card mock removed.",
    "tier": "P1"
   },
   {
@@ -210,8 +210,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-A wave 2 built, not compared: 'Publish visibility', 'Live means this page is included on the next publish.', 'Search indexing: Indexed · Change in SEO' (readout — the switch lives once, in SEO), Follow links switch, 'Head code' with 'Changes apply on the next publish.' / 'Head code affects this page only and is sanitized before save.'. The board's '· Pro' tag is not drawn: head code is not plan-gated in code.",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (Advanced tab, board shots/63-17061.png): Publish visibility select Live/Hidden + helper; 'Search indexing: Indexed' + 'Change in SEO' link (switches to SEO tab); Follow links select; Head code textarea + two rules. Board's '· Pro' on Head code not drawn: code:head-code-not-gated.",
    "tier": "P1"
   },
   {
@@ -232,8 +232,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-A S9 built, not compared: inline 'Couldn’t save page settings. Your changes are still here.', primary 'Retry save', subtitle '{Page} · Unsaved settings changes · {Active} stays open' (the failure toast is gone).",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case pages-settings-save-failed, board shots/63-18189.png): red 'Couldn’t save page settings. Your changes are still here.' inline between Site SEO defaults and SEO score details on the SEO tab (band kept for other tabs); title label reads 'Unsaved override' while dirty; footer Retry save. Board's breadcrumb suffix '· Home stays open' is sample context, not drawn.",
    "tier": "P1"
   },
   {
@@ -243,8 +243,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-A S9 built, not compared: 'Leave without saving?', 'You have unsaved page settings for {Page}. Save or discard them to return to Pages, or keep editing. {Active} stays open.', Keep editing · Discard changes · Save and leave (saves, then closes). Offline / invalid variants (101:24231, 101:29372) not built.",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (board shots/63-18758.png): leave guard was rendering BEHIND the dialog (drawer z 90/91 vs overlay 50) — drawer+scrim moved to --bk-z-overlay, stacking test added. Guard now 480 wide, 16px scale title (board 15), 13px body, left-aligned 32px buttons, neutral Discard.",
    "tier": "P1"
   },
   {

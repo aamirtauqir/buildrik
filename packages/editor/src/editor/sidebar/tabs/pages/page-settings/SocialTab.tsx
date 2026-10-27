@@ -1,5 +1,9 @@
 /**
- * SocialTab — Open Graph + Twitter sharing preview & fields.
+ * SocialTab — the page's sharing fields, design-2l9 board 63:16507: what an
+ * empty field falls back to, "Social title · n / 60", "Social description"
+ * with its count under it, the "Social image" preview, and "Social image URL"
+ * with its rule. (The full share-card mock that sat on top is gone — the
+ * board draws the image alone.)
  *
  * @license BSD-3-Clause
  */
@@ -12,79 +16,66 @@ interface Props {
   s: UsePageSettingsReturn;
 }
 
-export const SocialTab: React.FC<Props> = ({ s }) => {
-  /* og:title ships as the OG title, else the page's resolved title. */
-  const title = s.ogTitle || s.effectiveTitle;
-  const desc = s.ogDesc || s.seoDesc || "";
-  const domain = s.domain ?? "yoursite.com";
+const FIELD = "tw:flex tw:flex-col tw:gap-1.5";
+const COUNT = "tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-ink-soft)]";
 
-  return (
-    <div className="tw:flex tw:flex-col tw:gap-[14px]">
-      {/* design-2l9 board 63:16507 — what an empty field falls back to
-          (SEOInjector: ogTitle || title, ogDescription || description). */}
-      <p className="tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-soft)]" data-testid="social-explainer">
-        Empty social title uses SEO title; empty description uses the SEO description.
-      </p>
-      {/* OG card preview — prototype .og-card */}
-      <div style={{ maxWidth: 420, background: "var(--bk-bg-card)", border: "1px solid var(--bk-border)", borderRadius: 6, overflow: "hidden" }}>
-        <div style={{ width: "100%", aspectRatio: "1200 / 630", display: "grid", placeItems: "center", background: "var(--bk-bg-subtle)", position: "relative" }} role="img" aria-label="Open Graph image preview">
-          {s.ogImageUrl ? (
-            <img src={s.ogImageUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-          ) : (
-            <span style={{ font: "500 14px var(--bk-font-mono)", color: "var(--bk-ink-muted)", letterSpacing: "0.04em" }}>1200 × 630</span>
-          )}
-        </div>
-        <div className="tw:flex tw:flex-col tw:gap-0.5 tw:px-3 tw:py-[10px]">
-          <div style={{ font: "500 11px var(--bk-font-mono)", color: "var(--bk-ink-muted)" }}>{domain}</div>
-          <div style={{ font: "500 13px var(--bk-font-ui)", color: "var(--bk-ink)" }}>{title}</div>
-          <div style={{ font: "400 12px var(--bk-font-ui)", color: "var(--bk-ink)", lineHeight: 1.4 }}>{desc || "Add a description to preview here"}</div>
-        </div>
-      </div>
-      {/* OG Title */}
-      <div className="tw:flex tw:flex-col tw:gap-1.5" data-testid="social-field-title">
-        <div className="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2">
-          <Label htmlFor="og-title" className={BK_LABEL_CLASS} data-testid="social-label-title">Social title</Label>
-          {/* Board 2838:12126 — 11/16 ink-muted. It had no line-height of its
-              own and inherited the stack's. */}
-          <span data-testid="social-count-title" style={{ font: "500 11px/16px var(--bk-font-mono)", color: "var(--bk-ink-muted)" }}>{s.ogTitle.length}/60</span>
-        </div>
-        <TextInput
-          id="og-title"
-          data-testid="social-input-title"
-          value={s.ogTitle}
-          onChange={(e) => s.setOgTitle(e.target.value)}
-          placeholder={s.effectiveTitle}
-        />
-      </div>
-      {/* OG Description */}
-      <div className="tw:flex tw:flex-col tw:gap-1.5" data-testid="social-field-desc">
-        <div className="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2">
-          <Label htmlFor="og-desc" className={BK_LABEL_CLASS} data-testid="social-label-desc">Social description</Label>
-          <span data-testid="social-count-desc" style={{ font: "500 11px/16px var(--bk-font-mono)", color: "var(--bk-ink-muted)" }}>{s.ogDesc.length}/160</span>
-        </div>
-        <Textarea
-          className="tw:bg-white tw:focus:border-primary-700 tw:focus:ring-primary-700"
-          id="og-desc"
-          value={s.ogDesc}
-          onChange={(e) => s.setOgDesc(e.target.value)}
-          placeholder={s.seoDesc || "Brief summary shown on social"}
-        />
-      </div>
-      {/* OG Image URL */}
-      <div className="tw:flex tw:flex-col tw:gap-1.5" data-testid="social-field-image">
-        <Label htmlFor="og-image" className={BK_LABEL_CLASS} data-testid="social-label-image">Social image URL</Label>
-        <TextInput
-          id="og-image"
-          data-testid="social-input-image"
-          value={s.ogImageUrl ?? ""}
-          onChange={(e) => s.setOgImageUrl(e.target.value || null)}
-          placeholder="https://…"
-          type="url"
-        />
-        <HelperText className={BK_HELPER_CLASS}>Recommended: 1200 × 630. Clear the URL to remove the image.</HelperText>
+export const SocialTab: React.FC<Props> = ({ s }) => (
+  <div className="tw:flex tw:flex-col tw:gap-2.5">
+    {/* SEOInjector: ogTitle || title, ogDescription || description. */}
+    <p className="tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-soft)]" data-testid="social-explainer">
+      Empty social title uses SEO title; empty description uses the SEO description.
+    </p>
+    <div className={FIELD} data-testid="social-field-title">
+      <Label htmlFor="og-title" className={BK_LABEL_CLASS} data-testid="social-label-title">
+        {`Social title · ${s.ogTitle.length} / 60`}
+      </Label>
+      <TextInput
+        id="og-title"
+        data-testid="social-input-title"
+        value={s.ogTitle}
+        onChange={(e) => s.setOgTitle(e.target.value)}
+        placeholder={s.effectiveTitle}
+      />
+    </div>
+    <div className={FIELD} data-testid="social-field-desc">
+      <Label htmlFor="og-desc" className={BK_LABEL_CLASS} data-testid="social-label-desc">Social description</Label>
+      <Textarea
+        id="og-desc"
+        rows={2}
+        value={s.ogDesc}
+        onChange={(e) => s.setOgDesc(e.target.value)}
+        placeholder={s.seoDesc || "Brief summary shown on social"}
+      />
+      <span className={COUNT} data-testid="social-count-desc">{`${s.ogDesc.length} / 160`}</span>
+    </div>
+    <div className={FIELD}>
+      <span className="tw:text-[13px] tw:font-semibold tw:text-[var(--bk-ink)]">Social image</span>
+      <div
+        className="tw:grid tw:h-[124px] tw:w-60 tw:place-items-center tw:overflow-hidden tw:rounded-md tw:bg-[var(--bk-gray-100)]"
+        role="img"
+        aria-label="Social image preview"
+        data-testid="social-image-preview"
+      >
+        {s.ogImageUrl ? (
+          <img src={s.ogImageUrl} alt="" className="tw:block tw:size-full tw:object-cover" />
+        ) : (
+          <span className="tw:text-[length:var(--bk-text-12)] tw:tabular-nums tw:text-[var(--bk-ink-muted)]">1200 × 630</span>
+        )}
       </div>
     </div>
-  );
-};
+    <div className={FIELD} data-testid="social-field-image">
+      <Label htmlFor="og-image" className={BK_LABEL_CLASS} data-testid="social-label-image">Social image URL</Label>
+      <TextInput
+        id="og-image"
+        data-testid="social-input-image"
+        value={s.ogImageUrl ?? ""}
+        onChange={(e) => s.setOgImageUrl(e.target.value || null)}
+        placeholder="https://…"
+        type="url"
+      />
+      <HelperText className={BK_HELPER_CLASS}>Recommended: 1200 × 630. Clear the URL to remove the image.</HelperText>
+    </div>
+  </div>
+);
 
 SocialTab.displayName = "SocialTab";
