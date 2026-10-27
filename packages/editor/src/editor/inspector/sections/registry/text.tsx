@@ -123,9 +123,7 @@ export const TEXT_SECTIONS: Record<string, AnySectionEntry> = {
     shouldRender: (ctx) => shownOnInstanceRoot(ctx, TYPOGRAPHY_KEYS),
     summary: (ctx) => textSummary({ ...renderedValues(ctx.selectedElement.id, ctx.styles, ctx.composer), ...ctx.styles }),
     Component: TypographySection,
-    advancedKey: "text-inside",
-    advancedProps: TYPOGRAPHY_ADVANCED,
     styleKeys: TYPOGRAPHY_KEYS,
-    adaptProps: adaptTypography,
+    adaptProps: (ctx) => ({ ...adaptTypography(ctx), inside: true }),
   }),
 };

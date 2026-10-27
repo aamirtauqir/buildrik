@@ -24,7 +24,14 @@ describe("Typography section", () => {
 
   it("More settings opens the rest", () => {
     const { container } = render(<TypographySection styles={{}} onChange={vi.fn()} isOpen advancedExpanded onAdvancedToggle={vi.fn()} />);
-    expect(labels(container)).toEqual(expect.arrayContaining(["Transform", "Decoration", "Letter", "Word", "Style"]));
+    expect(labels(container)).toEqual(expect.arrayContaining(["Transform", "Decoration", "Letter spacing", "Word spacing", "Font style"]));
+  });
+
+  it("Text inside (247:23404): every row on the face, no More settings, the inheritance note", () => {
+    const { container } = render(<TypographySection styles={{}} onChange={vi.fn()} isOpen inside onAdvancedToggle={vi.fn()} />);
+    expect(labels(container)).toEqual(expect.arrayContaining(["Font", "Letter spacing", "Vertical align"]));
+    expect(screen.queryByRole("button", { name: /More settings/ })).toBeNull();
+    expect(screen.getByText("Inherited by descendants where applicable. Existing child overrides remain.")).toBeInTheDocument();
   });
 
   it("Page panel (board 21): Font and Text colour only, no More settings", () => {

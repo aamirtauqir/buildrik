@@ -20,6 +20,7 @@ import { FontControls } from "./FontControls";
 import { FontPicker } from "./FontPicker";
 import { ADVANCED_TYPOGRAPHY_COUNT, TypographyControls } from "./TypographyControls";
 import { TextStyleRow } from "./TextStyleRow";
+import { NoteRow } from "../behaviourRows";
 
 // ============================================================================
 // TYPES
@@ -44,6 +45,9 @@ export interface TypographySectionProps {
   inherited?: Readonly<Record<string, string>>;
   /** Head the section with the Brand "Text style" row (text types). */
   textStyle?: boolean;
+  /** "Text inside" (2L9 247:23404): every row on the face, no More
+   *  settings, and the inheritance note. */
+  inside?: boolean;
 }
 
 // ============================================================================
@@ -62,6 +66,7 @@ export const TypographySection: React.FC<TypographySectionProps> = ({
   variant = "element",
   inherited,
   textStyle = false,
+  inside = false,
 }) => {
   const handleFontChange = React.useCallback((value: string) => onChange("font-family", value), [onChange]);
   const isPage = variant === "page";
@@ -81,7 +86,7 @@ export const TypographySection: React.FC<TypographySectionProps> = ({
         inherited={inherited}
       />
 
-      {!isPage && advancedExpanded && (
+      {!isPage && (advancedExpanded || inside) && (
         <>
           {/* The Brand type-style binding, behind More settings (2L9 161:8940). */}
           {textStyle && <TextStyleRow styles={styles} onChange={onChange} />}
@@ -89,7 +94,9 @@ export const TypographySection: React.FC<TypographySectionProps> = ({
         </>
       )}
 
-      {!isPage && onAdvancedToggle && (
+      {inside && <NoteRow>Inherited by descendants where applicable. Existing child overrides remain.</NoteRow>}
+
+      {!isPage && !inside && onAdvancedToggle && (
         <MoreSettingsToggle
           isOpen={advancedExpanded}
           onToggle={() => onAdvancedToggle()}
