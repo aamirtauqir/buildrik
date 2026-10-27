@@ -58,9 +58,35 @@ const ctx = (
 const renderNode = (node: React.ReactNode) => render(<div data-testid="host">{node}</div>);
 
 describe("sectionOverrideMarks", () => {
+  it("2L9 IC05: a section's breakpoint overrides head its body — 'Spacing · 2 overrides', '● Padding 16 px', Remove Tablet override, Falls back to Desktop", () => {
+    const reset = vi.fn();
+    const marks = sectionOverrideMarks(
+      {
+        overrides: new Map([["padding-left", ["breakpoint"]], ["padding-right", ["breakpoint"]]]),
+        overrideLabels: { breakpoint: "Tablet" },
+        resetOverride: reset,
+        breakpointEntries: [
+          { property: "padding-left", value: "16px", fallback: "24px" },
+          { property: "padding-right", value: "16px", fallback: "24px" },
+          { property: "width", value: "480px", fallback: "" },
+        ],
+      },
+      ["padding-left", "padding-right"],
+    );
+    expect(marks.titleNote).toBe("2 overrides");
+    expect(marks.headerDot).toBeNull();
+    expect(marks.note).toBeNull();
+    renderNode(marks.lead);
+    const row = screen.getByTestId("inspector-bp-override");
+    expect(row).toHaveTextContent("Padding16 px");
+    expect(row).toHaveTextContent("Falls back to Desktop: 24 px");
+    fireEvent.click(screen.getByRole("button", { name: "Remove Tablet override" }));
+    expect(reset.mock.calls).toEqual([["padding-left", "breakpoint"], ["padding-right", "breakpoint"]]);
+  });
+
   it("nothing overridden in the section → no dot, no note", () => {
     const marks = sectionOverrideMarks(ctx({ width: ["breakpoint"] }, { breakpoint: "Tablet" }), ["padding-top"]);
-    expect(marks).toEqual({ headerDot: null, note: null });
+    expect(marks).toEqual({ headerDot: null, note: null, titleNote: null, lead: null });
   });
 
   it("board 26: '● Padding overrides master', no header dot", () => {

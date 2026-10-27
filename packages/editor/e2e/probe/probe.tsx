@@ -2580,6 +2580,10 @@ const CASES: Record<string, () => React.ReactElement> = {
     const parentStyles = q.get("parent");
     if (parentStyles) c.elements.getElement(page.root.id)?.setStyles(JSON.parse(parentStyles) as Record<string, string>);
     c.selection.select(el);
+    /* `?bp=tablet&bpStyles={…}` — edit at a breakpoint with that layer set (IC05). */
+    const bp = (q.get("bp") ?? "desktop") as "desktop" | "tablet" | "mobile";
+    const bpStyles = q.get("bpStyles");
+    if (bpStyles && bp !== "desktop") c.styles.setBreakpointStyle(el.getId(), bp, JSON.parse(bpStyles) as Record<string, string>);
     /* `?instance=Name` — make the element a component and select an instance
        of it, with `?overrides={…}` written on the instance (IC01–IC06). */
     const instanceName = q.get("instance");
@@ -2597,7 +2601,7 @@ const CASES: Record<string, () => React.ReactElement> = {
     function Host() {
       const { selectedElement } = useComposerSelection({ composer: c });
       const sel = selectedElement ?? el;
-      return <ProInspector composer={c} selectedElement={{ id: sel.getId(), type: sel.getType(), tagName: sel.getTagName() }} />;
+      return <ProInspector composer={c} currentBreakpoint={bp} selectedElement={{ id: sel.getId(), type: sel.getType(), tagName: sel.getTagName() }} />;
     }
     return (
       <ToastProvider>

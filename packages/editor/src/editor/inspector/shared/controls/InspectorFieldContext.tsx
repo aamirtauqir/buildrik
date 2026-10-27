@@ -19,6 +19,14 @@ import * as React from "react";
 
 export type OverrideKind = "breakpoint" | "pseudo" | "master";
 
+/** One property a layer overrides: its value there, and what removing it
+ *  reveals underneath (2L9 S13 / S15, IC05). */
+export interface OverrideEntry {
+  property: string;
+  value: string;
+  fallback: string;
+}
+
 export interface InspectorFieldContextValue {
   readOnly: boolean;
   /** `not-loaded` / `view`: an engine edit lock (Task 1.6) — the site has not
@@ -29,6 +37,9 @@ export interface InspectorFieldContextValue {
   /** "Tablet", ":hover" — what an override dot names. */
   overrideLabels: Readonly<Partial<Record<OverrideKind, string>>>;
   resetOverride: (property: string, kind: OverrideKind) => void;
+  /** The current breakpoint layer's own properties with their Desktop
+   *  fallback — a section lists its share (2L9 IC05). Absent on Desktop. */
+  breakpointEntries?: readonly OverrideEntry[];
   /** Run a discrete action (segment, select choice, toggle, Reset) as its own
    *  undo step — `useStyleHandlers.runDiscrete`. Absent: just run it. */
   runDiscrete?: (action: () => void) => void;

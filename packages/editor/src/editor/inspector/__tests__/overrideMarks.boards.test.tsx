@@ -66,7 +66,7 @@ describe("override marks — boards 27 / 28", () => {
     expect(screen.queryByTestId("inspector-section-note")).toBeNull();
   });
 
-  it("28: Tablet · 1 override, 'Size' header dot + note; Revert clears them", () => {
+  it("28 / IC05: Tablet · 1 override; Size lists it — 'Size · 1 override', Width, Falls back to Desktop; Revert clears it", () => {
     const { c, id, view } = mount("heading", "tablet");
     c.styles.setBreakpointStyle(id, "tablet", { width: "480px" });
     render(view());
@@ -75,14 +75,15 @@ describe("override marks — boards 27 / 28", () => {
     expect(screen.getByTestId("inspector-breakpoint-prefix").textContent).toBe("Tablet ·");
     expect(screen.getByTestId("inspector-bp-line").textContent).toContain("Tablet · 1 override");
     const size = document.getElementById("inspector-section-size")!;
-    expect(within(size).getByRole("img", { name: "Overridden on Tablet" })).toBeTruthy();
-    expect(within(size).getByTestId("inspector-section-note").textContent).toBe("Overridden on Tablet");
+    expect(within(size).getByTestId("inspector-section-title-note").textContent).toBe(" · 1 override");
+    expect(within(size).getByTestId("inspector-bp-override")).toHaveTextContent("Width480 px");
+    expect(within(size).getByRole("button", { name: "Remove Tablet override" })).toBeTruthy();
     act(() => fireEvent.click(screen.getByTestId("inspector-bp-revert")));
     /* 2L9 S15: the exact property and what Desktop shows under it. */
     expect(screen.getByTestId("inspector-override-review")).toHaveTextContent("Tablet overrides");
     expect(screen.getByTestId("inspector-override-consequence")).toHaveTextContent("Removing Tablet overrides reveals Desktop");
     act(() => fireEvent.click(screen.getByTestId("inspector-override-remove")));
-    expect(screen.queryByTestId("inspector-section-note")).toBeNull();
+    expect(screen.queryByTestId("inspector-bp-override")).toBeNull();
   });
 
   it("26: an instance's padding edit puts a master dot on that Padding row and the note on Spacing", async () => {

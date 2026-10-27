@@ -27,15 +27,8 @@ import { EVENTS } from "@/shared/constants/events";
 import type { PseudoStateId } from "@/shared/types";
 import type { BreakpointId } from "@/shared/types/breakpoints";
 import { writeElement } from "@/engine/commands/commandOperations";
-import type { OverrideKind } from "../shared/controls/InspectorFieldContext";
+import type { OverrideEntry, OverrideKind } from "../shared/controls/InspectorFieldContext";
 
-/** One property a layer overrides: its value there, and what removing it
- *  reveals underneath (2L9 S13 / S15). */
-export interface OverrideEntry {
-  property: string;
-  value: string;
-  fallback: string;
-}
 
 export interface FieldOverrides {
   overrides: ReadonlyMap<string, readonly OverrideKind[]>;

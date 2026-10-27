@@ -16,7 +16,7 @@
 import * as React from "react";
 import { Button } from "@/editor/chrome-ui";
 import type { PseudoStateId } from "@/shared/types";
-import type { OverrideEntry } from "../hooks/useFieldOverrides";
+import type { OverrideEntry } from "../shared/controls/InspectorFieldContext";
 
 const pseudoStateLabel = (s: PseudoStateId): string => (s === "normal" ? "Base" : `:${s}`);
 

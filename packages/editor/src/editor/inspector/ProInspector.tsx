@@ -267,6 +267,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
       overrides: fieldOverrides.overrides,
       overrideLabels: fieldOverrides.labels,
       resetOverride: (property, kind) => runDiscrete(() => fieldOverrides.resetOverride(property, kind)),
+      breakpointEntries: fieldOverrides.counts.breakpoint ? fieldOverrides.entries("breakpoint") : undefined,
       runDiscrete,
     }),
     [readOnly, conflict.pending, locked, notLoaded, editLocks, mixedKeys, fieldOverrides, runDiscrete]
