@@ -30,7 +30,6 @@ import { getLayerPreview } from "@/editor/panels/layers/data/layerUtils";
 import { LAYER_NAME_KEY } from "@/shared/constants/elementTypeLabels";
 import { ELEMENT_TYPE_LABELS } from "@/shared/constants/elementTypeLabels";
 import { PAGE_TEMPLATES, getMyTemplates } from "@/editor/sidebar/tabs/templates/templatesData";
-import { requestGenerateBlock } from "@/editor/sidebar/tabs/build/insertGroupRequest";
 import { isTabAllowedForViewer, type GroupedTabId } from "@/editor/rail/tabsConfig";
 import { useViewerChrome } from "../hooks/useEditorRole";
 
@@ -126,7 +125,6 @@ function buildCommands(
     ["content", "Open CMS", () => openPanel("content"), ["collections", "records"]],
     ["design", "Open Brand", () => openPanel("design"), ["tokens", "colours", "fonts"]],
     ["publish", "Open Publish", () => openPanel("publish")],
-    ["ai", "Open AI assistant", () => composer?.emit(EVENTS.UI_SWITCH_TAB, { tab: "ai" })],
     ["templates", "Browse Templates", () => openPanel("templates")],
     /* C4 #19: one of the New-page doors, from anywhere — the same event every
        door emits. */
@@ -234,14 +232,6 @@ function buildCommands(
   // ADD
   fromRegistry("add-text", "Add");
   fromRegistry("add-container", "Add");
-  commands.push({
-    id: "add-ai-block",
-    label: "Generate a block with AI…",
-    group: "Add",
-    keywords: ["ai", "generate", "section", "block"],
-    /* Add › Generate a block (G2-117) — the screen the command names. */
-    handler: run(() => requestGenerateBlock(composer)),
-  });
 
   // TOOLS
   fromRegistry("cms-records", "Tools");
@@ -533,11 +523,8 @@ const CommandPaletteCard: React.FC<CommandPaletteProps> = ({
     );
   }, [commands, recordCommands, recentCommands, query]);
 
-  // A query that matches nothing is never a dead end: AI, or stock photos.
-  const askAI = React.useCallback(() => {
-    composer?.emit(EVENTS.UI_SWITCH_TAB, { tab: "ai" });
-    onClose();
-  }, [composer, onClose]);
+  // A query that matches nothing is never a dead end: stock photos. (No
+  // "Ask AI instead" — no AI entry points in the editor UI, owner 2026-10-17.)
   const searchStock = React.useCallback(() => {
     composer?.emit(EVENTS.UI_PANEL_OPEN, { panel: "assets", screen: `stock:${query.trim()}` });
     onClose();
@@ -582,7 +569,7 @@ const CommandPaletteCard: React.FC<CommandPaletteProps> = ({
           break;
         case "Enter":
           e.preventDefault();
-          if (orderedCommands.length === 0 && query.trim()) askAI();
+          if (orderedCommands.length === 0 && query.trim()) searchStock();
           else {
             const cmd = orderedCommands[selectedIndex];
             if (cmd) runCommand(cmd);
@@ -590,7 +577,7 @@ const CommandPaletteCard: React.FC<CommandPaletteProps> = ({
           break;
       }
     },
-    [orderedCommands, selectedIndex, onClose, query, askAI, runCommand],
+    [orderedCommands, selectedIndex, onClose, query, searchStock, runCommand],
   );
 
   return (
@@ -676,9 +663,6 @@ const CommandPaletteCard: React.FC<CommandPaletteProps> = ({
                 </div>
                 <Button onClick={searchStock} data-idx={0} variant="link" data-testid="cmdk-no-results-stock">
                   Search stock photos for &lsquo;{query.trim()}&rsquo;
-                </Button>
-                <Button onClick={askAI} variant="link" data-testid="cmdk-no-results-ai">
-                  Ask AI instead ›
                 </Button>
               </div>
             ) : null

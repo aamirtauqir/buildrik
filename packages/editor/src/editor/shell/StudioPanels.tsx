@@ -102,6 +102,9 @@ export interface StudioPanelsProps {
   showRulers?: boolean;
   showXRay?: boolean;
   onOverlayChange?: (overlay: keyof CanvasOverlayState, enabled: boolean) => void;
+  /** Unused: the canvas "Improve with AI" row is gone (no AI entry points,
+   *  owner 2026-10-17). AquibraStudio — founder WIP, never staged by an
+   *  agent — still passes it; REQUESTS asks for both to go together. */
   onAIRequest?: (payload: { elementId: string; elementType?: string }) => void;
   onOpenMediaLibrary?: (
     allowedTypes: MediaAssetType[],
@@ -258,7 +261,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   showRulers = false,
   showXRay = false,
   onOverlayChange,
-  onAIRequest,
   onOpenMediaLibrary,
   onOpenIconPicker,
   onOpenCreateCollection,
@@ -964,7 +966,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
               showRulers={showRulers}
               showXRay={showXRay}
               showOutlines={showOutlines}
-              onAIRequest={onAIRequest}
               onOpenImageEditor={handleEditMedia}
               onZoomChange={onZoomChange}
               onOverlayChange={handleOverlayChange}

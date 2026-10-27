@@ -133,68 +133,15 @@ describe("BrandWorkspace › Presets (StylesSection drill-in)", () => {
   });
 });
 
-/* blocked:pr33-ai-removal — the entry stays on Type styles · Presets until PR #33 deletes it. */
-describe("BrandWorkspace › Type styles · Presets — AI assist entry", () => {
-  function makeAiComposer() {
-    const composer = makeFakeComposer();
-    const events = new EventEmitter();
-    Object.assign(composer, {
-      colorMode: { get: vi.fn(() => "light"), set: vi.fn(), resolved: vi.fn(() => "light") },
-      aiAssistService: new AIAssistService(events, { generate: vi.fn() }),
-    });
-    return composer;
-  }
-
-  function openComponents(utils: ReturnType<typeof renderWorkspace>) {
+// re-baseline: Brand › Type styles · Presets — "✦ Generate with AI" removed (no AI entry points, owner 2026-10-17).
+describe("BrandWorkspace › Type styles · Presets — no AI entry", () => {
+  it("offers no Generate with AI", () => {
+    const utils = renderWorkspace(makeFakeComposer());
     act(() => {
       openPage(utils, "styles");
     });
-    return utils.container.querySelector<HTMLButtonElement>("[data-open-ai-assist]")!;
-  }
-
-  it("the page offers the AI entry as its header action (7316:82755)", () => {
-    const utils = renderWorkspace(makeAiComposer());
-    const btn = openComponents(utils);
-    expect(btn).toBeTruthy();
-    expect(btn.textContent).toContain("Generate with AI");
-    expect(btn.getAttribute("data-testid")).toBe("brand-page-action");
-    expect(utils.getByTestId("brand-page-body").contains(btn)).toBe(false);
-  });
-
-  it("clicking the button opens AIPromptModal with the composer's service", () => {
-    const utils = renderWorkspace(makeAiComposer());
-    expect(utils.queryByText("Generate component with AI")).toBeNull();
-
-    const btn = openComponents(utils);
-    act(() => {
-      fireEvent.click(btn);
-    });
-
-    expect(utils.getByText("Generate component with AI")).toBeTruthy();
-    expect(utils.getByLabelText("Component description")).toBeTruthy();
-    expect(utils.getByText("Generate")).toBeTruthy();
-  });
-
-  it("flag off: the entry is blocked and cannot open the modal", () => {
-    vi.mocked(isFeatureEnabled).mockReturnValue(false);
-    const utils = renderWorkspace(makeAiComposer());
-    const btn = openComponents(utils);
-
-    expect(btn.getAttribute("aria-disabled")).toBe("true");
-    act(() => {
-      fireEvent.click(btn);
-    });
-    expect(utils.queryByText("Generate component with AI")).toBeNull();
-  });
-
-  /* L5-019: the flag is a build-wide switch, not a workspace setting, so the
-     tooltip blamed the workspace for something no one in it can change. */
-  it("flag off: the reason says it is coming, not that the workspace is off", () => {
-    vi.mocked(isFeatureEnabled).mockReturnValue(false);
-    const utils = renderWorkspace(makeAiComposer());
-    openComponents(utils);
-    expect(utils.queryByText(/switched on for this workspace/)).toBeNull();
-    expect(utils.getByText(/Coming soon/)).toBeTruthy();
+    expect(utils.container.querySelector("[data-open-ai-assist]")).toBeNull();
+    expect(utils.queryByText(/Generate with AI/)).toBeNull();
   });
 });
 

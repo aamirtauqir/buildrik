@@ -452,9 +452,10 @@ describe("selection + toggles", () => {
     expect(ids).not.toContain("toggle-snap-to-grid");
   });
 
-  it("ui-open-* commands emit their toggle events on the captured composer", () => {
-    run("ui-open-ai");
-    expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_TOGGLE_AI);
+  // re-baseline: no AI entry points in the editor UI (owner, 2026-10-17).
+  it("has no Open AI assistant command", () => {
+    const ids = buildDefaultCommands(composer as unknown as Composer).map((c) => c.id);
+    expect(ids).not.toContain("ui-open-ai");
   });
 });
 

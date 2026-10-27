@@ -7,7 +7,7 @@
 
 import * as React from "react";
 import { EVENTS } from "@/shared/constants/events";
-import { requestInsertGroup, requestGenerateBlock } from "@/editor/sidebar/tabs/build/insertGroupRequest";
+import { requestInsertGroup } from "@/editor/sidebar/tabs/build/insertGroupRequest";
 import { useVisibleFrameSpan } from "./hooks/useVisibleFrameSpan";
 import { useCanvasNavigationGuard } from "./hooks/useCanvasNavigationGuard";
 
@@ -81,7 +81,6 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       composer,
       device,
       zoom,
-      onAIRequest,
       showSpacing = false,
       showBadges = false,
       showGuides = true,
@@ -183,7 +182,6 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
     // UI state hooks
     const { contextMenu, setContextMenu, menuData, closeContextMenu } = useCanvasContextMenu({
       composer,
-      onAIRequest,
       addToast,
     });
 
@@ -931,14 +929,6 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
                 if (!composer) return;
                 composer.emit("ui:switch-tab", { tab: "add" });
                 requestInsertGroup(composer, "blocks");
-              }}
-              /* v3 FC-3: "Describe your site" CREATES the first section — that
-                 is Add's generator (same door as ⌘K "Generate a block with
-                 AI…"), not the right-column AI, which only ever EDITS an
-                 existing selection and has none to work with on an empty
-                 canvas. */
-              onDescribe={() => {
-                if (composer) requestGenerateBlock(composer);
               }}
               onStartBlank={() => {
                 setStartedBlank(true);

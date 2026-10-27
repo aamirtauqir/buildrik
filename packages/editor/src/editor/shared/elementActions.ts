@@ -36,7 +36,6 @@ export interface ElementActionContext {
   composer: Composer;
   element: Element;
   isRoot: boolean;
-  openAI?: () => void;
   /** Toast function for undo notifications */
   addToast?: AddToastFn;
 }
@@ -51,7 +50,6 @@ export type ElementActionId =
   | "lock"
   | "unlock"
   | "delete"
-  | "improve-with-ai"
   | "bind-to-cms"
   | "add-interaction"
   | "replace-with-block";
@@ -189,15 +187,6 @@ export const ELEMENT_ACTIONS: Record<ElementActionId, ElementAction> = {
   },
 
   // ── Canvas-only doors (board 4428:43928) ─────────────────────────────
-  "improve-with-ai": {
-    id: "improve-with-ai",
-    label: "Improve with AI",
-    icon: "sparkles",
-    /* The Inspector's ✦ chip is its AI door; the canvas row shows only when
-       the shell mounted an AI handler. */
-    isVisible: ({ openAI }) => Boolean(openAI),
-    run: ({ openAI }) => openAI?.(),
-  },
   "bind-to-cms": {
     id: "bind-to-cms",
     label: "Bind to CMS field…",
