@@ -21,8 +21,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-A S1 built, not compared: Elements · Blocks · Components tabs (chrome-ui Tabs), 'Insert into {Parent}' / '{Page} / {Path} · At end|after {X}' strip, Elements grouped by category ('Basic elements' first). Copy checked against the dump in RTL; geometry not compared. Receipt toast is REQUESTS #11 (useBlockInsertion, lead-owned).",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case add-panel-target, real Composer with Hero selected, board shots/7-18981.png): 'Search elements' (no ellipsis, no ⌘F chip — the shortcut still works); Elements · Blocks · Components as a segmented control on a gray card at y101, 256×32, active tab white; 'Insert into Hero' / 'Home / Hero · At end' as the card's lower half (13/12px), card 84 tall like the board; category headers 12/600 ink, 20 tall, no chevron or count (▸ only when collapsed), first at y186 (board 186); rows 32 tall, inset 12, rounded 6, icon at 24. Row list is the code catalog (board's sample order not conformed). Open: panel ✕ in the header comes from the shell's onClose (StudioPanels, not L-A); PanelSearch inset 16 vs board ~10 is the shared chrome-ui field (lead4).",
    "tier": "P1"
   },
   {

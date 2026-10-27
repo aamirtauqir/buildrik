@@ -298,23 +298,29 @@ export const BuildTab: React.FC<BuildTabProps> = ({
       />
       <PanelSearch
         ref={searchRef}
-        placeholder="Search elements…"
+        placeholder="Search elements"
         value={tab.searchQuery}
         onChange={tab.setSearchQuery}
-        shortcut="⌘F"
         data-testid="add-search"
       />
       {/* Board 7:18981: the three sources as tabs under the search. A query
           searches all three, so the tabs stand down while it runs. */}
+      {/* Board 7:18981 draws the tabs as a segmented control on a gray card,
+          with the insert target as the card's lower half. */}
       {!isSearching && (
-        <Tabs
-          label="Add"
-          tabs={ADD_TABS}
-          value={addTab}
-          onChange={(id) => setAddTab(id as AddTabId)}
-          panelId="add-panel-tabpanel"
-          data-testid="add-tabs"
-        />
+        <div className="tw:mx-3 tw:mt-2 tw:mb-0.5 tw:rounded-md tw:bg-[var(--bk-bg-subtle)]">
+          <Tabs
+            label="Add"
+            tabs={ADD_TABS}
+            value={addTab}
+            onChange={(id) => setAddTab(id as AddTabId)}
+            panelId="add-panel-tabpanel"
+            data-testid="add-tabs"
+            className="tw:gap-0 tw:p-0.5"
+            tabClassName="tw:h-7 tw:flex-1 tw:px-1 tw:text-[var(--bk-ink-soft)] tw:hover:bg-transparent tw:aria-selected:bg-[var(--bk-bg-card)] tw:aria-selected:text-[var(--bk-ink)] tw:aria-selected:hover:bg-[var(--bk-bg-card)]"
+          />
+          <InsertTargetStrip composer={composer} />
+        </div>
       )}
 
       <div className="bld-content" ref={panelRef}>
@@ -333,7 +339,6 @@ export const BuildTab: React.FC<BuildTabProps> = ({
           </div>
         ) : (
           <div className="bld-scroll" role="tabpanel" id="add-panel-tabpanel" aria-labelledby={`add-panel-tabpanel-tab-${addTab}`}>
-            <InsertTargetStrip composer={composer} />
             {/* Blocks insert through the SAME onBlockClick path elements use —
                 BlockDefinition extends BlockData. */}
             {tabGroups.map((g) => (

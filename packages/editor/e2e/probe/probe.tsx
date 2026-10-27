@@ -94,6 +94,7 @@ import { ComponentsTab } from "@/editor/sidebar/tabs/ComponentsTab";
 import { ComponentDetailScreen } from "@/editor/sidebar/tabs/component-library/ComponentDetailScreen";
 import { DSModeProvider } from "@/editor/design-system/state/DSModeContext";
 import { LayerTreeItem } from "@/editor/panels/layers/LayerTreeItem";
+import { renameElement } from "@/editor/panels/layers/hooks/layersPersistence";
 import type { LayerItem } from "@/editor/panels/layers/types";
 import { HistoryTab } from "@/editor/sidebar/tabs/history/HistoryTab";
 import { MilestoneSuggestionBanner } from "@/editor/sidebar/tabs/history/components/MilestoneSuggestionBanner";
@@ -793,6 +794,20 @@ const LAYERS_SEED = [
 ];
 
 let _layersComposer: Composer | null = null;
+function addTargetComposer(): Composer {
+  const c = new Composer({} as never);
+  const page = c.elements.createPage("Home", {
+    id: "ax-page",
+    root: { id: "ax-root", type: "container", tagName: "div", classes: ["buildrick-page-root"], children: [] },
+  });
+  c.elements.setActivePage(page.id);
+  const hero = c.elements.createElement("section" as never, { id: "ax-hero" });
+  c.elements.addElement(hero, page.root.id);
+  renameElement(c, "ax-hero", "Hero");
+  c.selection.select(c.elements.getElement("ax-hero") ?? null);
+  return c;
+}
+
 function layersComposer(): Composer {
   if (_layersComposer) return _layersComposer;
   const c = new Composer({} as never);
@@ -2541,6 +2556,17 @@ const CASES: Record<string, () => React.ReactElement> = {
       <ToastProvider>
         <div className="tw:flex tw:h-[812px] tw:w-70 tw:flex-col tw:overflow-hidden tw:bg-white">
           <BuildTab composer={INSERT_COMPOSER} onExpandToggle={() => {}} onClose={() => {}} />
+        </div>
+      </ToastProvider>
+    </div>
+  ),
+  /* Add panel with a target, board 7:18981: a real Composer with "Hero"
+     selected, so the insert-target strip reads "Insert into Hero". */
+  "add-panel-target": () => (
+    <div data-probe="add-panel-target">
+      <ToastProvider>
+        <div className="tw:flex tw:h-[812px] tw:w-70 tw:flex-col tw:overflow-hidden tw:bg-white">
+          <BuildTab composer={addTargetComposer()} onExpandToggle={() => {}} onClose={() => {}} />
         </div>
       </ToastProvider>
     </div>

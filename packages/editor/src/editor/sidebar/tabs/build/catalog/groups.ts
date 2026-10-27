@@ -81,12 +81,13 @@ export function buildInsertGroups(
 const CATEGORY_LABEL: Partial<Record<string, string>> = { basic: "Basic elements" };
 
 /** The Elements tab: the catalog's categories, in catalog order, each with
- *  the rows the site offers (an emptied category is dropped). */
+ *  the rows the site offers (an emptied category is dropped). No count —
+ *  board 7:18981 heads each category with its name alone. */
 export function elementCategoryGroups(elements: readonly FlatElEntry[]): Array<InsertGroup & { elements: FlatElEntry[] }> {
   return CATALOG.flatMap((cat) => {
     const rows = elements.filter((el) => el.catId === cat.id);
     return rows.length
-      ? [{ id: `cat-${cat.id}` as const, label: CATEGORY_LABEL[cat.id] ?? cat.name, count: rows.length, kind: "inline" as const, elements: rows }]
+      ? [{ id: `cat-${cat.id}` as const, label: CATEGORY_LABEL[cat.id] ?? cat.name, count: null, kind: "inline" as const, elements: rows }]
       : [];
   });
 }

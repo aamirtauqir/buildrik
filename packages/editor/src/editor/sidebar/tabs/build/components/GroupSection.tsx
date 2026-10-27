@@ -69,22 +69,23 @@ const HeaderRow: React.FC<{ group: InsertGroup; isOpen: boolean; onToggle: () =>
   <Button
     type="button"
     color="light"
-    className="bld-group-header tw:flex tw:items-center tw:justify-start tw:w-full tw:h-[var(--bk-size-row)] tw:py-0 tw:pl-[var(--bk-space-16)] tw:pr-[var(--bk-space-16)] tw:gap-0 tw:bg-transparent tw:border-0 tw:rounded-none tw:cursor-pointer tw:text-left tw:shadow-none tw:focus:ring-0 tw:focus:bg-transparent tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]"
+    className="bld-group-header tw:flex tw:items-center tw:justify-start tw:w-full tw:h-5 tw:py-0 tw:pl-3 tw:pr-4 tw:gap-0 tw:bg-transparent tw:border-0 tw:rounded-none tw:cursor-pointer tw:text-left tw:shadow-none tw:focus:ring-0 tw:focus:bg-transparent tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]"
     aria-expanded={isOpen}
     data-testid={`insert-group-${group.id}`}
     onClick={onToggle}
   >
-    {/* Board 4418:103353 group header: 32 tall (interactive section header),
-        chevron 12/18 at 16, label 11/500 tracking .88 at 32, mono count. */}
-    <span className="tw:w-4 tw:shrink-0 tw:text-[12px] tw:leading-[18px] tw:font-normal tw:text-[var(--bk-ink-muted)]" aria-hidden="true">
-      {isOpen ? "▾" : "▸"}
-    </span>
+    {/* Board 7:18981: the open group's header is its name alone — 12/600 ink
+        at the rows' 12px inset, 20 tall. A closed group keeps a ▸ at the end
+        so it still reads as collapsed. */}
     <span
       data-testid={`insert-group-label-${group.id}`}
-      className="tw:flex-1 tw:text-[11px] tw:leading-[16px] tw:font-medium tw:tracking-[0.88px] tw:text-[var(--bk-ink-muted)]"
+      className="tw:flex-1 tw:text-[12px] tw:leading-4 tw:font-semibold tw:text-[var(--bk-ink)]"
     >
       {group.label}
     </span>
+    {!isOpen && (
+      <span className="tw:ml-2 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]" aria-hidden="true">▸</span>
+    )}
     {group.count != null && (
       <span
         data-testid={`insert-group-count-${group.id}`}
@@ -96,8 +97,8 @@ const HeaderRow: React.FC<{ group: InsertGroup; isOpen: boolean; onToggle: () =>
   </Button>
 );
 
-/** Board 1069:4999 list row: dense · rounded-4 · 14 icon · 13/400 label,
- *  indented past the group chevron. `pinned` switches to board 1069:5011's
+/** Board 7:18981 list row: 32 tall, inset 12 with a 6px-round hover fill,
+ *  icon at 24 · 13/400 label. `pinned` switches to board 1069:5011's
  *  ⌥ Paste HTML… band, which is a full-height row at the panel inset with
  *  12/400 soft-ink text and no icon slot. Exported for BuildTab.
  *
@@ -144,10 +145,10 @@ export const Row: React.FC<{
       tabIndex={disabled ? -1 : 0}
       aria-disabled={disabled || undefined}
       draggable={disabled ? false : draggable}
-      className={`tw:group tw:flex tw:items-center tw:gap-[8px] tw:rounded-[4px] tw:select-none ${
+      className={`tw:group tw:flex tw:items-center tw:gap-[8px] tw:select-none ${
         pinned
-          ? "tw:h-[var(--bk-size-row)] tw:px-[var(--bk-space-16)]"
-          : "tw:h-[var(--bk-size-row-dense)] tw:pl-[var(--bk-space-28)] tw:pr-[var(--bk-space-16)]"
+          ? "tw:h-[var(--bk-size-row)] tw:rounded-[4px] tw:px-[var(--bk-space-16)]"
+          : "tw:mx-3 tw:h-8 tw:rounded-md tw:px-3"
       } ${
         disabled
           ? "tw:cursor-not-allowed"

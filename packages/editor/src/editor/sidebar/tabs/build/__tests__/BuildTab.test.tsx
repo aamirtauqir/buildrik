@@ -327,9 +327,10 @@ describe("BuildTab — search in its own field", () => {
   it("draws its own search field under the header, no purpose line, and claims nothing in the topbar", () => {
     const { composer, emitted } = emitterComposer();
     const { unmount } = renderTab({ composer });
-    const field = screen.getByPlaceholderText("Search elements…");
-    expect(field.getAttribute("aria-label")).toBe("Search elements…");
-    expect(screen.getByText("⌘F")).toBeTruthy();
+    const field = screen.getByPlaceholderText("Search elements");
+    expect(field.getAttribute("aria-label")).toBe("Search elements");
+    // re-baseline: Add panel — board 7:18981 draws the field with no shortcut chip (⌘F still works, below).
+    expect(screen.queryByText("⌘F")).toBeNull();
     expect(screen.queryByText(/Click a row to add it/)).toBeNull();
     unmount();
     expect(emitted.some(([e]) => e === "ui:search-context")).toBe(false);
@@ -337,7 +338,7 @@ describe("BuildTab — search in its own field", () => {
 
   it("/ focuses the field from outside a text box; ⌘F only from inside the panel", () => {
     renderTab();
-    const field = screen.getByPlaceholderText("Search elements…");
+    const field = screen.getByPlaceholderText("Search elements");
     fireEvent.keyDown(document.body, { key: "/" });
     expect(document.activeElement).toBe(field);
     field.blur();
@@ -349,16 +350,16 @@ describe("BuildTab — search in its own field", () => {
 
   it("a closed drawer answers no shortcut and drops its query", () => {
     const { rerender } = renderTab({ isOpen: true });
-    const field = screen.getByPlaceholderText("Search elements…") as HTMLInputElement;
+    const field = screen.getByPlaceholderText("Search elements") as HTMLInputElement;
     fireEvent.change(field, { target: { value: "button" } });
     rerender(
       <ToastProvider>
         <BuildTab composer={null} onBlockClick={vi.fn()} isOpen={false} />
       </ToastProvider>,
     );
-    expect((screen.getByPlaceholderText("Search elements…") as HTMLInputElement).value).toBe("");
+    expect((screen.getByPlaceholderText("Search elements") as HTMLInputElement).value).toBe("");
     fireEvent.keyDown(document.body, { key: "/" });
-    expect(document.activeElement).not.toBe(screen.getByPlaceholderText("Search elements…"));
+    expect(document.activeElement).not.toBe(screen.getByPlaceholderText("Search elements"));
   });
 
   /* Board 7063:78846: "Paste HTML…  ⌘⇧V". The chord reaches an open panel
@@ -400,7 +401,7 @@ describe("BuildTab — search in its own field", () => {
   it("a query swaps the groups for the flat results (138:53) and the no-results state", async () => {
     const { composer } = emitterComposer();
     renderTab({ composer });
-    const field = screen.getByPlaceholderText("Search elements…");
+    const field = screen.getByPlaceholderText("Search elements");
     fireEvent.change(field, { target: { value: "button" } });
     await waitFor(() => expect(screen.getByTestId("insert-search-results")).toBeTruthy());
     expect(screen.getAllByText("Button").length).toBeGreaterThan(0);
