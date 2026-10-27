@@ -30,10 +30,17 @@ import { getCurrentIconConfig, handleIconSelectAction, handleVideoPosterChange, 
 import { PropertyRows, type PropertyConfig } from "../PropertyField";
 import { Note, Warning, useElementVersion } from "./bodyRows";
 import { CheckRow } from "@/editor/inspector/shared/controls/CheckRow";
+import { GROUP_TITLE } from "@/editor/inspector/shared/controls/controlClasses";
 
 const LOADING_OPTIONS = [
   { value: "lazy", label: "Lazy" },
   { value: "eager", label: "Eager" },
+];
+
+const DECODING_OPTIONS = [
+  { value: "auto", label: "Auto" },
+  { value: "async", label: "Async" },
+  { value: "sync", label: "Sync" },
 ];
 
 /** A boolean attribute is on when present (HTML writes it empty) and not "false". */
@@ -55,15 +62,42 @@ function Source(p: TypeBlockBodyProps) {
   return <SourceRow composer={p.composer} element={p.element} targetIds={p.targetIds} onOpenMediaLibrary={p.onOpenMediaLibrary} />;
 }
 
+/* 2L9 36:2: Image source (the file card, Replace image, Alt text,
+   Decorative image), then a "Loading" group — Loading, Decoding, and where
+   fit and size live. Decorative is an explicit choice — an empty alt AND
+   role="presentation" — so a legacy alt="" still asks for alt text. The
+   generic writer drops an empty value, so it writes directly; Alt text
+   steps aside while it is on. */
 const Image: React.FC<TypeBlockBodyProps> = (p) => {
   const { read, write } = useAttrs(p);
-  const alt = read("alt") ?? "";
+  const alt = read("alt");
+  const decorative = read("role") === "presentation";
+  const setDecorative = (on: boolean) => {
+    const composer = p.composer;
+    if (!composer) return;
+    const targets = writableElements(composer, p.targetIds.map((id) => composer.elements.getElement(id)));
+    if (targets.length === 0) return;
+    runTxn(composer, "element-prop-change", () => {
+      for (const el of targets) {
+        if (on) {
+          el.setAttribute("alt", "");
+          el.setAttribute("role", "presentation");
+        } else {
+          el.removeAttribute("role");
+        }
+      }
+    });
+  };
   return (
     <>
       <Source {...p} />
-      <InputRow label="Alt text" value={alt} placeholder="Describe this image" onChange={(v) => write("alt", v)} />
-      {!alt.trim() && <Note testId="inspector-alt-hint">Add alt text so everyone can understand this image.</Note>}
-      <SelectRow label="Loading" value={read("loading") ?? ""} options={LOADING_OPTIONS} onChange={(v) => write("loading", v)} />
+      {!decorative && <InputRow label="Alt text" value={alt ?? ""} placeholder="Describe this image" onChange={(v) => write("alt", v)} />}
+      <CheckRow label="Decorative image" checked={decorative} onChange={setDecorative} />
+      {!decorative && !(alt ?? "").trim() && <Note testId="inspector-alt-hint">Add alt text so everyone can understand this image.</Note>}
+      <div className={GROUP_TITLE}>Loading</div>
+      <SelectRow label="Loading" value={read("loading") ?? "eager"} options={LOADING_OPTIONS} onChange={(v) => write("loading", v)} />
+      <SelectRow label="Decoding" value={read("decoding") ?? "auto"} options={DECODING_OPTIONS} onChange={(v) => write("decoding", v)} />
+      <Note>Image fit and dimensions are in Style.</Note>
     </>
   );
 };

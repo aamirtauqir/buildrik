@@ -2292,6 +2292,9 @@ const CASES: Record<string, () => React.ReactElement> = {
     /* `?styles={"display":"flex",…}` — a specimen's authored values. */
     const styles = q.get("styles");
     if (styles) el.setStyles(JSON.parse(styles) as Record<string, string>);
+    /* `?attrs={"src":"…","alt":"…"}` — a specimen's attributes. */
+    const attrs = q.get("attrs");
+    if (attrs) for (const [k, v] of Object.entries(JSON.parse(attrs) as Record<string, string>)) el.setAttribute(k, v);
     /* `?parent={"display":"flex"}` — the page root's, for flex / grid children. */
     const parentStyles = q.get("parent");
     if (parentStyles) c.elements.getElement(page.root.id)?.setStyles(JSON.parse(parentStyles) as Record<string, string>);

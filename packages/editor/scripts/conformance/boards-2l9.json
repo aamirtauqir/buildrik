@@ -4161,7 +4161,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Lane L-B P1 (2026-10-27): Container layout specimen probe-compared — Children layout with Display/Direction/Justify/Align items/Gap selects + More settings, Size Width/Height mode, Spacing/Background/Border shut with 'n set' (board says 'Fill'; 161:8940 says Background — the later page-04 board followed). Direction reads 'Row' (247:21216) where this specimen says 'Horizontal'. Text content specimen matches 161:8480 except Conditions (B-11). Still open: image content, effects/precision, page/no-selection, multi-selection, locked and component-instance specimens not yet re-compared this wave.",
+   "verifiedNote": "Lane L-B P1 (2026-10-27), probe-compared specimens: Container layout (Children layout selects + More settings, Size modes, Spacing/Background/Border shut with 'n set'; Direction reads 'Row' per 247:21216, not 'Horizontal'); Text content (matches 161:8480, Conditions → B-11); Image content (?type=image&attrs=…: 'Image source' with the grey file card, 'Replace image', Alt text, 'Decorative image' — an explicit alt=\"\" + role=presentation — then 'Loading' with Loading · Decoding and 'Image fit and dimensions are in Style.'; the CMS bind row stays above the card). Effects: brightness(1) read as 1% is fixed (now 100). Still open: Effects naming/readouts ('Transform and transition', 'Advanced effects · None', value boxes beside the sliders, Blur as a number field), Page/no-selection, Multiple selection, Locked and Component-instance specimens — not re-compared this wave (multi-selection and instance need a shell selection the probe does not make).",
    "tier": "P1"
   },
   {

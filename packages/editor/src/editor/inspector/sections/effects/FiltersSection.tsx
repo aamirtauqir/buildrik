@@ -19,6 +19,13 @@ const FILTERS = [
   { fn: "grayscale", label: "Grayscale", unit: "%", identity: "0%", min: 0, max: 100 },
 ] as const;
 
+/* `brightness(1)` is 100%: a bare number in a percentage filter is a ratio.
+   Read as a percentage it showed "1%" for an untouched filter. */
+const readFilter = (raw: string, unit: string): number => {
+  const n = parseFloat(raw);
+  return unit === "%" && !raw.trim().endsWith("%") ? n * 100 : n;
+};
+
 export const FiltersSection: React.FC<BaseStyleSectionProps> = ({ styles, onChange, isOpen, onToggle }) => (
   <Section title="Filters" isOpen={isOpen} onToggle={onToggle} id="inspector-section-filters">
     <div className="tw:relative">
@@ -30,7 +37,7 @@ export const FiltersSection: React.FC<BaseStyleSectionProps> = ({ styles, onChan
           unit={f.unit}
           min={f.min}
           max={f.max}
-          value={parseFloat(parseFunction(styles.filter, f.fn, f.identity))}
+          value={readFilter(parseFunction(styles.filter, f.fn, f.identity), f.unit)}
           onChange={(v) => onChange("filter", composeFilter(styles.filter, f.fn, `${v}${f.unit}`))}
         />
       ))}

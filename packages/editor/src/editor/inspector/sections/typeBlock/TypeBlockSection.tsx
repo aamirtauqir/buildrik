@@ -18,6 +18,14 @@ import { Button } from "@/editor/chrome-ui";
 import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
 import { formOf } from "../formFieldModel";
 
+/** The block's title: the type's name, except a field ("Field", F02) and an
+ *  image ("Image source", 2L9 36:2). */
+export function blockTitle(block: string | null | undefined, type: string): string {
+  if (block === "input") return "Field";
+  if (type === "image") return "Image source";
+  return elementTypeLabel(type);
+}
+
 export interface TypeBlockSectionProps extends TypeBlockBodyProps {
   isOpen: boolean;
   onToggle: () => void;
@@ -49,7 +57,7 @@ export function TypeBlockSection({ isOpen, onToggle, onOpenCreateCollection, ...
           ‹ {getLayerName(form) ?? "Form"}
         </Button>
       ) : null}
-      <Section title={caps.typeBlock === "input" ? "Field" : elementTypeLabel(body.element.type)} isOpen={isOpen} onToggle={onToggle} id="inspector-section-type">
+      <Section title={blockTitle(caps.typeBlock, body.element.type)} isOpen={isOpen} onToggle={onToggle} id="inspector-section-type">
         {/* 2L9 161:8480 / F2.02: the property's own row ("Text", its bind
             button) heads the block; its controls follow. */}
         {bindable ? <BindingPropertyRow composer={body.composer} elementId={body.element.id} onOpenCreateCollection={onOpenCreateCollection} /> : null}

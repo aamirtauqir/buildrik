@@ -64,6 +64,13 @@ describe("Filters — blur and the rest, merged into one filter value", () => {
     fireEvent.change(screen.getByLabelText("Grayscale"), { target: { value: "50" } });
     expect(p.onChange).toHaveBeenLastCalledWith("filter", "brightness(120%) grayscale(50%)");
   });
+
+  it("a bare ratio reads as its percentage — brightness(1) is 100, not 1 (2L9 36:2)", () => {
+    render(<FiltersSection {...props({ filter: "brightness(1) contrast(1.5) grayscale(0.25)" })} />);
+    expect(screen.getByLabelText("Brightness")).toHaveValue("100");
+    expect(screen.getByLabelText("Contrast")).toHaveValue("150");
+    expect(screen.getByLabelText("Grayscale")).toHaveValue("25");
+  });
 });
 
 describe("Transform & motion", () => {

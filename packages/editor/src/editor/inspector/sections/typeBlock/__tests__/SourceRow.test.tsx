@@ -34,7 +34,7 @@ describe("SourceRow", () => {
     );
     expect(screen.getByTestId("inspector-source-name")).toHaveTextContent("pasta-closeup.jpg");
     expect(screen.getByTestId("inspector-source-meta")).toHaveTextContent("2400 × 1600 · 428 KB");
-    expect(screen.getByRole("button", { name: "Replace" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Replace image" })).toBeInTheDocument();
   });
 
   it("audio: duration + size, and Choose audio even with a file", () => {

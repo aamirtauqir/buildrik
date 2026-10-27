@@ -12,7 +12,7 @@
  */
 
 import { defineSection, type AnySectionEntry, type SectionContext } from "./_shared";
-import { TypeBlockSection } from "../typeBlock/TypeBlockSection";
+import { TypeBlockSection, blockTitle } from "../typeBlock/TypeBlockSection";
 import { TYPE_BLOCKS } from "@/editor/inspector/config/typeBlocks";
 import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
 import type { ElementCapabilities, TypeBlockId } from "@/shared/constants/elementCapabilities";
@@ -41,8 +41,8 @@ export const TYPE_SECTIONS: Record<string, AnySectionEntry> = {
   type: defineSection({
     tab: "content",
     title: "Type",
-    /* 2L9 F02: a form field's block reads "Field". */
-    frameTitle: (ctx) => (ctx.caps.typeBlock === "input" ? "Field" : elementTypeLabel(ctx.selectedElement.type)),
+    /* 2L9 F02 "Field", 36:2 "Image source". */
+    frameTitle: (ctx) => blockTitle(ctx.caps.typeBlock, ctx.selectedElement.type),
     open: "always",
     capability: (caps) => hasBody(caps) && !LAYOUT_TYPE_BLOCKS.has(caps.typeBlock!),
     Component: TypeBlockSection,
