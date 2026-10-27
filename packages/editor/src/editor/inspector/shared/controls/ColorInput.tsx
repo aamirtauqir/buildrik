@@ -60,8 +60,14 @@ export function colourTokenLabel(tokenId: string): string {
   return rest.length ? `${head} / ${rest.join(" ")}` : head;
 }
 
-// Hex without "#" prefix — matches mock's "FFFFFF" display
-const stripHash = (val: string): string => (val.startsWith("#") ? val.slice(1) : val);
+/* 2L9 boards read a hex with its "#" ("#111827"); engine styles sometimes
+   store it bare ("333333"). */
+const showHex = (val: string): string => {
+  const v = val.trim();
+  if (/^[0-9A-Fa-f]{3}$|^[0-9A-Fa-f]{6}$|^[0-9A-Fa-f]{8}$/.test(v)) return `#${v.toUpperCase()}`;
+  if (/^#[0-9A-Fa-f]{3,8}$/.test(v)) return v.toUpperCase();
+  return v;
+};
 
 // ============================================================================
 // COLOR INPUT
@@ -140,7 +146,7 @@ export const ColorInput: React.FC<ColorInputProps> = ({
           value
         : "transparent";
 
-  const display = isBound ? (boundToken?.name ?? value) : stripHash(value || "");
+  const display = isBound ? (boundToken?.name ?? value) : showHex(value || "");
 
   /* Name the token the revert would restore, resolved the same way the bound
      path resolves its own — a button reading "Relink to token" would be the

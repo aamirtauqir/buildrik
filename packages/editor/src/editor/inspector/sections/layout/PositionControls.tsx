@@ -70,14 +70,25 @@ export const PositionControls: React.FC<PositionControlsProps> = ({
           helperText={POSITION_HELP}
         />
       </div>
-      {/* Position offset controls */}
+      {/* 2L9 247:21216: "Placement · Position · Z-index", the offsets after. */}
+      {hasPosition && (
+        <InputRow
+          label="Z-index"
+          property="z-index"
+          value={styles["z-index"] || ""}
+          onChange={(v) => onChange("z-index", v)}
+          type="number"
+          placeholder="auto"
+          helperText="Controls the vertical stack order"
+          isOverridden={propertyStates["z-index"]?.isOverridden}
+        />
+      )}
       {hasPosition && (
         <PositionOffsetControls
           styles={styles}
           onChange={onChange}
           disabled={disabled}
           reason={reason}
-          propertyStates={propertyStates}
         />
       )}
     </>
@@ -93,10 +104,6 @@ interface PositionOffsetControlsProps {
   onChange: (property: string, value: string) => void;
   disabled: (prop: string) => boolean | undefined;
   reason: (prop: string) => string | undefined;
-  propertyStates?: Record<
-    string,
-    { hidden?: boolean; disabled?: boolean; reason?: string; isOverridden?: boolean }
-  >;
 }
 
 const OFFSET_KEYS = ["top", "right", "bottom", "left"] as const;
@@ -106,7 +113,6 @@ const PositionOffsetControls: React.FC<PositionOffsetControlsProps> = ({
   onChange,
   disabled,
   reason,
-  propertyStates = {},
 }) => {
   return (
     <div className={OFFSET_PANEL}>
@@ -162,19 +168,6 @@ const PositionOffsetControls: React.FC<PositionOffsetControlsProps> = ({
           title={reason("bottom")}
         />
         <div />
-      </div>
-      {/* Z-Index */}
-      <div className="tw:mt-2">
-        <InputRow
-          label="Z-Index"
-          property="z-index"
-          value={styles["z-index"] || ""}
-          onChange={(v) => onChange("z-index", v)}
-          type="number"
-          placeholder="auto"
-          helperText="Controls the vertical stack order"
-          isOverridden={propertyStates["z-index"]?.isOverridden}
-        />
       </div>
     </div>
   );

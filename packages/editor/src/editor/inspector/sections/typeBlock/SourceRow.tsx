@@ -19,6 +19,7 @@
  * @license BSD-3-Clause
  */
 
+import { WIDE_BUTTON } from "@/editor/inspector/shared/controls/controlClasses";
 import * as React from "react";
 import { FileAudio, FileVideo, Image as ImageIcon, Shapes } from "lucide-react";
 import { Button } from "@/editor/chrome-ui";
@@ -41,7 +42,7 @@ interface Kind {
 }
 
 const KINDS: Record<string, Kind> = {
-  image: { picker: "image", choose: "Choose image", replace: "Replace", Icon: ImageIcon },
+  image: { picker: "image", choose: "Choose image", replace: "Replace image", Icon: ImageIcon },
   video: { picker: "video", choose: "Choose video", replace: "Replace", Icon: FileVideo },
   /* Board 10 keeps "Choose audio" with a file already set. */
   audio: { picker: "audio", choose: "Choose audio", replace: "Choose audio", Icon: FileAudio },
@@ -138,26 +139,28 @@ export function SourceRow({ composer, element, targetIds, onOpenMediaLibrary }: 
 
   return (
     <div className="tw:flex tw:flex-col tw:gap-2 tw:py-2" data-testid="inspector-source-row">
-      <div className="tw:flex tw:min-w-0 tw:items-start tw:gap-2">
+      {/* 2L9 36:2: one grey card — the file's glyph or thumbnail, its name,
+          then "1600 × 1200 · JPG". */}
+      <div className="tw:flex tw:min-w-0 tw:items-center tw:gap-2.5 tw:rounded-[4px] tw:bg-[var(--bk-bg-subtle)] tw:p-2.5">
         <div
-          className="tw:flex tw:size-10 tw:shrink-0 tw:items-center tw:justify-center tw:overflow-hidden tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink-soft)]"
+          className="tw:flex tw:size-8 tw:shrink-0 tw:items-center tw:justify-center tw:overflow-hidden tw:text-[var(--bk-ink-soft)]"
           data-testid="inspector-source-thumb"
         >
-          {thumb ? <img src={thumb} alt="" className="tw:size-full tw:object-cover" /> : <kind.Icon size={16} aria-hidden />}
+          {thumb ? <img src={thumb} alt="" className="tw:size-full tw:object-cover" /> : <kind.Icon size={20} aria-hidden />}
         </div>
-        <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:gap-1 tw:text-[length:var(--bk-text-12)] tw:leading-4">
-          <span className="tw:truncate tw:font-medium tw:text-[var(--bk-ink-soft)]" title={src || undefined} data-testid="inspector-source-name">
+        <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:gap-0.5 tw:leading-4">
+          <span className="tw:truncate tw:text-[13px] tw:font-medium tw:text-[var(--bk-ink)]" title={src || undefined} data-testid="inspector-source-name">
             {name}
           </span>
           {meta && (
-            <span className="tw:truncate tw:font-[family-name:var(--bk-font-mono)] tw:tabular-nums tw:text-[var(--bk-ink-muted)]" data-testid="inspector-source-meta">
+            <span className="tw:truncate tw:text-[12px] tw:tabular-nums tw:text-[var(--bk-ink-muted)]" data-testid="inspector-source-meta">
               {meta}
             </span>
           )}
         </div>
       </div>
       {onOpenMediaLibrary && (
-        <Button type="button" size="xs" color="light" className="tw:h-7 tw:w-full" onClick={open} data-testid="inspector-source-door">
+        <Button type="button" size="xs" color="light" className={WIDE_BUTTON} onClick={open} data-testid="inspector-source-door">
           {src ? kind.replace : kind.choose}
         </Button>
       )}

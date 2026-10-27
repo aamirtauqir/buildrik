@@ -19,11 +19,12 @@ const rowLabels = (container: HTMLElement) =>
 describe("Image — board 8", () => {
   const image = { id: "img", type: "image" as const, tagName: "img", attributes: { src: "https://cdn.example/pasta-closeup.jpg", alt: "" } };
 
-  it("source row, Alt text + hint, Loading — in board order; Fit is Style › Size's (2L9 36:2)", () => {
+  it("Image source: source card, Alt text + hint, Decorative image, then Loading / Decoding and the Style note (2L9 36:2)", () => {
     const { container } = renderBlock(image);
-    expect(screen.getByRole("button", { name: /^Image section/ })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /^Image source section/ })).toBeInTheDocument();
     expect(screen.getByTestId("inspector-source-name")).toHaveTextContent("pasta-closeup.jpg");
-    expect(rowLabels(container)).toEqual(["Alt text", "Loading"]);
+    expect(rowLabels(container)).toEqual(["Alt text", "Decorative image", "Loading", "Decoding"]);
+    expect(screen.getByText("Image fit and dimensions are in Style.")).toBeInTheDocument();
     expect(screen.getByTestId("inspector-alt-hint")).toHaveTextContent("Add alt text so everyone can understand this image.");
     expect(screen.getByPlaceholderText("Describe this image")).toBeInTheDocument();
   });
@@ -40,7 +41,7 @@ describe("Image — board 8", () => {
   it("Replace picks an image in the drawer and writes src, through the lock gate", () => {
     const pick = vi.fn();
     const { el, composer } = renderBlock(image, { onOpenMediaLibrary: pick });
-    fireEvent.click(screen.getByRole("button", { name: "Replace" }));
+    fireEvent.click(screen.getByRole("button", { name: "Replace image" }));
     expect(pick).toHaveBeenCalledWith(["image"], expect.any(Function), "Image");
     const onSelect = pick.mock.calls[0][1] as (a: { src: string }) => void;
     onSelect({ src: "https://cdn.example/new.jpg" });
@@ -48,6 +49,20 @@ describe("Image — board 8", () => {
     el().setLocked(true);
     onSelect({ src: "https://cdn.example/other.jpg" });
     expect(composer.elements.getElement("img")!.getAttribute("src")).toBe("https://cdn.example/new.jpg");
+  });
+});
+
+describe("Image — Decorative image (2L9 36:2)", () => {
+  it("is an explicit choice: alt=\"\" + role=presentation, Alt text steps aside, one Undo restores", () => {
+    const { el, undo } = renderBlock({ id: "img", type: "image" as const, tagName: "img", attributes: { src: "https://cdn.example/a.jpg", alt: "" } });
+    expect(screen.getByRole("checkbox", { name: "Decorative image" })).not.toBeChecked();
+    fireEvent.click(screen.getByRole("checkbox", { name: "Decorative image" }));
+    expect(el().getAttribute("role")).toBe("presentation");
+    expect(el().getAttribute("alt")).toBe("");
+    expect(screen.queryByPlaceholderText("Describe this image")).toBeNull();
+    expect(screen.queryByTestId("inspector-alt-hint")).toBeNull();
+    undo();
+    expect(el().getAttribute("role")).toBeUndefined();
   });
 });
 

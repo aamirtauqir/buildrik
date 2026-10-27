@@ -7,7 +7,7 @@
  */
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, beforeAll, afterAll, vi } from "vitest";
-import { InputWithUnit, CornerRadiusInput } from "..";
+import { InputWithUnit } from "..";
 
 beforeAll(() => {
   document.documentElement.style.setProperty("--buildrick-design-input-height", "40px");
@@ -23,13 +23,5 @@ describe("token-bound values display resolved", () => {
     render(<InputWithUnit label="Height" value="var(--buildrick-design-input-height)" onChange={vi.fn()} />);
     const input = screen.getAllByRole("textbox")[0] as HTMLInputElement;
     expect(input.value).toBe("40");
-  });
-
-  it("CornerRadiusInput shows 8 in each corner", () => {
-    const r = "var(--buildrick-design-input-radius)";
-    render(<CornerRadiusInput values={{ tl: r, tr: r, bl: r, br: r }} onChange={vi.fn()} linked onLinkToggle={vi.fn()} />);
-    const values = (screen.getAllByRole("textbox") as HTMLInputElement[]).map((i) => i.value);
-    expect(values.every((v) => v === "8")).toBe(true);
-    expect(values.length).toBeGreaterThan(0);
   });
 });

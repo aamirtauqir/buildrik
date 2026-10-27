@@ -33,8 +33,13 @@ const CONTENT_ORDER: readonly SectionId[] = [
 const STYLE_ORDER: readonly SectionId[] = [
   "type-layout",
   "layout",
+  /* 2L9 247:21216: "Advanced layout · n set" right under Children layout. */
+  "layout-advanced",
   "typography",
   "size",
+  /* 2L9 247:22853: a flex / grid child's own group, before Spacing. */
+  "flex-item",
+  "grid-item",
   "spacing",
   "fill",
   "border",

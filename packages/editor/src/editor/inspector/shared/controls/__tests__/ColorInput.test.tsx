@@ -19,9 +19,9 @@ function renderColor(value = "", onChange = vi.fn()) {
 }
 
 describe("ColorInput — value rendering", () => {
-  it("displays the hex without the leading #", () => {
+  it("displays the hex with its # (2L9 161:8940)", () => {
     renderColor("#ff0000");
-    expect(screen.getByRole("textbox", { name: "Fill value" })).toHaveValue("ff0000");
+    expect(screen.getByRole("textbox", { name: "Fill value" })).toHaveValue("#FF0000");
   });
 
   it("shows an empty field for an empty value, reading None — never a fake hex", () => {
@@ -145,7 +145,7 @@ describe("ColorInput — hex message", () => {
     expect(document.getElementById(field.getAttribute("aria-describedby") ?? "")).toHaveTextContent(HEX_ERROR);
     expect(HEX_ERROR).toMatch(/^Use a hex like #1A56DB or pick a token\.$/); // @lint-hex-policy: copy under test
     fireEvent.keyDown(field, { key: "Escape" });
-    expect(field).toHaveValue("ff0000");
+    expect(field).toHaveValue("#FF0000");
     expect(field).toHaveAttribute("aria-invalid", "false");
   });
 });

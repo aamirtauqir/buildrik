@@ -4161,7 +4161,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Lane L-B A1 (2026-10-26): tab strip now Content · Style · Behavior · Effects, type block on Content, Flex/Grid body + image Fit + Text style on Style — compared by probe screenshot (case inspector-panel, :5172) against the dump's copy for this board. Still open: header context line (REQUESTS #10), Semantics/Conditions/Advanced attributes (A2, REQUESTS #11), page/multi/locked/instance specimens.",
+   "verifiedNote": "Lane L-B P1 (2026-10-27), probe-compared specimens: Container layout (Children layout selects + More settings, Size modes, Spacing/Background/Border shut with 'n set'; Direction reads 'Row' per 247:21216, not 'Horizontal'); Text content (matches 161:8480, Conditions → B-11); Image content (?type=image&attrs=…: 'Image source' with the grey file card, 'Replace image', Alt text, 'Decorative image' — an explicit alt=\"\" + role=presentation — then 'Loading' with Loading · Decoding and 'Image fit and dimensions are in Style.'; the CMS bind row stays above the card). Effects: brightness(1) read as 1% is fixed (now 100). Still open: Effects naming/readouts ('Transform and transition', 'Advanced effects · None', value boxes beside the sliders, Blur as a number field), Page/no-selection, Multiple selection, Locked and Component-instance specimens — not re-compared this wave (multi-selection and instance need a shell selection the probe does not make).",
    "tier": "P1"
   },
   {
@@ -4765,8 +4765,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Lane L-B A1+A2 (probe inspector-panel ?type=paragraph, :5172, against the dump's copy): Content · Text block (Edit text on canvas) · Semantics (Tag 'Paragraph', ID, 'Content and semantic changes apply to all breakpoints.') · Advanced attributes '0 set' — match. Still open: an unbound CMS binding section shows (board shows none until bound — A10), Conditions (REQUESTS #11), header 'Content · All breakpoints' (REQUESTS #10).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B P1 (2026-10-27), probe inspector-panel ?type=text and ?type=heading on :5172, side by side with the board PNG: Content heading · 'Text' row with bind icon (the binding row now sits in the block; its value moved to the row's title) · full-width bordered 'Edit text on canvas' · Semantics with Tag as a Select (Paragraph/Span/Div/Blockquote, H1–H6 for headings) + ID + the all-breakpoints note · Advanced attributes '0 set'. Semantics opens when the element has an ID (as drawn, 'hero-intro'); without one it shuts with the tag as summary (156:716). Exceptions: Conditions row not drawn (code:conditions-not-built, REQUESTS B-11); breadcrumb '… › Hero › Text' is InspectorHeader (lead).",
    "tier": "P1"
   },
   {
@@ -4776,8 +4776,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Board Width mode/Height mode rows vs Fixed/Fill/Hug (sections/SizeSection.tsx:165); \"Background\" vs code \"Fill\"; \"2 set\" summaries",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B P1 (2026-10-27), probe ?type=heading Style tab on :5172 vs board PNG: Typography rows Font · Font size · Weight (words: Regular/Bold…) · Line height · Text color ('#' + uppercase hex); Align and Text style moved into More settings. Size as 'Width mode'/'Height mode' selects (Fixed/Fill/Hug · Auto) with a Width/Height value row only while Fixed. Spacing/Background/Border shut with 'n set'/'None'. Number steppers show on hover/focus only. Exceptions: Font keeps the source label + applied stack (R01); a 'More settings' disclosure stays under Typography and Size (code:advanced-properties-reachable — letter spacing, decoration, min/max, aspect have no other home); number field and unit select share one frame (shared InputWithUnit, not split per board); header context line is InspectorHeader (lead).",
    "tier": "P1"
   },
   {
@@ -5415,8 +5415,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Board \"Children layout\"/\"Placement\"/\"Advanced layout\" groups, Row/Column gap, Align lines; code one \"Layout\" section",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B P1 (2026-10-27), probe inspector-panel ?type=container&styles={flex, wrap, space-between, center, align-content start, row-gap 24, column-gap 32, relative, 3 advanced} on :5172, side by side with the board PNG: 'Children layout' · Display/Direction/Wrap/Justify/Align items/Align lines as selects · Row gap/Column gap · 'Placement' (13/semibold) · Position · Z-index · 'Advanced layout  3 set' shut. Exceptions: a relative/absolute element keeps its offset cross under Z-index (code:offsets-reachable — top/right/bottom/left have no other writer); a non-wrapping container or one gap value keeps 'More settings' for Wrap / Row & Column gap (36:2 draws that state).",
    "tier": "P1"
   },
   {
@@ -5448,8 +5448,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Grow/shrink exist; board \"Flex item\" group + spacing-token picker differ (SizeSection.tsx:95)",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B P1 (2026-10-27), probe inspector-panel ?type=container under a flex parent (?parent=) with padding-top bound to a spacing token, on :5172, side by side with the board PNG: 'Flex item' section (Grow · Shrink · Basis · Order · Align self, all on the face) before Spacing; Spacing as rows Padding top · Padding sides · Padding bottom · Margin top · Margin bottom; 'Source' group 'Padding top · spacing token · 24 px resolved' + full-width 'Unlink to 24 px' (+ 'Remove local override' when the edge is overridden here — unit-tested, the probe has no override). Exceptions: a bound field shows its resolved number, not the token name (shared InputWithUnit rule, 6894:74644; the Source line names it); 'More settings' under Spacing splits sides into Left / Right and reveals Margin sides (code:sides-reachable — margin: 0 auto centring has no other writer).",
    "tier": "P1"
   },
   {
@@ -5459,8 +5459,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Rows exist; board grouping/labels differ (\"Text inside\" registry/text.tsx:120)",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B P1 (2026-10-27), probe inspector-panel ?type=container with Inter/16/500/1.5/0.02em, Text inside opened and scrolled, on :5172, side by side with the board PNG: every row on the face (no More settings) — Font · Font size · Weight · Line height · Letter spacing · Word spacing · Transform · Decoration · Font style · White-space · Word break · Text indent · Vertical align, selects showing CSS's default (None / Normal / Baseline) when unset — and 'Inherited by descendants where applicable. Existing child overrides remain.' Exceptions: labels 'Font' and word weights ('Medium') follow 161:8940 where this board says 'Family' / '500' (same page, the text board's choice kept for one vocabulary); no 'Font-size token' picker (code:font-size-token-not-modeled — Text style binds the Brand type scale on text types); Text color and Align stay (code:inherited-colour-reachable — a container's text colour has no other writer).",
    "tier": "P1"
   },
   {
@@ -5470,8 +5470,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Two-stop Color 1/2 only; no 3-stop \"Custom gradient\" preservation; image options exist (:346)",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B P1 (2026-10-27), probe inspector-panel ?type=container with a 3-stop linear-gradient, and with an image fill, on :5172, side by side with the board PNG: paint kind is the open header's select ('Custom gradient' for a many-stop gradient); 'Saved gradient' box with the value as saved, 'Three stops retained. Two-stop controls cannot losslessly edit this value.', 'Edit custom gradient' (text edit, written on blur only when it parses) and 'Replace with two-stop gradient' (first + last stop, angle kept); 'Image fill options' Source · Size · Position ('Center center') · Repeat ('No repeat') · Attachment · Blend on the face; the footnote. Before this a 3-stop gradient was shown as the default #1A56DB→#22C55E pair and any edit rewrote it (data loss). Exceptions: the section title stays 'Background' (161:8940, the page-04 board this one contradicts with 'Fill'); a gradient + image on the same element shows one kind at a time (code:one-paint-kind — deriveBgType models one layer; the board's specimen shows both).",
    "tier": "P1"
   },
   {
@@ -5481,8 +5481,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Per-side borders/corners/outline grouping differs from board",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B P1 (2026-10-27), probe inspector-panel ?type=container&styles={1px solid #D4D9E2, radius 8 8 16 16, outline 2px solid offset 4} on :5172, Border opened and scrolled, side by side with the board PNG: Width · Style · Color · Top left · Top right · Bottom right · Bottom left, then 'Outline' (13/semibold) · Width · Style · Color · Offset; Bottom left → Offset measured 212 px vs the board's 216. Corners that agree read as one 'Radius' row (writes the shorthand). Exceptions: 'More settings 4' under the outline keeps the individual sides (border-top …) reachable (code:sides-reachable — no other writer); the outline colour shows a hex where the board's sample names a token (sample data); header 'Editing Desktop · Focus' is InspectorHeader (lead).",
    "tier": "P1"
   },
   {

@@ -105,3 +105,4 @@ B-13. **L-B · `src/engine/export/interactionRuntime.ts` (+ `src/engine/interact
 
 ## Open — lane L-C wave 3 (2026-10-27)
 
+B-14. **L-B → lead · `src/editor/shell/RecoveryBanner.tsx`** · `const NO_COLUMN = { left: 0, right: 0, top: 56 }` (from `3f0d2ce5f`) puts `verify:ds` Gate 14 at 139 > baseline 138 on the integration tip itself (checked in a detached worktree of `9393775b9`, no lane-B changes). Move the 56 to `src/shared/constants/layout.ts` (or reuse the header-height constant there). Lane B commits with this one gate red; every other gate passes.

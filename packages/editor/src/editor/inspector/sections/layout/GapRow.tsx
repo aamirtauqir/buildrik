@@ -2,7 +2,8 @@
  * GapRow — the one writer of `gap` / `row-gap` / `column-gap` (D-11: the gap
  * rows left Spacing; boards 16 and 17 draw "Gap [16 px]" inside the Flex
  * block and the grid Layout). Row and column gap wait behind the owner's
- * More settings.
+ * More settings — or stand in for Gap once either is set on its own
+ * (2L9 247:21216 "Row gap 24 px · Column gap 32 px").
  *
  * @license BSD-3-Clause
  */
@@ -20,10 +21,13 @@ export interface GapRowProps {
 }
 
 export function GapRow({ styles, onChange, advanced = false }: GapRowProps) {
+  const split = Boolean(styles["row-gap"] || styles["column-gap"]);
   return (
     <>
-      <InputWithUnit label="Gap" property="gap" units={GAP_UNITS} value={styles.gap || ""} onChange={(v) => onChange("gap", v)} />
-      {advanced && (
+      {(!split || styles.gap) && (
+        <InputWithUnit label="Gap" property="gap" units={GAP_UNITS} value={styles.gap || ""} onChange={(v) => onChange("gap", v)} />
+      )}
+      {(advanced || split) && (
         <>
           <InputWithUnit
             label="Row gap"

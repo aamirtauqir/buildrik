@@ -7,6 +7,7 @@
  * @license BSD-3-Clause
  */
 
+import { SpacingSection } from "@/editor/inspector/sections/SpacingSection";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import * as React from "react";
@@ -15,8 +16,6 @@ import path from "node:path";
 import {
   ButtonGroup,
   ColorInput,
-  CornerRadiusInput,
-  SpacingBox,
   InputRow,
   InputWithUnit,
   MixedValueIndicator,
@@ -105,17 +104,6 @@ describe("Mixed — shared controls", () => {
     expect(screen.getAllByText("Mixed")).toHaveLength(2);
   });
 
-  it("corner radius: a mixed corner is empty with the 'Mixed' placeholder", () => {
-    inMixed(
-      ["border-top-left-radius"],
-      <CornerRadiusInput values={{ tl: "4px", tr: "4px", br: "4px", bl: "4px" }} onChange={vi.fn()} />,
-    );
-    const tl = screen.getByRole("textbox", { name: "tl corner, Mixed values" });
-    expect(tl).toHaveValue("");
-    expect(tl).toHaveAttribute("placeholder", "Mixed");
-    expect(screen.getByRole("textbox", { name: "tr corner" })).toHaveValue("4");
-  });
-
   it("MixedValueIndicator reads the field context — no prop threading, muted 'Mixed'", () => {
     inMixed(["overflow"], <MixedValueIndicator property="overflow" />);
     expect(screen.getByText("Mixed")).toBeInTheDocument();
@@ -177,17 +165,16 @@ describe("typing into a Mixed field", () => {
 
   it("spacing side: \"16\" writes 16px, not 6px", () => {
     const onPadding = vi.fn();
-    const sides = { top: "", right: "", bottom: "", left: "" };
     inMixed(
       ["padding-top"],
       <Live
         initial="8px"
         render={(v, set) => (
-          <SpacingBox
-            margin={sides}
-            padding={{ ...sides, top: v }}
-            onMarginChange={vi.fn()}
-            onPaddingChange={(_side, n) => {
+          <SpacingSection
+            isOpen
+            styles={{ "padding-top": v }}
+            onBatchChange={vi.fn()}
+            onChange={(_property, n) => {
               onPadding(n);
               set(n);
             }}

@@ -50,7 +50,7 @@ describe("section order", () => {
 
   it("Heading · Content leads with its type block; Style has no type block", () => {
     expect(titlesFor("content", "heading")).toEqual(["heading", "Semantics", "Advanced attributes"]);
-    expect(titlesFor("style", "heading")).toEqual(["Typography", "Size", "Spacing", "Fill", "Border"]);
+    expect(titlesFor("style", "heading")).toEqual(["Typography", "Size", "Spacing", "Background", "Border"]);
   });
 
   it("161:13919 — Heading · Behavior: Visibility, Interactions; no Link", () => {
@@ -68,26 +68,26 @@ describe("section order", () => {
   });
 
   it("board 5 — Button · Style: Text inside (owner answer 1), no Typography", () => {
-    expect(titlesFor("style", "button")).toEqual(["Size", "Spacing", "Fill", "Border", "Text inside"]);
+    expect(titlesFor("style", "button")).toEqual(["Size", "Spacing", "Background", "Border", "Text inside"]);
   });
 
   it("36:2 — Image · Content holds the source; fit and dimensions are Style's", () => {
     expect(titlesFor("content", "image")).toEqual(["image", "Semantics", "Advanced attributes"]);
-    expect(titlesFor("style", "image")).toEqual(["Size", "Spacing", "Fill", "Border"]);
+    expect(titlesFor("style", "image")).toEqual(["Size", "Spacing", "Background", "Border"]);
   });
 
   it("board 13 — Accordion · Style: no Layout; Text inside kept (owner answer 1)", () => {
-    expect(titlesFor("style", "accordion")).toEqual(["Size", "Spacing", "Fill", "Border", "Text inside"]);
+    expect(titlesFor("style", "accordion")).toEqual(["Size", "Spacing", "Background", "Border", "Text inside"]);
     expect(titlesFor("content", "accordion")).toEqual(["accordion", "Semantics", "Advanced attributes"]);
   });
 
   it("board 16 — Flex · Style: the type block carries the layout; Content has none", () => {
-    expect(titlesFor("style", "flex", { isFlexContainer: true })).toEqual(["flex", "Size", "Spacing", "Fill", "Border", "Text inside"]);
+    expect(titlesFor("style", "flex", { isFlexContainer: true })).toEqual(["flex", "Size", "Spacing", "Background", "Border", "Text inside"]);
     expect(titlesFor("content", "flex")).toEqual(["Semantics", "Advanced attributes"]);
   });
 
-  it("board 17 — Container (grid) · Style: Text inside last, after Border", () => {
-    expect(titlesFor("style", "container", { isGridContainer: true })).toEqual(["Layout", "Size", "Spacing", "Fill", "Border", "Text inside"]);
+  it("board 17 — Container (grid) · Style: Text inside last, after Border; Advanced layout under Children layout (247:21216)", () => {
+    expect(titlesFor("style", "container", { isGridContainer: true })).toEqual(["Children layout", "Advanced layout", "Size", "Spacing", "Background", "Border", "Text inside"]);
   });
 
   it("board 18 — Section · Behavior: Link, no CMS binding", () => {

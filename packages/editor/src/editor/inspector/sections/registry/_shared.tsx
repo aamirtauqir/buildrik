@@ -74,9 +74,12 @@ export type SectionId =
   // Style — define → shape → paint (DD-15)
   | "type-layout"
   | "layout"
+  | "layout-advanced"
   | "typography"
   | "text-inside"
   | "size"
+  | "flex-item"
+  | "grid-item"
   | "spacing"
   | "fill"
   | "border"

@@ -18,18 +18,25 @@ const labels = (c: HTMLElement) => Array.from(c.querySelectorAll(".bdi-lb")).map
 describe("Typography section", () => {
   it("board 1's rows: Font, Font size, Line height, Weight, Colour, Align", () => {
     const { container } = render(<TypographySection styles={{}} onChange={vi.fn()} isOpen onAdvancedToggle={vi.fn()} />);
-    expect(labels(container)).toEqual(["Font", "Font size", "Line height", "Weight", "Colour", "Align"]);
+    expect(labels(container)).toEqual(["Font", "Font size", "Weight", "Line height", "Text color"]);
     expect(screen.getByRole("button", { name: /More settings/ })).toBeInTheDocument();
   });
 
   it("More settings opens the rest", () => {
     const { container } = render(<TypographySection styles={{}} onChange={vi.fn()} isOpen advancedExpanded onAdvancedToggle={vi.fn()} />);
-    expect(labels(container)).toEqual(expect.arrayContaining(["Transform", "Decoration", "Letter", "Word", "Style"]));
+    expect(labels(container)).toEqual(expect.arrayContaining(["Transform", "Decoration", "Letter spacing", "Word spacing", "Font style"]));
+  });
+
+  it("Text inside (247:23404): every row on the face, no More settings, the inheritance note", () => {
+    const { container } = render(<TypographySection styles={{}} onChange={vi.fn()} isOpen inside onAdvancedToggle={vi.fn()} />);
+    expect(labels(container)).toEqual(expect.arrayContaining(["Font", "Letter spacing", "Vertical align"]));
+    expect(screen.queryByRole("button", { name: /More settings/ })).toBeNull();
+    expect(screen.getByText("Inherited by descendants where applicable. Existing child overrides remain.")).toBeInTheDocument();
   });
 
   it("Page panel (board 21): Font and Text colour only, no More settings", () => {
     const { container } = render(<TypographySection styles={{}} onChange={vi.fn()} isOpen variant="page" onAdvancedToggle={vi.fn()} advancedExpanded />);
-    expect(labels(container)).toEqual(["Font", "Text colour"]);
+    expect(labels(container)).toEqual(["Font", "Text color"]);
     expect(screen.queryByRole("button", { name: /More settings/ })).toBeNull();
   });
 

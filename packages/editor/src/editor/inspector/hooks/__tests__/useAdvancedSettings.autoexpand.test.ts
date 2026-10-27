@@ -144,22 +144,24 @@ describe("auto-expand against the registry the inspector actually uses", () => {
     expect(result.current.isExpanded("typography")).toBe(true);
   });
 
-  it("opens Layout for overflow, which its advanced block draws — not for z-index, which sits with Position on the face (board 17)", () => {
-    expect(render({ "overflow-x": "scroll" }, real).result.current.isExpanded("layout")).toBe(true);
+  it("opens Layout for a grid's rows, which its More settings draws — not for overflow (Advanced layout, 2L9 247:21216) or z-index (Placement, on the face)", () => {
+    expect(render({ "grid-template-rows": "1fr 1fr" }, real).result.current.isExpanded("layout")).toBe(true);
+    expect(render({ "overflow-x": "scroll" }, real).result.current.isExpanded("layout")).toBe(false);
     expect(render({ "z-index": "10" }, real).result.current.isExpanded("layout")).toBe(false);
   });
 
-  it("opens Size for a flex item's shrink / basis / order, behind its More settings", () => {
-    expect(render({ "flex-basis": "200px" }, real).result.current.isExpanded("size")).toBe(true);
+  it("does not open Size for a flex item's shrink / basis — Flex item draws them on its face (2L9 247:22853)", () => {
+    expect(render({ "flex-basis": "200px" }, real).result.current.isExpanded("size")).toBe(false);
   });
 
-  it("opens Fill for background-blend-mode", () => {
+  it("Fill has no More settings to open — its image options are on the face (2L9 247:23966)", () => {
     const { result } = render({ "background-blend-mode": "multiply" }, real);
-    expect(result.current.isExpanded("fill")).toBe(true);
+    expect(result.current.isExpanded("fill")).toBe(false);
   });
 
-  it("opens Size for min-width and Border for outline-width", () => {
+  it("opens Size for min-width and Border for a side's own border — not for the outline, which Border shows on its face once set (247:24493)", () => {
     expect(render({ "min-width": "240px" }, real).result.current.isExpanded("size")).toBe(true);
-    expect(render({ "outline-width": "2px" }, real).result.current.isExpanded("border")).toBe(true);
+    expect(render({ "border-top": "1px solid red" }, real).result.current.isExpanded("border")).toBe(true);
+    expect(render({ "outline-width": "2px" }, real).result.current.isExpanded("border")).toBe(false);
   });
 });

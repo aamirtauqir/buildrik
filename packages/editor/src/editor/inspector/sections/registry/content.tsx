@@ -88,7 +88,7 @@ export const CONTENT_SECTIONS: Record<string, AnySectionEntry> = {
       return tag ? tagLabel(tag) : null;
     },
     shouldRender: (ctx) =>
-      ctx.selectedIds.length <= 1 || ctx.selectedIds.every((id) => ctx.composer?.elements.getElement(id)?.getType?.() === "heading"),
+      ctx.selectedIds.length <= 1 || ctx.selectedIds.every((id) => ctx.composer?.elements.getElement(id)?.getType?.() === ctx.selectedElement.type),
     Component: SemanticsSection,
     styleKeys: [],
     adaptProps: (ctx) => ({

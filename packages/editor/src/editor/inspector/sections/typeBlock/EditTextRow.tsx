@@ -14,6 +14,7 @@ import { Button } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine/Composer";
 import { EVENTS } from "@/shared/constants/events";
 import { useInspectorField } from "@/editor/inspector/shared/controls/InspectorFieldContext";
+import { WIDE_BUTTON } from "@/editor/inspector/shared/controls/controlClasses";
 
 interface EditTextRowProps {
   composer: Composer | null | undefined;
@@ -26,12 +27,13 @@ export function EditTextRow({ composer, elementId }: EditTextRowProps) {
   const { readOnly } = useInspectorField();
   if (!composer) return null;
   return (
-    <div className="tw:flex tw:h-6 tw:items-center tw:justify-end" data-testid="inspector-text-content">
+    /* 2L9 161:8480: a full-width bordered button under the "Text" row. */
+    <div className="tw:flex tw:items-center tw:py-1" data-testid="inspector-text-content">
       <Button
         type="button"
         size="xs"
         color="light"
-        className="tw:h-6 tw:w-40 tw:justify-center tw:border-0 tw:bg-transparent tw:px-2 tw:text-[12px] tw:font-normal tw:text-[var(--bk-accent-text)] tw:hover:bg-[var(--bk-accent-tint)]"
+        className={WIDE_BUTTON}
         aria-disabled={readOnly || undefined}
         onClick={() => {
           if (!readOnly) composer.emit(EVENTS.UI_INLINE_EDIT_REQUEST, { elementId });

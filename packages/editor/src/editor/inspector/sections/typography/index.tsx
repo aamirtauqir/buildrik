@@ -1,7 +1,9 @@
 /**
  * Typography — Font, Font size, Line height, Weight, Colour, Align (boards 1,
  * 4), the rest behind More settings. The same body serves:
- *   - "Typography", open, on text types, headed by the Brand "Text style";
+ *   - "Typography", open, on text types (Font, Font size, Weight, Line
+ *     height, Text color — 2L9 161:8940; Text style and Align under More
+ *     settings);
  *   - "Text inside", closed with a one-line summary, on containers, buttons,
  *     form fields and widgets (board 17, owner answer 1) — the registry names
  *     the section and draws the summary;
@@ -18,6 +20,7 @@ import { FontControls } from "./FontControls";
 import { FontPicker } from "./FontPicker";
 import { ADVANCED_TYPOGRAPHY_COUNT, TypographyControls } from "./TypographyControls";
 import { TextStyleRow } from "./TextStyleRow";
+import { NoteRow } from "../behaviourRows";
 
 // ============================================================================
 // TYPES
@@ -42,6 +45,9 @@ export interface TypographySectionProps {
   inherited?: Readonly<Record<string, string>>;
   /** Head the section with the Brand "Text style" row (text types). */
   textStyle?: boolean;
+  /** "Text inside" (2L9 247:23404): every row on the face, no More
+   *  settings, and the inheritance note. */
+  inside?: boolean;
 }
 
 // ============================================================================
@@ -60,13 +66,13 @@ export const TypographySection: React.FC<TypographySectionProps> = ({
   variant = "element",
   inherited,
   textStyle = false,
+  inside = false,
 }) => {
   const handleFontChange = React.useCallback((value: string) => onChange("font-family", value), [onChange]);
   const isPage = variant === "page";
 
   return (
     <Section title="Typography" isOpen={isOpen} onToggle={onToggle} id="inspector-section-typography">
-      {textStyle && <TextStyleRow styles={styles} onChange={onChange} />}
       <div className="tw:relative">
         <FontPicker value={styles["font-family"] || ""} onChange={handleFontChange} composer={composer} inheritedValue={inherited?.["font-family"]} />
       </div>
@@ -80,12 +86,22 @@ export const TypographySection: React.FC<TypographySectionProps> = ({
         inherited={inherited}
       />
 
-      {!isPage && advancedExpanded && (
-        <TypographyControls styles={styles} onChange={onChange} isMultiSelect={isMultiSelect} />
+      {!isPage && (advancedExpanded || inside) && (
+        <>
+          {/* The Brand type-style binding, behind More settings (2L9 161:8940). */}
+          {textStyle && <TextStyleRow styles={styles} onChange={onChange} />}
+          <TypographyControls styles={styles} onChange={onChange} isMultiSelect={isMultiSelect} />
+        </>
       )}
 
-      {!isPage && onAdvancedToggle && (
-        <MoreSettingsToggle isOpen={advancedExpanded} onToggle={() => onAdvancedToggle()} advancedCount={ADVANCED_TYPOGRAPHY_COUNT} />
+      {inside && <NoteRow>Inherited by descendants where applicable. Existing child overrides remain.</NoteRow>}
+
+      {!isPage && !inside && onAdvancedToggle && (
+        <MoreSettingsToggle
+          isOpen={advancedExpanded}
+          onToggle={() => onAdvancedToggle()}
+          advancedCount={ADVANCED_TYPOGRAPHY_COUNT + (textStyle ? 1 : 0)}
+        />
       )}
     </Section>
   );

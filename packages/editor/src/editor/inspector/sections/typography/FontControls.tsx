@@ -1,10 +1,11 @@
 /**
- * FontControls — the Typography section's face under Font (boards 1, 4):
- * Font size, Line height, Weight, Colour, Align. Each row names the CSS
+ * FontControls — the Typography section's face under Font (2L9 161:8940):
+ * Font size, Weight, Line height, Text color. Align and the Brand Text style
+ * are in More settings (TypographyControls). Each row names the CSS
  * property it edits, so read-only, override dots and "Mixed" come from the
  * field context (R-DD-14).
  *
- * The Page panel (board 21) shows only the text colour, as "Text colour".
+ * The Page panel (board 21 / S06) shows only the text colour, "Text color".
  *
  * A font size bound to a Brand type style is bound from the section's
  * "Text style" row (owner answer 4) — the one door for that binding; the
@@ -16,17 +17,21 @@
 
 import * as React from "react";
 import type { Composer } from "@/engine";
-import { SelectRow, ButtonGroup, ColorInput, InputWithUnit } from "@/editor/inspector/shared/controls";
+import { SelectRow, ColorInput, InputWithUnit } from "@/editor/inspector/shared/controls";
 
-/** Board 1 reads the weight as its number ("600"). */
-export const FONT_WEIGHTS = ["100", "200", "300", "400", "500", "600", "700", "800", "900"].map((v) => ({ value: v, label: v }));
+/** 2L9 161:8940 reads the weight by name ("Regular"). */
+export const FONT_WEIGHTS = [
+  ["100", "Thin"],
+  ["200", "Extra light"],
+  ["300", "Light"],
+  ["400", "Regular"],
+  ["500", "Medium"],
+  ["600", "Semibold"],
+  ["700", "Bold"],
+  ["800", "Extra bold"],
+  ["900", "Black"],
+].map(([value, label]) => ({ value, label }));
 
-/** Board 1's Align: Left · Center · Right. */
-const ALIGN_OPTIONS = [
-  { value: "left", label: "Left" },
-  { value: "center", label: "Center" },
-  { value: "right", label: "Right" },
-];
 
 interface FontControlsProps {
   styles: Record<string, string>;
@@ -44,7 +49,7 @@ export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, co
   const colour = (
     <div className="tw:relative">
       <ColorInput
-        label={variant === "page" ? "Text colour" : "Colour"}
+        label="Text color"
         value={styles.color || ""}
         onChange={(v) => onChange("color", v)}
         composer={composer}
@@ -68,6 +73,16 @@ export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, co
       </div>
 
       <div className="tw:relative">
+        <SelectRow
+          label="Weight"
+          value={styles["font-weight"] || ""}
+          onChange={(v) => onChange("font-weight", v)}
+          options={FONT_WEIGHTS}
+          property="font-weight"
+        />
+      </div>
+
+      <div className="tw:relative">
         <InputWithUnit
           label="Line height"
           value={styles["line-height"] || ""}
@@ -79,27 +94,8 @@ export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, co
         />
       </div>
 
-      <div className="tw:relative">
-        <SelectRow
-          label="Weight"
-          value={styles["font-weight"] || ""}
-          onChange={(v) => onChange("font-weight", v)}
-          options={FONT_WEIGHTS}
-          property="font-weight"
-        />
-      </div>
-
       {colour}
 
-      <div className="tw:relative">
-        <ButtonGroup
-          label="Align"
-          value={styles["text-align"] || ""}
-          onChange={(v) => onChange("text-align", v)}
-          options={ALIGN_OPTIONS}
-          property="text-align"
-        />
-      </div>
     </>
   );
 };

@@ -168,7 +168,7 @@ export function NoteRow({ children, testId, tone = "muted" }: { children: React.
       data-testid={testId}
       role={tone === "error" ? "alert" : undefined}
       className={
-        "tw:m-0 tw:py-2 tw:text-[11px] tw:leading-4 " +
+        "tw:m-0 tw:py-2 tw:text-[12px] tw:leading-4 " +
         (tone === "error"
           ? "tw:-ml-4 tw:-mr-5 tw:pl-4 tw:pr-5 tw:bg-[var(--bk-error-tint)] tw:text-[var(--bk-error-text)]"
           : "tw:text-[var(--bk-ink-muted)]")
