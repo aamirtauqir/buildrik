@@ -9,8 +9,8 @@
  *
  * Size is the only writer of width / height / min- / max- (Layout's old Size
  * row is gone, DD-9) and no longer carries object-fit (→ the Image block,
- * board 8). While the parent is a flex or grid container it also holds the
- * item controls (grow / span / align self — see `layout/ItemControls.tsx`).
+ * board 8). A flex or grid child's grow / span / align self are their own
+ * "Flex item" / "Grid item" section (2L9 247:22853, `layout/ItemControls.tsx`).
  * On the Page panel (board 21) it is the one "Max width" row.
  *
  * @license BSD-3-Clause
@@ -25,7 +25,6 @@ import { isTokenVar, resolveTokenVar } from "../shared/tokenBindingDetection";
 import { ButtonGroup, InputWithUnit, MoreSettingsToggle, Section, SelectRow } from "../shared/controls";
 import { useInspectorField } from "../shared/controls/InspectorFieldContext";
 import { CHAIN_BOUND, CHAIN_ROW, CHAIN_TRIGGER } from "../shared/controls/controlClasses";
-import { ItemControls, type ParentLayout } from "./layout/ItemControls";
 import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 
 // ============================================================================
@@ -240,8 +239,6 @@ export interface SizeSectionProps {
   elementId?: string;
   /** "page" = the Page panel's one Max width row (board 21). */
   variant?: "element" | "page";
-  /** The parent is a flex / grid container: show the item controls. */
-  parentLayout?: ParentLayout | null;
   /** An image: its Fit (object-fit) row — "Image fit and dimensions are in
    *  Style" (2L9 board 36:2). */
   fit?: boolean;
@@ -272,7 +269,6 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
   onChange,
   elementId,
   variant = "element",
-  parentLayout = null,
   fit = false,
   propertyStates = {},
   isOpen,
@@ -310,7 +306,6 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
       {fit && (
         <ButtonGroup label="Fit" property="object-fit" value={styles["object-fit"] ?? ""} options={FIT_OPTIONS} onChange={(v) => onChange("object-fit", v)} />
       )}
-      {parentLayout && <ItemControls parent={parentLayout} styles={styles} onChange={onChange} advanced={advancedExpanded} />}
       {advancedExpanded &&
         LIMITS.filter((l) => !hidden(l.property)).map((l) => (
           <InputWithUnit

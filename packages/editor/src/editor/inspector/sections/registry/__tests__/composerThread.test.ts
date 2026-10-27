@@ -27,7 +27,7 @@ describe("composer reaches the sections that own binding chips", () => {
     const cases: Array<[string, string, number]> = [
       ["../../BackgroundSection.tsx", "ColorInput", 3],
       ["../../BorderSection.tsx", "ColorInput", 2],
-      ["../../SpacingSection.tsx", "SpacingBox", 1],
+      ["../../SpacingSection.tsx", "SourceGroup", 1],
       ["../../typography/FontControls.tsx", "ColorInput", 1],
     ];
     for (const [file, control, count] of cases) {

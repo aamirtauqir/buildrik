@@ -78,6 +78,8 @@ export type SectionId =
   | "typography"
   | "text-inside"
   | "size"
+  | "flex-item"
+  | "grid-item"
   | "spacing"
   | "fill"
   | "border"

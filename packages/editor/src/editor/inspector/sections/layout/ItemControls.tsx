@@ -1,15 +1,10 @@
 /**
- * ItemControls — how an element sits inside a flex or grid PARENT: the
- * flex-item (grow, shrink, basis, order) and grid-item (column / row span)
- * properties, plus align-self / justify-self.
- *
- * Home (v4): inside the Size section, shown only while the parent is a flex
- * or grid container (`cssContext.isFlexItem` / `isGridItem`). These are
- * SHAPE properties — how big the element is and where it sits in the space
- * its parent gives it — which is Size's job in DD-15's define → shape →
- * paint; the boards draw no separate "Flex item" section, and a section of
- * its own would add a header to every child of every flex row. Grow and
- * Align self are on the face; the rest wait behind Size's More settings.
+ * ItemControls — how an element sits inside a flex or grid PARENT, as its
+ * own section while the parent is one (2L9 247:22853 "Flex item": Grow ·
+ * Shrink · Basis · Order · Align self; a grid child: Column span · Row span
+ * · Align self · Justify self). Before 2L9 these sat in Size, Grow and Align
+ * self on the face and the rest behind More settings; the board draws the
+ * group whole.
  *
  * The one writer of flex-grow, flex-shrink, flex-basis, order, grid-column,
  * grid-row, align-self and justify-self.
@@ -18,16 +13,15 @@
  */
 
 import * as React from "react";
-import { InputRow, SelectRow } from "@/editor/inspector/shared/controls";
+import { InputRow, Section, SelectRow } from "@/editor/inspector/shared/controls";
+import type { BaseStyleSectionProps } from "../registry/_shared";
 
-export type ParentLayout = "flex" | "grid";
+type ParentLayout = "flex" | "grid";
 
-export interface ItemControlsProps {
+interface ItemControlsProps {
   parent: ParentLayout;
   styles: Record<string, string>;
   onChange: (property: string, value: string) => void;
-  /** Size's More settings is open. */
-  advanced: boolean;
 }
 
 const SELF_OPTIONS = [
@@ -55,7 +49,7 @@ const SPAN_OPTIONS = [
 
 const numberOrEmpty = (v: string) => (v === "" || /^\d*\.?\d+$/.test(v) ? v : null);
 
-export function ItemControls({ parent, styles, onChange, advanced }: ItemControlsProps) {
+function ItemControls({ parent, styles, onChange }: ItemControlsProps) {
   const write = (property: string) => (v: string) => {
     const next = numberOrEmpty(v);
     if (next !== null) onChange(property, next);
@@ -82,12 +76,8 @@ export function ItemControls({ parent, styles, onChange, advanced }: ItemControl
           placeholder="Auto"
           onChange={(v) => onChange("grid-row", v)}
         />
-        {advanced && (
-          <>
-            <SelectRow label="Align self" property="align-self" value={styles["align-self"] || ""} options={GRID_SELF_OPTIONS} onChange={(v) => onChange("align-self", v)} />
-            <SelectRow label="Justify self" property="justify-self" value={styles["justify-self"] || ""} options={GRID_SELF_OPTIONS} onChange={(v) => onChange("justify-self", v)} />
-          </>
-        )}
+        <SelectRow label="Align self" property="align-self" value={styles["align-self"] || "auto"} options={GRID_SELF_OPTIONS} onChange={(v) => onChange("align-self", v)} />
+        <SelectRow label="Justify self" property="justify-self" value={styles["justify-self"] || "auto"} options={GRID_SELF_OPTIONS} onChange={(v) => onChange("justify-self", v)} />
       </>
     );
   }
@@ -95,14 +85,22 @@ export function ItemControls({ parent, styles, onChange, advanced }: ItemControl
   return (
     <>
       <InputRow label="Grow" type="number" property="flex-grow" placeholder="0" value={styles["flex-grow"] || ""} onChange={write("flex-grow")} />
-      <SelectRow label="Align self" property="align-self" value={styles["align-self"] || ""} options={SELF_OPTIONS} onChange={(v) => onChange("align-self", v)} />
-      {advanced && (
-        <>
-          <InputRow label="Shrink" type="number" property="flex-shrink" placeholder="1" value={styles["flex-shrink"] || ""} onChange={write("flex-shrink")} />
-          <InputRow label="Basis" property="flex-basis" placeholder="auto" value={styles["flex-basis"] || ""} onChange={(v) => onChange("flex-basis", v)} />
-          <InputRow label="Order" type="number" property="order" placeholder="0" value={styles.order || ""} onChange={(v) => (v === "" || /^-?\d+$/.test(v)) && onChange("order", v)} />
-        </>
-      )}
+      <InputRow label="Shrink" type="number" property="flex-shrink" placeholder="1" value={styles["flex-shrink"] || ""} onChange={write("flex-shrink")} />
+      <InputRow label="Basis" property="flex-basis" placeholder="auto" value={styles["flex-basis"] || ""} onChange={(v) => onChange("flex-basis", v)} />
+      <InputRow label="Order" type="number" property="order" placeholder="0" value={styles.order || ""} onChange={(v) => (v === "" || /^-?\d+$/.test(v)) && onChange("order", v)} />
+      <SelectRow label="Align self" property="align-self" value={styles["align-self"] || "auto"} options={SELF_OPTIONS} onChange={(v) => onChange("align-self", v)} />
     </>
   );
 }
+
+export const FlexItemSection: React.FC<BaseStyleSectionProps> = ({ styles, onChange, isOpen, onToggle }) => (
+  <Section title="Flex item" isOpen={isOpen} onToggle={onToggle} id="inspector-section-flex-item">
+    <ItemControls parent="flex" styles={styles} onChange={onChange} />
+  </Section>
+);
+
+export const GridItemSection: React.FC<BaseStyleSectionProps> = ({ styles, onChange, isOpen, onToggle }) => (
+  <Section title="Grid item" isOpen={isOpen} onToggle={onToggle} id="inspector-section-grid-item">
+    <ItemControls parent="grid" styles={styles} onChange={onChange} />
+  </Section>
+);

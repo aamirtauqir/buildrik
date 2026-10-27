@@ -208,7 +208,7 @@ const UNIT_WORDS: Record<string, string> = {
 };
 
 /** The unit words for a value, or "" when it has none to speak of. */
-export function unitWords(unit: string): string {
+function unitWords(unit: string): string {
   if (KEYWORDS.has(unit)) return "";
   return UNIT_WORDS[unit] ?? `in ${unit}`;
 }

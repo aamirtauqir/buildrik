@@ -13,6 +13,7 @@
 import { adaptBaseStyleProps, defineSection, shownOnInstanceRoot, type AnySectionEntry, type ShouldRenderContext } from "./_shared";
 import { LayoutAdvancedSection, LayoutSection } from "../layout";
 import { SizeSection } from "../SizeSection";
+import { FlexItemSection, GridItemSection } from "../layout/ItemControls";
 import { SpacingSection } from "../SpacingSection";
 import { BackgroundSection } from "../BackgroundSection";
 import { BorderSection } from "../BorderSection";
@@ -33,7 +34,8 @@ const LAYOUT_KEYS = [
   ...GAP_KEYS,
 ];
 const LAYOUT_ADVANCED_KEYS = ["overflow", "overflow-x", "overflow-y", "box-sizing", "float", "clear", "visibility"];
-const ITEM_KEYS = ["flex-grow", "flex-shrink", "flex-basis", "order", "align-self", "justify-self", "grid-column", "grid-row"];
+const FLEX_ITEM_KEYS = ["flex-grow", "flex-shrink", "flex-basis", "order", "align-self"];
+const GRID_ITEM_KEYS = ["grid-column", "grid-row", "align-self", "justify-self"];
 
 /** "2 set" / "None" — how many of a section's own properties the element
  *  carries here (2L9 161:8940 draws Spacing, Background and Border shut
@@ -92,18 +94,38 @@ export const BOX_SECTIONS: Record<string, AnySectionEntry> = {
     page: true,
     Component: SizeSection,
     advancedKey: "size",
-    advancedProps: ["min-width", "max-width", "min-height", "max-height", "flex-shrink", "flex-basis", "order", "align-self", "justify-self"],
-    styleKeys: ["width", "height", "min-width", "min-height", "max-width", "max-height", "object-fit", ...ITEM_KEYS],
+    advancedProps: ["min-width", "max-width", "min-height", "max-height"],
+    styleKeys: ["width", "height", "min-width", "min-height", "max-width", "max-height", "object-fit"],
     adaptProps: (ctx) => ({
       ...adaptBaseStyleProps(ctx),
       elementId: ctx.selectedElement.id,
       variant: ctx.variant,
       fit: ctx.caps.typeBlock === "image",
-      parentLayout: ctx.cssContext.isFlexItem ? ("flex" as const) : ctx.cssContext.isGridItem ? ("grid" as const) : null,
       propertyStates: ctx.propertyStates,
       advancedExpanded: ctx.advancedExpanded,
       onAdvancedToggle: ctx.onAdvancedToggle,
     }),
+  }),
+
+  /* 2L9 247:22853: a flex / grid child's own group, while its parent is one. */
+  "flex-item": defineSection({
+    tab: "style",
+    title: "Flex item",
+    open: "always",
+    shouldRender: (ctx) => ctx.cssContext.isFlexItem,
+    Component: FlexItemSection,
+    styleKeys: FLEX_ITEM_KEYS,
+    adaptProps: adaptBaseStyleProps,
+  }),
+
+  "grid-item": defineSection({
+    tab: "style",
+    title: "Grid item",
+    open: "always",
+    shouldRender: (ctx) => ctx.cssContext.isGridItem,
+    Component: GridItemSection,
+    styleKeys: GRID_ITEM_KEYS,
+    adaptProps: adaptBaseStyleProps,
   }),
 
   spacing: defineSection({
@@ -113,11 +135,14 @@ export const BOX_SECTIONS: Record<string, AnySectionEntry> = {
     summary: setSummary(SPACING_KEYS),
     page: true,
     Component: SpacingSection,
+    advancedKey: "spacing",
     styleKeys: SPACING_KEYS,
     adaptProps: (ctx) => ({
       ...adaptBaseStyleProps(ctx),
       onBatchChange: ctx.onBatchChange,
       propertyStates: ctx.propertyStates,
+      advancedExpanded: ctx.advancedExpanded,
+      onAdvancedToggle: ctx.onAdvancedToggle,
     }),
   }),
 

@@ -120,13 +120,7 @@ describe("SizeSection — what moved in and out", () => {
     expect(screen.getByLabelText("Max width")).toHaveValue("100");
   });
 
-  it("under a flex parent it carries Grow and Align self", () => {
-    renderSize({ parentLayout: "flex" });
-    expect(screen.getByLabelText("Grow")).toBeInTheDocument();
-    expect(screen.getByLabelText("Align self")).toBeInTheDocument();
-  });
-
-  it("with no flex / grid parent, no item controls", () => {
+  it("carries no item controls — a flex / grid child has its own section (2L9 247:22853)", () => {
     renderSize();
     expect(screen.queryByLabelText("Grow")).not.toBeInTheDocument();
     expect(screen.queryByLabelText("Column span")).not.toBeInTheDocument();

@@ -14,6 +14,7 @@ import { Button } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine/Composer";
 import { EVENTS } from "@/shared/constants/events";
 import { useInspectorField } from "@/editor/inspector/shared/controls/InspectorFieldContext";
+import { WIDE_BUTTON } from "@/editor/inspector/shared/controls/controlClasses";
 
 interface EditTextRowProps {
   composer: Composer | null | undefined;
@@ -32,7 +33,7 @@ export function EditTextRow({ composer, elementId }: EditTextRowProps) {
         type="button"
         size="xs"
         color="light"
-        className="tw:h-8 tw:w-full tw:justify-center tw:text-[13px] tw:font-normal tw:text-[var(--bk-ink)] tw:focus:ring-0"
+        className={WIDE_BUTTON}
         aria-disabled={readOnly || undefined}
         onClick={() => {
           if (!readOnly) composer.emit(EVENTS.UI_INLINE_EDIT_REQUEST, { elementId });

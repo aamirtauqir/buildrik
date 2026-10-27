@@ -85,7 +85,7 @@ describe("override marks — boards 27 / 28", () => {
     expect(screen.queryByTestId("inspector-section-note")).toBeNull();
   });
 
-  it("26: an instance's padding edit puts a master dot on that SpacingBox side and the note on Spacing", async () => {
+  it("26: an instance's padding edit puts a master dot on that Padding row and the note on Spacing", async () => {
     const c = createTestComposer();
     const root = c.elements.createPage("Home").root.id;
     const banner = c.elements.createElement("container" as never, {} as never);
@@ -105,7 +105,7 @@ describe("override marks — boards 27 / 28", () => {
     if (screen.queryByRole("tab", { name: "Style", selected: false })) fireEvent.click(screen.getByRole("tab", { name: "Style" }));
     fireEvent.click(screen.getByRole("button", { name: "Spacing section, collapsed" }));
     const spacing = document.getElementById("inspector-section-spacing")!;
-    const side = within(spacing).getByTestId("inspector-spacing-padding-top");
+    const side = within(spacing).getByTestId("inspector-row-padding-top");
     expect(within(side).getByRole("button", { name: "Overrides master" })).toBeTruthy();
     expect(within(spacing).getByTestId("inspector-section-note").textContent).toBe("Padding overrides master");
   });

@@ -5448,8 +5448,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Grow/shrink exist; board \"Flex item\" group + spacing-token picker differ (SizeSection.tsx:95)",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B P1 (2026-10-27), probe inspector-panel ?type=container under a flex parent (?parent=) with padding-top bound to a spacing token, on :5172, side by side with the board PNG: 'Flex item' section (Grow · Shrink · Basis · Order · Align self, all on the face) before Spacing; Spacing as rows Padding top · Padding sides · Padding bottom · Margin top · Margin bottom; 'Source' group 'Padding top · spacing token · 24 px resolved' + full-width 'Unlink to 24 px' (+ 'Remove local override' when the edge is overridden here — unit-tested, the probe has no override). Exceptions: a bound field shows its resolved number, not the token name (shared InputWithUnit rule, 6894:74644; the Source line names it); 'More settings' under Spacing splits sides into Left / Right and reveals Margin sides (code:sides-reachable — margin: 0 auto centring has no other writer).",
    "tier": "P1"
   },
   {

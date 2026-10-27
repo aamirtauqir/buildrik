@@ -12,7 +12,7 @@ import { render, screen, fireEvent, within } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import * as React from "react";
 import { InputWithUnit } from "../InputControls";
-import { SpacingBox } from "../SpacingControls";
+import { SpacingSection } from "@/editor/inspector/sections/SpacingSection";
 import { SizeSection } from "@/editor/inspector/sections/SizeSection";
 
 /** A parent that writes what the field sends, like the Inspector does. */
@@ -54,15 +54,15 @@ describe("Escape restores the value the field had at focus", () => {
 
   it("padding side: typed 77 then Escape clears the side it found empty", () => {
     function Box() {
-      const [padding, setPadding] = React.useState({ top: "", right: "", bottom: "", left: "" });
+      const [styles, setStyles] = React.useState<Record<string, string>>({});
       return (
-        <SpacingBox
-          margin={{ top: "", right: "", bottom: "", left: "" }}
-          padding={padding}
-          onMarginChange={() => {}}
-          onPaddingChange={(side, v) => {
-            onWrite(side, v);
-            setPadding((p) => ({ ...p, [side]: v }));
+        <SpacingSection
+          isOpen
+          styles={styles}
+          onBatchChange={() => {}}
+          onChange={(property, v) => {
+            onWrite(property.replace("padding-", ""), v);
+            setStyles((p) => ({ ...p, [property]: v }));
           }}
         />
       );

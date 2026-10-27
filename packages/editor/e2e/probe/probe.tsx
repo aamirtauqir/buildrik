@@ -2292,6 +2292,9 @@ const CASES: Record<string, () => React.ReactElement> = {
     /* `?styles={"display":"flex",…}` — a specimen's authored values. */
     const styles = q.get("styles");
     if (styles) el.setStyles(JSON.parse(styles) as Record<string, string>);
+    /* `?parent={"display":"flex"}` — the page root's, for flex / grid children. */
+    const parentStyles = q.get("parent");
+    if (parentStyles) c.elements.getElement(page.root.id)?.setStyles(JSON.parse(parentStyles) as Record<string, string>);
     c.selection.select(el);
     function Host() {
       const { selectedElement } = useComposerSelection({ composer: c });

@@ -28,7 +28,7 @@ import { VisibilitySection } from "../VisibilitySection";
 import { LayoutSection } from "../layout";
 import { FlexControls } from "../layout/FlexControls";
 import { GridControls } from "../layout/GridControls";
-import { ItemControls } from "../layout/ItemControls";
+import { FlexItemSection, GridItemSection } from "../layout/ItemControls";
 import { TypographySection } from "../typography";
 
 type Write = (property: string, value: string) => void;
@@ -45,9 +45,9 @@ const SECTIONS: Record<string, React.FC<SectionProps>> = {
   "Effects advanced": (p) => <EffectsAdvancedSection {...p} isOpen />,
   Flex: (p) => <FlexControls {...p} />,
   Grid: (p) => <GridControls {...p} />,
-  "Flex item": (p) => <ItemControls parent="flex" advanced {...p} />,
-  "Grid item": (p) => <ItemControls parent="grid" advanced {...p} />,
-  Size: (p) => <SizeSection {...p} parentLayout="flex" isOpen advancedExpanded onAdvancedToggle={() => {}} />,
+  "Flex item": (p) => <FlexItemSection {...p} isOpen />,
+  "Grid item": (p) => <GridItemSection {...p} isOpen />,
+  Size: (p) => <SizeSection {...p} isOpen advancedExpanded onAdvancedToggle={() => {}} />,
   Spacing: (p) => <SpacingSection {...p} isOpen />,
   Visibility: (p) => <VisibilitySection {...p} isOpen />,
   Layout: (p) => <LayoutSection {...p} isOpen advancedExpanded onAdvancedToggle={() => {}} />,

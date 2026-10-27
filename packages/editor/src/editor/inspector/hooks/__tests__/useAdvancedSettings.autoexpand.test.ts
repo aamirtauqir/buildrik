@@ -150,8 +150,8 @@ describe("auto-expand against the registry the inspector actually uses", () => {
     expect(render({ "z-index": "10" }, real).result.current.isExpanded("layout")).toBe(false);
   });
 
-  it("opens Size for a flex item's shrink / basis / order, behind its More settings", () => {
-    expect(render({ "flex-basis": "200px" }, real).result.current.isExpanded("size")).toBe(true);
+  it("does not open Size for a flex item's shrink / basis — Flex item draws them on its face (2L9 247:22853)", () => {
+    expect(render({ "flex-basis": "200px" }, real).result.current.isExpanded("size")).toBe(false);
   });
 
   it("opens Fill for background-blend-mode", () => {
