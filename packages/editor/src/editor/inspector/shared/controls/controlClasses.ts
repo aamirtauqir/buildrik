@@ -55,6 +55,10 @@ export const compactBtnClass = (active: boolean): string =>
       : "tw:bg-transparent tw:border-transparent tw:font-normal tw:text-[var(--bk-ink-soft)] tw:enabled:hover:bg-transparent tw:hover:text-[var(--bk-ink)]",
   ].join(" ");
 
+/** A named group inside an open section, headed like a section (2L9
+ *  247:21216 "Placement", 247:24493 "Outline"): 13 / semibold ink. */
+export const GROUP_TITLE = "tw:mt-6 tw:mb-3 tw:text-[13px] tw:leading-4 tw:font-semibold tw:text-[var(--bk-ink)]";
+
 /** Sub-heading inside an open section ("Size Constraints", "Overflow"). */
 export const SECTION_SUBTITLE =
   "tw:mt-0.5 tw:mb-1 tw:text-[length:var(--bk-text-11)] tw:font-semibold tw:uppercase tw:tracking-[0.08em] " +

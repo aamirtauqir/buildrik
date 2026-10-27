@@ -159,8 +159,9 @@ describe("auto-expand against the registry the inspector actually uses", () => {
     expect(result.current.isExpanded("fill")).toBe(true);
   });
 
-  it("opens Size for min-width and Border for outline-width", () => {
+  it("opens Size for min-width and Border for a side's own border — not for the outline, which Border shows on its face once set (247:24493)", () => {
     expect(render({ "min-width": "240px" }, real).result.current.isExpanded("size")).toBe(true);
-    expect(render({ "outline-width": "2px" }, real).result.current.isExpanded("border")).toBe(true);
+    expect(render({ "border-top": "1px solid red" }, real).result.current.isExpanded("border")).toBe(true);
+    expect(render({ "outline-width": "2px" }, real).result.current.isExpanded("border")).toBe(false);
   });
 });

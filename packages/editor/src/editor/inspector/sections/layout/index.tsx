@@ -14,7 +14,7 @@
 
 import * as React from "react";
 import { MoreSettingsToggle, Section } from "@/editor/inspector/shared/controls";
-import { SECTION_SUBTITLE } from "@/editor/inspector/shared/controls/controlClasses";
+import { GROUP_TITLE, SECTION_SUBTITLE } from "@/editor/inspector/shared/controls/controlClasses";
 import { DisplayControls } from "./DisplayControls";
 import { FlexControls } from "./FlexControls";
 import { GridControls } from "./GridControls";
@@ -35,10 +35,6 @@ export interface LayoutSectionProps {
   mixedKeys?: ReadonlySet<string>;
   isMultiSelect?: boolean;
 }
-
-/* 2L9 247:21216: "Placement" heads its rows like a section title (13 /
-   semibold ink), not the uppercase sub-heading. */
-const GROUP_TITLE = "tw:mt-3 tw:mb-1 tw:text-[13px] tw:leading-4 tw:font-semibold tw:text-[var(--bk-ink)]";
 
 const FLEX = new Set(["flex", "inline-flex"]);
 const GRID = new Set(["grid", "inline-grid"]);

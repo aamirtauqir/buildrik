@@ -33,8 +33,8 @@ export { SliderInput, RangeSlider } from "./SliderControls";
 export type { SliderInputProps, RangeSliderProps } from "./SliderControls";
 
 // Spacing controls
-export { SpacingBox, CornerRadiusInput } from "./SpacingControls";
-export type { SpacingBoxProps, CornerRadiusInputProps } from "./SpacingControls";
+export { SpacingBox } from "./SpacingControls";
+export type { SpacingBoxProps } from "./SpacingControls";
 
 // Alignment grid
 export { AlignmentGrid } from "./AlignmentGrid";

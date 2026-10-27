@@ -1,6 +1,5 @@
 /**
- * Spacing Controls — the SpacingBox (margin outside, padding inside) and
- * CornerRadiusInput.
+ * Spacing Controls — the SpacingBox (margin outside, padding inside).
  *
  * SpacingBox, board 1: a grey margin box holding a white padding box, each
  * with its label top-left and its four numbers on the edges (top centred,
@@ -12,12 +11,11 @@
  * @license BSD-3-Clause
  */
 
-import { Link, Unlink } from "lucide-react";
 import * as React from "react";
 import { FieldDot } from "./FieldDot";
-import { useInspectorField, mixedName } from "./InspectorFieldContext";
+import { useInspectorField } from "./InspectorFieldContext";
 import { unitWords } from "./InputControls";
-import { TextField, Button, TextInput, IconButton } from "@/editor/chrome-ui";
+import { TextField, IconButton } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
 import { requestBrandToken } from "@/editor/design-system/ui/brandOpenRequest";
 import { isTokenVar, extractVarName, cssVarToTokenId, resolveTokenVar } from "../tokenBindingDetection";
@@ -249,94 +247,3 @@ export const SpacingBox: React.FC<SpacingBoxProps> = ({
     </Ring>
   </div>
 );
-
-// ============================================================================
-// CORNER RADIUS INPUT
-// ============================================================================
-// Note: legacy FourSideInput (single-quad spacing control) removed
-// 2026-05-24. Had zero production callers since DS Phase D.1; the
-// canonical control is SpacingBox above.
-
-export interface CornerRadiusInputProps {
-  values: { tl: string; tr: string; br: string; bl: string };
-  onChange: (corner: "tl" | "tr" | "br" | "bl", value: string) => void;
-  linked?: boolean;
-  onLinkToggle?: () => void;
-}
-
-export const CornerRadiusInput: React.FC<CornerRadiusInputProps> = ({
-  values,
-  onChange,
-  linked = false,
-  onLinkToggle,
-}) => (
-  <div className="tw:flex tw:flex-col tw:gap-1">
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        gap: 4,
-      }}
-    >
-      <span className="bdi-sub-label">Radius</span>
-      {onLinkToggle && (
-        <Button
-          type="button"
-          onClick={onLinkToggle}
-          title={linked ? "Unlink corners" : "Link all corners"}
-          aria-label={linked ? "Unlink corners" : "Link all corners"}
-          className="tw:px-0 bdi-icon-btn"
-          style={{
-            width: 18,
-            height: 18,
-            color: linked ? "var(--bk-accent)" : "var(--bk-ink-muted)",
-          }}
-        >
-          {linked ? <Link size={12} aria-hidden="true" /> : <Unlink size={12} aria-hidden="true" />}
-        </Button>
-      )}
-    </div>
-    <div className="bdi-quad">
-      {(["tl", "tr", "bl", "br"] as const).map((corner) => (
-        <CornerCell key={corner} corner={corner} value={values[corner]} onChange={(v) => onChange(corner, v)} />
-      ))}
-    </div>
-  </div>
-);
-
-const CORNER_PROPERTY = {
-  tl: "border-top-left-radius",
-  tr: "border-top-right-radius",
-  br: "border-bottom-right-radius",
-  bl: "border-bottom-left-radius",
-} as const;
-
-const CornerCell: React.FC<{ corner: keyof typeof CORNER_PROPERTY; value: string; onChange: (value: string) => void }> = ({
-  corner,
-  value,
-  onChange,
-}) => {
-  const field = useInspectorField(CORNER_PROPERTY[corner]);
-  const { num, unit } = parseValue(value);
-  return (
-    <div className="bdi-num axis" data-axis={corner.toUpperCase()}>
-      <TextInput
-        type="text"
-        value={field.mixed ? "" : num}
-        readOnly={field.readOnly}
-        onChange={(e) => {
-          if (field.readOnly) return;
-          const v = e.target.value;
-          field.startTyping();
-          if (v === "") onChange("");
-          else if (/^-?[\d.]+$/.test(v)) onChange(`${v}px`);
-        }}
-        onBlur={field.stopTyping}
-        placeholder={field.mixed ? "Mixed" : "0"}
-        aria-label={field.mixed ? mixedName(`${corner} corner`) : `${corner} corner`}
-      />
-      {unit && !field.mixed && <span className="bdi-u">{unit}</span>}
-    </div>
-  );
-};

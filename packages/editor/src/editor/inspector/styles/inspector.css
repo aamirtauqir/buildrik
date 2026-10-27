@@ -44,34 +44,6 @@
   overflow-x: hidden;
 }
 
-/* ── Selection breadcrumb strip ────────────────────────── */
-.bdi-icon-btn {
-  width: 22px;
-  height: 22px;
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: none;
-  border-radius: 4px;
-  color: var(--bk-ink-muted);
-  cursor: pointer;
-  padding: 0;
-}
-.bdi-icon-btn:hover {
-  background: var(--bk-bg-subtle);
-  color: var(--bk-ink);
-}
-.bdi-icon-btn.on {
-  background: var(--bk-accent-tint);
-  color: var(--bk-accent);
-}
-.bdi-icon-btn:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-}
-
 /* ── Element header (Figma-style) ──────────────────────── */
 .bdi-ehdr {
   display: flex;
@@ -858,83 +830,6 @@ textarea.bdi-text {
   background: var(--bk-bg-panel);
   border-bottom: 1px solid var(--bk-border);
 }
-.bdi-num {
-  /* Legacy numeric input — behaves like .bdi-fld but without inline icon slot */
-  display: flex;
-  align-items: center;
-  height: 24px;
-  width: 100%;
-  background: var(--bk-bg-subtle);
-  border: 1px solid transparent;
-  border-radius: 4px;
-  overflow: hidden;
-  transition: background 120ms, border-color 120ms;
-  position: relative;
-}
-.bdi-num:hover {
-  background: var(--bk-bg-card, var(--bk-bg-card));
-  border-color: var(--bk-border);
-}
-.bdi-num:focus-within {
-  background: var(--bk-bg-card, var(--bk-bg-card));
-  border-color: var(--bk-accent);
-  box-shadow: var(--bk-shadow-focus);
-}
-.bdi-num input {
-  flex: 1;
-  min-width: 0;
-  border: none;
-  outline: none;
-  background: transparent;
-  padding: 0 var(--bk-space-4) 0 var(--bk-space-8);
-  font: 500 11px var(--bk-font-ui);
-  color: var(--bk-ink);
-  font-variant-numeric: tabular-nums;
-}
-.bdi-num input.muted {
-  color: var(--bk-ink-muted);
-}
-.bdi-num .bdi-u {
-  font: 500 var(--bk-text-11) var(--bk-font-mono);
-  color: var(--bk-ink-soft);
-  padding: 0 6px 0 2px;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  text-transform: lowercase;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  flex-shrink: 0; /* see `.bdi-fld .bdi-u` */
-}
-.bdi-num .bdi-u.select {
-  padding-right: var(--bk-space-4);
-}
-.bdi-num.mixed {
-  background: rgba(217, 119, 6, 0.06);
-  border-color: rgba(217, 119, 6, 0.35);
-}
-.bdi-num.axis {
-  padding-left: 14px;
-}
-.bdi-num.axis::before {
-  content: attr(data-axis);
-  position: absolute;
-  left: 4px;
-  top: 50%;
-  transform: translateY(-50%);
-  font: 600 var(--bk-text-11) var(--bk-font-ui);
-  letter-spacing: 0.08em;
-  color: var(--bk-ink-muted);
-  text-transform: uppercase;
-  pointer-events: none;
-}
-.bdi-quad {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--bk-space-4);
-}
-
 /* Scrollbar */
 .bdi-panel-scroll::-webkit-scrollbar {
   width: 6px;

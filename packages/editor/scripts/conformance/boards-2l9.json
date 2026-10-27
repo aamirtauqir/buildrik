@@ -5481,8 +5481,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Per-side borders/corners/outline grouping differs from board",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B P1 (2026-10-27), probe inspector-panel ?type=container&styles={1px solid #D4D9E2, radius 8 8 16 16, outline 2px solid offset 4} on :5172, Border opened and scrolled, side by side with the board PNG: Width · Style · Color · Top left · Top right · Bottom right · Bottom left, then 'Outline' (13/semibold) · Width · Style · Color · Offset; Bottom left → Offset measured 212 px vs the board's 216. Corners that agree read as one 'Radius' row (writes the shorthand). Exceptions: 'More settings 4' under the outline keeps the individual sides (border-top …) reachable (code:sides-reachable — no other writer); the outline colour shows a hex where the board's sample names a token (sample data); header 'Editing Desktop · Focus' is InspectorHeader (lead).",
    "tier": "P1"
   },
   {

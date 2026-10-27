@@ -15,7 +15,6 @@ import path from "node:path";
 import {
   ButtonGroup,
   ColorInput,
-  CornerRadiusInput,
   SpacingBox,
   InputRow,
   InputWithUnit,
@@ -103,17 +102,6 @@ describe("Mixed — shared controls", () => {
     expect(screen.getByRole("slider", { name: "Opacity, Mixed values" })).toBeInTheDocument();
     expect(screen.getByRole("slider", { name: "Blur, Mixed values" })).toBeInTheDocument();
     expect(screen.getAllByText("Mixed")).toHaveLength(2);
-  });
-
-  it("corner radius: a mixed corner is empty with the 'Mixed' placeholder", () => {
-    inMixed(
-      ["border-top-left-radius"],
-      <CornerRadiusInput values={{ tl: "4px", tr: "4px", br: "4px", bl: "4px" }} onChange={vi.fn()} />,
-    );
-    const tl = screen.getByRole("textbox", { name: "tl corner, Mixed values" });
-    expect(tl).toHaveValue("");
-    expect(tl).toHaveAttribute("placeholder", "Mixed");
-    expect(screen.getByRole("textbox", { name: "tr corner" })).toHaveValue("4");
   });
 
   it("MixedValueIndicator reads the field context — no prop threading, muted 'Mixed'", () => {

@@ -149,7 +149,8 @@ export const BOX_SECTIONS: Record<string, AnySectionEntry> = {
     summary: setSummary(BORDER_KEYS),
     Component: BorderSection,
     advancedKey: "border",
-    advancedProps: ["outline-width", "outline-style", "outline-color", "outline-offset"],
+    /* The outline and split corners show on the face once set (247:24493). */
+    advancedProps: ["border-top", "border-right", "border-bottom", "border-left"],
     styleKeys: BORDER_KEYS,
     adaptProps: (ctx) => ({
       ...adaptBaseStyleProps(ctx),
