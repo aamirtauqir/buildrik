@@ -171,7 +171,12 @@ const PageSettingsCard: React.FC<Props> = ({ page, allPages, composer, onClose, 
           <p className="tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="pg-drawer-subtitle">
             {s.isDirty || s.saveState === "error"
               ? `${page.name} · Unsaved settings changes${stays ? ` · ${stays} stays open` : ""}`
-              : `Editing ${page.name}${stays ? ` · ${stays} stays open on the canvas` : ""}`}
+              : stays
+                ? `Editing ${page.name} · ${stays} stays open on the canvas`
+                : active?.id === page.id
+                  ? /* 94:29621: the page on the canvas — its appearance is the Inspector's. */
+                    `Editing ${page.name} · Page appearance stays in the Inspector`
+                  : `Editing ${page.name}`}
           </p>
           {s.activeTab === "seo" && (
             <div id="pg-drawer-tab-seo" role="tabpanel" aria-label="SEO settings">
@@ -206,7 +211,8 @@ const PageSettingsCard: React.FC<Props> = ({ page, allPages, composer, onClose, 
           <Button
             size="xs"
             data-testid="pg-drawer-done"
-            disabled={s.saveState === "saving"}
+            /* 94:29621: nothing to save draws Save disabled (Cancel / ✕ close). */
+            disabled={s.saveState === "saving" || (!s.isDirty && s.saveState !== "error")}
             aria-busy={s.saveState === "saving" || undefined}
             onClick={() => void handleDone()}
           >

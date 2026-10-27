@@ -3251,6 +3251,19 @@ const CASES: Record<string, () => React.ReactElement> = {
       </ToastProvider>
     </div>
   ),
+  /* design-2l9 94:13447 — the same manager with About open. */
+  "pages-about-active": () => {
+    const c = listingsComposer();
+    const about = c.elements.getAllPages().find((p) => p.name === "About");
+    if (about) c.elements.setActivePage(about.id);
+    return (
+      <div data-probe="pages-about-active" style={{ width: 284, height: 812, display: "flex" }}>
+        <ToastProvider>
+          <PagesTab composer={c} onClose={() => {}} onRequestTemplates={() => {}} />
+        </ToastProvider>
+      </div>
+    );
+  },
   /* design-2l9 board 63:21262 — the manager's Listings view, 720 wide as the
      board draws it, on a real Composer (the recipe clicks the Listings tab). */
   "pages-listings": () => (
@@ -3750,6 +3763,17 @@ const CASES: Record<string, () => React.ReactElement> = {
       />
     </div>
   ),
+  /* design-2l9 94:29621 — page settings for the page on the canvas (About). */
+  "pages-settings-active": () => {
+    const about = { ...PAGE_SETTINGS_FIXTURE, id: "about", name: "About", slug: "about", isHome: false, isActive: true };
+    return (
+      <div data-probe="pages-settings-active" style={{ width: 1440, height: 900, background: "var(--bk-gray-900)" }}>
+        <ToastProvider>
+          <PageSettingsDrawer page={about} allPages={[about]} composer={null} onClose={() => {}} />
+        </ToastProvider>
+      </div>
+    );
+  },
   /* design-2l9 board 63:17617 — About renamed to "Our story" with its URL
      moved: page settings opened by "Update URL" offer the redirect. */
   "pages-settings-redirect": () => (
