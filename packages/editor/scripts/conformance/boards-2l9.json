@@ -5056,8 +5056,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Lane L-B P1 round 2 (built, not compared — no board image fetched this round; copy from the dump): a type change applies at once with the receipt 'Field type changed to Text' and Undo bound to that history step (history.captureUndo) — unit-tested on a real Composer, Undo restores the type. The receipt's position (bottom right, 460 wide) is the shell's toast.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B P1 round 3 (2026-10-27), board PNG fetched and compared side by side with the probe (contact form → field → Type → Email): Type reads the new type at once and the receipt says 'Field type changed to Email' with Undo (board: '… to Text' — the chosen type), Undo bound to that history step (unit-tested on a real Composer). The receipt's chrome (× close, Undo in the accent) is the shared chrome-ui Toast's, not this board's ink 'Undo' — not re-styled from one board.",
    "inheritsFrom": "170:121692",
    "tier": "P1"
   },
@@ -5202,8 +5202,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Lane L-B P1 round 2: board fetched and the instance block compared (same as 241:16522). Still open: the per-section override header 'Spacing · 2 overrides', the overridden row with 'Remove Tablet override' and 'Falls back to Desktop: 24 px', and the source line '· 2 Tablet overrides' — the breakpoint-override detail is not built in the section (today: the field's override dot + the section note).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B P1 round 3, probe ?type=container&styles={padding 24 sides}&bp=tablet&bpStyles={padding 16 sides} (StyleEngine.setBreakpointStyle), Spacing opened, side by side: the header reads 'Spacing · 2 overrides'; the body opens with '● Padding  16 px', 'Remove Tablet override' (drops that family's Tablet properties through the existing resetOverride), 'Falls back to Desktop: 24 px' — all read from the engine's Tablet layer and the element's base styles (useFieldOverrides.entries). The old header dot and 'Overridden on Tablet' note give way to it. Exceptions: the instance identity block's '· 2 Tablet overrides' source suffix is not added (the context row already reads 'Tablet · 2 overrides · Revert'); the board's two-column Typography body below is the older layout (coordinator: IC01 call stands).",
    "tier": "P1"
   },
   {
@@ -22796,7 +22796,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "FAILING STEP: inspector has no Content tab/Text content field (_shared.tsx:44 = Style·Behaviour·Effects); no insert receipt.",
+   "verifiedNote": "Lane L-B P1 round 3, board PNG compared: the Inspector half (Content › 'Text content' textarea with B I U link, 'Changes save automatically.', open Semantics with Tag / ID / 'Use a descriptive ID…') is the Play prototype's older Content layout — superseded for the Inspector by page 04's text board 161:8480 (Text row + bind icon, 'Edit text on canvas', Semantics; drift-fixed). Still open and not L-B's: the Add panel's insert receipt 'Text added to Hero · Selected on canvas · Focus stays here' (L-A).",
    "tier": "P1"
   },
   {
@@ -22816,9 +22816,9 @@
    "page": "09",
    "family": "play",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:161:8480",
    "verified": "drift-open",
-   "verifiedNote": "Edit content via inspector Text content field: no Content tab; text only editable inline on canvas.",
+   "verifiedNote": "Lane L-B P1 round 3, board PNG compared: editing the text through an Inspector textarea (+ B I U link) is the Play prototype's older Content layout; page 04's text board 161:8480 (drift-fixed) edits text on the canvas from 'Edit text on canvas' — the Inspector spec wins for the Inspector, as already decided for F2.02's 'Title text' box.",
    "tier": "P1"
   },
   {
@@ -22904,9 +22904,9 @@
    "page": "09",
    "family": "play",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:161:8480",
    "verified": "drift-open",
-   "verifiedNote": "FAILING STEP: binding lives in Behaviour › CMS binding selects (CmsBindingSection.tsx:239), not Content › Title text.",
+   "verifiedNote": "Lane L-B P1 round 3, board PNG compared: Content › 'Text' with Tag in the block and a 'Title text' preview box is the Play prototype's layout; the Inspector follows 161:8480 (Text row + bind icon → Choose source, Edit text on canvas, Tag in Semantics). The back link '‹ CMS · Dynamic pages' is the origin link C-11 built (UI_CMS_OPEN origin), not renderable in the probe (no CMS store).",
    "tier": "P1"
   },
   {
@@ -23071,7 +23071,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Lane L-B C-13 (built, not compared): Content › Dynamic bindings, drawn only while bound — '1 binding', '{Property} · {Collection}.{field} ›' opening the detail. Open: the board's property label reads the field's role ('Title text'); the row reads the element property ('Text').",
+   "verifiedNote": "Lane L-B P1 round 3, board PNG fetched (not compared live — the probe has no CMS store): the board draws Dynamic bindings as a subview — centred '‹ Back to Content', 'Dynamic bindings · 1 binding', centred 'Title text · Blog.title ›', note 'Text bindings are edited in Content.' — where C-13 draws it as a Content section while bound. Open: subview form + note; the property label reads the field's role ('Title text').",
    "tier": "P1"
   },
   {
@@ -23104,7 +23104,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "FAILING STEP: pick applies immediately (SourceRow.tsx:9); no choose-then-Replace, no captured target.",
+   "verifiedNote": "Lane L-B P1 round 3, board PNG compared: the Inspector half (Image, Replace…, Alt text) matches the Image source block; the open drift is the media drawer's choose-then-Replace with a captured target — L-C's surface, REQUESTS B-15.",
    "tier": "P1"
   },
   {
@@ -23126,7 +23126,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Captured-target-locked recovery missing; lock gate silently skips locked targets (SourceRow.tsx:9).",
+   "verifiedNote": "Lane L-B P1 round 3, board PNG compared: Inspector half unchanged from F3.03; the locked-target recovery ('Work image is now locked…', 'Choose new target') is the media drawer's — L-C, REQUESTS B-15.",
    "tier": "P1"
   },
   {
@@ -23137,7 +23137,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "\"Choose a replacement target\" mode missing.",
+   "verifiedNote": "Lane L-B P1 round 3, board PNG fetched: 'Choose a replacement target' mode is the media drawer's — L-C, REQUESTS B-15.",
    "tier": "P1"
   },
   {

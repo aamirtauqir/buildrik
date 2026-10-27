@@ -54,6 +54,10 @@ export interface SectionFrame {
   headerDot?: React.ReactNode;
   /** Bottom line of an open section ("● Overridden on Tablet"). */
   note?: React.ReactNode;
+  /** After the title: "· 2 overrides" (2L9 IC05). */
+  titleNote?: string | null;
+  /** Rows heading an open section's body: its breakpoint overrides (IC05). */
+  lead?: React.ReactNode;
 }
 
 export const SectionFrameContext = React.createContext<SectionFrame | null>(null);
@@ -222,6 +226,7 @@ export const Section: React.FC<SectionProps> = ({
           {mode === "summary" ? <ChevronRight size={14} aria-hidden="true" className="bdi-chev tw:shrink-0 tw:text-[var(--bk-ink)]" /> : null}
           <span className={NAME_CLASS} data-testid={`inspector-secname-${slug}`}>
             {title}
+            {frame?.titleNote ? <span data-testid="inspector-section-title-note"> · {frame.titleNote}</span> : null}
           </span>
           {frame?.headerDot}
           {summary ? (
@@ -247,6 +252,7 @@ export const Section: React.FC<SectionProps> = ({
       {isOpen && (
         <div id={contentId} className="bdi-sec-body">
           {/* A Section nested in this body is its own, unframed disclosure. */}
+          {frame?.lead}
           <SectionFrameContext.Provider value={null}>
             <FieldErrorContext.Provider value={reportError}>{children}</FieldErrorContext.Provider>
           </SectionFrameContext.Provider>
