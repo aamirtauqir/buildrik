@@ -26,7 +26,6 @@ L3-2. **lead3 (wave 3) · AquibraStudio.tsx (banner slot DOM order)** · same mo
 
 ## Open — lane L-A (2026-10-26)
 
-A-17. **L-A → owner · Pages "order commands" menu** · boards 137:55343 / 137:56060 / 137:56781 (B3-P130–132) draw a separate 280-wide menu beside the row — the page's name as its title, Move up ⌥↑, Move down ⌥↓ (disabled + reason at a boundary), Close menu — but no board shows what opens it: the row ⋯ opens the full menu (63:13820), which already carries Move up / Move down with the boundary reasons. Which control opens the order-commands menu (a drag handle, a key, a "Reorder…" item)? Until answered the moves stay in the row menu and the three rows stay drift-open.
 
 A-18. ~~**L-A → lead · Pages drawer width for Listings**~~ · closed by L-A without a shell change: LeftSidebar already passes a working `onExpandToggle` (280 ↔ 700) through TabRouter's commonTabProps; PagesTab now widens on entering Listings and narrows on leaving if it widened (test PagesTab.listingsWidth). 700 vs the board's ~720 is LeftSidebar's `panelWidthOverride`.
 
@@ -39,6 +38,8 @@ A-19. **L-A → lead · `chrome-ui/PanelFrame` header + PanelSearch band** · bo
 
 
 ## Closed
+
+A-17. **L-A → owner · Pages "order commands" menu** · boards 137:55343 / 137:56060 / 137:56781 (B3-P130–132) draw a separate 280-wide menu beside the row — the page's name as its title, Move up ⌥↑, Move down ⌥↓ (disabled + reason at a boundary), Close menu — but no board shows what opens it: the row ⋯ opens the full menu (63:13820), which already carries Move up / Move down with the boundary reasons. Which control opens the order-commands menu (a drag handle, a key, a "Reorder…" item)? Until answered the moves stay in the row menu and the three rows stay drift-open. — **Closed 2026-10-27, owner: no separate menu; covered by the row ⋯ menu (`founder:order-commands-in-row-menu`).**
 
 A-13. ~~page reorder as one composer history step~~ · `021c1b305`: `reorderPage` commits pending edits, records "Reorder pages" and commits it before returning (⌘Z / captureUndo undo exactly the move); `writeLocked` still refuses first. Decision: page FOLDER moves stay outside history (per-user, not in the document). Test `PageManager.reorderHistory.test.ts`.
 B-12. ~~detach on the document history~~ · `08bca1809`: `detachInstance` records "Detach instance" as one step; undo restores `componentInstance` and the map entry (rehydrated on the restore's PROJECT_LOADED). Inspector Detach applies directly with "{name} detached · Undo" (no dialog); manifest row 241:19230 → `board`. Tests `detachInstance.history.test.ts`, `ComponentRow.test.tsx`. The component-library detail screen's own detach confirm (L-C path) is unchanged.

@@ -1589,9 +1589,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "founder:order-commands-in-row-menu",
    "verified": "drift-open",
-   "verifiedNote": "L-A S6 built: Move up ⌥↑ / Move down ⌥↓ in the row menu and as row chords. Board's separate 'order commands' menu (title · Move up · Move down · Close menu) has no drawn entry point — REQUESTS A-17 (owner).",
+   "verifiedNote": "Owner 2026-10-27: no separate order-commands menu (no board shows what opens it). Move up ⌥↑ / Move down ⌥↓, the first/last-page reasons and the \"moved to position N · Undo\" receipt live in the page row ⋯ menu (board 63:13820), built by L-A. | L-A S6 built: Move up ⌥↑ / Move down ⌥↓ in the row menu and as row chords. Board's separate 'order commands' menu (title · Move up · Move down · Close menu) has no drawn entry point — REQUESTS A-17 (owner).",
    "tier": "P1"
   },
   {
@@ -1600,9 +1600,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "founder:order-commands-in-row-menu",
    "verified": "drift-open",
-   "verifiedNote": "L-A S6 built: '{Page} is the last top-level page.' with Move down disabled.",
+   "verifiedNote": "Owner 2026-10-27: no separate order-commands menu (no board shows what opens it). Move up ⌥↑ / Move down ⌥↓, the first/last-page reasons and the \"moved to position N · Undo\" receipt live in the page row ⋯ menu (board 63:13820), built by L-A. | L-A S6 built: '{Page} is the last top-level page.' with Move down disabled.",
    "tier": "P1"
   },
   {
@@ -1611,9 +1611,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "founder:order-commands-in-row-menu",
    "verified": "drift-open",
-   "verifiedNote": "L-A S6 built: '{Page} is the first top-level page.' with Move up disabled.",
+   "verifiedNote": "Owner 2026-10-27: no separate order-commands menu (no board shows what opens it). Move up ⌥↑ / Move down ⌥↓, the first/last-page reasons and the \"moved to position N · Undo\" receipt live in the page row ⋯ menu (board 63:13820), built by L-A. | L-A S6 built: '{Page} is the first top-level page.' with Move up disabled.",
    "tier": "P1"
   },
   {
