@@ -307,7 +307,7 @@
 /* "Compact rows" off (C4 #18): the standard 32. Both heights were 28, so the
    display option toggled a class that changed nothing (QA 2026-09-24). */
 .bdc-layers-tree:not(.bdc-layers-tree-compact) .bdc-lr {
-  height: var(--bk-size-row);
+  height: var(--bk-size-row); gap: var(--bk-space-8); /* 2L9 152:78614: chevron · glyph · name 8 apart */
 }
 
 /* ==========================================================================
@@ -422,8 +422,8 @@
   height: var(--bk-size-row);
   display: flex;
   align-items: center;
-  /* v3 4418:81300: count text at x16, 11/16 ink-muted; ⓘ ends 16 in. */
-  padding: 0 var(--bk-space-12) 0 var(--bk-space-16);
+  /* design-2l9 147:75914 / 152:78614: a gray band, count text 12 in. */
+  padding: 0 var(--bk-space-12); background: var(--bk-gray-100);
   font: 400 var(--bk-text-11)/16px var(--bk-font-ui);
   color: var(--bk-ink-muted);
 }

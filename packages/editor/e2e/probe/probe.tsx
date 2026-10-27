@@ -810,6 +810,27 @@ function listingsComposer(): Composer {
   return c;
 }
 
+function RestoredProbe() {
+  const composer = React.useMemo(() => listingsComposer(), []);
+  React.useEffect(() => {
+    const about = composer.elements.getAllPages().find((p) => p.name === "About");
+    if (!about) return;
+    /* ⌘Z is an importProject of the snapshot before the delete — the same
+       call here, so ids come back as they were. */
+    const before = composer.exportProject();
+    const t1 = setTimeout(() => composer.elements.deletePage(about.id), 300);
+    const t2 = setTimeout(() => composer.importProject(before), 900);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
+  }, [composer]);
+  return (
+    <div data-probe="pages-restored" style={{ width: 284, height: 812, display: "flex" }}>
+      <ToastProvider>
+        <PagesTab composer={composer} onClose={() => {}} onRequestTemplates={() => {}} />
+      </ToastProvider>
+    </div>
+  );
+}
+
 function ShellProbe() {
   const tab = (new URLSearchParams(location.search).get("tab") ?? "pages") as GroupedTabId;
   const composer = React.useMemo(() => listingsComposer(), []);
@@ -827,6 +848,27 @@ function ShellProbe() {
       </ToastProvider>
     </div>
   );
+}
+
+function hundredComposer(): Composer {
+  const c = new Composer({} as never);
+  const named: Array<[string, string]> = [
+    ["Home", ""], ["About", "about"], ["Work", "work"], ["Contact", "contact"], ["Legal", "legal"],
+    ["Accessibility and inclusive design", "accessibility-and-inclusive-design"],
+    ["Enterprise partnerships and programs", "enterprise-partnerships-and-programs"],
+  ];
+  for (let i = 1; named.length < 100; i++) {
+    const n = String(i).padStart(2, "0");
+    named.push([`Project ${n} — Design case study`, `project-${n}-design-case-study`]);
+  }
+  for (const [name, slug] of named) {
+    const page = c.elements.createPage(name, { slug } as never);
+    if (name === "Home") {
+      c.elements.setHomePage(page.id);
+      c.elements.setActivePage(page.id);
+    }
+  }
+  return c;
 }
 
 function addTargetComposer(): Composer {
@@ -898,13 +940,15 @@ function NewPageProbe() {
   );
 }
 
-function LayersProbe({ select }: { select?: string[] }) {
+function LayersProbe({ select, collapse }: { select?: string[]; collapse?: boolean }) {
   const c = layersComposer();
   React.useEffect(() => {
     if (select?.length) {
       c.selection.selectMultiple(select.map((id) => c.elements.getElement(id)!).filter(Boolean));
     }
-  }, [c, select]);
+    /* Board 152:78614: the branches folded with the selection inside one. */
+    if (collapse) setTimeout(() => c.emit("layers:collapse-all", {}), 200);
+  }, [c, select, collapse]);
   return (
     /* ToastProvider is not decoration: useLayerContextActions calls useToast
        at the top of LayersPanel, so without it the tree throws and the tab's
@@ -2586,6 +2630,11 @@ const CASES: Record<string, () => React.ReactElement> = {
   "layers-tree": () => (
     <div data-probe="layers-tree"><LayersProbe /></div>
   ),
+  "layers-collapsed-selection": () => (
+    <div data-probe="layers-collapsed-selection">
+      <LayersProbe select={["lx-heading"]} collapse />
+    </div>
+  ),
   "layers-multi-select": () => (
     <div data-probe="layers-multi-select">
       <LayersProbe select={["lx-heading", "lx-button", "lx-grid"]} />
@@ -3062,6 +3111,12 @@ const CASES: Record<string, () => React.ReactElement> = {
       {pagesPanel({ pages: [], loadError: "sync failed", onRetry: () => {} })}
     </div>
   ),
+  /* design-2l9 139:53653 — three pages ticked in a 512-tall drawer (1440 × 600). */
+  "pages-bulk-short": () => (
+    <div data-probe="pages-bulk-short" style={{ width: 284, height: "100vh", display: "flex", flexDirection: "column" }}>
+      {pagesPanel({ selectedIds: new Set(["home", "menu", "contact"]) })}
+    </div>
+  ),
   "pages-bulk-select": () => (
     <div data-probe="pages-bulk-select">
       {pagesPanel({ selectedIds: new Set(["home", "menu", "contact"]) })}
@@ -3095,6 +3150,18 @@ const CASES: Record<string, () => React.ReactElement> = {
         onManageCollection: () => {},
         onRequestTemplates: () => {},
       })}
+    </div>
+  ),
+  /* design-2l9 board 63:20585 — About deleted, then brought back, after
+     mount, so PagesTab sees the page leave and return. */
+  "pages-restored": () => <RestoredProbe />,
+  /* design-2l9 boards 94:15802 / 94:18181 — the 100-page fixture (long names
+     and URLs truncate); the recipe sets the viewport height. */
+  "pages-hundred": () => (
+    <div data-probe="pages-hundred" style={{ width: 284, height: "100vh", display: "flex" }}>
+      <ToastProvider>
+        <PagesTab composer={hundredComposer()} onClose={() => {}} onRequestTemplates={() => {}} />
+      </ToastProvider>
     </div>
   ),
   /* The editor's shell around one drawer — the real LayoutShell + LeftSidebar

@@ -40,7 +40,8 @@ export function NewPageModal({ composer }: { composer: Composer | null }) {
   const { addToast } = useToast();
   const [open, setOpen] = React.useState(false);
   const [name, setName] = React.useState("");
-  const [source, setSource] = React.useState<Source>("template");
+  /* design-2l9 101:36828 "New page / Blank default". */
+  const [source, setSource] = React.useState<Source>("blank");
   const [addToNav, setAddToNav] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
   const { capacity, retry: retryCapacity } = usePageCapacity(open);
@@ -54,7 +55,7 @@ export function NewPageModal({ composer }: { composer: Composer | null }) {
     if (!composer) return;
     const onRequest = () => {
       setName(getDefaultPageName(composer.elements.getAllPages()));
-      setSource("template");
+      setSource("blank");
       setAddToNav(true);
       setError(null);
       setOpen(true);

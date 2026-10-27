@@ -35,14 +35,13 @@ const defaultPrefs: LayerDisplayPrefs = {
   showLockBadges: true,
   highlightCmsBound: false,
   showHtmlBadges: false,
-  /* Compact by default — founder call, 2026-08-28. Three things agree: DESIGN.md
-     names "compact density" as the chrome's stance, board 1082:4527 draws the
-     tree at 28 (`--bk-size-row-dense`), and at the drawer's 732px a compact
-     tree shows ~26 rows where comfortable shows 18 — and this panel's whole job
-     is seeing the tree. A stored preference still wins: loadDisplayPrefs
-     spreads the saved value over these, so anyone who chose comfortable keeps
-     it. */
-  treeDensity: "compact",
+  /* Comfortable by default. The 2026-08-28 founder call made it compact
+     after page 1:3's board 1082:4527 (28-tall rows); the 2L9 file, now the
+     source of truth, draws Compact rows OFF (147:76329) and 32-tall rows in
+     every Layers board (147:75914, 152:78614), and the owner's 2026-10-26
+     rule is that the board wins on visuals. A stored preference still wins:
+     loadDisplayPrefs spreads the saved value over these. */
+  treeDensity: "comfortable",
 };
 
 function loadDisplayPrefs(): LayerDisplayPrefs {

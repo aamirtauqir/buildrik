@@ -31,6 +31,8 @@ const LEGEND = "tw:m-0 tw:px-3 tw:pt-1 tw:text-[12px] tw:leading-4 tw:text-[var(
 
 interface Props {
   pages: PageItem[];
+  /** A page just brought back by ⌘Z (board 63:20585): the note under the list. */
+  restored?: { id: string; name: string } | null;
   renamingPageId: string | null;
   nameError: string | null;
   openContextMenuPageId?: string | null;
@@ -81,6 +83,7 @@ interface Props {
 
 export const PageList: React.FC<Props> = ({
   pages,
+  restored,
   renamingPageId,
   nameError,
   openContextMenuPageId = null,
@@ -387,6 +390,23 @@ export const PageList: React.FC<Props> = ({
             {!search && pages.length === 1 && (
               <div className="bd-pg-onepage" data-testid="pages-onepage">
                 <p data-testid="pages-onepage-text">This site has one page.</p>
+              </div>
+            )}
+            {/* Board 63:20585: what ⌘Z brought back, under the list, with the
+                way into it. */}
+            {!search && restored && (
+              <div className="tw:flex tw:flex-col tw:items-start tw:gap-3 tw:px-3 tw:pt-3" role="status" data-testid="pages-restored">
+                <p className="tw:m-0 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)]">
+                  {`${restored.name} restored. Page settings and URL retained.`}
+                </p>
+                <Button
+                  variant="link"
+                  className="tw:h-7 tw:min-h-0 tw:px-3 tw:text-[13px] tw:font-medium tw:text-[var(--bk-accent-text)]"
+                  data-testid="pages-restored-open"
+                  onClick={() => onSelectPage(restored.id)}
+                >
+                  {`Open ${restored.name} in Editor`}
+                </Button>
               </div>
             )}
           </>
