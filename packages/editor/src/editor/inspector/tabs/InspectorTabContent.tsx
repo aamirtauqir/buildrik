@@ -148,7 +148,7 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
      form's Add field list is the Content tab's (156:3109). */
   const only =
     tabId === "behaviour" && subviewHere === "interaction" ? "interactions" : tabId === "content" && subviewHere === "add-field" ? "form-fields" : null;
-  const ids = only ? all.filter((id) => id === only) : all;
+  const ids = subviewHere === "override-review" && (tabId === "style" || tabId === "effects") ? [] : only ? all.filter((id) => id === only) : all;
   const modes = ids.map((id) => {
     const entry = SECTION_REGISTRY[id];
     const open = typeof entry.open === "function" ? entry.open(baseCtx) : entry.open;

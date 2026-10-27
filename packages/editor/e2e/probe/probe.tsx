@@ -2572,7 +2572,25 @@ const CASES: Record<string, () => React.ReactElement> = {
     if (styles) el.setStyles(JSON.parse(styles) as Record<string, string>);
     /* `?siteId=s&formBlock={…}` — the form's server row (Behavior › After submit). */
     const formBlock = q.get("formBlock");
-    if (formBlock) trpcStub({ "forms.getBlock": () => JSON.parse(formBlock), "forms.updateBlock": () => JSON.parse(formBlock) });
+    /* `&formMode=pending` never answers the load (F16); `saving` never answers
+       a save (F11); `fail` / `forbidden` refuse every save as a network
+       failure (F12) / FORBIDDEN (F15). */
+    const formMode = q.get("formMode");
+    if (formMode === "pending") window.fetch = () => new Promise<Response>(() => {});
+    else if (formBlock) {
+      trpcStub({ "forms.getBlock": () => JSON.parse(formBlock), ...(formMode ? {} : { "forms.updateBlock": () => JSON.parse(formBlock) }) });
+      if (formMode) {
+        const read = window.fetch;
+        window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+          const href = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+          if (!href.includes("forms.updateBlock")) return read(input, init);
+          if (formMode === "fail") throw new TypeError("Failed to fetch");
+          if (formMode === "saving") return new Promise<Response>(() => {});
+          const error = { json: { message: "FORBIDDEN", code: -32603, data: { code: "FORBIDDEN", httpStatus: 403, path: "forms.updateBlock" } } };
+          return new Response(JSON.stringify([{ error }]), { status: 403, headers: { "content-type": "application/json" } });
+        };
+      }
+    }
     /* `?attrs={"src":"…","alt":"…"}` — a specimen's attributes. */
     const attrs = q.get("attrs");
     if (attrs) for (const [k, v] of Object.entries(JSON.parse(attrs) as Record<string, string>)) el.setAttribute(k, v);
@@ -2584,6 +2602,22 @@ const CASES: Record<string, () => React.ReactElement> = {
     const bp = (q.get("bp") ?? "desktop") as "desktop" | "tablet" | "mobile";
     const bpStyles = q.get("bpStyles");
     if (bpStyles && bp !== "desktop") c.styles.setBreakpointStyle(el.getId(), bp, JSON.parse(bpStyles) as Record<string, string>);
+    /* `?hoverStyles={…}` — the element's :hover rule (S13). */
+    const hoverStyles = q.get("hoverStyles");
+    if (hoverStyles) c.styles.setRule(`[data-buildrick-id="${el.getId()}"]`, JSON.parse(hoverStyles) as Record<string, string>, { pseudo: ":hover" });
+    /* `?cms=1` — a "Blog" collection with one record, the element's text
+       bound to its Title (F2.16). The store is the browser's IndexedDB. */
+    if (q.get("cms")) {
+      void (async () => {
+        const col = await c.cms.collections.createCollection("Blog", "blog", "", {
+          fields: [{ id: "f-title", name: "Title", slug: "title", type: "text", required: true }] as never,
+        });
+        const item = await c.cms.collections.createContentItem(col.id, { title: "Article title" }, { status: "published" });
+        /* `?cms=unbound` — the collection only, nothing bound (F2.02). */
+        if (q.get("cms") !== "unbound") c.cms.bindings.bindToField(el.getId(), col.id, item?.id, "title", "content" as never);
+        c.selection.select(el);
+      })();
+    }
     /* `?instance=Name` — make the element a component and select an instance
        of it, with `?overrides={…}` written on the instance (IC01–IC06). */
     const instanceName = q.get("instance");
