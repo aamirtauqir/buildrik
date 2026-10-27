@@ -10,7 +10,7 @@
  * @license BSD-3-Clause
  */
 
-import { adaptBaseStyleProps, defineSection, shownOnInstanceRoot, type AnySectionEntry, type ShouldRenderContext } from "./_shared";
+import { adaptBaseStyleProps, defineSection, setSummary, shownOnInstanceRoot, type AnySectionEntry } from "./_shared";
 import { LayoutAdvancedSection, LayoutSection } from "../layout";
 import { SizeSection } from "../SizeSection";
 import { FlexItemSection, GridItemSection } from "../layout/ItemControls";
@@ -36,19 +36,6 @@ const LAYOUT_KEYS = [
 const LAYOUT_ADVANCED_KEYS = ["overflow", "overflow-x", "overflow-y", "box-sizing", "float", "clear", "visibility"];
 const FLEX_ITEM_KEYS = ["flex-grow", "flex-shrink", "flex-basis", "order", "align-self"];
 const GRID_ITEM_KEYS = ["grid-column", "grid-row", "align-self", "justify-self"];
-
-/** "2 set" / "None" — how many of a section's own properties the element
- *  carries here (2L9 161:8940 draws Spacing, Background and Border shut
- *  with this). */
-function setSummary(keys: readonly string[]) {
-  return (ctx: ShouldRenderContext): string => {
-    const n = keys.filter((k) => {
-      const v = ctx.authoredStyles[k];
-      return v !== undefined && v !== "" && v !== "none" && v !== "0" && v !== "0px";
-    }).length;
-    return n ? `${n} set` : "None";
-  };
-}
 
 const SPACING_KEYS = ["padding", "padding-top", "padding-right", "padding-bottom", "padding-left", "margin", "margin-top", "margin-right", "margin-bottom", "margin-left"];
 const FILL_KEYS = ["background", "background-color", "background-image", "background-size", "background-position", "background-repeat", "background-attachment", "background-blend-mode"];

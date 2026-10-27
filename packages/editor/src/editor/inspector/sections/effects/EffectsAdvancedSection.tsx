@@ -49,7 +49,7 @@ const WILL_CHANGE = [
 ];
 
 export const EffectsAdvancedSection: React.FC<BaseStyleSectionProps> = ({ styles, onChange, isOpen, onToggle }) => (
-  <Section title="Advanced" isOpen={isOpen} onToggle={onToggle} id="inspector-section-effects-advanced">
+  <Section title="Advanced effects" isOpen={isOpen} onToggle={onToggle} id="inspector-section-effects-advanced">
     <SelectRow label="Cursor" property="cursor" value={styles.cursor || ""} options={CURSORS} onChange={(v) => onChange("cursor", v)} />
     <SelectRow label="Blend" property="mix-blend-mode" value={styles["mix-blend-mode"] || ""} options={BLENDS} onChange={(v) => onChange("mix-blend-mode", v)} />
     <TextInputRow label="Text shadow" placeholder="2px 2px 4px rgba(0,0,0,0.3)" value={styles["text-shadow"] || ""} onChange={(v) => onChange("text-shadow", v)} />

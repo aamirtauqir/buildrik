@@ -4,7 +4,9 @@
  *
  *   ‹ Contact form   (above the block — TypeBlockSection; selects the form)
  *   Field
- *   Type         [Email ▾]
+ *   Type         [Email ▾]     → the "Field type" card beside the column
+ *                                (F29); a change applies at once with
+ *                                "Field type changed to Text · Undo" (F30)
  *   Label        [Email]           its <label>, else its accessible name
  *   Placeholder  [you@example.com]
  *   Name         [email]
@@ -27,9 +29,9 @@ import * as React from "react";
 import type { TypeBlockBodyProps } from "@/editor/inspector/config/typeBlocks";
 import type { Element } from "@/engine/elements/Element";
 import { writeElement } from "@/engine/commands/commandOperations";
-import { SelectRow } from "@/editor/inspector/shared/controls";
+import { Menu, MenuItem, Popover, useToast } from "@/editor/chrome-ui";
 import { CheckRow } from "@/editor/inspector/shared/controls/CheckRow";
-import { CommitRow, NoteRow } from "@/editor/inspector/sections/behaviourRows";
+import { CommitRow, NoteRow, PickRow } from "@/editor/inspector/sections/behaviourRows";
 import { fieldLabelText, fieldType, formOf, nameTaken, replaceField, writeFieldLabel } from "@/editor/inspector/sections/formFieldModel";
 import { handleTextareaDefaultChange } from "../attributeWriter";
 import { isAttrOn } from "../blockRows";
@@ -61,9 +63,53 @@ const EXTRA_ROWS: Record<string, readonly PropertyConfig[]> = {
   select: [{ id: "options", label: "Options (one per line)", type: "textarea", placeholder: "Option 1\nOption 2" }],
 };
 
+/** Type as the board's "Field type" card (2L9 170:121692): the choices
+ *  beside the column, the current one marked, Cancel last. */
+function TypeRow({ value, options, onPick }: { value: string; options: ReadonlyArray<{ value: string; label: string }>; onPick: (v: string) => void }) {
+  const [open, setOpen] = React.useState(false);
+  const label = options.find((o) => o.value === value)?.label ?? value;
+  return (
+    <Popover
+      open={open}
+      onClose={() => setOpen(false)}
+      placement="bottom-end"
+      beside=".layout-shell__inspector"
+      label="Field type"
+      block
+      className="tw:w-[280px] tw:p-1"
+      trigger={
+        /* The anchor is a flex row: the row grows to the column's width. */
+        <div className="tw:min-w-0 tw:flex-1">
+          <PickRow label="Type" value={label} onOpen={() => setOpen((v) => !v)} testId="form-field-type" />
+        </div>
+      }
+    >
+      <div className="tw:px-2 tw:pb-1 tw:pt-1.5 tw:text-[12px] tw:font-semibold tw:text-[var(--bk-ink)]">Field type</div>
+      <Menu label="Field type" className="tw:min-w-0">
+        {options.map((o) => (
+          <MenuItem
+            key={o.value}
+            aria-current={o.value === value || undefined}
+            onClick={() => {
+              setOpen(false);
+              onPick(o.value);
+            }}
+          >
+            {o.label}
+          </MenuItem>
+        ))}
+        <MenuItem className="tw:[&>span]:text-center" onClick={() => setOpen(false)}>
+          Cancel
+        </MenuItem>
+      </Menu>
+    </Popover>
+  );
+}
+
 export const FieldBody: React.FC<TypeBlockBodyProps> = (props) => {
   const { composer, element } = props;
   useElementVersion(composer);
+  const { addToast } = useToast();
   const [nameError, setNameError] = React.useState<string | null>(null);
   const [nameDraft, setNameDraft] = React.useState<string | null>(null);
   React.useEffect(() => {
@@ -84,15 +130,23 @@ export const FieldBody: React.FC<TypeBlockBodyProps> = (props) => {
       if (value.trim()) field.setAttribute(attr, value.trim());
       else field.removeAttribute(attr);
     });
+  const typeOptions = tag === "select" ? [{ value: type, label: "Select" }] : TYPE_OPTIONS;
   const setType = (next: string) => {
     if (next === type) return;
     let swapped = null as Element | null;
-    write("field-type", () => {
+    const done = write("field-type", () => {
       if (type === "textarea" || next === "textarea") swapped = replaceField(composer, field, next);
       else field.setAttribute("type", next);
     });
+    if (!done) return;
     /* The swap re-creates the field: the selection follows it. */
     if (swapped) composer.selection.select(swapped);
+    /* F30: applied at once, with its receipt and one Undo. */
+    addToast({
+      description: `Field type changed to ${typeOptions.find((o) => o.value === next)?.label ?? next}`,
+      tone: "info",
+      action: { label: "Undo", onClick: composer.history.captureUndo() },
+    });
   };
   const setName = (name: string) => {
     if (form && nameTaken(form, field, name)) {
@@ -113,7 +167,7 @@ export const FieldBody: React.FC<TypeBlockBodyProps> = (props) => {
 
   return (
     <>
-      <SelectRow label="Type" placeholder={null} value={type} onChange={setType} options={tag === "select" ? [{ value: type, label: "Select" }] : TYPE_OPTIONS} />
+      <TypeRow value={type} options={typeOptions} onPick={setType} />
       <CommitRow label="Label" value={fieldLabelText(scope, field)} onCommit={(v) => write("field-label", () => writeFieldLabel(scope, field, v))} testId="form-field-label" />
       {tag !== "select" ? (
         <CommitRow label="Placeholder" value={field.getAttribute("placeholder") ?? ""} onCommit={(v) => setAttr("placeholder", v)} testId="form-field-placeholder" />

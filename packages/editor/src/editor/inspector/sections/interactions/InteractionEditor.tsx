@@ -169,7 +169,7 @@ export const InteractionEditor: React.FC<InteractionEditorProps> = ({
             {onDuplicate ? <MenuItem onClick={act(() => onDuplicate(interaction.id))}>Duplicate</MenuItem> : null}
             <MenuItem onClick={act(() => onToggleEnabled(interaction.id))}>{interaction.enabled ? "Disable" : "Enable"}</MenuItem>
             <MenuItem onClick={act(() => onRemove(interaction.id))}>Delete</MenuItem>
-            <MenuItem className="tw:!justify-center" onClick={() => setMenuOpen(false)}>
+            <MenuItem className="tw:[&>span]:text-center" onClick={() => setMenuOpen(false)}>
               Close menu
             </MenuItem>
           </Menu>

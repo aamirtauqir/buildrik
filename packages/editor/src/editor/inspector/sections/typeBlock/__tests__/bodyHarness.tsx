@@ -3,11 +3,15 @@
  * element tree), for the media / embed / widget body tests.
  * @license BSD-3-Clause
  */
-import { render } from "@testing-library/react";
+import { render as rtlRender } from "@testing-library/react";
+import { ToastProvider } from "@/editor/chrome-ui";
 import { vi } from "vitest";
 import { createTestComposer } from "@/engine/__tests__/test-utils/realComposer";
 import type { ElementData } from "@/shared/types";
 import { TypeBlockSection } from "../TypeBlockSection";
+
+/* The Field block's Type change answers with a receipt toast (2L9 F30). */
+const render = (ui: React.ReactElement) => rtlRender(ui, { wrapper: ToastProvider });
 
 export function renderBlock(element: Partial<ElementData> & { id: string; type: ElementData["type"] }, extra: { onOpenMediaLibrary?: ReturnType<typeof vi.fn>; styles?: Record<string, string> } = {}) {
   const composer = createTestComposer();

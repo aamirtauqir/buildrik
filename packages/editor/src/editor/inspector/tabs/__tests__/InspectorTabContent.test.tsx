@@ -149,7 +149,7 @@ describe("InspectorTabContent — one order per tab, presence by capability", ()
 
   it("Behavior carries Interactions (Q1) and Visibility; Effects carries neither", () => {
     const { unmount } = renderTab({ tabId: "effects", elementType: "container" });
-    expect(sectionNames()).toEqual(["Opacity", "Shadow", "Filters", "Transform & motion", "Advanced"]);
+    expect(sectionNames()).toEqual(["Opacity", "Shadow", "Filters", "Transform and transition", "Advanced effects"]);
     unmount();
     renderTab({ tabId: "behaviour", elementType: "container" });
     expect(sectionNames()).toEqual(["Link", "Visibility", "Interactions"]);
@@ -190,9 +190,10 @@ describe("InspectorTabContent — display modes (DD-11)", () => {
     expect(onSetChoices).toHaveBeenCalledWith("heading", ["border"], "open");
   });
 
-  it("Effects › Advanced arrives closed with its one-line summary", () => {
+  it("Effects › Advanced effects and Transform and transition arrive closed with 'n set' / 'None' (2L9 161:12525)", () => {
     renderTab({ tabId: "effects", elementType: "heading" });
-    expect(screen.getByTestId("inspector-summary-effects-advanced")).toHaveTextContent("Cursor: auto · Blend: normal");
+    expect(screen.getByTestId("inspector-summary-effects-advanced")).toHaveTextContent("None");
+    expect(screen.getByTestId("inspector-summary-transform-motion")).toHaveTextContent("None");
   });
 
   it("a user's close wins over 'always'", () => {

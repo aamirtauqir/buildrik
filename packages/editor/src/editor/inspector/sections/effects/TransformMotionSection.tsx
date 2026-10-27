@@ -37,7 +37,7 @@ export const TransformMotionSection: React.FC<BaseStyleSectionProps> = ({ styles
   const t = styles.transform;
   const setT = (fn: string, arg: string) => onChange("transform", composeTransform(t, fn, arg));
   return (
-    <Section title="Transform & motion" isOpen={isOpen} onToggle={onToggle} id="inspector-section-transform-motion">
+    <Section title="Transform and transition" isOpen={isOpen} onToggle={onToggle} id="inspector-section-transform-motion">
       <div className="tw:relative">
         <RangeSlider label="Scale" property="transform" unit="%" min={0} max={200} value={parseFloat(parseFunction(t, "scale", "1")) * 100} onChange={(v) => setT("scale", `${v / 100}`)} />
       </div>

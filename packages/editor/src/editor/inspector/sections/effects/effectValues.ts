@@ -14,25 +14,58 @@
 /** Split on commas that are not inside parentheses (rgba(…)). */
 const splitLayers = (value: string) => value.split(/,(?![^(]*\))/).map((s) => s.trim());
 
-/** The inset layer of a box-shadow, "" when there is none. */
-export const extractInnerShadow = (boxShadow: string | undefined): string => {
-  if (!boxShadow || boxShadow === "none") return "";
-  return splitLayers(boxShadow).find((s) => s.startsWith("inset")) ?? "";
-};
+/** One box-shadow layer as the Shadow rows edit it (2L9 161:12525). */
+export interface ShadowLayer {
+  inset: boolean;
+  x: string;
+  y: string;
+  blur: string;
+  spread: string;
+  color: string;
+}
 
-/** Every non-inset layer of a box-shadow, "" when there is none. */
-export const extractOuterShadow = (boxShadow: string | undefined): string => {
-  if (!boxShadow || boxShadow === "none") return "";
-  return splitLayers(boxShadow)
-    .filter((s) => !s.startsWith("inset"))
-    .join(", ");
-};
+const LENGTH = /^-?(\d+\.?\d*|\.\d+)(px|em|rem|%)?$/;
 
-/** One box-shadow from an outer and an inner layer; "none" when both are empty. */
-export const composeShadow = (outer: string, inner: string): string => {
-  const layers = [outer, inner].filter((l) => l && l !== "none");
-  return layers.length ? layers.join(", ") : "none";
-};
+/** A layer's parts, or null when it is not "[inset] x y [blur] [spread] [color]"
+ *  (a var(), calc(), more lengths) — such a value is kept as written. */
+function parseShadowLayer(layer: string): ShadowLayer | null {
+  const tokens = layer.trim().match(/[^\s(]+(\([^)]*\))?/g) ?? [];
+  let inset = false;
+  const lengths: string[] = [];
+  const colour: string[] = [];
+  for (const t of tokens) {
+    if (t === "inset") inset = true;
+    else if (LENGTH.test(t)) {
+      if (colour.length) return null;
+      lengths.push(/^-?0$/.test(t) ? "0px" : /\d$/.test(t) ? `${t}px` : t);
+    } else if (/^(#|rgba?\(|hsla?\(|[a-z]+$)/i.test(t)) colour.push(t);
+    else return null;
+  }
+  if (lengths.length < 2 || lengths.length > 4 || colour.length > 1) return null;
+  const [x, y, blur = "0px", spread = "0px"] = lengths;
+  return { inset, x, y, blur, spread, color: colour[0] ?? "rgba(0, 0, 0, 1)" };
+}
+
+/** Every layer of a box-shadow, or null when any one cannot be edited as parts. */
+export function parseShadowLayers(value: string | undefined): ShadowLayer[] | null {
+  if (!value || value === "none") return [];
+  const layers = splitLayers(value).map(parseShadowLayer);
+  return layers.every((l): l is ShadowLayer => l !== null) ? layers : null;
+}
+
+export const composeShadowLayers = (layers: readonly ShadowLayer[]): string =>
+  layers.length ? layers.map((l) => `${l.inset ? "inset " : ""}${l.x} ${l.y} ${l.blur} ${l.spread} ${l.color}`).join(", ") : "none";
+
+/** The functions of a filter / transform value, in written order. */
+export const functionsOf = (value: string | undefined): string[] =>
+  value && value !== "none" ? [...value.matchAll(/([\w-]+)\(/g)].map((m) => m[1]) : [];
+
+/** Can controls for `known` edit this value without losing part of it — no
+ *  function they do not know, none written twice? */
+export function composable(value: string | undefined, known: readonly string[]): boolean {
+  const fns = functionsOf(value);
+  return fns.every((f) => known.includes(f)) && new Set(fns).size === fns.length;
+}
 
 /** The argument of `type(…)` inside a filter / transform value. */
 export const parseFunction = (value: string | undefined, type: string, defaultValue: string): string => {
@@ -78,7 +111,7 @@ const TRANSFORM_IDENTITY: Record<string, string> = {
 export const composeTransform = (current: string | undefined, fn: string, arg: string) =>
   composeFunctional(current, TRANSFORM_ORDER, TRANSFORM_IDENTITY, fn, arg);
 
-const FILTER_ORDER = ["blur", "brightness", "contrast", "grayscale"];
+export const FILTER_ORDER = ["blur", "brightness", "contrast", "grayscale"];
 const FILTER_IDENTITY: Record<string, string> = {
   blur: "0px",
   brightness: "100%",

@@ -201,7 +201,8 @@ export const Section: React.FC<SectionProps> = ({
       {/* The row is a container; the toggle carries the button role and any
           action is its SIBLING, never its child (axe nested-interactive).
           Gate 24 keeps raw <button> out of chrome, so the role sits on a span. */}
-      <div className={HEADER_CLASS} data-testid={`inspector-sechead-${slug}`} hidden={hideHeader || undefined}>
+      {/* `hidden` alone loses to the row's `tw:flex`; the class hides it. */}
+      <div className={hideHeader ? `${HEADER_CLASS} tw:hidden` : HEADER_CLASS} data-testid={`inspector-sechead-${slug}`} hidden={hideHeader || undefined}>
         <span
           role="button"
           tabIndex={0}

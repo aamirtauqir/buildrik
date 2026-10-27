@@ -211,8 +211,9 @@ export interface SectionEntry<P extends object = object> {
   title: string;
   /** A header that depends on the element (the type block reads "Heading"). */
   frameTitle?: (ctx: ShouldRenderContext) => string;
-  /** How it arrives (DD-11). */
-  open: SectionOpen;
+  /** How it arrives (DD-11) — fixed, or by the element (Visibility shuts
+   *  under a form's own settings, 2L9 156:11319). */
+  open: SectionOpen | ((ctx: ShouldRenderContext) => SectionOpen);
   /** Presence by what the type IS. Default: always present. */
   capability?: (caps: ElementCapabilities) => boolean;
   /** Presence by runtime state (an instance, a flex container). Runs after `capability`. */
@@ -266,7 +267,7 @@ export interface AnySectionEntry {
   tab: TabId;
   title: string;
   frameTitle?: (ctx: ShouldRenderContext) => string;
-  open: SectionOpen;
+  open: SectionOpen | ((ctx: ShouldRenderContext) => SectionOpen);
   capability?: (caps: ElementCapabilities) => boolean;
   shouldRender?: (ctx: ShouldRenderContext) => boolean;
   hasValue?: (ctx: ShouldRenderContext) => boolean;
@@ -350,5 +351,18 @@ export function adaptElementProps(ctx: SectionContext): {
     composer: ctx.composer ?? null,
     isOpen: ctx.isOpen,
     onToggle: ctx.onToggle,
+  };
+}
+
+/** "2 set" / "None" — how many of a section's own properties the element
+ *  carries here (2L9 161:8940 draws Spacing, Background and Border shut
+ *  with this; Effects' closed sections too, 161:12525). */
+export function setSummary(keys: readonly string[]) {
+  return (ctx: ShouldRenderContext): string => {
+    const n = keys.filter((k) => {
+      const v = ctx.authoredStyles[k];
+      return v !== undefined && v !== "" && v !== "none" && v !== "0" && v !== "0px";
+    }).length;
+    return n ? `${n} set` : "None";
   };
 }

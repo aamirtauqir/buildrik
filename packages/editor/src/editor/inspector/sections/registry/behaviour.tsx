@@ -11,7 +11,7 @@
  * @license BSD-3-Clause
  */
 
-import { adaptBaseStyleProps, adaptElementProps, defineSection, ownSection as own, type AnySectionEntry, type SectionContext } from "./_shared";
+import { adaptBaseStyleProps, adaptElementProps, defineSection, ownSection as own, type AnySectionEntry, type SectionContext, type SectionOpen, type ShouldRenderContext } from "./_shared";
 import { LinkSection } from "../LinkSection";
 import { FormAfterSubmitSection } from "../FormAfterSubmitSection";
 import { SliderPlaybackSection } from "../SliderPlaybackSection";
@@ -23,6 +23,14 @@ import type { AnimationConfig } from "@/shared/types/animations";
 
 /** The element under the canvas selection, for the interaction preview. */
 const canvasNode = (id: string) => document.querySelector(`[data-buildrick-id="${id}"]`) as HTMLElement | null;
+
+const DEVICES = ["Desktop", "Tablet", "Mobile"] as const;
+
+/** Visibility and Interactions arrive open, except under a type's own
+ *  settings (a form's After submit, a slider's), where they shut to a
+ *  summary — "All devices", "None" (2L9 156:11319). */
+const behindOwnSettings = (ctx: ShouldRenderContext): SectionOpen =>
+  ctx.caps.behaviourSections.some((id) => id === "form-settings" || id === "slider-settings") ? "closed" : "open";
 
 function adaptInteractions(ctx: SectionContext) {
   const element = () => ctx.composer?.elements.getElement(ctx.selectedElement.id);
@@ -130,7 +138,11 @@ export const BEHAVIOUR_SECTIONS: Record<string, AnySectionEntry> = {
   visibility: defineSection({
     tab: "behaviour",
     title: "Visibility",
-    open: "open",
+    open: behindOwnSettings,
+    summary: (ctx) => {
+      const shown = DEVICES.filter((d) => ctx.authoredStyles[`--hide-${d.toLowerCase()}`] !== "true");
+      return shown.length === DEVICES.length ? "All devices" : shown.length ? shown.join(" · ") : "Hidden";
+    },
     /* The three keys VisibilitySection reads, and only those — declaring
        `display` would mark the section as carrying a value on every element. */
     styleKeys: ["--hide-desktop", "--hide-tablet", "--hide-mobile"],
@@ -141,7 +153,11 @@ export const BEHAVIOUR_SECTIONS: Record<string, AnySectionEntry> = {
   interactions: defineSection({
     tab: "behaviour",
     title: "Interactions",
-    open: "open",
+    open: behindOwnSettings,
+    summary: (ctx) => {
+      const n = (ctx.composer?.elements.getElement(ctx.selectedElement.id)?.getInteractions?.() ?? []).length;
+      return n ? `${n} interaction${n === 1 ? "" : "s"}` : "None";
+    },
     Component: InteractionsSection,
     styleKeys: [],
     adaptProps: adaptInteractions,

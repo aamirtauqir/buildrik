@@ -58,7 +58,7 @@ describe("section order", () => {
   });
 
   it("board 3 — Effects: no Interactions", () => {
-    expect(titlesFor("effects", "heading")).toEqual(["Opacity", "Shadow", "Filters", "Transform & motion", "Advanced"]);
+    expect(titlesFor("effects", "heading")).toEqual(["Opacity", "Shadow", "Filters", "Transform and transition", "Advanced effects"]);
   });
 
   it("249:71560 — Button / Link: text on Content, destination on Behavior", () => {
