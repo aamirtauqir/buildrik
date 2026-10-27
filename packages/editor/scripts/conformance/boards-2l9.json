@@ -455,8 +455,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "No Pages|Listings|Structure switch (views in ⋯ menu); folders render before root pages; no 'Collection pages' block (Open page/Manage in CMS",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case pages-about-active; board shots/94-13447.png): About tinted with 'Current', Home plain; the row ⋯ is now the board's bolder glyph (16 box, 3px dots, was 12). Inherits 63:6393.",
    "inheritsFrom": "63:6393",
    "tier": "P1"
   },
@@ -548,8 +548,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Board 720×700 modal 'About · Page settings' + 'Home stays open' subtitle; code drawer 'Page settings — About'; SeoTab ✦ AI suggest (pr33)",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case pages-settings-active; board shots/94-29621.png): for the page on the canvas the subtitle reads 'Editing About · Page appearance stays in the Inspector' (another page: '… · Home stays open on the canvas'); Save is disabled until something changes (was always enabled — a clean Save just closed). Field values are the fixture's.",
    "inheritsFrom": "63:15939",
    "tier": "P1"
   },
@@ -618,8 +618,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Board 720×700 modal 'About · Page settings' + 'Home stays open' subtitle; code drawer 'Page settings — About'; SeoTab ✦ AI suggest (pr33)",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 against 94:29621's probe (same dialog, same state; board shots/95-20851.png): subtitle and disabled Save as there. The Pages drawer behind it inherits 94:13447.",
    "inheritsFrom": "63:15939",
    "tier": "P1"
   },
@@ -719,7 +719,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Board 720×700 modal 'About · Page settings' + 'Home stays open' subtitle; code drawer 'Page settings — About'; SeoTab ✦ AI suggest (pr33)",
+   "verifiedNote": "Compared 2026-10-27 (board shots/101-28780.png): the board keeps the dialog open after a save — 'About · Settings saved · Home stays open', 'Saved override', Save disabled. Code: Save writes, closes and toasts 'Page settings saved' (C4 #20). Behaviour change, not built; drift-open.",
    "inheritsFrom": "63:15939",
    "tier": "P1"
   },
@@ -1474,7 +1474,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-A S6 built, not compared: same menu (P120 variant).",
+   "verifiedNote": "Compared 2026-10-27 (board shots/131-41791.png) — the board disagrees with its own archetype 63:13820: it draws a title ('About'), rules after Save as template… / Copy link / Page settings, 'Page settings' without ›, Delete page red and a 'Close menu' row; 63:13820 (built) draws the menu bare. Left drift-open for the owner to pick one.",
    "inheritsFrom": "63:13820",
    "tier": "P1"
   },
@@ -1901,8 +1901,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "No Pages|Listings|Structure switch (views in ⋯ menu); folders render before root pages; no 'Collection pages' block (Open page/Manage in CMS",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case pages-tab at 284×512; board shots/142-59267.png): selection cleared — the plain manager in a short drawer, footer pinned, header ⋯ back (bulk band gone).",
    "inheritsFrom": "63:6393",
    "tier": "P1"
   },
@@ -2781,7 +2781,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-fixed",
-   "verifiedNote": "probe-compared 2026-10-27 (layers-tree → View, shots/147-76329.png): 'Layer display' 13/600 ink, five switches, the footnote, Close — taking the tree's place, opened by View beside the search (⋯ › Display settings… removed).",
+   "verifiedNote": "probe-compared 2026-10-27 (layers-tree → View, shots/147-76329.png): 'Layer display' 13/600 ink, five switches, the footnote, Close — taking the tree's place, opened by View beside the search (⋯ › Display settings… removed). Re-compared 2026-10-27 with 152:79864: the panel became a raised card and the off switch the input-border grey.",
    "tier": "P1"
   },
   {
@@ -2803,7 +2803,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-fixed",
-   "verifiedNote": "probe-compared 2026-10-27 (layers-tree with a query, shots/147-77189.png): head '{n} matches in {N} layers' 13/600; each result's path on its own muted line under the row at x12; 'Clear search' after the list; footer '{N} layers · {n} matches'. The board's per-result chevron is not drawn (flat results have no children).",
+   "verifiedNote": "Re-compared 2026-10-27 against 147:79728's probe (same rows): results keep the chevron slot and the path sits on its own line 12 in — the earlier 'flat rows' reading of this board was wrong (the board draws ›).",
    "tier": "P1"
   },
   {
@@ -2868,8 +2868,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Same search rows as 147:77189 (L-A wave 2), not compared.",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case layers-5000, 'Text' typed, 280×512; board shots/147-79728.png): head 'n matches in 5,000 layers' 13/600 at y≈110 (board 108), each result keeps its chevron slot at depth 0 with the path on its own line 12 in (was flat rows, path at 4), footer '5,000 layers · n matches'. Not conformed: the probe finds 13 — search also matches the element TYPE, so the Text-type 'Eyebrow' counts (code behaviour); the selected result keeps its tint where the board shows none.",
    "inheritsFrom": "147:77189",
    "tier": "P1"
   },
@@ -2892,7 +2892,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-fixed",
-   "verifiedNote": "probe-compared 2026-10-27 (case layers-collapsed-selection: the real LayersTab on a real Composer, heading selected, branches folded; board shots/152-78614.png): rows 32 tall (Compact rows now OFF by default, as 147:76329 draws), chevron centred at 28, name at 68 (board 69), chevron · glyph · name 8 apart; footer a gray-100 band, text 12 in: '8 layers · 1 selected inside Section' (board '… inside Hero'). Not drawn: the board's ⋯ on the page row — no page action is defined for Layers.",
+   "verifiedNote": "probe-compared 2026-10-27 (case layers-collapsed-selection: the real LayersTab on a real Composer, heading selected, branches folded; board shots/152-78614.png): rows 32 tall (Compact rows now OFF by default, as 147:76329 draws), chevron centred at 28, name at 68 (board 69), chevron · glyph · name 8 apart; footer a gray-100 band, text 12 in: '8 layers · 1 selected inside Section' (board '… inside Hero'). Not drawn: the board's ⋯ on the page row — no page action is defined for Layers. Decision (coordinator, round 4): the 32-tall default STANDS under the owner's 2026-10-26 ruling that the board wins on visuals — it supersedes the 2026-08-28 compact founder call.",
    "inheritsFrom": "147:75914",
    "tier": "P1"
   },
@@ -2903,8 +2903,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-A S2 built, not compared: shares the 147:75914 footer.",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case layers-5000 at 280×812; board shots/152-79032.png): search cleared, the tree back with Hero open and Text selected as an inset accent pill, '5,000 layers · 1 selected'. Inherits 147:75914.",
    "inheritsFrom": "147:75914",
    "tier": "P1"
   },
@@ -2915,8 +2915,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Code footer 'N layers'/'N selected of M'; board 'N layers · 1 selected' (+ 'inside Hero')",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case layers-5000: 5,000 real layers on a real Composer, Hero's Text selected, drawer 280×512 = a 1440×600 window; board shots/152-79448.png): '5,000 layers · 1 selected' footer band; page row at y100–132 (board centre 117 — 8 now sits between the search band and the tree); the selected row is an accent-tint pill inset 12, radius 6, with no 2px bar (was full-bleed + bar); placeholder 'Search layers' (no ellipsis). Glyphs are the per-type icons (code).",
    "inheritsFrom": "147:75914",
    "tier": "P1"
   },
@@ -2927,8 +2927,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-A S2: same popover as 147:76329, built, not compared.",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case layers-tree, View → Compact rows; board shots/152-79864.png): Layer display is a raised card under the search band (2 in, shadow, rounded below) over a white field; 44-tall rows of a 36×20 switch (off = #868C97 input-border grey, was flowbite gray-200), label 12 after it; footnote; Close; the card stays open after a toggle. The browser's grey button fill behind each switch is gone.",
    "inheritsFrom": "147:76329",
    "tier": "P1"
   },

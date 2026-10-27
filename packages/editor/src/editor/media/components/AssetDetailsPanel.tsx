@@ -47,7 +47,6 @@ import {
 import { LIBRARY_MODAL_BTN_SECONDARY } from "./libraryModal";
 
 /** Small dense button matching the panel's `mgr-btn` chrome. */
-const MINI_BTN = "tw:h-6 tw:px-2 tw:py-0 tw:text-[length:var(--bk-text-11)]";
 /* The rail's tag chip — the same pill the folder rail draws (1160:44 /
    3695:45155: 8/3, full radius, --bk-border edge on bg-panel, 11 ink-soft),
    with a 16 × inside it. A span, not a button: the × is the control. */
@@ -189,12 +188,6 @@ export interface AssetDetailsPanelProps {
    */
   onUpdateAltText?(key: string, altText: string): void;
   /**
-   * P7 — fire `media.generateAltText` for this asset. Returns the result
-   * so the panel can show a toast; null on failure or when the server
-   * preserved an existing user-typed alt text.
-   */
-  onRegenerateAltText?(key: string): Promise<{ altText: string; skipped: boolean } | null>;
-  /**
    * BLOCKERS C3 (authority `code:tag-writer`) — write the file's whole tag
    * list back. The Clone draws the TAGS chips (3695:45155) and the tag filter
    * (3721:43697) but no editor, and nothing wrote a tag; the block only
@@ -241,7 +234,6 @@ export function AssetDetailsPanel({
   composer,
   addToast,
   onUpdateAltText,
-  onRegenerateAltText,
   onUpdateTags,
   onManageFont,
   onJumpToElement,
@@ -264,7 +256,6 @@ export function AssetDetailsPanel({
         </Button>
       </Tooltip>
     );
-  const [regenerating, setRegenerating] = React.useState(false);
   const [moreOpen, setMoreOpen] = React.useState(false);
   /* 4418:58292 / 7093:78271 — TAGS, VERSIONS and USED IN sit behind one
      "Details ▸" row whose right side summarises them. */
@@ -436,14 +427,7 @@ export function AssetDetailsPanel({
           <div className="mgr-det-meta" data-testid="mgr-det-meta">{metaLine}</div>
 
           {selectedItem.type === "img" && onUpdateAltText && (
-            <AltTextSection
-              item={selectedItem}
-              regenerating={regenerating}
-              onUpdateAltText={onUpdateAltText}
-              onRegenerateAltText={onRegenerateAltText}
-              setRegenerating={setRegenerating}
-              addToast={addToast}
-            />
+            <AltTextSection item={selectedItem} onUpdateAltText={onUpdateAltText} />
           )}
 
           <Button
@@ -709,44 +693,13 @@ export function AssetDetailsPanel({
 
 interface AltTextSectionProps {
   item: LibraryItem;
-  regenerating: boolean;
-  setRegenerating(v: boolean): void;
   onUpdateAltText(key: string, altText: string): void;
-  onRegenerateAltText?(key: string): Promise<{ altText: string; skipped: boolean } | null>;
-  addToast(t: ToastInput): void;
 }
 
-function AltTextSection({
-  item,
-  regenerating,
-  setRegenerating,
-  onUpdateAltText,
-  onRegenerateAltText,
-  addToast,
-}: AltTextSectionProps) {
+/* No Generate / Regenerate: no AI entry point in the editor UI (owner,
+   2026-10-17). Text the model wrote earlier still says so (the ✨ AI chip). */
+function AltTextSection({ item, onUpdateAltText }: AltTextSectionProps) {
   const provenance = item.generatedAltMeta;
-
-  const handleRegenerate = async () => {
-    if (!onRegenerateAltText) return;
-    setRegenerating(true);
-    try {
-      const result = await onRegenerateAltText(item.key);
-      if (!result) {
-        addToast({ description: "Couldn't generate alt text — try again later", tone: "error" });
-        return;
-      }
-      if (result.skipped) {
-        addToast({
-          description: "Kept your alt text instead of overwriting",
-          tone: "info",
-        });
-        return;
-      }
-      addToast({ description: "Alt text regenerated", tone: "success" });
-    } finally {
-      setRegenerating(false);
-    }
-  };
 
   const altText = item.altText ?? "";
   const field = (filled: boolean) => (
@@ -764,14 +717,6 @@ function AltTextSection({
       onChange={(e) => onUpdateAltText(item.key, e.target.value)}
     />
   );
-  const regenerate = (label: string, className: string) =>
-    onRegenerateAltText ? (
-      <Button data-testid="alt-text-regenerate" className={className} onClick={handleRegenerate} disabled={regenerating}>
-        {label === "Generate" && <Sparkles size={12} />}
-        {regenerating ? "Generating…" : label}
-      </Button>
-    ) : null;
-
   return (
     <div data-testid="alt-text-section" className="mgr-det-section">
       <label htmlFor={`alt-text-${item.key}`} className="mgr-det-label">
@@ -779,7 +724,7 @@ function AltTextSection({
       </label>
       {altText ? (
         /* 4418:58292 — written alt text reads as a grey box: the text, then
-           "✨ AI" (when the model wrote it) and Regenerate. The field stays
+           "✨ AI" (when the model wrote it). The field stays
            editable in place. */
         <div className="mgr-alt-box tw:flex tw:flex-col tw:gap-1.5 tw:rounded-[var(--bk-radius-md)] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-subtle)] tw:p-2" data-testid="alt-text-box">
           {field(true)}
@@ -794,7 +739,6 @@ function AltTextSection({
                 AI
               </span>
             )}
-            {regenerate("Regenerate", "mgr-alt-regenerate")}
             {!provenance && (
               <span className="tw:ml-auto tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-ink-disabled)]">
                 {altText.length} / {ALT_TEXT_MAX}
@@ -807,7 +751,6 @@ function AltTextSection({
           {field(false)}
           <div className="tw:flex tw:items-center tw:justify-between tw:gap-2 tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-ink-disabled)]">
             <span>0 / {ALT_TEXT_MAX}</span>
-            {regenerate("Generate", `mgr-btn ${MINI_BTN}`)}
           </div>
         </>
       )}

@@ -2,13 +2,14 @@
  * AssetDetailsPanel — P7 alt text section tests.
  *
  * Covers: editor render, user-typed edit triggers onUpdateAltText, provenance
- * chip visibility, Regenerate button states (idle / generating / success /
- * skipped / error), non-image hides the section, missing handlers hide it.
+ * chip visibility, no Generate / Regenerate (no AI entry points in the
+ * editor UI, owner 2026-10-17), non-image hides the section, missing
+ * handlers hide it.
  *
  * @license BSD-3-Clause
  */
 
-import { render, fireEvent, waitFor, act } from "@testing-library/react";
+import { render, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import * as React from "react";
 import { AssetDetailsPanel } from "../AssetDetailsPanel";
@@ -49,7 +50,6 @@ function renderPanel(overrides: Partial<React.ComponentProps<typeof AssetDetails
     composer,
     addToast: vi.fn(),
     onUpdateAltText: vi.fn(),
-    onRegenerateAltText: vi.fn(),
     ...overrides,
   };
   return { ...render(<AssetDetailsPanel {...props} />), props };
@@ -109,116 +109,20 @@ describe("AssetDetailsPanel — alt text section (P7)", () => {
     expect(queryByText(/\/ 125$/)).toBeNull();
   });
 
-  it("renders 'Generate' label when there is no AI provenance and no alt text", () => {
-    const { getByTestId } = renderPanel();
-    const button = getByTestId("alt-text-regenerate");
-    expect(button.textContent).toMatch(/Generate/);
-    expect(button.textContent).not.toMatch(/Regenerate/);
-  });
-
-  it("4418:58292: filled alt text sits in the board's box with 'Regenerate', even without provenance", () => {
-    const { getByTestId } = renderPanel({ selectedItem: makeImage({ altText: "A red bicycle." }) });
-    expect(getByTestId("alt-text-box")).toBeTruthy();
-    expect(getByTestId("alt-text-regenerate").textContent).toMatch(/Regenerate/);
-  });
-
-  it("empty alt text keeps the plain field and 'Generate'", () => {
-    const { getByTestId, queryByTestId } = renderPanel();
-    expect(queryByTestId("alt-text-box")).toBeNull();
-    expect(getByTestId("alt-text-regenerate").textContent).toMatch(/^\s*Generate/);
-  });
-
-  it("renders 'Regenerate' label when AI provenance is present", () => {
-    const { getByTestId } = renderPanel({
+  // re-baseline: library alt text — Generate / Regenerate removed.
+  it("offers no Generate or Regenerate, empty or filled, with or without provenance", () => {
+    const { queryByTestId, queryByText, unmount } = renderPanel();
+    expect(queryByTestId("alt-text-regenerate")).toBeNull();
+    expect(queryByText(/Generate/)).toBeNull();
+    unmount();
+    const filled = renderPanel({
       selectedItem: makeImage({
         altText: "A red bicycle.",
         generatedAltMeta: { generatedAt: "2026-05-09T12:00:00Z", model: "gpt-4o-mini" },
       }),
     });
-    const button = getByTestId("alt-text-regenerate");
-    expect(button.textContent).toMatch(/Regenerate/);
-  });
-
-  it("calls onRegenerateAltText with the asset key when clicked, and toasts on success", async () => {
-    const onRegenerateAltText = vi.fn().mockResolvedValue({
-      altText: "Generated alt text.",
-      skipped: false,
-    });
-    const addToast = vi.fn();
-    const { getByTestId } = renderPanel({ onRegenerateAltText, addToast });
-
-    await act(async () => {
-      fireEvent.click(getByTestId("alt-text-regenerate"));
-    });
-
-    expect(onRegenerateAltText).toHaveBeenCalledWith("asset-1");
-    await waitFor(() => {
-      expect(addToast).toHaveBeenCalledWith(
-        expect.objectContaining({ description: expect.stringMatching(/regenerated/i), tone: "success" }),
-      );
-    });
-  });
-
-  it("toasts info when the server skipped overwriting user-typed alt text", async () => {
-    const onRegenerateAltText = vi.fn().mockResolvedValue({
-      altText: "User typed this",
-      skipped: true,
-    });
-    const addToast = vi.fn();
-    const { getByTestId } = renderPanel({ onRegenerateAltText, addToast });
-
-    await act(async () => {
-      fireEvent.click(getByTestId("alt-text-regenerate"));
-    });
-
-    await waitFor(() => {
-      expect(addToast).toHaveBeenCalledWith(
-        expect.objectContaining({ description: expect.stringMatching(/kept your alt text/i), tone: "info" }),
-      );
-    });
-  });
-
-  it("toasts error when onRegenerateAltText returns null (auth/network)", async () => {
-    const onRegenerateAltText = vi.fn().mockResolvedValue(null);
-    const addToast = vi.fn();
-    const { getByTestId } = renderPanel({ onRegenerateAltText, addToast });
-
-    await act(async () => {
-      fireEvent.click(getByTestId("alt-text-regenerate"));
-    });
-
-    await waitFor(() => {
-      expect(addToast).toHaveBeenCalledWith(
-        expect.objectContaining({ tone: "error" }),
-      );
-    });
-  });
-
-  it("disables the Regenerate button while the request is in flight", async () => {
-    let resolve: (v: any) => void = () => {};
-    const onRegenerateAltText = vi.fn(
-      () => new Promise<{ altText: string; skipped: boolean }>((r) => { resolve = r; }),
-    );
-    const { getByTestId } = renderPanel({ onRegenerateAltText });
-    const button = getByTestId("alt-text-regenerate") as HTMLButtonElement;
-
-    await act(async () => {
-      fireEvent.click(button);
-    });
-
-    expect(button.disabled).toBe(true);
-    expect(button.textContent).toMatch(/Generating/);
-
-    await act(async () => {
-      resolve({ altText: "done", skipped: false });
-      // Let the resolution propagate.
-      await Promise.resolve();
-      await Promise.resolve();
-    });
-
-    await waitFor(() => {
-      expect(button.disabled).toBe(false);
-    });
+    expect(filled.getByTestId("alt-text-box")).toBeTruthy();
+    expect(filled.queryByText(/Regenerate/)).toBeNull();
   });
 
   it("hides the alt-text section for non-image assets (videos, fonts, icons)", () => {

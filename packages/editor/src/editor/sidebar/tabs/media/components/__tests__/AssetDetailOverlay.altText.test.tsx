@@ -1,15 +1,13 @@
 /**
- * G3-022 — the drawer hub's alt text Generate goes through the server's
- * alt-text model (AltTextService, via `onGenerateAltText`) and shows its
- * states: generating (6623:149646), failed + Retry (6623:150370), filled →
- * Regenerate (4418:61698). It used to call a local file-name prompt and stay
- * silently manual when that failed.
+ * The drawer hub's alt text is the user's own field: no AI Generate /
+ * Regenerate (owner, 2026-10-17 — no AI entry points in the editor UI).
+ * re-baseline: asset alt text (the G3-022 Generate states are gone).
  *
  * @license BSD-3-Clause
  */
 import * as React from "react";
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent, act } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { ToastProvider } from "@/editor/chrome-ui";
 import { AssetDetailOverlay } from "../AssetDetailOverlay";
 import type { LibraryItem } from "@/editor/sidebar/tabs/media/data/mediaTypes";
@@ -25,46 +23,28 @@ const base: LibraryItem = {
   assetId: "a1",
 };
 
-function mount(item: LibraryItem, onGenerateAltText: React.ComponentProps<typeof AssetDetailOverlay>["onGenerateAltText"]) {
-  return render(
+function mount(item: LibraryItem, onUpdate = vi.fn(async () => {})) {
+  render(
     <ToastProvider>
-      <AssetDetailOverlay item={item} onClose={vi.fn()} onGenerateAltText={onGenerateAltText} />
+      <AssetDetailOverlay item={item} onClose={vi.fn()} onUpdate={onUpdate} />
     </ToastProvider>,
   );
+  return onUpdate;
 }
 
-describe("AssetDetailOverlay — G3-022 alt text Generate", () => {
-  it("empty → '✨ Generate'; filled → 'Regenerate'", () => {
-    const { unmount } = mount(base, vi.fn());
-    expect(screen.getByTestId("media-alt-generate")).toHaveTextContent("Generate");
-    expect(screen.getByTestId("media-alt-generate")).not.toHaveTextContent("Regenerate");
-    unmount();
-    mount({ ...base, altText: "A plate of pasta" }, vi.fn());
-    expect(screen.getByTestId("media-alt-generate")).toHaveTextContent("Regenerate");
+describe("AssetDetailOverlay — alt text", () => {
+  it("offers no Generate or Regenerate, empty or filled", () => {
+    mount(base);
+    expect(screen.queryByText(/Generate/)).toBeNull();
+    mount({ ...base, key: "a2", altText: "A sunlit studio" });
+    expect(screen.queryByText(/Regenerate/)).toBeNull();
   });
 
-  it("shows 'Generating…' while the model runs, and hands the asset over", async () => {
-    let resolve!: (v: { altText: string; skipped: boolean }) => void;
-    const gen = vi.fn(() => new Promise<{ altText: string; skipped: boolean }>((r) => { resolve = r; }));
-    mount(base, gen);
-    fireEvent.click(screen.getByTestId("media-alt-generate"));
-    expect(gen).toHaveBeenCalledWith(base);
-    expect(screen.getByTestId("media-alt-generate")).toHaveTextContent("Generating…");
-    expect(screen.getByLabelText("Alt text")).toHaveAttribute("placeholder", "Generating alt text…");
-    await act(async () => resolve({ altText: "Chef plating pasta", skipped: false }));
-    expect(screen.getByLabelText("Alt text")).toHaveValue("Chef plating pasta");
-  });
-
-  it("a failure is visible, with Retry — never silently manual", async () => {
-    const gen = vi.fn(async () => null);
-    mount(base, gen);
-    await act(async () => { fireEvent.click(screen.getByTestId("media-alt-generate")); });
-    expect(screen.getByLabelText("Alt text")).toHaveAttribute(
-      "placeholder",
-      "Couldn't generate alt text — write it or retry",
-    );
-    expect(screen.getByTestId("media-alt-generate")).toHaveTextContent("Retry");
-    await act(async () => { fireEvent.click(screen.getByTestId("media-alt-generate")); });
-    expect(gen).toHaveBeenCalledTimes(2);
+  it("saves what the user writes on blur", () => {
+    const onUpdate = mount(base);
+    const field = screen.getByLabelText("Alt text");
+    fireEvent.change(field, { target: { value: "A sunlit studio" } });
+    fireEvent.blur(field);
+    expect(onUpdate).toHaveBeenCalledWith("a1", { altText: "A sunlit studio" });
   });
 });

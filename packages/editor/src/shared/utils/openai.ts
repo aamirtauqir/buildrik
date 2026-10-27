@@ -16,9 +16,6 @@ import {
   ImageStyle,
   ProgrammingLanguage,
   CodeStyle,
-  isValidContentType,
-  isValidTone,
-  buildEnhancedPrompt,
   TONE_INSTRUCTIONS,
   CONTENT_TYPE_PROMPTS,
 } from "@/services/ai/AIPromptLibrary";
@@ -67,36 +64,6 @@ export interface StreamCallbacks {
   onChunk?: (chunk: string) => void;
   onComplete?: (fullContent: string) => void;
   onError?: (error: AIError) => void;
-}
-
-// =============================================================================
-// PUBLIC API - CONTENT GENERATION
-// =============================================================================
-
-/**
- * Generate content using AI with enhanced prompts
- */
-export async function generateContent(
-  prompt: string,
-  contentType: ContentType | string,
-  tone: ToneType | string,
-  options?: AIRequestOptions & { useEnhancedPrompts?: boolean }
-): Promise<string> {
-  const useEnhanced = options?.useEnhancedPrompts !== false;
-  const enhancedPrompt =
-    useEnhanced && isValidContentType(contentType) && isValidTone(tone)
-      ? buildEnhancedPrompt(prompt, contentType, tone)
-      : prompt;
-
-  const response = await aiTrpcClient.generateContent(
-    {
-      prompt: enhancedPrompt,
-      type: "content",
-      options: { tone: tone as string },
-    },
-    options
-  );
-  return response.data.content;
 }
 
 export const PROMPT_TEMPLATES = {

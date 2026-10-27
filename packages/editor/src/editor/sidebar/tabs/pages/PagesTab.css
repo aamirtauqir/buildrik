@@ -238,7 +238,7 @@
   cursor: pointer;
 }
 .bd-pg-row-overflow:hover { background: rgba(15,23,42,0.06); color: var(--bk-ink); }
-.bd-pg-row-overflow svg { width: var(--pg-icon-glyph); height: var(--pg-icon-glyph); }
+.bd-pg-row-overflow svg { width: var(--bk-space-16); height: var(--bk-space-16); } /* 2L9: the ⋯ is ~12 wide, 3px dots */
 
 /* ─── HOME CHIP + STATUS CHIP ─────────────────────────────────────────── */
 

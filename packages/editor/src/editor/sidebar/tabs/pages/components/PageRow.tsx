@@ -400,9 +400,10 @@ export const PageRow = React.memo<Props>(
             onClick={handleContextMenuClick}
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-              <circle cx="5" cy="12" r="1" fill="currentColor" />
-              <circle cx="12" cy="12" r="1" fill="currentColor" />
-              <circle cx="19" cy="12" r="1" fill="currentColor" />
+              {/* 94:13447: 3px dots, 4px apart — the bolder ⋯ every board draws. */}
+              <circle cx="5" cy="12" r="1.5" fill="currentColor" />
+              <circle cx="12" cy="12" r="1.5" fill="currentColor" />
+              <circle cx="19" cy="12" r="1.5" fill="currentColor" />
             </svg>
           </Button>
         </div>

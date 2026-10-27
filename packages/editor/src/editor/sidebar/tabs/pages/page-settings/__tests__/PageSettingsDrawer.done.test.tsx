@@ -35,6 +35,26 @@ const editTitle = (v = "Menu — Bella Cucina") =>
 
 afterEach(() => vi.useRealTimers());
 
+describe("PageSettingsDrawer — subtitle", () => {
+  // re-baseline: page settings subtitle — 94:29621 for the page on the canvas, 63:15939 for another.
+  it("says page appearance stays in the Inspector for the page on the canvas, and names the canvas page otherwise", () => {
+    const composer = { elements: { updatePage: vi.fn() }, emit: vi.fn(), getProjectMetadata: () => ({}) } as never;
+    const home: PageItem = { id: "h", name: "Home", slug: "home", isHome: true, isActive: true };
+    const { rerender } = render(
+      <ToastProvider>
+        <PageSettingsDrawer page={home} allPages={[home, page]} composer={composer} onClose={vi.fn()} />
+      </ToastProvider>,
+    );
+    expect(screen.getByTestId("pg-drawer-subtitle")).toHaveTextContent("Editing Home · Page appearance stays in the Inspector");
+    rerender(
+      <ToastProvider>
+        <PageSettingsDrawer page={page} allPages={[home, page]} composer={composer} onClose={vi.fn()} />
+      </ToastProvider>,
+    );
+    expect(screen.getByTestId("pg-drawer-subtitle")).toHaveTextContent("Editing Menu · Home stays open on the canvas");
+  });
+});
+
 describe("PageSettingsDrawer — Done / Cancel", () => {
   /* design-2l9 board 63:15939: "{Page} · Page settings", "Editing {Page}",
      Cancel · Save. Re-baseline: page settings copy. */
@@ -76,11 +96,12 @@ describe("PageSettingsDrawer — Done / Cancel", () => {
     expect(await screen.findByText("Page settings saved")).toBeInTheDocument();
   });
 
-  it("Done on a clean form just closes", () => {
-    const { onClose, updatePage } = mount();
-    fireEvent.click(screen.getByTestId("pg-drawer-done"));
-    expect(onClose).toHaveBeenCalledTimes(1);
-    expect(updatePage).not.toHaveBeenCalled();
+  // re-baseline: page settings Save — 94:29621 draws it disabled with nothing to save.
+  it("Save is disabled on a clean form and wakes with an edit", () => {
+    mount();
+    expect(screen.getByTestId("pg-drawer-done")).toBeDisabled();
+    editTitle();
+    expect(screen.getByTestId("pg-drawer-done")).not.toBeDisabled();
   });
 
   it("Cancel discards and closes without asking", () => {

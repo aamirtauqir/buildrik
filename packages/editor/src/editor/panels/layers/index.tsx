@@ -525,11 +525,9 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
       <div
         ref={state.treeContainerRef}
         id="bd-layers-tree"
-        /* Filtered rows are flat (4418:79355): no chevron slot, the glyph
-           sits where depth 0's chevron would. */
-        className={`bdc-layers-tree${state.displayPrefs.treeDensity === "compact" ? " bdc-layers-tree-compact" : ""}${
-          state.searchHook.isSearching ? " tw:[&_.bdc-lr-chev]:hidden!" : ""
-        }`}
+        /* design-2l9 147:77189 / 147:79728: search results keep the chevron,
+           at depth 0's place, with the path under the row. */
+        className={`bdc-layers-tree${state.displayPrefs.treeDensity === "compact" ? " bdc-layers-tree-compact" : ""}`}
         role="tree"
         aria-label="Page structure"
       >
@@ -555,7 +553,7 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
 
         {/* design-2l9 147:77189: a head line over the results. */}
         {state.searchHook.isSearching && filteredLayers.length > 0 && (
-          <p className="tw:m-0 tw:px-3 tw:pt-1 tw:pb-1 tw:text-[13px] tw:leading-5 tw:font-semibold tw:text-[var(--bk-ink)]" data-testid="layers-search-head">
+          <p className="tw:m-0 tw:px-3 tw:pb-1 tw:text-[13px] tw:leading-5 tw:font-semibold tw:text-[var(--bk-ink)]" data-testid="layers-search-head">
             {`${matchCount.toLocaleString("en-US")} match${matchCount === 1 ? "" : "es"} in ${totalCount.toLocaleString("en-US")} layers`}
           </p>
         )}

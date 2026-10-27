@@ -73,7 +73,7 @@ describe("LayersTab — header ⋯ menu", () => {
   it("filters from its own field under the header, and a closed drawer drops the query", () => {
     const c = composer();
     const { rerender } = render(<LayersTab composer={c} isOpen />);
-    const field = screen.getByPlaceholderText("Search layers…");
+    const field = screen.getByPlaceholderText("Search layers");
     const header = screen.getByText("Layers").closest("header, [class*=header], div") as HTMLElement;
     expect(header.compareDocumentPosition(field) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     fireEvent.change(field, { target: { value: "hero" } });
@@ -86,7 +86,7 @@ describe("LayersTab — header ⋯ menu", () => {
   it("Escape in the field clears it first, then closes the drawer", () => {
     const onClose = vi.fn();
     render(<LayersTab composer={null} onClose={onClose} />);
-    const field = screen.getByPlaceholderText("Search layers…") as HTMLInputElement;
+    const field = screen.getByPlaceholderText("Search layers") as HTMLInputElement;
     fireEvent.change(field, { target: { value: "hero" } });
     fireEvent.keyDown(field, { key: "Escape" });
     expect(field.value).toBe("");

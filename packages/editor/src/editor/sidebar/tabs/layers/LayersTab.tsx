@@ -68,7 +68,8 @@ export interface LayersTabProps {
   isOpen?: boolean;
 }
 
-const LAYERS_SEARCH_PLACEHOLDER = "Search layers…";
+/* design-2l9 147:75914 / 152:79448 draw no ellipsis. */
+const LAYERS_SEARCH_PLACEHOLDER = "Search layers";
 
 const count = (n: number) => n.toLocaleString("en-US");
 

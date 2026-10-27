@@ -1018,18 +1018,5 @@
   flex-shrink: 0;
 }
 
-/* 4418:58292 ALT TEXT, written — the box and the "✨ AI" pill are `tw:`
-   utilities (AssetDetailsPanel); Regenerate displaces flowbite's button. */
-.mgr-alt-box .mgr-alt-regenerate {
-  height: 18px;
-  min-height: 0;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  font: 400 var(--bk-text-11)/14px var(--bk-font-ui);
-  color: var(--bk-accent-text);
-}
-.mgr-alt-box .mgr-alt-regenerate:hover { text-decoration: underline; background: transparent; }
-
 /* 4418:58292 — the "Tags ▾" row fills the rail like every other row. */
 .mgr-tags-anchor .mgr-node { flex: 1; }
