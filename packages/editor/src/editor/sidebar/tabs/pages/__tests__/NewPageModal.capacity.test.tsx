@@ -54,6 +54,8 @@ describe("NewPageModal — capacity", () => {
       ),
     );
     expect(screen.getByTestId("new-page-create")).toBeDisabled();
+    // re-baseline: New page capacity — 101:38257 draws the full count in the error red.
+    expect(screen.getByTestId("new-page-capacity-head").className).toContain("tw:text-[var(--bk-error-text)]");
   });
 
   it("while checking, waits; when the check fails, keeps the choices and offers Retry check", async () => {

@@ -209,8 +209,21 @@ function PageCapacityLine({ capacity, count, atLimit }: { capacity: PageCapacity
           ];
   return (
     <div className="tw:flex tw:flex-col tw:gap-0.5" data-testid="new-page-capacity" role={capacity.state === "unavailable" || atLimit ? "status" : undefined}>
-      <p className={`${LINE} tw:tabular-nums ${atLimit || capacity.state === "unavailable" ? "tw:text-[var(--bk-ink)] tw:font-medium" : "tw:text-[var(--bk-ink-muted)]"}`}>{head}</p>
-      {body && <p className={`${LINE} tw:text-[var(--bk-ink-muted)]`}>{body}</p>}
+      {/* 101:38257: at the limit the count turns red and the way out sits a
+          line apart, in soft ink. */}
+      <p
+        className={`${LINE} tw:tabular-nums ${
+          atLimit
+            ? "tw:text-[var(--bk-error-text)]"
+            : capacity.state === "unavailable"
+              ? "tw:text-[var(--bk-ink)] tw:font-medium"
+              : "tw:text-[var(--bk-ink-muted)]"
+        }`}
+        data-testid="new-page-capacity-head"
+      >
+        {head}
+      </p>
+      {body && <p className={`${LINE} ${atLimit ? "tw:mt-3 tw:text-[var(--bk-ink-soft)]" : "tw:text-[var(--bk-ink-muted)]"}`}>{body}</p>}
     </div>
   );
 }

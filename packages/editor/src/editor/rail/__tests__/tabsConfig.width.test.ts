@@ -19,7 +19,7 @@ import { GROUPED_TABS_CONFIG } from "../tabsConfig";
  *
  * Now `.ls-panel` takes `width: var(--drawer-w, var(--bk-size-drawer))`, so
  * the token is load-bearing and flow-specific widths (Media 560, Templates
- * 700, header-expand 700) set `--drawer-w` instead. `panelWidth` and
+ * 700, header-expand 720) set `--drawer-w` instead. `panelWidth` and
  * `getTabWidth` are gone — a field no tab set and a helper that only ever
  * returned a constant.
  *

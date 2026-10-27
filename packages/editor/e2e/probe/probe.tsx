@@ -96,6 +96,8 @@ import { DSModeProvider } from "@/editor/design-system/state/DSModeContext";
 import { LayerTreeItem } from "@/editor/panels/layers/LayerTreeItem";
 import { renameElement } from "@/editor/panels/layers/hooks/layersPersistence";
 import { PagesTab } from "@/editor/sidebar/tabs/pages/PagesTab";
+import { LeftSidebar } from "@/editor/sidebar/LeftSidebar";
+import type { GroupedTabId } from "@/editor/rail/tabsConfig";
 import { MovePagesDialog, TOP_LEVEL } from "@/editor/sidebar/tabs/pages/components/MovePagesDialog";
 import type { LayerItem } from "@/editor/panels/layers/types";
 import { HistoryTab } from "@/editor/sidebar/tabs/history/HistoryTab";
@@ -806,6 +808,25 @@ function listingsComposer(): Composer {
     }
   }
   return c;
+}
+
+function ShellProbe() {
+  const tab = (new URLSearchParams(location.search).get("tab") ?? "pages") as GroupedTabId;
+  const composer = React.useMemo(() => listingsComposer(), []);
+  return (
+    <div data-probe="pages-shell" style={{ width: "100vw", height: "100vh" }}>
+      <ToastProvider>
+        <LayoutShell drawerOpen inspectorOpen={false}>
+          <LayoutShell.Sidebar>
+            <LeftSidebar composer={composer} activeTab={tab} onTabChange={() => {}} drawerOpen onDrawerToggle={() => {}} />
+          </LayoutShell.Sidebar>
+          <LayoutShell.Canvas>
+            <div style={{ height: "100%", background: "var(--bk-gray-100)" }} data-testid="shell-canvas" />
+          </LayoutShell.Canvas>
+        </LayoutShell>
+      </ToastProvider>
+    </div>
+  );
 }
 
 function addTargetComposer(): Composer {
@@ -3076,6 +3097,11 @@ const CASES: Record<string, () => React.ReactElement> = {
       })}
     </div>
   ),
+  /* The editor's shell around one drawer — the real LayoutShell + LeftSidebar
+     at the probe's viewport, `?tab=` picking the drawer (pages, layers,
+     build, media). For drawer header / search / width checks against the
+     boards (REQUESTS A-19), including at 1024. */
+  "pages-shell": () => <ShellProbe />,
   /* design-2l9 board 63:6393 — the whole Pages manager (header, search, view
      tabs, list, footer): the real PagesTab, 284 wide like the board. */
   "pages-tab": () => (
@@ -3582,6 +3608,21 @@ const CASES: Record<string, () => React.ReactElement> = {
         onMove={() => {}}
         onClose={() => {}}
       />
+    </div>
+  ),
+  /* design-2l9 board 63:17617 — About renamed to "Our story" with its URL
+     moved: page settings opened by "Update URL" offer the redirect. */
+  "pages-settings-redirect": () => (
+    <div data-probe="pages-settings-redirect" style={{ width: 1440, height: 900, background: "var(--bk-gray-900)" }}>
+      <ToastProvider>
+        <PageSettingsDrawer
+          page={{ ...PAGE_SETTINGS_FIXTURE, id: "about", name: "Our story", slug: "our-story", isHome: false }}
+          allPages={[PAGE_SETTINGS_FIXTURE, ...PAGES_FIXTURE.slice(1)]}
+          composer={null}
+          previousSlug="about"
+          onClose={() => {}}
+        />
+      </ToastProvider>
     </div>
   ),
   /* design-2l9 board 65:17860 — SEO score details over Page settings (the

@@ -330,7 +330,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   const panelContentRef = React.useRef<HTMLDivElement>(null);
   const [errorKey, setErrorKey] = React.useState(0);
 
-  // Expand state (board 16:6 header action): 280 ↔ 700 drawer width.
+  // Expand state (board 16:6 header action): 280 ↔ 720 drawer width.
   // Collapsed by default — the boards draw the 280 drawer (redrawn 2026-09-02). Controlled or
   // internal fallback, same shape the pin state had.
   const [internalExpanded, setInternalExpanded] = React.useState(false);
@@ -455,10 +455,11 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   const tabConfig = getTabConfig(activeTab);
   const panelTitle = tabConfig?.label ?? "Panel";
 
-  // Header expand (board 16:6) widens a drawer to 700. `null` means "no flow
-  // width" — the default comes from `--bk-size-drawer` in LeftSidebar.css, so
-  // the generated token is the single source.
-  const panelWidthOverride = isExpanded ? 700 : null;
+  // Expand widens the drawer to 720 and floats it over the canvas (design-2l9
+  // 63:21262, Pages Listings; REQUESTS A-19). `null` means "no flow width" —
+  // the default comes from `--bk-size-drawer` in LeftSidebar.css, so the
+  // generated token is the single source.
+  const panelWidthOverride = isExpanded ? 720 : null;
 
   const commonTabProps = {
     /* A closed drawer keeps its tab mounted (width 0); a tab that acts on
@@ -470,7 +471,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   };
 
   return (
-    <div className="ls-root">
+    <div className="ls-root tw:has-[.ls-panel--wide]:overflow-visible!">
       {/* Rail */}
       <nav
         ref={navRef}
@@ -505,7 +506,17 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
       </nav>
       {/* Panel */}
       <div
-        className={`ls-panel${!drawerOpen ? " ls-panel--closed" : ""}`}
+        /* design-2l9 63:21262: the widened drawer floats over the canvas. It
+           keeps the narrow drawer's place in the layout (the negative margin
+           hands the rest back) and spills right with the overlay shadow;
+           `ls-panel--wide` is what un-clips .ls-root and the sidebar slot. */
+        className={`ls-panel${
+          !drawerOpen
+            ? " ls-panel--closed"
+            : isExpanded
+              ? " ls-panel--wide tw:mr-[calc(var(--bk-size-drawer)-var(--drawer-w))] tw:[box-shadow:var(--bk-shadow-overlay)]"
+              : ""
+        }`}
         style={
           panelWidthOverride !== null
             ? ({ "--drawer-w": `${panelWidthOverride}px` } as React.CSSProperties)

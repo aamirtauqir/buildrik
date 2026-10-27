@@ -39,7 +39,6 @@ function publicPath(page: PageItem, slug: string): string {
 }
 
 const UI = "tw:[font-family:var(--bk-font-ui)]";
-const CARD = "tw:bg-[var(--bk-bg-subtle)] tw:border tw:border-[var(--bk-gray-200)] tw:rounded";
 const BANNER = "tw:bg-[var(--bk-warning-tint)] tw:border tw:border-[var(--bk-warning-text)] tw:rounded tw:text-[var(--bk-warning)]";
 const FIELD = "tw:flex tw:flex-col tw:gap-1.5";
 /* Board 63:15939: 13/600 ink labels; blue text links set in from the edge. */
@@ -48,7 +47,8 @@ const LINK = "tw:self-start tw:h-7 tw:min-h-0 tw:px-6 tw:text-[length:var(--bk-t
 const FIELD_HEAD = "tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2";
 /* Density-32 buttons: flowbite `size="xs"` supplies the h-8, these the rest. */
 const BTN_32 = "tw:rounded-[var(--bk-radius-md)] tw:text-[length:var(--bk-text-13)] tw:font-medium tw:focus:ring-0 tw:focus:[box-shadow:var(--bk-shadow-focus)]";
-const BTN_SECONDARY = `${BTN_32} tw:border-transparent tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-gray-200)]`;
+/* 63:17617: "Add redirect" is an outlined white button. */
+const BTN_SECONDARY = `${BTN_32} tw:border tw:border-[var(--bk-gray-200)] tw:bg-[var(--bk-bg-card)] tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-bg-subtle)]`;
 
 /** The first heading and the first run of body copy on a page — what the
  *  page is actually about, for the AI title prompt. */
@@ -324,45 +324,6 @@ export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, onOpe
             “{s.slug}” is a numbered URL — a descriptive slug ranks better (+10 pts)
           </HelperText>
         ) : null}
-        {/* Clone 3519:19920 — the saved slug change offers its redirect here,
-            beside the field that made it. One text node for the sentence.
-            `Add redirect` leaves for Settings › Redirects with the draft
-            prefilled; `Not now` answers THIS change and it does not come back
-            for it — a further change is a new offer. */}
-        {redirectOffer && (
-          <div
-            ref={offerRef}
-            role="status"
-            data-testid="page-seo-redirect-offer"
-            className={`tw:mt-1 tw:flex tw:flex-col tw:gap-2 tw:px-3 tw:py-2.5 ${CARD} ${UI}`}
-          >
-            <span className="tw:text-[length:var(--bk-text-12)] tw:leading-[18px] tw:text-[var(--bk-ink)]">
-              {`URL changed from ${from} to ${to}. Add a redirect so old links keep working?`}
-            </span>
-            <div className="tw:flex tw:items-center tw:gap-2">
-              <Button
-                type="button"
-                size="xs"
-                variant="secondary"
-                className={BTN_SECONDARY}
-                data-testid="page-seo-redirect-add"
-                onClick={addRedirect}
-              >
-                Add redirect
-              </Button>
-              <Button
-                type="button"
-                size="xs"
-                variant="ghost"
-                className={BTN_32}
-                data-testid="page-seo-redirect-later"
-                onClick={() => setAnsweredChange(change)}
-              >
-                Later
-              </Button>
-            </div>
-          </div>
-        )}
       </div>
       {/* Board 63:15939: "Search indexing" with its select on one row (the
           switch lives here; Advanced reads it out), then the two links and
@@ -382,7 +343,47 @@ export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, onOpe
           </Select>
         </div>
       </div>
-      {onOpenSiteDefaults && (
+      {/* design-2l9 63:17617 — the saved slug change offers its redirect
+          under Search indexing, as a plain line and two buttons (no card), in
+          the place Site SEO defaults takes otherwise. One text node.
+          `Add redirect` leaves for Settings › Redirects with the draft
+          prefilled; `Not now` answers THIS change and it does not come back
+          for it — a further change is a new offer. */}
+      {redirectOffer && (
+        <div
+          ref={offerRef}
+          role="status"
+          data-testid="page-seo-redirect-offer"
+          className={`tw:flex tw:flex-col tw:gap-2 ${UI}`}
+        >
+          <span className="tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-soft)]">
+            {`URL changed from ${from} to ${to}. Add a redirect so old links keep working?`}
+          </span>
+          <div className="tw:flex tw:items-center tw:gap-2">
+            <Button
+              type="button"
+              size="xs"
+              variant="secondary"
+              className={BTN_SECONDARY}
+              data-testid="page-seo-redirect-add"
+              onClick={addRedirect}
+            >
+              Add redirect
+            </Button>
+            <Button
+              type="button"
+              size="xs"
+              variant="ghost"
+              className={BTN_32}
+              data-testid="page-seo-redirect-later"
+              onClick={() => setAnsweredChange(change)}
+            >
+              Later
+            </Button>
+          </div>
+        </div>
+      )}
+      {onOpenSiteDefaults && !redirectOffer && (
         <Button
           variant="link"
           data-testid="seo-site-defaults"

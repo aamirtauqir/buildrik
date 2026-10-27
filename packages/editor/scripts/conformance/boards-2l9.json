@@ -22,7 +22,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-fixed",
-   "verifiedNote": "probe-compared 2026-10-27 (case add-panel-target, real Composer with Hero selected, board shots/7-18981.png): 'Search elements' (no ellipsis, no ⌘F chip — the shortcut still works); Elements · Blocks · Components as a segmented control on a gray card at y101, 256×32, active tab white; 'Insert into Hero' / 'Home / Hero · At end' as the card's lower half (13/12px), card 84 tall like the board; category headers 12/600 ink, 20 tall, no chevron or count (▸ only when collapsed), first at y186 (board 186); rows 32 tall, inset 12, rounded 6, icon at 24. Row list is the code catalog (board's sample order not conformed). Open: panel ✕ in the header comes from the shell's onClose (StudioPanels, not L-A); PanelSearch inset 16 vs board ~10 is the shared chrome-ui field (lead4).",
+   "verifiedNote": "probe-compared 2026-10-27 (case add-panel-target, real Composer with Hero selected, board shots/7-18981.png): 'Search elements' (no ellipsis, no ⌘F chip — the shortcut still works); Elements · Blocks · Components as a segmented control on a gray card at y101, 256×32, active tab white; 'Insert into Hero' / 'Home / Hero · At end' as the card's lower half (13/12px), card 84 tall like the board; category headers 12/600 ink, 20 tall, no chevron or count (▸ only when collapsed), first at y186 (board 186); rows 32 tall, inset 12, rounded 6, icon at 24. Row list is the code catalog (board's sample order not conformed). Open: panel ✕ in the header comes from the shell's onClose (StudioPanels, not L-A); search field now 12 in (A-19) vs the board's ~8.",
    "tier": "P1"
   },
   {
@@ -145,7 +145,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-fixed",
-   "verifiedNote": "probe-compared 2026-10-27 (case pages-tab: the real PagesTab on a real Composer, 284×812, shots/63-6393.png) for the whole panel: 'Pages · 5' + ⋯ + ✕, search band, Pages · Listings · Structure as a gray well with the chosen view on a white chip at inset 12, rows (glyph, name over URL, 'Current' on the tinted open row, ⋯), legend, footer '+ Add page' over From template · New folder. Earlier probe (pages-manager) covered folders and the Collection pages card. Open, shared chrome-ui (REQUESTS A-19): header 44 tall vs the board's 56, search field inset 16 vs 12.",
+   "verifiedNote": "probe-compared 2026-10-27 (case pages-tab: the real PagesTab on a real Composer, 284×812, shots/63-6393.png) for the whole panel: 'Pages · 5' + ⋯ + ✕, search band, Pages · Listings · Structure as a gray well with the chosen view on a white chip at inset 12, rows (glyph, name over URL, 'Current' on the tinted open row, ⋯), legend, footer '+ Add page' over From template · New folder. Earlier probe (pages-manager) covered folders and the Collection pages card. A-19 (2026-10-27, case pages-shell — the real LayoutShell + LeftSidebar, measured at 1440 and 1024): the boards' drawer head is 44-equivalent with NO rule under it (the earlier '56' was the topbar's), title 12 in, search field 12 in (Add's board ~8) — now title 12, field 12, rule gone; every drawer fits at 1024 with no horizontal overflow.",
    "tier": "P1"
   },
   {
@@ -221,8 +221,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-A S9: redirect offer's second action reads 'Later'. Container (modal vs drawer) is the open owner decision.",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case pages-settings-redirect: About renamed 'Our story', previousSlug about; board shots/63-17617.png): the redirect offer moved from a card beside Page URL to a plain line under Search indexing — 'URL changed from /about to /our-story. Add a redirect so old links keep working?' 12px soft ink, outlined white 'Add redirect' + 'Later' — in Site SEO defaults' place while it is open; SEO score details and the scope note follow. Not conformed: the '▷ Regenerate' AI link beside SEO title is not on the board (owner's no-AI-in-UI call, flagged in the report).",
    "tier": "P1"
   },
   {
@@ -289,7 +289,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-fixed",
-   "verifiedNote": "probe-compared 2026-10-27 (case pages-listings, real PagesTab on a real Composer at 720 wide, board shots/63-21262.png): 40-tall header 13/600 ink, columns at x476 SEO score / x556 Visibility / ⋯ (board same), 52-tall rows with Home roof / page glyph, name 13 over URL 12 sans, score/visibility 13px, row ⋯ opens the page menu, note under the last row, Pages footer kept under the listing. Entering Listings widens the drawer (LeftSidebar's expand, 700 vs board ~720) and leaving narrows it again (PagesTab.listingsWidth test); the separate 'Open full listings ›' link is gone. Open: 9px vertical offset is the shared PanelFrame header (REQUESTS A-19).",
+   "verifiedNote": "probe-compared 2026-10-27 (case pages-listings, real PagesTab on a real Composer at 720 wide, board shots/63-21262.png): 40-tall header 13/600 ink, columns at x476 SEO score / x556 Visibility / ⋯ (board same), 52-tall rows with Home roof / page glyph, name 13 over URL 12 sans, score/visibility 13px, row ⋯ opens the page menu, note under the last row, Pages footer kept under the listing. Entering Listings widens the drawer (LeftSidebar's expand, now 720 and floating over the canvas like the board — the canvas keeps its place; measured at 1440 and 1024) and leaving narrows it again (PagesTab.listingsWidth test); the separate 'Open full listings ›' link is gone. The 9px offset read earlier was a crop error; the drawer head matches (A-19).",
    "tier": "P1"
   },
   {
@@ -775,8 +775,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-A wave 2 built, not compared: '{n} of {n} pages on {Plan}' + 'Ask the workspace owner to upgrade, or remove an unused page before creating another.'; Create disabled (the server refuses a save past the limit).",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case new-page-dialog with the capacity query answered by a routed tRPC stub, limit = page count; board shots/101-38257.png): at the limit the count line ('n of n pages on Free') is error red, regular, and 'Ask the workspace owner to upgrade, or remove an unused page before creating another.' sits 12 below in soft ink; Create page disabled.",
    "tier": "P1"
   },
   {

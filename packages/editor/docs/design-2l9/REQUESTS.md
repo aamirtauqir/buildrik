@@ -29,7 +29,7 @@ L3-2. **lead3 (wave 3) · AquibraStudio.tsx (banner slot DOM order)** · same mo
 
 A-18. ~~**L-A → lead · Pages drawer width for Listings**~~ · closed by L-A without a shell change: LeftSidebar already passes a working `onExpandToggle` (280 ↔ 700) through TabRouter's commonTabProps; PagesTab now widens on entering Listings and narrows on leaving if it widened (test PagesTab.listingsWidth). 700 vs the board's ~720 is LeftSidebar's `panelWidthOverride`.
 
-A-19. **L-A → lead · `chrome-ui/PanelFrame` header + PanelSearch band** · boards 63:6393 / 63:21262 / 7:18981 draw the drawer header 56 tall (title baseline ~28, rule at 56); PanelFrame.Header is 44, so every drawer body sits 12px high. The search band insets its field 12 on the boards, 16 in code. Shared by every drawer — one lane should not move them all.
+A-19. ~~**L-A → lead · `chrome-ui/PanelFrame` header + PanelSearch band**~~ · closed by L-A (coordinator handed it over, 2026-10-27). Measured on 63:6393 / 147:75914 / 7:18981 and on the real LayoutShell + LeftSidebar (probe `pages-shell`): the drawer head was never 12px short — the '56' was the topbar's rule; the search field already lands at the boards' y. The real deltas were the rule under the head (boards draw none), the title inset (16 → 12) and the search inset (16 → 12): PanelHeader's drawer size and PanelSearch now match. Expand is 720 and floats over the canvas (the canvas keeps its place). Every drawer fits at 1024 with no horizontal overflow.
 
 
 
