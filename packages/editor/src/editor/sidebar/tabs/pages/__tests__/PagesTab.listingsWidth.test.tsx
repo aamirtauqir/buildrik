@@ -14,9 +14,9 @@ import PagesTab from "../PagesTab";
 
 afterEach(cleanup);
 
-function Host({ onToggle }: { onToggle: (wide: boolean) => void }) {
+function Host({ onToggle, startWide = false }: { onToggle: (wide: boolean) => void; startWide?: boolean }) {
   const composer = React.useMemo(() => createMockComposer({ pages: [pg("p1", "Home", { isHome: true }), pg("p2", "About")] }), []);
-  const [wide, setWide] = React.useState(false);
+  const [wide, setWide] = React.useState(startWide);
   return (
     <ToastProvider>
       <span data-testid="width">{wide ? "wide" : "narrow"}</span>
@@ -43,11 +43,8 @@ describe("PagesTab — Listings drawer width", () => {
     expect(onToggle).toHaveBeenCalledTimes(2);
   });
 
-  it("leaves a drawer the user widened alone when Listings closes", () => {
-    render(<Host onToggle={() => {}} />);
-    fireEvent.click(screen.getByTestId("pages-panel-menu"));
-    fireEvent.click(screen.getByTestId("pages-wide-view"));
-    expect(screen.getByTestId("width")).toHaveTextContent("wide");
+  it("leaves a drawer that was already wide alone when Listings closes", () => {
+    render(<Host onToggle={() => {}} startWide />);
     tab("Listings");
     tab("Structure");
     expect(screen.getByTestId("width")).toHaveTextContent("wide");

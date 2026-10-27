@@ -232,9 +232,10 @@ describe("SeoTab score card", () => {
     fireEvent.click(screen.getByTestId("seo-score-details"));
     const box = screen.getByTestId("seo-score-breakdown");
     expect(box).toHaveTextContent(/SEO score · .+ · 80\/100/);
-    expect(box).toHaveTextContent("Title length:20/20");
-    expect(box).toHaveTextContent("Description ≥100 characters:0/10");
-    fireEvent.click(screen.getByTestId("seo-score-details"));
+    // re-baseline: SEO score details — a small dialog with "Part: n/max" lines (65:17860).
+    expect(box).toHaveTextContent("Title length: 20/20");
+    expect(box).toHaveTextContent("Description ≥100 characters: 0/10");
+    fireEvent.click(screen.getByTestId("seo-score-back"));
     expect(screen.queryByTestId("seo-score-breakdown")).toBeNull();
   });
 

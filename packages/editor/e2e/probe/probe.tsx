@@ -3575,6 +3575,20 @@ const CASES: Record<string, () => React.ReactElement> = {
       />
     </div>
   ),
+  /* design-2l9 board 65:17860 — SEO score details over Page settings (the
+     recipe clicks "SEO score details"). */
+  "pages-settings-score": () => (
+    <div data-probe="pages-settings-score" style={{ width: 1440, height: 900, background: "var(--bk-gray-900)" }}>
+      <ToastProvider>
+        <PageSettingsDrawer
+          page={PAGE_SETTINGS_FIXTURE}
+          allPages={[PAGE_SETTINGS_FIXTURE, ...PAGES_FIXTURE.slice(1)]}
+          composer={null}
+          onClose={() => {}}
+        />
+      </ToastProvider>
+    </div>
+  ),
   /* design-2l9 board 63:18189 — page settings whose save is refused. The
      composer stub refuses the one write the save makes; the recipe edits the
      title and presses Save. */

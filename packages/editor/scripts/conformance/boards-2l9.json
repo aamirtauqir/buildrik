@@ -354,8 +354,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-A S5: ⋯ keeps Select pages… · Listings · Show structure · Reload (+ Widen panel, code-ahead). 'Recently deleted' waits on page trash (sub-plan S12, server).",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case pages-tab with the drawer at x56 as in the shell, ⋯ clicked; board shots/65-17148.png): menu 278 wide from the drawer's left edge (x56, board 56) under the header, rows 32, text inset 13 (board 12): Select pages… · Listings · Show structure · Reload, no rule; 'Widen panel' removed (Listings widens the drawer itself). Board's 'Recently deleted' is the page trash — P3, not built, so not drawn.",
    "tier": "P1"
   },
   {
@@ -365,8 +365,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-A wave 2 built, not compared: SEO score details opens \"SEO score · {Page} · {n}/100\" and the six parts (Title length /20, URL format /20, Description length /30, Descriptive URL /10, Title ≥30 characters /10, Description ≥100 characters /10) — seoScoreBreakdown, which calculateSeoScore now sums, so the rows cannot disagree with the score. Inline in the drawer, not a separate dialog; Back to SEO closes it.",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case pages-settings-score, board shots/65-17860.png): SEO score details opens a 480 dialog over Page settings (was an inline gray box): 'SEO score · {page} · n/100' title, six 'Part: n/max' lines 13px soft ink, 'Back to SEO' link closes it. Dialog 480×240 (board 480×256).",
    "tier": "P1"
   },
   {

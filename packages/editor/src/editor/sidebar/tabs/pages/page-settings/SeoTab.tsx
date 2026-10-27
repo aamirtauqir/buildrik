@@ -14,7 +14,7 @@ import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants/events";
 import type { PageItem } from "../types";
 import type { UsePageSettingsReturn } from "./usePageSettings";
-import { BK_HELPER_CLASS, BK_HELPER_ERROR_CLASS, BK_LABEL_CLASS, Button, HelperText, Label, Select, Textarea, TextInput } from "@/editor/chrome-ui";
+import { BK_HELPER_CLASS, BK_HELPER_ERROR_CLASS, BK_LABEL_CLASS, Button, HelperText, Label, Modal, Select, Textarea, TextInput } from "@/editor/chrome-ui";
 import { isPlaceholderSlug } from "../utils/seoScore";
 import { resolvePageDescription } from "@/engine/export/SEOInjector";
 import { pageFileNames } from "@/engine/export/pageFiles";
@@ -39,7 +39,6 @@ function publicPath(page: PageItem, slug: string): string {
 }
 
 const UI = "tw:[font-family:var(--bk-font-ui)]";
-const MONO = "tw:[font-family:var(--bk-font-mono)]";
 const CARD = "tw:bg-[var(--bk-bg-subtle)] tw:border tw:border-[var(--bk-gray-200)] tw:rounded";
 const BANNER = "tw:bg-[var(--bk-warning-tint)] tw:border tw:border-[var(--bk-warning-text)] tw:rounded tw:text-[var(--bk-warning)]";
 const FIELD = "tw:flex tw:flex-col tw:gap-1.5";
@@ -402,25 +401,38 @@ export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, onOpe
       <Button
         variant="link"
         data-testid="seo-score-details"
-        aria-expanded={detailsOpen}
+        aria-haspopup="dialog"
         className={`${LINK} ${UI}`}
-        onClick={() => setDetailsOpen((v) => !v)}
+        onClick={() => setDetailsOpen(true)}
       >
-        {detailsOpen ? "Back to SEO" : "SEO score details"}
+        SEO score details
       </Button>
-      {detailsOpen && (
-        <div className="tw:flex tw:flex-col tw:gap-1 tw:rounded-md tw:bg-[var(--bk-gray-100)] tw:p-3" data-testid="seo-score-breakdown">
-          <div className={`tw:text-[length:var(--bk-text-12)] tw:font-medium tw:text-[var(--bk-ink)] ${UI}`}>
-            {`SEO score · ${page.name} · ${s.seoScore}/100`}
-          </div>
+      {/* design-2l9 board 65:17860: the score's six parts in their own small
+          dialog over Page settings, one "Part: n/max" line each, and "Back to
+          SEO" to return. */}
+      <Modal
+        open={detailsOpen}
+        onClose={() => setDetailsOpen(false)}
+        width="sm"
+        title={`SEO score · ${page.name} · ${s.seoScore}/100`}
+        testId="seo-score-breakdown"
+      >
+        <div className="tw:flex tw:flex-col tw:items-start">
           {s.seoBreakdown.map((row) => (
-            <div key={row.label} className={`tw:flex tw:items-center tw:text-[11px] ${UI} tw:text-[var(--bk-ink-soft)]`}>
-              <span>{`${row.label}:`}</span>
-              <span className={`tw:ml-auto tw:tabular-nums ${MONO}`}>{`${row.earned}/${row.max}`}</span>
-            </div>
+            <span key={row.label} className={`tw:text-[13px] tw:leading-5 tw:tabular-nums tw:text-[var(--bk-ink-soft)] ${UI}`}>
+              {`${row.label}: ${row.earned}/${row.max}`}
+            </span>
           ))}
+          <Button
+            variant="link"
+            data-testid="seo-score-back"
+            className={`${LINK} ${UI} tw:mt-3`}
+            onClick={() => setDetailsOpen(false)}
+          >
+            Back to SEO
+          </Button>
         </div>
-      )}
+      </Modal>
       <p className={`tw:m-0 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink-soft)] ${UI}`} data-testid="seo-override-note">
         These overrides affect this page only. Clear the title to use site defaults.
       </p>
