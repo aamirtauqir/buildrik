@@ -72,7 +72,7 @@ export function BindingPropertyRow({ composer, elementId, onOpenCreateCollection
   const state = useCmsBinding(composer, elementId);
   const { readOnly } = useInspectorField();
   const [picking, setPicking] = React.useState(false);
-  const label = PROPERTY_LABEL[state.property];
+  const { label } = state;
   /* A deleted source is said and repaired in Dynamic bindings (board S36). */
   if (state.missing) return null;
 

@@ -72,9 +72,9 @@ describe("ContextRow — 2L9 S15 review before removal", () => {
       />,
     );
     fireEvent.click(screen.getByTestId("inspector-bp-revert"));
-    expect(screen.getAllByTestId("inspector-override-entry").map((e) => e.textContent)).toEqual(["Padding16 px", "Border radius8 px"]);
+    expect(screen.getAllByTestId("inspector-override-entry").map((e) => e.textContent)).toEqual(["Padding16 px", "Radius8 px"]);
     expect(screen.getByTestId("inspector-override-consequence")).toHaveTextContent(
-      "Removing Tablet overrides reveals Desktop: padding 24 px, border radius 12 px. Other breakpoints and states are retained.",
+      "Removing Tablet overrides reveals Desktop: padding 24 px, radius 12 px. Other breakpoints and states are retained.",
     );
     fireEvent.click(screen.getByTestId("inspector-override-keep"));
     expect(onRevertBreakpoint).not.toHaveBeenCalled();

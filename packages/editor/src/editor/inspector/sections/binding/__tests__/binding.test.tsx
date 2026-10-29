@@ -93,16 +93,16 @@ const row = (composer: unknown) => render(<BindingPropertyRow composer={composer
 describe("property row · static (B5-D01)", () => {
   it("names the property (its value on hover) and offers Bind (2L9 161:8480)", () => {
     row(makeComposer());
-    expect(screen.getByTestId("binding-row")).toHaveTextContent("Text");
+    expect(screen.getByTestId("binding-row")).toHaveTextContent("Title text");
     expect(screen.getByTitle("Our menu")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Bind text…" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Bind title text…" })).toBeInTheDocument();
   });
 });
 
 describe("Choose source (Play F2.02)", () => {
   it("groups Record data · Site & page · Live sources; List item says why it is off; site, page and live sources are Planned", () => {
     row(makeComposer());
-    fireEvent.click(screen.getByRole("button", { name: "Bind text…" }));
+    fireEvent.click(screen.getByRole("button", { name: "Bind title text…" }));
     const picker = screen.getByTestId("choose-source");
     expect(picker).toHaveTextContent("Choose source");
     expect(screen.getByPlaceholderText("Search sources or fields…")).toBeInTheDocument();
@@ -116,7 +116,7 @@ describe("Choose source (Play F2.02)", () => {
   it("Specific record → a collection → its fitting fields; a field binds the newest published record in one step", async () => {
     const composer = makeComposer();
     row(composer);
-    fireEvent.click(screen.getByRole("button", { name: "Bind text…" }));
+    fireEvent.click(screen.getByRole("button", { name: "Bind title text…" }));
     fireEvent.click(screen.getByTestId("choose-source-record"));
     fireEvent.click(screen.getByText("Menu"));
     expect(screen.queryByTestId("choose-source-field-photo")).toBeNull();
@@ -129,7 +129,7 @@ describe("Choose source (Play F2.02)", () => {
   it("search finds fields across collections", async () => {
     const composer = makeComposer();
     row(composer);
-    fireEvent.click(screen.getByRole("button", { name: "Bind text…" }));
+    fireEvent.click(screen.getByRole("button", { name: "Bind title text…" }));
     fireEvent.change(screen.getByPlaceholderText("Search sources or fields…"), { target: { value: "bio" } });
     expect(screen.getByTestId("choose-source-field-bio")).toHaveTextContent("Team · Bio");
     fireEvent.click(screen.getByTestId("choose-source-field-bio"));
@@ -139,7 +139,7 @@ describe("Choose source (Play F2.02)", () => {
   it("on a collection's template page, This page’s record binds no record — each generated page fills its own", () => {
     const composer = makeComposer({ template: true });
     row(composer);
-    fireEvent.click(screen.getByRole("button", { name: "Bind text…" }));
+    fireEvent.click(screen.getByRole("button", { name: "Bind title text…" }));
     expect(screen.getByTestId("choose-source-page")).toHaveTextContent("This page’s record · Menu");
     expect(screen.getByTestId("choose-source-page")).toHaveTextContent("Each generated page shows its own record");
     fireEvent.click(screen.getByTestId("choose-source-page"));
@@ -181,13 +181,13 @@ describe("property row · bound (B5-D04, D11, D13, D14)", () => {
 });
 
 describe("binding detail (Play F2.05)", () => {
-  it("‹ Back to Content · Text binding · Source · Format As written · If empty · Preview · Open record › · Unbind — keep shown text", async () => {
+  it("‹ Back to Content · Title text binding · Source · Format As written · If empty · Preview · Open record › · Unbind — keep shown text", async () => {
     const composer = makeComposer({ initial: BOUND });
     render(<BindingDetail composer={composer as never} elementId="e1" />);
     const detail = screen.getByTestId("binding-detail");
     await waitFor(() => expect(screen.getByTestId("binding-detail-preview")).toHaveTextContent("Cacio e pepe"));
     const text = detail.textContent ?? "";
-    const at = ["‹ Back to Content", "Text binding", "Source", "Menu · name", "Format", "As written", "If empty", "Preview", "Open record ›", "Unbind — keep shown text", "Keeps “Cacio e pepe” as static text."].map((t) => text.indexOf(t));
+    const at = ["‹ Back to Content", "Title text binding", "Source", "Menu · name", "Format", "As written", "If empty", "Preview", "Open record ›", "Unbind — keep shown text", "Keeps “Cacio e pepe” as static text."].map((t) => text.indexOf(t));
     expect(at.every((i) => i >= 0)).toBe(true);
     expect([...at].sort((a, b) => a - b)).toEqual(at);
   });
@@ -197,7 +197,7 @@ describe("binding detail (Play F2.05)", () => {
     render(<BindingDetail composer={composer as never} elementId="e1" />);
     await waitFor(() => expect(screen.getByTestId("binding-open-record")).not.toBeDisabled());
     fireEvent.click(screen.getByTestId("binding-open-record"));
-    expect(composer.emit).toHaveBeenCalledWith("ui:cms-open", { collectionId: "col-1", recordId: "r1", origin: "Heading · Text binding" });
+    expect(composer.emit).toHaveBeenCalledWith("ui:cms-open", { collectionId: "col-1", recordId: "r1", origin: "Heading · Title text binding" });
   });
 
   it("If empty stores a fallback on the same binding; Unbind keeps the text and closes the detail", async () => {
@@ -228,11 +228,11 @@ describe("Dynamic bindings summary (Play F2.16, B5-D04)", () => {
     expect(container.textContent).toBe("");
   });
 
-  it("bound: '1 binding' and 'Text · Menu.name ›', which opens the detail", () => {
+  it("bound: '1 binding' and 'Title text · Menu.name ›', which opens the detail", () => {
     render(<CmsBindingSection elementId="e1" composer={makeComposer({ initial: BOUND }) as never} isOpen />);
     expect(screen.getByText("Dynamic bindings")).toBeInTheDocument();
     expect(screen.getByTestId("cms-binding-count")).toHaveTextContent("1 binding");
-    expect(screen.getByTestId("cms-binding-summary-row")).toHaveTextContent("Text · Menu.name");
+    expect(screen.getByTestId("cms-binding-summary-row")).toHaveTextContent("Title text · Menu.name");
   });
 
   it("a deleted source says so by name, with Reconnect… and Unbind (board 25)", () => {

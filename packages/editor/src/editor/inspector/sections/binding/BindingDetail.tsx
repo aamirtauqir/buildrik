@@ -21,6 +21,7 @@
  *
  * @license BSD-3-Clause
  */
+import { WIDE_BUTTON } from "@/editor/inspector/shared/controls/controlClasses";
 import { ChevronDown } from "lucide-react";
 import * as React from "react";
 import type { Composer } from "@/engine";
@@ -37,7 +38,8 @@ import { closeSubview } from "@/editor/inspector/tabs/subviewStore";
 import { contextLine, sourceLabel, statusLine } from "./BindingPropertyRow";
 import { PROPERTY_LABEL, useCmsBinding } from "./useCmsBinding";
 
-const VALUE = "tw:min-w-0 tw:truncate tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink)]";
+/* F2.05: the preview reads as body text, 14 / regular. */
+const VALUE = "tw:min-w-0 tw:truncate tw:text-[14px] tw:leading-5 tw:text-[var(--bk-ink)]";
 /* A 28-tall box drawn like the column's selects (2L9 F2.05). */
 const SELECTISH =
   "tw:flex tw:h-7 tw:w-full tw:items-center tw:gap-1 tw:rounded-[4px] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-subtle)] " +
@@ -60,7 +62,7 @@ export function BindingDetail({ composer, elementId, onOpenCreateCollection }: B
   const state = useCmsBinding(composer, elementId);
   const { readOnly } = useInspectorField();
   const [picking, setPicking] = React.useState(false);
-  const label = PROPERTY_LABEL[state.property];
+  const { label } = state;
   const back = () => closeSubview("binding");
 
   /* The binding went away (unbound here or undone elsewhere): back to Content. */
@@ -81,14 +83,14 @@ export function BindingDetail({ composer, elementId, onOpenCreateCollection }: B
   };
 
   return (
-    <div className="tw:flex tw:flex-col tw:px-4 tw:py-2" data-testid="binding-detail">
+    <div className="tw:flex tw:flex-col tw:px-3 tw:py-2" data-testid="binding-detail">
       <Button
         type="button"
         variant="link"
         size="xs"
         data-testid="binding-detail-back"
         onClick={back}
-        className="tw:self-center tw:h-7 tw:px-0 tw:text-[12px] tw:font-normal"
+        className="tw:self-center tw:h-10 tw:px-0 tw:text-[13px] tw:font-normal"
       >
         ‹ Back to Content
       </Button>
@@ -100,6 +102,7 @@ export function BindingDetail({ composer, elementId, onOpenCreateCollection }: B
           open={picking}
           onClose={() => setPicking(false)}
           onOpenCreateCollection={onOpenCreateCollection}
+          block
           trigger={
             <Button
               type="button"
@@ -112,7 +115,7 @@ export function BindingDetail({ composer, elementId, onOpenCreateCollection }: B
               onClick={() => {
                 if (!readOnly) setPicking((v) => !v);
               }}
-              className={SELECTISH}
+              className={`${SELECTISH} tw:flex-1`}
             >
               <span className="tw:min-w-0 tw:flex-1 tw:truncate tw:text-left" data-testid="binding-detail-source">
                 {sourceLabel(state)}
@@ -141,6 +144,7 @@ export function BindingDetail({ composer, elementId, onOpenCreateCollection }: B
       <ControlRow label="Format">
         <span className={SELECTISH} data-testid="binding-detail-format">
           <span className="tw:flex-1">As written</span>
+          <ChevronDown size={12} aria-hidden="true" className="tw:shrink-0 tw:text-[var(--bk-ink-muted)]" />
         </span>
       </ControlRow>
       <CommitRow
@@ -153,7 +157,7 @@ export function BindingDetail({ composer, elementId, onOpenCreateCollection }: B
         testId="binding-detail-fallback"
       />
       <div className="tw:flex tw:flex-col tw:gap-2 tw:py-2">
-        <span className="bdi-lb">Preview</span>
+        <span className="tw:text-[13px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">Preview</span>
         <span className={VALUE} data-testid="binding-detail-preview">
           {state.status?.kind === "loading" ? "Loading…" : shown || "—"}
         </span>
@@ -170,7 +174,7 @@ export function BindingDetail({ composer, elementId, onOpenCreateCollection }: B
         onClick={openRecord}
         disabled={!state.preview?.record}
         data-testid="binding-open-record"
-        className="tw:self-center tw:h-8 tw:text-[12px] tw:font-normal"
+        className="tw:self-center tw:h-10 tw:text-[13px] tw:font-normal"
       >
         Open record ›
       </Button>
@@ -182,7 +186,7 @@ export function BindingDetail({ composer, elementId, onOpenCreateCollection }: B
           if (!readOnly) state.unbind();
         }}
         data-testid="binding-unbind"
-        className="tw:mt-1 tw:h-8 tw:w-full tw:text-[12px] tw:font-normal tw:text-[var(--bk-ink)] tw:focus:ring-0"
+        className={WIDE_BUTTON}
       >
         Unbind — keep shown text
       </Button>

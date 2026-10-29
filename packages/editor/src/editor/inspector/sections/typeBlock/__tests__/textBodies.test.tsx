@@ -49,7 +49,7 @@ describe("Heading (board 1)", () => {
     mock("heading", { tagName: "h2" });
     /* The bindable property row (C-13) names the property, not a control. */
     expect(rowLabels()).toEqual([]);
-    expect(screen.getByTestId("binding-row")).toHaveTextContent("Text");
+    expect(screen.getByTestId("binding-row")).toHaveTextContent("Title text");
     expect(screen.queryByTestId("inspector-field-level")).toBeNull();
     expect(screen.queryByLabelText("Text style")).toBeNull();
     expect(screen.getByRole("button", { name: "Edit text on canvas" })).toBeInTheDocument();

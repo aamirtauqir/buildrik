@@ -26,11 +26,17 @@ const CONTENT_ORDER: readonly SectionId[] = [
   "slides",
   "collection",
   "validation",
+  /* 2L9 245:42929: a table's Structure and Accessibility. */
+  "table-structure",
+  "table-accessibility",
+  "table-cell",
   "semantics",
   "attributes",
 ];
 
 const STYLE_ORDER: readonly SectionId[] = [
+  /* 2L9 245:44049: a table's scroll wrapper leads with its own layout. */
+  "table-wrapper",
   "type-layout",
   "layout",
   /* 2L9 247:21216: "Advanced layout · n set" right under Children layout. */
@@ -84,5 +90,7 @@ const DEFINING_CONTENT: readonly SectionId[] = ["type", "form-fields", "slides",
  */
 export function openingTab(type: string): TabId {
   const caps = capabilitiesFor(type);
+  /* A table is defined by its structure (2L9 245:42929). */
+  if (type === "table") return "content";
   return DEFINING_CONTENT.some((id) => SECTION_REGISTRY[id].capability?.(caps) ?? true) ? "content" : "style";
 }

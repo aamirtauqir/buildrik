@@ -31,6 +31,9 @@ function makeComposer() {
         getAttribute: vi.fn(() => ""),
         getStyles: vi.fn(() => ({})),
         getClasses: vi.fn(() => []),
+        getTagName: vi.fn(() => "div"),
+        getChildren: vi.fn(() => []),
+        getParent: vi.fn(() => null),
       })),
       // LinkSection queries all pages on mount to populate its page dropdown.
       getAllPages: vi.fn(() => []),

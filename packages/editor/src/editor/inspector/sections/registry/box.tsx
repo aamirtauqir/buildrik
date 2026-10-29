@@ -14,6 +14,7 @@ import { adaptBaseStyleProps, defineSection, setSummary, shownOnInstanceRoot, ty
 import { LayoutAdvancedSection, LayoutSection } from "../layout";
 import { SizeSection } from "../SizeSection";
 import { FlexItemSection, GridItemSection } from "../layout/ItemControls";
+import { isTableWrapper, TableWrapperSection } from "../TableSections";
 import { SpacingSection } from "../SpacingSection";
 import { BackgroundSection } from "../BackgroundSection";
 import { BorderSection } from "../BorderSection";
@@ -42,6 +43,17 @@ const FILL_KEYS = ["background", "background-color", "background-image", "backgr
 const BORDER_KEYS = ["border", "border-width", "border-style", "border-color", "border-top", "border-right", "border-bottom", "border-left", "outline-width", "outline-style", "outline-color", "outline-offset", "border-radius", "border-top-left-radius", "border-top-right-radius", "border-bottom-right-radius", "border-bottom-left-radius"];
 
 export const BOX_SECTIONS: Record<string, AnySectionEntry> = {
+  /* 2L9 245:44049: a table's scroll wrapper — its own layout, first. */
+  "table-wrapper": defineSection({
+    tab: "style",
+    title: "Wrapper layout",
+    open: "always",
+    shouldRender: (ctx) => ctx.selectedIds.length <= 1 && isTableWrapper(ctx.composer?.elements.getElement(ctx.selectedElement.id)),
+    Component: TableWrapperSection,
+    styleKeys: ["width", "overflow-x", "overflow-y"],
+    adaptProps: (ctx) => ({ ...adaptBaseStyleProps(ctx), composer: ctx.composer ?? null, elementId: ctx.selectedElement.id }),
+  }),
+
   layout: defineSection({
     tab: "style",
     /* 2L9 247:21216, 36:2. */
