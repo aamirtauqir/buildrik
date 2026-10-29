@@ -1,7 +1,8 @@
 /**
  * The empty-canvas CTA — board 4428:44164 (Canvas · empty page): a title, one
- * sentence, three template cards, and four routes — Browse all templates ·
- * Add a block · ✦ Describe your site · Start blank (G2-018).
+ * sentence, three template cards, and three routes — Browse all templates ·
+ * Add a block · Start blank (G2-018; ✦ Describe your site is gone — no AI
+ * entry points in the editor UI, owner 2026-10-17).
  *
  * Board 807:6558 draws what Start blank LEADS TO — the Insert drawer open, and
  * the sentence replaced by "Drop an element from the Insert panel, or drag a
@@ -29,7 +30,6 @@ const renderCTA = () => {
   const handlers = {
     onBrowseTemplates: vi.fn(),
     onAddBlock: vi.fn(),
-    onDescribe: vi.fn(),
     onStartBlank: vi.fn(),
   };
   render(<CanvasEmptyCTA {...handlers} />);
@@ -52,19 +52,17 @@ describe("CanvasEmptyCTA — board 4428:44164", () => {
     expect(h.onBrowseTemplates).toHaveBeenCalledTimes(1);
   });
 
-  it("offers the four routes in the board's order and wires each", () => {
+  // re-baseline: empty canvas — the AI route is removed.
+  it("offers the three routes in the board's order and wires each", () => {
     const h = renderCTA();
     const actions = screen.getByTestId("canvas-empty-cta-actions");
     expect(Array.from(actions.querySelectorAll("button")).map((b) => b.textContent)).toEqual([
       "Browse all templates",
       "Add a block",
-      "✦ Describe your site",
       "Start blank",
     ]);
     fireEvent.click(screen.getByTestId("canvas-empty-add-block"));
     expect(h.onAddBlock).toHaveBeenCalledTimes(1);
-    fireEvent.click(screen.getByTestId("canvas-empty-describe"));
-    expect(h.onDescribe).toHaveBeenCalledTimes(1);
     fireEvent.click(screen.getByTestId("canvas-empty-start-blank"));
     expect(h.onStartBlank).toHaveBeenCalledTimes(1);
   });

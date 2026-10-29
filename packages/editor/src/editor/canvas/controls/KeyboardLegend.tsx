@@ -26,7 +26,7 @@ const ROWS: ReadonlyArray<[string, string]> = [
   ["R", "Review panel"],
   ["C", "Comments · C · Esc leaves"],
   ["⌘S · save", "save now — autosave runs every second after you stop typing"],
-  ["⌘P / ⌘J", "preview · AI panel (⌘K finds pages)"],
+  ["⌘P", "preview (⌘K finds pages)"],
   ["⌘Z / ⌘⇧Z", "undo / redo, canvas-scoped"],
 ];
 

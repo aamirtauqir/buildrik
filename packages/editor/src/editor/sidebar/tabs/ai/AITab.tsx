@@ -62,7 +62,6 @@ const CONFIRM_SUFFIX = " Changes to page settings or publishing need a separate 
 import { DEFAULT_MODEL, type AIModel } from "./types";
 import "./AITab.css";
 import { useAiQuota, quotaLeftLabel } from "./hooks/useAiQuota";
-import { requestGenerateBlock } from "@/editor/sidebar/tabs/build/insertGroupRequest";
 
 export interface AITabProps {
   composer: Composer | null;
@@ -385,10 +384,7 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose, on
         </p>
       ) : agent.phase === "idle" ? (
         <div className="bd-ai-thread">
-          <EmptyThread
-            onTry={submit}
-            onCreate={composer ? () => requestGenerateBlock(composer) : undefined}
-          />
+          <EmptyThread onTry={submit} />
         </div>
       ) : (
         <AgentPlan

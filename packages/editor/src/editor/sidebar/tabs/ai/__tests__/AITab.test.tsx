@@ -57,8 +57,8 @@ describe("AITab skeleton", () => {
     expect(
       screen.getByText(/Review the plan before running it/),
     ).toBeInTheDocument();
-    // Board 4418:104313 CREATE replaced DRAFT.
-    expect(screen.getByTestId("ai-create-block").textContent).toContain("Generate a block in Add");
+    // re-baseline: the CREATE row (Add › Generate a block) is gone — no AI generator door.
+    expect(screen.queryByTestId("ai-create-block")).toBeNull();
   });
 
   it("renders a composer textarea", () => {
