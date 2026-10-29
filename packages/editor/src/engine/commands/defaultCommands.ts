@@ -573,13 +573,6 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
       shortcut: "ctrl+shift+v",
       run: () => composer.emit(EVENTS.UI_PASTE_HTML_REQUESTED),
     },
-    {
-      id: "ui-open-ai",
-      label: "Open AI assistant",
-      group: "Panels",
-      shortcut: "ctrl+shift+a",
-      run: () => composer.emit(EVENTS.UI_TOGGLE_AI),
-    },
 
     // ============================================
     // Zoom

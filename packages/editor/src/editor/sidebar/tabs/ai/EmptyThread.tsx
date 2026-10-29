@@ -31,11 +31,9 @@ const TRY_PROMPTS = [
 export interface EmptyThreadProps {
   /** Runs one of the suggestions as a prompt. */
   onTry?: (prompt: string) => void;
-  /** Board 4418:104313 CREATE — opens Add › Generate a block (G2-117). */
-  onCreate?: () => void;
 }
 
-export const EmptyThread: React.FC<EmptyThreadProps> = ({ onTry, onCreate }) => (
+export const EmptyThread: React.FC<EmptyThreadProps> = ({ onTry }) => (
   <div className="tw:flex tw:flex-col tw:pb-2">
     {/* Board 170:10 "Suggestions" is ONE block: the TRY label and the three
         prompts under it, which is why they share an anchor. */}
@@ -63,22 +61,5 @@ export const EmptyThread: React.FC<EmptyThreadProps> = ({ onTry, onCreate }) => 
     >
       Review the plan before running it. Completed steps apply immediately. You can undo applied edits.
     </p>
-
-    {/* Board 4418:104313 CREATE: a new block is made in Add (G2-117). It
-        replaced 921:4478's DRAFT row — a brief is now just a prompt, which
-        plans first anyway. */}
-    <div className="tw:flex tw:flex-col tw:pt-6" data-testid="ai-create">
-      <div className={BAND}>CREATE</div>
-      <Button
-        color="light"
-        className="tw:mx-4 tw:flex tw:h-10 tw:items-center tw:justify-start tw:gap-2 tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-card)] tw:px-3 tw:text-[13px] tw:text-[var(--bk-ink)]"
-        data-testid="ai-create-block"
-        onClick={() => onCreate?.()}
-        disabled={!onCreate}
-      >
-        <span>✦&nbsp;&nbsp;Generate a block in Add</span>
-        <span aria-hidden="true">›</span>
-      </Button>
-    </div>
   </div>
 );

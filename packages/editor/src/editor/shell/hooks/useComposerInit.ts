@@ -602,10 +602,6 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
     };
 
     const toggleExporterHandler = () => setShowExporter((v) => !v);
-    // AI is one surface now — the AITab rail panel. The ⌘K "AI" command emits
-    // ui:toggle:ai; translate it to opening the "ai" tab (StudioPanels listens
-    // for ui:switch-tab) instead of the removed AIAssistant modal.
-    const toggleAIHandler = () => instance.emit("ui:switch-tab", { tab: "ai" });
     const deviceChangedHandler = (d: DeviceType) => setDevice(d);
     const zoomChangedHandler = (z: number) => setZoom(z);
 
@@ -614,7 +610,6 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
     instance.on("project:changed", projectChangedHandler);
     instance.on("history:recorded", historyRecordedHandler);
     instance.on("ui:toggle:exporter", toggleExporterHandler);
-    instance.on("ui:toggle:ai", toggleAIHandler);
     /* The engine names these BREAKPOINT_CHANGED and VIEWPORT_ZOOM (Viewport.ts
        :70,:87). Listening for "device:changed" / "zoom:changed" meant nothing
        the engine did to zoom ever reached React — and the canvas transform is
@@ -644,7 +639,6 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
       instance.off("project:changed", projectChangedHandler);
       instance.off("history:recorded", historyRecordedHandler);
       instance.off("ui:toggle:exporter", toggleExporterHandler);
-      instance.off("ui:toggle:ai", toggleAIHandler);
       instance.off(EVENTS.BREAKPOINT_CHANGED, deviceChangedHandler);
       instance.off(EVENTS.VIEWPORT_ZOOM, zoomChangedHandler);
       // Its retry re-runs a load into this composer, which is going away.
