@@ -5393,7 +5393,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-fixed",
-   "verifiedNote": "Lane L-B P1 round 5, probe ?block=table → Inspect scroll wrapper → Style, side by side: 'Wrapper layout' first — Width, Overflow X, Overflow Y, the note 'These values belong to the wrapper. Table cells keep native table layout.', 'Back to {table}'. Exceptions: the wrapper's other Style sections follow (it is a container); the Table block stores its overflow as camelCase 'overflowX', which the Inspector reads as unset — a block-data defect (blocks/, not L-B's).",
+   "verifiedNote": "Lane L-B P1 round 5, probe ?block=table → Inspect scroll wrapper → Style, side by side: 'Wrapper layout' first — Width, Overflow X, Overflow Y, the note 'These values belong to the wrapper. Table cells keep native table layout.', 'Back to {table}'. Round 6: the Table block now stores CSS's own kebab-case keys (was camelCase overflowX, read as unset), so Overflow X reads 'Auto' as the board (TableSections + blockRegistry tests). Exception: the wrapper's other Style sections follow (it is a container).",
    "inheritsFrom": "245:42929",
    "tier": "P1"
   },
@@ -6586,7 +6586,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Lane L-B P1 round 5, board PNG fetched: the receipt now reads '{name} component created.' (unit-tested). Open: the owning detail page (Components › This page › Hero heading, Used on, 'The selected heading is now the first instance…') is the component library's full page — L-C's surface; and the receipt has no Undo (code:create-not-a-history-step — createComponent / adoptInstances record no document history step to undo).",
+   "verifiedNote": "Lane L-B round 6: the receipt reads '{name} component created.' with no Undo — creating a component (createComponent + adoptInstances) records no document history step, so behaviour follows the code (lead, round 6). Open for L-C: the owning detail page (Components › This page › Hero heading, Used on, 'The selected heading is now the first instance…') is the component library's full page.",
    "inheritsFrom": "271:125321",
    "tier": "P1"
   },
@@ -6598,7 +6598,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Lane L-B P1 round 5, board PNG fetched: as G13 for a library master (receipt copy done; the detail page is L-C's; no Undo — code:create-not-a-history-step).",
+   "verifiedNote": "Lane L-B round 6: as G13 for a library master — receipt '{name} component created.', no Undo (no history step; lead round 6). Open for L-C: the library's detail page.",
    "inheritsFrom": "271:125321",
    "tier": "P1"
   },
@@ -6608,9 +6608,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
+   "authority": "code:instance-facts-in-ic01-block",
    "verified": "drift-open",
-   "verifiedNote": "Lane L-B P1 round 5, board PNG fetched: the instance's Style tab draws 'Selector · Editing This element only' (class-first — owner decision pending) and a 'Component' group (Main · Scope 'This page · Home' · Overrides · Edit main component). The Inspector carries the instance identity above the tabs (IC01 241:16522, drift-fixed); its source line now says the scope ('This page · Home · v1' / 'Component library · v1', unit-tested). Open: the two boards place the instance facts differently (IC01 above the tabs, G15 a Style group) — needs a lead call.",
+   "verifiedNote": "Lead, round 6: G15 draws the instance facts (Main, Scope 'This page · Home', Overrides, Edit main component) as a 'Component' group on the Style tab; IC01 (241:16522, drift-fixed) draws them in one block above the tabs. The facts live in one place — IC01's block — whose source line now names the scope ('This page · Home · v1', unit-tested). The board's 'Selector · Editing This element only' is class-first (owner decision pending).",
    "inheritsFrom": "271:125321",
    "tier": "P1"
   },
@@ -6620,9 +6620,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
+   "authority": "code:instance-facts-in-ic01-block",
    "verified": "drift-open",
-   "verifiedNote": "Lane L-B P1 round 5, board PNG fetched: as G15 with Scope 'Component library' (the source line reads it). Open on the same IC01-vs-G16 placement call.",
+   "verifiedNote": "Lead, round 6: as G15 — the board's Style-tab 'Component' group (Scope 'Component library') conflicts with IC01's block above the tabs; the facts stay in IC01's block, whose source line reads 'Component library · v{n}'.",
    "inheritsFrom": "271:125321",
    "tier": "P1"
   },
