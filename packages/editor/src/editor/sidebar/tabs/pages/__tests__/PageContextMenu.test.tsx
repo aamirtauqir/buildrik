@@ -192,14 +192,18 @@ describe("PageContextMenu — 6883:69130", () => {
 
   /* design-2l9 boards 63:13820 / 131:41791 / 137:55343. Re-baseline: page row
      menu (was Rename… → Page settings… with no move or template rows). */
-  // re-baseline: page row menu — owner A-17: Move up / Move down carry ⌥↑ / ⌥↓ (boards 137:55343 / 137:56781); the rest stays bare (63:13820).
-  it("lists the board's rows in its order; only the order commands show chords", () => {
+  // re-baseline: page row menu — 131:41791 (owner: wins over 63:13820): titled, ruled into four groups, red Delete, Close menu; ⌥↑ / ⌥↓ per A-17.
+  it("draws 131:41791: the page as a title, four ruled groups, red Delete, Close menu", () => {
     render(<PageContextMenu pageId="p2" {...baseProps} />);
+    expect(screen.getByTestId("pages-menu-title")).toHaveTextContent("About");
     const rows = screen.getAllByRole("menuitem").map((r) => r.textContent?.trim());
     expect(rows).toEqual([
       "Rename…", "Duplicate", "Set as homepage", "Replace layout with template…", "Save as template…",
-      "Move to folder…", "Move up⌥↑", "Move down⌥↓", "Copy link", "Page settings ›", "Delete page",
+      "Move to folder…", "Move up⌥↑", "Move down⌥↓", "Copy link", "Page settings", "Delete page", "Close menu",
     ]);
+    expect(screen.getAllByRole("separator")).toHaveLength(3);
+    fireEvent.click(screen.getByTestId("pages-menu-close"));
+    expect(baseProps.onClose).toHaveBeenCalled();
   });
 
   it("Move up / down call the move with a direction; Save as template and Move to folder pass the page", () => {

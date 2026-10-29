@@ -156,7 +156,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-fixed",
-   "verifiedNote": "probe-compared 2026-10-27 (case pages-context-menu, shots/63-13820.png): 280 wide, 32 row pitch, bare labels in board order, no chord hints, no rule, Page settings ›, Delete page in the menu ink. The 11th row Move to folder… is board 131:41791 (P120) — the later board of the same menu; P02 predates folders.",
+   "verifiedNote": "probe-compared 2026-10-27 (case pages-context-menu, shots/63-13820.png): 280 wide, 32 row pitch, bare labels in board order, no chord hints, no rule, Page settings ›, Delete page in the menu ink. The 11th row Move to folder… is board 131:41791 (P120) — the later board of the same menu; P02 predates folders. Round 5 (owner): its row menu is drawn as context; 131:41791 is the dedicated board and wins — title, three rules, red Delete, Close menu now (probe-compared there).",
    "tier": "P1"
   },
   {
@@ -717,9 +717,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "code:save-closes-dialog",
    "verified": "drift-open",
-   "verifiedNote": "Compared 2026-10-27 (board shots/101-28780.png): the board keeps the dialog open after a save — 'About · Settings saved · Home stays open', 'Saved override', Save disabled. Code: Save writes, closes and toasts 'Page settings saved' (C4 #20). Behaviour change, not built; drift-open.",
+   "verifiedNote": "Owner (round 5): behaviour follows the code. The board keeps the dialog open after a save ('About · Settings saved · Home stays open', 'Saved override'); the code's Save writes, closes the dialog and toasts 'Page settings saved' with Manage pages (C4 #20). Compared 2026-10-27, board shots/101-28780.png.",
    "inheritsFrom": "63:15939",
    "tier": "P1"
   },
@@ -1473,8 +1473,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared 2026-10-27 (board shots/131-41791.png) — the board disagrees with its own archetype 63:13820: it draws a title ('About'), rules after Save as template… / Copy link / Page settings, 'Page settings' without ›, Delete page red and a 'Close menu' row; 63:13820 (built) draws the menu bare. Left drift-open for the owner to pick one.",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case pages-context-menu; board shots/131-41791.png). Owner (round 5): this dedicated board wins over 63:13820. The menu is 280 wide, titled with the page's name (12/600), rows 36 tall, three 5-tall rules splitting Rename… · Duplicate · Set as homepage · Replace layout with template… · Save as template… | Move to folder… · Move up · Move down · Copy link | Page settings | Delete page (red) · Close menu; 493 tall vs the board's ~478. Move up / Move down keep ⌥↑ / ⌥↓ (owner A-17); 'Remove from {folder}' joins the organise group when the page is in one.",
    "inheritsFrom": "63:13820",
    "tier": "P1"
   },

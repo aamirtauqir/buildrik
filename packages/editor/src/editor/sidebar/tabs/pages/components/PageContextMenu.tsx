@@ -6,10 +6,11 @@
  * - "Delete page" is DISABLED (not hidden) when: page is homepage OR only page
  * - Keyboard: Escape closes here; <Menu> owns ↑↓/Home/End roving and, unlike
  *   the hand-rolled version this replaced, SKIPS the disabled Delete item
- * - design-2l9 board 63:13820 draws the menu bare: no chord hints (F2, ⌘D,
- *   ⌫ still work on the row), no rule, "Page settings ›", and Delete page in
- *   the menu's own ink. Move up / Move down carry ⌥↑ / ⌥↓ as the order boards
- *   draw them (owner A-17).
+ * - design-2l9 board 131:41791 (owner: it wins over 63:13820): the page's
+ *   name as a title, rules between make · organise · settings · delete,
+ *   "Page settings", Delete page red, then "Close menu". No chord hints (F2,
+ *   ⌘D, ⌫ still work on the row) except Move up ⌥↑ / Move down ⌥↓, as the
+ *   order boards draw them (owner A-17).
  * - design-2l9 boards 63:13820 / 131:41791 / 137:55343: Save as template… ·
  *   Move to folder… · Move up ⌥↑ / Move down ⌥↓ join the menu in the board's
  *   order; a move that cannot happen is disabled and says why (137:56060,
@@ -21,6 +22,12 @@
 import * as React from "react";
 import type { PageItem } from "../types";
 import { Menu, MenuItem, POPOVER_BASE_CLASS, Portal } from "@/editor/chrome-ui";
+
+/* 131:41791 draws its rows 36 tall (the menu's own MenuItem is 32; a joined
+   class list does not merge, so the height is forced). */
+const ROW = "tw:h-9!";
+/* …and its rules 5 tall (MenuSeparator's 9 made the menu 30 too tall). */
+const RULE = "tw:my-0.5 tw:h-px tw:bg-[var(--bk-gray-200)]";
 
 /* A disabled row shows no tooltip, so its reason is a line in the menu. */
 const MENU_NOTE = "tw:m-0 tw:px-2 tw:pt-1 tw:pb-1.5 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
@@ -140,31 +147,43 @@ export const PageContextMenu: React.FC<Props> = ({
       data-testid="pages-context-menu"
     >
       <Menu label={`Options for ${page?.name ?? "page"}`} onKeyDown={handleKeyDown}>
-        {/* design-2l9 63:13820: bare labels, in the board's order. */}
-        <MenuItem data-testid="pages-menu-rename" onClick={() => act(() => onRename(pageId))}>
+        {/* design-2l9 131:41791 (owner: the dedicated board wins over
+            63:13820's context drawing): the page's name heads the menu, rules
+            split it into make · organise · settings · delete, Delete page is
+            red, and "Close menu" ends it. */}
+        <div className="tw:px-2 tw:pt-1 tw:text-[12px] tw:leading-4 tw:font-semibold tw:text-[var(--bk-ink)]" data-testid="pages-menu-title">
+          {page?.name ?? "Page"}
+        </div>
+        <MenuItem className={ROW} data-testid="pages-menu-rename" onClick={() => act(() => onRename(pageId))}>
           Rename…
         </MenuItem>
-        <MenuItem data-testid="pages-menu-duplicate" onClick={() => act(() => onDuplicate(pageId))}>
+        <MenuItem className={ROW} data-testid="pages-menu-duplicate" onClick={() => act(() => onDuplicate(pageId))}>
           Duplicate
         </MenuItem>
         {!isHome && (
-          <MenuItem data-testid="pages-menu-homepage" onClick={() => act(() => onSetHomepage(pageId))}>
+          <MenuItem className={ROW} data-testid="pages-menu-homepage" onClick={() => act(() => onSetHomepage(pageId))}>
             Set as homepage
           </MenuItem>
         )}
-        <MenuItem data-testid="pages-menu-replace-layout" onClick={() => act(() => onReplaceLayout(pageId))}>
+        <MenuItem className={ROW} data-testid="pages-menu-replace-layout" onClick={() => act(() => onReplaceLayout(pageId))}>
           Replace layout with template…
         </MenuItem>
-        <MenuItem data-testid="pages-menu-save-template" onClick={() => act(() => onSaveAsTemplate(pageId))}>
+        <MenuItem className={ROW} data-testid="pages-menu-save-template" onClick={() => act(() => onSaveAsTemplate(pageId))}>
           Save as template…
         </MenuItem>
-        <MenuItem data-testid="pages-menu-move-folder" onClick={() => act(() => onMoveToFolder(pageId))}>
+        <div role="separator" className={RULE} />
+        <MenuItem className={ROW} data-testid="pages-menu-move-folder" onClick={() => act(() => onMoveToFolder(pageId))}>
           Move to folder…
         </MenuItem>
+        {folderName && (
+          <MenuItem className={ROW} data-testid="pages-menu-remove-folder" onClick={() => act(() => onRemoveFromFolder(pageId))}>
+            Remove from {folderName}
+          </MenuItem>
+        )}
         {/* Owner decision A-17 (boards 137:55343 / 137:56060 / 137:56781):
             the order commands live here, with their chords, and a boundary's
             reason sits under the move it blocks. */}
-        <MenuItem
+        <MenuItem className={ROW}
           kbd="⌥↑"
           disabled={rootPosition === null || isFirst}
           data-testid="pages-menu-move-up"
@@ -177,7 +196,7 @@ export const PageContextMenu: React.FC<Props> = ({
             {moveReason}
           </p>
         )}
-        <MenuItem
+        <MenuItem className={ROW}
           kbd="⌥↓"
           disabled={rootPosition === null || isLast}
           data-testid="pages-menu-move-down"
@@ -190,18 +209,16 @@ export const PageContextMenu: React.FC<Props> = ({
             {moveReason}
           </p>
         )}
-        <MenuItem data-testid="pages-menu-copy-link" onClick={() => act(() => onCopyLink(pageId))}>
+        <MenuItem className={ROW} data-testid="pages-menu-copy-link" onClick={() => act(() => onCopyLink(pageId))}>
           Copy link
         </MenuItem>
-        <MenuItem data-testid="pages-menu-settings" onClick={() => act(() => onSettings(pageId))}>
-          Page settings ›
+        <div role="separator" className={RULE} />
+        <MenuItem className={ROW} data-testid="pages-menu-settings" onClick={() => act(() => onSettings(pageId))}>
+          Page settings
         </MenuItem>
-        {folderName && (
-          <MenuItem data-testid="pages-menu-remove-folder" onClick={() => act(() => onRemoveFromFolder(pageId))}>
-            Remove from {folderName}
-          </MenuItem>
-        )}
-        <MenuItem
+        <div role="separator" className={RULE} />
+        <MenuItem className={ROW}
+          danger
           disabled={deleteDisabled}
           title={deleteTooltip}
           data-testid="pages-menu-delete"
@@ -216,6 +233,9 @@ export const PageContextMenu: React.FC<Props> = ({
             {isHome ? "Homepage can’t be deleted" : "A site needs at least one page"}
           </p>
         )}
+        <MenuItem className={ROW} data-testid="pages-menu-close" onClick={onClose}>
+          Close menu
+        </MenuItem>
       </Menu>
     </div>
   );
