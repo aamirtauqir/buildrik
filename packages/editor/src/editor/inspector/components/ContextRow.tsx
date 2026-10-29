@@ -73,7 +73,7 @@ function Review({
 }) {
   return (
     <div className="tw:flex tw:flex-col tw:px-3 tw:pb-3" role="group" aria-label={title} data-testid="inspector-override-review">
-      <div className={`${GROUP_TITLE} tw:flex tw:items-center tw:justify-between`}>
+      <div className={`${GROUP_TITLE} tw:mt-4! tw:flex tw:items-center tw:justify-between`}>
         <span>{title}</span>
         <span className="tw:text-[12px] tw:font-normal tw:text-[var(--bk-ink-muted)]">{entries.length} set</span>
       </div>

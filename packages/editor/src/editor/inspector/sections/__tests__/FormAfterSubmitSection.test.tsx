@@ -6,7 +6,7 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect, vi, beforeEach, beforeAll, afterEach } from "vitest";
-import { render, screen, fireEvent, cleanup, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, cleanup, waitFor, configure } from "@testing-library/react";
 import { Composer } from "@/engine/Composer";
 import { FormAfterSubmitSection } from "../FormAfterSubmitSection";
 
@@ -51,6 +51,11 @@ const defaults = {
 };
 
 afterEach(cleanup);
+
+/* Every case waits on a mocked server round trip (load → save → status).
+   The 1 s default timed out under a full-suite run's load — a different
+   case each time, each passing alone. */
+configure({ asyncUtilTimeout: 5000 });
 
 describe("Form › AFTER SUBMIT + PROTECTION", () => {
   beforeEach(() => {

@@ -36,7 +36,8 @@ import { InspectorFieldContext } from "../shared/controls/InspectorFieldContext"
 import { sectionOverrideMarks } from "../shared/controls/OverrideDot";
 import { capabilitiesFor } from "@/shared/constants/elementCapabilities";
 import { BindingDetail } from "../sections/binding/BindingDetail";
-import { openSubview, useSubview } from "./subviewStore";
+import { closeSubview, openSubview, useSubview } from "./subviewStore";
+import { ResetStyleReview } from "../components/ResetStyleReview";
 
 // ============================================================================
 // TYPES
@@ -138,6 +139,10 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
     mixedKeys: cssContext.mixedKeys,
     isMultiSelect,
   };
+
+  if (subviewHere === "reset-style" && composer) {
+    return <ResetStyleReview composer={composer} elementId={selectedElement.id} onClose={() => closeSubview("reset-style")} />;
+  }
 
   if (tabId === "content" && subviewHere === "binding") {
     return <BindingDetail composer={composer} elementId={selectedElement.id} onOpenCreateCollection={onOpenCreateCollection} />;
