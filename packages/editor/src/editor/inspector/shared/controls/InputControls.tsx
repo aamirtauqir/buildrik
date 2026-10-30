@@ -140,6 +140,9 @@ export interface InputWithUnitProps {
    *  an empty field shows it as "32 px · inherited" (2L9 S21), full width,
    *  no stepper or unit until the user types a value of its own. */
   inherited?: string;
+  /** The selection disagrees on a value the field context does not track
+   *  (an attribute, not a style): reads "Mixed" like a style field does. */
+  mixed?: boolean;
   /** A plain count (grid Columns, board 17): the number and its stepper, no
    *  unit dropdown and no unit words in the name. */
   noUnit?: boolean;
@@ -266,8 +269,10 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
   dot = true,
   onRevert,
   inherited,
+  mixed: mixedProp = false,
 }) => {
   const field = useInspectorField(property);
+  const mixed = field.mixed || mixedProp;
   const units = noUnit ? NO_UNITS : unitsProp;
   /* A plain number is written as it is typed, so by Escape the element
      already carries it: restoring the text alone left 48px on a heading the
@@ -277,7 +282,7 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
   const { num, unit } = custom ? { num: value.trim(), unit: "" } : splitValue(value, units);
   const isKeyword = KEYWORDS.has(unit);
   const shown = isKeyword ? unit : num;
-  const fromCascade = !field.mixed && value === "" && !!inherited;
+  const fromCascade = !mixed && value === "" && !!inherited;
 
   const [text, setText] = React.useState(shown);
   const [invalid, setInvalid] = React.useState(false);
@@ -299,7 +304,7 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
   /* Enter / blur: read the entry. Unreadable → red border + the message, the
      entry stays so it can be corrected, the element keeps its old value. */
   const commit = () => {
-    if (field.readOnly || (field.mixed && text === "")) return;
+    if (field.readOnly || (mixed && text === "")) return;
     /* Untouched is not an entry. A token-bound size shows the number it
        resolves to, so reading that back on blur wrote "24px" over the token —
        which is also what undid an Escape the moment focus left. */
@@ -358,17 +363,17 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
   const nameId = React.useId();
   const suffixId = React.useId();
   const ownName = ariaLabel || !label;
-  const suffix = field.mixed ? "Mixed values" : isTokenVar(value) || noUnit ? "" : unitWords(unit);
+  const suffix = mixed ? "Mixed values" : isTokenVar(value) || noUnit ? "" : unitWords(unit);
   const name = ariaLabel || label || placeholder;
 
   const control = (
     <div
       data-testid={label ? fieldTestId(label) : undefined}
-      className={`bdi-fld tw:group/fld${invalid ? " invalid" : ""}${field.mixed ? " mixed" : ""}`}
+      className={`bdi-fld tw:group/fld${invalid ? " invalid" : ""}${mixed ? " mixed" : ""}`}
     >
       <TextInput
         type="text"
-        value={field.mixed ? "" : text}
+        value={mixed ? "" : text}
         onChange={(e) => {
           const next = e.target.value;
           field.startTyping();
@@ -389,7 +394,7 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
           field.stopTyping();
         }}
         onKeyDown={onKeyDown}
-        placeholder={field.mixed ? "Mixed" : fromCascade ? `${inherited} · inherited` : placeholder}
+        placeholder={mixed ? "Mixed" : fromCascade ? `${inherited} · inherited` : placeholder}
         id={inputId}
         aria-labelledby={suffix ? `${nameId} ${suffixId}` : nameId}
         // `.bdi-fld input.auto` keys off a class on the real <input>; flowbite

@@ -13,7 +13,7 @@ import { TypeBlockSection } from "../TypeBlockSection";
 /* The Field block's Type change answers with a receipt toast (2L9 F30). */
 const render = (ui: React.ReactElement) => rtlRender(ui, { wrapper: ToastProvider });
 
-export function renderBlock(element: Partial<ElementData> & { id: string; type: ElementData["type"] }, extra: { onOpenMediaLibrary?: ReturnType<typeof vi.fn>; styles?: Record<string, string> } = {}) {
+export function renderBlock(element: Partial<ElementData> & { id: string; type: ElementData["type"] }, extra: { onOpenMediaLibrary?: ReturnType<typeof vi.fn>; styles?: Record<string, string>; also?: ElementData[] } = {}) {
   const composer = createTestComposer();
   composer.importProject({
     pages: [
@@ -22,7 +22,7 @@ export function renderBlock(element: Partial<ElementData> & { id: string; type: 
         name: "Home",
         slug: "",
         isHome: true,
-        root: { id: "root", type: "container", tagName: "div", children: [{ tagName: "div", children: [], ...element } as ElementData] },
+        root: { id: "root", type: "container", tagName: "div", children: [{ tagName: "div", children: [], ...element } as ElementData, ...(extra.also ?? [])] },
       },
     ],
   } as never);
@@ -31,7 +31,7 @@ export function renderBlock(element: Partial<ElementData> & { id: string; type: 
   const utils = render(
     <TypeBlockSection
       element={{ id: element.id, type: element.type }}
-      targetIds={[element.id]}
+      targetIds={[element.id, ...(extra.also ?? []).map((e) => e.id)]}
       composer={composer}
       styles={extra.styles ?? {}}
       onChange={onChange}

@@ -150,32 +150,62 @@ function writeLabelShown(composer: Composer, el: Element, shown: boolean): void 
   else label.setAttribute("hidden", "");
 }
 
+/** One field across the selection: its value when every bar agrees, else
+ *  "Mixed" — shown as the field's placeholder, never written. */
+function agreed(values: readonly string[]): { value: string; mixed: boolean } {
+  const mixed = values.some((v) => v !== values[0]);
+  return { value: mixed ? "" : (values[0] ?? ""), mixed };
+}
+
+/* 2L9 B03: a batch edit says what it touched — and what it left alone. */
+const BATCH_NOTE: Record<"value" | "max" | "label", string> = {
+  value: "Only Value changed. Each Maximum and derived percentage uses its own pair.",
+  max: "Only Maximum changed. Each Value and derived percentage uses its own pair.",
+  label: "Only Show label changed.",
+};
+
 const Progress: React.FC<TypeBlockBodyProps> = (p) => {
   const el = useElement(p);
-  const { value, max, showLabel } = readProgress(el);
-  const run = (fn: (composer: Composer, target: Element) => void) => {
-    const composer = p.composer;
+  const composer = p.composer;
+  const all = p.targetIds.map((id) => composer?.elements.getElement(id)).filter((e): e is Element => !!e);
+  const read = all.length > 0 ? all.map((e) => readProgress(e)) : [readProgress(el)];
+  const value = agreed(read.map((r) => r.value));
+  const max = agreed(read.map((r) => r.max));
+  const { showLabel } = read[0];
+  const [applied, setApplied] = React.useState<{ key: string; count: number; field: keyof typeof BATCH_NOTE } | null>(null);
+  const selectionKey = p.targetIds.join(",");
+  const run = (field: keyof typeof BATCH_NOTE, fn: (composer: Composer, target: Element) => void) => {
     if (!composer) return;
     const targets = writableElements(composer, p.targetIds.map((id) => composer.elements.getElement(id)));
     if (targets.length === 0) return;
     runTxn(composer, "progress-change", () => {
       for (const target of targets) fn(composer, target);
     });
+    setApplied(targets.length > 1 ? { key: selectionKey, count: targets.length, field } : null);
   };
+  /* Each bar keeps its own other half: a Value typed across three bars
+     leaves each one's Maximum (and so its percentage) its own. */
   const setValue = (next: string) => {
     if (next === "" || Number(next) < 0) return;
-    run((c, t) => writeProgress(c, t, next, max));
+    run("value", (c, t) => writeProgress(c, t, next, readProgress(t).max));
   };
   const setMax = (next: string) => {
     if (!(Number(next) > 0)) return;
-    run((c, t) => writeProgress(c, t, value || "0", next));
+    run("max", (c, t) => writeProgress(c, t, readProgress(t).value || "0", next));
   };
+  const note = applied?.key === selectionKey ? applied : null;
   return (
     <>
       {/* Board 12 draws both as number fields with a stepper and no unit. */}
-      <InputWithUnit label="Value" noUnit value={value} placeholder="0" onChange={setValue} />
-      <InputWithUnit label="Maximum" noUnit value={max} placeholder="100" onChange={setMax} />
-      <CheckRow label="Show label" checked={showLabel} onChange={(on) => run((c, t) => writeLabelShown(c, t, on))} />
+      <InputWithUnit label="Value" noUnit value={value.value} mixed={value.mixed} placeholder="0" onChange={setValue} />
+      <InputWithUnit label="Maximum" noUnit value={max.value} mixed={max.mixed} placeholder="100" onChange={setMax} />
+      <CheckRow label="Show label" checked={showLabel} onChange={(on) => run("label", (c, t) => writeLabelShown(c, t, on))} />
+      {note ? (
+        <div className="tw:pt-4" role="status" data-testid="inspector-progress-applied">
+          <p className="tw:m-0 tw:text-[13px] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]">Applied to {note.count}</p>
+          <Note>{BATCH_NOTE[note.field]}</Note>
+        </div>
+      ) : null}
     </>
   );
 };

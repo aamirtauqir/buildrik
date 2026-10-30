@@ -2677,6 +2677,20 @@ const CASES: Record<string, () => React.ReactElement> = {
       host.appendChild(node);
       document.body.appendChild(host);
     }
+    /* `?also=1&alsoAttrs={"progress":{"value":"60"}}` — more of the same
+       block selected with it (a batch, B03); `alsoAttrs` sets attributes on
+       their descendants by tag name. */
+    const alsoCount = Number(q.get("also") ?? 0);
+    if (alsoCount > 0 && block) {
+      const alsoAttrs = JSON.parse(q.get("alsoAttrs") ?? "{}") as Record<string, Record<string, string>>;
+      const more = Array.from({ length: alsoCount }, () => insertBlock(c, block, page.root.id))
+        .map((moreId) => (moreId ? c.elements.getElement(moreId) : undefined))
+        .filter((m): m is NonNullable<typeof m> => !!m);
+      for (const m of more)
+        for (const d of m.getDescendants())
+          for (const [k, v] of Object.entries(alsoAttrs[d.getTagName().toLowerCase()] ?? {})) d.setAttribute(k, v);
+      c.selection.selectMultiple([el, ...more]);
+    }
     /* `?peers=3&lockedPeers=1` — same-kind elements on the page (S11). */
     for (let i = 0; i < Number(q.get("peers") ?? 0) + Number(q.get("lockedPeers") ?? 0); i++) {
       const peer = c.elements.createElement(type as never, { content: `Peer ${i + 1}` } as never);
