@@ -203,6 +203,11 @@ export function isCmsEntrySaveOwed(id: string): boolean {
   return outstandingCmsKeys().has(`entryUpsert:${id}`);
 }
 
+/** The same for a collection's own write (its link to a page, 187:21035). */
+export function isCmsCollectionSaveOwed(id: string): boolean {
+  return outstandingCmsKeys().has(`collectionUpsert:${id}`);
+}
+
 /* C0a (Task 5): CONFLICT and GONE are answers, not failures. CONFLICT must
    not loop forever against a row that has moved on since; GONE means the
    server already removed the row, so retrying would resurrect it. Both are

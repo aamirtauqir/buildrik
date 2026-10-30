@@ -13,6 +13,7 @@ import { pageFileNames } from "@/engine/export";
 import type { CMSCollection, CMSField } from "@/shared/types/cms";
 import { consumeDirectSync, markDirectSync, syncCollectionUpsert } from "@/services/cmsSync";
 import { cmsSlugField } from "@buildrik/shared/schemas/cms";
+import { LAYER_NAME_KEY } from "@/shared/constants/elementTypeLabels";
 
 export type CollectionPageLayout = "Article" | "Profile" | "Simple";
 export const COLLECTION_PAGE_LAYOUTS: readonly CollectionPageLayout[] = ["Article", "Profile", "Simple"];
@@ -64,48 +65,73 @@ export interface CreatedCollectionPage {
   name: string;
   /** The page's published file name — what `pageTemplatePath` stores. */
   file: string;
+  /** Reverts the creation step; false once history has moved past it. */
+  undo: () => boolean;
 }
 
 /**
  * Make the page: a section holding one element per chosen field, each bound
- * to that field for "this page's record". Opens nothing and links nothing.
+ * to that field for "this page's record" — ONE composer transaction, the
+ * bindings applied inside it, so the whole creation is one history step.
+ * `undo` reverts exactly that step (and refuses once history has moved on).
+ * Opens nothing and links nothing.
  */
-export function buildCollectionPage(
+export async function buildCollectionPage(
   composer: Composer,
   collection: CMSCollection,
   plan: PageFieldPlan[],
   layout: CollectionPageLayout,
-): CreatedCollectionPage {
+): Promise<CreatedCollectionPage> {
   const name = collectionPageName(collection, layout);
   composer.beginTransaction(`Create ${name}`);
   let page;
   try {
     page = composer.elements.createPage(name);
-    const section = composer.elements.createElement("section");
+    /* 187:21418: a section named for the layout; a Profile sets the image
+       beside a column of the text, the others stack. Each element carries
+       its field's name in Layers. */
+    const named = (el: ReturnType<typeof composer.elements.createElement>, label: string) => {
+      el.setData(LAYER_NAME_KEY, label);
+      return el;
+    };
+    const section = named(composer.elements.createElement("section"), layout);
     composer.elements.addElement(section, page.root.id);
-    const binds: Array<[string, PageFieldPlan]> = [];
-    for (const p of orderedPlan(plan, layout)) {
-      const el =
+    const ordered = orderedPlan(plan, layout);
+    const sideBySide = layout === "Profile" && ordered.some((p) => p.element === "image");
+    let textParent = section.getId();
+    if (sideBySide) {
+      section.setStyles({ display: "flex", gap: "40px", alignItems: "flex-start" });
+    }
+    const binds: Promise<void>[] = [];
+    for (const p of ordered) {
+      const el = named(
         p.element === "image"
           ? composer.elements.createElement("image", { attributes: { alt: p.field.name } })
           : composer.elements.createElement(p.element, {
               content: `{${p.field.name}}`,
               ...(p.element === "heading" ? { tagName: "h1" } : {}),
-            });
-      composer.elements.addElement(el, section.getId());
-      binds.push([el.getId(), p]);
+            }),
+        p.field.name,
+      );
+      if (sideBySide && p.element !== "image" && textParent === section.getId()) {
+        const column = named(composer.elements.createElement("container", { styles: { display: "flex", flexDirection: "column", gap: "16px" } }), "Text");
+        composer.elements.addElement(column, section.getId());
+        textParent = column.getId();
+      }
+      composer.elements.addElement(el, p.element === "image" ? section.getId() : textParent);
+      binds.push(composer.cms.bindings.bindToField(el.getId(), collection.id, undefined, p.field.slug, p.element === "image" ? "src" : "content"));
     }
+    /* Applied before the step closes, so the step holds the shown values. */
+    await Promise.all(binds);
     composer.endTransaction();
-    /* After the page step, one labelled step per binding — what ⌘Z walks back. */
-    for (const [id, p] of binds) {
-      composer.cms.bindings.bindToField(id, collection.id, undefined, p.field.slug, p.element === "image" ? "src" : "content", undefined, `Bind ${p.field.name}`);
-    }
   } catch (e) {
     composer.rollbackTransaction();
     throw e;
   }
+  composer.history.flushPending();
+  const undo = composer.history.captureUndo();
   const file = pageFileNames(composer.elements.getAllPages()).get(page.id) ?? `${page.id}.html`;
-  return { pageId: page.id, name, file };
+  return { pageId: page.id, name, file, undo };
 }
 
 /**

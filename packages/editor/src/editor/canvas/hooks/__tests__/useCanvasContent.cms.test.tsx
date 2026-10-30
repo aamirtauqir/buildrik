@@ -70,7 +70,8 @@ describe("useCanvasContent — CMS binding resolution", () => {
     });
     expect(result.current.displayContent).toContain('data-cms-bound="true"');
     expect(result.current.displayContent).not.toContain("{{title}}");
-    expect(resolveBinding).toHaveBeenCalledWith({ elementId: "el-1", property: "content" });
+    /* The canvas asks for the preview value (173:12022 — the record bar's choice). */
+    expect(resolveBinding).toHaveBeenCalledWith({ elementId: "el-1", property: "content" }, { preview: true });
   });
 
   it("resolves src / href bindings onto the bound element; an off-allowlist property is never applied", async () => {

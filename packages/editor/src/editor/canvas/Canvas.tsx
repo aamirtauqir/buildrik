@@ -26,6 +26,7 @@ import { CanvasLoadingSkeleton } from "./CanvasLoadingSkeleton";
 import { useEditLocks } from "@/editor/shared/useEditLocks";
 import { useProjectLoading } from "../shell/hooks/useProjectLoading";
 import { CanvasFooterToolbar } from "./CanvasFooterToolbar";
+import { CanvasRecordBar } from "./CanvasRecordBar";
 import { DeviceFramePreview, DeviceFrameToggle } from "./DeviceFramePreview";
 import {
   wrapperStyles,
@@ -840,6 +841,8 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
             />
           </div>
         )}
+        {/* 173:12022 — on a collection template page: which record the canvas previews. */}
+        {showFooterToolbar && !readOnly ? <CanvasRecordBar composer={composer} /> : null}
         <div ref={scrollRef} className="bd-canvas-scroll">
         <DeviceFramePreview device={device} active={deviceFrameActive}>
         {/* A column only when the width label is drawn under the page; on
