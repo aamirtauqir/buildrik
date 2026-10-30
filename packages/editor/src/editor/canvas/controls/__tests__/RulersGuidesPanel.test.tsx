@@ -35,19 +35,31 @@ describe("RulersGuidesPanel", () => {
     expect(screen.getByText("Guides · shared across this site")).toBeInTheDocument();
   });
 
-  it("edits a guide on Apply only — position and lock (155:83650)", () => {
+  it("moves a guide on Apply only (155:83650)", () => {
     const update = vi.fn();
-    const setLocked = vi.fn();
-    render(<Host initial={[V]} spy={{ update, setLocked }} />);
+    render(<Host initial={[V]} spy={{ update }} />);
     fireEvent.click(screen.getByTestId("guide-edit-v"));
     expect(screen.getByText("Vertical guide")).toBeInTheDocument();
     fireEvent.change(screen.getByTestId("guide-position"), { target: { value: "400" } });
-    fireEvent.click(screen.getByTestId("guide-lock"));
     expect(update).not.toHaveBeenCalled();
     fireEvent.click(screen.getByTestId("guide-apply"));
     expect(update).toHaveBeenCalledWith("v", 400);
+    expect(screen.getByTestId("guide-row-v")).toHaveTextContent("Vertical · 400 pxUnlocked");
+  });
+
+  it("Lock acts at once; a locked guide is read-only with ‹ Back to guides (145:67569)", () => {
+    const setLocked = vi.fn();
+    render(<Host initial={[V]} spy={{ setLocked }} />);
+    fireEvent.click(screen.getByTestId("guide-edit-v"));
+    fireEvent.click(screen.getByTestId("guide-lock"));
     expect(setLocked).toHaveBeenCalledWith("v", true);
-    expect(screen.getByTestId("guide-row-v")).toHaveTextContent("Vertical · 400 pxLocked");
+    expect(screen.getByTestId("guide-position")).toBeDisabled();
+    expect(screen.getByTestId("guide-hint")).toHaveTextContent("Unlock this guide to change it.");
+    expect(screen.getByTestId("guide-remove")).toBeDisabled();
+    expect(screen.getByTestId("guide-lock")).toHaveTextContent("Unlock guide");
+    expect(screen.queryByTestId("guide-apply")).toBeNull();
+    fireEvent.click(screen.getByTestId("guide-back"));
+    expect(screen.getByTestId("guide-row-v")).toHaveTextContent("Vertical · 320 pxLocked");
   });
 
   it("refuses a position that is not a whole number", () => {
