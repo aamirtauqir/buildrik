@@ -14278,9 +14278,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:request-G-9",
    "verified": "no",
-   "verifiedNote": "no \"‹ Back to Issues · Fixing 1 of 2\" band after Fix",
+   "verifiedNote": "L-G triage: the Issues panel is L-A's (it built B8-IS01); the '‹ Back to Issues · Fixing 1 of 2' band and the summary/location rows are REQUESTS G-9. | no \"‹ Back to Issues · Fixing 1 of 2\" band after Fix",
    "tier": "P2"
   },
   {
@@ -14289,9 +14289,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:request-G-9",
    "verified": "drift-open",
-   "verifiedNote": "shell/IssuesPanel.tsx:213 — errors-first exists; no \"n block publishing · n tips\" summary or per-row location",
+   "verifiedNote": "L-G triage: the Issues panel is L-A's (it built B8-IS01); the '‹ Back to Issues · Fixing 1 of 2' band and the summary/location rows are REQUESTS G-9. | shell/IssuesPanel.tsx:213 — errors-first exists; no \"n block publishing · n tips\" summary or per-row location",
    "tier": "P2"
   },
   {
@@ -14388,9 +14388,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:server-client-comment-anchor",
    "verified": "drift-open",
-   "verifiedNote": "packages/dashboard/app/review/[token]/review-client.tsx:478 — notes + approve exist; no pins, anchored composer, device switch, 6-digit cod…",
+   "verifiedNote": "L-G triage: pins, the anchored composer and the pinned-comments sheet need anchored client comments (REQUESTS G-2). | packages/dashboard/app/review/[token]/review-client.tsx:478 — notes + approve exist; no pins, anchored composer, device switch, 6-digit cod…",
    "tier": "P2"
   },
   {
@@ -14399,9 +14399,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:server-client-comment-anchor",
    "verified": "drift-open",
-   "verifiedNote": "packages/dashboard/app/review/[token]/review-client.tsx:478 — notes + approve exist; no pins, anchored composer, device switch, 6-digit cod…",
+   "verifiedNote": "L-G triage: pins, the anchored composer and the pinned-comments sheet need anchored client comments (REQUESTS G-2). | packages/dashboard/app/review/[token]/review-client.tsx:478 — notes + approve exist; no pins, anchored composer, device switch, 6-digit cod…",
    "tier": "P2"
   },
   {
@@ -14410,9 +14410,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "drift-open",
-   "verifiedNote": "packages/dashboard/app/review/[token]/review-client.tsx:478 — notes + approve exist; no pins, anchored composer, device switch, 6-digit cod…",
+   "verifiedNote": "L-G triage: the 6-digit approval code (R-13) — owner decision + migration (REQUESTS G-1). | packages/dashboard/app/review/[token]/review-client.tsx:478 — notes + approve exist; no pins, anchored composer, device switch, 6-digit cod…",
    "tier": "P2"
   },
   {
@@ -14443,9 +14443,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:server-client-comment-anchor",
    "verified": "drift-open",
-   "verifiedNote": "packages/dashboard/app/review/[token]/review-client.tsx:478 — notes + approve exist; no pins, anchored composer, device switch, 6-digit cod…",
+   "verifiedNote": "L-G triage: pins, the anchored composer and the pinned-comments sheet need anchored client comments (REQUESTS G-2). | packages/dashboard/app/review/[token]/review-client.tsx:478 — notes + approve exist; no pins, anchored composer, device switch, 6-digit cod…",
    "tier": "P2"
   },
   {
@@ -14718,9 +14718,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:server-usage-data-setting",
    "verified": "no",
-   "verifiedNote": "dashboard account settings has no usage-data toggle",
+   "verifiedNote": "L-G triage: Account › Privacy's usage-data switch has no field to store (no User column in prisma/schema.prisma) — needs a migration + the account-settings chain; REQUESTS G-4. | dashboard account settings has no usage-data toggle",
    "tier": "P2"
   },
   {
@@ -14729,9 +14729,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:server-usage-data-setting",
    "verified": "no",
-   "verifiedNote": "dashboard account settings has no usage-data toggle",
+   "verifiedNote": "L-G triage: Account › Privacy's usage-data switch has no field to store (no User column in prisma/schema.prisma) — needs a migration + the account-settings chain; REQUESTS G-4. | dashboard account settings has no usage-data toggle",
    "tier": "P2"
   },
   {
@@ -14740,9 +14740,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:server-usage-data-setting",
    "verified": "no",
-   "verifiedNote": "dashboard account settings has no usage-data toggle",
+   "verifiedNote": "L-G triage: Account › Privacy's usage-data switch has no field to store (no User column in prisma/schema.prisma) — needs a migration + the account-settings chain; REQUESTS G-4. | dashboard account settings has no usage-data toggle",
    "tier": "P2"
   },
   {
@@ -14984,9 +14984,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:server-settings-conflict",
    "verified": "no",
-   "verifiedNote": "no per-field settings conflict; CMS has the pattern (services/cmsSync.ts:219)",
+   "verifiedNote": "L-G triage: a per-field Keep mine / Use theirs needs the settings save to carry a precondition stamp and return the server's values on a mismatch (site-settings.service has none; CMS has the pattern) — REQUESTS G-5. | no per-field settings conflict; CMS has the pattern (services/cmsSync.ts:219)",
    "tier": "P2"
   },
   {
@@ -14995,9 +14995,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:server-settings-conflict",
    "verified": "no",
-   "verifiedNote": "no per-field settings conflict; CMS has the pattern (services/cmsSync.ts:219)",
+   "verifiedNote": "L-G triage: a per-field Keep mine / Use theirs needs the settings save to carry a precondition stamp and return the server's values on a mismatch (site-settings.service has none; CMS has the pattern) — REQUESTS G-5. | no per-field settings conflict; CMS has the pattern (services/cmsSync.ts:219)",
    "tier": "P2"
   },
   {
@@ -15006,9 +15006,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:server-settings-conflict",
    "verified": "no",
-   "verifiedNote": "no per-field settings conflict; CMS has the pattern (services/cmsSync.ts:219)",
+   "verifiedNote": "L-G triage: a per-field Keep mine / Use theirs needs the settings save to carry a precondition stamp and return the server's values on a mismatch (site-settings.service has none; CMS has the pattern) — REQUESTS G-5. | no per-field settings conflict; CMS has the pattern (services/cmsSync.ts:219)",
    "tier": "P2"
   },
   {
@@ -15317,9 +15317,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:248:20853",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance); same component and copy as 248:20853, which was compared.",
+   "verifiedNote": "L-G: variant of 248:20853 (compared): the same 'Saving {Screen} settings…' dialog with another destination taken from the nav. | Built, not compared directly (loading state, no inheritance); same component and copy as 248:20853, which was compared.",
    "tier": "P2"
   },
   {
@@ -15340,9 +15340,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:248:20853",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance); same component and copy as 248:20853, which was compared.",
+   "verifiedNote": "L-G: variant of 248:20853 (compared): the same 'Saving {Screen} settings…' dialog with another destination taken from the nav. | Built, not compared directly (loading state, no inheritance); same component and copy as 248:20853, which was compared.",
    "tier": "P2"
   },
   {
@@ -15363,9 +15363,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:248:20853",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance); same component and copy as 248:20853, which was compared.",
+   "verifiedNote": "L-G: variant of 248:20853 (compared): the same 'Saving {Screen} settings…' dialog with another destination taken from the nav. | Built, not compared directly (loading state, no inheritance); same component and copy as 248:20853, which was compared.",
    "tier": "P2"
   },
   {
@@ -15386,9 +15386,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:248:20853",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance); same component and copy as 248:20853, which was compared.",
+   "verifiedNote": "L-G: variant of 248:20853 (compared): the same 'Saving {Screen} settings…' dialog with another destination taken from the nav. | Built, not compared directly (loading state, no inheritance); same component and copy as 248:20853, which was compared.",
    "tier": "P2"
   },
   {
@@ -15409,9 +15409,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:248:20853",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance); same component and copy as 248:20853, which was compared.",
+   "verifiedNote": "L-G: variant of 248:20853 (compared): the same 'Saving {Screen} settings…' dialog with another destination taken from the nav. | Built, not compared directly (loading state, no inheritance); same component and copy as 248:20853, which was compared.",
    "tier": "P2"
   },
   {
@@ -15432,9 +15432,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:248:20853",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance); same component and copy as 248:20853, which was compared.",
+   "verifiedNote": "L-G: variant of 248:20853 (compared): the same 'Saving {Screen} settings…' dialog with another destination taken from the nav. | Built, not compared directly (loading state, no inheritance); same component and copy as 248:20853, which was compared.",
    "tier": "P2"
   },
   {
@@ -15455,9 +15455,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:248:20853",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance); same component and copy as 248:20853, which was compared.",
+   "verifiedNote": "L-G: variant of 248:20853 (compared): the same 'Saving {Screen} settings…' dialog with another destination taken from the nav. | Built, not compared directly (loading state, no inheritance); same component and copy as 248:20853, which was compared.",
    "tier": "P2"
   },
   {
@@ -15478,9 +15478,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:248:20853",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance); same component and copy as 248:20853, which was compared.",
+   "verifiedNote": "L-G: variant of 248:20853 (compared): the same 'Saving {Screen} settings…' dialog with another destination taken from the nav. | Built, not compared directly (loading state, no inheritance); same component and copy as 248:20853, which was compared.",
    "tier": "P2"
   },
   {
@@ -15501,9 +15501,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:248:20853",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance); same component and copy as 248:20853, which was compared.",
+   "verifiedNote": "L-G: variant of 248:20853 (compared): the same 'Saving {Screen} settings…' dialog with another destination taken from the nav. | Built, not compared directly (loading state, no inheritance); same component and copy as 248:20853, which was compared.",
    "tier": "P2"
   },
   {
@@ -21749,9 +21749,9 @@
    "page": "07",
    "family": "recovery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:request-G-7",
    "verified": "drift-open",
-   "verifiedNote": "InspectorHeader.tsx:78 \"2 selected · Elements\" vs \"2 elements\"; no canvas bar Duplicate/Delete/Group/More; MultiSelectBar rows not on board",
+   "verifiedNote": "L-G triage: shell/canvas surfaces owned by the lead / L-A / L-B (multi-selection header + canvas bar, focus mode, narrow inspector overlay, opening skeleton line, undo tooltip copy) — REQUESTS G-7. | InspectorHeader.tsx:78 \"2 selected · Elements\" vs \"2 elements\"; no canvas bar Duplicate/Delete/Group/More; MultiSelectBar rows not on board",
    "tier": "P2"
   },
   {
@@ -21782,9 +21782,9 @@
    "page": "07",
    "family": "recovery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:request-G-7",
    "verified": "no",
-   "verifiedNote": "No hide-all-panels mode or \"Show panels\" control anywhere in shell",
+   "verifiedNote": "L-G triage: shell/canvas surfaces owned by the lead / L-A / L-B (multi-selection header + canvas bar, focus mode, narrow inspector overlay, opening skeleton line, undo tooltip copy) — REQUESTS G-7. | No hide-all-panels mode or \"Show panels\" control anywhere in shell",
    "tier": "P2"
   },
   {
@@ -21804,9 +21804,9 @@
    "page": "07",
    "family": "recovery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:request-G-7",
    "verified": "no",
-   "verifiedNote": "No narrow-window inspector overlay mode in shell; phase1 narrow pins cover topbar/bottom bar only",
+   "verifiedNote": "L-G triage: shell/canvas surfaces owned by the lead / L-A / L-B (multi-selection header + canvas bar, focus mode, narrow inspector overlay, opening skeleton line, undo tooltip copy) — REQUESTS G-7. | No narrow-window inspector overlay mode in shell; phase1 narrow pins cover topbar/bottom bar only",
    "tier": "P2"
   },
   {
@@ -21815,9 +21815,9 @@
    "page": "07",
    "family": "recovery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:request-F-25",
    "verified": "drift-open",
-   "verifiedNote": "Not in lane F's paths: the 1280-wide 'Inspector stays closed behind an Inspector button' layout is the shell's (StudioPanels, lead) and the add receipt is L-A's — REQUESTS F-25.",
+   "verifiedNote": "L-G triage: the 1280-wide closed-Inspector layout is StudioPanels (lead) + L-A's receipt — REQUESTS F-25. | Not in lane F's paths: the 1280-wide 'Inspector stays closed behind an Inspector button' layout is the shell's (StudioPanels, lead) and the add receipt is L-A's — REQUESTS F-25.",
    "tier": "P2"
   },
   {
@@ -21826,9 +21826,9 @@
    "page": "07",
    "family": "recovery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:request-G-7",
    "verified": "drift-open",
-   "verifiedNote": "phase1: StudioSkeleton (chrome-ui/Skeleton.tsx:91, AquibraStudio.tsx:577) has no \"Opening <site>…\" line",
+   "verifiedNote": "L-G triage: shell/canvas surfaces owned by the lead / L-A / L-B (multi-selection header + canvas bar, focus mode, narrow inspector overlay, opening skeleton line, undo tooltip copy) — REQUESTS G-7. | phase1: StudioSkeleton (chrome-ui/Skeleton.tsx:91, AquibraStudio.tsx:577) has no \"Opening <site>…\" line",
    "tier": "P2"
   },
   {
@@ -21837,9 +21837,9 @@
    "page": "07",
    "family": "recovery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:request-F-11",
    "verified": "drift-open",
-   "verifiedNote": "probe-compared 2026-10-27 (lf-load-failed, 1440×900, board PNG): bar 0,56,1440×40 error tint, ✕ glyph, 13px red line at x39, Download local copy 1162/163×32 (board 1161/164), filled Retry 1335/81 (board 1336/79) — match. Copy details and the ✕ dismiss removed (not on the board). Open, not in lane paths: the live mount sits above the topbar (REQUESTS F-11) and the canvas shows no read-only site behind it (canvas/load path).",
+   "verifiedNote": "L-G triage: the banner itself was probe-compared as a match by L-F; what is open is its live mount in the 40px slot under the topbar (AquibraStudio, REQUESTS F-11, founder file). | probe-compared 2026-10-27 (lf-load-failed, 1440×900, board PNG): bar 0,56,1440×40 error tint, ✕ glyph, 13px red line at x39, Download local copy 1162/163×32 (board 1161/164), filled Retry 1335/81 (board 1336/79) — match. Copy details and the ✕ dismiss removed (not on the board). Open, not in lane paths: the live mount sits above the topbar (REQUESTS F-11) and the canvas shows no read-only site behind it (canvas/load path).",
    "tier": "P2"
   },
   {
@@ -21859,9 +21859,9 @@
    "page": "07",
    "family": "recovery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:request-F-11",
    "verified": "drift-open",
-   "verifiedNote": "probe-compared 2026-10-27 (lf-session-banner): bar 0,56,1440×40, ✕ glyph, line, filled Sign in ↗ 1309/107 (board 1312/103) — match. The save-failed strip no longer shows while this banner is up. Open: live mount above the topbar (F-11).",
+   "verifiedNote": "L-G triage: the banner itself was probe-compared as a match by L-F; what is open is its live mount in the 40px slot under the topbar (AquibraStudio, REQUESTS F-11, founder file). | probe-compared 2026-10-27 (lf-session-banner): bar 0,56,1440×40, ✕ glyph, line, filled Sign in ↗ 1309/107 (board 1312/103) — match. The save-failed strip no longer shows while this banner is up. Open: live mount above the topbar (F-11).",
    "tier": "P2"
   },
   {
@@ -21892,9 +21892,9 @@
    "page": "07",
    "family": "recovery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:request-F-16",
    "verified": "drift-open",
-   "verifiedNote": "probe-compared 2026-10-27 (lf-recovery-older): strip flush at the canvas column top 342,100 798×56 (board 342,100 798×56), warning tint, 13/18 two lines at x356, Discard… 889/93 · Restore my edits 991/135 (board 883/97 · 987/138) — match. Open: the live app still shows the old toast until the load path publishes the keptWorkOffer (F-16a, lead3).",
+   "verifiedNote": "L-G triage: the strip was probe-compared as a match by L-F; the live app still raises the old toast until the load path publishes the kept-work offer (REQUESTS F-16, lead). | probe-compared 2026-10-27 (lf-recovery-older): strip flush at the canvas column top 342,100 798×56 (board 342,100 798×56), warning tint, 13/18 two lines at x356, Discard… 889/93 · Restore my edits 991/135 (board 883/97 · 987/138) — match. Open: the live app still shows the old toast until the load path publishes the keptWorkOffer (F-16a, lead3).",
    "tier": "P2"
   },
   {
@@ -21903,9 +21903,9 @@
    "page": "07",
    "family": "recovery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:request-F-16",
    "verified": "drift-open",
-   "verifiedNote": "probe-compared 2026-10-27 (lf-recovery-newer): strip geometry and line match; Download my copy 145 wide. Open: no Compare (the shared Compare has no kept-copy source, F-16c) and the live toast (F-16a).",
+   "verifiedNote": "L-G triage: the strip was probe-compared as a match by L-F; the live app still raises the old toast until the load path publishes the kept-work offer (REQUESTS F-16, lead). | probe-compared 2026-10-27 (lf-recovery-newer): strip geometry and line match; Download my copy 145 wide. Open: no Compare (the shared Compare has no kept-copy source, F-16c) and the live toast (F-16a).",
    "tier": "P2"
   },
   {
@@ -21914,9 +21914,9 @@
    "page": "07",
    "family": "recovery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:request-F-16",
    "verified": "drift-open",
-   "verifiedNote": "probe-compared 2026-10-27 (lf-recovery-unknown): as G08 — strip and line match; no Compare (F-16c); live toast (F-16a).",
+   "verifiedNote": "L-G triage: the strip was probe-compared as a match by L-F; the live app still raises the old toast until the load path publishes the kept-work offer (REQUESTS F-16, lead). | probe-compared 2026-10-27 (lf-recovery-unknown): as G08 — strip and line match; no Compare (F-16c); live toast (F-16a).",
    "tier": "P2"
   },
   {
@@ -21926,8 +21926,8 @@
    "family": "recovery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "probe-compared 2026-10-27 (lf-discard): 480×156 (board 480×154), Cancel focused 93 · Delete copy white with red text 124 (board 98 · 118); it was a red-filled ConfirmDialog. Open: vertical position (F-24).",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-G: the only open item was the dialog's vertical position (F-24); F-24 landed — 2L9 dialogs now sit with their top at y≈280 (seen at y279 in L-G's probe captures 2026-10-30). Geometry and buttons were already matched by L-F's probe compare. | probe-compared 2026-10-27 (lf-discard): 480×156 (board 480×154), Cancel focused 93 · Delete copy white with red text 124 (board 98 · 118); it was a red-filled ConfirmDialog. Open: vertical position (F-24).",
    "tier": "P2"
   },
   {
@@ -21981,8 +21981,8 @@
    "family": "recovery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "probe-compared 2026-10-27 (lf-conflict-reload): 480×176 (board 480×176), Cancel 93 (focused) · Reload 91 filled (board 98 · 97, within 6). Open: vertical position (F-24).",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-G: the only open item was the dialog's vertical position (F-24); F-24 landed — 2L9 dialogs now sit with their top at y≈280 (seen at y279 in L-G's probe captures 2026-10-30). Geometry and buttons were already matched by L-F's probe compare. | probe-compared 2026-10-27 (lf-conflict-reload): 480×176 (board 480×176), Cancel 93 (focused) · Reload 91 filled (board 98 · 97, within 6). Open: vertical position (F-24).",
    "tier": "P2"
   },
   {
@@ -21992,8 +21992,8 @@
    "family": "recovery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "probe-compared 2026-10-27 (lf-conflict-overwrite): 480×176, Cancel 93 · Overwrite 111 white (board 98 · 113; it was a red fill). Open: vertical position (F-24).",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-G: the only open item was the dialog's vertical position (F-24); F-24 landed — 2L9 dialogs now sit with their top at y≈280 (seen at y279 in L-G's probe captures 2026-10-30). Geometry and buttons were already matched by L-F's probe compare. | probe-compared 2026-10-27 (lf-conflict-overwrite): 480×176, Cancel 93 · Overwrite 111 white (board 98 · 113; it was a red fill). Open: vertical position (F-24).",
    "tier": "P2"
   },
   {
@@ -22024,9 +22024,9 @@
    "page": "07",
    "family": "recovery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:request-F-19",
    "verified": "drift-open",
-   "verifiedNote": "L-F W8: showRoleRaisedBanner (\"You can edit this site now.\" · Reload to edit · ✕) built; the role re-read that produces it is REQUESTS F-19. Built, not compared.",
+   "verifiedNote": "L-G triage: banner built; the mid-session role re-read that raises it is REQUESTS F-19 (shell hooks, lead). | L-F W8: showRoleRaisedBanner (\"You can edit this site now.\" · Reload to edit · ✕) built; the role re-read that produces it is REQUESTS F-19. Built, not compared.",
    "tier": "P2"
   },
   {
@@ -22068,9 +22068,9 @@
    "page": "07",
    "family": "recovery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:request-F-20",
    "verified": "drift-open",
-   "verifiedNote": "L-F W8: showNewVersionBanner built; nothing detects a new build yet (REQUESTS F-20). Built, not compared.",
+   "verifiedNote": "L-G triage: banner and reload-after-saving built (L-F W8); nothing detects a new build until REQUESTS F-20 (server version route + shell poll). | L-F W8: showNewVersionBanner built; nothing detects a new build yet (REQUESTS F-20). Built, not compared.",
    "tier": "P2"
   },
   {
@@ -22079,9 +22079,9 @@
    "page": "07",
    "family": "recovery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:request-F-20",
    "verified": "drift-open",
-   "verifiedNote": "L-F W8: reloadAfterSaving says \"Saving first… then reloading on {page} with your panels as they are.\" and reloads only after the save lands. Producer REQUESTS F-20. Built, not compared.",
+   "verifiedNote": "L-G triage: banner and reload-after-saving built (L-F W8); nothing detects a new build until REQUESTS F-20 (server version route + shell poll). | L-F W8: reloadAfterSaving says \"Saving first… then reloading on {page} with your panels as they are.\" and reloads only after the save lands. Producer REQUESTS F-20. Built, not compared.",
    "tier": "P2"
   },
   {
@@ -22090,9 +22090,9 @@
    "page": "07",
    "family": "recovery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:request-F-20",
    "verified": "drift-open",
-   "verifiedNote": "L-F W8: a failed save stops the reload: \"Couldn’t save, so we didn’t reload. Nothing was lost.\" · Download a copy · Stay. Producer REQUESTS F-20. Built, not compared.",
+   "verifiedNote": "L-G triage: banner and reload-after-saving built (L-F W8); nothing detects a new build until REQUESTS F-20 (server version route + shell poll). | L-F W8: a failed save stops the reload: \"Couldn’t save, so we didn’t reload. Nothing was lost.\" · Download a copy · Stay. Producer REQUESTS F-20. Built, not compared.",
    "tier": "P2"
   },
   {
@@ -22123,9 +22123,9 @@
    "page": "07",
    "family": "recovery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:request-F-21",
    "verified": "drift-open",
-   "verifiedNote": "L-F W9: built, not compared. showOtherTabBanner(editHere) offers \"Edit here\" when a tab handoff is wired (REQUESTS F-21); dismissible without one.",
+   "verifiedNote": "L-G triage: built (L-F W9); the tab handoff that offers Edit here is REQUESTS F-21 (shell hook). | L-F W9: built, not compared. showOtherTabBanner(editHere) offers \"Edit here\" when a tab handoff is wired (REQUESTS F-21); dismissible without one.",
    "tier": "P2"
   },
   {
@@ -22134,9 +22134,9 @@
    "page": "07",
    "family": "recovery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:request-F-11",
    "verified": "drift-open",
-   "verifiedNote": "probe-compared 2026-10-27 (lf-handoff-moved): warning bar 0,56 1440×40, Edit here instead white 1278/138 (board 1275/140; it was filled). Open: hook mount F-21, slot placement F-11; the canvas 'View only · editing moved to another tab' line is not in lane F's paths.",
+   "verifiedNote": "L-G triage: the banner itself was probe-compared as a match by L-F; what is open is its live mount in the 40px slot under the topbar (AquibraStudio, REQUESTS F-11, founder file). | probe-compared 2026-10-27 (lf-handoff-moved): warning bar 0,56 1440×40, Edit here instead white 1278/138 (board 1275/140; it was filled). Open: hook mount F-21, slot placement F-11; the canvas 'View only · editing moved to another tab' line is not in lane F's paths.",
    "tier": "P2"
   },
   {
@@ -22145,9 +22145,9 @@
    "page": "07",
    "family": "recovery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:request-F-21",
    "verified": "drift-open",
-   "verifiedNote": "L-F W9: built, not compared. A failed save refuses: \"The other tab couldn’t save — finish there first. Nothing turned read-only.\" · Edit here (retry). Mount is REQUESTS F-21.",
+   "verifiedNote": "L-G triage: built (L-F W9); the tab handoff that offers Edit here is REQUESTS F-21 (shell hook). | L-F W9: built, not compared. A failed save refuses: \"The other tab couldn’t save — finish there first. Nothing turned read-only.\" · Edit here (retry). Mount is REQUESTS F-21.",
    "tier": "P2"
   },
   {
@@ -22156,9 +22156,9 @@
    "page": "07",
    "family": "recovery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:request-F-11",
    "verified": "drift-open",
-   "verifiedNote": "probe-compared 2026-10-27 (lf-more, offline emulated): bar + Sign in ↗ 1220/107 + '2 more ⌄' text 1337 (board 1216/103 · 1343), popover rows plain on white 42 tall with the shorter offline line and a white Reload (board), no ✕ in the list — match. Open: live mount above the topbar (F-11).",
+   "verifiedNote": "L-G triage: the banner itself was probe-compared as a match by L-F; what is open is its live mount in the 40px slot under the topbar (AquibraStudio, REQUESTS F-11, founder file). | probe-compared 2026-10-27 (lf-more, offline emulated): bar + Sign in ↗ 1220/107 + '2 more ⌄' text 1337 (board 1216/103 · 1343), popover rows plain on white 42 tall with the shorter offline line and a white Reload (board), no ✕ in the list — match. Open: live mount above the topbar (F-11).",
    "tier": "P2"
   },
   {
@@ -22200,9 +22200,9 @@
    "page": "07",
    "family": "recovery",
    "status": "active",
-   "authority": "open:notifications-other-sites",
+   "authority": "blocked:owner-notification-grouping",
    "verified": "drift-open",
-   "verifiedNote": "L-F W10: not built. The board groups This site / Other sites; owner decision 9 narrows the editor bell to the open site (NotificationService.siteScope). Owner to choose before it is built.",
+   "verifiedNote": "L-G triage: owner decision 9 narrowed the editor bell to the open site; This site / Other sites grouping waits on the owner (L-F W10). | L-F W10: not built. The board groups This site / Other sites; owner decision 9 narrows the editor bell to the open site (NotificationService.siteScope). Owner to choose before it is built.",
    "tier": "P2"
   },
   {
@@ -22211,9 +22211,9 @@
    "page": "07",
    "family": "recovery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:server-site-plan-lock",
    "verified": "no",
-   "verifiedNote": "No plan-lock state in editor",
+   "verifiedNote": "L-G triage: a site locked on Free (over the plan's site limit) needs the server to say so on load; no plan-lock state exists in sites.get — REQUESTS G-6. | No plan-lock state in editor",
    "tier": "P2"
   },
   {
@@ -22222,9 +22222,9 @@
    "page": "07",
    "family": "recovery",
    "status": "active",
-   "authority": "board",
+   "authority": "code:no-trial",
    "verified": "no",
-   "verifiedNote": "No trial in code (plans memory 10-17)",
+   "verifiedNote": "L-G triage: there is no trial in code (owner 10-17: 30-day Pro trial planned, not built) — same authority as 278:61847. | No trial in code (plans memory 10-17)",
    "tier": "P2"
   },
   {
@@ -22663,9 +22663,9 @@
    "page": "07",
    "family": "recovery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:request-G-7",
    "verified": "drift-open",
-   "verifiedNote": "phase1 Task 1.2: useHistoryFeedback.ts:180 \"Undo: <action>\" vs \"Undo is ⌘Z: “…”\"",
+   "verifiedNote": "L-G triage: shell/canvas surfaces owned by the lead / L-A / L-B (multi-selection header + canvas bar, focus mode, narrow inspector overlay, opening skeleton line, undo tooltip copy) — REQUESTS G-7. | phase1 Task 1.2: useHistoryFeedback.ts:180 \"Undo: <action>\" vs \"Undo is ⌘Z: “…”\"",
    "tier": "P2"
   },
   {
@@ -22696,9 +22696,9 @@
    "page": "07",
    "family": "recovery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:request-G-7",
    "verified": "no",
-   "verifiedNote": "phase1 Task 1.2: undo lives in canvas footer (CanvasFooterToolbar.tsx:71); no \"Undo: <step> · ⌘Z\" tooltip",
+   "verifiedNote": "L-G triage: shell/canvas surfaces owned by the lead / L-A / L-B (multi-selection header + canvas bar, focus mode, narrow inspector overlay, opening skeleton line, undo tooltip copy) — REQUESTS G-7. | phase1 Task 1.2: undo lives in canvas footer (CanvasFooterToolbar.tsx:71); no \"Undo: <step> · ⌘Z\" tooltip",
    "tier": "P2"
   },
   {
@@ -22718,9 +22718,9 @@
    "page": "07",
    "family": "recovery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:request-G-8",
    "verified": "no",
-   "verifiedNote": "CmsWorkspace.tsx:486 restore re-saves silently; no \"Restoring “…”…\" state",
+   "verifiedNote": "L-G triage: CMS record restore states live in CmsWorkspace (L-A) — REQUESTS G-8. | CmsWorkspace.tsx:486 restore re-saves silently; no \"Restoring “…”…\" state",
    "tier": "P2"
   },
   {
@@ -22729,9 +22729,9 @@
    "page": "07",
    "family": "recovery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:request-G-8",
    "verified": "no",
-   "verifiedNote": "No \"“…” restored\" receipt",
+   "verifiedNote": "L-G triage: CMS record restore states live in CmsWorkspace (L-A) — REQUESTS G-8. | No \"“…” restored\" receipt",
    "tier": "P2"
   },
   {
@@ -22740,9 +22740,9 @@
    "page": "07",
    "family": "recovery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:request-G-8",
    "verified": "no",
-   "verifiedNote": "No \"Couldn’t restore … Try again\" state; error unhandled in toast action",
+   "verifiedNote": "L-G triage: CMS record restore states live in CmsWorkspace (L-A) — REQUESTS G-8. | No \"Couldn’t restore … Try again\" state; error unhandled in toast action",
    "tier": "P2"
   },
   {
