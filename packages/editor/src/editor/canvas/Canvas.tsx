@@ -210,7 +210,16 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
     const { calculateSnapping } = useCanvasSnapping(composer);
 
     // Inline editing (must be before useSelectionBehavior since it needs editing.id)
-    const { editing, handleDoubleClick } = useCanvasInlineEdit({ composer, canvasRef });
+    /* design-2l9 TX03 / TX04: a committed text edit says so, and its Undo
+       reverts that one step (captureUndo — refuses once something newer). */
+    const { editing, handleDoubleClick } = useCanvasInlineEdit({
+      composer,
+      canvasRef,
+      onCommitted: () => {
+        const undo = composer?.history?.captureUndo?.();
+        addToast({ description: "Text updated.", tone: "info", ...(undo ? { action: { label: "Undo", onClick: () => { undo(); } } } : {}) });
+      },
+    });
 
     // Selection behavior hook (click-through, additive, hit expansion)
     const { handleClick: handleSelectionClick } = useSelectionBehavior({

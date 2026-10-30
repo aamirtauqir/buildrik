@@ -103,13 +103,21 @@ describe("RichTextEditor — menus keep every tool (TX05)", () => {
     expect(onCommand).toHaveBeenCalledWith("foreColor", "#ff0000");
   });
 
-  it("Link applies a typed address, refuses an empty one, and removes", () => {
+  it("Link opens 'Link selected text', applies a typed address, refuses an empty one (TX06)", () => {
     const onCommand = renderEditor();
     click("rte-link");
+    expect(screen.getByText("Link selected text")).toBeTruthy();
+    expect(screen.getByTestId("rte-link-body").textContent).toBe(
+      "Link “the selected text”. Page, selected element and inline text draft stay intact.",
+    );
     expect(screen.getByTestId("rte-link-apply")).toBeDisabled();
     fireEvent.change(screen.getByTestId("rte-link-url"), { target: { value: "https://example.com" } });
     click("rte-link-apply");
     expect(onCommand).toHaveBeenCalledWith("createLink", "https://example.com");
+  });
+
+  it("on linked text the dialog offers Remove link", () => {
+    const onCommand = renderEditor({ activeStyles: { link: true } });
     click("rte-link");
     click("rte-unlink");
     expect(onCommand).toHaveBeenCalledWith("unlink");

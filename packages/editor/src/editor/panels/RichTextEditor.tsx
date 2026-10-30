@@ -14,7 +14,7 @@
 
 import * as React from "react";
 import { ColorField } from "@/shared/forms";
-import { Popover, Button, Menu, MenuItem, MenuSeparator, Select, TextInput } from "@/editor/chrome-ui";
+import { Popover, Button, Menu, MenuItem, MenuSeparator, Modal, Select, TextInput } from "@/editor/chrome-ui";
 
 export interface RichTextEditorProps {
   onCommand: (command: string, value?: string) => void;
@@ -84,6 +84,37 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, block
     if (value === undefined) onCommand(command);
     else onCommand(command, value);
     close();
+  };
+
+  /* The link dialog takes focus from the edited text; keep its range. */
+  const savedRange = React.useRef<Range | null>(null);
+  const [linkText, setLinkText] = React.useState("");
+  const restoreSelection = () => {
+    const range = savedRange.current;
+    if (!range) return;
+    const host = (range.commonAncestorContainer as Element).parentElement?.closest?.("[contenteditable='true']")
+      ?? (range.commonAncestorContainer as Element).closest?.("[contenteditable='true']");
+    (host as HTMLElement | null)?.focus();
+    const sel = window.getSelection();
+    sel?.removeAllRanges();
+    sel?.addRange(range);
+  };
+  const openLink = () => {
+    const sel = window.getSelection();
+    savedRange.current = sel && sel.rangeCount ? sel.getRangeAt(0).cloneRange() : null;
+    setLinkText(sel?.toString().trim() ?? "");
+    setLinkUrl("");
+    setOpen("link");
+  };
+  const closeLink = () => {
+    close();
+    restoreSelection();
+  };
+  const applyLink = () => {
+    if (!linkUrl) return;
+    restoreSelection();
+    run("createLink", linkUrl);
+    setLinkUrl("");
   };
 
   const menuPopover = (which: Exclude<Open, null>, label: string, trigger: React.ReactNode, children: React.ReactNode) => (
@@ -175,37 +206,59 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, block
         trigger("color", "Color", "Color"),
         <ColorField label="Text color" onChange={(color) => onCommand("foreColor", color)} />,
       )}
-      {menuPopover(
-        "link",
-        "Link",
-        trigger("link", "Link", "Link", activeStyles.link),
-        <div className="tw:flex tw:w-62 tw:flex-col tw:gap-2">
+      {/* TX06 / TX07 (423:98532): "Link selected text" — a dialog over the
+          edit that keeps it open: the selection is saved before focus leaves
+          and put back before the link is made. */}
+      <Button
+        color="light"
+        size="xs"
+        className={`${CTRL}${activeStyles.link || open === "link" ? ` ${ON}` : ""}`}
+        aria-haspopup="dialog"
+        aria-expanded={open === "link"}
+        data-testid="rte-link"
+        onClick={openLink}
+      >
+        Link
+      </Button>
+      <Modal
+        open={open === "link"}
+        onClose={closeLink}
+        title="Link selected text"
+        width="sm"
+        testId="rte-link-dialog"
+      >
+        {/* bd-inline-keep: focus and clicks here do not end the edit. */}
+        <div className="bd-inline-keep tw:flex tw:flex-col tw:gap-3">
+          <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-soft)]" data-testid="rte-link-body">
+            {`Link “${linkText || "the selected text"}”. Page, selected element and inline text draft stay intact.`}
+          </p>
           <TextInput
             type="url"
             value={linkUrl}
             placeholder="https://…"
             aria-label="Link address"
             data-testid="rte-link-url"
+            autoFocus
             onChange={(e) => setLinkUrl(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && linkUrl) applyLink();
+            }}
           />
-          <div className="tw:flex tw:gap-2">
-            <Button size="xs" color="light" className={CTRL} data-testid="rte-unlink" onClick={() => run("unlink")}>
-              Remove
+          <div className="tw:flex tw:items-center tw:justify-end tw:gap-2">
+            {activeStyles.link && (
+              <Button size="xs" color="light" className={`${CTRL} tw:mr-auto`} data-testid="rte-unlink" onClick={() => { restoreSelection(); run("unlink"); }}>
+                Remove link
+              </Button>
+            )}
+            <Button size="xs" color="light" className="tw:h-8 tw:min-h-0 tw:px-4 tw:text-[13px]" data-testid="rte-link-cancel" onClick={closeLink}>
+              Cancel
             </Button>
-            <Button
-              size="xs"
-              disabled={!linkUrl}
-              data-testid="rte-link-apply"
-              onClick={() => {
-                run("createLink", linkUrl);
-                setLinkUrl("");
-              }}
-            >
+            <Button size="xs" className="tw:h-8 tw:min-h-0 tw:px-4 tw:text-[13px]" disabled={!linkUrl} data-testid="rte-link-apply" onClick={applyLink}>
               Apply link
             </Button>
           </div>
-        </div>,
-      )}
+        </div>
+      </Modal>
       {menuPopover(
         "more",
         "More formatting",

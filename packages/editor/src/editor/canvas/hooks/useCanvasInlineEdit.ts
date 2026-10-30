@@ -21,6 +21,9 @@ export interface EditingState {
 export interface UseCanvasInlineEditOptions {
   composer: Composer | null;
   canvasRef: React.RefObject<HTMLDivElement | null>;
+  /** After a CHANGED edit is committed as its one history step — the caller's
+   *  receipt (design-2l9 TX03 "Text updated. · Undo"). */
+  onCommitted?: () => void;
 }
 
 export interface UseCanvasInlineEditResult {
@@ -57,7 +60,11 @@ const INLINE_EDITABLE_TAGS = [
 export function useCanvasInlineEdit({
   composer,
   canvasRef,
+  onCommitted,
 }: UseCanvasInlineEditOptions): UseCanvasInlineEditResult {
+  /* Held in a ref: the edit session's listeners are bound once per session. */
+  const committedRef = React.useRef(onCommitted);
+  committedRef.current = onCommitted;
   const [editing, setEditing] = React.useState<EditingState>({
     id: null,
     original: "",
@@ -174,6 +181,7 @@ export function useCanvasInlineEdit({
              emitter, so the onboarding step that asks for exactly this
              action had nothing to listen to. */
           composer.emit(EVENTS.ELEMENT_EDIT_INLINE, { elementId: editing.id });
+          committedRef.current?.();
           /* No saveProject() here: with a site bound it only wrote
              localStorage yet marked the project saved before the server had
              the edit. The transaction's project:changed schedules the real
@@ -189,6 +197,9 @@ export function useCanvasInlineEdit({
     const handleBlur = (evt: FocusEvent) => {
       // Don't finish editing if focus is moving to the inline toolbar
       const relatedTarget = evt.relatedTarget as HTMLElement | null;
+      /* A dialog the toolbar opened over the edit (Link selected text) holds
+         focus itself — the edit stays open and is not refocused. */
+      if (relatedTarget?.closest(".bd-inline-keep, [data-testid='rte-link-dialog']")) return;
       if (relatedTarget?.closest(".bd-inline-toolbar")) {
         // Re-focus the contentEditable element after toolbar interaction
         setTimeout(() => el.focus(), 0);
@@ -212,7 +223,7 @@ export function useCanvasInlineEdit({
       if (!target) return;
 
       // Don't finish editing if clicking on the inline toolbar
-      if (target.closest(".bd-inline-toolbar")) {
+      if (target.closest(".bd-inline-toolbar, .bd-inline-keep, [data-testid='rte-link-dialog']")) {
         return;
       }
 
