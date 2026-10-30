@@ -2814,7 +2814,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-A wave 2: Layers footer '… · 1 selected · Locked by {Ancestor}' built. The inspector's 'Locked by Hero — unlock in Layers' / 'Show Hero in Layers' block is L-B's. Not compared.",
+   "verifiedNote": "probe-compared 2026-10-30 (case layers-tree, Container locked, its child selected; board shots/147-77668.png): footer '8 layers · 1 selected · Locked by Container'. Fixed: every row under a locked layer now shows the lock (a mark, not a control — 'Locked by a parent layer'), as the board draws Eyebrow / Headline / Text / Explore. Open: the board's lock glyphs read darker (ink) than the rows' muted ones, its selected pill stops short of the lock, the canvas chip 'Locked by Hero — unlock in Layers' (canvas overlay, not built) and the inspector's 'Locked — unlock to edit · Show Hero in Layers' block (L-B).",
    "tier": "P1"
   },
   {
@@ -2825,7 +2825,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-A wave 2: footer '… · 1 selected · Locked' built (board names it '{Hero} selected · Locked'); inspector unlock block is L-B's. Not compared.",
+   "verifiedNote": "probe-compared 2026-10-30 (case layers-tree; board shots/147-78110.png): the locked layer's descendants now all show the lock (fixed, as above); footer reads '… · 1 selected · Locked' where the board names the layer ('Hero selected · Locked') — 147:77668 itself says '1 selected', so the boards disagree and the code keeps the count. Inspector 'Unlock Hero' block is L-B's.",
    "tier": "P1"
   },
   {
