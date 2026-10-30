@@ -627,6 +627,8 @@ model Page {
   deletedAt       DateTime?
   deletedById     String?
   trashedSlug     String?  @db.VarChar(100)
+  // Set by a restore: a save whose base predates it does not re-trash the page.
+  restoredAt      DateTime?
 
   site Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
 

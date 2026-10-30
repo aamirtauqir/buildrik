@@ -84,6 +84,10 @@ export interface UseFoldersReturn {
 
   /** Call when pages are deleted so stale refs are cleaned. */
   pruneDeletedPages: (livePageIds: Set<string>) => void;
+
+  /** Re-read the server's folders. A restored page (A-21) is back in the
+   *  folder it sat in: the server never dropped it, the local copy pruned it. */
+  reload: () => void;
 }
 
 export function useFolders(
@@ -308,5 +312,6 @@ export function useFolders(
     movePageToFolder,
     removePageFromFolder,
     pruneDeletedPages,
+    reload,
   };
 }

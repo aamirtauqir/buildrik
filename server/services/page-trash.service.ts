@@ -47,16 +47,28 @@ export function tombstoneSlug(slug: string, id: string): string {
  * Move live pages of a site to the trash. Runs inside the caller's
  * transaction (the editor save removes the pages its snapshot no longer has).
  * Form blocks stay with the row until it is purged.
+ *
+ * `base` is the save's own base stamp (expectedLastEditedAt): a page restored
+ * AFTER it was missing from a snapshot built before the restore — an
+ * autosave in flight, another tab — and is left live. The restoring editor's
+ * next save, based after the restore, carries the page; if that editor has
+ * deleted it again by then, that save trashes it.
  */
 export async function trashPages(
   tx: Prisma.TransactionClient,
   siteId: string,
   pageIds: string[],
   deletedById: string | null,
+  base?: Date,
 ): Promise<void> {
   if (pageIds.length === 0) return;
   const pages = await tx.page.findMany({
-    where: { id: { in: pageIds }, siteId, deletedAt: null },
+    where: {
+      id: { in: pageIds },
+      siteId,
+      deletedAt: null,
+      ...(base ? { OR: [{ restoredAt: null }, { restoredAt: { lte: base } }] } : {}),
+    },
     select: { id: true, slug: true },
   });
   const deletedAt = new Date();
@@ -146,6 +158,7 @@ export async function restorePage(userId: string, input: RestorePageInput) {
           deletedAt: null,
           deletedById: null,
           trashedSlug: null,
+          restoredAt: new Date(),
           slug,
           slugManuallySet: input.slug !== undefined ? true : undefined,
           position: live.length,

@@ -29,11 +29,12 @@ const about: TrashedPage = {
   folderName: null,
 };
 
+const onRestored = vi.fn();
 function mount(canPurge = true) {
   const composer = createMockComposer({ pages: [pg("p1", "Home", { isHome: true })] });
   render(
     <ToastProvider>
-      <RecentlyDeletedView composer={composer as unknown as Composer} siteId="s1" canPurge={canPurge} onBack={vi.fn()} />
+      <RecentlyDeletedView composer={composer as unknown as Composer} siteId="s1" canPurge={canPurge} onBack={vi.fn()} onRestored={onRestored} />
     </ToastProvider>,
   );
   return composer;
@@ -63,6 +64,8 @@ describe("RecentlyDeletedView", () => {
     fireEvent.click(await screen.findByTestId("pages-trash-restore"));
     await waitFor(() => expect(composer.elements.createPage).toHaveBeenCalledWith("About", expect.objectContaining({ id: "p_about", slug: "about" })));
     expect(remote.restore).toHaveBeenCalledWith("s1", "p_about", undefined);
+    // The folders re-read: the server kept the page in its folder (142:68730).
+    expect(onRestored).toHaveBeenCalledTimes(1);
     expect(await screen.findByText("About restored with its URL and settings")).toBeInTheDocument();
     expect(screen.getByTestId("pages-trash-empty")).toHaveTextContent("Nothing deleted in the last 30 days.");
   });
@@ -75,7 +78,7 @@ describe("RecentlyDeletedView", () => {
     fireEvent.click(await screen.findByTestId("pages-trash-restore"));
     expect(await screen.findByText("Restore About with a new slug")).toBeInTheDocument();
     expect(screen.getByDisplayValue("about-2")).toBeInTheDocument();
-    fireEvent.click(screen.getByTestId("pages-trash-slug-confirm"));
+    fireEvent.click(screen.getByRole("button", { name: "Restore page" }));
     await waitFor(() => expect(remote.restore).toHaveBeenLastCalledWith("s1", "p_about", "about-2"));
   });
 

@@ -39,6 +39,8 @@ import { usePrePublishChecks } from "./usePrePublishChecks";
 import { ApprovalCheckRow, PublishGateBanner } from "./PublishGateBanner";
 import { UnpublishConfirmModal } from "./UnpublishConfirmModal";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
+import { useEditorRole } from "@/editor/shell/hooks/useEditorRole";
+import { roleAtLeast } from "@/services/RoleService";
 import { VERCEL_CHECK_LABEL } from "@buildrik/shared/schemas/publish";
 
 // ============================================
@@ -334,6 +336,9 @@ export const PublishTab: React.FC<PublishTabProps> = ({
      produced the payload ran synchronously before the job existed and is not
      a thing that can be cancelled, so the copy never claims it. */
   const [cancelling, setCancelling] = React.useState(false);
+  /* The server cancels for an ADMIN only; a role KNOWN to be lower gets no
+     Cancel (unknown leaves it to the server). */
+  const canCancel = roleAtLeast(useEditorRole(), "ADMIN") !== false;
   const cancelRun = async () => {
     if (!publishJob || cancelling) return;
     setCancelling(true);
@@ -715,7 +720,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
                 sentence prints under the bar and the run keeps going. */}
             {/* 4418:97570 sets Cancel at the bar's right end. */}
             <div className="tw:mt-1 tw:flex tw:items-center tw:justify-end tw:gap-4">
-              <Button
+              {canCancel && <Button
                 color="light"
                 size="xs"
                 onClick={() => void cancelRun()}
@@ -725,7 +730,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
                 data-testid="publish-cancel"
               >
                 {cancelling ? "Cancelling…" : "Cancel"}
-              </Button>
+              </Button>}
               {error ? (
                 <span className={`${META} tw:text-[var(--bk-error-text)]`} role="alert" data-testid="publish-cancel-error">
                   {error}
