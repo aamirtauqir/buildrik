@@ -13,7 +13,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor, act, within } from "@testing-library/react";
 import * as React from "react";
 import { BuildTab, type BuildTabProps } from "../BuildTab";
-import { requestInsertGroup } from "../insertGroupRequest";
+import { requestInsertGroup, showInsertReceipt } from "../insertGroupRequest";
 import { ToastProvider } from "@/editor/chrome-ui";
 
 beforeEach(() => {
@@ -201,6 +201,18 @@ describe("BuildTab — ★ FAVOURITES and RECENT (G2-115)", () => {
     expect(screen.getByTestId("insert-group-recent")).toHaveAttribute("aria-expanded", "true");
     fireEvent.click(screen.getByTestId("insert-recent-Heading"));
     expect(onBlockClick).toHaveBeenCalledTimes(2);
+  });
+});
+
+/* design-2l9 7:19448: the open panel takes the insert receipt, under its list. */
+describe("BuildTab — insert receipt", () => {
+  it("shows 'Text added to Hero' / 'Selected on canvas · Focus stays here' while open", () => {
+    const c = { on: vi.fn(), off: vi.fn(), emit: vi.fn(), selection: { getSelectedIds: () => [] }, elements: { getElement: () => null, getActivePage: () => null } } as never;
+    renderTab({ composer: c });
+    act(() => {
+      expect(showInsertReceipt(c, { title: "Text added to Hero", detail: "Selected on canvas · Focus stays here" })).toBe(true);
+    });
+    expect(screen.getByTestId("add-insert-receipt")).toHaveTextContent("Text added to HeroSelected on canvas · Focus stays here");
   });
 });
 

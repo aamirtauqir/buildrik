@@ -63,3 +63,26 @@ export function takePendingPasteHtml(composer: Composer): boolean {
   pendingPasteHtml.delete(composer);
   return asked;
 }
+
+/* design-2l9 7:19448: an insert's receipt ("Text added to Hero" / "Selected
+   on canvas · Focus stays here") belongs in the Add panel, under its list —
+   not in a toast. The open panel registers where its receipt goes; an insert
+   with no open Add panel (⌘K, the canvas menu) still raises the toast. */
+export interface InsertReceipt {
+  title: string;
+  detail: string;
+}
+const receiptSinks = new WeakMap<Composer, (r: InsertReceipt) => void>();
+
+export function setInsertReceiptSink(composer: Composer, sink: ((r: InsertReceipt) => void) | null): void {
+  if (sink) receiptSinks.set(composer, sink);
+  else receiptSinks.delete(composer);
+}
+
+/** Hands the receipt to the open Add panel; false when none is listening. */
+export function showInsertReceipt(composer: Composer, receipt: InsertReceipt): boolean {
+  const sink = receiptSinks.get(composer);
+  if (!sink) return false;
+  sink(receipt);
+  return true;
+}

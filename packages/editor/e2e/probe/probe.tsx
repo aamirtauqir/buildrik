@@ -97,6 +97,7 @@ import { DSModeProvider } from "@/editor/design-system/state/DSModeContext";
 import { LayerTreeItem } from "@/editor/panels/layers/LayerTreeItem";
 import { renameElement } from "@/editor/panels/layers/hooks/layersPersistence";
 import { PagesTab } from "@/editor/sidebar/tabs/pages/PagesTab";
+import { showInsertReceipt } from "@/editor/sidebar/tabs/build/insertGroupRequest";
 import { LeftSidebar } from "@/editor/sidebar/LeftSidebar";
 import type { GroupedTabId } from "@/editor/rail/tabsConfig";
 import { MovePagesDialog, TOP_LEVEL } from "@/editor/sidebar/tabs/pages/components/MovePagesDialog";
@@ -914,6 +915,23 @@ function layers5000Composer(): Composer {
   }
   c.selection.select(c.elements.getElement(heroText) ?? null);
   return c;
+}
+
+function AddReceiptProbe() {
+  const composer = React.useMemo(() => addTargetComposer(), []);
+  React.useEffect(() => {
+    const t = setTimeout(() => showInsertReceipt(composer, { title: "Text added to Hero", detail: "Selected on canvas · Focus stays here" }), 200);
+    return () => clearTimeout(t);
+  }, [composer]);
+  return (
+    <div data-probe="add-panel-receipt">
+      <ToastProvider>
+        <div className="tw:flex tw:h-[812px] tw:w-70 tw:flex-col tw:overflow-hidden tw:bg-white">
+          <BuildTab composer={composer} onExpandToggle={() => {}} onClose={() => {}} />
+        </div>
+      </ToastProvider>
+    </div>
+  );
 }
 
 function addTargetComposer(): Composer {
@@ -2796,6 +2814,9 @@ const CASES: Record<string, () => React.ReactElement> = {
       </ToastProvider>
     </div>
   ),
+  /* design-2l9 7:19448 — the same panel after "Text" landed in Hero: the
+     receipt the insert hook hands an open Add panel. */
+  "add-panel-receipt": () => <AddReceiptProbe />,
   /* Add panel with a target, board 7:18981: a real Composer with "Hero"
      selected, so the insert-target strip reads "Insert into Hero". */
   "add-panel-target": () => (
