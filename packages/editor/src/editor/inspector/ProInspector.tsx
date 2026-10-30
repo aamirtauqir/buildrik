@@ -43,6 +43,7 @@ import { PagePanel } from "./components/PagePanel";
 import { ThemeToggleInspector } from "./components/ThemeToggleInspector";
 import { THEME_TOGGLE_ATTR } from "@/engine/export/themeToggleRuntime";
 import { StatusLine, ViewOnlyLine } from "./components/StatusLine";
+import { DimmedNotice } from "./components/DimmedNotice";
 import { useEditLocks } from "../shared/useEditLocks";
 import { useSiteLoadStatus } from "../shell/siteLoadStatus";
 import { StatusMarks } from "./components/StatusMarks";
@@ -450,6 +451,17 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
                 aria-label="Element properties"
                 aria-disabled={editLocks.length > 0 || undefined}
               >
+                {/* 2L9 147:78900: dimmed in the editor only — said above every tab's body. */}
+                {targetIds.length <= 1 ? (
+                  <DimmedNotice
+                    composer={composer}
+                    elementId={selectedElement.id}
+                    onHideOnLiveSite={() => {
+                      setActiveTab("behaviour");
+                      requestAnimationFrame(() => document.getElementById("inspector-section-visibility")?.scrollIntoView({ block: "nearest" }));
+                    }}
+                  />
+                ) : null}
                 <InspectorErrorBoundary
                   targetName={
                     getLayerName(composer?.elements.getElement(selectedElement.id)) ?? elementTypeLabel(selectedElement.type)
