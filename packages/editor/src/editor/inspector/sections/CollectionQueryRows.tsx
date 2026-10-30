@@ -22,6 +22,8 @@ import {
 } from "@buildrik/shared/schemas/cmsConditions";
 import { Button } from "@/editor/chrome-ui";
 import { InputWithUnit, SelectRow } from "../shared/controls";
+import { CheckRow } from "../shared/controls/CheckRow";
+import { NoteRow } from "./behaviourRows";
 import { recordContextOf } from "./binding/useCmsBinding";
 import { RuleCard } from "./conditions/ConditionsPanel";
 
@@ -160,6 +162,15 @@ export function CollectionQueryRows({ composer, elementId, binding }: { composer
           set({ skip: n > 0 ? Math.min(n, CMS_COLLECTION_LIMIT_MAX) : undefined }, "Skip items");
         }}
       />
+      {/* B-27 (2L9 B5-D94): a related list on its own collection's template page. */}
+      {page?.id === binding.collectionId ? (
+        <CheckRow
+          label="Exclude this page’s record"
+          checked={Boolean(binding.excludeCurrent)}
+          onChange={(on) => set({ excludeCurrent: on }, "Filter list")}
+        />
+      ) : null}
+      {pageFields.length > 0 ? <NoteRow>Filter values follow the record being previewed.</NoteRow> : null}
     </div>
   );
 }

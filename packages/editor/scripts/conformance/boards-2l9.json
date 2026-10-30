@@ -5280,8 +5280,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "L-B round 21: reopened — the Tabs model landed (L-A round 19, engine-tabs.md); the C01 section is built on it. Not yet compared against this board.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 22: probe ?block=tabs › Content › '{tab} · Edit panel' side by side with shots/245-38888.png: the panel opens on Content › 'Editing panel' — 'Shown in editor only. Visitors still start on {initial}.', 'Back to {Tabs}', Native attributes ID panel-0n / Labelled by tab-0n, 'Panel content keeps its own IDs, styles and bindings.' — match. Board's 'Edit text on canvas' is its sample panel's text row; this panel is a container. Canvas reveal of the selected panel is L-A's runtime.",
    "tier": "P1"
   },
   {
@@ -5291,8 +5291,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "L-B round 21: reopened — the Tabs model landed (L-A round 19, engine-tabs.md); the C01 section is built on it. Not yet compared against this board.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 22 on the Tabs model: probe ?block=tabs › Behavior side by side with shots/245-39392.png: 'Tabs' · Initial tab [{label} ▾] (setInitialTab, one step), 'Initial tab is authored. Inspecting a panel does not change it.', 'Arrow keys, Home and End move focus. Enter or Space activates.', 'Back to paired content' — match (the published runtime is L-A's tabsRuntime). The C01 'Opens first' row moved here.",
    "tier": "P1"
   },
   {
@@ -6207,7 +6207,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-fixed",
-   "verifiedNote": "L-B round 21, engine model B-11 built (engine-conditions.md; shared evaluator packages/shared/schemas/cmsConditions.ts; CMSBindingManager.setCondition — one history step, saved in project.cmsBindings.conditions; canvas ghost + export removal; template pages handed to the server as data-bk-if, REQUESTS B-26). Probe ?cms=template&fields=1&condition={excerpt is set} side by side with shots/255-94411.png: Content › 'Conditions · 1 · Hidden' above Advanced attributes, '‹ CMS · Dynamic pages', bound row — match; 'Visibility condition added · Undo' is the receipt of + Add rule (unit-tested). Canvas 'Hidden by condition' ghost: CSS on data-bk-condition, not probed (the probe has no canvas).",
+   "verifiedNote": "L-B round 21, engine model B-11 built (engine-conditions.md; shared evaluator packages/shared/schemas/cmsConditions.ts; CMSBindingManager.setCondition — one history step, saved in project.cmsBindings.conditions; canvas ghost + export removal; template pages handed to the server as data-bk-if, REQUESTS B-26). Probe ?cms=template&fields=1&condition={excerpt is set} side by side with shots/255-94411.png: Content › 'Conditions · 1 · Hidden' above Advanced attributes, '‹ CMS · Dynamic pages', bound row — match; 'Visibility condition added · Undo' is the receipt of + Add rule (unit-tested). Canvas 'Hidden by condition' ghost: CSS on data-bk-condition, not probed (the probe has no canvas). Round 22: the published side is complete — generateDynamicPages evaluates each data-bk-if against its own record with the shared evaluator (B-26 server half; absent where false, attribute stripped where true; pages without markers byte-identical; server test cms.service.recordPass).",
    "tier": "P1"
   },
   {
@@ -9130,7 +9130,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-fixed",
-   "verifiedNote": "L-B round 21, engine model B-11 built (engine-conditions.md; shared evaluator packages/shared/schemas/cmsConditions.ts; CMSBindingManager.setCondition — one history step, saved in project.cmsBindings.conditions; canvas ghost + export removal; template pages handed to the server as data-bk-if, REQUESTS B-26). Same state as B4-D04 (255:94411), probe-compared there: 'Conditions · 1 · Hidden' + receipt. Server per-record evaluation for the published template page: REQUESTS B-26.",
+   "verifiedNote": "L-B round 21, engine model B-11 built (engine-conditions.md; shared evaluator packages/shared/schemas/cmsConditions.ts; CMSBindingManager.setCondition — one history step, saved in project.cmsBindings.conditions; canvas ghost + export removal; template pages handed to the server as data-bk-if, REQUESTS B-26). Same state as B4-D04 (255:94411), probe-compared there: 'Conditions · 1 · Hidden' + receipt. Server per-record evaluation for the published template page: REQUESTS B-26. Round 22: the published side is complete — generateDynamicPages evaluates each data-bk-if against its own record with the shared evaluator (B-26 server half; absent where false, attribute stripped where true; pages without markers byte-identical; server test cms.service.recordPass).",
    "tier": "P1"
   },
   {
@@ -9604,8 +9604,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-B round 21, engine model C-14 built (engine-list-query.md; applyCmsListQuery in packages/shared/schemas/cmsConditions.ts; CMSBindingManager.setListQuery — one history step, saved on the list's binding; RepeaterRenderer applies filter → sort → skip → Show for canvas and publish alike). Probe with a stored filter side by side with shots/195-27443.png: Filter '1 rule', the rule card (field · rule · value) with 'Remove filter', + Add filter, Match, Sort, Direction, + Then by, Show, Skip — match. Open: the board's value 'This page’s category' (@page.<field>) is offered only on a template page (code built, not probed there), and its per-generated-page evaluation needs the server (REQUESTS B-27); 'Exclude this page’s record' is not in the model.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 22: probe ?ancestorType=collection-list&cms=list&templatePage=1&query={excerpt is @page.excerpt, excludeCurrent} side by side with shots/195-27443.png: Filter '1 rule', card field · is · 'This page’s {field}', Remove filter, + Add filter, Match, Sort, Direction, + Then by, Show, Skip, '☑ Exclude this page’s record', 'Filter values follow the record being previewed.' — match (field is sample data). Per generated page: the editor defers @page filters / exclude / skip / Show on a published template page (data-bk-query + data-bk-item / data-bk-row on the copies) and the server's generateDynamicPages applies them with the shared applyRecordPass (B-27; server test cms.service.recordPass).",
    "tier": "P1"
   },
   {

@@ -14,6 +14,7 @@
 import { adaptBaseStyleProps, adaptElementProps, defineSection, ownSection as own, type AnySectionEntry, type SectionContext, type SectionOpen, type ShouldRenderContext } from "./_shared";
 import { LinkSection } from "../LinkSection";
 import { DialogBehaviorSection } from "../ModalSections";
+import { TabsBehaviorSection } from "../TabsSection";
 import { readModal } from "@/engine/widgets/modalModel";
 import { FormAfterSubmitSection } from "../FormAfterSubmitSection";
 import { SliderPlaybackSection } from "../SliderPlaybackSection";
@@ -127,6 +128,17 @@ export const BEHAVIOUR_SECTIONS: Record<string, AnySectionEntry> = {
     Component: SliderPlaybackSection,
     styleKeys: [],
     adaptProps: adaptElementProps,
+  }),
+
+  /* B-21 (2L9 B4-C06): which pair visitors start on. */
+  "tabs-behavior": defineSection({
+    tab: "behaviour",
+    title: "Tabs",
+    open: "always",
+    shouldRender: (ctx) => ctx.selectedIds.length <= 1 && ctx.selectedElement.type === "tabs",
+    Component: TabsBehaviorSection,
+    styleKeys: [],
+    adaptProps: (ctx) => ({ composer: ctx.composer, elementId: ctx.selectedElement.id, isOpen: ctx.isOpen, onToggle: ctx.onToggle }),
   }),
 
   /* B-17 (2L9 B4-C18): the dialog's own behaviour, on the dialog. */

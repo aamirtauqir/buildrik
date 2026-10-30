@@ -225,6 +225,8 @@ const cmsCollectionBindingSchema = z.object({
   filter: cmsConditionSchema.optional(),
   sort: z.array(cmsListSortKeySchema).max(CMS_LIST_SORT_MAX_KEYS).optional(),
   skip: z.number().int().min(0).max(CMS_COLLECTION_LIMIT_MAX).optional(),
+  /* B-27: "Exclude this page's record" (a related list on a template page). */
+  excludeCurrent: z.boolean().optional(),
 });
 
 const boundedRecord = <T extends z.ZodTypeAny>(value: T) =>

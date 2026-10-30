@@ -13,7 +13,7 @@ import { isTableCell, TableAccessibilitySection, TableCellSection, TableStructur
 import { adaptElementProps, defineSection, ownSection as own, type AnySectionEntry } from "./_shared";
 import { CmsBindingSection } from "../CmsBindingSection";
 import { ConditionsSection } from "../conditions/ConditionsPanel";
-import { TabsSection } from "../TabsSection";
+import { TabPanelSection, TabsSection } from "../TabsSection";
 import { ModalRelationshipSection } from "../ModalSections";
 import { readModal } from "@/engine/widgets/modalModel";
 import { recordContextOf } from "../binding/useCmsBinding";
@@ -149,6 +149,17 @@ export const CONTENT_SECTIONS: Record<string, AnySectionEntry> = {
     open: "always",
     shouldRender: (ctx) => ctx.selectedIds.length <= 1 && ctx.selectedElement.type === "tabs",
     Component: TabsSection,
+    styleKeys: [],
+    adaptProps: (ctx) => ({ composer: ctx.composer, elementId: ctx.selectedElement.id, isOpen: ctx.isOpen, onToggle: ctx.onToggle }),
+  }),
+
+  /* B-21 (2L9 B4-C05): a Tabs panel, shown in the editor while selected. */
+  "tab-panel": defineSection({
+    tab: "content",
+    title: "Editing panel",
+    open: "always",
+    shouldRender: (ctx) => ctx.selectedIds.length <= 1 && ctx.composer?.elements.getElement(ctx.selectedElement.id)?.getAttribute?.("role") === "tabpanel",
+    Component: TabPanelSection,
     styleKeys: [],
     adaptProps: (ctx) => ({ composer: ctx.composer, elementId: ctx.selectedElement.id, isOpen: ctx.isOpen, onToggle: ctx.onToggle }),
   }),

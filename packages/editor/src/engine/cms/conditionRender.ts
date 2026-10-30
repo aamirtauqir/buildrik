@@ -80,11 +80,14 @@ export function activePageFile(composer: Composer): string | undefined {
 
 /** The record a template page previews: the record bar's choice
  *  (getPreviewRecord, 173:12022), else its first published record. */
-export async function previewRecordOf(composer: Composer, collectionId: string): Promise<Record<string, unknown> | null> {
+export async function previewItemOf(composer: Composer, collectionId: string): Promise<{ id: string; data: Record<string, unknown> } | null> {
   const bindings = composer.cms?.bindings;
-  if (bindings?.getPreviewRecord) return (await bindings.getPreviewRecord(collectionId))?.data ?? null;
-  const first = (await composer.cms.collections.queryContent({ collectionId, status: "published", filter: {} })).items[0];
-  return first?.data ?? null;
+  if (bindings?.getPreviewRecord) return (await bindings.getPreviewRecord(collectionId)) ?? null;
+  return (await composer.cms.collections.queryContent({ collectionId, status: "published", filter: {} })).items[0] ?? null;
+}
+
+async function previewRecordOf(composer: Composer, collectionId: string): Promise<Record<string, unknown> | null> {
+  return (await previewItemOf(composer, collectionId))?.data ?? null;
 }
 
 export interface PageConditionOptions {

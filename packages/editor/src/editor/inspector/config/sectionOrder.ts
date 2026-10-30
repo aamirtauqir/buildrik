@@ -24,6 +24,7 @@ const CONTENT_ORDER: readonly SectionId[] = [
   /* B-17 / B-21: a modal trigger's dialog, a Tabs block's pairs (2L9 C07, C01). */
   "modal-relationship",
   "tabs-pairs",
+  "tab-panel",
   "type",
   "form-fields",
   "slides",
@@ -63,6 +64,7 @@ const STYLE_ORDER: readonly SectionId[] = [
 const BEHAVIOUR_ORDER: readonly SectionId[] = [
   /* 2L9 C18: a dialog's behaviour heads Behavior. */
   "dialog-behavior",
+  "tabs-behavior",
   "form-settings",
   "slider-settings",
   "link",

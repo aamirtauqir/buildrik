@@ -110,7 +110,8 @@ export class CMSExportResolver {
     /* Collection lists first (G3-079): their per-record copies are what the
        field bindings below then resolve over. A page without one is left
        untouched by this step. */
-    await new RepeaterRenderer(this.composer).expandCollectionLists(doc, { pageFile });
+    const perRecordOnServer = Boolean(templateCollectionFor(this.composer, pageFile));
+    await new RepeaterRenderer(this.composer).expandCollectionLists(doc, { pageFile, perRecordOnServer });
     const elements = doc.querySelectorAll("[data-buildrick-id]");
     const promises: Promise<void>[] = [];
 
@@ -149,7 +150,7 @@ export class CMSExportResolver {
     await applyPageConditions(doc, this.composer, {
       canvas: false,
       pageFile,
-      perRecordOnServer: Boolean(templateCollectionFor(this.composer, pageFile)),
+      perRecordOnServer,
     });
     stripConditionState(doc);
 

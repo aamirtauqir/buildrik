@@ -11,7 +11,7 @@ import { createTestComposer, installEngineBrowserStubs, removeEngineBrowserStubs
 import { getBlockById, insertBlock } from "@/blocks/blockRegistry";
 import { readTabs } from "@/engine/widgets/tabsModel";
 import { readModal } from "@/engine/widgets/modalModel";
-import { TabsSection } from "../TabsSection";
+import { TabPanelSection, TabsBehaviorSection, TabsSection } from "../TabsSection";
 import { DialogBehaviorSection, ModalRelationshipSection } from "../ModalSections";
 
 beforeAll(installEngineBrowserStubs);
@@ -27,7 +27,7 @@ function withBlock(id: string) {
 }
 
 describe("Tabs (C01)", () => {
-  it("pairs, Edit panel selects the panel, Add tab adds a pair, Opens first writes the initial pair", () => {
+  it("pairs, Edit panel selects the panel, Add tab adds a pair", () => {
     const { c, elId } = withBlock("tabs");
     const tabsId = c.elements.getElement(elId)!.getType() === "tabs" ? elId : c.elements.getElement(elId)!.getDescendants().find((d) => d.getType() === "tabs")!.getId();
     render(<TabsSection composer={c} elementId={tabsId} isOpen />);
@@ -40,10 +40,22 @@ describe("Tabs (C01)", () => {
       fireEvent.click(screen.getByTestId("tabs-add"));
     });
     expect(readTabs(c, tabsId)!.pairs).toHaveLength(before.pairs.length + 1);
+  });
+
+  it("C06: Behavior › Initial tab writes the authored pair; C05: a panel says it is shown in the editor only", () => {
+    const { c, elId } = withBlock("tabs");
+    const tabsId = c.elements.getElement(elId)!.getType() === "tabs" ? elId : c.elements.getElement(elId)!.getDescendants().find((d) => d.getType() === "tabs")!.getId();
+    const pairs = readTabs(c, tabsId)!.pairs;
+    render(<TabsBehaviorSection composer={c} elementId={tabsId} isOpen />);
     act(() => {
-      fireEvent.change(screen.getByRole("combobox", { name: "Opens first" }), { target: { value: before.pairs[1].key } });
+      fireEvent.change(screen.getByRole("combobox", { name: "Initial tab" }), { target: { value: pairs[1].key } });
     });
-    expect(readTabs(c, tabsId)!.initial).toBe(before.pairs[1].key);
+    expect(readTabs(c, tabsId)!.initial).toBe(pairs[1].key);
+    cleanup();
+    render(<TabPanelSection composer={c} elementId={pairs[0].panelId} isOpen />);
+    expect(screen.getByTestId("inspector-tab-panel")).toHaveTextContent(`Shown in editor only. Visitors still start on ${pairs[1].label}.`);
+    fireEvent.click(screen.getByTestId("tab-panel-back"));
+    expect(c.selection.getSelected()?.getId()).toBe(tabsId);
   });
 });
 
