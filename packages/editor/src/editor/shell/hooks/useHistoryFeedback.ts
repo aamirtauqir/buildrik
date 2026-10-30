@@ -118,6 +118,9 @@ const ACTION_DESCRIPTIONS: Record<string, string> = {
   "link-target-change": "Changed link target",
   "animation-change": "Changed animation",
   "bind-collection-list": "Bound the collection list",
+  // B-11 conditions (recorded labels are the receipt's own words)
+  "activate legacy condition": "Activated the old condition",
+  "remove legacy condition": "Removed the old condition",
   "interactions-change": "Changed interactions",
   // Media / components
   "replace media": "Replaced media",

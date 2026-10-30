@@ -1,6 +1,7 @@
 /**
  * Which tab subview is open, for which element. A subview replaces part of
  * a tab's body:
+ *   conditions  — Content › Conditions (B-11), the whole body;
  *   binding     — the Content tab's binding detail (Play F2.05: "‹ Back to
  *                 Content · {Property} binding"), the whole body;
  *   interaction — an open interaction (2L9 I15): Behavior shows only its
@@ -21,7 +22,7 @@
  */
 import * as React from "react";
 
-export type SubviewKind = "binding" | "interaction" | "add-field" | "override-review" | "reset-style" | "apply-style" | "font-picker" | "rename";
+export type SubviewKind = "binding" | "conditions" | "interaction" | "add-field" | "override-review" | "reset-style" | "apply-style" | "font-picker" | "rename";
 export interface Subview {
   kind: SubviewKind;
   elementId: string;

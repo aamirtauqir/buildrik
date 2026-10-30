@@ -30,6 +30,7 @@ import type { Composer } from "../Composer";
 import { BaseBindingManager, type BindingWithData } from "../data/BaseBindingManager";
 import type { CollectionManager } from "./CollectionManager";
 import { pageFileNames } from "../export/pageFiles";
+import type { CmsCondition, CmsListSortKey } from "@buildrik/shared/schemas/cmsConditions";
 
 /**
  * CMS element binding configuration
@@ -70,6 +71,18 @@ export interface CMSCollectionBinding {
    *  repeater, default) or its children (the Collection list element,
    *  G3-079 — the list stays one container, its children are the template). */
   repeat?: "self" | "children";
+  /** C-14 (engine-list-query.md): which records, in which order. */
+  filter?: CmsCondition;
+  sort?: CmsListSortKey[];
+  skip?: number;
+}
+
+/** A Collection list's query, as the Inspector edits it. */
+export interface CMSListQuery {
+  filter?: CmsCondition;
+  sort?: CmsListSortKey[];
+  skip?: number;
+  limit?: number;
 }
 
 /** The part of an element a binding copy walks. */
@@ -111,6 +124,8 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
      no choice the canvas previews the first published record, as before. */
   private previewChoice: Map<string, string> = new Map();
   private draftsOnCanvas = false;
+  /** B-11: element id → its visibility condition (engine-conditions.md). */
+  private conditions: Map<string, CmsCondition> = new Map();
 
   constructor(composer: Composer, cmsManager: CollectionManager) {
     super(composer);
@@ -147,11 +162,12 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
   private forgetBoundElement(elementId: string): void {
     this.forgetElement(elementId);
     if (this.collectionBindings.delete(elementId)) this.composer.emit(EVENTS.CMS_COLLECTION_UNBOUND, { elementId });
+    if (this.conditions.delete(elementId)) this.composer.emit(EVENTS.CMS_CONDITION_CHANGED, { elementId });
   }
 
   /** Bindings whose element no longer exists anywhere (a deleted page). */
   private pruneMissing(): void {
-    const ids = new Set([...Object.keys(this.export()), ...this.collectionBindings.keys()]);
+    const ids = new Set([...Object.keys(this.export()), ...this.collectionBindings.keys(), ...this.conditions.keys()]);
     for (const id of ids) if (!this.composer.elements.getElement(id)) this.forgetBoundElement(id);
   }
 
@@ -167,6 +183,11 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
     if (list) {
       this.collectionBindings.set(toId, { ...list, elementId: toId });
       this.composer.emit(EVENTS.CMS_COLLECTION_BOUND, { elementId: toId, collectionId: list.collectionId });
+    }
+    const condition = this.conditions.get(fromId);
+    if (condition) {
+      this.conditions.set(toId, structuredClone(condition));
+      this.composer.emit(EVENTS.CMS_CONDITION_CHANGED, { elementId: toId });
     }
     const a = from.getChildren();
     const b = to.getChildren();
@@ -509,11 +530,92 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
     }
   }
 
+  // ============================================
+  // Conditions (B-11) and list queries (C-14)
+  // ============================================
+
+  /** One recorded history step around a binding-map write (as bind()). */
+  private recordStep(label: string | undefined, write: () => void): void {
+    if (label) this.composer.history?.flushPending?.();
+    write();
+    this.composer.markDirty?.();
+    if (label) this.composer.history?.record?.(label);
+    else this.composer.history?.noteUnrecordedAction?.("changing a condition");
+  }
+
+  /** The element's visibility condition, if it has one. */
+  getCondition(elementId: string): CmsCondition | null {
+    return this.conditions.get(elementId) ?? null;
+  }
+
+  hasConditions(): boolean {
+    return this.conditions.size > 0;
+  }
+
+  /**
+   * Set (or, with null, remove) an element's visibility condition — one
+   * history step when `historyLabel` is given. Refused while writes are
+   * locked or the element is locked (P-1).
+   */
+  setCondition(elementId: string, condition: CmsCondition | null, historyLabel?: string): boolean {
+    if (this.composer.writeLocked) return false;
+    if (this.composer.elements.getElement(elementId)?.isLocked?.()) {
+      this.composer.emit(EVENTS.LOCKED_ELEMENTS_SKIPPED, undefined);
+      return false;
+    }
+    const safe = condition ? filterCmsBindings({ conditions: { [elementId]: condition } })?.conditions?.[elementId] : null;
+    if (condition && !safe) return false;
+    this.recordStep(historyLabel, () => {
+      if (safe) this.conditions.set(elementId, safe);
+      else this.conditions.delete(elementId);
+    });
+    this.composer.emit(EVENTS.CMS_CONDITION_CHANGED, { elementId });
+    return true;
+  }
+
+  exportConditions(): Record<string, CmsCondition> {
+    return Object.fromEntries(this.conditions);
+  }
+
+  /** Replace every condition (a load, an undo); the save filter runs here too. */
+  importConditions(data: Record<string, CmsCondition> | undefined): void {
+    this.conditions.clear();
+    const safe = filterCmsBindings({ conditions: data ?? {} })?.conditions ?? {};
+    for (const [id, c] of Object.entries(safe)) this.conditions.set(id, c);
+  }
+
+  /**
+   * A Collection list's query (filter, sort, skip, Show) — one history step.
+   * Keys given as undefined are cleared; keys not given are kept.
+   */
+  setListQuery(listId: string, query: CMSListQuery, historyLabel?: string): boolean {
+    if (this.composer.writeLocked) return false;
+    const binding = this.collectionBindings.get(listId);
+    if (!binding) return false;
+    if (this.composer.elements.getElement(listId)?.isLocked?.()) {
+      this.composer.emit(EVENTS.LOCKED_ELEMENTS_SKIPPED, undefined);
+      return false;
+    }
+    const next: CMSCollectionBinding = { ...binding };
+    for (const key of ["filter", "sort", "skip", "limit"] as const) {
+      if (!(key in query)) continue;
+      const v = query[key];
+      if (v === undefined || (Array.isArray(v) && v.length === 0)) delete next[key];
+      else (next as unknown as Record<string, unknown>)[key] = v;
+    }
+    const safe = filterCmsBindings({ collection: { [listId]: next } })?.collection?.[listId];
+    if (!safe) return false;
+    this.recordStep(historyLabel, () => this.collectionBindings.set(listId, safe as CMSCollectionBinding));
+    this.composer.emit(EVENTS.CMS_LIST_QUERY_CHANGED, { elementId: listId });
+    return true;
+  }
+
   /**
    * Clean up on destroy
    */
   override destroy(): void {
     this.collectionBindings.clear();
+    this.conditions.clear();
     super.destroy();
   }
 }

@@ -271,7 +271,7 @@ describe("P-1 — CMS binding writers refuse a locked element", () => {
   it("CollectionListSection: binding a list", () => {
     const { c, bindCollectionList, emit } = cmsComposer(true);
     render(<CollectionListSection elementId="list" composer={c} isOpen />);
-    fireEvent.change(screen.getByRole("combobox", { name: "Collection" }), { target: { value: "menu" } });
+    fireEvent.change(screen.getByRole("combobox", { name: "Source" }), { target: { value: "menu" } });
     expect(bindCollectionList).not.toHaveBeenCalled();
     expect(emit).toHaveBeenCalledWith(EVENTS.LOCKED_ELEMENTS_SKIPPED, undefined);
   });

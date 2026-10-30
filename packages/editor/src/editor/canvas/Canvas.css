@@ -844,6 +844,21 @@ button:hover > .bd-canvas-empty-cta__thumb {
   pointer-events: none;
 }
 
+/* B-11 (2L9 B4-D04 255:94411): an element its condition hides on the preview
+   record stays on the canvas as a ghost, named — the export removes it. */
+.buildrick-canvas [data-bk-condition="hidden"] {
+  opacity: 0.4;
+  outline: 1px dashed var(--bk-gray-400);
+  outline-offset: 2px;
+}
+
+.buildrick-canvas [data-bk-condition="hidden"]::after {
+  content: "Hidden by condition";
+  display: block;
+  font: 400 12px/16px var(--bk-font-ui);
+  color: var(--bk-ink-muted);
+}
+
 /* An empty box inside a Collection list is the card's media slot, drawn as a
    plain grey block on 4428:151488 — not the dashed "Drop a block here" strip,
    which would repeat once per record. */

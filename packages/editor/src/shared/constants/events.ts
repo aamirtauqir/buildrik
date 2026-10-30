@@ -710,6 +710,10 @@ export const EVENTS = {
   CMS_PREVIEW_RECORD_CHANGED: "cms:preview-record-changed",
   CMS_MANAGE_RECORDS: "cms:manage-records",
   CMS_COLLECTION_UNBOUND: "cms:collection:unbound",
+  /** An element's visibility condition was set, changed or removed (B-11). */
+  CMS_CONDITION_CHANGED: "cms:condition:changed",
+  /** A Collection list's query (filter / sort / skip / limit) changed (C-14). */
+  CMS_LIST_QUERY_CHANGED: "cms:list-query:changed",
 
   // ============================================
   // AI Events

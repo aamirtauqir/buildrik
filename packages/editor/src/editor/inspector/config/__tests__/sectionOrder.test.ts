@@ -98,7 +98,7 @@ describe("section order", () => {
   it("156:716 / 156:6055 — Form: Fields on Content, Form settings on Behavior", () => {
     expect(titlesFor("content", "form")).toEqual(["Fields", "Semantics", "Advanced attributes"]);
     expect(titlesFor("behaviour", "form")).toEqual(["After submit", "Visibility", "Interactions"]);
-    expect(titlesFor("content", "collection-list")).toEqual(["Collection", "Semantics", "Advanced attributes"]);
+    expect(titlesFor("content", "collection-list")).toEqual(["Collection list", "Semantics", "Advanced attributes"]);
     expect(titlesFor("content", "slider")).toEqual(["Slides", "Semantics", "Advanced attributes"]);
     expect(titlesFor("behaviour", "slider")).toEqual(["Playback", "Visibility", "Interactions"]);
   });

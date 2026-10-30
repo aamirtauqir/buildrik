@@ -8,6 +8,7 @@ import { CURRENT_ITEM_ATTR, followsContextRecord, RepeaterRenderer, richtextKeys
 import type { Composer } from "../Composer";
 import { URL_ATTRIBUTES } from "@buildrik/shared/schemas/element-markup";
 import { cmsRecordToken } from "@buildrik/shared/schemas/cms";
+import { applyPageConditions, stripConditionState, templateCollectionFor } from "./conditionRender";
 
 export type CMSExportMode = "static" | "template" | "none";
 export type TemplateSyntax = "handlebars" | "liquid";
@@ -109,7 +110,7 @@ export class CMSExportResolver {
     /* Collection lists first (G3-079): their per-record copies are what the
        field bindings below then resolve over. A page without one is left
        untouched by this step. */
-    await new RepeaterRenderer(this.composer).expandCollectionLists(doc);
+    await new RepeaterRenderer(this.composer).expandCollectionLists(doc, { pageFile });
     const elements = doc.querySelectorAll("[data-buildrick-id]");
     const promises: Promise<void>[] = [];
 
@@ -141,6 +142,16 @@ export class CMSExportResolver {
     });
 
     await Promise.all(promises);
+
+    /* B-11: the page's own conditions — on a template page the server
+       evaluates them per generated page (data-bk-if); elsewhere (a preview)
+       against the preview record. List copies already decided theirs. */
+    await applyPageConditions(doc, this.composer, {
+      canvas: false,
+      pageFile,
+      perRecordOnServer: Boolean(templateCollectionFor(this.composer, pageFile)),
+    });
+    stripConditionState(doc);
 
     clearItemPlaceholders(doc);
 

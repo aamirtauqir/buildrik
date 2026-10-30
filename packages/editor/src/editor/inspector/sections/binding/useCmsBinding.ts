@@ -108,8 +108,20 @@ function listCollectionId(composer: Composer, elementId: string): string | null 
 /** The collection whose template page is the active page, if any. */
 function templateCollectionId(composer: Composer, collections: CMSCollection[]): string | null {
   const page = composer.elements.getActivePage?.();
-  const file = page ? pageFileNames(composer.elements.getAllPages()).get(page.id) : undefined;
+  const file = page ? pageFileNames(composer.elements.getAllPages?.() ?? []).get(page.id) : undefined;
   return (file && collections.find((c) => c.pageTemplatePath === file)?.id) || null;
+}
+
+/**
+ * The collection whose record an element reads its conditions against (B-11):
+ * the Collection list it sits in, else the template page's collection; null
+ * on a plain page (no record — conditions are not offered).
+ */
+export function recordContextOf(composer: Composer | null | undefined, elementId: string): CMSCollection | null {
+  if (!composer?.cms?.collections) return null;
+  const collections: CMSCollection[] = composer.cms.collections.getAllCollections?.() ?? [];
+  const id = listCollectionId(composer, elementId) ?? templateCollectionId(composer, collections);
+  return collections.find((c) => c.id === id) ?? null;
 }
 
 export function useCmsBinding(composer: Composer | null | undefined, elementId: string): CmsBindingState {
@@ -117,7 +129,7 @@ export function useCmsBinding(composer: Composer | null | undefined, elementId: 
   React.useEffect(() => {
     if (!composer) return;
     const bump = () => setTick((t) => t + 1);
-    const evs = [EVENTS.BINDING_CREATED, EVENTS.BINDING_REMOVED, EVENTS.CMS_CONTENT_UPDATED, EVENTS.CMS_COLLECTION_UPDATED, EVENTS.PROJECT_LOADED];
+    const evs = [EVENTS.BINDING_CREATED, EVENTS.BINDING_REMOVED, EVENTS.CMS_CONTENT_UPDATED, EVENTS.CMS_COLLECTION_UPDATED, EVENTS.PROJECT_LOADED, EVENTS.CMS_PREVIEW_RECORD_CHANGED];
     evs.forEach((e) => composer.on(e, bump));
     /* Collections are created / updated / deleted on the CMS store's own
        emitter — an update is how a page becomes a template page
@@ -175,13 +187,22 @@ export function useCmsBinding(composer: Composer | null | undefined, elementId: 
     setPreview(null);
     /* Every record, not queryContent's 50-row page: a pinned record is found
        by id wherever it sits, as publish finds it (EDT-003). */
-    void composer.cms.collections
-      .getContentItems(collection.id)
-      .then((rows) => {
+    /* A-25 (173:12022 / 177:17091): on the template page "this page's
+       record" is the record bar's choice — its place among the canvas's
+       candidates (drafts count while Show drafts is on). */
+    const onTemplate = templateCollection?.id === collection.id && (!itemId || itemId === "context");
+    const bindings = composer.cms.bindings;
+    void Promise.all([
+      composer.cms.collections.getContentItems(collection.id),
+      onTemplate && bindings.previewCandidates ? bindings.previewCandidates(collection.id) : Promise.resolve(null),
+      onTemplate && bindings.getPreviewRecord ? bindings.getPreviewRecord(collection.id) : Promise.resolve(null),
+    ])
+      .then(([rows, candidates, chosen]) => {
         if (!live) return;
         setRecords(rows);
-        const items = rows.filter((r) => r.status === "published");
-        const found = itemId && itemId !== "context" ? items.findIndex((i) => i.id === itemId) : 0;
+        const items = candidates ?? rows.filter((r) => r.status === "published");
+        const found =
+          itemId && itemId !== "context" ? items.findIndex((i) => i.id === itemId) : chosen ? Math.max(0, items.findIndex((i) => i.id === chosen.id)) : 0;
         /* A pinned record that isn't published publishes nothing — say so,
            never preview another record in its place. */
         if (found < 0) return setPreview({ value: "", record: null, index: -1, total: items.length });
@@ -194,7 +215,7 @@ export function useCmsBinding(composer: Composer | null | undefined, elementId: 
     return () => {
       live = false;
     };
-  }, [composer, collection?.id, binding?.fieldSlug, binding?.itemId, tick, attempt]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [composer, collection?.id, binding?.fieldSlug, binding?.itemId, templateCollection?.id, tick, attempt]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const status: BindingStatus | null = !binding || missing
     ? null

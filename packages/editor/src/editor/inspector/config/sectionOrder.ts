@@ -21,6 +21,9 @@ import { capabilitiesFor } from "@/shared/constants/elementCapabilities";
 const CONTENT_ORDER: readonly SectionId[] = [
   /* B5-D04: a bound element's Dynamic bindings head the tab. */
   "cms-binding",
+  /* B-17 / B-21: a modal trigger's dialog, a Tabs block's pairs (2L9 C07, C01). */
+  "modal-relationship",
+  "tabs-pairs",
   "type",
   "form-fields",
   "slides",
@@ -31,6 +34,8 @@ const CONTENT_ORDER: readonly SectionId[] = [
   "table-accessibility",
   "table-cell",
   "semantics",
+  /* B-11: Conditions sit above Advanced attributes (2L9 B4-D04). */
+  "conditions",
   "attributes",
 ];
 
@@ -56,6 +61,8 @@ const STYLE_ORDER: readonly SectionId[] = [
 /* Board 156:6055: the type's own settings lead, then Visibility and
    Interactions. */
 const BEHAVIOUR_ORDER: readonly SectionId[] = [
+  /* 2L9 C18: a dialog's behaviour heads Behavior. */
+  "dialog-behavior",
   "form-settings",
   "slider-settings",
   "link",
