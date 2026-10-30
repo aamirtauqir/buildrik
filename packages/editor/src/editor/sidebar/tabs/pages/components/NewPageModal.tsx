@@ -53,10 +53,12 @@ export function NewPageModal({ composer }: { composer: Composer | null }) {
 
   React.useEffect(() => {
     if (!composer) return;
-    const onRequest = () => {
-      setName(getDefaultPageName(composer.elements.getAllPages()));
-      setSource("blank");
-      setAddToNav(true);
+    /* A plain request starts fresh; Templates' "‹ Back to New page" / Change
+       (104:28892) hands back what the dialog had, from template. */
+    const onRequest = (data?: { name?: string; addToNavigation?: boolean }) => {
+      setName(data?.name ?? getDefaultPageName(composer.elements.getAllPages()));
+      setSource(data?.name ? "template" : "blank");
+      setAddToNav(data?.addToNavigation ?? true);
       setError(null);
       setOpen(true);
     };

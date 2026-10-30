@@ -43,7 +43,7 @@ function makeComposer() {
       addPageToNavigation: vi.fn(() => 1),
     },
   };
-  const request = () => act(() => handlers.get(EVENTS.UI_NEW_PAGE_REQUESTED)?.forEach((fn) => fn({})));
+  const request = (data: object = {}) => act(() => handlers.get(EVENTS.UI_NEW_PAGE_REQUESTED)?.forEach((fn) => fn(data)));
   return { composer, request };
 }
 
@@ -108,6 +108,16 @@ describe("NewPageModal", () => {
      opened, so leaving the catalogue (Back to canvas) left that page behind.
      Now nothing is created until a template is chosen; the typed name rides
      along for the catalogue's Create page. */
+  // design-2l9 104:28892: Templates' Back to New page reopens the dialog as it was.
+  it("a request carrying a name reopens on From template with that name and choice", () => {
+    const { composer, request } = makeComposer();
+    render(<NewPageModal composer={composer as never} />);
+    request({ name: "Services", addToNavigation: false });
+    expect(screen.getByLabelText("Page name")).toHaveValue("Services");
+    expect(screen.getByTestId("new-page-source-template")).toHaveAttribute("aria-checked", "true");
+    expect(screen.getByRole("checkbox", { name: "Add to site navigation" })).not.toBeChecked();
+  });
+
   it("From template → opens the catalogue with the name, and creates nothing yet", () => {
     const { composer, request } = makeComposer();
     render(<NewPageModal composer={composer as never} />);

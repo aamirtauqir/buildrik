@@ -31,13 +31,15 @@ import {
 } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants/events";
-import { listNames } from "@shared/utils/helpers/string";
+import { listNames, slugify } from "@shared/utils/helpers/string";
 import type { DrawerTab, PageSettingsOpenRequest } from "./types";
 import { PageContextMenu } from "./components/PageContextMenu";
 import { MovePagesDialog, TOP_LEVEL } from "./components/MovePagesDialog";
 import { PageList } from "./components/PageList";
 import { SiteStructureTree } from "./components/SiteStructureTree";
 import { AddPageButton } from "./components/AddPageButton";
+import { LiveUrlConfirm, type LiveUrlChange } from "./components/LiveUrlConfirm";
+import { usePagesNotice } from "./usePagesNotice";
 import { SearchListingsTable } from "./components/SearchListingsTable";
 import { PageSettingsDrawer } from "./page-settings/PageSettingsDrawer";
 import { useDirtyPages } from "@/editor/shared/useDirtyPages";
@@ -107,28 +109,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
   openSettingsRequest,
 }) => {
   const p = usePages(composer);
-  /* The note under the list, until another page is opened: a page that left
-     the list and came back (⌘Z after a delete, board 63:20585) or a rename
-     that kept its URL (63:23182). */
-  const [notice, setNotice] = React.useState<{ text: string; open?: { id: string; label: string } } | null>(null);
-  const seen = React.useRef<{ ids: Set<string>; gone: Set<string> }>({ ids: new Set(), gone: new Set() });
-  React.useEffect(() => {
-    const now = new Set(p.pages.map((pg) => pg.id));
-    const { ids, gone } = seen.current;
-    for (const id of ids) {
-      if (!now.has(id)) gone.add(id);
-    }
-    for (const pg of p.pages) {
-      if (gone.has(pg.id)) {
-        gone.delete(pg.id);
-        setNotice({
-          text: `${pg.name} restored. Page settings and URL retained.`,
-          open: { id: pg.id, label: `Open ${pg.name} in Editor` },
-        });
-      }
-    }
-    seen.current.ids = now;
-  }, [p.pages]);
+  const { notice, setNotice } = usePagesNotice(p.pages);
 
   // Folders — sidebar-only, localStorage-persisted
   /* This read was `(composer as { id?: string })?.id`, and Composer has no
@@ -285,8 +266,12 @@ export const PagesTab: React.FC<PagesTabProps> = ({
   }, [closePageSettings]);
 
   const [movedFrom, setMovedFrom] = React.useState<{ pageId: string; slug: string } | null>(null);
+  /* design-2l9 63:15255: "Update URL" on a LIVE page asks first. Live is
+     real state: the site has been published (project metadata's
+     publishedUrl) and the page is not hidden from publish. */
+  const [liveUrlChange, setLiveUrlChange] = React.useState<LiveUrlChange | null>(null);
   const handleRenameCommit = React.useCallback(
-    (pageId: string, name: string, updateUrl?: boolean) => {
+    (pageId: string, name: string, updateUrl?: boolean, confirmed = false) => {
       const trimmed = name.trim();
       if (trimmed) {
         const exists = p.pages.some(
@@ -300,6 +285,12 @@ export const PagesTab: React.FC<PagesTabProps> = ({
       setNameError(null);
       const page = p.pages.find((pg) => pg.id === pageId);
       const before = page?.slug;
+      const siteLive = Boolean(composer?.getProjectMetadata?.()?.publishedUrl);
+      if (updateUrl && !confirmed && page && !page.isHome && siteLive && page.status !== "hidden") {
+        setLiveUrlChange({ pageId, current: page.name, name: trimmed, from: pageRoute(page), to: `/${slugify(trimmed)}` });
+        p.cancelRename();
+        return;
+      }
       p.commitRename(pageId, name, updateUrl);
       if (!updateUrl && page && !page.isHome && trimmed && trimmed !== page.name) {
         setNotice({ text: `Page renamed. URL kept at ${pageRoute(page)}.` });
@@ -311,7 +302,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
         p.openSettings(pageId);
       }
     },
-    [p]
+    [p, composer]
   );
 
   const handleDeleteRequest = (pageId: string) => {
@@ -727,6 +718,16 @@ export const PagesTab: React.FC<PagesTabProps> = ({
         onClose={() => setMovingPageId(null)}
       />
       {/* Delete confirmation dialog */}
+      {liveUrlChange && (
+        <LiveUrlConfirm
+          change={liveUrlChange}
+          onCancel={() => setLiveUrlChange(null)}
+          onConfirm={() => {
+            setLiveUrlChange(null);
+            handleRenameCommit(liveUrlChange.pageId, liveUrlChange.name, true, true);
+          }}
+        />
+      )}
       <ConfirmDialog
         open={!!deleteTargetId}
         onClose={() => setDeleteTargetId(null)}

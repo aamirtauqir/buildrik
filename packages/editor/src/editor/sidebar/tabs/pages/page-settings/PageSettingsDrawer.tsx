@@ -27,7 +27,7 @@ import { usePageSettings } from "./usePageSettings";
 import { SeoTab } from "./SeoTab";
 import { SocialTab } from "./SocialTab";
 import { AdvancedTab } from "./AdvancedTab";
-import { UnsavedWarningModal } from "./UnsavedWarningModal";
+import { UnsavedWarningModal, type LeaveGuardMode } from "./UnsavedWarningModal";
 import { Button, Portal, useFocusTrap } from "@/editor/chrome-ui";
 const TABS: { id: DrawerTab; label: string }[] = [
   { id: "seo", label: "SEO" },
@@ -102,6 +102,38 @@ const PageSettingsCard: React.FC<Props> = ({ page, allPages, composer, onClose, 
     onClose();
     afterCloseRef.current?.();
     afterCloseRef.current = null;
+  };
+
+  /* The return to Pages with unsaved settings (boards 101:22426…101:28183,
+     109:32246). `leaving` follows the REAL save that Save and leave started:
+     "saving" while it is in flight, "rejected" when it failed. Cancel
+     navigation stops only the leaving — the save carries on, and a save that
+     lands after it leaves the dialog open (101:28183). `returnPending` is the
+     form's own "After saving: return to Pages" foot, reached through Fix page
+     URL when the URL is what blocks the save (101:24836). */
+  const [leaving, setLeaving] = React.useState<"none" | "saving" | "rejected">("none");
+  const [returnPending, setReturnPending] = React.useState(false);
+  const navCancelled = React.useRef(false);
+  const guardMode: LeaveGuardMode =
+    leaving === "saving" ? "saving" : leaving === "rejected" ? "rejected" : s.slugError ? "invalid-url" : "ask";
+
+  const saveAndLeave = async () => {
+    navCancelled.current = false;
+    setReturnPending(false);
+    s.setShowDiscardConfirm(true);
+    setLeaving("saving");
+    const ok = await s.save();
+    if (navCancelled.current) {
+      setLeaving("none");
+      return;
+    }
+    if (ok) {
+      setLeaving("none");
+      s.setShowDiscardConfirm(false);
+      close();
+    } else {
+      setLeaving("rejected");
+    }
   };
 
   const handleClose = () => {
@@ -204,6 +236,25 @@ const PageSettingsCard: React.FC<Props> = ({ page, allPages, composer, onClose, 
             Couldn’t save page settings. Your changes are still here.
           </p>
         )}
+        {returnPending ? (
+          /* 101:24836: the return is still pending while the URL is fixed. */
+          <div className="bd-pg-drawer-foot" data-testid="pg-drawer-foot">
+            <p className="tw:m-0 tw:mr-auto tw:self-center tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="pg-drawer-return-note">
+              {`After saving: return to Pages${stays ? ` · ${stays} stays open` : ""}`}
+            </p>
+            <Button color="light" size="xs" data-testid="pg-drawer-cancel-nav" onClick={() => setReturnPending(false)}>
+              Cancel navigation
+            </Button>
+            <Button
+              size="xs"
+              data-testid="pg-drawer-save-leave"
+              disabled={Boolean(s.slugError) || s.saveState === "saving"}
+              onClick={() => void saveAndLeave()}
+            >
+              Save and leave
+            </Button>
+          </div>
+        ) : (
         <div className="bd-pg-drawer-foot" data-testid="pg-drawer-foot">
           <Button color="light" size="xs" data-testid="pg-drawer-cancel" onClick={handleCancel}>
             Cancel
@@ -219,23 +270,33 @@ const PageSettingsCard: React.FC<Props> = ({ page, allPages, composer, onClose, 
             {s.saveState === "error" ? "Retry save" : "Save"}
           </Button>
         </div>
+        )}
       </div>
       {/* The guarded close (✕ / ESC / scrim on a dirty form): Discard throws
           the edits away and closes, Keep editing returns to the form. */}
       <UnsavedWarningModal
         isOpen={s.showDiscardConfirm}
+        mode={guardMode}
         pageName={page.name}
         stays={stays}
-        onSaveAndLeave={async () => {
+        emptyUrl={!s.slug.trim()}
+        onSaveAndLeave={() => void saveAndLeave()}
+        onFixUrl={() => {
           s.setShowDiscardConfirm(false);
-          if (await s.save()) close();
+          s.setActiveTab("seo");
+          setReturnPending(true);
+          requestAnimationFrame(() => document.getElementById("seo-slug")?.focus());
         }}
         onDiscard={() => {
           s.discard();
+          setLeaving("none");
           s.setShowDiscardConfirm(false);
           close();
         }}
         onCancel={() => {
+          /* Keep editing, or — while saving — Cancel navigation. */
+          if (leaving === "saving") navCancelled.current = true;
+          setLeaving("none");
           afterCloseRef.current = null;
           s.setShowDiscardConfirm(false);
         }}

@@ -177,8 +177,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No 'Change this live page’s URL?' consequence dialog before Update URL on a live page",
+   "verified": "drift-open",
+   "verifiedNote": "Built and probe-compared 2026-10-30 (case pages-live-site; board shots/63-15255.png): 'Update URL' on a live page — the site has a publishedUrl and the page is not hidden from publish (real state) — asks 'Change this live page’s URL?' / 'About is live at /about. Changing it to /our-story can break old links after publishing. You can add a redirect after the change.' Cancel · Change URL; Cancel changes nothing, an unpublished site is not asked (test PagesTab.liveUrl). Open: the shared ConfirmDialog draws it wider with its buttons on the right; the board has a 480 card with them on the left.",
    "tier": "P1"
   },
   {
@@ -630,8 +630,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No navigation-pending/saving/offline/invalid-slug draft states",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-30 (board shots/101-22426.png, against the pages-settings-leave / pages-settings-save-failed probes): the retained draft is the dialog itself — 'About · Unsaved settings changes · Home stays open', 'SEO title · n / 60 · Unsaved override', Cancel · Save. The return flow starts from here (✕ / Esc / scrim).",
    "tier": "P1"
   },
   {
@@ -641,8 +641,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No navigation-pending/saving/offline/invalid-slug draft states",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-30 (case pages-settings-leave&save=hang; board shots/101-23017.png): Save and leave keeps the guard up while the REAL save is in flight — 'Saving About settings…', 'After saving, return to Pages. Home will stay open.', the note on cancelling, Cancel navigation · Saving… (disabled). Lands → the dialog closes.",
    "tier": "P1"
   },
   {
@@ -652,8 +652,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared 2026-10-30 (board shots/101-23620.png): a 'Couldn’t save About settings' dialog with Keep editing · Discard changes · Retry save and leave, raised when a save fails while a return to Pages is pending. The navigation-pending flow (101:22426…101:28183) is not built; the code shows the save failure inline (63:18189).",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-30 (case pages-settings-leave&save=reject; board shots/101-23620.png): the save rejected → 'Couldn’t save About settings', 'Your draft is still here. Nothing was applied. After a successful save, return to Pages; Home stays open.', the server note, Keep editing · Discard changes · Retry save and leave. Test PageSettingsDrawer.returnFlow.",
    "tier": "P1"
   },
   {
@@ -674,8 +674,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No navigation-pending/saving/offline/invalid-slug draft states",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-30 (same probe, then Fix page URL; board shots/101-24836.png): back in the form on the SEO tab, URL field focused, the foot reads 'After saving: return to Pages · Home stays open' with Cancel navigation · Save and leave (disabled while the URL is invalid). The board puts the note on its own line above the buttons; ours shares the row.",
    "tier": "P1"
   },
   {
@@ -686,7 +686,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No navigation-pending/saving/offline/invalid-slug draft states",
+   "verifiedNote": "Built 2026-10-30, not image-compared: with the URL corrected, the pending foot's Save and leave enables and runs the same real save-and-leave (101:23017 / 101:23620).",
    "tier": "P1"
   },
   {
@@ -695,9 +695,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "code:pages-are-local-document",
    "verified": "no",
-   "verifiedNote": "No navigation-pending/saving/offline/invalid-slug draft states",
+   "verifiedNote": "The save is composer.elements.updatePage — a local engine write (the document saves to the server separately, the shell's concern). There is no offline page-settings state to draw; the board's offline draft has nothing real behind it. 2026-10-30.",
    "tier": "P1"
   },
   {
@@ -708,7 +708,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No navigation-pending/saving/offline/invalid-slug draft states",
+   "verifiedNote": "Built 2026-10-30, not image-compared: Cancel navigation during the save closes only the guard; the save carries on and, when it lands, the dialog stays open (test PageSettingsDrawer.returnFlow 'Cancel navigation stops the leaving, not the save').",
    "tier": "P1"
   },
   {
@@ -829,9 +829,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "code:create-is-synchronous",
    "verified": "no",
-   "verifiedNote": "No in-dialog 'Creating…' progress; code closes + 'Page created' toast",
+   "verifiedNote": "Compared 2026-10-30 (board shots/101-41858.png). The board draws an in-dialog 'Creating Services…' state; the code's blank create is composer.elements.createPage — a synchronous local engine write with no pending phase (NewPageModal.create), so there is no real state to show and none is faked. Errors still land in the dialog (101:40412).",
    "tier": "P1"
   },
   {
@@ -853,7 +853,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Board '‹ Back to New page', 'Creating “Services”' strip; code back reads ‹ Back to canvas/Pages (L-C)",
+   "verifiedNote": "Built and probe-compared 2026-10-30 (case templates-resource-area&page=Services; board shots/104-28892.png): a visit from New page shows 'Creating “Services”' / 'Add to site navigation' with Change, and the back door reads '‹ Back to New page'; both reopen New page with the name and choice, From template (tests TemplatesTab.workspace / NewPageModal). Open: the board's strip spans under a slim header in a redesigned Templates workspace (Show · All/Built-in/Saved, cards with Preview) — that layout is L-C's Templates surface; and the strip's '· 6 of 10 pages on Free' is not carried.",
    "tier": "P1"
   },
   {
@@ -1007,9 +1007,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "code:pages-are-local-document",
    "verified": "no",
-   "verifiedNote": "No navigation-pending/saving/offline/invalid-slug draft states",
+   "verifiedNote": "Same as 101:27566: page settings save to the local document, so an offline-retained draft is not a real state here. The invalid-URL draft itself is 109:32246 / 101:24836. 2026-10-30.",
    "tier": "P1"
   },
   {
@@ -1019,8 +1019,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Code Keep editing/Discard; board 'Leave without saving?' + Save and leave (+offline/invalid variants)",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-30 (case pages-settings-leave with the URL cleared; board shots/109-32246.png): an invalid page URL turns the guard into 'About has unsaved page settings and an empty page URL. Closing returns to Pages; Home stays open.' + 'Saving requires a valid page URL…', Keep editing · Discard changes · Fix page URL (the save would refuse the URL, so no Save and leave).",
    "tier": "P1"
   },
   {
