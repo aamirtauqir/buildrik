@@ -8,7 +8,6 @@
  *   [ Add tab ]
  *   Relationships · Overview  tab-01 → panel-01 …
  *   Stable IDs · no pairing by label or position.
- *   Opens first [Overview ▾]
  *   Tab actions · [ Move Details before Overview ]
  *
  * Every write is the model's own history step (a legacy block gets its keys
@@ -22,6 +21,8 @@ import { Button } from "@/editor/chrome-ui";
 import { EVENTS } from "@/shared/constants/events";
 import { canWrite } from "@/engine/commands/commandOperations";
 import { addTab, moveTab, readTabs, setInitialTab } from "@/engine/widgets/tabsModel";
+import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
+import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
 import { Section, SelectRow } from "../shared/controls";
 import { GROUP_TITLE, WIDE_BUTTON } from "../shared/controls/controlClasses";
 import { NoteRow } from "./behaviourRows";
@@ -45,7 +46,6 @@ export function TabsSection({ composer, elementId, isOpen, onToggle }: { compose
   if (!tabs) return null;
   const { pairs } = tabs;
   const writable = () => canWrite(composer, elementId);
-  const initial = tabs.initial ?? pairs[0]?.key ?? "";
 
   return (
     <Section
@@ -64,7 +64,11 @@ export function TabsSection({ composer, elementId, isOpen, onToggle }: { compose
             className={WIDE_BUTTON}
             onClick={() => {
               const panel = composer.elements.getElement(p.panelId);
-              if (panel) composer.selection.select(panel);
+              if (!panel) return;
+              composer.selection.select(panel);
+              /* C05: the panel opens on Content › Editing panel, not on a
+                 container's default tab. After the selection settles. */
+              setTimeout(() => composer.emit(EVENTS.UI_INSPECTOR_FOCUS_SECTION, { section: "tab-panel" }), 0);
             }}
             data-testid={`tabs-edit-panel-${p.key}`}
           >
@@ -88,13 +92,6 @@ export function TabsSection({ composer, elementId, isOpen, onToggle }: { compose
         <NoteRow>
           {tabs.legacy ? "Paired by position until the first edit gives each pair a stable ID." : "Stable IDs · no pairing by label or position."}
         </NoteRow>
-        <SelectRow
-          label="Opens first"
-          value={initial}
-          placeholder={null}
-          options={pairs.map((p) => ({ value: p.key, label: p.label || p.key }))}
-          onChange={(key) => writable() && setInitialTab(composer, elementId, key)}
-        />
         {pairs.length >= 2 ? (
           <>
             <div className={`${GROUP_TITLE} tw:mb-1!`}>Tab actions</div>
@@ -109,6 +106,98 @@ export function TabsSection({ composer, elementId, isOpen, onToggle }: { compose
             </Button>
           </>
         ) : null}
+      </div>
+    </Section>
+  );
+}
+
+/** The Tabs root an element belongs to: itself, or the root of the panel / tab it is. */
+function tabsRootOf(composer: Composer, elementId: string): string | null {
+  for (let el = composer.elements.getElement(elementId) ?? null; el; el = el.getParent?.() ?? null) if (el.getType() === "tabs") return el.getId();
+  return null;
+}
+
+function useTabsVersion(composer: Composer | null | undefined): void {
+  const [, bump] = React.useReducer((n: number) => n + 1, 0);
+  React.useEffect(() => {
+    if (!composer) return;
+    composer.on(EVENTS.ELEMENT_UPDATED, bump);
+    composer.on(EVENTS.PROJECT_CHANGED, bump);
+    return () => {
+      composer.off(EVENTS.ELEMENT_UPDATED, bump);
+      composer.off(EVENTS.PROJECT_CHANGED, bump);
+    };
+  }, [composer]);
+}
+
+/**
+ * Behavior › Tabs on the root (2L9 B4-C06 `245:39392`): Initial tab — the
+ * authored pair visitors start on — and how visitors operate it.
+ */
+export function TabsBehaviorSection({ composer, elementId, isOpen, onToggle }: { composer: Composer | null | undefined; elementId: string; isOpen?: boolean; onToggle?: () => void }) {
+  useTabsVersion(composer);
+  if (!composer) return null;
+  const tabs = readTabs(composer, elementId);
+  if (!tabs) return null;
+  const initial = tabs.initial ?? tabs.pairs[0]?.key ?? "";
+  return (
+    <Section title="Tabs" isOpen={isOpen} onToggle={onToggle}>
+      <div className="tw:flex tw:flex-col tw:gap-1" data-testid="inspector-tabs-behavior">
+        <SelectRow
+          label="Initial tab"
+          value={initial}
+          placeholder={null}
+          options={tabs.pairs.map((p) => ({ value: p.key, label: p.label || p.key }))}
+          onChange={(key) => canWrite(composer, elementId) && setInitialTab(composer, elementId, key)}
+        />
+        <NoteRow>Initial tab is authored. Inspecting a panel does not change it.</NoteRow>
+        <NoteRow>Arrow keys, Home and End move focus. Enter or Space activates.</NoteRow>
+        <Button
+          color="light"
+          size="xs"
+          className={WIDE_BUTTON}
+          onClick={() => composer.emit(EVENTS.UI_INSPECTOR_FOCUS_SECTION, { section: "tabs-pairs" })}
+          data-testid="tabs-back-to-content"
+        >
+          Back to paired content
+        </Button>
+      </div>
+    </Section>
+  );
+}
+
+/**
+ * Content › Editing panel on a Tabs panel (2L9 B4-C05 `245:38888`): the
+ * canvas shows it while selected (editor only — the runtime reveals the
+ * panel that holds the selection); visitors start on the initial pair.
+ */
+export function TabPanelSection({ composer, elementId, isOpen, onToggle }: { composer: Composer | null | undefined; elementId: string; isOpen?: boolean; onToggle?: () => void }) {
+  useTabsVersion(composer);
+  if (!composer) return null;
+  const rootId = tabsRootOf(composer, elementId);
+  const tabs = rootId ? readTabs(composer, rootId) : null;
+  const pair = tabs?.pairs.find((p) => p.panelId === elementId);
+  if (!rootId || !tabs || !pair) return null;
+  const root = composer.elements.getElement(rootId);
+  const first = tabs.pairs.find((p) => p.key === (tabs.initial ?? tabs.pairs[0]?.key));
+  const rootName = root ? (getLayerName(root) ?? elementTypeLabel(root.getType())) : "Tabs";
+  return (
+    <Section title="Editing panel" isOpen={isOpen} onToggle={onToggle}>
+      <div className="tw:flex tw:flex-col tw:gap-1" data-testid="inspector-tab-panel">
+        <NoteRow>Shown in editor only. Visitors still start on {first?.label || "the first tab"}.</NoteRow>
+        <Button color="light" size="xs" className={WIDE_BUTTON} onClick={() => root && composer.selection.select(root)} data-testid="tab-panel-back">
+          Back to {rootName}
+        </Button>
+        <div className={`${GROUP_TITLE} tw:mb-1!`}>Native attributes</div>
+        <div className="bdi-row-ctrl">
+          <span className="bdi-lb">ID</span>
+          <span className="bdi-row-content tw:text-[12px] tw:text-[var(--bk-ink-soft)]">{tabs.legacy ? "assigned on first edit" : panelKeyOf(pair.key)}</span>
+        </div>
+        <div className="bdi-row-ctrl">
+          <span className="bdi-lb">Labelled by</span>
+          <span className="bdi-row-content tw:text-[12px] tw:text-[var(--bk-ink-soft)]">{tabs.legacy ? "its tab, by position" : pair.key}</span>
+        </div>
+        <NoteRow>Panel content keeps its own IDs, styles and bindings.</NoteRow>
       </div>
     </Section>
   );

@@ -5280,8 +5280,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "L-B round 21: reopened — the Tabs model landed (L-A round 19, engine-tabs.md); the C01 section is built on it. Not yet compared against this board.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 22: probe ?block=tabs › Content › '{tab} · Edit panel' side by side with shots/245-38888.png: the panel opens on Content › 'Editing panel' — 'Shown in editor only. Visitors still start on {initial}.', 'Back to {Tabs}', Native attributes ID panel-0n / Labelled by tab-0n, 'Panel content keeps its own IDs, styles and bindings.' — match. Board's 'Edit text on canvas' is its sample panel's text row; this panel is a container. Canvas reveal of the selected panel is L-A's runtime.",
    "tier": "P1"
   },
   {
@@ -5291,8 +5291,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "L-B round 21: reopened — the Tabs model landed (L-A round 19, engine-tabs.md); the C01 section is built on it. Not yet compared against this board.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 22 on the Tabs model: probe ?block=tabs › Behavior side by side with shots/245-39392.png: 'Tabs' · Initial tab [{label} ▾] (setInitialTab, one step), 'Initial tab is authored. Inspecting a panel does not change it.', 'Arrow keys, Home and End move focus. Enter or Space activates.', 'Back to paired content' — match (the published runtime is L-A's tabsRuntime). The C01 'Opens first' row moved here.",
    "tier": "P1"
   },
   {
