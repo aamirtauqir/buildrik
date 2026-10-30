@@ -28,6 +28,7 @@ import { setInsertReceiptSink, takePendingInsertGroup, takePendingPasteHtml, typ
 import { addTabOf, buildInsertGroups, blockRows, componentRows, elementCategoryGroups, type AddTabId, type InsertGroup, type InsertGroupId } from "./catalog/groups";
 import type { FlatElEntry } from "./catalog/types";
 import { InsertTargetStrip } from "./components/InsertTargetStrip";
+import { CmsAddSection } from "./components/CmsAddSection";
 import { CATALOG } from "./catalog/catalog";
 import { EVENTS } from "@/shared/constants";
 import type { ComponentDefinition } from "@/shared/types/components";
@@ -325,6 +326,13 @@ export const BuildTab: React.FC<BuildTabProps> = ({
           </div>
         ) : (
           <div className="bld-scroll" role="tabpanel" id="add-panel-tabpanel" aria-labelledby={`add-panel-tabpanel-tab-${addTab}`}>
+            {/* 176:21119 / 189:21741: the site's CMS rows lead the Elements tab. */}
+            {addTab === "elements" && (
+              <CmsAddSection
+                composer={composer}
+                onBlankList={() => onBlockClick?.({ id: "collection-list", label: "Collection list", category: "basic" })}
+              />
+            )}
             {/* Blocks insert through the SAME onBlockClick path elements use —
                 BlockDefinition extends BlockData. */}
             {tabGroups.map((g) => (
