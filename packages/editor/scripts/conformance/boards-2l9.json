@@ -8356,8 +8356,8 @@
    "family": "resources",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C C1: \"Leave without saving?\" names the record / destination tab or collection; Keep editing · Discard changes · Save and leave (RecordSheet.tsx). Origin label (\"Your destination is …\") waits on C2.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-C 2026-10-31 compared (RecordSheet cms-discard modal, the dialog 168:21408 probe-compared) vs shots/168-21848.png: 'Leave without saving?', 'Save or discard the edits to “{record}” before opening {tab}.', Keep editing (filled) · Discard changes · Save and leave — same component and copy for every record → tab/exit guard. | built, not compared — L-C C1: \"Leave without saving?\" names the record / destination tab or collection; Keep editing · Discard changes · Save and leave (RecordSheet.tsx). Origin label (\"Your destination is …\") waits on C2.",
    "inheritsFrom": "168:21408",
    "tier": "P2"
   },
@@ -8368,8 +8368,8 @@
    "family": "resources",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "built, not compared — L-C C1: Save and leave shows \"Saving record…\" + Saving… + Stay here; success takes the chosen way out (RecordSheet.tsx).",
+   "verified": "drift-open",
+   "verifiedNote": "L-C 2026-10-31 text-compared vs shots/168-22061.png: during Save and leave the sheet foot reads 'Saving…' with Cancel and a disabled 'Saving…' (RecordSheetFooter). Not screenshotted — no probe drives the save-then-leave pending state. | built, not compared — L-C C1: Save and leave shows \"Saving record…\" + Saving… + Stay here; success takes the chosen way out (RecordSheet.tsx).",
    "tier": "P2"
   },
   {
@@ -8379,8 +8379,8 @@
    "family": "resources",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C C1: \"Leave without saving?\" names the record / destination tab or collection; Keep editing · Discard changes · Save and leave (RecordSheet.tsx). Origin label (\"Your destination is …\") waits on C2.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-C 2026-10-31: same RecordSheet guard as 168:21848 (compared), destination 'Collection settings'. | built, not compared — L-C C1: \"Leave without saving?\" names the record / destination tab or collection; Keep editing · Discard changes · Save and leave (RecordSheet.tsx). Origin label (\"Your destination is …\") waits on C2.",
    "inheritsFrom": "168:21408",
    "tier": "P2"
   },
@@ -8391,8 +8391,8 @@
    "family": "resources",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "built, not compared — L-C C1: Save and leave shows \"Saving record…\" + Saving… + Stay here; success takes the chosen way out (RecordSheet.tsx).",
+   "verified": "drift-open",
+   "verifiedNote": "L-C 2026-10-31: as 168:22061 (text-compared, not screenshotted). | built, not compared — L-C C1: Save and leave shows \"Saving record…\" + Saving… + Stay here; success takes the chosen way out (RecordSheet.tsx).",
    "tier": "P2"
   },
   {
@@ -8402,8 +8402,8 @@
    "family": "resources",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C C1: \"Leave without saving?\" names the record / destination tab or collection; Keep editing · Discard changes · Save and leave (RecordSheet.tsx). Origin label (\"Your destination is …\") waits on C2.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-C 2026-10-31: same RecordSheet guard as 168:21848 (compared), destination '‹ Back to Editor · Home'. | built, not compared — L-C C1: \"Leave without saving?\" names the record / destination tab or collection; Keep editing · Discard changes · Save and leave (RecordSheet.tsx). Origin label (\"Your destination is …\") waits on C2.",
    "inheritsFrom": "168:21408",
    "tier": "P2"
   },
@@ -8414,8 +8414,8 @@
    "family": "resources",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "built, not compared — L-C C1: Save and leave shows \"Saving record…\" + Saving… + Stay here; success takes the chosen way out (RecordSheet.tsx).",
+   "verified": "drift-open",
+   "verifiedNote": "L-C 2026-10-31: as 168:22061 (text-compared, not screenshotted). | built, not compared — L-C C1: Save and leave shows \"Saving record…\" + Saving… + Stay here; success takes the chosen way out (RecordSheet.tsx).",
    "tier": "P2"
   },
   {
@@ -9697,7 +9697,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Full-page shell-in layout, nav, filters, Details/Usage/Versions tabs and copy differ from LibraryManager (no shell, “Asset library”)",
+   "verifiedNote": "L-C 2026-10-31 AS-1 frame probe-compared (media-fullpage-library) vs shots/199-37199.png: no top bar; rail head 'Assets' / 'Your uploads for this site'; grid column '‹ Back to Editor · {page}' + scope title, grey search + blue 'Upload ▾'; footer '{used} of {total} used' · 'All assets saved' (or 'N not on the server'); smart scopes 'Used on this site' / 'No known placements'; columns 240 · grid · 320. Open (next archetypes): rail rows centred without icons/counts + Fonts row (AS-2), filter row All types/Any tag/Date added/Grid|List/4 columns and borderless cards with 'W × H · size' (AS-3), details Details|Usage|Versions tabs with Place on canvas · Edit image · More ▾ (AS-4). | Full-page shell-in layout, nav, filters, Details/Usage/Versions tabs and copy differ from LibraryManager (no shell, “Asset library”)",
    "tier": "P2"
   },
   {
@@ -9728,9 +9728,9 @@
    "page": "05",
    "family": "assets",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Upload ▾ items Upload files/From URL/Stock/Icons; code menu Import from URL…/Add from stock…",
+   "authority": "code:no-icon-upload-door",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-C 2026-10-31 probe-compared vs shots/199-39042.png: 'Upload ▾' opens Upload files · From URL · Stock photos & videos (viewer write rows inert with the reason). Not drawn: 'Icons' (the manager has no icon importer — icons come from the media drawer's icon browser) and the menu's 'Close' row (Esc / outside click close it). | Upload ▾ items Upload files/From URL/Stock/Icons; code menu Import from URL…/Add from stock…",
    "tier": "P2"
   },
   {
@@ -12548,7 +12548,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "phase1 shell (Tasks 1.2–1.4). CMS exit reads \"‹ Back to canvas\" (CmsWorkspace.tsx:172) vs \"‹ Back to Editor · Home\"",
+   "verifiedNote": "L-C 2026-10-31 triage: the CMS exit reads '‹ Back to Editor · {page}' now (CmsWorkspace backToEditor). This board is the editor after the return (page + selection kept) — shell route, for the lead's live walk like 245:51515. | phase1 shell (Tasks 1.2–1.4). CMS exit reads \"‹ Back to canvas\" (CmsWorkspace.tsx:172) vs \"‹ Back to Editor · Home\"",
    "tier": "P2"
   },
   {
@@ -13875,7 +13875,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C C4: drawer Data = Site variables · Conditions · Recently deleted (disabled, \"Planned\" until the server restore slice); Sources hidden by SOURCES_IN_RELEASE (BD-39). Drawer \"‹ Back to Editor · Home\" is the Phase-1 bottom bar.",
+   "verifiedNote": "L-C 2026-10-31 text-compared: the drawer's Data group reads Site variables · Conditions · Recently deleted with Sources hidden, as RL02/RL03's boards draw it; the drawer itself is not in a probe case (not screenshotted). | built, not compared — L-C C4: drawer Data = Site variables · Conditions · Recently deleted (disabled, \"Planned\" until the server restore slice); Sources hidden by SOURCES_IN_RELEASE (BD-39). Drawer \"‹ Back to Editor · Home\" is the Phase-1 bottom bar.",
    "tier": "P2"
   },
   {
@@ -13885,8 +13885,8 @@
    "family": "resources",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "drift-open — L-C C4/D1: \"Site variables\" intro, per-variable \"N text placeholders\", \"Empty value\" built; still a drawer subview, not the workspace page. Not compared.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-C 2026-10-31 probe-compared (cms-workspace&page=variables) vs shots/424-337452.png: workspace page 'Site variables' with '+ New variable', 'Use one value across your site' + the {{site.key}} sentence, rows key/value · 'N placeholders' · ⋯. Not drawn here: the header's own ⋯ beside New variable (board has one; nothing behind it named).",
    "tier": "P2"
   },
   {
@@ -13896,8 +13896,8 @@
    "family": "resources",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "ConditionsView ContentViews.tsx:651 edits path/operator/value inline; board = read-only index, Locate, edit in Inspector",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-C 2026-10-31 probe-compared (cms-workspace&page=conditions) vs shots/424-337627.png: workspace page 'Conditions', 'Conditions across this site', 'Edit conditions on their selected element in the Inspector.', rows '{collection} › {element}' / 'Active · …' or 'Not active — review legacy rule' with Locate — read-only index (ContentViews ConditionsView). The probe host has no ‹ Back to Editor (shell-supplied).",
    "tier": "P2"
   },
   {

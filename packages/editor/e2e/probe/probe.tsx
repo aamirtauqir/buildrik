@@ -3404,7 +3404,8 @@ const CASES: Record<string, () => React.ReactElement> = {
           phase={phase}
           recordLabel="Blog record “Studio launch”"
           collectionName="Blog"
-          to="About"
+          /* ?to=Dynamic pages: the record → tab guards (168:21848 …). */
+          to={new URLSearchParams(location.search).get("to") ?? "About"}
           current="Home"
           canSave
           onKeepEditing={() => {}}

@@ -239,6 +239,20 @@ export interface AssetGridProps {
 
 // ─── Component ────────────────────────────────────────────────────────────
 
+/** The scope the manager is showing — the page title (2L9 B6-A01) and the
+ *  count line both name it. Smart scopes use the 2L9 rail's words. */
+export function assetScopeLabel(
+  smartFolder: SmartFolder,
+  currentFolderId: string | null,
+  folders: ReadonlyArray<{ id: string; name: string }>,
+): string {
+  if (smartFolder === "recent") return "Recent";
+  if (smartFolder === "in-use") return "Used on this site";
+  if (smartFolder === "unused") return "No known placements";
+  if (currentFolderId) return folders.find((f) => f.id === currentFolderId)?.name ?? "All assets";
+  return "All assets";
+}
+
 export function AssetGrid({
   state,
   visibleItems,
@@ -302,15 +316,10 @@ export function AssetGrid({
      "Last added 2h ago" tail (1174:4866) and the grid foot's "Showing N of M
      in <scope>", which said the same count a third time. In a search the line
      reads `1 result for "menu"` (3695:44339). */
-  const scopeLabel = React.useMemo(() => {
-    if (smartFolder === "recent") return "Recent";
-    if (smartFolder === "in-use") return "In use";
-    if (smartFolder === "unused") return "Unused";
-    if (state.currentFolderId) {
-      return state.allFolders.find((f) => f.id === state.currentFolderId)?.name ?? "All assets";
-    }
-    return "All assets";
-  }, [smartFolder, state.currentFolderId, state.allFolders]);
+  const scopeLabel = React.useMemo(
+    () => assetScopeLabel(smartFolder, state.currentFolderId, state.allFolders),
+    [smartFolder, state.currentFolderId, state.allFolders],
+  );
   const searchQuery = state.librarySearch.trim();
   const n = visibleItems.length;
   /* Clone 3721:43697 — under a tag the line counts the matches, `N matching
