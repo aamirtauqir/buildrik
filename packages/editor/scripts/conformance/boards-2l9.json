@@ -8614,8 +8614,9 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Previewing record 2 of 980 on canvas; code cannot switch preview record for template/list context",
-   "tier": "P1"
+   "verifiedNote": "Round 31: the record bar of 173:12022 (drift-fixed) on another record — 'Record [A studio built around people ⌄] ‹ › ☐ Show drafts' — with the same Title binding re-rendered: the bar's ‹ › and picker switch the canvas's preview record (CMS_PREVIEW_RECORD_CHANGED; useCmsBinding follows it). The old note 'cannot switch preview record' predates the bar. Not separately compared.",
+   "tier": "P1",
+   "inheritsFrom": "173:12022"
   },
   {
    "nodeId": "173:12958",
@@ -8784,8 +8785,9 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Show drafts on canvas: draft rows visible; no canvas draft toggle in code",
-   "tier": "P1"
+   "verifiedNote": "Round 31: the record bar of 173:12022 (drift-fixed) with 'Show drafts' on — the picker lists draft records too (CanvasRecordBar 'Show drafts on canvas'). The old note 'no canvas draft toggle' predates the bar. Not separately compared.",
+   "tier": "P1",
+   "inheritsFrom": "173:12022"
   },
   {
    "nodeId": "174:13529",
