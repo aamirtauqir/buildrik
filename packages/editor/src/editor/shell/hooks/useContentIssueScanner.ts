@@ -11,6 +11,10 @@
  *   "error"    — the last scan threw; `issues` keeps whatever it last had,
  *                the panel shows "Scan failed" + Try again over it
  *
+ * Split Collection lists get a second, async pass (B-31, D81 189:25985): a
+ * list whose `/page/k` would land on another page's file is an error issue,
+ * so the publish gate blocks with the same row the Inspector shows.
+ *
  * A background rescan (the project changed under us) updates `issues`
  * silently — it does not flip the panel to "Scanning…" for every keystroke,
  * only a manual scan does. Reactive triggers are debounced: `ELEMENT_UPDATED`
@@ -26,6 +30,7 @@ import { EVENTS } from "@/shared/constants";
 import { detectContentIssues } from "@buildrik/shared/content/contentIssues";
 import type { Issue } from "./useStudioState";
 import { isPageLive } from "@/engine/export/pageFiles";
+import { listPagination } from "@/engine/cms/listPages";
 
 export type ContentScanState = "idle" | "scanning" | "error";
 
@@ -42,6 +47,7 @@ export function useContentIssueScanner(composer: Composer | null): UseContentIss
   const [issues, setIssues] = React.useState<Issue[]>([]);
   const [scanState, setScanState] = React.useState<ContentScanState>("idle");
   const debounceRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [paginationIssues, setPaginationIssues] = React.useState<Issue[]>([]);
 
   /** The actual scan. Never throws outward — a detector that throws lands
    *  here as the "error" state, not a crash that takes the panel with it. */
@@ -100,7 +106,52 @@ export function useContentIssueScanner(composer: Composer | null): UseContentIss
     };
   }, [composer, rescan, scanNow]);
 
-  return { issues, scanState, rescan };
+  /* B-31: its own effect — async, cancelled on unmount (and by a newer run),
+     re-run when bindings, list queries or the project change. */
+  React.useEffect(() => {
+    if (!composer) return;
+    let run = 0;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    const scan = async () => {
+      const mine = ++run;
+      const split = (composer.cms?.bindings?.getAllCollectionBindings?.() ?? []).filter((b) => b.pages === "split");
+      const found: Issue[] = [];
+      for (const b of split) {
+        const pagination = await listPagination(composer, b.elementId).catch(() => null);
+        if (mine !== run) return;
+        if (pagination?.collision) {
+          found.push({
+            id: `list-pages:${b.elementId}`,
+            type: "error",
+            message: `${pagination.collision.path} is already used by another page. Rename that page or turn off pagination.`,
+            elementId: b.elementId,
+          });
+        }
+      }
+      if (mine === run) setPaginationIssues(found);
+    };
+    const schedule = () => {
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => void scan(), DEBOUNCE_MS);
+    };
+    void scan();
+    const evs = [
+      EVENTS.PROJECT_LOADED,
+      EVENTS.PROJECT_CHANGED,
+      EVENTS.CMS_COLLECTION_BOUND,
+      EVENTS.CMS_COLLECTION_UNBOUND,
+      EVENTS.CMS_LIST_QUERY_CHANGED,
+    ];
+    evs.forEach((e) => composer.on(e, schedule));
+    return () => {
+      run++;
+      if (timer) clearTimeout(timer);
+      evs.forEach((e) => composer.off(e, schedule));
+    };
+  }, [composer]);
+
+  const all = React.useMemo(() => (paginationIssues.length ? [...issues, ...paginationIssues] : issues), [issues, paginationIssues]);
+  return { issues: all, scanState, rescan };
 }
 
 export default useContentIssueScanner;

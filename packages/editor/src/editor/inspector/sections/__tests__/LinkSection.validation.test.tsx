@@ -1,6 +1,10 @@
+import * as React from "react";
 import { describe, it, expect, vi } from "vitest";
 import { render, fireEvent, screen } from "@testing-library/react";
 import { LinkSection } from "../LinkSection";
+import { ToastProvider as __ToastProvider } from "@/editor/chrome-ui";
+/* LinkSection raises toasts (B5-D90): render it under the provider. */
+const renderT = (ui: React.ReactElement) => render(ui, { wrapper: __ToastProvider });
 
 /**
  * LinkSection validation must gate the href write. If the user types an
@@ -40,7 +44,7 @@ function makeComposer(el: ReturnType<typeof makeElement>) {
 function renderLinkSection() {
   const el = makeElement();
   const composer = makeComposer(el);
-  const utils = render(
+  const utils = renderT(
     <LinkSection
       selectedElement={{ id: "e1", type: "link" }}
       composer={composer}

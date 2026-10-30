@@ -225,22 +225,6 @@ export class CommandCenter {
       return false;
     }
 
-    // Carve-out 0: the inspector's "Pick on canvas" owns a bare Escape while
-    // it's armed. Canvas.tsx's own listener cancels the pick; this shortcut
-    // is capture-phase on `window` and registered before that listener ever
-    // mounts, so without this guard "deselect" always won the race and
-    // cleared the selection out from under the cancelled pick — the user
-    // meant only to bail out of picking, not lose what was selected before
-    // it. DOM query, not an import — engine/ must not depend on editor/,
-    // same contract as the modal carve-out below.
-    if (
-      commandId === "deselect" &&
-      typeof document !== "undefined" &&
-      document.querySelector('[data-bk-pick="true"]')
-    ) {
-      return false;
-    }
-
     // Carve-out 0b: Escape closes the innermost surface, and the canvas
     // selection is the OUTERMOST. This listener runs before every surface
     // that registers later, so an open menu, listbox or dialog — or a

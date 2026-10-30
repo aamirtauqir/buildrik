@@ -109,7 +109,7 @@ export function CollectionSettingsPane({ composer, collection, records }: Collec
     <div className={PANE} data-testid="cms-settings">
       <h3 className={SECTION}>Collection</h3>
       <div className={CONTROL_W}>
-        <label className={LABEL} htmlFor="cms-settings-name">Collection name</label>
+        <label className={LABEL} htmlFor="cms-settings-name">Name</label>
         <TextInput id="cms-settings-name" sizing="sm" className={CONTROL} value={name} onChange={(e) => setName(e.target.value)} data-testid="cms-settings-name" />
       </div>
       <div className={CONTROL_W}>
