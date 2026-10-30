@@ -1,6 +1,7 @@
 /**
  * Rulers and guides — design-2l9 153:79518 (the list), 155:83650 (one guide:
- * position, lock, remove, Apply) and 155:82271 (after a removal, with its
+ * position, lock, remove, Apply), 145:67569 (a locked guide: read-only, Unlock,
+ * ‹ Back to guides) and 155:82271 (after a removal, with its
  * undo). Opens from the canvas View menu in the menu's place, like Grid and
  * snapping. The guides are the site's own data (`canvasGuides` in the project
  * settings, saved with the site — useCanvasGuides), so "shared across this
@@ -65,15 +66,13 @@ function GuideDetail({
 }) {
   const [type, setType] = React.useState<CanvasGuide["type"]>(guide?.type ?? "vertical");
   const [draft, setDraft] = React.useState(String(guide?.position ?? 100));
-  const [locked, setLocked] = React.useState(guide?.locked ?? false);
+  /* Lock / Unlock act at once (145:67569): read the guide's live state. */
+  const locked = Boolean(guide && guides.list.find((g) => g.id === guide.id)?.locked);
   const position = parsePosition(draft);
   const apply = () => {
-    if (position === null) return;
+    if (position === null || locked) return;
     if (!guide) guides.add(type, position);
-    else {
-      if (position !== guide.position) guides.update(guide.id, position);
-      if (locked !== guide.locked) guides.setLocked(guide.id, locked);
-    }
+    else if (position !== guide.position) guides.update(guide.id, position);
     onDone();
   };
   return (
@@ -102,6 +101,7 @@ function GuideDetail({
         <TextInput
           inputMode="numeric"
           value={draft}
+          disabled={locked}
           color={position === null ? "failure" : undefined}
           data-testid="guide-position"
           onChange={(e) => setDraft(e.target.value)}
@@ -112,17 +112,22 @@ function GuideDetail({
         />
       </label>
       <p className={`tw:m-0 tw:-mt-2 tw:text-[11px] tw:leading-4 ${position === null ? "tw:text-[var(--bk-error-text)]" : "tw:text-[var(--bk-ink-muted)]"}`} data-testid="guide-hint">
-        {position === null ? `Enter a whole number from ${POSITION_RANGE.min} to ${POSITION_RANGE.max}.` : "Changes apply with Apply."}
+        {locked
+          ? "Unlock this guide to change it."
+          : position === null
+            ? `Enter a whole number from ${POSITION_RANGE.min} to ${POSITION_RANGE.max}.`
+            : "Changes apply with Apply."}
       </p>
       {guide && (
         <div className="tw:flex tw:flex-col tw:items-start tw:gap-1">
-          <Button color="light" size="xs" className={OUTLINE_BTN} data-testid="guide-lock" aria-pressed={locked} onClick={() => setLocked((v) => !v)}>
+          <Button color="light" size="xs" className={OUTLINE_BTN} data-testid="guide-lock" aria-pressed={locked} onClick={() => guides.setLocked(guide.id, !locked)}>
             {locked ? "Unlock guide" : "Lock guide"}
           </Button>
           <Button
             color="light"
             size="xs"
-            className={`${TEXT_BTN} tw:px-5`}
+            className={`${locked ? OUTLINE_BTN : `${TEXT_BTN} tw:px-5`}`}
+            disabled={locked}
             data-testid="guide-remove"
             onClick={() => {
               guides.remove(guide.id);
@@ -133,6 +138,12 @@ function GuideDetail({
           </Button>
         </div>
       )}
+      {locked ? (
+        /* 145:67569: a locked guide changes nothing here — the way back. */
+        <Button variant="link" size="xs" className="tw:h-7 tw:min-h-0 tw:self-start tw:px-6 tw:text-[13px]" data-testid="guide-back" onClick={() => onDone()}>
+          ‹ Back to guides
+        </Button>
+      ) : (
       <div className="tw:flex tw:justify-end tw:gap-2">
         <Button color="light" size="xs" className={`${OUTLINE_BTN} tw:w-24`} onClick={() => onDone()}>
           Cancel
@@ -141,6 +152,7 @@ function GuideDetail({
           {guide ? "Apply" : "Add"}
         </Button>
       </div>
+      )}
     </div>
   );
 }
