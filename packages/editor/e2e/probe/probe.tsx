@@ -3357,6 +3357,21 @@ const CASES: Record<string, () => React.ReactElement> = {
       </ToastProvider>
     </div>
   ),
+  /* design-2l9 63:15255 — the manager on a published site (Update URL on a
+     live page asks first). */
+  "pages-live-site": () => {
+    const c = listingsComposer();
+    c.updateProjectMetadata({ publishedUrl: "https://fieldwork.studio" } as never);
+    return (
+      <div data-probe="pages-live-site" style={{ width: 1440, height: 900, display: "flex" }}>
+        <div style={{ width: 284, display: "flex" }}>
+          <ToastProvider>
+            <PagesTab composer={c} onClose={() => {}} onRequestTemplates={() => {}} />
+          </ToastProvider>
+        </div>
+      </div>
+    );
+  },
   /* design-2l9 94:13447 — the same manager with About open. */
   "pages-about-active": () => {
     const c = listingsComposer();
@@ -3438,7 +3453,13 @@ const CASES: Record<string, () => React.ReactElement> = {
         <div style={{ position: "fixed", left: 0, top: 56, width: 56, bottom: 32, borderRight: "1px solid var(--bk-border)" }} />
         <div style={{ position: "fixed", left: 56, top: 56, right: 0, bottom: 32, display: "flex" }}>
           <React.Suspense fallback={null}>
-            <FullPageRouter activeTab="templates" composer={layersComposer()} commonTabProps={{ onClose: () => {} }} />
+            <FullPageRouter
+              activeTab="templates"
+              composer={layersComposer()}
+              commonTabProps={{ onClose: () => {} }}
+              /* ?page= — the visit came from New page (104:28892). */
+              templatesOpen={new URLSearchParams(location.search).get("page") ? { newPageName: new URLSearchParams(location.search).get("page")!, addToNavigation: true } : undefined}
+            />
           </React.Suspense>
         </div>
         <div style={{ position: "fixed", left: 0, right: 0, bottom: 0, height: 32, borderTop: "1px solid var(--bk-border)" }} />
@@ -3932,6 +3953,35 @@ const CASES: Record<string, () => React.ReactElement> = {
       </ToastProvider>
     </div>
   ),
+
+  /* design-2l9 101:23017 / 101:23620 / 109:32246 — the return to Pages with
+     unsaved settings, About open while Home stays on the canvas. `?save=`
+     picks what the composer's updatePage does: hang (still saving) or reject. */
+  "pages-settings-leave": () => {
+    const mode = new URLSearchParams(location.search).get("save");
+    const about = { ...PAGE_SETTINGS_FIXTURE, id: "about", name: "About", slug: "about", isHome: false, isActive: false };
+    const homePage = { ...PAGE_SETTINGS_FIXTURE, id: "home", name: "Home", isHome: true, isActive: true };
+    return (
+      <div data-probe="pages-settings-leave" style={{ width: 1440, height: 900, background: "var(--bk-gray-900)" }}>
+        <ToastProvider>
+          <PageSettingsDrawer
+            page={about}
+            allPages={[homePage, about]}
+            composer={{
+              on: () => {},
+              off: () => {},
+              emit: () => {},
+              elements: {
+                updatePage: () => (mode === "reject" ? Promise.reject(new Error("refused")) : new Promise(() => {})),
+                getAllPages: () => [],
+              },
+            } as never}
+            onClose={() => {}}
+          />
+        </ToastProvider>
+      </div>
+    );
+  },
 
   /* Board 815:4608 — the four smart-guide scenarios. A guide only exists
      mid-drag, and `calculateSnapping` reads sibling geometry out of a real

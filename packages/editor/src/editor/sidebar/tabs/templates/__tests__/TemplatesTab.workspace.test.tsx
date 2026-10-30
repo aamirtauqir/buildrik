@@ -146,6 +146,20 @@ describe("Templates — full-canvas view (decision #24)", () => {
     expect(composer.elements.addPageToNavigation).toHaveBeenCalledWith("page-new");
   });
 
+  /* design-2l9 104:28892: a visit from the New page dialog says what it is
+     creating, and both "‹ Back to New page" and Change return to that dialog
+     with its name and navigation choice. */
+  it("names the page it is creating and goes back to New page with it", () => {
+    const composer = makeComposer();
+    const onClose = vi.fn();
+    render(<TemplatesTab composer={composer as never} onClose={onClose} request={{ newPageName: "Services", addToNavigation: true }} />);
+    expect(screen.getByTestId("tpl-creating-banner")).toHaveTextContent("Creating “Services”Add to site navigation");
+    expect(screen.getByTestId("tpl-ws-back")).toHaveTextContent("‹ Back to New page");
+    fireEvent.click(screen.getByTestId("tpl-creating-change"));
+    expect(onClose).toHaveBeenCalled();
+    expect(composer.emit).toHaveBeenCalledWith("ui:new-page-requested", { name: "Services", addToNavigation: true });
+  });
+
   /* QA 2026-09-24: Escape did not close the view. From the catalogue it goes
      back to the canvas; from a preview it goes back to the catalogue first. */
   it("Escape leaves the view from the catalogue, and a preview first", () => {

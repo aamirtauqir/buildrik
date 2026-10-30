@@ -459,6 +459,12 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
   const pageLabel = activePageInfo?.name ?? "this page";
   /* Replace mode's Cancel (4428:149355 → Build · Manage pages). */
   const backToPages = () => onSwitchTab?.("pages");
+  /* 104:28892: back to the New page dialog with what it had — the catalogue
+     closes and the dialog reopens on From template. */
+  const backToNewPage = () => {
+    onClose?.();
+    composer?.emit(EVENTS.UI_NEW_PAGE_REQUESTED, { name: newPageName, addToNavigation });
+  };
 
   return (
     <div className="tpl-ws" data-testid="tpl-workspace">
@@ -470,9 +476,9 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
           color="light"
           className="tpl-ws-back"
           data-testid="tpl-ws-back"
-          onClick={previewTemplate ? () => sel.setPreviewId(null) : replaceMode ? backToPages : onClose}
+          onClick={previewTemplate ? () => sel.setPreviewId(null) : replaceMode ? backToPages : newPageName ? backToNewPage : onClose}
         >
-          {previewTemplate ? "‹ Back to templates" : replaceMode ? "‹ Back to Pages" : "‹ Back to canvas"}
+          {previewTemplate ? "‹ Back to templates" : replaceMode ? "‹ Back to Pages" : newPageName ? "‹ Back to New page" : "‹ Back to canvas"}
         </Button>
         <div className="tpl-ws-title">Templates</div>
         {siteName && <div className="tpl-ws-site">{siteName}</div>}
@@ -532,6 +538,21 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
             {replaceMode ? `Pick a layout for ${pageLabel}.` : `Preview a template, then create a page or replace ${pageLabel}.`}{" "}
             Templates saved from a page keep the styles captured with them.
           </p>
+          {newPageName && !replaceMode && (
+            /* design-2l9 104:28892: the page this visit is creating, from the
+               New page dialog, with Change back to it. */
+            <div className="tw:mb-3 tw:flex tw:items-center tw:gap-3 tw:rounded-md tw:bg-[var(--bk-accent-tint)] tw:px-3 tw:py-2.5" data-testid="tpl-creating-banner" role="status">
+              <span className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
+                <span className="tw:text-[13px] tw:leading-5 tw:font-semibold tw:text-[var(--bk-ink)]">{`Creating “${newPageName}”`}</span>
+                <span className="tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
+                  {addToNavigation === false ? "Not added to site navigation" : "Add to site navigation"}
+                </span>
+              </span>
+              <Button variant="link" data-testid="tpl-creating-change" onClick={backToNewPage}>
+                Change
+              </Button>
+            </div>
+          )}
           {replaceMode && (
             /* 4428:149355: what this visit is for, with its way out. */
             <div className="tpl-replace-banner" data-testid="tpl-replace-banner" role="status">
