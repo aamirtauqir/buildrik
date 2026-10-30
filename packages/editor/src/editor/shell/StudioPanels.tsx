@@ -34,7 +34,7 @@ import type { SettingsOpenRequest } from "../sidebar/tabs/settings/types";
 import type { TemplatesOpenRequest } from "@/editor/sidebar/tabs/templates/TemplatesTab";
 import type { PageSettingsOpenRequest } from "../sidebar/tabs/pages/types";
 import { usePageCommands } from "../sidebar/tabs/pages/usePageCommands";
-import { cmsWorkspace, type CmsOpenRequest } from "@/editor/cms/cmsWorkspaceStore";
+import { cmsWorkspace, useCmsWorkspace, type CmsOpenRequest } from "@/editor/cms/cmsWorkspaceStore";
 import { TokenRegistryProvider, DSModeProvider, StylePresetRegistryProvider } from "@/editor/design-system";
 import { MigrationProgressMount } from "@/editor/design-system/ui/MigrationProgressMount";
 import { DSLintRunner } from "@/editor/design-system/ui/DSLintRunner";
@@ -466,7 +466,13 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
      inspector with the CMS workspace. The canvas stays mounted underneath
      (its iframe and engine state survive the round trip); the inspector
      column closes so the workspace spans both. */
-  const cmsWorkspaceOpen = !readOnlyView && isLeftPanelOpen && railTab === "content";
+  /* 122:43815: the Pages drawer can sit over an open record (overPages). */
+  const cmsOverPages = useCmsWorkspace().overPages === true;
+  const cmsWorkspaceOpen =
+    !readOnlyView && isLeftPanelOpen && (railTab === "content" || (railTab === "pages" && cmsOverPages));
+  React.useEffect(() => {
+    if (cmsOverPages && (railTab !== "pages" || !isLeftPanelOpen)) cmsWorkspace.setOverPages(false);
+  }, [cmsOverPages, railTab, isLeftPanelOpen]);
   const [cmsReturn, setCmsReturn] = React.useState<CmsReturn | null>(null);
   const [showOutlines, setShowOutlines] = React.useState(readOutlines);
   /* Outlines are the shell's own preference; every other View row is the caller's. */

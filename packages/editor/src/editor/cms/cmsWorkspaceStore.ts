@@ -35,6 +35,10 @@ export interface CmsWorkspaceState {
   /** A Save and leave back to the origin is in flight: the header's way back
    *  reads "Saving record…" (173:16635, Play F2.09). */
   returning?: boolean;
+  /** design-2l9 122:43815: the Pages drawer was opened over the workspace
+   *  with a record open — the workspace (and the draft) stays up beside it,
+   *  and opening a page asks the record first. */
+  overPages?: boolean;
 }
 
 /** `ui:cms-open` (EVENTS.UI_CMS_OPEN) — open a collection's table, and with
@@ -65,9 +69,16 @@ function set(next: CmsWorkspaceState): void {
  *  Fields", 168:21408). */
 export type CmsLeaveGuard = (go: () => void, next: CmsWorkspaceState) => boolean;
 let leaveGuard: CmsLeaveGuard | null = null;
-/** Asked before the workspace itself is left for the element it was opened
- *  from (the header's "‹ {origin}"); true when it took the exit over. */
-type CmsExitGuard = (go: () => void) => boolean;
+/** Asked before the workspace itself is left — for the element it was opened
+ *  from (the header's "‹ {origin}"), or for a page picked in the Pages drawer
+ *  over it (`page`, 122:44151); true when it took the exit over. */
+export interface CmsExitPage {
+  /** The page's name, as the guard says it ("You asked to open About"). */
+  name: string;
+  /** Still a page of the site? Checked when the leave would land (126:36751). */
+  exists: () => boolean;
+}
+type CmsExitGuard = (go: () => void, page?: CmsExitPage) => boolean;
 let exitGuard: CmsExitGuard | null = null;
 let visitHolders = 0;
 
@@ -125,8 +136,11 @@ export const cmsWorkspace = {
     };
   },
   /** Leave the workspace — through the open record's guard when there is one. */
-  exit: (go: () => void): void => {
-    if (!exitGuard?.(go)) go();
+  exit: (go: () => void, page?: CmsExitPage): void => {
+    if (!exitGuard?.(go, page)) go();
+  },
+  setOverPages: (overPages: boolean): void => {
+    if (Boolean(state.overPages) !== overPages) set({ ...state, overPages });
   },
   reset: (): void => set(INITIAL),
   subscribe: (l: () => void): (() => void) => {

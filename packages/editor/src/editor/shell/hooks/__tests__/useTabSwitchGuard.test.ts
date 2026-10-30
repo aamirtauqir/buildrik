@@ -12,6 +12,7 @@ import { describe, it, expect, vi, afterEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { shellDirty, type DirtyDomain } from "@/editor/shell/shellDirtyRegistry";
 import { useTabSwitchGuard } from "../useTabSwitchGuard";
+import { cmsWorkspace } from "@/editor/cms/cmsWorkspaceStore";
 
 const DOMAINS: DirtyDomain[] = ["settings", "cms-record"];
 
@@ -40,6 +41,21 @@ function setup(
 describe("useTabSwitchGuard", () => {
   afterEach(() => {
     act(() => DOMAINS.forEach((d) => shellDirty.set(d, false)));
+  });
+
+  /* design-2l9 122:43815: Pages opens OVER an open CMS record — the record
+     stays mounted beside the drawer, so nothing is asked; the visit is marked. */
+  it("CMS → Pages with a record open: no dialog, the workspace is held over Pages", () => {
+    act(() => {
+      cmsWorkspace.openRequest({ collectionId: "c1", recordId: "r1" });
+      shellDirty.set("cms-record", true);
+    });
+    const { result, setLeftPanelTab } = setup({ tab: "content" });
+    act(() => result.current.setLeftPanelTab("pages"));
+    expect(setLeftPanelTab).toHaveBeenCalledWith("pages");
+    expect(result.current.dialogProps.open).toBe(false);
+    expect(cmsWorkspace.get().overPages).toBe(true);
+    act(() => cmsWorkspace.reset());
   });
 
   it("clean: both sinks run immediately, onSwitched runs, no dialog", () => {

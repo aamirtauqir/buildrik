@@ -48,6 +48,7 @@ import { usePages } from "./usePages";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { useSiteOrigin } from "@/editor/shared/useSiteOrigin";
 import { useFolders } from "./useFolders";
+import { cmsWorkspace } from "@/editor/cms/cmsWorkspaceStore";
 import { movePagesWithHistory, useFolderMoves } from "./folderHistory";
 import { pageRoute } from "./utils/slug";
 import { useBulkSelect } from "./useBulkSelect";
@@ -362,6 +363,16 @@ export const PagesTab: React.FC<PagesTabProps> = ({
     bulk.clearSelection();
   }, [bulk.selectedIds, p.duplicatePages, bulk.clearSelection]);
 
+  /* design-2l9 122:43815 / 122:44151: over an open CMS record, opening a page
+     leaves the CMS through the record's guard ("You asked to open About"). */
+  const openPage = React.useCallback((id: string) => {
+    if (!cmsWorkspace.get().overPages) return p.selectPage(id);
+    const name = p.pages.find((pg) => pg.id === id)?.name ?? "this page";
+    cmsWorkspace.exit(
+      () => { cmsWorkspace.setOverPages(false); p.selectPage(id); },
+      { name, exists: () => Boolean(composer?.elements.getPage?.(id)) },
+    );
+  }, [p.selectPage, p.pages, composer]);
   const bulkDelete = useBulkDelete({ pages: p.pages, orderedPageIds, bulk, deletePage: p.deletePage, deletePages: p.deletePages });
 
   const { addToast } = useToast();
@@ -561,7 +572,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
             <div className="tw:flex tw:h-full tw:min-h-0 tw:flex-col">
               <SiteStructureTree
                 pages={p.pages}
-                onSelectPage={(id) => { p.selectPage(id); }}
+                onSelectPage={openPage}
                 onRowMenu={p.openContextMenu}
                 host={siteHost}
                 collections={dynamicPages.collections}
@@ -620,7 +631,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
             onCancelFolderDraft={() => setDraftingFolder(false)}
             onSelectPage={(id) => {
               setNotice(null);
-              p.selectPage(id);
+              openPage(id);
             }}
             onToggleSelect={handleToggleSelect}
             onBulkDuplicate={handleBulkDuplicate}

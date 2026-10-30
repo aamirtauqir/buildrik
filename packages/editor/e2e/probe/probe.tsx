@@ -18,6 +18,7 @@
  *
  * @license BSD-3-Clause
  */
+import { RecordLeaveDialog, type RecordLeavePhase } from "@/editor/cms/RecordLeaveDialog";
 import { RichTextEditor } from "@/editor/panels/RichTextEditor";
 import { CreateComponentModal } from "@/editor/shell/modals/CreateComponentModal";
 import * as React from "react";
@@ -2973,6 +2974,28 @@ const CASES: Record<string, () => React.ReactElement> = {
       <h1 style={{ margin: "16px 0 0", font: "600 32px/1.2 var(--bk-font-ui)" }}>Thoughtful design. Real impact.</h1>
     </div>
   ),
+  /* design-2l9 122:44151 … 126:36751 — the leave dialog for a page picked
+     over a CMS record, one phase per `?phase=` (RecordSheet drives it from
+     the real save; here each phase is drawn on its own to compare). */
+  "cms-leave-dialog": () => {
+    const phase = (new URLSearchParams(location.search).get("phase") ?? "ask") as RecordLeavePhase;
+    return (
+      <div data-probe="cms-leave-dialog" style={{ width: 1440, height: 900 }}>
+        <RecordLeaveDialog
+          phase={phase}
+          recordLabel="Blog record “Studio launch”"
+          collectionName="Blog"
+          to="About"
+          current="Home"
+          canSave
+          onKeepEditing={() => {}}
+          onDiscard={() => {}}
+          onSaveAndLeave={() => {}}
+          onRetry={() => {}}
+        />
+      </div>
+    );
+  },
   "canvas-empty": () => (
     <div data-probe="canvas-empty" style={{ position: "relative", width: 760, height: 580, background: "#fff" }}>
       <CanvasEmptyCTA onBrowseTemplates={() => {}} onAddBlock={() => {}} onStartBlank={() => {}} />
