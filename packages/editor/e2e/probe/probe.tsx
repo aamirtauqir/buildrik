@@ -80,6 +80,7 @@ import { InspectorHeader } from "@/editor/inspector/components/InspectorHeader";
 import { ProInspector } from "@/editor/inspector/ProInspector";
 import { useComposerSelection } from "@/editor/canvas/hooks/useComposerSelection";
 import { getBlockById, insertBlock } from "@/blocks/blockRegistry";
+import { openSubview } from "@/editor/inspector/tabs/subviewStore";
 import { Composer } from "@/engine/Composer";
 import { LayersLoadError, LayersNoResults } from "@/editor/panels/layers/components/LayersStateBlocks";
 import { Row as InsertRow } from "@/editor/sidebar/tabs/build/components/GroupSection";
@@ -2887,7 +2888,7 @@ const CASES: Record<string, () => React.ReactElement> = {
     if (styleClipboard) c.styleClipboard = JSON.parse(styleClipboard) as Record<string, string>;
     /* The composer and the element, for a script that changes state after
        mount (G04 / G22: the target locked after a menu or picker opened). */
-    Object.assign(window, { probeComposer: c, probeElementId: el.getId() });
+    Object.assign(window, { probeComposer: c, probeElementId: el.getId(), probeOpenSubview: openSubview });
     /* `?layerName=Hero heading` — the element's layer name. */
     if (q.get("layerName")) renameElement(c as never, el.getId(), q.get("layerName") ?? "");
     /* `?dimmed=1` — the element dimmed in the editor (the Layers eye): its
