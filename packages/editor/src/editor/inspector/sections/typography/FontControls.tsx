@@ -45,12 +45,29 @@ interface FontControlsProps {
   inherited?: Readonly<Record<string, string>>;
 }
 
+/** "32px" → "32 px". */
+const spaced = (v: string) => v.replace(/^(-?[\d.]+)([a-z%]+)$/, "$1 $2");
+
+/** A computed line height in px against the computed size: "1.2 ×". */
+function lineHeightShown(lh: string | undefined, size: string | undefined): string | undefined {
+  if (!lh) return undefined;
+  const l = parseFloat(lh);
+  const f = parseFloat(size ?? "");
+  if (lh.endsWith("px") && f > 0) return `${Math.round((l / f) * 100) / 100} ×`;
+  return spaced(lh);
+}
+
 export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, composer, variant = "element", inherited }) => {
+  /* 2L9 S21: an unset row shows what the cascade resolves, "· inherited". */
+  const fromCascade = (v: string | undefined) => (v ? `${v} · inherited` : undefined);
+  /* An own value. A key the cascade answered for is not one (`styles` also
+     carries computed fallbacks), nor is "inherit" written as a value. */
+  const own = (k: string) => (inherited?.[k] || styles[k] === "inherit" ? "" : (styles[k] ?? ""));
   const colour = (
     <div className="tw:relative">
       <ColorInput
         label="Text color"
-        value={styles.color || ""}
+        value={own("color")}
         onChange={(v) => onChange("color", v)}
         composer={composer}
         property="color"
@@ -65,7 +82,8 @@ export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, co
       <div className="tw:relative">
         <InputWithUnit
           label="Font size"
-          value={styles["font-size"] || "16px"}
+          value={own("font-size")}
+          inherited={inherited?.["font-size"] && spaced(inherited["font-size"])}
           onChange={(v) => onChange("font-size", v)}
           units={["px", "em", "rem", "%", "vw"]}
           property="font-size"
@@ -75,7 +93,8 @@ export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, co
       <div className="tw:relative">
         <SelectRow
           label="Weight"
-          value={styles["font-weight"] || ""}
+          value={own("font-weight")}
+          placeholder={fromCascade(inherited?.["font-weight"]) ?? "Default"}
           onChange={(v) => onChange("font-weight", v)}
           options={FONT_WEIGHTS}
           property="font-weight"
@@ -85,10 +104,11 @@ export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, co
       <div className="tw:relative">
         <InputWithUnit
           label="Line height"
-          value={styles["line-height"] || ""}
+          value={own("line-height")}
           onChange={(v) => onChange("line-height", v)}
           /* A bare number is a multiple of the size ("1.5"). */
           units={["px", "", "em", "%", "normal"]}
+          inherited={lineHeightShown(inherited?.["line-height"], inherited?.["font-size"] ?? styles["font-size"])}
           placeholder="1.5"
           property="line-height"
         />

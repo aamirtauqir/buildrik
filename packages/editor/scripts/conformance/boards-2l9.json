@@ -408,9 +408,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:161:8940",
    "verified": "drift-open",
-   "verifiedNote": "Wave-3 drift is the inspector's Text Style tab (Placement section, Typography layout, Spacing row) — L-B's surface; the L-A parts of this board (canvas bar contents, Layers) are fixed in 7:18654 / 147:75914.",
+   "verifiedNote": "Lane L-B round 8, board PNG compared with the live text Style tab (probe ?type=text): the board's inspector column is the page-03 drawing of the text Style tab — Placement › Display, a Font-size token row, Font size | Weight and Line height | Letter spacing paired, Align segments, Width | Height paired, Spacing / Background / Border / Size and position shut with chevrons. Page 04's text Style board 161:8940 (drift-fixed) draws it differently (Font, Font size, Weight, Line height, Text color one per row, More settings; Size modes; no Placement) and the Inspector follows page 04. The L-A half was fixed in 7:18654 / 147:75914.",
    "tier": "P1"
   },
   {
@@ -443,9 +443,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:255:84855",
    "verified": "drift-open",
-   "verifiedNote": "Board 'About · Page · Page appearance … SEO & social'; code PagePanel has ✦ AI chip (pr33) and different section copy",
+   "verifiedNote": "Lane L-B round 8, board PNG compared with the live page panel (new probe ?page=1&pageName=About) and with page 04's own page-panel board S06 255:84855. Built to S06 this round: 'About · Page', the path under it, 'Editing Desktop · Page appearance', and a 'Page settings' group with a full-width 'SEO and social' button and 'Opens About’s Page settings. Appearance stays here.' The ✦ AI chip this row named was removed in round 4 (owner: no AI in the UI). Where this page-03 board differs from S06 — a page icon before the name, chevrons on open sections, Spacing shut as '4 set', 'SEO & social' as a link, 'Page appearance stays here' — the Inspector follows page 04's S06.",
    "tier": "P1"
   },
   {
@@ -2330,9 +2330,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:161:8480",
    "verified": "drift-open",
-   "verifiedNote": "Wave-3 drift is the inspector's Text Content tab (textarea + B I U link + 'Changes save automatically.', Editing row, ID placeholder) — L-B's surface. L-A's View menu half was handled in 145:64586.",
+   "verifiedNote": "Lane L-B round 8, board PNG compared with the live text Content tab (probe ?type=text): the board's 'Text content' textarea + B I U link + 'Changes save automatically.' and an open Semantics (Tag / ID / 'Use a descriptive ID…') is the older Content layout, the same one 302:4542 / 302:5844 draw; page 04's text board 161:8480 (drift-fixed) edits text on the canvas from 'Edit text on canvas', Semantics shut with its tag. The L-A View-menu half was handled in 145:64586.",
    "tier": "P1"
   },
   {
@@ -5580,8 +5580,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Lane L-B P1 round 7, board PNG fetched: two progress bars selected — Progress · Value 'Mixed' · Maximum 90 · 'Applied to 2 · Only Maximum changed. Each Value and derived percentage uses its own pair.' — the batch result note is not built.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B round 8, side by side with the board PNG (probe ?block=progress&also=1&alsoAttrs={progress:{value:60}}, Maximum → 90): Value 'Mixed', Maximum '90', 'Applied to 2' / 'Only Maximum changed. Each Value and derived percentage uses its own pair.' Fixed the write too: each target now keeps its own Value / Maximum (it took the primary's). The board omits Show label (still a Progress row, board 12) and the batch header block (header is lead-owned).",
    "tier": "P1"
   },
   {
@@ -5625,7 +5625,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Lane L-B P1 round 7, board PNG fetched; not yet compared.",
+   "verifiedNote": "Lane L-B round 8, compared with the board PNG: the board makes Choose font the tab's whole body — Search field, one wide row per family+source ('Studio Sans · Uploaded' / file · weight under it; 'Studio Sans · Catalogue' / 'Same family label · different source identity'), Inherit, Manage site fonts, Cancel, and 'Search, scroll and {layer} → Font are retained.' Live is the dropdown under the Font row (search, category chips, SYSTEM / GOOGLE FONTS / UPLOADED groups, Manage site fonts foot). Not built this round: it is a picker redesign (a font-picker tab subview), and the retention line depends on R07's return-to-origin. Needs a lead call on whether R02 replaces the dropdown everywhere (the Brand font token uses the same picker).",
    "tier": "P1"
   },
   {
@@ -5866,9 +5866,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Lane L-B P1 round 7, board PNG fetched: Font 'Studio Sans · Uploaded' matches the source label; open: 'Studio Sans loaded · uploaded source ready.' and a full-width 'Undo font assignment' with its note are not built.",
+   "authority": "code:unverified-claim",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B round 8, side by side with the board PNG (probe pick Georgia over Inter, then Undo): status line '{Family} loaded · {source} source ready.' (read from document.fonts; 'Loading …' until a face has loaded; none for a system font), full-width 'Undo font assignment' bound by history.captureUndo to the one step the engine recorded (only if one was), and 'Undo restores the previous Inter stack[ without deleting the uploaded font].' The board's leading 'Family, source and weight agree.' is dropped: nothing in the code checks the uploaded file's weights against the element's, so the sentence would be a claim, not data.",
    "inheritsFrom": "247:30567",
    "tier": "P1"
   },
@@ -5981,7 +5981,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Lane L-B A9 (built, not compared): 'SEO and social' + 'Opens {page}’s Page settings. Appearance stays here.'. Round 4: the page header's '✦ AI' / 'Ask AI about this page' entry point is removed (binding rule: no AI entry points in the editor UI; server endpoints kept). Open: compare against the board image; header 'Editing Desktop · Page appearance' is InspectorHeader (lead).",
+   "verifiedNote": "Lane L-B round 8, side by side with the board PNG (probe ?page=1&pageName=Home): matches — 'Home · Page' with ⋯ ✕, the path under it, 'Editing Desktop · Page appearance', Background › Color, Size › Max width, Typography › Font · Text color, open without chevrons, 'Page settings' with a full-width 'SEO and social' button and 'Opens Home’s Page settings. Appearance stays here.' Open: the board's Spacing is one 'Padding 32 px' row; live shows the generic Padding top / sides / bottom, Margin top / bottom rows (and its Source block). The board's path '… › Hero › Home · Page' carries the previous selection; live shows the page alone. Font reads 'Inter' on the board from the cascade (the S21 read); the probe has no canvas node for the page root, so it reads 'Select font…' there.",
    "tier": "P1"
   },
   {
@@ -6046,8 +6046,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Lane L-B P1 round 7, board PNG fetched: the receipt now reads 'Applied to 3 headings.' + Undo (one transaction). Open: the board also draws a result note under the section — 'Applied to 3 headings · Only Desktop typography changed. The locked heading and every Tablet and Mobile value stayed unchanged.' — not built.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B round 8, side by side with the board PNG (probe heading 48px, peers=3, lockedPeers=1, ⋯ › Apply style … › Apply Typography to 3): 'Applied to 3 headings' / 'Only Desktop typography changed. The locked heading and every Tablet and Mobile value stayed unchanged.' under Typography, built from this apply's breakpoint, state, categories and skipped counts; gone once history moves past the step. Toast 'Applied to 3 headings. · Undo' kept as the board draws it.",
    "inheritsFrom": "255:87335",
    "tier": "P1"
   },
@@ -6149,8 +6149,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Resets without confirm (\"Styles reset · Undo\"); board names layer + properties",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B round 8, side by side with the board PNG (probe ?type=text&canvasParent=Inter/32px/600/1.2): Font 'Inter · inherited', Font size '32 px · inherited', Weight '600 · inherited', Line height '1.2 × · inherited' — read from the canvas node's computed style (getComputedStyle via data-buildrick-id), never a guessed default; full-width, no unit until a value of its own is typed. Text color row also present (the board's frame is cut at Line height by the toast).",
    "inheritsFrom": "255:91826",
    "tier": "P1"
   },

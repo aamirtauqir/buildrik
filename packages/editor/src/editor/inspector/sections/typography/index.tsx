@@ -74,7 +74,7 @@ export const TypographySection: React.FC<TypographySectionProps> = ({
   return (
     <Section title="Typography" isOpen={isOpen} onToggle={onToggle} id="inspector-section-typography">
       <div className="tw:relative">
-        <FontPicker value={styles["font-family"] || ""} onChange={handleFontChange} composer={composer} inheritedValue={inherited?.["font-family"]} />
+        <FontPicker value={inherited?.["font-family"] || styles["font-family"] === "inherit" ? "" : (styles["font-family"] ?? "")} onChange={handleFontChange} composer={composer} inheritedValue={inherited?.["font-family"]} />
       </div>
 
       <FontControls

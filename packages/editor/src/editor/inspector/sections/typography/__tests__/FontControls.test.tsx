@@ -25,7 +25,7 @@ describe("FontControls — board 1's rows", () => {
     expect(labels(container)).toEqual(["Font size", "Weight", "Line height", "Text color"]);
   });
 
-  it("shows the size's number, 16 when unset", () => {
+  it("shows the size's number", () => {
     renderFont({ "font-size": "32px" });
     expect(field("Font size")).toHaveValue("32");
   });
@@ -74,5 +74,30 @@ describe("FontControls — Page panel (board 21)", () => {
     expect(labels(container)).toEqual(["Text color"]);
     fireEvent.change(screen.getByRole("textbox", { name: "Text color value" }), { target: { value: "333333" } });
     expect(onChange).toHaveBeenCalledWith("color", "#333333");
+  });
+});
+
+describe("FontControls — what the cascade resolves (2L9 S21)", () => {
+  const inherited = { "font-size": "32px", "font-weight": "600", "line-height": "38.4px" };
+
+  it("an unset row reads the resolved value '· inherited' — never a guessed default", () => {
+    render(<FontControls styles={{ "font-size": "16px" }} onChange={vi.fn()} inherited={inherited} />);
+    expect(field("Font size")).toHaveValue("");
+    expect(field("Font size")).toHaveAttribute("placeholder", "32 px · inherited");
+    expect(field("Line height")).toHaveAttribute("placeholder", "1.2 × · inherited");
+    const weight = screen.getByLabelText("Weight") as HTMLSelectElement;
+    expect(weight.value).toBe("");
+    expect(weight.selectedOptions[0].textContent).toBe("600 · inherited");
+  });
+
+  it("no unit dropdown on an inherited row until it has a value of its own", () => {
+    render(<FontControls styles={{}} onChange={vi.fn()} inherited={inherited} />);
+    expect(screen.queryByLabelText("Font size unit")).toBeNull();
+  });
+
+  it("with nothing resolved the rows keep their plain placeholders", () => {
+    render(<FontControls styles={{}} onChange={vi.fn()} />);
+    expect(field("Line height")).toHaveAttribute("placeholder", "1.5");
+    expect((screen.getByLabelText("Weight") as HTMLSelectElement).selectedOptions[0].textContent).toBe("Default");
   });
 });

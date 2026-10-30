@@ -2682,6 +2682,34 @@ const CASES: Record<string, () => React.ReactElement> = {
     const bp = (q.get("bp") ?? "desktop") as "desktop" | "tablet" | "mobile";
     const bpStyles = q.get("bpStyles");
     if (bpStyles && bp !== "desktop") c.styles.setBreakpointStyle(el.getId(), bp, JSON.parse(bpStyles) as Record<string, string>);
+    /* `?canvasParent={…}` — a stand-in canvas node for the element inside a
+       parent with these styles, so the Inspector's computed-style reads see a
+       real cascade (S21 "· inherited"). Off-screen, outside React. */
+    const canvasParent = q.get("canvasParent");
+    if (canvasParent) {
+      const host = document.createElement("div");
+      host.style.cssText = "position:absolute;left:-9999px;top:0;";
+      Object.assign(host.style, JSON.parse(canvasParent));
+      const node = document.createElement(el.getTagName());
+      node.setAttribute("data-buildrick-id", el.getId());
+      node.textContent = "Probe";
+      host.appendChild(node);
+      document.body.appendChild(host);
+    }
+    /* `?also=1&alsoAttrs={"progress":{"value":"60"}}` — more of the same
+       block selected with it (a batch, B03); `alsoAttrs` sets attributes on
+       their descendants by tag name. */
+    const alsoCount = Number(q.get("also") ?? 0);
+    if (alsoCount > 0 && block) {
+      const alsoAttrs = JSON.parse(q.get("alsoAttrs") ?? "{}") as Record<string, Record<string, string>>;
+      const more = Array.from({ length: alsoCount }, () => insertBlock(c, block, page.root.id))
+        .map((moreId) => (moreId ? c.elements.getElement(moreId) : undefined))
+        .filter((m): m is NonNullable<typeof m> => !!m);
+      for (const m of more)
+        for (const d of m.getDescendants())
+          for (const [k, v] of Object.entries(alsoAttrs[d.getTagName().toLowerCase()] ?? {})) d.setAttribute(k, v);
+      c.selection.selectMultiple([el, ...more]);
+    }
     /* `?peers=3&lockedPeers=1` — same-kind elements on the page (S11). */
     for (let i = 0; i < Number(q.get("peers") ?? 0) + Number(q.get("lockedPeers") ?? 0); i++) {
       const peer = c.elements.createElement(type as never, { content: `Peer ${i + 1}` } as never);
@@ -2719,8 +2747,14 @@ const CASES: Record<string, () => React.ReactElement> = {
         c.selection.select(inst);
       })();
     }
+    /* `?page=1` — nothing selected: the Inspector's page panel (board 21,
+       P28). `?pageName=About` renames the page. */
+    const pageOnly = !!q.get("page");
+    const pageName = q.get("pageName");
+    if (pageName) c.elements.updatePage(page.id, { name: pageName });
     function Host() {
       const { selectedElement } = useComposerSelection({ composer: c });
+      if (pageOnly) return <ProInspector composer={c} currentBreakpoint={bp} selectedElement={null} />;
       const sel = selectedElement ?? el;
       return <ProInspector composer={c} currentBreakpoint={bp} selectedElement={{ id: sel.getId(), type: sel.getType(), tagName: sel.getTagName() }} />;
     }
