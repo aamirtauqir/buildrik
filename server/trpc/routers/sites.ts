@@ -36,6 +36,7 @@ import {
   cancelPublish,
   unpublishSite,
   getPublishDiff,
+  getPublishPreviewDiff,
   getPublishedSnapshot,
   getPublishHistory,
   rollbackPublish,
@@ -57,7 +58,7 @@ import {
   getScheduledPublish,
   ScheduledPublishError,
 } from "@/server/services/scheduled-publish.service";
-import { prePublishCheckSchema, publishInputSchema, publishHistoryInput, publishDiffInput, publishedSnapshotInput, rollbackInput, PUBLISH_APPROVAL_MESSAGES } from "@buildrik/shared/schemas/publish";
+import { prePublishCheckSchema, publishInputSchema, publishHistoryInput, publishDiffInput, publishPreviewDiffInput, publishedSnapshotInput, rollbackInput, PUBLISH_APPROVAL_MESSAGES } from "@buildrik/shared/schemas/publish";
 import { recordForSite } from "@/server/services/activity-log.service";
 import { resolveWorkspaceId as getWorkspaceId } from "@/server/trpc/workspace-ctx";
 import { SITE_LIMIT_MESSAGE } from "@/server/services/site-quota";
@@ -707,6 +708,21 @@ export const sitesRouter = router({
         throw e;
       }
       return getPublishDiff(input.siteId, input.fromJobId, input.toJobId);
+    }),
+
+  // What a publish now would change against the live version (A-33, 2L9
+  // B8-PB01–PB03): the editor posts the export it would publish. A mutation
+  // only for the payload size — it writes nothing. EDITOR, like publishDiff.
+  publishPreviewDiff: protectedProcedure
+    .input(publishPreviewDiffInput)
+    .mutation(async ({ ctx, input }) => {
+      try {
+        await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.siteId, "EDITOR");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
+      return getPublishPreviewDiff(input.siteId, input.pages);
     }),
 
   // The pages one published version shipped, for the editor's Compare (B8).

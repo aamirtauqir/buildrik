@@ -139,6 +139,8 @@ const SCOPE_LINE_FOR: Record<string, string> = {
  *  put a banner over the cards and "· changes stay here"; every other footer
  *  screen only says it in the footer (General, S05). */
 const OFFLINE_BANNER_SCREENS: ReadonlySet<string> = new Set(["headers", "analytics"]);
+/** Screens that print the offline line themselves, in place (B8-SH04). */
+const OFFLINE_LINE_IN_SCREEN: ReadonlySet<string> = new Set(["headers"]);
 
 
 function isScreenLocked(screenId: SettingsNavId, userPlan: PlanTier): boolean {
@@ -838,7 +840,7 @@ export const SettingsTab: React.FC<
       : loadState === "loading"
       ? { text: "Loading settings…", tone: "muted" }
       : loadState === "error"
-        ? { text: "Settings unavailable · Retry to continue", tone: "danger" }
+        ? { text: "Settings unavailable · Retry to continue", tone: "muted" }
         : footerMessage
           ? { text: footerMessage, tone: "muted" }
           : saveError
@@ -1069,7 +1071,7 @@ export const SettingsTab: React.FC<
           className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col tw:gap-3 tw:overflow-y-auto tw:bg-[var(--bk-bg-panel)] tw:px-6 tw:pb-6"
           data-testid="set-body"
         >
-          {!online && showFooter && OFFLINE_BANNER_SCREENS.has(currentScreen) ? (
+          {!online && showFooter && OFFLINE_BANNER_SCREENS.has(currentScreen) && !OFFLINE_LINE_IN_SCREEN.has(currentScreen) ? (
             /* B8-SH04 245:48768: the screen stays; only Save waits for the network. */
             <div
               role="status"
@@ -1134,8 +1136,9 @@ export const SettingsTab: React.FC<
             >
               {footStatus.text}
             </span>
-            {/* B8-SH07: while the save runs the footer is the status and Saving… only. */}
-            {saving ? null : (
+            {/* B8-SH07 / SH12 / SH13: while a save runs, or the screen's read is
+                pending or failed, the footer is the status and Save only. */}
+            {saving || loadState !== "ready" || (!online && OFFLINE_BANNER_SCREENS.has(currentScreen)) ? null : (
             <Button
               type="button"
               variant="secondary"

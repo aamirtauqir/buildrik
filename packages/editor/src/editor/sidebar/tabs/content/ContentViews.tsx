@@ -106,7 +106,13 @@ const SPACER = "tw:flex-1";
 /** Two stacked lines inside a row (name over type, key over value). */
 const ROW_STACK = "tw:flex tw:flex-col tw:gap-0.5 tw:min-w-0 tw:flex-1";
 /** The page's row reads across: key · value · placeholders (B5-V01). */
-const PAGE_ROW = "tw:grid tw:min-w-0 tw:flex-1 tw:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)] tw:items-center tw:gap-4";
+/* 2L9 260:235689: the key over its value in the first column, the
+   placeholder count beside them, the ⋯ at the end; 72px rows. */
+const PAGE_ROW = "tw:grid tw:min-w-0 tw:flex-1 tw:grid-cols-[minmax(0,1.9fr)_minmax(0,1fr)] tw:items-center tw:gap-x-4 tw:gap-y-1";
+const DIALOG_LABEL = "tw:text-[13px] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)]";
+const DIALOG_HINT = "tw:m-0 tw:text-[12px] tw:leading-[18px]";
+const PAGE_VALUE = "tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]";
+const PAGE_COUNT = "tw:col-start-2 tw:row-span-2 tw:row-start-1 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]";
 /** …and its FIRST line: 13/20 wherever a board draws one (151:10 a field name,
  *  151:54 a source name, 151:95 a condition's element). `Row` supplies the 13
  *  and nothing supplied the 20. */
@@ -347,6 +353,11 @@ export function VariablesView({
   }, [addSignal]);
   const keyError = key.trim() !== "" && !isValidVariableKey(key.trim());
   const dupError = variables.some((v) => v.key === key.trim());
+  const closeAdd = () => {
+    setAdding(false);
+    setKey("");
+    setValue("");
+  };
   const usesOf = (k: string) => usages.get(k) ?? [];
   const placeholdersOf = (k: string) => {
     const n = usesOf(k).length;
@@ -384,15 +395,15 @@ export function VariablesView({
   return (
     <div className={CONTENT_BODY}>
       {page ? null : <Crumb label="Site variables" onClick={onBack} />}
-      <div className={page ? `${SCROLL} tw:px-2` : SCROLL}>
+      <div className={page ? `${SCROLL} tw:max-w-[880px] tw:px-2` : SCROLL}>
         {/* RL02 (424:337452) — the intro says what a variable is for, list or
             no list. Variables are saved with the project and the export
             writes their value wherever {{site.<key>}} appears in text
             (G3-075); the canvas keeps the braces as typed — say so. */}
-        <div className="tw:flex tw:flex-col tw:gap-1 tw:px-4 tw:py-3" data-testid="content-vars-intro">
+        <div className={`tw:flex tw:flex-col tw:px-4 tw:py-3 ${page ? "tw:gap-3 tw:pt-5" : "tw:gap-1"}`} data-testid="content-vars-intro">
           <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)]">Use one value across your site</p>
-          <p className={`${SUB} tw:m-0`}>
-            Type <span className={MONO}>{"{{site.key}}"}</span> in text. Published pages show the value; the canvas keeps the
+          <p className={page ? "tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]" : `${SUB} tw:m-0`}>
+            Type <span className={page ? undefined : MONO}>{"{{site.key}}"}</span> in text. Published pages show the value; the canvas keeps the
             placeholder. Changes are saved with your site.
           </p>
         </div>
@@ -403,7 +414,7 @@ export function VariablesView({
           </div>
         )}
         {variables.map((v) => (
-          <Row key={v.key} size="stack" data-variable-row data-testid={`content-var-${v.key}`} className={page ? "tw:rounded-[var(--bk-radius-md)] tw:bg-[var(--bk-bg-panel)] tw:mb-1" : undefined}>
+          <Row key={v.key} size="stack" data-variable-row data-testid={`content-var-${v.key}`} className={page ? "tw:min-h-[72px]" : undefined}>
             <span className={page ? PAGE_ROW : ROW_STACK}>
               <span className={VAR_KEY} data-testid={`content-var-key-${v.key}`}>{`{{site.${v.key}}}`}</span>
               {editKey === v.key ? (
@@ -422,10 +433,15 @@ export function VariablesView({
                   }}
                 />
               ) : (
-                <span className={SUB} data-testid={`content-var-value-${v.key}`}>{v.value || "Empty value"}</span>
+                <span
+                  className={page ? (v.value ? PAGE_VALUE : `${PAGE_VALUE} tw:text-[var(--bk-ink-muted)]`) : SUB}
+                  data-testid={`content-var-value-${v.key}`}
+                >
+                  {v.value || "Empty value"}
+                </span>
               )}
               {/* 260:235689 — how many text placeholders read this key. */}
-              <span className={SUB} data-testid={`content-var-count-${v.key}`}>{placeholderCount(usesOf(v.key).length)}</span>
+              <span className={page ? PAGE_COUNT : SUB} data-testid={`content-var-count-${v.key}`}>{placeholderCount(usesOf(v.key).length)}</span>
             </span>
             <span className={ROW_ACTIONS}>
               {editKey === v.key ? (
@@ -462,14 +478,15 @@ export function VariablesView({
                     <MenuItem data-testid={`content-var-edit-${v.key}`} onClick={() => { setMenuFor(null); setEditKey(v.key); setEditValue(v.value); }}>
                       Edit value
                     </MenuItem>
-                    <MenuItem data-testid={`content-var-usages-${v.key}`} onClick={() => { setMenuFor(null); setShowing(v.key); }}>
-                      Show usages
-                    </MenuItem>
                     <MenuItem data-testid={`content-var-rename-${v.key}`} onClick={() => { setMenuFor(null); setRenaming(v.key); }}>
                       Rename key…
                     </MenuItem>
-                    <MenuItem danger data-testid={`content-var-delete-${v.key}`} onClick={() => { setMenuFor(null); setDeleting(v.key); }}>
-                      Delete…
+                    <MenuItem data-testid={`content-var-usages-${v.key}`} onClick={() => { setMenuFor(null); setShowing(v.key); }}>
+                      Show usages
+                    </MenuItem>
+                    {/* 260:237728: plain text, as the board draws it. */}
+                    <MenuItem data-testid={`content-var-delete-${v.key}`} onClick={() => { setMenuFor(null); setDeleting(v.key); }}>
+                      Delete variable…
                     </MenuItem>
                   </Menu>
                 </Popover>
@@ -478,42 +495,44 @@ export function VariablesView({
           </Row>
         ))}
         {adding ? (
-          <div className={INLINE_FORM}>
-            <TextInput
-              placeholder="key (e.g. phone)"
-              value={key}
-              onChange={(e) => setKey(e.target.value)}
-              aria-label="Variable key"
-              autoFocus
-            />
-            {(keyError || dupError) && (
-              <div className={ERROR_TEXT} role="alert">
-                {dupError ? "A variable with this key already exists." : "Keys are letters/digits/dashes, starting with a letter."}
-              </div>
-            )}
-            <TextInput
-              placeholder="value"
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              aria-label="Variable value"
-            />
-            <div className={FORM_ROW}>
-              <span className={SPACER} />
-              <Button color="light" size="xs" className={GHOST} onClick={() => setAdding(false)}>Cancel</Button>
-              <Button
-                size="xs"
-                disabled={!key.trim() || keyError || dupError}
-                onClick={() => {
-                  onChange([...variables, { key: key.trim(), value }]);
-                  setAdding(false);
-                  setKey("");
-                  setValue("");
-                }}
-              >
-                Add
-              </Button>
+          /* 2L9 B5-V03 260:236147 — "Add site variable" is a dialog. */
+          <Modal
+            open
+            onClose={closeAdd}
+            title="Add site variable"
+            kind="form"
+            testId="content-var-add"
+            footer={
+              <>
+                <Button variant="secondary" onClick={closeAdd}>
+                  Cancel
+                </Button>
+                <Button
+                  disabled={!key.trim() || keyError || dupError}
+                  onClick={() => {
+                    onChange([...variables, { key: key.trim(), value }]);
+                    closeAdd();
+                  }}
+                >
+                  Add variable
+                </Button>
+              </>
+            }
+          >
+            <div className="tw:flex tw:flex-col tw:gap-1.5 tw:[&_input]:border-transparent tw:[&_input]:bg-[var(--bk-bg-subtle)]">
+              <p className="tw:m-0 tw:mb-2 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">
+                Save a value once for text across your site. Publishing is separate.
+              </p>
+              <label className={DIALOG_LABEL} htmlFor="content-var-add-key">Key</label>
+              <TextInput id="content-var-add-key" sizing="sm" value={key} onChange={(e) => setKey(e.target.value)} aria-label="Variable key" autoFocus />
+              <p className={`${DIALOG_HINT} ${keyError || dupError ? "tw:text-[var(--bk-error-text)]" : "tw:text-[var(--bk-ink-muted)]"}`} role={keyError || dupError ? "alert" : undefined}>
+                {dupError ? "A variable with this key already exists." : "Start with a letter. Use letters, digits, underscores or dashes."}
+              </p>
+              <label className={`${DIALOG_LABEL} tw:mt-2`} htmlFor="content-var-add-value">Value</label>
+              <TextInput id="content-var-add-value" sizing="sm" value={value} onChange={(e) => setValue(e.target.value)} aria-label="Variable value" />
+              <p className={`${DIALOG_HINT} tw:text-[var(--bk-ink-muted)]`}>An empty value is allowed.</p>
             </div>
-          </div>
+          </Modal>
         ) : page ? null : (
           <Button className={`${LINK_BTN} tw:mx-4 tw:my-0.5`} data-testid="content-add-variable" onClick={() => setAdding(true)}>
             + New variable

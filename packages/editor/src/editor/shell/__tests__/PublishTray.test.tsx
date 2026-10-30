@@ -35,6 +35,8 @@ vi.mock("@/editor/sidebar/tabs/publish/usePublishSnapshot", async (orig) => ({
     reload: vi.fn(),
   }),
 }));
+const previewState: { preview: unknown } = { preview: null };
+vi.mock("@/editor/sidebar/tabs/publish/usePublishPreviewDiff", () => ({ usePublishPreviewDiff: () => previewState.preview }));
 const cms = {
   blocker: null as string | null,
   failure: null as null | { reason: string; attempts: number; since: number; open: { collectionId: string; recordId?: string } | null },
@@ -46,7 +48,11 @@ vi.mock("@/services/cmsSync", () => ({
   onCmsSyncError: () => () => {},
   retryCmsSync: () => cms.retry(),
 }));
-vi.mock("@/services/BuildrikSyncProvider", () => ({ getSiteIdFromUrl: () => "site-1" }));
+const updateSiteColumns = vi.fn(async () => ({}));
+vi.mock("@/services/BuildrikSyncProvider", () => ({
+  getSiteIdFromUrl: () => "site-1",
+  updateSiteColumns: (...a: unknown[]) => updateSiteColumns(...(a as [])),
+}));
 const roundState: { round: unknown } = { round: null };
 vi.mock("@/services/ReviewService", () => ({ fetchCurrentRound: async () => roundState.round }));
 const locateComment = vi.fn(() => "located");
@@ -76,6 +82,7 @@ function job(over: Partial<UsePublishJobResult> = {}): UsePublishJobResult {
     hasUnpublishedChanges: null,
     dismissBlock: vi.fn(),
     unpublished: vi.fn(),
+    startedAt: null,
     pollLost: false,
     ...over,
   };
@@ -147,6 +154,7 @@ beforeEach(() => {
   cms.blocker = null;
   cms.failure = null;
   roundState.round = null;
+  previewState.preview = null;
   cms.retry.mockClear();
   locateComment.mockClear();
 });
@@ -248,6 +256,29 @@ describe("PublishTray — states (B8-PB* copy)", () => {
     expect(screen.getByTestId("publish-tray-status").textContent).toContain("Live · fieldwork.studio");
   });
 
+  it("A-32: the queued job names its steps (all pending, skipped ones hidden) and the run counts its elapsed time", () => {
+    renderTray({
+      publishJob: job({
+        uiState: "publishing",
+        jobId: "job-1",
+        startedAt: new Date(Date.now() - 42_000).toISOString(),
+        steps: [
+          { name: "Generating pages", status: "pending" },
+          { name: "Optimizing images", status: "skipped" },
+          { name: "Deploying to CDN", status: "pending" },
+          { name: "Verifying SSL", status: "pending" },
+          { name: "Performance check", status: "skipped" },
+        ],
+      }),
+    });
+    const run = screen.getByTestId("publish-tray-run");
+    expect(run.textContent).toContain("Queued — waiting to start");
+    expect(run.textContent).toContain("Verifying SSL");
+    expect(run.textContent).not.toContain("Performance check");
+    expect(screen.getByTestId("publish-tray-elapsed").textContent).toMatch(/^Elapsed 0:4[2-4]$/);
+    expect(screen.getByRole("button", { name: "Cancel (not started)" })).toBeTruthy();
+  });
+
   it("queued (PB08): no steps yet, and the job can still be cancelled", () => {
     const queued = job({ uiState: "publishing", jobId: "job-1", steps: null });
     renderTray({ publishJob: queued });
@@ -305,6 +336,51 @@ describe("PublishTray — states (B8-PB* copy)", () => {
     cms.failure = { reason: "offline", attempts: 2, since: Date.now() - 5_000, open: null };
     renderTray();
     expect(reason()).toBe("Saving CMS changes…");
+  });
+
+  it("A-33: what will change — counts against the live version, a chip per page, CMS records, See all into Compare", () => {
+    previewState.preview = {
+      diff: { retained: true, pages: [], added: 1, removed: 0, changed: 3, liveVersion: 12, cmsRecords: 4 },
+      changes: [
+        { name: "Home", change: "changed" },
+        { name: "Work", change: "changed" },
+        { name: "About", change: "changed" },
+        { name: "Services", change: "added" },
+      ],
+    };
+    const { composer } = renderTray();
+    expect(screen.getByTestId("publish-tray-changes").textContent).toBe("3 pages changed · 1 added · 0 removed");
+    expect(screen.getByTestId("publish-tray-change-chips").textContent).toBe("✎ changed Home✎ changed Work✎ changed About+ added Services");
+    expect(screen.getByTestId("publish-tray-cms-count").textContent).toBe("CMS: 4 records published");
+    fireEvent.click(screen.getByTestId("publish-tray-see-all"));
+    expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_COMPARE_OPEN, expect.objectContaining({ right: { kind: "current" }, from: "Publish" }));
+  });
+
+  it("A-34 / B8-PB22: over the plan's site limit — the plan's sentence under the shut CTA, no checks", () => {
+    checksState.checks = {
+      ready: false,
+      checks: [{ label: "Plan limit", status: "fail", detail: "Over the Free limit — Upgrade to publish" }],
+    } as unknown as PrePublishChecksResult;
+    renderTray({ nextMove: move({ errorCount: 1 }) });
+    expect(cta()).toBeDisabled();
+    expect(reason()).toBe("Over the Free limit — Upgrade to publish");
+    expect(document.querySelector('section[aria-label="Checks"]')).toBeNull();
+  });
+
+  it("A-36 / B8-PB16–17: a password kept on Free — Upgrade, or remove it (asked first) and publish", async () => {
+    checksState.checks = {
+      ready: false,
+      checks: [{ label: "Password protection", status: "fail", detail: "This site is password protected. On Free the protection is removed and the site becomes public." }],
+    } as unknown as PrePublishChecksResult;
+    const { onRequestPublish } = renderTray({ nextMove: move({ errorCount: 1 }) });
+    expect(screen.getByTestId("publish-check-password").textContent).toContain("On Free the protection is removed");
+    expect(screen.getByText("1 blocking")).toBeTruthy();
+    fireEvent.click(screen.getByTestId("publish-check-password-remove"));
+    expect(screen.getByText("Remove password protection and publish?")).toBeTruthy();
+    expect(screen.getByText("fieldwork.studio becomes public. You can add protection again on Pro.")).toBeTruthy();
+    fireEvent.click(screen.getByTestId("publish-remove-protection-confirm"));
+    await waitFor(() => expect(onRequestPublish).toHaveBeenCalledTimes(1));
+    expect(updateSiteColumns).toHaveBeenCalledWith("site-1", { publishedPassword: null });
   });
 
   it("checks loading (PB23): placeholders only, nothing actionable", () => {

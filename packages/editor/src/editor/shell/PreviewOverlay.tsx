@@ -121,6 +121,14 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({
   initialDevice = "desktop",
 }) => {
   const [device, setDevice] = React.useState<Breakpoint>(initialDevice);
+  /* J-F1.11 8:3262: every opening starts at the editor's device; switching
+     inside the preview (or moving to another page) keeps the choice. */
+  const opened = html != null;
+  const deviceRef = React.useRef(initialDevice);
+  deviceRef.current = initialDevice;
+  React.useEffect(() => {
+    if (opened) setDevice(deviceRef.current);
+  }, [opened]);
   const [shareOpen, setShareOpen] = React.useState(false);
   const pagesRef = React.useRef(pages);
   pagesRef.current = pages;

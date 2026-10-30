@@ -21,6 +21,9 @@ import { Button, Checkbox, Modal, Select, TextInput } from "@/editor/chrome-ui";
 import { FIELD_RULES, FIELD_TYPES, FIELD_TYPE_LABEL, OPTION_TYPES, TYPED_VALUE_TYPES, fieldKeyError, fieldKeyFrom, freeKey, parseDefault, type FieldRuleKey } from "./fieldTypes";
 import { cmsValueError } from "@buildrik/shared/schemas/cms";
 import { OptionsEditor } from "./OptionsEditor";
+import type { OpenMediaLibrary } from "./RecordFieldControl";
+import type { MediaAssetType } from "@/shared/types/media";
+import { useAssetPick } from "@/editor/sidebar/tabs/media/data/assetPick";
 
 /* 2L9 167:4135…167:8207: the label OVER its field, 13/20 medium ink; the
    field filled grey with no rule; 12/18 muted hints under it. */
@@ -34,6 +37,12 @@ const NOTE = "tw:m-0 tw:text-[14px] tw:leading-5 tw:text-[var(--bk-ink)]";
 /* 2L9 167:4135…167:8207, type by type: which take a default here, which
    show their limits here (the field inspector still edits every rule a type
    has), and the line under the default. */
+/* 167:7406 / 167:7671: an image or file field's default is an asset from
+   the library, of the kinds the field takes. */
+const ASSET_TYPES: Partial<Record<CMSFieldType, { allowed: MediaAssetType[]; hint: string }>> = {
+  image: { allowed: ["image"], hint: "Images only." },
+  file: { allowed: ["image", "video", "font"], hint: "Allowed uploads: images, video and fonts. PDFs are not supported." },
+};
 const DEFAULTABLE: ReadonlySet<CMSFieldType> = new Set([...TYPED_VALUE_TYPES, "richtext", "boolean"]);
 const ADD_RULE_TYPES: ReadonlySet<CMSFieldType> = new Set(["text", "textarea", "number"]);
 function defaultHint(type: CMSFieldType, raw: string): string | null {
@@ -65,12 +74,16 @@ export function AddFieldDialog({
   collections,
   onClose,
   onAdd,
+  onOpenMediaLibrary,
 }: {
   collection: CMSCollection;
   /** Every collection — a reference field's target. */
   collections: CMSCollection[];
   onClose: () => void;
   onAdd: (field: Omit<CMSField, "id" | "order">) => Promise<void>;
+  /** The media library's pick — an image / file field's default asset
+   *  (167:7406 / 167:7671). Absent: no default asset is offered. */
+  onOpenMediaLibrary?: OpenMediaLibrary;
 }) {
   const [type, setType] = React.useState<CMSFieldType | null>(null);
   const [name, setName] = React.useState("");
@@ -85,6 +98,16 @@ export function AddFieldDialog({
   const [rules, setRules] = React.useState<Partial<Record<FieldRuleKey, string>>>({});
   const [placeholder, setPlaceholder] = React.useState("");
   const [helpText, setHelpText] = React.useState("");
+  /* The default asset is the asset's own src — what a record's image or file
+     value stores (RecordFieldControl). While the library is picking, this
+     dialog steps aside so the drawer can be used; it returns when the pick
+     lands or is cancelled. */
+  const [assetSrc, setAssetSrc] = React.useState("");
+  const [picking, setPicking] = React.useState(false);
+  const pickPending = useAssetPick();
+  React.useEffect(() => {
+    if (picking && !pickPending) setPicking(false);
+  }, [picking, pickPending]);
 
   const taken = React.useMemo(() => new Set(collection.fields.map((f) => f.slug)), [collection.fields]);
   const nextName = name.trim();
@@ -98,7 +121,7 @@ export function AddFieldDialog({
     Object.entries(rules).flatMap(([k, v]) => (v && v.trim() !== "" && Number.isFinite(Number(v)) ? [[k, Number(v)]] : [])),
   ) as Partial<Record<FieldRuleKey, number>>;
   const validation = { ...(required ? { required: true } : {}), ...ruleValues };
-  const defaultValue = type ? parseDefault(type, defaultRaw) : undefined;
+  const defaultValue = type && ASSET_TYPES[type] ? assetSrc || undefined : type ? parseDefault(type, defaultRaw) : undefined;
   /* A default has to pass the field's own rules, or every new record starts
      out unpublishable. */
   const defaultError =
@@ -132,6 +155,8 @@ export function AddFieldDialog({
       setBusy(false);
     }
   };
+
+  if (picking) return null;
 
   if (clash) {
     const suggestion = freeKey(fieldKeyFrom(nextName) === clash ? clash : fieldKeyFrom(nextName) || clash, taken);
@@ -338,6 +363,35 @@ export function AddFieldDialog({
           </p>
         ) : null}
         {type === "number" ? null : ruleRows}
+        {ASSET_TYPES[type] && onOpenMediaLibrary ? (
+          <div className={ROW} data-testid="cms-add-field-asset">
+            {assetSrc ? (
+              <span className="tw:flex tw:items-center tw:gap-2 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">
+                <span className="tw:min-w-0 tw:flex-1 tw:truncate" data-testid="cms-add-field-asset-name">{assetSrc.split("/").pop()}</span>
+                <Button variant="ghost" size="xs" onClick={() => setAssetSrc("")} data-testid="cms-add-field-asset-remove">
+                  Remove
+                </Button>
+              </span>
+            ) : null}
+            <Button
+              variant="secondary"
+              size="sm"
+              className="tw:h-8 tw:w-[228px] tw:font-normal"
+              data-testid="cms-add-field-asset-choose"
+              onClick={() => {
+                const t = ASSET_TYPES[type]!;
+                setPicking(true);
+                onOpenMediaLibrary(t.allowed, (asset) => {
+                  setAssetSrc(asset.src);
+                  setPicking(false);
+                }, `${nextName || label} · default`);
+              }}
+            >
+              Choose default asset…
+            </Button>
+            <p className={`${HINT} tw:text-[var(--bk-ink-muted)]`}>{ASSET_TYPES[type]!.hint}</p>
+          </div>
+        ) : null}
         <div className={ROW}>
           <label className={ROW_LABEL} htmlFor="cms-add-field-placeholder">Placeholder</label>
           <TextInput id="cms-add-field-placeholder" sizing="sm" autoComplete="off" value={placeholder} onChange={(e) => setPlaceholder(e.target.value)} data-testid="cms-add-field-placeholder" />

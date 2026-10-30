@@ -195,7 +195,7 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
   if (!collection && ws.page === "variables") {
     return (
       <div className="tw:flex tw:h-full tw:min-h-0" data-testid="cms-workspace" data-bk-full-page="">
-        <section className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:bg-[var(--bk-bg-subtle)]" data-testid="cms-ws-variables">
+        <section className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:bg-[var(--bk-bg-panel)]" data-testid="cms-ws-variables">
           <header className={HEADER} data-testid="cms-ws-header">
             {back}
             <h2 className={TITLE}>Site variables</h2>
@@ -578,6 +578,7 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
           onClose={() => setAddingField(false)}
           collections={panel.collections}
           onAdd={(field) => panel.addField(collection.id, field)}
+          onOpenMediaLibrary={onOpenMediaLibrary}
         />
       ) : null}
       {csvImportOpen ? (

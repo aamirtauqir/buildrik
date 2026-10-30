@@ -16,7 +16,6 @@ import { EVENTS } from "@/shared/constants";
 import { useActivePageId } from "@/editor/shared/useActivePageId";
 import type { ComposerConfig, ProjectData } from "@/shared/types";
 import { ToastProvider, UpgradeModal, useToast, StudioSkeleton, Button } from "@/editor/chrome-ui";
-import { StaleApprovalModal } from "./modals/StaleApprovalModal";
 import { SessionExpiredModal } from "./modals/SessionExpiredModal";
 import { PublishConfirmModal } from "./modals/PublishConfirmModal";
 import { PublishErrorsConfirmModal } from "./modals/PublishErrorsConfirmModal";
@@ -486,14 +485,15 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
        open-errors        → "Publish with N open errors?" (B1-11), whose
                             Publish anyway continues to `gateAfterErrors`
        changes-requested  → the changes-requested gate (B1-09)
-       stale-approval     → StaleApprovalModal (B1-10) — its Publish anyway
-                            ships with `acknowledgeStale`
-       confirm            → the four-facts confirm (B3-10)
+       stale-approval     → the same numbered confirm in its stale form
+                            (B8-PB05/PB06): an Admin ticks "Publish without a
+                            fresh review" and it ships with `acknowledgeStale`
+       confirm            → the numbered confirm (B8-PB04)
        waiting · none     → nothing opens; the CTA was disabled with its reason
 
      Publishing replaces the live site for every visitor. The stop on the
-     common path is the facts confirm; StaleApprovalModal used to be the only
-     gate, and it fires after the server has already refused. */
+     common path is the facts confirm; the stale acknowledgement used to be
+     the only gate, and it fired after the server had already refused. */
   const [publishDoor, setPublishDoor] = React.useState<PublishGate>("none");
   const serverGate = gateFromBlockReason(publishJob.blockedReason);
   const doorOpen = React.useCallback(
@@ -664,16 +664,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
            (L5-074) — the unsaved-edits toast owns recovery there. */
         localDraftShown={!getSiteIdFromUrl() || loadError !== null}
       />
-      <LoadErrorBanner
-        kind={loadError}
-        onRetry={() => window.location.reload()}
-        /* New tab, deliberately: the auth load-error can sit over LOCAL
-           fallback changes being edited, and a same-tab redirect destroys
-           them — the exact failure the session-expired surface exists to
-           prevent. Same-origin cookie lands either way. */
-        onSignIn={() => window.open(`${DASHBOARD_URL}/auth?reason=session-expired`, "_blank", "noopener")}
-        onDismiss={() => setLoadError(null)}
-      />
       <header role="banner" aria-label="Editor toolbar">
         <StudioHeader
           composer={composer}
@@ -704,6 +694,10 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           onExportHTML={handleExportHTML}
           onVercelPublish={requestPublish}
           publishLoading={publishJob.uiState === "publishing"}
+          /* A-29: the toggle counts the worker's steps (B8-PB07) and turns
+             red on a failed publish (B8-PB10); a lost poll is not a failure. */
+          publishSteps={publishJob.steps}
+          publishFailed={publishJob.uiState === "failed" && !publishJob.pollLost}
           publishedUrl={publishJob.publishedUrl}
           publishOutcome={publishOutcome}
           reviewStatus={reviewStatus}
@@ -712,6 +706,17 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           addToast={addToast}
         />
       </header>
+      {/* F-11 (B7-G02 225:2821): the global banner slot sits UNDER the topbar. */}
+      <LoadErrorBanner
+        kind={loadError}
+        onRetry={() => window.location.reload()}
+        /* New tab, deliberately: the auth load-error can sit over LOCAL
+           fallback changes being edited, and a same-tab redirect destroys
+           them — the exact failure the session-expired surface exists to
+           prevent. Same-origin cookie lands either way. */
+        onSignIn={() => window.open(`${DASHBOARD_URL}/auth?reason=session-expired`, "_blank", "noopener")}
+        onDismiss={() => setLoadError(null)}
+      />
       <StudioPanels
         composer={composer}
         selectedElement={selectedElement}
@@ -835,6 +840,8 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         pageName={previewHtml ? composer.elements.getActivePage?.()?.name : null}
         pages={previewHtml ? composer.elements.getAllPages() : undefined}
         currentPageId={previewHtml ? composer.elements.getActivePage?.()?.id : null}
+        /* J-F1.11 8:3262: the preview opens at the device being edited (A-22). */
+        initialDevice={state.device}
         /* Another page in the preview (its menu, or an internal link): the
            editor moves to that page too, so "Back to canvas" lands on what
            was being previewed (L5-051). */
@@ -855,19 +862,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           record dirty, caught before ⌘H, ⇧A, the palette, ui:switch-tab or
           UI_PANEL_OPEN silently discards it. */}
       <UnsavedTabSwitchDialog {...tabSwitchDialogProps} />
-
-      {/* Stale-approval gate (contracts §1.5, S5.6 board 131:201): the site
-          changed after the client approved it. The modal itemizes the changed
-          pages, offers a fresh review round, or ships the changes deliberately. */}
-      <StaleApprovalModal
-        isOpen={doorOpen("stale-approval")}
-        composer={composer}
-        onClose={closeDoor}
-        onPublishAnyway={() => {
-          setPublishDoor("none");
-          void handlePublishAcknowledged();
-        }}
-      />
 
       {/* The changes-requested gate (B1-09), by name from the pre-click door.
           `no-review` / `review-pending` are `waiting` — a shut door, never a
@@ -919,7 +913,8 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           not see (a revision that went stale between paint and click) still
           lands in its dialog afterwards — sequential, not alternatives. */}
       <PublishConfirmModal
-        isOpen={doorOpen("confirm")}
+        isOpen={doorOpen("confirm") || doorOpen("stale-approval")}
+        stale={doorOpen("stale-approval")}
         composer={composer}
         /* So the confirm can ask `runPrePublishChecks` whether this workspace
            can deploy at all — the panel path has always asked; this one
@@ -927,7 +922,14 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         siteId={getSiteIdFromUrl()}
         isPublished={publishJob.uiState === "published" || !!publishJob.publishedUrl}
         publishedUrl={publishJob.publishedUrl}
-        onConfirm={confirmPublish}
+        onConfirm={
+          doorOpen("stale-approval")
+            ? () => {
+                setPublishDoor("none");
+                void handlePublishAcknowledged();
+              }
+            : confirmPublish
+        }
         onClose={closeDoor}
       />
     </div>

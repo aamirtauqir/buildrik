@@ -15,10 +15,11 @@
 
 import * as React from "react";
 import type { Composer } from "@/engine";
-import { fetchCurrentRound, type CurrentRound } from "@/services/ReviewService";
+import { fetchApprovedSnapshot, fetchCurrentRound, type CurrentRound } from "@/services/ReviewService";
 import { fetchPrePublishChecks } from "@/services/PublishService";
-import { exportPublishPages } from "@/editor/shell/exportPublishPages";
+import { exportPublishPages, type PublishPage } from "@/editor/shell/exportPublishPages";
 import { saveStatusStore } from "@/editor/shell/saveStatusStore";
+import { usePublishPreviewDiff } from "./usePublishPreviewDiff";
 import { Checkbox } from "@/editor/chrome-ui";
 
 /* Board B3-10 (7574:193972) draws the four facts as a two-column table on a
@@ -105,6 +106,20 @@ export interface PublishConfirmFactsProps {
   tips?: number;
   tipsSeen?: boolean;
   onTipsSeen?(seen: boolean): void;
+  /** The approval is older than the edits (B8-PB05/PB06): the Approval row
+   *  says how much changed since, and carries `staleControl` at its end. */
+  stale?: boolean;
+  staleControl?: React.ReactNode;
+}
+
+/** Pages that differ between what the client approved and what would ship. */
+function changedSince(approved: readonly PublishPage[], current: readonly PublishPage[]): number {
+  const a = new Map(approved.map((p) => [p.path, p.html]));
+  let n = 0;
+  for (const p of current) if (a.get(p.path) !== p.html) n++;
+  const now = new Set(current.map((p) => p.path));
+  for (const path of a.keys()) if (!now.has(path)) n++;
+  return n;
 }
 
 export const PublishConfirmFacts: React.FC<PublishConfirmFactsProps> = ({
@@ -120,7 +135,13 @@ export const PublishConfirmFacts: React.FC<PublishConfirmFactsProps> = ({
   tips = 0,
   tipsSeen = false,
   onTipsSeen,
+  stale = false,
+  staleControl,
 }) => {
+  const [changes, setChanges] = React.useState<number | null>(null);
+  /* A-33: "3 pages changed · 1 added · CMS 4 records" against the live version. */
+  const preview = usePublishPreviewDiff(composer, siteId ?? null, active);
+  const d = preview?.diff;
   const [pageCount, setPageCount] = React.useState<number | null>(null);
   const [round, setRound] = React.useState<CurrentRound | null>(null);
   const [loadingRound, setLoadingRound] = React.useState(true);
@@ -140,12 +161,14 @@ export const PublishConfirmFacts: React.FC<PublishConfirmFactsProps> = ({
     void (async () => {
       /* The page count is the EXPORT's count, not the page list's: what ships
          is what the exporter produces. */
-      const [pages, r, checks] = await Promise.all([
+      const [pages, r, checks, approved] = await Promise.all([
         composer ? exportPublishPages(composer).catch(() => null) : Promise.resolve(null),
         fetchCurrentRound().catch(() => null),
         siteId ? fetchPrePublishChecks(siteId).catch(() => null) : Promise.resolve(null),
+        stale ? fetchApprovedSnapshot().catch(() => null) : Promise.resolve(null),
       ]);
       if (cancelled) return;
+      setChanges(approved && pages ? changedSince(approved, pages) : null);
       /* A checks call that fails is not a pass (DQ-001). It used to collapse
          into "nothing failed" through `null?.checks ?? []`, which cleared the
          blockers and enabled Publish on any transient error. It now blocks,
@@ -172,7 +195,7 @@ export const PublishConfirmFacts: React.FC<PublishConfirmFactsProps> = ({
     return () => {
       cancelled = true;
     };
-  }, [active, composer, onPageCount, siteId, onBlockingChecks]);
+  }, [active, composer, onPageCount, siteId, onBlockingChecks, stale]);
 
   /* Board B8-PB04 `233:1802`: a numbered ledger — the number is the row's
      place in the publish checklist, so a row that does not apply leaves its
@@ -196,7 +219,18 @@ export const PublishConfirmFacts: React.FC<PublishConfirmFactsProps> = ({
       <div className={ROW}>
         <span className={KEY} data-testid="publish-fact-key-pages">1 Changes</span>
         <span className={VAL} data-testid="publish-fact-val-pages">
-          {pageCount == null ? "Preparing…" : `${pageCount} page${pageCount === 1 ? "" : "s"}`}
+          {d?.retained
+            ? [
+                `${d.changed} page${d.changed === 1 ? "" : "s"} changed`,
+                `${d.added} added`,
+                d.removed ? `${d.removed} removed` : null,
+                d.cmsRecords ? `CMS ${d.cmsRecords} record${d.cmsRecords === 1 ? "" : "s"}` : null,
+              ]
+                .filter(Boolean)
+                .join(" · ")
+            : pageCount == null
+              ? "Preparing…"
+              : `${pageCount} page${pageCount === 1 ? "" : "s"}`}
         </span>
       </div>
       {tips > 0 ? (
@@ -217,7 +251,14 @@ export const PublishConfirmFacts: React.FC<PublishConfirmFactsProps> = ({
         <div className={ROW}>
           {/* "Approval", the board's word; the value still names who. */}
           <span className={KEY} data-testid="publish-fact-key-approval">4 Approval</span>
-          <span className={VAL} data-testid="publish-fact-val-approval">{approvalLine(round, loadingRound)}</span>
+          <span className={VAL} data-testid="publish-fact-val-approval">
+            {stale && round?.resolvedAt
+              ? `Approved ${new Date(round.resolvedAt).toLocaleDateString(undefined, { day: "numeric", month: "short" })} · edited since${
+                  changes !== null ? ` (${changes} change${changes === 1 ? "" : "s"})` : ""
+                }`
+              : approvalLine(round, loadingRound)}
+          </span>
+          {stale && staleControl ? <span className="tw:w-[200px] tw:flex-none">{staleControl}</span> : null}
         </div>
       ) : null}
       <div className={ROW}>

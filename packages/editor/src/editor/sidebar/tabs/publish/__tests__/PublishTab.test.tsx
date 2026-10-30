@@ -67,6 +67,7 @@ function makeJob(over: Partial<UsePublishJobResult> = {}): UsePublishJobResult {
     lastPublishedAt: null,
     hasUnpublishedChanges: null,
     unpublished: vi.fn(),
+    startedAt: null,
     pollLost: false,
     publish: vi.fn(), cancel: vi.fn(), track: vi.fn(), reset: vi.fn(), dismissBlock: vi.fn(), ...over,
   };

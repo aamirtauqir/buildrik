@@ -139,6 +139,8 @@ import { PageSwitcher } from "@/editor/shell/PageSwitcher";
 import { BottomBar } from "@/editor/shell/BottomBar";
 import { saveStatusStore } from "@/editor/shell/saveStatusStore";
 import { publishTray } from "@/editor/shell/publishTrayStore";
+import { buildPublishSteps } from "@buildrik/shared/schemas/publish";
+import { SettingsTab } from "@/editor/sidebar/tabs/settings/SettingsTab";
 import { UnpublishConfirmModal } from "@/editor/sidebar/tabs/publish/UnpublishConfirmModal";
 import { saveFailedBanner } from "@/editor/shell/globalBanners";
 import type { SaveState } from "@/editor/chrome-ui";
@@ -180,7 +182,6 @@ import { PublishSettingsGuard } from "@/editor/sidebar/tabs/settings/components/
 import type { PageSummary } from "@/shared/types";
 import { ReviewTab } from "@/editor/sidebar/tabs/review/ReviewTab";
 import { PublishGateModal, type PublishGateReason } from "@/editor/shell/modals/PublishGateModal";
-import { StaleApprovalModal } from "@/editor/shell/modals/StaleApprovalModal";
 import { CommentLayer } from "@/editor/canvas/comments/CommentLayer";
 import { EVENTS } from "@/shared/constants/events";
 
@@ -2394,6 +2395,7 @@ function publishTrayFrame(
     hasUnpublishedChanges: true,
     dismissBlock: () => {},
     unpublished: () => {},
+    startedAt: null,
     pollLost: false,
     ...o.job,
   };
@@ -3635,6 +3637,7 @@ const CASES: Record<string, () => React.ReactElement> = {
           collections={[CMS_STATUS_COLLECTION]}
           onClose={() => {}}
           onAdd={() => (fail ? Promise.reject(new Error("offline")) : new Promise<void>(() => {}))}
+          onOpenMediaLibrary={(_types, onSelect) => onSelect({ src: "https://cdn.example/media/portrait.jpg" } as never)}
         />
       </div>
     );
@@ -4169,19 +4172,14 @@ const CASES: Record<string, () => React.ReactElement> = {
       uiState: "publishing",
       jobId: "cmv8job000003",
       progress: 50,
-      steps: [
-        { name: "Generating pages", status: "done" },
-        { name: "Optimizing images", status: "skipped" },
-        { name: "Deploying to CDN", status: "active" },
-        { name: "Verifying SSL", status: "pending" },
-        { name: "Performance check", status: "pending" },
-      ],
+      steps: buildPublishSteps(2),
+      startedAt: new Date(Date.now() - 42_000).toISOString(),
     },
   }),
   "publish-tray-queued": () => publishTrayFrame("publish-tray-queued", {
     nextMove: deriveLifecycleState(TRAY_LIFE),
     server: { "sites.publishHistory": TRAY_ROWS.slice(1) },
-    job: { uiState: "publishing", jobId: "cmv8job000004", progress: 0, steps: null },
+    job: { uiState: "publishing", jobId: "cmv8job000004", progress: 0, steps: buildPublishSteps(-1), startedAt: new Date(Date.now() - 42_000).toISOString() },
   }),
   "publish-tray-lost": () => publishTrayFrame("publish-tray-lost", {
     nextMove: deriveLifecycleState(TRAY_LIFE),
@@ -4203,6 +4201,21 @@ const CASES: Record<string, () => React.ReactElement> = {
   "publish-tray-viewer": () => publishTrayFrame("publish-tray-viewer", {
     nextMove: deriveLifecycleState({ ...TRAY_LIFE, isViewer: true }),
     server: { "sites.publishHistory": TRAY_ROWS.slice(1) },
+  }),
+  /* A-36 B8-PB16 233:8594 / A-34 B8-PB22 233:11934 — the plan's refusals. */
+  "publish-tray-password": () => publishTrayFrame("publish-tray-password", {
+    nextMove: deriveLifecycleState({ ...TRAY_LIFE, errorCount: 1 }),
+    server: {
+      "sites.publishHistory": TRAY_ROWS.slice(1),
+      "sites.prePublishChecks": { ready: false, checks: [{ label: "Password protection", status: "fail", detail: "This site is password protected. On Free the protection is removed and the site becomes public." }] },
+    },
+  }),
+  "publish-tray-plan-limit": () => publishTrayFrame("publish-tray-plan-limit", {
+    nextMove: deriveLifecycleState({ ...TRAY_LIFE, errorCount: 1 }),
+    server: {
+      "sites.publishHistory": TRAY_ROWS.slice(1),
+      "sites.prePublishChecks": { ready: false, checks: [{ label: "Plan limit", status: "fail", detail: "Over the Free limit — Upgrade to publish" }] },
+    },
   }),
   "publish-tray-checking": () => publishTrayFrame("publish-tray-checking", {
     nextMove: deriveLifecycleState(TRAY_LIFE),
@@ -4232,6 +4245,10 @@ const CASES: Record<string, () => React.ReactElement> = {
         unreadCount={0}
         onOpenNotifications={() => {}}
         onPublish={() => {}}
+        /* `&publish=failed|running`: B8-PB10's red toggle, B8-PB07's run label. */
+        publish={new URLSearchParams(location.search).get("publish") === "failed" ? "failed" : "ready"}
+        publishExpanded={false}
+        ctaLabel={new URLSearchParams(location.search).get("publish") === "running" ? "Publishing 2/3…" : undefined}
         menu={
           <IconButton label="Site menu" data-testid="topbar-site-menu">
             <SiteMenuIcon />
@@ -4297,12 +4314,23 @@ const CASES: Record<string, () => React.ReactElement> = {
   // state a slow compare actually shows — and the two things this recipe
   // measures, the title and the body gutter, render before and regardless of
   // it. The change rows are NOT measured here; see the recipe's own note.
+  /* B8-PB05 233:2418 / PB06 233:3034 — the numbered confirm in its stale
+     form (StaleApprovalModal is gone, A-31). `&role=ADMIN|EDITOR`; the round
+     was approved, then edited (the approved snapshot differs on one page). */
   "s5-6-approved-edited-since": () => {
-    trpcStub({ "reviews.currentRound": () => REVIEW_ROUND(), "sites.myRole": () => "OWNER" });
+    const role = new URLSearchParams(location.search).get("role") ?? "ADMIN";
+    stubTrayServer({
+      "reviews.currentRound": { id: "r1", status: "APPROVED", invitedEmail: "lena@client.test", reviewerName: "Lena", revoked: false, resolvedAt: "2026-10-15T10:00:00.000Z", createdAt: "2026-10-14T10:00:00.000Z", revision: "x", roundNumber: 1, totalRounds: 1, openCommentCount: 0, token: null },
+      "reviews.approvedSnapshot": [{ path: "index.html", html: "<p>old</p>" }],
+      "sites.prePublishChecks": TRAY_CHECKS,
+      "sites.myRole": { role },
+    });
+    publishTray.setIssues([{ id: "i2", type: "warning", message: "2 images have no alt text", elementId: "el-2" }]);
+    saveStatusStore.set({ state: "saved", savedAt: new Date("2026-10-30T10:42:00").getTime() });
     return (
       <div data-probe="s5-6-approved-edited-since">
         <ToastProvider>
-          <StaleApprovalModal isOpen composer={null} onPublishAnyway={() => {}} onClose={() => {}} />
+          <PublishConfirmModal isOpen stale composer={null} siteId="s1" publishedUrl="https://fieldwork.studio" isPublished onConfirm={() => {}} onClose={() => {}} />
         </ToastProvider>
       </div>
     );
@@ -4715,6 +4743,37 @@ const CASES: Record<string, () => React.ReactElement> = {
      else, so a two-method stub is the whole dependency. It is hosted in the
      board's own pane: `.bd-set-pane-body` supplies the 32/24 insets and the
      bg-app ground, and 824 is 760 (the card) plus those two 32s. */
+  /* The whole Settings task (nav, pane, footer) for the server-load states:
+     `&screen=<id>` and `&load=hang|fail` on `siteDetail.settings.get`
+     (B8-SH12 252:47733 loading, B8-SH13 252:47989 load failed). */
+  "settings-tab": () => {
+    const q = new URLSearchParams(location.search);
+    const load = q.get("load");
+    window.fetch = (async (input: RequestInfo | URL) => {
+      const href = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+      const procs = new URL(href, location.origin).pathname.split("/api/trpc/")[1]?.split(",") ?? [];
+      if (load === "hang" && procs.includes("siteDetail.settings.get")) return new Promise<Response>(() => {});
+      if (load === "fail" && procs.includes("siteDetail.settings.get")) return new Response("{}", { status: 500 });
+      /* `&save=hang`: the update never answers (B8-SH07 saving). */
+      if (q.get("save") === "hang" && procs.some((p) => p.endsWith(".update"))) return new Promise<Response>(() => {});
+      const ROW = {
+        cspPolicy: "default-src 'self'; img-src 'self' https: data:",
+        hstsMaxAge: 86400,
+        xFrameOptions: "SAMEORIGIN",
+        referrerPolicy: "strict-origin-when-cross-origin",
+        permissionsPolicy: "camera=(), microphone=()",
+      };
+      const body = procs.map((p) => ({ result: { data: { json: p === "siteDetail.settings.get" ? ROW : null } } }));
+      return new Response(JSON.stringify(body), { status: 200, headers: { "content-type": "application/json" } });
+    }) as typeof fetch;
+    return (
+      <ToastProvider>
+        <div data-probe="settings-tab" className="tw:fixed tw:inset-0 tw:flex tw:bg-[var(--bk-bg-app)]">
+          <SettingsTab composer={settingsComposer({}) as never} projectId="probe-site" initialScreen={q.get("screen") ?? "headers"} onClose={() => {}} />
+        </div>
+      </ToastProvider>
+    );
+  },
   "settings-general": () => {
     let settings: Record<string, unknown> = {
       seo: {

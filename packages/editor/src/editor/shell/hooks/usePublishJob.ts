@@ -92,6 +92,8 @@ export interface UsePublishJobResult {
   error: string | null;
   /** The failed job's per-step build log — board 784:4403's "View log". */
   steps: PublishStep[] | null;
+  /** When the running job began (ISO), for the tray's "Elapsed" (A-32). */
+  startedAt: string | null;
   /** Set when the approval gate blocked the publish; drives the acknowledge UX. */
   blockedReason: PublishBlockReason;
   publish: (
@@ -405,6 +407,7 @@ export function usePublishJob(): UsePublishJobResult {
     hasUnpublishedChanges: hydrated?.hasUnpublishedChanges ?? null,
     error,
     steps: status?.steps ?? null,
+    startedAt: status?.startedAt ?? null,
     blockedReason,
     publish,
     cancel,

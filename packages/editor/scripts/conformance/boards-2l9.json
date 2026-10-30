@@ -122,8 +122,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Board compared (shots/8-3262.png); built 2026-10-30 (PreviewOverlay): 'Back to editor' (was '‹ Back to canvas'), '{Page} · Draft preview', and the line 'ⓘ Fonts and colors may differ slightly until published' under the bar (the preview renders the editor's draft HTML, not the published build). Kept, off-board: the device switcher (widths printed), page menu and Share preview. Opening at the editor's current device needs the caller to pass it — PreviewOverlay takes initialDevice; AquibraStudio (founder WIP, not edited) is REQUESTS A-22. Test PreviewOverlay. | Board: 'Back to editor · Home · Draft preview · Tablet · 768px' + fidelity notice; code: '‹ Back to canvas', opens at Desktop",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 28 (A-22, owner cleared AquibraStudio): AquibraStudio passes initialDevice={state.device}, and PreviewOverlay (mounted closed) restarts at that device on every opening — test PreviewOverlay 'each opening starts at the editor's device'. The overlay's visuals were compared against shots/8-3262.png on 2026-10-30 ('Back to editor', '{Page} · Draft preview', the fidelity line); kept off-board: page menu and Share preview. Not re-shot live (needs the Next app).",
    "tier": "P1"
   },
   {
@@ -2137,7 +2137,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "probe-compared 2026-10-30 (case canvas-grid-panel, View; board shots/145-64586.png): fixed the head — 'Canvas view' 13/600 and a text Close, as Grid and snapping (was a small-caps label). Round 10: the Rulers row reads 'Rulers and guides' (the rulers are where guides are placed; no '…' — it toggles, the board's guide-detail dialog (S11) does not exist). Focus mode left out: owner:focus-mode (open owner decision). Still open: the board's 'Canvas view preferences' foot (no destination exists); the shared MenuItem's checkbox squares and the chord hints the board omits; Spacing/Badges/X-Ray kept (code-ahead). | lead4 2026-10-27 (A-14): the View menu opens downward from the top bar.",
+   "verifiedNote": "Round 28: the board's Focus mode row is out by owner decision (founder:no-focus-mode, 2026-10-30). Still open for: the 'Canvas view preferences' foot (no destination exists), the shared MenuItem's checkbox squares and chord hints the board omits; Spacing/Badges/X-Ray kept (code-ahead). Head fixed and compared 2026-10-30 (canvas-grid-panel, View).",
    "tier": "P1"
   },
   {
@@ -3692,9 +3692,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "founder:no-focus-mode",
    "verified": "drift-open",
-   "verifiedNote": "Search exists; no macOS/Windows key toggle or single-key preference",
+   "verifiedNote": "Owner 2026-10-30 (via coordinator): no Focus mode, so the shortcut sheet has no Focus mode entry to search for; the sheet itself is covered by its other rows.",
    "inheritsFrom": "263:255899",
    "tier": "P2"
   },
@@ -8223,8 +8223,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 26, probe-compared: shots/167-7406.png — Name, Key, Type, Required, Placeholder, Help text match. Still open: the board's default asset ('Choose default asset…' · 'Images only.') needs an asset chooser in the dialog; not built.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 27, probe-compared: shots/167-7406.png vs probe cms-add-field (Image, Portrait): an outlined 228-wide 'Choose default asset…' under Required with 'Images only.', then Placeholder and Help text. It opens the media library's pick (requestAssetPick, images only); the dialog steps aside while the drawer picks and returns when the pick lands or is cancelled; the default stored is the asset's src — what a record's image value stores (test AddFieldDialog › default asset). The chosen asset shows by file name with Remove.",
    "tier": "P2"
   },
   {
@@ -8234,8 +8234,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Round 26, compared by board copy: as Image (167:7406) — open for 'Choose default asset…' and 'Allowed uploads: images, video and fonts. PDFs are not supported.' (needs the asset chooser).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 27, compared by board copy (dump) vs probe text + the T14 image: as Image with the pick limited to images, video and fonts and the line 'Allowed uploads: images, video and fonts. PDFs are not supported.' — true to the asset-upload route's allowed types (no PDF).",
    "tier": "P2"
   },
   {
@@ -12895,8 +12895,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 26, built, NOT image-compared (the round's 8 images went to B5-T): Site variables now opens as the CMS workspace's page (cmsWorkspace.openVariables, page: 'variables') the way a collection does — the drawer keeps its list; header '‹ back · Site variables · + New variable', the intro 'Use one value across your site' + 'Type {{site.key}} in text…', rows across the pane: key · value ('Empty value') · 'n text placeholders' · ⋯ (Edit value / Show usages / Rename key… / Delete…). Text matches the board copy (dump/page-3-6); the header's ⋯ is not built (no board says what it holds). The drawer subview is gone (dead once the page exists). Probe cms-workspace&page=variables. Next: fetch shots/260-235689.png and compare.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 27, probe-compared: shots/260-235689.png vs probe cms-workspace&page=variables: Site variables as the workspace's page on white, header '‹ back · Site variables · + New variable', intro 13 medium + 12 muted line, rows 72 tall with {{site.key}} (mono) over the value (13 ink; 'Empty value' muted), 'n text placeholders' at ~65% across, ⋯ at the end, content 880 max; the drawer's Site variables row is marked while the page is open. Not built: the header's own ⋯ (no board shows its contents). The probe's back reads 'Back to canvas' (its origin); the app's reads the editor origin.",
    "tier": "P2"
   },
   {
@@ -12906,8 +12906,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C C4: intro + \"No variables yet. Add a key and value to start.\"; drawer subview, not the workspace page.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 27, compared by board copy (dump) + the V01 image: same page, the intro, then 'No variables yet. Add a key and value to start.'",
    "tier": "P2"
   },
   {
@@ -12917,8 +12917,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Inline add row vs modal; dup copy matches (:580), key-rule copy differs",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 27, probe-compared: shots/260-236147.png vs probe cms-workspace&page=variables after + New variable: a dialog 'Add site variable' (was an inline form), 'Save a value once for text across your site. Publishing is separate.', Key (filled) + 'Start with a letter. Use letters, digits, underscores or dashes.' (true to isValidVariableKey), Value + 'An empty value is allowed.', Cancel · Add variable. The dialog sits ~15px lower (shared chrome-ui placement).",
    "tier": "P2"
   },
   {
@@ -12996,8 +12996,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C D1: row ⋯ Edit value · Show usages · Rename key… · Delete….",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 27, probe-compared: shots/260-237728.png vs probe (row ⋯ on phone): menu Edit value · Rename key… · Show usages · Delete variable… in the board's order, Delete in plain text as drawn (was red 'Delete…', usages before rename).",
    "tier": "P2"
   },
   {
@@ -13917,7 +13917,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-fixed",
-   "verifiedNote": "Round 24, probe-compared: shots/233-2.png vs probe publish-tray-blocking-server (&siteId=s1, 1440x900). Status card (Live · domain, Published … · v12, View live / Copy link); CHECKS with '1 blocking · 3 tips', blocker first, red ✕ / amber ! glyphs, 13px sentences wrapping, Fix › at the end, 'Red blocks publishing · amber is advisory'; GOES TO + Manage domains ›; disabled 'Publish changes' with 'Fix 1 blocking issue to publish'; legal links. Server rows print the server's own sentence. Not built: the WHAT WILL CHANGE counts/chips (draft-vs-live diff, REQUESTS A-33); APPROVAL row shows only when a round exists (probe publish-tray-ready).",
+   "verifiedNote": "Round 24, probe-compared (see earlier); round 28: the WHAT WILL CHANGE counts, page chips (✎ / + / −), 'CMS: n records published' and 'See all ›' are now built on sites.publishPreviewDiff (A-33; tests PublishTray 'what will change', publish.diff.test getPublishPreviewDiff) — not image-compared (the probe's tray composer cannot export pages). 'Brand: n tokens' is not built (no brand-token diff). Shots/233-2.png.",
    "tier": "P1"
   },
   {
@@ -13928,7 +13928,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-fixed",
-   "verifiedNote": "Round 24, probe-compared: shots/233-649.png vs probe publish-tray-ready (&siteId=s1). Tips only ('3 tips' over every listed row), APPROVAL '✓ Approved by Lena · <date>' + Open Review › (reviews.currentRound), GOES TO, enabled blue 'Publish changes', legal links. Residual: WHAT WILL CHANGE counts/chips wait on A-33; the board's '(client)' suffix is not printed (the reviewer is not always a client).",
+   "verifiedNote": "Round 24 probe-compared; round 28: counts/chips/CMS line/See all built on A-33 as 233:2 (unit-tested, not image-compared); Brand tokens not built.",
    "tier": "P1"
   },
   {
@@ -13939,7 +13939,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Round 24: still open — the subview is the draft-vs-live per-page diff; contract filed REQUESTS A-33 (P-2). The published-version Compare (PublishDiffView) is reachable from the tray after a publish ('See what changed', PB09).",
+   "verifiedNote": "Round 28: A-33 built the draft-vs-live diff (sites.publishPreviewDiff, page-level: changed / added / removed + CMS records since the last publish); the tray's 'See all ›' opens the one Compare on live vs current. Still open: this board's subview lists each page with an element-level summary ('Hero text, 2 images', 'Section added') and its own Compare ›, which a page-level diff cannot say; and 'Brand: primary, accent changed' (no brand-token diff exists).",
    "tier": "P1"
   },
   {
@@ -13950,7 +13950,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-fixed",
-   "verifiedNote": "Round 24, probe-compared: shots/233-1802.png vs probe publish-confirm-tips (&siteId=s1): 720 wide, no ✕, 'Publish to fieldwork.studio', numbered ledger 1 Changes / 2 Tips '3 advisory checks' + '☐ I’ve seen these' / 4 Approval / 5 Release 'Saved 10:42 · the current live release stays available to republish', Cancel + disabled Publish, 'Tick the boxes above to publish'. Publish enables on the tick (tests PublishConfirmModal*). Residual: '1 Changes' prints the page count (counts + See all › wait on A-33).",
+   "verifiedNote": "Round 24 probe-compared; round 28: '1 Changes' now reads the A-33 summary ('3 pages changed · 1 added · CMS 4 records') when the comparison is available, else the page count (not image-compared — the probe has no composer). The row's 'See all ›' is not built in the dialog.",
    "tier": "P1"
   },
   {
@@ -13960,8 +13960,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 24: the confirm is the board's numbered ledger now (PB04); the stale-approval door still opens StaleApprovalModal (AquibraStudio routing). Filed REQUESTS A-31 (route stale-approval into the one confirm + role); L-A builds the Approval row half once it lands.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 28, probe-compared: shots/233-2418.png vs probe s5-6-approved-edited-since&role=EDITOR — the stale-approval door now opens the one numbered confirm (A-31; StaleApprovalModal deleted): '4 Approval · Approved {date} · edited since (n changes)' from the approved snapshot vs the export; an Editor gets 'Request fresh review' (opens Review) and 'Publishing without a fresh review needs Admin access — or request a fresh review.', Publish shut. Residual: '1 Changes' counts and See all › wait on A-33 (in progress); the probe has no composer, so its row reads without the change count.",
    "tier": "P1"
   },
   {
@@ -13971,8 +13971,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 24: as 233:2418 — needs REQUESTS A-31 (stale approval routed into PublishConfirmModal with the Admin 'Publish without a fresh review' box).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 28, probe-compared: shots/233-3034.png vs probe s5-6-approved-edited-since&role=ADMIN with both boxes ticked — the stale-approval door now opens the one numbered confirm (A-31; StaleApprovalModal deleted): '4 Approval · Approved {date} · edited since (n changes)' from the approved snapshot vs the export; an Admin's '☐ Publish without a fresh review' gates Publish and the confirm ships with acknowledgeStale (the router also requires ADMIN). Tests PublishConfirmModal › stale approval. Residual as 233:2418 (A-33).",
    "tier": "P1"
   },
   {
@@ -13982,8 +13982,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 24, tray half probe-compared (publish-tray-running): status card kept, PUBLISHING with ✓ / ● '· step n of N' / ○ rows from the worker's steps (skipped ones dropped; the tray used to look for status 'running', the worker writes 'active'), footer 'Publishing can’t be stopped once deploying. You can keep working or leave.', no CTA. Still open: 'step 2 of 4' until the worker marks never-run steps skipped up front and 'Elapsed' needs startedAt (A-32); topbar 'Publishing 2/3…' built in StudioHeader (publishSteps) but AquibraStudio must pass it (A-29).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 28, probe-compared: shots/233-3648.png vs probe publish-tray-running (steps from the shared buildPublishSteps(2), started 42s ago): ✓ Generating pages / ● Deploying to CDN · step 2 of 3 / ○ Verifying SSL / 'Elapsed 0:42' ticking from the job's startedAt (else createdAt), footer 'Publishing can’t be stopped…'; topbar 'Publishing 2/3…' wired (A-29) and compared. Server (A-32): never-run steps are 'skipped' from the job's first write, so N is 3; the queued row is written with its step list; sites.publishStatus already carried startedAt — the editor's mapping dropped it.",
    "tier": "P1"
   },
   {
@@ -13993,8 +13993,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 24, tray half probe-compared (publish-tray-queued): 'Queued — waiting to start' and 'Cancel (not started)' (publishJob.cancel; the server cancels QUEUED/BUILDING for any member — no Admin gate in code). Still open: the pending step names are unknown until the worker writes them (queued jobs carry steps: []), Elapsed (A-32), topbar 'Publishing 0/3…' (A-29).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 28, probe-compared: shots/233-4197.png vs probe publish-tray-queued (buildPublishSteps(-1)): '● Queued — waiting to start' over the three pending steps by name, 'Elapsed 0:42', 'Cancel (not started)'; topbar 'Publishing 0/3…' (A-29, runLabel counts done steps when none is active). Admin-only cancel stays the server's rule (any member may cancel a QUEUED/BUILDING job today).",
    "tier": "P1"
   },
   {
@@ -14015,8 +14015,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 25: tray half probe-compared (round 24). Topbar half built: Topbar `publish=\"failed\"` ('Publish failed' on --bk-error, still the tray toggle; Topbar.test) and StudioHeader `publishFailed` (StudioHeader.test). Open only until AquibraStudio passes publishFailed (REQUESTS A-29, owner).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 28: tray half probe-compared (round 24, publish-tray-failed); topbar half now wired (A-29: AquibraStudio passes publishFailed = uiState failed and not a lost poll) and probe-compared: shots/233-5303.png top bar vs probe topbar-shell&publish=failed — red 'Publish failed', still the tray toggle. Presence avatars absent in the probe.",
    "tier": "P1"
   },
   {
@@ -14081,8 +14081,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Round 24: open — server first. Site password protection exists (Settings › Access, Pro + ADMIN; publish reconciles it on Vercel best-effort, skipping on 402/403), but nothing refuses a publish when a Free workspace's site still carries a password: the deploy goes out and the protection is silently skipped. Contract filed REQUESTS A-36 (a 'Password protection' fail row from runPrePublishChecks + the remove-and-publish mutation); the tray shuts on any failing server row already.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 28 (A-36), probe-compared: shots/233-8594.png vs probe publish-tray-password: CHECKS '1 blocking' with the red card '✕ This site is password protected. On Free the protection is removed and the site becomes public.', 'Upgrade ↗' (billing) and 'Remove protection and publish…', no legend or destination, 'Fix 1 blocking issue to publish' under the shut CTA. Server: runPrePublishChecks fails 'Password protection' when a site keeps publishedPassword on FREE (test publish-prechecks-visibility). Residual: WHAT WILL CHANGE counts unavailable in the probe (A-33 built, needs a composer).",
    "tier": "P1"
   },
   {
@@ -14092,8 +14092,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Round 24: open — the 'Remove protection and publish' confirm needs REQUESTS A-36's server half (clear publishedPassword, then publish) before the editor can offer it.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 28 (A-36), probe-compared: shots/233-9161.png vs probe publish-tray-password after 'Remove protection and publish…': 'Remove password protection and publish?', '{domain} becomes public. You can add protection again on Pro.', Cancel · Remove and publish. Confirm clears the password through siteDetail.settings.update ({ publishedPassword: null } — clearing is allowed on every plan), re-reads the checks and opens the publish door (test PublishTray A-36); a refused clear says so and publishes nothing.",
    "tier": "P1"
   },
   {
@@ -14135,9 +14135,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "code:offline-no-diff",
    "verified": "drift-open",
-   "verifiedNote": "Round 24: probe re-checked (offline) — unchanged from 2026-10-27; still open only for the WHAT WILL CHANGE counts/chips and See all › (REQUESTS A-33).",
+   "verifiedNote": "Round 28: the WHAT WILL CHANGE counts come from the server (sites.publishPreviewDiff compares the export with the live job's retained payload, A-33). Offline that read cannot run, so the tray keeps 'Changes since the last publish' with the page names; drawing the board's counts offline would show numbers nothing computed. The rest of the board (status card + What will change, no Checks / Goes to, 'Needs a connection', legal links, ⋯) was probe-compared 2026-10-27.",
    "tier": "P1"
   },
   {
@@ -14147,8 +14147,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Round 24: no plan site-limit check reaches the editor; contract filed REQUESTS A-34 (a 'Plan limit' fail row from runPrePublishChecks). The tray already shuts on any failing server row once it exists.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 28 (A-34), probe-compared: shots/233-11934.png vs probe publish-tray-plan-limit: status card, WHAT WILL CHANGE, no checks or destination, disabled 'Publish changes' with 'Over the Free limit — Upgrade to publish'. Server: runPrePublishChecks fails 'Plan limit' for a site with as many older live sites in its workspace as the plan allows (oldest keep their place; tests publish-prechecks-visibility). Counts residual as 233:8594.",
    "tier": "P1"
   },
   {
@@ -14907,8 +14907,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Built, not compared (offline state): Settings reads navigator.onLine; offline keeps the edits, the footer says \"Needs a connection · changes stay here, unsaved\" (SH04/AN07 wording; S05 draws \"Needs a connection — your edits stay on this screen, unsaved\"), the banner \"You’re offline. Save settings needs a connection.\", Save disabled until online (tested). AN07 also draws \"Status unavailable offline\" for the tracker status — not built.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 27, probe-compared: shots/245-48768.png vs probe settings-tab&screen=headers (edit, then offline): the plain line 'You’re offline. Save settings needs a connection.' under the restore note (was an amber banner above it), the edit kept, footer 'Needs a connection · changes stay here, unsaved' with Save only (Discard hidden while offline, as drawn). Field-style residual as 245:49535.",
    "tier": "P2"
   },
   {
@@ -14941,8 +14941,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Wave 3b: while saving the footer is 'Saving settings…' with only the disabled 'Saving…' (no Discard), as drawn (tested); the probe's save fails too fast to capture the state.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 27, probe-compared: shots/245-49535.png vs probe settings-tab&screen=headers&save=hang (edit Permissions-Policy, Save): cards in the board's order with the stored row, footer 'Saving settings…' with only the disabled 'Saving…'. Residual shared by every settings screen: fields are white with a rule where the board fills them grey, and the CSP value is a mono textarea.",
    "tier": "P2"
   },
   {
@@ -15318,8 +15318,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance); same component and copy as 248:20853, which was compared.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 27, compared by board copy (dump/page-3-7) vs code: the board differs from the image-compared 248:20853 only in the destination — 'Your destination is SEO. Wait for the save result; if it fails, your changes stay here.' UnsavedSettingsDialog prints `destination.name`, which SettingsTab sets from navTitle('SEO' is that nav item's title, constants.ts SETTINGS_NAV). Title 'Saving General settings…' and 'Stay in General' as compared.",
    "tier": "P2"
   },
   {
@@ -15341,8 +15341,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance); same component and copy as 248:20853, which was compared.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 27, compared by board copy (dump/page-3-7) vs code: the board differs from the image-compared 248:20853 only in the destination — 'Your destination is Domains. Wait for the save result; if it fails, your changes stay here.' UnsavedSettingsDialog prints `destination.name`, which SettingsTab sets from navTitle('Domains' is that nav item's title, constants.ts SETTINGS_NAV). Title 'Saving General settings…' and 'Stay in General' as compared.",
    "tier": "P2"
   },
   {
@@ -15364,8 +15364,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance); same component and copy as 248:20853, which was compared.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 27, compared by board copy (dump/page-3-7) vs code: the board differs from the image-compared 248:20853 only in the destination — 'Your destination is Redirects. Wait for the save result; if it fails, your changes stay here.' UnsavedSettingsDialog prints `destination.name`, which SettingsTab sets from navTitle('Redirects' is that nav item's title, constants.ts SETTINGS_NAV). Title 'Saving General settings…' and 'Stay in General' as compared.",
    "tier": "P2"
   },
   {
@@ -15387,8 +15387,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance); same component and copy as 248:20853, which was compared.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 27, compared by board copy (dump/page-3-7) vs code: the board differs from the image-compared 248:20853 only in the destination — 'Your destination is Access. Wait for the save result; if it fails, your changes stay here.' UnsavedSettingsDialog prints `destination.name`, which SettingsTab sets from navTitle('Access' is that nav item's title, constants.ts SETTINGS_NAV). Title 'Saving General settings…' and 'Stay in General' as compared.",
    "tier": "P2"
   },
   {
@@ -15410,8 +15410,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance); same component and copy as 248:20853, which was compared.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 27, compared by board copy (dump/page-3-7) vs code: the board differs from the image-compared 248:20853 only in the destination — 'Your destination is Analytics. Wait for the save result; if it fails, your changes stay here.' UnsavedSettingsDialog prints `destination.name`, which SettingsTab sets from navTitle('Analytics' is that nav item's title, constants.ts SETTINGS_NAV). Title 'Saving General settings…' and 'Stay in General' as compared.",
    "tier": "P2"
   },
   {
@@ -15433,8 +15433,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance); same component and copy as 248:20853, which was compared.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 27, compared by board copy (dump/page-3-7) vs code: the board differs from the image-compared 248:20853 only in the destination — 'Your destination is Form submissions. Wait for the save result; if it fails, your changes stay here.' UnsavedSettingsDialog prints `destination.name`, which SettingsTab sets from navTitle('Form submissions' is that nav item's title, constants.ts SETTINGS_NAV). Title 'Saving General settings…' and 'Stay in General' as compared.",
    "tier": "P2"
   },
   {
@@ -15456,8 +15456,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance); same component and copy as 248:20853, which was compared.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 27, compared by board copy (dump/page-3-7) vs code: the board differs from the image-compared 248:20853 only in the destination — 'Your destination is Custom code. Wait for the save result; if it fails, your changes stay here.' UnsavedSettingsDialog prints `destination.name`, which SettingsTab sets from navTitle('Custom code' is that nav item's title, constants.ts SETTINGS_NAV). Title 'Saving General settings…' and 'Stay in General' as compared.",
    "tier": "P2"
   },
   {
@@ -15479,8 +15479,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance); same component and copy as 248:20853, which was compared.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 27, compared by board copy (dump/page-3-7) vs code: the board differs from the image-compared 248:20853 only in the destination — 'Your destination is Security headers. Wait for the save result; if it fails, your changes stay here.' UnsavedSettingsDialog prints `destination.name`, which SettingsTab sets from navTitle('Security headers' is that nav item's title, constants.ts SETTINGS_NAV). Title 'Saving General settings…' and 'Stay in General' as compared.",
    "tier": "P2"
   },
   {
@@ -15502,8 +15502,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance); same component and copy as 248:20853, which was compared.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 27, compared by board copy (dump/page-3-7) vs code: the board differs from the image-compared 248:20853 only in the destination — 'Your destination is Danger zone. Wait for the save result; if it fails, your changes stay here.' UnsavedSettingsDialog prints `destination.name`, which SettingsTab sets from navTitle('Danger zone' is that nav item's title, constants.ts SETTINGS_NAV). Title 'Saving General settings…' and 'Stay in General' as compared.",
    "tier": "P2"
   },
   {
@@ -15514,7 +15514,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared (loading state): the load card reads 'Loading <screen>…'; the footer 'Loading settings…' (tested).",
+   "verifiedNote": "Round 27: same LoadCard as SH12 (252:47733, drift-fixed) — Analytics reads 'Loading Analytics…'; this board not image-compared.",
    "tier": "P3"
   },
   {
@@ -15525,7 +15525,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared (error state): 'Couldn’t load <screen>', 'The settings service did not respond. Your existing configuration has not changed.', Try again; footer 'Settings unavailable · Retry to continue' (tested).",
+   "verifiedNote": "Round 27: same LoadCard as SH13 (252:47989, drift-fixed); this board not image-compared.",
    "tier": "P3"
   },
   {
@@ -15535,8 +15535,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Built, not compared (loading state): the load card reads 'Loading <screen>…'; the footer 'Loading settings…' (tested).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 27, probe-compared: shots/252-47733.png vs probe settings-tab&screen=headers&load=hang (the whole Settings task, siteDetail.settings.get never answers): 'Loading Security headers…' on the pane over three 94-tall placeholder cards with two bars each (was one card with the line only), footer 'Loading settings…' with Save only (Discard gone, as drawn). Residual, not this row's: Settings is not yet inside the editor shell (REQUESTS E-10) and the back reads 'Back to Editor' without the page.",
    "tier": "P2"
   },
   {
@@ -15546,8 +15546,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Built, not compared (error state): 'Couldn’t load <screen>', 'The settings service did not respond. Your existing configuration has not changed.', Try again; footer 'Settings unavailable · Retry to continue' (tested).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 27, probe-compared: shots/252-47989.png vs probe settings-tab&screen=headers&load=fail: 'Couldn’t load Security headers', 'The settings service did not respond. Your existing configuration has not changed.', a filled Try again under them (was a card with the button at its right), footer 'Settings unavailable · Retry to continue' muted (was red) with Save only. Shell residual as 252:47733 (E-10).",
    "tier": "P2"
   },
   {
@@ -21782,9 +21782,9 @@
    "page": "07",
    "family": "recovery",
    "status": "active",
-   "authority": "board",
+   "authority": "founder:no-focus-mode",
    "verified": "no",
-   "verifiedNote": "No hide-all-panels mode or \"Show panels\" control anywhere in shell",
+   "verifiedNote": "Owner 2026-10-30 (via coordinator): no Focus mode — the hide-all-panels mode and its 'Show panels' control are not built.",
    "tier": "P2"
   },
   {
@@ -23147,9 +23147,9 @@
    "page": "09",
    "family": "play",
    "status": "active",
-   "authority": "board",
+   "authority": "founder:unsourced-list-is-a-tip",
    "verified": "drift-open",
-   "verifiedNote": "Round 25, probe-compared (issues-cards): the card layout matches — red-tint blocker card '✕ <sentence>' / location / Fix ›, grey tips. The 'collection list has no source' issue now exists (useIssuesFeed, A-35, from composer.cms.bindings), but as a TIP until the owner decides whether publish refuses it — so this board's '1 issue blocks publishing' is not what the editor says for it today. Open on that owner decision; the message is 'Collection list has no source' (the list's layer name is not in the exported element data).",
+   "verifiedNote": "Owner 2026-10-30 (via coordinator): a collection list with no source is a tip, never a publish blocker. The editor raises it as a tip (useIssuesFeed, A-35) and the Issues cards match the board's layout (round 25, probe issues-cards); the board's '1 issue blocks publishing' is overridden by this decision.",
    "tier": "P1"
   },
   {
@@ -23225,8 +23225,8 @@
    "family": "play",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 24: the confirm is the board's numbered ledger (1 Changes / 2 Tips ☐ I’ve seen these / 4 Approval / 5 Release, Cancel · Publish, 'Tick the boxes above to publish' — probe publish-confirm-tips, see 233:1802). Open: this board is the stale-approval variant ('☐ Publish without a fresh review'), which needs the AquibraStudio route (REQUESTS A-31).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 28: the board's stale confirm with both boxes unticked is the probe's Admin state before ticking (s5-6-approved-edited-since&role=ADMIN), compared with 233:3034's image set. Residual: Changes counts (A-33).",
    "tier": "P1"
   },
   {
@@ -23236,8 +23236,8 @@
    "family": "play",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 24: ticking 'I’ve seen these' is built and gates Publish (PublishConfirmModal.test 'Publish waits for…'). Open only for the stale-approval box this board also draws (REQUESTS A-31).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 28: tips ticked, override unticked — the Admin probe state between the two ticks; Publish stays shut until the override (test). Compared with the PB06 image set. Residual: Changes counts (A-33).",
    "tier": "P1"
   },
   {
@@ -23247,8 +23247,8 @@
    "family": "play",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 24: the Admin 'Publish without a fresh review' box needs the stale-approval door routed into the one confirm (REQUESTS A-31); StaleApprovalModal still answers it.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 28, probe-compared with shots/233-3034.png (same state): both boxes ticked, Publish open, ships with acknowledgeStale. Residual: Changes counts (A-33).",
    "tier": "P1"
   },
   {
@@ -25582,7 +25582,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Round 24 re-read: the loader's real failure state is built — LoadErrorBanner carries the board's line ('Couldn’t load this site. You can look around; editing waits until it loads.'), Download local copy and Retry only (no Copy details); bottom bar 'Not loaded · nothing saved yet' · Details (probe bottom-bar state=not-loaded). What the canvas and Layers show is whatever copy the loader restored (a local draft) — empty when there is none; nothing is faked. Still open: the banner mounts above the topbar, not in the 40px slot under it (AquibraStudio, REQUESTS F-11), and the inspector reads 'View only until the site loads' where the board says 'View only — properties unlock when the site loads' (StatusLine.tsx:94, L-B). Not walked live (needs a forced load failure on the Next app).",
+   "verifiedNote": "Round 28 (F-11, owner cleared AquibraStudio): LoadErrorBanner — the global banner slot — now mounts after <header>, so the DOM (and focus) order is topbar → banner → panels as the board draws it (y 56); it was drawn there only through flex order. Banner copy/actions and the bottom-bar 'Not loaded · nothing saved yet' match (compared earlier). Still open, not L-A's path: the inspector line reads 'View only until the site loads' where the board says 'View only — properties unlock when the site loads' (inspector/components/StatusLine.tsx:94, L-B). Not walked live (needs a forced load failure on the Next app).",
    "tier": "P1"
   },
   {

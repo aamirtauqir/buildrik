@@ -1014,7 +1014,9 @@ describe("SettingsTab — the footer follows the screen's load", () => {
     expect(save().disabled).toBe(true);
     fireEvent.click(screen.getByText("go error"));
     expect(footStatus()).toBe("Settings unavailable · Retry to continue");
-    expect(screen.getByTestId("set-foot-status").className).toContain("var(--bk-error)");
+    /* 2L9 252:47989: the line is muted, and only Save stands (no Discard). */
+    expect(screen.getByTestId("set-foot-status").className).not.toContain("var(--bk-error)");
+    expect(screen.queryByTestId("set-foot-discard")).toBeNull();
     expect(save().disabled).toBe(true);
     fireEvent.click(screen.getByText("go ready"));
     // Ready and clean: the save bar says so, Save disabled (8134:212718).

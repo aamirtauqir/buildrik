@@ -207,6 +207,7 @@ export const ContentTab: React.FC<ContentTabProps> = ({
           variablesCount={panel.variables.length}
           conditionsCount={panel.conditions.length}
           selectedCollectionId={workspace.collectionId}
+          variablesOpen={workspace.page === "variables"}
           /* v3 IA (4428:143182) — a collection opens in the workspace beside
              the drawer; the drawer stays on its list. */
           onOpenCollection={(id) => cmsWorkspace.openCollection(id)}

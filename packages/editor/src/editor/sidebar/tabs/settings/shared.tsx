@@ -388,34 +388,50 @@ export interface LoadCardProps {
   onRetry?: () => void;
 }
 
-/** 2L9 B8-AN13/14, SH12/13 (252:47222…252:47989): "Loading <screen>…", or
- *  "Couldn’t load <screen>", what happened, and Try again. */
+/** 2L9 B8-AN13/14, SH12/13 (252:47222…252:47989): "Loading <screen>…" over
+ *  placeholder cards, or "Couldn’t load <screen>", what happened, and Try
+ *  again. */
+/* The board's bars sit a step darker than the card they are on. */
+const PLACEHOLDER_BAR = "tw:rounded tw:bg-[var(--bk-gray-200)] tw:animate-pulse tw:motion-reduce:animate-none";
+
 export const LoadCard: React.FC<LoadCardProps> = ({ title, state, errorLine, onRetry }) => (
+  /* 252:47733 / 252:47989: no card of its own — the heading on the pane, then
+     three placeholder cards while loading; on failure the sentence and a
+     filled Try again under it. */
   <section
-    className={`${SET_CARD} tw:flex tw:w-full tw:max-w-180 tw:items-center tw:justify-between tw:gap-6 tw:p-4`}
+    className="tw:flex tw:w-full tw:max-w-180 tw:flex-col tw:gap-2"
     role={state === "error" ? "alert" : "status"}
     aria-busy={state === "loading"}
     data-testid="set-load-card"
     data-state={state}
   >
-    <div className="tw:flex tw:min-w-0 tw:flex-col tw:gap-1">
-      <div
-        className="tw:text-[length:var(--bk-text-14)] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]"
-        data-testid="set-load-title"
-      >
-        {state === "loading" ? `Loading ${title}…` : `Couldn’t load ${title}`}
+    <div
+      className="tw:text-[length:var(--bk-text-13)] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]"
+      data-testid="set-load-title"
+    >
+      {state === "loading" ? `Loading ${title}…` : `Couldn’t load ${title}`}
+    </div>
+    {state === "loading" ? (
+      <div className="tw:mt-2 tw:flex tw:flex-col tw:gap-2" aria-hidden="true">
+        {[0, 1, 2].map((i) => (
+          <div key={i} className="tw:flex tw:h-[94px] tw:flex-col tw:justify-center tw:gap-3 tw:rounded-[var(--bk-radius-md)] tw:bg-[var(--bk-bg-subtle)] tw:px-4">
+            <div className={`${PLACEHOLDER_BAR} tw:h-2.5 tw:w-[30%]`} />
+            <div className={`${PLACEHOLDER_BAR} tw:h-2 tw:w-[78%]`} />
+          </div>
+        ))}
       </div>
-      {state === "error" ? (
+    ) : (
+      <>
         <div className="tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="set-load-state">
           {errorLine}
         </div>
-      ) : null}
-    </div>
-    {state === "error" ? (
-      <Button type="button" size="xs" className={SET_BTN} onClick={onRetry} data-testid="set-load-retry">
-        Try again
-      </Button>
-    ) : null}
+        <div className="tw:mt-2">
+          <Button type="button" size="xs" className={`${SET_BTN} tw:px-6`} onClick={onRetry} data-testid="set-load-retry">
+            Try again
+          </Button>
+        </div>
+      </>
+    )}
   </section>
 );
 
