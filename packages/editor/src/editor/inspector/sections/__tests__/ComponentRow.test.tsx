@@ -9,7 +9,7 @@
  *
  * @license BSD-3-Clause
  */
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import * as React from "react";
 import { describe, it, expect, vi } from "vitest";
 import { ComponentRow } from "../ComponentRow";
@@ -191,6 +191,17 @@ describe("ComponentRow — board 26", () => {
     expect(screen.getByText("Its 2 overrides will be removed. Content from the main component replaces them.")).toBeTruthy();
     fireEvent.click(screen.getByTestId("instance-reset-confirm-confirm"));
     expect(resetInstance).toHaveBeenCalledWith("el-1");
+  });
+
+  it("2L9 IC02 walk: after the reset re-mounts the instance, it is selected again", async () => {
+    const resetInstance = vi.fn(async () => true);
+    const composer = makeComposer({ component: makeComponent(), instance: withOverrides(2), resetInstance });
+    const select = vi.fn();
+    (composer as unknown as { selection: unknown }).selection = { getSelectedIds: () => [], select };
+    renderRow(composer);
+    fireEvent.click(screen.getByTestId("component-reset"));
+    fireEvent.click(screen.getByTestId("instance-reset-confirm-confirm"));
+    await waitFor(() => expect(select).toHaveBeenCalled());
   });
 
   it("2L9 IC06: Detach applies at once, says \"{name} detached\" and its Undo undoes that detach", async () => {

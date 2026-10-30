@@ -126,8 +126,15 @@ export const ComponentRow: React.FC<ComponentRowProps> = ({ composer, elementId 
   const reset = () => {
     setConfirm(null);
     if (!writable()) return;
-    void composer.components?.resetInstance?.(instanceId);
     setInfo({ ...info, overrides: 0 });
+    /* The reset re-mounts the instance (sync removes the old subtree and
+       pastes the master's, ids kept by position), which dropped the
+       selection: the Inspector fell back to the page. Keep it on the
+       instance (2L9 IC02 walk). */
+    void Promise.resolve(composer.components?.resetInstance?.(instanceId)).then(() => {
+      const el = composer.elements?.getElement?.(instanceId);
+      if (el && !composer.selection?.getSelectedIds?.().includes(instanceId)) composer.selection?.select(el);
+    });
   };
 
   return (
