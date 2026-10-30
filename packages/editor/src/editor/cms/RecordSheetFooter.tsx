@@ -22,9 +22,10 @@ export interface RecordSheetFooterProps {
   saveLeaveDisabled: boolean;
   saveLabel: string;
   onSave: () => void;
-  /** stay: a way out runs with the save (168:21620) · unavailable: the submitted
+  /** stay / stay-here: a way out runs with the save (168:21620 / 173:16635) ·
+   *  saving: a save from an element-opened record (174:13882) · unavailable: the submitted
    *  save owns the record (126:37330, 126:35760) · drop-return: a paused way out · close. */
-  cancel: "stay" | "unavailable" | "drop-return" | "close";
+  cancel: "stay" | "stay-here" | "unavailable" | "saving" | "drop-return" | "close";
   onStay: () => void;
   onDropReturn: () => void;
   onClose: () => void;
@@ -52,9 +53,15 @@ export function RecordSheetFooter(p: RecordSheetFooterProps) {
           <Button size="xs" className={FOOT_BTN_PRIMARY} disabled={p.saveDisabled} data-testid="cms-sheet-save" onClick={p.onSave}>
             {p.saveLabel}
           </Button>
-          {p.cancel === "stay" ? (
+          {p.cancel === "stay" || p.cancel === "stay-here" ? (
+            /* 168:21620 "Cancel" · 173:16635 "Stay here" (a return to the element). */
             <Button size="xs" variant="secondary" className={FOOT_BTN_SECONDARY} data-testid="cms-sheet-stay" onClick={p.onStay}>
-              Cancel
+              {p.cancel === "stay-here" ? "Stay here" : "Cancel"}
+            </Button>
+          ) : p.cancel === "saving" ? (
+            /* 174:13882 / 177:16850: opened from an element, the save owns the record until it lands. */
+            <Button size="xs" variant="secondary" className={FOOT_BTN_SECONDARY} disabled data-testid="cms-sheet-cancel-saving">
+              Saving…
             </Button>
           ) : p.cancel === "unavailable" ? (
             <>

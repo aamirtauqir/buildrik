@@ -446,7 +446,7 @@ export function RecordSheet({
 
   const statusBadge = record ? recordStatusBadge(record) : null;
   /* F2.09 — a way back to an element reads as the save while it runs. */
-  const returning = returnTo !== null && saving && returnTo.origin === true;
+  const returning = saving && origin !== null && !returnTo?.page; // 173:16635 / 174:13882 — a save from an element-opened record
   React.useEffect(() => {
     cmsWorkspace.setReturning(returning);
     return () => cmsWorkspace.setReturning(false);
@@ -564,8 +564,8 @@ export function RecordSheet({
           </span>
 
           {paused ? (
-            <div className="tw:flex tw:flex-none tw:flex-col tw:gap-0.5 tw:rounded-[6px] tw:bg-[var(--bk-error-tint)] tw:px-4 tw:py-2" role="alert" data-testid="cms-sheet-return-paused">
-              <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">
+            <div className="tw:flex tw:flex-none tw:flex-col tw:gap-0.5 tw:rounded-[6px] tw:bg-[var(--bk-warning-tint)] tw:px-4 tw:py-2" role="alert" data-testid="cms-sheet-return-paused">
+              <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-warning-text)]">
                 {pausedTo ? `Your edits are still here. Return to ${pausedTo} is paused.` : "Your edits are still here. Leaving is paused."}
               </p>
               {saveError !== FAILED ? <p className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-error-text)]">{saveError}</p> : null}
@@ -586,9 +586,9 @@ export function RecordSheet({
               </p>
             </div>
           ) : returnCancelled && saving ? (
-            <p className="tw:m-0 tw:flex-none tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]" role="status" data-testid="cms-sheet-return-cancelled">
-              {/* 126:37330 — navigation called off; the submitted save runs on. */}
-              Record · Saving continues; stay here
+            /* 126:37330 (a page leave) · 177:16850 (a return to the element): called off; the save runs on. */
+            <p className={`tw:m-0 tw:flex-none tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)] ${origin !== null ? "tw:rounded-[4px] tw:bg-[var(--bk-gray-100)] tw:px-3 tw:py-2" : ""}`} role="status" data-testid="cms-sheet-return-cancelled">
+              {origin !== null ? "Return cancelled. Your record save is still in progress." : "Record · Saving continues; stay here"}
             </p>
           ) : null}
 
@@ -664,7 +664,7 @@ export function RecordSheet({
         saveLeaveDisabled={requiredBlock || !canSave}
         saveLabel={saving ? "Saving…" : queued.locked ? "Save pending" : paused ? "Retry and return" : saveError && saveError !== OFFLINE && !blocked ? "Retry save" : "Save record"}
         onSave={() => void save()}
-        cancel={returnTo && saving ? "stay" : (returnCancelled && saving) || queued.locked ? "unavailable" : paused ? "drop-return" : "close"}
+        cancel={returnTo && saving ? (returnTo.origin ? "stay-here" : "stay") : queued.locked || (returnCancelled && saving && origin === null) ? "unavailable" : saving && origin !== null ? "saving" : paused ? "drop-return" : "close"}
         onStay={stayHere}
         onDropReturn={() => holdReturn(null)}
         onClose={() => guard(onClose)}
