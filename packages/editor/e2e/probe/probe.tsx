@@ -97,6 +97,8 @@ import { DSModeProvider } from "@/editor/design-system/state/DSModeContext";
 import { LayerTreeItem } from "@/editor/panels/layers/LayerTreeItem";
 import { renameElement } from "@/editor/panels/layers/hooks/layersPersistence";
 import { PagesTab } from "@/editor/sidebar/tabs/pages/PagesTab";
+import { CanvasEmptyCTA } from "@/editor/canvas/CanvasEmptyCTA";
+import { showInsertReceipt } from "@/editor/sidebar/tabs/build/insertGroupRequest";
 import { LeftSidebar } from "@/editor/sidebar/LeftSidebar";
 import type { GroupedTabId } from "@/editor/rail/tabsConfig";
 import { MovePagesDialog, TOP_LEVEL } from "@/editor/sidebar/tabs/pages/components/MovePagesDialog";
@@ -914,6 +916,23 @@ function layers5000Composer(): Composer {
   }
   c.selection.select(c.elements.getElement(heroText) ?? null);
   return c;
+}
+
+function AddReceiptProbe() {
+  const composer = React.useMemo(() => addTargetComposer(), []);
+  React.useEffect(() => {
+    const t = setTimeout(() => showInsertReceipt(composer, { title: "Text added to Hero", detail: "Selected on canvas · Focus stays here" }), 200);
+    return () => clearTimeout(t);
+  }, [composer]);
+  return (
+    <div data-probe="add-panel-receipt">
+      <ToastProvider>
+        <div className="tw:flex tw:h-[812px] tw:w-70 tw:flex-col tw:overflow-hidden tw:bg-white">
+          <BuildTab composer={composer} onExpandToggle={() => {}} onClose={() => {}} />
+        </div>
+      </ToastProvider>
+    </div>
+  );
 }
 
 function addTargetComposer(): Composer {
@@ -2762,6 +2781,13 @@ const CASES: Record<string, () => React.ReactElement> = {
       </ToastProvider>
     </div>
   ),
+  /* design-2l9 101:42581 — the empty canvas CTA inside a 760×580 page card
+     (owner 2026-10-30 keeps its cards and actions). */
+  "canvas-empty": () => (
+    <div data-probe="canvas-empty" style={{ position: "relative", width: 760, height: 580, background: "#fff" }}>
+      <CanvasEmptyCTA onBrowseTemplates={() => {}} onAddBlock={() => {}} onStartBlank={() => {}} />
+    </div>
+  ),
   /* design-2l9 101:42581 — Layers on an empty page ("Services"). */
   "layers-empty": () => {
     const c = new Composer({} as never);
@@ -2803,6 +2829,9 @@ const CASES: Record<string, () => React.ReactElement> = {
       </ToastProvider>
     </div>
   ),
+  /* design-2l9 7:19448 — the same panel after "Text" landed in Hero: the
+     receipt the insert hook hands an open Add panel. */
+  "add-panel-receipt": () => <AddReceiptProbe />,
   /* Add panel with a target, board 7:18981: a real Composer with "Hero"
      selected, so the insert-target strip reads "Insert into Hero". */
   "add-panel-target": () => (
@@ -4406,6 +4435,11 @@ if (name.startsWith("pages-")) {
    its ground and its row rules, and it reaches the app through Topbar, not
    through NotificationPanel. Per-case for the same reason as history.css —
    the file also claims .bk-topbar* and .bk-notif-*. */
+/* Canvas.css carries .bd-canvas-empty-cta; Canvas.tsx imports it, but the
+   canvas-empty case mounts only the CTA. */
+if (name === "canvas-empty") {
+  await import("@/editor/canvas/Canvas.css");
+}
 if (name.startsWith("notifications-")) {
   await import("@/editor/shell/header.css");
 }

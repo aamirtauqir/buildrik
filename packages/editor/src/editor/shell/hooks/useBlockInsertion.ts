@@ -15,7 +15,7 @@ import { useToast } from "@/editor/chrome-ui";
 import { animateDropSuccess } from "@/shared/utils/dragDrop/animations";
 import { getSuggestedParents } from "@/shared/utils/nesting";
 import { writableElements } from "@/engine/commands/commandOperations";
-import { takeReplaceTarget } from "@/editor/sidebar/tabs/build/insertGroupRequest";
+import { showInsertReceipt, takeReplaceTarget } from "@/editor/sidebar/tabs/build/insertGroupRequest";
 import { resolveInsertTarget } from "@/editor/sidebar/tabs/build/insertTarget";
 import { getElementNameFromType } from "@/editor/canvas/utils/elementInfo";
 
@@ -129,24 +129,22 @@ export function useBlockInsertion(composer: Composer | null): UseBlockInsertionR
 
           /* A-11 / boards 7:19448, 302:4542, 10:3787: the receipt names where
              the block landed ("Text added to Hero"; the page at its root) and
-             that the selection moved while focus stayed in the panel. The
-             toast store keeps one transient, so ten fast inserts show one
-             receipt whose Undo is the last insert. */
+             that the selection moved while focus stayed in the panel. 7:19448
+             draws it IN the Add panel, under the list — so an open Add panel
+             takes it there; any other insert path keeps the toast (the toast
+             store keeps one transient, so ten fast inserts show one receipt
+             whose Undo is the last insert). */
           const undo = { label: "Undo", onClick: composer.history.captureUndo() };
-          addToast(
-            replaced
-              ? {
-                  description: `${getElementNameFromType(replaced.getType())} replaced with ${block.label}`,
-                  tone: "success",
-                  action: undo,
-                }
-              : {
-                  title: `${block.label} added to ${target.parentName}`,
-                  description: "Selected on canvas · Focus stays here",
-                  tone: "success",
-                  action: undo,
-                },
-          );
+          const receipt = { title: `${block.label} added to ${target.parentName}`, detail: "Selected on canvas · Focus stays here" };
+          if (replaced) {
+            addToast({
+              description: `${getElementNameFromType(replaced.getType())} replaced with ${block.label}`,
+              tone: "success",
+              action: undo,
+            });
+          } else if (!showInsertReceipt(composer, receipt)) {
+            addToast({ title: receipt.title, description: receipt.detail, tone: "success", action: undo });
+          }
         } else {
           // Build contextual nesting error message
           const parentEl = composer.elements.getElement(parentId);

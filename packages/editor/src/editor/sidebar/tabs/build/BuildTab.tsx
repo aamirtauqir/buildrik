@@ -24,7 +24,7 @@ import { GroupSection, Row } from "./components/GroupSection";
 import { useToast } from "@/editor/chrome-ui";
 import { SearchResults } from "./components/SearchResults";
 import { useInsertDrag } from "@/editor/canvas/insertDrag";
-import { takePendingInsertGroup, takePendingPasteHtml } from "./insertGroupRequest";
+import { setInsertReceiptSink, takePendingInsertGroup, takePendingPasteHtml, type InsertReceipt } from "./insertGroupRequest";
 import { addTabOf, buildInsertGroups, blockRows, componentRows, elementCategoryGroups, type AddTabId, type InsertGroup, type InsertGroupId } from "./catalog/groups";
 import type { FlatElEntry } from "./catalog/types";
 import { InsertTargetStrip } from "./components/InsertTargetStrip";
@@ -112,6 +112,14 @@ export const BuildTab: React.FC<BuildTabProps> = ({
   }, [scrollTarget]);
   const { addToast } = useToast();
   const insertDrag = useInsertDrag(composer);
+  /* design-2l9 7:19448: while this panel is open, an insert's receipt lands
+     here, under the list, instead of a toast (useBlockInsertion). */
+  const [receipt, setReceipt] = React.useState<InsertReceipt | null>(null);
+  React.useEffect(() => {
+    if (!composer || !isOpen) return;
+    setInsertReceiptSink(composer, setReceipt);
+    return () => setInsertReceiptSink(composer, null);
+  }, [composer, isOpen]);
 
 
   const groups = React.useMemo(
@@ -349,6 +357,16 @@ export const BuildTab: React.FC<BuildTabProps> = ({
                 onManageComponents={composer ? () => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "components" }) : undefined}
               />
             ))}
+            {receipt && (
+              <div
+                role="status"
+                className="tw:mx-3 tw:mt-1 tw:flex tw:flex-col tw:gap-0.5 tw:rounded-md tw:bg-[var(--bk-success-tint)] tw:px-2 tw:py-2"
+                data-testid="add-insert-receipt"
+              >
+                <span className="tw:text-[13px] tw:leading-5 tw:text-[var(--bk-success-text)]">{receipt.title}</span>
+                <span className="tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">{receipt.detail}</span>
+              </div>
+            )}
             {/* Boards 6887:79760 / 4418:102121: "Page templates ›" closes the
                 block list — whole-page layouts live in Templates. */}
             {composer && addTab === "blocks" && (

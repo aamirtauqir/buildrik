@@ -12,7 +12,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import type { Composer } from "@/engine";
 import type { BlockData } from "@/shared/types";
 import { useBlockInsertion } from "../useBlockInsertion";
-import { requestReplaceWithBlock } from "@/editor/sidebar/tabs/build/insertGroupRequest";
+import { requestReplaceWithBlock, setInsertReceiptSink } from "@/editor/sidebar/tabs/build/insertGroupRequest";
 
 const mocks = vi.hoisted(() => ({
   addToast: vi.fn(),
@@ -228,6 +228,17 @@ describe("useBlockInsertion", () => {
       })
     );
     expect(composer.endTransaction).toHaveBeenCalled();
+  });
+
+  // re-baseline: insert receipt — 7:19448 puts it in the open Add panel instead of a toast.
+  it("hands the receipt to an open Add panel instead of raising the toast", () => {
+    const sink = vi.fn();
+    setInsertReceiptSink(composer as unknown as Composer, sink);
+    const { result } = mountHook();
+    act(() => result.current.handleBlockClick(heroBlock));
+    expect(sink).toHaveBeenCalledWith({ title: "Hero added to Home", detail: "Selected on canvas · Focus stays here" });
+    expect(mocks.addToast).not.toHaveBeenCalledWith(expect.objectContaining({ title: "Hero added to Home" }));
+    setInsertReceiptSink(composer as unknown as Composer, null);
   });
 
   it("inserts INSIDE the selected element when it accepts the block type", () => {
