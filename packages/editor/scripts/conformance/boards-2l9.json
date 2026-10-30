@@ -2812,9 +2812,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "open:ancestor-lock-semantics",
-   "verified": "drift-open",
-   "verifiedNote": "Lane L-B round 11, board PNG compared: the board makes a Text inside a locked Hero read-only in the Inspector — 'Text · Locked', 'Locked — unlock to edit', 'Locked by Hero', 'Show Hero in Layers', a disabled Text content field, 'Selection and copying remain available.' The engine does not lock descendants: `isLocked()` is the element's own flag and the write gate (`writableElements`) checks only that, so the Text is editable and the Inspector shows it editable (the Layers footer's 'Locked by Hero' is a label, not a gate). Building the board would make the Inspector claim a lock the engine does not enforce. Needs an owner/lead call: should an ancestor lock gate its descendants (engine change), or does the board drop 'Locked by'?",
+   "authority": "code:lock-not-inherited",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B round 11, board PNG compared: the board makes a Text inside a locked Hero read-only in the Inspector — 'Text · Locked', 'Locked — unlock to edit', 'Locked by Hero', 'Show Hero in Layers', a disabled Text content field, 'Selection and copying remain available.' The engine does not lock descendants: `isLocked()` is the element's own flag and the write gate (`writableElements`) checks only that, so the Text is editable and the Inspector shows it editable (the Layers footer's 'Locked by Hero' is a label, not a gate). Building the board would make the Inspector claim a lock the engine does not enforce. Needs an owner/lead call: should an ancestor lock gate its descendants (engine change), or does the board drop 'Locked by'? Lead decision (round 12): behaviour follows the code — a lock is the element's own flag and is not inherited (`isLocked()`, `writableElements`), so the Inspector shows no inherited lock. The lead is putting \"should a parent lock its children?\" to the owner; a yes comes back as engine work.",
    "tier": "P1"
   },
   {
@@ -2823,9 +2823,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Lane L-B round 11, board PNG compared with live (a locked element): both say 'Locked — unlock to edit' and offer Unlock (live: the status line's inline 'Unlock', one undo step via unlock-element). The board's differs: a warning-coloured status line, 'This section and its descendants are locked.' and a full-width 'Unlock Hero', then only the section's own field, disabled, and 'Selection and copying remain available.' Not built: the descendants sentence is not true of the engine (see 147:77668 — descendants are not gated), and the stripped body would hide the read-only controls page 04's locked state shows dimmed (DD-18). Open pending the same call as 147:77668.",
+   "authority": "code:lock-not-inherited",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B round 12, side by side with the board PNG (new probe ?type=container&locked=1): 'Locked — unlock to edit' in the warning ink and a full-width 'Unlock {layer}' (was an inline 'Unlock' link on a muted line); Unlock is the shared unlock-element command, one undo step. Kept: the controls stay below, dimmed and read-only (DD-18), where the board's schematic shows only one disabled field and 'Selection and copying remain available.'. Not drawn: 'This section and its descendants are locked.' — lead decision round 12, behaviour follows the code: a lock is the element's own flag and is not inherited; the lead is asking the owner whether a parent should lock its children (a yes comes back as engine work). The header 'Hero · Locked' is InspectorHeader (lead); live also shows the StatusMarks '🔒 Locked' mark.",
    "tier": "P1"
   },
   {
@@ -4429,8 +4429,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "code:conditions-not-built",
-   "verified": "drift-open",
-   "verifiedNote": "Lane L-B round 11, side by side with the board PNG (probe ?block=contact-form, Content): Fields — one row per field, name over '{type}' with its ⋯ menu (Name · Text, Email · Email, Message · Textarea, the submit · Submit button), '+ Add field', 'Drag to reorder, or use a field's menu.', then Semantics · Form and Advanced attributes. The board's 'Conditions · None' is not built (no conditions in the model; same authority as I12/I14). '· Required' and '1 set' are the board's fixture data (the probe block's fields are not required). The old note ('Fields sits in Behaviour', 'no reorder hint') is stale. The row's state in the name (saving / failed / offline / After submit) is elsewhere on the board; the Inspector body is this. (Board image of this state not fetched this round: 157:102776 / 104210 / 104927 were, and draw the same body.)",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B round 12, side by side with the board PNG and the live probe shot (?block=contact-form, Content): Fields — Name · Text, Email · Email, Message · Textarea, the submit · Submit button, each with ⋯; '+ Add field'; 'Drag to reorder, or use a field's menu.'; Semantics · Form; Advanced attributes. Not built: 'Conditions · None' (no field conditions in the model). '· Required' / '1 set' are fixture data.",
    "tier": "P1"
   },
   {
@@ -4461,9 +4461,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Lane L-B round 11: not fetched (8-image limit). Its siblings 157:103125 and 157:103842 draw the Email field body live matches (except the unbuilt Conditions); the old note ('Label writes the placeholder', no Name / Default rows) is stale. Compare before closing.",
+   "authority": "code:conditions-not-built",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B round 12, side by side with the board PNG and the live probe shot (?block=contact-form&child=input&childAttrs={type:email}): ‹ Contact form; Field — Type Email, Label, Placeholder 'you@example.com', Name 'email', 'Name is the key stored with each submission.', Required, Default value; Validation · More settings; Advanced attributes. Not built: 'Conditions · None'. Required's tick and '2 set' are fixture data.",
    "tier": "P1"
   },
   {
@@ -4483,9 +4483,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Lane L-B round 11: not fetched (8-image limit). Its siblings 157:103125 and 157:103842 draw the Email field body live matches (except the unbuilt Conditions); the old note ('Label writes the placeholder', no Name / Default rows) is stale. Compare before closing.",
+   "authority": "code:conditions-not-built",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B round 12, side by side with the board PNG and the live probe shot (?block=contact-form&child=input&childAttrs={type:email}): ‹ Contact form; Field — Type Email, Label, Placeholder 'you@example.com', Name 'email', 'Name is the key stored with each submission.', Required, Default value; Validation · More settings; Advanced attributes. Not built: 'Conditions · None'. Required's tick and '2 set' are fixture data.",
    "tier": "P1"
   },
   {
@@ -5180,8 +5180,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Lane L-B A8 (built, not compared): no overrides — Reset is disabled and 'No overrides to reset' shows.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B round 12, side by side with the board PNG (probe ?type=container&instance=Hero card): '◇ Hero card · instance', 'Component library · v{n}', Variant 'Default', 'Edit main component ›', a disabled full-width 'Reset to main component', 'No overrides to reset', 'Detach instance'. The board's Style body below is the older page-03 layout (Placement, Font-size token) — 161:8940 governs it.",
    "tier": "P1"
   },
   {
@@ -5991,8 +5991,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Lane L-B A9 (built, not compared): 'Template applied' · 'The {template} template was applied to {page}.' · 'Dismiss notice' (forgets it). Open: page scoping — the stored notice carries no page id (the writer is TemplatesTab, L-C), so it still shows on every page for its 30 minutes.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B round 12, side by side with the board PNG (probe ?page=1&pageName=Home&template=Studio): under the page header, 'Template applied' as a titled group, 'The Studio template was applied to Home.', and a full-width 'Dismiss notice' (was a green-tinted card above the header with a text-link Dismiss). Dismiss forgets it; it shows for 30 minutes after the apply. The board's grey line at the frame's foot ('Notice belongs to this completed operation on Home…') sits outside the panel's padding — read as a board annotation, not drawn.",
    "tier": "P1"
   },
   {

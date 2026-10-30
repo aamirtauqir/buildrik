@@ -1,8 +1,9 @@
 /**
  * StatusLine — why the controls below are read-only, and the one way out
  * (DD-18, Q4). Replaced LockedBanner.
- *   locked   → "Locked — unlock to edit · Unlock" (board 23; the shared
- *              `unlock-element` command, one undo step);
+ *   locked   → "Locked — unlock to edit" and a full-width "Unlock {layer}"
+ *              (2L9 147:78110; the shared `unlock-element` command, one
+ *              undo step);
  *   conflict → "This site changed elsewhere — resolve to keep editing ·
  *              Resolve" (board 29; reopens the conflict dialog).
  *
@@ -12,6 +13,9 @@
 import * as React from "react";
 import type { Composer } from "@/engine";
 import { Button } from "@/editor/chrome-ui";
+import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
+import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
+import { WIDE_BUTTON } from "../shared/controls/controlClasses";
 
 export interface StatusLineProps {
   composer: Composer | null | undefined;
@@ -33,24 +37,32 @@ const TONE = {
 } as const;
 
 export function StatusLine({ composer, elementId, locked, conflict }: StatusLineProps) {
-  const line = conflict.pending
-    ? {
-        text: "This site changed elsewhere — resolve to keep editing",
-        action: "Resolve",
-        run: conflict.resolve,
-        id: "inspector-resolve",
-        tone: "warning" as const,
-      }
-    : locked
-      ? {
-          text: "Locked — unlock to edit",
-          action: "Unlock",
-          run: () => composer?.commands.run("unlock-element", { elementId }),
-          id: "inspector-unlock",
-          tone: "muted" as const,
-        }
-      : null;
-  if (!line) return null;
+  if (locked && !conflict.pending) {
+    const el = composer?.elements?.getElement?.(elementId);
+    const name = el ? (getLayerName(el) ?? elementTypeLabel(el.getType())) : "element";
+    return (
+      <div role="status" data-testid="inspector-status-line" data-tone="locked" className="tw:flex tw:flex-col tw:gap-2 tw:px-3 tw:pb-2">
+        <span className="tw:text-[12px] tw:font-semibold tw:leading-4 tw:text-[var(--bk-warning-text)]">Locked — unlock to edit</span>
+        <Button
+          color="light"
+          size="xs"
+          data-testid="inspector-unlock"
+          className={`${WIDE_BUTTON} tw:w-auto! tw:self-start tw:px-4`}
+          onClick={() => void composer?.commands.run("unlock-element", { elementId })}
+        >
+          Unlock {name}
+        </Button>
+      </div>
+    );
+  }
+  if (!conflict.pending) return null;
+  const line = {
+    text: "This site changed elsewhere — resolve to keep editing",
+    action: "Resolve",
+    run: conflict.resolve,
+    id: "inspector-resolve",
+    tone: "warning" as const,
+  };
   return (
     <div
       role="status"

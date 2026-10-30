@@ -2727,6 +2727,8 @@ const CASES: Record<string, () => React.ReactElement> = {
       host.appendChild(node);
       document.body.appendChild(host);
     }
+    /* `?locked=1` — the element's own lock (147:78110). */
+    if (q.get("locked")) el.setLocked(true);
     /* `?dimmed=1` — the element dimmed in the editor (the Layers eye): its
        canvas stand-in carries `data-hidden`, as useCanvasEditorFlags sets it
        (147:78900). */
@@ -2812,6 +2814,9 @@ const CASES: Record<string, () => React.ReactElement> = {
       );
     /* `?page=1` — nothing selected: the Inspector's page panel (board 21,
        P28). `?pageName=About` renames the page. */
+    /* `?template=Studio` — a template applied just now (S07's notice). */
+    const templateQ = q.get("template");
+    if (templateQ) localStorage.setItem("buildrick-last-applied-template", JSON.stringify({ name: templateQ, ts: Date.now() }));
     const pageOnly = !!q.get("page");
     const pageName = q.get("pageName");
     if (pageName) c.elements.updatePage(page.id, { name: pageName });
