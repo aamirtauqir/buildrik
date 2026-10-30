@@ -400,6 +400,15 @@ describe("StudioHeader", () => {
       expect(toggle().textContent).toBe("Publishing…");
     });
 
+    it("a failed publish turns the toggle red, 'Publish failed', and it still opens the tray (B8-PB10)", () => {
+      vi.mocked(isFeatureEnabled).mockReturnValue(true);
+      render(<StudioHeader {...makeProps({ publishFailed: true })} />);
+      expect(toggle().textContent).toBe("Publish failed");
+      expect(toggle().getAttribute("data-publish-state")).toBe("failed");
+      fireEvent.click(toggle());
+      expect(publishTray.get().open).toBe(true);
+    });
+
     it("a second click closes it; the label does not change on open (no layout shift)", () => {
       vi.mocked(isFeatureEnabled).mockReturnValue(true);
       render(<StudioHeader {...makeProps()} />);

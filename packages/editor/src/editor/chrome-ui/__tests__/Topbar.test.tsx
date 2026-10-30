@@ -108,6 +108,20 @@ describe("Topbar", () => {
     }
   });
 
+  /* 2L9 B8-PB10 (233:5303): a failed publish turns the toggle red and says so;
+     it stays pressable — it opens the tray with the reason and Try again. */
+  it("failed: 'Publish failed' on the error fill, still a pressable toggle", () => {
+    const onPublish = vi.fn();
+    render(<Topbar siteName="x" publish="failed" ctaLabel="Publish changes" onPublish={onPublish} publishExpanded={false} />);
+    const btn = screen.getByTestId("topbar-publish");
+    expect(btn.textContent).toBe("Publish failed");
+    expect(btn.getAttribute("data-publish-state")).toBe("failed");
+    expect(btn.className).toContain("tw:bg-[var(--bk-error)]");
+    expect(btn).not.toBeDisabled();
+    fireEvent.click(btn);
+    expect(onPublish).toHaveBeenCalledTimes(1);
+  });
+
   it("is a banner carrying the site name", () => {
     render(<Topbar siteName="Bella Cucina" />);
     expect(screen.getByRole("banner")).toBeTruthy();

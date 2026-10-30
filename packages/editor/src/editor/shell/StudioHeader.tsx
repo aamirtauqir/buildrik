@@ -139,6 +139,9 @@ export interface StudioHeaderProps {
   /** The running job's steps (`publishJob.steps`) — the toggle reads
    *  "Publishing 2/3…" while it runs (board B8-PB07 `233:3648`). */
   publishSteps?: PublishStep[] | null;
+  /** The last publish failed (`publishJob.uiState === "failed" && !pollLost`)
+   *  — the toggle turns red, "Publish failed" (board B8-PB10 `233:5303`). */
+  publishFailed?: boolean;
   /** Live URL after successful publish */
   publishedUrl?: string | null;
   /** T5 (D10): 2s outcome flash — drives "✓ Published" and the announcement
@@ -276,6 +279,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   onExportHTML,
   publishLoading,
   publishSteps = null,
+  publishFailed = false,
   publishedUrl,
   publishOutcome = null,
   reviewStatus,
@@ -767,6 +771,8 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   const publish: PublishState =
     publishOutcome === "published" && !trayOpen
       ? "published"
+      : publishFailed && isTrayToggle
+        ? "failed"
       : !isTrayToggle && nextMove?.blockedReason
         ? "disabled"
         : "ready";

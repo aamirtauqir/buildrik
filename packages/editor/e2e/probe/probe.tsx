@@ -152,6 +152,7 @@ import { NewPageModal } from "@/editor/sidebar/tabs/pages/components/NewPageModa
 import { PageSettingsDrawer } from "@/editor/sidebar/tabs/pages/page-settings/PageSettingsDrawer";
 import { Topbar, SiteMenuIcon, IconButton, BreakpointSwitcher } from "@/editor/chrome-ui";
 import { RecordsTable } from "@/editor/cms/RecordsTable";
+import { AddFieldDialog } from "@/editor/cms/AddFieldDialog";
 import { CmsWorkspace } from "@/editor/cms/CmsWorkspace";
 import { ReplaceModal } from "@/editor/sidebar/tabs/templates/TemplatesTabModals";
 import { cmsWorkspace } from "@/editor/cms/cmsWorkspaceStore";
@@ -3607,6 +3608,39 @@ const CASES: Record<string, () => React.ReactElement> = {
   // and boards.json's 2026-08-31 walk of the sibling board (164:2) confirms
   // 360 against the live app. The filter is internal state cycled by its own
   // control, so the recipe clicks it rather than the fixture pre-setting it.
+  /* 2L9 B5-T01…T19 (167:3871…167:8747) — Add field over a collection. Drive
+     it from the type list (cms-add-field-type-<t>); `&fail=1` makes the save
+     refuse (T19), otherwise the save never settles (T18 "Saving…"). */
+  "cms-add-field": () => {
+    const fail = new URLSearchParams(location.search).get("fail") === "1";
+    return (
+      <div data-probe="cms-add-field" className="tw:fixed tw:inset-0 tw:bg-[var(--bk-bg-app)]">
+        <AddFieldDialog
+          collection={CMS_STATUS_COLLECTION}
+          collections={[CMS_STATUS_COLLECTION]}
+          onClose={() => {}}
+          onAdd={() => (fail ? Promise.reject(new Error("offline")) : new Promise<void>(() => {}))}
+        />
+      </div>
+    );
+  },
+  /* 2L9 B8-IS01 236:9417 / Play F4.01 303:32296 — cards: a blocker (element),
+     an element tip, and two server checks with no element. `?clear=1`: no
+     blocker (F4.05 303:34252, Review and publish). */
+  "issues-cards": () => {
+    const clear = new URLSearchParams(location.search).get("clear") === "1";
+    const rows: Issue[] = [
+      ...(clear ? [] : [{ id: "cms:list-no-source:l1", type: "error" as const, message: "Collection list has no source", location: "Home › Journal section", elementId: "l1", pageId: "home" }]),
+      { id: "content:alt:i1", type: "warning", message: "Image is missing alt text", location: "Home › Hero", elementId: "i1", pageId: "home" },
+      { id: "publish-check:Favicon", type: "warning", message: "No favicon set. Browsers will show a default icon." },
+      { id: "publish-check:SEO configured", type: "warning", message: "No meta title template set." },
+    ];
+    return (
+      <div data-probe="issues-cards" className="tw:h-203 tw:w-[300px] tw:bg-white">
+        <IssuesPanel issues={rows} activePageId="home" onClose={() => {}} onSelectElement={() => {}} onFix={async () => null} />
+      </div>
+    );
+  },
   "issues-filtered": () => (
     <div data-probe="issues-filtered" className="tw:h-203 tw:w-90 tw:bg-white">
       <IssuesPanel

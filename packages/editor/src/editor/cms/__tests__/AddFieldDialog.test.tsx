@@ -36,7 +36,11 @@ describe("AddFieldDialog", () => {
     const { onAdd } = mount();
     fireEvent.click(screen.getByTestId("cms-add-field-type-select"));
     fireEvent.change(screen.getByTestId("cms-add-field-name"), { target: { value: "Course" } });
-    fireEvent.change(screen.getByTestId("cms-add-field-options"), { target: { value: "Starter\nMain" } });
+    /* 2L9 167:6844: one "Label and saved value" field per option, + Add option. */
+    expect(screen.getByText("Records choose one option.")).toBeInTheDocument();
+    fireEvent.change(screen.getByTestId("cms-add-field-options-0"), { target: { value: "Starter" } });
+    fireEvent.click(screen.getByTestId("cms-add-field-options-add"));
+    fireEvent.change(screen.getByTestId("cms-add-field-options-1"), { target: { value: "Main" } });
     fireEvent.click(screen.getByTestId("cms-add-field-save"));
     await waitFor(() => expect(onAdd).toHaveBeenCalledWith({ name: "Course", slug: "course", type: "select", options: ["Starter", "Main"] }));
   });
@@ -66,10 +70,12 @@ describe("AddFieldDialog", () => {
     expect(screen.getByText("Add number field")).toBeInTheDocument();
     expect(screen.getByText("Menu items · New field")).toBeInTheDocument();
     expect(screen.getByTestId("cms-add-field-key-hint")).toHaveTextContent("Used in bindings and patterns. Must be unique in Menu items.");
-    expect(screen.getByText("Existing records keep empty values until edited.")).toBeInTheDocument();
+    /* 2L9 167:4135: labels over filled fields, a Type select in place of a
+       step back, Required as a checkbox. */
+    expect(screen.getByTestId("cms-add-field-type")).toHaveValue("number");
     fireEvent.change(screen.getByTestId("cms-add-field-name"), { target: { value: "Cooking time" } });
     expect(screen.getByTestId("cms-add-field-key")).toHaveValue("cooking-time");
-    fireEvent.click(screen.getByTestId("cms-add-field-required-yes"));
+    fireEvent.click(screen.getByTestId("cms-add-field-required"));
     fireEvent.click(screen.getByTestId("cms-add-field-save"));
     await waitFor(() =>
       expect(onAdd).toHaveBeenCalledWith({ name: "Cooking time", slug: "cooking-time", type: "number", validation: { required: true } }),
@@ -81,7 +87,11 @@ describe("AddFieldDialog", () => {
     const { onAdd } = mount();
     fireEvent.click(screen.getByTestId("cms-add-field-type-multiselect"));
     fireEvent.change(screen.getByTestId("cms-add-field-name"), { target: { value: "Tags" } });
-    fireEvent.change(screen.getByTestId("cms-add-field-options"), { target: { value: "Vegan\n Spicy \n\nVegan" } });
+    expect(screen.getByText("Records choose any number of options.")).toBeInTheDocument();
+    for (const [i, v] of ["Vegan", " Spicy ", "", "Vegan"].entries()) {
+      if (i > 0) fireEvent.click(screen.getByTestId("cms-add-field-options-add"));
+      fireEvent.change(screen.getByTestId(`cms-add-field-options-${i}`), { target: { value: v } });
+    }
     fireEvent.click(screen.getByTestId("cms-add-field-save"));
     await waitFor(() => expect(onAdd).toHaveBeenCalledWith({ name: "Tags", slug: "tags", type: "multiselect", options: ["Vegan", "Spicy"] }));
   });
@@ -94,11 +104,13 @@ describe("AddFieldDialog", () => {
     expect(screen.getByTestId("cms-add-field-save")).toBeDisabled();
   });
 
-  it("goes back to the type list", () => {
+  it("changes the type in place, dropping the old type's rules", () => {
     mount();
-    fireEvent.click(screen.getByTestId("cms-add-field-type-image"));
-    fireEvent.click(screen.getByTestId("cms-add-field-back"));
-    expect(screen.getByTestId("cms-add-field-types")).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId("cms-add-field-type-text"));
+    expect(screen.getByText("Add text field")).toBeInTheDocument();
+    fireEvent.change(screen.getByTestId("cms-add-field-type"), { target: { value: "image" } });
+    expect(screen.getByText("Add image field")).toBeInTheDocument();
+    expect(screen.queryByTestId("cms-add-field-types")).toBeNull();
   });
 
   it("a reference field names the collection it points at", async () => {
