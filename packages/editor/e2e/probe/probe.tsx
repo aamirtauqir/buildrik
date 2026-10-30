@@ -2663,6 +2663,20 @@ const CASES: Record<string, () => React.ReactElement> = {
     const bp = (q.get("bp") ?? "desktop") as "desktop" | "tablet" | "mobile";
     const bpStyles = q.get("bpStyles");
     if (bpStyles && bp !== "desktop") c.styles.setBreakpointStyle(el.getId(), bp, JSON.parse(bpStyles) as Record<string, string>);
+    /* `?canvasParent={…}` — a stand-in canvas node for the element inside a
+       parent with these styles, so the Inspector's computed-style reads see a
+       real cascade (S21 "· inherited"). Off-screen, outside React. */
+    const canvasParent = q.get("canvasParent");
+    if (canvasParent) {
+      const host = document.createElement("div");
+      host.style.cssText = "position:absolute;left:-9999px;top:0;";
+      Object.assign(host.style, JSON.parse(canvasParent));
+      const node = document.createElement(el.getTagName());
+      node.setAttribute("data-buildrick-id", el.getId());
+      node.textContent = "Probe";
+      host.appendChild(node);
+      document.body.appendChild(host);
+    }
     /* `?peers=3&lockedPeers=1` — same-kind elements on the page (S11). */
     for (let i = 0; i < Number(q.get("peers") ?? 0) + Number(q.get("lockedPeers") ?? 0); i++) {
       const peer = c.elements.createElement(type as never, { content: `Peer ${i + 1}` } as never);

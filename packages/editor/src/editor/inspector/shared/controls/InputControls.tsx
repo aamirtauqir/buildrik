@@ -136,6 +136,10 @@ export interface InputWithUnitProps {
   /** The CSS property this row edits — the field context reads read-only,
    *  "Mixed" and its override dot by it (InspectorFieldContext). */
   property?: string;
+  /** What the cascade resolves when the element sets nothing ("32 px") —
+   *  an empty field shows it as "32 px · inherited" (2L9 S21), full width,
+   *  no stepper or unit until the user types a value of its own. */
+  inherited?: string;
   /** A plain count (grid Columns, board 17): the number and its stepper, no
    *  unit dropdown and no unit words in the name. */
   noUnit?: boolean;
@@ -261,6 +265,7 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
   noUnit = false,
   dot = true,
   onRevert,
+  inherited,
 }) => {
   const field = useInspectorField(property);
   const units = noUnit ? NO_UNITS : unitsProp;
@@ -272,6 +277,7 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
   const { num, unit } = custom ? { num: value.trim(), unit: "" } : splitValue(value, units);
   const isKeyword = KEYWORDS.has(unit);
   const shown = isKeyword ? unit : num;
+  const fromCascade = !field.mixed && value === "" && !!inherited;
 
   const [text, setText] = React.useState(shown);
   const [invalid, setInvalid] = React.useState(false);
@@ -383,18 +389,18 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
           field.stopTyping();
         }}
         onKeyDown={onKeyDown}
-        placeholder={field.mixed ? "Mixed" : placeholder}
+        placeholder={field.mixed ? "Mixed" : fromCascade ? `${inherited} · inherited` : placeholder}
         id={inputId}
         aria-labelledby={suffix ? `${nameId} ${suffixId}` : nameId}
         // `.bdi-fld input.auto` keys off a class on the real <input>; flowbite
         // puts `className` on the wrapper, so it goes through `theme`.
-        theme={{ field: { input: { base: isKeyword ? "auto" : "" } } }}
+        theme={{ field: { input: { base: isKeyword ? "auto" : fromCascade && !text ? "auto tw:placeholder:text-[var(--bk-ink-soft)]" : "" } } }}
         readOnly={field.readOnly}
         aria-readonly={field.readOnly || undefined}
         aria-invalid={invalid}
         aria-describedby={invalid ? errorId : undefined}
       />
-      {isKeyword || custom ? null : (
+      {isKeyword || custom || (fromCascade && !text) ? null : (
         <>
           {/* Pointer shortcut for ↑ / ↓ on the field itself (the keyboard
               path, which also takes Shift for 10). Not a separate control. */}

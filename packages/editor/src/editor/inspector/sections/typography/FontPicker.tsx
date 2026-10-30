@@ -137,6 +137,8 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value: ownValue, onChang
   const source =
     field.mixed || !value || value === "inherit" || /^var\(/.test(value)
       ? null
+      : !ownValue && inheritedValue
+        ? "inherited"
       : uploaded
         ? "Uploaded"
         : SYSTEM_FONTS.some((f) => f.value === value)

@@ -21,6 +21,8 @@ import { colourTokenLabel } from "@/editor/inspector/shared/controls/ColorInput"
 import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 
 const SUMMARY_KEYS = ["font-family", "font-size", "color"] as const;
+/* The rows that can say "· inherited" (S21). */
+const INHERITED_KEYS = [...SUMMARY_KEYS, "font-weight", "line-height"] as const;
 
 const TYPOGRAPHY_KEYS = ["font-family", "font-size", "font-weight", "font-style", "line-height", "letter-spacing", "color", "text-align", "text-transform", "text-decoration", "white-space", "word-break", "word-spacing", "text-indent", "vertical-align"];
 const TYPOGRAPHY_ADVANCED = ["text-align", "font-style", "text-transform", "text-decoration", "letter-spacing", "word-spacing", "white-space", "word-break", "text-indent", "vertical-align"];
@@ -30,9 +32,13 @@ const adaptTypography = (ctx: SectionContext) => ({
   advancedExpanded: ctx.advancedExpanded,
   onAdvancedToggle: ctx.onAdvancedToggle,
   variant: ctx.variant,
-  /* The Page panel shows what the page renders where it sets nothing: its
-     font and text colour (board 21: "Inter", "Text / primary"). */
-  inherited: ctx.variant === "page" ? renderedValues(ctx.selectedElement.id, ctx.styles, ctx.composer) : undefined,
+  /* What the element renders where it sets nothing — read off the canvas
+     node's computed style, the value the cascade resolves (board 21's page
+     font / text colour; 2L9 S21 "32 px · inherited" after a reset). */
+  inherited:
+    ctx.variant === "page"
+      ? renderedValues(ctx.selectedElement.id, ctx.styles, ctx.composer)
+      : renderedValues(ctx.selectedElement.id, ctx.authoredStyles, ctx.composer),
 });
 
 /** A value as the summary shows it: a token var resolves to what it stands
@@ -79,8 +85,9 @@ function renderedValues(elementId: string, own: Record<string, string>, composer
   if (!node) return {};
   const cs = window.getComputedStyle(node);
   const out: Record<string, string> = {};
-  for (const key of SUMMARY_KEYS) {
-    if (own[key]) continue;
+  for (const key of INHERITED_KEYS) {
+    /* "inherit" written as a value is no value of its own (text types are made with it). */
+    if (own[key] && own[key] !== "inherit") continue;
     const value = cs.getPropertyValue(key).trim();
     if (!value) continue;
     const hex = key === "color" ? toHex(value) : null;
