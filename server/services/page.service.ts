@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, PlanName } from "@/lib/constants/plan-limits";
 import { sanitizeBlocks } from "@/lib/sanitize-blocks";
 import { newPageRoot } from "@buildrik/shared/content/elementIds";
+import { trashPages } from "@/server/services/page-trash.service";
 import type {
   CreatePageInput,
   UpdatePageInput,
@@ -10,7 +11,7 @@ import type {
   RemoveTranslationInput,
 } from "@buildrik/shared/schemas/pages";
 
-type DeletePageInput = { pageId: string; siteId: string };
+type DeletePageInput = { pageId: string; siteId: string; userId: string };
 
 type TranslationMap = Record<string, { blocks: Prisma.JsonValue }>;
 
@@ -26,7 +27,7 @@ export async function listPages(siteId: string) {
   // blocks/settings/slugHistory/meta/slugManuallySet for applied-template
   // state + slug-redirect history to survive reload.
   return prisma.page.findMany({
-    where: { siteId },
+    where: { siteId, deletedAt: null },
     select: {
       id: true,
       siteId: true,
@@ -49,7 +50,7 @@ export async function listPages(siteId: string) {
 }
 
 export async function getPage(pageId: string) {
-  return prisma.page.findUnique({ where: { id: pageId } });
+  return prisma.page.findFirst({ where: { id: pageId, deletedAt: null } });
 }
 
 export async function createPage(input: CreatePageInput) {
@@ -64,7 +65,7 @@ export async function createPage(input: CreatePageInput) {
   const plan = (member?.workspace?.plan ?? "FREE") as PlanName;
   const limit = PLAN_LIMITS[plan].pagesPerSite as number;
 
-  const pageCount = await prisma.page.count({ where: { siteId: input.siteId } });
+  const pageCount = await prisma.page.count({ where: { siteId: input.siteId, deletedAt: null } });
   if (pageCount >= limit) throw new Error("PAGE_LIMIT");
 
   const baseSlug = input.slug ?? slugify(input.name);
@@ -97,7 +98,7 @@ export async function createPage(input: CreatePageInput) {
 }
 
 export async function updatePage(input: UpdatePageInput) {
-  const existing = await prisma.page.findUnique({ where: { id: input.pageId } });
+  const existing = await prisma.page.findFirst({ where: { id: input.pageId, deletedAt: null } });
   // The router's role gate ran against input.siteId, so the page must BE on
   // that site — or an EDITOR of site A could edit any page by id (audit
   // 2026-09-24). A foreign page is reported as missing, not as forbidden.
@@ -122,17 +123,19 @@ export async function updatePage(input: UpdatePageInput) {
 
 export async function deletePage(input: DeletePageInput) {
   // Same site-binding as updatePage: the role gate checked input.siteId.
-  const page = await prisma.page.findUnique({ where: { id: input.pageId } });
+  const page = await prisma.page.findFirst({ where: { id: input.pageId, deletedAt: null } });
   if (!page || page.siteId !== input.siteId) throw new Error("NOT_FOUND");
 
-  const pageCount = await prisma.page.count({ where: { siteId: input.siteId } });
+  const pageCount = await prisma.page.count({ where: { siteId: input.siteId, deletedAt: null } });
   if (pageCount <= 1) throw new Error("LAST_PAGE");
 
-  await prisma.formBlock.deleteMany({ where: { pageId: input.pageId } });
-  await prisma.page.delete({ where: { id: input.pageId } });
-  await prisma.site.update({
-    where: { id: input.siteId },
-    data: { pages: { decrement: 1 } },
+  // A-21: to the trash (restorable for 30 days), as an editor save does.
+  await prisma.$transaction(async (tx) => {
+    await trashPages(tx, input.siteId, [input.pageId], input.userId);
+    await tx.site.update({
+      where: { id: input.siteId },
+      data: { pages: { decrement: 1 } },
+    });
   });
 }
 
@@ -145,8 +148,8 @@ export async function deletePage(input: DeletePageInput) {
 // industry convention is base-language fallback only. Caller passes the
 // browser/Accept-Language locale unchanged.
 export async function resolveTranslation(pageId: string, locale: string) {
-  const page = await prisma.page.findUnique({
-    where: { id: pageId },
+  const page = await prisma.page.findFirst({
+    where: { id: pageId, deletedAt: null },
     select: {
       id: true,
       siteId: true,
@@ -187,8 +190,8 @@ export function buildFallbackChain(locale: string, defaultLocale: string): strin
 }
 
 export async function setTranslation(input: SetTranslationInput) {
-  const page = await prisma.page.findUnique({
-    where: { id: input.pageId },
+  const page = await prisma.page.findFirst({
+    where: { id: input.pageId, deletedAt: null },
     select: { id: true, siteId: true, translations: true },
   });
   if (!page) throw new Error("NOT_FOUND");
@@ -223,8 +226,8 @@ export async function setTranslation(input: SetTranslationInput) {
 }
 
 export async function removeTranslation(input: RemoveTranslationInput) {
-  const page = await prisma.page.findUnique({
-    where: { id: input.pageId },
+  const page = await prisma.page.findFirst({
+    where: { id: input.pageId, deletedAt: null },
     select: { id: true, siteId: true, translations: true },
   });
   if (!page) throw new Error("NOT_FOUND");

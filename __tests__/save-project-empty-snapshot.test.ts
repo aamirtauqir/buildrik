@@ -17,6 +17,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 const pageFindMany = vi.fn();
 const pageDeleteMany = vi.fn();
+const pageUpdate = vi.fn();
 const formBlockDeleteMany = vi.fn();
 const siteFindUnique = vi.fn();
 const siteUpdate = vi.fn();
@@ -28,7 +29,7 @@ vi.mock("@/lib/prisma", () => {
       findFirst: vi.fn(async () => null),
       deleteMany: (...a: unknown[]) => pageDeleteMany(...a),
       upsert: vi.fn(),
-      update: vi.fn(),
+      update: (...a: unknown[]) => pageUpdate(...a),
       create: vi.fn(),
     },
     formBlock: { deleteMany: (...a: unknown[]) => formBlockDeleteMany(...a) },
@@ -62,13 +63,18 @@ describe("saveProjectData with an empty page list", () => {
     expect(pageDeleteMany).not.toHaveBeenCalled();
   });
 
-  it("still deletes a page the user really did remove", async () => {
+  it("still trashes a page the user really did remove (A-21)", async () => {
+    pageFindMany
+      .mockResolvedValueOnce([{ id: "p_1" }, { id: "p_2" }])
+      .mockResolvedValueOnce([{ id: "p_2", slug: "about" }]);
     await saveProjectData({
       siteId: "s_1",
       pages: [{ id: "p_1", blocks: [], position: 0 }],
     } as never);
-    expect(pageDeleteMany).toHaveBeenCalledWith(
-      expect.objectContaining({ where: { id: { in: ["p_2"] } } }),
+    expect(pageFindMany.mock.calls[1][0].where).toEqual({ id: { in: ["p_2"] }, siteId: "s_1", deletedAt: null });
+    expect(pageUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { id: "p_2" }, data: expect.objectContaining({ slug: "about~deleted~p_2" }) }),
     );
+    expect(pageDeleteMany).not.toHaveBeenCalled();
   });
 });

@@ -621,10 +621,17 @@ model Page {
   translations    Json?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+  // Page trash (design-2l9 A-21): a trashed page keeps its row for 30 days.
+  // `slug` then holds `<slug>~deleted~<id>` (frees @@unique) and the URL it
+  // had is in `trashedSlug`. Every read of live pages filters deletedAt: null.
+  deletedAt       DateTime?
+  deletedById     String?
+  trashedSlug     String?  @db.VarChar(100)
 
   site Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
 
   @@unique([siteId, slug])
+  @@index([siteId, deletedAt])
   @@map("pages")
 }
 

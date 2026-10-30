@@ -253,7 +253,7 @@ export async function cloneSiteAsTemplate(
   if (!site) throw new TemplateError("SITE_NOT_FOUND", "Site not found in this workspace");
 
   const pages = await prisma.page.findMany({
-    where: { siteId },
+    where: { siteId, deletedAt: null },
     orderBy: { position: "asc" },
     select: { name: true, slug: true, position: true, isHomePage: true, blocks: true },
   });
