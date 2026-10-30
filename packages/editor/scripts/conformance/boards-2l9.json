@@ -4822,7 +4822,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Generic unit list px % em rem vw vh auto; board property-specific list + conversion note",
+   "verifiedNote": "Lane L-B round 18, compared with the board PNG: the unit choices match the board's for Font size — px, em, rem, %, vw (property-specific, not the generic list the old note named). Open, two gaps: (1) the board draws the choice as a 'Font size unit' card beside the column with Cancel; live it is the field's own unit select — every number field shares that control (InputWithUnit), so the card is a change to all of them; (2) the board's 'Convert using the authored page's font and viewport values.' is not what the code does — a unit change converts px ↔ rem / em at a 16 px root only (I07's receipt says so) and leaves %, vw as typed; that line would need real per-page font and viewport conversion first.",
    "tier": "P1"
   },
   {
@@ -5169,8 +5169,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Lane L-B round 13, board PNG recropped (the dialog sits over the canvas): 'Reset this instance?' / 'Its 3 overrides (including Tablet, Mobile and :hover) will be removed. Content from the main component replaces them.' · Cancel · Reset. The confirm now reads 'Reset this instance?' / 'Its {n} override(s) will be removed. Content from the main component replaces them.' (was 'Reset {name} to main component?' / '…will be discarded.'). Left out: '(including Tablet, Mobile and :hover)' — the instance's override list holds element paths, not the breakpoint or state each was made in. Not walked live: the probe's instance has no recorded overrides, so Reset stays disabled there (unit-tested).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B round 18, walked live (probe ?type=container&instance=Hero card&overrides={3 styles}, now recorded as the instance's real overrides via recordInstanceOverride): 'Reset to main component · 3 overrides' → 'Reset this instance?' / 'Its 3 overrides will be removed. Content from the main component replaces them.' · Cancel · Reset → the row reads 'Reset to main component' (disabled) / 'No overrides to reset'. Fixed on the walk: the reset re-mounts the instance (sync replaces the subtree, ids kept), which dropped the selection — the Inspector fell back to another element; the instance is now selected again (unit-tested). Not drawn: '(including Tablet, Mobile and :hover)' — the override list holds element paths, not the breakpoint or state of each.",
    "tier": "P1"
   },
   {

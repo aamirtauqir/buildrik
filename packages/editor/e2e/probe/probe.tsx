@@ -2835,7 +2835,13 @@ const CASES: Record<string, () => React.ReactElement> = {
         const inst = id ? c.elements.getElement(id) : null;
         if (!inst) return;
         const overrides = q.get("overrides");
-        if (overrides) inst.setStyles(JSON.parse(overrides) as Record<string, string>);
+        if (overrides) {
+          const styles = JSON.parse(overrides) as Record<string, string>;
+          inst.setStyles(styles);
+          /* Recorded as the instance's overrides too, as an Inspector edit
+             on an instance records them (Reset counts these — IC02). */
+          for (const [prop, value] of Object.entries(styles)) c.components.recordInstanceOverride(inst.getId(), "style", prop, value);
+        }
         c.selection.select(inst);
       })();
     }
