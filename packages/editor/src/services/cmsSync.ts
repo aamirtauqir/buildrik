@@ -196,6 +196,13 @@ function outstandingCmsChanges(): number {
 
 registerPendingSource("cms", outstandingCmsChanges);
 
+/** This record's own save is still owed to the server — queued, in flight,
+ *  conflicted, or in the outbox. A record sheet holding a queued revision
+ *  (design-2l9 126:35760) stays locked until this turns false. */
+export function isCmsEntrySaveOwed(id: string): boolean {
+  return outstandingCmsKeys().has(`entryUpsert:${id}`);
+}
+
 /* C0a (Task 5): CONFLICT and GONE are answers, not failures. CONFLICT must
    not loop forever against a row that has moved on since; GONE means the
    server already removed the row, so retrying would resurrect it. Both are

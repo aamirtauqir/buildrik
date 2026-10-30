@@ -370,7 +370,11 @@ export const PagesTab: React.FC<PagesTabProps> = ({
     const name = p.pages.find((pg) => pg.id === id)?.name ?? "this page";
     cmsWorkspace.exit(
       () => { cmsWorkspace.setOverPages(false); p.selectPage(id); },
-      { name, exists: () => Boolean(composer?.elements.getPage?.(id)) },
+      {
+        name,
+        exists: () => Boolean(composer?.elements.getPage?.(id)),
+        isCurrent: composer?.elements.getActivePage?.()?.id === id,
+      },
     );
   }, [p.selectPage, p.pages, composer]);
   const bulkDelete = useBulkDelete({ pages: p.pages, orderedPageIds, bulk, deletePage: p.deletePage, deletePages: p.deletePages });

@@ -77,6 +77,8 @@ export interface CmsExitPage {
   name: string;
   /** Still a page of the site? Checked when the leave would land (126:36751). */
   exists: () => boolean;
+  /** The page already on the canvas — the guard still asks (125:35603). */
+  isCurrent?: boolean;
 }
 type CmsExitGuard = (go: () => void, page?: CmsExitPage) => boolean;
 let exitGuard: CmsExitGuard | null = null;

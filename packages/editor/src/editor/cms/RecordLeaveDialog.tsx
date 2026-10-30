@@ -1,7 +1,7 @@
 /**
  * RecordLeaveDialog — leaving a CMS record with unsaved edits for a PAGE
  * picked in the Pages drawer over the workspace (design-2l9 122:44151 ask,
- * 126:36130 saving, 122:44343 save failed, 125:35409 queued, 126:36751 the
+ * 125:35603 the page already on the canvas, 126:36130 saving, 122:44343 save failed, 125:35409 queued, 126:36751 the
  * page was removed). One dialog that follows the real save: it stays up while
  * "Save and leave" runs and says what happened; the page opens only after a
  * confirmed save (RecordSheet decides, this only draws).
@@ -23,6 +23,8 @@ export interface RecordLeaveDialogProps {
   to: string;
   /** The page on the canvas now ("Home") — it stays unchanged. */
   current: string | null;
+  /** The page asked for is the one already on the canvas (125:35603). */
+  toIsCurrent?: boolean;
   /** The server's refusal (a published record broke the collection's rules). */
   reason?: string | null;
   onKeepEditing: () => void;
@@ -43,6 +45,7 @@ export function RecordLeaveDialog({
   collectionName,
   to,
   current,
+  toIsCurrent = false,
   reason,
   onKeepEditing,
   onDiscard,
@@ -60,8 +63,10 @@ export function RecordLeaveDialog({
   const copy: Record<RecordLeavePhase, { title: string; body: string; note: string }> = {
     ask: {
       title: "Leave without saving?",
-      body: `${recordLabel} has unsaved changes. You asked to open ${to}.`,
-      note: `Only this record’s draft is affected.${current ? ` Your ${current} page remains unchanged.` : ""}`,
+      body: `${recordLabel} has unsaved changes. You asked to open ${to}${toIsCurrent ? " in Editor" : ""}.`,
+      note: toIsCurrent
+        ? `${to} is still the remembered canvas page. Returning to it leaves this record form.`
+        : `Only this record’s draft is affected.${current ? ` Your ${current} page remains unchanged.` : ""}`,
     },
     saving: {
       title: "Leave without saving?",

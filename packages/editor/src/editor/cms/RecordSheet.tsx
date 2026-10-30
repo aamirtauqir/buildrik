@@ -30,6 +30,7 @@ import { TypedDeleteDialog } from "./TypedDeleteDialog";
 import { RecordPreview } from "./RecordPreview";
 import { RecordLeaveDialog, type RecordLeavePhase } from "./RecordLeaveDialog";
 import { RecordSheetFooter } from "./RecordSheetFooter";
+import { useQueuedSaveLock } from "./useQueuedSaveLock";
 import { RecordFieldControl, isEmptyValue, type OpenMediaLibrary } from "./RecordFieldControl";
 import { RecordTemplatePreviewDialog } from "./RecordTemplatePreviewDialog";
 import { applyCmsPattern, cmsSlugField, cmsSlugify } from "@buildrik/shared/schemas/cms";
@@ -297,6 +298,13 @@ export function RecordSheet({
     stayRef.current = true;
     setReturnCancelled(true);
   };
+  /* 126:35760 — a queued save holds the record until the queue answers it. */
+  const queued = useQueuedSaveLock(record?.id ?? null, (how) => {
+    if (how === "conflict") return;
+    setSaveError(null);
+    stayRef.current = true;
+    closeSaved();
+  });
 
   /* Keep mine re-sends this device's copy; it can conflict again (the claim
      then holds the new choice), land, or queue. Use theirs replaces this
@@ -522,7 +530,7 @@ export function RecordSheet({
             className={`tw:flex-none tw:text-[12px] tw:leading-[18px] ${
               saveError && !blocked && saveError !== OFFLINE
                 ? "tw:text-[var(--bk-error-text)]"
-                : dirty && !saving
+                : dirty && !saving && !queued.locked
                   ? "tw:text-[var(--bk-warning-text)]"
                   : "tw:text-[var(--bk-ink-soft)]"
             }`}
@@ -560,7 +568,7 @@ export function RecordSheet({
               </p>
               {saveError !== FAILED ? <p className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-error-text)]">{saveError}</p> : null}
             </div>
-          ) : (saveError === FAILED || saveError === OFFLINE) && !blocked && !saving ? (
+          ) : (saveError === FAILED || saveError === OFFLINE) && !blocked && !saving && !queued.locked ? (
             /* 165:1072 (failed) · 165:1625 (offline): the banner sits over the
                fields and says what happened to the edits. */
             <div
@@ -610,11 +618,10 @@ export function RecordSheet({
             </div>
           ) : null}
 
-          {/* 126:37330: the submitted save owns the fields until it settles. */}
-          <fieldset disabled={returnCancelled && saving} className="tw:m-0 tw:flex tw:min-w-0 tw:flex-col tw:gap-4 tw:border-0 tw:p-0">
+          {/* 126:37330 / 126:35760: a submitted save owns the fields until it settles. */}
+          <fieldset disabled={(returnCancelled && saving) || queued.locked} className="tw:m-0 tw:flex tw:min-w-0 tw:flex-col tw:gap-4 tw:border-0 tw:p-0">
             {[...collection.fields].sort((a, b) => a.order - b.order).map(control)}
           </fieldset>
-
 
           {/* The publishing switch closes the form (165:2184's "Published —
               included in the next site publish · Eligible for publishing"). */}
@@ -627,7 +634,7 @@ export function RecordSheet({
             </div>
           ) : (
             <div className="tw:flex tw:flex-none tw:flex-col tw:gap-1" data-testid="cms-sheet-eligibility">
-              <ToggleSwitch checked={published} label="Published — included in the next site publish" sizing="sm" data-testid="cms-sheet-published" onChange={setPublished} />
+              <ToggleSwitch checked={published} disabled={queued.locked} label="Published — included in the next site publish" sizing="sm" data-testid="cms-sheet-published" onChange={setPublished} />
               <span className={`tw:flex tw:items-center tw:gap-1.5 tw:text-[12px] tw:leading-[18px] ${missing.length ? "tw:text-[var(--bk-warning-text)]" : "tw:text-[var(--bk-ink-soft)]"}`}>
                 {!record && !dirty ? <TriangleAlert size={12} className="tw:flex-none" aria-hidden="true" /> : null}
                 {!record && !dirty
@@ -653,11 +660,11 @@ export function RecordSheet({
           setPending(false);
           holdReturn(null);
         }}
-        saveDisabled={!canSave || requiredBlock || (!dirty && !!record) || saving}
+        saveDisabled={!canSave || requiredBlock || (!dirty && !!record) || saving || queued.locked}
         saveLeaveDisabled={requiredBlock || !canSave}
-        saveLabel={saving ? "Saving…" : paused ? "Retry and return" : saveError && saveError !== OFFLINE && !blocked ? "Retry save" : "Save record"}
+        saveLabel={saving ? "Saving…" : queued.locked ? "Save pending" : paused ? "Retry and return" : saveError && saveError !== OFFLINE && !blocked ? "Retry save" : "Save record"}
         onSave={() => void save()}
-        cancel={returnTo && saving ? "stay" : returnCancelled && saving ? "unavailable" : paused ? "drop-return" : "close"}
+        cancel={returnTo && saving ? "stay" : (returnCancelled && saving) || queued.locked ? "unavailable" : paused ? "drop-return" : "close"}
         onStay={stayHere}
         onDropReturn={() => holdReturn(null)}
         onClose={() => guard(onClose)}
@@ -727,6 +734,7 @@ export function RecordSheet({
         collectionName={collection.name}
         to={removedTo ?? leaveTo?.page?.name ?? returnTo?.page?.name ?? ""}
         current={composer?.elements.getActivePage?.()?.name ?? null}
+        toIsCurrent={!removedTo && Boolean(leaveTo?.page?.isCurrent)}
         reason={leavePhase === "refused" ? saveError : null}
         canSave={canSave}
         keepRef={keepRef}
@@ -738,7 +746,10 @@ export function RecordSheet({
           else if (saving) stayHere();
           /* A refusal keeps the page pending while the record is fixed. */
           else if (leavePhase === "refused") setPending(true);
-          else holdReturn(null);
+          else {
+            if (leavePhase === "queued") queued.lock();
+            holdReturn(null);
+          }
         }}
         onDiscard={() => {
           const intent = leaveTo;

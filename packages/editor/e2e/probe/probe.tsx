@@ -2190,6 +2190,10 @@ function CmsWorkspaceHost() {
       tab: (q.get("tab") as "fields" | null) ?? undefined,
       origin: q.get("origin") ?? undefined,
     });
+    /* A page picked in the Pages drawer over the record (122:44151 · 126:35760). */
+    Object.assign(window, {
+      probeExit: (name: string) => cmsWorkspace.exit(() => undefined, { name, exists: () => true }),
+    });
     return null;
   });
   return (

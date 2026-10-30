@@ -23,7 +23,7 @@ export interface RecordSheetFooterProps {
   saveLabel: string;
   onSave: () => void;
   /** stay: a way out runs with the save (168:21620) · unavailable: the submitted
-   *  save owns the record (126:37330) · drop-return: a paused way out · close. */
+   *  save owns the record (126:37330, 126:35760) · drop-return: a paused way out · close. */
   cancel: "stay" | "unavailable" | "drop-return" | "close";
   onStay: () => void;
   onDropReturn: () => void;
