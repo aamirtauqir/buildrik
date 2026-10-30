@@ -80,7 +80,7 @@ export function useCMSPreview({ composer, content }: UseCMSPreviewOptions): UseC
           el.setAttribute("data-cms-bound", "true");
           bindings.forEach((binding) => {
             if (followsContextRecord(binding) && currentItemOf === binding.collectionId) return;
-            const promise = composer.cms.bindings.resolveBinding(binding).then((value) => {
+            const promise = composer.cms.bindings.resolveBinding(binding, { preview: true }).then((value) => {
               /* Rendered into the app origin (Canvas innerHTML): stored
                  property names and CMS entry values are data — only the
                  shared allowlist, and never a dangerous src/href URL. */
@@ -142,6 +142,8 @@ export function useCMSPreview({ composer, content }: UseCMSPreviewOptions): UseC
        the old text and never drew the bound marker. */
     composer.on(EVENTS.BINDING_CREATED, handleContentChange);
     composer.on(EVENTS.BINDING_REMOVED, handleContentChange);
+    /* The record bar (173:12022) picked another record, or drafts on/off. */
+    composer.on(EVENTS.CMS_PREVIEW_RECORD_CHANGED, handleContentChange);
 
     return () => {
       composer.cms.collections.off("content:updated", handleContentChange);
@@ -154,6 +156,7 @@ export function useCMSPreview({ composer, content }: UseCMSPreviewOptions): UseC
       composer.off(EVENTS.CMS_COLLECTION_UNBOUND, handleContentChange);
       composer.off(EVENTS.BINDING_CREATED, handleContentChange);
       composer.off(EVENTS.BINDING_REMOVED, handleContentChange);
+      composer.off(EVENTS.CMS_PREVIEW_RECORD_CHANGED, handleContentChange);
     };
   }, [composer]);
 

@@ -706,6 +706,8 @@ export const EVENTS = {
   // CMS Binding Events
   // ============================================
   CMS_COLLECTION_BOUND: "cms:collection:bound",
+  /** The canvas previews another record, or drafts on/off (design-2l9 173:12022) — a view preference. */
+  CMS_PREVIEW_RECORD_CHANGED: "cms:preview-record-changed",
   CMS_MANAGE_RECORDS: "cms:manage-records",
   CMS_COLLECTION_UNBOUND: "cms:collection:unbound",
 
@@ -931,6 +933,7 @@ export interface EventPayloads {
     superseded?: string;
   };
   [EVENTS.HISTORY_UNRECORDED]: { label: string };
+  [EVENTS.CMS_PREVIEW_RECORD_CHANGED]: { collectionId: string | null };
   [EVENTS.HISTORY_RECORDED]: { label?: string };
   [EVENTS.HISTORY_CLEARED]: void;
 

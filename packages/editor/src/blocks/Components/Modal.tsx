@@ -7,6 +7,8 @@
 import type { BlockBuildConfig, Composer } from "../types";
 import { BLOCK_COLORS } from "../blockPalette";
 
+import { generateId } from "@shared/utils/helpers/id";
+
 /**
  * Build modal dialog component
  */
@@ -32,6 +34,10 @@ function buildModal(composer: Composer, parentId: string, dropIndex?: number): s
 
   composer.elements.addElement(trigger, parentId, dropIndex);
   const triggerId = trigger.getId();
+  /* design-2l9 C07 / B-17: the trigger opens its dialog by a stable key
+     (engine/widgets/modalModel.ts; runtime engine/export/modalRuntime.ts). */
+  const key = generateId("modal");
+  trigger.setAttribute("data-modal-target", key);
 
   const triggerText = composer.elements.createElement("text", {
     tagName: "span",
@@ -46,6 +52,10 @@ function buildModal(composer: Composer, parentId: string, dropIndex?: number): s
       class: "modal-overlay",
       role: "dialog",
       "aria-modal": "true",
+      "data-modal-key": key,
+      "data-modal-escape": "true",
+      "data-modal-backdrop": "true",
+      "data-modal-initial": "closed",
     },
     styles: {
       position: "fixed",
@@ -60,7 +70,11 @@ function buildModal(composer: Composer, parentId: string, dropIndex?: number): s
       zIndex: "1000",
     },
   });
-  composer.elements.addElement(modal, parentId);
+  /* C07 / C10: the dialog sits at the page root, not inside the trigger's
+     parent (a header, a component) — "Trigger and dialog were added at
+     Home's root" when dropped at the root, "Dialog is a direct child of
+     Home. Trigger is inside Hero." otherwise. */
+  composer.elements.addElement(modal, composer.elements.getActivePage?.()?.root.id ?? parentId);
 
   // Modal content box
   const modalContent = composer.elements.createElement("container", {
@@ -111,6 +125,7 @@ function buildModal(composer: Composer, parentId: string, dropIndex?: number): s
     tagName: "button",
     attributes: {
       class: "modal-close",
+      "data-modal-close": "",
     },
     styles: {
       background: "transparent",

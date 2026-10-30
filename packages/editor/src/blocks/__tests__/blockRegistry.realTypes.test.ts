@@ -18,7 +18,9 @@
  * byte-for-byte what it did before the fix (captured in
  * `__fixtures__/catalogBlockHtml.baseline.json` from the pre-fix code) —
  * except the Carousel, whose old output was the bug (see
- * `sliderExport.test.ts`).
+ * `sliderExport.test.ts`), and Tabs / Modal, re-baselined 2026-10-30 when they
+ * gained their pair / link attributes and the Modal's dialog moved to the
+ * page root (design-2l9 B-21 / B-17, docs/design-2l9/engine-*.md).
  *
  * @license BSD-3-Clause
  */
@@ -114,7 +116,9 @@ function norm(s: string): string {
       if (!ids.has(id)) ids.set(id, `ID${ids.size}`);
       return ids.get(id)!;
     })
-    .replace(/page-[a-z0-9-]+/g, "PAGE");
+    .replace(/page-[a-z0-9-]+/g, "PAGE")
+    /* The Modal block's link key is minted per insert (B-17). */
+    .replace(/modal-[a-z0-9]+-[a-z0-9]+/g, "MODALKEY");
 }
 
 async function publishedFiles(composer: ReturnType<typeof createTestComposer>): Promise<string> {

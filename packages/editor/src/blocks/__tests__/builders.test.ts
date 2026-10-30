@@ -378,6 +378,12 @@ describe("modalBlockConfig.build", () => {
     expect(overlay.attributes.role).toBe("dialog");
     expect(overlay.attributes["aria-modal"]).toBe("true");
     expect(overlay.styles.display).toBe("none"); // hidden by default
+    /* B-17: trigger and dialog are linked by one key; the dialog closes on
+       Escape / backdrop and starts closed. (With a page, the dialog goes to
+       the page root — widgetModels.test.) */
+    expect(overlay.attributes["data-modal-key"]).toMatch(/^modal-/);
+    expect(trigger.attributes["data-modal-target"]).toBe(overlay.attributes["data-modal-key"]);
+    expect(overlay.attributes["data-modal-initial"]).toBe("closed");
 
     const content = overlay.children[0];
     expect(content.attributes.class).toBe("modal-content");

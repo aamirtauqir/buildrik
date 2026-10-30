@@ -11,10 +11,14 @@
  *   - countdown: an element carrying `data-countdown-end` (a countdown with no
  *     end time — every one saved before v4 — gets nothing);
  *   - accordion: an element carrying `data-allow-multiple` (the Accordion
- *     block has always written it, with no runtime to read it until now).
+ *     block has always written it, with no runtime to read it until now);
+ *   - tabs: a `role="tablist"` (B-21, `tabsRuntime.ts`);
+ *   - modal: a `role="dialog"` (B-17, `modalRuntime.ts`).
  */
 import { initCountdownRuntime } from "@buildrik/editor/src/engine/export/countdownRuntime";
 import { initAccordionRuntime } from "@buildrik/editor/src/engine/export/accordionRuntime";
+import { initTabsRuntime } from "@buildrik/editor/src/engine/export/tabsRuntime";
+import { initModalRuntime } from "@buildrik/editor/src/engine/export/modalRuntime";
 
 /** An IIFE running `fn(document)` once the DOM is parsed. */
 function onReady(fn: (root: ParentNode) => unknown): string {
@@ -25,6 +29,11 @@ function onReady(fn: (root: ParentNode) => unknown): string {
 const RUNTIMES = [
   { marker: "data-buildrick-countdown-runtime", uses: "data-countdown-end=", fn: initCountdownRuntime },
   { marker: "data-buildrick-accordion-runtime", uses: "data-allow-multiple", fn: initAccordionRuntime },
+  /* design-2l9 B-21 / B-17: every Tabs block has a tablist and every Modal a
+     dialog role — including blocks saved before the pair / link models, which
+     the runtimes pair by position. */
+  { marker: "data-buildrick-tabs-runtime", uses: 'role="tablist"', fn: initTabsRuntime },
+  { marker: "data-buildrick-modal-runtime", uses: 'role="dialog"', fn: initModalRuntime },
 ] as const;
 
 /**

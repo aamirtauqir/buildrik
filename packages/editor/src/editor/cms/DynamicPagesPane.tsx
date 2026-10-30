@@ -19,6 +19,7 @@
  */
 import * as React from "react";
 import type { Composer } from "@/engine";
+import { EVENTS } from "@/shared/constants";
 import { pageFileNames } from "@/engine/export";
 import type { CMSCollection, CMSContentItem } from "@/shared/types/cms";
 import { Button, Select, TextInput, useToast } from "@/editor/chrome-ui";
@@ -27,6 +28,8 @@ import { ACTION, CONTROL, CONTROL_W, LABEL, NOTE, PANE, SECTION, WARN } from "./
 import { DynamicPagesStart } from "./DynamicPagesStart";
 import { CreateCollectionPageDialog, type CreateCollectionPageChoice } from "./CreateCollectionPageDialog";
 import { buildCollectionPage, collectionPageName, retryCollectionLink, saveCollectionLink, type CreatedCollectionPage } from "./createCollectionPage";
+import { unsavedCollectionLinks, useUnsavedCollectionLink } from "./unsavedCollectionLinks";
+import { isCmsCollectionSaveOwed, onCmsSyncError } from "@/services/cmsSync";
 
 export interface DynamicPagesPaneProps {
   composer: Composer | null;
@@ -36,7 +39,7 @@ export interface DynamicPagesPaneProps {
   onOpenPage?: (pageId: string) => void;
 }
 
-type Made = CreatedCollectionPage & { pattern: string };
+type Made = Pick<CreatedCollectionPage, "pageId" | "name"> & { undo?: CreatedCollectionPage["undo"] };
 
 export function DynamicPagesPane({ composer, collection, records, onOpenPage }: DynamicPagesPaneProps) {
   const { addToast } = useToast();
@@ -51,8 +54,16 @@ export function DynamicPagesPane({ composer, collection, records, onOpenPage }: 
   React.useEffect(() => setPattern(collection.pageSlugPattern ?? ""), [collection.pageSlugPattern]);
   React.useEffect(() => setTemplate(collection.pageTemplatePath ?? ""), [collection.pageTemplatePath]);
 
-  /* Read each render, not memoised on the composer: a page made from this tab
-     (187:20616) has to be found the moment the collection links to it. */
+  /* Re-read on every page change — made here (187:20616), or gone with an
+     Undo (187:22375) — not memoised on the composer. */
+  const [, setPagesTick] = React.useState(0);
+  React.useEffect(() => {
+    if (!composer) return;
+    const bump = () => setPagesTick((t) => t + 1);
+    const evs = [EVENTS.PAGE_CHANGED, EVENTS.PAGE_CREATED, EVENTS.PROJECT_LOADED, EVENTS.HISTORY_UNDO, EVENTS.HISTORY_REDO];
+    evs.forEach((e) => composer.on(e, bump));
+    return () => evs.forEach((e) => composer.off(e, bump));
+  }, [composer]);
   const pages = (() => {
     if (!composer) return [];
     const all = composer.elements.getAllPages();
@@ -62,10 +73,11 @@ export function DynamicPagesPane({ composer, collection, records, onOpenPage }: 
        the picker can never offer the home, matching the server's BAD_REQUEST
        guard in upsertCollection(). */
     return all
-      .map((p) => ({ file: names.get(p.id) ?? "index.html", name: p.name }))
+      .map((p) => ({ id: p.id, file: names.get(p.id) ?? "index.html", name: p.name }))
       .filter((p) => p.file !== "index.html");
   })();
-  const templateName = pages.find((p) => p.file === template)?.name ?? "";
+  const templatePage = pages.find((p) => p.file === template) ?? null;
+  const templateName = templatePage?.name ?? "";
 
   const trimmed = pattern.trim();
   const keys = [...trimmed.matchAll(/\{([a-zA-Z0-9_-]+)\}/g)].map((m) => m[1]);
@@ -94,13 +106,40 @@ export function DynamicPagesPane({ composer, collection, records, onOpenPage }: 
   const [form, setForm] = React.useState(false);
   const [dialog, setDialog] = React.useState(false);
   const [creating, setCreating] = React.useState<string | null>(null);
-  const [unlinked, setUnlinked] = React.useState<Made | null>(null);
+  /* 187:21035 — held in a store, so it outlives this tab (187:22071). */
+  const unlinked = useUnsavedCollectionLink(collection.id);
+  /* The queue may land it on its own (a reconnect replays the outbox):
+     then the link is saved and the notice goes. */
+  React.useEffect(() => {
+    if (!unlinked) return;
+    const check = () => {
+      if (!isCmsCollectionSaveOwed(collection.id) && collection.pageTemplatePath === unlinked.file) unsavedCollectionLinks.clear(collection.id);
+    };
+    return onCmsSyncError(() => window.setTimeout(check, 0));
+  }, [unlinked, collection.id, collection.pageTemplatePath]);
   const [linking, setLinking] = React.useState(false);
   const opened = (made: Made) => {
     addToast({
       tone: "success",
-      title: `${made.name} created · ${published.length} page${published.length === 1 ? "" : "s"} on publish`,
-      description: `Collection page · ${collection.name}. Every element can be edited.`,
+      /* 187:21418 — one line and its Undo. */
+      description: `${made.name} created · ${published.length} page${published.length === 1 ? "" : "s"} on publish`,
+      /* 187:21418 → 187:22586: Undo reverts the one creation step; the
+         collection's link stays and now points at nothing — said so. */
+      action: made.undo && {
+        label: "Undo",
+        onClick: () => {
+          if (!made.undo?.()) return;
+          addToast({
+            tone: "warning",
+            /* Stays until answered: the shell's own "Undo: …" receipt would
+               otherwise replace it (a transient replaces a transient). */
+            duration: Infinity,
+            title: `${made.name} removed. Collection link needs repair.`,
+            description: `${collection.name} still links to the removed page; Dynamic pages offers Choose page or Create collection page.`,
+            action: { label: "Open CMS", onClick: () => composer?.emit(EVENTS.UI_PANEL_OPEN, { panel: "content" }) },
+          });
+        },
+      },
     });
     onOpenPage?.(made.pageId);
   };
@@ -109,15 +148,23 @@ export function DynamicPagesPane({ composer, collection, records, onOpenPage }: 
     setDialog(false);
     setCreating(collectionPageName(collection, choice.layout));
     try {
-      const made: Made = { ...buildCollectionPage(composer, collection, choice.plan, choice.layout), pattern: choice.pattern };
+      const made = await buildCollectionPage(composer, collection, choice.plan, choice.layout);
       let reached = false;
       try {
-        reached = await saveCollectionLink(composer, collection, { file: made.file, pattern: made.pattern });
+        reached = await saveCollectionLink(composer, collection, { file: made.file, pattern: choice.pattern });
       } catch {
         reached = false;
       }
       if (reached) opened(made);
-      else setUnlinked(made);
+      else
+        unsavedCollectionLinks.set({
+          collectionId: collection.id,
+          collectionName: collection.name,
+          pageId: made.pageId,
+          name: made.name,
+          file: made.file,
+          pattern: choice.pattern,
+        });
     } finally {
       setCreating(null);
     }
@@ -128,7 +175,7 @@ export function DynamicPagesPane({ composer, collection, records, onOpenPage }: 
     try {
       if (await retryCollectionLink(composer, collection.id)) {
         const made = unlinked;
-        setUnlinked(null);
+        unsavedCollectionLinks.clear(collection.id);
         opened(made);
       }
     } finally {
@@ -211,6 +258,20 @@ export function DynamicPagesPane({ composer, collection, records, onOpenPage }: 
     );
   }
 
+  /* The link as saved — not a form edit still in progress. */
+  const linkedPage = !dirty && collection.pageTemplatePath && templatePage?.file === collection.pageTemplatePath ? templatePage : null;
+  if (ready && linkedPage) {
+    /* 187:21853 — what the next publish does, in words. */
+    status = (
+      <section className="tw:flex tw:flex-col tw:gap-1" data-testid="cms-dp-status">
+        <h3 className={SECTION}>On the next publish</h3>
+        <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">
+          {`${published.length} published record${published.length === 1 ? "" : "s"} will generate ${published.length} page${published.length === 1 ? "" : "s"}. Changes to records or the template appear after site publish.`}
+        </p>
+      </section>
+    );
+  }
+
   const startState = creating
     ? ({ kind: "creating", name: creating } as const)
     : unlinked
@@ -242,7 +303,19 @@ export function DynamicPagesPane({ composer, collection, records, onOpenPage }: 
 
   return (
     <div className={PANE} data-testid="cms-dynamic-pages">
-      <p className={`${NOTE} tw:m-0`}>One page per record. Pages are created on publish and update when records change.</p>
+      {/* 187:21853 — a saved link names its page first, with the way to it. */}
+      {linkedPage ? (
+        <div className="tw:flex tw:flex-col tw:items-start tw:gap-1" data-testid="cms-dp-linked">
+          <h3 className="tw:m-0 tw:text-[13px] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]">{linkedPage.name}</h3>
+          {onOpenPage ? (
+            <Button size="xs" variant="link" className="tw:h-auto tw:min-h-0 tw:p-0 tw:text-[13px] tw:font-normal" onClick={() => onOpenPage(linkedPage.id)} data-testid="cms-dp-edit-page">
+              Edit collection page ›
+            </Button>
+          ) : null}
+        </div>
+      ) : (
+        <p className={`${NOTE} tw:m-0`}>One page per record. Pages are created on publish and update when records change.</p>
+      )}
       <div className={CONTROL_W}>
         <label className={LABEL} htmlFor="cms-dp-pattern">URL pattern</label>
         <TextInput
