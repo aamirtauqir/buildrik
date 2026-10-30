@@ -81,6 +81,8 @@ const ACTION_DESCRIPTIONS: Record<string, string> = {
   "reorder-section": "Reordered section",
   "reorder pages": "Reordered pages",
   "duplicate pages": "Duplicated pages",
+  "close label": "Changed the close label",
+  "insert local modal": "Inserted a modal",
   "detach instance": "Detached component instance",
   "move-layer-top": "Brought layer to front",
   "move-layer-bottom": "Sent layer to back",
