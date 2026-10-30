@@ -13,7 +13,7 @@
  */
 
 import * as React from "react";
-import { IconButton, Menu, MenuItem, MenuLabel, Popover, TextInput } from "@/editor/chrome-ui";
+import { IconButton, Menu, MenuItem, Popover, TextInput } from "@/editor/chrome-ui";
 import { listNames } from "@shared/utils/helpers/string";
 import type { Composer } from "@/engine";
 import type { FolderItem, PageItem } from "../types";
@@ -251,8 +251,11 @@ export const PageFolder: React.FC<Props> = ({
             }
           >
             <Menu label={`${folder.name} options`} className="tw:w-64">
-              <MenuLabel>{folder.name}</MenuLabel>
-              <p className="tw:m-0 tw:px-2 tw:pb-1.5 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink-muted)] tw:whitespace-normal">
+              {/* Titled like the page menu (131:41791), not a small-caps label. */}
+              <div className="tw:px-2 tw:pt-1 tw:text-[12px] tw:leading-4 tw:font-semibold tw:text-[var(--bk-ink)]" data-testid={`pages-folder-menu-title-${folder.id}`}>
+                {folder.name}
+              </div>
+              <p className="tw:m-0 tw:px-2 tw:pt-1 tw:pb-1.5 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-soft)] tw:whitespace-normal">
                 {`Only you see this folder. Deleting it keeps ${pages.length ? listNames(pages.map((p) => p.name)) : "nothing"} at the top level.`}
               </p>
               <MenuItem
@@ -273,6 +276,9 @@ export const PageFolder: React.FC<Props> = ({
                 }}
               >
                 {`Delete folder · keep ${pages.length === 1 ? "page" : "pages"}`}
+              </MenuItem>
+              <MenuItem data-testid={`pages-folder-menu-close-${folder.id}`} onClick={() => setMenuOpen(false)}>
+                Close menu
               </MenuItem>
             </Menu>
           </Popover>

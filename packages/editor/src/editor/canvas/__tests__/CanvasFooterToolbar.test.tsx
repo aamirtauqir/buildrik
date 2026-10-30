@@ -229,7 +229,8 @@ describe("CanvasFooterToolbar — Grid and snapping", () => {
     const onGridSizeChange = vi.fn();
     openGrid({ gridSize: 7, onGridSizeChange });
     fireEvent.change(screen.getByTestId("grid-snap-size"), { target: { value: "1.5" } });
-    expect(screen.getByTestId("grid-snap-hint").textContent).toBe("Enter a whole number from 1 to 100 px. Current grid stays 7 px.");
+    expect(screen.getByTestId("grid-snap-error").textContent).toBe("Enter a whole number from 1 to 100 px. Current grid stays 7 px.");
+    expect(screen.getByTestId("grid-snap-hint").textContent).toBe("Whole number · 1–100 px");
     expect(screen.getByTestId("grid-snap-apply")).toBeDisabled();
   });
 });

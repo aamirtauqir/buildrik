@@ -2426,6 +2426,10 @@ const CASES: Record<string, () => React.ReactElement> = {
           onZoomChange={() => {}}
           gridSize={7}
           onGridSizeChange={() => {}}
+          device="desktop"
+          onDeviceChange={() => {}}
+          pageWidth={1440}
+          onCustomWidth={() => {}}
         />
       </div>
     </div>
@@ -2830,7 +2834,7 @@ const CASES: Record<string, () => React.ReactElement> = {
   ),
   "layers-no-results": () => (
     <div data-probe="layers-no-results" style={{ width: 280, background: "#fff" }}>
-      <LayersNoResults search="hero" onSearchEverywhere={() => {}} />
+      <LayersNoResults search="hero" onClear={() => {}} />
     </div>
   ),
   // Insert board 138:198 — disabled row ("Soon" tag + reason tooltip, no

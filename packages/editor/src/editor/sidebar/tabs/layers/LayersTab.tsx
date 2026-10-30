@@ -267,7 +267,8 @@ export const LayersTab: React.FC<LayersTabProps> = ({
               </IconButton>
             }
           >
-            <Menu label="Layers options">
+            {/* 152:78185 draws the menu the panel's width (268 inside it). */}
+            <Menu label="Layers options" className="tw:w-[252px]">
               <MenuItem data-testid="layers-expand-all" onClick={runMenu(() => composer?.emit("layers:expand-all", {}))}>
                 Expand all
               </MenuItem>
@@ -286,12 +287,18 @@ export const LayersTab: React.FC<LayersTabProps> = ({
               <MenuItem data-testid="layers-menu-select-mode" onClick={runMenu(() => setSelecting(true))}>
                 Select mode
               </MenuItem>
-              <MenuSeparator />
               {onExpandToggle && (
-                <MenuItem data-testid="layers-wide-view" onClick={runMenu(onExpandToggle)}>
-                  {isExpanded ? "Narrow panel" : "Widen panel"}
-                </MenuItem>
+                <>
+                  <MenuSeparator />
+                  <MenuItem data-testid="layers-wide-view" onClick={runMenu(onExpandToggle)}>
+                    {isExpanded ? "Narrow panel" : "Widen panel"}
+                  </MenuItem>
+                </>
               )}
+              {/* 152:78185 ends the menu with "Close menu". */}
+              <MenuItem data-testid="layers-menu-close" onClick={() => setMenuOpen(false)}>
+                Close menu
+              </MenuItem>
             </Menu>
           </Popover>
         }

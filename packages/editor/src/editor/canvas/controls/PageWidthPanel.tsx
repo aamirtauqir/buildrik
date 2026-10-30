@@ -13,7 +13,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Menu, MenuItem, TextInput, type Breakpoint } from "@/editor/chrome-ui";
+import { Button, Menu, MenuItem, TextInput, type Breakpoint } from "@/editor/chrome-ui";
 
 const WIDTH_RANGE = { min: 240, max: 2560 } as const;
 
@@ -49,8 +49,20 @@ export function PageWidthPanel({ width, device, custom, onDeviceChange, onCustom
   };
 
   return (
-    <div className="tw:flex tw:w-60 tw:flex-col tw:gap-2 tw:p-3" data-testid="page-width-panel">
-      <span className="tw:text-[13px] tw:font-medium tw:text-[var(--bk-ink)]">Page width</span>
+    <div className="tw:flex tw:w-60 tw:flex-col tw:gap-2 tw:whitespace-normal tw:p-3" data-testid="page-width-panel">
+      {/* 145:71013 / 145:71444: the title and a text Close on one row. */}
+      <div className="tw:flex tw:items-center">
+        <span className="tw:text-[13px] tw:font-medium tw:text-[var(--bk-ink)]">Page width</span>
+        <Button
+          color="light"
+          size="xs"
+          data-testid="page-width-close"
+          className="tw:-mr-2 tw:ml-auto tw:h-7 tw:border-transparent tw:bg-transparent tw:px-2 tw:text-[13px] tw:font-normal tw:text-[var(--bk-ink)] tw:focus:ring-0"
+          onClick={onDone}
+        >
+          Close
+        </Button>
+      </div>
       <label className="tw:flex tw:flex-col tw:gap-1 tw:text-[12px] tw:text-[var(--bk-ink-soft)]">
         Width (px)
         <TextInput

@@ -211,6 +211,7 @@ export const PageList: React.FC<Props> = ({
           selectedCount={selectedIds.size}
           selectedNames={pages.filter((p) => selectedIds.has(p.id)).map((p) => p.name)}
           folders={folders}
+          anyInFolder={[...selectedIds].some((id) => pageToFolder.has(id))}
           onDuplicate={onBulkDuplicate}
           onMoveToFolder={onBulkMoveToFolder}
           onRemoveFromFolders={onBulkRemoveFromFolders}

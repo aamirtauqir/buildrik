@@ -21,7 +21,7 @@
  */
 
 import * as React from "react";
-import { BreakpointSwitcher, Button, isModalOpen, Menu, MenuGroup, MenuItem, MenuLabel, Popover, type Breakpoint } from "@/editor/chrome-ui";
+import { BreakpointSwitcher, Button, isModalOpen, Menu, MenuGroup, MenuItem, Popover, type Breakpoint } from "@/editor/chrome-ui";
 import { ChevronDown } from "lucide-react";
 import { stepZoom } from "@/shared/constants/canvas";
 import { GridSnapPanel } from "./controls/GridSnapPanel";
@@ -388,7 +388,20 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
             />
           ) : (
           <Menu label="Canvas view" data-testid="canvas-view-menu" className={FOOTER_MENU}>
-            <MenuLabel>Canvas view</MenuLabel>
+            {/* 145:64586: titled like Grid and snapping — "Canvas view" and a
+                text Close, not a small-caps label. */}
+            <div className="tw:flex tw:items-center tw:pl-2">
+              <span className="tw:text-[13px] tw:font-semibold tw:text-[var(--bk-ink)]">Canvas view</span>
+              <Button
+                color="light"
+                size="xs"
+                data-testid="canvas-view-close"
+                className="tw:ml-auto tw:h-7 tw:border-transparent tw:bg-transparent tw:px-2 tw:text-[13px] tw:font-normal tw:text-[var(--bk-ink)] tw:focus:ring-0"
+                onClick={() => setViewOpen(false)}
+              >
+                Close
+              </Button>
+            </div>
             <MenuItem
               selected={overlays.grid}
               kbd={onGridSizeChange ? "›" : "⌘'"}
