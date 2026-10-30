@@ -5646,8 +5646,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No explicit \"Use\" step after returning from site fonts",
+   "verified": "drift-open",
+   "verifiedNote": "L-B round 23: built, test-verified (ChooseFont.test 'back from Site fonts'), not probe-compared — the state needs the Site fonts round trip. Manage site fonts records the uploaded families; back in Choose font, a family added meanwhile shows 'Choose font' · 'Search: {query}' · 'Added to site · not applied' · primary 'Use {family}' · 'Uploaded · {file} · {weight}' · Cancel · 'Current applied font remains {current}.' Nothing is written until Use (one discrete step, Undo font assignment bound to it).",
    "tier": "P1"
   },
   {
@@ -5657,8 +5657,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No \"Font unavailable — fallback rendering\" + Retry",
+   "verified": "drift-open",
+   "verifiedNote": "L-B round 23: built, test-verified (FontPicker.assignment R05), not probe-compared. After a pick, a family whose face is in error (document.fonts) or that the FontManager reported (FONT_ERROR) reads 'Font unavailable — fallback is rendering. The intended family and source are retained.', 'Retry font load' (re-registers the uploaded file / re-requests the catalogue family), 'Undo font assignment' (the pick's own step), 'A late load cannot reapply an undone choice. Project save and font loading are separate statuses.' The stored family is never rewritten.",
    "tier": "P1"
   },
   {
@@ -5668,8 +5668,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No \"Selection changed\" refusal",
+   "verified": "drift-open",
+   "verifiedNote": "L-B round 23: built, test-verified (ChooseFont.test 'removed target'), not probe-compared. If the element the picker opened for is removed while it is open, the picker shows 'Cannot apply font' · '{name} was removed while this picker was open.' · 'Use {font}' disabled · 'Close picker' · 'This result will not be applied to the newly selected object…' and pick() refuses. In the shell the Inspector follows the selection when its element goes, so the picker usually closes first — the guard holds either way.",
    "tier": "P1"
   },
   {

@@ -11,6 +11,7 @@
 import { ChevronDown } from "lucide-react";
 import * as React from "react";
 import { clearFontAssignment, useFontAssignment } from "./ChooseFont";
+import { loadGoogleFont } from "@/services/GoogleFontsService";
 import { openSubview } from "@/editor/inspector/tabs/subviewStore";
 import { Button } from "@/editor/chrome-ui";
 import { fieldTestId, labelTestId, rowTestId } from "@/editor/inspector/shared/controls";
@@ -105,29 +106,60 @@ export function useUploadedFonts(composer: Composer | null | undefined): SystemF
   return fonts;
 }
 
-/** Whether a face of this family has finished loading in the document —
- *  re-read whenever the document finishes loading fonts. Null when there is
- *  no family to ask about (a system font) or no font set to ask. */
-function useFamilyLoaded(family: string | null): boolean | null {
-  const read = React.useCallback((): boolean | null => {
+/** Families the FontManager failed to load (FONT_ERROR), this session. */
+const failedFamilies = new Set<string>();
+
+type LoadState = "loaded" | "loading" | "failed";
+
+/** Whether a face of this family has loaded in the document, is still on its
+ *  way, or failed (a face in error, or the FontManager reported the family
+ *  unloadable — 2L9 R05). Re-read whenever the document finishes loading
+ *  fonts or the manager reports. Null when there is no family to ask about. */
+function useFamilyLoaded(family: string | null, composer: Composer | null | undefined): [LoadState | null, () => void] {
+  const read = React.useCallback((): LoadState | null => {
     if (!family || typeof document === "undefined" || typeof document.fonts?.forEach !== "function") return null;
-    let loaded = false;
+    let state: LoadState = failedFamilies.has(family) ? "failed" : "loading";
     document.fonts.forEach((f) => {
-      if (f.family.replace(/["']/g, "") === family && f.status === "loaded") loaded = true;
+      if (f.family.replace(/["']/g, "") !== family) return;
+      if (f.status === "loaded") state = "loaded";
+      else if (f.status === "error" && state !== "loaded") state = "failed";
     });
-    return loaded;
+    return state;
   }, [family]);
-  const [loaded, setLoaded] = React.useState(read);
+  const [state, setState] = React.useState(read);
+  const [attempt, setAttempt] = React.useState(0);
   React.useEffect(() => {
-    setLoaded(read());
+    setState(read());
     const fonts = typeof document === "undefined" ? undefined : document.fonts;
-    if (!family || typeof fonts?.load !== "function" || typeof fonts.addEventListener !== "function") return;
-    const refresh = () => setLoaded(read());
-    fonts.load(`16px "${family}"`).then(refresh, refresh);
-    fonts.addEventListener("loadingdone", refresh);
-    return () => fonts.removeEventListener("loadingdone", refresh);
-  }, [family, read]);
-  return loaded;
+    const manager = composer?.fonts;
+    const refresh = () => setState(read());
+    const onError = (payload: unknown) => {
+      const failed = (payload as { font?: { family?: string } } | null)?.font?.family;
+      if (failed) failedFamilies.add(failed);
+      refresh();
+    };
+    manager?.on?.(EVENTS.FONT_ERROR, onError);
+    manager?.on?.(EVENTS.FONT_LOADED, refresh);
+    if (family && typeof fonts?.load === "function") fonts.load(`16px "${family}"`).then(refresh, refresh);
+    if (family && typeof fonts?.addEventListener === "function") fonts.addEventListener("loadingdone", refresh);
+    return () => {
+      manager?.off?.(EVENTS.FONT_ERROR, onError);
+      manager?.off?.(EVENTS.FONT_LOADED, refresh);
+      if (typeof fonts?.removeEventListener === "function") fonts.removeEventListener("loadingdone", refresh);
+    };
+  }, [family, read, composer, attempt]);
+  /* Retry: the same source again — the uploaded file re-registered, the
+     catalogue family re-requested. The family and source stay as assigned. */
+  const retry = React.useCallback(() => {
+    if (!family) return;
+    failedFamilies.delete(family);
+    const own = composer?.fonts?.getAllFonts({ source: "custom" }).find((f) => f.family === family);
+    const url = own?.variants[0]?.url;
+    if (url) void composer?.fonts?.registerLibraryFont({ filename: url.split(/[?#]/)[0]?.split("/").pop() ?? family, url }).catch(() => failedFamilies.add(family));
+    else loadGoogleFont(family);
+    setAttempt((n) => n + 1);
+  }, [family, composer]);
+  return [state, retry];
 }
 
 export const FontPicker: React.FC<FontPickerProps> = ({ value: ownValue, composer, inheritedValue, elementId }) => {
@@ -168,7 +200,7 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value: ownValue, compose
   /* Shown while the element still carries the family picked (R08) — an
      undo, ⌘Z or another pick ends it. */
   const assigned = latest && latest.value === ownValue && !field.mixed ? latest : null;
-  const loaded = useFamilyLoaded(assigned && assigned.source !== "system" ? assigned.family : null);
+  const [load, retryLoad] = useFamilyLoaded(assigned && assigned.source !== "system" ? assigned.family : null, composer);
   const stack = ownValue && !field.mixed && ownValue.includes(",") && !assigned ? ownValue.replace(/'/g, "") : null;
 
   return (
@@ -208,9 +240,19 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value: ownValue, compose
       ) : null}
       {assigned ? (
         <div className="tw:col-span-full tw:flex tw:flex-col tw:gap-2 tw:pb-2 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)]" data-testid="font-assignment">
-          {assigned.source === "system" ? null : (
+          {assigned.source === "system" ? null : load === "failed" ? (
+            /* R05: the intended family and source stay; the fallback renders. */
+            <>
+              <p className="tw:m-0" role="alert" data-testid="font-assignment-status">
+                Font unavailable — fallback is rendering. The intended family and source are retained.
+              </p>
+              <Button color="light" size="xs" className={WIDE_BUTTON} onClick={retryLoad} data-testid="font-assignment-retry">
+                Retry font load
+              </Button>
+            </>
+          ) : (
             <p className="tw:m-0" data-testid="font-assignment-status">
-              {loaded
+              {load === "loaded"
                 ? `${assigned.family} loaded · ${assigned.source} source ready.`
                 : `Loading ${assigned.family} · ${assigned.source} source.`}
             </p>
@@ -227,6 +269,9 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value: ownValue, compose
           >
             Undo font assignment
           </Button>
+          {load === "failed" ? (
+            <p className="tw:m-0">A late load cannot reapply an undone choice. Project save and font loading are separate statuses.</p>
+          ) : null}
           <p className="tw:m-0">
             {assigned.previous
               ? `Undo restores the previous ${assigned.previous} stack`

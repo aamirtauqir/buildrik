@@ -177,3 +177,33 @@ describe("The Font row — the door to Choose font", () => {
     expect(screen.getByTestId("open-subview")).toHaveTextContent("none");
   });
 });
+
+describe("Choose font — back from Site fonts (R04) and a removed target (R06)", () => {
+  it("a family added while away comes back 'Added to site · not applied' and applies only through its own Use", () => {
+    const families = ["Inter"];
+    const { composer } = composerWithFonts(families);
+    const first = open(composer);
+    fireEvent.click(screen.getByTestId("font-picker-manage-site-fonts"));
+    first.unmount();
+    families.push("Studio Sans");
+    const back = open(composer);
+    expect(screen.getByTestId("inspector-choose-font-returned")).toHaveTextContent("Added to site · not applied");
+    expect(screen.getByTestId("inspector-choose-font-returned")).toHaveTextContent("Uploaded · studio-sans-regular.woff2 · Regular");
+    expect(back.onChange).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByTestId("inspector-choose-font-use"));
+    expect(back.onChange).toHaveBeenCalledWith("'Studio Sans', sans-serif");
+  });
+
+  it("the element removed while the picker is open: nothing is applied, Close picker", () => {
+    const { composer } = composerWithFonts(["Inter"]);
+    let alive = true;
+    (composer as unknown as { elements: { getElement: () => unknown } }).elements.getElement = () => (alive ? { getType: () => "heading", getData: () => ({}), getCustomData: () => undefined } : undefined);
+    const { onChange, rerender } = open(composer);
+    alive = false;
+    rerender(<ChooseFont composer={composer} elementId={`el-${n}`} value="" onChange={onChange} onClose={() => {}} />);
+    expect(screen.getByTestId("inspector-choose-font-stale")).toHaveTextContent("was removed while this picker was open");
+    expect(screen.getByTestId("inspector-choose-font-use")).toBeDisabled();
+    expect(onChange).not.toHaveBeenCalled();
+  });
+});
+

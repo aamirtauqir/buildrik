@@ -21,6 +21,10 @@
  * while the picker is open — leaving for Site fonts and coming back finds
  * them as they were — which is what the last line claims.
  *
+ * Back from Site fonts with a family added there, the picker offers it as
+ * "Added to site · not applied" with its own "Use {family}" (R04); a target
+ * removed while the picker is open refuses the pick (R06).
+ *
  * A pick is one discrete write; when the engine records it, `captureUndo`
  * binds the Font row's "Undo font assignment" (R08) to that step. The
  * assignment lives here, not in the row, because the row is not mounted
@@ -80,7 +84,7 @@ export const clearFontAssignment = (): void => setAssignment(null);
 // WHAT IS KEPT WHILE OPEN — search and scroll, per element
 // ============================================================================
 
-const kept = new Map<string, { query: string; scrollTop: number }>();
+const kept = new Map<string, { query: string; scrollTop: number; familiesAtLeave?: string[] }>();
 
 // ============================================================================
 // ROWS
@@ -186,8 +190,21 @@ export function ChooseFont({ composer, elementId, value, onChange, onClose, form
     if (listRef.current) listRef.current.scrollTop = top;
   }, [elementId]);
 
-  const remember = (next: Partial<{ query: string; scrollTop: number }>) =>
+  const remember = (next: Partial<{ query: string; scrollTop: number; familiesAtLeave: string[] }>) =>
     kept.set(elementId, { query, scrollTop: listRef.current?.scrollTop ?? 0, ...next });
+
+  /* R04 247:32025: a family added in Site fonts while the picker was away
+     comes back "Added to site · not applied" — applied only by its own Use. */
+  const [returned, setReturned] = React.useState<Row | null>(() => {
+    const before = kept.get(elementId)?.familiesAtLeave;
+    if (!before) return null;
+    return rowsFor(composer, "").find((r) => r.source === "Uploaded" && !before.includes(r.family)) ?? null;
+  });
+  /* R06 247:32989: the element this picker writes to is gone — nothing is
+     applied to whatever is selected now. */
+  const nameAtOpen = React.useRef(layer);
+  const existedAtOpen = React.useRef(!subject && !!composer?.elements?.getElement(elementId));
+  const targetGone = existedAtOpen.current && !composer?.elements?.getElement(elementId);
 
   const close = () => {
     kept.delete(elementId);
@@ -195,7 +212,7 @@ export function ChooseFont({ composer, elementId, value, onChange, onClose, form
   };
 
   const pick = (row: Row | null) => {
-    if (field.readOnly) return;
+    if (field.readOnly || targetGone) return;
     const next = row ? (form === "family" ? familyOf(row) : row.value) : "inherit";
     if (next === value) return close();
     if (row?.catalogue) loadGoogleFont(row.family);
@@ -230,6 +247,53 @@ export function ChooseFont({ composer, elementId, value, onChange, onClose, form
   const uploadedSelected = uploadedFonts.some((f) => namesFont(value, f));
   const isSelected = (row: Row) =>
     row.source === "Catalogue" ? !uploadedSelected && primaryFamily(value) === row.family : namesFont(value, { value: row.value, label: row.family, category: "system" });
+
+  if (targetGone || returned) {
+    const current = value && value !== "inherit" ? primaryFamily(value) || value : "inherited";
+    return (
+      <div className="tw:flex tw:flex-col tw:gap-2 tw:px-3 tw:pb-3" role="group" aria-label="Choose font" data-testid={targetGone ? "inspector-choose-font-stale" : "inspector-choose-font-returned"}>
+        <div className={`${GROUP_TITLE} tw:mt-4!`}>{targetGone ? "Cannot apply font" : "Choose font"}</div>
+        {targetGone ? (
+          <p className={NOTE}>
+            {nameAtOpen.current} was removed while this picker was open.{returned ? ` ${returned.family} remains available in Assets.` : ""}
+          </p>
+        ) : (
+          <>
+            {query ? <p className="tw:m-0 tw:flex tw:h-7 tw:items-center tw:rounded-[4px] tw:bg-[var(--bk-bg-subtle)] tw:px-2 tw:text-[12px] tw:text-[var(--bk-ink-soft)]">Search: {query}</p> : null}
+            <p className={NOTE}>Added to site · not applied</p>
+          </>
+        )}
+        <Button
+          size="xs"
+          className={`${WIDE_BUTTON} tw:text-white!`}
+          disabled={targetGone || field.readOnly}
+          onClick={() => returned && pick(returned)}
+          data-testid="inspector-choose-font-use"
+        >
+          Use {returned?.family ?? "font"}
+        </Button>
+        {!targetGone && returned?.detail ? <p className={NOTE}>Uploaded · {returned.detail}</p> : null}
+        <Button
+          color="light"
+          size="xs"
+          className={WIDE_BUTTON}
+          onClick={() => {
+            if (targetGone) return close();
+            kept.set(elementId, { query, scrollTop: 0 });
+            setReturned(null);
+          }}
+          data-testid="inspector-choose-font-returned-cancel"
+        >
+          {targetGone ? "Close picker" : "Cancel"}
+        </Button>
+        <p className={NOTE}>
+          {targetGone
+            ? "This result will not be applied to the newly selected object. Reopen from a valid target to choose again."
+            : `Current applied font remains ${current}.`}
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -290,7 +354,7 @@ export function ChooseFont({ composer, elementId, value, onChange, onClose, form
           size="xs"
           className={WIDE_BUTTON}
           onClick={() => {
-            remember({});
+            remember({ familiesAtLeave: uploadedFonts.map((f) => f.label) });
             openSiteFonts(composer);
           }}
           data-testid="font-picker-manage-site-fonts"
