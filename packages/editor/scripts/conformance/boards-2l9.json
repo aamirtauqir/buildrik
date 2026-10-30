@@ -15318,8 +15318,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance); same component and copy as 248:20853, which was compared.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 27, compared by board copy (dump/page-3-7) vs code: the board differs from the image-compared 248:20853 only in the destination — 'Your destination is SEO. Wait for the save result; if it fails, your changes stay here.' UnsavedSettingsDialog prints `destination.name`, which SettingsTab sets from navTitle('SEO' is that nav item's title, constants.ts SETTINGS_NAV). Title 'Saving General settings…' and 'Stay in General' as compared.",
    "tier": "P2"
   },
   {
@@ -15341,8 +15341,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance); same component and copy as 248:20853, which was compared.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 27, compared by board copy (dump/page-3-7) vs code: the board differs from the image-compared 248:20853 only in the destination — 'Your destination is Domains. Wait for the save result; if it fails, your changes stay here.' UnsavedSettingsDialog prints `destination.name`, which SettingsTab sets from navTitle('Domains' is that nav item's title, constants.ts SETTINGS_NAV). Title 'Saving General settings…' and 'Stay in General' as compared.",
    "tier": "P2"
   },
   {
@@ -15364,8 +15364,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance); same component and copy as 248:20853, which was compared.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 27, compared by board copy (dump/page-3-7) vs code: the board differs from the image-compared 248:20853 only in the destination — 'Your destination is Redirects. Wait for the save result; if it fails, your changes stay here.' UnsavedSettingsDialog prints `destination.name`, which SettingsTab sets from navTitle('Redirects' is that nav item's title, constants.ts SETTINGS_NAV). Title 'Saving General settings…' and 'Stay in General' as compared.",
    "tier": "P2"
   },
   {
@@ -15387,8 +15387,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance); same component and copy as 248:20853, which was compared.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 27, compared by board copy (dump/page-3-7) vs code: the board differs from the image-compared 248:20853 only in the destination — 'Your destination is Access. Wait for the save result; if it fails, your changes stay here.' UnsavedSettingsDialog prints `destination.name`, which SettingsTab sets from navTitle('Access' is that nav item's title, constants.ts SETTINGS_NAV). Title 'Saving General settings…' and 'Stay in General' as compared.",
    "tier": "P2"
   },
   {
@@ -15410,8 +15410,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance); same component and copy as 248:20853, which was compared.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 27, compared by board copy (dump/page-3-7) vs code: the board differs from the image-compared 248:20853 only in the destination — 'Your destination is Analytics. Wait for the save result; if it fails, your changes stay here.' UnsavedSettingsDialog prints `destination.name`, which SettingsTab sets from navTitle('Analytics' is that nav item's title, constants.ts SETTINGS_NAV). Title 'Saving General settings…' and 'Stay in General' as compared.",
    "tier": "P2"
   },
   {
@@ -15433,8 +15433,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance); same component and copy as 248:20853, which was compared.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 27, compared by board copy (dump/page-3-7) vs code: the board differs from the image-compared 248:20853 only in the destination — 'Your destination is Form submissions. Wait for the save result; if it fails, your changes stay here.' UnsavedSettingsDialog prints `destination.name`, which SettingsTab sets from navTitle('Form submissions' is that nav item's title, constants.ts SETTINGS_NAV). Title 'Saving General settings…' and 'Stay in General' as compared.",
    "tier": "P2"
   },
   {
@@ -15456,8 +15456,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance); same component and copy as 248:20853, which was compared.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 27, compared by board copy (dump/page-3-7) vs code: the board differs from the image-compared 248:20853 only in the destination — 'Your destination is Custom code. Wait for the save result; if it fails, your changes stay here.' UnsavedSettingsDialog prints `destination.name`, which SettingsTab sets from navTitle('Custom code' is that nav item's title, constants.ts SETTINGS_NAV). Title 'Saving General settings…' and 'Stay in General' as compared.",
    "tier": "P2"
   },
   {
@@ -15479,8 +15479,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance); same component and copy as 248:20853, which was compared.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 27, compared by board copy (dump/page-3-7) vs code: the board differs from the image-compared 248:20853 only in the destination — 'Your destination is Security headers. Wait for the save result; if it fails, your changes stay here.' UnsavedSettingsDialog prints `destination.name`, which SettingsTab sets from navTitle('Security headers' is that nav item's title, constants.ts SETTINGS_NAV). Title 'Saving General settings…' and 'Stay in General' as compared.",
    "tier": "P2"
   },
   {
@@ -15502,8 +15502,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance); same component and copy as 248:20853, which was compared.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 27, compared by board copy (dump/page-3-7) vs code: the board differs from the image-compared 248:20853 only in the destination — 'Your destination is Danger zone. Wait for the save result; if it fails, your changes stay here.' UnsavedSettingsDialog prints `destination.name`, which SettingsTab sets from navTitle('Danger zone' is that nav item's title, constants.ts SETTINGS_NAV). Title 'Saving General settings…' and 'Stay in General' as compared.",
    "tier": "P2"
   },
   {
@@ -15514,7 +15514,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared (loading state): the load card reads 'Loading <screen>…'; the footer 'Loading settings…' (tested).",
+   "verifiedNote": "Round 27: same LoadCard as SH12 (252:47733, drift-fixed) — Analytics reads 'Loading Analytics…'; this board not image-compared.",
    "tier": "P3"
   },
   {
@@ -15525,7 +15525,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared (error state): 'Couldn’t load <screen>', 'The settings service did not respond. Your existing configuration has not changed.', Try again; footer 'Settings unavailable · Retry to continue' (tested).",
+   "verifiedNote": "Round 27: same LoadCard as SH13 (252:47989, drift-fixed); this board not image-compared.",
    "tier": "P3"
   },
   {
@@ -15535,8 +15535,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Built, not compared (loading state): the load card reads 'Loading <screen>…'; the footer 'Loading settings…' (tested).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 27, probe-compared: shots/252-47733.png vs probe settings-tab&screen=headers&load=hang (the whole Settings task, siteDetail.settings.get never answers): 'Loading Security headers…' on the pane over three 94-tall placeholder cards with two bars each (was one card with the line only), footer 'Loading settings…' with Save only (Discard gone, as drawn). Residual, not this row's: Settings is not yet inside the editor shell (REQUESTS E-10) and the back reads 'Back to Editor' without the page.",
    "tier": "P2"
   },
   {
@@ -15546,8 +15546,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Built, not compared (error state): 'Couldn’t load <screen>', 'The settings service did not respond. Your existing configuration has not changed.', Try again; footer 'Settings unavailable · Retry to continue' (tested).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 27, probe-compared: shots/252-47989.png vs probe settings-tab&screen=headers&load=fail: 'Couldn’t load Security headers', 'The settings service did not respond. Your existing configuration has not changed.', a filled Try again under them (was a card with the button at its right), footer 'Settings unavailable · Retry to continue' muted (was red) with Save only. Shell residual as 252:47733 (E-10).",
    "tier": "P2"
   },
   {

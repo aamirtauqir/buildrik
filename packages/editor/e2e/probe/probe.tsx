@@ -139,6 +139,7 @@ import { PageSwitcher } from "@/editor/shell/PageSwitcher";
 import { BottomBar } from "@/editor/shell/BottomBar";
 import { saveStatusStore } from "@/editor/shell/saveStatusStore";
 import { publishTray } from "@/editor/shell/publishTrayStore";
+import { SettingsTab } from "@/editor/sidebar/tabs/settings/SettingsTab";
 import { UnpublishConfirmModal } from "@/editor/sidebar/tabs/publish/UnpublishConfirmModal";
 import { saveFailedBanner } from "@/editor/shell/globalBanners";
 import type { SaveState } from "@/editor/chrome-ui";
@@ -4707,6 +4708,28 @@ const CASES: Record<string, () => React.ReactElement> = {
      else, so a two-method stub is the whole dependency. It is hosted in the
      board's own pane: `.bd-set-pane-body` supplies the 32/24 insets and the
      bg-app ground, and 824 is 760 (the card) plus those two 32s. */
+  /* The whole Settings task (nav, pane, footer) for the server-load states:
+     `&screen=<id>` and `&load=hang|fail` on `siteDetail.settings.get`
+     (B8-SH12 252:47733 loading, B8-SH13 252:47989 load failed). */
+  "settings-tab": () => {
+    const q = new URLSearchParams(location.search);
+    const load = q.get("load");
+    window.fetch = (async (input: RequestInfo | URL) => {
+      const href = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+      const procs = new URL(href, location.origin).pathname.split("/api/trpc/")[1]?.split(",") ?? [];
+      if (load === "hang" && procs.includes("siteDetail.settings.get")) return new Promise<Response>(() => {});
+      if (load === "fail" && procs.includes("siteDetail.settings.get")) return new Response("{}", { status: 500 });
+      const body = procs.map(() => ({ result: { data: { json: null } } }));
+      return new Response(JSON.stringify(body), { status: 200, headers: { "content-type": "application/json" } });
+    }) as typeof fetch;
+    return (
+      <ToastProvider>
+        <div data-probe="settings-tab" className="tw:fixed tw:inset-0 tw:flex tw:bg-[var(--bk-bg-app)]">
+          <SettingsTab composer={settingsComposer({}) as never} projectId="probe-site" initialScreen={q.get("screen") ?? "headers"} onClose={() => {}} />
+        </div>
+      </ToastProvider>
+    );
+  },
   "settings-general": () => {
     let settings: Record<string, unknown> = {
       seo: {

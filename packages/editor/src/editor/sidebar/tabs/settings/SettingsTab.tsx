@@ -801,7 +801,7 @@ export const SettingsTab: React.FC<
       : loadState === "loading"
       ? { text: "Loading settings…", tone: "muted" }
       : loadState === "error"
-        ? { text: "Settings unavailable · Retry to continue", tone: "danger" }
+        ? { text: "Settings unavailable · Retry to continue", tone: "muted" }
         : footerMessage
           ? { text: footerMessage, tone: "muted" }
           : saveError
@@ -1097,8 +1097,9 @@ export const SettingsTab: React.FC<
             >
               {footStatus.text}
             </span>
-            {/* B8-SH07: while the save runs the footer is the status and Saving… only. */}
-            {saving ? null : (
+            {/* B8-SH07 / SH12 / SH13: while a save runs, or the screen's read is
+                pending or failed, the footer is the status and Save only. */}
+            {saving || loadState !== "ready" ? null : (
             <Button
               type="button"
               variant="secondary"
