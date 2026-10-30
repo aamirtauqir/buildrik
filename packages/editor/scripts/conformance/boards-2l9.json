@@ -1813,8 +1813,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 29 (A-21): built, not compared. Page trash is real: the save soft-deletes (Page.deletedAt + slug tombstone), pages.trash.list/restore/purge (EDITOR restore, ADMIN purge), RecentlyDeletedView from ⋯ Recently deleted and the delete receipts. Tests RecentlyDeletedView, page-trash-service.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Probe-compared 2026-10-31 (pages-trash&trash=slug, Restore → Restore page; board shots/142-54521.png). Fixed: a restore now returns to the Pages list (was left on an empty Recently deleted) and the receipt reads 'About restored at /about-2 · Top level' + Open. Row position is code: the server restores at the end of the list (page-trash.service position: live.length), so About sits last, not second.",
    "tier": "P1"
   },
   {
@@ -1824,8 +1824,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 29 (A-21): built, not compared. Page trash is real: the save soft-deletes (Page.deletedAt + slug tombstone), pages.trash.list/restore/purge (EDITOR restore, ADMIN purge), RecentlyDeletedView from ⋯ Recently deleted and the delete receipts. Tests RecentlyDeletedView, page-trash-service.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Probe-compared 2026-10-31 (case pages-trash, context offline; board shots/142-55231.png): Recently deleted · 1, ‹ Back to Pages, 30-day line, About /about · Top level, Deleted by you · Today, Restore (disabled) · More, foot note. Fixed: 'Needs a connection' moved to its own line under the actions (was squeezed beside More).",
    "tier": "P1"
   },
   {
@@ -1913,8 +1913,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 29 (A-21): built, not compared. Page trash is real: the save soft-deletes (Page.deletedAt + slug tombstone), pages.trash.list/restore/purge (EDITOR restore, ADMIN purge), RecentlyDeletedView from ⋯ Recently deleted and the delete receipts. Tests RecentlyDeletedView, page-trash-service.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Probe-compared 2026-10-31 (pages-trash&trash=list, Restore; board shots/142-59972.png). Fixed: back on the Pages list with 'About restored · /about' + Open (was 'restored with its URL and settings' on the empty trash view). Row position is code (server appends the restored page).",
    "tier": "P1"
   },
   {
@@ -2090,8 +2090,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 29 (A-21): built, not compared. Page trash is real: the save soft-deletes (Page.deletedAt + slug tombstone), pages.trash.list/restore/purge (EDITOR restore, ADMIN purge), RecentlyDeletedView from ⋯ Recently deleted and the delete receipts. Tests RecentlyDeletedView, page-trash-service.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared 2026-10-31 against shots/142-68730.png: the Return board draws only the default Layers shell (Home tree, Hero/Text selected) — no trash UI. The folder retention it names is server behaviour (restore keeps folderId; onRestored reloads folders, RecentlyDeletedView test). Layers default verified on its own rows.",
    "inheritsFrom": "142:62396",
    "tier": "P1"
   },
@@ -2102,8 +2102,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 29 (A-21): built, not compared. Page trash is real: the save soft-deletes (Page.deletedAt + slug tombstone), pages.trash.list/restore/purge (EDITOR restore, ADMIN purge), RecentlyDeletedView from ⋯ Recently deleted and the delete receipts. Tests RecentlyDeletedView, page-trash-service.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared 2026-10-31 against shots/144-64089.png: the precondition list (another page holds /about, former folder gone) is the ordinary Pages list (pages-shell probe, compared on 127:37393 et al.); the restore it leads to asks for a new slug (142:53954, pages-trash&trash=slug).",
    "tier": "P1"
   },
   {
@@ -8884,8 +8884,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 31: built, not compared. Canvas › View › 'Show hidden elements' (personal preference, this browser; on by default): on, an element its condition hides on the preview record is a ghost (opacity .4, dashed, 'Hidden by condition'); off, it is not drawn ([data-bk-hide-conditional] display:none) and the selection stays. The Inspector's line for the off state is L-B's (REQUESTS A-37).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Probe-compared 2026-10-31 (case canvas-hidden-ghost, real Canvas.css; board shots/176-19089.png). Fixed: 'Hidden by condition' now sits ABOVE the dashed box at full ink (was inside it, below the text, faded with the element); the fade moved from element opacity to its text colour + children so the label keeps its contrast. View › Show hidden elements row and the inspector note ('Hidden on this record — showing as ghost.') match the dump.",
    "tier": "P1"
   },
   {
@@ -8895,8 +8895,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 31: built, not compared. Canvas › View › 'Show hidden elements' (personal preference, this browser; on by default): on, an element its condition hides on the preview record is a ghost (opacity .4, dashed, 'Hidden by condition'); off, it is not drawn ([data-bk-hide-conditional] display:none) and the selection stays. The Inspector's line for the off state is L-B's (REQUESTS A-37).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Probe-compared 2026-10-31 (canvas-hidden-ghost&hide=1; board shots via dump text): with Show hidden elements off the ghost is not drawn ([data-bk-hide-conditional] display:none), selection is untouched (Layers keeps Heading), and the Conditions note reads 'Hidden on this record. Enable Show hidden elements to see it on canvas.' (ConditionsPanel).",
    "tier": "P1"
   },
   {
@@ -8950,8 +8950,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 32: built, not compared (copy and structure read from the board). Add › Elements leads, on a collection page, with 'CMS fields · {Collection}' / 'This page’s record': one 56-tall row per field the page can show — name, then its kind ('Heading H1', 'Paragraph', 'Rich text', 'Image', 'Text', 'Text · date') — and 'Insert into {parent} · after {sibling}'. Gaps: 'Image + title alt' reads 'Image' (alt is not bound); reference sub-fields ('Author › name') are not offered (pageFieldPlan skips references).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Probe-compared 2026-10-31 (case add-panel-cms, real Composer, Blog linked to 'Blog post'; board shots/176-21119.png). Fixed: kind column at x144 (was 156); the image row reads 'Image + title alt' and the insert now binds alt to the display field as well as src. Lists: the D37 board files List of Blog/Team under Elements while D74 (189:21741) gives them their own 'Collection lists' section — the boards disagree; the panel follows D74.",
    "tier": "P1"
   },
   {
@@ -8961,8 +8961,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 32: built, not compared. A field row inserts its element after the insert target, bound to the page's record (bindToField), selected, in one history step; receipt '{Field} inserted · bound to {Collection}' + Undo (CmsAddSection.test).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Probe-compared 2026-10-31 (add-panel-cms, click Excerpt; board shots/176-21523.png): inserted after Heading, selected, receipt 'Excerpt inserted · bound to Blog' + Undo, one history step (CmsAddSection.test). The inspector binding block is L-B's surface.",
    "tier": "P1"
   },
   {
@@ -9363,8 +9363,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 32: built, not compared. Add › Elements on any page with collections: 'Collection lists', 'Insert after {sibling}', an outlined 'List of {Collection}' per collection — a list bound to it whose card is ordinary elements (image, title, one text field) — 'Collection list · blank' (the catalog's list), 'Each list uses ordinary editable elements.' (CmsAddSection.test).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Probe-compared 2026-10-31 (add-panel-cms&home=1; board shots/189-21741.png): 'Collection lists' / 'Insert after {sibling}' / outlined List of Blog, List of Team (32 tall) / quiet 'Collection list · blank' / 'Each list uses ordinary editable elements.' match. The tabs + insert-target strip above are the Add panel's own (7:18981).",
    "tier": "P1"
   },
   {
@@ -9529,8 +9529,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 32: built, not compared — the Link row's 'Create collection page' opens the Dynamic pages dialog over the Inspector and runs the same two-step make (buildCollectionPage, saveCollectionLink; useLinkRowCollectionPage), the editor staying on the Card's page with the Card selected (docs/design-2l9/engine-record-pages.md: no second generator, no migration). D88: 'Create collection page for Team' from the Link row, 'You’ll return to this card after creating the page.'",
+   "verified": "drift-fixed",
+   "verifiedNote": "Probe-compared 2026-10-31 (case link-row-record, real Composer; This record's page → Create collection page; board shots/193-25921.png): dialog 720 wide over the Inspector, URL pattern, Include fields, Layout Profile + preview, Cancel / Create page; the Link row behind it reads 'Team has no page per record.' + the note. Match.",
    "tier": "P1"
   },
   {
@@ -9540,8 +9540,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 32: built, not compared — the Link row's 'Create collection page' opens the Dynamic pages dialog over the Inspector and runs the same two-step make (buildCollectionPage, saveCollectionLink; useLinkRowCollectionPage), the editor staying on the Card's page with the Card selected (docs/design-2l9/engine-record-pages.md: no second generator, no migration). D89: 'Creating page…' (disabled) at the origin.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared 2026-10-31: same Link row as 193:25921/193:28433 (probe link-row-record, image-compared); the pending phase reads 'Creating page…' disabled with 'You’ll return to this card after creating the page.' — copy equals the dump, phases tested in useLinkRowCollectionPage.test. The phase is transient, not shot.",
    "tier": "P1"
   },
   {
@@ -9551,8 +9551,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 32: built, not compared — the Link row's 'Create collection page' opens the Dynamic pages dialog over the Inspector and runs the same two-step make (buildCollectionPage, saveCollectionLink; useLinkRowCollectionPage), the editor staying on the Card's page with the Card selected (docs/design-2l9/engine-record-pages.md: no second generator, no migration). D90: back on the Card: '{page} is ready. Choose This record’s page to link each card.', 'Page ready. Choose This record page to link the Card.', toast '{page} created · Open page'.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Probe-compared 2026-10-31 (link-row-record, Create page; board shots/193-26952.png). Fixed: once the page is made the Link to select empties ('Choose link…') — it stayed on 'This record’s page' with nothing stored, so re-choosing it fired no change and the Card could never be linked. Notes 'Team profile is ready…' / 'Page ready…', Open in new tab, toast 'Team profile created · Open page'. Test LinkSection.recordReady.",
    "tier": "P1"
   },
   {
@@ -9584,8 +9584,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 32: built, not compared — the Link row's 'Create collection page' opens the Dynamic pages dialog over the Inspector and runs the same two-step make (buildCollectionPage, saveCollectionLink; useLinkRowCollectionPage), the editor staying on the Card's page with the Card selected (docs/design-2l9/engine-record-pages.md: no second generator, no migration). D93: 'Page created, link not saved. Retry keeps the existing {page} page.' + 'Retry link save' — the page stays, the retry saves the link only.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Probe-compared 2026-10-31 (link-row-record&siteId=probe-site: the collection link's server save fails; board shots/193-28433.png): 'Page created, link not saved. Retry keeps the existing Team profile page.', Retry link save (primary, full width), 'Page created. Retry saving its collection link.' Match; the board greys the select, live leaves it enabled (no lock exists in code).",
    "tier": "P1"
   },
   {
@@ -9640,8 +9640,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 32: built, not compared — the Link row's 'Create collection page' opens the Dynamic pages dialog over the Inspector and runs the same two-step make (buildCollectionPage, saveCollectionLink; useLinkRowCollectionPage), the editor staying on the Card's page with the Card selected (docs/design-2l9/engine-record-pages.md: no second generator, no migration). D97: 'Saving link…', 'Saving the collection link. Your Card stays selected.'",
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared 2026-10-31: the retry phase of the row image-compared on 193:28433 — 'Saving link…' disabled + 'Saving the collection link. Your Card stays selected.' equal the dump; retry saves the link only (retryCollectionLink; useLinkRowCollectionPage.test). Transient, not shot.",
    "tier": "P1"
   },
   {
@@ -9650,9 +9650,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Generated page with \"‹ Home · Team card\" return; not in code",
+   "authority": "code:no-selection-inspector-is-the-page-panel",
+   "verified": "drift-fixed",
+   "verifiedNote": "Probe-compared 2026-10-31 (case link-row-record: This record's page → Create page → toast Open page; board shots/195-29753.png). Built: the made page's Inspector offers '‹ Home · Team card' (centred accent link under the header, recordPageReturn + RecordPageReturnRow); it returns to Home with the Card selected and is spent. Code: with nothing selected the Inspector is the page panel (board 21, DD-13 — page appearance kept), not the board's 'Select an element to edit it.' stub. Test useLinkRowCollectionPage (D98).",
    "tier": "P1"
   },
   {
@@ -11537,8 +11537,8 @@
    "family": "templates",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Template recovery + permanent delete flow missing; templateSync mirrors saves only",
+   "verified": "drift-fixed",
+   "verifiedNote": "Probe-compared 2026-10-31 (templates-resource-area&siteId&tplTrash=list; board shots/251-73352.png): ‹ Back to Saved templates, Recently deleted 20/28, the 30-day note, the bordered row (name, 'Deleted today · 30 days left · 7 sections', Restore 112 primary, Delete permanently… 208 outline), the Admin footnote. Built round 33 (full chain: user_templates.deletedAt additive migration, userTemplates.delete now soft, userTemplates.trash.list/restore/purge — EDITOR restore, ADMIN purge with the name typed back — 30-day cron purge; TemplateTrashService; RecentlyDeletedTemplates). The frame around it (Show filter, search, header ⋯) is the Templates redesign on T01 222:43842 (L-C); until it lands the door is 'Recently deleted' under Reload catalogue and a saved card's Delete.",
    "tier": "P3"
   },
   {
@@ -11548,8 +11548,8 @@
    "family": "templates",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Template recovery + permanent delete flow missing; templateSync mirrors saves only",
+   "verified": "drift-fixed",
+   "verifiedNote": "Probe-compared 2026-10-31 (tplTrash=hang, Restore): the button reads 'Restoring…' disabled while the server answers. Built round 33 (full chain: user_templates.deletedAt additive migration, userTemplates.delete now soft, userTemplates.trash.list/restore/purge — EDITOR restore, ADMIN purge with the name typed back — 30-day cron purge; TemplateTrashService; RecentlyDeletedTemplates). The frame around it (Show filter, search, header ⋯) is the Templates redesign on T01 222:43842 (L-C); until it lands the door is 'Recently deleted' under Reload catalogue and a saved card's Delete.",
    "tier": "P2"
   },
   {
@@ -11559,8 +11559,8 @@
    "family": "templates",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Template recovery + permanent delete flow missing; templateSync mirrors saves only",
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared 2026-10-31 (RecentlyDeletedTemplates test + probe): a restore returns to the catalogue with the template back (same templateId) and the receipt 'Fieldwork home restored'. Built round 33 (full chain: user_templates.deletedAt additive migration, userTemplates.delete now soft, userTemplates.trash.list/restore/purge — EDITOR restore, ADMIN purge with the name typed back — 30-day cron purge; TemplateTrashService; RecentlyDeletedTemplates). The frame around it (Show filter, search, header ⋯) is the Templates redesign on T01 222:43842 (L-C); until it lands the door is 'Recently deleted' under Reload catalogue and a saved card's Delete.",
    "tier": "P2"
   },
   {
@@ -11570,8 +11570,8 @@
    "family": "templates",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Template recovery + permanent delete flow missing; templateSync mirrors saves only",
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared 2026-10-31 (tplTrash=fail; test): the row stays and reads 'Couldn’t restore Fieldwork home. It is still in Recently deleted; try again.' Built round 33 (full chain: user_templates.deletedAt additive migration, userTemplates.delete now soft, userTemplates.trash.list/restore/purge — EDITOR restore, ADMIN purge with the name typed back — 30-day cron purge; TemplateTrashService; RecentlyDeletedTemplates). The frame around it (Show filter, search, header ⋯) is the Templates redesign on T01 222:43842 (L-C); until it lands the door is 'Recently deleted' under Reload catalogue and a saved card's Delete.",
    "tier": "P2"
   },
   {
@@ -11581,8 +11581,8 @@
    "family": "templates",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Template recovery + permanent delete flow missing; templateSync mirrors saves only",
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared 2026-10-31 (text + test path): offline, Restore and Delete permanently… are disabled and the row says 'Needs a connection. Restore and permanent deletion are unavailable offline.' Built round 33 (full chain: user_templates.deletedAt additive migration, userTemplates.delete now soft, userTemplates.trash.list/restore/purge — EDITOR restore, ADMIN purge with the name typed back — 30-day cron purge; TemplateTrashService; RecentlyDeletedTemplates). The frame around it (Show filter, search, header ⋯) is the Templates redesign on T01 222:43842 (L-C); until it lands the door is 'Recently deleted' under Reload catalogue and a saved card's Delete.",
    "tier": "P3"
   },
   {
@@ -11592,8 +11592,8 @@
    "family": "templates",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Template recovery + permanent delete flow missing; templateSync mirrors saves only",
+   "verified": "drift-fixed",
+   "verifiedNote": "Probe-compared 2026-10-31 (tplTrash=empty): 'No recently deleted templates' / 'Deleted saved templates appear here until their recovery period ends.' Built round 33 (full chain: user_templates.deletedAt additive migration, userTemplates.delete now soft, userTemplates.trash.list/restore/purge — EDITOR restore, ADMIN purge with the name typed back — 30-day cron purge; TemplateTrashService; RecentlyDeletedTemplates). The frame around it (Show filter, search, header ⋯) is the Templates redesign on T01 222:43842 (L-C); until it lands the door is 'Recently deleted' under Reload catalogue and a saved card's Delete.",
    "tier": "P3"
   },
   {
@@ -11603,8 +11603,8 @@
    "family": "templates",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Template recovery + permanent delete flow missing; templateSync mirrors saves only",
+   "verified": "drift-fixed",
+   "verifiedNote": "Probe-compared 2026-10-31 (Delete permanently…; board shots/251-74485.png): 480 dialog at top 279, 'Delete Fieldwork home permanently?', the body, 'Type Fieldwork home to confirm', Cancel · Delete permanently (disabled until the exact name). Built round 33 (full chain: user_templates.deletedAt additive migration, userTemplates.delete now soft, userTemplates.trash.list/restore/purge — EDITOR restore, ADMIN purge with the name typed back — 30-day cron purge; TemplateTrashService; RecentlyDeletedTemplates). The frame around it (Show filter, search, header ⋯) is the Templates redesign on T01 222:43842 (L-C); until it lands the door is 'Recently deleted' under Reload catalogue and a saved card's Delete.",
    "tier": "P2"
   },
   {
@@ -11614,8 +11614,8 @@
    "family": "templates",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Template recovery + permanent delete flow missing; templateSync mirrors saves only",
+   "verified": "drift-fixed",
+   "verifiedNote": "Probe-compared 2026-10-31: with the exact name typed the destructive action enables (test). Built round 33 (full chain: user_templates.deletedAt additive migration, userTemplates.delete now soft, userTemplates.trash.list/restore/purge — EDITOR restore, ADMIN purge with the name typed back — 30-day cron purge; TemplateTrashService; RecentlyDeletedTemplates). The frame around it (Show filter, search, header ⋯) is the Templates redesign on T01 222:43842 (L-C); until it lands the door is 'Recently deleted' under Reload catalogue and a saved card's Delete.",
    "inheritsFrom": "251:74485",
    "tier": "P2"
   },
@@ -11626,8 +11626,8 @@
    "family": "templates",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Template recovery + permanent delete flow missing; templateSync mirrors saves only",
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared 2026-10-31 (text + code): while the purge is confirmed a dialog reads 'Deleting Fieldwork home…' / 'The saved template remains unavailable while deletion is being confirmed.' Not shot. Built round 33 (full chain: user_templates.deletedAt additive migration, userTemplates.delete now soft, userTemplates.trash.list/restore/purge — EDITOR restore, ADMIN purge with the name typed back — 30-day cron purge; TemplateTrashService; RecentlyDeletedTemplates). The frame around it (Show filter, search, header ⋯) is the Templates redesign on T01 222:43842 (L-C); until it lands the door is 'Recently deleted' under Reload catalogue and a saved card's Delete.",
    "tier": "P2"
   },
   {
@@ -11637,8 +11637,8 @@
    "family": "templates",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Template recovery + permanent delete flow missing; templateSync mirrors saves only",
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared 2026-10-31 (test): acknowledged, the list empties to the empty state and the receipt reads 'Fieldwork home permanently deleted. Existing pages are unchanged.' Built round 33 (full chain: user_templates.deletedAt additive migration, userTemplates.delete now soft, userTemplates.trash.list/restore/purge — EDITOR restore, ADMIN purge with the name typed back — 30-day cron purge; TemplateTrashService; RecentlyDeletedTemplates). The frame around it (Show filter, search, header ⋯) is the Templates redesign on T01 222:43842 (L-C); until it lands the door is 'Recently deleted' under Reload catalogue and a saved card's Delete.",
    "tier": "P2"
   },
   {
@@ -12093,9 +12093,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "board",
-   "verified": "no",
-   "verifiedNote": "built, not compared — L-C D5: \"Change {field} type\" preview rows \"old → new\" / \"can’t convert\", \"Lossless conversion · Values remain intact.\", Cancel · Clear values… · Convert N values (TypeChangeDialog.tsx).",
+   "authority": "open:cms-dialog-top-128 (REQUESTS A-41)",
+   "verified": "drift-open",
+   "verifiedNote": "Probe-compared 2026-10-31 (case cms-type-change; board shots/257-51318.png). Fixed: 720 wide (was 560); subtitle '20 records have a value. Preview the first five before changing Number to Text.' (was 'Number → Text'); the preview is a mono table (title · value · → · new); summary 'Lossless conversion · Used by 0 · Values remain intact.' (Used by from the field's usages). Open: the board's dialog top is 128, the shared Modal's is 31vh (279) — A-41.",
    "tier": "P2"
   },
   {
@@ -12126,9 +12126,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "board",
-   "verified": "no",
-   "verifiedNote": "built, not compared — L-C D5: \"Converting {field}…\" / \"Clearing {field} values…\" while values are written.",
+   "authority": "open:cms-dialog-top-128 (REQUESTS A-41)",
+   "verified": "drift-open",
+   "verifiedNote": "Probe-compared 2026-10-31 (cms-type-change&apply=hang, Convert; shots/257-51906.png). Fixed: 720 wide; 'Waiting for the server to confirm all 20 values.' The board's second sentence ('Fields and saved values remain unchanged until acknowledgment') is not true in code — the type moves first (CmsWorkspace.changeType) — so it is left out. Open: top 128 vs 31vh (A-41).",
    "tier": "P2"
   },
   {
@@ -12137,9 +12137,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "board",
-   "verified": "no",
-   "verifiedNote": "built, not compared — L-C D5: \"Converting {field}…\" / \"Clearing {field} values…\" while values are written.",
+   "authority": "open:cms-dialog-top-128 (REQUESTS A-41)",
+   "verified": "drift-open",
+   "verifiedNote": "Compared 2026-10-31 with the convert pending state (same Modal): 720 wide; copy now 'Waiting for acknowledgment. The 20 stored values remain unchanged until the server confirms each one.' ('each one': values are written per record). Open: top 128 vs 31vh (A-41).",
    "tier": "P2"
   },
   {
@@ -12150,7 +12150,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "built, not compared — L-C D5: toast \"{field} converted · N values converted and saved.\" (board: inline line under Type).",
+   "verifiedNote": "2026-10-31 L-A compare (text): the board acknowledges inline in the field's detail ('Type Text / 20 values converted and saved. Used by 0. / Back to Fields'); L-C D5 shows a toast ('Reading time converted · 20 values converted and saved.') and returns to the Fields list. Not matched — L-C's call.",
    "tier": "P2"
   },
   {
@@ -12159,9 +12159,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "code:type-moves-before-values",
-   "verified": "no",
-   "verifiedNote": "built, not compared — L-C D5: \"Couldn’t change {field}\" + Retry. The type moves before the values (a published record's save is checked against the new type), so the copy says some values may still need converting — not the board's \"all values unchanged\".",
+   "authority": "open:cms-dialog-top-128 (REQUESTS A-41)",
+   "verified": "drift-open",
+   "verifiedNote": "Probe-compared 2026-10-31 (cms-type-change&apply=fail; shots/257-52512.png): title, Back to Fields · Retry match; 720 wide (was 560). Body is code: the type moves before the values, so the copy says some values may still need converting, not the board's 'all values unchanged'. Open: top 128 vs 31vh (A-41).",
    "tier": "P2"
   },
   {
@@ -12559,7 +12559,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "built, not compared — L-C D5: toast \"{field} converted · N values converted and saved.\" (board: inline line under Type).",
+   "verifiedNote": "2026-10-31 L-A compare (text): the Fields list after conversion reads 'Reading time · Text' — matches the list as the toast closes it; the board's 'Reading time converted' line sits where L-C's toast title says the same. Not image-compared.",
    "tier": "P2"
   },
   {
@@ -22798,8 +22798,8 @@
    "family": "play",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Lane L-B P1 round 3, board PNG compared: the Inspector half (Content › 'Text content' textarea with B I U link, 'Changes save automatically.', open Semantics with Tag / ID / 'Use a descriptive ID…') is the Play prototype's older Content layout — superseded for the Inspector by page 04's text board 161:8480 (Text row + bind icon, 'Edit text on canvas', Semantics; drift-fixed). Still open and not L-B's: the Add panel's insert receipt 'Text added to Hero · Selected on canvas · Focus stays here' (L-A).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared 2026-10-31: the Add half is the insert receipt 'Text added to Hero / Selected on canvas · Focus stays here' — the same receipt probe-compared on 7:19448 (add-panel-receipt). The Inspector half is the prototype's older Content layout, superseded by page 04's text board 161:8480 (L-B, drift-fixed).",
    "tier": "P1"
   },
   {
@@ -23162,7 +23162,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Round 24: depends on F4.01's issue (REQUESTS A-35); Fix › already selects the element. '‹ Back to Issues' in the inspector is still missing.",
+   "verifiedNote": "2026-10-31 L-A: Fix › on 'Collection list has no source' selects the list (A-35); the Inspector's list block ('Choose collection…', 'No source selected. This list cannot publish yet.') is L-B's. Still open: '‹ Back to Issues' at the Inspector's head after Fix › / Open image › — the Issues ⇄ Inspector swap lives in StudioPanels/AquibraStudio (REQUESTS A-39). The board's canvas is the prototype's abstract placeholder.",
    "tier": "P1"
   },
   {
@@ -24798,9 +24798,9 @@
    "page": "09",
    "family": "play",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:161:8480 inspector text board (prototype says content fields are static)",
    "verified": "drift-open",
-   "verifiedNote": "Select child works; inspector has no Content tab/Text content field (_shared.tsx:44).",
+   "verifiedNote": "2026-10-31: selecting Eyebrow from Layers/canvas works; the Inspector half ('Text content' textarea, B I U, 'Changes save automatically.') is the Play prototype's older Content layout — page 04's text board 161:8480 owns the Inspector text body (L-B, drift-fixed), as on F1.03 302:4542.",
    "tier": "P1"
   },
   {
@@ -24809,9 +24809,9 @@
    "page": "09",
    "family": "play",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:161:8480 inspector text board (prototype says content fields are static)",
    "verified": "drift-open",
-   "verifiedNote": "Heading level exists (textBodies.tsx:57) but no Content tab/text field.",
+   "verifiedNote": "2026-10-31: selecting Headline works; heading level lives in the text body. The Inspector half is the prototype's older Content layout — superseded by page 04's 161:8480 (L-B, drift-fixed).",
    "tier": "P1"
   },
   {
@@ -24822,7 +24822,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Button label field missing in inspector; link lives in Behaviour › Link.",
+   "verifiedNote": "2026-10-31 L-A triage: selecting the button works. Open, Inspector (L-B, REQUESTS A-40): no page-04 board draws a button's content; this board names the field 'Button label' and shows 'Link target' under Semantics — the code reads 'Text' and keeps the link in Behavior › Link.",
    "tier": "P1"
   },
   {
@@ -24832,8 +24832,8 @@
    "family": "play",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "No grouped \"Images missing alt text · Open image ›\" subview; IssuesPanel rows are per element (IssuesPanel.tsx:337).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Probe-compared 2026-10-31 (case issues-cards, Fix › on the group; board shots/353-24569.png). Built: two or more images without alt text are one card ('! 2 images have no alt text', their places, Fix ›) counted as one tip; Fix › opens 'Images missing alt text' ✕ / '2 images · choose one to inspect' / per image its place, 'Missing alt text · image content', 'Open image ›' (selects it) / '‹ Back to Issues'. Places are the scanner's '{page} › {label}' (no parent chain in the shared finding). Test IssuesPanel (C02).",
    "tier": "P1"
   },
   {

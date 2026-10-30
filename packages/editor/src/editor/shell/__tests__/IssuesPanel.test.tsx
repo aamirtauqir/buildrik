@@ -191,3 +191,38 @@ describe("IssuesPanel — a long message wraps inside its card", () => {
     expect(screen.getByTestId("issue-location-0").className).not.toMatch(/tw:truncate/);
   });
 });
+
+describe("IssuesPanel · images missing alt text (Play C02 353:24569, F4.01 303:32296)", () => {
+  const ALT = [
+    { id: "a1", type: "warning" as const, message: "Image is missing alt text", location: "Home › Image", elementId: "img1", pageId: "home", contentKind: "missing-alt" as const },
+    { id: "a2", type: "warning" as const, message: "Image is missing alt text", location: "About › Image", elementId: "img2", pageId: "about", contentKind: "missing-alt" as const },
+  ];
+
+  it("two or more are one card; Fix › lists them, Open image › selects one, ‹ Back to Issues returns", () => {
+    const onSelectElement = vi.fn();
+    render(<IssuesPanel issues={[ISSUES[0], ...ALT]} onClose={vi.fn()} onSelectElement={onSelectElement} />);
+    fireEvent.click(screen.getByRole("button", { name: "Whole site" }));
+    const card = screen.getByTestId("issue-alt-group");
+    expect(card).toHaveTextContent("2 images have no alt text");
+    expect(card).toHaveTextContent("Home › Image, About › Image");
+    // One card, one tip: "1 issue blocks publishing · 1 tip".
+    expect(screen.getByTestId("issues-summary")).toHaveTextContent("1 issue blocks publishing · 1 tip");
+    expect(screen.queryAllByText("Image is missing alt text")).toHaveLength(0);
+
+    fireEvent.click(screen.getByTestId("issue-alt-group-fix"));
+    expect(screen.getByText("Images missing alt text")).toBeInTheDocument();
+    expect(screen.getByText("2 images · choose one to inspect")).toBeInTheDocument();
+    expect(screen.getAllByText("Missing alt text · image content")).toHaveLength(2);
+    fireEvent.click(screen.getAllByRole("button", { name: "Open image ›" })[1]);
+    expect(onSelectElement).toHaveBeenCalledWith(ALT[1]);
+
+    fireEvent.click(screen.getByTestId("issues-alt-back"));
+    expect(screen.getByTestId("issue-alt-group")).toBeInTheDocument();
+  });
+
+  it("a single one keeps its own card", () => {
+    render(<IssuesPanel issues={[ALT[0]]} onClose={vi.fn()} activePageId="home" />);
+    expect(screen.queryByTestId("issue-alt-group")).toBeNull();
+    expect(screen.getByText("Image is missing alt text")).toBeInTheDocument();
+  });
+});

@@ -75,8 +75,12 @@ export function RecentlyDeletedView({ composer, siteId, canPurge, onBack, onRest
     setSlugAsk(null);
     if (out.kind === "restored") {
       onRestored?.();
+      /* 142:54521 / 142:59972: back on the Pages list, the restored page in it. */
+      onBack();
       addToast({
-        description: slug ? `${page.name} restored at /${out.slug}` : `${page.name} restored with its URL and settings`,
+        description: slug
+          ? `${page.name} restored at /${out.slug} · ${page.folderName ?? "Top level"}`
+          : `${page.name} restored · /${out.slug}`,
         tone: "info",
         action: { label: "Open", onClick: () => composer?.elements.setActivePage(out.pageId) },
       });
@@ -194,8 +198,9 @@ export function RecentlyDeletedView({ composer, siteId, canPurge, onBack, onRest
                       </Menu>
                     </Popover>
                   )}
-                  {!t.online && <span className={NOTE}>Needs a connection</span>}
                 </div>
+                {/* 142:55231: the offline note is its own line under the actions. */}
+                {!t.online && <p className={`${NOTE} tw:m-0 tw:mt-2`}>Needs a connection</p>}
                 {error && (
                   <p className="tw:m-0 tw:mt-2 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-error-text)]" role="alert" data-testid="pages-trash-row-error">
                     {error}

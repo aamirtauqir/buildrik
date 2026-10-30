@@ -4,6 +4,7 @@ const siteFindUnique = vi.fn();
 const upsert = vi.fn();
 const findMany = vi.fn();
 const deleteMany = vi.fn();
+const updateMany = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
@@ -12,6 +13,7 @@ vi.mock("@/lib/prisma", () => ({
       upsert: (...a: unknown[]) => upsert(...a),
       findMany: (...a: unknown[]) => findMany(...a),
       deleteMany: (...a: unknown[]) => deleteMany(...a),
+      updateMany: (...a: unknown[]) => updateMany(...a),
     },
   },
 }));
@@ -22,7 +24,7 @@ import {
   deleteUserTemplate,
 } from "@server/services/user-template.service";
 
-beforeEach(() => [siteFindUnique, upsert, findMany, deleteMany].forEach((m) => m.mockReset()));
+beforeEach(() => [siteFindUnique, upsert, findMany, deleteMany, updateMany].forEach((m) => m.mockReset()));
 
 describe("user-template.service", () => {
   it("resolves the workspace from the site and upserts on (workspaceId, templateId)", async () => {
@@ -67,7 +69,7 @@ describe("user-template.service", () => {
     await listUserTemplates("s1");
     expect(findMany).toHaveBeenCalledWith(
       expect.objectContaining({
-        where: { workspaceId: "ws1" },
+        where: { workspaceId: "ws1", deletedAt: null },
         select: expect.objectContaining({ templateId: true, html: true }),
       })
     );
@@ -79,10 +81,15 @@ describe("user-template.service", () => {
     expect(findMany).not.toHaveBeenCalled();
   });
 
-  it("delete uses deleteMany scoped to the resolved workspace", async () => {
+  /* B6-T24: a delete moves the template to Recently deleted, not out of the table. */
+  it("delete marks deletedAt, scoped to the resolved workspace", async () => {
     siteFindUnique.mockResolvedValueOnce({ workspaceId: "ws1" });
-    deleteMany.mockResolvedValueOnce({ count: 1 });
+    updateMany.mockResolvedValueOnce({ count: 1 });
     expect(await deleteUserTemplate("s1", "user-1")).toEqual({ ok: true });
-    expect(deleteMany).toHaveBeenCalledWith({ where: { workspaceId: "ws1", templateId: "user-1" } });
+    expect(updateMany).toHaveBeenCalledWith({
+      where: { workspaceId: "ws1", templateId: "user-1", deletedAt: null },
+      data: { deletedAt: expect.any(Date) },
+    });
+    expect(deleteMany).not.toHaveBeenCalled();
   });
 });

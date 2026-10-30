@@ -27,6 +27,7 @@
  */
 
 import { UnsavedLinkNotice } from "./UnsavedLinkNotice";
+import { RecordPageReturnRow } from "./RecordPageReturnRow";
 import { MoreHorizontal, X } from "lucide-react";
 import * as React from "react";
 import type { Composer } from "@/engine";
@@ -174,6 +175,8 @@ export function PagePanel({ composer }: PagePanelProps) {
         {appliedTemplate ? <TemplateAppliedBanner name={appliedTemplate} pageName={page.name} onDismiss={dismissTemplate} /> : null}
         {/* A-26 (187:22071): a collection page whose link the server has not confirmed. */}
         <UnsavedLinkNotice composer={composer} pageId={page.id} />
+        {/* B5-D98 (195:29753): back to the Card whose Link row made this page. */}
+        <RecordPageReturnRow composer={composer} pageId={page.id} />
         <div className="bdi-panel-scroll">
           {subview?.kind === "font-picker" && subview.elementId === root.id ? (
             <ChooseFont
