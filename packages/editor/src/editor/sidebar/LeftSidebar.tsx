@@ -27,6 +27,7 @@ import { useSidebarKeyboard } from "./useSidebarKeyboard";
 import {
   Plus,
   LayoutGrid,
+  Database,
   Image,
   Layers,
   File,
@@ -48,6 +49,7 @@ import type { LucideIcon } from "lucide-react";
 const ICON_MAP: Record<string, LucideIcon> = {
   Plus,
   LayoutGrid,
+  Database,
   Image,
   Layers,
   File,

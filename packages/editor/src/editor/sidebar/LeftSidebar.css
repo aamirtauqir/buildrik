@@ -54,20 +54,19 @@
   gap: 2px;
 }
 
-/* Board 4418:123573 (parity V1 #4): 10 top padding, 4 between items — the
-   first item lands at y66 (56 + 10), pitch 48 (44 + 4). */
+/* design-2l9 Shell/Rail 497:99445 (1:1): 48×52 items, 56 pitch, label top 43. */
 .ls-rail--figma {
-  padding-top: 10px;
+  padding-top: 8px;
 }
 .ls-rail--figma .ls-zone {
   gap: 4px;
 }
 .ls-rail--figma .ls-btn--labeled {
-  gap: 4px; /* board 4418:123573: 4 between glyph and label */
+  gap: 7px;
 }
 .ls-rail--figma .ls-btn__label {
   font-weight: 400;
-  color: var(--bk-ink-muted);
+  color: var(--bk-ink-soft);
 }
 /* ink-muted on accent-tint is 4.49:1 at 11px (WCAG AA fail) — the active
    item's label takes the active ink, as its glyph does. */
@@ -76,10 +75,10 @@
 }
 
 /* ─────────────────────────────────────────────
-   DIVIDER — 24px hairline between zones
+   DIVIDER — the hairline between rail groups (497:99445: 40 of the 56 rail)
    ───────────────────────────────────────────── */
 .ls-divider {
-  width: 24px;
+  width: 40px;
   height: 1px;
   background: var(--bk-border);
   flex-shrink: 0;
@@ -136,9 +135,9 @@
 .ls-btn--labeled {
   flex-direction: column;
   gap: 2px;
-  width: var(--bk-size-header);
-  height: var(--bk-size-header);
-  min-height: var(--bk-size-header);
+  width: 48px;
+  height: 52px;
+  min-height: 52px;
 }
 
 .ls-btn__label {
@@ -180,7 +179,7 @@
   width: 18px;
   height: 18px;
   flex-shrink: 0;
-  stroke-width: 1.6;
+  stroke-width: 2;
 }
 
 /* ─────────────────────────────────────────────

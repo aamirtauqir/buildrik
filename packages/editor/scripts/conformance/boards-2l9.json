@@ -25470,8 +25470,8 @@
    "family": "shell-components",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Rail tabsConfig.ts:62 has Templates/Components/Settings/Publish/History/Activity/Review; board: Add Layers Pages|Assets CMS Brand|Help.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Built + compared 2026-10-30 (round 23) at 1:1 with shots/497-99445.png, probe pages-shell (docs/design-2l9/compare/rail-497-99445.png, board left / live right): Add · Layers · Pages | Assets · CMS · Brand with a 40 hairline between (RAIL_FIGMA now two groups), the CMS glyph the database, 48×52 items on a 56 pitch (Layers glyph 72 / label 97 vs board 72 / ~97), 2px strokes, labels in the glyph's ink. Help sits at the rail's foot in the app (with the onboarding chip above it, kept); the probe frame has no Help. Re-baselined tabsConfig.figma 'two groups'. | Rail tabsConfig.ts:62 has Templates/Components/Settings/Publish/History/Activity/Review; board: Add Layers Pages|Assets CMS Brand|Help.",
    "tier": "P1"
   },
   {
@@ -25515,7 +25515,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "phase1 T1.3: PageTabBar tabs cannot hold 100 pages; PageSwitcher + PageSwitcherMenu missing.",
+   "verifiedNote": "Round 23 (probe pages-shell, 5 pages): the Pages drawer is this board's — 'Pages · N', search, Pages / Listings / Structure, rows with path and ⋯, Current on the open page, + Add page / From template / New folder. Not compared at 100 pages (the probe seeds 5; the switcher-scale claim is unmeasured). The topbar/bottom-bar switcher is lead-owned (A-16). | phase1 T1.3: PageTabBar tabs cannot hold 100 pages; PageSwitcher + PageSwitcherMenu missing.",
    "tier": "P1"
   },
   {
@@ -25526,7 +25526,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "phase1 shell; LayersTab exists (LayersTab.tsx:71); footer \"N layers\" (:308) vs board \"8 elements · Home\".",
+   "verifiedNote": "Round 23: the Layers states here match the Layers family boards; this summary board's footer '8 elements · Home' disagrees with the family board 147:75914 ('7 layers · 1 selected', drift-fixed) — the family board was kept. | phase1 shell; LayersTab exists (LayersTab.tsx:71); footer \"N layers\" (:308) vs board \"8 elements · Home\".",
    "tier": "P1"
   },
   {
@@ -25569,8 +25569,8 @@
    "family": "shell-components",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "phase1 StatusBadge: CMS records need Draft/Published/Changed since publish badges; back \"‹ Back to canvas\" (CmsWorkspace.tsx:172).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared 2026-10-30 (round 23) with shots/500-342150.png, probe cms-workspace (64 records): records table with Draft / Published / Changed since publish badges, search, status filter, Updated · Newest sort, Columns, Title · Status · Updated · Author, '1–50 of N records' with Previous / Next, + Add record top-right — match; the way back reads the origin ('‹ Back to Editor · Home' in the app, '‹ Back to canvas' in the probe frame). | phase1 StatusBadge: CMS records need Draft/Published/Changed since publish badges; back \"‹ Back to canvas\" (CmsWorkspace.tsx:172).",
    "tier": "P1"
   },
   {
