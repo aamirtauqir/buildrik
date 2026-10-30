@@ -174,8 +174,8 @@ describe("ExportModal — tab switching", () => {
 
     // Options tab shows the config panel.
     fireEvent.click(screen.getByRole("tab", { name: "Options" }));
-    expect(screen.getByText("Page Title")).toBeInTheDocument();
-    expect(screen.getByLabelText("Minify output")).toBeInTheDocument();
+    expect(screen.getByLabelText("Page title")).toBeInTheDocument();
+    expect(screen.getByLabelText("Minify")).toBeInTheDocument();
   });
 
   it("re-generates the export when an option changes", async () => {
@@ -184,7 +184,7 @@ describe("ExportModal — tab switching", () => {
     expect(mocks.exportFn).toHaveBeenCalledTimes(1);
 
     fireEvent.click(screen.getByRole("tab", { name: "Options" }));
-    fireEvent.click(screen.getByLabelText("Minify output"));
+    fireEvent.change(screen.getByLabelText("Minify"), { target: { value: "on" } });
 
     await waitFor(() => expect(mocks.exportFn).toHaveBeenCalledTimes(2));
     expect(mocks.engineCtor).toHaveBeenLastCalledWith(
@@ -309,7 +309,7 @@ describe("ExportModal — download flows", () => {
     expect(screen.queryByRole("button", { name: "Download CSS" })).toBeNull();
 
     fireEvent.click(screen.getByRole("tab", { name: "Options" }));
-    fireEvent.click(screen.getByRole("button", { name: "external" }));
+    fireEvent.change(screen.getByLabelText("CSS"), { target: { value: "external" } });
 
     const cssBtn = await screen.findByRole("button", { name: "Download CSS" });
     await waitFor(() => expect(cssBtn).toBeEnabled());
@@ -331,7 +331,7 @@ describe("ExportModal — download flows", () => {
     expect(screen.queryByRole("button", { name: "Download All" })).toBeNull();
 
     fireEvent.click(screen.getByRole("tab", { name: "Options" }));
-    fireEvent.click(screen.getByRole("button", { name: "external" }));
+    fireEvent.change(screen.getByLabelText("CSS"), { target: { value: "external" } });
 
     const allBtn = await screen.findByRole("button", { name: "Download All" });
     await waitFor(() => expect(allBtn).toBeEnabled());

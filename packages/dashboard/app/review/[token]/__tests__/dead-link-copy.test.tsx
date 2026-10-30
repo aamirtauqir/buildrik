@@ -52,10 +52,10 @@ describe("dead-link screens", () => {
     expect(screen.getByText("This link has expired")).toBeTruthy();
   });
 
-  it("tells a revoked link it was revoked (board 4418:121971)", () => {
+  it("tells a revoked link it was turned off (2L9 B8-R12 237:12524)", () => {
     deadLink("FORBIDDEN", "REVOKED");
     render(<ReviewClient token="t" />);
-    expect(screen.getByText("This review link was revoked")).toBeTruthy();
+    expect(screen.getByText("This review link was turned off")).toBeTruthy();
   });
 
   it("still says mistyped for a token that resolves to nothing", () => {
