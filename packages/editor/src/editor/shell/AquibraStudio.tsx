@@ -835,6 +835,8 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         pageName={previewHtml ? composer.elements.getActivePage?.()?.name : null}
         pages={previewHtml ? composer.elements.getAllPages() : undefined}
         currentPageId={previewHtml ? composer.elements.getActivePage?.()?.id : null}
+        /* J-F1.11 8:3262: the preview opens at the device being edited (A-22). */
+        initialDevice={state.device}
         /* Another page in the preview (its menu, or an internal link): the
            editor moves to that page too, so "Back to canvas" lands on what
            was being previewed (L5-051). */

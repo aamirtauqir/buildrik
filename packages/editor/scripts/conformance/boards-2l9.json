@@ -122,8 +122,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Board compared (shots/8-3262.png); built 2026-10-30 (PreviewOverlay): 'Back to editor' (was '‹ Back to canvas'), '{Page} · Draft preview', and the line 'ⓘ Fonts and colors may differ slightly until published' under the bar (the preview renders the editor's draft HTML, not the published build). Kept, off-board: the device switcher (widths printed), page menu and Share preview. Opening at the editor's current device needs the caller to pass it — PreviewOverlay takes initialDevice; AquibraStudio (founder WIP, not edited) is REQUESTS A-22. Test PreviewOverlay. | Board: 'Back to editor · Home · Draft preview · Tablet · 768px' + fidelity notice; code: '‹ Back to canvas', opens at Desktop",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 28 (A-22, owner cleared AquibraStudio): AquibraStudio passes initialDevice={state.device}, and PreviewOverlay (mounted closed) restarts at that device on every opening — test PreviewOverlay 'each opening starts at the editor's device'. The overlay's visuals were compared against shots/8-3262.png on 2026-10-30 ('Back to editor', '{Page} · Draft preview', the fidelity line); kept off-board: page menu and Share preview. Not re-shot live (needs the Next app).",
    "tier": "P1"
   },
   {

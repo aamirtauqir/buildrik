@@ -55,6 +55,13 @@ describe("PreviewOverlay", () => {
     expect(screen.getByTestId("bp-cell-tablet")).toHaveAttribute("aria-pressed", "true");
   });
 
+  it("mounted closed, each opening starts at the editor's device (A-22)", () => {
+    const { rerender } = render(<PreviewOverlay html={null} onDone={vi.fn()} initialDevice="desktop" />);
+    rerender(<PreviewOverlay html={null} onDone={vi.fn()} initialDevice="mobile" />);
+    rerender(<PreviewOverlay html="<p>x</p>" onDone={vi.fn()} initialDevice="mobile" />);
+    expect(screen.getByTestId("bp-cell-mobile")).toHaveAttribute("aria-pressed", "true");
+  });
+
   it("Escape exits", () => {
     const onDone = vi.fn();
     render(<PreviewOverlay html="<p>x</p>" onDone={onDone} />);
