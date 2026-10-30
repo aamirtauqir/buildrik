@@ -40,13 +40,13 @@ function mount(select: boolean) {
 }
 
 describe("Inspector while the site has not loaded", () => {
-  it("shows 'View only until the site loads' and disables the fields; both clear with the lock", () => {
+  it("shows 'View only — properties unlock when the site loads' and disables the fields; both clear with the lock", () => {
     const c = mount(true);
     expect(screen.queryByTestId("inspector-view-only")).toBeNull();
     expect(screen.getByRole("group", { name: "Element properties" })).not.toHaveAttribute("aria-disabled");
 
     act(() => c.setEditLock("not-loaded", true));
-    expect(screen.getByTestId("inspector-view-only").textContent).toBe("View only until the site loads");
+    expect(screen.getByTestId("inspector-view-only").textContent).toBe("View only — properties unlock when the site loads");
     expect(screen.getByRole("group", { name: "Element properties" })).toHaveAttribute("aria-disabled", "true");
     expect(screen.getByTestId("inspector-panel")).toHaveAttribute("data-readonly", "true");
 
