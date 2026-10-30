@@ -117,6 +117,36 @@ describe("ProInspector — per-element scroll memory (P-7b)", () => {
     expect(scroller.scrollTop).toBe(600);
   });
 
+  /* 2L9 S32 (258:37744): "Restored Hero heading → Style scroll position" —
+     each tab of an element keeps its own place. */
+  it("remembers a place per element AND tab", async () => {
+    const composer = makeComposer();
+    const { container, getByRole } = render(
+      <ProInspector selectedElement={el("el-1")} composer={composer as never} currentBreakpoint="desktop" />,
+      { wrapper: ToastProvider }
+    );
+    const scroller = container.querySelector(".bdi-panel-scroll") as HTMLElement;
+    Object.defineProperty(scroller, "clientHeight", { configurable: true, value: 780 });
+    await frame();
+    fireEvent.click(getByRole("tab", { name: "Style" }));
+    await frame();
+    scroller.scrollTop = 500;
+    fireEvent.scroll(scroller);
+
+    fireEvent.click(getByRole("tab", { name: "Behavior" }));
+    await frame();
+    expect(scroller.scrollTop).toBe(0);
+    scroller.scrollTop = 120;
+    fireEvent.scroll(scroller);
+
+    fireEvent.click(getByRole("tab", { name: "Style" }));
+    await frame();
+    expect(scroller.scrollTop).toBe(500);
+    fireEvent.click(getByRole("tab", { name: "Behavior" }));
+    await frame();
+    expect(scroller.scrollTop).toBe(120);
+  });
+
   it("a collapsed column (a full page is open) does not overwrite the memory", async () => {
     const composer = makeComposer();
     const view = (id: string) => (

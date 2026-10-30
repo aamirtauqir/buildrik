@@ -44,12 +44,12 @@ describe("useClipboardToasts", () => {
     await flush();
 
     expect(addToast.mock.calls.map((c) => c[0].description).sort()).toEqual([
-      "Element copied", "Element cut", "Element duplicated", "Element pasted",
+      "Element copied", "Element cut", "Element duplicated.", "Element pasted",
     ]);
   });
 
-  /* Board 5940:147595: "Section duplicated · Undo" — the copy's type, and an
-     Undo. One duplicate command clones every selected element in one burst,
+  /* 2L9 S10 (255:86840): "Hero heading duplicated. · Undo" — the original's
+     layer name (else its type), and an Undo. One duplicate command clones every selected element in one burst,
      so the burst speaks once, like paste. */
   it("names a single duplicate by its type and offers Undo; counts a burst", async () => {
     const { composer, fire } = fakeComposer();
@@ -63,7 +63,66 @@ describe("useClipboardToasts", () => {
     fire(EVENTS.ELEMENT_DUPLICATED, clone("text"));
     await flush();
 
-    expect(addToast.mock.calls.map((c) => c[0].description)).toEqual(["Section duplicated", "2 elements duplicated"]);
+    expect(addToast.mock.calls.map((c) => c[0].description)).toEqual(["Section duplicated.", "2 elements duplicated."]);
+    const first = addToast.mock.calls[0][0];
+    expect(first.action.label).toBe("Undo");
+    first.action.onClick();
+    expect((composer as unknown as { history: { undo: ReturnType<typeof vi.fn> } }).history.undo).toHaveBeenCalled();
+  });
+
+  it("names a duplicate by the original's layer name, not the copy's", async () => {
+    const { composer, fire } = fakeComposer();
+    const addToast = vi.fn();
+    renderHook(() => useClipboardToasts(composer, addToast));
+    const named = (name: string) => ({ getType: () => "heading", getCustomData: () => name });
+    fire(EVENTS.ELEMENT_DUPLICATED, { original: named("Hero heading"), clone: named("Hero heading copy") });
+    await flush();
+    expect(addToast.mock.calls[0][0].description).toBe("Hero heading duplicated.");
+  });
+
+  /* 2L9 S09 (255:86352): "Hero heading deleted. · Undo" — only the delete
+     command's transaction speaks, once, naming what the selection held. */
+  /* 2L9 G02 (271:124383): "2 styles applied · Desktop / Default · Undo". */
+  it("says how many styles a paste applied, and where", () => {
+    const { composer, fire } = fakeComposer();
+    const addToast = vi.fn();
+    renderHook(() => useClipboardToasts(composer, addToast));
+    fire(EVENTS.STYLES_PASTED, { count: 2 });
+    expect(addToast.mock.calls[0][0].description).toBe("2 styles applied · Desktop / Default");
+    expect(addToast.mock.calls[0][0].action.label).toBe("Undo");
+  });
+
+  it("says what the delete command removed, once, with Undo", () => {
+    const { composer, fire } = fakeComposer();
+    const el = (id: string, name?: string, type = "heading") => ({ getId: () => id, getType: () => type, getCustomData: () => name });
+    const hero = el("h", "Hero heading");
+    const child = el("c", undefined, "text");
+    let selected: unknown[] = [hero];
+    (composer as unknown as { selection: unknown }).selection = { getAllSelected: () => selected };
+    const addToast = vi.fn();
+    renderHook(() => useClipboardToasts(composer, addToast));
+
+    fire(EVENTS.TRANSACTION_BEGIN, { label: "delete" });
+    fire(EVENTS.ELEMENT_DELETED, child);
+    fire(EVENTS.ELEMENT_DELETED, hero);
+    fire(EVENTS.TRANSACTION_END);
+    /* Removals outside the command (sync, re-mounts) say nothing. */
+    fire(EVENTS.ELEMENT_DELETED, hero);
+    fire(EVENTS.TRANSACTION_BEGIN, { label: "paste" });
+    fire(EVENTS.ELEMENT_DELETED, hero);
+    fire(EVENTS.TRANSACTION_END);
+    /* Two at once; a locked one the command skipped is never deleted. */
+    selected = [el("a", undefined, "image"), el("b", undefined, "text"), el("l", "Locked")];
+    fire(EVENTS.TRANSACTION_BEGIN, { label: "delete" });
+    fire(EVENTS.ELEMENT_DELETED, (selected as ReturnType<typeof el>[])[0]);
+    fire(EVENTS.ELEMENT_DELETED, (selected as ReturnType<typeof el>[])[1]);
+    fire(EVENTS.TRANSACTION_END);
+    /* Rolled back: nothing was deleted. */
+    fire(EVENTS.TRANSACTION_BEGIN, { label: "delete" });
+    fire(EVENTS.ELEMENT_DELETED, (selected as ReturnType<typeof el>[])[0]);
+    fire(EVENTS.TRANSACTION_END, { rolledBack: true });
+
+    expect(addToast.mock.calls.map((c) => c[0].description)).toEqual(["Hero heading deleted.", "2 elements deleted."]);
     const first = addToast.mock.calls[0][0];
     expect(first.action.label).toBe("Undo");
     first.action.onClick();

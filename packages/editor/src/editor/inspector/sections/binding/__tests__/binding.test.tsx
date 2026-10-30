@@ -16,6 +16,10 @@ import { BindingPropertyRow } from "../BindingPropertyRow";
 import { BindingDetail } from "../BindingDetail";
 import { closeSubview, openSubview, useSubview } from "@/editor/inspector/tabs/subviewStore";
 import { CmsBindingSection } from "@/editor/inspector/sections/CmsBindingSection";
+import { ToastProvider } from "@/editor/chrome-ui";
+
+/** The unbind receipt is a toast (2L9 D11). */
+const withToasts = { wrapper: ToastProvider };
 
 const MENU = {
   id: "col-1",
@@ -32,6 +36,7 @@ const RECORDS = [
   { id: "r2", data: { name: "" }, status: "published" },
 ];
 
+const undoUnbind = vi.fn();
 function makeComposer(opts: { collections?: Array<Record<string, unknown>>; initial?: Array<Record<string, unknown>>; template?: boolean; fail?: boolean } = {}) {
   const collections = opts.collections ?? [MENU, TEAM];
   const bindings: Array<Record<string, unknown>> = [...(opts.initial ?? [])];
@@ -42,6 +47,7 @@ function makeComposer(opts: { collections?: Array<Record<string, unknown>>; init
   const page = { id: "p1", name: opts.template ? "Menu item" : "Home", slug: opts.template ? "menu-item" : "", isHome: !opts.template, root: { id: "root" } };
   const home = { id: "p0", name: "Home", slug: "", isHome: true, root: { id: "root0" } };
   return {
+    history: { captureUndo: vi.fn(() => undoUnbind) },
     on,
     off,
     emit: vi.fn(),
@@ -183,7 +189,7 @@ describe("property row · bound (B5-D04, D11, D13, D14)", () => {
 describe("binding detail (Play F2.05)", () => {
   it("‹ Back to Content · Title text binding · Source · Format As written · If empty · Preview · Open record › · Unbind — keep shown text", async () => {
     const composer = makeComposer({ initial: BOUND });
-    render(<BindingDetail composer={composer as never} elementId="e1" />);
+    render(<BindingDetail composer={composer as never} elementId="e1" />, withToasts);
     const detail = screen.getByTestId("binding-detail");
     await waitFor(() => expect(screen.getByTestId("binding-detail-preview")).toHaveTextContent("Cacio e pepe"));
     const text = detail.textContent ?? "";
@@ -194,7 +200,7 @@ describe("binding detail (Play F2.05)", () => {
 
   it("C-11: Open record names where to come back to", async () => {
     const composer = makeComposer({ initial: BOUND });
-    render(<BindingDetail composer={composer as never} elementId="e1" />);
+    render(<BindingDetail composer={composer as never} elementId="e1" />, withToasts);
     await waitFor(() => expect(screen.getByTestId("binding-open-record")).not.toBeDisabled());
     fireEvent.click(screen.getByTestId("binding-open-record"));
     expect(composer.emit).toHaveBeenCalledWith("ui:cms-open", { collectionId: "col-1", recordId: "r1", origin: "Heading · Title text binding" });
@@ -203,7 +209,7 @@ describe("binding detail (Play F2.05)", () => {
   it("If empty stores a fallback on the same binding; Unbind keeps the text and closes the detail", async () => {
     const composer = makeComposer({ initial: BOUND });
     act(() => openSubview({ kind: "binding", elementId: "e1" }));
-    render(<BindingDetail composer={composer as never} elementId="e1" />);
+    render(<BindingDetail composer={composer as never} elementId="e1" />, withToasts);
     const input = screen.getByLabelText("If empty");
     fireEvent.change(input, { target: { value: "Untitled dish" } });
     act(() => {
@@ -214,6 +220,10 @@ describe("binding detail (Play F2.05)", () => {
       fireEvent.click(screen.getByTestId("binding-unbind"));
     });
     expect(composer.cms.bindings.unbindAll).toHaveBeenCalled();
+    /* 2L9 D11: "Title is now static text · Undo", bound to the unbind step. */
+    expect(screen.getByText("Name is now static text")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Undo" }));
+    expect(undoUnbind).toHaveBeenCalled();
     function Probe() {
       return <span data-testid="open-for">{useSubview()?.elementId ?? "none"}</span>;
     }
@@ -224,12 +234,12 @@ describe("binding detail (Play F2.05)", () => {
 
 describe("Dynamic bindings summary (Play F2.16, B5-D04)", () => {
   it("draws nothing while unbound", () => {
-    const { container } = render(<CmsBindingSection elementId="e1" composer={makeComposer() as never} isOpen />);
+    const { container } = render(<CmsBindingSection elementId="e1" composer={makeComposer() as never} isOpen />, withToasts);
     expect(container.textContent).toBe("");
   });
 
   it("bound: '1 binding' and 'Title text · Menu.name ›', which opens the detail", () => {
-    render(<CmsBindingSection elementId="e1" composer={makeComposer({ initial: BOUND }) as never} isOpen />);
+    render(<CmsBindingSection elementId="e1" composer={makeComposer({ initial: BOUND }) as never} isOpen />, withToasts);
     expect(screen.getByText("Dynamic bindings")).toBeInTheDocument();
     expect(screen.getByTestId("cms-binding-count")).toHaveTextContent("1 binding");
     expect(screen.getByTestId("cms-binding-summary-row")).toHaveTextContent("Title text · Menu.name");
@@ -237,7 +247,7 @@ describe("Dynamic bindings summary (Play F2.16, B5-D04)", () => {
 
   it("a deleted source says so by name, with Reconnect… and Unbind (board 25)", () => {
     const composer = makeComposer({ initial: [{ collectionId: "col-x", collectionName: "Specials", fieldSlug: "title", property: "content" }] });
-    render(<CmsBindingSection elementId="e1" composer={composer as never} isOpen />);
+    render(<CmsBindingSection elementId="e1" composer={composer as never} isOpen />, withToasts);
     expect(screen.getByTestId("cms-source-missing")).toHaveTextContent("Source missing — Collection “Specials” was deleted.");
     expect(screen.getByTestId("cms-reconnect")).toBeInTheDocument();
     fireEvent.click(screen.getByTestId("cms-unbind"));

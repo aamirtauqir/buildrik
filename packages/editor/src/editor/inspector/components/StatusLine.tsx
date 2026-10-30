@@ -98,3 +98,45 @@ export function ViewOnlyLine({ cause }: { cause: "missing" | "forbidden" | "othe
     </div>
   );
 }
+
+/**
+ * 2L9 S02 (255:82909): the project did not load for a connection reason
+ * (`network` / `offline` — the loader's retriable kinds that are not a
+ * sign-in) — the Inspector says the saved project is safe and offers the same
+ * in-place retry the load-error banner runs (`useSiteLoadStatus().retry`).
+ * Without a published retry there is nothing honest to offer, so no button.
+ */
+export function LoadFailedCard({ retry }: { retry: (() => Promise<boolean>) | null }) {
+  const [busy, setBusy] = React.useState(false);
+  const mounted = React.useRef(true);
+  React.useEffect(
+    () => () => {
+      mounted.current = false;
+    },
+    []
+  );
+  return (
+    <div role="status" data-testid="inspector-load-failed" className="tw:flex tw:flex-col tw:gap-2 tw:px-3 tw:py-3">
+      <p className="tw:m-0 tw:mb-2 tw:text-[13px] tw:font-semibold tw:leading-4 tw:text-[var(--bk-ink)]">Project could not load</p>
+      <p className="tw:m-0 tw:text-[12px] tw:font-normal tw:leading-4 tw:text-[var(--bk-ink-muted)]">
+        Check your connection, then retry. Your saved project has not been replaced.
+      </p>
+      {retry ? (
+        <Button
+          size="xs"
+          className="tw:h-8 tw:w-full tw:justify-center tw:text-[13px] tw:font-normal tw:focus:ring-0"
+          data-testid="inspector-load-retry"
+          disabled={busy}
+          onClick={() => {
+            setBusy(true);
+            void retry().finally(() => {
+              if (mounted.current) setBusy(false);
+            });
+          }}
+        >
+          Retry loading
+        </Button>
+      ) : null}
+    </div>
+  );
+}

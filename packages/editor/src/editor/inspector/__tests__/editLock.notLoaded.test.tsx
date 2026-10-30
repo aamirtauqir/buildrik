@@ -7,8 +7,8 @@
  *
  * @license BSD-3-Clause
  */
-import { describe, it, expect, beforeAll, afterAll, afterEach } from "vitest";
-import { act, cleanup, render, screen } from "@testing-library/react";
+import { describe, it, expect, beforeAll, afterAll, afterEach, vi } from "vitest";
+import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { ToastProvider } from "@/editor/chrome-ui";
 import { createTestComposer, installEngineBrowserStubs, removeEngineBrowserStubs } from "@/engine/__tests__/test-utils/realComposer";
 import { setSiteLoadStatus } from "@/editor/shell/siteLoadStatus";
@@ -73,6 +73,29 @@ describe("Inspector while the site has not loaded", () => {
       }),
     );
     expect(screen.getByTestId("inspector-view-only").textContent).toBe("View only · your role changed");
+  });
+
+  /* 2L9 S02 (255:82909): a connection failure — the saved project is safe,
+     and Retry loading runs the loader's own in-place retry. */
+  it("a connection failure says the saved project is safe and retries the load in place", async () => {
+    const c = mount(true);
+    const retry = vi.fn(() => Promise.resolve(false));
+    act(() => {
+      c.setEditLock("not-loaded", true);
+      setSiteLoadStatus({ failure: { kind: "network", status: null, code: null, requestId: null, url: null }, retry });
+    });
+    const card = screen.getByTestId("inspector-load-failed");
+    expect(card).toHaveTextContent("Project could not load");
+    expect(card).toHaveTextContent("Check your connection, then retry. Your saved project has not been replaced.");
+    expect(screen.queryByTestId("inspector-view-only")).toBeNull();
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Retry loading" }));
+    });
+    expect(retry).toHaveBeenCalledTimes(1);
+    /* No published retry: nothing to offer. */
+    act(() => setSiteLoadStatus({ failure: { kind: "offline", status: null, code: null, requestId: null, url: null }, retry: null }));
+    expect(screen.getByTestId("inspector-load-failed")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Retry loading" })).toBeNull();
   });
 
   it("view mode alone is read-only without the not-loaded line", () => {

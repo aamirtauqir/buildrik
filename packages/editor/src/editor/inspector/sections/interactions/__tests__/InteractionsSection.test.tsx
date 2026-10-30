@@ -144,19 +144,20 @@ describe("InteractionsSection", () => {
   });
 
   it("shows an interaction the moment the element takes it (live defect: it appeared only after a re-mount)", () => {
-    const handlers = new Map<string, (el: unknown) => void>();
+    /* Every listener of an event hears it, as on the real composer. */
+    const handlers = new Map<string, Set<(el: unknown) => void>>();
     let stored: Interaction[] = [];
     const element = { id: "el-1", getInteractions: () => stored };
     const composer = {
-      on: (e: string, h: (el: unknown) => void) => handlers.set(e, h),
-      off: (e: string) => handlers.delete(e),
+      on: (e: string, h: (el: unknown) => void) => (handlers.get(e) ?? handlers.set(e, new Set()).get(e)!).add(h),
+      off: (e: string, h: (el: unknown) => void) => handlers.get(e)?.delete(h),
       elements: { getElement: () => element },
     };
     renderOpen({
       interactions: [],
       onInteractionsChange: (next) => {
         stored = next;
-        handlers.get(EVENTS.ELEMENT_UPDATED)?.(element);
+        handlers.get(EVENTS.ELEMENT_UPDATED)?.forEach((h) => h(element));
       },
       composer: composer as never,
       elementId: "el-1",

@@ -90,7 +90,9 @@ export interface CmsBindingState {
   bind: (collectionId: string, fieldSlug: string) => void;
   setRecord: (itemId: string) => void;
   setFallback: (fallback: string) => void;
-  unbind: () => void;
+  /** Unbind, keeping the value on screen. Returns the receipt (2L9 D11:
+   *  "Title is now static text"), or null when nothing was unbound. */
+  unbind: () => string | null;
   retry: () => void;
 }
 
@@ -248,8 +250,10 @@ export function useCmsBinding(composer: Composer | null | undefined, elementId: 
     setRecord: (itemId) => rebind(itemId || undefined, binding?.fallback, "Choose record"),
     setFallback: (fallback) => rebind(binding?.itemId, fallback.trim() || undefined, "Set fallback"),
     unbind: () => {
-      if (!composer || !binding || !writable()) return;
-      composer.cms.bindings.unbindAll(elementId, `Unbind ${field?.name ?? binding.fieldSlug}`);
+      if (!composer || !binding || !writable()) return null;
+      const name = field?.name ?? binding.fieldSlug;
+      composer.cms.bindings.unbindAll(elementId, `Unbind ${name}`);
+      return `${name} is now static text`;
     },
     retry: () => setAttempt((n) => n + 1),
   };

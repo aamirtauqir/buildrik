@@ -430,7 +430,7 @@
   background-color: transparent;
 }
 .bdi-sec[data-readonly="locked"] > .bdi-sec-body :is(.bdi-fld, .bdi-ddn, .bdi-fill, .bdi-seg, .bdi-text, .bdi-pad, [data-testid="inspector-spacing-box"]),
-.bdi-sec[data-readonly="locked"] > .bdi-sec-body :is(button, select, input, textarea):not(.bdi-lb, .bdi-lb *, .bdi-adv, :is(.bdi-fld, .bdi-ddn, .bdi-fill, .bdi-seg, .bdi-pad, [data-testid="inspector-spacing-box"]) *) {
+.bdi-sec[data-readonly="locked"] > .bdi-sec-body :is(button, select, input, textarea):not(.bdi-lb, .bdi-lb *, .bdi-adv, .bdi-unlock, :is(.bdi-fld, .bdi-ddn, .bdi-fill, .bdi-seg, .bdi-pad, [data-testid="inspector-spacing-box"]) *) {
   opacity: 0.45;
 }
 

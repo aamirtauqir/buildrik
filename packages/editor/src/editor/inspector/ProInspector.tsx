@@ -43,8 +43,9 @@ import { MultiSelectBar } from "./components/MultiSelectBar";
 import { PagePanel } from "./components/PagePanel";
 import { ThemeToggleInspector } from "./components/ThemeToggleInspector";
 import { THEME_TOGGLE_ATTR } from "@/engine/export/themeToggleRuntime";
-import { StatusLine, ViewOnlyLine } from "./components/StatusLine";
+import { LoadFailedCard, StatusLine, ViewOnlyLine } from "./components/StatusLine";
 import { DimmedNotice } from "./components/DimmedNotice";
+import { LockRefusalNote, useLockRefusal, useWatchPasteRefusal } from "./components/LockRefusal";
 import { useEditLocks } from "../shared/useEditLocks";
 import { useSiteLoadStatus } from "../shell/siteLoadStatus";
 import { StatusMarks } from "./components/StatusMarks";
@@ -253,9 +254,13 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
      fields say so instead of taking input that goes nowhere. */
   const editLocks = useEditLocks(composer);
   const notLoaded = editLocks.includes("not-loaded");
-  const loadFailure = useSiteLoadStatus().failure;
+  const { failure: loadFailure, retry: loadRetry } = useSiteLoadStatus();
   const readOnly = locked || conflict.pending || editLocks.length > 0;
   const { addToast } = useToast();
+  useWatchPasteRefusal(composer);
+  /* 2L9 G04 / G22: the refusal card carries the lock and its Unlock. */
+  const pasteRefused = useLockRefusal(composer, selectedElement?.id ?? "", "paste-style");
+  const addRefused = useLockRefusal(composer, selectedElement?.id ?? "", "add-interaction");
   const fieldContext = React.useMemo<InspectorFieldContextValue>(
     () => ({
       readOnly,
@@ -282,29 +287,31 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     [readOnly, conflict.pending, locked, notLoaded, editLocks, mixedKeys, fieldOverrides, runDiscrete, composer, addToast]
   );
 
-  /* Scroll persistence per element (P-7b). The scroll listener is the only
-     writer: it records the element whose body is on screen, bound in a
-     LAYOUT effect so it is detached before the next element's body renders
+  /* Scroll persistence per element AND tab (P-7b; 2L9 S32 258:37744:
+     "Restored Hero heading → Style scroll position"). The scroll listener is
+     the only writer: it records the element and tab whose body is on screen,
+     bound in a LAYOUT effect so it is detached before the next body renders
      into the same container. A hidden column (full page: 0×0) is not a
      position. */
+  const scrollKey = selectedElement?.id ? `${selectedElement.id}\u0000${activeTab}` : null;
   React.useLayoutEffect(() => {
     const container = contentRef.current;
-    if (!container || !selectedElement?.id) return;
-    const id = selectedElement.id;
+    if (!container || !scrollKey) return;
+    const id = scrollKey;
     const handleScroll = () => {
       if (container.clientHeight === 0) return;
       scrollPositionsRef.current.set(id, container.scrollTop);
     };
     container.addEventListener("scroll", handleScroll, { passive: true });
     return () => container.removeEventListener("scroll", handleScroll);
-  }, [selectedElement?.id]);
+  }, [scrollKey]);
 
   /* The restore: re-applied as the body grows, until it holds, the user takes
      the wheel, or a second has passed. */
   React.useEffect(() => {
     const container = contentRef.current;
-    if (!selectedElement?.id || !container) return;
-    const target = scrollPositionsRef.current.get(selectedElement.id) ?? 0;
+    if (!scrollKey || !container) return;
+    const target = scrollPositionsRef.current.get(scrollKey) ?? 0;
     let settled = false;
     const apply = () => {
       if (settled) return;
@@ -330,7 +337,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
       container.removeEventListener("pointerdown", settle);
       container.removeEventListener("keydown", settle);
     };
-  }, [selectedElement?.id]);
+  }, [scrollKey]);
 
   /* G2-146 — ⌘K "Jump to property" rows + the reveal behind them, the canvas
      menu's "Add interaction" and the header's binding chip. */
@@ -389,8 +396,12 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
 
   /* Above whatever the column shows — the page panel or an element — once the
      load has given up rather than while it is still on its way. */
+  /* 2L9 S02: a connection failure is the tab body (or tops the page panel). */
+  const connectionFailure = notLoaded && !projectLoading && (loadFailure?.kind === "network" || loadFailure?.kind === "offline");
   const viewOnly =
-    notLoaded && !projectLoading ? (
+    connectionFailure && !selectedElement ? (
+      <LoadFailedCard retry={loadRetry} />
+    ) : notLoaded && !projectLoading && !connectionFailure ? (
       <ViewOnlyLine
         cause={loadFailure?.kind === "missing" ? "missing" : loadFailure?.kind === "forbidden" ? "forbidden" : "other"}
       />
@@ -440,7 +451,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
         {targetIds.length > 1 ? null : (
           <StatusMarks composer={composer} elementId={selectedElement.id} binding={binding} locked={locked} />
         )}
-        <StatusLine composer={composer} elementId={selectedElement.id} locked={locked} conflict={conflict} />
+        <StatusLine composer={composer} elementId={selectedElement.id} locked={locked && !pasteRefused && !addRefused} conflict={conflict} />
         {targetIds.length > 1 ? <MultiSelectBar composer={composer} selectedIds={targetIds} /> : null}
         {/* 2L9 IC01: an instance's identity block sits above the tabs. */}
         {targetIds.length <= 1 && composer?.components?.getInstanceByElementId?.(selectedElement.id) ? (
@@ -493,6 +504,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
                 aria-label="Element properties"
                 aria-disabled={editLocks.length > 0 || undefined}
               >
+                {targetIds.length <= 1 ? <LockRefusalNote composer={composer} elementId={selectedElement.id} kind="paste-style" /> : null}
                 {/* 2L9 147:78900: dimmed in the editor only — said above every tab's body. */}
                 {targetIds.length <= 1 ? (
                   <DimmedNotice
@@ -504,33 +516,37 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
                     }}
                   />
                 ) : null}
-                <InspectorErrorBoundary
-                  targetName={
-                    getLayerName(composer?.elements.getElement(selectedElement.id)) ?? elementTypeLabel(selectedElement.type)
-                  }
-                >
-                  <InspectorTabContent
-                    tabId={activeTab}
-                    breakpoint={currentBreakpoint}
-                    pseudoState={currentPseudoState}
-                    composer={composer}
-                    selectedElement={selectedElement}
-                    selectedIds={targetIds}
-                    selectedTypes={selectedTypes}
-                    styles={styles_state}
-                    authoredStyles={authoredStyles}
-                    onChange={handleStyleChange}
-                    onBatchChange={handleBatchStyleChange}
-                    cssContext={enrichedContext}
-                    propertyStates={propertyStates}
-                    choices={choices}
-                    onSetChoices={setChoices}
-                    advancedState={advancedState}
-                    onOpenMediaLibrary={onOpenMediaLibrary}
-                    onOpenIconPicker={onOpenIconPicker}
-                    onOpenCreateCollection={onOpenCreateCollection}
-                  />
-                </InspectorErrorBoundary>
+                {connectionFailure ? (
+                  <LoadFailedCard retry={loadRetry} />
+                ) : (
+                  <InspectorErrorBoundary
+                    targetName={
+                      getLayerName(composer?.elements.getElement(selectedElement.id)) ?? elementTypeLabel(selectedElement.type)
+                    }
+                  >
+                    <InspectorTabContent
+                      tabId={activeTab}
+                      breakpoint={currentBreakpoint}
+                      pseudoState={currentPseudoState}
+                      composer={composer}
+                      selectedElement={selectedElement}
+                      selectedIds={targetIds}
+                      selectedTypes={selectedTypes}
+                      styles={styles_state}
+                      authoredStyles={authoredStyles}
+                      onChange={handleStyleChange}
+                      onBatchChange={handleBatchStyleChange}
+                      cssContext={enrichedContext}
+                      propertyStates={propertyStates}
+                      choices={choices}
+                      onSetChoices={setChoices}
+                      advancedState={advancedState}
+                      onOpenMediaLibrary={onOpenMediaLibrary}
+                      onOpenIconPicker={onOpenIconPicker}
+                      onOpenCreateCollection={onOpenCreateCollection}
+                    />
+                  </InspectorErrorBoundary>
+                )}
               </div>
             </div>
           </>
