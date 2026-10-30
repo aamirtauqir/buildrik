@@ -153,6 +153,15 @@ describe("applyStyleToPeers", () => {
     expect(applyStyleToPeers(c, src, [peer], { breakpoint: "desktop", pseudo: "normal" })).toBe(0);
   });
 
+  it("copies a hover rule under the selector the inspector writes and reads", () => {
+    const src = add("button");
+    const peer = add("button");
+    const key = (id: string) => `[data-buildrick-id="${id}"]`;
+    c.styles.setRule(key(src.getId()), { color: "#ffffff" }, { pseudo: ":hover" });
+    expect(applyStyleToPeers(c, src, [peer], { breakpoint: "desktop", pseudo: "hover" })).toBe(1);
+    expect(c.styles.getRule(`${key(peer.getId())}:hover`)?.properties.color).toBe("#ffffff");
+  });
+
   it("does nothing when the source has no style here", () => {
     const src = add("button");
     const peer = add("button");
