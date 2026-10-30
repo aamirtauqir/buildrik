@@ -35,6 +35,9 @@ const CONTENT_ORDER: readonly SectionId[] = [
   "table-structure",
   "table-accessibility",
   "table-cell",
+  /* B69: a container's direct children, after its own defining block. */
+  "children",
+  "commerce",
   "semantics",
   /* B-11: Conditions sit above Advanced attributes (2L9 B4-D04). */
   "conditions",

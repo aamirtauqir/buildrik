@@ -93,6 +93,7 @@ export function validationRows(type: string): readonly { attr: string; label: st
     return [
       { attr: "min", label: "Min" },
       { attr: "max", label: "Max" },
+      { attr: "step", label: "Step" },
     ];
   }
   return [];

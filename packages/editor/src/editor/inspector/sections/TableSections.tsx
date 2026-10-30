@@ -156,7 +156,7 @@ export const TableStructureSection: React.FC<TableSectionProps> = ({ composer, e
         </NoteRow>
         <div className="tw:flex tw:flex-col tw:gap-2">
           <Button color="light" size="xs" className={WIDE_BUTTON} disabled>
-            Add blank row
+            Add column
           </Button>
           <Button size="xs" className={`${WIDE_BUTTON} tw:text-white!`} onClick={() => select("table-cell")} data-testid="table-edit-spanning">
             Edit {spanning.name} content
@@ -170,6 +170,21 @@ export const TableStructureSection: React.FC<TableSectionProps> = ({ composer, e
     );
   }
 
+  /* C13 / C16: a blank column — every row gets a copy of its last cell's tag
+     and appearance, no content, in one transaction. */
+  const addBlankColumn = () => {
+    const rows = table.getDescendants().filter((d) => tag(d) === "tr");
+    if (rows.length === 0) return;
+    writeElement(composer, table, "table-add-column", () => {
+      for (const row of rows) {
+        const last = row.getChildren().filter((c) => isCellTag(c)).pop();
+        if (!last) continue;
+        const blank = composer.elements.createElement("container", { tagName: tag(last), styles: { ...last.getStyles() } });
+        composer.elements.addElement(blank, row.getId());
+      }
+    });
+  };
+
   const header = parts.headerCells[0] ? textOf(parts.headerCells[0]) : "";
   return (
     <Section title="Structure" isOpen={isOpen} onToggle={onToggle} tier={tier} id="inspector-section-table-structure">
@@ -178,6 +193,9 @@ export const TableStructureSection: React.FC<TableSectionProps> = ({ composer, e
       <div className="tw:flex tw:flex-col tw:gap-2 tw:pt-1">
         <Button color="light" size="xs" className={WIDE_BUTTON} disabled={!parts.tbody || parts.bodyRows.length === 0} onClick={addBlankRow}>
           Add blank row
+        </Button>
+        <Button color="light" size="xs" className={WIDE_BUTTON} disabled={parts.columns === 0} onClick={addBlankColumn}>
+          Add column
         </Button>
         {parts.firstCell ? (
           <Button color="light" size="xs" className={WIDE_BUTTON} onClick={() => composer.selection.select(parts.firstCell!)}>

@@ -67,8 +67,8 @@ const TAG_NAMES: Readonly<Record<string, string>> = {
   footer: "Footer",
   main: "Main",
   nav: "Navigation",
-  ul: "List",
-  ol: "Numbered list",
+  ul: "Unordered · ul",
+  ol: "Ordered · ol",
   li: "List item",
   figure: "Figure",
   blockquote: "Quote",
@@ -97,6 +97,8 @@ const choose = (id: string, label: string, values: readonly string[]): PropertyC
 const NATIVE_ATTRS: Readonly<Record<string, readonly PropertyConfig[]>> = {
   /* Text and phrasing */
   time: [text("datetime", "datetime", "2026-10-21"), text("lang", "lang", "en")],
+  /* B69/01: a paragraph's language ("Inherited" until set). */
+  p: [text("lang", "Language", "Inherited")],
   abbr: [text("title", "Expansion")],
   dfn: [text("title", "Term")],
   q: [text("cite", "cite", "https://")],
@@ -156,6 +158,8 @@ const TAG_CHOICES: Readonly<Record<string, readonly string[]>> = {
   heading: ["h1", "h2", "h3", "h4", "h5", "h6"],
   text: ["p", "span", "div", "blockquote"],
   paragraph: ["p", "span", "div", "blockquote"],
+  /* B69/02: List type — unordered or ordered, the same items. */
+  list: ["ul", "ol"],
 };
 
 /** 2L9 161:8480 / 247:26594: Tag is a select ("Paragraph", "h2"), written

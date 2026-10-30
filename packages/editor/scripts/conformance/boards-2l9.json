@@ -5405,7 +5405,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-fixed",
-   "verifiedNote": "L-B round 24: the Table block holds real colspan / rowspan (Table cell section, C14, writes them), so this is built. Probe ?block=table with body cell B2 at colspan=2, table selected, side by side with shots/245-44573.png: 'Complex table preserved', 'B2 spans 2 columns. Rectangular row and column commands are unavailable for this structure.', the row command disabled, primary 'Edit B2 content' (selects that cell, Table cell section), 'Inspect native attributes', 'No flattening or normalization on selection. Existing spans, IDs, header associations and nested content remain.' Match, except the disabled command reads 'Add blank row' — the only structural command the table has (no Add column exists to disable).",
+   "verifiedNote": "L-B round 24: the Table block holds real colspan / rowspan (Table cell section, C14, writes them), so this is built. Probe ?block=table with body cell B2 at colspan=2, table selected, side by side with shots/245-44573.png: 'Complex table preserved', 'B2 spans 2 columns. Rectangular row and column commands are unavailable for this structure.', the row command disabled, primary 'Edit B2 content' (selects that cell, Table cell section), 'Inspect native attributes', 'No flattening or normalization on selection. Existing spans, IDs, header associations and nested content remain.' Match: the Table block now has 'Add column' (every row gets a blank copy of its last cell, one Undo), and that is the command the complex state disables, as the board draws.",
    "tier": "P1"
   },
   {
@@ -5679,8 +5679,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Per-type bodies exist in Style type block; board homes them under Content (Tag, Children, Source, Alt…)",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 25, reference board compared type by type: probe ?block=<id> for every block on the board, the Content and Behavior tabs dumped (scratch b69.mjs) and read against the board's 'editing homes'. Container: Children (new: count, each direct child opens itself, Open Add when mixed/empty) + Semantics Tag. Text / Heading / Paragraph: the text block (Edit text on canvas, the bind control on its row), Semantics Tag/Level/ID, Paragraph Language (new, lang). Button: Text, Type, Disabled. Link: Text on Content; Destination / Target / Rel on Behavior. Match on homes; 'Native structure' / 'Safe editing' are the board's reference annotations, not panel rows.",
    "tier": "P1"
   },
   {
@@ -5690,8 +5690,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Per-type bodies exist in Style type block; board homes them under Content (Tag, Children, Source, Alt…)",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 25, reference board compared type by type: probe ?block=<id> for every block on the board, the Content and Behavior tabs dumped (scratch b69.mjs) and read against the board's 'editing homes'. List: List type ul/ol (new, Semantics Tag, same items), Children with 'Add blank list item' (one Undo). Divider: thickness/colour on Style, void note on Semantics. Row / Column: Children; direction / gap on Style. Spacer: Style only, no fake text control. Theme toggle: its own body (Site preference, Open Brand). Match.",
    "tier": "P1"
   },
   {
@@ -5702,7 +5702,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Per-type bodies exist in Style type block; board homes them under Content (Tag, Children, Source, Alt…)",
+   "verifiedNote": "L-B round 25, reference board compared type by type: probe ?block=<id> for every block on the board, the Content and Behavior tabs dumped (scratch b69.mjs) and read against the board's 'editing homes'. Image (Source, Alt, Loading, Decoding; Fit on Style), Video (+ Preload, new), Audio match; Icon gained 'Accessible name' (aria-label). Open: SVG's Representation / ViewBox / Role / Labelled by as one block (today Source + Semantics native attrs + the S34 replace review), Lottie's Status and Replacement rows.",
    "tier": "P1"
   },
   {
@@ -5713,7 +5713,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Per-type bodies exist in Style type block; board homes them under Content (Tag, Children, Source, Alt…)",
+   "verifiedNote": "L-B round 25, reference board compared type by type: probe ?block=<id> for every block on the board, the Content and Behavior tabs dumped (scratch b69.mjs) and read against the board's 'editing homes'. Section (Tag, ID, Children), 2 / 3 Columns (Children + 'Add blank column', Gap on Style), Video embed (URL, Ratio, Autoplay/Muted/Controls), Map embed (Location) match on homes. Open: Image gallery's image list (Exact image + Back, Choose asset, Move) is the generic Children list; Columns 'Reduce count · Review populated content' not built; Map URL status line.",
    "tier": "P1"
   },
   {
@@ -5724,7 +5724,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Per-type bodies exist in Style type block; board homes them under Content (Tag, Children, Source, Alt…)",
+   "verifiedNote": "L-B round 25, reference board compared type by type: probe ?block=<id> for every block on the board, the Content and Behavior tabs dumped (scratch b69.mjs) and read against the board's 'editing homes'. Collection list, Form (Fields, reorder, Delivery → Behavior form settings), Input, Textarea (+ Columns, new) match. Open: Grid tracks / rows / flow (A02 — Columns count only).",
    "tier": "P1"
   },
   {
@@ -5734,8 +5734,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Per-type bodies exist in Style type block; board homes them under Content (Tag, Children, Source, Alt…)",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 25, reference board compared type by type: probe ?block=<id> for every block on the board, the Content and Behavior tabs dumped (scratch b69.mjs) and read against the board's 'editing homes'. Select (options, default — F31), Checkbox / Radio (+ Submission value, new), File (+ Accept, Multiple, 'A file field cannot be prefilled.' replacing Default value and Placeholder — new), Date / Time (Default; Min / Max / Step under Validation, Step new). Match on homes.",
    "tier": "P1"
   },
   {
@@ -5745,8 +5745,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Per-type bodies exist in Style type block; board homes them under Content (Tag, Children, Source, Alt…)",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 25, reference board compared type by type: probe ?block=<id> for every block on the board, the Content and Behavior tabs dumped (scratch b69.mjs) and read against the board's 'editing homes'. Email, Password (legacy warning + Change type), Number / Range (Default; Min / Max / Step in Validation), Color (Default), Label (Edit text on canvas; For under Semantics native attributes). Match on homes.",
    "tier": "P1"
   },
   {
@@ -5756,8 +5756,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Per-type bodies exist in Style type block; board homes them under Content (Tag, Children, Source, Alt…)",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 25, reference board compared type by type: probe ?block=<id> for every block on the board, the Content and Behavior tabs dumped (scratch b69.mjs) and read against the board's 'editing homes'. Submit (Text, Type, Disabled). Hero / Features / Menu grid / Testimonials / CTA: their exact children open from Children ('{name} · {tag}'), uniform items add a blank copy. Match on homes; the board's per-part labels ('Edit heading child') are the generic child list's names.",
    "tier": "P1"
   },
   {
@@ -5767,8 +5767,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Per-type bodies exist in Style type block; board homes them under Content (Tag, Children, Source, Alt…)",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 25, reference board compared type by type: probe ?block=<id> for every block on the board, the Content and Behavior tabs dumped (scratch b69.mjs) and read against the board's 'editing homes'. Contact / Footer / Navbar / Card / Testimonials: Children (exact child per row); Footer / Navbar Tag in Semantics; Slider: Slides list + Add slide, Playback on Behavior. Match on homes.",
    "tier": "P1"
   },
   {
@@ -5778,8 +5778,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Per-type bodies exist in Style type block; board homes them under Content (Tag, Children, Source, Alt…)",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 25, reference board compared type by type: probe ?block=<id> for every block on the board, the Content and Behavior tabs dumped (scratch b69.mjs) and read against the board's 'editing homes'. Pricing (Children), Progress (Value / Maximum / label), Countdown (Ends at, time basis note, When done, Message), Accordion (items, initial open, several open), Social icons (Children + 'Add blank link'), Contact form (Fields; Behavior form settings). Match on homes.",
    "tier": "P1"
   },
   {
@@ -5789,8 +5789,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Switch/Toggle bodies exist; Tabs/Modal/Dialog/Table relationship controls missing",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 25, reference board compared type by type: probe ?block=<id> for every block on the board, the Content and Behavior tabs dumped (scratch b69.mjs) and read against the board's 'editing homes'. Stack (Style), Switch (Caption, Name, Submission value — new, Checked, Required), Tabs (C01–C06), Modal (C07–C18), Table (Structure, Cell, wrapper — C13–C16), Product card (Existing content note). Match on homes.",
    "tier": "P1"
   },
   {
@@ -5800,8 +5800,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "product types have no type body (src/shared/constants/elementCapabilities.ts:21)",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 25, reference board compared type by type: probe ?block=<id> for every block on the board, the Content and Behavior tabs dumped (scratch b69.mjs) and read against the board's 'editing homes'. Product grid / Product detail: Children + new 'Existing content' section — 'Edit existing text and media through Canvas or Layers. Saved product attributes are preserved.' · 'Commerce editing is planned.' Cart button is a Button (Text, Type) with its saved marker untouched. Match on homes.",
    "tier": "P1"
   },
   {

@@ -71,7 +71,10 @@ const TYPE_OPTIONS = [
 
 /** Rows a type has beyond the board's set (no board draws them; kept). */
 const EXTRA_ROWS: Record<string, readonly PropertyConfig[]> = {
-  textarea: [{ id: "rows", label: "Rows", type: "text", placeholder: "4" }],
+  textarea: [
+    { id: "rows", label: "Rows", type: "text", placeholder: "4" },
+    { id: "cols", label: "Columns", type: "text", placeholder: "Not set" },
+  ],
   select: [{ id: "options", label: "Options (one per line)", type: "textarea", placeholder: "Option 1\nOption 2" }],
 };
 
@@ -266,7 +269,7 @@ export const FieldBody: React.FC<TypeBlockBodyProps> = (props) => {
           </Button>
         </div>
       ) : null}
-      {tag !== "select" ? (
+      {tag !== "select" && type !== "file" ? (
         <CommitRow label="Placeholder" value={field.getAttribute("placeholder") ?? ""} onCommit={(v) => setAttr("placeholder", v)} testId="form-field-placeholder" />
       ) : null}
       <CommitRow
@@ -302,7 +305,27 @@ export const FieldBody: React.FC<TypeBlockBodyProps> = (props) => {
         }
         testId="form-field-required"
       />
-      {tag !== "select" && !props.justAdded ? <CommitRow label="Default value" value={defaultValue} onCommit={setDefault} testId="form-field-default" /> : null}
+      {/* B69/06: a file field cannot be prefilled — the browser forbids it —
+          so it takes what files it accepts, and whether several. */}
+      {type === "file" ? (
+        <>
+          <CommitRow label="Accept" value={field.getAttribute("accept") ?? ""} onCommit={(v) => setAttr("accept", v)} placeholder=".pdf,.png,.jpg" testId="form-field-accept" />
+          <CheckRow
+            label="Multiple"
+            checked={isAttrOn(field.getAttribute("multiple"))}
+            onChange={(on) =>
+              write("field-multiple", () => {
+                if (on) field.setAttribute("multiple", "");
+                else field.removeAttribute("multiple");
+              })
+            }
+            testId="form-field-multiple"
+          />
+          <NoteRow testId="form-field-no-prefill">A file field cannot be prefilled.</NoteRow>
+        </>
+      ) : tag !== "select" && !props.justAdded ? (
+        <CommitRow label="Default value" value={defaultValue} onCommit={setDefault} testId="form-field-default" />
+      ) : null}
       {tag === "select" && options.length ? (
         <>
           <SelectRow
