@@ -10,6 +10,7 @@ import { describe, it, expect, beforeAll, afterAll, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { createTestComposer, installEngineBrowserStubs, removeEngineBrowserStubs } from "@/engine/__tests__/test-utils/realComposer";
 import { StatusLine } from "../StatusLine";
+import { EVENTS } from "@/shared/constants/events";
 
 beforeAll(installEngineBrowserStubs);
 afterAll(removeEngineBrowserStubs);
@@ -39,6 +40,37 @@ describe("StatusLine", () => {
     c.history.flushPending();
     c.history.undo();
     expect(c.elements.getElement(el.getId())!.isLocked()).toBe(true);
+  });
+
+  it("147:77668: an ancestor's lock names it and shows it in Layers (it is unlocked there)", () => {
+    const c = createTestComposer();
+    const root = c.elements.createPage("Home").root.id;
+    const s = c.elements.createElement("section");
+    c.elements.addElement(s, root);
+    const h = c.elements.createElement("heading");
+    c.elements.addElement(h, s.getId());
+    const section = c.elements.getElement(s.getId())!;
+    section.setLocked(true);
+    const tab = vi.fn();
+    c.on(EVENTS.UI_SWITCH_TAB, tab);
+    render(<StatusLine composer={c} elementId={h.getId()} locked conflict={idle} />);
+    expect(screen.getByTestId("inspector-locked-by")).toHaveTextContent("Locked by Section");
+    expect(screen.queryByTestId("inspector-unlock")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Show Section in Layers" }));
+    expect(c.selection.getSelected()?.getId()).toBe(section.getId());
+    expect(tab).toHaveBeenCalledWith({ tab: "layers" });
+    expect(section.isLocked()).toBe(true);
+  });
+
+  it("147:78110: a lock on an element with children says it covers them", () => {
+    const c = createTestComposer();
+    const root = c.elements.createPage("Home").root.id;
+    const s = c.elements.createElement("section");
+    c.elements.addElement(s, root);
+    c.elements.addElement(c.elements.createElement("heading"), s.getId());
+    c.elements.getElement(s.getId())!.setLocked(true);
+    render(<StatusLine composer={c} elementId={s.getId()} locked conflict={idle} />);
+    expect(screen.getByTestId("inspector-status-line")).toHaveTextContent("This section and its descendants are locked.");
   });
 
   it("a pending save conflict wins, and Resolve reopens its dialog", () => {

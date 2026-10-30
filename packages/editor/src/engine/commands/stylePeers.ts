@@ -28,7 +28,7 @@ import type { Element } from "../elements/Element";
 import { getBreakpointQuery } from "@/shared/constants/breakpoints";
 import type { BreakpointId } from "@/shared/types/breakpoints";
 import type { PseudoStateId } from "@/shared/types";
-import { writableElements } from "./commandOperations";
+import { lockOwner, writableElements } from "./commandOperations";
 
 export interface StylePeers {
   peers: Element[];
@@ -54,7 +54,7 @@ export function findStylePeers(composer: Composer, source: Element): StylePeers 
   if (!root) return out;
   for (const el of root.getDescendants()) {
     if (el.getId() === source.getId() || !sameKind(el, source)) continue;
-    if (el.isLocked()) out.skippedLocked += 1;
+    if (lockOwner(el)) out.skippedLocked += 1;
     else if (inInstance(el)) out.skippedInInstance += 1;
     else out.peers.push(el);
   }

@@ -3260,8 +3260,14 @@ const CASES: Record<string, () => React.ReactElement> = {
     function Host() {
       const { selectedElement } = useComposerSelection({ composer: c });
       React.useEffect(() => {
-        const h = c.elements.getElement("lx-heading");
-        if (h) c.selection.select(h);
+        /* `&lock=lx-section&select=lx-heading` — an inherited lock (147:77668). */
+        const q = new URLSearchParams(location.search);
+        const lock = q.get("lock");
+        if (lock) c.elements.getElement(lock)?.setLocked(true);
+        /* `&select=a,b,c` — a multi-selection (B04's Align and distribute). */
+        const picked = (q.get("select") ?? "lx-heading").split(",").map((id) => c.elements.getElement(id)).filter((e): e is NonNullable<typeof e> => Boolean(e));
+        if (picked.length > 1) c.selection.selectMultiple(picked);
+        else if (picked[0]) c.selection.select(picked[0]);
       }, []);
       const sel = selectedElement;
       return sel ? <ProInspector composer={c} selectedElement={{ id: sel.getId(), type: sel.getType(), tagName: sel.getTagName() }} /> : null;

@@ -68,6 +68,10 @@ export function DynamicPagesPane({ composer, collection, records, onOpenPage, on
   const [seoDescription, setSeoDescription] = React.useState(collection.pageSeoDescription ?? "");
   React.useEffect(() => setSeoTitle(collection.pageSeoTitle ?? ""), [collection.pageSeoTitle]);
   React.useEffect(() => setSeoDescription(collection.pageSeoDescription ?? ""), [collection.pageSeoDescription]);
+  /* A-27 (165:3693 "Social image"): the image field each page's og:image comes from. */
+  const [socialImage, setSocialImage] = React.useState(collection.pageSocialImage ?? "");
+  React.useEffect(() => setSocialImage(collection.pageSocialImage ?? ""), [collection.pageSocialImage]);
+  const imageFields = collection.fields.filter((f) => f.type === "image");
   const [saving, setSaving] = React.useState(false);
   React.useEffect(() => setPattern(collection.pageSlugPattern ?? ""), [collection.pageSlugPattern]);
   React.useEffect(() => setTemplate(collection.pageTemplatePath ?? ""), [collection.pageTemplatePath]);
@@ -115,7 +119,8 @@ export function DynamicPagesPane({ composer, collection, records, onOpenPage, on
     trimmed !== (collection.pageSlugPattern ?? "") ||
     template !== (collection.pageTemplatePath ?? "") ||
     seoTitle.trim() !== (collection.pageSeoTitle ?? "") ||
-    seoDescription.trim() !== (collection.pageSeoDescription ?? "");
+    seoDescription.trim() !== (collection.pageSeoDescription ?? "") ||
+    socialImage !== (collection.pageSocialImage ?? "");
   const slugField = cmsSlugField(collection.fields) ?? collection.fields[0];
   const fix = unknown.length && slugField ? trimmed.replace(`{${unknown[0]}}`, `{${slugField.slug}}`) : null;
 
@@ -212,6 +217,7 @@ export function DynamicPagesPane({ composer, collection, records, onOpenPage, on
         pageTemplatePath: template || undefined,
         pageSeoTitle: seoTitle.trim() || undefined,
         pageSeoDescription: seoDescription.trim() || undefined,
+        pageSocialImage: socialImage || undefined,
       });
       addToast({
         tone: "success",
@@ -329,7 +335,8 @@ export function DynamicPagesPane({ composer, collection, records, onOpenPage, on
   );
 
   /* 165:3693 (the whole form) · 187:21853 (a saved link): Collection page,
-     Edit collection page ›, URL pattern, SEO title, SEO description, then
+     Edit collection page ›, URL pattern, SEO title, SEO description, Social
+     image, then
      what the next publish does. The page list stays, collapsed. */
   return (
     <div className={PANE} data-testid="cms-dynamic-pages">
@@ -398,6 +405,18 @@ export function DynamicPagesPane({ composer, collection, records, onOpenPage, on
           {seoUnknown.join(", ")} {seoUnknown.length === 1 ? "is" : "are"} not a field of {collection.name}.
         </span>
       ) : null}
+      {field(
+        "cms-dp-social-image",
+        "Social image",
+        <Select id="cms-dp-social-image" sizing="sm" className={`${CONTROL} ${FILLED}`} value={socialImage} onChange={(e) => setSocialImage(e.target.value)} data-testid="cms-dp-social-image">
+          <option value="">{imageFields.length ? "None" : "No image fields"}</option>
+          {imageFields.map((f) => (
+            <option key={f.slug} value={f.slug}>
+              {f.name}
+            </option>
+          ))}
+        </Select>,
+      )}
       {status ? <div className={FIELD_W}>{status}</div> : null}
       {urls.length && !patternError ? (
         <details className={FIELD_W} data-testid="cms-dp-more">

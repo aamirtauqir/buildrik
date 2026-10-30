@@ -20,6 +20,7 @@ import { LockRefusalNote, setLockRefusal, useLockRefusal } from "@/editor/inspec
 import { closeSubview, openSubview } from "@/editor/inspector/tabs/subviewStore";
 import { EVENTS } from "@/shared/constants/events";
 import { NoteRow } from "../behaviourRows";
+import { lockOwner } from "@/engine/commands/commandOperations";
 // Re-export types for external use
 export type { Interaction, InteractionTrigger, InteractionsSectionProps };
 
@@ -116,7 +117,7 @@ export const InteractionsSection: React.FC<InteractionsSectionProps> = ({
   const addInteraction = (trigger: InteractionTrigger, preset?: AnimationPreset) => {
     /* 2L9 G22: locked after the picker opened — nothing is added, and the
        section says so (no "added" receipt, no editor for a missing row). */
-    if (composer && elementId && composer.elements.getElement(elementId)?.isLocked?.()) {
+    if (composer && elementId && lockOwner(composer.elements.getElement(elementId))) {
       setShowAddPanel(false);
       setLockRefusal({ elementId, kind: "add-interaction" });
       return;

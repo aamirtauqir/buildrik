@@ -60,6 +60,8 @@ export interface CMSCollection {
   pageSlugPattern?: string;
   pageSeoTitle?: string;
   pageSeoDescription?: string;
+  /** The image field whose value is each generated page's og:image (A-27). */
+  pageSocialImage?: string;
   pageTemplatePath?: string;
   createdAt: string;
   updatedAt: string;

@@ -22,6 +22,7 @@ import { EVENTS } from "@/shared/constants/events";
 import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
 import { BINDABLE_TYPES } from "@/shared/constants/elementCapabilities";
 import { findStylePeers } from "@/engine/commands/stylePeers";
+import { lockOwner } from "@/engine/commands/commandOperations";
 import { requestReplaceWithBlock } from "@/editor/sidebar/tabs/build/insertGroupRequest";
 
 /** Toast notification function signature */
@@ -230,7 +231,7 @@ export const ELEMENT_ACTIONS: Record<ElementActionId, ElementAction> = {
     /* Blocks are sections; offering to replace a heading with a hero is noise. */
     isVisible: ({ element, isRoot }) => !isRoot && SECTION_TYPES.has(element.getType?.() ?? ""),
     /* Replacing deletes the element: a lock refuses it (audit 2026-10-08 P1-3). */
-    isEnabled: ({ element }) => (element.isLocked?.() ? "Unlock it to replace it" : true),
+    isEnabled: ({ element }) => (lockOwner(element) ? "Unlock it to replace it" : true),
     run: ({ composer, element }) => {
       composer.selection.select(element as never);
       composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "add" });

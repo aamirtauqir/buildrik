@@ -109,6 +109,13 @@ describe("InspectorHeader", () => {
     expect(screen.queryByRole("combobox")).toBeNull();
   });
 
+  it("147:77668: an ancestor's lock reads 'Read only · Locked by {ancestor}'", () => {
+    section.setLocked(true);
+    mount();
+    expect(rowOf("inspector-editing-row").textContent).toBe("Read only · Locked by Section");
+    expect(screen.queryByRole("combobox")).toBeNull();
+  });
+
   it('the Editing select is reachable by Tab and labelled "Editing"', async () => {
     const user = userEvent.setup();
     mount();

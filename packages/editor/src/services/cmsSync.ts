@@ -653,7 +653,7 @@ export async function hydrateCmsFromServer(): Promise<void> {
     const remote = (await client().cms.collections.list.query({ siteId })) as Array<{
       id: string; name: string; slug: string; description: string | null; icon: string | null;
       displayField: string | null; fields: unknown; createdAt: Date | string; updatedAt: Date | string;
-      pageSlugPattern: string | null; pageSeoTitle: string | null; pageSeoDescription: string | null; pageTemplatePath: string | null;
+      pageSlugPattern: string | null; pageSeoTitle: string | null; pageSeoDescription: string | null; pageSocialImage?: string | null; pageTemplatePath: string | null;
     }>;
     const migrationScope = `cms:${siteId}`;
     const firstPass = stampMigrationDue(migrationScope);
@@ -697,6 +697,7 @@ export async function hydrateCmsFromServer(): Promise<void> {
           pageSlugPattern: rc.pageSlugPattern ?? undefined,
           pageSeoTitle: rc.pageSeoTitle ?? undefined,
           pageSeoDescription: rc.pageSeoDescription ?? undefined,
+          pageSocialImage: rc.pageSocialImage ?? undefined,
           pageTemplatePath: rc.pageTemplatePath ?? undefined,
           createdAt: iso(rc.createdAt), updatedAt: iso(rc.updatedAt),
         };
@@ -823,6 +824,7 @@ export async function syncCollectionUpsert(c: CMSCollection): Promise<boolean> {
         pageSlugPattern: c.pageSlugPattern ?? null,
         pageSeoTitle: c.pageSeoTitle ?? null,
         pageSeoDescription: c.pageSeoDescription ?? null,
+        pageSocialImage: c.pageSocialImage ?? null,
         pageTemplatePath: c.pageTemplatePath ?? null,
         expectedUpdatedAt: base,
       }).then((row) => {

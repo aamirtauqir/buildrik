@@ -46,6 +46,7 @@ import { ResetStyleReview } from "../components/ResetStyleReview";
 import { ChooseFont } from "../sections/typography/ChooseFont";
 import { RenameCard } from "../components/RenameCard";
 import { BatchEligibility } from "../components/BatchEligibility";
+import { AlignDistribute } from "../components/AlignDistribute";
 import { ApplyStyleResultNote, ApplyStyleReview, useApplyStyleResult } from "../components/ApplyStyleReview";
 
 // ============================================================================
@@ -220,6 +221,8 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
 
   return (
     <>
+      {/* 2L9 B04 247:29578: "Align and distribute" heads a multi-selection's Style tab. */}
+      {tabId === "style" && isMultiSelect && !subviewHere ? <AlignDistribute composer={composer} selectedIds={selectedIds} /> : null}
       {batch}
       {tabId === "content" && !isMultiSelect ? <TemplatePageDoor composer={composer} elementId={selectedElement.id} /> : null}
       {tabId === "content" && !isMultiSelect ? (

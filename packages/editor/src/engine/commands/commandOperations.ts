@@ -26,10 +26,8 @@ export type ReorderDirection = "forward" | "backward" | "front" | "back";
  * never substitutes anything for what was selected. An element goes only if
  * it is not locked, not in a component instance, and removing it takes no
  * locked element with it — no locked descendant (its subtree goes with it),
- * and no locked ancestor that is itself in the selection (⌘A selected the
- * locked container, so its contents stay with it). A lock covers only the
- * element itself elsewhere in the editor, so a child picked on its own
- * inside a locked container can still be deleted. ⌘A still removes the
+ * and no lock over it (lockOwner: its own or an ancestor's — a lock covers
+ * everything inside it, owner 2026-10-31). ⌘A still removes the
  * unlocked siblings of a locked image, while an explicit Delete on the
  * section around it removes nothing — the first A-5 fix swapped in that
  * section's other children and deleted them unasked (review I-1). `skipped`
@@ -44,8 +42,7 @@ export function dropLockedAndInstances(elements: Element[]): {
    *  dropped element is a component part rather than locked (L2-016). */
   skippedPayload: { reason: "instance" } | undefined;
 } {
-  const selected = new Set(elements.map((el) => el.getId()));
-  const isLockBound = (el: Element) => el.isLocked() || hasLockedDescendant(el) || hasSelectedLockedAncestor(el, selected);
+  const isLockBound = (el: Element) => lockOwner(el) !== null || hasLockedDescendant(el);
   const kept = elements.filter((el) => !el.isComponentInstance() && !isLockBound(el));
   const dropped = elements.filter((el) => !kept.includes(el));
   const instanceOnly = dropped.length > 0 && !dropped.some(isLockBound);
@@ -56,9 +53,19 @@ function hasLockedDescendant(el: Element): boolean {
   return el.getChildren().some((child) => child.isLocked() || hasLockedDescendant(child));
 }
 
-function hasSelectedLockedAncestor(el: Element, selected: Set<string>): boolean {
-  for (let p = el.getParent(); p; p = p.getParent()) if (p.isLocked() && selected.has(p.getId())) return true;
-  return false;
+/**
+ * The element whose lock covers `element`: the element itself when its own
+ * lock is on, else its nearest locked ancestor — a lock covers everything
+ * inside it (owner 2026-10-31; boards 147:77668 / 147:78110 / 147:78484).
+ * `null` when nothing locks it. A pure read: to refuse a write and raise the
+ * "locked" toast, go through writableElements / canWrite / writeElement.
+ * Unlocking happens on the owner (the `unlock-element` command acts on an
+ * element's own flag), so a descendant's chrome names the owner.
+ */
+export function lockOwner(element: Element | null | undefined): Element | null {
+  /* `?.`: several suites hand the panel partial element doubles. */
+  for (let el = element ?? null; el; el = el.getParent?.() ?? null) if (el.isLocked?.()) return el;
+  return null;
 }
 
 /**
@@ -75,7 +82,7 @@ function hasSelectedLockedAncestor(el: Element, selected: Set<string>): boolean 
 export function nudgeSelected(composer: Composer, deltaX: number, deltaY: number): void {
   const selected = composer.selection.getSelected();
   if (!selected) return;
-  if (selected.isLocked?.() || selected.isComponentInstance?.()) {
+  if (lockOwner(selected) || selected.isComponentInstance?.()) {
     composer.emit(EVENTS.LOCKED_ELEMENTS_SKIPPED, undefined);
     return;
   }
@@ -182,15 +189,15 @@ export function reorderElement(composer: Composer, direction: ReorderDirection):
  * P-1: the lock gate every Inspector write passes through (and pasteStyles).
  *
  * Returns the elements a write may change — locked ones dropped, missing ones
- * ignored. A lock covers the element itself, as everywhere else in the
- * editor; the stricter removal rule (locked descendants, instances) is
+ * ignored. A lock covers the element and everything inside it (lockOwner);
+ * the stricter removal rule (locked descendants, instances) is
  * dropLockedAndInstances above.
  *
  * SIDE EFFECT — not a pure filter: when it drops a locked element it emits
  * LOCKED_ELEMENTS_SKIPPED (once per call), the same signal delete/cut/nudge
  * raise, and the shell shows the "locked" toast (useClipboardToasts). Call it
  * only where a write is actually being attempted; to merely ASK whether an
- * element is locked, read `isLocked()`.
+ * element is locked, read `lockOwner()`.
  */
 export function writableElements<T extends Element>(
   composer: Composer,
@@ -198,7 +205,7 @@ export function writableElements<T extends Element>(
 ): T[] {
   const present = elements.filter((el): el is T => Boolean(el));
   /* `?.`: several suites hand the panel partial element doubles. */
-  const kept = present.filter((el) => !el.isLocked?.());
+  const kept = present.filter((el) => !lockOwner(el));
   if (kept.length !== present.length) composer.emit(EVENTS.LOCKED_ELEMENTS_SKIPPED, undefined);
   return kept;
 }

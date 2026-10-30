@@ -12,6 +12,9 @@ import type { Composer } from "@/engine";
 import { ROTATION_HANDLE_OFFSET } from "@/engine/canvas/constants";
 import type { HandlePosition } from "@/engine/canvas/ResizeHandler";
 import { Z_LAYERS } from "@/shared/constants/canvas";
+import { lockOwner } from "@/engine/commands/commandOperations";
+import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
+import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
 import { useCanvasResize } from "../hooks";
 import { SelectionHandles } from "./SelectionHandles";
 
@@ -75,15 +78,26 @@ const SelectionBoxOverlayComponent: React.FC<SelectionBoxOverlayProps> = ({
   }, [composer, elementId]);
 
   // Check if element is locked — subscribes to element:updated to stay reactive
-  const [isElementLocked, setIsElementLocked] = React.useState(false);
+  /* The element's own lock or one over it (lockOwner); the badge's title
+     names the layer holding an inherited lock. */
+  const [lockTitle, setLockTitle] = React.useState<string | null>(null);
+  const isElementLocked = lockTitle !== null;
 
   React.useEffect(() => {
     if (!composer || !elementId) {
-      setIsElementLocked(false);
+      setLockTitle(null);
       return;
     }
     const refresh = () => {
-      setIsElementLocked(composer.elements.getElement(elementId)?.isLocked() ?? false);
+      const el = composer.elements.getElement(elementId);
+      const owner = lockOwner(el);
+      setLockTitle(
+        !owner
+          ? null
+          : owner === el
+            ? "Element is locked. Unlock in Layers panel."
+            : `Locked by ${getLayerName(owner) ?? elementTypeLabel(owner.getType())} — unlock in Layers`
+      );
     };
     refresh();
     composer.on("element:updated", refresh);
@@ -440,7 +454,7 @@ const SelectionBoxOverlayComponent: React.FC<SelectionBoxOverlayProps> = ({
       {/* Locked badge — shown instead of resize handles for locked elements */}
       {isElementLocked && !isMultiSelect && (
         <div
-          title="Element is locked. Unlock in Layers panel."
+          title={lockTitle ?? undefined}
           style={{
             position: "absolute",
             left: left + width / 2 - 8,
