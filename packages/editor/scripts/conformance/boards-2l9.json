@@ -4172,7 +4172,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Board splits \"Update shared Brand color\" vs \"Use on selected element\"; popover has no such split. L-D overlap",
+   "verifiedNote": "L-B round 19: the shared-token edit now says who owns the change — '← Back to Brand colors', {token}, 'Editing shared Brand color', 'Known references · N in this site', picker, 'Changes this token’s color; the original palette color stays unchanged.', primary 'Update {token} · Light' (useUpdateColorEverywhere writes the Light literal), secondary 'Use on selected element' (raw value, detaches), 'Local use applies in Light and Dark. Other uses of the token stay unchanged.', Cancel; popover copy to the board's US spelling (Brand colors, Search colors, Custom color). Not drawn: the Light/Dark switch and 'Source · palette…' (the edit writes Light only; no source field on the entry). Compared with the dump copy only — no PNG this round.",
    "tier": "P1"
   },
   {
@@ -4395,9 +4395,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Handoff/acceptance board for F01–F19, not a UI surface",
+   "authority": "superseded:handoff-board",
+   "verified": "no",
+   "verifiedNote": "lead 2026-10-30: handoff/review board, not a UI state — no build closes it",
    "tier": "P1"
   },
   {
@@ -4822,7 +4822,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Lane L-B round 18, compared with the board PNG: the unit choices match the board's for Font size — px, em, rem, %, vw (property-specific, not the generic list the old note named). Open, two gaps: (1) the board draws the choice as a 'Font size unit' card beside the column with Cancel; live it is the field's own unit select — every number field shares that control (InputWithUnit), so the card is a change to all of them; (2) the board's 'Convert using the authored page's font and viewport values.' is not what the code does — a unit change converts px ↔ rem / em at a 16 px root only (I07's receipt says so) and leaves %, vw as typed; that line would need real per-page font and viewport conversion first.",
+   "verifiedNote": "L-B round 19: Font size's unit choice is the board's card beside the column — 'Font size unit', px · em · rem · % · vw (✓ current), Cancel — scoped by InputWithUnit's new unitCardTitle prop; every other number field keeps its inline unit select (unit-tested both ways). The board's 'Convert using the authored page’s font and viewport values.' is not drawn: code:unit-conversion-root-16 — a unit change converts px ↔ rem/em at a 16 px root only (I07's receipt says so) and leaves %, vw as typed. Built, not compared to the PNG (the shot is not in shots/ and the round's image budget was spent).",
    "tier": "P1"
   },
   {
@@ -4976,9 +4976,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Handoff/acceptance board for I01–I19",
+   "authority": "superseded:handoff-board",
+   "verified": "no",
+   "verifiedNote": "lead 2026-10-30: handoff/review board, not a UI state — no build closes it",
    "tier": "P1"
   },
   {
@@ -5223,9 +5223,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Handoff board for IC01–IC06",
+   "authority": "superseded:handoff-board",
+   "verified": "no",
+   "verifiedNote": "lead 2026-10-30: handoff/review board, not a UI state — no build closes it",
    "tier": "P1"
   },
   {
@@ -5892,7 +5892,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Assets › Fonts pinned origin row lives in Assets (L-C)",
+   "verifiedNote": "L-B round 19: not built. The board is an Assets › Fonts page (Site fonts / My font files, rows with 'Added by … · Added to site', Upload font files, storage line, '‹ Back to Editor · Home' and the pinned 'Back to font picker'). Live, Site fonts is a modal (SiteFontsModal, Clone 3686:42317) and Assets has no Fonts page, so the pinned origin row has no page to sit on. Needs the Assets Fonts page first (assets drawer, L-C) — larger than a row.",
    "tier": "P1"
   },
   {
@@ -5937,7 +5937,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "phase1 — load-failed chrome (Task 1.6)",
+   "verifiedNote": "L-B round 19, probe-compared (inspector-panel ?loadFailed=network) with shots/255-82909.png: on a network/offline load failure (the loader's connection kinds) the tab body is 'Project could not load' / 'Check your connection, then retry. Your saved project has not been replaced.' / full-width primary 'Retry loading' running the loader's published in-place retry (no button when none is published) — matches. Open: the header's context line 'Could not load {site}' (InspectorHeader, lead) and the path row (S31).",
    "tier": "P1"
   },
   {
@@ -6013,8 +6013,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Board \"Hero heading deleted · Undo\" on Page panel",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 19, probe-compared (case element-receipt&action=delete, 1440x900) with shots/255-86352.png: the real delete command leaves nothing selected, the Inspector shows Home · Page, receipt 'Hero heading deleted.' + Undo bound to the delete transaction (history.captureUndo). Spoken only for the delete command's transaction (useClipboardToasts). Toast chrome (blue Undo, × close, 932/790 vs board 960/808) is the shared chrome-ui Toast, not this row.",
    "tier": "P1"
   },
   {
@@ -6024,8 +6024,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Board selects the new copy explicitly with receipt",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 19, probe-compared (case element-receipt&action=duplicate) against the S10 dump copy: the duplicate command selects the copy; receipt now names the ORIGINAL's layer name 'Hero heading duplicated.' + Undo (was the type label). code: the copy is named 'Hero heading 2' (engine nextCopyName), board 'Hero heading copy' — engine-owned; tab persistence decides the open tab. Toast chrome is the shared Toast.",
    "tier": "P1"
   },
   {
@@ -6105,7 +6105,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "⌘K global rows \"label · path\"; board Inspector-scoped \"Properties · Hero heading\" search",
+   "verifiedNote": "L-B round 19: NOT built — conflicts with owner decision G2-146 (2026-09-25, usePropertyJump.ts header): '⌘K Jump to property instead of a search bar in the inspector'. The lead asked for an inspector-scoped filter without changing ⌘K; that is the search bar the owner turned down. Needs the owner (or the lead with the owner) to reopen G2-146. The reveal half (S18) exists: UI_INSPECTOR_FOCUS_SECTION opens the tab and section, scrolls, focuses, tints the row.",
    "tier": "P1"
   },
   {
@@ -6340,8 +6340,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "unbindAll keeps text; board retained static value + Undo",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 19, probe-compared (inspector-panel cms=1, binding detail › Unbind — keep shown text): back on Content, the element keeps its text, receipt '{Field} is now static text' + Undo bound to the recorded unbind step (history.captureUndo) — board 'Title is now static text · Undo'. Same receipt from Dynamic bindings › Unbind. code: the heading's Title text row is 'Edit text on canvas' (161:8480), not a field; Conditions row not drawn (B-11).",
    "tier": "P1"
   },
   {
@@ -6375,7 +6375,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Shell chrome; \"Show inspector\" vs board \"Show Inspector\"",
+   "verifiedNote": "L-B round 19 (lead cleared StudioPanels for S30), compared with shots/258-36770.png: copy 'Show Inspector', 144×32, 13 medium; the ⌘\\ hint moved to the tooltip and aria-keyshortcuts (the board draws none). Open: position — the board keeps the 300 column reserved and puts the button at its top (1276,104); live the canvas runs full width with the button at its top-right (top-5 right-5). That is the shell grid (AquibraStudio/LayoutShell), not measured here.",
    "tier": "P1"
   },
   {
@@ -6386,7 +6386,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "phase1 — Inspector header breadcrumb (Task 1.4)",
+   "verifiedNote": "L-B round 19: not built — needs a lead call. Every 2L9 inspector board draws the path row ('… › Hero › Hero heading', even 'Home · Page' on S09), which makes the header 104 tall on every page; Task 1.4 (InspectorHeader.tsx header comment) draws it only on a collection template page so the header keeps 84. S31's '…' opens 'Selection path' (Home · Main · Hero · Content stack · Hero heading). Building the overflow alone, inside the template-page rule, would not match the board.",
    "tier": "P1"
   },
   {
@@ -6397,7 +6397,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Per-element restore exists; board per element+tab",
+   "verifiedNote": "L-B round 19: scroll memory is now per element AND tab (ProInspector scrollKey); unit test 'remembers a place per element AND tab'. The board's 'Restored … scroll position' line is a loose annotation (x 1141, no panel padding), not drawn. Not probe-compared: the probe's Style body fits its column, nothing to scroll.",
    "tier": "P1"
   },
   {
@@ -6407,8 +6407,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "URL rows exist; no retained invalid draft + \"Restore last valid URL\"",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 19, probe-compared (inspector-panel type=video-embed, invalid entry) with shots/258-38255.png: label 'URL', red-bordered field keeps the draft, 'Use a supported YouTube or Vimeo link. The last valid Vimeo video remains on the page.', Ratio, full-width 'Restore last valid URL', Escape note — order and copy match. The field now commits on Enter/blur; an invalid entry never reaches the element. Ratio stays the segmented control (board draws a select) as on every other video board.",
    "tier": "P1"
   },
   {
@@ -6462,8 +6462,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "No \"2 styles copied · This element only · Desktop / Default\" receipt; Selector row blocked:owner-class-first",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 19, probe-compared (case element-receipt&action=paste-style, real command) against the G02 dump copy: receipt '2 styles applied · Desktop / Default' + Undo (paste-style merges onto the element's own base styles). Selector row: open:owner-class-first via archetype G01.",
    "inheritsFrom": "271:124080",
    "tier": "P1"
   },
@@ -6485,8 +6485,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "No locked-before-command refusal note",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 19, probe-compared (inspector-panel heading, styleClipboard, locked then paste-style) with shots/271-124992.png: 'Editing unavailable' / '{name} was locked before the style could be pasted. No properties changed.' / full-width Unlock at the head of the tab body; nothing written. Caught from COMMAND_RUN, so every Paste style door says it. Selector row: open:owner-class-first. Header lines are the header's.",
    "tier": "P1"
   },
   {
@@ -6519,8 +6519,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Save as component… opens existing dialog; no \"Where it can be used\" Library/This page scope, pending/failure states",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 19, probe case create-component (?used / ?createMode), side by side with shots/271-127059.png (G10) and the dump copy of G07: an empty name keeps the dialog a draft — red field, 'Enter a name between 1 and 200 characters.', Create shut (maxLength 200). Layout as archetype G05.",
    "tier": "P1"
   },
   {
@@ -6530,8 +6530,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Save as component… opens existing dialog; no \"Where it can be used\" Library/This page scope, pending/failure states",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 19, probe case create-component (?used / ?createMode), side by side with shots/271-127059.png (G10) and the dump copy of G08: at the limit the usage line reads '100 of 100 components. Delete one before creating another.' and Create is shut.",
    "tier": "P1"
   },
   {
@@ -6541,8 +6541,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Save as component… opens existing dialog; no \"Where it can be used\" Library/This page scope, pending/failure states",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 19, probe case create-component (?used / ?createMode), side by side with shots/271-127059.png (G10) and the dump copy of G09: This page, pending — 'Creating component…' under the usage line, the primary keeps 'Create component' (was 'Creating…'), disabled.",
    "tier": "P1"
   },
   {
@@ -6552,8 +6552,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Save as component… opens existing dialog; no \"Where it can be used\" Library/This page scope, pending/failure states",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 19, probe case create-component (?used / ?createMode), side by side with shots/271-127059.png (G10) and the dump copy of G10: This page, refused — 'Couldn’t create the component. The name and scope are kept; Hero heading is unchanged.' in the dialog (was an error toast), name and scope kept, primary 'Try again' retries. Dialog geometry (divided footer, field fill, centred vs top) is G05's.",
    "tier": "P1"
   },
   {
@@ -6563,8 +6563,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Save as component… opens existing dialog; no \"Where it can be used\" Library/This page scope, pending/failure states",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 19, probe case create-component (?used / ?createMode), side by side with shots/271-127059.png (G10) and the dump copy of G11: library, pending — 'Creating component…', primary keeps 'Create and share component'.",
    "tier": "P1"
   },
   {
@@ -6574,8 +6574,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Save as component… opens existing dialog; no \"Where it can be used\" Library/This page scope, pending/failure states",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 19, probe case create-component (?used / ?createMode), side by side with shots/271-127059.png (G10) and the dump copy of G12: library, refused — same line as G10, 'Try again'.",
    "tier": "P1"
   },
   {
@@ -6681,8 +6681,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "\"Locked — unlock to edit\"/Unlock copy matches; no \"No interaction was added\" note; Selector row is class-first",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 19, probe-compared (heading, add-interaction picker open, element locked, preset chosen) with shots/271-131163.png: Interactions shows only 'Locked — unlock to edit' / 'No interaction was added to Hero heading.' / full-width Unlock; no interaction written, no 'added' receipt (before this the receipt fired and the editor opened on a missing row). Selector row: open:owner-class-first.",
    "tier": "P1"
   },
   {
@@ -6691,9 +6691,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "REVIEW ONLY board for S08/G01–G22",
+   "authority": "superseded:handoff-board",
+   "verified": "no",
+   "verifiedNote": "lead 2026-10-30: handoff/review board, not a UI state — no build closes it",
    "tier": "P1"
   },
   {

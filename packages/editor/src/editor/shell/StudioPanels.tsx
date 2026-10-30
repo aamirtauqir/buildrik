@@ -189,10 +189,11 @@ interface CmsReturn {
  *  canvas" ends on that binding (Play F2.12 `302:16675`). */
 type CmsDoorRequest = CmsOpenRequest & { binding?: FocusSectionPayload };
 
-/* Board 36 (7995:210885): a 188 × 28 panel action, 20 in from the canvas's
-   top right, label and shortcut centred, 13/500 gray-700. */
+/* 2L9 S30 (258:36770): a 144 × 32 "Show Inspector", 13/500 gray-700; 20 in
+   from the canvas's top right (board 36's place — the 2L9 board keeps the
+   column reserved, REQUESTS B-25). */
 const SHOW_INSPECTOR =
-  "tw:absolute tw:top-5 tw:right-5 tw:z-[var(--bk-z-chrome)] tw:h-7 tw:w-[188px] tw:gap-1.5 tw:rounded-md " +
+  "tw:absolute tw:top-5 tw:right-5 tw:z-[var(--bk-z-chrome)] tw:h-8 tw:w-[144px] tw:gap-1.5 tw:rounded-md " +
   "tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:px-3 tw:py-1 tw:text-[13px] tw:leading-5 " +
   "tw:font-medium tw:text-[var(--bk-gray-700)] tw:focus:ring-0";
 
@@ -980,16 +981,13 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
                 color="light"
                 size="xs"
                 className={SHOW_INSPECTOR}
-                aria-label="Show inspector"
                 aria-keyshortcuts={"Meta+\\"}
-                title={"Show inspector (⌘\\)"}
+                title={"Show Inspector (⌘\\)"}
                 data-testid="show-inspector"
                 onClick={() => setInspectorShown(true)}
               >
-                Show inspector
-                <kbd className="tw:font-[inherit]" aria-hidden="true">
-                  {"⌘\\"}
-                </kbd>
+                {/* 2L9 S30 258:36770: "Show Inspector", 144 × 32; the shortcut is in the tooltip. */}
+                Show Inspector
               </Button>
             ) : null}
           </div>

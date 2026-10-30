@@ -328,3 +328,30 @@ describe("InputWithUnit — an unreadable entry is held for the tab guard (2L9 I
     expect(getUnappliedDraft()).toBeNull();
   });
 });
+
+/* 2L9 I06 (161:11006): Font size's units as a card beside the column —
+   "Font size unit", the property's units, Cancel. Only the field that asks. */
+describe("InputWithUnit — unit card (I06)", () => {
+  it("opens the titled card, writes the chosen unit, and Cancel changes nothing", () => {
+    cleanup();
+    const onChange = vi.fn();
+    render(<InputWithUnit label="Font size" value="24px" onChange={onChange} units={["px", "em", "rem", "%", "vw"]} unitCardTitle="Font size unit" />);
+    expect(screen.queryByRole("combobox")).toBeNull();
+    fireEvent.click(screen.getByTestId("unit-card-trigger"));
+    expect(screen.getByText("Font size unit")).toBeInTheDocument();
+    expect(screen.getAllByRole("menuitemradio").map((b) => b.textContent?.replace("✓", "").trim())).toEqual(["px", "em", "rem", "%", "vw"]);
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(onChange).not.toHaveBeenCalled();
+    expect(screen.queryByText("Font size unit")).toBeNull();
+    fireEvent.click(screen.getByTestId("unit-card-trigger"));
+    fireEvent.click(screen.getByRole("menuitemradio", { name: /^em$/ }));
+    expect(onChange).toHaveBeenCalledWith("1.5em");
+  });
+
+  it("without the title the field keeps its inline unit select", () => {
+    cleanup();
+    render(<InputWithUnit label="Width" value="10px" onChange={vi.fn()} />);
+    expect(screen.queryByTestId("unit-card-trigger")).toBeNull();
+    expect(screen.getByRole("combobox", { name: /unit/ })).toBeInTheDocument();
+  });
+});

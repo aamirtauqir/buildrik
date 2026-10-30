@@ -102,6 +102,8 @@ import { InspectorLoading } from "@/editor/inspector/components/InspectorLoading
 import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
 import { LayerTreeItem } from "@/editor/panels/layers/LayerTreeItem";
 import { renameElement } from "@/editor/panels/layers/hooks/layersPersistence";
+import { useClipboardToasts } from "@/editor/shell/hooks/useClipboardToasts";
+import { setSiteLoadStatus } from "@/editor/shell/siteLoadStatus";
 import { PagesTab } from "@/editor/sidebar/tabs/pages/PagesTab";
 import { CanvasEmptyCTA } from "@/editor/canvas/CanvasEmptyCTA";
 import { showInsertReceipt } from "@/editor/sidebar/tabs/build/insertGroupRequest";
@@ -2664,6 +2666,14 @@ const CASES: Record<string, () => React.ReactElement> = {
     const el = c.elements.createElement("heading" as never, { content: "Thoughtful design." } as never);
     c.elements.addElement(el, page.root.id);
     el.setData("layerName", "Hero heading");
+    /* G08–G12: `?used=100` masters already on the site; `?createMode=pending`
+       never answers the create, `fail` refuses it. */
+    const q = new URLSearchParams(location.search);
+    const used = Number(q.get("used") ?? 0);
+    if (used) c.components.getAllComponents = () => Array.from({ length: used }) as never;
+    const createMode = q.get("createMode");
+    if (createMode === "pending") c.components.createComponent = () => new Promise(() => {});
+    if (createMode === "fail") c.components.createComponent = async () => null;
     return (
       <ToastProvider>
         <div data-probe="create-component">
@@ -2712,6 +2722,46 @@ const CASES: Record<string, () => React.ReactElement> = {
           <InspectorLoading />
         </div>
       </div>
+    );
+  },
+  /* `?action=delete|duplicate|paste-style` — the real command on a heading named "Hero
+     heading", with the shell's receipt hook mounted: S09 (255:86352) /
+     S10 (255:86840). The Inspector sits in the shell's right column. */
+  "element-receipt": () => {
+    const action = new URLSearchParams(location.search).get("action") ?? "delete";
+    const c = new Composer({} as never);
+    const page = c.elements.createPage("Home");
+    c.elements.setActivePage(page.id);
+    const el = c.elements.createElement("heading" as never, { content: "Thoughtful design. Lasting impact." } as never);
+    c.elements.addElement(el, page.root.id);
+    renameElement(c as never, el.getId(), "Hero heading");
+    /* `action=paste-style`: two copied styles waiting (G02 271:124383). */
+    if (action === "paste-style") c.styleClipboard = { "font-size": "32px", "font-weight": "600" };
+    c.selection.select(el);
+    function Host() {
+      const { addToast } = useToast();
+      useClipboardToasts(c, addToast);
+      const { selectedElement } = useComposerSelection({ composer: c });
+      React.useEffect(() => {
+        const t = setTimeout(() => void c.commands.run(action), 50);
+        return () => clearTimeout(t);
+      }, []);
+      return (
+        <ProInspector
+          composer={c}
+          currentBreakpoint="desktop"
+          selectedElement={selectedElement ? { id: selectedElement.getId(), type: selectedElement.getType(), tagName: selectedElement.getTagName() } : null}
+        />
+      );
+    }
+    return (
+      <ToastProvider>
+        <div style={{ position: "fixed", top: 56, right: 0, width: 300, height: 812, borderLeft: "1px solid var(--bk-border)" }}>
+          <div data-probe="element-receipt" className="tw:flex tw:h-[812px] tw:w-[300px] tw:flex-col tw:bg-white">
+            <Host />
+          </div>
+        </div>
+      </ToastProvider>
     );
   },
   "inspector-panel": () => {
@@ -2776,6 +2826,14 @@ const CASES: Record<string, () => React.ReactElement> = {
     }
     /* `?locked=1` — the element's own lock (147:78110). */
     if (q.get("locked")) el.setLocked(true);
+    /* `?styleClipboard={…}` — a copied style waiting to paste (G04). */
+    const styleClipboard = q.get("styleClipboard");
+    if (styleClipboard) c.styleClipboard = JSON.parse(styleClipboard) as Record<string, string>;
+    /* The composer and the element, for a script that changes state after
+       mount (G04 / G22: the target locked after a menu or picker opened). */
+    Object.assign(window, { probeComposer: c, probeElementId: el.getId() });
+    /* `?layerName=Hero heading` — the element's layer name. */
+    if (q.get("layerName")) renameElement(c as never, el.getId(), q.get("layerName") ?? "");
     /* `?dimmed=1` — the element dimmed in the editor (the Layers eye): its
        canvas stand-in carries `data-hidden`, as useCanvasEditorFlags sets it
        (147:78900). */
@@ -2868,6 +2926,16 @@ const CASES: Record<string, () => React.ReactElement> = {
     /* `?loading=1&siteName=…` — the project still arriving (S01). */
     if (q.get("siteName")) c.updateProjectMetadata({ name: q.get("siteName") ?? "" });
     if (q.get("loading")) c.setProjectLoading(true);
+    /* `?loadFailed=network` — the load gave up for that reason, a retry
+       published that never lands (S02). */
+    const loadFailed = q.get("loadFailed");
+    if (loadFailed) {
+      c.setEditLock("not-loaded", true);
+      setSiteLoadStatus({
+        failure: { kind: loadFailed as "network", status: null, code: null, requestId: null, url: null },
+        retry: () => new Promise<boolean>(() => {}),
+      });
+    }
     /* `?batch=1` — B01: the element (a heading), a second heading at another
        size and a locked image, all three selected. */
     if (q.get("batch")) {

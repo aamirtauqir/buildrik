@@ -10,15 +10,16 @@
  * Apply writes a raw colour, which unlinks a bound token in the same write
  * (one Undo step). Recent colours and Detach are not part of it.
  *
- * Kept from the picker it replaces: ✎ on a row (shown on hover / focus) opens
- * Edit <token> with "Update everywhere (N×)" — the Brand token changes — and
- * "Only this element", which detaches this value with the new colour; Pro
- * adds the search and its "N of M match" line.
+ * ✎ on a row (shown on hover / focus) opens the shared token's edit (2L9
+ * 39:9114 panel 3): "Update {token} · Light" changes the Brand token, "Use on
+ * selected element" writes the new colour on this element only (it detaches
+ * the value). Pro adds the search and its "N of M match" line. Copy is the
+ * 2L9 board's ("Brand colors", "Custom color").
  *
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { ChevronDown, ChevronLeft, ChevronRight, ExternalLink, Pencil, Search as SearchIcon } from "lucide-react";
+import { ChevronDown, ChevronRight, ExternalLink, Pencil, Search as SearchIcon } from "lucide-react";
 import { Button, IconButton, TextInput } from "@/editor/chrome-ui";
 import { ColorPicker } from "@/editor/design-system/ui/colors/ColorPicker";
 import type { TokenEntry } from "./TokenPickerPopover";
@@ -66,17 +67,23 @@ export const ColorFillPopover: React.FC<ColorFillPopoverProps> = ({
   const [editing, setEditing] = React.useState<TokenEntry | null>(null);
   const [customOpen, setCustomOpen] = React.useState(false);
 
+  /* 2L9 39:9114 panel 3, "Edit a shared token": two explicit owners — the
+     shared Brand colour (its Light value: useUpdateColorEverywhere writes
+     the light literal) or a local value on the selected element only. */
   if (editing) {
     const t = editing;
     const n = usageOf(t.id);
     return (
       <div className="tw:-m-2 tw:w-70" data-testid="fill-edit-token">
-        <div className="tw:flex tw:items-center tw:gap-2 tw:px-4 tw:pt-3">
-          <IconButton label="Back" onClick={() => setEditing(null)} className="tw:size-6 tw:min-h-0 tw:min-w-0">
-            <ChevronLeft size={14} aria-hidden />
-          </IconButton>
-          <span className="tw:text-[length:var(--bk-text-13)] tw:font-medium tw:text-[var(--bk-ink)]">Edit {t.name}</span>
-          <span className="tw:text-[length:var(--bk-text-11)] tw:text-[var(--bk-ink-muted)]">used {n}×</span>
+        <div className="tw:flex tw:flex-col tw:gap-1 tw:px-3 tw:pt-3">
+          <Button type="button" variant="link" className={`${LINK} tw:self-start`} onClick={() => setEditing(null)} data-testid="fill-edit-back">
+            ← Back to Brand colors
+          </Button>
+          <span className="tw:pt-1 tw:text-[length:var(--bk-text-13)] tw:font-semibold tw:leading-4 tw:text-[var(--bk-ink)]">{t.name}</span>
+          <span className={`${TEXT_12} tw:text-[var(--bk-ink-muted)]`}>Editing shared Brand color</span>
+          <span className={`${TEXT_12} tw:text-[var(--bk-ink-muted)]`} data-testid="fill-edit-usage">
+            Known references · {n} in this site
+          </span>
         </div>
         <ColorPicker
           initialHex={t.value}
@@ -85,18 +92,21 @@ export const ColorFillPopover: React.FC<ColorFillPopoverProps> = ({
           onSave={() => {}}
           actions={(hex, valid) => (
             <div className="tw:flex tw:flex-col tw:gap-2">
+              <p className="tw:m-0 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
+                Changes this token’s color; the original palette color stays unchanged.
+              </p>
+              <Button type="button" size="xs" className="tw:h-8 tw:w-full" disabled={!valid} onClick={() => onUpdateToken(t.id, hex)} data-testid="fill-edit-everywhere">
+                Update {t.name} · Light
+              </Button>
+              <Button type="button" variant="secondary" size="xs" className="tw:h-8 tw:w-full" disabled={!valid} onClick={() => onCustomValue(hex.toUpperCase())} data-testid="fill-edit-only-this">
+                Use on selected element
+              </Button>
+              <p className="tw:m-0 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
+                Local use applies in Light and Dark. Other uses of the token stay unchanged.
+              </p>
               <Button type="button" variant="link" className={`${LINK} tw:self-start tw:text-[var(--bk-ink)]`} onClick={() => setEditing(null)}>
                 Cancel
               </Button>
-              <Button type="button" size="xs" className="tw:h-8 tw:w-full" disabled={!valid} onClick={() => onUpdateToken(t.id, hex)} data-testid="fill-edit-everywhere">
-                Update everywhere ({n}×)
-              </Button>
-              <Button type="button" variant="secondary" size="xs" className="tw:h-8 tw:w-full" disabled={!valid} onClick={() => onCustomValue(hex.toUpperCase())} data-testid="fill-edit-only-this">
-                Only this element
-              </Button>
-              <p className="tw:m-0 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
-                Update everywhere changes the Brand token; Only this element detaches this value from it.
-              </p>
             </div>
           )}
         />
@@ -111,7 +121,7 @@ export const ColorFillPopover: React.FC<ColorFillPopoverProps> = ({
      pads 8, so the frame steps out by 8 and pads 12 itself. */
   return (
     <div className="tw:-m-2 tw:flex tw:w-[278px] tw:flex-col tw:gap-1 tw:p-3" data-testid="fill-popover">
-      <p className="tw:m-0 tw:text-[length:var(--bk-text-13)] tw:font-medium tw:leading-4 tw:text-[var(--bk-ink-soft)]">Brand colours</p>
+      <p className="tw:m-0 tw:text-[length:var(--bk-text-13)] tw:font-medium tw:leading-4 tw:text-[var(--bk-ink-soft)]">Brand colors</p>
 
       {showSearch ? (
         <div className="tw:flex tw:flex-col tw:gap-1 tw:pt-1">
@@ -120,8 +130,8 @@ export const ColorFillPopover: React.FC<ColorFillPopoverProps> = ({
             icon={SearchIcon}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search colours"
-            aria-label="Search colours"
+            placeholder="Search colors"
+            aria-label="Search colors"
             data-testid="fill-search"
           />
           {q ? (
@@ -133,11 +143,11 @@ export const ColorFillPopover: React.FC<ColorFillPopoverProps> = ({
       ) : null}
 
       {tokens.length === 0 ? (
-        <p className={`tw:m-0 tw:py-2 ${TEXT_12} tw:text-[var(--bk-ink-muted)]`}>No brand colours yet.</p>
+        <p className={`tw:m-0 tw:py-2 ${TEXT_12} tw:text-[var(--bk-ink-muted)]`}>No brand colors yet.</p>
       ) : (
         /* Five rows show; a larger brand scrolls inside, so the Brand link
            stays on screen. */
-        <ul className="tw:m-0 tw:flex tw:max-h-60 tw:list-none tw:flex-col tw:overflow-y-auto tw:p-0" aria-label="Brand colours">
+        <ul className="tw:m-0 tw:flex tw:max-h-60 tw:list-none tw:flex-col tw:overflow-y-auto tw:p-0" aria-label="Brand colors">
           {shown.map((t) => (
             <li
               key={t.id}
@@ -187,7 +197,7 @@ export const ColorFillPopover: React.FC<ColorFillPopoverProps> = ({
           onClick={onOpenBrand}
           className={`tw:h-6 tw:w-full tw:justify-between tw:rounded tw:border-0 tw:bg-transparent tw:px-2 tw:py-0 ${TEXT_12} tw:font-normal tw:text-[var(--bk-accent-text)] tw:hover:bg-[var(--bk-gray-50)] tw:focus:ring-0 tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]`}
         >
-          Add colours in Brand
+          Add colors in Brand
           <ExternalLink size={12} aria-hidden className="tw:flex-none" />
         </Button>
       ) : null}
@@ -202,7 +212,7 @@ export const ColorFillPopover: React.FC<ColorFillPopoverProps> = ({
           className={`tw:h-6 tw:w-full tw:justify-start tw:gap-1 tw:rounded tw:border-0 tw:bg-transparent tw:px-2 tw:py-0 ${TEXT_12} tw:font-medium tw:text-[var(--bk-ink-soft)] tw:hover:bg-[var(--bk-gray-50)] tw:focus:ring-0 tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]`}
         >
           {customOpen ? <ChevronDown size={12} aria-hidden /> : <ChevronRight size={12} aria-hidden />}
-          Custom colour
+          Custom color
         </Button>
         {customOpen ? (
           <div id="fill-custom-colour" className="tw:-mx-3 tw:-mb-3" data-testid="fill-custom-picker">

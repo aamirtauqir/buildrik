@@ -59,6 +59,20 @@ Rows closed this run are `drift-open` with notes ("built, not compared" where no
 | S2 layer review before removal | `e94bc1396` | done |
 | manifest cleanup | `fffa7c08c` | 14 L-F recovery rows restored to base |
 
+## Status (round 19, 2026-10-30)
+
+| Rows | State |
+|---|---|
+| S09, S10, G02 receipts (useClipboardToasts — delete transaction, original's name, "· Desktop / Default") | drift-fixed (probe `element-receipt`) |
+| S33 invalid video URL kept as a refused draft + Restore last valid URL | drift-fixed |
+| G04 / G22 lock refusals (`components/LockRefusal.tsx`) | drift-fixed |
+| D11 "{Field} is now static text · Undo" | drift-fixed |
+| G07–G12 Create component draft / limit / pending / failure | drift-fixed |
+| S32 scroll per element + tab | built, test-verified, not probe-compared |
+| S02 load-failure card, S30 Show Inspector, I06 unit card, 39:9114 shared-token edit | built; open parts in the rows' notes |
+| S31 (B-23), S17/S18 (B-24, owner G2-146), R09 (Assets Fonts page) | not built — lead / owner |
+| 4 handoff / review boards | `superseded:handoff-board` (lead) |
+
 ## Archetypes (ordered: Play-journey steps first, then the largest drift clusters)
 
 ### A1 · Tab chassis — Content · Style · Behavior · Effects  (~200 rows inherit; direct: 36:2, 161:8480, 156:716, 161:13919)
