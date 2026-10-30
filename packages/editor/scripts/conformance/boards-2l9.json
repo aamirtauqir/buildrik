@@ -4025,8 +4025,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Board compared (shots/423-98884.png): after Apply link the draft stays open (built, walked live round 13); the board's 'Selected text link · https://… · The link is part of the current text edit…' block is the Inspector's — L-B. | Round 13: Link applies through the 'Link selected text' dialog with the draft kept (423:98532, walked live: link made, edit open, Done commits one step). Not image-compared (board not fetched). | Round 12: the toolbar's Link opens the address field with 'Apply link' (and Remove); the board's titled dialog 'Link selected text' is not drawn — not compared (board not fetched). | Prior: Link popover exists; board dialog 'Link selected text' + Apply link",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B round 17 add-on, side by side with the board PNG (probe heading with a canvas stand-in made contentEditable and the selection inside a link): Content shows 'Selected text link', the link's real href ('https://fieldwork.studio/work'; '· opens in a new tab' when its target is _blank), and 'The link is part of the current text edit. Done or Escape commits this text transaction.' — read from the <a href> around the document selection inside this element's node while the inline edit is on (SelectedTextLink, follows selectionchange; unit-tested). Editor half (L-A): Board compared (shots/423-98884.png): after Apply link the draft stays open (built, walked live round 13); the board's 'Selected text link · https://… · The link is part of the current text edit…' block is the Inspector's — L-B. | Round 13: Link applies through the 'Link selected text' dialog with the draft kept (423:98532, walked live: link made, edit open, Done commits one step). Not image-compared (board not fetched). | Round 12: the toolbar's Link opens the address field with 'Apply link' (and Remove); the board's titled dialog 'Link selected text' is not drawn — not compared (board not fetched). | Prior: Link popover exists; board dialog 'Link selected text' + Apply link",
    "tier": "P1"
   },
   {
