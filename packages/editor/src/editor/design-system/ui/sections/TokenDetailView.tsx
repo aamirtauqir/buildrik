@@ -33,12 +33,8 @@ import * as React from "react";
 import { resolveTokenLiteral, type TokenUsageCount } from "@buildrik/shared/tokens";
 import type { Composer } from "@/engine/Composer";
 import type { DesignToken } from "@/editor/design-system/types";
-import type { LintIssue } from "@/engine/designSystem/LintState";
-import type { UsageRef } from "@/engine/designSystem/TokenUsageTracker";
-import { ELEMENT_TYPE_LABELS } from "@/shared/constants/elementTypeLabels";
 import { useDSModeOptional } from "@/editor/design-system/state/DSModeContext";
-import { calcContrastRatio } from "@/engine/designSystem/colorMath";
-import { findSurfaceToken, resolveSurface, shownValue } from "@/editor/design-system/utils/contrastLint";
+import { TokenChecksLine, TokenUsageList, tokenContrastLine, useTokenFacts } from "./tokenFacts";
 import { ColorPicker } from "../colors/ColorPicker";
 import { displayValue } from "../colors/ColorTokenList";
 import { BrandFontPopover } from "./BrandFontPopover";
@@ -86,7 +82,6 @@ const ACTION =
   "tw:h-6 tw:flex-none tw:rounded-[var(--bk-radius-md)] tw:border-[var(--bk-border)] tw:px-3 tw:text-[length:var(--bk-text-13)] tw:font-normal tw:leading-4 tw:text-[var(--bk-ink)]";
 /* DQ-020: a 20px target (DESIGN.md A1.4) for a 16px line — the -2px margins
    keep the row's layout where the 16px link left it. */
-const LINK = "tw:h-auto tw:min-h-5 tw:-my-0.5 tw:p-0 tw:text-[length:var(--bk-text-12)] tw:leading-4";
 
 /* The 40px preview tile — the token's own colour, family or size is the one
    computed value; everything else is chrome. */
@@ -157,72 +152,11 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
     onValueChange?.(token.id, draft);
   };
 
-  // ─ Used by: subscribe to tokenUsage:changed for live count + breakdown updates.
-  const tracker = composer?.designSystem?.tokenUsage;
-  const readBreakdown = React.useCallback(
-    (): readonly UsageRef[] => tracker?.getBreakdown?.(token.id) ?? [],
-    [tracker, token.id],
-  );
-  const [usageRefs, setUsageRefs] = React.useState<readonly UsageRef[]>(() => readBreakdown());
-  React.useEffect(() => {
-    if (!tracker) return;
-    setUsageRefs(readBreakdown());
-    const handler = () => setUsageRefs(readBreakdown());
-    tracker.on("tokenUsage:changed", handler);
-    return () => {
-      tracker.off("tokenUsage:changed", handler);
-    };
-  }, [tracker, readBreakdown]);
-  /* One element can bind the token several times (base, tablet, :hover) —
-     the row says "elements", so count elements. */
-  const usageCount = new Set(usageRefs.map((r) => r.elementId)).size;
+  // ─ Used by · lint · Aliased by — one subscription set, shared with ColorTokenEditor.
+  const { usageRefs, usageCount, lintState, lintIssues, aliases } = useTokenFacts(composer, token.id, allTokens);
   const [usageExpanded, setUsageExpanded] = React.useState(false);
 
-  // ─ Lint: subscribe to lint:changed; snapshot visible (non-suppressed) issues.
-  const lintState = composer?.designSystem?.lintState;
-  const [lintIssues, setLintIssues] = React.useState<readonly LintIssue[]>(
-    () => lintState?.getVisibleIssues?.(token.id) ?? [],
-  );
-  React.useEffect(() => {
-    if (!lintState) return;
-    setLintIssues(lintState.getVisibleIssues(token.id));
-    const handler = () => setLintIssues(lintState.getVisibleIssues(token.id));
-    lintState.on("lint:changed", handler);
-    return () => {
-      lintState.off("lint:changed", handler);
-    };
-  }, [lintState, token.id]);
-
-  // ─ Aliased by: reverse-lookup via composer.aliasResolver (D6.a).
-  const aliasResolver = composer?.aliasResolver;
-  const computeAliases = React.useCallback((): readonly DesignToken[] => {
-    if (!aliasResolver || !allTokens || allTokens.length === 0) return [];
-    return aliasResolver.findAliasesOf(token.id, allTokens);
-  }, [aliasResolver, allTokens, token.id]);
-  const [aliases, setAliases] = React.useState<readonly DesignToken[]>(() => computeAliases());
-  React.useEffect(() => {
-    setAliases(computeAliases());
-    if (!composer || typeof composer.on !== "function") return;
-    const handler = () => setAliases(computeAliases());
-    composer.on("tokens:alias-changed", handler);
-    return () => {
-      composer.off?.("tokens:alias-changed", handler);
-    };
-  }, [composer, computeAliases]);
-
-  /* The contrast the pass line reports: the token as the page shows it,
-     against the customer's page colour (never the editor's). */
-  const contrast = React.useMemo(() => {
-    if (!isColor) return null;
-    const surface = findSurfaceToken(allTokens ?? [token]);
-    const bg = resolveSurface(surface, resolveList, mode);
-    const fg = shownValue(token, resolveList, mode);
-    if (!fg || fg.toUpperCase() === bg.toUpperCase()) return null;
-    const ratio = calcContrastRatio(fg, bg);
-    if (!Number.isFinite(ratio)) return null;
-    const on = bg.toUpperCase() === "#FFFFFF" ? "white" : (surface?.friendlyName ?? surface?.name ?? bg);
-    return `${ratio.toFixed(1)}:1 contrast on ${on}`;
-  }, [isColor, resolveList, token, mode]);
+  const contrast = isColor ? tokenContrastLine(token, resolveList, mode) : null;
 
   // ─ Editors. The value line is read-only until its Change is pressed.
   const [editingLight, setEditingLight] = React.useState(false);
@@ -591,37 +525,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
           View ›
         </Button>
       </div>
-      {usageExpanded && usageCount > 0 && (
-        <ul className="tw:mb-2 tw:flex tw:flex-col tw:gap-0.5 tw:pl-1" data-used-by-list role="list">
-          {usageRefs.map((ref, idx) => {
-            const el = composer?.elements?.getElement?.(ref.elementId);
-            const type = el?.getType?.();
-            const name = type
-              ? (ELEMENT_TYPE_LABELS[type] ?? type.charAt(0).toUpperCase() + type.slice(1))
-              : ref.elementId;
-            const where = ref.context ? `${ref.styleProp} · ${ref.context}` : ref.styleProp;
-            return (
-              <li key={`${ref.elementId}-${ref.styleProp}-${idx}`}>
-                <Button
-                  type="button"
-                  variant="link"
-                  size="xs"
-                  onClick={() => {
-                    const target = composer?.elements?.getElement?.(ref.elementId);
-                    if (target) composer?.selection?.select(target);
-                  }}
-                  aria-label={`Select ${name} · ${where}`}
-                  data-used-by-entry={ref.elementId}
-                  className={`${LINK} tw:text-[var(--bk-ink)] tw:enabled:hover:text-[var(--bk-accent)]`}
-                >
-                  <span>{name}</span>
-                  <span className={`tw:ml-1 tw:text-[var(--bk-ink-muted)] ${MONO}`}>· {where}</span>
-                </Button>
-              </li>
-            );
-          })}
-        </ul>
-      )}
+      {usageExpanded && usageCount > 0 && <TokenUsageList composer={composer} usageRefs={usageRefs} />}
 
       {/* Aliased by — hidden when empty (D6.a) */}
       {aliases.length > 0 && (
@@ -634,46 +538,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
       )}
 
       {/* Brand checks */}
-      <div className="tw:mt-1 tw:flex tw:min-h-6 tw:flex-col tw:justify-center tw:gap-1.5">
-        {issue ? (
-          <div
-            className="tw:flex tw:flex-wrap tw:items-center tw:gap-x-3 tw:gap-y-1 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-warning-text)]"
-            data-testid="brand-token-lint-value"
-            data-lint-status="fail"
-          >
-            <span>
-              <span aria-hidden="true">△ </span>
-              {issue.message}
-            </span>
-            {issue.autoFixHint && (
-              <Button type="button" variant="link" size="xs" onClick={handleAutoFix} aria-label="Auto-fix lint issue" className={LINK}>
-                Auto-fix
-              </Button>
-            )}
-            <Button
-              type="button"
-              variant="link"
-              size="xs"
-              onClick={handleIgnore}
-              aria-label="Ignore lint issue"
-              data-testid="brand-token-ignore"
-              className={`${LINK} tw:text-[var(--bk-ink-muted)]`}
-            >
-              Ignore
-            </Button>
-          </div>
-        ) : (
-          /* `--bk-success-text` — the one green that passes AA at this size. */
-          <div
-            className="tw:flex tw:items-center tw:gap-1.5 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-soft)]"
-            data-testid="brand-token-lint-value"
-            data-lint-status="pass"
-          >
-            <span aria-hidden="true" className="tw:text-[var(--bk-success-text)]">✓</span>
-            <span>Brand checks pass{contrast ? ` · ${contrast}` : ""}</span>
-          </div>
-        )}
-      </div>
+      <TokenChecksLine issue={issue} contrast={contrast} onAutoFix={handleAutoFix} onIgnore={handleIgnore} />
 
 
       <TokenRenameDialog

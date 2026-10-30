@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { setTokenLiteral, resolveTokenLiteral, lightAliasOf } from "../resolve";
+import { setTokenAlias, setTokenLiteral, resolveTokenLiteral, lightAliasOf } from "../resolve";
 import type { DesignToken } from "@buildrik/shared/schemas/design-tokens";
 
 const p: DesignToken = { id: "b", name: "b", kind: "color", layer: "primitive", modes: { light: { value: "#000" } }, category: "colors", cssVar: "--buildrick-design-b", type: "color" };
@@ -102,5 +102,22 @@ describe("lightAliasOf", () => {
     ];
     expect(resolveTokenLiteral(ts, "color-old", "light")).toBe("#1A56DB");
     expect(resolveTokenLiteral(ts, "color-old", "dark")).toBe("#60A5FA");
+  });
+});
+
+describe("setTokenAlias (2L9 B6-B02)", () => {
+  const b2: DesignToken = { ...p, id: "b2", cssVar: "--buildrick-design-b2", modes: { light: { value: "#111" } } };
+  it("points a semantic token's light mode at another token; its dark mode stays", () => {
+    const withDark: DesignToken = { ...s1, modes: { light: { alias: "b" }, dark: { value: "#eee" } } };
+    const out = setTokenAlias([p, b2, withDark], "s1", "b2");
+    expect(resolveTokenLiteral(out, "s1", "light")).toBe("#111");
+    expect(out.find((t) => t.id === "s1")!.modes.dark).toEqual({ value: "#eee" });
+  });
+  it("refuses a primitive, an unknown target, itself, and a cycle", () => {
+    expect(setTokenAlias([p, b2], "b", "b2")).toEqual([p, b2]);
+    expect(setTokenAlias([p, s1], "s1", "nope")).toEqual([p, s1]);
+    expect(setTokenAlias([p, s1], "s1", "s1")).toEqual([p, s1]);
+    const s3: DesignToken = { ...s1, id: "s3", cssVar: "--buildrick-design-s3", modes: { light: { alias: "s1" } } };
+    expect(setTokenAlias([p, s1, s3], "s1", "s3")).toEqual([p, s1, s3]);
   });
 });

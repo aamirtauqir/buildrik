@@ -10095,8 +10095,8 @@
    "family": "brand",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — Edit opens a token card (Change/Set/Used by/View) not board's Light/Dark hex fields + Picker, Used by/Aliased by links, Token actions. Reach note absent (0 uses). | prior: L-D W1: card opens the token's edit page in place of the list: \"‹ Colors\", reach note \"This changes n places across the site, including uses through aliases.\", then the token controls (light/dark pickers, used by, aliased by, token actions). Labels inside the controls keep \"Light value\"/\"Dark value\"",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 29, rebuilt to the board and probe-compared side by side (lb/b02.png): '‹ Colors', the token's name, the reach line, Light / Dark hex fields (swatch, mono, commit on Enter / blur) each with Picker, 'Dark shade suggestions ▾' (the light colour's own scale: dark step, mirror step, 300, 400), the alias select ('Literal value · no alias' or 'Alias of {token} · #hex' — setTokenAlias, cycles refused), 'Used by n ›' (element list + canvas highlight), 'Aliased by n tokens ›' (opens one), 'Token actions ▾' (Rename… · Generate scale · Reset to default / Delete…). Brand-check line kept under it. ColorTokenEditor; usage / lint / alias facts shared with TokenDetailView (tokenFacts.tsx). Hex fields are white bordered where the board fills them grey. | Compared live 2026-10-26 (cms-brand): DRIFT — Edit opens a token card (Change/Set/Used by/View) not board's Light/Dark hex fields + Picker, Used by/Aliased by links, Token actions. Reach note absent (0 uses). | prior: L-D W1: card opens the token's edit page in place of the list: \"‹ Colors\", reach note \"This changes n places across the site, including uses through aliases.\", then the token controls (light/dark pickers, used by, aliased by, token actions). Labels inside the controls keep \"Light value\"/\"Dark value\"",
    "tier": "P2"
   },
   {
@@ -10118,8 +10118,8 @@
    "family": "brand",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — Error copy matches exactly. Shown in a picker popover (not inline field); popover bottom 891px runs under footer (868), Cancel/Apply half-hidden. | prior: L-D S8: \"Enter a valid hex color, such as #1A56DB. The token hasn’t changed.\" (ColorPicker). Drill-in layout open (B02). Built, not compared.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 29: an invalid hex ('#12X') stays in its field and 'Enter a valid hex color, such as #1A56DB. The token hasn’t changed.' shows; nothing is written (ColorTokenEditor.test). | Compared live 2026-10-26 (cms-brand): DRIFT — Error copy matches exactly. Shown in a picker popover (not inline field); popover bottom 891px runs under footer (868), Cancel/Apply half-hidden. | prior: L-D S8: \"Enter a valid hex color, such as #1A56DB. The token hasn’t changed.\" (ColorPicker). Drill-in layout open (B02). Built, not compared.",
    "tier": "P2"
   },
   {
@@ -10152,8 +10152,8 @@
    "family": "brand",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — Heading + strap copy match. Starters are 48px left-aligned rows in one card vs board 32px centered bordered buttons with gaps; 'From logo or URL' hidden (dsAi flag). | prior: L-D S6: \"Choose a starting point\" + \"Preview a palette before applying it to your site.\", › rows, \"From logo or URL ›\" last (dsAi only, authority for that row's gate: code:dsai-flag). Built, not compared.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 29, probe text compare (?case=brand-workspace&page=…, pane innerText vs the board's copy; scratch lb/bcmp.mjs): 'Choose a starting point · Preview a palette before applying it to your site.' and one '{starter} ›' row per starter — the starter names are the catalogue's (board sample names are data); 'From logo or URL ›' is code:dsai-flag (AI). | Compared live 2026-10-26 (cms-brand): DRIFT — Heading + strap copy match. Starters are 48px left-aligned rows in one card vs board 32px centered bordered buttons with gaps; 'From logo or URL' hidden (dsAi flag). | prior: L-D S6: \"Choose a starting point\" + \"Preview a palette before applying it to your site.\", › rows, \"From logo or URL ›\" last (dsAi only, authority for that row's gate: code:dsai-flag). Built, not compared.",
    "tier": "P2"
   },
   {
@@ -10208,7 +10208,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — 'Mode · Off' is a heading not a select; tokens listed as name/'No dark value'/Set rows, not light+dark hex pairs+Picker; 'Turn on Auto…' secondary at top (board primary at bottom); extra cards. | prior: L-D W3: \"Mode · Off\", \"Website appearance\", \"Auto follows the visitor’s device appearance. Editor controls stay light.\", \"Turn on Auto…\"; per-token paired values are ColourModeSection's list below. Built, not compared.",
+   "verifiedNote": "L-B round 29, probe text compare (?case=brand-workspace&page=…, pane innerText vs the board's copy; scratch lb/bcmp.mjs): drift: board rows are 'name · light hex · dark hex · Picker' per semantic colour with 'Turn on Auto…' last; ours puts Turn on Auto… first, a Light / Dark preview switch, and rows 'No dark value · Set' / '#light → #dark'. | Compared live 2026-10-26 (cms-brand): DRIFT — 'Mode · Off' is a heading not a select; tokens listed as name/'No dark value'/Set rows, not light+dark hex pairs+Picker; 'Turn on Auto…' secondary at top (board primary at bottom); extra cards. | prior: L-D W3: \"Mode · Off\", \"Website appearance\", \"Auto follows the visitor’s device appearance. Editor controls stay light.\", \"Turn on Auto…\"; per-token paired values are ColourModeSection's list below. Built, not compared.",
    "tier": "P2"
   },
   {
@@ -10242,7 +10242,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — Import | Export tabs vs one page with both sections; dashed dropzone vs button; Update matching/Add new only buttons vs select; extra 'or paste JSON'. | prior: L-D W4: ordinary page (header, strap, preview column) with Import | Export tabs; Import: \"Import tokens\", \"Choose JSON file\", \"Review compatible values and changes before applying.\", Update matching (+ code-ahead Add new only) with \"Matching values update. Tokens absent from the file are kept.\". Bui",
+   "verifiedNote": "L-B round 29, probe text compare (?case=brand-workspace&page=…, pane innerText vs the board's copy; scratch lb/bcmp.mjs): drift: the board shows Import (Choose JSON file · Update matching) and Export (CSS · JSON · Tailwind · 'Tailwind export does not retain dark-mode values.') on one page; ours splits them into Import | Export tabs and adds 'or paste JSON' and 'Add new only' (kept). | Compared live 2026-10-26 (cms-brand): DRIFT — Import | Export tabs vs one page with both sections; dashed dropzone vs button; Update matching/Add new only buttons vs select; extra 'or paste JSON'. | prior: L-D W4: ordinary page (header, strap, preview column) with Import | Export tabs; Import: \"Import tokens\", \"Choose JSON file\", \"Review compatible values and changes before applying.\", Update matching (+ code-ahead Add new only) with \"Matching values update. Tokens absent from the file are kept.\". Bui",
    "tier": "P2"
   },
   {
@@ -10275,7 +10275,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-D W5: finding rows read label (\"Missing dark value\") over the finding's sentence, each with Open · Fix (when hinted) · Ignore; \"Show ignored · N\" lists ignored tokens with Restore; Run checks in the header. No \"Unconnected color\" lint rule (Connect to Brand colors stays a door under the list). Built, not compared.",
+   "verifiedNote": "L-B round 29: not compared — the probe's tokens raise no Brand-check findings, so 'Unconnected color' / 'Missing dark value' rows cannot be shown there. | L-D W5: finding rows read label (\"Missing dark value\") over the finding's sentence, each with Open · Fix (when hinted) · Ignore; \"Show ignored · N\" lists ignored tokens with Restore; Run checks in the header. No \"Unconnected color\" lint rule (Connect to Brand colors stays a door under the list). Built, not compared.",
    "tier": "P2"
   },
   {
@@ -10319,7 +10319,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-D S1: nav/title \"Typography\", action \"Manage site fonts ›\". Open: Heading/Body font selects + font-size token rows (deferred). Not compared.",
+   "verifiedNote": "L-B round 29, probe text compare (?case=brand-workspace&page=…, pane innerText vs the board's copy; scratch lb/bcmp.mjs): drift: the board's Typography page is 'Heading font ▾ / Body font ▾ · Manage site fonts › · Font-size tokens (Core type tokens can’t be removed or renamed.) · text-xs … display, px, Used by n'; ours lists the font roles (Heading / Body / Mono ›) and the type-style rows. Needs a font-size token list built from the typography tokens. | L-D S1: nav/title \"Typography\", action \"Manage site fonts ›\". Open: Heading/Body font selects + font-size token rows (deferred). Not compared.",
    "tier": "P2"
   },
   {
@@ -10330,7 +10330,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-D S3: Compact/Normal/Spacious segmented (aria-pressed) + Reset to defaults + board note; ⋯ menu removed. \"+ Add spacing\" kept (code-ahead). Built, not compared.",
+   "verifiedNote": "L-B round 29, probe text compare (?case=brand-workspace&page=…, pane innerText vs the board's copy; scratch lb/bcmp.mjs): Compact / Normal / Spacious · Reset to defaults · 'Spacing steps can be changed but not renamed or deleted.' · rows 'name · px · Used by n' match. Drift: our table has a TOKEN / VALUE / PRESET / USED header row and '+ Add spacing' the board does not draw (kept: adding a step is a capability). | L-D S3: Compact/Normal/Spacious segmented (aria-pressed) + Reset to defaults + board note; ⋯ menu removed. \"+ Add spacing\" kept (code-ahead). Built, not compared.",
    "tier": "P2"
   },
   {
@@ -10340,8 +10340,8 @@
    "family": "brand",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-D S1: Other kinds index, 11 rows with the board's descriptions + intro line. Built, not compared.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 29, probe text compare (?case=brand-workspace&page=…, pane innerText vs the board's copy; scratch lb/bcmp.mjs): 'Each kind has its own page. Values use that kind’s validator.' and the eleven '{Kind} · {what} ›' rows — exact. | L-D S1: Other kinds index, 11 rows with the board's descriptions + intro line. Built, not compared.",
    "tier": "P2"
   },
   {
@@ -10352,7 +10352,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — '+ Add radius' secondary inline with '‹ Other kinds' (board: primary on own row); value plain text not input; header band + swatch col + side token card not on board. | prior: L-D S1+W8: \"‹ Other kinds\", \"+ Add radius\", rows name · value · \"Used by n\" · ⋯. Rows sit in the token table (header band kept); the side card stays for the selected token (code-ahead: usage list, checks). Built, not compared.",
+   "verifiedNote": "L-B round 29, probe text compare (?case=brand-workspace&page=…, pane innerText vs the board's copy; scratch lb/bcmp.mjs): '‹ Other kinds · + Add radius' and rows 'name · value · Used by n · ⋯' match. Drift: a TOKEN / VALUE / USED header row the board does not draw. | Compared live 2026-10-26 (cms-brand): DRIFT — '+ Add radius' secondary inline with '‹ Other kinds' (board: primary on own row); value plain text not input; header band + swatch col + side token card not on board. | prior: L-D S1+W8: \"‹ Other kinds\", \"+ Add radius\", rows name · value · \"Used by n\" · ⋯. Rows sit in the token table (header band kept); the side card stays for the selected token (code-ahead: usage list, checks). Built, not compared.",
    "tier": "P2"
   },
   {
@@ -10374,7 +10374,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-D S1: one Type styles · Presets page (Type styles + Presets groups, read-only notes, \"Browse section blocks in Add ›\"); Component styles page folded in. ✦ Generate with AI kept until PR #33. Built, not compared.",
+   "verifiedNote": "L-B round 29, probe text compare (?case=brand-workspace&page=…, pane innerText vs the board's copy; scratch lb/bcmp.mjs): Type styles list + Presets 'Read-only catalogue' + 'Browse section blocks in Add ›' match in structure; each style reads 'Inter Bold 36/40' where the board writes 'Fraunces · 32/40 · 600'. | L-D S1: one Type styles · Presets page (Type styles + Presets groups, read-only notes, \"Browse section blocks in Add ›\"); Component styles page folded in. ✦ Generate with AI kept until PR #33. Built, not compared.",
    "tier": "P2"
   },
   {

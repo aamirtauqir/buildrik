@@ -41,7 +41,7 @@ import { ChevronLeft } from "lucide-react";
 import { Button, Modal, Popover, Tooltip, useToast } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine/Composer";
 import { EVENTS } from "@/shared/constants/events";
-import { resolveTokenLiteral, setTokenLiteral } from "@buildrik/shared/tokens";
+import { resolveTokenLiteral, setTokenAlias, setTokenLiteral } from "@buildrik/shared/tokens";
 import type { SpacingPreset } from "../state/spacingRegistry";
 import {
   useColorRegistry,
@@ -75,6 +75,7 @@ import { BrandPreview } from "./BrandPreview";
 import { BrandCard, BrandChevron, BrandRow } from "./BrandCard";
 import { BrandLivePreview } from "./BrandLivePreview";
 import { aliasedByCount } from "./colors/ColorTokenList";
+import { ColorTokenEditor } from "./colors/ColorTokenEditor";
 import { TokenDetailView } from "./sections/TokenDetailView";
 import { TokenDeleteDialog } from "./sections/TokenDeleteDialog";
 import { TokensSection } from "./sections/TokensSection";
@@ -623,6 +624,16 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
     if (next === allTokens) return;
     if (!store.commit(next, "Edit token")) refused(`"${tok.name}"`);
   };
+  /* B6-B02's alias select: the light mode points at another token, or back
+     to a literal of the value it shows now. One commit, one ⌘Z. */
+  const aliasToken = (id: string, targetId: string | null) => {
+    const tok = tokenById(id);
+    if (!tok) return;
+    const next = targetId
+      ? setTokenAlias(allTokens, id, targetId)
+      : setTokenLiteral(allTokens, id, "light", resolveTokenLiteral(allTokens, id, "light") ?? "");
+    if (!store.commit(next, "Edit token")) refused(`"${tok.name}"`);
+  };
   const deleteToken = (id: string, opts?: { replaceWith?: string }) => {
     const tok = tokenById(id);
     if (!tok) return;
@@ -823,25 +834,42 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
         /* B6-B02: the token's edit page, in place of the list. */
         const reach = composer?.designSystem?.tokenUsage?.getCount?.(selectedToken.id);
         return (
-          <div className="tw:flex tw:max-w-[620px] tw:flex-col tw:gap-3" data-testid="brand-token-edit">
+          <div className="tw:flex tw:max-w-[620px] tw:flex-col tw:gap-4" data-testid="brand-token-edit">
             <Button
               type="button"
               variant="link"
               size="xs"
-              className="tw:h-7 tw:self-start tw:px-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)] tw:enabled:hover:text-[var(--bk-accent)] tw:enabled:hover:no-underline"
+              className="tw:h-7 tw:max-w-[446px] tw:px-0 tw:text-[length:var(--bk-text-13)] tw:font-normal tw:leading-5"
               onClick={() => setSelectedTokenId(null)}
               data-testid="brand-back-colours"
             >
               ‹ Colors
             </Button>
+            <h3 className="tw:m-0 tw:text-[length:var(--bk-text-14)] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]" data-testid="brand-token-edit-name">
+              {isBeginner ? (selectedToken.friendlyName ?? selectedToken.name) : selectedToken.id}
+            </h3>
             {typeof reach === "number" && reach > 0 && (
               /* B6-B02 / B6-B30: what an edit here reaches, before it is made. */
-              <p className="tw:m-0 tw:bg-[var(--bk-accent-tint)] tw:p-3 tw:text-[length:var(--bk-text-12)] tw:leading-[18px] tw:text-[var(--bk-ink)]" data-testid="brand-token-reach">
+              <p className="tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-[18px] tw:text-[var(--bk-ink)]" data-testid="brand-token-reach">
                 This changes {reach} place{reach === 1 ? "" : "s"} across the site
                 {aliasedByCount(allTokens, selectedToken.id) > 0 ? ", including uses through aliases." : "."}
               </p>
             )}
-            {detailCard(selectedToken)}
+            <ColorTokenEditor
+                token={selectedToken}
+                composer={composer}
+                allTokens={allTokens}
+                mode={shownMode}
+                onValueChange={changeToken}
+                onAliasChange={aliasToken}
+                onSelectToken={setSelectedTokenId}
+                onShowUsage={tokenPageProps.onShowUsage}
+                onRename={renameToken}
+                onDelete={deleteToken}
+                onReset={SEED_BY_ID.has(selectedToken.id) ? resetToken : undefined}
+                onDeleted={() => setSelectedTokenId(null)}
+                onGenerateScale={isSemanticColour(selectedToken) ? openScale : undefined}
+              />
           </div>
         );
       }
