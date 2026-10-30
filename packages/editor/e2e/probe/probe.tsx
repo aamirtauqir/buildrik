@@ -105,6 +105,7 @@ import { Composer } from "@/engine/Composer";
 import { LayersLoadError, LayersNoResults } from "@/editor/panels/layers/components/LayersStateBlocks";
 import { Row as InsertRow } from "@/editor/sidebar/tabs/build/components/GroupSection";
 import { BuildTab } from "@/editor/sidebar/tabs/build/BuildTab";
+import { LinkSection } from "@/editor/inspector/sections/LinkSection";
 import type { ComponentDefinition } from "@/shared/types/components";
 import { PanelLoadingSkeleton } from "@/editor/shared/PanelStates";
 /* AgentPlan carries `.bd-ai-*` styles that only AITab imports, so the probe
@@ -920,16 +921,20 @@ function trashStub(mode: string) {
     deletedBy: { id: "u1", name: "You", isYou: true }, folderName: mode === "folder" ? "Client projects" : null,
   }];
   const fail = (status: number, code: string, message: string) => ({ error: { json: { message, code: -1, data: { code, httpStatus: status } } } });
-  window.fetch = (async (input: RequestInfo | URL) => {
+  window.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
     const href = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
     const procs = new URL(href, location.origin).pathname.split("/api/trpc/")[1]?.split(",") ?? [];
+    /* The slug the restore asked for (the "choose a different URL" step). */
+    const asked = /"slug":"([^"]+)"/.exec(typeof init?.body === "string" ? init.body : "")?.[1];
     const body = procs.map((name) => {
       if (name === "pages.trash.list") return { result: { data: { json: list } } };
       if (name === "sites.myRole") return { result: { data: { json: { role: "ADMIN" } } } };
       if (name === "pages.trash.restore") {
-        if (mode === "slug") return fail(409, "CONFLICT", "SLUG_TAKEN:about-2");
+        if (mode === "slug" && !asked) return fail(409, "CONFLICT", "SLUG_TAKEN:about-2");
         if (mode === "limit") return fail(412, "PRECONDITION_FAILED", "Delete a page or upgrade to restore.");
         if (mode === "fail") return fail(500, "INTERNAL_SERVER_ERROR", "boom");
+        const row = { id: "p_about_trash", name: "About", slug: asked ?? "about", isHomePage: false, blocks: [], settings: {} };
+        return { result: { data: { json: row } } };
       }
       return { result: { data: { json: null } } };
     });
@@ -2352,6 +2357,107 @@ function CmsDynamicPagesHost() {
   );
 }
 
+/* design-2l9 176:21119 / 176:21523 / 189:21741 — the Add panel's CMS rows
+   on a REAL Composer: a Blog collection linked to its "Blog post" template
+   page (Article › Heading selected) and a Team collection. `&home=1` opens
+   Home instead, where only the Collection lists show (189:21741). */
+function AddPanelCmsHost() {
+  const [composer, setComposer] = React.useState<Composer | null>(null);
+  React.useEffect(() => {
+    const c = new Composer({} as never);
+    const home = c.elements.createPage("Home");
+    c.elements.setHomePage(home.id);
+    const tpl = c.elements.createPage("Blog post");
+    void (async () => {
+      const blog = await c.cms.collections.createCollection("Blog", "blog", undefined, {
+        displayField: "title",
+        fields: [
+          { id: "f-title", name: "Title", slug: "title", type: "text", order: 0 },
+          { id: "f-slug", name: "Slug", slug: "slug", type: "slug", order: 1 },
+          { id: "f-excerpt", name: "Excerpt", slug: "excerpt", type: "textarea", order: 2 },
+          { id: "f-body", name: "Body", slug: "body", type: "richtext", order: 3 },
+          { id: "f-cover", name: "Cover image", slug: "cover", type: "image", order: 4 },
+          { id: "f-pub", name: "Published on", slug: "published", type: "date", order: 5 },
+        ] as never,
+      });
+      await c.cms.collections.createCollection("Team", "team", undefined, {
+        displayField: "name",
+        fields: [
+          { id: "t-portrait", name: "Portrait", slug: "portrait", type: "image", order: 0 },
+          { id: "t-name", name: "Name", slug: "name", type: "text", order: 1 },
+          { id: "t-role", name: "Role", slug: "role", type: "text", order: 2 },
+        ] as never,
+      });
+      const file = pageFileNames(c.elements.getAllPages()).get(tpl.id) ?? "blog-post.html";
+      await c.cms.collections.updateCollection(blog.id, { pageSlugPattern: "/blog/{slug}", pageTemplatePath: file } as never);
+      const onHome = new URLSearchParams(location.search).get("home") === "1";
+      const page = onHome ? home : tpl;
+      c.elements.setActivePage(page.id);
+      const article = c.elements.createElement("section" as never, { id: "apc-article" });
+      c.elements.addElement(article, page.root.id);
+      renameElement(c, "apc-article", "Article");
+      const heading = c.elements.createElement("heading" as never, { id: "apc-heading", content: "A clearer point of view" });
+      c.elements.addElement(heading, "apc-article");
+      renameElement(c, "apc-heading", "Heading");
+      c.selection.select(c.elements.getElement("apc-heading") ?? null);
+      setComposer(c);
+    })();
+  }, []);
+  return (
+    <div data-probe="add-panel-cms">
+      <ToastProvider>
+        <div className="tw:flex tw:h-[812px] tw:w-70 tw:flex-col tw:overflow-hidden tw:bg-white">
+          {composer ? <BuildTab composer={composer} onExpandToggle={() => {}} onClose={() => {}} /> : null}
+        </div>
+      </ToastProvider>
+    </div>
+  );
+}
+
+/* design-2l9 193:25921 … 195:29268 — the Link row of a Card inside a Team
+   Collection list, on a REAL Composer, in a 288-wide inspector column. Team
+   has no page per record; the walk picks This record's page and runs Create
+   collection page. `&siteId=` makes the collection link's server save fail
+   (no server behind the probe) for D93; without it the make succeeds (D90). */
+function LinkRowRecordHost() {
+  const [state, setState] = React.useState<{ c: Composer; card: string } | null>(null);
+  React.useEffect(() => {
+    const c = new Composer({} as never);
+    const home = c.elements.createPage("Home");
+    c.elements.setHomePage(home.id);
+    c.elements.setActivePage(home.id);
+    void (async () => {
+      const team = await c.cms.collections.createCollection("Team", "team", undefined, {
+        displayField: "name",
+        fields: [
+          { id: "f-portrait", name: "Portrait", slug: "portrait", type: "image", order: 0 },
+          { id: "f-name", name: "Name", slug: "name", type: "text", order: 1 },
+          { id: "f-slug", name: "Slug", slug: "slug", type: "slug", order: 2 },
+          { id: "f-role", name: "Role", slug: "role", type: "text", order: 3 },
+          { id: "f-bio", name: "Bio", slug: "bio", type: "richtext", order: 4 },
+        ] as never,
+      });
+      await c.cms.collections.createContentItem(team.id, { name: "Ali Shah", role: "Designer", slug: "ali-shah" }, { status: "published" });
+      const list = c.elements.createElement("collection-list" as never, { id: "lr-list" });
+      c.elements.addElement(list, home.root.id);
+      renameElement(c, "lr-list", "Team");
+      const card = c.elements.createElement("link" as never, { id: "lr-card", tagName: "a" } as never);
+      c.elements.addElement(card, "lr-list");
+      renameElement(c, "lr-card", "Card");
+      c.cms.bindings.bindCollectionList("lr-list", team.id);
+      c.selection.select(c.elements.getElement("lr-card") ?? null);
+      setState({ c, card: "lr-card" });
+    })();
+  }, []);
+  return (
+    <ToastProvider>
+      <div data-probe="link-row-record" style={{ position: "fixed", right: 0, top: 56, width: 288, bottom: 32, background: "white", borderLeft: "1px solid var(--bk-border)" }}>
+        {state ? <LinkSection composer={state.c} selectedElement={{ id: state.card, type: "link" }} isOpen tier="primary" /> : null}
+      </div>
+    </ToastProvider>
+  );
+}
+
 function CmsWorkspaceHost() {
   const q = new URLSearchParams(location.search);
   const composer = React.useMemo(
@@ -2674,6 +2780,21 @@ const CASES: Record<string, () => React.ReactElement> = {
      then Grid. */
   /* design-2l9 board 7:18654 — the canvas bar's contents at the board's
      ~800 canvas column: path, device toggles, width chip, zoom, View. */
+  /* 176:19089 / 176:19451 — a heading its condition hides on the preview
+     record, under the real Canvas.css rules: a named ghost, or (&hide=1, Show
+     hidden elements off) not drawn at all. */
+  "canvas-hidden-ghost": () => (
+    <div
+      className="buildrick-canvas"
+      data-probe="canvas-hidden-ghost"
+      data-bk-hide-conditional={new URLSearchParams(location.search).get("hide") === "1" ? "true" : undefined}
+      style={{ width: 512, padding: 24, background: "white", fontFamily: "var(--bk-font-ui)" }}
+    >
+      <p style={{ margin: 0, fontSize: 12 }}>JOURNAL / DESIGN</p>
+      <h2 data-bk-condition="hidden" style={{ margin: "24px 0 12px", fontSize: 24, fontWeight: 400 }}>A clearer point of view</h2>
+      <p style={{ margin: 0, fontSize: 12 }}>By Ali · 19 October 2026</p>
+    </div>
+  ),
   "canvas-bar": () => (
     <div data-probe="canvas-bar" style={{ width: 800 }}>
       <CanvasFooterToolbar
@@ -3507,6 +3628,8 @@ const CASES: Record<string, () => React.ReactElement> = {
   /* design-2l9 7:19448 — the same panel after "Text" landed in Hero: the
      receipt the insert hook hands an open Add panel. */
   "add-panel-receipt": () => <AddReceiptProbe />,
+  "add-panel-cms": () => <AddPanelCmsHost />,
+  "link-row-record": () => <LinkRowRecordHost />,
   /* Add panel with a target, board 7:18981: a real Composer with "Hero"
      selected, so the insert-target strip reads "Insert into Hero". */
   "add-panel-target": () => (
@@ -5571,7 +5694,7 @@ if (name.startsWith("pages-")) {
    the file also claims .bk-topbar* and .bk-notif-*. */
 /* Canvas.css carries .bd-canvas-empty-cta; Canvas.tsx imports it, but the
    canvas-empty case mounts only the CTA. */
-if (name === "canvas-empty" || name === "canvas-outlines") {
+if (name === "canvas-empty" || name === "canvas-outlines" || name === "canvas-hidden-ghost") {
   await import("@/editor/canvas/Canvas.css");
 }
 if (name.startsWith("notifications-")) {

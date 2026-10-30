@@ -1813,8 +1813,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 29 (A-21): built, not compared. Page trash is real: the save soft-deletes (Page.deletedAt + slug tombstone), pages.trash.list/restore/purge (EDITOR restore, ADMIN purge), RecentlyDeletedView from ⋯ Recently deleted and the delete receipts. Tests RecentlyDeletedView, page-trash-service.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Probe-compared 2026-10-31 (pages-trash&trash=slug, Restore → Restore page; board shots/142-54521.png). Fixed: a restore now returns to the Pages list (was left on an empty Recently deleted) and the receipt reads 'About restored at /about-2 · Top level' + Open. Row position is code: the server restores at the end of the list (page-trash.service position: live.length), so About sits last, not second.",
    "tier": "P1"
   },
   {
@@ -1824,8 +1824,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 29 (A-21): built, not compared. Page trash is real: the save soft-deletes (Page.deletedAt + slug tombstone), pages.trash.list/restore/purge (EDITOR restore, ADMIN purge), RecentlyDeletedView from ⋯ Recently deleted and the delete receipts. Tests RecentlyDeletedView, page-trash-service.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Probe-compared 2026-10-31 (case pages-trash, context offline; board shots/142-55231.png): Recently deleted · 1, ‹ Back to Pages, 30-day line, About /about · Top level, Deleted by you · Today, Restore (disabled) · More, foot note. Fixed: 'Needs a connection' moved to its own line under the actions (was squeezed beside More).",
    "tier": "P1"
   },
   {
@@ -1913,8 +1913,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 29 (A-21): built, not compared. Page trash is real: the save soft-deletes (Page.deletedAt + slug tombstone), pages.trash.list/restore/purge (EDITOR restore, ADMIN purge), RecentlyDeletedView from ⋯ Recently deleted and the delete receipts. Tests RecentlyDeletedView, page-trash-service.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Probe-compared 2026-10-31 (pages-trash&trash=list, Restore; board shots/142-59972.png). Fixed: back on the Pages list with 'About restored · /about' + Open (was 'restored with its URL and settings' on the empty trash view). Row position is code (server appends the restored page).",
    "tier": "P1"
   },
   {
@@ -2090,8 +2090,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 29 (A-21): built, not compared. Page trash is real: the save soft-deletes (Page.deletedAt + slug tombstone), pages.trash.list/restore/purge (EDITOR restore, ADMIN purge), RecentlyDeletedView from ⋯ Recently deleted and the delete receipts. Tests RecentlyDeletedView, page-trash-service.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared 2026-10-31 against shots/142-68730.png: the Return board draws only the default Layers shell (Home tree, Hero/Text selected) — no trash UI. The folder retention it names is server behaviour (restore keeps folderId; onRestored reloads folders, RecentlyDeletedView test). Layers default verified on its own rows.",
    "inheritsFrom": "142:62396",
    "tier": "P1"
   },
@@ -2102,8 +2102,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 29 (A-21): built, not compared. Page trash is real: the save soft-deletes (Page.deletedAt + slug tombstone), pages.trash.list/restore/purge (EDITOR restore, ADMIN purge), RecentlyDeletedView from ⋯ Recently deleted and the delete receipts. Tests RecentlyDeletedView, page-trash-service.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared 2026-10-31 against shots/144-64089.png: the precondition list (another page holds /about, former folder gone) is the ordinary Pages list (pages-shell probe, compared on 127:37393 et al.); the restore it leads to asks for a new slug (142:53954, pages-trash&trash=slug).",
    "tier": "P1"
   },
   {
@@ -8884,8 +8884,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 31: built, not compared. Canvas › View › 'Show hidden elements' (personal preference, this browser; on by default): on, an element its condition hides on the preview record is a ghost (opacity .4, dashed, 'Hidden by condition'); off, it is not drawn ([data-bk-hide-conditional] display:none) and the selection stays. The Inspector's line for the off state is L-B's (REQUESTS A-37).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Probe-compared 2026-10-31 (case canvas-hidden-ghost, real Canvas.css; board shots/176-19089.png). Fixed: 'Hidden by condition' now sits ABOVE the dashed box at full ink (was inside it, below the text, faded with the element); the fade moved from element opacity to its text colour + children so the label keeps its contrast. View › Show hidden elements row and the inspector note ('Hidden on this record — showing as ghost.') match the dump.",
    "tier": "P1"
   },
   {
@@ -8895,8 +8895,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 31: built, not compared. Canvas › View › 'Show hidden elements' (personal preference, this browser; on by default): on, an element its condition hides on the preview record is a ghost (opacity .4, dashed, 'Hidden by condition'); off, it is not drawn ([data-bk-hide-conditional] display:none) and the selection stays. The Inspector's line for the off state is L-B's (REQUESTS A-37).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Probe-compared 2026-10-31 (canvas-hidden-ghost&hide=1; board shots via dump text): with Show hidden elements off the ghost is not drawn ([data-bk-hide-conditional] display:none), selection is untouched (Layers keeps Heading), and the Conditions note reads 'Hidden on this record. Enable Show hidden elements to see it on canvas.' (ConditionsPanel).",
    "tier": "P1"
   },
   {
@@ -8950,8 +8950,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 32: built, not compared (copy and structure read from the board). Add › Elements leads, on a collection page, with 'CMS fields · {Collection}' / 'This page’s record': one 56-tall row per field the page can show — name, then its kind ('Heading H1', 'Paragraph', 'Rich text', 'Image', 'Text', 'Text · date') — and 'Insert into {parent} · after {sibling}'. Gaps: 'Image + title alt' reads 'Image' (alt is not bound); reference sub-fields ('Author › name') are not offered (pageFieldPlan skips references).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Probe-compared 2026-10-31 (case add-panel-cms, real Composer, Blog linked to 'Blog post'; board shots/176-21119.png). Fixed: kind column at x144 (was 156); the image row reads 'Image + title alt' and the insert now binds alt to the display field as well as src. Lists: the D37 board files List of Blog/Team under Elements while D74 (189:21741) gives them their own 'Collection lists' section — the boards disagree; the panel follows D74.",
    "tier": "P1"
   },
   {
@@ -8961,8 +8961,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 32: built, not compared. A field row inserts its element after the insert target, bound to the page's record (bindToField), selected, in one history step; receipt '{Field} inserted · bound to {Collection}' + Undo (CmsAddSection.test).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Probe-compared 2026-10-31 (add-panel-cms, click Excerpt; board shots/176-21523.png): inserted after Heading, selected, receipt 'Excerpt inserted · bound to Blog' + Undo, one history step (CmsAddSection.test). The inspector binding block is L-B's surface.",
    "tier": "P1"
   },
   {
@@ -9363,8 +9363,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 32: built, not compared. Add › Elements on any page with collections: 'Collection lists', 'Insert after {sibling}', an outlined 'List of {Collection}' per collection — a list bound to it whose card is ordinary elements (image, title, one text field) — 'Collection list · blank' (the catalog's list), 'Each list uses ordinary editable elements.' (CmsAddSection.test).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Probe-compared 2026-10-31 (add-panel-cms&home=1; board shots/189-21741.png): 'Collection lists' / 'Insert after {sibling}' / outlined List of Blog, List of Team (32 tall) / quiet 'Collection list · blank' / 'Each list uses ordinary editable elements.' match. The tabs + insert-target strip above are the Add panel's own (7:18981).",
    "tier": "P1"
   },
   {
@@ -9529,8 +9529,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 32: built, not compared — the Link row's 'Create collection page' opens the Dynamic pages dialog over the Inspector and runs the same two-step make (buildCollectionPage, saveCollectionLink; useLinkRowCollectionPage), the editor staying on the Card's page with the Card selected (docs/design-2l9/engine-record-pages.md: no second generator, no migration). D88: 'Create collection page for Team' from the Link row, 'You’ll return to this card after creating the page.'",
+   "verified": "drift-fixed",
+   "verifiedNote": "Probe-compared 2026-10-31 (case link-row-record, real Composer; This record's page → Create collection page; board shots/193-25921.png): dialog 720 wide over the Inspector, URL pattern, Include fields, Layout Profile + preview, Cancel / Create page; the Link row behind it reads 'Team has no page per record.' + the note. Match.",
    "tier": "P1"
   },
   {
@@ -9540,8 +9540,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 32: built, not compared — the Link row's 'Create collection page' opens the Dynamic pages dialog over the Inspector and runs the same two-step make (buildCollectionPage, saveCollectionLink; useLinkRowCollectionPage), the editor staying on the Card's page with the Card selected (docs/design-2l9/engine-record-pages.md: no second generator, no migration). D89: 'Creating page…' (disabled) at the origin.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared 2026-10-31: same Link row as 193:25921/193:28433 (probe link-row-record, image-compared); the pending phase reads 'Creating page…' disabled with 'You’ll return to this card after creating the page.' — copy equals the dump, phases tested in useLinkRowCollectionPage.test. The phase is transient, not shot.",
    "tier": "P1"
   },
   {
@@ -9551,8 +9551,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 32: built, not compared — the Link row's 'Create collection page' opens the Dynamic pages dialog over the Inspector and runs the same two-step make (buildCollectionPage, saveCollectionLink; useLinkRowCollectionPage), the editor staying on the Card's page with the Card selected (docs/design-2l9/engine-record-pages.md: no second generator, no migration). D90: back on the Card: '{page} is ready. Choose This record’s page to link each card.', 'Page ready. Choose This record page to link the Card.', toast '{page} created · Open page'.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Probe-compared 2026-10-31 (link-row-record, Create page; board shots/193-26952.png). Fixed: once the page is made the Link to select empties ('Choose link…') — it stayed on 'This record’s page' with nothing stored, so re-choosing it fired no change and the Card could never be linked. Notes 'Team profile is ready…' / 'Page ready…', Open in new tab, toast 'Team profile created · Open page'. Test LinkSection.recordReady.",
    "tier": "P1"
   },
   {
@@ -9584,8 +9584,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 32: built, not compared — the Link row's 'Create collection page' opens the Dynamic pages dialog over the Inspector and runs the same two-step make (buildCollectionPage, saveCollectionLink; useLinkRowCollectionPage), the editor staying on the Card's page with the Card selected (docs/design-2l9/engine-record-pages.md: no second generator, no migration). D93: 'Page created, link not saved. Retry keeps the existing {page} page.' + 'Retry link save' — the page stays, the retry saves the link only.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Probe-compared 2026-10-31 (link-row-record&siteId=probe-site: the collection link's server save fails; board shots/193-28433.png): 'Page created, link not saved. Retry keeps the existing Team profile page.', Retry link save (primary, full width), 'Page created. Retry saving its collection link.' Match; the board greys the select, live leaves it enabled (no lock exists in code).",
    "tier": "P1"
   },
   {
@@ -9640,8 +9640,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 32: built, not compared — the Link row's 'Create collection page' opens the Dynamic pages dialog over the Inspector and runs the same two-step make (buildCollectionPage, saveCollectionLink; useLinkRowCollectionPage), the editor staying on the Card's page with the Card selected (docs/design-2l9/engine-record-pages.md: no second generator, no migration). D97: 'Saving link…', 'Saving the collection link. Your Card stays selected.'",
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared 2026-10-31: the retry phase of the row image-compared on 193:28433 — 'Saving link…' disabled + 'Saving the collection link. Your Card stays selected.' equal the dump; retry saves the link only (retryCollectionLink; useLinkRowCollectionPage.test). Transient, not shot.",
    "tier": "P1"
   },
   {

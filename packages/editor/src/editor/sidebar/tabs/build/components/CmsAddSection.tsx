@@ -25,12 +25,21 @@ import { resolveInsertTarget } from "../insertTarget";
    a list is an outlined full-width button, the blank list a quiet one. */
 const HEAD = "tw:m-0 tw:px-3 tw:pt-3 tw:text-[12px] tw:leading-5 tw:font-semibold tw:text-[var(--bk-ink)]";
 const NOTE = "tw:m-0 tw:px-3 tw:py-1 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
-const FIELD_NAME = "tw:w-[132px] tw:flex-none tw:truncate tw:text-[13px] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)]";
+const FIELD_NAME = "tw:w-[120px] tw:flex-none tw:truncate tw:text-[13px] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)]";
 const LIST_BTN = "tw:mx-3 tw:mt-3 tw:h-8 tw:w-[calc(100%-24px)] tw:text-[13px] tw:font-medium";
 
-/** What a plan row is, as the board names it ("Heading H1", "Paragraph"). */
-function kindLabel(p: PageFieldPlan): string {
-  if (p.element === "heading" || p.element === "image" || p.label === "Rich text") return p.label;
+/** The field an inserted image's alt text reads: the collection's display field. */
+function altFieldOf(collection: CMSCollection): CMSCollection["fields"][number] | null {
+  return collection.fields.find((f) => f.slug === collection.displayField) ?? null;
+}
+
+/** What a plan row is, as the board names it ("Heading H1", "Image + title alt"). */
+function kindLabel(collection: CMSCollection, p: PageFieldPlan): string {
+  if (p.element === "image") {
+    const alt = altFieldOf(collection);
+    return alt ? `Image + ${alt.name.toLowerCase()} alt` : p.label;
+  }
+  if (p.element === "heading" || p.label === "Rich text") return p.label;
   return p.field.type === "date" || p.field.type === "datetime" ? "Text · date" : p.field.type === "textarea" ? "Paragraph" : "Text";
 }
 
@@ -79,6 +88,8 @@ export function CmsAddSection({
       composer.elements.addElement(el, at.parentId, at.index);
       id = el.getId();
       await composer.cms.bindings.bindToField(id, collection.id, undefined, p.field.slug, p.element === "image" ? "src" : "content");
+      const alt = p.element === "image" ? altFieldOf(collection) : null;
+      if (alt) await composer.cms.bindings.bindToField(id, collection.id, undefined, alt.slug, "alt");
       composer.endTransaction();
     } catch (e) {
       composer.rollbackTransaction();
@@ -153,7 +164,7 @@ export function CmsAddSection({
           {pageFieldPlan(template).map((p) => (
             <Row key={p.field.slug} size="tall" interactive data-testid={`add-cms-field-${p.field.slug}`} onClick={() => void insertField(template, p)}>
               <span className={FIELD_NAME}>{p.field.name}</span>
-              <span className="tw:truncate tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">{kindLabel(p)}</span>
+              <span className="tw:truncate tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">{kindLabel(template, p)}</span>
             </Row>
           ))}
           {target && <p className={`${NOTE} tw:pt-1`}>{`Insert into ${target.parentName} · ${where}`}</p>}

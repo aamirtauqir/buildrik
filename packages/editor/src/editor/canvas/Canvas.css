@@ -828,10 +828,19 @@ button:hover > .bd-canvas-empty-cta__thumb {
 
 /* B-11 (2L9 B4-D04 255:94411): an element its condition hides on the preview
    record stays on the canvas as a ghost, named — the export removes it. */
+/* 176:19089: the element fades, its name does not — the label sits above the
+   dashed box at full ink, so the fade is on the content (own text colour +
+   children), never `opacity` on the element, which the label would inherit. */
 .buildrick-canvas [data-bk-condition="hidden"] {
-  opacity: 0.4;
+  position: relative;
+  color: color-mix(in srgb, currentColor 40%, transparent);
   outline: 1px dashed var(--bk-gray-400);
   outline-offset: 2px;
+}
+
+.buildrick-canvas [data-bk-condition="hidden"] > *,
+.buildrick-canvas img[data-bk-condition="hidden"] {
+  opacity: 0.4;
 }
 
 /* 176:19451: "Show hidden elements" off — the ghost is not drawn at all. */
@@ -839,11 +848,15 @@ button:hover > .bd-canvas-empty-cta__thumb {
   display: none !important;
 }
 
-.buildrick-canvas [data-bk-condition="hidden"]::after {
+.buildrick-canvas [data-bk-condition="hidden"]::before {
   content: "Hidden by condition";
-  display: block;
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 0;
+  white-space: nowrap;
   font: 400 12px/16px var(--bk-font-ui);
   color: var(--bk-ink-muted);
+  pointer-events: none;
 }
 
 /* An empty box inside a Collection list is the card's media slot, drawn as a
