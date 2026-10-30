@@ -107,6 +107,15 @@ describe("useCanvasInlineEdit › an inline edit commits as one composer history
       el.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
     });
     expect(onCommitted).toHaveBeenCalledTimes(1);
+    expect(onCommitted).toHaveBeenLastCalledWith({ linkChanged: false });
     expect(el.innerHTML).toBe("Hello there");
+
+    /* TX11: a link made in the edit says so. */
+    open();
+    act(() => {
+      el.innerHTML = 'Hello <a href="https://example.com">there</a>';
+      el.dispatchEvent(new FocusEvent("blur"));
+    });
+    expect(onCommitted).toHaveBeenLastCalledWith({ linkChanged: true });
   });
 });

@@ -215,9 +215,9 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
     const { editing, handleDoubleClick } = useCanvasInlineEdit({
       composer,
       canvasRef,
-      onCommitted: () => {
+      onCommitted: ({ linkChanged }) => {
         const undo = composer?.history?.captureUndo?.();
-        addToast({ description: "Text updated.", tone: "info", ...(undo ? { action: { label: "Undo", onClick: () => { undo(); } } } : {}) });
+        addToast({ description: linkChanged ? "Text and link updated." : "Text updated.", tone: "info", ...(undo ? { action: { label: "Undo", onClick: () => { undo(); } } } : {}) });
       },
     });
 

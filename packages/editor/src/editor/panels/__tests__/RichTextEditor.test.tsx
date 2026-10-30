@@ -74,6 +74,13 @@ describe("RichTextEditor — menus keep every tool (TX05)", () => {
     expect(onCommand).toHaveBeenLastCalledWith("justifyFull");
   });
 
+  it("… ends with Close menu (423:98182)", () => {
+    renderEditor();
+    click("rte-more");
+    click("rte-more-close");
+    expect(screen.queryByTestId("rte-more-close")).toBeNull();
+  });
+
   it("… holds Strikethrough, Indent, Outdent, Text highlight, Clear formatting and Text size", () => {
     const onCommand = renderEditor();
     for (const c of ["strikeThrough", "indent", "outdent", "removeFormat"]) {
