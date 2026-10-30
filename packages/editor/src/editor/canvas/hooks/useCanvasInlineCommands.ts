@@ -33,6 +33,12 @@ export function useCanvasInlineCommands({
         `[data-buildrick-id="${editingId}"]`
       ) as HTMLElement | null;
       if (!editingEl) return;
+      /* design-2l9 TX02/TX03: the toolbar's Done ends the edit the way
+         clicking away does — the blur handler commits it. */
+      if (command === "commitEdit") {
+        editingEl.blur();
+        return;
+      }
 
       editingEl.focus();
       const selection = window.getSelection();

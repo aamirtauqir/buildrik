@@ -1,15 +1,25 @@
 /**
- * Aquibra Rich Text Editor
- * WYSIWYG text editing toolbar
+ * Aquibra Rich Text Editor — the inline text toolbar over a text being edited
+ * on the canvas.
+ *
+ * design-2l9 TX02 / TX10 (423:97218 / 423:100171): one compact row —
+ * "Heading ▾ · B · I · U · Lists · Align · Color · Link · … · Done". TX05
+ * (423:98182): every tool the old 18-control bar carried is kept, the rare
+ * ones behind "…" (Strikethrough, Indent, Outdent, Text highlight, Clear
+ * formatting, Text size). Done commits the edit, as Escape and clicking away
+ * do (TX03).
+ *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
 import { ColorField } from "@/shared/forms";
-import { Popover, Button, Select, TextInput, Tooltip } from "@/editor/chrome-ui";
+import { Popover, Button, Menu, MenuItem, MenuSeparator, Select, TextInput } from "@/editor/chrome-ui";
 
 export interface RichTextEditorProps {
   onCommand: (command: string, value?: string) => void;
+  /** The edited element's tag — names the block menu ("Heading" for h1–h6). */
+  blockTag?: string;
   activeStyles?: {
     bold?: boolean;
     italic?: boolean;
@@ -19,331 +29,234 @@ export interface RichTextEditorProps {
   };
 }
 
-export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activeStyles = {} }) => {
-  const [linkUrl, setLinkUrl] = React.useState("");
-  const [textColorOpen, setTextColorOpen] = React.useState(false);
-  const [bgColorOpen, setBgColorOpen] = React.useState(false);
-  const [linkOpen, setLinkOpen] = React.useState(false);
+const BLOCKS = [
+  { value: "p", label: "Paragraph" },
+  { value: "h1", label: "Heading 1" },
+  { value: "h2", label: "Heading 2" },
+  { value: "h3", label: "Heading 3" },
+  { value: "h4", label: "Heading 4" },
+  { value: "h5", label: "Heading 5" },
+  { value: "h6", label: "Heading 6" },
+] as const;
 
-  const handleLink = () => {
-    if (linkUrl) {
-      onCommand("createLink", linkUrl);
-      setLinkUrl("");
-      setLinkOpen(false);
-    }
+const LISTS = [
+  { command: "insertUnorderedList", label: "Bullet list" },
+  { command: "insertOrderedList", label: "Numbered list" },
+] as const;
+
+const ALIGNS = [
+  { command: "justifyLeft", label: "Align left" },
+  { command: "justifyCenter", label: "Align center" },
+  { command: "justifyRight", label: "Align right" },
+  { command: "justifyFull", label: "Justify" },
+] as const;
+
+const FONT_SIZES = [
+  { value: "1", label: "10px" },
+  { value: "2", label: "13px" },
+  { value: "3", label: "16px" },
+  { value: "4", label: "18px" },
+  { value: "5", label: "24px" },
+  { value: "6", label: "32px" },
+  { value: "7", label: "48px" },
+] as const;
+
+/* 423:97218 draws text controls 28 tall on a 36 bar, 13px, no icons. */
+const CTRL =
+  "tw:h-7 tw:min-h-0 tw:min-w-0 tw:border-transparent tw:bg-transparent tw:px-3 tw:text-[13px] tw:font-normal tw:text-[var(--bk-ink)] tw:hover:bg-[var(--bk-gray-100)] tw:focus:ring-0";
+const ON = "tw:bg-[var(--bk-accent-tint)]! tw:text-[var(--bk-accent-text)]!";
+
+function blockLabel(tag?: string): string {
+  if (!tag) return "Text";
+  if (/^h[1-6]$/.test(tag)) return "Heading";
+  if (tag === "p") return "Paragraph";
+  return "Text";
+}
+
+type Open = null | "block" | "lists" | "align" | "color" | "link" | "more" | "highlight";
+
+export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, blockTag, activeStyles = {} }) => {
+  const [open, setOpen] = React.useState<Open>(null);
+  const [linkUrl, setLinkUrl] = React.useState("");
+  const toggle = (which: Exclude<Open, null>) => setOpen((v) => (v === which ? null : which));
+  const close = () => setOpen(null);
+  const run = (command: string, value?: string) => {
+    if (value === undefined) onCommand(command);
+    else onCommand(command, value);
+    close();
   };
 
-  const toolbarGroups = [
-    {
-      name: "format",
-      items: [
-        {
-          command: "bold",
-          icon: "B",
-          label: "Bold",
-          active: activeStyles.bold,
-          style: { fontWeight: 600 },
-        },
-        {
-          command: "italic",
-          icon: "I",
-          label: "Italic",
-          active: activeStyles.italic,
-          style: { fontStyle: "italic" },
-        },
-        {
-          command: "underline",
-          icon: "U",
-          label: "Underline",
-          active: activeStyles.underline,
-          style: { textDecoration: "underline" },
-        },
-        {
-          command: "strikeThrough",
-          icon: "S",
-          label: "Strikethrough",
-          active: activeStyles.strikethrough,
-          style: { textDecoration: "line-through" },
-        },
-      ],
-    },
-    {
-      name: "list",
-      items: [
-        { command: "insertUnorderedList", icon: "•", label: "Bullet List" },
-        { command: "insertOrderedList", icon: "1.", label: "Numbered List" },
-      ],
-    },
-    {
-      name: "align",
-      items: [
-        { command: "justifyLeft", icon: "⬅", label: "Align Left" },
-        { command: "justifyCenter", icon: "⬌", label: "Align Center" },
-        { command: "justifyRight", icon: "➡", label: "Align Right" },
-        /* Justify drew the SAME "⬌" as Align Center, so the two controls were
-           indistinguishable on screen — the label only reached a tooltip. */
-        { command: "justifyFull", icon: "☰", label: "Justify" },
-      ],
-    },
-    {
-      name: "indent",
-      items: [
-        { command: "outdent", icon: "⇤", label: "Decrease Indent" },
-        { command: "indent", icon: "⇥", label: "Increase Indent" },
-      ],
-    },
-  ];
+  const menuPopover = (which: Exclude<Open, null>, label: string, trigger: React.ReactNode, children: React.ReactNode) => (
+    /* "Text highlight…" swaps the "…" menu for its colour field in place. */
+    <Popover open={open === which || (which === "more" && open === "highlight")} onClose={close} label={label} placement="bottom" trigger={trigger}>
+      {children}
+    </Popover>
+  );
 
-  const fontSizes = [
-    { value: "1", label: "10px" },
-    { value: "2", label: "13px" },
-    { value: "3", label: "16px" },
-    { value: "4", label: "18px" },
-    { value: "5", label: "24px" },
-    { value: "6", label: "32px" },
-    { value: "7", label: "48px" },
-  ];
+  const trigger = (which: Exclude<Open, null>, text: string, ariaLabel: string, active = false) => (
+    <Button
+      color="light"
+      size="xs"
+      className={`${CTRL}${active || open === which ? ` ${ON}` : ""}`}
+      aria-label={ariaLabel}
+      aria-haspopup="menu"
+      aria-expanded={open === which}
+      data-testid={`rte-${which}`}
+      onClick={() => toggle(which)}
+    >
+      {text}
+    </Button>
+  );
 
-  const headings = [
-    { value: "p", label: "Paragraph" },
-    { value: "h1", label: "Heading 1" },
-    { value: "h2", label: "Heading 2" },
-    { value: "h3", label: "Heading 3" },
-    { value: "h4", label: "Heading 4" },
-    { value: "h5", label: "Heading 5" },
-    { value: "h6", label: "Heading 6" },
-  ];
+  /* 423:97218 draws B / I / U as plain letters. */
+  const mark = (command: string, glyph: string, label: string, active?: boolean) => (
+    <Button
+      color="light"
+      size="xs"
+      className={`${CTRL} tw:w-9 tw:px-0${active ? ` ${ON}` : ""}`}
+      aria-label={label}
+      aria-pressed={active ?? false}
+      data-testid={`rte-${command}`}
+      onClick={() => onCommand(command)}
+    >
+      {glyph}
+    </Button>
+  );
 
   return (
     <div
-      className="tw:flex tw:items-center tw:gap-0.5"
-      style={{
-        padding: 4,
-        background: "var(--bk-bg-panel)",
-        borderRadius: 8,
-        border: "1px solid var(--bk-border)",
-      }}
+      className="tw:inline-flex tw:h-10 tw:w-fit tw:items-center tw:gap-1 tw:rounded-md tw:bg-[var(--bk-bg-card)] tw:px-2 tw:shadow-[var(--bk-shadow-raised)]"
+      role="toolbar"
+      aria-label="Text formatting"
+      data-testid="rte-toolbar"
     >
-      {/* Heading Selector */}
-      <Select
-        /* Both toolbar selects shipped unnamed — axe critical, and a toolbar
-           that reads out as "combo box, combo box" tells a screen-reader user
-           nothing about which one sets the block and which the size. */
-        aria-label="Text style"
-        onChange={(e) => onCommand("formatBlock", e.target.value)}
-        style={{
-          padding: "2px 6px",
-          minWidth: 84,
-          background: "var(--bk-bg-panel)",
-          border: "1px solid var(--bk-border)",
-          borderRadius: 4,
-          color: "var(--bk-ink)",
-          fontSize: 12,
-          cursor: "pointer",
-          appearance: "auto",
-        }}
-      >
-        {headings.map((h) => (
-          <option key={h.value} value={h.value}>
-            {h.label}
-          </option>
-        ))}
-      </Select>
-      {/* Font Size */}
-      <Select
-        aria-label="Font size"
-        onChange={(e) => onCommand("fontSize", e.target.value)}
-        style={{
-          padding: "2px 6px",
-          minWidth: 84,
-          background: "var(--bk-bg-panel)",
-          border: "1px solid var(--bk-border)",
-          borderRadius: 4,
-          color: "var(--bk-ink)",
-          fontSize: 12,
-          cursor: "pointer",
-          appearance: "auto",
-        }}
-      >
-        {fontSizes.map((s) => (
-          <option key={s.value} value={s.value}>
-            {s.label}
-          </option>
-        ))}
-      </Select>
-      <Divider />
-      {/* Format Buttons */}
-      {toolbarGroups.map((group, gi) => (
-        <React.Fragment key={group.name}>
-          {gi > 0 && <Divider />}
-          {group.items.map((item) => {
-            const isActive = "active" in item ? item.active : false;
-            const itemStyle = "style" in item ? item.style : {};
-            return (
-              <Tooltip
-                key={item.command}
-                content={item.label}
-                placement="bottom"
-                arrow={false}
-                className="tw:max-w-[280px] tw:whitespace-normal"
-              >
-                <Button
-                  color="light"
-                  /* The button's content is a single glyph — "B", "•", "⬌" —
-                     so without a name a screen reader announces the glyph.
-                     A Tooltip is a description, not a label. */
-                  aria-label={item.label}
-                  onClick={() => onCommand(item.command)}
-                  style={{
-                    ...toolbarButtonStyle,
-                    background: isActive ? "var(--bk-accent)" : "transparent",
-                    color: isActive ? "var(--bk-bg-card)" : "var(--bk-ink-soft)",
-                    ...itemStyle,
-                  }} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
-                >
-                  {item.icon}
-                </Button>
-              </Tooltip>
-            );
-          })}
-        </React.Fragment>
-      ))}
-      <Divider />
-      {/* Colors */}
-      <Popover
-        open={textColorOpen}
-        onClose={() => setTextColorOpen(false)}
-        label="Text color"
-        trigger={
-          <Button
-            color="light"
-            style={toolbarButtonStyle}
-            title="Text Color"
-            aria-label="Change text color"
-            aria-expanded={textColorOpen}
-            onClick={() => setTextColorOpen((v) => !v)} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
-          >
-            <span style={{ borderBottom: "2px solid var(--bk-accent)" }}>A</span>
-          </Button>
-        }
-      >
-        <ColorField label="Text Color" onChange={(color) => onCommand("foreColor", color)} />
-      </Popover>
-      <Popover
-        open={bgColorOpen}
-        onClose={() => setBgColorOpen(false)}
-        label="Highlight color"
-        trigger={
-          <Button
-            color="light"
-            style={toolbarButtonStyle}
-            title="Background Color"
-            aria-label="Change background highlight color"
-            aria-expanded={bgColorOpen}
-            onClick={() => setBgColorOpen((v) => !v)} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
-          >
-            <span style={{ background: "var(--bk-warning)", padding: "0 4px" }}>A</span>
-          </Button>
-        }
-      >
-        <ColorField
-          label="Highlight Color"
-          onChange={(color) => onCommand("hiliteColor", color)}
-        />
-      </Popover>
-      <Divider />
-      {/* Link */}
-      <Popover
-        open={linkOpen}
-        onClose={() => setLinkOpen(false)}
-        label="Insert link"
-        trigger={
-          <Button
-            color="light"
-            style={{
-              ...toolbarButtonStyle,
-              background: activeStyles.link ? "var(--bk-accent)" : "transparent",
-              color: activeStyles.link ? "var(--bk-bg-card)" : "var(--bk-ink-soft)",
-            }}
-            title="Insert Link"
-            aria-label="Insert link"
-            aria-expanded={linkOpen}
-            onClick={() => setLinkOpen((v) => !v)} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
-          >
-            🔗
-          </Button>
-        }
-      >
-        <div style={{ width: 250 }}>
+      {menuPopover(
+        "block",
+        "Text style",
+        trigger("block", `${blockLabel(blockTag)} ▾`, "Text style"),
+        <Menu label="Text style">
+          {BLOCKS.map((b) => (
+            <MenuItem key={b.value} selected={blockTag === b.value} data-testid={`rte-block-${b.value}`} onClick={() => run("formatBlock", b.value)}>
+              {b.label}
+            </MenuItem>
+          ))}
+        </Menu>,
+      )}
+      {mark("bold", "B", "Bold", activeStyles.bold)}
+      {mark("italic", "I", "Italic", activeStyles.italic)}
+      {mark("underline", "U", "Underline", activeStyles.underline)}
+      {menuPopover(
+        "lists",
+        "Lists",
+        trigger("lists", "Lists", "Lists"),
+        <Menu label="Lists">
+          {LISTS.map((l) => (
+            <MenuItem key={l.command} data-testid={`rte-${l.command}`} onClick={() => run(l.command)}>
+              {l.label}
+            </MenuItem>
+          ))}
+        </Menu>,
+      )}
+      {menuPopover(
+        "align",
+        "Align",
+        trigger("align", "Align", "Align"),
+        <Menu label="Align">
+          {ALIGNS.map((a) => (
+            <MenuItem key={a.command} data-testid={`rte-${a.command}`} onClick={() => run(a.command)}>
+              {a.label}
+            </MenuItem>
+          ))}
+        </Menu>,
+      )}
+      {menuPopover(
+        "color",
+        "Text color",
+        trigger("color", "Color", "Color"),
+        <ColorField label="Text color" onChange={(color) => onCommand("foreColor", color)} />,
+      )}
+      {menuPopover(
+        "link",
+        "Link",
+        trigger("link", "Link", "Link", activeStyles.link),
+        <div className="tw:flex tw:w-62 tw:flex-col tw:gap-2">
           <TextInput
-            type="text"
+            type="url"
             value={linkUrl}
+            placeholder="https://…"
+            aria-label="Link address"
+            data-testid="rte-link-url"
             onChange={(e) => setLinkUrl(e.target.value)}
-            placeholder="https://..."
-            style={{
-              width: "100%",
-              padding: "8px 12px",
-              background: "var(--bk-bg-panel)",
-              border: "1px solid var(--bk-border)",
-              borderRadius: 6,
-              color: "var(--bk-ink)",
-              fontSize: 13,
-              marginBottom: 8,
-            }}
           />
           <div className="tw:flex tw:gap-2">
-            <Button size="xs" color="light" onClick={() => onCommand("unlink")} className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]">
+            <Button size="xs" color="light" className={CTRL} data-testid="rte-unlink" onClick={() => run("unlink")}>
               Remove
             </Button>
-            <Button size="xs" onClick={handleLink}>
-              Apply
+            <Button
+              size="xs"
+              disabled={!linkUrl}
+              data-testid="rte-link-apply"
+              onClick={() => {
+                run("createLink", linkUrl);
+                setLinkUrl("");
+              }}
+            >
+              Apply link
             </Button>
           </div>
-        </div>
-      </Popover>
-      {/* Clear Formatting */}
-      <Tooltip content="Clear Formatting" placement="bottom" arrow={false} className="tw:max-w-[280px] tw:whitespace-normal">
-        <Button
-          color="light"
-          aria-label="Clear formatting"
-          onClick={() => onCommand("removeFormat")}
-          style={toolbarButtonStyle}
-          className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-ink-soft)] tw:hover:text-[var(--bk-ink)]"
-        >
-          ✕
-        </Button>
-      </Tooltip>
+        </div>,
+      )}
+      {menuPopover(
+        "more",
+        "More formatting",
+        trigger("more", "…", "More formatting", activeStyles.strikethrough),
+        open === "highlight" ? (
+          <ColorField label="Text highlight" onChange={(color) => onCommand("hiliteColor", color)} />
+        ) : (
+        <Menu label="More formatting">
+          <MenuItem selected={activeStyles.strikethrough ?? false} data-testid="rte-strikeThrough" onClick={() => run("strikeThrough")}>
+            Strikethrough
+          </MenuItem>
+          <MenuItem data-testid="rte-indent" onClick={() => run("indent")}>
+            Indent
+          </MenuItem>
+          <MenuItem data-testid="rte-outdent" onClick={() => run("outdent")}>
+            Outdent
+          </MenuItem>
+          <MenuItem data-testid="rte-highlight" onClick={() => setOpen("highlight")}>
+            Text highlight…
+          </MenuItem>
+          <MenuItem data-testid="rte-removeFormat" onClick={() => run("removeFormat")}>
+            Clear formatting
+          </MenuItem>
+          <MenuSeparator />
+          <div className="tw:flex tw:items-center tw:gap-2 tw:px-2 tw:py-1 tw:text-[12px] tw:text-[var(--bk-ink-muted)]">
+            Text size
+            <Select aria-label="Text size" data-testid="rte-fontSize" defaultValue="" onChange={(e) => run("fontSize", e.target.value)}>
+              <option value="" disabled>
+                —
+              </option>
+              {FONT_SIZES.map((s) => (
+                <option key={s.value} value={s.value}>
+                  {s.label}
+                </option>
+              ))}
+            </Select>
+          </div>
+        </Menu>
+        ),
+      )}
+      <Button
+        color="light"
+        size="xs"
+        className="tw:ml-6 tw:h-8 tw:min-h-0 tw:px-5 tw:text-[13px] tw:font-normal tw:focus:ring-0"
+        data-testid="rte-done"
+        onClick={() => onCommand("commitEdit")}
+      >
+        Done
+      </Button>
     </div>
   );
-};
-
-const Divider = () => (
-  <div
-    style={{
-      width: 1,
-      height: 18,
-      background: "var(--bk-border)",
-      margin: "0 2px",
-    }}
-  />
-);
-
-const toolbarButtonStyle: React.CSSProperties = {
-  /* Board 1176:4824 is one 633px row. At 28px a button plus 8px of padding
-     and 4px dividers, the bar wrapped onto a second row over the text it was
-     editing — and the second row covered the line being typed. */
-  width: 24,
-  height: 24,
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  background: "transparent",
-  border: "none",
-  borderRadius: 4,
-  color: "var(--bk-ink-soft)",
-  cursor: "pointer",
-  fontSize: 13,
-  transition: "all 0.15s ease",
 };
 
 export default RichTextEditor;

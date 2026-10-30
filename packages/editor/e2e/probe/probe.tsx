@@ -18,6 +18,7 @@
  *
  * @license BSD-3-Clause
  */
+import { RichTextEditor } from "@/editor/panels/RichTextEditor";
 import { CreateComponentModal } from "@/editor/shell/modals/CreateComponentModal";
 import * as React from "react";
 import { createRoot } from "react-dom/client";
@@ -2917,6 +2918,14 @@ const CASES: Record<string, () => React.ReactElement> = {
           <p data-buildrick-id="o3" style={{ margin: "8px 0 0" }}>Lasting impact.</p>
         </section>
       </div>
+    </div>
+  ),
+  /* design-2l9 TX02 / TX10 (423:97218): the inline text toolbar over a
+     heading being edited. */
+  "canvas-text-toolbar": () => (
+    <div data-probe="canvas-text-toolbar" style={{ width: 760, padding: 24, background: "#fff" }}>
+      <RichTextEditor onCommand={() => {}} blockTag="h1" />
+      <h1 style={{ margin: "16px 0 0", font: "600 32px/1.2 var(--bk-font-ui)" }}>Thoughtful design. Real impact.</h1>
     </div>
   ),
   "canvas-empty": () => (
