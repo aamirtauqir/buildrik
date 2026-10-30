@@ -24,7 +24,7 @@ import { pageFileNames } from "@/engine/export";
 import type { CMSCollection, CMSContentItem } from "@/shared/types/cms";
 import { Button, Select, TextInput, useToast } from "@/editor/chrome-ui";
 import { applyCmsPattern, cmsPatternError, cmsSlugField } from "@buildrik/shared/schemas/cms";
-import { ACTION, CONTROL, NOTE, PANE, WARN } from "./paneStyles";
+import { CONTROL, NOTE, PANE, WARN } from "./paneStyles";
 import { DynamicPagesStart } from "./DynamicPagesStart";
 import { undoWithOwnReceipt } from "@/editor/shell/hooks/useHistoryFeedback";
 
@@ -46,11 +46,20 @@ export interface DynamicPagesPaneProps {
   records: CMSContentItem[];
   /** Put a page on the canvas and leave the CMS (187:21418). */
   onOpenPage?: (pageId: string) => void;
+  /** 165:3693 — the form's Save lives in the workspace header (top-right);
+   *  the pane reports it here (null while no form is shown). */
+  onSaveAction?: (action: DynamicPagesSave | null) => void;
+}
+
+export interface DynamicPagesSave {
+  disabled: boolean;
+  saving: boolean;
+  run: () => void;
 }
 
 type Made = Pick<CreatedCollectionPage, "pageId" | "name"> & { undo?: CreatedCollectionPage["undo"] };
 
-export function DynamicPagesPane({ composer, collection, records, onOpenPage }: DynamicPagesPaneProps) {
+export function DynamicPagesPane({ composer, collection, records, onOpenPage, onSaveAction }: DynamicPagesPaneProps) {
   const { addToast } = useToast();
   const [pattern, setPattern] = React.useState(collection.pageSlugPattern ?? "");
   const [template, setTemplate] = React.useState(collection.pageTemplatePath ?? "");
@@ -237,8 +246,6 @@ export function DynamicPagesPane({ composer, collection, records, onOpenPage }: 
   let status: React.ReactNode = null;
   if (!trimmed) {
     status = <span className={WARN} data-testid="cms-dp-status">No pattern set — this collection generates no pages.</span>;
-  } else if (patternError) {
-    status = null;
   } else if (published.length === 0) {
     status = (
       <span className={WARN} data-testid="cms-dp-status">
@@ -254,14 +261,20 @@ export function DynamicPagesPane({ composer, collection, records, onOpenPage }: 
        pane's state changing; never claim the pages will generate. */
     status = <span className={WARN} data-testid="cms-dp-status">The saved template page is missing — choose one again, or publishing generates none of these.</span>;
   } else {
-    /* 187:21853 / 165:3693 — what the next publish does, in words. */
+    /* 165:3693 — what the next publish does, in a grey box; kept beside a
+       pattern error (the board does), saying what that error means for it. */
+    const distinct = new Set(urls).size;
     status = (
-      <section className="tw:flex tw:flex-col tw:gap-1" data-testid="cms-dp-status">
+      <section className="tw:flex tw:flex-col tw:gap-1 tw:rounded-[6px] tw:bg-[var(--bk-gray-50)] tw:p-3" data-testid="cms-dp-status">
         <h3 className="tw:m-0 tw:text-[12px] tw:font-semibold tw:leading-[18px] tw:text-[var(--bk-ink)]">On the next publish</h3>
         <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">
-          {`${published.length} published record${published.length === 1 ? "" : "s"} will generate ${published.length} page${published.length === 1 ? "" : "s"}.`}
-          {drafts ? ` ${drafts} draft record${drafts === 1 ? " is" : "s are"} excluded.` : ""}
-          {" Changes to records or the template appear after site publish."}
+          {patternError
+            ? collide
+              ? `${published.length} published records share ${distinct} URL${distinct === 1 ? "" : "s"} — saving is blocked until each record has its own.`
+              : "Nothing is generated until the URL pattern can be saved."
+            : `${published.length} published record${published.length === 1 ? "" : "s"} will generate ${published.length} page${published.length === 1 ? "" : "s"}.`}
+          {!patternError && drafts ? ` ${drafts} draft record${drafts === 1 ? " is" : "s are"} excluded.` : ""}
+          {!patternError ? " Changes to records or the template appear after site publish." : ""}
         </p>
       </section>
     );
@@ -282,6 +295,16 @@ export function DynamicPagesPane({ composer, collection, records, onOpenPage }: 
   const dialogEl = (
     <CreateCollectionPageDialog key={String(dialog)} open={dialog} collection={collection} onCancel={() => setDialog(false)} onCreate={(c) => void create(c)} />
   );
+  const blocked = saving || Boolean(patternError) || seoUnknown.length > 0;
+  /* Reported each render; the header draws it. */
+  const saveRef = React.useRef(save);
+  saveRef.current = save;
+  const showsForm = !startState;
+  React.useEffect(() => {
+    if (!onSaveAction) return;
+    onSaveAction(showsForm ? { disabled: blocked || !dirty, saving, run: () => void saveRef.current() } : null);
+  }, [onSaveAction, showsForm, blocked, dirty, saving]);
+  React.useEffect(() => () => onSaveAction?.(null), [onSaveAction]);
   if (startState) {
     return (
       <div className={PANE} data-testid="cms-dynamic-pages">
@@ -304,7 +327,6 @@ export function DynamicPagesPane({ composer, collection, records, onOpenPage }: 
       {extra}
     </div>
   );
-  const blocked = saving || Boolean(patternError) || seoUnknown.length > 0;
 
   /* 165:3693 (the whole form) · 187:21853 (a saved link): Collection page,
      Edit collection page ›, URL pattern, SEO title, SEO description, then
@@ -389,13 +411,6 @@ export function DynamicPagesPane({ composer, collection, records, onOpenPage }: 
             ))}
           </ul>
         </details>
-      ) : null}
-      {dirty ? (
-        <div>
-          <Button size="xs" className={ACTION} disabled={blocked} data-testid="cms-dp-save" onClick={() => void save()}>
-            Save
-          </Button>
-        </div>
       ) : null}
     </div>
   );

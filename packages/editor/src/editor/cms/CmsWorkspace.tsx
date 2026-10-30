@@ -17,7 +17,7 @@ import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants";
 import { Button, IconButton, Menu, MenuItem, MenuSeparator, Popover, Tabs, useToast } from "@/editor/chrome-ui";
 import { useContentPanel } from "@/editor/sidebar/tabs/content/useContentPanel";
-import { DynamicPagesPane } from "./DynamicPagesPane";
+import { DynamicPagesPane, type DynamicPagesSave } from "./DynamicPagesPane";
 import { CollectionSettingsPane } from "./CollectionSettingsPane";
 import { FieldsTable } from "./FieldsTable";
 import { FieldInspector } from "./FieldInspector";
@@ -103,6 +103,7 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
   const [menuOpen, setMenuOpen] = React.useState(false);
   const [csvImportOpen, setCsvImportOpen] = React.useState(false);
   const [addingField, setAddingField] = React.useState(false);
+  const [dpSave, setDpSave] = React.useState<DynamicPagesSave | null>(null);
   const [fieldId, setFieldId] = React.useState<string | null>(null);
   const { loadRecords } = panel;
   /* CMS-01: the record a "new" sheet's first save created. A later save from
@@ -160,8 +161,9 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
   /* 165:2 / 173:16169 — the way back sits 66 in; the title starts at 273
      whether or not there is one. */
   const back = ws.returning ? (
+    /* 173:16635 — a grey 232 pill where the way back was, at the pane's edge. */
     <span
-      className="tw:ml-[42px] tw:w-[183px] tw:flex-none tw:truncate tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]"
+      className="tw:flex tw:h-8 tw:w-[232px] tw:flex-none tw:items-center tw:justify-center tw:rounded-[6px] tw:bg-[var(--bk-gray-100)] tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]"
       role="status"
       data-testid="cms-sheet-returning"
     >
@@ -236,6 +238,11 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
     ) : ws.tab === "fields" ? (
       <Button size="xs" className={PRIMARY} data-testid="cms-ws-add-field" onClick={() => setAddingField(true)}>
         + Add field
+      </Button>
+    ) : ws.tab === "dynamic-pages" && dpSave ? (
+      /* 165:3693 — the Dynamic pages form saves from the header, top-right. */
+      <Button size="xs" variant="secondary" className={PRIMARY} data-testid="cms-dp-save" disabled={dpSave.disabled} onClick={dpSave.run}>
+        {dpSave.saving ? "Saving…" : "Save"}
       </Button>
     ) : null;
 
@@ -371,6 +378,7 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
         composer={composer}
         collection={collection}
         records={panel.records}
+        onSaveAction={setDpSave}
         /* 187:21418 — a made collection page opens on the canvas, Layers beside it. */
         onOpenPage={(pageId) =>
           cmsWorkspace.exit(() => {

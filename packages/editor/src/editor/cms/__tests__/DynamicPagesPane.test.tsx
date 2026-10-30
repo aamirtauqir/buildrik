@@ -9,7 +9,7 @@ import { describe, it, expect, afterEach, vi } from "vitest";
 import { render, screen, fireEvent, cleanup, waitFor, act, within } from "@testing-library/react";
 import type { CMSCollection, CMSContentItem } from "@/shared/types/cms";
 import { ToastProvider } from "@/editor/chrome-ui";
-import { DynamicPagesPane } from "../DynamicPagesPane";
+import { DynamicPagesPane, type DynamicPagesSave } from "../DynamicPagesPane";
 import { unsavedCollectionLinks } from "../unsavedCollectionLinks";
 import { makeEngine } from "./fakeCmsEngine";
 
@@ -44,12 +44,28 @@ const rec = (id: string, name: string, status: CMSContentItem["status"] = "publi
   id, collectionId: "col-1", data: { name, slug: name.toLowerCase().replace(/ /g, "-") }, status, createdAt: "", updatedAt: "",
 });
 
+/** The pane reports its Save; the workspace header draws it (165:3693) — this
+ *  stands in for that header. */
+function WithHeaderSave(p: { collection: CMSCollection; records: CMSContentItem[]; composer: unknown; onOpenPage?: (id: string) => void }) {
+  const [save, setSave] = React.useState<DynamicPagesSave | null>(null);
+  return (
+    <>
+      {save ? (
+        <button data-testid="cms-dp-save" disabled={save.disabled} onClick={save.run}>
+          Save
+        </button>
+      ) : null}
+      <DynamicPagesPane composer={p.composer as never} collection={p.collection} records={p.records} onOpenPage={p.onOpenPage} onSaveAction={setSave} />
+    </>
+  );
+}
+
 /** `form`: past the start screen, as "Choose an existing page" leaves it. */
 function mount(collection: CMSCollection, records: CMSContentItem[], { form = true, onOpenPage }: { form?: boolean; onOpenPage?: (id: string) => void } = {}) {
   const engine = makeEngine({ collections: [collection], items: records });
   render(
     <ToastProvider>
-      <DynamicPagesPane composer={engine.composer as never} collection={collection} records={records} onOpenPage={onOpenPage} />
+      <WithHeaderSave collection={collection} records={records} composer={engine.composer} onOpenPage={onOpenPage} />
     </ToastProvider>,
   );
   if (form && screen.queryByTestId("cms-dp-start-choose")) fireEvent.click(screen.getByTestId("cms-dp-start-choose"));
@@ -174,12 +190,12 @@ describe("DynamicPagesPane", () => {
     );
   });
 
-  it("Save shows only once something is edited; the page list stays, collapsed", () => {
+  it("the header Save is off until something is edited; the page list stays, collapsed", () => {
     mount({ ...MENU, pageSlugPattern: "/menu/{slug}", pageTemplatePath: "menu-item.html" } as CMSCollection, [rec("a", "Margherita")]);
     expect(screen.getByTestId("cms-dp-more")).toContainElement(screen.getByTestId("cms-dp-list"));
-    expect(screen.queryByTestId("cms-dp-save")).toBeNull();
+    expect(screen.getByTestId("cms-dp-save")).toBeDisabled();
     fireEvent.change(screen.getByTestId("cms-dp-seo-title"), { target: { value: "{name} · Menu" } });
-    expect(screen.getByTestId("cms-dp-save")).toHaveTextContent("Save");
+    expect(screen.getByTestId("cms-dp-save")).toBeEnabled();
   });
 
   describe("Create collection page (187:20406 … 187:21418)", () => {

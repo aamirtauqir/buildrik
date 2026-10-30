@@ -757,6 +757,38 @@ describe("RecordSheet · the way back names its origin (2L9 C2)", () => {
     );
   });
 
+  /* 173:16635 → 177:16850: Save and leave back to the element — "Saving
+     record…" where the way back was, Stay here; Stay here keeps the save
+     going with "Return cancelled…" and both buttons Saving…. */
+  it("returning to the element: Saving record… · Stay here, then Return cancelled with the save running", async () => {
+    let finish: (v: boolean) => void = () => undefined;
+    mountFrom("Heading · Title binding");
+    fireEvent.change(await screen.findByLabelText("Price *"), { target: { value: "$13" } });
+    syncMock.mockImplementationOnce(() => new Promise<boolean>((r) => (finish = r)));
+    fireEvent.click(screen.getByTestId("cms-ws-back-to-canvas"));
+    fireEvent.click(await screen.findByTestId("cms-discard-save"));
+    expect(await screen.findByTestId("cms-sheet-returning")).toHaveTextContent("Saving record…");
+    expect(screen.getByTestId("cms-sheet-stay")).toHaveTextContent("Stay here");
+    fireEvent.click(screen.getByTestId("cms-sheet-stay"));
+    expect(screen.getByTestId("cms-sheet-return-cancelled")).toHaveTextContent("Return cancelled. Your record save is still in progress.");
+    expect(screen.getByTestId("cms-sheet-cancel-saving")).toBeDisabled();
+    await act(async () => finish(true));
+    await waitFor(() => expect(screen.queryByTestId("cms-sheet-return-cancelled")).toBeNull());
+  });
+
+  /* 174:13882 — a plain save in a record opened from an element. */
+  it("a save in a record opened from an element shows Saving record… and both buttons Saving…", async () => {
+    let finish: (v: boolean) => void = () => undefined;
+    mountFrom("Heading · Title binding");
+    fireEvent.change(await screen.findByLabelText("Price *"), { target: { value: "$13" } });
+    syncMock.mockImplementationOnce(() => new Promise<boolean>((r) => (finish = r)));
+    fireEvent.click(screen.getByTestId("cms-sheet-save"));
+    expect(await screen.findByTestId("cms-sheet-returning")).toHaveTextContent("Saving record…");
+    expect(screen.getByTestId("cms-sheet-save")).toHaveTextContent("Saving…");
+    expect(screen.getByTestId("cms-sheet-cancel-saving")).toHaveTextContent("Saving…");
+    await act(async () => finish(true));
+  });
+
   it("without an origin it stays ‹ Back to canvas", async () => {
     mountFrom();
     expect(await screen.findByTestId("cms-ws-back-to-canvas")).toHaveTextContent("‹ Back to canvas");

@@ -7794,8 +7794,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Built + probe-compared 2026-10-30 (round 21) with shots/165-3693.png: the Dynamic pages form is now the board's — Collection page (select), Edit collection page ›, URL pattern, SEO title, SEO description, 720 filled fields under 13 ink labels; a collision outlines the pattern red with 'Multiple records resolve to /team/designer. Choose a unique field, such as {slug}.' and 'Use {slug}', and blocks Save. The collision is the publish worker's own rule (shared applyCmsPattern over the PUBLISHED records — the server generates one path per record and has no uniqueness check). Still open: Save sits under the form, the board puts it top-right in the workspace header; 'Social image' is not built — no such field on the collection (server schema → REQUESTS A-27); the board keeps 'On the next publish' (grey box) beside the error, the code says nothing about the next publish while the pattern is invalid. | No URL-pattern collision check or \"Use {slug}\" fix in code",
+   "verified": "drift-fixed",
+   "verifiedNote": "Closed 2026-10-30 (round 22) against shots/165-3693.png, probe cms-dynamic-pages: Save now sits top-right in the workspace header (grey/disabled while the pattern collides or nothing is edited; the pane reports it through onSaveAction), and 'On the next publish' stays beside the error in its grey box — truthfully: '2 published records share 1 URL — saving is blocked until each record has its own.' Social image waits on REQUESTS A-27 (owner: needs a Prisma migration). | Built + probe-compared 2026-10-30 (round 21) with shots/165-3693.png: the Dynamic pages form is now the board's — Collection page (select), Edit collection page ›, URL pattern, SEO title, SEO description, 720 filled fields under 13 ink labels; a collision outlines the pattern red with 'Multiple records resolve to /team/designer. Choose a unique field, such as {slug}.' and 'Use {slug}', and blocks Save. The collision is the publish worker's own rule (shared applyCmsPattern over the PUBLISHED records — the server generates one path per record and has no uniqueness check). Still open: Save sits under the form, the board puts it top-right in the workspace header; 'Social image' is not built — no such field on the collection (server schema → REQUESTS A-27); the board keeps 'On the next publish' (grey box) beside the error, the code says nothing about the next publish while the pattern is invalid. | No URL-pattern collision check or \"Use {slug}\" fix in code",
    "tier": "P1"
   },
   {
@@ -8714,8 +8714,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "built (2026-10-27): during Save and leave to the origin the header's way back reads 'Saving record…' and the footer Cancel/Saving…; no board shot in the dump to compare.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared 2026-10-30 (round 22) with shots/173-16635.png: Save and leave back to the element → the way back becomes a grey 232 'Saving record…' pill, state 'Saving…', footer Saving… + 'Stay here' — match. The record body follows the later record board 122:43331 (state line on top, one 500 column); these boards draw the older two-column form. Probe cms-workspace&record=post-1&origin=Heading · Title binding (&hang=1 holds the save, &fail=1 fails it), port 5171. Test RecordSheet 'returning to the element'. | built (2026-10-27): during Save and leave to the origin the header's way back reads 'Saving record…' and the footer Cancel/Saving…; no board shot in the dump to compare.",
    "tier": "P1"
   },
   {
@@ -8737,8 +8737,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C C1: \"Leave without saving?\" names the record / destination tab or collection; Keep editing · Discard changes · Save and leave (RecordSheet.tsx). Origin label (\"Your destination is …\") waits on C2.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared 2026-10-30 (round 22) with shots/173-17098.png: 'Leave without saving?' · 'Your destination is {origin}.' · Keep editing / Discard changes / Save and leave — match. The origin string is the door's (L-B C-11: the board's 'Blog post › Heading › Content › Title text binding' is what that door passes). The record body follows the later record board 122:43331 (state line on top, one 500 column); these boards draw the older two-column form. Probe cms-workspace&record=post-1&origin=Heading · Title binding (&hang=1 holds the save, &fail=1 fails it), port 5171. | built, not compared — L-C C1: \"Leave without saving?\" names the record / destination tab or collection; Keep editing · Discard changes · Save and leave (RecordSheet.tsx). Origin label (\"Your destination is …\") waits on C2.",
    "tier": "P1"
   },
   {
@@ -8805,8 +8805,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "built (2026-10-27): during Save and leave to the origin the header's way back reads 'Saving record…' and the footer Cancel/Saving…; no board shot in the dump to compare.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Built + compared 2026-10-30 (round 22) with shots/174-13882.png: a plain Save in a record opened from an element shows the 'Saving record…' pill and both footer buttons 'Saving…' (disabled) — match. A record not opened from an element keeps 165:797's usable Cancel. The record body follows the later record board 122:43331 (state line on top, one 500 column); these boards draw the older two-column form. Probe cms-workspace&record=post-1&origin=Heading · Title binding (&hang=1 holds the save, &fail=1 fails it), port 5171. Test RecordSheet '174:13882'. | built (2026-10-27): during Save and leave to the origin the header's way back reads 'Saving record…' and the footer Cancel/Saving…; no board shot in the dump to compare.",
    "tier": "P1"
   },
   {
@@ -8816,8 +8816,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C C1: failed Save and leave keeps edits, \"Your edits are still here. Return to X is paused.\", footer \"Couldn’t save · return paused\", Cancel · Retry and return.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared 2026-10-30 (round 22) with shots/174-14111.png: a failed return keeps the edits — warning-tinted 'Your edits are still here. Return to Heading is paused.' (was error-tinted; now the board's yellow), 'Couldn’t save · return paused', Retry and return / Cancel — match. The record body follows the later record board 122:43331 (state line on top, one 500 column); these boards draw the older two-column form. Probe cms-workspace&record=post-1&origin=Heading · Title binding (&hang=1 holds the save, &fail=1 fails it), port 5171. | built, not compared — L-C C1: failed Save and leave keeps edits, \"Your edits are still here. Return to X is paused.\", footer \"Couldn’t save · return paused\", Cancel · Retry and return.",
    "tier": "P1"
   },
   {
@@ -9004,8 +9004,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "built (2026-10-27): during Save and leave to the origin the header's way back reads 'Saving record…' and the footer Cancel/Saving…; no board shot in the dump to compare.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Built + compared 2026-10-30 (round 22) with shots/177-16850.png: Stay here during a return to the element → grey 'Return cancelled. Your record save is still in progress.', fields read-only, both buttons 'Saving…', the header pill stays until the save lands — match. A page leave keeps 126:37330's 'Cancel unavailable' version. The record body follows the later record board 122:43331 (state line on top, one 500 column); these boards draw the older two-column form. Probe cms-workspace&record=post-1&origin=Heading · Title binding (&hang=1 holds the save, &fail=1 fails it), port 5171. | built (2026-10-27): during Save and leave to the origin the header's way back reads 'Saving record…' and the footer Cancel/Saving…; no board shot in the dump to compare.",
    "tier": "P1"
   },
   {
@@ -9084,9 +9084,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "board",
+   "authority": "code:cms-drawer-kept-at-1280",
    "verified": "drift-open",
-   "verifiedNote": "CMS record at 1280×640 with \"CMS navigation\" collapsed; CmsWorkspace has no compact layout. Topbar phase1",
+   "verifiedNote": "Measured 2026-10-30 (round 22) in the Vite demo at 1280×640 (docs/design-2l9/compare/cms-workspace-1280.png): the shell keeps the 280 CMS drawer open beside the workspace, which is 940 wide at x 340 and lays out unchanged (the 500 record column, the header, the footer all fit). The board's compact state — drawer gone, a 'CMS navigation' button and popover in the workspace header — needs the shell to collapse the drawer at that width, which it never does (LayoutShell/StudioPanels, lead-owned); the workspace has no width at which its own compact layout would apply. | CMS record at 1280×640 with \"CMS navigation\" collapsed; CmsWorkspace has no compact layout. Topbar phase1",
    "tier": "P1"
   },
   {
@@ -9095,9 +9095,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "board",
+   "authority": "code:cms-drawer-kept-at-1280",
    "verified": "no",
-   "verifiedNote": "Narrow: unsaved preview moves into a modal; no narrow preview modal in code",
+   "verifiedNote": "Measured 2026-10-30 (round 22) in the Vite demo at 1280×640 (docs/design-2l9/compare/cms-workspace-1280.png): the shell keeps the 280 CMS drawer open beside the workspace, which is 940 wide at x 340 and lays out unchanged (the 500 record column, the header, the footer all fit). The board's compact state — drawer gone, a 'CMS navigation' button and popover in the workspace header — needs the shell to collapse the drawer at that width, which it never does (LayoutShell/StudioPanels, lead-owned); the workspace has no width at which its own compact layout would apply. The narrow 'live unsaved preview in a modal' follows from the same collapse; at 940 the record's Form / Preview switch (122:43331) already shows the live preview in place. | Narrow: unsaved preview moves into a modal; no narrow preview modal in code",
    "tier": "P1"
   },
   {
@@ -9217,9 +9217,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "board",
+   "authority": "code:cms-drawer-kept-at-1280",
    "verified": "no",
-   "verifiedNote": "Compact CMS navigation popover keeps record draft; no compact nav in CmsWorkspace",
+   "verifiedNote": "Measured 2026-10-30 (round 22) in the Vite demo at 1280×640 (docs/design-2l9/compare/cms-workspace-1280.png): the shell keeps the 280 CMS drawer open beside the workspace, which is 940 wide at x 340 and lays out unchanged (the 500 record column, the header, the footer all fit). The board's compact state — drawer gone, a 'CMS navigation' button and popover in the workspace header — needs the shell to collapse the drawer at that width, which it never does (LayoutShell/StudioPanels, lead-owned); the workspace has no width at which its own compact layout would apply. The record draft is kept by every CMS door already (cmsWorkspace leave guard). | Compact CMS navigation popover keeps record draft; no compact nav in CmsWorkspace",
    "tier": "P1"
   },
   {
@@ -9230,7 +9230,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Saved-record preview modal excludes draft; RecordPreview is form-live only (RecordPreview.tsx:6), no saved-version view",
+   "verifiedNote": "Round 22 (correction): 'Preview saved record' exists — RecordTemplatePreviewDialog renders the SAVED record (record prop, not the form) through the collection page, so the draft is excluded as the board says. Drift: the board draws a 512 card ('{record} · Last saved version', title, excerpt, Close); the code shows the whole template page (720+, iframe, Open in new tab). Not compared beyond that. | Round 22: the compact frame is not reachable (see 180:17867).",
    "tier": "P1"
   },
   {
