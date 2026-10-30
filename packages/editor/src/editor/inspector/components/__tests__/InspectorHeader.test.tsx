@@ -234,6 +234,16 @@ describe("InspectorHeader", () => {
       expect(nav.querySelector('[aria-current="page"]')?.textContent).toBe("Section");
       expect(screen.queryByTestId("inspector-type-icon")).toBeNull();
     });
+
+    it("multi: a type label ending in s pluralises with -es ('2 selected · Progresses')", () => {
+      const bars = [0, 1].map(() => {
+        const p = c.elements.createElement("progress");
+        c.elements.addElement(p, section.getId());
+        return p.getId();
+      });
+      mount({ element: { id: bars[0], type: "progress" }, selectedIds: bars });
+      expect(screen.getByTestId("inspector-element-name")).toHaveTextContent("2 selected · Progresses");
+    });
   });
 
   it("B5-D04: a bound element names its source in the name row; it opens Dynamic bindings", () => {

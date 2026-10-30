@@ -106,7 +106,10 @@ function commonParent(els: Element[]): Element | null {
   return common;
 }
 
-const pluralType = (type: string) => `${elementTypeLabel(type)}s`;
+const pluralType = (type: string) => {
+  const label = elementTypeLabel(type);
+  return /(s|x|z|ch|sh)$/i.test(label) ? `${label}es` : `${label}s`;
+};
 
 export function InspectorHeader({
   composer,
