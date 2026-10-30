@@ -104,6 +104,7 @@ import { LayerTreeItem } from "@/editor/panels/layers/LayerTreeItem";
 import { renameElement } from "@/editor/panels/layers/hooks/layersPersistence";
 import { useClipboardToasts } from "@/editor/shell/hooks/useClipboardToasts";
 import { setSiteLoadStatus } from "@/editor/shell/siteLoadStatus";
+import { unsavedCollectionLinks } from "@/editor/cms/unsavedCollectionLinks";
 import { PagesTab } from "@/editor/sidebar/tabs/pages/PagesTab";
 import { CanvasEmptyCTA } from "@/editor/canvas/CanvasEmptyCTA";
 import { showInsertReceipt } from "@/editor/sidebar/tabs/build/insertGroupRequest";
@@ -2822,7 +2823,7 @@ const CASES: Record<string, () => React.ReactElement> = {
        containers (S31's path). */
     let host = page.root.id;
     for (const name of (q.get("ancestors") ?? "").split(",").filter(Boolean)) {
-      const box = c.elements.createElement("container" as never, {} as never);
+      const box = c.elements.createElement((q.get("ancestorType") ?? "container") as never, {} as never);
       c.elements.addElement(box, host);
       renameElement(c as never, box.getId(), name);
       host = box.getId();
@@ -2951,10 +2952,18 @@ const CASES: Record<string, () => React.ReactElement> = {
            (B5-D99: an element inside a list). */
         if (q.get("cms") === "list") {
           const parent = el.getParent?.();
-          if (parent) c.cms.bindings.bindCollectionList(parent.getId(), col.id);
-          c.selection.select(el);
+          if (parent) c.cms.bindings.bindCollectionList(parent.getId(), col.id, { limit: q.get("limit") ? Number(q.get("limit")) : undefined });
+          /* `&query={…}` — the list's filter / sort / skip (C-14); `&selectList=1` selects the list. */
+          if (parent && q.get("query")) c.cms.bindings.setListQuery(parent.getId(), JSON.parse(q.get("query") ?? "{}"));
+          c.selection.select(q.get("selectList") && parent ? parent : el);
           return;
         }
+        /* `?condition={…}` — the element's visibility condition (B-11);
+           `?legacyCondition=1` — a pre-CMS "old Conditions" binding instead. */
+        const conditionQ = q.get("condition");
+        if (conditionQ) c.cms.bindings.setCondition(el.getId(), JSON.parse(conditionQ));
+        if (q.get("legacyCondition"))
+          el.setDataBinding("condition", { type: "condition", sourceId: "", path: "", condition: { operator: "exists", left: "opening_hours.sunday" } } as never);
         if (q.get("cms") !== "unbound" && !q.get("unbound")) c.cms.bindings.bindToField(el.getId(), col.id, q.get("cms") === "template" ? undefined : item?.id, "title", "content" as never);
         c.selection.select(el);
       })();
@@ -3030,6 +3039,9 @@ const CASES: Record<string, () => React.ReactElement> = {
     const templateQ = q.get("template");
     if (templateQ) localStorage.setItem("buildrick-last-applied-template", JSON.stringify({ name: templateQ, ts: Date.now() }));
     const pageOnly = !!q.get("page");
+    /* `&unsavedLink=1` — this page's collection link is not saved (A-26, 187:22071). */
+    if (q.get("unsavedLink"))
+      unsavedCollectionLinks.set({ collectionId: "team", collectionName: "Team", pageId: page.id, name: "Team profile", file: "team-profile.html", pattern: "{slug}" });
     const pageName = q.get("pageName");
     if (pageName) c.elements.updatePage(page.id, { name: pageName });
     function Host() {

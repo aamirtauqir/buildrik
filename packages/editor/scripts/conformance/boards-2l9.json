@@ -5235,8 +5235,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Reopened round 19: the engine model landed (L-A, owner approval 2026-10-30) — engine/widgets/tabsModel.ts + export/tabsRuntime.ts (canvas + published, tested on the export path), Tabs block writes keyed pairs + data-tabs-initial; docs/design-2l9/engine-tabs.md. The Inspector Tabs section this board draws is L-B's (REQUESTS B-21 reply); not compared. | Lane L-B round 11: not a capabilities-table change — tabs has no tab↔panel pairing, initial-tab attribute or runtime in the model (REQUESTS B-21, lead). Same shape as C07/C10/C18 (blocked:engine-modal-link).",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 21 on L-A's Tabs model (engine-tabs.md): probe ?block=tabs side by side with shots/245-36832.png: 'Tabs · {n} pairs', 'Button and panel move together.', '{label} · Edit panel' per pair (selects the panel; the runtime reveals it), 'Add tab', Relationships '{label}  tab-01 → panel-01', 'Stable IDs · no pairing by label or position.', Tab actions 'Move {2nd} before {1st}' — match; plus 'Opens first' (setInitialTab — the board's 'initial state'). Not drawn: 'Inspect relationships' (no target defined in the model). Real-composer test.",
    "tier": "P1"
   },
   {
@@ -5245,9 +5245,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "blocked:engine-tabs-pairs",
+   "authority": "board",
    "verified": "no",
-   "verifiedNote": "L-B round 20: blocked with its archetype C01 — tabs is a plain container with no tab↔panel pair, initial tab or runtime (REQUESTS B-21). Nothing to compare until the model exists.",
+   "verifiedNote": "L-B round 21: reopened — the Tabs model landed (L-A round 19, engine-tabs.md); the C01 section is built on it. Not yet compared against this board.",
    "tier": "P1"
   },
   {
@@ -5256,9 +5256,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "blocked:engine-tabs-pairs",
+   "authority": "board",
    "verified": "no",
-   "verifiedNote": "L-B round 20: blocked with its archetype C01 — tabs is a plain container with no tab↔panel pair, initial tab or runtime (REQUESTS B-21). Nothing to compare until the model exists.",
+   "verifiedNote": "L-B round 21: reopened — the Tabs model landed (L-A round 19, engine-tabs.md); the C01 section is built on it. Not yet compared against this board.",
    "tier": "P1"
   },
   {
@@ -5279,9 +5279,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "blocked:engine-tabs-pairs",
+   "authority": "board",
    "verified": "no",
-   "verifiedNote": "L-B round 20: blocked with its archetype C01 — tabs is a plain container with no tab↔panel pair, initial tab or runtime (REQUESTS B-21). Nothing to compare until the model exists.",
+   "verifiedNote": "L-B round 21: reopened — the Tabs model landed (L-A round 19, engine-tabs.md); the C01 section is built on it. Not yet compared against this board.",
    "tier": "P1"
   },
   {
@@ -5290,9 +5290,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "blocked:engine-tabs-pairs",
+   "authority": "board",
    "verified": "no",
-   "verifiedNote": "L-B round 20: blocked with its archetype C01 — tabs is a plain container with no tab↔panel pair, initial tab or runtime (REQUESTS B-21). Nothing to compare until the model exists.",
+   "verifiedNote": "L-B round 21: reopened — the Tabs model landed (L-A round 19, engine-tabs.md); the C01 section is built on it. Not yet compared against this board.",
    "tier": "P1"
   },
   {
@@ -5302,8 +5302,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Reopened round 19: the engine model landed (L-A, owner approval 2026-10-30) — engine/widgets/modalModel.ts + export/modalRuntime.ts (canvas reveal + published open/close, focus trap, inert, Escape/backdrop), Modal block puts the dialog at the page root with a key; docs/design-2l9/engine-modal.md. The Inspector surfaces this board draws are L-B's (REQUESTS B-17 reply); not compared. | Lead, round 5: the trigger ↔ dialog link is a new engine data model, out of scope while only 2 agents run (REQUESTS B-17, deferred). Board PNG fetched round 4.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 21 on L-A's Modal model (engine-modal.md): probe ?block=modal (trigger selected) side by side with shots/245-39899.png: 'Modal relationship', Dialog [{dialog} ▾] (re-links), 'Dialog is a direct child of Home. Trigger is inside {parent}.', primary 'Edit {dialog}' (selects the dialog, which the canvas reveals), 'Link existing dialog' (menu of the page's other dialogs; shut when there are none), Actions 'Duplicate modal' + its note and an Undo receipt — match. Real-composer test.",
    "tier": "P1"
   },
   {
@@ -5312,9 +5312,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "blocked:engine-modal-link",
+   "authority": "board",
    "verified": "no",
-   "verifiedNote": "L-B round 20: blocked with C07 — no trigger↔dialog link, local insertion or close policy in the element model (REQUESTS B-17, deferred by the lead).",
+   "verifiedNote": "L-B round 21: reopened — the Modal model landed (L-A round 19, engine-modal.md); the C07 / C18 sections are built on it. Not yet compared against this board.",
    "tier": "P1"
   },
   {
@@ -5323,9 +5323,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "blocked:engine-modal-link",
+   "authority": "board",
    "verified": "no",
-   "verifiedNote": "L-B round 20: blocked with C07 — no trigger↔dialog link, local insertion or close policy in the element model (REQUESTS B-17, deferred by the lead).",
+   "verifiedNote": "L-B round 21: reopened — the Modal model landed (L-A round 19, engine-modal.md); the C07 / C18 sections are built on it. Not yet compared against this board.",
    "tier": "P1"
   },
   {
@@ -5335,8 +5335,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Reopened round 19: the engine model landed (L-A, owner approval 2026-10-30) — engine/widgets/modalModel.ts + export/modalRuntime.ts (canvas reveal + published open/close, focus trap, inert, Escape/backdrop), Modal block puts the dialog at the page root with a key; docs/design-2l9/engine-modal.md. The Inspector surfaces this board draws are L-B's (REQUESTS B-17 reply); not compared. | Lead, round 5: needs the engine's trigger ↔ dialog link (REQUESTS B-17, deferred).",
+   "verified": "drift-open",
+   "verifiedNote": "L-B round 21: the Modal model and Inspector are built (C07), but this board is the insertion receipt FROM a shared component ('Local modal created' / 'Trigger and dialog were added at Home’s root. Header component is unchanged.' / 'Back to Header component' / 'Local trigger and dialog added. · Undo'); the insert-into-component refusal → local insertion flow is the canvas/insert path, not built.",
    "inheritsFrom": "245:39899",
    "tier": "P1"
   },
@@ -5346,9 +5346,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "blocked:engine-modal-link",
+   "authority": "board",
    "verified": "no",
-   "verifiedNote": "L-B round 20: blocked with C07 — no trigger↔dialog link, local insertion or close policy in the element model (REQUESTS B-17, deferred by the lead).",
+   "verifiedNote": "L-B round 21: reopened — the Modal model landed (L-A round 19, engine-modal.md); the C07 / C18 sections are built on it. Not yet compared against this board.",
    "tier": "P1"
   },
   {
@@ -5357,9 +5357,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "blocked:engine-modal-link",
+   "authority": "board",
    "verified": "no",
-   "verifiedNote": "L-B round 20: blocked with C07 — no trigger↔dialog link, local insertion or close policy in the element model (REQUESTS B-17, deferred by the lead).",
+   "verifiedNote": "L-B round 21: reopened — the Modal model landed (L-A round 19, engine-modal.md); the C07 / C18 sections are built on it. Not yet compared against this board.",
    "tier": "P1"
   },
   {
@@ -5901,9 +5901,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "blocked:engine-modal-link",
+   "authority": "board",
    "verified": "no",
-   "verifiedNote": "L-B round 20: blocked with C07 — no trigger↔dialog link, local insertion or close policy in the element model (REQUESTS B-17, deferred by the lead).",
+   "verifiedNote": "L-B round 21: reopened — the Modal model landed (L-A round 19, engine-modal.md); the C07 / C18 sections are built on it. Not yet compared against this board.",
    "tier": "P1"
   },
   {
@@ -5913,8 +5913,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Reopened round 19: the engine model landed (L-A, owner approval 2026-10-30) — engine/widgets/modalModel.ts + export/modalRuntime.ts (canvas reveal + published open/close, focus trap, inert, Escape/backdrop), Modal block puts the dialog at the page root with a key; docs/design-2l9/engine-modal.md. The Inspector surfaces this board draws are L-B's (REQUESTS B-17 reply); not compared. | Lead, round 5: needs the engine's trigger ↔ dialog link (REQUESTS B-17, deferred).",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 21: probe ?block=modal › Edit {dialog} › Behavior side by side with shots/252-46927.png: 'Dialog behavior' heads Behavior on the dialog — Close on Escape, Close on backdrop click, Initial state Closed/Open (setDialogBehavior, one step), 'Editor reveal and visitor open state are temporary.', the backdrop / focus-trap note, 'Back to dialog content' — match. Header context line reads 'Behavior · Container' (the header archetype's).",
    "inheritsFrom": "245:39899",
    "tier": "P1"
   },
@@ -6205,9 +6205,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "blocked:engine-conditions",
-   "verified": "no",
-   "verifiedNote": "L-B round 20: blocked — there is no element-level conditions model (show/hide by a record field) in the engine or the export runtime (REQUESTS B-11); the Inspector draws no Conditions row (no placeholder rows, LD-6).",
+   "authority": "board",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 21, engine model B-11 built (engine-conditions.md; shared evaluator packages/shared/schemas/cmsConditions.ts; CMSBindingManager.setCondition — one history step, saved in project.cmsBindings.conditions; canvas ghost + export removal; template pages handed to the server as data-bk-if, REQUESTS B-26). Probe ?cms=template&fields=1&condition={excerpt is set} side by side with shots/255-94411.png: Content › 'Conditions · 1 · Hidden' above Advanced attributes, '‹ CMS · Dynamic pages', bound row — match; 'Visibility condition added · Undo' is the receipt of + Add rule (unit-tested). Canvas 'Hidden by condition' ghost: CSS on data-bk-condition, not probed (the probe has no canvas).",
    "tier": "P1"
   },
   {
@@ -6216,9 +6216,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "blocked:engine-conditions",
-   "verified": "no",
-   "verifiedNote": "L-B round 20: blocked — there is no element-level conditions model (show/hide by a record field) in the engine or the export runtime (REQUESTS B-11); the Inspector draws no Conditions row (no placeholder rows, LD-6).",
+   "authority": "board",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 21, engine model B-11 built (engine-conditions.md; shared evaluator packages/shared/schemas/cmsConditions.ts; CMSBindingManager.setCondition — one history step, saved in project.cmsBindings.conditions; canvas ghost + export removal; template pages handed to the server as data-bk-if, REQUESTS B-26). An old DataManager condition (element dataBinding 'condition') is kept inactive: the row reads 'Conditions · 1 · Inactive' (unit-tested conditionsSummary; probe ?legacyCondition=1 shows the subview, compared under D07).",
    "tier": "P1"
   },
   {
@@ -6227,9 +6227,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "blocked:engine-conditions",
-   "verified": "no",
-   "verifiedNote": "L-B round 20: blocked — there is no element-level conditions model (show/hide by a record field) in the engine or the export runtime (REQUESTS B-11); the Inspector draws no Conditions row (no placeholder rows, LD-6).",
+   "authority": "board",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 21, engine model B-11 built (engine-conditions.md; shared evaluator packages/shared/schemas/cmsConditions.ts; CMSBindingManager.setCondition — one history step, saved in project.cmsBindings.conditions; canvas ghost + export removal; template pages handed to the server as data-bk-if, REQUESTS B-26). Activate condition converts the old rule (exists→is set, ==→is, …) and drops the old binding in ONE undo step (transaction; real-composer test), receipt 'Legacy condition activated · Undo'; the row then reads '1 · Hidden|Shown' as D04.",
    "tier": "P1"
   },
   {
@@ -6295,9 +6295,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "blocked:engine-conditions",
-   "verified": "no",
-   "verifiedNote": "L-B round 20: blocked — there is no element-level conditions model (show/hide by a record field) in the engine or the export runtime (REQUESTS B-11); the Inspector draws no Conditions row (no placeholder rows, LD-6).",
+   "authority": "board",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 21, engine model B-11 built (engine-conditions.md; shared evaluator packages/shared/schemas/cmsConditions.ts; CMSBindingManager.setCondition — one history step, saved in project.cmsBindings.conditions; canvas ghost + export removal; template pages handed to the server as data-bk-if, REQUESTS B-26). Probe ?legacyCondition=1 › Conditions side by side with shots/258-33994.png: '‹ Back to Content', 'Conditions', 'Not active — from old Conditions' (warning text), the rule as two shut selects 'opening_hours.sunday' / 'is set', 'Remove rule', 'The existing condition is preserved…', primary 'Activate condition', 'Keep inactive', 'Activation replaces the legacy rule in one Undo step.' — match.",
    "tier": "P1"
   },
   {
@@ -6306,9 +6306,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "blocked:engine-conditions",
-   "verified": "no",
-   "verifiedNote": "L-B round 20: blocked — there is no element-level conditions model (show/hide by a record field) in the engine or the export runtime (REQUESTS B-11); the Inspector draws no Conditions row (no placeholder rows, LD-6).",
+   "authority": "board",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 21, engine model B-11 built (engine-conditions.md; shared evaluator packages/shared/schemas/cmsConditions.ts; CMSBindingManager.setCondition — one history step, saved in project.cmsBindings.conditions; canvas ghost + export removal; template pages handed to the server as data-bk-if, REQUESTS B-26). Probe ?condition={excerpt is set} › Conditions side by side with shots/258-34343.png: Match All, rule card (field / rule selects, Remove rule), '{Field} is empty. This condition is false.', 'Hidden on this record — showing as ghost.', + Add rule, the privacy note, 'Open source ›' — match (field name is sample data).",
    "tier": "P1"
   },
   {
@@ -6317,9 +6317,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "blocked:engine-conditions",
-   "verified": "no",
-   "verifiedNote": "L-B round 20: blocked — there is no element-level conditions model (show/hide by a record field) in the engine or the export runtime (REQUESTS B-11); the Inspector draws no Conditions row (no placeholder rows, LD-6).",
+   "authority": "board",
+   "verified": "drift-open",
+   "verifiedNote": "L-B round 21, engine model B-11 built (engine-conditions.md; shared evaluator packages/shared/schemas/cmsConditions.ts; CMSBindingManager.setCondition — one history step, saved in project.cmsBindings.conditions; canvas ghost + export removal; template pages handed to the server as data-bk-if, REQUESTS B-26). Open: the board picks a sub-key of a JSON-ish value ('opening_hours' › monday … sunday with their values) in a source picker; the rule's Field select lists the collection's fields only (a dotted path from an old condition is kept and shown). No CMS field type stores an object today, so the sub-key picker has nothing real to list.",
    "tier": "P1"
   },
   {
@@ -6328,9 +6328,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "blocked:engine-conditions",
-   "verified": "no",
-   "verifiedNote": "L-B round 20: blocked — there is no element-level conditions model (show/hide by a record field) in the engine or the export runtime (REQUESTS B-11); the Inspector draws no Conditions row (no placeholder rows, LD-6).",
+   "authority": "board",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 21, engine model B-11 built (engine-conditions.md; shared evaluator packages/shared/schemas/cmsConditions.ts; CMSBindingManager.setCondition — one history step, saved in project.cmsBindings.conditions; canvas ghost + export removal; template pages handed to the server as data-bk-if, REQUESTS B-26). Probe (no condition) › Conditions side by side with shots/258-35104.png: 'Show this element on every record.', '+ Add rule', 'Conditions control visibility. Device visibility stays in Behavior.' — match; removing the last rule gives 'Visibility condition removed · Undo' (unit-tested).",
    "tier": "P1"
   },
   {
@@ -9128,9 +9128,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "blocked:engine-conditions",
-   "verified": "no",
-   "verifiedNote": "L-B round 20 (A-23): blocked — 'Conditions · 1 · Hidden' and 'Visibility condition added · Undo' need the element conditions model (REQUESTS B-11); nothing in the engine or export stores a condition.",
+   "authority": "board",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 21, engine model B-11 built (engine-conditions.md; shared evaluator packages/shared/schemas/cmsConditions.ts; CMSBindingManager.setCondition — one history step, saved in project.cmsBindings.conditions; canvas ghost + export removal; template pages handed to the server as data-bk-if, REQUESTS B-26). Same state as B4-D04 (255:94411), probe-compared there: 'Conditions · 1 · Hidden' + receipt. Server per-record evaluation for the published template page: REQUESTS B-26.",
    "tier": "P1"
   },
   {
@@ -9317,8 +9317,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 19: the state now outlives the CMS tab — editor/cms/unsavedCollectionLinks.ts (forPage(pageId)), cleared when the link lands by retry or by the queue's replay (cmsSync.isCmsCollectionSaveOwed). The notice itself sits in the Inspector's page panel — REQUESTS A-26 to L-B. | Editor banner on generated page after link failure; not in code",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 21 (A-26), probe ?page=1&unsavedLink=1 side by side with shots/187-22071.png: under the page header '‹ CMS · Dynamic pages', then the full-bleed warning band 'Collection link not saved' / 'The page is safe here. Retry the link in CMS.' / centred 'Retry in CMS ›' (opens the collection's Dynamic pages) — match; from L-A's unsavedCollectionLinks.forPage, gone when the link lands. The header is the page panel's ('{page} · Page'), the board's 'Collection page · Team / Select an element to edit it.' is a collection-page header variant not built.",
    "tier": "P1"
   },
   {
@@ -9382,9 +9382,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "blocked:engine-list-query",
-   "verified": "no",
-   "verifiedNote": "L-B round 20 (A-23): blocked — the list query the board draws (Filter rule, Match, Sort/Then by, related-list record picker) needs the collection-list query in the model and the renderer (RepeaterRenderer, lead; REQUESTS C-14). Today a Collection list stores collection + limit only; drawing filter rows would invent data.",
+   "authority": "board",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 21, engine model C-14 built (engine-list-query.md; applyCmsListQuery in packages/shared/schemas/cmsConditions.ts; CMSBindingManager.setListQuery — one history step, saved on the list's binding; RepeaterRenderer applies filter → sort → skip → Show for canvas and publish alike). Probe ?ancestorType=collection-list&cms=list&selectList=1 side by side with shots/189-22915.png: 'Collection list' · Source · 'Open collection ›' · Filter None · + Add filter · Match · Sort Updated · Direction Newest first · + Then by · Show · Skip — match. Pages (Split into pages) and When empty are their own rows (189:25445, 189:24174), not this one.",
    "tier": "P1"
   },
   {
@@ -9603,9 +9603,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "blocked:engine-list-query",
-   "verified": "no",
-   "verifiedNote": "L-B round 20 (A-23): blocked — the list query the board draws (Filter rule, Match, Sort/Then by, related-list record picker) needs the collection-list query in the model and the renderer (RepeaterRenderer, lead; REQUESTS C-14). Today a Collection list stores collection + limit only; drawing filter rows would invent data.",
+   "authority": "board",
+   "verified": "drift-open",
+   "verifiedNote": "L-B round 21, engine model C-14 built (engine-list-query.md; applyCmsListQuery in packages/shared/schemas/cmsConditions.ts; CMSBindingManager.setListQuery — one history step, saved on the list's binding; RepeaterRenderer applies filter → sort → skip → Show for canvas and publish alike). Probe with a stored filter side by side with shots/195-27443.png: Filter '1 rule', the rule card (field · rule · value) with 'Remove filter', + Add filter, Match, Sort, Direction, + Then by, Show, Skip — match. Open: the board's value 'This page’s category' (@page.<field>) is offered only on a template page (code built, not probed there), and its per-generated-page evaluation needs the server (REQUESTS B-27); 'Exclude this page’s record' is not in the model.",
    "tier": "P1"
   },
   {

@@ -26,6 +26,7 @@
  * @license BSD-3-Clause
  */
 
+import { UnsavedLinkNotice } from "./UnsavedLinkNotice";
 import { MoreHorizontal, X } from "lucide-react";
 import * as React from "react";
 import type { Composer } from "@/engine";
@@ -171,6 +172,8 @@ export function PagePanel({ composer }: PagePanelProps) {
       <div className="bdi-panel" data-testid="inspector-page-panel" data-readonly={readOnly || undefined}>
         <PageHeader composer={composer} pageName={page.name} pageId={page.id} breakpoint={breakpoint} />
         {appliedTemplate ? <TemplateAppliedBanner name={appliedTemplate} pageName={page.name} onDismiss={dismissTemplate} /> : null}
+        {/* A-26 (187:22071): a collection page whose link the server has not confirmed. */}
+        <UnsavedLinkNotice composer={composer} pageId={page.id} />
         <div className="bdi-panel-scroll">
           {subview?.kind === "font-picker" && subview.elementId === root.id ? (
             <ChooseFont

@@ -308,3 +308,16 @@ describe("ListItemNote (B5-D99 197:28410)", () => {
     expect(container.textContent).toBe("");
   });
 });
+
+/* A-25 (173:12022 / 177:17091): on the template page "This page’s record ·
+   i of N" and the preview follow the record bar's choice. */
+describe("record bar choice (A-25)", () => {
+  it("reads the chosen record's place among the canvas's candidates", async () => {
+    const composer = makeComposer({ template: true, initial: [{ collectionId: "col-1", fieldSlug: "name", property: "content" }] });
+    const bindings = composer.cms.bindings as Record<string, unknown>;
+    bindings.previewCandidates = vi.fn(async () => RECORDS);
+    bindings.getPreviewRecord = vi.fn(async () => RECORDS[1]);
+    render(<BindingPropertyRow composer={composer as never} elementId="e1" />);
+    await waitFor(() => expect(screen.getByTestId("binding-context")).toHaveTextContent("This page’s record · 2 of 2"));
+  });
+});
