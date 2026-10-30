@@ -7,6 +7,7 @@
  * (typeBlock/bodies/fieldBody, 156:1316). Every write here goes through the
  * lock gate on the form (P-1). The tree reading lives in `./formFieldModel`.
  */
+import { markJustAdded } from "./justAddedField";
 import * as React from "react";
 import type { Composer } from "@/engine";
 import type { Element } from "@/engine/elements/Element";
@@ -185,7 +186,10 @@ export const FormFieldsSection: React.FC<FormFieldsSectionProps> = ({ elementId,
       if (nameTaken(form, field, field.getAttribute("name") ?? "")) field.setAttribute("name", `field-${n}`);
       added = field;
     });
-    if (added) openField(added);
+    if (added) {
+      markJustAdded(composer, added.getId());
+      openField(added);
+    }
   };
 
   /** Move a field past its neighbour — the two units, when they share a

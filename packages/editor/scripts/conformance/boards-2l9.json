@@ -4238,8 +4238,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Lane L-B round 14, compared with the board PNG (probe contact-form › + Add field › Text): the new field opens with Type Text, Label 'Field 4', Placeholder 'Your answer', Name 'field-4', Required — as the board. Open: the board's 'Added to Contact form.' note and the '‹ Contact form' back link under the fields (live: back link on top), and the board omits the Name note / Default value / Validation / Advanced rows for the just-added state. Lane L-B A4 (built, not compared): a new Text field is named 'field-N', labelled 'Field N', placeholder 'Your answer', and opens in the field editor. Open: 'Added to Contact form.' note and 'Text field added · All breakpoints · Undo' receipt.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B round 15, side by side with the board PNG (probe contact-form › + Add field › Text): the field just added shows Field · Type Text, Label 'Field 4', Placeholder 'Your answer', Name 'field-4', Required, then 'Added to the form.' and the '‹ Form' link under it — no back link on top, no Name note, Default value or Validation. Kept: Advanced attributes (shut, '0 set') — it is the universal section every element carries and its gate test forbids a per-element hide; the board's just-added frame omits it. Driven by the real just-added state (justAddedField: set by Add field, ended by any newer history step or another selection; unit-tested). The board's 'Contact form' / 'Field 4' are its names; the probe's form has no layer name, so it reads 'the form' / 'Form'.",
    "inheritsFrom": "156:1316",
    "tier": "P1"
   },
@@ -5558,8 +5558,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Lane L-B round 14, compared with the board PNG (not reproduced live — the probe cannot select two headings plus a locked image): the board moves batch eligibility into the Style tab body — 'Typography eligibility', '2 headings can change font size. Locked image is excluded and remains unchanged.', Font size 'Mixed', a full-width 'Apply to 2 eligible headings' — then 'Selection' with one 'Inspect {name}' button per object and the no-DOM-ID note, and '· 2 of 3 eligible' after 'Editing Desktop · Default state' in the header. Live keeps eligibility in the multi bar above the tabs. Open: a redesign of the batch panel. Lane L-B B1 (built, not compared — copy checked against the dump): the multi bar says '2 of 3 eligible. Locked {name} is excluded and remains unchanged.' when a target is locked (writes already skip it), lists 'Selection · Inspect {name}' rows that narrow to one object, and ends 'No DOM ID batch write. Choose one object for identity, binding and child-list tasks.'. Open: the eligibility count in the header line (B-10, lead) and the per-section 'Typography eligibility' / 'Apply to 2 eligible headings' rows.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B round 15 (lead cleared the batch panel and InspectorHeader), side by side with the board PNG (new probe ?type=heading&batch=1: two headings at 48 / 32 px and a locked image, all selected): header '3 selected · 2 of 3 eligible'; Style opens with 'Typography eligibility', '2 headings can change font size. Locked image is excluded and remains unchanged.', Font size 'Mixed' and a full-width 'Apply to 2 eligible headings' (a draft until Apply, which writes the eligible ones only through the lock gate, one Undo — unit-tested); 'Selection' as a group of full-width 'Inspect Heading 1 / Heading 2 / locked image' and the no-DOM-ID note. Kept, not on the board: the multi bar's Align / Distribute / Group above the tabs (the batch's layout capabilities) and its eligibility line; the board puts '2 of 3 eligible' after the editing state — at 300 wide the state select leaves no room, so it sits after the title. Header fix on the way: a multi-selection named itself only on a template page; it now reads '{n} selected' everywhere.",
    "tier": "P1"
   },
   {
@@ -5925,8 +5925,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Lane L-B round 14, compared with the board PNG (probe case inspector-states): body 'Loading project' / 'Your saved content is still arriving. Editing controls will appear when it is ready.' and now the board's four grey bars under it. Open: the board draws the real header ('… › Hero › Opening project', 'Loading Fieldwork Studio') and the tab strip above it; live shows a placeholder header bar and no tabs while the project loads (the header is InspectorHeader, lead). Lane L-B A9 (built, not compared): loading reads 'Loading project' / 'Your saved content is still arriving. Editing controls will appear when it is ready.' under the header bar. Open: the board also draws the (inert) tab strip and the header 'Loading {site}' (REQUESTS #10 territory).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B round 15 (lead cleared InspectorHeader), side by side with the board PNG (probe ?type=text&page=1&loading=1&siteName=Fieldwork Studio): while the project loads the Inspector shows the header as it will read — 'Opening project' and 'Loading Fieldwork Studio' (the site's name from its metadata; 'Loading' alone before it arrives) — the real tab strip, then 'Loading project', 'Your saved content is still arriving. Editing controls will appear when it is ready.' and the four grey bars. Not drawn: the board's path '… › Hero › Opening project' — sample data, nothing is selected while loading.",
    "tier": "P1"
   },
   {
@@ -6632,9 +6632,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Lane L-B A7b (built, not compared): presets-first add screen — see 161:14772.",
+   "authority": "code:conditions-not-built",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B round 15, side by side with the board PNG (probe heading › Behavior › + Add interaction): Visibility as before, then '‹ Back to Interactions', 'Add interaction', the seven presets (Fade in on scroll … Press while held), 'Choose a trigger ›', 'Plays when rendered (CSS) ›' — the add screen of 161:14772. Same exception: the Conditions note is not built.",
    "inheritsFrom": "161:14772",
    "tier": "P1"
   },

@@ -20,6 +20,7 @@
  * @license BSD-3-Clause
  */
 
+import { GROUP_TITLE, WIDE_BUTTON } from "../shared/controls/controlClasses";
 import * as React from "react";
 import type { Composer } from "@/engine";
 import { AlignmentHandler } from "@/engine/canvas/AlignmentHandler";
@@ -131,8 +132,10 @@ export function MultiSelectBar({ composer, selectedIds }: MultiSelectBarProps) {
           ? `Edits apply to all ${n}. One Undo restores all ${n}.`
           : `${eligible} of ${n} eligible. Locked ${lockedNames.join(", ")} ${lockedNames.length === 1 ? "is" : "are"} excluded and ${lockedNames.length === 1 ? "remains" : "remain"} unchanged.`}
       </p>
-      <div className="tw:flex tw:flex-col tw:px-3 tw:pb-2" role="group" aria-labelledby="inspector-multi-selection-label">
-        <span className={`${LABEL} tw:py-1 tw:px-1`} id="inspector-multi-selection-label">
+      {/* 2L9 247:28097: "Selection" as a group, one full-width bordered
+          "Inspect {name}" per object. */}
+      <div className="tw:flex tw:flex-col tw:gap-2 tw:px-3 tw:pb-2" role="group" aria-labelledby="inspector-multi-selection-label">
+        <span className={`${GROUP_TITLE} tw:mt-2!`} id="inspector-multi-selection-label">
           Selection
         </span>
         {ids.map((id, i) => (
@@ -142,7 +145,7 @@ export function MultiSelectBar({ composer, selectedIds }: MultiSelectBarProps) {
             color="light"
             size="xs"
             data-testid="inspector-multi-inspect"
-            className="tw:h-7 tw:w-full tw:justify-start tw:border-0 tw:bg-transparent tw:px-1 tw:text-[12px] tw:font-normal tw:text-[var(--bk-accent-text)] tw:hover:bg-[var(--bk-bg-subtle)] tw:focus:ring-0"
+            className={WIDE_BUTTON}
             onClick={() => {
               const el = els[i];
               if (el) composer?.selection.select(el);
@@ -151,7 +154,7 @@ export function MultiSelectBar({ composer, selectedIds }: MultiSelectBarProps) {
             Inspect {locked[i] ? `locked ${names[i].toLowerCase()}` : names[i]}
           </Button>
         ))}
-        <p className="tw:m-0 tw:px-1 tw:pt-1 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="inspector-multi-identity-note">
+        <p className="tw:m-0 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="inspector-multi-identity-note">
           No DOM ID batch write. Choose one object for identity, binding and child-list tasks.
         </p>
       </div>

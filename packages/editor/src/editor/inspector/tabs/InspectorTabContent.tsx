@@ -42,6 +42,7 @@ import type { PseudoStateId } from "@/shared/types";
 import { ResetStyleReview } from "../components/ResetStyleReview";
 import { ChooseFont } from "../sections/typography/ChooseFont";
 import { RenameCard } from "../components/RenameCard";
+import { BatchEligibility } from "../components/BatchEligibility";
 import { ApplyStyleResultNote, ApplyStyleReview, useApplyStyleResult } from "../components/ApplyStyleReview";
 
 // ============================================================================
@@ -185,6 +186,15 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
   }
 
   const all = visibleSectionIds(tabId, selectedTypes.length ? selectedTypes : [type], baseCtx);
+  /* 2L9 B01: a mixed selection's typography, as an explicit batch to the
+     eligible ones, heads the Style tab. */
+  const batch =
+    tabId === "style" && isMultiSelect && composer ? (
+      <BatchEligibility
+        composer={composer}
+        elements={selectedIds.map((id) => composer.elements.getElement(id)).filter((e): e is NonNullable<typeof e> => !!e)}
+      />
+    ) : null;
   /* An open interaction is the Behavior tab's whole body (2L9 I15); a
      form's Add field list is the Content tab's (156:3109). */
   const only =
@@ -203,6 +213,7 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
 
   return (
     <>
+      {batch}
       {ids.map((id, i) => {
         const entry = SECTION_REGISTRY[id];
         const displayMode = modes[i];

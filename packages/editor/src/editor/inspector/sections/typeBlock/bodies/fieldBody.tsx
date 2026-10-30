@@ -203,7 +203,7 @@ export const FieldBody: React.FC<TypeBlockBodyProps> = (props) => {
         <NoteRow tone="error" testId="form-field-name-clobber">
           {clobberingWarning(nameDraft ?? field.getAttribute("name") ?? "")}
         </NoteRow>
-      ) : (
+      ) : props.justAdded ? null : (
         <NoteRow testId="form-field-name-note">Name is the key stored with each submission.</NoteRow>
       )}
       <CheckRow
@@ -217,7 +217,7 @@ export const FieldBody: React.FC<TypeBlockBodyProps> = (props) => {
         }
         testId="form-field-required"
       />
-      {tag !== "select" ? <CommitRow label="Default value" value={defaultValue} onCommit={setDefault} testId="form-field-default" /> : null}
+      {tag !== "select" && !props.justAdded ? <CommitRow label="Default value" value={defaultValue} onCommit={setDefault} testId="form-field-default" /> : null}
       {extraRows.length ? <PropertyRows composer={composer} element={element} targetIds={[element.id]} rows={extraRows} /> : null}
     </>
   );
