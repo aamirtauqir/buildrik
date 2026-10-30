@@ -38,10 +38,15 @@ describe("IssuesPanel", () => {
     expect(screen.getByText("1 issue blocks publishing · 2 tips")).toBeInTheDocument();
     expect(screen.queryByTestId("issues-review-publish")).toBeNull();
     expect(screen.getByRole("button", { name: "All" })).toBeInTheDocument();
+    /* 2L9 B8-IS01: cards, not dot rows — a blocker on the red tint with ✕,
+       advice on grey with !, the severity named for screen readers; no pill,
+       no legend. */
     expect(screen.getByTestId("issue-severity-0")).toHaveTextContent("Error");
-    expect(screen.getByTestId("issue-severity-1")).toHaveTextContent("Warning · should fix");
-    expect(screen.getByTestId("issue-dot-0").className).toContain("tw:bg-[var(--bk-error)]");
-    expect(screen.getByText("● red = error · ● amber = warning")).toBeInTheDocument();
+    expect(screen.getByTestId("issue-severity-1")).toHaveTextContent("Warning");
+    expect(screen.getByTestId("issue-dot-0").textContent).toBe("✕ ");
+    expect(screen.getByTestId("issue-row-0").className).toContain("tw:bg-[var(--bk-error-tint)]");
+    expect(screen.getByTestId("issue-row-1").className).toContain("tw:bg-[var(--bk-bg-subtle)]");
+    expect(screen.queryByText("● red = error · ● amber = warning")).toBeNull();
   });
 
   /* L4-036: with 1 error among 19 warnings the error was row 15 — producer
@@ -97,6 +102,14 @@ describe("IssuesPanel", () => {
     renderPanel({ onSelectElement });
     fireEvent.click(screen.getByText(/Broken link/));
     expect(onSelectElement).toHaveBeenCalledWith(ISSUES[0]);
+  });
+
+  it("Fix › opens the exact target when there is nothing to repair mechanically (B8-IS01)", () => {
+    const onSelectElement = vi.fn();
+    const issue = { id: "e", type: "error" as const, message: "Collection list has no source", elementId: "list-1", location: "Home › Journal section" };
+    renderPanel({ onSelectElement, issues: [issue] });
+    fireEvent.click(screen.getByTestId("issue-open-0"));
+    expect(onSelectElement).toHaveBeenCalledWith(issue);
   });
 
   // ── T10 page scope (topbar plan, eng D17) ──────────────────────────────────
@@ -164,19 +177,17 @@ describe("IssuesPanel — content-scan states", () => {
   });
 });
 
-/* QA (integration 5e0d47902): the lint's long messages ("No dark value for
-   "color-primary" — dark mode shows…") wrapped to three lines
-   inside the fixed 56-tall row (board 164:28), pushing the location line
-   11 px past the row into the next one. One line each, the full text kept in
-   the DOM and in the title. */
-describe("IssuesPanel — a long message stays inside its 56 row", () => {
-  it("message and location are single truncated lines, with the full message as the title", () => {
+/* 2L9 B8-IS01 cards wrap: the whole sentence is read before a fix, never
+   cut at a fixed row height (the 56-tall row that truncated is gone). */
+describe("IssuesPanel — a long message wraps inside its card", () => {
+  it("message and location wrap; the full message stays the title", () => {
     const long = 'No dark value for "color-primary" — dark mode shows its light value, so check it on a dark page.';
     renderPanel({ issues: [{ id: "l1", type: "warning" as const, message: long, location: "Brand › color-primary" }] });
     const msg = screen.getByTestId("issue-message-0");
-    expect(msg.textContent).toBe(long);
-    expect(msg.className).toMatch(/tw:truncate/);
+    expect(msg.textContent).toContain(long);
+    expect(msg.className).toContain("tw:whitespace-normal");
+    expect(msg.className).not.toMatch(/tw:truncate/);
     expect(msg.getAttribute("title")).toBe(long);
-    expect(screen.getByTestId("issue-location-0").className).toMatch(/tw:truncate/);
+    expect(screen.getByTestId("issue-location-0").className).not.toMatch(/tw:truncate/);
   });
 });

@@ -264,6 +264,10 @@ function RailHelpMenu({ composer, showTour }: { composer: Composer | null; showT
       open={open}
       onClose={() => setOpen(false)}
       placement="right-end"
+      /* Portalled: the rail clips its overflow and the open drawer sits over
+         it, so an anchored panel opened UNDER the drawer (measured: x 17,
+         covered by the Pages panel). 2L9 263:255084 draws it beside the rail. */
+      portal
       label="Help"
       trigger={
         <Button

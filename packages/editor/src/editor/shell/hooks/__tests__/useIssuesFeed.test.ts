@@ -214,3 +214,40 @@ describe("useIssuesFeed — the publish-check rows stay current", () => {
     await waitFor(() => expect(hasVercelRow(issues.get())).toBe(false));
   });
 });
+
+/* REQUESTS A-35 / Play F4.01 (303:32296): a collection list with no source is
+   an issue, read from the real binding data (composer.cms.bindings). */
+describe("useIssuesFeed — collection lists with no source", () => {
+  const page = (children: Array<Record<string, unknown>>) => ({
+    id: "home",
+    name: "Home",
+    root: { id: "root", type: "container", children: [{ id: "sec", type: "section", content: "Journal section", children }] },
+  });
+  function withBindings(bound: Set<string>, pages: Array<Record<string, unknown>>) {
+    const c = makeComposer({ pages }) as unknown as Record<string, unknown>;
+    c.cms = { bindings: { hasCollectionBinding: (id: string) => bound.has(id) } };
+    return c as never;
+  }
+
+  it("lists an unbound list with its page and parent, and drops it once a collection is bound", async () => {
+    const bound = new Set<string>();
+    const composer = withBindings(bound, [page([{ id: "list-1", type: "collection-list" }, { id: "list-2", type: "collection-list" }])]);
+    bound.add("list-2");
+    const issues = setIssuesHook();
+    renderHook(() => useIssuesFeed(composer, null, issues.setIssues));
+    await waitFor(() => expect(issues.get().filter((i) => i.id.startsWith("cms:list-no-source:"))).toHaveLength(1));
+    const row = issues.get().find((i) => i.id === "cms:list-no-source:list-1")!;
+    expect(row).toMatchObject({ message: "Collection list has no source", location: "Home › Journal section", elementId: "list-1", pageId: "home" });
+    bound.add("list-1");
+    vi.useFakeTimers();
+    try {
+      act(() => {
+        (composer as unknown as { emit: (e: string) => void }).emit("cms:collection:bound");
+        vi.advanceTimersByTime(400);
+      });
+    } finally {
+      vi.useRealTimers();
+    }
+    await waitFor(() => expect(issues.get().some((i) => i.id.startsWith("cms:list-no-source:"))).toBe(false));
+  });
+});

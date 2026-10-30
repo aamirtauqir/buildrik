@@ -11,15 +11,15 @@
  * to earn it. `applyAutoFix` returns the new value, or null when it cannot
  * safely rewrite the token; null is the fix-failed branch.
  *
- * The issue line is chrome-ui's Row, not a hand-built role="button" div: Row
- * already owns that exact contract (role, tabIndex, Enter/Space, disabled).
+ * Each issue is a card (2L9 B8-IS01): its sentence is a chrome-ui Button —
+ * the door to the target — and Fix › sits beside it, never inside it.
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
 import { CheckCircle2, X } from "lucide-react";
-import { PanelHeader, Button, IconButton, EmptyState, Spinner, Row } from "@/editor/chrome-ui";
+import { PanelHeader, Button, IconButton, EmptyState, Spinner } from "@/editor/chrome-ui";
 import { issueAppliesToPage, type Issue } from "./hooks/useStudioState";
 import { publishTray } from "./publishTrayStore";
 
@@ -86,18 +86,19 @@ function isFixable(i: Issue): boolean {
   return Boolean(i.tokenId && i.autoFixHint);
 }
 
-/* Board 4418:147641: an 8px dot per row, and a severity pill under Fix ›. */
-const DOT: Record<Issue["type"], string> = {
-  error: "tw:bg-[var(--bk-error)]",
-  warning: "tw:bg-[var(--bk-yellow-400)]",
-  info: "tw:bg-[var(--bk-gray-400)]",
+/* 2L9 B8-IS01: the severity is a glyph in the sentence — ✕ red blocks,
+   ! advises — named for screen readers. */
+const GLYPH: Record<Issue["type"], string> = {
+  error: "tw:text-[var(--bk-error)]",
+  warning: "tw:text-[var(--bk-ink)]",
+  info: "tw:text-[var(--bk-ink-muted)]",
 };
-const SEVERITY: Record<Issue["type"], { label: string; className: string } | null> = {
-  error: { label: "Error", className: "tw:bg-[rgba(155,28,28,0.12)] tw:text-[var(--bk-red-800)]" },
-  warning: { label: "Warning · should fix", className: "tw:bg-[rgba(114,59,19,0.12)] tw:text-[var(--bk-yellow-800)]" },
-  info: null,
-};
-const PILL = "tw:inline-flex tw:h-[22px] tw:items-center tw:rounded-full tw:px-2 tw:text-[11px] tw:leading-4 tw:font-medium tw:whitespace-nowrap";
+const SEVERITY_LABEL: Record<Issue["type"], string> = { error: "Error", warning: "Warning", info: "Note" };
+/* The card's sentence: a flowbite Button (the door to the target) that reads
+   as text — wraps, left-aligned, 13/20, no chrome. */
+const CARD_TEXT =
+  "tw:h-auto tw:min-h-0 tw:w-full tw:justify-start tw:whitespace-normal tw:border-0 tw:bg-transparent tw:p-0 " +
+  "tw:text-left tw:text-[13px] tw:leading-5 tw:font-normal tw:hover:bg-transparent tw:disabled:opacity-100 tw:disabled:cursor-default";
 /* The scope segmented control: 24 high, 2px inset, selected on bg-subtle. */
 const SEG_WRAP = "tw:flex tw:h-6 tw:items-center tw:gap-0.5 tw:rounded-md tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:p-0.5";
 const segClass = (on: boolean) =>
@@ -113,7 +114,7 @@ const BODY = "tw:flex tw:flex-col tw:h-full tw:min-h-0";
    punctuation. The rest is 164:22's own row: it shipped 12px on the font's
    own line box, in a shorter row, with the count in ink-muted. */
 const SUMMARY =
-  "tw:flex tw:h-8 tw:items-center tw:px-4 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink)]";
+  "tw:flex tw:h-8 tw:items-center tw:px-4 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]";
 /* flowbite's Button is 40 tall and pads itself; only same-property utilities
    beat that through twMerge (CLAUDE.md §Chrome), and left alone it pushed the
    36 row to 40. */
@@ -122,8 +123,8 @@ const FILTER_BTN =
   "tw:text-[var(--bk-accent-text)] tw:no-underline";
 /* Board 164:32 draws Fix as accent text on the row, not a bordered control. */
 const FIX_BTN =
-  "tw:h-[18px] tw:min-h-0 tw:border-transparent tw:bg-transparent tw:p-0 " +
-  "tw:text-[12px] tw:leading-[18px] tw:font-medium tw:text-[var(--bk-accent-text)]";
+  "tw:h-5 tw:min-h-0 tw:border-transparent tw:bg-transparent tw:p-0 " +
+  "tw:text-[12px] tw:leading-5 tw:font-normal tw:text-[var(--bk-accent)]";
 /* Board 164:33/164:34 — the filter's own consequence, a 36-tall 11/16 line. */
 const FILTER_NOTE =
   "tw:m-0 tw:flex tw:h-9 tw:flex-none tw:items-center tw:px-4 tw:text-[11px] tw:leading-4 " +
@@ -341,66 +342,76 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
                 title={`No ${filter === "error" ? "errors" : "warnings"}`}
               />
             ) : (
-              visible.map((i, idx) => (
-                // Fix sits BESIDE the navigate target, never inside it — a
-                // button nested in a role="button" is invalid.
-                <div key={i.id} className="tw:relative tw:h-14" data-testid={`issue-row-${idx}`}>
-                  <Row
-                    size="tall"
-                    interactive
-                    className="tw:h-14 tw:w-full tw:items-start tw:pl-4 tw:pr-4 tw:pt-2"
-                    onClick={() => onSelectElement?.(i)}
+              visible.map((i, idx) => {
+                /* 2L9 B8-IS01 / Play F4.01 (236:9417, 303:32296): one card per
+                   issue — a blocker on the red tint, advice on grey; the
+                   sentence wraps, the location under it, Fix › on its own
+                   line. Fix › repairs a token mechanically where it can,
+                   and otherwise opens the exact target. */
+                const blocking = i.type === "error";
+                /* Every sentence is a door (the shell routes each kind — never a
+                   dead click); Fix › is drawn where there is an exact element,
+                   as the board does ("No favicon" carries none). */
+                const locatable = Boolean(onSelectElement);
+                const exact = locatable && Boolean(i.elementId);
+                const autoFix = isFixable(i) && !!onFix;
+                return (
+                  <div
+                    key={i.id}
+                    className={`tw:mx-3 tw:mb-1.5 tw:rounded-[var(--bk-radius-sm)] tw:px-2 tw:py-1 ${
+                      blocking ? "tw:bg-[var(--bk-error-tint)]" : "tw:bg-[var(--bk-bg-subtle)]"
+                    }`}
+                    data-testid={`issue-row-${idx}`}
                   >
-                    <span aria-hidden="true" data-testid={`issue-dot-${idx}`} className={`tw:mt-1.5 tw:size-2 tw:flex-none tw:rounded-full ${DOT[i.type]}`} />
-                    <span className="tw:flex tw:flex-col tw:flex-1 tw:min-w-0">
-                      {/* One line each: the row is a fixed 56. Full text: title + DOM.
-                          The first line leaves room for Fix ›, the second for the pill. */}
-                      <span
-                        className={`tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)] tw:truncate ${isFixable(i) && onFix ? "tw:pr-10" : ""}`}
-                        title={i.message}
-                        data-testid={`issue-message-${idx}`}
-                      >
-                        {i.message}
-                      </span>
-                      <span className="tw:mt-0.5 tw:flex tw:items-center tw:gap-2 tw:min-w-0">
-                        <span
-                          className="tw:flex-1 tw:min-w-0 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)] tw:truncate"
-                          data-testid={`issue-location-${idx}`}
-                        >
-                          {i.location}
-                        </span>
-                        {SEVERITY[i.type] && (
-                          <span className={`${PILL} tw:flex-none ${SEVERITY[i.type]!.className}`} data-testid={`issue-severity-${idx}`}>
-                            {SEVERITY[i.type]!.label}
-                          </span>
-                        )}
-                      </span>
-                    </span>
-                  </Row>
-                  {isFixable(i) && onFix && (
                     <Button
                       color="light"
                       size="xs"
-                      className={`tw:absolute tw:right-4 tw:top-2 ${FIX_BTN}`}
-                      data-testid={`issue-fix-${idx}`}
-                      disabled={fixing !== null}
-                      onClick={() => void runFix(i)}
+                      className={`${CARD_TEXT} ${blocking ? "tw:text-[var(--bk-error-text)]" : "tw:text-[var(--bk-ink)]"}`}
+                      disabled={!locatable}
+                      onClick={() => onSelectElement?.(i)}
+                      data-testid={`issue-message-${idx}`}
+                      title={i.message}
                     >
-                      Fix ›
+                      <span className="tw:block tw:text-left">
+                        <span aria-hidden="true" data-testid={`issue-dot-${idx}`} className={GLYPH[i.type]}>
+                          {blocking ? "✕ " : "! "}
+                        </span>
+                        <span className="tw:sr-only" data-testid={`issue-severity-${idx}`}>
+                          {SEVERITY_LABEL[i.type]}:{" "}
+                        </span>
+                        {i.message}
+                      </span>
                     </Button>
-                  )}
-                </div>
-              ))
+                    {i.location ? (
+                      <p className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]" data-testid={`issue-location-${idx}`}>
+                        {i.location}
+                      </p>
+                    ) : null}
+                    {autoFix || exact ? (
+                      <Button
+                        color="light"
+                        size="xs"
+                        className={`tw:mt-1 tw:mb-0.5 ${FIX_BTN}`}
+                        data-testid={autoFix ? `issue-fix-${idx}` : `issue-open-${idx}`}
+                        disabled={autoFix && fixing !== null}
+                        onClick={() => (autoFix ? void runFix(i) : onSelectElement?.(i))}
+                      >
+                        Fix ›
+                      </Button>
+                    ) : null}
+                  </div>
+                );
+              })
             )}
+              {/* F4.05: nothing blocks — the next move is the publish tray. */}
+              {!scoped.some((i) => i.type === "error") ? (
+                <div className="tw:px-3 tw:pt-1 tw:pb-3">
+                  <Button size="sm" className="tw:h-8 tw:w-[216px] tw:text-[13px] tw:font-medium" onClick={() => publishTray.open()} data-testid="issues-review-publish">
+                    Review and publish
+                  </Button>
+                </div>
+              ) : null}
           </div>
-          {/* F4.05: nothing blocks — the next move is the publish tray. */}
-          {!scoped.some((i) => i.type === "error") ? (
-            <div className="tw:flex-none tw:px-4 tw:pt-2">
-              <Button size="sm" className="tw:h-8" onClick={() => publishTray.open()} data-testid="issues-review-publish">
-                Review and publish
-              </Button>
-            </div>
-          ) : null}
           {/* Board 164:22 orders this LAST — under the rows, not over them. It
               shipped above the first issue, which is where the board's own
               annotation put it in words but not in layout; the frame draws
@@ -414,9 +425,6 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
               {scoped.length - visible.length === 1 ? "issue is" : "issues are"} hidden.
             </p>
           )}
-          <p className="tw:m-0 tw:flex-none tw:px-4 tw:py-2 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-gray-500)]">
-            ● red = error · ● amber = warning
-          </p>
         </>
       )}
       {suppressedTokenIds.length > 0 && (

@@ -90,7 +90,10 @@ const PREVIEW_BTN_CLASS =
    surfaces where publishing is not the viewer's to do. View mode is the
    case: the `action` slot used to hold SendForReview there and so replaced
    this button by accident; emptying the slot made Publish reappear. */
-export type PublishState = "ready" | "disabled" | "published" | "hidden";
+/** `failed`: the last publish failed (2L9 B8-PB10 `233:5303`) — the toggle
+ *  reads "Publish failed" on the error fill and still opens the tray, which
+ *  holds the reason and Try again. */
+export type PublishState = "ready" | "disabled" | "published" | "failed" | "hidden";
 
 /**
  * The tool cluster (plan §2, eng D12) — DATA props, never a node: the deleted
@@ -192,6 +195,7 @@ const PUBLISH_LABEL: Record<PublishState, string> = {
   ready: "Publish",
   disabled: "Publish",
   published: "✓ Published",
+  failed: "Publish failed",
   hidden: "",
 };
 
@@ -346,10 +350,16 @@ export function Topbar({
             onClick={onPublish}
             size="xs"
             title={ctaHint}
-            className={PUBLISH_BTN_CLASS}
+            color={publish === "failed" ? "red" : undefined}
+            className={
+              publish === "failed"
+                ? `${PUBLISH_BTN_CLASS} tw:bg-[var(--bk-error)] tw:text-white tw:hover:bg-[var(--bk-error-text)]`
+                : PUBLISH_BTN_CLASS
+            }
+            data-publish-state={publish}
             data-testid="topbar-publish"
           >
-            {ctaLabel ?? PUBLISH_LABEL[publish]}
+            {publish === "failed" ? PUBLISH_LABEL.failed : ctaLabel ?? PUBLISH_LABEL[publish]}
           </Button>
         )
       )}

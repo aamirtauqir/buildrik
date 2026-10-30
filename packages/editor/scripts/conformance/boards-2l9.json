@@ -3637,7 +3637,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-A S7 built, not compared: rail Help opens a menu 'Help' — 'Keyboard shortcuts ?' (the sheet) and 'Getting started' (tour replay); the Keyboard legend card it used to open is kept as a third row under a rule (code-ahead, OD-3). Rail = the board's 7 (Add, Layers, Pages, Assets, CMS, Brand, Help); off-rail homes recorded in rail/tabsConfig.ts.",
+   "verifiedNote": "Round 25, probe-compared (pages-shell, Help): BUG fixed — the menu opened inline inside the rail (overflow hidden) at x 17 and lay UNDER the open drawer (elementFromPoint hit the Pages panel); it now portals beside the rail (x 67, over the drawer, bottom-aligned with Help). Still drifts: the head reads 'HELP' in the shared MenuLabel's small caps where the board says 'Help', and a third row 'Keyboard legend' (code-ahead — the legend's only door) sits under a rule. Board shots/263-255084.png.",
    "tier": "P2"
   },
   {
@@ -8080,8 +8080,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C C6: \"Add field\" + \"Choose the kind of content this field stores.\", all 16 schema types in board order and names (fieldTypes.ts).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 25, probe-compared: shots/167-3871.png vs probe cms-add-field: 640 wide (board ~620), 'Add field', 'Choose the kind of content this field stores.', the 16 stored types as a two-column grid of outlined 30-tall tiles in board order, outlined Cancel. Was a single-column list of 44-tall rows at 560.",
    "tier": "P2"
   },
   {
@@ -8091,8 +8091,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C C6/D2: \"Add {type} field · {collection} · New field\", key hint, Default value (checked against the field's rules), Minimum/Maximum (length), Placeholder, Help text, Add field CTA.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 25, probe-compared: shots/167-4135.png vs probe cms-add-field (Text): labels over grey filled fields — Name, Key + 'Used in bindings and patterns. Must be unique in Blog.', Type (select; changes the type in place, so 'Back to field types' is gone), Required checkbox (was Yes/No chips), Default value, Minimum / Maximum length, Placeholder, Help text; Cancel + Add field. Dropped the off-board 'Existing records keep empty values until edited.' Width 640 vs the board's ~620 (Modal lg).",
    "tier": "P2"
   },
   {
@@ -8202,7 +8202,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "built, not compared — L-C C6/D2: \"Add {type} field · {collection} · New field\", key hint, Default value (checked against the field's rules), Minimum/Maximum (length), Placeholder, Help text, Add field CTA.",
+   "verifiedNote": "Round 25: layout rebuilt with T02; the options list is OptionsEditor ('Label and saved value' rows on the board) — not compared. Board shots/167-6844.png.",
    "tier": "P2"
   },
   {
@@ -8246,7 +8246,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C C6/D2: \"Add {type} field · {collection} · New field\", key hint, Default value (checked against the field's rules), Minimum/Maximum (length), Placeholder, Help text, Add field CTA.",
+   "verifiedNote": "Round 25: layout rebuilt with T02 (labels over filled fields, Type select, Required checkbox); the Collection select now carries 'One record per value. Multi-reference fields are not available.'. Compared by text only: the board also offers Placeholder on a reference, which the code gives only to typed-value fields — not added. Board shots/167-7936.png.",
    "tier": "P2"
   },
   {
@@ -8278,8 +8278,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "built, not compared — L-C C6: refused add keeps the settings, \"Couldn’t save. Your field settings are still here.\" + Retry.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 25, probe-compared: shots/167-8747.png vs probe cms-add-field&fail=1 (Long text, Summary, save refused): every value kept, 'Couldn’t save. Your field settings are still here.' in red under Help text, Cancel + Retry. The dialog sits lower than the board (the shared chrome-ui placement).",
    "tier": "P2"
   },
   {
@@ -14016,7 +14016,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Round 24, tray half probe-compared (publish-tray-failed): red 'Publish failed — <server reason> The live site still shows v12.', outlined Try again (idempotent latch kept), View log (steps + job/deployment ids), no footer CTA. Still open: the topbar's red 'Publish failed' toggle (REQUESTS A-30).",
+   "verifiedNote": "Round 25: tray half probe-compared (round 24). Topbar half built: Topbar `publish=\"failed\"` ('Publish failed' on --bk-error, still the tray toggle; Topbar.test) and StudioHeader `publishFailed` (StudioHeader.test). Open only until AquibraStudio passes publishFailed (REQUESTS A-29, owner).",
    "tier": "P1"
   },
   {
@@ -14268,8 +14268,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "shell/IssuesPanel.tsx:213 — errors-first exists; no \"n block publishing · n tips\" summary or per-row location",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 25, probe-compared: shots/236-9417.png vs probe issues-cards: verdict head ('n issue(s) block publishing · n tips'), blockers first on the red tint with ✕, tips on grey with !, location line under each, Fix › opens the exact target (onSelectElement → page + select; issue-open-N) or repairs a token (issue-fix-N). Kept, off-board: scope and severity filter on the head row.",
    "tier": "P2"
   },
   {
@@ -23148,7 +23148,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Round 24: the Issues head now reads the board's verdict ('1 issue blocks publishing · 3 tips', IssuesPanel issueSummary). FAILING STEP stays: no issue is raised for a collection list without a source — the binding lives in composer.cms.bindings, which the shared detector cannot see; filed REQUESTS A-35 (useIssuesFeed is lead-owned). Rows are still the panel family's dot rows, not the board's tinted cards.",
+   "verifiedNote": "Round 25, probe-compared (issues-cards): the card layout matches — red-tint blocker card '✕ <sentence>' / location / Fix ›, grey tips. The 'collection list has no source' issue now exists (useIssuesFeed, A-35, from composer.cms.bindings), but as a TIP until the owner decides whether publish refuses it — so this board's '1 issue blocks publishing' is not what the editor says for it today. Open on that owner decision; the message is 'Collection list has no source' (the list's layer name is not in the exported element data).",
    "tier": "P1"
   },
   {
@@ -23191,8 +23191,8 @@
    "family": "play",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 24, built + unit-tested (IssuesPanel.test 'no blockers'): 'No blocking issues · N tips' and a blue 'Review and publish' that opens the publish tray. Not compared live; the rows are the panel family's dot rows where this board draws tinted cards with a location line.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 25, probe-compared: shots/303-34252.png vs probe issues-cards&clear=1: 'No blocking issues · 3 tips' (13px), grey cards '! <sentence>' wrapping with the location under and Fix › where there is an exact element, cards without an element carry no Fix (as 'No favicon'), then the blue 216-wide 'Review and publish' under the list (opens the publish tray). Kept, off-board (code-ahead): the This page / Whole site scope and the severity filter on the head row. Server check sentences are the server's.",
    "tier": "P1"
   },
   {
