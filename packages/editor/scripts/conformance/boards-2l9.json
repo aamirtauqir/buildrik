@@ -4172,7 +4172,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-B round 19: the shared-token edit now says who owns the change — '← Back to Brand colors', {token}, 'Editing shared Brand color', 'Known references · N in this site', picker, 'Changes this token’s color; the original palette color stays unchanged.', primary 'Update {token} · Light' (useUpdateColorEverywhere writes the Light literal), secondary 'Use on selected element' (raw value, detaches), 'Local use applies in Light and Dark. Other uses of the token stay unchanged.', Cancel; popover copy to the board's US spelling (Brand colors, Search colors, Custom color). Not drawn: the Light/Dark switch and 'Source · palette…' (the edit writes Light only; no source field on the entry). Compared with the dump copy only — no PNG this round.",
+   "verifiedNote": "L-B round 20, probe (heading › Text color popover, three states) side by side with shots/39-9114.png: panel 1 rows now 'Edit' (text) + 'Use', centred 'Add colors in Brand', 'Custom color ▸'; panel 2 'Local color · selected element' + 'Applies a local value to the selected element. Brand colors remain unchanged.' + Cancel | Apply; panel 3 centred '← Back to Brand colors', token, 'Editing shared Brand color', 'Known references · N in this site', 'Changes this token’s color…', 'Update {token} · Light', 'Use on selected element', note, centred Cancel — match. Open: panel 1's 'Color for {element}' / 'Desktop · Default state' head (ColorInput has no element or state to name), the Light/Dark switch and 'Source · palette…' (code: useUpdateColorEverywhere writes the Light literal only; no source field on the entry), and the shared ColorPicker's internals (Hex/New row vs the board's swatch select + Workspace palette).",
    "tier": "P1"
   },
   {
@@ -4329,8 +4329,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Lane L-B round 16, built against the board PNG, unit-tested, not walked live (the probe cannot take the browser offline): with navigator offline the After submit / Notifications / Spam controls read only, 'Needs a connection. You can still edit form fields.' sits under the message, and Form settings status reads 'Needs a connection'; no save is attempted. The form's fields (Content) stay editable.",
+   "verified": "drift-open",
+   "verifiedNote": "L-B round 20, probe ?block=contact-form&siteId=s1&formBlock={MESSAGE,…} with the browser set offline, side by side with shots/156-8406.png: 'Needs a connection. You can still edit form fields.' under Message, Notifications / Spam protection ('Applies on next publish') / Form settings status 'Needs a connection' + 'Saved separately…' — copy and order match. Open: the board greys the settings controls while offline (Message, Send to, the spam checkbox); live they draw enabled. code:after-submit-live-on-save for the board's 'Applies on next publish' under After submit.",
    "tier": "P1"
   },
   {
@@ -4565,8 +4565,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Redirect is a free-text CommitRow (FormAfterSubmitSection.tsx:195); no shared page picker, URL check, atomic save",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 20, probe ?formBlock={REDIRECT, no URL} side by side with shots/159-8959.png: Then 'Redirect', 'Redirect to' select 'Choose page or URL…' (F25's picker, round 17), Notifications, Spam protection, Form settings status 'Choose a destination to save' + note, Visibility / Interactions — match. Exception as the archetype: no 'Applies on next publish' under After submit (code:after-submit-live-on-save).",
    "inheritsFrom": "156:11319",
    "tier": "P1"
   },
@@ -4821,8 +4821,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-B round 19: Font size's unit choice is the board's card beside the column — 'Font size unit', px · em · rem · % · vw (✓ current), Cancel — scoped by InputWithUnit's new unitCardTitle prop; every other number field keeps its inline unit select (unit-tested both ways). The board's 'Convert using the authored page’s font and viewport values.' is not drawn: code:unit-conversion-root-16 — a unit change converts px ↔ rem/em at a 16 px root only (I07's receipt says so) and leaves %, vw as typed. Built, not compared to the PNG (the shot is not in shots/ and the round's image budget was spent).",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 20, probe inspector-panel ?shell=1 (column opened) side by side with shots/161-11006.png: 'Font size unit' card beside the column, level with the tab strip, 240 wide, 40px rows px · em · rem · % · vw, plain centred Cancel — match. Opt-in via InputWithUnit unitCardTitle; other fields keep the inline select. code:unit-conversion-root-16 — the board's 'Convert using the authored page’s font and viewport values.' is not drawn: a unit change converts px ↔ rem/em at a 16 px root only and leaves %, vw as typed.",
    "tier": "P1"
   },
   {
@@ -5213,8 +5213,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "B-12 (lead): detach is one document history step; the Inspector's Detach applies directly with \"{name} detached · Undo\". Not yet compared live.",
+   "verified": "drift-open",
+   "verifiedNote": "L-B round 20, compared with shots/241-19230.png: after Detach the board's header reads 'Hero card · local group' / 'Detached · content and styles retained' above the Editing line. Live Detach applies at once with the '{name} detached · Undo' receipt (B-12) and the header shows the now-plain container — no detached-state lines. Needs a 'just detached' marker the header can read (the element model keeps none after detachInstance).",
    "tier": "P1"
   },
   {
@@ -5245,9 +5245,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:engine-tabs-pairs",
    "verified": "no",
-   "verifiedNote": "tabs is a plain container (src/shared/constants/elementCapabilities.ts:171); no pair/relationship UI",
+   "verifiedNote": "L-B round 20: blocked with its archetype C01 — tabs is a plain container with no tab↔panel pair, initial tab or runtime (REQUESTS B-21). Nothing to compare until the model exists.",
    "tier": "P1"
   },
   {
@@ -5256,9 +5256,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:engine-tabs-pairs",
    "verified": "no",
-   "verifiedNote": "tabs is a plain container (src/shared/constants/elementCapabilities.ts:171); no pair/relationship UI",
+   "verifiedNote": "L-B round 20: blocked with its archetype C01 — tabs is a plain container with no tab↔panel pair, initial tab or runtime (REQUESTS B-21). Nothing to compare until the model exists.",
    "tier": "P1"
   },
   {
@@ -5279,9 +5279,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:engine-tabs-pairs",
    "verified": "no",
-   "verifiedNote": "tabs is a plain container (src/shared/constants/elementCapabilities.ts:171); no pair/relationship UI",
+   "verifiedNote": "L-B round 20: blocked with its archetype C01 — tabs is a plain container with no tab↔panel pair, initial tab or runtime (REQUESTS B-21). Nothing to compare until the model exists.",
    "tier": "P1"
   },
   {
@@ -5290,9 +5290,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:engine-tabs-pairs",
    "verified": "no",
-   "verifiedNote": "tabs is a plain container (src/shared/constants/elementCapabilities.ts:171); no pair/relationship UI",
+   "verifiedNote": "L-B round 20: blocked with its archetype C01 — tabs is a plain container with no tab↔panel pair, initial tab or runtime (REQUESTS B-21). Nothing to compare until the model exists.",
    "tier": "P1"
   },
   {
@@ -5312,9 +5312,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:engine-modal-link",
    "verified": "no",
-   "verifiedNote": "No modal trigger↔dialog link, local insertion or close policy UI",
+   "verifiedNote": "L-B round 20: blocked with C07 — no trigger↔dialog link, local insertion or close policy in the element model (REQUESTS B-17, deferred by the lead).",
    "tier": "P1"
   },
   {
@@ -5323,9 +5323,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:engine-modal-link",
    "verified": "no",
-   "verifiedNote": "No modal trigger↔dialog link, local insertion or close policy UI",
+   "verifiedNote": "L-B round 20: blocked with C07 — no trigger↔dialog link, local insertion or close policy in the element model (REQUESTS B-17, deferred by the lead).",
    "tier": "P1"
   },
   {
@@ -5346,9 +5346,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:engine-modal-link",
    "verified": "no",
-   "verifiedNote": "No modal trigger↔dialog link, local insertion or close policy UI",
+   "verifiedNote": "L-B round 20: blocked with C07 — no trigger↔dialog link, local insertion or close policy in the element model (REQUESTS B-17, deferred by the lead).",
    "tier": "P1"
   },
   {
@@ -5357,9 +5357,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:engine-modal-link",
    "verified": "no",
-   "verifiedNote": "No modal trigger↔dialog link, local insertion or close policy UI",
+   "verifiedNote": "L-B round 20: blocked with C07 — no trigger↔dialog link, local insertion or close policy in the element model (REQUESTS B-17, deferred by the lead).",
    "tier": "P1"
   },
   {
@@ -5890,7 +5890,7 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
+   "authority": "open:needs-assets-fonts-page",
    "verified": "drift-open",
    "verifiedNote": "L-B round 19: not built. The board is an Assets › Fonts page (Site fonts / My font files, rows with 'Added by … · Added to site', Upload font files, storage line, '‹ Back to Editor · Home' and the pinned 'Back to font picker'). Live, Site fonts is a modal (SiteFontsModal, Clone 3686:42317) and Assets has no Fonts page, so the pinned origin row has no page to sit on. Needs the Assets Fonts page first (assets drawer, L-C) — larger than a row.",
    "tier": "P1"
@@ -5901,9 +5901,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:engine-modal-link",
    "verified": "no",
-   "verifiedNote": "No modal trigger↔dialog link, local insertion or close policy UI",
+   "verifiedNote": "L-B round 20: blocked with C07 — no trigger↔dialog link, local insertion or close policy in the element model (REQUESTS B-17, deferred by the lead).",
    "tier": "P1"
   },
   {
@@ -5936,8 +5936,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-B round 19, probe-compared (inspector-panel ?loadFailed=network) with shots/255-82909.png: on a network/offline load failure (the loader's connection kinds) the tab body is 'Project could not load' / 'Check your connection, then retry. Your saved project has not been replaced.' / full-width primary 'Retry loading' running the loader's published in-place retry (no button when none is published) — matches. Open: the header's context line 'Could not load {site}' (InspectorHeader, lead) and the path row (S31).",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 20, probe ?loadFailed=network&siteName=… side by side with shots/255-82909.png: header context line 'Could not load {site}', path row, tabs, body 'Project could not load' / 'Check your connection, then retry. Your saved project has not been replaced.' / primary 'Retry loading' (the loader's published retry). Match; type icon and ✕ are the header archetype's.",
    "tier": "P1"
   },
   {
@@ -6103,9 +6103,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-B round 19: NOT built — conflicts with owner decision G2-146 (2026-09-25, usePropertyJump.ts header): '⌘K Jump to property instead of a search bar in the inspector'. The lead asked for an inspector-scoped filter without changing ⌘K; that is the search bar the owner turned down. Needs the owner (or the lead with the owner) to reopen G2-146. The reveal half (S18) exists: UI_INSPECTOR_FOCUS_SECTION opens the tab and section, scrolls, focuses, tints the row.",
+   "authority": "superseded:owner-G2-146",
+   "verified": "no",
+   "verifiedNote": "⌘K Jump to property replaces an inspector search bar (owner 2026-09-25)",
    "tier": "P1"
   },
   {
@@ -6114,9 +6114,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "⌘K global rows \"label · path\"; board Inspector-scoped \"Properties · Hero heading\" search",
+   "authority": "superseded:owner-G2-146",
+   "verified": "no",
+   "verifiedNote": "⌘K Jump to property replaces an inspector search bar (owner 2026-09-25)",
    "inheritsFrom": "255:90324",
    "tier": "P1"
   },
@@ -6127,8 +6127,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No category selection, so no zero-category no-history case",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 20, probe heading with 3 peers + 1 locked, ⋯ › Apply style, Typography unticked, side by side with shots/255-91321.png: 'Apply style to headings', '3 eligible headings · 1 locked heading skipped', categories, 'Select at least one category. No properties are selected and nothing will change.', disabled 'Apply style', 'Select Typography' (new — re-ticks the first offered category), Cancel. Nothing chosen runs nothing, so no history. Kept from S11: 'On Home · Desktop · Default state'; categories the source does not set stay disabled.",
    "tier": "P1"
   },
   {
@@ -6195,8 +6195,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No searchable \"Choose source\" picker",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 20, probe ?cms=unbound, Title text's binding button, side by side with shots/255-94031.png: 'Choose source' beside the column — search 'Search sources or fields…', RECORD DATA (List item · Specific record), SITE & PAGE (Site, Page), LIVE SOURCES — match. code:cms-sources-only: Site / Page / live sources read 'Planned'; 'This page’s record · Blog' shows only on a collection's template page (the probe page is not one).",
    "tier": "P1"
   },
   {
@@ -6205,9 +6205,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:engine-conditions",
    "verified": "no",
-   "verifiedNote": "No element Conditions (show/hide by record field) in Inspector",
+   "verifiedNote": "L-B round 20: blocked — there is no element-level conditions model (show/hide by a record field) in the engine or the export runtime (REQUESTS B-11); the Inspector draws no Conditions row (no placeholder rows, LD-6).",
    "tier": "P1"
   },
   {
@@ -6216,9 +6216,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:engine-conditions",
    "verified": "no",
-   "verifiedNote": "No element Conditions (show/hide by record field) in Inspector",
+   "verifiedNote": "L-B round 20: blocked — there is no element-level conditions model (show/hide by a record field) in the engine or the export runtime (REQUESTS B-11); the Inspector draws no Conditions row (no placeholder rows, LD-6).",
    "tier": "P1"
   },
   {
@@ -6227,9 +6227,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:engine-conditions",
    "verified": "no",
-   "verifiedNote": "No element Conditions (show/hide by record field) in Inspector",
+   "verifiedNote": "L-B round 20: blocked — there is no element-level conditions model (show/hide by a record field) in the engine or the export runtime (REQUESTS B-11); the Inspector draws no Conditions row (no placeholder rows, LD-6).",
    "tier": "P1"
   },
   {
@@ -6295,9 +6295,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:engine-conditions",
    "verified": "no",
-   "verifiedNote": "No element Conditions (show/hide by record field) in Inspector",
+   "verifiedNote": "L-B round 20: blocked — there is no element-level conditions model (show/hide by a record field) in the engine or the export runtime (REQUESTS B-11); the Inspector draws no Conditions row (no placeholder rows, LD-6).",
    "tier": "P1"
   },
   {
@@ -6306,9 +6306,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:engine-conditions",
    "verified": "no",
-   "verifiedNote": "No element Conditions (show/hide by record field) in Inspector",
+   "verifiedNote": "L-B round 20: blocked — there is no element-level conditions model (show/hide by a record field) in the engine or the export runtime (REQUESTS B-11); the Inspector draws no Conditions row (no placeholder rows, LD-6).",
    "tier": "P1"
   },
   {
@@ -6317,9 +6317,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:engine-conditions",
    "verified": "no",
-   "verifiedNote": "No element Conditions (show/hide by record field) in Inspector",
+   "verifiedNote": "L-B round 20: blocked — there is no element-level conditions model (show/hide by a record field) in the engine or the export runtime (REQUESTS B-11); the Inspector draws no Conditions row (no placeholder rows, LD-6).",
    "tier": "P1"
   },
   {
@@ -6328,9 +6328,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:engine-conditions",
    "verified": "no",
-   "verifiedNote": "No element Conditions (show/hide by record field) in Inspector",
+   "verifiedNote": "L-B round 20: blocked — there is no element-level conditions model (show/hide by a record field) in the engine or the export runtime (REQUESTS B-11); the Inspector draws no Conditions row (no placeholder rows, LD-6).",
    "tier": "P1"
   },
   {
@@ -6375,7 +6375,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-B round 19 (lead cleared StudioPanels for S30), compared with shots/258-36770.png: copy 'Show Inspector', 144×32, 13 medium; the ⌘\\ hint moved to the tooltip and aria-keyshortcuts (the board draws none). Open: position — the board keeps the 300 column reserved and puts the button at its top (1276,104); live the canvas runs full width with the button at its top-right (top-5 right-5). That is the shell grid (AquibraStudio/LayoutShell), not measured here.",
+   "verifiedNote": "L-B round 20 (lead cleared the shell grid): hiding the inspector now keeps its column reserved (LayoutShell inspectorOpen || showInspectorDoor), bg-subtle, empty, with 'Show Inspector' 144×32 at top 48 / right 20 inside it; ProInspector stays mounted invisible under it (tab and scroll survive). Unit-tested (StudioPanels.inspectorColumn). Not probe-compared: there is no probe of the StudioPanels shell — needs the lead's live walk.",
    "tier": "P1"
   },
   {
@@ -6385,8 +6385,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-B round 19: not built — needs a lead call. Every 2L9 inspector board draws the path row ('… › Hero › Hero heading', even 'Home · Page' on S09), which makes the header 104 tall on every page; Task 1.4 (InspectorHeader.tsx header comment) draws it only on a collection template page so the header keeps 84. S31's '…' opens 'Selection path' (Home · Main · Hero · Content stack · Hero heading). Building the overflow alone, inside the template-page rule, would not match the board.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 20 (lead: path row on every page, header files cleared), probe inspector-panel ?ancestors=Main,Hero,Content stack side by side with shots/258-37248.png: name row, path row '… › {parent} › {element}' under it on any page, then the context line; '…' opens 'Selection path' beside the column level with the tab strip, 280 wide, 40px centred rows Home · Main · Hero · Content stack · Hero heading, each selects (current closes). Board's crumb 'Hero' is sample data. The 'Keyboard: …' line is an annotation.",
    "tier": "P1"
   },
   {
@@ -6396,8 +6396,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-B round 19: scroll memory is now per element AND tab (ProInspector scrollKey); unit test 'remembers a place per element AND tab'. The board's 'Restored … scroll position' line is a loose annotation (x 1141, no panel padding), not drawn. Not probe-compared: the probe's Style body fits its column, nothing to scroll.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 20, probe inspector-panel heading, Style with both More settings open (scrollHeight 1204 / 716): scrolled Style to 300, Behavior opened at 0, back on Style restored 300 — the board's state (Style kept at Typography · Advanced). Scroll memory is keyed element + tab (unit test too). Section order under it is the Style archetype's. The 'Restored …' line is an annotation.",
    "tier": "P1"
   },
   {
@@ -8524,8 +8524,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 18 (L-A, CMS lane): Inspector surface — REQUESTS A-23 to L-B (board shot committed). | Board: grouped source popover (record/list item/specific record/Site/Page, Live=Planned). Code: Collection select only; no Site/Page",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 20 (A-23), probe ?cms=template&unbound=1, Title text's bind button, side by side with shots/173-9019.png: 'Choose source' beside the column — search, RECORD DATA (This page’s record · Blog / Each generated page shows its own record · List item / Select an element inside a collection list · Specific record), SITE & PAGE, LIVE SOURCES — match; '‹ CMS · Dynamic pages' heads the Content tab. code:cms-sources-only: Site / Page / live sources read 'Planned'.",
    "tier": "P1"
   },
   {
@@ -8535,8 +8535,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 18 (L-A, CMS lane): Inspector surface — REQUESTS A-23 to L-B (board shot committed). | Board lists incompatible fields with reasons; code hides them (CmsBindingSection.tsx:57,132)",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 20 (A-23), probe ?cms=unbound&fields=1 › Specific record, side by side with shots/173-9389.png: card titled 'Blog fields', search, centred '‹ Sources', every field — fitting ones '{Type} · {slug}' and pickable, the rest shut with '{Type} cannot supply title text' (was: hidden). code: Body reads 'Rich text · body', not 'formatting will be removed' — a rich-text binding keeps its sanitised formatting (CMSBindingManager sanitizeRichtext); Author is shut ('Reference cannot supply title text'), not 'choose one field ›' — there is no reference sub-field binding; no 'Date & time · choose a format' (Format offers As written only).",
    "tier": "P1"
   },
   {
@@ -8546,8 +8546,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 18 (L-A, CMS lane): Inspector surface — REQUESTS A-23 to L-B (board shot committed). | Compared live 2026-10-26 (cms-brand): unreachable live — Needs a Blog dynamic template page with a heading bound to Blog.title. QA site has no collection/template; converting a shared QA page was not done (other agents' tabs raised 2 site conflicts). | prior: Lane L-B C-13 (built, not compared): bound — Dynamic bindings heads Content; the property row reads '{Collection} · {field}', the preview value and 'This page’s record · i of N'.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 20 (A-23), probe ?cms=template (Home is Blog's template page, heading bound to this page's record) side by side with shots/173-9757.png: name row 'Heading · Blog.title' (the bound chip moved into the header's name row; a missing source keeps its error chip in StatusMarks), '‹ CMS · Dynamic pages' (new TemplatePageDoor, opens the collection's Dynamic pages), 'Dynamic bindings · Title text · Blog.title ›', 'Title text' row 'Blog · title / {value} ⋯', \"This page’s record · 1 of N\" — match. Kept: '1 binding' count (Play F2.16); the board's 'Text' section with Tag is Semantics (A2); Conditions not drawn (blocked:engine-conditions, B-11). The receipt 'Title bound to Blog.title · Undo' was not exercised here. Fixed on the way: useCmsBinding now hears CMS_COLLECTION_UPDATED on the store's emitter, so a page made a template page is followed live.",
    "tier": "P1"
   },
   {
@@ -8557,8 +8557,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 18 (L-A, CMS lane): Inspector surface — REQUESTS A-23 to L-B (board shot committed). | Compared live 2026-10-26 (cms-brand): unreachable live — Binding subview needs a bound heading on a collection template page; same blocker as 173:9757. | prior: Lane L-B C-13 (built, not compared): binding subview — see 302:13946.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 20 (A-23), probe ?cms=template › Title text · Blog.title ›, side by side with shots/173-10329.png: '‹ Back to Content', 'Title text binding', Source 'Blog · title', \"This page’s record · each page shows its own\", Format 'As written', If empty, Preview, 'Open record ›', 'Unbind — keep shown text', 'Keeps “…” as static text.' — match; the name row carries 'Blog.title' as drawn.",
    "tier": "P1"
   },
   {
@@ -9128,9 +9128,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:engine-conditions",
    "verified": "no",
-   "verifiedNote": "Round 18 (L-A, CMS lane): Inspector surface — REQUESTS A-23 to L-B (board shot committed). | Content summary \"1 · Hidden\" + receipt; no condition status in inspector",
+   "verifiedNote": "L-B round 20 (A-23): blocked — 'Conditions · 1 · Hidden' and 'Visibility condition added · Undo' need the element conditions model (REQUESTS B-11); nothing in the engine or export stores a condition.",
    "tier": "P1"
   },
   {
@@ -9382,9 +9382,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:engine-list-query",
    "verified": "no",
-   "verifiedNote": "Round 18 (L-A, CMS lane): Inspector surface — REQUESTS A-23 to L-B (board shot committed). | Filter rule + category menu; no list filter in code",
+   "verifiedNote": "L-B round 20 (A-23): blocked — the list query the board draws (Filter rule, Match, Sort/Then by, related-list record picker) needs the collection-list query in the model and the renderer (RepeaterRenderer, lead; REQUESTS C-14). Today a Collection list stores collection + limit only; drawing filter rows would invent data.",
    "tier": "P1"
   },
   {
@@ -9603,9 +9603,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:engine-list-query",
    "verified": "no",
-   "verifiedNote": "Round 18 (L-A, CMS lane): Inspector surface — REQUESTS A-23 to L-B (board shot committed). | Related list record picker keeps query; not in code",
+   "verifiedNote": "L-B round 20 (A-23): blocked — the list query the board draws (Filter rule, Match, Sort/Then by, related-list record picker) needs the collection-list query in the model and the renderer (RepeaterRenderer, lead; REQUESTS C-14). Today a Collection list stores collection + limit only; drawing filter rows would invent data.",
    "tier": "P1"
   },
   {
@@ -9660,8 +9660,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Round 18 (L-A, CMS lane): Inspector surface — REQUESTS A-23 to L-B (board shot committed). | Card Content \"Inside list of Team · This card has no link · Edit link in Behavior ›\"; not in code",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 20 (A-23), probe ?type=container&ancestors=Team&cms=list (parent a Collection list of Blog), Content, side by side with shots/197-28410.png: 'Inside list of {collection}' / 'Edits to this Card apply to every {collection} record.' / 'Card' / 'This card has no link.' / 'Edit link in Behavior ›' (opens Behavior › Link) — match (collection name is sample data). New ListItemNote, from useCmsBinding's listCollection and the element's own href; the link block only where Behavior › Link exists.",
    "tier": "P1"
   },
   {

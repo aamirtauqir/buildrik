@@ -36,6 +36,8 @@ import { InspectorFieldContext } from "../shared/controls/InspectorFieldContext"
 import { sectionOverrideMarks } from "../shared/controls/OverrideDot";
 import { capabilitiesFor } from "@/shared/constants/elementCapabilities";
 import { BindingDetail } from "../sections/binding/BindingDetail";
+import { TemplatePageDoor } from "../sections/binding/TemplatePageDoor";
+import { ListItemNote } from "../sections/binding/ListItemNote";
 import { closeSubview, openSubview, useSubview } from "./subviewStore";
 import type { BreakpointId } from "@/shared/types/breakpoints";
 import type { PseudoStateId } from "@/shared/types";
@@ -214,6 +216,10 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
   return (
     <>
       {batch}
+      {tabId === "content" && !isMultiSelect ? <TemplatePageDoor composer={composer} elementId={selectedElement.id} /> : null}
+      {tabId === "content" && !isMultiSelect ? (
+        <ListItemNote composer={composer} elementId={selectedElement.id} hasLinkSection={visibleSectionIds("behaviour", [type], baseCtx).includes("link")} />
+      ) : null}
       {ids.map((id, i) => {
         const entry = SECTION_REGISTRY[id];
         const displayMode = modes[i];

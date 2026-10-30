@@ -66,6 +66,10 @@ export function ChooseSourcePicker({ state, open, onClose, trigger, onOpenCreate
     }
   }, [open]);
 
+  const openFields = (collection: CMSCollection) => {
+    setQuery("");
+    setStep({ kind: "fields", collection });
+  };
   const fits = (f: CMSField) => FIELD_TYPES_FOR[state.property].has(f.type);
   const pick = (collection: CMSCollection, field: CMSField) => {
     state.bind(collection.id, field.slug);
@@ -94,16 +98,32 @@ export function ChooseSourcePicker({ state, open, onClose, trigger, onOpenCreate
 
   let body: React.ReactNode;
   if (step.kind === "fields") {
-    const fields = step.collection.fields.filter(fits);
+    /* 2L9 B5-D03 (173:9389): every field of the collection, each saying why
+       it can or cannot supply this property — the incompatible ones stay in
+       the list, shut, with the reason (FIELD_TYPES_FOR is the contract). */
+    const fields = q ? step.collection.fields.filter((f) => `${f.name} ${f.slug}`.toLowerCase().includes(q)) : step.collection.fields;
+    const target = state.label.toLowerCase();
     body = (
       <>
-        <MenuItem className={ITEM} data-testid="choose-source-back" onClick={() => setStep({ kind: "sources" })}>
+        <MenuItem className={`${ITEM} tw:justify-center! tw:[&>span]:text-center! tw:text-[var(--bk-accent-text)]!`} data-testid="choose-source-back" onClick={() => setStep({ kind: "sources" })}>
           ‹ Sources
         </MenuItem>
-        <MenuGroup>
-          <MenuLabel>{step.collection.name} fields</MenuLabel>
-          {fields.length ? fields.map((f) => fieldItem(step.collection, f, false)) : <MenuItem disabled className={ITEM}>No fields fit here</MenuItem>}
-        </MenuGroup>
+        {fields.length ? (
+          fields.map((f) => {
+            const type = FIELD_TYPE_LABEL[f.type] ?? f.type;
+            return fits(f) ? (
+              <MenuItem key={`${step.collection.id}:${f.slug}`} className={ITEM} data-testid={`choose-source-field-${f.slug}`} onClick={() => pick(step.collection, f)}>
+                <Row label={f.name} hint={`${type} · ${f.slug}`} />
+              </MenuItem>
+            ) : (
+              <MenuItem key={`${step.collection.id}:${f.slug}`} disabled className={ITEM} data-testid={`choose-source-field-${f.slug}`}>
+                <Row label={f.name} hint={`${type} cannot supply ${target}`} />
+              </MenuItem>
+            );
+          })
+        ) : (
+          <MenuItem disabled className={ITEM}>No fields in {step.collection.name} yet</MenuItem>
+        )}
       </>
     );
   } else if (step.kind === "collections") {
@@ -115,7 +135,7 @@ export function ChooseSourcePicker({ state, open, onClose, trigger, onOpenCreate
         <MenuGroup>
           <MenuLabel>Specific record</MenuLabel>
           {state.collections.map((c) => (
-            <MenuItem key={c.id} className={ITEM} onClick={() => setStep({ kind: "fields", collection: c })}>
+            <MenuItem key={c.id} className={ITEM} onClick={() => openFields(c)}>
               <Row label={c.name} />
             </MenuItem>
           ))}
@@ -160,7 +180,7 @@ export function ChooseSourcePicker({ state, open, onClose, trigger, onOpenCreate
                   className={ITEM}
                   disabled={!s.collection}
                   data-testid={`choose-source-${s.key}`}
-                  onClick={() => s.collection && setStep({ kind: "fields", collection: s.collection })}
+                  onClick={() => s.collection && openFields(s.collection)}
                 >
                   <Row label={s.label} hint={s.hint} />
                 </MenuItem>
@@ -169,7 +189,7 @@ export function ChooseSourcePicker({ state, open, onClose, trigger, onOpenCreate
                 className={ITEM}
                 data-testid="choose-source-record"
                 onClick={() =>
-                  setStep(state.collections.length === 1 ? { kind: "fields", collection: state.collections[0] } : { kind: "collections" })
+                  state.collections.length === 1 ? openFields(state.collections[0]) : setStep({ kind: "collections" })
                 }
               >
                 <Row label="Specific record" hint="Pin one record to this property" />
@@ -203,12 +223,12 @@ export function ChooseSourcePicker({ state, open, onClose, trigger, onOpenCreate
     <Popover open={open} onClose={onClose} placement="bottom-end" label="Choose source" trigger={trigger} block={block} beside=".layout-shell__inspector" className="tw:w-[280px] tw:p-1">
       <div className="tw:flex tw:flex-col tw:gap-1" data-testid="choose-source">
         <div className="tw:flex tw:items-center tw:justify-between tw:px-2 tw:pt-1">
-          <span className="tw:text-[13px] tw:font-semibold tw:text-[var(--bk-ink)]">Choose source</span>
+          <span className="tw:text-[13px] tw:font-semibold tw:text-[var(--bk-ink)]">{step.kind === "fields" ? `${step.collection.name} fields` : "Choose source"}</span>
           <IconButton label="Close" size="sm" onClick={onClose} data-testid="choose-source-close" className="tw:size-6 tw:text-[var(--bk-ink-muted)]">
             <X size={14} aria-hidden="true" />
           </IconButton>
         </div>
-        {step.kind === "sources" ? (
+        {step.kind !== "collections" ? (
           <div className="tw:px-1">
             <TextInput
               sizing="sm"

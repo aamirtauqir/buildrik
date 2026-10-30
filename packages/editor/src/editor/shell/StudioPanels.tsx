@@ -189,11 +189,10 @@ interface CmsReturn {
  *  canvas" ends on that binding (Play F2.12 `302:16675`). */
 type CmsDoorRequest = CmsOpenRequest & { binding?: FocusSectionPayload };
 
-/* 2L9 S30 (258:36770): a 144 × 32 "Show Inspector", 13/500 gray-700; 20 in
-   from the canvas's top right (board 36's place — the 2L9 board keeps the
-   column reserved, REQUESTS B-25). */
+/* 2L9 S30 (258:36770): a 144 × 32 "Show Inspector", 13/500 gray-700, 48
+   down and 20 in from the reserved column's top right. */
 const SHOW_INSPECTOR =
-  "tw:absolute tw:top-5 tw:right-5 tw:z-[var(--bk-z-chrome)] tw:h-8 tw:w-[144px] tw:gap-1.5 tw:rounded-md " +
+  "tw:absolute tw:top-12 tw:right-5 tw:z-[var(--bk-z-chrome)] tw:h-8 tw:w-[144px] tw:gap-1.5 tw:rounded-md " +
   "tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:px-3 tw:py-1 tw:text-[13px] tw:leading-5 " +
   "tw:font-medium tw:text-[var(--bk-gray-700)] tw:focus:ring-0";
 
@@ -913,7 +912,8 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
         // Open whenever not fullpage — the no-selection state is a DRAWN
         // board (2 lines + ✦ Ask AI); gating on selectedElement collapsed the
         // column to 1px, so that state rendered off-viewport, unseeable.
-        inspectorOpen={inspectorOpen}
+        /* 2L9 S30: a hidden inspector keeps its column, empty, with the way back. */
+        inspectorOpen={inspectorOpen || showInspectorDoor}
         /* The tray's column is wider than the inspector's (board 499:2656).
            `order-2`: after the global banner slot (order 1), which sits under
            the topbar — see GlobalBannerSlot's SLOT_CLASS. */
@@ -974,22 +974,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
               onOverlayChange={handleOverlayChange}
               onDeviceChange={onDeviceChange}
             />
-            {/* Board 36: with the inspector hidden the canvas runs full width
-                and carries the way back at its top right. */}
-            {showInspectorDoor ? (
-              <Button
-                color="light"
-                size="xs"
-                className={SHOW_INSPECTOR}
-                aria-keyshortcuts={"Meta+\\"}
-                title={"Show Inspector (⌘\\)"}
-                data-testid="show-inspector"
-                onClick={() => setInspectorShown(true)}
-              >
-                {/* 2L9 S30 258:36770: "Show Inspector", 144 × 32; the shortcut is in the tooltip. */}
-                Show Inspector
-              </Button>
-            ) : null}
           </div>
           {/* FC-7 takeover shape 2 of 3 (see FullPageRouter.tsx's "THE THREE
               TAKEOVER SHAPES" contract): an in-place region over the canvas,
@@ -1023,7 +1007,23 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
             </LayoutShell.Inspector>
           ) : null
         ) : (
-        <LayoutShell.Inspector>
+        <LayoutShell.Inspector className={showInspectorDoor ? "tw:relative tw:bg-[var(--bk-bg-subtle)]!" : ""}>
+          {/* 2L9 S30 (258:36770): the hidden inspector's column stays reserved
+              and empty, "Show Inspector" at its top right. ProInspector stays
+              mounted under it (invisible), so tab and scroll survive. */}
+          {showInspectorDoor ? (
+            <Button
+              color="light"
+              size="xs"
+              className={SHOW_INSPECTOR}
+              aria-keyshortcuts={"Meta+\\"}
+              title={"Show Inspector (⌘\\)"}
+              data-testid="show-inspector"
+              onClick={() => setInspectorShown(true)}
+            >
+              Show Inspector
+            </Button>
+          ) : null}
           {trayShown ? (
             <PublishTray
               composer={composer}
@@ -1062,8 +1062,8 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
                 the scroll offset survives, and takes it out of the tab order
                 and the accessibility tree. */}
             <div
-              className={aiInInspector ? "tw:absolute tw:inset-0 tw:invisible tw:pointer-events-none" : "tw:contents"}
-              aria-hidden={aiInInspector || undefined}
+              className={aiInInspector || showInspectorDoor ? "tw:absolute tw:inset-0 tw:invisible tw:pointer-events-none" : "tw:contents"}
+              aria-hidden={aiInInspector || showInspectorDoor || undefined}
               data-testid="inspector-body-host"
             >
               <ProInspector

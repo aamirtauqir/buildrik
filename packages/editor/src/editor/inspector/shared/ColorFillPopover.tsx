@@ -19,8 +19,8 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { ChevronDown, ChevronRight, ExternalLink, Pencil, Search as SearchIcon } from "lucide-react";
-import { Button, IconButton, TextInput } from "@/editor/chrome-ui";
+import { ChevronDown, ChevronRight, ExternalLink, Search as SearchIcon } from "lucide-react";
+import { Button, TextInput } from "@/editor/chrome-ui";
 import { ColorPicker } from "@/editor/design-system/ui/colors/ColorPicker";
 import type { TokenEntry } from "./TokenPickerPopover";
 
@@ -76,7 +76,7 @@ export const ColorFillPopover: React.FC<ColorFillPopoverProps> = ({
     return (
       <div className="tw:-m-2 tw:w-70" data-testid="fill-edit-token">
         <div className="tw:flex tw:flex-col tw:gap-1 tw:px-3 tw:pt-3">
-          <Button type="button" variant="link" className={`${LINK} tw:self-start`} onClick={() => setEditing(null)} data-testid="fill-edit-back">
+          <Button type="button" variant="link" className={`${LINK} tw:self-center`} onClick={() => setEditing(null)} data-testid="fill-edit-back">
             ← Back to Brand colors
           </Button>
           <span className="tw:pt-1 tw:text-[length:var(--bk-text-13)] tw:font-semibold tw:leading-4 tw:text-[var(--bk-ink)]">{t.name}</span>
@@ -104,7 +104,7 @@ export const ColorFillPopover: React.FC<ColorFillPopoverProps> = ({
               <p className="tw:m-0 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
                 Local use applies in Light and Dark. Other uses of the token stay unchanged.
               </p>
-              <Button type="button" variant="link" className={`${LINK} tw:self-start tw:text-[var(--bk-ink)]`} onClick={() => setEditing(null)}>
+              <Button type="button" variant="link" className={`${LINK} tw:self-center tw:text-[13px] tw:text-[var(--bk-ink)]`} onClick={() => setEditing(null)}>
                 Cancel
               </Button>
             </div>
@@ -178,13 +178,15 @@ export const ColorFillPopover: React.FC<ColorFillPopoverProps> = ({
               >
                 Use
               </Button>
-              <IconButton
-                label={`Edit ${t.name}`}
+              <Button
+                type="button"
+                variant="ghost"
+                aria-label={`Edit ${t.name}`}
                 onClick={() => setEditing(t)}
-                className="tw:order-1 tw:size-6 tw:min-h-0 tw:min-w-0 tw:flex-none tw:text-[var(--bk-ink-muted)] tw:opacity-0 tw:group-hover:opacity-100 tw:focus-visible:opacity-100"
+                className="tw:order-1 tw:h-6 tw:flex-none tw:border-0 tw:bg-transparent tw:px-2 tw:text-[length:var(--bk-text-13)] tw:font-normal tw:text-[var(--bk-ink)] tw:focus:ring-0 tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]"
               >
-                <Pencil size={12} aria-hidden />
-              </IconButton>
+                Edit
+              </Button>
             </li>
           ))}
         </ul>
@@ -195,7 +197,7 @@ export const ColorFillPopover: React.FC<ColorFillPopoverProps> = ({
           type="button"
           variant="ghost"
           onClick={onOpenBrand}
-          className={`tw:h-6 tw:w-full tw:justify-between tw:rounded tw:border-0 tw:bg-transparent tw:px-2 tw:py-0 ${TEXT_12} tw:font-normal tw:text-[var(--bk-accent-text)] tw:hover:bg-[var(--bk-gray-50)] tw:focus:ring-0 tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]`}
+          className={`tw:h-6 tw:w-full tw:justify-center tw:gap-1 tw:rounded tw:border-0 tw:bg-transparent tw:px-2 tw:py-0 ${TEXT_12} tw:font-normal tw:text-[var(--bk-accent-text)] tw:hover:bg-[var(--bk-gray-50)] tw:focus:ring-0 tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]`}
         >
           Add colors in Brand
           <ExternalLink size={12} aria-hidden className="tw:flex-none" />
@@ -209,10 +211,10 @@ export const ColorFillPopover: React.FC<ColorFillPopoverProps> = ({
           aria-expanded={customOpen}
           aria-controls="fill-custom-colour"
           onClick={() => setCustomOpen((v) => !v)}
-          className={`tw:h-6 tw:w-full tw:justify-start tw:gap-1 tw:rounded tw:border-0 tw:bg-transparent tw:px-2 tw:py-0 ${TEXT_12} tw:font-medium tw:text-[var(--bk-ink-soft)] tw:hover:bg-[var(--bk-gray-50)] tw:focus:ring-0 tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]`}
+          className={`tw:h-8 tw:w-full tw:justify-center tw:gap-1 tw:rounded tw:border-0 tw:bg-transparent tw:px-2 tw:py-0 tw:text-[length:var(--bk-text-13)] tw:font-normal tw:text-[var(--bk-ink)] tw:hover:bg-[var(--bk-gray-50)] tw:focus:ring-0 tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]`}
         >
-          {customOpen ? <ChevronDown size={12} aria-hidden /> : <ChevronRight size={12} aria-hidden />}
           Custom color
+          {customOpen ? <ChevronDown size={12} aria-hidden /> : <ChevronRight size={12} aria-hidden />}
         </Button>
         {customOpen ? (
           <div id="fill-custom-colour" className="tw:-mx-3 tw:-mb-3" data-testid="fill-custom-picker">
@@ -221,6 +223,20 @@ export const ColorFillPopover: React.FC<ColorFillPopoverProps> = ({
               onChange={() => {}}
               onCancel={() => setCustomOpen(false)}
               onSave={(hex) => onCustomValue(hex.toUpperCase())}
+              actions={(hex, valid) => (
+                <div className="tw:flex tw:flex-col tw:gap-2">
+                  <span className={`${TEXT_12} tw:text-[var(--bk-ink-muted)]`}>Local color · selected element</span>
+                  <p className={`tw:m-0 ${TEXT_12} tw:text-[var(--bk-ink-muted)]`}>Applies a local value to the selected element. Brand colors remain unchanged.</p>
+                  <div className="tw:flex tw:gap-2">
+                    <Button type="button" variant="secondary" size="xs" className="tw:h-8 tw:flex-1" onClick={() => setCustomOpen(false)}>
+                      Cancel
+                    </Button>
+                    <Button type="button" size="xs" className="tw:h-8 tw:flex-1" disabled={!valid} onClick={() => onCustomValue(hex.toUpperCase())} data-testid="fill-custom-apply">
+                      Apply
+                    </Button>
+                  </div>
+                </div>
+              )}
             />
           </div>
         ) : null}

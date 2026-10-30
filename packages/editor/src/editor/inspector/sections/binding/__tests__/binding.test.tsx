@@ -14,6 +14,8 @@ import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, fireEvent, cleanup, waitFor, act } from "@testing-library/react";
 import { BindingPropertyRow } from "../BindingPropertyRow";
 import { BindingDetail } from "../BindingDetail";
+import { TemplatePageDoor } from "../TemplatePageDoor";
+import { ListItemNote } from "../ListItemNote";
 import { closeSubview, openSubview, useSubview } from "@/editor/inspector/tabs/subviewStore";
 import { CmsBindingSection } from "@/editor/inspector/sections/CmsBindingSection";
 import { ToastProvider } from "@/editor/chrome-ui";
@@ -119,13 +121,16 @@ describe("Choose source (Play F2.02)", () => {
     expect(screen.getAllByText("Planned")).toHaveLength(5);
   });
 
-  it("Specific record → a collection → its fitting fields; a field binds the newest published record in one step", async () => {
+  it("Specific record → a collection → every field, the unfit ones shut with why (B5-D03); a field binds the newest published record in one step", async () => {
     const composer = makeComposer();
     row(composer);
     fireEvent.click(screen.getByRole("button", { name: "Bind title text…" }));
     fireEvent.click(screen.getByTestId("choose-source-record"));
     fireEvent.click(screen.getByText("Menu"));
-    expect(screen.queryByTestId("choose-source-field-photo")).toBeNull();
+    expect(screen.getByText("Menu fields")).toBeInTheDocument();
+    expect(screen.getByTestId("choose-source-field-name")).toHaveTextContent("Text · name");
+    expect(screen.getByTestId("choose-source-field-photo")).toBeDisabled();
+    expect(screen.getByTestId("choose-source-field-photo")).toHaveTextContent("Image cannot supply title text");
     fireEvent.click(screen.getByTestId("choose-source-field-name"));
     await waitFor(() =>
       expect(composer.cms.bindings.bindToField).toHaveBeenCalledWith("e1", "col-1", "r1", "name", "content", undefined, "Bind Name"),
@@ -252,5 +257,54 @@ describe("Dynamic bindings summary (Play F2.16, B5-D04)", () => {
     expect(screen.getByTestId("cms-reconnect")).toBeInTheDocument();
     fireEvent.click(screen.getByTestId("cms-unbind"));
     expect(composer.cms.bindings.unbindAll).toHaveBeenCalled();
+  });
+});
+
+describe("TemplatePageDoor (B5-D04)", () => {
+  it("on a collection's template page: '‹ CMS · Dynamic pages' opens that collection's Dynamic pages", () => {
+    const composer = makeComposer({ template: true });
+    render(<TemplatePageDoor composer={composer as never} elementId="e1" />);
+    fireEvent.click(screen.getByTestId("inspector-template-door"));
+    expect(composer.emit).toHaveBeenCalledWith("ui:cms-open", { collectionId: "col-1", tab: "dynamic-pages" });
+  });
+
+  it("elsewhere, nothing", () => {
+    const { container } = render(<TemplatePageDoor composer={makeComposer() as never} elementId="e1" />);
+    expect(container.textContent).toBe("");
+  });
+});
+
+describe("ListItemNote (B5-D99 197:28410)", () => {
+  const inList = (href?: string) => {
+    const composer = makeComposer();
+    const card = {
+      getId: () => "e1",
+      getType: () => "container",
+      getCustomData: () => "Card",
+      getAttribute: (k: string) => (k === "href" ? href : undefined),
+      getParent: () => ({ getId: () => "list", getParent: () => null }),
+    };
+    (composer.elements as Record<string, unknown>).getElement = () => card;
+    (composer.cms.bindings as Record<string, unknown>).getCollectionBinding = (id: string) => (id === "list" ? { repeat: "children", collectionId: "col-2" } : null);
+    return composer;
+  };
+
+  it("inside a Team list: what an edit reaches, the card's link state, and the door to Behavior › Link", () => {
+    const composer = inList();
+    render(<ListItemNote composer={composer as never} elementId="e1" hasLinkSection />);
+    const note = screen.getByTestId("inspector-list-item-note");
+    expect(note).toHaveTextContent("Inside list of Team");
+    expect(note).toHaveTextContent("Edits to this Card apply to every Team record.");
+    expect(screen.getByTestId("inspector-list-item-link")).toHaveTextContent("This card has no link.");
+    fireEvent.click(screen.getByRole("button", { name: "Edit link in Behavior ›" }));
+    expect(composer.emit).toHaveBeenCalledWith("ui:inspector-focus-section", { section: "link" });
+  });
+
+  it("no link block where Behavior has no Link; nothing outside a list", () => {
+    render(<ListItemNote composer={inList("/team.html") as never} elementId="e1" hasLinkSection={false} />);
+    expect(screen.queryByTestId("inspector-list-item-link")).toBeNull();
+    cleanup();
+    const { container } = render(<ListItemNote composer={makeComposer() as never} elementId="e1" hasLinkSection />);
+    expect(container.textContent).toBe("");
   });
 });

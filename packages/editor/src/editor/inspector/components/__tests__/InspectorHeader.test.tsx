@@ -2,9 +2,10 @@
 /**
  * InspectorHeader — Shell/InspectorHeader (2L9 `497:339496`, plan Task 1.4):
  * Target row (icon + name, ⋯, ✕ hide (⌘\)) and the "Editing" row — a
- * read-only `${breakpoint} ·` prefix + the state Select. The element path is
- * a third row only on a collection's template page. The status marks are
- * their own row. Real Composer.
+ * read-only `${breakpoint} ·` prefix + the state Select, with the element
+ * path between them on every page (2L9 S31; owner rule 2026-10-26: the board
+ * wins over the template-page-only default). The status marks are their own
+ * row. Real Composer.
  *
  * @license BSD-3-Clause
  */
@@ -14,7 +15,6 @@ import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { Composer } from "@/engine/Composer";
 import type { Element } from "@/engine/elements/Element";
-import type { CMSCollection } from "@/shared/types/cms";
 import type { PseudoStateId } from "@/shared/types";
 import { EVENTS } from "@/shared/constants/events";
 import { ToastProvider } from "@/editor/chrome-ui";
@@ -58,12 +58,6 @@ const mount = (over: Partial<Props> = {}) =>
       <InspectorHeader {...baseProps(over)} />
     </ToastProvider>
   );
-
-/** The active page (Home → index.html) becomes a collection's template page. */
-const makeTemplatePage = () =>
-  vi
-    .spyOn(c.cms.collections, "getAllCollections")
-    .mockReturnValue([{ id: "col", name: "Blog", pageTemplatePath: "index.html" } as CMSCollection]);
 
 const rowOf = (testId: string) => screen.getByTestId(testId);
 
@@ -112,8 +106,8 @@ describe("InspectorHeader", () => {
     const user = userEvent.setup();
     mount();
     const select = screen.getByRole("combobox", { name: "Editing" });
-    const hide = screen.getByRole("button", { name: "Hide inspector (⌘\\)" });
-    hide.focus();
+    /* The last focusable before it is the path's last link crumb. */
+    screen.getByRole("button", { name: "Section" }).focus();
     await user.tab();
     expect(document.activeElement).toBe(select);
   });
@@ -165,20 +159,16 @@ describe("InspectorHeader", () => {
     expect(screen.queryByRole("button", { name: /AI/ })).toBeNull();
   });
 
-  it("84 tall like the board: 12 padding, a 24 target row and a 32 Editing row, 4 apart; no status marks inside", () => {
+  it("104 tall like the boards: target row, path row, a 32 Editing row; no status marks inside", () => {
     mount();
     const header = screen.getByTestId("inspector-header");
     expect(header.className).toContain("tw:p-3");
     expect(header.className).toContain("tw:gap-1");
     expect(rowOf("inspector-target-row").className).toContain("tw:h-6");
+    expect(rowOf("inspector-path-row").className).toContain("tw:h-4");
     expect(rowOf("inspector-editing-row").className).toContain("tw:h-8");
-    expect(header.children).toHaveLength(2);
+    expect([...header.children].map((r) => r.getAttribute("data-testid"))).toEqual(["inspector-target-row", "inspector-path-row", "inspector-editing-row"]);
     expect(header.querySelector('[data-testid="inspector-status-marks"]')).toBeNull();
-  });
-
-  it("off a template page there is no element path", () => {
-    mount();
-    expect(screen.queryByRole("navigation", { name: "Element path" })).toBeNull();
   });
 
   it("header height is equal for a depth-1 and a depth-4 selection on the same page", () => {
@@ -192,24 +182,16 @@ describe("InspectorHeader", () => {
     const deep = c.elements.createElement("text", { content: "deep" });
     c.elements.addElement(deep, d.getId());
     const shape = () => [...screen.getByTestId("inspector-header").children].map((r) => r.className);
-
-    for (const template of [false, true]) {
-      cleanup();
-      if (template) makeTemplatePage();
-      mount({ element: { id: section.getId(), type: "section" }, selectedIds: [section.getId()] });
-      const shallow = shape();
-      cleanup();
-      mount({ element: { id: deep.getId(), type: "text" }, selectedIds: [deep.getId()] });
-      /* Same rows, same row classes → same height (84, or 104 on a template). */
-      expect(shape()).toEqual(shallow);
-      expect(shallow).toHaveLength(template ? 3 : 2);
-    }
+    mount({ element: { id: section.getId(), type: "section" }, selectedIds: [section.getId()] });
+    const shallow = shape();
+    cleanup();
+    mount({ element: { id: deep.getId(), type: "text" }, selectedIds: [deep.getId()] });
+    expect(shape()).toEqual(shallow);
+    expect(shallow).toHaveLength(3);
   });
 
-  describe("on a collection template page (the 104 variant)", () => {
-    beforeEach(makeTemplatePage);
-
-    it("draws the path page › ancestors › element, as a named landmark", () => {
+  describe("the element path (S31 258:37248)", () => {
+    it("draws page › ancestors › element on any page, as a named landmark", () => {
       mount();
       const nav = screen.getByRole("navigation", { name: "Element path" });
       expect(nav.textContent).toBe("Home›Section›Heading");
@@ -224,6 +206,21 @@ describe("InspectorHeader", () => {
       expect(c.selection.getSelected()).toBeFalsy();
     });
 
+    it("a longer path reads '… › parent › element'; … opens Selection path, each crumb selectable", () => {
+      const box = c.elements.createElement("container");
+      c.elements.addElement(box, section.getId());
+      const h = c.elements.createElement("heading", { content: "Deep" });
+      c.elements.addElement(h, box.getId());
+      mount({ element: { id: h.getId(), type: "heading" }, selectedIds: [h.getId()] });
+      expect(screen.getByRole("navigation", { name: "Element path" }).textContent).toBe("Container›Heading");
+      expect(screen.getByTestId("inspector-path-row").textContent).toBe("…›Container›Heading");
+      fireEvent.click(screen.getByTestId("inspector-path-more"));
+      const menu = screen.getByRole("menu", { name: "Selection path" });
+      expect([...menu.querySelectorAll('[role="menuitem"]')].map((m) => m.textContent)).toEqual(["Home", "Section", "Container", "Heading"]);
+      fireEvent.click(screen.getByRole("menuitem", { name: "Section" }));
+      expect(c.selection.getSelected()?.getId()).toBe(section.getId());
+    });
+
     it("multi: '3 selected · Headings', path to the common parent", () => {
       const more = [1, 2].map(() => {
         const h = c.elements.createElement("heading");
@@ -232,13 +229,27 @@ describe("InspectorHeader", () => {
       });
       mount({ selectedIds: [heading.getId(), ...more] });
       expect(screen.getByTestId("inspector-element-name")).toHaveTextContent("3 selected · Headings");
-      // Board 22: the path is the shared parent's ("Home › Hero"), not repeated
-      // as a last crumb, and the name row draws no type icon.
       const nav = screen.getByRole("navigation", { name: "Element path" });
       expect(nav.textContent).toBe("Home›Section");
       expect(nav.querySelector('[aria-current="page"]')?.textContent).toBe("Section");
       expect(screen.queryByTestId("inspector-type-icon")).toBeNull();
     });
+  });
+
+  it("B5-D04: a bound element names its source in the name row; it opens Dynamic bindings", () => {
+    const emit = vi.spyOn(c, "emit");
+    mount({ boundTo: "Blog.title" });
+    const chip = screen.getByTestId("inspector-bound-chip");
+    expect(rowOf("inspector-target-row").contains(chip)).toBe(true);
+    expect(chip).toHaveTextContent("Blog.title");
+    fireEvent.click(chip);
+    expect(emit).toHaveBeenCalledWith(EVENTS.UI_INSPECTOR_FOCUS_SECTION, { section: "cms-binding" });
+  });
+
+  it("S02: a load failure replaces the context line", () => {
+    mount({ loadFailedLine: "Could not load Fieldwork Studio" });
+    expect(screen.getByTestId("inspector-load-failed-line")).toHaveTextContent("Could not load Fieldwork Studio");
+    expect(screen.queryByRole("combobox", { name: "Editing" })).toBeNull();
   });
 
   it("single: the name row draws the type icon", () => {

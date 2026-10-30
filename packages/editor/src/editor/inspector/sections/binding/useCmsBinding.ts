@@ -119,9 +119,12 @@ export function useCmsBinding(composer: Composer | null | undefined, elementId: 
     const bump = () => setTick((t) => t + 1);
     const evs = [EVENTS.BINDING_CREATED, EVENTS.BINDING_REMOVED, EVENTS.CMS_CONTENT_UPDATED, EVENTS.CMS_COLLECTION_UPDATED, EVENTS.PROJECT_LOADED];
     evs.forEach((e) => composer.on(e, bump));
-    /* Collections are created / deleted on the CMS store's own emitter. */
+    /* Collections are created / updated / deleted on the CMS store's own
+       emitter — an update is how a page becomes a template page
+       (pageTemplatePath), which the Content tab's door and "This page's
+       record" read. */
     const store = composer.cms?.collections;
-    const storeEvs = [EVENTS.CMS_COLLECTION_CREATED, EVENTS.CMS_COLLECTION_DELETED, EVENTS.CMS_STORE_REFRESHED];
+    const storeEvs = [EVENTS.CMS_COLLECTION_CREATED, EVENTS.CMS_COLLECTION_UPDATED, EVENTS.CMS_COLLECTION_DELETED, EVENTS.CMS_STORE_REFRESHED];
     storeEvs.forEach((e) => store?.on?.(e, bump));
     return () => {
       evs.forEach((e) => composer.off(e, bump));
