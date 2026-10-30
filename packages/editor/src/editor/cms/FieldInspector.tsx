@@ -234,8 +234,8 @@ export function FieldInspector({ composer, collection, collections, field, recor
         ) : null}
         {field.type === "multiselect" || field.type === "select" ? (
           <div className={STACK}>
-            <label className={LABEL} htmlFor="cms-fi-options">Options</label>
-            <OptionsEditor id="cms-fi-options" options={field.options ?? []} onChange={(next) => update({ options: next })} />
+            <span className={LABEL}>Options</span>
+            <OptionsEditor id="cms-fi-options" options={field.options ?? []} onChange={(next) => update({ options: next })} multiple={field.type === "multiselect"} />
           </div>
         ) : null}
         {bound ? (

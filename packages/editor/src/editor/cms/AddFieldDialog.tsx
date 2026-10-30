@@ -265,8 +265,8 @@ export function AddFieldDialog({
         ) : null}
         {OPTION_TYPES.has(type) ? (
           <div className={ROW}>
-            <label className={ROW_LABEL} htmlFor="cms-add-field-options">Options</label>
-            <OptionsEditor id="cms-add-field-options" options={options} onChange={setOptions} live />
+            <span className={ROW_LABEL}>Options</span>
+            <OptionsEditor id="cms-add-field-options" options={options} onChange={setOptions} live multiple={type === "multiselect"} />
           </div>
         ) : null}
         {TYPED_VALUE_TYPES.has(type) ? (

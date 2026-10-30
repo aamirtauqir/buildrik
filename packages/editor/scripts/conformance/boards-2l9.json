@@ -8201,8 +8201,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Round 25: layout rebuilt with T02; the options list is OptionsEditor ('Label and saved value' rows on the board) — not compared. Board shots/167-6844.png.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 25, probe-compared: shots/167-6844.png vs probe cms-add-field (Option, Topic: Design / Research / Studio): the T02 layout plus Options as one 'Label and saved value' field per option, an outlined '+ Add option', 'Records choose one option.' (multi-option fields: '…any number of options.'). Was a one-option-per-line textarea; the field inspector uses the same editor. Residuals: field pitch ~3px taller; the dialog sits lower (shared chrome-ui placement).",
    "tier": "P2"
   },
   {
