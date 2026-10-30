@@ -41,7 +41,6 @@ import { calcContrastRatio } from "@/engine/designSystem/colorMath";
 import { findSurfaceToken, resolveSurface, shownValue } from "@/editor/design-system/utils/contrastLint";
 import { ColorPicker } from "../colors/ColorPicker";
 import { displayValue } from "../colors/ColorTokenList";
-import { FontFamilyPicker } from "./FontFamilyPicker";
 import { BrandFontPopover } from "./BrandFontPopover";
 import { TokenDeleteDialog } from "./TokenDeleteDialog";
 import { TokenRenameDialog } from "./TokenRenameDialog";
@@ -439,12 +438,13 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
               </Button>
             }
             roleName={token.name}
+            tokenId={token.id}
             value={value}
             onPick={(family) => {
               onValueChange?.(token.id, family);
               setFontPopoverOpen(false);
             }}
-            onAllFonts={() => {
+            onTypeStack={() => {
               setFontPopoverOpen(false);
               setEditingLight(true);
             }}
@@ -508,18 +508,6 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
         <div className="tw:mb-2" data-testid="brand-token-light-editor">
           {(
             <>
-              {/* Clone 3721:44821 — a font-family token is picked, not only
-                  typed: presets, the ADDED site fonts, `Manage site fonts`.
-                  The field below stays for a hand-typed stack. */}
-              {token.type === "font-family" && (
-                <div className="tw:mb-1.5">
-                  <FontFamilyPicker
-                    value={value}
-                    onChange={(family) => onValueChange?.(token.id, family)}
-                    composer={composer}
-                  />
-                </div>
-              )}
               <TextInput
                 type="text"
                 value={draft}

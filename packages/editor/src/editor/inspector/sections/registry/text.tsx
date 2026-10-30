@@ -9,7 +9,7 @@
 
 import { adaptBaseStyleProps, defineSection, shownOnInstanceRoot, type AnySectionEntry, type SectionContext } from "./_shared";
 import { TypographySection } from "../typography";
-import { primaryFamily } from "../typography/FontPickerDropdown";
+import { primaryFamily } from "../typography/FontPicker";
 import { cssVarToTokenId, extractVarName, resolveTokenVar } from "@/editor/inspector/shared/tokenBindingDetection";
 import { getDOMElement } from "@/engine/canvas/resize/utils";
 import { parseColor } from "@/shared/utils/parsers/colorParser";

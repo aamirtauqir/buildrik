@@ -94,6 +94,8 @@ import type { ComparePage } from "@/shared/utils/html";
 import { ComponentsTab } from "@/editor/sidebar/tabs/ComponentsTab";
 import { ComponentDetailScreen } from "@/editor/sidebar/tabs/component-library/ComponentDetailScreen";
 import { DSModeProvider } from "@/editor/design-system/state/DSModeContext";
+import { TokenDetailView } from "@/editor/design-system/ui/sections/TokenDetailView";
+import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
 import { LayerTreeItem } from "@/editor/panels/layers/LayerTreeItem";
 import { renameElement } from "@/editor/panels/layers/hooks/layersPersistence";
 import { PagesTab } from "@/editor/sidebar/tabs/pages/PagesTab";
@@ -2632,6 +2634,29 @@ const CASES: Record<string, () => React.ReactElement> = {
       <ToastProvider>
         <div data-probe="create-component">
           <CreateComponentModal isOpen onClose={() => {}} composer={c} elementId={el.getId()} />
+        </div>
+      </ToastProvider>
+    );
+  },
+  /* A Brand font role's card (TokenDetailView) — Change opens Choose font in
+     the token's form (R02, B-19). `?value=Inter`. */
+  "brand-font-token": () => {
+    const q = new URLSearchParams(location.search);
+    const c = new Composer({} as never);
+    const spec = { id: "font-heading", name: "Heading Font", category: "typography", cssVar: "--buildrick-design-font-heading", type: "font-family" } as const;
+    function Host() {
+      const [value, setValue] = React.useState(q.get("value") ?? "Inter");
+      const token = React.useMemo(() => v6Token({ ...spec, value }), [value]);
+      return (
+        <DSModeProvider initialMode="pro">
+          <TokenDetailView token={token} composer={c} onValueChange={(_id, v) => setValue(v)} />
+        </DSModeProvider>
+      );
+    }
+    return (
+      <ToastProvider>
+        <div data-probe="brand-font-token" className="tw:w-[300px] tw:bg-white">
+          <Host />
         </div>
       </ToastProvider>
     );

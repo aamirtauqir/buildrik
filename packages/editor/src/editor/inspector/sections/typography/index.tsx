@@ -116,15 +116,4 @@ export const TypographySection: React.FC<TypographySectionProps> = ({
 export { FontPicker, SYSTEM_FONTS, useUploadedFonts, openSiteFonts, type SystemFont } from "./FontPicker";
 export { FontControls, FONT_WEIGHTS } from "./FontControls";
 export { TypographyControls, ADVANCED_TYPOGRAPHY_COUNT } from "./TypographyControls";
-export {
-  FontSearchInput,
-  CategoryTabs,
-  FontList,
-  FontPickerPanel,
-  primaryFamily,
-  namesFont,
-  CATEGORY_LABELS,
-  type FontPickerPanelProps,
-} from "./FontPickerDropdown";
-
 export default TypographySection;
