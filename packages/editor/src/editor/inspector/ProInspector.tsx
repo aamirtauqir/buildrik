@@ -293,12 +293,21 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
       resetOverride: (property, kind) => runDiscrete(() => fieldOverrides.resetOverride(property, kind)),
       breakpointEntries: fieldOverrides.counts.breakpoint ? fieldOverrides.entries("breakpoint") : undefined,
       runDiscrete,
+      sourcesOf: (property) => {
+        if (selectedElements.length < 2) return [];
+        const read = shownStylesAt(composer, currentBreakpoint, currentPseudoState);
+        return selectedElements.map((el) => ({
+          id: el.getId(),
+          name: getLayerName(el) ?? elementTypeLabel(el.getType()),
+          value: read(el)[property] ?? "",
+        }));
+      },
       announce: (message) => {
         const undo = composer?.history?.captureUndo?.();
         addToast({ description: message, action: undo ? { label: "Undo", onClick: undo } : undefined });
       },
     }),
-    [readOnly, conflict.pending, locked, notLoaded, editLocks, mixedKeys, fieldOverrides, runDiscrete, composer, addToast, selectedElement, currentBreakpoint, currentPseudoState]
+    [readOnly, conflict.pending, locked, notLoaded, editLocks, mixedKeys, fieldOverrides, runDiscrete, composer, addToast, selectedElement, selectedElements, currentBreakpoint, currentPseudoState]
   );
 
   /* Scroll persistence per element AND tab (P-7b; 2L9 S32 258:37744:

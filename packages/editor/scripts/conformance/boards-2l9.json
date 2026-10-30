@@ -5515,7 +5515,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-B round 26, built: the element's CSS animation edit screen says 'Plays when rendered. This saved {Hover} trigger is not applied by current CSS output.' when its trigger is not page load (true of the export: the animation is an inline style), and a 'Property conflict' block when an enabled interaction animates the same property — '{preset} and {interaction} both animate {opacity}. Neither is removed automatically.', 'Inspect {interaction}', 'Disable CSS animation' (test ElementAnimationConflict). Open: the board's screen layout (header 'CSS animation · Legacy trigger', Preset select, Trigger row, 'Playback options' rows, 'Preview applied configuration') — today the shared AnimationEditor (editor/animation, preset grid) draws that part.",
+   "verifiedNote": "L-B round 4: the screen layout built (src/editor/animation, AnimationEditor.test): 'CSS animation · Legacy trigger', Preset select (all 25 presets grouped), Trigger read-only '{Hover} · saved legacy' with the not-applied note under it, 'Playback options' Duration / Delay in seconds, Direction, Fill, Repeat (Infinite), plus Easing (the CSS writes it; the board omits it), then Property conflict and 'Preview applied configuration'. The preset grid, sliders and generated-CSS readout are gone. Built, not compared (no probe case reaches the edit screen). | L-B round 26, built: the element's CSS animation edit screen says 'Plays when rendered. This saved {Hover} trigger is not applied by current CSS output.' when its trigger is not page load (true of the export: the animation is an inline style), and a 'Property conflict' block when an enabled interaction animates the same property — '{preset} and {interaction} both animate {opacity}. Neither is removed automatically.', 'Inspect {interaction}', 'Disable CSS animation' (test ElementAnimationConflict). Open: the board's screen layout (header 'CSS animation · Legacy trigger', Preset select, Trigger row, 'Playback options' rows, 'Preview applied configuration') — today the shared AnimationEditor (editor/animation, preset grid) draws that part.",
    "tier": "P1"
   },
   {
@@ -5602,8 +5602,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No multi-source token disclosure for mixed selection",
+   "verified": "drift-open",
+   "verifiedNote": "L-B round 4: built, not compared (the probe cannot make a multi-selection with two token-bound colours) — when a multi-selection's colour is Mixed only because the targets name one resolved colour through different sources, Text color lists them ('Same value · multiple sources', '{layer}  Brand / primary', 'Local #1946E5') and 'Make local color change' writes that colour to all, one Undo (ColorSources.test). Not built: the Value row still reads Mixed (board prints the hex), 'Remove {breakpoint} {state} overrides' and 'Inspect sources'. | No multi-source token disclosure for mixed selection",
    "tier": "P1"
   },
   {

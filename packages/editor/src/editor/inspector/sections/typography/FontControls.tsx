@@ -18,6 +18,7 @@
 import * as React from "react";
 import type { Composer } from "@/engine";
 import { SelectRow, ColorInput, InputWithUnit } from "@/editor/inspector/shared/controls";
+import { ColorSources } from "@/editor/inspector/shared/controls/ColorSources";
 
 /** 2L9 161:8940 reads the weight by name ("Regular"). */
 export const FONT_WEIGHTS = [
@@ -73,6 +74,7 @@ export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, co
         property="color"
         inheritedValue={inherited?.color}
       />
+      <ColorSources property="color" onChange={onChange} />
     </div>
   );
   if (variant === "page") return colour;

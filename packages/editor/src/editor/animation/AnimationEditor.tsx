@@ -1,21 +1,24 @@
 /**
- * Aquibra Animation Editor
- * Visual animation configuration
+ * Aquibra Animation Editor — the element's CSS animation (2L9 A10 247:26063)
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { SelectField, NumberField, SliderField } from "@/shared/forms";
-import type { AnimationConfig } from "@/shared/types/animations";
+import type { AnimationConfig, AnimationDirection, AnimationFillMode } from "@/shared/types/animations";
 import { DEFAULT_ANIMATION } from "@/shared/types/animations";
-import { Tabs, Button } from "@/editor/chrome-ui";
+import { Select } from "@/editor/chrome-ui";
+import { SelectRow } from "@/editor/inspector/shared/controls";
+import { CommitRow } from "@/editor/inspector/sections/behaviourRows";
 // Re-export for backwards compatibility
 export type { AnimationConfig } from "@/shared/types/animations";
 
 export interface AnimationEditorProps {
   animation?: AnimationConfig;
   onChange: (animation: AnimationConfig) => void;
-  onPreview?: () => void;
+  /** The saved trigger, read-only ("Hover · saved legacy"); absent: no row. */
+  trigger?: string;
+  /** What that trigger means for the CSS output, under its row. */
+  triggerNote?: React.ReactNode;
 }
 
 const animations = {
@@ -64,162 +67,124 @@ const easings = [
 
 const defaultAnimation: AnimationConfig = DEFAULT_ANIMATION;
 
+const GROUPS = [
+  ["Entrance", animations.entrance],
+  ["Attention", animations.attention],
+  ["Exit", animations.exit],
+] as const;
+
+const DIRECTIONS = [
+  { value: "normal", label: "Normal" },
+  { value: "reverse", label: "Reverse" },
+  { value: "alternate", label: "Alternate" },
+  { value: "alternate-reverse", label: "Alternate reverse" },
+];
+
+const FILLS = [
+  { value: "none", label: "None" },
+  { value: "forwards", label: "Forwards" },
+  { value: "backwards", label: "Backwards" },
+  { value: "both", label: "Both" },
+];
+
+const REPEATS = [
+  ...[1, 2, 3, 4, 5, 10].map((n) => ({ value: String(n), label: n === 1 ? "Once" : `${n} times` })),
+  { value: "-1", label: "Infinite" },
+];
+
+/** "1.2 s" from 1200 ms; a typed "1.2", "1.2s" or "1200ms" back to ms. */
+const seconds = (ms: number) => `${Math.round(ms) / 1000} s`;
+const toMs = (text: string): number | null => {
+  const t = text.trim().toLowerCase();
+  const n = parseFloat(t);
+  if (!Number.isFinite(n) || n < 0) return null;
+  return t.endsWith("ms") ? Math.round(n) : Math.round(n * 1000);
+};
+
+/**
+ * 2L9 A10 (247:26063): the CSS animation edit screen — Preset and Trigger
+ * under "CSS animation", then "Playback options": Duration, Delay,
+ * Direction, Fill, Repeat (and Easing, which the CSS writes too).
+ * `trigger` is the saved trigger's read-only line and `triggerNote` what it
+ * means for the CSS output (the caller knows how to name it).
+ */
 export const AnimationEditor: React.FC<AnimationEditorProps> = ({
   animation = defaultAnimation,
   onChange,
-  onPreview,
+  trigger,
+  triggerNote,
 }) => {
-  const [activeTab, setActiveTab] = React.useState("entrance");
-
   const updateAnimation = (updates: Partial<AnimationConfig>) => {
     onChange({ ...animation, ...updates });
   };
-
-  // Animation groups available for future advanced UI
-  // const allAnimations = [
-  //   ...animations.entrance.map((a) => ({ ...a, group: "Entrance" })),
-  //   ...animations.attention.map((a) => ({ ...a, group: "Attention" })),
-  //   ...animations.exit.map((a) => ({ ...a, group: "Exit" })),
-  // ];
+  const legacy = animation.trigger !== "load";
 
   return (
-    <div className="tw:p-3">
-      {/* Animation Type */}
-      <Tabs
-        tabs={[
-          { id: "entrance", label: "Entrance" },
-          { id: "attention", label: "Attention" },
-          { id: "exit", label: "Exit" },
-        ]}
-        value={activeTab}
-        onChange={setActiveTab}
-        label="Animation type"
+    <div className="tw:flex tw:flex-col" data-testid="animation-editor">
+      <div className="tw:flex tw:h-8 tw:items-center tw:justify-between">
+        <span className="tw:text-[13px] tw:font-semibold tw:leading-4 tw:text-[var(--bk-ink)]">CSS animation</span>
+        {legacy ? <span className="tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">Legacy trigger</span> : null}
+      </div>
+      <div className="bdi-row-ctrl" data-testid="anim-preset">
+        <label className="bdi-lb" htmlFor="anim-preset-select">
+          Preset
+        </label>
+        <div className="bdi-row-content">
+          <Select id="anim-preset-select" sizing="sm" className="tw:w-full" value={animation.type} onChange={(e) => updateAnimation({ type: e.target.value })}>
+            {GROUPS.map(([group, list]) => (
+              <optgroup key={group} label={group}>
+                {list.map((a) => (
+                  <option key={a.value} value={a.value}>
+                    {a.label}
+                  </option>
+                ))}
+              </optgroup>
+            ))}
+          </Select>
+        </div>
+      </div>
+      {trigger ? (
+        <div className="bdi-row-ctrl" data-testid="anim-trigger">
+          <span className="bdi-lb">Trigger</span>
+          <div className="bdi-row-content">
+            <span className="tw:flex tw:h-6 tw:w-full tw:items-center tw:truncate tw:rounded-[4px] tw:bg-[var(--bk-bg-subtle)] tw:px-2 tw:text-[12px] tw:text-[var(--bk-ink)]">
+              {trigger}
+            </span>
+          </div>
+        </div>
+      ) : null}
+      {triggerNote}
+      <div className="tw:mt-4 tw:flex tw:h-8 tw:items-center tw:text-[13px] tw:font-semibold tw:leading-4 tw:text-[var(--bk-ink)]" data-testid="anim-timing-label">
+        Playback options
+      </div>
+      <CommitRow
+        label="Duration"
+        value={seconds(animation.duration)}
+        onCommit={(v) => {
+          const ms = toMs(v);
+          if (ms !== null && ms > 0) updateAnimation({ duration: ms });
+        }}
+        testId="anim-duration"
       />
-      <div className="tw:mt-4">
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap: 8,
-          }}
-        >
-          {animations[activeTab as keyof typeof animations]?.map((anim) => (
-            <Button
-              key={anim.value}
-              data-testid={`anim-chip-${anim.value}`}
-              onClick={() => updateAnimation({ type: anim.value })}
-              style={{
-                // 11px label + 6px side padding: at 12px the longest presets
-                // ("Fade In Down", "Slide In Down", "Fade Out Down") wrapped to
-                // two lines inside a 1fr column (Figma board B9.1).
-                // Board 429:2362 fixes the chip at 40 tall; 12/6 on an 11px
-                // line box measured 37, so any chip whose label wrapped grew
-                // taller than the rest of its row.
-                height: "var(--bk-space-40)",
-                padding: "12px 6px",
-                background:
-                  animation.type === anim.value
-                    ? "var(--bk-accent)"
-                    : "var(--bk-bg-app)",
-                border:
-                  animation.type === anim.value
-                    ? "none"
-                    : "1px solid var(--bk-border)",
-                borderRadius: "var(--bk-radius-sm)",
-                color: animation.type === anim.value ? "var(--bk-bg-card)" : "var(--bk-ink-soft)",
-                fontSize: 11,
-                cursor: "pointer",
-                transition: "all 0.15s ease",
-              }}
-            >
-              {anim.label}
-            </Button>
-          ))}
-        </div>
-      </div>
-      {/* Timing */}
-      <div className="tw:mt-6">
-        {/* Board 429:2390 — 11 Semi Bold in ink-muted at 0.66 tracking. It
-            shipped 12px with no tracking at all. */}
-        <div
-          data-testid="anim-timing-label"
-          style={{
-            fontSize: 11,
-            fontWeight: 600,
-            letterSpacing: "0.66px",
-            textTransform: "uppercase",
-            color: "var(--bk-ink-muted)",
-            marginBottom: 12,
-          }}
-        >
-          Timing
-        </div>
-
-        <div className="tw:flex tw:flex-col tw:gap-4">
-          <SliderField
-            label="Duration"
-            value={animation.duration}
-            onChange={(v) => updateAnimation({ duration: v })}
-            min={100}
-            max={3000}
-            step={100}
-          />
-
-          <SliderField
-            label="Delay"
-            value={animation.delay}
-            onChange={(v) => updateAnimation({ delay: v })}
-            min={0}
-            max={2000}
-            step={100}
-          />
-
-          <SelectField
-            label="Easing"
-            value={animation.easing}
-            onChange={(v) => updateAnimation({ easing: v })}
-            options={easings}
-          />
-
-          <NumberField
-            label="Iterations"
-            value={animation.iterations}
-            onChange={(v) => updateAnimation({ iterations: v })}
-            min={1}
-            max={10}
-          />
-        </div>
-      </div>
-      {/* Trigger row removed 2026-05-18 — UI promised load/scroll/hover/click
-       * options but engine never honored them (generateAnimationCSS only reads
-       * type/duration/easing/delay/iterations). For triggered animations use
-       * the Interactions section, which is GSAP-wired via InteractionRuntime.
-       * See memory project_animation_audit_20260518.md. */}
-      {/* Preview */}
-      <div className="tw:mt-6">
-        <Button onClick={onPreview} style={{
-          width: "100%"
-        }} color="light">
-          ▶️ Preview Animation
-        </Button>
-      </div>
-      {/* Generated CSS */}
-      <div className="tw:mt-4">
-        <div
-          style={{
-            padding: 12,
-            background: "var(--bk-bg-app)",
-            border: "1px solid var(--bk-border)",
-            borderRadius: "var(--bk-radius-sm)",
-            fontFamily: "var(--bk-font-mono)",
-            fontSize: 11,
-            color: "var(--bk-ink-soft)",
-          }}
-        >
-          animation: {animation.type} {animation.duration}ms {animation.easing} {animation.delay}ms{" "}
-          {animation.iterations === -1 ? "infinite" : animation.iterations};
-        </div>
-      </div>
+      <CommitRow
+        label="Delay"
+        value={seconds(animation.delay)}
+        onCommit={(v) => {
+          const ms = toMs(v);
+          if (ms !== null) updateAnimation({ delay: ms });
+        }}
+        testId="anim-delay"
+      />
+      <SelectRow label="Direction" value={animation.direction} placeholder={null} options={DIRECTIONS} onChange={(v) => updateAnimation({ direction: v as AnimationDirection })} />
+      <SelectRow label="Fill" value={animation.fillMode ?? "forwards"} placeholder={null} options={FILLS} onChange={(v) => updateAnimation({ fillMode: v as AnimationFillMode })} />
+      <SelectRow
+        label="Repeat"
+        value={String(animation.iterations)}
+        placeholder={null}
+        options={REPEATS.some((r) => r.value === String(animation.iterations)) ? REPEATS : [...REPEATS, { value: String(animation.iterations), label: `${animation.iterations} times` }]}
+        onChange={(v) => updateAnimation({ iterations: Number(v) })}
+      />
+      <SelectRow label="Easing" value={animation.easing} placeholder={null} options={easings} onChange={(v) => updateAnimation({ easing: v })} />
     </div>
   );
 };
