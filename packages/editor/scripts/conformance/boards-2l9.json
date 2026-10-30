@@ -9650,9 +9650,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Generated page with \"‹ Home · Team card\" return; not in code",
+   "authority": "code:no-selection-inspector-is-the-page-panel",
+   "verified": "drift-fixed",
+   "verifiedNote": "Probe-compared 2026-10-31 (case link-row-record: This record's page → Create page → toast Open page; board shots/195-29753.png). Built: the made page's Inspector offers '‹ Home · Team card' (centred accent link under the header, recordPageReturn + RecordPageReturnRow); it returns to Home with the Card selected and is spent. Code: with nothing selected the Inspector is the page panel (board 21, DD-13 — page appearance kept), not the board's 'Select an element to edit it.' stub. Test useLinkRowCollectionPage (D98).",
    "tier": "P1"
   },
   {
@@ -22798,8 +22798,8 @@
    "family": "play",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Lane L-B P1 round 3, board PNG compared: the Inspector half (Content › 'Text content' textarea with B I U link, 'Changes save automatically.', open Semantics with Tag / ID / 'Use a descriptive ID…') is the Play prototype's older Content layout — superseded for the Inspector by page 04's text board 161:8480 (Text row + bind icon, 'Edit text on canvas', Semantics; drift-fixed). Still open and not L-B's: the Add panel's insert receipt 'Text added to Hero · Selected on canvas · Focus stays here' (L-A).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared 2026-10-31: the Add half is the insert receipt 'Text added to Hero / Selected on canvas · Focus stays here' — the same receipt probe-compared on 7:19448 (add-panel-receipt). The Inspector half is the prototype's older Content layout, superseded by page 04's text board 161:8480 (L-B, drift-fixed).",
    "tier": "P1"
   },
   {
@@ -23162,7 +23162,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Round 24: depends on F4.01's issue (REQUESTS A-35); Fix › already selects the element. '‹ Back to Issues' in the inspector is still missing.",
+   "verifiedNote": "2026-10-31 L-A: Fix › on 'Collection list has no source' selects the list (A-35); the Inspector's list block ('Choose collection…', 'No source selected. This list cannot publish yet.') is L-B's. Still open: '‹ Back to Issues' at the Inspector's head after Fix › / Open image › — the Issues ⇄ Inspector swap lives in StudioPanels/AquibraStudio (REQUESTS A-39). The board's canvas is the prototype's abstract placeholder.",
    "tier": "P1"
   },
   {
@@ -24798,9 +24798,9 @@
    "page": "09",
    "family": "play",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:161:8480 inspector text board (prototype says content fields are static)",
    "verified": "drift-open",
-   "verifiedNote": "Select child works; inspector has no Content tab/Text content field (_shared.tsx:44).",
+   "verifiedNote": "2026-10-31: selecting Eyebrow from Layers/canvas works; the Inspector half ('Text content' textarea, B I U, 'Changes save automatically.') is the Play prototype's older Content layout — page 04's text board 161:8480 owns the Inspector text body (L-B, drift-fixed), as on F1.03 302:4542.",
    "tier": "P1"
   },
   {
@@ -24809,9 +24809,9 @@
    "page": "09",
    "family": "play",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:161:8480 inspector text board (prototype says content fields are static)",
    "verified": "drift-open",
-   "verifiedNote": "Heading level exists (textBodies.tsx:57) but no Content tab/text field.",
+   "verifiedNote": "2026-10-31: selecting Headline works; heading level lives in the text body. The Inspector half is the prototype's older Content layout — superseded by page 04's 161:8480 (L-B, drift-fixed).",
    "tier": "P1"
   },
   {
@@ -24822,7 +24822,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Button label field missing in inspector; link lives in Behaviour › Link.",
+   "verifiedNote": "2026-10-31 L-A triage: selecting the button works. Open, Inspector (L-B, REQUESTS A-40): no page-04 board draws a button's content; this board names the field 'Button label' and shows 'Link target' under Semantics — the code reads 'Text' and keeps the link in Behavior › Link.",
    "tier": "P1"
   },
   {
@@ -24832,8 +24832,8 @@
    "family": "play",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "No grouped \"Images missing alt text · Open image ›\" subview; IssuesPanel rows are per element (IssuesPanel.tsx:337).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Probe-compared 2026-10-31 (case issues-cards, Fix › on the group; board shots/353-24569.png). Built: two or more images without alt text are one card ('! 2 images have no alt text', their places, Fix ›) counted as one tip; Fix › opens 'Images missing alt text' ✕ / '2 images · choose one to inspect' / per image its place, 'Missing alt text · image content', 'Open image ›' (selects it) / '‹ Back to Issues'. Places are the scanner's '{page} › {label}' (no parent chain in the shared finding). Test IssuesPanel (C02).",
    "tier": "P1"
   },
   {

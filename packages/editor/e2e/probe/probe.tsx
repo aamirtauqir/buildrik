@@ -106,6 +106,7 @@ import { LayersLoadError, LayersNoResults } from "@/editor/panels/layers/compone
 import { Row as InsertRow } from "@/editor/sidebar/tabs/build/components/GroupSection";
 import { BuildTab } from "@/editor/sidebar/tabs/build/BuildTab";
 import { LinkSection } from "@/editor/inspector/sections/LinkSection";
+import { PagePanel } from "@/editor/inspector/components/PagePanel";
 import type { ComponentDefinition } from "@/shared/types/components";
 import { PanelLoadingSkeleton } from "@/editor/shared/PanelStates";
 /* AgentPlan carries `.bd-ai-*` styles that only AITab imports, so the probe
@@ -2420,7 +2421,7 @@ function AddPanelCmsHost() {
    collection page. `&siteId=` makes the collection link's server save fail
    (no server behind the probe) for D93; without it the make succeeds (D90). */
 function LinkRowRecordHost() {
-  const [state, setState] = React.useState<{ c: Composer; card: string } | null>(null);
+  const [state, setState] = React.useState<{ c: Composer; card: string; home: string } | null>(null);
   React.useEffect(() => {
     const c = new Composer({} as never);
     const home = c.elements.createPage("Home");
@@ -2446,13 +2447,28 @@ function LinkRowRecordHost() {
       renameElement(c, "lr-card", "Card");
       c.cms.bindings.bindCollectionList("lr-list", team.id);
       c.selection.select(c.elements.getElement("lr-card") ?? null);
-      setState({ c, card: "lr-card" });
+      setState({ c, card: "lr-card", home: home.id });
     })();
   }, []);
+  /* After "Open page" (D98) the made page is active: the column shows what
+     the Inspector shows there with nothing selected. */
+  const [, bump] = React.useReducer((n: number) => n + 1, 0);
+  React.useEffect(() => {
+    if (!state) return;
+    state.c.on(EVENTS.PAGE_CHANGED, bump);
+    return () => {
+      state.c.off(EVENTS.PAGE_CHANGED, bump);
+    };
+  }, [state]);
+  const onCardPage = state?.c.elements.getActivePage()?.id === state?.home;
   return (
     <ToastProvider>
       <div data-probe="link-row-record" style={{ position: "fixed", right: 0, top: 56, width: 288, bottom: 32, background: "white", borderLeft: "1px solid var(--bk-border)" }}>
-        {state ? <LinkSection composer={state.c} selectedElement={{ id: state.card, type: "link" }} isOpen tier="primary" /> : null}
+        {state && onCardPage ? (
+          <LinkSection composer={state.c} selectedElement={{ id: state.card, type: "link" }} isOpen tier="primary" />
+        ) : state ? (
+          <PagePanel composer={state.c} />
+        ) : null}
       </div>
     </ToastProvider>
   );
@@ -3963,7 +3979,9 @@ const CASES: Record<string, () => React.ReactElement> = {
     const clear = new URLSearchParams(location.search).get("clear") === "1";
     const rows: Issue[] = [
       ...(clear ? [] : [{ id: "cms:list-no-source:l1", type: "error" as const, message: "Collection list has no source", location: "Home › Journal section", elementId: "l1", pageId: "home" }]),
-      { id: "content:alt:i1", type: "warning", message: "Image is missing alt text", location: "Home › Hero", elementId: "i1", pageId: "home" },
+      { id: "content:alt:i1", type: "warning", message: "Image is missing alt text", location: "Home › Hero", elementId: "i1", pageId: "home", contentKind: "missing-alt" },
+      /* Play C02 (353:24569): a second image groups the two into one card. */
+      { id: "content:alt:i2", type: "warning", message: "Image is missing alt text", location: "Home › Team", elementId: "i2", pageId: "home", contentKind: "missing-alt" },
       { id: "publish-check:Favicon", type: "warning", message: "No favicon set. Browsers will show a default icon." },
       { id: "publish-check:SEO configured", type: "warning", message: "No meta title template set." },
     ];
