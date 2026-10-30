@@ -33,7 +33,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-A S1: panel half built (tabs + target strip), not compared. Receipt 'Text added to Hero · Selected on canvas · Focus stays here' waits on REQUESTS #11; inspector Content tab is L-B.",
+   "verifiedNote": "Compared 2026-10-30 (board shots/7-19448.png): the board draws the insert receipt ('Text added to Hero' / 'Selected on canvas · Focus stays here') as a green band inside the Add panel under the list; the code raises the same copy as a toast from shell/hooks/useBlockInsertion.ts. Moving it into the panel needs that hook to hand the receipt to BuildTab — not done this round.",
    "tier": "P1"
   },
   {
@@ -156,7 +156,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-fixed",
-   "verifiedNote": "probe-compared 2026-10-27 (case pages-context-menu, shots/63-13820.png): 280 wide, 32 row pitch, bare labels in board order, no chord hints, no rule, Page settings ›, Delete page in the menu ink. The 11th row Move to folder… is board 131:41791 (P120) — the later board of the same menu; P02 predates folders.",
+   "verifiedNote": "probe-compared 2026-10-27 (case pages-context-menu, shots/63-13820.png): 280 wide, 32 row pitch, bare labels in board order, no chord hints, no rule, Page settings ›, Delete page in the menu ink. The 11th row Move to folder… is board 131:41791 (P120) — the later board of the same menu; P02 predates folders. Round 5 (owner): its row menu is drawn as context; 131:41791 is the dedicated board and wins — title, three rules, red Delete, Close menu now (probe-compared there).",
    "tier": "P1"
   },
   {
@@ -321,8 +321,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-A wave 2 built, not compared: receipt '{Page} renamed · URL kept' + Undo. The inline 'Page renamed. URL kept at /about.' line is not drawn.",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-30 (case pages-tab: About renamed 'Our story' with Keep URL; board shots/63-23182.png): the row reads Our story /about, the note under the list says 'Page renamed. URL kept at /about.' (new), and the toast says 'Our story renamed · URL kept' with Undo. Not conformed: the toast's own placement and its outlined Undo are the shared Toast's.",
    "tier": "P1"
   },
   {
@@ -653,7 +653,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Same save-failed state as 63:18189 (L-A S9), not compared.",
+   "verifiedNote": "Compared 2026-10-30 (board shots/101-23620.png): a 'Couldn’t save About settings' dialog with Keep editing · Discard changes · Retry save and leave, raised when a save fails while a return to Pages is pending. The navigation-pending flow (101:22426…101:28183) is not built; the code shows the save failure inline (63:18189).",
    "tier": "P1"
   },
   {
@@ -717,9 +717,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "code:save-closes-dialog",
    "verified": "drift-open",
-   "verifiedNote": "Compared 2026-10-27 (board shots/101-28780.png): the board keeps the dialog open after a save — 'About · Settings saved · Home stays open', 'Saved override', Save disabled. Code: Save writes, closes and toasts 'Page settings saved' (C4 #20). Behaviour change, not built; drift-open.",
+   "verifiedNote": "Owner (round 5): behaviour follows the code. The board keeps the dialog open after a save ('About · Settings saved · Home stays open', 'Saved override'); the code's Save writes, closes the dialog and toasts 'Page settings saved' with Manage pages (C4 #20). Compared 2026-10-27, board shots/101-28780.png.",
    "inheritsFrom": "63:15939",
    "tier": "P1"
   },
@@ -786,8 +786,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-A wave 2 built, not compared: 'Checking page capacity…' / 'Wait for the current page limit before creating.'; Create disabled while checking.",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-30 (case new-page-dialog with the capacity query never answering; board shots/101-38980.png): 'Checking page capacity…' red, 'Wait for the current page limit before creating.' 12 below in soft ink, Create page disabled.",
    "tier": "P1"
   },
   {
@@ -797,8 +797,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-A wave 2 built, not compared: 'Couldn’t check page capacity' / 'Your page name and navigation choice are retained.' + Retry check; Create waits for a known limit.",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-30 (case new-page-dialog with the capacity query failing; board shots/101-39695.png): 'Couldn’t check page capacity' red, 'Your page name and navigation choice are retained.' below; foot Cancel · Create page (disabled) · Retry check — Retry moved after Create (was before).",
    "tier": "P1"
   },
   {
@@ -808,8 +808,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-A S10 built, not compared: 'Couldn’t create {Page}. Nothing was changed. Try again.' and the primary reads 'Try again'.",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-30 (case new-page-dialog, Create pressed against a composer that cannot create; board shots/101-40412.png): 'Couldn’t create Services. Nothing was changed. Try again.' red under the capacity line; primary reads Try again.",
    "tier": "P1"
   },
   {
@@ -842,7 +842,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-A wave 2 built, not compared: empty canvas reads 'Your page is ready' / 'Use Add to insert elements or sections.' (template cards and actions kept, code-ahead); New page receipt '{Page} created · Added to site navigation'. Layers' 'Empty page · Add elements to begin' footer not drawn.",
+   "verifiedNote": "Compared 2026-10-30 (board shots/101-42581.png). Layers half fixed (probe layers-empty): the page row is its name alone and 'Empty page · Add elements to begin' sits under it; no View, no count footer on an empty page (the count also now reaches LayersTab on mount — it was missed). Open: the canvas draws only 'Your page is ready' / 'Use Add to insert elements or sections.'; the code still adds three template cards and Browse all templates · Add a block · Start blank — removing the empty page's only doors is waiting on an owner call. The 'Services created · Added to site navigation' receipt is the shared Toast's placement.",
    "tier": "P1"
   },
   {
@@ -1473,8 +1473,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared 2026-10-27 (board shots/131-41791.png) — the board disagrees with its own archetype 63:13820: it draws a title ('About'), rules after Save as template… / Copy link / Page settings, 'Page settings' without ›, Delete page red and a 'Close menu' row; 63:13820 (built) draws the menu bare. Left drift-open for the owner to pick one.",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-27 (case pages-context-menu; board shots/131-41791.png). Owner (round 5): this dedicated board wins over 63:13820. The menu is 280 wide, titled with the page's name (12/600), rows 36 tall, three 5-tall rules splitting Rename… · Duplicate · Set as homepage · Replace layout with template… · Save as template… | Move to folder… · Move up · Move down · Copy link | Page settings | Delete page (red) · Close menu; 493 tall vs the board's ~478. Move up / Move down keep ⌥↑ / ⌥↓ (owner A-17); 'Remove from {folder}' joins the organise group when the page is in one.",
    "inheritsFrom": "63:13820",
    "tier": "P1"
   },

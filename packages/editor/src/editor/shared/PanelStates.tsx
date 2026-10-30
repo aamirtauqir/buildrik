@@ -31,7 +31,7 @@ const StateGlyph = () => (
 
 /** Glyph, a title ("Nothing here yet" unless the panel names its own), one
  *  line — and an optional action under it. */
-export const PanelStateMessage: React.FC<{ title?: string; message: string; padTop: string; testId: string; children?: React.ReactNode }> = ({
+const PanelStateMessage: React.FC<{ title?: string; message: string; padTop: string; testId: string; children?: React.ReactNode }> = ({
   title = "Nothing here yet",
   message,
   padTop,

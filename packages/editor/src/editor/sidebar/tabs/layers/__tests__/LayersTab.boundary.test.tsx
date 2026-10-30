@@ -9,7 +9,7 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect, vi, beforeAll, afterEach } from "vitest";
-import { render, screen, cleanup, fireEvent } from "@testing-library/react";
+import { render, screen, cleanup, fireEvent, act } from "@testing-library/react";
 
 let shouldThrow = true;
 vi.mock("@/editor/panels/layers/index", () => ({
@@ -68,5 +68,22 @@ describe("LayersTab — the count and the tree fail together (board 781:4217)", 
     expect(screen.getByTestId("layers-panel-mock")).toBeTruthy();
     expect(container.querySelector(".bdc-lcount")).toBeTruthy();
     err.mockRestore();
+  });
+});
+
+/* design-2l9 101:42581: once the tree reports 0 layers, the drawer is the
+   page's name and one line — no View, no count footer. */
+describe("LayersTab — empty page", () => {
+  it("hides View and the count once the tree reports no layers", () => {
+    const handlers = new Map<string, (d: unknown) => void>();
+    const composer = {
+      ...stubComposer(),
+      on: vi.fn((ev: string, fn: (d: unknown) => void) => handlers.set(ev, fn)),
+    } as unknown as Composer;
+    render(<LayersTab composer={composer} />);
+    expect(screen.getByTestId("layers-view-toggle")).toBeTruthy();
+    act(() => handlers.get("layers:stats-change")?.({ total: 0, selected: 0 }));
+    expect(screen.queryByTestId("layers-view-toggle")).toBeNull();
+    expect(screen.queryByTestId("layers-count")).toBeNull();
   });
 });

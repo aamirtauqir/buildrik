@@ -2755,6 +2755,21 @@ const CASES: Record<string, () => React.ReactElement> = {
       </ToastProvider>
     </div>
   ),
+  /* design-2l9 101:42581 — Layers on an empty page ("Services"). */
+  "layers-empty": () => {
+    const c = new Composer({} as never);
+    const page = c.elements.createPage("Services", { slug: "services" } as never);
+    c.elements.setActivePage(page.id);
+    return (
+      <div data-probe="layers-empty">
+        <ToastProvider>
+          <div className="tw:flex tw:h-[812px] tw:w-70 tw:flex-col tw:overflow-hidden tw:bg-white">
+            <LayersTab composer={c} onClose={() => {}} />
+          </div>
+        </ToastProvider>
+      </div>
+    );
+  },
   "layers-tree": () => (
     <div data-probe="layers-tree"><LayersProbe /></div>
   ),

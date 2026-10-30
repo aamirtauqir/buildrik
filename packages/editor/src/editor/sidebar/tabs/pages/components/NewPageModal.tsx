@@ -118,14 +118,15 @@ export function NewPageModal({ composer }: { composer: Composer | null }) {
           <Button color="light" size="xs" data-testid="new-page-cancel" onClick={() => setOpen(false)}>
             Cancel
           </Button>
+          <Button size="xs" data-testid="new-page-create" disabled={!name.trim() || capacityBlocks} onClick={create}>
+            {error ? "Try again" : source === "template" ? "Choose template" : "Create page"}
+          </Button>
+          {/* 101:39695: Retry check closes the row, after the blocked Create. */}
           {capacity.state === "unavailable" && (
             <Button color="light" size="xs" data-testid="new-page-capacity-retry" onClick={retryCapacity}>
               Retry check
             </Button>
           )}
-          <Button size="xs" data-testid="new-page-create" disabled={!name.trim() || capacityBlocks} onClick={create}>
-            {error ? "Try again" : source === "template" ? "Choose template" : "Create page"}
-          </Button>
         </>
       }
     >
@@ -210,21 +211,20 @@ function PageCapacityLine({ capacity, count, atLimit }: { capacity: PageCapacity
           ];
   return (
     <div className="tw:flex tw:flex-col tw:gap-0.5" data-testid="new-page-capacity" role={capacity.state === "unavailable" || atLimit ? "status" : undefined}>
-      {/* 101:38257: at the limit the count turns red and the way out sits a
-          line apart, in soft ink. */}
+      {/* 101:38257 / 101:38980 / 101:39695: whenever the count blocks the
+          create — at the limit, still checking, or unknown — its head is red
+          and what to do sits a line apart, in soft ink. */}
       <p
         className={`${LINE} tw:tabular-nums ${
-          atLimit
+          atLimit || capacity.state === "checking" || capacity.state === "unavailable"
             ? "tw:text-[var(--bk-error-text)]"
-            : capacity.state === "unavailable"
-              ? "tw:text-[var(--bk-ink)] tw:font-medium"
-              : "tw:text-[var(--bk-ink-muted)]"
+            : "tw:text-[var(--bk-ink-muted)]"
         }`}
         data-testid="new-page-capacity-head"
       >
         {head}
       </p>
-      {body && <p className={`${LINE} ${atLimit ? "tw:mt-3 tw:text-[var(--bk-ink-soft)]" : "tw:text-[var(--bk-ink-muted)]"}`}>{body}</p>}
+      {body && <p className={`${LINE} tw:mt-3 tw:text-[var(--bk-ink-soft)]`}>{body}</p>}
     </div>
   );
 }
