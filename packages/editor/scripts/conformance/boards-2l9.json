@@ -13916,8 +13916,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "shell/lifecycle.ts:256 — phase1 T1.7 tray. Board: red check blocks publish; code re-labels \"Publish anyway\" — behaviour conflict, needs own…",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 24, probe-compared: shots/233-2.png vs probe publish-tray-blocking-server (&siteId=s1, 1440x900). Status card (Live · domain, Published … · v12, View live / Copy link); CHECKS with '1 blocking · 3 tips', blocker first, red ✕ / amber ! glyphs, 13px sentences wrapping, Fix › at the end, 'Red blocks publishing · amber is advisory'; GOES TO + Manage domains ›; disabled 'Publish changes' with 'Fix 1 blocking issue to publish'; legal links. Server rows print the server's own sentence. Not built: the WHAT WILL CHANGE counts/chips (draft-vs-live diff, REQUESTS A-33); APPROVAL row shows only when a round exists (probe publish-tray-ready).",
    "tier": "P1"
   },
   {
@@ -13927,8 +13927,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/publish/PublishTab.tsx:1001 — phase1 T1.7: no tray; panel has Checks/Release to/Changes/Last deploy, CTA \"Publish to productio…",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 24, probe-compared: shots/233-649.png vs probe publish-tray-ready (&siteId=s1). Tips only ('3 tips' over every listed row), APPROVAL '✓ Approved by Lena · <date>' + Open Review › (reviews.currentRound), GOES TO, enabled blue 'Publish changes', legal links. Residual: WHAT WILL CHANGE counts/chips wait on A-33; the board's '(client)' suffix is not printed (the reviewer is not always a client).",
    "tier": "P1"
   },
   {
@@ -13939,7 +13939,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "shell/PublishDiffView.tsx:1 — phase1 T1.7: diff is version↔version only; draft-vs-live per-page Compare needs P-2",
+   "verifiedNote": "Round 24: still open — the subview is the draft-vs-live per-page diff; contract filed REQUESTS A-33 (P-2). The published-version Compare (PublishDiffView) is reachable from the tray after a publish ('See what changed', PB09).",
    "tier": "P1"
   },
   {
@@ -13949,8 +13949,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "shell/modals/PublishConfirmModal.tsx:85 — \"Publish to production?\" facts confirm; no tick boxes; stale override is a separate modal",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 24, probe-compared: shots/233-1802.png vs probe publish-confirm-tips (&siteId=s1): 720 wide, no ✕, 'Publish to fieldwork.studio', numbered ledger 1 Changes / 2 Tips '3 advisory checks' + '☐ I’ve seen these' / 4 Approval / 5 Release 'Saved 10:42 · the current live release stays available to republish', Cancel + disabled Publish, 'Tick the boxes above to publish'. Publish enables on the tick (tests PublishConfirmModal*). Residual: '1 Changes' prints the page count (counts + See all › wait on A-33).",
    "tier": "P1"
   },
   {
@@ -13961,7 +13961,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "shell/modals/PublishConfirmModal.tsx:85 — \"Publish to production?\" facts confirm; no tick boxes; stale override is a separate modal",
+   "verifiedNote": "Round 24: the confirm is the board's numbered ledger now (PB04); the stale-approval door still opens StaleApprovalModal (AquibraStudio routing). Filed REQUESTS A-31 (route stale-approval into the one confirm + role); L-A builds the Approval row half once it lands.",
    "tier": "P1"
   },
   {
@@ -13972,7 +13972,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "shell/modals/PublishConfirmModal.tsx:85 — \"Publish to production?\" facts confirm; no tick boxes; stale override is a separate modal",
+   "verifiedNote": "Round 24: as 233:2418 — needs REQUESTS A-31 (stale approval routed into PublishConfirmModal with the Admin 'Publish without a fresh review' box).",
    "tier": "P1"
   },
   {
@@ -13983,7 +13983,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/publish/PublishTab.tsx:724 — progress block exists; no step list/elapsed, no topbar \"Publishing n/3\", Cancel not Admin+queued-…",
+   "verifiedNote": "Round 24, tray half probe-compared (publish-tray-running): status card kept, PUBLISHING with ✓ / ● '· step n of N' / ○ rows from the worker's steps (skipped ones dropped; the tray used to look for status 'running', the worker writes 'active'), footer 'Publishing can’t be stopped once deploying. You can keep working or leave.', no CTA. Still open: 'step 2 of 4' until the worker marks never-run steps skipped up front and 'Elapsed' needs startedAt (A-32); topbar 'Publishing 2/3…' built in StudioHeader (publishSteps) but AquibraStudio must pass it (A-29).",
    "tier": "P1"
   },
   {
@@ -13994,7 +13994,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/publish/PublishTab.tsx:724 — progress block exists; no step list/elapsed, no topbar \"Publishing n/3\", Cancel not Admin+queued-…",
+   "verifiedNote": "Round 24, tray half probe-compared (publish-tray-queued): 'Queued — waiting to start' and 'Cancel (not started)' (publishJob.cancel; the server cancels QUEUED/BUILDING for any member — no Admin gate in code). Still open: the pending step names are unknown until the worker writes them (queued jobs carry steps: []), Elapsed (A-32), topbar 'Publishing 0/3…' (A-29).",
    "tier": "P1"
   },
   {
@@ -14004,8 +14004,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/publish/PublishTab.tsx:809 — result block exists; \"See what changed\" missing (P-4)",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 24, probe-compared: shots/233-4748.png vs probe publish-tray-success (&siteId=s1, history v13/v12): green 'Your changes are live on fieldwork.studio. v13 is live.', outlined View live ↗, Copy link, See what changed (opens the one Compare on published v12 → v13 — PublishDiffView, from 'Publish'; offered only when both versions keep their payload), no footer CTA. The status card reads the new version (Published 1m ago · v13), the board's v12 is its sample.",
    "tier": "P1"
   },
   {
@@ -14016,7 +14016,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/publish/PublishTab.tsx:534 — Try again + View log exist; copy must name the live version kept",
+   "verifiedNote": "Round 24, tray half probe-compared (publish-tray-failed): red 'Publish failed — <server reason> The live site still shows v12.', outlined Try again (idempotent latch kept), View log (steps + job/deployment ids), no footer CTA. Still open: the topbar's red 'Publish failed' toggle (REQUESTS A-30).",
    "tier": "P1"
   },
   {
@@ -14025,9 +14025,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "code:no-start-timeout-state",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/publish/PublishTab.tsx:553 — pollLost \"Check status\" exists; start-timeout state (Try again off) not distinct",
+   "verifiedNote": "Round 24: the code has no 'start timed out' state. usePublishJob.publish awaits sites.publish; a start that errors is 'failed' with Try again, which cannot double-deploy because the server refuses a second live job per site (ALREADY_PUBLISHING, publish.service). A start that never answers leaves the tray idle. Drawing 'Try again stays off until we know' would fake a state the hook cannot reach.",
    "tier": "P1"
   },
   {
@@ -14037,8 +14037,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/publish/PublishTab.tsx:553 — pollLost \"Check status\" exists; start-timeout state (Try again off) not distinct",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 24, probe-compared: shots/233-6396.png vs probe publish-tray-lost: amber 'We lost track of this publish. It may still finish. Nothing is shown as failed until the server says so.', outlined Check status (re-tracks the SAME job), no footer CTA.",
    "tier": "P1"
   },
   {
@@ -14047,9 +14047,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "code:no-live-unrecorded-outcome",
    "verified": "no",
-   "verifiedNote": "no \"live but not recorded\" outcome in usePublishJob",
+   "verifiedNote": "Round 24: no 'live but not recorded' outcome exists. The worker records the deploy (completePublish: job COMPLETED + site live in one transaction) after Vercel reports ready; a failure there ends the job FAILED, which the tray shows as PB10 with Try again. Nothing in usePublishJob or sites.publishStatus distinguishes it.",
    "tier": "P1"
   },
   {
@@ -14059,8 +14059,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/publish/PublishTab.tsx:810 — simulation notice exists; board wants server flag (P-5) and tray copy",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 24, probe-compared: shots/233-7488.png vs probe publish-tray-simulated: grey 'Simulation mode — nothing is deployed' above the status card, grey 'Simulated publish — nothing went live.', no actions, no footer CTA (warning tint → neutral, as the board). Detection is the worker's simulated host (.dev-simulated.invalid); a server flag (P-5) and REQUESTS #8 stay open for the safety side.",
    "tier": "P1"
   },
   {
@@ -14070,8 +14070,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/publish/PublishGateBanner.tsx:1 — gate banner exists; tray layout and \"Waiting on review\" reason differ",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 24, probe-compared: shots/233-8034.png vs probe publish-tray-changes-requested: amber '<reviewer> requested changes on 2 comments. Publishing waits for a fresh approval.' (reviews.currentRound openCommentCount), Open Review ›, WHAT WILL CHANGE, no CHECKS / GOES TO, disabled 'Publish changes' with 'Waiting on review'. Residual: change counts (A-33).",
    "tier": "P1"
   },
   {
@@ -14080,9 +14080,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "code:no-site-password-protection",
    "verified": "no",
-   "verifiedNote": "no publish-time password-on-Free block or Remove-protection-and-publish confirm",
+   "verifiedNote": "Round 24: there is no site password protection in the product — no Site field, no settings control, no publish check (runPrePublishChecks, publish.service:71-170). Nothing exists to block on Free; the board's two ways out have nothing to act on.",
    "tier": "P1"
   },
   {
@@ -14091,9 +14091,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "code:no-site-password-protection",
    "verified": "no",
-   "verifiedNote": "no publish-time password-on-Free block or Remove-protection-and-publish confirm",
+   "verifiedNote": "Round 24: as 233:8594 — 'Remove protection and publish' confirms removing a protection the code does not have.",
    "tier": "P1"
   },
   {
@@ -14114,8 +14114,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Board 'Publishing needs Editor access' vs code 'Viewers can't publish — ask an editor': waits on REQUESTS #13 (a lead-owned test pins the old copy).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 24, probe-compared: shots/233-10270.png vs probe publish-tray-viewer: status card, WHAT WILL CHANGE, no checks / destination, disabled 'Publish changes' with 'Publishing needs Editor access' (lifecycle PUBLISH_REFUSAL.viewer). Residual: change counts (A-33).",
    "tier": "P1"
   },
   {
@@ -14137,7 +14137,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "probe-compared 2026-10-27 (still open): shots/233-11377.png vs probe publish-tray (offline) — status card + WHAT WILL CHANGE, no Checks / Goes to, \"Needs a connection\", legal links, ⋯. Not built: the board's per-page change chips and \"3 pages changed · 1 added · 0 removed\" counts (needs a draft-vs-live diff, inventory P-2) and \"See all ›\".",
+   "verifiedNote": "Round 24: probe re-checked (offline) — unchanged from 2026-10-27; still open only for the WHAT WILL CHANGE counts/chips and See all › (REQUESTS A-33).",
    "tier": "P1"
   },
   {
@@ -14148,7 +14148,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "no site-limit publish lock in lifecycle publishBlocker",
+   "verifiedNote": "Round 24: no plan site-limit check reaches the editor; contract filed REQUESTS A-34 (a 'Plan limit' fail row from runPrePublishChecks). The tray already shuts on any failing server row once it exists.",
    "tier": "P1"
   },
   {
@@ -14158,8 +14158,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/publish/PublishTab.tsx:520 — \"Checking readiness…\" vs tray \"Checking…\"",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 24, probe-compared: shots/233-12491.png vs probe publish-tray-checking (prePublishChecks never answers): the body is placeholders only (card + four rows), disabled 'Publish changes' with 'Checking…', legal links.",
    "tier": "P1"
   },
   {

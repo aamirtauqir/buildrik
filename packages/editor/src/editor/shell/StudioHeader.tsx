@@ -54,6 +54,8 @@ import { BANNER_ID, clearGlobalBanner, saveFailedBanner, showGlobalBanner } from
 import { SaveFailedStrip } from "./SaveFailedStrip";
 import { isAuthSaveError } from "./hooks/useSaveCallback";
 import { publishTray, usePublishTrayOpen } from "./publishTrayStore";
+import { runLabel } from "./PublishTrayRun";
+import type { PublishStep } from "@/services/PublishService";
 import { shellDirty, useShellDirty } from "./shellDirtyRegistry";
 import { saveStatusStore } from "./saveStatusStore";
 import "./header.css";
@@ -134,6 +136,9 @@ export interface StudioHeaderProps {
   onVercelPublish?: () => void;
   /** True while a publish job is in flight */
   publishLoading?: boolean;
+  /** The running job's steps (`publishJob.steps`) — the toggle reads
+   *  "Publishing 2/3…" while it runs (board B8-PB07 `233:3648`). */
+  publishSteps?: PublishStep[] | null;
   /** Live URL after successful publish */
   publishedUrl?: string | null;
   /** T5 (D10): 2s outcome flash — drives "✓ Published" and the announcement
@@ -270,6 +275,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   onSave,
   onExportHTML,
   publishLoading,
+  publishSteps = null,
   publishedUrl,
   publishOutcome = null,
   reviewStatus,
@@ -943,7 +949,13 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
         /* Board 497:99433 says "Publish" on the tray toggle; "Publish
            changes" stays the tray's own CTA and the toggle's title. The
            review verbs keep their words (they open Review, not the tray). */
-        ctaLabel={isViewer ? nextMove?.label ?? "Publish" : isTrayToggle ? undefined : nextMove?.label}
+        ctaLabel={
+          isViewer
+            ? nextMove?.label ?? "Publish"
+            : isTrayToggle
+              ? publishLoading ? runLabel(publishSteps) : undefined
+              : nextMove?.label
+        }
         ctaHint={nextMove?.hint}
         onPublish={handleCtaClick}
         /* SendForReview used to render ONLY in view mode, from when

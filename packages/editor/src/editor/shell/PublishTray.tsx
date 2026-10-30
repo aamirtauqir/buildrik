@@ -27,7 +27,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Button, CopyButton, Menu, MenuItem, Popover, Progress, useFocusTrap } from "@/editor/chrome-ui";
+import { Button, CopyButton, Menu, MenuItem, Popover, useFocusTrap } from "@/editor/chrome-ui";
 import { MoreHorizontal, X } from "lucide-react";
 import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants";
@@ -43,17 +43,17 @@ import {
 import { VERCEL_CHECK_LABEL } from "@buildrik/shared/schemas/publish";
 import { CONTENT_CHECK_LABELS } from "@buildrik/shared/content/contentIssues";
 import { locateComment } from "@/editor/sidebar/tabs/review/locate";
-import { CHECK_DOOR, CheckIcon, PrePublishChecks } from "@/editor/sidebar/tabs/publish/PrePublishChecks";
-import { ApprovalCheckRow } from "@/editor/sidebar/tabs/publish/PublishGateBanner";
 import { openPublishCheckFix } from "@/editor/sidebar/tabs/publish/PublishTab";
 import { usePrePublishChecks } from "@/editor/sidebar/tabs/publish/usePrePublishChecks";
 import { domainOf, usePublishSnapshot } from "@/editor/sidebar/tabs/publish/usePublishSnapshot";
 import { formatRelativeTime } from "@/shared/utils/relativeTime";
+import { fetchCurrentRound, type CurrentRound } from "@/services/ReviewService";
 import { PUBLISH_CHECK_ISSUE } from "./hooks/useIssuesFeed";
 import type { UsePublishJobResult } from "./hooks/usePublishJob";
 import type { Issue } from "./hooks/useStudioState";
 import { PUBLISH_REFUSAL, type NextMove } from "./lifecycle";
 import { publishTray } from "./publishTrayStore";
+import { FailedLog, OUTCOME_BTN, OutcomeNote, PublishedActions, RunSection, TraySkeleton, runSteps } from "./PublishTrayRun";
 
 /* The server's content rows ("Image alt text", "Links") run the same shared
    detector the issue scanner runs per element — the tray lists the per-element
@@ -148,26 +148,7 @@ function locateIssue(composer: Composer, issue: Issue): void {
 }
 
 const ISSUE_ROW =
-  "tw:flex tw:w-full tw:items-start tw:gap-2 tw:py-2 tw:text-left tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]";
-
-const IssueRow: React.FC<{ issue: Issue; composer: Composer | null }> = ({ issue, composer }) => (
-  <div className={ISSUE_ROW} data-testid={`publish-tray-issue-${issue.type === "error" ? "fail" : "warning"}`}>
-    <span className="tw:mt-0.5">
-      <CheckIcon status={issue.type === "error" ? "fail" : "warning"} />
-    </span>
-    <span className="tw:min-w-0 tw:flex-1">{issue.message}</span>
-    <Button
-      color="light"
-      size="xs"
-      className={CHECK_DOOR}
-      disabled={!composer}
-      aria-label={`Fix: ${issue.message}`}
-      onClick={() => composer && locateIssue(composer, issue)}
-    >
-      Fix ›
-    </Button>
-  </div>
-);
+  "tw:flex tw:w-full tw:items-start tw:gap-2 tw:py-[13px] tw:text-left tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]";
 
 /* ── The one CTA ─────────────────────────────────────────────────────────── */
 
@@ -185,12 +166,14 @@ interface CtaInput {
   checkState: "loading" | "ready" | "error";
   vercelMissing: boolean;
   cms: CmsSyncState;
+  /** The site is live — a review verb's door still reads "Publish changes" (B8-PB15). */
+  live: boolean;
 }
 
 /** In priority order: what is running or has just failed speaks first, then
  *  what stops a new publish, then the door itself. */
-function trayCta({ nextMove, publishJob, wired, checkState, vercelMissing, cms }: CtaInput): Cta {
-  const label = nextMove?.kind === "publish" ? nextMove.label : "Publish";
+function trayCta({ nextMove, publishJob, wired, checkState, vercelMissing, cms, live }: CtaInput): Cta {
+  const label = nextMove?.kind === "publish" ? nextMove.label : live ? "Publish changes" : "Publish";
   const ui = publishJob?.uiState;
   if (ui === "publishing") return { kind: "shut", label: "Publishing…", reason: null };
   if (ui === "failed" && publishJob?.pollLost && publishJob.jobId) return { kind: "check-status", label: "Check status" };
@@ -203,6 +186,8 @@ function trayCta({ nextMove, publishJob, wired, checkState, vercelMissing, cms }
   if (nextMove === null) return { kind: "shut", label: "Up to date", reason: null };
   if (vercelMissing) return { kind: "connect", label: "Connect Vercel" };
   if (checkState === "loading") return { kind: "shut", label, reason: "Checking…" };
+  /* B8-PB15: the round's sentence is in the tray's body; the CTA only says why it waits. */
+  if (nextMove.gate === "changes-requested") return { kind: "shut", label, reason: "Waiting on review" };
   if (nextMove.kind !== "publish") return { kind: "shut", label, reason: nextMove.gateReason ?? nextMove.blockedReason };
   if (nextMove.blockedReason) return { kind: "shut", label, reason: nextMove.blockedReason };
   return { kind: "publish", label };
@@ -216,7 +201,8 @@ const META = "tw:m-0 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 const BODY = "tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]";
 const LINK_BTN =
   "tw:h-8 tw:w-auto tw:border-transparent tw:bg-transparent tw:px-0 tw:text-[13px] tw:font-normal tw:text-[var(--bk-accent)] tw:hover:bg-transparent tw:hover:underline";
-const ID = "tw:font-[family-name:var(--bk-font-mono)] tw:tabular-nums tw:text-[11px] tw:text-[var(--bk-ink-soft)]";
+/** Fix › at the row's text size (board B8-PB01: 13, accent). */
+const FIX_DOOR = "tw:flex-none tw:h-5 tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[13px] tw:font-normal tw:text-[var(--bk-accent)]";
 
 const SIMULATED_HOST = ".dev-simulated.invalid";
 
@@ -226,6 +212,29 @@ function ago(at: string | Date | null): string {
   const ts = new Date(at).getTime();
   return Number.isFinite(ts) ? formatRelativeTime(ts, { fallback: "days", justNowLabel: "just now" }) : "";
 }
+
+/* ── The review round, for the Approval section ─────────────────────────── */
+
+/** The current round, read once per open and again when the gate moves —
+ *  B8-PB01 prints who approved and when; PB15 how many comments came back. */
+function useCurrentRound(gate: NextMove["gate"] | null): CurrentRound | null {
+  const [round, setRound] = React.useState<CurrentRound | null>(null);
+  React.useEffect(() => {
+    let alive = true;
+    fetchCurrentRound()
+      .then((r) => alive && setRound(r && !r.revoked ? r : null))
+      .catch(() => alive && setRound(null));
+    return () => {
+      alive = false;
+    };
+  }, [gate]);
+  return round;
+}
+
+const reviewerOf = (round: CurrentRound | null): string => round?.reviewerName ?? round?.invitedEmail ?? "Your client";
+
+const shortDate = (at: string | Date | null): string =>
+  at ? new Date(at).toLocaleDateString(undefined, { day: "numeric", month: "short" }) : "";
 
 /* ── The tray ────────────────────────────────────────────────────────────── */
 
@@ -245,9 +254,18 @@ export const PublishTray: React.FC<PublishTrayProps> = ({ composer, publishJob, 
     [allChecks],
   );
   const [cms, refreshCms] = useCmsSync();
+  const round = useCurrentRound(nextMove?.gate ?? null);
 
   const vercelMissing = (checks?.checks ?? []).some((c) => c.label === VERCEL_CHECK_LABEL && c.status === "fail");
-  const cta = trayCta({ nextMove, publishJob, wired: !!onRequestPublish, checkState, vercelMissing, cms });
+  const cta = trayCta({
+    nextMove,
+    publishJob,
+    wired: !!onRequestPublish,
+    checkState,
+    vercelMissing,
+    cms,
+    live: !!publishJob?.publishedUrl,
+  });
 
   /* Idempotent Try again / Check status: a second press while the first is in
      flight does nothing. The latch clears when the job moves on — or after
@@ -278,37 +296,69 @@ export const PublishTray: React.FC<PublishTrayProps> = ({ composer, publishJob, 
   const simulated = Boolean(publishedUrl?.includes(SIMULATED_HOST));
   const isLive = !!publishedUrl;
   const justPublished = publishJob?.jobId != null && uiState === "published";
+  const running = uiState === "publishing";
+  const failed = uiState === "failed" && !!publishJob?.error;
+  /* PB07–PB14: a run or its outcome replaces the checks and the footer CTA. */
+  const outcome = running || failed || (justPublished && !!publishedUrl);
 
   /* Issue rows: the content and Brand findings. The server's own rows come
-     from PrePublishChecks, so `publish-check:` issues are not listed twice. */
+     from the checks list, so `publish-check:` issues are not listed twice. */
   const siteIssues = issues.filter((i) => i.type !== "info" && !i.id.startsWith(PUBLISH_CHECK_ISSUE));
-  const blockingCount = issues.filter((i) => i.type === "error").length;
-  const tipCount = issues.filter((i) => i.type === "warning").length;
+  const serverRows = checkState === "ready" ? (checks?.checks ?? []).filter((c) => c.status !== "pass") : [];
+  /* Blockers first (board B8-PB01), then the advice; the count is every row listed. */
+  const rows = [
+    ...serverRows.map((c) => ({
+      key: c.label,
+      kind: "check",
+      blocking: c.status === "fail",
+      message: c.detail,
+      fix: c.label === VERCEL_CHECK_LABEL ? null : () => openPublishCheckFix(composer, c.label),
+    })),
+    ...siteIssues.map((i) => ({
+      key: i.id,
+      kind: "issue",
+      blocking: i.type === "error",
+      message: i.message,
+      fix: composer ? () => locateIssue(composer, i) : undefined,
+    })),
+  ].sort((a, b) => Number(b.blocking) - Number(a.blocking));
+  const blockingCount = rows.filter((r) => r.blocking).length;
+  const tipCount = rows.length - blockingCount;
   const summary = [blockingCount ? `${blockingCount} blocking` : "", tipCount ? `${tipCount} tip${tipCount === 1 ? "" : "s"}` : ""]
     .filter(Boolean)
     .join(" · ");
 
-  const renderFix = (label: string): React.ReactNode =>
-    label === VERCEL_CHECK_LABEL ? null : (
-      <Button color="light" size="xs" className={CHECK_DOOR} onClick={() => openPublishCheckFix(composer, label)}>
-        Fix ›
-      </Button>
-    );
-
-  const running = uiState === "publishing";
   /* B8-PB20: a workspace that cannot publish shows only the site's status;
      B8-PB19/PB21: a viewer or a lost connection see what would change, but
-     no checks and no destination — none of it is theirs to act on now. */
+     no checks and no destination — none of it is theirs to act on now.
+     B8-PB15: a round that came back with changes is the one thing to read. */
   const refusal = !onRequestPublish ? PUBLISH_REFUSAL.off : nextMove?.blockedReason ?? null;
   const statusOnly = refusal === PUBLISH_REFUSAL.off;
-  const noChecks = statusOnly || refusal === PUBLISH_REFUSAL.viewer || refusal === PUBLISH_REFUSAL.offline;
+  const changesRequested = nextMove?.gate === "changes-requested";
+  const noChecks =
+    statusOnly || changesRequested || refusal === PUBLISH_REFUSAL.viewer || refusal === PUBLISH_REFUSAL.offline;
+  const loadingChecks = checkState === "loading" && !outcome && !noChecks;
   const [moreOpen, setMoreOpen] = React.useState(false);
-  const runningStep = (() => {
-    const steps = publishJob?.steps;
-    if (!running || !steps?.length) return null;
-    const i = steps.findIndex((s) => s.status === "running");
-    return i < 0 ? null : { name: steps[i].name, index: i + 1, total: steps.length };
-  })();
+  const [logOpen, setLogOpen] = React.useState(false);
+
+  const openReview = () => composer?.emit(EVENTS.UI_SWITCH_TAB, { tab: "review" });
+  const last = snapshot.lastDeploy;
+  const prev = snapshot.previousDeploy;
+  const seeWhatChanged =
+    justPublished && last && prev && last.rollbackable && prev.rollbackable
+      ? () =>
+          composer?.emit(EVENTS.UI_COMPARE_OPEN, {
+            left: { kind: "published", jobId: prev.id, version: prev.version },
+            right: { kind: "published", jobId: last.id, version: last.version },
+            from: "Publish",
+          })
+      : undefined;
+  const approvalLine =
+    round?.status?.toLowerCase() === "approved"
+      ? `✓ Approved by ${reviewerOf(round)}${round.resolvedAt ? ` · ${shortDate(round.resolvedAt)}` : ""}`
+      : nextMove && (nextMove.gate === "waiting" || nextMove.gate === "unchecked")
+        ? nextMove.gateReason
+        : null;
 
   return (
     <div
@@ -373,74 +423,31 @@ export const PublishTray: React.FC<PublishTrayProps> = ({ composer, publishJob, 
         </Button>
       </div>
 
+      {loadingChecks ? (
+        <div className="tw:min-h-0 tw:flex-1">
+          <TraySkeleton />
+        </div>
+      ) : (
       <div className="tw:min-h-0 tw:flex-1 tw:overflow-y-auto tw:pb-3">
+        {/* PB14: said first, before the card, so nothing below reads as live. */}
         {simulated ? (
-          <p className="tw:m-3 tw:mb-0 tw:rounded-[var(--bk-radius-md)] tw:bg-[var(--bk-warning-tint)] tw:px-3 tw:py-2 tw:text-[12px] tw:text-[var(--bk-warning-text)]">
-            Simulation mode — nothing is deployed
-          </p>
+          <OutcomeNote tone="neutral" testId="publish-tray-simulated">Simulation mode — nothing is deployed</OutcomeNote>
         ) : null}
 
-        {/* Status card */}
+        {/* Status card — on top in every state, the run's included (PB07). */}
         <section
           className="tw:m-3 tw:mb-0 tw:rounded-[var(--bk-radius-lg)] tw:bg-[var(--bk-bg-subtle)] tw:p-3"
           aria-label="Site status"
           data-testid="publish-tray-status"
         >
-          {running ? (
-            <>
-              <p className={BODY} role="status">
-                Publishing{domain ? ` to ${domain}` : ""}…
-              </p>
-              <p className={`${META} tw:mt-1`}>
-                {runningStep
-                  ? `Step ${runningStep.index} of ${runningStep.total} · ${runningStep.name}`
-                  : `${Math.round(publishJob?.progress ?? 0)}%`}
-              </p>
-              <Progress progress={Math.round(publishJob?.progress ?? 0)} size="sm" className="tw:mt-2" />
-              <p className={`${META} tw:mt-2`}>Closing this tray does not cancel the publish.</p>
-            </>
-          ) : uiState === "failed" && publishJob?.error ? (
-            <div role="alert" data-testid="publish-tray-failed">
-              {publishJob.pollLost ? (
-                <p className={BODY}>
-                  We lost track of this publish. It may still finish. Nothing is shown as failed until the server says so.
-                </p>
-              ) : (
-                <p className={`${BODY} tw:text-[var(--bk-error-text)]`}>
-                  Publish failed — {publishJob.error}
-                  {isLive ? " The live site is unchanged." : " Nothing went live."}
-                </p>
-              )}
-              <dl className="tw:m-0 tw:mt-2 tw:grid tw:grid-cols-[auto_1fr] tw:gap-x-2 tw:gap-y-0.5">
-                {publishJob.jobId ? (
-                  <>
-                    <dt className={META}>Job</dt>
-                    <dd className={`tw:m-0 ${ID}`} data-testid="publish-tray-job-id">{publishJob.jobId}</dd>
-                  </>
-                ) : null}
-                {publishJob.deploymentId ? (
-                  <>
-                    <dt className={META}>Deployment</dt>
-                    <dd className={`tw:m-0 ${ID}`} data-testid="publish-tray-deployment-id">{publishJob.deploymentId}</dd>
-                  </>
-                ) : null}
-              </dl>
-            </div>
-          ) : justPublished && publishedUrl ? (
-            <>
-              <p className={`${BODY} tw:text-[var(--bk-success-text)]`} role="status">
-                {simulated ? "Simulated publish — nothing went live." : `Your changes are live on ${domain ?? publishedUrl}.`}
-              </p>
-              <LiveLinks url={publishedUrl} />
-            </>
-          ) : isLive ? (
+          {publishedUrl ? (
             <>
               <p className={BODY}>
                 <span aria-hidden="true">● </span>Live · {domain ?? publishedUrl}
               </p>
-              {snapshot.lastDeploy ? (
+              {last ? (
                 <p className={`${META} tw:mt-1`}>
-                  Published {ago(snapshot.lastDeploy.rawAt)} · v{snapshot.lastDeploy.version}
+                  Published {ago(last.rawAt)} · v{last.version}
                 </p>
               ) : null}
               <LiveLinks url={publishedUrl} />
@@ -456,6 +463,67 @@ export const PublishTray: React.FC<PublishTrayProps> = ({ composer, publishJob, 
             </>
           )}
         </section>
+
+        {running ? <RunSection steps={publishJob?.steps ?? null} /> : null}
+
+        {failed && publishJob ? (
+          publishJob.pollLost ? (
+            <OutcomeNote
+              tone="warning"
+              role="alert"
+              testId="publish-tray-failed"
+              actions={<OutcomeButton cta={cta} disabled={ctaDisabled} onClick={onCta} />}
+            >
+              We lost track of this publish. It may still finish. Nothing is shown as failed until the server says so.
+            </OutcomeNote>
+          ) : (
+            <>
+              <OutcomeNote
+                tone="error"
+                role="alert"
+                testId="publish-tray-failed"
+                actions={
+                  <>
+                    <OutcomeButton cta={cta} disabled={ctaDisabled} onClick={onCta} />
+                    <Button
+                      color="light"
+                      size="xs"
+                      className={LINK_BTN}
+                      aria-expanded={logOpen}
+                      onClick={() => setLogOpen((v) => !v)}
+                      data-testid="publish-tray-view-log"
+                    >
+                      View log
+                    </Button>
+                  </>
+                }
+              >
+                Publish failed — {publishJob.error}
+                {isLive ? (last ? ` The live site still shows v${last.version}.` : " The live site is unchanged.") : " Nothing went live."}
+              </OutcomeNote>
+              {logOpen ? (
+                <FailedLog steps={publishJob.steps} jobId={publishJob.jobId} deploymentId={publishJob.deploymentId} />
+              ) : null}
+            </>
+          )
+        ) : null}
+
+        {justPublished && publishedUrl ? (
+          simulated ? (
+            <OutcomeNote tone="neutral" role="status" testId="publish-tray-published">
+              Simulated publish — nothing went live.
+            </OutcomeNote>
+          ) : (
+            <OutcomeNote
+              tone="success"
+              role="status"
+              testId="publish-tray-published"
+              actions={<PublishedActions url={publishedUrl} onSeeWhatChanged={seeWhatChanged} />}
+            >
+              Your changes are live on {domain ?? publishedUrl}.{last ? ` v${last.version} is live.` : ""}
+            </OutcomeNote>
+          )
+        ) : null}
 
         {cms.stuck ? (
           <section className={SECTION} aria-label="CMS sync" data-testid="publish-tray-cms-stuck">
@@ -488,8 +556,25 @@ export const PublishTray: React.FC<PublishTrayProps> = ({ composer, publishJob, 
           </section>
         ) : null}
 
-        {running || statusOnly ? null : (
+        {outcome || statusOnly ? null : (
           <>
+            {/* PB15: the round came back — what the client asked, and the way to it. */}
+            {changesRequested ? (
+              <OutcomeNote
+                tone="warning"
+                testId="publish-tray-changes-requested"
+                actions={
+                  <Button color="light" size="xs" className={LINK_BTN} onClick={openReview}>
+                    Open Review ›
+                  </Button>
+                }
+              >
+                {reviewerOf(round)} requested changes
+                {round?.openCommentCount ? ` on ${round.openCommentCount} comment${round.openCommentCount === 1 ? "" : "s"}` : ""}.
+                {" "}Publishing waits for a fresh approval.
+              </OutcomeNote>
+            ) : null}
+
             <section className={SECTION} aria-label="What will change">
               <h3 className={HEAD}>What will change</h3>
               <p className={BODY} data-testid="publish-tray-changes">
@@ -511,20 +596,52 @@ export const PublishTray: React.FC<PublishTrayProps> = ({ composer, publishJob, 
                 <h3 className={HEAD}>Checks</h3>
                 {summary ? <span className={META}>{summary}</span> : null}
               </div>
-              <PrePublishChecks
-                state={checkState}
-                checks={checks}
-                onRetry={() => void reload()}
-                renderFix={renderFix}
-                hidePassing
-                legend="Red blocks publishing · amber is advisory"
-              >
-                <ApprovalCheckRow nextMove={nextMove} composer={composer} />
-                {siteIssues.map((issue) => (
-                  <IssueRow key={issue.id} issue={issue} composer={composer} />
+              <div data-testid="publish-checks">
+                {checkState === "error" ? (
+                  <div className="tw:flex tw:items-center tw:justify-between tw:gap-3 tw:py-2 tw:text-[12px]" role="alert">
+                    <span className="tw:text-[var(--bk-error-text)]">Couldn&apos;t load the readiness checks.</span>
+                    <Button color="light" size="xs" onClick={() => void reload()}>
+                      Retry
+                    </Button>
+                  </div>
+                ) : null}
+                {rows.map((r) => (
+                  <TrayRow
+                    key={r.key}
+                    blocking={r.blocking}
+                    message={r.message}
+                    testId={`publish-${r.kind === "issue" ? "tray-issue" : "check"}-${r.blocking ? "fail" : "warning"}`}
+                    fix={r.fix}
+                  />
                 ))}
-              </PrePublishChecks>
+                {rows.length > 0 ? (
+                  <p className={`${META} tw:mt-1`} data-testid="publish-checks-legend">
+                    Red blocks publishing · amber is advisory
+                  </p>
+                ) : checkState === "ready" ? (
+                  <p className={`${BODY} tw:py-1`}>Nothing to fix</p>
+                ) : null}
+              </div>
             </section>
+
+            {approvalLine ? (
+              <section className={SECTION} aria-label="Approval" data-testid="publish-tray-approval">
+                <h3 className={HEAD}>Approval</h3>
+                <p className={BODY}>{approvalLine}</p>
+                <div>
+                  <Button
+                    color="light"
+                    size="xs"
+                    className={LINK_BTN}
+                    onClick={() =>
+                      nextMove?.gate === "unchecked" ? composer?.emit(EVENTS.REVIEW_STATUS_RETRY, undefined) : openReview()
+                    }
+                  >
+                    {nextMove?.gate === "unchecked" ? "Retry ›" : "Open Review ›"}
+                  </Button>
+                </div>
+              </section>
+            ) : null}
 
             <section className={SECTION} aria-label="Goes to">
               <h3 className={HEAD}>Goes to</h3>
@@ -546,8 +663,24 @@ export const PublishTray: React.FC<PublishTrayProps> = ({ composer, publishJob, 
           </>
         )}
       </div>
+      )}
 
-      {/* Task footer — the ONE CTA, its reason under it. */}
+      {/* Task footer. A run has no CTA: before the worker picks the job up it
+          can still be cancelled (PB08), after that it cannot (PB07). An
+          outcome's button sits with its sentence; the footer is empty. */}
+      {running ? (
+        <div className="tw:flex-none tw:border-t tw:border-[var(--bk-border)] tw:p-3" data-testid="publish-tray-run-footer">
+          {runSteps(publishJob?.steps).length === 0 ? (
+            <Button color="light" size="sm" className="tw:h-8 tw:w-full" onClick={() => void publishJob?.cancel()}>
+              Cancel (not started)
+            </Button>
+          ) : (
+            <p className={META}>Publishing can&apos;t be stopped once deploying. You can keep working or leave.</p>
+          )}
+        </div>
+      ) : outcome ? (
+        <div className="tw:h-3.5 tw:flex-none tw:border-t tw:border-[var(--bk-border)]" />
+      ) : (
       <div className="tw:flex-none tw:border-t tw:border-[var(--bk-border)] tw:px-3 tw:pb-3 tw:pt-3">
         <Button
           variant={ctaDisabled ? "secondary" : "primary"}
@@ -575,9 +708,51 @@ export const PublishTray: React.FC<PublishTrayProps> = ({ composer, publishJob, 
           </a>
         </div>
       </div>
+      )}
     </div>
   );
 };
+
+/** PB10 Try again / PB12 Check status — the outcome's own outlined button,
+ *  still the one CTA (idempotent, latched). */
+const OutcomeButton: React.FC<{ cta: Cta; disabled: boolean; onClick: () => void }> = ({ cta, disabled, onClick }) => (
+  <Button color="light" size="xs" className={OUTCOME_BTN} disabled={disabled} onClick={onClick} data-testid="publish-tray-cta">
+    {cta.label}
+  </Button>
+);
+
+/** B8-PB01/PB02 check row: the glyph (red ✕ blocks, amber ! advises), the
+ *  sentence wrapping at 13, Fix › at the far end. */
+const TrayRow: React.FC<{ blocking: boolean; message: string; testId: string; fix?: (() => void) | null }> = ({
+  blocking,
+  message,
+  testId,
+  fix,
+}) => (
+  <div className={ISSUE_ROW} data-testid={testId}>
+    <span
+      className={`tw:mt-px tw:inline-flex tw:w-3 tw:flex-none tw:justify-center tw:text-[13px] tw:font-semibold ${
+        blocking ? "tw:text-[var(--bk-error)]" : "tw:text-[var(--bk-warning)]"
+      }`}
+    >
+      <span aria-hidden="true">{blocking ? "✕" : "!"}</span>
+      <span className="tw:sr-only">{blocking ? "blocking" : "warning"}</span>
+    </span>
+    <span className="tw:min-w-0 tw:flex-1">{message}</span>
+    {fix === null ? null : (
+      <Button
+        color="light"
+        size="xs"
+        className={FIX_DOOR}
+        disabled={!fix}
+        aria-label={`Fix: ${message}`}
+        onClick={() => fix?.()}
+      >
+        Fix ›
+      </Button>
+    )}
+  </div>
+);
 
 /** "View live ↗" and "Copy link" — the status card's two doors. */
 const LiveLinks: React.FC<{ url: string }> = ({ url }) => (

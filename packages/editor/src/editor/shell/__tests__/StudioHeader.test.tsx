@@ -385,6 +385,21 @@ describe("StudioHeader", () => {
       expect(onVercelPublish).not.toHaveBeenCalled();
     });
 
+    it("while a publish runs the toggle counts the worker's steps (B8-PB07 'Publishing 2/3…')", () => {
+      vi.mocked(isFeatureEnabled).mockReturnValue(true);
+      const steps = [
+        { name: "Generating pages", status: "done" },
+        { name: "Optimizing images", status: "skipped" },
+        { name: "Deploying to CDN", status: "active" },
+        { name: "Verifying SSL", status: "pending" },
+      ];
+      render(<StudioHeader {...makeProps({ publishLoading: true, publishSteps: steps })} />);
+      expect(toggle().textContent).toBe("Publishing 2/3…");
+      cleanup();
+      render(<StudioHeader {...makeProps({ publishLoading: true, publishSteps: null })} />);
+      expect(toggle().textContent).toBe("Publishing…");
+    });
+
     it("a second click closes it; the label does not change on open (no layout shift)", () => {
       vi.mocked(isFeatureEnabled).mockReturnValue(true);
       render(<StudioHeader {...makeProps()} />);
