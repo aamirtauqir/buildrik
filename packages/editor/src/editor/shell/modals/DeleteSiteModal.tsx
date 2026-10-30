@@ -1,14 +1,12 @@
 /**
- * Delete this site — 8137:217905 (confirm) → 8137:218168 (typed confirm),
- * the M17 copy over boards 5890:44728 / 5891:44701. Opened from the Danger
+ * Delete this site — 2L9 B8-S17 (238:14765). One step: what happens, then the
+ * site's own name typed to arm the red "Delete site" — the same name the
+ * server checks (`sites.delete`). The site goes offline and can be restored
+ * from Recently deleted for 30 days (`sites.restore`). Opened from the Danger
  * zone and from the owner's Permissions dialog.
  *
- * Step one says what happens: the live address is unpublished now (named when
- * there is one) and the site can be restored from Recently deleted for 30
- * days (`sites.restore`). Its red `Delete site` does not delete — it asks for
- * DELETE; typing it arms the same button, which runs the caller's delete. The
- * server's own check is the site's name (`sites.delete`), which the caller
- * supplies.
+ * It was two steps (8137:217905 → 8137:218168, typing DELETE); the 2L9 board
+ * asks for the name up front.
  *
  * @license BSD-3-Clause
  */
@@ -22,41 +20,25 @@ import {
   LIBRARY_MODAL_TITLE,
 } from "@/editor/media/components/libraryModal";
 
-const WORD = "DELETE";
-
-/** M17: what the delete takes down, and how long it can come back. */
-function deleteSiteLine(liveAddress: string | null | undefined): string {
-  const restore = "You can restore it from Recently deleted for 30 days.";
-  return liveAddress ? `This unpublishes ${liveAddress} now. ${restore}` : `This takes the site offline now. ${restore}`;
-}
-
 export const DeleteSiteModal: React.FC<{
   open: boolean;
   siteName: string;
-  /** The live address the delete unpublishes (`bellacucina.com`), when known. */
-  liveAddress?: string | null;
   onClose: () => void;
   /** Resolves when the site is gone; rejects with the server's message. */
   onDelete: () => Promise<void>;
-}> = ({ open, siteName, liveAddress, onClose, onDelete }) => {
-  const [typing, setTyping] = React.useState(false);
+}> = ({ open, siteName, onClose, onDelete }) => {
   const [typed, setTyped] = React.useState("");
   const [busy, setBusy] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   React.useEffect(() => {
     if (!open) {
-      setTyping(false);
       setTyped("");
       setError(null);
     }
   }, [open]);
-  const armed = typed.trim() === WORD;
+  const armed = typed.trim() === siteName.trim();
 
   const run = async () => {
-    if (!typing) {
-      setTyping(true);
-      return;
-    }
     if (!armed || busy) return;
     setBusy(true);
     setError(null);
@@ -76,25 +58,25 @@ export const DeleteSiteModal: React.FC<{
         <h2 className={LIBRARY_MODAL_TITLE}>{title}</h2>
         <ModalBody className="tw:flex tw:flex-col tw:gap-4">
           <p className={LIBRARY_MODAL_BODY} data-testid="delete-site-line">
-            {deleteSiteLine(liveAddress)}
+            The site goes offline and moves to Recently deleted. You can restore it for 30 days.
           </p>
-          {typing ? (
-            <div className="tw:flex tw:flex-col tw:gap-1">
-              <label htmlFor="delete-site-input" className="tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink)]">
-                Type DELETE to confirm
-              </label>
-              <TextInput
-                id="delete-site-input"
-                value={typed}
-                onChange={(e) => setTyped(e.target.value)}
-                placeholder={WORD}
-                autoComplete="off"
-                spellCheck={false}
-                autoFocus
-                data-testid="delete-site-input"
-              />
-            </div>
-          ) : null}
+          <div className="tw:flex tw:flex-col tw:gap-1">
+            <label htmlFor="delete-site-input" className="tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink)]">
+              Type {siteName} to confirm
+            </label>
+            <TextInput
+              id="delete-site-input"
+              value={typed}
+              onChange={(e) => setTyped(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") void run();
+              }}
+              autoComplete="off"
+              spellCheck={false}
+              autoFocus
+              data-testid="delete-site-input"
+            />
+          </div>
           {error ? (
             <p className="tw:m-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-error-text)]" role="alert">
               {error}
@@ -109,7 +91,7 @@ export const DeleteSiteModal: React.FC<{
             size="xs"
             variant="danger"
             className={LIBRARY_MODAL_BTN_DANGER}
-            disabled={(typing && !armed) || busy}
+            disabled={!armed || busy}
             aria-busy={busy || undefined}
             onClick={() => void run()}
             data-testid="delete-site-confirm"

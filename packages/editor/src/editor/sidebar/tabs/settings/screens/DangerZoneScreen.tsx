@@ -10,8 +10,8 @@
  *    card offers `Unarchive site` (`sites.unarchive`, at once).
  *  - **Transfer site** — TransferSiteDialog → `sites.transfer` (the creator
  *    or the workspace OWNER, Q-B5); the toast says who owns it now.
- *  - **Delete site** — DeleteSiteModal (M17) → `sites.delete`; the line names
- *    the live address it unpublishes. The editor then leaves for the
+ *  - **Delete site** — DeleteSiteModal (2L9 B8-S17) → `sites.delete`, armed
+ *    by typing the site's name. The editor then leaves for the
  *    dashboard's Recently deleted, where the site can be restored for 30 days.
  *
  * Every action applies at once (`immediate`). Below OWNER (`readOnly`) the
@@ -364,7 +364,6 @@ export const DangerZoneScreen: React.FC<ScreenProps> = ({
       <DeleteSiteModal
         open={dialog === "delete"}
         siteName={siteName}
-        liveAddress={site.liveAddress}
         onClose={() => setDialog(null)}
         onDelete={remove}
       />

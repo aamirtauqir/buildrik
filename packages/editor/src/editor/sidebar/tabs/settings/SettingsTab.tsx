@@ -102,6 +102,7 @@ import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { EVENTS } from "@/shared/constants/events";
 import { roleAtLeast } from "@/services/RoleService";
 import { useEditorRole } from "@/editor/shell/hooks/useEditorRole";
+import { fetchMyRole } from "@/services/RoleService";
 
 import "./settings.css";
 
@@ -729,6 +730,18 @@ export const SettingsTab: React.FC<
      links — no centred LockedScreen, no header Upgrade. */
   const ownsLock = locked && isSettingsScreenId(currentScreen) && SCREENS_WITH_OWN_PLAN_LOCK.has(currentScreen);
   const editorRole = useEditorRole();
+  /* 2L9 B8-SH09 (245:50045): until the role lookup has answered, a draft may
+     be made but Save waits — "Checking your access… · Save unavailable". The
+     lookup is RoleService's one cached request; this only learns when it is
+     done (useEditorRole's null means "unknown" as well as "not yet"). */
+  const [roleSettled, setRoleSettled] = React.useState(false);
+  React.useEffect(() => {
+    let live = true;
+    void fetchMyRole().then(() => live && setRoleSettled(true));
+    return () => {
+      live = false;
+    };
+  }, []);
   /* PD-1 (M7): Site columns are the dashboard's, mirrored from the editor only
      for an ADMIN. Below ADMIN (a KNOWN role — unknown stays editable, the
      server decides) the fields that edit them are read-only and say why; the
@@ -834,6 +847,8 @@ export const SettingsTab: React.FC<
   const footStatus: { text: string; tone: "muted" | "ink" | "danger" } =
     !online && loadState === "ready"
       ? { text: OFFLINE_BANNER_SCREENS.has(currentScreen) ? "Needs a connection · changes stay here, unsaved" : "Needs a connection — your edits stay on this screen, unsaved", tone: "ink" }
+      : !roleSettled && loadState === "ready"
+      ? { text: "Checking your access… · Save unavailable", tone: "muted" }
       : saving
       /* GAP-ST-PS 277:41957. */
       ? { text: savingForPublish ? `Saving ${headTitle} before opening Publish…` : "Saving settings…", tone: "muted" }
@@ -1160,7 +1175,7 @@ export const SettingsTab: React.FC<
               type="button"
               size="xs"
               className={`${SET_BTN} tw:px-6`}
-              disabled={!online || loadState !== "ready" || saving || clientFieldErrors !== null || (!screenIsDirty && !saveError)}
+              disabled={!online || !roleSettled || loadState !== "ready" || saving || clientFieldErrors !== null || (!screenIsDirty && !saveError)}
               onClick={() => handleSave()}
               data-testid="set-foot-save"
             >

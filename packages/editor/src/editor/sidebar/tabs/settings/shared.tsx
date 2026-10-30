@@ -454,11 +454,12 @@ export const SaveErrorBanner: React.FC<{ message: string }> = ({ message }) => (
 // member's role. The shell renders it above the disabled screen.
 // ─────────────────────────────────────────────────────────────────────────────
 
-/* 8134:212323: the accent tint, 16 in, 12 down, a 4 radius, 13/20 ink. */
+/* 2L9 B8-S19 (238:15344): one grey line the cards' width, 13/20 ink — not
+   the accent-tinted block of 8134:212323. */
 export const ReadOnlyBanner: React.FC<{ message: string }> = ({ message }) => (
   <div
     role="status"
-    className="tw:shrink-0 tw:rounded-[var(--bk-radius-sm)] tw:bg-[var(--bk-accent-tint)] tw:px-4 tw:py-3 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]"
+    className="tw:w-full tw:max-w-180 tw:shrink-0 tw:rounded-[var(--bk-radius-sm)] tw:bg-[var(--bk-bg-subtle)] tw:px-3 tw:py-1 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]"
     data-testid="set-readonly"
   >
     {message}

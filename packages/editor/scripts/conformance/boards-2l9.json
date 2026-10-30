@@ -10047,9 +10047,9 @@
    "page": "05",
    "family": "assets",
    "status": "active",
-   "authority": "board",
+   "authority": "code:desktop-shell-no-compact",
    "verified": "drift-open",
-   "verifiedNote": "No compact “Assets navigation” drawer at 1280×640",
+   "verifiedNote": "L-C 2026-10-31 triage: owner decision — no compact 1280 shell, so no collapsed Assets navigation. | No compact “Assets navigation” drawer at 1280×640",
    "tier": "P2"
   },
   {
@@ -10058,9 +10058,9 @@
    "page": "05",
    "family": "assets",
    "status": "active",
-   "authority": "board",
+   "authority": "code:desktop-shell-no-compact",
    "verified": "drift-open",
-   "verifiedNote": "No compact “Assets navigation” drawer at 1280×640",
+   "verifiedNote": "L-C 2026-10-31 triage: owner decision — no compact 1280 shell, so no compact Assets navigation drawer. | No compact “Assets navigation” drawer at 1280×640",
    "tier": "P2"
   },
   {
@@ -14310,9 +14310,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/review/ReviewTab.tsx:141 — L-F. Status line/page groups/Locate exist; round card, Client/Team/All, Next ›, audience picker dif…",
+   "authority": "blocked:server-review-round-facts",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-C 2026-10-31 probe-compared (review-panel-older-round / -detached-present, 280 drawer) vs shots/237-8258.png: header 'Review' over '{site} · Round {n}'; a bg-subtle round card ('◐ {state} · {name} ({email})', 'Sent {d Mon}', 'Copy link ⧉' while the client link lives); '{n} open · {m} resolved' then Client | Team | All (All tinted) and Next ›; '— Home —' page marks; rows '① Lena (client) · Logo · 2m' / quote / 'Locate ›  ✓ Resolve' (+ Copy link, kept); composer one line 'Team only ▾' · 'Comment on Home…' · Send. Left: the card's 'Opened · … · 2 h ago' and '· link works until …' need the reviewer's last visit and the link expiry (REQUESTS G-10); in the 280 drawer the counts wrap above the filters (the board's column is 360).",
    "tier": "P2"
   },
   {
@@ -14321,9 +14321,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:server-review-link-expiry",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/review/ReviewTab.tsx:141 — L-F. Status line/page groups/Locate exist; round card, Client/Team/All, Next ›, audience picker dif…",
+   "verifiedNote": "L-C 2026-10-31: '◌ Link expired · {name} can no longer open it' / 'Sent … · expired …' / Re-send needs currentRound to say the link expired and when (REQUESTS G-10) — the editor cannot tell an expired link from a token withheld from a non-admin. | sidebar/tabs/review/ReviewTab.tsx:141 — L-F. Status line/page groups/Locate exist; round card, Client/Team/All, Next ›, audience picker dif…",
    "tier": "P2"
   },
   {
@@ -14332,9 +14332,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "open:canvas-located-band",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/review/ReviewTab.tsx:141 — L-F. Status line/page groups/Locate exist; round card, Client/Team/All, Next ›, audience picker dif…",
+   "verifiedNote": "L-C 2026-10-31: the board puts the located comment in a canvas band ('① “…” · Logo on Home  ‹ Back to Review') with Review closed and the Inspector open; Review still tops itself with 'Comment located'. Canvas/shell chrome — REQUESTS G-12. | sidebar/tabs/review/ReviewTab.tsx:141 — L-F. Status line/page groups/Locate exist; round card, Client/Team/All, Next ›, audience picker dif…",
    "tier": "P2"
   },
   {
@@ -14343,9 +14343,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:server-client-visible-reply",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/review/ReviewTab.tsx:141 — L-F. Status line/page groups/Locate exist; round card, Client/Team/All, Next ›, audience picker dif…",
+   "verifiedNote": "L-C 2026-10-31: 'To Lena ▾' / 'Lena will see this reply.' needs replies the client page lists (REQUESTS G-11); the composer's audience select has its one honest choice, 'Team only'. | sidebar/tabs/review/ReviewTab.tsx:141 — L-F. Status line/page groups/Locate exist; round card, Client/Team/All, Next ›, audience picker dif…",
    "tier": "P2"
   },
   {
@@ -14354,9 +14354,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/review/ReviewTab.tsx:141 — L-F. Status line/page groups/Locate exist; round card, Client/Team/All, Next ›, audience picker dif…",
+   "authority": "blocked:server-review-round-facts",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-C 2026-10-31 probe-compared (review-panel-detached-present&status=CHANGES_REQUESTED) vs shots/237-10534.png: under the composer, 'Send Round {n+1} to {name}' (primary; asks first — the re-send confirm) beside '{resolved} of {total} resolved'; card reads '◐ Changes requested · {name} ({email})'. The card's opened time / link expiry: G-10.",
    "tier": "P2"
   },
   {
@@ -14366,8 +14366,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "no leave guard for an unsent reply",
+   "verified": "drift-open",
+   "verifiedNote": "L-C 2026-10-31 built, unit-tested, not screenshotted: closing Review over an unsent comment asks 'Leave without saving?' — 'Your comment hasn’t been sent. It is kept here if you keep editing.' — Discard changes (outline) · Keep editing (primary); Esc/scrim keep editing. 'comment', not the board's 'reply to Lena': editor comments are team-only (G-11). Only the panel's ✕ is guarded; a rail switch unmounts the panel in the shell.",
    "tier": "P2"
   },
   {
@@ -14376,9 +14376,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "code:cancel-keeps-form",
    "verified": "drift-open",
-   "verifiedNote": "shell/SendForReview.tsx:110 — code silently sends without preview; board stops and asks",
+   "verifiedNote": "L-C 2026-10-31 text-compared vs shots/237-11712.png (ReviewSentModal state preview-failed, f647cd0f9): title, 'Your client would see no pages. Nothing was sent.', Send without preview · Try again match. Code adds Cancel and 'Your email and note are kept.' — the send stopped and Cancel returns to the form with what was typed (SendForReview test). Not screenshotted.",
    "tier": "P2"
   },
   {
@@ -14422,7 +14422,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "packages/dashboard/app/review/[token]/review-client.tsx:478 — notes + approve exist; no pins, anchored composer, device switch, 6-digit cod…",
+   "verifiedNote": "L-C 2026-10-31 unit-level (offline-note.test.tsx): the client page says 'You’re offline — your comment is kept.' while the browser is offline (above the snapshot, and in the notes view, where Add note waits for the connection; the draft never clears). Not compared — the page needs a live token. Pins, device switch and the comments list are G-1/G-2.",
    "tier": "P2"
   },
   {
@@ -14596,9 +14596,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "open:publish-from-settings-consequence",
    "verified": "no",
-   "verifiedNote": "no turn-off-and-publish consequence confirm",
+   "verifiedNote": "L-C 2026-10-31 triaged: 'Turn off protection and publish now?' / 'Your site becomes public when this publish finishes.' / Cancel · Turn off and publish belongs to publishing from Site settings (the PublishTray side of REQUESTS G-3, L-A); Access has no publish door of its own.",
    "tier": "P2"
   },
   {
@@ -14653,7 +14653,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/DangerZoneScreen.tsx:104 — archive/transfer/delete + typed delete exist (DeleteSiteModal); copy differs",
+   "verifiedNote": "L-C 2026-10-31 built to the board, unit-tested (DangerZoneScreen, PermissionsHost), not screenshotted (the probe's Danger zone needs sites.get): one step — 'Delete {site}?', 'The site goes offline and moves to Recently deleted. You can restore it for 30 days.', 'Type {site} to confirm', Cancel · Delete site (disabled until the name matches; the server checks the same name). Was two steps typing DELETE (8137:217905 → 218168).",
    "tier": "P2"
   },
   {
@@ -14662,9 +14662,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "code:slug-pinned-after-deploy",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/components/SlugChangeDialog.tsx:41 — title + \"Change URL\" match; body copy differs",
+   "verifiedNote": "L-C 2026-10-31 text-compared vs shots/238-15056.png: title 'Change the site URL?', Cancel · Change URL match; the body stays the code's — after a deploy the Vercel project keeps the old slug (SA-06), so 'links … stop working' is false (SlugChangeDialog header). | sidebar/tabs/settings/components/SlugChangeDialog.tsx:41 — title + \"Change URL\" match; body copy differs",
    "tier": "P2"
   },
   {
@@ -14674,8 +14674,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Wave 3: the Domains read-only banner now reads the board's 'Domains need Admin access. Ask an admin to change them.' (other screens keep 'Changing <Screen> needs <Role> access.'); not probe-rendered — the read-only state needs an Editor role the probe composer cannot carry.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-C 2026-10-31 probe-compared (settings-tab&screen=domains&role=EDITOR) vs shots/238-15344.png: the read-only line is one grey 13/20 line the cards' width (ReadOnlyBanner, all read-only screens; was an accent-tinted block), the Domains card lists the domains with no Make primary / + Add domain. Kept: Manage DNS and the waiting domain's DNS card — the read doors to a domain's records (owner 2026-10-04). | Wave 3: the Domains read-only banner now reads the board's 'Domains need Admin access. Ask an admin to change them.' (other screens keep 'Changing <Screen> needs <Role> access.'); not probe-rendered — the read-only state needs an Editor role the probe composer cannot carry.",
    "tier": "P2"
   },
   {
@@ -14962,8 +14962,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "no \"Checking your access… · Save unavailable\" footer state",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-C 2026-10-31 probe-compared (settings-tab&screen=headers&role=hang — new: the role lookup never answers) vs shots/245-50045.png: the screen stays editable, the footer reads 'Checking your access… · Save unavailable' and Save settings is disabled until RoleService's lookup has answered.",
    "tier": "P2"
   },
   {
@@ -15030,7 +15030,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/SettingsTab.tsx:988 — \"Back to canvas\" vs \"‹ Back to Editor · Home\"; phase1 shell",
+   "verifiedNote": "L-C 2026-10-31 triaged: '‹ Back to Editor · {page}' is built (B8-S02). This board is the editor after the return — the same page and selection kept — which is the shell's settings route, not reachable in the probe; for the lead's live walk.",
    "tier": "P2"
   },
   {
@@ -16531,8 +16531,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/LocalizationScreen.tsx:65 — staged-default save/ack/failure + Français Undo states differ",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-C 2026-10-31 probe-compared (settings-tab&screen=localization, remove de-DE) vs shots/277-25943.png: footer 'Saved default: {default} · {X} remains removed', note 'Only the default language is staged. {X} was removed immediately. Saving or discarding the default will not restore it. Publishing currently emits the default locale only.' (probe locale codes print as EN-US / DE-DE).",
    "tier": "P3"
   },
   {
@@ -16543,7 +16543,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/LocalizationScreen.tsx:65 — staged-default save/ack/failure + Français Undo states differ",
+   "verifiedNote": "L-C 2026-10-31 built, unit-tested (LocalizationScreen L05), not screenshotted: after Undo the row reads 'Restored · {pages}', footer 'Unsaved default: {D} · {X} restored immediately', note 'Default language changes are staged. {X} was restored immediately. …' and 'Undo restored only {X}. It did not change the staged {D} default.' The staged default's Remove stays enabled (removing it puts the select back on the saved one — an existing behaviour the board greys).",
    "tier": "P3"
   },
   {
