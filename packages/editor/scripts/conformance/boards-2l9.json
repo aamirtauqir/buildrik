@@ -9119,9 +9119,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "board",
+   "authority": "code:desktop-shell-no-compact",
    "verified": "no",
-   "verifiedNote": "Narrow canvas: record controls live in View popover; no record controls in code",
+   "verifiedNote": "Round 32 (coordinator): the 1280×640 compact shell, where the record bar folds into a View popover, is not built — the same call as the other 1280 boards (code:desktop-shell-no-compact). At 1280 the record bar stays under the canvas bar (173:12022).",
    "tier": "P1"
   },
   {
