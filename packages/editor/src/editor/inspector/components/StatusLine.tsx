@@ -3,7 +3,7 @@
  * (DD-18, Q4). Replaced LockedBanner.
  *   locked   → "Editing unavailable" · "This element is locked. Inspecting
  *              it through Layers keeps its values visible." · a full-width
- *              primary "Unlock" (2L9 S22 255:92819, at the head of the tab
+ *              primary "Unlock {name}" (2L9 S22 255:92819 / 147:78110, at the head of the tab
  *              body; the shared `unlock-element` command, one undo step);
  *              an ancestor's lock → "Locked by {layer}" · "Show {layer} in
  *              Layers" (147:77668 — it is unlocked there);
@@ -82,11 +82,11 @@ export function StatusLine({ composer, elementId, locked, conflict }: StatusLine
         <Button
           size="xs"
           data-testid="inspector-unlock"
-          aria-label={`Unlock ${name}`}
           className={`${WIDE_BUTTON} tw:text-white!`}
           onClick={() => void composer?.commands.run("unlock-element", { elementId })}
         >
-          Unlock
+          {/* 147:78110: the action names the layer it unlocks. */}
+          Unlock {name}
         </Button>
       </div>
     );

@@ -95,3 +95,12 @@ describe("Video (native)", () => {
     expect(screen.queryByTestId("inspector-autoplay-warning")).toBeNull();
   });
 });
+
+describe("SVG — 2L9 B69/03 (249:72047)", () => {
+  it("its own attributes sit with the source: ViewBox, Role, Labelled by", () => {
+    const { el, container } = renderBlock({ id: "s", type: "svg", tagName: "svg", attributes: { viewBox: "0 0 24 24" } });
+    expect(rowLabels(container)).toEqual(expect.arrayContaining(["ViewBox", "Role", "Labelled by"]));
+    fireEvent.change(screen.getByLabelText("Labelled by"), { target: { value: "icon-title" } });
+    expect(el().getAttribute("aria-labelledby")).toBe("icon-title");
+  });
+});

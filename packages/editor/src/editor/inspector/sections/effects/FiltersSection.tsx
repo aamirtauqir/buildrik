@@ -11,7 +11,7 @@
  */
 
 import * as React from "react";
-import { AuthoredValue, countWord, RangeSlider, Section } from "@/editor/inspector/shared/controls";
+import { AuthoredValue, countWord, InputWithUnit, RangeSlider, Section } from "@/editor/inspector/shared/controls";
 import type { BaseStyleSectionProps } from "../registry/_shared";
 import type { Composer } from "@/engine";
 import { useToast } from "@/editor/chrome-ui";
@@ -94,7 +94,19 @@ export const FiltersSection: React.FC<BaseStyleSectionProps> = ({ styles, onChan
         <CustomFilter filter={filter ?? ""} onChange={onChange} composer={composer} />
       ) : (
         <div className="tw:relative">
-          {FILTERS.map((f) => (
+          {/* 2L9 36:2: Blur is a number field with its unit; the percentage
+              filters are sliders with a value box. */}
+          <InputWithUnit
+            label="Blur"
+            property="filter"
+            units={["px"]}
+            value={`${readFilter(parseFunction(filter, "blur", "0px"), "px")}px`}
+            onChange={(v) => {
+              const n = parseFloat(v);
+              if (Number.isFinite(n)) onChange("filter", composeFilter(filter, "blur", `${Math.max(0, n)}px`));
+            }}
+          />
+          {FILTERS.filter((f) => f.fn !== "blur").map((f) => (
             <RangeSlider
               key={f.fn}
               label={f.label}

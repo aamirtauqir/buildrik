@@ -158,10 +158,32 @@ const ICON_ROWS: readonly PropertyConfig[] = [
   { id: "aria-label", label: "Accessible name", type: "text", placeholder: "Decorative" },
 ];
 
-/** SVG: its source row. Icon: the icon picker door and its size / stroke. */
+/* 2L9 B69/03 (249:72047): an SVG's own attributes live with its source —
+   ViewBox, Role and Labelled by (moved from Semantics' native attributes). */
+const SVG_ROWS: readonly PropertyConfig[] = [
+  { id: "viewBox", label: "ViewBox", type: "text", placeholder: "0 0 24 24" },
+  {
+    id: "role",
+    label: "Role",
+    type: "select",
+    options: [
+      { value: "img", label: "img" },
+      { value: "presentation", label: "presentation" },
+    ],
+  },
+  { id: "aria-labelledby", label: "Labelled by", type: "text", placeholder: "An element id" },
+];
+
+/** SVG: its source and attributes. Icon: the icon picker door and its size / stroke. */
 const Svg: React.FC<TypeBlockBodyProps> = (p) => {
   const { composer, element, onOpenIconPicker } = p;
-  if (element.type !== "icon") return <Source {...p} />;
+  if (element.type !== "icon")
+    return (
+      <>
+        <Source {...p} />
+        <PropertyRows composer={composer} element={element} targetIds={p.targetIds} rows={SVG_ROWS} />
+      </>
+    );
   const choose = (icon: IconConfig) => {
     if (!composer) return;
     /* P-1: the lock gate — a locked icon keeps its glyph. */
