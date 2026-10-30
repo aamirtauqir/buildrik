@@ -5569,8 +5569,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Progress Value/Maximum single-target only (sections/typeBlock/bodies/widgetBodies.tsx:176)",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 23, probe ?block=progress&also=1 with the bars at 20 / 80 (real values), Maximum 50 + Enter, side by side with shots/247-28584.png: Value Mixed, Maximum draft '50' outlined red, 'Maximum must be at least 80; lower those values first.', 'Neither bar changed. Their individual values remain 20 and 80.', primary 'Use maximum 80' (the smallest maximum every bar accepts — the board's 90 is sample data), 'Revert draft'. No bar is written and no history step is made until a valid maximum. Match (the probe also draws the batch bar and Show label above / below).",
    "tier": "P1"
   },
   {
@@ -5590,9 +5590,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
+   "authority": "open:align-distribute-home",
    "verified": "no",
-   "verifiedNote": "No zero-property no-op disclosure",
+   "verifiedNote": "L-B round 23: not built. The board puts 'Align and distribute' (Reference · flow-layout refusal 'Alignment cannot change them to absolute positioning', Inspect parent layout) and a zero-property Apply style no-op on the Style tab of a multi-selection; today Align / Distribute live in the multi-select bar above the tabs, whose home is the open owner decision align-distribute-home (sub-plan code-ahead table). Built once that is decided.",
    "tier": "P1"
   },
   {
@@ -5879,8 +5879,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No per-target maxima batch write/Undo result",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 23, probe: Maximum 90 on the two bars → toast 'Maximum set to 90 on 2 bars. · Undo' (B03) → Undo (the batch's one history step, captureUndo), side by side with shots/251-77000.png: Maximum back to 100, 'Applied to 2' · 'Both original maxima are 100. Each original Value remains 20 and 80.', toast 'Original maxima restored.' Match. Differing originals read 'Original maxima: 100 and 120.'",
    "inheritsFrom": "247:29083",
    "tier": "P1"
   },

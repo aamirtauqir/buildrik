@@ -29,6 +29,9 @@ import { InputRow, InputWithUnit, SelectRow } from "@/editor/inspector/shared/co
 import { runTxn, writeAttribute } from "../attributeWriter";
 import { Note, useElementVersion } from "./bodyRows";
 import { CheckRow } from "@/editor/inspector/shared/controls/CheckRow";
+import { Button, useToast } from "@/editor/chrome-ui";
+import { WIDE_BUTTON } from "@/editor/inspector/shared/controls/controlClasses";
+import { CommitRow } from "@/editor/inspector/sections/behaviourRows";
 
 function useElement(p: TypeBlockBodyProps): Element | undefined {
   useElementVersion(p.composer);
@@ -164,46 +167,111 @@ const BATCH_NOTE: Record<"value" | "max" | "label", string> = {
   label: "Only Show label changed.",
 };
 
+const FIELD_NAME = { value: "Value", max: "Maximum" } as const;
+
+/** "20 and 80", "20, 40 and 80". */
+const listOf = (xs: readonly string[]): string => (xs.length <= 1 ? (xs[0] ?? "") : `${xs.slice(0, -1).join(", ")} and ${xs[xs.length - 1]}`);
+
+/** B06: what Undo put back, in the bars' own numbers. */
+function restoredNote(field: "value" | "max", before: readonly { value: string; max: string }[]): string {
+  const own = before.map((r) => (field === "max" ? r.max : r.value));
+  const other = before.map((r) => (field === "max" ? r.value || "0" : r.max));
+  const kept = field === "max" ? "Value" : "Maximum";
+  const head =
+    own.every((x) => x === own[0]) ? `${own.length === 2 ? "Both" : "All"} original ${field === "max" ? "maxima" : "values"} are ${own[0]}.` : `Original ${field === "max" ? "maxima" : "values"}: ${listOf(own)}.`;
+  return `${head} Each original ${kept} remains ${listOf(other)}.`;
+}
+
+type Applied = { key: string; count: number; note: string };
+
 const Progress: React.FC<TypeBlockBodyProps> = (p) => {
   const el = useElement(p);
   const composer = p.composer;
+  const { addToast } = useToast();
   const all = p.targetIds.map((id) => composer?.elements.getElement(id)).filter((e): e is Element => !!e);
   const read = all.length > 0 ? all.map((e) => readProgress(e)) : [readProgress(el)];
   const value = agreed(read.map((r) => r.value));
   const max = agreed(read.map((r) => r.max));
   const { showLabel } = read[0];
-  const [applied, setApplied] = React.useState<{ key: string; count: number; field: keyof typeof BATCH_NOTE } | null>(null);
+  const [applied, setApplied] = React.useState<Applied | null>(null);
+  /* B02: a Maximum below some bar's Value refuses the WHOLE operation and
+     keeps the draft, with the smallest maximum every bar accepts. */
+  const [refused, setRefused] = React.useState<{ key: string; draft: string; floor: number; values: string[] } | null>(null);
+  const draftId = React.useId();
   const selectionKey = p.targetIds.join(",");
-  const run = (field: keyof typeof BATCH_NOTE, fn: (composer: Composer, target: Element) => void) => {
+  const run = (field: "value" | "max" | "label", fn: (composer: Composer, target: Element) => void, shown?: string) => {
     if (!composer) return;
     const targets = writableElements(composer, p.targetIds.map((id) => composer.elements.getElement(id)));
     if (targets.length === 0) return;
+    const before = targets.map((t) => readProgress(t));
     runTxn(composer, "progress-change", () => {
       for (const target of targets) fn(composer, target);
     });
-    setApplied(targets.length > 1 ? { key: selectionKey, count: targets.length, field } : null);
+    setRefused(null);
+    if (targets.length < 2) return setApplied(null);
+    setApplied({ key: selectionKey, count: targets.length, note: BATCH_NOTE[field] });
+    if (field === "label" || shown === undefined) return;
+    /* B03 → B06: the receipt's Undo is the batch's one history step; after it
+       the panel says what came back. */
+    const undo = composer.history.captureUndo();
+    addToast({
+      description: `${FIELD_NAME[field]} set to ${shown} on ${targets.length} bars.`,
+      action: {
+        label: "Undo",
+        onClick: () => {
+          undo();
+          setApplied({ key: selectionKey, count: targets.length, note: restoredNote(field, before) });
+          addToast({ description: `Original ${field === "max" ? "maxima" : "values"} restored.` });
+        },
+      },
+    });
   };
   /* Each bar keeps its own other half: a Value typed across three bars
      leaves each one's Maximum (and so its percentage) its own. */
   const setValue = (next: string) => {
     if (next === "" || Number(next) < 0) return;
-    run("value", (c, t) => writeProgress(c, t, next, readProgress(t).max));
+    run("value", (c, t) => writeProgress(c, t, next, readProgress(t).max), next);
   };
   const setMax = (next: string) => {
     if (!(Number(next) > 0)) return;
-    run("max", (c, t) => writeProgress(c, t, readProgress(t).value || "0", next));
+    const values = read.map((r) => r.value || "0");
+    const floor = Math.max(...values.map(Number).filter(Number.isFinite));
+    if (Number(next) < floor) {
+      setRefused({ key: selectionKey, draft: next, floor, values });
+      return;
+    }
+    run("max", (c, t) => writeProgress(c, t, readProgress(t).value || "0", next), next);
   };
   const note = applied?.key === selectionKey ? applied : null;
+  const draft = refused?.key === selectionKey ? refused : null;
   return (
     <>
       {/* Board 12 draws both as number fields with a stepper and no unit. */}
       <InputWithUnit label="Value" noUnit value={value.value} mixed={value.mixed} placeholder="0" onChange={setValue} />
-      <InputWithUnit label="Maximum" noUnit value={max.value} mixed={max.mixed} placeholder="100" onChange={setMax} />
+      {draft ? (
+        <>
+          <CommitRow label="Maximum" value={draft.draft} onCommit={setMax} error={{ id: draftId }} testId="inspector-progress-max-draft" />
+          <div id={draftId} role="alert" data-testid="inspector-progress-refused">
+            <Note>Maximum must be at least {draft.floor}; lower those values first.</Note>
+            <Note>
+              {draft.values.length > 1 ? `Neither bar changed. Their individual values remain ${listOf(draft.values)}.` : `Nothing changed. The value remains ${draft.values[0]}.`}
+            </Note>
+          </div>
+          <Button size="xs" className={`${WIDE_BUTTON} tw:text-white!`} onClick={() => setMax(String(draft.floor))} data-testid="inspector-progress-use-floor">
+            Use maximum {draft.floor}
+          </Button>
+          <Button color="light" size="xs" className={WIDE_BUTTON} onClick={() => setRefused(null)} data-testid="inspector-progress-revert-draft">
+            Revert draft
+          </Button>
+        </>
+      ) : (
+        <InputWithUnit label="Maximum" noUnit value={max.value} mixed={max.mixed} placeholder="100" onChange={setMax} />
+      )}
       <CheckRow label="Show label" checked={showLabel} onChange={(on) => run("label", (c, t) => writeLabelShown(c, t, on))} />
-      {note ? (
+      {note && !draft ? (
         <div className="tw:pt-4" role="status" data-testid="inspector-progress-applied">
           <p className="tw:m-0 tw:text-[13px] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]">Applied to {note.count}</p>
-          <Note>{BATCH_NOTE[note.field]}</Note>
+          <Note>{note.note}</Note>
         </div>
       ) : null}
     </>
