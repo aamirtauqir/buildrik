@@ -73,6 +73,7 @@ import { UploadAssetModal } from "@/editor/media/UploadAssetModal";
 import { LibraryManager } from "@/editor/media/LibraryManager";
 import { ImageEditorModal } from "@/editor/media/ImageEditorModal";
 import { ToastProvider, useToast } from "@/editor/chrome-ui";
+import { SiteFontsModal } from "@/editor/media/components/SiteFontsModal";
 import { ContentTab } from "@/editor/sidebar/tabs/content/ContentTab";
 import { CMSCollectionSetupModal } from "@/editor/shell/modals/CMSCollectionSetupModal";
 import { LayersTab } from "@/editor/sidebar/tabs/layers/LayersTab";
@@ -1020,6 +1021,25 @@ function layersComposer(): Composer {
  * so that recipe reaches it with a click and a keypress, entirely through the
  * shipped keyboard path.
  */
+/* 2L9 R03 (247:31533): the one Manage site fonts dialog, one font added. */
+function SiteFontsProbe() {
+  const composer = React.useMemo(() => {
+    const handlers = new Map<string, Array<(d: unknown) => void>>();
+    const assets = [{ id: "f1", type: "font", originalName: "Studio-Sans.woff2", src: "data:,", siteFont: true }];
+    return {
+      on: (ev: string, fn: (d: unknown) => void) => void handlers.set(ev, [...(handlers.get(ev) ?? []), fn]),
+      off: () => {},
+      emit: (ev: string, d: unknown) => handlers.get(ev)?.forEach((fn) => fn(d)),
+      getProjectMetadata: () => ({ name: "Fieldwork Studio" }),
+      media: { getAssets: () => assets, on: () => {}, off: () => {}, updateAsset: async () => {} },
+    };
+  }, []);
+  React.useEffect(() => {
+    composer.emit("ui:site-fonts", {});
+  }, [composer]);
+  return <SiteFontsModal composer={composer as never} />;
+}
+
 function NewPageProbe() {
   const composer = React.useMemo(() => {
     const handlers = new Map<string, Array<(d: unknown) => void>>();
@@ -3246,6 +3266,8 @@ const CASES: Record<string, () => React.ReactElement> = {
       </div>
     );
   },
+  /* 2L9 R03 (247:31533): the one Manage site fonts dialog, one font added. */
+  "site-fonts": () => <SiteFontsProbe />,
   "layers-tree": () => (
     <div data-probe="layers-tree"><LayersProbe /></div>
   ),

@@ -1,7 +1,9 @@
 /**
- * SiteFontsModal — Clone 3686:42317 "Site fonts", with its two swaps
- * 3695:45594 "Font added" and 3695:45606 "No fonts found" (Assets · Clone
- * Phase 5, section 4184:26629).
+ * SiteFontsModal — the one "Manage site fonts" dialog, drawn to 2L9 R03
+ * (247:31533; lead 2026-10-31: one dialog, restyled to that board). Built
+ * from Clone 3686:42317 "Site fonts" and its swap 3695:45606 "No fonts
+ * found"; the Clone's separate "Font added" swap (3695:45594) is now the
+ * card's own "Added to site · Ready to use" state, as R03 draws it.
  *
  * The model it drives is two-step. A font FILE in the library is UPLOADED;
  * `Add font` makes it ADDED (`MediaAsset.siteFont`), and only then does the
@@ -64,14 +66,17 @@ const ACCEPTED_FONT_FILES = `${MEDIA_EXTENSIONS.FONT.slice(0, -1).join(", ")} or
 /** The family the dialog's own sample face for a file registers under. */
 const previewFamily = (assetId: string) => `bk-font-preview-${assetId.replace(/[^a-zA-Z0-9-]/g, "-")}`;
 
-type View = { kind: "list" } | { kind: "added"; family: string } | { kind: "none"; query: string };
+type View = { kind: "list" } | { kind: "none"; query: string };
 
 const CARD =
   "tw:flex tw:flex-col tw:items-start tw:gap-2 tw:rounded-[var(--bk-radius-md)] tw:border tw:border-[var(--bk-border)] tw:p-4 " +
   "tw:data-[highlighted=true]:border-[var(--bk-accent)]";
 const CARD_NAME = "tw:m-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:font-semibold tw:text-[var(--bk-ink)]";
 const CARD_SAMPLE = "tw:m-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-soft)]";
-const CARD_STATE = "tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]";
+const CARD_STATE = "tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)]";
+const FIELD_LABEL = "tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-soft)]";
+const FIELD_VALUE =
+  "tw:m-0 tw:truncate tw:rounded-[var(--bk-radius-sm)] tw:bg-[var(--bk-bg-subtle)] tw:px-2 tw:py-1 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink)]";
 
 interface SiteFontsModalProps {
   composer: Composer;
@@ -148,42 +153,13 @@ export function SiteFontsModal({ composer }: SiteFontsModalProps) {
       )
     : fonts;
 
+  /* 2L9 R03 (247:31533): adding stays on the list — the card itself turns
+     to "Added to site · Ready to use", highlighted. */
   const add = async (font: MediaAsset) => {
     await composer.media.updateAsset(font.id, { siteFont: true });
-    setView({ kind: "added", family: libraryFontFamily(font.originalName) });
+    setHighlightId(font.id);
   };
-
-  if (view.kind === "added") {
-    return (
-      <ModalRoot open={open} onClose={close}>
-        <ModalContent size="table" srTitle="Font added" data-testid="site-fonts-added">
-          <h2 className={LIBRARY_MODAL_TITLE} data-testid="site-fonts-added-title">
-            Font added
-          </h2>
-          <ModalBody>
-            <p className={LIBRARY_MODAL_BODY} data-testid="site-fonts-added-body">
-              Uploaded {view.family} is now available in the font pickers. Existing text is unchanged until you
-              choose this font.
-            </p>
-          </ModalBody>
-          <div className={LIBRARY_MODAL_FOOT} data-testid="site-fonts-added-foot">
-            <Button size="xs" className={LIBRARY_MODAL_BTN_PRIMARY} onClick={close} data-testid="site-fonts-added-done">
-              Done
-            </Button>
-            <Button
-              size="xs"
-              variant="secondary"
-              className={LIBRARY_MODAL_BTN_SECONDARY}
-              onClick={() => setView({ kind: "list" })}
-              data-testid="site-fonts-added-manage"
-            >
-              Manage site fonts
-            </Button>
-          </div>
-        </ModalContent>
-      </ModalRoot>
-    );
-  }
+  const siteName = composer.getProjectMetadata?.()?.name || "this site";
 
   if (view.kind === "none") {
     return (
@@ -226,14 +202,24 @@ export function SiteFontsModal({ composer }: SiteFontsModalProps) {
 
   return (
     <ModalRoot open={open} onClose={close}>
-      <ModalContent size="table" srTitle="Site fonts" data-testid="site-fonts">
+      <ModalContent size="table" srTitle="Manage site fonts" data-testid="site-fonts">
         <h2 className={LIBRARY_MODAL_TITLE} data-testid="site-fonts-title">
-          Site fonts
+          Manage site fonts
         </h2>
         <ModalBody>
           <p className={LIBRARY_MODAL_BODY} data-testid="site-fonts-body">
-            Manage this site&apos;s fonts. Built-in Inter stays available.
+            Add a font to {siteName}. This makes it available without changing any text.
           </p>
+          {/* R03: the actions sit under the line, right-aligned — nothing here
+              is pending, so both close. */}
+          <div className="tw:mt-4 tw:flex tw:justify-end tw:gap-2" data-testid="site-fonts-actions">
+            <Button size="xs" variant="secondary" className={LIBRARY_MODAL_BTN_SECONDARY} onClick={close} data-testid="site-fonts-cancel">
+              Cancel
+            </Button>
+            <Button size="xs" className={LIBRARY_MODAL_BTN_PRIMARY} onClick={close} data-testid="site-fonts-done">
+              Done
+            </Button>
+          </div>
           <TextInput
             type="search"
             value={query}
@@ -277,6 +263,17 @@ export function SiteFontsModal({ composer }: SiteFontsModalProps) {
                     <h4 className={CARD_NAME} data-testid={`site-font-name-${font.id}`}>
                       {libraryFontFamily(font.originalName)} · {font.originalName}
                     </h4>
+                    {/* R03: Family and Source, as read-only fields. */}
+                    <dl className="tw:m-0 tw:grid tw:w-full tw:grid-cols-[68px_minmax(0,1fr)] tw:items-center tw:gap-x-2 tw:gap-y-2">
+                      <dt className={FIELD_LABEL}>Family</dt>
+                      <dd className={FIELD_VALUE} data-testid={`site-font-family-${font.id}`}>
+                        {libraryFontFamily(font.originalName)}
+                      </dd>
+                      <dt className={FIELD_LABEL}>Source</dt>
+                      <dd className={FIELD_VALUE} data-testid={`site-font-source-${font.id}`}>
+                        Uploaded · {font.originalName}
+                      </dd>
+                    </dl>
                     {/* The one computed style CLAUDE.md allows: the family
                         exists only as this file's own face. */}
                     <p
@@ -289,7 +286,7 @@ export function SiteFontsModal({ composer }: SiteFontsModalProps) {
                     {font.siteFont ? (
                       <div className="tw:flex tw:items-center tw:gap-3">
                         <span className={CARD_STATE} data-testid={`site-font-added-${font.id}`}>
-                          Added
+                          Added to site · Ready to use
                         </span>
                         <Button
                           size="xs"
@@ -317,17 +314,9 @@ export function SiteFontsModal({ composer }: SiteFontsModalProps) {
             </ul>
           )}
         </ModalBody>
-        <div className={LIBRARY_MODAL_FOOT} data-testid="site-fonts-foot">
-          <Button
-            size="xs"
-            variant="secondary"
-            className={LIBRARY_MODAL_BTN_SECONDARY}
-            onClick={close}
-            data-testid="site-fonts-cancel"
-          >
-            Cancel
-          </Button>
-        </div>
+        <p className="tw:m-0 tw:px-6 tw:pb-6 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="site-fonts-foot">
+          Existing font assignments stay unchanged. Upload and site membership use Assets permissions.
+        </p>
       </ModalContent>
     </ModalRoot>
   );
