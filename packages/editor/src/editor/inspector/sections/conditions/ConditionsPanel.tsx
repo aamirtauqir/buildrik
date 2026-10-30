@@ -19,6 +19,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
+import { useShowHiddenElements } from "@/editor/canvas/hiddenElementsPref";
 import type { Composer } from "@/engine";
 import { BK_SELECT_BARE_VALUE_THEME, Button, Select, useToast } from "@/editor/chrome-ui";
 import { ChevronDown } from "lucide-react";
@@ -185,6 +186,7 @@ export function ConditionsPanel({ composer, elementId }: { composer: Composer | 
   const { addToast } = useToast();
   const [reviewLegacy, setReviewLegacy] = React.useState(true);
   const rulesRef = React.useRef<HTMLDivElement>(null);
+  const showHidden = useShowHiddenElements();
   const back = () => closeSubview("conditions");
 
   const write = (next: CmsCondition | null, label: string, receipt: string) => {
@@ -334,7 +336,8 @@ export function ConditionsPanel({ composer, elementId }: { composer: Composer | 
                 : `${ruleLabel(failing, state.collection)} ${CMS_CONDITION_OP_LABEL[failing.op]}${failing.value ? ` ${failing.value}` : ""} is false on this record.`}
             </p>
           ) : null}
-          <p className={NOTE}>Hidden on this record — showing as ghost.</p>
+          {/* B5-D34: the ghost only exists while Show hidden elements is on. */}
+          <p className={NOTE}>{showHidden ? "Hidden on this record — showing as ghost." : "Hidden on this record. Enable Show hidden elements to see it on canvas."}</p>
         </div>
       ) : state.passes === true ? (
         <div data-testid="conditions-result">

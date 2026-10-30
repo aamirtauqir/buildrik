@@ -304,6 +304,9 @@ export const CMS_CONDITION_ROW_ATTR = "data-bk-if-row";
 export const CMS_LIST_QUERY_ATTR = "data-bk-query";
 export const CMS_LIST_ITEM_ATTR = "data-bk-item";
 export const CMS_LIST_ROW_ATTR = "data-bk-row";
+/** B-30 (B5-D78): a Collection list's "No items" child — shown only when the
+ *  list has no records, never repeated. */
+export const CMS_LIST_EMPTY_ATTR = "data-bk-empty";
 
 /** What a list hands the per-page pass. */
 export interface CmsPageListQuery {
@@ -311,6 +314,8 @@ export interface CmsPageListQuery {
   skip?: number;
   limit?: number;
   excludeCurrent?: boolean;
+  /** "Hide list" when no record is left (B-30). */
+  whenEmpty?: "hide";
 }
 
 const pageListQuerySchema = z.object({
@@ -318,6 +323,7 @@ const pageListQuerySchema = z.object({
   skip: z.number().int().min(0).optional(),
   limit: z.number().int().min(0).optional(),
   excludeCurrent: z.boolean().optional(),
+  whenEmpty: z.literal("hide").optional(),
 });
 
 export const encodeCmsJson = (value: unknown): string => encodeURIComponent(JSON.stringify(value));
@@ -390,5 +396,13 @@ export function applyRecordPass(root: { querySelectorAll(sel: string): ArrayLike
       c.removeAttribute(CMS_LIST_ITEM_ATTR);
       c.removeAttribute(CMS_LIST_ROW_ATTR);
     }
+    /* B-30: the "No items" block shows only when no record is left on this
+       page; "Hide list" drops the list instead. */
+    const left = copies.some((c) => c.parentNode === list);
+    for (const slot of Array.from(list.children).filter((c) => c.hasAttribute(CMS_LIST_EMPTY_ATTR))) {
+      if (left) slot.remove();
+      else slot.removeAttribute(CMS_LIST_EMPTY_ATTR);
+    }
+    if (!left && parsed.success && parsed.data.whenEmpty === "hide") list.remove();
   }
 }

@@ -13,6 +13,7 @@ import { EVENTS } from "@/shared/constants/events";
 import { Button } from "@/editor/chrome-ui";
 import { Section, SelectRow, type SectionTier } from "../shared/controls";
 import { CollectionQueryRows } from "./CollectionQueryRows";
+import { CollectionPagesRows } from "./CollectionPagesRows";
 import { ActionRow } from "./behaviourRows";
 import { canWrite } from "@/engine/commands/commandOperations";
 import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
@@ -100,6 +101,8 @@ export const CollectionListSection: React.FC<CollectionListSectionProps> = ({ el
           </div>
           {/* C-14 (2L9 B5-D76 / D94): Filter, Match, Sort, Show, Skip. */}
           <CollectionQueryRows composer={composer} elementId={elementId} binding={binding} />
+          {/* B-30 (2L9 B5-D75 / D78 / D80): Pages, When empty. */}
+          <CollectionPagesRows composer={composer} elementId={elementId} binding={binding} />
         </>
       ) : null}
     </Section>

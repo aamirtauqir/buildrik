@@ -92,9 +92,10 @@ export function SessionEditsPopover({
         <div className="tw:flex tw:min-w-0 tw:flex-1 tw:items-center tw:gap-2">
           <Button
             type="button"
-            variant="secondary"
+            variant="ghost"
             size="xs"
-            className="tw:h-7 tw:px-3 tw:text-[length:var(--bk-text-13)] tw:font-medium tw:leading-5 tw:text-[var(--bk-gray-700)]"
+            /* 2L9 B6-B01: a plain text action beside the outlined Restore points. */
+            className="tw:h-7 tw:border-transparent tw:bg-transparent tw:px-3 tw:text-[length:var(--bk-text-13)] tw:font-medium tw:leading-5 tw:text-[var(--bk-gray-700)]"
             onClick={() => setOpen((v) => !v)}
             disabled={disabled}
             data-testid="brand-session-edits"

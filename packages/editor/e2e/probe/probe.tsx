@@ -23,6 +23,8 @@ import { RecordLeaveDialog, type RecordLeavePhase } from "@/editor/cms/RecordLea
 import { RichTextEditor } from "@/editor/panels/RichTextEditor";
 import { CreateComponentModal } from "@/editor/shell/modals/CreateComponentModal";
 import * as React from "react";
+import { BrandWorkspace } from "@/editor/design-system/ui/BrandWorkspace";
+import { TokenRegistryProvider } from "@/editor/design-system/state/TokenRegistryContext";
 import { createRoot } from "react-dom/client";
 // fonts.css before default.css, and imported here rather than from default.css
 // — see the note at the top of themes/default.css. Without it this probe has no
@@ -2933,6 +2935,27 @@ const CASES: Record<string, () => React.ReactElement> = {
       <ToastProvider>
         <div data-probe="create-component">
           <CreateComponentModal isOpen onClose={() => {}} composer={c} elementId={el.getId()} />
+        </div>
+      </ToastProvider>
+    );
+  },
+  /* The whole Brand workspace at 1440 × 812 (B6 boards, L-B round 28):
+     `?page=<id>` lands on that Brand page (as `initialPage`); the composer
+     holds a Home page with a heading and a paragraph for the preview. */
+  "brand-workspace": () => {
+    const q = new URLSearchParams(location.search);
+    const c = new Composer({} as never);
+    const page = c.elements.createPage("Home");
+    c.elements.setActivePage(page.id);
+    c.elements.addElement(c.elements.createElement("heading", { tagName: "h1", content: "Thoughtful work. Lasting impact." }), page.root.id);
+    c.elements.addElement(c.elements.createElement("text", { tagName: "p", content: "We bring clarity to complex ideas through design and careful craft." }), page.root.id);
+    Object.assign(window, { probeComposer: c });
+    return (
+      <ToastProvider>
+        <div data-probe="brand-workspace" className="tw:flex tw:h-[812px] tw:w-[1440px] tw:bg-white">
+          <TokenRegistryProvider composer={c}>
+            <BrandWorkspace composer={c} projectId="probe" initialPage={q.get("page") ?? undefined} onClose={() => undefined} />
+          </TokenRegistryProvider>
         </div>
       </ToastProvider>
     );

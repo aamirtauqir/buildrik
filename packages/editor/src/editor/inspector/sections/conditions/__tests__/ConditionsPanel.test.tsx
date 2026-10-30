@@ -13,6 +13,7 @@ import { ToastProvider } from "@/editor/chrome-ui";
 import type { CmsCondition } from "@buildrik/shared/schemas/cmsConditions";
 import { ConditionsPanel, conditionsSummary } from "../ConditionsPanel";
 import { convertLegacyCondition } from "../useConditions";
+import { setShowHiddenElements } from "@/editor/canvas/hiddenElementsPref";
 
 afterEach(cleanup);
 
@@ -105,6 +106,17 @@ describe("Conditions", () => {
     expect(screen.queryByTestId("conditions-result")).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "Choose field" }));
     expect(document.activeElement).toBe(screen.getByLabelText("Field"));
+  });
+
+  it("B5-D34: with Show hidden elements off, the false result says how to see it", async () => {
+    setShowHiddenElements(false);
+    try {
+      const { composer } = makeComposer({ condition: { match: "all", rules: [{ field: "sunday", op: "set" }] } });
+      mount(composer);
+      await waitFor(() => expect(screen.getByTestId("conditions-result")).toHaveTextContent("Hidden on this record. Enable Show hidden elements to see it on canvas."));
+    } finally {
+      setShowHiddenElements(true);
+    }
   });
 
   it("D10: removing the last rule removes the condition, with its receipt", () => {

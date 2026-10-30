@@ -8,6 +8,7 @@
  */
 
 import * as React from "react";
+import { SectionErrorBoundary } from "@/editor/inspector/components/SectionErrorBoundary";
 import type { Composer } from "@/engine";
 import type {
   IconConfig,
@@ -317,7 +318,12 @@ export function defineSection<P extends object>(
           ? { ...ctx, styles: pickKeys(ctx.styles, entry.styleKeys) as Record<string, string> }
           : ctx;
       const props = adaptProps(slicedCtx);
-      return <Component {...props} />;
+      /* 2L9 B4-S05: a section that throws is replaced by its own notice. */
+      return (
+        <SectionErrorBoundary title={meta.title} resetKey={ctx.selectedElement.id}>
+          <Component {...props} />
+        </SectionErrorBoundary>
+      );
     },
   };
 }
