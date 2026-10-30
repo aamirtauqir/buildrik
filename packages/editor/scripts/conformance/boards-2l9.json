@@ -1959,8 +1959,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "probe-compared 2026-10-31 (case pages-trash, 1440×900, ⋯ › Recently deleted; board shots/142-61796.png): menu rows match ('About' 13/600 ink, red 'Delete permanently…', 'Close menu'), but it opens right of More (x257) over the drawer; the board sets it outside the drawer (x345).",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-31 (case pages-trash, ⋯ › Recently deleted › More; board shots/142-61796.png): the menu opens outside the drawer, 5px clear of it (menu x353 inside a panel at the drawer edge +5; board 345) and level with the row's URL line (y169 = row top +41; board +42); 'About' 13/600 ink, red 'Delete permanently…', 'Close menu'. Popover beside + besideSide=\"right\".",
    "inheritsFrom": "63:20001",
    "tier": "P1"
   },
@@ -1972,8 +1972,9 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Return frames of the trash flow; origin restore depends on trash",
-   "tier": "P3"
+   "verifiedNote": "Round 31: the trash flow's return frame is the editor it returns to — Layers drawer, Hero / Text selected, inspector Style (Placement, Typography …), bottom bar — the same state as J-F1.04 7:19791 (Select Text in Layers), whose remaining drift is the inspector (7:18654 → L-B). The trash itself is built (A-21). Closes with that archetype.",
+   "tier": "P3",
+   "inheritsFrom": "7:19791"
   },
   {
    "nodeId": "142:63098",

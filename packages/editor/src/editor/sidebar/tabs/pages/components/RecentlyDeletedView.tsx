@@ -135,7 +135,9 @@ export function RecentlyDeletedView({ composer, siteId, canPurge, onBack, onRest
             return (
               <div key={page.id} className="tw:rounded-md tw:bg-[var(--bk-gray-100)] tw:p-2" data-testid="pages-trash-row">
                 <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:font-semibold tw:text-[var(--bk-ink)]">{page.name}</p>
-                <p className={`${NOTE} tw:mt-1`}>{meta.where}</p>
+                <p className={`${NOTE} tw:mt-1`} data-trash-menu-anchor={menuFor === page.id ? "" : undefined}>
+                  {meta.where}
+                </p>
                 <p className={NOTE}>{meta.who}</p>
                 <div className="tw:mt-2 tw:flex tw:items-center tw:gap-2">
                   <Button
@@ -153,10 +155,12 @@ export function RecentlyDeletedView({ composer, siteId, canPurge, onBack, onRest
                     <Popover
                       open={menuFor === page.id}
                       onClose={() => setMenuFor(null)}
-                      placement="right"
-                      /* Over the canvas, right of the drawer (142:61796): inside
-                         the list's scroll box it was clipped at the drawer edge. */
-                      portal
+                      /* Over the canvas, 5px right of the drawer, level with
+                         the row's URL line (142:61796); inside the list's scroll
+                         box it was clipped at the drawer edge. */
+                      beside='[data-testid="pages-trash"]'
+                      besideSide="right"
+                      besideTop="[data-trash-menu-anchor]"
                       label={`${page.name} actions`}
                       trigger={
                         <Button
