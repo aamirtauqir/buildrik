@@ -52,6 +52,7 @@ export type ElementActionId =
   | "delete"
   | "bind-to-cms"
   | "add-interaction"
+  | "show-in-layers"
   | "replace-with-block";
 
 export interface ElementAction {
@@ -211,6 +212,17 @@ export const ELEMENT_ACTIONS: Record<ElementActionId, ElementAction> = {
       composer.emit(EVENTS.UI_INSPECTOR_FOCUS_SECTION, { section: "interactions" });
     },
   },
+  /* 2L9 S08: the element in the Layers tree, selected. */
+  "show-in-layers": {
+    id: "show-in-layers",
+    label: "Show in Layers",
+    icon: "layers",
+    isVisible: notRoot,
+    run: ({ composer, element }) => {
+      composer.selection.select(element as never);
+      composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "layers" });
+    },
+  },
   "replace-with-block": {
     id: "replace-with-block",
     label: "Replace with block…",
@@ -227,21 +239,30 @@ export const ELEMENT_ACTIONS: Record<ElementActionId, ElementAction> = {
   },
 };
 
-/** The Inspector's ⋯ menu, board 30 — nothing else ("---" is a rule).
- *  Lock and Unlock share a slot: only the one that applies is visible. */
-export const INSPECTOR_MENU: readonly (ElementActionId | "---")[] = [
+/** The Inspector's ⋯ menu (2L9 S08 `255:85835`): one registry, four
+ *  headed groups ("#Name" is a group heading, drawn only above a visible
+ *  row). Lock and Unlock share a slot: only the one that applies shows. */
+export const INSPECTOR_MENU: readonly (ElementActionId | `#${string}`)[] = [
+  "#Clipboard",
   "duplicate",
   "copy-style",
   "paste-style",
-  "apply-style-to-page",
-  "reset-style",
-  "---",
+  "#Structure",
   "save-as-component",
+  "bind-to-cms",
+  "show-in-layers",
+  "#State",
   "lock",
   "unlock",
-  "---",
+  "add-interaction",
+  "apply-style-to-page",
+  "reset-style",
+  "#Delete",
   "delete",
 ];
+
+/** A group heading entry of `INSPECTOR_MENU`, not an action. */
+export const isMenuGroup = (entry: ElementActionId | `#${string}`): entry is `#${string}` => entry.startsWith("#");
 
 export function actionLabel(action: ElementAction, ctx: ElementActionContext): string {
   return typeof action.label === "function" ? action.label(ctx) : action.label;

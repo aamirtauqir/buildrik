@@ -5526,7 +5526,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Lane L-B A2: Semantics Tag (heading H1–H6) + ID on Content; Title / Tab index / custom data-* under Advanced attributes (built, compared by probe for copy only). Open: Title/Tab index shown inside Semantics on the board, protected data-bk-id note, 'Change semantic tag' review (A12/A13).",
+   "verifiedNote": "L-B round 25, probe ?type=heading&attrs={id, title, tabindex, aria-label, data-section:''} side by side with shots/247-26594.png: Semantics now carries Tag, ID, Title, Tab index (moved from Advanced attributes; form fields keep them there — no Semantics on F02) and 'Change semantic tag' (opens the A12 review). Open: the board's 'Custom attributes · {n} set' list — an existing aria-* attribute as its own row, an authored-empty data-* with 'Empty is authored empty. Remove deletes the attribute.' + 'Remove {attr}', and the protected internal id ('Internal identity is protected.'); today Advanced attributes adds data-* / aria-* but does not list the existing ones that way.",
    "tier": "P1"
   },
   {
@@ -5702,7 +5702,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-B round 25, reference board compared type by type: probe ?block=<id> for every block on the board, the Content and Behavior tabs dumped (scratch b69.mjs) and read against the board's 'editing homes'. Image (Source, Alt, Loading, Decoding; Fit on Style), Video (+ Preload, new), Audio match; Icon gained 'Accessible name' (aria-label). Open: SVG's Representation / ViewBox / Role / Labelled by as one block (today Source + Semantics native attrs + the S34 replace review), Lottie's Status and Replacement rows.",
+   "verifiedNote": "L-B round 25, reference board compared type by type: probe ?block=<id> for every block on the board, the Content and Behavior tabs dumped (scratch b69.mjs) and read against the board's 'editing homes'. Image (Source, Alt, Loading, Decoding; Fit on Style), Video (Preload is in Advanced attributes, also on Content), Audio match; Icon gained 'Accessible name' (aria-label). Open: SVG's Representation / ViewBox / Role / Labelled by as one block (today Source + Semantics native attrs + the S34 replace review), Lottie's Status and Replacement rows.",
    "tier": "P1"
   },
   {
@@ -6002,8 +6002,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Board groups Clipboard/Structure/State + Bind to CMS, Show in Layers, Add interaction; Selector row is class-first",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 25, probe ?type=heading&layerName=Hero heading&shell=1 → ⋯, side by side with shots/255-85835.png: 280 wide, the element's name, then Clipboard (Duplicate · Copy style · Paste style), Structure (Save as component… · Bind to CMS field… · Show in Layers — new action: selects it and opens Layers), State (Lock · Add interaction · Apply style to all {kind} · Reset style), Delete — labels centred, no AI rows, one registry (INSPECTOR_MENU). Match. The panel behind it ('Selector · Editing · This element only') is the class-first row, blocked:owner-class-first.",
    "tier": "P1"
   },
   {
@@ -6161,8 +6161,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Board header \"Read only · … is locked\" + \"Editing unavailable\" card; code status line",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 25, probe ?type=heading&locked=1&layerName=Hero heading → Style, side by side with shots/255-92819.png: the tab body opens on 'Editing unavailable' · 'This element is locked. Inspecting it through Layers keeps its values visible.' · full-width primary 'Unlock' (unlock-element, one step), then the dimmed read-only values (Typography…). Match on the body. The header context line 'Read only · {layer} is locked' is the lead's InspectorHeader (REQUESTS B-29); the '🔒 Locked' mark above the tabs stays until then.",
    "tier": "P1"
   },
   {
@@ -6263,7 +6263,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "\"Bound to …\" mark; board Content \"Dynamic bindings\" row",
+   "verifiedNote": "L-B round 25: compared with the probe (?type=heading&cms=1). Same parts, two differences: (1) order — the board puts the Text block (Tag, the bound row 'Title text · Blog.title') first and the read-only 'Dynamic bindings · 1 binding' summary after it with 'Read-only summary. Edit the binding at its property row.'; B5-D04 (compared and closed) puts Dynamic bindings at the head of the tab with a link row. The two boards disagree — lead to pick one before this changes. (2) Tag H1 select sits in the text block on the board; here it is Semantics' Tag.",
    "tier": "P1"
   },
   {
@@ -6474,8 +6474,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Disabled reason \"Copy a style first\" matches; menu grouping differs (S08)",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 25, same probe with an empty style clipboard, side by side with shots/271-124689.png: Paste style disabled with 'Copy a style first' under it, in the S08 groups. Match.",
    "tier": "P1"
   },
   {

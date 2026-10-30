@@ -115,7 +115,7 @@ const Audio: React.FC<TypeBlockBodyProps> = (p) => {
 };
 
 const Video: React.FC<TypeBlockBodyProps> = (p) => {
-  const { read, toggle, write } = useAttrs(p);
+  const { read, toggle } = useAttrs(p);
   const autoplay = isOn(read("autoplay"));
   const muted = isOn(read("muted"));
   const setPoster = (value: string) => {
@@ -131,8 +131,6 @@ const Video: React.FC<TypeBlockBodyProps> = (p) => {
     <>
       <Source {...p} />
       <InputRow label="Poster image" value={read("poster") ?? ""} placeholder="https://…" onChange={setPoster} />
-      {/* B69/03: how much the browser fetches before play. */}
-      <SelectRow label="Preload" value={read("preload") ?? "auto"} options={PRELOAD_OPTIONS} onChange={(v) => write("preload", v)} />
       <CheckRow label="Autoplay" checked={autoplay} onChange={toggle("autoplay")} />
       <CheckRow label="Muted" checked={muted} onChange={toggle("muted")} />
       <CheckRow label="Loop" checked={isOn(read("loop"))} onChange={toggle("loop")} />
@@ -142,12 +140,6 @@ const Video: React.FC<TypeBlockBodyProps> = (p) => {
     </>
   );
 };
-
-const PRELOAD_OPTIONS = [
-  { value: "auto", label: "Auto" },
-  { value: "metadata", label: "Metadata" },
-  { value: "none", label: "None" },
-];
 
 const ICON_ROWS: readonly PropertyConfig[] = [
   {

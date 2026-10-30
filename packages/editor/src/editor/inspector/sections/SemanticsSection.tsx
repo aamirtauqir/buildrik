@@ -33,6 +33,7 @@ import { markJustAdded, useJustAdded } from "./justAddedField";
 import { Button, useToast } from "@/editor/chrome-ui";
 import { ControlRow, Section, SelectRow } from "@/editor/inspector/shared/controls";
 import { WIDE_BUTTON } from "@/editor/inspector/shared/controls/controlClasses";
+import { COMMON_ATTRIBUTE_FIELDS } from "@/editor/inspector/config/attributeFields";
 import { runTxn } from "./typeBlock/attributeWriter";
 import { PropertyRows, type PropertyConfig } from "./typeBlock/PropertyField";
 import { Note, useElementVersion } from "./typeBlock/bodies/bodyRows";
@@ -46,6 +47,10 @@ export interface SemanticsSectionProps {
 }
 
 const ID_ROW: readonly PropertyConfig[] = [{ id: "id", label: "ID", type: "text", placeholder: "element-id" }];
+
+/** A11 247:26594: Title and Tab index sit with the ID (a link's Title is its
+ *  Link section's — R-DD-9). */
+const identityRows = (type: string): readonly PropertyConfig[] => [...ID_ROW, ...COMMON_ATTRIBUTE_FIELDS.filter((f) => type !== "link" || f.id !== "title")];
 
 /** How a tag reads on the row (board 161:8480: `p` reads "Paragraph"). */
 const TAG_NAMES: Readonly<Record<string, string>> = {
@@ -262,7 +267,7 @@ export function SemanticsSection({ composer, element, targetIds, isOpen, onToggl
           </span>
         </ControlRow>
       ) : null}
-      {single && <PropertyRows composer={composer} element={element} targetIds={targetIds} rows={ID_ROW} />}
+      {single && <PropertyRows composer={composer} element={element} targetIds={targetIds} rows={identityRows(element.type)} />}
       {single && NATIVE_ATTRS[tag.toLowerCase()] ? (
         <div data-testid="inspector-native-attributes">
           <div className="tw:pb-1 tw:pt-3 tw:text-[13px] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]">Native attributes</div>
@@ -276,6 +281,11 @@ export function SemanticsSection({ composer, element, targetIds, isOpen, onToggl
       ) : null}
       {single && VOID_SEPARATORS.has(tag.toLowerCase()) ? (
         <Note testId="inspector-semantics-void">No text or children — a {tag.toLowerCase()} keeps its place in the line.</Note>
+      ) : null}
+      {single && !converted && semanticConversionFor(element.type) && composer ? (
+        <Button color="light" size="xs" className={WIDE_BUTTON} onClick={() => setReview(semanticConversionFor(element.type))} data-testid="inspector-semantics-change-tag">
+          Change semantic tag
+        </Button>
       ) : null}
       {converted ? (
         <div className="tw:flex tw:flex-col tw:gap-2" data-testid="inspector-semantics-retained">

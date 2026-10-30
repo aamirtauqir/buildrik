@@ -44,6 +44,9 @@ import { PagePanel } from "./components/PagePanel";
 import { ThemeToggleInspector } from "./components/ThemeToggleInspector";
 import { THEME_TOGGLE_ATTR } from "@/engine/export/themeToggleRuntime";
 import { LoadFailedCard, StatusLine, ViewOnlyLine } from "./components/StatusLine";
+
+/** The locked card's own render: the conflict line is drawn above the tabs. */
+const NO_CONFLICT = { pending: false, resolve: () => undefined };
 import { DimmedNotice } from "./components/DimmedNotice";
 import { LockRefusalNote, useLockRefusal, useWatchPasteRefusal } from "./components/LockRefusal";
 import { useJustDetached, useRecordDetaches } from "./hooks/useJustDetached";
@@ -465,7 +468,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
         {targetIds.length > 1 ? null : (
           <StatusMarks composer={composer} elementId={selectedElement.id} binding={binding?.missing ? binding : null} locked={locked} />
         )}
-        <StatusLine composer={composer} elementId={selectedElement.id} locked={locked && !pasteRefused && !addRefused} conflict={conflict} />
+        <StatusLine composer={composer} elementId={selectedElement.id} locked={false} conflict={conflict} />
         {targetIds.length > 1 ? <MultiSelectBar composer={composer} selectedIds={targetIds} /> : null}
         {/* 2L9 IC01: an instance's identity block sits above the tabs. */}
         {targetIds.length <= 1 && composer?.components?.getInstanceByElementId?.(selectedElement.id) ? (
@@ -492,6 +495,8 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
               tabClassName={INSPECTOR_TAB_CLASS}
             />
             {leaveGuard}
+            {/* 2L9 S22: "Editing unavailable" heads the tab body of a locked element. */}
+            <StatusLine composer={composer} elementId={selectedElement.id} locked={locked && !pasteRefused && !addRefused} conflict={NO_CONFLICT} />
             {showContextRow ? (
               <ContextRow
                 state={currentPseudoState}

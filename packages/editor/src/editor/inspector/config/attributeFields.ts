@@ -14,8 +14,9 @@
 
 import type { PropertyConfig } from "../sections/typeBlock/PropertyField";
 
-/* The ID is Content › Semantics' (2L9 board 247:26594), not a row here. */
-const COMMON_ATTRIBUTE_FIELDS: readonly PropertyConfig[] = [
+/* ID, Title and Tab index are Content › Semantics' (2L9 A11 247:26594),
+   except on form fields, which draw no Semantics (F02) and keep them here. */
+export const COMMON_ATTRIBUTE_FIELDS: readonly PropertyConfig[] = [
   { id: "title", label: "Title", type: "text", placeholder: "Shown on hover" },
   { id: "tabindex", label: "Tab index", type: "text", placeholder: "0" },
 ];
@@ -99,8 +100,6 @@ const TYPE_ATTRIBUTE_FIELDS: Readonly<Record<string, readonly PropertyConfig[]>>
   ],
 };
 
-/** The Attributes rows for a type: its own §17.H rows, then the common ones
- *  (a link has no Title row — R-DD-9). */
 /** Form fields draw no Semantics section (2L9 F02), so their ID and their
  *  less-used flags are here. */
 const FIELD_TYPES = new Set(["input", "textarea", "select", "upload"]);
@@ -111,7 +110,7 @@ const FIELD_EXTRAS: readonly PropertyConfig[] = [
 const SELECT_EXTRAS: readonly PropertyConfig[] = [{ id: "multiple", label: "Multiple", type: "checkbox" }];
 
 export function attributeFieldsFor(type: string): readonly PropertyConfig[] {
-  const common = type === "link" ? COMMON_ATTRIBUTE_FIELDS.filter((f) => f.id !== "title") : COMMON_ATTRIBUTE_FIELDS;
+  const common = FIELD_TYPES.has(type) ? COMMON_ATTRIBUTE_FIELDS : [];
   const field = FIELD_TYPES.has(type) ? [...FIELD_EXTRAS, ...(type === "select" ? SELECT_EXTRAS : [])] : [];
   return [...field, ...common, ...(TYPE_ATTRIBUTE_FIELDS[type] ?? [])];
 }
