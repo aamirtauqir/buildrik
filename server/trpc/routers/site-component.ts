@@ -28,10 +28,31 @@ import {
   renameWorkspaceComponentSchema,
   componentLibrarySchema,
   libraryComponentSchema,
+  listComponentTrashSchema,
+  restoreComponentsSchema,
+  purgeComponentsSchema,
 } from "@buildrik/shared/schemas/site-component";
+import {
+  listComponentTrash,
+  restoreComponents,
+  purgeComponents,
+  ComponentTrashError,
+} from "@/server/services/component-trash.service";
 import { guardSiteAccess as guardSite, guardSiteRole } from "@/server/trpc/guards";
 import { resolveWorkspaceId } from "@/server/trpc/workspace-ctx";
 import { checkWorkspaceRole, PermissionError } from "@/server/services/permission.service";
+
+/* Component trash (design-2l9 K18–K20): the service checks the site role
+   (EDITOR lists/restores, ADMIN purges) and says when a component is gone. */
+async function translateTrashError<T>(run: () => Promise<T>): Promise<T> {
+  try {
+    return await run();
+  } catch (e) {
+    if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+    if (e instanceof ComponentTrashError) throw new TRPCError({ code: "NOT_FOUND", message: e.message });
+    throw e;
+  }
+}
 
 // P6 shared library: managing the workspace component library (rename/delete a
 // master everywhere) is an ADMIN action (contract §2 — VIEWER read-only,
@@ -82,8 +103,22 @@ export const siteComponentsRouter = router({
     .input(deleteSiteComponentSchema)
     .mutation(async ({ ctx, input }) => {
       await guardSiteRole(ctx.prisma, ctx.session.user.id, input.siteId);
-      return deleteSiteComponent(input.siteId, input.componentId);
+      // Moves the master to Recently deleted (30 days), not a hard delete.
+      return deleteSiteComponent(input.siteId, input.componentId, ctx.session.user.id, input.trash);
     }),
+
+  // design-2l9 K18–K20, K42: the Components panel's Recently deleted.
+  trash: router({
+    list: protectedProcedure.input(listComponentTrashSchema).query(({ ctx, input }) =>
+      translateTrashError(() => listComponentTrash(ctx.session.user.id, input.siteId)),
+    ),
+    restore: protectedProcedure.input(restoreComponentsSchema).mutation(({ ctx, input }) =>
+      translateTrashError(() => restoreComponents(ctx.session.user.id, input)),
+    ),
+    purge: protectedProcedure.input(purgeComponentsSchema).mutation(({ ctx, input }) =>
+      translateTrashError(() => purgeComponents(ctx.session.user.id, input)),
+    ),
+  }),
 
   // FROM LIBRARY (board 4418:99857): the workspace's shared masters seen from
   // this site. Reading is open to any member of the site; bringing one onto the
@@ -126,12 +161,12 @@ export const siteComponentsRouter = router({
       return renameWorkspaceComponent(workspaceId, input.componentId, input.name);
     }),
 
-  // P6 shared library — delete a master from every site (ADMIN, confirmed at UI).
+  // P6 shared library — move a master to every site's Recently deleted (ADMIN, confirmed at UI).
   workspaceDelete: protectedProcedure
     .input(componentUsageSchema)
     .mutation(async ({ ctx, input }) => {
       const workspaceId = await resolveWorkspaceId(ctx);
       await requireWorkspaceAdmin(ctx, workspaceId);
-      return deleteWorkspaceComponent(workspaceId, input.componentId);
+      return deleteWorkspaceComponent(workspaceId, input.componentId, ctx.session.user.id);
     }),
 });

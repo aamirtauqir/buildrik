@@ -1213,11 +1213,19 @@ model SiteComponent {
   createdBy   String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  /// Component trash (design-2l9 K18–K20): set while the master sits in
+  /// "Recently deleted" (30 days). Every live read filters `deletedAt: null`.
+  deletedAt   DateTime?
+  deletedById String?
+  /// What the delete detached: { instances: [{ record, fingerprint }], pageCount }.
+  /// Null when the delete did not come from the editor (workspace library).
+  trash       Json?
 
   site Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
 
   @@unique([siteId, componentId])
   @@index([siteId, updatedAt])
+  @@index([siteId, deletedAt])
   @@map("site_components")
 }
 

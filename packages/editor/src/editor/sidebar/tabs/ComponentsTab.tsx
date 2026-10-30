@@ -16,6 +16,12 @@ import { ComponentIcon } from "./component-library/ComponentIcon";
 import type { ComponentsTabProps } from "./component-library/types";
 import { useComponentsState } from "./component-library/useComponentsState";
 import { ImportPackageDialog } from "./component-library/ImportPackageDialog";
+import { RecentlyDeletedComponents } from "./component-library/RecentlyDeletedComponents";
+import { useComponentTrash } from "./component-library/useComponentTrash";
+import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
+import { useEditorRole } from "@/editor/shell/hooks/useEditorRole";
+import { roleAtLeast } from "@/services/RoleService";
+import { useOnlineStatus } from "@/shared/hooks/useOnlineStatus";
 
 import "./component-library/ComponentsTab.css";
 import { EVENTS } from "@/shared/constants";
@@ -57,6 +63,17 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
   const [query, setQuery] = React.useState("");
   const [sort, setSort] = React.useState<SortKey>("used");
   const [importing, setImporting] = React.useState(false);
+  /* K19 217:41750: Recently deleted replaces the list until ‹ Back to Components. */
+  const [showTrash, setShowTrash] = React.useState(false);
+  const siteId = getSiteIdFromUrl();
+  const trash = useComponentTrash(composer, siteId);
+  const canPurge = roleAtLeast(useEditorRole(), "ADMIN") !== false;
+  const online = useOnlineStatus();
+  const { handleBackFromDetail } = state;
+  const openTrash = React.useCallback(() => {
+    handleBackFromDetail();
+    setShowTrash(true);
+  }, [handleBackFromDetail]);
 
   // Board 4418:143126: the last Detach all, reported at the top of the list.
   const [detached, setDetached] = React.useState<{ id: string; name: string; count: number } | null>(null);
@@ -153,12 +170,27 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         onClose={onClose}
         onInsert={state.handleDetailInsert}
         onDelete={state.handleDetailDelete}
+        onOpenTrash={siteId ? openTrash : undefined}
         onDetachedAll={(count) => {
           const { id, name } = state.detailComponent!;
           setDetached({ id, name, count });
         }}
         selectedElementId={state.canvasSelection[0] ?? null}
       />
+    );
+  }
+
+  if (showTrash) {
+    return (
+      <PanelFrame className="tw:h-full" data-testid="comp-panel">
+        <RecentlyDeletedComponents
+          composer={composer}
+          trash={trash}
+          canPurge={canPurge}
+          online={online}
+          onBack={() => setShowTrash(false)}
+        />
+      </PanelFrame>
     );
   }
 
@@ -368,6 +400,11 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
           <Button variant="link" size="xs" className="tw:mx-4 tw:h-7 tw:p-0" onClick={() => setImporting(true)} data-testid="comp-import-open">
             Import package…
           </Button>
+          {siteId && (
+            <Button variant="link" size="xs" className="tw:mx-4 tw:h-7 tw:p-0" onClick={openTrash} data-testid="comp-trash-open">
+              {trash.items.length > 0 ? `Recently deleted · ${trash.items.length}` : "Recently deleted"}
+            </Button>
+          )}
           <div className="tw:flex tw:items-center tw:gap-2 tw:px-3 tw:py-2">
             <PanelSearch placeholder="Search components" value={query} onChange={setQuery} className="tw:flex-1" data-testid="comp-search" />
             {scope !== "library" ? (
@@ -447,7 +484,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         open={!!state.confirmDelete}
         onClose={() => state.setConfirmDelete(null)}
         onConfirm={() => {
-          void state.confirmDeleteAction().then((toast) => toast && addToast(toast));
+          void state.confirmDeleteAction(siteId ? openTrash : undefined).then((toast) => toast && addToast(toast));
         }}
         {...componentDeleteCopy(
           state.confirmDelete?.name ?? "",

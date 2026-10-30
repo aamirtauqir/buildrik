@@ -10882,8 +10882,8 @@
    "family": "components",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No component Recently deleted/30-day trash or bulk restore",
+   "verified": "drift-open",
+   "verifiedNote": "L-B round 33: component trash built (server tombstone + 'Recently deleted' in the Components drawer, ‹ Back to Components). Built, not compared — the board draws the full-page Components workspace (left nav) that the drawer does not have (K02). Rows: checkbox, name, \"Detached N instances on N pages · Deleted by you · today\", \"Deletes in N days\"; bulk bar N selected · Restore · Delete permanently (Admin) · Clear.",
    "tier": "P3"
   },
   {
@@ -10894,7 +10894,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Toast \"X deleted · N detached · Undo\" (src/editor/sidebar/tabs/component-library/ComponentDetailScreen.tsx:81) after a permanent-delete con…",
+   "verifiedNote": "L-B round 33: component trash built (server tombstone + 'Recently deleted' in the Components drawer, ‹ Back to Components). Built, not compared — the board draws the full-page Components workspace (left nav) that the drawer does not have (K02). Receipt \"{name} deleted · N instances on N pages were detached\" · Undo · \"Recently deleted ›\". The detail screen still asks a confirm first (copy now says it moves to Recently deleted for 30 days).",
    "tier": "P3"
   },
   {
@@ -10904,8 +10904,8 @@
    "family": "components",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Typed DELETE permanent purge (Admin) missing",
+   "verified": "drift-open",
+   "verifiedNote": "L-B round 33: component trash built (server tombstone + 'Recently deleted' in the Components drawer, ‹ Back to Components). Built, not compared — the board draws the full-page Components workspace (left nav) that the drawer does not have (K02). \"Delete N components permanently?\", the board copy, \"Type DELETE to confirm\", Delete permanently disabled until typed; server refuses below ADMIN and without the literal DELETE.",
    "tier": "P2"
   },
   {
@@ -11526,8 +11526,8 @@
    "family": "components",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Restore from Recently deleted with re-link receipt missing",
+   "verified": "drift-open",
+   "verifiedNote": "L-B round 33: component trash built (server tombstone + 'Recently deleted' in the Components drawer, ‹ Back to Components). Built, not compared — the board draws the full-page Components workspace (left nav) that the drawer does not have (K02). Receipt \"{name} restored · N unchanged instances re-linked\" · Undo; re-links only instances whose element fingerprint is unchanged since the delete.",
    "tier": "P3"
   },
   {

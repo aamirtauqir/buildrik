@@ -12,7 +12,9 @@ import { ToastProvider } from "@/editor/chrome-ui";
 import { EVENTS } from "@/shared/constants";
 import { createMockComposer } from "@/editor/sidebar/__tests__/test-utils/mockComposer";
 
-vi.mock("@/services/componentSync", () => ({ fetchComponentLibrary: vi.fn(async () => []) }));
+vi.mock("@/services/componentSync", () => ({
+  onComponentTrashChanged: () => () => {},
+  stageComponentTrash: vi.fn(), fetchComponentLibrary: vi.fn(async () => []) }));
 
 import { ComponentsTab } from "@/editor/sidebar/tabs/ComponentsTab";
 

@@ -12,6 +12,8 @@ import { ToastProvider } from "@/editor/chrome-ui";
 import { createMockComposer } from "@/editor/sidebar/__tests__/test-utils/mockComposer";
 
 vi.mock("@/services/componentSync", () => ({
+  onComponentTrashChanged: () => () => {},
+  stageComponentTrash: vi.fn(),
   fetchComponentLibrary: vi.fn(async () => [
     { componentId: "btn", name: "Button / primary", siteCount: 3, onThisSite: true },
     { componentId: "price", name: "Price row", siteCount: 2, onThisSite: false },

@@ -5,11 +5,16 @@
  * metadata only; get returns the payload for hydrate/restore. No prune —
  * components are deliberate, low-churn artifacts (unlike auto-versioning).
  *
+ * Trash (design-2l9 K18–K20): a delete sets `deletedAt` and keeps the row for
+ * 30 days (component-trash.service.ts lists, restores and purges it). Every
+ * read here is of LIVE masters and filters `deletedAt: null`.
+ *
  * @license BSD-3-Clause
  */
 import { prisma } from "@/lib/prisma";
 import { sanitizeComponentPayload } from "@/lib/sanitize-blocks";
-import type { UpsertSiteComponentInput } from "@buildrik/shared/schemas/site-component";
+import { Prisma } from "@prisma/client";
+import type { ComponentTrashInfo, UpsertSiteComponentInput } from "@buildrik/shared/schemas/site-component";
 import { siteScopeWhere } from "@/server/services/permission.service";
 
 export async function upsertSiteComponent(
@@ -33,10 +38,15 @@ export async function upsertSiteComponent(
       pageId,
       createdBy: input.createdBy ?? null,
     },
+    // Saving a master again takes it out of the trash: an Undo of a delete
+    // re-registers the master through this same upsert.
     update: {
       name: input.name,
       payload: payload as never,
       pageId,
+      deletedAt: null,
+      deletedById: null,
+      trash: Prisma.DbNull,
     },
   });
   // updatedAt: the editor stamps its local copy with the SERVER's clock (C-4).
@@ -45,27 +55,36 @@ export async function upsertSiteComponent(
 
 export async function listSiteComponents(siteId: string) {
   return prisma.siteComponent.findMany({
-    where: { siteId },
+    where: { siteId, deletedAt: null },
     orderBy: { updatedAt: "desc" },
     select: { componentId: true, name: true, pageId: true, createdBy: true, createdAt: true, updatedAt: true },
   });
 }
 
 export async function getSiteComponent(siteId: string, componentId: string): Promise<unknown | null> {
-  const row = await prisma.siteComponent.findUnique({
-    where: { siteId_componentId: { siteId, componentId } },
+  const row = await prisma.siteComponent.findFirst({
+    where: { siteId, componentId, deletedAt: null },
     select: { payload: true },
   });
   return row?.payload ?? null;
 }
 
+/**
+ * Move a master to "Recently deleted". `trash` is what the editor's delete
+ * detached (instance links + fingerprints), for the restore to re-link.
+ * updateMany so a missing or already-trashed row is a no-op, not a throw
+ * (the editor mirror fires delete best-effort, and retries).
+ */
 export async function deleteSiteComponent(
   siteId: string,
-  componentId: string
+  componentId: string,
+  deletedById: string | null,
+  trash?: ComponentTrashInfo
 ): Promise<{ ok: true }> {
-  // deleteMany so a missing row is a no-op, not a P2025 throw (the editor
-  // mirror fires delete best-effort).
-  await prisma.siteComponent.deleteMany({ where: { siteId, componentId } });
+  await prisma.siteComponent.updateMany({
+    where: { siteId, componentId, deletedAt: null },
+    data: { deletedAt: new Date(), deletedById, trash: trash ? (trash as never) : Prisma.DbNull },
+  });
   return { ok: true };
 }
 
@@ -84,7 +103,7 @@ export async function listWorkspaceComponents(
   // site outside their grant, or have its usage counted in "used on N sites".
   const scope = await siteScopeWhere(prisma, userId, workspaceId);
   const rows = await prisma.siteComponent.findMany({
-    where: { site: { workspaceId, deletedAt: null, ...scope } },
+    where: { deletedAt: null, site: { workspaceId, deletedAt: null, ...scope } },
     select: { componentId: true, name: true, updatedAt: true },
   });
   const byId = new Map<
@@ -129,7 +148,7 @@ export async function renameWorkspaceComponent(
   name: string
 ): Promise<{ updated: number }> {
   const res = await prisma.siteComponent.updateMany({
-    where: { componentId, site: { workspaceId, deletedAt: null } },
+    where: { componentId, deletedAt: null, site: { workspaceId, deletedAt: null } },
     data: { name },
   });
   return { updated: res.count };
@@ -137,16 +156,19 @@ export async function renameWorkspaceComponent(
 
 /**
  * P6 shared library: delete a component master from the whole workspace —
- * removes it from every site that carries it. Destructive and confirmed at the
- * UI (the library surfaces "used on N sites" first). Workspace-scoped. Returns
- * how many site-rows were removed.
+ * moves it to every carrying site's "Recently deleted" (30 days). Confirmed
+ * at the UI (the library surfaces "used on N sites" first). Workspace-scoped.
+ * Returns how many site-rows were trashed. No detach record: the dashboard
+ * has no document to detach in.
  */
 export async function deleteWorkspaceComponent(
   workspaceId: string,
-  componentId: string
+  componentId: string,
+  deletedById: string | null
 ): Promise<{ deleted: number }> {
-  const res = await prisma.siteComponent.deleteMany({
-    where: { componentId, site: { workspaceId, deletedAt: null } },
+  const res = await prisma.siteComponent.updateMany({
+    where: { componentId, deletedAt: null, site: { workspaceId, deletedAt: null } },
+    data: { deletedAt: new Date(), deletedById, trash: Prisma.DbNull },
   });
   return { deleted: res.count };
 }
@@ -160,7 +182,7 @@ export async function getComponentUsage(
   sites: Array<{ siteId: string; siteName: string; updatedAt: Date }>;
 }> {
   const rows = await prisma.siteComponent.findMany({
-    where: { componentId, site: { workspaceId, deletedAt: null } },
+    where: { componentId, deletedAt: null, site: { workspaceId, deletedAt: null } },
     orderBy: { updatedAt: "desc" },
     select: { siteId: true, updatedAt: true, site: { select: { name: true } } },
   });
@@ -185,7 +207,7 @@ export async function listComponentLibrary(siteId: string): Promise<
   const site = await prisma.site.findUnique({ where: { id: siteId }, select: { workspaceId: true } });
   if (!site) throw new Error("SITE_NOT_FOUND");
   const rows = await prisma.siteComponent.findMany({
-    where: { pageId: null, site: { workspaceId: site.workspaceId, deletedAt: null } },
+    where: { pageId: null, deletedAt: null, site: { workspaceId: site.workspaceId, deletedAt: null } },
     select: { componentId: true, name: true, siteId: true, updatedAt: true },
   });
   const byId = new Map<string, { componentId: string; name: string; sites: Set<string>; updatedAt: Date }>();
@@ -219,7 +241,7 @@ export async function getLibraryComponent(siteId: string, componentId: string): 
   const site = await prisma.site.findUnique({ where: { id: siteId }, select: { workspaceId: true } });
   if (!site) throw new Error("SITE_NOT_FOUND");
   const row = await prisma.siteComponent.findFirst({
-    where: { componentId, pageId: null, site: { workspaceId: site.workspaceId, deletedAt: null } },
+    where: { componentId, pageId: null, deletedAt: null, site: { workspaceId: site.workspaceId, deletedAt: null } },
     orderBy: { updatedAt: "desc" },
     select: { payload: true },
   });
