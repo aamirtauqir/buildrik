@@ -14179,9 +14179,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-G 2026-10-30 (partly fixed): title 'Export site' (was 'Export site as X', blurb gone), tabs above the Format row, Format is three radios HTML · ZIP · React (Vue / Next.js 'Soon' stubs removed), primary 'Export'. Still open: Preview keeps its Desktop/Tablet/Mobile switch (board draws none), Options is still the checkbox panel (board: label/value rows CSS · Minify · CSS reset · Meta and viewport · CMS content), and the Free-plan custom-code note is not shown because the export DOES include custom code today (ExportEngine:624) — owner/code call before that line can be true. | export/ExportModal.tsx:288 — title \"Export site as X\"; Vue/Next \"Soon\" shown (ExportOptions.tsx:29); no Free custom-code note",
+   "authority": "code:preview-device-switch-kept",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-G 2026-10-30: the 2L9 frame is built (probe export-html-modal: 'Export site', tabs, Format radios, foot); Preview keeps its Desktop / Tablet / Mobile switch, which the board does not draw (coordinator decision: capability kept). Code tab carries its Copy button. | L-G 2026-10-30 (partly fixed): title 'Export site' (was 'Export site as X', blurb gone), tabs above the Format row, Format is three radios HTML · ZIP · React (Vue / Next.js 'Soon' stubs removed), primary 'Export'. Still open: Preview keeps its Desktop/Tablet/Mobile switch (board draws none), Options is still the checkbox panel (board: label/value rows CSS · Minify · CSS reset · Meta and viewport · CMS content), and the Free-plan custom-code note is not shown because the export DOES include custom code today (ExportEngine:624) — owner/code call before that line can be true. | export/ExportModal.tsx:288 — title \"Export site as X\"; Vue/Next \"Soon\" shown (ExportOptions.tsx:29); no Free custom-code note",
    "tier": "P2"
   },
   {
@@ -14190,9 +14190,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-G 2026-10-30 (partly fixed): title 'Export site' (was 'Export site as X', blurb gone), tabs above the Format row, Format is three radios HTML · ZIP · React (Vue / Next.js 'Soon' stubs removed), primary 'Export'. Still open: Preview keeps its Desktop/Tablet/Mobile switch (board draws none), Options is still the checkbox panel (board: label/value rows CSS · Minify · CSS reset · Meta and viewport · CMS content), and the Free-plan custom-code note is not shown because the export DOES include custom code today (ExportEngine:624) — owner/code call before that line can be true. | export/ExportModal.tsx:288 — title \"Export site as X\"; Vue/Next \"Soon\" shown (ExportOptions.tsx:29); no Free custom-code note",
+   "authority": "code:preview-device-switch-kept",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-G 2026-10-30: the 2L9 frame is built (probe export-html-modal: 'Export site', tabs, Format radios, foot); Preview keeps its Desktop / Tablet / Mobile switch, which the board does not draw (coordinator decision: capability kept). Code tab carries its Copy button. | L-G 2026-10-30 (partly fixed): title 'Export site' (was 'Export site as X', blurb gone), tabs above the Format row, Format is three radios HTML · ZIP · React (Vue / Next.js 'Soon' stubs removed), primary 'Export'. Still open: Preview keeps its Desktop/Tablet/Mobile switch (board draws none), Options is still the checkbox panel (board: label/value rows CSS · Minify · CSS reset · Meta and viewport · CMS content), and the Free-plan custom-code note is not shown because the export DOES include custom code today (ExportEngine:624) — owner/code call before that line can be true. | export/ExportModal.tsx:288 — title \"Export site as X\"; Vue/Next \"Soon\" shown (ExportOptions.tsx:29); no Free custom-code note",
    "tier": "P2"
   },
   {
@@ -14201,9 +14201,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-G 2026-10-30 (partly fixed): title 'Export site' (was 'Export site as X', blurb gone), tabs above the Format row, Format is three radios HTML · ZIP · React (Vue / Next.js 'Soon' stubs removed), primary 'Export'. Still open: Preview keeps its Desktop/Tablet/Mobile switch (board draws none), Options is still the checkbox panel (board: label/value rows CSS · Minify · CSS reset · Meta and viewport · CMS content), and the Free-plan custom-code note is not shown because the export DOES include custom code today (ExportEngine:624) — owner/code call before that line can be true. | export/ExportModal.tsx:288 — title \"Export site as X\"; Vue/Next \"Soon\" shown (ExportOptions.tsx:29); no Free custom-code note",
+   "authority": "founder:custom-code-all-plans",
+   "verified": "drift-fixed",
+   "verifiedNote": "Owner 2026-10-30: custom code stays in the export on every plan, so the board's 'Custom code isn’t included on the Free plan.' line is dropped. L-G probe-compared (export-html-modal, Options) vs shots/236-6085.png: label / value rows Format · CSS · Minify · CSS reset · Meta and viewport (+ CMS content with bindings), values as borderless selects with chevrons, Cancel · Export foot. Kept beyond the board: the Page title row (capability). Shared Modal chrome: the board rules a line under the title and under the tabs; the dialog's title is 18 vs 16. | L-G 2026-10-30: the Options tab is now the board's label / value rows (Page title · CSS · Minify · CSS reset · Meta and viewport · CMS content, every former option kept as a select — ExportOptions.test). Open on the owner: 'Custom code isn’t included on the Free plan.' would be false today — the export includes custom code (ExportEngine:624). | L-G 2026-10-30 (partly fixed): title 'Export site' (was 'Export site as X', blurb gone), tabs above the Format row, Format is three radios HTML · ZIP · React (Vue / Next.js 'Soon' stubs removed), primary 'Export'. Still open: Preview keeps its Desktop/Tablet/Mobile switch (board draws none), Options is still the checkbox panel (board: label/value rows CSS · Minify · CSS reset · Meta and viewport · CMS content), and the Free-plan custom-code note is not shown because the export DOES include custom code today (ExportEngine:624) — owner/code call before that line can be true. | export/ExportModal.tsx:288 — title \"Export site as X\"; Vue/Next \"Soon\" shown (ExportOptions.tsx:29); no Free custom-code note",
    "tier": "P2"
   },
   {
@@ -14433,8 +14433,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "packages/dashboard/app/review/[token]/review-client.tsx:478 — notes + approve exist; no pins, anchored composer, device switch, 6-digit cod…",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-G 2026-10-30, unit-level (dashboard client page): the revoked link now reads 'This review link was turned off' / '{agency} stopped this review. Ask them for a new link.' with 'Request a new link' (dead-link-copy + signoff-parity tests); was 'This review link was revoked'. | packages/dashboard/app/review/[token]/review-client.tsx:478 — notes + approve exist; no pins, anchored composer, device switch, 6-digit cod…",
    "tier": "P2"
   },
   {
@@ -14454,9 +14454,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:server-client-comment-anchor",
    "verified": "drift-open",
-   "verifiedNote": "packages/dashboard/app/review/[token]/review-client.tsx:478 — notes + approve exist; no pins, anchored composer, device switch, 6-digit cod…",
+   "verifiedNote": "L-G: the phone page with sticky Request changes · Approve draws the pinned-comments layout (pins, '＋ Comment', Comments sheet) — blocked with the rest of it on anchored client comments (REQUESTS G-2). | packages/dashboard/app/review/[token]/review-client.tsx:478 — notes + approve exist; no pins, anchored composer, device switch, 6-digit cod…",
    "tier": "P2"
   },
   {
@@ -22246,7 +22246,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-F W2: built, not compared. Two-line Session rows (step, then \"time · you\"), Restore to here on the hovered / j-k row, j/k hint under the list. \"verb · target · place\" needs target + page on each history entry, which the engine does not record (code:history-entry-no-target, part); session markers (Opened Home, Undo history cleared) likewise have no data.",
+   "verifiedNote": "L-G probe-compared 2026-10-30 (history-tab?view=session) vs shots/230-12999.png — DRIFT, open: the board's list has '— Opened Home —' and '— Undo history cleared 09:58 —' separators (the engine records neither a page-open nor a clear time today), a hint line 'Esc closes History' (code: Esc collapses the expanded row), and no footer — the panel still prints 'This session only — the last 100 steps…' and '+ Save a version' (from older board 163:2). Rows match: step, then 'time · you' (author shows only when the step is stamped with a user). | L-F W2: built, not compared. Two-line Session rows (step, then \"time · you\"), Restore to here on the hovered / j-k row, j/k hint under the list. \"verb · target · place\" needs target + page on each history entry, which the engine does not record (code:history-entry-no-target, part); session markers (Opened Home, Undo history cleared) likewise have no data.",
    "tier": "P2"
   },
   {
@@ -22278,8 +22278,8 @@
    "family": "recovery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-F W3: built, not compared. \"Filter: All ▾\" chip with one flat menu (All · Named · Auto-saves · By <author>) and \"Save a version\" at the row's right (it was a footer). Row meta \"Named · Sam · Yesterday 17:20\" not yet adopted (row keeps time · relative · N changes; the N-changes door is code-ahead, kept).",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-G probe-compared 2026-10-30 (case history-tab?view=saves, real Composer, 280 drawer) vs shots/230-14662.png: Session · Saves · Published pill tabs with Saves filled, 'Filter: All ▾' chip and 'Save a version' on one row, the empty list's two lines, the prune note at the foot. The open filter menu (All · Named · Auto-saves · By <author>) is L-F W3's, pinned in its tests; not screenshotted open. The panel's host column (inspector side on the board) is the shell's. | L-F W3: built, not compared. \"Filter: All ▾\" chip with one flat menu (All · Named · Auto-saves · By <author>) and \"Save a version\" at the row's right (it was a footer). Row meta \"Named · Sam · Yesterday 17:20\" not yet adopted (row keeps time · relative · N changes; the N-changes door is code-ahead, kept).",
    "tier": "P2"
   },
   {

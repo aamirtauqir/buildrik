@@ -141,7 +141,7 @@ describe("F · revoked (4418:121971)", () => {
     const header = screen.getByRole("banner");
     expect(header.textContent).toContain("Ali's Studio");
     expect(header.textContent).toContain("Round 3");
-    expect(screen.getByText(/Ask Ali's Studio for a new one/)).toBeTruthy();
+    expect(screen.getByText(/Ali's Studio stopped this review. Ask them for a new link./)).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Try this link again" }));
     expect(refetch).toHaveBeenCalled();
     fireEvent.click(screen.getByRole("button", { name: "Request a new link" }));

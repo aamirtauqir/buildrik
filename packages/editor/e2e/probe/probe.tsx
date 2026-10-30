@@ -5186,6 +5186,27 @@ const CASES: Record<string, () => React.ReactElement> = {
       </div>
     );
   },
+  /* B7-H01…H16 (L-G): the History panel on a real Composer with a few undo
+     steps, in the 280-wide drawer. ?view=session|saves|published */
+  "history-tab": () => {
+    const c = new Composer({} as never);
+    const page = c.elements.createPage("Home", {
+      id: "hx-page",
+      root: { id: "hx-root", type: "container", tagName: "div", classes: ["buildrick-page-root"], children: [] },
+    });
+    c.elements.setActivePage(page.id);
+    for (const [id, type, text] of [["hx-h", "heading", "Thoughtful design."], ["hx-t", "text", "Good design makes room."]] as const) {
+      c.elements.addElement(c.elements.createElement(type as never, { id, content: text }), page.root.id);
+    }
+    const view = new URLSearchParams(location.search).get("view") as "session" | "saves" | "published" | null;
+    return (
+      <div data-probe="history-tab" className="tw:flex tw:h-203 tw:w-70 tw:flex-col tw:bg-white">
+        <ToastProvider>
+          <HistoryTab composer={c} projectId="probe-site" initialView={view ?? "session"} />
+        </ToastProvider>
+      </div>
+    );
+  },
   // "settings-webhooks" (board 640:3849) removed A-12/A01-6 — webhooks moved
   // from this pane's WebhooksScreen to the dashboard's Settings >
   // Integrations, which this probe harness does not render. Board 640:3849
