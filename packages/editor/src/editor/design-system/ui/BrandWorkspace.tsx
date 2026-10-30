@@ -670,7 +670,7 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
         if (selectedToken) return null;
         return (
           <>
-            <Button type="button" variant="secondary" size="xs" className={PAGE_ACTION} onClick={() => setShowAddToken(true)} data-testid="brand-page-action">
+            <Button type="button" variant="primary" size="xs" className={`${PAGE_ACTION} tw:border-transparent tw:text-white!`} onClick={() => setShowAddToken(true)} data-testid="brand-page-action">
               + Add color
             </Button>
             <Button
@@ -1068,7 +1068,8 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
               >
                 {g.label}
               </p>
-              {g.rows.map((n) => navRow(n.id, n.label))}
+              {/* B6-B01: the nav names the open findings, "Checks · 2". */}
+              {g.rows.map((n) => navRow(n.id, n.id === "brand-checks" ? checksLabel : n.label))}
             </div>
           ))}
         </nav>
@@ -1095,7 +1096,10 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
       {/* ── Main: the door, the header (title · Review changes · Restore
            points, the strap under it), then pane + preview column. ──────── */}
       <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:px-8 tw:pt-5">
-        <div className="tw:flex tw:shrink-0" data-testid="brand-back-row">
+        {/* B6-B01 (203:33565): "‹ Back to Editor · Home  Colors · 4" on one
+            row; Review changes · Restore points ▾ · the strap on the next. */}
+        <header className="tw:flex tw:shrink-0 tw:flex-col tw:gap-2" data-testid="brand-header">
+          <div className="tw:flex tw:h-[30px] tw:items-center tw:gap-4" data-testid="brand-back-row">
           <Button
             type="button"
             variant="link"
@@ -1106,9 +1110,6 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
             <ChevronLeft size={12} aria-hidden />
             {backLabel}
           </Button>
-        </div>
-          <header className="tw:mt-4 tw:flex tw:shrink-0 tw:flex-col tw:gap-1" data-testid="brand-header">
-            <div className="tw:flex tw:h-[30px] tw:items-center tw:gap-2">
               <h2
                 className="tw:m-0 tw:min-w-0 tw:flex-1 tw:truncate tw:text-[length:var(--bk-text-20)] tw:font-semibold tw:leading-[30px] tw:tracking-[-0.24px] tw:text-[var(--bk-ink)]"
                 data-testid="brand-page-title"
@@ -1142,6 +1143,8 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
                   </div>
                 </Popover>
               )}
+            </div>
+            <div className="tw:flex tw:min-h-8 tw:flex-wrap tw:items-center tw:gap-2">
               {/* "Review changes" (spec §4): non-blocking, this session's
                   edits with Revert. No Undo / Redo here: the topbar's is the
                   one undo (GAP-ST boards draw a pair — not adopted). */}
@@ -1164,9 +1167,9 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
                       trigger={
                         <Button
                           type="button"
-                          variant="ghost"
+                          variant="secondary"
                           size="xs"
-                          className={`${PAGE_ACTION} tw:border-transparent tw:bg-transparent`}
+                          className={PAGE_ACTION}
                           aria-expanded={restoreOpen}
                           aria-haspopup="dialog"
                           disabled={!online}
@@ -1190,6 +1193,9 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
                         />
                       </div>
                     </Popover>
+                    <p className="tw:m-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]" data-testid="brand-page-strap">
+                      {STRAP}
+                    </p>
                     {!online && (
                       <span id="brand-restore-offline" className="tw:text-[length:var(--bk-text-12)] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]">
                         Restore points need a connection
@@ -1213,9 +1219,6 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
                 </Button>
               )}
             </div>
-            <p className="tw:m-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]" data-testid="brand-page-strap">
-              {STRAP}
-            </p>
           </header>
       <div className={"tw:mt-5 tw:flex tw:min-h-0 tw:flex-1 tw:gap-8"}>
         {/* ── Pane ──────────────────────────────────────────────────────── */}
@@ -1306,7 +1309,8 @@ const BrandWorkspaceBody: React.FC<BrandWorkspaceProps> = ({
         {/* ── Preview column ────────────────────────────────────────────── */}
         {(!compact || compactPreview) && (
         <aside
-          className={`tw:flex tw:flex-col tw:gap-4 tw:overflow-y-auto tw:pb-4 ${compact ? "tw:min-w-0 tw:flex-1" : "tw:w-[468px] tw:shrink-0"}`}
+          /* 2L9 B6-B01: a full-height grey column to the window's edge. */
+          className={`tw:flex tw:flex-col tw:gap-4 tw:overflow-y-auto tw:bg-[var(--bk-bg-subtle)] tw:px-6 tw:py-5 ${compact ? "tw:min-w-0 tw:flex-1" : "tw:-mr-8 tw:w-[468px] tw:shrink-0"}`}
           data-testid="brand-preview-column"
         >
           {composer?.exportHTML ? (

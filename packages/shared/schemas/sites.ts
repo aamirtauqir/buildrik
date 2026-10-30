@@ -227,6 +227,10 @@ const cmsCollectionBindingSchema = z.object({
   skip: z.number().int().min(0).max(CMS_COLLECTION_LIMIT_MAX).optional(),
   /* B-27: "Exclude this page's record" (a related list on a template page). */
   excludeCurrent: z.boolean().optional(),
+  /* B-30 (2L9 B5-D80): "Split into pages" — Show is the page size; absent = "Show first N only". */
+  pages: z.literal("split").optional(),
+  /* B-30 (B5-D78): "Hide list" when nothing matches; absent = the editable No items block. */
+  whenEmpty: z.literal("hide").optional(),
 });
 
 const boundedRecord = <T extends z.ZodTypeAny>(value: T) =>

@@ -4159,8 +4159,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-B round 3: the open Filters section counts what is set ('1 set'), as the specimen draws. | L-B round 2 (2026-10-31), probe-compared Effects specimen (inspector-panel&styles=opacity .5, blur 4px): Blur is now a number field with px; Brightness / Contrast / Grayscale carry a value box + unit beside the slider; 'Transform and transition' / 'Advanced effects · None' already match. Opacity stays one field (161:12525, the dedicated board, draws it so; 36:2's slider is the specimen). Locked specimen: the boards differ — 36:2 'Select parent Hero', 147:77668 'Show Hero in Layers' (built). Multiple selection: B04 247:29578 puts Align and distribute at the Style tab's head, ahead of 36:2's Typography-first specimen. Still open: section '1 set' counts on open Shadow/Filters, Page / Component-instance specimens not re-compared. | Lane L-B P1 (2026-10-27), probe-compared specimens: Container layout (Children layout selects + More settings, Size modes, Spacing/Background/Border shut with 'n set'; Direction reads 'Row' per 247:21216, not 'Horizontal'); Text content (matches 161:8480, Conditions → B-11); Image content (?type=image&attrs=…: 'Image source' with the grey file card, 'Replace image', Alt text, 'Decorative image' — an explicit alt=\"\" + role=presentation — then 'Loading' with Loading · Decoding and 'Image fit and dimensions are in Style.'; the CMS bind row stays above the card). Effects: brightness(1) read as 1% is fixed (now 100). Still open: Effects naming/readouts ('Transform and transition', 'Advanced effects · None', value boxes beside the sliders, Blur as a number field), Page/no-selection, Multiple selection, Locked and Component-instance specimens — not re-compared this wave (multi-selection and instance need a shell selection the probe does not make).",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 28, the four remaining specimens probe-compared (scratch lb/ptxt2.mjs; s-page.png, s-inst.png): Page / no selection (?page=1) — Background Color · Size Max width · Typography Font / Text color · Spacing · Page settings button + note, in the specimen's order; its button / note wording follows the dedicated page-panel board S06 ('SEO and social', 'Opens Home’s Page settings. Appearance stays here.'), not this specimen's 'SEO & social'. Component instance (?instance=Header&overrides=font-size 28px) — follows the dedicated instance boards IC01–IC06 (instance band 'Header · instance', Edit main component ›, 'Reset to main component · 1 override', per-field 'Font size overrides master'), which redraw this specimen's band. Multiple selection follows B04 247:29578 and Locked follows 147:77668 (both noted below). Every specimen on this board is now either matched or owned by a later, dedicated board. | L-B round 3: the open Filters section counts what is set ('1 set'), as the specimen draws. | L-B round 2 (2026-10-31), probe-compared Effects specimen (inspector-panel&styles=opacity .5, blur 4px): Blur is now a number field with px; Brightness / Contrast / Grayscale carry a value box + unit beside the slider; 'Transform and transition' / 'Advanced effects · None' already match. Opacity stays one field (161:12525, the dedicated board, draws it so; 36:2's slider is the specimen). Locked specimen: the boards differ — 36:2 'Select parent Hero', 147:77668 'Show Hero in Layers' (built). Multiple selection: B04 247:29578 puts Align and distribute at the Style tab's head, ahead of 36:2's Typography-first specimen. Still open: section '1 set' counts on open Shadow/Filters, Page / Component-instance specimens not re-compared. | Lane L-B P1 (2026-10-27), probe-compared specimens: Container layout (Children layout selects + More settings, Size modes, Spacing/Background/Border shut with 'n set'; Direction reads 'Row' per 247:21216, not 'Horizontal'); Text content (matches 161:8480, Conditions → B-11); Image content (?type=image&attrs=…: 'Image source' with the grey file card, 'Replace image', Alt text, 'Decorative image' — an explicit alt=\"\" + role=presentation — then 'Loading' with Loading · Decoding and 'Image fit and dimensions are in Style.'; the CMS bind row stays above the card). Effects: brightness(1) read as 1% is fixed (now 100). Still open: Effects naming/readouts ('Transform and transition', 'Advanced effects · None', value boxes beside the sliders, Blur as a number field), Page/no-selection, Multiple selection, Locked and Component-instance specimens — not re-compared this wave (multi-selection and instance need a shell selection the probe does not make).",
    "tier": "P1"
   },
   {
@@ -5968,8 +5968,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "L-B round 23: not built — per the lead's condition. Sections have no error boundary of their own: one boundary wraps the whole tab body (ProInspector), so a per-section 'Retry Typography' would be a fake today. Building it means a boundary per registry entry in InspectorTabContent first.",
+   "verified": "drift-open",
+   "verifiedNote": "L-B round 28: built — every registry section renders inside SectionErrorBoundary (registry/_shared defineSection): a section that throws is replaced by '{Section} unavailable · We could not display these controls. Your text and saved values are unchanged. · Retry {Section}' (board copy, exact), the other sections keep rendering, a new selection starts clean (SectionErrorBoundary.test). Not compared visually: the probe has no way to make one section throw. | L-B round 23: not built — per the lead's condition. Sections have no error boundary of their own: one boundary wraps the whole tab body (ProInspector), so a per-section 'Retry Typography' would be a fake today. Building it means a boundary per registry entry in InspectorTabContent first.",
    "tier": "P1"
   },
   {
@@ -9373,9 +9373,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "blocked:engine-list-pages-empty REQUESTS B-30 — no list-binding model for pagination / When empty",
-   "verified": "drift-open",
-   "verifiedNote": "L-B round 27: rows compared by board text (dump) against CollectionQueryRows: Source · Open collection › · Filter · + Add filter · Match · Sort · Direction · + Then by · Show · Skip match (the 'code has only Show items' note below is stale). Missing: 'Pages' (Show first N only / Split into pages), 'When empty' (Show editable No items block / Hide list) and 'Published records only…' — no model; REQUESTS B-30. | Content list panel Source/Filter/Sort/Show/Skip/Split/When empty; code: Collection + Show items (CollectionListSection.tsx:64)",
+   "authority": "board",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 28, B-30 built (engine-list-query model extended; tests listPages.test, CollectionPagesRows.test) and probe-compared (?block=collection-list with a stubbed Blog of 14 records, filter Category is Design, Show 6; scratch lb/d80.mjs, d80.png / d81.png): the panel now ends 'Pages · ◉ Show first 6 only ○ Split into pages · When empty · ◉ Show editable No items block ○ Hide list' as drawn. Not drawn: 'Published records only. Show drafts affects canvas preview.' — the canvas list shows drafts whatever Show drafts says, so the second half would be false. | L-B round 27: rows compared by board text (dump) against CollectionQueryRows: Source · Open collection › · Filter · + Add filter · Match · Sort · Direction · + Then by · Show · Skip match (the 'code has only Show items' note below is stale). Missing: 'Pages' (Show first N only / Split into pages), 'When empty' (Show editable No items block / Hide list) and 'Published records only…' — no model; REQUESTS B-30. | Content list panel Source/Filter/Sort/Show/Skip/Split/When empty; code: Collection + Show items (CollectionListSection.tsx:64)",
    "tier": "P1"
   },
   {
@@ -9407,9 +9407,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "blocked:engine-list-pages-empty REQUESTS B-30 — no list-binding model for pagination / When empty",
-   "verified": "drift-open",
-   "verifiedNote": "L-B round 27: the inspector rows on this board match today's list panel (Filter rule Category is …, Sort, + Then by, Show, Skip); the board's point is the editable 'No items' slot and 'When empty' — RepeaterRenderer only hides the template when empty. REQUESTS B-30. | Editable \"No items\" slot + When empty; not in code",
+   "authority": "board",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 28, B-30 built (engine-list-query model extended; tests listPages.test, CollectionPagesRows.test) and probe-compared (?block=collection-list with a stubbed Blog of 14 records, filter Category is Design, Show 6; scratch lb/d80.mjs, d80.png / d81.png): the inspector rows match; the 'No items' block is a child of the list (data-bk-empty) added by 'Show editable No items block', never repeated, hidden on the canvas while records exist and shown (template hidden) when none match; on publish it is removed when records exist and kept when none — RepeaterRenderer, unit-tested (listPages.test). Canvas state not screenshot. | L-B round 27: the inspector rows on this board match today's list panel (Filter rule Category is …, Sort, + Then by, Show, Skip); the board's point is the editable 'No items' slot and 'When empty' — RepeaterRenderer only hides the template when empty. REQUESTS B-30. | Editable \"No items\" slot + When empty; not in code",
    "tier": "P1"
   },
   {
@@ -9429,9 +9429,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "blocked:engine-list-pages-empty REQUESTS B-30 — no list-binding model for pagination / When empty",
-   "verified": "drift-open",
-   "verifiedNote": "L-B round 27: 'Split into pages' → /page/N static pages is an export feature with no model. REQUESTS B-30. | Split into static pages /page/N; not in code",
+   "authority": "board",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 28, B-30 built (engine-list-query model extended; tests listPages.test, CollectionPagesRows.test) and probe-compared (?block=collection-list with a stubbed Blog of 14 records, filter Category is Design, Show 6; scratch lb/d80.mjs, d80.png / d81.png): Split into pages → '3 pages · /, /page/2, /page/3' · 'Generated on publish. Previous and Next are editable links.' — exact. Split adds the pager block after the list (nav: Previous · 'Page k of n' · Next, ordinary editable elements); publish writes page/2.html, page/3.html with Previous/Next hrefs filled and disabled at the ends. | L-B round 27: 'Split into pages' → /page/N static pages is an export feature with no model. REQUESTS B-30. | Split into static pages /page/N; not in code",
    "tier": "P1"
   },
   {
@@ -9440,9 +9440,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "blocked:engine-list-pages-empty REQUESTS B-30 — no list-binding model for pagination / When empty",
-   "verified": "drift-open",
-   "verifiedNote": "L-B round 27: the /page/N URL-collision publish block depends on Split into pages (D80). REQUESTS B-30. | Pagination URL collision blocks publish; not in code",
+   "authority": "board",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 28, B-30 built (engine-list-query model extended; tests listPages.test, CollectionPagesRows.test) and probe-compared (?block=collection-list with a stubbed Blog of 14 records, filter Category is Design, Show 6; scratch lb/d80.mjs, d80.png / d81.png): a page with slug page/2: '/page/2 is already used by another page. Rename that page or turn off pagination.' + 'Open conflicting page ›' (switches to that page) — exact. The export never overwrites that page's file; the Publish tray blocker is REQUESTS B-31 (lead-owned scanner). | L-B round 27: the /page/N URL-collision publish block depends on Split into pages (D80). REQUESTS B-30. | Pagination URL collision blocks publish; not in code",
    "tier": "P1"
   },
   {
@@ -9451,9 +9451,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "blocked:engine-list-pages-empty REQUESTS B-30 — no list-binding model for pagination / When empty",
-   "verified": "drift-open",
-   "verifiedNote": "L-B round 27, by board text: the related list's query is built (Category is This page’s category, 'Exclude this page’s record', 'Filter values follow the record being previewed.', server re-expands per record — B-27). Missing: the Pages group ('Pagination is unavailable on a collection page.') and When empty — REQUESTS B-30. | Related list: filter by this page's category, exclude current record, pagination disabled; not in code",
+   "authority": "board",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 28, B-30 built (engine-list-query model extended; tests listPages.test, CollectionPagesRows.test) and probe-compared (?block=collection-list with a stubbed Blog of 14 records, filter Category is Design, Show 6; scratch lb/d80.mjs, d80.png / d81.png): on a collection page Split is disabled with 'Pagination is unavailable on a collection page.' (the renderer ignores split there too); When empty applies per generated page in the server's applyRecordPass (slot kept or list removed) — unit-tested. Template-page inspector state checked by text, not screenshot. | L-B round 27, by board text: the related list's query is built (Category is This page’s category, 'Exclude this page’s record', 'Filter values follow the record being previewed.', server re-expands per record — B-27). Missing: the Pages group ('Pagination is unavailable on a collection page.') and When empty — REQUESTS B-30. | Related list: filter by this page's category, exclude current record, pagination disabled; not in code",
    "tier": "P1"
   },
   {
@@ -10084,8 +10084,8 @@
    "family": "brand",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — Brand shell differs: back link and title on separate rows; bordered cards, round swatches; preview is a bordered 50%-zoom card, not a full-height grey column; nav Checks has no count. | prior: L-D S1 shell + W1 body: grouped cards (\"{n} semantic colors\", then other groups), name + \"Edit ›\", \"Light #…     Dark #…\", \"Used by n places · through aliases\"; no auto-opened token. Built, not compared.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 28, probe-compared side by side (new probe case ?case=brand-workspace at 1440, scratch lb/brand.mjs, b01.png): '‹ Back to Editor · Home  Colors · n' on one row; plain 'Review changes', outlined 'Restore points ▾' and the strap on the next; primary '+ Add color' · 'Generate scale'; unboxed colour rows in a 494 column — square 28 swatch, name, 'Edit ›' at the row's end, 'Light … Dark …', 'Used by n places'; nav 'Checks · n' when findings exist; the preview is the full-height grey column at the right — Light / Dark switch (zoom kept at the row's end), 'Website preview', the real page (the site's own export with the staged brand, BrandLivePreview) in a white card. Probe's 'No brand set' banner is first-run state (B47, out of scope) and its sample tokens differ from the board's (data). | Compared live 2026-10-26 (cms-brand): DRIFT — Brand shell differs: back link and title on separate rows; bordered cards, round swatches; preview is a bordered 50%-zoom card, not a full-height grey column; nav Checks has no count. | prior: L-D S1 shell + W1 body: grouped cards (\"{n} semantic colors\", then other groups), name + \"Edit ›\", \"Light #…     Dark #…\", \"Used by n places · through aliases\"; no auto-opened token. Built, not compared.",
    "tier": "P2"
   },
   {
@@ -10737,9 +10737,9 @@
    "page": "05",
    "family": "components",
    "status": "active",
-   "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No library versions / v4→v5 update review; engine version is a local counter (engine/components/ComponentManager.ts:399)",
+   "authority": "founder:components-versioning-not-now owner 2026-10-31: the versioned component library (v4 → v5 updates, share update) is not built now",
+   "verified": "drift-open",
+   "verifiedNote": "L-B round 28: closed on the owner's answer — versioned library updates are not in this version. | No library versions / v4→v5 update review; engine version is a local counter (engine/components/ComponentManager.ts:399)",
    "tier": "P2"
   },
   {
@@ -10748,9 +10748,9 @@
    "page": "05",
    "family": "components",
    "status": "active",
-   "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Update-applied receipt missing (depends on K05 versioned library updates)",
+   "authority": "founder:components-versioning-not-now owner 2026-10-31: the versioned component library (v4 → v5 updates, share update) is not built now",
+   "verified": "drift-open",
+   "verifiedNote": "L-B round 28: closed on the owner's answer — versioned library updates are not in this version. | Update-applied receipt missing (depends on K05 versioned library updates)",
    "tier": "P2"
   },
   {
@@ -10759,9 +10759,9 @@
    "page": "05",
    "family": "components",
    "status": "active",
-   "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No local-changes/Share update as vN/Keep as site copy flow",
+   "authority": "founder:components-versioning-not-now owner 2026-10-31: the versioned component library (v4 → v5 updates, share update) is not built now",
+   "verified": "drift-open",
+   "verifiedNote": "L-B round 28: closed on the owner's answer — versioned library updates are not in this version. | No local-changes/Share update as vN/Keep as site copy flow",
    "tier": "P2"
   },
   {
@@ -10770,9 +10770,9 @@
    "page": "05",
    "family": "components",
    "status": "active",
-   "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Role-gated share (Editor disabled, reason) missing; never inherits (disabled variant)",
+   "authority": "founder:components-versioning-not-now owner 2026-10-31: the versioned component library (v4 → v5 updates, share update) is not built now",
+   "verified": "drift-open",
+   "verifiedNote": "L-B round 28: closed on the owner's answer — versioned library updates are not in this version. | Role-gated share (Editor disabled, reason) missing; never inherits (disabled variant)",
    "tier": "P2"
   },
   {
@@ -11091,9 +11091,9 @@
    "page": "05",
    "family": "components",
    "status": "active",
-   "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Compared live 2026-10-26 (cms-brand): unreachable live — Blocked-by-inaccessible-image export state not built (no per-asset access data); rows have no ⋯/Export entry. | prior: drift-open — L-C D8: the blocked-by-inaccessible-image state is not built: the editor has no per-asset access data to know an image is from a site the person can't open.",
+   "authority": "founder:components-packages-not-now owner 2026-10-31: component package export / import is not built now",
+   "verified": "drift-open",
+   "verifiedNote": "L-B round 28: closed on the owner's answer — component package export / import is not in this version. | Compared live 2026-10-26 (cms-brand): unreachable live — Blocked-by-inaccessible-image export state not built (no per-asset access data); rows have no ⋯/Export entry. | prior: drift-open — L-C D8: the blocked-by-inaccessible-image state is not built: the editor has no per-asset access data to know an image is from a site the person can't open.",
    "tier": "P2"
   },
   {
@@ -11102,9 +11102,9 @@
    "page": "05",
    "family": "components",
    "status": "active",
-   "authority": "board",
-   "verified": "no",
-   "verifiedNote": "built, not compared — L-C D8: \"Export {name}\" · \"Exporting main component … never changes, saves or publishes your site.\" · Included (Styles, Media and fonts — referenced by address, Nested components) · File \"{slug}.brcomponent · about N KB\" · Download package (ExportPackageDialog.tsx).",
+   "authority": "founder:components-packages-not-now owner 2026-10-31: component package export / import is not built now",
+   "verified": "drift-open",
+   "verifiedNote": "L-B round 28: closed on the owner's answer — component package export / import is not in this version. | built, not compared — L-C D8: \"Export {name}\" · \"Exporting main component … never changes, saves or publishes your site.\" · Included (Styles, Media and fonts — referenced by address, Nested components) · File \"{slug}.brcomponent · about N KB\" · Download package (ExportPackageDialog.tsx).",
    "inheritsFrom": "220:42592",
    "tier": "P2"
   },
@@ -11114,9 +11114,9 @@
    "page": "05",
    "family": "components",
    "status": "active",
-   "authority": "board",
-   "verified": "no",
-   "verifiedNote": "built, not compared — L-C D8: receipt toast \"Download started: {file}. Your site was not changed.\"",
+   "authority": "founder:components-packages-not-now owner 2026-10-31: component package export / import is not built now",
+   "verified": "drift-open",
+   "verifiedNote": "L-B round 28: closed on the owner's answer — component package export / import is not in this version. | built, not compared — L-C D8: receipt toast \"Download started: {file}. Your site was not changed.\"",
    "tier": "P2"
   },
   {
@@ -11125,9 +11125,9 @@
    "page": "05",
    "family": "components",
    "status": "active",
-   "authority": "board",
+   "authority": "founder:components-packages-not-now owner 2026-10-31: component package export / import is not built now",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — 3 steps (Choose file › Check › Import) vs board 6; no 'Drop a .brcomponent file here' dropzone or Selected row; dialog 560w centered y=307 vs 720w y≈120. | prior: built, not compared — L-C D9: \"Import components\" · steps · \"Add components from a .brcomponent package. Nothing is added until the last step.\" · Choose file · Selected line · limits line; refuses non-packages by name.",
+   "verifiedNote": "L-B round 28: closed on the owner's answer — component package export / import is not in this version. | Compared live 2026-10-26 (cms-brand): DRIFT — 3 steps (Choose file › Check › Import) vs board 6; no 'Drop a .brcomponent file here' dropzone or Selected row; dialog 560w centered y=307 vs 720w y≈120. | prior: built, not compared — L-C D9: \"Import components\" · steps · \"Add components from a .brcomponent package. Nothing is added until the last step.\" · Choose file · Selected line · limits line; refuses non-packages by name.",
    "tier": "P2"
   },
   {
@@ -11136,9 +11136,9 @@
    "page": "05",
    "family": "components",
    "status": "active",
-   "authority": "board",
-   "verified": "no",
-   "verifiedNote": "drift-open — L-C D9: not built — a package carries no scope choice (imports are site-wide) / no token or CMS links to map; the wizard has 3 steps, not 6.",
+   "authority": "founder:components-packages-not-now owner 2026-10-31: component package export / import is not built now",
+   "verified": "drift-open",
+   "verifiedNote": "L-B round 28: closed on the owner's answer — component package export / import is not in this version. | drift-open — L-C D9: not built — a package carries no scope choice (imports are site-wide) / no token or CMS links to map; the wizard has 3 steps, not 6.",
    "inheritsFrom": "220:43545",
    "tier": "P2"
   },
@@ -11148,9 +11148,9 @@
    "page": "05",
    "family": "components",
    "status": "active",
-   "authority": "board",
-   "verified": "no",
-   "verifiedNote": "drift-open — L-C D9: Check step lists each master New / \"Already on this site · kept as is\"; access blocks and the capacity line are not built. Not compared.",
+   "authority": "founder:components-packages-not-now owner 2026-10-31: component package export / import is not built now",
+   "verified": "drift-open",
+   "verifiedNote": "L-B round 28: closed on the owner's answer — component package export / import is not in this version. | drift-open — L-C D9: Check step lists each master New / \"Already on this site · kept as is\"; access blocks and the capacity line are not built. Not compared.",
    "inheritsFrom": "220:43545",
    "tier": "P2"
   },
@@ -11160,9 +11160,9 @@
    "page": "05",
    "family": "components",
    "status": "active",
-   "authority": "board",
-   "verified": "no",
-   "verifiedNote": "drift-open — L-C D9: not built — a package carries no scope choice (imports are site-wide) / no token or CMS links to map; the wizard has 3 steps, not 6.",
+   "authority": "founder:components-packages-not-now owner 2026-10-31: component package export / import is not built now",
+   "verified": "drift-open",
+   "verifiedNote": "L-B round 28: closed on the owner's answer — component package export / import is not in this version. | drift-open — L-C D9: not built — a package carries no scope choice (imports are site-wide) / no token or CMS links to map; the wizard has 3 steps, not 6.",
    "inheritsFrom": "220:43545",
    "tier": "P2"
   },
@@ -11172,9 +11172,9 @@
    "page": "05",
    "family": "components",
    "status": "active",
-   "authority": "board",
-   "verified": "no",
-   "verifiedNote": "drift-open — L-C D9: not built — a package carries no scope choice (imports are site-wide) / no token or CMS links to map; the wizard has 3 steps, not 6.",
+   "authority": "founder:components-packages-not-now owner 2026-10-31: component package export / import is not built now",
+   "verified": "drift-open",
+   "verifiedNote": "L-B round 28: closed on the owner's answer — component package export / import is not in this version. | drift-open — L-C D9: not built — a package carries no scope choice (imports are site-wide) / no token or CMS links to map; the wizard has 3 steps, not 6.",
    "inheritsFrom": "220:43545",
    "tier": "P2"
   },
@@ -11184,9 +11184,9 @@
    "page": "05",
    "family": "components",
    "status": "active",
-   "authority": "board",
-   "verified": "no",
-   "verifiedNote": "built, not compared — L-C D9: \"Importing N of M… Keep this window open.\"",
+   "authority": "founder:components-packages-not-now owner 2026-10-31: component package export / import is not built now",
+   "verified": "drift-open",
+   "verifiedNote": "L-B round 28: closed on the owner's answer — component package export / import is not in this version. | built, not compared — L-C D9: \"Importing N of M… Keep this window open.\"",
    "tier": "P2"
   },
   {
@@ -11195,9 +11195,9 @@
    "page": "05",
    "family": "components",
    "status": "active",
-   "authority": "board",
-   "verified": "no",
-   "verifiedNote": "drift-open — L-C D9: a master that fails to add stops the import with \"{name} couldn’t be added. N of M were imported; Retry adds the rest.\"; the unknown-outcome receipt check (K37) needs a server import receipt and is not built.",
+   "authority": "founder:components-packages-not-now owner 2026-10-31: component package export / import is not built now",
+   "verified": "drift-open",
+   "verifiedNote": "L-B round 28: closed on the owner's answer — component package export / import is not in this version. | drift-open — L-C D9: a master that fails to add stops the import with \"{name} couldn’t be added. N of M were imported; Retry adds the rest.\"; the unknown-outcome receipt check (K37) needs a server import receipt and is not built.",
    "tier": "P2"
   },
   {
@@ -11206,9 +11206,9 @@
    "page": "05",
    "family": "components",
    "status": "active",
-   "authority": "board",
-   "verified": "no",
-   "verifiedNote": "drift-open — L-C D9: receipt is a toast \"Imported N components from {file}. N already on this site were kept as they are.\"; Undo import (outside composer history) and Review imported resources not built.",
+   "authority": "founder:components-packages-not-now owner 2026-10-31: component package export / import is not built now",
+   "verified": "drift-open",
+   "verifiedNote": "L-B round 28: closed on the owner's answer — component package export / import is not in this version. | drift-open — L-C D9: receipt is a toast \"Imported N components from {file}. N already on this site were kept as they are.\"; Undo import (outside composer history) and Review imported resources not built.",
    "tier": "P2"
   },
   {
@@ -11217,9 +11217,9 @@
    "page": "05",
    "family": "components",
    "status": "active",
-   "authority": "board",
-   "verified": "no",
-   "verifiedNote": "drift-open — L-C D9: a master that fails to add stops the import with \"{name} couldn’t be added. N of M were imported; Retry adds the rest.\"; the unknown-outcome receipt check (K37) needs a server import receipt and is not built.",
+   "authority": "founder:components-packages-not-now owner 2026-10-31: component package export / import is not built now",
+   "verified": "drift-open",
+   "verifiedNote": "L-B round 28: closed on the owner's answer — component package export / import is not in this version. | drift-open — L-C D9: a master that fails to add stops the import with \"{name} couldn’t be added. N of M were imported; Retry adds the rest.\"; the unknown-outcome receipt check (K37) needs a server import receipt and is not built.",
    "tier": "P2"
   },
   {

@@ -70,8 +70,9 @@ export interface BrandLivePreviewProps {
 }
 
 /* 7315:80955: the page frame is 346 × 265 inside the 468 card, centred. */
-const FRAME_W = 346;
-const FRAME_H = 265;
+/* 2L9 B6-B01 (203:33565): the page card in the grey preview column. */
+const FRAME_W = 420;
+const FRAME_H = 520;
 const ZOOMS = [
   { value: "0.25", label: "25%" },
   { value: "0.5", label: "50%" },
@@ -169,23 +170,17 @@ export const BrandLivePreview: React.FC<BrandLivePreviewProps> = ({
 
   return (
     <section
-      aria-label="Live preview"
+      aria-label="Website preview"
       data-testid="brand-live-preview"
       data-preview-mode={mode}
-      className="tw:flex tw:shrink-0 tw:flex-col tw:rounded-[var(--bk-radius-lg)] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)]"
+      className="tw:flex tw:shrink-0 tw:flex-col tw:gap-3"
     >
-      {/* 7315:80955: caption centred at 24 under the card's top edge, the
-          frame 6 under the caption's line. */}
-      <header className="tw:flex tw:items-center tw:gap-3 tw:px-4 tw:pb-1.5 tw:pt-3.5">
-        <span
-          className="tw:min-w-0 tw:flex-1 tw:truncate tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink-muted)]"
-          data-testid="brand-live-preview-caption"
-        >
-          Live preview{pageName ? ` · ${pageName}` : ""}
-        </span>
-        {/* The Light / Dark switch rides in this row, beside the zoom: the
-            page frame below stays clear (BRP1-M8 8224:240644). */}
+      {/* 2L9 B6-B01 (203:33565): the Light / Dark switch heads the grey
+          column, then "Website preview", then the page in a white card. The
+          zoom stays at the row's end. */}
+      <header className="tw:flex tw:items-center tw:gap-3">
         {controls && <span className="tw:inline-flex tw:shrink-0" data-testid="brand-live-preview-controls">{controls}</span>}
+        <span className="tw:flex-1" />
         {/* 7315:80955 draws the zoom as bare text with a caret ("50% ▾"), not
             a boxed field: the bare theme strips flowbite's border, fill and
             arrow image, and the caret is drawn beside it. */}
@@ -215,22 +210,29 @@ export const BrandLivePreview: React.FC<BrandLivePreviewProps> = ({
           </span>
         </span>}
       </header>
+      <p
+        className="tw:m-0 tw:truncate tw:text-[length:var(--bk-text-12)] tw:font-semibold tw:leading-[18px] tw:text-[var(--bk-ink)]"
+        data-testid="brand-live-preview-caption"
+        title={pageName ? `Website preview · ${pageName}` : undefined}
+      >
+        Website preview
+      </p>
       {pageIsEmpty ? (
-        <div className="tw:flex tw:flex-col tw:gap-3 tw:px-4 tw:pb-4" data-testid="brand-live-preview-empty">
+        <div className="tw:flex tw:flex-col tw:gap-3 tw:bg-white tw:p-4" data-testid="brand-live-preview-empty">
           <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]">
             This page is empty. Add content to the canvas to preview your brand changes.
           </p>
         </div>
-      ) : <div className="tw:flex tw:justify-center tw:px-4 tw:pb-2">
+      ) : <div className="tw:flex tw:justify-center">
         <div
-          className="tw:relative tw:overflow-hidden tw:rounded-[var(--bk-radius-sm)] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-gray-50)]"
+          className="tw:relative tw:overflow-hidden tw:bg-white"
           style={{ width: FRAME_W, height: FRAME_H }}
           data-testid="brand-live-preview-frame"
         >
           {doc && (
             <iframe
               ref={frameRef}
-              title="Live preview"
+              title="Website preview"
               sandbox="allow-same-origin"
               srcDoc={doc}
               onLoad={writeStaged}
