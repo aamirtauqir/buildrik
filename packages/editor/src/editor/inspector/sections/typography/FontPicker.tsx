@@ -271,13 +271,14 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value: ownValue, compose
           </Button>
           {load === "failed" ? (
             <p className="tw:m-0">A late load cannot reapply an undone choice. Project save and font loading are separate statuses.</p>
-          ) : null}
+          ) : (
           <p className="tw:m-0">
             {assigned.previous
               ? `Undo restores the previous ${assigned.previous} stack`
               : "Undo restores the inherited font"}
             {assigned.source === "uploaded" ? " without deleting the uploaded font." : "."}
           </p>
+          )}
         </div>
       ) : null}
     </div>

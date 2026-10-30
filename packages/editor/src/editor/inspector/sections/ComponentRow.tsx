@@ -5,7 +5,8 @@
  *
  *   ◇ Hero card · instance
  *   Component library · v4
- *   Variant   [Default ▾]
+ *   Variant   [Default ▾]   ("Variant unavailable" + why, when the
+ *             instance's variant was removed — IC04 241:18146)
  *   Edit main component ›
  *   Reset to main component · 3 overrides     (disabled: "No overrides to reset")
  *   Detach instance
@@ -93,6 +94,10 @@ export const ComponentRow: React.FC<ComponentRowProps> = ({ composer, elementId 
   const { component, instanceId, overrides } = info;
   const variants = component.variants ?? [];
   const current = variants.find((v) => v.id === info.currentVariant) ?? variants[0];
+  /* IC04: the instance names a variant its component no longer has — the
+     default renders (ComponentVariantResolver finds nothing), and the row
+     says so instead of quietly reading "Default". */
+  const missingVariant = !!info.currentVariant && !variants.some((v) => v.id === info.currentVariant);
 
   /* P-1: a variant swap, reset or detach rewrites this instance — lock gate
      first (it says so when it refuses). */
@@ -159,11 +164,16 @@ export const ComponentRow: React.FC<ComponentRowProps> = ({ composer, elementId 
         </div>
         <SelectRow
           label="Variant"
-          placeholder={null}
-          value={current?.id ?? ""}
+          placeholder={missingVariant ? "Variant unavailable" : null}
+          value={missingVariant ? "" : (current?.id ?? "")}
           options={variants.length === 0 ? NO_VARIANTS : variants.map((v) => ({ value: v.id, label: v.name }))}
           onChange={pickVariant}
         />
+        {missingVariant ? (
+          <p className="tw:m-0 tw:pb-1 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-warning-text)]" role="status" data-testid="component-variant-missing">
+            The selected variant was removed from {component.name}. Showing the default until you choose another.
+          </p>
+        ) : null}
         <Button
           color="light"
           size="xs"

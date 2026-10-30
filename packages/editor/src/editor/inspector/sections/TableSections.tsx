@@ -71,6 +71,24 @@ function partsOf(table: Element | undefined) {
   };
 }
 
+/** The first cell spanning more than one column or row, named like a sheet
+ *  ("B2": column letter, row number counting every row of the table). */
+function spanningCellOf(table: Element): { cell: Element; name: string; span: string } | null {
+  const rows = table.getDescendants().filter((d) => tag(d) === "tr");
+  for (let r = 0; r < rows.length; r++) {
+    const cells = rows[r].getChildren().filter((c) => tag(c) === "td" || tag(c) === "th");
+    for (let c = 0; c < cells.length; c++) {
+      const cols = Number(cells[c].getAttribute("colspan") ?? 1);
+      const rws = Number(cells[c].getAttribute("rowspan") ?? 1);
+      if (cols > 1 || rws > 1) {
+        const span = cols > 1 ? `${cols} columns` : `${rws} rows`;
+        return { cell: cells[c], name: `${String.fromCharCode(65 + Math.min(c, 25))}${r + 1}`, span };
+      }
+    }
+  }
+  return null;
+}
+
 /* Rows and a caption come and go as elements, not as an update of the
    table: re-read on every structural event (and undo / redo). */
 const TREE_EVENTS = [EVENTS.ELEMENT_UPDATED, EVENTS.ELEMENT_CREATED, EVENTS.ELEMENT_DELETED, EVENTS.ELEMENT_MOVED, EVENTS.HISTORY_UNDO, EVENTS.HISTORY_REDO] as const;
@@ -121,6 +139,36 @@ export const TableStructureSection: React.FC<TableSectionProps> = ({ composer, e
       }
     });
   };
+
+  /* C16 245:44573: a cell that spans more than one column or row makes the
+     table non-rectangular — row / column commands would have to flatten or
+     guess, so they stand down; the structure is kept exactly as authored. */
+  const spanning = spanningCellOf(table);
+  if (spanning) {
+    const select = (section: string) => {
+      composer.selection.select(spanning.cell);
+      setTimeout(() => composer.emit(EVENTS.UI_INSPECTOR_FOCUS_SECTION, { section }), 0);
+    };
+    return (
+      <Section title="Structure" stateTitle="Complex table preserved" isOpen={isOpen} onToggle={onToggle} tier={tier} id="inspector-section-table-structure">
+        <NoteRow testId="table-complex">
+          {spanning.name} spans {spanning.span}. Rectangular row and column commands are unavailable for this structure.
+        </NoteRow>
+        <div className="tw:flex tw:flex-col tw:gap-2">
+          <Button color="light" size="xs" className={WIDE_BUTTON} disabled>
+            Add blank row
+          </Button>
+          <Button size="xs" className={`${WIDE_BUTTON} tw:text-white!`} onClick={() => select("table-cell")} data-testid="table-edit-spanning">
+            Edit {spanning.name} content
+          </Button>
+          <Button color="light" size="xs" className={WIDE_BUTTON} onClick={() => select("table-cell")} data-testid="table-inspect-native">
+            Inspect native attributes
+          </Button>
+        </div>
+        <NoteRow>No flattening or normalization on selection. Existing spans, IDs, header associations and nested content remain.</NoteRow>
+      </Section>
+    );
+  }
 
   const header = parts.headerCells[0] ? textOf(parts.headerCells[0]) : "";
   return (
