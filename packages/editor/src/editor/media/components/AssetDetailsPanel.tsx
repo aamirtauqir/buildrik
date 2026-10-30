@@ -17,7 +17,7 @@
  * @license BSD-3-Clause
  */
 
-import { Sparkles, X } from "lucide-react";
+import { ChevronDown, Sparkles, X } from "lucide-react";
 import * as React from "react";
 import type { Composer } from "@/engine/Composer";
 import type { LibraryItem, VersionEntry } from "@/editor/sidebar/tabs/media/data/mediaTypes";
@@ -38,7 +38,6 @@ import {
   TextInput,
   Textarea,
   Tooltip,
-  VersionRow,
 } from "@/editor/chrome-ui";
 import {
   useMediaWriteAccess,
@@ -61,17 +60,46 @@ const MUTED_SM = "tw:text-xs tw:text-[var(--bk-ink-disabled)]";
    flowbite `xs` IS h-8; the accent fill is `.mgr-btn-primary`'s own, and the
    quiet grey Clear selection is the same fill as the dialogs' Cancel. */
 const RAIL_PRIMARY = "mgr-btn-primary tw:w-full tw:shrink-0 tw:justify-center";
-/* 4418:58292 act/Insert to canvas — the rail's one filled action is INK, not
-   accent: 40 tall, radius 8, 13 regular white. */
-const RAIL_INSERT = "mgr-btn-ink tw:w-full tw:shrink-0 tw:justify-center";
 const RAIL_QUIET = `${LIBRARY_MODAL_BTN_SECONDARY} tw:w-full tw:shrink-0`;
-/* 4418:58292 row/Details — a 32 row, no fill: "Details ▸" left, the summary right. */
-const DETAILS_ROW =
-  "tw:h-8 tw:min-h-0 tw:w-full tw:shrink-0 tw:justify-start tw:border-0 tw:bg-transparent tw:p-0 tw:shadow-none tw:enabled:hover:bg-transparent";
 /* 4418:58608 — the checked files, one 13/20 line each, 12 apart. */
 const FILE_LIST = "tw:m-0 tw:mt-2 tw:flex tw:list-none tw:flex-col tw:gap-3 tw:p-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]";
 // P7 — alt-text upper bound matches the server prompt's "Under 125 characters" rule.
 const ALT_TEXT_MAX = 125;
+
+type DetailTab = "details" | "usage" | "versions";
+const DETAIL_TABS: ReadonlyArray<{ id: DetailTab; label: string }> = [
+  { id: "details", label: "Details" },
+  { id: "usage", label: "Usage" },
+  { id: "versions", label: "Versions" },
+];
+/* 199:37199 — three equal 32-high tabs, the current one on the accent tint. */
+const DET_TABS = "tw:grid tw:grid-cols-3 tw:gap-1";
+const DET_TAB =
+  "tw:h-8 tw:min-h-0 tw:w-full tw:rounded-[var(--bk-radius-md)] tw:border-0 tw:px-2 tw:py-0 tw:shadow-none tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]";
+const DET_TAB_ON = "tw:bg-[var(--bk-accent-tint)] tw:font-medium tw:enabled:hover:bg-[var(--bk-accent-tint)]";
+const DET_TAB_OFF = "tw:bg-transparent tw:font-normal";
+/* 199:37822 — a placement is a 32 link row: "Page › element ↗" in accent. */
+const USAGE_LINK =
+  "tw:h-8 tw:min-h-0 tw:w-full tw:justify-center tw:px-0 tw:text-[length:var(--bk-text-12)] tw:font-normal tw:text-[var(--bk-accent-text)]";
+const USAGE_TEXT = "tw:flex tw:h-8 tw:items-center tw:justify-center tw:text-[length:var(--bk-text-12)] tw:text-[var(--bk-ink)]";
+/* 199:38433 — a version is a 56 row: head 12 ink over "date · format" 11 muted. */
+const VERSION_ITEM =
+  "tw:h-14 tw:min-h-0 tw:w-full tw:justify-start tw:rounded-[var(--bk-radius-md)] tw:border-0 tw:bg-transparent tw:px-2 tw:py-0 tw:text-left tw:shadow-none tw:enabled:hover:bg-[var(--bk-bg-subtle)]";
+
+/** "WebP" / "JPG" / "SVG" — how the board writes a format. */
+function prettyFormat(ext: string): string {
+  return ext === "WEBP" ? "WebP" : ext;
+}
+
+/** "19 Oct 2026". */
+function longDate(iso: string): string {
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? "" : d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+}
+
+function stripExt(name: string): string {
+  return name.replace(/\.[a-z0-9]+$/i, "");
+}
 
 /** "PNG" / "MP4" / "WOFF2" — the filename's own extension, else the MIME subtype. */
 function fileExt(item: LibraryItem): string {
@@ -210,6 +238,15 @@ export interface AssetDetailsPanelProps {
    * underneath. Omitted, rows render without a Jump action.
    */
   onJumpToElement?(pageId: string, elementId: string): void;
+  /** The folder the file is filed in — Details' "Folder" row (199:37199). */
+  folderName?: string | null;
+  /** 200:31384 / 199:38433 — pick a file and save it as the family's next
+   *  version (it replaces nothing until the user chooses where to use it). */
+  onUploadVersion?(item: LibraryItem): void;
+  /** 200:31384 — More ▾ rows the context menu already runs. */
+  onCopyUrl?(item: LibraryItem): void;
+  onDownloadItem?(item: LibraryItem): void;
+  onMoveToFolder?(item: LibraryItem): void;
 }
 
 // ─── Component ────────────────────────────────────────────────────────────
@@ -237,6 +274,11 @@ export function AssetDetailsPanel({
   onUpdateTags,
   onManageFont,
   onJumpToElement,
+  folderName = null,
+  onUploadVersion,
+  onCopyUrl,
+  onDownloadItem,
+  onMoveToFolder,
 }: AssetDetailsPanelProps) {
   const [localPickerOpen, setLocalPickerOpen] = React.useState(false);
   const replaceAllPickerOpen = replacePickerOpen ?? localPickerOpen;
@@ -257,20 +299,25 @@ export function AssetDetailsPanel({
       </Tooltip>
     );
   const [moreOpen, setMoreOpen] = React.useState(false);
-  /* 4418:58292 / 7093:78271 — TAGS, VERSIONS and USED IN sit behind one
-     "Details ▸" row whose right side summarises them. */
-  const [detailsOpen, setDetailsOpen] = React.useState(false);
+  /* 2L9 B6-A01 — Details | Usage | Versions; the tab survives a file change. */
+  const [tab, setTab] = React.useState<DetailTab>("details");
+  const copyAltText = (alt: string) => {
+    void navigator.clipboard?.writeText(alt).then(
+      () => addToast({ description: "Alt text copied", tone: "success" }),
+      () => addToast({ description: "Couldn’t copy the alt text", tone: "error" }),
+    );
+  };
   const runMore = (fn: () => void) => () => {
     setMoreOpen(false);
     fn();
   };
   /* The ⋯ twin of `gated`: a viewer sees the row disabled, with the reason. */
-  const menuGated = (action: MediaWriteAction, label: string, run: () => void, danger = false) => (
+  const menuGated = (action: MediaWriteAction, label: string, run: () => void, danger = false, testId = `mgr-det-${action}`) => (
     <MenuItem
       danger={danger}
       disabled={!write.canWrite}
       title={write.canWrite ? undefined : write.reason(action)}
-      data-testid={`mgr-det-${action}`}
+      data-testid={testId}
       onClick={runMore(run)}
     >
       {write.canWrite ? label : `${label.replace(/…$/, "")} · View only`}
@@ -391,10 +438,6 @@ export function AssetDetailsPanel({
       : isFont
         ? `${selectedItem.siteFont ? "Site font · added" : "Uploaded · not added"} · ${ext}`
         : `Selected asset · ${ext}`;
-  const versionCount = Math.max(1, versions.length);
-  const detailsSummary = `${versionCount} ${versionCount === 1 ? "version" : "versions"} · ${
-    usageCount === 0 ? "not used yet" : `used in ${usageCount} ${usageCount === 1 ? "place" : "places"}`
-  }`;
   /* FC-6: was a joined string ("2 places — Menu preview, Footer"); now the
      same grouped, navigable row list the drawer's overlay draws
      (AssetDetailOverlay.tsx), built from the same `collectUsageByPage` util
@@ -405,218 +448,259 @@ export function AssetDetailsPanel({
      it on the site). */
   const usagePages = mergeUsageByPage(replaceSources.map((src) => collectUsageByPage(composer, src)));
 
+  const fmt = prettyFormat(ext);
+  const facts =
+    selectedItem.width && selectedItem.height
+      ? `${selectedItem.width} × ${selectedItem.height} · ${fmt} · ${shortBytes(selectedItem.size)}`
+      : `${fmt} · ${shortBytes(selectedItem.size)}`;
+  const familyName = (versions[0]?.item ?? selectedItem).displayName ?? (versions[0]?.item ?? selectedItem).name;
+  /* A file with no saved version is its own one-member family. */
+  const family: ReadonlyArray<VersionEntry> =
+    versions.length > 0 ? versions : [{ item: selectedItem, index: 1, placements: usageCount, pages: [] }];
+  const placedEntry = family.find((v) => v.placements > 0) ?? null;
+  const placementCount = usagePages.reduce((n, pg) => n + pg.hits.length, 0);
+  const canReplace = !isFont && usageCount > 0;
+
   return (
     <>
       <div className={railClass} data-testid="mgr-details" data-dimmed={dimmed || undefined}>
         <div className="mgr-det-body">
-          <div className="mgr-det-preview">
-            {selectedItem.type === "img" ? (
-              <img src={selectedItem.src} alt={selectedItem.name} />
-            ) : selectedItem.type === "vid" ? (
-              /* A video is not an <img>: that rendered a broken image with the
-                 filename as its alt (measured, Clone walk 2026-09-13). The
-                 first frame is the preview the board's grey tile stands for. */
-              <video src={selectedItem.src} muted playsInline preload="metadata" data-testid="mgr-det-video" />
-            ) : selectedItem.type === "ico" ? (
-              <img src={selectedItem.src} alt={selectedItem.name} className="tw:size-16" />
-            ) : isFont ? (
-              <span className="tw:text-5xl tw:font-semibold tw:text-[var(--bk-ink)]">Aa Bb</span>
-            ) : null}
+          {/* 2L9 B6-A01/A02/A03 — the file's name, then Details | Usage |
+              Versions. One tab at a time; the tab is kept across files. */}
+          <h3 className="mgr-det-title" data-testid="mgr-det-title">{selectedItem.displayName ?? selectedItem.name}</h3>
+          <div className={DET_TABS} role="tablist" aria-label="Asset details" data-testid="mgr-det-tabs">
+            {DETAIL_TABS.map((t) => (
+              <Button
+                key={t.id}
+                type="button"
+                color="light"
+                size="xs"
+                role="tab"
+                aria-selected={tab === t.id}
+                className={`${DET_TAB} ${tab === t.id ? DET_TAB_ON : DET_TAB_OFF}`}
+                data-testid={`mgr-det-tab-${t.id}`}
+                onClick={() => setTab(t.id)}
+              >
+                {t.label}
+              </Button>
+            ))}
           </div>
-          <div className="mgr-det-filename">{selectedItem.displayName ?? selectedItem.name}</div>
-          <div className="mgr-det-meta" data-testid="mgr-det-meta">{metaLine}</div>
 
-          {selectedItem.type === "img" && onUpdateAltText && (
-            <AltTextSection item={selectedItem} onUpdateAltText={onUpdateAltText} />
-          )}
-
-          <Button
-            type="button"
-            color="light"
-            size="xs"
-            className={DETAILS_ROW}
-            aria-expanded={detailsOpen}
-            data-testid="mgr-det-details-toggle"
-            onClick={() => setDetailsOpen((v) => !v)}
-          >
-            <span className="tw:flex tw:w-full tw:items-center tw:justify-between tw:gap-2">
-              <span className="tw:text-[length:var(--bk-text-13)] tw:font-medium tw:leading-5 tw:text-[var(--bk-ink)]">
-                Details {detailsOpen ? "▾" : "▸"}
-              </span>
-              <span className="tw:text-[length:var(--bk-text-11)] tw:font-normal tw:leading-4 tw:text-[var(--bk-gray-500)]" data-testid="mgr-det-summary">
-                {detailsSummary}
-              </span>
-            </span>
-          </Button>
-
-          {detailsOpen && onUpdateTags && <TagsSection item={selectedItem} onUpdateTags={onUpdateTags} />}
-
-          {/* Clone 3695:45529 / 3697:20326 (Phase 6): the family, newest
-              first — `v2 · Latest saved` over `v1 · Original` — drawn only
-              once a version has been saved. The member whose src the site's
-              placements carry is marked APPLIED; the marker follows the
-              placements, not a flag on the row. A row is the door to Asset
-              versions, where applying is the explicit step; the `_v1234`
-              stem heuristic and its Revert button are gone with it. */}
-          {detailsOpen && versions.length > 1 && (
-            <section className="mgr-det-section" data-testid="mgr-det-versions">
-              <h4 className="mgr-det-label">Versions</h4>
-              <div className="mgr-version-list">
-                {[...versions].reverse().map((entry) => (
-                  <VersionRow
-                    key={entry.item.key}
-                    title={versionLabel(entry, versions.length)}
-                    meta={shortDate(entry.item.createdAt)}
-                    current={entry.placements > 0}
-                    currentLabel="APPLIED"
-                    onClick={onOpenVersions}
-                    data-testid={`mgr-det-version-${entry.item.key}`}
-                    leading={
-                      <span className="mgr-version-thumb">
-                        {entry.item.thumb || entry.item.type === "img" ? (
-                          <img src={entry.item.thumb || entry.item.src} alt={entry.item.name} />
-                        ) : (
-                          <span className="tw:text-[length:var(--bk-text-11)]">{entry.item.type.toUpperCase()}</span>
-                        )}
-                      </span>
-                    }
-                  />
-                ))}
+          {tab === "details" && (
+            <div className="mgr-det-pane" role="tabpanel" data-testid="mgr-det-pane-details">
+              <div className="mgr-det-preview">
+                {selectedItem.type === "img" ? (
+                  <img src={selectedItem.src} alt={selectedItem.name} />
+                ) : selectedItem.type === "vid" ? (
+                  /* A video is not an <img>: the first frame is the preview. */
+                  <video src={selectedItem.src} muted playsInline preload="metadata" data-testid="mgr-det-video" />
+                ) : selectedItem.type === "ico" ? (
+                  <img src={selectedItem.src} alt={selectedItem.name} className="tw:size-16" />
+                ) : isFont ? (
+                  <span className="tw:text-5xl tw:font-semibold tw:text-[var(--bk-ink)]">Aa Bb</span>
+                ) : null}
               </div>
-            </section>
+              <div className="mgr-det-meta" data-testid="mgr-det-meta">{isFont ? metaLine : facts}</div>
+
+              {selectedItem.type === "img" && onUpdateAltText && (
+                <AltTextSection item={selectedItem} onUpdateAltText={onUpdateAltText} />
+              )}
+              {onUpdateTags && <TagsSection item={selectedItem} onUpdateTags={onUpdateTags} />}
+              <section className="mgr-det-section" data-testid="mgr-det-folder">
+                <h4 className="mgr-det-label">Folder</h4>
+                <p className="mgr-det-value">{folderName ?? "Not in a folder"}</p>
+              </section>
+
+              {/* 199:37199 — Place on canvas (primary), then Edit image · More ▾.
+                  A video has no Edit image (Rename takes its place); a font is
+                  managed in Site fonts, not placed. */}
+              <div className="mgr-det-actions mgr-det-actions--inline" data-testid="mgr-det-actions">
+                {!isFont ? (
+                  <Button size="xs" className={RAIL_PRIMARY} onClick={() => onInsert(selectedItem.key)}>
+                    Place on canvas
+                  </Button>
+                ) : onManageFont ? (
+                  <Button size="xs" className={RAIL_PRIMARY} onClick={() => onManageFont(selectedItem)} data-testid="mgr-det-manage-font">
+                    Manage font
+                  </Button>
+                ) : null}
+                <div className="mgr-det-actions-row">
+                  {isImage ? (
+                    <Button className="mgr-btn" onClick={() => onEditImage(selectedItem)}>
+                      Edit image
+                    </Button>
+                  ) : (
+                    gated("rename", "Rename", "mgr-btn", () => onOpenRename(selectedItem))
+                  )}
+                  <Popover
+                    open={moreOpen}
+                    onClose={() => setMoreOpen(false)}
+                    placement="top-end"
+                    label="More actions"
+                    trigger={
+                      <Button
+                        className="mgr-btn mgr-btn-quiet"
+                        aria-haspopup="menu"
+                        aria-expanded={moreOpen}
+                        data-testid="mgr-det-more"
+                        onClick={() => setMoreOpen((v) => !v)}
+                      >
+                        More <ChevronDown size={12} aria-hidden="true" />
+                      </Button>
+                    }
+                  >
+                    {/* 200:31384 — Optimize · Upload new version… · Replace across
+                        site… · Rename · Copy URL · Copy alt text · Download · Move
+                        to folder · Delete asset… · Close. A row the file's kind
+                        cannot use is left out, not disabled. */}
+                    <Menu label="More actions" className="tw:w-[200px]">
+                      {selectedItem.type === "img" && onOptimizeImage && (
+                        <MenuItem onClick={runMore(() => onOptimizeImage(selectedItem))}>Optimize</MenuItem>
+                      )}
+                      {selectedItem.type === "img" && onUploadVersion &&
+                        menuGated("upload", "Upload new version…", () => onUploadVersion(selectedItem))}
+                      {!isFont && (
+                        <MenuItem
+                          disabled={usageCount === 0}
+                          title={usageCount === 0 ? "Nothing on the site uses this asset yet" : undefined}
+                          data-testid="mgr-det-replace-across"
+                          onClick={runMore(() => setReplaceAllPickerOpen(true))}
+                        >
+                          Replace across site…
+                        </MenuItem>
+                      )}
+                      {isImage && menuGated("rename", "Rename", () => onOpenRename(selectedItem))}
+                      {onCopyUrl && (
+                        <MenuItem data-testid="mgr-det-copy-url" onClick={runMore(() => onCopyUrl(selectedItem))}>Copy URL</MenuItem>
+                      )}
+                      {selectedItem.type === "img" && (
+                        <MenuItem
+                          disabled={!selectedItem.altText}
+                          title={selectedItem.altText ? undefined : "This image has no alt text yet"}
+                          data-testid="mgr-det-copy-alt"
+                          onClick={runMore(() => copyAltText(selectedItem.altText ?? ""))}
+                        >
+                          Copy alt text
+                        </MenuItem>
+                      )}
+                      {onDownloadItem && (
+                        <MenuItem data-testid="mgr-det-download" onClick={runMore(() => onDownloadItem(selectedItem))}>Download</MenuItem>
+                      )}
+                      {onMoveToFolder && menuGated("rename", "Move to folder", () => onMoveToFolder(selectedItem), false, "mgr-det-move")}
+                      {menuGated("delete", "Delete asset…", () => onRequestDelete(selectedItem.key), true)}
+                      <MenuSeparator />
+                      <MenuItem data-testid="mgr-det-more-close" onClick={() => setMoreOpen(false)}>Close</MenuItem>
+                    </Menu>
+                  </Popover>
+                </div>
+              </div>
+            </div>
           )}
 
-          {detailsOpen && (
-            <section className="mgr-det-section" data-testid="mgr-det-used">
-              <h4 className="mgr-det-label">Used in</h4>
+          {tab === "usage" && (
+            <div className="mgr-det-pane" role="tabpanel" data-testid="mgr-det-used">
+              {/* 199:37822 — which version the placements carry, the scope
+                  caveat, then the placements by page, each a jump. CMS
+                  records are not traced (no usage index over records). */}
+              {versions.length > 1 && placedEntry ? (
+                <p className="mgr-det-strong" data-testid="mgr-det-used-version">Version {placedEntry.index} · Selected</p>
+              ) : null}
+              <p className="mgr-det-note">Usage outside this site isn&rsquo;t checked.</p>
               {usagePages.length === 0 ? (
                 <p className="mgr-det-used-line">
                   {usageCount === 0
-                    ? "Not used on this site"
-                    : /* The engine's placement count and the live page trace can
-                         diverge (a placement the trace can't reach) — count
-                         still says something rather than a false "not used". */
-                      `Used in ${usageCount} ${usageCount === 1 ? "place" : "places"}`}
+                    ? "No known placements on this site."
+                    : `Used in ${usageCount} ${usageCount === 1 ? "place" : "places"}`}
                 </p>
               ) : (
-                <div data-testid="mgr-det-used-rows" role="list" aria-label="Pages using this asset">
-                  {usagePages.map((pg) => (
-                    <React.Fragment key={pg.pageId}>
-                      <div
-                        className="tw:flex tw:h-6 tw:items-center tw:justify-between tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink-muted)]"
-                        data-testid={`mgr-det-used-page-${pg.pageId}`}
-                      >
-                        <span className="tw:truncate">{pg.pageName}</span>
-                        <span className="tw:font-medium tw:tabular-nums">{pg.hits.length}</span>
+                <>
+                  <h4 className="mgr-det-strong" data-testid="mgr-det-used-count">
+                    Pages · {placementCount} {placementCount === 1 ? "placement" : "placements"}
+                  </h4>
+                  <div data-testid="mgr-det-used-rows" role="list" aria-label="Pages using this asset">
+                    {usagePages.map((pg) => (
+                      <div key={pg.pageId} data-testid={`mgr-det-used-page-${pg.pageId}`} role="presentation">
+                        {pg.hits.map((hit) => (
+                          <div key={hit.elementId} role="listitem" data-testid={`mgr-det-used-row-${hit.elementId}`}>
+                            {onJumpToElement ? (
+                              <Button
+                                type="button"
+                                variant="link"
+                                className={USAGE_LINK}
+                                data-testid={`mgr-det-jump-${hit.elementId}`}
+                                onClick={() => onJumpToElement(pg.pageId, hit.elementId)}
+                              >
+                                {hit.crumb} {"↗"}
+                              </Button>
+                            ) : (
+                              <span className={USAGE_TEXT}>{hit.crumb}</span>
+                            )}
+                          </div>
+                        ))}
                       </div>
-                      {pg.hits.map((hit) => (
-                        <div
-                          key={hit.elementId}
-                          className="tw:flex tw:h-8 tw:items-center tw:gap-2"
-                          data-testid={`mgr-det-used-row-${hit.elementId}`}
-                          role="listitem"
-                        >
-                          <span className="tw:min-w-0 tw:flex-1 tw:truncate tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">
-                            {hit.label}
-                          </span>
-                          {onJumpToElement ? (
-                            <Button
-                              type="button"
-                              color="light"
-                              size="xs"
-                              variant="link"
-                              className="tw:min-h-6 tw:shrink-0 tw:p-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-accent-text)]"
-                              data-testid={`mgr-det-jump-${hit.elementId}`}
-                              onClick={() => onJumpToElement(pg.pageId, hit.elementId)}
-                            >
-                              Jump {"›"}
-                            </Button>
-                          ) : null}
-                        </div>
-                      ))}
-                    </React.Fragment>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                </>
               )}
-            </section>
+              {!isFont && (
+                <Button
+                  size="xs"
+                  className={RAIL_PRIMARY}
+                  disabled={!canReplace}
+                  title={canReplace ? undefined : "Nothing on the site uses this asset yet"}
+                  data-testid="mgr-det-usage-replace"
+                  onClick={() => setReplaceAllPickerOpen(true)}
+                >
+                  Replace across site…
+                </Button>
+              )}
+            </div>
           )}
 
-          {/* Per type (phase1-journeys.md, J-B table): images and SVGs get the
-              full set; a video has no Edit image; a font is neither inserted
-              nor replaced across the site — Manage font · Rename · Delete
-              (3696:21550 / 3705:21059; Manage font opens the Site fonts
-              dialog, 3686:42317, on this file, and is drawn in the board's
-              quiet fill). Insert to canvas is the PRIMARY: 3705:20396 and
-              4207:26629 (the later section) draw it filled, over
-              3695:20340's outlined one. */}
-          <div className="mgr-det-actions mgr-det-actions--inline" data-testid="mgr-det-actions">
-            {!isFont && (
-              <Button size="xs" className={RAIL_INSERT} onClick={() => onInsert(selectedItem.key)}>
-                Insert to canvas
-              </Button>
-            )}
-            {isFont && onManageFont && (
-              <Button
-                size="xs"
-                variant="secondary"
-                className={RAIL_QUIET}
-                onClick={() => onManageFont(selectedItem)}
-                data-testid="mgr-det-manage-font"
-              >
-                Manage font
-              </Button>
-            )}
-            {/* 4418:58292 — one quiet button and a ⋯: "Edit image" for an
-                image, else Rename. The rest of the old stack (Rename · Replace
-                across site… · Optimize · Delete) lives in the ⋯, unchanged —
-                same gates, same reasons, same doors. */}
-            <div className="mgr-det-actions-row">
-              {isImage ? (
-                <Button className="mgr-btn" onClick={() => onEditImage(selectedItem)}>
-                  Edit image
-                </Button>
-              ) : (
-                gated("rename", "Rename", "mgr-btn", () => onOpenRename(selectedItem))
-              )}
-              <Popover
-                open={moreOpen}
-                onClose={() => setMoreOpen(false)}
-                placement="top-end"
-                label="More actions"
-                trigger={
-                  <Button
-                    className="mgr-btn mgr-btn-more"
-                    aria-label="More actions"
-                    aria-haspopup="menu"
-                    aria-expanded={moreOpen}
-                    data-testid="mgr-det-more"
-                    onClick={() => setMoreOpen((v) => !v)}
-                  >
-                    ⋯
-                  </Button>
-                }
-              >
-                <Menu label="More actions">
-                  {/* 7093:78242 — Rename… · Replace across site… · Delete… (each opens a dialog). */}
-                  {isImage && menuGated("rename", "Rename…", () => onOpenRename(selectedItem))}
-                  {!isFont && (
-                    <MenuItem
-                      disabled={usageCount === 0}
-                      title={usageCount === 0 ? "Nothing on the site uses this asset yet" : undefined}
-                      onClick={runMore(() => setReplaceAllPickerOpen(true))}
+          {tab === "versions" && (
+            <div className="mgr-det-pane" role="tabpanel" data-testid="mgr-det-versions">
+              {/* 199:38433 — the family's name, then every version newest
+                  first: "Version N · Selected · Used in N pages" for the one
+                  the site's placements carry, "Version N · Available" for the
+                  rest, with its date and format. A row opens Asset versions,
+                  where using a version is the explicit step. */}
+              <h4 className="mgr-det-strong" data-testid="mgr-det-family">{stripExt(familyName)}</h4>
+              <div role="list" aria-label="Versions">
+                {[...family].reverse().map((entry) => {
+                  const used = entry.placements > 0;
+                  const pages = entry.pages.length;
+                  const head = `Version ${entry.index} · ${used ? "Selected" : "Available"}${
+                    used && pages > 0 ? ` · Used in ${pages} ${pages === 1 ? "page" : "pages"}` : ""
+                  }`;
+                  return (
+                    <Button
+                      key={entry.item.key}
+                      type="button"
+                      color="light"
+                      size="xs"
+                      role="listitem"
+                      className={VERSION_ITEM}
+                      data-testid={`mgr-det-version-${entry.item.key}`}
+                      onClick={onOpenVersions}
                     >
-                      Replace across site…
-                    </MenuItem>
-                  )}
-                  {selectedItem.type === "img" && onOptimizeImage && (
-                    <MenuItem onClick={runMore(() => onOptimizeImage(selectedItem))}>Optimize</MenuItem>
-                  )}
-                  <MenuSeparator />
-                  {menuGated("delete", "Delete…", () => onRequestDelete(selectedItem.key), true)}
-                </Menu>
-              </Popover>
+                      <span className="tw:flex tw:flex-col tw:items-start tw:gap-1">
+                        <span className="tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink)]">{head}</span>
+                        <span className="tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
+                          {longDate(entry.item.createdAt)} · {prettyFormat(fileExt(entry.item))}
+                        </span>
+                      </span>
+                    </Button>
+                  );
+                })}
+              </div>
+              {selectedItem.type === "img" && onUploadVersion ? (
+                <>
+                  {gated("upload", "Upload new version…", RAIL_PRIMARY, () => onUploadVersion(selectedItem))}
+                  <p className="mgr-det-note">A new version does not replace any images until you choose where to use it.</p>
+                </>
+              ) : null}
             </div>
-          </div>
+          )}
         </div>
       </div>
 
@@ -720,7 +804,7 @@ function AltTextSection({ item, onUpdateAltText }: AltTextSectionProps) {
   return (
     <div data-testid="alt-text-section" className="mgr-det-section">
       <label htmlFor={`alt-text-${item.key}`} className="mgr-det-label">
-        Alt text
+        Default alt
       </label>
       {altText ? (
         /* 4418:58292 — written alt text reads as a grey box: the text, then
@@ -754,6 +838,7 @@ function AltTextSection({ item, onUpdateAltText }: AltTextSectionProps) {
           </div>
         </>
       )}
+      <p className="mgr-det-note" data-testid="alt-text-hint">Used for new placements. Existing alt text stays unchanged.</p>
     </div>
   );
 }

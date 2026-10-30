@@ -531,15 +531,36 @@
   object-fit: contain;
 }
 
-.mgr-det-filename {
-  /* 4418:58292 — filename and meta are both 13/20 gray-600. */
-  font-size: var(--bk-text-13);
-  line-height: 20px;
-  font-weight: 400;
-  color: var(--bk-gray-600);
+/* 2L9 B6-A01 — the rail's head: the file's name, 13/600 ink, then the tabs. */
+.mgr-det-title {
+  margin: 0;
+  font: 600 var(--bk-text-13)/20px var(--bk-font-ui);
+  color: var(--bk-ink);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+.mgr-det-pane {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bk-space-12);
+}
+/* 199:37822 / 199:38433 — "Pages · 2 placements", "Studio study": 12/500 ink. */
+.mgr-det-strong {
+  margin: 0;
+  font: 500 var(--bk-text-12)/16px var(--bk-font-ui);
+  color: var(--bk-ink);
+}
+/* 199:37199 / 37822 / 38433 — the rail's caveats: 11/16 muted. */
+.mgr-det-note {
+  margin: 0;
+  font: 400 var(--bk-text-11)/16px var(--bk-font-ui);
+  color: var(--bk-ink-muted);
+}
+.mgr-det-value {
+  margin: 0;
+  font: 400 var(--bk-text-13)/20px var(--bk-font-ui);
+  color: var(--bk-ink);
 }
 
 .mgr-det-meta {
@@ -556,13 +577,12 @@
 }
 
 /* 4418:58292 — ALT TEXT: 11/500 caps, 0.88 tracking, gray-600. */
+/* 2L9 199:37199 — "Default alt", "Tags", "Folder": 12 regular ink-soft,
+   sentence case (the V3 11/500 caps label is displaced). */
 .mgr-det-label {
   margin: 0;
-  font-size: var(--bk-text-11);
-  font-weight: 500;
-  letter-spacing: 0.88px;
-  text-transform: uppercase;
-  color: var(--bk-gray-600);
+  font: 400 var(--bk-text-12)/16px var(--bk-font-ui);
+  color: var(--bk-ink-soft);
 }
 
 /* 4418:58608 — "2 assets selected" 20/600 over a 13/20 gray-500 hint. */
@@ -622,32 +642,20 @@
   justify-content: center;
 }
 
-/* 4418:58292 act/Insert to canvas — ink fill, 40 tall, radius 8, 13 regular. */
-.mgr-det-actions .mgr-btn-ink {
-  height: 40px;
-  min-height: 0;
-  padding: 0 var(--bk-space-12);
-  border: 0;
-  border-radius: var(--bk-radius-lg);
-  background: var(--bk-ink);
-  color: var(--bk-accent-on);
-  font: 400 var(--bk-text-13)/20px var(--bk-font-ui);
-}
-.mgr-det-actions .mgr-btn-ink:hover { filter: brightness(1.25); }
 
 /* 4418:58292 act-row — Edit image: 11/500 ink-soft on a bordered white
    32 row; the ⋯ beside it is a 24 square, centred on the row. */
 .mgr-det-actions-row { align-items: center; }
+/* 199:37199 — More ▾ is text on the column, no border. */
+.mgr-det-actions-row .mgr-btn-quiet {
+  border-color: transparent;
+  background: transparent;
+  gap: var(--bk-space-4);
+}
 .mgr-det-actions-row .mgr-btn {
   flex: 1 1 0;
   width: auto;
   font-size: var(--bk-text-11);
-}
-.mgr-det-actions-row .mgr-btn-more {
-  flex: none;
-  width: 24px;
-  height: 24px;
-  padding: 0;
 }
 
 .mgr-det-actions .mgr-btn:disabled {
@@ -694,46 +702,11 @@
 
 .mgr-sync-pill svg { width: 10px; height: 10px; }
 
-.mgr-version-list {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
 
-.mgr-version-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: var(--bk-space-8);
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background 0.1s;
-}
 
-.mgr-version-row:hover { background: var(--bk-bg-subtle); }
 
-.mgr-version-row.active {
-  background: var(--bk-accent-tint);
-}
 
-.mgr-version-thumb {
-  width: 40px;
-  height: 40px;
-  border-radius: 4px;
-  background: var(--bk-bg-subtle);
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  border: 1px solid var(--bk-border);
-}
 
-.mgr-version-thumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
 
 .mgr-empty {
   flex: 1;

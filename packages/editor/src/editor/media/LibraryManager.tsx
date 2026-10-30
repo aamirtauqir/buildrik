@@ -599,6 +599,57 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
   const versionsOfRef = React.useRef(state.versionsOf);
   versionsOfRef.current = state.versionsOf;
 
+  /* One way a version lands, whether the image editor saved it or a file was
+     picked with "Upload new version…" (2L9 199:38433 / 200:31384): through
+     the upload pipeline AS A VERSION of the family's parent —
+     `<stem>-v<N>.<ext>` in the parent's folder, flagged with the parent's
+     key — never as a library card, and nothing on the site changes until the
+     user applies it. A refused upload throws. The server's version history is
+     written best-effort once both rows are synced. */
+  const saveVersion = React.useCallback(
+    async (item: LibraryItem, blob: Blob, edits?: EditsSnapshot) => {
+      const parentKey = item.versionOf ?? item.key;
+      const family = versionsOfRef.current(parentKey);
+      const parent = family[0] ?? item;
+      const stem = parent.name.replace(/\.[^/.]+$/, "");
+      const file = new File([blob], displayNameFor(`${stem}-v${Math.max(family.length, 1) + 1}`, blob.type), { type: blob.type });
+      const result = await composer.media.uploadFile(file, {
+        ...(parent.folderId ? { folderId: parent.folderId } : {}),
+        versionOf: parentKey,
+        ...(edits ? { edits } : {}),
+      });
+      if (!result.success || !result.asset) throw new Error(result.error ?? "Could not save the version");
+      const saved = result.asset;
+      if (parent.assetId && saved.serverId && !saved.localOnly) {
+        void createAssetVersion({ assetId: parent.assetId, url: saved.src, bytes: saved.size, edits: edits ?? {} }).catch(() => {
+          /* History is a convenience; the version itself has landed. */
+        });
+      }
+    },
+    [composer],
+  );
+
+  /* "Upload new version…" — the picked file becomes the next version, then
+     the rail's Versions tab lists it (Available until applied). */
+  const versionInputRef = React.useRef<HTMLInputElement>(null);
+  const [versionTarget, setVersionTarget] = React.useState<LibraryItem | null>(null);
+  const handleVersionFile = React.useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      e.target.value = "";
+      const target = versionTarget;
+      setVersionTarget(null);
+      if (!file || !target) return;
+      try {
+        await saveVersion(target, file);
+        addToast({ description: "New version saved. It replaces nothing until you use it.", tone: "success" });
+      } catch (err) {
+        addToast({ description: err instanceof Error ? err.message : "Could not save the version", tone: "error" });
+      }
+    },
+    [versionTarget, saveVersion, addToast],
+  );
+
   /* Clone 3681:20026 → 3695:45529 — Edit image opens the editor on the file
      (a fresh blob URL: the stored src may be dead across sessions), with the
      name its head prints and the tab to open on. Its Save lands the edited
@@ -623,24 +674,8 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
       const parentKey = item.versionOf ?? item.key;
       const freshSrc = (await composer.media.getAssetSrc(item.key)) || item.src;
       const onSave = async (editedSrc: string, edits?: EditsSnapshot) => {
-        const family = versionsOfRef.current(parentKey);
-        const parent = family[0] ?? item;
         const res = await fetch(editedSrc);
-        const blob = await res.blob();
-        const stem = parent.name.replace(/\.[^/.]+$/, "");
-        const file = new File([blob], displayNameFor(`${stem}-v${Math.max(family.length, 1) + 1}`, blob.type), { type: blob.type });
-        const result = await composer.media.uploadFile(file, {
-          ...(parent.folderId ? { folderId: parent.folderId } : {}),
-          versionOf: parentKey,
-          ...(edits ? { edits } : {}),
-        });
-        if (!result.success || !result.asset) throw new Error(result.error ?? "Could not save the version");
-        const saved = result.asset;
-        if (parent.assetId && saved.serverId && !saved.localOnly) {
-          void createAssetVersion({ assetId: parent.assetId, url: saved.src, bytes: saved.size, edits: edits ?? {} }).catch(() => {
-            /* History is a convenience; the version itself has landed. */
-          });
-        }
+        await saveVersion(item, await res.blob(), edits);
       };
       onOpenImageEditor(freshSrc, onSave, {
         fileName: item.displayName ?? item.name,
@@ -648,7 +683,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
         onDone: () => setVersionsFor(parentKey),
       });
     },
-    [onOpenImageEditor, addToast, composer],
+    [onOpenImageEditor, addToast, composer, saveVersion],
   );
 
   /* Move every placement the family has on the site onto the target
@@ -968,6 +1003,14 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
             onClose();
           }}
           onUpdateTags={(key, tags) => void state.updateItem(key, { tags })}
+          folderName={selectedItem?.folderId ? (state.allFolders.find((f) => f.id === selectedItem.folderId)?.name ?? null) : null}
+          onUploadVersion={(item) => {
+            setVersionTarget(item);
+            versionInputRef.current?.click();
+          }}
+          onCopyUrl={state.copyUrl}
+          onDownloadItem={(item) => handleDownload([{ src: item.src, name: item.displayName ?? item.name }])}
+          onMoveToFolder={setMenuMoveTarget}
           /* Clone 3696:21550 — Site fonts is mounted once in the shell and
              opens on the composer event, with this file highlighted. */
           onManageFont={(item) => composer.emit("ui:site-fonts", { assetId: item.key })}
@@ -1017,6 +1060,14 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
         accept="image/*,video/*,audio/*,.svg,.ttf,.otf,.woff,.woff2"
         style={{ display: "none" }}
         onChange={handleFileChange}
+      />
+      <TextInput
+        ref={versionInputRef}
+        type="file"
+        accept="image/*"
+        style={{ display: "none" }}
+        data-testid="mgr-version-input"
+        onChange={(e) => void handleVersionFile(e)}
       />
       {/* Modals */}
       {/* Clone 3695:45569 → 3695:45573: Save to library lands the file and

@@ -9697,7 +9697,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-C 2026-10-31 AS-1 frame + AS-3 grid probe-compared (media-fullpage-library, 1440×900) vs shots/199-37199.png: rail head, '‹ Back to Editor · {page}' + scope title, search + 'Upload ▾', footer quota · saved; AS-3 filter row 'All types ▾ · Any tag ▾ · Date added ▾ · Grid | List · 4 columns ▾' (28 high, 128 selects, Grid on the accent tint; tag filter moved off the rail; sort = Date added menu + Reverse order), count line '{n} assets · {scope}' with a 'Select' link at its end (code: the board draws no multi-select; bulk move/download/delete kept), borderless cards 'name / W × H · size' ('SVG · 8 KB', 'Video · 24 MB'), 1px accent outline when selected, ⋯ on hover/focus, 4 columns default. Open: rail rows centred + Fonts row (AS-2), details Details|Usage|Versions tabs + Place on canvas · Edit image · More ▾ (AS-4). | Full-page shell-in layout, nav, filters, Details/Usage/Versions tabs and copy differ from LibraryManager (no shell, “Asset library”)",
+   "verifiedNote": "L-C 2026-10-31 AS-1 frame + AS-3 grid + AS-4 details rail probe-compared (media-fullpage-library, 1440×900) vs shots/199-37199.png: rail head; '‹ Back to Editor · {page}' + scope title; search + 'Upload ▾'; filter row 'All types ▾ · Any tag ▾ · Date added ▾ · Grid | List · 4 columns ▾' (tag filter moved off the rail; sort = Date added menu + Reverse order); count line '{n} assets · {scope}' + 'Select' (code: the board draws no multi-select; bulk move/download/delete kept); borderless cards 'name / W × H · size', 1px accent outline when selected; details rail = file name, Details | Usage | Versions tabs, preview, 'W × H · WebP · size', Default alt + 'Used for new placements…', Tags, Folder, Place on canvas (primary) · Edit image · More ▾. Open: rail rows centred without icons/counts + Fonts row (AS-2). | Full-page shell-in layout, nav, filters, Details/Usage/Versions tabs and copy differ from LibraryManager (no shell, “Asset library”)",
    "tier": "P2"
   },
   {
@@ -9706,9 +9706,9 @@
    "page": "05",
    "family": "assets",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Usage grouped Pages/CMS with outside-site note; code has single “Used in” list",
+   "authority": "code:no-cms-usage-index",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-C 2026-10-31 AS-4 built + probe-compared (Usage tab, media-fullpage-library) vs shots/199-37822.png: 'Version N · Selected' (family of 2+), 'Usage outside this site isn’t checked.', 'Pages · N placements', one centred accent row per placement 'Page › element ↗' (jumps to the element), primary 'Replace across site…' (disabled with reason at 0). Code: the CMS block ('CMS · 1 record', record rows, 'CMS records are edited separately.') is not drawn — there is no usage index over CMS records, so it would be invented. The probe composer has no placements; rows pinned in AssetDetailsPanel.clone.test. | Usage grouped Pages/CMS with outside-site note; code has single “Used in” list",
    "tier": "P2"
   },
   {
@@ -9718,8 +9718,8 @@
    "family": "assets",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Inline version list, Upload new version… and Use on N placements; code has VersionsModal, no version upload",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-C 2026-10-31 AS-4 built + probe-compared (Versions tab) vs shots/199-38433.png: family name, rows newest first 'Version N · Selected · Used in N pages' / 'Version N · Available' over 'D Mon YYYY · FMT' (a row opens Asset versions, where using a version stays the explicit step), primary 'Upload new version…' (picks a file and saves it as the next version of the family through the same path as the image editor's save) + 'A new version does not replace any images until you choose where to use it.' | Inline version list, Upload new version… and Use on N placements; code has VersionsModal, no version upload",
    "tier": "P2"
   },
   {
@@ -9906,8 +9906,8 @@
    "family": "assets",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Menu lacks Upload new version, Copy URL, Copy alt text, Download, Move to folder",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-C 2026-10-31 AS-4 built + probe-compared (More ▾ open) vs shots/200-31384.png: Optimize · Upload new version… · Replace across site… · Rename · Copy URL · Copy alt text · Download · Move to folder · Delete asset… (red) · Close. Rows the file's kind cannot use are left out (video: no Optimize / Upload new version / Copy alt text; font: Delete asset… · Close); Copy alt text is disabled while the image has none; viewers see the write rows disabled with the reason. | Menu lacks Upload new version, Copy URL, Copy alt text, Download, Move to folder",
    "tier": "P2"
   },
   {

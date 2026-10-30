@@ -297,7 +297,7 @@ describe("Clone 3721:44843 · Canvas · New image inserted into Home — Insert 
       insertToCanvas,
     });
     fireEvent.click(screen.getByTestId("mgr-asset-team"));
-    fireEvent.click(within(screen.getByTestId("mgr-det-actions")).getByRole("button", { name: "Insert to canvas" }));
+    fireEvent.click(within(screen.getByTestId("mgr-det-actions")).getByRole("button", { name: "Place on canvas" }));
     expect(insertToCanvas).toHaveBeenCalledWith("team");
     await vi.waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
   });
@@ -308,7 +308,6 @@ describe("BLOCKERS C3 · the rail's TAGS block writes through the state (authori
     const updateItem = vi.fn(() => Promise.resolve());
     await mountLibrary({ updateItem });
     fireEvent.click(screen.getByTestId("mgr-asset-team"));
-    fireEvent.click(screen.getByTestId("mgr-det-details-toggle"));
     const input = screen.getByTestId("mgr-det-tag-input");
     fireEvent.change(input, { target: { value: "  Staff " } });
     fireEvent.keyDown(input, { key: "Enter" });
@@ -319,7 +318,6 @@ describe("BLOCKERS C3 · the rail's TAGS block writes through the state (authori
     const updateItem = vi.fn(() => Promise.resolve());
     await mountLibrary({ updateItem });
     fireEvent.click(screen.getByTestId("mgr-asset-team"));
-    fireEvent.click(screen.getByTestId("mgr-det-details-toggle"));
     fireEvent.click(screen.getByRole("button", { name: "Remove tag team" }));
     expect(updateItem).toHaveBeenCalledWith("team", { tags: [] });
   });
