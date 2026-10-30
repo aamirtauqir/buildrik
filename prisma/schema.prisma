@@ -459,6 +459,9 @@ model CmsCollection {
   pageSlugPattern    String?
   pageSeoTitle       String?
   pageSeoDescription String?
+  // The slug of the image field whose value is each generated page's
+  // og:image (A-27, board 165:3693 "Social image").
+  pageSocialImage    String?
   // The publish-payload path of the page that templates each entry (e.g.
   // "blog/_template/index.html"). The publish step renders it per entry.
   pageTemplatePath   String?

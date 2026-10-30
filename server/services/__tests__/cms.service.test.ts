@@ -80,6 +80,15 @@ describe("collections", () => {
     expect(mocks.colCreate.mock.calls[0][0].data).toMatchObject({ siteId: "s1", name: "Posts", slug: "posts" });
   });
 
+  it("A-27: upsert stores the social image field (and null when unset)", async () => {
+    mocks.colCreate.mockResolvedValueOnce({ id: "c3" });
+    await upsertCollection("s1", { siteId: "s1", name: "Posts", slug: "posts", fields: [], pageSocialImage: "cover" });
+    expect(mocks.colCreate.mock.calls.at(-1)![0].data).toMatchObject({ pageSocialImage: "cover" });
+    mocks.colCreate.mockResolvedValueOnce({ id: "c4" });
+    await upsertCollection("s1", { siteId: "s1", name: "Notes", slug: "notes", fields: [] });
+    expect(mocks.colCreate.mock.calls.at(-1)![0].data).toMatchObject({ pageSocialImage: null });
+  });
+
   it("upsert with id refuses a collection already owned by another site (no write)", async () => {
     mocks.colFindUnique.mockResolvedValueOnce({ siteId: "other-site", deletedAt: null });
     await expect(
@@ -394,6 +403,28 @@ describe("generateDynamicPages", () => {
     expect(out[0].content).toContain("<h1>Hello &amp; World</h1>"); // substituted + escaped
     expect(out[0].content).toContain("<title>Hello &amp; World</title>"); // SEO injected into <head>
     expect(out[0].content).toContain('content="desc Hello &amp; World"');
+  });
+
+  it("A-27: emits the record's chosen image field as og:image, replacing the template's own", async () => {
+    mocks.colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/blog/{title}", pageSeoTitle: null, pageSeoDescription: null, pageSocialImage: "cover" });
+    mocks.entFindMany.mockResolvedValueOnce([
+      { id: "e1", data: { title: "A", cover: "https://cdn.example.com/a.jpg?w=1&h=2" } },
+      { id: "e2", data: { title: "B" } },
+    ]);
+    const out = await generateDynamicPages("s1", "c1", '<html><head><meta property="og:image" content="https://x/template.png"></head><body></body></html>');
+    expect(out[0].content).toContain('<meta property="og:image" content="https://cdn.example.com/a.jpg?w=1&amp;h=2">');
+    expect(out[0].content).not.toContain("template.png");
+    /* No value: nothing emitted, the template's own image stays. */
+    expect(out[1].content.match(/og:image/g)).toHaveLength(1);
+    expect(out[1].content).toContain("template.png");
+  });
+
+  it("A-27: a dangerous image URL is not emitted (the image binding's URL check)", async () => {
+    mocks.colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/p/{t}", pageSeoTitle: null, pageSeoDescription: null, pageSocialImage: "cover" });
+    mocks.entFindMany.mockResolvedValueOnce([{ id: "e1", data: { t: "x", cover: "javascript:alert(1)" } }]);
+    const out = await generateDynamicPages("s1", "c1", "<html><head></head><body></body></html>");
+    expect(out[0].content).not.toContain("og:image");
+    expect(out[0].content).not.toContain("javascript:");
   });
 
   it("returns [] for a non-page collection", async () => {

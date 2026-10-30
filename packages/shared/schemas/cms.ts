@@ -363,6 +363,9 @@ export const upsertCollectionInput = z.object({
   pageSlugPattern: z.string().max(200).nullable().optional(),
   pageSeoTitle: z.string().max(200).nullable().optional(),
   pageSeoDescription: z.string().max(400).nullable().optional(),
+  /* A-27 (165:3693 "Social image"): the slug of the image field whose value
+     becomes each generated page's og:image. */
+  pageSocialImage: z.string().max(100).nullable().optional(),
   pageTemplatePath: z.string().max(500).nullable().optional(),
 });
 export type UpsertCollectionInput = z.infer<typeof upsertCollectionInput>;

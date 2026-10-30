@@ -172,6 +172,21 @@ describe("DynamicPagesPane", () => {
     );
   });
 
+  it("A-27 (165:3693): Social image offers the image fields and saves the chosen one", async () => {
+    const withCover = {
+      ...MENU,
+      pageSlugPattern: "/menu/{slug}",
+      fields: [...MENU.fields, { id: "f3", name: "Cover image", slug: "cover", type: "image", order: 2 }],
+    } as CMSCollection;
+    const { updateCollection } = mount(withCover, [rec("a", "Margherita")]);
+    const select = screen.getByTestId("cms-dp-social-image") as HTMLSelectElement;
+    expect(screen.getByLabelText("Social image")).toBe(select);
+    expect([...select.options].map((o) => o.textContent)).toEqual(["None", "Cover image"]);
+    fireEvent.change(select, { target: { value: "cover" } });
+    fireEvent.click(screen.getByTestId("cms-dp-save"));
+    await waitFor(() => expect(updateCollection).toHaveBeenCalledWith("col-1", expect.objectContaining({ pageSocialImage: "cover" })));
+  });
+
   it("never offers the home page (index.html) as a template", () => {
     mount(MENU, [rec("a", "Margherita")]);
     const opts = [...screen.getByTestId("cms-dp-template").querySelectorAll("option")].map((o) => o.textContent ?? "");
