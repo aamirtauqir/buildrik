@@ -156,17 +156,21 @@ function statusLine(open: number, resolved: number, detached = 0): string {
   return `${open} open · ${resolved} resolved${detached > 0 ? ` · ${detached} detached` : ""}`;
 }
 
-/** The round card's first line — "◐ Awaiting · Lena Weiss (lena@…)". The
- *  board's "Opened · … · 2 h ago" needs the reviewer's last visit, which
- *  `currentRound` does not return (REQUESTS G-10); until then the line says
- *  where the round stands, which it does know. */
+/** The round card's first line — "◐ Opened · Lena Weiss (lena@…) · 2h ago",
+ *  "◌ Link expired · Lena can no longer open it" (B8-R02), or where the round
+ *  stands. */
 function roundState(round: CurrentRound): string {
   const st = round.status?.toLowerCase();
-  if (round.invitedEmail === null) return "Internal round — no client invited";
+  if (round.invitedEmail === null) return "◐ Internal round — no client invited";
+  if (round.linkExpired) return `◌ Link expired · ${round.reviewerName ?? round.invitedEmail} can no longer open it`;
   const who =
     round.reviewerName && round.invitedEmail
       ? `${round.reviewerName} (${round.invitedEmail})`
       : (round.reviewerName ?? round.invitedEmail);
+  if (!round.revoked && st === "pending" && round.reviewerLastSeenAt) {
+    const age = shortAge(round.reviewerLastSeenAt);
+    return `◐ Opened · ${who} · ${age === "just now" ? age : `${age} ago`}`;
+  }
   const state = round.revoked
     ? "Link revoked"
     : st === "changes_requested"
@@ -174,7 +178,16 @@ function roundState(round: CurrentRound): string {
       : st === "approved"
         ? "Approved"
         : "Awaiting";
-  return `${state} · ${who}`;
+  return `◐ ${state} · ${who}`;
+}
+
+/** "Sent 15 Oct · link works until 13 Jan" / "Sent 15 Jul · expired 13 Oct". */
+function sentLine(round: CurrentRound): string {
+  const sent = `Sent ${shortDate(round.createdAt)}`;
+  if (!round.expiresAt || round.revoked || round.invitedEmail === null) return sent;
+  return round.linkExpired
+    ? `${sent} · expired ${shortDate(round.expiresAt)}`
+    : `${sent} · link works until ${shortDate(round.expiresAt)}`;
 }
 
 /** "15 Oct" — the board's sent date. */
@@ -1055,9 +1068,8 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
   /* ── The round card (2L9 B8-R01 237:8258) ─────────────────────────────
      Where the round stands and who it went to, when it was sent, and the
      client's link. It replaces the C2 round banner (board B3-05), whose walk
-     (Next ›) now ends the filter row. The board's "link works until 13 Jan"
-     needs the link's expiry, which `currentRound` does not return
-     (REQUESTS G-10). */
+     (Next ›) now ends the filter row. An expired link (B8-R02) offers
+     Re-send here. */
   const changesRequested = round.status?.toLowerCase() === "changes_requested";
   const copyReviewLink = async (token: string) => {
     try {
@@ -1076,13 +1088,25 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
       data-tone={changesRequested ? "warning" : "neutral"}
     >
       <span className="tw:text-[13px] tw:leading-[18px] tw:text-[var(--bk-ink)]" data-testid="review-banner-line">
-        <span aria-hidden="true">◐ </span>
         {roundState(round)}
       </span>
       <span className="tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="review-banner-sent">
-        Sent {shortDate(round.createdAt)}
+        {sentLine(round)}
       </span>
-      {liveToken ? (
+      {round.linkExpired && onResend ? (
+        /* B8-R02: the expired link's way forward — asks first, like the ⋯ row. */
+        <Button
+          color="light"
+          size="xs"
+          className="tw:mt-1 tw:h-7 tw:min-h-0 tw:px-3 tw:text-[13px] tw:font-normal"
+          disabled={resending || isViewer}
+          title={isViewer ? "Viewers can't resend the review link — ask an editor" : undefined}
+          onClick={() => setConfirmResend(true)}
+          data-testid="review-card-resend"
+        >
+          Re-send
+        </Button>
+      ) : liveToken ? (
         <Button
           color="light"
           size="xs"

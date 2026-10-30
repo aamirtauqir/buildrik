@@ -19,6 +19,9 @@ import { useToast } from "@/editor/chrome-ui";
 import type { CreateCollectionPageChoice } from "./CreateCollectionPageDialog";
 import { buildCollectionPage, retryCollectionLink, saveCollectionLink } from "./createCollectionPage";
 import { unsavedCollectionLinks, useUnsavedCollectionLink } from "./unsavedCollectionLinks";
+import { recordPageReturn } from "./recordPageReturn";
+import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
+import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
 
 export type LinkRowPagePhase = "idle" | "creating" | "ready" | "unlinked" | "saving";
 
@@ -41,10 +44,28 @@ export function useLinkRowCollectionPage(composer: Composer | null | undefined, 
       addToast({
         description: `${name} created`,
         tone: "info",
-        action: { label: "Open page", onClick: () => composer?.elements.setActivePage(pageId) },
+        action: {
+          label: "Open page",
+          onClick: () => {
+            if (!composer) return;
+            /* D98: the opened page offers "‹ {origin page} · {Collection} {card}". */
+            const origin = composer.elements.getActivePage();
+            const card = composer.elements.getElement(cardId);
+            if (origin && card) {
+              const cardName = (getLayerName(card) ?? elementTypeLabel(card.getType())).toLowerCase();
+              recordPageReturn.set({
+                pageId,
+                originPageId: origin.id,
+                originElementId: cardId,
+                label: `${origin.name} · ${collection?.name ?? ""} ${cardName}`.replace(/ {2,}/g, " "),
+              });
+            }
+            composer.elements.setActivePage(pageId);
+          },
+        },
       });
     },
-    [composer, addToast],
+    [composer, addToast, cardId, collection?.name],
   );
 
   const create = async (choice: CreateCollectionPageChoice) => {

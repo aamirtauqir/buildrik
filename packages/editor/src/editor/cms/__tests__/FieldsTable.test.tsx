@@ -121,8 +121,9 @@ describe("FieldInspector", () => {
     fireEvent.change(screen.getByTestId("cms-fi-type"), { target: { value: "text" } });
     expect(updateField).not.toHaveBeenCalled();
     expect(screen.getByText("Change Price type")).toBeInTheDocument();
-    expect(screen.getByTestId("cms-type-change-preview")).toHaveTextContent("Margherita12 → “12”");
-    expect(screen.getByTestId("cms-type-change-summary")).toHaveTextContent("Lossless conversion · Values remain intact.");
+    expect(screen.getByTestId("cms-type-change-preview")).toHaveTextContent("Margherita12→becomes “12”");
+    expect(screen.getByText("1 record has a value. Preview it before changing Number to Text.")).toBeInTheDocument();
+    expect(screen.getByTestId("cms-type-change-summary")).toHaveTextContent(/^Lossless conversion · Used by \d+ · Values remain intact\.$/);
     fireEvent.click(screen.getByTestId("cms-type-change-convert"));
     await waitFor(() => expect(onChangeType).toHaveBeenCalledWith(MENU.fields[1], "text", "convert"));
   });

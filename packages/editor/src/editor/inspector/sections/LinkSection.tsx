@@ -96,6 +96,16 @@ export const LinkSection: React.FC<LinkSectionProps> = ({
   /* B5-D88…D97: the collection page is made from here; the user stays on the Card. */
   const pageMake = useLinkRowCollectionPage(composer, listCollection ?? null, selectedElement.id);
   const [pageDialog, setPageDialog] = React.useState(false);
+  /* D90 (193:26952): the page is made but nothing links to it yet — the
+     select empties ("Choose link…") so choosing This record's page is a real
+     change that writes the link (D92). Left on "record", re-choosing it fired
+     no change and the Card could never be linked. */
+  const madeNotLinked = !!listCollection && pageMake.phase === "ready" && linkType !== "record";
+  React.useEffect(() => {
+    if (pageMake.phase !== "ready") return;
+    const href = composer?.elements.getElement(selectedElement.id)?.getAttribute?.("href");
+    if (href !== RECORD_HREF) setLinkType("none");
+  }, [pageMake.phase, composer, selectedElement.id]);
   const { announce } = useInspectorField();
   const linkName = (el: Element | null | undefined) => (el ? getLayerName(el) ?? elementTypeLabel(el.getType()) : "Element");
   /* Rel is read off the element on render; an undo / redo re-renders it. */
@@ -291,7 +301,10 @@ export const LinkSection: React.FC<LinkSectionProps> = ({
   if (!isLinkable) return null;
 
   const rel = composer?.elements.getElement(selectedElement.id)?.getAttribute?.("rel") || "";
-  const opensInTab = linkType === "record" || linkType === "page" || linkType === "url" || linkType === "anchor";
+  const opensInTab = madeNotLinked || linkType === "record" || linkType === "page" || linkType === "url" || linkType === "anchor";
+  /* The make's button + note: before the page exists, while it is made or its
+     link retried, and (D90) once made until the Card links to it. */
+  const showMake = madeNotLinked || (linkType === "record" && !!listCollection && (!recordPages || (pageMake.phase !== "idle" && pageMake.phase !== "ready")));
   const pageOptions = pages.map((page) => ({ value: page.id, label: page.name }));
 
   return (
@@ -303,11 +316,11 @@ export const LinkSection: React.FC<LinkSectionProps> = ({
         value={linkType === "none" ? "" : linkType}
         onChange={(v) => handleLinkTypeChange(v || "none")}
         options={listCollection ? [{ value: "record", label: "This record\u2019s page" }, ...LINK_TYPE_OPTIONS] : LINK_TYPE_OPTIONS}
-        placeholder="None"
+        placeholder={madeNotLinked ? "Choose link…" : "None"}
       />
 
-      {linkType === "record" && listCollection ? (
-        pageMake.phase === "ready" ? (
+      {madeNotLinked || (linkType === "record" && listCollection) ? (
+        madeNotLinked ? (
           <NoteRow testId="link-record-note">{`${pageMake.pageName} is ready. Choose This record’s page to link each card.`}</NoteRow>
         ) : pageMake.phase === "unlinked" || pageMake.phase === "saving" ? (
           <NoteRow testId="link-record-note">{`Page created, link not saved. Retry keeps the existing ${pageMake.pageName} page.`}</NoteRow>
@@ -360,11 +373,11 @@ export const LinkSection: React.FC<LinkSectionProps> = ({
             onChange={(on) => updateTarget(on ? "_blank" : "_self")}
             testId="link-new-tab"
           />
-          {linkType === "record" ? null : <CommitRow label="Rel" value={rel} onCommit={updateRel} placeholder="nofollow" testId="link-rel" />}
+          {linkType === "record" || madeNotLinked ? null : <CommitRow label="Rel" value={rel} onCommit={updateRel} placeholder="nofollow" testId="link-rel" />}
         </>
       )}
 
-      {linkType === "record" && listCollection && (!recordPages || pageMake.phase !== "idle") ? (
+      {showMake && listCollection ? (
         <div className="tw:flex tw:flex-col tw:gap-1 tw:pt-2">
           {pageMake.phase === "ready" ? null : (
             <Button
@@ -406,7 +419,7 @@ export const LinkSection: React.FC<LinkSectionProps> = ({
         </div>
       ) : null}
 
-      {linkType === "record" ? null : <NoteRow testId="link-hint">Changing Link to clears the old destination</NoteRow>}
+      {linkType === "record" || madeNotLinked ? null : <NoteRow testId="link-hint">Changing Link to clears the old destination</NoteRow>}
     </Section>
   );
 };

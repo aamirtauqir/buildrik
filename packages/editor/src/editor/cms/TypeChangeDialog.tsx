@@ -27,16 +27,22 @@ export interface TypeChangeDialogProps {
   /** Changes the type and writes (or clears) the values; rejects when the
    *  server refused part of it. */
   onApply: (mode: TypeChangeMode) => Promise<void>;
+  /** How many elements read this field (the Fields table's "Used by"). */
+  usedBy?: number;
 }
 
 const PREVIEW_ROWS = 5;
-const ROW = "tw:grid tw:grid-cols-[1fr_auto] tw:gap-3 tw:text-[12px] tw:leading-[18px]";
+/* 257:51318: a mono table — title, the stored value right-aligned, →, the
+   new value — read as one block, not two columns at the dialog's edges. */
+const ROW =
+  "tw:grid tw:grid-cols-[minmax(0,140px)_minmax(24px,auto)_auto_minmax(0,1fr)] tw:items-baseline tw:gap-x-3 " +
+  "tw:[font-family:var(--bk-font-mono)] tw:tabular-nums tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]";
 
 function shown(v: unknown): string {
   return typeof v === "string" ? `“${v}”` : cmsTextOf(v);
 }
 
-export function TypeChangeDialog({ collection, field, to, records, onClose, onApply }: TypeChangeDialogProps) {
+export function TypeChangeDialog({ collection, field, to, records, onClose, onApply, usedBy }: TypeChangeDialogProps) {
   const plan = React.useMemo(() => planConversion(field, records, to), [field, records, to]);
   const [step, setStep] = React.useState<"preview" | "clear">("preview");
   const [typed, setTyped] = React.useState("");
@@ -62,8 +68,14 @@ export function TypeChangeDialog({ collection, field, to, records, onClose, onAp
 
   if (busy) {
     return (
-      <Modal open onClose={() => undefined} title={busy === "convert" ? `Converting ${field.name}…` : `Clearing ${field.name} values…`} testId="cms-type-change-busy">
-        <p className="tw:m-0">Saving {n} value{n === 1 ? "" : "s"} to the server. Keep this window open.</p>
+      <Modal open onClose={() => undefined} title={busy === "convert" ? `Converting ${field.name}…` : `Clearing ${field.name} values…`} width="xl" placement="panel" testId="cms-type-change-busy">
+        {/* 257:51906 / 257:52092. The type itself has already moved (see
+            CmsWorkspace.changeType), so the convert copy claims only the values. */}
+        <p className="tw:m-0">
+          {busy === "convert"
+            ? `Waiting for the server to confirm all ${n} value${n === 1 ? "" : "s"}.`
+            : `Waiting for acknowledgment. The ${n} stored value${n === 1 ? "" : "s"} remain${n === 1 ? "s" : ""} unchanged until the server confirms ${n === 1 ? "it" : "each one"}.`}
+        </p>
       </Modal>
     );
   }
@@ -74,7 +86,7 @@ export function TypeChangeDialog({ collection, field, to, records, onClose, onAp
         open
         onClose={onClose}
         title={`Couldn’t change ${field.name}`}
-        testId="cms-type-change-failed"
+        width="xl" placement="panel" testId="cms-type-change-failed"
         footer={
           <>
             <Button variant="secondary" onClick={onClose}>
@@ -101,7 +113,7 @@ export function TypeChangeDialog({ collection, field, to, records, onClose, onAp
         open
         onClose={onClose}
         title={`Clear ${field.name} values?`}
-        testId="cms-type-change-clear"
+        width="xl" placement="panel" testId="cms-type-change-clear"
         footer={
           <>
             <Button variant="secondary" onClick={onClose}>
@@ -137,8 +149,10 @@ export function TypeChangeDialog({ collection, field, to, records, onClose, onAp
       open
       onClose={onClose}
       title={`Change ${field.name} type`}
-      subtitle={`${from} → ${toLabel}`}
+      subtitle={`${n} record${n === 1 ? " has" : "s have"} a value. Preview ${n > PREVIEW_ROWS ? "the first five" : n === 1 ? "it" : "them"} before changing ${from} to ${toLabel}.`}
       kind="form"
+      /* 257:51318 — a 720 dialog, like Create collection page. */
+      width="xl" placement="panel"
       testId="cms-type-change"
       footer={
         <>
@@ -159,9 +173,12 @@ export function TypeChangeDialog({ collection, field, to, records, onClose, onAp
           const c = plan.converts.find((x) => x.record.id === r.id);
           return (
             <div key={r.id} className={ROW}>
-              <span className="tw:truncate tw:text-[var(--bk-ink-soft)]">{recordTitle(collection, r)}</span>
-              <span className="tw:[font-family:var(--bk-font-mono)] tw:tabular-nums tw:text-[var(--bk-ink)]">
-                {cmsTextOf(r.data[field.slug])} → {c ? shown(c.value) : "can’t convert"}
+              <span className="tw:truncate">{recordTitle(collection, r)}</span>
+              <span className="tw:text-right">{cmsTextOf(r.data[field.slug])}</span>
+              <span aria-hidden="true">→</span>
+              <span className="tw:truncate">
+                <span className="tw:sr-only">becomes </span>
+                {c ? shown(c.value) : "can’t convert"}
               </span>
             </div>
           );
@@ -169,7 +186,7 @@ export function TypeChangeDialog({ collection, field, to, records, onClose, onAp
       </div>
       <p className="tw:m-0 tw:mt-3 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]" data-testid="cms-type-change-summary">
         {lossless
-          ? "Lossless conversion · Values remain intact."
+          ? `Lossless conversion${usedBy === undefined ? "" : ` · Used by ${usedBy}`} · Values remain intact.`
           : `${plan.failing.length} of ${n} values can’t become ${toLabel}. Clear values… changes the type without them.`}
       </p>
     </Modal>

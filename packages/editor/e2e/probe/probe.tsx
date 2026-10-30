@@ -105,6 +105,10 @@ import { Composer } from "@/engine/Composer";
 import { LayersLoadError, LayersNoResults } from "@/editor/panels/layers/components/LayersStateBlocks";
 import { Row as InsertRow } from "@/editor/sidebar/tabs/build/components/GroupSection";
 import { BuildTab } from "@/editor/sidebar/tabs/build/BuildTab";
+import { LinkSection } from "@/editor/inspector/sections/LinkSection";
+import { CommandPalette } from "@/editor/shell/modals/CommandPalette";
+import { TypeChangeDialog } from "@/editor/cms/TypeChangeDialog";
+import { PagePanel } from "@/editor/inspector/components/PagePanel";
 import type { ComponentDefinition } from "@/shared/types/components";
 import { PanelLoadingSkeleton } from "@/editor/shared/PanelStates";
 /* AgentPlan carries `.bd-ai-*` styles that only AITab imports, so the probe
@@ -488,6 +492,8 @@ const mgrComposer = (assets: typeof MGR_ASSETS = MGR_ASSETS) =>
       downloadAssets: () => 0,
       getIcons: () => [],
       getFonts: () => [],
+      getSelectedAssets: () => [],
+      selectAssets: () => {},
     },
     mediaOps: {
       getUsages: (src: string) => ({
@@ -920,18 +926,44 @@ function trashStub(mode: string) {
     deletedBy: { id: "u1", name: "You", isYou: true }, folderName: mode === "folder" ? "Client projects" : null,
   }];
   const fail = (status: number, code: string, message: string) => ({ error: { json: { message, code: -1, data: { code, httpStatus: status } } } });
-  window.fetch = (async (input: RequestInfo | URL) => {
+  window.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
     const href = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
     const procs = new URL(href, location.origin).pathname.split("/api/trpc/")[1]?.split(",") ?? [];
+    /* The slug the restore asked for (the "choose a different URL" step). */
+    const asked = /"slug":"([^"]+)"/.exec(typeof init?.body === "string" ? init.body : "")?.[1];
     const body = procs.map((name) => {
       if (name === "pages.trash.list") return { result: { data: { json: list } } };
       if (name === "sites.myRole") return { result: { data: { json: { role: "ADMIN" } } } };
       if (name === "pages.trash.restore") {
-        if (mode === "slug") return fail(409, "CONFLICT", "SLUG_TAKEN:about-2");
+        if (mode === "slug" && !asked) return fail(409, "CONFLICT", "SLUG_TAKEN:about-2");
         if (mode === "limit") return fail(412, "PRECONDITION_FAILED", "Delete a page or upgrade to restore.");
         if (mode === "fail") return fail(500, "INTERNAL_SERVER_ERROR", "boom");
+        const row = { id: "p_about_trash", name: "About", slug: asked ?? "about", isHomePage: false, blocks: [], settings: {} };
+        return { result: { data: { json: row } } };
       }
       return { result: { data: { json: null } } };
+    });
+    return new Response(JSON.stringify(body), { status: 200, headers: { "content-type": "application/json" } });
+  }) as typeof fetch;
+}
+
+/* design-2l9 B6-T24…T33 — the saved-template trash with `?siteId=` and
+   `&tplTrash=`: list (Fieldwork home, deleted today), empty, fail (restore
+   refused), hang (restore / purge never answer). */
+let tplTrashStubbed = false;
+function templateTrashStub(mode: string | null) {
+  if (!mode || tplTrashStubbed) return;
+  tplTrashStubbed = true;
+  const row = { templateId: "user-1", name: "Fieldwork home", html: "<section></section>".repeat(7), deletedAt: new Date().toISOString() };
+  window.fetch = (async (input: RequestInfo | URL) => {
+    const href = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+    const procs = new URL(href, location.origin).pathname.split("/api/trpc/")[1]?.split(",") ?? [];
+    if (mode === "hang" && procs.some((p) => p !== "userTemplates.trash.list")) return new Promise<Response>(() => {});
+    const body = procs.map((name) => {
+      if (name === "userTemplates.trash.list") return { result: { data: { json: mode === "empty" ? [] : [row] } } };
+      if (name === "userTemplates.trash.restore" && mode === "fail") return { error: { json: { message: "boom", code: -1, data: { code: "INTERNAL_SERVER_ERROR", httpStatus: 500 } } } };
+      if (name === "userTemplates.trash.restore") return { result: { data: { json: { ...row, category: null, description: null, css: null, thumbnail: null, updatedAt: row.deletedAt } } } };
+      return { result: { data: { json: { success: true } } } };
     });
     return new Response(JSON.stringify(body), { status: 200, headers: { "content-type": "application/json" } });
   }) as typeof fetch;
@@ -2352,6 +2384,122 @@ function CmsDynamicPagesHost() {
   );
 }
 
+/* design-2l9 176:21119 / 176:21523 / 189:21741 — the Add panel's CMS rows
+   on a REAL Composer: a Blog collection linked to its "Blog post" template
+   page (Article › Heading selected) and a Team collection. `&home=1` opens
+   Home instead, where only the Collection lists show (189:21741). */
+function AddPanelCmsHost() {
+  const [composer, setComposer] = React.useState<Composer | null>(null);
+  React.useEffect(() => {
+    const c = new Composer({} as never);
+    const home = c.elements.createPage("Home");
+    c.elements.setHomePage(home.id);
+    const tpl = c.elements.createPage("Blog post");
+    void (async () => {
+      const blog = await c.cms.collections.createCollection("Blog", "blog", undefined, {
+        displayField: "title",
+        fields: [
+          { id: "f-title", name: "Title", slug: "title", type: "text", order: 0 },
+          { id: "f-slug", name: "Slug", slug: "slug", type: "slug", order: 1 },
+          { id: "f-excerpt", name: "Excerpt", slug: "excerpt", type: "textarea", order: 2 },
+          { id: "f-body", name: "Body", slug: "body", type: "richtext", order: 3 },
+          { id: "f-cover", name: "Cover image", slug: "cover", type: "image", order: 4 },
+          { id: "f-pub", name: "Published on", slug: "published", type: "date", order: 5 },
+        ] as never,
+      });
+      await c.cms.collections.createCollection("Team", "team", undefined, {
+        displayField: "name",
+        fields: [
+          { id: "t-portrait", name: "Portrait", slug: "portrait", type: "image", order: 0 },
+          { id: "t-name", name: "Name", slug: "name", type: "text", order: 1 },
+          { id: "t-role", name: "Role", slug: "role", type: "text", order: 2 },
+        ] as never,
+      });
+      const file = pageFileNames(c.elements.getAllPages()).get(tpl.id) ?? "blog-post.html";
+      await c.cms.collections.updateCollection(blog.id, { pageSlugPattern: "/blog/{slug}", pageTemplatePath: file } as never);
+      const onHome = new URLSearchParams(location.search).get("home") === "1";
+      const page = onHome ? home : tpl;
+      c.elements.setActivePage(page.id);
+      const article = c.elements.createElement("section" as never, { id: "apc-article" });
+      c.elements.addElement(article, page.root.id);
+      renameElement(c, "apc-article", "Article");
+      const heading = c.elements.createElement("heading" as never, { id: "apc-heading", content: "A clearer point of view" });
+      c.elements.addElement(heading, "apc-article");
+      renameElement(c, "apc-heading", "Heading");
+      c.selection.select(c.elements.getElement("apc-heading") ?? null);
+      setComposer(c);
+    })();
+  }, []);
+  return (
+    <div data-probe="add-panel-cms">
+      <ToastProvider>
+        <div className="tw:flex tw:h-[812px] tw:w-70 tw:flex-col tw:overflow-hidden tw:bg-white">
+          {composer ? <BuildTab composer={composer} onExpandToggle={() => {}} onClose={() => {}} /> : null}
+        </div>
+      </ToastProvider>
+    </div>
+  );
+}
+
+/* design-2l9 193:25921 … 195:29268 — the Link row of a Card inside a Team
+   Collection list, on a REAL Composer, in a 288-wide inspector column. Team
+   has no page per record; the walk picks This record's page and runs Create
+   collection page. `&siteId=` makes the collection link's server save fail
+   (no server behind the probe) for D93; without it the make succeeds (D90). */
+function LinkRowRecordHost() {
+  const [state, setState] = React.useState<{ c: Composer; card: string; home: string } | null>(null);
+  React.useEffect(() => {
+    const c = new Composer({} as never);
+    const home = c.elements.createPage("Home");
+    c.elements.setHomePage(home.id);
+    c.elements.setActivePage(home.id);
+    void (async () => {
+      const team = await c.cms.collections.createCollection("Team", "team", undefined, {
+        displayField: "name",
+        fields: [
+          { id: "f-portrait", name: "Portrait", slug: "portrait", type: "image", order: 0 },
+          { id: "f-name", name: "Name", slug: "name", type: "text", order: 1 },
+          { id: "f-slug", name: "Slug", slug: "slug", type: "slug", order: 2 },
+          { id: "f-role", name: "Role", slug: "role", type: "text", order: 3 },
+          { id: "f-bio", name: "Bio", slug: "bio", type: "richtext", order: 4 },
+        ] as never,
+      });
+      await c.cms.collections.createContentItem(team.id, { name: "Ali Shah", role: "Designer", slug: "ali-shah" }, { status: "published" });
+      const list = c.elements.createElement("collection-list" as never, { id: "lr-list" });
+      c.elements.addElement(list, home.root.id);
+      renameElement(c, "lr-list", "Team");
+      const card = c.elements.createElement("link" as never, { id: "lr-card", tagName: "a" } as never);
+      c.elements.addElement(card, "lr-list");
+      renameElement(c, "lr-card", "Card");
+      c.cms.bindings.bindCollectionList("lr-list", team.id);
+      c.selection.select(c.elements.getElement("lr-card") ?? null);
+      setState({ c, card: "lr-card", home: home.id });
+    })();
+  }, []);
+  /* After "Open page" (D98) the made page is active: the column shows what
+     the Inspector shows there with nothing selected. */
+  const [, bump] = React.useReducer((n: number) => n + 1, 0);
+  React.useEffect(() => {
+    if (!state) return;
+    state.c.on(EVENTS.PAGE_CHANGED, bump);
+    return () => {
+      state.c.off(EVENTS.PAGE_CHANGED, bump);
+    };
+  }, [state]);
+  const onCardPage = state?.c.elements.getActivePage()?.id === state?.home;
+  return (
+    <ToastProvider>
+      <div data-probe="link-row-record" style={{ position: "fixed", right: 0, top: 56, width: 288, bottom: 32, background: "white", borderLeft: "1px solid var(--bk-border)" }}>
+        {state && onCardPage ? (
+          <LinkSection composer={state.c} selectedElement={{ id: state.card, type: "link" }} isOpen tier="primary" />
+        ) : state ? (
+          <PagePanel composer={state.c} />
+        ) : null}
+      </div>
+    </ToastProvider>
+  );
+}
+
 function CmsWorkspaceHost() {
   const q = new URLSearchParams(location.search);
   const composer = React.useMemo(
@@ -2674,6 +2822,21 @@ const CASES: Record<string, () => React.ReactElement> = {
      then Grid. */
   /* design-2l9 board 7:18654 — the canvas bar's contents at the board's
      ~800 canvas column: path, device toggles, width chip, zoom, View. */
+  /* 176:19089 / 176:19451 — a heading its condition hides on the preview
+     record, under the real Canvas.css rules: a named ghost, or (&hide=1, Show
+     hidden elements off) not drawn at all. */
+  "canvas-hidden-ghost": () => (
+    <div
+      className="buildrick-canvas"
+      data-probe="canvas-hidden-ghost"
+      data-bk-hide-conditional={new URLSearchParams(location.search).get("hide") === "1" ? "true" : undefined}
+      style={{ width: 512, padding: 24, background: "white", fontFamily: "var(--bk-font-ui)" }}
+    >
+      <p style={{ margin: 0, fontSize: 12 }}>JOURNAL / DESIGN</p>
+      <h2 data-bk-condition="hidden" style={{ margin: "24px 0 12px", fontSize: 24, fontWeight: 400 }}>A clearer point of view</h2>
+      <p style={{ margin: 0, fontSize: 12 }}>By Ali · 19 October 2026</p>
+    </div>
+  ),
   "canvas-bar": () => (
     <div data-probe="canvas-bar" style={{ width: 800 }}>
       <CanvasFooterToolbar
@@ -3402,7 +3565,8 @@ const CASES: Record<string, () => React.ReactElement> = {
           phase={phase}
           recordLabel="Blog record “Studio launch”"
           collectionName="Blog"
-          to="About"
+          /* ?to=Dynamic pages: the record → tab guards (168:21848 …). */
+          to={new URLSearchParams(location.search).get("to") ?? "About"}
           current="Home"
           canSave
           onKeepEditing={() => {}}
@@ -3507,6 +3671,8 @@ const CASES: Record<string, () => React.ReactElement> = {
   /* design-2l9 7:19448 — the same panel after "Text" landed in Hero: the
      receipt the insert hook hands an open Add panel. */
   "add-panel-receipt": () => <AddReceiptProbe />,
+  "add-panel-cms": () => <AddPanelCmsHost />,
+  "link-row-record": () => <LinkRowRecordHost />,
   /* Add panel with a target, board 7:18981: a real Composer with "Hero"
      selected, so the insert-target strip reads "Insert into Hero". */
   "add-panel-target": () => (
@@ -3840,7 +4006,9 @@ const CASES: Record<string, () => React.ReactElement> = {
     const clear = new URLSearchParams(location.search).get("clear") === "1";
     const rows: Issue[] = [
       ...(clear ? [] : [{ id: "cms:list-no-source:l1", type: "error" as const, message: "Collection list has no source", location: "Home › Journal section", elementId: "l1", pageId: "home" }]),
-      { id: "content:alt:i1", type: "warning", message: "Image is missing alt text", location: "Home › Hero", elementId: "i1", pageId: "home" },
+      { id: "content:alt:i1", type: "warning", message: "Image is missing alt text", location: "Home › Hero", elementId: "i1", pageId: "home", contentKind: "missing-alt" },
+      /* Play C02 (353:24569): a second image groups the two into one card. */
+      { id: "content:alt:i2", type: "warning", message: "Image is missing alt text", location: "Home › Team", elementId: "i2", pageId: "home", contentKind: "missing-alt" },
       { id: "publish-check:Favicon", type: "warning", message: "No favicon set. Browsers will show a default icon." },
       { id: "publish-check:SEO configured", type: "warning", message: "No meta title template set." },
     ];
@@ -3850,6 +4018,36 @@ const CASES: Record<string, () => React.ReactElement> = {
       </div>
     );
   },
+  /* 257:51318 / 257:51906 / 257:52092 / 257:52512 — Change Reading time type
+     over 20 stored numbers. Click Convert / Clear: `&apply=hang` holds the
+     write open (pending), `&apply=fail` refuses it. */
+  "cms-type-change": () => {
+    const apply = new URLSearchParams(location.search).get("apply");
+    const titles = ["Intro to grids", "Design systems", "Client handoff", "Accessible forms", "Responsive layouts"];
+    const records = Array.from({ length: 20 }, (_, i) => ({
+      id: `r${i}`, collectionId: "blog", status: "published", createdAt: "", updatedAt: "",
+      data: { title: titles[i] ?? `Post ${i + 1}`, reading: [5, 8, 4, 10, 6][i] ?? 3 },
+    }));
+    return (
+      <ToastProvider>
+        <TypeChangeDialog
+          collection={{ id: "blog", name: "Blog", slug: "blog", displayField: "title", fields: [{ id: "f-title", name: "Title", slug: "title", type: "text", order: 0 }] } as never}
+          field={{ id: "f-rt", name: "Reading time", slug: "reading", type: "number", order: 1 } as never}
+          to={"text" as never}
+          records={records as never}
+          usedBy={0}
+          onClose={() => {}}
+          onApply={() => (apply === "fail" ? Promise.reject(new Error("refused")) : new Promise(() => {}))}
+        />
+      </ToastProvider>
+    );
+  },
+  /* 263:250083 / 263:250988 — the ⌘K palette over the Layers composer. */
+  "command-palette": () => (
+    <ToastProvider>
+      <CommandPalette composer={layersComposer()} onClose={() => {}} reviewsEnabled />
+    </ToastProvider>
+  ),
   "issues-filtered": () => (
     <div data-probe="issues-filtered" className="tw:h-203 tw:w-90 tw:bg-white">
       <IssuesPanel
@@ -4157,7 +4355,7 @@ const CASES: Record<string, () => React.ReactElement> = {
      FullPageRouter mount in the slot between the rail (56) and the bottom
      bar (868), under the topbar (56). */
   "templates-resource-area": () => (
-    <div data-probe="templates-resource-area">
+    <div data-probe="templates-resource-area" ref={() => templateTrashStub(new URLSearchParams(location.search).get("tplTrash"))}>
       <ToastProvider>
         <div style={{ position: "fixed", inset: "0 0 auto 0", height: 56, background: "white", borderBottom: "1px solid var(--bk-border)" }} />
         <div style={{ position: "fixed", left: 0, top: 56, width: 56, bottom: 32, borderRight: "1px solid var(--bk-border)" }} />
@@ -4564,9 +4762,19 @@ const CASES: Record<string, () => React.ReactElement> = {
   /* ?status=CHANGES_REQUESTED draws B8-R05's next-round foot. */
   "review-panel-detached-present": () => {
     const status = new URLSearchParams(location.search).get("status");
+    const link = new URLSearchParams(location.search).get("link");
     trpcStub({
       "comments.list": () => REVIEW_COMMENTS,
-      "reviews.currentRound": () => REVIEW_ROUND(status ? { status } : {}),
+      "reviews.currentRound": () =>
+        REVIEW_ROUND({
+          ...(status ? { status } : {}),
+          /* ?link=expired|live: B8-R02 / R01's link facts (G-10). */
+          ...(link === "expired"
+            ? { linkExpired: true, expiresAt: daysAgo(18), token: null }
+            : link === "live"
+              ? { linkExpired: false, expiresAt: new Date(Date.now() + 74 * 86_400_000).toISOString(), reviewerLastSeenAt: new Date(Date.now() - 2 * 3_600_000).toISOString() }
+              : {}),
+        }),
       "sites.myRole": () => "OWNER",
     });
     return reviewHost(
@@ -4579,6 +4787,8 @@ const CASES: Record<string, () => React.ReactElement> = {
       <ReviewTab
         composer={reviewComposerStub(["d1", "d2"])}
         onResend={async () => ({ inviteEmailSent: true })}
+        /* B8-R06: the ✕ is what asks before an unsent comment is dropped. */
+        onClose={() => undefined}
       />,
     );
   },
@@ -5231,6 +5441,8 @@ const CASES: Record<string, () => React.ReactElement> = {
         autoRedirectLocale: false,
       },
       "siteDetail.domains.list": [{ id: "d1", domain: "fieldwork.studio", status: "ACTIVE", isPrimary: true, forceHttps: true, dnsRecords: [] }],
+      /* The Danger zone's read (B8-S17). */
+      "sites.get": { id: "probe-site", name: "Fieldwork Studio", status: "PUBLISHED", publishedUrl: "https://fieldwork-studio.vercel.app", createdBy: null },
       "siteDetail.locales": {
         locales: [
           { code: "en-US", path: "/", translated: 12, total: 12, status: "LIVE", pending: [] },
@@ -5571,7 +5783,7 @@ if (name.startsWith("pages-")) {
    the file also claims .bk-topbar* and .bk-notif-*. */
 /* Canvas.css carries .bd-canvas-empty-cta; Canvas.tsx imports it, but the
    canvas-empty case mounts only the CTA. */
-if (name === "canvas-empty" || name === "canvas-outlines") {
+if (name === "canvas-empty" || name === "canvas-outlines" || name === "canvas-hidden-ghost") {
   await import("@/editor/canvas/Canvas.css");
 }
 if (name.startsWith("notifications-")) {

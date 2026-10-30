@@ -26,7 +26,9 @@ import { publishTray } from "./publishTrayStore";
 /** "1 issue blocks publishing · 3 tips" / "No blocking issues · 3 tips". */
 function issueSummary(issues: Issue[]): string {
   const blocking = issues.filter((i) => i.type === "error").length;
-  const tips = issues.filter((i) => i.type === "warning").length;
+  /* Two or more images without alt text are one card, so one tip (C02). */
+  const alt = issues.filter((i) => i.type === "warning" && i.contentKind === "missing-alt").length;
+  const tips = issues.filter((i) => i.type === "warning").length - (alt >= 2 ? alt - 1 : 0);
   const head = blocking
     ? `${blocking} issue${blocking === 1 ? " blocks" : "s block"} publishing`
     : "No blocking issues";
@@ -167,6 +169,7 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
   const [scope, setScope] = React.useState<"page" | "site">("page");
   const [fixing, setFixing] = React.useState<Issue | null>(null);
   const [failed, setFailed] = React.useState<Issue | null>(null);
+  const [altOpen, setAltOpen] = React.useState(false);
   const scoped = scope === "page" ? issues.filter((i) => issueAppliesToPage(i, activePageId)) : issues;
 
   const runFix = async (issue: Issue) => {
@@ -190,9 +193,42 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
   const visible = (filter === "all" ? scoped : scoped.filter((i) => i.type === filter))
     .slice()
     .sort((a, b) => Number(b.type === "error") - Number(a.type === "error"));
+  /* Play C02 (353:24569, list row on F4.01 303:32296): two or more images
+     without alt text are ONE card — "2 images have no alt text" with their
+     places — whose Fix › opens "Images missing alt text" to pick one. */
+  const altIssues = visible.filter((i) => i.contentKind === "missing-alt");
+  const altGrouped = altIssues.length >= 2;
+  const firstAltId = altIssues[0]?.id;
   const filterIndex = FILTERS.findIndex((f) => f.key === filter);
   const currentFilter = FILTERS[filterIndex];
   const nextFilter = FILTERS[(filterIndex + 1) % FILTERS.length];
+
+  if (altOpen && altGrouped) {
+    return (
+      <div className={BODY} data-testid="issues-alt-group">
+        <PanelHeader title="Images missing alt text" onClose={onClose} size="panel" />
+        <div className={SCROLL}>
+          <p className="tw:m-0 tw:px-4 tw:pt-1 tw:pb-2 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">
+            {`${altIssues.length} images · choose one to inspect`}
+          </p>
+          {altIssues.map((i) => (
+            <div key={i.id} className="tw:mx-3 tw:mb-1.5 tw:rounded-[var(--bk-radius-sm)] tw:bg-[var(--bk-bg-subtle)] tw:px-2 tw:py-1">
+              <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">{i.location ?? i.message}</p>
+              <p className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]">Missing alt text · image content</p>
+              <Button color="light" size="xs" className={`tw:mt-1 tw:mb-0.5 ${FIX_BTN}`} onClick={() => onSelectElement?.(i)}>
+                Open image ›
+              </Button>
+            </div>
+          ))}
+          <div className="tw:px-3 tw:pt-2">
+            <Button color="light" size="xs" className={FIX_BTN} onClick={() => setAltOpen(false)} data-testid="issues-alt-back">
+              ‹ Back to Issues
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={BODY}>
@@ -343,6 +379,26 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
               />
             ) : (
               visible.map((i, idx) => {
+                if (altGrouped && i.contentKind === "missing-alt") {
+                  if (i.id !== firstAltId) return null;
+                  return (
+                    <div key="alt-group" className="tw:mx-3 tw:mb-1.5 tw:rounded-[var(--bk-radius-sm)] tw:bg-[var(--bk-bg-subtle)] tw:px-2 tw:py-1" data-testid="issue-alt-group">
+                      <Button color="light" size="xs" className={`${CARD_TEXT} tw:text-[var(--bk-ink)]`} onClick={() => setAltOpen(true)}>
+                        <span className="tw:block tw:text-left">
+                          <span aria-hidden="true" className={GLYPH.warning}>! </span>
+                          <span className="tw:sr-only">{SEVERITY_LABEL.warning}: </span>
+                          {`${altIssues.length} images have no alt text`}
+                        </span>
+                      </Button>
+                      <p className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]">
+                        {altIssues.map((a) => a.location).filter(Boolean).join(", ")}
+                      </p>
+                      <Button color="light" size="xs" className={`tw:mt-1 tw:mb-0.5 ${FIX_BTN}`} data-testid="issue-alt-group-fix" onClick={() => setAltOpen(true)}>
+                        Fix ›
+                      </Button>
+                    </div>
+                  );
+                }
                 /* 2L9 B8-IS01 / Play F4.01 (236:9417, 303:32296): one card per
                    issue — a blocker on the red tint, advice on grey; the
                    sentence wraps, the location under it, Fix › on its own

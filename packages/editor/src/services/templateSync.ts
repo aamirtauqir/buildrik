@@ -52,7 +52,8 @@ export interface MyTemplateRow {
   thumbnail?: string;
 }
 
-function readLocal(): MyTemplateRow[] {
+/** This device's saved templates (the MY_TEMPLATES cache the catalogue reads). */
+export function readLocalTemplates(): MyTemplateRow[] {
   try {
     const s = localStorage.getItem(STORAGE_KEYS.MY_TEMPLATES);
     return s ? (JSON.parse(s) as MyTemplateRow[]) : [];
@@ -97,7 +98,7 @@ export async function hydrateUserTemplatesFromServer(): Promise<void> {
   try {
     const remote = await client().userTemplates.list.query({ siteId });
     if (!remote.length) return;
-    const local = readLocal();
+    const local = readLocalTemplates();
     const localIds = new Set(local.map((t) => t.id));
     const merged = [...local];
     for (const r of remote) {

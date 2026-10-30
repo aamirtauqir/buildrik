@@ -19,6 +19,7 @@ vi.mock("@/lib/prisma", () => ({
     page: { findMany: vi.fn(async () => []), deleteMany: vi.fn() },
     formBlock: { deleteMany: vi.fn() },
     siteComponent: { deleteMany: vi.fn(async () => ({ count: 0 })) },
+    userTemplate: { deleteMany: vi.fn(async () => ({ count: 0 })) },
     $transaction: vi.fn(async (ops: unknown[]) => ops),
   },
 }));
@@ -168,7 +169,7 @@ describe("soft-delete-purge", () => {
     const res = await softDeletePurge(makeReq("soft-delete-purge", "Bearer test-secret"));
     expect(res.status).toBe(200);
     const body = await res.json();
-    expect(body).toEqual({ ok: true, deleted: 2, pagesDeleted: 0, componentsDeleted: 0 });
+    expect(body).toEqual({ ok: true, deleted: 2, pagesDeleted: 0, componentsDeleted: 0, templatesDeleted: 0 });
   });
 
   it("purges components in Recently deleted past 30 days (K19)", async () => {

@@ -84,13 +84,14 @@ export const DeleteSiteModal: React.FC<{
           ) : null}
         </ModalBody>
         <div className={LIBRARY_MODAL_FOOT}>
-          <Button size="xs" variant="ghost" className={LIBRARY_MODAL_BTN_GHOST} disabled={busy} onClick={onClose}>
+          <Button size="xs" variant="ghost" className={`${LIBRARY_MODAL_BTN_GHOST} tw:border tw:border-[var(--bk-border)]`} disabled={busy} onClick={onClose}>
             Cancel
           </Button>
           <Button
             size="xs"
             variant="danger"
-            className={LIBRARY_MODAL_BTN_DANGER}
+            /* B8-S17: unarmed, it reads unavailable (grey), not a faded red. */
+            className={`${LIBRARY_MODAL_BTN_DANGER} tw:disabled:border-transparent tw:disabled:bg-[var(--bk-bg-subtle)] tw:disabled:text-[var(--bk-ink-muted)] tw:disabled:opacity-100`}
             disabled={!armed || busy}
             aria-busy={busy || undefined}
             onClick={() => void run()}

@@ -430,6 +430,25 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   React.useEffect(() => {
     if (issuesOpen) setAiInInspector(false);
   }, [issuesOpen]);
+  /* Play F4.02 / C02.2 (303:32650, 353:24957) — A-39: Issues closed because
+     Fix › / Open image › selected an element, so the Inspector heads with
+     "‹ Back to Issues" while that element stays selected. A plain close (✕,
+     Escape) selects nothing new and draws no row. */
+  const [issuesReturn, setIssuesReturn] = React.useState<string | null>(null);
+  const selectedAtIssuesOpen = React.useRef<string | null>(null);
+  const issuesWasOpen = React.useRef(false);
+  React.useEffect(() => {
+    const sel = selectedElement?.id ?? null;
+    if (issuesOpen && !issuesWasOpen.current) {
+      selectedAtIssuesOpen.current = sel;
+      setIssuesReturn(null);
+    } else if (!issuesOpen && issuesWasOpen.current) {
+      setIssuesReturn(sel && sel !== selectedAtIssuesOpen.current ? sel : null);
+    } else if (!issuesOpen && issuesReturn && sel !== issuesReturn) {
+      setIssuesReturn(null);
+    }
+    issuesWasOpen.current = issuesOpen;
+  }, [issuesOpen, selectedElement?.id, issuesReturn]);
 
   /* A click on the empty canvas closes the Layers drawer (prototype B10 /
      C4#18) — the canvas clears the selection itself. */
@@ -1061,6 +1080,22 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
                 a :hover state to Base. `invisible` keeps the layout box, so
                 the scroll offset survives, and takes it out of the tab order
                 and the accessibility tree. */}
+            {issuesReturn && !aiInInspector && !showInspectorDoor ? (
+              <div className="tw:flex tw:flex-none tw:justify-center tw:pt-2" data-testid="inspector-back-to-issues">
+                <Button
+                  type="button"
+                  variant="link"
+                  size="xs"
+                  className="tw:h-8 tw:text-[13px] tw:font-normal"
+                  onClick={() => {
+                    setIssuesReturn(null);
+                    composer?.emit(EVENTS.UI_OPEN_ISSUES);
+                  }}
+                >
+                  ‹ Back to Issues
+                </Button>
+              </div>
+            ) : null}
             <div
               className={aiInInspector || showInspectorDoor ? "tw:absolute tw:inset-0 tw:invisible tw:pointer-events-none" : "tw:contents"}
               aria-hidden={aiInInspector || showInspectorDoor || undefined}

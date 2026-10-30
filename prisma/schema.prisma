@@ -1247,11 +1247,16 @@ model UserTemplate {
   createdBy   String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  /// Saved-template trash (design-2l9 B6-T24…T33): set = in Recently deleted
+  /// for USER_TEMPLATE_TRASH_RETENTION_DAYS, then purged. Same row, same
+  /// templateId — a restore keeps the template's identity.
+  deletedAt   DateTime?
 
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
   @@unique([workspaceId, templateId])
   @@index([workspaceId, updatedAt])
+  @@index([workspaceId, deletedAt])
   @@map("user_templates")
 }
 

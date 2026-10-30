@@ -315,6 +315,7 @@ export function FieldInspector({ composer, collection, collections, field, recor
           records={records}
           onClose={() => setRetyping(null)}
           onApply={(mode) => onChangeType(field, retyping, mode)}
+          usedBy={uses.length}
         />
       ) : null}
       {askingRequired ? (

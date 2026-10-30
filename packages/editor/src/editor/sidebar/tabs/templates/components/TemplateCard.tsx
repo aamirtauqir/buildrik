@@ -21,6 +21,8 @@ export interface TemplateCardProps {
    *  — "Use for <page>" → the replace confirm. The card body still previews. */
   useLabel?: string;
   onUse?: (id: string) => void;
+  /** A saved template's Delete (B6-T16) — to Recently deleted. */
+  onDelete?: () => void;
 }
 
 /** The thumbnail frame is 226 wide on the board; the page renders at 1200. */
@@ -33,6 +35,7 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
   isApplied = false,
   useLabel,
   onUse,
+  onDelete,
 }) => {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" || e.key === " ") {
@@ -81,6 +84,23 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
             {isSaved ? "Saved" : "Built-in"}
             {isPremium ? " · Pro" : ""}
           </span>
+          {onDelete ? (
+            <Button
+              type="button"
+              variant="link"
+              size="xs"
+              className="tw:ml-2 tw:h-5 tw:px-0 tw:text-[12px] tw:font-normal"
+              aria-label={`Delete ${template.name}`}
+              data-testid={`tpl-card-delete-${template.id}`}
+              onClick={(e: React.MouseEvent) => {
+                e.stopPropagation();
+                onDelete();
+              }}
+              onKeyDown={(e: React.KeyboardEvent) => e.stopPropagation()}
+            >
+              Delete
+            </Button>
+          ) : null}
         </div>
       </div>
       {onUse && useLabel ? (

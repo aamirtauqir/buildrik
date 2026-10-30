@@ -65,6 +65,18 @@ describe("CmsAddSection", () => {
     expect(bindings).toEqual([expect.objectContaining({ collectionId: blog.id, fieldSlug: "excerpt", property: "content" })]);
   });
 
+  it("an image field row reads 'Image + title alt' and binds both src and alt (176:21119)", async () => {
+    const { c } = await setup(true);
+    expect(await screen.findByTestId("add-cms-field-cover")).toHaveTextContent("Image + title alt");
+    fireEvent.click(screen.getByTestId("add-cms-field-cover"));
+    expect(await screen.findByText("Cover image inserted · bound to Blog")).toBeInTheDocument();
+    const bindings = c.cms.bindings.getBindings(c.selection.getSelectedIds()[0]);
+    expect(bindings).toEqual([
+      expect.objectContaining({ collectionName: "Blog", fieldSlug: "cover", property: "src" }),
+      expect.objectContaining({ collectionName: "Blog", fieldSlug: "title", property: "alt" }),
+    ]);
+  });
+
   it("on any page: List of Blog builds a list bound to Blog; blank is the catalog's", async () => {
     const { c, blog, onBlankList } = await setup(false);
     expect(await screen.findByText("Collection lists")).toBeInTheDocument();
