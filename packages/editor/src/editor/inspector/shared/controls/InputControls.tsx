@@ -447,8 +447,9 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
               open={unitCardOpen}
               onClose={() => setUnitCardOpen(false)}
               beside=".layout-shell__inspector"
+              besideTop='[role="tablist"]'
               label={unitCardTitle}
-              className="tw:w-[220px] tw:p-3"
+              className="tw:w-[240px] tw:p-3"
               trigger={
                 <Button
                   color="light"
@@ -472,8 +473,8 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
                 {units.map((u) => (
                   <MenuItem
                     key={u}
-                    radio
-                    selected={u === unit}
+                    aria-current={u === unit ? "true" : undefined}
+                    className="tw:h-10!"
                     onClick={() => {
                       setUnitCardOpen(false);
                       if (u !== unit) onUnitChange(u);
@@ -486,7 +487,7 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
               <Button
                 color="light"
                 size="xs"
-                className="tw:mt-2 tw:h-8 tw:w-full tw:justify-center tw:text-[13px] tw:font-normal tw:focus:ring-0"
+                className="tw:mt-1 tw:h-10 tw:w-full tw:justify-center tw:border-0 tw:bg-transparent tw:text-[13px] tw:font-normal tw:text-[var(--bk-ink)] tw:focus:ring-0"
                 onClick={() => setUnitCardOpen(false)}
               >
                 Cancel

@@ -171,7 +171,7 @@ describe("StudioPanels — a section-focus request always lands on a visible ins
 
     expect(screen.queryByTestId("ai-tab")).toBeNull();
     expect(screen.getByTestId("pro-inspector").getAttribute("data-revealed")).toBe("content");
-    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("false");
+    expect(screen.queryByTestId("show-inspector")).toBeNull();
   });
 
   it("with a column tab (History) open: the tab closes and the section is revealed", async () => {
@@ -190,12 +190,12 @@ describe("StudioPanels — a section-focus request always lands on a visible ins
     const composer = makeComposer();
     render(<Harness composer={composer} />);
     act(() => composer.emit(EVENTS.UI_TOGGLE_INSPECTOR));
-    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("true");
+    expect(screen.queryByTestId("show-inspector")).not.toBeNull(); // hidden: S30's reserved column
 
     act(() => composer.emit(EVENTS.UI_INSPECTOR_FOCUS_SECTION, { section: "content" }));
     await flushFrame();
 
-    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("false");
+    expect(screen.queryByTestId("show-inspector")).toBeNull();
     expect(screen.getByTestId("pro-inspector").getAttribute("data-revealed")).toBe("content");
   });
 
@@ -211,28 +211,29 @@ describe("StudioPanels — a section-focus request always lands on a visible ins
 });
 
 
-/* Board 36 (Inspector v4 · Inspector hidden): the canvas runs full width and
-   carries its own way back — "Show inspector ⌘\" at its top right. That
-   button replaced the "Inspector hidden · Show" toast (GW-3 / M-2), which was
-   the way back only while no board drew one. */
-describe("StudioPanels — Show inspector on the canvas (board 36)", () => {
+/* 2L9 S30 (258:36770, Inspector hidden): the column stays reserved and empty,
+   with "Show Inspector" at its top right (it was board 36's full-width canvas
+   with the button on it). That button replaced the "Inspector hidden · Show"
+   toast (GW-3 / M-2). The inspector stays mounted, invisible, under it. */
+describe("StudioPanels — Show Inspector in the reserved column (2L9 S30)", () => {
   const showButton = () => screen.queryByRole("button", { name: "Show Inspector" });
 
-  it("hiding the inspector puts Show inspector ⌘\\ on the canvas; it brings the inspector back", () => {
+  it("hiding the inspector keeps its column with Show Inspector in it; the button brings the inspector back", () => {
     const composer = makeComposer();
     render(<Harness composer={composer} />);
     expect(showButton()).toBeNull();
     act(() => composer.emit(EVENTS.UI_TOGGLE_INSPECTOR));
-    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("true");
+    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("false");
+    expect(screen.getByTestId("inspector-body-host").getAttribute("aria-hidden")).toBe("true");
     const button = showButton()!;
     /* 2L9 S30 (258:36770): "Show Inspector"; ⌘\ is announced and in the tooltip. */
     expect(button.textContent).toBe("Show Inspector");
     expect(button.getAttribute("aria-keyshortcuts")).toBe("Meta+\\");
     expect(button.getAttribute("title")).toBe("Show Inspector (⌘\\)");
-    /* On the canvas, not in the (hidden) column. */
-    expect(inspectorColumn().contains(button)).toBe(false);
+    /* In the reserved column. */
+    expect(inspectorColumn().contains(button)).toBe(true);
     fireEvent.click(button);
-    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("false");
+    expect(screen.getByTestId("inspector-body-host").getAttribute("aria-hidden")).toBeNull();
     expect(showButton()).toBeNull();
   });
 
@@ -249,7 +250,7 @@ describe("StudioPanels — Show inspector on the canvas (board 36)", () => {
     act(() => composer.emit(EVENTS.UI_TOGGLE_INSPECTOR));
     act(() => composer.emit(EVENTS.UI_TOGGLE_INSPECTOR));
     expect(showButton()).toBeNull();
-    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("false");
+    expect(screen.queryByTestId("show-inspector")).toBeNull();
   });
 
   it("not drawn while a mode fills the column (AI) — the column is open", () => {
@@ -266,7 +267,7 @@ describe("StudioPanels — Show inspector on the canvas (board 36)", () => {
     act(() => composer.emit(EVENTS.UI_TOGGLE_INSPECTOR));
     unmount();
     render(<Harness composer={makeComposer()} />);
-    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("false");
+    expect(screen.queryByTestId("show-inspector")).toBeNull();
     expect(showButton()).toBeNull();
   });
 });
@@ -283,7 +284,7 @@ describe("StudioPanels — ‹ Inspector leads to the inspector (M-1)", () => {
     fireEvent.click(screen.getByRole("button", { name: "‹ Inspector" }));
     expect(screen.queryByTestId("ai-tab")).toBeNull();
     expect(screen.getByTestId("pro-inspector")).toBeTruthy();
-    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("false");
+    expect(screen.queryByTestId("show-inspector")).toBeNull();
   });
 
   it("AI's ✕ leaves a hidden inspector hidden", () => {
@@ -292,7 +293,7 @@ describe("StudioPanels — ‹ Inspector leads to the inspector (M-1)", () => {
     act(() => composer.emit(EVENTS.UI_TOGGLE_INSPECTOR));
     act(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "ai" }));
     fireEvent.click(screen.getByRole("button", { name: "Close AI" }));
-    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("true");
+    expect(screen.queryByTestId("show-inspector")).not.toBeNull(); // hidden: S30's reserved column
   });
 
   it("Issues' back row gets the same promise", () => {
@@ -310,7 +311,7 @@ describe("StudioPanels — ‹ Inspector leads to the inspector (M-1)", () => {
     fireEvent.click(screen.getByRole("button", { name: "Issues back" }));
     expect(onCloseIssues).toHaveBeenCalled();
     rerender(<Harness composer={composer} issuesOpen={false} onCloseIssues={onCloseIssues} />);
-    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("false");
+    expect(screen.queryByTestId("show-inspector")).toBeNull();
   });
 });
 
@@ -321,21 +322,21 @@ describe("StudioPanels — the column opens for every panel it hosts", () => {
     const composer = makeComposer();
     const { rerender } = render(<Harness composer={composer} />);
     act(() => composer.emit(EVENTS.UI_TOGGLE_INSPECTOR));
-    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("true");
+    expect(screen.queryByTestId("show-inspector")).not.toBeNull(); // hidden: S30's reserved column
 
     act(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "ai" }));
     expect(screen.getByTestId("ai-tab")).toBeTruthy();
-    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("false");
+    expect(screen.queryByTestId("show-inspector")).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "Close AI" }));
-    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("true");
+    expect(screen.queryByTestId("show-inspector")).not.toBeNull(); // hidden: S30's reserved column
 
     act(() => composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "history" }));
     expect(screen.getByTestId("column-tab-history")).toBeTruthy();
-    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("false");
+    expect(screen.queryByTestId("show-inspector")).toBeNull();
 
     rerender(<Harness composer={composer} issuesOpen renderIssuesPanel={() => <div data-testid="issues" />} />);
     expect(screen.getByTestId("issues")).toBeTruthy();
-    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("false");
+    expect(screen.queryByTestId("show-inspector")).toBeNull();
   });
 });
 
@@ -464,7 +465,7 @@ describe("StudioPanels — the CMS workspace returns to the bound element (§13)
     await flushFrame();
     await flushFrame();
     expect(screen.getByTestId("pro-inspector").getAttribute("data-revealed")).toBe("cms-binding");
-    expect(inspectorColumn().getAttribute("aria-hidden")).toBe("false");
+    expect(screen.queryByTestId("show-inspector")).toBeNull();
   });
 
   it("a door without a binding returns to the bare canvas", async () => {

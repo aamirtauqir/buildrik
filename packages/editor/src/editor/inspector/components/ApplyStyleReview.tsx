@@ -203,7 +203,8 @@ export function ApplyStyleReview({ composer, elementId, breakpoint, pseudo, onCl
       <p className={NOTE}>
         {names.length
           ? `${andList(names)} overrides on the ${peers.length} eligible ${nounFor(noun, peers.length)} will be replaced. Other categories and breakpoints stay unchanged.`
-          : "Choose what to apply."}
+          : /* 2L9 S19 (255:91321): nothing chosen writes nothing, and no history. */
+            "Select at least one category. No properties are selected and nothing will change."}
       </p>
       <div className="tw:flex tw:flex-col tw:gap-2 tw:pt-1">
         <Button
@@ -214,8 +215,13 @@ export function ApplyStyleReview({ composer, elementId, breakpoint, pseudo, onCl
           onClick={apply}
           data-testid="inspector-apply-style-apply"
         >
-          Apply {andList(names) || "style"} to {peers.length}
+          {names.length ? `Apply ${andList(names)} to ${peers.length}` : "Apply style"}
         </Button>
+        {names.length === 0 && offered.length > 0 ? (
+          <Button color="light" size="xs" className={WIDE_BUTTON} onClick={() => setChosen([offered[0]])} data-testid="inspector-apply-style-select-first">
+            Select {CATEGORIES.find((c) => c.id === offered[0])?.label ?? offered[0]}
+          </Button>
+        ) : null}
         <Button color="light" size="xs" className={WIDE_BUTTON} onClick={onClose} data-testid="inspector-apply-style-cancel">
           Cancel
         </Button>

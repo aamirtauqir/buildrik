@@ -339,12 +339,13 @@ describe("InputWithUnit — unit card (I06)", () => {
     expect(screen.queryByRole("combobox")).toBeNull();
     fireEvent.click(screen.getByTestId("unit-card-trigger"));
     expect(screen.getByText("Font size unit")).toBeInTheDocument();
-    expect(screen.getAllByRole("menuitemradio").map((b) => b.textContent?.replace("✓", "").trim())).toEqual(["px", "em", "rem", "%", "vw"]);
+    expect(screen.getAllByRole("menuitem").map((b) => b.textContent)).toEqual(["px", "em", "rem", "%", "vw"]);
+    expect(screen.getByRole("menuitem", { name: "px" })).toHaveAttribute("aria-current", "true");
     fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
     expect(onChange).not.toHaveBeenCalled();
     expect(screen.queryByText("Font size unit")).toBeNull();
     fireEvent.click(screen.getByTestId("unit-card-trigger"));
-    fireEvent.click(screen.getByRole("menuitemradio", { name: /^em$/ }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "em" }));
     expect(onChange).toHaveBeenCalledWith("1.5em");
   });
 

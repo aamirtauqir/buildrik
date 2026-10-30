@@ -8,12 +8,15 @@
  *      writes ignore breakpoint and state, so their line says so instead
  *      ("Content · All breakpoints", "Behavior · Heading" — boards 161:8480,
  *      161:13919, 36:2) and carries no Select.
- * 12 padding, 4 between rows: 84 tall. The element path (chrome-ui
- * Breadcrumb, "Home › Hero › Heading") is a third row on top — 104 tall —
- * ONLY while the current page is a collection template. It never depends on
- * the selection, so the header keeps its height as selection moves within a
- * page (plan Task 1.4). The page crumb clears the selection, an ancestor
- * crumb selects it.
+ * 12 padding, 4 between rows. The element path (chrome-ui Breadcrumb) is
+ * the row under the target, on every page, as every 2L9 inspector board
+ * draws it (owner rule 2026-10-26: the board wins over the earlier
+ * template-page-only default) — 104 tall. A path longer than three crumbs
+ * reads "… › {parent} › {element}" (2L9 S31 258:37248); the "…" opens
+ * "Selection path" beside the column, every crumb selectable. The page crumb
+ * clears the selection, an ancestor crumb selects it.
+ * While the site did not load for a connection reason the context line reads
+ * "Could not load {site}" (2L9 S02 255:82909) — `loadFailedLine`.
  * Variants: `multi` (board 22): the name row reads "3 selected · Headings"
  * with no type icon, and the path is the shared parent's own ("Home › Hero"),
  * ending on that parent — the selection is not repeated as a crumb.
@@ -24,13 +27,12 @@
 import { X } from "lucide-react";
 import * as React from "react";
 import type { Composer, Element } from "@/engine";
-import { Breadcrumb, IconButton, Label, Select, type BreadcrumbItem, type CustomFlowbiteTheme } from "@/editor/chrome-ui";
+import { Breadcrumb, Button, IconButton, Label, Menu, MenuItem, Popover, Select, type BreadcrumbItem, type CustomFlowbiteTheme } from "@/editor/chrome-ui";
 import { getElementIcon } from "@/editor/shared/elementIcons";
 import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
 import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
 import { EVENTS } from "@/shared/constants/events";
 import type { PseudoStateId } from "@/shared/types";
-import { pageFileNames } from "@/engine/export/pageFiles";
 import type { TabId } from "@/editor/inspector/sections/registry";
 import { ElementNameField } from "./ElementNameField";
 import { InspectorElementMenu } from "./InspectorElementMenu";
@@ -49,6 +51,12 @@ export interface InspectorHeaderProps {
   onStateChange: (state: PseudoStateId) => void;
   /** States that carry overrides at this breakpoint — their option says so. */
   statesWithOverrides?: ReadonlySet<PseudoStateId>;
+  /** The site did not load: the context line says so instead (S02). */
+  loadFailedLine?: string;
+  /** What the element is bound to ("Blog.title") — said in the name row and
+   *  opening Content › Dynamic bindings (2L9 B5-D04 173:9757). A missing
+   *  source keeps its error chip in StatusMarks. */
+  boundTo?: string;
 }
 
 const STATES: readonly { id: PseudoStateId; label: string }[] = [
@@ -64,14 +72,6 @@ const STATES: readonly { id: PseudoStateId; label: string }[] = [
 const STATE_SELECT_THEME: NonNullable<CustomFlowbiteTheme["select"]> = {
   field: { select: { sizes: { md: "tw:h-8 tw:py-0 tw:pl-2 tw:pr-8 tw:text-[12px] tw:leading-4" } } },
 };
-
-/** Whether the active page is a collection's template page. */
-function onTemplatePage(composer: Composer): boolean {
-  const page = composer.elements.getActivePage?.();
-  if (!page) return false;
-  const file = pageFileNames(composer.elements.getAllPages()).get(page.id);
-  return Boolean(file) && (composer.cms?.collections.getAllCollections() ?? []).some((c) => c.pageTemplatePath === file);
-}
 
 /** Page crumb, then each ancestor below the page root down to `anchor`, then
  *  `last` as the current crumb — or, without `last`, `anchor` is the current one. */
@@ -114,6 +114,8 @@ export function InspectorHeader({
   state,
   onStateChange,
   statesWithOverrides,
+  loadFailedLine,
+  boundTo,
 }: InspectorHeaderProps) {
   const stateId = React.useId();
   const multi = selectedIds.length > 1;
@@ -129,11 +131,9 @@ export function InspectorHeader({
   const multiName = multi
     ? `${selectedIds.length} selected${new Set(selectedEls.map((e) => e.getType())).size === 1 ? ` · ${pluralType(element.type)}` : ""}`
     : "";
-  if (composer && onTemplatePage(composer)) {
+  if (composer) {
     if (multi) {
-      const els = selectedEls;
-      const parent = commonParent(els);
-      items = pathFor(composer, parent);
+      items = pathFor(composer, commonParent(selectedEls));
     } else {
       const el = composer.elements.getElement(element.id);
       items = pathFor(composer, el?.getParent?.() ?? null, getLayerName(el) ?? typeLabel);
@@ -142,9 +142,6 @@ export function InspectorHeader({
 
   return (
     <div className="tw:flex tw:flex-col tw:gap-1 tw:p-3" data-testid="inspector-header">
-      {items.length > 0 ? (
-        <Breadcrumb label="Element path" items={items} className="tw:h-4" data-testid="inspector-breadcrumb" />
-      ) : null}
       <div className="tw:flex tw:h-6 tw:items-center tw:gap-1" data-testid="inspector-target-row">
         <div className="tw:flex tw:min-w-0 tw:flex-1 tw:items-center tw:gap-2 tw:text-[13px] tw:font-semibold tw:leading-4 tw:text-[var(--bk-ink-soft)]">
           {multi ? null : (
@@ -170,6 +167,19 @@ export function InspectorHeader({
             )}
           </span>
         </div>
+        {boundTo ? (
+          <Button
+            color="light"
+            size="xs"
+            data-testid="inspector-bound-chip"
+            data-tone="bound"
+            title={`Bound to ${boundTo}`}
+            onClick={() => composer?.emit(EVENTS.UI_INSPECTOR_FOCUS_SECTION, { section: "cms-binding" })}
+            className="tw:h-6 tw:min-w-0 tw:max-w-[120px] tw:shrink tw:border-0 tw:bg-transparent tw:px-1 tw:text-[13px] tw:font-normal tw:text-[var(--bk-accent-text)] tw:hover:bg-transparent tw:hover:underline tw:focus:ring-0"
+          >
+            <span className="tw:truncate">{boundTo}</span>
+          </Button>
+        ) : null}
         <InspectorElementMenu composer={composer} selectedElementId={element.id} />
         <IconButton
           label="Hide inspector (⌘\)"
@@ -180,8 +190,13 @@ export function InspectorHeader({
           <X size={16} aria-hidden="true" />
         </IconButton>
       </div>
+      {items.length > 0 ? <ElementPath items={items} /> : null}
       <div className="tw:flex tw:h-8 tw:items-center tw:gap-2" data-testid="inspector-editing-row">
-        {activeTab === "content" || activeTab === "behaviour" ? (
+        {loadFailedLine ? (
+          <span className="tw:min-w-0 tw:truncate tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)]" data-testid="inspector-load-failed-line">
+            {loadFailedLine}
+          </span>
+        ) : activeTab === "content" || activeTab === "behaviour" ? (
           <span className="tw:min-w-0 tw:truncate tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)]">
             {activeTab === "content" ? "Content · All breakpoints" : `Behavior · ${typeLabel}`}
           </span>
@@ -213,6 +228,68 @@ export function InspectorHeader({
           </>
         )}
       </div>
+    </div>
+  );
+}
+
+/** Crumbs drawn before the path folds into "… › parent › element". */
+const PATH_MAX = 3;
+
+/** The element path row (S31): short paths in full; longer ones fold their
+ *  head into a "…" that opens "Selection path" beside the column. */
+function ElementPath({ items }: { items: BreadcrumbItem[] }) {
+  const [open, setOpen] = React.useState(false);
+  const fold = items.length > PATH_MAX;
+  const tail = fold ? items.slice(-2) : items;
+  return (
+    <div className="tw:flex tw:h-4 tw:min-w-0 tw:items-center" data-testid="inspector-path-row">
+      {fold ? (
+        <>
+          <Popover
+            open={open}
+            onClose={() => setOpen(false)}
+            beside=".layout-shell__inspector"
+            besideTop='[role="tablist"]'
+            label="Selection path"
+            className="tw:w-[280px] tw:p-3"
+            trigger={
+              <Button
+                color="light"
+                size="xs"
+                aria-haspopup="menu"
+                aria-expanded={open}
+                aria-label={`Selection path: ${items.map((i) => i.label).join(" › ")}`}
+                data-testid="inspector-path-more"
+                onClick={() => setOpen((v) => !v)}
+                className="tw:-my-1 tw:h-6 tw:min-w-6 tw:border-0 tw:bg-transparent tw:p-0 tw:text-[12px] tw:font-normal tw:leading-4 tw:text-[var(--bk-ink-muted)] tw:hover:bg-transparent tw:hover:text-[var(--bk-ink)] tw:focus:ring-0"
+              >
+                …
+              </Button>
+            }
+          >
+            <p className="tw:m-0 tw:mb-2 tw:text-[13px] tw:font-semibold tw:leading-4 tw:text-[var(--bk-ink)]">Selection path</p>
+            <Menu label="Selection path" className="tw:min-w-0">
+              {items.map((item) => (
+                <MenuItem
+                  key={item.id}
+                  className="tw:h-10! tw:[&>span]:text-center!"
+                  aria-current={item.onSelect ? undefined : "location"}
+                  onClick={() => {
+                    setOpen(false);
+                    item.onSelect?.();
+                  }}
+                >
+                  {item.label}
+                </MenuItem>
+              ))}
+            </Menu>
+          </Popover>
+          <span aria-hidden="true" className="tw:shrink-0 tw:px-1 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
+            ›
+          </span>
+        </>
+      ) : null}
+      <Breadcrumb label="Element path" items={tail} maxItems={PATH_MAX} className="tw:h-4 tw:min-w-0" data-testid="inspector-breadcrumb" />
     </div>
   );
 }

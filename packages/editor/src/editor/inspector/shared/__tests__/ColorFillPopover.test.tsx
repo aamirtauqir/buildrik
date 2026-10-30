@@ -38,7 +38,7 @@ describe("ColorFillPopover (board 33)", () => {
     const pop = screen.getByTestId("fill-popover");
     expect(pop.textContent?.startsWith("Brand colors")).toBe(true);
     const rows = within(screen.getByRole("list", { name: "Brand colors" })).getAllByRole("listitem");
-    expect(rows.map((r) => r.textContent)).toEqual(["Primary#1A56DBUse", "Text#374151Use", "Background#FFFFFFUse"]);
+    expect(rows.map((r) => r.textContent)).toEqual(["Primary#1A56DBUseEdit", "Text#374151UseEdit", "Background#FFFFFFUseEdit"]);
     // Board 33's content stays on top; below it, the closed "Custom colour" section.
     expect(pop.textContent?.endsWith("Add colors in BrandCustom color")).toBe(true);
     expect(screen.queryByText(/Recent|Detach/)).toBeNull();

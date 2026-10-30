@@ -5,7 +5,7 @@
  *
  *   Dynamic bindings                 1 binding
  *          Title text · Blog.title ›   → the binding detail (centred link)
- *   Text bindings are edited in Content.
+ * (2L9 B5-D04 draws no "… are edited in Content." note — this IS Content.)
  *
  * A binding is made and edited at its property row in the type block
  * (`binding/BindingPropertyRow`: Choose source, then the detail). This
@@ -24,7 +24,7 @@ import { useInspectorField } from "../shared/controls/InspectorFieldContext";
 import { ActionRow, NoteRow } from "./behaviourRows";
 import { ChooseSourcePicker } from "./binding/ChooseSourcePicker";
 import { openSubview } from "@/editor/inspector/tabs/subviewStore";
-import { PROPERTY_LABEL, useCmsBinding } from "./binding/useCmsBinding";
+import { useCmsBinding } from "./binding/useCmsBinding";
 
 export interface CmsBindingSectionProps {
   elementId: string;
@@ -119,7 +119,6 @@ export const CmsBindingSection: React.FC<CmsBindingSectionProps> = ({ elementId,
           >
             {label} · {state.collection?.name}.{binding.fieldSlug} ›
           </div>
-          <NoteRow testId="cms-binding-note">{PROPERTY_LABEL[state.property]} bindings are edited in Content.</NoteRow>
         </>
       )}
     </Section>

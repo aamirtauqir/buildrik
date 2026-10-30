@@ -94,7 +94,11 @@ describe("ApplyStyleReview (S11)", () => {
     expect(screen.getByRole("button", { name: "Apply Typography and Fill to 1" })).toBeTruthy();
     fireEvent.click(screen.getByRole("checkbox", { name: "Typography" }));
     fireEvent.click(screen.getByRole("checkbox", { name: "Fill" }));
-    expect(screen.getByRole("button", { name: "Apply style to 1" })).toBeDisabled();
+    /* 2L9 S19 (255:91321): nothing chosen — disabled "Apply style", says why, offers the first category back. */
+    expect(screen.getByRole("button", { name: "Apply style" })).toBeDisabled();
+    expect(screen.getByText("Select at least one category. No properties are selected and nothing will change.")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Select Typography" }));
+    expect(screen.getByRole("checkbox", { name: "Typography" })).toBeChecked();
   });
 });
 

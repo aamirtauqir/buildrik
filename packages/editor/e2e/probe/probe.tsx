@@ -2780,8 +2780,17 @@ const CASES: Record<string, () => React.ReactElement> = {
     const blockId = q.get("block");
     const block = blockId ? getBlockById(blockId) : undefined;
     const id = block ? insertBlock(c, block, page.root.id) : undefined;
+    /* `?ancestors=Main,Hero,Content stack` — the element sits inside named
+       containers (S31's path). */
+    let host = page.root.id;
+    for (const name of (q.get("ancestors") ?? "").split(",").filter(Boolean)) {
+      const box = c.elements.createElement("container" as never, {} as never);
+      c.elements.addElement(box, host);
+      renameElement(c as never, box.getId(), name);
+      host = box.getId();
+    }
     const el = id ? c.elements.getElement(id)! : c.elements.createElement(type as never, { content: "Thoughtful design." } as never);
-    if (!id) c.elements.addElement(el, page.root.id);
+    if (!id) c.elements.addElement(el, host);
     /* `?styles={"display":"flex",…}` — a specimen's authored values. */
     const styles = q.get("styles");
     if (styles) el.setStyles(JSON.parse(styles) as Record<string, string>);
@@ -2885,8 +2894,30 @@ const CASES: Record<string, () => React.ReactElement> = {
           fields: [{ id: "f-title", name: "Title", slug: "title", type: "text", required: true }] as never,
         });
         const item = await c.cms.collections.createContentItem(col.id, { title: "Article title" }, { status: "published" });
+        /* `?cms=template` — Home is Blog's template page; the binding follows
+           this page's record (B5-D04/D05). `&fields=1` adds Blog's other
+           field types (B5-D03). */
+        if (q.get("cms") === "template") await c.cms.collections.updateCollection(col.id, { pageTemplatePath: "index.html" } as never);
+        if (q.get("fields"))
+          await c.cms.collections.updateCollection(col.id, {
+            fields: [
+              { id: "f-title", name: "Title", slug: "title", type: "text", required: true },
+              { id: "f-excerpt", name: "Excerpt", slug: "excerpt", type: "textarea" },
+              { id: "f-body", name: "Body", slug: "body", type: "richtext" },
+              { id: "f-cover", name: "Cover image", slug: "cover", type: "image" },
+              { id: "f-author", name: "Author", slug: "author", type: "reference" },
+            ],
+          } as never);
         /* `?cms=unbound` — the collection only, nothing bound (F2.02). */
-        if (q.get("cms") !== "unbound") c.cms.bindings.bindToField(el.getId(), col.id, item?.id, "title", "content" as never);
+        /* `?cms=list` — the element's parent is a Collection list of Blog
+           (B5-D99: an element inside a list). */
+        if (q.get("cms") === "list") {
+          const parent = el.getParent?.();
+          if (parent) c.cms.bindings.bindCollectionList(parent.getId(), col.id);
+          c.selection.select(el);
+          return;
+        }
+        if (q.get("cms") !== "unbound" && !q.get("unbound")) c.cms.bindings.bindToField(el.getId(), col.id, q.get("cms") === "template" ? undefined : item?.id, "title", "content" as never);
         c.selection.select(el);
       })();
     }

@@ -441,7 +441,9 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           element={selectedElement}
           selectedIds={targetIds}
           breakpointLabel={BREAKPOINTS[currentBreakpoint]?.name ?? currentBreakpoint}
+          boundTo={targetIds.length <= 1 && binding && !binding.missing ? binding.label : undefined}
           activeTab={activeTab}
+          loadFailedLine={connectionFailure ? `Could not load ${composer?.getProjectMetadata?.()?.name || "this site"}` : undefined}
           state={currentPseudoState}
           /* The state Select draws only on Style / Effects (B-10), where a
              state's values are edited. */
@@ -449,7 +451,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           statesWithOverrides={statesWithOverrides}
         />
         {targetIds.length > 1 ? null : (
-          <StatusMarks composer={composer} elementId={selectedElement.id} binding={binding} locked={locked} />
+          <StatusMarks composer={composer} elementId={selectedElement.id} binding={binding?.missing ? binding : null} locked={locked} />
         )}
         <StatusLine composer={composer} elementId={selectedElement.id} locked={locked && !pasteRefused && !addRefused} conflict={conflict} />
         {targetIds.length > 1 ? <MultiSelectBar composer={composer} selectedIds={targetIds} /> : null}
