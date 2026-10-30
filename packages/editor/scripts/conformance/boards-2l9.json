@@ -14081,8 +14081,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Round 24: open — server first. Site password protection exists (Settings › Access, Pro + ADMIN; publish reconciles it on Vercel best-effort, skipping on 402/403), but nothing refuses a publish when a Free workspace's site still carries a password: the deploy goes out and the protection is silently skipped. Contract filed REQUESTS A-36 (a 'Password protection' fail row from runPrePublishChecks + the remove-and-publish mutation); the tray shuts on any failing server row already.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 28 (A-36), probe-compared: shots/233-8594.png vs probe publish-tray-password: CHECKS '1 blocking' with the red card '✕ This site is password protected. On Free the protection is removed and the site becomes public.', 'Upgrade ↗' (billing) and 'Remove protection and publish…', no legend or destination, 'Fix 1 blocking issue to publish' under the shut CTA. Server: runPrePublishChecks fails 'Password protection' when a site keeps publishedPassword on FREE (test publish-prechecks-visibility). Residual: WHAT WILL CHANGE counts unavailable in the probe (A-33 built, needs a composer).",
    "tier": "P1"
   },
   {
@@ -14092,8 +14092,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Round 24: open — the 'Remove protection and publish' confirm needs REQUESTS A-36's server half (clear publishedPassword, then publish) before the editor can offer it.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 28 (A-36), probe-compared: shots/233-9161.png vs probe publish-tray-password after 'Remove protection and publish…': 'Remove password protection and publish?', '{domain} becomes public. You can add protection again on Pro.', Cancel · Remove and publish. Confirm clears the password through siteDetail.settings.update ({ publishedPassword: null } — clearing is allowed on every plan), re-reads the checks and opens the publish door (test PublishTray A-36); a refused clear says so and publishes nothing.",
    "tier": "P1"
   },
   {
@@ -14147,8 +14147,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Round 24: no plan site-limit check reaches the editor; contract filed REQUESTS A-34 (a 'Plan limit' fail row from runPrePublishChecks). The tray already shuts on any failing server row once it exists.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 28 (A-34), probe-compared: shots/233-11934.png vs probe publish-tray-plan-limit: status card, WHAT WILL CHANGE, no checks or destination, disabled 'Publish changes' with 'Over the Free limit — Upgrade to publish'. Server: runPrePublishChecks fails 'Plan limit' for a site with as many older live sites in its workspace as the plan allows (oldest keep their place; tests publish-prechecks-visibility). Counts residual as 233:8594.",
    "tier": "P1"
   },
   {

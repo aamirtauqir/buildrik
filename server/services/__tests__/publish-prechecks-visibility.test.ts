@@ -11,6 +11,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 const pageFindManyMock = vi.fn();
 const siteFindUniqueMock = vi.fn();
+const siteCountMock = vi.fn();
 const domainFindFirstMock = vi.fn();
 const cmsCollectionFindManyMock = vi.fn();
 const cmsEntryFindManyMock = vi.fn();
@@ -18,7 +19,7 @@ const cmsEntryFindManyMock = vi.fn();
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     page: { findMany: (...a: unknown[]) => pageFindManyMock(...a) },
-    site: { findUnique: (...a: unknown[]) => siteFindUniqueMock(...a) },
+    site: { findUnique: (...a: unknown[]) => siteFindUniqueMock(...a), count: (...a: unknown[]) => siteCountMock(...a) },
     domain: { findFirst: (...a: unknown[]) => domainFindFirstMock(...a) },
     // The module touches these elsewhere; the checks under test do not, but a
     // bare mock object makes the import graph resolvable.
@@ -63,6 +64,7 @@ beforeEach(() => {
     metaTitleTemplate: "{page} — Site", touchIcon: "x", deletedAt: null, workspaceId: "ws1",
   });
   domainFindFirstMock.mockReset().mockResolvedValue(null);
+  siteCountMock.mockReset().mockResolvedValue(0);
   cmsCollectionFindManyMock.mockReset().mockResolvedValue([]);
   cmsEntryFindManyMock.mockReset().mockResolvedValue([]);
 });
@@ -284,5 +286,45 @@ describe("pre-publish lists bound elements with no value", () => {
 
     siteFindUniqueMock.mockResolvedValue({ metaTitleTemplate: "x", deletedAt: null, workspaceId: "ws1", projectCmsBindings: null });
     expect(status((await runPrePublishChecks("s1")).checks, "CMS bindings")).toBeUndefined();
+  });
+});
+
+/* A-34 (B8-PB22) / A-36 (B8-PB16): what the plan allows this site. */
+describe("pre-publish checks — the plan's own refusals", () => {
+  const site = (over: Record<string, unknown>) => ({
+    metaTitleTemplate: "x", touchIcon: "x", deletedAt: null, workspaceId: "ws1",
+    createdAt: new Date("2026-01-05T00:00:00.000Z"), publishedPassword: null, workspace: { plan: "FREE" }, ...over,
+  });
+  beforeEach(() => pageFindManyMock.mockResolvedValue([{ id: "1", name: "Home", blocks: [{}], settings: null }]));
+
+  it("a site beyond its plan's site limit fails 'Plan limit' with the CTA's sentence", async () => {
+    siteFindUniqueMock.mockResolvedValue(site({}));
+    siteCountMock.mockResolvedValue(3); // three older sites on a 3-site Free plan
+    const { checks, ready } = await runPrePublishChecks("s4");
+    expect(status(checks, "Plan limit")).toBe("fail");
+    expect(detail(checks, "Plan limit")).toBe("Over the Free limit — Upgrade to publish");
+    expect(ready).toBe(false);
+    expect(siteCountMock).toHaveBeenCalledWith({
+      where: expect.objectContaining({ workspaceId: "ws1", deletedAt: null, id: { not: "s4" } }),
+    });
+  });
+
+  it("a site within the limit has no plan row", async () => {
+    siteFindUniqueMock.mockResolvedValue(site({}));
+    siteCountMock.mockResolvedValue(2);
+    const { checks } = await runPrePublishChecks("s3");
+    expect(status(checks, "Plan limit")).toBeUndefined();
+  });
+
+  it("a password kept on Free fails 'Password protection'; on Pro it is allowed", async () => {
+    siteFindUniqueMock.mockResolvedValue(site({ publishedPassword: "enc:xyz" }));
+    let { checks } = await runPrePublishChecks("s1");
+    expect(status(checks, "Password protection")).toBe("fail");
+    expect(detail(checks, "Password protection")).toBe(
+      "This site is password protected. On Free the protection is removed and the site becomes public.",
+    );
+    siteFindUniqueMock.mockResolvedValue(site({ publishedPassword: "enc:xyz", workspace: { plan: "PRO" } }));
+    ({ checks } = await runPrePublishChecks("s1"));
+    expect(status(checks, "Password protection")).toBeUndefined();
   });
 });

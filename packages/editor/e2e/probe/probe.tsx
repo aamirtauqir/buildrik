@@ -4193,6 +4193,21 @@ const CASES: Record<string, () => React.ReactElement> = {
     nextMove: deriveLifecycleState({ ...TRAY_LIFE, isViewer: true }),
     server: { "sites.publishHistory": TRAY_ROWS.slice(1) },
   }),
+  /* A-36 B8-PB16 233:8594 / A-34 B8-PB22 233:11934 — the plan's refusals. */
+  "publish-tray-password": () => publishTrayFrame("publish-tray-password", {
+    nextMove: deriveLifecycleState({ ...TRAY_LIFE, errorCount: 1 }),
+    server: {
+      "sites.publishHistory": TRAY_ROWS.slice(1),
+      "sites.prePublishChecks": { ready: false, checks: [{ label: "Password protection", status: "fail", detail: "This site is password protected. On Free the protection is removed and the site becomes public." }] },
+    },
+  }),
+  "publish-tray-plan-limit": () => publishTrayFrame("publish-tray-plan-limit", {
+    nextMove: deriveLifecycleState({ ...TRAY_LIFE, errorCount: 1 }),
+    server: {
+      "sites.publishHistory": TRAY_ROWS.slice(1),
+      "sites.prePublishChecks": { ready: false, checks: [{ label: "Plan limit", status: "fail", detail: "Over the Free limit — Upgrade to publish" }] },
+    },
+  }),
   "publish-tray-checking": () => publishTrayFrame("publish-tray-checking", {
     nextMove: deriveLifecycleState(TRAY_LIFE),
     server: { "sites.publishHistory": TRAY_ROWS.slice(1) },

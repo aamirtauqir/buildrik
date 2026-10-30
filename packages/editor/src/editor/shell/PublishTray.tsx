@@ -32,7 +32,7 @@ import { MoreHorizontal, X } from "lucide-react";
 import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
-import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
+import { getSiteIdFromUrl, updateSiteColumns } from "@/services/BuildrikSyncProvider";
 import {
   cmsSyncBlocker,
   cmsSyncFailure,
@@ -40,7 +40,7 @@ import {
   retryCmsSync,
   type CmsSyncFailure,
 } from "@/services/cmsSync";
-import { VERCEL_CHECK_LABEL } from "@buildrik/shared/schemas/publish";
+import { PASSWORD_CHECK_LABEL, PLAN_LIMIT_CHECK_LABEL, VERCEL_CHECK_LABEL } from "@buildrik/shared/schemas/publish";
 import { CONTENT_CHECK_LABELS } from "@buildrik/shared/content/contentIssues";
 import { locateComment } from "@/editor/sidebar/tabs/review/locate";
 import { openPublishCheckFix } from "@/editor/sidebar/tabs/publish/PublishTab";
@@ -52,8 +52,9 @@ import { PUBLISH_CHECK_ISSUE } from "./hooks/useIssuesFeed";
 import type { UsePublishJobResult } from "./hooks/usePublishJob";
 import type { Issue } from "./hooks/useStudioState";
 import { PUBLISH_REFUSAL, type NextMove } from "./lifecycle";
+import { trayCta, type Cta } from "./publishTrayCta";
 import { publishTray } from "./publishTrayStore";
-import { ChangesSection, FailedLog, OUTCOME_BTN, OutcomeNote, PublishedActions, RunSection, TraySkeleton, runSteps } from "./PublishTrayRun";
+import { ChangesSection, FailedLog, PasswordCheckCard, OUTCOME_BTN, OutcomeNote, PublishedActions, RunSection, TraySkeleton, runSteps } from "./PublishTrayRun";
 import { usePublishPreviewDiff } from "@/editor/sidebar/tabs/publish/usePublishPreviewDiff";
 
 /* The server's content rows ("Image alt text", "Links") run the same shared
@@ -81,7 +82,7 @@ export interface PublishTrayProps {
 
 /* ── CMS sync — pending vs stuck ─────────────────────────────────────────── */
 
-interface CmsSyncState {
+export interface CmsSyncState {
   /** `cmsSyncBlocker()`'s sentence — writes still on their way. */
   pending: string | null;
   /** Set once the failing write has failed 5 times or for 60 s. */
@@ -151,49 +152,6 @@ function locateIssue(composer: Composer, issue: Issue): void {
 const ISSUE_ROW =
   "tw:flex tw:w-full tw:items-start tw:gap-2 tw:py-[13px] tw:text-left tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]";
 
-/* ── The one CTA ─────────────────────────────────────────────────────────── */
-
-type Cta =
-  | { kind: "publish"; label: string }
-  | { kind: "retry"; label: string }
-  | { kind: "check-status"; label: string }
-  | { kind: "connect"; label: string }
-  | { kind: "shut"; label: string; reason: string | null };
-
-interface CtaInput {
-  nextMove: NextMove | null;
-  publishJob?: UsePublishJobResult;
-  wired: boolean;
-  checkState: "loading" | "ready" | "error";
-  vercelMissing: boolean;
-  cms: CmsSyncState;
-  /** The site is live — a review verb's door still reads "Publish changes" (B8-PB15). */
-  live: boolean;
-}
-
-/** In priority order: what is running or has just failed speaks first, then
- *  what stops a new publish, then the door itself. */
-function trayCta({ nextMove, publishJob, wired, checkState, vercelMissing, cms, live }: CtaInput): Cta {
-  const label = nextMove?.kind === "publish" ? nextMove.label : live ? "Publish changes" : "Publish";
-  const ui = publishJob?.uiState;
-  if (ui === "publishing") return { kind: "shut", label: "Publishing…", reason: null };
-  if (ui === "failed" && publishJob?.pollLost && publishJob.jobId) return { kind: "check-status", label: "Check status" };
-  if (ui === "failed" && publishJob?.error) return { kind: "retry", label: "Try again" };
-  if (!wired) {
-    return { kind: "shut", label, reason: nextMove?.blockedReason ?? PUBLISH_REFUSAL.off };
-  }
-  if (cms.stuck) return { kind: "shut", label, reason: `CMS changes couldn't sync: ${cms.stuck.reason}` };
-  if (cms.pending) return { kind: "shut", label, reason: "Saving CMS changes…" };
-  if (nextMove === null) return { kind: "shut", label: "Up to date", reason: null };
-  if (vercelMissing) return { kind: "connect", label: "Connect Vercel" };
-  if (checkState === "loading") return { kind: "shut", label, reason: "Checking…" };
-  /* B8-PB15: the round's sentence is in the tray's body; the CTA only says why it waits. */
-  if (nextMove.gate === "changes-requested") return { kind: "shut", label, reason: "Waiting on review" };
-  if (nextMove.kind !== "publish") return { kind: "shut", label, reason: nextMove.gateReason ?? nextMove.blockedReason };
-  if (nextMove.blockedReason) return { kind: "shut", label, reason: nextMove.blockedReason };
-  return { kind: "publish", label };
-}
-
 /* ── Layout constants (board 499:2656) ───────────────────────────────────── */
 
 const HEAD = "tw:m-0 tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.04em] tw:text-[var(--bk-ink-muted)]";
@@ -260,12 +218,16 @@ export const PublishTray: React.FC<PublishTrayProps> = ({ composer, publishJob, 
   const round = useCurrentRound(nextMove?.gate ?? null);
 
   const vercelMissing = (checks?.checks ?? []).some((c) => c.label === VERCEL_CHECK_LABEL && c.status === "fail");
+  const failing = (label: string) => (checks?.checks ?? []).find((c) => c.label === label && c.status === "fail") ?? null;
+  const planLimit = failing(PLAN_LIMIT_CHECK_LABEL)?.detail ?? null;
+  const passwordRow = failing(PASSWORD_CHECK_LABEL);
   const cta = trayCta({
     nextMove,
     publishJob,
     wired: !!onRequestPublish,
     checkState,
     vercelMissing,
+    planLimit,
     cms,
     live: !!publishJob?.publishedUrl,
   });
@@ -307,7 +269,8 @@ export const PublishTray: React.FC<PublishTrayProps> = ({ composer, publishJob, 
   /* Issue rows: the content and Brand findings. The server's own rows come
      from the checks list, so `publish-check:` issues are not listed twice. */
   const siteIssues = issues.filter((i) => i.type !== "info" && !i.id.startsWith(PUBLISH_CHECK_ISSUE));
-  const serverRows = checkState === "ready" ? (checks?.checks ?? []).filter((c) => c.status !== "pass") : [];
+  const serverRows =
+    checkState === "ready" ? (checks?.checks ?? []).filter((c) => c.status !== "pass" && c.label !== PASSWORD_CHECK_LABEL) : [];
   /* Blockers first (board B8-PB01), then the advice; the count is every row listed. */
   const rows = [
     ...serverRows.map((c) => ({
@@ -325,8 +288,8 @@ export const PublishTray: React.FC<PublishTrayProps> = ({ composer, publishJob, 
       fix: composer ? () => locateIssue(composer, i) : undefined,
     })),
   ].sort((a, b) => Number(b.blocking) - Number(a.blocking));
-  const blockingCount = rows.filter((r) => r.blocking).length;
-  const tipCount = rows.length - blockingCount;
+  const blockingCount = rows.filter((r) => r.blocking).length + (passwordRow ? 1 : 0);
+  const tipCount = rows.filter((r) => !r.blocking).length;
   const summary = [blockingCount ? `${blockingCount} blocking` : "", tipCount ? `${tipCount} tip${tipCount === 1 ? "" : "s"}` : ""]
     .filter(Boolean)
     .join(" · ");
@@ -339,7 +302,11 @@ export const PublishTray: React.FC<PublishTrayProps> = ({ composer, publishJob, 
   const statusOnly = refusal === PUBLISH_REFUSAL.off;
   const changesRequested = nextMove?.gate === "changes-requested";
   const noChecks =
-    statusOnly || changesRequested || refusal === PUBLISH_REFUSAL.viewer || refusal === PUBLISH_REFUSAL.offline;
+    statusOnly ||
+    changesRequested ||
+    planLimit !== null ||
+    refusal === PUBLISH_REFUSAL.viewer ||
+    refusal === PUBLISH_REFUSAL.offline;
   const loadingChecks = checkState === "loading" && !outcome && !noChecks;
   const [moreOpen, setMoreOpen] = React.useState(false);
   const [logOpen, setLogOpen] = React.useState(false);
@@ -616,6 +583,19 @@ export const PublishTray: React.FC<PublishTrayProps> = ({ composer, publishJob, 
                     </Button>
                   </div>
                 ) : null}
+                {passwordRow ? (
+                  <PasswordCheckCard
+                    detail={passwordRow.detail}
+                    domain={domain}
+                    onUpgrade={() => window.open(`${DASHBOARD_URL}/dashboard/settings/billing`, "_blank", "noopener")}
+                    onRemoveAndPublish={async () => {
+                      if (!siteId) throw new Error("no site");
+                      await updateSiteColumns(siteId, { publishedPassword: null });
+                      await reload();
+                      onRequestPublish?.();
+                    }}
+                  />
+                ) : null}
                 {rows.map((r) => (
                   <TrayRow
                     key={r.key}
@@ -629,7 +609,7 @@ export const PublishTray: React.FC<PublishTrayProps> = ({ composer, publishJob, 
                   <p className={`${META} tw:mt-1`} data-testid="publish-checks-legend">
                     Red blocks publishing · amber is advisory
                   </p>
-                ) : checkState === "ready" ? (
+                ) : checkState === "ready" && !passwordRow ? (
                   <p className={`${BODY} tw:py-1`}>Nothing to fix</p>
                 ) : null}
               </div>
@@ -654,6 +634,8 @@ export const PublishTray: React.FC<PublishTrayProps> = ({ composer, publishJob, 
               </section>
             ) : null}
 
+            {/* B8-PB16: the password card is the whole question; no destination. */}
+            {passwordRow ? null : (
             <section className={SECTION} aria-label="Goes to">
               <h3 className={HEAD}>Goes to</h3>
               <div className="tw:flex tw:items-center tw:justify-between tw:gap-2">
@@ -669,6 +651,7 @@ export const PublishTray: React.FC<PublishTrayProps> = ({ composer, publishJob, 
                 </Button>
               </div>
             </section>
+            )}
             </>
             )}
           </>

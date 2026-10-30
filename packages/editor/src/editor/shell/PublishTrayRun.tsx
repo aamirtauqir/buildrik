@@ -16,7 +16,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Button, CopyButton, SkeletonBlock } from "@/editor/chrome-ui";
+import { Button, CopyButton, Modal, SkeletonBlock } from "@/editor/chrome-ui";
 import type { PublishStep } from "@/services/PublishService";
 import type { PublishPreview } from "@/editor/sidebar/tabs/publish/usePublishPreviewDiff";
 
@@ -254,6 +254,80 @@ export const ChangesSection: React.FC<{
         </>
       )}
     </section>
+  );
+};
+
+/**
+ * B8-PB16 / PB17 (A-36): a password kept on a plan without password
+ * protection. The card states it; its two ways out are Upgrade ↗ and
+ * "Remove protection and publish…", which asks first (PB17) and then clears
+ * the password (siteDetail.settings.update — clearing is allowed on every
+ * plan) before the publish door opens.
+ */
+export const PasswordCheckCard: React.FC<{
+  detail: string;
+  domain: string | null;
+  onUpgrade: () => void;
+  onRemoveAndPublish: () => Promise<void>;
+}> = ({ detail, domain, onUpgrade, onRemoveAndPublish }) => {
+  const [asking, setAsking] = React.useState(false);
+  const [busy, setBusy] = React.useState(false);
+  const [failed, setFailed] = React.useState(false);
+  return (
+    <div className="tw:my-1 tw:rounded-[var(--bk-radius-sm)] tw:bg-[var(--bk-error-tint)] tw:p-2" data-testid="publish-check-password">
+      <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-error-text)]">
+        <span aria-hidden="true">✕ </span>
+        {detail}
+      </p>
+      <div className="tw:mt-2 tw:flex tw:items-center tw:gap-2">
+        <Button variant="secondary" size="xs" className={OUTCOME_BTN} onClick={onUpgrade} data-testid="publish-check-password-upgrade">
+          Upgrade ↗
+        </Button>
+        <Button color="light" size="xs" className={LINK_BTN} onClick={() => setAsking(true)} data-testid="publish-check-password-remove">
+          Remove protection and publish…
+        </Button>
+      </div>
+      {asking ? (
+        <Modal
+          open
+          onClose={() => !busy && setAsking(false)}
+          title="Remove password protection and publish?"
+          kind="question"
+          width="sm"
+          testId="publish-remove-protection"
+          footer={
+            <>
+              <Button variant="secondary" disabled={busy} onClick={() => setAsking(false)}>
+                Cancel
+              </Button>
+              <Button
+                disabled={busy}
+                data-testid="publish-remove-protection-confirm"
+                onClick={() => {
+                  setBusy(true);
+                  setFailed(false);
+                  onRemoveAndPublish()
+                    .then(() => setAsking(false))
+                    .catch(() => setFailed(true))
+                    .finally(() => setBusy(false));
+                }}
+              >
+                {busy ? "Removing…" : "Remove and publish"}
+              </Button>
+            </>
+          }
+        >
+          <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">
+            {domain ?? "This site"} becomes public. You can add protection again on Pro.
+          </p>
+          {failed ? (
+            <p className="tw:m-0 tw:mt-2 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-error-text)]" role="alert">
+              Couldn’t remove the protection. Nothing was published.
+            </p>
+          ) : null}
+        </Modal>
+      ) : null}
+    </div>
   );
 };
 

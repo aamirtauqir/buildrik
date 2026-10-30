@@ -48,7 +48,11 @@ vi.mock("@/services/cmsSync", () => ({
   onCmsSyncError: () => () => {},
   retryCmsSync: () => cms.retry(),
 }));
-vi.mock("@/services/BuildrikSyncProvider", () => ({ getSiteIdFromUrl: () => "site-1" }));
+const updateSiteColumns = vi.fn(async () => ({}));
+vi.mock("@/services/BuildrikSyncProvider", () => ({
+  getSiteIdFromUrl: () => "site-1",
+  updateSiteColumns: (...a: unknown[]) => updateSiteColumns(...(a as [])),
+}));
 const roundState: { round: unknown } = { round: null };
 vi.mock("@/services/ReviewService", () => ({ fetchCurrentRound: async () => roundState.round }));
 const locateComment = vi.fn(() => "located");
@@ -350,6 +354,33 @@ describe("PublishTray — states (B8-PB* copy)", () => {
     expect(screen.getByTestId("publish-tray-cms-count").textContent).toBe("CMS: 4 records published");
     fireEvent.click(screen.getByTestId("publish-tray-see-all"));
     expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_COMPARE_OPEN, expect.objectContaining({ right: { kind: "current" }, from: "Publish" }));
+  });
+
+  it("A-34 / B8-PB22: over the plan's site limit — the plan's sentence under the shut CTA, no checks", () => {
+    checksState.checks = {
+      ready: false,
+      checks: [{ label: "Plan limit", status: "fail", detail: "Over the Free limit — Upgrade to publish" }],
+    } as unknown as PrePublishChecksResult;
+    renderTray({ nextMove: move({ errorCount: 1 }) });
+    expect(cta()).toBeDisabled();
+    expect(reason()).toBe("Over the Free limit — Upgrade to publish");
+    expect(document.querySelector('section[aria-label="Checks"]')).toBeNull();
+  });
+
+  it("A-36 / B8-PB16–17: a password kept on Free — Upgrade, or remove it (asked first) and publish", async () => {
+    checksState.checks = {
+      ready: false,
+      checks: [{ label: "Password protection", status: "fail", detail: "This site is password protected. On Free the protection is removed and the site becomes public." }],
+    } as unknown as PrePublishChecksResult;
+    const { onRequestPublish } = renderTray({ nextMove: move({ errorCount: 1 }) });
+    expect(screen.getByTestId("publish-check-password").textContent).toContain("On Free the protection is removed");
+    expect(screen.getByText("1 blocking")).toBeTruthy();
+    fireEvent.click(screen.getByTestId("publish-check-password-remove"));
+    expect(screen.getByText("Remove password protection and publish?")).toBeTruthy();
+    expect(screen.getByText("fieldwork.studio becomes public. You can add protection again on Pro.")).toBeTruthy();
+    fireEvent.click(screen.getByTestId("publish-remove-protection-confirm"));
+    await waitFor(() => expect(onRequestPublish).toHaveBeenCalledTimes(1));
+    expect(updateSiteColumns).toHaveBeenCalledWith("site-1", { publishedPassword: null });
   });
 
   it("checks loading (PB23): placeholders only, nothing actionable", () => {

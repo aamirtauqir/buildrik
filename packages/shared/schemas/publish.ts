@@ -121,6 +121,15 @@ export const publishResultSchema = z.object({
  */
 export const VERCEL_CHECK_LABEL = "Vercel connected";
 
+/** A-34 (2L9 B8-PB22): the site sits beyond its workspace plan's site limit —
+ *  a hard fail whose detail is the CTA's reason. */
+export const PLAN_LIMIT_CHECK_LABEL = "Plan limit";
+
+/** A-36 (2L9 B8-PB16): a site that keeps a password on a plan without
+ *  password protection — a hard fail with two ways out (upgrade, or remove
+ *  the protection and publish). */
+export const PASSWORD_CHECK_LABEL = "Password protection";
+
 /**
  * The four states the approval gate can block a publish in, and the sentence
  * the user is shown for each. Same reason as VERCEL_CHECK_LABEL above: the
