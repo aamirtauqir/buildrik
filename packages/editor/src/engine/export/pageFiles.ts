@@ -61,3 +61,20 @@ export function pageFileNames(pages: ReadonlyArray<Pick<PageData, "id" | "slug" 
     }),
   );
 }
+
+/**
+ * B-30 (2L9 B5-D80): page `k` (≥ 2) of a page whose Collection list is split
+ * into pages — `index.html` → `page/2.html` (served at `/page/2`),
+ * `blog.html` → `blog/page/2.html` (`/blog/page/2`). Page 1 is the page's own file.
+ */
+export function paginatedFileName(file: string, k: number): string {
+  if (k <= 1) return file;
+  const base = file === "index.html" ? "" : file.replace(/\.html$/, "") + "/";
+  return `${base}page/${k}.html`;
+}
+
+/** The path a visitor sees for page `k`: "/", "/page/2", "/blog/page/2". */
+export function paginatedPath(file: string, k: number): string {
+  const name = paginatedFileName(file, k);
+  return name === "index.html" ? "/" : "/" + name.replace(/\.html$/, "");
+}

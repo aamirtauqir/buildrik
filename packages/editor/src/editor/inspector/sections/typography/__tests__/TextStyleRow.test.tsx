@@ -64,7 +64,10 @@ describe("where it lives", () => {
 
   it("the Typography entry asks for it on an element, the Text inside entry never does", () => {
     const ctx = { variant: "element", styles: {}, onChange: vi.fn(), selectedElement: { id: "e", type: "heading" } } as never;
-    expect((TEXT_SECTIONS.typography.render(ctx) as { props: { textStyle?: boolean } }).props.textStyle).toBe(true);
-    expect((TEXT_SECTIONS["text-inside"].render(ctx) as { props: { textStyle?: boolean } }).props.textStyle).toBeFalsy();
+    /* The entry's element is its section boundary (B4-S05); the section is its child. */
+    const sectionProps = (id: "typography" | "text-inside") =>
+      (TEXT_SECTIONS[id].render(ctx) as { props: { children: { props: { textStyle?: boolean } } } }).props.children.props;
+    expect(sectionProps("typography").textStyle).toBe(true);
+    expect(sectionProps("text-inside").textStyle).toBeFalsy();
   });
 });

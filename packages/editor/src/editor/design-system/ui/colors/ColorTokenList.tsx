@@ -65,8 +65,10 @@ export function aliasedByCount(tokens: readonly DesignToken[], id: string): numb
   return tokens.filter((t) => t.id !== id && Object.values(t.modes).some((m) => m && "alias" in m && m.alias === id)).length;
 }
 
+/* B6-B01 (203:33565): unboxed rows — square swatch, name with "Edit ›" at
+   the row's end, the values and reach under it — in a 494 column. */
 const CARD =
-  "tw:group tw:flex tw:w-full tw:items-start tw:gap-3 tw:rounded-[var(--bk-radius-lg)] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:p-4 tw:text-left tw:outline-none tw:cursor-pointer " +
+  "tw:group tw:flex tw:w-full tw:max-w-[494px] tw:items-start tw:gap-3 tw:rounded-[var(--bk-radius-sm)] tw:p-1 tw:-m-1 tw:text-left tw:outline-none tw:cursor-pointer " +
   "tw:hover:bg-[var(--bk-bg-subtle)] tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]";
 const MONO = "tw:[font-family:var(--bk-font-mono)] tw:tabular-nums tw:whitespace-pre";
 
@@ -106,7 +108,7 @@ const ColorSwatch: React.FC<{ value: string }> = ({ value }) => (
   <span
     aria-hidden="true"
     data-testid="brand-color-swatch"
-    className={`tw:relative tw:inline-block tw:size-4 tw:flex-none tw:rounded-full tw:border ${
+    className={`tw:relative tw:inline-block tw:size-7 tw:flex-none tw:rounded-[var(--bk-radius-xs)] tw:border ${
       isLikelyLightValue(value) ? "tw:border-[var(--bk-gray-300)]" : "tw:border-[var(--bk-alpha-ink-10)]"
     }`}
     style={{ background: value }}
@@ -179,7 +181,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
           <p className="tw:m-0 tw:text-[length:var(--bk-text-13)] tw:font-medium tw:leading-5 tw:text-[var(--bk-ink-muted)]" data-testid={`brand-colour-group-${g || "other"}`}>
             {items.length} {GROUP_LABEL[g] ?? "other"} color{items.length === 1 ? "" : "s"}
           </p>
-          <ul className="tw:m-0 tw:flex tw:list-none tw:flex-col tw:gap-2 tw:p-0">
+          <ul className="tw:m-0 tw:flex tw:list-none tw:flex-col tw:gap-5 tw:p-0">
             {items.map((token) => {
               const currentValue = resolveTokenLiteral(allTokens, token.id, "light") ?? "";
               const darkValue = token.modes.dark ? resolveTokenLiteral(allTokens, token.id, "dark") : null;
@@ -203,7 +205,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
                         onSelectToken?.(token.id);
                       }
                     }}
-                    className={`${CARD}${selected ? " tw:border-[var(--bk-accent)]" : ""}`}
+                    className={`${CARD}${selected ? " tw:bg-[var(--bk-bg-subtle)]" : ""}`}
                   >
                     <ColorSwatch value={currentValue} />
                     <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:gap-1">
