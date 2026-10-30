@@ -202,3 +202,62 @@ describe("purgeExpiredPageTrash", () => {
     expect(prisma.page.deleteMany).not.toHaveBeenCalled();
   });
 });
+
+/* The restore race: a save built before a restore (an autosave in flight,
+   another tab) reaches the server after it. Its snapshot lacks the page, so it
+   would move the page straight back to the trash. Rows live in memory here and
+   the tx answers the where clause trashPages sends, so the race is replayed
+   in the order it happens. */
+describe("trashPages — a save based before a restore", () => {
+  type Row = { id: string; siteId: string; slug: string; deletedAt: Date | null; restoredAt: Date | null };
+  type Where = {
+    id: { in: string[] };
+    siteId: string;
+    deletedAt: null;
+    OR?: Array<{ restoredAt: null } | { restoredAt: { lte: Date } }>;
+  };
+  const memoryTx = (rows: Row[]) => ({
+    page: {
+      findMany: async ({ where }: { where: Where }) =>
+        rows.filter(
+          (r) =>
+            where.id.in.includes(r.id) &&
+            r.siteId === where.siteId &&
+            r.deletedAt === null &&
+            (!where.OR ||
+              where.OR.some((c) =>
+                c.restoredAt === null ? r.restoredAt === null : r.restoredAt !== null && r.restoredAt <= c.restoredAt.lte,
+              )),
+        ),
+      update: async ({ where, data }: { where: { id: string }; data: Partial<Row> }) =>
+        Object.assign(rows.find((r) => r.id === where.id)!, data),
+    },
+  });
+
+  it("leaves a page restored after the save's base live; a later save still trashes it", async () => {
+    const { trashPages } = await import("@/server/services/page-trash.service");
+    const base = new Date("2026-10-31T10:00:00Z"); // the racing save's expectedLastEditedAt
+    const restoredAt = new Date("2026-10-31T10:00:05Z"); // the restore, after that save was built
+    const rows: Row[] = [
+      { id: "p_about", siteId: "s_1", slug: "about", deletedAt: null, restoredAt },
+      { id: "p_old", siteId: "s_1", slug: "old", deletedAt: null, restoredAt: null },
+    ];
+    const tx = memoryTx(rows) as never;
+
+    await trashPages(tx, "s_1", ["p_about", "p_old"], "u_1", base);
+    expect(rows[0]).toMatchObject({ deletedAt: null, slug: "about" }); // the race: not re-trashed
+    expect(rows[1].deletedAt).toBeInstanceOf(Date); // an ordinary removal still trashes
+
+    // The restoring editor deletes it again; its save is based after the restore.
+    await trashPages(tx, "s_1", ["p_about"], "u_1", new Date("2026-10-31T10:01:00Z"));
+    expect(rows[0]).toMatchObject({ slug: "about~deleted~p_about" });
+    expect(rows[0].deletedAt).toBeInstanceOf(Date);
+  });
+
+  it("restore stamps restoredAt", async () => {
+    m(prisma.page.findFirst).mockResolvedValue({ id: "p_about", name: "About", slug: "about~deleted~p_about", trashedSlug: "about", isHomePage: false } as never);
+    m(prisma.page.findMany).mockResolvedValue([] as never);
+    await restorePage("u_1", { siteId: "s_1", pageId: "p_about" });
+    expect(m(prisma.page.update).mock.calls[0][0]!.data).toMatchObject({ restoredAt: expect.any(Date) });
+  });
+});

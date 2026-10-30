@@ -1149,7 +1149,13 @@ export async function saveProjectData(input: SaveProjectDataInput, expectedLastE
       const pagesToDelete = existingPages.filter((p) => !incomingPageIds.has(p.id));
       /* A-21: a page the editor no longer has goes to the trash (kept 30
          days, restorable from "Recently deleted"), not out of the database. */
-      await trashPages(tx, input.siteId, pagesToDelete.map((p) => p.id), userId ?? null);
+      await trashPages(
+        tx,
+        input.siteId,
+        pagesToDelete.map((p) => p.id),
+        userId ?? null,
+        expectedLastEditedAt ? new Date(expectedLastEditedAt) : undefined,
+      );
     }
 
     // Upsert each incoming page.
