@@ -101,7 +101,9 @@ describe("Mixed — shared controls", () => {
     );
     expect(screen.getByRole("slider", { name: "Opacity, Mixed values" })).toBeInTheDocument();
     expect(screen.getByRole("slider", { name: "Blur, Mixed values" })).toBeInTheDocument();
-    expect(screen.getAllByText("Mixed")).toHaveLength(2);
+    expect(screen.getByText("Mixed")).toBeInTheDocument();
+    /* 2L9 36:2: a RangeSlider's readout is a value box — Mixed is its placeholder. */
+    expect(screen.getByRole("textbox", { name: "Blur value" })).toHaveAttribute("placeholder", "Mixed");
   });
 
   it("MixedValueIndicator reads the field context — no prop threading, muted 'Mixed'", () => {

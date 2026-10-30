@@ -140,7 +140,7 @@ const NATIVE_ATTRS: Readonly<Record<string, readonly PropertyConfig[]>> = {
   /* Metrics (progress has its type block) */
   meter: [text("value", "Value"), text("min", "Min", "0"), text("max", "Max", "1"), text("low", "Low"), text("high", "High"), text("optimum", "Optimum")],
   /* SVG subtree */
-  svg: [text("viewBox", "viewBox", "0 0 24 24")],
+  /* svg: viewBox, role and aria-labelledby are its Content block's (B69/03). */
   path: [text("d", "d"), text("stroke", "Stroke"), text("fill", "Fill")],
   circle: [text("cx", "cx"), text("cy", "cy"), text("r", "r"), text("stroke", "Stroke"), text("fill", "Fill")],
   rect: [text("x", "x"), text("y", "y"), text("width", "width"), text("height", "height"), text("stroke", "Stroke"), text("fill", "Fill")],
