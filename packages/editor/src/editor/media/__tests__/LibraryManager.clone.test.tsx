@@ -79,39 +79,37 @@ async function mountLibrary(
   return { ...utils, onClose, composer };
 }
 
-/** The header's ▾ — Import from URL and Add from stock live in its menu (4418:58292). */
-const openAddMenu = () => fireEvent.click(screen.getByTestId("mgr-btn-upload-menu"));
+/** 2L9 B6-A04: "Upload ▾" holds Upload files · From URL · Stock photos & videos. */
+const openAddMenu = () => fireEvent.click(screen.getByTestId("mgr-btn-upload"));
 
 describe("Clone 3695:45155 · Assets · No selection — J-A library chrome", () => {
-  it("titles the overlay 'Asset library' with no MANAGE tag and no breadcrumb", async () => {
-    await mountLibrary();
-    expect(screen.getByRole("heading", { name: "Asset library" })).toBeInTheDocument();
+  /* 2L9 B6-A01 / A04 (199:37199 / 199:39042): the rail heads itself
+     "Assets"; the grid column opens with ‹ Back to Editor and the scope as its
+     title, then the search and one blue "Upload ▾". */
+  it("heads the rail 'Assets' and the grid column with Back to Editor and the scope", async () => {
+    const { onClose } = await mountLibrary();
+    expect(screen.getByRole("heading", { name: "Assets" })).toBeInTheDocument();
+    expect(screen.getByText("Your uploads for this site")).toBeInTheDocument();
+    expect(screen.getByTestId("mgr-scope-title")).toHaveTextContent("All assets");
     expect(screen.queryByText("MANAGE")).toBeNull();
-    expect(screen.queryByText("All Media")).toBeNull();
+    fireEvent.click(screen.getByTestId("mgr-btn-close"));
+    expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  /* Board 4418:58292 "mgr-top" (v3): Upload | ▾ is one dark split control —
-     the ▾ holds Import from URL and Add from stock — then ‹ Back to canvas.
-     This pinned the Clone's four loose buttons (Import URL · Upload · Add
-     from stock · Close). */
-  it("draws Upload | ▾ then ‹ Back to canvas; the ▾ holds Import from URL and Add from stock", async () => {
-    const { onClose } = await mountLibrary();
-    const top = screen.getByTestId("mgr-top");
-    const names = within(top).getAllByRole("button").map((b) => b.getAttribute("aria-label") ?? b.textContent?.trim());
-    expect(names).toEqual(["Upload", "More ways to add", "‹ Back to canvas"]);
+  it("Upload ▾ holds Upload files · From URL · Stock photos & videos", async () => {
+    await mountLibrary();
     openAddMenu();
-    expect(screen.getByTestId("mgr-btn-import")).toHaveTextContent("Import from URL…");
-    expect(screen.getByTestId("mgr-btn-stock")).toHaveTextContent("Add from stock…");
-    fireEvent.click(within(top).getByRole("button", { name: "‹ Back to canvas" }));
-    expect(onClose).toHaveBeenCalledTimes(1);
+    expect(screen.getByTestId("mgr-btn-upload-files")).toHaveTextContent("Upload files");
+    expect(screen.getByTestId("mgr-btn-import")).toHaveTextContent("From URL");
+    expect(screen.getByTestId("mgr-btn-stock")).toHaveTextContent("Stock photos & videos");
   });
 
   it("reads the toolbar count as '<N> files · <scope>' and moves the scope out of the grid foot", async () => {
     await mountLibrary();
     expect(screen.getByTestId("mgr-count")).toHaveTextContent("10 files · All assets");
     expect(screen.queryByText(/^Showing/)).toBeNull();
-    fireEvent.click(screen.getByRole("button", { name: /^Unused/ }));
-    expect(screen.getByTestId("mgr-count")).toHaveTextContent(/files · Unused$/);
+    fireEvent.click(screen.getByRole("button", { name: /^No known placements/ }));
+    expect(screen.getByTestId("mgr-count")).toHaveTextContent(/files · No known placements$/);
   });
 
   it("4418:58292 — the toolbar reads Filter ▾ · Grid|List · Grid ▾ · ⋯, and Grid ▾ names its column count", async () => {
@@ -179,7 +177,7 @@ describe("Clone 3695:44339 · Assets · Search menu", () => {
     const setLibraryQuery = vi.fn();
     const setLibrarySearch = vi.fn();
     await mountLibrary({ setLibraryQuery, setLibrarySearch });
-    fireEvent.change(screen.getByPlaceholderText("Search all assets…"), { target: { value: "menu" } });
+    fireEvent.change(screen.getByPlaceholderText("Search assets…"), { target: { value: "menu" } });
     expect(setLibraryQuery).toHaveBeenCalledWith("menu");
     expect(setLibrarySearch).not.toHaveBeenCalled();
   });
@@ -355,14 +353,14 @@ describe("Clone 3700:20347 / 3700:20350 · New folder — P2-A", () => {
     const setCurrentFolderId = vi.fn();
     const createFolder = vi.fn((name: string) => Promise.resolve(makeFolder({ id: "f-new", name })));
     await mountLibrary({ createFolder, setCurrentFolderId });
-    fireEvent.click(screen.getByRole("button", { name: /^Unused/ }));
+    fireEvent.click(screen.getByRole("button", { name: /^No known placements/ }));
     fireEvent.click(screen.getByTestId("mgr-new-folder-open"));
     fireEvent.change(screen.getByTestId("mgr-create-folder-input"), { target: { value: "Campaign images" } });
     fireEvent.click(screen.getByTestId("mgr-create-folder-go"));
     expect(createFolder).toHaveBeenCalledWith("Campaign images");
     await vi.waitFor(() => expect(setCurrentFolderId).toHaveBeenLastCalledWith("f-new"));
     // The smart-folder scope it was opened from is released with it.
-    expect(screen.getByTestId("mgr-count")).not.toHaveTextContent(/Unused$/);
+    expect(screen.getByTestId("mgr-count")).not.toHaveTextContent(/No known placements$/);
     expect(screen.queryByTestId("mgr-create-folder")).toBeNull();
   });
 
@@ -657,7 +655,7 @@ describe("Clone 4215:26635 / 4207:26629 / 4220:26643 · dragging assets over the
       "Drop 2 files on a folder to move them · release outside to cancel",
     );
     // The board keeps the count line after the hint.
-    expect(screen.getByTestId("mgr-status")).toHaveTextContent(/10 assets/);
+    expect(screen.getByTestId("mgr-status")).toHaveTextContent(/ of .* used/);
     expect(screen.getByTestId("mgr-drag-ghost-badge")).toHaveTextContent("2 items");
     // Nothing moved yet, and the file-upload drop zone did not wake.
     expect(screen.queryByTestId("mgr-dropzone")).toBeNull();

@@ -8356,8 +8356,8 @@
    "family": "resources",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C C1: \"Leave without saving?\" names the record / destination tab or collection; Keep editing · Discard changes · Save and leave (RecordSheet.tsx). Origin label (\"Your destination is …\") waits on C2.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-C 2026-10-31 compared (RecordSheet cms-discard modal, the dialog 168:21408 probe-compared) vs shots/168-21848.png: 'Leave without saving?', 'Save or discard the edits to “{record}” before opening {tab}.', Keep editing (filled) · Discard changes · Save and leave — same component and copy for every record → tab/exit guard. | built, not compared — L-C C1: \"Leave without saving?\" names the record / destination tab or collection; Keep editing · Discard changes · Save and leave (RecordSheet.tsx). Origin label (\"Your destination is …\") waits on C2.",
    "inheritsFrom": "168:21408",
    "tier": "P2"
   },
@@ -8368,8 +8368,8 @@
    "family": "resources",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "built, not compared — L-C C1: Save and leave shows \"Saving record…\" + Saving… + Stay here; success takes the chosen way out (RecordSheet.tsx).",
+   "verified": "drift-open",
+   "verifiedNote": "L-C 2026-10-31 text-compared vs shots/168-22061.png: during Save and leave the sheet foot reads 'Saving…' with Cancel and a disabled 'Saving…' (RecordSheetFooter). Not screenshotted — no probe drives the save-then-leave pending state. | built, not compared — L-C C1: Save and leave shows \"Saving record…\" + Saving… + Stay here; success takes the chosen way out (RecordSheet.tsx).",
    "tier": "P2"
   },
   {
@@ -8379,8 +8379,8 @@
    "family": "resources",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C C1: \"Leave without saving?\" names the record / destination tab or collection; Keep editing · Discard changes · Save and leave (RecordSheet.tsx). Origin label (\"Your destination is …\") waits on C2.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-C 2026-10-31: same RecordSheet guard as 168:21848 (compared), destination 'Collection settings'. | built, not compared — L-C C1: \"Leave without saving?\" names the record / destination tab or collection; Keep editing · Discard changes · Save and leave (RecordSheet.tsx). Origin label (\"Your destination is …\") waits on C2.",
    "inheritsFrom": "168:21408",
    "tier": "P2"
   },
@@ -8391,8 +8391,8 @@
    "family": "resources",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "built, not compared — L-C C1: Save and leave shows \"Saving record…\" + Saving… + Stay here; success takes the chosen way out (RecordSheet.tsx).",
+   "verified": "drift-open",
+   "verifiedNote": "L-C 2026-10-31: as 168:22061 (text-compared, not screenshotted). | built, not compared — L-C C1: Save and leave shows \"Saving record…\" + Saving… + Stay here; success takes the chosen way out (RecordSheet.tsx).",
    "tier": "P2"
   },
   {
@@ -8402,8 +8402,8 @@
    "family": "resources",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C C1: \"Leave without saving?\" names the record / destination tab or collection; Keep editing · Discard changes · Save and leave (RecordSheet.tsx). Origin label (\"Your destination is …\") waits on C2.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-C 2026-10-31: same RecordSheet guard as 168:21848 (compared), destination '‹ Back to Editor · Home'. | built, not compared — L-C C1: \"Leave without saving?\" names the record / destination tab or collection; Keep editing · Discard changes · Save and leave (RecordSheet.tsx). Origin label (\"Your destination is …\") waits on C2.",
    "inheritsFrom": "168:21408",
    "tier": "P2"
   },
@@ -8414,8 +8414,8 @@
    "family": "resources",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "built, not compared — L-C C1: Save and leave shows \"Saving record…\" + Saving… + Stay here; success takes the chosen way out (RecordSheet.tsx).",
+   "verified": "drift-open",
+   "verifiedNote": "L-C 2026-10-31: as 168:22061 (text-compared, not screenshotted). | built, not compared — L-C C1: Save and leave shows \"Saving record…\" + Saving… + Stay here; success takes the chosen way out (RecordSheet.tsx).",
    "tier": "P2"
   },
   {
@@ -9697,7 +9697,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Full-page shell-in layout, nav, filters, Details/Usage/Versions tabs and copy differ from LibraryManager (no shell, “Asset library”)",
+   "verifiedNote": "L-C 2026-10-31 AS-1 frame probe-compared (media-fullpage-library) vs shots/199-37199.png: no top bar; rail head 'Assets' / 'Your uploads for this site'; grid column '‹ Back to Editor · {page}' + scope title, grey search + blue 'Upload ▾'; footer '{used} of {total} used' · 'All assets saved' (or 'N not on the server'); smart scopes 'Used on this site' / 'No known placements'; columns 240 · grid · 320. Open (next archetypes): rail rows centred without icons/counts + Fonts row (AS-2), filter row All types/Any tag/Date added/Grid|List/4 columns and borderless cards with 'W × H · size' (AS-3), details Details|Usage|Versions tabs with Place on canvas · Edit image · More ▾ (AS-4). | Full-page shell-in layout, nav, filters, Details/Usage/Versions tabs and copy differ from LibraryManager (no shell, “Asset library”)",
    "tier": "P2"
   },
   {
@@ -9728,9 +9728,9 @@
    "page": "05",
    "family": "assets",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Upload ▾ items Upload files/From URL/Stock/Icons; code menu Import from URL…/Add from stock…",
+   "authority": "code:no-icon-upload-door",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-C 2026-10-31 probe-compared vs shots/199-39042.png: 'Upload ▾' opens Upload files · From URL · Stock photos & videos (viewer write rows inert with the reason). Not drawn: 'Icons' (the manager has no icon importer — icons come from the media drawer's icon browser) and the menu's 'Close' row (Esc / outside click close it). | Upload ▾ items Upload files/From URL/Stock/Icons; code menu Import from URL…/Add from stock…",
    "tier": "P2"
   },
   {
@@ -12548,7 +12548,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "phase1 shell (Tasks 1.2–1.4). CMS exit reads \"‹ Back to canvas\" (CmsWorkspace.tsx:172) vs \"‹ Back to Editor · Home\"",
+   "verifiedNote": "L-C 2026-10-31 triage: the CMS exit reads '‹ Back to Editor · {page}' now (CmsWorkspace backToEditor). This board is the editor after the return (page + selection kept) — shell route, for the lead's live walk like 245:51515. | phase1 shell (Tasks 1.2–1.4). CMS exit reads \"‹ Back to canvas\" (CmsWorkspace.tsx:172) vs \"‹ Back to Editor · Home\"",
    "tier": "P2"
   },
   {
@@ -13875,7 +13875,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C C4: drawer Data = Site variables · Conditions · Recently deleted (disabled, \"Planned\" until the server restore slice); Sources hidden by SOURCES_IN_RELEASE (BD-39). Drawer \"‹ Back to Editor · Home\" is the Phase-1 bottom bar.",
+   "verifiedNote": "L-C 2026-10-31 text-compared: the drawer's Data group reads Site variables · Conditions · Recently deleted with Sources hidden, as RL02/RL03's boards draw it; the drawer itself is not in a probe case (not screenshotted). | built, not compared — L-C C4: drawer Data = Site variables · Conditions · Recently deleted (disabled, \"Planned\" until the server restore slice); Sources hidden by SOURCES_IN_RELEASE (BD-39). Drawer \"‹ Back to Editor · Home\" is the Phase-1 bottom bar.",
    "tier": "P2"
   },
   {
@@ -13885,8 +13885,8 @@
    "family": "resources",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "drift-open — L-C C4/D1: \"Site variables\" intro, per-variable \"N text placeholders\", \"Empty value\" built; still a drawer subview, not the workspace page. Not compared.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-C 2026-10-31 probe-compared (cms-workspace&page=variables) vs shots/424-337452.png: workspace page 'Site variables' with '+ New variable', 'Use one value across your site' + the {{site.key}} sentence, rows key/value · 'N placeholders' · ⋯. Not drawn here: the header's own ⋯ beside New variable (board has one; nothing behind it named).",
    "tier": "P2"
   },
   {
@@ -13896,8 +13896,8 @@
    "family": "resources",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "ConditionsView ContentViews.tsx:651 edits path/operator/value inline; board = read-only index, Locate, edit in Inspector",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-C 2026-10-31 probe-compared (cms-workspace&page=conditions) vs shots/424-337627.png: workspace page 'Conditions', 'Conditions across this site', 'Edit conditions on their selected element in the Inspector.', rows '{collection} › {element}' / 'Active · …' or 'Not active — review legacy rule' with Locate — read-only index (ContentViews ConditionsView). The probe host has no ‹ Back to Editor (shell-supplied).",
    "tier": "P2"
   },
   {
@@ -14313,9 +14313,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "blocked:server-review-round-facts",
+   "authority": "board",
    "verified": "drift-fixed",
-   "verifiedNote": "L-C 2026-10-31 probe-compared (review-panel-older-round / -detached-present, 280 drawer) vs shots/237-8258.png: header 'Review' over '{site} · Round {n}'; a bg-subtle round card ('◐ {state} · {name} ({email})', 'Sent {d Mon}', 'Copy link ⧉' while the client link lives); '{n} open · {m} resolved' then Client | Team | All (All tinted) and Next ›; '— Home —' page marks; rows '① Lena (client) · Logo · 2m' / quote / 'Locate ›  ✓ Resolve' (+ Copy link, kept); composer one line 'Team only ▾' · 'Comment on Home…' · Send. Left: the card's 'Opened · … · 2 h ago' and '· link works until …' need the reviewer's last visit and the link expiry (REQUESTS G-10); in the 280 drawer the counts wrap above the filters (the board's column is 360).",
+   "verifiedNote": "L-C 2026-10-31 G-10 landed (no migration): currentRound returns expiresAt, linkExpired and reviewerLastSeenAt; the card reads '◐ Opened · {name} ({email}) · 2h ago' and 'Sent {d} · link works until {d}'. Probe ?link=live. | L-C 2026-10-31 probe-compared (review-panel-older-round / -detached-present, 280 drawer) vs shots/237-8258.png: header 'Review' over '{site} · Round {n}'; a bg-subtle round card ('◐ {state} · {name} ({email})', 'Sent {d Mon}', 'Copy link ⧉' while the client link lives); '{n} open · {m} resolved' then Client | Team | All (All tinted) and Next ›; '— Home —' page marks; rows '① Lena (client) · Logo · 2m' / quote / 'Locate ›  ✓ Resolve' (+ Copy link, kept); composer one line 'Team only ▾' · 'Comment on Home…' · Send. Left: the card's 'Opened · … · 2 h ago' and '· link works until …' need the reviewer's last visit and the link expiry (REQUESTS G-10); in the 280 drawer the counts wrap above the filters (the board's column is 360).",
    "tier": "P2"
   },
   {
@@ -14324,9 +14324,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "blocked:server-review-link-expiry",
-   "verified": "drift-open",
-   "verifiedNote": "L-C 2026-10-31: '◌ Link expired · {name} can no longer open it' / 'Sent … · expired …' / Re-send needs currentRound to say the link expired and when (REQUESTS G-10) — the editor cannot tell an expired link from a token withheld from a non-admin. | sidebar/tabs/review/ReviewTab.tsx:141 — L-F. Status line/page groups/Locate exist; round card, Client/Team/All, Next ›, audience picker dif…",
+   "authority": "board",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-C 2026-10-31 probe-compared (review-panel-detached-present&link=expired) against the board's dump copy: '◌ Link expired · {name} can no longer open it', 'Sent {d} · expired {d}', Re-send (asks first — the re-send confirm). linkExpired comes from currentRound (G-10): minted, unrevoked, past expiresAt — never from the token, which non-admins don't get. | L-C 2026-10-31: '◌ Link expired · {name} can no longer open it' / 'Sent … · expired …' / Re-send needs currentRound to say the link expired and when (REQUESTS G-10) — the editor cannot tell an expired link from a token withheld from a non-admin. | sidebar/tabs/review/ReviewTab.tsx:141 — L-F. Status line/page groups/Locate exist; round card, Client/Team/All, Next ›, audience picker dif…",
    "tier": "P2"
   },
   {
@@ -14357,9 +14357,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "blocked:server-review-round-facts",
+   "authority": "board",
    "verified": "drift-fixed",
-   "verifiedNote": "L-C 2026-10-31 probe-compared (review-panel-detached-present&status=CHANGES_REQUESTED) vs shots/237-10534.png: under the composer, 'Send Round {n+1} to {name}' (primary; asks first — the re-send confirm) beside '{resolved} of {total} resolved'; card reads '◐ Changes requested · {name} ({email})'. The card's opened time / link expiry: G-10.",
+   "verifiedNote": "L-C 2026-10-31: card facts via G-10 as R01. | L-C 2026-10-31 probe-compared (review-panel-detached-present&status=CHANGES_REQUESTED) vs shots/237-10534.png: under the composer, 'Send Round {n+1} to {name}' (primary; asks first — the re-send confirm) beside '{resolved} of {total} resolved'; card reads '◐ Changes requested · {name} ({email})'. The card's opened time / link expiry: G-10.",
    "tier": "P2"
   },
   {
@@ -14369,8 +14369,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-C 2026-10-31 built, unit-tested, not screenshotted: closing Review over an unsent comment asks 'Leave without saving?' — 'Your comment hasn’t been sent. It is kept here if you keep editing.' — Discard changes (outline) · Keep editing (primary); Esc/scrim keep editing. 'comment', not the board's 'reply to Lena': editor comments are team-only (G-11). Only the panel's ✕ is guarded; a rail switch unmounts the panel in the shell.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-C 2026-10-31 probe-compared (review-panel-detached-present, comment typed, ✕) vs shots/237-11120.png: 'Leave without saving?', body, Discard changes (outline) · Keep editing (primary). | L-C 2026-10-31 built, unit-tested, not screenshotted: closing Review over an unsent comment asks 'Leave without saving?' — 'Your comment hasn’t been sent. It is kept here if you keep editing.' — Discard changes (outline) · Keep editing (primary); Esc/scrim keep editing. 'comment', not the board's 'reply to Lena': editor comments are team-only (G-11). Only the panel's ✕ is guarded; a rail switch unmounts the panel in the shell.",
    "tier": "P2"
   },
   {
@@ -14425,7 +14425,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-C 2026-10-31 unit-level (offline-note.test.tsx): the client page says 'You’re offline — your comment is kept.' while the browser is offline (above the snapshot, and in the notes view, where Add note waits for the connection; the draft never clears). Not compared — the page needs a live token. Pins, device switch and the comments list are G-1/G-2.",
+   "verifiedNote": "L-C 2026-10-31: screenshot compare unreachable here — the client page is a Next route needing a live token and server (not started by lanes); for the lead's live walk. | L-C 2026-10-31 unit-level (offline-note.test.tsx): the client page says 'You’re offline — your comment is kept.' while the browser is offline (above the snapshot, and in the notes view, where Add note waits for the connection; the draft never clears). Not compared — the page needs a live token. Pins, device switch and the comments list are G-1/G-2.",
    "tier": "P2"
   },
   {
@@ -14655,8 +14655,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-C 2026-10-31 built to the board, unit-tested (DangerZoneScreen, PermissionsHost), not screenshotted (the probe's Danger zone needs sites.get): one step — 'Delete {site}?', 'The site goes offline and moves to Recently deleted. You can restore it for 30 days.', 'Type {site} to confirm', Cancel · Delete site (disabled until the name matches; the server checks the same name). Was two steps typing DELETE (8137:217905 → 218168).",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-C 2026-10-31 probe-compared (settings-tab&screen=danger-zone&role=OWNER, Delete site…) vs shots/238-14765.png: title, body, 'Type {site} to confirm', outlined Cancel, Delete site grey until the name matches. | L-C 2026-10-31 built to the board, unit-tested (DangerZoneScreen, PermissionsHost), not screenshotted (the probe's Danger zone needs sites.get): one step — 'Delete {site}?', 'The site goes offline and moves to Recently deleted. You can restore it for 30 days.', 'Type {site} to confirm', Cancel · Delete site (disabled until the name matches; the server checks the same name). Was two steps typing DELETE (8137:217905 → 218168).",
    "tier": "P2"
   },
   {
@@ -16544,9 +16544,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "code:staged-default-removable",
    "verified": "drift-open",
-   "verifiedNote": "L-C 2026-10-31 built, unit-tested (LocalizationScreen L05), not screenshotted: after Undo the row reads 'Restored · {pages}', footer 'Unsaved default: {D} · {X} restored immediately', note 'Default language changes are staged. {X} was restored immediately. …' and 'Undo restored only {X}. It did not change the staged {D} default.' The staged default's Remove stays enabled (removing it puts the select back on the saved one — an existing behaviour the board greys).",
+   "verifiedNote": "Lead 2026-10-31: Remove stays enabled on the staged default (removing it puts the select back on the saved one). | L-C 2026-10-31 built, unit-tested (LocalizationScreen L05), not screenshotted: after Undo the row reads 'Restored · {pages}', footer 'Unsaved default: {D} · {X} restored immediately', note 'Default language changes are staged. {X} was restored immediately. …' and 'Undo restored only {X}. It did not change the staged {D} default.' The staged default's Remove stays enabled (removing it puts the select back on the saved one — an existing behaviour the board greys).",
    "tier": "P3"
   },
   {
@@ -22312,9 +22312,9 @@
    "page": "07",
    "family": "recovery",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-C 2026-10-31 probe-compared (saves, ⋯ › Delete) vs shots/230-16354.png: rows, title 'Delete “{name}”?', body and Cancel · Delete version match. Left: the board draws Delete version as an outline button with red text; the shared ConfirmDialog tone=destructive is a solid red button everywhere — a chrome-ui decision for the lead, not this panel. | L-F W3: built, not compared. Delete… opens ConfirmDialog \"Delete “{name}”?\" / \"This version can’t be restored after it’s deleted.\" · Cancel · Delete version (the inline row confirm is gone).",
+   "authority": "code:shared-destructive-confirm",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lead 2026-10-31: the shared ConfirmDialog keeps its solid red destructive button everywhere (the board's outline-red is not adopted). | L-C 2026-10-31 probe-compared (saves, ⋯ › Delete) vs shots/230-16354.png: rows, title 'Delete “{name}”?', body and Cancel · Delete version match. Left: the board draws Delete version as an outline button with red text; the shared ConfirmDialog tone=destructive is a solid red button everywhere — a chrome-ui decision for the lead, not this panel. | L-F W3: built, not compared. Delete… opens ConfirmDialog \"Delete “{name}”?\" / \"This version can’t be restored after it’s deleted.\" · Cancel · Delete version (the inline row confirm is gone).",
    "tier": "P2"
   },
   {

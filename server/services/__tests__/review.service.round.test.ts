@@ -43,14 +43,17 @@ describe("getCurrentRound", () => {
     const created = new Date("2026-07-20T10:00:00Z");
     const updated = new Date("2026-07-21T09:00:00Z");
     // No `includeToken` arg → the base select, which never asks Prisma for
-    // `token`/`expiresAt` at all (A19-6/S-7 — see the includeToken tests below).
+    // `token` at all (A19-6/S-7 — see the includeToken tests below).
+    const seen = new Date("2026-07-21T08:00:00Z");
+    const expires = new Date("2099-01-01T00:00:00Z");
     rrFindFirst.mockResolvedValue({
       id: "r1",
       status: "PENDING",
       invitedEmail: "sara@client.com",
-      reviewer: { name: "Sara Khan" },
+      reviewer: { name: "Sara Khan", lastSeenAt: seen },
       revokedAt: null,
       resolvedAt: null,
+      expiresAt: expires,
       createdAt: created,
       updatedAt: updated,
     });
@@ -71,12 +74,40 @@ describe("getCurrentRound", () => {
       totalRounds: 2,
       openCommentCount: 3,
       token: null,
+      expiresAt: expires,
+      linkExpired: false,
+      reviewerLastSeenAt: seen,
     });
     // open-comment count is scoped to the site + OPEN
     expect(commentCount).toHaveBeenCalledWith({ where: { siteId: "s1", status: "OPEN" } });
     // the default call never asks Prisma for the token column at all
     expect(rrFindFirst.mock.calls[0][0].select).not.toHaveProperty("token");
-    expect(rrFindFirst.mock.calls[0][0].select).not.toHaveProperty("expiresAt");
+    // the expiry is not a secret: every editor's card says when the link ends
+    expect(rrFindFirst.mock.calls[0][0].select).toHaveProperty("expiresAt", true);
+  });
+
+  /* 2L9 B8-R02: an expired link is told apart from a token withheld from a
+     non-admin — from columns every editor may read. */
+  it("reports a minted, unrevoked link past its expiry as expired, without the token", async () => {
+    const base = {
+      id: "r1",
+      status: "PENDING",
+      invitedEmail: "sara@client.com",
+      reviewer: null,
+      revokedAt: null,
+      resolvedAt: null,
+      createdAt: new Date("2026-07-01T00:00:00Z"),
+      updatedAt: new Date("2026-07-01T00:00:00Z"),
+    };
+    rrCount.mockResolvedValue(1);
+    commentCount.mockResolvedValue(0);
+    rrFindFirst.mockResolvedValue({ ...base, expiresAt: new Date("2026-08-01T00:00:00Z") });
+    const expired = await getCurrentRound("s1");
+    expect(expired).toMatchObject({ linkExpired: true, reviewerLastSeenAt: null, token: null });
+    rrFindFirst.mockResolvedValue({ ...base, expiresAt: new Date("2026-08-01T00:00:00Z"), revokedAt: new Date() });
+    expect(await getCurrentRound("s1")).toMatchObject({ linkExpired: false });
+    rrFindFirst.mockResolvedValue({ ...base, invitedEmail: null, expiresAt: null });
+    expect(await getCurrentRound("s1")).toMatchObject({ linkExpired: false, expiresAt: null });
   });
 
   it("marks a revoked round (includeToken: true)", async () => {

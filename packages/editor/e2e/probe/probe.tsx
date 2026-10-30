@@ -488,6 +488,8 @@ const mgrComposer = (assets: typeof MGR_ASSETS = MGR_ASSETS) =>
       downloadAssets: () => 0,
       getIcons: () => [],
       getFonts: () => [],
+      getSelectedAssets: () => [],
+      selectAssets: () => {},
     },
     mediaOps: {
       getUsages: (src: string) => ({
@@ -3402,7 +3404,8 @@ const CASES: Record<string, () => React.ReactElement> = {
           phase={phase}
           recordLabel="Blog record “Studio launch”"
           collectionName="Blog"
-          to="About"
+          /* ?to=Dynamic pages: the record → tab guards (168:21848 …). */
+          to={new URLSearchParams(location.search).get("to") ?? "About"}
           current="Home"
           canSave
           onKeepEditing={() => {}}
@@ -4564,9 +4567,19 @@ const CASES: Record<string, () => React.ReactElement> = {
   /* ?status=CHANGES_REQUESTED draws B8-R05's next-round foot. */
   "review-panel-detached-present": () => {
     const status = new URLSearchParams(location.search).get("status");
+    const link = new URLSearchParams(location.search).get("link");
     trpcStub({
       "comments.list": () => REVIEW_COMMENTS,
-      "reviews.currentRound": () => REVIEW_ROUND(status ? { status } : {}),
+      "reviews.currentRound": () =>
+        REVIEW_ROUND({
+          ...(status ? { status } : {}),
+          /* ?link=expired|live: B8-R02 / R01's link facts (G-10). */
+          ...(link === "expired"
+            ? { linkExpired: true, expiresAt: daysAgo(18), token: null }
+            : link === "live"
+              ? { linkExpired: false, expiresAt: new Date(Date.now() + 74 * 86_400_000).toISOString(), reviewerLastSeenAt: new Date(Date.now() - 2 * 3_600_000).toISOString() }
+              : {}),
+        }),
       "sites.myRole": () => "OWNER",
     });
     return reviewHost(
@@ -4579,6 +4592,8 @@ const CASES: Record<string, () => React.ReactElement> = {
       <ReviewTab
         composer={reviewComposerStub(["d1", "d2"])}
         onResend={async () => ({ inviteEmailSent: true })}
+        /* B8-R06: the ✕ is what asks before an unsent comment is dropped. */
+        onClose={() => undefined}
       />,
     );
   },
@@ -5231,6 +5246,8 @@ const CASES: Record<string, () => React.ReactElement> = {
         autoRedirectLocale: false,
       },
       "siteDetail.domains.list": [{ id: "d1", domain: "fieldwork.studio", status: "ACTIVE", isPrimary: true, forceHttps: true, dnsRecords: [] }],
+      /* The Danger zone's read (B8-S17). */
+      "sites.get": { id: "probe-site", name: "Fieldwork Studio", status: "PUBLISHED", publishedUrl: "https://fieldwork-studio.vercel.app", createdBy: null },
       "siteDetail.locales": {
         locales: [
           { code: "en-US", path: "/", translated: 12, total: 12, status: "LIVE", pending: [] },

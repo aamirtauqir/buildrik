@@ -216,6 +216,32 @@ describe("the banner — Next walks the comments (the helper is locate.test.ts)"
   });
 });
 
+describe("the round card — the link's facts (2L9 B8-R01 / R02)", () => {
+  it("says when the reviewer opened it and how long the link works", async () => {
+    fetchCurrentRound.mockResolvedValue(
+      round({
+        reviewerLastSeenAt: new Date(Date.now() - 2 * 3_600_000),
+        expiresAt: new Date("2027-01-13T12:00:00Z"),
+        linkExpired: false,
+      }),
+    );
+    fetchReviewComments.mockResolvedValue([]);
+    mount();
+    expect((await screen.findByTestId("review-banner-line")).textContent).toBe("◐ Opened · Ayesha (client@example.test) · 2h ago");
+    expect(screen.getByTestId("review-banner-sent").textContent).toMatch(/· link works until /);
+  });
+
+  it("an expired link says so and offers Re-send, which asks first", async () => {
+    fetchCurrentRound.mockResolvedValue(round({ expiresAt: new Date("2026-01-01T12:00:00Z"), linkExpired: true }));
+    fetchReviewComments.mockResolvedValue([]);
+    mount();
+    expect((await screen.findByTestId("review-banner-line")).textContent).toBe("◌ Link expired · Ayesha can no longer open it");
+    expect(screen.getByTestId("review-banner-sent").textContent).toMatch(/· expired /);
+    fireEvent.click(screen.getByTestId("review-card-resend"));
+    expect(await screen.findByRole("button", { name: "Send new review" })).toBeTruthy();
+  });
+});
+
 describe("the round card — a zero is not a status", () => {
   it("with nothing open on a pending round it names the wait, not a count", async () => {
     fetchCurrentRound.mockResolvedValue(round({ openCommentCount: 0 }));
