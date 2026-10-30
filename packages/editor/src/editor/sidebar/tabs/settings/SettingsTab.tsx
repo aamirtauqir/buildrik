@@ -46,7 +46,6 @@ import {
   type SettingsFlush,
   type SettingsFlushResult,
   type SettingsScreenId,
-  type SettingsPaneId,
   type ScreenLoadState,
   type SettingsOpenRequest,
   type RedirectRepair,
@@ -59,11 +58,9 @@ import {
   SCREEN_SAVE_MODEL,
   SCREEN_SCOPE,
   SCOPE_LINE,
-  workspaceScopeLine,
   WORKSPACE_LINKS,
   SAVE_ERROR_MESSAGES,
   isSettingsScreenId,
-  isSettingsPaneId,
   SET_BTN,
   SET_HEAD_BTN,
   SET_EYEBROW,
@@ -83,16 +80,18 @@ import {
   OverviewScreen,
   AccessScreen,
   DangerZoneScreen,
-  WorkspaceDoorScreen,
 } from "./index";
 import { UnsavedSettingsDialog, type UnsavedGuardPhase } from "./components/UnsavedSettingsDialog";
+import { SettingsPermissionsDialog } from "./components/SettingsPermissionsDialog";
+import { WorkspaceDoorDialog } from "./components/WorkspaceDoorDialog";
+import { PublishSettingsGuard, type PublishGuardPhase } from "./components/PublishSettingsGuard";
+import { publishTray } from "@/editor/shell/publishTrayStore";
 import { shellDirty } from "@/editor/shell/shellDirtyRegistry";
 import { requestBrandReturn } from "@/editor/design-system/ui/brandOpenRequest";
 import { searchSettings, type SearchEntry } from "./searchIndex";
 import type { ProjectSettings } from "@/shared/types/project";
 import {
   getEditorPlanTier,
-  getEditorWorkspaceName,
   getSiteIdFromUrl,
   planSettingsSave,
   saveSiteSettings,
@@ -215,7 +214,7 @@ export const SettingsTab: React.FC<
   });
   /* A position saved before Phase B can name a screen that no longer exists
      (`integrations`): it lands on the Overview. */
-  const currentScreen: SettingsPaneId = isSettingsPaneId(persistedScreen) ? persistedScreen : "overview";
+  const currentScreen: SettingsScreenId = isSettingsScreenId(persistedScreen) ? persistedScreen : "overview";
 
   // The site name, read from the composer the way the topbar reads it.
   const [siteName, setSiteName] = React.useState("Untitled site");
@@ -292,6 +291,10 @@ export const SettingsTab: React.FC<
   const [loadState, setLoadState] = React.useState<ScreenLoadState>("ready");
   const [saveError, setSaveError] = React.useState<string | null>(null);
   const [saving, setSaving] = React.useState(false);
+  /* "Permissions ›" (B8-PM01): opens over the screen, which keeps its draft. */
+  const [permissionsOpen, setPermissionsOpen] = React.useState(false);
+  /* GAP-ST-ORG: the workspace row whose dashboard page just opened in a new tab. */
+  const [doorTitle, setDoorTitle] = React.useState<string | null>(null);
   const [resetKey, setResetKey] = React.useState(0);
   /* A Search result names a field; it is scrolled to once its screen is on. */
   const pendingFieldRef = React.useRef<string | null>(null);
@@ -390,10 +393,15 @@ export const SettingsTab: React.FC<
           if (composer) requestBrandReturn(composer, { screen: currentScreen });
           onOpenDesignTab?.();
           return;
+        case "members":
+        case "billing":
+        case "webhooks":
+          /* GAP-ST-ORG 277:38019: the dashboard page opens in a new tab and
+             a dialog says so over the screen, whose draft stays. */
+          window.open(`${DASHBOARD_URL}${WORKSPACE_LINKS[id]}`, "_blank", "noopener,noreferrer");
+          setDoorTitle(navTitle(id));
+          return;
         default:
-          /* Workspace rows (Members, Billing, Integrations & webhooks) open
-             their door card in the pane (8139:217358); its button leaves for
-             the dashboard. */
           navigateTo(id);
       }
     },
@@ -403,7 +411,8 @@ export const SettingsTab: React.FC<
   const requestNav = React.useCallback(
     (id: SettingsNavId) => {
       if (id === currentScreen) return;
-      if (screenIsDirtyRef.current) {
+      /* Leaving for the dashboard in a new tab keeps this screen and its draft. */
+      if (screenIsDirtyRef.current && id !== "members" && id !== "billing" && id !== "webhooks") {
         raiseGuard({ kind: "nav", id });
         return;
       }
@@ -531,17 +540,11 @@ export const SettingsTab: React.FC<
 
   const current = SETTINGS_NAV.find((n) => n.id === currentScreen);
   const isOverview = currentScreen === "overview";
-  const workspaceDoor =
-    currentScreen === "members" || currentScreen === "billing" || currentScreen === "webhooks" ? currentScreen : null;
-  /* A screen with its own rules — not the Overview, not a workspace door. */
-  const screenId =
-    currentScreen === "overview" || currentScreen === "members" || currentScreen === "billing" || currentScreen === "webhooks"
-      ? null
-      : currentScreen;
+  /* A screen with its own rules — not the Overview. */
+  const screenId = currentScreen === "overview" ? null : currentScreen;
   const screenRules = screenId
     ? { minRole: SCREEN_MIN_ROLE[screenId], saveModel: SCREEN_SAVE_MODEL[screenId], scope: SCREEN_SCOPE[screenId] }
     : null;
-  const workspaceName = getEditorWorkspaceName() ?? "Your workspace";
 
   /* BE-3: what a composer-backed screen's Save does with the settings its
      flush returned. With a site: the changed Site columns and JSON-only keys
@@ -652,6 +655,46 @@ export const SettingsTab: React.FC<
      the save ran keeps the user here (with the Saved toast). A refused save
      turns the dialog to its failed phase, the destination kept, and the
      screen's banner goes up behind it. */
+  /* GAP-ST-PG / PS / PF: the topbar's Publish while this screen holds an
+     edit. The tray opens through `publishTray`; while the screen is dirty it
+     is closed again at once and the guard asks first. `publishAnywayRef`
+     lets the one open that the guard itself makes through. */
+  const [publishGuard, setPublishGuard] = React.useState<PublishGuardPhase | null>(null);
+  const [savingForPublish, setSavingForPublish] = React.useState(false);
+  const publishAnywayRef = React.useRef(false);
+  React.useEffect(
+    () =>
+      publishTray.subscribe(() => {
+        if (!publishTray.get().open) {
+          publishAnywayRef.current = false;
+          return;
+        }
+        if (publishAnywayRef.current || !screenIsDirtyRef.current) return;
+        publishTray.close();
+        setPublishGuard("ask");
+      }),
+    [],
+  );
+  const openPublish = React.useCallback(() => {
+    setPublishGuard(null);
+    publishAnywayRef.current = true;
+    publishTray.open();
+  }, []);
+  const saveThenPublish = React.useCallback(() => {
+    setPublishGuard(null);
+    setSavingForPublish(true);
+    handleSave(
+      () => {
+        setSavingForPublish(false);
+        openPublish();
+      },
+      () => {
+        setSavingForPublish(false);
+        setPublishGuard("failed");
+      },
+    );
+  }, [handleSave, openPublish]);
+
   const handleSaveAndLeave = React.useCallback(() => {
     setGuardPhase("saving");
     handleSave(
@@ -663,7 +706,7 @@ export const SettingsTab: React.FC<
         else if (target.kind === "leave") leave();
         else {
           /* Only a settings screen re-renders the footer; a door (Brand ↗) leaves it be. */
-          carryAckRef.current = isSettingsPaneId(target.id);
+          carryAckRef.current = isSettingsScreenId(target.id);
           performNav(target.id);
         }
       },
@@ -696,11 +739,6 @@ export const SettingsTab: React.FC<
   const readOnly = !!screenRules && !locked && roleAtLeast(editorRole, screenRules.minRole) === false;
 
   const renderScreen = (): React.ReactNode => {
-    if (workspaceDoor && current) {
-      return (
-        <WorkspaceDoorScreen door={workspaceDoor} title={current.title.replace(/ ↗$/, "")} workspaceName={workspaceName} onClose={() => requestNav("overview")} />
-      );
-    }
     if (!screenId) return <OverviewScreen projectId={projectId} siteName={siteName} onOpenScreen={requestNav} />;
     const required = SCREEN_PLAN_REQUIREMENTS[screenId];
     if (locked && required && !ownsLock) {
@@ -787,9 +825,7 @@ export const SettingsTab: React.FC<
     : `${current.title.replace(/ ↗$/, "")}${screenHeader?.title ? ` / ${screenHeader.title}` : ""}`;
   const headScope = screenRules
     ? SCOPE_LINE_FOR[screenId as string] ?? SCOPE_LINE[screenRules.scope]
-    : workspaceDoor
-      ? workspaceScopeLine(workspaceName)
-      : SCOPE_LINE.lifecycle;
+    : SCOPE_LINE.lifecycle;
 
   const immediate = screenRules?.saveModel === "immediate";
   const online = useOnlineStatus();
@@ -797,7 +833,8 @@ export const SettingsTab: React.FC<
     !online && loadState === "ready"
       ? { text: OFFLINE_BANNER_SCREENS.has(currentScreen) ? "Needs a connection · changes stay here, unsaved" : "Needs a connection — your edits stay on this screen, unsaved", tone: "ink" }
       : saving
-      ? { text: "Saving settings…", tone: "muted" }
+      /* GAP-ST-PS 277:41957. */
+      ? { text: savingForPublish ? `Saving ${headTitle} before opening Publish…` : "Saving settings…", tone: "muted" }
       : loadState === "loading"
       ? { text: "Loading settings…", tone: "muted" }
       : loadState === "error"
@@ -810,7 +847,7 @@ export const SettingsTab: React.FC<
               ? { text: "Unsaved changes", tone: "ink" }
               : savedAck && screenRules?.scope === "publish"
                 ? { text: "Saved · applies on next publish", tone: "muted" }
-                : { text: "All changes saved", tone: "muted" };
+                : { text: "Saved", tone: "muted" };
   /* The footer is there while something waits to be saved, a save failed, or
      a footer screen's read is pending or failed — never on the Overview, a
      locked or read-only screen. An immediate screen gets it only while it
@@ -948,7 +985,7 @@ export const SettingsTab: React.FC<
               })}
             </nav>
             {/* S5 Q1 / B8-S01: who you are, then the way to what that allows
-                (the Permissions dialog, PermissionsHost), on two lines. */}
+                (B8-PM01: the settings minimum-role matrix, SettingsPermissionsDialog), on two lines. */}
             {editorRole ? (
               <div className="tw:flex tw:shrink-0 tw:flex-col tw:items-start tw:gap-2 tw:px-4 tw:pt-2 tw:pb-4" data-testid="set-role">
                 <span className="tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
@@ -958,7 +995,7 @@ export const SettingsTab: React.FC<
                   type="button"
                   variant="link"
                   className="tw:h-auto tw:min-h-0 tw:px-0 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:no-underline tw:hover:underline"
-                  onClick={() => composer?.emit(EVENTS.UI_OPEN_PERMISSIONS, undefined)}
+                  onClick={() => setPermissionsOpen(true)}
                   data-testid="set-role-permissions"
                 >
                   Permissions ›
@@ -1137,6 +1174,15 @@ export const SettingsTab: React.FC<
         onKeepEditing={handleKeepEditing}
         onDiscard={handleDiscard}
         onSaveAndLeave={handleSaveAndLeave}
+      />
+      <SettingsPermissionsDialog open={permissionsOpen} onClose={() => setPermissionsOpen(false)} />
+      <WorkspaceDoorDialog title={doorTitle} onClose={() => setDoorTitle(null)} />
+      <PublishSettingsGuard
+        phase={publishGuard}
+        screenName={headTitle}
+        onKeepEditing={() => setPublishGuard(null)}
+        onPublishWithout={openPublish}
+        onSaveAndContinue={saveThenPublish}
       />
     </div>
   );

@@ -213,6 +213,23 @@ describe("FormsScreen — 238:13598 views, filter and rows", () => {
     expect(screen.getByTestId("set-forms-selected")).toHaveTextContent("1 selected");
   });
 
+  it("while an Unspam runs, a dialog says the row stays in Spam until confirmed (272:27190)", async () => {
+    listBlocks.mockResolvedValue([block("f1", "Contact", 1)]);
+    listSubs.mockResolvedValue(pageOf([sub("a", { name: "Taylor" }, { isSpam: true })], 1));
+    let release!: () => void;
+    api.forms.updateSubmission.mutate.mockImplementation(() => new Promise((r) => (release = () => r({}))));
+    setup();
+    await screen.findByTestId("set-forms-table");
+    fireEvent.click(screen.getByTestId("set-forms-view-spam"));
+    fireEvent.click(await screen.findByTestId("set-forms-select-a"));
+    fireEvent.click(screen.getByTestId("set-forms-move"));
+    expect(await screen.findByText("Unspam submission…")).toBeInTheDocument();
+    expect(screen.getByText("The selected submission stays in Spam until the server confirms the move to Inbox.")).toBeInTheDocument();
+    expect(screen.getByTestId("set-forms-move-check")).toHaveTextContent("Check status");
+    await act(async () => release());
+    await waitFor(() => expect(screen.queryByText("Unspam submission…")).not.toBeInTheDocument());
+  });
+
   it("the row name opens the fields and marks a new submission read", async () => {
     listBlocks.mockResolvedValue([block("f1", "Contact", 1)]);
     listSubs.mockResolvedValue(pageOf([sub("a", { email: "x@y.co", message: "Table for 4" })], 1));
@@ -353,6 +370,11 @@ describe("FormsScreen — bulk delete asks first (GAP-FM07–10)", () => {
     fireEvent.click(screen.getByTestId("set-forms-delete-ok"));
     expect(await screen.findByText("Deleting 2 submissions…")).toBeInTheDocument();
     expect(screen.getByText(/remain listed until deletion is confirmed/)).toBeInTheDocument();
+    /* 272:23206: one "Check status" (re-reads the list), no Cancel, no second delete. */
+    expect(screen.queryByRole("button", { name: /permanently|Cancel/ })).not.toBeInTheDocument();
+    const reads = api.forms.listSubmissions.query.mock.calls.length;
+    fireEvent.click(screen.getByTestId("set-forms-delete-check"));
+    await waitFor(() => expect(api.forms.listSubmissions.query.mock.calls.length).toBe(reads + 1));
     await act(async () => release());
   });
 

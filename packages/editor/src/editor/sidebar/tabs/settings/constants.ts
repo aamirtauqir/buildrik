@@ -11,7 +11,6 @@
 import type { WorkspaceRole } from "@/services/RoleService";
 import type {
   SettingsNavId,
-  SettingsPaneId,
   SettingsSaveModel,
   SettingsScope,
   SettingsScreenId,
@@ -149,11 +148,6 @@ export function isSettingsScreenId(id: string): id is SettingsScreenId {
   return (SETTINGS_SCREEN_IDS as readonly string[]).includes(id);
 }
 
-const WORKSPACE_DOOR_IDS: readonly SettingsWorkspaceDoorId[] = ["members", "billing", "webhooks"];
-
-export function isSettingsPaneId(id: string): id is SettingsPaneId {
-  return isSettingsScreenId(id) || (WORKSPACE_DOOR_IDS as readonly string[]).includes(id);
-}
 
 /**
  * The role a screen needs to CHANGE anything on it (SA-21, plan M2). Below it
@@ -221,24 +215,6 @@ export const SCOPE_LINE: Record<SettingsScope, string> = {
   lifecycle: "Site lifecycle · changes apply immediately",
 };
 
-/** 8139:217358: a workspace door's line. */
-export const workspaceScopeLine = (workspaceName: string) => `${workspaceName} · all sites · managed in workspace settings`;
-
-/** The door card's two sentences per workspace row (8139:217358's shape). */
-export const WORKSPACE_DOOR_COPY: Record<SettingsWorkspaceDoorId, { what: string; managed: string }> = {
-  members: {
-    what: "Invite people and choose their roles across your workspace.",
-    managed: "Members are managed in workspace settings.",
-  },
-  billing: {
-    what: "See your plan, invoices and payment method.",
-    managed: "Billing is managed in workspace settings.",
-  },
-  webhooks: {
-    what: "Connect apps and manage webhooks for your workspace.",
-    managed: "These connections are managed in workspace settings.",
-  },
-};
 
 /** 3950:26309 / 3951:26319 / 3951:26607 — the banner a screen draws when
  *  its Save fails; the shell sets it after a refused Save, Domains and

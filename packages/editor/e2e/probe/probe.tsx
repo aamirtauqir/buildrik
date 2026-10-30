@@ -174,6 +174,9 @@ import {
   FormsScreen,
   LocalizationScreen,
 } from "@/editor/sidebar/tabs/settings/screens";
+import { SettingsPermissionsDialog } from "@/editor/sidebar/tabs/settings/components/SettingsPermissionsDialog";
+import { WorkspaceDoorDialog } from "@/editor/sidebar/tabs/settings/components/WorkspaceDoorDialog";
+import { PublishSettingsGuard } from "@/editor/sidebar/tabs/settings/components/PublishSettingsGuard";
 import type { PageSummary } from "@/shared/types";
 import { ReviewTab } from "@/editor/sidebar/tabs/review/ReviewTab";
 import { PublishGateModal, type PublishGateReason } from "@/editor/shell/modals/PublishGateModal";
@@ -4856,6 +4859,76 @@ const CASES: Record<string, () => React.ReactElement> = {
       </SettingsPane>
     );
   },
+  /* GAP-FM / GAP-FMC action states (272:23206 · 272:23770 · 272:24050 ·
+     272:24592, L-G): the board's Contact inbox, 24 rows behind three, and a
+     fetch that answers the reads but HANGS (`?mode=hang`) or FAILS
+     (`?mode=fail`) or answers (`?mode=ok`) the delete / export / move — the recipe selects two rows
+     and clicks the action. */
+  "settings-forms-actions": () => {
+    const mode = new URLSearchParams(location.search).get("mode") ?? "hang";
+    const sub = (id: string, name: string, message: string) => ({
+      id, formBlockId: "f1", siteId: "probe-site", data: { name, message }, sourceUrl: null,
+      isRead: true, isSpam: false, isArchived: false, createdAt: "2026-10-20T10:00:00.000Z", formBlock: { name: "Contact" },
+    });
+    const answers: Record<string, unknown> = {
+      "forms.listBlocks": [{ id: "f1", name: "Contact", isActive: true, _count: { submissions: 24 } }],
+      "forms.listSubmissions": {
+        total: 24, page: 1, perPage: 20,
+        data: [
+          sub("s1", "Mara Lenz", "We’d like a quote for our new studio."),
+          sub("s2", "Jonas Peters", "Question about your studio"),
+          sub("s3", "A. Okafor", "Question about your studio"),
+        ],
+      },
+    };
+    const ACTIONS = ["forms.deleteSubmission", "forms.exportSubmissions", "forms.updateSubmission"];
+    window.fetch = (async (input: RequestInfo | URL) => {
+      const href = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+      const procs = new URL(href, location.origin).pathname.split("/api/trpc/")[1]?.split(",") ?? [];
+      if (mode !== "ok" && procs.some((p) => ACTIONS.includes(p))) {
+        if (mode === "hang") return new Promise<Response>(() => {});
+        const err = { error: { json: { message: "probe failure", code: -32603, data: { code: "INTERNAL_SERVER_ERROR", httpStatus: 500 } } } };
+        return new Response(JSON.stringify(procs.map(() => err)), { status: 500, headers: { "content-type": "application/json" } });
+      }
+      const body = procs.map((name) => ({ result: { data: { json: answers[name] ?? null } } }));
+      return new Response(JSON.stringify(body), { status: 200, headers: { "content-type": "application/json" } });
+    }) as typeof fetch;
+    return (
+      <SettingsPane case_="settings-forms-actions">
+        <FormsScreen projectId="probe-site" />
+      </SettingsPane>
+    );
+  },
+  /* B8-PM01 245:50300 / PM03 252:49487 (L-G): the settings Permissions
+     dialog. `?siteId=probe-site&role=EDITOR` answers sites.myRole; with no
+     role the lookup answers nothing and the dialog shows its failure. */
+  "settings-permissions": () => {
+    const role = new URLSearchParams(location.search).get("role");
+    stubTrpc({ "sites.myRole": role ? { role } : null });
+    return (
+      <div data-probe="settings-permissions">
+        <SettingsPermissionsDialog open onClose={() => undefined} />
+      </div>
+    );
+  },
+  /* GAP-ST-ORG 277:38019 (L-G): the workspace door's dialog. */
+  "settings-door": () => (
+    <div data-probe="settings-door">
+      <WorkspaceDoorDialog title="Members" onClose={() => undefined} />
+    </div>
+  ),
+  /* GAP-ST-PG 277:41731 / PF 277:42171 (L-G): Publish with unsaved settings. */
+  "settings-publish-guard": () => (
+    <div data-probe="settings-publish-guard">
+      <PublishSettingsGuard
+        phase={new URLSearchParams(location.search).get("phase") === "failed" ? "failed" : "ask"}
+        screenName="Languages"
+        onKeepEditing={() => undefined}
+        onPublishWithout={() => undefined}
+        onSaveAndContinue={() => undefined}
+      />
+    </div>
+  ),
   // "settings-webhooks" (board 640:3849) removed A-12/A01-6 — webhooks moved
   // from this pane's WebhooksScreen to the dashboard's Settings >
   // Integrations, which this probe harness does not render. Board 640:3849
