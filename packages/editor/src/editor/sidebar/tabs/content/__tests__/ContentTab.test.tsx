@@ -100,7 +100,9 @@ describe("ContentTab", () => {
     fireEvent.click(screen.getByRole("button", { name: "+ New variable" }));
     fireEvent.change(screen.getByLabelText("Variable key"), { target: { value: "phone" } });
     fireEvent.change(screen.getByLabelText("Variable value"), { target: { value: "+44 20" } });
-    fireEvent.click(screen.getByRole("button", { name: "Add" }));
+    /* 2L9 B5-V03 260:236147 — "Add site variable" is a dialog. */
+    expect(screen.getByText("Start with a letter. Use letters, digits, underscores or dashes.")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Add variable" }));
     expect(await screen.findByText("{{site.phone}}")).toBeInTheDocument();
     expect(sources.get("site")?.data).toEqual({ name: "Bella Cucina", phone: "+44 20" });
     expect(composer.getProjectSettings().siteVariables).toEqual([

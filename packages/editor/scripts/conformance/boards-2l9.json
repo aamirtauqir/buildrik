@@ -8223,8 +8223,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 26, probe-compared: shots/167-7406.png — Name, Key, Type, Required, Placeholder, Help text match. Still open: the board's default asset ('Choose default asset…' · 'Images only.') needs an asset chooser in the dialog; not built.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 27, probe-compared: shots/167-7406.png vs probe cms-add-field (Image, Portrait): an outlined 228-wide 'Choose default asset…' under Required with 'Images only.', then Placeholder and Help text. It opens the media library's pick (requestAssetPick, images only); the dialog steps aside while the drawer picks and returns when the pick lands or is cancelled; the default stored is the asset's src — what a record's image value stores (test AddFieldDialog › default asset). The chosen asset shows by file name with Remove.",
    "tier": "P2"
   },
   {
@@ -8234,8 +8234,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Round 26, compared by board copy: as Image (167:7406) — open for 'Choose default asset…' and 'Allowed uploads: images, video and fonts. PDFs are not supported.' (needs the asset chooser).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 27, compared by board copy (dump) vs probe text + the T14 image: as Image with the pick limited to images, video and fonts and the line 'Allowed uploads: images, video and fonts. PDFs are not supported.' — true to the asset-upload route's allowed types (no PDF).",
    "tier": "P2"
   },
   {
@@ -12895,8 +12895,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 26, built, NOT image-compared (the round's 8 images went to B5-T): Site variables now opens as the CMS workspace's page (cmsWorkspace.openVariables, page: 'variables') the way a collection does — the drawer keeps its list; header '‹ back · Site variables · + New variable', the intro 'Use one value across your site' + 'Type {{site.key}} in text…', rows across the pane: key · value ('Empty value') · 'n text placeholders' · ⋯ (Edit value / Show usages / Rename key… / Delete…). Text matches the board copy (dump/page-3-6); the header's ⋯ is not built (no board says what it holds). The drawer subview is gone (dead once the page exists). Probe cms-workspace&page=variables. Next: fetch shots/260-235689.png and compare.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 27, probe-compared: shots/260-235689.png vs probe cms-workspace&page=variables: Site variables as the workspace's page on white, header '‹ back · Site variables · + New variable', intro 13 medium + 12 muted line, rows 72 tall with {{site.key}} (mono) over the value (13 ink; 'Empty value' muted), 'n text placeholders' at ~65% across, ⋯ at the end, content 880 max; the drawer's Site variables row is marked while the page is open. Not built: the header's own ⋯ (no board shows its contents). The probe's back reads 'Back to canvas' (its origin); the app's reads the editor origin.",
    "tier": "P2"
   },
   {
@@ -12906,8 +12906,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C C4: intro + \"No variables yet. Add a key and value to start.\"; drawer subview, not the workspace page.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 27, compared by board copy (dump) + the V01 image: same page, the intro, then 'No variables yet. Add a key and value to start.'",
    "tier": "P2"
   },
   {
@@ -12917,8 +12917,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Inline add row vs modal; dup copy matches (:580), key-rule copy differs",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 27, probe-compared: shots/260-236147.png vs probe cms-workspace&page=variables after + New variable: a dialog 'Add site variable' (was an inline form), 'Save a value once for text across your site. Publishing is separate.', Key (filled) + 'Start with a letter. Use letters, digits, underscores or dashes.' (true to isValidVariableKey), Value + 'An empty value is allowed.', Cancel · Add variable. The dialog sits ~15px lower (shared chrome-ui placement).",
    "tier": "P2"
   },
   {
@@ -12996,8 +12996,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C D1: row ⋯ Edit value · Show usages · Rename key… · Delete….",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 27, probe-compared: shots/260-237728.png vs probe (row ⋯ on phone): menu Edit value · Rename key… · Show usages · Delete variable… in the board's order, Delete in plain text as drawn (was red 'Delete…', usages before rename).",
    "tier": "P2"
   },
   {

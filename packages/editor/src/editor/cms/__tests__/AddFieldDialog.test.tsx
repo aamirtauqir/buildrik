@@ -189,4 +189,31 @@ describe("AddFieldDialog", () => {
     fireEvent.click(screen.getByTestId("cms-add-field-save"));
     await waitFor(() => expect(onAdd).toHaveBeenCalledWith({ name: "Featured", slug: "featured", type: "boolean", defaultValue: true }));
   });
+
+  /* 2L9 167:7406 / 167:7671 — an image or file default is an asset from the
+     library, stored as the asset's src (what a record's value stores). */
+  it("an image field's default asset comes from the media library and is stored as its src", async () => {
+    const onAdd = vi.fn(() => Promise.resolve());
+    const pick = vi.fn((types: string[], onSelect: (a: { src: string }) => void) => onSelect({ src: "https://cdn.test/media/portrait.jpg" }));
+    render(<AddFieldDialog collection={MENU} collections={[MENU]} onClose={vi.fn()} onAdd={onAdd} onOpenMediaLibrary={pick as never} />);
+    fireEvent.click(screen.getByTestId("cms-add-field-type-image"));
+    expect(screen.getByText("Images only.")).toBeInTheDocument();
+    fireEvent.change(screen.getByTestId("cms-add-field-name"), { target: { value: "Portrait" } });
+    fireEvent.click(screen.getByTestId("cms-add-field-asset-choose"));
+    expect(pick).toHaveBeenCalledWith(["image"], expect.any(Function), "Portrait · default");
+    expect(screen.getByTestId("cms-add-field-asset-name")).toHaveTextContent("portrait.jpg");
+    fireEvent.click(screen.getByTestId("cms-add-field-save"));
+    await waitFor(() =>
+      expect(onAdd).toHaveBeenCalledWith({ name: "Portrait", slug: "portrait", type: "image", defaultValue: "https://cdn.test/media/portrait.jpg" }),
+    );
+  });
+
+  it("a file field takes images, video and fonts", () => {
+    const pick = vi.fn();
+    render(<AddFieldDialog collection={MENU} collections={[MENU]} onClose={vi.fn()} onAdd={vi.fn()} onOpenMediaLibrary={pick as never} />);
+    fireEvent.click(screen.getByTestId("cms-add-field-type-file"));
+    expect(screen.getByText("Allowed uploads: images, video and fonts. PDFs are not supported.")).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId("cms-add-field-asset-choose"));
+    expect(pick.mock.calls[0][0]).toEqual(["image", "video", "font"]);
+  });
 });

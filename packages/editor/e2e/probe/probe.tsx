@@ -3626,6 +3626,7 @@ const CASES: Record<string, () => React.ReactElement> = {
           collections={[CMS_STATUS_COLLECTION]}
           onClose={() => {}}
           onAdd={() => (fail ? Promise.reject(new Error("offline")) : new Promise<void>(() => {}))}
+          onOpenMediaLibrary={(_types, onSelect) => onSelect({ src: "https://cdn.example/media/portrait.jpg" } as never)}
         />
       </div>
     );
