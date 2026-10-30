@@ -72,8 +72,7 @@ export interface AITabProps {
   /** Rendered in the inspector column (boards 170:2 · 66:225), where the way
    *  out is back to the inspector rather than a panel close. */
   onBack?: () => void;
-  /** A door's intent: the prompt it puts in the empty field ("Improve with
-   *  AI" → IMPROVE_ELEMENT_PROMPT). */
+  /** A door's intent: the prompt it puts in the empty field. */
   seedPrompt?: string;
 }
 
