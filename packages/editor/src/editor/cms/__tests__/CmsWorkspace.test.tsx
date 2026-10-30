@@ -182,7 +182,7 @@ describe("CmsWorkspace · Back to canvas (§13)", () => {
     cmsWorkspace.openCollection("col-1");
     const onBack = vi.fn();
     render(<ToastProvider><CmsWorkspace composer={composer as never} onBackToCanvas={onBack} /></ToastProvider>);
-    const back = await screen.findByRole("button", { name: "‹ Back to canvas" });
+    const back = await screen.findByRole("button", { name: /^‹ Back to Editor/ });
     const header = screen.getByTestId("cms-ws-header");
     expect(header.firstElementChild).toBe(back);
     fireEvent.click(back);
@@ -196,7 +196,7 @@ describe("CmsWorkspace · Back to canvas (§13)", () => {
     const onBack = vi.fn();
     render(<ToastProvider><CmsWorkspace composer={composer as never} onBackToCanvas={onBack} /></ToastProvider>);
     await screen.findByTestId("cms-sheet");
-    fireEvent.click(screen.getByRole("button", { name: "‹ Back to canvas" }));
+    fireEvent.click(screen.getByRole("button", { name: /^‹ Back to Editor/ }));
     expect(onBack).toHaveBeenCalledTimes(1);
     expect(cmsWorkspace.get().recordId).toBeNull();
   });
@@ -207,7 +207,7 @@ describe("CmsWorkspace · Back to canvas (§13)", () => {
     cmsWorkspace.openRecord("r1");
     render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
     const sheet = await screen.findByTestId("cms-sheet");
-    expect(within(sheet).queryByRole("button", { name: "‹ Back to canvas" })).toBeNull();
+    expect(within(sheet).queryByRole("button", { name: /^‹ Back to Editor/ })).toBeNull();
   });
 
   it("no back action without one (the rail's own visit)", async () => {
@@ -215,7 +215,7 @@ describe("CmsWorkspace · Back to canvas (§13)", () => {
     cmsWorkspace.openCollection("col-1");
     render(<ToastProvider><CmsWorkspace composer={composer as never} /></ToastProvider>);
     await screen.findByTestId("cms-ws-header");
-    expect(screen.queryByRole("button", { name: "‹ Back to canvas" })).toBeNull();
+    expect(screen.queryByRole("button", { name: /^‹ Back to Editor/ })).toBeNull();
   });
 });
 

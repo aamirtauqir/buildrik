@@ -111,57 +111,45 @@ describe("ContentTab", () => {
     ]);
   });
 
-  it("conditions: lists element condition bindings with summaries and removes them", async () => {
-    const { composer, elements } = makeEngine({ collections: [MENU], items: [] });
-    const removeDataBinding = vi.fn();
-    elements.push({
-      getId: () => "el-9",
-      getType: () => "badge",
-      getContent: () => "Sold out",
-      getDataBindings: () => ({
-        condition: {
-          type: "condition",
-          sourceId: "",
-          path: "",
-          condition: { operator: "==", left: "available", right: "false" },
-        },
-      }),
-      removeDataBinding,
+  it("conditions (176:21830): a workspace page, read-only — where, active or legacy; Locate opens the page and selects", async () => {
+    const { composer, elements } = makeEngine({
+      collections: [MENU],
+      items: [],
+      conditions: { "el-1": { match: "all", rules: [{ field: "opening_hours.sunday", op: "set" }] } },
     });
-    render(<ContentTab composer={composer as never} />);
-    fireEvent.click(await screen.findByText("Conditions"));
-    expect(await screen.findByText("when available is false")).toBeInTheDocument();
-    /* Board 151:87 names the row after the element, not after its tag — the
-       label was "badge · Sold out" until 2026-09-08. */
-    expect(screen.getByText("Sold out")).toBeInTheDocument();
-    /* Board 151:87 puts the row actions behind a `⋯`, so removal is two
-       clicks now: open the row menu, then choose. */
-    fireEvent.click(screen.getByRole("button", { name: /Actions for/ }));
-    fireEvent.click(screen.getByRole("menuitem", { name: "Remove condition" }));
-    expect(removeDataBinding).toHaveBeenCalledWith("condition");
-  });
-
-  it("condition create: pick result opens the form and binds through the engine", async () => {
-    const { composer, elements } = makeEngine({ collections: [MENU], items: [] });
-    elements.push({
-      getId: () => "el-5",
-      getType: () => "section",
-      getContent: () => "",
-      getDataBindings: () => ({}),
-      removeDataBinding: vi.fn(),
-    });
-    render(<ContentTab composer={composer as never} />);
-    fireEvent.click(await screen.findByText("Conditions"));
-    fireEvent.click(screen.getByRole("button", { name: "+ New condition" }));
-    act(() => composer.emit("inspector:pick-result", "el-5"));
-    const path = await screen.findByLabelText("Condition path");
-    fireEvent.change(path, { target: { value: "site.open" } });
-    fireEvent.change(screen.getByLabelText("Condition value"), { target: { value: "true" } });
-    fireEvent.click(screen.getByRole("button", { name: "Add condition" }));
-    expect(composer.data.bindCondition).toHaveBeenCalledWith(
-      elements[0],
-      expect.objectContaining({ operator: "==", left: "site.open", right: "true" }),
+    const pageRoot = { getId: () => "root-item", getParent: () => undefined };
+    elements.push(
+      { getId: () => "el-1", getType: () => "heading", getContent: () => "", getDataBindings: () => ({}), removeDataBinding: vi.fn(), getParent: () => pageRoot },
+      {
+        getId: () => "el-2",
+        getType: () => "heading",
+        getContent: () => "",
+        getDataBindings: () => ({ condition: { type: "condition", sourceId: "", path: "", condition: { operator: "==", left: "a", right: "b" } } }),
+        removeDataBinding: vi.fn(),
+        getParent: () => pageRoot,
+      },
     );
+    const onBackToCanvas = vi.fn();
+    render(
+      <ToastProvider>
+        <ContentTab composer={composer as never} />
+        <CmsWorkspace composer={composer as never} onBackToCanvas={onBackToCanvas} />
+      </ToastProvider>,
+    );
+    fireEvent.click(await screen.findByText("Conditions"));
+    expect(cmsWorkspace.get().page).toBe("conditions");
+    expect(await screen.findByText("Conditions across this site")).toBeInTheDocument();
+    expect(screen.getByText("Edit conditions on their selected element in the Inspector.")).toBeInTheDocument();
+    expect(screen.getByTestId("content-cond-label-el-1")).toHaveTextContent("Menu item › Heading");
+    expect(screen.getByTestId("content-cond-summary-el-1")).toHaveTextContent("Active · opening_hours.sunday is set");
+    expect(screen.getByTestId("content-cond-summary-el-2")).toHaveTextContent("Not active — review legacy rule");
+    // Read-only: no create, no remove.
+    expect(screen.queryByText("+ New condition")).toBeNull();
+    expect(screen.queryByRole("button", { name: /Actions for/ })).toBeNull();
+    fireEvent.click(screen.getByTestId("content-cond-locate-el-1"));
+    expect(onBackToCanvas).toHaveBeenCalled();
+    expect(composer.elements.setActivePage).toHaveBeenCalledWith("p-item");
+    expect(composer.selection.select).toHaveBeenCalledWith(elements[0]);
   });
 
   /* Regression. `CollectionView` renders the Dynamic pages row only when

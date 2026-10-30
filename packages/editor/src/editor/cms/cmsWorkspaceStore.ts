@@ -41,7 +41,7 @@ export interface CmsWorkspaceState {
   overPages?: boolean;
   /** A Data page in the workspace instead of a collection — 2L9 B5-V01
    *  `260:235689` draws Site variables as a full page, not a drawer subview. */
-  page?: "variables";
+  page?: "variables" | "conditions";
 }
 
 /** `ui:cms-open` (EVENTS.UI_CMS_OPEN) — open a collection's table, and with
@@ -107,6 +107,8 @@ export const cmsWorkspace = {
     navigate({ ...state, collectionId, tab, recordId: null, page: undefined }),
   /** Site variables as the workspace's page (B5-V01). */
   openVariables: (): void => navigate({ ...state, collectionId: null, recordId: null, page: "variables" }),
+  /** Conditions as the workspace's page (176:21830 D39). */
+  openConditions: (): void => navigate({ ...state, collectionId: null, recordId: null, page: "conditions" }),
   setTab: (tab: CmsTab): void => navigate({ ...state, tab, recordId: null }),
   openRecord: (recordId: string | null): void => navigate({ ...state, tab: "records", recordId }),
   /** One write for both, so the table never renders a frame without its sheet. */

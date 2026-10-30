@@ -6,7 +6,6 @@
  * @license BSD-3-Clause
  */
 import type { CMSField } from "@/shared/types/cms";
-import type { ConditionBinding, ConditionExpression, LogicGroup } from "@/shared/types/data";
 import type { SiteVariable } from "@/shared/types/project";
 
 /** DataManager source id that carries the site variables ({{site.*}}). */
@@ -50,53 +49,6 @@ export function variablesToSourceData(vars: SiteVariable[]): Record<string, stri
 /** Valid variable key: dotted-path-safe segment (letters/digits/_/-). */
 export function isValidVariableKey(key: string): boolean {
   return /^[A-Za-z][A-Za-z0-9_-]*$/.test(key);
-}
-
-const OPERATOR_LABEL: Record<string, string> = {
-  "==": "is",
-  "!=": "is not",
-  ">": ">",
-  "<": "<",
-  ">=": "≥",
-  "<=": "≤",
-  contains: "contains",
-  not_contains: "doesn't contain",
-  exists: "exists",
-  not_exists: "doesn't exist",
-  empty: "is empty",
-  not_empty: "isn't empty",
-};
-
-function sideLabel(side: ConditionExpression["left"]): string {
-  if (side == null) return "";
-  if (typeof side === "object") {
-    const b = side as { sourceId?: string; path?: string };
-    return [b.sourceId, b.path].filter(Boolean).join(".");
-  }
-  return String(side);
-}
-
-function isLogicGroup(c: ConditionExpression | LogicGroup): c is LogicGroup {
-  return "conditions" in c;
-}
-
-/** "when available is false" — the sub-line on a Conditions row (board 151:87). */
-export function conditionSummary(binding: ConditionBinding): string {
-  const c = binding.condition;
-  if (isLogicGroup(c)) {
-    const parts = c.conditions.map((sub) =>
-      isLogicGroup(sub) ? "(…)" : exprSummary(sub),
-    );
-    return `when ${parts.join(` ${String((c as { operator?: string }).operator ?? "and").toLowerCase()} `)}`;
-  }
-  return `when ${exprSummary(c)}`;
-}
-
-function exprSummary(e: ConditionExpression): string {
-  const op = OPERATOR_LABEL[e.operator] ?? e.operator;
-  const left = sideLabel(e.left);
-  const right = e.right !== undefined ? ` ${sideLabel(e.right)}` : "";
-  return `${left} ${op}${right}`.trim();
 }
 
 /** Default value for a new record, per field type (mirrors the record form). */

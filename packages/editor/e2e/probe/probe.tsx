@@ -18,6 +18,7 @@
  *
  * @license BSD-3-Clause
  */
+import { pageFileNames } from "@/engine/export";
 import { RecordLeaveDialog, type RecordLeavePhase } from "@/editor/cms/RecordLeaveDialog";
 import { RichTextEditor } from "@/editor/panels/RichTextEditor";
 import { CreateComponentModal } from "@/editor/shell/modals/CreateComponentModal";
@@ -2328,6 +2329,12 @@ function CmsDynamicPagesHost() {
       for (const [name, role] of [["Ali Shah", "Designer"], ["Sara Khan", "Designer"]]) {
         await c.cms.collections.createContentItem(col.id, { name, role, slug: name.toLowerCase().replace(/ /g, "-") }, { status: "published" });
       }
+      /* `?linked=1`: the collection already has its page (165:3432). */
+      if (new URLSearchParams(location.search).get("linked")) {
+        const page = c.elements.createPage("Team member");
+        const file = pageFileNames(c.elements.getAllPages()).get(page.id) ?? "team-member.html";
+        await c.cms.collections.updateCollection(col.id, { pageSlugPattern: "/team/{slug}", pageTemplatePath: file } as never);
+      }
       cmsWorkspace.reset();
       cmsWorkspace.openRequest({ collectionId: col.id, tab: "dynamic-pages" });
       setComposer(c);
@@ -2363,7 +2370,24 @@ function CmsWorkspaceHost() {
           : async () => null;
       /* The Title field is bound once, so the field inspector draws its lock (165:2917). */
       const bound = { "el-hero-title": [{ collectionId: "blog", fieldSlug: "title", property: "content" }] };
-      (base.cms as Record<string, unknown>).bindings = { export: () => bound, getAllCollectionBindings: () => [] };
+      (base.cms as Record<string, unknown>).bindings = {
+        export: () => bound,
+        getAllCollectionBindings: () => [],
+        /* `&page=conditions` (176:21830): the happy-hour banner has a rule;
+           the sold-out badge keeps its legacy binding only. */
+        getCondition: (id: string) =>
+          id === "el-happy-hour" ? { match: "all", rules: [{ field: "opening_hours.sunday", op: "set" }] } : null,
+      };
+      if (q.get("page") === "conditions") {
+        const els = base.elements as Record<string, unknown>;
+        const all = (els.getAllElements as () => Array<Record<string, unknown>>)();
+        const root = { getId: () => "root-blog-post", getParent: () => undefined };
+        const headed = all.map((e) => ({ ...e, getType: () => "heading", getParent: () => root }));
+        els.getAllElements = () => headed;
+        els.getElement = (id: string) => headed.find((e) => (e as { getId?: () => string }).getId?.() === id) ?? null;
+        els.getAllPages = () => [{ id: "p-blog-post", name: "Blog post", root: { id: "root-blog-post" } }];
+        els.getActivePage = () => ({ id: "p-home", name: "Home" });
+      }
       return base as unknown as Composer;
     },
     [],
@@ -2373,6 +2397,10 @@ function CmsWorkspaceHost() {
     /* `&page=variables`: Site variables as the workspace's page (B5-V01). */
     if (q.get("page") === "variables") {
       cmsWorkspace.openVariables();
+      return null;
+    }
+    if (q.get("page") === "conditions") {
+      cmsWorkspace.openConditions();
       return null;
     }
     cmsWorkspace.openRequest({
