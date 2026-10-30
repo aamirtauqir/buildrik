@@ -33,7 +33,7 @@ const COLUMN_PARENTS: ReadonlySet<string> = new Set(["row", "columns", "columns3
 
 const nameOf = (el: Element): string => getLayerName(el) ?? elementTypeLabel(el.getType());
 
-function useTreeVersion(composer: Composer | null | undefined): void {
+export function useTreeVersion(composer: Composer | null | undefined): void {
   const [, bump] = React.useReducer((n: number) => n + 1, 0);
   React.useEffect(() => {
     if (!composer) return;
@@ -53,6 +53,53 @@ function uniformItem(parent: Element, children: readonly Element[]): string | nu
   const type = children[0].getType();
   if (!children.every((c) => c.getTagName().toLowerCase() === tag && c.getType() === type)) return null;
   return ITEM_NOUN[tag] ?? (type === "container" && COLUMN_PARENTS.has(parent.getType()) ? "column" : elementTypeLabel(type).toLowerCase());
+}
+
+/** B69/04 "Reduce count": the last column goes. An empty one goes at once;
+ *  one with content is reviewed first — Move its blocks into the column
+ *  before it, Remove it with them, or Cancel. Each is one Undo. */
+function ReduceColumns({ composer, parent, columns }: { composer: Composer; parent: Element; columns: readonly Element[] }) {
+  const [reviewing, setReviewing] = React.useState(false);
+  const last = columns[columns.length - 1];
+  const before = columns[columns.length - 2];
+  React.useEffect(() => setReviewing(false), [last?.getId()]);
+  if (!last || !before) return null;
+  const held = last.getChildren().length;
+  const remove = () =>
+    writeElement(composer, parent, "Remove column", () => {
+      composer.elements.removeElement(last.getId());
+    });
+  const moveThenRemove = () =>
+    writeElement(composer, parent, "Move column content", () => {
+      for (const child of [...last.getChildren()]) composer.elements.moveElement(child.getId(), before.getId());
+      composer.elements.removeElement(last.getId());
+    });
+  if (held === 0) {
+    return (
+      <Button color="light" size="xs" className={WIDE_BUTTON} onClick={remove} data-testid="columns-reduce">
+        Remove empty column
+      </Button>
+    );
+  }
+  if (!reviewing) {
+    return (
+      <Button color="light" size="xs" className={WIDE_BUTTON} onClick={() => setReviewing(true)} data-testid="columns-reduce">
+        Review populated content
+      </Button>
+    );
+  }
+  return (
+    <div className="tw:flex tw:flex-col tw:gap-2" data-testid="columns-review">
+      <NoteRow>
+        Column {columns.length} holds {held === 1 ? "1 block" : `${held} blocks`}. Move {held === 1 ? "it" : "them"} into column {columns.length - 1}, or remove the column with {held === 1 ? "it" : "them"}.
+      </NoteRow>
+      <div className="tw:grid tw:grid-cols-3 tw:gap-2">
+        <Button color="light" size="xs" onClick={moveThenRemove}>Move</Button>
+        <Button color="light" size="xs" onClick={remove}>Remove</Button>
+        <Button color="light" size="xs" onClick={() => setReviewing(false)}>Cancel</Button>
+      </div>
+    </div>
+  );
 }
 
 export function ChildrenSection({ composer, elementId, isOpen, onToggle }: { composer: Composer | null | undefined; elementId: string; isOpen?: boolean; onToggle?: () => void }) {
@@ -103,6 +150,7 @@ export function ChildrenSection({ composer, elementId, isOpen, onToggle }: { com
             Open Add
           </Button>
         )}
+        {item === "column" ? <ReduceColumns composer={composer} parent={el} columns={children} /> : null}
         <NoteRow>Each child keeps its own ID, styles and content. Selecting one edits that exact child.</NoteRow>
       </div>
     </Section>

@@ -16,6 +16,7 @@ import { BindingPropertyRow } from "../BindingPropertyRow";
 import { BindingDetail } from "../BindingDetail";
 import { TemplatePageDoor } from "../TemplatePageDoor";
 import { ListItemNote } from "../ListItemNote";
+import { BindingStatusSection } from "../BindingStatusSection";
 import { closeSubview, openSubview, useSubview } from "@/editor/inspector/tabs/subviewStore";
 import { CmsBindingSection } from "@/editor/inspector/sections/CmsBindingSection";
 import { ToastProvider } from "@/editor/chrome-ui";
@@ -173,21 +174,35 @@ describe("property row · bound (B5-D04, D11, D13, D14)", () => {
     expect(screen.getByTestId("open-for")).toHaveTextContent("e1");
   });
 
+  /* B5-D11…D15: the status is the Content tab's last group, "Binding status". */
+  const status = (composer: unknown) => render(<BindingStatusSection composer={composer as never} elementId="e1" />);
+
   it("an empty value with a fallback says so", async () => {
-    row(makeComposer({ initial: [{ ...BOUND[0], itemId: "r2", fallback: "Untitled" }] }));
+    status(makeComposer({ initial: [{ ...BOUND[0], itemId: "r2", fallback: "Untitled" }] }));
     await waitFor(() => expect(screen.getByTestId("binding-status")).toHaveTextContent("Empty — showing fallback “Untitled”."));
+    expect(screen.getByTestId("binding-status-group")).toHaveTextContent(/^Binding status/);
   });
 
   it("a failed load keeps the binding and offers Retry", async () => {
-    row(makeComposer({ initial: BOUND, fail: true }));
+    status(makeComposer({ initial: BOUND, fail: true }));
     await waitFor(() => expect(screen.getByTestId("binding-status")).toHaveTextContent("Couldn’t load Menu. Your binding is kept."));
     expect(screen.getByTestId("binding-retry")).toBeInTheDocument();
   });
 
-  it("a field that no longer exists asks for another", () => {
-    row(makeComposer({ initial: [{ ...BOUND[0], fieldSlug: "gone" }] }));
+  it("a field that no longer exists asks for another — Choose field opens the binding detail", () => {
+    status(makeComposer({ initial: [{ ...BOUND[0], fieldSlug: "gone" }] }));
     expect(screen.getByTestId("binding-status")).toHaveTextContent("gone no longer exists. Choose a field.");
-    expect(screen.getByTestId("binding-choose-field")).toBeInTheDocument();
+    function Probe() {
+      return <span data-testid="open-for">{useSubview()?.elementId ?? ""}</span>;
+    }
+    render(<Probe />);
+    fireEvent.click(screen.getByTestId("binding-choose-field"));
+    expect(screen.getByTestId("open-for")).toHaveTextContent("e1");
+  });
+
+  it("the row itself no longer carries the status", () => {
+    row(makeComposer({ initial: [{ ...BOUND[0], fieldSlug: "gone" }] }));
+    expect(screen.queryByTestId("binding-status")).toBeNull();
   });
 });
 
@@ -304,6 +319,15 @@ describe("ListItemNote (B5-D99 197:28410)", () => {
     expect(note).toHaveTextContent("Edits to this Card apply to every Team record.");
     expect(screen.getByTestId("inspector-list-item-link")).toHaveTextContent("This card has no link.");
     fireEvent.click(screen.getByRole("button", { name: "Edit link in Behavior ›" }));
+    expect(composer.emit).toHaveBeenCalledWith("ui:inspector-focus-section", { section: "link" });
+  });
+
+  it("a card linked to its record page reads as a binding: 'Dynamic bindings · Link to · Team record page ›' (B5-D101)", () => {
+    const composer = inList("{{item.url}}");
+    render(<ListItemNote composer={composer as never} elementId="e1" hasLinkSection />);
+    expect(screen.queryByTestId("inspector-list-item-link")).toBeNull();
+    expect(screen.getByTestId("inspector-list-item-note")).toHaveTextContent("Dynamic bindings");
+    fireEvent.click(screen.getByRole("button", { name: "Link to · Team record page ›" }));
     expect(composer.emit).toHaveBeenCalledWith("ui:inspector-focus-section", { section: "link" });
   });
 

@@ -12,6 +12,7 @@ import { isJustAdded } from "../justAddedField";
 import { isTableCell, TableAccessibilitySection, TableCellSection, TableStructureSection } from "../TableSections";
 import { adaptElementProps, defineSection, ownSection as own, type AnySectionEntry } from "./_shared";
 import { CmsBindingSection } from "../CmsBindingSection";
+import { BindingStatusSection } from "../binding/BindingStatusSection";
 import { ConditionsSection } from "../conditions/ConditionsPanel";
 import { TabPanelSection, TabsSection } from "../TabsSection";
 import { componentTriggerOf, DialogContentSection, isModalTrigger, ModalRelationshipSection } from "../ModalSections";
@@ -21,6 +22,7 @@ import { CollectionListSection } from "../CollectionListSection";
 import { ChildrenSection, COMMERCE_TYPES, CommerceNoteSection } from "../ChildrenSection";
 import { FormFieldsSection } from "../FormFieldsSection";
 import { SlidesSection } from "../SlidesSection";
+import { GalleryImageBackSection, GallerySection, galleryOf } from "../GallerySection";
 import { AttributesSection, attributesSummary } from "../attributes/AttributesSection";
 import { SemanticsSection, tagLabel } from "../SemanticsSection";
 import { ValidationSection, validationSummary } from "../ValidationSection";
@@ -46,6 +48,28 @@ export const CONTENT_SECTIONS: Record<string, AnySectionEntry> = {
     adaptProps: adaptElementProps,
   }),
 
+  /* B69/04 (249:72335): an Image gallery's images — open, move, Choose asset. */
+  gallery: defineSection({
+    tab: "content",
+    title: "Images",
+    open: "open",
+    shouldRender: (ctx) => ctx.selectedIds.length <= 1 && ctx.selectedElement.type === "gallery",
+    Component: GallerySection,
+    styleKeys: [],
+    adaptProps: (ctx) => ({ composer: ctx.composer, elementId: ctx.selectedElement.id, isOpen: ctx.isOpen, onToggle: ctx.onToggle, onOpenMediaLibrary: ctx.onOpenMediaLibrary }),
+  }),
+
+  /* B69/04 "Exact image + Back": an image of a gallery returns to it. */
+  "gallery-image": defineSection({
+    tab: "content",
+    title: "Gallery",
+    open: "always",
+    shouldRender: (ctx) => ctx.selectedIds.length <= 1 && Boolean(galleryOf(ctx.composer?.elements.getElement(ctx.selectedElement.id))),
+    Component: GalleryImageBackSection,
+    styleKeys: [],
+    adaptProps: (ctx) => ({ composer: ctx.composer, elementId: ctx.selectedElement.id }),
+  }),
+
   collection: defineSection({
     tab: "content",
     /* 2L9 B5-D76: "Collection list". */
@@ -68,6 +92,18 @@ export const CONTENT_SECTIONS: Record<string, AnySectionEntry> = {
     Component: CmsBindingSection,
     styleKeys: [],
     adaptProps: (ctx) => ({ ...adaptElementProps(ctx), onOpenCreateCollection: ctx.onOpenCreateCollection }),
+  }),
+
+  /* B5-D11…D15 (173:14104): a bound property's trouble, last on the tab. */
+  "binding-status": defineSection({
+    tab: "content",
+    title: "Binding status",
+    open: "always",
+    capability: (caps) => caps.cmsBindable && !caps.isStructuralChild,
+    shouldRender: (ctx) => Boolean(ctx.composer?.cms?.bindings?.getBindings?.(ctx.selectedElement.id)?.length),
+    Component: BindingStatusSection,
+    styleKeys: [],
+    adaptProps: (ctx) => ({ composer: ctx.composer, elementId: ctx.selectedElement.id }),
   }),
 
   /* 2L9 F02: a field's validation, shut with a summary under its block. */
@@ -156,7 +192,7 @@ export const CONTENT_SECTIONS: Record<string, AnySectionEntry> = {
       const el = ctx.composer.elements.getElement(ctx.selectedElement.id);
       if (!el?.canHaveChildren?.()) return false;
       if (ctx.caps.typeBlock && ctx.caps.typeBlock !== "flex" && ctx.caps.typeBlock !== "grid") return false;
-      if (["form", "table", "tabs", "slider", "accordion", "theme-toggle"].includes(ctx.selectedElement.type)) return false;
+      if (["form", "table", "tabs", "slider", "accordion", "theme-toggle", "gallery"].includes(ctx.selectedElement.type)) return false;
       if (["tablist", "tabpanel", "dialog"].includes(el.getAttribute?.("role") ?? "")) return false;
       if (["table", "thead", "tbody", "tr", "td", "th"].includes(el.getTagName().toLowerCase())) return false;
       return !ctx.composer.cms?.bindings?.getCollectionBinding?.(el.getId());

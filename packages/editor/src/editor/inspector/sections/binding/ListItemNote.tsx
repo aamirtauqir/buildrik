@@ -22,7 +22,7 @@ import { Button } from "@/editor/chrome-ui";
 import { EVENTS } from "@/shared/constants/events";
 import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
 import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
-import { useCmsBinding } from "./useCmsBinding";
+import { RECORD_PAGE_HREF, useCmsBinding } from "./useCmsBinding";
 import { GROUP_TITLE } from "@/editor/inspector/shared/controls/controlClasses";
 
 const NOTE = "tw:m-0 tw:py-1 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-soft)]";
@@ -47,7 +47,22 @@ export function ListItemNote({
       <p className={NOTE}>
         Edits to this {name} apply to every {listCollection.name} record.
       </p>
-      {hasLinkSection ? (
+      {hasLinkSection && href === RECORD_PAGE_HREF ? (
+        <>
+          {/* B5-D101: the card's link is a binding — to its record's page. */}
+          <div className={`${GROUP_TITLE} tw:mt-4!`}>Dynamic bindings</div>
+          <Button
+            type="button"
+            variant="link"
+            size="xs"
+            className="tw:h-8 tw:self-center tw:text-[13px] tw:font-normal"
+            onClick={() => composer.emit(EVENTS.UI_INSPECTOR_FOCUS_SECTION, { section: "link" })}
+            data-testid="inspector-list-item-record-link"
+          >
+            Link to · {listCollection.name} record page ›
+          </Button>
+        </>
+      ) : hasLinkSection ? (
         <>
           <div className={`${GROUP_TITLE} tw:mt-4!`}>{name}</div>
           <p className="tw:m-0 tw:py-1 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="inspector-list-item-link">

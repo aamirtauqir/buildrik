@@ -6,8 +6,8 @@
  *   bound    Text   Blog · title
  *                   A clearer point of view
  *                   This page’s record · 1 of 980          ›
- *            Binding status   Empty — showing fallback “Untitled article”.
  *
+ * Its trouble (B5-D11…D15) is the tab's last group, `./BindingStatusSection`.
  * The bind button opens Choose source; a bound row opens the binding detail
  * (`./BindingDetail`). The copy helpers here are shared with the detail and
  * the Dynamic bindings summary.
@@ -20,7 +20,6 @@ import type { Composer } from "@/engine";
 import { IconButton } from "@/editor/chrome-ui";
 import { recordTitle } from "@/editor/cms/RecordsTable";
 import { useInspectorField } from "@/editor/inspector/shared/controls/InspectorFieldContext";
-import { ActionRow, NoteRow } from "../behaviourRows";
 import { ChooseSourcePicker } from "./ChooseSourcePicker";
 import { openSubview } from "@/editor/inspector/tabs/subviewStore";
 import { PROPERTY_LABEL, useCmsBinding, type CmsBindingState } from "./useCmsBinding";
@@ -96,7 +95,6 @@ export function BindingPropertyRow({ composer, elementId, onOpenCreateCollection
     <ChooseSourcePicker state={state} open={picking} onClose={() => setPicking(false)} trigger={trigger} onOpenCreateCollection={onOpenCreateCollection} />
   );
 
-  const status = statusLine(state);
   if (!state.binding) {
     /* 2L9 161:8480: the property's name, its bind button at the right; the
        value itself is on the canvas (and in the image source row). */
@@ -145,24 +143,6 @@ export function BindingPropertyRow({ composer, elementId, onOpenCreateCollection
           {contextLine(state)}
         </span>
       </div>
-      {status ? (
-        <>
-          <NoteRow tone={state.status?.kind === "empty-fallback" || state.status?.kind === "loading" ? "muted" : "error"} testId="binding-status">
-            Binding status · {status}
-          </NoteRow>
-          {state.status?.kind === "failed" ? (
-            <ActionRow onClick={state.retry} testId="binding-retry">
-              Retry
-            </ActionRow>
-          ) : state.status?.kind === "field-missing" || state.status?.kind === "incompatible" ? (
-            picker(
-              <ActionRow onClick={() => setPicking(true)} testId="binding-choose-field">
-                Choose field
-              </ActionRow>,
-            )
-          ) : null}
-        </>
-      ) : null}
     </>
   );
 }

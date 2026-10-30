@@ -62,10 +62,16 @@ export function CollectionQueryRows({ composer, elementId, binding }: { composer
           { value: "desc", label: "Newest first" },
           { value: "asc", label: "Oldest first" },
         ]
-      : [
-          { value: "asc", label: "A–Z / low to high" },
-          { value: "desc", label: "Z–A / high to low" },
-        ];
+      : typeOf(key) === "number"
+        ? [
+            { value: "asc", label: "Low to high" },
+            { value: "desc", label: "High to low" },
+          ]
+        : /* 2L9 B5-D79: a text key reads "A → Z". */
+          [
+            { value: "asc", label: "A → Z" },
+            { value: "desc", label: "Z → A" },
+          ];
   /* No sort stored = today's order, newest updated first. */
   const shown: CmsListSortKey[] = sort.length ? sort : [{ field: "_updated", dir: "desc" }];
   const writeSort = (next: CmsListSortKey[]) => set({ sort: next }, "Sort list");
@@ -129,6 +135,12 @@ export function CollectionQueryRows({ composer, elementId, binding }: { composer
             options={dirOptions(key.field)}
             onChange={(dir) => writeSort(shown.map((k, j) => (j === i ? { ...k, dir: dir as "asc" | "desc" } : k)))}
           />
+          {/* 2L9 B5-D79: with more than one key, a band counts them under the first. */}
+          {i === 0 && shown.length > 1 ? (
+            <div className="tw:my-1 tw:rounded-[4px] tw:bg-[var(--bk-bg-subtle)] tw:py-1.5 tw:text-center tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="collection-sort-count">
+              {shown.length} sort keys
+            </div>
+          ) : null}
         </React.Fragment>
       ))}
       {shown.length < CMS_LIST_SORT_MAX_KEYS ? (

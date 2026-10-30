@@ -24,6 +24,11 @@ import { canWrite } from "@/engine/commands/commandOperations";
 import { pageFileNames } from "@/engine/export";
 import { FIELD_TYPE_LABEL } from "@/editor/cms/fieldTypes";
 
+/** B5-D84: a list copy's link to its own record's generated page — the
+ *  repeater writes the record's path for this token (RepeaterRenderer
+ *  `{{item.url}}`, the collection's URL pattern). */
+export const RECORD_PAGE_HREF = "{{item.url}}";
+
 export type BoundProperty = "src" | "href" | "content";
 export type RecordContext = "list" | "template" | "record";
 

@@ -9,9 +9,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:249:71560 B4-B69/01 Children is the inspector's own container board; this journey board's 'Container content' predates it",
    "verified": "drift-open",
-   "verifiedNote": "Round 12 (bottom bar): already the board's form — the page switcher prints the active page's real path, and the homepage's is '/' ('Home /', toPageSummaries; pinned by usePageSummaries.test + PageSwitcher.test). The '/home' seen in the Vite demo is a page that is NOT the homepage (file glyph), so its real path is shown. The shortcut stays as code defines it: '⇧⌘O to switch' (⌘P is Preview — code:shortcut-cmd-p-is-preview), the board's '⌘P to switch' is not followed. Remaining open: 'Container content · N child elements' (inspector, L-B). | Re-compared 2026-10-30 in the real shell (Vite demo on :5171, Heading + Text inserted, Text selected in Layers): the canvas bar now sits at the top (y56–98) as the board draws it, so 'bar position' is closed; Layers ✕ removed (see 7:19791). Still open, not L-A's: the bottom bar's page switcher reads 'Home /home' where the board reads 'Home /' (the home page's route) and its shortcut hint differs ('⇧⌘O' vs '⌘P', code contract) — lead; 'Container content · N child elements' — inspector, L-B. | probe-compared 2026-10-27 (case canvas-bar at the board's 800 column, shots/7-18654.png): bar CONTENTS match — 'Home / Hero' left, device toggles centred (24 square, tinted active), gray mono '1440 px' chip, outlined '52% ⌄' 82 wide, 'View'. Still open, not L-A's: bar position (top y56, lead3 — A-14), bottom bar 'Saved just now · Details' (lead), Container content note / 'N child elements' (inspector, L-B).",
+   "verifiedNote": "L-B round 27: 'Container content · N child elements' — the journey board's older container body (a note and a '3 child elements' chip). The inspector family's own board B4-B69/01 249:71560 (page 04, drift-fixed) replaces it with Content › Children: 'N direct children', each child opening itself, 'Add blank …' / 'Open Add' (probe ?block=section, scratch lb/t-sec.png). Bottom bar / canvas bar parts were already closed by L-A and the lead (notes below). | Round 12 (bottom bar): already the board's form — the page switcher prints the active page's real path, and the homepage's is '/' ('Home /', toPageSummaries; pinned by usePageSummaries.test + PageSwitcher.test). The '/home' seen in the Vite demo is a page that is NOT the homepage (file glyph), so its real path is shown. The shortcut stays as code defines it: '⇧⌘O to switch' (⌘P is Preview — code:shortcut-cmd-p-is-preview), the board's '⌘P to switch' is not followed. Remaining open: 'Container content · N child elements' (inspector, L-B). | Re-compared 2026-10-30 in the real shell (Vite demo on :5171, Heading + Text inserted, Text selected in Layers): the canvas bar now sits at the top (y56–98) as the board draws it, so 'bar position' is closed; Layers ✕ removed (see 7:19791). Still open, not L-A's: the bottom bar's page switcher reads 'Home /home' where the board reads 'Home /' (the home page's route) and its shortcut hint differs ('⇧⌘O' vs '⌘P', code contract) — lead; 'Container content · N child elements' — inspector, L-B. | probe-compared 2026-10-27 (case canvas-bar at the board's 800 column, shots/7-18654.png): bar CONTENTS match — 'Home / Hero' left, device toggles centred (24 square, tinted active), gray mono '1440 px' chip, outlined '52% ⌄' 82 wide, 'View'. Still open, not L-A's: bar position (top y56, lead3 — A-14), bottom bar 'Saved just now · Details' (lead), Container content note / 'N child elements' (inspector, L-B).",
    "tier": "P1"
   },
   {
@@ -54,9 +54,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:161:8480 B4-I01 is the inspector's own Text board; this journey board's inspector body predates it",
    "verified": "drift-open",
-   "verifiedNote": "Inspector body belongs to L-B (04); canvas/Layers context matches base editor archetype",
+   "verifiedNote": "L-B round 27: the only open part was the Inspector body (canvas/Layers already match). The journey board draws an older Text body (textarea + B/I/U/link + 'Changes save automatically.'); the inspector family's own board B4-I01 161:8480 (page 04, drift-fixed) draws the current one — 'Text' row with bind icon, 'Edit text on canvas', Semantics Tag + ID — and that is what the probe shows (?type=text, scratch lb/t-text.png). The Inspector header line ('Editing Desktop · Default state' vs 'Content · All breakpoints') is the lead's InspectorHeader, Task 1.4. | Inspector body belongs to L-B (04); canvas/Layers context matches base editor archetype",
    "tier": "P1"
   },
   {
@@ -5711,8 +5711,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-B round 2: Map embed Status matches on homes ('Detected: Google Maps' ≈ 'Preview source accepted'). Still open: Gallery 'Choose asset' add and 'Move up / down', Columns 'Reduce count · Review populated content'. | L-B round 25, reference board compared type by type: probe ?block=<id> for every block on the board, the Content and Behavior tabs dumped (scratch b69.mjs) and read against the board's 'editing homes'. Section (Tag, ID, Children), 2 / 3 Columns (Children + 'Add blank column', Gap on Style), Video embed (URL, Ratio, Autoplay/Muted/Controls), Map embed (Location) match on homes. Open: Image gallery's image list (Exact image + Back, Choose asset, Move) is the generic Children list; Columns 'Reduce count · Review populated content' not built; Map URL status line.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 27, probe-compared (?block=gallery / columns3, Content tab, screenshots in scratch lb/g04-*.png) against the board's editing homes: Image gallery now has its own 'Images · N image children' list (each opens the exact <img>; Move up / down per image, one Undo; 'Choose asset' adds an <img> of the picked file styled like the last one — the probe passes no media opener, so that door is unit-tested only, GallerySection.test) and an image of a gallery gets 'Back to {gallery}'. Columns 'Reduce count': 'Review populated content' opens Move (blocks into the column before) / Remove (column with its blocks) / Cancel, each one Undo; an empty last column reads 'Remove empty column'. Map URL status line kept as round 2 matched it. | L-B round 2: Map embed Status matches on homes ('Detected: Google Maps' ≈ 'Preview source accepted'). Still open: Gallery 'Choose asset' add and 'Move up / down', Columns 'Reduce count · Review populated content'. | L-B round 25, reference board compared type by type: probe ?block=<id> for every block on the board, the Content and Behavior tabs dumped (scratch b69.mjs) and read against the board's 'editing homes'. Section (Tag, ID, Children), 2 / 3 Columns (Children + 'Add blank column', Gap on Style), Video embed (URL, Ratio, Autoplay/Muted/Controls), Map embed (Location) match on homes. Open: Image gallery's image list (Exact image + Back, Choose asset, Move) is the generic Children list; Columns 'Reduce count · Review populated content' not built; Map URL status line.",
    "tier": "P1"
   },
   {
@@ -8512,8 +8512,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Lane L-B C-13 (built, not compared): unbound text shows its static value on the type block's 'Text' row with a Bind button; no Dynamic bindings section until bound.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 27, probe-compared on :5172 (inspector-panel ?type=heading&cms=template[&fields=1][&condition=…|&legacyCondition=1|&unbound=1], innerText read against the board's inspector text from the dump; scripts scratch lb/ptxt.mjs, d25.mjs, cond.mjs): unbound heading on a template page: '‹ CMS · Dynamic pages', Title text, Conditions None. The board shows the static value where the inspector's text boards draw 'Edit text on canvas'. Block structure follows the inspector's own boards (161:8480): the block is titled by type ('Heading') with Tag under Semantics, where the CMS boards draw 'Text · Tag H1' inside the block — deliberate, not drift. | Lane L-B C-13 (built, not compared): unbound text shows its static value on the type block's 'Text' row with a Bind button; no Dynamic bindings section until bound.",
    "tier": "P1"
   },
   {
@@ -8579,8 +8579,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Popover: Change field / Open record / Unbind — keep shown text; code shows flat ActionRows (CmsBindingSection.tsx:313,:321)",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 27, probe-compared on :5172 (inspector-panel ?type=heading&cms=template[&fields=1][&condition=…|&legacyCondition=1|&unbound=1], innerText read against the board's inspector text from the dump; scripts scratch lb/ptxt.mjs, d25.mjs, cond.mjs): also screenshot side by side with the board (scratch lb/d07.png): '‹ CMS · Dynamic pages', 'Dynamic bindings' · 'Title text · Blog.title ›', 'Title text' row 'Blog · title / value ⋯', 'This page’s record · i of N', Conditions None. Extra: the '1 binding' count on Dynamic bindings. Block structure follows the inspector's own boards (161:8480): the block is titled by type ('Heading') with Tag under Semantics, where the CMS boards draw 'Text · Tag H1' inside the block — deliberate, not drift. | Popover: Change field / Open record / Unbind — keep shown text; code shows flat ActionRows (CmsBindingSection.tsx:313,:321)",
    "tier": "P1"
   },
   {
@@ -8590,8 +8590,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Unbind keeps text + one undo matches (CmsBindingSection.tsx:214); board adds receipt \"Title is now static text · Undo\"",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 27, probe-compared on :5172 (inspector-panel ?type=heading&cms=template[&fields=1][&condition=…|&legacyCondition=1|&unbound=1], innerText read against the board's inspector text from the dump; scripts scratch lb/ptxt.mjs, d25.mjs, cond.mjs): after Unbind — keep shown text: same as D01 (static text, no Dynamic bindings); the receipt '… is now static text' is unit-tested (binding.test). Block structure follows the inspector's own boards (161:8480): the block is titled by type ('Heading') with Tag under Semantics, where the CMS boards draw 'Text · Tag H1' inside the block — deliberate, not drift. | Unbind keeps text + one undo matches (CmsBindingSection.tsx:214); board adds receipt \"Title is now static text · Undo\"",
    "tier": "P1"
   },
   {
@@ -8624,7 +8624,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Lane L-B C-13 (built, not compared): 'Binding status · Empty — showing fallback “…”.'.",
+   "verifiedNote": "L-B round 27: the status group moved to the tab's end as on 173:14104 (BindingStatusSection); the empty-with-fallback line 'Empty — showing fallback “…”.' is unit-tested. Not compared: the probe's &bindState=empty did not empty the record (updateContentItem in the probe left the title), and the board's 'Draft · not included in live output' context line was not checked. | L-B round 27: built, copy checked against the board text — BindingPropertyRow's status lines read 'Empty — showing fallback “…”' / 'Loading {Collection} records…' / 'Couldn’t load {Collection}. Your binding is kept.' + Retry / '{field} no longer exists. Choose a field.' + Choose field / '{field} is now {Type}. Choose a text field.' (unit-tested in binding.test). Not compared visually: the probe cannot inject an empty record, a load in flight, a failed load or a changed schema. | Lane L-B C-13 (built, not compared): 'Binding status · Empty — showing fallback “…”.'.",
    "tier": "P1"
   },
   {
@@ -8634,8 +8634,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Lane L-B C-13 (built, not compared): 'Loading…' preview and 'Binding status · Loading {Collection} records…'.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 27, probe-compared (new probe hook &bindState=loading|fail|missing|incompatible on ?type=heading&cms=template, a fresh browser context per case — reusing one context leaked the previous run's IndexedDB 'Blog' and turned 'This page’s record' into 'Specific record'; scratch lb/ptxt.mjs). Fixed this round against 173:14104 (screenshot side by side, lb/d13.png): the status is no longer an inline band under the row but the tab's last group — 'Binding status' title, the line (red for a fault, muted for loading / fallback), full-width Retry or Choose field (opens the binding detail, whose Source row holds the field picker) — BindingStatusSection. Loading: row 'Loading…', 'This page’s record' (the count arrives with the records), 'Binding status · Loading Blog records…'. | L-B round 27: built, copy checked against the board text — BindingPropertyRow's status lines read 'Empty — showing fallback “…”' / 'Loading {Collection} records…' / 'Couldn’t load {Collection}. Your binding is kept.' + Retry / '{field} no longer exists. Choose a field.' + Choose field / '{field} is now {Type}. Choose a text field.' (unit-tested in binding.test). Not compared visually: the probe cannot inject an empty record, a load in flight, a failed load or a changed schema. | Lane L-B C-13 (built, not compared): 'Loading…' preview and 'Binding status · Loading {Collection} records…'.",
    "tier": "P1"
   },
   {
@@ -8645,8 +8645,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Lane L-B C-13 (built, not compared): 'Preview unavailable', 'Couldn’t load {Collection}. Your binding is kept.' + Retry.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 27, probe-compared (new probe hook &bindState=loading|fail|missing|incompatible on ?type=heading&cms=template, a fresh browser context per case — reusing one context leaked the previous run's IndexedDB 'Blog' and turned 'This page’s record' into 'Specific record'; scratch lb/ptxt.mjs). Fixed this round against 173:14104 (screenshot side by side, lb/d13.png): the status is no longer an inline band under the row but the tab's last group — 'Binding status' title, the line (red for a fault, muted for loading / fallback), full-width Retry or Choose field (opens the binding detail, whose Source row holds the field picker) — BindingStatusSection. Failed: 'Preview unavailable', 'Couldn’t load Blog. Your binding is kept.', Retry. | L-B round 27: built, copy checked against the board text — BindingPropertyRow's status lines read 'Empty — showing fallback “…”' / 'Loading {Collection} records…' / 'Couldn’t load {Collection}. Your binding is kept.' + Retry / '{field} no longer exists. Choose a field.' + Choose field / '{field} is now {Type}. Choose a text field.' (unit-tested in binding.test). Not compared visually: the probe cannot inject an empty record, a load in flight, a failed load or a changed schema. | Lane L-B C-13 (built, not compared): 'Preview unavailable', 'Couldn’t load {Collection}. Your binding is kept.' + Retry.",
    "tier": "P1"
   },
   {
@@ -8656,8 +8656,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Lane L-B C-13 (built, not compared): '{field} no longer exists. Choose a field.' + Choose field (reopens Choose source).",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 27, probe-compared (new probe hook &bindState=loading|fail|missing|incompatible on ?type=heading&cms=template, a fresh browser context per case — reusing one context leaked the previous run's IndexedDB 'Blog' and turned 'This page’s record' into 'Specific record'; scratch lb/ptxt.mjs). Fixed this round against 173:14104 (screenshot side by side, lb/d13.png): the status is no longer an inline band under the row but the tab's last group — 'Binding status' title, the line (red for a fault, muted for loading / fallback), full-width Retry or Choose field (opens the binding detail, whose Source row holds the field picker) — BindingStatusSection. Field missing: '{field} no longer exists. Choose a field.' + Choose field. | L-B round 27: built, copy checked against the board text — BindingPropertyRow's status lines read 'Empty — showing fallback “…”' / 'Loading {Collection} records…' / 'Couldn’t load {Collection}. Your binding is kept.' + Retry / '{field} no longer exists. Choose a field.' + Choose field / '{field} is now {Type}. Choose a text field.' (unit-tested in binding.test). Not compared visually: the probe cannot inject an empty record, a load in flight, a failed load or a changed schema. | Lane L-B C-13 (built, not compared): '{field} no longer exists. Choose a field.' + Choose field (reopens Choose source).",
    "tier": "P1"
   },
   {
@@ -8667,8 +8667,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Lane L-B C-13 (built, not compared): '{field} is now {Type}. Choose a text field.' + Choose field.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 27, probe-compared (new probe hook &bindState=loading|fail|missing|incompatible on ?type=heading&cms=template, a fresh browser context per case — reusing one context leaked the previous run's IndexedDB 'Blog' and turned 'This page’s record' into 'Specific record'; scratch lb/ptxt.mjs). Fixed this round against 173:14104 (screenshot side by side, lb/d13.png): the status is no longer an inline band under the row but the tab's last group — 'Binding status' title, the line (red for a fault, muted for loading / fallback), full-width Retry or Choose field (opens the binding detail, whose Source row holds the field picker) — BindingStatusSection. Incompatible: 'title is now Image. Choose a text field.' + Choose field. | L-B round 27: built, copy checked against the board text — BindingPropertyRow's status lines read 'Empty — showing fallback “…”' / 'Loading {Collection} records…' / 'Couldn’t load {Collection}. Your binding is kept.' + Retry / '{field} no longer exists. Choose a field.' + Choose field / '{field} is now {Type}. Choose a text field.' (unit-tested in binding.test). Not compared visually: the probe cannot inject an empty record, a load in flight, a failed load or a changed schema. | Lane L-B C-13 (built, not compared): '{field} is now {Type}. Choose a text field.' + Choose field.",
    "tier": "P1"
   },
   {
@@ -8793,8 +8793,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "If-empty fallback committed with Undo receipt; no fallback control in UI though engine supports it",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 27, probe-compared on :5172 (inspector-panel ?type=heading&cms=template[&fields=1][&condition=…|&legacyCondition=1|&unbound=1], innerText read against the board's inspector text from the dump; scripts scratch lb/ptxt.mjs, d25.mjs, cond.mjs): BindingDetail through 'Title text · Blog.title ›': '‹ Back to Content · Title text binding · Source Blog · title · This page’s record · each page shows its own · Format As written · If empty · Preview … · Open record › · Unbind — keep shown text · Keeps “…” as static text.' — row for row with the board. | If-empty fallback committed with Undo receipt; no fallback control in UI though engine supports it",
    "tier": "P1"
   },
   {
@@ -8826,8 +8826,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Inspector Content Conditions (\"Show on every record · + Add rule\"); code edits conditions only in CMS drawer (ContentViews.tsx:651)",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 27, probe-compared on :5172 (inspector-panel ?type=heading&cms=template[&fields=1][&condition=…|&legacyCondition=1|&unbound=1], innerText read against the board's inspector text from the dump; scripts scratch lb/ptxt.mjs, d25.mjs, cond.mjs): Conditions subview, empty: '‹ Back to Content · Conditions · Show this element on every record. · + Add rule · Conditions control visibility. Device visibility stays in Behavior.' — exact. | Inspector Content Conditions (\"Show on every record · + Add rule\"); code edits conditions only in CMS drawer (ContentViews.tsx:651)",
    "tier": "P1"
   },
   {
@@ -8836,9 +8836,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Rule row Match All / source / operator / Remove; code is a free-text path+operator form in the drawer (ContentViews.tsx:722)",
+   "authority": "code:add-rule-is-complete + Add rule writes a whole rule (first field, first operator); no half-made rule exists in the model",
+   "verified": "drift-open",
+   "verifiedNote": "L-B round 27: the board's incomplete rule ('Choose a source…' / 'Choose an operator…' / 'The element stays visible until the rule is complete.') is not how the code adds a rule: + Add rule writes a complete rule on the collection's first field with its first operator (one step, receipt), so there is no incomplete state to show. | Rule row Match All / source / operator / Remove; code is a free-text path+operator form in the drawer (ContentViews.tsx:722)",
    "tier": "P1"
   },
   {
@@ -8902,9 +8902,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Missing path keeps rule, shows on live + Choose field; no path validation in code (fixture source is stored JSON)",
+   "authority": "code:missing-field-evaluates-empty the shared evaluator reads a missing field as empty, so 'will show' would misstate the live result",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 27, probe-compared on :5172 (inspector-panel ?type=heading&cms=template[&fields=1][&condition=…|&legacyCondition=1|&unbound=1], innerText read against the board's inspector text from the dump; scripts scratch lb/ptxt.mjs, d25.mjs, cond.mjs): new this round: a rule whose field the collection no longer has shows '{key} no longer exists — Choose field' (the link focuses that rule's Field select) instead of the empty/false lines. The board's next line, 'Can’t be checked on the live site — this element will show.', is not what the code does: the shared evaluator (packages/shared/schemas/cmsConditions.ts, the one the export and the server run) reads a missing field as empty, so the line says what will happen: 'Read as empty on the live site — this element will hide|show.' Screenshot scratch lb/d35.png. | Missing path keeps rule, shows on live + Choose field; no path validation in code (fixture source is stored JSON)",
    "tier": "P1"
   },
   {
@@ -8914,8 +8914,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Legacy condition inactive until reviewed, Activate/Keep inactive; no legacy state in code",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 27, probe-compared on :5172 (inspector-panel ?type=heading&cms=template[&fields=1][&condition=…|&legacyCondition=1|&unbound=1], innerText read against the board's inspector text from the dump; scripts scratch lb/ptxt.mjs, d25.mjs, cond.mjs): ?legacyCondition=1: 'Not active — from old Conditions · opening_hours.sunday · is set · Remove rule · The existing condition is preserved. The element currently shows on the live site. · Activate condition · Keep inactive · Activation replaces the legacy rule in one Undo step.' — exact. | Legacy condition inactive until reviewed, Activate/Keep inactive; no legacy state in code",
    "tier": "P1"
   },
   {
@@ -8925,8 +8925,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Legacy activated in one Undo + receipt; not in code",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 27, probe-compared on :5172 (inspector-panel ?type=heading&cms=template[&fields=1][&condition=…|&legacyCondition=1|&unbound=1], innerText read against the board's inspector text from the dump; scripts scratch lb/ptxt.mjs, d25.mjs, cond.mjs): an active 'sunday is set' rule on a record whose Sunday is empty: 'Match All · rule card · Remove rule · Sunday is empty. This condition is false. · Hidden on this record — showing as ghost. · + Add rule · privacy note · Open source ›' — exact (rule shows the field's name, the board its path). | Legacy activated in one Undo + receipt; not in code",
    "tier": "P1"
   },
   {
@@ -9025,9 +9025,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Repair chooser keeps original rule; not in code",
+   "authority": "code:missing-field-evaluates-empty the shared evaluator reads a missing field as empty, so 'will show' would misstate the live result",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 27, probe-compared on :5172 (inspector-panel ?type=heading&cms=template[&fields=1][&condition=…|&legacyCondition=1|&unbound=1], innerText read against the board's inspector text from the dump; scripts scratch lb/ptxt.mjs, d25.mjs, cond.mjs): new this round: a rule whose field the collection no longer has shows '{key} no longer exists — Choose field' (the link focuses that rule's Field select) instead of the empty/false lines. The board's next line, 'Can’t be checked on the live site — this element will show.', is not what the code does: the shared evaluator (packages/shared/schemas/cmsConditions.ts, the one the export and the server run) reads a missing field as empty, so the line says what will happen: 'Read as empty on the live site — this element will hide|show.' Screenshot scratch lb/d35.png. Board's 'Choose field' footer button = the inline link. | Repair chooser keeps original rule; not in code",
    "tier": "P1"
   },
   {
@@ -9037,8 +9037,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Repaired rule now true + receipt Undo; not in code",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 27, probe-compared on :5172 (inspector-panel ?type=heading&cms=template[&fields=1][&condition=…|&legacyCondition=1|&unbound=1], innerText read against the board's inspector text from the dump; scripts scratch lb/ptxt.mjs, d25.mjs, cond.mjs): new this round: a true single 'is set' rule reads 'Title is set. This condition is true.' then 'Shown on this record and in published output.' (was 'Shown on this record.'); ConditionsPanel.test. | Repaired rule now true + receipt Undo; not in code",
    "tier": "P1"
   },
   {
@@ -9139,8 +9139,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "\"1 · Inactive\" legacy status; not in code",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 27, probe-compared on :5172 (inspector-panel ?type=heading&cms=template[&fields=1][&condition=…|&legacyCondition=1|&unbound=1], innerText read against the board's inspector text from the dump; scripts scratch lb/ptxt.mjs, d25.mjs, cond.mjs): Content tab with an old condition: Conditions row '1 · Inactive' (exact); rest as D07. Block structure follows the inspector's own boards (161:8480): the block is titled by type ('Heading') with Tag under Semantics, where the CMS boards draw 'Text · Tag H1' inside the block — deliberate, not drift. | \"1 · Inactive\" legacy status; not in code",
    "tier": "P1"
   },
   {
@@ -9150,8 +9150,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Activated legacy \"1 · Hidden\" + receipt; not in code",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 27, probe-compared on :5172 (inspector-panel ?type=heading&cms=template[&fields=1][&condition=…|&legacyCondition=1|&unbound=1], innerText read against the board's inspector text from the dump; scripts scratch lb/ptxt.mjs, d25.mjs, cond.mjs): Content tab with an activated condition false on the record: Conditions '1 · Hidden' (exact); rest as D07. Block structure follows the inspector's own boards (161:8480): the block is titled by type ('Heading') with Tag under Semantics, where the CMS boards draw 'Text · Tag H1' inside the block — deliberate, not drift. | Activated legacy \"1 · Hidden\" + receipt; not in code",
    "tier": "P1"
   },
   {
@@ -9161,8 +9161,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Repaired \"1 · Shown\" + receipt; not in code",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 27, probe-compared on :5172 (inspector-panel ?type=heading&cms=template[&fields=1][&condition=…|&legacyCondition=1|&unbound=1], innerText read against the board's inspector text from the dump; scripts scratch lb/ptxt.mjs, d25.mjs, cond.mjs): Content tab with a repaired condition true on the record: Conditions '1 · Shown' (exact); rest as D07. Block structure follows the inspector's own boards (161:8480): the block is titled by type ('Heading') with Tag under Semantics, where the CMS boards draw 'Text · Tag H1' inside the block — deliberate, not drift. | Repaired \"1 · Shown\" + receipt; not in code",
    "tier": "P1"
   },
   {
@@ -9172,8 +9172,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "\"1 · Needs repair\"; not in code",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 27, probe-compared on :5172 (inspector-panel ?type=heading&cms=template[&fields=1][&condition=…|&legacyCondition=1|&unbound=1], innerText read against the board's inspector text from the dump; scripts scratch lb/ptxt.mjs, d25.mjs, cond.mjs): new this round: Conditions row reads '1 · Needs repair' when a rule's field is gone (conditionsSummary; ConditionsPanel.test). Rest as D07. | \"1 · Needs repair\"; not in code",
    "tier": "P1"
   },
   {
@@ -9195,8 +9195,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Edit active condition, JSON path picker retains rule; no inspector rule editor",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 27, probe-compared on :5172 (inspector-panel ?type=heading&cms=template[&fields=1][&condition=…|&legacyCondition=1|&unbound=1], innerText read against the board's inspector text from the dump; scripts scratch lb/ptxt.mjs, d25.mjs, cond.mjs): same state as D41 (edit an active rule): exact. | Edit active condition, JSON path picker retains rule; no inspector rule editor",
    "tier": "P1"
   },
   {
@@ -9206,8 +9206,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Remove exists in drawer menu (ContentViews.tsx:707); board removes from inspector with Undo receipt",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 27, probe-compared on :5172 (inspector-panel ?type=heading&cms=template[&fields=1][&condition=…|&legacyCondition=1|&unbound=1], innerText read against the board's inspector text from the dump; scripts scratch lb/ptxt.mjs, d25.mjs, cond.mjs): after removing the last rule the subview is the empty state (D28, exact); receipt 'Visibility condition removed · Undo' unit-tested (ConditionsPanel.test D10). | Remove exists in drawer menu (ContentViews.tsx:707); board removes from inspector with Undo receipt",
    "tier": "P1"
   },
   {
@@ -9370,9 +9370,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:engine-list-pages-empty REQUESTS B-30 — no list-binding model for pagination / When empty",
    "verified": "drift-open",
-   "verifiedNote": "Content list panel Source/Filter/Sort/Show/Skip/Split/When empty; code: Collection + Show items (CollectionListSection.tsx:64)",
+   "verifiedNote": "L-B round 27: rows compared by board text (dump) against CollectionQueryRows: Source · Open collection › · Filter · + Add filter · Match · Sort · Direction · + Then by · Show · Skip match (the 'code has only Show items' note below is stale). Missing: 'Pages' (Show first N only / Split into pages), 'When empty' (Show editable No items block / Hide list) and 'Published records only…' — no model; REQUESTS B-30. | Content list panel Source/Filter/Sort/Show/Skip/Split/When empty; code: Collection + Show items (CollectionListSection.tsx:64)",
    "tier": "P1"
   },
   {
@@ -9404,9 +9404,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Editable \"No items\" slot + When empty; not in code",
+   "authority": "blocked:engine-list-pages-empty REQUESTS B-30 — no list-binding model for pagination / When empty",
+   "verified": "drift-open",
+   "verifiedNote": "L-B round 27: the inspector rows on this board match today's list panel (Filter rule Category is …, Sort, + Then by, Show, Skip); the board's point is the editable 'No items' slot and 'When empty' — RepeaterRenderer only hides the template when empty. REQUESTS B-30. | Editable \"No items\" slot + When empty; not in code",
    "tier": "P1"
   },
   {
@@ -9416,8 +9416,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Three sort keys; code has no sort control",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 27, probe-compared (?block=collection-list with a stubbed Blog collection and three keys; scratch lb/d79.mjs / d79.png): Sort Updated · Newest first, the grey '3 sort keys' band (new), Then by Title · A → Z (direction copy now 'A → Z' / 'Z → A' for text keys, 'Low to high' for numbers, Newest/Oldest first for dates), Then by Published on · Newest first; + Then by gone at three keys. The board's lower groups (Pages / When empty) are D75's, B-30. | Three sort keys; code has no sort control",
    "tier": "P1"
   },
   {
@@ -9426,9 +9426,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Split into static pages /page/N; not in code",
+   "authority": "blocked:engine-list-pages-empty REQUESTS B-30 — no list-binding model for pagination / When empty",
+   "verified": "drift-open",
+   "verifiedNote": "L-B round 27: 'Split into pages' → /page/N static pages is an export feature with no model. REQUESTS B-30. | Split into static pages /page/N; not in code",
    "tier": "P1"
   },
   {
@@ -9437,9 +9437,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Pagination URL collision blocks publish; not in code",
+   "authority": "blocked:engine-list-pages-empty REQUESTS B-30 — no list-binding model for pagination / When empty",
+   "verified": "drift-open",
+   "verifiedNote": "L-B round 27: the /page/N URL-collision publish block depends on Split into pages (D80). REQUESTS B-30. | Pagination URL collision blocks publish; not in code",
    "tier": "P1"
   },
   {
@@ -9448,9 +9448,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Related list: filter by this page's category, exclude current record, pagination disabled; not in code",
+   "authority": "blocked:engine-list-pages-empty REQUESTS B-30 — no list-binding model for pagination / When empty",
+   "verified": "drift-open",
+   "verifiedNote": "L-B round 27, by board text: the related list's query is built (Category is This page’s category, 'Exclude this page’s record', 'Filter values follow the record being previewed.', server re-expands per record — B-27). Missing: the Pages group ('Pagination is unavailable on a collection page.') and When empty — REQUESTS B-30. | Related list: filter by this page's category, exclude current record, pagination disabled; not in code",
    "tier": "P1"
   },
   {
@@ -9459,9 +9459,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Card context \"Inside list of Blog · edits affect every copy\" + Link-to binding row; no card context in code",
+   "authority": "superseded:197:29333 D99/D101 draw the same card-in-list Content panel later; their copy is built",
+   "verified": "drift-open",
+   "verifiedNote": "L-B round 27: a card in a list — ListItemNote draws the later boards' copy for the same state: 'Inside list of Blog · Edits to this Card apply to every Blog record.' (B5-D99 197:28410) and, with the record link, 'Dynamic bindings · Link to · Blog record page ›' (B5-D101 197:29333, built this round). D83's '‹ Edit list of Blog', 'Edits to this card template affect every record copy.' and 'Link to · Blog › This record’s page · Edit in Behavior ›' are an earlier wording of the same panel. | Card context \"Inside list of Blog · edits affect every copy\" + Link-to binding row; no card context in code",
    "tier": "P1"
   },
   {
@@ -9471,8 +9471,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Link to \"This record's page\"; LinkSection has no CMS record-page target",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 27, probe-compared (inspector-panel ?type=link, the element moved into a container bound as a Collection list with a stubbed collection; scratch lb/d84.mjs, lb/d84.png / lb/d87.png) side by side with the board: Behavior › Link 'Link to' offers 'This record’s page' only inside a Collection list; choosing it writes href={{item.url}}, which the repeater already resolves to each record's generated page (collection URL pattern); note 'Each {Collection} {element} opens its own generated page.' (D92's sentence, used for D84 too); Open in new tab kept; Rel row and the 'Changing Link to…' hint hidden for this target as the board draws. Header 'Team · link' chip is InspectorHeader (lead). | Link to \"This record's page\"; LinkSection has no CMS record-page target",
    "tier": "P1"
   },
   {
@@ -9515,8 +9515,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Card Link \"Team has no page per record · Create collection page\"; LinkSection lacks record-page target",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 27, probe-compared (inspector-panel ?type=link, the element moved into a container bound as a Collection list with a stubbed collection; scratch lb/d84.mjs, lb/d84.png / lb/d87.png) side by side with the board: a list whose collection makes no pages: 'Link to' reads This record’s page (select stays enabled, so the author can pick another target — the board draws it disabled), '{Collection} has no page per record.', primary 'Create collection page' → opens the collection's Dynamic pages (cmsWorkspace.openRequest + CMS panel). Not drawn: 'You'll return to this card after creating the page.' — there is no return path from Dynamic pages to the card (see D91). | Card Link \"Team has no page per record · Create collection page\"; LinkSection lacks record-page target",
    "tier": "P1"
   },
   {
@@ -9558,9 +9558,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Link destination menu \"This record's page\"; not in code",
+   "authority": "code:no-return-from-dynamic-pages Dynamic pages has no 'return to origin' contract; building the returned state would fake it",
+   "verified": "drift-open",
+   "verifiedNote": "L-B round 27: not built — the state after returning from Create collection page ('Choose link…' + 'Team profile is ready. Choose This record’s page to link each card.' + a Link destination menu on the canvas). The editor has no return from CMS Dynamic pages to the card that sent you there; the choice itself is built (D84/D87). | Link destination menu \"This record's page\"; not in code",
    "tier": "P1"
   },
   {
@@ -9570,8 +9570,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Card linked + receipt Undo; not in code",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 27, probe-compared (inspector-panel ?type=link, the element moved into a container bound as a Collection list with a stubbed collection; scratch lb/d84.mjs, lb/d84.png / lb/d87.png) side by side with the board: linked state matches (This record’s page, 'Each Team card opens its own generated page.', Open in new tab); receipt 'Card linked to its record page · Undo' through InspectorFieldContext.announce (toast + Undo), unit-tested (LinkSection.recordPage.test). Not drawn: the 'You'll return…' line (D91). | Card linked + receipt Undo; not in code",
    "tier": "P1"
   },
   {
@@ -9682,8 +9682,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Card Content binding index \"Link to · Team record page ›\"; not in code",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 27: Content tab of a card in a list whose href is the record-page token: 'Inside list of Team · Edits to this Card apply to every Team record.' then 'Dynamic bindings' and the link 'Link to · Team record page ›' (focuses Behavior › Link), replacing the 'Links to …' line — unit-tested (binding.test ListItemNote); probe-compared (scratch lb/d101.png, a link element in a bound list): the head matches; the board's Card is a container, so the probe's link text block below is the element's own. | Card Content binding index \"Link to · Team record page ›\"; not in code",
    "tier": "P1"
   },
   {
