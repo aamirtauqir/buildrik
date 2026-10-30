@@ -32,6 +32,8 @@ import { resolveTokens } from "./utils/resolveTemplateTokens";
 import { snapshotFromComputedStyle } from "./utils/tokenSnapshot";
 import { DEFAULT_TOKENS } from "@/editor/design-system/constants";
 import { ApplyProgressOverlay, type ApplyStep } from "./ApplyProgressOverlay";
+import { RecentlyDeletedTemplates } from "./components/RecentlyDeletedTemplates";
+import { templateTrash } from "@/services/TemplateTrashService";
 import "./TemplatesTab.css";
 
 /** The sidebar lists the built-in page templates (board 4418:54134). */
@@ -140,6 +142,8 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
   /* "⟳ Reload catalogue" re-reads the saved templates (the built-ins are a
      static module). */
   const [reloadKey, setReloadKey] = React.useState(0);
+  /* B6-T24: "Recently deleted" replaces the main column until ‹ Back. */
+  const [trashOpen, setTrashOpen] = React.useState(false);
   const catalogue = React.useMemo<TemplateItem[]>(
     () => [...PAGE_TEMPLATES, ...getMyTemplates()],
     // eslint-disable-next-line react-hooks/exhaustive-deps -- reloadKey is the trigger
@@ -168,6 +172,24 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
   }
 
   // ── Handlers ──
+  /* B6-T16: a saved template goes to Recently deleted (30 days), with Undo. */
+  async function deleteSaved(t: TemplateItem) {
+    const r = await templateTrash.remove(t.id);
+    setReloadKey((k) => k + 1);
+    if (!r.ok) {
+      addToast({ description: `Couldn’t delete ${t.name}. It is still saved; try again.`, tone: "warning" });
+      return;
+    }
+    addToast({
+      description: `${t.name} moved to Recently deleted`,
+      tone: "info",
+      action: {
+        label: "Undo",
+        onClick: () => void templateTrash.restore(t.id).then(() => setReloadKey((k) => k + 1)),
+      },
+    });
+  }
+
   /** Did the replace in flight take a backup? Read by the success toast. */
   const backupTakenRef = React.useRef(false);
   function handleApplyToCurrent(id: string) {
@@ -531,9 +553,27 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
         <Button variant="link" className="tpl-ws-reload" data-testid="tpl-ws-reload" onClick={() => setReloadKey((k) => k + 1)}>
           ⟳&nbsp;&nbsp;Reload catalogue
         </Button>
+        <Button
+          variant="link"
+          className="tpl-ws-reload"
+          data-testid="tpl-ws-trash"
+          onClick={() => {
+            sel.setPreviewId(null);
+            setTrashOpen(true);
+          }}
+        >
+          Recently deleted
+        </Button>
       </aside>
       <div className="tpl-shell tpl-ws-main">
-      {previewTemplate ? (
+      {trashOpen ? (
+        <RecentlyDeletedTemplates
+          onBack={() => setTrashOpen(false)}
+          onRestored={() => setReloadKey((k) => k + 1)}
+          /* Permanent delete is ADMIN, the same bar as applying a template. */
+          canPurge={canApplyTemplate}
+        />
+      ) : previewTemplate ? (
         /* Board 4418:53202 — the preview lives in the view, not in a modal. */
         <TemplatePreview
           template={previewTemplate}
@@ -595,6 +635,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
                 onClick={(id) => sel.setPreviewId(id)}
                 useLabel={replaceMode ? `Use for ${pageLabel}` : undefined}
                 onUse={replaceMode ? handleApplyToCurrent : undefined}
+                onDelete={tpl.category === "my-templates" ? () => void deleteSaved(tpl) : undefined}
               />
             ))}
           </div>

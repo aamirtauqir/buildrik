@@ -106,6 +106,7 @@ import { LayersLoadError, LayersNoResults } from "@/editor/panels/layers/compone
 import { Row as InsertRow } from "@/editor/sidebar/tabs/build/components/GroupSection";
 import { BuildTab } from "@/editor/sidebar/tabs/build/BuildTab";
 import { LinkSection } from "@/editor/inspector/sections/LinkSection";
+import { TypeChangeDialog } from "@/editor/cms/TypeChangeDialog";
 import { PagePanel } from "@/editor/inspector/components/PagePanel";
 import type { ComponentDefinition } from "@/shared/types/components";
 import { PanelLoadingSkeleton } from "@/editor/shared/PanelStates";
@@ -938,6 +939,28 @@ function trashStub(mode: string) {
         return { result: { data: { json: row } } };
       }
       return { result: { data: { json: null } } };
+    });
+    return new Response(JSON.stringify(body), { status: 200, headers: { "content-type": "application/json" } });
+  }) as typeof fetch;
+}
+
+/* design-2l9 B6-T24…T33 — the saved-template trash with `?siteId=` and
+   `&tplTrash=`: list (Fieldwork home, deleted today), empty, fail (restore
+   refused), hang (restore / purge never answer). */
+let tplTrashStubbed = false;
+function templateTrashStub(mode: string | null) {
+  if (!mode || tplTrashStubbed) return;
+  tplTrashStubbed = true;
+  const row = { templateId: "user-1", name: "Fieldwork home", html: "<section></section>".repeat(7), deletedAt: new Date().toISOString() };
+  window.fetch = (async (input: RequestInfo | URL) => {
+    const href = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+    const procs = new URL(href, location.origin).pathname.split("/api/trpc/")[1]?.split(",") ?? [];
+    if (mode === "hang" && procs.some((p) => p !== "userTemplates.trash.list")) return new Promise<Response>(() => {});
+    const body = procs.map((name) => {
+      if (name === "userTemplates.trash.list") return { result: { data: { json: mode === "empty" ? [] : [row] } } };
+      if (name === "userTemplates.trash.restore" && mode === "fail") return { error: { json: { message: "boom", code: -1, data: { code: "INTERNAL_SERVER_ERROR", httpStatus: 500 } } } };
+      if (name === "userTemplates.trash.restore") return { result: { data: { json: { ...row, category: null, description: null, css: null, thumbnail: null, updatedAt: row.deletedAt } } } };
+      return { result: { data: { json: { success: true } } } };
     });
     return new Response(JSON.stringify(body), { status: 200, headers: { "content-type": "application/json" } });
   }) as typeof fetch;
@@ -3991,6 +4014,30 @@ const CASES: Record<string, () => React.ReactElement> = {
       </div>
     );
   },
+  /* 257:51318 / 257:51906 / 257:52092 / 257:52512 — Change Reading time type
+     over 20 stored numbers. Click Convert / Clear: `&apply=hang` holds the
+     write open (pending), `&apply=fail` refuses it. */
+  "cms-type-change": () => {
+    const apply = new URLSearchParams(location.search).get("apply");
+    const titles = ["Intro to grids", "Design systems", "Client handoff", "Accessible forms", "Responsive layouts"];
+    const records = Array.from({ length: 20 }, (_, i) => ({
+      id: `r${i}`, collectionId: "blog", status: "published", createdAt: "", updatedAt: "",
+      data: { title: titles[i] ?? `Post ${i + 1}`, reading: [5, 8, 4, 10, 6][i] ?? 3 },
+    }));
+    return (
+      <ToastProvider>
+        <TypeChangeDialog
+          collection={{ id: "blog", name: "Blog", slug: "blog", displayField: "title", fields: [{ id: "f-title", name: "Title", slug: "title", type: "text", order: 0 }] } as never}
+          field={{ id: "f-rt", name: "Reading time", slug: "reading", type: "number", order: 1 } as never}
+          to={"text" as never}
+          records={records as never}
+          usedBy={0}
+          onClose={() => {}}
+          onApply={() => (apply === "fail" ? Promise.reject(new Error("refused")) : new Promise(() => {}))}
+        />
+      </ToastProvider>
+    );
+  },
   "issues-filtered": () => (
     <div data-probe="issues-filtered" className="tw:h-203 tw:w-90 tw:bg-white">
       <IssuesPanel
@@ -4298,7 +4345,7 @@ const CASES: Record<string, () => React.ReactElement> = {
      FullPageRouter mount in the slot between the rail (56) and the bottom
      bar (868), under the topbar (56). */
   "templates-resource-area": () => (
-    <div data-probe="templates-resource-area">
+    <div data-probe="templates-resource-area" ref={() => templateTrashStub(new URLSearchParams(location.search).get("tplTrash"))}>
       <ToastProvider>
         <div style={{ position: "fixed", inset: "0 0 auto 0", height: 56, background: "white", borderBottom: "1px solid var(--bk-border)" }} />
         <div style={{ position: "fixed", left: 0, top: 56, width: 56, bottom: 32, borderRight: "1px solid var(--bk-border)" }} />

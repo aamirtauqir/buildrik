@@ -26,3 +26,23 @@ export const deleteUserTemplateSchema = z.object({ siteId: z.string(), templateI
 export type UpsertUserTemplateInput = z.infer<typeof upsertUserTemplateSchema>;
 export type ListUserTemplatesInput = z.infer<typeof listUserTemplatesSchema>;
 export type DeleteUserTemplateInput = z.infer<typeof deleteUserTemplateSchema>;
+
+/* Saved-template trash — "Recently deleted" (design-2l9 B6-T24…T33). A
+   deleted saved template stays restorable for this many days, then the
+   retention purge removes it. */
+export const USER_TEMPLATE_TRASH_RETENTION_DAYS = 30;
+
+export const restoreUserTemplateSchema = z.object({ siteId: z.string(), templateId: z.string() });
+/** Permanent delete: the template's name typed back (B6-T30/T31). */
+export const purgeUserTemplateSchema = z.object({ siteId: z.string(), templateId: z.string(), confirmName: z.string() });
+
+export const trashedUserTemplateSchema = z.object({
+  templateId: z.string(),
+  name: z.string(),
+  html: z.string(),
+  deletedAt: z.coerce.date(),
+});
+
+export type RestoreUserTemplateInput = z.infer<typeof restoreUserTemplateSchema>;
+export type PurgeUserTemplateInput = z.infer<typeof purgeUserTemplateSchema>;
+export type TrashedUserTemplate = z.infer<typeof trashedUserTemplateSchema>;
