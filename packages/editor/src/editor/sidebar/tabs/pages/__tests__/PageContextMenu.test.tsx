@@ -234,6 +234,15 @@ describe("PageContextMenu — 6883:69130", () => {
     expect(screen.getByTestId("pages-menu-move-reason").textContent).toBe("Pages in a folder can’t be reordered.");
   });
 
+  it("a folder member's menu names its folder; the reason follows the pair, then Remove (127:39528 / 134:44345)", () => {
+    const follows = (a: Element, b: Element) => !!(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
+    render(<PageContextMenu pageId="p2" {...baseProps} rootPosition={null} folderName="Client projects" />);
+    expect(screen.getByTestId("pages-menu-title").textContent).toBe("About · In Client projects");
+    const reason = screen.getByTestId("pages-menu-move-reason");
+    expect(follows(screen.getByTestId("pages-menu-move-down"), reason)).toBe(true);
+    expect(follows(reason, screen.getByTestId("pages-menu-remove-folder"))).toBe(true);
+  });
+
   it("puts the reason under the move it blocks (137:56781 first · 137:56060 last)", () => {
     const follows = (a: Element, b: Element) => !!(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
     const { rerender } = render(<PageContextMenu pageId="p1" {...baseProps} rootPosition={{ index: 0, count: 3 }} />);

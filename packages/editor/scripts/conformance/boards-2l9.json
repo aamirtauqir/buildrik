@@ -685,8 +685,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Built 2026-10-30, not image-compared: with the URL corrected, the pending foot's Save and leave enables and runs the same real save-and-leave (101:23017 / 101:23620).",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-30 (case pages-settings-leave: URL cleared → ✕ → Fix page URL → 'about'; board shots/101-25436.png): the pending foot 'After saving: return to Pages · Home stays open', Cancel navigation · Save and leave (enabled once the URL is valid, runs the real save-and-leave). Fixed: the focused URL field is ringed as ONE '/about' field — the input's own ring/outline painted over the '/' beside it. The board's 'Unsaved settings changes' subtitle needs a dirty title, which the recipe does not make.",
    "tier": "P1"
   },
   {
@@ -707,8 +707,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Built 2026-10-30, not image-compared: Cancel navigation during the save closes only the guard; the save carries on and, when it lands, the dialog stays open (test PageSettingsDrawer.returnFlow 'Cancel navigation stops the leaving, not the save').",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-30 (case pages-settings-leave&save=hang: dirty URL → ✕ → Save and leave → Cancel navigation; board shots/101-28183.png): built to the board — subtitle 'About · Saving settings… · Navigation cancelled', the form read-only while the real save runs (fields, select and links greyed), 'When this save finishes, you’ll stay in About settings.' under the override note, Cancel and Save disabled. The save carries on and the dialog stays when it lands (test PageSettingsDrawer.returnFlow).",
    "tier": "P1"
   },
   {
@@ -1352,8 +1352,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Folders are personal (tip copy); board inline name + 'Create folder' and receipt",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-30 (case pages-shell, New folder → type 'Client projects'; board shots/127-36696.png): built to the board — New folder no longer makes 'New Folder' and opens it in rename; it opens a 255×152 grey card under My folders (shown even with no folders): 'New folder', a 28-tall name field, 'Only you see this folder. Page URLs stay the same.', Create folder (128, disabled until a name) · Cancel (88). Nothing is made until Create folder; Cancel / Escape leave nothing. Tests PageList 'new folder draft'.",
    "tier": "P1"
   },
   {
@@ -1364,7 +1364,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Folders are personal (tip copy); board inline name + 'Create folder' and receipt",
+   "verifiedNote": "probe-compared 2026-10-30 (same recipe, then Create folder; board shots/127-37393.png): the list matches — 'Client projects · 0 pages · Folder' under Studio — and the receipt reads 'Client projects created · Only visible to you'. Open: the receipt is the shared chrome-ui Toast (✕ icon, its own position), the board draws a text 'Close'; not forked here.",
    "tier": "P1"
   },
   {
@@ -1384,9 +1384,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:requests-13-folder-undo",
    "verified": "drift-open",
-   "verifiedNote": "L-A S6: receipt '{Page} moved to {Folder} · {url} unchanged' built; the board's Undo is not offered — folders are not composer history (REQUESTS #13). Not compared.",
+   "verifiedNote": "probe-compared 2026-10-30 (board shots/127-38819.png): receipt 'About moved to Studio · /about unchanged' is built (shared Toast). Blocked: the board's Undo needs folder moves in composer history (REQUESTS #13); not stubbed.",
    "tier": "P1"
   },
   {
@@ -1395,9 +1395,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "founder:order-commands-in-row-menu",
    "verified": "drift-open",
-   "verifiedNote": "L-A S6 built, not compared: in a folder Move up/down are disabled with 'Pages in a folder can’t be reordered.'",
+   "verifiedNote": "probe-compared 2026-10-30 (case pages-folder-menu; board shots/127-39528.png). Fixed: the title names the folder ('About · In Client projects'), the reason 'Pages in a folder can’t be reordered.' follows the disabled Move up / Move down pair, and 'Remove from {Folder}' comes after it, as the board orders them. The board's short folder-scoped menu (centred grey buttons) is not a separate menu: per the owner's 2026-10-27 call (137:55343 family) order commands live in the one page ⋯ menu, so a folder member keeps Rename, Duplicate, Page settings, Delete etc. around them.",
    "tier": "P1"
   },
   {
@@ -1451,8 +1451,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-A S6 built, not compared: '{Page} is already at the top level. No change is needed.' + disabled 'Already at top level'.",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-30 (case pages-move-one, click 'Top level (no folder)'; board shots/131-40341.png): picked pill on Top level, 'About is already at the top level. No change is needed.', Cancel · disabled 'Already at top level'. Fixed: the action pair now 88 / 208 wide as the board draws it (was label-driven 77 / 151) — also closes 127:38098's noted primary-width gap.",
    "tier": "P1"
   },
   {
@@ -1532,9 +1532,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "founder:order-commands-in-row-menu",
    "verified": "drift-open",
-   "verifiedNote": "L-A S6: folder member menu shows the disabled pair + reason and 'Remove from {Folder}'. The board's folder-scoped short menu ('About · In Studio') is the full menu here. Not compared.",
+   "verifiedNote": "probe-compared 2026-10-30 (case pages-folder-menu; board shots/134-44345.png). Fixed: the title names the folder ('About · In Client projects'), the reason 'Pages in a folder can’t be reordered.' follows the disabled Move up / Move down pair, and 'Remove from {Folder}' comes after it, as the board orders them. The board's short folder-scoped menu (centred grey buttons) is not a separate menu: per the owner's 2026-10-27 call (137:55343 family) order commands live in the one page ⋯ menu, so a folder member keeps Rename, Duplicate, Page settings, Delete etc. around them.",
    "tier": "P1"
   },
   {

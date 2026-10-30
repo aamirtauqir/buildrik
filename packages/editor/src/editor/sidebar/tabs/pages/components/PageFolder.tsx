@@ -43,8 +43,6 @@ interface Props {
   onRenameCommit: (id: string, name: string, updateUrl?: boolean) => void;
   onRenameCancel: () => void;
   onDrop: (pageId: string) => void;
-  /** A folder just made by "New folder" opens in rename (L3-012). */
-  startRenaming?: boolean;
 }
 
 export const PageFolder: React.FC<Props> = ({
@@ -67,11 +65,10 @@ export const PageFolder: React.FC<Props> = ({
   onRenameCommit,
   onRenameCancel,
   onDrop,
-  startRenaming = false,
 }) => {
   const [isDragOver, setIsDragOver] = React.useState(false);
   const [menuOpen, setMenuOpen] = React.useState(false);
-  const [isRenamingFolder, setIsRenamingFolder] = React.useState(startRenaming);
+  const [isRenamingFolder, setIsRenamingFolder] = React.useState(false);
   const [renameValue, setRenameValue] = React.useState(folder.name);
   const renameInputRef = React.useRef<HTMLInputElement>(null);
 

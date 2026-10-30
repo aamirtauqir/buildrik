@@ -19,6 +19,7 @@ import type { FolderItem, PageItem } from "../types";
 import type { CollectionPagesRow } from "../useDynamicPagesSummary";
 import { AddPageButton } from "./AddPageButton";
 import { BulkToolbar } from "./BulkToolbar";
+import { NewFolderDraft } from "./NewFolderDraft";
 import { PageFolder } from "./PageFolder";
 import { PageRow, ROW_SUB, ROW_TAG } from "./PageRow";
 
@@ -54,8 +55,10 @@ interface Props {
   onRetry: () => void;
   onAddPage: () => void;
   onAddFolder: () => void;
-  /** The folder "New folder" just made — it opens in rename (L3-012). */
-  newFolderId?: string | null;
+  /** 127:36696 — "New folder" asks for the name in a card under My folders. */
+  draftingFolder?: boolean;
+  onCreateFolder: (name: string) => void;
+  onCancelFolderDraft: () => void;
   onSelectPage: (id: string) => void;
   onToggleSelect: (id: string, e: React.MouseEvent | React.KeyboardEvent) => void;
   onBulkDuplicate: () => void;
@@ -100,7 +103,9 @@ export const PageList: React.FC<Props> = ({
   onRetry,
   onAddPage,
   onAddFolder,
-  newFolderId = null,
+  draftingFolder = false,
+  onCreateFolder,
+  onCancelFolderDraft,
   onSelectPage,
   onToggleSelect,
   onBulkDuplicate,
@@ -295,7 +300,7 @@ export const PageList: React.FC<Props> = ({
             {/* Board 63:6393: root pages first, then the personal folders under
                 their own heading — a second tree, since a tree owns only
                 treeitems and the heading is not one. */}
-            {!search && folders.length > 0 && (
+            {!search && (folders.length > 0 || draftingFolder) && (
               <>
               <div className={SECTION_HEAD} data-testid="pages-folders-head">
                 <span className={SECTION_TITLE} id="pages-folders-title">My folders</span>
@@ -321,7 +326,6 @@ export const PageList: React.FC<Props> = ({
                   onToggleSelect={onToggleSelect}
                   onToggle={() => onFolderToggle(folder.id)}
                   onFolderRename={(name) => onFolderRename(folder.id, name)}
-                  startRenaming={folder.id === newFolderId}
                   onFolderDelete={() => onFolderDelete(folder.id)}
                   onSelectPage={onSelectPage}
                   onContextMenu={onContextMenu}
@@ -333,6 +337,7 @@ export const PageList: React.FC<Props> = ({
               );
             })}
               </div>
+              {draftingFolder && <NewFolderDraft onCreate={onCreateFolder} onCancel={onCancelFolderDraft} />}
               </>
             )}
             {!search && collectionPages.length > 0 && (

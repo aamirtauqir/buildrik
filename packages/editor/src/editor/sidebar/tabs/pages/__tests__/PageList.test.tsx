@@ -29,6 +29,8 @@ function makeProps(overrides: Partial<React.ComponentProps<typeof PageList>> = {
     onRetry: vi.fn(),
     onAddPage: vi.fn(),
     onAddFolder: vi.fn(),
+    onCreateFolder: vi.fn(),
+    onCancelFolderDraft: vi.fn(),
     onSelectPage: vi.fn(),
     onToggleSelect: vi.fn(),
     onBulkDuplicate: vi.fn(),
@@ -211,5 +213,30 @@ describe("PageList — sections (board 63:6393)", () => {
     expect(screen.getByRole("tree", { name: "Pages" })).not.toContainElement(screen.getByTestId("pages-collections"));
     rerender(<PageList {...makeProps({ collectionPages: [blog], search: "ab" })} />);
     expect(screen.queryByTestId("pages-collections")).not.toBeInTheDocument();
+  });
+});
+
+/* design-2l9 127:36696 — "New folder" names the folder before making it. */
+describe("PageList — new folder draft", () => {
+  it("shows My folders with the draft even with no folders, and creates only on Create folder", () => {
+    const onCreateFolder = vi.fn();
+    render(<PageList {...makeProps({ folders: [], draftingFolder: true, onCreateFolder })} />);
+    expect(screen.getByText("My folders")).toBeInTheDocument();
+    expect(screen.getByText("Only you see this folder. Page URLs stay the same.")).toBeInTheDocument();
+    const create = screen.getByTestId("pages-new-folder-create");
+    expect(create).toBeDisabled();
+    fireEvent.change(screen.getByLabelText("New folder"), { target: { value: "  Client projects " } });
+    fireEvent.click(create);
+    expect(onCreateFolder).toHaveBeenCalledWith("Client projects");
+  });
+
+  it("Cancel and Escape leave no folder", () => {
+    const onCancelFolderDraft = vi.fn();
+    const onCreateFolder = vi.fn();
+    render(<PageList {...makeProps({ folders: [], draftingFolder: true, onCreateFolder, onCancelFolderDraft })} />);
+    fireEvent.keyDown(screen.getByLabelText("New folder"), { key: "Escape" });
+    fireEvent.click(screen.getByTestId("pages-new-folder-cancel"));
+    expect(onCancelFolderDraft).toHaveBeenCalledTimes(2);
+    expect(onCreateFolder).not.toHaveBeenCalled();
   });
 });

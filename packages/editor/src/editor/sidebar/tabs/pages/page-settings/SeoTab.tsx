@@ -42,7 +42,7 @@ const BANNER = "tw:bg-[var(--bk-warning-tint)] tw:border tw:border-[var(--bk-war
 const FIELD = "tw:flex tw:flex-col tw:gap-1.5";
 /* Board 63:15939: 13/600 ink labels; blue text links set in from the edge. */
 const LABEL_TEXT = "tw:text-[13px] tw:font-semibold tw:text-[var(--bk-ink)]";
-const LINK = "tw:self-start tw:h-7 tw:min-h-0 tw:px-6 tw:text-[length:var(--bk-text-13)] tw:font-medium tw:text-[var(--bk-accent-text)]";
+const LINK = "tw:self-start tw:h-7 tw:min-h-0 tw:px-6 tw:text-[length:var(--bk-text-13)] tw:font-medium tw:text-[var(--bk-accent-text)] tw:disabled:opacity-40";
 /* Density-32 buttons: flowbite `size="xs"` supplies the h-8, these the rest. */
 const BTN_32 = "tw:rounded-[var(--bk-radius-md)] tw:text-[length:var(--bk-text-13)] tw:font-medium tw:focus:ring-0 tw:focus:[box-shadow:var(--bk-shadow-focus)]";
 /* 63:17617: "Add redirect" is an outlined white button. */
@@ -172,18 +172,20 @@ export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, onOpe
       {/* ── 5. URL SLUG ─────────────────────────────────────────────────── */}
       <div className={FIELD} data-testid="seo-field-slug">
         <Label htmlFor="seo-slug" className={BK_LABEL_CLASS} data-testid="seo-label-slug">Page URL</Label>
-        <div className="tw:flex tw:items-stretch">
+        {/* 101:25436 rings the whole "/about" field while it has focus — the
+            input's own ring painted over the "/" beside it. */}
+        <div className="tw:flex tw:items-stretch tw:rounded-md tw:focus-within:outline tw:focus-within:outline-1 tw:focus-within:outline-primary-700">
           {/* Board 63:15939 reads "/about" in one filled field. */}
           <span
             aria-hidden="true"
-            className={`tw:inline-flex tw:items-center tw:pl-2.5 tw:rounded-l-md tw:bg-[var(--bk-gray-100)] tw:text-[var(--bk-ink)] tw:text-[13px] ${UI}`}
+            className={`tw:inline-flex tw:items-center tw:pl-2.5 tw:rounded-l-md tw:bg-[var(--bk-gray-100)] tw:text-[var(--bk-ink)] tw:in-disabled:text-[var(--bk-ink-disabled)] tw:text-[13px] ${UI}`}
           >
             /
           </span>
           {/* The input's own border-radius/type face live on theme.field.input,
               which a caller theme would REPLACE leaf-wise (losing the token
               colours) — so reach the real <input> with a descendant variant. */}
-          <div className={`tw:flex-1 tw:min-w-0 tw:[&_input]:rounded-l-none tw:[&_input]:pl-0`}>
+          <div className={`tw:flex-1 tw:min-w-0 tw:[&_input]:rounded-l-none tw:[&_input]:pl-0 tw:[&_input:focus]:ring-0! tw:[&_input:focus]:border-transparent! tw:[&_input:focus]:outline-none!`}>
             <TextInput
               id="seo-slug"
               sizing="sm"

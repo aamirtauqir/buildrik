@@ -152,7 +152,8 @@ export const PageContextMenu: React.FC<Props> = ({
             split it into make · organise · settings · delete, Delete page is
             red, and "Close menu" ends it. */}
         <div className="tw:px-2 tw:pt-1 tw:text-[12px] tw:leading-4 tw:font-semibold tw:text-[var(--bk-ink)]" data-testid="pages-menu-title">
-          {page?.name ?? "Page"}
+          {/* 127:39528 / 134:44345 — a folder member's menu names its folder. */}
+          {folderName ? `${page?.name ?? "Page"} · In ${folderName}` : (page?.name ?? "Page")}
         </div>
         <MenuItem className={ROW} data-testid="pages-menu-rename" onClick={() => act(() => onRename(pageId))}>
           Rename…
@@ -175,11 +176,6 @@ export const PageContextMenu: React.FC<Props> = ({
         <MenuItem className={ROW} data-testid="pages-menu-move-folder" onClick={() => act(() => onMoveToFolder(pageId))}>
           Move to folder…
         </MenuItem>
-        {folderName && (
-          <MenuItem className={ROW} data-testid="pages-menu-remove-folder" onClick={() => act(() => onRemoveFromFolder(pageId))}>
-            Remove from {folderName}
-          </MenuItem>
-        )}
         {/* Owner decision A-17 (boards 137:55343 / 137:56060 / 137:56781):
             the order commands live here, with their chords, and a boundary's
             reason sits under the move it blocks. */}
@@ -191,7 +187,7 @@ export const PageContextMenu: React.FC<Props> = ({
         >
           Move up
         </MenuItem>
-        {moveReason && (rootPosition === null || isFirst) && (
+        {moveReason && rootPosition !== null && isFirst && (
           <p className={MENU_NOTE} data-testid="pages-menu-move-reason">
             {moveReason}
           </p>
@@ -204,10 +200,17 @@ export const PageContextMenu: React.FC<Props> = ({
         >
           Move down
         </MenuItem>
-        {moveReason && rootPosition !== null && !isFirst && (
+        {/* A folder member's reason covers both moves, so it follows the pair
+            and "Remove from <folder>" comes after it (127:39528 / 134:44345). */}
+        {moveReason && (rootPosition === null || !isFirst) && (
           <p className={MENU_NOTE} data-testid="pages-menu-move-reason">
             {moveReason}
           </p>
+        )}
+        {folderName && (
+          <MenuItem className={ROW} data-testid="pages-menu-remove-folder" onClick={() => act(() => onRemoveFromFolder(pageId))}>
+            Remove from {folderName}
+          </MenuItem>
         )}
         <MenuItem className={ROW} data-testid="pages-menu-copy-link" onClick={() => act(() => onCopyLink(pageId))}>
           Copy link

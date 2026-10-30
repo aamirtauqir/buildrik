@@ -167,14 +167,9 @@ describe("PageFolder (flat model)", () => {
   });
 });
 
-/* L3-012: "New folder" made a folder called "New Folder" and left it there —
-   the naming step was skipped. A just-created folder opens in rename. */
-describe("PageFolder — a new folder starts in rename", () => {
-  it("opens its name field when created", () => {
-    render(<PageFolder folder={{ ...folder, name: "New Folder" }} pages={[]} {...baseProps} startRenaming />);
-    expect(screen.getByLabelText("Rename folder")).toHaveValue("New Folder");
-  });
-
+/* design-2l9 127:36696 — "New folder" asks for the name first, so a
+   folder never mounts already in rename. */
+describe("PageFolder — no folder opens in rename by itself", () => {
   it("an existing folder does not", () => {
     render(<PageFolder folder={folder} pages={pages} {...baseProps} />);
     expect(screen.queryByLabelText("Rename folder")).toBeNull();
