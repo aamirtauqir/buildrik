@@ -127,30 +127,32 @@ describe("IntegrationRow", () => {
 });
 
 describe("CommentRow", () => {
-  /* The status dot is never the only carrier: boards 156:2 / 157:109 put the
-     author, their kind and the age in one meta line under the comment. The
-     casing follows the boards ("Sara · client · Home · 2d"). */
-  it("names the client in words, not by a dot or a tint", () => {
-    render(
-      <CommentRow author="Hina Raza" authorKind="client" body="Move the hero up" meta="Home · 2d" />,
-    );
-    expect(screen.getByText(/Hina Raza · client · Home · 2d/)).toBeTruthy();
+  /* 2L9 B8-R01 (237:8258): who, where and when lead — "Lena (client) · Logo ·
+     2m" — then the quote. */
+  it("leads with the author and their kind in words", () => {
+    render(<CommentRow author="Hina Raza" authorKind="client" body="Move the hero up" meta="Logo · 2d" />);
+    expect(screen.getByText("Hina Raza (client) · Logo · 2d")).toBeTruthy();
   });
 
-  /* L5-035: the Review panel passes "You" for a team comment, and the kind
-     word repeated it — "You · you · Home · 1m". */
-  it("does not repeat the author as its kind ('You · Home', not 'You · you')", () => {
-    render(<CommentRow author="You" authorKind="internal" body="Tighten this" meta="Home · 1m" index={3} />);
-    expect(screen.getByTestId("review-comment-meta-3").textContent).toBe("You · Home · 1m");
+  it("names a team comment (team), and lets 'You' say its own kind", () => {
+    render(<CommentRow author="Ali" authorKind="internal" body="Check contrast" meta="Hero · 1d" index={2} />);
+    expect(screen.getByTestId("review-comment-meta-2").textContent).toBe("Ali (team) · Hero · 1d");
+    render(<CommentRow author="You" authorKind="internal" body="Tighten this" meta="1m" index={3} />);
+    expect(screen.getByTestId("review-comment-meta-3").textContent).toBe("You · 1m");
   });
 
-  it("quotes the comment — it is the row's headline, not its footnote", () => {
+  it("wears the canvas pin's number", () => {
+    render(<CommentRow author="Lena" authorKind="client" body="Bigger logo" pin={1} index={0} />);
+    expect(screen.getByLabelText("Pin 1").textContent).toBe("1");
+  });
+
+  it("quotes the comment", () => {
     render(<CommentRow author="Hina Raza" authorKind="client" body="Move the hero up" />);
     expect(screen.getByText(/“Move the hero up”/)).toBeTruthy();
   });
 
-  it("says 'resolved' in the meta line as well as colouring the dot", () => {
-    render(<CommentRow author="Ali" body="footer link dead" resolved meta="Home · 3d" />);
+  it("says 'Resolved' in words", () => {
+    render(<CommentRow author="Ali" body="footer link dead" resolved meta="3d" />);
     expect(screen.getByText(/· Resolved$/)).toBeTruthy();
   });
 });

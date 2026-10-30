@@ -30,6 +30,8 @@ interface MarkerLog {
 }
 
 const logs = new WeakMap<Composer, MarkerLog>();
+/* One empty list, so a store read with no log yet is referentially stable. */
+const NONE: readonly HistorySessionMarker[] = [];
 
 function notify(log: MarkerLog): void {
   log.markers = [...log.markers];
@@ -74,7 +76,7 @@ export function recordHistoryCleared(composer: Composer): void {
 }
 
 export function getHistorySessionMarkers(composer: Composer): readonly HistorySessionMarker[] {
-  return logs.get(composer)?.markers ?? [];
+  return logs.get(composer)?.markers ?? NONE;
 }
 
 export function subscribeHistorySessionMarkers(composer: Composer, fn: () => void): () => void {

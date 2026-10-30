@@ -4498,10 +4498,12 @@ const CASES: Record<string, () => React.ReactElement> = {
   // Neither state is reachable by clicking: both need a round, a client, and
   // comments — and the Detached group additionally needs the orphan
   // announcement only the canvas CommentLayer makes.
+  /* ?status=CHANGES_REQUESTED draws B8-R05's next-round foot. */
   "review-panel-detached-present": () => {
+    const status = new URLSearchParams(location.search).get("status");
     trpcStub({
       "comments.list": () => REVIEW_COMMENTS,
-      "reviews.currentRound": () => REVIEW_ROUND(),
+      "reviews.currentRound": () => REVIEW_ROUND(status ? { status } : {}),
       "sites.myRole": () => "OWNER",
     });
     return reviewHost(
@@ -5127,7 +5129,7 @@ const CASES: Record<string, () => React.ReactElement> = {
   ),
   /* The whole Site settings tab (L-G round 2) — nav, header, footer and the
      screen, for the footer / load / role / Analytics states of page 06.
-     ?siteId=probe-site&screen=analytics&role=ADMIN
+     ?siteId=probe-site&screen=analytics&role=ADMIN   (role=hang: the lookup never answers)
        &status=none|receiving|hang|fail|verifyhang|verifyfail  (siteDetail.analyticsStatus)
        &read=ok|hang|fail                (siteDetail.settings.get)
        &save=ok|hang|fail                (every mutation)
@@ -5165,6 +5167,7 @@ const CASES: Record<string, () => React.ReactElement> = {
         enabledLocales: ["en-US", "de-DE"],
         autoRedirectLocale: false,
       },
+      "siteDetail.domains.list": [{ id: "d1", domain: "fieldwork.studio", status: "ACTIVE", isPrimary: true, forceHttps: true, dnsRecords: [] }],
       "siteDetail.locales": {
         locales: [
           { code: "en-US", path: "/", translated: 12, total: 12, status: "LIVE", pending: [] },
@@ -5179,7 +5182,9 @@ const CASES: Record<string, () => React.ReactElement> = {
       const isMutation = (init?.method ?? "GET").toUpperCase() === "POST";
       const pick = isMutation
         ? mode("save", "ok")
-        : procs.includes("siteDetail.analyticsStatus")
+        : procs.includes("sites.myRole") && role === "hang"
+          ? "hang"
+          : procs.includes("siteDetail.analyticsStatus")
           ? statusMode()
           : procs.includes("siteDetail.settings.get") || procs.includes("siteDetail.locales")
             ? mode("read", "ok")

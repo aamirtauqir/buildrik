@@ -103,9 +103,13 @@ afterEach(() => {
 });
 
 describe("the frame every board shares (board 4418:115784)", () => {
-  it("is one status line — counts and who it waits on; no progress bar, no round strip, no Compare button", async () => {
+  /* 2L9 B8-R01: the round card says where the round stands; the filter row
+     leads with the counts. */
+  it("a round card and a counts line; no progress bar, no round strip, no Compare button", async () => {
     renderTab();
-    expect(await screen.findByTestId("review-status-line")).toHaveTextContent("2 open · 1 resolved · Awaiting Sara Khan");
+    expect(await screen.findByTestId("review-status-line")).toHaveTextContent("2 open · 1 resolved");
+    expect(screen.getByTestId("review-banner-line").textContent).toMatch(/^◐ Awaiting · Sara Khan/);
+    expect(screen.getByTestId("panel-header-subtitle").textContent).toMatch(/Round \d+$/);
     expect(screen.queryByRole("progressbar")).toBeNull();
     expect(screen.queryByText(/Round 2 of 3/)).toBeNull();
     expect(screen.queryByRole("button", { name: "Compare with approved" })).toBeNull();
@@ -122,10 +126,27 @@ describe("the frame every board shares (board 4418:115784)", () => {
     expect(await screen.findByRole("menuitem", { name: "Round history ›" })).toBeInTheDocument();
   });
 
-  it("Send is the blue primary even while disabled", async () => {
+  /* 2L9 B8-R01: "Team only ▾", the comment field and an outline Send on
+     one line. */
+  it("the composer is one line: audience, comment, Send", async () => {
     renderTab();
     const send = await screen.findByRole("button", { name: "Send" });
-    expect(send.className).toContain("tw:disabled:bg-[var(--bk-accent)]");
+    expect(send).toBeDisabled();
+    const line = send.parentElement as HTMLElement;
+    expect(within(line).getByLabelText("Who sees this comment")).toHaveDisplayValue("Team only");
+    expect(within(line).getByRole("textbox")).toBeInTheDocument();
+  });
+
+  it("Client | Team | All filters the thread by who wrote it", async () => {
+    renderTab();
+    await screen.findByText(/hero photo is too dark/);
+    fireEvent.click(screen.getByTestId("review-audience-team"));
+    expect(screen.queryByText(/hero photo is too dark/)).toBeNull();
+    expect(screen.getByText(/on it, swapping the image/)).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId("review-audience-client"));
+    expect(screen.getByText(/hero photo is too dark/)).toBeInTheDocument();
+    expect(screen.queryByText(/on it, swapping the image/)).toBeNull();
+    expect(screen.getByTestId("review-audience-client")).toHaveAttribute("aria-pressed", "true");
   });
 });
 
@@ -134,8 +155,8 @@ describe("load states", () => {
     renderTab();
     expect(await screen.findByText(/hero photo is too dark/)).toBeInTheDocument();
     expect(screen.getByText(/on it, swapping the image/)).toBeInTheDocument();
-    // Board 156:2 marks where the open thread starts.
-    expect(screen.getByText(/^Open · /)).toBeInTheDocument();
+    // 2L9 B8-R01: each page's comments under "— Page —".
+    expect(screen.getAllByText(/^— .+ —$/).length).toBeGreaterThan(0);
   });
 
   /* Board 156:2 labels the group with the page's NAME. Without a composer
@@ -149,7 +170,7 @@ describe("load states", () => {
       elements: { getAllPages: () => [{ id: "page-home", name: "Home" }] },
     };
     renderTab({ composer });
-    expect(await screen.findByText("Open · Home")).toBeInTheDocument();
+    expect(await screen.findByText("— Home —")).toBeInTheDocument();
     expect(screen.queryByText(/page-home/)).not.toBeInTheDocument();
   });
 
@@ -227,7 +248,7 @@ describe("load states", () => {
     fetchCurrentRound.mockResolvedValue({ ...ROUND, revoked: true });
     renderTab();
     expect(await screen.findByText("This review link was revoked.")).toBeInTheDocument();
-    expect(screen.getByTestId("review-status-line").textContent).toMatch(/· Round \d+$/);
+    expect(screen.getByTestId("review-banner-line").textContent).toMatch(/^◐ Link revoked/);
     // Board 4418:116040 draws no footer primary: the new link is a ⋯ row.
     fireEvent.click(screen.getByTestId("review-round-menu"));
     expect(await screen.findByRole("menuitem", { name: "Send a new link" })).toBeInTheDocument();
@@ -403,7 +424,7 @@ describe("actions", () => {
     renderTab({ composer: { on: vi.fn(), off: vi.fn(), emit: vi.fn(), elements: { getAllPages: () => [{ id: "page-home", name: "Home" }] } } });
     await screen.findByText(/hero photo is too dark/);
     expect(screen.getByPlaceholderText("Comment on Home…")).toBeInTheDocument();
-    expect(screen.getByTestId("review-composer-meta").textContent).toBe("Page comment · Home · team only");
+    expect(screen.getByLabelText("Who sees this comment")).toHaveDisplayValue("Team only");
   });
 
   /* The harness supplies onResend by default, which is exactly why nothing
@@ -431,7 +452,7 @@ describe("actions", () => {
     const row = (await screen.findByText(/hero photo is too dark/)).closest("[data-comment-row]") as HTMLElement;
     fetchReviewComments.mockResolvedValue([{ ...COMMENTS[0], status: "RESOLVED" }, COMMENTS[2]]);
     fireEvent.click(within(row).getByRole("button", { name: /^resolve$/i }));
-    await waitFor(() => expect(screen.getByText(/^Resolved · /)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText(/· Resolved$/)).toBeInTheDocument());
     expect(screen.getByText(/hero photo is too dark/)).toBeInTheDocument();
     expect(screen.getByTestId("review-resolved-band").textContent).toBe("Earlier resolved");
   });
@@ -503,14 +524,14 @@ describe("ReviewTab — board 157:2 fills the DETACHED band", () => {
     fireEvent.click(await screen.findByRole("radio", { name: /Hours/ }));
     fireEvent.click(screen.getByTestId("reattach-submit"));
     await waitFor(() => expect(reattachReviewComment).toHaveBeenCalled());
-    expect(await screen.findByText("Open · Home / Hours")).toBeInTheDocument();
+    expect(await screen.findByText("— Home / Hours —")).toBeInTheDocument();
   });
 
   it("leaves the other bands neutral", async () => {
     const composer = makeComposer([]);
     renderTab({ composer });
 
-    const open = await screen.findByText(/^Open · /i);
+    const open = await screen.findByText(/^— .+ —$/);
     const band = open.closest("div") as HTMLElement;
     expect(band.style.background).toBe("");
   });
@@ -811,5 +832,33 @@ describe("ReviewTab — FC-9: an EDITOR keeps full control", () => {
     expect(reattach).not.toHaveAttribute("aria-disabled");
     fireEvent.click(reattach);
     expect(composer.elements.setActivePage).toHaveBeenCalledWith("page-home");
+  });
+});
+
+/* 2L9 B8-R06 (237:11120): closing the panel over an unsent comment asks —
+   Esc keeps editing, only "Discard changes" drops it. */
+describe("leaving with an unsent comment", () => {
+  it("closes straight away with nothing typed", async () => {
+    const onClose = vi.fn();
+    renderTab({ onClose });
+    await screen.findByText(/hero photo is too dark/);
+    fireEvent.click(screen.getByRole("button", { name: /^Close/ }));
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("asks first, keeps the comment on Keep editing, drops it on Discard changes", async () => {
+    const onClose = vi.fn();
+    renderTab({ onClose });
+    await screen.findByText(/hero photo is too dark/);
+    const field = screen.getByPlaceholderText(/^Comment on /);
+    fireEvent.change(field, { target: { value: "warmer crop?" } });
+    fireEvent.click(screen.getByRole("button", { name: /^Close/ }));
+    expect(onClose).not.toHaveBeenCalled();
+    expect(screen.getByText("Leave without saving?")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Keep editing" }));
+    expect(field).toHaveValue("warmer crop?");
+    fireEvent.click(screen.getByRole("button", { name: /^Close/ }));
+    fireEvent.click(screen.getByRole("button", { name: "Discard changes" }));
+    expect(onClose).toHaveBeenCalledTimes(1);
   });
 });

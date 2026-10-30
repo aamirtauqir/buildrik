@@ -89,6 +89,9 @@ export function PanelHeaderActions({
 
 export interface PanelHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
   title: string;
+  /** A muted second line under the title — 2L9 B8-R01's "Fieldwork Studio ·
+   *  Round 2". Outside the heading, so the heading's name stays the title. */
+  subtitle?: string;
   actions?: React.ReactNode;
   /** Expanded = 700-wide drawer (board 16:6 expand action); announced via aria-pressed. */
   isExpanded?: boolean;
@@ -136,7 +139,7 @@ const SIZE_CLASS: Record<"drawer" | "panel" | "column", string> = {
     "tw:h-11 tw:pl-4 tw:border-b tw:border-[var(--bk-gray-100)] tw:text-[length:var(--bk-text-13)] tw:font-medium tw:leading-5 tw:text-[var(--bk-ink)]",
 };
 
-export function PanelHeader({ title, actions, isExpanded, onExpandToggle, onHelpClick, onClose, closeLabel, size: sizeProp, className, ...rest }: PanelHeaderProps) {
+export function PanelHeader({ title, subtitle, actions, isExpanded, onExpandToggle, onHelpClick, onClose, closeLabel, size: sizeProp, className, ...rest }: PanelHeaderProps) {
   const hosted = React.useContext(PanelHeaderSize);
   const size = sizeProp ?? hosted;
   return (
@@ -170,9 +173,23 @@ export function PanelHeader({ title, actions, isExpanded, onExpandToggle, onHelp
           beside it, the heading's accessible name became "SEOSearch & social
           preview", and any action label in here would have joined it. Caught by
           SettingsTab's pending-nav test, which asserted the heading read "SEO". */}
-      <span className="tw:flex-1" role="heading" aria-level={2} data-testid="panel-header-title">
-        {title}
-      </span>
+      {subtitle ? (
+        <span className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
+          <span role="heading" aria-level={2} data-testid="panel-header-title">
+            {title}
+          </span>
+          <span
+            className="tw:truncate tw:text-[12px] tw:font-normal tw:leading-4 tw:text-[var(--bk-ink-muted)]"
+            data-testid="panel-header-subtitle"
+          >
+            {subtitle}
+          </span>
+        </span>
+      ) : (
+        <span className="tw:flex-1" role="heading" aria-level={2} data-testid="panel-header-title">
+          {title}
+        </span>
+      )}
       <PanelHeaderActions
         label={title}
         closeLabel={closeLabel}
