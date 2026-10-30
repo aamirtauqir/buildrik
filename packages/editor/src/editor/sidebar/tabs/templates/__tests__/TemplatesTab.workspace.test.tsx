@@ -221,22 +221,23 @@ describe("Templates — full-canvas view (decision #24)", () => {
     expect(screen.getByTestId("tpl-ws-preview")).toBeInTheDocument();
   });
 
-  /* Walked live: the apply called onTemplateUsed (→ Add) for a new page too,
-     which unmounted the view before "Page created" could show. */
-  it("Create page ends on Page created; the view is left only from its Done", async () => {
+  /* design-2l9 106:37579: a created page lands in the editor with a receipt
+     ("{Page} created from {Template} · Page settings"), not a dialog over the
+     Templates view — so the view is left as the run ends. */
+  it("Create page ends in the editor with the receipt", async () => {
     const composer = makeComposer();
     const onTemplateUsed = vi.fn();
+    addToast.mockClear();
     render(<TemplatesTab composer={composer as never} onClose={vi.fn()} onTemplateUsed={onTemplateUsed} />);
     const t = PAGE_TEMPLATES.find((x) => x.status !== "premium")!;
     fireEvent.click(screen.getByTestId(`tpl-ws-item-${t.id}`));
     fireEvent.click(screen.getByRole("button", { name: "Create page" }));
     fireEvent.click(within(screen.getByTestId("tpl-create-confirm")).getByRole("button", { name: "Create page" }));
-    await waitFor(() => expect(screen.getByTestId("tpl-create-success")).toBeInTheDocument(), { timeout: 5000 });
-    /* It names the page it made, not the placeholder "Template". */
-    expect(screen.getByTestId("tpl-create-success").textContent).not.toContain("‘Template’");
-    await new Promise((r) => requestAnimationFrame(() => r(null)));
-    expect(onTemplateUsed).not.toHaveBeenCalled();
-    fireEvent.click(screen.getByRole("button", { name: "Done" }));
-    expect(onTemplateUsed).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(onTemplateUsed).toHaveBeenCalledTimes(1), { timeout: 5000 });
+    const receipt = addToast.mock.calls.map((c) => c[0]).find((x) => / created from /.test(x.description ?? ""));
+    /* The page the run made (the mock's createPage names it "New"). */
+    expect(receipt?.description).toBe(`New created from ${t.name}`);
+    expect(receipt?.action?.label).toBe("Page settings");
+    expect(screen.queryByTestId("tpl-create-success")).toBeNull();
   });
 });

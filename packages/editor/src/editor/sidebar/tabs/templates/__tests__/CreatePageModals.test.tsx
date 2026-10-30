@@ -13,7 +13,6 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
   CreatePageConfirmModal,
-  CreatePageSuccessModal,
   CreatePageErrorModal,
 } from "../TemplatesTabModals";
 
@@ -47,18 +46,6 @@ describe("create page from template (boards 1169:4725, 4418:54243)", () => {
     ).toBeInTheDocument();
   });
 
-  /* "you're on it now" is only true because the apply switches to the page it
-     created — see TemplatesTab.addAsNewPage.test.tsx. */
-  it("success says which page exists and that you are already on it", () => {
-    render(
-      <CreatePageSuccessModal pageName="Menu 2" onClose={vi.fn()} onOpenPageSettings={vi.fn()} />,
-    );
-    expect(screen.getByText(/‘Menu 2’ is ready — you’re on it now\./)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Open page settings" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Done" })).toBeInTheDocument();
-    // The old copy promised a trip the apply no longer needs.
-    expect(screen.queryByRole("button", { name: /go to page/i })).not.toBeInTheDocument();
-  });
 
   it("the failure reassures that nothing of theirs changed, and says what broke when it knows (2L9 222:47163)", () => {
     render(<CreatePageErrorModal onCancel={vi.fn()} onRetry={vi.fn()} />);
@@ -94,5 +81,26 @@ describe("ApplyProgressOverlay — creating a page", () => {
     expect(screen.getByTestId("tpl-applying-note")).toHaveTextContent("Another creation cannot start while this operation is running.");
     expect(screen.getByTestId("tpl-applying-status")).toBeDisabled();
     expect(screen.getByTestId("tpl-applying-step-import")).toHaveTextContent("Importing template HTML — applying…");
+  });
+});
+
+describe("ApplyProgressOverlay — preparing (107:31110)", () => {
+  it("before the import: 'Preparing SaaS Landing…', still cancellable", async () => {
+    const { ApplyProgressOverlay } = await import("../ApplyProgressOverlay");
+    render(
+      <ApplyProgressOverlay
+        templateName="SaaS Landing"
+        creating="Services"
+        steps={[
+          { id: "tokens", label: "Resolving brand tokens", state: "active" },
+          { id: "import", label: "Importing template HTML", state: "queued" },
+        ]}
+        onCancel={vi.fn()}
+      />,
+    );
+    expect(screen.getByTestId("tpl-applying-title")).toHaveTextContent("Preparing SaaS Landing…");
+    expect(screen.getByTestId("tpl-applying-sub")).toHaveTextContent("Preparing the template for Services. You can still cancel before import starts.");
+    expect(screen.getByTestId("tpl-applying-note")).toHaveTextContent("Your other pages and Brand settings remain unchanged.");
+    expect(screen.getByTestId("tpl-applying-cancel")).toBeInTheDocument();
   });
 });

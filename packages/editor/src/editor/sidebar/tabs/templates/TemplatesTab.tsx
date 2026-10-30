@@ -19,7 +19,7 @@ import { EVENTS } from "@/shared/constants/events";
 import { usePageCapacity } from "@/editor/sidebar/tabs/pages/usePageCapacity";
 import { type TemplateItem, SITE_TEMPLATES, PAGE_TEMPLATES, DEFAULT_TEMPLATE_VERSION, getMyTemplates } from "./templatesData";
 import { clearAppliedId, recordTemplateApplied, saveAppliedId } from "./templatesStorage";
-import { ReplaceModal, CreatePageConfirmModal, CreatePageSuccessModal, CreatePageErrorModal, BackupFailedModal } from "./TemplatesTabModals";
+import { ReplaceModal, CreatePageConfirmModal, CreatePageErrorModal, BackupFailedModal } from "./TemplatesTabModals";
 import { TemplatePreview } from "./TemplatePreview";
 import { useEditorRole } from "@/editor/shell/hooks/useEditorRole";
 import { roleAtLeast } from "@/services/RoleService";
@@ -79,10 +79,8 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
   const capacityText =
     capacity.state === "known" && capacity.limit !== -1 ? `${pageCount} of ${capacity.limit} pages on ${capacity.plan}` : null;
   const { addToast } = useToast();
-  const [createResult, setCreateResult] = React.useState<"success" | "error" | null>(null);
+  const [createResult, setCreateResult] = React.useState<"error" | null>(null);
   /** G2-100: the page whose backup could not be written — the Backup failed dialog is open. */
-  /** The page the create flow just made — the Page created modal names it. */
-  const [createdPageName, setCreatedPageName] = React.useState<string | null>(null);
   const [backupFailedPage, setBackupFailedPage] = React.useState<string | null>(null);
 
 
@@ -304,7 +302,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
 
     /* 222:47163 promises "No empty page was left behind": a page made for
        this apply is taken back out if the import then fails. */
-    let madePage: { id: string; previousId: string | null } | null = null;
+    let madePage: { id: string; name: string; previousId: string | null } | null = null;
     try {
       // 1 — tokens
       setApplyStepIndex(0);
@@ -331,7 +329,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
            Portfolio, and Page 1 came back as Portfolio. */
         const previousId = composer.elements.getActivePage()?.id ?? null;
         const created = composer.elements.createPage(newPageName ?? t.name);
-        madePage = { id: created.id, previousId };
+        madePage = { id: created.id, name: created.name, previousId };
         if (addToNavigation) composer.elements.addPageToNavigation(created.id);
         composer.elements.setActivePage?.(created.id);
       }
@@ -377,12 +375,10 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
 
     // P2 fix (codex A6): success modal now fires AFTER actual page creation +
     // HTML import, not on confirm-click. Renders only in newPage flow.
-    if (wasNewPageMode) {
-      /* Named now: pendingId is cleared just below, and the modal read the
-         template name from it on the next render — "‘Template’ is ready". */
-      setCreatedPageName(composer?.elements.getActivePage()?.name ?? t.name);
-      setCreateResult("success");
-    }
+    /* design-2l9 106:37579: a created page lands in the editor with a
+       receipt — "Services created from SaaS Landing · Page settings" — not a
+       dialog over the Templates view. Named now: the active page IS it. */
+    const createdName = wasNewPageMode ? madePage?.name ?? newPageName ?? t.name : null;
 
     pendingId.current = null;
     addAsNewPageRef.current = false;
@@ -397,7 +393,22 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
          auto-version went (#25). The board's second action, View backup,
          needs a two-action toast chrome-ui does not have. */
       const replacedName = composer?.elements.getActivePage()?.name;
-      if (!wasNewPageMode && replacedName) {
+      if (createdName) {
+        addToast({
+          description: `${createdName} created from ${t.name}`,
+          tone: "success",
+          action: {
+            label: "Page settings",
+            onClick: () => {
+              /* Page settings is local state inside PagesTab, so the ask
+                 goes through the composer (UI_PAGES_OPEN_SETTINGS). */
+              const active = composer?.elements.getActivePage?.();
+              onSwitchTab?.("pages");
+              if (active) composer?.emit(EVENTS.UI_PAGES_OPEN_SETTINGS, { pageId: active.id });
+            },
+          },
+        });
+      } else if (!wasNewPageMode && replacedName) {
         addToast({
           tone: "success",
           title: `${replacedName} replaced`,
@@ -421,10 +432,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
           version: t.version ?? DEFAULT_TEMPLATE_VERSION,
         });
       }
-      /* A new page ends on "Page created" (1169:4725), whose Done / Open page
-         settings leave the view. Leaving here too unmounted the view — and
-         that dialog with it — before it was ever seen (walked live). */
-      if (!wasNewPageMode) onTemplateUsed?.();
+      onTemplateUsed?.();
     });
     setApplyStepIndex(APPLY_STEPS.length);
     await paint();
@@ -657,23 +665,6 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
           />
         );
       })()}
-      {createResult === "success" && (
-        <CreatePageSuccessModal
-          pageName={createdPageName ?? tName}
-          onClose={() => { setCreateResult(null); onTemplateUsed?.(); }}
-          onOpenPageSettings={() => {
-            setCreateResult(null);
-            onSwitchTab?.("pages");
-            /* Page settings is local state inside PagesTab, so the ask goes
-               through the composer (UI_PAGES_OPEN_SETTINGS). Without this the
-               button opened the Pages list and left the user to find the
-               page they had just made. */
-            const active = composer?.elements.getActivePage?.();
-            if (active) composer?.emit(EVENTS.UI_PAGES_OPEN_SETTINGS, { pageId: active.id });
-            onTemplateUsed?.();
-          }}
-        />
-      )}
       {createResult === "error" && (
         <CreatePageErrorModal
           reason={applyError ?? undefined}

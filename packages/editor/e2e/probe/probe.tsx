@@ -127,7 +127,6 @@ import { PublishTab } from "@/editor/sidebar/tabs/publish/PublishTab";
 import {
   CreatePageConfirmModal,
   CreatePageErrorModal,
-  CreatePageSuccessModal,
 } from "@/editor/sidebar/tabs/templates/TemplatesTabModals";
 import type { UsePublishJobResult } from "@/editor/shell/hooks/usePublishJob";
 import type { PageItem } from "@/editor/sidebar/tabs/pages/types";
@@ -3650,7 +3649,6 @@ const CASES: Record<string, () => React.ReactElement> = {
         onCancel={() => {}}
         onConfirm={() => {}}
       />
-      <CreatePageSuccessModal pageName="Menu 2" onClose={() => {}} onOpenPageSettings={() => {}} />
       <CreatePageErrorModal onCancel={() => {}} onRetry={() => {}} />
     </div>
   ),

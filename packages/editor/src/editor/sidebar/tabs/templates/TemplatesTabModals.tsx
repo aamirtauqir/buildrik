@@ -177,51 +177,6 @@ export const CreatePageConfirmModal: React.FC<CreatePageConfirmModalProps> = ({
 );
 
 // ============================================================================
-// Create Page Success Modal (uMJFZ)
-// ============================================================================
-
-export interface CreatePageSuccessModalProps {
-  /** The page that now exists, and that the editor is already showing. */
-  pageName: string;
-  onClose: () => void;
-  onOpenPageSettings: () => void;
-}
-
-export const CreatePageSuccessModal: React.FC<CreatePageSuccessModalProps> = ({
-  pageName,
-  onClose,
-  onOpenPageSettings,
-}) => (
-  /* Board 1169:4725: "Page created" with a green tick, "‘Menu 2’ is ready —
-     you're on it now", and the two things left to do. "Go to page" was the
-     old copy from when the apply did NOT switch pages. */
-  <Modal
-    open
-    onClose={onClose}
-    dismissOnScrimClick
-    testId="tpl-create-success"
-    title="Page created"
-    footer={
-      <>
-        <Button color="light" onClick={onOpenPageSettings}>
-          Open page settings
-        </Button>
-        <Button onClick={onClose}>Done</Button>
-      </>
-    }
-  >
-    <p className="tw:m-0 tw:flex tw:items-center tw:gap-2">
-      {/* success-TEXT, not success: board 1169:4736 colours this line
-          --color/success-text `var(--bk-green-600)`, and the raw `var(--bk-green-500)` measured 3.39:1 on
-          the modal's white ground — under the 4.5 floor the conformance run
-          enforces. The board's own token is the accessible one. */}
-      <span className="tw:text-[var(--bk-success-text)]" aria-hidden="true">✓</span>
-      ‘{pageName}’ is ready — you&rsquo;re on it now.
-    </p>
-  </Modal>
-);
-
-// ============================================================================
 // Create Page Error Modal (9NalZ)
 // ============================================================================
 
