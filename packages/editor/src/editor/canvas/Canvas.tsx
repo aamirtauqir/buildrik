@@ -49,6 +49,7 @@ import {
   useSliderRuntime,
   useCountdownRuntime,
   useAccordionRuntime,
+  useTabsModalRuntime,
   useCanvasEditorFlags,
   useCanvasContextMenu,
   useCursorSync,
@@ -542,6 +543,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
     // 13) — the runtimes the published page gets, on the same rule.
     useCountdownRuntime({ canvasRef, content: displayContent });
     useAccordionRuntime({ canvasRef, content: displayContent });
+    useTabsModalRuntime({ canvasRef, content: displayContent, selectedId });
     // Lock styling and the Layers eye are editor-only DOM flags, re-derived
     // after every render of the canvas HTML (audit 2026-10-08 P1-5).
     useCanvasEditorFlags({ canvasRef, composer, content: displayContent });

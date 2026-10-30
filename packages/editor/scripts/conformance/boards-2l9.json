@@ -5234,9 +5234,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "blocked:engine-tabs-pairs",
+   "authority": "board",
    "verified": "no",
-   "verifiedNote": "Lane L-B round 11: not a capabilities-table change — tabs has no tab↔panel pairing, initial-tab attribute or runtime in the model (REQUESTS B-21, lead). Same shape as C07/C10/C18 (blocked:engine-modal-link).",
+   "verifiedNote": "Reopened round 19: the engine model landed (L-A, owner approval 2026-10-30) — engine/widgets/tabsModel.ts + export/tabsRuntime.ts (canvas + published, tested on the export path), Tabs block writes keyed pairs + data-tabs-initial; docs/design-2l9/engine-tabs.md. The Inspector Tabs section this board draws is L-B's (REQUESTS B-21 reply); not compared. | Lane L-B round 11: not a capabilities-table change — tabs has no tab↔panel pairing, initial-tab attribute or runtime in the model (REQUESTS B-21, lead). Same shape as C07/C10/C18 (blocked:engine-modal-link).",
    "tier": "P1"
   },
   {
@@ -5301,9 +5301,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "blocked:engine-modal-link",
+   "authority": "board",
    "verified": "no",
-   "verifiedNote": "Lead, round 5: the trigger ↔ dialog link is a new engine data model, out of scope while only 2 agents run (REQUESTS B-17, deferred). Board PNG fetched round 4.",
+   "verifiedNote": "Reopened round 19: the engine model landed (L-A, owner approval 2026-10-30) — engine/widgets/modalModel.ts + export/modalRuntime.ts (canvas reveal + published open/close, focus trap, inert, Escape/backdrop), Modal block puts the dialog at the page root with a key; docs/design-2l9/engine-modal.md. The Inspector surfaces this board draws are L-B's (REQUESTS B-17 reply); not compared. | Lead, round 5: the trigger ↔ dialog link is a new engine data model, out of scope while only 2 agents run (REQUESTS B-17, deferred). Board PNG fetched round 4.",
    "tier": "P1"
   },
   {
@@ -5334,9 +5334,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "blocked:engine-modal-link",
+   "authority": "board",
    "verified": "no",
-   "verifiedNote": "Lead, round 5: needs the engine's trigger ↔ dialog link (REQUESTS B-17, deferred).",
+   "verifiedNote": "Reopened round 19: the engine model landed (L-A, owner approval 2026-10-30) — engine/widgets/modalModel.ts + export/modalRuntime.ts (canvas reveal + published open/close, focus trap, inert, Escape/backdrop), Modal block puts the dialog at the page root with a key; docs/design-2l9/engine-modal.md. The Inspector surfaces this board draws are L-B's (REQUESTS B-17 reply); not compared. | Lead, round 5: needs the engine's trigger ↔ dialog link (REQUESTS B-17, deferred).",
    "inheritsFrom": "245:39899",
    "tier": "P1"
   },
@@ -5912,9 +5912,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "blocked:engine-modal-link",
+   "authority": "board",
    "verified": "no",
-   "verifiedNote": "Lead, round 5: needs the engine's trigger ↔ dialog link (REQUESTS B-17, deferred).",
+   "verifiedNote": "Reopened round 19: the engine model landed (L-A, owner approval 2026-10-30) — engine/widgets/modalModel.ts + export/modalRuntime.ts (canvas reveal + published open/close, focus trap, inert, Escape/backdrop), Modal block puts the dialog at the page root with a key; docs/design-2l9/engine-modal.md. The Inspector surfaces this board draws are L-B's (REQUESTS B-17 reply); not compared. | Lead, round 5: needs the engine's trigger ↔ dialog link (REQUESTS B-17, deferred).",
    "inheritsFrom": "245:39899",
    "tier": "P1"
   },

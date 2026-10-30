@@ -7,6 +7,10 @@
 import type { BlockBuildConfig, Composer } from "../types";
 import { BLOCK_COLORS } from "../blockPalette";
 
+/** Stable pair keys — tab and panel pair by this, never by label or position
+ *  (engine/widgets/tabsModel.ts; runtime engine/export/tabsRuntime.ts). */
+const tabKey = (index: number) => `tab-${String(index + 1).padStart(2, "0")}`;
+
 /**
  * Build tabbed interface component
  */
@@ -15,6 +19,8 @@ function buildTabs(composer: Composer, parentId: string, dropIndex?: number): st
     tagName: "div",
     attributes: {
       class: "tabs",
+      /* design-2l9 C01 / B-21: the pair shown first, by its stable key. */
+      "data-tabs-initial": "tab-01",
     },
     styles: {
       width: "100%",
@@ -48,6 +54,7 @@ function buildTabs(composer: Composer, parentId: string, dropIndex?: number): st
       attributes: {
         class: `tab-button${index === 0 ? " active" : ""}`,
         role: "tab",
+        "data-tab-key": tabKey(index),
         "aria-selected": index === 0 ? "true" : "false",
       },
       styles: {
@@ -79,6 +86,7 @@ function buildTabs(composer: Composer, parentId: string, dropIndex?: number): st
       attributes: {
         class: `tab-panel${index === 0 ? " active" : ""}`,
         role: "tabpanel",
+        "data-tab-key": tabKey(index),
       },
       styles: {
         display: index === 0 ? "block" : "none",
