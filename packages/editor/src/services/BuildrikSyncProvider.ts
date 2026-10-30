@@ -13,7 +13,7 @@ import { fetchMyRole, roleAtLeast } from "./RoleService";
 import { resumeKeepingUnsaved } from "./unsavedRecovery";
 import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
 import { dropSessionMediaUrls } from "@/shared/utils/html";
-import type { PageMeta, PageSettings, ProjectData, ProjectSettings, SiteSEO, SlugChange } from "@/shared/types/project";
+import type { PageData, PageMeta, PageSettings, ProjectData, ProjectSettings, SiteSEO, SlugChange } from "@/shared/types/project";
 import type { ProjectSettingsPatch } from "@buildrik/shared/schemas/project-settings";
 import type { updateSiteSettingsSchema } from "@buildrik/shared/schemas/site-detail";
 import { SITE_COLUMN_FIELDS } from "@buildrik/shared/schemas/site-column-fields";
@@ -627,6 +627,31 @@ export async function deleteSite(siteId: string, siteName: string): Promise<void
 }
 
 /**
+ * One `pages.list`-shaped row → the editor's PageData. Shared by the project
+ * load and the page-trash restore (A-21), which hands back the same row shape.
+ */
+export function pageDataFromRow(row: unknown): PageData {
+  const p = row as DashboardPageRow;
+  return {
+    id: p.id,
+    name: p.name,
+    slug: p.slug,
+    isHome: p.isHomePage,
+    /* A page that has never been saved stores `[]`. Each gets its OWN root,
+       with an id derived from the page: one shared DEFAULT_ROOT object
+       made every blank page one element, so an edit on one landed on all. */
+    root: (p.blocks && typeof p.blocks === "object" && !Array.isArray(p.blocks))
+      ? p.blocks
+      : (blankPageRoot(p.id) as ElementData),
+    settings: p.settings,
+    meta: p.meta ?? undefined,
+    updatedAt: p.updatedAt,
+    slugManuallySet: p.slugManuallySet ?? false,
+    slugHistory: p.slugHistory ?? [],
+  };
+}
+
+/**
  * The dashboard's rows → the editor's ProjectData. Pure: no client, no module
  * state. `loadProject` feeds it the three tRPC reads; the `/share/<token>`
  * draft preview feeds it the same rows from the server, so a shared draft is
@@ -671,23 +696,7 @@ export function projectDataFromRows(
   return {
     version: "1.0",
     pagesOrder: sortedPages.map((p) => p.id),
-    pages: sortedPages.map((p) => ({
-      id: p.id,
-      name: p.name,
-      slug: p.slug,
-      isHome: p.isHomePage,
-      /* A page that has never been saved stores `[]`. Each gets its OWN root,
-         with an id derived from the page: one shared DEFAULT_ROOT object
-         made every blank page one element, so an edit on one landed on all. */
-      root: (p.blocks && typeof p.blocks === "object" && !Array.isArray(p.blocks))
-        ? p.blocks
-        : (blankPageRoot(p.id) as ElementData),
-      settings: p.settings,
-      meta: p.meta ?? undefined,
-      updatedAt: p.updatedAt,
-      slugManuallySet: p.slugManuallySet ?? false,
-      slugHistory: p.slugHistory ?? [],
-    })),
+    pages: sortedPages.map(pageDataFromRow),
     // projectStyles holds StyleEngine CSS rules ({id, selector, properties}).
     // Legacy data also contains design-token entries ({id, kind, cssVar, ...})
     // from before tokens migrated to TokenRegistry — those fail StyleEngine

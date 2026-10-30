@@ -33,11 +33,11 @@ function mount(): MockComposer {
 const openMenu = () => fireEvent.click(screen.getByTestId("pages-panel-menu"));
 
 describe("PagesTab — header ⋯ menu", () => {
-  it("offers Select pages… · Listings · Show structure · Reload (board 65:17148)", () => {
+  it("offers Select pages… · Listings · Show structure · Reload · Recently deleted (board 65:17148, A-21)", () => {
     mount();
     openMenu();
     const labels = screen.getAllByRole("menuitem").map((el) => el.textContent?.trim());
-    expect(labels).toEqual(["Select pages…", "Listings", "Show structure", "Reload"]);
+    expect(labels).toEqual(["Select pages…", "Listings", "Show structure", "Reload", "Recently deleted"]);
   });
 
   it("select mode swaps the ⋯ for Done, which leaves it (v3 7069:78984)", () => {
