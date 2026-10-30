@@ -542,6 +542,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
           onReplacePage={(t) => handleApplyToCurrent(t.id)}
           onBack={() => sel.setPreviewId(null)}
           dialogOpen={Boolean(createConfirmId) || sel.showReplace}
+          creating={Boolean(newPageName) && !replaceMode}
           usedOn={(usageMap.get(previewTemplate.id) ?? []).map((u) => ({ id: u.pageId, name: u.pageName }))}
           onOpenPage={(pageId) => {
             composer?.elements.setActivePage?.(pageId);

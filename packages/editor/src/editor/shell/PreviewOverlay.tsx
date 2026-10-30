@@ -2,7 +2,7 @@
  * PreviewOverlay — in-shell preview (Figma shell state 7, board 65:211).
  *
  * The topbar stays; everything below it is replaced by a clean, sandboxed
- * render of the sanitized page HTML; "‹ Back to canvas" (or Esc) exits.
+ * render of the sanitized page HTML; "Back to editor" (or Esc) exits.
  * Replaces the old pop-up-window preview (which could be blocked and lost
  * the shell context). Same sanitize path as before — the iframe is fully
  * sandboxed and the HTML has been through sanitizeHTMLForPreview.
@@ -53,6 +53,9 @@ interface PreviewOverlayProps {
   currentPageId?: string | null;
   /** Show another page in the preview. */
   onShowPage?: (pageId: string) => void;
+  /** 8:3262 "Preview / current Tablet": opens at the editor's device. The
+   *  caller (AquibraStudio) does not pass it yet — REQUESTS A-22. */
+  initialDevice?: Breakpoint;
 }
 
 /** The page an in-site href points at: "/contact", "contact.html", "./contact/",
@@ -115,8 +118,9 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({
   pages = [],
   currentPageId,
   onShowPage,
+  initialDevice = "desktop",
 }) => {
-  const [device, setDevice] = React.useState<Breakpoint>("desktop");
+  const [device, setDevice] = React.useState<Breakpoint>(initialDevice);
   const [shareOpen, setShareOpen] = React.useState(false);
   const pagesRef = React.useRef(pages);
   pagesRef.current = pages;
@@ -173,9 +177,16 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({
       className={REGION_CLASS}
     >
       <div className={DEVICE_BAR_CLASS}>
-        <Button color="light" size="xs" onClick={onDone} className={BACK_CLASS} data-testid="preview-back">
-          ‹ Back to canvas
-        </Button>
+        {/* design-2l9 8:3262: "Back to editor", then which page is shown and
+            that it is the draft. */}
+        <div className="tw:flex tw:min-w-0 tw:items-center tw:gap-3">
+          <Button variant="link" size="xs" onClick={onDone} className={BACK_CLASS} data-testid="preview-back">
+            Back to editor
+          </Button>
+          <span className="tw:truncate tw:text-[13px] tw:text-[var(--bk-ink)]" data-testid="preview-title">
+            {`${pageName ?? "Page"} · Draft preview`}
+          </span>
+        </div>
         <div className={DEVICE_BAR_INNER_CLASS}>
           <BreakpointSwitcher labelled sublabels={DEVICE_WIDTHS} value={device} onChange={setDevice} />
         </div>
@@ -202,6 +213,11 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({
           )}
         </div>
       </div>
+      {/* 8:3262: the preview renders the draft through the editor's own HTML,
+          not the published build — say so once, under the bar. */}
+      <p className="tw:m-0 tw:flex tw:shrink-0 tw:items-center tw:gap-1 tw:px-3 tw:pt-2 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="preview-fidelity">
+        <span aria-hidden="true">ⓘ</span> Fonts and colors may differ slightly until published
+      </p>
       <div className={STAGE_CLASS}>
         <DeviceFramePreview device={device as DeviceType} active={framed}>
           <iframe

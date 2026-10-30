@@ -26,6 +26,8 @@ interface Props {
   composer: Composer | null;
   /** Opened by a rename's "Update URL" (G2-076): the offer measures from here. */
   previousSlug?: string;
+  /** 67:11341 — the redirect Settings › Redirects just saved. */
+  redirectSaved?: { from: string; to: string };
   /** 6887:73809 "Site SEO defaults ›" → Settings › SEO defaults (the drawer
    *  guards unsaved edits first). */
   onOpenSiteDefaults?: () => void;
@@ -49,7 +51,7 @@ const BTN_32 = "tw:rounded-[var(--bk-radius-md)] tw:text-[length:var(--bk-text-1
 const BTN_SECONDARY = `${BTN_32} tw:border tw:border-[var(--bk-gray-200)] tw:bg-[var(--bk-bg-card)] tw:text-[var(--bk-ink)] tw:enabled:hover:bg-[var(--bk-bg-subtle)]`;
 
 
-export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, onOpenSiteDefaults }) => {
+export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, redirectSaved, onOpenSiteDefaults }) => {
   const [detailsOpen, setDetailsOpen] = React.useState(false);
   const domain = s.domain ?? "yoursite.com";
   /* An empty field ships the inherited title, so the counter measures that. */
@@ -87,7 +89,8 @@ export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, onOpe
      from it would hide that page once published — no offer. */
   const oldPathTaken = sitePages.some((p) => p.id !== page.id && (p.isHome ? "/" : `/${p.slug ?? ""}`) === from);
   const change = opened.slug && page.slug && from !== to && !oldPathTaken ? `${from} → ${to}` : null;
-  const redirectOffer = change !== null && change !== answeredChange;
+  /* Back from Settings › Redirects with the rule saved, the offer is answered. */
+  const redirectOffer = change !== null && change !== answeredChange && !redirectSaved;
   /* Opened by "Update URL": the offer is why the sheet opened, so bring it
      into view (it sits under the slug field, below the fold). */
   const offerRef = React.useRef<HTMLDivElement>(null);
@@ -350,6 +353,12 @@ export const SeoTab: React.FC<Props> = ({ s, page, composer, previousSlug, onOpe
       <p className={`tw:m-0 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink-soft)] ${UI}`} data-testid="seo-override-note">
         These overrides affect this page only. Clear the title to use site defaults.
       </p>
+      {redirectSaved && (
+        /* Redirects ship with the publish (settings.redirects → vercel.json). */
+        <p className={`tw:m-0 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink-soft)] ${UI}`} data-testid="seo-redirect-saved">
+          {`Redirect saved · ${redirectSaved.from} → ${redirectSaved.to} · Applies on next publish`}
+        </p>
+      )}
     </div>
   );
 };

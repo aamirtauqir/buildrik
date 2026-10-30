@@ -32,7 +32,7 @@ import {
 import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants/events";
 import { listNames, slugify } from "@shared/utils/helpers/string";
-import type { DrawerTab, PageSettingsOpenRequest } from "./types";
+import type { PageSettingsOpenRequest } from "./types";
 import { PageContextMenu } from "./components/PageContextMenu";
 import { MovePagesDialog, TOP_LEVEL } from "./components/MovePagesDialog";
 import { PageList } from "./components/PageList";
@@ -242,12 +242,12 @@ export const PagesTab: React.FC<PagesTabProps> = ({
      already closed. The handler is stable on purpose: the prop stays held for
      the whole visit, and an effect that re-ran on every page re-sync would
      reopen a drawer the user had just closed. */
-  const [doorTab, setDoorTab] = React.useState<DrawerTab | undefined>(undefined);
+  const [door, setDoor] = React.useState<Omit<PageSettingsOpenRequest, "pageId"> | undefined>(undefined);
   const { openSettings, closeSettings: closePageSettings } = p;
   const onOpen = React.useCallback(
-    ({ pageId, tab }: PageSettingsOpenRequest) => {
+    ({ pageId, tab, redirectSaved }: PageSettingsOpenRequest) => {
       openSettings(pageId);
-      setDoorTab(tab);
+      setDoor({ tab, redirectSaved });
     },
     [openSettings],
   );
@@ -263,7 +263,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
   }, [composer, onOpen]);
 
   const closeSettings = React.useCallback(() => {
-    setDoorTab(undefined);
+    setDoor(undefined);
     closePageSettings();
   }, [closePageSettings]);
 
@@ -747,7 +747,8 @@ export const PagesTab: React.FC<PagesTabProps> = ({
               setMovedFrom(null);
               closeSettings();
             }}
-            initialTab={doorTab}
+            initialTab={door?.tab}
+            redirectSaved={door?.redirectSaved}
             previousSlug={movedFrom?.pageId === settingsPage.id ? movedFrom.slug : undefined}
           />
         </SettingsErrorBoundary>
