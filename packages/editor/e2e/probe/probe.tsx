@@ -2833,6 +2833,21 @@ const CASES: Record<string, () => React.ReactElement> = {
           enabled: it.enabled !== false,
         })),
       );
+    /* `?loading=1&siteName=…` — the project still arriving (S01). */
+    if (q.get("siteName")) c.updateProjectMetadata({ name: q.get("siteName") ?? "" });
+    if (q.get("loading")) c.setProjectLoading(true);
+    /* `?batch=1` — B01: the element (a heading), a second heading at another
+       size and a locked image, all three selected. */
+    if (q.get("batch")) {
+      el.setStyle("font-size", "48px");
+      const h2 = c.elements.createElement("heading" as never, { content: "Heading 2" } as never);
+      c.elements.addElement(h2, page.root.id);
+      c.elements.getElement(h2.getId())?.setStyle("font-size", "32px");
+      const img = c.elements.createElement("image" as never, {} as never);
+      c.elements.addElement(img, page.root.id);
+      c.elements.getElement(img.getId())?.setLocked(true);
+      c.selection.selectMultiple([el, h2, img].map((e) => c.elements.getElement(e.getId())!).filter(Boolean));
+    }
     /* `?page=1` — nothing selected: the Inspector's page panel (board 21,
        P28). `?pageName=About` renames the page. */
     /* `?template=Studio` — a template applied just now (S07's notice). */

@@ -344,7 +344,23 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
 
   /* Board 159:102 — while the site is still arriving there is nothing to
      select; an empty canvas message would read as "your site is empty". */
-  if (projectLoading && !selectedElement) return <InspectorLoading />;
+  if (projectLoading && !selectedElement)
+    return (
+      <InspectorLoading
+        siteName={composer?.getProjectMetadata?.()?.name}
+        tabs={
+          <Tabs
+            tabs={INSPECTOR_TABS}
+            value={activeTab}
+            onChange={(id) => setActiveTab(id as TabId)}
+            label="Inspector tabs"
+            data-testid="inspector-tab-strip"
+            className="tw:h-10 tw:px-3 tw:py-1 tw:gap-1 tw:border-0"
+            tabClassName={INSPECTOR_TAB_CLASS}
+          />
+        }
+      />
+    );
 
   /* Above whatever the column shows — the page panel or an element — once the
      load has given up rather than while it is still on its way. */

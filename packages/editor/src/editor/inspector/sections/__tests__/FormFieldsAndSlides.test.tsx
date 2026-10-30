@@ -164,6 +164,28 @@ describe("Form › FIELDS (2L9 156:716)", () => {
         />,
       );
 
+    it("2L9 F06: a field just added reads 'Added to …' with the way back under it, only the new-field rows, until it is edited", () => {
+      const composer = make();
+      render(<FormFieldsSection elementId="f" composer={composer} isOpen />);
+      fireEvent.click(screen.getByTestId("form-add-field"));
+      act(() => { fireEvent.click(screen.getByTestId("form-add-field-input")); });
+      const id = composer.selection.getSelectedIds()[0];
+      field(composer, id);
+      const block = document.getElementById("inspector-section-type")!;
+      expect(screen.getByTestId("field-added-note")).toHaveTextContent("Added to the form.");
+      /* The way back follows the note, inside the block. */
+      expect(block).toContainElement(screen.getByTestId("field-back-to-form"));
+      expect(screen.queryByTestId("form-field-name-note")).toBeNull();
+      expect(screen.queryByTestId("form-field-default")).toBeNull();
+      /* Any newer step ends it. */
+      act(() => {
+        composer.elements.getElement(id)!.setAttribute("placeholder", "Edited");
+        composer.history.flushPending();
+      });
+      expect(screen.queryByTestId("field-added-note")).toBeNull();
+      expect(screen.getByTestId("form-field-name-note")).toBeInTheDocument();
+    });
+
     it("'‹ {form}' above 'Field'; Type · Label · Placeholder · Name + note · Required · Default value", () => {
       const composer = make();
       field(composer, "email");

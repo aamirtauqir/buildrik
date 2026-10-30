@@ -121,12 +121,17 @@ export function InspectorHeader({
   const Icon = getElementIcon(element.type);
 
   let items: BreadcrumbItem[] = [];
-  let multiName = "";
+  /* A selection names itself on every page (2L9 B01 "3 selected"; one type:
+     "2 selected · Headings"). It used to be named only on a template page,
+     so elsewhere the title line was blank. */
+  const selectedEls = multi && composer ? selectedIds.map((id) => composer.elements.getElement(id)).filter((e): e is Element => Boolean(e)) : [];
+  const lockedCount = selectedEls.filter((e) => e.isLocked?.()).length;
+  const multiName = multi
+    ? `${selectedIds.length} selected${new Set(selectedEls.map((e) => e.getType())).size === 1 ? ` · ${pluralType(element.type)}` : ""}`
+    : "";
   if (composer && onTemplatePage(composer)) {
     if (multi) {
-      const els = selectedIds.map((id) => composer.elements.getElement(id)).filter((e): e is Element => Boolean(e));
-      const types = new Set(els.map((e) => e.getType()));
-      multiName = `${selectedIds.length} selected · ${types.size === 1 ? pluralType(element.type) : "Elements"}`;
+      const els = selectedEls;
       const parent = commonParent(els);
       items = pathFor(composer, parent);
     } else {
@@ -149,7 +154,17 @@ export function InspectorHeader({
           )}
           <span className="tw:min-w-0 tw:truncate" title={multi ? multiName : undefined}>
             {multi ? (
-              <span data-testid="inspector-element-name">{multiName}</span>
+              <>
+                <span data-testid="inspector-element-name">{multiName}</span>
+                {/* 2L9 B01: what a batch edit reaches, when the lock gate holds
+                    some back (the board puts it after the editing state; the
+                    state select leaves no room there at 300 wide). */}
+                {lockedCount > 0 ? (
+                  <span className="tw:font-normal tw:text-[12px] tw:text-[var(--bk-ink-muted)]" data-testid="inspector-batch-eligible">
+                    {" "}· {selectedEls.length - lockedCount} of {selectedEls.length} eligible
+                  </span>
+                ) : null}
+              </>
             ) : (
               <ElementNameField composer={composer} elementId={element.id} typeLabel={typeLabel} />
             )}

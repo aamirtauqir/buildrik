@@ -8,6 +8,7 @@
  * @license BSD-3-Clause
  */
 
+import { isJustAdded } from "../justAddedField";
 import { isTableCell, TableAccessibilitySection, TableCellSection, TableStructureSection } from "../TableSections";
 import { adaptElementProps, defineSection, ownSection as own, type AnySectionEntry } from "./_shared";
 import { CmsBindingSection } from "../CmsBindingSection";
@@ -68,6 +69,8 @@ export const CONTENT_SECTIONS: Record<string, AnySectionEntry> = {
     title: "Validation",
     open: "closed",
     capability: (caps) => caps.typeBlock === "input",
+    /* 2L9 F06: a field just added shows only the rows a new field needs. */
+    shouldRender: (ctx) => !isJustAdded(ctx.composer, ctx.selectedElement.id),
     summary: (ctx) => validationSummary(ctx.composer, ctx.selectedElement.id),
     Component: ValidationSection,
     styleKeys: [],

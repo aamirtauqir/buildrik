@@ -33,6 +33,9 @@ export interface TypeBlockBodyProps {
   mixedKeys?: ReadonlySet<string>;
   onOpenMediaLibrary?: (allowedTypes: MediaAssetType[], onSelect: (asset: MediaAsset) => void) => void;
   onOpenIconPicker?: (current: IconConfig | undefined, onSelect: (icon: IconConfig) => void) => void;
+  /** A form field "+ Add field" just made, untouched (2L9 F06): its body
+   *  shows only the rows a new field needs. */
+  justAdded?: boolean;
 }
 
 export const TYPE_BLOCKS: Partial<Record<TypeBlockId, React.FC<TypeBlockBodyProps>>> = {
