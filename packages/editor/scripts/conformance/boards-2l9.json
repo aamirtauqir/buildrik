@@ -4204,8 +4204,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Lane L-B A3 (built, not compared): a taken submission key is refused with '“{key}” is already used. Choose a unique submission key.' and the draft is kept (test FormFieldsAndSlides). Open: visual comparison.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B round 9, side by side with the board PNG (new probe ?block=contact-form&child=input&childAttrs={type:email}, Name → 'fullname'): Name field outlined red, and '“fullname” is already used. Choose a unique submission key.' under it in red (was a tinted band). The board's sample key 'name' is refused here by a different rule — it collides with a form property ('won’t survive publishing'), the code's behaviour; the duplicate case was walked with the block's own 'fullname'.",
    "tier": "P1"
   },
   {
@@ -4787,8 +4787,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Lane L-B P1 (built, not compared — copy checked against the dump): an unreadable entry keeps its draft in the field and says 'Enter a non-negative number and a supported unit. Last applied: 24 px.' (non-negative properties; others 'Enter a number and a supported unit. …'); a negative on a non-negative property is refused the same way.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B round 9, side by side with the board PNG (probe ?type=text, Font size '24pxx' + blur): red field, and 'Enter a non-negative number and a supported unit. Last applied: 24 px.' directly under Font size. Field errors used to collect in a tinted band under the section's last row (board 34); they now sit under their own field in a polite live region (Section/ErrorLine), every field.",
    "tier": "P1"
   },
   {
@@ -4832,8 +4832,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Lane L-B P2 (built, not compared): a unit change converts px ↔ rem / em at 16 px (24px → 1.5rem → 24px), keeping the rendered size; other pairs keep the number. Open: the board's conversion note line.",
+   "verified": "drift-open",
+   "verifiedNote": "Lane L-B round 9, compared with the board PNG (probe ?type=text, Font size unit px → rem): the field reads '1.5 rem', as the board draws it. Open: the board's toast 'Converted using root font 16px · Undo' — the number field is a shared control with no toast or history access (it is rendered outside a ToastProvider in many places); it needs that threaded through the field context first.",
    "tier": "P1"
   },
   {
@@ -4843,8 +4843,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Lane L-B P1 (built, not compared): a calc() / clamp() / min() / max() value shows as authored, the row reads '{Label} · Custom value', no unit menu or stepper, note 'Preserved as authored. Enter an explicit supported value to replace it.'; focus + blur writes nothing; an explicit value replaces it.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B round 9, side by side with the board PNG (probe ?type=text&styles={width:'calc(100% - 2rem)'}): 'Width · Custom value' on its own line, 'calc(100% - 2rem)' full width under it, then 'Preserved as authored. Enter an explicit supported value to replace it.' full width. Live had squeezed the label into the label column (truncated) and the note into it too.",
    "tier": "P1"
   },
   {
@@ -4999,8 +4999,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Lane L-B A7 (built, not compared): a disabled interaction keeps its row, value 'Off · {effect}'. Open: 'Enable interaction' row action.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B round 9, side by side with the board PNG (new probe ?interactions=[{trigger:'scroll-into-view',enabled:false}], Behavior): a centred muted row 'Off · Fade In on scroll into view', '+ Add interaction', and 'Enable interaction' (full width, shown when exactly one interaction is off, so it names one). The board's short 'Fade in on scroll' is the trigger's label shortened; live reads the trigger's own label.",
    "tier": "P1"
   },
   {
@@ -5033,8 +5033,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Lane L-B A7c (built, not compared): Interaction actions menu — see 165:17822.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B round 9, side by side with the board PNG (probe, two scroll-into-view interactions): each is one centred row 'On scroll into view · Fade In ›' that opens its screen, then '+ Add interaction'. Interaction rows were label/value select rows (board 2 of the old file). The CSS-animation row (ElementAnimationRow) keeps the label/value form; the board draws none.",
    "inheritsFrom": "165:17822",
    "tier": "P1"
   },
@@ -5624,8 +5624,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Lane L-B round 8, compared with the board PNG: the board makes Choose font the tab's whole body — Search field, one wide row per family+source ('Studio Sans · Uploaded' / file · weight under it; 'Studio Sans · Catalogue' / 'Same family label · different source identity'), Inherit, Manage site fonts, Cancel, and 'Search, scroll and {layer} → Font are retained.' Live is the dropdown under the Font row (search, category chips, SYSTEM / GOOGLE FONTS / UPLOADED groups, Manage site fonts foot). Not built this round: it is a picker redesign (a font-picker tab subview), and the retention line depends on R07's return-to-origin. Needs a lead call on whether R02 replaces the dropdown everywhere (the Brand font token uses the same picker).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B round 9, lead decision: Choose font is the one picker. Side by side with the board PNG (probe heading › Style › Font row, search 'Ge'): 'Choose font' fills the tab body — search field, one full-width row per family and source ('Georgia · System', 'Geist Mono · Catalogue'; an uploaded family reads '{Family} · Uploaded' with '{file} · {weight}' under it, and a catalogue family with the same name reads 'Same family label · different source identity' — unit-tested, the probe has no uploaded font), Inherit, Manage site fonts, Cancel, 'Search, scroll and {layer} → Font are retained.' The line is kept because it is true: search and scroll are held per element while the picker is open and restored after a trip to Site fonts (unit-tested). Rows come only from the font list: FontManager's uploaded fonts, the system stacks, the Google catalogue. Not matched: the board's search field is a gray filled box; live is the chrome-ui TextInput. Brand's token picker still mounts the old dropdown, outside L-B's paths: REQUESTS B-19.",
    "tier": "P1"
   },
   {
@@ -5980,8 +5980,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Lane L-B round 8, side by side with the board PNG (probe ?page=1&pageName=Home): matches — 'Home · Page' with ⋯ ✕, the path under it, 'Editing Desktop · Page appearance', Background › Color, Size › Max width, Typography › Font · Text color, open without chevrons, 'Page settings' with a full-width 'SEO and social' button and 'Opens Home’s Page settings. Appearance stays here.' Open: the board's Spacing is one 'Padding 32 px' row; live shows the generic Padding top / sides / bottom, Margin top / bottom rows (and its Source block). The board's path '… › Hero › Home · Page' carries the previous selection; live shows the page alone. Font reads 'Inter' on the board from the cascade (the S21 read); the probe has no canvas node for the page root, so it reads 'Select font…' there.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B round 9, side by side with the board PNG (probe ?page=1&pageName=Home): header, path, 'Editing Desktop · Page appearance', Background / Size / Typography, Spacing as one 'Padding 20 px' row (shown only when all four sides agree, writing all four; no margin rows until one is set), 'Page settings' with full-width 'SEO and social' and its note. The probe page's padding is a spacing token, so its Source group shows ('Padding · spacing token · 20 px resolved', Unlink writes all four); the board's 32 px is a plain value. 'More settings' under Spacing now works on the page panel (splits the sides) — it was a dead button there; the board draws none, kept so separate sides stay reachable.",
    "tier": "P1"
   },
   {

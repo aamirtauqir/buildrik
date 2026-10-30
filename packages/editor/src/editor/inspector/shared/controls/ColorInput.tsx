@@ -11,7 +11,7 @@ import { ChevronDown, Link2, Link2Off } from "lucide-react";
 import * as React from "react";
 import { useInspectorField } from "./InspectorFieldContext";
 import { FieldDot } from "./FieldDot";
-import { ErrorLine, useFieldError } from "./Section";
+import { ErrorLine } from "./Section";
 import { fieldTestId, labelTestId, rowTestId } from "./ControlRow";
 import { useColorRegistry } from "@/editor/design-system/state/TokenRegistryContext";
 import { isTokenVar, extractVarName, cssVarToTokenId } from "../tokenBindingDetection";
@@ -201,7 +201,7 @@ export const ColorInput: React.FC<ColorInputProps> = ({
      does is flagged on Enter / blur (DD-19) and Esc puts the value back. */
   const [hexText, setHexText] = React.useState(display);
   const [invalid, setInvalid] = React.useState(false);
-  const errorId = useFieldError(invalid ? HEX_ERROR : null);
+  const errorId = React.useId();
   React.useEffect(() => {
     setHexText(display);
     setInvalid(false);

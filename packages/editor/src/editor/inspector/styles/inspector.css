@@ -202,15 +202,6 @@
 .bdi-sec.closed .bdi-sec-body {
   display: none;
 }
-/* Board 34: the section's error band, under its last row, full width. */
-.bdi-sec-errors {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: var(--bk-space-8) var(--bk-space-16);
-  background: var(--bk-error-tint);
-}
-
 /* ── Sub-label inside section body ────────────────────── */
 /* 2L9 F02 / F10: a group inside a section is headed like a section —
    "Field", "Notifications" — 13 semibold ink, sentence case. */

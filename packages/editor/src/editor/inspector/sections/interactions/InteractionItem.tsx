@@ -6,7 +6,7 @@
 
 import * as React from "react";
 import { ANIMATION_PRESETS, type Interaction, getTriggerInfo } from "./types";
-import { PickRow } from "../behaviourRows";
+import { Button } from "@/editor/chrome-ui";
 
 // ============================================================================
 // TYPES
@@ -22,21 +22,39 @@ export interface InteractionItemProps {
 // COMPONENT
 // ============================================================================
 
-/* Board 2: "On click  [Scroll to menu ▾]" — the trigger as the label, the
-   animation it plays as the value; opening it drills into its edit screen. */
+/* 2L9 165:19449 / 165:18272: one interaction is one centred row —
+   "On scroll into view · Fade in ›" — that drills into its edit screen. A
+   disabled one keeps its row, muted, as "Off · Fade in on scroll into view". */
 export const InteractionItem: React.FC<InteractionItemProps> = ({ interaction, onOpen }) => {
   const triggerInfo = getTriggerInfo(interaction.trigger);
   const presetLabel =
     ANIMATION_PRESETS.find((p) => p.value === interaction.animation.preset)?.label ?? interaction.animation.preset;
-
-  /* 2L9 165:18272: a disabled interaction keeps its row, marked "Off · …". */
+  const on = interaction.enabled;
   return (
-    <PickRow
-      label={triggerInfo.label}
-      value={interaction.enabled ? presetLabel : `Off · ${presetLabel}`}
-      onOpen={onOpen}
-      muted={!interaction.enabled}
-    />
+    <Button
+      type="button"
+      variant="ghost"
+      size="xs"
+      onClick={onOpen}
+      data-testid="interaction-row"
+      className={
+        "tw:h-10 tw:w-full tw:justify-center tw:gap-0 tw:text-[13px] tw:font-normal tw:text-[var(--bk-ink)] tw:focus:ring-0" +
+        (on ? "" : " tw:text-[var(--bk-ink-soft)]")
+      }
+    >
+      {on ? (
+        <>
+          <span>{triggerInfo.label}</span>
+          <span>&nbsp;· {presetLabel}</span>
+          <span aria-hidden="true">&nbsp;›</span>
+        </>
+      ) : (
+        <>
+          <span>Off · {presetLabel}&nbsp;</span>
+          <span>{triggerInfo.label.toLowerCase()}</span>
+        </>
+      )}
+    </Button>
   );
 };
 

@@ -18,7 +18,7 @@ import * as React from "react";
 import { fieldTestId, labelTestId, rowTestId } from "./ControlRow";
 import { FieldDot } from "./FieldDot";
 import { useInspectorField, mixedName } from "./InspectorFieldContext";
-import { ErrorLine, useFieldError } from "./Section";
+import { ErrorLine } from "./Section";
 import { TextField, BK_SELECT_BARE_UNIT_THEME, BK_SELECT_BARE_VALUE_THEME, Select, Textarea, TextInput, Tooltip } from "@/editor/chrome-ui";
 
 // ============================================================================
@@ -287,7 +287,7 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
   const [text, setText] = React.useState(shown);
   const [invalid, setInvalid] = React.useState(false);
   const error = invalid ? numberError(property, custom ? "" : num, unit) : null;
-  const errorId = useFieldError(error);
+  const errorId = React.useId();
 
   /* A new value from outside (another element, an undo) replaces whatever
      is in the field, including an entry it could not read. */
@@ -447,11 +447,13 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
   );
 
   /* An unlabelled field takes the whole row (paired fields). Its override
-     dot sits in front of the field — with no label there is nowhere else. */
+     dot sits in front of the field — with no label there is nowhere else.
+     A custom expression stacks (2L9 I08): "Width · Custom value" on its own
+     line, the expression full width under it, then the note. */
   return (
     <div
       data-testid={label ? rowTestId(label) : undefined}
-      className={`bdi-row-ctrl${label ? "" : " bare"}`}
+      className={`bdi-row-ctrl${label ? "" : " bare"}${custom ? " tw:grid-cols-1! tw:gap-y-1" : ""}`}
     >
       {label ? (
         <label className="bdi-lb" data-testid={labelTestId(label)} htmlFor={inputId}>
@@ -475,7 +477,7 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
       </div>
       <ErrorLine id={errorId} message={error} />
       {custom && !invalid ? (
-        <p className="tw:m-0 tw:pb-1 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="inspector-field-custom">
+        <p className="tw:col-span-full tw:m-0 tw:pb-1 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="inspector-field-custom">
           Preserved as authored. Enter an explicit supported value to replace it.
         </p>
       ) : null}
