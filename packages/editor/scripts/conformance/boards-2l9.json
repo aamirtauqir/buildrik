@@ -13983,7 +13983,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Round 24, tray half probe-compared (publish-tray-running): status card kept, PUBLISHING with ✓ / ● '· step n of N' / ○ rows from the worker's steps (skipped ones dropped; the tray used to look for status 'running', the worker writes 'active'), footer 'Publishing can’t be stopped once deploying. You can keep working or leave.', no CTA. Still open: 'step 2 of 4' until the worker marks never-run steps skipped up front and 'Elapsed' needs startedAt (A-32); topbar 'Publishing 2/3…' built in StudioHeader (publishSteps) but AquibraStudio must pass it (A-29).",
+   "verifiedNote": "Round 28: topbar 'Publishing 2/3…' wired (A-29: AquibraStudio passes publishSteps) and probe-compared (topbar-shell&publish=running vs shots/233-3648.png); tray half compared round 24. Still open for the server half of A-32 (never-run steps marked skipped up front so N is 3; startedAt for Elapsed) — cleared, in progress.",
    "tier": "P1"
   },
   {
@@ -13994,7 +13994,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Round 24, tray half probe-compared (publish-tray-queued): 'Queued — waiting to start' and 'Cancel (not started)' (publishJob.cancel; the server cancels QUEUED/BUILDING for any member — no Admin gate in code). Still open: the pending step names are unknown until the worker writes them (queued jobs carry steps: []), Elapsed (A-32), topbar 'Publishing 0/3…' (A-29).",
+   "verifiedNote": "Round 28: topbar label wired (A-29); queued state compared round 24. Open for A-32's server half (step names before the worker starts, Elapsed).",
    "tier": "P1"
   },
   {
@@ -14015,8 +14015,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 25: tray half probe-compared (round 24). Topbar half built: Topbar `publish=\"failed\"` ('Publish failed' on --bk-error, still the tray toggle; Topbar.test) and StudioHeader `publishFailed` (StudioHeader.test). Open only until AquibraStudio passes publishFailed (REQUESTS A-29, owner).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 28: tray half probe-compared (round 24, publish-tray-failed); topbar half now wired (A-29: AquibraStudio passes publishFailed = uiState failed and not a lost poll) and probe-compared: shots/233-5303.png top bar vs probe topbar-shell&publish=failed — red 'Publish failed', still the tray toggle. Presence avatars absent in the probe.",
    "tier": "P1"
   },
   {

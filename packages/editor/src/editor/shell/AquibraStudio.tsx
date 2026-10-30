@@ -704,6 +704,10 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           onExportHTML={handleExportHTML}
           onVercelPublish={requestPublish}
           publishLoading={publishJob.uiState === "publishing"}
+          /* A-29: the toggle counts the worker's steps (B8-PB07) and turns
+             red on a failed publish (B8-PB10); a lost poll is not a failure. */
+          publishSteps={publishJob.steps}
+          publishFailed={publishJob.uiState === "failed" && !publishJob.pollLost}
           publishedUrl={publishJob.publishedUrl}
           publishOutcome={publishOutcome}
           reviewStatus={reviewStatus}

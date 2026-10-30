@@ -4225,6 +4225,10 @@ const CASES: Record<string, () => React.ReactElement> = {
         unreadCount={0}
         onOpenNotifications={() => {}}
         onPublish={() => {}}
+        /* `&publish=failed|running`: B8-PB10's red toggle, B8-PB07's run label. */
+        publish={new URLSearchParams(location.search).get("publish") === "failed" ? "failed" : "ready"}
+        publishExpanded={false}
+        ctaLabel={new URLSearchParams(location.search).get("publish") === "running" ? "Publishing 2/3…" : undefined}
         menu={
           <IconButton label="Site menu" data-testid="topbar-site-menu">
             <SiteMenuIcon />
