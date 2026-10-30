@@ -41,7 +41,10 @@ export interface PublishSnapshot {
   pageNames: string[];
   /** `rawAt` is the timestamp itself — board 784:4326 prints it relatively
       ("just now"), board 641:2652 absolutely ("2 Jul, 14:22"). */
-  lastDeploy: { version: number; when: string; rawAt: string | Date | null; isLive: boolean } | null;
+  lastDeploy: { id: string; version: number; when: string; rawAt: string | Date | null; isLive: boolean; rollbackable: boolean } | null;
+  /** The deploy before the last one — the other side of the tray's "See what
+      changed" (B8-PB09) once a publish lands. */
+  previousDeploy: { id: string; version: number; rollbackable: boolean } | null;
   loading: boolean;
   /** The history read failed. Board 781:4489 — never the same as "no deploys
       yet", which is what a silent catch made it look like. */
@@ -193,12 +196,15 @@ export function usePublishSnapshot(
        serving; a finished job only says a deploy once ran. */
     lastDeploy: latest
       ? {
+          id: latest.id,
+          rollbackable: latest.rollbackable,
           version: latest.version,
           when: deployStamp(latest.completedAt),
           rawAt: latest.completedAt,
           isLive: Boolean(publishedUrl),
         }
       : null,
+    previousDeploy: rows?.[1] ? { id: rows[1].id, version: rows[1].version, rollbackable: rows[1].rollbackable } : null,
     loading,
     error,
     reload: () => setRetry((n) => n + 1),

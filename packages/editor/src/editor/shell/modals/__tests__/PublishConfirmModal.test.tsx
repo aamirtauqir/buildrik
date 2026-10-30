@@ -30,6 +30,7 @@ vi.mock("@/editor/chrome-ui", async () => {
 import { ToastProvider } from "@/editor/chrome-ui";
 import { EVENTS } from "@/shared/constants/events";
 import { PublishConfirmModal } from "../PublishConfirmModal";
+import { publishTray } from "@/editor/shell/publishTrayStore";
 
 const composer = {} as never;
 
@@ -62,7 +63,7 @@ describe("PublishConfirmModal — it does not publish on its own", () => {
   it("publishes only when the user confirms", async () => {
     const onConfirm = vi.fn();
     renderModal({ onConfirm });
-    fireEvent.click(await screen.findByText("Publish now"));
+    fireEvent.click(await screen.findByText("Publish"));
     expect(onConfirm).toHaveBeenCalledTimes(1);
   });
 
@@ -79,30 +80,54 @@ describe("PublishConfirmModal — it does not publish on its own", () => {
     exportPublishPages.mockResolvedValue([]);
     renderModal();
     await waitFor(() => expect(screen.getByText(/0 pages/)).toBeTruthy());
-    const btn = (await screen.findByText("Publish now")).closest("button") as HTMLButtonElement;
+    const btn = (await screen.findByText("Publish")).closest("button") as HTMLButtonElement;
     expect(btn.disabled).toBe(true);
   });
 });
 
 describe("PublishConfirmModal — it states the real consequence", () => {
-  it("warns that a live site is replaced, and names the target", async () => {
+  it("names the live domain in the title and keeps the current release (B8-PB04)", async () => {
     renderModal({ isPublished: true, publishedUrl: "https://bellacucina.com" });
+    expect(screen.getByText("Publish to bellacucina.com")).toBeTruthy();
     await waitFor(() =>
-      expect(screen.getByText(/replaces the live site immediately/)).toBeTruthy(),
+      expect(screen.getByTestId("publish-fact-val-rollback").textContent).toContain(
+        "the current live release stays available to republish",
+      ),
     );
-    /* Board 914:4507 names the environment with the domain: "Production ·
-       bellacucina.com", not the bare host. */
-    expect(screen.getByText("Production · bellacucina.com")).toBeTruthy();
-    // Board B3-10: one question and one verb in every state.
-    expect(screen.getByText("Publish to production?")).toBeTruthy();
-    expect(screen.getByText("Publish now")).toBeTruthy();
+    expect(screen.getByText("1 Changes")).toBeTruthy();
+    expect(screen.getByText("5 Release")).toBeTruthy();
   });
 
-  it("does not claim a live site is being replaced on a first publish", async () => {
+  it("a first publish has no live release to keep", async () => {
     const { container } = renderModal({ isPublished: false });
     await waitFor(() => expect(screen.getByText(/2 pages/)).toBeTruthy());
-    expect(container.textContent).not.toContain("replaces the live site");
-    expect(screen.getByText("Publish now")).toBeTruthy();
+    expect(screen.getByText("Publish this site")).toBeTruthy();
+    expect(container.textContent).not.toContain("current live release");
+  });
+});
+
+describe("PublishConfirmModal — tips are acknowledged (B8-PB04 / Play F4.09)", () => {
+  it("Publish waits for “I’ve seen these”, with the reason under it", async () => {
+    publishTray.setIssues([{ id: "w", type: "warning", message: "2 images have no alt text" }]);
+    const onConfirm = vi.fn();
+    renderModal({ onConfirm });
+    await waitFor(() => expect(screen.getByText("1 advisory check")).toBeTruthy());
+    const btn = screen.getByText("Publish").closest("button") as HTMLButtonElement;
+    expect(btn.disabled).toBe(true);
+    expect(screen.getByTestId("publish-confirm-reason").textContent).toBe("Tick the boxes above to publish");
+    fireEvent.click(screen.getByTestId("publish-fact-tips-seen"));
+    expect(btn.disabled).toBe(false);
+    expect(screen.queryByTestId("publish-confirm-reason")).toBeNull();
+    fireEvent.click(btn);
+    expect(onConfirm).toHaveBeenCalledTimes(1);
+    publishTray.setIssues([]);
+  });
+
+  it("no tips, no box: Publish is ready", async () => {
+    renderModal();
+    await waitFor(() => expect(screen.getByText(/2 pages/)).toBeTruthy());
+    expect(screen.queryByTestId("publish-fact-tips-seen")).toBeNull();
+    expect((screen.getByText("Publish").closest("button") as HTMLButtonElement).disabled).toBe(false);
   });
 });
 
@@ -117,10 +142,11 @@ describe("PublishConfirmModal — approval line reflects the real round", () => 
     await waitFor(() => expect(screen.getByText(/Approved by Sara Khan/)).toBeTruthy());
   });
 
-  it("says not-sent when there is no round", async () => {
+  it("no round, no Approval row", async () => {
     fetchCurrentRound.mockResolvedValue(null);
     renderModal();
-    await waitFor(() => expect(screen.getByText("Not sent for review.")).toBeTruthy());
+    await waitFor(() => expect(screen.getByText(/2 pages/)).toBeTruthy());
+    await waitFor(() => expect(screen.queryByText("4 Approval")).toBeNull());
   });
 
   it("surfaces unresolved comments instead of implying sign-off", async () => {
@@ -136,8 +162,8 @@ describe("PublishConfirmModal — approval line reflects the real round", () => 
   it("never blocks on a failed review lookup — publish stays available", async () => {
     fetchCurrentRound.mockRejectedValue(new Error("network"));
     renderModal();
-    await waitFor(() => expect(screen.getByText("Not sent for review.")).toBeTruthy());
-    const btn = (await screen.findByText("Publish now")).closest("button") as HTMLButtonElement;
+    await waitFor(() => expect(screen.queryByText("4 Approval")).toBeNull());
+    const btn = (await screen.findByText("Publish")).closest("button") as HTMLButtonElement;
     expect(btn.disabled).toBe(false);
   });
 });

@@ -137,6 +137,8 @@ import type { PageItem } from "@/editor/sidebar/tabs/pages/types";
 import { PageSwitcher } from "@/editor/shell/PageSwitcher";
 import { BottomBar } from "@/editor/shell/BottomBar";
 import { saveStatusStore } from "@/editor/shell/saveStatusStore";
+import { publishTray } from "@/editor/shell/publishTrayStore";
+import { UnpublishConfirmModal } from "@/editor/sidebar/tabs/publish/UnpublishConfirmModal";
 import { saveFailedBanner } from "@/editor/shell/globalBanners";
 import type { SaveState } from "@/editor/chrome-ui";
 import { LayoutShell } from "@/editor/rail/LayoutShell";
@@ -845,13 +847,23 @@ function RestoredProbe() {
 function ShellProbe() {
   const tab = (new URLSearchParams(location.search).get("tab") ?? "pages") as GroupedTabId;
   const composer = React.useMemo(() => {
-    const c = listingsComposer();
+    /* `?pages=100`: the 100-page site of board 498:634 (switcher scale). */
+    const c = new URLSearchParams(location.search).get("pages") === "100" ? hundredComposer() : listingsComposer();
     /* `?refuse=<page name>`: the engine refuses that page's delete, the one
        way a real bulk delete partly fails (139:48427). */
     const refuse = new URLSearchParams(location.search).get("refuse");
     if (refuse) {
       const del = c.elements.deletePage.bind(c.elements);
-      c.elements.deletePage = (id: string) => (c.elements.getPage(id)?.name === refuse ? false : del(id));
+      /* `&once=1`: refuse only the first try, so Retry can succeed (139:49899). */
+      const once = new URLSearchParams(location.search).get("once") === "1";
+      let refused = false;
+      c.elements.deletePage = (id: string) => {
+        if (c.elements.getPage(id)?.name === refuse && !(once && refused)) {
+          refused = true;
+          return false;
+        }
+        return del(id);
+      };
     }
     return c;
   }, []);
@@ -2318,10 +2330,42 @@ const trayComposer = {
   selection: { select: () => {} },
 } as unknown as React.ComponentProps<typeof PublishTray>["composer"];
 
+/* With `&siteId=` in the URL the tray asks the server for its history, its
+   readiness checks and the review round; these answer over the tRPC
+   transport (`stubTrpc`'s envelope). `hang` names procedures that never
+   answer — the checks-loading board (B8-PB23). */
+const TRAY_CHECKS = {
+  ready: true,
+  checks: [
+    { label: "Favicon", status: "warning", detail: "No favicon set. Browsers will show a default icon." },
+    { label: "SEO configured", status: "warning", detail: "No meta title template set. Search engines may not index your site properly." },
+  ],
+};
+const TRAY_ROWS = [
+  { id: "j13", version: 13, completedAt: new Date(Date.now() - 60_000).toISOString(), deploymentId: "d13", rollbackable: true, rolledBackFrom: null },
+  { id: "j12", version: 12, completedAt: new Date(Date.now() - 2 * 86_400_000).toISOString(), deploymentId: "d12", rollbackable: true, rolledBackFrom: null },
+];
+function stubTrayServer(answers: Record<string, unknown>, hang: string[] = []) {
+  window.fetch = (async (input: RequestInfo | URL) => {
+    const href = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+    const procs = new URL(href, location.origin).pathname.split("/api/trpc/")[1]?.split(",") ?? [];
+    if (procs.some((p) => hang.includes(p))) return new Promise<Response>(() => {});
+    const body = procs.map((name) => ({ result: { data: { json: answers[name] ?? null } } }));
+    return new Response(JSON.stringify(body), { status: 200, headers: { "content-type": "application/json" } });
+  }) as typeof fetch;
+}
+
 function publishTrayFrame(
   probe: string,
-  o: { nextMove: ReturnType<typeof deriveLifecycleState>; issues?: Issue[]; job?: Partial<UsePublishJobResult> },
+  o: {
+    nextMove: ReturnType<typeof deriveLifecycleState>;
+    issues?: Issue[];
+    job?: Partial<UsePublishJobResult>;
+    server?: Record<string, unknown>;
+    hang?: string[];
+  },
 ): React.ReactElement {
+  if (o.server || o.hang) stubTrayServer(o.server ?? {}, o.hang);
   const job: UsePublishJobResult = {
     uiState: "idle",
     jobId: null,
@@ -4037,9 +4081,77 @@ const CASES: Record<string, () => React.ReactElement> = {
   "publish-tray-success": () => publishTrayFrame("publish-tray-success", {
     nextMove: null,
     job: { uiState: "published", jobId: "cmv8job000001" },
+    server: { "sites.publishHistory": TRAY_ROWS },
+  }),
+  /* Round 24 (B8-PB01/02/07/08/12/14/15/19/23). Pair with `&siteId=s1` so
+     the server answers below are read. */
+  "publish-tray-ready": () => publishTrayFrame("publish-tray-ready", {
+    nextMove: deriveLifecycleState({ ...TRAY_LIFE, reviewsEnabled: true, editsRequireApproval: true, reviewState: "approved" }),
+    issues: [{ id: "i2", type: "warning", message: "2 images have no alt text", elementId: "el-2" }],
+    server: {
+      "sites.publishHistory": TRAY_ROWS.slice(1),
+      "sites.prePublishChecks": TRAY_CHECKS,
+      "reviews.currentRound": { id: "r1", status: "APPROVED", invitedEmail: "lena@client.test", reviewerName: "Lena", revoked: false, resolvedAt: "2026-10-15T10:00:00.000Z", createdAt: "2026-10-14T10:00:00.000Z", revision: "x", roundNumber: 1, totalRounds: 1, openCommentCount: 0, token: null },
+    },
+  }),
+  "publish-tray-blocking-server": () => publishTrayFrame("publish-tray-blocking-server", {
+    nextMove: deriveLifecycleState({ ...TRAY_LIFE, errorCount: 1 }),
+    issues: [
+      { id: "i1", type: "error", message: "Collection list “Latest posts” has no source", elementId: "el-1" },
+      { id: "i2", type: "warning", message: "2 images have no alt text", elementId: "el-2" },
+    ],
+    server: { "sites.publishHistory": TRAY_ROWS.slice(1), "sites.prePublishChecks": TRAY_CHECKS },
+  }),
+  "publish-tray-running": () => publishTrayFrame("publish-tray-running", {
+    nextMove: deriveLifecycleState(TRAY_LIFE),
+    server: { "sites.publishHistory": TRAY_ROWS.slice(1) },
+    job: {
+      uiState: "publishing",
+      jobId: "cmv8job000003",
+      progress: 50,
+      steps: [
+        { name: "Generating pages", status: "done" },
+        { name: "Optimizing images", status: "skipped" },
+        { name: "Deploying to CDN", status: "active" },
+        { name: "Verifying SSL", status: "pending" },
+        { name: "Performance check", status: "pending" },
+      ],
+    },
+  }),
+  "publish-tray-queued": () => publishTrayFrame("publish-tray-queued", {
+    nextMove: deriveLifecycleState(TRAY_LIFE),
+    server: { "sites.publishHistory": TRAY_ROWS.slice(1) },
+    job: { uiState: "publishing", jobId: "cmv8job000004", progress: 0, steps: null },
+  }),
+  "publish-tray-lost": () => publishTrayFrame("publish-tray-lost", {
+    nextMove: deriveLifecycleState(TRAY_LIFE),
+    server: { "sites.publishHistory": TRAY_ROWS.slice(1) },
+    job: { uiState: "failed", jobId: "cmv8job000005", pollLost: true, error: "Failed to poll publish status" },
+  }),
+  "publish-tray-simulated": () => publishTrayFrame("publish-tray-simulated", {
+    nextMove: null,
+    server: { "sites.publishHistory": TRAY_ROWS.slice(1) },
+    job: { uiState: "published", jobId: "cmv8job000006", publishedUrl: "https://s1.dev-simulated.invalid" },
+  }),
+  "publish-tray-changes-requested": () => publishTrayFrame("publish-tray-changes-requested", {
+    nextMove: deriveLifecycleState({ ...TRAY_LIFE, reviewsEnabled: true, editsRequireApproval: true, reviewState: "changes-requested", reviewerName: "Lena" }),
+    server: {
+      "sites.publishHistory": TRAY_ROWS.slice(1),
+      "reviews.currentRound": { id: "r1", status: "CHANGES_REQUESTED", invitedEmail: "lena@client.test", reviewerName: "Lena", revoked: false, resolvedAt: null, createdAt: "2026-10-14T10:00:00.000Z", revision: "x", roundNumber: 1, totalRounds: 1, openCommentCount: 2, token: null },
+    },
+  }),
+  "publish-tray-viewer": () => publishTrayFrame("publish-tray-viewer", {
+    nextMove: deriveLifecycleState({ ...TRAY_LIFE, isViewer: true }),
+    server: { "sites.publishHistory": TRAY_ROWS.slice(1) },
+  }),
+  "publish-tray-checking": () => publishTrayFrame("publish-tray-checking", {
+    nextMove: deriveLifecycleState(TRAY_LIFE),
+    server: { "sites.publishHistory": TRAY_ROWS.slice(1) },
+    hang: ["sites.prePublishChecks"],
   }),
   "publish-tray-failed": () => publishTrayFrame("publish-tray-failed", {
     nextMove: deriveLifecycleState(TRAY_LIFE),
+    server: { "sites.publishHistory": TRAY_ROWS.slice(1) },
     job: {
       uiState: "failed",
       jobId: "cmv8job000002",
@@ -4219,6 +4331,28 @@ const CASES: Record<string, () => React.ReactElement> = {
       />
     </div>
   ),
+  /* B8-PB18 233:9714 — Unpublish, typed domain. */
+  "unpublish-confirm": () => (
+    <div data-probe="unpublish-confirm">
+      <UnpublishConfirmModal open siteName="Fieldwork Studio" domain="fieldwork.studio" onConfirm={() => {}} onClose={() => {}} />
+    </div>
+  ),
+  /* B8-PB04 233:1802 — the confirm with advice to acknowledge: the server's
+     two warnings (stubbed transport, `&siteId=s1`) and the site's own tip,
+     a save stamp, an approved round. Publish waits for the box. */
+  "publish-confirm-tips": () => {
+    stubTrayServer({
+      "sites.prePublishChecks": TRAY_CHECKS,
+      "reviews.currentRound": { id: "r1", status: "APPROVED", invitedEmail: "lena@client.test", reviewerName: "Lena", revoked: false, resolvedAt: "2026-10-15T10:00:00.000Z", createdAt: "2026-10-14T10:00:00.000Z", revision: "x", roundNumber: 1, totalRounds: 1, openCommentCount: 0, token: null },
+    });
+    publishTray.setIssues([{ id: "i2", type: "warning", message: "2 images have no alt text", elementId: "el-2" }]);
+    saveStatusStore.set({ state: "saved", savedAt: new Date("2026-10-30T10:42:00").getTime() });
+    return (
+      <div data-probe="publish-confirm-tips">
+        <PublishConfirmModal isOpen composer={null} siteId="s1" publishedUrl="https://fieldwork.studio" isPublished onConfirm={() => {}} onClose={() => {}} />
+      </div>
+    );
+  },
   /* Board 1171:4713 — the Pages panel with the row context menu open over it.
      PageContextMenu is a portal with a fixed position computed from the
      click, so the probe hands it the coordinates a right-click on the Menu

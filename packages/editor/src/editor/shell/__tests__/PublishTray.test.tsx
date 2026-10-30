@@ -47,6 +47,8 @@ vi.mock("@/services/cmsSync", () => ({
   retryCmsSync: () => cms.retry(),
 }));
 vi.mock("@/services/BuildrikSyncProvider", () => ({ getSiteIdFromUrl: () => "site-1" }));
+const roundState: { round: unknown } = { round: null };
+vi.mock("@/services/ReviewService", () => ({ fetchCurrentRound: async () => roundState.round }));
 const locateComment = vi.fn(() => "located");
 vi.mock("@/editor/sidebar/tabs/review/locate", () => ({ locateComment: (...a: unknown[]) => locateComment(...(a as [])) }));
 
@@ -144,6 +146,7 @@ beforeEach(() => {
   checksState.checks = { ready: true, checks: [] } as unknown as PrePublishChecksResult;
   cms.blocker = null;
   cms.failure = null;
+  roundState.round = null;
   cms.retry.mockClear();
   locateComment.mockClear();
 });
@@ -221,7 +224,7 @@ describe("PublishTray — states (B8-PB* copy)", () => {
     expect(reason()).toBe("Checking…");
   });
 
-  it("publishing: progress with the running step, the CTA shut", () => {
+  it("publishing (PB07): the worker's steps, skipped ones neither listed nor counted, no CTA", () => {
     renderTray({
       publishJob: job({
         uiState: "publishing",
@@ -229,22 +232,37 @@ describe("PublishTray — states (B8-PB* copy)", () => {
         progress: 40,
         steps: [
           { name: "Generating pages", status: "done" },
-          { name: "Deploying to CDN", status: "running" },
+          { name: "Optimizing images", status: "skipped" },
+          { name: "Deploying to CDN", status: "active" },
           { name: "Verifying SSL", status: "pending" },
         ],
       }),
     });
-    expect(screen.getByText("Publishing to fieldwork.studio…")).toBeTruthy();
-    expect(screen.getByText("Step 2 of 3 · Deploying to CDN")).toBeTruthy();
-    expect(cta().textContent).toBe("Publishing…");
-    expect(cta()).toBeDisabled();
+    const run = screen.getByTestId("publish-tray-run");
+    expect(run.textContent).toContain("Deploying to CDN · step 2 of 3");
+    expect(run.textContent).not.toContain("Optimizing images");
+    expect(screen.queryByTestId("publish-tray-cta")).toBeNull();
+    expect(screen.getByTestId("publish-tray-run-footer").textContent).toBe(
+      "Publishing can't be stopped once deploying. You can keep working or leave.",
+    );
+    expect(screen.getByTestId("publish-tray-status").textContent).toContain("Live · fieldwork.studio");
   });
 
-  it("success: the live URL, View live and Copy link", () => {
+  it("queued (PB08): no steps yet, and the job can still be cancelled", () => {
+    const queued = job({ uiState: "publishing", jobId: "job-1", steps: null });
+    renderTray({ publishJob: queued });
+    expect(screen.getByTestId("publish-tray-queued").textContent).toContain("Queued — waiting to start");
+    fireEvent.click(screen.getByRole("button", { name: "Cancel (not started)" }));
+    expect(queued.cancel).toHaveBeenCalledTimes(1);
+  });
+
+  it("success (PB09): the green sentence names the version, View live and Copy link", () => {
     renderTray({ nextMove: null, publishJob: job({ uiState: "published", jobId: "job-1" }) });
-    expect(screen.getByText("Your changes are live on fieldwork.studio.")).toBeTruthy();
-    expect(screen.getByTestId("publish-tray-view-live").getAttribute("href")).toBe("https://fieldwork.studio");
-    expect(screen.getByRole("button", { name: "Copy Copy link" }).textContent).toBe("Copy link");
+    expect(screen.getByTestId("publish-tray-published").textContent).toContain(
+      "Your changes are live on fieldwork.studio. v12 is live.",
+    );
+    expect(screen.getAllByTestId("publish-tray-view-live").map((a) => a.getAttribute("href"))).toContain("https://fieldwork.studio");
+    expect(screen.queryByTestId("publish-tray-cta")).toBeNull();
   });
 
   it("simulated success says nothing went live", () => {
@@ -289,6 +307,47 @@ describe("PublishTray — states (B8-PB* copy)", () => {
     expect(reason()).toBe("Saving CMS changes…");
   });
 
+  it("checks loading (PB23): placeholders only, nothing actionable", () => {
+    checksState.checkState = "loading";
+    renderTray();
+    expect(screen.getByTestId("publish-tray-skeleton")).toBeTruthy();
+    expect(screen.queryByTestId("publish-tray-status")).toBeNull();
+    expect(reason()).toBe("Checking…");
+  });
+
+  it("changes requested (PB15): who asked and how much, Open Review, no checks; the CTA waits on review", async () => {
+    roundState.round = { status: "CHANGES_REQUESTED", reviewerName: "Lena", invitedEmail: null, revoked: false, openCommentCount: 2, resolvedAt: null };
+    const { composer } = renderTray({
+      nextMove: move({ reviewsEnabled: true, editsRequireApproval: true, reviewState: "changes-requested", reviewerName: "Lena" }),
+    });
+    await waitFor(() =>
+      expect(screen.getByTestId("publish-tray-changes-requested").textContent).toContain(
+        "Lena requested changes on 2 comments. Publishing waits for a fresh approval.",
+      ),
+    );
+    expect(reason()).toBe("Waiting on review");
+    expect(document.querySelector('section[aria-label="Checks"]')).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Open Review ›" }));
+    expect(composer.emit).toHaveBeenCalledWith("ui:switch-tab", { tab: "review" });
+  });
+
+  it("an approved round is named in the Approval section (PB01)", async () => {
+    roundState.round = { status: "APPROVED", reviewerName: "Lena", invitedEmail: null, revoked: false, openCommentCount: 0, resolvedAt: "2026-10-15T10:00:00.000Z" };
+    renderTray({ nextMove: move({ reviewsEnabled: true, editsRequireApproval: true, reviewState: "approved" }) });
+    await waitFor(() => expect(screen.getByTestId("publish-tray-approval").textContent).toContain("✓ Approved by Lena"));
+  });
+
+  it("blockers list first and the count covers every row", () => {
+    checksState.checks = {
+      ready: true,
+      checks: [{ label: "Favicon", status: "warning", detail: "No favicon set." }],
+    } as unknown as PrePublishChecksResult;
+    renderTray({ nextMove: move({ errorCount: 1 }), issues: [{ id: "a", type: "error", message: "No source", elementId: "e" }] });
+    const rows = screen.getByTestId("publish-checks").querySelectorAll("[data-testid^='publish-']");
+    expect(rows[0].textContent).toContain("No source");
+    expect(screen.getByText("1 blocking · 1 tip")).toBeTruthy();
+  });
+
   it("an outside block (offline) speaks before the issue count", () => {
     renderTray({ nextMove: move({ offline: true, errorCount: 2 }) });
     expect(reason()).toBe("Needs a connection");
@@ -329,11 +388,15 @@ describe("PublishTray — outside refusals draw less (B8-PB19/20/21)", () => {
 });
 
 describe("PublishTray — deploy failed", () => {
-  it("shows the reason, the job id and the deployment id", () => {
+  it("(PB10) names the live version kept; View log shows the job id and the deployment id", () => {
     renderTray({
       publishJob: job({ uiState: "failed", jobId: "job-9", deploymentId: "dpl_123", error: "Vercel timed out." }),
     });
-    expect(screen.getByText(/Publish failed — Vercel timed out\./)).toBeTruthy();
+    expect(screen.getByTestId("publish-tray-failed").textContent).toContain(
+      "Publish failed — Vercel timed out. The live site still shows v12.",
+    );
+    expect(screen.queryByTestId("publish-tray-job-id")).toBeNull();
+    fireEvent.click(screen.getByTestId("publish-tray-view-log"));
     expect(screen.getByTestId("publish-tray-job-id").textContent).toBe("job-9");
     expect(screen.getByTestId("publish-tray-deployment-id").textContent).toBe("dpl_123");
     expect(cta().textContent).toBe("Try again");
@@ -371,6 +434,7 @@ describe("PublishTray — deploy failed", () => {
   it("a failure after partial upload (deployment id present) asks for a NEW job through the door, never re-tracks the dead one", () => {
     const failed = job({ uiState: "failed", jobId: "job-9", deploymentId: "dpl_partial", error: "Upload interrupted." });
     const { onRequestPublish } = renderTray({ publishJob: failed });
+    fireEvent.click(screen.getByTestId("publish-tray-view-log"));
     expect(screen.getByTestId("publish-tray-deployment-id").textContent).toBe("dpl_partial");
     fireEvent.click(cta());
     expect(onRequestPublish).toHaveBeenCalledTimes(1);
