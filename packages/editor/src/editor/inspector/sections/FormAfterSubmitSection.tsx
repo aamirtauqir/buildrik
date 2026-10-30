@@ -46,6 +46,7 @@
  * @license BSD-3-Clause
  */
 import { InspectorFieldContext } from "@/editor/inspector/shared/controls/InspectorFieldContext";
+import { useOnlineStatus } from "@/shared/hooks/useOnlineStatus";
 import * as React from "react";
 import type { Composer } from "@/engine";
 import { getBuildrikClient } from "@/services/api-client";
@@ -155,16 +156,6 @@ function RedirectRow({ composer, value, onCommit }: { composer: Composer | null;
   );
 }
 
-/** The browser's connection — the form settings live on the server. */
-function subscribeOnline(notify: () => void): () => void {
-  window.addEventListener("online", notify);
-  window.addEventListener("offline", notify);
-  return () => {
-    window.removeEventListener("online", notify);
-    window.removeEventListener("offline", notify);
-  };
-}
-
 /** A URL a visitor can be sent to: http(s), a host with a dot, no spaces. */
 const COMPLETE_URL = /^https?:\/\/[^\s/?#]+\.[^\s/?#]+(?:[/?#]\S*)?$/i;
 
@@ -176,7 +167,7 @@ export const FormAfterSubmitSection: React.FC<FormAfterSubmitSectionProps> = ({
   tier = "tertiary",
 }) => {
   const fieldCtx = React.useContext(InspectorFieldContext);
-  const online = React.useSyncExternalStore(subscribeOnline, () => navigator.onLine, () => true);
+  const online = useOnlineStatus();
   const [settings, setSettings] = React.useState<Settings | null>(null);
   const [loadError, setLoadError] = React.useState<string | null>(null);
   const [status, setStatus] = React.useState<Status>({ kind: "saved" });

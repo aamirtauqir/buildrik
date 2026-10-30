@@ -32,6 +32,7 @@
  * @license BSD-3-Clause
  */
 
+import { useOnlineStatus } from "@/shared/hooks/useOnlineStatus";
 import * as React from "react";
 import { ChevronLeft, Search as SearchIcon } from "lucide-react";
 import { Badge, Button, TextInput, useToast } from "@/editor/chrome-ui";
@@ -140,16 +141,6 @@ const SCOPE_LINE_FOR: Record<string, string> = {
  *  screen only says it in the footer (General, S05). */
 const OFFLINE_BANNER_SCREENS: ReadonlySet<string> = new Set(["headers", "analytics"]);
 
-/** The browser's connection — B8-S05 / SH04: Save needs one; the edits wait. */
-function subscribeOnline(notify: () => void) {
-  window.addEventListener("online", notify);
-  window.addEventListener("offline", notify);
-  return () => {
-    window.removeEventListener("online", notify);
-    window.removeEventListener("offline", notify);
-  };
-}
-const readOnline = () => navigator.onLine;
 
 function isScreenLocked(screenId: SettingsNavId, userPlan: PlanTier): boolean {
   const required = isSettingsScreenId(screenId) ? SCREEN_PLAN_REQUIREMENTS[screenId] : undefined;
@@ -801,7 +792,7 @@ export const SettingsTab: React.FC<
       : SCOPE_LINE.lifecycle;
 
   const immediate = screenRules?.saveModel === "immediate";
-  const online = React.useSyncExternalStore(subscribeOnline, readOnline, () => true);
+  const online = useOnlineStatus();
   const footStatus: { text: string; tone: "muted" | "ink" | "danger" } =
     !online && loadState === "ready"
       ? { text: OFFLINE_BANNER_SCREENS.has(currentScreen) ? "Needs a connection · changes stay here, unsaved" : "Needs a connection — your edits stay on this screen, unsaved", tone: "ink" }
