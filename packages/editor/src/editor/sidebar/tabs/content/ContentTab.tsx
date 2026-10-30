@@ -26,7 +26,6 @@ import {
   type CmsHydrationStatus,
 } from "@/services/cmsSync";
 import { useContentPanel } from "./useContentPanel";
-import { variableUsage } from "./variableUsage";
 import { cmsWorkspace, useCmsWorkspace } from "@/editor/cms/cmsWorkspaceStore";
 import { RootView } from "./ContentRootView";
 import {
@@ -35,7 +34,6 @@ import {
   SECTION_H,
   SourcesView,
   type SourceRowActions,
-  VariablesView,
 } from "./ContentViews";
 
 export interface ContentTabProps {
@@ -214,7 +212,8 @@ export const ContentTab: React.FC<ContentTabProps> = ({
           onOpenCollection={(id) => cmsWorkspace.openCollection(id)}
           onCreateCollection={onCreateCollection}
           onOpenSources={() => setView({ kind: "sources" })}
-          onOpenVariables={() => setView({ kind: "variables" })}
+          /* B5-V01: Site variables opens as the workspace's page, like a collection. */
+          onOpenVariables={() => cmsWorkspace.openVariables()}
           onOpenConditions={() => setView({ kind: "conditions" })}
         />
       );
@@ -226,21 +225,6 @@ export const ContentTab: React.FC<ContentTabProps> = ({
           onBack={() => setView({ kind: "root" })}
           onImportJson={importJson}
           actions={sourceActions}
-        />
-      );
-      break;
-    case "variables":
-      body = (
-        <VariablesView
-          variables={panel.variables}
-          onBack={() => setView({ kind: "root" })}
-          onChange={panel.setVariables}
-          usages={variableUsage(composer)}
-          onOpenUse={(id) => {
-            /* The element is on the canvas, which the CMS workspace covers. */
-            selectElement(id);
-            composer?.emit("ui:switch-tab", { tab: "layers" });
-          }}
         />
       );
       break;

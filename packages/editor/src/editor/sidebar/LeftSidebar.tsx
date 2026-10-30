@@ -16,7 +16,7 @@ import type { GroupedTabId, GroupedTabConfig } from "../rail/tabsConfig";
 import { getTabConfig, getFigmaRailGroups, RAIL_FIGMA_IDS, VIEWER_TABS } from "../rail/tabsConfig";
 import type { BlockData } from "@/shared/types";
 import type { PageSettingsOpenRequest } from "./tabs/pages/types";
-import { Button, HintTooltip, Menu, MenuGroup, MenuItem, MenuLabel, Popover, useToast } from "@/editor/chrome-ui";
+import { Button, HintTooltip, Menu, MenuGroup, MenuItem, Popover, useToast } from "@/editor/chrome-ui";
 import { useEditLocks } from "@/editor/shared/useEditLocks";
 import { InspectorErrorBoundary } from "../inspector/components/InspectorErrorBoundary";
 import { PanelSkeleton, SidebarErrorFallback } from "./SidebarFallbacks";
@@ -285,12 +285,16 @@ function RailHelpMenu({ composer, showTour }: { composer: Composer | null; showT
       }
     >
       <Menu label="Help" data-testid="rail-help-menu" className="tw:w-60">
-        <MenuLabel>Help</MenuLabel>
-        <MenuItem kbd="?" data-testid="rail-help-shortcuts" onClick={() => { close(); composer?.emit(EVENTS.UI_TOGGLE_CHEAT_SHEET, {}); }}>
+        {/* 2L9 263:255084 heads the menu "Help" in sentence case, muted — not
+            the shared MenuLabel's small caps. */}
+        <div className="tw:px-2 tw:pt-1 tw:pb-0.5 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]" data-testid="rail-help-title">
+          Help
+        </div>
+        <MenuItem kbd="?" className="tw:min-h-10" data-testid="rail-help-shortcuts" onClick={() => { close(); composer?.emit(EVENTS.UI_TOGGLE_CHEAT_SHEET, {}); }}>
           Keyboard shortcuts
         </MenuItem>
         {showTour && (
-          <MenuItem data-testid="rail-help-getting-started" onClick={() => { close(); composer?.emit(EVENTS.UI_ONBOARDING_REPLAY, {}); }}>
+          <MenuItem className="tw:min-h-10" data-testid="rail-help-getting-started" onClick={() => { close(); composer?.emit(EVENTS.UI_ONBOARDING_REPLAY, {}); }}>
             Getting started
           </MenuItem>
         )}

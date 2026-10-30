@@ -17,6 +17,8 @@ import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants";
 import { Button, IconButton, Menu, MenuItem, MenuSeparator, Popover, Tabs, useToast } from "@/editor/chrome-ui";
 import { useContentPanel } from "@/editor/sidebar/tabs/content/useContentPanel";
+import { VariablesView } from "@/editor/sidebar/tabs/content/ContentViews";
+import { variableUsage } from "@/editor/sidebar/tabs/content/variableUsage";
 import { DynamicPagesPane, type DynamicPagesSave } from "./DynamicPagesPane";
 import { CollectionSettingsPane } from "./CollectionSettingsPane";
 import { FieldsTable } from "./FieldsTable";
@@ -81,6 +83,8 @@ function plural(n: number, one: string, many = `${one}s`): string {
 
 export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary, onBackToCanvas }: CmsWorkspaceProps) {
   const panel = useContentPanel(composer);
+  /* B5-V01: the Site variables page's "+ New variable" asks its list to add. */
+  const [varAdd, setVarAdd] = React.useState(0);
   const { addToast } = useToast();
   const ws = useCmsWorkspace();
   /* 8139:217711 / 8139:217890 — an edit the server refused because another
@@ -185,6 +189,41 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
       ‹ {ws.origin ?? "Back to canvas"}
     </Button>
   ) : null;
+
+  /* 2L9 B5-V01 `260:235689`: Site variables is a page of the workspace —
+     the drawer keeps its list, this pane holds the variables. */
+  if (!collection && ws.page === "variables") {
+    return (
+      <div className="tw:flex tw:h-full tw:min-h-0" data-testid="cms-workspace" data-bk-full-page="">
+        <section className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:bg-[var(--bk-bg-subtle)]" data-testid="cms-ws-variables">
+          <header className={HEADER} data-testid="cms-ws-header">
+            {back}
+            <h2 className={TITLE}>Site variables</h2>
+            <span className="tw:flex-1" />
+            <Button size="xs" className={PRIMARY} data-testid="cms-ws-new-variable" onClick={() => setVarAdd((n) => n + 1)}>
+              + New variable
+            </Button>
+          </header>
+          <div className="tw:min-h-0 tw:flex-1">
+            <VariablesView
+              page
+              addSignal={varAdd}
+              variables={panel.variables}
+              onBack={() => cmsWorkspace.openCollection(null)}
+              onChange={panel.setVariables}
+              usages={variableUsage(composer)}
+              onOpenUse={(id) => {
+                const el = composer?.elements.getElement(id);
+                if (!composer || !el) return;
+                composer.selection.select(el);
+                composer.emit("ui:switch-tab", { tab: "layers" });
+              }}
+            />
+          </div>
+        </section>
+      </div>
+    );
+  }
 
   if (!collection) {
     const records = Object.values(panel.recordCounts).reduce((a, b) => a + b, 0);

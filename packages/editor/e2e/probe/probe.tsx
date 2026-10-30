@@ -2131,6 +2131,7 @@ function contentComposer({
     },
     elements: {
       getAllElements: () => elements.map(contentElement),
+      getAllPages: () => [],
       getElement: (id: string) => {
         const e = elements.find((x) => x.id === id);
         return e ? contentElement(e) : null;
@@ -2242,6 +2243,11 @@ function CmsWorkspaceHost() {
   );
   React.useState(() => {
     cmsWorkspace.reset();
+    /* `&page=variables`: Site variables as the workspace's page (B5-V01). */
+    if (q.get("page") === "variables") {
+      cmsWorkspace.openVariables();
+      return null;
+    }
     cmsWorkspace.openRequest({
       collectionId: "blog",
       recordId: q.get("record") ?? undefined,

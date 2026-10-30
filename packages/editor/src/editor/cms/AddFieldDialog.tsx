@@ -31,6 +31,29 @@ const HINT = "tw:m-0 tw:text-[12px] tw:leading-[18px]";
 /* 4418:164225 / :164230 — body copy is 14/20 ink, the dialog's own text size
    (measured: "Existing records keep empty values until edited." is 315px). */
 const NOTE = "tw:m-0 tw:text-[14px] tw:leading-5 tw:text-[var(--bk-ink)]";
+/* 2L9 167:4135…167:8207, type by type: which take a default here, which
+   show their limits here (the field inspector still edits every rule a type
+   has), and the line under the default. */
+const DEFAULTABLE: ReadonlySet<CMSFieldType> = new Set([...TYPED_VALUE_TYPES, "richtext", "boolean"]);
+const ADD_RULE_TYPES: ReadonlySet<CMSFieldType> = new Set(["text", "textarea", "number"]);
+function defaultHint(type: CMSFieldType, raw: string): string | null {
+  switch (type) {
+    case "email":
+      return "Default and record values must be valid email addresses.";
+    case "url":
+      return "Use a complete supported URL. Invalid values remain visible for correction.";
+    case "slug":
+      return "Use lowercase letters, numbers and hyphens. URL uniqueness is checked in Dynamic pages.";
+    case "number":
+      return "Empty limits are unset; they do not mean zero.";
+    case "date":
+    case "datetime":
+      return raw.trim() ? null : "No default is set.";
+    default:
+      return null;
+  }
+}
+
 /* 167:3871: a two-column grid of outlined tiles, 30 tall, 13 regular, left. */
 const TYPE_ROW =
   "tw:h-[30px] tw:w-full tw:justify-start tw:rounded-[var(--bk-radius-sm)] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:px-1.5 " +
@@ -170,6 +193,20 @@ export function AddFieldDialog({
     );
   }
 
+  const ruleRows = (ADD_RULE_TYPES.has(type) ? FIELD_RULES[type] ?? [] : []).map((r) => (
+    <div key={r.key} className={ROW}>
+      <label className={ROW_LABEL} htmlFor={`cms-add-field-rule-${r.key}`}>{r.label}</label>
+      <TextInput
+        id={`cms-add-field-rule-${r.key}`}
+        sizing="sm"
+        type="number"
+        value={rules[r.key] ?? ""}
+        onChange={(e) => setRules((p) => ({ ...p, [r.key]: e.target.value }))}
+        data-testid={`cms-add-field-rule-${r.key}`}
+      />
+    </div>
+  ));
+
   return (
     <Modal
       open
@@ -269,36 +306,42 @@ export function AddFieldDialog({
             <OptionsEditor id="cms-add-field-options" options={options} onChange={setOptions} live multiple={type === "multiselect"} />
           </div>
         ) : null}
-        {TYPED_VALUE_TYPES.has(type) ? (
+        {type === "number" ? ruleRows : null}
+        {DEFAULTABLE.has(type) ? (
           <div className={ROW}>
             <label className={ROW_LABEL} htmlFor="cms-add-field-default">Default value</label>
-            <TextInput id="cms-add-field-default" sizing="sm" autoComplete="off" value={defaultRaw} onChange={(e) => setDefaultRaw(e.target.value)} data-testid="cms-add-field-default" />
+            {type === "boolean" ? (
+              <Select id="cms-add-field-default" sizing="sm" value={defaultRaw === "true" ? "true" : ""} onChange={(e) => setDefaultRaw(e.target.value)} data-testid="cms-add-field-default">
+                <option value="">No</option>
+                <option value="true">Yes</option>
+              </Select>
+            ) : (
+              <TextInput
+                id="cms-add-field-default"
+                sizing="sm"
+                autoComplete="off"
+                type={type === "date" ? "date" : type === "datetime" ? "datetime-local" : "text"}
+                value={defaultRaw}
+                onChange={(e) => setDefaultRaw(e.target.value)}
+                data-testid="cms-add-field-default"
+              />
+            )}
           </div>
         ) : null}
         {defaultError ? (
           <p className={`${HINT} tw:-mt-2 tw:text-[var(--bk-error-text)]`} role="alert" data-testid="cms-add-field-default-error">
             {defaultError}
           </p>
+        ) : defaultHint(type, defaultRaw) ? (
+          <p className={`${HINT} tw:-mt-2 tw:text-[var(--bk-ink-muted)]`} data-testid="cms-add-field-default-hint">
+            {defaultHint(type, defaultRaw)}
+          </p>
         ) : null}
-        {(FIELD_RULES[type] ?? []).map((r) => (
-          <div key={r.key} className={ROW}>
-            <label className={ROW_LABEL} htmlFor={`cms-add-field-rule-${r.key}`}>{r.label}</label>
-            <TextInput
-              id={`cms-add-field-rule-${r.key}`}
-              sizing="sm"
-              type="number"
-              value={rules[r.key] ?? ""}
-              onChange={(e) => setRules((p) => ({ ...p, [r.key]: e.target.value }))}
-              data-testid={`cms-add-field-rule-${r.key}`}
-            />
-          </div>
-        ))}
-        {TYPED_VALUE_TYPES.has(type) ? (
-          <div className={ROW}>
-            <label className={ROW_LABEL} htmlFor="cms-add-field-placeholder">Placeholder</label>
-            <TextInput id="cms-add-field-placeholder" sizing="sm" autoComplete="off" value={placeholder} onChange={(e) => setPlaceholder(e.target.value)} data-testid="cms-add-field-placeholder" />
-          </div>
-        ) : null}
+        {type === "number" ? null : ruleRows}
+        <div className={ROW}>
+          <label className={ROW_LABEL} htmlFor="cms-add-field-placeholder">Placeholder</label>
+          <TextInput id="cms-add-field-placeholder" sizing="sm" autoComplete="off" value={placeholder} onChange={(e) => setPlaceholder(e.target.value)} data-testid="cms-add-field-placeholder" />
+        </div>
         <div className={ROW}>
           <label className={ROW_LABEL} htmlFor="cms-add-field-help">Help text</label>
           <TextInput id="cms-add-field-help" sizing="sm" autoComplete="off" value={helpText} onChange={(e) => setHelpText(e.target.value)} data-testid="cms-add-field-help" />

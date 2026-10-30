@@ -3636,8 +3636,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 25, probe-compared (pages-shell, Help): BUG fixed — the menu opened inline inside the rail (overflow hidden) at x 17 and lay UNDER the open drawer (elementFromPoint hit the Pages panel); it now portals beside the rail (x 67, over the drawer, bottom-aligned with Help). Still drifts: the head reads 'HELP' in the shared MenuLabel's small caps where the board says 'Help', and a third row 'Keyboard legend' (code-ahead — the legend's only door) sits under a rule. Board shots/263-255084.png.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 26, probe-compared: shots/263-255084.png vs probe pages-shell (Help): portalled beside the rail over the open drawer (round 25 bug fix), head 'Help' in sentence case 12px muted (was the shared MenuLabel's small caps), Keyboard shortcuts ? and Getting started at the board's 40px pitch. Kept, off-board: a third row 'Keyboard legend' under a rule — the legend's only way in (coordinator round 26).",
    "tier": "P2"
   },
   {
@@ -8102,8 +8102,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C C6/D2: \"Add {type} field · {collection} · New field\", key hint, Default value (checked against the field's rules), Minimum/Maximum (length), Placeholder, Help text, Add field CTA.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 26, compared field by field (board copy from dump/page-3-6 vs probe cms-add-field text) and by image via 167:8747 (the same Long text dialog): Name, Key + hint, Type, Required, Default value, Minimum length, Maximum length, Placeholder, Help text, Cancel / Add field — identical.",
    "tier": "P2"
   },
   {
@@ -8113,8 +8113,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C C6/D2: \"Add {type} field · {collection} · New field\", key hint, Default value (checked against the field's rules), Minimum/Maximum (length), Placeholder, Help text, Add field CTA.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 26, probe-compared: shots/167-4689.png vs probe cms-add-field (Rich text): Default value + Placeholder, no length limits (were Minimum/Maximum length with no default) — the field inspector still edits the limits. Field list identical to the board.",
    "tier": "P2"
   },
   {
@@ -8124,8 +8124,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "built, not compared — L-C C6/D2: \"Add {type} field · {collection} · New field\", key hint, Default value (checked against the field's rules), Minimum/Maximum (length), Placeholder, Help text, Add field CTA.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 26, probe-compared: shots/167-4956.png vs probe cms-add-field (Email): Default value with 'Default and record values must be valid email addresses.', Placeholder, Help text; no length limits here (inspector keeps them). Field list identical.",
    "tier": "P2"
   },
   {
@@ -8135,8 +8135,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "built, not compared — L-C C6/D2: \"Add {type} field · {collection} · New field\", key hint, Default value (checked against the field's rules), Minimum/Maximum (length), Placeholder, Help text, Add field CTA.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 26, compared by board copy (dump) vs probe text — no image (budget): Default value with 'Use a complete supported URL. Invalid values remain visible for correction.', Placeholder, Help text, no length limits; same layout as the image-compared Email (167:4956).",
    "tier": "P2"
   },
   {
@@ -8146,8 +8146,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C C6/D2: \"Add {type} field · {collection} · New field\", key hint, Default value (checked against the field's rules), Minimum/Maximum (length), Placeholder, Help text, Add field CTA.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 26, probe-compared: shots/167-5492.png vs probe cms-add-field (Slug): Default value with 'Use lowercase letters, numbers and hyphens. URL uniqueness is checked in Dynamic pages.', Placeholder, Help text, no length limits. Field list identical.",
    "tier": "P2"
   },
   {
@@ -8157,8 +8157,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C C6/D2: \"Add {type} field · {collection} · New field\", key hint, Default value (checked against the field's rules), Minimum/Maximum (length), Placeholder, Help text, Add field CTA.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 26, probe-compared: shots/167-5760.png vs probe cms-add-field (Number): Minimum, Maximum BEFORE Default value (was after), 'Empty limits are unset; they do not mean zero.', Placeholder, Help text. Field list identical.",
    "tier": "P2"
   },
   {
@@ -8168,8 +8168,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C C6/D2: \"Add {type} field · {collection} · New field\", key hint, Default value (checked against the field's rules), Minimum/Maximum (length), Placeholder, Help text, Add field CTA.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 26, probe-compared: shots/167-6038.png vs probe cms-add-field (Date): Default value is a date field with 'No default is set.' under it while empty, Placeholder, Help text. Residual: the native date input shows its own 'dd/mm/yyyy' where the board prints 'Choose date…'.",
    "tier": "P2"
   },
   {
@@ -8179,8 +8179,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "built, not compared — L-C C6/D2: \"Add {type} field · {collection} · New field\", key hint, Default value (checked against the field's rules), Minimum/Maximum (length), Placeholder, Help text, Add field CTA.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 26, compared by board copy (dump) vs probe text — no image (budget): as Date (167:6038) with a date-and-time input and 'No default is set.'. Residual: native placeholder vs 'Choose date and time…'.",
    "tier": "P2"
   },
   {
@@ -8190,8 +8190,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C C6/D2: \"Add {type} field · {collection} · New field\", key hint, Default value (checked against the field's rules), Minimum/Maximum (length), Placeholder, Help text, Add field CTA.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 26, probe-compared: shots/167-6574.png vs probe cms-add-field (Yes/no): Default value as a No/Yes select reading No (Yes stores true, No stores nothing — test), Placeholder, Help text. Was no default at all.",
    "tier": "P2"
   },
   {
@@ -8212,8 +8212,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C C6/D2: \"Add {type} field · {collection} · New field\", key hint, Default value (checked against the field's rules), Minimum/Maximum (length), Placeholder, Help text, Add field CTA.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 26, compared by board copy (dump) vs probe text and by image via 167:6844 (the same options editor): Options as 'Label and saved value' fields, + Add option, 'Records can choose more than one option.', Placeholder, Help text.",
    "tier": "P2"
   },
   {
@@ -8224,7 +8224,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C C6/D2: \"Add {type} field · {collection} · New field\", key hint, Default value (checked against the field's rules), Minimum/Maximum (length), Placeholder, Help text, Add field CTA.",
+   "verifiedNote": "Round 26, probe-compared: shots/167-7406.png — Name, Key, Type, Required, Placeholder, Help text match. Still open: the board's default asset ('Choose default asset…' · 'Images only.') needs an asset chooser in the dialog; not built.",
    "tier": "P2"
   },
   {
@@ -8235,7 +8235,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "built, not compared — L-C C6/D2: \"Add {type} field · {collection} · New field\", key hint, Default value (checked against the field's rules), Minimum/Maximum (length), Placeholder, Help text, Add field CTA.",
+   "verifiedNote": "Round 26, compared by board copy: as Image (167:7406) — open for 'Choose default asset…' and 'Allowed uploads: images, video and fonts. PDFs are not supported.' (needs the asset chooser).",
    "tier": "P2"
   },
   {
@@ -8245,8 +8245,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 25: layout rebuilt with T02 (labels over filled fields, Type select, Required checkbox); the Collection select now carries 'One record per value. Multi-reference fields are not available.'. Compared by text only: the board also offers Placeholder on a reference, which the code gives only to typed-value fields — not added. Board shots/167-7936.png.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 26, compared by board copy (dump) vs probe text, layout by image via T02/T12: Collection select + 'One record per value. Multi-reference fields are not available.', Placeholder (now on every type), Help text. Board sample 'Team' is its data.",
    "tier": "P2"
   },
   {
@@ -8256,8 +8256,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "built, not compared — L-C C6/D2: \"Add {type} field · {collection} · New field\", key hint, Default value (checked against the field's rules), Minimum/Maximum (length), Placeholder, Help text, Add field CTA.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 26, probe-compared: shots/167-8207.png vs probe cms-add-field (Color): Default value, Placeholder, Help text. Board sample '#1D4ED8' is its data.",
    "tier": "P2"
   },
   {
@@ -12896,7 +12896,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — Still a 280px drawer subview (main pane keeps showing Blog Fields); no 'Site variables' page header or '+ New variable' primary top-right; row = key/value/'0 placeholders'/⋯ matches. | prior: drift-open — L-C C4/D1: \"Site variables\" intro, per-variable \"N text placeholders\", \"Empty value\" built; still a drawer subview, not the workspace page. Not compared.",
+   "verifiedNote": "Round 26, built, NOT image-compared (the round's 8 images went to B5-T): Site variables now opens as the CMS workspace's page (cmsWorkspace.openVariables, page: 'variables') the way a collection does — the drawer keeps its list; header '‹ back · Site variables · + New variable', the intro 'Use one value across your site' + 'Type {{site.key}} in text…', rows across the pane: key · value ('Empty value') · 'n text placeholders' · ⋯ (Edit value / Show usages / Rename key… / Delete…). Text matches the board copy (dump/page-3-6); the header's ⋯ is not built (no board says what it holds). The drawer subview is gone (dead once the page exists). Probe cms-workspace&page=variables. Next: fetch shots/260-235689.png and compare.",
    "tier": "P2"
   },
   {

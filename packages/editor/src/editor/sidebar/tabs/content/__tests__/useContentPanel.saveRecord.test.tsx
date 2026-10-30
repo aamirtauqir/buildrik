@@ -52,6 +52,9 @@ function stubComposer(opts: { failUpdate?: boolean } = {}) {
     getProjectMetadata: () => ({ name: "p" }),
     getProjectSettings: () => ({ siteVariables: [] }),
     setProjectSettings: vi.fn(),
+    /* The hook re-reads site variables on PROJECT_CHANGED (B5-V01). */
+    on: vi.fn(),
+    off: vi.fn(),
     elements: { getAllElements: () => [], getElement: () => null },
     data: {
       getSource: () => null, registerSource: vi.fn(), updateSourceData: vi.fn(),

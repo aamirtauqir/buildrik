@@ -105,6 +105,8 @@ const FORM_ROW = "tw:flex tw:gap-2 tw:items-center";
 const SPACER = "tw:flex-1";
 /** Two stacked lines inside a row (name over type, key over value). */
 const ROW_STACK = "tw:flex tw:flex-col tw:gap-0.5 tw:min-w-0 tw:flex-1";
+/** The page's row reads across: key · value · placeholders (B5-V01). */
+const PAGE_ROW = "tw:grid tw:min-w-0 tw:flex-1 tw:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)] tw:items-center tw:gap-4";
 /** …and its FIRST line: 13/20 wherever a board draws one (151:10 a field name,
  *  151:54 a source name, 151:95 a condition's element). `Row` supplies the 13
  *  and nothing supplied the 20. */
@@ -316,8 +318,15 @@ export function VariablesView({
   onChange,
   usages = new Map(),
   onOpenUse,
+  page = false,
+  addSignal = 0,
 }: {
   variables: SiteVariable[];
+  /** B5-V01 (260:235689): the CMS workspace's full page — no crumb, the add
+   *  door is the page header's, rows read across (key · value · uses · ⋯). */
+  page?: boolean;
+  /** Bumped by the page header's "+ New variable". */
+  addSignal?: number;
   onBack: () => void;
   onChange: (vars: SiteVariable[]) => void;
   /** Where each key is typed as {{site.<key>}} (260:238267). */
@@ -333,6 +342,9 @@ export function VariablesView({
   const [menuFor, setMenuFor] = React.useState<string | null>(null);
   const [renaming, setRenaming] = React.useState<string | null>(null);
   const [deleting, setDeleting] = React.useState<string | null>(null);
+  React.useEffect(() => {
+    if (addSignal > 0) setAdding(true);
+  }, [addSignal]);
   const keyError = key.trim() !== "" && !isValidVariableKey(key.trim());
   const dupError = variables.some((v) => v.key === key.trim());
   const usesOf = (k: string) => usages.get(k) ?? [];
@@ -371,8 +383,8 @@ export function VariablesView({
 
   return (
     <div className={CONTENT_BODY}>
-      <Crumb label="Site variables" onClick={onBack} />
-      <div className={SCROLL}>
+      {page ? null : <Crumb label="Site variables" onClick={onBack} />}
+      <div className={page ? `${SCROLL} tw:px-2` : SCROLL}>
         {/* RL02 (424:337452) — the intro says what a variable is for, list or
             no list. Variables are saved with the project and the export
             writes their value wherever {{site.<key>}} appears in text
@@ -391,8 +403,8 @@ export function VariablesView({
           </div>
         )}
         {variables.map((v) => (
-          <Row key={v.key} size="stack" data-variable-row data-testid={`content-var-${v.key}`}>
-            <span className={ROW_STACK}>
+          <Row key={v.key} size="stack" data-variable-row data-testid={`content-var-${v.key}`} className={page ? "tw:rounded-[var(--bk-radius-md)] tw:bg-[var(--bk-bg-panel)] tw:mb-1" : undefined}>
+            <span className={page ? PAGE_ROW : ROW_STACK}>
               <span className={VAR_KEY} data-testid={`content-var-key-${v.key}`}>{`{{site.${v.key}}}`}</span>
               {editKey === v.key ? (
                 <TextInput
@@ -502,7 +514,7 @@ export function VariablesView({
               </Button>
             </div>
           </div>
-        ) : (
+        ) : page ? null : (
           <Button className={`${LINK_BTN} tw:mx-4 tw:my-0.5`} data-testid="content-add-variable" onClick={() => setAdding(true)}>
             + New variable
           </Button>
