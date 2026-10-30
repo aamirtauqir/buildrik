@@ -40,7 +40,7 @@ import { closeSubview, openSubview, useSubview } from "./subviewStore";
 import type { BreakpointId } from "@/shared/types/breakpoints";
 import type { PseudoStateId } from "@/shared/types";
 import { ResetStyleReview } from "../components/ResetStyleReview";
-import { ApplyStyleReview } from "../components/ApplyStyleReview";
+import { ApplyStyleResultNote, ApplyStyleReview, useApplyStyleResult } from "../components/ApplyStyleReview";
 
 // ============================================================================
 // TYPES
@@ -124,6 +124,7 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
   /* Another element closes any subview (Play F2.05, 2L9 I15). */
   React.useEffect(() => () => openSubview(null), [selectedElement.id]);
   const subviewHere = subview?.elementId === selectedElement.id && selectedIds.length <= 1 ? subview.kind : null;
+  const applied = useApplyStyleResult(composer, selectedElement.id, breakpoint, pseudoState);
   const type = selectedElement.type;
   const caps = capabilitiesFor(type);
   const isMultiSelect = selectedIds.length > 1;
@@ -173,6 +174,9 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
     const open = typeof entry.open === "function" ? entry.open(baseCtx) : entry.open;
     return resolveDisplayMode(open, sectionHasValue(id, baseCtx), choices[`${type}:${id}`]);
   });
+  /* S12: the last Apply style's result sits under the first section it
+     changed on this tab — not on a tab that shows none of them. */
+  const resultAfter = applied ? (ids.find((id) => applied.sectionIds.includes(id)) ?? null) : null;
   /* ⌥-click (DD-22): everything shut when anything is open, else all open. */
   const toggleAll = () => onSetChoices(type, ids, modes.some((m) => m === "open") ? "closed" : "open");
 
@@ -207,6 +211,7 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
         return (
           <SectionFrameContext.Provider key={id} value={frame}>
             {entry.render(ctx)}
+            {applied && id === resultAfter ? <ApplyStyleResultNote result={applied} /> : null}
           </SectionFrameContext.Provider>
         );
       })}

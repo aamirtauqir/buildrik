@@ -13,7 +13,7 @@ import type { Composer } from "@/engine/Composer";
 import type { Element } from "@/engine/elements/Element";
 import { createTestComposer, installEngineBrowserStubs, removeEngineBrowserStubs } from "@/engine/__tests__/test-utils/realComposer";
 import { ToastProvider } from "@/editor/chrome-ui";
-import { ApplyStyleReview } from "../ApplyStyleReview";
+import { ApplyStyleResultNote, ApplyStyleReview, useApplyStyleResult } from "../ApplyStyleReview";
 
 beforeAll(installEngineBrowserStubs);
 afterAll(removeEngineBrowserStubs);
@@ -95,5 +95,51 @@ describe("ApplyStyleReview (S11)", () => {
     fireEvent.click(screen.getByRole("checkbox", { name: "Typography" }));
     fireEvent.click(screen.getByRole("checkbox", { name: "Fill" }));
     expect(screen.getByRole("button", { name: "Apply style to 1" })).toBeDisabled();
+  });
+});
+
+/** What the tab renders under the section — the result, while it holds. */
+function Result({ id }: { id: string }) {
+  const r = useApplyStyleResult(c, id, "desktop", "normal");
+  return r ? <ApplyStyleResultNote result={r} /> : null;
+}
+
+describe("ApplyStyleReview — the result under the section (S12)", () => {
+  it("says what changed and what each skip and other breakpoint kept, from this apply", () => {
+    const src = h3();
+    src.setStyle("font-size", "48px");
+    h3();
+    h3();
+    h3();
+    h3().setLocked(true);
+    c.history.flushPending();
+    render(
+      <ToastProvider>
+        <ApplyStyleReview composer={c} elementId={src.getId()} breakpoint="desktop" pseudo="normal" onClose={vi.fn()} />
+        <Result id={src.getId()} />
+      </ToastProvider>,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Apply Typography to 3" }));
+    const note = screen.getByTestId("inspector-apply-style-result");
+    expect(note).toHaveTextContent("Applied to 3 headings");
+    expect(note).toHaveTextContent("Only Desktop typography changed. The locked heading and every Tablet and Mobile value stayed unchanged.");
+  });
+
+  it("goes once history moves past the apply (its Undo), and never shows for another element", () => {
+    const src = h3();
+    src.setStyle("font-size", "48px");
+    const peer = h3();
+    c.history.flushPending();
+    render(
+      <ToastProvider>
+        <ApplyStyleReview composer={c} elementId={src.getId()} breakpoint="desktop" pseudo="normal" onClose={vi.fn()} />
+        <Result id={src.getId()} />
+        <Result id={peer.getId()} />
+      </ToastProvider>,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Apply Typography to 1" }));
+    expect(screen.getAllByTestId("inspector-apply-style-result")).toHaveLength(1);
+    act(() => screen.getByRole("button", { name: "Undo" }).click());
+    expect(screen.queryByTestId("inspector-apply-style-result")).toBeNull();
   });
 });
