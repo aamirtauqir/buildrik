@@ -51,4 +51,39 @@ describe("Children (B69)", () => {
     fireEvent.click(screen.getByTestId("children-open-add"));
     expect(seen).toEqual([{ tab: "add" }]);
   });
+
+  it("3 columns, last one populated: Review → Move puts its blocks in the column before and drops it, one Undo", () => {
+    const { c, elId } = withBlock("columns3");
+    const row = c.elements.getElement(elId)!;
+    const [, second, third] = row.getChildren();
+    const extra = c.elements.createElement("text", { tagName: "p", content: "x" });
+    c.elements.addElement(extra, third.getId());
+    c.history.flushPending();
+    const secondBefore = second.getChildren().length;
+    const heldBefore = third.getChildren().length;
+    render(<ChildrenSection composer={c} elementId={elId} isOpen />);
+    fireEvent.click(screen.getByRole("button", { name: "Review populated content" }));
+    expect(screen.getByTestId("columns-review")).toBeInTheDocument();
+    const steps = c.history.getUndoCount();
+    fireEvent.click(screen.getByRole("button", { name: "Move" }));
+    c.history.flushPending();
+    expect(c.elements.getElement(elId)!.getChildren()).toHaveLength(2);
+    expect(c.elements.getElement(second.getId())!.getChildren()).toHaveLength(secondBefore + heldBefore);
+    expect(c.history.getUndoCount()).toBe(steps + 1);
+  });
+
+  it("Cancel leaves the columns as they were; Remove drops the column with its content", () => {
+    const { c, elId } = withBlock("columns3");
+    const third = c.elements.getElement(elId)!.getChildren()[2];
+    c.elements.addElement(c.elements.createElement("text", { tagName: "p", content: "x" }), third.getId());
+    c.history.flushPending();
+    render(<ChildrenSection composer={c} elementId={elId} isOpen />);
+    fireEvent.click(screen.getByRole("button", { name: "Review populated content" }));
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(c.elements.getElement(elId)!.getChildren()).toHaveLength(3);
+    fireEvent.click(screen.getByRole("button", { name: "Review populated content" }));
+    fireEvent.click(screen.getByRole("button", { name: "Remove" }));
+    expect(c.elements.getElement(elId)!.getChildren()).toHaveLength(2);
+    expect(c.elements.getElement(third.getId())).toBeFalsy();
+  });
 });

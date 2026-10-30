@@ -81,6 +81,8 @@ export type SectionId =
   | "table-structure"
   | "table-accessibility"
   | "table-cell"
+  | "gallery"
+  | "gallery-image"
   | "table-wrapper"
   | "semantics"
   | "attributes"

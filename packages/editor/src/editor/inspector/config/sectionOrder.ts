@@ -29,6 +29,9 @@ const CONTENT_ORDER: readonly SectionId[] = [
   "type",
   "form-fields",
   "slides",
+  /* B69/04: a gallery's images; an image of one returns to it. */
+  "gallery",
+  "gallery-image",
   "collection",
   "validation",
   /* 2L9 245:42929: a table's Structure and Accessibility. */
