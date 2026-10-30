@@ -11,49 +11,15 @@
  * @license BSD-3-Clause
  */
 
-/** The Inspector v4 property row (board 1): 108 label column, 8 gap, the
- *  control; 28 tall — the same box `.bdi-row-ctrl` draws. */
-export const CONTROL_ROW = "tw:grid tw:grid-cols-[108px_minmax(0,1fr)] tw:items-center tw:gap-x-2 tw:min-h-7";
-
-/** Board 1 row label: 12/16, ink-muted, left. */
-export const CONTROL_LABEL =
-  "tw:flex tw:items-center tw:gap-1 tw:min-w-0 tw:text-[12px] tw:leading-4 tw:font-normal " +
-  "tw:text-[var(--bk-ink-muted)] tw:[font-family:var(--bk-font-ui)]";
-
-/** A row of options sharing the control column — the segmented track. */
-export const CONTROL_BTN_GROUP =
-  "tw:flex tw:flex-1 tw:h-6 tw:p-0.5 tw:rounded-[4px] tw:bg-[var(--bk-bg-subtle)]";
-
 /**
- * Wrapper for a chrome-ui `TextInput`: same wrapper/leaf split as the Select
- * below — `className` never reaches the `<input>`, and a caller `theme` would
- * replace the leaf holding BK_TEXT_INPUT_THEME's token colours.
+ * Wrapper for a chrome-ui `TextInput`: `className` never reaches the
+ * `<input>`, and a caller `theme` would replace the leaf holding
+ * BK_TEXT_INPUT_THEME's token colours — a descendant variant reaches the real
+ * control without touching either.
  */
 export const CONTROL_INPUT_WRAP =
   "tw:flex-1 tw:min-w-0 tw:[&_input]:h-6 tw:[&_input]:py-0 tw:[&_input]:px-2 " +
   "tw:[&_input]:text-[12px] tw:[&_input]:font-normal tw:[&_input]:[font-family:var(--bk-font-ui)]";
-
-/**
- * Wrapper for a chrome-ui `Select`: flowbite applies `className` to an outer
- * wrapper `<div>`, never to the `<select>` itself (see selectTheme.ts), and a
- * caller `theme` would replace the leaf that carries the token colours. A
- * descendant variant reaches the real control without touching either.
- */
-export const CONTROL_SELECT_WRAP =
-  "tw:flex-1 tw:min-w-0 tw:[&_select]:h-6 tw:[&_select]:py-0 tw:[&_select]:pl-2 " +
-  "tw:[&_select]:text-[12px] tw:[&_select]:font-normal tw:[&_select]:cursor-pointer " +
-  "tw:[&_select]:[font-family:var(--bk-font-ui)]";
-
-/** One option of a `CONTROL_BTN_GROUP` track — board 1's segmented look:
- *  the chosen one a white chip on a hairline with accent text. */
-export const compactBtnClass = (active: boolean): string =>
-  [
-    "tw:flex-1 tw:h-5 tw:min-h-0 tw:px-1 tw:py-0 tw:rounded-[3px] tw:border tw:text-[12px] tw:leading-4",
-    "tw:[font-family:var(--bk-font-ui)] tw:focus:ring-0 tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]",
-    active
-      ? "tw:bg-[var(--bk-bg-panel)] tw:border-[var(--bk-border)] tw:font-medium tw:text-[var(--bk-accent-text)] tw:enabled:hover:bg-[var(--bk-bg-panel)]"
-      : "tw:bg-transparent tw:border-transparent tw:font-normal tw:text-[var(--bk-ink-soft)] tw:enabled:hover:bg-transparent tw:hover:text-[var(--bk-ink)]",
-  ].join(" ");
 
 /** A full-width bordered action row (2L9 161:8480 "Edit text on canvas",
  *  247:22853 "Unlink to 24 px"): 32 tall, 13 regular ink. On a flowbite
@@ -63,11 +29,6 @@ export const WIDE_BUTTON = "tw:h-8 tw:w-full tw:justify-center tw:text-[13px] tw
 /** A named group inside an open section, headed like a section (2L9
  *  247:21216 "Placement", 247:24493 "Outline"): 13 / semibold ink. */
 export const GROUP_TITLE = "tw:mt-6 tw:mb-3 tw:text-[13px] tw:leading-4 tw:font-semibold tw:text-[var(--bk-ink)]";
-
-/** Sub-heading inside an open section ("Size Constraints", "Overflow"). */
-export const SECTION_SUBTITLE =
-  "tw:mt-0.5 tw:mb-1 tw:text-[length:var(--bk-text-11)] tw:font-semibold tw:uppercase tw:tracking-[0.08em] " +
-  "tw:text-[var(--bk-ink-muted)] tw:[font-family:var(--bk-font-ui)]";
 
 /**
  * Row that reveals a token-link chain button on hover or keyboard focus.

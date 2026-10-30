@@ -133,6 +133,8 @@ export function InspectorHeader({
   /* A selection names itself on every page (2L9 B01 "3 selected"; one type:
      "2 selected · Headings"). It used to be named only on a template page,
      so elsewhere the title line was blank. */
+  const own = !multi ? composer?.elements.getElement(element.id) : undefined;
+  const ownLock = own?.isLocked?.() ? (getLayerName(own) ?? typeLabel) : null;
   const selectedEls = multi && composer ? selectedIds.map((id) => composer.elements.getElement(id)).filter((e): e is Element => Boolean(e)) : [];
   const lockedCount = selectedEls.filter((e) => e.isLocked?.()).length;
   const multiName = multi
@@ -209,6 +211,12 @@ export function InspectorHeader({
         {loadFailedLine ? (
           <span className="tw:min-w-0 tw:truncate tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)]" data-testid="inspector-load-failed-line">
             {loadFailedLine}
+          </span>
+        ) : ownLock ? (
+          /* 2L9 S22 255:92819: the element's OWN lock (not inherited — lock is
+             not inherited in the engine) reads on the context line. */
+          <span className="tw:min-w-0 tw:truncate tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)]" data-testid="inspector-locked-line">
+            Read only · {ownLock} is locked
           </span>
         ) : activeTab === "content" || activeTab === "behaviour" ? (
           <span className="tw:min-w-0 tw:truncate tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)]">

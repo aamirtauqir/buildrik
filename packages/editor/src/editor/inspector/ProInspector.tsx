@@ -466,7 +466,8 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           statesWithOverrides={statesWithOverrides}
         />
         {targetIds.length > 1 ? null : (
-          <StatusMarks composer={composer} elementId={selectedElement.id} binding={binding?.missing ? binding : null} locked={locked} />
+          /* The element's own lock is the header's "Read only · … is locked" (S22). */
+          <StatusMarks composer={composer} elementId={selectedElement.id} binding={binding?.missing ? binding : null} locked={false} />
         )}
         <StatusLine composer={composer} elementId={selectedElement.id} locked={false} conflict={conflict} />
         {targetIds.length > 1 ? <MultiSelectBar composer={composer} selectedIds={targetIds} /> : null}

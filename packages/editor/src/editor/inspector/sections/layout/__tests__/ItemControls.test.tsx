@@ -38,12 +38,12 @@ describe("Flex item", () => {
 });
 
 describe("Grid item", () => {
-  it("column / row span, a custom placement stays selectable, and the self alignments", () => {
+  it("A02: Column / Row are the written placement, and the self alignments", () => {
     const onChange = vi.fn();
     render(<GridItemSection styles={{ "grid-row": "2 / 4" }} onChange={onChange} isOpen />);
-    fireEvent.change(screen.getByLabelText("Column span"), { target: { value: "1 / -1" } });
-    expect(onChange).toHaveBeenLastCalledWith("grid-column", "1 / -1");
-    expect(screen.getByLabelText("Row span")).toHaveValue("2 / 4");
+    fireEvent.change(screen.getByLabelText("Column"), { target: { value: "2 / span 2" } });
+    expect(onChange).toHaveBeenLastCalledWith("grid-column", "2 / span 2");
+    expect(screen.getByLabelText("Row")).toHaveValue("2 / 4");
     fireEvent.change(screen.getByLabelText("Justify self"), { target: { value: "end" } });
     expect(onChange).toHaveBeenLastCalledWith("justify-self", "end");
   });

@@ -5426,8 +5426,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Code Columns count only; board tracks + item placement",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 26, probe ?block=grid&styles={grid-template-columns repeat(3, minmax(0, 1fr)), grid-auto-flow row dense, gap 24px} → Style, side by side with shots/247-21762.png: 'Grid layout' — Columns 3, Tracks 'repeat(3, minmax(0, 1fr))', Rows, Flow 'Row dense', Align rows, Justify rows, Gap 24 px on the face (item alignment and row/column gap behind More settings). A grid child's 'Grid item' section reads Column / Row as the written placement ('2 / span 2'), Align self, Justify self. Match.",
    "tier": "P1"
   },
   {
@@ -5437,8 +5437,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Overflow/Box sizing exist; Float/Clear and grouped Size constraints differ",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 26, probe ?type=container&styles={overflow-x hidden, overflow-y auto, box-sizing border-box, clear both, min/max width}&parent=flex → Style, side by side with shots/247-22310.png: 'Advanced layout' — Overflow X, Overflow Y, Box sizing, Visibility, Float, Clear as one select each (the old shorthand buttons gone; an overflow shorthand reads into both axes); Size's limits under 'Size constraints' (Min/Max width/height); Flex item after. Match.",
    "tier": "P1"
   },
   {
@@ -5525,8 +5525,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-B round 25, probe ?type=heading&attrs={id, title, tabindex, aria-label, data-section:''} side by side with shots/247-26594.png: Semantics now carries Tag, ID, Title, Tab index (moved from Advanced attributes; form fields keep them there — no Semantics on F02) and 'Change semantic tag' (opens the A12 review). Open: the board's 'Custom attributes · {n} set' list — an existing aria-* attribute as its own row, an authored-empty data-* with 'Empty is authored empty. Remove deletes the attribute.' + 'Remove {attr}', and the protected internal id ('Internal identity is protected.'); today Advanced attributes adds data-* / aria-* but does not list the existing ones that way.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 26, probe ?type=heading&attrs={id, title, tabindex, aria-label, data-section:''} → Content, side by side with shots/247-26594.png: Semantics — Tag, ID, Title, Tab index, 'Change semantic tag' (A12 review); 'Custom attributes · 2 set' lists the element's real aria-* / data-* (editor markers excluded), each value editable in one step; the authored-empty data-section says 'Empty is authored empty. Remove deletes the attribute.' with 'Remove data-section'; 'Internal ID' read-only + 'Internal identity is protected.' Match; the custom list sits in Advanced attributes (the section 161:8480 names), and the internal id is the element's own id (the board's 'data-bk-id' is sample).",
    "tier": "P1"
   },
   {
@@ -5723,8 +5723,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-B round 25, reference board compared type by type: probe ?block=<id> for every block on the board, the Content and Behavior tabs dumped (scratch b69.mjs) and read against the board's 'editing homes'. Collection list, Form (Fields, reorder, Delivery → Behavior form settings), Input, Textarea (+ Columns, new) match. Open: Grid tracks / rows / flow (A02 — Columns count only).",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 26: the remaining B69/05 gap (Grid Tracks / Rows / Flow) closed by A02 — Grid layout now carries Columns, Tracks, Rows, Flow, Align/Justify rows and Gap on the face. Collection list, Form, Input, Textarea (+ Columns) compared in round 25. Match on homes.",
    "tier": "P1"
   },
   {
@@ -6162,7 +6162,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-fixed",
-   "verifiedNote": "L-B round 25, probe ?type=heading&locked=1&layerName=Hero heading → Style, side by side with shots/255-92819.png: the tab body opens on 'Editing unavailable' · 'This element is locked. Inspecting it through Layers keeps its values visible.' · full-width primary 'Unlock' (unlock-element, one step), then the dimmed read-only values (Typography…). Match on the body. The header context line 'Read only · {layer} is locked' is the lead's InspectorHeader (REQUESTS B-29); the '🔒 Locked' mark above the tabs stays until then.",
+   "verifiedNote": "L-B rounds 25–26, probe ?type=heading&locked=1&layerName=Hero heading → Style, side by side with shots/255-92819.png: header context line 'Read only · Hero heading is locked' (the element's own lock; InspectorHeader, lead-cleared), the tab body opens on 'Editing unavailable' · 'This element is locked. Inspecting it through Layers keeps its values visible.' · primary 'Unlock' (unlock-element, one step), then the dimmed read-only values. The separate '🔒 Locked' mark above the tabs is gone. Match.",
    "tier": "P1"
   },
   {
@@ -6261,9 +6261,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:B5-D04",
    "verified": "drift-open",
-   "verifiedNote": "L-B round 25: compared with the probe (?type=heading&cms=1). Same parts, two differences: (1) order — the board puts the Text block (Tag, the bound row 'Title text · Blog.title') first and the read-only 'Dynamic bindings · 1 binding' summary after it with 'Read-only summary. Edit the binding at its property row.'; B5-D04 (compared and closed) puts Dynamic bindings at the head of the tab with a link row. The two boards disagree — lead to pick one before this changes. (2) Tag H1 select sits in the text block on the board; here it is Semantics' Tag.",
+   "verifiedNote": "L-B round 25 compared; lead round 26: B5-D04 (the binding-specific board, already closed) wins — Dynamic bindings stays at the head of the Content tab with its link row. Superseded.",
    "tier": "P1"
   },
   {

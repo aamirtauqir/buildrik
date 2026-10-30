@@ -12,7 +12,7 @@ import type { Composer } from "@/engine";
 import { Section } from "@/editor/inspector/shared/controls";
 import { attributeFieldsFor } from "@/editor/inspector/config/attributeFields";
 import { PropertyRows } from "../typeBlock/PropertyField";
-import { DataAttributeEditor } from "./DataAttributeEditor";
+import { CustomAttributesList, customAttributesOf, DataAttributeEditor } from "./DataAttributeEditor";
 import { CSSClassesSection } from "../CSSClassesSection";
 
 export interface AttributesSectionProps {
@@ -29,7 +29,7 @@ export function attributesSummary(composer: Composer | null | undefined, element
   const el = composer?.elements.getElement(element.id);
   if (!el) return null;
   const named = attributeFieldsFor(element.type).filter((f) => el.getAttribute?.(f.id));
-  const data = Object.keys(el.getAttributes?.() ?? {}).filter((k) => k.startsWith("data-") && !k.startsWith("data-buildrick"));
+  const data = customAttributesOf(el.getAttributes?.() ?? {});
   return `${named.length + data.length} set`;
 }
 
@@ -39,6 +39,7 @@ export function AttributesSection({ composer, element, targetIds, isOpen, onTogg
   return (
     <Section title="Advanced attributes" isOpen={isOpen} onToggle={onToggle} id="inspector-section-attributes">
       <PropertyRows composer={composer} element={element} targetIds={targetIds} rows={rows} />
+      <CustomAttributesList elementId={element.id} composer={composer} />
       <div className="tw:pt-2" data-testid="inspector-data-attributes">
         <DataAttributeEditor elementId={element.id} composer={composer} />
       </div>

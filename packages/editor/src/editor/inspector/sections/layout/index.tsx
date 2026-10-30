@@ -14,11 +14,11 @@
 
 import * as React from "react";
 import { MoreSettingsToggle, Section } from "@/editor/inspector/shared/controls";
-import { GROUP_TITLE, SECTION_SUBTITLE } from "@/editor/inspector/shared/controls/controlClasses";
+import { GROUP_TITLE } from "@/editor/inspector/shared/controls/controlClasses";
 import { DisplayControls } from "./DisplayControls";
 import { FlexControls } from "./FlexControls";
 import { GridControls } from "./GridControls";
-import { OverflowControls, VisibilityFloatControls } from "./OverflowVisibilityControls";
+import { AdvancedLayoutRows } from "./OverflowVisibilityControls";
 import type { BaseStyleSectionProps } from "../registry/_shared";
 import { PositionControls } from "./PositionControls";
 
@@ -67,13 +67,11 @@ export const LayoutSection: React.FC<LayoutSectionProps> = ({
   );
 };
 
-/** 2L9 247:21216 "Advanced layout · 3 set": overflow, visibility & float. */
+/** 2L9 247:21216 "Advanced layout · 3 set" / A03 247:22310: Overflow X / Y,
+ *  Box sizing, Visibility, Float, Clear. */
 export const LayoutAdvancedSection: React.FC<BaseStyleSectionProps> = ({ styles, onChange, isOpen, onToggle }) => (
   <Section title="Advanced layout" isOpen={isOpen} onToggle={onToggle} id="inspector-section-layout-advanced">
-    <div className={SECTION_SUBTITLE}>Overflow</div>
-    <OverflowControls styles={styles} onChange={onChange} />
-    <div className={SECTION_SUBTITLE}>Visibility & Float</div>
-    <VisibilityFloatControls styles={styles} onChange={onChange} />
+    <AdvancedLayoutRows styles={styles} onChange={onChange} />
   </Section>
 );
 
