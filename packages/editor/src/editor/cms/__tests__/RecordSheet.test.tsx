@@ -111,9 +111,9 @@ describe("RecordSheet", () => {
   it("opens under the tabs with its way back, and saves edits through the engine", async () => {
     const { composer } = mount();
     await openRow();
-    expect(screen.getByTestId("cms-sheet-title")).toHaveTextContent("Margherita");
-    expect(screen.getByTestId("cms-sheet-crumb")).toHaveTextContent("‹ Menu items records");
-    expect(screen.getByTestId("cms-sheet-state")).toHaveTextContent("Saved");
+    /* Re-baseline design-2l9 122:43331: "Menu items › Margherita", "Record · Saved". */
+    expect(screen.getByTestId("cms-sheet-title")).toHaveTextContent("Menu items › Margherita");
+    expect(screen.getByTestId("cms-sheet-state")).toHaveTextContent("Record · Saved");
     expect(screen.getByTestId("cms-sheet-save")).toBeDisabled();
     fireEvent.change(screen.getByLabelText("Price *"), { target: { value: "$13" } });
     expect(screen.getByTestId("cms-sheet-state")).toHaveTextContent("Unsaved changes");
@@ -365,15 +365,19 @@ describe("RecordSheet", () => {
   });
 });
 
-describe("RecordSheet · Preview (unsaved) (2L9 165:520)", () => {
-  it("is always beside the form and follows its current values", async () => {
+describe("RecordSheet · Preview (2L9 122:43331 Form / Preview)", () => {
+  it("Preview shows the record from the form's current values", async () => {
     mount();
     await openRow();
+    expect(screen.queryByTestId("cms-record-preview")).toBeNull();
+    fireEvent.click(screen.getByTestId("cms-sheet-view-preview"));
     expect(screen.getByTestId("cms-record-preview")).toHaveTextContent("PreviewReflects the values in this form.");
     const card = screen.getByTestId("cms-record-preview-card");
     expect(card).toHaveTextContent("Margherita");
+    fireEvent.click(screen.getByTestId("cms-sheet-view-form"));
     fireEvent.change(screen.getByLabelText("Price *"), { target: { value: "$15" } });
-    expect(card).toHaveTextContent("$15");
+    fireEvent.click(screen.getByTestId("cms-sheet-view-preview"));
+    expect(screen.getByTestId("cms-record-preview-card")).toHaveTextContent("$15");
     expect(screen.getByTestId("cms-record-preview")).toHaveTextContent("Preview (unsaved)");
     expect(screen.getByTestId("cms-sheet-preview-template")).toHaveTextContent("Preview saved record");
   });
@@ -487,6 +491,45 @@ describe("RecordSheet · Leave without saving? with Save and leave (2L9 C1)", ()
       await waitFor(() => expect(screen.getByTestId("cms-leave-body").textContent).toMatch(/^Couldn’t save .*About has not been opened\.$/));
       expect(screen.getByTestId("cms-leave-retry")).toBeInTheDocument();
       expect(go).not.toHaveBeenCalled();
+    });
+
+    /* 125:35023 → 125:36161: a published record missing a required field
+       cannot be saved; Save and leave keeps the page pending until it can. */
+    it("an invalid record keeps the page pending until it is fixed, then Save and leave lands", async () => {
+      await dirtyRecord();
+      const pub = screen.getByTestId("cms-sheet-published") as HTMLInputElement;
+      if (!pub.checked) fireEvent.click(pub);
+      fireEvent.change(screen.getByLabelText("Price *"), { target: { value: "" } });
+      expect(screen.getByTestId("cms-sheet-save")).toBeDisabled();
+      expect(screen.getByTestId("cms-sheet-required")).toHaveTextContent("Enter a price before saving.");
+      const go = pageExit();
+      fireEvent.click(screen.getByTestId("cms-leave-save"));
+      expect(screen.getByTestId("cms-sheet-pending")).toHaveTextContent("After saving: Open About");
+      expect(screen.getByTestId("cms-sheet-save-leave")).toBeDisabled();
+      fireEvent.change(screen.getByLabelText("Price *"), { target: { value: "$14" } });
+      expect(screen.getByTestId("cms-sheet-save-leave")).not.toBeDisabled();
+      fireEvent.click(screen.getByTestId("cms-sheet-save-leave"));
+      await waitFor(() => expect(go).toHaveBeenCalledTimes(1));
+    });
+
+    it("Cancel navigation drops the pending page; the draft stays (128:39389)", async () => {
+      await dirtyRecord();
+      const pub = screen.getByTestId("cms-sheet-published") as HTMLInputElement;
+      if (!pub.checked) fireEvent.click(pub);
+      fireEvent.change(screen.getByLabelText("Price *"), { target: { value: "" } });
+      pageExit();
+      fireEvent.click(screen.getByTestId("cms-leave-save"));
+      fireEvent.click(screen.getByTestId("cms-sheet-cancel-nav"));
+      expect(screen.queryByTestId("cms-sheet-pending")).toBeNull();
+      expect(screen.getByTestId("cms-sheet-save")).toBeDisabled();
+    });
+
+    it("after 'no longer available', the record says the draft stayed (128:39584)", async () => {
+      await dirtyRecord();
+      pageExit(() => false);
+      fireEvent.click(screen.getByTestId("cms-leave-discard"));
+      fireEvent.click(screen.getByTestId("cms-leave-keep"));
+      expect(screen.getByTestId("cms-sheet-removed-note")).toHaveTextContent("About was removed. Your Margherita draft is retained.");
     });
 
     it("a page removed meanwhile opens nothing and keeps the draft (126:36751)", async () => {

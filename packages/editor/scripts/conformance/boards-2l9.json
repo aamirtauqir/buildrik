@@ -1152,8 +1152,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "CMS record editor exists (L-C); opening Pages manager over a dirty record not drawn this way",
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared live 2026-10-30 in the real shell (Vite demo :5171, record 'Studio launch' edited; board shots/122-43331.png): built — RecordSheet to the board: '{Collection} › {record}' with a Form / Preview switch (Preview renders the record from the form's current values — RecordPreview), the state line 'Record · Unsaved changes' / 'Saved' / 'Offline, save pending' / 'Couldn’t save — Retry' at the top of a single 500 column, footer Save record · Cancel from the left (RecordSheetFooter). Kept: the record ⋯ (Delete). Not this row: the workspace's own head ('Back to Editor · Home' + the collection name) and the CMS drawer column are CmsWorkspace's; the board draws the Published line as text where the code keeps the switch. Tests RecordSheet / CmsWorkspace.recordSave.",
    "tier": "P1"
   },
   {
@@ -1196,8 +1196,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Covered by the built flow, not image-compared (board not fetched): a validation refusal shows its reason in the dialog (\"refused\" phase). Built 2026-10-30: the Pages drawer opens OVER an open CMS record (useTabSwitchGuard openPagesOverRecord → cmsWorkspace.overPages; StudioPanels keeps the workspace mounted), and a page picked there leaves through the record's own guard (PagesTab openPage → cmsWorkspace.exit(go, { name, exists }) → RecordSheet → RecordLeaveDialog), which follows the REAL save: Saving… while onSave runs, the page opens only after a confirmed save (true), 'queued' when the save returns false (offline mirror), 'Couldn’t save' + Retry save on a thrown save, the server's reason on a refusal, and 'no longer available' when the page is gone by the time the leave lands. Nothing is simulated. Tests RecordSheet ('leaving for a page'). | No record-draft guard when opening a page (save/queued/failed/removed states) (L-C)",
+   "verified": "drift-fixed",
+   "verifiedNote": "Board compared (board shots/125-35023.png); built and test-compared: a published record missing a required field cannot be saved — Save off, 'Enter a {field} before saving.' beside it — and Save and leave keeps the page pending: footer 'After saving: Open About' · Cancel navigation · Save and leave (off until savable). The intent is real (returnTo holds the page; cleared by Save and leave or Cancel navigation). Test RecordSheet 'an invalid record keeps the page pending'. (the page-over-CMS flow, round 16)",
    "tier": "P1"
   },
   {
@@ -1230,7 +1230,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Covered by the built flow, not image-compared (board not fetched): the current page (Home) still asks — walked live (\"You asked to open Home\"). Built 2026-10-30: the Pages drawer opens OVER an open CMS record (useTabSwitchGuard openPagesOverRecord → cmsWorkspace.overPages; StudioPanels keeps the workspace mounted), and a page picked there leaves through the record's own guard (PagesTab openPage → cmsWorkspace.exit(go, { name, exists }) → RecordSheet → RecordLeaveDialog), which follows the REAL save: Saving… while onSave runs, the page opens only after a confirmed save (true), 'queued' when the save returns false (offline mirror), 'Couldn’t save' + Retry save on a thrown save, the server's reason on a refusal, and 'no longer available' when the page is gone by the time the leave lands. Nothing is simulated. Tests RecordSheet ('leaving for a page'). | No record-draft guard when opening a page (save/queued/failed/removed states) (L-C)",
+   "verifiedNote": "Walked live (round 16): picking the page already on the canvas (Home) still runs the record's guard. Board not fetched (round budget). (the page-over-CMS flow, round 16) | Covered by the built flow, not image-compared (board not fetched): the current page (Home) still asks — walked live (\"You asked to open Home\"). Built 2026-10-30: the Pages drawer opens OVER an open CMS record (useTabSwitchGuard openPagesOverRecord → cmsWorkspace.overPages; StudioPanels keeps the workspace mounted), and a page picked there leaves through the record's own guard (PagesTab openPage → cmsWorkspace.exit(go, { name, exists }) → RecordSheet → RecordLeaveDialog), which follows the REAL save: Saving… while onSave runs, the page opens only after a confirmed save (true), 'queued' when the save returns false (offline mirror), 'Couldn’t save' + Retry save on a thrown save, the server's reason on a refusal, and 'no longer available' when the page is gone by the time the leave lands. Nothing is simulated. Tests RecordSheet ('leaving for a page'). | No record-draft guard when opening a page (save/queued/failed/removed states) (L-C)",
    "tier": "P1"
   },
   {
@@ -1252,8 +1252,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No record-draft guard when opening a page (save/queued/failed/removed states) (L-C)",
+   "verified": "drift-fixed",
+   "verifiedNote": "Board compared (board shots/125-36161.png); built: corrected, the pending 'Save and leave' enables and lands the page (test). A refusal's Keep editing also keeps the page pending now (the board's rule), instead of dropping it. (the page-over-CMS flow, round 16)",
    "tier": "P1"
   },
   {
@@ -1264,7 +1264,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Covered by the built flow, not image-compared (board not fetched): Keep editing on a queued save drops the navigation; the queued draft stays (the sheet's offline banner). Built 2026-10-30: the Pages drawer opens OVER an open CMS record (useTabSwitchGuard openPagesOverRecord → cmsWorkspace.overPages; StudioPanels keeps the workspace mounted), and a page picked there leaves through the record's own guard (PagesTab openPage → cmsWorkspace.exit(go, { name, exists }) → RecordSheet → RecordLeaveDialog), which follows the REAL save: Saving… while onSave runs, the page opens only after a confirmed save (true), 'queued' when the save returns false (offline mirror), 'Couldn’t save' + Retry save on a thrown save, the server's reason on a refusal, and 'no longer available' when the page is gone by the time the leave lands. Nothing is simulated. Tests RecordSheet ('leaving for a page'). | No record-draft guard when opening a page (save/queued/failed/removed states) (L-C)",
+   "verifiedNote": "Board compared (board shots/126-35760.png): Keep editing on a queued save → 'Record · Offline, save pending', 'Save pending' · 'Cancel unavailable' with the fields read-only. Built partly: the state line reads 'Offline, save pending' and the navigation is dropped with the draft kept; the code does NOT lock the record while a queued mirror waits — the queue replays on reconnect with no completion signal back to the sheet, so a lock could never be released honestly. | Covered by the built flow, not image-compared (board not fetched): Keep editing on a queued save drops the navigation; the queued draft stays (the sheet's offline banner). Built 2026-10-30: the Pages drawer opens OVER an open CMS record (useTabSwitchGuard openPagesOverRecord → cmsWorkspace.overPages; StudioPanels keeps the workspace mounted), and a page picked there leaves through the record's own guard (PagesTab openPage → cmsWorkspace.exit(go, { name, exists }) → RecordSheet → RecordLeaveDialog), which follows the REAL save: Saving… while onSave runs, the page opens only after a confirmed save (true), 'queued' when the save returns false (offline mirror), 'Couldn’t save' + Retry save on a thrown save, the server's reason on a refusal, and 'no longer available' when the page is gone by the time the leave lands. Nothing is simulated. Tests RecordSheet ('leaving for a page'). | No record-draft guard when opening a page (save/queued/failed/removed states) (L-C)",
    "tier": "P1"
   },
   {
@@ -1274,8 +1274,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Covered by the built flow, not image-compared (board not fetched): Keep editing on a failed save drops the navigation; the draft stays with Retry in the footer. Built 2026-10-30: the Pages drawer opens OVER an open CMS record (useTabSwitchGuard openPagesOverRecord → cmsWorkspace.overPages; StudioPanels keeps the workspace mounted), and a page picked there leaves through the record's own guard (PagesTab openPage → cmsWorkspace.exit(go, { name, exists }) → RecordSheet → RecordLeaveDialog), which follows the REAL save: Saving… while onSave runs, the page opens only after a confirmed save (true), 'queued' when the save returns false (offline mirror), 'Couldn’t save' + Retry save on a thrown save, the server's reason on a refusal, and 'no longer available' when the page is gone by the time the leave lands. Nothing is simulated. Tests RecordSheet ('leaving for a page'). | No record-draft guard when opening a page (save/queued/failed/removed states) (L-C)",
+   "verified": "drift-fixed",
+   "verifiedNote": "Board compared (board shots/126-35945.png): 'Record · Couldn’t save — Retry' in red, Retry save · Cancel; Keep editing on the failed leave drops the navigation and keeps the draft. (the page-over-CMS flow, round 16)",
    "tier": "P1"
   },
   {
@@ -1318,9 +1318,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "code:one-leave-owner",
    "verified": "no",
-   "verifiedNote": "No record-draft guard when opening a page (save/queued/failed/removed states) (L-C)",
+   "verifiedNote": "Board compared (board shots/126-36945.png): '2 of 2 · … 1. About page settings · Saved 2. Studio launch record · Couldn’t save'. A leave in the code has one owner — the open record (the page settings drawer cannot be open over the CMS workspace at the same time), so there is no chained two-owner save to report. | No record-draft guard when opening a page (save/queued/failed/removed states) (L-C)",
    "tier": "P1"
   },
   {
@@ -1330,8 +1330,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Covered by the built flow, not image-compared (board not fetched): Keep editing during Saving… → the save lands and the record stays open (stayHere). Built 2026-10-30: the Pages drawer opens OVER an open CMS record (useTabSwitchGuard openPagesOverRecord → cmsWorkspace.overPages; StudioPanels keeps the workspace mounted), and a page picked there leaves through the record's own guard (PagesTab openPage → cmsWorkspace.exit(go, { name, exists }) → RecordSheet → RecordLeaveDialog), which follows the REAL save: Saving… while onSave runs, the page opens only after a confirmed save (true), 'queued' when the save returns false (offline mirror), 'Couldn’t save' + Retry save on a thrown save, the server's reason on a refusal, and 'no longer available' when the page is gone by the time the leave lands. Nothing is simulated. Tests RecordSheet ('leaving for a page'). | No record-draft guard when opening a page (save/queued/failed/removed states) (L-C)",
+   "verified": "drift-fixed",
+   "verifiedNote": "Board compared (board shots/126-37142.png): 'Record · Saved', Save record off, Cancel — the record stays open when a save lands after Keep editing (stayHere; existing test 'while the save runs'). Layout per 122:43331 (live).",
    "tier": "P1"
   },
   {
@@ -1418,8 +1418,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Covered by the built flow, not image-compared (board not fetched): a refused save (invalid title) keeps the draft; Keep editing cancels the navigation. Built 2026-10-30: the Pages drawer opens OVER an open CMS record (useTabSwitchGuard openPagesOverRecord → cmsWorkspace.overPages; StudioPanels keeps the workspace mounted), and a page picked there leaves through the record's own guard (PagesTab openPage → cmsWorkspace.exit(go, { name, exists }) → RecordSheet → RecordLeaveDialog), which follows the REAL save: Saving… while onSave runs, the page opens only after a confirmed save (true), 'queued' when the save returns false (offline mirror), 'Couldn’t save' + Retry save on a thrown save, the server's reason on a refusal, and 'no longer available' when the page is gone by the time the leave lands. Nothing is simulated. Tests RecordSheet ('leaving for a page'). | No record-draft guard when opening a page (save/queued/failed/removed states) (L-C)",
+   "verified": "drift-fixed",
+   "verifiedNote": "Board compared (board shots/128-39389.png); built: Cancel navigation drops the pending page; the invalid draft stays with Save off and 'Enter a {field} before saving.' (test). The field-level error under Title is RecordFieldControl's required marker. (the page-over-CMS flow, round 16)",
    "tier": "P1"
   },
   {
@@ -1429,8 +1429,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Covered by the built flow, not image-compared (board not fetched): after \"About is no longer available\", Keep editing returns to the record with its draft. Built 2026-10-30: the Pages drawer opens OVER an open CMS record (useTabSwitchGuard openPagesOverRecord → cmsWorkspace.overPages; StudioPanels keeps the workspace mounted), and a page picked there leaves through the record's own guard (PagesTab openPage → cmsWorkspace.exit(go, { name, exists }) → RecordSheet → RecordLeaveDialog), which follows the REAL save: Saving… while onSave runs, the page opens only after a confirmed save (true), 'queued' when the save returns false (offline mirror), 'Couldn’t save' + Retry save on a thrown save, the server's reason on a refusal, and 'no longer available' when the page is gone by the time the leave lands. Nothing is simulated. Tests RecordSheet ('leaving for a page'). | No record-draft guard when opening a page (save/queued/failed/removed states) (L-C)",
+   "verified": "drift-fixed",
+   "verifiedNote": "Board compared (board shots/128-39584.png); built: after 'About is no longer available', Keep editing returns to the record, which says '{page} was removed. Your {record} draft is retained.' under the publishing line (test). (the page-over-CMS flow, round 16)",
    "tier": "P1"
   },
   {
