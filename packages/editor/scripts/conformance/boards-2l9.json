@@ -1701,8 +1701,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Built, not image-compared live: Retry deletes only the failed page — card '{Work} deleted' / 'Work — deleted after retry' / 'About — already deleted' / 'Home — kept; it is the homepage', receipt 'Work deleted · Undo' (useBulkDelete test). The probe's refusal is permanent, so a successful retry is not reachable there. Board shots/139-49899.png on disk. Built 2026-10-30 (useBulkDelete + BulkDeleteResult): only outcomes the delete really produces — the homepage (or the last page) KEPT by the guard and never sent, a page the engine refuses (deletePage → false) FAILED, kept and left selected with a retry, the rest deleted. Tests useBulkDelete.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 24, probe-compared: shots/139-49899.png vs probe pages-shell&refuse=Work&once=1 (the engine refuses Work's delete once): Select pages… → Home, About, Work → Delete 3 pages → '1 deleted · 1 kept · 1 failed' → Retry delete Work → card 'Work deleted' / 'Work — deleted after retry' / 'About — already deleted' / 'Home — kept; it is the homepage', grey card 12px lines over the list. Board sample folders/collection pages are its data. The toast's 'Recently deleted' is the page trash (owner, A-21).",
    "tier": "P1"
   },
   {
@@ -14080,9 +14080,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "code:no-site-password-protection",
+   "authority": "board",
    "verified": "no",
-   "verifiedNote": "Round 24: there is no site password protection in the product — no Site field, no settings control, no publish check (runPrePublishChecks, publish.service:71-170). Nothing exists to block on Free; the board's two ways out have nothing to act on.",
+   "verifiedNote": "Round 24: open — server first. Site password protection exists (Settings › Access, Pro + ADMIN; publish reconciles it on Vercel best-effort, skipping on 402/403), but nothing refuses a publish when a Free workspace's site still carries a password: the deploy goes out and the protection is silently skipped. Contract filed REQUESTS A-36 (a 'Password protection' fail row from runPrePublishChecks + the remove-and-publish mutation); the tray shuts on any failing server row already.",
    "tier": "P1"
   },
   {
@@ -14091,9 +14091,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "code:no-site-password-protection",
+   "authority": "board",
    "verified": "no",
-   "verifiedNote": "Round 24: as 233:8594 — 'Remove protection and publish' confirms removing a protection the code does not have.",
+   "verifiedNote": "Round 24: open — the 'Remove protection and publish' confirm needs REQUESTS A-36's server half (clear publishedPassword, then publish) before the editor can offer it.",
    "tier": "P1"
   },
   {
@@ -14103,8 +14103,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/publish/UnpublishConfirmModal.tsx:62 — types UNPUBLISH; board types the domain, Admin only",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 24, probe-compared: shots/233-9714.png vs probe unpublish-confirm: 480 wide at y279, 'Unpublish fieldwork.studio?', 'The site will show a “site not found” page. Domains stay connected. You can publish again any time.' (true to unpublishSite: deployment deleted, project + domains stay), 'Type fieldwork.studio to confirm', Cancel + disabled red Unpublish until the domain is typed (PublishTab.states tests). Admin only is the server's (sites.unpublish checkSiteRole ADMIN); a site with no live domain still types UNPUBLISH. Residual: the dialog is ~35px taller (title/body spacing of the shared Modal).",
    "tier": "P1"
   },
   {
@@ -23148,7 +23148,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "FAILING STEP: no \"collection list has no source\" detector (contentIssues.ts:123 alt/image/link only); no blocker/tips split.",
+   "verifiedNote": "Round 24: the Issues head now reads the board's verdict ('1 issue blocks publishing · 3 tips', IssuesPanel issueSummary). FAILING STEP stays: no issue is raised for a collection list without a source — the binding lives in composer.cms.bindings, which the shared detector cannot see; filed REQUESTS A-35 (useIssuesFeed is lead-owned). Rows are still the panel family's dot rows, not the board's tinted cards.",
    "tier": "P1"
   },
   {
@@ -23159,7 +23159,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Issue row selects element (IssuesPanel.tsx:337) but no \"‹ Back to Issues\" in inspector (only Back to Inspector).",
+   "verifiedNote": "Round 24: depends on F4.01's issue (REQUESTS A-35); Fix › already selects the element. '‹ Back to Issues' in the inspector is still missing.",
    "tier": "P1"
   },
   {
@@ -23192,7 +23192,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Issues has no \"Review and publish\" CTA; blocker/tips summary line missing (IssuesPanel.tsx:217).",
+   "verifiedNote": "Round 24, built + unit-tested (IssuesPanel.test 'no blockers'): 'No blocking issues · N tips' and a blue 'Review and publish' that opens the publish tray. Not compared live; the rows are the panel family's dot rows where this board draws tinted cards with a location line.",
    "tier": "P1"
   },
   {
@@ -23225,7 +23225,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Confirm is \"Publish to production?\" (PublishConfirmModal.tsx:85); no numbered checklist with acknowledgement boxes.",
+   "verifiedNote": "Round 24: the confirm is the board's numbered ledger (1 Changes / 2 Tips ☐ I’ve seen these / 4 Approval / 5 Release, Cancel · Publish, 'Tick the boxes above to publish' — probe publish-confirm-tips, see 233:1802). Open: this board is the stale-approval variant ('☐ Publish without a fresh review'), which needs the AquibraStudio route (REQUESTS A-31).",
    "tier": "P1"
   },
   {
@@ -23236,7 +23236,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "\"I’ve seen these\" tips acknowledgement missing (depends F4.08).",
+   "verifiedNote": "Round 24: ticking 'I’ve seen these' is built and gates Publish (PublishConfirmModal.test 'Publish waits for…'). Open only for the stale-approval box this board also draws (REQUESTS A-31).",
    "tier": "P1"
   },
   {
@@ -23247,7 +23247,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Admin \"Publish without a fresh review\" box missing; code uses StaleApprovalModal \"Publish anyway\".",
+   "verifiedNote": "Round 24: the Admin 'Publish without a fresh review' box needs the stale-approval door routed into the one confirm (REQUESTS A-31); StaleApprovalModal still answers it.",
    "tier": "P1"
   },
   {
@@ -25514,8 +25514,8 @@
    "family": "shell-components",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 23 (probe pages-shell, 5 pages): the Pages drawer is this board's — 'Pages · N', search, Pages / Listings / Structure, rows with path and ⋯, Current on the open page, + Add page / From template / New folder. Not compared at 100 pages (the probe seeds 5; the switcher-scale claim is unmeasured). The topbar/bottom-bar switcher is lead-owned (A-16). | phase1 T1.3: PageTabBar tabs cannot hold 100 pages; PageSwitcher + PageSwitcherMenu missing.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 24, probe-compared at 100 pages: shots/498-634.png vs probe pages-shell&pages=100 (hundredComposer: 7 named + 93 'Project NN — Design case study'). 'Pages · 100', search, Pages / Listings / Structure, Home 'Current' tinted, 44px rows (13/12px name over path), long names and paths truncate with an ellipsis, the list scrolls inside its own box (760 visible of 4540) while '+ Add page · From template · New folder' stay pinned. Not re-shot here: the bottom bar's '100 pages · ⌘P to switch' (PageSwitcher, lead-owned, A-16 closed) and the topbar — the probe mounts the drawer without them.",
    "tier": "P1"
   },
   {
@@ -25581,7 +25581,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "lead3 2026-10-27: banner under the topbar (shell flex order) and the status in the bottom bar ('Not loaded · nothing saved yet' · Details, probe bottom-bar state=not-loaded). Canvas/layers emptiness and Copy details are not shell. Not compared live. | Compared live 2026-10-26 (editor-inspector): DRIFT — Forced via aborted sites.get. Banner above topbar y0-54 (board below it y56-97) + extra 'Copy details'; canvas/layers empty; inspector only 'View only until the site loads'; status in topbar. | prior: Load-failed banner, lock and echoes built (feat/design-2l9-editlock); not walked live (needs a forced load failure). Banner slot under topbar is an AquibraStudio request (REQUESTS.md #4).",
+   "verifiedNote": "Round 24 re-read: the loader's real failure state is built — LoadErrorBanner carries the board's line ('Couldn’t load this site. You can look around; editing waits until it loads.'), Download local copy and Retry only (no Copy details); bottom bar 'Not loaded · nothing saved yet' · Details (probe bottom-bar state=not-loaded). What the canvas and Layers show is whatever copy the loader restored (a local draft) — empty when there is none; nothing is faked. Still open: the banner mounts above the topbar, not in the 40px slot under it (AquibraStudio, REQUESTS F-11), and the inspector reads 'View only until the site loads' where the board says 'View only — properties unlock when the site loads' (StatusLine.tsx:94, L-B). Not walked live (needs a forced load failure on the Next app).",
    "tier": "P1"
   },
   {

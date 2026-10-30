@@ -21,6 +21,17 @@ import * as React from "react";
 import { CheckCircle2, X } from "lucide-react";
 import { PanelHeader, Button, IconButton, EmptyState, Spinner, Row } from "@/editor/chrome-ui";
 import { issueAppliesToPage, type Issue } from "./hooks/useStudioState";
+import { publishTray } from "./publishTrayStore";
+
+/** "1 issue blocks publishing · 3 tips" / "No blocking issues · 3 tips". */
+function issueSummary(issues: Issue[]): string {
+  const blocking = issues.filter((i) => i.type === "error").length;
+  const tips = issues.filter((i) => i.type === "warning").length;
+  const head = blocking
+    ? `${blocking} issue${blocking === 1 ? " blocks" : "s block"} publishing`
+    : "No blocking issues";
+  return tips ? `${head} · ${tips} tip${tips === 1 ? "" : "s"}` : head;
+}
 
 export interface IssuesPanelProps {
   issues: Issue[];
@@ -260,7 +271,11 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
             </div>
           </div>
           <div className={SUMMARY} data-testid="issues-filter-row">
-            <span className="tw:flex-1">Open issues: {visible.length}</span>
+            {/* Play F4.01 / F4.05 (2L9 303:32296, 303:34252): the verdict for
+                publishing, then the advice — "1 issue blocks publishing · 3 tips". */}
+            <span className="tw:flex-1" data-testid="issues-summary">
+              {issueSummary(scoped)}
+            </span>
             {/* The severity filter — no board draws it; kept as a quiet
                 trailing control (designer-notes.md). Clicking cycles. */}
             <Button
@@ -378,6 +393,14 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
               ))
             )}
           </div>
+          {/* F4.05: nothing blocks — the next move is the publish tray. */}
+          {!scoped.some((i) => i.type === "error") ? (
+            <div className="tw:flex-none tw:px-4 tw:pt-2">
+              <Button size="sm" className="tw:h-8" onClick={() => publishTray.open()} data-testid="issues-review-publish">
+                Review and publish
+              </Button>
+            </div>
+          ) : null}
           {/* Board 164:22 orders this LAST — under the rows, not over them. It
               shipped above the first issue, which is where the board's own
               annotation put it in words but not in layout; the frame draws

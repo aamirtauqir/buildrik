@@ -6,6 +6,7 @@
 import * as React from "react";
 import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { publishTray } from "../publishTrayStore";
 import { IssuesPanel } from "../IssuesPanel";
 
 const ISSUES = [
@@ -28,11 +29,14 @@ describe("IssuesPanel", () => {
      the message over its location, Fix › and a severity pill; a legend
      closes the panel. The severity filter (no board draws it) stays as a
      quiet trailing control on the head row. */
-  it("lists every issue under an 'Open issues: N' head, with the board's row parts", () => {
+  /* 2L9 Play F4.01 (303:32296) heads the list with the publishing verdict:
+     "1 issue blocks publishing · 2 tips" (was "Open issues: 3"). */
+  it("lists every issue under the publishing verdict, with the board's row parts", () => {
     renderPanel();
     expect(screen.getByText(/Broken link/)).toBeInTheDocument();
     expect(screen.getByText(/missing alt/)).toBeInTheDocument();
-    expect(screen.getByText("Open issues: 3")).toBeInTheDocument();
+    expect(screen.getByText("1 issue blocks publishing · 2 tips")).toBeInTheDocument();
+    expect(screen.queryByTestId("issues-review-publish")).toBeNull();
     expect(screen.getByRole("button", { name: "All" })).toBeInTheDocument();
     expect(screen.getByTestId("issue-severity-0")).toHaveTextContent("Error");
     expect(screen.getByTestId("issue-severity-1")).toHaveTextContent("Warning · should fix");
@@ -117,15 +121,24 @@ describe("IssuesPanel", () => {
       expect(screen.getByText(/Off-token color everywhere/)).toBeInTheDocument();
       expect(screen.queryByText(/Missing alt on About/)).not.toBeInTheDocument();
       // the head's count follows the scope
-      expect(screen.getByText("Open issues: 2")).toBeInTheDocument();
+      expect(screen.getByText("1 issue blocks publishing · 1 tip")).toBeInTheDocument();
     });
 
     it("Whole site shows everything", () => {
       renderPanel({ issues: PAGED, activePageId: "home" });
       fireEvent.click(screen.getByRole("button", { name: /whole site/i }));
       expect(screen.getByText(/Missing alt on About/)).toBeInTheDocument();
-      expect(screen.getByText("Open issues: 3")).toBeInTheDocument();
+      expect(screen.getByText("1 issue blocks publishing · 2 tips")).toBeInTheDocument();
     });
+  });
+
+  /* Play F4.05 (303:34252): with no blocker the panel offers the next move. */
+  it("no blockers: 'No blocking issues · N tips' and Review and publish opens the tray", () => {
+    renderPanel({ issues: [{ id: "w", type: "warning" as const, message: "Image missing alt text" }] });
+    expect(screen.getByText("No blocking issues · 1 tip")).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId("issues-review-publish"));
+    expect(publishTray.get().open).toBe(true);
+    publishTray.close();
   });
 });
 

@@ -1,6 +1,7 @@
 /**
- * UnpublishConfirmModal — board `4418:98016` (Site menu · Unpublish, typed
- * confirm, 560).
+ * UnpublishConfirmModal — 2L9 board B8-PB18 `233:9714` ("Unpublish
+ * fieldwork.studio?", type the domain to confirm; was `4418:98016`, typed
+ * UNPUBLISH). A site with no live domain still asks for the word.
  *
  * Taking a site down is wide — every visitor loses it at once — so both doors
  * (the site menu's "Unpublish site…" and the panel's own button) land on this
@@ -29,6 +30,8 @@ const UNPUBLISH_WORD = "UNPUBLISH";
 export interface UnpublishConfirmModalProps {
   open: boolean;
   siteName: string;
+  /** The live domain — the word to type, and the title's name for the site. */
+  domain?: string | null;
   busy?: boolean;
   onConfirm: () => void;
   onClose: () => void;
@@ -37,6 +40,7 @@ export interface UnpublishConfirmModalProps {
 export const UnpublishConfirmModal: React.FC<UnpublishConfirmModalProps> = ({
   open,
   siteName,
+  domain = null,
   busy = false,
   onConfirm,
   onClose,
@@ -47,28 +51,30 @@ export const UnpublishConfirmModal: React.FC<UnpublishConfirmModalProps> = ({
   React.useEffect(() => {
     if (!open) setTyped("");
   }, [open]);
-  const armed = typed.trim() === UNPUBLISH_WORD;
+  const word = domain ?? UNPUBLISH_WORD;
+  const armed = typed.trim() === word;
+  const title = `Unpublish ${domain ?? siteName}?`;
 
   return (
     <ModalRoot open={open} onOpenChange={(o) => !o && onClose()} dismissOnScrimClick={false}>
-      <ModalContent size="form" srTitle="Unpublish site?" data-testid="unpublish-confirm">
-        <ModalTitle>Unpublish site?</ModalTitle>
+      <ModalContent size="confirm" srTitle={title} data-testid="unpublish-confirm">
+        <ModalTitle>{title}</ModalTitle>
         <ModalBody>
+          {/* True to `unpublishSite`: it deletes the production deployment and
+              leaves the Vercel project and its domains attached. */}
           <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-soft)]" data-testid="unpublish-body">
-            <strong className="tw:font-medium tw:text-[var(--bk-ink)]">{siteName}</strong> will be taken offline and
-            its public URL will stop working until you publish again.
+            The site will show a “site not found” page. Domains stay connected. You can publish again any time.
           </p>
-          <p className="tw:mb-1.5 tw:mt-4 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]">
-            Type <strong>{UNPUBLISH_WORD}</strong> to confirm:
+          <p className="tw:mb-1.5 tw:mt-4 tw:text-[13px] tw:font-medium tw:leading-5 tw:text-[var(--bk-ink)]">
+            Type {word} to confirm
           </p>
           <TextField
             value={typed}
             onChange={(e) => setTyped(e.target.value)}
-            placeholder={UNPUBLISH_WORD}
             autoFocus
             autoComplete="off"
             spellCheck={false}
-            aria-label={`Type ${UNPUBLISH_WORD} to confirm`}
+            aria-label={`Type ${word} to confirm`}
             data-testid="unpublish-word"
             onKeyDown={(e) => {
               if (e.key === "Enter" && armed && !busy) onConfirm();

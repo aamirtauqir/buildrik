@@ -488,23 +488,23 @@ describe("PublishTab — Unpublish has a door, one confirm, and tells the shell"
     await waitFor(() => expect(screen.getByText("LIVE · v3")).toBeTruthy());
     await openPublishMenu();
     fireEvent.click(await screen.findByRole("menuitem", { name: "Unpublish site…" }));
-    expect(screen.getByText("Unpublish site?")).toBeTruthy();
+    expect(screen.getByText("Unpublish bellacucina.com?")).toBeTruthy();
     expect(unpublishSite).not.toHaveBeenCalled();
-    /* Typed confirm (board 4418:98016, decision 29 — wide action): the button
-       is dead until the word is typed, so a reflex Enter cannot take the site
-       down. */
+    /* Typed confirm (2L9 B8-PB18 233:9714, decision 29 — wide action): the
+       button is dead until the live domain is typed, so a reflex Enter cannot
+       take the site down. */
     const confirm = screen.getByTestId("unpublish-confirm-button") as HTMLButtonElement;
     expect(confirm.disabled).toBe(true);
     fireEvent.click(confirm);
     expect(unpublishSite).not.toHaveBeenCalled();
-    fireEvent.change(screen.getByTestId("unpublish-word"), { target: { value: "unpublish" } });
+    fireEvent.change(screen.getByTestId("unpublish-word"), { target: { value: "bellacucina" } });
     expect(confirm.disabled).toBe(true);
-    fireEvent.change(screen.getByTestId("unpublish-word"), { target: { value: "UNPUBLISH" } });
+    fireEvent.change(screen.getByTestId("unpublish-word"), { target: { value: "bellacucina.com" } });
     expect(confirm.disabled).toBe(false);
     fireEvent.click(confirm);
     await waitFor(() => expect(unpublishSite).toHaveBeenCalledWith("site_1"));
     await waitFor(() => expect(unpublished).toHaveBeenCalledTimes(1));
-    await waitFor(() => expect(screen.queryByText("Unpublish site?")).toBeNull());
+    await waitFor(() => expect(screen.queryByText("Unpublish bellacucina.com?")).toBeNull());
   });
 
   it("a failed unpublish keeps the dialog up — the site is still live", async () => {
@@ -526,11 +526,11 @@ describe("PublishTab — Unpublish has a door, one confirm, and tells the shell"
     await waitFor(() => expect(screen.getByText("LIVE · v3")).toBeTruthy());
     await openPublishMenu();
     fireEvent.click(await screen.findByRole("menuitem", { name: "Unpublish site…" }));
-    fireEvent.change(screen.getByTestId("unpublish-word"), { target: { value: "UNPUBLISH" } });
+    fireEvent.change(screen.getByTestId("unpublish-word"), { target: { value: "bellacucina.com" } });
     fireEvent.click(screen.getByTestId("unpublish-confirm-button"));
     await waitFor(() => expect(unpublishSite).toHaveBeenCalled());
     await waitFor(() => expect((screen.getByTestId("unpublish-confirm-button") as HTMLButtonElement).disabled).toBe(false));
-    expect(screen.getByText("Unpublish site?")).toBeTruthy();
+    expect(screen.getByText("Unpublish bellacucina.com?")).toBeTruthy();
     expect(unpublished).not.toHaveBeenCalled();
   });
 
@@ -547,7 +547,7 @@ describe("PublishTab — Unpublish has a door, one confirm, and tells the shell"
         onUnpublishIntentConsumed={consumed}
       />,
     );
-    expect(await screen.findByText("Unpublish site?")).toBeTruthy();
+    expect(await screen.findByText("Unpublish bellacucina.com?")).toBeTruthy();
     expect(screen.getByTestId("unpublish-word")).toBeTruthy();
     expect(consumed).toHaveBeenCalledTimes(1);
   });

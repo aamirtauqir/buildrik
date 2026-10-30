@@ -13,7 +13,7 @@
  *     thing left that means "no publish path is wired" (flag off);
  *   · a running publish can be cancelled (`publishJob.cancel` →
  *     `sites.cancelPublish`), and a cancelled job has its own outcome block;
- *   · Unpublish asks for the word (typed UNPUBLISH) from both doors.
+ *   · Unpublish asks for the live domain, typed, from both doors (B8-PB18).
  *
  * Read-only view of the ONE canonical publish state machine (`usePublishJob`,
  * the same instance the topbar drives). No second state machine, no second
@@ -33,7 +33,7 @@ import type { NextMove } from "@/editor/shell/lifecycle";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { unpublishSite } from "@/services/PublishService";
 import { EVENTS } from "@/shared/constants";
-import { relativeShort, usePublishSnapshot } from "./usePublishSnapshot";
+import { domainOf, relativeShort, usePublishSnapshot } from "./usePublishSnapshot";
 import { CHECK_DOOR, PrePublishChecks } from "./PrePublishChecks";
 import { usePrePublishChecks } from "./usePrePublishChecks";
 import { ApprovalCheckRow, PublishGateBanner } from "./PublishGateBanner";
@@ -1063,6 +1063,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
       <UnpublishConfirmModal
         open={confirmUnpublish}
         siteName={siteName}
+        domain={domainOf(publishedUrl)}
         busy={unpublishing}
         onConfirm={() => void runUnpublish()}
         onClose={() => setConfirmUnpublish(false)}

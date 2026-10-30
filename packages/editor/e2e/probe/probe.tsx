@@ -138,6 +138,7 @@ import { PageSwitcher } from "@/editor/shell/PageSwitcher";
 import { BottomBar } from "@/editor/shell/BottomBar";
 import { saveStatusStore } from "@/editor/shell/saveStatusStore";
 import { publishTray } from "@/editor/shell/publishTrayStore";
+import { UnpublishConfirmModal } from "@/editor/sidebar/tabs/publish/UnpublishConfirmModal";
 import { saveFailedBanner } from "@/editor/shell/globalBanners";
 import type { SaveState } from "@/editor/chrome-ui";
 import { LayoutShell } from "@/editor/rail/LayoutShell";
@@ -853,7 +854,16 @@ function ShellProbe() {
     const refuse = new URLSearchParams(location.search).get("refuse");
     if (refuse) {
       const del = c.elements.deletePage.bind(c.elements);
-      c.elements.deletePage = (id: string) => (c.elements.getPage(id)?.name === refuse ? false : del(id));
+      /* `&once=1`: refuse only the first try, so Retry can succeed (139:49899). */
+      const once = new URLSearchParams(location.search).get("once") === "1";
+      let refused = false;
+      c.elements.deletePage = (id: string) => {
+        if (c.elements.getPage(id)?.name === refuse && !(once && refused)) {
+          refused = true;
+          return false;
+        }
+        return del(id);
+      };
     }
     return c;
   }, []);
@@ -4319,6 +4329,12 @@ const CASES: Record<string, () => React.ReactElement> = {
         onConfirm={() => {}}
         onClose={() => {}}
       />
+    </div>
+  ),
+  /* B8-PB18 233:9714 — Unpublish, typed domain. */
+  "unpublish-confirm": () => (
+    <div data-probe="unpublish-confirm">
+      <UnpublishConfirmModal open siteName="Fieldwork Studio" domain="fieldwork.studio" onConfirm={() => {}} onClose={() => {}} />
     </div>
   ),
   /* B8-PB04 233:1802 — the confirm with advice to acknowledge: the server's
