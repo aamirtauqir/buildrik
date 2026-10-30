@@ -1384,9 +1384,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "blocked:requests-13-folder-undo",
-   "verified": "drift-open",
-   "verifiedNote": "probe-compared 2026-10-30 (board shots/127-38819.png): receipt 'About moved to Studio · /about unchanged' is built (shared Toast). Blocked: the board's Undo. Folder moves cannot become undo steps from pages/: HistoryManager records whole-project snapshots (record/captureUndo over importProject) and has no public custom-step API, and folders live outside the project (useFolders + pageFolderRemote). Needs an engine history change (REQUESTS #13). Re-checked round 9.",
+   "authority": "board",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-30 (case pages-shell: folder Studio, About ⋯ → Move to folder… → Move; board shots/127-38819.png): receipt 'About moved to Studio · /about unchanged' with a blue text Undo on the right, as the board; clicking it put About back at the top level (read from the tree). Built on history.recordCustom (engine): the move is one undo step on the editor stack and the Undo is bound to it (captureUndo — refuses once a newer step is on top). Tests HistoryManager.custom / folderHistory. The toast's own ✕ stays (coordinator round 10: leave the toast).",
    "tier": "P1"
   },
   {
@@ -1406,9 +1406,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "blocked:requests-13-folder-undo",
-   "verified": "drift-open",
-   "verifiedNote": "Receipt '{Page} removed from {Folder} · Page kept' built; not image-compared this round. Blocked on the board's Undo — Folder moves cannot become undo steps from pages/: HistoryManager records whole-project snapshots (record/captureUndo over importProject) and has no public custom-step API, and folders live outside the project (useFolders + pageFolderRemote). Needs an engine history change (REQUESTS #13). | L-A S6: receipt '{Page} removed from {Folder} · Page kept' built (from the Move dialog's Top level); no Undo (REQUESTS #13). Not compared.",
+   "authority": "board",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-30 (case pages-shell, About in Client projects → Move to folder… → Top level; board shots/127-40244.png): 'About removed from Client projects · Page kept · Undo'. Folder move = one history.recordCustom step. The receipt's Undo is bound to its own step (captureUndo); layout is the shared Toast (✕ kept; where the board wraps Undo to a second line the shared Toast keeps one row — coordinator round 10: leave the toast).",
    "tier": "P1"
   },
   {
@@ -1461,9 +1461,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "blocked:requests-13-folder-undo",
-   "verified": "drift-open",
-   "verifiedNote": "Receipt '{Page} moved to {Folder} · {url} unchanged' built; not image-compared this round. Blocked on the board's Undo — Folder moves cannot become undo steps from pages/: HistoryManager records whole-project snapshots (record/captureUndo over importProject) and has no public custom-step API, and folders live outside the project (useFolders + pageFolderRemote). Needs an engine history change (REQUESTS #13). | L-A S6: receipt '{Page} moved to {Folder} · {url} unchanged' built; no Undo (REQUESTS #13).",
+   "authority": "board",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-30 (case pages-shell, About ⋯ → Move to folder… → Move; board shots/131-41086.png): 'About moved to Studio · /about unchanged · Undo', and Undo put About back (read from the tree). Folder move = one history.recordCustom step. The receipt's Undo is bound to its own step (captureUndo); layout is the shared Toast (✕ kept; where the board wraps Undo to a second line the shared Toast keeps one row — coordinator round 10: leave the toast).",
    "tier": "P1"
   },
   {
@@ -1566,9 +1566,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "blocked:requests-13-folder-undo",
-   "verified": "drift-open",
-   "verifiedNote": "Receipt '{Page} moved to position {n}' (page order is not in composer history either) built; not image-compared this round. Blocked on the board's Undo — Folder moves cannot become undo steps from pages/: HistoryManager records whole-project snapshots (record/captureUndo over importProject) and has no public custom-step API, and folders live outside the project (useFolders + pageFolderRemote). Needs an engine history change (REQUESTS #13). | L-A S6 built: Move down reorders among top-level pages (rootMove, unit-tested), receipt '{Page} moved to position {n}'; no Undo — page order is not in composer history (REQUESTS #13).",
+   "authority": "board",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-30 (case pages-shell, About ⋯ → Move down; board shots/137-53911.png): 'About moved to position 3 · Undo' (Undo puts the page back after its old neighbour). Correction: round 9 wrongly marked this blocked — the Undo already existed. The receipt's Undo is bound to its own step (captureUndo); layout is the shared Toast (✕ kept; where the board wraps Undo to a second line the shared Toast keeps one row — coordinator round 10: leave the toast).",
    "tier": "P1"
   },
   {
@@ -1711,9 +1711,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "blocked:requests-13-folder-undo",
-   "verified": "drift-open",
-   "verifiedNote": "Receipt '{n} pages duplicated · Originals kept' built; not image-compared this round. Blocked on the board's Undo — Folder moves cannot become undo steps from pages/: HistoryManager records whole-project snapshots (record/captureUndo over importProject) and has no public custom-step API, and folders live outside the project (useFolders + pageFolderRemote). Needs an engine history change (REQUESTS #13). | L-A S8 built, not compared: one receipt '{n} pages duplicated · Originals kept' (usePages.duplicatePages) instead of one toast per page. Board's Undo not offered (duplicate is outside composer history — REQUESTS #13 family).",
+   "authority": "board",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-30 (case pages-shell, three pages checked → Duplicate; board shots/139-50620.png): '3 pages duplicated · Originals kept · Undo'. Built: the copies are one 'Duplicate pages' transaction (one snapshot step) and the Undo is bound to it. Test usePages. The receipt's Undo is bound to its own step (captureUndo); layout is the shared Toast (✕ kept; where the board wraps Undo to a second line the shared Toast keeps one row — coordinator round 10: leave the toast).",
    "tier": "P1"
   },
   {
@@ -2137,7 +2137,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "probe-compared 2026-10-30 (case canvas-grid-panel, View; board shots/145-64586.png): fixed the head — 'Canvas view' 13/600 and a text Close, as Grid and snapping (was a small-caps label). Still open: 'Rulers and guides…' (S11 shared guides) and Focus mode (REQUESTS #12); the board's 'Canvas view preferences' foot (no destination exists); the shared MenuItem's checkbox squares and the chord hints the board omits; Spacing/Badges/X-Ray kept (code-ahead). | lead4 2026-10-27 (A-14): the View menu opens downward from the top bar.",
+   "verifiedNote": "probe-compared 2026-10-30 (case canvas-grid-panel, View; board shots/145-64586.png): fixed the head — 'Canvas view' 13/600 and a text Close, as Grid and snapping (was a small-caps label). Round 10: the Rulers row reads 'Rulers and guides' (the rulers are where guides are placed; no '…' — it toggles, the board's guide-detail dialog (S11) does not exist). Focus mode left out: owner:focus-mode (open owner decision). Still open: the board's 'Canvas view preferences' foot (no destination exists); the shared MenuItem's checkbox squares and the chord hints the board omits; Spacing/Badges/X-Ray kept (code-ahead). | lead4 2026-10-27 (A-14): the View menu opens downward from the top bar.",
    "tier": "P1"
   },
   {
@@ -2298,8 +2298,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "lead4 2026-10-27 (A-14): the Page width popover opens downward from the top bar. | L-A S3 built, not compared: Page width popover from the bar's '{width} px' — Width (px), presets 1920 · Wide … 375 · Mobile, 'Custom width: 240–2560 px.'. 'Saved for your editor on this site.' not drawn: the width is session-only (not persisted). Fluid Desktop stays on the topbar switcher; '1440 · Desktop' previews at 1440.",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-30 (case canvas-grid-panel, width chip; board shots/145-71013.png): 'Page width' + text Close, 'Width (px)' field, 1920 · Wide / 1440 · Desktop / 1280 / 1024 / 768 · Tablet / 375 · Mobile, 'Custom width: 240–2560 px.' Not drawn on purpose: '…Saved for your editor on this site.' (the width is session-only). | lead4 2026-10-27 (A-14): the Page width popover opens downward from the top bar.",
    "tier": "P1"
   },
   {
@@ -2814,7 +2814,7 @@
    "status": "active",
    "authority": "open:ancestor-lock-semantics",
    "verified": "drift-open",
-   "verifiedNote": "Lane L-B round 11, board PNG compared: the board makes a Text inside a locked Hero read-only in the Inspector — 'Text · Locked', 'Locked — unlock to edit', 'Locked by Hero', 'Show Hero in Layers', a disabled Text content field, 'Selection and copying remain available.' The engine does not lock descendants: `isLocked()` is the element's own flag and the write gate (`writableElements`) checks only that, so the Text is editable and the Inspector shows it editable (the Layers footer's 'Locked by Hero' is a label, not a gate). Building the board would make the Inspector claim a lock the engine does not enforce. Needs an owner/lead call: should an ancestor lock gate its descendants (engine change), or does the board drop 'Locked by'?",
+   "verifiedNote": "Lane L-B round 11, board PNG compared: the board makes a Text inside a locked Hero read-only in the Inspector — 'Text · Locked', 'Locked — unlock to edit', 'Locked by Hero', 'Show Hero in Layers', a disabled Text content field, 'Selection and copying remain available.' The engine does not lock descendants: `isLocked()` is the element's own flag and the write gate (`writableElements`) checks only that, so the Text is editable and the Inspector shows it editable (the Layers footer's 'Locked by Hero' is a label, not a gate). Building the board would make the Inspector claim a lock the engine does not enforce. Needs an owner/lead call: should an ancestor lock gate its descendants (engine change), or does the board drop 'Locked by'? | L-A: probe-compared 2026-10-30 (case layers-tree, Container locked, its child selected; board shots/147-77668.png): footer '8 layers · 1 selected · Locked by Container'. Fixed: every row under a locked layer now shows the lock (a mark, not a control — 'Locked by a parent layer'), as the board draws Eyebrow / Headline / Text / Explore. Open: the board's lock glyphs read darker (ink) than the rows' muted ones, its selected pill stops short of the lock, the canvas chip 'Locked by Hero — unlock in Layers' (canvas overlay, not built) and the inspector's 'Locked — unlock to edit · Show Hero in Layers' block (L-B).",
    "tier": "P1"
   },
   {
@@ -2825,7 +2825,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Lane L-B round 11, board PNG compared with live (a locked element): both say 'Locked — unlock to edit' and offer Unlock (live: the status line's inline 'Unlock', one undo step via unlock-element). The board's differs: a warning-coloured status line, 'This section and its descendants are locked.' and a full-width 'Unlock Hero', then only the section's own field, disabled, and 'Selection and copying remain available.' Not built: the descendants sentence is not true of the engine (see 147:77668 — descendants are not gated), and the stripped body would hide the read-only controls page 04's locked state shows dimmed (DD-18). Open pending the same call as 147:77668.",
+   "verifiedNote": "Lane L-B round 11, board PNG compared with live (a locked element): both say 'Locked — unlock to edit' and offer Unlock (live: the status line's inline 'Unlock', one undo step via unlock-element). The board's differs: a warning-coloured status line, 'This section and its descendants are locked.' and a full-width 'Unlock Hero', then only the section's own field, disabled, and 'Selection and copying remain available.' Not built: the descendants sentence is not true of the engine (see 147:77668 — descendants are not gated), and the stripped body would hide the read-only controls page 04's locked state shows dimmed (DD-18). Open pending the same call as 147:77668. | L-A: probe-compared 2026-10-30 (case layers-tree; board shots/147-78110.png): the locked layer's descendants now all show the lock (fixed, as above); footer reads '… · 1 selected · Locked' where the board names the layer ('Hero selected · Locked') — 147:77668 itself says '1 selected', so the boards disagree and the code keeps the count. Inspector 'Unlock Hero' block is L-B's.",
    "tier": "P1"
   },
   {
@@ -2847,7 +2847,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Lane L-B round 11: the Inspector half is built — 'Dimmed in editor only' / '{Layer} is still included on the live site.' / Show normally / 'Hide on live site…' above every tab's body (DimmedNotice), driven by the canvas node's data-hidden (or the stored Layers set); compared side by side with the board PNG (probe ?type=text&dimmed=1). 'Show normally' emits LAYER_SHOW_NORMALLY_REQUESTED; Layers must listen (REQUESTS B-20, L-A) — until then it reaches no one. L-A half: the Layers note can go once B-20 lands; the selected pill vs eye-off is L-A's. Earlier: probe-compared 2026-10-30 (case layers-tree, row selected then its eye): footer '8 layers · 1 selected · Dimmed', the row's name greyed with the eye-off.",
+   "verifiedNote": "probe-compared 2026-10-30 (case layers-tree, row selected then its eye; board shots/147-78900.png), Layers side: footer '8 layers · 1 selected · Dimmed', the row's name greyed with the eye-off, and — fixed (REQUESTS B-20) — no dimmed note under the tree any more: the Inspector's 'Dimmed in editor only · Show normally' banner (L-B) carries it, and its Show normally (LAYER_SHOW_NORMALLY_REQUESTED) un-dims through the same write as the row's eye (useLayerActions setDimmed; test LayersPanel.showNormally). Open: the board's selected pill stops short of the eye-off, which sits outside it (live the icon is inside the pill). | Prior: Lane L-B round 11: the Inspector half is built — 'Dimmed in editor only' / '{Layer} is still included on the live site.' / Show normally / 'Hide on live site…' above every tab's body (DimmedNotice), driven by the canvas node's data-hidden (or the stored Layers set); compared side by side with the board PNG (probe ?type=text&dimmed=1). 'Show normally' emits LAYER_SHOW_NORMALLY_REQUESTED; Layers must listen (REQUESTS B-20, L-A) — until then it reaches no one. L-A half: the Layers note can go once B-20 lands; the selected pill vs eye-off is L-A's. Earlier: probe-compared 2026-10-30 (case layers-tree, row selected then its eye): footer '8 layers · 1 selected · Dimmed', the row's name greyed with the eye-off.",
    "tier": "P1"
   },
   {

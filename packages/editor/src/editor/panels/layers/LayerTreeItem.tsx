@@ -50,6 +50,8 @@ export interface LayerTreeItemProps {
   /** Selection mode (LayersTab's Select): the row shows its checkbox and a
    *  click or Enter/Space toggles it. Off (default): no checkbox. */
   selecting?: boolean;
+  /** An ancestor is locked — 147:77668 draws the lock on every row under it. */
+  lockedAncestor?: boolean;
 }
 
 export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
@@ -85,6 +87,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
     getVisibleLayerIds,
     displayPrefs,
     selecting = false,
+    lockedAncestor = false,
   } = props;
   const isSelected = selectedIds.has(layer.id);
   const isExpanded = expandedIds.has(layer.id);
@@ -400,7 +403,17 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
 
         {/* "Show lock badges" off hides the control on rows that are not
             locked; a locked row keeps it, or it could never be unlocked. */}
-        {!readOnly && (displayPrefs.showLockBadges || isLocked) && (
+        {/* 147:77668: under a locked ancestor the row shows the lock too — a
+            mark, not a control (unlock the ancestor that holds it). */}
+        {!readOnly && !isLocked && lockedAncestor && (
+          <span className="bdc-lr-lock bdc-on tw:cursor-default!" data-testid={`layer-lock-inherited-${layer.id}`} title="Locked by a parent layer" role="img" aria-label="Locked by a parent layer">
+            <svg viewBox="0 0 24 24">
+              <rect x="5" y="11" width="14" height="10" rx="2" />
+              <path d="M8 11V7a4 4 0 018 0v4" />
+            </svg>
+          </span>
+        )}
+        {!readOnly && !(lockedAncestor && !isLocked) && (displayPrefs.showLockBadges || isLocked) && (
         <Button
           type="button"
           className={`bdc-lr-lock tw:focus:ring-0${isLocked ? " bdc-on" : ""}`}
@@ -436,7 +449,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
         )}
       </div>
       {isExpanded && hasChildren && layer.children.map((child) => (
-        <LayerTreeItem key={child.id} {...props} layer={child} />
+        <LayerTreeItem key={child.id} {...props} layer={child} lockedAncestor={lockedAncestor || isLocked} />
       ))}
     </>
   );

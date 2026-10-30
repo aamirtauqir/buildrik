@@ -294,17 +294,26 @@ export function usePages(composer: Composer | null): UsePagesReturn {
         return;
       }
       let made = 0;
-      for (const id of pageIds) {
-        try {
-          if (composer.elements.duplicatePage(id)) made += 1;
-        } catch (err) {
-          console.error("[pages] duplicatePage failed", err);
+      /* design-2l9 139:50620: the copies are one undo step, and the receipt's
+         Undo is bound to it. */
+      composer.beginTransaction("Duplicate pages");
+      try {
+        for (const id of pageIds) {
+          try {
+            if (composer.elements.duplicatePage(id)) made += 1;
+          } catch (err) {
+            console.error("[pages] duplicatePage failed", err);
+          }
         }
+      } finally {
+        composer.endTransaction();
       }
+      const undo = made > 0 ? composer.history?.captureUndo?.() : undefined;
+      const action = undo ? { action: { label: "Undo", onClick: () => { undo(); } } } : {};
       addToast(
         made === pageIds.length
-          ? { description: `${made} pages duplicated · Originals kept`, tone: "info", duration: 8000 }
-          : { description: `${made} of ${pageIds.length} pages duplicated · Originals kept`, tone: "warning", duration: 8000 },
+          ? { description: `${made} pages duplicated · Originals kept`, tone: "info", duration: 8000, ...action }
+          : { description: `${made} of ${pageIds.length} pages duplicated · Originals kept`, tone: "warning", duration: 8000, ...action },
       );
     },
     [composer, duplicatePage, addToast]
