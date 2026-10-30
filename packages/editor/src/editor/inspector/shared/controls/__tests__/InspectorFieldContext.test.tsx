@@ -62,7 +62,7 @@ describe("InspectorFieldContext", () => {
       <InspectorFieldContext.Provider
         value={ctx({ readOnly: true, readOnlyReason: "locked", overrides: new Map([["font-family", ["pseudo"]]]), overrideLabels: { pseudo: ":hover" } })}
       >
-        <FontPicker value="Inter, sans-serif" onChange={() => {}} />
+        <FontPicker value="Inter, sans-serif" />
       </InspectorFieldContext.Provider>
     );
     expect(screen.getByRole("button", { name: "Overridden on :hover" })).toBeTruthy();

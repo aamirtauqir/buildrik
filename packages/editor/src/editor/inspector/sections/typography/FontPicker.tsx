@@ -1,6 +1,8 @@
 /**
- * FontPicker - Font family dropdown with Google Fonts integration
- * Part of Typography section refactoring
+ * FontPicker — the Typography section's Font row: the family and its source,
+ * the applied stack, and after a pick the R08 note with "Undo font
+ * assignment". Clicking it opens Choose font (`./ChooseFont`, 2L9 R02), the
+ * one font picker, as the tab's whole body.
  *
  * @module editor/inspector/sections/typography/FontPicker
  * @license BSD-3-Clause
@@ -8,8 +10,9 @@
 
 import { ChevronDown } from "lucide-react";
 import * as React from "react";
-import { loadGoogleFont, type GoogleFont } from "@/services/GoogleFontsService";
-import { FontPickerPanel, namesFont, primaryFamily } from "./FontPickerDropdown";
+import { namesFont, primaryFamily } from "./FontPickerDropdown";
+import { clearFontAssignment, useFontAssignment } from "./ChooseFont";
+import { openSubview } from "@/editor/inspector/tabs/subviewStore";
 import { Button } from "@/editor/chrome-ui";
 import { fieldTestId, labelTestId, rowTestId } from "@/editor/inspector/shared/controls";
 import { WIDE_BUTTON } from "@/editor/inspector/shared/controls/controlClasses";
@@ -52,7 +55,8 @@ export const openSiteFonts = (composer: Composer | null | undefined): void => {
 
 interface FontPickerProps {
   value: string;
-  onChange: (value: string) => void;
+  /** The element (or page root) the row edits — Choose font opens for it. */
+  elementId?: string;
   /** Source of the UPLOADED group — the FontManager's custom fonts, which the
    *  Composer registers from the media library's ADDED site fonts. */
   composer?: Composer | null;
@@ -115,75 +119,14 @@ function useFamilyLoaded(family: string | null): boolean | null {
   return loaded;
 }
 
-/** The last family picked here, while the element still carries it (2L9 R08):
- *  the value written, where it came from, what it replaced, and an Undo bound
- *  to that one history step. */
-interface Assignment {
-  value: string;
-  family: string;
-  source: string;
-  previous: string | null;
-  undo: () => boolean;
-}
-
-export const FontPicker: React.FC<FontPickerProps> = ({ value: ownValue, onChange, composer, inheritedValue }) => {
+export const FontPicker: React.FC<FontPickerProps> = ({ value: ownValue, composer, inheritedValue, elementId }) => {
   const field = useInspectorField("font-family");
   const value = ownValue || inheritedValue || "";
-  const [showFontPicker, setShowFontPicker] = React.useState(false);
   const uploadedFonts = useUploadedFonts(composer);
-  const [assignment, setAssignment] = React.useState<Assignment | null>(null);
-
-  // Handle font selection
-  const handleFontSelect = (font: GoogleFont | SystemFont) => {
-    /* Read-only (DD-18): refused here, not by disabling the trigger. */
-    if (field.readOnly) return;
-    const fontValue = "family" in font ? `'${font.family}', ${font.category}` : font.value;
-    setShowFontPicker(false);
-    if (fontValue === ownValue) return;
-
-    // Load Google Font if needed
-    if ("family" in font) {
-      loadGoogleFont(font.family);
-    }
-
-    /* One Undo step, the one the engine records for this write — bound only
-       if a step was recorded, so the button never undoes an older edit. */
-    let recorded = false;
-    const onRecorded = () => {
-      recorded = true;
-    };
-    composer?.on?.(EVENTS.HISTORY_RECORDED, onRecorded);
-    try {
-      field.discrete(() => onChange(fontValue));
-    } finally {
-      composer?.off?.(EVENTS.HISTORY_RECORDED, onRecorded);
-    }
-    const undo = recorded ? composer?.history?.captureUndo?.() : undefined;
-    const isUploaded = uploadedFonts.some((f) => f.value === fontValue);
-    setAssignment(
-      undo && fontValue !== "inherit"
-        ? {
-            value: fontValue,
-            family: "family" in font ? font.family : font.label,
-            source: isUploaded ? "uploaded" : "family" in font ? "Google Fonts" : "system",
-            previous: ownValue && ownValue !== "inherit" ? primaryFamily(ownValue) || ownValue : null,
-            undo,
-          }
-        : null,
-    );
-  };
-  /* Shown while the element still carries the family picked here — an undo,
-     ⌘Z or another element's selection ends it. */
-  const assigned = assignment && assignment.value === ownValue && !field.mixed ? assignment : null;
-  const loaded = useFamilyLoaded(assigned && assigned.source !== "system" ? assigned.family : null);
-
-  const handleManage = () => {
-    setShowFontPicker(false);
-    openSiteFonts(composer);
-  };
+  const latest = useFontAssignment(elementId);
 
   /* An uploaded family reads back as one: the trigger says so for the walk
-     (`data-font-source`), the reopened dropdown by its selected `Uploaded` row. */
+     (`data-font-source`). */
   const uploaded = uploadedFonts.some((f) => namesFont(value, f));
 
   // Get current font name for display
@@ -211,32 +154,28 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value: ownValue, onChang
         : SYSTEM_FONTS.some((f) => f.value === value)
           ? "System"
           : "Google Fonts";
-  const stack = ownValue && !field.mixed && ownValue.includes(",") ? ownValue.replace(/'/g, "") : null;
+  /* Shown while the element still carries the family picked (R08) — an
+     undo, ⌘Z or another pick ends it. */
+  const assigned = latest && latest.value === ownValue && !field.mixed ? latest : null;
+  const loaded = useFamilyLoaded(assigned && assigned.source !== "system" ? assigned.family : null);
+  const stack = ownValue && !field.mixed && ownValue.includes(",") && !assigned ? ownValue.replace(/'/g, "") : null;
 
   return (
     /* Board 1 reads "Font  [Inter]" — one row, label left, the same column
-       every other row uses. It used to stack a "Font Family"
-       caption above a full-bleed button, the only row in the section that did. */
-    /* `.bdi-ddn` — the SHARED control frame, not a fourth hand-rolled one.
-       807:8352 draws Family's box exactly like every other control on the
-       board: gray-50 on a gray-100 hairline, radius 4, 28 tall, 160 wide. This
-       one was white on `--bk-border-medium` at radius 6, and carried a 12px
-       bottom margin that broke the board's contiguous 34-row rhythm — the only
-       row in the panel that did either. The one style left inline is the
-       preview typeface, which is the field's value and cannot be a class. */
+       every other row uses. `.bdi-ddn` is the shared control frame. The one
+       style left inline is the preview typeface, which is the field's value
+       and cannot be a class. The row is the door to Choose font (R02), the
+       tab's whole body while open. */
     <div className="bdi-row-ctrl tw:relative" data-testid={rowTestId("Font")}>
       <label className="bdi-lb" data-testid={labelTestId("Font")}>
         Font
         <FieldDot field={field} />
       </label>
-      {/* Current Font Display / Toggle Button */}
       <Button
         onClick={() => {
-          if (!field.readOnly) setShowFontPicker(!showFontPicker);
+          if (!field.readOnly && elementId) openSubview({ kind: "font-picker", elementId });
         }}
-        aria-haspopup="listbox"
-        aria-expanded={showFontPicker}
-        aria-controls="font-picker-listbox"
+        aria-haspopup="dialog"
         aria-label={field.mixed ? mixedName("Font family") : "Font family"}
         aria-disabled={field.readOnly || undefined}
         data-testid={fieldTestId("Font")}
@@ -251,7 +190,7 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value: ownValue, onChang
         {/* The field chevron every other select in the column draws. */}
         <ChevronDown size={12} aria-hidden="true" className="tw:flex-none tw:text-[var(--bk-ink-muted)]" />
       </Button>
-      {stack && !assigned ? (
+      {stack ? (
         <p className="tw:col-span-full tw:m-0 tw:pb-1 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="font-applied-stack">
           Applied stack: {stack}
         </p>
@@ -271,7 +210,7 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value: ownValue, onChang
             className={WIDE_BUTTON}
             onClick={() => {
               assigned.undo();
-              setAssignment(null);
+              clearFontAssignment();
             }}
             data-testid="font-assignment-undo"
           >
@@ -285,17 +224,6 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value: ownValue, onChang
           </p>
         </div>
       ) : null}
-      {/* Font Picker Dropdown */}
-      {showFontPicker && (
-        <FontPickerPanel
-          id="font-picker-listbox"
-          systemFonts={SYSTEM_FONTS}
-          uploadedFonts={uploadedFonts}
-          currentValue={value}
-          onSelect={handleFontSelect}
-          onManage={handleManage}
-        />
-      )}
     </div>
   );
 };

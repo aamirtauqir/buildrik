@@ -4,10 +4,10 @@
  *
  * `FontPickerPanel` is the whole listbox body — search, category tabs, the
  * groups (Uploaded · System · Google Fonts) and the `Manage site fonts` foot.
- * Two hosts mount it: the Typography section's Family row (`FontPicker`) and
- * the Brand panel's font-family token (`design-system/…/FontFamilyPicker`).
- * They share the rows and never the state — Clone 3721:43423's QA note:
- * "Brand inspector uses a separate font-source variable".
+ * One host is left: the Brand panel's font-family token
+ * (`design-system/…/FontFamilyPicker`). The Inspector's Font row moved to
+ * Choose font (`./ChooseFont`, 2L9 R02 — the one picker); Brand follows it
+ * through REQUESTS B-19, and this file goes when it does.
  *
  * @module editor/inspector/sections/typography/FontPickerDropdown
  * @license BSD-3-Clause
