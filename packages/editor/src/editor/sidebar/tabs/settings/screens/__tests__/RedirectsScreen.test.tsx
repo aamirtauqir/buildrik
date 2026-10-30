@@ -624,7 +624,10 @@ describe("the Pages door — URL repair draft (3519:19920) → saved (3519:20096
     await waitFor(() => expect(screen.getByTestId("set-rd-repair-saved")).toBeInTheDocument());
     fireEvent.click(screen.getByTestId("set-rd-repair-back"));
     const emits = (composer.emit as ReturnType<typeof vi.fn>).mock.calls.filter(([e]) => String(e).startsWith("ui:"));
-    expect(emits).toEqual([[EVENTS.UI_PAGES_OPEN_SETTINGS, { pageId: "p-about", tab: "seo" }]]);
+    /* 67:11341: the SEO tab is told which redirect was saved. */
+    expect(emits).toEqual([
+      [EVENTS.UI_PAGES_OPEN_SETTINGS, { pageId: "p-about", tab: "seo", redirectSaved: { from: "/about", to: "/about-us" } }],
+    ]);
     expect(screen.queryByTestId("set-rd-repair-saved")).toBeNull();
   });
 

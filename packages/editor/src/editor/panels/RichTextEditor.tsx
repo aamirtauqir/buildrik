@@ -266,8 +266,9 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, block
         open === "highlight" ? (
           <ColorField label="Text highlight" onChange={(color) => onCommand("hiliteColor", color)} />
         ) : (
-        <Menu label="More formatting">
-          <MenuItem selected={activeStyles.strikethrough ?? false} data-testid="rte-strikeThrough" onClick={() => run("strikeThrough")}>
+        /* 423:98182: a 240 menu, labels centred, Close menu an outlined row. */
+        <Menu label="More formatting" className="tw:w-60 tw:[&_[role^=menuitem]>span]:text-center">
+          <MenuItem data-testid="rte-strikeThrough" onClick={() => run("strikeThrough")}>
             Strikethrough
           </MenuItem>
           <MenuItem data-testid="rte-indent" onClick={() => run("indent")}>
@@ -277,7 +278,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, block
             Outdent
           </MenuItem>
           <MenuItem data-testid="rte-highlight" onClick={() => setOpen("highlight")}>
-            Text highlight…
+            Text highlight
           </MenuItem>
           <MenuItem data-testid="rte-removeFormat" onClick={() => run("removeFormat")}>
             Clear formatting
@@ -296,6 +297,10 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, block
               ))}
             </Select>
           </div>
+          {/* 423:98182 ends the menu with "Close menu". */}
+          <MenuItem data-testid="rte-more-close" className="tw:mt-1 tw:border! tw:border-solid! tw:border-[var(--bk-border)]!" onClick={close}>
+            Close menu
+          </MenuItem>
         </Menu>
         ),
       )}

@@ -387,9 +387,15 @@ export const RedirectsScreen: React.FC<RedirectsScreenProps> = ({
      precedes it. */
   const backToSeo = () => {
     const pageId = repairCard?.pageId;
+    const saved = repairCard?.saved;
     setRepairCard(null);
     if (!composer || !pageId) return;
-    composer.emit(EVENTS.UI_PAGES_OPEN_SETTINGS, { pageId, tab: "seo" });
+    /* 67:11341: the SEO tab names the redirect that was just saved. */
+    composer.emit(EVENTS.UI_PAGES_OPEN_SETTINGS, {
+      pageId,
+      tab: "seo",
+      ...(saved ? { redirectSaved: { from: saved.fromPath, to: saved.toUrl } } : {}),
+    });
   };
 
   if (!projectId) {

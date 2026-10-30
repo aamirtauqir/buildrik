@@ -23,7 +23,7 @@ export interface UseCanvasInlineEditOptions {
   canvasRef: React.RefObject<HTMLDivElement | null>;
   /** After a CHANGED edit is committed as its one history step — the caller's
    *  receipt (design-2l9 TX03 "Text updated. · Undo"). */
-  onCommitted?: () => void;
+  onCommitted?: (change: { linkChanged: boolean }) => void;
 }
 
 export interface UseCanvasInlineEditResult {
@@ -181,7 +181,9 @@ export function useCanvasInlineEdit({
              emitter, so the onboarding step that asks for exactly this
              action had nothing to listen to. */
           composer.emit(EVENTS.ELEMENT_EDIT_INLINE, { elementId: editing.id });
-          committedRef.current?.();
+          /* TX11: "Text and link updated." when the edit made or changed a link. */
+          const links = (html: string) => (html.match(/<a\b[^>]*>/gi) ?? []).join("|");
+          committedRef.current?.({ linkChanged: links(newHtml) !== links(editing.original) });
           /* No saveProject() here: with a site bound it only wrote
              localStorage yet marked the project saved before the server had
              the edit. The transaction's project:changed schedules the real

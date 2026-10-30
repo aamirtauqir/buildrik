@@ -4163,6 +4163,7 @@ const CASES: Record<string, () => React.ReactElement> = {
           allPages={[PAGE_SETTINGS_FIXTURE, ...PAGES_FIXTURE.slice(1)]}
           composer={null}
           previousSlug="about"
+          redirectSaved={new URLSearchParams(location.search).get("saved") ? { from: "/about", to: "/our-story" } : undefined}
           onClose={() => {}}
         />
       </ToastProvider>

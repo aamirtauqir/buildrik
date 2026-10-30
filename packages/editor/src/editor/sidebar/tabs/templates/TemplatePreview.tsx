@@ -31,6 +31,9 @@ export interface TemplatePreviewProps {
   /** A dialog over the preview (the Create page / Replace confirm) owns
    *  Escape while it is open — Escape closes it, not the preview. */
   dialogOpen?: boolean;
+  /** A New-page visit ("Creating “Services”"): the template makes that page,
+   *  so Replace page… is not offered (105:29094 draws Create page alone). */
+  creating?: boolean;
 }
 
 type ViewportMode = "desktop" | "tablet" | "mobile";
@@ -48,6 +51,7 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
   onReplacePage,
   onBack,
   dialogOpen = false,
+  creating = false,
   usedOn = [],
   onOpenPage,
 }) => {
@@ -105,6 +109,7 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
           <Button size="sm" onClick={() => onCreatePage(template)}>
             Create page
           </Button>
+          {!creating && (
           <Button
             size="sm"
             data-testid="tpl-ws-replace"
@@ -113,20 +118,22 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
           >
             Replace page…
           </Button>
+          )}
         </div>
       </div>
-      <div className="tw:relative tw:flex tw:min-h-0 tw:flex-1 tw:justify-center tw:overflow-auto tw:bg-[var(--bk-bg-subtle)] tw:p-6">
-        {/* The width toggle is kept, off-board (owner: never silently remove
-            a capability — designer notes): quiet, at the well's corner. */}
-        <div className="tw:absolute tw:top-2 tw:right-3 tw:flex tw:gap-1" role="group" aria-label="Preview width">
+      <div className="tw:relative tw:flex tw:min-h-0 tw:flex-1 tw:flex-col tw:items-start tw:overflow-auto tw:bg-[var(--bk-bg-subtle)] tw:p-6">
+        {/* 105:29094: Desktop · Tablet · Mobile as a row of tabs at the top
+            left of the well, the picked one on the accent tint. */}
+        <div className="tw:flex tw:gap-2" role="group" aria-label="Preview width" data-testid="tpl-ws-viewports">
           {VIEWPORTS.map((v) => (
             <Button
               key={v.id}
               color="light"
               size="xs"
               aria-pressed={viewport === v.id}
-              className={`tw:h-6 tw:min-h-0 tw:border-0 tw:px-2 tw:text-[length:var(--bk-text-11)] ${
-                viewport === v.id ? "tw:bg-[var(--bk-gray-200)]" : "tw:bg-transparent"
+              data-testid={`tpl-ws-viewport-${v.id}`}
+              className={`tw:h-8 tw:min-h-0 tw:border-0 tw:px-5 tw:text-[length:var(--bk-text-13)] tw:font-normal tw:focus:ring-0 ${
+                viewport === v.id ? "tw:bg-[var(--bk-accent-tint)] tw:text-[var(--bk-accent-text)]" : "tw:bg-transparent tw:text-[var(--bk-ink)]"
               }`}
               onClick={() => setViewport(v.id)}
             >
@@ -135,7 +142,7 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
           ))}
         </div>
         <iframe
-          className="tw:mt-4 tw:h-full tw:min-h-[480px] tw:max-w-full tw:rounded tw:border-0 tw:bg-white tw:[box-shadow:var(--bk-shadow-raised)]"
+          className="tw:mt-4 tw:self-center tw:h-full tw:min-h-[480px] tw:max-w-full tw:rounded tw:border-0 tw:bg-white tw:[box-shadow:var(--bk-shadow-raised)]"
           style={{ width }}
           title={`Preview: ${template.name}`}
           sandbox="allow-same-origin"

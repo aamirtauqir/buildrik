@@ -34,7 +34,7 @@ describe("StudioPanels — the two open requests wait here for a lazy panel", ()
      must not hand a request to, or open the drawer on, the wrong tab. */
   it("each request switches the tab itself and, once switched, hands the request down and opens the drawer", () => {
     expect(src).toMatch(/onLeftPanelTabChange\?\.\("settings", \(\) => \{\s*setSettingsOpen\(\{ screen: data\.screen, repair: data\.repair \?\? null \}\);\s*openDrawer\(\);/);
-    expect(src).toMatch(/onLeftPanelTabChange\?\.\("pages", \(\) => \{\s*setPagesOpen\(\{ pageId: data\.pageId, tab: data\.tab \}\);\s*openDrawer\(\);/);
+    expect(src).toMatch(/onLeftPanelTabChange\?\.\("pages", \(\) => \{\s*setPagesOpen\(\{ pageId: data\.pageId, tab: data\.tab, redirectSaved: data\.redirectSaved \}\);\s*openDrawer\(\);/);
   });
 
   it("hands the requests down and drops each one when its tab is left", () => {

@@ -437,4 +437,11 @@ describe("SeoTab Google preview — served URL", () => {
     );
     expect(screen.getByTestId("seo-preview-url").textContent).toBe("bellacucina.com/menu-2.html");
   });
+
+  /* design-2l9 67:11341 — back from Settings › Redirects, the SEO tab says
+     what was saved and when it reaches visitors. */
+  it("names the redirect that was just saved", () => {
+    render(<SeoTab s={makeSettings()} page={makePage()} composer={null} redirectSaved={{ from: "/about", to: "/our-story" }} />);
+    expect(screen.getByTestId("seo-redirect-saved")).toHaveTextContent("Redirect saved · /about → /our-story · Applies on next publish");
+  });
 });
