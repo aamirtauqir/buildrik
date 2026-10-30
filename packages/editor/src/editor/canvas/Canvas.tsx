@@ -5,6 +5,7 @@
  * @license BSD-3-Clause
  */
 
+import { useShowHiddenElements } from "./hiddenElementsPref";
 import * as React from "react";
 import { EVENTS } from "@/shared/constants/events";
 import { requestInsertGroup } from "@/editor/sidebar/tabs/build/insertGroupRequest";
@@ -222,6 +223,9 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
         addToast({ description: linkChanged ? "Text and link updated." : "Text updated.", tone: "info", ...(undo ? { action: { label: "Undo", onClick: () => { undo(); } } } : {}) });
       },
     });
+
+    /* 176:19089 / 176:19451: draw condition-hidden elements as ghosts, or not at all. */
+    const showHidden = useShowHiddenElements();
 
     // Selection behavior hook (click-through, additive, hit expansion)
     const { handleClick: handleSelectionClick } = useSelectionBehavior({
@@ -857,6 +861,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
             data-device={device}
             data-xray-mode={showXRay ? "true" : undefined}
             data-outlines={showOutlines ? "true" : undefined}
+            data-bk-hide-conditional={showHidden ? undefined : "true"}
             data-badges={showBadges ? "true" : undefined}
             data-drag-active={isDragOver ? "true" : undefined}
             data-invalid-drop={isDragOver && !isValidDrop ? "true" : undefined}

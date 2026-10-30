@@ -21,6 +21,7 @@
  */
 
 import * as React from "react";
+import { setShowHiddenElements, useShowHiddenElements } from "./hiddenElementsPref";
 import { BreakpointSwitcher, Button, isModalOpen, Menu, MenuGroup, MenuItem, Popover, type Breakpoint } from "@/editor/chrome-ui";
 import { ChevronDown } from "lucide-react";
 import { stepZoom } from "@/shared/constants/canvas";
@@ -223,6 +224,7 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
   }, [overlays, onOverlayChange, onZoomChange, onFitToScreen, onZoomToSelection, zoom]);
 
   const [viewOpen, setViewOpen] = React.useState(false);
+  const showHidden = useShowHiddenElements();
   const [gridOpen, setGridOpen] = React.useState(false);
   const [guidesOpen, setGuidesOpen] = React.useState(false);
   const [zoomOpen, setZoomOpen] = React.useState(false);
@@ -448,6 +450,17 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
               overlayRow(VIEW_ROWS[0])
             )}
             {VIEW_ROWS.slice(1).map(overlayRow)}
+            {/* 176:19089: conditional elements hidden on this record — ghosts, or nothing. */}
+            <MenuItem
+              selected={showHidden}
+              data-testid="canvas-view-hidden"
+              onClick={() => {
+                setShowHiddenElements(!showHidden);
+                setViewOpen(false);
+              }}
+            >
+              Show hidden elements
+            </MenuItem>
             <MenuGroup>{MORE_VIEW_ROWS.map(overlayRow)}</MenuGroup>
           </Menu>
           )}

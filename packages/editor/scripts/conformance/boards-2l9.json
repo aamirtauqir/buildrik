@@ -8882,8 +8882,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "False condition → 40% selectable ghost + View \"Show hidden elements\"; no canvas ghost/view pref in code",
+   "verified": "drift-open",
+   "verifiedNote": "Round 31: built, not compared. Canvas › View › 'Show hidden elements' (personal preference, this browser; on by default): on, an element its condition hides on the preview record is a ghost (opacity .4, dashed, 'Hidden by condition'); off, it is not drawn ([data-bk-hide-conditional] display:none) and the selection stays. The Inspector's line for the off state is L-B's (REQUESTS A-37).",
    "tier": "P1"
   },
   {
@@ -8893,8 +8893,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Ghost off, selection retained; no view pref in code",
+   "verified": "drift-open",
+   "verifiedNote": "Round 31: built, not compared. Canvas › View › 'Show hidden elements' (personal preference, this browser; on by default): on, an element its condition hides on the preview record is a ghost (opacity .4, dashed, 'Hidden by condition'); off, it is not drawn ([data-bk-hide-conditional] display:none) and the selection stays. The Inspector's line for the off state is L-B's (REQUESTS A-37).",
    "tier": "P1"
   },
   {
