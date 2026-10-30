@@ -11,7 +11,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "probe-compared 2026-10-27 (case canvas-bar at the board's 800 column, shots/7-18654.png): bar CONTENTS match — 'Home / Hero' left, device toggles centred (24 square, tinted active), gray mono '1440 px' chip, outlined '52% ⌄' 82 wide, 'View'. Still open, not L-A's: bar position (top y56, lead3 — A-14), bottom bar 'Saved just now · Details' (lead), Container content note / 'N child elements' (inspector, L-B).",
+   "verifiedNote": "Re-compared 2026-10-30 in the real shell (Vite demo on :5171, Heading + Text inserted, Text selected in Layers): the canvas bar now sits at the top (y56–98) as the board draws it, so 'bar position' is closed; Layers ✕ removed (see 7:19791). Still open, not L-A's: the bottom bar's page switcher reads 'Home /home' where the board reads 'Home /' (the home page's route) and its shortcut hint differs ('⇧⌘O' vs '⌘P', code contract) — lead; 'Container content · N child elements' — inspector, L-B. | probe-compared 2026-10-27 (case canvas-bar at the board's 800 column, shots/7-18654.png): bar CONTENTS match — 'Home / Hero' left, device toggles centred (24 square, tinted active), gray mono '1440 px' chip, outlined '52% ⌄' 82 wide, 'View'. Still open, not L-A's: bar position (top y56, lead3 — A-14), bottom bar 'Saved just now · Details' (lead), Container content note / 'N child elements' (inspector, L-B).",
    "tier": "P1"
   },
   {
@@ -44,7 +44,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Footer board: 'Home / Hero · 1440 px · 52% · View'; code: Undo/Redo·View▾·100%▾·readout. Undo removal is phase1",
+   "verifiedNote": "compared 2026-10-30 in the real shell (Vite demo on :5171, Heading + Text inserted, Text selected in Layers); board shots/7-19791.png. Matches: topbar, rail, canvas bar at the top ('Home / {element}' crumb, devices, '1024 px' chip, zoom, View), the selected row's pill. Fixed: the Layers header's ✕ removed — every 2L9 Layers board heads the panel with ⋯ alone (the rail and Escape still close it). Not changed, the boards disagree: this journey board has no 'View' beside the search and puts '8 elements · Home' under the tree, where the Layers spec family (147:75914 archetype, drift-fixed) draws View and the count in the bottom band — the code follows the family. Inspector body (L-B), bottom bar (lead). Follows archetype 7:18654. | Prior: Footer board: 'Home / Hero · 1440 px · 52% · View'; code: Undo/Redo·View▾·100%▾·readout. Undo removal is phase1",
    "inheritsFrom": "7:18654",
    "tier": "P1"
   },
@@ -1440,8 +1440,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Bulk dialog only; no per-page 'Move About to…' from row menu; 'already at top level' note missing",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-30 (case pages-move-one, Studio picked; board shots/131-39598.png): 'Move About to…', the folders-are-personal line with '/about stays unchanged', Client projects / Studio (picked pill) / Top level (no folder), Cancel · 'Move to Studio' (88 / 208). The row menu's Move to folder… opens it (131:41791).",
    "tier": "P1"
   },
   {
@@ -1544,8 +1544,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No organization receipts ('About moved to Studio · /about unchanged')",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-30 (case pages-shell: About moved into Studio, then its ⋯ → Remove from Studio; board shots/137-52464.png): built — the menu's Remove now raises 'About removed from Studio · Page and URL kept · Undo', the move one history.recordCustom step with the Undo bound to it (useFolderMoves). Layout is the shared Toast (✕ kept; one row where the board wraps Undo — coordinator round 10: leave the toast).",
    "tier": "P1"
   },
   {
@@ -1657,8 +1657,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-A S6 built: '{Page} moved to position {n} · Still the homepage' when the homepage moves (homepage flag unchanged).",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-30 (case pages-shell, Home ⋯ → Move down; board shots/137-59625.png): 'Home moved to position 2 · Still the homepage · Undo'; Home moves below About and keeps the homepage. Layout is the shared Toast (✕ kept; one row where the board wraps Undo — coordinator round 10: leave the toast).",
    "tier": "P1"
   },
   {
@@ -1734,8 +1734,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No organization receipts ('About moved to Studio · /about unchanged')",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-30 (case pages-shell: three pages checked → Move to… → Move; board shots/139-52176.png): built — '3 pages moved to Studio · URLs unchanged · Undo' (board: Client projects), one undo step for all three. Layout is the shared Toast (✕ kept; one row where the board wraps Undo — coordinator round 10: leave the toast).",
    "tier": "P1"
   },
   {
@@ -1745,8 +1745,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No 'Home is the homepage' disabled reason in bulk bar",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-30 (case pages-shell, Home ⌘-clicked; board shots/139-52895.png): built — with the homepage alone selected Delete is off (greyed) and a note under the bar reads 'Home is the homepage' / 'Set another page as the homepage before deleting Home.'; with others selected too, Delete stays on (the homepage is spared, as before) and the note stays. Test BulkToolbar.",
    "tier": "P1"
   },
   {
@@ -2813,8 +2813,8 @@
    "family": "editor",
    "status": "active",
    "authority": "code:lock-not-inherited",
-   "verified": "drift-fixed",
-   "verifiedNote": "Lane L-B round 11, board PNG compared: the board makes a Text inside a locked Hero read-only in the Inspector — 'Text · Locked', 'Locked — unlock to edit', 'Locked by Hero', 'Show Hero in Layers', a disabled Text content field, 'Selection and copying remain available.' The engine does not lock descendants: `isLocked()` is the element's own flag and the write gate (`writableElements`) checks only that, so the Text is editable and the Inspector shows it editable (the Layers footer's 'Locked by Hero' is a label, not a gate). Building the board would make the Inspector claim a lock the engine does not enforce. Needs an owner/lead call: should an ancestor lock gate its descendants (engine change), or does the board drop 'Locked by'? Lead decision (round 12): behaviour follows the code — a lock is the element's own flag and is not inherited (`isLocked()`, `writableElements`), so the Inspector shows no inherited lock. The lead is putting \"should a parent lock its children?\" to the owner; a yes comes back as engine work.",
+   "verified": "drift-open",
+   "verifiedNote": "Lead 2026-10-30: lock is not inherited in the engine — a child of a locked layer can still be edited — so Layers draws no lock on the rows under a locked layer (the round-10 inherited mark, 8ccaea2f3, was reverted: it told the user something untrue). Pending the owner's answer to \"should a parent lock its children?\"; if yes, the mark returns together with real enforcement. Board shot on disk (shots/147-77668.png). | Prior: Lane L-B round 11, board PNG compared: the board makes a Text inside a locked Hero read-only in the Inspector — 'Text · Locked', 'Locked — unlock to edit', 'Locked by Hero', 'Show Hero in Layers', a disabled Text content field, 'Selection and copying remain available.' The engine does not lock descendants: `isLocked()` is the element's own flag and the write gate (`writableElements`) checks only that, so the Text is editable and the Inspector shows it editable (the Layers footer's 'Locked by Hero' is a label, not a gate). Building the board would make the Inspector claim a lock the engine does not enforce. Needs an owner/lead call: should an ancestor lock gate its descendants (engine change), or does the board drop 'Locked by'? | L-A: probe-compared 2026-10-30 (case layers-tree, Container locked, its child selected; board shots/147-77668.png): footer '8 layers · 1 selected · Locked by Container'. Fixed: every row under a locked layer now shows the lock (a mark, not a control — 'Locked by a parent layer'), as the board draws Eyebrow / Headline / Text / Explore. Open: the board's lock glyphs read darker (ink) than the rows' muted ones, its selected pill stops short of the lock, the canvas chip 'Locked by Hero — unlock in Layers' (canvas overlay, not built) and the inspector's 'Locked — unlock to edit · Show Hero in Layers' block (L-B).",
    "tier": "P1"
   },
   {
@@ -2824,8 +2824,8 @@
    "family": "editor",
    "status": "active",
    "authority": "code:lock-not-inherited",
-   "verified": "drift-fixed",
-   "verifiedNote": "Lane L-B round 12, side by side with the board PNG (new probe ?type=container&locked=1): 'Locked — unlock to edit' in the warning ink and a full-width 'Unlock {layer}' (was an inline 'Unlock' link on a muted line); Unlock is the shared unlock-element command, one undo step. Kept: the controls stay below, dimmed and read-only (DD-18), where the board's schematic shows only one disabled field and 'Selection and copying remain available.'. Not drawn: 'This section and its descendants are locked.' — lead decision round 12, behaviour follows the code: a lock is the element's own flag and is not inherited; the lead is asking the owner whether a parent should lock its children (a yes comes back as engine work). The header 'Hero · Locked' is InspectorHeader (lead); live also shows the StatusMarks '🔒 Locked' mark.",
+   "verified": "drift-open",
+   "verifiedNote": "Lead 2026-10-30: lock is not inherited in the engine — a child of a locked layer can still be edited — so Layers draws no lock on the rows under a locked layer (the round-10 inherited mark, 8ccaea2f3, was reverted: it told the user something untrue). Pending the owner's answer to \"should a parent lock its children?\"; if yes, the mark returns together with real enforcement. Board shot on disk (shots/147-78110.png). | Prior: Lane L-B round 11, board PNG compared with live (a locked element): both say 'Locked — unlock to edit' and offer Unlock (live: the status line's inline 'Unlock', one undo step via unlock-element). The board's differs: a warning-coloured status line, 'This section and its descendants are locked.' and a full-width 'Unlock Hero', then only the section's own field, disabled, and 'Selection and copying remain available.' Not built: the descendants sentence is not true of the engine (see 147:77668 — descendants are not gated), and the stripped body would hide the read-only controls page 04's locked state shows dimmed (DD-18). Open pending the same call as 147:77668. | L-A: probe-compared 2026-10-30 (case layers-tree; board shots/147-78110.png): the locked layer's descendants now all show the lock (fixed, as above); footer reads '… · 1 selected · Locked' where the board names the layer ('Hero selected · Locked') — 147:77668 itself says '1 selected', so the boards disagree and the code keeps the count. Inspector 'Unlock Hero' block is L-B's.",
    "tier": "P1"
   },
   {
