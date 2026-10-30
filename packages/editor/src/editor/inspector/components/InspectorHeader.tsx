@@ -57,6 +57,9 @@ export interface InspectorHeaderProps {
    *  opening Content › Dynamic bindings (2L9 B5-D04 173:9757). A missing
    *  source keeps its error chip in StatusMarks. */
   boundTo?: string;
+  /** Detached this session from this component (2L9 IC06 241:19230): the
+   *  path row says so instead. */
+  detachedFrom?: string;
 }
 
 const STATES: readonly { id: PseudoStateId; label: string }[] = [
@@ -116,6 +119,7 @@ export function InspectorHeader({
   statesWithOverrides,
   loadFailedLine,
   boundTo,
+  detachedFrom,
 }: InspectorHeaderProps) {
   const stateId = React.useId();
   const multi = selectedIds.length > 1;
@@ -190,7 +194,14 @@ export function InspectorHeader({
           <X size={16} aria-hidden="true" />
         </IconButton>
       </div>
-      {items.length > 0 ? <ElementPath items={items} /> : null}
+      {detachedFrom ? (
+        <div className="tw:flex tw:flex-col tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="inspector-detached-lines">
+          <span>{detachedFrom} · local group</span>
+          <span>Detached · content and styles retained</span>
+        </div>
+      ) : items.length > 0 ? (
+        <ElementPath items={items} />
+      ) : null}
       <div className="tw:flex tw:h-8 tw:items-center tw:gap-2" data-testid="inspector-editing-row">
         {loadFailedLine ? (
           <span className="tw:min-w-0 tw:truncate tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)]" data-testid="inspector-load-failed-line">

@@ -46,6 +46,7 @@ import { THEME_TOGGLE_ATTR } from "@/engine/export/themeToggleRuntime";
 import { LoadFailedCard, StatusLine, ViewOnlyLine } from "./components/StatusLine";
 import { DimmedNotice } from "./components/DimmedNotice";
 import { LockRefusalNote, useLockRefusal, useWatchPasteRefusal } from "./components/LockRefusal";
+import { useJustDetached, useRecordDetaches } from "./hooks/useJustDetached";
 import { useEditLocks } from "../shared/useEditLocks";
 import { useSiteLoadStatus } from "../shell/siteLoadStatus";
 import { StatusMarks } from "./components/StatusMarks";
@@ -258,6 +259,8 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
   const readOnly = locked || conflict.pending || editLocks.length > 0;
   const { addToast } = useToast();
   useWatchPasteRefusal(composer);
+  useRecordDetaches(composer);
+  const detachedFrom = useJustDetached(composer, selectedElement?.id ?? "");
   /* 2L9 G04 / G22: the refusal card carries the lock and its Unlock. */
   const pasteRefused = useLockRefusal(composer, selectedElement?.id ?? "", "paste-style");
   const addRefused = useLockRefusal(composer, selectedElement?.id ?? "", "add-interaction");
@@ -274,6 +277,14 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
               ? "view"
               : null,
       mixedKeys,
+      target: selectedElement
+        ? {
+            name: getLayerName(composer?.elements.getElement(selectedElement.id)) ?? elementTypeLabel(selectedElement.type),
+            editing: `${BREAKPOINTS[currentBreakpoint]?.name ?? currentBreakpoint} · ${
+              currentPseudoState === "normal" ? "Default" : currentPseudoState.charAt(0).toUpperCase() + currentPseudoState.slice(1)
+            } state`,
+          }
+        : undefined,
       overrides: fieldOverrides.overrides,
       overrideLabels: fieldOverrides.labels,
       resetOverride: (property, kind) => runDiscrete(() => fieldOverrides.resetOverride(property, kind)),
@@ -284,7 +295,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
         addToast({ description: message, action: undo ? { label: "Undo", onClick: undo } : undefined });
       },
     }),
-    [readOnly, conflict.pending, locked, notLoaded, editLocks, mixedKeys, fieldOverrides, runDiscrete, composer, addToast]
+    [readOnly, conflict.pending, locked, notLoaded, editLocks, mixedKeys, fieldOverrides, runDiscrete, composer, addToast, selectedElement, currentBreakpoint, currentPseudoState]
   );
 
   /* Scroll persistence per element AND tab (P-7b; 2L9 S32 258:37744:
@@ -442,6 +453,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           selectedIds={targetIds}
           breakpointLabel={BREAKPOINTS[currentBreakpoint]?.name ?? currentBreakpoint}
           boundTo={targetIds.length <= 1 && binding && !binding.missing ? binding.label : undefined}
+          detachedFrom={targetIds.length <= 1 ? detachedFrom ?? undefined : undefined}
           activeTab={activeTab}
           loadFailedLine={connectionFailure ? `Could not load ${composer?.getProjectMetadata?.()?.name || "this site"}` : undefined}
           state={currentPseudoState}

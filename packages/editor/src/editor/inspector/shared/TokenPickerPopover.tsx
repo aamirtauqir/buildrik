@@ -30,6 +30,8 @@ export interface TokenEntry {
   name: string;
   value: string;
   cssVar: string;
+  /** The token its Light value aliases ("palette.gray.900"), if any. */
+  source?: string;
 }
 
 export interface TokenPickerPopoverProps {

@@ -328,6 +328,13 @@ export const FormAfterSubmitSection: React.FC<FormAfterSubmitSectionProps> = ({
         /* 2L9 F14: offline, the service settings cannot save — shown, read
            only, and said; the form's fields (Content) stay editable. */
         <InspectorFieldContext.Provider value={online ? fieldCtx : { ...fieldCtx, readOnly: true }}>
+          {/* 2L9 F14 (156:8406): offline the settings read as shut — their
+              controls and the checkbox row greyed, labels left at ink. */}
+          <div
+            className={online ? "tw:contents" : "tw:contents tw:[&_.bdi-row-content]:opacity-70 tw:[&_input[type=checkbox]]:opacity-50 tw:[&_[data-testid=inspector-row-block-automated-submissions]_label]:text-[var(--bk-ink-muted)]!"}
+            data-offline={online ? undefined : "true"}
+            data-testid="form-settings-controls"
+          >
           <SelectRow
             label="Then"
             /* "Show message" is the select's empty choice (SelectRow always draws one). */
@@ -372,6 +379,7 @@ export const FormAfterSubmitSection: React.FC<FormAfterSubmitSectionProps> = ({
             checked={settings.spamProtection}
             onChange={(checked) => save({ spamProtection: checked })}
           />
+          </div>
           <div className={GROUP_TITLE}>Form settings status</div>
           {/* A Redirect with no destination is not saved, whether it was just
               chosen or loaded that way (156:11319). */}

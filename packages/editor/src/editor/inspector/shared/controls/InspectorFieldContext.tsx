@@ -46,6 +46,9 @@ export interface InspectorFieldContextValue {
   /** Say what a write just did, with an Undo bound to that step (2L9 I07:
    *  "Converted using root font 16px · Undo"). Absent: say nothing. */
   announce?: (message: string) => void;
+  /** Who and where a write lands — "Hero intro" / "Desktop · Default state"
+   *  (2L9 39:9114's "Color for …" head). Absent: not said. */
+  target?: { name: string; editing: string };
 }
 
 const EMPTY: InspectorFieldContextValue = {
@@ -85,6 +88,8 @@ export interface InspectorField {
   discrete: (action: () => void) => void;
   /** See `InspectorFieldContextValue.announce`. */
   announce: (message: string) => void;
+  /** See `InspectorFieldContextValue.target`. */
+  target?: { name: string; editing: string };
 }
 
 const NONE: readonly OverrideKind[] = [];
@@ -108,5 +113,6 @@ export function useInspectorField(property?: string): InspectorField {
     },
     discrete: ctx.runDiscrete ?? runNow,
     announce: ctx.announce ?? (() => undefined),
+    target: ctx.target,
   };
 }

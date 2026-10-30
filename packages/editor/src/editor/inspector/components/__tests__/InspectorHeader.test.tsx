@@ -246,6 +246,12 @@ describe("InspectorHeader", () => {
     expect(emit).toHaveBeenCalledWith(EVENTS.UI_INSPECTOR_FOCUS_SECTION, { section: "cms-binding" });
   });
 
+  it("IC06: just detached — the path row says what it was and what stayed", () => {
+    mount({ detachedFrom: "Hero card" });
+    expect(screen.getByTestId("inspector-detached-lines")).toHaveTextContent("Hero card · local groupDetached · content and styles retained");
+    expect(screen.queryByRole("navigation", { name: "Element path" })).toBeNull();
+  });
+
   it("S02: a load failure replaces the context line", () => {
     mount({ loadFailedLine: "Could not load Fieldwork Studio" });
     expect(screen.getByTestId("inspector-load-failed-line")).toHaveTextContent("Could not load Fieldwork Studio");

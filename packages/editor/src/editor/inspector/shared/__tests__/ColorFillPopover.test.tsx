@@ -115,4 +115,12 @@ describe("ColorFillPopover (board 33)", () => {
     fireEvent.click(screen.getByRole("button", { name: "← Back to Brand colors" }));
     expect(screen.getByTestId("fill-popover")).toBeTruthy();
   });
+
+  /* 2L9 39:9114: the head names the target, the shared edit names its source. */
+  it("'Color for {element}' / '{breakpoint} · {state}', and the edited token's Source", () => {
+    setup({ target: { name: "Hero intro", editing: "Desktop · Default state" }, tokens: tokens.map((t, i) => (i === 0 ? { ...t, source: "palette.blue.700" } : t)) });
+    expect(screen.getByTestId("fill-target")).toHaveTextContent("Color for Hero introDesktop · Default state");
+    fireEvent.click(screen.getByRole("button", { name: "Edit Primary" }));
+    expect(screen.getByTestId("fill-edit-source")).toHaveTextContent("Source · palette.blue.700");
+  });
 });
