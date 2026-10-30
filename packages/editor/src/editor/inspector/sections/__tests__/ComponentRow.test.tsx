@@ -174,6 +174,16 @@ describe("ComponentRow — board 26", () => {
     expect(updateInstanceVariant).toHaveBeenCalledWith("el-1", "v-s");
   });
 
+  it("IC04: a removed variant reads 'Variant unavailable' and why — no silent Default; choosing one swaps", () => {
+    const updateInstanceVariant = vi.fn();
+    renderRow(makeComposer({ component: withVariants(), instance: makeInstance({ variantSelection: { variantId: "v-dark" } } as never), updateInstanceVariant }));
+    const select = screen.getByLabelText("Variant") as HTMLSelectElement;
+    expect(select.selectedOptions[0].textContent).toBe("Variant unavailable");
+    expect(screen.getByTestId("component-variant-missing")).toHaveTextContent("The selected variant was removed from");
+    fireEvent.change(select, { target: { value: "v-s" } });
+    expect(updateInstanceVariant).toHaveBeenCalledWith("el-1", "v-s");
+  });
+
   it("Edit master opens the Components panel on that master", () => {
     const composer = makeComposer({ component: makeComponent(), instance: makeInstance() });
     renderRow(composer);

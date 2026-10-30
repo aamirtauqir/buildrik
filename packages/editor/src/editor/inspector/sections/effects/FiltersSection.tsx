@@ -13,6 +13,10 @@
 import * as React from "react";
 import { AuthoredValue, countWord, RangeSlider, Section } from "@/editor/inspector/shared/controls";
 import type { BaseStyleSectionProps } from "../registry/_shared";
+import type { Composer } from "@/engine";
+import { useToast } from "@/editor/chrome-ui";
+import { EVENTS } from "@/shared/constants/events";
+import { useInspectorField } from "@/editor/inspector/shared/controls/InspectorFieldContext";
 import { composable, composeFilter, FILTER_ORDER, functionsOf, parseFunction } from "./effectValues";
 
 const FILTERS = [
@@ -39,7 +43,43 @@ function keptNote(filter: string): string {
   return `${unknown.join(", ")} ${unknown.length === 1 ? "is" : "are"} kept as written — the sliders do not edit ${unknown.length === 1 ? "it" : "them"}.`;
 }
 
-export const FiltersSection: React.FC<BaseStyleSectionProps> = ({ styles, onChange, isOpen, onToggle }) => {
+/**
+ * A filter the sliders cannot hold, edited as its authored text (2L9 I11
+ * `161:13481`): the whole sequence is kept as written — change the first
+ * term and the rest stay in place — and the edit answers "Filter updated ·
+ * Undo", bound to the step the write recorded.
+ */
+function CustomFilter({ filter, onChange, composer }: { filter: string; onChange: BaseStyleSectionProps["onChange"]; composer?: Composer | null }) {
+  const field = useInspectorField("filter");
+  const { addToast } = useToast();
+  const commit = (next: string) => {
+    let recorded = false;
+    const onRecorded = () => {
+      recorded = true;
+    };
+    composer?.on?.(EVENTS.HISTORY_RECORDED, onRecorded);
+    try {
+      field.discrete(() => onChange("filter", next));
+    } finally {
+      composer?.off?.(EVENTS.HISTORY_RECORDED, onRecorded);
+    }
+    const undo = recorded ? composer?.history?.captureUndo?.() : undefined;
+    addToast({ description: "Filter updated", ...(undo ? { action: { label: "Undo", onClick: undo } } : {}) });
+  };
+  return (
+    <AuthoredValue
+      testId="inspector-filters-authored"
+      caption="Authored value"
+      value={filter}
+      note={keptNote(filter)}
+      editLabel="Edit custom value"
+      accept={(v) => functionsOf(v).length > 0}
+      onCommit={commit}
+    />
+  );
+}
+
+export const FiltersSection: React.FC<BaseStyleSectionProps> = ({ styles, onChange, isOpen, onToggle, composer }) => {
   const filter = styles.filter;
   const custom = !composable(filter, FILTER_ORDER);
   return (
@@ -51,15 +91,7 @@ export const FiltersSection: React.FC<BaseStyleSectionProps> = ({ styles, onChan
       action={custom ? <span className="tw:text-[12px] tw:text-[var(--bk-ink-soft)]">Custom</span> : undefined}
     >
       {custom ? (
-        <AuthoredValue
-          testId="inspector-filters-authored"
-          caption="Authored value"
-          value={filter ?? ""}
-          note={keptNote(filter ?? "")}
-          editLabel="Edit custom value"
-          accept={(v) => functionsOf(v).length > 0}
-          onCommit={(v) => onChange("filter", v)}
-        />
+        <CustomFilter filter={filter ?? ""} onChange={onChange} composer={composer} />
       ) : (
         <div className="tw:relative">
           {FILTERS.map((f) => (

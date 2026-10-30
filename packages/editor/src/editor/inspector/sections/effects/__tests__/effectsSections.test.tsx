@@ -12,6 +12,7 @@ import { describe, expect, it, vi } from "vitest";
 import { SECTION_REGISTRY } from "@/editor/inspector/sections/registry";
 import { EffectsAdvancedSection } from "../EffectsAdvancedSection";
 import { FiltersSection } from "../FiltersSection";
+import { ToastProvider } from "@/editor/chrome-ui";
 import { OpacitySection } from "../OpacitySection";
 import { ShadowSection } from "../ShadowSection";
 import { TransformMotionSection } from "../TransformMotionSection";
@@ -61,7 +62,11 @@ describe("Shadow — layer rows (2L9 161:12525)", () => {
 describe("Filters — kept as written when the sliders cannot hold it (161:12525, I10)", () => {
   it("two blurs and a saturate: 'Custom', the authored value, the note, and an edit that writes the text", () => {
     const p = props({ filter: "blur(4px) saturate(1.2) blur(1px)" });
-    render(<FiltersSection {...p} />);
+    render(
+      <ToastProvider>
+        <FiltersSection {...p} />
+      </ToastProvider>,
+    );
     expect(screen.getByText("Custom")).toBeInTheDocument();
     expect(screen.getByTestId("inspector-filters-authored")).toHaveTextContent("blur(4px) saturate(1.2) blur(1px)");
     expect(screen.getByText("Two blur functions are preserved in their original order.")).toBeInTheDocument();
@@ -71,6 +76,7 @@ describe("Filters — kept as written when the sliders cannot hold it (161:12525
     fireEvent.change(box, { target: { value: "blur(2px) saturate(1.2) blur(1px)" } });
     fireEvent.blur(box);
     expect(p.onChange).toHaveBeenCalledWith("filter", "blur(2px) saturate(1.2) blur(1px)");
+    expect(screen.getByText("Filter updated")).toBeInTheDocument();
   });
 });
 

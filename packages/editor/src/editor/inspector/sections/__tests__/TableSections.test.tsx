@@ -35,6 +35,19 @@ describe("Table · Structure", () => {
     expect(openingTab("table")).toBe("content");
   });
 
+  it("C16: a spanning cell keeps the structure — row commands stand down, Edit {cell} content selects that cell", () => {
+    const { c, id, table } = setup();
+    const tbody = table().getChildren().find((el) => tag(el) === "tbody")!;
+    const cell = tbody.getChildren()[0].getChildren()[1];
+    cell.setAttribute("colspan", "2");
+    render(<TableStructureSection composer={c} elementId={id} isOpen />);
+    expect(screen.getByTestId("table-complex")).toHaveTextContent("B2 spans 2 columns. Rectangular row and column commands are unavailable for this structure.");
+    expect(screen.getByRole("button", { name: "Add blank row" })).toBeDisabled();
+    fireEvent.click(screen.getByTestId("table-edit-spanning"));
+    expect(c.selection.getSelected()?.getId()).toBe(cell.getId());
+    expect(tbody.getChildren()).toHaveLength(3);
+  });
+
   it("Add blank row copies the last row's cells — tag and appearance, no content — in one transaction", () => {
     const { c, id, table } = setup();
     render(<TableStructureSection composer={c} elementId={id} isOpen />);

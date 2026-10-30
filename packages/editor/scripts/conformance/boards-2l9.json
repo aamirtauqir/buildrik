@@ -4587,9 +4587,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Redirect is a free-text CommitRow (FormAfterSubmitSection.tsx:195); no shared page picker, URL check, atomic save",
+   "authority": "code:after-submit-live-on-save",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 24, probe ?block=contact-form&siteId=s1&formBlock={REDIRECT, https://fieldwork.test/thanks, notify, spam on} → Behavior, side by side with shots/159-9710.png: After submit · Then Redirect · Redirect to (the F19 page/URL picker reading the custom URL), Notifications · Send to, Spam protection · 'Applies on next publish' · Block automated submissions, Form settings status · Saved · 'Saved separately from page edits; outside document Undo.', Visibility, Interactions. Match except the board's 'Applies on next publish' under After submit: the public form route reads action / redirect at submit time, so they apply on save (same authority as F10).",
    "inheritsFrom": "156:11319",
    "tier": "P1"
   },
@@ -4876,8 +4876,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No exact-expression filter editing that keeps sequence",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 24, probe ?type=text&styles={filter 'blur(4px) saturate(1.2) blur(1px)', box-shadow} → Effects → Edit custom value → first term to blur(6px), side by side with shots/161-13481.png: Filters 'Custom', Authored value 'blur(6px) saturate(1.2) blur(1px)' (sequence kept), 'Two blur functions are preserved in their original order.', 'Edit custom value', toast 'Filter updated · Undo' bound to the write's recorded step. Match; Opacity reads as an empty section (+) where the board shows 100%.",
    "inheritsFrom": "161:13037",
    "tier": "P1"
   },
@@ -5191,8 +5191,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No missing-variant state",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 24, probe ?type=container&instance=Hero card with the instance's variantSelection pointing at a variant the component no longer has, side by side with shots/241-18146.png: Variant reads 'Variant unavailable' (not a silent 'Default'), 'The selected variant was removed from Hero card. Showing the default until you choose another.' (the removed variant's NAME is not stored — only its id — so the board's '“Dark”' is not drawn), choosing a variant swaps it. Drift kept: the select is not warning-tinted.",
    "tier": "P1"
   },
   {
@@ -5404,8 +5404,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "table is a plain container (elementCapabilities.ts:173); no rows/cols/caption/merged-cell UI",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 24: the Table block holds real colspan / rowspan (Table cell section, C14, writes them), so this is built. Probe ?block=table with body cell B2 at colspan=2, table selected, side by side with shots/245-44573.png: 'Complex table preserved', 'B2 spans 2 columns. Rectangular row and column commands are unavailable for this structure.', the row command disabled, primary 'Edit B2 content' (selects that cell, Table cell section), 'Inspect native attributes', 'No flattening or normalization on selection. Existing spans, IDs, header associations and nested content remain.' Match, except the disabled command reads 'Add blank row' — the only structural command the table has (no Add column exists to disable).",
    "tier": "P1"
   },
   {
