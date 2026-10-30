@@ -5581,7 +5581,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No per-target maxima batch write/Undo result",
+   "verifiedNote": "Lane L-B P1 round 7, board PNG fetched: two progress bars selected — Progress · Value 'Mixed' · Maximum 90 · 'Applied to 2 · Only Maximum changed. Each Value and derived percentage uses its own pair.' — the batch result note is not built.",
    "tier": "P1"
   },
   {
@@ -5612,9 +5612,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:161:8940",
    "verified": "drift-open",
-   "verifiedNote": "Lane L-B P1 round 6, board PNG fetched: Font '{family} · {source}' + 'Applied stack: …' match. Open: the board adds a full-width primary 'Choose font' under the Font row (the code's Font row is itself the picker's door).",
+   "verifiedNote": "Lane L-B P1 round 7, board PNG compared: Font '{family} · {source}' and 'Applied stack: …' match. The board adds a full-width primary 'Choose font' under the Font row; 161:8940 (the text Style board, drift-fixed) draws the Font row alone, and the row is itself the picker's door — one door, as the page-04 Style board draws it.",
    "tier": "P1"
   },
   {
@@ -5625,7 +5625,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "\"Manage site fonts\" foot exists; board returns to exact Inspector origin",
+   "verifiedNote": "Lane L-B P1 round 7, board PNG fetched; not yet compared.",
    "tier": "P1"
   },
   {
@@ -5868,7 +5868,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Lane L-B F1 (built, not compared): source-aware font field — see 247:30567.",
+   "verifiedNote": "Lane L-B P1 round 7, board PNG fetched: Font 'Studio Sans · Uploaded' matches the source label; open: 'Studio Sans loaded · uploaded source ready.' and a full-width 'Undo font assignment' with its note are not built.",
    "inheritsFrom": "247:30567",
    "tier": "P1"
   },
@@ -6035,8 +6035,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Lane L-B P1 round 6, board PNG fetched: the review's category boxes need the engine's applyStyleToPeers to take a category / property filter — REQUESTS B-18 (lead). The current confirm is the ApplyStyleDialog (board 31).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B P1 round 7 (cleared to own engine/commands/stylePeers.ts — B-18 closed: applyStyleToPeers takes optional `categories`; omitted, board 31's set exactly as before; engine tests cover both), probe ?type=heading&styles=…&peers=3&lockedPeers=1 → ⋯ › Apply style to all…, side by side with the board PNG: the review is the tab's whole body — 'Apply style to headings', 'On Home · Desktop · Default state', '3 eligible headings · 1 locked heading skipped' (findStylePeers' real counts; '· N inside a component skipped' when any), Typography / Spacing / Fill / Border boxes (the source's categories enabled, Typography first), 'Typography overrides on the 3 eligible headings will be replaced. Other categories and breakpoints stay unchanged.', primary 'Apply Typography to 3', Cancel. Apply copies exactly the chosen categories in one transaction. Difference is data only: categories the source sets nothing in are off (the board's sample source sets all four).",
    "tier": "P1"
   },
   {
@@ -6047,7 +6047,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Fixed categories in code; board choose Typography/Spacing/Fill/Border, locked-skipped count",
+   "verifiedNote": "Lane L-B P1 round 7, board PNG fetched: the receipt now reads 'Applied to 3 headings.' + Undo (one transaction). Open: the board also draws a result note under the section — 'Applied to 3 headings · Only Desktop typography changed. The locked heading and every Tablet and Mobile value stayed unchanged.' — not built.",
    "inheritsFrom": "255:87335",
    "tier": "P1"
   },
@@ -6172,8 +6172,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Lane L-B P1 round 6, board PNG fetched and compared with the probe's CMS stub (?type=heading&cms=1): the Dynamic bindings summary matches (F2.16 form). Open: the bound property row — the board draws a full-width tinted card ('Blog · title' / value / ⋯) under a 'Title text' label with 'This page’s record · 1 of 980' below; the code's row (C-13, built to B5-D04 / D11) is a label column + value lines + ›.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B P1 round 7, probe ?type=heading&cms=1, side by side with D01 (and its twin B5-D04 173:9757): the Dynamic bindings summary, then 'Title text' over the binding as one full-width tinted card — 'Blog · title', the value, ⋯ — and the context line under it; a bound text draws no 'Edit text on canvas' (its value is the record's). Differences: the context line reads the probe's specific record ('Specific record · Article title') where the board's template page reads 'This page’s record · 1 of 980'; Tag stays in Semantics (161:8480).",
    "tier": "P1"
   },
   {
@@ -6183,8 +6183,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Board Content › \"Dynamic bindings\" with \"‹ CMS · Dynamic pages\" return; code Behaviour \"CMS binding\"",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B P1 round 7, board PNG compared with the probe's CMS stub (?type=heading&cms=1 → binding detail): the same detail as F2.05 302:13946 (drift-fixed) — centred '‹ Back to Content', 'Title text binding', Source box, context line, Format 'As written', If empty, Preview, centred 'Open record ›', 'Unbind — keep shown text' and its note. The context line reads the probe's specific record where the board's heading sits on a template page (sample).",
    "inheritsFrom": "255:93321",
    "tier": "P1"
   },
@@ -6249,9 +6249,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:302:12190",
    "verified": "drift-open",
-   "verifiedNote": "Collection/Field/Record selects in Behaviour; board \"Bind Title text\" source picker (This page’s record/Specific/List item)",
+   "verifiedNote": "Lane L-B P1 round 7, board PNG compared: 'Bind Title text' with Collection / Record selects and a field button is the older bind flow; the Inspector binds through Play F2.02's Choose source card (302:12190, drift-fixed) — Specific record → collection → its fitting fields.",
    "inheritsFrom": "258:31477",
    "tier": "P1"
   },
@@ -6283,9 +6283,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:161:8480",
    "verified": "drift-open",
-   "verifiedNote": "Unbind exists; board return path + Undo toast",
+   "verifiedNote": "Lane L-B P1 round 7, board PNG compared: after Unbind the board's Content shows the older layout (Tag in the block, a 'Title text' value field); the Inspector follows 161:8480 — the static text row + bind icon, Edit text on canvas — and Unbind keeps the shown text (unit-tested).",
    "inheritsFrom": "258:32981",
    "tier": "P1"
   },

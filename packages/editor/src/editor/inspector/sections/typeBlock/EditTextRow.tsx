@@ -25,7 +25,10 @@ export function EditTextRow({ composer, elementId }: EditTextRowProps) {
   /* Read-only (locked, save conflict — DD-18): the door stays visible and
      focusable, and the click is refused here — never `disabled`. */
   const { readOnly } = useInspectorField();
-  if (!composer) return null;
+  /* A bound text comes from its record (D01 / B5-D04 draw no edit door):
+     what the canvas would edit is the record's value. */
+  const bound = composer?.cms?.bindings?.getBindings?.(elementId)?.some((b) => b.property === "content");
+  if (!composer || bound) return null;
   return (
     /* 2L9 161:8480: a full-width bordered button under the "Text" row. */
     <div className="tw:flex tw:items-center tw:py-1" data-testid="inspector-text-content">

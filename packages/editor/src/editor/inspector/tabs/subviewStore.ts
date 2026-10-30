@@ -9,7 +9,8 @@
  *                 only its Fields section;
  *   override-review — the review before removing a layer's overrides (S13,
  *                 S15): Style / Effects show nothing under it;
- *   reset-style — the review before Reset style (S20): the tab's whole body.
+ *   reset-style — the review before Reset style (S20): the tab's whole body;
+ *   apply-style — the review before Apply style to all … (S11): the same.
  * The section that opens it and the tab renderer that honours it are
  * different components, so the value lives here. Selecting another element
  * closes it (the renderer shows it only for the element it was opened on).
@@ -18,7 +19,7 @@
  */
 import * as React from "react";
 
-export type SubviewKind = "binding" | "interaction" | "add-field" | "override-review" | "reset-style";
+export type SubviewKind = "binding" | "interaction" | "add-field" | "override-review" | "reset-style" | "apply-style";
 export interface Subview {
   kind: SubviewKind;
   elementId: string;

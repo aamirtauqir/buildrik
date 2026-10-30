@@ -15,6 +15,11 @@
  * binding, attributes, classes or interactions (board 31).
  * One transaction, so one Undo restores every peer.
  *
+ * With `categories` (2L9 S11 / S12, the Inspector's review) the copy is
+ * exactly the chosen categories' properties instead — Typography, Spacing,
+ * Fill, Border — and nothing else. Without it the copy is board 31's set,
+ * unchanged.
+ *
  * @license BSD-3-Clause
  */
 
@@ -56,9 +61,25 @@ export function findStylePeers(composer: Composer, source: Element): StylePeers 
   return out;
 }
 
+/** The categories the S11 review offers. */
+export type StyleCategory = "typography" | "spacing" | "fill" | "border";
+
 export interface ApplyStyleOptions {
   breakpoint: BreakpointId;
   pseudo: PseudoStateId;
+  /** Copy only these categories' properties (S11). Omitted: board 31's set. */
+  categories?: readonly StyleCategory[];
+}
+
+const TYPOGRAPHY_EXACT = new Set(["color", "line-height", "letter-spacing", "word-spacing", "white-space", "word-break", "vertical-align"]);
+
+/** Which S11 category a CSS property belongs to; null for none of them. */
+export function styleCategoryOf(prop: string): StyleCategory | null {
+  if (TYPOGRAPHY_EXACT.has(prop) || prop.startsWith("font-") || prop.startsWith("text-")) return "typography";
+  if (prop.startsWith("padding") || prop.startsWith("margin")) return "spacing";
+  if (prop.startsWith("background")) return "fill";
+  if (prop.startsWith("border") || prop.startsWith("outline")) return "border";
+  return null;
 }
 
 /* Board 31 "Copies: Typography, fill, border and effects". */
@@ -88,6 +109,17 @@ function styleAt(composer: Composer, source: Element, { breakpoint, pseudo }: Ap
   return { ...source.getStyles() };
 }
 
+/** The categories `source` sets at this breakpoint + state — what the
+ *  review can offer to copy. */
+export function sourceStyleCategories(composer: Composer, source: Element, options: ApplyStyleOptions): StyleCategory[] {
+  const found = new Set<StyleCategory>();
+  for (const prop of Object.keys(styleAt(composer, source, options))) {
+    const c = styleCategoryOf(prop);
+    if (c) found.add(c);
+  }
+  return [...found];
+}
+
 /** Returns how many peers were written (0 when there was nothing to copy). */
 export function applyStyleToPeers(
   composer: Composer,
@@ -95,7 +127,11 @@ export function applyStyleToPeers(
   peers: readonly Element[],
   options: ApplyStyleOptions,
 ): number {
-  const styles = pickCopied(styleAt(composer, source, options));
+  const all = styleAt(composer, source, options);
+  const { categories } = options;
+  const styles = categories
+    ? Object.fromEntries(Object.entries(all).filter(([k]) => categories.includes(styleCategoryOf(k) as StyleCategory)))
+    : pickCopied(all);
   if (Object.keys(styles).length === 0) return 0;
   const targets = writableElements(composer, peers);
   if (targets.length === 0) return 0;

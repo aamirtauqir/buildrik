@@ -8,7 +8,7 @@ import { describe, it, expect, beforeAll, afterAll, beforeEach } from "vitest";
 import type { Composer } from "@/engine/Composer";
 import type { Element } from "@/engine/elements/Element";
 import { createTestComposer, installEngineBrowserStubs, removeEngineBrowserStubs } from "@/engine/__tests__/test-utils/realComposer";
-import { applyStyleToPeers, findStylePeers } from "../stylePeers";
+import { applyStyleToPeers, findStylePeers, sourceStyleCategories, styleCategoryOf } from "../stylePeers";
 
 beforeAll(installEngineBrowserStubs);
 afterAll(removeEngineBrowserStubs);
@@ -157,5 +157,56 @@ describe("applyStyleToPeers", () => {
     const src = add("button");
     const peer = add("button");
     expect(applyStyleToPeers(c, src, [peer], { breakpoint: "desktop", pseudo: "hover" })).toBe(0);
+  });
+});
+
+describe("applyStyleToPeers — categories (2L9 S11 / S12)", () => {
+  const styled = () => {
+    const src = add("button");
+    const peer = add("button");
+    src.setStyle("font-size", "20px");
+    src.setStyle("color", "rgb(255, 0, 0)");
+    src.setStyle("padding", "12px");
+    src.setStyle("background-color", "rgb(0, 0, 255)");
+    src.setStyle("border-width", "2px");
+    src.setStyle("opacity", "0.5");
+    return { src, peer };
+  };
+
+  it("omitted: board 31's set exactly as before — typography, fill, border, effects; never spacing", () => {
+    const { src, peer } = styled();
+    applyStyleToPeers(c, src, [peer], { breakpoint: "desktop", pseudo: "normal" });
+    const got = c.elements.getElement(peer.getId())!.getStyles();
+    expect(got).toMatchObject({ "font-size": "20px", color: "rgb(255, 0, 0)", "background-color": "rgb(0, 0, 255)", "border-width": "2px", opacity: "0.5" });
+    expect(got.padding).toBeUndefined();
+  });
+
+  it("['typography']: only typography — no fill, border, effects or spacing", () => {
+    const { src, peer } = styled();
+    expect(applyStyleToPeers(c, src, [peer], { breakpoint: "desktop", pseudo: "normal", categories: ["typography"] })).toBe(1);
+    expect(c.elements.getElement(peer.getId())!.getStyles()).toEqual({ "font-size": "20px", color: "rgb(255, 0, 0)" });
+  });
+
+  it("['spacing', 'border']: the chosen categories, spacing included", () => {
+    const { src, peer } = styled();
+    applyStyleToPeers(c, src, [peer], { breakpoint: "desktop", pseudo: "normal", categories: ["spacing", "border"] });
+    expect(c.elements.getElement(peer.getId())!.getStyles()).toEqual({ padding: "12px", "border-width": "2px" });
+  });
+
+  it("categories with nothing to copy write nothing", () => {
+    const src = add("button");
+    const peer = add("button");
+    src.setStyle("font-size", "20px");
+    expect(applyStyleToPeers(c, src, [peer], { breakpoint: "desktop", pseudo: "normal", categories: ["fill"] })).toBe(0);
+  });
+
+  it("names a property's category, and the categories a source sets", () => {
+    expect(styleCategoryOf("font-family")).toBe("typography");
+    expect(styleCategoryOf("margin-top")).toBe("spacing");
+    expect(styleCategoryOf("background-image")).toBe("fill");
+    expect(styleCategoryOf("outline-color")).toBe("border");
+    expect(styleCategoryOf("opacity")).toBeNull();
+    const { src } = styled();
+    expect(sourceStyleCategories(c, src, { breakpoint: "desktop", pseudo: "normal" }).sort()).toEqual(["border", "fill", "spacing", "typography"]);
   });
 });

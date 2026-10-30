@@ -37,7 +37,10 @@ import { sectionOverrideMarks } from "../shared/controls/OverrideDot";
 import { capabilitiesFor } from "@/shared/constants/elementCapabilities";
 import { BindingDetail } from "../sections/binding/BindingDetail";
 import { closeSubview, openSubview, useSubview } from "./subviewStore";
+import type { BreakpointId } from "@/shared/types/breakpoints";
+import type { PseudoStateId } from "@/shared/types";
 import { ResetStyleReview } from "../components/ResetStyleReview";
+import { ApplyStyleReview } from "../components/ApplyStyleReview";
 
 // ============================================================================
 // TYPES
@@ -45,6 +48,9 @@ import { ResetStyleReview } from "../components/ResetStyleReview";
 
 export interface InspectorTabContentProps {
   tabId: TabId;
+  /** Where a style write lands — the Apply style review copies from here. */
+  breakpoint?: BreakpointId;
+  pseudoState?: PseudoStateId;
   composer: Composer | null | undefined;
   /** The primary selected element — what the sections read. */
   selectedElement: { id: string; type: string; tagName?: string };
@@ -109,6 +115,8 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
     onOpenMediaLibrary,
     onOpenIconPicker,
     onOpenCreateCollection,
+    breakpoint = "desktop",
+    pseudoState = "normal",
   } = props;
 
   const field = React.useContext(InspectorFieldContext);
@@ -139,6 +147,12 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
     mixedKeys: cssContext.mixedKeys,
     isMultiSelect,
   };
+
+  if (subviewHere === "apply-style" && composer) {
+    return (
+      <ApplyStyleReview composer={composer} elementId={selectedElement.id} breakpoint={breakpoint} pseudo={pseudoState} onClose={() => closeSubview("apply-style")} />
+    );
+  }
 
   if (subviewHere === "reset-style" && composer) {
     return <ResetStyleReview composer={composer} elementId={selectedElement.id} onClose={() => closeSubview("reset-style")} />;
