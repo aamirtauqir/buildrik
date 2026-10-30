@@ -25,10 +25,10 @@ const DEAD_LINK_COPY: Record<string, { title: string; body: (agency: string) => 
     body: () =>
       "Review links work for 90 days. Ask your designer to send a new one — your earlier comments are still saved.",
   },
+  /* 2L9 B8-R12 237:12524. */
   REVOKED: {
-    title: "This review link was revoked",
-    body: (agency) =>
-      `This link is no longer active. Ask ${agency} for a new one — your earlier notes are still with your designer.`,
+    title: "This review link was turned off",
+    body: (agency) => `${agency} stopped this review. Ask them for a new link.`,
   },
   NOT_FOUND: {
     title: "This link doesn't work",
