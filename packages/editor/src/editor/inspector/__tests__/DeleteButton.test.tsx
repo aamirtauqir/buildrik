@@ -1,6 +1,6 @@
 /**
- * Inspector ⋯ — Delete is the last row, alone under its rule, drawn as the
- * danger row, with its key (board 30: "Delete ⌫").
+ * Inspector ⋯ — Delete is the last row, alone under its "Delete" group
+ * heading, drawn as the danger row (2L9 S08 255:85835; no key hints).
  *
  * @license BSD-3-Clause
  */
@@ -10,7 +10,7 @@ import { InspectorElementMenu } from "../components/InspectorElementMenu";
 import { ToastProvider } from "@/editor/chrome-ui";
 
 export const makeMenuComposer = () => {
-  const el = { getId: () => "abc12345678", getType: () => "container", getTagName: () => "div", isLocked: () => false };
+  const el = { getId: () => "abc12345678", getType: () => "container", getTagName: () => "div", isLocked: () => false, getCustomData: () => undefined };
   return {
     elements: { getElement: vi.fn(() => el), getActivePage: () => undefined },
     commands: { run: vi.fn(() => true) },
@@ -21,7 +21,7 @@ export const makeMenuComposer = () => {
 };
 
 describe("Inspector ⋯ — the Delete row", () => {
-  it("is the last row, after a rule, danger, with its shortcut", () => {
+  it("is the last row, under its Delete heading, danger", () => {
     render(
       <ToastProvider>
         <InspectorElementMenu composer={makeMenuComposer() as never} selectedElementId="abc12345678" />
@@ -32,7 +32,6 @@ describe("Inspector ⋯ — the Delete row", () => {
     const del = items[items.length - 1];
     expect(del).toHaveAccessibleName(/^Delete/);
     expect(del.className).toMatch(/text-red-700/);
-    expect(del.previousElementSibling).toHaveAttribute("role", "separator");
-    expect(del.textContent).toMatch(/Del|⌫/);
+    expect(del.previousElementSibling).toHaveTextContent("Delete");
   });
 });

@@ -99,10 +99,12 @@ describe("Attributes", () => {
     expect(screen.queryByText("ID")).toBeNull();
   });
 
-  it("summarises as the 2L9 boards do: '{n} set', '0 set' included; the id is not counted", () => {
+  it("summarises as the 2L9 boards do: '{n} set', '0 set' included; the id, title and tab index (Semantics, A11) are not counted", () => {
     const el = makeMockElement({ id: "e1", type: "heading", attrs: { id: "hero-title", title: "Hi" } });
-    const composer = makeMockComposer({ element: el });
-    expect(attributesSummary(composer as never, { id: "e1", type: "heading" })).toBe("1 set");
+    expect(attributesSummary(makeMockComposer({ element: el }) as never, { id: "e1", type: "heading" })).toBe("0 set");
+    /* A form field draws no Semantics: its Title stays in Advanced attributes. */
+    const field = makeMockElement({ id: "e1", type: "input", attrs: { title: "Hi" } });
+    expect(attributesSummary(makeMockComposer({ element: field }) as never, { id: "e1", type: "input" })).toBe("1 set");
     expect(attributesSummary(makeMockComposer({ element: makeMockElement({ id: "e1" }) }) as never, { id: "e1", type: "heading" })).toBe("0 set");
   });
 });

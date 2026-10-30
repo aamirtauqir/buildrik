@@ -10,7 +10,7 @@ import type { Composer } from "@/engine/Composer";
 import type { Element } from "@/engine/elements/Element";
 import { EVENTS } from "@/shared/constants/events";
 import { createTestComposer, installEngineBrowserStubs, removeEngineBrowserStubs } from "@/engine/__tests__/test-utils/realComposer";
-import { actionLabel, ELEMENT_ACTIONS, INSPECTOR_MENU, type ElementActionContext } from "../elementActions";
+import { actionLabel, ELEMENT_ACTIONS, INSPECTOR_MENU, isMenuGroup, type ElementActionContext } from "../elementActions";
 import { getContextMenuActions } from "@/editor/canvas/menus/contextMenuRegistry";
 
 beforeAll(installEngineBrowserStubs);
@@ -39,21 +39,26 @@ beforeEach(() => {
 });
 
 const visibleRows = (ctx: ElementActionContext) =>
-  INSPECTOR_MENU.filter((id) => id === "---" || !ELEMENT_ACTIONS[id].isVisible || ELEMENT_ACTIONS[id].isVisible!(ctx));
+  INSPECTOR_MENU.filter((id) => isMenuGroup(id) || !ELEMENT_ACTIONS[id].isVisible || ELEMENT_ACTIONS[id].isVisible!(ctx));
 
 describe("INSPECTOR_MENU — board 30, nothing else", () => {
-  it("nine rows and two rules, in the board's order", () => {
+  it("2L9 S08: the rows under Clipboard / Structure / State / Delete, in the board's order", () => {
     const ctx = ctxFor(h3);
-    expect(visibleRows(ctx).map((id) => (id === "---" ? id : actionLabel(ELEMENT_ACTIONS[id], ctx)))).toEqual([
+    expect(visibleRows(ctx).map((id) => (isMenuGroup(id) ? id : actionLabel(ELEMENT_ACTIONS[id], ctx)))).toEqual([
+      "#Clipboard",
       "Duplicate",
       "Copy style",
       "Paste style",
+      "#Structure",
+      "Save as component…",
+      "Bind to CMS field…",
+      "Show in Layers",
+      "#State",
+      "Lock",
+      "Add interaction",
       "Apply style to all H3 headings",
       "Reset style",
-      "---",
-      "Save as component…",
-      "Lock",
-      "---",
+      "#Delete",
       "Delete",
     ]);
   });
@@ -70,7 +75,7 @@ describe("INSPECTOR_MENU — board 30, nothing else", () => {
   });
 
   it("never offers the rows the redesign removed", () => {
-    for (const gone of ["improve-with-ai", "bind-to-cms", "add-interaction", "replace-with-block"]) {
+    for (const gone of ["improve-with-ai", "replace-with-block"]) {
       expect(INSPECTOR_MENU).not.toContain(gone);
     }
   });

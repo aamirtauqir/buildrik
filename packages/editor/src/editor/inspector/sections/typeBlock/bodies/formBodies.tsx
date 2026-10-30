@@ -58,11 +58,12 @@ const ChoiceBody: React.FC<TypeBlockBodyProps> = (props) => {
       return {
         textId: innerText(el)?.getId?.() ?? element.id,
         name: input?.getAttribute?.("name") ?? "",
+        value: input?.getAttribute?.("value") ?? "",
         checked: isAttrOn(input?.getAttribute?.("checked")),
         required: isAttrOn(input?.getAttribute?.("required")),
       };
     },
-    { textId: element.id, name: "", checked: false, required: false },
+    { textId: element.id, name: "", value: "", checked: false, required: false },
   );
   const write = (name: string, value: string) => {
     if (!composer) return;
@@ -73,6 +74,8 @@ const ChoiceBody: React.FC<TypeBlockBodyProps> = (props) => {
     <>
       <EditTextRow composer={composer} elementId={attrs.textId} />
       <InputRow label="Name" value={attrs.name} onChange={(v) => write("name", v)} placeholder="field_name" />
+      {/* B69/06: what the form submits when it is checked ("on" when unset). */}
+      <InputRow label="Submission value" value={attrs.value} onChange={(v) => write("value", v)} placeholder="on" />
       <CheckRow label="Checked by default" checked={attrs.checked} onChange={(on) => write("checked", on ? "true" : "")} />
       <CheckRow label="Required" checked={attrs.required} onChange={(on) => write("required", on ? "true" : "")} />
     </>

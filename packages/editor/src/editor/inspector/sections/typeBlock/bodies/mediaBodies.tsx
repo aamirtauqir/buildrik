@@ -154,6 +154,8 @@ const ICON_ROWS: readonly PropertyConfig[] = [
     type: "select",
     options: ["1", "1.5", "2", "2.5", "3"].map((v) => ({ value: v, label: v })),
   },
+  /* B69/03: what a screen reader says for the icon (empty = decorative). */
+  { id: "aria-label", label: "Accessible name", type: "text", placeholder: "Decorative" },
 ];
 
 /** SVG: its source row. Icon: the icon picker door and its size / stroke. */

@@ -18,6 +18,7 @@ import { componentTriggerOf, DialogContentSection, isModalTrigger, ModalRelation
 import { readModal } from "@/engine/widgets/modalModel";
 import { recordContextOf } from "../binding/useCmsBinding";
 import { CollectionListSection } from "../CollectionListSection";
+import { ChildrenSection, COMMERCE_TYPES, CommerceNoteSection } from "../ChildrenSection";
 import { FormFieldsSection } from "../FormFieldsSection";
 import { SlidesSection } from "../SlidesSection";
 import { AttributesSection, attributesSummary } from "../attributes/AttributesSection";
@@ -141,6 +142,39 @@ export const CONTENT_SECTIONS: Record<string, AnySectionEntry> = {
       isOpen: ctx.isOpen,
       onToggle: ctx.onToggle,
     }),
+  }),
+
+  /* B69 (249:71560 …): a block that holds blocks lists and opens its exact
+     children. Not where the type has its own list (Fields, Slides,
+     Collection list, Tabs, Table), a body of its own, or is a Modal dialog. */
+  children: defineSection({
+    tab: "content",
+    title: "Children",
+    open: "open",
+    shouldRender: (ctx) => {
+      if (ctx.selectedIds.length > 1 || !ctx.composer) return false;
+      const el = ctx.composer.elements.getElement(ctx.selectedElement.id);
+      if (!el?.canHaveChildren?.()) return false;
+      if (ctx.caps.typeBlock && ctx.caps.typeBlock !== "flex" && ctx.caps.typeBlock !== "grid") return false;
+      if (["form", "table", "tabs", "slider", "accordion", "theme-toggle"].includes(ctx.selectedElement.type)) return false;
+      if (["tablist", "tabpanel", "dialog"].includes(el.getAttribute?.("role") ?? "")) return false;
+      if (["table", "thead", "tbody", "tr", "td", "th"].includes(el.getTagName().toLowerCase())) return false;
+      return !ctx.composer.cms?.bindings?.getCollectionBinding?.(el.getId());
+    },
+    Component: ChildrenSection,
+    styleKeys: [],
+    adaptProps: (ctx) => ({ composer: ctx.composer, elementId: ctx.selectedElement.id, isOpen: ctx.isOpen, onToggle: ctx.onToggle }),
+  }),
+
+  /* B69/12: commerce blocks — existing content only, commerce planned. */
+  commerce: defineSection({
+    tab: "content",
+    title: "Existing content",
+    open: "always",
+    shouldRender: (ctx) => ctx.selectedIds.length <= 1 && COMMERCE_TYPES.has(ctx.selectedElement.type),
+    Component: CommerceNoteSection,
+    styleKeys: [],
+    adaptProps: (ctx) => ({ isOpen: ctx.isOpen, onToggle: ctx.onToggle }),
   }),
 
   /* B-21 (2L9 B4-C01): a Tabs block's pairs and which opens first. */

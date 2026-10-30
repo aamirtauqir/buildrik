@@ -1,9 +1,10 @@
 /**
  * StatusLine — why the controls below are read-only, and the one way out
  * (DD-18, Q4). Replaced LockedBanner.
- *   locked   → "Locked — unlock to edit" and a full-width "Unlock {layer}"
- *              (2L9 147:78110; the shared `unlock-element` command, one
- *              undo step);
+ *   locked   → "Editing unavailable" · "This element is locked. Inspecting
+ *              it through Layers keeps its values visible." · a full-width
+ *              primary "Unlock" (2L9 S22 255:92819, at the head of the tab
+ *              body; the shared `unlock-element` command, one undo step);
  *   conflict → "This site changed elsewhere — resolve to keep editing ·
  *              Resolve" (board 29; reopens the conflict dialog).
  *
@@ -41,16 +42,19 @@ export function StatusLine({ composer, elementId, locked, conflict }: StatusLine
     const el = composer?.elements?.getElement?.(elementId);
     const name = el ? (getLayerName(el) ?? elementTypeLabel(el.getType())) : "element";
     return (
-      <div role="status" data-testid="inspector-status-line" data-tone="locked" className="tw:flex tw:flex-col tw:gap-2 tw:px-3 tw:pb-2">
-        <span className="tw:text-[12px] tw:font-semibold tw:leading-4 tw:text-[var(--bk-warning-text)]">Locked — unlock to edit</span>
+      <div role="status" data-testid="inspector-status-line" data-tone="locked" className="tw:flex tw:flex-col tw:gap-2 tw:px-3 tw:pt-3 tw:pb-2">
+        <span className="tw:text-[13px] tw:font-semibold tw:leading-4 tw:text-[var(--bk-ink)]">Editing unavailable</span>
+        <span className="tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)]">
+          This element is locked. Inspecting it through Layers keeps its values visible.
+        </span>
         <Button
-          color="light"
           size="xs"
           data-testid="inspector-unlock"
-          className={`${WIDE_BUTTON} tw:w-auto! tw:self-start tw:px-4`}
+          aria-label={`Unlock ${name}`}
+          className={`${WIDE_BUTTON} tw:text-white!`}
           onClick={() => void composer?.commands.run("unlock-element", { elementId })}
         >
-          Unlock {name}
+          Unlock
         </Button>
       </div>
     );

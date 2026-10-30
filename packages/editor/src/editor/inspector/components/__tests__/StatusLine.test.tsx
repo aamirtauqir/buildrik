@@ -31,7 +31,7 @@ describe("StatusLine", () => {
     el.setLocked(true);
     c.history.flushPending();
     render(<StatusLine composer={c} elementId={el.getId()} locked conflict={idle} />);
-    expect(screen.getByTestId("inspector-status-line")).toHaveTextContent("Locked — unlock to edit");
+    expect(screen.getByTestId("inspector-status-line")).toHaveTextContent("Editing unavailableThis element is locked. Inspecting it through Layers keeps its values visible.");
     /* 2L9 147:78110: a full-width action naming the layer. */
     expect(screen.getByRole("button", { name: "Unlock Heading" })).toBeInTheDocument();
     fireEvent.click(screen.getByTestId("inspector-unlock"));

@@ -70,6 +70,8 @@ export type SectionId =
   | "cms-binding"
   | "conditions"
   | "tabs-pairs"
+  | "children"
+  | "commerce"
   | "tab-panel"
   | "tabs-behavior"
   | "modal-relationship"

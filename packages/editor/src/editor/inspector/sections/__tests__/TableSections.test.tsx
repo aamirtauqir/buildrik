@@ -35,6 +35,19 @@ describe("Table · Structure", () => {
     expect(openingTab("table")).toBe("content");
   });
 
+  it("Add column gives every row a blank copy of its last cell, in one Undo", () => {
+    const { c, id, table } = setup();
+    render(<TableStructureSection composer={c} elementId={id} isOpen />);
+    c.history.flushPending();
+    const steps = c.history.getUndoCount();
+    fireEvent.click(screen.getByRole("button", { name: "Add column" }));
+    c.history.flushPending();
+    expect(screen.getByTestId("table-columns")).toHaveTextContent("5");
+    const rows = table().getDescendants().filter((d) => tag(d) === "tr");
+    expect(rows.every((r) => r.getChildren().length === 5)).toBe(true);
+    expect(c.history.getUndoCount()).toBe(steps + 1);
+  });
+
   it("C16: a spanning cell keeps the structure — row commands stand down, Edit {cell} content selects that cell", () => {
     const { c, id, table } = setup();
     const tbody = table().getChildren().find((el) => tag(el) === "tbody")!;
@@ -42,7 +55,7 @@ describe("Table · Structure", () => {
     cell.setAttribute("colspan", "2");
     render(<TableStructureSection composer={c} elementId={id} isOpen />);
     expect(screen.getByTestId("table-complex")).toHaveTextContent("B2 spans 2 columns. Rectangular row and column commands are unavailable for this structure.");
-    expect(screen.getByRole("button", { name: "Add blank row" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Add column" })).toBeDisabled();
     fireEvent.click(screen.getByTestId("table-edit-spanning"));
     expect(c.selection.getSelected()?.getId()).toBe(cell.getId());
     expect(tbody.getChildren()).toHaveLength(3);
