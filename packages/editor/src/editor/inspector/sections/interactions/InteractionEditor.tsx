@@ -149,6 +149,8 @@ export const InteractionEditor: React.FC<InteractionEditorProps> = ({
           onClose={() => setMenuOpen(false)}
           placement="bottom-end"
           beside=".layout-shell__inspector"
+          /* 2L9 165:17822: the menu tops out level with the tab strip. */
+          besideTop="[data-testid=inspector-tab-strip]"
           label="Interaction actions"
           className="tw:w-[240px] tw:p-1"
           trigger={

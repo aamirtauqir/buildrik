@@ -11,6 +11,7 @@ import * as React from "react";
 import { captureError } from "@/shared/utils/errorTracking";
 import { trackSidebar } from "@/shared/utils/sidebarAnalytics";
 import { Button } from "@/editor/chrome-ui";
+import { WIDE_BUTTON } from "../shared/controls/controlClasses";
 
 interface InspectorErrorBoundaryProps {
   children: React.ReactNode;
@@ -55,14 +56,15 @@ export class InspectorErrorBoundary extends React.Component<
       return (
         <div
           role="alert"
-          className="tw:m-3 tw:flex tw:flex-col tw:items-start tw:gap-2 tw:rounded-lg tw:bg-[var(--bk-error-tint)] tw:p-3"
+          className="tw:flex tw:flex-col tw:gap-2 tw:px-3 tw:pt-4"
           data-testid="inspector-error"
         >
-          <div className="tw:text-[13px] tw:font-semibold tw:text-[var(--bk-error-text)]">Unable to display Inspector</div>
+          <div className="tw:text-[13px] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]">Unable to display Inspector</div>
           <div className="tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)]">
             {this.props.targetName ? `${this.props.targetName} is still selected. ` : null}This display error has not changed your document.
           </div>
-          <Button size="xs" color="light" onClick={() => this.setState({ hasError: false })}>
+          {/* 2L9 S03: a plain group, the one way out full width and primary. */}
+          <Button size="xs" variant="primary" className={`${WIDE_BUTTON} tw:text-white!`} onClick={() => this.setState({ hasError: false })}>
             Try again
           </Button>
         </div>
