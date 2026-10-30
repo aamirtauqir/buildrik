@@ -9617,8 +9617,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Related list previewing second record; not in code",
+   "verified": "drift-open",
+   "verifiedNote": "Round 34 L-A: built, not compared live — under a selected Collection list the canvas now reads what it shows (ListCountCaption: '6 of 6 Team records', with a query '6 of 13 matching records · current record excluded'), counted the way RepeaterRenderer renders it; test ListCountCaption. The related list itself is served by excludeCurrent + @page.* (engine-record-pages.md); the list panel on the right is L-B's.",
    "tier": "P1"
   },
   {
@@ -11327,7 +11327,7 @@
    "page": "05",
    "family": "templates",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:engine-import-report (REQUESTS A-42)",
    "verified": "no",
    "verifiedNote": "Import report / partial-omission + undo-creation flow missing (T-1/T-4)",
    "tier": "P2"
@@ -11647,7 +11647,7 @@
    "page": "05",
    "family": "templates",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:engine-import-report (REQUESTS A-42)",
    "verified": "no",
    "verifiedNote": "Import report / partial-omission + undo-creation flow missing (T-1/T-4)",
    "tier": "P2"
@@ -11658,7 +11658,7 @@
    "page": "05",
    "family": "templates",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:engine-import-report (REQUESTS A-42)",
    "verified": "no",
    "verifiedNote": "Import report / partial-omission + undo-creation flow missing (T-1/T-4)",
    "tier": "P2"

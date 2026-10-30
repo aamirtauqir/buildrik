@@ -32,8 +32,14 @@ export const CANVAS_TAG_CLASS =
   "tw:flex tw:items-center tw:h-5 tw:px-1.5 tw:whitespace-nowrap tw:bg-[var(--bk-accent)] " +
   "tw:text-[11px] tw:leading-4 tw:text-[var(--bk-accent-on)] tw:[font-family:var(--bk-font-ui)] tw:pointer-events-none";
 
-export const SelectionLabel: React.FC<SelectionLabelProps> = ({ composer, elementId, canvasRef }) => {
-  const [pos, setPos] = React.useState<{ left: number; top: number } | null>(null);
+/** An element's box in the canvas overlay's coordinates (unscaled, scroll
+ *  included), kept current on resize, DOM change and scroll. Null while the
+ *  element is not on the canvas. */
+export function useCanvasElementBox(
+  elementId: string,
+  canvasRef: React.RefObject<HTMLDivElement | null>,
+): { left: number; top: number; height: number } | null {
+  const [pos, setPos] = React.useState<{ left: number; top: number; height: number } | null>(null);
 
   React.useEffect(() => {
     const canvas = canvasRef.current;
@@ -47,6 +53,7 @@ export const SelectionLabel: React.FC<SelectionLabelProps> = ({ composer, elemen
       setPos({
         left: (r.left - c.left) / zs + (canvas.scrollLeft || 0),
         top: (r.top - c.top) / zs + (canvas.scrollTop || 0),
+        height: r.height / zs,
       });
     };
     update();
@@ -62,6 +69,11 @@ export const SelectionLabel: React.FC<SelectionLabelProps> = ({ composer, elemen
       window.removeEventListener("scroll", update, { capture: true } as EventListenerOptions);
     };
   }, [elementId, canvasRef]);
+  return pos;
+}
+
+export const SelectionLabel: React.FC<SelectionLabelProps> = ({ composer, elementId, canvasRef }) => {
+  const pos = useCanvasElementBox(elementId, canvasRef);
 
   const element = composer.elements.getElement(elementId);
   if (!pos || !element) return null;
