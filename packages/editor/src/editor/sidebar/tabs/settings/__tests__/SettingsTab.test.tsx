@@ -255,6 +255,7 @@ vi.mock("../screens/RedirectsScreen", () => ({
 
 import { SettingsTab } from "../SettingsTab";
 import { shellDirty } from "@/editor/shell/shellDirtyRegistry";
+import { publishTray } from "@/editor/shell/publishTrayStore";
 import { takeBrandReturn } from "@/editor/design-system/ui/brandOpenRequest";
 import { SettingsSaveCancelled, SettingsSaveError } from "@/services/BuildrikSyncProvider";
 
@@ -407,7 +408,7 @@ describe("SettingsTab — the shell", () => {
     expect(row.className).toContain("tw:bg-[var(--bk-accent-tint)]");
     expect(screen.getByTestId("set-nav-overview").getAttribute("aria-current")).toBeNull();
     // 8134:212718: a clean footer screen keeps its save bar, both actions disabled.
-    expect(footStatus()).toBe("All changes saved");
+    expect(footStatus()).toBe("Saved");
     expect((screen.getByTestId("set-foot-save") as HTMLButtonElement).disabled).toBe(true);
     expect((screen.getByTestId("set-foot-discard") as HTMLButtonElement).disabled).toBe(true);
     expect(screen.getByTestId("set-card-site")).toBeTruthy();
@@ -482,13 +483,14 @@ describe("SettingsTab — doors", () => {
     expect(takeBrandReturn(asComposer(composer) as never)).toMatchObject({ screen: "seo" });
   });
 
-  it("the role foot opens the Permissions dialog for every known role", () => {
+  it("the role foot opens the settings Permissions dialog for every known role (B8-PM01)", () => {
     role.value = "EDITOR";
     const composer = makeComposer();
     renderS(<SettingsTab composer={asComposer(composer)} />);
     expect(screen.getByTestId("set-role").textContent).toContain("Your role: Editor");
     fireEvent.click(screen.getByTestId("set-role-permissions"));
-    expect(composer.emit).toHaveBeenCalledWith("ui:open-permissions", undefined);
+    expect(screen.getByTestId("set-perm-dialog")).toBeInTheDocument();
+    expect(composer.emit).not.toHaveBeenCalledWith("ui:open-permissions", undefined);
     role.value = null;
     cleanup();
     renderS(<SettingsTab composer={asComposer(makeComposer())} />);
@@ -586,7 +588,7 @@ describe("SettingsTab — Unsaved settings", () => {
     expect(screen.queryByTestId("set-unsaved")).toBeNull();
     expect(onClose).not.toHaveBeenCalled();
     expect(headTitle()).toBe("General");
-    expect(footStatus()).toBe("All changes saved");
+    expect(footStatus()).toBe("Saved");
   });
 
   it("the guard's Discard drops the edits without touching the composer and returns to the canvas", async () => {
@@ -619,7 +621,7 @@ describe("SettingsTab — Unsaved settings", () => {
     fireEvent.click(screen.getByTestId("set-unsaved-discard"));
     await waitFor(() => expect(headTitle()).toBe("SEO"));
     expect(onClose).not.toHaveBeenCalled();
-    expect(footStatus()).toBe("All changes saved");
+    expect(footStatus()).toBe("Saved");
   });
 
   it("names the dirty screen and the destination (B8-GUARD), or the way out", async () => {
@@ -628,9 +630,6 @@ describe("SettingsTab — Unsaved settings", () => {
     fireEvent.click(screen.getByTestId("set-nav-localization"));
     expect(screen.getByTestId("set-unsaved-names").textContent).toBe("General → Languages");
     expect(screen.getByTestId("set-unsaved").getAttribute("data-phase")).toBe("ask");
-    fireEvent.click(screen.getByTestId("set-unsaved-keep"));
-    fireEvent.click(screen.getByTestId("set-nav-billing"));
-    expect(screen.getByTestId("set-unsaved-names").textContent).toBe("General → Billing");
     fireEvent.click(screen.getByTestId("set-unsaved-keep"));
     fireEvent.click(screen.getByTestId("set-back"));
     expect(screen.getByTestId("set-unsaved-names").textContent).toBe("General → (leave)");
@@ -708,7 +707,7 @@ describe("SettingsTab — Unsaved settings", () => {
     fireEvent.change(screen.getByLabelText("Meta title"), { target: { value: "x" } });
     await waitFor(() => expect(footStatus()).toBe("Unsaved changes"));
     fireEvent.click(screen.getByTestId("set-foot-discard"));
-    await waitFor(() => expect(footStatus()).toBe("All changes saved"));
+    await waitFor(() => expect(footStatus()).toBe("Saved"));
   });
 
   it("Save and leave on the way out saves, then leaves", async () => {
@@ -948,7 +947,7 @@ describe("SettingsTab — Save with a site id goes through the settings mutation
     await waitFor(() => expect(headTitle()).toBe("Domains"));
     fireEvent.click(screen.getByTestId("set-nav-seo"));
     await waitFor(() => expect(headTitle()).toBe("SEO"));
-    expect(footStatus()).toBe("All changes saved");
+    expect(footStatus()).toBe("Saved");
   });
 
   it("the screen's own invalid fields disable Save until they are fixed (§27)", async () => {
@@ -1019,7 +1018,7 @@ describe("SettingsTab — the footer follows the screen's load", () => {
     expect(save().disabled).toBe(true);
     fireEvent.click(screen.getByText("go ready"));
     // Ready and clean: the save bar says so, Save disabled (8134:212718).
-    expect(footStatus()).toBe("All changes saved");
+    expect(footStatus()).toBe("Saved");
     expect(save().disabled).toBe(true);
   });
 });
@@ -1350,21 +1349,21 @@ describe("SettingsTab — its registry entry is honest at every door", () => {
   });
 });
 
-/* 8139:217358: a workspace row opens its door card in the pane. */
+/* GAP-ST-ORG 277:38019: a workspace row opens its dashboard page in a new
+   tab and says so in a dialog over the screen, which keeps its draft. */
 describe("SettingsTab — workspace doors", () => {
-  it("Integrations: the row is current, the card names the workspace, Open leaves for the dashboard, Close returns", async () => {
+  it("Integrations opens the dashboard in a new tab; the dialog returns to the same screen and draft", async () => {
     const openSpy = vi.spyOn(window, "open").mockImplementation(() => null);
     renderS(<SettingsTab composer={asComposer(makeComposer())} />);
+    await openGeneralAndEdit();
     fireEvent.click(screen.getByTestId("set-nav-webhooks"));
-    await waitFor(() => expect(headTitle()).toBe("Integrations"));
-    expect(screen.getByTestId("set-nav-webhooks").getAttribute("aria-current")).toBe("page");
-    expect(screen.getByTestId("set-head-scope").textContent).toBe("Your workspace · all sites · managed in workspace settings");
-    expect(screen.getByTestId("set-door-webhooks").textContent).toContain("Your workspace · Integrations");
-    expect(screen.queryByTestId("set-foot-save")).toBeNull();
-    fireEvent.click(screen.getByTestId("set-door-open"));
     expect(String(openSpy.mock.calls[0][0])).toMatch(/\/dashboard\/settings\/integrations$/);
-    fireEvent.click(screen.getByTestId("set-door-close"));
-    await waitFor(() => expect(headTitle()).toBe("Overview"));
+    expect(screen.queryByTestId("set-unsaved")).toBeNull();
+    expect(screen.getByTestId("set-door-dialog").textContent).toContain("Organization workspace · Integrations");
+    fireEvent.click(screen.getByTestId("set-door-back"));
+    expect(screen.queryByTestId("set-door-dialog")).toBeNull();
+    expect(headTitle()).toBe("General");
+    expect(shellDirty.get()).toBe(true);
     openSpy.mockRestore();
   });
 });
@@ -1408,5 +1407,61 @@ describe("SettingsTab — saving (2L9 B8-SH07 / AN08)", () => {
     await act(async () => finish());
     await waitFor(() => expect(footStatus()).toBe("Saved · applies on next publish"));
     expect(screen.getByTestId("set-foot-save").textContent).toBe("Save settings");
+  });
+});
+
+/* GAP-ST-PG / PS / PF (277:41731 · 277:41957 · 277:42171): Publish while a
+   screen holds an edit asks first; the tray opens only through the guard. */
+describe("SettingsTab — publish with unsaved settings", () => {
+  afterEach(() => publishTray.close());
+
+  it("closes the tray and asks; Publish without these changes opens it", async () => {
+    renderS(<SettingsTab composer={asComposer(makeComposer())} />);
+    await openGeneralAndEdit();
+    act(() => publishTray.open());
+    expect(publishTray.get().open).toBe(false);
+    expect(screen.getByTestId("set-publish-guard-body").textContent).toBe(
+      "Publish uses saved site settings. Your General changes are still unsaved.",
+    );
+    fireEvent.click(screen.getByTestId("set-publish-guard-without"));
+    expect(publishTray.get().open).toBe(true);
+    expect(screen.queryByTestId("set-publish-guard")).toBeNull();
+    expect(shellDirty.get()).toBe(true);
+  });
+
+  it("Save and continue saves, says so in the footer, then opens the tray", async () => {
+    let finish!: () => void;
+    renderS(<SettingsTab composer={asComposer(makeComposer(() => new Promise<void>((r) => (finish = r))))} />);
+    await openGeneralAndEdit();
+    act(() => publishTray.open());
+    fireEvent.click(screen.getByTestId("set-publish-guard-save"));
+    await waitFor(() => expect(footStatus()).toBe("Saving General before opening Publish…"));
+    expect(publishTray.get().open).toBe(false);
+    await act(async () => finish());
+    await waitFor(() => expect(publishTray.get().open).toBe(true));
+  });
+
+  it("a refused save keeps the edits and the tray shut; Retry save and continue tries again", async () => {
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    let attempt = 0;
+    renderS(
+      <SettingsTab composer={asComposer(makeComposer(() => (attempt++ === 0 ? Promise.reject(new Error("503")) : Promise.resolve())))} />,
+    );
+    await openGeneralAndEdit();
+    act(() => publishTray.open());
+    fireEvent.click(screen.getByTestId("set-publish-guard-save"));
+    expect(await screen.findByText("Couldn’t save General")).toBeInTheDocument();
+    expect(screen.getByTestId("set-publish-guard-body").textContent).toBe("Your changes remain here. Publish has not opened.");
+    expect(publishTray.get().open).toBe(false);
+    fireEvent.click(screen.getByTestId("set-publish-guard-save"));
+    await waitFor(() => expect(publishTray.get().open).toBe(true));
+    errorSpy.mockRestore();
+  });
+
+  it("a clean screen lets the tray open untouched", () => {
+    renderS(<SettingsTab composer={asComposer(makeComposer())} />);
+    act(() => publishTray.open());
+    expect(publishTray.get().open).toBe(true);
+    expect(screen.queryByTestId("set-publish-guard")).toBeNull();
   });
 });

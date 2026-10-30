@@ -19,4 +19,3 @@ export { DomainsScreen } from "./DomainsScreen";
 export { OverviewScreen } from "./OverviewScreen";
 export { AccessScreen } from "./AccessScreen";
 export { DangerZoneScreen } from "./DangerZoneScreen";
-export { WorkspaceDoorScreen } from "./WorkspaceDoorScreen";

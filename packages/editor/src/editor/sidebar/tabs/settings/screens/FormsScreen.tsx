@@ -152,15 +152,13 @@ export const FormsScreen: React.FC<ScreenProps> = ({ composer, projectId, onDirt
   const [selected, setSelected] = React.useState<ReadonlySet<string>>(new Set());
   const [deleteDialog, setDeleteDialog] = React.useState<DeleteDialog>(null);
   const [moveFailed, setMoveFailed] = React.useState<string[] | null>(null);
-  const [moving, setMoving] = React.useState(false);
-  /* GAP-FM-Export: the export's own dialog — preparing, ready (with what it held) or failed. */
-  /* GAP-FMC 277:345909: the form filter asks in a small dialog. */
+  /* The ids an Unspam / Unarchive is moving (GAP-FM-Unspam · Pending 272:27190). */
+  const [moving, setMoving] = React.useState<string[] | null>(null);
+  /* GAP-FMC 277:345909: the form filter asks in a small dialog. GAP-FM-Export: preparing, ready or failed. */
   const [filterOpen, setFilterOpen] = React.useState(false);
   const [exportState, setExportState] = React.useState<{ phase: "preparing" | "failed" } | { phase: "ready"; count: number } | null>(null);
 
-  React.useEffect(() => {
-    onDirtyChange?.(false);
-  }, [onDirtyChange]);
+  React.useEffect(() => onDirtyChange?.(false), [onDirtyChange]);
 
   const reportRef = React.useRef(onLoadStateChange);
   reportRef.current = onLoadStateChange;
@@ -268,13 +266,13 @@ export const FormsScreen: React.FC<ScreenProps> = ({ composer, projectId, onDirt
 
   /* Unspam / Unarchive (272:27190…272:28506): back to the Inbox, no confirm. */
   const moveToInbox = async (ids: string[]) => {
-    setMoving(true);
+    setMoving(ids);
     setMoveFailed(null);
     setAck(null);
     const patch = view === "spam" ? { isSpam: false } : { isArchived: false };
     const failed = await runEach(ids, (id) => getClient().forms.updateSubmission.mutate({ id, ...patch }));
     const done = ids.length - failed.length;
-    setMoving(false);
+    setMoving(null);
     setSelected(new Set(failed));
     if (failed.length > 0) setMoveFailed(failed);
     if (done > 0) {
@@ -380,25 +378,9 @@ export const FormsScreen: React.FC<ScreenProps> = ({ composer, projectId, onDirt
   };
   const where = `${scopeName} · ${VIEW_LABEL[view]}`;
 
-  const dialog = (() => {
-    if (!deleteDialog) return null;
-    const n = deleteDialog.ids.length;
-    if (deleteDialog.phase === "failed") {
-      return {
-        title: "Couldn’t delete the submissions",
-        message: `${n === 1 ? "The submission is" : n === 2 ? "Both submissions are" : `${n} submissions are`} still in ${where}. Your selection is kept.`,
-        confirmLabel: "Try again",
-      };
-    }
-    if (deleteDialog.phase === "pending") {
-      return {
-        title: `Deleting ${plural(n, "submission")}…`,
-        message: `${namesOf(deleteDialog.ids)} ${n === 1 ? "remains" : "remain"} listed until deletion is confirmed. No Undo is offered for permanent deletion.`,
-        confirmLabel: `Delete ${n} permanently`,
-      };
-    }
-    return null;
-  })();
+  const deletePendingIds = deleteDialog?.phase === "pending" ? deleteDialog.ids : null;
+  const deleteFailedIds = deleteDialog?.phase === "failed" ? deleteDialog.ids : null;
+  const nFailed = deleteFailedIds?.length ?? 0;
 
   return (
     <Screen>
@@ -578,11 +560,11 @@ export const FormsScreen: React.FC<ScreenProps> = ({ composer, projectId, onDirt
                 size="xs"
                 variant="secondary"
                 className={SET_BTN}
-                disabled={count === 0 || moving}
+                disabled={count === 0 || moving !== null}
                 onClick={() => void moveToInbox(selectedIds)}
                 data-testid="set-forms-move"
               >
-                {moving ? `${view === "spam" ? "Unspam" : "Unarchive"} ${plural(count, "submission")}…` : view === "spam" ? "Unspam" : "Unarchive"}
+                {view === "spam" ? "Unspam" : "Unarchive"}
               </Button>
             ) : null}
           </div>
@@ -666,20 +648,24 @@ export const FormsScreen: React.FC<ScreenProps> = ({ composer, projectId, onDirt
       >
         <p className={MUTED_13}>Submissions can’t be restored after they’re deleted.</p>
       </Modal>
+      {/* GAP-FM08 272:23206: no Cancel — a delete cannot be called back; Esc hides the card only. */}
+      <PendingCard
+        open={deletePendingIds !== null}
+        onClose={() => setDeleteDialog(null)}
+        title={`Deleting ${plural(deletePendingIds?.length ?? 0, "submission")}…`}
+        body={`${namesOf(deletePendingIds ?? [])} ${deletePendingIds?.length === 1 ? "remains" : "remain"} listed until deletion is confirmed. No Undo is offered for permanent deletion.`}
+        onCheck={() => void loadSubs()}
+        testId="set-forms-delete"
+      />
+      {/* GAP-FM10 272:23770: Cancel · Try again (primary), 640 wide. */}
       <ConfirmDialog
-        open={dialog !== null}
-        onClose={() => {
-          if (deleteDialog?.phase !== "pending") setDeleteDialog(null);
-        }}
-        onConfirm={() => {
-          if (deleteDialog && deleteDialog.phase !== "pending") void deleteSelected(deleteDialog.ids);
-        }}
-        title={dialog?.title ?? ""}
-        message={dialog?.message ?? ""}
-        confirmLabel={dialog?.confirmLabel ?? ""}
-        busy={deleteDialog?.phase === "pending"}
-        tone="destructive"
-        width="sm"
+        open={deleteFailedIds !== null}
+        onClose={() => setDeleteDialog(null)}
+        onConfirm={() => deleteFailedIds && void deleteSelected(deleteFailedIds)}
+        title="Couldn’t delete the submissions"
+        message={`${nFailed === 1 ? "The submission is" : nFailed === 2 ? "Both submissions are" : `${nFailed} submissions are`} still in ${where}. Your selection is kept.`}
+        confirmLabel="Try again"
+        width="lg"
         testId="set-forms-delete-dialog"
       />
       <Modal
@@ -696,7 +682,7 @@ export const FormsScreen: React.FC<ScreenProps> = ({ composer, projectId, onDirt
           ) : null
         }
       >
-        <p className={MUTED_13} role="status" data-testid="set-forms-export-line">
+        <p className={INK_13} role="status" data-testid="set-forms-export-line">
           {exportState?.phase === "ready"
             ? `${plural(exportState.count, "submission")} · ${scopeName} · ${VIEW_LABEL[view]}. Your selection and filters are unchanged.`
             : `${scopeName} · ${VIEW_LABEL[view]} · ${plural(submissions?.total ?? 0, "submission")}. All matching rows will be exported, including those not selected.`}
@@ -709,7 +695,7 @@ export const FormsScreen: React.FC<ScreenProps> = ({ composer, projectId, onDirt
         title="Couldn’t export submissions"
         message="No CSV was created. Your filters and selection are kept."
         confirmLabel="Try again"
-        width="sm"
+        width="lg"
         testId="set-forms-export-failed"
       />
       <Modal
@@ -744,6 +730,15 @@ export const FormsScreen: React.FC<ScreenProps> = ({ composer, projectId, onDirt
       >
         <p className={MUTED_13}>{`${VIEW_LABEL[view]} view is kept. Change the form to update counts and CSV scope.`}</p>
       </Modal>
+      {/* GAP-FM-Unspam / Unarchive · Pending (272:27190 · 272:27978). */}
+      <PendingCard
+        open={moving !== null}
+        onClose={() => setMoving(null)}
+        title={`${view === "spam" ? "Unspam" : "Unarchive"} ${moving && moving.length > 1 ? `${moving.length} submissions` : "submission"}…`}
+        body={`The selected ${moving && moving.length > 1 ? "submissions stay" : "submission stays"} in ${VIEW_LABEL[view]} until the server confirms the move to Inbox.`}
+        onCheck={() => void loadSubs()}
+        testId="set-forms-move"
+      />
       <ConfirmDialog
         open={moveFailed !== null}
         onClose={() => setMoveFailed(null)}
@@ -755,12 +750,33 @@ export const FormsScreen: React.FC<ScreenProps> = ({ composer, projectId, onDirt
         title={moveFailed && moveFailed.length > 1 ? "Couldn’t move the submissions" : "Couldn’t move the submission"}
         message={`${moveFailed && moveFailed.length > 1 ? "The submissions are" : "The submission is"} still in ${VIEW_LABEL[view]}. Your selection is kept.`}
         confirmLabel="Try again"
-        width="sm"
+        width="lg"
         testId="set-forms-move-failed"
       />
     </Screen>
   );
 };
+
+/* A pending action's 640 card (272:23206, 272:27190): one "Check status" re-reads the list. */
+type PendingCardProps = { open: boolean; onClose: () => void; title: string; body: string; onCheck: () => void; testId: string };
+const PendingCard: React.FC<PendingCardProps> = ({ open, onClose, title, body, onCheck, testId }) => (
+  <Modal
+    open={open}
+    onClose={onClose}
+    title={title}
+    width="lg"
+    dismissOnScrimClick={false}
+    footerAlign="start"
+    testId={`${testId}-pending`}
+    footer={
+      <Button type="button" size="xs" variant="secondary" className={SET_BTN} onClick={onCheck} data-testid={`${testId}-check`}>
+        Check status
+      </Button>
+    }
+  >
+    <p className={INK_13} role="status">{body}</p>
+  </Modal>
+);
 
 /* The empty card keeps the settings card. */
 const CARD = `${SET_CARD} tw:flex tw:flex-col tw:gap-4 tw:p-6`;
