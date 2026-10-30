@@ -9,7 +9,7 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { applyCmsListQuery, decodeCmsCondition, evaluateCmsCondition, opsForFieldType, type CmsCondition } from "@buildrik/shared/schemas/cmsConditions";
+import { applyCmsListQuery, applyRecordPass, decodeCmsCondition, evaluateCmsCondition, opsForFieldType, type CmsCondition } from "@buildrik/shared/schemas/cmsConditions";
 import { filterCmsBindings } from "@buildrik/shared/schemas/sites";
 import { CMSExportResolver } from "../CMSExportResolver";
 import { RepeaterRenderer } from "../RepeaterRenderer";
@@ -165,5 +165,33 @@ describe("render", () => {
     const plain = await new CMSExportResolver(composer).resolve(PAGE, { mode: "static", pageFile: "index.html" });
     expect(plain).toContain("Closed Sundays");
     expect(plain).not.toContain("data-bk-if");
+  });
+
+  it("B-27: on a published template page an @page filter is deferred to the per-record pass, which the server runs", async () => {
+    const { composer, bindings, blogId } = await setup({ template: true });
+    bindings.bindCollection("list", blogId, { repeat: "children" });
+    bindings.setListQuery("list", { filter: { match: "all", rules: [{ field: "sunday", op: "is", value: "@page.sunday" }] }, excludeCurrent: true });
+    const html = await new CMSExportResolver(composer).resolve(LIST, { mode: "static", pageFile: "post.html" });
+    expect(html).toContain("data-bk-query=");
+    expect(html.match(/data-bk-item=/g)).toHaveLength(3);
+    /* The server's pass for Alpha's page (sunday "Sun"): records whose sunday
+       is "Sun", Alpha itself excluded → none. */
+    const items = (await composer.cms.collections.queryContent({ collectionId: blogId })).items;
+    const alpha = items.find((i) => i.data.name === "Alpha")!;
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    applyRecordPass(doc, alpha.data, alpha.id);
+    expect(doc.querySelectorAll('[data-buildrick-id="card"]')).toHaveLength(0);
+    expect(doc.body.innerHTML).not.toMatch(/data-bk-(query|item|row)/);
+  });
+
+  it("excludeCurrent on the canvas leaves out the template page's preview record", async () => {
+    const { composer, bindings, blogId } = await setup({ template: true });
+    (composer.elements as unknown as Record<string, unknown>).getActivePage = () => ({ id: "p", name: "Post", slug: "post", root: { id: "root" } });
+    (composer.elements as unknown as Record<string, unknown>).getAllPages = () => [{ id: "h", name: "Home", slug: "", isHome: true }, { id: "p", name: "Post", slug: "post" }];
+    bindings.bindCollection("list", blogId, { repeat: "children" });
+    bindings.setListQuery("list", { excludeCurrent: true });
+    const doc = new DOMParser().parseFromString(LIST, "text/html");
+    await new RepeaterRenderer(composer).expandCollectionLists(doc, { canvas: true, pageFile: "post.html" });
+    expect(doc.querySelectorAll('[data-buildrick-id="card"]')).toHaveLength(2);
   });
 });

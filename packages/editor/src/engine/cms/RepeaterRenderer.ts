@@ -11,8 +11,16 @@ import { sanitizeRichtext } from "@/shared/utils/html/sanitization";
 import type { CMSContentItem } from "@/shared/types/cms";
 import type { Composer } from "../Composer";
 import type { CMSCollectionBinding, CMSElementBinding } from "./CMSBindingManager";
-import { applyCmsListQuery } from "@buildrik/shared/schemas/cmsConditions";
-import { activePageFile, applyCopyConditions, CONDITION_STATE_ATTR, previewRecordOf, templateCollectionFor } from "./conditionRender";
+import {
+  applyCmsListQuery,
+  CMS_LIST_ITEM_ATTR,
+  CMS_LIST_QUERY_ATTR,
+  CMS_LIST_ROW_ATTR,
+  conditionFields,
+  encodeCmsJson,
+  type CmsPageListQuery,
+} from "@buildrik/shared/schemas/cmsConditions";
+import { activePageFile, applyCopyConditions, CONDITION_STATE_ATTR, previewItemOf, templateCollectionFor } from "./conditionRender";
 
 /** Elements whose content is raw text, never HTML text. */
 const RAW_TEXT_SELECTOR = "script, style, xmp, iframe, noembed, noframes, noscript, textarea, title";
@@ -71,6 +79,9 @@ export interface CollectionListExpandOptions {
    *  preview record feeds `@page.*` filter values and conditions. Absent:
    *  the active page. */
   pageFile?: string;
+  /** Publish of a template page: what depends on the page's own record is
+   *  left to the server's per-record pass (B-27, applyRecordPass). */
+  perRecordOnServer?: boolean;
 }
 
 /** A reference field's target records by id (and the target collection, for
@@ -156,11 +167,11 @@ export class RepeaterRenderer {
   private async expandChildren(
     listEl: HTMLElement,
     binding: CMSCollectionBinding,
-    { canvas = false, pageFile }: CollectionListExpandOptions,
+    { canvas = false, pageFile, perRecordOnServer = false }: CollectionListExpandOptions,
   ): Promise<void> {
     /* The canvas shows drafts too — the author is building the list before
        publishing its records; export ships only what the binding's status allows. */
-    const queried = binding.filter || binding.sort?.length || binding.skip;
+    const queried = binding.filter || binding.sort?.length || binding.skip || binding.excludeCurrent;
     const { items: all } = await this.composer.cms.collections.queryContent({
       collectionId: binding.collectionId,
       status: canvas || binding.status === "all" ? undefined : binding.status,
@@ -169,13 +180,32 @@ export class RepeaterRenderer {
          set first, then takes Show. */
       limit: (!queried && binding.limit) || CMS_COLLECTION_LIMIT_MAX,
     });
-    /* C-14: the list's query; `@page.*` values and this list's conditions
-       read the template page's preview record (engine-list-query.md). */
+    /* C-14: the list's query; `@page.*` values, "Exclude this page's record"
+       and this list's conditions read the template page's record — its
+       preview record here (engine-list-query.md). */
     const template = templateCollectionFor(this.composer, pageFile ?? activePageFile(this.composer));
-    const pageRecord = template ? await previewRecordOf(this.composer, template.id) : null;
-    const items = queried
-      ? applyCmsListQuery(all, { filter: binding.filter, sort: binding.sort, skip: binding.skip, limit: binding.limit }, pageRecord)
-      : all;
+    const pageItem = template ? await previewItemOf(this.composer, template.id) : null;
+    const pageRecord = pageItem?.data ?? null;
+    const readsPage = Boolean(binding.filter?.rules.some((r) => r.value?.startsWith("@page.")) || binding.excludeCurrent);
+    /* B-27: on a published template page those depend on each generated
+       page's record — sort here, hand the rest to the server's pass. */
+    const deferred = perRecordOnServer && template !== null && readsPage;
+    const excludeId = binding.excludeCurrent && template?.id === binding.collectionId ? (pageItem?.id ?? null) : null;
+    const items = deferred
+      ? applyCmsListQuery(all, { sort: binding.sort })
+      : queried
+        ? applyCmsListQuery(all, { filter: binding.filter, sort: binding.sort, skip: binding.skip, limit: binding.limit, excludeId }, pageRecord)
+        : all;
+    if (deferred) {
+      const q: CmsPageListQuery = {
+        ...(binding.filter ? { filter: binding.filter } : {}),
+        ...(binding.skip ? { skip: binding.skip } : {}),
+        ...(binding.limit ? { limit: binding.limit } : {}),
+        ...(binding.excludeCurrent && template?.id === binding.collectionId ? { excludeCurrent: true } : {}),
+      };
+      listEl.setAttribute(CMS_LIST_QUERY_ATTR, encodeCmsJson(q));
+    }
+    const rowFields = deferred ? conditionFields(binding.filter) : [];
     const refs = await this.referenceTables(binding.collectionId, canvas);
     const templates = Array.from(listEl.children) as HTMLElement[];
     const pristine = templates.map((t) => t.cloneNode(true) as HTMLElement);
@@ -196,6 +226,10 @@ export class RepeaterRenderer {
         applyCopyConditions(node, listEl, item.data, this.composer.cms.bindings, canvas, pageRecord);
         if (intoTemplate) continue;
         if (!canvas && node.getAttribute(CONDITION_STATE_ATTR) === "hidden") continue;
+        if (deferred) {
+          node.setAttribute(CMS_LIST_ITEM_ATTR, item.id);
+          node.setAttribute(CMS_LIST_ROW_ATTR, encodeCmsJson(Object.fromEntries(rowFields.map((f) => [f, item.data[f] ?? null]))));
+        }
         if (canvas) node.setAttribute("data-cms-repeater-clone", String(index));
         else this.clearUnresolved(node, binding.itemVar || "item");
         listEl.appendChild(node);

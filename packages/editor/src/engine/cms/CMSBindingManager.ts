@@ -75,6 +75,8 @@ export interface CMSCollectionBinding {
   filter?: CmsCondition;
   sort?: CmsListSortKey[];
   skip?: number;
+  /** B-27: leave out the template page's own record. */
+  excludeCurrent?: boolean;
 }
 
 /** A Collection list's query, as the Inspector edits it. */
@@ -83,6 +85,7 @@ export interface CMSListQuery {
   sort?: CmsListSortKey[];
   skip?: number;
   limit?: number;
+  excludeCurrent?: boolean;
 }
 
 /** The part of an element a binding copy walks. */
@@ -597,10 +600,10 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
       return false;
     }
     const next: CMSCollectionBinding = { ...binding };
-    for (const key of ["filter", "sort", "skip", "limit"] as const) {
+    for (const key of ["filter", "sort", "skip", "limit", "excludeCurrent"] as const) {
       if (!(key in query)) continue;
       const v = query[key];
-      if (v === undefined || (Array.isArray(v) && v.length === 0)) delete next[key];
+      if (v === undefined || v === false || (Array.isArray(v) && v.length === 0)) delete next[key];
       else (next as unknown as Record<string, unknown>)[key] = v;
     }
     const safe = filterCmsBindings({ collection: { [listId]: next } })?.collection?.[listId];

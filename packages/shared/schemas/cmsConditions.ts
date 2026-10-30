@@ -200,6 +200,7 @@ export function evaluateCmsCondition(
 
 /** A record as a list query sees it: its data plus its own timestamps. */
 export interface CmsQueryRecord {
+  id?: string;
   data: Record<string, unknown>;
   createdAt?: string;
   updatedAt?: string;
@@ -227,6 +228,8 @@ export interface CmsListQuery {
   sort?: readonly CmsListSortKey[];
   skip?: number;
   limit?: number;
+  /** "Exclude this page's record" (B5-D94): the record with this id is left out. */
+  excludeId?: string | null;
 }
 
 /**
@@ -236,6 +239,7 @@ export interface CmsListQuery {
  */
 export function applyCmsListQuery<T extends CmsQueryRecord>(records: readonly T[], query: CmsListQuery, pageRecord?: Record<string, unknown> | null): T[] {
   let out = query.filter ? records.filter((r) => evaluateCmsCondition(query.filter as CmsCondition, r.data, pageRecord)) : [...records];
+  if (query.excludeId) out = out.filter((r) => r.id !== query.excludeId);
   const keys = query.sort ?? [];
   if (keys.length > 0) {
     out = out
@@ -273,5 +277,105 @@ export function decodeCmsCondition(raw: string): CmsCondition | null {
     return parsed.success ? parsed.data : null;
   } catch {
     return null;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Per generated page (B-26 / B-27). A collection's template page is exported
+ * once and filled once per record on the server (`generateDynamicPages`).
+ * What depends on THAT record travels in the markup:
+ *   data-bk-if="<condition>"        an element shown only when its condition
+ *                                   holds on the page's record;
+ *   data-bk-query="<list query>"    a Collection list whose filter reads the
+ *                                   page's record (`@page.*`) or excludes it —
+ *                                   its copies carry data-bk-item (the record
+ *                                   id) and data-bk-row (the fields the filter
+ *                                   reads), already sorted; the per-page pass
+ *                                   filters, excludes, skips and takes Show.
+ * `applyRecordPass` is that pass, over any DOM (the server's jsdom, the
+ * editor's preview). One evaluator, one place.
+ * ------------------------------------------------------------------------- */
+
+export const CMS_LIST_QUERY_ATTR = "data-bk-query";
+export const CMS_LIST_ITEM_ATTR = "data-bk-item";
+export const CMS_LIST_ROW_ATTR = "data-bk-row";
+
+/** What a list hands the per-page pass. */
+export interface CmsPageListQuery {
+  filter?: CmsCondition;
+  skip?: number;
+  limit?: number;
+  excludeCurrent?: boolean;
+}
+
+const pageListQuerySchema = z.object({
+  filter: cmsConditionSchema.optional(),
+  skip: z.number().int().min(0).optional(),
+  limit: z.number().int().min(0).optional(),
+  excludeCurrent: z.boolean().optional(),
+});
+
+export const encodeCmsJson = (value: unknown): string => encodeURIComponent(JSON.stringify(value));
+
+function decodeJson(raw: string | null): unknown {
+  if (!raw) return null;
+  try {
+    return JSON.parse(decodeURIComponent(raw));
+  } catch {
+    return null;
+  }
+}
+
+/** Does this exported page carry anything the per-page pass acts on? */
+export function needsRecordPass(html: string): boolean {
+  return html.includes(CMS_CONDITION_ATTR) || html.includes(CMS_LIST_QUERY_ATTR);
+}
+
+/** The fields a condition reads (the head of each dotted path). */
+export function conditionFields(condition: CmsCondition | undefined): string[] {
+  return condition ? [...new Set(condition.rules.map((r) => r.field.split(".")[0]))] : [];
+}
+
+/**
+ * Apply one record to an exported template page: conditions decide their
+ * elements, lists reduce their copies. Mutates `root`; every marker it reads
+ * is removed. An undecodable marker keeps its element / copies (shown).
+ */
+export function applyRecordPass(root: { querySelectorAll(sel: string): ArrayLike<Element> }, record: Record<string, unknown>, recordId?: string | null): void {
+  for (const el of Array.from(root.querySelectorAll(`[${CMS_CONDITION_ATTR}]`))) {
+    const condition = decodeCmsCondition(el.getAttribute(CMS_CONDITION_ATTR) ?? "");
+    el.removeAttribute(CMS_CONDITION_ATTR);
+    if (condition && !evaluateCmsCondition(condition, record)) el.remove();
+  }
+  for (const list of Array.from(root.querySelectorAll(`[${CMS_LIST_QUERY_ATTR}]`))) {
+    const parsed = pageListQuerySchema.safeParse(decodeJson(list.getAttribute(CMS_LIST_QUERY_ATTR)));
+    list.removeAttribute(CMS_LIST_QUERY_ATTR);
+    const copies = Array.from(list.children).filter((c) => c.hasAttribute(CMS_LIST_ITEM_ATTR));
+    if (parsed.success) {
+      const q = parsed.data;
+      /* One record may render as several nodes: decide per record, in order. */
+      const order: string[] = [];
+      const rows = new Map<string, Record<string, unknown>>();
+      for (const c of copies) {
+        const id = c.getAttribute(CMS_LIST_ITEM_ATTR) ?? "";
+        if (!rows.has(id)) {
+          order.push(id);
+          const row = decodeJson(c.getAttribute(CMS_LIST_ROW_ATTR));
+          rows.set(id, row && typeof row === "object" ? (row as Record<string, unknown>) : {});
+        }
+      }
+      const kept = new Set(
+        applyCmsListQuery(
+          order.map((id) => ({ id, data: rows.get(id) ?? {} })),
+          { filter: q.filter, skip: q.skip, limit: q.limit, excludeId: q.excludeCurrent ? (recordId ?? null) : null },
+          record,
+        ).map((r) => r.id),
+      );
+      for (const c of copies) if (!kept.has(c.getAttribute(CMS_LIST_ITEM_ATTR) ?? "")) c.remove();
+    }
+    for (const c of copies) {
+      c.removeAttribute(CMS_LIST_ITEM_ATTR);
+      c.removeAttribute(CMS_LIST_ROW_ATTR);
+    }
   }
 }

@@ -27,6 +27,7 @@ import { insertBeforeHeadClose } from "@/lib/publish-html";
 import { sanitizeCmsRichText } from "@buildrik/shared/content/cmsRichText";
 import { escapeHtmlText } from "@buildrik/shared/schemas/element-markup";
 import { CMS_COLLECTION_LIMIT_MAX, filterCmsBindings } from "@buildrik/shared/schemas/sites";
+import { applyRecordPass, needsRecordPass } from "@buildrik/shared/schemas/cmsConditions";
 
 /**
  * CMS server persistence (E7) — the ONLY layer that reads/writes cms_collections
@@ -888,6 +889,26 @@ function stripExistingSeoTags(html: string): string {
     .replace(/<link\b[^>]*\brel\s*=\s*["']canonical["'][^>]*>/gi, "");
 }
 
+/**
+ * B-26 / B-27 (packages/editor/docs/design-2l9/engine-conditions.md,
+ * engine-list-query.md): what on a template page depends on THIS record —
+ * `data-bk-if` elements and `data-bk-query` lists — decided with the shared
+ * evaluator the editor runs (`applyRecordPass`). A page carrying neither is
+ * returned untouched, byte for byte. The parse is jsdom's (through
+ * isomorphic-dompurify, the sanitizer's own DOM), so scripts never run.
+ */
+function applyRecordToPage(html: string, data: Record<string, unknown>, recordId: string): string {
+  if (!needsRecordPass(html)) return html;
+  const probe = DOMPurify.sanitize("<p></p>", { RETURN_DOM: true }) as unknown as HTMLElement;
+  const doc = probe.ownerDocument.implementation.createHTMLDocument("");
+  doc.open();
+  doc.write(html);
+  doc.close();
+  applyRecordPass(doc, data, recordId);
+  const doctype = /^\s*<!doctype[^>]*>/i.exec(html)?.[0]?.trim() ?? "";
+  return `${doctype ? `${doctype}\n` : ""}${doc.documentElement.outerHTML}`;
+}
+
 export async function generateDynamicPages(
   siteId: string,
   collectionId: string,
@@ -916,6 +937,8 @@ export async function generateDynamicPages(
     /* A record's own keys count as fields too (a collection stored without
        its field list still fills its tokens); any other {word} stays. */
     let html = substituteOutsideScriptStyle(cleanedTemplate, data, richtext, new Set([...fieldKeys, ...Object.keys(data)]));
+    /* B-26 / B-27: this record's conditions and list queries. */
+    html = applyRecordToPage(html, data, e.id);
     const seoTags =
       `<title>${escapeHtmlText(seoTitle)}</title>` +
       (seoTitle ? `<meta property="og:title" content="${escapeHtmlText(seoTitle)}">` : "") +

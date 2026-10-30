@@ -2936,7 +2936,7 @@ const CASES: Record<string, () => React.ReactElement> = {
         /* `?cms=template` — Home is Blog's template page; the binding follows
            this page's record (B5-D04/D05). `&fields=1` adds Blog's other
            field types (B5-D03). */
-        if (q.get("cms") === "template") await c.cms.collections.updateCollection(col.id, { pageTemplatePath: "index.html" } as never);
+        if (q.get("cms") === "template" || q.get("templatePage")) await c.cms.collections.updateCollection(col.id, { pageTemplatePath: "index.html" } as never);
         if (q.get("fields"))
           await c.cms.collections.updateCollection(col.id, {
             fields: [
