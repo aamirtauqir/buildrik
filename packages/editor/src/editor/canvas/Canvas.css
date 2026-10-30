@@ -644,8 +644,9 @@ button:hover > .bd-canvas-empty-cta__thumb {
 }
 
 /* A-12 "Show outlines" (board 145:64586): every element's edge, the content
-   left as it is — X-Ray's outline without its wireframe. */
-.buildrik-canvas[data-outlines="true"] [data-buildrik-id] {
+   left as it is — X-Ray's outline without its wireframe. (Spelled "buildrik"
+   on both names until 2026-10-30, so it matched nothing.) */
+.buildrick-canvas[data-outlines="true"] [data-buildrick-id] {
   outline: 1px dashed var(--bk-border-medium);
   outline-offset: -1px;
 }

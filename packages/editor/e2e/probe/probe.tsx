@@ -2783,6 +2783,18 @@ const CASES: Record<string, () => React.ReactElement> = {
   ),
   /* design-2l9 101:42581 — the empty canvas CTA inside a 760×580 page card
      (owner 2026-10-30 keeps its cards and actions). */
+  /* A-12 / board 145:64586 — "Show outlines" on the canvas container: the
+     real class and attribute names, three nested elements. */
+  "canvas-outlines": () => (
+    <div data-probe="canvas-outlines" style={{ width: 400, height: 240, background: "#fff" }}>
+      <div className="buildrick-canvas" data-outlines="true" style={{ position: "relative", padding: 24 }}>
+        <section data-buildrick-id="o1" data-testid="outline-section" style={{ padding: 16 }}>
+          <h2 data-buildrick-id="o2" style={{ margin: 0 }}>Thoughtful design.</h2>
+          <p data-buildrick-id="o3" style={{ margin: "8px 0 0" }}>Lasting impact.</p>
+        </section>
+      </div>
+    </div>
+  ),
   "canvas-empty": () => (
     <div data-probe="canvas-empty" style={{ position: "relative", width: 760, height: 580, background: "#fff" }}>
       <CanvasEmptyCTA onBrowseTemplates={() => {}} onAddBlock={() => {}} onStartBlank={() => {}} />
@@ -4487,7 +4499,7 @@ if (name.startsWith("pages-")) {
    the file also claims .bk-topbar* and .bk-notif-*. */
 /* Canvas.css carries .bd-canvas-empty-cta; Canvas.tsx imports it, but the
    canvas-empty case mounts only the CTA. */
-if (name === "canvas-empty") {
+if (name === "canvas-empty" || name === "canvas-outlines") {
   await import("@/editor/canvas/Canvas.css");
 }
 if (name.startsWith("notifications-")) {
