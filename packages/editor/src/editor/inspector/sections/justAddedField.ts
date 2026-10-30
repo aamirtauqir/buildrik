@@ -6,7 +6,8 @@
  *
  * The same receipt rule serves the other "just made" bodies, by kind: a
  * Tabs pair just repaired (C04 "{n} linked") and a local modal just inserted
- * from a component (C10 "Local modal created"), each with the element it
+ * from a component (C10 "Local modal created") and an element just converted
+ * to another semantic tag (A13 "Content retained"), each with the element it
  * came from.
  *
  * @license BSD-3-Clause
@@ -15,7 +16,7 @@ import * as React from "react";
 import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants/events";
 
-export type JustMadeKind = "field" | "tabs-linked" | "local-modal";
+export type JustMadeKind = "field" | "tabs-linked" | "local-modal" | "semantic-converted";
 
 let added: { elementId: string; undoCount: number; kind: JustMadeKind; fromId?: string } | null = null;
 const listeners = new Set<() => void>();

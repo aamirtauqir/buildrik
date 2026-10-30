@@ -5536,8 +5536,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No \"Change semantic tag\" impact review / one-Undo conversion",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 23, probe ?type=heading&layerName=Hero heading → Semantics › Tag 'p — change to paragraph…', side by side with shots/247-27113.png: 'Change semantic tag' — Current h2, New tag p, 'Text, nested emphasis, ID, styles and links can be preserved. Heading semantics will change.', primary 'Change to paragraph', Cancel, 'One Undo restores the original tag and attributes.' Match; the probe keeps the heading's type block above (the board leaves it out). The select never applies a cross-type tag directly.",
    "tier": "P1"
   },
   {
@@ -5547,8 +5547,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No \"Change semantic tag\" impact review / one-Undo conversion",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 23, probe → Change to paragraph, side by side with shots/247-27602.png: the SAME node (same id, content, children, attributes incl. ID, styles — elementConversion.replaceInPlace) is a paragraph in ONE history step; Semantics opens with Tag Paragraph, ID, 'Content retained' — 'The same node and inline children are retained. Styles and references are unchanged.', 'Edit text on canvas'; toast 'Heading changed to paragraph. · Undo'. Match (Tag reads 'Paragraph' — the row's label for p).",
    "tier": "P1"
   },
   {
@@ -5811,8 +5811,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No native-tag (time/abbr/wbr…) Tag control or attribute routes",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 23, reference board (support routes). Content › Semantics now routes each native tag to its own attributes on the actual node (NATIVE_ATTRS, one Undo per write through the lock gate): time · datetime + lang, abbr/dfn title, q/blockquote/del/ins cite (+ datetime), data value, bdo/bdi dir; headings keep Tag H1–H6 + ID; figure → 'Edit caption' selects its figcaption. Probe-checked on a meter (same section). Landmarks keep their actual native tag read-only. Inline marks are preserved by the text editor (no change).",
    "tier": "P1"
   },
   {
@@ -5822,8 +5822,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No native-tag (time/abbr/wbr…) Tag control or attribute routes",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 23, reference board: lists — ol start / Reversed / Numbering, li value (dt/dd are edited as their own nodes; no auto-conversion); native forms — fieldset Disabled + Owner form + 'Edit legend', option value/label/Disabled/Selected, optgroup, output for/name/form, label for (select options: F31); media — track Kind / Language / Source / label / Default, source src/type/srcset/media/sizes on the exact node.",
    "tier": "P1"
   },
   {
@@ -5833,8 +5833,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No native-tag (time/abbr/wbr…) Tag control or attribute routes",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 23, reference board: tables — th/td Scope/Headers/Colspan/Rowspan are the existing Table cell section (C14), col/colgroup span, table 'Edit caption'; details 'Initial open' + 'Edit summary', native dialog 'Open' (not assumed to be a Buildrik Modal — the Modal model only acts on [data-modal-key]); meter Value / Min / Max / Low / High / Optimum (probe-checked), progress keeps its type block.",
    "tier": "P1"
   },
   {
@@ -5844,8 +5844,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No native-tag (time/abbr/wbr…) Tag control or attribute routes",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 23, reference board: br / hr / wbr say 'No text or children — a {tag} keeps its place in the line.' (no padding/drop UI added); SVG subtree — svg viewBox, path d / Stroke / Fill, circle and rect geometry + paint, use 'Fragment ref' (href); links stay on Behavior › Link (B69). No vector editor (deferred by the board).",
    "tier": "P1"
   },
   {

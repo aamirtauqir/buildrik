@@ -16,7 +16,7 @@
 
 import type { Composer } from "@/engine";
 import type { Element } from "@/engine/elements/Element";
-import type { ElementData } from "@/shared/types/element";
+import { replaceInPlace } from "./elementConversion";
 import { escapeHTML, unescapeHTML } from "@/shared/utils/html/encoding";
 
 const NOT_FIELDS = new Set(["submit", "button", "reset", "hidden", "image"]);
@@ -128,33 +128,15 @@ export function formOf(field: Element): Element | null {
   return null;
 }
 
-/** What a field carries across a tag change: everything but its type, tag,
- *  content and children — the id (BD-29: a conversion never replaces the
- *  identity), classes, styles at every breakpoint, lock, layer data. */
-function identityOf(el: Element): Partial<ElementData> {
-  const data: Partial<ElementData> = el.getData();
-  for (const key of ["type", "tagName", "content", "contentFormat", "children", "attributes"] as const) delete data[key];
-  return data;
-}
-
-/** Swap an input for a textarea (or back), keeping the field's identity,
- *  name / placeholder / place. Returns the swapped element (same id). Callers
- *  own the lock gate + transaction. */
 export function replaceField(composer: Composer, el: Element, type: string): Element | null {
-  const parent = el.getParent();
-  if (!parent) return null;
-  const identity = identityOf(el);
-  const index = parent.getChildIndex(el);
   const attributes: Record<string, string> = {};
   for (const name of ["name", "placeholder", "aria-label", "required", "id", "minlength", "maxlength"]) {
     const v = el.getAttribute(name);
     if (v !== undefined) attributes[name] = v;
   }
   if (type !== "textarea") attributes.type = type;
-  composer.elements.removeElement(el.getId());
-  const next = composer.elements.createElement(type === "textarea" ? "textarea" : "input", { ...identity, attributes });
-  composer.elements.addElement(next, parent.getId(), index);
-  return next;
+  const tag = type === "textarea" ? "textarea" : "input";
+  return replaceInPlace(composer, el, tag, { tagName: tag, attributes }, true);
 }
 
 
@@ -197,20 +179,13 @@ export function conversionRefusal(composer: Composer, field: Element): string | 
  * options, their order and the default).
  */
 export function convertSelectToText(composer: Composer, field: Element): Element | null {
-  const parent = field.getParent();
-  if (!parent || conversionRefusal(composer, field)) return null;
-  const id = field.getId();
-  const data = identityOf(field);
-  const index = parent.getChildIndex(field);
+  if (conversionRefusal(composer, field)) return null;
   const fallback = selectOptions(field).find((o) => o.isDefault);
   const attributes: Record<string, string> = { ...(field.getData().attributes ?? {}), type: "text" };
   delete attributes.multiple;
   delete attributes.size;
   if (fallback) attributes.value = fallback.value ?? fallback.label;
-  composer.elements.removeElement(id);
-  const next = composer.elements.createElement("input", { ...data, tagName: "input", attributes });
-  composer.elements.addElement(next, parent.getId(), index);
-  return next;
+  return replaceInPlace(composer, field, "input", { tagName: "input", attributes }, true);
 }
 
 /** Make the option at `index` the select's default (`selected`), the others not. */

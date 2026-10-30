@@ -122,8 +122,9 @@ export const CONTENT_SECTIONS: Record<string, AnySectionEntry> = {
     title: "Semantics",
     /* A form field's ID is in Advanced attributes — F02 draws no Semantics. */
     capability: (caps) => caps.typeBlock !== "input",
-    /* 2L9: open with an ID (161:8480), else shut reading its tag (156:716). */
-    open: "set",
+    /* 2L9: open with an ID (161:8480), else shut reading its tag (156:716);
+       open right after a tag conversion, on "Content retained" (A13). */
+    open: (ctx) => (isJustAdded(ctx.composer, ctx.selectedElement.id, "semantic-converted") ? "always" : "set"),
     hasValue: (ctx) => Boolean(ctx.composer?.elements.getElement(ctx.selectedElement.id)?.getAttribute?.("id")),
     summary: (ctx) => {
       const tag = ctx.composer?.elements.getElement(ctx.selectedElement.id)?.getTagName?.();
