@@ -3489,7 +3489,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Placeholder/bands differ; no nested 'Go to page ›' scope or footer key legend; AI command row :239 (pr33)",
+   "verifiedNote": "Round 34 L-A, probe-compared (case command-palette): built — placeholder 'Search actions, pages, layers, records…', no scope chip unscoped, legend '↑↓ Move ↵ Run → Open Esc Close' + '? Keys' (opens the shortcuts sheet), a disabled row's reason on its own line, 'Go to page ›' opening the nested list ('Filter pages…', '‹ Go to page', current page 'Already on this page'), no-results 'No results for “q”' / 'Check the spelling or try a shorter word.' Still open: the opening list's curated bands (Recent · For “{selection}” · Areas & tasks · Help) in sentence case, 13px rows and the filled input.",
    "tier": "P2"
   },
   {
@@ -3500,7 +3500,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Placeholder/bands differ; no nested 'Go to page ›' scope or footer key legend; AI command row :239 (pr33)",
+   "verifiedNote": "Round 34 L-A, probe-compared (case command-palette): built — placeholder 'Search actions, pages, layers, records…', no scope chip unscoped, legend '↑↓ Move ↵ Run → Open Esc Close' + '? Keys' (opens the shortcuts sheet), a disabled row's reason on its own line, 'Go to page ›' opening the nested list ('Filter pages…', '‹ Go to page', current page 'Already on this page'), no-results 'No results for “q”' / 'Check the spelling or try a shorter word.' Still open: the opening list's curated bands (Recent · For “{selection}” · Areas & tasks · Help) in sentence case, 13px rows and the filled input.",
    "inheritsFrom": "263:250083",
    "tier": "P2"
   },
@@ -3512,7 +3512,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Placeholder/bands differ; no nested 'Go to page ›' scope or footer key legend; AI command row :239 (pr33)",
+   "verifiedNote": "Round 34 L-A, probe-compared (case command-palette): built — placeholder 'Search actions, pages, layers, records…', no scope chip unscoped, legend '↑↓ Move ↵ Run → Open Esc Close' + '? Keys' (opens the shortcuts sheet), a disabled row's reason on its own line, 'Go to page ›' opening the nested list ('Filter pages…', '‹ Go to page', current page 'Already on this page'), no-results 'No results for “q”' / 'Check the spelling or try a shorter word.' Still open: the opening list's curated bands (Recent · For “{selection}” · Areas & tasks · Help) in sentence case, 13px rows and the filled input.",
    "inheritsFrom": "263:250083",
    "tier": "P2"
   },
@@ -3536,7 +3536,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Placeholder/bands differ; no nested 'Go to page ›' scope or footer key legend; AI command row :239 (pr33)",
+   "verifiedNote": "Round 34 L-A, probe-compared (case command-palette): built — placeholder 'Search actions, pages, layers, records…', no scope chip unscoped, legend '↑↓ Move ↵ Run → Open Esc Close' + '? Keys' (opens the shortcuts sheet), a disabled row's reason on its own line, 'Go to page ›' opening the nested list ('Filter pages…', '‹ Go to page', current page 'Already on this page'), no-results 'No results for “q”' / 'Check the spelling or try a shorter word.' Still open: the opening list's curated bands (Recent · For “{selection}” · Areas & tasks · Help) in sentence case, 13px rows and the filled input.",
    "inheritsFrom": "263:250083",
    "tier": "P2"
   },
@@ -3557,7 +3557,7 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:palette-scope-origin (REQUESTS A-44)",
    "verified": "no",
    "verifiedNote": "No scope chip / scoped-no-results states",
    "tier": "P2"
@@ -3568,7 +3568,7 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:palette-scope-origin (REQUESTS A-44)",
    "verified": "no",
    "verifiedNote": "No scope chip / scoped-no-results states",
    "tier": "P2"
@@ -3579,7 +3579,7 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:palette-scope-origin (REQUESTS A-44)",
    "verified": "no",
    "verifiedNote": "No scope chip / scoped-no-results states",
    "tier": "P2"
@@ -3658,7 +3658,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Search exists; no macOS/Windows key toggle or single-key preference",
+   "verifiedNote": "Round 34 L-A: 'Show keys for macOS | Windows' built (KeyboardCheatSheet; every chip respells, test). Still open: the per-row scope column ('Global incl. fields', 'Canvas'), the 'Search commands ⌘K' head link, and the single-key preference (REQUESTS A-43).",
    "tier": "P2"
   },
   {
@@ -3669,7 +3669,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Search exists; no macOS/Windows key toggle or single-key preference",
+   "verifiedNote": "Round 34 L-A: 'Show keys for macOS | Windows' built (KeyboardCheatSheet; every chip respells, test). Still open: the per-row scope column ('Global incl. fields', 'Canvas'), the 'Search commands ⌘K' head link, and the single-key preference (REQUESTS A-43).",
    "inheritsFrom": "263:255899",
    "tier": "P2"
   },
@@ -3679,9 +3679,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:engine-single-key-pref (REQUESTS A-43)",
    "verified": "drift-open",
-   "verifiedNote": "Search exists; no macOS/Windows key toggle or single-key preference",
+   "verifiedNote": "Round 34 L-A: 'Show keys for macOS | Windows' built (KeyboardCheatSheet; every chip respells, test). Still open: the per-row scope column ('Global incl. fields', 'Canvas'), the 'Search commands ⌘K' head link, and the single-key preference (REQUESTS A-43).",
    "inheritsFrom": "263:255899",
    "tier": "P2"
   },
@@ -3888,7 +3888,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Search exists; no macOS/Windows key toggle or single-key preference",
+   "verifiedNote": "Round 34 L-A: 'Show keys for macOS | Windows' built (KeyboardCheatSheet; every chip respells, test). Still open: the per-row scope column ('Global incl. fields', 'Canvas'), the 'Search commands ⌘K' head link, and the single-key preference (REQUESTS A-43).",
    "inheritsFrom": "263:255899",
    "tier": "P2"
   },
@@ -3900,7 +3900,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Placeholder/bands differ; no nested 'Go to page ›' scope or footer key legend; AI command row :239 (pr33)",
+   "verifiedNote": "Round 34 L-A, probe-compared (case command-palette): built — placeholder 'Search actions, pages, layers, records…', no scope chip unscoped, legend '↑↓ Move ↵ Run → Open Esc Close' + '? Keys' (opens the shortcuts sheet), a disabled row's reason on its own line, 'Go to page ›' opening the nested list ('Filter pages…', '‹ Go to page', current page 'Already on this page'), no-results 'No results for “q”' / 'Check the spelling or try a shorter word.' Still open: the opening list's curated bands (Recent · For “{selection}” · Areas & tasks · Help) in sentence case, 13px rows and the filled input. Scope chip: REQUESTS A-44.",
    "inheritsFrom": "263:250083",
    "tier": "P2"
   },
@@ -3910,9 +3910,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:engine-single-key-pref (REQUESTS A-43)",
    "verified": "drift-open",
-   "verifiedNote": "Search exists; no macOS/Windows key toggle or single-key preference",
+   "verifiedNote": "Round 34 L-A: 'Show keys for macOS | Windows' built (KeyboardCheatSheet; every chip respells, test). Still open: the per-row scope column ('Global incl. fields', 'Canvas'), the 'Search commands ⌘K' head link, and the single-key preference (REQUESTS A-43).",
    "inheritsFrom": "263:255899",
    "tier": "P2"
   },

@@ -50,6 +50,8 @@ interface PaletteCommand {
    *  muted as "Label · reason" and don't close the palette. */
   disabled?: boolean;
   disabledReason?: string;
+  /** A door into a nested list (263:250988 "Go to page ›"): → or click opens it. */
+  opens?: "pages";
 }
 
 export interface CommandPaletteProps {
@@ -155,6 +157,9 @@ function buildCommands(
     }
     commands.push({ id: `nav-${id}`, label, group: "Navigate", keywords, handler: run(fn) });
   }
+  /* 263:250083 / 263:250988: the pages are one nested list, not rows. */
+  commands.push({ id: "nav-go-to-page", label: "Go to page", group: "Navigate", keywords: ["page", "open", "switch"], opens: "pages", handler: () => undefined });
+
   /* The Permissions dialog's door for every role but a viewer (whose door is
      the inspector notice) — and, for the owner, the way to delete the site
      (5905:44701). "More", so it shows only once typed: 4418:141220's opening
@@ -177,9 +182,9 @@ function buildCommands(
      engine cannot carry this — its list is built once at startup while the
      selection changes under it — so the reason is computed here, each open. */
   const guard = (cmd: { id: string; requiresSelection?: boolean }): string | undefined => {
-    if (cmd.id === "group") return selectedCount < 2 ? "select two or more" : undefined;
-    if (cmd.id === "ungroup") return selectedType !== "container" ? "select a group" : undefined;
-    if (cmd.id === "paste") return composer.clipboard?.length ? undefined : "nothing copied";
+    if (cmd.id === "group") return selectedCount < 2 ? "Select two or more elements" : undefined;
+    if (cmd.id === "ungroup") return selectedType !== "container" ? "Select a group" : undefined;
+    if (cmd.id === "paste") return composer.clipboard?.length ? undefined : "Nothing copied";
     if (cmd.requiresSelection) return selectedCount === 0 ? "Select an element first" : undefined;
     return undefined;
   };
@@ -432,6 +437,8 @@ const CommandPaletteCard: React.FC<CommandPaletteProps> = ({
 }) => {
   const [query, setQuery] = React.useState(initialQuery);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
+  /* 263:250988: inside "Go to page" — the list is the site's pages. */
+  const [nested, setNested] = React.useState<"pages" | null>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
   const listRef = React.useRef<HTMLDivElement>(null);
   /* Same predicate + same viewer computation StudioPanels' rail/ui:switch-tab
@@ -485,11 +492,36 @@ const CommandPaletteCard: React.FC<CommandPaletteProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [composer]);
 
+  const openNested = React.useCallback((to: "pages" | null) => {
+    setNested(to);
+    setQuery("");
+    setSelectedIndex(0);
+    setTimeout(() => inputRef.current?.focus(), 0);
+  }, []);
+
   const runCommand = React.useCallback((cmd: PaletteCommand) => {
     if (cmd.disabled) return;
+    if (cmd.opens) return openNested(cmd.opens);
     recordCommandRun(cmd.id.replace(/^recent-/, ""));
     cmd.handler();
-  }, []);
+  }, [openNested]);
+
+  /* The nested page list: every page, the one on the canvas named and inert. */
+  const pageCommands = React.useMemo<PaletteCommand[]>(() => {
+    if (nested !== "pages" || !composer) return [];
+    const active = composer.elements.getActivePage?.()?.id;
+    return composer.elements.getAllPages().map((page) => ({
+      id: `goto-${page.id}`,
+      label: page.name,
+      group: "‹ Go to page",
+      disabled: page.id === active,
+      disabledReason: page.id === active ? "Already on this page" : undefined,
+      handler: () => {
+        composer.elements.setActivePage(page.id);
+        onClose();
+      },
+    }));
+  }, [nested, composer, onClose]);
 
   /* RECENT (S3.14, restored off-board — the owner's "never silently remove a
      capability"; 4418:141220 draws no strip, logged in the designer notes):
@@ -519,11 +551,12 @@ const CommandPaletteCard: React.FC<CommandPaletteProps> = ({
 
   const visibleCommands = React.useMemo(() => {
     const q = query.toLowerCase().trim();
+    if (nested === "pages") return pageCommands.filter((c) => !q || c.label.toLowerCase().includes(q));
     if (!q) return [...recentCommands, ...commands.filter((c) => OPENING_BANDS.has(c.group))];
     return [...commands, ...recordCommands].filter((cmd) =>
       [cmd.label, cmd.group, ...(cmd.keywords ?? [])].join(" ").toLowerCase().includes(q),
     );
-  }, [commands, recordCommands, recentCommands, query]);
+  }, [commands, recordCommands, recentCommands, query, nested, pageCommands]);
 
   // A query that matches nothing is never a dead end: stock photos. (No
   // "Ask AI instead" — no AI entry points in the editor UI, owner 2026-10-17.)
@@ -569,6 +602,21 @@ const CommandPaletteCard: React.FC<CommandPaletteProps> = ({
           e.preventDefault();
           setSelectedIndex((i) => Math.max(i - 1, 0));
           break;
+        case "ArrowRight": {
+          const cmd = orderedCommands[selectedIndex];
+          if (cmd?.opens) {
+            e.preventDefault();
+            openNested(cmd.opens);
+          }
+          break;
+        }
+        case "ArrowLeft":
+        case "Backspace":
+          if (nested && !query) {
+            e.preventDefault();
+            openNested(null);
+          }
+          break;
         case "Enter":
           e.preventDefault();
           if (orderedCommands.length === 0 && query.trim()) searchStock();
@@ -579,7 +627,7 @@ const CommandPaletteCard: React.FC<CommandPaletteProps> = ({
           break;
       }
     },
-    [orderedCommands, selectedIndex, onClose, query, searchStock, runCommand],
+    [orderedCommands, selectedIndex, onClose, query, searchStock, runCommand, nested, openNested],
   );
 
   return (
@@ -607,7 +655,7 @@ const CommandPaletteCard: React.FC<CommandPaletteProps> = ({
             ref={inputRef}
             data-autofocus=""
             type="text"
-            placeholder="Search pages, layers, assets and actions…"
+            placeholder={nested === "pages" ? "Filter pages…" : "Search actions, pages, layers, records…"}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             /* A combobox over the listbox below, so the highlight the arrow
@@ -617,7 +665,7 @@ const CommandPaletteCard: React.FC<CommandPaletteProps> = ({
             aria-controls={LIST_ID}
             aria-autocomplete="list"
             aria-activedescendant={orderedCommands[selectedIndex] ? `${LIST_ID}-${selectedIndex}` : undefined}
-            aria-label="Search pages, layers, assets and actions"
+            aria-label={nested === "pages" ? "Filter pages" : "Search actions, pages, layers, records"}
             data-testid="cmdk-input"
             /* a11y.css's unlayered `*:focus-visible` ring beats any layered
                utility; `style` reaches the real <input> on this wrapper. */
@@ -638,12 +686,6 @@ const CommandPaletteCard: React.FC<CommandPaletteProps> = ({
               ✕
             </Button>
           )}
-          <span
-            data-testid="cmdk-scope"
-            className="tw:flex-none tw:rounded tw:bg-[var(--bk-bg-subtle)] tw:px-1.5 tw:py-0.5 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-soft)]"
-          >
-            Scope: everything
-          </span>
         </div>
         <div className="tw:h-px tw:flex-none tw:bg-[var(--bk-border)]" />
 
@@ -660,17 +702,31 @@ const CommandPaletteCard: React.FC<CommandPaletteProps> = ({
                 className="tw:flex tw:flex-col tw:items-center tw:justify-center tw:gap-1 tw:px-4 tw:py-6 tw:text-center tw:text-[12px] tw:leading-[18px]"
                 data-testid="cmdk-no-results"
               >
-                <div data-testid="cmdk-no-results-line" className="tw:text-[var(--bk-ink-muted)]">
-                  Nothing matches &lsquo;{query.trim()}&rsquo;.
+                {/* 263:253111 */}
+                <div data-testid="cmdk-no-results-line" className="tw:font-medium tw:text-[var(--bk-ink)]">
+                  No results for &ldquo;{query.trim()}&rdquo;
                 </div>
-                <Button onClick={searchStock} data-idx={0} variant="link" data-testid="cmdk-no-results-stock">
-                  Search stock photos for &lsquo;{query.trim()}&rsquo;
-                </Button>
+                <div className="tw:text-[var(--bk-ink-muted)]">Check the spelling or try a shorter word.</div>
+                {nested ? null : (
+                  <Button onClick={searchStock} data-idx={0} variant="link" data-testid="cmdk-no-results-stock">
+                    Search stock photos for &ldquo;{query.trim()}&rdquo; ›
+                  </Button>
+                )}
               </div>
             ) : null
           ) : (
             bands.map(([group, cmds]) => (
               <div key={group}>
+                {nested && group === "‹ Go to page" ? (
+                  <Button
+                    variant="link"
+                    data-testid="cmdk-nested-back"
+                    onClick={() => openNested(null)}
+                    className="tw:h-auto tw:min-h-0 tw:px-4 tw:pt-2 tw:pb-1 tw:text-[12px] tw:font-medium tw:leading-4"
+                  >
+                    ‹ Go to page
+                  </Button>
+                ) : (
                 <div
                   role="presentation"
                   data-testid={`cmdk-band-${bandSlug(group)}`}
@@ -678,6 +734,7 @@ const CommandPaletteCard: React.FC<CommandPaletteProps> = ({
                 >
                   {group}
                 </div>
+                )}
                 {cmds.map((cmd) => {
                   const globalIdx = orderedCommands.indexOf(cmd);
                   const isSelected = globalIdx === selectedIndex;
@@ -695,7 +752,7 @@ const CommandPaletteCard: React.FC<CommandPaletteProps> = ({
                       aria-disabled={cmd.disabled || undefined}
                       data-testid={`cmdk-row-${cmd.id}`}
                       variant="ghost"
-                      className={`tw:flex tw:h-8 tw:min-h-0 tw:w-full tw:items-center tw:justify-between tw:gap-2 tw:rounded-none tw:border-0 tw:px-4 tw:py-0 tw:text-left ${
+                      className={`tw:flex ${cmd.disabled && cmd.disabledReason ? "tw:h-11" : "tw:h-8"} tw:min-h-0 tw:w-full tw:items-center tw:justify-between tw:gap-2 tw:rounded-none tw:border-0 tw:px-4 tw:py-0 tw:text-left ${
                         isSelected
                           ? "tw:bg-[var(--bk-bg-subtle)] tw:enabled:hover:bg-[var(--bk-bg-subtle)]"
                           : "tw:bg-transparent tw:enabled:hover:bg-transparent"
@@ -705,7 +762,11 @@ const CommandPaletteCard: React.FC<CommandPaletteProps> = ({
                         data-testid={`cmdk-label-${cmd.id}`}
                         className="tw:min-w-0 tw:overflow-hidden tw:text-ellipsis tw:whitespace-nowrap tw:text-[11px] tw:font-normal tw:leading-4 tw:text-[var(--bk-ink-soft)]"
                       >
-                        {cmd.disabled && cmd.disabledReason ? `${cmd.label} · ${cmd.disabledReason}` : cmd.label}
+                        {cmd.opens ? `${cmd.label} ›` : cmd.label}
+                        {/* 263:251794: why it can't run, on its own line. */}
+                        {cmd.disabled && cmd.disabledReason ? (
+                          <span className="tw:block tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">{cmd.disabledReason}</span>
+                        ) : null}
                       </span>
                       {showChord && cmd.shortcut ? <Kbd shortcut={cmd.shortcut} testId={`cmdk-kbd-${cmd.id}`} /> : null}
                     </Button>
@@ -716,13 +777,16 @@ const CommandPaletteCard: React.FC<CommandPaletteProps> = ({
           )}
         </div>
 
-        {/* Legend — "Click a command · Esc Close … Current editor". */}
+        {/* Legend (263:250083). */}
         <div className="tw:h-px tw:flex-none tw:bg-[var(--bk-border)]" />
         <div
           data-testid="cmdk-legend"
           className="tw:flex tw:flex-none tw:items-center tw:gap-3 tw:px-4 tw:py-2 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]"
         >
-          <span>Click a command</span>
+          {/* 263:250083: the keys, then "? Keys" to the shortcuts sheet. */}
+          <span>↑↓ Move</span>
+          <span>↵ Run</span>
+          <span>→ Open</span>
           <Button
             variant="link"
             onClick={onClose}
@@ -731,7 +795,17 @@ const CommandPaletteCard: React.FC<CommandPaletteProps> = ({
             Esc Close
           </Button>
           <span className="tw:flex-1" />
-          <span>Current editor</span>
+          <Button
+            variant="link"
+            data-testid="cmdk-keys"
+            onClick={() => {
+              composer?.emit(EVENTS.UI_TOGGLE_CHEAT_SHEET, {});
+              onClose();
+            }}
+            className="tw:h-auto tw:min-h-5 tw:-my-0.5 tw:p-0 tw:text-[11px] tw:font-medium tw:leading-4 tw:text-[var(--bk-ink)]"
+          >
+            ? Keys
+          </Button>
         </div>
       </div>
     </>

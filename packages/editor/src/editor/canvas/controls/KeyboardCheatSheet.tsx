@@ -21,7 +21,7 @@
  */
 
 import * as React from "react";
-import { ModalBody, ModalClose, ModalContent, ModalRoot, ModalTitle, TextInput } from "@/editor/chrome-ui";
+import { Button, ModalBody, ModalClose, ModalContent, ModalRoot, ModalTitle, TextInput } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
 import { buildSheetGroups, formatKeys, rowKeys, type SheetGroup } from "./keyboardSheetRows";
 
@@ -75,7 +75,10 @@ function filterGroups(groups: SheetGroup[], query: string, isMac: boolean): Shee
 }
 
 export const KeyboardCheatSheet: React.FC<KeyboardCheatSheetProps> = ({ isOpen, onClose, composer }) => {
-  const isMac = isMacPlatform();
+  /* 263:255899 / 263:256463: "Show keys for macOS | Windows" — starts on
+     this machine's keys; the other set is a click away (a Mac user writing
+     docs for Windows colleagues, a shared screen). */
+  const [isMac, setIsMac] = React.useState(isMacPlatform);
   const [query, setQuery] = React.useState("");
   /* Cleared each open — yesterday's query is not today's question. */
   React.useEffect(() => {
@@ -125,6 +128,25 @@ export const KeyboardCheatSheet: React.FC<KeyboardCheatSheetProps> = ({ isOpen, 
             className="tw:mb-3"
             data-testid="kb-search"
           />
+          <div className="tw:mb-3 tw:flex tw:items-center tw:gap-3" data-testid="kb-keys-for">
+            <span className="tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]">Show keys for</span>
+            <div className="tw:flex tw:h-7 tw:items-center tw:gap-0.5 tw:rounded-md tw:border tw:border-[var(--bk-border)] tw:p-0.5" role="group" aria-label="Show keys for">
+              {([["macOS", true], ["Windows", false]] as const).map(([label, mac]) => (
+                <Button
+                  key={label}
+                  color="alternative"
+                  aria-pressed={isMac === mac}
+                  className={
+                    "tw:h-6 tw:min-h-0 tw:rounded tw:border-0 tw:px-2.5 tw:py-0 tw:text-[12px] tw:font-medium tw:focus:ring-0 " +
+                    (isMac === mac ? "tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink)]" : "tw:bg-transparent tw:text-[var(--bk-ink-muted)]")
+                  }
+                  onClick={() => setIsMac(mac)}
+                >
+                  {label}
+                </Button>
+              ))}
+            </div>
+          </div>
           {query.trim() && visible.length === 0 && (
             <p className="tw:text-[13px] tw:text-[var(--bk-ink-muted)]">
               Nothing matches &lsquo;{query.trim()}&rsquo;.
