@@ -82,13 +82,21 @@ function CustomFilter({ filter, onChange, composer }: { filter: string; onChange
 export const FiltersSection: React.FC<BaseStyleSectionProps> = ({ styles, onChange, isOpen, onToggle, composer }) => {
   const filter = styles.filter;
   const custom = !composable(filter, FILTER_ORDER);
+  const setCount = custom ? 0 : FILTERS.filter((f) => readFilter(parseFunction(filter, f.fn, f.identity), f.unit) !== readFilter(f.identity, f.unit)).length;
   return (
     <Section
       title="Filters"
       isOpen={isOpen}
       onToggle={onToggle}
       id="inspector-section-filters"
-      action={custom ? <span className="tw:text-[12px] tw:text-[var(--bk-ink-soft)]">Custom</span> : undefined}
+      action={
+        custom ? (
+          <span className="tw:text-[12px] tw:text-[var(--bk-ink-soft)]">Custom</span>
+        ) : setCount ? (
+          /* 2L9 36:2: the open section counts what is set, as a closed one does. */
+          <span className="tw:text-[12px] tw:text-[var(--bk-ink-muted)]" data-testid="inspector-filters-count">{`${setCount} set`}</span>
+        ) : undefined
+      }
     >
       {custom ? (
         <CustomFilter filter={filter ?? ""} onChange={onChange} composer={composer} />

@@ -101,6 +101,16 @@ describe("Filters — blur and the rest, merged into one filter value", () => {
   });
 });
 
+describe("Filters — 2L9 36:2 'n set' on the open section", () => {
+  it("counts the filters off their identity; none set shows no count", () => {
+    const { unmount } = render(<FiltersSection {...props({ filter: "blur(4px) brightness(1)" })} />);
+    expect(screen.getByTestId("inspector-filters-count")).toHaveTextContent("1 set");
+    unmount();
+    render(<FiltersSection {...props()} />);
+    expect(screen.queryByTestId("inspector-filters-count")).toBeNull();
+  });
+});
+
 describe("Transform & motion", () => {
   it("A08: Scale reads as a percent; rotate keeps scale; the transition rows write their longhands", () => {
     const p = props({ transform: "scale(1.5)" });

@@ -102,10 +102,14 @@ describe("Clone 3686:42317 · Assets · Site fonts", () => {
 
     open(composer);
 
-    expect(screen.getByTestId("site-fonts-title")).toHaveTextContent("Site fonts");
-    expect(screen.getByTestId("site-fonts-body")).toHaveTextContent(
-      "Manage this site's fonts. Built-in Inter stays available.",
+    expect(screen.getByTestId("site-fonts-title")).toHaveTextContent("Manage site fonts");
+    expect(screen.getByTestId("site-fonts-body")).toHaveTextContent(/^Add a font to .+\. This makes it available without changing any text\.$/);
+    expect(screen.getByTestId("site-fonts-done")).toHaveTextContent("Done");
+    expect(screen.getByTestId("site-fonts-foot")).toHaveTextContent(
+      "Existing font assignments stay unchanged. Upload and site membership use Assets permissions.",
     );
+    expect(card("inter").getByTestId("site-font-family-inter")).toHaveTextContent("Inter Var");
+    expect(card("inter").getByTestId("site-font-source-inter")).toHaveTextContent("Uploaded · Inter-Var.woff2");
     expect(screen.getByTestId("site-fonts-search")).toHaveAttribute("placeholder", "Search fonts");
     expect(screen.getByTestId("site-fonts-section")).toHaveTextContent("Uploaded fonts");
 
@@ -122,7 +126,7 @@ describe("Clone 3686:42317 · Assets · Site fonts", () => {
     expect(card("grotesk").getByTestId("site-font-name-grotesk")).toHaveTextContent(
       "Space Grotesk Bold · Space_Grotesk-Bold.otf",
     );
-    expect(card("grotesk").getByTestId("site-font-added-grotesk")).toHaveTextContent("Added");
+    expect(card("grotesk").getByTestId("site-font-added-grotesk")).toHaveTextContent("Added to site · Ready to use");
     expect(card("grotesk").getByTestId("site-font-remove-grotesk")).toHaveTextContent("Remove");
     expect(card("grotesk").queryByTestId("site-font-add-grotesk")).toBeNull();
 
@@ -194,38 +198,20 @@ describe("Clone 3686:42317 · Assets · Site fonts", () => {
   });
 });
 
-describe("Clone 3695:45594 · Assets · Font added", () => {
-  it("Add font writes siteFont: true and swaps to Font added, naming the family; Done closes everything", async () => {
+describe("2L9 R03 · adding a font (replaces Clone 3695:45594's Font added swap)", () => {
+  it("Add font writes siteFont: true; the card turns to 'Added to site · Ready to use', highlighted; Done closes", async () => {
     const { composer, updateAsset } = mount();
     open(composer);
 
     fireEvent.click(card("inter").getByTestId("site-font-add-inter"));
 
     await waitFor(() => expect(updateAsset).toHaveBeenCalledWith("inter", { siteFont: true }));
-    const added = await screen.findByTestId("site-fonts-added");
-    expect(within(added).getByTestId("site-fonts-added-title")).toHaveTextContent("Font added");
-    expect(within(added).getByTestId("site-fonts-added-body")).toHaveTextContent(
-      "Uploaded Inter Var is now available in the font pickers. Existing text is unchanged until you choose this font.",
-    );
-    expect(screen.queryByTestId("site-fonts")).toBeNull();
-
-    fireEvent.click(within(added).getByTestId("site-fonts-added-done"));
-    expect(screen.queryByTestId("site-fonts-added")).toBeNull();
-    expect(screen.queryByTestId("site-fonts")).toBeNull();
-  });
-
-  it("Manage site fonts goes back to Site fonts, where the card now reads Added · Remove", async () => {
-    const { composer } = mount();
-    open(composer);
-    fireEvent.click(card("inter").getByTestId("site-font-add-inter"));
-    const added = await screen.findByTestId("site-fonts-added");
-
-    fireEvent.click(within(added).getByTestId("site-fonts-added-manage"));
-
-    expect(dialog()).toBeInTheDocument();
-    expect(card("inter").getByTestId("site-font-added-inter")).toHaveTextContent("Added");
+    expect(await card("inter").findByTestId("site-font-added-inter")).toHaveTextContent("Added to site · Ready to use");
+    expect(screen.getByTestId("site-font-inter")).toHaveAttribute("data-highlighted", "true");
     expect(card("inter").getByTestId("site-font-remove-inter")).toBeInTheDocument();
-    expect(card("inter").queryByTestId("site-font-add-inter")).toBeNull();
+
+    fireEvent.click(screen.getByTestId("site-fonts-done"));
+    expect(screen.queryByTestId("site-fonts")).toBeNull();
   });
 
   it("Remove writes siteFont: false and the card offers Add font again", async () => {
@@ -237,8 +223,6 @@ describe("Clone 3695:45594 · Assets · Font added", () => {
     await waitFor(() => expect(updateAsset).toHaveBeenCalledWith("grotesk", { siteFont: false }));
     expect(card("grotesk").getByTestId("site-font-add-grotesk")).toBeInTheDocument();
     expect(card("grotesk").queryByTestId("site-font-added-grotesk")).toBeNull();
-    // Removing is the undo; it has no result dialog of its own.
-    expect(screen.queryByTestId("site-fonts-added")).toBeNull();
     expect(dialog()).toBeInTheDocument();
   });
 });
