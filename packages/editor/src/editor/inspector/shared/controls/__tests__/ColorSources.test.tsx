@@ -53,3 +53,32 @@ describe("ColorSources — B05", () => {
     expect(screen.queryByTestId("inspector-color-sources")).toBeNull();
   });
 });
+
+describe("ColorSources — B05 overrides", () => {
+  it("offers Remove {breakpoint} {state} overrides only when the colour has those layers, and resets each", () => {
+    const resetOverride = vi.fn();
+    mount(["var(--buildrick-design-color-brand-primary)", "#1946E5"], {
+      overrides: new Map([["color", ["breakpoint", "pseudo"]]]),
+      overrideLabels: { breakpoint: "Mobile", pseudo: ":hover" },
+      resetOverride,
+    } as never);
+    fireEvent.click(screen.getByRole("button", { name: "Remove Mobile Hover overrides" }));
+    expect(resetOverride).toHaveBeenCalledWith("color", "breakpoint");
+    expect(resetOverride).toHaveBeenCalledWith("color", "pseudo");
+  });
+});
+
+describe("ColorInput — B05 Value row", () => {
+  it("reads the one shared colour, not Mixed", async () => {
+    const { ColorInput } = await import("../ColorInput");
+    const ctx = {
+      readOnly: false, readOnlyReason: null, mixedKeys: new Set(["color"]), overrides: new Map(), overrideLabels: {}, resetOverride: () => {},
+      sourcesOf: () => [
+        { id: "a", name: "A", value: "var(--buildrick-design-color-brand-primary)" },
+        { id: "b", name: "B", value: "var(--buildrick-design-color-brand-link)" },
+      ],
+    } as InspectorFieldContextValue;
+    render(<InspectorFieldContext.Provider value={ctx}><ColorInput label="Text color" value="" onChange={vi.fn()} property="color" /></InspectorFieldContext.Provider>);
+    expect(screen.getByLabelText("Text color value")).toHaveValue("#1946E5");
+  });
+});

@@ -79,6 +79,9 @@ import { CMSCollectionSetupModal } from "@/editor/shell/modals/CMSCollectionSetu
 import { LayersTab } from "@/editor/sidebar/tabs/layers/LayersTab";
 import { InspectorHeader } from "@/editor/inspector/components/InspectorHeader";
 import { ProInspector } from "@/editor/inspector/ProInspector";
+import { ElementAnimationEditor } from "@/editor/inspector/sections/interactions/ElementAnimationRow";
+import { useColorRegistry } from "@/editor/design-system/state/TokenRegistryContext";
+import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 import { useComposerSelection } from "@/editor/canvas/hooks/useComposerSelection";
 import { getBlockById, insertBlock } from "@/blocks/blockRegistry";
 import { openSubview } from "@/editor/inspector/tabs/subviewStore";
@@ -1038,6 +1041,61 @@ function SiteFontsProbe() {
     composer.emit("ui:site-fonts", {});
   }, [composer]);
   return <SiteFontsModal composer={composer as never} />;
+}
+
+/* 2L9 B05 (247:30075): two headings, one colour through a token and the
+   same colour as a hex — the first semantic colour token of the registry. */
+function ColorSourcesProbe() {
+  const { tokens } = useColorRegistry();
+  const c = React.useMemo(() => {
+    const comp = new Composer({} as never);
+    const page = comp.elements.createPage("Home");
+    comp.elements.setActivePage(page.id);
+    for (const [id, name] of [["cs-1", "Heading 1"], ["cs-2", "Heading 2"]]) {
+      const h = comp.elements.createElement("heading" as never, { id, content: name } as never);
+      comp.elements.addElement(h, page.root.id);
+      renameElement(comp as never, id, name);
+    }
+    return comp;
+  }, []);
+  const [ready, setReady] = React.useState(false);
+  React.useEffect(() => {
+    const token = tokens.find((t) => t.layer !== "primitive" && resolveTokenLiteral(tokens, t.id, "light"));
+    if (!token) return;
+    c.elements.getElement("cs-1")?.setStyle("color", `var(${token.cssVar})`);
+    c.elements.getElement("cs-2")?.setStyle("color", resolveTokenLiteral(tokens, token.id, "light") ?? "");
+    c.selection.selectMultiple([c.elements.getElement("cs-1")!, c.elements.getElement("cs-2")!]);
+    setReady(true);
+  }, [c, tokens]);
+  const { selectedElement } = useComposerSelection({ composer: c });
+  return (
+    <ToastProvider>
+      <div data-probe="inspector-panel" className="tw:flex tw:h-[812px] tw:w-[300px] tw:flex-col tw:bg-white">
+        {ready && selectedElement ? (
+          <ProInspector composer={c} selectedElement={{ id: selectedElement.getId(), type: selectedElement.getType(), tagName: selectedElement.getTagName() }} />
+        ) : null}
+      </div>
+    </ToastProvider>
+  );
+}
+
+/* 2L9 A10 (247:26063): the CSS animation edit screen — a saved Hover trigger
+   and a conflict with a scroll entrance. */
+function AnimationScreenProbe() {
+  const [animation, setAnimation] = React.useState({
+    type: "fadeIn", duration: 1200, delay: 100, easing: "ease", direction: "alternate" as const, iterations: -1, trigger: "hover" as const, fillMode: "both" as const,
+  });
+  return (
+    <div data-probe="inspector-panel" className="tw:flex tw:w-[300px] tw:flex-col tw:bg-white tw:px-3">
+      <ElementAnimationEditor
+        animation={animation}
+        onChange={(a) => a && setAnimation(a as typeof animation)}
+        onPreview={() => {}}
+        conflicts={[{ id: "i1", label: "Scroll entrance", property: "opacity" }]}
+        onInspect={() => {}}
+      />
+    </div>
+  );
 }
 
 function NewPageProbe() {
@@ -3268,6 +3326,8 @@ const CASES: Record<string, () => React.ReactElement> = {
   },
   /* 2L9 R03 (247:31533): the one Manage site fonts dialog, one font added. */
   "site-fonts": () => <SiteFontsProbe />,
+  "inspector-color-sources": () => <ColorSourcesProbe />,
+  "animation-screen": () => <AnimationScreenProbe />,
   "layers-tree": () => (
     <div data-probe="layers-tree"><LayersProbe /></div>
   ),
