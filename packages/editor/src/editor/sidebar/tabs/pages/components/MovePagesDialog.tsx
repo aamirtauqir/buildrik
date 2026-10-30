@@ -59,10 +59,11 @@ export function MovePagesDialog({ open, pageNames, folders, onMove, onClose, cur
       testId="pages-move-dialog"
       footer={
         <>
-          <Button color="light" size="xs" className={BTN} onClick={onClose}>
+          {/* 127:38098 / 131:40341 draw the pair 88 and 208 wide whatever the label. */}
+          <Button color="light" size="xs" className={`${BTN} tw:min-w-22`} onClick={onClose}>
             Cancel
           </Button>
-          <Button size="xs" className={BTN} data-testid="pages-move-confirm" disabled={already} onClick={() => onMove(picked)}>
+          <Button size="xs" className={`${BTN} tw:min-w-52`} data-testid="pages-move-confirm" disabled={already} onClick={() => onMove(picked)}>
             {already
               ? pickedFolder ? `Already in ${pickedFolder.name}` : "Already at top level"
               : !single && count > 1

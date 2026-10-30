@@ -114,6 +114,10 @@ const PageSettingsCard: React.FC<Props> = ({ page, allPages, composer, onClose, 
   const [leaving, setLeaving] = React.useState<"none" | "saving" | "rejected">("none");
   const [returnPending, setReturnPending] = React.useState(false);
   const navCancelled = React.useRef(false);
+  /* 101:28183: Cancel navigation while the save runs — said in the form
+     until that save ends. */
+  const [stayAfterSave, setStayAfterSave] = React.useState(false);
+  const saving = s.saveState === "saving";
   const guardMode: LeaveGuardMode =
     leaving === "saving" ? "saving" : leaving === "rejected" ? "rejected" : s.slugError ? "invalid-url" : "ask";
 
@@ -123,6 +127,7 @@ const PageSettingsCard: React.FC<Props> = ({ page, allPages, composer, onClose, 
     s.setShowDiscardConfirm(true);
     setLeaving("saving");
     const ok = await s.save();
+    setStayAfterSave(false);
     if (navCancelled.current) {
       setLeaving("none");
       return;
@@ -201,7 +206,9 @@ const PageSettingsCard: React.FC<Props> = ({ page, allPages, composer, onClose, 
           {/* Board 63:15939: which page, and that the canvas page stays —
               or, dirty, that edits are unsaved (63:18189). */}
           <p className="tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="pg-drawer-subtitle">
-            {s.isDirty || s.saveState === "error"
+            {saving && stayAfterSave
+              ? `${page.name} · Saving settings… · Navigation cancelled`
+              : s.isDirty || s.saveState === "error"
               ? `${page.name} · Unsaved settings changes${stays ? ` · ${stays} stays open` : ""}`
               : stays
                 ? `Editing ${page.name} · ${stays} stays open on the canvas`
@@ -210,6 +217,8 @@ const PageSettingsCard: React.FC<Props> = ({ page, allPages, composer, onClose, 
                     `Editing ${page.name} · Page appearance stays in the Inspector`
                   : `Editing ${page.name}`}
           </p>
+          {/* 101:28183: the form is read-only while its save runs. */}
+          <fieldset disabled={saving} className="tw:m-0 tw:min-w-0 tw:border-0 tw:p-0">
           {s.activeTab === "seo" && (
             <div id="pg-drawer-tab-seo" role="tabpanel" aria-label="SEO settings">
               <SeoTab s={s} page={page} composer={composer} previousSlug={previousSlug} onOpenSiteDefaults={openSiteDefaults} />
@@ -224,6 +233,12 @@ const PageSettingsCard: React.FC<Props> = ({ page, allPages, composer, onClose, 
             <div id="pg-drawer-tab-advanced" role="tabpanel" aria-label="Advanced settings">
               <AdvancedTab s={s} />
             </div>
+          )}
+          </fieldset>
+          {saving && stayAfterSave && (
+            <p className="tw:m-0 tw:text-[length:var(--bk-text-11)] tw:leading-4 tw:text-[var(--bk-ink-soft)]" data-testid="pg-drawer-stay-note">
+              {`When this save finishes, you’ll stay in ${page.name} settings.`}
+            </p>
           )}
         </div>
         {/* The SEO tab says it in its form (63:18189); the other two here. */}
@@ -256,7 +271,7 @@ const PageSettingsCard: React.FC<Props> = ({ page, allPages, composer, onClose, 
           </div>
         ) : (
         <div className="bd-pg-drawer-foot" data-testid="pg-drawer-foot">
-          <Button color="light" size="xs" data-testid="pg-drawer-cancel" onClick={handleCancel}>
+          <Button color="light" size="xs" data-testid="pg-drawer-cancel" disabled={saving} onClick={handleCancel}>
             Cancel
           </Button>
           <Button
@@ -295,7 +310,10 @@ const PageSettingsCard: React.FC<Props> = ({ page, allPages, composer, onClose, 
         }}
         onCancel={() => {
           /* Keep editing, or — while saving — Cancel navigation. */
-          if (leaving === "saving") navCancelled.current = true;
+          if (leaving === "saving") {
+            navCancelled.current = true;
+            setStayAfterSave(true);
+          }
           setLeaving("none");
           afterCloseRef.current = null;
           s.setShowDiscardConfirm(false);

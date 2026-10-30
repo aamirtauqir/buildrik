@@ -65,7 +65,13 @@ describe("page settings — return to Pages with unsaved settings", () => {
     fireEvent.click(screen.getByTestId("pages-unsaved-save"));
     fireEvent.click(screen.getByTestId("pages-unsaved-cancel-nav"));
     expect(screen.queryByTestId("pages-unsaved-modal")).toBeNull();
+    /* 101:28183: the form says the save runs on and the dialog stays. */
+    expect(screen.getByTestId("pg-drawer-subtitle")).toHaveTextContent("About · Saving settings… · Navigation cancelled");
+    expect(screen.getByTestId("pg-drawer-stay-note")).toHaveTextContent("When this save finishes, you’ll stay in About settings.");
+    expect(screen.getByTestId("pg-drawer-cancel")).toBeDisabled();
+    expect(document.getElementById("seo-slug")).toBeDisabled();
     await act(async () => pending[0].resolve());
+    expect(screen.queryByTestId("pg-drawer-stay-note")).toBeNull();
     expect(onClose).not.toHaveBeenCalled();
   });
 

@@ -62,6 +62,13 @@ export interface ConfirmDialogProps {
   width?: ModalWidth;
   /** Forwarded to Modal — a ✕ at the head's right edge, where the board draws one. */
   closeButton?: boolean;
+  /** Forwarded to Modal — the actions at the left ("start") instead of the
+   *  right. Default "end", unchanged. */
+  actionsAlign?: "start" | "end";
+  /** "text" (default, unchanged): Cancel is a quiet text button. "outline":
+   *  a bordered white button, as design-2l9's page confirms draw it
+   *  (63:15255). */
+  cancelStyle?: "text" | "outline";
 }
 
 /** Long enough to read "3 pages deleted.", short enough not to be a step. */
@@ -83,6 +90,7 @@ const SUCCESS_CLOSING = "tw:m-0 tw:mt-1 tw:text-[11px] tw:leading-4 tw:text-[var
 
 export function ConfirmDialog({
   open, onClose, onConfirm, title, message, confirmLabel, cancelLabel = "Cancel", tone = "default", busy, testId, success, width, closeButton,
+  actionsAlign = "end", cancelStyle = "text",
 }: ConfirmDialogProps) {
   const [done, setDone] = React.useState(false);
 
@@ -141,13 +149,19 @@ export function ConfirmDialog({
       width={width}
       closeButton={closeButton}
       dismissOnScrimClick={tone === "default"}
+      footerAlign={actionsAlign}
       footer={
         <>
           <Button
             color="light"
             size="xs"
             onClick={onClose}
-            className="tw:border-transparent tw:bg-transparent tw:text-[var(--bk-gray-700)] tw:hover:text-[var(--bk-ink)]"
+            className={
+              cancelStyle === "outline"
+                ? "tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-card)] tw:text-[var(--bk-ink)]"
+                : "tw:border-transparent tw:bg-transparent tw:text-[var(--bk-gray-700)] tw:hover:text-[var(--bk-ink)]"
+            }
+            data-testid={testId ? `${testId}-cancel` : undefined}
           >
             {cancelLabel}
           </Button>

@@ -23,6 +23,11 @@ vi.mock("@/editor/chrome-ui", async () => {
   };
 });
 
+const capacity = vi.hoisted(() => ({ value: { state: "none" } as { state: string; plan?: string; limit?: number } }));
+vi.mock("@/editor/sidebar/tabs/pages/usePageCapacity", () => ({
+  usePageCapacity: () => ({ capacity: capacity.value, retry: vi.fn() }),
+}));
+
 import { TemplatesTab } from "../TemplatesTab";
 import { SITE_TEMPLATES } from "../templatesData";
 import { getTabMode } from "@/editor/rail/tabsConfig";
@@ -158,6 +163,19 @@ describe("Templates — full-canvas view (decision #24)", () => {
     fireEvent.click(screen.getByTestId("tpl-creating-change"));
     expect(onClose).toHaveBeenCalled();
     expect(composer.emit).toHaveBeenCalledWith("ui:new-page-requested", { name: "Services", addToNavigation: true });
+  });
+
+  // design-2l9 104:28892: the strip carries the real capacity — or nothing when it is unknown or unlimited.
+  it("adds 'n of N pages on Plan' from the real count and limit, and hides it when unlimited", () => {
+    capacity.value = { state: "known", plan: "Free", limit: 10 };
+    const composer = makeComposer();
+    const { unmount } = render(<TemplatesTab composer={composer as never} onClose={vi.fn()} request={{ newPageName: "Services", addToNavigation: true }} />);
+    expect(screen.getByTestId("tpl-creating-banner")).toHaveTextContent("Add to site navigation · 1 of 10 pages on Free");
+    unmount();
+    capacity.value = { state: "known", plan: "Pro", limit: -1 };
+    render(<TemplatesTab composer={composer as never} onClose={vi.fn()} request={{ newPageName: "Services", addToNavigation: true }} />);
+    expect(screen.getByTestId("tpl-creating-banner")).not.toHaveTextContent("pages on");
+    capacity.value = { state: "none" };
   });
 
   /* QA 2026-09-24: Escape did not close the view. From the catalogue it goes

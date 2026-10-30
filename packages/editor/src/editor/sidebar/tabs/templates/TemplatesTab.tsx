@@ -16,6 +16,7 @@ import { getEditorPlanTier } from "@/services/BuildrikSyncProvider";
 import { X } from "lucide-react";
 import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants/events";
+import { usePageCapacity } from "@/editor/sidebar/tabs/pages/usePageCapacity";
 import { type TemplateItem, SITE_TEMPLATES, PAGE_TEMPLATES, DEFAULT_TEMPLATE_VERSION, getMyTemplates } from "./templatesData";
 import { clearAppliedId, recordTemplateApplied, saveAppliedId } from "./templatesStorage";
 import { ReplaceModal, CreatePageConfirmModal, CreatePageSuccessModal, CreatePageErrorModal, BackupFailedModal } from "./TemplatesTabModals";
@@ -70,6 +71,13 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
   const newPageName = request?.newPageName;
   const addToNavigation = request?.addToNavigation;
   const replaceMode = Boolean(request?.replace);
+  /* 104:28892's "6 of 10 pages on Free": the same capacity New page reads —
+     the server's page limit and the site's real page count; nothing shown
+     while it is unknown or unlimited. */
+  const { capacity } = usePageCapacity(Boolean(newPageName) && !replaceMode);
+  const pageCount = composer?.elements.getAllPages?.().length ?? 0;
+  const capacityText =
+    capacity.state === "known" && capacity.limit !== -1 ? `${pageCount} of ${capacity.limit} pages on ${capacity.plan}` : null;
   const { addToast } = useToast();
   const [createResult, setCreateResult] = React.useState<"success" | "error" | null>(null);
   /** G2-100: the page whose backup could not be written — the Backup failed dialog is open. */
@@ -545,7 +553,9 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
               <span className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
                 <span className="tw:text-[13px] tw:leading-5 tw:font-semibold tw:text-[var(--bk-ink)]">{`Creating “${newPageName}”`}</span>
                 <span className="tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
-                  {addToNavigation === false ? "Not added to site navigation" : "Add to site navigation"}
+                  {[addToNavigation === false ? "Not added to site navigation" : "Add to site navigation", capacityText]
+                    .filter(Boolean)
+                    .join(" · ")}
                 </span>
               </span>
               <Button variant="link" data-testid="tpl-creating-change" onClick={backToNewPage}>

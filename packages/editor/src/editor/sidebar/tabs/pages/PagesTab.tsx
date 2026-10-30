@@ -126,7 +126,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
     [p.pages]
   );
   const f = useFolders(folderScopeId, livePageIds);
-  const [newFolderId, setNewFolderId] = React.useState<string | null>(null);
+  const [draftingFolder, setDraftingFolder] = React.useState(false);
   const bulk = useBulkSelect();
 
   /* FC-1 (fix-all 2026-09-25): pages a page-generating CMS collection
@@ -613,7 +613,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
                 <AddPageButton
                   onAddBlank={requestNewPage}
                   onFromTemplate={onRequestTemplates}
-                  onAddFolder={() => { setView("pages"); setNewFolderId(f.createFolder("New Folder")); }}
+                  onAddFolder={() => { setView("pages"); setDraftingFolder(true); }}
                 />
               </div>
             </div>
@@ -635,7 +635,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
                 <AddPageButton
                   onAddBlank={requestNewPage}
                   onFromTemplate={onRequestTemplates}
-                  onAddFolder={() => { setView("pages"); setNewFolderId(f.createFolder("New Folder")); }}
+                  onAddFolder={() => { setView("pages"); setDraftingFolder(true); }}
                 />
               </div>
             </div>
@@ -655,8 +655,10 @@ export const PagesTab: React.FC<PagesTabProps> = ({
             selectedIds={bulk.selectedIds}
             search={search}
             onAddPage={requestNewPage}
-            onAddFolder={() => setNewFolderId(f.createFolder("New Folder"))}
-            newFolderId={newFolderId}
+            onAddFolder={() => setDraftingFolder(true)}
+            draftingFolder={draftingFolder}
+            onCreateFolder={(name) => { f.createFolder(name); setDraftingFolder(false); addToast({ description: `${name} created · Only visible to you`, tone: "info" }); /* 127:37393 */ }}
+            onCancelFolderDraft={() => setDraftingFolder(false)}
             onSelectPage={(id) => {
               setNotice(null);
               p.selectPage(id);

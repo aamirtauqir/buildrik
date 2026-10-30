@@ -59,6 +59,8 @@ function renderList(pages: ReturnType<typeof page>[], search = "") {
       onBulkDuplicate={vi.fn()}
       onClearSelection={vi.fn()}
       onAddFolder={vi.fn()}
+      onCreateFolder={vi.fn()}
+      onCancelFolderDraft={vi.fn()}
       onBulkMoveToFolder={vi.fn()}
       onBulkRemoveFromFolders={vi.fn()}
     />,

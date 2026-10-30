@@ -1304,6 +1304,8 @@ function pagesPanel(over: Partial<React.ComponentProps<typeof PageList>> = {}) {
           onRetry={() => {}}
           onAddPage={() => {}}
           onAddFolder={() => {}}
+          onCreateFolder={() => {}}
+          onCancelFolderDraft={() => {}}
           onSelectPage={() => {}}
           onToggleSelect={() => {}}
           onBulkDuplicate={() => {}}
@@ -3901,6 +3903,34 @@ const CASES: Record<string, () => React.ReactElement> = {
         onMoveToFolder={() => {}}
         onMove={() => {}}
         rootPosition={{ index: 1, count: PAGES_FIXTURE.length }}
+      />
+    </div>
+  ),
+  /* design-2l9 boards 127:39528 / 134:44345 — the menu of a page inside a
+     folder (About in Client projects): no top-level position, so the order
+     pair is off and "Remove from Client projects" is offered. */
+  "pages-folder-menu": () => (
+    <div data-probe="pages-folder-menu" style={{ width: 280, height: 812 }}>
+      {pagesPanel()}
+      <PageContextMenu
+        pageId="about"
+        x={240}
+        y={170}
+        pages={PAGES_FIXTURE}
+        folderName="Client projects"
+        onClose={() => {}}
+        onRename={() => {}}
+        onDuplicate={() => {}}
+        onDelete={() => {}}
+        onSetHomepage={() => {}}
+        onReplaceLayout={() => {}}
+        onCopyLink={() => {}}
+        onSettings={() => {}}
+        onRemoveFromFolder={() => {}}
+        onSaveAsTemplate={() => {}}
+        onMoveToFolder={() => {}}
+        onMove={() => {}}
+        rootPosition={null}
       />
     </div>
   ),
