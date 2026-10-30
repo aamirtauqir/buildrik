@@ -20,7 +20,7 @@ import * as React from "react";
 import type { Composer } from "@/engine";
 import type { Element } from "@/engine/elements/Element";
 import { Button } from "@/editor/chrome-ui";
-import { writableElements } from "@/engine/commands/commandOperations";
+import { lockOwner, writableElements } from "@/engine/commands/commandOperations";
 import { capabilitiesFor } from "@/shared/constants/elementCapabilities";
 import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
 import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
@@ -46,7 +46,7 @@ export interface BatchEligibilityProps {
 }
 
 export function BatchEligibility({ composer, elements }: BatchEligibilityProps) {
-  const eligible = elements.filter((e) => takesTypography(e.getType()) && !e.isLocked());
+  const eligible = elements.filter((e) => takesTypography(e.getType()) && !lockOwner(e));
   const excluded = elements.filter((e) => !eligible.includes(e));
   const sizes = eligible.map((e) => e.getStyles()["font-size"] ?? "");
   const mixed = sizes.some((s) => s !== sizes[0]);
@@ -56,7 +56,7 @@ export function BatchEligibility({ composer, elements }: BatchEligibilityProps) 
   const kind = kindOf(eligible, eligible.length);
   const named = excluded.map((e) => {
     const name = getLayerName(e) ?? elementTypeLabel(e.getType()).toLowerCase();
-    return e.isLocked() ? `Locked ${name.charAt(0).toLowerCase()}${name.slice(1)}` : name;
+    return lockOwner(e) ? `Locked ${name.charAt(0).toLowerCase()}${name.slice(1)}` : name;
   });
   const excludedText = `${andList(named).charAt(0).toUpperCase()}${andList(named).slice(1)} ${excluded.length === 1 ? "is" : "are"} excluded and ${excluded.length === 1 ? "remains" : "remain"} unchanged.`;
 

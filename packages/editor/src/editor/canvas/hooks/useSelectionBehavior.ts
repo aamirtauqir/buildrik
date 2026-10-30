@@ -17,6 +17,9 @@ import * as React from "react";
 import type { Composer, Element } from "@/engine";
 import { useToast } from "@/editor/chrome-ui";
 import { getElementId } from "@/shared/utils/dragDrop";
+import { lockOwner } from "@/engine/commands/commandOperations";
+import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
+import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
 import { buildElementStack, findElementWithHitExpansion } from "../shared/hitTesting";
 
 /** Distance threshold for "same click position" detection */
@@ -57,6 +60,26 @@ export function useSelectionBehavior({
   const lastClickTime = React.useRef<number>(0);
   const clickCount = React.useRef<number>(0);
 
+  /* A locked element — its own lock or one over it (lockOwner: a lock covers
+     everything inside it) — is not picked from the canvas; the toast names
+     the layer that holds the lock, which is where it is released. */
+  const refuseLocked = React.useCallback(
+    (element: Element): boolean => {
+      const owner = lockOwner(element);
+      if (!owner) return false;
+      addToast({
+        description:
+          owner === element
+            ? "This element is locked. Unlock it here in the inspector or in Layers."
+            : `Locked by ${getLayerName(owner) ?? elementTypeLabel(owner.getType())} — unlock in Layers`,
+        tone: "info",
+        duration: 2500,
+      });
+      return true;
+    },
+    [addToast]
+  );
+
   const resetClickThrough = React.useCallback(() => {
     setClickThroughStack([]);
     setClickThroughIndex(0);
@@ -85,14 +108,7 @@ export function useSelectionBehavior({
         if (stack.length > 0) {
           const element = composer.elements.getElement(stack[0]);
           if (element) {
-            if (element.isLocked()) {
-              addToast({
-                description: "This element is locked. Unlock it here in the inspector or in Layers.",
-                tone: "info",
-                duration: 2500,
-              });
-              return;
-            }
+            if (refuseLocked(element)) return;
             composer.selection.select(element);
           }
         }
@@ -103,20 +119,12 @@ export function useSelectionBehavior({
         if (nextId) {
           const element = composer.elements.getElement(nextId);
           if (element) {
-            if (element.isLocked()) {
-              addToast({
-                description: "This element is locked. Unlock it here in the inspector or in Layers.",
-                tone: "info",
-                duration: 2500,
-              });
-            } else {
-              composer.selection.select(element);
-            }
+            if (!refuseLocked(element)) composer.selection.select(element);
           }
         }
       }
     },
-    [composer, isSamePosition, clickThroughIndex, clickThroughStack, addToast]
+    [composer, isSamePosition, clickThroughIndex, clickThroughStack, refuseLocked]
   );
 
   /** Handle normal selection (single or additive) */
@@ -131,14 +139,7 @@ export function useSelectionBehavior({
         if (id) {
           const element = composer.elements.getElement(id);
           if (element) {
-            if (element.isLocked()) {
-              addToast({
-                description: "This element is locked. Unlock it here in the inspector or in Layers.",
-                tone: "info",
-                duration: 2500,
-              });
-              return;
-            }
+            if (refuseLocked(element)) return;
             if (isAdditive) {
               composer.selection.addToSelection(element);
             } else {
@@ -152,7 +153,7 @@ export function useSelectionBehavior({
       composer.selection.clear();
       resetClickThrough();
     },
-    [composer, resetClickThrough, addToast]
+    [composer, resetClickThrough, refuseLocked]
   );
 
   /** Handle double-click: Select first child of container */
@@ -170,14 +171,11 @@ export function useSelectionBehavior({
         const stack = buildElementStack(x, y);
         const childAtPosition = children.find((child: Element) => stack.includes(child.getId()));
 
-        if (childAtPosition) {
-          composer.selection.select(childAtPosition);
-        } else {
-          composer.selection.select(children[0]);
-        }
+        const child = childAtPosition ?? children[0];
+        if (!refuseLocked(child)) composer.selection.select(child);
       }
     },
-    [composer]
+    [composer, refuseLocked]
   );
 
   /** Handle triple-click: Deep select innermost element */
@@ -190,9 +188,9 @@ export function useSelectionBehavior({
 
       const innermostId = stack[0];
       const innermost = composer.elements.getElement(innermostId);
-      if (innermost) composer.selection.select(innermost);
+      if (innermost && !refuseLocked(innermost)) composer.selection.select(innermost);
     },
-    [composer]
+    [composer, refuseLocked]
   );
 
   /** Calculate click count for multi-click detection */

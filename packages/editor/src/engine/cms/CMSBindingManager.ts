@@ -29,6 +29,7 @@ import { BINDABLE_TYPES } from "@/shared/constants/elementCapabilities";
 import type { Composer } from "../Composer";
 import { BaseBindingManager, type BindingWithData } from "../data/BaseBindingManager";
 import type { CollectionManager } from "./CollectionManager";
+import { lockOwner } from "../commands/commandOperations";
 import { pageFileNames } from "../export/pageFiles";
 import type { CmsCondition, CmsListSortKey } from "@buildrik/shared/schemas/cmsConditions";
 
@@ -562,7 +563,7 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
    */
   setCondition(elementId: string, condition: CmsCondition | null, historyLabel?: string): boolean {
     if (this.composer.writeLocked) return false;
-    if (this.composer.elements.getElement(elementId)?.isLocked?.()) {
+    if (lockOwner(this.composer.elements.getElement(elementId))) {
       this.composer.emit(EVENTS.LOCKED_ELEMENTS_SKIPPED, undefined);
       return false;
     }
@@ -595,7 +596,7 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
     if (this.composer.writeLocked) return false;
     const binding = this.collectionBindings.get(listId);
     if (!binding) return false;
-    if (this.composer.elements.getElement(listId)?.isLocked?.()) {
+    if (lockOwner(this.composer.elements.getElement(listId))) {
       this.composer.emit(EVENTS.LOCKED_ELEMENTS_SKIPPED, undefined);
       return false;
     }

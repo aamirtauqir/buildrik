@@ -32,6 +32,7 @@ import { getElementIcon } from "@/editor/shared/elementIcons";
 import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
 import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
 import { EVENTS } from "@/shared/constants/events";
+import { lockOwner } from "@/engine/commands/commandOperations";
 import type { PseudoStateId } from "@/shared/types";
 import type { TabId } from "@/editor/inspector/sections/registry";
 import { ElementNameField } from "./ElementNameField";
@@ -134,9 +135,16 @@ export function InspectorHeader({
      "2 selected · Headings"). It used to be named only on a template page,
      so elsewhere the title line was blank. */
   const own = !multi ? composer?.elements.getElement(element.id) : undefined;
-  const ownLock = own?.isLocked?.() ? (getLayerName(own) ?? typeLabel) : null;
+  /* The lock over this element — its own, or an ancestor's (lockOwner: a
+     lock covers everything inside it; the line names the layer holding it). */
+  const lockHolder = lockOwner(own);
+  const lockLine = !lockHolder
+    ? null
+    : lockHolder === own
+      ? `Read only · ${getLayerName(own) ?? typeLabel} is locked`
+      : `Read only · Locked by ${getLayerName(lockHolder) ?? elementTypeLabel(lockHolder.getType())}`;
   const selectedEls = multi && composer ? selectedIds.map((id) => composer.elements.getElement(id)).filter((e): e is Element => Boolean(e)) : [];
-  const lockedCount = selectedEls.filter((e) => e.isLocked?.()).length;
+  const lockedCount = selectedEls.filter((e) => lockOwner(e)).length;
   const multiName = multi
     ? `${selectedIds.length} selected${new Set(selectedEls.map((e) => e.getType())).size === 1 ? ` · ${pluralType(element.type)}` : ""}`
     : "";
@@ -212,11 +220,10 @@ export function InspectorHeader({
           <span className="tw:min-w-0 tw:truncate tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)]" data-testid="inspector-load-failed-line">
             {loadFailedLine}
           </span>
-        ) : ownLock ? (
-          /* 2L9 S22 255:92819: the element's OWN lock (not inherited — lock is
-             not inherited in the engine) reads on the context line. */
+        ) : lockLine ? (
+          /* 2L9 S22 255:92819 (own lock) / 147:77668 (an ancestor's). */
           <span className="tw:min-w-0 tw:truncate tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)]" data-testid="inspector-locked-line">
-            Read only · {ownLock} is locked
+            {lockLine}
           </span>
         ) : activeTab === "content" || activeTab === "behaviour" ? (
           <span className="tw:min-w-0 tw:truncate tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)]">

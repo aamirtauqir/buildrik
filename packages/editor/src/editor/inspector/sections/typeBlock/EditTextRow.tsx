@@ -18,6 +18,7 @@ import { WIDE_BUTTON } from "@/editor/inspector/shared/controls/controlClasses";
 import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
 import { SelectedTextLink } from "./SelectedTextLink";
 import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
+import { lockOwner } from "@/engine/commands/commandOperations";
 
 const NOTE = "tw:m-0 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 
@@ -34,17 +35,22 @@ export function EditTextRow({ composer, elementId }: EditTextRowProps) {
      what the canvas would edit is the record's value. */
   const bound = composer?.cms?.bindings?.getBindings?.(elementId)?.some((b) => b.property === "content");
   if (!composer || bound) return null;
-  /* 2L9 TX09 (423:99859): the element's OWN lock (not an ancestor's — a
-     lock is not inherited) says why the door is shut and how to open it; the
-     canvas refuses Enter / double-click on it too (useCanvasInlineEdit). */
+  /* 2L9 TX09 (423:99859): the lock — the element's own, or an ancestor's
+     (lockOwner; a lock covers everything inside it) — says why the door is
+     shut and where it opens; the canvas refuses Enter / double-click on it
+     too (useCanvasInlineEdit). */
   const locked = readOnlyReason === "locked";
   const el = locked ? composer.elements?.getElement?.(elementId) : null;
   const name = el ? (getLayerName(el) ?? elementTypeLabel(el.getType())) : "This element";
+  const holder = el ? lockOwner(el) : null;
+  const holderName = holder && holder !== el ? (getLayerName(holder) ?? elementTypeLabel(holder.getType())) : null;
   return (
     <div className="tw:flex tw:flex-col tw:gap-1 tw:py-1" data-testid="inspector-text-content">
       {locked ? (
         <p className={NOTE} data-testid="inspector-text-locked">
-          {name} is locked. Unlock it in Layers to edit its text or semantic tag.
+          {holderName
+            ? `Locked by ${holderName}. Unlock ${holderName} in Layers to edit this text or its semantic tag.`
+            : `${name} is locked. Unlock it in Layers to edit its text or semantic tag.`}
         </p>
       ) : null}
       {/* 2L9 161:8480: a full-width bordered button under the "Text" row. */}
@@ -64,7 +70,7 @@ export function EditTextRow({ composer, elementId }: EditTextRowProps) {
       <SelectedTextLink elementId={elementId} />
       {locked ? (
         <p className={NOTE} data-testid="inspector-text-locked-hint">
-          Locked — unlock {name} before editing. Enter and double-click do not start an edit.
+          Locked — unlock {holderName ?? name} before editing. Enter and double-click do not start an edit.
         </p>
       ) : null}
     </div>

@@ -27,6 +27,8 @@ import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
 import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
 import { WIDE_BUTTON } from "../shared/controls/controlClasses";
 import { useElementVersion } from "../sections/typeBlock/bodies/bodyRows";
+import { lockOwner } from "@/engine/commands/commandOperations";
+import { ELEMENT_ACTIONS } from "@/editor/shared/elementActions";
 
 export type LockRefusalKind = "paste-style" | "add-interaction";
 
@@ -48,7 +50,7 @@ export function useLockRefusal(composer: Composer | null | undefined, elementId:
     },
     () => refusal,
   );
-  const locked = composer?.elements?.getElement?.(elementId)?.isLocked?.() === true;
+  const locked = lockOwner(composer?.elements?.getElement?.(elementId)) !== null;
   return current?.elementId === elementId && current.kind === kind && locked;
 }
 
@@ -60,7 +62,7 @@ export function useWatchPasteRefusal(composer: Composer | null | undefined): voi
       if (e?.id !== "paste-style" || e.result !== 0) return;
       const clipboard = composer.styleClipboard;
       const el = composer.selection.getSelected();
-      if (!el?.isLocked() || !clipboard || Object.keys(clipboard).length === 0) return;
+      if (!el || !lockOwner(el) || !clipboard || Object.keys(clipboard).length === 0) return;
       setLockRefusal({ elementId: el.getId(), kind: "paste-style" });
     };
     composer.on(EVENTS.COMMAND_RUN, onRun);
@@ -93,6 +95,11 @@ export function LockRefusalNote({ composer, elementId, kind }: LockRefusalNotePr
   const el = composer?.elements?.getElement?.(elementId);
   const name = el ? (getLayerName(el) ?? elementTypeLabel(el.getType())) : "This element";
   const copy = COPY[kind];
+  /* An ancestor's lock (147:77668) is released on that layer: name it and
+     show it in Layers instead of offering an Unlock that would do nothing. */
+  const owner = lockOwner(el);
+  const inherited = composer && el && owner && owner !== el ? owner : null;
+  const ownerName = inherited ? (getLayerName(inherited) ?? elementTypeLabel(inherited.getType())) : null;
   return (
     <div
       role="status"
@@ -101,6 +108,7 @@ export function LockRefusalNote({ composer, elementId, kind }: LockRefusalNotePr
     >
       {copy.title ? <p className="tw:m-0 tw:mb-2 tw:text-[13px] tw:font-semibold tw:leading-4 tw:text-[var(--bk-ink)]">{copy.title}</p> : null}
       {copy.status ? <p className="tw:m-0 tw:text-[12px] tw:font-normal tw:leading-4 tw:text-[var(--bk-ink-muted)]">{copy.status}</p> : null}
+      {ownerName ? <p className="tw:m-0 tw:text-[12px] tw:font-normal tw:leading-4 tw:text-[var(--bk-ink-muted)]">Locked by {ownerName}</p> : null}
       <p className="tw:m-0 tw:text-[12px] tw:font-normal tw:leading-4 tw:text-[var(--bk-ink-muted)]">{copy.text(name)}</p>
       <Button
         color="light"
@@ -109,10 +117,11 @@ export function LockRefusalNote({ composer, elementId, kind }: LockRefusalNotePr
         data-testid="inspector-lock-refusal-unlock"
         onClick={() => {
           setLockRefusal(null);
-          void composer?.commands.run("unlock-element", { elementId });
+          if (composer && inherited) ELEMENT_ACTIONS["show-in-layers"].run({ composer, element: inherited, isRoot: false });
+          else void composer?.commands.run("unlock-element", { elementId });
         }}
       >
-        Unlock
+        {ownerName ? `Show ${ownerName} in Layers` : "Unlock"}
       </Button>
     </div>
   );

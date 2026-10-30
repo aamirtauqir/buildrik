@@ -5,6 +5,8 @@
  *              it through Layers keeps its values visible." · a full-width
  *              primary "Unlock" (2L9 S22 255:92819, at the head of the tab
  *              body; the shared `unlock-element` command, one undo step);
+ *              an ancestor's lock → "Locked by {layer}" · "Show {layer} in
+ *              Layers" (147:77668 — it is unlocked there);
  *   conflict → "This site changed elsewhere — resolve to keep editing ·
  *              Resolve" (board 29; reopens the conflict dialog).
  *
@@ -17,6 +19,8 @@ import { Button } from "@/editor/chrome-ui";
 import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
 import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
 import { WIDE_BUTTON } from "../shared/controls/controlClasses";
+import { lockOwner } from "@/engine/commands/commandOperations";
+import { ELEMENT_ACTIONS } from "@/editor/shared/elementActions";
 
 export interface StatusLineProps {
   composer: Composer | null | undefined;
@@ -41,11 +45,39 @@ export function StatusLine({ composer, elementId, locked, conflict }: StatusLine
   if (locked && !conflict.pending) {
     const el = composer?.elements?.getElement?.(elementId);
     const name = el ? (getLayerName(el) ?? elementTypeLabel(el.getType())) : "element";
+    const owner = lockOwner(el);
+    if (composer && el && owner && owner !== el) {
+      /* Boards 147:77668: the lock is an ancestor's (a lock covers everything
+         inside it). It is released on that layer, so the way out is to show
+         it — selected, in Layers — where its own Unlock is. */
+      const ownerName = getLayerName(owner) ?? elementTypeLabel(owner.getType());
+      return (
+        <div role="status" data-testid="inspector-status-line" data-tone="locked" className="tw:flex tw:flex-col tw:gap-2 tw:px-3 tw:pt-3 tw:pb-2">
+          <span className="tw:text-[13px] tw:font-semibold tw:leading-4 tw:text-[var(--bk-ink)]">Editing unavailable</span>
+          <span className="tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)]" data-testid="inspector-locked-by">
+            Locked by {ownerName}
+          </span>
+          <Button
+            size="xs"
+            color="light"
+            data-testid="inspector-show-lock-owner"
+            className={WIDE_BUTTON}
+            onClick={() => ELEMENT_ACTIONS["show-in-layers"].run({ composer, element: owner, isRoot: false })}
+          >
+            Show {ownerName} in Layers
+          </Button>
+        </div>
+      );
+    }
+    /* Board 147:78110: a lock on an element with children covers them too. */
+    const covers = (el?.getChildren?.().length ?? 0) > 0;
     return (
       <div role="status" data-testid="inspector-status-line" data-tone="locked" className="tw:flex tw:flex-col tw:gap-2 tw:px-3 tw:pt-3 tw:pb-2">
         <span className="tw:text-[13px] tw:font-semibold tw:leading-4 tw:text-[var(--bk-ink)]">Editing unavailable</span>
         <span className="tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)]">
-          This element is locked. Inspecting it through Layers keeps its values visible.
+          {covers && el
+            ? `This ${elementTypeLabel(el.getType()).toLowerCase()} and its descendants are locked.`
+            : "This element is locked. Inspecting it through Layers keeps its values visible."}
         </span>
         <Button
           size="xs"

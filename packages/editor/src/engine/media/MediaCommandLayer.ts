@@ -22,6 +22,7 @@ import { EVENTS } from "@/shared/constants/events";
 import type { Element } from "../elements/Element";
 import { MEDIA_EVENTS } from "@/shared/constants/media";
 import { isSafeSrc } from "./MediaHelpers";
+import { lockOwner } from "../commands/commandOperations";
 import {
   MediaNoActivePageError,
   MediaReplacePartialError,
@@ -279,7 +280,7 @@ export class MediaCommandLayer {
    */
   followAssetAlt(src: string, previousAlt: string | undefined, nextAlt: string | undefined): number {
     const followers = this.composer.elements.findByMediaSrc(src).filter((el) => {
-      if (el.isLocked()) return false;
+      if (lockOwner(el)) return false;
       const alt = el.getAttribute("alt");
       return !alt || alt === previousAlt;
     });

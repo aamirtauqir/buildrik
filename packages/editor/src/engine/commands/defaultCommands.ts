@@ -13,7 +13,7 @@ import type { CommandData, CommandOptions, ElementType } from "@/shared/types";
 import type { Element } from "../elements/Element";
 import { canNestElement } from "@/shared/utils/nesting";
 import type { Composer } from "../Composer";
-import { nudgeSelected, reorderElement, dropLockedAndInstances, pasteStyles, writeElement } from "./commandOperations";
+import { nudgeSelected, reorderElement, dropLockedAndInstances, pasteStyles, writeElement, lockOwner } from "./commandOperations";
 
 /**
  * Build the full list of default commands.
@@ -163,7 +163,13 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
            unnoticed while ⌘A selected only the page root; now that Select All
            takes every element, ⌘A then ⌘D would have duplicated most of the
            page several times over. Found by codex. */
-        const ids = topMost(c.selection.getAllSelected()).map((el) => el.getId());
+        /* A copy lands beside its original, inside the same parent: under a
+           lock (the parent's own or an ancestor's) that parent may not change,
+           so that element is not copied and the "locked" toast says why. */
+        const tops = topMost(c.selection.getAllSelected());
+        const free = tops.filter((el) => !lockOwner(el.getParent?.()));
+        if (free.length !== tops.length) c.emit(EVENTS.LOCKED_ELEMENTS_SKIPPED, undefined);
+        const ids = free.map((el) => el.getId());
         if (ids.length === 0) return;
         c.beginTransaction("duplicate");
         const clones = ids
@@ -368,10 +374,14 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
           if (!target) continue;
           plan.push({ data, target, index });
         }
-        if (plan.length === 0) return;
+        /* Nothing lands inside a lock (the target's own or an ancestor's);
+           the "locked" toast says why the paste came up short. */
+        const landing = plan.filter((step) => !lockOwner(step.target));
+        if (landing.length !== plan.length) c.emit(EVENTS.LOCKED_ELEMENTS_SKIPPED, undefined);
+        if (landing.length === 0) return;
 
         c.beginTransaction("paste");
-        for (const step of plan) {
+        for (const step of landing) {
           /* `pasteElement` announces CLIPBOARD_PASTE itself, with the element,
              target and index. Emitting a second, thinner one here gave every
              paste two "Element pasted" toasts — and one paste can place N
