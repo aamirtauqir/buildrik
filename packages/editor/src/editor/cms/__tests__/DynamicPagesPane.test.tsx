@@ -6,15 +6,17 @@
  */
 import * as React from "react";
 import { describe, it, expect, afterEach, vi } from "vitest";
-import { render, screen, fireEvent, cleanup, waitFor, act } from "@testing-library/react";
+import { render, screen, fireEvent, cleanup, waitFor, act, within } from "@testing-library/react";
 import type { CMSCollection, CMSContentItem } from "@/shared/types/cms";
 import { ToastProvider } from "@/editor/chrome-ui";
 import { DynamicPagesPane } from "../DynamicPagesPane";
+import { unsavedCollectionLinks } from "../unsavedCollectionLinks";
 import { makeEngine } from "./fakeCmsEngine";
 
 /* The page-making itself runs on a real Composer in createCollectionPage.test;
    here it is the pane's states around it. */
-const buildMock = vi.fn((..._a: unknown[]) => ({ pageId: "pg-new", name: "Menu items profile", file: "menu-items-profile.html" }));
+const undoMock = vi.fn(() => true);
+const buildMock = vi.fn(async (..._a: unknown[]) => ({ pageId: "pg-new", name: "Menu items profile", file: "menu-items-profile.html", undo: undoMock }));
 const linkMock = vi.fn(async (..._a: unknown[]) => true);
 const retryMock = vi.fn(async (..._a: unknown[]) => true);
 vi.mock("../createCollectionPage", async () => {
@@ -54,7 +56,10 @@ function mount(collection: CMSCollection, records: CMSContentItem[], { form = tr
   return engine;
 }
 
-afterEach(() => cleanup());
+afterEach(() => {
+  cleanup();
+  unsavedCollectionLinks.reset();
+});
 
 describe("DynamicPagesPane", () => {
   it("with no pattern says nothing is generated (4418:89084)", () => {
@@ -140,6 +145,17 @@ describe("DynamicPagesPane", () => {
     expect(opts).toContain("Menu item");
   });
 
+  it("a saved link names its page, opens it, and says what the next publish does (187:21853)", () => {
+    const onOpenPage = vi.fn();
+    mount({ ...MENU, pageSlugPattern: "/menu/{slug}", pageTemplatePath: "menu-item.html" } as CMSCollection, [rec("a", "Margherita"), rec("b", "Diavola")], { onOpenPage });
+    expect(screen.getByTestId("cms-dp-linked")).toHaveTextContent("Menu item");
+    fireEvent.click(screen.getByTestId("cms-dp-edit-page"));
+    expect(onOpenPage).toHaveBeenCalledTimes(1);
+    expect(screen.getByTestId("cms-dp-status")).toHaveTextContent(
+      "On the next publish2 published records will generate 2 pages. Changes to records or the template appear after site publish.",
+    );
+  });
+
   describe("Create collection page (187:20406 … 187:21418)", () => {
     afterEach(() => {
       buildMock.mockClear();
@@ -174,6 +190,21 @@ describe("DynamicPagesPane", () => {
       expect(await screen.findByText("Menu items profile created · 2 pages on publish")).toBeInTheDocument();
     });
 
+    it("the receipt's Undo reverts the creation step and says the link needs repair (187:22586)", async () => {
+      const onOpenPage = vi.fn();
+      const engine = mount(MENU, [rec("a", "Margherita")], { form: false, onOpenPage });
+      const emit = vi.fn();
+      (engine.composer as unknown as { emit: typeof emit }).emit = emit;
+      fireEvent.click(screen.getByTestId("cms-dp-start-create"));
+      fireEvent.click(screen.getByTestId("cms-dp-create-confirm"));
+      const receipt = (await screen.findByText("Menu items profile created · 1 page on publish")).closest("[role=status], [role=alert], li, div")!;
+      fireEvent.click(within(receipt as HTMLElement).getByRole("button", { name: "Undo" }));
+      expect(undoMock).toHaveBeenCalledTimes(1);
+      expect(await screen.findByText("Menu items profile removed. Collection link needs repair.")).toBeInTheDocument();
+      fireEvent.click(screen.getByRole("button", { name: "Open CMS" }));
+      expect(emit).toHaveBeenCalledWith("panel:open", { panel: "content" });
+    });
+
     it("a link the server did not confirm keeps the page and retries only the link (187:21035 / 187:21245)", async () => {
       linkMock.mockResolvedValueOnce(false);
       let finish: (v: boolean) => void = () => undefined;
@@ -188,6 +219,11 @@ describe("DynamicPagesPane", () => {
       );
       expect(screen.getByTestId("cms-dp-start")).toHaveTextContent("URL pattern · /menu-items/{slug}");
       expect(onOpenPage).not.toHaveBeenCalled();
+      /* Leaving the tab and coming back keeps it (187:22071 reads the same store). */
+      cleanup();
+      mount(MENU, [rec("a", "Margherita")], { form: false, onOpenPage });
+      expect(screen.getByTestId("cms-dp-start")).toHaveTextContent("Page created, link not saved");
+      expect(unsavedCollectionLinks.forPage("pg-new")?.collectionName).toBe("Menu items");
       fireEvent.click(screen.getByTestId("cms-dp-start-retry"));
       await waitFor(() => expect(screen.getByTestId("cms-dp-start-retry")).toHaveTextContent("Saving link…"));
       await act(async () => finish(true));

@@ -136,3 +136,43 @@ describe("Composer — CMS bindings round-trip", () => {
     expect(c.cms.bindings.getCollectionBinding("list-2")).toBeFalsy();
   });
 });
+
+/* design-2l9 187:21418: a bind made inside a composer transaction belongs to
+   the transaction's step — it records no step of its own and does not mark
+   the last action as unrecorded, and its promise settles once applied. */
+describe("Composer — a bind inside a transaction", () => {
+  it("is part of the transaction's one step", async () => {
+    const c = createTestComposer();
+    const page = c.elements.getActivePage() ?? c.elements.createPage("Home");
+    c.elements.setActivePage(page.id);
+    c.history.flushPending();
+    vi.spyOn(c.cms.bindings, "resolveBinding").mockResolvedValue("Bound value");
+    const unrecorded = vi.fn();
+    c.on(EVENTS.HISTORY_UNRECORDED, unrecorded);
+    const before = c.history.getUndoCount();
+    c.beginTransaction("Make and bind");
+    const el = c.elements.createElement("text", { content: "Placeholder" });
+    c.elements.addElement(el, page.root.id);
+    await c.cms.bindings.bindToField(el.getId(), "col-1", undefined, "title", "content", undefined, "Bind Title");
+    c.endTransaction();
+    c.history.flushPending();
+    expect(unrecorded).not.toHaveBeenCalled();
+    expect(c.history.getUndoCount()).toBe(before + 1);
+    expect(c.history.canUndo()).toBe(true);
+    expect(c.history.undo()).toBe(true);
+    expect(c.elements.getElement(el.getId())).toBeUndefined();
+    expect(c.cms.bindings.getBindings(el.getId())).toHaveLength(0);
+  });
+
+  it("outside a transaction, an unlabelled bind still says it was not recorded", async () => {
+    const c = createTestComposer();
+    const page = c.elements.getActivePage() ?? c.elements.createPage("Home");
+    const el = c.elements.createElement("text", { content: "Placeholder" });
+    c.elements.addElement(el, page.root.id);
+    vi.spyOn(c.cms.bindings, "resolveBinding").mockResolvedValue("x");
+    const unrecorded = vi.fn();
+    c.on(EVENTS.HISTORY_UNRECORDED, unrecorded);
+    await c.cms.bindings.bindToField(el.getId(), "col-1", "rec-1", "title", "content");
+    expect(unrecorded).toHaveBeenCalledTimes(1);
+  });
+});

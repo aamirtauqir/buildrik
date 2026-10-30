@@ -59,4 +59,37 @@ describe("wireWidgetRuntimes", () => {
     items[0].querySelector("button")!.click();
     expect(open()).toEqual([true, false]);
   });
+
+  /* design-2l9 B-21 / B-17: the serialized runtimes switch tabs and open /
+     close a dialog on the published page — a Tabs and a Modal saved before
+     the models included (paired by position). */
+  it("injects and runs the tabs runtime on a page with a tablist", () => {
+    const page = `<html><body><div class="tabs"><div role="tablist">
+<button role="tab" aria-selected="true">One</button><button role="tab" aria-selected="false">Two</button></div>
+<div role="tabpanel">P1</div><div role="tabpanel" style="display: none">P2</div></div></body></html>`;
+    const out = wireWidgetRuntimes(page);
+    expect(out.match(/data-buildrick-tabs-runtime/g)).toHaveLength(1);
+    expect(wireWidgetRuntimes(out)).toBe(out);
+    runScripts(out);
+    const tabs = document.querySelectorAll<HTMLElement>('[role="tab"]');
+    const panels = document.querySelectorAll<HTMLElement>('[role="tabpanel"]');
+    expect(panels[1].hidden).toBe(true);
+    tabs[1].click();
+    expect(panels[1].hidden).toBe(false);
+    expect(panels[0].hidden).toBe(true);
+  });
+
+  it("injects and runs the modal runtime on a page with a dialog", () => {
+    const page = `<html><body><button data-modal-target="m1">Open</button>
+<div role="dialog" aria-modal="true" data-modal-key="m1" style="display: none"><button data-modal-close>×</button></div></body></html>`;
+    const out = wireWidgetRuntimes(page);
+    expect(out).toContain("data-buildrick-modal-runtime");
+    expect(out).not.toContain("data-buildrick-tabs-runtime");
+    runScripts(out);
+    const dialog = document.querySelector<HTMLElement>('[role="dialog"]')!;
+    document.querySelector<HTMLElement>("[data-modal-target]")!.click();
+    expect(dialog.style.display).not.toBe("none");
+    dialog.querySelector<HTMLElement>("[data-modal-close]")!.click();
+    expect(dialog.style.display).toBe("none");
+  });
 });

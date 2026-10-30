@@ -5234,9 +5234,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "blocked:engine-tabs-pairs",
+   "authority": "board",
    "verified": "no",
-   "verifiedNote": "Lane L-B round 11: not a capabilities-table change — tabs has no tab↔panel pairing, initial-tab attribute or runtime in the model (REQUESTS B-21, lead). Same shape as C07/C10/C18 (blocked:engine-modal-link).",
+   "verifiedNote": "Reopened round 19: the engine model landed (L-A, owner approval 2026-10-30) — engine/widgets/tabsModel.ts + export/tabsRuntime.ts (canvas + published, tested on the export path), Tabs block writes keyed pairs + data-tabs-initial; docs/design-2l9/engine-tabs.md. The Inspector Tabs section this board draws is L-B's (REQUESTS B-21 reply); not compared. | Lane L-B round 11: not a capabilities-table change — tabs has no tab↔panel pairing, initial-tab attribute or runtime in the model (REQUESTS B-21, lead). Same shape as C07/C10/C18 (blocked:engine-modal-link).",
    "tier": "P1"
   },
   {
@@ -5301,9 +5301,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "blocked:engine-modal-link",
+   "authority": "board",
    "verified": "no",
-   "verifiedNote": "Lead, round 5: the trigger ↔ dialog link is a new engine data model, out of scope while only 2 agents run (REQUESTS B-17, deferred). Board PNG fetched round 4.",
+   "verifiedNote": "Reopened round 19: the engine model landed (L-A, owner approval 2026-10-30) — engine/widgets/modalModel.ts + export/modalRuntime.ts (canvas reveal + published open/close, focus trap, inert, Escape/backdrop), Modal block puts the dialog at the page root with a key; docs/design-2l9/engine-modal.md. The Inspector surfaces this board draws are L-B's (REQUESTS B-17 reply); not compared. | Lead, round 5: the trigger ↔ dialog link is a new engine data model, out of scope while only 2 agents run (REQUESTS B-17, deferred). Board PNG fetched round 4.",
    "tier": "P1"
   },
   {
@@ -5334,9 +5334,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "blocked:engine-modal-link",
+   "authority": "board",
    "verified": "no",
-   "verifiedNote": "Lead, round 5: needs the engine's trigger ↔ dialog link (REQUESTS B-17, deferred).",
+   "verifiedNote": "Reopened round 19: the engine model landed (L-A, owner approval 2026-10-30) — engine/widgets/modalModel.ts + export/modalRuntime.ts (canvas reveal + published open/close, focus trap, inert, Escape/backdrop), Modal block puts the dialog at the page root with a key; docs/design-2l9/engine-modal.md. The Inspector surfaces this board draws are L-B's (REQUESTS B-17 reply); not compared. | Lead, round 5: needs the engine's trigger ↔ dialog link (REQUESTS B-17, deferred).",
    "inheritsFrom": "245:39899",
    "tier": "P1"
   },
@@ -5912,9 +5912,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "blocked:engine-modal-link",
+   "authority": "board",
    "verified": "no",
-   "verifiedNote": "Lead, round 5: needs the engine's trigger ↔ dialog link (REQUESTS B-17, deferred).",
+   "verifiedNote": "Reopened round 19: the engine model landed (L-A, owner approval 2026-10-30) — engine/widgets/modalModel.ts + export/modalRuntime.ts (canvas reveal + published open/close, focus trap, inert, Escape/backdrop), Modal block puts the dialog at the page root with a key; docs/design-2l9/engine-modal.md. The Inspector surfaces this board draws are L-B's (REQUESTS B-17 reply); not compared. | Lead, round 5: needs the engine's trigger ↔ dialog link (REQUESTS B-17, deferred).",
    "inheritsFrom": "245:39899",
    "tier": "P1"
   },
@@ -8602,8 +8602,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Round 18 (L-A): the canvas record bar is L-A's, but the preview choice lives in the engine (CMSBindingManager.resolveBinding previews the first published record) — REQUESTS A-24 to the lead; L-A builds the bar once it exists. | Canvas record row (Record ‹ › Show drafts) + picker popover absent; code previews first published record only (CmsBindingSection.tsx:178)",
+   "verified": "drift-fixed",
+   "verifiedNote": "Built + compared 2026-10-30 (round 19) with shots/173-12022.png in the Vite demo (Team template page made from Dynamic pages): 'Record [title ⌄] ‹ › ☐ Show drafts' bar under the canvas bar, full canvas width, 40 tall; picker 'Search published records…', rows, 'Showing published records · N', '☐ Show drafts on canvas', Close — match. ‹ › and the picker moved the canvas heading between records while the stored element kept its value (view preference). Engine: CMSBindingManager.setPreviewRecord / getPreviewRecord / previewCandidates / setShowDrafts / templateCollectionOf + EVENTS.CMS_PREVIEW_RECORD_CHANGED; resolveBinding(…, { preview: true }) for the canvas only, default still the first published record. The Inspector's 'This page’s record · i of N' still counts from index 0 — REQUESTS A-25 to L-B. Tests CMSBindingManager.previewRecord, CanvasRecordBar, useCanvasContent.cms. | Round 18 (L-A): the canvas record bar is L-A's, but the preview choice lives in the engine (CMSBindingManager.resolveBinding previews the first published record) — REQUESTS A-24 to the lead; L-A builds the bar once it exists. | Canvas record row (Record ‹ › Show drafts) + picker popover absent; code previews first published record only (CmsBindingSection.tsx:178)",
    "tier": "P1"
   },
   {
@@ -9240,8 +9240,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Built round 18 (L-A), not compared — board shot not fetched (round image budget spent; fetch next round). Start screen when no page is linked: 'Create a page for every {Collection} record' · 'Build one template from {Collection} fields. Each published record gets its own URL.' · Create collection page (primary) / Choose an existing page · 'No pages will be generated until a collection page is linked.' (DynamicPagesStart). | Board: \"Create collection page / Choose an existing page\"; code only template-page select (DynamicPagesPane.tsx:171)",
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared 2026-10-30 (round 19) with shots/187-20406.png: title 13 semibold, line, Create collection page (primary, 240) over Choose an existing page (240), stacked 16 apart, 12 note — match (re-laid out from a row this round). Probe cms-dynamic-pages (real Composer, port 5171; &siteId= makes the link's mirror fail, Playwright then lets it through). | Built round 18 (L-A), not compared — board shot not fetched (round image budget spent; fetch next round). Start screen when no page is linked: 'Create a page for every {Collection} record' · 'Build one template from {Collection} fields. Each published record gets its own URL.' · Create collection page (primary) / Choose an existing page · 'No pages will be generated until a collection page is linked.' (DynamicPagesStart). | Board: \"Create collection page / Choose an existing page\"; code only template-page select (DynamicPagesPane.tsx:171)",
    "tier": "P1"
   },
   {
@@ -9251,8 +9251,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Built round 18 (L-A), not compared — board shot not fetched (round image budget spent; fetch next round). CreateCollectionPageDialog: 'Create collection page for {Collection}' · 'Create editable elements from these fields.' · URL pattern (default /{collection}/{slug}, shared cmsPatternError) · Include fields '{Field} · Heading H1 / Text / Rich text / Image' (fields no element can show are not offered) · Layout Article / Profile / Simple · token preview · 'You can edit every element after creation.' · Cancel / Create page. | Create collection page modal (fields→elements, layout); no page generator in code",
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared 2026-10-30 (round 19) with shots/187-20616.png: 720 dialog, 'Create editable elements from these fields.', filled URL pattern, '{Field} · Heading H1 / Text / Rich text / Image' rows 44 apart, Layout as three equal segments with the chosen one tinted, preview with the portrait circle beside {Name} {Role} {Bio}, Cancel / Create page — match. Dialog sits at chrome-ui's one placement (top ≈279), the board draws it at ≈56 (C-16: one placement for every dialog). The board's 'You can edit every element after creation.' is in the dump but not drawn; dropped. Probe cms-dynamic-pages (real Composer, port 5171; &siteId= makes the link's mirror fail, Playwright then lets it through). | Built round 18 (L-A), not compared — board shot not fetched (round image budget spent; fetch next round). CreateCollectionPageDialog: 'Create collection page for {Collection}' · 'Create editable elements from these fields.' · URL pattern (default /{collection}/{slug}, shared cmsPatternError) · Include fields '{Field} · Heading H1 / Text / Rich text / Image' (fields no element can show are not offered) · Layout Article / Profile / Simple · token preview · 'You can edit every element after creation.' · Cancel / Create page. | Create collection page modal (fields→elements, layout); no page generator in code",
    "tier": "P1"
   },
   {
@@ -9262,8 +9262,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Built round 18 (L-A), not compared — board shot not fetched (round image budget spent; fetch next round). 'Creating {page}…' · 'Creating the page, then saving its collection link. Keep this tab open.' · Creating… (disabled) while the page is made and the link's server save runs. | Creating page then link; not in code",
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared 2026-10-30 (round 19) with shots/187-20858.png: 'Creating Team profile…' · line · disabled 'Creating…' 240 — match (link mirror held 1.5 s). Probe cms-dynamic-pages (real Composer, port 5171; &siteId= makes the link's mirror fail, Playwright then lets it through). | Built round 18 (L-A), not compared — board shot not fetched (round image budget spent; fetch next round). 'Creating {page}…' · 'Creating the page, then saving its collection link. Keep this tab open.' · Creating… (disabled) while the page is made and the link's server save runs. | Creating page then link; not in code",
    "tier": "P1"
   },
   {
@@ -9273,8 +9273,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Built round 18 (L-A), not compared — board shot not fetched (round image budget spent; fetch next round). A link the server did not confirm (saveCollectionLink: direct mirror, markDirectSync) keeps the page: 'Page created, link not saved' · '{page} is in your pages. Retry saves only the collection link; it will not create another page.' · Retry link save · Open {page} › · 'URL pattern · …'. Test DynamicPagesPane. | Page created, link not saved + Retry link only; not in code",
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared 2026-10-30 (round 19) with shots/187-21035.png: 'Page created, link not saved' · line · Retry link save (200) · 'Open {page} ›' centred under it · mono 'URL pattern · /team/{slug}' — match. Probe cms-dynamic-pages (real Composer, port 5171; &siteId= makes the link's mirror fail, Playwright then lets it through). | Built round 18 (L-A), not compared — board shot not fetched (round image budget spent; fetch next round). A link the server did not confirm (saveCollectionLink: direct mirror, markDirectSync) keeps the page: 'Page created, link not saved' · '{page} is in your pages. Retry saves only the collection link; it will not create another page.' · Retry link save · Open {page} › · 'URL pattern · …'. Test DynamicPagesPane. | Page created, link not saved + Retry link only; not in code",
    "tier": "P1"
   },
   {
@@ -9284,8 +9284,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Built round 18 (L-A), not compared — board shot not fetched (round image budget spent; fetch next round). Retry link save re-sends only the collection (retryCollectionLink) — 'Saving link…' while it runs; no second page. Test DynamicPagesPane. | Retry link saving; not in code",
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared 2026-10-30 (round 19) with shots/187-21245.png: Retry runs → 'Saving link…' disabled, the rest unchanged — match; landing then opens the page. Probe cms-dynamic-pages (real Composer, port 5171; &siteId= makes the link's mirror fail, Playwright then lets it through). | Built round 18 (L-A), not compared — board shot not fetched (round image budget spent; fetch next round). Retry link save re-sends only the collection (retryCollectionLink) — 'Saving link…' while it runs; no second page. Test DynamicPagesPane. | Retry link saving; not in code",
    "tier": "P1"
   },
   {
@@ -9295,8 +9295,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Built round 18 (L-A), not compared — board shot not fetched (round image budget spent; fetch next round). Create page makes an ordinary page (one transaction: section + one element per field; then one labelled 'Bind {field}' step per binding, to 'this page's record') and opens it: setActivePage + UI_PANEL_OPEN layers; toast '{page} created · N pages on publish'. NOT built: the toast's Undo — the page and its bindings land as several history steps (BaseBindingManager records each bind after its apply), so a one-click Undo of the whole creation would need an engine-level grouped step; ⌘Z walks them back. Tests createCollectionPage (real Composer), DynamicPagesPane. Walked in the Vite demo 2026-10-30: Team collection → Dynamic pages → Create collection page → Create page opened 'Team profile' on the canvas with Layers beside it (Section › bound heading showing the record's value) and the toast 'Team profile created · 1 page on publish'. | Generated ordinary page + receipt \"6 pages on publish · Undo\"; not in code",
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared 2026-10-30 (round 19) with shots/187-21418.png in the Vite demo: the page opens with Layers 'Profile › Name …' (named per field, bound glyph), the record bar, one-line receipt '{page} created · N pages on publish' with Undo. The creation is ONE history step (page + section + elements + bindings applied inside one composer transaction; BaseBindingManager.bind no longer records/notes a bind made inside a transaction) and the receipt's Undo is bound to that step (captureUndo) — walked: Undo removed the page and its bindings in one go. Inspector 'Collection page · Team' panel is L-B's. Tests createCollectionPage (real Composer), Composer.cmsBindings, DynamicPagesPane. | Built round 18 (L-A), not compared — board shot not fetched (round image budget spent; fetch next round). Create page makes an ordinary page (one transaction: section + one element per field; then one labelled 'Bind {field}' step per binding, to 'this page's record') and opens it: setActivePage + UI_PANEL_OPEN layers; toast '{page} created · N pages on publish'. NOT built: the toast's Undo — the page and its bindings land as several history steps (BaseBindingManager records each bind after its apply), so a one-click Undo of the whole creation would need an engine-level grouped step; ⌘Z walks them back. Tests createCollectionPage (real Composer), DynamicPagesPane. Walked in the Vite demo 2026-10-30: Team collection → Dynamic pages → Create collection page → Create page opened 'Team profile' on the canvas with Layers beside it (Section › bound heading showing the record's value) and the toast 'Team profile created · 1 page on publish'. | Generated ordinary page + receipt \"6 pages on publish · Undo\"; not in code",
    "tier": "P1"
   },
   {
@@ -9307,7 +9307,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Linked summary + Edit collection page › + publish count; code edits pattern/template/SEO fields (DynamicPagesPane.tsx:158-180)",
+   "verifiedNote": "Built round 19, not compared (board shot not fetched — round image budget spent on the 8 waiting rows): a saved link names its page with 'Edit collection page ›' (opens it on the canvas) and the status reads 'On the next publish · N published records will generate N pages. Changes to records or the template appear after site publish.' The editable form (pattern, template select, SEO patterns, page list, Save) stays below — the board draws only URL pattern and SEO title; whether the rest goes is to compare next round. Test DynamicPagesPane '187:21853'. | Linked summary + Edit collection page › + publish count; code edits pattern/template/SEO fields (DynamicPagesPane.tsx:158-180)",
    "tier": "P1"
   },
   {
@@ -9317,8 +9317,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Editor banner on generated page after link failure; not in code",
+   "verified": "drift-open",
+   "verifiedNote": "Round 19: the state now outlives the CMS tab — editor/cms/unsavedCollectionLinks.ts (forPage(pageId)), cleared when the link lands by retry or by the queue's replay (cmsSync.isCmsCollectionSaveOwed). The notice itself sits in the Inspector's page panel — REQUESTS A-26 to L-B. | Editor banner on generated page after link failure; not in code",
    "tier": "P1"
   },
   {
@@ -9328,8 +9328,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Built round 18 (L-A), not compared — board shot not fetched (round image budget spent; fetch next round). A linked page that is gone: 'Collection page missing' · 'The linked page is no longer in your pages. The collection link still exists.' · Choose page / Create collection page · 'Publishing generates none of these until a page is linked.' (the board's 'Publishing is blocked' is not what publish does — it skips the collection; and the code cannot know the page went by Undo, so it does not say so). | Saved link with missing page, publish blocked; partial: RecordTemplatePreviewDialog.tsx:53 only",
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared 2026-10-30 (round 19) with shots/187-22375.png: 'Collection page missing' · Choose page (200) over Create collection page (240) · red note — layout match, reached live by the receipt's Undo in the probe. Copy stays truthful (owner-accepted round 18): 'The linked page is no longer in your pages…' / 'Publishing generates none of these until a page is linked.' Probe cms-dynamic-pages (real Composer, port 5171; &siteId= makes the link's mirror fail, Playwright then lets it through). | Built round 18 (L-A), not compared — board shot not fetched (round image budget spent; fetch next round). A linked page that is gone: 'Collection page missing' · 'The linked page is no longer in your pages. The collection link still exists.' · Choose page / Create collection page · 'Publishing generates none of these until a page is linked.' (the board's 'Publishing is blocked' is not what publish does — it skips the collection; and the code cannot know the page went by Undo, so it does not say so). | Saved link with missing page, publish blocked; partial: RecordTemplatePreviewDialog.tsx:53 only",
    "tier": "P1"
   },
   {
@@ -9505,8 +9505,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Built round 18 (L-A), not compared — board shot not fetched (round image budget spent; fetch next round). Create collection page from the missing state opens the same dialog; Cancel closes it and leaves the missing state as it was. | Recreate missing page modal, exact Cancel; no generator",
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared 2026-10-30 (round 19) with shots/191-31132.png: Create collection page from the missing state opens the same dialog; Cancel returns to the missing state unchanged — match (probe walk). Probe cms-dynamic-pages (real Composer, port 5171; &siteId= makes the link's mirror fail, Playwright then lets it through). | Built round 18 (L-A), not compared — board shot not fetched (round image budget spent; fetch next round). Create collection page from the missing state opens the same dialog; Cancel closes it and leaves the missing state as it was. | Recreate missing page modal, exact Cancel; no generator",
    "tier": "P1"
   },
   {

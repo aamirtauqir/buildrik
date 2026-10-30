@@ -2161,6 +2161,43 @@ const CMS_WS_RECORDS = Array.from({ length: 64 }, (_, i) => ({
   },
 }));
 
+/* design-2l9 187:20406 … 187:22375 on a REAL Composer: the Dynamic pages tab
+   makes a page and binds it, which the stub composer cannot. A Team
+   collection with two published records; `&siteId=` makes the link's server
+   mirror fail (no server behind the probe) for 187:21035. */
+function CmsDynamicPagesHost() {
+  const [composer, setComposer] = React.useState<Composer | null>(null);
+  React.useEffect(() => {
+    const c = new Composer({} as never);
+    c.elements.setActivePage(c.elements.createPage("Home").id);
+    void (async () => {
+      const col = await c.cms.collections.createCollection("Team", "team", undefined, {
+        displayField: "name",
+        fields: [
+          { id: "f-portrait", name: "Portrait", slug: "portrait", type: "image", order: 0 },
+          { id: "f-name", name: "Name", slug: "name", type: "text", order: 1 },
+          { id: "f-slug", name: "Slug", slug: "slug", type: "slug", order: 2 },
+          { id: "f-role", name: "Role", slug: "role", type: "text", order: 3 },
+          { id: "f-bio", name: "Bio", slug: "bio", type: "richtext", order: 4 },
+        ] as never,
+      });
+      for (const [name, role] of [["Ali Shah", "Product designer"], ["Sara Khan", "Strategist"]]) {
+        await c.cms.collections.createContentItem(col.id, { name, role, slug: name.toLowerCase().replace(/ /g, "-") }, { status: "published" });
+      }
+      cmsWorkspace.reset();
+      cmsWorkspace.openRequest({ collectionId: col.id, tab: "dynamic-pages" });
+      setComposer(c);
+    })();
+  }, []);
+  return (
+    <ToastProvider>
+      <div data-probe="cms-dynamic-pages" className="tw:relative" style={{ width: 1145, height: 812 }}>
+        {composer ? <CmsWorkspace composer={composer} /> : null}
+      </div>
+    </ToastProvider>
+  );
+}
+
 function CmsWorkspaceHost() {
   const q = new URLSearchParams(location.search);
   const composer = React.useMemo(
@@ -2403,6 +2440,7 @@ const CASES: Record<string, () => React.ReactElement> = {
     </div>
   ),
   "cms-workspace": () => <CmsWorkspaceHost />,
+  "cms-dynamic-pages": () => <CmsDynamicPagesHost />,
   /* 2L9 223:44891 — the Replace confirm over a built-in template. */
   "tpl-replace-confirm": () => (
     <div data-probe="tpl-replace-confirm">
