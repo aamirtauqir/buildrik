@@ -1,3 +1,4 @@
+import * as React from "react";
 // @vitest-environment jsdom
 /**
  * Behavior › Link inside a Collection list (2L9 B5-D84 189:27792, D87
@@ -11,6 +12,9 @@ import { createTestComposer, installEngineBrowserStubs, removeEngineBrowserStubs
 import { cmsWorkspace } from "@/editor/cms/cmsWorkspaceStore";
 import { LinkSection } from "../LinkSection";
 import { InspectorFieldContext } from "@/editor/inspector/shared/controls/InspectorFieldContext";
+import { ToastProvider as __ToastProvider } from "@/editor/chrome-ui";
+/* LinkSection raises toasts (B5-D90): render it under the provider. */
+const renderT = (ui: React.ReactElement) => render(ui, { wrapper: __ToastProvider });
 
 beforeAll(installEngineBrowserStubs);
 afterAll(removeEngineBrowserStubs);
@@ -38,7 +42,7 @@ const linkTo = () => screen.getByRole("combobox", { name: "Link to" }) as HTMLSe
 describe("Link · This record's page (B5-D84 / D87)", () => {
   it("offers This record's page inside a list; choosing it writes the record-path token, no Rel or hint", () => {
     const { c, card } = cardInList("blog/{slug}");
-    render(<LinkSection composer={c} selectedElement={{ id: card.getId(), type: "link" }} isOpen />);
+    renderT(<LinkSection composer={c} selectedElement={{ id: card.getId(), type: "link" }} isOpen />);
     fireEvent.change(linkTo(), { target: { value: "record" } });
     expect(c.elements.getElement(card.getId())!.getAttribute("href")).toBe("{{item.url}}");
     expect(screen.getByTestId("link-record-note")).toHaveTextContent("Each Blog link opens its own generated page.");
@@ -50,7 +54,7 @@ describe("Link · This record's page (B5-D84 / D87)", () => {
   it("the receipt names the element: '{name} linked to its record page' (B5-D92)", () => {
     const { c, card } = cardInList("blog/{slug}");
     const announce = vi.fn();
-    render(
+    renderT(
       <InspectorFieldContext.Provider value={{ readOnly: false, mixedKeys: new Set(), overrides: new Map(), resetOverride: () => undefined, announce } as never}>
         <LinkSection composer={c} selectedElement={{ id: card.getId(), type: "link" }} isOpen />
       </InspectorFieldContext.Provider>,
@@ -62,20 +66,20 @@ describe("Link · This record's page (B5-D84 / D87)", () => {
   it("reads an existing record link back as This record's page", () => {
     const { c, card } = cardInList("blog/{slug}");
     card.setAttribute("href", "{{item.url}}");
-    render(<LinkSection composer={c} selectedElement={{ id: card.getId(), type: "link" }} isOpen />);
+    renderT(<LinkSection composer={c} selectedElement={{ id: card.getId(), type: "link" }} isOpen />);
     expect(linkTo().value).toBe("record");
   });
 
-  it("a collection with no pages: says so, writes no link, and Create collection page opens its Dynamic pages", () => {
+  it("a collection with no pages: says so, writes no link, and Create collection page opens its dialog here (B5-D88)", () => {
     const { c, card } = cardInList();
-    const open = vi.spyOn(cmsWorkspace, "openRequest").mockImplementation(() => undefined);
-    render(<LinkSection composer={c} selectedElement={{ id: card.getId(), type: "link" }} isOpen />);
+    renderT(<LinkSection composer={c} selectedElement={{ id: card.getId(), type: "link" }} isOpen />);
     fireEvent.change(linkTo(), { target: { value: "record" } });
     expect(c.elements.getElement(card.getId())!.getAttribute("href")).toBeFalsy();
     expect(screen.getByTestId("link-record-note")).toHaveTextContent("Blog has no page per record.");
+    expect(screen.getByTestId("link-create-note")).toHaveTextContent("You\u2019ll return to this card after creating the page.");
     fireEvent.click(screen.getByTestId("link-create-collection-page"));
-    expect(open).toHaveBeenCalledWith({ collectionId: "c1", tab: "dynamic-pages" });
-    open.mockRestore();
+    // The Dynamic pages tab's own dialog, over the Inspector — the user stays on the Card.
+    expect(screen.getByText("Create collection page for Blog")).toBeInTheDocument();
   });
 
   it("outside a list there is no record option", () => {
@@ -84,7 +88,7 @@ describe("Link · This record's page (B5-D84 / D87)", () => {
     c.elements.setActivePage(page.id);
     const a = c.elements.createElement("link", { tagName: "a" });
     c.elements.addElement(a, page.root.id);
-    render(<LinkSection composer={c} selectedElement={{ id: a.getId(), type: "link" }} isOpen />);
+    renderT(<LinkSection composer={c} selectedElement={{ id: a.getId(), type: "link" }} isOpen />);
     expect(Array.from(linkTo().options).map((o) => o.value)).not.toContain("record");
   });
 });

@@ -8950,8 +8950,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Add panel \"CMS fields · Blog\" contextual insertion into named position; Add has only generic Collection list (catalog.ts:37)",
+   "verified": "drift-open",
+   "verifiedNote": "Round 32: built, not compared (copy and structure read from the board). Add › Elements leads, on a collection page, with 'CMS fields · {Collection}' / 'This page’s record': one 56-tall row per field the page can show — name, then its kind ('Heading H1', 'Paragraph', 'Rich text', 'Image', 'Text', 'Text · date') — and 'Insert into {parent} · after {sibling}'. Gaps: 'Image + title alt' reads 'Image' (alt is not bound); reference sub-fields ('Author › name') are not offered (pageFieldPlan skips references).",
    "tier": "P1"
   },
   {
@@ -8961,8 +8961,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Excerpt inserted as bound paragraph, selected + paired Undo; not in code",
+   "verified": "drift-open",
+   "verifiedNote": "Round 32: built, not compared. A field row inserts its element after the insert target, bound to the page's record (bindToField), selected, in one history step; receipt '{Field} inserted · bound to {Collection}' + Undo (CmsAddSection.test).",
    "tier": "P1"
   },
   {
@@ -9364,7 +9364,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Add offers \"List of Blog/List of Team/blank\"; code one generic Collection list block (catalog.ts:37, blocks/Layout/CollectionList.tsx:39)",
+   "verifiedNote": "Round 32: built, not compared. Add › Elements on any page with collections: 'Collection lists', 'Insert after {sibling}', an outlined 'List of {Collection}' per collection — a list bound to it whose card is ordinary elements (image, title, one text field) — 'Collection list · blank' (the catalog's list), 'Each list uses ordinary editable elements.' (CmsAddSection.test).",
    "tier": "P1"
   },
   {
@@ -9529,8 +9529,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Create page modal from Link row origin; no generator",
+   "verified": "drift-open",
+   "verifiedNote": "Round 32: built, not compared — the Link row's 'Create collection page' opens the Dynamic pages dialog over the Inspector and runs the same two-step make (buildCollectionPage, saveCollectionLink; useLinkRowCollectionPage), the editor staying on the Card's page with the Card selected (docs/design-2l9/engine-record-pages.md: no second generator, no migration). D88: 'Create collection page for Team' from the Link row, 'You’ll return to this card after creating the page.'",
    "tier": "P1"
   },
   {
@@ -9540,8 +9540,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Creating page pending at origin; not in code",
+   "verified": "drift-open",
+   "verifiedNote": "Round 32: built, not compared — the Link row's 'Create collection page' opens the Dynamic pages dialog over the Inspector and runs the same two-step make (buildCollectionPage, saveCollectionLink; useLinkRowCollectionPage), the editor staying on the Card's page with the Card selected (docs/design-2l9/engine-record-pages.md: no second generator, no migration). D89: 'Creating page…' (disabled) at the origin.",
    "tier": "P1"
   },
   {
@@ -9551,8 +9551,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Returned to same Card, toast Open page; not in code",
+   "verified": "drift-open",
+   "verifiedNote": "Round 32: built, not compared — the Link row's 'Create collection page' opens the Dynamic pages dialog over the Inspector and runs the same two-step make (buildCollectionPage, saveCollectionLink; useLinkRowCollectionPage), the editor staying on the Card's page with the Card selected (docs/design-2l9/engine-record-pages.md: no second generator, no migration). D90: back on the Card: '{page} is ready. Choose This record’s page to link each card.', 'Page ready. Choose This record page to link the Card.', toast '{page} created · Open page'.",
    "tier": "P1"
   },
   {
@@ -9584,8 +9584,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Page created, link failed, Retry link save; not in code",
+   "verified": "drift-open",
+   "verifiedNote": "Round 32: built, not compared — the Link row's 'Create collection page' opens the Dynamic pages dialog over the Inspector and runs the same two-step make (buildCollectionPage, saveCollectionLink; useLinkRowCollectionPage), the editor staying on the Card's page with the Card selected (docs/design-2l9/engine-record-pages.md: no second generator, no migration). D93: 'Page created, link not saved. Retry keeps the existing {page} page.' + 'Retry link save' — the page stays, the retry saves the link only.",
    "tier": "P1"
   },
   {
@@ -9640,8 +9640,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Retry only link, page retained; not in code",
+   "verified": "drift-open",
+   "verifiedNote": "Round 32: built, not compared — the Link row's 'Create collection page' opens the Dynamic pages dialog over the Inspector and runs the same two-step make (buildCollectionPage, saveCollectionLink; useLinkRowCollectionPage), the editor staying on the Card's page with the Card selected (docs/design-2l9/engine-record-pages.md: no second generator, no migration). D97: 'Saving link…', 'Saving the collection link. Your Card stays selected.'",
    "tier": "P1"
   },
   {

@@ -22,7 +22,8 @@ import { CheckRow } from "../shared/controls/CheckRow";
 import { isEmail, isPhoneNumber } from "@/shared/utils/helpers/validation";
 import { writeElement } from "@/engine/commands/commandOperations";
 import { Button } from "@/editor/chrome-ui";
-import { cmsWorkspace } from "@/editor/cms/cmsWorkspaceStore";
+import { CreateCollectionPageDialog } from "@/editor/cms/CreateCollectionPageDialog";
+import { useLinkRowCollectionPage } from "@/editor/cms/useLinkRowCollectionPage";
 import { WIDE_BUTTON } from "../shared/controls/controlClasses";
 import { RECORD_PAGE_HREF as RECORD_HREF, useCmsBinding } from "./binding/useCmsBinding";
 import { useInspectorField } from "../shared/controls/InspectorFieldContext";
@@ -92,6 +93,9 @@ export const LinkSection: React.FC<LinkSectionProps> = ({
   const isLinkable = LINKABLE_TYPES.has(selectedElement.type);
   const { listCollection } = useCmsBinding(composer, selectedElement.id);
   const recordPages = Boolean(listCollection?.pageSlugPattern);
+  /* B5-D88…D97: the collection page is made from here; the user stays on the Card. */
+  const pageMake = useLinkRowCollectionPage(composer, listCollection ?? null, selectedElement.id);
+  const [pageDialog, setPageDialog] = React.useState(false);
   const { announce } = useInspectorField();
   const linkName = (el: Element | null | undefined) => (el ? getLayerName(el) ?? elementTypeLabel(el.getType()) : "Element");
   /* Rel is read off the element on render; an undo / redo re-renders it. */
@@ -303,7 +307,11 @@ export const LinkSection: React.FC<LinkSectionProps> = ({
       />
 
       {linkType === "record" && listCollection ? (
-        recordPages ? (
+        pageMake.phase === "ready" ? (
+          <NoteRow testId="link-record-note">{`${pageMake.pageName} is ready. Choose This record’s page to link each card.`}</NoteRow>
+        ) : pageMake.phase === "unlinked" || pageMake.phase === "saving" ? (
+          <NoteRow testId="link-record-note">{`Page created, link not saved. Retry keeps the existing ${pageMake.pageName} page.`}</NoteRow>
+        ) : recordPages ? (
           <NoteRow testId="link-record-note">
             Each {listCollection.name} {linkName(composer?.elements.getElement(selectedElement.id)).toLowerCase()} opens its own generated page.
           </NoteRow>
@@ -356,21 +364,45 @@ export const LinkSection: React.FC<LinkSectionProps> = ({
         </>
       )}
 
-      {linkType === "record" && listCollection && !recordPages ? (
+      {linkType === "record" && listCollection && (!recordPages || pageMake.phase !== "idle") ? (
         <div className="tw:flex tw:flex-col tw:gap-1 tw:pt-2">
-          {/* B5-D87: the collection makes no pages yet — its Dynamic pages tab makes them. */}
-          <Button
-            variant="primary"
-            size="xs"
-            className={`${WIDE_BUTTON} tw:text-white!`}
-            data-testid="link-create-collection-page"
-            onClick={() => {
-              cmsWorkspace.openRequest({ collectionId: listCollection.id, tab: "dynamic-pages" });
-              composer?.emit(EVENTS.UI_PANEL_OPEN, { panel: "content" });
+          {pageMake.phase === "ready" ? null : (
+            <Button
+              variant="primary"
+              size="xs"
+              className={`${WIDE_BUTTON} tw:text-white!`}
+              disabled={pageMake.phase === "creating" || pageMake.phase === "saving"}
+              data-testid="link-create-collection-page"
+              onClick={() => (pageMake.phase === "unlinked" ? void pageMake.retry() : setPageDialog(true))}
+            >
+              {pageMake.phase === "creating"
+                ? "Creating page…"
+                : pageMake.phase === "saving"
+                  ? "Saving link…"
+                  : pageMake.phase === "unlinked"
+                    ? "Retry link save"
+                    : "Create collection page"}
+            </Button>
+          )}
+          <NoteRow testId="link-create-note">
+            {pageMake.phase === "ready"
+              ? "Page ready. Choose This record page to link the Card."
+              : pageMake.phase === "unlinked"
+                ? "Page created. Retry saving its collection link."
+                : pageMake.phase === "saving"
+                  ? "Saving the collection link. Your Card stays selected."
+                  : "You’ll return to this card after creating the page."}
+          </NoteRow>
+          <CreateCollectionPageDialog
+            key={String(pageDialog)}
+            open={pageDialog}
+            collection={listCollection}
+            onCancel={() => setPageDialog(false)}
+            onCreate={(choice) => {
+              setPageDialog(false);
+              void pageMake.create(choice);
             }}
-          >
-            Create collection page
-          </Button>
+          />
         </div>
       ) : null}
 
