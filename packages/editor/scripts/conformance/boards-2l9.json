@@ -11,7 +11,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Re-compared 2026-10-30 in the real shell (Vite demo on :5171, Heading + Text inserted, Text selected in Layers): the canvas bar now sits at the top (y56–98) as the board draws it, so 'bar position' is closed; Layers ✕ removed (see 7:19791). Still open, not L-A's: the bottom bar's page switcher reads 'Home /home' where the board reads 'Home /' (the home page's route) and its shortcut hint differs ('⇧⌘O' vs '⌘P', code contract) — lead; 'Container content · N child elements' — inspector, L-B. | probe-compared 2026-10-27 (case canvas-bar at the board's 800 column, shots/7-18654.png): bar CONTENTS match — 'Home / Hero' left, device toggles centred (24 square, tinted active), gray mono '1440 px' chip, outlined '52% ⌄' 82 wide, 'View'. Still open, not L-A's: bar position (top y56, lead3 — A-14), bottom bar 'Saved just now · Details' (lead), Container content note / 'N child elements' (inspector, L-B).",
+   "verifiedNote": "Round 12 (bottom bar): already the board's form — the page switcher prints the active page's real path, and the homepage's is '/' ('Home /', toPageSummaries; pinned by usePageSummaries.test + PageSwitcher.test). The '/home' seen in the Vite demo is a page that is NOT the homepage (file glyph), so its real path is shown. The shortcut stays as code defines it: '⇧⌘O to switch' (⌘P is Preview — code:shortcut-cmd-p-is-preview), the board's '⌘P to switch' is not followed. Remaining open: 'Container content · N child elements' (inspector, L-B). | Re-compared 2026-10-30 in the real shell (Vite demo on :5171, Heading + Text inserted, Text selected in Layers): the canvas bar now sits at the top (y56–98) as the board draws it, so 'bar position' is closed; Layers ✕ removed (see 7:19791). Still open, not L-A's: the bottom bar's page switcher reads 'Home /home' where the board reads 'Home /' (the home page's route) and its shortcut hint differs ('⇧⌘O' vs '⌘P', code contract) — lead; 'Container content · N child elements' — inspector, L-B. | probe-compared 2026-10-27 (case canvas-bar at the board's 800 column, shots/7-18654.png): bar CONTENTS match — 'Home / Hero' left, device toggles centred (24 square, tinted active), gray mono '1440 px' chip, outlined '52% ⌄' 82 wide, 'View'. Still open, not L-A's: bar position (top y56, lead3 — A-14), bottom bar 'Saved just now · Details' (lead), Container content note / 'N child elements' (inspector, L-B).",
    "tier": "P1"
   },
   {
@@ -874,8 +874,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No confirm/progress/slow/partial/unconfirmed operation dialog (L-C)",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-30 (case templates-resource-area&page=Services, SaaS Landing → Create page; board shots/106-29182.png): 'Create Services from SaaS Landing?', 'A new page will be created and added to site navigation. Your other pages and Brand settings will stay unchanged.' (the navigation clause only when the New-page choice adds it), 'After creation, Services opens in the Editor.' (true: the apply switches to the page it makes), Cancel · Create page on the left, 640×208 (board ≈636×209). Test CreatePageModals.",
    "tier": "P1"
   },
   {
@@ -886,7 +886,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No confirm/progress/slow/partial/unconfirmed operation dialog (L-C)",
+   "verifiedNote": "Built 2026-10-30 (ApplyProgressOverlay creating=): 'Creating Services…', 'The page is being created and the template layout is being applied.', 'Keep this task open. Another creation cannot start while this operation is running.' (one run per window — applyRunningRef), the REAL stages ('Resolving brand tokens — done / Importing template HTML — applying… / …'), and past the import a disabled 'Applying layout…' where Cancel was. Test CreatePageModals. Not shot live: the run completes in milliseconds (shots/106-37032.png on disk). | No confirm/progress/slow/partial/unconfirmed operation dialog (L-C)",
    "tier": "P1"
   },
   {
@@ -1679,8 +1679,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Bulk delete is all-or-undo; no per-page result, retry or partial undo",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-30 (case pages-shell&refuse=Work — the probe makes the engine refuse Work's delete; Home, About, Work selected → Delete; board shots/139-48427.png): card '1 deleted · 1 kept · 1 failed' / 'About — deleted' / 'Home — kept; it is the homepage' / 'Work — delete failed; page kept' (red) / 'Retry delete Work', Work stays selected; receipt 'About deleted. Home and Work are still available. · Undo'. The board's 'Recently deleted' link is not drawn: there is no page trash (REQUESTS A-21). Built 2026-10-30 (useBulkDelete + BulkDeleteResult): only outcomes the delete really produces — the homepage (or the last page) KEPT by the guard and never sent, a page the engine refuses (deletePage → false) FAILED, kept and left selected with a retry, the rest deleted. Tests useBulkDelete.",
    "tier": "P1"
   },
   {
@@ -1690,8 +1690,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Bulk delete is all-or-undo; no per-page result, retry or partial undo",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-30 (same, then the receipt's Undo; board shots/139-49184.png): card 'About restored' / 'About — restored with its URL and settings' / 'Home — unchanged' / 'Work — still available; deletion failed'; receipt 'About restored' (shared Toast: ✕, not a text Close). Built 2026-10-30 (useBulkDelete + BulkDeleteResult): only outcomes the delete really produces — the homepage (or the last page) KEPT by the guard and never sent, a page the engine refuses (deletePage → false) FAILED, kept and left selected with a retry, the rest deleted. Tests useBulkDelete.",
    "tier": "P1"
   },
   {
@@ -1702,7 +1702,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Bulk delete is all-or-undo; no per-page result, retry or partial undo",
+   "verifiedNote": "Built, not image-compared live: Retry deletes only the failed page — card '{Work} deleted' / 'Work — deleted after retry' / 'About — already deleted' / 'Home — kept; it is the homepage', receipt 'Work deleted · Undo' (useBulkDelete test). The probe's refusal is permanent, so a successful retry is not reachable there. Board shots/139-49899.png on disk. Built 2026-10-30 (useBulkDelete + BulkDeleteResult): only outcomes the delete really produces — the homepage (or the last page) KEPT by the guard and never sent, a page the engine refuses (deletePage → false) FAILED, kept and left selected with a retry, the rest deleted. Tests useBulkDelete.",
    "tier": "P1"
   },
   {
@@ -1780,7 +1780,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Bulk delete is all-or-undo; no per-page result, retry or partial undo",
+   "verifiedNote": "Built, not image-compared live: the retry's Undo says 'Work restored · About remains deleted' (useBulkDelete test). Board shots/142-52543.png on disk. Built 2026-10-30 (useBulkDelete + BulkDeleteResult): only outcomes the delete really produces — the homepage (or the last page) KEPT by the guard and never sent, a page the engine refuses (deletePage → false) FAILED, kept and left selected with a retry, the rest deleted. Tests useBulkDelete.",
    "tier": "P1"
   },
   {
@@ -2203,8 +2203,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No guide detail panel, lock, apply, sync/conflict states",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-30 (case canvas-grid-panel&guides=locked, View › Rulers and guides… › Edit on the locked 240 guide; board shots/145-67569.png): 'Vertical guide' + Close, Position (px) 240 disabled, 'Unlock this guide to change it.', Unlock guide, Remove guide (disabled), '‹ Back to guides' — no Cancel/Apply. Fixed this round: Lock / Unlock act at once (they were a draft applied with Apply), and a locked guide's detail is read-only. Test RulersGuidesPanel. Sync statuses on the instances (pending / failed / offline / acknowledged): not drawn — code:guides-save-with-site. | Built 2026-10-30: View › 'Rulers and guides…' (canvas/controls/RulersGuidesPanel) over the site's real guides (useCanvasGuides — canvasGuides in the project settings, saved with the site): Show rulers, 'Guides · shared across this site' with '{Vertical|Horizontal} · {n} px / Locked|Unlocked · Edit' rows, Add guide (direction + position); a guide's detail '{Vertical} guide' — Position (px), 'Changes apply with Apply.', Lock/Unlock guide, Remove guide, Cancel · Apply; after a removal 'Undo guide removal' restores it as it was. Test RulersGuidesPanel. Not drawn: the boards' sync statuses (pending / failed / offline / acknowledged) — guides have no sync of their own, they save with the site like any edit. Instances compared: 155:83650 (detail) and 153:79518 (list, shots/153-79518.png — matches: title + Close, Show rulers, the two rows with Edit, Add guide; row/field spacing tuned to it). This archetype's own board was not fetched. | Prior: No guide detail panel, lock, apply, sync/conflict states",
    "tier": "P3"
   },
   {
@@ -2379,7 +2379,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Origin shows retained shared guides; guide model missing",
+   "verifiedNote": "Board compared (shots/145-74465.png): the Return frame is the canvas after Close — rulers with the site's guides drawn across the page (one vertical, one horizontal), no panel. That is GuidesOverlay over RulersOverlay with the saved canvasGuides; the probe harness has no full canvas, so it was not shot live. Its instances' \"retained shared guides\" are the saved guides (useCanvasGuides). | Built 2026-10-30: View › 'Rulers and guides…' (canvas/controls/RulersGuidesPanel) over the site's real guides (useCanvasGuides — canvasGuides in the project settings, saved with the site): Show rulers, 'Guides · shared across this site' with '{Vertical|Horizontal} · {n} px / Locked|Unlocked · Edit' rows, Add guide (direction + position); a guide's detail '{Vertical} guide' — Position (px), 'Changes apply with Apply.', Lock/Unlock guide, Remove guide, Cancel · Apply; after a removal 'Undo guide removal' restores it as it was. Test RulersGuidesPanel. Not drawn: the boards' sync statuses (pending / failed / offline / acknowledged) — guides have no sync of their own, they save with the site like any edit. Instances compared: 155:83650 (detail) and 153:79518 (list, shots/153-79518.png — matches: title + Close, Show rulers, the two rows with Edit, Add guide; row/field spacing tuned to it). This archetype's own board was not fetched. | Prior: Origin shows retained shared guides; guide model missing",
    "tier": "P3"
   },
   {
@@ -2938,9 +2938,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "code:guides-save-with-site",
    "verified": "no",
-   "verifiedNote": "No guide detail panel, lock, apply, sync/conflict states",
+   "verifiedNote": "Guides have no sync status of their own: they are the site's canvasGuides, saved with the site like any other edit (useCanvasGuides → setProjectSettings → autosave). The panel and guide detail are built (145:67569 / 153:79518 compared). | No guide detail panel, lock, apply, sync/conflict states",
    "inheritsFrom": "145:67569",
    "tier": "P3"
   },
@@ -2950,9 +2950,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "code:guides-save-with-site",
    "verified": "no",
-   "verifiedNote": "No guide detail panel, lock, apply, sync/conflict states",
+   "verifiedNote": "Guides have no sync status of their own: they are the site's canvasGuides, saved with the site like any other edit (useCanvasGuides → setProjectSettings → autosave). The panel and guide detail are built (145:67569 / 153:79518 compared). | No guide detail panel, lock, apply, sync/conflict states",
    "inheritsFrom": "145:67569",
    "tier": "P3"
   },
@@ -2962,9 +2962,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "code:guides-save-with-site",
    "verified": "no",
-   "verifiedNote": "No guide detail panel, lock, apply, sync/conflict states",
+   "verifiedNote": "Guides have no sync status of their own: they are the site's canvasGuides, saved with the site like any other edit (useCanvasGuides → setProjectSettings → autosave). The panel and guide detail are built (145:67569 / 153:79518 compared). | No guide detail panel, lock, apply, sync/conflict states",
    "inheritsFrom": "145:67569",
    "tier": "P3"
   },
@@ -2998,9 +2998,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "code:guides-save-with-site",
    "verified": "no",
-   "verifiedNote": "No guide detail panel, lock, apply, sync/conflict states",
+   "verifiedNote": "Guides have no sync status of their own: they are the site's canvasGuides, saved with the site like any other edit (useCanvasGuides → setProjectSettings → autosave). The panel and guide detail are built (145:67569 / 153:79518 compared). | No guide detail panel, lock, apply, sync/conflict states",
    "inheritsFrom": "145:67569",
    "tier": "P3"
   },
@@ -3071,8 +3071,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No guide detail panel, lock, apply, sync/conflict states",
+   "verified": "drift-fixed",
+   "verifiedNote": "Built and test-compared (RulersGuidesPanel 'removes a guide and offers to undo'); board shots/155-82271.png: after Remove guide the list keeps 'Horizontal · 120 px' and offers 'Undo guide removal' above Add guide. The probe's guide list is static, so the post-removal list was not shot live. Built 2026-10-30: View › 'Rulers and guides…' (canvas/controls/RulersGuidesPanel) over the site's real guides (useCanvasGuides — canvasGuides in the project settings, saved with the site): Show rulers, 'Guides · shared across this site' with '{Vertical|Horizontal} · {n} px / Locked|Unlocked · Edit' rows, Add guide (direction + position); a guide's detail '{Vertical} guide' — Position (px), 'Changes apply with Apply.', Lock/Unlock guide, Remove guide, Cancel · Apply; after a removal 'Undo guide removal' restores it as it was. Test RulersGuidesPanel. Not drawn: the boards' sync statuses (pending / failed / offline / acknowledged) — guides have no sync of their own, they save with the site like any edit.",
    "inheritsFrom": "145:67569",
    "tier": "P1"
   },
@@ -3107,8 +3107,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No guide detail panel, lock, apply, sync/conflict states",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-30 (case canvas-grid-panel, View › Rulers and guides… › Edit on the 320 guide; board shots/155-83650.png): 'Vertical guide' + Close, Position (px) 320, 'Changes apply with Apply.', Lock guide, Remove guide, Cancel · Apply, 360 wide under View. Field is the shared white bordered input (board fills it grey). Built 2026-10-30: View › 'Rulers and guides…' (canvas/controls/RulersGuidesPanel) over the site's real guides (useCanvasGuides — canvasGuides in the project settings, saved with the site): Show rulers, 'Guides · shared across this site' with '{Vertical|Horizontal} · {n} px / Locked|Unlocked · Edit' rows, Add guide (direction + position); a guide's detail '{Vertical} guide' — Position (px), 'Changes apply with Apply.', Lock/Unlock guide, Remove guide, Cancel · Apply; after a removal 'Undo guide removal' restores it as it was. Test RulersGuidesPanel. Not drawn: the boards' sync statuses (pending / failed / offline / acknowledged) — guides have no sync of their own, they save with the site like any edit.",
    "inheritsFrom": "145:67569",
    "tier": "P1"
   },
@@ -3969,8 +3969,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Code full toolbar (sizes, align set, colours); board compact 'Heading ▾ B I U Lists Align Color Link … Done'",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-30 (case canvas-text-toolbar, board shots/423-97218.png): one 40-tall white row with the raised shadow, plain B / I / U, text controls, an outlined Done at the end; 607 wide vs the board's ~633. Built 2026-10-30 (panels/RichTextEditor): the inline toolbar is the board's compact row 'Heading ▾ · B · I · U · Lists · Align · Color · Link · … · Done' — Lists / Align / Heading are menus, Color the text-colour field, Done commits the edit through the same blur the click-away uses (useCanvasInlineCommands 'commitEdit'); the 18-control bar's other tools moved behind '…' (TX05). Test RichTextEditor. The board's canvas/inspector around it (Tablet 768, 'Edit text' block) are not this row.",
    "tier": "P1"
   },
   {
@@ -3980,8 +3980,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "phase1 (Task 1.2 one history step on commit); board receipt copy",
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared live 2026-10-30 in the real shell (Vite demo :5171: heading edited, Done; board shots/423-97552.png): the receipt 'Text updated. · Undo' (Canvas onCommitted → captureUndo bound to the edit's one history step; nothing for an unchanged edit). Escape now commits (owner decision BD-31: cherry-picked 1d28d3d8f from feat/flow-decisions), so Escape, Enter, click-away and the toolbar's Done take one path (useCanvasInlineEdit finishEdit). Shared Toast (✕ kept). Tests useCanvasInlineEdit.history.",
    "tier": "P1"
   },
   {
@@ -4004,7 +4004,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Overflow menu 'Strikethrough · Indent · Outdent · Text highlight · Clear formatting' not a menu in code",
+   "verifiedNote": "Built 2026-10-30 (panels/RichTextEditor): the inline toolbar is the board's compact row 'Heading ▾ · B · I · U · Lists · Align · Color · Link · … · Done' — Lists / Align / Heading are menus, Color the text-colour field, Done commits the edit through the same blur the click-away uses (useCanvasInlineCommands 'commitEdit'); the 18-control bar's other tools moved behind '…' (TX05). Test RichTextEditor. '…' holds Strikethrough, Indent, Outdent, Text highlight… (swaps to its colour field in place), Clear formatting, and Text size (the old size select — kept, the board's list does not name it). Not image-compared (board not fetched). | Prior: Overflow menu 'Strikethrough · Indent · Outdent · Text highlight · Clear formatting' not a menu in code",
    "tier": "P1"
   },
   {
@@ -4014,8 +4014,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Link popover exists; board dialog 'Link selected text' + Apply link",
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared live 2026-10-30 in the real shell (heading edited, all text selected, toolbar Link; board shots/423-98532.png): a dialog 'Link selected text' — 'Link “Heading”. Page, selected element and inline text draft stay intact.', the address field, Cancel · Apply link. Built: the edit STAYS open behind it (useCanvasInlineEdit ignores focus moving into the dialog), the selection is saved before focus leaves and put back before createLink — walked: Apply wrapped the text in <a href>, the edit stayed open, Done committed it. Board quotes the text with straight quotes and a period inside; the code uses “ ”. Remove link is offered on linked text. Test RichTextEditor.",
    "tier": "P1"
   },
   {
@@ -4026,7 +4026,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Link popover exists; board dialog 'Link selected text' + Apply link",
+   "verifiedNote": "Round 13: Link applies through the 'Link selected text' dialog with the draft kept (423:98532, walked live: link made, edit open, Done commits one step). Not image-compared (board not fetched). | Round 12: the toolbar's Link opens the address field with 'Apply link' (and Remove); the board's titled dialog 'Link selected text' is not drawn — not compared (board not fetched). | Prior: Link popover exists; board dialog 'Link selected text' + Apply link",
    "tier": "P1"
   },
   {
@@ -4037,7 +4037,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Link popover exists; board dialog 'Link selected text' + Apply link",
+   "verifiedNote": "Round 13: Link applies through the 'Link selected text' dialog with the draft kept (423:98532, walked live: link made, edit open, Done commits one step). Not image-compared (board not fetched). | Round 12: the toolbar's Link opens the address field with 'Apply link' (and Remove); the board's titled dialog 'Link selected text' is not drawn — not compared (board not fetched). | Prior: Link popover exists; board dialog 'Link selected text' + Apply link",
    "tier": "P1"
   },
   {
@@ -4046,9 +4046,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "code:text-commit-is-local",
    "verified": "no",
-   "verifiedNote": "No 'Retry site save' inline state",
+   "verifiedNote": "Board compared (shots/423-99545.png: 'Retry site save' under Edit text in the Inspector). A text edit cannot fail to save on its own: committing writes the element in the local document (one transaction); the server save is the site's autosave, whose failure and retry are the bottom bar's ('Saved just now' / Details) and the save-failed strip — not a per-text state. | No 'Retry site save' inline state",
    "tier": "P1"
   },
   {
@@ -4059,7 +4059,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No 'Locked — unlock … Enter and double-click do not start an edit' notice",
+   "verifiedNote": "Board compared (shots/423-99859.png): the locked notice is the INSPECTOR's — 'Hero heading is locked. Unlock it in Layers to edit its text or semantic tag.', Edit text disabled, 'Locked — unlock Hero heading before editing. Enter and double-click do not start an edit.' — L-B's paths. The canvas side already holds: a layer's OWN lock (not inherited) stops Enter / double-click from starting an edit (useCanvasInlineEdit.locked tests). | No 'Locked — unlock … Enter and double-click do not start an edit' notice",
    "tier": "P1"
   },
   {

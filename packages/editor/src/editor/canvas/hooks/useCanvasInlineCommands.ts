@@ -33,6 +33,12 @@ export function useCanvasInlineCommands({
         `[data-buildrick-id="${editingId}"]`
       ) as HTMLElement | null;
       if (!editingEl) return;
+      /* design-2l9 TX02/TX03: the toolbar's Done ends the edit the way
+         clicking away does — the blur handler commits it. */
+      if (command === "commitEdit") {
+        editingEl.blur();
+        return;
+      }
 
       editingEl.focus();
       const selection = window.getSelection();
@@ -168,7 +174,7 @@ export function useCanvasInlineCommands({
          the element, which destroyed the contentEditable session on the FIRST
          toolbar click — format applied, editing over, in a toolbar of
          eighteen controls. The live DOM already holds every edit;
-         useCanvasInlineEdit's finishEdit(true) sanitizes and persists the
+         useCanvasInlineEdit's finishEdit() sanitizes and persists the
          final markup once, when the session actually ends (Enter, Escape,
          click-outside). One writer, one transaction, one undo step. */
     },

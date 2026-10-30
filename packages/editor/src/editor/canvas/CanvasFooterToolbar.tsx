@@ -25,6 +25,7 @@ import { BreakpointSwitcher, Button, isModalOpen, Menu, MenuGroup, MenuItem, Pop
 import { ChevronDown } from "lucide-react";
 import { stepZoom } from "@/shared/constants/canvas";
 import { GridSnapPanel } from "./controls/GridSnapPanel";
+import { RulersGuidesPanel, type CanvasGuideActions } from "./controls/RulersGuidesPanel";
 import { PageWidthPanel } from "./controls/PageWidthPanel";
 // Device values are the chrome-ui Breakpoint union.
 export type FooterDevice = Breakpoint;
@@ -57,6 +58,8 @@ export interface CanvasFooterToolbarProps {
   onFitToScreen?: () => void;
   /** Board 817:4723 — fit the SELECTED element, not the page. */
   onZoomToSelection?: () => void;
+  /** The site's ruler guides — View › Rulers and guides… (153:79518). */
+  guides?: CanvasGuideActions;
 
   // ── Edit + viewport controls (moved off the topbar) ──────────────────────
   /** Current device/breakpoint. When provided, the device switcher renders. */
@@ -141,6 +144,7 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
   onZoomChange,
   onFitToScreen,
   onZoomToSelection,
+  guides,
   device,
   onDeviceChange,
   customWidth,
@@ -220,6 +224,7 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
 
   const [viewOpen, setViewOpen] = React.useState(false);
   const [gridOpen, setGridOpen] = React.useState(false);
+  const [guidesOpen, setGuidesOpen] = React.useState(false);
   const [zoomOpen, setZoomOpen] = React.useState(false);
   const [widthOpen, setWidthOpen] = React.useState(false);
 
@@ -352,15 +357,16 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
         {/* "View" — board 145:64586's Canvas view. Opens downward: the bar
             sits at the top of the canvas column (7:18654). */}
         <Popover
-          open={viewOpen || gridOpen}
+          open={viewOpen || gridOpen || guidesOpen}
           onClose={() => {
             setViewOpen(false);
             setGridOpen(false);
+            setGuidesOpen(false);
           }}
           placement="bottom-end"
           /* The Grid panel is its own framed surface (145:65011, 360 wide):
              no popover padding around it. */
-          className={gridOpen ? `${POPOVER_UNDER_BAR} tw:p-0!` : POPOVER_UNDER_BAR}
+          className={gridOpen || guidesOpen ? `${POPOVER_UNDER_BAR} tw:p-0!` : POPOVER_UNDER_BAR}
           label="Canvas view"
           trigger={
             <Button
@@ -388,6 +394,13 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
                 if (size !== gridSize) onGridSizeChange(size);
                 if (gridOn !== overlays.grid) onOverlayChange("grid", gridOn);
               }}
+            />
+          ) : guidesOpen && guides ? (
+            <RulersGuidesPanel
+              rulersOn={overlays.rulers}
+              onRulersChange={(on) => onOverlayChange("rulers", on)}
+              guides={guides}
+              onClose={() => setGuidesOpen(false)}
             />
           ) : (
           <Menu label="Canvas view" data-testid="canvas-view-menu" className={FOOTER_MENU}>
@@ -417,7 +430,24 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
             >
               {`Grid · ${gridSize ?? 8} px`}
             </MenuItem>
-            {VIEW_ROWS.map(overlayRow)}
+            {/* 153:79518: with the site's guides to hand, the rulers row opens
+                Rulers and guides; without, it stays the toggle. */}
+            {guides ? (
+              <MenuItem
+                selected={overlays.rulers}
+                kbd="›"
+                data-testid="canvas-view-rulers"
+                onClick={() => {
+                  setViewOpen(false);
+                  setGuidesOpen(true);
+                }}
+              >
+                Rulers and guides…
+              </MenuItem>
+            ) : (
+              overlayRow(VIEW_ROWS[0])
+            )}
+            {VIEW_ROWS.slice(1).map(overlayRow)}
             <MenuGroup>{MORE_VIEW_ROWS.map(overlayRow)}</MenuGroup>
           </Menu>
           )}

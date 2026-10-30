@@ -18,6 +18,7 @@
  *
  * @license BSD-3-Clause
  */
+import { RichTextEditor } from "@/editor/panels/RichTextEditor";
 import { CreateComponentModal } from "@/editor/shell/modals/CreateComponentModal";
 import * as React from "react";
 import { createRoot } from "react-dom/client";
@@ -840,7 +841,17 @@ function RestoredProbe() {
 
 function ShellProbe() {
   const tab = (new URLSearchParams(location.search).get("tab") ?? "pages") as GroupedTabId;
-  const composer = React.useMemo(() => listingsComposer(), []);
+  const composer = React.useMemo(() => {
+    const c = listingsComposer();
+    /* `?refuse=<page name>`: the engine refuses that page's delete, the one
+       way a real bulk delete partly fails (139:48427). */
+    const refuse = new URLSearchParams(location.search).get("refuse");
+    if (refuse) {
+      const del = c.elements.deletePage.bind(c.elements);
+      c.elements.deletePage = (id: string) => (c.elements.getPage(id)?.name === refuse ? false : del(id));
+    }
+    return c;
+  }, []);
   return (
     <div data-probe="pages-shell" style={{ width: "100vw", height: "100vh" }}>
       <ToastProvider>
@@ -2432,6 +2443,21 @@ const CASES: Record<string, () => React.ReactElement> = {
           onDeviceChange={() => {}}
           pageWidth={1440}
           onCustomWidth={() => {}}
+          /* 153:79518's two guides, as the site would hold them; `&guides=locked`
+             is 145:67569's one locked 240 guide. */
+          guides={{
+            list: new URLSearchParams(location.search).get("guides") === "locked"
+              ? [{ id: "g-v", type: "vertical", position: 240, locked: true }]
+              : [
+                  { id: "g-v", type: "vertical", position: 320, locked: false },
+                  { id: "g-h", type: "horizontal", position: 120, locked: false },
+                ],
+            add: () => {},
+            update: () => {},
+            setLocked: () => {},
+            remove: () => {},
+            restore: () => {},
+          }}
         />
       </div>
     </div>
@@ -2938,6 +2964,14 @@ const CASES: Record<string, () => React.ReactElement> = {
           <p data-buildrick-id="o3" style={{ margin: "8px 0 0" }}>Lasting impact.</p>
         </section>
       </div>
+    </div>
+  ),
+  /* design-2l9 TX02 / TX10 (423:97218): the inline text toolbar over a
+     heading being edited. */
+  "canvas-text-toolbar": () => (
+    <div data-probe="canvas-text-toolbar" style={{ width: 760, padding: 24, background: "#fff" }}>
+      <RichTextEditor onCommand={() => {}} blockTag="h1" />
+      <h1 style={{ margin: "16px 0 0", font: "600 32px/1.2 var(--bk-font-ui)" }}>Thoughtful design. Real impact.</h1>
     </div>
   ),
   "canvas-empty": () => (

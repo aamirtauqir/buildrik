@@ -73,8 +73,9 @@ export interface UsePagesReturn {
   duplicatePage: (pageId: string) => void;
   duplicatePages: (pageIds: readonly string[]) => void;
   deletePage: (pageId: string) => void;
-  /** Bulk delete with one report (v3 4418:96537). Guards are the caller's. */
-  deletePages: (pageIds: string[]) => void;
+  /** Bulk delete with one report (v3 4418:96537). Guards are the caller's.
+   *  Returns what really happened — a page the engine refused stays (139:48427). */
+  deletePages: (pageIds: string[], opts?: DeletePagesOptions) => DeletePagesResult;
   setHomepage: (pageId: string) => void;
   copyPageLink: (pageId: string) => void;
 
@@ -87,6 +88,19 @@ export interface UsePagesReturn {
   /** The site's project is still on its way. An empty list means "not known
       yet", not "no pages" — see the state below. */
   loading: boolean;
+}
+
+export interface DeletePagesResult {
+  deleted: string[];
+  /** The engine refused these (deletePage → false); still present ones are kept. */
+  failed: string[];
+}
+
+export interface DeletePagesOptions {
+  /** The receipt's text when the default ("n pages deleted · names") is not it. */
+  describe?: (result: DeletePagesResult) => string;
+  /** Called after the receipt's Undo actually reverted the deletion. */
+  onUndone?: () => void;
 }
 
 export function usePages(composer: Composer | null): UsePagesReturn {
@@ -364,17 +378,22 @@ export function usePages(composer: Composer | null): UsePagesReturn {
    *  "3 pages deleted · Menu, Contact, About · Undo" — and one undo brings
    *  them all back. The caller has already applied the home/last guards. */
   const deletePages = React.useCallback(
-    (pageIds: string[]) => {
-      if (!composer || pageIds.length === 0) return;
-      const names = pageIds.map((id) => pages.find((p) => p.id === id)?.name).filter((n): n is string => !!n);
-      pageIds.forEach((id) => composer.elements.deletePage(id));
+    (pageIds: string[], opts: DeletePagesOptions = {}): DeletePagesResult => {
+      const result: DeletePagesResult = { deleted: [], failed: [] };
+      if (!composer || pageIds.length === 0) return result;
+      for (const id of pageIds) (composer.elements.deletePage(id) ? result.deleted : result.failed).push(id);
+      if (result.deleted.length === 0) return result;
+      const names = result.deleted.map((id) => pages.find((p) => p.id === id)?.name).filter((n): n is string => !!n);
       const undoDelete = composer.history?.captureUndo?.();
       addToast({
-        description: `${pageIds.length} page${pageIds.length === 1 ? "" : "s"} deleted · ${names.join(", ")}`,
+        description:
+          opts.describe?.(result) ??
+          `${result.deleted.length} page${result.deleted.length === 1 ? "" : "s"} deleted · ${names.join(", ")}`,
         tone: "info",
         duration: 8000,
-        action: { label: "Undo", onClick: () => undoDelete?.() },
+        action: { label: "Undo", onClick: () => { if (undoDelete?.()) opts.onUndone?.(); } },
       });
+      return result;
     },
     [composer, pages, addToast]
   );

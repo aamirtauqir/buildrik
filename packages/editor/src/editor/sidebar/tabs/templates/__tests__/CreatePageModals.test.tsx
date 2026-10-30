@@ -29,11 +29,22 @@ describe("create page from template (boards 1169:4725, 4418:54243)", () => {
         onConfirm={vi.fn()}
       />,
     );
-    expect(screen.getByText(/Create a page from ‘Bistro Menu’\?/)).toBeInTheDocument();
+    /* Re-baseline: design-2l9 106:29182's question and copy. */
+    expect(screen.getByText("Create Menu 2 from Bistro Menu?")).toBeInTheDocument();
     expect(
-      screen.getByText(/A new page named ‘Menu 2’ will be added\. Your current pages stay unchanged\./),
+      screen.getByText("A new page will be created. Your other pages and Brand settings will stay unchanged."),
     ).toBeInTheDocument();
+    expect(screen.getByText("After creation, Menu 2 opens in the Editor.")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Create page" })).toBeInTheDocument();
+  });
+
+  it("names site navigation only when the New-page choice adds it", () => {
+    render(
+      <CreatePageConfirmModal templateName="SaaS Landing" newPageName="Services" addToNavigation onCancel={vi.fn()} onConfirm={vi.fn()} />,
+    );
+    expect(
+      screen.getByText("A new page will be created and added to site navigation. Your other pages and Brand settings will stay unchanged."),
+    ).toBeInTheDocument();
   });
 
   /* "you're on it now" is only true because the apply switches to the page it
@@ -60,5 +71,28 @@ describe("create page from template (boards 1169:4725, 4418:54243)", () => {
       <CreatePageErrorModal reason="Template has no content." onCancel={vi.fn()} onRetry={vi.fn()} />,
     );
     expect(screen.getByTestId("tpl-create-error-reason")).toHaveTextContent("Template has no content.");
+  });
+});
+
+/* design-2l9 106:37032 — the create run names the page and, past the point
+   of no return, says what it is doing instead of offering Cancel. */
+describe("ApplyProgressOverlay — creating a page", () => {
+  it("reads 'Creating Services…' with the keep-open note and the disabled status", async () => {
+    const { ApplyProgressOverlay } = await import("../ApplyProgressOverlay");
+    render(
+      <ApplyProgressOverlay
+        templateName="SaaS Landing"
+        creating="Services"
+        steps={[
+          { id: "tokens", label: "Resolving brand tokens", state: "done" },
+          { id: "import", label: "Importing template HTML", state: "active" },
+        ]}
+      />,
+    );
+    expect(screen.getByTestId("tpl-applying-title")).toHaveTextContent("Creating Services…");
+    expect(screen.getByTestId("tpl-applying-sub")).toHaveTextContent("The page is being created and the template layout is being applied.");
+    expect(screen.getByTestId("tpl-applying-note")).toHaveTextContent("Another creation cannot start while this operation is running.");
+    expect(screen.getByTestId("tpl-applying-status")).toBeDisabled();
+    expect(screen.getByTestId("tpl-applying-step-import")).toHaveTextContent("Importing template HTML — applying…");
   });
 });
