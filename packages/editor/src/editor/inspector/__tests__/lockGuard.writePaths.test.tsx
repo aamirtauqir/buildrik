@@ -37,6 +37,7 @@ import { CollectionListSection } from "../sections/CollectionListSection";
 import { useFieldOverrides } from "../hooks/useFieldOverrides";
 import { BindingDetail } from "../sections/binding/BindingDetail";
 import { InspectorElementMenu } from "../components/InspectorElementMenu";
+import { ResetStyleReview } from "../components/ResetStyleReview";
 import { useStyleHandlers } from "../hooks/useStyleHandlers";
 
 beforeAll(installEngineBrowserStubs);
@@ -193,16 +194,21 @@ describe("P-1 — style resets refuse a locked element", () => {
     expect(skipped).toHaveBeenCalled();
   });
 
-  it("InspectorElementMenu: Reset style", () => {
+  it("InspectorElementMenu: Reset style (through its review, 2L9 S20)", () => {
     const h = add("heading", { content: "T" });
     h.setStyle("color", "rgb(1, 1, 1)");
     lock(h);
     composer.selection.select(h);
-    render(<InspectorElementMenu composer={composer} selectedElementId={h.getId()} />, {
-      wrapper: ToastProvider,
-    });
+    render(
+      <>
+        <InspectorElementMenu composer={composer} selectedElementId={h.getId()} />
+        <ResetStyleReview composer={composer} elementId={h.getId()} onClose={() => {}} />
+      </>,
+      { wrapper: ToastProvider },
+    );
     fireEvent.click(screen.getByRole("button", { name: /element actions/i }));
     fireEvent.click(screen.getByText("Reset style"));
+    fireEvent.click(screen.getByTestId("inspector-reset-remove"));
     expect(h.getStyles().color).toBe("rgb(1, 1, 1)");
     expect(skipped).toHaveBeenCalled();
   });

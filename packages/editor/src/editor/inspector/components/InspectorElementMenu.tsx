@@ -21,6 +21,7 @@ import type { Composer } from "@/engine";
 import { IconButton, Menu, MenuItem, MenuSeparator, Popover, useToast } from "@/editor/chrome-ui";
 import { formatShortcutHint, isMac } from "@/editor/canvas/menus/shortcutHint";
 import { useInspectorField } from "../shared/controls/InspectorFieldContext";
+import { openSubview } from "../tabs/subviewStore";
 import {
   actionLabel,
   ELEMENT_ACTIONS,
@@ -71,6 +72,11 @@ export const InspectorElementMenu: React.FC<InspectorElementMenuProps> = ({ comp
           className={ROW}
           onClick={() => {
             close();
+            /* 2L9 S20: Reset style reviews first, as the tab's body. */
+            if (id === "reset-style") {
+              openSubview({ kind: "reset-style", elementId: selectedElementId });
+              return;
+            }
             /* Its own undo step, after any edit still pending (Reset style
                right after Align used to undo with it — or be overtaken by it). */
             runDiscrete(() => action.run(ctx));

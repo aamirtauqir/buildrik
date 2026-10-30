@@ -101,6 +101,9 @@ describe("Table · Wrapper layout (245:44049)", () => {
     const { c, table } = setup();
     const wrapper = table().getParent()!;
     expect(isTableWrapper(wrapper)).toBe(true);
+    /* The block stores CSS's own names, so Wrapper layout reads them (was overflowX). */
+    expect(wrapper.getStyles()["overflow-x"]).toBe("auto");
+    expect(wrapper.getStyles()).not.toHaveProperty("overflowX");
     const onChange = vi.fn();
     render(<TableWrapperSection composer={c} elementId={wrapper.getId()} styles={{ width: "100%" }} onChange={onChange} isOpen />);
     fireEvent.change(screen.getByLabelText("Overflow X"), { target: { value: "auto" } });

@@ -5393,7 +5393,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-fixed",
-   "verifiedNote": "Lane L-B P1 round 5, probe ?block=table → Inspect scroll wrapper → Style, side by side: 'Wrapper layout' first — Width, Overflow X, Overflow Y, the note 'These values belong to the wrapper. Table cells keep native table layout.', 'Back to {table}'. Exceptions: the wrapper's other Style sections follow (it is a container); the Table block stores its overflow as camelCase 'overflowX', which the Inspector reads as unset — a block-data defect (blocks/, not L-B's).",
+   "verifiedNote": "Lane L-B P1 round 5, probe ?block=table → Inspect scroll wrapper → Style, side by side: 'Wrapper layout' first — Width, Overflow X, Overflow Y, the note 'These values belong to the wrapper. Table cells keep native table layout.', 'Back to {table}'. Round 6: the Table block now stores CSS's own kebab-case keys (was camelCase overflowX, read as unset), so Overflow X reads 'Auto' as the board (TableSections + blockRegistry tests). Exception: the wrapper's other Style sections follow (it is a container).",
    "inheritsFrom": "245:42929",
    "tier": "P1"
   },
@@ -5614,7 +5614,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Lane L-B F1 (built, not compared — copy checked against the dump): the Font field reads '{family} · {source}' (System / Google Fonts / Uploaded) and the row adds 'Applied stack: {stack}' for a written stack. Open: 'Choose font' label on the trigger.",
+   "verifiedNote": "Lane L-B P1 round 6, board PNG fetched: Font '{family} · {source}' + 'Applied stack: …' match. Open: the board adds a full-width primary 'Choose font' under the Font row (the code's Font row is itself the picker's door).",
    "tier": "P1"
   },
   {
@@ -6036,7 +6036,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Fixed categories in code; board choose Typography/Spacing/Fill/Border, locked-skipped count",
+   "verifiedNote": "Lane L-B P1 round 6, board PNG fetched: the review's category boxes need the engine's applyStyleToPeers to take a category / property filter — REQUESTS B-18 (lead). The current confirm is the ApplyStyleDialog (board 31).",
    "tier": "P1"
   },
   {
@@ -6138,8 +6138,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Resets without confirm (\"Styles reset · Undo\"); board names layer + properties",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B P1 round 6, probe ?type=heading&styles={font family, size, weight, line height} → ⋯ › Reset style, side by side with the board PNG: the Inspector's Reset style now reviews first as the tab's whole body (a tab subview) — 'Reset local style', '{name} · Desktop · Default state', 'Remove 4 local properties: font family, font size, font weight and line height.', the inheritance note, full-width primary 'Remove 4 local properties' and 'Cancel'. Remove runs the same reset-style element action (one Undo, 'Styles reset · Undo'); the list is exactly what that command clears (the element's own Desktop · Default styles). The canvas menu / ⌘K row still reset directly (outside L-B's paths).",
    "tier": "P1"
   },
   {
@@ -6173,7 +6173,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Board Content › \"Dynamic bindings\" with \"‹ CMS · Dynamic pages\" return; code Behaviour \"CMS binding\"",
+   "verifiedNote": "Lane L-B P1 round 6, board PNG fetched and compared with the probe's CMS stub (?type=heading&cms=1): the Dynamic bindings summary matches (F2.16 form). Open: the bound property row — the board draws a full-width tinted card ('Blog · title' / value / ⋯) under a 'Title text' label with 'This page’s record · 1 of 980' below; the code's row (C-13, built to B5-D04 / D11) is a label column + value lines + ›.",
    "tier": "P1"
   },
   {
@@ -6238,9 +6238,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:161:8480",
    "verified": "drift-open",
-   "verifiedNote": "Collection/Field/Record selects in Behaviour; board \"Bind Title text\" source picker (This page’s record/Specific/List item)",
+   "verifiedNote": "Lane L-B P1 round 6, board PNG compared: Content › 'Text' with Tag in the block and a 'Title text' value field is the older Content layout; the Inspector follows page 04's text board 161:8480 (drift-fixed) — the property row 'Title text' + bind icon (opens Choose source, F2.02 drift-fixed), Edit text on canvas, Tag in Semantics.",
    "tier": "P1"
   },
   {
@@ -6272,9 +6272,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:302:13946",
    "verified": "drift-open",
-   "verifiedNote": "Unbind exists; board return path + Undo toast",
+   "verifiedNote": "Lane L-B P1 round 6, board PNG compared: this binding detail (bordered '‹ Back to Content' at the top, Source / Record / Field / Format 'None' / If empty, 'Unbind') is superseded by Play F2.05's detail (302:13946, drift-fixed against its board with CMS data in the probe): centred back link, '{Property} binding', Source box, Format 'As written', If empty, Preview, Open record ›, 'Unbind — keep shown text'. One detail screen; F2.05 is the journey the product follows.",
    "tier": "P1"
   },
   {
@@ -6352,7 +6352,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Enter/Escape exist inline; board confirm card noting DOM ID/tag unchanged",
+   "verifiedNote": "Lane L-B P1 round 6, board PNG fetched: the board draws renaming as an 'Element name' confirm card on the Style tab (Name field, 'Editor label only. DOM ID … and tag H1 are unchanged. Enter commits; Escape restores …', 'Rename to …', 'Cancel'). The name edit lives in the header (InspectorHeader, lead) — open.",
    "tier": "P1"
   },
   {
@@ -6452,7 +6452,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "No \"2 styles copied · This element only · Desktop / Default\" receipt; Selector row blocked:owner-class-first",
+   "verifiedNote": "Lane L-B P1 round 6, board PNG fetched: the receipt '2 styles copied · This element only · Desktop / Default' is the Copy style element action's toast (editor/shared/elementActions.ts, outside L-B's paths); the Selector row is class-first (owner decision pending). Open.",
    "tier": "P1"
   },
   {
@@ -6586,7 +6586,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Lane L-B P1 round 5, board PNG fetched: the receipt now reads '{name} component created.' (unit-tested). Open: the owning detail page (Components › This page › Hero heading, Used on, 'The selected heading is now the first instance…') is the component library's full page — L-C's surface; and the receipt has no Undo (code:create-not-a-history-step — createComponent / adoptInstances record no document history step to undo).",
+   "verifiedNote": "Lane L-B round 6: the receipt reads '{name} component created.' with no Undo — creating a component (createComponent + adoptInstances) records no document history step, so behaviour follows the code (lead, round 6). Open for L-C: the owning detail page (Components › This page › Hero heading, Used on, 'The selected heading is now the first instance…') is the component library's full page.",
    "inheritsFrom": "271:125321",
    "tier": "P1"
   },
@@ -6598,7 +6598,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Lane L-B P1 round 5, board PNG fetched: as G13 for a library master (receipt copy done; the detail page is L-C's; no Undo — code:create-not-a-history-step).",
+   "verifiedNote": "Lane L-B round 6: as G13 for a library master — receipt '{name} component created.', no Undo (no history step; lead round 6). Open for L-C: the library's detail page.",
    "inheritsFrom": "271:125321",
    "tier": "P1"
   },
@@ -6608,9 +6608,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
+   "authority": "code:instance-facts-in-ic01-block",
    "verified": "drift-open",
-   "verifiedNote": "Lane L-B P1 round 5, board PNG fetched: the instance's Style tab draws 'Selector · Editing This element only' (class-first — owner decision pending) and a 'Component' group (Main · Scope 'This page · Home' · Overrides · Edit main component). The Inspector carries the instance identity above the tabs (IC01 241:16522, drift-fixed); its source line now says the scope ('This page · Home · v1' / 'Component library · v1', unit-tested). Open: the two boards place the instance facts differently (IC01 above the tabs, G15 a Style group) — needs a lead call.",
+   "verifiedNote": "Lead, round 6: G15 draws the instance facts (Main, Scope 'This page · Home', Overrides, Edit main component) as a 'Component' group on the Style tab; IC01 (241:16522, drift-fixed) draws them in one block above the tabs. The facts live in one place — IC01's block — whose source line now names the scope ('This page · Home · v1', unit-tested). The board's 'Selector · Editing This element only' is class-first (owner decision pending).",
    "inheritsFrom": "271:125321",
    "tier": "P1"
   },
@@ -6620,9 +6620,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
+   "authority": "code:instance-facts-in-ic01-block",
    "verified": "drift-open",
-   "verifiedNote": "Lane L-B P1 round 5, board PNG fetched: as G15 with Scope 'Component library' (the source line reads it). Open on the same IC01-vs-G16 placement call.",
+   "verifiedNote": "Lead, round 6: as G15 — the board's Style-tab 'Component' group (Scope 'Component library') conflicts with IC01's block above the tabs; the facts stay in IC01's block, whose source line reads 'Component library · v{n}'.",
    "inheritsFrom": "271:125321",
    "tier": "P1"
   },

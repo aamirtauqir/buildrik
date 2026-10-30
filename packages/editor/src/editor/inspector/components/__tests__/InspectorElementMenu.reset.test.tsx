@@ -2,7 +2,8 @@
 /**
  * "Reset all styles" — kept as an inspector ⋯ row after the canvas menu lost
  * it (G2-054). Owner rule 2026-09-24: parity never silently removes a
- * capability. One transaction, and an Undo toast.
+ * capability. 2L9 S20: the row opens the review (the tab's body) first;
+ * Remove there is one transaction, with an Undo toast.
  *
  * @license BSD-3-Clause
  */
@@ -15,6 +16,13 @@ import {
 } from "@/engine/__tests__/test-utils/realComposer";
 import { ToastProvider } from "@/editor/chrome-ui";
 import { InspectorElementMenu } from "../InspectorElementMenu";
+import { ResetStyleReview } from "../ResetStyleReview";
+import { closeSubview, useSubview } from "@/editor/inspector/tabs/subviewStore";
+
+function ReviewHost({ composer, id }: { composer: ReturnType<typeof createTestComposer>; id: string }) {
+  const sub = useSubview();
+  return sub?.kind === "reset-style" ? <ResetStyleReview composer={composer} elementId={id} onClose={() => closeSubview("reset-style")} /> : null;
+}
 
 beforeAll(installEngineBrowserStubs);
 afterAll(removeEngineBrowserStubs);
@@ -34,10 +42,15 @@ describe("InspectorElementMenu — Reset style", () => {
     render(
       <ToastProvider>
         <InspectorElementMenu composer={composer} selectedElementId={el.getId()} />
+        <ReviewHost composer={composer} id={el.getId()} />
       </ToastProvider>,
     );
     fireEvent.click(screen.getByTestId("inspector-element-menu"));
     fireEvent.click(screen.getByTestId("inspector-menu-reset-style"));
+    /* The review first: nothing removed yet. */
+    expect(Object.keys(el.getStyles?.() ?? {})).toHaveLength(2);
+    expect(screen.getByTestId("inspector-reset-properties")).toHaveTextContent("Remove 2 local properties: color and padding.");
+    fireEvent.click(screen.getByTestId("inspector-reset-remove"));
     expect(Object.keys(el.getStyles?.() ?? {})).toHaveLength(0);
     composer.history?.flushPending?.();
 
