@@ -21,6 +21,12 @@ vi.mock("@/editor/shell/exportPublishPages", () => ({
 }));
 vi.mock("@/services/ReviewService", () => ({
   fetchCurrentRound: () => fetchCurrentRound(),
+  fetchApprovedSnapshot: async () => [{ path: "index.html", html: "<p>old</p>" }],
+}));
+const myRole = { role: "ADMIN" as string | null };
+vi.mock("@/services/RoleService", () => ({
+  fetchMyRole: async () => myRole.role,
+  roleAtLeast: (r: string | null, min: string) => (r === null ? null : ["VIEWER", "EDITOR", "ADMIN", "OWNER"].indexOf(r) >= ["VIEWER", "EDITOR", "ADMIN", "OWNER"].indexOf(min)),
 }));
 vi.mock("@/editor/chrome-ui", async () => {
   const actual = await vi.importActual<Record<string, unknown>>("@/editor/chrome-ui");
@@ -203,5 +209,44 @@ describe("PublishConfirmModal — regression: no unbacked controls", () => {
     for (const dead of ["Preview", "Schedule", "Changelog", "changelog note"]) {
       expect(container.textContent).not.toContain(dead);
     }
+  });
+});
+
+/* A-31 · B8-PB05 233:2418 / PB06 233:3034 — the stale-approval door opens the
+   same numbered confirm; StaleApprovalModal is gone. */
+describe("PublishConfirmModal — stale approval", () => {
+  const approved = {
+    id: "r1", status: "APPROVED", invitedEmail: "c@x.com", reviewerName: "Lena",
+    revoked: false, resolvedAt: "2026-10-15T10:00:00.000Z", createdAt: "2026-10-14T10:00:00.000Z",
+    revision: "1", roundNumber: 1, totalRounds: 1, openCommentCount: 0,
+  };
+
+  it("an Admin ticks 'Publish without a fresh review' before Publish opens; the row counts the changes", async () => {
+    myRole.role = "ADMIN";
+    fetchCurrentRound.mockResolvedValue(approved);
+    const onConfirm = vi.fn();
+    renderModal({ stale: true, onConfirm, isPublished: true, publishedUrl: "https://fieldwork.studio" });
+    await waitFor(() => expect(screen.getByTestId("publish-fact-val-approval")).toHaveTextContent(/edited since \(2 changes\)/));
+    const publish = screen.getByText("Publish").closest("button") as HTMLButtonElement;
+    expect(publish.disabled).toBe(true);
+    fireEvent.click(await screen.findByTestId("publish-confirm-override"));
+    expect(publish.disabled).toBe(false);
+    fireEvent.click(publish);
+    expect(onConfirm).toHaveBeenCalledTimes(1);
+  });
+
+  it("an Editor is offered a fresh review instead, and Publish stays shut", async () => {
+    myRole.role = "EDITOR";
+    fetchCurrentRound.mockResolvedValue(approved);
+    const emit = vi.fn();
+    const onClose = vi.fn();
+    renderModal({ stale: true, composer: { emit } as never, onClose });
+    expect(await screen.findByTestId("publish-confirm-stale-note")).toHaveTextContent(
+      "Publishing without a fresh review needs Admin access — or request a fresh review.",
+    );
+    expect((screen.getByText("Publish").closest("button") as HTMLButtonElement).disabled).toBe(true);
+    fireEvent.click(screen.getByTestId("publish-confirm-request-review"));
+    expect(onClose).toHaveBeenCalled();
+    expect(emit).toHaveBeenCalledWith(EVENTS.UI_SWITCH_TAB, { tab: "review" });
   });
 });

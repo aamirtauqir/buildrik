@@ -178,7 +178,6 @@ import {
 import type { PageSummary } from "@/shared/types";
 import { ReviewTab } from "@/editor/sidebar/tabs/review/ReviewTab";
 import { PublishGateModal, type PublishGateReason } from "@/editor/shell/modals/PublishGateModal";
-import { StaleApprovalModal } from "@/editor/shell/modals/StaleApprovalModal";
 import { CommentLayer } from "@/editor/canvas/comments/CommentLayer";
 import { EVENTS } from "@/shared/constants/events";
 
@@ -4294,12 +4293,23 @@ const CASES: Record<string, () => React.ReactElement> = {
   // state a slow compare actually shows — and the two things this recipe
   // measures, the title and the body gutter, render before and regardless of
   // it. The change rows are NOT measured here; see the recipe's own note.
+  /* B8-PB05 233:2418 / PB06 233:3034 — the numbered confirm in its stale
+     form (StaleApprovalModal is gone, A-31). `&role=ADMIN|EDITOR`; the round
+     was approved, then edited (the approved snapshot differs on one page). */
   "s5-6-approved-edited-since": () => {
-    trpcStub({ "reviews.currentRound": () => REVIEW_ROUND(), "sites.myRole": () => "OWNER" });
+    const role = new URLSearchParams(location.search).get("role") ?? "ADMIN";
+    stubTrayServer({
+      "reviews.currentRound": { id: "r1", status: "APPROVED", invitedEmail: "lena@client.test", reviewerName: "Lena", revoked: false, resolvedAt: "2026-10-15T10:00:00.000Z", createdAt: "2026-10-14T10:00:00.000Z", revision: "x", roundNumber: 1, totalRounds: 1, openCommentCount: 0, token: null },
+      "reviews.approvedSnapshot": [{ path: "index.html", html: "<p>old</p>" }],
+      "sites.prePublishChecks": TRAY_CHECKS,
+      "sites.myRole": { role },
+    });
+    publishTray.setIssues([{ id: "i2", type: "warning", message: "2 images have no alt text", elementId: "el-2" }]);
+    saveStatusStore.set({ state: "saved", savedAt: new Date("2026-10-30T10:42:00").getTime() });
     return (
       <div data-probe="s5-6-approved-edited-since">
         <ToastProvider>
-          <StaleApprovalModal isOpen composer={null} onPublishAnyway={() => {}} onClose={() => {}} />
+          <PublishConfirmModal isOpen stale composer={null} siteId="s1" publishedUrl="https://fieldwork.studio" isPublished onConfirm={() => {}} onClose={() => {}} />
         </ToastProvider>
       </div>
     );

@@ -13960,8 +13960,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 24: the confirm is the board's numbered ledger now (PB04); the stale-approval door still opens StaleApprovalModal (AquibraStudio routing). Filed REQUESTS A-31 (route stale-approval into the one confirm + role); L-A builds the Approval row half once it lands.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 28, probe-compared: shots/233-2418.png vs probe s5-6-approved-edited-since&role=EDITOR — the stale-approval door now opens the one numbered confirm (A-31; StaleApprovalModal deleted): '4 Approval · Approved {date} · edited since (n changes)' from the approved snapshot vs the export; an Editor gets 'Request fresh review' (opens Review) and 'Publishing without a fresh review needs Admin access — or request a fresh review.', Publish shut. Residual: '1 Changes' counts and See all › wait on A-33 (in progress); the probe has no composer, so its row reads without the change count.",
    "tier": "P1"
   },
   {
@@ -13971,8 +13971,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 24: as 233:2418 — needs REQUESTS A-31 (stale approval routed into PublishConfirmModal with the Admin 'Publish without a fresh review' box).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 28, probe-compared: shots/233-3034.png vs probe s5-6-approved-edited-since&role=ADMIN with both boxes ticked — the stale-approval door now opens the one numbered confirm (A-31; StaleApprovalModal deleted): '4 Approval · Approved {date} · edited since (n changes)' from the approved snapshot vs the export; an Admin's '☐ Publish without a fresh review' gates Publish and the confirm ships with acknowledgeStale (the router also requires ADMIN). Tests PublishConfirmModal › stale approval. Residual as 233:2418 (A-33).",
    "tier": "P1"
   },
   {
@@ -23224,8 +23224,8 @@
    "family": "play",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 24: the confirm is the board's numbered ledger (1 Changes / 2 Tips ☐ I’ve seen these / 4 Approval / 5 Release, Cancel · Publish, 'Tick the boxes above to publish' — probe publish-confirm-tips, see 233:1802). Open: this board is the stale-approval variant ('☐ Publish without a fresh review'), which needs the AquibraStudio route (REQUESTS A-31).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 28: the board's stale confirm with both boxes unticked is the probe's Admin state before ticking (s5-6-approved-edited-since&role=ADMIN), compared with 233:3034's image set. Residual: Changes counts (A-33).",
    "tier": "P1"
   },
   {
@@ -23235,8 +23235,8 @@
    "family": "play",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 24: ticking 'I’ve seen these' is built and gates Publish (PublishConfirmModal.test 'Publish waits for…'). Open only for the stale-approval box this board also draws (REQUESTS A-31).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 28: tips ticked, override unticked — the Admin probe state between the two ticks; Publish stays shut until the override (test). Compared with the PB06 image set. Residual: Changes counts (A-33).",
    "tier": "P1"
   },
   {
@@ -23246,8 +23246,8 @@
    "family": "play",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 24: the Admin 'Publish without a fresh review' box needs the stale-approval door routed into the one confirm (REQUESTS A-31); StaleApprovalModal still answers it.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 28, probe-compared with shots/233-3034.png (same state): both boxes ticked, Publish open, ships with acknowledgeStale. Residual: Changes counts (A-33).",
    "tier": "P1"
   },
   {

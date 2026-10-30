@@ -20,11 +20,12 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { ModalBody, ModalContent, ModalFooter, ModalRoot, ModalTitle, Button } from "@/editor/chrome-ui";
+import { ModalBody, ModalContent, ModalFooter, ModalRoot, ModalTitle, Button, Checkbox } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants/events";
 import { PublishConfirmFacts } from "@/editor/sidebar/tabs/publish/PublishConfirmFacts";
 import { publishTray } from "../publishTrayStore";
+import { fetchMyRole, roleAtLeast } from "@/services/RoleService";
 
 export interface PublishConfirmModalProps {
   isOpen: boolean;
@@ -36,6 +37,10 @@ export interface PublishConfirmModalProps {
   /** The site being published — passed through so the facts can ask the server
       whether this workspace can deploy at all. */
   siteId?: string | null;
+  /** The approval is older than the edits (gate `stale-approval`, B8-PB05 /
+   *  PB06): the Approval row offers an Admin the override box and anyone else
+   *  the way to a fresh review; `onConfirm` then ships with acknowledgeStale. */
+  stale?: boolean;
   /** Proceed with the canonical publish. */
   onConfirm: () => void | Promise<void>;
   onClose: () => void;
@@ -48,9 +53,25 @@ export const PublishConfirmModal: React.FC<PublishConfirmModalProps> = ({
   isPublished,
   publishedUrl,
   siteId,
+  stale = false,
   onConfirm,
   onClose,
 }) => {
+  /* PB06: publishing past a stale approval is ADMIN+ (the router enforces
+     the same, sites.publish acknowledgeStale). */
+  const [admin, setAdmin] = React.useState<boolean | null>(null);
+  const [override, setOverride] = React.useState(false);
+  React.useEffect(() => {
+    if (!isOpen || !stale) return;
+    setOverride(false);
+    let alive = true;
+    fetchMyRole()
+      .then((r) => alive && setAdmin(roleAtLeast(r, "ADMIN") === true))
+      .catch(() => alive && setAdmin(false));
+    return () => {
+      alive = false;
+    };
+  }, [isOpen, stale]);
   const [submitting, setSubmitting] = React.useState(false);
   /* A blocking pre-publish check means the server will refuse this deploy.
      v3 FC-8: every failing check renders here, not just the first. */
@@ -67,7 +88,8 @@ export const PublishConfirmModal: React.FC<PublishConfirmModalProps> = ({
   React.useEffect(() => {
     if (isOpen) setTipsSeen(false);
   }, [isOpen]);
-  const unticked = tips > 0 && !tipsSeen;
+  const blockedByStale = stale && !(admin && override);
+  const unticked = (tips > 0 && !tipsSeen) || (stale && admin === true && !override);
 
   /* The confirm opens with the Publish surface already up behind it — the
      existing `UI_PANEL_OPEN` door, once per open. */
@@ -101,7 +123,39 @@ export const PublishConfirmModal: React.FC<PublishConfirmModalProps> = ({
               tips={tips}
               tipsSeen={tipsSeen}
               onTipsSeen={setTipsSeen}
+              stale={stale}
+              staleControl={
+                admin ? (
+                  <label className="tw:flex tw:items-start tw:gap-1.5 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">
+                    <Checkbox
+                      className="tw:mt-0.5"
+                      checked={override}
+                      onChange={(e) => setOverride(e.currentTarget.checked)}
+                      data-testid="publish-confirm-override"
+                    />
+                    Publish without a fresh review
+                  </label>
+                ) : admin === false ? (
+                  <Button
+                    color="light"
+                    size="xs"
+                    className="tw:h-5 tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[13px] tw:font-normal tw:text-[var(--bk-accent)]"
+                    onClick={() => {
+                      onClose();
+                      composer?.emit?.(EVENTS.UI_SWITCH_TAB, { tab: "review" });
+                    }}
+                    data-testid="publish-confirm-request-review"
+                  >
+                    Request fresh review
+                  </Button>
+                ) : null
+              }
             />
+            {stale && admin === false ? (
+              <p className="tw:m-0 tw:mt-1 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]" data-testid="publish-confirm-stale-note">
+                Publishing without a fresh review needs Admin access — or request a fresh review.
+              </p>
+            ) : null}
           </div>
 
           {/* v3 FC-8: every failing server check, not just the first. */}
@@ -122,7 +176,7 @@ export const PublishConfirmModal: React.FC<PublishConfirmModalProps> = ({
           </Button>
           <Button
             size="xs"
-            disabled={submitting || pageCount === 0 || blockers.length > 0 || unticked}
+            disabled={submitting || pageCount === 0 || blockers.length > 0 || unticked || blockedByStale}
             aria-describedby={unticked ? "publish-confirm-reason" : undefined}
             onClick={() => {
               setSubmitting(true);
