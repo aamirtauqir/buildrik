@@ -26,6 +26,11 @@ import { Button, Select, TextInput, useToast } from "@/editor/chrome-ui";
 import { applyCmsPattern, cmsPatternError, cmsSlugField } from "@buildrik/shared/schemas/cms";
 import { ACTION, CONTROL, CONTROL_W, LABEL, NOTE, PANE, SECTION, WARN } from "./paneStyles";
 import { DynamicPagesStart } from "./DynamicPagesStart";
+
+/* 187:21853: the linked view's 720 fields, filled, under 13/20 ink labels. */
+const LINKED_W = "tw:w-[720px]";
+const LINKED_LABEL = "tw:mb-2 tw:block tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]";
+const FILLED = "tw:[&_input]:border-0 tw:[&_input]:bg-[var(--bk-gray-100)]";
 import { CreateCollectionPageDialog, type CreateCollectionPageChoice } from "./CreateCollectionPageDialog";
 import { buildCollectionPage, collectionPageName, retryCollectionLink, saveCollectionLink, type CreatedCollectionPage } from "./createCollectionPage";
 import { unsavedCollectionLinks, useUnsavedCollectionLink } from "./unsavedCollectionLinks";
@@ -130,12 +135,11 @@ export function DynamicPagesPane({ composer, collection, records, onOpenPage }: 
         onClick: () => {
           if (!made.undo?.()) return;
           addToast({
-            tone: "warning",
-            /* Stays until answered: the shell's own "Undo: …" receipt would
-               otherwise replace it (a transient replaces a transient). */
+            /* 187:22586: one line and Open CMS. Stays until answered: the
+               shell's own "Undo: …" receipt would otherwise replace it. */
+            tone: "neutral",
             duration: Infinity,
-            title: `${made.name} removed. Collection link needs repair.`,
-            description: `${collection.name} still links to the removed page; Dynamic pages offers Choose page or Create collection page.`,
+            description: `${made.name} removed. Collection link needs repair.`,
             action: { label: "Open CMS", onClick: () => composer?.emit(EVENTS.UI_PANEL_OPEN, { panel: "content" }) },
           });
         },
@@ -259,12 +263,12 @@ export function DynamicPagesPane({ composer, collection, records, onOpenPage }: 
   }
 
   /* The link as saved — not a form edit still in progress. */
-  const linkedPage = !dirty && collection.pageTemplatePath && templatePage?.file === collection.pageTemplatePath ? templatePage : null;
-  if (ready && linkedPage) {
+  const linkedPage = collection.pageTemplatePath && templatePage?.file === collection.pageTemplatePath ? templatePage : null;
+  if (ready && linkedPage && !dirty) {
     /* 187:21853 — what the next publish does, in words. */
     status = (
       <section className="tw:flex tw:flex-col tw:gap-1" data-testid="cms-dp-status">
-        <h3 className={SECTION}>On the next publish</h3>
+        <h3 className="tw:m-0 tw:text-[12px] tw:font-semibold tw:leading-[18px] tw:text-[var(--bk-ink)]">On the next publish</h3>
         <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">
           {`${published.length} published record${published.length === 1 ? "" : "s"} will generate ${published.length} page${published.length === 1 ? "" : "s"}. Changes to records or the template appear after site publish.`}
         </p>
@@ -301,33 +305,35 @@ export function DynamicPagesPane({ composer, collection, records, onOpenPage }: 
     );
   }
 
-  return (
-    <div className={PANE} data-testid="cms-dynamic-pages">
-      {/* 187:21853 — a saved link names its page first, with the way to it. */}
-      {linkedPage ? (
-        <div className="tw:flex tw:flex-col tw:items-start tw:gap-1" data-testid="cms-dp-linked">
-          <h3 className="tw:m-0 tw:text-[13px] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]">{linkedPage.name}</h3>
-          {onOpenPage ? (
-            <Button size="xs" variant="link" className="tw:h-auto tw:min-h-0 tw:p-0 tw:text-[13px] tw:font-normal" onClick={() => onOpenPage(linkedPage.id)} data-testid="cms-dp-edit-page">
-              Edit collection page ›
-            </Button>
-          ) : null}
-        </div>
-      ) : (
-        <p className={`${NOTE} tw:m-0`}>One page per record. Pages are created on publish and update when records change.</p>
-      )}
-      <div className={CONTROL_W}>
-        <label className={LABEL} htmlFor="cms-dp-pattern">URL pattern</label>
+  const patternField = (
+      <div className={linkedPage ? LINKED_W : CONTROL_W}>
+        <label className={linkedPage ? LINKED_LABEL : LABEL} htmlFor="cms-dp-pattern">URL pattern</label>
         <TextInput
           id="cms-dp-pattern"
           sizing="sm"
-          className={CONTROL}
+          className={linkedPage ? `${CONTROL} ${FILLED}` : CONTROL}
           placeholder="/menu/{slug}"
           value={pattern}
           onChange={(e) => setPattern(e.target.value)}
           data-testid="cms-dp-pattern"
         />
       </div>
+  );
+  const seoTitleField = (
+      <div className={linkedPage ? LINKED_W : CONTROL_W}>
+        <label className={linkedPage ? LINKED_LABEL : LABEL} htmlFor="cms-dp-seo-title">{linkedPage ? "SEO title" : "SEO title pattern"}</label>
+        <TextInput
+          id="cms-dp-seo-title"
+          sizing="sm"
+          className={linkedPage ? `${CONTROL} ${FILLED}` : CONTROL}
+          placeholder={`{${collection.displayField ?? collection.fields[0]?.slug ?? "title"}}`}
+          value={seoTitle}
+          onChange={(e) => setSeoTitle(e.target.value)}
+          data-testid="cms-dp-seo-title"
+        />
+      </div>
+  );
+  const templateField = (
       <div className={CONTROL_W}>
         <label className={LABEL} htmlFor="cms-dp-template">Template page</label>
         <Select id="cms-dp-template" sizing="sm" className={CONTROL} value={template} onChange={(e) => setTemplate(e.target.value)} data-testid="cms-dp-template">
@@ -339,18 +345,8 @@ export function DynamicPagesPane({ composer, collection, records, onOpenPage }: 
           ))}
         </Select>
       </div>
-      <div className={CONTROL_W}>
-        <label className={LABEL} htmlFor="cms-dp-seo-title">SEO title pattern</label>
-        <TextInput
-          id="cms-dp-seo-title"
-          sizing="sm"
-          className={CONTROL}
-          placeholder={`{${collection.displayField ?? collection.fields[0]?.slug ?? "title"}}`}
-          value={seoTitle}
-          onChange={(e) => setSeoTitle(e.target.value)}
-          data-testid="cms-dp-seo-title"
-        />
-      </div>
+  );
+  const seoDescriptionField = (
       <div className={CONTROL_W}>
         <label className={LABEL} htmlFor="cms-dp-seo-description">SEO description pattern</label>
         <TextInput
@@ -362,13 +358,8 @@ export function DynamicPagesPane({ composer, collection, records, onOpenPage }: 
           data-testid="cms-dp-seo-description"
         />
       </div>
-      {seoUnknown.length ? (
-        <span className={WARN} data-testid="cms-dp-seo-error">
-          {seoUnknown.join(", ")} {seoUnknown.length === 1 ? "is" : "are"} not a field of {collection.name}.
-        </span>
-      ) : null}
-      <div>{status}</div>
-      {urls.length ? (
+  );
+  const pageList = urls.length ? (
         <section className={CONTROL_W}>
           <h3 className={`${SECTION} tw:mb-2`}>
             Pages to generate · {urls.length}
@@ -382,7 +373,73 @@ export function DynamicPagesPane({ composer, collection, records, onOpenPage }: 
             ))}
           </ul>
         </section>
+  ) : null;
+  const rest = (
+    <>
+      {templateField}
+      {seoDescriptionField}
+      {pageList}
+    </>
+  );
+
+  if (linkedPage) {
+    /* 187:21853 — a saved link: its page and the way to it, the URL and SEO
+       title, and what the next publish does. The template choice, SEO
+       description and page list sit under More settings (kept, not drawn on
+       the board); Save appears once something is edited. */
+    return (
+      <div className={PANE} data-testid="cms-dynamic-pages">
+        <div className="tw:flex tw:flex-col tw:items-start" data-testid="cms-dp-linked">
+          <h3 className="tw:m-0 tw:text-[13px] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]">{linkedPage.name}</h3>
+          {onOpenPage ? (
+            <Button size="xs" variant="link" className="tw:mt-3 tw:h-8 tw:w-[200px] tw:justify-center tw:p-0 tw:text-[13px] tw:font-normal" onClick={() => onOpenPage(linkedPage.id)} data-testid="cms-dp-edit-page">
+              Edit collection page ›
+            </Button>
+          ) : null}
+        </div>
+        {patternField}
+        {seoTitleField}
+        {seoUnknown.length ? (
+        <span className={WARN} data-testid="cms-dp-seo-error">
+          {seoUnknown.join(", ")} {seoUnknown.length === 1 ? "is" : "are"} not a field of {collection.name}.
+        </span>
       ) : null}
+        <div>{status}</div>
+        <details className="tw:w-[720px]" data-testid="cms-dp-more">
+          <summary className={`${NOTE} tw:cursor-pointer`}>More settings</summary>
+          <div className="tw:mt-3 tw:flex tw:flex-col tw:gap-4">{rest}</div>
+        </details>
+        {dirty ? (
+          <div>
+        <Button
+          size="xs"
+          className={ACTION}
+          disabled={!(dirty || ready) || saving || unknown.length > 0 || Boolean(patternProblem) || seoUnknown.length > 0}
+          data-testid="cms-dp-save"
+          onClick={() => void save()}
+        >
+          Save changes
+        </Button>
+      </div>
+        ) : null}
+      </div>
+    );
+  }
+
+  return (
+    <div className={PANE} data-testid="cms-dynamic-pages">
+      <p className={`${NOTE} tw:m-0`}>One page per record. Pages are created on publish and update when records change.</p>
+      {patternField}
+      {templateField}
+      {seoTitleField}
+      {seoDescriptionField}
+      {seoUnknown.length ? (
+        <span className={WARN} data-testid="cms-dp-seo-error">
+          {seoUnknown.join(", ")} {seoUnknown.length === 1 ? "is" : "are"} not a field of {collection.name}.
+        </span>
+      ) : null}
+      <div>{status}</div>
+      {pageList}
       <div>
         <Button
           size="xs"

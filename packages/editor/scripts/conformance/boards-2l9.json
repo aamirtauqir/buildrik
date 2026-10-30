@@ -9252,7 +9252,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-fixed",
-   "verifiedNote": "Compared 2026-10-30 (round 19) with shots/187-20616.png: 720 dialog, 'Create editable elements from these fields.', filled URL pattern, '{Field} · Heading H1 / Text / Rich text / Image' rows 44 apart, Layout as three equal segments with the chosen one tinted, preview with the portrait circle beside {Name} {Role} {Bio}, Cancel / Create page — match. Dialog sits at chrome-ui's one placement (top ≈279), the board draws it at ≈56 (C-16: one placement for every dialog). The board's 'You can edit every element after creation.' is in the dump but not drawn; dropped. Probe cms-dynamic-pages (real Composer, port 5171; &siteId= makes the link's mirror fail, Playwright then lets it through). | Built round 18 (L-A), not compared — board shot not fetched (round image budget spent; fetch next round). CreateCollectionPageDialog: 'Create collection page for {Collection}' · 'Create editable elements from these fields.' · URL pattern (default /{collection}/{slug}, shared cmsPatternError) · Include fields '{Field} · Heading H1 / Text / Rich text / Image' (fields no element can show are not offered) · Layout Article / Profile / Simple · token preview · 'You can edit every element after creation.' · Cancel / Create page. | Create collection page modal (fields→elements, layout); no page generator in code",
+   "verifiedNote": "Round 20: the dialog now sits at the workspace's top (chrome-ui Modal placement=\"workspace\", contract test Modal.board) — probe-measured frame 360/56/720×698 vs the board's 360/56/720×651. | Compared 2026-10-30 (round 19) with shots/187-20616.png: 720 dialog, 'Create editable elements from these fields.', filled URL pattern, '{Field} · Heading H1 / Text / Rich text / Image' rows 44 apart, Layout as three equal segments with the chosen one tinted, preview with the portrait circle beside {Name} {Role} {Bio}, Cancel / Create page — match. Dialog sits at chrome-ui's one placement (top ≈279), the board draws it at ≈56 (C-16: one placement for every dialog). The board's 'You can edit every element after creation.' is in the dump but not drawn; dropped. Probe cms-dynamic-pages (real Composer, port 5171; &siteId= makes the link's mirror fail, Playwright then lets it through). | Built round 18 (L-A), not compared — board shot not fetched (round image budget spent; fetch next round). CreateCollectionPageDialog: 'Create collection page for {Collection}' · 'Create editable elements from these fields.' · URL pattern (default /{collection}/{slug}, shared cmsPatternError) · Include fields '{Field} · Heading H1 / Text / Rich text / Image' (fields no element can show are not offered) · Layout Article / Profile / Simple · token preview · 'You can edit every element after creation.' · Cancel / Create page. | Create collection page modal (fields→elements, layout); no page generator in code",
    "tier": "P1"
   },
   {
@@ -9306,8 +9306,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Built round 19, not compared (board shot not fetched — round image budget spent on the 8 waiting rows): a saved link names its page with 'Edit collection page ›' (opens it on the canvas) and the status reads 'On the next publish · N published records will generate N pages. Changes to records or the template appear after site publish.' The editable form (pattern, template select, SEO patterns, page list, Save) stays below — the board draws only URL pattern and SEO title; whether the rest goes is to compare next round. Test DynamicPagesPane '187:21853'. | Linked summary + Edit collection page › + publish count; code edits pattern/template/SEO fields (DynamicPagesPane.tsx:158-180)",
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared 2026-10-30 (round 20) with shots/187-21853.png, probe cms-dynamic-pages after Create page: '{page}' 13 semibold · 'Edit collection page ›' · URL pattern and SEO title as 720 filled fields under 13 ink labels · 'On the next publish' 12 semibold · '{N} published records will generate {N} pages. Changes to records or the template appear after site publish.' — match. Kept beyond the board (capabilities, not removed): a collapsed 'More settings' (template page, SEO description, page list) and 'Save changes' once a field is edited. The header's '‹ Back to Team profile' is the workspace origin (C-11/C-12). Tests DynamicPagesPane. | Built round 19, not compared (board shot not fetched — round image budget spent on the 8 waiting rows): a saved link names its page with 'Edit collection page ›' (opens it on the canvas) and the status reads 'On the next publish · N published records will generate N pages. Changes to records or the template appear after site publish.' The editable form (pattern, template select, SEO patterns, page list, Save) stays below — the board draws only URL pattern and SEO title; whether the rest goes is to compare next round. Test DynamicPagesPane '187:21853'. | Linked summary + Edit collection page › + publish count; code edits pattern/template/SEO fields (DynamicPagesPane.tsx:158-180)",
    "tier": "P1"
   },
   {
@@ -9339,8 +9339,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Document Undo removed page, toast \"link needs repair · Open CMS\"; not in code",
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared 2026-10-30 (round 20) with shots/187-22586.png in the Vite demo: the receipt's Undo reverts the one creation step — back on Home, the made page gone — and says 'Team profile removed. Collection link needs repair.' with Open CMS (one line, persistent until answered) — match. The shell's own 'Undo: Create Team profile · Redo' receipt stacks under it (every Undo raises it; lead-owned), the board draws only ours. | Document Undo removed page, toast \"link needs repair · Open CMS\"; not in code",
    "tier": "P1"
   },
   {

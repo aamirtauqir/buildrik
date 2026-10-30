@@ -156,6 +156,15 @@ describe("DynamicPagesPane", () => {
     );
   });
 
+  it("the linked view keeps the template, SEO description and list under More settings; Save shows once edited", () => {
+    mount({ ...MENU, pageSlugPattern: "/menu/{slug}", pageTemplatePath: "menu-item.html" } as CMSCollection, [rec("a", "Margherita")]);
+    expect(screen.getByTestId("cms-dp-more")).toContainElement(screen.getByTestId("cms-dp-template"));
+    expect(screen.getByLabelText("SEO title")).toBeInTheDocument();
+    expect(screen.queryByTestId("cms-dp-save")).toBeNull();
+    fireEvent.change(screen.getByTestId("cms-dp-seo-title"), { target: { value: "{name} · Menu" } });
+    expect(screen.getByTestId("cms-dp-save")).toHaveTextContent("Save changes");
+  });
+
   describe("Create collection page (187:20406 … 187:21418)", () => {
     afterEach(() => {
       buildMock.mockClear();

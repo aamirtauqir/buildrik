@@ -23,19 +23,23 @@ import { getOverlayRoot } from "./OverlayRoot";
    G14 225:9180, 165:2184, 223:44891 — C-16 / F-24). A column with a
    31vh spacer above (it shrinks first when a tall dialog would not fit)
    and a growing one below. */
-const SCRIM_ALIGN_CLASS: Record<"center" | "top", string> = {
+const SCRIM_ALIGN_CLASS: Record<"center" | "top" | "workspace", string> = {
   center:
     "tw:flex-col tw:items-center tw:justify-start tw:pb-4 tw:before:content-[''] tw:before:shrink tw:before:basis-[31vh] tw:before:min-h-4 " +
     "tw:after:content-[''] tw:after:grow",
   top: "tw:justify-center tw:items-start tw:pt-[12vh]",
+  /* A tall dialog drawn from the top of the workspace, under the 56px topbar
+     (design-2l9 187:20616 / 191:31132: frame top 56 on a 900 window). */
+  workspace: "tw:justify-center tw:items-start tw:pt-14 tw:pb-4",
 };
 
 export interface OverlayMountProps {
   open: boolean;
   onClose: () => void;
   children: React.ReactNode;
-  /** Align to the top instead of centring — the command palette pattern. */
-  align?: "center" | "top";
+  /** Align to the top instead of centring — the command palette pattern;
+   *  "workspace": a tall dialog's top at the workspace's top (56). */
+  align?: "center" | "top" | "workspace";
   /** Clicking the scrim closes by default; destructive flows can opt out. */
   dismissOnScrimClick?: boolean;
   /**

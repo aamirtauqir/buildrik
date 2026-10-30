@@ -77,6 +77,7 @@ export function CreateCollectionPageDialog({ open, collection, onCancel, onCreat
       kind="form"
       /* 187:20616 — a 720 dialog. */
       width="xl"
+      placement="workspace"
       testId="cms-dp-create"
       footer={
         <>

@@ -104,14 +104,18 @@ export interface ModalProps {
   /** Where the footer's buttons sit — "end" (default, right) or "start"
    *  (left, as design-2l9's page confirms draw them, e.g. 63:15255). */
   footerAlign?: "start" | "end";
+  /** Where the frame sits. Default: the 2L9 dialog placement (top at 31vh).
+   *  "workspace": a tall dialog drawn from the workspace's top, under the
+   *  topbar (187:20616). */
+  placement?: "default" | "workspace";
 }
 
 export function Modal({
-  open, onClose, title, subtitle, kind = "question", width, children, footer, dismissOnScrimClick, dirty, testId, closeButton, footerAlign = "end",
+  open, onClose, title, subtitle, kind = "question", width, children, footer, dismissOnScrimClick, dirty, testId, closeButton, footerAlign = "end", placement = "default",
 }: ModalProps) {
   const titleId = React.useId();
   return (
-    <OverlayMount open={open} onClose={onClose} labelledBy={titleId} dismissOnScrimClick={dismissOnScrimClick} dirty={dirty}>
+    <OverlayMount open={open} onClose={onClose} labelledBy={titleId} dismissOnScrimClick={dismissOnScrimClick} dirty={dirty} align={placement === "workspace" ? "workspace" : "center"}>
       <div className={[MODAL_FRAME_BASE_CLASS, WIDTH_CLASS[width ?? KIND_WIDTH[kind]], closeButton ? "tw:relative" : ""].join(" ")} data-testid={testId}>
         <div className={MODAL_HEAD_CLASS}>
           <span className={MODAL_TITLE_CLASS} id={titleId}>
