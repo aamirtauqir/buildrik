@@ -11,6 +11,10 @@
  * carries, so the server finds it. "Generate N pages" saves that binding —
  * the pages themselves appear with the next publish, as the intro line says.
  *
+ * design-2l9 187:20406 … 187:22375: until a page is linked the tab starts on
+ * "Create collection page" / "Choose an existing page" (DynamicPagesStart);
+ * a linked page that is gone says so before the form.
+ *
  * @license BSD-3-Clause
  */
 import * as React from "react";
@@ -20,14 +24,21 @@ import type { CMSCollection, CMSContentItem } from "@/shared/types/cms";
 import { Button, Select, TextInput, useToast } from "@/editor/chrome-ui";
 import { applyCmsPattern, cmsPatternError, cmsSlugField } from "@buildrik/shared/schemas/cms";
 import { ACTION, CONTROL, CONTROL_W, LABEL, NOTE, PANE, SECTION, WARN } from "./paneStyles";
+import { DynamicPagesStart } from "./DynamicPagesStart";
+import { CreateCollectionPageDialog, type CreateCollectionPageChoice } from "./CreateCollectionPageDialog";
+import { buildCollectionPage, collectionPageName, retryCollectionLink, saveCollectionLink, type CreatedCollectionPage } from "./createCollectionPage";
 
 export interface DynamicPagesPaneProps {
   composer: Composer | null;
   collection: CMSCollection;
   records: CMSContentItem[];
+  /** Put a page on the canvas and leave the CMS (187:21418). */
+  onOpenPage?: (pageId: string) => void;
 }
 
-export function DynamicPagesPane({ composer, collection, records }: DynamicPagesPaneProps) {
+type Made = CreatedCollectionPage & { pattern: string };
+
+export function DynamicPagesPane({ composer, collection, records, onOpenPage }: DynamicPagesPaneProps) {
   const { addToast } = useToast();
   const [pattern, setPattern] = React.useState(collection.pageSlugPattern ?? "");
   const [template, setTemplate] = React.useState(collection.pageTemplatePath ?? "");
@@ -40,7 +51,9 @@ export function DynamicPagesPane({ composer, collection, records }: DynamicPages
   React.useEffect(() => setPattern(collection.pageSlugPattern ?? ""), [collection.pageSlugPattern]);
   React.useEffect(() => setTemplate(collection.pageTemplatePath ?? ""), [collection.pageTemplatePath]);
 
-  const pages = React.useMemo(() => {
+  /* Read each render, not memoised on the composer: a page made from this tab
+     (187:20616) has to be found the moment the collection links to it. */
+  const pages = (() => {
     if (!composer) return [];
     const all = composer.elements.getAllPages();
     const names = pageFileNames(all);
@@ -51,7 +64,7 @@ export function DynamicPagesPane({ composer, collection, records }: DynamicPages
     return all
       .map((p) => ({ file: names.get(p.id) ?? "index.html", name: p.name }))
       .filter((p) => p.file !== "index.html");
-  }, [composer]);
+  })();
   const templateName = pages.find((p) => p.file === template)?.name ?? "";
 
   const trimmed = pattern.trim();
@@ -75,6 +88,53 @@ export function DynamicPagesPane({ composer, collection, records }: DynamicPages
     seoDescription.trim() !== (collection.pageSeoDescription ?? "");
   const slugField = cmsSlugField(collection.fields) ?? collection.fields[0];
   const fix = unknown.length && slugField ? trimmed.replace(`{${unknown[0]}}`, `{${slugField.slug}}`) : null;
+
+  /* 187:20406 → 187:21418: the start screen, the create dialog, and the two
+     steps of creating — the page, then the server-confirmed link. */
+  const [form, setForm] = React.useState(false);
+  const [dialog, setDialog] = React.useState(false);
+  const [creating, setCreating] = React.useState<string | null>(null);
+  const [unlinked, setUnlinked] = React.useState<Made | null>(null);
+  const [linking, setLinking] = React.useState(false);
+  const opened = (made: Made) => {
+    addToast({
+      tone: "success",
+      title: `${made.name} created · ${published.length} page${published.length === 1 ? "" : "s"} on publish`,
+      description: `Collection page · ${collection.name}. Every element can be edited.`,
+    });
+    onOpenPage?.(made.pageId);
+  };
+  const create = async (choice: CreateCollectionPageChoice) => {
+    if (!composer) return;
+    setDialog(false);
+    setCreating(collectionPageName(collection, choice.layout));
+    try {
+      const made: Made = { ...buildCollectionPage(composer, collection, choice.plan, choice.layout), pattern: choice.pattern };
+      let reached = false;
+      try {
+        reached = await saveCollectionLink(composer, collection, { file: made.file, pattern: made.pattern });
+      } catch {
+        reached = false;
+      }
+      if (reached) opened(made);
+      else setUnlinked(made);
+    } finally {
+      setCreating(null);
+    }
+  };
+  const retryLink = async () => {
+    if (!composer || !unlinked) return;
+    setLinking(true);
+    try {
+      if (await retryCollectionLink(composer, collection.id)) {
+        const made = unlinked;
+        setUnlinked(null);
+        opened(made);
+      }
+    } finally {
+      setLinking(false);
+    }
+  };
 
   const save = async () => {
     if (!composer || unknown.length || patternProblem || seoUnknown.length) return;
@@ -148,6 +208,35 @@ export function DynamicPagesPane({ composer, collection, records }: DynamicPages
           {drafts ? ` · ${drafts} unpublished draft${drafts === 1 ? " is" : "s are"} skipped` : ""}
         </span>
       </span>
+    );
+  }
+
+  const startState = creating
+    ? ({ kind: "creating", name: creating } as const)
+    : unlinked
+      ? ({ kind: "link-failed", name: unlinked.name, pattern: unlinked.pattern, saving: linking } as const)
+      : form
+        ? null
+        : !collection.pageTemplatePath && !collection.pageSlugPattern
+          ? ({ kind: "empty", collection: collection.name } as const)
+          : collection.pageTemplatePath && !templateName
+            ? ({ kind: "missing" } as const)
+            : null;
+  const dialogEl = (
+    <CreateCollectionPageDialog key={String(dialog)} open={dialog} collection={collection} onCancel={() => setDialog(false)} onCreate={(c) => void create(c)} />
+  );
+  if (startState) {
+    return (
+      <div className={PANE} data-testid="cms-dynamic-pages">
+        <DynamicPagesStart
+          state={startState}
+          onCreate={() => setDialog(true)}
+          onChooseExisting={() => setForm(true)}
+          onRetryLink={() => void retryLink()}
+          onOpenPage={unlinked && onOpenPage ? () => onOpenPage(unlinked.pageId) : undefined}
+        />
+        {dialogEl}
+      </div>
     );
   }
 

@@ -9241,7 +9241,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Board: \"Create collection page / Choose an existing page\"; code only template-page select (DynamicPagesPane.tsx:171)",
+   "verifiedNote": "Built round 18 (L-A), not compared — board shot not fetched (round image budget spent; fetch next round). Start screen when no page is linked: 'Create a page for every {Collection} record' · 'Build one template from {Collection} fields. Each published record gets its own URL.' · Create collection page (primary) / Choose an existing page · 'No pages will be generated until a collection page is linked.' (DynamicPagesStart). | Board: \"Create collection page / Choose an existing page\"; code only template-page select (DynamicPagesPane.tsx:171)",
    "tier": "P1"
   },
   {
@@ -9251,8 +9251,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Create collection page modal (fields→elements, layout); no page generator in code",
+   "verified": "drift-open",
+   "verifiedNote": "Built round 18 (L-A), not compared — board shot not fetched (round image budget spent; fetch next round). CreateCollectionPageDialog: 'Create collection page for {Collection}' · 'Create editable elements from these fields.' · URL pattern (default /{collection}/{slug}, shared cmsPatternError) · Include fields '{Field} · Heading H1 / Text / Rich text / Image' (fields no element can show are not offered) · Layout Article / Profile / Simple · token preview · 'You can edit every element after creation.' · Cancel / Create page. | Create collection page modal (fields→elements, layout); no page generator in code",
    "tier": "P1"
   },
   {
@@ -9262,8 +9262,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Creating page then link; not in code",
+   "verified": "drift-open",
+   "verifiedNote": "Built round 18 (L-A), not compared — board shot not fetched (round image budget spent; fetch next round). 'Creating {page}…' · 'Creating the page, then saving its collection link. Keep this tab open.' · Creating… (disabled) while the page is made and the link's server save runs. | Creating page then link; not in code",
    "tier": "P1"
   },
   {
@@ -9273,8 +9273,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Page created, link not saved + Retry link only; not in code",
+   "verified": "drift-open",
+   "verifiedNote": "Built round 18 (L-A), not compared — board shot not fetched (round image budget spent; fetch next round). A link the server did not confirm (saveCollectionLink: direct mirror, markDirectSync) keeps the page: 'Page created, link not saved' · '{page} is in your pages. Retry saves only the collection link; it will not create another page.' · Retry link save · Open {page} › · 'URL pattern · …'. Test DynamicPagesPane. | Page created, link not saved + Retry link only; not in code",
    "tier": "P1"
   },
   {
@@ -9284,8 +9284,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Retry link saving; not in code",
+   "verified": "drift-open",
+   "verifiedNote": "Built round 18 (L-A), not compared — board shot not fetched (round image budget spent; fetch next round). Retry link save re-sends only the collection (retryCollectionLink) — 'Saving link…' while it runs; no second page. Test DynamicPagesPane. | Retry link saving; not in code",
    "tier": "P1"
   },
   {
@@ -9295,8 +9295,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Generated ordinary page + receipt \"6 pages on publish · Undo\"; not in code",
+   "verified": "drift-open",
+   "verifiedNote": "Built round 18 (L-A), not compared — board shot not fetched (round image budget spent; fetch next round). Create page makes an ordinary page (one transaction: section + one element per field; then one labelled 'Bind {field}' step per binding, to 'this page's record') and opens it: setActivePage + UI_PANEL_OPEN layers; toast '{page} created · N pages on publish'. NOT built: the toast's Undo — the page and its bindings land as several history steps (BaseBindingManager records each bind after its apply), so a one-click Undo of the whole creation would need an engine-level grouped step; ⌘Z walks them back. Tests createCollectionPage (real Composer), DynamicPagesPane. Walked in the Vite demo 2026-10-30: Team collection → Dynamic pages → Create collection page → Create page opened 'Team profile' on the canvas with Layers beside it (Section › bound heading showing the record's value) and the toast 'Team profile created · 1 page on publish'. | Generated ordinary page + receipt \"6 pages on publish · Undo\"; not in code",
    "tier": "P1"
   },
   {
@@ -9328,8 +9328,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Saved link with missing page, publish blocked; partial: RecordTemplatePreviewDialog.tsx:53 only",
+   "verified": "drift-open",
+   "verifiedNote": "Built round 18 (L-A), not compared — board shot not fetched (round image budget spent; fetch next round). A linked page that is gone: 'Collection page missing' · 'The linked page is no longer in your pages. The collection link still exists.' · Choose page / Create collection page · 'Publishing generates none of these until a page is linked.' (the board's 'Publishing is blocked' is not what publish does — it skips the collection; and the code cannot know the page went by Undo, so it does not say so). | Saved link with missing page, publish blocked; partial: RecordTemplatePreviewDialog.tsx:53 only",
    "tier": "P1"
   },
   {
@@ -9505,8 +9505,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Recreate missing page modal, exact Cancel; no generator",
+   "verified": "drift-open",
+   "verifiedNote": "Built round 18 (L-A), not compared — board shot not fetched (round image budget spent; fetch next round). Create collection page from the missing state opens the same dialog; Cancel closes it and leaves the missing state as it was. | Recreate missing page modal, exact Cancel; no generator",
    "tier": "P1"
   },
   {

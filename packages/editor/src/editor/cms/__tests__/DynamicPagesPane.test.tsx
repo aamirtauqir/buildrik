@@ -5,12 +5,27 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { describe, it, expect, afterEach } from "vitest";
-import { render, screen, fireEvent, cleanup, waitFor } from "@testing-library/react";
+import { describe, it, expect, afterEach, vi } from "vitest";
+import { render, screen, fireEvent, cleanup, waitFor, act } from "@testing-library/react";
 import type { CMSCollection, CMSContentItem } from "@/shared/types/cms";
 import { ToastProvider } from "@/editor/chrome-ui";
 import { DynamicPagesPane } from "../DynamicPagesPane";
 import { makeEngine } from "./fakeCmsEngine";
+
+/* The page-making itself runs on a real Composer in createCollectionPage.test;
+   here it is the pane's states around it. */
+const buildMock = vi.fn((..._a: unknown[]) => ({ pageId: "pg-new", name: "Menu items profile", file: "menu-items-profile.html" }));
+const linkMock = vi.fn(async (..._a: unknown[]) => true);
+const retryMock = vi.fn(async (..._a: unknown[]) => true);
+vi.mock("../createCollectionPage", async () => {
+  const m = await vi.importActual<typeof import("../createCollectionPage")>("../createCollectionPage");
+  return {
+    ...m,
+    buildCollectionPage: (...a: unknown[]) => buildMock(...a),
+    saveCollectionLink: (...a: unknown[]) => linkMock(...a),
+    retryCollectionLink: (...a: unknown[]) => retryMock(...a),
+  };
+});
 
 const MENU = {
   id: "col-1",
@@ -27,13 +42,15 @@ const rec = (id: string, name: string, status: CMSContentItem["status"] = "publi
   id, collectionId: "col-1", data: { name, slug: name.toLowerCase().replace(/ /g, "-") }, status, createdAt: "", updatedAt: "",
 });
 
-function mount(collection: CMSCollection, records: CMSContentItem[]) {
+/** `form`: past the start screen, as "Choose an existing page" leaves it. */
+function mount(collection: CMSCollection, records: CMSContentItem[], { form = true, onOpenPage }: { form?: boolean; onOpenPage?: (id: string) => void } = {}) {
   const engine = makeEngine({ collections: [collection], items: records });
   render(
     <ToastProvider>
-      <DynamicPagesPane composer={engine.composer as never} collection={collection} records={records} />
+      <DynamicPagesPane composer={engine.composer as never} collection={collection} records={records} onOpenPage={onOpenPage} />
     </ToastProvider>,
   );
+  if (form && screen.queryByTestId("cms-dp-start-choose")) fireEvent.click(screen.getByTestId("cms-dp-start-choose"));
   return engine;
 }
 
@@ -85,13 +102,18 @@ describe("DynamicPagesPane", () => {
     expect(screen.getByTestId("cms-dp-status")).toHaveTextContent("1 record, none published.");
   });
 
-  it("A-17: a saved template page that no longer exists is surfaced as a dangling reference, not Ready", () => {
+  it("A-17 / 187:22375: a linked page that no longer exists says so first, then the form names the dangling reference", () => {
     // "old-item.html" matches no page in fakeCmsEngine's getAllPages() —
     // the template was renamed or deleted after this collection bound to it.
     mount(
       { ...MENU, pageSlugPattern: "/menu/{slug}", pageTemplatePath: "old-item.html" } as CMSCollection,
       [rec("a", "Margherita")],
+      { form: false },
     );
+    expect(screen.getByTestId("cms-dp-start")).toHaveTextContent("Collection page missing");
+    expect(screen.getByTestId("cms-dp-start")).toHaveTextContent("The linked page is no longer in your pages. The collection link still exists.");
+    expect(screen.getByTestId("cms-dp-start-create")).toHaveTextContent("Create collection page");
+    fireEvent.click(screen.getByTestId("cms-dp-start-choose"));
     expect(screen.getByTestId("cms-dp-status")).toHaveTextContent(
       "The saved template page is missing — choose one again",
     );
@@ -116,5 +138,61 @@ describe("DynamicPagesPane", () => {
     const opts = [...screen.getByTestId("cms-dp-template").querySelectorAll("option")].map((o) => o.textContent ?? "");
     expect(opts).not.toContain("Home");
     expect(opts).toContain("Menu item");
+  });
+
+  describe("Create collection page (187:20406 … 187:21418)", () => {
+    afterEach(() => {
+      buildMock.mockClear();
+      linkMock.mockReset().mockResolvedValue(true);
+      retryMock.mockReset().mockResolvedValue(true);
+    });
+
+    it("starts on the two doors when no page is linked", () => {
+      mount(MENU, [rec("a", "Margherita")], { form: false });
+      const start = screen.getByTestId("cms-dp-start");
+      expect(start).toHaveTextContent("Create a page for every Menu items record");
+      expect(start).toHaveTextContent("Build one template from Menu items fields. Each published record gets its own URL.");
+      expect(start).toHaveTextContent("No pages will be generated until a collection page is linked.");
+      fireEvent.click(screen.getByTestId("cms-dp-start-choose"));
+      expect(screen.getByTestId("cms-dp-pattern")).toBeInTheDocument();
+    });
+
+    it("the dialog offers each showable field as its element; Create makes the page, saves the link, and opens it", async () => {
+      const onOpenPage = vi.fn();
+      mount(MENU, [rec("a", "Margherita"), rec("b", "Diavola")], { form: false, onOpenPage });
+      fireEvent.click(screen.getByTestId("cms-dp-start-create"));
+      expect(screen.getByText("Create collection page for Menu items")).toBeInTheDocument();
+      expect(screen.getByTestId("cms-dp-create-pattern")).toHaveValue("/menu-items/{slug}");
+      expect(screen.getByTestId("cms-dp-create")).toHaveTextContent("Name · Heading H1");
+      fireEvent.click(screen.getByTestId("cms-dp-create-confirm"));
+      await waitFor(() => expect(onOpenPage).toHaveBeenCalledWith("pg-new"));
+      expect(buildMock).toHaveBeenCalledTimes(1);
+      expect(linkMock).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ id: "col-1" }), {
+        file: "menu-items-profile.html",
+        pattern: "/menu-items/{slug}",
+      });
+      expect(await screen.findByText("Menu items profile created · 2 pages on publish")).toBeInTheDocument();
+    });
+
+    it("a link the server did not confirm keeps the page and retries only the link (187:21035 / 187:21245)", async () => {
+      linkMock.mockResolvedValueOnce(false);
+      let finish: (v: boolean) => void = () => undefined;
+      retryMock.mockImplementationOnce(() => new Promise<boolean>((r) => (finish = r)));
+      const onOpenPage = vi.fn();
+      mount(MENU, [rec("a", "Margherita")], { form: false, onOpenPage });
+      fireEvent.click(screen.getByTestId("cms-dp-start-create"));
+      fireEvent.click(screen.getByTestId("cms-dp-create-confirm"));
+      await waitFor(() => expect(screen.getByTestId("cms-dp-start")).toHaveTextContent("Page created, link not saved"));
+      expect(screen.getByTestId("cms-dp-start")).toHaveTextContent(
+        "Menu items profile is in your pages. Retry saves only the collection link; it will not create another page.",
+      );
+      expect(screen.getByTestId("cms-dp-start")).toHaveTextContent("URL pattern · /menu-items/{slug}");
+      expect(onOpenPage).not.toHaveBeenCalled();
+      fireEvent.click(screen.getByTestId("cms-dp-start-retry"));
+      await waitFor(() => expect(screen.getByTestId("cms-dp-start-retry")).toHaveTextContent("Saving link…"));
+      await act(async () => finish(true));
+      await waitFor(() => expect(onOpenPage).toHaveBeenCalledWith("pg-new"));
+      expect(buildMock).toHaveBeenCalledTimes(1);
+    });
   });
 });
