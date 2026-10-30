@@ -7,7 +7,8 @@
  * @license BSD-3-Clause
  */
 
-import { render, screen, fireEvent } from "@testing-library/react";
+import { act, render, screen, fireEvent } from "@testing-library/react";
+import { openSubview, useSubview } from "@/editor/inspector/tabs/subviewStore";
 import { describe, it, expect, vi } from "vitest";
 import { TypographySection } from "../index";
 import { textSummary, TEXT_SECTIONS } from "@/editor/inspector/sections/registry/text";
@@ -47,12 +48,20 @@ describe("Typography section", () => {
     expect(screen.getByTestId("font-applied-stack")).toHaveTextContent("Applied stack: Inter, sans-serif");
   });
 
-  it("picking a font writes font-family", () => {
-    const onChange = vi.fn();
-    render(<TypographySection styles={{}} onChange={onChange} isOpen />);
+  it("the Font row opens Choose font (R02) for the section's element", () => {
+    function Open() {
+      const sub = useSubview();
+      return <span data-testid="subview">{sub ? `${sub.kind}:${sub.elementId}` : "none"}</span>;
+    }
+    render(
+      <>
+        <TypographySection styles={{}} onChange={vi.fn()} isOpen elementId="el-typo" />
+        <Open />
+      </>,
+    );
     fireEvent.click(screen.getByRole("button", { name: "Font family" }));
-    fireEvent.click(screen.getByRole("option", { name: /Georgia/ }));
-    expect(onChange).toHaveBeenCalledWith("font-family", "Georgia, serif");
+    expect(screen.getByTestId("subview")).toHaveTextContent("font-picker:el-typo");
+    act(() => openSubview(null));
   });
 });
 

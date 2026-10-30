@@ -137,6 +137,9 @@ export const InteractionsSection: React.FC<InteractionsSectionProps> = ({
      back returns to the list. The editor used to expand inline under the row
      and push the rest of the tab below the fold. */
   const editing = interactions.find((i) => i.id === editingId) ?? null;
+  /* "Enable interaction" names one interaction: shown when exactly one is off. */
+  const off = interactions.filter((i) => !i.enabled);
+  const disabledOnly = off.length === 1 ? off[0] : null;
   const editingAnimation = animationOpen && animation && onAnimationChange ? animation : null;
   const back = (label: string, onBack: () => void) => (
     <Button
@@ -217,6 +220,19 @@ export const InteractionsSection: React.FC<InteractionsSectionProps> = ({
             >
               + Add interaction
             </Button>
+            {/* 2L9 165:18272: the one switched-off interaction offers its way back. */}
+            {disabledOnly ? (
+              <Button
+                type="button"
+                color="light"
+                size="xs"
+                data-testid="interactions-enable"
+                onClick={() => toggleEnabled(disabledOnly.id)}
+                className="tw:my-1 tw:h-8 tw:w-full tw:text-[12px] tw:font-normal tw:text-[var(--bk-ink)] tw:focus:ring-0"
+              >
+                Enable interaction
+              </Button>
+            ) : null}
             {interactions.length === 0 && !animation ? <NoteRow testId="interactions-empty">No interactions yet.</NoteRow> : null}
           </>
         )}

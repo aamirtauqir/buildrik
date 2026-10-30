@@ -172,10 +172,9 @@ describe("TokenDetailView — font-family token picker (Clone 3721:44821)", () =
   it("is a separate selection from the Typography picker — picking here leaves the Heading inspector alone", () => {
     const { composer } = composerWithFonts(["Inter Variable"]);
     const onToken = vi.fn();
-    const onHeading = vi.fn();
     render(
       <DSModeProvider initialMode="pro">
-        <FontPicker value="'Inter Variable', sans-serif" onChange={onHeading} composer={composer} />
+        <FontPicker value="'Inter Variable', sans-serif" composer={composer} />
         <TokenDetailView token={fontToken} composer={composer} onValueChange={onToken} />
       </DSModeProvider>,
     );
@@ -184,7 +183,6 @@ describe("TokenDetailView — font-family token picker (Clone 3721:44821)", () =
     const list = openTokenPicker();
     fireEvent.click(within(list).getByRole("option", { name: /^Lora/ }));
     expect(onToken).toHaveBeenCalledWith("font-heading", "Lora");
-    expect(onHeading).not.toHaveBeenCalled();
     expect(screen.getByRole("button", { name: "Font family" })).toHaveTextContent("Inter Variable");
   });
 });

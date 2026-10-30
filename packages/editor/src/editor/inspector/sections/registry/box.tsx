@@ -142,6 +142,7 @@ export const BOX_SECTIONS: Record<string, AnySectionEntry> = {
       propertyStates: ctx.propertyStates,
       advancedExpanded: ctx.advancedExpanded,
       onAdvancedToggle: ctx.onAdvancedToggle,
+      variant: ctx.variant === "page" ? ("page" as const) : ("element" as const),
     }),
   }),
 

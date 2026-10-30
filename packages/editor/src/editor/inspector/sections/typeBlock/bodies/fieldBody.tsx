@@ -111,6 +111,7 @@ export const FieldBody: React.FC<TypeBlockBodyProps> = (props) => {
   useElementVersion(composer);
   const { addToast } = useToast();
   const [nameError, setNameError] = React.useState<string | null>(null);
+  const nameErrorId = React.useId();
   const [nameDraft, setNameDraft] = React.useState<string | null>(null);
   React.useEffect(() => {
     setNameError(null);
@@ -172,11 +173,19 @@ export const FieldBody: React.FC<TypeBlockBodyProps> = (props) => {
       {tag !== "select" ? (
         <CommitRow label="Placeholder" value={field.getAttribute("placeholder") ?? ""} onCommit={(v) => setAttr("placeholder", v)} testId="form-field-placeholder" />
       ) : null}
-      <CommitRow label="Name" value={field.getAttribute("name") ?? ""} onCommit={setName} onDraft={setNameDraft} testId="form-field-name" />
+      <CommitRow
+        label="Name"
+        value={field.getAttribute("name") ?? ""}
+        onCommit={setName}
+        onDraft={setNameDraft}
+        testId="form-field-name"
+        error={nameError ? { id: nameErrorId } : null}
+      />
+      {/* 2L9 F03: the refusal sits under the field, the field outlined red. */}
       {nameError ? (
-        <NoteRow tone="error" testId="form-field-name-error">
+        <p id={nameErrorId} role="alert" className="tw:m-0 tw:pb-1 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-error-text)]" data-testid="form-field-name-error">
           {nameError}
-        </NoteRow>
+        </p>
       ) : clobberingWarning(nameDraft ?? field.getAttribute("name") ?? "") ? (
         /* Stripped by the sanitizer at publish (DOM clobbering): said while
            it is typed, before it lands. */

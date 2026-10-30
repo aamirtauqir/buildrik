@@ -42,12 +42,20 @@ describe("InteractionsSection", () => {
     expect([...at].sort((a, b) => a - b)).toEqual(at);
   });
 
-  it("a row reads trigger as the label, the animation as the value (board 2: On click  [Scroll to menu ▾])", () => {
+  it("a row reads 'trigger · animation ›', centred (2L9 165:19449)", () => {
     const interaction = { ...makeInteraction("hover"), animation: { ...DEFAULT_ANIMATION_CONFIG, preset: "scaleUp" } } as Interaction;
     renderOpen({ interactions: [interaction], onInteractionsChange: vi.fn() });
     const row = screen.getByRole("button", { name: /On hover/ });
-    expect(row.querySelector(".bdi-lb")).toHaveTextContent("On hover");
-    expect(row).toHaveTextContent("Scale Up");
+    expect(row).toHaveTextContent("On hover · Scale Up ›");
+  });
+
+  it("a switched-off interaction reads 'Off · …' and the one off offers Enable interaction (2L9 165:18272)", () => {
+    const interaction = { ...makeInteraction("hover"), enabled: false, animation: { ...DEFAULT_ANIMATION_CONFIG, preset: "scaleUp" } } as Interaction;
+    const onInteractionsChange = vi.fn();
+    renderOpen({ interactions: [interaction], onInteractionsChange });
+    expect(screen.getByTestId("interaction-row")).toHaveTextContent("Off · Scale Up on hover");
+    fireEvent.click(screen.getByRole("button", { name: "Enable interaction" }));
+    expect(onInteractionsChange).toHaveBeenCalledWith([{ ...interaction, enabled: true }]);
   });
 
   it("renders Add Interaction button", () => {

@@ -40,6 +40,7 @@ import { closeSubview, openSubview, useSubview } from "./subviewStore";
 import type { BreakpointId } from "@/shared/types/breakpoints";
 import type { PseudoStateId } from "@/shared/types";
 import { ResetStyleReview } from "../components/ResetStyleReview";
+import { ChooseFont } from "../sections/typography/ChooseFont";
 import { ApplyStyleResultNote, ApplyStyleReview, useApplyStyleResult } from "../components/ApplyStyleReview";
 
 // ============================================================================
@@ -123,7 +124,10 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
   const subview = useSubview();
   /* Another element closes any subview (Play F2.05, 2L9 I15). */
   React.useEffect(() => () => openSubview(null), [selectedElement.id]);
-  const subviewHere = subview?.elementId === selectedElement.id && selectedIds.length <= 1 ? subview.kind : null;
+  /* Choose font writes to the whole selection like the row it replaces; the
+     other subviews are about one element. */
+  const subviewHere =
+    subview?.elementId === selectedElement.id && (selectedIds.length <= 1 || subview.kind === "font-picker") ? subview.kind : null;
   const applied = useApplyStyleResult(composer, selectedElement.id, breakpoint, pseudoState);
   const type = selectedElement.type;
   const caps = capabilitiesFor(type);
@@ -152,6 +156,18 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
   if (subviewHere === "apply-style" && composer) {
     return (
       <ApplyStyleReview composer={composer} elementId={selectedElement.id} breakpoint={breakpoint} pseudo={pseudoState} onClose={() => closeSubview("apply-style")} />
+    );
+  }
+
+  if (subviewHere === "font-picker" && tabId === "style") {
+    return (
+      <ChooseFont
+        composer={composer}
+        elementId={selectedElement.id}
+        value={authoredStyles["font-family"] ?? ""}
+        onChange={(v) => onChange("font-family", v)}
+        onClose={() => closeSubview("font-picker")}
+      />
     );
   }
 

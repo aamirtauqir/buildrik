@@ -1,6 +1,6 @@
 /**
  * 2L9 R08 — after a family is picked, the Font row says what landed and
- * offers "Undo font assignment": ONE undo, bound to the step the engine
+ * offers "Undo font assignment" (the pick made in Choose font, R02): ONE undo, bound to the step the engine
  * recorded for that write (history.captureUndo), never a guessed revert.
  *
  * @license BSD-3-Clause
@@ -10,6 +10,8 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import * as React from "react";
 import { FontPicker } from "../FontPicker";
+import { ChooseFont, clearFontAssignment } from "../ChooseFont";
+import { closeSubview, openSubview, useSubview } from "@/editor/inspector/tabs/subviewStore";
 import { InspectorFieldContext } from "@/editor/inspector/shared/controls/InspectorFieldContext";
 import type { Composer } from "@/engine/Composer";
 import type { Element } from "@/engine/elements/Element";
@@ -17,7 +19,11 @@ import { createTestComposer, installEngineBrowserStubs, removeEngineBrowserStubs
 
 beforeAll(installEngineBrowserStubs);
 afterAll(removeEngineBrowserStubs);
-afterEach(() => vi.restoreAllMocks());
+afterEach(() => {
+  vi.restoreAllMocks();
+  clearFontAssignment();
+  openSubview(null);
+});
 
 let c: Composer;
 let el: Element;
@@ -45,6 +51,7 @@ function Harness() {
     };
   }, []);
   const current = c.elements.getElement(el.getId())?.getStyles()["font-family"] ?? "";
+  const open = useSubview();
   return (
     <InspectorFieldContext.Provider
       value={{
@@ -61,21 +68,27 @@ function Harness() {
         },
       }}
     >
-      <FontPicker
-        value={current}
-        onChange={(v) => {
-          c.elements.getElement(el.getId())?.setStyle("font-family", v);
-          bump();
-        }}
-        composer={c}
-      />
+      <FontPicker value={current} composer={c} elementId={el.getId()} />
+      {open?.kind === "font-picker" ? (
+        <ChooseFont
+          composer={c}
+          elementId={el.getId()}
+          value={current}
+          onChange={(v) => {
+            c.elements.getElement(el.getId())?.setStyle("font-family", v);
+            bump();
+          }}
+          onClose={() => closeSubview("font-picker")}
+        />
+      ) : null}
     </InspectorFieldContext.Provider>
   );
 }
 
+/* The row opens Choose font (R02); a family is picked from its rows. */
 const pick = (name: string) => {
   fireEvent.click(screen.getByRole("button", { name: "Font family" }));
-  fireEvent.click(screen.getByRole("option", { name: new RegExp(name) }));
+  fireEvent.click(screen.getByRole("button", { name: new RegExp(`^${name} · `) }));
 };
 
 describe("FontPicker — Undo font assignment (2L9 R08)", () => {
@@ -119,8 +132,7 @@ describe("FontPicker — Undo font assignment (2L9 R08)", () => {
   it("a newer pick replaces the note, naming the family it replaced", () => {
     render(<Harness />);
     pick("Georgia");
-    fireEvent.click(screen.getByRole("button", { name: "Font family" }));
-    fireEvent.click(screen.getByRole("option", { name: /Arial/ }));
+    pick("Arial");
     expect(screen.getByTestId("font-assignment")).toHaveTextContent("previous Georgia stack");
   });
 });

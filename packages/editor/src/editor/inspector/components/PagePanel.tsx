@@ -45,6 +45,8 @@ import { InspectorFieldContext, type InspectorFieldContextValue } from "../share
 import { sectionOverrideMarks } from "../shared/controls/OverrideDot";
 import { Section, SectionFrameContext, type SectionFrame } from "../shared/controls/Section";
 import { WIDE_BUTTON } from "../shared/controls/controlClasses";
+import { ChooseFont } from "../sections/typography/ChooseFont";
+import { closeSubview, useSubview } from "../tabs/subviewStore";
 
 export interface PagePanelProps {
   composer: Composer | null | undefined;
@@ -119,7 +121,7 @@ export function PagePanel({ composer }: PagePanelProps) {
   );
 
   const conflict = useSaveConflict();
-  const { styles, handleStyleChange, handleBatchStyleChange, overriddenProperties } = useStyleHandlers(
+  const { styles, handleStyleChange, handleBatchStyleChange, overriddenProperties, runDiscrete } = useStyleHandlers(
     root,
     composer,
     breakpoint,
@@ -130,6 +132,9 @@ export function PagePanel({ composer }: PagePanelProps) {
   const overrides = useFieldOverrides(composer, root?.id, breakpoint);
   const { choices, setChoices } = useInspectorSections();
   const [appliedTemplate, dismissTemplate] = useAppliedTemplate();
+  const subview = useSubview();
+  /* More settings per section, for this panel's life (Spacing's sides). */
+  const [advanced, setAdvanced] = React.useState<Readonly<Record<string, boolean>>>({});
 
   const locked = Boolean(rootEl?.isLocked?.());
   const readOnly = locked || conflict.pending;
@@ -141,8 +146,9 @@ export function PagePanel({ composer }: PagePanelProps) {
       overrides: overrides.overrides,
       overrideLabels: overrides.labels,
       resetOverride: overrides.resetOverride,
+      runDiscrete,
     }),
-    [readOnly, conflict.pending, locked, overrides]
+    [readOnly, conflict.pending, locked, overrides, runDiscrete]
   );
 
   if (!composer || !page || !root) return null;
@@ -166,6 +172,15 @@ export function PagePanel({ composer }: PagePanelProps) {
         {appliedTemplate ? <TemplateAppliedBanner name={appliedTemplate} pageName={page.name} onDismiss={dismissTemplate} /> : null}
         <PageHeader composer={composer} pageName={page.name} pageId={page.id} breakpoint={breakpoint} />
         <div className="bdi-panel-scroll">
+          {subview?.kind === "font-picker" && subview.elementId === root.id ? (
+            <ChooseFont
+              composer={composer}
+              elementId={root.id}
+              value={authoredStyles["font-family"] ?? ""}
+              onChange={(v) => handleStyleChange("font-family", v)}
+              onClose={() => closeSubview("font-picker")}
+            />
+          ) : (
           <div className="bdi-body">
             {PAGE_SECTIONS.map((id, i) => {
               const entry = SECTION_REGISTRY[id];
@@ -188,8 +203,8 @@ export function PagePanel({ composer }: PagePanelProps) {
                 isOpen: displayMode === "open",
                 onToggle,
                 displayMode,
-                advancedExpanded: false,
-                onAdvancedToggle: NO_OP,
+                advancedExpanded: Boolean(advanced[id]),
+                onAdvancedToggle: () => setAdvanced((a) => ({ ...a, [id]: !a[id] })),
                 tabId: "style",
                 mixedKeys: EMPTY_MIXED_KEYS,
                 isMultiSelect: false,
@@ -218,6 +233,7 @@ export function PagePanel({ composer }: PagePanelProps) {
               <NoteRow testId="inspector-page-note">Opens {page.name}’s Page settings. Appearance stays here.</NoteRow>
             </Section>
           </div>
+          )}
         </div>
       </div>
     </InspectorFieldContext.Provider>

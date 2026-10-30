@@ -125,7 +125,7 @@ describe("InputWithUnit — board 34: an entry it cannot read", () => {
     expect(screen.queryByTestId("inspector-field-error")).toBeNull();
   });
 
-  it("inside a section the message lands in the section's polite band, under its rows", () => {
+  it("inside a section the message sits directly under its own field (2L9 I03), in a polite region", () => {
     render(
       <Section title="Size" defaultOpen>
         <InputWithUnit label="Width" value="10px" onChange={vi.fn()} />
@@ -139,9 +139,10 @@ describe("InputWithUnit — board 34: an entry it cannot read", () => {
     expect(line).toHaveTextContent("Enter a number and a supported unit. Last applied: 10 px.");
     expect(line.id).toBe(input.getAttribute("aria-describedby"));
     expect(line.parentElement).toHaveAttribute("aria-live", "polite");
-    /* After the last row, not between Width and Height (board 34). */
+    /* Between Width and Height — under the field it is about, not in a band after the last row. */
     const height = screen.getByRole("textbox", { name: /^Height/ });
-    expect(height.compareDocumentPosition(line) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(line.compareDocumentPosition(height) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(screen.getByTestId("inspector-row-width")).toContainElement(line);
   });
 });
 

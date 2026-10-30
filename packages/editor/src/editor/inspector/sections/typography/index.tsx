@@ -43,6 +43,8 @@ export interface TypographySectionProps {
   variant?: "element" | "page";
   /** What the element renders as where it sets nothing (Page panel: font, text colour). */
   inherited?: Readonly<Record<string, string>>;
+  /** The element (or page root) the section edits — Choose font opens for it. */
+  elementId?: string;
   /** Head the section with the Brand "Text style" row (text types). */
   textStyle?: boolean;
   /** "Text inside" (2L9 247:23404): every row on the face, no More
@@ -65,16 +67,16 @@ export const TypographySection: React.FC<TypographySectionProps> = ({
   composer,
   variant = "element",
   inherited,
+  elementId,
   textStyle = false,
   inside = false,
 }) => {
-  const handleFontChange = React.useCallback((value: string) => onChange("font-family", value), [onChange]);
   const isPage = variant === "page";
 
   return (
     <Section title="Typography" isOpen={isOpen} onToggle={onToggle} id="inspector-section-typography">
       <div className="tw:relative">
-        <FontPicker value={inherited?.["font-family"] || styles["font-family"] === "inherit" ? "" : (styles["font-family"] ?? "")} onChange={handleFontChange} composer={composer} inheritedValue={inherited?.["font-family"]} />
+        <FontPicker value={inherited?.["font-family"] || styles["font-family"] === "inherit" ? "" : (styles["font-family"] ?? "")} composer={composer} inheritedValue={inherited?.["font-family"]} elementId={elementId} />
       </div>
 
       <FontControls

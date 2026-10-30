@@ -63,41 +63,27 @@ export interface SectionFrame {
 export const SectionFrameContext = React.createContext<SectionFrame | null>(null);
 
 // ============================================================================
-// FIELD ERRORS (board 34, DD-19)
+// FIELD ERRORS (2L9 I03, DD-19)
 // ============================================================================
 
-/** Where a field reports the entry it could not read. */
-type FieldErrorSink = (id: string, message: string | null) => void;
-
-const FieldErrorContext = React.createContext<FieldErrorSink | null>(null);
-
-const ERROR_LINE = "tw:m-0 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-error-text)]";
+const ERROR_LINE = "tw:col-span-full tw:m-0 tw:pb-1 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-error-text)]";
 
 /**
- * A field's error line. Inside a Section the line is drawn in the section's
- * error band, under its last row (board 34), which is also the section's
- * polite live region; outside one, `ErrorLine` draws it in place. Returns the
- * id for the field's `aria-describedby`.
+ * A field's error line, directly under the field it is about (2L9 I03: "Enter
+ * a non-negative number … Last applied: 24 px." under Font size). It used to
+ * be collected into a band under the section's last row (board 34). The
+ * polite live region is mounted with the field, so the message is announced
+ * when it lands.
  */
-export function useFieldError(message: string | null): string {
-  const id = React.useId();
-  const sink = React.useContext(FieldErrorContext);
-  React.useEffect(() => {
-    if (!sink) return;
-    sink(id, message);
-    return () => sink(id, null);
-  }, [sink, id, message]);
-  return id;
-}
-
-/** The error line for a field rendered outside any Section. */
 export function ErrorLine({ id, message }: { id: string; message: string | null }) {
-  const sink = React.useContext(FieldErrorContext);
-  if (sink || !message) return null;
   return (
-    <p id={id} role="status" className={ERROR_LINE} data-testid="inspector-field-error">
-      {message}
-    </p>
+    <div aria-live="polite" className="tw:col-span-full">
+      {message ? (
+        <p id={id} className={ERROR_LINE} data-testid="inspector-field-error">
+          {message}
+        </p>
+      ) : null}
+    </div>
   );
 }
 
@@ -153,16 +139,6 @@ export const Section: React.FC<SectionProps> = ({
      dims a locked element's controls; board 29's conflict does not). */
   const { readOnlyReason } = useInspectorField();
   const [internalIsOpen, setInternalIsOpen] = React.useState(defaultOpen);
-  const [errors, setErrors] = React.useState<ReadonlyMap<string, string>>(() => new Map());
-  const reportError = React.useCallback<FieldErrorSink>((fieldId, message) => {
-    setErrors((prev) => {
-      if ((prev.get(fieldId) ?? null) === message) return prev;
-      const next = new Map(prev);
-      if (message === null) next.delete(fieldId);
-      else next.set(fieldId, message);
-      return next;
-    });
-  }, []);
 
   const isControlled = controlledIsOpen !== undefined;
   const standaloneOpen = isControlled ? controlledIsOpen : internalIsOpen;
@@ -254,24 +230,13 @@ export const Section: React.FC<SectionProps> = ({
           {/* A Section nested in this body is its own, unframed disclosure. */}
           {frame?.lead}
           <SectionFrameContext.Provider value={null}>
-            <FieldErrorContext.Provider value={reportError}>{children}</FieldErrorContext.Provider>
+            {children}
           </SectionFrameContext.Provider>
           {frame?.note ? (
             <p className="tw:m-0 tw:pt-1 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-accent-text)]">{frame.note}</p>
           ) : null}
         </div>
       )}
-      {/* Board 34: the band under the section's rows. Mounted while the
-          section is open so it is a live region before a message lands. */}
-      {isOpen ? (
-        <div aria-live="polite" className={errors.size ? "bdi-sec-errors" : undefined}>
-          {[...errors].map(([fieldId, message]) => (
-            <p key={fieldId} id={fieldId} className={ERROR_LINE} data-testid="inspector-field-error">
-              {message}
-            </p>
-          ))}
-        </div>
-      ) : null}
     </div>
   );
 };

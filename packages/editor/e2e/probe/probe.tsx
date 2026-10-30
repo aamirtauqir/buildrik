@@ -2747,6 +2747,26 @@ const CASES: Record<string, () => React.ReactElement> = {
         c.selection.select(inst);
       })();
     }
+    /* `?child=input&childAttrs={"type":"email"}` — select the block's first
+       descendant with that tag (and those attributes) instead (F03). */
+    const childTag = q.get("child");
+    const childAttrs = JSON.parse(q.get("childAttrs") ?? "{}") as Record<string, string>;
+    const child = childTag
+      ? el.getDescendants().find((d) => d.getTagName().toLowerCase() === childTag && Object.entries(childAttrs).every(([k, v]) => d.getAttribute(k) === v))
+      : undefined;
+    if (child) c.selection.select(child);
+    /* `?interactions=[{"trigger":"scroll-into-view","preset":"fadeIn","enabled":false}]`
+       — the element's interactions (I21, I24). */
+    const interactionsQ = q.get("interactions");
+    if (interactionsQ)
+      el.setInteractions(
+        (JSON.parse(interactionsQ) as Array<{ trigger: string; preset?: string; enabled?: boolean }>).map((it, i) => ({
+          id: `probe-interaction-${i}`,
+          trigger: it.trigger,
+          animation: { preset: it.preset ?? "fadeIn", duration: 600, delay: 0, easing: "power2.out" },
+          enabled: it.enabled !== false,
+        })),
+      );
     /* `?page=1` — nothing selected: the Inspector's page panel (board 21,
        P28). `?pageName=About` renames the page. */
     const pageOnly = !!q.get("page");

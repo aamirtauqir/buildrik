@@ -62,7 +62,7 @@ describe("Mixed — shared controls", () => {
   });
 
   it("font: shows 'Mixed' muted, never the primary's family; 'Mixed values' in the name", () => {
-    inMixed(["font-family"], <FontPicker value="'Inter', sans-serif" onChange={vi.fn()} />);
+    inMixed(["font-family"], <FontPicker value="'Inter', sans-serif" />);
     const trigger = screen.getByRole("button", { name: "Font family, Mixed values" });
     expect(trigger.textContent).toBe("Mixed");
     expect(trigger.textContent).not.toContain("Inter");

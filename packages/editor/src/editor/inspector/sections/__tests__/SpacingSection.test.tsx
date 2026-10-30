@@ -99,3 +99,29 @@ describe("SpacingSection — field context", () => {
     expect(screen.getByRole("textbox", { name: "Padding top Mixed values" })).toHaveAttribute("placeholder", "Mixed");
   });
 });
+
+describe("SpacingSection — the page panel (2L9 S06)", () => {
+  const renderPage = (styles: Record<string, string>, advancedExpanded = false) => {
+    const onBatchChange = vi.fn();
+    render(<SpacingSection styles={styles} onChange={vi.fn()} onBatchChange={onBatchChange} isOpen variant="page" advancedExpanded={advancedExpanded} onAdvancedToggle={vi.fn()} />);
+    return { onBatchChange };
+  };
+  const labels = () => Array.from(document.querySelectorAll(".bdi-lb")).map((l) => l.textContent?.trim());
+
+  it("four equal sides are one 'Padding' row, which writes all four; no margin rows while none is set", () => {
+    const { onBatchChange } = renderPage({ padding: "32px" });
+    expect(labels()).toEqual(["Padding"]);
+    fireEvent.change(screen.getByRole("textbox", { name: /^Padding/ }), { target: { value: "40" } });
+    expect(onBatchChange).toHaveBeenCalledWith({ "padding-top": "40px", "padding-right": "40px", "padding-bottom": "40px", "padding-left": "40px" });
+  });
+
+  it("sides that differ keep their own rows — one row would not be true", () => {
+    renderPage({ "padding-top": "32px", "padding-right": "16px", "padding-bottom": "32px", "padding-left": "16px" });
+    expect(labels()).toEqual(expect.arrayContaining(["Padding top", "Padding sides", "Padding bottom"]));
+  });
+
+  it("a set margin still shows its rows; More settings splits the padding again", () => {
+    renderPage({ padding: "32px", "margin-top": "8px" }, true);
+    expect(labels()).toEqual(expect.arrayContaining(["Padding top", "Margin top"]));
+  });
+});

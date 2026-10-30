@@ -28,6 +28,9 @@ import { parseCssShorthand } from "../shared/utils/parseCssShorthand";
 type Side = "top" | "right" | "bottom" | "left";
 type Box = "padding" | "margin";
 
+const hiddenAny = (states: SpacingSectionProps["propertyStates"] = {}, box: Box) =>
+  (["top", "right", "bottom", "left"] as const).some((side) => states[`${box}-${side}`]?.hidden);
+
 export interface SpacingSectionProps {
   styles: Record<string, string>;
   onChange: (property: string, value: string) => void;
@@ -42,6 +45,9 @@ export interface SpacingSectionProps {
   isMultiSelect?: boolean;
   /** Threaded so the Source group can jump to the token in Brand. */
   composer?: Composer | null;
+  /** The page panel (2L9 S06): a padding the four sides agree on is one
+   *  "Padding" row; no margin rows until one is set. */
+  variant?: "element" | "page";
 }
 
 const UNITS: Record<Box, string[]> = {
@@ -122,8 +128,14 @@ export const SpacingSection: React.FC<SpacingSectionProps> = ({
   advancedExpanded = false,
   onAdvancedToggle,
   composer,
+  variant = "element",
 }) => {
   const boxes = { padding: sidesOf(styles, "padding"), margin: sidesOf(styles, "margin") };
+  const p = boxes.padding;
+  /* S06 "Padding 32 px": only when it is true of all four sides. */
+  const onePadding =
+    variant === "page" && !advancedExpanded && p.top === p.right && p.top === p.bottom && p.top === p.left && !hiddenAny(propertyStates, "padding");
+  const marginSet = EDGES.some((side) => boxes.margin[side]);
   const hidden = (property: string) => propertyStates[property]?.hidden;
 
   const edge = (box: Box, side: Side) => {
@@ -171,18 +183,37 @@ export const SpacingSection: React.FC<SpacingSectionProps> = ({
     );
   };
 
+  const pageRows = () => (
+    <>
+      <InputWithUnit
+        label="Padding"
+        property="padding-top"
+        units={UNITS.padding}
+        placeholder=""
+        value={p.top}
+        onChange={(v) => onBatchChange({ "padding-top": v, "padding-right": v, "padding-bottom": v, "padding-left": v })}
+      />
+      {marginSet ? rows("margin") : null}
+    </>
+  );
+
   /* The first token-bound edge, in the rows' order. */
   const bound = ORDER.flatMap((box) => EDGES.map((side) => ({ box, side, value: boxes[box][side] }))).find((e) => isTokenVar(e.value));
 
   return (
     <Section title="Spacing" isOpen={isOpen} onToggle={onToggle} id="inspector-section-spacing">
-      {ORDER.map(rows)}
+      {onePadding ? pageRows() : ORDER.map(rows)}
       {bound && (
         <SourceGroup
           property={`${bound.box}-${bound.side}`}
-          name={`${NAME[bound.box]} ${bound.side}`}
+          /* One Padding row is all four sides: so is its source, and its Unlink. */
+          name={onePadding && bound.box === "padding" ? "Padding" : `${NAME[bound.box]} ${bound.side}`}
           value={bound.value}
-          onChange={onChange}
+          onChange={
+            onePadding && bound.box === "padding"
+              ? (_property, v) => onBatchChange({ "padding-top": v, "padding-right": v, "padding-bottom": v, "padding-left": v })
+              : onChange
+          }
           composer={composer}
         />
       )}

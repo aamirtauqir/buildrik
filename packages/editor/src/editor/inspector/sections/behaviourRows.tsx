@@ -36,9 +36,12 @@ export interface CommitRowProps {
   stacked?: boolean;
   /** Every keystroke's draft (a warning that reads what is being typed). */
   onDraft?: (draft: string) => void;
+  /** The entry was refused: the field reads invalid, its border red, and
+   *  `aria-describedby` names the error line the caller draws under it. */
+  error?: { id: string } | null;
 }
 
-export function CommitRow({ label, value, onCommit, placeholder, type, testId, clearOnCommit, suggestions, onPaste, stacked, onDraft }: CommitRowProps) {
+export function CommitRow({ label, value, onCommit, placeholder, type, testId, clearOnCommit, suggestions, onPaste, stacked, onDraft, error }: CommitRowProps) {
   const { readOnly } = useInspectorField();
   const id = React.useId();
   const listId = `${id}-list`;
@@ -57,7 +60,9 @@ export function CommitRow({ label, value, onCommit, placeholder, type, testId, c
       <div className="bdi-row-content">
         <TextField
           id={id}
-          className={stacked ? "tw:bg-[var(--bk-bg-subtle)]! tw:rounded-[4px]! tw:border-[var(--bk-border)]!" : "bdi-text"}
+          className={(stacked ? "tw:bg-[var(--bk-bg-subtle)]! tw:rounded-[4px]! tw:border-[var(--bk-border)]!" : "bdi-text") + (error ? " tw:border-[var(--bk-error)]!" : "")}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error?.id}
           readOnly={readOnly}
           type={type}
           list={suggestions?.length ? listId : undefined}

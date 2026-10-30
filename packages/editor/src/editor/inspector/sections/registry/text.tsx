@@ -32,6 +32,7 @@ const adaptTypography = (ctx: SectionContext) => ({
   advancedExpanded: ctx.advancedExpanded,
   onAdvancedToggle: ctx.onAdvancedToggle,
   variant: ctx.variant,
+  elementId: ctx.selectedElement.id,
   /* What the element renders where it sets nothing — read off the canvas
      node's computed style, the value the cascade resolves (board 21's page
      font / text colour; 2L9 S21 "32 px · inherited" after a reset). */
