@@ -129,6 +129,58 @@ describe("Input (board 14)", () => {
   });
 });
 
+describe("Select → Text (BD-29, 2L9 F31–F35)", () => {
+  function project() {
+    const c: Composer = createTestComposer();
+    const root = c.elements.createPage("Home").root.id;
+    c.importProject({
+      pages: [{
+        id: "p", name: "Home", slug: "", isHome: true,
+        root: { id: root, type: "container", tagName: "div", children: [
+          { id: "f", type: "form", tagName: "form", children: [
+            { id: "lb", type: "label", tagName: "label", content: "Topic", children: [] },
+            { id: "sel", type: "select", tagName: "select", attributes: { name: "topic", required: "" }, styles: { width: "100%" },
+              content: "<option>Design</option><option selected>Research</option><option>Studio</option>", children: [] },
+          ] },
+        ] },
+      }],
+    } as never);
+    c.history.flushPending();
+    return c;
+  }
+
+  it("F31: the select shows its options and default; F33–F35: Text converts after the confirm, in place, in one Undo", () => {
+    const c = project();
+    renderBlock(c, { id: "sel", type: "select" });
+    expect(screen.getByTestId("form-field-options")).toHaveTextContent("3 options");
+    expect(screen.getByText("Research · Default")).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId("form-field-type"));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Text" }));
+    expect(screen.getByText("Change Topic to Text?")).toBeInTheDocument();
+    expect(screen.getByText("The 3 options—Design, Research and Studio—will be removed. The current default “Research” stays as text.")).toBeInTheDocument();
+    /* Cancel is the default and changes nothing. */
+    fireEvent.click(screen.getByTestId("form-field-convert-cancel"));
+    expect(c.elements.getElement("sel")!.getType()).toBe("select");
+    fireEvent.click(screen.getByTestId("form-field-type"));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Text" }));
+    const before = c.history.getUndoCount();
+    fireEvent.click(screen.getByTestId("form-field-convert-confirm"));
+    c.history.flushPending();
+    const now = c.elements.getElement("sel")!;
+    expect(now.getType()).toBe("input");
+    expect(now.getAttribute("type")).toBe("text");
+    expect(now.getAttribute("value")).toBe("Research");
+    expect(now.getAttribute("name")).toBe("topic");
+    expect(now.getStyles().width).toBe("100%");
+    expect(c.history.getUndoCount()).toBe(before + 1);
+    expect(screen.getByText("Topic changed to Text")).toBeInTheDocument();
+    c.history.undo();
+    const back = c.elements.getElement("sel")!;
+    expect(back.getType()).toBe("select");
+    expect(back.getContent()).toMatch(/^<option>Design<\/option><option selected[^>]*>Research<\/option><option>Studio<\/option>$/);
+  });
+});
+
 describe("Checkbox (board 15)", () => {
   function project(locked = false) {
     const c: Composer = createTestComposer();

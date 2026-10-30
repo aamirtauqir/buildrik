@@ -184,6 +184,21 @@ describe("render", () => {
     expect(doc.body.innerHTML).not.toMatch(/data-bk-(query|item|row)/);
   });
 
+  it("a list copy's own condition that reads @page.* is decided per generated page (data-bk-if + data-bk-if-row)", async () => {
+    const { composer, bindings, blogId } = await setup({ template: true });
+    bindings.bindCollection("list", blogId, { repeat: "children" });
+    bindings.setCondition("sun", { match: "all", rules: [{ field: "sunday", op: "is", value: "@page.sunday" }] });
+    const html = await new CMSExportResolver(composer).resolve(LIST, { mode: "static", pageFile: "post.html" });
+    expect(html.match(/data-bk-if-row=/g)).toHaveLength(3);
+    const items = (await composer.cms.collections.queryContent({ collectionId: blogId })).items;
+    const alpha = items.find((i) => i.data.name === "Alpha")!;
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    applyRecordPass(doc, alpha.data, alpha.id);
+    /* Alpha's page (sunday "Sun"): only the copy whose own sunday is "Sun" keeps it. */
+    expect(doc.body.innerHTML.match(/Open Sundays/g)).toHaveLength(1);
+    expect(doc.body.innerHTML).not.toMatch(/data-bk-if/);
+  });
+
   it("excludeCurrent on the canvas leaves out the template page's preview record", async () => {
     const { composer, bindings, blogId } = await setup({ template: true });
     (composer.elements as unknown as Record<string, unknown>).getActivePage = () => ({ id: "p", name: "Post", slug: "post", root: { id: "root" } });

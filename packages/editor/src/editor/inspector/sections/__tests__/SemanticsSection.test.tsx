@@ -12,6 +12,7 @@ import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { createTestComposer, installEngineBrowserStubs, removeEngineBrowserStubs } from "@/engine/__tests__/test-utils/realComposer";
 import type { Composer } from "@/engine/Composer";
 import { SemanticsSection, tagLabel } from "../SemanticsSection";
+import { ToastProvider } from "@/editor/chrome-ui";
 
 beforeAll(installEngineBrowserStubs);
 afterAll(removeEngineBrowserStubs);
@@ -36,7 +37,7 @@ describe("Semantics", () => {
   it("a heading's Tag is a select H1–H6 (2L9 247:26594); choosing one writes the tag and ONE Undo restores it", () => {
     const { c, id } = setup("heading", { tagName: "h2" });
     renderSection(c, id, "heading");
-    expect(Array.from(tagSelect().options).map((o) => o.textContent)).toEqual(["H1", "H2", "H3", "H4", "H5", "H6"]);
+    expect(Array.from(tagSelect().options).map((o) => o.textContent)).toEqual(["H1", "H2", "H3", "H4", "H5", "H6", "p — change to paragraph…"]);
     expect(tagSelect().value).toBe("h2");
     fireEvent.change(tagSelect(), { target: { value: "h4" } });
     expect(c.elements.getElement(id)!.getTagName()).toBe("h4");
@@ -87,5 +88,45 @@ describe("Semantics", () => {
     expect(tagLabel("h3")).toBe("Heading 3");
     expect(tagLabel("nav")).toBe("Navigation");
     expect(tagLabel("time")).toBe("time");
+  });
+
+  it("B4-Native: a time / meter / details shows its native attributes, each write one Undo on the node; a wbr says it has no children", () => {
+    const { c, id } = setup("text", { tagName: "time" });
+    renderSection(c, id, "text");
+    const native = screen.getByTestId("inspector-native-attributes");
+    fireEvent.change(within(native).getByLabelText("datetime"), { target: { value: "2026-10-21" } });
+    expect(c.elements.getElement(id)!.getAttribute("datetime")).toBe("2026-10-21");
+    c.history.flushPending();
+    c.history.undo();
+    expect(c.elements.getElement(id)!.getAttribute("datetime")).toBeUndefined();
+    cleanup();
+    const meter = setup("container", { tagName: "meter" });
+    renderSection(meter.c, meter.id, "container");
+    expect(within(screen.getByTestId("inspector-native-attributes")).getByLabelText("Optimum")).toBeInTheDocument();
+    cleanup();
+    const wbr = setup("text", { tagName: "wbr" });
+    renderSection(wbr.c, wbr.id, "text");
+    expect(screen.getByTestId("inspector-semantics-void")).toHaveTextContent("No text or children");
+  });
+
+  it("A12 / A13: a heading's Tag offers 'change to paragraph…', reviewed; the same node becomes a paragraph in ONE Undo", () => {
+    const { c, id } = setup("heading", { tagName: "h2", styles: { color: "red" }, attributes: { id: "our-approach" } });
+    render(
+      <ToastProvider>
+        <SemanticsSection composer={c} element={{ id, type: "heading" }} targetIds={[id]} isOpen onToggle={() => {}} />
+      </ToastProvider>,
+    );
+    fireEvent.change(tagSelect(), { target: { value: "convert:p" } });
+    expect(c.elements.getElement(id)!.getType()).toBe("heading");
+    expect(screen.getByTestId("inspector-semantics-review")).toHaveTextContent("Heading semantics will change.");
+    const before = c.history.getUndoCount();
+    fireEvent.click(screen.getByTestId("inspector-semantics-convert"));
+    c.history.flushPending();
+    const now = c.elements.getElement(id)!;
+    expect([now.getType(), now.getTagName(), now.getContent(), now.getAttribute("id"), now.getStyles().color]).toEqual(["paragraph", "p", "Hi", "our-approach", "red"]);
+    expect(c.history.getUndoCount()).toBe(before + 1);
+    expect(screen.getByText("Heading changed to paragraph.")).toBeInTheDocument();
+    c.history.undo();
+    expect([c.elements.getElement(id)!.getType(), c.elements.getElement(id)!.getTagName()]).toEqual(["heading", "h2"]);
   });
 });

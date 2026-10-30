@@ -10,6 +10,11 @@
  *   Stable IDs · no pairing by label or position.
  *   Tab actions · [ Move Details before Overview ]
  *
+ * A button with no confirmed panel (C02 `245:37366`) shows "Unlinked content
+ * · Needs repair" instead, and "Repair relationships" chooses the pair
+ * explicitly (C03 `245:37877`, `linkTabPair`); right after, the section reads
+ * "{n} linked" with the repaired pair (C04 `245:38385`).
+ *
  * Every write is the model's own history step (a legacy block gets its keys
  * inside the first edit's step); the lock gate runs first.
  *
@@ -17,10 +22,11 @@
  */
 import * as React from "react";
 import type { Composer } from "@/engine";
-import { Button } from "@/editor/chrome-ui";
+import { Button, useToast } from "@/editor/chrome-ui";
 import { EVENTS } from "@/shared/constants/events";
 import { canWrite } from "@/engine/commands/commandOperations";
-import { addTab, moveTab, readTabs, setInitialTab } from "@/engine/widgets/tabsModel";
+import { addTab, linkTabPair, moveTab, readTabs, setInitialTab } from "@/engine/widgets/tabsModel";
+import { justAddedFrom, markJustAdded, useJustAdded } from "./justAddedField";
 import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
 import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
 import { Section, SelectRow } from "../shared/controls";
@@ -30,32 +36,143 @@ import { NoteRow } from "./behaviourRows";
 /** The panel id the board writes beside a tab's key ("tab-01 → panel-01"). */
 const panelKeyOf = (key: string): string => key.replace(/^tab-/, "panel-");
 
+/** A read-only value in the row's control column (board: gray-filled field). */
+function ValuePill({ children, testId }: { children: React.ReactNode; testId?: string }) {
+  return (
+    <span className="bdi-row-content">
+      <span
+        data-testid={testId}
+        className="tw:flex tw:h-7 tw:min-w-0 tw:flex-1 tw:items-center tw:truncate tw:rounded-[4px] tw:bg-[var(--bk-bg-subtle)] tw:px-2 tw:text-[12px] tw:text-[var(--bk-ink-soft)]"
+      >
+        {children}
+      </span>
+    </span>
+  );
+}
+
+/** A panel's layer name, else its place among the block's panels ("Panel 2"). */
+function panelName(composer: Composer, panelId: string): string {
+  const el = composer.elements.getElement(panelId);
+  if (!el) return "Panel";
+  const named = getLayerName(el);
+  if (named) return named;
+  const panels = el.getParent()?.getChildren().filter((c) => c.getAttribute("role") === "tabpanel") ?? [];
+  return `Panel ${panels.indexOf(el) + 1}`;
+}
+
+const tabLine = (label: string, key: string | null): string => (key ? `${label || "Tab"} · ${key}` : label || "Tab");
+
 export function TabsSection({ composer, elementId, isOpen, onToggle }: { composer: Composer | null | undefined; elementId: string; isOpen?: boolean; onToggle?: () => void }) {
-  const [, bump] = React.useReducer((n: number) => n + 1, 0);
-  React.useEffect(() => {
-    if (!composer) return;
-    composer.on(EVENTS.ELEMENT_UPDATED, bump);
-    composer.on(EVENTS.PROJECT_CHANGED, bump);
-    return () => {
-      composer.off(EVENTS.ELEMENT_UPDATED, bump);
-      composer.off(EVENTS.PROJECT_CHANGED, bump);
-    };
-  }, [composer]);
+  useTabsVersion(composer);
+  const { addToast } = useToast();
+  const [repair, setRepair] = React.useState<{ tabId: string; panelId: string } | null>(null);
+  const justLinked = useJustAdded(composer, elementId, "tabs-linked");
   if (!composer) return null;
   const tabs = readTabs(composer, elementId);
   if (!tabs) return null;
-  const { pairs } = tabs;
+  const { pairs, unpairedTabs, unpairedPanels } = tabs;
   const writable = () => canWrite(composer, elementId);
+  const root = composer.elements.getElement(elementId);
+  const rootName = root ? (getLayerName(root) ?? elementTypeLabel(root.getType())) : "Tabs";
+
+  /* C03 — choose a pair explicitly: button and panel, never guessed. */
+  if (repair) {
+    const tabChoices = unpairedTabs.length ? unpairedTabs.map((t) => ({ id: t.tabId, label: tabLine(t.label, t.key) })) : pairs.map((p) => ({ id: p.tabId, label: tabLine(p.label, p.key) }));
+    const panelChoices = unpairedPanels.map((x) => ({ id: x.panelId, label: x.key ? `${panelName(composer, x.panelId)} · ${panelKeyOf(x.key)}` : panelName(composer, x.panelId) }));
+    const tabLabel = tabChoices.find((t) => t.id === repair.tabId)?.label.split(" · ")[0] ?? "Tab";
+    const link = () => {
+      if (!repair.tabId || !repair.panelId || !writable()) return;
+      if (!linkTabPair(composer, elementId, repair.tabId, repair.panelId)) return;
+      const undo = composer.history.captureUndo();
+      markJustAdded(composer, elementId, "tabs-linked", repair.tabId);
+      setRepair(null);
+      addToast({ description: `${tabLabel} linked to ${panelName(composer, repair.panelId)}.`, action: { label: "Undo", onClick: undo } });
+    };
+    return (
+      <Section title="Repair relationships" stateTitle="Repair relationships" isOpen={isOpen} onToggle={onToggle}>
+        <div className="tw:flex tw:flex-col tw:gap-2" data-testid="tabs-repair">
+          <SelectRow
+            label="Tab button"
+            value={repair.tabId}
+            placeholder="Choose a button"
+            options={tabChoices.map((t) => ({ value: t.id, label: t.label }))}
+            onChange={(id) => setRepair({ ...repair, tabId: id })}
+          />
+          <SelectRow
+            label="Panel"
+            value={repair.panelId}
+            placeholder="Choose a panel"
+            options={panelChoices.map((x) => ({ value: x.id, label: x.label }))}
+            onChange={(id) => setRepair({ ...repair, panelId: id })}
+          />
+          <NoteRow>Both belong to {rootName}. This panel is not paired elsewhere.</NoteRow>
+          <Button size="xs" className={`${WIDE_BUTTON} tw:text-white!`} disabled={!repair.tabId || !repair.panelId} onClick={link} data-testid="tabs-link-pair">
+            Link selected pair
+          </Button>
+          <Button color="light" size="xs" className={WIDE_BUTTON} onClick={() => setRepair(null)} data-testid="tabs-repair-cancel">
+            Cancel
+          </Button>
+          <NoteRow>One Undo restores the previous IDs and relationships.</NoteRow>
+        </div>
+      </Section>
+    );
+  }
+
+  /* C02 — a button with no confirmed panel (or a panel no button opens):
+     both stay in the document; pair actions wait for an explicit repair. */
+  if (unpairedTabs.length || unpairedPanels.length) {
+    const tab = unpairedTabs[0];
+    const panel = unpairedPanels[0];
+    return (
+      <Section
+        title="Unlinked content"
+        stateTitle="Unlinked content"
+        isOpen={isOpen}
+        onToggle={onToggle}
+        action={<span className="tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">Needs repair</span>}
+      >
+        <div className="tw:flex tw:flex-col tw:gap-2" data-testid="tabs-unlinked">
+          <NoteRow>
+            {tab ? `${tab.label || "A tab"} has no confirmed panel.` : `${panelName(composer, panel!.panelId)} is not opened by any tab.`} Both nodes are preserved.
+          </NoteRow>
+          <div className="bdi-row-ctrl">
+            <span className="bdi-lb">Button</span>
+            <ValuePill testId="tabs-unlinked-button">{tab ? tabLine(tab.label, tab.key) : "Not linked"}</ValuePill>
+          </div>
+          <div className="bdi-row-ctrl">
+            <span className="bdi-lb">Panel</span>
+            <ValuePill testId="tabs-unlinked-panel">{tab ? "Not linked" : panelName(composer, panel!.panelId)}</ValuePill>
+          </div>
+          <Button
+            size="xs"
+            className={`${WIDE_BUTTON} tw:text-white!`}
+            onClick={() => setRepair({ tabId: tab?.tabId ?? "", panelId: unpairedPanels.length === 1 ? unpairedPanels[0].panelId : "" })}
+            data-testid="tabs-repair-open"
+          >
+            Repair relationships
+          </Button>
+          <NoteRow>Pair actions are unavailable until you choose a valid panel. Styling remains available.</NoteRow>
+        </div>
+      </Section>
+    );
+  }
+
+  /* C04 — right after a repair: the pairs, and the one just linked. */
+  const linked = justLinked ? pairs.filter((p) => p.tabId === justAddedFrom(composer, elementId, "tabs-linked")) : [];
 
   return (
     <Section
       title="Tabs"
       isOpen={isOpen}
       onToggle={onToggle}
-      action={<span className="tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="tabs-pair-count">{pairs.length === 1 ? "1 pair" : `${pairs.length} pairs`}</span>}
+      action={
+        <span className="tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="tabs-pair-count">
+          {justLinked ? `${pairs.length} linked` : pairs.length === 1 ? "1 pair" : `${pairs.length} pairs`}
+        </span>
+      }
     >
       <div className="tw:flex tw:flex-col tw:gap-2" data-testid="inspector-tabs-section">
-        <NoteRow>Button and panel move together.</NoteRow>
+        {justLinked ? null : <NoteRow>Button and panel move together.</NoteRow>}
         {pairs.map((p) => (
           <Button
             key={p.key}
@@ -75,24 +192,26 @@ export function TabsSection({ composer, elementId, isOpen, onToggle }: { compose
             {p.label || "Tab"} · Edit panel
           </Button>
         ))}
-        <Button color="light" size="xs" className={WIDE_BUTTON} onClick={() => writable() && addTab(composer, elementId)} data-testid="tabs-add">
-          Add tab
-        </Button>
+        {justLinked ? null : (
+          <Button color="light" size="xs" className={WIDE_BUTTON} onClick={() => writable() && addTab(composer, elementId)} data-testid="tabs-add">
+            Add tab
+          </Button>
+        )}
         <div className={`${GROUP_TITLE} tw:mb-1!`}>Relationships</div>
-        {pairs.map((p) => (
+        {(justLinked ? linked : pairs).map((p) => (
           <div key={p.key} className="bdi-row-ctrl" data-testid={`tabs-pair-${p.key}`}>
             <span className="bdi-lb">{p.label || "Tab"}</span>
-            <span className="bdi-row-content">
-              <span className="tw:flex tw:h-7 tw:flex-1 tw:items-center tw:rounded-[4px] tw:bg-[var(--bk-bg-subtle)] tw:px-2 tw:text-[12px] tw:text-[var(--bk-ink-soft)]">
-                {tabs.legacy ? "paired by position" : `${p.key} → ${panelKeyOf(p.key)}`}
-              </span>
-            </span>
+            <ValuePill>{tabs.legacy ? "paired by position" : `${p.key} → ${panelKeyOf(p.key)}`}</ValuePill>
           </div>
         ))}
         <NoteRow>
-          {tabs.legacy ? "Paired by position until the first edit gives each pair a stable ID." : "Stable IDs · no pairing by label or position."}
+          {justLinked
+            ? "aria-controls and aria-labelledby reference the chosen pair."
+            : tabs.legacy
+              ? "Paired by position until the first edit gives each pair a stable ID."
+              : "Stable IDs · no pairing by label or position."}
         </NoteRow>
-        {pairs.length >= 2 ? (
+        {pairs.length >= 2 && !justLinked ? (
           <>
             <div className={`${GROUP_TITLE} tw:mb-1!`}>Tab actions</div>
             <Button

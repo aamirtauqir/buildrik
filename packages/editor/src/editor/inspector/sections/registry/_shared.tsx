@@ -73,6 +73,7 @@ export type SectionId =
   | "tab-panel"
   | "tabs-behavior"
   | "modal-relationship"
+  | "dialog-content"
   | "dialog-behavior"
   | "validation"
   | "table-structure"

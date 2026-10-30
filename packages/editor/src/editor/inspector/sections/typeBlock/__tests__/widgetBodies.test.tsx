@@ -129,6 +129,29 @@ describe("Progress — a batch (2L9 B03)", () => {
     expect(note).toHaveTextContent("Only Maximum changed. Each Value and derived percentage uses its own pair.");
   });
 
+  it("B02: a Maximum below a bar's Value refuses the whole batch and keeps the draft; Use maximum {floor} applies", () => {
+    const { composer } = renderBlock(bar("a", "20", "100"), { also: [bar("b", "80", "100") as never] });
+    fireEvent.change(screen.getByLabelText("Maximum"), { target: { value: "50" } });
+    expect(composer.elements.getElement("a-bar")!.getAttribute("max")).toBe("100");
+    expect(composer.elements.getElement("b-bar")!.getAttribute("max")).toBe("100");
+    expect(screen.getByTestId("inspector-progress-refused")).toHaveTextContent("Maximum must be at least 80; lower those values first.");
+    expect(screen.getByTestId("inspector-progress-refused")).toHaveTextContent("Neither bar changed. Their individual values remain 20 and 80.");
+    fireEvent.click(screen.getByTestId("inspector-progress-use-floor"));
+    expect(composer.elements.getElement("a-bar")!.getAttribute("max")).toBe("80");
+    expect(screen.queryByTestId("inspector-progress-refused")).toBeNull();
+  });
+
+  it("B03 → B06: the batch receipt's Undo restores every original maximum and says so", () => {
+    const { composer } = renderBlock(bar("a", "20", "100"), { also: [bar("b", "80", "100") as never] });
+    fireEvent.change(screen.getByLabelText("Maximum"), { target: { value: "90" } });
+    expect(screen.getByText("Maximum set to 90 on 2 bars.")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Undo" }));
+    expect(composer.elements.getElement("a-bar")!.getAttribute("max")).toBe("100");
+    expect(composer.elements.getElement("b-bar")!.getAttribute("max")).toBe("100");
+    expect(screen.getByTestId("inspector-progress-applied")).toHaveTextContent("Both original maxima are 100. Each original Value remains 20 and 80.");
+    expect(screen.getByText("Original maxima restored.")).toBeInTheDocument();
+  });
+
   it("a Value across the batch keeps each bar's own Maximum", () => {
     const { composer } = renderBlock(bar("a", "30", "100"), { also: [bar("b", "60", "200") as never] });
     fireEvent.change(screen.getByLabelText("Value"), { target: { value: "50" } });

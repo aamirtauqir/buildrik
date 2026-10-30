@@ -15,7 +15,8 @@
  * the rest of the page is made inert, Escape / a click on the backdrop itself
  * / any `[data-modal-close]` (or legacy `.modal-close`) closes it when allowed
  * (`data-modal-escape`, `data-modal-backdrop`), and focus returns to the
- * trigger. `data-modal-initial="open"` opens on load.
+ * trigger. `data-modal-initial="open"` opens on load. A dialog with no name of
+ * its own is labelled by its first heading (`aria-labelledby`).
  *
  * Canvas (`interactive: false`): dialogs stay closed unless `reveal` (the
  * selection) is the dialog or inside it — then it shows, without
@@ -68,6 +69,18 @@ export function initModalRuntime(root: ParentNode, opts: ModalRuntimeOptions = {
     cleanups.push(function () { d.removeAttribute("data-bk-modal-init"); });
     if (!d.id) d.id = "bk-modal-" + ++seq;
     if (!d.getAttribute("aria-modal")) d.setAttribute("aria-modal", "true");
+    /* C08 "Labelled by": the dialog is named by its first heading unless it
+       already carries a name. Derived per load, like the dialog's own id. */
+    const heading = d.querySelector("h1, h2, h3, h4, h5, h6");
+    if (heading && !d.getAttribute("aria-labelledby") && !d.getAttribute("aria-label")) {
+      const minted = !heading.id;
+      if (minted) heading.id = d.id + "-title";
+      d.setAttribute("aria-labelledby", heading.id);
+      cleanups.push(function () {
+        d.removeAttribute("aria-labelledby");
+        if (minted) heading.removeAttribute("id");
+      });
+    }
     const shown = d.style.display && d.style.display !== "none" ? d.style.display : d.getAttribute("data-modal-display") || "flex";
     let openedBy: HTMLElement | null = null;
     let inerted: Element[] = [];

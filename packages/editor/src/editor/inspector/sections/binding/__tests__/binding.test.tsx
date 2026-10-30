@@ -268,6 +268,13 @@ describe("TemplatePageDoor (B5-D04)", () => {
     expect(composer.emit).toHaveBeenCalledWith("ui:cms-open", { collectionId: "col-1", tab: "dynamic-pages" });
   });
 
+  it("not above a Collection list, which has its own Open collection (B5-D94)", () => {
+    const composer = makeComposer({ template: true });
+    (composer.cms.bindings as unknown as Record<string, unknown>).getCollectionBinding = () => ({ collectionId: "col-1" });
+    const { container } = render(<TemplatePageDoor composer={composer as never} elementId="e1" />);
+    expect(container.textContent).toBe("");
+  });
+
   it("elsewhere, nothing", () => {
     const { container } = render(<TemplatePageDoor composer={makeComposer() as never} elementId="e1" />);
     expect(container.textContent).toBe("");

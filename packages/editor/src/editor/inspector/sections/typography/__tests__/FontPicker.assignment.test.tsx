@@ -129,6 +129,25 @@ describe("FontPicker — Undo font assignment (2L9 R08)", () => {
     expect(note).toHaveTextContent("Undo restores the previous Inter stack without deleting the uploaded font.");
   });
 
+  it("R05: a face that failed to load says the fallback renders, keeps the family, offers Retry", async () => {
+    const faces = [{ family: '"Studio Sans"', status: "error" }];
+    vi.spyOn(document, "fonts", "get").mockReturnValue({
+      forEach: (fn: (f: { family: string; status: string }) => void) => faces.forEach(fn),
+      load: () => Promise.resolve([]),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    } as never);
+    vi.spyOn(c.fonts, "getAllFonts").mockReturnValue([
+      { id: "library-studio", family: "Studio Sans", source: "custom", variants: [], loaded: false },
+    ] as never);
+    render(<Harness />);
+    pick("Studio Sans");
+    expect(await screen.findByText("Font unavailable — fallback is rendering. The intended family and source are retained.")).toBeInTheDocument();
+    expect(c.elements.getElement(el.getId())?.getStyles()["font-family"]).toBe("'Studio Sans', sans-serif");
+    expect(screen.getByTestId("font-assignment-retry")).toBeInTheDocument();
+    expect(screen.getByTestId("font-assignment")).toHaveTextContent("A late load cannot reapply an undone choice.");
+  });
+
   it("a newer pick replaces the note, naming the family it replaced", () => {
     render(<Harness />);
     pick("Georgia");

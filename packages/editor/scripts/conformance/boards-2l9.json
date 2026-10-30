@@ -4753,9 +4753,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:handoff-board",
    "verified": "no",
-   "verifiedNote": "Published form posts to dashboard app/api/public/forms/[siteId]/[formBlockId]/route.ts which returns separate HTML pages (:19,:148); no inl…",
+   "verifiedNote": "Visitor runtime handoff board (published form states and accessibility), not an editor surface. Lead round 23: skipped.",
    "tier": "P1"
   },
   {
@@ -5068,8 +5068,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Field list has no Select/options rows; no data-loss confirm (BD-29, owner-approved 2026-10-19)",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 23, probe ?block=contact-form + a real select (3 options, 'Research' selected) side by side with shots/170-122442.png: Field · Type Select, Label, Name + note, Required, Default value (a select over the options, writes `selected`, one step), 'Options · 3 options' with 'Research · Default', 'Labels and saved values are identical.' (or 'Saved values differ…' when an option has its own value). Match, except: no Placeholder row on a select — a native <select> has no placeholder attribute (the board's 'Choose a topic…' would be a fake option), and the existing one-per-line options editor stays under the list (capability kept).",
    "tier": "P1"
   },
   {
@@ -5079,8 +5079,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Field list has no Select/options rows; no data-loss confirm (BD-29, owner-approved 2026-10-19)",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 23, probe ?block=contact-form + the select, form selected, side by side with shots/170-122820.png: Fields list 'Topic · Select · Required' among Text / Textarea / Submit button rows, + Add field, 'Drag to reorder, or use a field’s menu.' Match (the fixture's extra Email field is the block's own).",
    "tier": "P1"
   },
   {
@@ -5090,8 +5090,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Field list has no Select/options rows; no data-loss confirm (BD-29, owner-approved 2026-10-19)",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 23: on a select the Type row's 'Field type' card offers exactly Text · Select · Cancel (fieldBody typeOptions), side by side with shots/170-123180.png. Match; picking Text opens the F34 confirm instead of applying.",
    "tier": "P1"
   },
   {
@@ -5101,8 +5101,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Field list has no Select/options rows; no data-loss confirm (BD-29, owner-approved 2026-10-19)",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 23, probe → Type › Text, full-frame shot side by side with shots/170-123569.png: 'Change Topic to Text?', 'The 3 options—Design, Research and Studio—will be removed. The current default “Research” stays as text.', Cancel (primary, focused — the default) and 'Change to Text'. Match; the dialog is centred by chrome-ui Modal (board draws it higher).",
    "tier": "P1"
   },
   {
@@ -5112,8 +5112,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Field list has no Select/options rows; no data-loss confirm (BD-29, owner-approved 2026-10-19)",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 23, probe → Change to Text, side by side with shots/170-123968.png: Type Text, Label Topic, Placeholder, Name topic, Required, Default value 'Research', Validation / Advanced attributes; toast 'Topic changed to Text · Undo'. convertSelectToText keeps the element id, attributes, classes, styles at every breakpoint and lock; ONE history step, Undo restores the options, their order and the default (test formBodies 'Select → Text').",
    "tier": "P1"
   },
   {
@@ -5123,8 +5123,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Field list has no Select/options rows; no data-loss confirm (BD-29, owner-approved 2026-10-19)",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 23, the acceptance note board: loss disclosed by name with Cancel the default; one atomic reversible step; the field keeps its identity (same id — no replace-with-new-id), label, key and styling; before converting, a field with CMS bindings / a condition / a list binding is refused with its reason (conversionRefusal) rather than converted. Lossless input↔textarea swaps still apply directly with Undo (F29/F30).",
    "tier": "P1"
   },
   {
@@ -5246,8 +5246,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "L-B round 21: reopened — the Tabs model landed (L-A round 19, engine-tabs.md); the C01 section is built on it. Not yet compared against this board.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 23, probe ?block=tabs with the second panel's data-tab-key broken (a real unlinked pair: readTabs.unpairedTabs / unpairedPanels) side by side with shots/245-37366.png: 'Unlinked content · Needs repair', '{tab} has no confirmed panel. Both nodes are preserved.', Button '{label} · tab-02' / Panel 'Not linked' as gray value fields, primary 'Repair relationships', 'Pair actions are unavailable until you choose a valid panel. Styling remains available.' Match (sample names differ). Tabs now open on Content (openingTab).",
    "tier": "P1"
   },
   {
@@ -5257,8 +5257,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "L-B round 21: reopened — the Tabs model landed (L-A round 19, engine-tabs.md); the C01 section is built on it. Not yet compared against this board.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 23, probe (same state) → Repair relationships, side by side with shots/245-37877.png: 'Repair relationships', Tab button / Panel selects (unpaired only), 'Both belong to {Tabs}. This panel is not paired elsewhere.', primary 'Link selected pair', Cancel, 'One Undo restores the previous IDs and relationships.' Match. Link = engine linkTabPair, one history step.",
    "tier": "P1"
   },
   {
@@ -5268,8 +5268,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "tabs is a plain container (src/shared/constants/elementCapabilities.ts:171); no pair/relationship UI",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 23, probe → Link selected pair, side by side with shots/245-38385.png: 'Tabs · 3 linked', '{tab} · Edit panel' per pair, Relationships with the repaired pair 'tab-02 → panel-02', 'aria-controls and aria-labelledby reference the chosen pair.', toast '{tab} linked to {panel}. · Undo' (captureUndo of the one step). The receipt state ends on the next history step (justAddedField kind 'tabs-linked'). Match.",
    "inheritsFrom": "245:36832",
    "tier": "P1"
   },
@@ -5313,8 +5313,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "L-B round 21: reopened — the Modal model landed (L-A round 19, engine-modal.md); the C07 / C18 sections are built on it. Not yet compared against this board.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 23, probe ?block=modal → dialog selected, side by side with shots/245-40398.png: 'Dialog content' — Edit title, Edit body, Close label (writes the close control's aria-label, one step), 'Back to {trigger}', 'Back restores closed authoring view and trigger focus.', Accessibility · Labelled by, 'Visitor focus stays inside the open dialog and returns to the opener.' Labelled by names the title heading — modalRuntime now sets aria-labelledby from the dialog's first heading per load — instead of the board's stored id 'dialog-title-01' (the id is derived per load, never stored).",
    "tier": "P1"
   },
   {
@@ -5324,8 +5324,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "L-B round 21: reopened — the Modal model landed (L-A round 19, engine-modal.md); the C07 / C18 sections are built on it. Not yet compared against this board.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 23, probe ?block=modal&instance=Header component (the trigger inside a real component instance) side by side with shots/245-40932.png: 'Cannot link this dialog', 'This dialog belongs to one page; a shared component cannot store its reference.', Link dialog disabled, primary 'Insert local modal at page root', Cancel (closes the section), the note. Match. The probe also draws the instance identity block above the tabs (IC01), which the board leaves out.",
    "tier": "P1"
   },
   {
@@ -5335,8 +5335,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-B round 21: the Modal model and Inspector are built (C07), but this board is the insertion receipt FROM a shared component ('Local modal created' / 'Trigger and dialog were added at Home’s root. Header component is unchanged.' / 'Back to Header component' / 'Local trigger and dialog added. · Undo'); the insert-into-component refusal → local insertion flow is the canvas/insert path, not built.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 23, probe → Insert local modal at page root, side by side with shots/245-41419.png: the Modal block inserted at Home's root in ONE history step, the new trigger selected, 'Local modal created' — 'Trigger and dialog were added at Home’s root. {Component} is unchanged.', 'Edit {dialog}', 'Back to {component}', toast 'Local trigger and dialog added. · Undo'. Match.",
    "inheritsFrom": "245:39899",
    "tier": "P1"
   },
@@ -5347,8 +5347,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "L-B round 21: reopened — the Modal model landed (L-A round 19, engine-modal.md); the C07 / C18 sections are built on it. Not yet compared against this board.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 23, probe ?block=modal&also=1 with the trigger's dialog removed (data-modal-target left dangling) side by side with shots/245-41919.png: 'Missing dialog', 'The saved dialog ID no longer exists. Select a valid dialog on {page} to repair this trigger.', Dialog 'Choose existing dialog', primary 'Link {dialog}' (disabled until a dialog is chosen — the board's enabled button names a dialog nobody chose), 'No nearest-dialog guess. Cancel preserves the missing reference.', Cancel. Link = linkModal, one step, receipt with Undo.",
    "tier": "P1"
   },
   {
@@ -5358,8 +5358,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "L-B round 21: reopened — the Modal model landed (L-A round 19, engine-modal.md); the C07 / C18 sections are built on it. Not yet compared against this board.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 23: the same board as C18 (252:46927); probe ?block=modal → dialog → Behavior, side by side with shots/245-42414.png — Dialog behavior rows, both notes, 'Back to dialog content' (now opens Content › Dialog content). Match.",
    "tier": "P1"
   },
   {
@@ -5536,8 +5536,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No \"Change semantic tag\" impact review / one-Undo conversion",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 23, probe ?type=heading&layerName=Hero heading → Semantics › Tag 'p — change to paragraph…', side by side with shots/247-27113.png: 'Change semantic tag' — Current h2, New tag p, 'Text, nested emphasis, ID, styles and links can be preserved. Heading semantics will change.', primary 'Change to paragraph', Cancel, 'One Undo restores the original tag and attributes.' Match; the probe keeps the heading's type block above (the board leaves it out). The select never applies a cross-type tag directly.",
    "tier": "P1"
   },
   {
@@ -5547,8 +5547,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No \"Change semantic tag\" impact review / one-Undo conversion",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 23, probe → Change to paragraph, side by side with shots/247-27602.png: the SAME node (same id, content, children, attributes incl. ID, styles — elementConversion.replaceInPlace) is a paragraph in ONE history step; Semantics opens with Tag Paragraph, ID, 'Content retained' — 'The same node and inline children are retained. Styles and references are unchanged.', 'Edit text on canvas'; toast 'Heading changed to paragraph. · Undo'. Match (Tag reads 'Paragraph' — the row's label for p).",
    "tier": "P1"
   },
   {
@@ -5569,8 +5569,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Progress Value/Maximum single-target only (sections/typeBlock/bodies/widgetBodies.tsx:176)",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 23, probe ?block=progress&also=1 with the bars at 20 / 80 (real values), Maximum 50 + Enter, side by side with shots/247-28584.png: Value Mixed, Maximum draft '50' outlined red, 'Maximum must be at least 80; lower those values first.', 'Neither bar changed. Their individual values remain 20 and 80.', primary 'Use maximum 80' (the smallest maximum every bar accepts — the board's 90 is sample data), 'Revert draft'. No bar is written and no history step is made until a valid maximum. Match (the probe also draws the batch bar and Show label above / below).",
    "tier": "P1"
   },
   {
@@ -5590,9 +5590,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
+   "authority": "open:align-distribute-home",
    "verified": "no",
-   "verifiedNote": "No zero-property no-op disclosure",
+   "verifiedNote": "L-B round 23: not built. The board puts 'Align and distribute' (Reference · flow-layout refusal 'Alignment cannot change them to absolute positioning', Inspect parent layout) and a zero-property Apply style no-op on the Style tab of a multi-selection; today Align / Distribute live in the multi-select bar above the tabs, whose home is the open owner decision align-distribute-home (sub-plan code-ahead table). Built once that is decided.",
    "tier": "P1"
   },
   {
@@ -5646,8 +5646,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No explicit \"Use\" step after returning from site fonts",
+   "verified": "drift-open",
+   "verifiedNote": "L-B round 23: built, test-verified (ChooseFont.test 'back from Site fonts'), not probe-compared — the state needs the Site fonts round trip. Manage site fonts records the uploaded families; back in Choose font, a family added meanwhile shows 'Choose font' · 'Search: {query}' · 'Added to site · not applied' · primary 'Use {family}' · 'Uploaded · {file} · {weight}' · Cancel · 'Current applied font remains {current}.' Nothing is written until Use (one discrete step, Undo font assignment bound to it).",
    "tier": "P1"
   },
   {
@@ -5657,8 +5657,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No \"Font unavailable — fallback rendering\" + Retry",
+   "verified": "drift-open",
+   "verifiedNote": "L-B round 23: built, test-verified (FontPicker.assignment R05), not probe-compared. After a pick, a family whose face is in error (document.fonts) or that the FontManager reported (FONT_ERROR) reads 'Font unavailable — fallback is rendering. The intended family and source are retained.', 'Retry font load' (re-registers the uploaded file / re-requests the catalogue family), 'Undo font assignment' (the pick's own step), 'A late load cannot reapply an undone choice. Project save and font loading are separate statuses.' The stored family is never rewritten.",
    "tier": "P1"
   },
   {
@@ -5668,8 +5668,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No \"Selection changed\" refusal",
+   "verified": "drift-open",
+   "verifiedNote": "L-B round 23: built, test-verified (ChooseFont.test 'removed target'), not probe-compared. If the element the picker opened for is removed while it is open, the picker shows 'Cannot apply font' · '{name} was removed while this picker was open.' · 'Use {font}' disabled · 'Close picker' · 'This result will not be applied to the newly selected object…' and pick() refuses. In the shell the Inspector follows the selection when its element goes, so the picker usually closes first — the guard holds either way.",
    "tier": "P1"
   },
   {
@@ -5811,8 +5811,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No native-tag (time/abbr/wbr…) Tag control or attribute routes",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 23, reference board (support routes). Content › Semantics now routes each native tag to its own attributes on the actual node (NATIVE_ATTRS, one Undo per write through the lock gate): time · datetime + lang, abbr/dfn title, q/blockquote/del/ins cite (+ datetime), data value, bdo/bdi dir; headings keep Tag H1–H6 + ID; figure → 'Edit caption' selects its figcaption. Probe-checked on a meter (same section). Landmarks keep their actual native tag read-only. Inline marks are preserved by the text editor (no change).",
    "tier": "P1"
   },
   {
@@ -5822,8 +5822,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No native-tag (time/abbr/wbr…) Tag control or attribute routes",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 23, reference board: lists — ol start / Reversed / Numbering, li value (dt/dd are edited as their own nodes; no auto-conversion); native forms — fieldset Disabled + Owner form + 'Edit legend', option value/label/Disabled/Selected, optgroup, output for/name/form, label for (select options: F31); media — track Kind / Language / Source / label / Default, source src/type/srcset/media/sizes on the exact node.",
    "tier": "P1"
   },
   {
@@ -5833,8 +5833,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No native-tag (time/abbr/wbr…) Tag control or attribute routes",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 23, reference board: tables — th/td Scope/Headers/Colspan/Rowspan are the existing Table cell section (C14), col/colgroup span, table 'Edit caption'; details 'Initial open' + 'Edit summary', native dialog 'Open' (not assumed to be a Buildrik Modal — the Modal model only acts on [data-modal-key]); meter Value / Min / Max / Low / High / Optimum (probe-checked), progress keeps its type block.",
    "tier": "P1"
   },
   {
@@ -5844,8 +5844,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No native-tag (time/abbr/wbr…) Tag control or attribute routes",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 23, reference board: br / hr / wbr say 'No text or children — a {tag} keeps its place in the line.' (no padding/drop UI added); SVG subtree — svg viewBox, path d / Stroke / Fill, circle and rect geometry + paint, use 'Fragment ref' (href); links stay on Behavior › Link (B69). No vector editor (deferred by the board).",
    "tier": "P1"
   },
   {
@@ -5879,8 +5879,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No per-target maxima batch write/Undo result",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 23, probe: Maximum 90 on the two bars → toast 'Maximum set to 90 on 2 bars. · Undo' (B03) → Undo (the batch's one history step, captureUndo), side by side with shots/251-77000.png: Maximum back to 100, 'Applied to 2' · 'Both original maxima are 100. Each original Value remains 20 and 80.', toast 'Original maxima restored.' Match. Differing originals read 'Original maxima: 100 and 120.'",
    "inheritsFrom": "247:29083",
    "tier": "P1"
   },
@@ -5902,8 +5902,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "L-B round 21: reopened — the Modal model landed (L-A round 19, engine-modal.md); the C07 / C18 sections are built on it. Not yet compared against this board.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 23: the same section as C08 (245:40398) on an identical board; compared together (probe ?block=modal, dialog selected). Match.",
    "tier": "P1"
   },
   {
@@ -5970,7 +5970,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "One boundary for the whole tab (ProInspector.tsx:389); no per-section \"Retry Typography\"",
+   "verifiedNote": "L-B round 23: not built — per the lead's condition. Sections have no error boundary of their own: one boundary wraps the whole tab body (ProInspector), so a per-section 'Retry Typography' would be a fake today. Building it means a boundary per registry entry in InspectorTabContent first.",
    "tier": "P1"
   },
   {
@@ -9605,7 +9605,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-fixed",
-   "verifiedNote": "L-B round 22: probe ?ancestorType=collection-list&cms=list&templatePage=1&query={excerpt is @page.excerpt, excludeCurrent} side by side with shots/195-27443.png: Filter '1 rule', card field · is · 'This page’s {field}', Remove filter, + Add filter, Match, Sort, Direction, + Then by, Show, Skip, '☑ Exclude this page’s record', 'Filter values follow the record being previewed.' — match (field is sample data). Per generated page: the editor defers @page filters / exclude / skip / Show on a published template page (data-bk-query + data-bk-item / data-bk-row on the copies) and the server's generateDynamicPages applies them with the shared applyRecordPass (B-27; server test cms.service.recordPass).",
+   "verifiedNote": "L-B round 22: probe ?ancestorType=collection-list&cms=list&templatePage=1&query={excerpt is @page.excerpt, excludeCurrent} side by side with shots/195-27443.png: Filter '1 rule', card field · is · 'This page’s {field}', Remove filter, + Add filter, Match, Sort, Direction, + Then by, Show, Skip, '☑ Exclude this page’s record', 'Filter values follow the record being previewed.' — match (field is sample data). Per generated page: the editor defers @page filters / exclude / skip / Show on a published template page (data-bk-query + data-bk-item / data-bk-row on the copies) and the server's generateDynamicPages applies them with the shared applyRecordPass (B-27; server test cms.service.recordPass). Round 23: the ‹ CMS · Dynamic pages door no longer heads the Content tab of a Collection list (TemplatePageDoor; the list has its own Open collection ›), as the board omits it — probe re-checked. A list copy’s own element condition that reads @page.* is now also decided per generated page (data-bk-if + data-bk-if-row, applyRecordPass).",
    "tier": "P1"
   },
   {

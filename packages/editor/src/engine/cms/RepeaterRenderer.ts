@@ -223,7 +223,7 @@ export class RepeaterRenderer {
         this.applyContext(node, context, binding, null, refs);
         this.applyCurrentItem(node, listEl, item, binding.collectionId, canvas);
         /* B-11: conditions in this copy read its record. */
-        applyCopyConditions(node, listEl, item.data, this.composer.cms.bindings, canvas, pageRecord);
+        applyCopyConditions(node, listEl, item.data, this.composer.cms.bindings, canvas, pageRecord, Boolean(perRecordOnServer && template));
         if (intoTemplate) continue;
         if (!canvas && node.getAttribute(CONDITION_STATE_ATTR) === "hidden") continue;
         if (deferred) {

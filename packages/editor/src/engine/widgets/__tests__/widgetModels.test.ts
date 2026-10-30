@@ -15,7 +15,7 @@ import { modalBlockConfig } from "@/blocks/Components/Modal";
 import { ExportEngine } from "@/engine/export/ExportEngine";
 import { initTabsRuntime } from "@/engine/export/tabsRuntime";
 import { initModalRuntime } from "@/engine/export/modalRuntime";
-import { addTab, ensureTabKeys, moveTab, readTabs, removeTab, setInitialTab } from "../tabsModel";
+import { addTab, ensureTabKeys, linkTabPair, moveTab, readTabs, removeTab, setInitialTab } from "../tabsModel";
 import { duplicateModal, ensureModalLink, linkModal, readModal, setDialogBehavior } from "../modalModel";
 import type { Composer } from "@/engine/Composer";
 
@@ -48,6 +48,42 @@ async function publishedBody(c: Composer): Promise<void> {
 }
 
 describe("Tabs model (B-21)", () => {
+  it("an unlinked button and panel are reported, and linkTabPair repairs them in one step (C02–C04)", () => {
+    const { c, hero } = setup();
+    const id = tabsBlockConfig.build!(c as never, hero)!;
+    const panels = c.elements.getElement(id)!.getChildren().filter((e) => e.getAttribute("role") === "tabpanel");
+    panels[1].setAttribute("data-tab-key", "orphan");
+    c.history.flushPending();
+    const s = readTabs(c, id)!;
+    expect(s.pairs.map((p) => p.key)).toEqual(["tab-01", "tab-03"]);
+    expect(s.unpairedTabs.map((t) => t.key)).toEqual(["tab-02"]);
+    expect(s.unpairedPanels.map((x) => x.panelId)).toEqual([panels[1].getId()]);
+    expect(oneStep(c, () => expect(linkTabPair(c, id, s.unpairedTabs[0].tabId, panels[1].getId())).toBe(true))).toBe(1);
+    const after = readTabs(c, id)!;
+    expect(after.pairs.map((p) => p.key)).toEqual(["tab-01", "tab-02", "tab-03"]);
+    expect(after.unpairedTabs).toEqual([]);
+    c.history.undo();
+    expect(readTabs(c, id)!.unpairedPanels).toHaveLength(1);
+  });
+
+  it("a legacy block with more buttons than panels keys the extra button unpaired on repair", () => {
+    const { c, hero } = setup();
+    const id = tabsBlockConfig.build!(c as never, hero)!;
+    const root = c.elements.getElement(id)!;
+    for (const e of root.getDescendants()) e.removeAttribute("data-tab-key");
+    root.removeAttribute("data-tabs-initial");
+    const lastPanel = root.getChildren().filter((e) => e.getAttribute("role") === "tabpanel")[2];
+    c.elements.removeElement(lastPanel.getId());
+    c.history.flushPending();
+    const s = readTabs(c, id)!;
+    expect(s.legacy).toBe(true);
+    expect(s.unpairedTabs).toHaveLength(1);
+    expect(linkTabPair(c, id, s.unpairedTabs[0].tabId, s.pairs[1].panelId)).toBe(true);
+    const after = readTabs(c, id)!;
+    expect(after.legacy).toBe(false);
+    expect(after.pairs.find((p) => p.tabId === s.unpairedTabs[0].tabId)?.panelId).toBe(s.pairs[1].panelId);
+  });
+
   it("the block writes keyed pairs and the initial pair", () => {
     const { c, hero } = setup();
     const id = tabsBlockConfig.build!(c as never, hero)!;
@@ -180,6 +216,8 @@ describe("Modal model (B-17)", () => {
     const dialog = document.querySelector<HTMLElement>('[role="dialog"]')!;
     const trigger = document.querySelector<HTMLElement>("[data-modal-target]")!;
     expect(dialog.style.display).toBe("none");
+    /* C08 "Labelled by": named by its first heading. */
+    expect(document.getElementById(dialog.getAttribute("aria-labelledby")!)?.tagName).toBe("H3");
     trigger.click();
     expect(dialog.style.display).not.toBe("none");
     expect(trigger.getAttribute("aria-expanded")).toBe("true");
