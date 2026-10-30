@@ -4719,7 +4719,16 @@ const CASES: Record<string, () => React.ReactElement> = {
       const procs = new URL(href, location.origin).pathname.split("/api/trpc/")[1]?.split(",") ?? [];
       if (load === "hang" && procs.includes("siteDetail.settings.get")) return new Promise<Response>(() => {});
       if (load === "fail" && procs.includes("siteDetail.settings.get")) return new Response("{}", { status: 500 });
-      const body = procs.map(() => ({ result: { data: { json: null } } }));
+      /* `&save=hang`: the update never answers (B8-SH07 saving). */
+      if (q.get("save") === "hang" && procs.some((p) => p.endsWith(".update"))) return new Promise<Response>(() => {});
+      const ROW = {
+        cspPolicy: "default-src 'self'; img-src 'self' https: data:",
+        hstsMaxAge: 86400,
+        xFrameOptions: "SAMEORIGIN",
+        referrerPolicy: "strict-origin-when-cross-origin",
+        permissionsPolicy: "camera=(), microphone=()",
+      };
+      const body = procs.map((p) => ({ result: { data: { json: p === "siteDetail.settings.get" ? ROW : null } } }));
       return new Response(JSON.stringify(body), { status: 200, headers: { "content-type": "application/json" } });
     }) as typeof fetch;
     return (

@@ -14907,8 +14907,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Built, not compared (offline state): Settings reads navigator.onLine; offline keeps the edits, the footer says \"Needs a connection · changes stay here, unsaved\" (SH04/AN07 wording; S05 draws \"Needs a connection — your edits stay on this screen, unsaved\"), the banner \"You’re offline. Save settings needs a connection.\", Save disabled until online (tested). AN07 also draws \"Status unavailable offline\" for the tracker status — not built.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 27, probe-compared: shots/245-48768.png vs probe settings-tab&screen=headers (edit, then offline): the plain line 'You’re offline. Save settings needs a connection.' under the restore note (was an amber banner above it), the edit kept, footer 'Needs a connection · changes stay here, unsaved' with Save only (Discard hidden while offline, as drawn). Field-style residual as 245:49535.",
    "tier": "P2"
   },
   {
@@ -14941,8 +14941,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Wave 3b: while saving the footer is 'Saving settings…' with only the disabled 'Saving…' (no Discard), as drawn (tested); the probe's save fails too fast to capture the state.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 27, probe-compared: shots/245-49535.png vs probe settings-tab&screen=headers&save=hang (edit Permissions-Policy, Save): cards in the board's order with the stored row, footer 'Saving settings…' with only the disabled 'Saving…'. Residual shared by every settings screen: fields are white with a rule where the board fills them grey, and the CSP value is a mono textarea.",
    "tier": "P2"
   },
   {

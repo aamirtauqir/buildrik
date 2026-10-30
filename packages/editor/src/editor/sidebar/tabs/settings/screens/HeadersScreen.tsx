@@ -19,6 +19,7 @@
  */
 
 import * as React from "react";
+import { useOnlineStatus } from "@/shared/hooks/useOnlineStatus";
 import { ToggleSwitch } from "@/editor/chrome-ui";
 import { updateSiteColumns } from "@/services/BuildrikSyncProvider";
 import type { UpdateSiteSettingsInput } from "@buildrik/shared/schemas/site-detail";
@@ -126,6 +127,7 @@ export const HeadersScreen: React.FC<ScreenProps> = ({
   saveError,
   fieldErrors,
 }) => {
+  const online = useOnlineStatus();
   const [csp, setCsp] = React.useState("");
   const [xFrame, setXFrame] = React.useState<XFrameOptions | "">("");
   const [referrer, setReferrer] = React.useState<ReferrerPolicy | "">("");
@@ -243,6 +245,13 @@ export const HeadersScreen: React.FC<ScreenProps> = ({
       <div className={SET_RESTORE_STRIP} data-testid="set-hd-restore">
         Restoring a site version leaves this configuration unchanged.
       </div>
+      {/* B8-SH04 245:48768: offline, a plain line under the restore note —
+          the screen stays editable; only Save waits for the network. */}
+      {online ? null : (
+        <div className={SET_RESTORE_STRIP} role="status" data-testid="set-offline">
+          You’re offline. Save settings needs a connection.
+        </div>
+      )}
 
       <Section title="Content Security Policy">
         <Row stem="csp-header-value" label="CSP header value" htmlFor="set-hd-csp" stacked>
