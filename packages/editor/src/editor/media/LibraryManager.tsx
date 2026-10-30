@@ -770,9 +770,6 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
           recentCount={recentCount}
           inUseCount={inUseCount}
           unusedCount={unusedCount}
-          allTags={allTags}
-          tagFilter={state.tagFilter}
-          setTagFilter={state.setTagFilter}
           folderCounts={state.folderCounts}
           onNewFolder={() => setCreateFolderOpen(true)}
           deleteFolder={async (folderId: string) => {
@@ -902,6 +899,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
           state={state}
           visibleItems={visibleItems}
           usageMap={usageMap}
+          allTags={allTags}
           smartFolder={smartFolder}
           movedNote={movedNote}
           selectedAssetId={selectedAssetId}

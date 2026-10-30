@@ -9,7 +9,7 @@
  */
 
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import type {
   LibraryItem,
@@ -44,6 +44,7 @@ function mount(state: MediaStateResult, over: Partial<Parameters<typeof AssetGri
     state,
     visibleItems: state.libraryItems,
     usageMap: new Map<string, number>(),
+    allTags: [] as ReadonlyArray<string>,
     smartFolder: null,
     selectedAssetId: null,
     onSelectAsset: vi.fn(),
@@ -78,7 +79,7 @@ describe("AssetGrid — toolbar (board 1161:35)", () => {
       counts: { all: 4, img: 3, vid: 1, ico: 0, fnt: 0 },
     });
     mount(state);
-    expect(screen.getByTestId("mgr-count")).toHaveTextContent("2 files · All assets");
+    expect(screen.getByTestId("mgr-count")).toHaveTextContent("2 assets · All assets");
   });
 
   // A folder made inside another is not in the root list; the count line
@@ -94,7 +95,7 @@ describe("AssetGrid — toolbar (board 1161:35)", () => {
       ],
     });
     mount(state);
-    expect(screen.getByTestId("mgr-count")).toHaveTextContent("1 file · Campaign images");
+    expect(screen.getByTestId("mgr-count")).toHaveTextContent("1 asset · Campaign images");
   });
 
   it("reads '<N> results for \"q\"' while a search is active (3695:44339)", () => {
@@ -130,10 +131,12 @@ describe("AssetGrid — toolbar (board 1161:35)", () => {
     expect(state.setFmtFilter).toHaveBeenCalledWith("png");
   });
 
-  it("6879:61904 — an active file type is named on the Filter button", () => {
-    const state = makeState({ fmtFilter: "jpg" });
-    mount(state);
-    expect(screen.getByTestId("mgr-filter")).toHaveTextContent("Filter · JPG");
+  it("199:37199 — the type select reads All types, or the active file type", () => {
+    mount(makeState());
+    expect(screen.getByTestId("mgr-filter")).toHaveTextContent("All types");
+    cleanup();
+    mount(makeState({ fmtFilter: "jpg" }));
+    expect(screen.getByTestId("mgr-filter")).toHaveTextContent("JPG");
   });
 
   // A type filter set in the drawer persists into the manager; the Filter
@@ -141,7 +144,7 @@ describe("AssetGrid — toolbar (board 1161:35)", () => {
   it("a drawer type filter is named on the Filter button and All clears it", () => {
     const state = makeState({ activeTypes: new Set(["vid"]) as MediaStateResult["activeTypes"] });
     mount(state);
-    expect(screen.getByTestId("mgr-filter")).toHaveTextContent("Filter · Video");
+    expect(screen.getByTestId("mgr-filter")).toHaveTextContent("Video");
     fireEvent.click(screen.getByTestId("mgr-filter"));
     fireEvent.click(screen.getByTestId("mgr-filter-all"));
     expect(state.setType).toHaveBeenCalledWith("all");
@@ -150,18 +153,18 @@ describe("AssetGrid — toolbar (board 1161:35)", () => {
   it("the 2 / 3 / 4 toggle sets the column count", () => {
     const state = makeState({ gridN: 3 });
     mount(state);
-    fireEvent.click(screen.getByRole("button", { name: "Grid · 3 columns" }));
-    fireEvent.click(screen.getByText("4 columns"));
+    expect(screen.getByTestId("mgr-gridn")).toHaveTextContent("3 columns");
+    fireEvent.click(screen.getByTestId("mgr-gridn"));
+    fireEvent.click(screen.getByTestId("mgr-gridn-4"));
     expect(state.setGridN).toHaveBeenCalledWith(4);
   });
 
-  // 7093:78219 — ⋯ › Select assets… enters select mode as the List with
-  // nothing checked. Select-all lives in the list header's checkbox.
-  it("⋯ › Select assets… enters select mode as the list, and selects nothing", () => {
+  // The board draws no select mode; "Select" at the end of the count line
+  // enters it as the List with nothing checked.
+  it("Select (count line) enters select mode as the list, and selects nothing", () => {
     const state = makeState({ selMode: false, libraryItems: [makeItem({ key: "a" })] });
     const { container } = mount(state);
-    fireEvent.click(screen.getByRole("button", { name: "Library options" }));
-    fireEvent.click(screen.getByText("Select assets…"));
+    fireEvent.click(screen.getByTestId("mgr-select-mode"));
     expect(state.toggleSelMode).toHaveBeenCalledTimes(1);
     expect(state.selectAll).not.toHaveBeenCalled();
     expect(container.querySelector(".mgr-list")).toBeInTheDocument();
@@ -169,10 +172,12 @@ describe("AssetGrid — toolbar (board 1161:35)", () => {
 });
 
 describe("AssetGrid — sort menu", () => {
-  const openSort = () => {
-    fireEvent.click(screen.getByRole("button", { name: "Library options" }));
-    fireEvent.click(screen.getByTestId("mgr-sort"));
-  };
+  const openSort = () => fireEvent.click(screen.getByTestId("mgr-sort"));
+
+  it("199:37199 — the sort select names the current order (Date added)", () => {
+    mount(makeState({ sort: "date", sortDir: "desc" }));
+    expect(screen.getByTestId("mgr-sort")).toHaveTextContent("Date added");
+  });
 
   it("6930:80054 — each option carries its own direction (Name Z→A)", () => {
     const state = makeState({ sort: "date", sortDir: "desc" });
@@ -334,25 +339,16 @@ describe("AssetGrid — bulk toolbar", () => {
 });
 
 describe("AssetGrid — badges + footer", () => {
-  it("card meta says used ×N (board 1161:55) — the usage chip on the thumb is gone", () => {
+  it("199:37199 — a card's second line is W × H · size; usage left the card", () => {
     const state = makeState({
-      libraryItems: [makeItem({ key: "a" })],
-      counts: { all: 1, img: 1, vid: 0, ico: 0, fnt: 0 },
+      libraryItems: [makeItem({ key: "a", width: 1600, height: 1000, size: 240 * 1024 })],
     });
     mount(state, { usageMap: new Map([["a", 3]]) });
-    expect(screen.getByText("used ×3")).toBeInTheDocument();
+    expect(screen.getByTestId("mgr-facts-a")).toHaveTextContent("1600 × 1000 · 240 KB");
+    expect(screen.queryByText("used ×3")).toBeNull();
   });
 
-  it("an unused asset says so — the answer to \"can I delete this?\"", () => {
-    const state = makeState({
-      libraryItems: [makeItem({ key: "a" })],
-      counts: { all: 1, img: 1, vid: 0, ico: 0, fnt: 0 },
-    });
-    mount(state, { usageMap: new Map() });
-    expect(screen.getByText("Unused")).toBeInTheDocument();
-  });
-
-  it("4418:58292 — a selected card carries the ring, not a checkbox; ⋯ sits on every card at rest", () => {
+  it("a selected card carries the ring, not a checkbox; ⋯ waits for hover or focus (199:37199)", () => {
     const state = makeState({
       libraryItems: [makeItem({ key: "a" }), makeItem({ key: "b", name: "b.png" })],
       counts: { all: 2, img: 2, vid: 0, ico: 0, fnt: 0 },
@@ -361,7 +357,7 @@ describe("AssetGrid — badges + footer", () => {
     expect(screen.getByTestId("mgr-asset-a")).toHaveClass("selected");
     expect(container.querySelector(".mgr-sel-check")).toBeNull();
     for (const k of ["a", "b"]) {
-      expect(screen.getByTestId(`mgr-asset-menu-${k}`).className).not.toMatch(/opacity-0/);
+      expect(screen.getByTestId(`mgr-asset-menu-${k}`).className).toMatch(/group-hover:opacity-100/);
     }
   });
 
@@ -403,19 +399,17 @@ describe("AssetGrid — badges + footer", () => {
     expect(screen.queryByText("UP")).toBeNull();
   });
 
-  it("non-image cards carry their kind badge", () => {
+  it("non-image cards say their kind on the facts line, not a badge", () => {
     const state = makeState({
       libraryItems: [
-        makeItem({ key: "v", name: "clip.mp4", type: "vid" }),
-        makeItem({ key: "s", name: "logo.svg", type: "ico" }),
-        makeItem({ key: "f", name: "Inter.woff2", type: "fnt" }),
+        makeItem({ key: "v", name: "clip.mp4", type: "vid", size: 2048 }),
+        makeItem({ key: "s", name: "logo.svg", type: "ico", size: 8 * 1024 }),
       ],
     });
     mount(state);
-    expect(screen.getByText("▶")).toBeInTheDocument();
-    expect(screen.getByText("SVG")).toBeInTheDocument();
-    // The font THUMB also renders "Aa" as its specimen — scope to the badge.
-    expect(document.querySelectorAll(".mgr-kind")).toHaveLength(3);
+    expect(screen.getByTestId("mgr-facts-v")).toHaveTextContent(/^Video · /);
+    expect(screen.getByTestId("mgr-facts-s")).toHaveTextContent("SVG · 8 KB");
+    expect(document.querySelectorAll(".mgr-kind")).toHaveLength(0);
   });
 
   it("the count line names the smart folder as its scope", () => {
@@ -424,7 +418,7 @@ describe("AssetGrid — badges + footer", () => {
       counts: { all: 5, img: 5, vid: 0, ico: 0, fnt: 0 },
     });
     mount(state, { smartFolder: "unused" });
-    expect(screen.getByTestId("mgr-count")).toHaveTextContent("1 file · No known placements");
+    expect(screen.getByTestId("mgr-count")).toHaveTextContent("1 asset · No known placements");
   });
 });
 
@@ -547,10 +541,11 @@ describe("AssetGrid — the card ··· menu (Clone 3721:43552)", () => {
     expect(state.openCtxMenu).toHaveBeenCalledTimes(2);
   });
 
-  it("4418:58608 — in select mode the toolbar carries '☑ Select', which leaves select mode", () => {
+  it("in select mode the count line's 'Done selecting' leaves select mode", () => {
     const state = makeState({ selMode: true, libraryItems: [makeItem({ key: "team" })] });
     mount(state);
-    fireEvent.click(screen.getByTestId("mgr-select-chip"));
+    expect(screen.getByTestId("mgr-select-mode")).toHaveTextContent("Done selecting");
+    fireEvent.click(screen.getByTestId("mgr-select-mode"));
     expect(state.toggleSelMode).toHaveBeenCalledTimes(1);
   });
 });

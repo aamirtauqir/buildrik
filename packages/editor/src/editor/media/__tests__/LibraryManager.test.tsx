@@ -134,9 +134,9 @@ describe("LibraryManager — D5 baseline", () => {
         counts: { all: 2, img: 2, vid: 0, ico: 0, fnt: 0 },
       })
     );
-    // Clone 3695:45155 — "2 files · All assets"; the grid foot that used to
+    // Clone 3695:45155 — "2 assets · All assets"; the grid foot that used to
     // read "Showing N of M" is gone (LibraryManager.clone.test.tsx).
-    expect(screen.getByTestId("mgr-count")).toHaveTextContent("2 files · All assets");
+    expect(screen.getByTestId("mgr-count")).toHaveTextContent("2 assets · All assets");
   });
 
   /* QA 2026-09-24 (A1, board B1-13 7564:185465): "Move files…" in the

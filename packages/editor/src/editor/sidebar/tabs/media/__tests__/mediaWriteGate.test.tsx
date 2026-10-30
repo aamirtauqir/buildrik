@@ -119,7 +119,7 @@ describe("FolderTree — view only", () => {
         currentFolderId={null} setCurrentFolderId={vi.fn()}
         counts={{ all: 0, img: 0, vid: 0, ico: 0, fnt: 0 }}
         smartFolder={null} setSmartFolder={vi.fn()} recentCount={0} inUseCount={0} unusedCount={0}
-        allTags={[]} tagFilter={null} setTagFilter={vi.fn()} folderCounts={new Map()}
+        folderCounts={new Map()}
         onNewFolder={onNewFolder} deleteFolder={deleteFolder}
       />,
     );
@@ -156,7 +156,7 @@ describe("AssetGrid — view only", () => {
     const onUploadClick = vi.fn();
     render(
       <AssetGrid
-        state={state} visibleItems={state.libraryItems} usageMap={new Map()} smartFolder={null}
+        state={state} visibleItems={state.libraryItems} usageMap={new Map()} allTags={[]} smartFolder={null}
         selectedAssetId={null} onSelectAsset={vi.fn()} onInsert={vi.fn()} onUploadClick={onUploadClick}
         onOpenStockModal={vi.fn()} onDownload={vi.fn(() => 0)} onMoveSelected={vi.fn()}
         onAssetDragStart={vi.fn()} onAssetDragEnd={vi.fn()} addToast={vi.fn()}

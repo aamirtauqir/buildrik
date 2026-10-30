@@ -22,14 +22,13 @@ import {
   FolderOpen,
   Plus,
   Trash2,
-  Tag,
   ChevronDown,
   ChevronRight,
 } from "lucide-react";
 import * as React from "react";
 import type { MediaFolder } from "@/editor/sidebar/tabs/media/data/mediaTypes";
 import { useMediaWriteAccess } from "@/editor/sidebar/tabs/media/hooks/useMediaWriteAccess";
-import { Button, Tooltip, Popover, Menu, MenuItem, MenuLabel, MenuSeparator } from "@/editor/chrome-ui";
+import { Button, Tooltip } from "@/editor/chrome-ui";
 /* `.mgr-*` lives in LibraryManager.css, which only LibraryManager imported — so
    this rail drew as unstyled 16px rows anywhere it was mounted on its own (a
    probe, a test, board 1205:4829's own measurement, which read every padding
@@ -96,14 +95,6 @@ export interface FolderTreeProps {
   recentCount: number;
   inUseCount: number;
   unusedCount: number;
-  /** Every tag in the LIBRARY (Clone 3721:43697 lists `menu · team · food`
-   *  whatever the scope) — the orchestrator reads `allLibraryItems`. */
-  allTags: string[];
-  /** The active tag — a FILTER, not a search string (Clone 3721:43697).
-   *  Picked from the rail's "Tags ▾" menu (4418:58292); picking it again
-   *  clears it. */
-  tagFilter: string | null;
-  setTagFilter(tag: string | null): void;
   /** Clone 3698:20337 — each folder row prints its own asset count. */
   folderCounts: ReadonlyMap<string, number>;
   /** Clone 3700:20347 — `row/＋ New folder` opens the orchestrator's modal. */
@@ -237,9 +228,6 @@ export function FolderTree({
   recentCount,
   inUseCount,
   unusedCount,
-  allTags,
-  tagFilter,
-  setTagFilter,
   folderCounts,
   onNewFolder,
   deleteFolder,
@@ -247,11 +235,6 @@ export function FolderTree({
   assetDragActive = false,
 }: FolderTreeProps) {
   const [collapsedFolders, setCollapsedFolders] = React.useState<Set<string>>(new Set());
-  const [tagsOpen, setTagsOpen] = React.useState(false);
-  const pickTag = (tag: string | null) => {
-    setTagFilter(tag);
-    setTagsOpen(false);
-  };
   /* Audit G3-064: viewers see New folder and each folder's trash disabled
      with the reason (board 6289:148485 pattern). */
   const write = useMediaWriteAccess();
@@ -460,55 +443,6 @@ export function FolderTree({
           </div>
         )}
 
-        {/* Board 4418:58292 — the rail ends in one "Tags ▾" row. It replaced
-            the TAGS chips (Clone 3721:43697; same filter, now in a menu) and
-            the Trash row, which was a "coming soon" toast with no trash
-            behind it (audit G3-041; asset delete is instant + Undo, #17). */}
-        <div className="mgr-tree-gap" data-testid="mgr-tree-gap-2" />
-        <div className="mgr-tags-anchor tw:flex tw:flex-col">
-          <Popover
-            open={tagsOpen}
-            onClose={() => setTagsOpen(false)}
-            placement="right"
-            label="Filter by tag"
-            block
-            trigger={
-              <TreeNode
-                icon={<Tag size={14} className="mgr-node-ico" />}
-                label={tagFilter ? `Tags · ${tagFilter} ▾` : "Tags ▾"}
-                testId="mgr-row-tags"
-                active={tagFilter !== null}
-                onClick={() => setTagsOpen((v) => !v)}
-              />
-            }
-          >
-            <Menu label="Filter by tag">
-              {allTags.length === 0 ? (
-                <MenuLabel>No tags yet — add them in an asset&rsquo;s details.</MenuLabel>
-              ) : (
-                allTags.map((tag) => (
-                  <MenuItem
-                    key={tag}
-                    radio
-                    selected={tagFilter === tag}
-                    data-testid={`mgr-tag-${tag}`}
-                    onClick={() => pickTag(tagFilter === tag ? null : tag)}
-                  >
-                    {tag}
-                  </MenuItem>
-                ))
-              )}
-              {tagFilter && (
-                <>
-                  <MenuSeparator />
-                  <MenuItem data-testid="mgr-tag-clear" onClick={() => pickTag(null)}>
-                    Clear tag filter
-                  </MenuItem>
-                </>
-              )}
-            </Menu>
-          </Popover>
-        </div>
       </div>
     </div>
   );

@@ -51,7 +51,7 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
   );
   const [gridN, setGridN_] = useState<2 | 3 | 4>(() => {
     const v = localStorage.getItem(STORAGE_KEYS.MEDIA_GRID_N);
-    return v === "2" ? 2 : v === "4" ? 4 : 3;
+    return v === "2" ? 2 : v === "3" ? 3 : 4;
   });
   // Board 145:2 caption: "Type pills are a multi-select filter" — the Set is
   // the SSOT; empty = everything. The old single-value key migrates once.

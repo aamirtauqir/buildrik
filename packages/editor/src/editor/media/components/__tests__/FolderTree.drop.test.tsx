@@ -30,9 +30,6 @@ function mount(onMoveAssetToFolder?: (k: string, f: string | null) => void, asse
       recentCount={1}
       inUseCount={2}
       unusedCount={1}
-      allTags={[]}
-      tagFilter={null}
-      setTagFilter={vi.fn()}
       folderCounts={new Map()}
       onNewFolder={vi.fn()}
       deleteFolder={vi.fn()}
@@ -106,7 +103,6 @@ describe("FolderTree — every folder is a target while an asset is dragged (Clo
     expect(screen.getByTestId("mgr-row-folder-f1")).toHaveAttribute("data-drop-target", "true");
     expect(screen.getByTestId("mgr-row-recent")).not.toHaveAttribute("data-drop-target");
     expect(screen.getByTestId("mgr-new-folder-open")).not.toHaveAttribute("data-drop-target");
-    expect(screen.getByTestId("mgr-row-tags")).not.toHaveAttribute("data-drop-target");
   });
 
   it("outlines nothing at rest, or without a move handler", () => {

@@ -106,19 +106,18 @@ describe("Clone 3695:45155 · Assets · No selection — J-A library chrome", ()
 
   it("reads the toolbar count as '<N> files · <scope>' and moves the scope out of the grid foot", async () => {
     await mountLibrary();
-    expect(screen.getByTestId("mgr-count")).toHaveTextContent("10 files · All assets");
+    expect(screen.getByTestId("mgr-count")).toHaveTextContent("10 assets · All assets");
     expect(screen.queryByText(/^Showing/)).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: /^No known placements/ }));
-    expect(screen.getByTestId("mgr-count")).toHaveTextContent(/files · No known placements$/);
+    expect(screen.getByTestId("mgr-count")).toHaveTextContent(/assets? · No known placements$/);
   });
 
-  it("4418:58292 — the toolbar reads Filter ▾ · Grid|List · Grid ▾ · ⋯, and Grid ▾ names its column count", async () => {
+  it("199:37199 — the filter row reads All types · Any tag · Date added · Grid|List · N columns", async () => {
     await mountLibrary();
-    expect(screen.getByTestId("mgr-filter")).toHaveTextContent("Filter");
+    const row = screen.getByTestId("mgr-subbar");
+    expect(row.textContent).toBe("All typesAny tagDate addedGridList3 columns");
     expect(screen.getByRole("button", { name: "Grid" })).toHaveAttribute("aria-pressed", "true");
-    expect(screen.getByRole("button", { name: "List" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Grid · 3 columns" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Library options" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Library options" })).toBeNull();
   });
 
   it("7093:78182 — Filter ▾ offers FORMAT and the library's own file types, and the button names the choice", async () => {
@@ -131,15 +130,13 @@ describe("Clone 3695:45155 · Assets · No selection — J-A library chrome", ()
     expect(setFmtFilter).toHaveBeenCalledWith("jpg");
   });
 
-  it("7093:78219 / 6930:80054 — ⋯ › Sort by names the sort: 'Date added' by default", async () => {
+  it("199:37199 — the sort select names the sort: 'Date added' by default", async () => {
     await mountLibrary();
-    fireEvent.click(screen.getByRole("button", { name: "Library options" }));
     expect(screen.getByTestId("mgr-sort")).toHaveTextContent("Date added");
   });
 
   it("names the sort 'Name A→Z' when sorted by name ascending", async () => {
     await mountLibrary({ sort: "name", sortDir: "asc" });
-    fireEvent.click(screen.getByRole("button", { name: "Library options" }));
     expect(screen.getByTestId("mgr-sort")).toHaveTextContent("Name A→Z");
   });
 
@@ -184,10 +181,9 @@ describe("Clone 3695:44339 · Assets · Search menu", () => {
 });
 
 describe("Clone 3695:19968 / 20154 · bulk mode", () => {
-  it("⋯ › Select assets… enters select mode as the List with nothing checked, and the rail says so", async () => {
+  it("Select (count line) enters select mode as the List with nothing checked, and the rail says so", async () => {
     const toggleSelMode = vi.fn();
     await mountLibrary({ toggleSelMode });
-    fireEvent.click(screen.getByRole("button", { name: "Library options" }));
     fireEvent.click(screen.getByTestId("mgr-select-mode"));
     expect(toggleSelMode).toHaveBeenCalledTimes(1);
     expect(screen.getByTestId("mgr-list-head")).toBeInTheDocument();
@@ -1324,7 +1320,6 @@ describe("Clone 3697:20326 · the rail's VERSIONS block", () => {
     const used = within(screen.getByTestId("mgr-det-used"));
     expect(used.getByTestId("mgr-det-used-page-p-home")).toHaveTextContent("Home");
     expect(used.getByTestId("mgr-det-used-page-p-menu")).toHaveTextContent("Menu");
-    expect(screen.getByTestId("mgr-use-hero")).toHaveTextContent("used ×3");
   });
 
   it("Edit latest saved version opens the editor on v2's file; its save becomes v3 of hero", async () => {

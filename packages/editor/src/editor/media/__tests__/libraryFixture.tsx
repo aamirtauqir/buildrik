@@ -114,7 +114,7 @@ export function makeMediaState(over: Partial<MediaStateResult> = {}): MediaState
     sort: "date",
     sortDir: "desc",
     gridN: 3,
-    fmtFilter: "all",
+    fmtFilter: "",
     selMode: false,
     selectedKeys: new Set<string>(),
     setSort: noop(),
