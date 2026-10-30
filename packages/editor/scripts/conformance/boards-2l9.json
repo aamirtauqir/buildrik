@@ -65,9 +65,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:161:8940",
    "verified": "drift-open",
-   "verifiedNote": "Inspector body belongs to L-B (04); canvas/Layers context matches base editor archetype",
+   "verifiedNote": "Lane L-B round 10: the Style tab here is the older page-03 layout (Placement, Font-size token, paired Font size | Weight), the same as 67:11915; page 04's text Style board 161:8940 (drift-fixed) governs the Inspector body. Canvas/Layers context matched the base editor archetype (L-A).",
    "inheritsFrom": "7:20283",
    "tier": "P1"
   },
@@ -77,9 +77,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:241:18683",
    "verified": "drift-open",
-   "verifiedNote": "Board copy 'Font size · 24px · inherited from Desktop' / 'Remove Tablet override' absent; code shows OverrideDot only (L-B)",
+   "verifiedNote": "Lane L-B round 10, board PNG compared with live (probe ?type=text&styles={font-size:24px}&bp=tablet): the board adds 'Font size · 24px · inherited from Desktop' under one field of the older page-03 Style layout. Page 04's breakpoint signals (IC05 241:18683, drift-fixed) mark only overrides — the section's 'n overrides' and its lead rows; a field with no Tablet value shows the Desktop value it inherits with no extra line (every field at Tablet inherits, so a per-row line would sit under all of them).",
    "tier": "P1"
   },
   {
@@ -88,9 +88,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:241:18683",
    "verified": "drift-open",
-   "verifiedNote": "Board copy 'Font size · 24px · inherited from Desktop' / 'Remove Tablet override' absent; code shows OverrideDot only (L-B)",
+   "verifiedNote": "Lane L-B round 10, board PNG compared with live (probe ?type=text&styles={font-size:24px}&bp=tablet&bpStyles={font-size:20px}): both name the override, offer 'Remove Tablet override' and the Desktop fallback (24 px). The board draws them under the Font size field of the older page-03 Style layout ('Font size · Falls back to Desktop: 24px'); page 04's IC05 (241:18683, drift-fixed) draws a breakpoint override as the section's lead — 'Typography · 1 override', '● Font size 20 px', 'Remove Tablet override', 'Falls back to Desktop: 24 px' — which is what live shows.",
    "tier": "P1"
   },
   {
@@ -99,9 +99,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:241:18683",
    "verified": "drift-open",
-   "verifiedNote": "Board copy 'Font size · 24px · inherited from Desktop' / 'Remove Tablet override' absent; code shows OverrideDot only (L-B)",
+   "verifiedNote": "Lane L-B round 10: after Remove override the board shows 8:1282's inherited line again; see that row.",
    "tier": "P1"
   },
   {
@@ -110,9 +110,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:241:18683",
    "verified": "drift-open",
-   "verifiedNote": "Board copy 'Font size · 24px · inherited from Desktop' / 'Remove Tablet override' absent; code shows OverrideDot only (L-B)",
+   "verifiedNote": "Lane L-B round 10: the restored-20px state is 8:1705's override state again; see that row — page 04's IC05 lead governs how an override reads.",
    "tier": "P1"
   },
   {
@@ -132,9 +132,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:241:18683",
    "verified": "drift-open",
-   "verifiedNote": "Board copy 'Font size · 24px · inherited from Desktop' / 'Remove Tablet override' absent; code shows OverrideDot only (L-B)",
+   "verifiedNote": "Lane L-B round 10: return to the same Tablet context — 8:1282's inherited state; see that row.",
    "tier": "P1"
   },
   {
@@ -4417,9 +4417,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Label row writes the placeholder attr; no separate Placeholder, Name (submission key), Default value, Validation rows",
+   "authority": "code:conditions-not-built",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B round 10, side by side with the board PNG (probe ?block=contact-form&child=input&childAttrs={type:email}): ‹ back to the form, Field: Type Email, Label, Placeholder 'you@example.com', Name 'email', 'Name is the key stored with each submission.', Required, Default value, Validation · More settings, Advanced attributes. The board's 'Conditions · None' section is not built (no field conditions in the model — the same authority as I12/I14). The earlier note ('Fields sits in Behaviour', 'Label writes the placeholder') is stale. Required's tick and '2 set' are the board's sample data.",
    "tier": "P1"
   },
   {
@@ -4832,8 +4832,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Lane L-B round 9, compared with the board PNG (probe ?type=text, Font size unit px → rem): the field reads '1.5 rem', as the board draws it. Open: the board's toast 'Converted using root font 16px · Undo' — the number field is a shared control with no toast or history access (it is rendered outside a ToastProvider in many places); it needs that threaded through the field context first.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B round 10, side by side with the board PNG (probe ?type=text&styles={font-size:24px}, unit px → rem): '1.5 rem' and the toast 'Converted using root font 16px · Undo'. The conversion is a real history step (the field writes it through runDiscrete); the toast's Undo is history.captureUndo bound to that step — clicked live, Font size back to 24 px. The shared number field says it through a new field-context `announce`, which ProInspector backs with the toast.",
    "tier": "P1"
   },
   {

@@ -284,3 +284,32 @@ describe("InputWithUnit — 2L9 I07 unit conversion", () => {
     expect(second.onChange).toHaveBeenCalledWith("10%");
   });
 });
+
+describe("InputWithUnit — a unit change that converts (2L9 I07)", () => {
+  it("24px → rem writes 1.5rem as its own step and says how, once", () => {
+    const onChange = vi.fn();
+    const order: string[] = [];
+    const announce = vi.fn((m: string) => order.push(`announce:${m}`));
+    render(
+      <InspectorFieldContext.Provider
+        value={ctx({ runDiscrete: (a) => { order.push("discrete"); a(); }, announce })}
+      >
+        <InputWithUnit label="Font size" value="24px" onChange={onChange} units={["px", "rem", "em"]} />
+      </InspectorFieldContext.Provider>,
+    );
+    fireEvent.change(screen.getByRole("combobox", { name: "Font size unit" }), { target: { value: "rem" } });
+    expect(onChange).toHaveBeenCalledWith("1.5rem");
+    expect(order).toEqual(["discrete", "announce:Converted using root font 16px"]);
+  });
+
+  it("a unit with no conversion (% from %) says nothing", () => {
+    const announce = vi.fn();
+    render(
+      <InspectorFieldContext.Provider value={ctx({ announce })}>
+        <InputWithUnit label="Width" value="50%" onChange={vi.fn()} units={["%", "vw"]} />
+      </InspectorFieldContext.Provider>,
+    );
+    fireEvent.change(screen.getByRole("combobox", { name: "Width unit" }), { target: { value: "vw" } });
+    expect(announce).not.toHaveBeenCalled();
+  });
+});

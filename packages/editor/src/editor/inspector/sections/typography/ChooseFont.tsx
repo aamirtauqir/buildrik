@@ -11,6 +11,9 @@
  *   [ Inherit ]  [ Manage site fonts ]  [ Cancel ]
  *   Search, scroll and Hero heading → Font are retained.
  *
+ * The Brand panel's font token uses it too (`form="family"`: a bare family,
+ * no Inherit), so there is one picker in the editor.
+ *
  * Rows are the families the font list really has: the site's uploaded fonts
  * (FontManager's custom fonts, named by file and weight), the system stacks,
  * and the Google catalogue. A catalogue family an uploaded font shares its
@@ -35,8 +38,7 @@ import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
 import { EVENTS } from "@/shared/constants/events";
 import { useInspectorField } from "@/editor/inspector/shared/controls/InspectorFieldContext";
 import { GROUP_TITLE, WIDE_BUTTON } from "@/editor/inspector/shared/controls/controlClasses";
-import { SYSTEM_FONTS, openSiteFonts, useUploadedFonts } from "./FontPicker";
-import { namesFont, primaryFamily } from "./FontPickerDropdown";
+import { SYSTEM_FONTS, namesFont, openSiteFonts, primaryFamily, useUploadedFonts } from "./FontPicker";
 import { FONT_WEIGHTS } from "./FontControls";
 
 // ============================================================================
@@ -156,16 +158,27 @@ export interface ChooseFontProps {
   value: string;
   onChange: (value: string) => void;
   onClose: () => void;
+  /** What a pick writes: the element's quoted stack ("'Inter', sans-serif"),
+   *  or a Brand font token's bare family ("Inter"; a system stack with no
+   *  single family stays as written). A token has no Inherit. */
+  form?: "stack" | "family";
+  /** Who the kept search belongs to, for the last line: "{layer} → Font"
+   *  for an element; a Brand role names itself ("Body Font"). */
+  subject?: string;
 }
 
-export function ChooseFont({ composer, elementId, value, onChange, onClose }: ChooseFontProps) {
+/** The value a row writes in the token's form: its family where it has one. */
+const familyOf = (row: Row) => (row.source === "System" && primaryFamily(row.value) !== row.family ? row.value : row.family);
+
+export function ChooseFont({ composer, elementId, value, onChange, onClose, form = "stack", subject }: ChooseFontProps) {
   const field = useInspectorField("font-family");
   const uploadedFonts = useUploadedFonts(composer);
   const [query, setQuery] = React.useState(() => kept.get(elementId)?.query ?? "");
   const listRef = React.useRef<HTMLDivElement>(null);
   /* Re-read when a font is added or removed in Site fonts (`uploadedFonts` changes). */
   const rows = React.useMemo(() => (uploadedFonts ? rowsFor(composer, query) : []), [composer, query, uploadedFonts]);
-  const el = composer?.elements.getElement(elementId);
+  /* A Brand role names itself; an element is named as the Layers panel names it. */
+  const el = subject ? undefined : composer?.elements?.getElement(elementId);
   const layer = el ? (getLayerName(el) ?? elementTypeLabel(el.getType())) : "This element";
 
   React.useLayoutEffect(() => {
@@ -183,7 +196,7 @@ export function ChooseFont({ composer, elementId, value, onChange, onClose }: Ch
 
   const pick = (row: Row | null) => {
     if (field.readOnly) return;
-    const next = row ? row.value : "inherit";
+    const next = row ? (form === "family" ? familyOf(row) : row.value) : "inherit";
     if (next === value) return close();
     if (row?.catalogue) loadGoogleFont(row.family);
     /* One Undo step, the one the engine records for this write — bound only
@@ -219,7 +232,12 @@ export function ChooseFont({ composer, elementId, value, onChange, onClose }: Ch
     row.source === "Catalogue" ? !uploadedSelected && primaryFamily(value) === row.family : namesFont(value, { value: row.value, label: row.family, category: "system" });
 
   return (
-    <div className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col tw:px-3 tw:pb-3" role="group" aria-label="Choose font" data-testid="inspector-choose-font">
+    <div
+      className="tw:flex tw:min-h-0 tw:flex-1 tw:flex-col tw:px-3 tw:pb-3"
+      role="group"
+      aria-label="Choose font"
+      data-testid="inspector-choose-font"
+    >
       <div className={`${GROUP_TITLE} tw:mt-4!`}>Choose font</div>
       <TextInput
         type="search"
@@ -262,9 +280,11 @@ export function ChooseFont({ composer, elementId, value, onChange, onClose }: Ch
         ))}
       </div>
       <div className="tw:flex tw:flex-col tw:gap-2 tw:pt-2">
-        <Button color="light" size="xs" className={WIDE_BUTTON} disabled={field.readOnly} onClick={() => pick(null)} data-testid="inspector-choose-font-inherit">
-          Inherit
-        </Button>
+        {form === "stack" ? (
+          <Button color="light" size="xs" className={WIDE_BUTTON} disabled={field.readOnly} onClick={() => pick(null)} data-testid="inspector-choose-font-inherit">
+            Inherit
+          </Button>
+        ) : null}
         <Button
           color="light"
           size="xs"
@@ -281,7 +301,7 @@ export function ChooseFont({ composer, elementId, value, onChange, onClose }: Ch
           Cancel
         </Button>
         <p className={NOTE} data-testid="inspector-choose-font-kept">
-          Search, scroll and {layer} → Font are retained.
+          Search, scroll and {subject ?? `${layer} → Font`} are retained.
         </p>
       </div>
     </div>

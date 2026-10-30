@@ -25,9 +25,17 @@ interface StoredData {
   data?: { interactions?: Interaction[] };
 }
 
+/* The element's own interaction store, as Element/ElementOperations keep it:
+   the manager reads and writes through these, never through getData(). */
 function makeMockElement(interactions?: Interaction[]) {
   const data: StoredData = interactions ? { data: { interactions } } : {};
-  return { data, getData: () => data };
+  return {
+    data,
+    getInteractions: () => data.data?.interactions ?? [],
+    setInteractions: vi.fn((next: Interaction[]) => {
+      data.data = { ...data.data, interactions: next };
+    }),
+  };
 }
 
 function makeMockComposer() {
@@ -143,7 +151,7 @@ describe("InteractionManager", () => {
       expect(created!.animation).toEqual({ ...DEFAULT_ANIMATION_CONFIG, duration: 900 });
 
       expect(manager.getInteractions("el-1")).toEqual([created]);
-      expect(composer.markDirty).toHaveBeenCalled();
+      expect(element.setInteractions).toHaveBeenCalled();
       expect(composer.emit).toHaveBeenCalledWith(EVENTS.INTERACTION_ADDED, {
         elementId: "el-1",
         interaction: created,
@@ -161,14 +169,15 @@ describe("InteractionManager", () => {
     it("returns null and emits nothing for an unknown element", () => {
       expect(manager.addInteraction("nope", "click")).toBeNull();
       expect(composer.emit).not.toHaveBeenCalled();
-      expect(composer.markDirty).not.toHaveBeenCalled();
+      expect(element.setInteractions).not.toHaveBeenCalled();
     });
   });
 
   describe("updateInteraction", () => {
     it("merges updates, persists, and emits with the previous interaction", () => {
       const original = makeInteraction({ id: "int-u", trigger: "click" });
-      wireElement(makeMockElement([original]));
+      element = makeMockElement([original]);
+      wireElement(element);
 
       const updated = manager.updateInteraction("el-1", "int-u", {
         trigger: "hover",
@@ -177,7 +186,7 @@ describe("InteractionManager", () => {
 
       expect(updated).toMatchObject({ id: "int-u", trigger: "hover", name: "renamed" });
       expect(manager.getInteraction("el-1", "int-u")).toEqual(updated);
-      expect(composer.markDirty).toHaveBeenCalled();
+      expect(element.setInteractions).toHaveBeenCalled();
       expect(composer.emit).toHaveBeenCalledWith(EVENTS.INTERACTION_UPDATED, {
         elementId: "el-1",
         interaction: updated,
@@ -229,7 +238,7 @@ describe("InteractionManager", () => {
     it("clearInteractions is a silent no-op when already empty", () => {
       manager.clearInteractions("el-1");
       expect(composer.emit).not.toHaveBeenCalled();
-      expect(composer.markDirty).not.toHaveBeenCalled();
+      expect(element.setInteractions).not.toHaveBeenCalled();
     });
   });
 
@@ -332,13 +341,12 @@ describe("InteractionManager", () => {
 
   describe("reorderInteraction", () => {
     beforeEach(() => {
-      wireElement(
-        makeMockElement([
-          makeInteraction({ id: "int-a" }),
-          makeInteraction({ id: "int-b" }),
-          makeInteraction({ id: "int-c" }),
-        ]),
-      );
+      element = makeMockElement([
+        makeInteraction({ id: "int-a" }),
+        makeInteraction({ id: "int-b" }),
+        makeInteraction({ id: "int-c" }),
+      ]);
+      wireElement(element);
     });
 
     function ids() {
@@ -352,7 +360,7 @@ describe("InteractionManager", () => {
         elementId: "el-1",
         interactions: expect.any(Array),
       });
-      expect(composer.markDirty).toHaveBeenCalled();
+      expect(element.setInteractions).toHaveBeenCalled();
     });
 
     it("clamps an out-of-range index to the end", () => {

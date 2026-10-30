@@ -10,7 +10,6 @@
 
 import { ChevronDown } from "lucide-react";
 import * as React from "react";
-import { namesFont, primaryFamily } from "./FontPickerDropdown";
 import { clearFontAssignment, useFontAssignment } from "./ChooseFont";
 import { openSubview } from "@/editor/inspector/tabs/subviewStore";
 import { Button } from "@/editor/chrome-ui";
@@ -43,6 +42,18 @@ export const SYSTEM_FONTS: SystemFont[] = [
   { value: "'Times New Roman', serif", label: "Times New Roman", category: "serif" },
   { value: "'Courier New', monospace", label: "Courier New", category: "monospace" },
 ];
+
+/**
+ * The family a value names — `'Inter Var', sans-serif` → `Inter Var`, and a
+ * token's bare `Inter Var` → itself. The inspector holds the quoted stack and
+ * the Brand token the bare family; one comparison reads both back.
+ */
+export const primaryFamily = (value: string): string =>
+  (value.split(",")[0] ?? "").trim().replace(/^['"]|['"]$/g, "");
+
+/** Whether a value names this preset — by its exact stack or by its family. */
+export const namesFont = (value: string, font: SystemFont): boolean =>
+  value === font.value || (value !== "" && primaryFamily(value) === font.label);
 
 /** The door every picker carries — Site fonts (3686:42317) listens in StudioPanels. */
 export const openSiteFonts = (composer: Composer | null | undefined): void => {

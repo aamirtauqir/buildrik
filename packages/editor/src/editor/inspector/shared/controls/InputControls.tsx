@@ -353,7 +353,13 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
   const onUnitChange = (next: string) => {
     if (field.readOnly) return;
     if (KEYWORDS.has(next)) onChange(next);
-    else if (num !== "" && NUMBER.test(num)) onChange(`${convertUnit(Number(num), unit, next)}${next}`);
+    else if (num !== "" && NUMBER.test(num)) {
+      const converted = convertUnit(Number(num), unit, next);
+      /* Its own Undo step; a px ↔ rem / em change converts the number, and
+         says so with that step's Undo (2L9 I07). */
+      field.discrete(() => onChange(`${converted}${next}`));
+      if (converted !== num) field.announce(`Converted using root font ${ROOT_PX}px`);
+    }
   };
 
   /* The name is the row's label (or `ariaLabel`) plus the unit or "mixed
