@@ -80,6 +80,10 @@ export const LocalizationScreen: React.FC<ScreenProps> = ({
   const [removing, setRemoving] = React.useState<LocaleRow | null>(null);
   const [busy, setBusy] = React.useState(false);
   const [actionError, setActionError] = React.useState<string | null>(null);
+  /* GAP-ST-L04 / L05 (277:25943 / 277:26152): the last language removed or
+     put back by Undo this visit — both save at once, so the footer and the
+     note say it stands apart from the staged default. */
+  const [localeEvent, setLocaleEvent] = React.useState<{ code: string; kind: "removed" | "restored" } | null>(null);
 
   /* The toast's Undo runs after later edits: it reads the list as it is then. */
   const enabledRef = React.useRef(enabledLocales);
@@ -114,11 +118,16 @@ export const LocalizationScreen: React.FC<ScreenProps> = ({
   /* 238:11810's footer names both defaults while one is staged. */
   React.useEffect(() => {
     if (!registerFooterMessage) return;
+    const event = localeEvent ? `${localeLabel(localeEvent.code)} ${localeEvent.kind}` : null;
     registerFooterMessage(
-      dirty ? `Unsaved default: ${localeLabel(defaultLocale)} · saved default: ${localeLabel(savedDefault)}` : null,
+      dirty
+        ? `Unsaved default: ${localeLabel(defaultLocale)} · ${event ? `${event} immediately` : `saved default: ${localeLabel(savedDefault)}`}`
+        : event
+          ? `Saved default: ${localeLabel(savedDefault)} · ${localeLabel(localeEvent!.code)} remains ${localeEvent!.kind}`
+          : null,
     );
     return () => registerFooterMessage(null);
-  }, [registerFooterMessage, dirty, defaultLocale, savedDefault]);
+  }, [registerFooterMessage, dirty, defaultLocale, savedDefault, localeEvent]);
 
   /** The table's counts follow the server (a new default is complete at `/`). */
   const refreshTable = React.useCallback(async () => {
@@ -186,6 +195,7 @@ export const LocalizationScreen: React.FC<ScreenProps> = ({
     try {
       await writeLocales(enabledLocales.filter((c) => c !== code));
       setRemoving(null);
+      setLocaleEvent({ code, kind: "removed" });
       /* 238:11810: "Français removed · Undo" — Undo adds it back, once. */
       let undone = false;
       const toastId = addToast({
@@ -198,9 +208,11 @@ export const LocalizationScreen: React.FC<ScreenProps> = ({
             undone = true;
             removeToast(toastId);
             if (enabledRef.current.includes(code)) return;
-            void writeLocales([...enabledRef.current, code]).catch((error: unknown) =>
-              setActionError(`${localeLabel(code)} was not added back: ${error instanceof Error ? error.message : "try again."}`),
-            );
+            void writeLocales([...enabledRef.current, code])
+              .then(() => setLocaleEvent({ code, kind: "restored" }))
+              .catch((error: unknown) =>
+                setActionError(`${localeLabel(code)} was not added back: ${error instanceof Error ? error.message : "try again."}`),
+              );
           },
         },
       });
@@ -285,7 +297,14 @@ export const LocalizationScreen: React.FC<ScreenProps> = ({
             const isSaved = row.code === savedDefault;
             const isChosen = dirty && row.code === defaultLocale;
             const pages = isSaved ? `${row.translated} pages translated` : `${row.translated} of ${row.total} pages translated`;
-            const status = isSaved ? `Saved default · ${pages}` : isChosen ? `Chosen default · unsaved · ${pages}` : pages;
+            const restored = localeEvent?.kind === "restored" && localeEvent.code === row.code;
+            const status = isSaved
+              ? `Saved default · ${pages}`
+              : isChosen
+                ? `Chosen default · unsaved · ${pages}`
+                : restored
+                  ? `Restored · ${pages}`
+                  : pages;
             return (
               <div key={row.code} role="listitem" className={ROW} data-testid={`set-loc-row-${row.code}`}>
                 <span className={NAME}>
@@ -334,8 +353,17 @@ export const LocalizationScreen: React.FC<ScreenProps> = ({
           first (owner override 2026-10-04), so the board's "removed
           immediately" reads as "saves at once". */}
       <p className={`${NOTE} tw:max-w-180`} data-testid="set-loc-publish-note">
-        Only the default language is staged. Adding or removing a language saves at once — saving or discarding the default will not undo it. Publishing currently emits the default locale only.
+        {localeEvent?.kind === "removed"
+          ? `Only the default language is staged. ${localeLabel(localeEvent.code)} was removed immediately. Saving or discarding the default will not restore it. Publishing currently emits the default locale only.`
+          : localeEvent?.kind === "restored"
+            ? `Default language changes are staged. ${localeLabel(localeEvent.code)} was restored immediately. Saving or discarding the default does not change the locale list. Publishing currently emits the default locale only.`
+            : "Only the default language is staged. Adding or removing a language saves at once — saving or discarding the default will not undo it. Publishing currently emits the default locale only."}
       </p>
+      {localeEvent?.kind === "restored" && dirty ? (
+        <p className={`${NOTE} tw:max-w-180`} data-testid="set-loc-undo-note">
+          Undo restored only {localeLabel(localeEvent.code)}. It did not change the staged {localeLabel(defaultLocale)} default.
+        </p>
+      ) : null}
 
       <AddLocaleDialog
         open={addOpen}

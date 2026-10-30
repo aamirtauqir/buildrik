@@ -227,6 +227,35 @@ describe("Languages — locales save immediately", () => {
     expect(removeToast).toHaveBeenCalledWith("t1");
   });
 
+  /* GAP-ST-L04 / L05: a removal and its Undo save at once, apart from the
+     staged default — the footer and the note say so. */
+  it("L04: after a removal the footer keeps it apart from the saved default", async () => {
+    const { props } = setup();
+    await loaded();
+    fireEvent.click(screen.getByTestId("set-loc-row-remove-ar"));
+    fireEvent.click(screen.getByTestId("set-loc-remove-ok"));
+    await waitFor(() => expect(props.registerFooterMessage).toHaveBeenLastCalledWith("Saved default: English · Arabic remains removed"));
+    expect(screen.getByTestId("set-loc-publish-note")).toHaveTextContent(
+      "Only the default language is staged. Arabic was removed immediately. Saving or discarding the default will not restore it.",
+    );
+  });
+
+  it("L05: Undo restores the language, marks its row, and leaves the staged default alone", async () => {
+    const { props } = setup();
+    await loaded();
+    fireEvent.click(screen.getByTestId("set-loc-row-remove-ar"));
+    fireEvent.click(screen.getByTestId("set-loc-remove-ok"));
+    await waitFor(() => expect(addToast).toHaveBeenCalled());
+    fireEvent.change(screen.getByTestId("set-loc-default"), { target: { value: "fr" } });
+    const toast = (addToast.mock.calls[0] as unknown as [{ action: { onClick: () => void } }])[0];
+    act(() => toast.action.onClick());
+    await waitFor(() => expect(screen.getByTestId("set-loc-row-pages-ar").textContent).toMatch(/^Restored · /));
+    expect(props.registerFooterMessage).toHaveBeenLastCalledWith("Unsaved default: French · Arabic restored immediately");
+    expect(screen.getByTestId("set-loc-undo-note")).toHaveTextContent(
+      "Undo restored only Arabic. It did not change the staged French default.",
+    );
+  });
+
   it("8135:214262: a locale with translations asks first, says they are kept, and Cancel writes nothing", async () => {
     setup();
     await loaded();

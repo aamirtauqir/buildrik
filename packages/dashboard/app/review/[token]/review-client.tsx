@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { trpc } from "@lib/trpc/client";
 import { Button, InputField, Modal } from "@/components/dashboard/primitives";
 import { RequestChangesDialog, type RequestChangesPhase } from "@/components/reviews/request-changes-dialog";
@@ -123,6 +123,22 @@ const crumbOf = (...parts: React.ReactNode[]) => (
   </>
 );
 
+/** Whether the browser says it is online, kept current by its events. */
+function useOnline(): boolean {
+  const [online, setOnline] = useState(() => (typeof navigator === "undefined" ? true : navigator.onLine));
+  useEffect(() => {
+    const on = () => setOnline(true);
+    const off = () => setOnline(false);
+    window.addEventListener("online", on);
+    window.addEventListener("offline", off);
+    return () => {
+      window.removeEventListener("online", on);
+      window.removeEventListener("offline", off);
+    };
+  }, []);
+  return online;
+}
+
 /** The in-page error UI is the whole handling; see the hooks below. */
 const HANDLED_IN_PAGE = (): void => undefined;
 
@@ -148,6 +164,9 @@ export function ReviewClient({ token }: { token: string }) {
     { enabled: Boolean(review.data?.reviewer), retry: false },
   );
   const utils = trpc.useUtils();
+  /* 2L9 B8-R11 (237:12474): offline, the note stays in its field and the page
+     says so; sending waits for the connection. */
+  const online = useOnline();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -347,6 +366,12 @@ export function ReviewClient({ token }: { token: string }) {
     );
   };
 
+  const offlineLine = online ? null : (
+    <p role="status" className="mt-3 text-[13px] leading-5 text-[#6B7280]" data-testid="review-offline">
+      You’re offline — your comment is kept.
+    </p>
+  );
+
   const notesPanel = (
     <aside className="flex h-[500px] w-[320px] shrink-0 flex-col rounded-lg border border-[#E5E7EB] bg-white p-4">
       <p className="text-[13px] font-medium text-[#111827]">Your notes</p>
@@ -359,6 +384,7 @@ export function ReviewClient({ token }: { token: string }) {
           ))}
         </ul>
       ) : null}
+      {offlineLine}
       <textarea
         value={draft}
         onChange={(e) => setDraft(e.target.value)}
@@ -367,7 +393,7 @@ export function ReviewClient({ token }: { token: string }) {
         maxLength={2000}
         className="mt-3 h-[72px] w-full resize-none rounded-md border border-[#D1D5DB] px-3 py-2 text-[13px] text-[#111827] outline-none focus:border-[#1A56DB]"
       />
-      <Button className="mt-3 tw:w-full" onClick={addNote} disabled={!draft.trim() || comment.isPending}>
+      <Button className="mt-3 tw:w-full" onClick={addNote} disabled={!draft.trim() || comment.isPending || !online}>
         {comment.isPending ? "Sending…" : "Add note"}
       </Button>
       {comment.error && changes === null ? (
@@ -483,6 +509,7 @@ export function ReviewClient({ token }: { token: string }) {
         </div>
       }
     >
+      {offlineLine}
       <div className="mt-4 mb-3 flex-1 bg-white pt-4">
         <SnapshotFrame page={activePage} height={600} />
       </div>

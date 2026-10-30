@@ -6,7 +6,7 @@
  *
  * VersionList — D3 Stage 1 extraction (audit-remediation 2026-05-08).
  *
- * Owns the virtualized list of saved versions: date-group flattening,
+ * Owns the virtualized list of saved versions:
  * react-window FixedSizeList wiring, container-height measurement,
  * VersionRow rendering, and the empty-state branch when the filtered
  * list yields nothing.
@@ -34,7 +34,10 @@ import { VERSION_NAME_MAX } from "@buildrik/shared/schemas/site-version";
 
 // ─── Constants ────────────────────────────────────────────────────────
 
-const ROW_HEIGHT = 64; // version row (48px) + 16px breathing room
+/* 2L9 H04/H07/H15: a save is two lines at the Session list's 50 pitch —
+   the name, then "Named · {author} · {when}" (or just "{when}" for an
+   auto-save) — with no Today / Yesterday bands. */
+const ROW_HEIGHT = 50;
 const OVERSCAN = 5;
 
 // ─── Date helpers ─────────────────────────────────────────────────────
@@ -42,15 +45,15 @@ const OVERSCAN = 5;
 /* 6930:82577 draws the row menu's items at a 30 pitch (as SavesFilter). */
 const ROW_MENU_ITEM = "tw:h-[30px] tw:px-2.5";
 
-function getDateGroup(timestamp: number): string {
-  const now = new Date();
+/** "Today 10:30", "Yesterday 17:20", "Mon" within the week, else "12 Oct". */
+function saveWhen(timestamp: number, now = new Date()): string {
   const date = new Date(timestamp);
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const yesterday = new Date(today.getTime() - 86400000);
-
-  if (date >= today) return "Today";
-  if (date >= yesterday) return "Yesterday";
-  return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  const day = 86_400_000;
+  if (timestamp >= today) return `Today ${formatTime(timestamp)}`;
+  if (timestamp >= today - day) return `Yesterday ${formatTime(timestamp)}`;
+  if (timestamp >= today - 6 * day) return date.toLocaleDateString(undefined, { weekday: "short" });
+  return date.toLocaleDateString(undefined, { day: "numeric", month: "short" });
 }
 
 export function formatTime(timestamp: number): string {
@@ -58,10 +61,6 @@ export function formatTime(timestamp: number): string {
 }
 
 // ─── Flat row types ───────────────────────────────────────────────────
-
-type FlatRow =
-  | { kind: "date-header"; id: string; label: string }
-  | { kind: "version"; id: string; version: NamedVersion };
 
 // ─── Empty state ──────────────────────────────────────────────────────
 
@@ -213,8 +212,15 @@ export function VersionRow({
               </div>
             )}
             <div className="version-meta">
-              <span className="version-time">{formatTime(version.createdAt)}</span>
-              <span>{relative}</span>
+              <span className="version-time" data-testid="version-meta-text">
+                {[
+                  version.isAutoCheckpoint ? null : "Named",
+                  version.isAutoCheckpoint ? null : version.authorName,
+                  saveWhen(version.createdAt),
+                ]
+                  .filter(Boolean)
+                  .join(" · ")}
+              </span>
               {/* Board 162:2 — "Auto-save · 3 changes · 16:20". Omitted rather
                   than shown as 0 when the undo stack does not reach back that
                   far: see versionChangeCounts. */}
@@ -237,9 +243,6 @@ export function VersionRow({
                 >
                   {changeCount} change{changeCount === 1 ? "" : "s"}
                 </Button>
-              )}
-              {version.isAutoCheckpoint && (
-                <span className="entry-badge auto-save">Auto</span>
               )}
             </div>
           </div>
@@ -377,22 +380,6 @@ export function VersionList({
   const listWrapperRef = React.useRef<HTMLDivElement>(null);
   const [listHeight, setListHeight] = React.useState(0);
 
-  // Flatten into virtualization-friendly rows: a date-header before
-  // each new date group, then the version rows in that group.
-  const flatRows = React.useMemo<FlatRow[]>(() => {
-    const rows: FlatRow[] = [];
-    let currentGroup = "";
-    for (const v of filteredVersions) {
-      const group = getDateGroup(v.createdAt);
-      if (group !== currentGroup) {
-        currentGroup = group;
-        rows.push({ kind: "date-header", id: `group-${group}`, label: group });
-      }
-      rows.push({ kind: "version", id: v.id, version: v });
-    }
-    return rows;
-  }, [filteredVersions]);
-
   // Measure list container height for FixedSizeList. ResizeObserver
   // re-measures on container shape changes; window resize covers the
   // browser-resize case.
@@ -416,20 +403,8 @@ export function VersionList({
 
   const renderRow = React.useCallback(
     ({ index, style }: ListChildComponentProps) => {
-      const row = flatRows[index];
-      if (!row) return null;
-
-      if (row.kind === "date-header") {
-        return (
-          <div style={{ ...style, display: "flex", alignItems: "flex-end", paddingBottom: 4 }}>
-            <div className="date-group-header" style={{ position: "static", width: "100%" }}>
-              {row.label}
-            </div>
-          </div>
-        );
-      }
-
-      const v = row.version;
+      const v = filteredVersions[index];
+      if (!v) return null;
       return (
         <div style={style}>
           <VersionRow
@@ -447,7 +422,7 @@ export function VersionList({
       );
     },
     [
-      flatRows,
+      filteredVersions,
       changeCounts,
       restoringId,
       onRestoreRequest,
@@ -481,10 +456,10 @@ export function VersionList({
         <FixedSizeList
           height={listHeight}
           width="100%"
-          itemCount={flatRows.length}
+          itemCount={filteredVersions.length}
           itemSize={ROW_HEIGHT}
           overscanCount={OVERSCAN}
-          itemKey={(index) => flatRows[index]?.id ?? index}
+          itemKey={(index) => filteredVersions[index]?.id ?? index}
         >
           {renderRow}
         </FixedSizeList>

@@ -32,6 +32,7 @@ import { ELEMENT_TYPE_LABELS } from "@/shared/constants/elementTypeLabels";
 import { PAGE_TEMPLATES, getMyTemplates } from "@/editor/sidebar/tabs/templates/templatesData";
 import { isTabAllowedForViewer, type GroupedTabId } from "@/editor/rail/tabsConfig";
 import { useViewerChrome } from "../hooks/useEditorRole";
+import { recordHistoryCleared } from "@/shared/utils/historySessionMarkers";
 
 // =============================================================================
 // TYPES
@@ -283,6 +284,7 @@ function buildCommands(
         if (typeof window !== "undefined" && !window.confirm("Clear this session's undo history? This can't be undone.")) {
           return;
         }
+        if (composer.history) recordHistoryCleared(composer);
         composer.history?.clear();
         composer.emit(EVENTS.HISTORY_CLEARED, undefined);
       }),

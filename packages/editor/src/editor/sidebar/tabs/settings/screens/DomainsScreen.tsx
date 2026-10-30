@@ -569,7 +569,8 @@ export const DomainsScreen: React.FC<ScreenProps> = ({
                   {connectionLine(row)}
                 </span>
                 <span className="tw:flex tw:items-center tw:gap-4">
-                  {row.isPrimary ? null : row.status === "VERIFIED" ? (
+                  {/* B8-S19: a read-only screen draws no write actions. */}
+                  {row.isPrimary || readOnly ? null : row.status === "VERIFIED" ? (
                     <Button
                       type="button"
                       variant="link"
@@ -613,7 +614,7 @@ export const DomainsScreen: React.FC<ScreenProps> = ({
                 </span>
               </div>
             ))}
-            {addLink}
+            {readOnly ? null : addLink}
           </section>
           {waiting ? (
             <section className={LIST_CARD} data-testid="set-card-dns-waiting">

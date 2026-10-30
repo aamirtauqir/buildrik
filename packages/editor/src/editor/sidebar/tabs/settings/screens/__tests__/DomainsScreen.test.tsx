@@ -208,12 +208,14 @@ describe("DomainsScreen — 2L9 B8-S09 238:12413, one Domains card", () => {
     expect(onDirtyChange).not.toHaveBeenCalledWith(true);
   });
 
-  it("read-only disables Add domain and Make primary", async () => {
+  /* 2L9 B8-S19 238:15344: the read-only list draws no write actions. */
+  it("read-only draws no Add domain or Make primary; Manage DNS stays", async () => {
     d.list.query.mockResolvedValue([bella(), { ...shop(), status: "VERIFIED" }]);
     setup({ readOnly: true });
-    await loaded();
-    expect(screen.getByTestId("set-dom-add")).toBeDisabled();
-    expect(screen.getByTestId("set-dom-make-primary-dom2")).toBeDisabled();
+    await waitFor(() => expect(screen.getByTestId("set-card-domains")).toBeInTheDocument());
+    expect(screen.queryByTestId("set-dom-add")).toBeNull();
+    expect(screen.queryByTestId("set-dom-make-primary-dom2")).toBeNull();
+    expect(screen.getByTestId("set-dom-manage-dom2")).toBeInTheDocument();
   });
 });
 

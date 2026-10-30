@@ -73,7 +73,9 @@ export const SaveVersionFooter: React.FC<{
               aria-disabled="true"
               onClick={() => {}}
               data-testid="saves-save-version"
-              className={buttonClass}
+              /* 2L9 H15: the unavailable action reads unavailable — grey
+                 fill, muted label — while keeping its reason on hover. */
+              className={`${buttonClass} tw:cursor-not-allowed tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink-muted)] tw:hover:bg-[var(--bk-bg-subtle)]`}
             >
               {label}
             </Button>

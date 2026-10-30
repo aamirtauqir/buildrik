@@ -148,17 +148,19 @@ describe("Transfer — 8137:217348 → 8137:217625", () => {
   });
 });
 
-describe("Delete — 8137:217905 → 8137:218168", () => {
-  it("names the live address, asks for DELETE, deletes with the site's name and leaves for Recently deleted", async () => {
+describe("Delete — 2L9 B8-S17 238:14765", () => {
+  it("says what happens, arms on the site's name, deletes with it and leaves for Recently deleted", async () => {
     setup();
     await loaded();
     fireEvent.click(screen.getByTestId("set-danger-delete-btn"));
     expect(screen.getByTestId("delete-site-line")).toHaveTextContent(
-      "This unpublishes bellacucina.com now. You can restore it from Recently deleted for 30 days.",
+      "The site goes offline and moves to Recently deleted. You can restore it for 30 days.",
     );
-    fireEvent.click(screen.getByTestId("delete-site-confirm"));
+    expect(screen.getByTestId("delete-site-confirm")).toBeDisabled();
+    fireEvent.change(screen.getByLabelText("Type Bella Cucina to confirm"), { target: { value: "Bella Cucin" } });
+    expect(screen.getByTestId("delete-site-confirm")).toBeDisabled();
     expect(deleteSite).not.toHaveBeenCalled();
-    fireEvent.change(screen.getByLabelText("Type DELETE to confirm"), { target: { value: "DELETE" } });
+    fireEvent.change(screen.getByLabelText("Type Bella Cucina to confirm"), { target: { value: "Bella Cucina" } });
     fireEvent.click(screen.getByTestId("delete-site-confirm"));
     await waitFor(() => expect(deleteSite).toHaveBeenCalledWith("s1", "Bella Cucina"));
     await waitFor(() => expect(assign).toHaveBeenCalledWith(expect.stringMatching(new RegExp(`${RECENTLY_DELETED_PATH.replace("?", "\\?")}$`))));

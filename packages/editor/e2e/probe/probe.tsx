@@ -19,6 +19,7 @@
  * @license BSD-3-Clause
  */
 import { pageFileNames } from "@/engine/export";
+import { recordHistoryCleared, trackHistorySessionMarkers } from "@/shared/utils/historySessionMarkers";
 import { RecordLeaveDialog, type RecordLeavePhase } from "@/editor/cms/RecordLeaveDialog";
 import { RichTextEditor } from "@/editor/panels/RichTextEditor";
 import { CreateComponentModal } from "@/editor/shell/modals/CreateComponentModal";
@@ -1725,7 +1726,7 @@ const reviewHost = (name: string, children: React.ReactNode) => (
     data-probe={name}
     style={{ width: 280, height: 812, display: "flex", flexDirection: "column", background: "#fff" }}
   >
-    {children}
+    <ToastProvider>{children}</ToastProvider>
   </div>
 );
 
@@ -4560,10 +4561,12 @@ const CASES: Record<string, () => React.ReactElement> = {
   // Neither state is reachable by clicking: both need a round, a client, and
   // comments — and the Detached group additionally needs the orphan
   // announcement only the canvas CommentLayer makes.
+  /* ?status=CHANGES_REQUESTED draws B8-R05's next-round foot. */
   "review-panel-detached-present": () => {
+    const status = new URLSearchParams(location.search).get("status");
     trpcStub({
       "comments.list": () => REVIEW_COMMENTS,
-      "reviews.currentRound": () => REVIEW_ROUND(),
+      "reviews.currentRound": () => REVIEW_ROUND(status ? { status } : {}),
       "sites.myRole": () => "OWNER",
     });
     return reviewHost(
@@ -5189,7 +5192,7 @@ const CASES: Record<string, () => React.ReactElement> = {
   ),
   /* The whole Site settings tab (L-G round 2) — nav, header, footer and the
      screen, for the footer / load / role / Analytics states of page 06.
-     ?siteId=probe-site&screen=analytics&role=ADMIN
+     ?siteId=probe-site&screen=analytics&role=ADMIN   (role=hang: the lookup never answers)
        &status=none|receiving|hang|fail|verifyhang|verifyfail  (siteDetail.analyticsStatus)
        &read=ok|hang|fail                (siteDetail.settings.get)
        &save=ok|hang|fail                (every mutation)
@@ -5227,6 +5230,7 @@ const CASES: Record<string, () => React.ReactElement> = {
         enabledLocales: ["en-US", "de-DE"],
         autoRedirectLocale: false,
       },
+      "siteDetail.domains.list": [{ id: "d1", domain: "fieldwork.studio", status: "ACTIVE", isPrimary: true, forceHttps: true, dnsRecords: [] }],
       "siteDetail.locales": {
         locales: [
           { code: "en-US", path: "/", translated: 12, total: 12, status: "LIVE", pending: [] },
@@ -5241,7 +5245,9 @@ const CASES: Record<string, () => React.ReactElement> = {
       const isMutation = (init?.method ?? "GET").toUpperCase() === "POST";
       const pick = isMutation
         ? mode("save", "ok")
-        : procs.includes("siteDetail.analyticsStatus")
+        : procs.includes("sites.myRole") && role === "hang"
+          ? "hang"
+          : procs.includes("siteDetail.analyticsStatus")
           ? statusMode()
           : procs.includes("siteDetail.settings.get") || procs.includes("siteDetail.locales")
             ? mode("read", "ok")
@@ -5293,6 +5299,11 @@ const CASES: Record<string, () => React.ReactElement> = {
       root: { id: "hx-root", type: "container", tagName: "div", classes: ["buildrick-page-root"], children: [] },
     });
     c.elements.setActivePage(page.id);
+    /* H01's markers: the session log opens on Home, then a user clear —
+       the steps below are made after it. */
+    trackHistorySessionMarkers(c);
+    recordHistoryCleared(c);
+    c.history.clear();
     for (const [id, type, text] of [["hx-h", "heading", "Thoughtful design."], ["hx-t", "text", "Good design makes room."]] as const) {
       c.elements.addElement(c.elements.createElement(type as never, { id, content: text }), page.root.id);
     }
