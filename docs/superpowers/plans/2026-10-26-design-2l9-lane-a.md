@@ -244,3 +244,16 @@ insert-panel, pages-panel, canvas-footer-toolbar, pages-context-menu) caught the
 Still open on page 03 for L-A: draft-retained / navigation-pending states (101:22426…), folder
 create inline copy, bulk-bar homepage reason, folder menu container, Listings 720 width,
 shared guides (S11) and page trash (S12).
+
+## Status — round 18 (2026-10-30, L-A also covers the CMS lane)
+
+| Work | State | Commit |
+|---|---|---|
+| 126:35760 queued save locks the record until the queue answers (useQueuedSaveLock + cmsSync.isCmsEntrySaveOwed) | built, probe-compared | fd37be810 |
+| 125:35603 the current page still asks ("…open Home in Editor") | built, demo-compared | fd37be810 |
+| 165:2184 leave guard, 165:1625 offline banner | probe-compared | 138dc7693 |
+| Layers bound glyph (173:9757 / 189:22915) | built, probe-compared (part of Inspector-owned rows) | 138dc7693 |
+| Dynamic pages: Create collection page, link-failed / retry, missing page (187:20406 … 187:22375, 191:31132) | built, demo-walked, not image-compared | dba84fc5f |
+
+Requests: A-23 (L-B — the Inspector binding boards: 173:9757, 173:9019, 173:9389, 173:10329, 182:18493, 189:22915, 195:27443, 197:28410), A-24 (lead — engine preview-record choice for the canvas record bar, 173:12022 family). B-20 closed.
+Next round: fetch shots for 187:20406 / 187:20616 / 187:20858 / 187:21035 / 187:21245 / 187:21418 / 187:22375 / 191:31132 and compare; Site variables as a workspace page (260:235689, shot on disk); 187:21853 linked-template restyle; 187:22071 canvas notice.
