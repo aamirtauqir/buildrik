@@ -152,16 +152,21 @@ describe("TokenDetailView — a font role picks through Choose font (R02)", () =
   it("picking for the token leaves the Heading inspector's own selection alone", () => {
     const { composer } = composerWithFonts(["Inter Variable"]);
     const onToken = vi.fn();
+    /* Its own role id: the picker keeps a role's search and the families it
+       left with across reopenings (R04) — "Manage site fonts" above left this
+       file's shared role, so a font added since would come back as R04's
+       "Added to site · not applied" instead of the list. */
+    const token = { ...fontToken, id: "font-heading-selection" };
     render(
       <DSModeProvider initialMode="pro">
         <FontPicker value="'Inter Variable', sans-serif" composer={composer} />
-        <TokenDetailView token={fontToken} composer={composer} onValueChange={onToken} />
+        <TokenDetailView token={token} composer={composer} onValueChange={onToken} />
       </DSModeProvider>,
     );
     fireEvent.click(screen.getByTestId("brand-token-action-replace"));
     fireEvent.change(screen.getByLabelText("Search fonts"), { target: { value: "Lora" } });
     fireEvent.click(screen.getByRole("button", { name: "Lora · Catalogue" }));
-    expect(onToken).toHaveBeenCalledWith("font-heading", "Lora");
+    expect(onToken).toHaveBeenCalledWith("font-heading-selection", "Lora");
     expect(screen.getByRole("button", { name: "Font family" })).toHaveTextContent("Inter Variable");
   });
 });

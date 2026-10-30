@@ -49,6 +49,15 @@ export interface InspectorFieldContextValue {
   /** Who and where a write lands — "Hero intro" / "Desktop · Default state"
    *  (2L9 39:9114's "Color for …" head). Absent: not said. */
   target?: { name: string; editing: string };
+  /** A multi-selection's per-target shown value of a property, named as
+   *  Layers names it (2L9 B05's source list). Absent / one target: []. */
+  sourcesOf?: (property: string) => readonly InspectorSource[];
+}
+
+export interface InspectorSource {
+  id: string;
+  name: string;
+  value: string;
 }
 
 const EMPTY: InspectorFieldContextValue = {
@@ -96,6 +105,14 @@ const NONE: readonly OverrideKind[] = [];
 
 /** The accessible name of a field the selection disagrees about (board 22). */
 export const mixedName = (label: string): string => `${label}, Mixed values`;
+
+const NO_SOURCES: readonly InspectorSource[] = [];
+
+/** Each selected target's own shown value of `property` (B05). */
+export function useInspectorSources(property: string): readonly InspectorSource[] {
+  const ctx = React.useContext(InspectorFieldContext);
+  return ctx.sourcesOf?.(property) ?? NO_SOURCES;
+}
 
 export function useInspectorField(property?: string): InspectorField {
   const ctx = React.useContext(InspectorFieldContext);

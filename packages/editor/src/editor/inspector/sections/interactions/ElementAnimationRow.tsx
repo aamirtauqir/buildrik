@@ -77,16 +77,21 @@ export interface ElementAnimationEditorProps {
 /** The animation's edit screen body — the old inline expansion. */
 export function ElementAnimationEditor({ animation, onChange, onPreview, conflicts = [], onInspect }: ElementAnimationEditorProps) {
   const first = conflicts[0];
+  const triggerName = animationTriggerLabel(animation).replace(/^On /, "").replace(/^./, (c) => c.toUpperCase());
   return (
     <div className="tw:flex tw:flex-col tw:gap-2 tw:pb-2">
       {/* 2L9 A10 247:26063: the CSS output plays an element animation when
           the element renders — a saved non-load trigger is not applied. */}
-      {animation.trigger !== "load" ? (
-        <NoteRow testId="element-animation-legacy">
-          Plays when rendered. This saved {animationTriggerLabel(animation).replace(/^On /, "").replace(/^./, (c) => c.toUpperCase())} trigger is not applied by current CSS output.
-        </NoteRow>
-      ) : null}
-      <AnimationEditor animation={animation} onChange={onChange} onPreview={onPreview} />
+      <AnimationEditor
+        animation={animation}
+        onChange={onChange}
+        trigger={animation.trigger === "load" ? triggerName : `${triggerName} · saved legacy`}
+        triggerNote={
+          animation.trigger !== "load" ? (
+            <NoteRow testId="element-animation-legacy">Plays when rendered. This saved {triggerName} trigger is not applied by current CSS output.</NoteRow>
+          ) : null
+        }
+      />
       {first ? (
         <div className="tw:flex tw:flex-col tw:gap-2" data-testid="element-animation-conflict">
           <div className="tw:pt-2 tw:text-[13px] tw:font-semibold tw:leading-4 tw:text-[var(--bk-ink)]">Property conflict</div>
@@ -113,6 +118,11 @@ export function ElementAnimationEditor({ animation, onChange, onPreview, conflic
           Remove animation
         </Button>
       )}
+      {onPreview ? (
+        <Button color="light" size="xs" className={WIDE_BUTTON} onClick={onPreview} data-testid="element-animation-preview">
+          Preview applied configuration
+        </Button>
+      ) : null}
     </div>
   );
 }
