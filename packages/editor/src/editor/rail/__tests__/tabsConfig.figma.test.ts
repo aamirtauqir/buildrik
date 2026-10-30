@@ -32,8 +32,13 @@ describe("tabsConfig — Figma rail", () => {
     expect(labels).toEqual(["Add", "Layers", "Pages", "Assets", "CMS", "Brand"]);
   });
 
-  it("renders as ONE group — the board draws no divider", () => {
-    expect(getFigmaRailGroups()).toHaveLength(1);
+  /* design-2l9 Shell/Rail 497:99445 (re-baseline from the old file's 52:2):
+     Add · Layers · Pages | Assets · CMS · Brand, one divider between. */
+  it("renders as two groups — Add · Layers · Pages | Assets · CMS · Brand", () => {
+    expect(getFigmaRailGroups().map((g) => g.tabs.map((t) => t.label))).toEqual([
+      ["Add", "Layers", "Pages"],
+      ["Assets", "CMS", "Brand"],
+    ]);
   });
 
   it("every rail id resolves to a real tab config (no typos, no crashes)", () => {

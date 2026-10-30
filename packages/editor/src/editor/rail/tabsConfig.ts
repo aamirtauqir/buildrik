@@ -229,7 +229,8 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
     // panel") + routable. The authoritative IA (14-screen-specs.md:8) promotes
     // it to a first-class rail tab in the pending 6-tab redesign.
     id: "content",
-    iconName: "LayoutGrid",
+    /* 497:99445 — the CMS glyph is the database. */
+    iconName: "Database",
     // v3 IA Q4: "CMS" — the panel IS the CMS (collections, records, fields,
     // dynamic pages, sources, {{site.*}} variables). "Content" read as
     // page copy and nobody looked here for collections (Critical UX-F-01).
@@ -297,7 +298,9 @@ export function getTabConfig(tabId: GroupedTabId): GroupedTabConfig | undefined 
 
 /** The six rail items of the Figma contract, in board 52:2 order, one group. */
 export const RAIL_FIGMA: ReadonlyArray<{ zone: TabZone; ids: readonly GroupedTabId[] }> = [
-  { zone: "creation", ids: ["add", "layers", "pages", "assets", "content", "design"] },
+  /* design-2l9 Shell/Rail 497:99445: Add · Layers · Pages | Assets · CMS · Brand. */
+  { zone: "creation", ids: ["add", "layers", "pages"] },
+  { zone: "structure", ids: ["assets", "content", "design"] },
 ] as const;
 
 /** Flat set of tab ids that appear in the Figma rail (for filtering / tests). */
