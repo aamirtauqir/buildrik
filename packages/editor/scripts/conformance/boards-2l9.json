@@ -15848,9 +15848,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:272:24319",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared: 'CSV ready' / '{n} submissions · {Form} · {View}. Your selection and filters are unchanged.' / Back to submissions; the file downloads (the board's 'Prototype fixture' line is not product copy). Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice).",
+   "verifiedNote": "L-G triage 2026-10-30: variant of 272:24319 (compared): same 'CSV ready' dialog, All forms instead of Contact. | Built, not compared: 'CSV ready' / '{n} submissions · {Form} · {View}. Your selection and filters are unchanged.' / Back to submissions; the file downloads (the board's 'Prototype fixture' line is not product copy). Export follows view + form (forms.exportSubmissions isSpam/isArchived, lane-E server slice).",
    "tier": "P3"
   },
   {
@@ -15937,9 +15937,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:request-E-12",
    "verified": "drift-open",
-   "verifiedNote": "Not built: '‹ Back to submissions · {Form} / {View}' return band in the Inspector after Configure needs the Inspector/shell (not lane-E paths) — request candidate.",
+   "verifiedNote": "L-G triage 2026-10-30: the '‹ Back to submissions · {Form} / {View}' band lives in the Inspector/shell (REQUESTS E-12, L-B + lead), not a settings path; Configure itself selects the form and opens Content/Fields. | Not built: '‹ Back to submissions · {Form} / {View}' return band in the Inspector after Configure needs the Inspector/shell (not lane-E paths) — request candidate.",
    "tier": "P3"
   },
   {
@@ -15959,9 +15959,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
    "tier": "P3"
   },
   {
@@ -15970,9 +15970,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
    "tier": "P3"
   },
   {
@@ -15981,9 +15981,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
    "tier": "P3"
   },
   {
@@ -15992,9 +15992,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
    "tier": "P3"
   },
   {
@@ -16003,9 +16003,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
    "tier": "P3"
   },
   {
@@ -16014,9 +16014,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
    "tier": "P3"
   },
   {
@@ -16025,9 +16025,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
    "tier": "P3"
   },
   {
@@ -16036,9 +16036,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
    "tier": "P3"
   },
   {
@@ -16047,9 +16047,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
    "tier": "P3"
   },
   {
@@ -16058,9 +16058,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
    "tier": "P3"
   },
   {
@@ -16069,9 +16069,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
    "tier": "P3"
   },
   {
@@ -16080,9 +16080,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
    "tier": "P3"
   },
   {
@@ -16091,9 +16091,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
    "tier": "P3"
   },
   {
@@ -16102,9 +16102,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
    "tier": "P3"
   },
   {
@@ -16113,9 +16113,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
    "tier": "P3"
   },
   {
@@ -16124,9 +16124,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
    "tier": "P3"
   },
   {
@@ -16135,9 +16135,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
    "tier": "P3"
   },
   {
@@ -16146,9 +16146,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
    "tier": "P3"
   },
   {
@@ -16157,9 +16157,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
    "tier": "P3"
   },
   {
@@ -16168,9 +16168,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
    "tier": "P3"
   },
   {
@@ -16179,9 +16179,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
    "tier": "P3"
   },
   {
@@ -16190,9 +16190,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
    "tier": "P3"
   },
   {
@@ -16201,9 +16201,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
    "tier": "P3"
   },
   {
@@ -16212,9 +16212,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
    "tier": "P3"
   },
   {
@@ -16223,9 +16223,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
    "tier": "P3"
   },
   {
@@ -16234,9 +16234,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
    "tier": "P3"
   },
   {
@@ -16245,9 +16245,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
    "tier": "P3"
   },
   {
@@ -16256,9 +16256,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval needs server R-13; client approve is one confirm (review-client.tsx:516)",
    "tier": "P3"
   },
   {
@@ -16267,9 +16267,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:server-client-comment-anchor",
    "verified": "no",
-   "verifiedNote": "no phone pin placement, pan, comments sheet on the client page",
+   "verifiedNote": "L-G triage 2026-10-30: phone/tablet pin placement, pan and the pinned-comments sheet need anchored client comments (an anchor field on client review comments — full server chain + migration, lane-F plan F5.08). Filed REQUESTS G-2. | no phone pin placement, pan, comments sheet on the client page",
    "tier": "P3"
   },
   {
@@ -16278,9 +16278,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:server-client-comment-anchor",
    "verified": "no",
-   "verifiedNote": "no phone pin placement, pan, comments sheet on the client page",
+   "verifiedNote": "L-G triage 2026-10-30: phone/tablet pin placement, pan and the pinned-comments sheet need anchored client comments (an anchor field on client review comments — full server chain + migration, lane-F plan F5.08). Filed REQUESTS G-2. | no phone pin placement, pan, comments sheet on the client page",
    "tier": "P3"
   },
   {
@@ -16289,9 +16289,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:server-client-comment-anchor",
    "verified": "no",
-   "verifiedNote": "no phone pin placement, pan, comments sheet on the client page",
+   "verifiedNote": "L-G triage 2026-10-30: phone/tablet pin placement, pan and the pinned-comments sheet need anchored client comments (an anchor field on client review comments — full server chain + migration, lane-F plan F5.08). Filed REQUESTS G-2. | no phone pin placement, pan, comments sheet on the client page",
    "tier": "P3"
   },
   {
@@ -16300,9 +16300,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:server-client-comment-anchor",
    "verified": "no",
-   "verifiedNote": "no phone pin placement, pan, comments sheet on the client page",
+   "verifiedNote": "L-G triage 2026-10-30: phone/tablet pin placement, pan and the pinned-comments sheet need anchored client comments (an anchor field on client review comments — full server chain + migration, lane-F plan F5.08). Filed REQUESTS G-2. | no phone pin placement, pan, comments sheet on the client page",
    "tier": "P3"
   },
   {
@@ -16311,9 +16311,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:server-client-comment-anchor",
    "verified": "no",
-   "verifiedNote": "no phone pin placement, pan, comments sheet on the client page",
+   "verifiedNote": "L-G triage 2026-10-30: phone/tablet pin placement, pan and the pinned-comments sheet need anchored client comments (an anchor field on client review comments — full server chain + migration, lane-F plan F5.08). Filed REQUESTS G-2. | no phone pin placement, pan, comments sheet on the client page",
    "tier": "P3"
   },
   {
@@ -16322,9 +16322,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:server-client-comment-anchor",
    "verified": "no",
-   "verifiedNote": "no phone pin placement, pan, comments sheet on the client page",
+   "verifiedNote": "L-G triage 2026-10-30: phone/tablet pin placement, pan and the pinned-comments sheet need anchored client comments (an anchor field on client review comments — full server chain + migration, lane-F plan F5.08). Filed REQUESTS G-2. | no phone pin placement, pan, comments sheet on the client page",
    "tier": "P3"
   },
   {
@@ -16333,9 +16333,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:server-client-comment-anchor",
    "verified": "no",
-   "verifiedNote": "no phone pin placement, pan, comments sheet on the client page",
+   "verifiedNote": "L-G triage 2026-10-30: phone/tablet pin placement, pan and the pinned-comments sheet need anchored client comments (an anchor field on client review comments — full server chain + migration, lane-F plan F5.08). Filed REQUESTS G-2. | no phone pin placement, pan, comments sheet on the client page",
    "tier": "P3"
   },
   {
@@ -16344,9 +16344,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:server-client-comment-anchor",
    "verified": "no",
-   "verifiedNote": "no phone pin placement, pan, comments sheet on the client page",
+   "verifiedNote": "L-G triage 2026-10-30: phone/tablet pin placement, pan and the pinned-comments sheet need anchored client comments (an anchor field on client review comments — full server chain + migration, lane-F plan F5.08). Filed REQUESTS G-2. | no phone pin placement, pan, comments sheet on the client page",
    "tier": "P3"
   },
   {
@@ -16631,9 +16631,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:248:20853",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
+   "verifiedNote": "L-G triage 2026-10-30: board conflict — GAP-ST-W draws the save-and-leave pending state as a footer line ('Saving {Screen}… destination: {Dest}'), B8-SAVING 248:20853 draws the same state as a dialog; the compared B8-SAVING dialog is the one built (lane-E decision), so these destination variants close on it. | Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
    "tier": "P3"
   },
   {
@@ -16665,9 +16665,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:248:20853",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
+   "verifiedNote": "L-G triage 2026-10-30: board conflict — GAP-ST-W draws the save-and-leave pending state as a footer line ('Saving {Screen}… destination: {Dest}'), B8-SAVING 248:20853 draws the same state as a dialog; the compared B8-SAVING dialog is the one built (lane-E decision), so these destination variants close on it. | Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
    "tier": "P3"
   },
   {
@@ -16676,9 +16676,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:277:28233",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared.",
+   "verifiedNote": "L-G triage 2026-10-30: variant of 277:28233 (compared): the same save-failed dialog with another screen/destination name taken from the nav; no other difference on the board. | Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared.",
    "tier": "P3"
   },
   {
@@ -16699,9 +16699,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:248:20853",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
+   "verifiedNote": "L-G triage 2026-10-30: board conflict — GAP-ST-W draws the save-and-leave pending state as a footer line ('Saving {Screen}… destination: {Dest}'), B8-SAVING 248:20853 draws the same state as a dialog; the compared B8-SAVING dialog is the one built (lane-E decision), so these destination variants close on it. | Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
    "tier": "P3"
   },
   {
@@ -16710,9 +16710,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:277:28233",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared.",
+   "verifiedNote": "L-G triage 2026-10-30: variant of 277:28233 (compared): the same save-failed dialog with another screen/destination name taken from the nav; no other difference on the board. | Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared.",
    "tier": "P3"
   },
   {
@@ -16733,9 +16733,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:248:20853",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
+   "verifiedNote": "L-G triage 2026-10-30: board conflict — GAP-ST-W draws the save-and-leave pending state as a footer line ('Saving {Screen}… destination: {Dest}'), B8-SAVING 248:20853 draws the same state as a dialog; the compared B8-SAVING dialog is the one built (lane-E decision), so these destination variants close on it. | Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
    "tier": "P3"
   },
   {
@@ -16744,9 +16744,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:277:28233",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared.",
+   "verifiedNote": "L-G triage 2026-10-30: variant of 277:28233 (compared): the same save-failed dialog with another screen/destination name taken from the nav; no other difference on the board. | Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared.",
    "tier": "P3"
   },
   {
@@ -16767,9 +16767,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:248:20853",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
+   "verifiedNote": "L-G triage 2026-10-30: board conflict — GAP-ST-W draws the save-and-leave pending state as a footer line ('Saving {Screen}… destination: {Dest}'), B8-SAVING 248:20853 draws the same state as a dialog; the compared B8-SAVING dialog is the one built (lane-E decision), so these destination variants close on it. | Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
    "tier": "P3"
   },
   {
@@ -16778,9 +16778,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:277:28233",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared.",
+   "verifiedNote": "L-G triage 2026-10-30: variant of 277:28233 (compared): the same save-failed dialog with another screen/destination name taken from the nav; no other difference on the board. | Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared.",
    "tier": "P3"
   },
   {
@@ -16801,9 +16801,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:248:20853",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
+   "verifiedNote": "L-G triage 2026-10-30: board conflict — GAP-ST-W draws the save-and-leave pending state as a footer line ('Saving {Screen}… destination: {Dest}'), B8-SAVING 248:20853 draws the same state as a dialog; the compared B8-SAVING dialog is the one built (lane-E decision), so these destination variants close on it. | Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
    "tier": "P3"
   },
   {
@@ -16812,9 +16812,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:277:28233",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared.",
+   "verifiedNote": "L-G triage 2026-10-30: variant of 277:28233 (compared): the same save-failed dialog with another screen/destination name taken from the nav; no other difference on the board. | Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared.",
    "tier": "P3"
   },
   {
@@ -16835,9 +16835,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:248:20853",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
+   "verifiedNote": "L-G triage 2026-10-30: board conflict — GAP-ST-W draws the save-and-leave pending state as a footer line ('Saving {Screen}… destination: {Dest}'), B8-SAVING 248:20853 draws the same state as a dialog; the compared B8-SAVING dialog is the one built (lane-E decision), so these destination variants close on it. | Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
    "tier": "P3"
   },
   {
@@ -16846,9 +16846,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:277:28233",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared.",
+   "verifiedNote": "L-G triage 2026-10-30: variant of 277:28233 (compared): the same save-failed dialog with another screen/destination name taken from the nav; no other difference on the board. | Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared.",
    "tier": "P3"
   },
   {
@@ -16869,9 +16869,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:248:20853",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
+   "verifiedNote": "L-G triage 2026-10-30: board conflict — GAP-ST-W draws the save-and-leave pending state as a footer line ('Saving {Screen}… destination: {Dest}'), B8-SAVING 248:20853 draws the same state as a dialog; the compared B8-SAVING dialog is the one built (lane-E decision), so these destination variants close on it. | Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
    "tier": "P3"
   },
   {
@@ -16880,9 +16880,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:277:28233",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared.",
+   "verifiedNote": "L-G triage 2026-10-30: variant of 277:28233 (compared): the same save-failed dialog with another screen/destination name taken from the nav; no other difference on the board. | Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared.",
    "tier": "P3"
   },
   {
@@ -16903,9 +16903,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:248:20853",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
+   "verifiedNote": "L-G triage 2026-10-30: board conflict — GAP-ST-W draws the save-and-leave pending state as a footer line ('Saving {Screen}… destination: {Dest}'), B8-SAVING 248:20853 draws the same state as a dialog; the compared B8-SAVING dialog is the one built (lane-E decision), so these destination variants close on it. | Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
    "tier": "P3"
   },
   {
@@ -16914,9 +16914,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:277:28233",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared.",
+   "verifiedNote": "L-G triage 2026-10-30: variant of 277:28233 (compared): the same save-failed dialog with another screen/destination name taken from the nav; no other difference on the board. | Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared.",
    "tier": "P3"
   },
   {
@@ -16937,9 +16937,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:248:20853",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
+   "verifiedNote": "L-G triage 2026-10-30: board conflict — GAP-ST-W draws the save-and-leave pending state as a footer line ('Saving {Screen}… destination: {Dest}'), B8-SAVING 248:20853 draws the same state as a dialog; the compared B8-SAVING dialog is the one built (lane-E decision), so these destination variants close on it. | Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
    "tier": "P3"
   },
   {
@@ -16948,9 +16948,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:277:28233",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared.",
+   "verifiedNote": "L-G triage 2026-10-30: variant of 277:28233 (compared): the same save-failed dialog with another screen/destination name taken from the nav; no other difference on the board. | Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared.",
    "tier": "P3"
   },
   {
@@ -16971,9 +16971,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:248:20853",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
+   "verifiedNote": "L-G triage 2026-10-30: board conflict — GAP-ST-W draws the save-and-leave pending state as a footer line ('Saving {Screen}… destination: {Dest}'), B8-SAVING 248:20853 draws the same state as a dialog; the compared B8-SAVING dialog is the one built (lane-E decision), so these destination variants close on it. | Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
    "tier": "P3"
   },
   {
@@ -16982,9 +16982,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:277:28233",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared.",
+   "verifiedNote": "L-G triage 2026-10-30: variant of 277:28233 (compared): the same save-failed dialog with another screen/destination name taken from the nav; no other difference on the board. | Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared.",
    "tier": "P3"
   },
   {
@@ -17005,9 +17005,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:248:20853",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
+   "verifiedNote": "L-G triage 2026-10-30: board conflict — GAP-ST-W draws the save-and-leave pending state as a footer line ('Saving {Screen}… destination: {Dest}'), B8-SAVING 248:20853 draws the same state as a dialog; the compared B8-SAVING dialog is the one built (lane-E decision), so these destination variants close on it. | Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
    "tier": "P3"
   },
   {
@@ -17016,9 +17016,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:277:28233",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared.",
+   "verifiedNote": "L-G triage 2026-10-30: variant of 277:28233 (compared): the same save-failed dialog with another screen/destination name taken from the nav; no other difference on the board. | Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared.",
    "tier": "P3"
   },
   {
@@ -17039,9 +17039,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:248:20853",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
+   "verifiedNote": "L-G triage 2026-10-30: board conflict — GAP-ST-W draws the save-and-leave pending state as a footer line ('Saving {Screen}… destination: {Dest}'), B8-SAVING 248:20853 draws the same state as a dialog; the compared B8-SAVING dialog is the one built (lane-E decision), so these destination variants close on it. | Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
    "tier": "P3"
   },
   {
@@ -17050,9 +17050,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:277:28233",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared.",
+   "verifiedNote": "L-G triage 2026-10-30: variant of 277:28233 (compared): the same save-failed dialog with another screen/destination name taken from the nav; no other difference on the board. | Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared.",
    "tier": "P3"
   },
   {
@@ -17896,9 +17896,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:request-E-12",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (delivery-recovery): DRIFT — Configure selects the Form and opens Content/Fields, but no '‹ Back to submissions · Form / Inbox' strip above the canvas. | prior: Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Configure) not walked.",
+   "verifiedNote": "L-G triage 2026-10-30: the '‹ Back to submissions · {Form} / {View}' band lives in the Inspector/shell (REQUESTS E-12, L-B + lead), not a settings path; Configure itself selects the form and opens Content/Fields. | Compared live 2026-10-26 (delivery-recovery): DRIFT — Configure selects the Form and opens Content/Fields, but no '‹ Back to submissions · Form / Inbox' strip above the canvas. | prior: Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Configure) not walked.",
    "tier": "P3"
   },
   {
@@ -20166,9 +20166,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:248:20853",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
+   "verifiedNote": "L-G triage 2026-10-30: board conflict — GAP-ST-W draws the save-and-leave pending state as a footer line ('Saving {Screen}… destination: {Dest}'), B8-SAVING 248:20853 draws the same state as a dialog; the compared B8-SAVING dialog is the one built (lane-E decision), so these destination variants close on it. | Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
    "tier": "P3"
   },
   {
@@ -20177,9 +20177,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:277:28233",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared.",
+   "verifiedNote": "L-G triage 2026-10-30: variant of 277:28233 (compared): the same save-failed dialog with another screen/destination name taken from the nav; no other difference on the board. | Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared.",
    "tier": "P3"
   },
   {
@@ -20200,9 +20200,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:248:20853",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
+   "verifiedNote": "L-G triage 2026-10-30: board conflict — GAP-ST-W draws the save-and-leave pending state as a footer line ('Saving {Screen}… destination: {Dest}'), B8-SAVING 248:20853 draws the same state as a dialog; the compared B8-SAVING dialog is the one built (lane-E decision), so these destination variants close on it. | Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
    "tier": "P3"
   },
   {
@@ -20211,9 +20211,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:277:28233",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared.",
+   "verifiedNote": "L-G triage 2026-10-30: variant of 277:28233 (compared): the same save-failed dialog with another screen/destination name taken from the nav; no other difference on the board. | Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared.",
    "tier": "P3"
   },
   {
@@ -20234,9 +20234,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:248:20853",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
+   "verifiedNote": "L-G triage 2026-10-30: board conflict — GAP-ST-W draws the save-and-leave pending state as a footer line ('Saving {Screen}… destination: {Dest}'), B8-SAVING 248:20853 draws the same state as a dialog; the compared B8-SAVING dialog is the one built (lane-E decision), so these destination variants close on it. | Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
    "tier": "P3"
   },
   {
@@ -20245,9 +20245,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:277:28233",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared.",
+   "verifiedNote": "L-G triage 2026-10-30: variant of 277:28233 (compared): the same save-failed dialog with another screen/destination name taken from the nav; no other difference on the board. | Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared.",
    "tier": "P3"
   },
   {
@@ -20268,9 +20268,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:248:20853",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
+   "verifiedNote": "L-G triage 2026-10-30: board conflict — GAP-ST-W draws the save-and-leave pending state as a footer line ('Saving {Screen}… destination: {Dest}'), B8-SAVING 248:20853 draws the same state as a dialog; the compared B8-SAVING dialog is the one built (lane-E decision), so these destination variants close on it. | Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
    "tier": "P3"
   },
   {
@@ -20279,9 +20279,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:277:28233",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared.",
+   "verifiedNote": "L-G triage 2026-10-30: variant of 277:28233 (compared): the same save-failed dialog with another screen/destination name taken from the nav; no other difference on the board. | Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared.",
    "tier": "P3"
   },
   {
@@ -20302,9 +20302,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:248:20853",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
+   "verifiedNote": "L-G triage 2026-10-30: board conflict — GAP-ST-W draws the save-and-leave pending state as a footer line ('Saving {Screen}… destination: {Dest}'), B8-SAVING 248:20853 draws the same state as a dialog; the compared B8-SAVING dialog is the one built (lane-E decision), so these destination variants close on it. | Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
    "tier": "P3"
   },
   {
@@ -20313,9 +20313,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:277:28233",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared.",
+   "verifiedNote": "L-G triage 2026-10-30: variant of 277:28233 (compared): the same save-failed dialog with another screen/destination name taken from the nav; no other difference on the board. | Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared.",
    "tier": "P3"
   },
   {
@@ -20336,9 +20336,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:248:20853",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
+   "verifiedNote": "L-G triage 2026-10-30: board conflict — GAP-ST-W draws the save-and-leave pending state as a footer line ('Saving {Screen}… destination: {Dest}'), B8-SAVING 248:20853 draws the same state as a dialog; the compared B8-SAVING dialog is the one built (lane-E decision), so these destination variants close on it. | Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
    "tier": "P3"
   },
   {
@@ -20347,9 +20347,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:277:28233",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared.",
+   "verifiedNote": "L-G triage 2026-10-30: variant of 277:28233 (compared): the same save-failed dialog with another screen/destination name taken from the nav; no other difference on the board. | Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared.",
    "tier": "P3"
   },
   {
@@ -20370,9 +20370,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:248:20853",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
+   "verifiedNote": "L-G triage 2026-10-30: board conflict — GAP-ST-W draws the save-and-leave pending state as a footer line ('Saving {Screen}… destination: {Dest}'), B8-SAVING 248:20853 draws the same state as a dialog; the compared B8-SAVING dialog is the one built (lane-E decision), so these destination variants close on it. | Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
    "tier": "P3"
   },
   {
@@ -20381,9 +20381,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:277:28233",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared.",
+   "verifiedNote": "L-G triage 2026-10-30: variant of 277:28233 (compared): the same save-failed dialog with another screen/destination name taken from the nav; no other difference on the board. | Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared.",
    "tier": "P3"
   },
   {
@@ -20404,9 +20404,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:248:20853",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
+   "verifiedNote": "L-G triage 2026-10-30: board conflict — GAP-ST-W draws the save-and-leave pending state as a footer line ('Saving {Screen}… destination: {Dest}'), B8-SAVING 248:20853 draws the same state as a dialog; the compared B8-SAVING dialog is the one built (lane-E decision), so these destination variants close on it. | Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
    "tier": "P3"
   },
   {
@@ -20415,9 +20415,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:277:28233",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared.",
+   "verifiedNote": "L-G triage 2026-10-30: variant of 277:28233 (compared): the same save-failed dialog with another screen/destination name taken from the nav; no other difference on the board. | Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared.",
    "tier": "P3"
   },
   {
@@ -20438,9 +20438,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:248:20853",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
+   "verifiedNote": "L-G triage 2026-10-30: board conflict — GAP-ST-W draws the save-and-leave pending state as a footer line ('Saving {Screen}… destination: {Dest}'), B8-SAVING 248:20853 draws the same state as a dialog; the compared B8-SAVING dialog is the one built (lane-E decision), so these destination variants close on it. | Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
    "tier": "P3"
   },
   {
@@ -20449,9 +20449,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:277:28233",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared.",
+   "verifiedNote": "L-G triage 2026-10-30: variant of 277:28233 (compared): the same save-failed dialog with another screen/destination name taken from the nav; no other difference on the board. | Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared.",
    "tier": "P3"
   },
   {
@@ -20472,9 +20472,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:248:20853",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
+   "verifiedNote": "L-G triage 2026-10-30: board conflict — GAP-ST-W draws the save-and-leave pending state as a footer line ('Saving {Screen}… destination: {Dest}'), B8-SAVING 248:20853 draws the same state as a dialog; the compared B8-SAVING dialog is the one built (lane-E decision), so these destination variants close on it. | Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
    "tier": "P3"
   },
   {
@@ -20483,9 +20483,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:277:28233",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared.",
+   "verifiedNote": "L-G triage 2026-10-30: variant of 277:28233 (compared): the same save-failed dialog with another screen/destination name taken from the nav; no other difference on the board. | Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared.",
    "tier": "P3"
   },
   {
@@ -20506,9 +20506,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:248:20853",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
+   "verifiedNote": "L-G triage 2026-10-30: board conflict — GAP-ST-W draws the save-and-leave pending state as a footer line ('Saving {Screen}… destination: {Dest}'), B8-SAVING 248:20853 draws the same state as a dialog; the compared B8-SAVING dialog is the one built (lane-E decision), so these destination variants close on it. | Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
    "tier": "P3"
   },
   {
@@ -20517,9 +20517,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:277:28233",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared.",
+   "verifiedNote": "L-G triage 2026-10-30: variant of 277:28233 (compared): the same save-failed dialog with another screen/destination name taken from the nav; no other difference on the board. | Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared.",
    "tier": "P3"
   },
   {
@@ -20540,9 +20540,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:248:20853",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
+   "verifiedNote": "L-G triage 2026-10-30: board conflict — GAP-ST-W draws the save-and-leave pending state as a footer line ('Saving {Screen}… destination: {Dest}'), B8-SAVING 248:20853 draws the same state as a dialog; the compared B8-SAVING dialog is the one built (lane-E decision), so these destination variants close on it. | Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
    "tier": "P3"
   },
   {
@@ -20551,9 +20551,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:277:28233",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared.",
+   "verifiedNote": "L-G triage 2026-10-30: variant of 277:28233 (compared): the same save-failed dialog with another screen/destination name taken from the nav; no other difference on the board. | Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared.",
    "tier": "P3"
   },
   {
@@ -20574,9 +20574,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:248:20853",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
+   "verifiedNote": "L-G triage 2026-10-30: board conflict — GAP-ST-W draws the save-and-leave pending state as a footer line ('Saving {Screen}… destination: {Dest}'), B8-SAVING 248:20853 draws the same state as a dialog; the compared B8-SAVING dialog is the one built (lane-E decision), so these destination variants close on it. | Built, not compared directly (loading state, no inheritance). GAP-ST-W draws saving as a footer line; the B8-SAVING dialog (248:20853) is used for every screen — one shape for one state. Owner/lead to confirm.",
    "tier": "P3"
   },
   {
@@ -20585,9 +20585,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:277:28233",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared.",
+   "verifiedNote": "L-G triage 2026-10-30: variant of 277:28233 (compared): the same save-failed dialog with another screen/destination name taken from the nav; no other difference on the board. | Built, not compared directly (error state, no inheritance); same component and copy as 277:28233, which was compared.",
    "tier": "P3"
   },
   {
@@ -20644,9 +20644,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:server-client-comment-anchor",
    "verified": "no",
-   "verifiedNote": "no phone pin placement, pan, comments sheet on the client page",
+   "verifiedNote": "L-G triage 2026-10-30: phone/tablet pin placement, pan and the pinned-comments sheet need anchored client comments (an anchor field on client review comments — full server chain + migration, lane-F plan F5.08). Filed REQUESTS G-2. | no phone pin placement, pan, comments sheet on the client page",
    "tier": "P3"
   },
   {
@@ -20655,9 +20655,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:server-client-comment-anchor",
    "verified": "no",
-   "verifiedNote": "no phone pin placement, pan, comments sheet on the client page",
+   "verifiedNote": "L-G triage 2026-10-30: phone/tablet pin placement, pan and the pinned-comments sheet need anchored client comments (an anchor field on client review comments — full server chain + migration, lane-F plan F5.08). Filed REQUESTS G-2. | no phone pin placement, pan, comments sheet on the client page",
    "tier": "P3"
   },
   {
@@ -20666,9 +20666,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:server-client-comment-anchor",
    "verified": "no",
-   "verifiedNote": "no phone pin placement, pan, comments sheet on the client page",
+   "verifiedNote": "L-G triage 2026-10-30: phone/tablet pin placement, pan and the pinned-comments sheet need anchored client comments (an anchor field on client review comments — full server chain + migration, lane-F plan F5.08). Filed REQUESTS G-2. | no phone pin placement, pan, comments sheet on the client page",
    "tier": "P3"
   },
   {
@@ -20677,9 +20677,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:server-client-comment-anchor",
    "verified": "no",
-   "verifiedNote": "no phone pin placement, pan, comments sheet on the client page",
+   "verifiedNote": "L-G triage 2026-10-30: phone/tablet pin placement, pan and the pinned-comments sheet need anchored client comments (an anchor field on client review comments — full server chain + migration, lane-F plan F5.08). Filed REQUESTS G-2. | no phone pin placement, pan, comments sheet on the client page",
    "tier": "P3"
   },
   {
@@ -20688,9 +20688,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:server-client-comment-anchor",
    "verified": "no",
-   "verifiedNote": "no phone pin placement, pan, comments sheet on the client page",
+   "verifiedNote": "L-G triage 2026-10-30: phone/tablet pin placement, pan and the pinned-comments sheet need anchored client comments (an anchor field on client review comments — full server chain + migration, lane-F plan F5.08). Filed REQUESTS G-2. | no phone pin placement, pan, comments sheet on the client page",
    "tier": "P3"
   },
   {
@@ -20699,9 +20699,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:server-client-comment-anchor",
    "verified": "no",
-   "verifiedNote": "no phone pin placement, pan, comments sheet on the client page",
+   "verifiedNote": "L-G triage 2026-10-30: phone/tablet pin placement, pan and the pinned-comments sheet need anchored client comments (an anchor field on client review comments — full server chain + migration, lane-F plan F5.08). Filed REQUESTS G-2. | no phone pin placement, pan, comments sheet on the client page",
    "tier": "P3"
   },
   {
@@ -20710,9 +20710,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:server-client-comment-anchor",
    "verified": "no",
-   "verifiedNote": "no phone pin placement, pan, comments sheet on the client page",
+   "verifiedNote": "L-G triage 2026-10-30: phone/tablet pin placement, pan and the pinned-comments sheet need anchored client comments (an anchor field on client review comments — full server chain + migration, lane-F plan F5.08). Filed REQUESTS G-2. | no phone pin placement, pan, comments sheet on the client page",
    "tier": "P3"
   },
   {
@@ -20721,9 +20721,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:server-client-comment-anchor",
    "verified": "no",
-   "verifiedNote": "no phone pin placement, pan, comments sheet on the client page",
+   "verifiedNote": "L-G triage 2026-10-30: phone/tablet pin placement, pan and the pinned-comments sheet need anchored client comments (an anchor field on client review comments — full server chain + migration, lane-F plan F5.08). Filed REQUESTS G-2. | no phone pin placement, pan, comments sheet on the client page",
    "tier": "P3"
   },
   {
@@ -20732,9 +20732,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:server-client-comment-anchor",
    "verified": "no",
-   "verifiedNote": "no phone pin placement, pan, comments sheet on the client page",
+   "verifiedNote": "L-G triage 2026-10-30: phone/tablet pin placement, pan and the pinned-comments sheet need anchored client comments (an anchor field on client review comments — full server chain + migration, lane-F plan F5.08). Filed REQUESTS G-2. | no phone pin placement, pan, comments sheet on the client page",
    "tier": "P3"
   },
   {
@@ -20743,9 +20743,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:server-client-comment-anchor",
    "verified": "no",
-   "verifiedNote": "no phone pin placement, pan, comments sheet on the client page",
+   "verifiedNote": "L-G triage 2026-10-30: phone/tablet pin placement, pan and the pinned-comments sheet need anchored client comments (an anchor field on client review comments — full server chain + migration, lane-F plan F5.08). Filed REQUESTS G-2. | no phone pin placement, pan, comments sheet on the client page",
    "tier": "P3"
   },
   {
@@ -20787,9 +20787,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:server-client-comment-anchor",
    "verified": "no",
-   "verifiedNote": "no phone pin placement, pan, comments sheet on the client page",
+   "verifiedNote": "L-G triage 2026-10-30: phone/tablet pin placement, pan and the pinned-comments sheet need anchored client comments (an anchor field on client review comments — full server chain + migration, lane-F plan F5.08). Filed REQUESTS G-2. | no phone pin placement, pan, comments sheet on the client page",
    "tier": "P3"
   },
   {
@@ -20798,9 +20798,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:server-client-comment-anchor",
    "verified": "no",
-   "verifiedNote": "no phone pin placement, pan, comments sheet on the client page",
+   "verifiedNote": "L-G triage 2026-10-30: phone/tablet pin placement, pan and the pinned-comments sheet need anchored client comments (an anchor field on client review comments — full server chain + migration, lane-F plan F5.08). Filed REQUESTS G-2. | no phone pin placement, pan, comments sheet on the client page",
    "tier": "P3"
   },
   {
@@ -20820,9 +20820,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:request-E-12",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Zero-selection-configure) not walked.",
+   "verifiedNote": "L-G triage 2026-10-30: the '‹ Back to submissions · {Form} / {View}' band lives in the Inspector/shell (REQUESTS E-12, L-B + lead), not a settings path; Configure itself selects the form and opens Content/Fields. | Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Zero-selection-configure) not walked.",
    "tier": "P3"
   },
   {
@@ -20831,9 +20831,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -20842,9 +20842,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -20853,9 +20853,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -20864,9 +20864,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -20875,9 +20875,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -20886,9 +20886,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -20897,9 +20897,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -20908,9 +20908,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -20919,9 +20919,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -20930,9 +20930,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -20941,9 +20941,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -20952,9 +20952,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -20963,9 +20963,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -20974,9 +20974,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -20985,9 +20985,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -20996,9 +20996,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "inheritsFrom": "280:70080",
    "tier": "P3"
   },
@@ -21008,9 +21008,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "inheritsFrom": "280:70169",
    "tier": "P3"
   },
@@ -21020,9 +21020,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -21031,9 +21031,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "inheritsFrom": "280:70335",
    "tier": "P3"
   },
@@ -21043,9 +21043,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "inheritsFrom": "280:70392",
    "tier": "P3"
   },
@@ -21055,9 +21055,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -21066,9 +21066,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -21077,9 +21077,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -21088,9 +21088,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "inheritsFrom": "280:70688",
    "tier": "P3"
   },
@@ -21100,9 +21100,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -21111,9 +21111,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -21122,9 +21122,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -21133,9 +21133,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -21144,9 +21144,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -21155,9 +21155,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "inheritsFrom": "280:71195",
    "tier": "P3"
   },
@@ -21167,9 +21167,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "inheritsFrom": "280:70080",
    "tier": "P3"
   },
@@ -21179,9 +21179,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "inheritsFrom": "280:70169",
    "tier": "P3"
   },
@@ -21191,9 +21191,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -21202,9 +21202,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "inheritsFrom": "280:70335",
    "tier": "P3"
   },
@@ -21214,9 +21214,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "inheritsFrom": "280:70392",
    "tier": "P3"
   },
@@ -21226,9 +21226,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -21237,9 +21237,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -21248,9 +21248,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -21259,9 +21259,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "inheritsFrom": "280:70688",
    "tier": "P3"
   },
@@ -21271,9 +21271,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -21282,9 +21282,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -21293,9 +21293,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -21304,9 +21304,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -21315,9 +21315,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -21326,9 +21326,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "inheritsFrom": "280:71195",
    "tier": "P3"
   },
@@ -21338,9 +21338,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "inheritsFrom": "280:70080",
    "tier": "P3"
   },
@@ -21350,9 +21350,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "inheritsFrom": "280:70169",
    "tier": "P3"
   },
@@ -21362,9 +21362,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -21373,9 +21373,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "inheritsFrom": "280:70335",
    "tier": "P3"
   },
@@ -21385,9 +21385,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "inheritsFrom": "280:70392",
    "tier": "P3"
   },
@@ -21397,9 +21397,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -21408,9 +21408,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -21419,9 +21419,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -21430,9 +21430,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "inheritsFrom": "280:70688",
    "tier": "P3"
   },
@@ -21442,9 +21442,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -21453,9 +21453,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -21464,9 +21464,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -21475,9 +21475,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -21486,9 +21486,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -21497,9 +21497,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "inheritsFrom": "280:71195",
    "tier": "P3"
   },
@@ -21509,9 +21509,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "inheritsFrom": "280:70080",
    "tier": "P3"
   },
@@ -21521,9 +21521,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "inheritsFrom": "280:70169",
    "tier": "P3"
   },
@@ -21533,9 +21533,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -21544,9 +21544,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "inheritsFrom": "280:70335",
    "tier": "P3"
   },
@@ -21556,9 +21556,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "inheritsFrom": "280:70392",
    "tier": "P3"
   },
@@ -21568,9 +21568,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -21579,9 +21579,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -21590,9 +21590,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -21601,9 +21601,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "inheritsFrom": "280:70688",
    "tier": "P3"
   },
@@ -21613,9 +21613,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -21624,9 +21624,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -21635,9 +21635,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -21646,9 +21646,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -21657,9 +21657,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -21668,9 +21668,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "inheritsFrom": "280:71195",
    "tier": "P3"
   },
@@ -21680,9 +21680,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "tier": "P3"
   },
   {
@@ -21691,9 +21691,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "inheritsFrom": "280:75919",
    "tier": "P3"
   },
@@ -21703,9 +21703,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:owner-approval-code",
    "verified": "no",
-   "verifiedNote": "OTP approval per device origin; needs R-13 + phone placement",
+   "verifiedNote": "L-G triage 2026-10-30: client 6-digit approval code (R-13) needs the owner's call (code for every approval or invited reviewers only) and a new Prisma table + migration (lane-F plan 'Later slices'); no migration in this lane. Filed REQUESTS G-1. | OTP approval per device origin; needs R-13 + phone placement",
    "inheritsFrom": "280:75919",
    "tier": "P3"
   },

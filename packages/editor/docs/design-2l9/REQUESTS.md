@@ -198,3 +198,8 @@ B-28. ~~**L-B → lead (FYI) · `src/engine/` touched on owner-approved models**
 ## L-B round 25 (2026-10-30)
 
 B-29. ~~**L-B → lead · `inspector/components/InspectorHeader.tsx` (context line)** · S22 `255:92819`: on a locked element the board's context line reads "Read only · {layer} is locked" (instead of "Editing Desktop · Default state"). L-B moved the lock card into the tab body ("Editing unavailable" · "This element is locked. Inspecting it through Layers keeps its values visible." · primary "Unlock", StatusLine); the header line is yours. Until then the "🔒 Locked" mark (StatusMarks) above the tabs carries the state.~~ · closed round 26 (lead cleared L-B for InspectorHeader): built — 'Read only · {name} is locked' for the element's own lock.
+
+## L-G (site delivery, branch `feat/design-2l9-lane-g`) — 2026-10-30
+
+G-1. **L-G → owner + server (lead) · client approval code (R-13)** · GAP-RV-*-code…offline (28) and GAP-RVC-* (78), Play F5.20–F5.33 · the 6-digit approval code needs the owner's call (every approval, or invited reviewers only) and a `ReviewApprovalCode` table + migration; contract already written in `docs/superpowers/plans/2026-10-26-design-2l9-lane-f.md` §Later slices. Rows carry `blocked:owner-approval-code`.
+G-2. **L-G → server (lead) · anchored client comments** · GAP-RV-Phone-* placement / pan / sheet (20), Play F5.08 · pins need an anchor (element id + offset + device) on client review comments — shared schema → service → router → `review-client.tsx`, plus a migration. Rows carry `blocked:server-client-comment-anchor`.
