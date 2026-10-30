@@ -196,8 +196,11 @@ export const ComponentRow: React.FC<ComponentRowProps> = ({ composer, elementId 
           open={confirm === "reset"}
           onClose={() => setConfirm(null)}
           onConfirm={reset}
-          title={`Reset ${component.name} to main component?`}
-          message={`The ${overrides} override${overrides === 1 ? "" : "s"} on this instance will be discarded.`}
+          /* 2L9 241:17060. The board's "(including Tablet, Mobile and :hover)"
+             is left out: the instance's override list holds element paths,
+             not the breakpoint or state each was made in. */
+          title="Reset this instance?"
+          message={`Its ${overrides} override${overrides === 1 ? "" : "s"} will be removed. Content from the main component replaces them.`}
           confirmLabel="Reset"
           testId="instance-reset-confirm"
         />

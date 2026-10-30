@@ -187,8 +187,8 @@ describe("ComponentRow — board 26", () => {
     renderRow(makeComposer({ component: makeComponent(), instance: withOverrides(2), resetInstance }));
     fireEvent.click(screen.getByTestId("component-reset"));
     expect(resetInstance).not.toHaveBeenCalled();
-    expect(screen.getByText("Reset Reservation banner to main component?")).toBeTruthy();
-    expect(screen.getByText("The 2 overrides on this instance will be discarded.")).toBeTruthy();
+    expect(screen.getByText("Reset this instance?")).toBeTruthy();
+    expect(screen.getByText("Its 2 overrides will be removed. Content from the main component replaces them.")).toBeTruthy();
     fireEvent.click(screen.getByTestId("instance-reset-confirm-confirm"));
     expect(resetInstance).toHaveBeenCalledWith("el-1");
   });

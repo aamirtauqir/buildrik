@@ -2846,8 +2846,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "probe-compared 2026-10-30 (case layers-tree, row selected then its eye; board shots/147-78900.png), Layers side: footer '8 layers · 1 selected · Dimmed', the row's name greyed with the eye-off, and — fixed (REQUESTS B-20) — no dimmed note under the tree any more: the Inspector's 'Dimmed in editor only · Show normally' banner (L-B) carries it, and its Show normally (LAYER_SHOW_NORMALLY_REQUESTED) un-dims through the same write as the row's eye (useLayerActions setDimmed; test LayersPanel.showNormally). Open: the board's selected pill stops short of the eye-off, which sits outside it (live the icon is inside the pill). | Prior: Lane L-B round 11: the Inspector half is built — 'Dimmed in editor only' / '{Layer} is still included on the live site.' / Show normally / 'Hide on live site…' above every tab's body (DimmedNotice), driven by the canvas node's data-hidden (or the stored Layers set); compared side by side with the board PNG (probe ?type=text&dimmed=1). 'Show normally' emits LAYER_SHOW_NORMALLY_REQUESTED; Layers must listen (REQUESTS B-20, L-A) — until then it reaches no one. L-A half: the Layers note can go once B-20 lands; the selected pill vs eye-off is L-A's. Earlier: probe-compared 2026-10-30 (case layers-tree, row selected then its eye): footer '8 layers · 1 selected · Dimmed', the row's name greyed with the eye-off.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B round 13, end to end in the probe (new case layers-dimmed-inspector: the real Layers tab and the Inspector on one composer): Layers eye on the heading → the canvas node carries data-hidden=true and the Inspector shows 'Dimmed in editor only' / 'Heading is still included on the live site.' / Show normally / 'Hide on live site…'; Show normally → Layers un-dims it (B-20, L-A dd790c3f9), data-hidden=false, the notice goes. L-A dropped the Layers note. probe-compared 2026-10-30 (case layers-tree, row selected then its eye; board shots/147-78900.png), Layers side: footer '8 layers · 1 selected · Dimmed', the row's name greyed with the eye-off, and — fixed (REQUESTS B-20) — no dimmed note under the tree any more: the Inspector's 'Dimmed in editor only · Show normally' banner (L-B) carries it, and its Show normally (LAYER_SHOW_NORMALLY_REQUESTED) un-dims through the same write as the row's eye (useLayerActions setDimmed; test LayersPanel.showNormally). Open: the board's selected pill stops short of the eye-off, which sits outside it (live the icon is inside the pill). | Prior: Lane L-B round 11: the Inspector half is built — 'Dimmed in editor only' / '{Layer} is still included on the live site.' / Show normally / 'Hide on live site…' above every tab's body (DimmedNotice), driven by the canvas node's data-hidden (or the stored Layers set); compared side by side with the board PNG (probe ?type=text&dimmed=1). 'Show normally' emits LAYER_SHOW_NORMALLY_REQUESTED; Layers must listen (REQUESTS B-20, L-A) — until then it reaches no one. L-A half: the Layers note can go once B-20 lands; the selected pill vs eye-off is L-A's. Earlier: probe-compared 2026-10-30 (case layers-tree, row selected then its eye): footer '8 layers · 1 selected · Dimmed', the row's name greyed with the eye-off.",
    "tier": "P1"
   },
   {
@@ -4989,7 +4989,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "probe-compared 2026-10-27 for content: 'Interaction actions' card title, Duplicate · Disable · Delete · 'Close menu' — now actually centred (its tw:!justify-center did nothing on MenuItem's label span; fixed round 2). Placement beside the column over the canvas (beside='.layout-shell__inspector') cannot be shown in the probe (no shell) — open until the lead's live walk.",
+   "verifiedNote": "Lane L-B round 13, placement measured in the probe with the panel in a `.layout-shell__inspector` column at the 1440 frame's right edge (new ?shell=1): the Interaction actions menu opens beside the column — right edge 9 px clear of it (menu x 891–1131, column at 1140), 240 wide, as the board draws (board ≈ 7 px at 1024 → 9–10 px at 1440; 171 → 240 wide). Gap: the board tops the menu level with the tab strip (≈ y 180 at 1440×900), live tops it on its trigger ('More…', y 204 in the probe's shorter layout — ≈ 128 px lower than the board in a real column). Popover `beside` aligns to the trigger by design (colour picker, board 4428:142922); changing it is chrome-ui's. Content matched in round 2. probe-compared 2026-10-27 for content: 'Interaction actions' card title, Duplicate · Disable · Delete · 'Close menu' — now actually centred (its tw:!justify-center did nothing on MenuItem's label span; fixed round 2). Placement beside the column over the canvas (beside='.layout-shell__inspector') cannot be shown in the probe (no shell) — open until the lead's live walk.",
    "tier": "P1"
   },
   {
@@ -5170,7 +5170,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Lane L-B A8 (built, not compared): Reset confirms with 'Reset {name} to main component?' / 'The {n} overrides on this instance will be discarded.'. Open: the board's per-property consequence list.",
+   "verifiedNote": "Lane L-B round 13, board PNG recropped (the dialog sits over the canvas): 'Reset this instance?' / 'Its 3 overrides (including Tablet, Mobile and :hover) will be removed. Content from the main component replaces them.' · Cancel · Reset. The confirm now reads 'Reset this instance?' / 'Its {n} override(s) will be removed. Content from the main component replaces them.' (was 'Reset {name} to main component?' / '…will be discarded.'). Left out: '(including Tablet, Mobile and :hover)' — the instance's override list holds element paths, not the breakpoint or state each was made in. Not walked live: the probe's instance has no recorded overrides, so Reset stays disabled there (unit-tested).",
    "tier": "P1"
   },
   {
@@ -6351,8 +6351,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Lane L-B P1 round 6, board PNG fetched: the board draws renaming as an 'Element name' confirm card on the Style tab (Name field, 'Editor label only. DOM ID … and tag H1 are unchanged. Enter commits; Escape restores …', 'Rename to …', 'Cancel'). The name edit lives in the header (InspectorHeader, lead) — open.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B round 13 (lead cleared InspectorHeader), side by side with the board PNG (probe ?type=heading&attrs={id:'hero-title'}, double-click the header name, type 'Opening headline'): the tab body becomes the rename card — 'Element name', Name field, 'Editor label only. DOM ID \"hero-title\" and tag H2 are unchanged. Enter commits; Escape restores “Heading”.' (the element's real id and tag; the id clause goes when it has none), full-width 'Rename to Opening headline' (disabled until the name changes) and Cancel. Enter commits through renameElement (the Layers writer); Escape and Cancel close without renaming. One rename path: the header's inline edit is gone — double-click / Enter / F2 on the name opens this card (InspectorHeader itself needed no edit; ElementNameField opens the subview).",
    "tier": "P1"
   },
   {
@@ -6450,9 +6450,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
+   "authority": "open:owner-class-first",
    "verified": "drift-open",
-   "verifiedNote": "Lane L-B P1 round 6, board PNG fetched: the receipt '2 styles copied · This element only · Desktop / Default' is the Copy style element action's toast (editor/shared/elementActions.ts, outside L-B's paths); the Selector row is class-first (owner decision pending). Open.",
+   "verifiedNote": "Lane L-B round 13: the receipt is not in elementActions.ts (that row only runs the copy-style command) but in the lead-owned shell hook useClipboardToasts — REQUESTS B-22 gives the exact text from what the command copies: the one element's own base styles, so '{n} style(s) copied · This element only · Desktop / Default'. Left open as the lead asked: the Selector row's class-first part (owner decision). Lane L-B P1 round 6, board PNG fetched: the receipt '2 styles copied · This element only · Desktop / Default' is the Copy style element action's toast (editor/shared/elementActions.ts, outside L-B's paths); the Selector row is class-first (owner decision pending). Open.",
    "tier": "P1"
   },
   {
