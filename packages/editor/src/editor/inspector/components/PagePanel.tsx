@@ -169,8 +169,8 @@ export function PagePanel({ composer }: PagePanelProps) {
   return (
     <InspectorFieldContext.Provider value={fieldContext}>
       <div className="bdi-panel" data-testid="inspector-page-panel" data-readonly={readOnly || undefined}>
-        {appliedTemplate ? <TemplateAppliedBanner name={appliedTemplate} pageName={page.name} onDismiss={dismissTemplate} /> : null}
         <PageHeader composer={composer} pageName={page.name} pageId={page.id} breakpoint={breakpoint} />
+        {appliedTemplate ? <TemplateAppliedBanner name={appliedTemplate} pageName={page.name} onDismiss={dismissTemplate} /> : null}
         <div className="bdi-panel-scroll">
           {subview?.kind === "font-picker" && subview.elementId === root.id ? (
             <ChooseFont
@@ -302,25 +302,18 @@ function PageHeader({ composer, pageName, pageId, breakpoint }: { composer: Comp
   );
 }
 
-/** 2L9 S07 — shown for 30 minutes after a template is applied, until dismissed. */
+/** 2L9 S07 — under the page's header for 30 minutes after a template is
+ *  applied, until dismissed: a titled group with a full-width Dismiss. */
 function TemplateAppliedBanner({ name, pageName, onDismiss }: { name: string; pageName: string; onDismiss: () => void }) {
   return (
-    <div role="status" aria-live="polite" className="tw:px-3 tw:pt-3" data-testid="inspector-template-applied">
-      <div className="tw:flex tw:w-full tw:flex-col tw:items-start tw:gap-1.5 tw:rounded-lg tw:bg-[var(--bk-success-tint)] tw:px-3 tw:py-2.5 tw:text-left">
-        <h3 className="tw:m-0 tw:text-[12px] tw:font-semibold tw:text-[var(--bk-success-text)]">Template applied</h3>
-        <p className="tw:m-0 tw:text-[11px] tw:leading-normal tw:text-[var(--bk-ink-soft)]">
-          The {name} template was applied to {pageName}.
-        </p>
-        <Button
-          size="xs"
-          color="light"
-          onClick={onDismiss}
-          data-testid="inspector-template-dismiss"
-          className="tw:h-6 tw:border-0 tw:bg-transparent tw:px-0 tw:text-[11px] tw:font-medium tw:text-[var(--bk-accent-text)] tw:hover:bg-transparent tw:hover:underline"
-        >
-          Dismiss notice
-        </Button>
-      </div>
+    <div role="status" aria-live="polite" className="tw:flex tw:flex-col tw:gap-2 tw:px-3 tw:pb-2 tw:pt-3" data-testid="inspector-template-applied">
+      <h3 className="tw:m-0 tw:text-[13px] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]">Template applied</h3>
+      <p className="tw:m-0 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)]">
+        The {name} template was applied to {pageName}.
+      </p>
+      <Button color="light" size="xs" onClick={onDismiss} data-testid="inspector-template-dismiss" className={WIDE_BUTTON}>
+        Dismiss notice
+      </Button>
     </div>
   );
 }

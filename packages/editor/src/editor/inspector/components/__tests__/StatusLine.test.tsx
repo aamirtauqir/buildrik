@@ -32,6 +32,8 @@ describe("StatusLine", () => {
     c.history.flushPending();
     render(<StatusLine composer={c} elementId={el.getId()} locked conflict={idle} />);
     expect(screen.getByTestId("inspector-status-line")).toHaveTextContent("Locked — unlock to edit");
+    /* 2L9 147:78110: a full-width action naming the layer. */
+    expect(screen.getByRole("button", { name: "Unlock Heading" })).toBeInTheDocument();
     fireEvent.click(screen.getByTestId("inspector-unlock"));
     expect(c.elements.getElement(el.getId())!.isLocked()).toBe(false);
     c.history.flushPending();
@@ -47,7 +49,7 @@ describe("StatusLine", () => {
     expect(resolve).toHaveBeenCalled();
   });
 
-  it("board 29: the conflict line is warning-tinted; the locked line is not", () => {
+  it("board 29: the conflict line is warning-tinted; the locked block is not tinted (147:78110)", () => {
     const { unmount } = render(<StatusLine composer={null} elementId="x" locked={false} conflict={{ pending: true, resolve: vi.fn() }} />);
     let line = screen.getByTestId("inspector-status-line");
     expect(line).toHaveAttribute("data-tone", "warning");
@@ -55,11 +57,7 @@ describe("StatusLine", () => {
     unmount();
     render(<StatusLine composer={null} elementId="x" locked conflict={idle} />);
     line = screen.getByTestId("inspector-status-line");
-    expect(line).toHaveAttribute("data-tone", "muted");
+    expect(line).toHaveAttribute("data-tone", "locked");
     expect(line.className).not.toContain("--bk-warning-tint");
-    /* Boards 23 / 29 pad the line 6 · 16; the 24px action gives its extra 8 back. */
-    expect(line.className).toContain("tw:px-4");
-    expect(line.className).toContain("tw:py-1.5");
-    expect(screen.getByTestId("inspector-unlock").className).toContain("tw:-my-1");
   });
 });
