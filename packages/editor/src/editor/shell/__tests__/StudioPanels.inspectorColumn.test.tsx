@@ -597,3 +597,41 @@ describe("StudioPanels — the Show outlines preference (A-12)", () => {
     expect(canvasProps.current.showOutlines).toBe(true);
   });
 });
+
+describe("StudioPanels — ‹ Back to Issues after Fix › (A-39, Play F4.02 303:32650)", () => {
+  const ISSUES = (onBack: () => void) => <div data-testid="issues-panel-stub" onClick={onBack} />;
+  function mountAt(issuesOpen: boolean, selected: string | null, composer: FakeComposer) {
+    return (
+      <Harness
+        composer={composer}
+        issuesOpen={issuesOpen}
+        renderIssuesPanel={ISSUES}
+        onCloseIssues={() => {}}
+        selectedElement={selected ? ({ id: selected, type: "container" } as never) : null}
+      />
+    );
+  }
+
+  it("a Fix › that selects an element heads the Inspector with the way back, which reopens Issues", () => {
+    const composer = makeComposer();
+    const open = vi.fn();
+    composer.on(EVENTS.UI_OPEN_ISSUES, open);
+    const { rerender } = render(mountAt(true, null, composer));
+    rerender(mountAt(false, "list-1", composer));
+    fireEvent.click(screen.getByRole("button", { name: "‹ Back to Issues" }));
+    expect(open).toHaveBeenCalledTimes(1);
+    expect(screen.queryByTestId("inspector-back-to-issues")).toBeNull();
+  });
+
+  it("a plain close draws nothing, and selecting something else drops the row", () => {
+    const composer = makeComposer();
+    const { rerender } = render(mountAt(true, "a", composer));
+    rerender(mountAt(false, "a", composer));
+    expect(screen.queryByTestId("inspector-back-to-issues")).toBeNull();
+    rerender(mountAt(true, "a", composer));
+    rerender(mountAt(false, "b", composer));
+    expect(screen.getByTestId("inspector-back-to-issues")).toBeInTheDocument();
+    rerender(mountAt(false, "c", composer));
+    expect(screen.queryByTestId("inspector-back-to-issues")).toBeNull();
+  });
+});

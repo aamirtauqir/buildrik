@@ -101,3 +101,21 @@ describe("KeyboardCheatSheet — the board's search", () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 });
+
+describe("KeyboardCheatSheet · Show keys for (263:255899 / 263:256463)", () => {
+  it("switches every chip between the macOS and Windows spellings", () => {
+    const plat = Object.getOwnPropertyDescriptor(Navigator.prototype, "platform");
+    Object.defineProperty(window.navigator, "platform", { value: "MacIntel", configurable: true });
+    try {
+      open();
+      expect(screen.getByRole("button", { name: "macOS" })).toHaveAttribute("aria-pressed", "true");
+      expect(screen.getByTestId("kb-badge-undo")).toHaveTextContent(formatChord("ctrl+z", true));
+      fireEvent.click(screen.getByRole("button", { name: "Windows" }));
+      expect(screen.getByRole("button", { name: "Windows" })).toHaveAttribute("aria-pressed", "true");
+      expect(screen.getByTestId("kb-badge-undo")).toHaveTextContent(formatChord("ctrl+z", false));
+    } finally {
+      if (plat) Object.defineProperty(Navigator.prototype, "platform", plat);
+      else delete (window.navigator as { platform?: string }).platform;
+    }
+  });
+});

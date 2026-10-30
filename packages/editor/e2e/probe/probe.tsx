@@ -106,6 +106,7 @@ import { LayersLoadError, LayersNoResults } from "@/editor/panels/layers/compone
 import { Row as InsertRow } from "@/editor/sidebar/tabs/build/components/GroupSection";
 import { BuildTab } from "@/editor/sidebar/tabs/build/BuildTab";
 import { LinkSection } from "@/editor/inspector/sections/LinkSection";
+import { CommandPalette } from "@/editor/shell/modals/CommandPalette";
 import { TypeChangeDialog } from "@/editor/cms/TypeChangeDialog";
 import { PagePanel } from "@/editor/inspector/components/PagePanel";
 import type { ComponentDefinition } from "@/shared/types/components";
@@ -4041,6 +4042,12 @@ const CASES: Record<string, () => React.ReactElement> = {
       </ToastProvider>
     );
   },
+  /* 263:250083 / 263:250988 — the ⌘K palette over the Layers composer. */
+  "command-palette": () => (
+    <ToastProvider>
+      <CommandPalette composer={layersComposer()} onClose={() => {}} reviewsEnabled />
+    </ToastProvider>
+  ),
   "issues-filtered": () => (
     <div data-probe="issues-filtered" className="tw:h-203 tw:w-90 tw:bg-white">
       <IssuesPanel

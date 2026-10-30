@@ -68,7 +68,7 @@ export function TypeChangeDialog({ collection, field, to, records, onClose, onAp
 
   if (busy) {
     return (
-      <Modal open onClose={() => undefined} title={busy === "convert" ? `Converting ${field.name}…` : `Clearing ${field.name} values…`} width="xl" testId="cms-type-change-busy">
+      <Modal open onClose={() => undefined} title={busy === "convert" ? `Converting ${field.name}…` : `Clearing ${field.name} values…`} width="xl" placement="panel" testId="cms-type-change-busy">
         {/* 257:51906 / 257:52092. The type itself has already moved (see
             CmsWorkspace.changeType), so the convert copy claims only the values. */}
         <p className="tw:m-0">
@@ -86,7 +86,7 @@ export function TypeChangeDialog({ collection, field, to, records, onClose, onAp
         open
         onClose={onClose}
         title={`Couldn’t change ${field.name}`}
-        width="xl" testId="cms-type-change-failed"
+        width="xl" placement="panel" testId="cms-type-change-failed"
         footer={
           <>
             <Button variant="secondary" onClick={onClose}>
@@ -113,7 +113,7 @@ export function TypeChangeDialog({ collection, field, to, records, onClose, onAp
         open
         onClose={onClose}
         title={`Clear ${field.name} values?`}
-        width="xl" testId="cms-type-change-clear"
+        width="xl" placement="panel" testId="cms-type-change-clear"
         footer={
           <>
             <Button variant="secondary" onClick={onClose}>
@@ -152,7 +152,7 @@ export function TypeChangeDialog({ collection, field, to, records, onClose, onAp
       subtitle={`${n} record${n === 1 ? " has" : "s have"} a value. Preview ${n > PREVIEW_ROWS ? "the first five" : n === 1 ? "it" : "them"} before changing ${from} to ${toLabel}.`}
       kind="form"
       /* 257:51318 — a 720 dialog, like Create collection page. */
-      width="xl"
+      width="xl" placement="panel"
       testId="cms-type-change"
       footer={
         <>
