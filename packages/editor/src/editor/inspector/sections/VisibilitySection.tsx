@@ -30,6 +30,8 @@ const VISIBILITY_BREAKPOINTS = (["desktop", "tablet", "mobile"] as const).map((i
   };
 });
 
+const andList = (xs: readonly string[]) => (xs.length <= 1 ? (xs[0] ?? "") : `${xs.slice(0, -1).join(", ")} and ${xs[xs.length - 1]}`);
+
 export const VisibilitySection: React.FC<VisibilitySectionProps> = ({
   styles: elementStyles,
   onChange,
@@ -83,6 +85,16 @@ export const VisibilitySection: React.FC<VisibilitySectionProps> = ({
           );
         })}
       </div>
+      {/* 2L9 I13: where it is hidden, said. The board adds "stays visible
+          here for editing"; the canvas hides it at that device too
+          (Canvas.css, matching the published page), so the line says what
+          does stay: the selection and its Layers row. */}
+      {hiddenCount > 0 ? (
+        <p className="tw:m-0 tw:pt-1 tw:pb-1 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="visibility-hidden-note">
+          Hidden on the live {andList(VISIBILITY_BREAKPOINTS.filter((bp) => !isVisible(bp.id)).map((bp) => bp.label))} page
+          {hiddenCount > 1 ? "s" : ""}. The canvas hides it there too; it stays selected and listed in Layers.
+        </p>
+      ) : null}
     </Section>
   );
 };

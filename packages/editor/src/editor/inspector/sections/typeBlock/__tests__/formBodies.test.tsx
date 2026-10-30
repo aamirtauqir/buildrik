@@ -100,6 +100,26 @@ describe("Input (board 14)", () => {
     expect(screen.getByRole("button", { name: "Undo" })).toBeInTheDocument();
   });
 
+  it("2L9 F08: a legacy Password field warns, not dismissibly, and Change type opens the type card; Password is not offered to others", () => {
+    mock({ type: "password" });
+    expect(screen.getByTestId("form-field-password-warning")).toHaveTextContent("Existing Password field");
+    expect(screen.getByTestId("form-field-password-warning")).toHaveTextContent("Password values are stored and emailed as plain text");
+    fireEvent.click(screen.getByRole("button", { name: "Change type ›" }));
+    expect(screen.getByRole("menuitem", { name: "Password" })).toBeInTheDocument();
+    cleanup();
+    mock({ type: "text" });
+    fireEvent.click(screen.getByTestId("form-field-type"));
+    expect(screen.queryByRole("menuitem", { name: "Password" })).toBeNull();
+    expect(screen.queryByTestId("form-field-password-warning")).toBeNull();
+  });
+
+  it("2L9 F09: no label — what a screen reader will say, and Add label focuses the Label field", () => {
+    mock({ placeholder: "you@example.com" });
+    expect(screen.getByTestId("form-field-no-label")).toHaveTextContent("No label — screen readers will announce the placeholder");
+    fireEvent.click(screen.getByRole("button", { name: "Add label" }));
+    expect(screen.getByLabelText("Label")).toHaveFocus();
+  });
+
   it("Select keeps its options rows (no board — by analogy)", () => {
     const el = makeMockElement({ id: "e1", type: "select" });
     renderBlock(makeMockComposer({ element: el }), { id: "e1", type: "select" });

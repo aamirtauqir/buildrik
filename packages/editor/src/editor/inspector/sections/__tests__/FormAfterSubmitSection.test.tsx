@@ -102,6 +102,31 @@ describe("Form › AFTER SUBMIT + PROTECTION", () => {
     ));
   });
 
+  it("2L9 F25: an incomplete URL is refused with the board's message, the draft kept, nothing saved", async () => {
+    render(<FormAfterSubmitSection elementId="f" composer={project()} isOpen />);
+    await waitFor(() => screen.getByLabelText("Then"));
+    fireEvent.change(screen.getByLabelText("Then"), { target: { value: "REDIRECT" } });
+    await waitFor(() => screen.getByLabelText("Redirect to"));
+    fireEvent.change(screen.getByLabelText("Redirect to"), { target: { value: "__custom" } });
+    fireEvent.change(screen.getByLabelText("URL"), { target: { value: "https:/fieldwork" } });
+    fireEvent.blur(screen.getByLabelText("URL"));
+    expect(screen.getByTestId("form-redirect-url-error")).toHaveTextContent("Enter a complete https:// or http:// URL.");
+    expect(screen.getByLabelText("URL")).toHaveValue("https:/fieldwork");
+    expect(screen.getByLabelText("URL")).toHaveAttribute("aria-invalid", "true");
+    expect(api.forms.updateBlock.mutate).not.toHaveBeenCalled();
+  });
+
+  it("2L9 F14: offline, the service settings read only, say they need a connection, and the status says so", async () => {
+    const onLine = vi.spyOn(navigator, "onLine", "get").mockReturnValue(false);
+    render(<FormAfterSubmitSection elementId="f" composer={project()} isOpen />);
+    await waitFor(() => screen.getByLabelText("Then"));
+    expect(screen.getByTestId("form-settings-offline")).toHaveTextContent("Needs a connection. You can still edit form fields.");
+    expect(screen.getByTestId("form-settings-status")).toHaveTextContent("Needs a connection");
+    fireEvent.change(screen.getByLabelText("Then"), { target: { value: "REDIRECT" } });
+    expect(api.forms.updateBlock.mutate).not.toHaveBeenCalled();
+    onLine.mockRestore();
+  });
+
   it("I1: switching action away from Redirect (with an existing URL) saves immediately, both fields bundled", async () => {
     api.forms.getBlock.query.mockResolvedValue({
       ...defaults, successAction: "REDIRECT", redirectUrl: "https://example.com/thanks",

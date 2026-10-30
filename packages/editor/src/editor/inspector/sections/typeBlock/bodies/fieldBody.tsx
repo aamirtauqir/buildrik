@@ -29,7 +29,7 @@ import * as React from "react";
 import type { TypeBlockBodyProps } from "@/editor/inspector/config/typeBlocks";
 import type { Element } from "@/engine/elements/Element";
 import { writeElement } from "@/engine/commands/commandOperations";
-import { Menu, MenuItem, Popover, useToast } from "@/editor/chrome-ui";
+import { Button, Menu, MenuItem, Popover, useToast } from "@/editor/chrome-ui";
 import { CheckRow } from "@/editor/inspector/shared/controls/CheckRow";
 import { CommitRow, NoteRow, PickRow } from "@/editor/inspector/sections/behaviourRows";
 import { fieldLabelText, fieldType, formOf, nameTaken, replaceField, writeFieldLabel } from "@/editor/inspector/sections/formFieldModel";
@@ -63,10 +63,24 @@ const EXTRA_ROWS: Record<string, readonly PropertyConfig[]> = {
   select: [{ id: "options", label: "Options (one per line)", type: "textarea", placeholder: "Option 1\nOption 2" }],
 };
 
+const SUBTITLE = "tw:text-[13px] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]";
+const WARN = "tw:m-0 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-warning-text)]";
+
 /** Type as the board's "Field type" card (2L9 170:121692): the choices
  *  beside the column, the current one marked, Cancel last. */
-function TypeRow({ value, options, onPick }: { value: string; options: ReadonlyArray<{ value: string; label: string }>; onPick: (v: string) => void }) {
-  const [open, setOpen] = React.useState(false);
+function TypeRow({
+  value,
+  options,
+  onPick,
+  open,
+  setOpen,
+}: {
+  value: string;
+  options: ReadonlyArray<{ value: string; label: string }>;
+  onPick: (v: string) => void;
+  open: boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
   const label = options.find((o) => o.value === value)?.label ?? value;
   return (
     <Popover
@@ -112,6 +126,8 @@ export const FieldBody: React.FC<TypeBlockBodyProps> = (props) => {
   const { addToast } = useToast();
   const [nameError, setNameError] = React.useState<string | null>(null);
   const nameErrorId = React.useId();
+  const [typeOpen, setTypeOpen] = React.useState(false);
+  const labelRef = React.useRef<HTMLInputElement>(null);
   const [nameDraft, setNameDraft] = React.useState<string | null>(null);
   React.useEffect(() => {
     setNameError(null);
@@ -131,7 +147,10 @@ export const FieldBody: React.FC<TypeBlockBodyProps> = (props) => {
       if (value.trim()) field.setAttribute(attr, value.trim());
       else field.removeAttribute(attr);
     });
-  const typeOptions = tag === "select" ? [{ value: type, label: "Select" }] : TYPE_OPTIONS;
+  /* 2L9 F08: Password is legacy — offered only to the field that already
+     is one (so its row still names it), never as a new choice. */
+  const typeOptions =
+    tag === "select" ? [{ value: type, label: "Select" }] : TYPE_OPTIONS.filter((o) => o.value !== "password" || type === "password");
   const setType = (next: string) => {
     if (next === type) return;
     let swapped = null as Element | null;
@@ -179,8 +198,31 @@ export const FieldBody: React.FC<TypeBlockBodyProps> = (props) => {
 
   return (
     <>
-      <TypeRow value={type} options={typeOptions} onPick={setType} />
-      <CommitRow label="Label" value={fieldLabelText(scope, field)} onCommit={setLabel} testId="form-field-label" />
+      {/* 2L9 F08: a legacy Password field — what it does with the value, and
+          the way out. Not dismissible: it holds while the type is Password. */}
+      {type === "password" ? (
+        <div className="tw:flex tw:flex-col tw:gap-1 tw:pb-2" role="alert" data-testid="form-field-password-warning">
+          <div className={SUBTITLE}>Existing Password field</div>
+          <p className={WARN}>Password values are stored and emailed as plain text</p>
+          <Button variant="link" size="xs" className="tw:h-6 tw:self-start tw:px-5 tw:text-[12px] tw:font-normal" onClick={() => setTypeOpen(true)}>
+            Change type ›
+          </Button>
+        </div>
+      ) : null}
+      <TypeRow value={type} options={typeOptions} onPick={setType} open={typeOpen} setOpen={setTypeOpen} />
+      <CommitRow label="Label" value={fieldLabelText(scope, field)} onCommit={setLabel} testId="form-field-label" inputRef={labelRef} />
+      {/* 2L9 F09: a field with no label — what a screen reader will say, and
+          the repair. */}
+      {!fieldLabelText(scope, field) ? (
+        <div className="tw:flex tw:flex-col tw:gap-1 tw:pb-1" data-testid="form-field-no-label">
+          <p className={WARN}>
+            No label — screen readers will {field.getAttribute("placeholder") ? "announce the placeholder" : "announce only the field type"}
+          </p>
+          <Button variant="link" size="xs" className="tw:h-6 tw:self-start tw:px-5 tw:text-[12px] tw:font-normal" onClick={() => labelRef.current?.focus()}>
+            Add label
+          </Button>
+        </div>
+      ) : null}
       {tag !== "select" ? (
         <CommitRow label="Placeholder" value={field.getAttribute("placeholder") ?? ""} onCommit={(v) => setAttr("placeholder", v)} testId="form-field-placeholder" />
       ) : null}
