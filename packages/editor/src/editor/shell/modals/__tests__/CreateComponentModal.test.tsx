@@ -111,15 +111,55 @@ describe("CreateComponentModal — 2L9 G05 / G06", () => {
     expect(adoptInstances).toHaveBeenCalledWith("c1", ["el-1", "el-2"]);
   });
 
-  it("a blank name cannot be submitted; a failed create says so and stays open", async () => {
-    const { composer } = makeComposer(vi.fn().mockResolvedValue(null));
-    const { onClose } = renderModal(composer);
+  /* G07: an empty name keeps the dialog a draft. */
+  it("a blank name cannot be submitted and says what a name needs", () => {
+    const { composer } = makeComposer();
+    renderModal(composer);
     fireEvent.change(screen.getByLabelText("Name"), { target: { value: "   " } });
     expect(screen.getByRole("button", { name: "Create and share component" })).toBeDisabled();
+    expect(screen.getByTestId("create-component-name-error")).toHaveTextContent("Enter a name between 1 and 200 characters.");
+    expect(screen.getByLabelText("Name")).toHaveAttribute("aria-invalid", "true");
     fireEvent.change(screen.getByLabelText("Name"), { target: { value: "Hero" } });
+    expect(screen.queryByTestId("create-component-name-error")).toBeNull();
+  });
+
+  /* G08: at the limit the usage line says what to do and Create is shut. */
+  it("at 100 of 100 Create is shut and the usage line says why", () => {
+    const { composer } = makeComposer();
+    (composer as { components: { getAllComponents: () => unknown[] } }).components.getAllComponents = () => Array.from({ length: 100 });
+    renderModal(composer);
+    expect(screen.getByTestId("create-component-usage")).toHaveTextContent("100 of 100 components. Delete one before creating another.");
+    expect(screen.getByRole("button", { name: "Create and share component" })).toBeDisabled();
+  });
+
+  /* G09 / G11: pending — the button keeps its label, the note says it is running. */
+  it("while the create runs it says 'Creating component…' and keeps the label", async () => {
+    let finish: (v: unknown) => void = () => {};
+    const { composer } = makeComposer(vi.fn(() => new Promise((r) => (finish = r))));
+    renderModal(composer);
     fireEvent.click(screen.getByRole("button", { name: "Create and share component" }));
-    await waitFor(() => expect(addToastMock).toHaveBeenCalledWith(expect.objectContaining({ tone: "error" })));
+    expect(await screen.findByTestId("create-component-pending")).toHaveTextContent("Creating component…");
+    expect(screen.getByRole("button", { name: "Create and share component" })).toBeDisabled();
+    finish(null);
+    await waitFor(() => expect(screen.queryByTestId("create-component-pending")).toBeNull());
+  });
+
+  /* G10 / G12: failure keeps the input, says the element is unchanged, offers Try again. */
+  it("a failed create keeps name and scope, says so in the dialog, and offers Try again", async () => {
+    const createComponent = vi.fn().mockResolvedValueOnce(null).mockResolvedValueOnce({ id: "c1", name: "Hero" });
+    const { composer } = makeComposer(createComponent);
+    const { onClose } = renderModal(composer);
+    fireEvent.click(scopeOption("This page"));
+    fireEvent.click(screen.getByRole("button", { name: "Create component" }));
+    expect(await screen.findByTestId("create-component-failed")).toHaveTextContent(
+      "Couldn’t create the component. The name and scope are kept; Hero is unchanged."
+    );
     expect(onClose).not.toHaveBeenCalled();
+    expect(screen.getByLabelText("Name")).toHaveValue("Hero");
+    expect(scopeOption("This page")).toHaveAttribute("aria-checked", "true");
+    fireEvent.click(screen.getByRole("button", { name: "Try again" }));
+    await waitFor(() => expect(onClose).toHaveBeenCalled());
+    expect(createComponent).toHaveBeenLastCalledWith("Hero", "el-1", { prefillFromDs: true, pageId: "page-home" });
   });
 
   /* G06: This page chosen — the primary reads "Create component" and the master is the page's. */

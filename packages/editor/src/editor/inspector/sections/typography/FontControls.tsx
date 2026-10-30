@@ -87,6 +87,7 @@ export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, co
           onChange={(v) => onChange("font-size", v)}
           units={["px", "em", "rem", "%", "vw"]}
           property="font-size"
+          unitCardTitle="Font size unit"
         />
       </div>
 

@@ -25,7 +25,7 @@ import { WIDE_BUTTON } from "@/editor/inspector/shared/controls/controlClasses";
 import { ChevronDown } from "lucide-react";
 import * as React from "react";
 import type { Composer } from "@/engine";
-import { Button } from "@/editor/chrome-ui";
+import { Button, useToast } from "@/editor/chrome-ui";
 import { EVENTS } from "@/shared/constants/events";
 import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
 import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
@@ -61,6 +61,7 @@ export interface BindingDetailProps {
 export function BindingDetail({ composer, elementId, onOpenCreateCollection }: BindingDetailProps) {
   const state = useCmsBinding(composer, elementId);
   const { readOnly } = useInspectorField();
+  const { addToast } = useToast();
   const [picking, setPicking] = React.useState(false);
   const { label } = state;
   const back = () => closeSubview("binding");
@@ -183,7 +184,10 @@ export function BindingDetail({ composer, elementId, onOpenCreateCollection }: B
         color="light"
         size="xs"
         onClick={() => {
-          if (!readOnly) state.unbind();
+          if (readOnly) return;
+          /* 2L9 D11: the static value stays; one Undo brings the binding back. */
+          const receipt = state.unbind();
+          if (receipt && composer) addToast({ description: receipt, action: { label: "Undo", onClick: composer.history.captureUndo() } });
         }}
         data-testid="binding-unbind"
         className={WIDE_BUTTON}

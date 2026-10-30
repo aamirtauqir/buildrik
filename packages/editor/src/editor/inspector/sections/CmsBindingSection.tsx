@@ -18,6 +18,7 @@
  */
 import * as React from "react";
 import type { Composer } from "@/engine";
+import { useToast } from "@/editor/chrome-ui";
 import { Section, type SectionTier } from "../shared/controls";
 import { useInspectorField } from "../shared/controls/InspectorFieldContext";
 import { ActionRow, NoteRow } from "./behaviourRows";
@@ -44,6 +45,7 @@ export const CmsBindingSection: React.FC<CmsBindingSectionProps> = ({ elementId,
   const state = useCmsBinding(composer, elementId);
   const { readOnly } = useInspectorField();
   const [reconnecting, setReconnecting] = React.useState(false);
+  const { addToast } = useToast();
   const { binding } = state;
   if (!binding) return null;
   const { label } = state;
@@ -90,7 +92,10 @@ export const CmsBindingSection: React.FC<CmsBindingSectionProps> = ({ elementId,
           />
           <ActionRow
             onClick={() => {
-              if (!readOnly) state.unbind();
+              if (readOnly) return;
+              /* 2L9 D11: the static value stays; one Undo brings the binding back. */
+              const receipt = state.unbind();
+              if (receipt && composer) addToast({ description: receipt, action: { label: "Undo", onClick: composer.history.captureUndo() } });
             }}
             testId="cms-unbind"
           >

@@ -21,6 +21,13 @@
  * line is the masters this site holds against the manager's limit
  * (DEFAULT_COMPONENT_CONFIG.maxComponents, the drawer's isAtComponentLimit).
  *
+ * States (G07–G12, 271:126015…271:127754): an empty or over-long name keeps
+ * the dialog a draft ("Enter a name between 1 and 200 characters."); at the
+ * limit the usage line says what to do and Create is shut; while the create
+ * runs, "Creating component…" (the button keeps its label); a refusal or a
+ * throw keeps the name and scope, says the element is unchanged, and the
+ * primary becomes "Try again".
+ *
  * @license BSD-3-Clause
  */
 
@@ -65,8 +72,13 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({ isOp
   const [convertMatching, setConvertMatching] = React.useState(false);
   const [scope, setScope] = React.useState<"site" | "page">("site");
   const [isCreating, setIsCreating] = React.useState(false);
+  const [failed, setFailed] = React.useState(false);
 
   const used = isOpen && composer ? composer.components.getAllComponents().length : 0;
+  const max = DEFAULT_COMPONENT_CONFIG.maxComponents;
+  const atLimit = used >= max;
+  const trimmed = name.trim();
+  const nameValid = trimmed.length >= 1 && trimmed.length <= NAME_MAX;
   const matches = React.useMemo(
     () => (isOpen && composer && elementId ? findMatchingElements(composer, elementId) : []),
     [isOpen, composer, elementId],
@@ -78,19 +90,21 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({ isOp
       setName("");
       setConvertMatching(false);
       setScope("site");
+      setFailed(false);
     }
   }, [isOpen, defaultName]);
 
   const handleSubmit = async () => {
-    if (!composer || !elementId || !name.trim()) return;
+    if (!composer || !elementId || !nameValid || atLimit || isCreating) return;
     setIsCreating(true);
+    setFailed(false);
     try {
       const component = await composer.components.createComponent(name.trim(), elementId, {
         prefillFromDs: true,
         pageId: scope === "page" ? activePage?.id ?? null : null,
       });
       if (!component) {
-        addToast({ description: "Couldn't create the component", tone: "error" });
+        setFailed(true);
         return;
       }
       const converted = composer.components.adoptInstances(component.id, [
@@ -107,8 +121,8 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({ isOp
       });
       composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "components" });
       onClose();
-    } catch (error) {
-      addToast({ description: error instanceof Error ? error.message : "Couldn't create the component", tone: "error" });
+    } catch {
+      setFailed(true);
     } finally {
       setIsCreating(false);
     }
@@ -134,12 +148,20 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({ isOp
             value={name}
             onChange={(e) => setName(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === "Enter" && name.trim()) void handleSubmit();
+              if (e.key === "Enter") void handleSubmit();
             }}
             autoFocus
+            maxLength={NAME_MAX}
+            aria-invalid={nameValid ? undefined : true}
+            aria-describedby={nameValid ? undefined : "create-component-name-error"}
             data-testid="create-component-name"
-            className="tw:mb-4 tw:w-full"
+            className={nameValid ? "tw:mb-4 tw:w-full" : "tw:w-full tw:[&_input]:border-[var(--bk-error)]!"}
           />
+          {nameValid ? null : (
+            <p id="create-component-name-error" className={`${NOTE} tw:mb-2`} data-testid="create-component-name-error">
+              Enter a name between 1 and {NAME_MAX} characters.
+            </p>
+          )}
           <div className={LABEL} id="create-component-scope-label">
             Where it can be used
           </div>
@@ -160,15 +182,24 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({ isOp
             </p>
           )}
           <p className={NOTE} data-testid="create-component-usage">
-            {used} of {DEFAULT_COMPONENT_CONFIG.maxComponents} components
+            {atLimit ? `${used} of ${max} components. Delete one before creating another.` : `${used} of ${max} components`}
           </p>
+          {isCreating ? (
+            <p role="status" className={NOTE} data-testid="create-component-pending">
+              Creating component…
+            </p>
+          ) : failed ? (
+            <p role="alert" className={NOTE} data-testid="create-component-failed">
+              Couldn’t create the component. The name and scope are kept; {defaultName} is unchanged.
+            </p>
+          ) : null}
         </ModalBody>
         <ModalFooter divided>
           <Button color="light" size="xs" className="tw:w-[72px]" data-testid="create-component-cancel" onClick={onClose} disabled={isCreating}>
             Cancel
           </Button>
-          <Button size="xs" className="tw:min-w-[184px]" data-testid="create-component-submit" onClick={() => void handleSubmit()} disabled={!name.trim() || isCreating}>
-            {isCreating ? "Creating…" : scope === "site" ? "Create and share component" : "Create component"}
+          <Button size="xs" className="tw:min-w-[184px]" data-testid="create-component-submit" onClick={() => void handleSubmit()} disabled={!nameValid || atLimit || isCreating}>
+            {failed ? "Try again" : scope === "site" ? "Create and share component" : "Create component"}
           </Button>
         </ModalFooter>
       </ModalContent>
@@ -199,6 +230,9 @@ function ScopeOption({ checked, onPick, label, caption }: { checked: boolean; on
     </>
   );
 }
+
+/** The longest component name the dialog takes (G07). */
+const NAME_MAX = 200;
 
 /* 2L9 G05: a 13 / ink lead, labels above their fields, 12 / muted notes. */
 const LEAD = "tw:m-0 tw:mb-4 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]";

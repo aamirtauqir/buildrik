@@ -20,7 +20,7 @@ import { fieldTestId, labelTestId, rowTestId } from "./ControlRow";
 import { FieldDot } from "./FieldDot";
 import { useInspectorField, mixedName } from "./InspectorFieldContext";
 import { ErrorLine } from "./Section";
-import { TextField, BK_SELECT_BARE_UNIT_THEME, BK_SELECT_BARE_VALUE_THEME, Select, Textarea, TextInput, Tooltip } from "@/editor/chrome-ui";
+import { Button, Menu, MenuItem, Popover, TextField, BK_SELECT_BARE_UNIT_THEME, BK_SELECT_BARE_VALUE_THEME, Select, Textarea, TextInput, Tooltip } from "@/editor/chrome-ui";
 
 // ============================================================================
 // HELPERS
@@ -154,6 +154,10 @@ export interface InputWithUnitProps {
    *  write the value the field held then. Size's Fill field shows a readout,
    *  not the value, so it puts back its own. */
   onRevert?: (atFocus: string) => void;
+  /** The unit choice as a card beside the column, under this title, instead
+   *  of the inline unit select (2L9 I06 161:11006 "Font size unit" — px, em,
+   *  rem, %, vw · Cancel). Only the field that passes it changes. */
+  unitCardTitle?: string;
 }
 
 const NO_UNITS: readonly string[] = [""];
@@ -271,8 +275,10 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
   onRevert,
   inherited,
   mixed: mixedProp = false,
+  unitCardTitle,
 }) => {
   const field = useInspectorField(property);
+  const [unitCardOpen, setUnitCardOpen] = React.useState(false);
   const mixed = field.mixed || mixedProp;
   const units = noUnit ? NO_UNITS : unitsProp;
   /* A plain number is written as it is typed, so by Escape the element
@@ -436,7 +442,57 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
               <ChevronDown size={10} />
             </span>
           </span>
-          {noUnit ? null : (
+          {noUnit ? null : unitCardTitle ? (
+            <Popover
+              open={unitCardOpen}
+              onClose={() => setUnitCardOpen(false)}
+              beside=".layout-shell__inspector"
+              label={unitCardTitle}
+              className="tw:w-[220px] tw:p-3"
+              trigger={
+                <Button
+                  color="light"
+                  size="xs"
+                  className="bdi-unit tw:h-full tw:gap-1 tw:border-0 tw:bg-transparent tw:px-1 tw:text-[12px] tw:font-normal tw:text-[var(--bk-ink-muted)] tw:focus:ring-0"
+                  aria-haspopup="menu"
+                  aria-expanded={unitCardOpen}
+                  aria-label={`${name} unit`}
+                  data-testid="unit-card-trigger"
+                  onClick={() => {
+                    if (!field.readOnly) setUnitCardOpen((v) => !v);
+                  }}
+                >
+                  {unit === "" ? "×" : unit}
+                  <ChevronDown size={12} aria-hidden="true" />
+                </Button>
+              }
+            >
+              <p className="tw:m-0 tw:mb-2 tw:text-[13px] tw:font-semibold tw:leading-4 tw:text-[var(--bk-ink)]">{unitCardTitle}</p>
+              <Menu label={unitCardTitle} className="tw:min-w-0">
+                {units.map((u) => (
+                  <MenuItem
+                    key={u}
+                    radio
+                    selected={u === unit}
+                    onClick={() => {
+                      setUnitCardOpen(false);
+                      if (u !== unit) onUnitChange(u);
+                    }}
+                  >
+                    {u === "" ? "×" : u}
+                  </MenuItem>
+                ))}
+              </Menu>
+              <Button
+                color="light"
+                size="xs"
+                className="tw:mt-2 tw:h-8 tw:w-full tw:justify-center tw:text-[13px] tw:font-normal tw:focus:ring-0"
+                onClick={() => setUnitCardOpen(false)}
+              >
+                Cancel
+              </Button>
+            </Popover>
+          ) : (
           <span className="bdi-unit">
             <Select
               className="bdi-u"

@@ -16,6 +16,7 @@ import { DEFAULT_ANIMATION_CONFIG, type AnimationPreset } from "@/engine/interac
 import { DEFAULT_ANIMATION, type AnimationConfig } from "@/shared/types/animations";
 import { type Interaction, type InteractionTrigger, type InteractionsSectionProps } from "./types";
 import { Button, useToast } from "@/editor/chrome-ui";
+import { LockRefusalNote, setLockRefusal, useLockRefusal } from "@/editor/inspector/components/LockRefusal";
 import { closeSubview, openSubview } from "@/editor/inspector/tabs/subviewStore";
 import { EVENTS } from "@/shared/constants/events";
 import { NoteRow } from "../behaviourRows";
@@ -73,6 +74,7 @@ export const InteractionsSection: React.FC<InteractionsSectionProps> = ({
     };
   }, [composer, elementId]);
   const interactions = live ?? interactionsProp;
+  const addRefused = useLockRefusal(composer, elementId ?? "", "add-interaction");
   const animation = liveAnimation === undefined ? animationProp : liveAnimation;
 
   const addAnimation = () => {
@@ -97,6 +99,13 @@ export const InteractionsSection: React.FC<InteractionsSectionProps> = ({
     addToast({ description, ...(composer ? { action: { label: "Undo", onClick: () => composer.history.undo() } } : {}) });
   // Add new interaction
   const addInteraction = (trigger: InteractionTrigger, preset?: AnimationPreset) => {
+    /* 2L9 G22: locked after the picker opened — nothing is added, and the
+       section says so (no "added" receipt, no editor for a missing row). */
+    if (composer && elementId && composer.elements.getElement(elementId)?.isLocked?.()) {
+      setShowAddPanel(false);
+      setLockRefusal({ elementId, kind: "add-interaction" });
+      return;
+    }
     const newInteraction: Interaction = {
       id: `interaction-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
       trigger,
@@ -201,6 +210,9 @@ export const InteractionsSection: React.FC<InteractionsSectionProps> = ({
               onPreview={onAnimationPreview}
             />
           </>
+        ) : addRefused && elementId ? (
+          /* 2L9 G22: the refusal is the section's whole body until unlocked. */
+          <LockRefusalNote composer={composer} elementId={elementId} kind="add-interaction" />
         ) : showAddPanel ? (
           /* 2L9 I14: the add screen replaces the list. */
           <AddInteractionPanel

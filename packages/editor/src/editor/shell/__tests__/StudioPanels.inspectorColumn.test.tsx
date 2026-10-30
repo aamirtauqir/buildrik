@@ -216,7 +216,7 @@ describe("StudioPanels — a section-focus request always lands on a visible ins
    button replaced the "Inspector hidden · Show" toast (GW-3 / M-2), which was
    the way back only while no board drew one. */
 describe("StudioPanels — Show inspector on the canvas (board 36)", () => {
-  const showButton = () => screen.queryByRole("button", { name: "Show inspector" });
+  const showButton = () => screen.queryByRole("button", { name: "Show Inspector" });
 
   it("hiding the inspector puts Show inspector ⌘\\ on the canvas; it brings the inspector back", () => {
     const composer = makeComposer();
@@ -225,9 +225,10 @@ describe("StudioPanels — Show inspector on the canvas (board 36)", () => {
     act(() => composer.emit(EVENTS.UI_TOGGLE_INSPECTOR));
     expect(inspectorColumn().getAttribute("aria-hidden")).toBe("true");
     const button = showButton()!;
-    expect(button.textContent).toContain("Show inspector");
-    expect(button.textContent).toContain("⌘\\");
+    /* 2L9 S30 (258:36770): "Show Inspector"; ⌘\ is announced and in the tooltip. */
+    expect(button.textContent).toBe("Show Inspector");
     expect(button.getAttribute("aria-keyshortcuts")).toBe("Meta+\\");
+    expect(button.getAttribute("title")).toBe("Show Inspector (⌘\\)");
     /* On the canvas, not in the (hidden) column. */
     expect(inspectorColumn().contains(button)).toBe(false);
     fireEvent.click(button);

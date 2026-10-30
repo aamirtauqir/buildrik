@@ -278,7 +278,7 @@ describe("P-1 — CMS binding writers refuse a locked element", () => {
 
   it("BindingDetail: Unbind — keep shown text", () => {
     const { c, unbindAll } = cmsComposer(true);
-    render(<BindingDetail composer={c} elementId="list" />);
+    render(<BindingDetail composer={c} elementId="list" />, { wrapper: ToastProvider });
     const unbind = screen.queryByRole("button", { name: "Unbind — keep shown text" });
     if (!unbind) throw new Error("detail did not render the bound state — fixture out of date");
     fireEvent.click(unbind);

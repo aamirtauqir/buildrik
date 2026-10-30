@@ -40,7 +40,7 @@ describe("ColorInput · the Brand colours picker (L4-025)", () => {
   it("lists only live semantic colours, once each", () => {
     render(<ColorInput label="Fill" value="#ffffff" onChange={() => {}} composer={{ emit: vi.fn() } as never} />);
     fireEvent.click(screen.getByRole("button", { name: "Choose Fill color" }));
-    const list = screen.getByRole("list", { name: "Brand colours" });
+    const list = screen.getByRole("list", { name: "Brand colors" });
     const rows = within(list).getAllByRole("listitem").map((li) => li.textContent ?? "");
     expect(rows).toHaveLength(2);
     expect(rows.some((r) => r.includes("Primary"))).toBe(true);
