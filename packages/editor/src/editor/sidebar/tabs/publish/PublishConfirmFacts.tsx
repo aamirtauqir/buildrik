@@ -19,6 +19,7 @@ import { fetchApprovedSnapshot, fetchCurrentRound, type CurrentRound } from "@/s
 import { fetchPrePublishChecks } from "@/services/PublishService";
 import { exportPublishPages, type PublishPage } from "@/editor/shell/exportPublishPages";
 import { saveStatusStore } from "@/editor/shell/saveStatusStore";
+import { usePublishPreviewDiff } from "./usePublishPreviewDiff";
 import { Checkbox } from "@/editor/chrome-ui";
 
 /* Board B3-10 (7574:193972) draws the four facts as a two-column table on a
@@ -138,6 +139,9 @@ export const PublishConfirmFacts: React.FC<PublishConfirmFactsProps> = ({
   staleControl,
 }) => {
   const [changes, setChanges] = React.useState<number | null>(null);
+  /* A-33: "3 pages changed · 1 added · CMS 4 records" against the live version. */
+  const preview = usePublishPreviewDiff(composer, siteId ?? null, active);
+  const d = preview?.diff;
   const [pageCount, setPageCount] = React.useState<number | null>(null);
   const [round, setRound] = React.useState<CurrentRound | null>(null);
   const [loadingRound, setLoadingRound] = React.useState(true);
@@ -215,7 +219,18 @@ export const PublishConfirmFacts: React.FC<PublishConfirmFactsProps> = ({
       <div className={ROW}>
         <span className={KEY} data-testid="publish-fact-key-pages">1 Changes</span>
         <span className={VAL} data-testid="publish-fact-val-pages">
-          {pageCount == null ? "Preparing…" : `${pageCount} page${pageCount === 1 ? "" : "s"}`}
+          {d?.retained
+            ? [
+                `${d.changed} page${d.changed === 1 ? "" : "s"} changed`,
+                `${d.added} added`,
+                d.removed ? `${d.removed} removed` : null,
+                d.cmsRecords ? `CMS ${d.cmsRecords} record${d.cmsRecords === 1 ? "" : "s"}` : null,
+              ]
+                .filter(Boolean)
+                .join(" · ")
+            : pageCount == null
+              ? "Preparing…"
+              : `${pageCount} page${pageCount === 1 ? "" : "s"}`}
         </span>
       </div>
       {tips > 0 ? (

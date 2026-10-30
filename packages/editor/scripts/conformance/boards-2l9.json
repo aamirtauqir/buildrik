@@ -13917,7 +13917,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-fixed",
-   "verifiedNote": "Round 24, probe-compared: shots/233-2.png vs probe publish-tray-blocking-server (&siteId=s1, 1440x900). Status card (Live · domain, Published … · v12, View live / Copy link); CHECKS with '1 blocking · 3 tips', blocker first, red ✕ / amber ! glyphs, 13px sentences wrapping, Fix › at the end, 'Red blocks publishing · amber is advisory'; GOES TO + Manage domains ›; disabled 'Publish changes' with 'Fix 1 blocking issue to publish'; legal links. Server rows print the server's own sentence. Not built: the WHAT WILL CHANGE counts/chips (draft-vs-live diff, REQUESTS A-33); APPROVAL row shows only when a round exists (probe publish-tray-ready).",
+   "verifiedNote": "Round 24, probe-compared (see earlier); round 28: the WHAT WILL CHANGE counts, page chips (✎ / + / −), 'CMS: n records published' and 'See all ›' are now built on sites.publishPreviewDiff (A-33; tests PublishTray 'what will change', publish.diff.test getPublishPreviewDiff) — not image-compared (the probe's tray composer cannot export pages). 'Brand: n tokens' is not built (no brand-token diff). Shots/233-2.png.",
    "tier": "P1"
   },
   {
@@ -13928,7 +13928,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-fixed",
-   "verifiedNote": "Round 24, probe-compared: shots/233-649.png vs probe publish-tray-ready (&siteId=s1). Tips only ('3 tips' over every listed row), APPROVAL '✓ Approved by Lena · <date>' + Open Review › (reviews.currentRound), GOES TO, enabled blue 'Publish changes', legal links. Residual: WHAT WILL CHANGE counts/chips wait on A-33; the board's '(client)' suffix is not printed (the reviewer is not always a client).",
+   "verifiedNote": "Round 24 probe-compared; round 28: counts/chips/CMS line/See all built on A-33 as 233:2 (unit-tested, not image-compared); Brand tokens not built.",
    "tier": "P1"
   },
   {
@@ -13939,7 +13939,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Round 24: still open — the subview is the draft-vs-live per-page diff; contract filed REQUESTS A-33 (P-2). The published-version Compare (PublishDiffView) is reachable from the tray after a publish ('See what changed', PB09).",
+   "verifiedNote": "Round 28: A-33 built the draft-vs-live diff (sites.publishPreviewDiff, page-level: changed / added / removed + CMS records since the last publish); the tray's 'See all ›' opens the one Compare on live vs current. Still open: this board's subview lists each page with an element-level summary ('Hero text, 2 images', 'Section added') and its own Compare ›, which a page-level diff cannot say; and 'Brand: primary, accent changed' (no brand-token diff exists).",
    "tier": "P1"
   },
   {
@@ -13950,7 +13950,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-fixed",
-   "verifiedNote": "Round 24, probe-compared: shots/233-1802.png vs probe publish-confirm-tips (&siteId=s1): 720 wide, no ✕, 'Publish to fieldwork.studio', numbered ledger 1 Changes / 2 Tips '3 advisory checks' + '☐ I’ve seen these' / 4 Approval / 5 Release 'Saved 10:42 · the current live release stays available to republish', Cancel + disabled Publish, 'Tick the boxes above to publish'. Publish enables on the tick (tests PublishConfirmModal*). Residual: '1 Changes' prints the page count (counts + See all › wait on A-33).",
+   "verifiedNote": "Round 24 probe-compared; round 28: '1 Changes' now reads the A-33 summary ('3 pages changed · 1 added · CMS 4 records') when the comparison is available, else the page count (not image-compared — the probe has no composer). The row's 'See all ›' is not built in the dialog.",
    "tier": "P1"
   },
   {
@@ -13982,8 +13982,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 28: topbar 'Publishing 2/3…' wired (A-29: AquibraStudio passes publishSteps) and probe-compared (topbar-shell&publish=running vs shots/233-3648.png); tray half compared round 24. Still open for the server half of A-32 (never-run steps marked skipped up front so N is 3; startedAt for Elapsed) — cleared, in progress.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 28, probe-compared: shots/233-3648.png vs probe publish-tray-running (steps from the shared buildPublishSteps(2), started 42s ago): ✓ Generating pages / ● Deploying to CDN · step 2 of 3 / ○ Verifying SSL / 'Elapsed 0:42' ticking from the job's startedAt (else createdAt), footer 'Publishing can’t be stopped…'; topbar 'Publishing 2/3…' wired (A-29) and compared. Server (A-32): never-run steps are 'skipped' from the job's first write, so N is 3; the queued row is written with its step list; sites.publishStatus already carried startedAt — the editor's mapping dropped it.",
    "tier": "P1"
   },
   {
@@ -13993,8 +13993,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 28: topbar label wired (A-29); queued state compared round 24. Open for A-32's server half (step names before the worker starts, Elapsed).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Round 28, probe-compared: shots/233-4197.png vs probe publish-tray-queued (buildPublishSteps(-1)): '● Queued — waiting to start' over the three pending steps by name, 'Elapsed 0:42', 'Cancel (not started)'; topbar 'Publishing 0/3…' (A-29, runLabel counts done steps when none is active). Admin-only cancel stays the server's rule (any member may cancel a QUEUED/BUILDING job today).",
    "tier": "P1"
   },
   {
@@ -14135,9 +14135,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "code:offline-no-diff",
    "verified": "drift-open",
-   "verifiedNote": "Round 24: probe re-checked (offline) — unchanged from 2026-10-27; still open only for the WHAT WILL CHANGE counts/chips and See all › (REQUESTS A-33).",
+   "verifiedNote": "Round 28: the WHAT WILL CHANGE counts come from the server (sites.publishPreviewDiff compares the export with the live job's retained payload, A-33). Offline that read cannot run, so the tray keeps 'Changes since the last publish' with the page names; drawing the board's counts offline would show numbers nothing computed. The rest of the board (status card + What will change, no Checks / Goes to, 'Needs a connection', legal links, ⋯) was probe-compared 2026-10-27.",
    "tier": "P1"
   },
   {

@@ -18,6 +18,7 @@
 import * as React from "react";
 import { Button, CopyButton, SkeletonBlock } from "@/editor/chrome-ui";
 import type { PublishStep } from "@/services/PublishService";
+import type { PublishPreview } from "@/editor/sidebar/tabs/publish/usePublishPreviewDiff";
 
 const BODY = "tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]";
 const META = "tw:m-0 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
@@ -64,20 +65,37 @@ const Glyph: React.FC<{ step: PublishStep }> = ({ step }) => (
 
 /** PB07 / PB08: the run, step by step. A job the worker has not picked up
  *  yet has no steps — it is queued, and says so. */
-export const RunSection: React.FC<{ steps: PublishStep[] | null }> = ({ steps }) => {
+/** "0:42" — minutes and seconds since the job began, ticking. */
+function useElapsed(since: string | null): string | null {
+  const [now, setNow] = React.useState(() => Date.now());
+  React.useEffect(() => {
+    if (!since) return undefined;
+    const t = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(t);
+  }, [since]);
+  const start = since ? Date.parse(since) : NaN;
+  if (!Number.isFinite(start)) return null;
+  const secs = Math.max(0, Math.floor((now - start) / 1000));
+  return `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, "0")}`;
+}
+
+export const RunSection: React.FC<{ steps: PublishStep[] | null; startedAt?: string | null }> = ({ steps, startedAt = null }) => {
   const shown = runSteps(steps);
   const pos = runPosition(steps);
+  const elapsed = useElapsed(startedAt);
+  /* Queued: the worker has written the steps (all pending) but none runs yet. */
+  const queued = shown.length === 0 || shown.every((s) => s.status === "pending");
   return (
     <section className="tw:flex tw:flex-col tw:gap-1.5 tw:px-3 tw:pt-3.5" aria-label="Publishing" data-testid="publish-tray-run">
       <h3 className={HEAD}>Publishing</h3>
       <ol className="tw:m-0 tw:flex tw:list-none tw:flex-col tw:gap-1.5 tw:p-0" role="status">
-        {shown.length === 0 ? (
+        {queued ? (
           <li className={`${BODY} tw:flex tw:items-center tw:gap-2`} data-testid="publish-tray-queued">
             <span aria-hidden="true" className="tw:inline-flex tw:w-3 tw:justify-center tw:text-[12px]">●</span>
             Queued — waiting to start
           </li>
-        ) : (
-          shown.map((s, i) => (
+        ) : null}
+        {shown.map((s, i) => (
             <li
               key={s.name}
               className={`tw:flex tw:items-center tw:gap-2 tw:text-[13px] tw:leading-5 ${
@@ -89,9 +107,13 @@ export const RunSection: React.FC<{ steps: PublishStep[] | null }> = ({ steps })
               {s.name}
               {pos && pos.index === i + 1 ? ` · step ${pos.index} of ${pos.total}` : ""}
             </li>
-          ))
-        )}
+          ))}
       </ol>
+      {elapsed ? (
+        <p className={META} data-testid="publish-tray-elapsed">
+          Elapsed {elapsed}
+        </p>
+      ) : null}
     </section>
   );
 };
@@ -175,6 +197,63 @@ export const FailedLog: React.FC<{ steps: PublishStep[] | null; jobId: string | 
         ) : null}
       </dl>
     </div>
+  );
+};
+
+/** B8-PB01–PB03 / PB21 "WHAT WILL CHANGE" (A-33): the counts against the
+ *  live version, a chip per page (✎ changed · + added · − removed), the CMS
+ *  records published since, and "See all ›" into the one Compare. Without a
+ *  comparison (loading, no site, pruned payload) the plain sentence stays. */
+export const ChangesSection: React.FC<{
+  preview: PublishPreview | null;
+  fallback: string;
+  pageNames: string[];
+  onSeeAll?: () => void;
+}> = ({ preview, fallback, pageNames, onSeeAll }) => {
+  const d = preview?.diff;
+  const counted = d && d.retained;
+  const glyph = { changed: "✎", added: "+", removed: "−" } as const;
+  return (
+    <section className="tw:flex tw:flex-col tw:gap-1.5 tw:px-3 tw:pt-3.5" aria-label="What will change">
+      <div className="tw:flex tw:items-baseline tw:justify-between">
+        <h3 className={HEAD}>What will change</h3>
+        {onSeeAll ? (
+          <Button color="light" size="xs" className={`${LINK_BTN} tw:h-5 tw:text-[12px] tw:text-[var(--bk-ink-muted)]`} onClick={onSeeAll} data-testid="publish-tray-see-all">
+            See all ›
+          </Button>
+        ) : null}
+      </div>
+      {counted ? (
+        <>
+          <p className={`${BODY} tw:font-medium`} data-testid="publish-tray-changes">
+            {d.changed} page{d.changed === 1 ? "" : "s"} changed · {d.added} added · {d.removed} removed
+          </p>
+          {preview.changes.length > 0 ? (
+            <p className="tw:m-0 tw:flex tw:flex-wrap tw:gap-x-3 tw:gap-y-1 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="publish-tray-change-chips">
+              {preview.changes.map((c) => (
+                <span key={`${c.change}-${c.name}`}>
+                  <span aria-hidden="true">{glyph[c.change]} </span>
+                  <span className="tw:sr-only">{c.change} </span>
+                  {c.name}
+                </span>
+              ))}
+            </p>
+          ) : null}
+          {d.cmsRecords > 0 ? (
+            <p className={META} data-testid="publish-tray-cms-count">
+              CMS: {d.cmsRecords} record{d.cmsRecords === 1 ? "" : "s"} published
+            </p>
+          ) : null}
+        </>
+      ) : (
+        <>
+          <p className={BODY} data-testid="publish-tray-changes">
+            {fallback}
+          </p>
+          {pageNames.length > 0 ? <p className={META}>{pageNames.join(" · ")}</p> : null}
+        </>
+      )}
+    </section>
   );
 };
 

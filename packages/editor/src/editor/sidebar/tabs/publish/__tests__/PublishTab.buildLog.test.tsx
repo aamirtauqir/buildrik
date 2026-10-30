@@ -71,6 +71,7 @@ const failedJob = (steps: UsePublishJobResult["steps"]): UsePublishJobResult => 
   lastPublishedAt: null,
   hasUnpublishedChanges: null,
   unpublished: vi.fn(),
+  startedAt: null,
   pollLost: false,
   publish: vi.fn(),
   cancel: vi.fn(),

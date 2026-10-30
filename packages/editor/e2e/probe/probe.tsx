@@ -139,6 +139,7 @@ import { PageSwitcher } from "@/editor/shell/PageSwitcher";
 import { BottomBar } from "@/editor/shell/BottomBar";
 import { saveStatusStore } from "@/editor/shell/saveStatusStore";
 import { publishTray } from "@/editor/shell/publishTrayStore";
+import { buildPublishSteps } from "@buildrik/shared/schemas/publish";
 import { SettingsTab } from "@/editor/sidebar/tabs/settings/SettingsTab";
 import { UnpublishConfirmModal } from "@/editor/sidebar/tabs/publish/UnpublishConfirmModal";
 import { saveFailedBanner } from "@/editor/shell/globalBanners";
@@ -2391,6 +2392,7 @@ function publishTrayFrame(
     hasUnpublishedChanges: true,
     dismissBlock: () => {},
     unpublished: () => {},
+    startedAt: null,
     pollLost: false,
     ...o.job,
   };
@@ -4161,19 +4163,14 @@ const CASES: Record<string, () => React.ReactElement> = {
       uiState: "publishing",
       jobId: "cmv8job000003",
       progress: 50,
-      steps: [
-        { name: "Generating pages", status: "done" },
-        { name: "Optimizing images", status: "skipped" },
-        { name: "Deploying to CDN", status: "active" },
-        { name: "Verifying SSL", status: "pending" },
-        { name: "Performance check", status: "pending" },
-      ],
+      steps: buildPublishSteps(2),
+      startedAt: new Date(Date.now() - 42_000).toISOString(),
     },
   }),
   "publish-tray-queued": () => publishTrayFrame("publish-tray-queued", {
     nextMove: deriveLifecycleState(TRAY_LIFE),
     server: { "sites.publishHistory": TRAY_ROWS.slice(1) },
-    job: { uiState: "publishing", jobId: "cmv8job000004", progress: 0, steps: null },
+    job: { uiState: "publishing", jobId: "cmv8job000004", progress: 0, steps: buildPublishSteps(-1), startedAt: new Date(Date.now() - 42_000).toISOString() },
   }),
   "publish-tray-lost": () => publishTrayFrame("publish-tray-lost", {
     nextMove: deriveLifecycleState(TRAY_LIFE),

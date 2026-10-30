@@ -53,7 +53,8 @@ import type { UsePublishJobResult } from "./hooks/usePublishJob";
 import type { Issue } from "./hooks/useStudioState";
 import { PUBLISH_REFUSAL, type NextMove } from "./lifecycle";
 import { publishTray } from "./publishTrayStore";
-import { FailedLog, OUTCOME_BTN, OutcomeNote, PublishedActions, RunSection, TraySkeleton, runSteps } from "./PublishTrayRun";
+import { ChangesSection, FailedLog, OUTCOME_BTN, OutcomeNote, PublishedActions, RunSection, TraySkeleton, runSteps } from "./PublishTrayRun";
+import { usePublishPreviewDiff } from "@/editor/sidebar/tabs/publish/usePublishPreviewDiff";
 
 /* The server's content rows ("Image alt text", "Links") run the same shared
    detector the issue scanner runs per element — the tray lists the per-element
@@ -254,6 +255,8 @@ export const PublishTray: React.FC<PublishTrayProps> = ({ composer, publishJob, 
     [allChecks],
   );
   const [cms, refreshCms] = useCmsSync();
+  /* A-33: what a publish now would change, against the live version. */
+  const preview = usePublishPreviewDiff(composer, siteId, uiState !== "publishing", uiState);
   const round = useCurrentRound(nextMove?.gate ?? null);
 
   const vercelMissing = (checks?.checks ?? []).some((c) => c.label === VERCEL_CHECK_LABEL && c.status === "fail");
@@ -464,7 +467,7 @@ export const PublishTray: React.FC<PublishTrayProps> = ({ composer, publishJob, 
           )}
         </section>
 
-        {running ? <RunSection steps={publishJob?.steps ?? null} /> : null}
+        {running ? <RunSection steps={publishJob?.steps ?? null} startedAt={publishJob?.startedAt ?? null} /> : null}
 
         {failed && publishJob ? (
           publishJob.pollLost ? (
@@ -575,19 +578,27 @@ export const PublishTray: React.FC<PublishTrayProps> = ({ composer, publishJob, 
               </OutcomeNote>
             ) : null}
 
-            <section className={SECTION} aria-label="What will change">
-              <h3 className={HEAD}>What will change</h3>
-              <p className={BODY} data-testid="publish-tray-changes">
-                {nextMove === null
+            <ChangesSection
+              preview={nextMove === null ? null : preview}
+              fallback={
+                nextMove === null
                   ? "No unpublished changes"
                   : isLive
                     ? "Changes since the last publish"
-                    : "First publish — every page goes live"}
-              </p>
-              {nextMove !== null && snapshot.pageNames.length > 0 ? (
-                <p className={META}>{snapshot.pageNames.join(" · ")}</p>
-              ) : null}
-            </section>
+                    : "First publish — every page goes live"
+              }
+              pageNames={nextMove !== null ? snapshot.pageNames : []}
+              onSeeAll={
+                last && preview?.diff.retained
+                  ? () =>
+                      composer?.emit(EVENTS.UI_COMPARE_OPEN, {
+                        left: { kind: "published", jobId: last.id, version: last.version },
+                        right: { kind: "current" },
+                        from: "Publish",
+                      })
+                  : undefined
+              }
+            />
 
             {noChecks ? null : (
             <>
@@ -670,7 +681,7 @@ export const PublishTray: React.FC<PublishTrayProps> = ({ composer, publishJob, 
           outcome's button sits with its sentence; the footer is empty. */}
       {running ? (
         <div className="tw:flex-none tw:border-t tw:border-[var(--bk-border)] tw:p-3" data-testid="publish-tray-run-footer">
-          {runSteps(publishJob?.steps).length === 0 ? (
+          {runSteps(publishJob?.steps).every((s) => s.status === "pending") ? (
             <Button color="light" size="sm" className="tw:h-8 tw:w-full" onClick={() => void publishJob?.cancel()}>
               Cancel (not started)
             </Button>
