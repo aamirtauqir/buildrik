@@ -5492,8 +5492,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Transform/Transition rows exist; multi-layer authored shadow not preserved (ShadowSection.tsx:46)",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 26, probe ?type=container&styles={box-shadow '0 4px 16px #0002, inset 0 0 0 1px #fff8', transform scale(1.02) translateY(-4px), transition longhands} → Effects, side by side with shots/247-25026.png: Shadow '2 layers' · 'Authored shadow' (the value as written, in order) · 'Editing one layer keeps order and inset placement.' (layer rows behind 'Edit layers'); Transform as fields — Scale 102 %, Rotate deg, Move X / Y with unit, Skew deg; Transition — Property (as written, 'transform, opacity'), Duration ms, Delay ms, Easing (ease-out…). Match; the transform / transition sit in one 'Transform and transition' section (board: two headings).",
    "tier": "P1"
   },
   {
@@ -5503,8 +5503,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Cursor/Blend/Text shadow rows; board shows authored values read-only/editable",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 26, probe → Effects, side by side with shots/247-25554.png: Advanced effects — Cursor (Pointer), Blend mode (Multiply), Will change as written ('transform, opacity'); 'Text shadow' · Custom CSS (exact expression) · 'Exact authored expression is preserved.'; Filters keep the custom sequence (I11). Opacity is its own section above (SSOT: one Opacity writer) where the board draws it inside Advanced effects; the filter note reads I11's copy ('Two blur functions are preserved…') — the two boards differ.",
    "tier": "P1"
   },
   {
@@ -5515,7 +5515,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Animation row exists; no legacy-trigger note or property-conflict warning",
+   "verifiedNote": "L-B round 26, built: the element's CSS animation edit screen says 'Plays when rendered. This saved {Hover} trigger is not applied by current CSS output.' when its trigger is not page load (true of the export: the animation is an inline style), and a 'Property conflict' block when an enabled interaction animates the same property — '{preset} and {interaction} both animate {opacity}. Neither is removed automatically.', 'Inspect {interaction}', 'Disable CSS animation' (test ElementAnimationConflict). Open: the board's screen layout (header 'CSS animation · Legacy trigger', Preset select, Trigger row, 'Playback options' rows, 'Preview applied configuration') — today the shared AnimationEditor (editor/animation, preset grid) draws that part.",
    "tier": "P1"
   },
   {
