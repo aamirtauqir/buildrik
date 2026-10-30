@@ -97,13 +97,9 @@ describe("Clone 3708:20650 / 20446 · Delete from the rail", () => {
     expect(rail().getByText("hero-dark.jpg")).toBeInTheDocument();
   });
 
-  it("Replace instead closes the confirm and opens the replace-across picker for that asset", async () => {
-    const cancelDelete = vi.fn();
-    await mountLibrary({ confirmDelete: menuConfirm, cancelDelete });
-    fireEvent.click(screen.getByTestId("media-delete-replace"));
-    expect(cancelDelete).toHaveBeenCalledTimes(1);
-    expect(rail().getByText("menu-cover.png")).toBeInTheDocument();
-    expect(screen.getByText(/Replace "menu-cover.png" across 1 use/)).toBeInTheDocument();
+  it("2L9 199:42695 — the confirm draws no Replace instead (Replace across site… stays in More ▾ / Usage)", async () => {
+    await mountLibrary({ confirmDelete: menuConfirm });
+    expect(screen.queryByTestId("media-delete-replace")).toBeNull();
   });
 });
 

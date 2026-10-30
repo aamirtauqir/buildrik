@@ -246,12 +246,10 @@ export function useSelectionState(
     if (graced.length > 0) {
       /* The toast names the file the way the confirm did — the full display
          name (Clone 3708:20446), not the engine's stem. */
-      const what = files === 1 ? `"${gracedName}"` : `${files} files`;
-      const broke = graced.reduce((n, g) => n + g.usageCount, 0);
+      /* 2L9 B6-A13 (199:42990): "{file} deleted. Undo available for 8 seconds." */
+      const what = files === 1 ? gracedName : `${files} files`;
       showToast(
-        broke > 0
-          ? `Deleted ${what} and cleared it from ${broke} element${broke === 1 ? "" : "s"}.`
-          : `Deleted ${what}.`,
+        `${what} deleted. Undo available for 8 seconds.`,
         "info",
         { action: { label: "Undo", onClick: () => graced.forEach((g) => g.undo()) }, duration: 8000 },
       );

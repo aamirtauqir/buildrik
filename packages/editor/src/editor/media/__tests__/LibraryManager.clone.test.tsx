@@ -743,7 +743,7 @@ describe("Clone 3397:18137 · fullpage · drag-over (re-draws V1 1163:13948)", (
   });
 });
 
-describe("Clone 3724:20828 / 3724:20832 · Upload files → Upload complete", () => {
+describe("Clone 3724:20828 · Upload files → 2L9 B6-A05…A08 upload rows and receipt", () => {
   it("the header Upload's picker opens the confirm; Cancel uploads nothing", async () => {
     const upload = vi.fn(() => Promise.resolve([]));
     await mountLibrary({ upload });
@@ -770,7 +770,7 @@ describe("Clone 3724:20828 / 3724:20832 · Upload files → Upload complete", ()
     expect(upload).toHaveBeenCalledWith([file], { folderId: "f-new" });
   });
 
-  it("Upload file → the modal waits on the queue, then Upload complete; View asset selects it in the rail and closes", async () => {
+  it("2L9 199:39336 → 41227 — Upload file closes the confirm; the grid row reads Uploading…, then '{file} saved to Assets' opens it in the rail", async () => {
     let finish: (v: UploadResult[]) => void = () => {};
     const upload = vi.fn(() => new Promise<UploadResult[]>((resolve) => { finish = resolve; }));
     await mountLibrary({
@@ -781,37 +781,48 @@ describe("Clone 3724:20828 / 3724:20832 · Upload files → Upload complete", ()
     pickFiles([file]);
     fireEvent.click(screen.getByTestId("mgr-upload-files-confirm"));
     expect(upload).toHaveBeenCalledWith([file], { folderId: null });
-    // Still the Upload files modal, now reading the queue.
-    expect(screen.getByTestId("mgr-upload-files-pct-0")).toHaveTextContent("62%");
-    expect(screen.queryByTestId("mgr-upload-complete")).toBeNull();
-    finish(landedResult(makeAsset({ id: "hero", name: "hero-dark", originalName: "hero-dark.jpg", mimeType: "image/jpeg" })));
-    const done = await screen.findByTestId("mgr-upload-complete");
     expect(screen.queryByTestId("mgr-upload-files")).toBeNull();
-    expect(within(done).getByTestId("mgr-upload-complete-body")).toHaveTextContent("hero-dark.jpg is now in your library.");
-    fireEvent.click(screen.getByTestId("mgr-upload-complete-view"));
-    expect(screen.queryByTestId("mgr-upload-complete")).toBeNull();
-    expect(within(screen.getByTestId("mgr-details")).getByText("hero-dark.jpg")).toBeInTheDocument();
+    expect(screen.getByTestId("mgr-upl-phase-hero-dark.jpg")).toHaveTextContent("Uploading…");
+    expect(screen.getByTestId("mgr-sync-pill")).toHaveTextContent("1 file not saved to Assets");
+    finish(landedResult(makeAsset({ id: "hero", name: "hero-dark", originalName: "hero-dark.jpg", mimeType: "image/jpeg" })));
+    const receipt = await screen.findByTestId("mgr-upload-receipt");
+    expect(receipt).toHaveTextContent("hero-dark.jpg saved to Assets");
+    fireEvent.click(receipt);
+    expect(screen.queryByTestId("mgr-upload-receipt")).toBeNull();
+    expect(screen.getByTestId("mgr-det-title")).toHaveTextContent("hero-dark.jpg");
   });
 
-  it("Done closes the result and selects nothing", async () => {
-    const upload = vi.fn(() => Promise.resolve(landedResult(makeAsset({ id: "hero", originalName: "hero-dark.jpg" }))));
-    await mountLibrary({ upload });
-    pickFiles([makeFile("hero-dark.jpg", 8 * MB)]);
-    fireEvent.click(screen.getByTestId("mgr-upload-files-confirm"));
-    fireEvent.click(await screen.findByTestId("mgr-upload-complete-done"));
-    expect(screen.queryByTestId("mgr-upload-complete")).toBeNull();
-    expect(within(screen.getByTestId("mgr-details")).queryByText("hero-dark.jpg")).toBeNull();
+  it("199:39965 — a file being registered reads Saving…", async () => {
+    await mountLibrary({ uploadQueue: [{ fileName: "hero-dark.jpg", progress: 90, status: "processing" }] });
+    expect(screen.getByTestId("mgr-upl-phase-hero-dark.jpg")).toHaveTextContent("Saving…");
   });
 
-  it("a batch where nothing landed closes without a result — the grid's failed rows are the door", async () => {
+  it("199:40594 — a refused file reads Couldn’t save with its reason, Retry and Remove file", async () => {
+    const retryUpload = vi.fn();
+    const dismissUpload = vi.fn();
+    await mountLibrary({
+      retryUpload,
+      dismissUpload,
+      uploadQueue: [{ fileName: "hero-dark.jpg", progress: 0, status: "error", error: "Server rejected" }],
+    });
+    expect(screen.getByTestId("mgr-upl-phase-hero-dark.jpg")).toHaveTextContent("Couldn’t save");
+    expect(screen.getByTestId("mgr-upl-hero-dark.jpg")).toHaveTextContent("Server rejected");
+    fireEvent.click(screen.getByTestId("mgr-upl-retry-hero-dark.jpg"));
+    expect(retryUpload).toHaveBeenCalledWith("hero-dark.jpg");
+    fireEvent.click(screen.getByTestId("mgr-upl-remove-hero-dark.jpg"));
+    expect(dismissUpload).toHaveBeenCalledWith("hero-dark.jpg");
+  });
+
+  it("a batch where nothing landed leaves no receipt — the grid's failed rows are the door", async () => {
     const upload = vi.fn(() =>
       Promise.resolve([{ success: false, error: "Server rejected", fileName: "hero-dark.jpg" }]),
     );
     await mountLibrary({ upload });
     pickFiles([makeFile("hero-dark.jpg", 8 * MB)]);
     fireEvent.click(screen.getByTestId("mgr-upload-files-confirm"));
-    await vi.waitFor(() => expect(screen.queryByTestId("mgr-upload-files")).toBeNull());
-    expect(screen.queryByTestId("mgr-upload-complete")).toBeNull();
+    await vi.waitFor(() => expect(upload).toHaveBeenCalled());
+    expect(screen.queryByTestId("mgr-upload-files")).toBeNull();
+    expect(screen.queryByTestId("mgr-upload-receipt")).toBeNull();
   });
 
   it("the empty-library hero's Upload goes through the same confirm", async () => {

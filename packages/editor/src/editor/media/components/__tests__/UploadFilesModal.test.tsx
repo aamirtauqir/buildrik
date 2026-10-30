@@ -22,8 +22,6 @@ function mount(over: Partial<React.ComponentProps<typeof UploadFilesModal>> = {}
   const props = {
     open: true,
     files: [makeFile("pasta-2-small.jpg", 8 * MB)],
-    uploading: false,
-    uploadQueue: [],
     onCancel: vi.fn(),
     onUpload: vi.fn(),
     ...over,
@@ -71,27 +69,6 @@ describe("Clone 3724:20828 · Upload files", () => {
     mount({ files: [makeFile("setup.exe", MB, "application/octet-stream")] });
     expect(screen.getByTestId("mgr-upload-files-reason-0")).toHaveTextContent(/Unsupported file type/);
     expect(screen.getByTestId("mgr-upload-files-status")).toHaveTextContent("Nothing to upload.");
-    expect(screen.getByTestId("mgr-upload-files-confirm")).toBeDisabled();
-  });
-
-  it("while the upload runs each line reads the queue's progress and a failure its reason in place", () => {
-    mount({
-      files: [makeFile("a.jpg", MB), makeFile("b.jpg", MB)],
-      uploading: true,
-      uploadQueue: [
-        { fileName: "a.jpg", progress: 62, status: "uploading" },
-        { fileName: "b.jpg", progress: 0, status: "error", error: "Server rejected" },
-      ],
-    });
-    expect(screen.getByTestId("mgr-upload-files-pct-0")).toHaveTextContent("62%");
-    expect(screen.getByTestId("mgr-upload-files-bar-0").querySelector("[role='progressbar']")).toHaveAttribute(
-      "aria-valuenow",
-      "62",
-    );
-    expect(screen.getByTestId("mgr-upload-files-reason-1")).toHaveTextContent("Server rejected");
-    expect(screen.getByTestId("mgr-upload-files-status")).toHaveTextContent("Uploading…");
-    // Nothing to press until it lands: the orchestrator swaps in Upload complete.
-    expect(screen.queryByTestId("mgr-upload-files-cancel")).toBeNull();
     expect(screen.getByTestId("mgr-upload-files-confirm")).toBeDisabled();
   });
 

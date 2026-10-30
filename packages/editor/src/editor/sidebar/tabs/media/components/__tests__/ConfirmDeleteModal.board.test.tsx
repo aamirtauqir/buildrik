@@ -68,6 +68,6 @@ describe("ConfirmDeleteModal (board 1175:4827 — the >20 gate, under Clone 3701
     );
     expect(screen.getByTestId("media-delete-title")).toHaveTextContent("Delete one.jpg?");
     expect(screen.queryByLabelText("Type DELETE to confirm")).toBeNull();
-    expect(screen.getByRole("button", { name: "Delete permanently" })).not.toBeDisabled();
+    expect(screen.getByRole("button", { name: "Delete asset" })).not.toBeDisabled();
   });
 });

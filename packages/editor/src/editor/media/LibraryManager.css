@@ -688,16 +688,10 @@
 
 
 
+/* 199:39336 — "1 file not saved to Assets" reads as plain footer text, in
+   the warning ink so it is not mistaken for "All assets saved". */
 .mgr-sync-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 3px var(--bk-space-8);
-  background: var(--bk-warning-tint);
   color: var(--bk-warning-text);
-  border-radius: var(--bk-radius-full);
-  font-size: var(--bk-text-11);
-  font-weight: 600;
 }
 
 .mgr-sync-pill svg { width: 10px; height: 10px; }
@@ -868,44 +862,47 @@
 .mgr-dropzone-title { font: 600 15px var(--bk-font-ui); color: var(--bk-accent-text); }
 .mgr-dropzone-sub { font: 400 11px var(--bk-font-ui); color: var(--bk-ink-soft); }
 
-.mgr-uploads {
-  margin: var(--bk-space-8) var(--bk-space-20) 0;
+/* 2L9 199:39336 / 40594 — an upload row: name left, phase right (13 ink /
+   12 muted); a failed one adds its reason and Retry · Remove file. */
+.mgr-upl-list {
+  margin: 0;
   padding: 0;
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: var(--bk-space-4);
-}
-.mgr-upload {
-  display: flex;
-  align-items: center;
   gap: var(--bk-space-8);
-  padding: var(--bk-space-8) var(--bk-space-12);
-  border-radius: var(--bk-radius-md);
-  background: var(--bk-bg-subtle);
-  font: 400 11px var(--bk-font-ui);
-  color: var(--bk-ink-soft);
+  flex-shrink: 0;
 }
-.mgr-upload.error { background: var(--bk-error-tint); color: var(--bk-error-text, var(--bk-error)); }
-.mgr-upload.complete { background: var(--bk-success-tint); color: var(--bk-success-text, var(--bk-success)); }
-.mgr-upload-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.mgr-upload-track {
-  width: 120px;
-  height: 5px;
-  border-radius: var(--bk-radius-full);
-  background: var(--bk-border);
+.mgr-upl { display: flex; flex-direction: column; gap: var(--bk-space-8); padding: var(--bk-space-8) var(--bk-space-12); }
+.mgr-upl-head { display: flex; align-items: center; gap: var(--bk-space-12); }
+.mgr-upl-name {
+  flex: 1;
+  min-width: 0;
   overflow: hidden;
-  flex-shrink: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: 400 var(--bk-text-13)/20px var(--bk-font-ui);
+  color: var(--bk-ink);
 }
-.mgr-upload-fill { display: block; height: 100%; background: var(--bk-accent); }
-.mgr-upload-dismiss {
-  border: 0;
-  background: transparent;
+.mgr-upl-phase { flex-shrink: 0; font: 400 var(--bk-text-12)/16px var(--bk-font-ui); color: var(--bk-ink-soft); }
+.mgr-upl--failed .mgr-upl-phase { color: var(--bk-error-text); }
+.mgr-upl-reason { margin: 0; font: 400 var(--bk-text-12)/16px var(--bk-font-ui); color: var(--bk-ink); }
+.mgr-upl-actions { display: flex; align-items: center; gap: var(--bk-space-16); }
+.mgr-upl-actions .mgr-upl-link {
+  min-height: 0;
   padding: 0;
-  font: 500 11px var(--bk-font-ui);
-  color: var(--bk-accent-text);
-  cursor: pointer;
+  font: 400 var(--bk-text-12)/16px var(--bk-font-ui);
+  color: var(--bk-ink);
+}
+
+/* 199:41227 — "{file} saved to Assets", 12 ink, under the grid. */
+.mgr-receipt {
   flex-shrink: 0;
+  align-self: flex-start;
+  min-height: 0;
+  padding: var(--bk-space-8) 0;
+  font: 400 var(--bk-text-12)/16px var(--bk-font-ui);
+  color: var(--bk-ink);
 }
 
 /* 4418:58292 — the "Tags ▾" row fills the rail like every other row. */

@@ -11,7 +11,7 @@
 
 import * as React from "react";
 import {
-  Search, AlertCircle, X, ChevronDown,
+  Search, X, ChevronDown,
 } from "lucide-react";
 import type { Composer } from "@/engine/Composer";
 import { useMediaState } from "../sidebar/tabs/media/hooks/useMediaState";
@@ -30,7 +30,6 @@ import { MoveAssetsModal } from "./components/MoveAssetsModal";
 import { MoveFailedModal } from "./components/MoveFailedModal";
 import { ReplaceResultModal, type ReplaceOutcome } from "./components/ReplaceResultModal";
 import { UploadFilesModal } from "./components/UploadFilesModal";
-import { UploadCompleteModal } from "./components/UploadCompleteModal";
 import { VersionsModal } from "./components/VersionsModal";
 import { ApplyVersionModal } from "./components/ApplyVersionModal";
 import { UrlImportError, fetchUrlAsFile } from "./fetchUrlAsFile";
@@ -284,6 +283,8 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
     () => state.libraryItems.filter((i) => i.localOnly).length,
     [state.libraryItems],
   );
+  const pendingUploadCount = (state.uploadQueue ?? []).filter((u) => u.status !== "complete").length;
+  const notSavedCount = localOnlyCount + pendingUploadCount;
 
   const [importUrlOpen, setImportUrlOpen] = React.useState(false);
   /* Clone 3700:20347 — `row/＋ New folder` opens a modal. The folder lands
@@ -444,15 +445,6 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
     if (selectedAssetId && deleted.includes(selectedAssetId)) setSelectedAssetId(null);
   }, [state, selectedAssetId]);
 
-  const handleReplaceInstead = React.useCallback(
-    (key: string) => {
-      state.cancelDelete();
-      setSelectedAssetId(key);
-      setReplacePickerOpen(true);
-    },
-    [state],
-  );
-
   /* ─── P3-I Import URL · Stock ──────────────────────────────────────── */
   /* Clone 3397:18835 → 3695:43873 / 3695:43876: the import's outcome is a
      dialog, not a toast. The file goes through the engine's own upload gate
@@ -521,15 +513,15 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
      this input). Once sent, the same modal reads the queue until the batch
      resolves; then Upload complete names what landed. A drop skips the
      confirm — edge `AFTE|NAV>3397:17505` goes straight back to the library. */
-  const [uploadBatch, setUploadBatch] = React.useState<{ files: File[]; uploading: boolean } | null>(null);
-  const [uploadDone, setUploadDone] = React.useState<{
-    landed: MediaAsset[];
-    failed: Array<{ fileName: string; reason: string }>;
-  } | null>(null);
+  const [uploadBatch, setUploadBatch] = React.useState<{ files: File[] } | null>(null);
+  /* 2L9 B6-A08 (199:41227) — what landed is a line under the grid, "{file}
+     saved to Assets" (the Upload complete dialog is displaced); pressing it
+     opens the file in the rail. Failures stay on their own rows. */
+  const [uploadReceipt, setUploadReceipt] = React.useState<{ firstId: string; label: string } | null>(null);
 
   const handleFileChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.length) {
-      setUploadBatch({ files: Array.from(e.target.files), uploading: false });
+      setUploadBatch({ files: Array.from(e.target.files) });
       e.target.value = "";
     }
   }, []);
@@ -542,28 +534,31 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
      grid's failed rows (with their reasons) are the door. */
   const runUploadBatch = React.useCallback(
     async (files: File[]) => {
-      setUploadBatch({ files, uploading: true });
-      const results = await state.upload(files, { folderId: state.currentFolderId });
+      /* The confirm gives way at once: progress is the grid's rows (199:39336). */
       setUploadBatch(null);
+      setUploadReceipt(null);
+      const results = await state.upload(files, { folderId: state.currentFolderId });
       const landed = results.flatMap((r) => (r.success && r.asset ? [r.asset] : []));
       if (landed.length === 0) return;
-      setUploadDone({
-        landed,
-        failed: results.filter((r) => !r.success).map((r) => ({ fileName: r.fileName, reason: r.error ?? "Upload failed" })),
+      setUploadReceipt({
+        firstId: landed[0].id,
+        label:
+          landed.length === 1
+            ? `${displayNameFor(landed[0].name, landed[0].mimeType)} saved to Assets`
+            : `${landed.length} files saved to Assets`,
       });
     },
     [state],
   );
 
-  /* Edge `Action / View asset` — the rail IS the asset's details (decision in
-     the P3 brief: the prototype's 3721:45823 dialog is a placeholder). A smart
-     scope that would hide the new card is released. */
+  /* The receipt opens what landed in the rail; a smart scope that would hide
+     the new card is released. */
   const viewUploadedAsset = React.useCallback(() => {
-    if (!uploadDone) return;
+    if (!uploadReceipt) return;
     setSmartFolder(null);
-    setSelectedAssetId(uploadDone.landed[0].id);
-    setUploadDone(null);
-  }, [uploadDone]);
+    setSelectedAssetId(uploadReceipt.firstId);
+    setUploadReceipt(null);
+  }, [uploadReceipt]);
 
   /* ─── P6-V Versions ────────────────────────────────────────────────── */
   /* Clone 3695:45529 — the Asset versions dialog, open on this file's family
@@ -769,7 +764,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
       setIsDragOver(false);
       if (!files.length) return;
       e.preventDefault();
-      state.upload(files, { folderId: state.currentFolderId });
+      void runUploadBatch(files);
     },
   };
 
@@ -931,6 +926,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
           isDragOver={isDragOver}
           onDownload={handleDownload}
           onDismissUpload={state.dismissUpload}
+          onRetryUpload={state.retryUpload}
           state={state}
           visibleItems={visibleItems}
           usageMap={usageMap}
@@ -947,6 +943,11 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
           onAssetDragEnd={() => setAssetDrag(null)}
           addToast={addToast}
         />
+        {uploadReceipt ? (
+          <Button type="button" variant="link" className="mgr-receipt" data-testid="mgr-upload-receipt" onClick={viewUploadedAsset}>
+            {uploadReceipt.label}
+          </Button>
+        ) : null}
         </div>
         {/* ─── RIGHT: Details rail ─── */}
         {/* D5 Stage 2 (audit-remediation 2026-05-08): RIGHT panel +
@@ -1042,10 +1043,11 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
           {formatQuotaSize(state.storage.used)} of {formatQuotaSize(state.storage.total)} used
         </span>
         <span className="mgr-status-center" data-testid="mgr-sync-state">
-          {localOnlyCount > 0 ? (
+          {/* 199:39336 / 40594 — files still landing or refused count with the
+              assets that never reached the server: "1 file not saved to Assets". */}
+          {notSavedCount > 0 ? (
             <span className="mgr-sync-pill" data-testid="mgr-sync-pill">
-              <AlertCircle size={12} />
-              {localOnlyCount} not on the server
+              {notSavedCount} {notSavedCount === 1 ? "file" : "files"} not saved to Assets
             </span>
           ) : (
             "All assets saved"
@@ -1108,7 +1110,6 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
           payload={state.confirmDelete}
           onConfirm={handleExecuteDelete}
           onCancel={state.cancelDelete}
-          onReplaceInstead={handleReplaceInstead}
         />
       )}
       {folderConfirm && (
@@ -1239,17 +1240,8 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor }: Library
       <UploadFilesModal
         open={uploadBatch !== null}
         files={uploadBatch?.files ?? []}
-        uploading={uploadBatch?.uploading ?? false}
-        uploadQueue={state.uploadQueue}
         onCancel={() => setUploadBatch(null)}
         onUpload={(files) => void runUploadBatch(files)}
-      />
-      <UploadCompleteModal
-        open={uploadDone !== null}
-        landed={uploadDone?.landed ?? []}
-        failed={uploadDone?.failed ?? []}
-        onDone={() => setUploadDone(null)}
-        onViewAsset={viewUploadedAsset}
       />
       {/* One Move modal for both doors: the checked set (3683:19950) or the
           card menu's one file (3721:45952). */}

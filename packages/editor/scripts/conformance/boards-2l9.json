@@ -9739,9 +9739,9 @@
    "page": "05",
    "family": "assets",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Board: Uploading… + Cancel upload, no %; code shows % fill, no cancel",
+   "authority": "code:no-upload-abort",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-C 2026-10-31 AS-5 built + probe-compared (new case media-fullpage-uploading) vs shots/199-39336.png: the confirm closes on Upload and the file is a row above the grid — name left, 'Uploading…' right; footer '{n} file(s) not saved to Assets' (in-flight + refused + local-only). Code: no 'Cancel upload' — MediaManager.uploadFile has no abort path, so a cancel would only hide a transfer that still lands. | Board: Uploading… + Cancel upload, no %; code shows % fill, no cancel",
    "tier": "P2"
   },
   {
@@ -9751,8 +9751,8 @@
    "family": "assets",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Distinct Saving… registration phase not modelled; single progress phase in code",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-C 2026-10-31 AS-5 built + probe-compared (media-fullpage-uploading) vs shots/199-39965.png: the row reads 'Saving…' while the pipeline registers the asset (engine status optimizing/processing); footer as A05. | Distinct Saving… registration phase not modelled; single progress phase in code",
    "tier": "P2"
   },
   {
@@ -9762,8 +9762,8 @@
    "family": "assets",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Failed tile copy + Retry/Remove file; code error row/toast differs",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-C 2026-10-31 AS-5 built + probe-compared (media-fullpage-uploading) vs shots/199-40594.png: 'Couldn’t save' (error ink) right of the name, the engine's reason on the next line, primary 'Retry' (re-sends the kept File) and 'Remove file'. Not drawn: the failed file's thumbnail (the refused file has no library src). The board's 'Your file is kept on this device.' case is the local-only asset, which the footer counts. | Failed tile copy + Retry/Remove file; code error row/toast differs",
    "tier": "P2"
   },
   {
@@ -9773,8 +9773,8 @@
    "family": "assets",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Inline “saved to Assets” receipt vs code “Upload complete” modal",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-C 2026-10-31 AS-5 built; compared vs shots/199-41227.png by unit pin (LibraryManager.clone 'saved to Assets' test — the probe cannot complete an upload): the Upload complete dialog is gone; what landed is a line under the grid, '{file} saved to Assets' ('{n} files saved to Assets'); pressing it opens the file in the rail. Footer back to 'All assets saved'. | Inline “saved to Assets” receipt vs code “Upload complete” modal",
    "tier": "P2"
   },
   {
@@ -9817,8 +9817,8 @@
    "family": "assets",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Copy: Delete asset + 8-second + Site settings caveat; code “Delete permanently”, Replace instead",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-C 2026-10-31 AS-7 built + probe-compared (media-fullpage-library, More ▾ › Delete asset…) vs shots/199-42695.png: 'Delete {file}?', 'Used in N known place(s). Those images will break.' (or 'No known placements on this site.'), the 11 muted caveat 'May also be used as a favicon, social image or brand image — check Site settings. After 8 seconds this can’t be undone.', Cancel (primary) · Delete asset. The V3 'Replace instead' shortcut is gone (Replace across site… stays in More ▾ and Usage). Same dialog in the media drawer. The checked-set confirm (no 2L9 board) keeps its red button. Small residual: the shared library modal title is 20/600 vs the board's ~14. | Copy: Delete asset + 8-second + Site settings caveat; code “Delete permanently”, Replace instead",
    "tier": "P2"
   },
   {
@@ -9828,8 +9828,8 @@
    "family": "assets",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "8s grace Undo exists; toast copy differs",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-C 2026-10-31 AS-7 built; compared by unit pin (useSelectionState.usage) vs shots/199-42990.png: the toast reads '{file} deleted. Undo available for 8 seconds.' ('{n} files deleted. …') with Undo, 8 s — the engine's grace window. The old 'cleared it from N elements' tail is dropped (the confirm said it). | 8s grace Undo exists; toast copy differs",
    "tier": "P3"
   },
   {

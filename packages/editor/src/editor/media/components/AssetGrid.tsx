@@ -221,6 +221,8 @@ export interface AssetGridProps {
   movedNote?: string | null;
   /** Board 1163:13948 — the error row's Dismiss. */
   onDismissUpload?: (fileName: string) => void;
+  /** 199:40594 — Retry re-sends the failed file. */
+  onRetryUpload?: (fileName: string) => void;
   /** Board 1163:4641's bulk Download — routed to the engine's media layer. */
   onDownload: (assets: ReadonlyArray<{ src: string; name: string }>) => number;
   /** Whole grid becomes the drop zone while a file drag is over the manager. */
@@ -270,6 +272,7 @@ export function AssetGrid({
   smartFolder,
   movedNote = null,
   onDismissUpload,
+  onRetryUpload,
   onDownload,
   isDragOver = false,
   selectedAssetId,
@@ -743,32 +746,51 @@ export function AssetGrid({
         </div>
       )}
 
-      {/* Board 1163:13948 — files still landing report themselves above the
-          grid: what failed and why, what is still working, what arrived. */}
+      {/* 2L9 B6-A05/A06/A07 (199:39336 / 39965 / 40594) — a file still
+          landing is a row above the grid: its name, then "Uploading…" while
+          the bytes move and "Saving…" while the asset is registered. A file
+          that did not land says "Couldn’t save" with the reason, Retry and
+          Remove file. No Cancel upload: the pipeline cannot abort a transfer
+          (code:no-upload-abort). */}
       {activeUploads.length > 0 && (
-        <ul className="mgr-uploads" aria-label="Uploads">
-          {activeUploads.map((u) => (
-            <li key={u.fileName} className={`mgr-upload ${u.status}`}>
-              <span className="mgr-upload-name">
-                {u.fileName}
-                {u.status === "error"
-                  ? ` → ${u.error ?? "not supported"}`
-                  : u.status === "complete"
-                    ? ""
-                    : " → uploading…"}
-              </span>
-              {u.status === "uploading" || u.status === "processing" || u.status === "optimizing" ? (
-                <span className="mgr-upload-track" aria-hidden="true">
-                  <span className="mgr-upload-fill" style={{ width: `${Math.round(u.progress)}%` }} />
-                </span>
-              ) : null}
-              {u.status === "error" && onDismissUpload ? (
-                <Button className="mgr-upload-dismiss" onClick={() => onDismissUpload(u.fileName)}>
-                  Dismiss
-                </Button>
-              ) : null}
-            </li>
-          ))}
+        <ul className="mgr-upl-list" aria-label="Uploads" data-testid="mgr-uploads">
+          {activeUploads.map((u) => {
+            const failed = u.status === "error";
+            const phase = failed
+              ? "Couldn’t save"
+              : u.status === "optimizing" || u.status === "processing"
+                ? "Saving…"
+                : "Uploading…";
+            return (
+              <li key={u.fileName} className={`mgr-upl${failed ? " mgr-upl--failed" : ""}`} data-testid={`mgr-upl-${u.fileName}`}>
+                <div className="mgr-upl-head">
+                  <span className="mgr-upl-name">{u.fileName}</span>
+                  <span className="mgr-upl-phase" role="status" data-testid={`mgr-upl-phase-${u.fileName}`}>{phase}</span>
+                </div>
+                {failed ? (
+                  <>
+                    <p className="mgr-upl-reason">{u.error ?? "Not saved to Assets."}</p>
+                    <div className="mgr-upl-actions">
+                      {onRetryUpload ? (
+                        <Button size="xs" className="mgr-btn-primary" data-testid={`mgr-upl-retry-${u.fileName}`} onClick={() => onRetryUpload(u.fileName)}>
+                          Retry
+                        </Button>
+                      ) : null}
+                      <Button
+                        type="button"
+                        variant="link"
+                        className="mgr-upl-link"
+                        data-testid={`mgr-upl-remove-${u.fileName}`}
+                        onClick={() => onDismissUpload?.(u.fileName)}
+                      >
+                        Remove file
+                      </Button>
+                    </div>
+                  </>
+                ) : null}
+              </li>
+            );
+          })}
         </ul>
       )}
 
