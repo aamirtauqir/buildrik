@@ -2727,6 +2727,18 @@ const CASES: Record<string, () => React.ReactElement> = {
       host.appendChild(node);
       document.body.appendChild(host);
     }
+    /* `?dimmed=1` — the element dimmed in the editor (the Layers eye): its
+       canvas stand-in carries `data-hidden`, as useCanvasEditorFlags sets it
+       (147:78900). */
+    if (q.get("dimmed")) {
+      const node = document.querySelector(`[data-buildrick-id="${el.getId()}"]`) ?? document.body.appendChild(document.createElement("div"));
+      node.setAttribute("data-buildrick-id", el.getId());
+      node.setAttribute("data-hidden", "true");
+      if (node.parentElement === document.body) (node as HTMLElement).style.cssText = "position:absolute;left:-9999px;";
+      c.on(EVENTS.LAYER_SHOW_NORMALLY_REQUESTED, ({ id }: { id: string }) => {
+        if (id === el.getId()) node.removeAttribute("data-hidden");
+      });
+    }
     /* `?also=1&alsoAttrs={"progress":{"value":"60"}}` — more of the same
        block selected with it (a batch, B03); `alsoAttrs` sets attributes on
        their descendants by tag name. */

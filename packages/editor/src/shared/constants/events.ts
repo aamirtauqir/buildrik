@@ -76,6 +76,9 @@ export const EVENTS = {
   LAYER_HOVER: "layer:hover",
   /** Fired after toggling layer visibility — carries undo action */
   LAYER_VISIBILITY_TOGGLED: "layer:visibility-toggled",
+  /** The Inspector's "Show normally" on a layer dimmed in the editor
+   *  (2L9 147:78900): the Layers panel, which owns the dimmed set, un-dims it. */
+  LAYER_SHOW_NORMALLY_REQUESTED: "layer:show-normally-requested",
 
   // ============================================
   // Selection Events
@@ -907,6 +910,7 @@ export interface EventPayloads {
   // Layer Panel Events
   [EVENTS.LAYER_HOVER]: { id: string | null };
   [EVENTS.LAYER_VISIBILITY_TOGGLED]: { id: string; hidden: boolean; undo: () => void };
+  [EVENTS.LAYER_SHOW_NORMALLY_REQUESTED]: { id: string };
 
   // Selection Events
   [EVENTS.SELECTION_CHANGED]: { selected: string[] };
