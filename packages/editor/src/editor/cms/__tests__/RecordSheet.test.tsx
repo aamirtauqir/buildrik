@@ -794,9 +794,9 @@ describe("RecordSheet · the way back names its origin (2L9 C2)", () => {
     await act(async () => finish(true));
   });
 
-  it("without an origin it stays ‹ Back to canvas", async () => {
+  it("without an origin it reads ‹ Back to Editor (165:2)", async () => {
     mountFrom();
-    expect(await screen.findByTestId("cms-ws-back-to-canvas")).toHaveTextContent("‹ Back to canvas");
+    expect(await screen.findByTestId("cms-ws-back-to-canvas")).toHaveTextContent(/^‹ Back to Editor/);
   });
 
   it("the origin goes when the workspace closes", async () => {

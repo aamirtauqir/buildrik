@@ -24,13 +24,18 @@ import { pageFileNames } from "@/engine/export";
 import type { CMSCollection, CMSContentItem } from "@/shared/types/cms";
 import { Button, Select, TextInput, useToast } from "@/editor/chrome-ui";
 import { applyCmsPattern, cmsPatternError, cmsSlugField } from "@buildrik/shared/schemas/cms";
-import { CONTROL, NOTE, PANE, WARN } from "./paneStyles";
+import { NOTE, PANE, WARN } from "./paneStyles";
 import { DynamicPagesStart } from "./DynamicPagesStart";
 import { undoWithOwnReceipt } from "@/editor/shell/hooks/useHistoryFeedback";
 
 /* 165:3693 / 187:21853: 720 filled fields under 13/20 ink labels; an
    invalid one is outlined in the error red. */
 const FIELD_W = "tw:w-[720px]";
+/* 165:3432 measured: this form's controls are 28 tall (the shared pane
+   CONTROL is 32), filled, 13px. */
+const CONTROL =
+  "tw:[&_input]:h-7 tw:[&_input]:py-0 tw:[&_input]:pl-2.5 tw:[&_input]:text-[13px] tw:[&_input]:rounded-[6px] " +
+  "tw:[&_select]:h-7 tw:[&_select]:py-0 tw:[&_select]:pl-2.5 tw:[&_select]:text-[13px] tw:[&_select]:rounded-[6px]";
 const FIELD_LABEL = "tw:mb-2 tw:block tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]";
 const FILLED =
   "tw:[&_input]:border-0 tw:[&_input]:bg-[var(--bk-gray-100)] tw:[&_select]:border-0 tw:[&_select]:bg-[var(--bk-gray-100)]";
@@ -326,8 +331,8 @@ export function DynamicPagesPane({ composer, collection, records, onOpenPage, on
     );
   }
 
-  const field = (id: string, label: string, control: React.ReactNode, extra?: React.ReactNode) => (
-    <div className={FIELD_W}>
+  const field = (id: string, label: string, control: React.ReactNode, extra?: React.ReactNode, first = false) => (
+    <div className={`${FIELD_W}${first ? " tw:mt-2" : ""}`}>
       <label className={FIELD_LABEL} htmlFor={id}>{label}</label>
       {control}
       {extra}
@@ -352,10 +357,11 @@ export function DynamicPagesPane({ composer, collection, records, onOpenPage, on
           ))}
         </Select>,
         linkedPage && onOpenPage ? (
-          <Button size="xs" variant="link" className="tw:mt-2 tw:h-8 tw:w-[200px] tw:justify-center tw:p-0 tw:text-[13px] tw:font-normal" onClick={() => onOpenPage(linkedPage.id)} data-testid="cms-dp-edit-page">
+          <Button size="xs" variant="link" className="tw:mt-[17px] tw:h-8 tw:w-[200px] tw:justify-center tw:p-0 tw:text-[13px] tw:font-normal" onClick={() => onOpenPage(linkedPage.id)} data-testid="cms-dp-edit-page">
             Edit collection page ›
           </Button>
         ) : null,
+        true,
       )}
       {field(
         "cms-dp-pattern",
@@ -380,6 +386,9 @@ export function DynamicPagesPane({ composer, collection, records, onOpenPage, on
               </Button>
             ) : null}
           </div>
+        ) : urls.length > 0 ? (
+          /* 165:3432: how many pages the pattern makes, under the field. */
+          <p className={`${NOTE} tw:m-0 tw:mt-2`} data-testid="cms-dp-unique">{`${urls.length.toLocaleString()} unique URL${urls.length === 1 ? "" : "s"}`}</p>
         ) : null,
       )}
       {field(

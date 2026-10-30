@@ -13,6 +13,8 @@ type Handler = (p: unknown) => void;
 export function makeEngine(opts?: {
   collections?: CMSCollection[];
   items?: CMSContentItem[];
+  /** cms.bindings.getCondition(): element id → its condition (176:21830). */
+  conditions?: Record<string, unknown>;
   /** cms.bindings.export(): element id → its CMS field bindings. */
   bindings?: Record<string, Array<{ collectionId: string; fieldSlug: string; property: string }>>;
   /** cms.bindings.getAllCollectionBindings(): a repeater/Collection-list's
@@ -34,6 +36,7 @@ export function makeEngine(opts?: {
     removeDataBinding: (p: string) => void;
     /** A repeater/Collection-list's own template (`repeat: "children"`). */
     getDescendants?: () => FakeElement[];
+    getParent?: () => unknown;
   };
   const elements: FakeElement[] = [];
   const updateCollection = vi.fn((id: string, updates: Record<string, unknown>) => {
@@ -54,9 +57,11 @@ export function makeEngine(opts?: {
       getAllElements: () => elements,
       getElement: (id: string) => elements.find((e) => e.getId() === id) ?? null,
       getAllPages: () => [
-        { id: "p-home", name: "Home", slug: "home", isHome: true },
-        { id: "p-item", name: "Menu item", slug: "menu-item" },
+        { id: "p-home", name: "Home", slug: "home", isHome: true, root: { id: "root-home" } },
+        { id: "p-item", name: "Menu item", slug: "menu-item", root: { id: "root-item" } },
       ],
+      getActivePage: () => ({ id: "p-home" }),
+      setActivePage: vi.fn(),
     },
     selection: { select: vi.fn() },
     data: {
@@ -92,6 +97,7 @@ export function makeEngine(opts?: {
     cms: {
       bindings: {
         export: () => opts?.bindings ?? {},
+        getCondition: (id: string) => opts?.conditions?.[id] ?? null,
         getAllCollectionBindings: () => opts?.collectionBindings ?? [],
         getBindings: (id: string) => opts?.bindings?.[id] ?? [],
         getCollectionBinding: (id: string) => opts?.collectionBindings?.find((b) => b.elementId === id) ?? null,

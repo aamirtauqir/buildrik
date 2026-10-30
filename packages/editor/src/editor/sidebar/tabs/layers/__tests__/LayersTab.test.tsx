@@ -131,23 +131,6 @@ describe("LayersTab — header ⋯ menu", () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  it("inspector Pick-on-canvas owns Escape — the two-step does not clear the selection out from under it", () => {
-    const onClose = vi.fn();
-    const clear = vi.fn();
-    const c = {
-      ...composer(),
-      selection: { getSelectedIds: () => ["el-1"], clear },
-    } as unknown as Composer;
-    render(<LayersTab composer={c} onClose={onClose} />);
-    const pickFlag = document.createElement("div");
-    pickFlag.setAttribute("data-bk-pick", "true");
-    document.body.appendChild(pickFlag);
-    fireEvent.keyDown(document.body, { key: "Escape" });
-    expect(clear).not.toHaveBeenCalled();
-    expect(onClose).not.toHaveBeenCalled();
-    document.body.removeChild(pickFlag);
-  });
-
   /* design-2l9 147:75914 / 147:76329: "View" beside the search opens the
      display settings ("Layer display" … Close). Re-baseline. */
   it("View beside the search toggles the display settings", () => {

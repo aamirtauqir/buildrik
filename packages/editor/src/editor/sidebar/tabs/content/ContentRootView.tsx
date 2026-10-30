@@ -38,6 +38,7 @@ export function RootView({
   conditionsCount,
   selectedCollectionId,
   variablesOpen = false,
+  conditionsOpen = false,
   onOpenCollection,
   onCreateCollection,
   onOpenSources,
@@ -52,6 +53,8 @@ export function RootView({
   selectedCollectionId?: string | null;
   /** The workspace shows the Site variables page (B5-V01) — its row is marked. */
   variablesOpen?: boolean;
+  /** The workspace shows the Conditions page (176:21830) — its row is marked. */
+  conditionsOpen?: boolean;
   onOpenCollection: (id: string) => void;
   onCreateCollection?: () => void;
   onOpenSources: () => void;
@@ -176,7 +179,7 @@ export function RootView({
         <ListRow icon={<Database size={16} />} label="Sources" count={sourcesCount} chevron data-testid="content-open-sources" onClick={onOpenSources} />
       ) : null}
       <ListRow icon={<Braces size={16} />} label="Site variables" count={variablesCount} chevron selected={variablesOpen} aria-current={variablesOpen ? "true" : undefined} data-testid="content-open-variables" onClick={onOpenVariables} />
-      <ListRow icon={<GitBranch size={16} />} label="Conditions" count={conditionsCount} chevron data-testid="content-open-conditions" onClick={onOpenConditions} />
+      <ListRow icon={<GitBranch size={16} />} label="Conditions" count={conditionsCount} chevron selected={conditionsOpen} aria-current={conditionsOpen ? "true" : undefined} data-testid="content-open-conditions" onClick={onOpenConditions} />
       {/* Restoring deleted collections, fields and records needs the server
           to list and undelete them; until that ships the row says Planned
           rather than opening a list with nothing it can do. */}

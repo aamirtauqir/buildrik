@@ -263,24 +263,6 @@
   outline-offset: 2px;
 }
 
-/* Pick mode (board 301:2186) — the inspector is waiting for the user to point
-   at an element. It must beat the three rules above, all of which match the
-   element under the pointer and so outrank a `cursor` inherited from the frame:
-   `move` on hover, `grabbing` while dragging, `not-allowed` when locked. A
-   locked element is pickable — the pick reads it, it does not edit it.
-
-   `.buildrick-canvas` is the third selector because the page surface carries
-   an INLINE `cursor: default` (canvasStyles), and an own declaration always
-   beats an inherited one — !important on the frame cannot reach it. Measured
-   2026-09-08 with CDP: the frame and every element read `crosshair` while the
-   canvas BETWEEN elements read `default`, which is exactly the
-   `partial-trigger-exists-cursor-not-on-body` drift boards.json records
-   against 301:2186. It is a stylesheet !important against a plain inline
-   style, so it wins. */
-[data-bk-pick="true"],
-[data-bk-pick="true"] .buildrick-canvas,
-[data-bk-pick="true"] [data-buildrick-id] { cursor: crosshair !important; }
-
 [data-buildrick-id][data-hidden="true"] {
   opacity: 0.25;
   pointer-events: none;
@@ -850,6 +832,11 @@ button:hover > .bd-canvas-empty-cta__thumb {
   opacity: 0.4;
   outline: 1px dashed var(--bk-gray-400);
   outline-offset: 2px;
+}
+
+/* 176:19451: "Show hidden elements" off — the ghost is not drawn at all. */
+[data-bk-hide-conditional="true"] [data-bk-condition="hidden"] {
+  display: none !important;
 }
 
 .buildrick-canvas [data-bk-condition="hidden"]::after {

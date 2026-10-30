@@ -17,7 +17,7 @@ import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants";
 import { Button, IconButton, Menu, MenuItem, MenuSeparator, Popover, Tabs, useToast } from "@/editor/chrome-ui";
 import { useContentPanel } from "@/editor/sidebar/tabs/content/useContentPanel";
-import { VariablesView } from "@/editor/sidebar/tabs/content/ContentViews";
+import { ConditionsView, VariablesView } from "@/editor/sidebar/tabs/content/ContentViews";
 import { variableUsage } from "@/editor/sidebar/tabs/content/variableUsage";
 import { DynamicPagesPane, type DynamicPagesSave } from "./DynamicPagesPane";
 import { CollectionSettingsPane } from "./CollectionSettingsPane";
@@ -80,6 +80,9 @@ function HintColumn({ title, hint, testId }: { title: string; hint: string; test
 function plural(n: number, one: string, many = `${one}s`): string {
   return `${n} ${n === 1 ? one : many}`;
 }
+
+/** The way back with no element origin (165:2, 176:21830). */
+const backToEditor = (page: string | undefined) => (page ? `Back to Editor · ${page}` : "Back to Editor");
 
 export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary, onBackToCanvas }: CmsWorkspaceProps) {
   const panel = useContentPanel(composer);
@@ -186,7 +189,9 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
         })
       }
     >
-      ‹ {ws.origin ?? "Back to canvas"}
+      {/* 165:2 / 176:21830: with no element origin, the way back names the
+          editor and the page it kept open. */}
+      ‹ {ws.origin ?? backToEditor(composer?.elements.getActivePage?.()?.name)}
     </Button>
   ) : null;
 
@@ -218,6 +223,37 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
                 composer.selection.select(el);
                 composer.emit("ui:switch-tab", { tab: "layers" });
               }}
+            />
+          </div>
+        </section>
+      </div>
+    );
+  }
+
+  /* 176:21830 (D39): Conditions is a page of the workspace — a read-only
+     index; Locate leaves for the canvas, opens the element's page and selects
+     it, so its Inspector (Content › Conditions) is where the rule is edited. */
+  if (!collection && ws.page === "conditions") {
+    return (
+      <div className="tw:flex tw:h-full tw:min-h-0" data-testid="cms-workspace" data-bk-full-page="">
+        <section className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:bg-[var(--bk-bg-panel)]" data-testid="cms-ws-conditions">
+          <header className={HEADER} data-testid="cms-ws-header">
+            {back}
+            <h2 className={TITLE}>Conditions</h2>
+          </header>
+          <div className="tw:min-h-0 tw:flex-1">
+            <ConditionsView
+              conditions={panel.conditions}
+              onLocate={(row) =>
+                cmsWorkspace.exit(() => {
+                  cmsWorkspace.openRecord(null);
+                  onBackToCanvas?.();
+                  if (!composer) return;
+                  if (row.pageId && composer.elements.getActivePage()?.id !== row.pageId) composer.elements.setActivePage(row.pageId);
+                  const el = composer.elements.getElement(row.elementId);
+                  if (el) composer.selection.select(el);
+                })
+              }
             />
           </div>
         </section>

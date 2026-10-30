@@ -24,9 +24,9 @@ import {
   Select,
   TextInput,
 } from "@/editor/chrome-ui";
-import type { ConditionExpression, ConditionOperator, DataSource } from "@/shared/types/data";
+import type { DataSource } from "@/shared/types/data";
 import type { SiteVariable } from "@/shared/types/project";
-import { conditionSummary, isValidVariableKey } from "./contentPanelUtils";
+import { isValidVariableKey } from "./contentPanelUtils";
 import type { ConditionRow } from "./useContentPanel";
 import { ConnectSourceDialog, RenameDialog, ResyncJsonDialog } from "./DataRowDialogs";
 import { placeholderCount, type VariableUse } from "./variableUsage";
@@ -100,9 +100,6 @@ const STATUS_PILL_IDLE = "tw:bg-[var(--bk-gray-200)] tw:border-[var(--bk-gray-40
    source's status, 151:71 a variable's value, 151:96 a condition's summary —
    all four boards draw it 11/16, and the line-height was left to the face. */
 const SUB = "tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
-const INLINE_FORM = "tw:flex tw:flex-col tw:gap-2 tw:p-3 tw:border-b tw:border-[var(--bk-gray-200)]";
-const FORM_ROW = "tw:flex tw:gap-2 tw:items-center";
-const SPACER = "tw:flex-1";
 /** Two stacked lines inside a row (name over type, key over value). */
 const ROW_STACK = "tw:flex tw:flex-col tw:gap-0.5 tw:min-w-0 tw:flex-1";
 /** The page's row reads across: key · value · placeholders (B5-V01). */
@@ -599,136 +596,50 @@ export function VariablesView({
   );
 }
 
-/* ── Conditions (151:87) ─────────────────────────────────────────────────── */
+/* ── Conditions (176:21830 D39) ──────────────────────────────────────────── */
 
-const OPERATORS: ConditionOperator[] = ["==", "!=", ">", "<", ">=", "<=", "contains", "exists", "empty"];
-
+/** The site's element conditions as a read-only index: where each one is and
+ *  whether it is active; Locate selects the element, whose Inspector
+ *  (Content › Conditions) is where a condition is edited. */
 export function ConditionsView({
   conditions,
-  onBack,
-  onRemove,
-  onSelectElement,
-  onStartPick,
-  pickedElementId,
-  onCreate,
-  onCancelPick,
+  onLocate,
 }: {
   conditions: ConditionRow[];
-  onBack: () => void;
-  onRemove: (elementId: string) => void;
-  onSelectElement: (elementId: string) => void;
-  onStartPick: () => void;
-  pickedElementId: string | null;
-  onCreate: (expr: ConditionExpression) => void;
-  onCancelPick: () => void;
+  onLocate: (row: ConditionRow) => void;
 }) {
-  const [left, setLeft] = React.useState("");
-  const [operator, setOperator] = React.useState<ConditionOperator>("==");
-  const [right, setRight] = React.useState("");
-  const needsRight = !["exists", "not_exists", "empty", "not_empty"].includes(operator);
-  const [menuFor, setMenuFor] = React.useState<string | null>(null);
-
+  /* 176:21830 measured: the column is 1020 wide from 24 in; title 14/20 then
+     the sentence 16 under it; rows on an 80 pitch, Locate as a link. */
   return (
-    <div className={CONTENT_BODY}>
-      <Crumb label="Conditions" onClick={onBack} />
-      <div className={SCROLL}>
-        {conditions.map((c) => (
-          <Row key={`${c.elementId}`} size="tall" data-condition-row data-testid={`content-cond-${c.elementId}`}>
-            <span className={ROW_STACK}>
-              <span className={`${ROW_TITLE} tw:overflow-hidden tw:text-ellipsis tw:whitespace-nowrap`} data-testid={`content-cond-label-${c.elementId}`}>{c.label}</span>
-              <span className={SUB} data-testid={`content-cond-summary-${c.elementId}`}>{conditionSummary(c.binding)}</span>
-            </span>
-            <span className={ROW_ACTIONS}>
-              {/* Board 151:87 draws `⋯`. */}
-              <Popover
-                open={menuFor === c.elementId}
-                onClose={() => setMenuFor(null)}
-                placement="bottom-end"
-                label={`Actions for ${c.label}`}
-                trigger={
-                  <IconButton
-                    label={`Actions for ${c.label}`}
-                    onClick={() => setMenuFor((p) => (p === c.elementId ? null : c.elementId))}
-                  >
-                    ⋯
-                  </IconButton>
-                }
-              >
-                <Menu>
-                  <MenuItem onClick={() => { setMenuFor(null); onSelectElement(c.elementId); }}>
-                    Select element
-                  </MenuItem>
-                  <MenuItem onClick={() => { setMenuFor(null); onRemove(c.elementId); }}>
-                    Remove condition
-                  </MenuItem>
-                </Menu>
-              </Popover>
-            </span>
-          </Row>
-        ))}
-        {conditions.length === 0 && !pickedElementId && (
-          <div className={`${SUB} tw:p-3`}>
-            No conditions yet. A condition shows or hides an element based on data —
-            &ldquo;+ New condition&rdquo; starts by picking the element on the canvas it
-            controls.
-          </div>
-        )}
-        {pickedElementId ? (
-          <div className={INLINE_FORM} data-testid="condition-form">
-            <div className={SUB}>Show the picked element when…</div>
-            <TextInput
-              placeholder="site.hours or menu.available"
-              value={left}
-              onChange={(e) => setLeft(e.target.value)}
-              aria-label="Condition path"
-              autoFocus
-            />
-            <div className={FORM_ROW}>
-              <Select
-                value={operator}
-                onChange={(e) => setOperator(e.target.value as ConditionOperator)}
-                aria-label="Operator"
-              >
-                {OPERATORS.map((o) => (
-                  <option key={o} value={o}>{o}</option>
-                ))}
-              </Select>
-              {needsRight && (
-                <div className={SPACER}>
-                  <TextInput
-                    placeholder="value"
-                    value={right}
-                    onChange={(e) => setRight(e.target.value)}
-                    aria-label="Condition value"
-                  />
-                </div>
-              )}
-            </div>
-            <div className={FORM_ROW}>
-              <span className={SPACER} />
-              <Button color="light" size="xs" className={GHOST} onClick={onCancelPick}>Cancel</Button>
-              <Button
-                size="xs"
-                disabled={!left.trim() || (needsRight && !right.trim())}
-                onClick={() =>
-                  onCreate({
-                    operator,
-                    left: left.trim(),
-                    ...(needsRight ? { right: right.trim() } : {}),
-                  })
-                }
-              >
-                Add condition
+    <div className={`${SCROLL} tw:h-full`}>
+      <div className="tw:max-w-[1068px] tw:px-6 tw:pt-[34px]">
+        <p className="tw:m-0 tw:text-[14px] tw:leading-5 tw:font-semibold tw:text-[var(--bk-ink)]">Conditions across this site</p>
+        <p className="tw:m-0 tw:mt-4 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]">
+          Edit conditions on their selected element in the Inspector.
+        </p>
+        <div className="tw:mt-[30px]">
+          {conditions.map((c) => (
+            <div key={c.elementId} className="tw:flex tw:h-20 tw:items-start tw:gap-4" data-condition-row data-testid={`content-cond-${c.elementId}`}>
+              <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
+                <span className="tw:truncate tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]" data-testid={`content-cond-label-${c.elementId}`}>
+                  {c.label}
+                </span>
+                <span className="tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid={`content-cond-summary-${c.elementId}`}>
+                  {c.state === "active" ? `Active · ${c.summary}` : "Not active — review legacy rule"}
+                </span>
+              </div>
+              <Button className={`${LINK_BTN} tw:mt-0.5`} data-testid={`content-cond-locate-${c.elementId}`} onClick={() => onLocate(c)}>
+                Locate
               </Button>
             </div>
-          </div>
-        ) : (
-          <Button className={`${LINK_BTN} tw:mx-4 tw:my-0.5`} data-testid="content-add-condition" onClick={onStartPick}>
-            + New condition
-          </Button>
-        )}
+          ))}
+          {conditions.length === 0 && (
+            <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-muted)]" data-testid="content-cond-empty">
+              No conditions yet. Select an element and add one in the Inspector under Content › Conditions.
+            </p>
+          )}
+        </div>
       </div>
-
     </div>
   );
 }

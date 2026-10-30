@@ -9,11 +9,9 @@ import {
   loadLegacySiteVariables,
   variablesToSourceData,
   isValidVariableKey,
-  conditionSummary,
   fieldDefault,
 } from "../contentPanelUtils";
 import type { CMSField } from "@/shared/types/cms";
-import type { ConditionBinding } from "@/shared/types/data";
 
 beforeEach(() => localStorage.clear());
 
@@ -53,47 +51,6 @@ describe("isValidVariableKey", () => {
   });
   it("rejects dots, spaces, leading digits, empties", () => {
     for (const k of ["", "2fast", "site.name", "with space", "{{x}}"]) expect(isValidVariableKey(k)).toBe(false);
-  });
-});
-
-describe("conditionSummary", () => {
-  const bind = (condition: ConditionBinding["condition"]): ConditionBinding => ({
-    type: "condition",
-    sourceId: "",
-    path: "",
-    condition,
-  });
-
-  it('renders "when available is false" for a simple expression', () => {
-    expect(conditionSummary(bind({ operator: "==", left: "available", right: "false" }))).toBe(
-      "when available is false",
-    );
-  });
-
-  it("labels binding sides via sourceId.path", () => {
-    expect(
-      conditionSummary(
-        bind({
-          operator: ">",
-          left: { type: "variable", sourceId: "site", path: "hours" } as never,
-          right: 17,
-        }),
-      ),
-    ).toBe("when site.hours > 17");
-  });
-
-  it("renders logic groups with their operator", () => {
-    expect(
-      conditionSummary(
-        bind({
-          operator: "AND",
-          conditions: [
-            { operator: "==", left: "a", right: "1" },
-            { operator: "exists", left: "b" },
-          ],
-        }),
-      ),
-    ).toBe("when a is 1 and b exists");
   });
 });
 

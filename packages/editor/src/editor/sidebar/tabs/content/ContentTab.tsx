@@ -18,7 +18,7 @@
 import * as React from "react";
 import { Button, PanelHeader, SectionHeader, SkeletonBlock } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
-import type { ConditionExpression } from "@/shared/types/data";
+
 import {
   getCmsHydrationStatus,
   onCmsHydrationChange,
@@ -29,7 +29,6 @@ import { useContentPanel } from "./useContentPanel";
 import { cmsWorkspace, useCmsWorkspace } from "@/editor/cms/cmsWorkspaceStore";
 import { RootView } from "./ContentRootView";
 import {
-  ConditionsView,
   CONTENT_BODY,
   SECTION_H,
   SourcesView,
@@ -79,25 +78,6 @@ export const ContentTab: React.FC<ContentTabProps> = ({
   const panel = useContentPanel(composer);
   const workspace = useCmsWorkspace();
   const { view, setView, reload } = panel;
-  const [pickedElementId, setPickedElementId] = React.useState<string | null>(null);
-
-  // "+ New condition" pick flow — reuses the inspector's canvas pick mode.
-  React.useEffect(() => {
-    if (!composer) return;
-    const onResult = (id: unknown) => {
-      if (typeof id === "string" && view.kind === "conditions") setPickedElementId(id);
-    };
-    composer.on("inspector:pick-result", onResult);
-    return () => {
-      composer.off("inspector:pick-result", onResult);
-    };
-  }, [composer, view.kind]);
-
-  const startPick = () => composer?.emit("inspector:pick-start");
-  const cancelPick = () => {
-    composer?.emit("inspector:pick-cancel");
-    setPickedElementId(null);
-  };
 
   const importJson = (json: string): string | null => {
     if (!composer) return "Editor not ready.";
@@ -135,10 +115,7 @@ export const ContentTab: React.FC<ContentTabProps> = ({
       }
     : undefined;
 
-  const selectElement = (id: string) => {
-    const el = composer?.elements.getElement(id);
-    if (el && composer) composer.selection.select(el);
-  };
+
 
 
   const [liveHydration, setLiveHydration] = React.useState<CmsHydrationStatus>(() =>
@@ -208,6 +185,7 @@ export const ContentTab: React.FC<ContentTabProps> = ({
           conditionsCount={panel.conditions.length}
           selectedCollectionId={workspace.collectionId}
           variablesOpen={workspace.page === "variables"}
+          conditionsOpen={workspace.page === "conditions"}
           /* v3 IA (4428:143182) — a collection opens in the workspace beside
              the drawer; the drawer stays on its list. */
           onOpenCollection={(id) => cmsWorkspace.openCollection(id)}
@@ -215,7 +193,8 @@ export const ContentTab: React.FC<ContentTabProps> = ({
           onOpenSources={() => setView({ kind: "sources" })}
           /* B5-V01: Site variables opens as the workspace's page, like a collection. */
           onOpenVariables={() => cmsWorkspace.openVariables()}
-          onOpenConditions={() => setView({ kind: "conditions" })}
+          /* 176:21830: Conditions is a workspace page too. */
+          onOpenConditions={() => cmsWorkspace.openConditions()}
         />
       );
       break;
@@ -226,28 +205,6 @@ export const ContentTab: React.FC<ContentTabProps> = ({
           onBack={() => setView({ kind: "root" })}
           onImportJson={importJson}
           actions={sourceActions}
-        />
-      );
-      break;
-    case "conditions":
-      body = (
-        <ConditionsView
-          conditions={panel.conditions}
-          onBack={() => {
-            cancelPick();
-            setView({ kind: "root" });
-          }}
-          onRemove={panel.removeCondition}
-          onSelectElement={selectElement}
-          onStartPick={startPick}
-          pickedElementId={pickedElementId}
-          onCancelPick={cancelPick}
-          onCreate={(expr: ConditionExpression) => {
-            if (pickedElementId) {
-              panel.addCondition(pickedElementId, expr);
-              setPickedElementId(null);
-            }
-          }}
         />
       );
       break;

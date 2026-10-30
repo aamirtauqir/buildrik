@@ -67,8 +67,9 @@ describe("CanvasFooterToolbar — the View menu (board 145:64586)", () => {
     expect(screen.queryByRole("menu")).toBeNull();
     openMenu();
     expect(screen.getByText("Canvas view")).toBeTruthy();
-    const rows = screen.getAllByRole("menuitemcheckbox").map((r) => r.textContent?.replace(/(⌘.*|›)$/, "").trim());
-    expect(rows).toEqual(["Grid · 7 px", "Rulers and guides", "Snap guides", "Show outlines", "Spacing", "Badges", "X-Ray"]);
+    const rows = screen.getAllByRole("menuitemcheckbox").map((r) => r.textContent?.replace(/(⌘.*|›|✓)$/, "").trim());
+    /* "Show hidden elements" (176:19089) is on by default, so it carries its ✓. */
+    expect(rows).toEqual(["Grid · 7 px", "Rulers and guides", "Snap guides", "Show outlines", "Show hidden elements", "Spacing", "Badges", "X-Ray"]);
     expect(screen.queryByTestId("canvas-view-breakpoint")).toBeNull();
     expect(screen.queryByTestId("canvas-view-zoom")).toBeNull();
   });
@@ -232,5 +233,23 @@ describe("CanvasFooterToolbar — Grid and snapping", () => {
     expect(screen.getByTestId("grid-snap-error").textContent).toBe("Enter a whole number from 1 to 100 px. Current grid stays 7 px.");
     expect(screen.getByTestId("grid-snap-hint").textContent).toBe("Whole number · 1–100 px");
     expect(screen.getByTestId("grid-snap-apply")).toBeDisabled();
+  });
+});
+
+/* 2L9 176:19089 / 176:19451: Show hidden elements — a personal view
+   preference; off, the canvas stops drawing condition-hidden ghosts. */
+describe("CanvasFooterToolbar — Show hidden elements", () => {
+  it("toggles the preference from Canvas view", async () => {
+    const { setShowHiddenElements } = await import("../hiddenElementsPref");
+    setShowHiddenElements(true);
+    renderToolbar();
+    fireEvent.click(screen.getByTestId("canvas-view-menu-trigger"));
+    const row = screen.getByTestId("canvas-view-hidden");
+    expect(row).toHaveTextContent("Show hidden elements");
+    fireEvent.click(row);
+    expect(localStorage.getItem("bk-canvas-show-hidden")).toBe("false");
+    fireEvent.click(screen.getByTestId("canvas-view-menu-trigger"));
+    fireEvent.click(screen.getByTestId("canvas-view-hidden"));
+    expect(localStorage.getItem("bk-canvas-show-hidden")).toBe("true");
   });
 });

@@ -5,6 +5,7 @@
  * @license BSD-3-Clause
  */
 
+import { useShowHiddenElements } from "./hiddenElementsPref";
 import * as React from "react";
 import { EVENTS } from "@/shared/constants/events";
 import { requestInsertGroup } from "@/editor/sidebar/tabs/build/insertGroupRequest";
@@ -223,6 +224,9 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       },
     });
 
+    /* 176:19089 / 176:19451: draw condition-hidden elements as ghosts, or not at all. */
+    const showHidden = useShowHiddenElements();
+
     // Selection behavior hook (click-through, additive, hit expansion)
     const { handleClick: handleSelectionClick } = useSelectionBehavior({
       composer,
@@ -230,33 +234,6 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       onContextMenuClose: closeContextMenu,
     });
 
-    // Inspector pick mode — subscribe to inspector:pick-start/cancel events
-    // emitted by the ProInspector Crosshair button. While active, next canvas
-    // click resolves the element under cursor and selects it instead of
-    // running normal selection behavior. Escape key cancels.
-    const [pickMode, setPickMode] = React.useState(false);
-    React.useEffect(() => {
-      if (!composer) return;
-      const start = () => setPickMode(true);
-      const cancel = () => setPickMode(false);
-      composer.on("inspector:pick-start", start);
-      composer.on("inspector:pick-cancel", cancel);
-      return () => {
-        composer.off("inspector:pick-start", start);
-        composer.off("inspector:pick-cancel", cancel);
-      };
-    }, [composer]);
-    React.useEffect(() => {
-      if (!pickMode) return;
-      const onKey = (e: KeyboardEvent) => {
-        if (e.key === "Escape") {
-          setPickMode(false);
-          composer?.emit("inspector:pick-cancel");
-        }
-      };
-      document.addEventListener("keydown", onKey);
-      return () => document.removeEventListener("keydown", onKey);
-    }, [pickMode, composer]);
 
     // Inline editing commands (delegated to useCanvasInlineCommands)
     const { handleInlineCommand } = useCanvasInlineCommands({
@@ -683,29 +660,12 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
     }, [liveAnnouncement, announce]);
 
     // Canvas click handler - wraps selection behavior with focus management.
-    // If inspector pick mode is active, intercept: resolve target element id
-    // from the nearest [data-buildrick-id] ancestor, select it via composer,
-    // emit inspector:pick-result, exit pick mode, and skip the normal
-    // click-through/additive selection path.
     const handleCanvasClick = React.useCallback(
       (e: React.MouseEvent) => {
         wrapperRef.current?.focus();
-        if (pickMode && composer) {
-          const target = (e.target as HTMLElement).closest("[data-buildrick-id]") as HTMLElement | null;
-          const id = target?.getAttribute("data-buildrick-id") ?? null;
-          if (id) {
-            const el = composer.elements.getElement(id);
-            if (el) composer.selection.select(el);
-          }
-          composer.emit("inspector:pick-result", id);
-          setPickMode(false);
-          e.preventDefault();
-          e.stopPropagation();
-          return;
-        }
         handleSelectionClick(e);
       },
-      [handleSelectionClick, pickMode, composer]
+      [handleSelectionClick]
     );
 
     /* The grey around the page is canvas too. The column's 24px padding and
@@ -876,7 +836,6 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
              crosshair showed over the empty gutter and nowhere else, which is
              the one part of the canvas with nothing to pick. The attribute
              hands it to a rule that reaches the subtree instead. */
-          data-bk-pick={pickMode ? "true" : undefined}
           style={getCanvasStyles(size, device, scale, isDragOver)}
         >
           {/* Element animations resolve against these. The canvas had none
@@ -902,6 +861,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
             data-device={device}
             data-xray-mode={showXRay ? "true" : undefined}
             data-outlines={showOutlines ? "true" : undefined}
+            data-bk-hide-conditional={showHidden ? undefined : "true"}
             data-badges={showBadges ? "true" : undefined}
             data-drag-active={isDragOver ? "true" : undefined}
             data-invalid-drop={isDragOver && !isValidDrop ? "true" : undefined}

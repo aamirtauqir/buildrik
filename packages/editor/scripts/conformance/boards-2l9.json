@@ -7782,8 +7782,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Board: Collection page + Edit collection page ›, Social image, \"On the next publish\" summary; code: Template page select, Generate N pages (",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-31 (case cms-dynamic-pages&linked=1 vs shots/165-3432.png, text rows measured): Collection page label 133 / select text 165 (board 133 / 165), select 720×28 at y156 (board 156, 28 tall — this form's controls are 28, the shared pane CONTROL 32), Edit collection page › moved to 212 (was 203), URL pattern, the new 'N unique URLs' helper (board '980 unique URLs'), SEO title / SEO description / Social image, 'On the next publish' box. Remaining offsets ≤3px. Sample data (Blog, 980) not copied.",
    "tier": "P1"
   },
   {
@@ -8312,8 +8312,9 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code \"‹ Back to canvas\" only when opened from an element; board persistent \"‹ Back to Editor · Home\"; editor chrome phase1",
-   "tier": "P1"
+   "verifiedNote": "Round 31: the editor after ‹ Back to Editor — Home kept open, Hero / Text still selected, inspector Content (Text content, B I U) — is J-F1.05 7:20283 (L-B). The CMS side now says where it returns: with no element origin the way back reads '‹ Back to Editor · {page}' (was '‹ Back to canvas').",
+   "tier": "P1",
+   "inheritsFrom": "7:20283"
   },
   {
    "nodeId": "168:21194",
@@ -8613,8 +8614,9 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Previewing record 2 of 980 on canvas; code cannot switch preview record for template/list context",
-   "tier": "P1"
+   "verifiedNote": "Round 31: the record bar of 173:12022 (drift-fixed) on another record — 'Record [A studio built around people ⌄] ‹ › ☐ Show drafts' — with the same Title binding re-rendered: the bar's ‹ › and picker switch the canvas's preview record (CMS_PREVIEW_RECORD_CHANGED; useCmsBinding follows it). The old note 'cannot switch preview record' predates the bar. Not separately compared.",
+   "tier": "P1",
+   "inheritsFrom": "173:12022"
   },
   {
    "nodeId": "173:12958",
@@ -8783,8 +8785,9 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Show drafts on canvas: draft rows visible; no canvas draft toggle in code",
-   "tier": "P1"
+   "verifiedNote": "Round 31: the record bar of 173:12022 (drift-fixed) with 'Show drafts' on — the picker lists draft records too (CanvasRecordBar 'Show drafts on canvas'). The old note 'no canvas draft toggle' predates the bar. Not separately compared.",
+   "tier": "P1",
+   "inheritsFrom": "173:12022"
   },
   {
    "nodeId": "174:13529",
@@ -8881,8 +8884,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "False condition → 40% selectable ghost + View \"Show hidden elements\"; no canvas ghost/view pref in code",
+   "verified": "drift-open",
+   "verifiedNote": "Round 31: built, not compared. Canvas › View › 'Show hidden elements' (personal preference, this browser; on by default): on, an element its condition hides on the preview record is a ghost (opacity .4, dashed, 'Hidden by condition'); off, it is not drawn ([data-bk-hide-conditional] display:none) and the selection stays. The Inspector's line for the off state is L-B's (REQUESTS A-37).",
    "tier": "P1"
   },
   {
@@ -8892,8 +8895,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Ghost off, selection retained; no view pref in code",
+   "verified": "drift-open",
+   "verifiedNote": "Round 31: built, not compared. Canvas › View › 'Show hidden elements' (personal preference, this browser; on by default): on, an element its condition hides on the preview record is a ghost (opacity .4, dashed, 'Hidden by condition'); off, it is not drawn ([data-bk-hide-conditional] display:none) and the selection stays. The Inspector's line for the off state is L-B's (REQUESTS A-37).",
    "tier": "P1"
   },
   {
@@ -8969,8 +8972,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Board: read-only index with Locate, edit in Inspector. Code: editable list with + New condition/Remove (ContentViews.tsx:651,771)",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-31 (case cms-workspace&page=conditions&back=1, side by side with shots/176-21830.png; workspace-relative px): Conditions is a page of the CMS workspace (drawer row selected), header '‹ Back to Editor · Home' x66 + 'Conditions' x273 (board 68 / 272); 'Conditions across this site' y90, sentence y126, rows y176 / y256 on an 80 pitch (board 90 / 126 / 176 / 256), Locate link right edge 1044 (board 1043). Rows 'Blog post › Heading' + 'Active · opening_hours.sunday is set' / 'Not active — review legacy rule'. Read-only: the drawer's + New condition / Remove are gone; Locate leaves for the canvas, opens the page, selects (ContentTab.test).",
    "tier": "P1"
   },
   {
@@ -9482,8 +9485,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C C2: record/workspace back reads \"‹ {origin}\" from CmsOpenRequest.origin and the guard says \"Your destination is {origin}.\"; live label waits on REQUESTS #11 (L-B passes origin).",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-31 (case cms-workspace&origin=Home · Latest posts): the header's way back reads '‹ Home · Latest posts' at x66 (board 68) before 'Blog · N records' at x273 (board 272), from CmsOpenRequest.origin; the records list under it is the records archetype.",
    "tier": "P1"
   },
   {
