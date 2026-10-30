@@ -35,6 +35,30 @@ describe("EditTextRow", () => {
     expect(composer.emit).not.toHaveBeenCalled();
   });
 
+  it("2L9 TX09: its own lock says why and how — the name, Unlock in Layers, and that Enter / double-click do not edit", () => {
+    const el = { getType: () => "heading", getCustomData: (k: string) => (k === "layerName" ? "Hero heading" : undefined) };
+    const composer = { emit: vi.fn(), elements: { getElement: () => el } } as unknown as Composer;
+    render(
+      <InspectorFieldContext.Provider value={{ readOnly: true, readOnlyReason: "locked", mixedKeys: new Set(), overrides: new Map(), resetOverride: () => {} } as never}>
+        <EditTextRow composer={composer} elementId="h1" />
+      </InspectorFieldContext.Provider>,
+    );
+    expect(screen.getByTestId("inspector-text-locked")).toHaveTextContent("Hero heading is locked. Unlock it in Layers to edit its text or semantic tag.");
+    expect(screen.getByTestId("inspector-text-locked-hint")).toHaveTextContent(
+      "Locked — unlock Hero heading before editing. Enter and double-click do not start an edit.",
+    );
+  });
+
+  it("a save conflict is read-only too, but not a lock — no lock notice", () => {
+    const composer = { emit: vi.fn() } as unknown as Composer;
+    render(
+      <InspectorFieldContext.Provider value={{ readOnly: true, readOnlyReason: "conflict", mixedKeys: new Set(), overrides: new Map(), resetOverride: () => {} } as never}>
+        <EditTextRow composer={composer} elementId="h1" />
+      </InspectorFieldContext.Provider>,
+    );
+    expect(screen.queryByTestId("inspector-text-locked")).toBeNull();
+  });
+
   it("renders nothing without a composer", () => {
     const { container } = render(<EditTextRow composer={null} elementId="h1" />);
     expect(container.textContent).toBe("");

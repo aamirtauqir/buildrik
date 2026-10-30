@@ -39,9 +39,11 @@ export interface CommitRowProps {
   /** The entry was refused: the field reads invalid, its border red, and
    *  `aria-describedby` names the error line the caller draws under it. */
   error?: { id: string } | null;
+  /** The real <input> — a repair link elsewhere focuses it (2L9 F09). */
+  inputRef?: React.Ref<HTMLInputElement>;
 }
 
-export function CommitRow({ label, value, onCommit, placeholder, type, testId, clearOnCommit, suggestions, onPaste, stacked, onDraft, error }: CommitRowProps) {
+export function CommitRow({ label, value, onCommit, placeholder, type, testId, clearOnCommit, suggestions, onPaste, stacked, onDraft, error, inputRef }: CommitRowProps) {
   const { readOnly } = useInspectorField();
   const id = React.useId();
   const listId = `${id}-list`;
@@ -61,6 +63,7 @@ export function CommitRow({ label, value, onCommit, placeholder, type, testId, c
         <TextField
           id={id}
           className={(stacked ? "tw:bg-[var(--bk-bg-subtle)]! tw:rounded-[4px]! tw:border-[var(--bk-border)]!" : "bdi-text") + (error ? " tw:border-[var(--bk-error)]!" : "")}
+          ref={inputRef}
           aria-invalid={error ? true : undefined}
           aria-describedby={error?.id}
           readOnly={readOnly}

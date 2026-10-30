@@ -4058,8 +4058,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Board compared (shots/423-99859.png): the locked notice is the INSPECTOR's — 'Hero heading is locked. Unlock it in Layers to edit its text or semantic tag.', Edit text disabled, 'Locked — unlock Hero heading before editing. Enter and double-click do not start an edit.' — L-B's paths. The canvas side already holds: a layer's OWN lock (not inherited) stops Enter / double-click from starting an edit (useCanvasInlineEdit.locked tests). | No 'Locked — unlock … Enter and double-click do not start an edit' notice",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B round 15 add-on, side by side with the board PNG (probe ?type=heading&locked=1, Content): for the element's OWN lock (not inherited — a lock is the element's flag), the text door reads \"{name} is locked. Unlock it in Layers to edit its text or semantic tag.\", the Edit text door is shut (aria-disabled, focusable — DD-18), and under it \"Locked — unlock {name} before editing. Enter and double-click do not start an edit.\" The canvas already refuses Enter / double-click on it (useCanvasInlineEdit). Layout differences are page 04's text board 161:8480 (Edit text on canvas, Tag in Semantics), not this row's; a save conflict, also read-only, shows no lock notice (unit-tested).",
    "tier": "P1"
   },
   {
@@ -4262,8 +4262,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No plain-text Password warning; type block still offers Password as a type (sections/typeBlock/bodies/formBodies.tsx:33)",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B round 16, side by side with the board PNG (probe contact-form email field set to Password): 'Existing Password field' / 'Password values are stored and emailed as plain text' (warning ink, not dismissible — it holds while the type is Password) / 'Change type ›', which opens the Field type card; then the Field rows. Password is now legacy: offered only to a field that already is one, never as a new choice (unit-tested). Placement: the board heads the block with this group above 'Field'; live it is the block's first rows, under the 'Field' title.",
    "tier": "P1"
   },
   {
@@ -4273,8 +4273,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No accessible-label repair for existing unlabeled fields",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B round 16, side by side with the board PNG (probe contact-form email field, Label cleared): under the empty Label 'No label — screen readers will announce the placeholder' (or '… announce only the field type' with no placeholder) and 'Add label', which focuses the Label field (unit-tested); the rest of the Field block as before.",
    "tier": "P1"
   },
   {
@@ -4330,7 +4330,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No offline state disabling service controls while Content stays reachable",
+   "verifiedNote": "Lane L-B round 16, built against the board PNG, unit-tested, not walked live (the probe cannot take the browser offline): with navigator offline the After submit / Notifications / Spam controls read only, 'Needs a connection. You can still edit form fields.' sits under the message, and Form settings status reads 'Needs a connection'; no save is attempted. The form's fields (Content) stay editable.",
    "tier": "P1"
   },
   {
@@ -4555,7 +4555,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No \"Enter a complete https:// or http:// URL\" validation with retained draft",
+   "verifiedNote": "Lane L-B round 16, compared with the board PNG: built — an incomplete custom URL ('https:/fieldwork') is refused on commit with 'Enter a complete https:// or http:// URL.', the field red and its draft kept, nothing saved (unit-tested). Open: the board's destination picker is a popover ('Choose page or URL', search, the pages as 'Home · /', 'Or use an absolute URL', Cancel / Use URL); live is the 'Redirect to' select with 'Custom URL…' opening a URL row.",
    "tier": "P1"
   },
   {
@@ -4578,7 +4578,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No pending state for page+action atomic save",
+   "verifiedNote": "Lane L-B round 16, compared with the board PNG: the board's state is the Redirect row with 'https://fieldwork.test/thanks' and Form settings status 'Saving...' — live writes the action and URL in one call (I1) and the status reads 'Saving…' while it is in flight (unit-tested; FormAfterSubmitSection tests). Not walked live: the probe's tab click did not take in the saving mode this round.",
    "tier": "P1"
   },
   {
@@ -4898,9 +4898,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No \"Hidden on the live Desktop page… stays visible here\" note",
+   "authority": "code:canvas-hides-hidden",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B round 16, side by side with the board PNG (probe ?type=text&styles={--hide-desktop:true}, Behavior): Desktop unticked and 'Hidden on the live Desktop page. The canvas hides it there too; it stays selected and listed in Layers.' The board's second sentence — 'This selected element stays visible here for editing.' — is not what the canvas does: Canvas.css hides an element on the device it is hidden for, matching the published page, so the line says what does stay. The board's Data conditions note is not built (conditions).",
    "tier": "P1"
   },
   {
@@ -4954,9 +4954,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
+   "authority": "code:no-auto-preview",
    "verified": "no",
-   "verifiedNote": "No reduced-motion disclosure",
+   "verifiedNote": "Lane L-B round 16, compared with the board PNG: 'Reduced motion is on. Automatic preview was skipped.' under an interaction, and 'Play once'. Not built: the editor has no automatic preview to skip — an interaction plays only from its Play button — so the sentence would describe nothing the code does. Reopen if an auto-preview lands.",
    "tier": "P1"
   },
   {

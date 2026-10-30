@@ -45,6 +45,7 @@
  *
  * @license BSD-3-Clause
  */
+import { InspectorFieldContext } from "@/editor/inspector/shared/controls/InspectorFieldContext";
 import * as React from "react";
 import type { Composer } from "@/engine";
 import { getBuildrikClient } from "@/services/api-client";
@@ -112,6 +113,8 @@ function RedirectRow({ composer, value, onCommit }: { composer: Composer | null;
   const options = pages.map((p) => ({ value: pagePath(files.get(p.id) ?? "index.html"), label: p.name }));
   const onPage = options.some((o) => o.value === value);
   const [custom, setCustom] = React.useState(Boolean(value) && !onPage);
+  const [urlError, setUrlError] = React.useState(false);
+  const urlErrorId = React.useId();
   return (
     <>
       <SelectRow
@@ -125,11 +128,45 @@ function RedirectRow({ composer, value, onCommit }: { composer: Composer | null;
         }}
       />
       {custom && (
-        <CommitRow label="URL" type="text" placeholder="https://example.com/thanks" value={onPage ? "" : value} onCommit={onCommit} />
+        <>
+          <CommitRow
+            label="URL"
+            type="text"
+            placeholder="https://example.com/thanks"
+            value={onPage ? "" : value}
+            onCommit={(v) => {
+              /* 2L9 F25: an incomplete URL is refused here, the draft kept
+                 in the field, nothing saved. */
+              if (v.trim() && !COMPLETE_URL.test(v.trim())) return setUrlError(true);
+              setUrlError(false);
+              onCommit(v);
+            }}
+            onDraft={() => setUrlError(false)}
+            error={urlError ? { id: urlErrorId } : null}
+          />
+          {urlError ? (
+            <p id={urlErrorId} role="alert" className="tw:m-0 tw:pb-1 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-error-text)]" data-testid="form-redirect-url-error">
+              Enter a complete https:// or http:// URL.
+            </p>
+          ) : null}
+        </>
       )}
     </>
   );
 }
+
+/** The browser's connection — the form settings live on the server. */
+function subscribeOnline(notify: () => void): () => void {
+  window.addEventListener("online", notify);
+  window.addEventListener("offline", notify);
+  return () => {
+    window.removeEventListener("online", notify);
+    window.removeEventListener("offline", notify);
+  };
+}
+
+/** A URL a visitor can be sent to: http(s), a host with a dot, no spaces. */
+const COMPLETE_URL = /^https?:\/\/[^\s/?#]+\.[^\s/?#]+(?:[/?#]\S*)?$/i;
 
 export const FormAfterSubmitSection: React.FC<FormAfterSubmitSectionProps> = ({
   elementId,
@@ -138,6 +175,8 @@ export const FormAfterSubmitSection: React.FC<FormAfterSubmitSectionProps> = ({
   onToggle,
   tier = "tertiary",
 }) => {
+  const fieldCtx = React.useContext(InspectorFieldContext);
+  const online = React.useSyncExternalStore(subscribeOnline, () => navigator.onLine, () => true);
   const [settings, setSettings] = React.useState<Settings | null>(null);
   const [loadError, setLoadError] = React.useState<string | null>(null);
   const [status, setStatus] = React.useState<Status>({ kind: "saved" });
@@ -234,7 +273,9 @@ export const FormAfterSubmitSection: React.FC<FormAfterSubmitSectionProps> = ({
       ) : !settings ? (
         <NoteRow tone={loadError ? "error" : "muted"}>{loadError ?? "Loading form settings…"}</NoteRow>
       ) : (
-        <>
+        /* 2L9 F14: offline, the service settings cannot save — shown, read
+           only, and said; the form's fields (Content) stay editable. */
+        <InspectorFieldContext.Provider value={online ? fieldCtx : { ...fieldCtx, readOnly: true }}>
           <SelectRow
             label="Then"
             /* "Show message" is the select's empty choice (SelectRow always draws one). */
@@ -253,6 +294,11 @@ export const FormAfterSubmitSection: React.FC<FormAfterSubmitSectionProps> = ({
             />
           ) : (
             <RedirectRow composer={composer} value={settings.redirectUrl ?? ""} onCommit={(v) => save({ redirectUrl: v })} />
+          )}
+          {online ? null : (
+            <p className="tw:m-0 tw:py-1 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-warning-text)]" data-testid="form-settings-offline">
+              Needs a connection. You can still edit form fields.
+            </p>
           )}
           <div className={GROUP_TITLE}>Notifications</div>
           {adminOnly ? (
@@ -277,11 +323,15 @@ export const FormAfterSubmitSection: React.FC<FormAfterSubmitSectionProps> = ({
           <div className={GROUP_TITLE}>Form settings status</div>
           {/* A Redirect with no destination is not saved, whether it was just
               chosen or loaded that way (156:11319). */}
-          <FormSettingsStatus
-            status={status.kind === "saved" && settings.successAction === "REDIRECT" && !settings.redirectUrl ? { kind: "incomplete" } : status}
-          />
+          {online ? (
+            <FormSettingsStatus
+              status={status.kind === "saved" && settings.successAction === "REDIRECT" && !settings.redirectUrl ? { kind: "incomplete" } : status}
+            />
+          ) : (
+            <NoteRow testId="form-settings-status">Needs a connection</NoteRow>
+          )}
           <NoteRow testId="form-after-submit-note">Saved separately from page edits; outside document Undo.</NoteRow>
-        </>
+        </InspectorFieldContext.Provider>
       )}
     </Section>
   );

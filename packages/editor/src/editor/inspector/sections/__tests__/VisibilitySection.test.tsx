@@ -25,6 +25,18 @@ describe("VisibilitySection — rendering", () => {
     }
   });
 
+  it("2L9 I13: names where it is hidden, and what stays (the canvas hides it there too)", () => {
+    renderVisibility({ "--hide-desktop": "true" });
+    expect(screen.getByTestId("visibility-hidden-note")).toHaveTextContent(
+      "Hidden on the live Desktop page. The canvas hides it there too; it stays selected and listed in Layers.",
+    );
+  });
+
+  it("no note while it shows everywhere", () => {
+    renderVisibility();
+    expect(screen.queryByTestId("visibility-hidden-note")).toBeNull();
+  });
+
   it("reflects a hidden breakpoint from --hide-* styles", () => {
     renderVisibility({ "--hide-mobile": "true" });
     expect(screen.getByRole("checkbox", { name: "Mobile" })).not.toBeChecked();
