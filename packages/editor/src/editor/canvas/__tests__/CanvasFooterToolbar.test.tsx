@@ -68,7 +68,7 @@ describe("CanvasFooterToolbar — the View menu (board 145:64586)", () => {
     openMenu();
     expect(screen.getByText("Canvas view")).toBeTruthy();
     const rows = screen.getAllByRole("menuitemcheckbox").map((r) => r.textContent?.replace(/(⌘.*|›)$/, "").trim());
-    expect(rows).toEqual(["Grid · 7 px", "Rulers", "Snap guides", "Show outlines", "Spacing", "Badges", "X-Ray"]);
+    expect(rows).toEqual(["Grid · 7 px", "Rulers and guides", "Snap guides", "Show outlines", "Spacing", "Badges", "X-Ray"]);
     expect(screen.queryByTestId("canvas-view-breakpoint")).toBeNull();
     expect(screen.queryByTestId("canvas-view-zoom")).toBeNull();
   });

@@ -373,6 +373,9 @@ describe("usePages duplicatePages", () => {
     expect(composer.elements.duplicatePage).toHaveBeenCalledTimes(3);
     expect(addToastMock).toHaveBeenCalledTimes(1);
     expect(lastToast()?.description).toBe("3 pages duplicated · Originals kept");
+    /* One transaction, and the receipt's Undo (139:50620). */
+    expect(composer.beginTransaction).toHaveBeenCalledWith("Duplicate pages");
+    expect(lastToast()?.action?.label).toBe("Undo");
   });
 });
 

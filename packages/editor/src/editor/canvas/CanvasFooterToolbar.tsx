@@ -97,7 +97,10 @@ const SIDE = "tw:flex tw:min-w-0 tw:items-center";
 
 /* Board 145:64586's own rows, in its order. */
 const VIEW_ROWS: readonly { key: keyof CanvasOverlayState; label: string; kbd?: string }[] = [
-  { key: "rulers", label: "Rulers", kbd: "⌘R" },
+  /* 145:64586 "Rulers and guides…": the rulers are where guides are placed
+     (click a ruler). No "…" — it toggles; the board's guide-detail dialog
+     (S11) does not exist. */
+  { key: "rulers", label: "Rulers and guides", kbd: "⌘R" },
   { key: "guides", label: "Snap guides", kbd: "⌘;" },
   { key: "outlines", label: "Show outlines" },
 ];
