@@ -48,7 +48,7 @@ import { usePages } from "./usePages";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { useSiteOrigin } from "@/editor/shared/useSiteOrigin";
 import { useFolders } from "./useFolders";
-import { movePagesWithHistory } from "./folderHistory";
+import { movePagesWithHistory, useFolderMoves } from "./folderHistory";
 import { pageRoute } from "./utils/slug";
 import { useBulkSelect } from "./useBulkSelect";
 import { useDynamicPagesSummary } from "./useDynamicPagesSummary";
@@ -403,19 +403,22 @@ export const PagesTab: React.FC<PagesTabProps> = ({
     bulk.clearSelection();
   }, [bulkDeleteIds, p.deletePages, bulk.clearSelection]);
 
+  const { addToast } = useToast();
+  const moveFolders = useFolderMoves(composer, f);
+
   const handleBulkMoveToFolder = React.useCallback(
     (folderId: string) => {
       const name = f.folders.find((fd) => fd.id === folderId)?.name ?? "folder";
-      movePagesWithHistory(composer, f, [...bulk.selectedIds], folderId, `${bulk.selectedIds.size} pages moved to ${name}`);
+      moveFolders([...bulk.selectedIds], folderId, `${bulk.selectedIds.size} pages moved to ${name} · URLs unchanged`);
       bulk.clearSelection();
     },
-    [bulk.selectedIds, f, composer, bulk.clearSelection]
+    [bulk.selectedIds, f.folders, moveFolders, bulk.clearSelection]
   );
 
   const handleBulkRemoveFromFolders = React.useCallback(() => {
-    movePagesWithHistory(composer, f, [...bulk.selectedIds], TOP_LEVEL, `${bulk.selectedIds.size} pages moved to the top level`);
+    moveFolders([...bulk.selectedIds], TOP_LEVEL, `${bulk.selectedIds.size} pages moved to the top level · URLs unchanged`);
     bulk.clearSelection();
-  }, [bulk.selectedIds, f, composer, bulk.clearSelection]);
+  }, [bulk.selectedIds, moveFolders, bulk.clearSelection]);
 
   /* Boards 137:53911 / 137:59625: one place up or down among the TOP-LEVEL
      pages (folder members are not ordered). The engine orders the whole site
@@ -423,7 +426,6 @@ export const PagesTab: React.FC<PagesTabProps> = ({
      whatever precedes it in site order. Page order is not in the composer's
      history, so the receipt's Undo puts the page back after its old
      neighbour itself. */
-  const { addToast } = useToast();
   const rootIds = React.useMemo(
     () => p.pages.filter((pg) => !f.pageToFolder.has(pg.id)).map((pg) => pg.id),
     [p.pages, f.pageToFolder],
@@ -457,14 +459,12 @@ export const PagesTab: React.FC<PagesTabProps> = ({
       if (!page) return;
       const from = f.folders.find((fd) => fd.id === f.pageToFolder.get(page.id));
       const to = f.folders.find((fd) => fd.id === target);
-      const description = to
+      /* Boards 127:38819 / 131:41086 / 127:40244. */
+      moveFolders([page.id], target, to
         ? `${page.name} moved to ${to.name} · ${pageRoute(page)} unchanged`
-        : `${page.name} removed from ${from?.name ?? "its folder"} · Page kept`;
-      /* Boards 127:38819 / 131:41086 / 127:40244: one undo step, and the receipt's Undo. */
-      const undo = movePagesWithHistory(composer, f, [page.id], target, description.split(" · ")[0]);
-      addToast({ description, tone: "info", ...(undo ? { action: { label: "Undo", onClick: () => { undo(); } } } : {}) });
+        : `${page.name} removed from ${from?.name ?? "its folder"} · Page kept`);
     },
-    [movingPage, f, addToast, composer],
+    [movingPage, f, moveFolders],
   );
 
   /* Board 137:58206: "{Folder} deleted · About kept at top level" — its
@@ -702,7 +702,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
           onCopyLink={p.copyPageLink}
           onSettings={p.openSettings}
           folderName={menuFolderName}
-          onRemoveFromFolder={(id) => movePagesWithHistory(composer, f, [id], TOP_LEVEL, `Removed from ${menuFolderName ?? "folder"}`)}
+          onRemoveFromFolder={(id) => moveFolders([id], TOP_LEVEL, `${p.pages.find((pg) => pg.id === id)?.name ?? "Page"} removed from ${menuFolderName ?? "its folder"} · Page and URL kept`) /* 137:52464 */}
           onSaveAsTemplate={saveAsTemplate}
           onMoveToFolder={setMovingPageId}
           onMove={movePage}

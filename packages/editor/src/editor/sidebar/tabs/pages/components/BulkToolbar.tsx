@@ -18,6 +18,8 @@ interface Props {
   folders: FolderItem[];
   /** Some selected page sits in a folder — only then is Top level a move. */
   anyInFolder: boolean;
+  /** The homepage's name when it is among the selected pages (139:52895). */
+  homeSelected?: string | null;
   onDuplicate: () => void;
   onMoveToFolder: (folderId: string) => void;
   onRemoveFromFolders: () => void;
@@ -34,6 +36,7 @@ export const BulkToolbar: React.FC<Props> = ({
   selectedNames,
   folders,
   anyInFolder,
+  homeSelected = null,
   onDuplicate,
   onMoveToFolder,
   onRemoveFromFolders,
@@ -42,7 +45,11 @@ export const BulkToolbar: React.FC<Props> = ({
 }) => {
   const [moveOpen, setMoveOpen] = React.useState(false);
 
+  /* 139:52895: the homepage is never deleted from here — with it alone
+     selected Delete is off, and the reason is said under the bar. */
+  const deleteOff = homeSelected !== null && selectedCount === 1;
   return (
+    <>
     <div
       className="tw:flex tw:shrink-0 tw:flex-col tw:bg-[var(--bk-gray-100)] tw:px-3 tw:pt-1.5 tw:pb-1"
       role="toolbar"
@@ -62,7 +69,16 @@ export const BulkToolbar: React.FC<Props> = ({
         <Button color="light" size="xs" className={ACTION} data-testid="pages-bulk-move" onClick={() => setMoveOpen(true)}>
           Move to…
         </Button>
-        <Button color="light" size="xs" className={`${ACTION} tw:text-[var(--bk-error)]`} onClick={onDelete}>Delete</Button>
+        <Button
+          color="light"
+          size="xs"
+          className={`${ACTION} ${deleteOff ? "tw:text-[var(--bk-ink-disabled)]" : "tw:text-[var(--bk-error)]"}`}
+          disabled={deleteOff}
+          data-testid="pages-bulk-delete"
+          onClick={onDelete}
+        >
+          Delete
+        </Button>
       </div>
       <MovePagesDialog
         open={moveOpen}
@@ -77,6 +93,15 @@ export const BulkToolbar: React.FC<Props> = ({
         }}
       />
     </div>
+    {homeSelected !== null && (
+      <div className="tw:mx-3 tw:mt-2 tw:shrink-0 tw:rounded-md tw:bg-[var(--bk-gray-100)] tw:px-2 tw:py-1.5" role="note" data-testid="pages-bulk-home-note">
+        <p className="tw:m-0 tw:text-[12px] tw:leading-4 tw:font-semibold tw:text-[var(--bk-ink)]">{`${homeSelected} is the homepage`}</p>
+        <p className="tw:m-0 tw:mt-0.5 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
+          {`Set another page as the homepage before deleting ${homeSelected}.`}
+        </p>
+      </div>
+    )}
+    </>
   );
 };
 

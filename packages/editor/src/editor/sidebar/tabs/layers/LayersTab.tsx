@@ -245,10 +245,11 @@ export const LayersTab: React.FC<LayersTabProps> = ({
       {/* Board 142:2 — header is the bare 16:6 Panel header; the ⋯ panel menu
           (7059:78962) rides in its actions slot — `actions`, not children,
           which PanelHeader drops. The count lives in the footer. */}
+      {/* Every 2L9 Layers board (147:75914, 152:78185, 7:19791…) heads the
+          panel with the ⋯ alone — no ✕. The rail icon and Escape close it. */}
       <PanelFrame.Header
         title="Layers"
         onHelpClick={onHelpClick}
-        onClose={onClose}
         actions={
           <Popover
             open={menuOpen}

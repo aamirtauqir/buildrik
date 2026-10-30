@@ -11,7 +11,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "probe-compared 2026-10-27 (case canvas-bar at the board's 800 column, shots/7-18654.png): bar CONTENTS match — 'Home / Hero' left, device toggles centred (24 square, tinted active), gray mono '1440 px' chip, outlined '52% ⌄' 82 wide, 'View'. Still open, not L-A's: bar position (top y56, lead3 — A-14), bottom bar 'Saved just now · Details' (lead), Container content note / 'N child elements' (inspector, L-B).",
+   "verifiedNote": "Re-compared 2026-10-30 in the real shell (Vite demo on :5171, Heading + Text inserted, Text selected in Layers): the canvas bar now sits at the top (y56–98) as the board draws it, so 'bar position' is closed; Layers ✕ removed (see 7:19791). Still open, not L-A's: the bottom bar's page switcher reads 'Home /home' where the board reads 'Home /' (the home page's route) and its shortcut hint differs ('⇧⌘O' vs '⌘P', code contract) — lead; 'Container content · N child elements' — inspector, L-B. | probe-compared 2026-10-27 (case canvas-bar at the board's 800 column, shots/7-18654.png): bar CONTENTS match — 'Home / Hero' left, device toggles centred (24 square, tinted active), gray mono '1440 px' chip, outlined '52% ⌄' 82 wide, 'View'. Still open, not L-A's: bar position (top y56, lead3 — A-14), bottom bar 'Saved just now · Details' (lead), Container content note / 'N child elements' (inspector, L-B).",
    "tier": "P1"
   },
   {
@@ -44,7 +44,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Footer board: 'Home / Hero · 1440 px · 52% · View'; code: Undo/Redo·View▾·100%▾·readout. Undo removal is phase1",
+   "verifiedNote": "compared 2026-10-30 in the real shell (Vite demo on :5171, Heading + Text inserted, Text selected in Layers); board shots/7-19791.png. Matches: topbar, rail, canvas bar at the top ('Home / {element}' crumb, devices, '1024 px' chip, zoom, View), the selected row's pill. Fixed: the Layers header's ✕ removed — every 2L9 Layers board heads the panel with ⋯ alone (the rail and Escape still close it). Not changed, the boards disagree: this journey board has no 'View' beside the search and puts '8 elements · Home' under the tree, where the Layers spec family (147:75914 archetype, drift-fixed) draws View and the count in the bottom band — the code follows the family. Inspector body (L-B), bottom bar (lead). Follows archetype 7:18654. | Prior: Footer board: 'Home / Hero · 1440 px · 52% · View'; code: Undo/Redo·View▾·100%▾·readout. Undo removal is phase1",
    "inheritsFrom": "7:18654",
    "tier": "P1"
   },
@@ -1440,8 +1440,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Bulk dialog only; no per-page 'Move About to…' from row menu; 'already at top level' note missing",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-30 (case pages-move-one, Studio picked; board shots/131-39598.png): 'Move About to…', the folders-are-personal line with '/about stays unchanged', Client projects / Studio (picked pill) / Top level (no folder), Cancel · 'Move to Studio' (88 / 208). The row menu's Move to folder… opens it (131:41791).",
    "tier": "P1"
   },
   {
@@ -1544,8 +1544,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No organization receipts ('About moved to Studio · /about unchanged')",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-30 (case pages-shell: About moved into Studio, then its ⋯ → Remove from Studio; board shots/137-52464.png): built — the menu's Remove now raises 'About removed from Studio · Page and URL kept · Undo', the move one history.recordCustom step with the Undo bound to it (useFolderMoves). Layout is the shared Toast (✕ kept; one row where the board wraps Undo — coordinator round 10: leave the toast).",
    "tier": "P1"
   },
   {
@@ -1657,8 +1657,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-A S6 built: '{Page} moved to position {n} · Still the homepage' when the homepage moves (homepage flag unchanged).",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-30 (case pages-shell, Home ⋯ → Move down; board shots/137-59625.png): 'Home moved to position 2 · Still the homepage · Undo'; Home moves below About and keeps the homepage. Layout is the shared Toast (✕ kept; one row where the board wraps Undo — coordinator round 10: leave the toast).",
    "tier": "P1"
   },
   {
@@ -1734,8 +1734,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No organization receipts ('About moved to Studio · /about unchanged')",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-30 (case pages-shell: three pages checked → Move to… → Move; board shots/139-52176.png): built — '3 pages moved to Studio · URLs unchanged · Undo' (board: Client projects), one undo step for all three. Layout is the shared Toast (✕ kept; one row where the board wraps Undo — coordinator round 10: leave the toast).",
    "tier": "P1"
   },
   {
@@ -1745,8 +1745,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No 'Home is the homepage' disabled reason in bulk bar",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-30 (case pages-shell, Home ⌘-clicked; board shots/139-52895.png): built — with the homepage alone selected Delete is off (greyed) and a note under the bar reads 'Home is the homepage' / 'Set another page as the homepage before deleting Home.'; with others selected too, Delete stays on (the homepage is spared, as before) and the note stays. Test BulkToolbar.",
    "tier": "P1"
   },
   {

@@ -80,6 +80,19 @@ describe("BulkToolbar", () => {
     expect(screen.queryByText("Top level (no folder)")).toBeNull();
   });
 
+  it("with the homepage alone selected, Delete is off and the reason is said (139:52895)", () => {
+    const onDelete = vi.fn();
+    render(<BulkToolbar {...baseProps} selectedCount={1} selectedNames={["Home"]} homeSelected="Home" onDelete={onDelete} />);
+    expect(screen.getByTestId("pages-bulk-delete")).toBeDisabled();
+    expect(screen.getByTestId("pages-bulk-home-note")).toHaveTextContent("Home is the homepageSet another page as the homepage before deleting Home.");
+  });
+
+  it("with the homepage among others, Delete stays on (the others go) and the note stays", () => {
+    render(<BulkToolbar {...baseProps} homeSelected="Home" />);
+    expect(screen.getByTestId("pages-bulk-delete")).not.toBeDisabled();
+    expect(screen.getByTestId("pages-bulk-home-note")).toBeInTheDocument();
+  });
+
   it("Delete reads in the error red", () => {
     render(<BulkToolbar {...baseProps} />);
     expect(screen.getByRole("button", { name: "Delete" }).className).toContain("tw:text-[var(--bk-error)]");
