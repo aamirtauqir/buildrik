@@ -109,3 +109,34 @@ describe("fieldUsage — Collection-bound repeaters", () => {
     expect(uses.size).toBe(0);
   });
 });
+
+/* design-2l9 165:3173 — exact usages: the element's page and place, and each
+   of the collection's own patterns on its collection page. */
+describe("fieldUsage — exact labels (165:3173)", () => {
+  it("names the page, the parent and the element, and every pattern that uses the field", async () => {
+    const { installEngineBrowserStubs, removeEngineBrowserStubs, createTestComposer } = await import("@/engine/__tests__/test-utils/realComposer");
+    const { pageFileNames } = await import("@/engine/export");
+    installEngineBrowserStubs();
+    try {
+      const c = createTestComposer();
+      c.elements.setActivePage(c.elements.createPage("Home").id);
+      const post = c.elements.createPage("Blog post");
+      const article = c.elements.createElement("section");
+      article.setData("layerName", "Heading");
+      c.elements.addElement(article, post.root.id);
+      const text = c.elements.createElement("heading", { content: "x" });
+      text.setData("layerName", "Text");
+      c.elements.addElement(text, article.getId());
+      c.cms.bindings.bindToField(text.getId(), "blog", undefined, "title", "content");
+      const file = pageFileNames(c.elements.getAllPages()).get(post.id)!;
+      const blog = {
+        id: "blog", name: "Blog", slug: "blog",
+        fields: [{ id: "f", name: "Title", slug: "title", type: "text", order: 0 }],
+        pageTemplatePath: file, pageSlugPattern: "/blog/{slug}", pageSeoTitle: "{title} · Studio",
+      } as unknown as CMSCollection;
+      expect(fieldUsage(c, blog).get("title")?.map((u) => u.label)).toEqual(["Blog post · Heading / Text", "Blog post · SEO title pattern"]);
+    } finally {
+      removeEngineBrowserStubs();
+    }
+  });
+});

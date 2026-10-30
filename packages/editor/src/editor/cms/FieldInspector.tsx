@@ -134,20 +134,21 @@ export function FieldInspector({ composer, collection, collections, field, recor
           <h3 className="tw:m-0 tw:text-[13px] tw:leading-5 tw:font-semibold tw:text-[var(--bk-ink)]">
             {field.name} · {uses.length} usage{uses.length === 1 ? "" : "s"}
           </h3>
-          <ul className="tw:m-0 tw:flex tw:list-none tw:flex-col tw:gap-1 tw:p-0" data-testid="cms-fi-uses">
+          <ul className="tw:m-0 tw:flex tw:list-none tw:flex-col tw:gap-1.5 tw:p-0" data-testid="cms-fi-uses">
             {uses.map((u, i) => (
               <li key={`${u.label}-${i}`}>
                 {u.elementId ? (
-                  <Button size="xs" color="light" className="tw:h-8 tw:w-full tw:justify-start tw:border-0 tw:bg-[var(--bk-bg-subtle)] tw:px-3 tw:text-[12px] tw:font-normal" onClick={() => onOpenUse(u.elementId!)}>
+                  <Button size="xs" variant="ghost" className="tw:h-8 tw:w-full tw:justify-center tw:px-3 tw:text-[13px] tw:font-normal tw:text-[var(--bk-ink)]" onClick={() => onOpenUse(u.elementId!)}>
                     {u.label}
                   </Button>
                 ) : (
-                  <span className="tw:flex tw:h-8 tw:items-center tw:rounded-[6px] tw:bg-[var(--bk-bg-subtle)] tw:px-3 tw:text-[12px] tw:text-[var(--bk-ink)]">{u.label}</span>
+                  <span className="tw:flex tw:h-8 tw:items-center tw:justify-center tw:px-3 tw:text-[13px] tw:text-[var(--bk-ink)]">{u.label}</span>
                 )}
               </li>
             ))}
           </ul>
-          <Button size="xs" variant="link" className="tw:h-auto tw:min-h-0 tw:self-start tw:p-0 tw:text-[12px] tw:font-medium" onClick={() => setShowUses(false)} data-testid="cms-fi-back-to-field">
+          {/* 165:3173: usages as centred lines, the way back centred under them. */}
+          <Button size="xs" variant="link" className="tw:h-8 tw:self-center tw:p-0 tw:text-[13px] tw:font-normal" onClick={() => setShowUses(false)} data-testid="cms-fi-back-to-field">
             ‹ Back to field
           </Button>
         </div>

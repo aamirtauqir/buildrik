@@ -145,6 +145,22 @@ const DESTRUCTIVE_LABELS = new Set([
   "cut",
 ]);
 
+/* A domain receipt whose Undo says its own result (design-2l9 187:22586:
+   "{page} removed. Collection link needs repair · Open CMS") runs that undo
+   through here, and the generic "Undo: …" bar stays down for it — one
+   message per action. Explicit, never inferred from the label: the flag is
+   up only while `run` executes, and history emits HISTORY_UNDO synchronously
+   inside `undo()`. */
+let ownReceiptUndo = false;
+export function undoWithOwnReceipt(run: () => boolean): boolean {
+  ownReceiptUndo = true;
+  try {
+    return run();
+  } finally {
+    ownReceiptUndo = false;
+  }
+}
+
 export function useHistoryFeedback(
   composer: Composer | null,
   addToast: (input: ToastInput) => string
@@ -176,6 +192,7 @@ export function useHistoryFeedback(
        back no matter what it reverted. Destructive labels keep the longer
        linger they had. */
     const handleUndo = (data: { entry: { label?: string } }) => {
+      if (ownReceiptUndo) return;
       const action = formatLabel(data.entry.label);
       const isDestructive = DESTRUCTIVE_LABELS.has(data.entry.label?.toLowerCase() ?? "");
       addToast({

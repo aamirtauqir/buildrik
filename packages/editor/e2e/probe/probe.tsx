@@ -2165,7 +2165,8 @@ const CMS_WS_RECORDS = Array.from({ length: 64 }, (_, i) => ({
 /* design-2l9 187:20406 … 187:22375 on a REAL Composer: the Dynamic pages tab
    makes a page and binds it, which the stub composer cannot. A Team
    collection with two published records; `&siteId=` makes the link's server
-   mirror fail (no server behind the probe) for 187:21035. */
+   mirror fail (no server behind the probe) for 187:21035. Both records share
+   a Role, so "/team/{role}" collides (165:3693). */
 function CmsDynamicPagesHost() {
   const [composer, setComposer] = React.useState<Composer | null>(null);
   React.useEffect(() => {
@@ -2182,7 +2183,7 @@ function CmsDynamicPagesHost() {
           { id: "f-bio", name: "Bio", slug: "bio", type: "richtext", order: 4 },
         ] as never,
       });
-      for (const [name, role] of [["Ali Shah", "Product designer"], ["Sara Khan", "Strategist"]]) {
+      for (const [name, role] of [["Ali Shah", "Designer"], ["Sara Khan", "Designer"]]) {
         await c.cms.collections.createContentItem(col.id, { name, role, slug: name.toLowerCase().replace(/ /g, "-") }, { status: "published" });
       }
       cmsWorkspace.reset();

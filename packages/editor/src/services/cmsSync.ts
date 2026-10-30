@@ -215,10 +215,17 @@ export function isCmsCollectionSaveOwed(id: string): boolean {
 export interface CmsConflict {
   kind: "collection" | "entry";
   id: string;
-  /** Overwrite the server with this device's copy; true when it landed. */
-  keepMine(): Promise<boolean>;
+  /** Overwrite the server with this device's copy; true when it landed.
+   *  Entries take `data` — a merged copy (165:2414: your changed fields over
+   *  the latest saved record) — which is written here first, then sent. */
+  keepMine(data?: Record<string, unknown>): Promise<boolean>;
   /** Replace this device's copy with the server's. */
   useTheirs(): Promise<void>;
+  /** Entries: the field values this device tried to save. */
+  mine?: Record<string, unknown>;
+  /** Entries: the server's current field values (read, not applied), or null
+   *  when the server no longer has the row. */
+  theirs?: () => Promise<Record<string, unknown> | null>;
 }
 const conflictListeners = new Set<(c: CmsConflict) => void>();
 export function onCmsConflict(cb: (c: CmsConflict) => void): () => void {
@@ -971,11 +978,20 @@ export async function syncEntryUpsert(item: CMSContentItem): Promise<boolean> {
         raiseConflict({
           kind: "entry",
           id: item.id,
-          keepMine: async () => {
+          keepMine: async (data) => {
             rebaseOnConflict(stampKey, e);
-            return syncEntryUpsert(item);
+            if (!data) return syncEntryUpsert(item);
+            const merged: CMSContentItem = { ...item, data, updatedAt: new Date().toISOString() };
+            await Storage.saveContentItem(merged);
+            await engine?.refreshFromStorage();
+            return syncEntryUpsert(merged);
           },
           useTheirs: () => takeServerCopy(siteId, "entry", item.id),
+          mine: item.data,
+          theirs: async () => {
+            const rows = (await client().cms.entries.list.query({ siteId, collectionId: item.collectionId })) as Array<{ id: string; data: Record<string, unknown> }>;
+            return rows.find((r) => r.id === item.id)?.data ?? null;
+          },
         }),
       /* Refused as published: a record the server already holds goes back
          to the server's copy; one it never held is kept here as a draft (and

@@ -7738,8 +7738,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No per-field diff modal; code resolves conflicts only as whole-record keepMine/useTheirs",
+   "verified": "drift-fixed",
+   "verifiedNote": "Built + compared 2026-10-30 (round 21) with shots/165-2414.png, probe cms-workspace&record=post-1&siteId with Playwright answering the entry upsert with a real tRPC CONFLICT (CMS_CONFLICT:<stamp>, classify()) and entries.list with the server's row: 'Changed elsewhere · Review' → 'Review record changes' (720, top 279), 'Only changed fields are shown. Keep mine applies your changed fields…', per field 'Mine: …' / 'Theirs · latest saved: …', Cancel / Use theirs / Keep mine — match. Theirs is READ when the review opens (the CONFLICT carries only a stamp): CmsConflict.theirs() over cms.entries.list; Keep mine sends theirs + the fields edited since the sheet opened (walked: title mine, excerpt theirs in the sent payload). If the latest copy can't be read the dialog says so and Keep mine re-sends the whole copy. Tests RecordSheet (conflict), ConflictReviewDialog via the sheet. | No per-field diff modal; code resolves conflicts only as whole-record keepMine/useTheirs",
    "tier": "P1"
   },
   {
@@ -7772,8 +7772,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "built + probe-rendered 2026-10-27 (no board shot): 'Show N usages' opens '{field} · N usages', one row per use (opens the element), '‹ Back to field'.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared 2026-10-30 (round 21) with shots/165-3173.png, probe cms-dynamic-pages (real Composer + bindings): 'Name · 1 usage' · centred usage lines · centred '‹ Back to field' — match. Usages are exact, from the binding map and the collection's own patterns: '{page} · {parent} / {element}' (layer names) and '{collection page} · URL pattern / SEO title pattern / SEO description pattern'. The board's 'Open Graph title' is the SEO title pattern (one field writes both tags). Test fieldUsage 'exact labels'. | built + probe-rendered 2026-10-27 (no board shot): 'Show N usages' opens '{field} · N usages', one row per use (opens the element), '‹ Back to field'.",
    "tier": "P1"
   },
   {
@@ -7794,8 +7794,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No URL-pattern collision check or \"Use {slug}\" fix in code",
+   "verified": "drift-open",
+   "verifiedNote": "Built + probe-compared 2026-10-30 (round 21) with shots/165-3693.png: the Dynamic pages form is now the board's — Collection page (select), Edit collection page ›, URL pattern, SEO title, SEO description, 720 filled fields under 13 ink labels; a collision outlines the pattern red with 'Multiple records resolve to /team/designer. Choose a unique field, such as {slug}.' and 'Use {slug}', and blocks Save. The collision is the publish worker's own rule (shared applyCmsPattern over the PUBLISHED records — the server generates one path per record and has no uniqueness check). Still open: Save sits under the form, the board puts it top-right in the workspace header; 'Social image' is not built — no such field on the collection (server schema → REQUESTS A-27); the board keeps 'On the next publish' (grey box) beside the error, the code says nothing about the next publish while the pattern is invalid. | No URL-pattern collision check or \"Use {slug}\" fix in code",
    "tier": "P1"
   },
   {
@@ -9307,7 +9307,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-fixed",
-   "verifiedNote": "Compared 2026-10-30 (round 20) with shots/187-21853.png, probe cms-dynamic-pages after Create page: '{page}' 13 semibold · 'Edit collection page ›' · URL pattern and SEO title as 720 filled fields under 13 ink labels · 'On the next publish' 12 semibold · '{N} published records will generate {N} pages. Changes to records or the template appear after site publish.' — match. Kept beyond the board (capabilities, not removed): a collapsed 'More settings' (template page, SEO description, page list) and 'Save changes' once a field is edited. The header's '‹ Back to Team profile' is the workspace origin (C-11/C-12). Tests DynamicPagesPane. | Built round 19, not compared (board shot not fetched — round image budget spent on the 8 waiting rows): a saved link names its page with 'Edit collection page ›' (opens it on the canvas) and the status reads 'On the next publish · N published records will generate N pages. Changes to records or the template appear after site publish.' The editable form (pattern, template select, SEO patterns, page list, Save) stays below — the board draws only URL pattern and SEO title; whether the rest goes is to compare next round. Test DynamicPagesPane '187:21853'. | Linked summary + Edit collection page › + publish count; code edits pattern/template/SEO fields (DynamicPagesPane.tsx:158-180)",
+   "verifiedNote": "Round 21: the linked view is now the full form 165:3693 draws (Collection page select + SEO description shown, no 'More settings'); 187:21853 draws the same form without those two rows — the fuller board was taken. | Compared 2026-10-30 (round 20) with shots/187-21853.png, probe cms-dynamic-pages after Create page: '{page}' 13 semibold · 'Edit collection page ›' · URL pattern and SEO title as 720 filled fields under 13 ink labels · 'On the next publish' 12 semibold · '{N} published records will generate {N} pages. Changes to records or the template appear after site publish.' — match. Kept beyond the board (capabilities, not removed): a collapsed 'More settings' (template page, SEO description, page list) and 'Save changes' once a field is edited. The header's '‹ Back to Team profile' is the workspace origin (C-11/C-12). Tests DynamicPagesPane. | Built round 19, not compared (board shot not fetched — round image budget spent on the 8 waiting rows): a saved link names its page with 'Edit collection page ›' (opens it on the canvas) and the status reads 'On the next publish · N published records will generate N pages. Changes to records or the template appear after site publish.' The editable form (pattern, template select, SEO patterns, page list, Save) stays below — the board draws only URL pattern and SEO title; whether the rest goes is to compare next round. Test DynamicPagesPane '187:21853'. | Linked summary + Edit collection page › + publish count; code edits pattern/template/SEO fields (DynamicPagesPane.tsx:158-180)",
    "tier": "P1"
   },
   {

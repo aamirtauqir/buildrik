@@ -63,7 +63,7 @@ describe("FieldsTable", () => {
     expect(screen.getByTestId("cms-field-used-f1")).toHaveTextContent("1");
     expect(screen.getByTestId("cms-field-used-f1")).toHaveAttribute("title", "Menu card");
     expect(screen.getByTestId("cms-field-used-f2")).toHaveTextContent("0");
-    expect(screen.getByTestId("cms-field-used-f3")).toHaveAttribute("title", "Dynamic pages");
+    expect(screen.getByTestId("cms-field-used-f3")).toHaveAttribute("title", "Dynamic pages · URL pattern"); // 165:3173: where, exactly (no collection page linked here)
     expect(screen.getByTestId("cms-field-f2")).toHaveAttribute("aria-selected", "true");
     fireEvent.click(screen.getByTestId("cms-field-f3"));
     expect(onSelect).toHaveBeenCalledWith("f3");
@@ -195,7 +195,7 @@ describe("FieldInspector", () => {
   it("locks a field the URL pattern names — no element to open", () => {
     mount(2);
     fireEvent.click(screen.getByTestId("cms-fi-delete"));
-    expect(screen.getByTestId("cms-field-locked-uses")).toHaveTextContent("Dynamic pages › Slug");
+    expect(screen.getByTestId("cms-field-locked-uses")).toHaveTextContent("Dynamic pages · URL pattern › Slug");
     expect(screen.queryByTestId("cms-field-locked-open")).toBeNull();
   });
 

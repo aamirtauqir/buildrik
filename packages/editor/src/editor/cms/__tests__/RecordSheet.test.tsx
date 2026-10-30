@@ -211,6 +211,24 @@ describe("RecordSheet", () => {
     conflictMock.mockImplementation(() => false);
   });
 
+  /* 165:2414 — the per-field review: only fields where mine and the latest
+     saved copy differ; Keep mine applies MY edited fields over theirs. */
+  it("reviews field by field and keeps only my edited fields over the latest saved record (165:2414)", async () => {
+    const choice = conflictOnSave() as Choice & { mine?: Record<string, unknown>; theirs?: () => Promise<Record<string, unknown>> };
+    choice.mine = { ...MARGHERITA.data, price: "$13" };
+    choice.theirs = async () => ({ ...MARGHERITA.data, description: "Tomato and basil" });
+    mount();
+    await saveAnEdit();
+    fireEvent.click(await screen.findByTestId("cms-sheet-conflict-review"));
+    expect(await screen.findByTestId("cms-conflict-field-price")).toHaveTextContent("Mine: $13Theirs · latest saved: $12");
+    expect(screen.getByTestId("cms-conflict-field-description")).toHaveTextContent("Mine: TomatoTheirs · latest saved: Tomato and basil");
+    expect(screen.queryByTestId("cms-conflict-field-name")).toBeNull();
+    fireEvent.click(screen.getByTestId("cms-sheet-keep-mine"));
+    await waitFor(() => expect(choice.keepMine).toHaveBeenCalledWith({ ...MARGHERITA.data, description: "Tomato and basil", price: "$13" }));
+    conflictMock.mockReset();
+    conflictMock.mockImplementation(() => false);
+  });
+
   it("Use theirs takes the server's copy and closes; Keep mine that lands closes saved", async () => {
     let choice = conflictOnSave();
     mount();
