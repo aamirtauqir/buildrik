@@ -95,6 +95,8 @@ import { ComponentsTab } from "@/editor/sidebar/tabs/ComponentsTab";
 import { ComponentDetailScreen } from "@/editor/sidebar/tabs/component-library/ComponentDetailScreen";
 import { DSModeProvider } from "@/editor/design-system/state/DSModeContext";
 import { TokenDetailView } from "@/editor/design-system/ui/sections/TokenDetailView";
+import { InspectorErrorBoundary } from "@/editor/inspector/components/InspectorErrorBoundary";
+import { InspectorLoading } from "@/editor/inspector/components/InspectorLoading";
 import { v6Token } from "@/engine/__tests__/test-utils/v6Token";
 import { LayerTreeItem } from "@/editor/panels/layers/LayerTreeItem";
 import { renameElement } from "@/editor/panels/layers/hooks/layersPersistence";
@@ -2665,6 +2667,25 @@ const CASES: Record<string, () => React.ReactElement> = {
           <Host />
         </div>
       </ToastProvider>
+    );
+  },
+  /* S03 / S01: the Inspector's display error and its loading body, in the
+     300 column. */
+  "inspector-states": () => {
+    const Boom = (): React.ReactElement => {
+      throw new Error("probe display error");
+    };
+    return (
+      <div data-probe="inspector-states" className="tw:flex tw:gap-4">
+        <div className="tw:w-[300px] tw:bg-white" data-testid="probe-s03">
+          <InspectorErrorBoundary targetName="Hero heading">
+            <Boom />
+          </InspectorErrorBoundary>
+        </div>
+        <div className="tw:flex tw:h-[400px] tw:w-[300px] tw:flex-col tw:bg-white" data-testid="probe-s01">
+          <InspectorLoading />
+        </div>
+      </div>
     );
   },
   "inspector-panel": () => {

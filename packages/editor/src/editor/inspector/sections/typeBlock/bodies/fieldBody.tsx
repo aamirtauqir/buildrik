@@ -149,6 +149,17 @@ export const FieldBody: React.FC<TypeBlockBodyProps> = (props) => {
       action: { label: "Undo", onClick: composer.history.captureUndo() },
     });
   };
+  /* 2L9 F04: "{old label} label changed · All breakpoints · Undo" — a label
+     is the field's content, the same at every breakpoint. */
+  const setLabel = (next: string) => {
+    const before = fieldLabelText(scope, field) || "Field";
+    if (!write("field-label", () => writeFieldLabel(scope, field, next))) return;
+    addToast({
+      description: `${before} label changed · All breakpoints`,
+      tone: "info",
+      action: { label: "Undo", onClick: composer.history.captureUndo() },
+    });
+  };
   const setName = (name: string) => {
     if (form && nameTaken(form, field, name)) {
       setNameError(`“${name.trim()}” is already used. Choose a unique submission key.`);
@@ -169,7 +180,7 @@ export const FieldBody: React.FC<TypeBlockBodyProps> = (props) => {
   return (
     <>
       <TypeRow value={type} options={typeOptions} onPick={setType} />
-      <CommitRow label="Label" value={fieldLabelText(scope, field)} onCommit={(v) => write("field-label", () => writeFieldLabel(scope, field, v))} testId="form-field-label" />
+      <CommitRow label="Label" value={fieldLabelText(scope, field)} onCommit={setLabel} testId="form-field-label" />
       {tag !== "select" ? (
         <CommitRow label="Placeholder" value={field.getAttribute("placeholder") ?? ""} onCommit={(v) => setAttr("placeholder", v)} testId="form-field-placeholder" />
       ) : null}

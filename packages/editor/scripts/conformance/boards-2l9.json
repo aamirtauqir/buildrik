@@ -4215,8 +4215,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Lane L-B A3 (built, not compared): Label edits the associated <label> text ('Work email'). Open: 'Email label changed · All breakpoints · Undo' receipt.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B round 14, side by side with the board PNG (probe ?block=contact-form&child=input&childAttrs={type:email}, Label → 'Work email'): Label writes the associated <label>, and the receipt 'Email label changed · All breakpoints · Undo' (old label; the Undo is captureUndo on that one step — unit-tested). The field body matches 157:103125 (Conditions not built).",
    "inheritsFrom": "156:1316",
    "tier": "P1"
   },
@@ -4239,7 +4239,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Lane L-B A4 (built, not compared): a new Text field is named 'field-N', labelled 'Field N', placeholder 'Your answer', and opens in the field editor. Open: 'Added to Contact form.' note and 'Text field added · All breakpoints · Undo' receipt.",
+   "verifiedNote": "Lane L-B round 14, compared with the board PNG (probe contact-form › + Add field › Text): the new field opens with Type Text, Label 'Field 4', Placeholder 'Your answer', Name 'field-4', Required — as the board. Open: the board's 'Added to Contact form.' note and the '‹ Contact form' back link under the fields (live: back link on top), and the board omits the Name note / Default value / Validation / Advanced rows for the just-added state. Lane L-B A4 (built, not compared): a new Text field is named 'field-N', labelled 'Field N', placeholder 'Your answer', and opens in the field editor. Open: 'Added to Contact form.' note and 'Text field added · All breakpoints · Undo' receipt.",
    "inheritsFrom": "156:1316",
    "tier": "P1"
   },
@@ -4250,8 +4250,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Lane L-B A5 (built, not compared): an added field stays in the list in place (FormFieldsAndSlides tests). Open: visual comparison; submit row.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B round 14, side by side with the board PNG (probe: add a Text field, back to the form): Fields lists Name · Text, Email · Email, Message · Textarea, Field 4 · Text, then the submit · Submit button — the added field in place before the submit, '+ Add field', the reorder hint. Conditions not built; '· Required' is fixture data.",
    "inheritsFrom": "156:716",
    "tier": "P1"
   },
@@ -4316,9 +4316,9 @@
    "page": "04",
    "family": "inspector",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Lane L-B A6 (built, not compared): acknowledged save reads 'Saved'.",
+   "authority": "code:after-submit-live-on-save",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B round 14, side by side with the board PNG (probe ?block=contact-form&siteId=s1&formBlock={MESSAGE, notify, spam on}, Behavior): After submit · Then Show message · Message box; Notifications · Send to; Spam protection · 'Applies on next publish' · Block automated submissions; Form settings status · 'Saved' · 'Saved separately from page edits; outside document Undo.'. Same exception as 156:6055: no 'Applies on next publish' under After submit (the setting is live on save).",
    "inheritsFrom": "156:6055",
    "tier": "P1"
   },
@@ -4988,8 +4988,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Lane L-B round 13, placement measured in the probe with the panel in a `.layout-shell__inspector` column at the 1440 frame's right edge (new ?shell=1): the Interaction actions menu opens beside the column — right edge 9 px clear of it (menu x 891–1131, column at 1140), 240 wide, as the board draws (board ≈ 7 px at 1024 → 9–10 px at 1440; 171 → 240 wide). Gap: the board tops the menu level with the tab strip (≈ y 180 at 1440×900), live tops it on its trigger ('More…', y 204 in the probe's shorter layout — ≈ 128 px lower than the board in a real column). Popover `beside` aligns to the trigger by design (colour picker, board 4428:142922); changing it is chrome-ui's. Content matched in round 2. probe-compared 2026-10-27 for content: 'Interaction actions' card title, Duplicate · Disable · Delete · 'Close menu' — now actually centred (its tw:!justify-center did nothing on MenuItem's label span; fixed round 2). Placement beside the column over the canvas (beside='.layout-shell__inspector') cannot be shown in the probe (no shell) — open until the lead's live walk.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B round 14, measured in the probe (?shell=1, the panel in a `.layout-shell__inspector` column at the 1440 frame's right edge): the Interaction actions menu opens beside the column — right edge 9 px clear (x 891–1131, column at 1140), 240 wide — and now tops out level with the tab strip (menu y 84 = tab strip y 84), as the board draws it. Popover takes a new optional `besideTop` selector (contract-tested; omitted, it still aligns to the trigger, so the colour picker is unchanged). Content: 'Interaction actions', Duplicate · Disable · Delete · 'Close menu' centred (round 2).",
    "tier": "P1"
   },
   {
@@ -5559,7 +5559,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Lane L-B B1 (built, not compared — copy checked against the dump): the multi bar says '2 of 3 eligible. Locked {name} is excluded and remains unchanged.' when a target is locked (writes already skip it), lists 'Selection · Inspect {name}' rows that narrow to one object, and ends 'No DOM ID batch write. Choose one object for identity, binding and child-list tasks.'. Open: the eligibility count in the header line (B-10, lead) and the per-section 'Typography eligibility' / 'Apply to 2 eligible headings' rows.",
+   "verifiedNote": "Lane L-B round 14, compared with the board PNG (not reproduced live — the probe cannot select two headings plus a locked image): the board moves batch eligibility into the Style tab body — 'Typography eligibility', '2 headings can change font size. Locked image is excluded and remains unchanged.', Font size 'Mixed', a full-width 'Apply to 2 eligible headings' — then 'Selection' with one 'Inspect {name}' button per object and the no-DOM-ID note, and '· 2 of 3 eligible' after 'Editing Desktop · Default state' in the header. Live keeps eligibility in the multi bar above the tabs. Open: a redesign of the batch panel. Lane L-B B1 (built, not compared — copy checked against the dump): the multi bar says '2 of 3 eligible. Locked {name} is excluded and remains unchanged.' when a target is locked (writes already skip it), lists 'Selection · Inspect {name}' rows that narrow to one object, and ends 'No DOM ID batch write. Choose one object for identity, binding and child-list tasks.'. Open: the eligibility count in the header line (B-10, lead) and the per-section 'Typography eligibility' / 'Apply to 2 eligible headings' rows.",
    "tier": "P1"
   },
   {
@@ -5926,7 +5926,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Lane L-B A9 (built, not compared): loading reads 'Loading project' / 'Your saved content is still arriving. Editing controls will appear when it is ready.' under the header bar. Open: the board also draws the (inert) tab strip and the header 'Loading {site}' (REQUESTS #10 territory).",
+   "verifiedNote": "Lane L-B round 14, compared with the board PNG (probe case inspector-states): body 'Loading project' / 'Your saved content is still arriving. Editing controls will appear when it is ready.' and now the board's four grey bars under it. Open: the board draws the real header ('… › Hero › Opening project', 'Loading Fieldwork Studio') and the tab strip above it; live shows a placeholder header bar and no tabs while the project loads (the header is InspectorHeader, lead). Lane L-B A9 (built, not compared): loading reads 'Loading project' / 'Your saved content is still arriving. Editing controls will appear when it is ready.' under the header bar. Open: the board also draws the (inert) tab strip and the header 'Loading {site}' (REQUESTS #10 territory).",
    "tier": "P1"
   },
   {
@@ -5947,8 +5947,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Lane L-B A9 (built, not compared): 'Unable to display Inspector' · '{name} is still selected. This display error has not changed your document.' · 'Try again' (test InspectorStates).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B round 14, side by side with the board PNG (probe case inspector-states): 'Unable to display Inspector' (13 / semibold, ink), 'Hero heading is still selected. This display error has not changed your document.', and a full-width primary 'Try again' — was a red-tinted card with a small light button. In the panel it sits under the header and tabs (ProInspector keeps them above the boundary).",
    "tier": "P1"
   },
   {
@@ -5958,8 +5958,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Lane L-B A9 (built, not compared): Try again re-renders the same target on the same tab — selection and tab live above the boundary (test InspectorStates).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B round 14, compared with the board PNG: after Try again the same element shows on the same tab (selection and tab live above the boundary — unit-tested), and the Style body is the normal one (Typography Font / Font size / Weight / Line height as page 04 draws them; Spacing · n set, Background · None shut). Lane L-B A9 (built, not compared): Try again re-renders the same target on the same tab — selection and tab live above the boundary (test InspectorStates).",
    "tier": "P1"
   },
   {
@@ -6452,7 +6452,7 @@
    "status": "active",
    "authority": "open:owner-class-first",
    "verified": "drift-open",
-   "verifiedNote": "Lane L-B round 13: the receipt is not in elementActions.ts (that row only runs the copy-style command) but in the lead-owned shell hook useClipboardToasts — REQUESTS B-22 gives the exact text from what the command copies: the one element's own base styles, so '{n} style(s) copied · This element only · Desktop / Default'. Left open as the lead asked: the Selector row's class-first part (owner decision). Lane L-B P1 round 6, board PNG fetched: the receipt '2 styles copied · This element only · Desktop / Default' is the Copy style element action's toast (editor/shared/elementActions.ts, outside L-B's paths); the Selector row is class-first (owner decision pending). Open.",
+   "verifiedNote": "Lane L-B round 14 (lead cleared useClipboardToasts): the receipt reads '{n} style(s) copied · This element only · Desktop / Default' — what copy-style copies, the one element's own base styles — unit-tested; matches the board's '2 styles copied · This element only · Desktop / Default'. Open (lead): the Selector row's class-first part, an owner decision. Lane L-B round 13: the receipt is not in elementActions.ts (that row only runs the copy-style command) but in the lead-owned shell hook useClipboardToasts — REQUESTS B-22 gives the exact text from what the command copies: the one element's own base styles, so '{n} style(s) copied · This element only · Desktop / Default'. Left open as the lead asked: the Selector row's class-first part (owner decision). Lane L-B P1 round 6, board PNG fetched: the receipt '2 styles copied · This element only · Desktop / Default' is the Copy style element action's toast (editor/shared/elementActions.ts, outside L-B's paths); the Selector row is class-first (owner decision pending). Open.",
    "tier": "P1"
   },
   {

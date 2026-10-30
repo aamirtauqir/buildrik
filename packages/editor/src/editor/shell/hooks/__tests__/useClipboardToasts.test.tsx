@@ -100,6 +100,20 @@ describe("useClipboardToasts", () => {
     ]);
   });
 
+  it("2L9 G01: Copy style's receipt says what was copied — count, scope, breakpoint and state", () => {
+    const { composer, fire } = fakeComposer();
+    const addToast = vi.fn();
+    renderHook(() => useClipboardToasts(composer, addToast));
+    fire(EVENTS.STYLES_COPIED, { count: 2 });
+    fire(EVENTS.STYLES_COPIED, { count: 1 });
+    fire(EVENTS.STYLES_COPIED, { count: 0 });
+    expect(addToast.mock.calls.map(([t]) => t.description)).toEqual([
+      "2 styles copied · This element only · Desktop / Default",
+      "1 style copied · This element only · Desktop / Default",
+      "No styles to copy",
+    ]);
+  });
+
   it("unsubscribes on unmount", () => {
     const { composer, count } = fakeComposer();
     const { unmount } = renderHook(() => useClipboardToasts(composer, vi.fn()));

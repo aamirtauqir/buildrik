@@ -82,6 +82,24 @@ describe("Input (board 14)", () => {
     expect(composer.beginTransaction).toHaveBeenCalledWith("field-type");
   });
 
+  it("2L9 F04: a label change answers '{old label} label changed · All breakpoints' with Undo", () => {
+    const c = createTestComposer();
+    c.importProject({
+      pages: [{ id: "p", name: "Home", slug: "", isHome: true, root: { id: "root", type: "container", tagName: "div", children: [
+        { id: "f", type: "form", tagName: "form", children: [
+          { id: "lb", type: "text", tagName: "label", attributes: { for: "em" }, content: "Email", children: [] },
+          { id: "em", type: "input", tagName: "input", attributes: { id: "em", type: "email", name: "email" }, children: [] },
+        ] },
+      ] } }],
+    } as never);
+    renderBlock(c, { id: "em", type: "input" });
+    const label = screen.getByLabelText("Label");
+    fireEvent.change(label, { target: { value: "Work email" } });
+    fireEvent.blur(label);
+    expect(screen.getByText("Email label changed · All breakpoints")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Undo" })).toBeInTheDocument();
+  });
+
   it("Select keeps its options rows (no board — by analogy)", () => {
     const el = makeMockElement({ id: "e1", type: "select" });
     renderBlock(makeMockComposer({ element: el }), { id: "e1", type: "select" });

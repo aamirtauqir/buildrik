@@ -41,6 +41,13 @@ export function InspectorLoading(): React.ReactElement {
         <div className="tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">
           Your saved content is still arriving. Editing controls will appear when it is ready.
         </div>
+        {/* The board's four bars: content arriving, not controls with values. */}
+        <div className="tw:flex tw:flex-col tw:gap-1.5 tw:pt-2" aria-hidden="true" data-testid="inspector-loading-bars">
+          <SkeletonBlock className="tw:h-3.5 tw:w-[70%]" />
+          <SkeletonBlock className="tw:h-3.5 tw:w-full" />
+          <SkeletonBlock className="tw:h-3.5 tw:w-[52%]" />
+          <SkeletonBlock className="tw:h-3.5 tw:w-full" />
+        </div>
       </div>
     </div>
   );

@@ -108,7 +108,13 @@ export function useClipboardToasts(
       const n = e?.count ?? 0;
       addToast(
         n > 0
-          ? { description: `${plural(n, "1 style", "styles")} copied`, tone: "info", duration: 2000 }
+          ? {
+              /* 2L9 G01 (271:124080): what copy-style copies — the one
+                 element's own base styles: Desktop, Default state. */
+              description: `${plural(n, "1 style", "styles")} copied · This element only · Desktop / Default`,
+              tone: "info",
+              duration: 2000,
+            }
           : { description: "No styles to copy", tone: "warning", duration: 2000 }
       );
     };
