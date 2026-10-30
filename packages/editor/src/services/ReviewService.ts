@@ -176,6 +176,12 @@ export interface CurrentRound {
   /** The client link's token while that link still opens (null: no client
    *  invited, or revoked, or expired) — `reviewLinkUrl` builds the URL. */
   token: string | null;
+  /** When the client link stops opening; null when none was minted. */
+  expiresAt?: string | Date | null;
+  /** Minted, not revoked, past `expiresAt` (2L9 B8-R02). */
+  linkExpired?: boolean;
+  /** The reviewer's last visit (2L9 B8-R01 "Opened · … · 2 h ago"). */
+  reviewerLastSeenAt?: string | Date | null;
 }
 
 /**

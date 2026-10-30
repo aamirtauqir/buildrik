@@ -295,6 +295,16 @@ export interface CurrentRound {
    *  sender already receives it from `submitReview`; this lets the Review panel
    *  copy the live link later without a re-send (B3). */
   token: string | null;
+  /** When the client link stops opening (90 days from send); null when no
+   *  link was minted. 2L9 B8-R01 "link works until 13 Jan". */
+  expiresAt: Date | null;
+  /** The link was minted, is not revoked, and is past `expiresAt` — derived
+   *  from columns every editor may read, so it never depends on the token
+   *  (which only an ADMIN gets). 2L9 B8-R02. */
+  linkExpired: boolean;
+  /** The reviewer's last visit to the link (`Reviewer.lastSeenAt`); null
+   *  before they identify. 2L9 B8-R01 "Opened · … · 2 h ago". */
+  reviewerLastSeenAt: Date | null;
 }
 
 /**
@@ -346,9 +356,10 @@ const CURRENT_ROUND_BASE_SELECT = {
   id: true,
   status: true,
   invitedEmail: true,
-  reviewer: { select: { name: true } },
+  reviewer: { select: { name: true, lastSeenAt: true } },
   revokedAt: true,
   resolvedAt: true,
+  expiresAt: true,
   createdAt: true,
   updatedAt: true,
 } as const;
@@ -364,9 +375,10 @@ export async function getCurrentRound(siteId: string, includeToken = false): Pro
     id: string;
     status: string;
     invitedEmail: string | null;
-    reviewer: { name: string | null } | null;
+    reviewer: { name: string | null; lastSeenAt: Date } | null;
     revokedAt: Date | null;
     resolvedAt: Date | null;
+    expiresAt: Date | null;
     createdAt: Date;
     updatedAt: Date;
   } | null;
@@ -376,7 +388,7 @@ export async function getCurrentRound(siteId: string, includeToken = false): Pro
     const row = await prisma.reviewRequest.findFirst({
       where: { siteId },
       orderBy: { createdAt: "desc" },
-      select: { ...CURRENT_ROUND_BASE_SELECT, token: true, expiresAt: true },
+      select: { ...CURRENT_ROUND_BASE_SELECT, token: true },
     });
     r = row;
     if (row) {
@@ -410,6 +422,9 @@ export async function getCurrentRound(siteId: string, includeToken = false): Pro
     totalRounds,
     openCommentCount,
     token,
+    expiresAt: r.expiresAt,
+    linkExpired: r.invitedEmail !== null && r.revokedAt === null && r.expiresAt !== null && r.expiresAt <= new Date(),
+    reviewerLastSeenAt: r.reviewer?.lastSeenAt ?? null,
   };
 }
 
