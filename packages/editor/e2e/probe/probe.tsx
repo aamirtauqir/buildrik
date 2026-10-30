@@ -890,6 +890,39 @@ function ShellProbe() {
   );
 }
 
+/* design-2l9 A-21 — the page trash in the real shell. `?trash=` picks the
+   server's answers: list (default, About in the trash), empty, slug (restore
+   answers SLUG_TAKEN about-2), limit (restore refused over the plan), fail
+   (restore errors). The probe URL carries `?siteId=` so the editor has a site. */
+function trashStub(mode: string) {
+  const deletedAt = new Date().toISOString();
+  const list = mode === "empty" ? [] : [{
+    id: "p_about_trash", name: "About", slug: "about", deletedAt,
+    deletedBy: { id: "u1", name: "You", isYou: true }, folderName: mode === "folder" ? "Client projects" : null,
+  }];
+  const fail = (status: number, code: string, message: string) => ({ error: { json: { message, code: -1, data: { code, httpStatus: status } } } });
+  window.fetch = (async (input: RequestInfo | URL) => {
+    const href = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+    const procs = new URL(href, location.origin).pathname.split("/api/trpc/")[1]?.split(",") ?? [];
+    const body = procs.map((name) => {
+      if (name === "pages.trash.list") return { result: { data: { json: list } } };
+      if (name === "sites.myRole") return { result: { data: { json: { role: "ADMIN" } } } };
+      if (name === "pages.trash.restore") {
+        if (mode === "slug") return fail(409, "CONFLICT", "SLUG_TAKEN:about-2");
+        if (mode === "limit") return fail(412, "PRECONDITION_FAILED", "Delete a page or upgrade to restore.");
+        if (mode === "fail") return fail(500, "INTERNAL_SERVER_ERROR", "boom");
+      }
+      return { result: { data: { json: null } } };
+    });
+    return new Response(JSON.stringify(body), { status: 200, headers: { "content-type": "application/json" } });
+  }) as typeof fetch;
+}
+
+function TrashProbe() {
+  React.useMemo(() => trashStub(new URLSearchParams(location.search).get("trash") ?? "list"), []);
+  return <ShellProbe />;
+}
+
 function hundredComposer(): Composer {
   const c = new Composer({} as never);
   const named: Array<[string, string]> = [
@@ -3888,6 +3921,8 @@ const CASES: Record<string, () => React.ReactElement> = {
      build, media). For drawer header / search / width checks against the
      boards (REQUESTS A-19), including at 1024. */
   "pages-shell": () => <ShellProbe />,
+  /* A-21 page trash, opened from ⋯ › Recently deleted (boards 142:53229 …). */
+  "pages-trash": () => <TrashProbe />,
   /* design-2l9 board 63:6393 — the whole Pages manager (header, search, view
      tabs, list, footer): the real PagesTab, 284 wide like the board. */
   "pages-tab": () => (

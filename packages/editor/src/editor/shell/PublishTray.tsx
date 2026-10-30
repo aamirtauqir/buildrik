@@ -56,6 +56,8 @@ import { trayCta, type Cta } from "./publishTrayCta";
 import { publishTray } from "./publishTrayStore";
 import { ChangesSection, FailedLog, PasswordCheckCard, OUTCOME_BTN, OutcomeNote, PublishedActions, RunSection, TraySkeleton, runSteps } from "./PublishTrayRun";
 import { usePublishPreviewDiff } from "@/editor/sidebar/tabs/publish/usePublishPreviewDiff";
+import { useEditorRole } from "./hooks/useEditorRole";
+import { roleAtLeast } from "@/services/RoleService";
 
 /* The server's content rows ("Image alt text", "Links") run the same shared
    detector the issue scanner runs per element — the tray lists the per-element
@@ -203,6 +205,9 @@ export const PublishTray: React.FC<PublishTrayProps> = ({ composer, publishJob, 
   useFitWhileOpen(composer);
 
   const siteId = React.useMemo(() => getSiteIdFromUrl(), []);
+  /* sites.cancelPublish is ADMIN on the job's site. A role KNOWN to be lower
+     sees the cancel disabled with the reason; unknown leaves it to the server. */
+  const canCancel = roleAtLeast(useEditorRole(), "ADMIN") !== false;
   const siteName = composer?.getProjectMetadata?.()?.name || "This site";
   const publishedUrl = publishJob?.publishedUrl ?? null;
   const uiState = publishJob?.uiState;
@@ -665,9 +670,23 @@ export const PublishTray: React.FC<PublishTrayProps> = ({ composer, publishJob, 
       {running ? (
         <div className="tw:flex-none tw:border-t tw:border-[var(--bk-border)] tw:p-3" data-testid="publish-tray-run-footer">
           {runSteps(publishJob?.steps).every((s) => s.status === "pending") ? (
-            <Button color="light" size="sm" className="tw:h-8 tw:w-full" onClick={() => void publishJob?.cancel()}>
-              Cancel (not started)
-            </Button>
+            <>
+              <Button
+                color="light"
+                size="sm"
+                className="tw:h-8 tw:w-full"
+                disabled={!canCancel}
+                aria-describedby={canCancel ? undefined : "publish-tray-cancel-reason"}
+                onClick={() => void publishJob?.cancel()}
+              >
+                Cancel (not started)
+              </Button>
+              {!canCancel && (
+                <p id="publish-tray-cancel-reason" className={`${META} tw:mt-2`}>
+                  Only an Admin can cancel a publish.
+                </p>
+              )}
+            </>
           ) : (
             <p className={META}>Publishing can&apos;t be stopped once deploying. You can keep working or leave.</p>
           )}

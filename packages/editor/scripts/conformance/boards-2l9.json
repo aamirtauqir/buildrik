@@ -1790,8 +1790,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 29 (A-21): built, not compared. Page trash is real: the save soft-deletes (Page.deletedAt + slug tombstone), pages.trash.list/restore/purge (EDITOR restore, ADMIN purge), RecentlyDeletedView from ⋯ Recently deleted and the delete receipts. Tests RecentlyDeletedView, page-trash-service.",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-31 (case pages-trash, 1440×900, ⋯ › Recently deleted; board shots/142-61796.png for the list): body below the head matches within 1–3px (Back link, retention line, 255×112 card, Restore 97×32, More), footer note at the drawer foot. The drawer head is the shared PanelHeader (44, A-19); these 142:* boards draw 57.",
    "inheritsFrom": "63:20001",
    "tier": "P3"
   },
@@ -1802,8 +1802,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 29 (A-21): built, not compared. Page trash is real: the save soft-deletes (Page.deletedAt + slug tombstone), pages.trash.list/restore/purge (EDITOR restore, ADMIN purge), RecentlyDeletedView from ⋯ Recently deleted and the delete receipts. Tests RecentlyDeletedView, page-trash-service.",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-31 (case pages-trash, 1440×900, ⋯ › Recently deleted; board shots/142-53954.png): 480 dialog, title, sentence, 14px 'Page URL' label, field, '/about-2' helper, Cancel + 'Restore page'. The folder line shows only when the page had a folder.",
    "tier": "P1"
   },
   {
@@ -1835,8 +1835,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 29 (A-21): built, not compared. Page trash is real: the save soft-deletes (Page.deletedAt + slug tombstone), pages.trash.list/restore/purge (EDITOR restore, ADMIN purge), RecentlyDeletedView from ⋯ Recently deleted and the delete receipts. Tests RecentlyDeletedView, page-trash-service.",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-31 (case pages-trash, 1440×900, ⋯ › Recently deleted; board shots/142-55781.png): 480 dialog, 'Delete About permanently?', sentence, 'Page name', confirm disabled until the name is typed.",
    "tier": "P1"
   },
   {
@@ -1846,8 +1846,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 29 (A-21): built, not compared. Page trash is real: the save soft-deletes (Page.deletedAt + slug tombstone), pages.trash.list/restore/purge (EDITOR restore, ADMIN purge), RecentlyDeletedView from ⋯ Recently deleted and the delete receipts. Tests RecentlyDeletedView, page-trash-service.",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-31 (case pages-trash, 1440×900, ⋯ › Recently deleted; board shots/142-55781.png + typed name): confirm enables on the exact name (RecentlyDeletedView.test).",
    "tier": "P1"
   },
   {
@@ -1857,8 +1857,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 29 (A-21): built, not compared. Page trash is real: the save soft-deletes (Page.deletedAt + slug tombstone), pages.trash.list/restore/purge (EDITOR restore, ADMIN purge), RecentlyDeletedView from ⋯ Recently deleted and the delete receipts. Tests RecentlyDeletedView, page-trash-service.",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-31 (case pages-trash, 1440×900, ⋯ › Recently deleted; board shots/dump copy): 'Recently deleted' (no count), 'Nothing deleted in the last 30 days.', retention line, footer note; toast 'About permanently deleted'.",
    "tier": "P3"
   },
   {
@@ -1868,8 +1868,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 29 (A-21): built, not compared. Page trash is real: the save soft-deletes (Page.deletedAt + slug tombstone), pages.trash.list/restore/purge (EDITOR restore, ADMIN purge), RecentlyDeletedView from ⋯ Recently deleted and the delete receipts. Tests RecentlyDeletedView, page-trash-service.",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-31 (case pages-trash, 1440×900, ⋯ › Recently deleted; board shots/142-57466 copy from dump): Retry + More, red 'Couldn’t restore About. The deleted page is still available here.' under the row.",
    "tier": "P1"
   },
   {
@@ -1960,7 +1960,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Round 29 (A-21): built, not compared. Page trash is real: the save soft-deletes (Page.deletedAt + slug tombstone), pages.trash.list/restore/purge (EDITOR restore, ADMIN purge), RecentlyDeletedView from ⋯ Recently deleted and the delete receipts. Tests RecentlyDeletedView, page-trash-service.",
+   "verifiedNote": "probe-compared 2026-10-31 (case pages-trash, 1440×900, ⋯ › Recently deleted; board shots/142-61796.png): menu rows match ('About' 13/600 ink, red 'Delete permanently…', 'Close menu'), but it opens right of More (x257) over the drawer; the board sets it outside the drawer (x345).",
    "inheritsFrom": "63:20001",
    "tier": "P1"
   },
@@ -2532,9 +2532,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "founder:restore-over-limit-refused",
    "verified": "no",
-   "verifiedNote": "No plan-limit/view-only restore or plan options dialog",
+   "verifiedNote": "Owner decision 2026-10-30 (A-21): a restore over the plan page limit is refused (\"Delete a page or upgrade to restore.\" on the trash row); no view-only restored page, so no plan-options return from it.",
    "tier": "P1"
   },
   {

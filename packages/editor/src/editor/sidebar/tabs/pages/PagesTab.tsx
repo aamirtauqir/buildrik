@@ -489,6 +489,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
         composer={composer}
         siteId={folderScopeId}
         canPurge={canPurge}
+        onRestored={f.reload}
         onBack={() => setTrashOpen(false)}
         onClose={onClose}
         onHelpClick={onHelpClick}

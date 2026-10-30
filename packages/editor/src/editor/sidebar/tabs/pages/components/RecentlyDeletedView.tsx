@@ -13,13 +13,11 @@
 import * as React from "react";
 import {
   BK_HELPER_CLASS,
-  BK_LABEL_CLASS,
   Button,
   ConfirmDialog,
   Label,
   Menu,
   MenuItem,
-  MenuLabel,
   PanelFrame,
   Popover,
   TextInput,
@@ -32,6 +30,8 @@ import { usePageTrash } from "../usePageTrash";
 
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const NOTE = "tw:m-0 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
+/* 142:53954 / 142:55781: the field label at 14/20 ink, 16 under the sentence. */
+const FIELD_LABEL = "tw:mt-2 tw:text-[14px] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)]";
 
 function deletedWhen(at: Date, now = new Date()): string {
   const day = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
@@ -53,11 +53,13 @@ export interface RecentlyDeletedViewProps {
   /** False only when the role is KNOWN to be below ADMIN (null = unknown: the server decides). */
   canPurge: boolean;
   onBack: () => void;
+  /** After a restore: the page is back in its folder on the server (144:64795 / 142:68730). */
+  onRestored?: () => void;
   onClose?: () => void;
   onHelpClick?: () => void;
 }
 
-export function RecentlyDeletedView({ composer, siteId, canPurge, onBack, onClose, onHelpClick }: RecentlyDeletedViewProps) {
+export function RecentlyDeletedView({ composer, siteId, canPurge, onBack, onRestored, onClose, onHelpClick }: RecentlyDeletedViewProps) {
   const t = usePageTrash(composer, siteId);
   const { addToast } = useToast();
   const [menuFor, setMenuFor] = React.useState<string | null>(null);
@@ -72,6 +74,7 @@ export function RecentlyDeletedView({ composer, siteId, canPurge, onBack, onClos
     }
     setSlugAsk(null);
     if (out.kind === "restored") {
+      onRestored?.();
       addToast({
         description: slug ? `${page.name} restored at /${out.slug}` : `${page.name} restored with its URL and settings`,
         tone: "info",
@@ -116,7 +119,11 @@ export function RecentlyDeletedView({ composer, siteId, canPurge, onBack, onClos
             </Button>
           </p>
         ) : t.items.length === 0 ? (
-          <p className={NOTE} data-testid="pages-trash-empty">Nothing deleted in the last {PAGE_TRASH_RETENTION_DAYS} days.</p>
+          /* 142:56910: the empty line, then the retention line. */
+          <>
+            <p className={NOTE} data-testid="pages-trash-empty">Nothing deleted in the last {PAGE_TRASH_RETENTION_DAYS} days.</p>
+            <p className={NOTE}>Deleted pages stay here for {PAGE_TRASH_RETENTION_DAYS} days.</p>
+          </>
         ) : (
           <p className={NOTE}>Deleted pages stay here for {PAGE_TRASH_RETENTION_DAYS} days.</p>
         )}
@@ -147,6 +154,9 @@ export function RecentlyDeletedView({ composer, siteId, canPurge, onBack, onClos
                       open={menuFor === page.id}
                       onClose={() => setMenuFor(null)}
                       placement="right"
+                      /* Over the canvas, right of the drawer (142:61796): inside
+                         the list's scroll box it was clipped at the drawer edge. */
+                      portal
                       label={`${page.name} actions`}
                       trigger={
                         <Button
@@ -163,16 +173,18 @@ export function RecentlyDeletedView({ composer, siteId, canPurge, onBack, onClos
                       }
                     >
                       <Menu label={`${page.name} actions`}>
-                        <MenuLabel>{page.name}</MenuLabel>
+                        <div className="tw:px-2 tw:pt-1 tw:pb-2 tw:text-[13px] tw:leading-5 tw:font-semibold tw:text-[var(--bk-ink)]">
+                          {page.name}
+                        </div>
                         <MenuItem
-                          className="tw:text-[var(--bk-error-text)]"
                           data-testid="pages-trash-purge"
                           onClick={() => {
                             setMenuFor(null);
                             setPurgeAsk({ page, typed: "" });
                           }}
                         >
-                          Delete permanently…
+                          {/* Red on the label: the row's own colour class wins over a className. */}
+                          <span className="tw:text-[var(--bk-error-text)]">Delete permanently…</span>
                         </MenuItem>
                         <MenuItem onClick={() => setMenuFor(null)}>Close menu</MenuItem>
                       </Menu>
@@ -188,7 +200,8 @@ export function RecentlyDeletedView({ composer, siteId, canPurge, onBack, onClos
               </div>
             );
           })}
-        {t.load !== "error" && <p className={NOTE}>Restoring keeps the page’s URL and settings.</p>}
+        {/* 142:53229: the note sits at the drawer's foot, not under the list. */}
+        {t.load !== "error" && <p className={`${NOTE} tw:mt-auto`}>Restoring keeps the page’s URL and settings.</p>}
       </div>
 
       <ConfirmDialog
@@ -196,8 +209,9 @@ export function RecentlyDeletedView({ composer, siteId, canPurge, onBack, onClos
         onClose={() => setSlugAsk(null)}
         onConfirm={() => slugAsk && void restore(slugAsk.page, slugAsk.slug)}
         title={slugAsk ? `Restore ${slugAsk.page.name} with a new slug` : ""}
-        confirmLabel="Restore"
+        confirmLabel="Restore page"
         cancelStyle="outline"
+        width="sm"
         confirmDisabled={!slugValid}
         busy={!!slugAsk && t.busyId === slugAsk.page.id}
         testId="pages-trash-slug"
@@ -207,15 +221,21 @@ export function RecentlyDeletedView({ composer, siteId, canPurge, onBack, onClos
               <p className="tw:m-0">
                 Another page now uses /{slugAsk.page.slug}. Keep that page and choose a different URL for the restored page.
               </p>
-              <Label htmlFor="pages-trash-slug-input" className={BK_LABEL_CLASS}>Page URL</Label>
+              <Label htmlFor="pages-trash-slug-input" className={FIELD_LABEL}>Page URL</Label>
               <TextInput
                 id="pages-trash-slug-input"
                 sizing="sm"
                 value={slugAsk.slug}
                 onChange={(e) => setSlugAsk({ ...slugAsk, slug: e.target.value.trim().toLowerCase() })}
               />
-              <p className={`${BK_HELPER_CLASS} tw:text-[var(--bk-ink-muted)]`}>
-                {slugValid ? `/${slugAsk.slug} · ${slugAsk.page.folderName ?? "Top level"}` : "Use lowercase letters, numbers and hyphens."}
+              <p className={`${BK_HELPER_CLASS} tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]`}>
+                {slugValid ? `/${slugAsk.slug}` : "Use lowercase letters, numbers and hyphens."}
+                {slugAsk.page.folderName && (
+                  <>
+                    <br />
+                    {`${slugAsk.page.name} returns to ${slugAsk.page.folderName}.`}
+                  </>
+                )}
               </p>
             </div>
           )
@@ -230,13 +250,14 @@ export function RecentlyDeletedView({ composer, siteId, canPurge, onBack, onClos
         confirmLabel="Delete permanently"
         tone="destructive"
         cancelStyle="outline"
+        width="sm"
         confirmDisabled={!purgeAsk || purgeAsk.typed.trim() !== purgeAsk.page.name}
         testId="pages-trash-purge-confirm"
         message={
           purgeAsk && (
             <div className="tw:flex tw:flex-col tw:gap-2">
               <p className="tw:m-0">This can’t be undone. Type {purgeAsk.page.name} to confirm.</p>
-              <Label htmlFor="pages-trash-purge-input" className={BK_LABEL_CLASS}>Page name</Label>
+              <Label htmlFor="pages-trash-purge-input" className={FIELD_LABEL}>Page name</Label>
               <TextInput
                 id="pages-trash-purge-input"
                 sizing="sm"

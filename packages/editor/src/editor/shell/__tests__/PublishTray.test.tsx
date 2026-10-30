@@ -54,6 +54,8 @@ vi.mock("@/services/BuildrikSyncProvider", () => ({
   updateSiteColumns: (...a: unknown[]) => updateSiteColumns(...(a as [])),
 }));
 const roundState: { round: unknown } = { round: null };
+const roleState = vi.hoisted(() => ({ role: null as string | null }));
+vi.mock("@/editor/shell/hooks/useEditorRole", () => ({ useEditorRole: () => roleState.role }));
 vi.mock("@/services/ReviewService", () => ({ fetchCurrentRound: async () => roundState.round }));
 const locateComment = vi.fn(() => "located");
 vi.mock("@/editor/sidebar/tabs/review/locate", () => ({ locateComment: (...a: unknown[]) => locateComment(...(a as [])) }));
@@ -285,6 +287,19 @@ describe("PublishTray — states (B8-PB* copy)", () => {
     expect(screen.getByTestId("publish-tray-queued").textContent).toContain("Queued — waiting to start");
     fireEvent.click(screen.getByRole("button", { name: "Cancel (not started)" }));
     expect(queued.cancel).toHaveBeenCalledTimes(1);
+  });
+
+  it("queued: below Admin the cancel is disabled with the reason (server: ADMIN only)", () => {
+    roleState.role = "EDITOR";
+    try {
+      const queued = job({ uiState: "publishing", jobId: "job-1", steps: null });
+      renderTray({ publishJob: queued });
+      const cancel = screen.getByRole("button", { name: "Cancel (not started)" });
+      expect(cancel).toBeDisabled();
+      expect(screen.getByText("Only an Admin can cancel a publish.")).toBeTruthy();
+    } finally {
+      roleState.role = null;
+    }
   });
 
   it("success (PB09): the green sentence names the version, View live and Copy link", () => {
