@@ -43,6 +43,9 @@ export interface InspectorFieldContextValue {
   /** Run a discrete action (segment, select choice, toggle, Reset) as its own
    *  undo step — `useStyleHandlers.runDiscrete`. Absent: just run it. */
   runDiscrete?: (action: () => void) => void;
+  /** Say what a write just did, with an Undo bound to that step (2L9 I07:
+   *  "Converted using root font 16px · Undo"). Absent: say nothing. */
+  announce?: (message: string) => void;
 }
 
 const EMPTY: InspectorFieldContextValue = {
@@ -80,6 +83,8 @@ export interface InspectorField {
    *  so it is its own undo step rather than merged with the edit before or
    *  after it. Typing does not: keystrokes are meant to coalesce. */
   discrete: (action: () => void) => void;
+  /** See `InspectorFieldContextValue.announce`. */
+  announce: (message: string) => void;
 }
 
 const NONE: readonly OverrideKind[] = [];
@@ -102,5 +107,6 @@ export function useInspectorField(property?: string): InspectorField {
       if (property) ctx.resetOverride(property, kind);
     },
     discrete: ctx.runDiscrete ?? runNow,
+    announce: ctx.announce ?? (() => undefined),
   };
 }

@@ -4832,8 +4832,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Lane L-B round 9, compared with the board PNG (probe ?type=text, Font size unit px → rem): the field reads '1.5 rem', as the board draws it. Open: the board's toast 'Converted using root font 16px · Undo' — the number field is a shared control with no toast or history access (it is rendered outside a ToastProvider in many places); it needs that threaded through the field context first.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B round 10, side by side with the board PNG (probe ?type=text&styles={font-size:24px}, unit px → rem): '1.5 rem' and the toast 'Converted using root font 16px · Undo'. The conversion is a real history step (the field writes it through runDiscrete); the toast's Undo is history.captureUndo bound to that step — clicked live, Font size back to 24 px. The shared number field says it through a new field-context `announce`, which ProInspector backs with the toast.",
    "tier": "P1"
   },
   {

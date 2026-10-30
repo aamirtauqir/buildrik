@@ -27,7 +27,7 @@ import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
 import type { DeviceType } from "@/shared/types";
 import type { BreakpointId } from "@/shared/types/breakpoints";
 import type { IconConfig, MediaAsset, MediaAssetType } from "@/shared/types/media";
-import { Tabs } from "@/editor/chrome-ui";
+import { Tabs, useToast } from "@/editor/chrome-ui";
 import { useComposerSelection } from "../canvas/hooks/useComposerSelection";
 import { useProjectLoading } from "../shell/hooks/useProjectLoading";
 import { useSaveConflict } from "../shell/hooks/useSaveConflict";
@@ -253,6 +253,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
   const notLoaded = editLocks.includes("not-loaded");
   const loadFailure = useSiteLoadStatus().failure;
   const readOnly = locked || conflict.pending || editLocks.length > 0;
+  const { addToast } = useToast();
   const fieldContext = React.useMemo<InspectorFieldContextValue>(
     () => ({
       readOnly,
@@ -271,8 +272,12 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
       resetOverride: (property, kind) => runDiscrete(() => fieldOverrides.resetOverride(property, kind)),
       breakpointEntries: fieldOverrides.counts.breakpoint ? fieldOverrides.entries("breakpoint") : undefined,
       runDiscrete,
+      announce: (message) => {
+        const undo = composer?.history?.captureUndo?.();
+        addToast({ description: message, action: undo ? { label: "Undo", onClick: undo } : undefined });
+      },
     }),
-    [readOnly, conflict.pending, locked, notLoaded, editLocks, mixedKeys, fieldOverrides, runDiscrete]
+    [readOnly, conflict.pending, locked, notLoaded, editLocks, mixedKeys, fieldOverrides, runDiscrete, composer, addToast]
   );
 
   /* Scroll persistence per element (P-7b). The scroll listener is the only
