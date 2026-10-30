@@ -38,6 +38,7 @@ import { capabilitiesFor } from "@/shared/constants/elementCapabilities";
 import { BindingDetail } from "../sections/binding/BindingDetail";
 import { TemplatePageDoor } from "../sections/binding/TemplatePageDoor";
 import { ListItemNote } from "../sections/binding/ListItemNote";
+import { ConditionsPanel } from "../sections/conditions/ConditionsPanel";
 import { closeSubview, openSubview, useSubview } from "./subviewStore";
 import type { BreakpointId } from "@/shared/types/breakpoints";
 import type { PseudoStateId } from "@/shared/types";
@@ -181,6 +182,10 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
 
   if (subviewHere === "reset-style" && composer) {
     return <ResetStyleReview composer={composer} elementId={selectedElement.id} onClose={() => closeSubview("reset-style")} />;
+  }
+
+  if (tabId === "content" && subviewHere === "conditions") {
+    return <ConditionsPanel composer={composer} elementId={selectedElement.id} />;
   }
 
   if (tabId === "content" && subviewHere === "binding") {

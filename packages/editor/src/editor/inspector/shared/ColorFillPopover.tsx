@@ -41,6 +41,8 @@ export interface ColorFillPopoverProps {
   onOpenBrand?: () => void;
   /** The colour on screen (resolved when bound) — where the custom picker starts. */
   currentHex: string;
+  /** "Color for {name}" / "{breakpoint} · {state}" — the popover's head (39:9114). */
+  target?: { name: string; editing: string };
 }
 
 const HEX = /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/;
@@ -62,6 +64,7 @@ export const ColorFillPopover: React.FC<ColorFillPopoverProps> = ({
   showSearch,
   onOpenBrand,
   currentHex,
+  target,
 }) => {
   const [query, setQuery] = React.useState("");
   const [editing, setEditing] = React.useState<TokenEntry | null>(null);
@@ -84,6 +87,11 @@ export const ColorFillPopover: React.FC<ColorFillPopoverProps> = ({
           <span className={`${TEXT_12} tw:text-[var(--bk-ink-muted)]`} data-testid="fill-edit-usage">
             Known references · {n} in this site
           </span>
+          {t.source ? (
+            <span className={`${TEXT_12} tw:text-[var(--bk-ink-muted)]`} data-testid="fill-edit-source">
+              Source · {t.source}
+            </span>
+          ) : null}
         </div>
         <ColorPicker
           initialHex={t.value}
@@ -121,6 +129,12 @@ export const ColorFillPopover: React.FC<ColorFillPopoverProps> = ({
      pads 8, so the frame steps out by 8 and pads 12 itself. */
   return (
     <div className="tw:-m-2 tw:flex tw:w-[278px] tw:flex-col tw:gap-1 tw:p-3" data-testid="fill-popover">
+      {target ? (
+        <div className="tw:mb-2 tw:flex tw:flex-col tw:gap-1 tw:border-b tw:border-[var(--bk-border)] tw:pb-3" data-testid="fill-target">
+          <span className="tw:text-[length:var(--bk-text-13)] tw:font-semibold tw:leading-4 tw:text-[var(--bk-ink)]">Color for {target.name}</span>
+          <span className={`${TEXT_12} tw:text-[var(--bk-ink-muted)]`}>{target.editing}</span>
+        </div>
+      ) : null}
       <p className="tw:m-0 tw:text-[length:var(--bk-text-13)] tw:font-medium tw:leading-4 tw:text-[var(--bk-ink-soft)]">Brand colors</p>
 
       {showSearch ? (

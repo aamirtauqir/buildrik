@@ -18,15 +18,17 @@ export function TemplatePageDoor({ composer, elementId }: { composer: Composer |
   const { templateCollection } = useCmsBinding(composer, elementId);
   if (!composer || !templateCollection) return null;
   return (
+    <div className="tw:flex tw:justify-center">
     <Button
       type="button"
       variant="link"
       size="xs"
       data-testid="inspector-template-door"
       onClick={() => composer.emit(EVENTS.UI_CMS_OPEN, { collectionId: templateCollection.id, tab: "dynamic-pages" })}
-      className="tw:h-10 tw:self-center tw:text-[13px] tw:font-normal"
+      className="tw:h-10 tw:text-[13px] tw:font-normal"
     >
       ‹ CMS · Dynamic pages
     </Button>
+    </div>
   );
 }

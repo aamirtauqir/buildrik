@@ -122,6 +122,8 @@ describe("Form › AFTER SUBMIT + PROTECTION", () => {
     render(<FormAfterSubmitSection elementId="f" composer={project()} isOpen />);
     await waitFor(() => screen.getByLabelText("Then"));
     expect(screen.getByTestId("form-settings-offline")).toHaveTextContent("Needs a connection. You can still edit form fields.");
+    /* 156:8406: the settings' controls draw shut while offline. */
+    expect(screen.getByTestId("form-settings-controls")).toHaveAttribute("data-offline", "true");
     expect(screen.getByTestId("form-settings-status")).toHaveTextContent("Needs a connection");
     fireEvent.change(screen.getByLabelText("Then"), { target: { value: "REDIRECT" } });
     expect(api.forms.updateBlock.mutate).not.toHaveBeenCalled();

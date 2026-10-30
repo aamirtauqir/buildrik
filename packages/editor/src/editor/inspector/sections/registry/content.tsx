@@ -12,6 +12,11 @@ import { isJustAdded } from "../justAddedField";
 import { isTableCell, TableAccessibilitySection, TableCellSection, TableStructureSection } from "../TableSections";
 import { adaptElementProps, defineSection, ownSection as own, type AnySectionEntry } from "./_shared";
 import { CmsBindingSection } from "../CmsBindingSection";
+import { ConditionsSection } from "../conditions/ConditionsPanel";
+import { TabsSection } from "../TabsSection";
+import { ModalRelationshipSection } from "../ModalSections";
+import { readModal } from "@/engine/widgets/modalModel";
+import { recordContextOf } from "../binding/useCmsBinding";
 import { CollectionListSection } from "../CollectionListSection";
 import { FormFieldsSection } from "../FormFieldsSection";
 import { SlidesSection } from "../SlidesSection";
@@ -42,7 +47,8 @@ export const CONTENT_SECTIONS: Record<string, AnySectionEntry> = {
 
   collection: defineSection({
     tab: "content",
-    title: "Collection",
+    /* 2L9 B5-D76: "Collection list". */
+    title: "Collection list",
     open: "open",
     capability: own("collection"),
     Component: CollectionListSection,
@@ -134,6 +140,50 @@ export const CONTENT_SECTIONS: Record<string, AnySectionEntry> = {
       isOpen: ctx.isOpen,
       onToggle: ctx.onToggle,
     }),
+  }),
+
+  /* B-21 (2L9 B4-C01): a Tabs block's pairs and which opens first. */
+  "tabs-pairs": defineSection({
+    tab: "content",
+    title: "Tabs",
+    open: "always",
+    shouldRender: (ctx) => ctx.selectedIds.length <= 1 && ctx.selectedElement.type === "tabs",
+    Component: TabsSection,
+    styleKeys: [],
+    adaptProps: (ctx) => ({ composer: ctx.composer, elementId: ctx.selectedElement.id, isOpen: ctx.isOpen, onToggle: ctx.onToggle }),
+  }),
+
+  /* B-17 (2L9 B4-C07): a modal trigger's dialog. */
+  "modal-relationship": defineSection({
+    tab: "content",
+    title: "Modal relationship",
+    open: "always",
+    shouldRender: (ctx) =>
+      ctx.selectedIds.length <= 1 &&
+      Boolean(ctx.composer && readModal(ctx.composer, ctx.selectedElement.id)?.triggerIds.includes(ctx.selectedElement.id)),
+    Component: ModalRelationshipSection,
+    styleKeys: [],
+    adaptProps: (ctx) => ({ composer: ctx.composer, elementId: ctx.selectedElement.id, isOpen: ctx.isOpen, onToggle: ctx.onToggle }),
+  }),
+
+  /* B-11 (2L9 B4-D04, B5-D54): shown / hidden by the record — only where the
+     element has a record to read, or already carries a condition (old or new). */
+  conditions: defineSection({
+    tab: "content",
+    title: "Conditions",
+    open: "closed",
+    shouldRender: (ctx) => {
+      if (ctx.selectedIds.length > 1) return false;
+      const id = ctx.selectedElement.id;
+      return Boolean(
+        ctx.composer?.cms?.bindings?.getCondition?.(id) ||
+          ctx.composer?.elements.getElement(id)?.getDataBinding?.("condition") ||
+          recordContextOf(ctx.composer, id),
+      );
+    },
+    Component: ConditionsSection,
+    styleKeys: [],
+    adaptProps: (ctx) => ({ composer: ctx.composer, elementId: ctx.selectedElement.id, isOpen: ctx.isOpen, onToggle: ctx.onToggle }),
   }),
 
   attributes: defineSection({

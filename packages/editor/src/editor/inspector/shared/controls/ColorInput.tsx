@@ -129,6 +129,7 @@ export const ColorInput: React.FC<ColorInputProps> = ({
     id: t.id,
     name: t.name,
     value: resolveTokenLiteral(colorTokens, t.id, "light") ?? "",
+    source: "alias" in t.modes.light ? t.modes.light.alias : undefined,
     cssVar: t.cssVar,
   }));
   /* The picker offers the Brand page's own set — live semantic colours. It
@@ -344,6 +345,7 @@ export const ColorInput: React.FC<ColorInputProps> = ({
           }
         >
           <ColorFillPopover
+            target={field.target}
             tokens={pickerEntries}
             boundTokenId={boundToken?.id ?? null}
             currentHex={swatchColor === "transparent" ? "" : swatchColor}

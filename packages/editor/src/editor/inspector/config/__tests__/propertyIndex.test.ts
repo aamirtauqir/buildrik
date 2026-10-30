@@ -37,7 +37,7 @@ describe("buildPropertyIndex", () => {
   });
 
   it("follows the type's capabilities — a Collection list offers Collection, not Dynamic bindings", () => {
-    expect(find("collection-list", "Collection")).toHaveLength(1);
+    expect(find("collection-list", "Collection list")).toHaveLength(1);
     expect(find("collection-list", "Dynamic bindings")).toHaveLength(0);
     expect(find("heading", "Dynamic bindings")).toHaveLength(1);
   });

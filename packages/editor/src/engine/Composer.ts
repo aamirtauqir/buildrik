@@ -742,6 +742,9 @@ export class Composer extends EventEmitter {
         this.cms.bindings.import(copyIdKeyedRecord(data.cmsBindings.field, renames) as never);
       if (data.cmsBindings.collection)
         this.cms.bindings.importCollectionBindings(copyIdKeyedRecord(data.cmsBindings.collection, renames) as never);
+      /* Always: a snapshot without conditions (an undo past the first one)
+         clears them. */
+      this.cms.bindings.importConditions(copyIdKeyedRecord(data.cmsBindings.conditions ?? {}, renames) as never);
     }
 
     // Import project settings
@@ -817,6 +820,7 @@ export class Composer extends EventEmitter {
             cmsBindings: {
               field: this.cms.bindings.export(),
               collection: this.cms.bindings.exportCollectionBindings(),
+              ...(this.cms.bindings.hasConditions() ? { conditions: this.cms.bindings.exportConditions() } : {}),
             },
           }
         : {}),

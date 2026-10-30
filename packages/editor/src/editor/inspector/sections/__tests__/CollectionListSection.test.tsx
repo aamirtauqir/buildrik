@@ -10,9 +10,20 @@ import { describe, it, expect, vi } from "vitest";
 import { CollectionListSection } from "../CollectionListSection";
 import type { Composer } from "@/engine";
 
+const MENU = {
+  id: "menu",
+  name: "Menu items",
+  slug: "menu-items",
+  fields: [
+    { id: "f1", name: "Name", slug: "name", type: "text" },
+    { id: "f2", name: "Price", slug: "price", type: "number" },
+  ],
+};
+
 function makeComposer(bound: { collectionId: string; limit?: number } | null = null) {
   const bindCollectionList = vi.fn();
   const unbindCollection = vi.fn();
+  const setListQuery = vi.fn(() => true);
   const composer = {
     on: vi.fn(),
     off: vi.fn(),
@@ -25,16 +36,18 @@ function makeComposer(bound: { collectionId: string; limit?: number } | null = n
       bindings: {
         bindCollectionList,
         unbindCollection,
+        setListQuery,
         getCollectionBinding: vi.fn(() => (bound ? { elementId: "list", itemVar: "item", repeat: "children", ...bound } : null)),
       },
       collections: {
         on: vi.fn(),
         off: vi.fn(),
-        getAllCollections: vi.fn(() => [{ id: "menu", name: "Menu items", slug: "menu-items", fields: [] }]),
+        getAllCollections: vi.fn(() => [MENU]),
+        getCollection: vi.fn(() => MENU),
       },
     },
   } as unknown as Composer;
-  return { composer, bindCollectionList, unbindCollection };
+  return { composer, bindCollectionList, unbindCollection, setListQuery };
 }
 
 const renderSection = (composer: Composer, onOpenCreateCollection?: () => void) =>
@@ -43,47 +56,47 @@ const renderSection = (composer: Composer, onOpenCreateCollection?: () => void) 
 describe("CollectionListSection", () => {
   it("lists None + every collection", () => {
     renderSection(makeComposer().composer);
-    const select = screen.getByRole("combobox", { name: "Collection" });
+    const select = screen.getByRole("combobox", { name: "Source" });
     expect([...(select as HTMLSelectElement).options].map((o) => o.textContent)).toEqual(["None", "Menu items"]);
   });
 
   it("picking a collection binds the list to it", () => {
     const { composer, bindCollectionList } = makeComposer();
     renderSection(composer);
-    fireEvent.change(screen.getByRole("combobox", { name: "Collection" }), { target: { value: "menu" } });
+    fireEvent.change(screen.getByRole("combobox", { name: "Source" }), { target: { value: "menu" } });
     expect(bindCollectionList).toHaveBeenCalledWith("list", "menu", { limit: undefined });
   });
 
-  it("the Show field caps the count on the bound collection", () => {
-    const { composer, bindCollectionList } = makeComposer({ collectionId: "menu" });
+  it("the Show field caps the count on the bound collection — one step on the list's query", () => {
+    const { composer, setListQuery } = makeComposer({ collectionId: "menu" });
     renderSection(composer);
-    fireEvent.change(screen.getByRole("textbox", { name: "Show items" }), { target: { value: "3" } });
-    expect(bindCollectionList).toHaveBeenLastCalledWith("list", "menu", { limit: 3 });
+    fireEvent.change(screen.getByRole("textbox", { name: "Show" }), { target: { value: "3" } });
+    expect(setListQuery).toHaveBeenLastCalledWith("list", { limit: 3 }, "Show items");
   });
 
   /* Board 20 draws Show items as a number field with a stepper and no unit. */
-  it("Show items is a number field: ↑ steps the count, no unit dropdown", () => {
-    const { composer, bindCollectionList } = makeComposer({ collectionId: "menu", limit: 6 });
+  it("Show is a number field: ↑ steps the count, no unit dropdown", () => {
+    const { composer, setListQuery } = makeComposer({ collectionId: "menu", limit: 6 });
     renderSection(composer);
-    const field = screen.getByRole("textbox", { name: "Show items" });
+    const field = screen.getByRole("textbox", { name: "Show" });
     fireEvent.keyDown(field, { key: "ArrowUp" });
-    expect(bindCollectionList).toHaveBeenLastCalledWith("list", "menu", { limit: 7 });
-    expect(screen.queryByRole("combobox", { name: "Show items unit" })).toBeNull();
+    expect(setListQuery).toHaveBeenLastCalledWith("list", { limit: 7 }, "Show items");
+    expect(screen.queryByRole("combobox", { name: "Show unit" })).toBeNull();
   });
 
   /* Ldata I2a: the stored binding's limit is bounded (cmsBindingsSchema);
      a bigger number typed here must not produce a binding the save drops. */
   it("the Show field clamps an oversized count to the stored maximum", () => {
-    const { composer, bindCollectionList } = makeComposer({ collectionId: "menu" });
+    const { composer, setListQuery } = makeComposer({ collectionId: "menu" });
     renderSection(composer);
-    fireEvent.change(screen.getByRole("textbox", { name: "Show items" }), { target: { value: "999999" } });
-    expect(bindCollectionList).toHaveBeenLastCalledWith("list", "menu", { limit: 10_000 });
+    fireEvent.change(screen.getByRole("textbox", { name: "Show" }), { target: { value: "999999" } });
+    expect(setListQuery).toHaveBeenLastCalledWith("list", { limit: 10_000 }, "Show items");
   });
 
   it("None unbinds", () => {
     const { composer, unbindCollection } = makeComposer({ collectionId: "menu" });
     renderSection(composer);
-    fireEvent.change(screen.getByRole("combobox", { name: "Collection" }), { target: { value: "" } });
+    fireEvent.change(screen.getByRole("combobox", { name: "Source" }), { target: { value: "" } });
     expect(unbindCollection).toHaveBeenCalledWith("list");
   });
 
@@ -94,10 +107,10 @@ describe("CollectionListSection", () => {
     expect(create).toHaveBeenCalled();
   });
 
-  it("board 20 order: Collection · + New collection… · Show items · Open collection", () => {
+  it("2L9 B5-D76 order: Source · + New collection… · Open collection · Filter · + Add filter · Match · Sort · Direction · + Then by · Show · Skip", () => {
     const { container } = renderSection(makeComposer({ collectionId: "menu", limit: 6 }).composer, vi.fn());
     const text = container.textContent ?? "";
-    const at = ["Collection", "+ New collection…", "Show items", "Open collection"].map((t) => text.indexOf(t));
+    const at = ["Source", "+ New collection…", "Open collection", "Filter", "+ Add filter", "Match", "Sort", "Direction", "+ Then by", "Show", "Skip"].map((t) => text.indexOf(t));
     expect(at.every((i) => i >= 0)).toBe(true);
     expect([...at].sort((a, b) => a - b)).toEqual(at);
   });
@@ -109,9 +122,29 @@ describe("CollectionListSection", () => {
     expect(composer.emit).toHaveBeenCalledWith("ui:cms-open", expect.objectContaining({ collectionId: "menu", origin: expect.stringMatching(/ · /) }));
   });
 
-  it("unbound: no Show items, no Open collection", () => {
+  /* C-14: a filter rule, a sort key and Skip are each one step on the query. */
+  it("+ Add filter adds a rule on the first field; Sort / Skip write the query", () => {
+    const { composer, setListQuery } = makeComposer({ collectionId: "menu" });
+    renderSection(composer);
+    fireEvent.click(screen.getByTestId("collection-add-filter"));
+    expect(setListQuery).toHaveBeenLastCalledWith("list", { filter: { match: "all", rules: [{ field: "name", op: "set" }] } }, "Add filter");
+    fireEvent.change(screen.getByRole("combobox", { name: "Sort" }), { target: { value: "price" } });
+    expect(setListQuery).toHaveBeenLastCalledWith("list", { sort: [{ field: "price", dir: "asc" }] }, "Sort list");
+    fireEvent.change(screen.getByRole("textbox", { name: "Skip" }), { target: { value: "2" } });
+    expect(setListQuery).toHaveBeenLastCalledWith("list", { skip: 2 }, "Skip items");
+  });
+
+  it("a stored filter draws its rule card with Remove filter", () => {
+    const { composer, setListQuery } = makeComposer({ collectionId: "menu", filter: { match: "all", rules: [{ field: "price", op: "gt", value: "5" }] } } as never);
+    renderSection(composer);
+    expect(screen.getByRole("combobox", { name: "Filter" })).toHaveDisplayValue("1 rule");
+    fireEvent.click(screen.getByRole("button", { name: "Remove filter" }));
+    expect(setListQuery).toHaveBeenLastCalledWith("list", { filter: undefined }, "Remove filter");
+  });
+
+  it("unbound: no Show, no Open collection", () => {
     renderSection(makeComposer().composer);
-    expect(screen.queryByRole("textbox", { name: "Show items" })).toBeNull();
+    expect(screen.queryByRole("textbox", { name: "Show" })).toBeNull();
     expect(screen.queryByTestId("collection-open")).toBeNull();
   });
 });
