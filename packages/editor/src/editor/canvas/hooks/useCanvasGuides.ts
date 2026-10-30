@@ -35,6 +35,12 @@ export interface UseCanvasGuidesReturn {
   removeGuide: (id: string) => void;
   /** Update guide position */
   updateGuide: (id: string, position: number) => void;
+  /** Every saved guide, shown or not — the Rulers and guides list (153:79518). */
+  savedGuides: CanvasGuide[];
+  /** Lock or unlock a guide (155:83650): a locked guide does not drag. */
+  setGuideLocked: (id: string, locked: boolean) => void;
+  /** Put a removed guide back as it was (155:82271 "Undo guide removal"). */
+  restoreGuide: (guide: CanvasGuide) => void;
 }
 
 const savedGuides = (composer: Composer | null): CanvasGuide[] =>
@@ -110,11 +116,24 @@ export function useCanvasGuides({ composer, enabled }: UseCanvasGuidesOptions): 
     [commit]
   );
 
+  const setGuideLocked = React.useCallback(
+    (id: string, locked: boolean) => commit((prev) => prev.map((g) => (g.id === id ? { ...g, locked } : g))),
+    [commit]
+  );
+
+  const restoreGuide = React.useCallback(
+    (guide: CanvasGuide) => commit((prev) => (prev.some((g) => g.id === guide.id) ? prev : [...prev, guide])),
+    [commit]
+  );
+
   return {
     guides: enabled ? guides : [],
     addGuide,
     removeGuide,
     updateGuide,
+    savedGuides: guides,
+    setGuideLocked,
+    restoreGuide,
   };
 }
 

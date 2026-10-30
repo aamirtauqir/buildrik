@@ -319,7 +319,10 @@ export function CanvasOverlayGroup({
           onMouseDown={(e) => e.preventDefault()}
           onClick={(e) => e.stopPropagation()}
         >
-          <RichTextEditor onCommand={onInlineCommand} />
+          <RichTextEditor
+            onCommand={onInlineCommand}
+            blockTag={canvasRef.current?.querySelector(`[data-buildrick-id="${editing.id}"]`)?.tagName.toLowerCase()}
+          />
         </div>
       )}
 

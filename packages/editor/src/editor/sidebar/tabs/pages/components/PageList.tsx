@@ -55,6 +55,8 @@ interface Props {
   onRetry: () => void;
   onAddPage: () => void;
   onAddFolder: () => void;
+  /** The result card of a partial bulk delete (139:48427), above the rows. */
+  bulkResult?: React.ReactNode;
   /** 127:36696 — "New folder" asks for the name in a card under My folders. */
   draftingFolder?: boolean;
   onCreateFolder: (name: string) => void;
@@ -103,6 +105,7 @@ export const PageList: React.FC<Props> = ({
   onRetry,
   onAddPage,
   onAddFolder,
+  bulkResult = null,
   draftingFolder = false,
   onCreateFolder,
   onCancelFolderDraft,
@@ -220,6 +223,7 @@ export const PageList: React.FC<Props> = ({
           onClear={onClearSelection}
         />
       )}
+      {bulkResult}
       {/* Board 141:203 draws the error as a full-width band between the search
           row and the Add-page foot — a SIBLING of the tree, not a child of it.
           Nested inside `.bd-pg-list` it inherited that container's 6px gutter,

@@ -293,6 +293,9 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       addGuide,
       removeGuide,
       updateGuide,
+      savedGuides,
+      setGuideLocked,
+      restoreGuide,
     } = useCanvasGuides({ composer, enabled: showRulers });
 
     // Hover, marquee, keyboard
@@ -795,6 +798,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
               onZoomChange={onZoomChange}
               onFitToScreen={handleFitToScreen}
               onZoomToSelection={handleZoomToSelection}
+              guides={{ list: savedGuides, add: addGuide, update: updateGuide, setLocked: setGuideLocked, remove: removeGuide, restore: restoreGuide }}
               gridSize={gridSize}
               onGridSizeChange={composer ? (size) => composer.setGridSize(size) : undefined}
               readout={readoutPath}

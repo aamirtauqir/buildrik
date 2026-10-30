@@ -51,6 +51,8 @@ import { useFolders } from "./useFolders";
 import { movePagesWithHistory, useFolderMoves } from "./folderHistory";
 import { pageRoute } from "./utils/slug";
 import { useBulkSelect } from "./useBulkSelect";
+import { useBulkDelete } from "./useBulkDelete";
+import { BulkDeleteResult } from "./components/BulkDeleteResult";
 import { useDynamicPagesSummary } from "./useDynamicPagesSummary";
 import { pageFileNames } from "@/engine/export";
 import "./PagesTab.css";
@@ -150,7 +152,6 @@ export const PagesTab: React.FC<PagesTabProps> = ({
   /* Board 183:2 confirms a BULK delete by name before it happens — "Delete 3
      pages?" over the list of them. The single-page path has always asked;
      selecting three and pressing Delete removed all three on the spot. */
-  const [bulkDeleteIds, setBulkDeleteIds] = React.useState<string[] | null>(null);
   const deleteTarget = p.pages.find((pg) => pg.id === deleteTargetId);
   /* EDT-057 (board E3): deleting a collection's template page stops its
      record pages publishing — the confirm names the collection and how many. */
@@ -361,47 +362,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
     bulk.clearSelection();
   }, [bulk.selectedIds, p.duplicatePages, bulk.clearSelection]);
 
-  /** Resolve what a bulk delete would actually remove, applying the same
-   *  guards as the per-page path: never the home page, never the last one. */
-  const resolveBulkDeletable = React.useCallback((): string[] => {
-    const selected = [...bulk.selectedIds];
-    // The home page is never bulk-deletable (matches the per-page guard).
-    let deletable = selected.filter((id) => {
-      const pg = p.pages.find((x) => x.id === id);
-      return pg && !pg.isHome;
-    });
-    // A site always needs ≥1 page. If the selection would wipe every page
-    // (e.g. no page is flagged home), spare the first one in tree order so
-    // the action isn't a silent no-op.
-    if (deletable.length >= p.pages.length && orderedPageIds.length > 0) {
-      const spareId = orderedPageIds[0];
-      deletable = deletable.filter((id) => id !== spareId);
-    }
-    if (deletable.length === 0) {
-      // Nothing bulk-deletable (only the home/last page was selected) —
-      // route through the guarded single-delete so the user still gets the
-      // explanatory toast instead of nothing happening.
-      if (selected.length > 0) p.deletePage(selected[0]);
-      bulk.clearSelection();
-      return [];
-    }
-    return deletable;
-  }, [bulk.selectedIds, p.pages, p.deletePage, orderedPageIds, bulk.clearSelection]);
-
-  const handleBulkDelete = React.useCallback(() => {
-    const deletable = resolveBulkDeletable();
-    if (deletable.length > 0) setBulkDeleteIds(deletable);
-  }, [resolveBulkDeletable]);
-
-  /* The dialog is NOT closed here. Board 183:60 keeps it up long enough to
-     report what happened ("3 pages deleted." / "Closing…") and then closes
-     itself — the panel used to drop the modal on the same tick and leave the
-     result to whatever toast deletePage happened to raise, which is a report
-     from a different surface about a different unit of work. */
-  const confirmBulkDelete = React.useCallback(() => {
-    p.deletePages(bulkDeleteIds ?? []);
-    bulk.clearSelection();
-  }, [bulkDeleteIds, p.deletePages, bulk.clearSelection]);
+  const bulkDelete = useBulkDelete({ pages: p.pages, orderedPageIds, bulk, deletePage: p.deletePage, deletePages: p.deletePages });
 
   const { addToast } = useToast();
   const moveFolders = useFolderMoves(composer, f);
@@ -665,7 +626,8 @@ export const PagesTab: React.FC<PagesTabProps> = ({
             onBulkDuplicate={handleBulkDuplicate}
             onBulkMoveToFolder={handleBulkMoveToFolder}
             onBulkRemoveFromFolders={handleBulkRemoveFromFolders}
-            onBulkDelete={handleBulkDelete}
+            onBulkDelete={bulkDelete.request}
+            bulkResult={bulkDelete.report && <BulkDeleteResult report={bulkDelete.report} onRetry={bulkDelete.retry} />}
             onClearSelection={leaveSelectMode}
             onContextMenu={p.openContextMenu}
             onMovePage={movePage}
@@ -747,10 +709,10 @@ export const PagesTab: React.FC<PagesTabProps> = ({
       />
       {/* Board 183:2 — the bulk confirm names what goes. */}
       <ConfirmDialog
-        open={!!bulkDeleteIds}
-        onClose={() => setBulkDeleteIds(null)}
-        onConfirm={confirmBulkDelete}
-        title={`Delete ${bulkDeleteIds?.length ?? 0} page${(bulkDeleteIds?.length ?? 0) === 1 ? "" : "s"}?`}
+        open={!!bulkDelete.confirmIds}
+        onClose={bulkDelete.closeConfirm}
+        onConfirm={bulkDelete.confirm}
+        title={`Delete ${bulkDelete.confirmIds?.length ?? 0} page${(bulkDelete.confirmIds?.length ?? 0) === 1 ? "" : "s"}?`}
         /* Said "This cannot be undone." Bulk delete is the SAME deletePage
            call in a loop, and the loop lands in one history entry: selected
            two pages in the running editor, deleted them, and a single ⌘Z
@@ -761,14 +723,14 @@ export const PagesTab: React.FC<PagesTabProps> = ({
            the way back. The board's "Undo is available for 30 seconds" is
            not how undo works here: ⌘Z has no clock. */
         message={`${listNames(
-          (bulkDeleteIds ?? []).map((id) => p.pages.find((pg) => pg.id === id)?.name ?? id),
+          (bulkDelete.confirmIds ?? []).map((id) => p.pages.find((pg) => pg.id === id)?.name ?? id),
         )} — and everything on them — are removed. Inbound links to these pages will break. One undo (⌘Z) brings them all back.`}
-        confirmLabel={`Delete ${bulkDeleteIds?.length ?? 0} page${(bulkDeleteIds?.length ?? 0) === 1 ? "" : "s"}`}
+        confirmLabel={`Delete ${bulkDelete.confirmIds?.length ?? 0} page${(bulkDelete.confirmIds?.length ?? 0) === 1 ? "" : "s"}`}
         tone="destructive"
         testId="pages-bulk-delete"
         success={{
           title: "Deleted",
-          message: `${bulkDeleteIds?.length ?? 0} page${(bulkDeleteIds?.length ?? 0) === 1 ? "" : "s"} deleted.`,
+          message: `${bulkDelete.deletedCount} page${bulkDelete.deletedCount === 1 ? "" : "s"} deleted.`,
         }}
       />
 
