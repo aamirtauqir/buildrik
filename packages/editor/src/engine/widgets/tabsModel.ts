@@ -27,6 +27,10 @@ export interface TabsState {
   initial: string | null;
   /** Saved before keys: paired by position until `ensureTabKeys`. */
   legacy: boolean;
+  /** Tab buttons with no panel of their key (C02 "unlinked button"). */
+  unpairedTabs: { tabId: string; key: string | null; label: string }[];
+  /** Panels no tab button opens (C02 "unlinked panel"). */
+  unpairedPanels: { panelId: string; key: string | null }[];
 }
 
 function parts(composer: Composer, rootId: string): { root: Element; list: Element; tabs: Element[]; panels: Element[] } | null {
@@ -71,10 +75,16 @@ export function readTabs(composer: Composer, rootId: string): TabsState | null {
     const panel = legacy ? p.panels[i] : p.panels.find((x) => x.getAttribute("data-tab-key") === key);
     if (panel) pairs.push({ key, tabId: tab.getId(), panelId: panel.getId(), label: labelOf(tab) });
   });
+  const pairedTabs = new Set(pairs.map((x) => x.tabId));
+  const pairedPanels = new Set(pairs.map((x) => x.panelId));
+  const unpairedTabs = p.tabs
+    .filter((t) => !pairedTabs.has(t.getId()))
+    .map((t) => ({ tabId: t.getId(), key: legacy ? null : (t.getAttribute("data-tab-key") ?? null), label: labelOf(t) }));
+  const unpairedPanels = p.panels.filter((x) => !pairedPanels.has(x.getId())).map((x) => ({ panelId: x.getId(), key: x.getAttribute("data-tab-key") ?? null }));
   const saved = p.root.getAttribute("data-tabs-initial");
   const selected = p.tabs.findIndex((t) => t.getAttribute("aria-selected") === "true");
   const initial = !legacy && saved && pairs.some((x) => x.key === saved) ? saved : (pairs[Math.max(0, selected)]?.key ?? null);
-  return { pairs, initial, legacy };
+  return { pairs, initial, legacy, unpairedTabs, unpairedPanels };
 }
 
 function nextKey(used: Set<string>): string {
@@ -99,6 +109,13 @@ export function ensureTabKeys(composer: Composer, rootId: string): void {
       composer.elements.getElement(pair.panelId)?.setAttribute("data-tab-key", key);
       if (i === initialIndex) p.root.setAttribute("data-tabs-initial", key);
     });
+    /* A button left over by position keeps its own key, unpaired, so the
+       block reads by key from here on instead of falling back to position. */
+    for (const t of state.unpairedTabs) {
+      const key = nextKey(used);
+      used.add(key);
+      composer.elements.getElement(t.tabId)?.setAttribute("data-tab-key", key);
+    }
   });
 }
 
@@ -181,6 +198,31 @@ export function removeTab(composer: Composer, rootId: string, key: string): bool
       composer.elements.removeElement(pair.tabId);
       composer.elements.removeElement(pair.panelId);
       if (state.initial === pair.key) p.root.setAttribute("data-tabs-initial", state.pairs.find((x) => x.key !== pair.key)!.key);
+      return true;
+    }) ?? false
+  );
+}
+
+/**
+ * Repairs an unlinked pair (C03 "Link selected pair"): the panel takes the
+ * button's key — the button keeps its own when no other panel holds it — and
+ * the panel moves out of any pair it was in. One step; Undo restores the
+ * previous keys and relationships. Refused when either is not this block's.
+ */
+export function linkTabPair(composer: Composer, rootId: string, tabId: string, panelId: string): boolean {
+  const before = parts(composer, rootId);
+  if (!before || !before.tabs.some((t) => t.getId() === tabId) || !before.panels.some((x) => x.getId() === panelId)) return false;
+  return (
+    edit(composer, rootId, "Link tab and panel", (state, p) => {
+      const tab = p.tabs.find((t) => t.getId() === tabId);
+      const panel = p.panels.find((x) => x.getId() === panelId);
+      if (!tab || !panel) return false;
+      const own = tab.getAttribute("data-tab-key");
+      const heldElsewhere = !!own && p.panels.some((x) => x !== panel && x.getAttribute("data-tab-key") === own);
+      const key = own && !heldElsewhere ? own : nextKey(new Set([...p.tabs, ...p.panels].map((e) => e.getAttribute("data-tab-key") ?? "")));
+      tab.setAttribute("data-tab-key", key);
+      panel.setAttribute("data-tab-key", key);
+      if (!state.initial) p.root.setAttribute("data-tabs-initial", key);
       return true;
     }) ?? false
   );

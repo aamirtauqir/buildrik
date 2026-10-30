@@ -11,6 +11,14 @@
  *     Close on Escape, Close on backdrop click, Initial state, the two notes,
  *     "Back to dialog content".
  *
+ *   On a trigger the same section turns into "Missing dialog" when its saved
+ *     dialog is gone (C11 `245:41919`), "Cannot link this dialog" inside a
+ *     shared component (C09 `245:40932`, insert a local modal instead) and
+ *     "Local modal created" right after that insert (C10 `245:41419`).
+ *   DialogContentSection — Content, on the dialog (C08 `245:40398`, C17
+ *     `252:46614`): Edit title / body, Close label, Back to {trigger},
+ *     Accessibility · Labelled by.
+ *
  * Each write is the model's own history step; the lock gate runs first.
  *
  * @license BSD-3-Clause
@@ -26,7 +34,15 @@ import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
 import { Section, SelectRow } from "../shared/controls";
 import { CheckRow } from "../shared/controls/CheckRow";
 import { GROUP_TITLE, WIDE_BUTTON } from "../shared/controls/controlClasses";
-import { NoteRow } from "./behaviourRows";
+import { CommitRow, NoteRow } from "./behaviourRows";
+import { justAddedFrom, markJustAdded, useJustAdded } from "./justAddedField";
+import { getBlockById, insertBlock } from "@/blocks/blockRegistry";
+
+/** Selects an element and opens the section that edits it (after the selection settles — C05's rule). */
+function selectInto(composer: Composer, el: Element, section: string): void {
+  composer.selection.select(el);
+  setTimeout(() => composer.emit(EVENTS.UI_INSPECTOR_FOCUS_SECTION, { section }), 0);
+}
 
 const nameOf = (el: Element | null | undefined): string => (el ? (getLayerName(el) ?? elementTypeLabel(el.getType())) : "");
 
@@ -50,21 +66,153 @@ function pageDialogs(composer: Composer): Element[] {
   return root ? root.getDescendants().filter((e) => e.getAttribute("role") === "dialog") : [];
 }
 
+/** A Modal-block trigger: linked, legacy, or pointing at a dialog that is gone. */
+export function isModalTrigger(composer: Composer, elementId: string): boolean {
+  const el = composer.elements.getElement(elementId);
+  if (!el || el.getAttribute("role") === "dialog") return false;
+  return !!el.getAttribute("data-modal-target") || !!readModal(composer, elementId)?.triggerIds.includes(elementId);
+}
+
+/** The component instance a trigger sits in (itself or an ancestor). */
+function instanceOf(el: Element | null | undefined): Element | null {
+  for (let up = el ?? null; up; up = up.getParent()) if (up.isComponentInstance?.()) return up;
+  return null;
+}
+
+/** An instance by its component's name ("Header component"), else its layer name. */
+function componentName(composer: Composer, el: Element): string {
+  const instance = composer.components?.getInstanceByElementId(el.getId());
+  return (instance && composer.components?.getComponent(instance.componentId)?.name) || nameOf(el);
+}
+
+/** C09: an instance holding a modal trigger — a shared component cannot store a page dialog's reference. */
+export function componentTriggerOf(composer: Composer, elementId: string): Element | null {
+  const el = composer.elements.getElement(elementId);
+  if (!el) return null;
+  if (isModalTrigger(composer, elementId)) return instanceOf(el);
+  return el.isComponentInstance?.() && el.getDescendants().some((d) => isModalTrigger(composer, d.getId())) ? el : null;
+}
+
 export function ModalRelationshipSection({ composer, elementId, isOpen, onToggle }: { composer: Composer | null | undefined; elementId: string; isOpen?: boolean; onToggle?: () => void }) {
   useModalVersion(composer);
   const { addToast } = useToast();
   const [linking, setLinking] = React.useState(false);
+  const [choice, setChoice] = React.useState("");
+  const justMade = useJustAdded(composer, elementId, "local-modal");
   if (!composer) return null;
   const state = readModal(composer, elementId);
   const dialog = state ? composer.elements.getElement(state.dialogId) : null;
   const trigger = composer.elements.getElement(elementId);
   const writable = () => canWrite(composer, elementId);
   const pageName = composer.elements.getActivePage?.()?.name ?? "the page";
-  const others = pageDialogs(composer).filter((d) => d.getId() !== state?.dialogId);
+  const dialogs = pageDialogs(composer);
+  const others = dialogs.filter((d) => d.getId() !== state?.dialogId);
+  const linkWithReceipt = (dialogId: string) => {
+    if (!writable() || !linkModal(composer, elementId, dialogId)) return;
+    addToast({ description: `${nameOf(trigger)} linked to ${nameOf(composer.elements.getElement(dialogId))}.`, action: { label: "Undo", onClick: composer.history.captureUndo() } });
+  };
   const link = (dialogId: string) => {
     setLinking(false);
     if (writable()) linkModal(composer, elementId, dialogId);
   };
+
+  /* C10 — right after "Insert local modal at page root". */
+  if (justMade && dialog) {
+    const from = composer.elements.getElement(justAddedFrom(composer, elementId, "local-modal") ?? "");
+    const fromName = from ? componentName(composer, from) : "";
+    return (
+      <Section title="Local modal created" stateTitle="Local modal created" isOpen={isOpen} onToggle={onToggle}>
+        <div className="tw:flex tw:flex-col tw:gap-2" data-testid="modal-local-created">
+          <NoteRow>
+            Trigger and dialog were added at {pageName}’s root.{from ? ` ${fromName} is unchanged.` : ""}
+          </NoteRow>
+          <Button color="light" size="xs" className={WIDE_BUTTON} onClick={() => selectInto(composer, dialog, "dialog-content")} data-testid="modal-edit-dialog">
+            Edit {nameOf(dialog)}
+          </Button>
+          {from ? (
+            <Button color="light" size="xs" className={WIDE_BUTTON} onClick={() => composer.selection.select(from)} data-testid="modal-back-to-origin">
+              Back to {fromName}
+            </Button>
+          ) : null}
+        </div>
+      </Section>
+    );
+  }
+
+  /* C09 — a trigger in a shared component: the link is refused, a local
+     modal (trigger + dialog at the page root) is offered instead. */
+  const instance = componentTriggerOf(composer, elementId);
+  if (instance) {
+    const insertLocal = () => {
+      const pageRoot = composer.elements.getActivePage?.()?.root.id;
+      const block = getBlockById("modal");
+      if (!pageRoot || !block || !canWrite(composer, pageRoot)) return;
+      composer.beginTransaction("Insert local modal");
+      let made: string | undefined;
+      try {
+        made = insertBlock(composer, block, pageRoot);
+        composer.endTransaction();
+      } catch (e) {
+        composer.rollbackTransaction();
+        throw e;
+      }
+      const madeEl = made ? composer.elements.getElement(made) : undefined;
+      if (!madeEl) return;
+      const undo = composer.history.captureUndo();
+      markJustAdded(composer, madeEl.getId(), "local-modal", instance.getId());
+      composer.selection.select(madeEl);
+      addToast({ description: "Local trigger and dialog added.", action: { label: "Undo", onClick: undo } });
+    };
+    return (
+      <Section title="Cannot link this dialog" stateTitle="Cannot link this dialog" isOpen={isOpen} onToggle={onToggle}>
+        <div className="tw:flex tw:flex-col tw:gap-2" data-testid="modal-component-refused">
+          <NoteRow>This dialog belongs to one page; a shared component cannot store its reference.</NoteRow>
+          <Button color="light" size="xs" className={WIDE_BUTTON} disabled data-testid="modal-link-refused">
+            Link dialog
+          </Button>
+          <Button size="xs" className={`${WIDE_BUTTON} tw:text-white!`} onClick={insertLocal} data-testid="modal-insert-local">
+            Insert local modal at page root
+          </Button>
+          <Button color="light" size="xs" className={WIDE_BUTTON} onClick={onToggle} data-testid="modal-refused-cancel">
+            Cancel
+          </Button>
+          <NoteRow>Creates a local trigger and dialog outside this component. The shared definition and instance stay unchanged.</NoteRow>
+        </div>
+      </Section>
+    );
+  }
+
+  /* C11 — the saved dialog is gone: repaired only by an explicit choice. */
+  if (!state && trigger?.getAttribute("data-modal-target")) {
+    const chosen = dialogs.find((d) => d.getId() === choice);
+    return (
+      <Section title="Missing dialog" stateTitle="Missing dialog" isOpen={isOpen} onToggle={onToggle}>
+        <div className="tw:flex tw:flex-col tw:gap-2" data-testid="modal-missing">
+          <NoteRow>The saved dialog ID no longer exists. Select a valid dialog on {pageName} to repair this trigger.</NoteRow>
+          <SelectRow
+            label="Dialog"
+            value={choice}
+            placeholder="Choose existing dialog"
+            options={dialogs.map((d) => ({ value: d.getId(), label: nameOf(d) }))}
+            onChange={setChoice}
+          />
+          <Button
+            size="xs"
+            className={`${WIDE_BUTTON} tw:text-white!`}
+            disabled={!chosen}
+            onClick={() => chosen && linkWithReceipt(chosen.getId())}
+            data-testid="modal-missing-link"
+          >
+            {chosen ? `Link ${nameOf(chosen)}` : "Link dialog"}
+          </Button>
+          <NoteRow>No nearest-dialog guess. Cancel preserves the missing reference.</NoteRow>
+          <Button color="light" size="xs" className={WIDE_BUTTON} onClick={() => setChoice("")} data-testid="modal-missing-cancel">
+            Cancel
+          </Button>
+        </div>
+      </Section>
+    );
+  }
 
   return (
     <Section title="Modal relationship" isOpen={isOpen} onToggle={onToggle}>
@@ -73,7 +221,7 @@ export function ModalRelationshipSection({ composer, elementId, isOpen, onToggle
           label="Dialog"
           value={state?.dialogId ?? ""}
           placeholder={state ? null : "None"}
-          options={pageDialogs(composer).map((d) => ({ value: d.getId(), label: nameOf(d) }))}
+          options={dialogs.map((d) => ({ value: d.getId(), label: nameOf(d) }))}
           onChange={(id) => id && link(id)}
         />
         {state && dialog ? (
@@ -86,7 +234,7 @@ export function ModalRelationshipSection({ composer, elementId, isOpen, onToggle
           <Button
             size="xs"
             className={`${WIDE_BUTTON} tw:text-white!`}
-            onClick={() => composer.selection.select(dialog)}
+            onClick={() => selectInto(composer, dialog, "dialog-content")}
             data-testid="modal-edit-dialog"
           >
             Edit {nameOf(dialog)}
@@ -143,6 +291,81 @@ export function ModalRelationshipSection({ composer, elementId, isOpen, onToggle
   );
 }
 
+/** The close control inside a dialog (`[data-modal-close]`, legacy `.modal-close`). */
+function closeControlOf(dialog: Element): Element | undefined {
+  return dialog.getDescendants().find((d) => d.getAttribute("data-modal-close") !== undefined) ??
+    dialog.getDescendants().find((d) => (d.getAttribute("class") ?? "").split(/\s+/).includes("modal-close"));
+}
+
+const textOf = (el: Element): string => [el, ...el.getDescendants()].map((e) => e.getContent().replace(/<[^>]*>/g, "")).join("").trim();
+
+/**
+ * Content › Dialog content on the dialog (2L9 B4-C08 `245:40398`, C17
+ * `252:46614`): the dialog's own parts, its accessible name, and the way
+ * back to the trigger — which closes the editor reveal (a selected trigger
+ * does not reveal its dialog).
+ */
+export function DialogContentSection({ composer, elementId, isOpen, onToggle }: { composer: Composer | null | undefined; elementId: string; isOpen?: boolean; onToggle?: () => void }) {
+  useModalVersion(composer);
+  if (!composer) return null;
+  const state = readModal(composer, elementId);
+  const dialog = state ? composer.elements.getElement(state.dialogId) : null;
+  if (!state || !dialog) return null;
+  const parts = dialog.getDescendants();
+  const title = parts.find((d) => /^h[1-6]$/i.test(d.getTagName()));
+  const body = parts.find((d) => (d.getAttribute("class") ?? "").split(/\s+/).includes("modal-body")) ?? parts.find((d) => d.getTagName().toLowerCase() === "p");
+  const close = closeControlOf(dialog);
+  const trigger = state.triggerIds.map((id) => composer.elements.getElement(id)).find(Boolean);
+  const named = dialog.getAttribute("aria-labelledby") || dialog.getAttribute("aria-label");
+  const setCloseLabel = (v: string) => {
+    if (!close || !canWrite(composer, close.getId())) return;
+    composer.beginTransaction("Close label");
+    if (v.trim()) close.setAttribute("aria-label", v.trim());
+    else close.removeAttribute("aria-label");
+    composer.endTransaction();
+  };
+  return (
+    <Section title="Dialog content" isOpen={isOpen} onToggle={onToggle}>
+      <div className="tw:flex tw:flex-col tw:gap-2" data-testid="inspector-dialog-content">
+        {title ? (
+          <Button color="light" size="xs" className={WIDE_BUTTON} onClick={() => composer.selection.select(title)} data-testid="dialog-edit-title">
+            Edit title
+          </Button>
+        ) : null}
+        {body ? (
+          <Button color="light" size="xs" className={WIDE_BUTTON} onClick={() => composer.selection.select(body)} data-testid="dialog-edit-body">
+            Edit body
+          </Button>
+        ) : null}
+        {close ? (
+          <CommitRow label="Close label" value={close.getAttribute("aria-label") ?? textOf(close)} onCommit={setCloseLabel} testId="dialog-close-label" />
+        ) : null}
+        {trigger ? (
+          <>
+            <Button color="light" size="xs" className={WIDE_BUTTON} onClick={() => selectInto(composer, trigger, "modal-relationship")} data-testid="dialog-back-to-trigger">
+              Back to {nameOf(trigger)}
+            </Button>
+            <NoteRow>Back restores closed authoring view and trigger focus.</NoteRow>
+          </>
+        ) : null}
+        <div className={`${GROUP_TITLE} tw:mb-1!`}>Accessibility</div>
+        <div className="bdi-row-ctrl">
+          <span className="bdi-lb">Labelled by</span>
+          <span className="bdi-row-content">
+            <span
+              className="tw:flex tw:h-7 tw:min-w-0 tw:flex-1 tw:items-center tw:truncate tw:rounded-[4px] tw:bg-[var(--bk-bg-subtle)] tw:px-2 tw:text-[12px] tw:text-[var(--bk-ink-soft)]"
+              data-testid="dialog-labelled-by"
+            >
+              {named ? (dialog.getAttribute("aria-labelledby") ?? "Own label") : title ? nameOf(title) : "Not named — add a heading"}
+            </span>
+          </span>
+        </div>
+        <NoteRow>Visitor focus stays inside the open dialog and returns to the opener.</NoteRow>
+      </div>
+    </Section>
+  );
+}
+
 export function DialogBehaviorSection({ composer, elementId, isOpen, onToggle }: { composer: Composer | null | undefined; elementId: string; isOpen?: boolean; onToggle?: () => void }) {
   useModalVersion(composer);
   if (!composer) return null;
@@ -172,7 +395,7 @@ export function DialogBehaviorSection({ composer, elementId, isOpen, onToggle }:
           color="light"
           size="xs"
           className={WIDE_BUTTON}
-          onClick={() => composer.emit(EVENTS.UI_INSPECTOR_FOCUS_SECTION, { section: "semantics" })}
+          onClick={() => composer.emit(EVENTS.UI_INSPECTOR_FOCUS_SECTION, { section: "dialog-content" })}
           data-testid="dialog-back-to-content"
         >
           Back to dialog content

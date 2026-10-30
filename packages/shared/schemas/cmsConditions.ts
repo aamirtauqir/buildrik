@@ -285,7 +285,11 @@ export function decodeCmsCondition(raw: string): CmsCondition | null {
  * once and filled once per record on the server (`generateDynamicPages`).
  * What depends on THAT record travels in the markup:
  *   data-bk-if="<condition>"        an element shown only when its condition
- *                                   holds on the page's record;
+ *                                   holds on the page's record — or, with
+ *   data-bk-if-row="<record fields>" an element of a list copy whose own
+ *                                   condition compares the copy's record to
+ *                                   the page's (`@page.*`): evaluated on that
+ *                                   row, `@page.*` read from the page's record;
  *   data-bk-query="<list query>"    a Collection list whose filter reads the
  *                                   page's record (`@page.*`) or excludes it —
  *                                   its copies carry data-bk-item (the record
@@ -296,6 +300,7 @@ export function decodeCmsCondition(raw: string): CmsCondition | null {
  * editor's preview). One evaluator, one place.
  * ------------------------------------------------------------------------- */
 
+export const CMS_CONDITION_ROW_ATTR = "data-bk-if-row";
 export const CMS_LIST_QUERY_ATTR = "data-bk-query";
 export const CMS_LIST_ITEM_ATTR = "data-bk-item";
 export const CMS_LIST_ROW_ATTR = "data-bk-row";
@@ -331,6 +336,11 @@ export function needsRecordPass(html: string): boolean {
   return html.includes(CMS_CONDITION_ATTR) || html.includes(CMS_LIST_QUERY_ATTR);
 }
 
+/** Does a condition compare against the page's own record (`@page.*`)? */
+export function readsPageRecord(condition: CmsCondition | undefined): boolean {
+  return Boolean(condition?.rules.some((r) => r.value?.startsWith("@page.")));
+}
+
 /** The fields a condition reads (the head of each dotted path). */
 export function conditionFields(condition: CmsCondition | undefined): string[] {
   return condition ? [...new Set(condition.rules.map((r) => r.field.split(".")[0]))] : [];
@@ -344,8 +354,11 @@ export function conditionFields(condition: CmsCondition | undefined): string[] {
 export function applyRecordPass(root: { querySelectorAll(sel: string): ArrayLike<Element> }, record: Record<string, unknown>, recordId?: string | null): void {
   for (const el of Array.from(root.querySelectorAll(`[${CMS_CONDITION_ATTR}]`))) {
     const condition = decodeCmsCondition(el.getAttribute(CMS_CONDITION_ATTR) ?? "");
+    const row = decodeJson(el.getAttribute(CMS_CONDITION_ROW_ATTR));
     el.removeAttribute(CMS_CONDITION_ATTR);
-    if (condition && !evaluateCmsCondition(condition, record)) el.remove();
+    el.removeAttribute(CMS_CONDITION_ROW_ATTR);
+    const data = row && typeof row === "object" ? (row as Record<string, unknown>) : record;
+    if (condition && !evaluateCmsCondition(condition, data, record)) el.remove();
   }
   for (const list of Array.from(root.querySelectorAll(`[${CMS_LIST_QUERY_ATTR}]`))) {
     const parsed = pageListQuerySchema.safeParse(decodeJson(list.getAttribute(CMS_LIST_QUERY_ATTR)));

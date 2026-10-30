@@ -4,7 +4,9 @@
  * docs/design-2l9/engine-conditions.md):
  *
  *   applyCopyConditions — inside one Collection list copy, against that
- *     copy's record (RepeaterRenderer.expandChildren);
+ *     copy's record (RepeaterRenderer.expandChildren); on a published
+ *     template page a condition comparing it to the page's record (`@page.*`)
+ *     is written as `data-bk-if` + `data-bk-if-row` for the per-page pass;
  *   applyPageConditions — everything else, against the template page's
  *     record: on the canvas and in a preview the page's preview record (the
  *     first published, the record `resolveBinding` previews); in a publish of
@@ -20,8 +22,12 @@
  */
 import {
   CMS_CONDITION_ATTR,
+  CMS_CONDITION_ROW_ATTR,
+  conditionFields,
   encodeCmsCondition,
+  encodeCmsJson,
   evaluateCmsCondition,
+  readsPageRecord,
 } from "@buildrik/shared/schemas/cmsConditions";
 import type { CMSCollection } from "@/shared/types/cms";
 import type { Composer } from "../Composer";
@@ -51,6 +57,7 @@ export function applyCopyConditions(
   bindings: Bindings,
   canvas: boolean,
   pageRecord?: Record<string, unknown> | null,
+  perRecordOnServer = false,
 ): void {
   if (!bindings.hasConditions?.()) return;
   const isList = (el: Element) => bindings.getCollectionBinding?.(idOf(el))?.repeat === "children";
@@ -61,6 +68,12 @@ export function applyCopyConditions(
     let nested = false;
     for (let up = el.parentElement; up && up !== listEl; up = up.parentElement) if (isList(up)) nested = true;
     if (nested) continue;
+    if (perRecordOnServer && readsPageRecord(condition)) {
+      el.setAttribute(CMS_CONDITION_ATTR, encodeCmsCondition(condition));
+      el.setAttribute(CMS_CONDITION_ROW_ATTR, encodeCmsJson(Object.fromEntries(conditionFields(condition).map((f) => [f, data[f] ?? null]))));
+      el.setAttribute(CONDITION_STATE_ATTR, "shown");
+      continue;
+    }
     decide(el, evaluateCmsCondition(condition, data, pageRecord), canvas);
   }
 }
@@ -114,7 +127,7 @@ export async function applyPageConditions(doc: Document, composer: Composer, opt
   }
   const record = await previewRecordOf(composer, template.id);
   if (!record) return;
-  for (const el of pending) decide(el, evaluateCmsCondition(bindings.getCondition(idOf(el))!, record), options.canvas);
+  for (const el of pending) decide(el, evaluateCmsCondition(bindings.getCondition(idOf(el))!, record, record), options.canvas);
 }
 
 /** Export: the canvas-only marker never ships. */

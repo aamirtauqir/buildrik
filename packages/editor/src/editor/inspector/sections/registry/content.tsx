@@ -14,7 +14,7 @@ import { adaptElementProps, defineSection, ownSection as own, type AnySectionEnt
 import { CmsBindingSection } from "../CmsBindingSection";
 import { ConditionsSection } from "../conditions/ConditionsPanel";
 import { TabPanelSection, TabsSection } from "../TabsSection";
-import { ModalRelationshipSection } from "../ModalSections";
+import { componentTriggerOf, DialogContentSection, isModalTrigger, ModalRelationshipSection } from "../ModalSections";
 import { readModal } from "@/engine/widgets/modalModel";
 import { recordContextOf } from "../binding/useCmsBinding";
 import { CollectionListSection } from "../CollectionListSection";
@@ -171,8 +171,20 @@ export const CONTENT_SECTIONS: Record<string, AnySectionEntry> = {
     open: "always",
     shouldRender: (ctx) =>
       ctx.selectedIds.length <= 1 &&
-      Boolean(ctx.composer && readModal(ctx.composer, ctx.selectedElement.id)?.triggerIds.includes(ctx.selectedElement.id)),
+      Boolean(ctx.composer && (isModalTrigger(ctx.composer, ctx.selectedElement.id) || componentTriggerOf(ctx.composer, ctx.selectedElement.id))),
     Component: ModalRelationshipSection,
+    styleKeys: [],
+    adaptProps: (ctx) => ({ composer: ctx.composer, elementId: ctx.selectedElement.id, isOpen: ctx.isOpen, onToggle: ctx.onToggle }),
+  }),
+
+  /* B-17 (2L9 B4-C08 / C17): the dialog's own parts and the way back. */
+  "dialog-content": defineSection({
+    tab: "content",
+    title: "Dialog content",
+    open: "always",
+    shouldRender: (ctx) =>
+      ctx.selectedIds.length <= 1 && Boolean(ctx.composer && readModal(ctx.composer, ctx.selectedElement.id)?.dialogId === ctx.selectedElement.id),
+    Component: DialogContentSection,
     styleKeys: [],
     adaptProps: (ctx) => ({ composer: ctx.composer, elementId: ctx.selectedElement.id, isOpen: ctx.isOpen, onToggle: ctx.onToggle }),
   }),

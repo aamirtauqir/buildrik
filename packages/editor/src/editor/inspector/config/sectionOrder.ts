@@ -23,6 +23,7 @@ const CONTENT_ORDER: readonly SectionId[] = [
   "cms-binding",
   /* B-17 / B-21: a modal trigger's dialog, a Tabs block's pairs (2L9 C07, C01). */
   "modal-relationship",
+  "dialog-content",
   "tabs-pairs",
   "tab-panel",
   "type",
@@ -99,7 +100,8 @@ const DEFINING_CONTENT: readonly SectionId[] = ["type", "form-fields", "slides",
  */
 export function openingTab(type: string): TabId {
   const caps = capabilitiesFor(type);
-  /* A table is defined by its structure (2L9 245:42929). */
-  if (type === "table") return "content";
+  /* A table is defined by its structure (2L9 245:42929), Tabs by their pairs
+     (C01–C04, every Tabs board opens on Content). */
+  if (type === "table" || type === "tabs") return "content";
   return DEFINING_CONTENT.some((id) => SECTION_REGISTRY[id].capability?.(caps) ?? true) ? "content" : "style";
 }

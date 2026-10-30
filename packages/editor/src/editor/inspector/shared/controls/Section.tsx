@@ -103,6 +103,10 @@ export interface SectionProps {
   /** Draw no header row — a section showing a screen that heads itself
    *  (2L9 I14: the add-interaction screen's "‹ Back to Interactions"). */
   hideHeader?: boolean;
+  /** The section's own state names it instead of the registry title — a
+   *  repair or receipt state of the same section (2L9 C02 "Unlinked
+   *  content", C11 "Missing dialog"). */
+  stateTitle?: string;
   children: React.ReactNode;
 }
 
@@ -132,6 +136,7 @@ export const Section: React.FC<SectionProps> = ({
   preview,
   action,
   hideHeader = false,
+  stateTitle,
   children,
 }) => {
   const frame = React.useContext(SectionFrameContext);
@@ -149,7 +154,7 @@ export const Section: React.FC<SectionProps> = ({
 
   const mode: SectionDisplayMode = frame ? frame.displayMode : standaloneOpen ? "open" : "summary";
   const isOpen = mode === "open";
-  const title = frame?.title ?? ownTitle;
+  const title = stateTitle ?? frame?.title ?? ownTitle;
   const id = frame ? `inspector-section-${frame.sectionId}` : ownId;
 
   const toggle = (e?: React.MouseEvent | React.KeyboardEvent) => {
