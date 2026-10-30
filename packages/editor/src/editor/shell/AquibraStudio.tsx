@@ -664,16 +664,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
            (L5-074) — the unsaved-edits toast owns recovery there. */
         localDraftShown={!getSiteIdFromUrl() || loadError !== null}
       />
-      <LoadErrorBanner
-        kind={loadError}
-        onRetry={() => window.location.reload()}
-        /* New tab, deliberately: the auth load-error can sit over LOCAL
-           fallback changes being edited, and a same-tab redirect destroys
-           them — the exact failure the session-expired surface exists to
-           prevent. Same-origin cookie lands either way. */
-        onSignIn={() => window.open(`${DASHBOARD_URL}/auth?reason=session-expired`, "_blank", "noopener")}
-        onDismiss={() => setLoadError(null)}
-      />
       <header role="banner" aria-label="Editor toolbar">
         <StudioHeader
           composer={composer}
@@ -716,6 +706,17 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           addToast={addToast}
         />
       </header>
+      {/* F-11 (B7-G02 225:2821): the global banner slot sits UNDER the topbar. */}
+      <LoadErrorBanner
+        kind={loadError}
+        onRetry={() => window.location.reload()}
+        /* New tab, deliberately: the auth load-error can sit over LOCAL
+           fallback changes being edited, and a same-tab redirect destroys
+           them — the exact failure the session-expired surface exists to
+           prevent. Same-origin cookie lands either way. */
+        onSignIn={() => window.open(`${DASHBOARD_URL}/auth?reason=session-expired`, "_blank", "noopener")}
+        onDismiss={() => setLoadError(null)}
+      />
       <StudioPanels
         composer={composer}
         selectedElement={selectedElement}

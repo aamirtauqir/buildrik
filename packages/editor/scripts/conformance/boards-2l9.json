@@ -25581,7 +25581,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Round 24 re-read: the loader's real failure state is built — LoadErrorBanner carries the board's line ('Couldn’t load this site. You can look around; editing waits until it loads.'), Download local copy and Retry only (no Copy details); bottom bar 'Not loaded · nothing saved yet' · Details (probe bottom-bar state=not-loaded). What the canvas and Layers show is whatever copy the loader restored (a local draft) — empty when there is none; nothing is faked. Still open: the banner mounts above the topbar, not in the 40px slot under it (AquibraStudio, REQUESTS F-11), and the inspector reads 'View only until the site loads' where the board says 'View only — properties unlock when the site loads' (StatusLine.tsx:94, L-B). Not walked live (needs a forced load failure on the Next app).",
+   "verifiedNote": "Round 28 (F-11, owner cleared AquibraStudio): LoadErrorBanner — the global banner slot — now mounts after <header>, so the DOM (and focus) order is topbar → banner → panels as the board draws it (y 56); it was drawn there only through flex order. Banner copy/actions and the bottom-bar 'Not loaded · nothing saved yet' match (compared earlier). Still open, not L-A's path: the inspector line reads 'View only until the site loads' where the board says 'View only — properties unlock when the site loads' (inspector/components/StatusLine.tsx:94, L-B). Not walked live (needs a forced load failure on the Next app).",
    "tier": "P1"
   },
   {
