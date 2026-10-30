@@ -895,9 +895,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "code:create-is-local",
    "verified": "no",
-   "verifiedNote": "No confirm/progress/slow/partial/unconfirmed operation dialog (L-C)",
+   "verifiedNote": "'Taking longer than usual…' cannot be reached: The template create run is local and short: tokens → one importHTMLToActivePage transaction → two paint frames → bookkeeping (TemplatesTab.runApply), measured in milliseconds, with no server step and no timeout. | No confirm/progress/slow/partial/unconfirmed operation dialog (L-C)",
    "tier": "P1"
   },
   {
@@ -906,9 +906,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "code:failed-create-removes-page",
    "verified": "no",
-   "verifiedNote": "No confirm/progress/slow/partial/unconfirmed operation dialog (L-C)",
+   "verifiedNote": "A failed create takes the page it made back out (TemplatesTab.runApply catch: nav links removed, deletePage, previous page re-opened) and says 'Template apply failed — nothing was changed' + Retry — so a created page WITHOUT its layout never exists to report, inspect, retry into or restore. | No confirm/progress/slow/partial/unconfirmed operation dialog (L-C)",
    "tier": "P1"
   },
   {
@@ -918,8 +918,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No 'Services created from SaaS Landing' receipt / unconfirmed inspection (L-C)",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-30 (case templates-resource-area&page=Services, SaaS Landing → Create page → Create page; board shots/106-37579.png): built — the run ends with the receipt 'Services created from SaaS Landing · Page settings' (Page settings opens that page's settings through UI_PAGES_OPEN_SETTINGS) and leaves Templates for the editor (onTemplateUsed); the 'Page created' dialog it replaces is deleted. The board's editor behind it (Layers 'Services', Page inspector) is the shell, not this row. Test TemplatesTab.workspace.",
    "tier": "P1"
   },
   {
@@ -951,9 +951,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "code:failed-create-removes-page",
    "verified": "drift-open",
-   "verifiedNote": "Board 'Your page is ready · Use Add to insert…' + 'Services created · Added to site navigation'",
+   "verifiedNote": "A failed create takes the page it made back out (TemplatesTab.runApply catch: nav links removed, deletePage, previous page re-opened) and says 'Template apply failed — nothing was changed' + Retry — so a created page WITHOUT its layout never exists to report, inspect, retry into or restore. | Board 'Your page is ready · Use Add to insert…' + 'Services created · Added to site navigation'",
    "tier": "P1"
   },
   {
@@ -964,7 +964,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No confirm/progress/slow/partial/unconfirmed operation dialog (L-C)",
+   "verifiedNote": "Built 2026-10-30 (ApplyProgressOverlay): while the tokens step runs, a create reads 'Preparing SaaS Landing…' / 'Preparing the template for Services. You can still cancel before import starts.' / 'Your other pages and Brand settings remain unchanged.', the real steps, and Cancel (true: cancel is honoured until the import). Test CreatePageModals. Not shot live: the step lasts one paint frame. Board shots/107-31110.png on disk. | No confirm/progress/slow/partial/unconfirmed operation dialog (L-C)",
    "tier": "P1"
   },
   {
@@ -973,9 +973,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "code:failed-create-removes-page",
    "verified": "no",
-   "verifiedNote": "No confirm/progress/slow/partial/unconfirmed operation dialog (L-C)",
+   "verifiedNote": "A failed create takes the page it made back out (TemplatesTab.runApply catch: nav links removed, deletePage, previous page re-opened) and says 'Template apply failed — nothing was changed' + Retry — so a created page WITHOUT its layout never exists to report, inspect, retry into or restore. 'Retrying the layout import into the existing Services page' has no existing page to retry into. Board shots/107-31291.png compared. | No confirm/progress/slow/partial/unconfirmed operation dialog (L-C)",
    "tier": "P1"
   },
   {
@@ -984,9 +984,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "code:create-is-local",
    "verified": "no",
-   "verifiedNote": "No confirm/progress/slow/partial/unconfirmed operation dialog (L-C)",
+   "verifiedNote": "\"We couldn't confirm the result\" / reconciliation / access-check states have nothing to reconcile: The template create run is local and short: tokens → one importHTMLToActivePage transaction → two paint frames → bookkeeping (TemplatesTab.runApply), measured in milliseconds, with no server step and no timeout. The page exists in the editor's document the moment the run ends, or the run failed and removed it. | No confirm/progress/slow/partial/unconfirmed operation dialog (L-C)",
    "tier": "P1"
   },
   {
@@ -1041,9 +1041,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "code:failed-create-removes-page",
    "verified": "no",
-   "verifiedNote": "No post-failure cleanup receipt / restore",
+   "verifiedNote": "A failed create takes the page it made back out (TemplatesTab.runApply catch: nav links removed, deletePage, previous page re-opened) and says 'Template apply failed — nothing was changed' + Retry — so a created page WITHOUT its layout never exists to report, inspect, retry into or restore. 'Services restored · Home is still open' — nothing is left to restore. Board shots/109-42059.png compared. | No post-failure cleanup receipt / restore",
    "tier": "P1"
   },
   {
@@ -1074,9 +1074,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "code:create-is-local",
    "verified": "no",
-   "verifiedNote": "No server reconciliation states (L-C; needs tRPC chain)",
+   "verifiedNote": "\"We couldn't confirm the result\" / reconciliation / access-check states have nothing to reconcile: The template create run is local and short: tokens → one importHTMLToActivePage transaction → two paint frames → bookkeeping (TemplatesTab.runApply), measured in milliseconds, with no server step and no timeout. The page exists in the editor's document the moment the run ends, or the run failed and removed it. | No server reconciliation states (L-C; needs tRPC chain)",
    "tier": "P1"
   },
   {
@@ -1085,9 +1085,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "code:create-is-local",
    "verified": "no",
-   "verifiedNote": "No server reconciliation states (L-C; needs tRPC chain)",
+   "verifiedNote": "\"We couldn't confirm the result\" / reconciliation / access-check states have nothing to reconcile: The template create run is local and short: tokens → one importHTMLToActivePage transaction → two paint frames → bookkeeping (TemplatesTab.runApply), measured in milliseconds, with no server step and no timeout. The page exists in the editor's document the moment the run ends, or the run failed and removed it. | No server reconciliation states (L-C; needs tRPC chain)",
    "tier": "P1"
   },
   {
@@ -1096,9 +1096,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "code:create-is-local",
    "verified": "no",
-   "verifiedNote": "No server reconciliation states (L-C; needs tRPC chain)",
+   "verifiedNote": "\"We couldn't confirm the result\" / reconciliation / access-check states have nothing to reconcile: The template create run is local and short: tokens → one importHTMLToActivePage transaction → two paint frames → bookkeeping (TemplatesTab.runApply), measured in milliseconds, with no server step and no timeout. The page exists in the editor's document the moment the run ends, or the run failed and removed it. | No server reconciliation states (L-C; needs tRPC chain)",
    "tier": "P1"
   },
   {
@@ -1107,9 +1107,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "code:create-is-local",
    "verified": "no",
-   "verifiedNote": "No server reconciliation states (L-C; needs tRPC chain)",
+   "verifiedNote": "\"We couldn't confirm the result\" / reconciliation / access-check states have nothing to reconcile: The template create run is local and short: tokens → one importHTMLToActivePage transaction → two paint frames → bookkeeping (TemplatesTab.runApply), measured in milliseconds, with no server step and no timeout. The page exists in the editor's document the moment the run ends, or the run failed and removed it. | No server reconciliation states (L-C; needs tRPC chain)",
    "tier": "P1"
   },
   {
@@ -1118,9 +1118,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "code:create-is-local",
    "verified": "no",
-   "verifiedNote": "No 'Services created from SaaS Landing' receipt / unconfirmed inspection (L-C)",
+   "verifiedNote": "\"We couldn't confirm the result\" / reconciliation / access-check states have nothing to reconcile: The template create run is local and short: tokens → one importHTMLToActivePage transaction → two paint frames → bookkeeping (TemplatesTab.runApply), measured in milliseconds, with no server step and no timeout. The page exists in the editor's document the moment the run ends, or the run failed and removed it. | No 'Services created from SaaS Landing' receipt / unconfirmed inspection (L-C)",
    "tier": "P1"
   },
   {
@@ -1129,9 +1129,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "code:create-is-local",
    "verified": "no",
-   "verifiedNote": "No server reconciliation states (L-C; needs tRPC chain)",
+   "verifiedNote": "\"We couldn't confirm the result\" / reconciliation / access-check states have nothing to reconcile: The template create run is local and short: tokens → one importHTMLToActivePage transaction → two paint frames → bookkeeping (TemplatesTab.runApply), measured in milliseconds, with no server step and no timeout. The page exists in the editor's document the moment the run ends, or the run failed and removed it. | No server reconciliation states (L-C; needs tRPC chain)",
    "tier": "P1"
   },
   {
@@ -1140,9 +1140,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "code:create-is-local",
    "verified": "no",
-   "verifiedNote": "No server reconciliation states (L-C; needs tRPC chain)",
+   "verifiedNote": "\"We couldn't confirm the result\" / reconciliation / access-check states have nothing to reconcile: The template create run is local and short: tokens → one importHTMLToActivePage transaction → two paint frames → bookkeeping (TemplatesTab.runApply), measured in milliseconds, with no server step and no timeout. The page exists in the editor's document the moment the run ends, or the run failed and removed it. | No server reconciliation states (L-C; needs tRPC chain)",
    "tier": "P1"
   },
   {
@@ -2378,8 +2378,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Board compared (shots/145-74465.png): the Return frame is the canvas after Close — rulers with the site's guides drawn across the page (one vertical, one horizontal), no panel. That is GuidesOverlay over RulersOverlay with the saved canvasGuides; the probe harness has no full canvas, so it was not shot live. Its instances' \"retained shared guides\" are the saved guides (useCanvasGuides). | Built 2026-10-30: View › 'Rulers and guides…' (canvas/controls/RulersGuidesPanel) over the site's real guides (useCanvasGuides — canvasGuides in the project settings, saved with the site): Show rulers, 'Guides · shared across this site' with '{Vertical|Horizontal} · {n} px / Locked|Unlocked · Edit' rows, Add guide (direction + position); a guide's detail '{Vertical} guide' — Position (px), 'Changes apply with Apply.', Lock/Unlock guide, Remove guide, Cancel · Apply; after a removal 'Undo guide removal' restores it as it was. Test RulersGuidesPanel. Not drawn: the boards' sync statuses (pending / failed / offline / acknowledged) — guides have no sync of their own, they save with the site like any edit. Instances compared: 155:83650 (detail) and 153:79518 (list, shots/153-79518.png — matches: title + Close, Show rulers, the two rows with Edit, Add guide; row/field spacing tuned to it). This archetype's own board was not fetched. | Prior: Origin shows retained shared guides; guide model missing",
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared live 2026-10-30 in the real shell (Vite demo :5171, rulers on, guides added 'Vertical · 200' / 'Horizontal · 120' through Rulers and guides…, panel closed; board shots/145-74465.png): rulers top and left with the two guides across the page. Fixed on the way: (1) guides drew blue — the board draws them red (now var(--bk-red-500)); (2) a guide drew at position × zoom² — the overlay sits inside the zoomed canvas, so a 200 guide sat at the ruler's ~120 at 61%; it now sits on its ruler mark (measured: vertical at the '200' tick, horizontal at 120). Test GuidesOverlay. | Board compared (shots/145-74465.png): the Return frame is the canvas after Close — rulers with the site's guides drawn across the page (one vertical, one horizontal), no panel. That is GuidesOverlay over RulersOverlay with the saved canvasGuides; the probe harness has no full canvas, so it was not shot live. Its instances' \"retained shared guides\" are the saved guides (useCanvasGuides). | Built 2026-10-30: View › 'Rulers and guides…' (canvas/controls/RulersGuidesPanel) over the site's real guides (useCanvasGuides — canvasGuides in the project settings, saved with the site): Show rulers, 'Guides · shared across this site' with '{Vertical|Horizontal} · {n} px / Locked|Unlocked · Edit' rows, Add guide (direction + position); a guide's detail '{Vertical} guide' — Position (px), 'Changes apply with Apply.', Lock/Unlock guide, Remove guide, Cancel · Apply; after a removal 'Undo guide removal' restores it as it was. Test RulersGuidesPanel. Not drawn: the boards' sync statuses (pending / failed / offline / acknowledged) — guides have no sync of their own, they save with the site like any edit. Instances compared: 155:83650 (detail) and 153:79518 (list, shots/153-79518.png — matches: title + Close, Show rulers, the two rows with Edit, Add guide; row/field spacing tuned to it). This archetype's own board was not fetched. | Prior: Origin shows retained shared guides; guide model missing",
    "tier": "P3"
   },
   {
