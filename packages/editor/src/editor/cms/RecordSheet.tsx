@@ -33,6 +33,7 @@ import { RecordSheetFooter } from "./RecordSheetFooter";
 import { useQueuedSaveLock } from "./useQueuedSaveLock";
 import { RecordFieldControl, isEmptyValue, type OpenMediaLibrary } from "./RecordFieldControl";
 import { RecordTemplatePreviewDialog } from "./RecordTemplatePreviewDialog";
+import { ConflictReviewDialog } from "./ConflictReviewDialog";
 import { applyCmsPattern, cmsSlugField, cmsSlugify } from "@buildrik/shared/schemas/cms";
 import { CMS_TAB_LABEL, cmsWorkspace, type CmsExitPage, type CmsTab, type CmsWorkspaceState } from "./cmsWorkspaceStore";
 import { shellDirty } from "@/editor/shell/shellDirtyRegistry";
@@ -67,8 +68,6 @@ export interface RecordSheetProps {
   gone?: boolean;
 }
 
-/* 8139:217692 — the conflict choice: 32 tall, 12 inline, 13/20 medium. */
-const CHOICE_BTN = "tw:h-8 tw:px-3 tw:py-1 tw:text-[13px] tw:leading-5 tw:font-medium tw:rounded-[6px]";
 
 /* 165:1625 — the queued mirror: the change is on this device, not the server. */
 const OFFLINE = "Your edits are not saved to the server. Keep this tab open.";
@@ -139,6 +138,8 @@ export function RecordSheet({
   const [templatePreviewOpen, setTemplatePreviewOpen] = React.useState(false);
 
   const lastRecordId = React.useRef<string | null>(record?.id ?? "new");
+  /* 165:2414: "your changed fields" are measured from the record as opened. */
+  const openedWith = React.useRef<Record<string, unknown>>(initial);
   React.useEffect(() => {
     /* Reset the form when the row being edited changes (or a new sheet opens);
        the saveError resets too — the new sheet has nothing to recover from.
@@ -148,6 +149,7 @@ export function RecordSheet({
     const currentId = record?.id ?? "new";
     if (currentId === lastRecordId.current) return;
     lastRecordId.current = currentId;
+    openedWith.current = initial;
     setForm(initial);
     setPublished(initialPublished);
     setSaveError(null);
@@ -309,7 +311,7 @@ export function RecordSheet({
   /* Keep mine re-sends this device's copy; it can conflict again (the claim
      then holds the new choice), land, or queue. Use theirs replaces this
      device's copy with the server's, so the sheet's edits are gone with it. */
-  const choose = async (choice: "keepMine" | "useTheirs") => {
+  const choose = async (choice: "keepMine" | "useTheirs", merged?: Record<string, unknown>) => {
     const c = conflict;
     if (!c) return;
     setResolving(true);
@@ -322,7 +324,7 @@ export function RecordSheet({
         leave(back ? back.go : onClose);
         return;
       }
-      const landed = await c.keepMine();
+      const landed = await c.keepMine(merged);
       if (isCmsConflictPending("entry", c.id)) return;
       settleConflict();
       if (landed) closeSaved();
@@ -592,29 +594,27 @@ export function RecordSheet({
 
           {conflict && !gone ? (
             /* 165:1903 — "Changed elsewhere" over the fields; Review opens the
-               whole-record choice (a per-field diff, 165:2414, is not built). */
+               per-field review (165:2414, ConflictReviewDialog). */
             <div className="tw:flex tw:flex-none tw:items-start tw:gap-3 tw:rounded-[6px] tw:bg-[var(--bk-warning-tint)] tw:px-3 tw:py-3" role="alert" data-testid="cms-sheet-conflict">
               <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:gap-1">
                 <p className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:font-semibold tw:text-[var(--bk-warning-text)]">Changed elsewhere</p>
                 <p className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-warning-text)]">
-                  {reviewing ? "Someone else changed this record. Keep your version or use theirs." : "Review the fields that changed before saving."}
+                  Review the fields that changed before saving.
                 </p>
-                {reviewing ? (
-                  <div className="tw:mt-1 tw:flex tw:h-8 tw:items-center tw:gap-2">
-                    <Button size="sm" variant="secondary" className={CHOICE_BTN} disabled={resolving} data-testid="cms-sheet-keep-mine" onClick={() => void choose("keepMine")}>
-                      Keep mine
-                    </Button>
-                    <Button size="sm" className={CHOICE_BTN} disabled={resolving} data-testid="cms-sheet-use-theirs" onClick={() => void choose("useTheirs")}>
-                      Use theirs
-                    </Button>
-                  </div>
-                ) : null}
               </div>
-              {reviewing ? null : (
-                <Button size="xs" variant="secondary" className="tw:h-8 tw:px-4 tw:text-[13px] tw:font-medium" onClick={() => setReviewing(true)} data-testid="cms-sheet-conflict-review">
-                  Review
-                </Button>
-              )}
+              <Button size="xs" variant="secondary" className="tw:h-8 tw:px-4 tw:text-[13px] tw:font-medium" onClick={() => setReviewing(true)} data-testid="cms-sheet-conflict-review">
+                Review
+              </Button>
+              <ConflictReviewDialog
+                open={reviewing}
+                conflict={conflict}
+                fields={collection.fields}
+                base={openedWith.current}
+                resolving={resolving}
+                onCancel={() => setReviewing(false)}
+                onKeepMine={(merged) => void choose("keepMine", merged)}
+                onUseTheirs={() => void choose("useTheirs")}
+              />
             </div>
           ) : null}
 

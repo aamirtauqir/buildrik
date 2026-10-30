@@ -67,38 +67,56 @@ describe("DynamicPagesPane", () => {
     expect(screen.getByTestId("cms-dp-status")).toHaveTextContent("No pattern set — this collection generates no pages.");
   });
 
-  it("binds the pattern AND the template page by its published file name, then lists the pages (4428:147857)", async () => {
+  it("binds the pattern AND the template page by its published file name, then lists the pages (4428:147857, 165:3693)", async () => {
     const { updateCollection } = mount(MENU, [rec("a", "Margherita"), rec("b", "Quattro Formaggi"), rec("c", "Draft one", "draft")]);
     fireEvent.change(screen.getByTestId("cms-dp-pattern"), { target: { value: "/menu/{slug}" } });
-    expect(screen.getByTestId("cms-dp-status")).toHaveTextContent("Choose a template page");
+    expect(screen.getByTestId("cms-dp-status")).toHaveTextContent("Choose a collection page");
     fireEvent.change(screen.getByTestId("cms-dp-template"), { target: { value: "menu-item.html" } });
-    expect(screen.getByTestId("cms-dp-status")).toHaveTextContent("Ready");
-    expect(screen.getByTestId("cms-dp-status")).toHaveTextContent("2 complete records will get a page · 1 unpublished draft is skipped");
+    expect(screen.getByTestId("cms-dp-status")).toHaveTextContent(
+      "On the next publish2 published records will generate 2 pages. 1 draft record is excluded.",
+    );
     expect(screen.getByTestId("cms-dp-list")).toHaveTextContent("/menu/margherita");
     expect(screen.getByTestId("cms-dp-list")).toHaveTextContent("/menu/quattro-formaggi");
+    expect(screen.getByTestId("cms-dp-save")).toHaveTextContent("Save");
     fireEvent.click(screen.getByTestId("cms-dp-save"));
     await waitFor(() =>
       expect(updateCollection).toHaveBeenCalledWith("col-1", { pageSlugPattern: "/menu/{slug}", pageTemplatePath: "menu-item.html" }),
     );
-    expect(screen.getByTestId("cms-dp-save")).toHaveTextContent("Generate 2 pages");
   });
 
-  it("refuses a pattern that names no field and offers the fix (4418:164278)", () => {
+  it("refuses a pattern that names no field and offers the fix, under the field (4418:164278)", () => {
     mount(MENU, [rec("a", "Margherita")]);
     fireEvent.change(screen.getByTestId("cms-dp-pattern"), { target: { value: "/menu/{title}" } });
-    expect(screen.getByTestId("cms-dp-status")).toHaveTextContent("/menu/{title} cannot be saved: title is not a field of Menu items.");
+    expect(screen.getByTestId("cms-dp-pattern-error")).toHaveTextContent("/menu/{title} cannot be saved: title is not a field of Menu items.");
+    expect(screen.getByTestId("cms-dp-pattern")).toHaveAttribute("aria-invalid", "true");
     expect(screen.getByTestId("cms-dp-save")).toBeDisabled();
     fireEvent.click(screen.getByTestId("cms-dp-fix"));
     expect(screen.getByTestId("cms-dp-pattern")).toHaveValue("/menu/{slug}");
   });
 
+  it("blocks a pattern two published records resolve to alike, and offers the slug field (165:3693)", () => {
+    mount({ ...MENU, pageTemplatePath: "menu-item.html" } as CMSCollection, [rec("a", "Margherita"), rec("b", "Diavola")]);
+    fireEvent.change(screen.getByTestId("cms-dp-pattern"), { target: { value: "/menu/all-{name}x" } });
+    fireEvent.change(screen.getByTestId("cms-dp-pattern"), { target: { value: "/menu/{name}" } });
+    expect(screen.queryByTestId("cms-dp-pattern-error")).toBeNull();
+    const dupes = [rec("a", "Margherita"), { ...rec("b", "Diavola"), data: { name: "Margherita", slug: "diavola" } }];
+    cleanup();
+    mount({ ...MENU, pageTemplatePath: "menu-item.html" } as CMSCollection, dupes);
+    fireEvent.change(screen.getByTestId("cms-dp-pattern"), { target: { value: "/menu/{name}" } });
+    expect(screen.getByTestId("cms-dp-pattern-error")).toHaveTextContent("Multiple records resolve to /menu/margherita. Choose a unique field, such as {slug}.");
+    expect(screen.getByTestId("cms-dp-save")).toBeDisabled();
+    fireEvent.click(screen.getByTestId("cms-dp-fix"));
+    expect(screen.getByTestId("cms-dp-pattern")).toHaveValue("/menu/{slug}");
+    expect(screen.queryByTestId("cms-dp-pattern-error")).toBeNull();
+  });
+
   it("refuses a pattern that isn't a path, or names no field (DM-18)", () => {
     mount(MENU, [rec("a", "Margherita")]);
     fireEvent.change(screen.getByTestId("cms-dp-pattern"), { target: { value: "/menu/all" } });
-    expect(screen.getByTestId("cms-dp-status")).toHaveTextContent("/menu/all cannot be saved: A URL pattern needs a field");
+    expect(screen.getByTestId("cms-dp-pattern-error")).toHaveTextContent("/menu/all cannot be saved: A URL pattern needs a field");
     expect(screen.getByTestId("cms-dp-save")).toBeDisabled();
     fireEvent.change(screen.getByTestId("cms-dp-pattern"), { target: { value: "/menu?x={slug}" } });
-    expect(screen.getByTestId("cms-dp-status")).toHaveTextContent("letters, numbers, -, _, / and {field} only");
+    expect(screen.getByTestId("cms-dp-pattern-error")).toHaveTextContent("letters, numbers, -, _, / and {field} only");
     expect(screen.getByTestId("cms-dp-save")).toBeDisabled();
   });
 
@@ -148,7 +166,7 @@ describe("DynamicPagesPane", () => {
   it("a saved link names its page, opens it, and says what the next publish does (187:21853)", () => {
     const onOpenPage = vi.fn();
     mount({ ...MENU, pageSlugPattern: "/menu/{slug}", pageTemplatePath: "menu-item.html" } as CMSCollection, [rec("a", "Margherita"), rec("b", "Diavola")], { onOpenPage });
-    expect(screen.getByTestId("cms-dp-linked")).toHaveTextContent("Menu item");
+    expect(screen.getByTestId("cms-dp-template")).toHaveValue("menu-item.html");
     fireEvent.click(screen.getByTestId("cms-dp-edit-page"));
     expect(onOpenPage).toHaveBeenCalledTimes(1);
     expect(screen.getByTestId("cms-dp-status")).toHaveTextContent(
@@ -156,13 +174,12 @@ describe("DynamicPagesPane", () => {
     );
   });
 
-  it("the linked view keeps the template, SEO description and list under More settings; Save shows once edited", () => {
+  it("Save shows only once something is edited; the page list stays, collapsed", () => {
     mount({ ...MENU, pageSlugPattern: "/menu/{slug}", pageTemplatePath: "menu-item.html" } as CMSCollection, [rec("a", "Margherita")]);
-    expect(screen.getByTestId("cms-dp-more")).toContainElement(screen.getByTestId("cms-dp-template"));
-    expect(screen.getByLabelText("SEO title")).toBeInTheDocument();
+    expect(screen.getByTestId("cms-dp-more")).toContainElement(screen.getByTestId("cms-dp-list"));
     expect(screen.queryByTestId("cms-dp-save")).toBeNull();
     fireEvent.change(screen.getByTestId("cms-dp-seo-title"), { target: { value: "{name} · Menu" } });
-    expect(screen.getByTestId("cms-dp-save")).toHaveTextContent("Save changes");
+    expect(screen.getByTestId("cms-dp-save")).toHaveTextContent("Save");
   });
 
   describe("Create collection page (187:20406 … 187:21418)", () => {

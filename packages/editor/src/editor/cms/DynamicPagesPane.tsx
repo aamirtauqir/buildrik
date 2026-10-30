@@ -24,13 +24,17 @@ import { pageFileNames } from "@/engine/export";
 import type { CMSCollection, CMSContentItem } from "@/shared/types/cms";
 import { Button, Select, TextInput, useToast } from "@/editor/chrome-ui";
 import { applyCmsPattern, cmsPatternError, cmsSlugField } from "@buildrik/shared/schemas/cms";
-import { ACTION, CONTROL, CONTROL_W, LABEL, NOTE, PANE, SECTION, WARN } from "./paneStyles";
+import { ACTION, CONTROL, NOTE, PANE, WARN } from "./paneStyles";
 import { DynamicPagesStart } from "./DynamicPagesStart";
+import { undoWithOwnReceipt } from "@/editor/shell/hooks/useHistoryFeedback";
 
-/* 187:21853: the linked view's 720 fields, filled, under 13/20 ink labels. */
-const LINKED_W = "tw:w-[720px]";
-const LINKED_LABEL = "tw:mb-2 tw:block tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]";
-const FILLED = "tw:[&_input]:border-0 tw:[&_input]:bg-[var(--bk-gray-100)]";
+/* 165:3693 / 187:21853: 720 filled fields under 13/20 ink labels; an
+   invalid one is outlined in the error red. */
+const FIELD_W = "tw:w-[720px]";
+const FIELD_LABEL = "tw:mb-2 tw:block tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]";
+const FILLED =
+  "tw:[&_input]:border-0 tw:[&_input]:bg-[var(--bk-gray-100)] tw:[&_select]:border-0 tw:[&_select]:bg-[var(--bk-gray-100)]";
+const INVALID = "tw:[&_input]:border tw:[&_input]:border-[var(--bk-error)]";
 import { CreateCollectionPageDialog, type CreateCollectionPageChoice } from "./CreateCollectionPageDialog";
 import { buildCollectionPage, collectionPageName, retryCollectionLink, saveCollectionLink, type CreatedCollectionPage } from "./createCollectionPage";
 import { unsavedCollectionLinks, useUnsavedCollectionLink } from "./unsavedCollectionLinks";
@@ -133,7 +137,8 @@ export function DynamicPagesPane({ composer, collection, records, onOpenPage }: 
       action: made.undo && {
         label: "Undo",
         onClick: () => {
-          if (!made.undo?.()) return;
+          /* The follow-up below is this undo's message; the shell's "Undo: …" bar stays down. */
+          if (!made.undo || !undoWithOwnReceipt(made.undo)) return;
           addToast({
             /* 187:22586: one line and Open CMS. Stays until answered: the
                shell's own "Undo: …" receipt would otherwise replace it. */
@@ -211,22 +216,29 @@ export function DynamicPagesPane({ composer, collection, records, onOpenPage }: 
     }
   };
 
-  let status: React.ReactNode;
+  /* 165:3693 / 4418:164278: what is wrong with the URL pattern is said under
+     the field itself (red), with the one-click fix. A collision is checked
+     with the shared slug rule over the published records — what the publish
+     worker generates paths from — and blocks Save. */
+  const firstDup = urls.find((u, i) => urls.indexOf(u) !== i) ?? null;
+  const slugFix = slugField ? trimmed.replace(/\{[a-zA-Z0-9_-]+\}(?!.*\{)/, `{${slugField.slug}}`) : null;
+  let patternError: { text: string; fix: string | null } | null = null;
+  if (unknown.length) {
+    patternError = { text: `${trimmed} cannot be saved: ${unknown.join(", ")} ${unknown.length === 1 ? "is" : "are"} not a field of ${collection.name}.`, fix };
+  } else if (patternProblem) {
+    patternError = { text: `${trimmed} cannot be saved: ${patternProblem}`, fix: null };
+  } else if (collide && firstDup) {
+    patternError = {
+      text: `Multiple records resolve to ${firstDup}. Choose a unique field, such as {${slugField?.slug ?? "slug"}}.`,
+      fix: slugFix && slugFix !== trimmed ? slugFix : null,
+    };
+  }
+
+  let status: React.ReactNode = null;
   if (!trimmed) {
     status = <span className={WARN} data-testid="cms-dp-status">No pattern set — this collection generates no pages.</span>;
-  } else if (unknown.length) {
-    status = (
-      <span className={`${WARN} tw:flex tw:items-center tw:gap-2`} data-testid="cms-dp-status">
-        {trimmed} cannot be saved: {unknown.join(", ")} {unknown.length === 1 ? "is" : "are"} not a field of {collection.name}.
-        {fix ? (
-          <Button size="xs" variant="link" className="tw:h-auto tw:min-h-0 tw:p-0 tw:text-[12px]" data-testid="cms-dp-fix" onClick={() => setPattern(fix)}>
-            Use {fix}
-          </Button>
-        ) : null}
-      </span>
-    );
-  } else if (patternProblem) {
-    status = <span className={WARN} data-testid="cms-dp-status">{trimmed} cannot be saved: {patternProblem}</span>;
+  } else if (patternError) {
+    status = null;
   } else if (published.length === 0) {
     status = (
       <span className={WARN} data-testid="cms-dp-status">
@@ -236,45 +248,25 @@ export function DynamicPagesPane({ composer, collection, records, onOpenPage }: 
       </span>
     );
   } else if (!template) {
-    status = <span className={WARN} data-testid="cms-dp-status">Choose a template page — without one, publishing emits none of these.</span>;
+    status = <span className={WARN} data-testid="cms-dp-status">Choose a collection page — without one, publishing emits none of these.</span>;
   } else if (!templateName) {
-    /* A09-8/A-17: the saved template page can go missing (renamed or
-       deleted) without this pane's own state changing — `template` still
-       holds the old file name, so `ready` looked true while the publish
-       service would silently skip every record for this collection
-       (`appendDynamicPagesToPublish`'s `if (!template) continue`). Surface
-       the dangling reference instead of claiming Ready. */
+    /* A09-8/A-17: the saved template page can go missing without this
+       pane's state changing; never claim the pages will generate. */
     status = <span className={WARN} data-testid="cms-dp-status">The saved template page is missing — choose one again, or publishing generates none of these.</span>;
-  } else if (collide) {
-    status = <span className={WARN} data-testid="cms-dp-status">Two records resolve to the same URL — add a field that differs, such as {"{slug}"}.</span>;
   } else {
-    status = (
-      <span className="tw:flex tw:items-center tw:gap-2" data-testid="cms-dp-status">
-        <span className="tw:inline-flex tw:h-5 tw:items-center tw:gap-1 tw:rounded-[4px] tw:bg-[var(--bk-green-100)] tw:px-1.5 tw:text-[11px] tw:font-medium tw:text-[var(--bk-green-700)]">
-          <span className="tw:size-1.5 tw:rounded-full tw:bg-[var(--bk-green-500)]" aria-hidden="true" />
-          Ready
-        </span>
-        <span className={NOTE}>
-          {published.length} complete record{published.length === 1 ? "" : "s"} will get a page
-          {drafts ? ` · ${drafts} unpublished draft${drafts === 1 ? " is" : "s are"} skipped` : ""}
-        </span>
-      </span>
-    );
-  }
-
-  /* The link as saved — not a form edit still in progress. */
-  const linkedPage = collection.pageTemplatePath && templatePage?.file === collection.pageTemplatePath ? templatePage : null;
-  if (ready && linkedPage && !dirty) {
-    /* 187:21853 — what the next publish does, in words. */
+    /* 187:21853 / 165:3693 — what the next publish does, in words. */
     status = (
       <section className="tw:flex tw:flex-col tw:gap-1" data-testid="cms-dp-status">
         <h3 className="tw:m-0 tw:text-[12px] tw:font-semibold tw:leading-[18px] tw:text-[var(--bk-ink)]">On the next publish</h3>
         <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">
-          {`${published.length} published record${published.length === 1 ? "" : "s"} will generate ${published.length} page${published.length === 1 ? "" : "s"}. Changes to records or the template appear after site publish.`}
+          {`${published.length} published record${published.length === 1 ? "" : "s"} will generate ${published.length} page${published.length === 1 ? "" : "s"}.`}
+          {drafts ? ` ${drafts} draft record${drafts === 1 ? " is" : "s are"} excluded.` : ""}
+          {" Changes to records or the template appear after site publish."}
         </p>
       </section>
     );
   }
+  const linkedPage = templatePage;
 
   const startState = creating
     ? ({ kind: "creating", name: creating } as const)
@@ -305,66 +297,90 @@ export function DynamicPagesPane({ composer, collection, records, onOpenPage }: 
     );
   }
 
-  const patternField = (
-      <div className={linkedPage ? LINKED_W : CONTROL_W}>
-        <label className={linkedPage ? LINKED_LABEL : LABEL} htmlFor="cms-dp-pattern">URL pattern</label>
-        <TextInput
-          id="cms-dp-pattern"
-          sizing="sm"
-          className={linkedPage ? `${CONTROL} ${FILLED}` : CONTROL}
-          placeholder="/menu/{slug}"
-          value={pattern}
-          onChange={(e) => setPattern(e.target.value)}
-          data-testid="cms-dp-pattern"
-        />
-      </div>
+  const field = (id: string, label: string, control: React.ReactNode, extra?: React.ReactNode) => (
+    <div className={FIELD_W}>
+      <label className={FIELD_LABEL} htmlFor={id}>{label}</label>
+      {control}
+      {extra}
+    </div>
   );
-  const seoTitleField = (
-      <div className={linkedPage ? LINKED_W : CONTROL_W}>
-        <label className={linkedPage ? LINKED_LABEL : LABEL} htmlFor="cms-dp-seo-title">{linkedPage ? "SEO title" : "SEO title pattern"}</label>
-        <TextInput
-          id="cms-dp-seo-title"
-          sizing="sm"
-          className={linkedPage ? `${CONTROL} ${FILLED}` : CONTROL}
-          placeholder={`{${collection.displayField ?? collection.fields[0]?.slug ?? "title"}}`}
-          value={seoTitle}
-          onChange={(e) => setSeoTitle(e.target.value)}
-          data-testid="cms-dp-seo-title"
-        />
-      </div>
-  );
-  const templateField = (
-      <div className={CONTROL_W}>
-        <label className={LABEL} htmlFor="cms-dp-template">Template page</label>
-        <Select id="cms-dp-template" sizing="sm" className={CONTROL} value={template} onChange={(e) => setTemplate(e.target.value)} data-testid="cms-dp-template">
+  const blocked = saving || Boolean(patternError) || seoUnknown.length > 0;
+
+  /* 165:3693 (the whole form) · 187:21853 (a saved link): Collection page,
+     Edit collection page ›, URL pattern, SEO title, SEO description, then
+     what the next publish does. The page list stays, collapsed. */
+  return (
+    <div className={PANE} data-testid="cms-dynamic-pages">
+      {field(
+        "cms-dp-template",
+        "Collection page",
+        <Select id="cms-dp-template" sizing="sm" className={`${CONTROL} ${FILLED}`} value={template} onChange={(e) => setTemplate(e.target.value)} data-testid="cms-dp-template">
           <option value="">Choose a page…</option>
           {pages.map((p) => (
             <option key={p.file} value={p.file}>
               {p.name}
             </option>
           ))}
-        </Select>
-      </div>
-  );
-  const seoDescriptionField = (
-      <div className={CONTROL_W}>
-        <label className={LABEL} htmlFor="cms-dp-seo-description">SEO description pattern</label>
+        </Select>,
+        linkedPage && onOpenPage ? (
+          <Button size="xs" variant="link" className="tw:mt-2 tw:h-8 tw:w-[200px] tw:justify-center tw:p-0 tw:text-[13px] tw:font-normal" onClick={() => onOpenPage(linkedPage.id)} data-testid="cms-dp-edit-page">
+            Edit collection page ›
+          </Button>
+        ) : null,
+      )}
+      {field(
+        "cms-dp-pattern",
+        "URL pattern",
         <TextInput
-          id="cms-dp-seo-description"
+          id="cms-dp-pattern"
           sizing="sm"
-          className={CONTROL}
-          value={seoDescription}
-          onChange={(e) => setSeoDescription(e.target.value)}
-          data-testid="cms-dp-seo-description"
-        />
-      </div>
-  );
-  const pageList = urls.length ? (
-        <section className={CONTROL_W}>
-          <h3 className={`${SECTION} tw:mb-2`}>
-            Pages to generate · {urls.length}
-          </h3>
-          <ul className="tw:m-0 tw:list-none tw:rounded-[6px] tw:border tw:border-[var(--bk-border)] tw:p-0 tw:py-1" data-testid="cms-dp-list">
+          className={`${CONTROL} ${FILLED} ${patternError ? INVALID : ""}`}
+          placeholder="/menu/{slug}"
+          value={pattern}
+          color={patternError ? "failure" : undefined}
+          aria-invalid={patternError ? true : undefined}
+          onChange={(e) => setPattern(e.target.value)}
+          data-testid="cms-dp-pattern"
+        />,
+        patternError ? (
+          <div className="tw:mt-2 tw:flex tw:flex-col tw:items-start tw:gap-2">
+            <span className="tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-soft)]" data-testid="cms-dp-pattern-error">{patternError.text}</span>
+            {patternError.fix ? (
+              <Button size="xs" variant="link" className="tw:h-auto tw:min-h-0 tw:w-[200px] tw:justify-center tw:p-0 tw:text-[13px] tw:font-normal" data-testid="cms-dp-fix" onClick={() => setPattern(patternError!.fix!)}>
+                {`Use ${patternError.fix.match(/\{[^}]+\}(?!.*\{)/)?.[0] ?? patternError.fix}`}
+              </Button>
+            ) : null}
+          </div>
+        ) : null,
+      )}
+      {field(
+        "cms-dp-seo-title",
+        "SEO title",
+        <TextInput
+          id="cms-dp-seo-title"
+          sizing="sm"
+          className={`${CONTROL} ${FILLED}`}
+          placeholder={`{${collection.displayField ?? collection.fields[0]?.slug ?? "title"}}`}
+          value={seoTitle}
+          onChange={(e) => setSeoTitle(e.target.value)}
+          data-testid="cms-dp-seo-title"
+        />,
+      )}
+      {field(
+        "cms-dp-seo-description",
+        "SEO description",
+        <TextInput id="cms-dp-seo-description" sizing="sm" className={`${CONTROL} ${FILLED}`} value={seoDescription} onChange={(e) => setSeoDescription(e.target.value)} data-testid="cms-dp-seo-description" />,
+      )}
+      {seoUnknown.length ? (
+        <span className={WARN} data-testid="cms-dp-seo-error">
+          {seoUnknown.join(", ")} {seoUnknown.length === 1 ? "is" : "are"} not a field of {collection.name}.
+        </span>
+      ) : null}
+      {status ? <div className={FIELD_W}>{status}</div> : null}
+      {urls.length && !patternError ? (
+        <details className={FIELD_W} data-testid="cms-dp-more">
+          <summary className={`${NOTE} tw:cursor-pointer`}>{`Pages to generate · ${urls.length}`}</summary>
+          <ul className="tw:m-0 tw:mt-2 tw:list-none tw:rounded-[6px] tw:border tw:border-[var(--bk-border)] tw:p-0 tw:py-1" data-testid="cms-dp-list">
             {urls.map((u, i) => (
               <li key={`${u}-${i}`} className="tw:flex tw:h-[26px] tw:items-center tw:justify-between tw:px-2 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">
                 <span className="tw:truncate">{u}</span>
@@ -372,85 +388,15 @@ export function DynamicPagesPane({ composer, collection, records, onOpenPage }: 
               </li>
             ))}
           </ul>
-        </section>
-  ) : null;
-  const rest = (
-    <>
-      {templateField}
-      {seoDescriptionField}
-      {pageList}
-    </>
-  );
-
-  if (linkedPage) {
-    /* 187:21853 — a saved link: its page and the way to it, the URL and SEO
-       title, and what the next publish does. The template choice, SEO
-       description and page list sit under More settings (kept, not drawn on
-       the board); Save appears once something is edited. */
-    return (
-      <div className={PANE} data-testid="cms-dynamic-pages">
-        <div className="tw:flex tw:flex-col tw:items-start" data-testid="cms-dp-linked">
-          <h3 className="tw:m-0 tw:text-[13px] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]">{linkedPage.name}</h3>
-          {onOpenPage ? (
-            <Button size="xs" variant="link" className="tw:mt-3 tw:h-8 tw:w-[200px] tw:justify-center tw:p-0 tw:text-[13px] tw:font-normal" onClick={() => onOpenPage(linkedPage.id)} data-testid="cms-dp-edit-page">
-              Edit collection page ›
-            </Button>
-          ) : null}
-        </div>
-        {patternField}
-        {seoTitleField}
-        {seoUnknown.length ? (
-        <span className={WARN} data-testid="cms-dp-seo-error">
-          {seoUnknown.join(", ")} {seoUnknown.length === 1 ? "is" : "are"} not a field of {collection.name}.
-        </span>
-      ) : null}
-        <div>{status}</div>
-        <details className="tw:w-[720px]" data-testid="cms-dp-more">
-          <summary className={`${NOTE} tw:cursor-pointer`}>More settings</summary>
-          <div className="tw:mt-3 tw:flex tw:flex-col tw:gap-4">{rest}</div>
         </details>
-        {dirty ? (
-          <div>
-        <Button
-          size="xs"
-          className={ACTION}
-          disabled={!(dirty || ready) || saving || unknown.length > 0 || Boolean(patternProblem) || seoUnknown.length > 0}
-          data-testid="cms-dp-save"
-          onClick={() => void save()}
-        >
-          Save changes
-        </Button>
-      </div>
-        ) : null}
-      </div>
-    );
-  }
-
-  return (
-    <div className={PANE} data-testid="cms-dynamic-pages">
-      <p className={`${NOTE} tw:m-0`}>One page per record. Pages are created on publish and update when records change.</p>
-      {patternField}
-      {templateField}
-      {seoTitleField}
-      {seoDescriptionField}
-      {seoUnknown.length ? (
-        <span className={WARN} data-testid="cms-dp-seo-error">
-          {seoUnknown.join(", ")} {seoUnknown.length === 1 ? "is" : "are"} not a field of {collection.name}.
-        </span>
       ) : null}
-      <div>{status}</div>
-      {pageList}
-      <div>
-        <Button
-          size="xs"
-          className={ACTION}
-          disabled={!(dirty || ready) || saving || unknown.length > 0 || Boolean(patternProblem) || seoUnknown.length > 0}
-          data-testid="cms-dp-save"
-          onClick={() => void save()}
-        >
-          {ready ? `Generate ${published.length} page${published.length === 1 ? "" : "s"}` : "Save"}
-        </Button>
-      </div>
+      {dirty ? (
+        <div>
+          <Button size="xs" className={ACTION} disabled={blocked} data-testid="cms-dp-save" onClick={() => void save()}>
+            Save
+          </Button>
+        </div>
+      ) : null}
     </div>
   );
 }
