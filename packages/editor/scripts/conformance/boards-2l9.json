@@ -5970,7 +5970,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "One boundary for the whole tab (ProInspector.tsx:389); no per-section \"Retry Typography\"",
+   "verifiedNote": "L-B round 23: not built — per the lead's condition. Sections have no error boundary of their own: one boundary wraps the whole tab body (ProInspector), so a per-section 'Retry Typography' would be a fake today. Building it means a boundary per registry entry in InspectorTabContent first.",
    "tier": "P1"
   },
   {
