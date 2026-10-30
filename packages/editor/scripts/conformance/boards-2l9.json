@@ -1229,8 +1229,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Walked live (round 16): picking the page already on the canvas (Home) still runs the record's guard. Board not fetched (round budget). (the page-over-CMS flow, round 16) | Covered by the built flow, not image-compared (board not fetched): the current page (Home) still asks — walked live (\"You asked to open Home\"). Built 2026-10-30: the Pages drawer opens OVER an open CMS record (useTabSwitchGuard openPagesOverRecord → cmsWorkspace.overPages; StudioPanels keeps the workspace mounted), and a page picked there leaves through the record's own guard (PagesTab openPage → cmsWorkspace.exit(go, { name, exists }) → RecordSheet → RecordLeaveDialog), which follows the REAL save: Saving… while onSave runs, the page opens only after a confirmed save (true), 'queued' when the save returns false (offline mirror), 'Couldn’t save' + Retry save on a thrown save, the server's reason on a refusal, and 'no longer available' when the page is gone by the time the leave lands. Nothing is simulated. Tests RecordSheet ('leaving for a page'). | No record-draft guard when opening a page (save/queued/failed/removed states) (L-C)",
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared 2026-10-30 (round 18), board shots/125-35603.png vs the Vite demo at 1440×900 (Blog record edited, Pages drawer over it, the current page Home picked): 'Leave without saving?' · '… You asked to open Home in Editor.' · 'Home is still the remembered canvas page. Returning to it leaves this record form.' · Keep editing (filled) / Discard changes / Save and leave stacked full width — copy, order and emphasis match. PagesTab passes isCurrent on the exit; RecordLeaveDialog words the current page. The board draws the CMS drawer behind the dialog; live the Pages drawer the page was picked from is open (the drawer is the door, not part of this state). Test RecordSheet '125:35603'.",
    "tier": "P1"
   },
   {
@@ -1263,8 +1263,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Board compared (board shots/126-35760.png): Keep editing on a queued save → 'Record · Offline, save pending', 'Save pending' · 'Cancel unavailable' with the fields read-only. Built partly: the state line reads 'Offline, save pending' and the navigation is dropped with the draft kept; the code does NOT lock the record while a queued mirror waits — the queue replays on reconnect with no completion signal back to the sheet, so a lock could never be released honestly. | Covered by the built flow, not image-compared (board not fetched): Keep editing on a queued save drops the navigation; the queued draft stays (the sheet's offline banner). Built 2026-10-30: the Pages drawer opens OVER an open CMS record (useTabSwitchGuard openPagesOverRecord → cmsWorkspace.overPages; StudioPanels keeps the workspace mounted), and a page picked there leaves through the record's own guard (PagesTab openPage → cmsWorkspace.exit(go, { name, exists }) → RecordSheet → RecordLeaveDialog), which follows the REAL save: Saving… while onSave runs, the page opens only after a confirmed save (true), 'queued' when the save returns false (offline mirror), 'Couldn’t save' + Retry save on a thrown save, the server's reason on a refusal, and 'no longer available' when the page is gone by the time the leave lands. Nothing is simulated. Tests RecordSheet ('leaving for a page'). | No record-draft guard when opening a page (save/queued/failed/removed states) (L-C)",
+   "verified": "drift-fixed",
+   "verifiedNote": "Built + compared 2026-10-30 (round 18): Keep editing on a queued page-leave locks the record to its submitted revision — 'Record · Offline, save pending', fields and Published read-only, 'Save pending' · 'Cancel unavailable' · 'This submitted save can’t be cancelled.', no offline banner. The lock is released only by the sync layer: useQueuedSaveLock subscribes to the retry queue (onCmsSyncError fires on drain) and re-reads cmsSync.isCmsEntrySaveOwed (queue + in-flight + outbox); a conflict answer releases to the conflict choice, a landing to 'Record saved'. Probe cms-workspace&offline=1&siteId (port 5171): real mirror to an absent server queued, lock drawn as the board; Playwright then let the upsert through, dispatched 'online', the queue drained and the lock released with the saved toast. Board shots/126-35760.png side by side with the probe shot: match (probe record stays 'dirty' after landing only because the probe composer's records are static). Test RecordSheet '126:35760'.",
    "tier": "P1"
   },
   {
@@ -7705,8 +7705,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "probe 2026-10-27: banner now sits over the fields and the footer reads 'Offline · Not saved'; the queued (offline) state cannot be produced in the probe — its save mirror has no server and reports reached.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Probe-compared 2026-10-30 (round 18, cms-workspace&offline=1&siteId — the real mirror to an absent server queues) with shots/165-1625.png: the warning banner sits over the fields, 'You’re offline' · 'Your edits are not saved to the server. Keep this tab open.' — copy and placement match; the edits stay in the fields. This board's footer note 'Offline · Not saved' is the record state line at the top since 122:43331 ('Record · Offline, save pending', as 126:35760 draws it). Save record is off in the app once the local write lands (the probe composer keeps static rows, so it stays dirty there). | probe 2026-10-27: banner now sits over the fields and the footer reads 'Offline · Not saved'; the queued (offline) state cannot be produced in the probe — its save mirror has no server and reports reached.",
    "tier": "P1"
   },
   {
@@ -7727,8 +7727,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "lead4 2026-10-27: C-16 closed in chrome-ui (ebb468e88) — Modal title 16/24, frame top at 31vh (279 on 900, probe-measured in tpl-replace-confirm / lf-session-dialog); this board not re-probed. | probe-compared 2026-10-27: Keep editing is the filled primary, Discard changes / Save and leave outlined, dialog 480 wide, copy matches. Open: dialog sits viewport-centred (board top ≈280) and its title is 20px vs board ≈16 — both chrome-ui Modal (REQUESTS C-16).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Probe-compared 2026-10-30 (round 18, cms-workspace&record=post-1, port 5171) with shots/165-2184.png: title edited, Cancel → 'Leave without saving?' · '{record} has unsaved record edits.' · Keep editing (filled, focused) / Discard changes / Save and leave in one right-aligned row; dialog 480 wide at top 279 of 900 (board ≈280), title 16/24 — match. The sheet behind follows the later record board 122:43331 (state line at the top, one 500 column), not this board's two-column form. | lead4 2026-10-27: C-16 closed in chrome-ui (ebb468e88) — Modal title 16/24, frame top at 31vh (279 on 900, probe-measured in tpl-replace-confirm / lf-session-dialog); this board not re-probed. | probe-compared 2026-10-27: Keep editing is the filled primary, Discard changes / Save and leave outlined, dialog 480 wide, copy matches. Open: dialog sits viewport-centred (board top ≈280) and its title is 20px vs board ≈16 — both chrome-ui Modal (REQUESTS C-16).",
    "tier": "P1"
   },
   {
@@ -8525,7 +8525,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Board: grouped source popover (record/list item/specific record/Site/Page, Live=Planned). Code: Collection select only; no Site/Page",
+   "verifiedNote": "Round 18 (L-A, CMS lane): Inspector surface — REQUESTS A-23 to L-B (board shot committed). | Board: grouped source popover (record/list item/specific record/Site/Page, Live=Planned). Code: Collection select only; no Site/Page",
    "tier": "P1"
   },
   {
@@ -8536,7 +8536,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Board lists incompatible fields with reasons; code hides them (CmsBindingSection.tsx:57,132)",
+   "verifiedNote": "Round 18 (L-A, CMS lane): Inspector surface — REQUESTS A-23 to L-B (board shot committed). | Board lists incompatible fields with reasons; code hides them (CmsBindingSection.tsx:57,132)",
    "tier": "P1"
   },
   {
@@ -8547,7 +8547,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (cms-brand): unreachable live — Needs a Blog dynamic template page with a heading bound to Blog.title. QA site has no collection/template; converting a shared QA page was not done (other agents' tabs raised 2 site conflicts). | prior: Lane L-B C-13 (built, not compared): bound — Dynamic bindings heads Content; the property row reads '{Collection} · {field}', the preview value and 'This page’s record · i of N'.",
+   "verifiedNote": "Round 18 (L-A, CMS lane): Inspector surface — REQUESTS A-23 to L-B (board shot committed). | Compared live 2026-10-26 (cms-brand): unreachable live — Needs a Blog dynamic template page with a heading bound to Blog.title. QA site has no collection/template; converting a shared QA page was not done (other agents' tabs raised 2 site conflicts). | prior: Lane L-B C-13 (built, not compared): bound — Dynamic bindings heads Content; the property row reads '{Collection} · {field}', the preview value and 'This page’s record · i of N'.",
    "tier": "P1"
   },
   {
@@ -8558,7 +8558,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (cms-brand): unreachable live — Binding subview needs a bound heading on a collection template page; same blocker as 173:9757. | prior: Lane L-B C-13 (built, not compared): binding subview — see 302:13946.",
+   "verifiedNote": "Round 18 (L-A, CMS lane): Inspector surface — REQUESTS A-23 to L-B (board shot committed). | Compared live 2026-10-26 (cms-brand): unreachable live — Binding subview needs a bound heading on a collection template page; same blocker as 173:9757. | prior: Lane L-B C-13 (built, not compared): binding subview — see 302:13946.",
    "tier": "P1"
   },
   {
@@ -8603,7 +8603,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Canvas record row (Record ‹ › Show drafts) + picker popover absent; code previews first published record only (CmsBindingSection.tsx:178)",
+   "verifiedNote": "Round 18 (L-A): the canvas record bar is L-A's, but the preview choice lives in the engine (CMSBindingManager.resolveBinding previews the first published record) — REQUESTS A-24 to the lead; L-A builds the bar once it exists. | Canvas record row (Record ‹ › Show drafts) + picker popover absent; code previews first published record only (CmsBindingSection.tsx:178)",
    "tier": "P1"
   },
   {
@@ -9130,7 +9130,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Content summary \"1 · Hidden\" + receipt; no condition status in inspector",
+   "verifiedNote": "Round 18 (L-A, CMS lane): Inspector surface — REQUESTS A-23 to L-B (board shot committed). | Content summary \"1 · Hidden\" + receipt; no condition status in inspector",
    "tier": "P1"
   },
   {
@@ -9241,7 +9241,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Board: \"Create collection page / Choose an existing page\"; code only template-page select (DynamicPagesPane.tsx:171)",
+   "verifiedNote": "Built round 18 (L-A), not compared — board shot not fetched (round image budget spent; fetch next round). Start screen when no page is linked: 'Create a page for every {Collection} record' · 'Build one template from {Collection} fields. Each published record gets its own URL.' · Create collection page (primary) / Choose an existing page · 'No pages will be generated until a collection page is linked.' (DynamicPagesStart). | Board: \"Create collection page / Choose an existing page\"; code only template-page select (DynamicPagesPane.tsx:171)",
    "tier": "P1"
   },
   {
@@ -9251,8 +9251,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Create collection page modal (fields→elements, layout); no page generator in code",
+   "verified": "drift-open",
+   "verifiedNote": "Built round 18 (L-A), not compared — board shot not fetched (round image budget spent; fetch next round). CreateCollectionPageDialog: 'Create collection page for {Collection}' · 'Create editable elements from these fields.' · URL pattern (default /{collection}/{slug}, shared cmsPatternError) · Include fields '{Field} · Heading H1 / Text / Rich text / Image' (fields no element can show are not offered) · Layout Article / Profile / Simple · token preview · 'You can edit every element after creation.' · Cancel / Create page. | Create collection page modal (fields→elements, layout); no page generator in code",
    "tier": "P1"
   },
   {
@@ -9262,8 +9262,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Creating page then link; not in code",
+   "verified": "drift-open",
+   "verifiedNote": "Built round 18 (L-A), not compared — board shot not fetched (round image budget spent; fetch next round). 'Creating {page}…' · 'Creating the page, then saving its collection link. Keep this tab open.' · Creating… (disabled) while the page is made and the link's server save runs. | Creating page then link; not in code",
    "tier": "P1"
   },
   {
@@ -9273,8 +9273,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Page created, link not saved + Retry link only; not in code",
+   "verified": "drift-open",
+   "verifiedNote": "Built round 18 (L-A), not compared — board shot not fetched (round image budget spent; fetch next round). A link the server did not confirm (saveCollectionLink: direct mirror, markDirectSync) keeps the page: 'Page created, link not saved' · '{page} is in your pages. Retry saves only the collection link; it will not create another page.' · Retry link save · Open {page} › · 'URL pattern · …'. Test DynamicPagesPane. | Page created, link not saved + Retry link only; not in code",
    "tier": "P1"
   },
   {
@@ -9284,8 +9284,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Retry link saving; not in code",
+   "verified": "drift-open",
+   "verifiedNote": "Built round 18 (L-A), not compared — board shot not fetched (round image budget spent; fetch next round). Retry link save re-sends only the collection (retryCollectionLink) — 'Saving link…' while it runs; no second page. Test DynamicPagesPane. | Retry link saving; not in code",
    "tier": "P1"
   },
   {
@@ -9295,8 +9295,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Generated ordinary page + receipt \"6 pages on publish · Undo\"; not in code",
+   "verified": "drift-open",
+   "verifiedNote": "Built round 18 (L-A), not compared — board shot not fetched (round image budget spent; fetch next round). Create page makes an ordinary page (one transaction: section + one element per field; then one labelled 'Bind {field}' step per binding, to 'this page's record') and opens it: setActivePage + UI_PANEL_OPEN layers; toast '{page} created · N pages on publish'. NOT built: the toast's Undo — the page and its bindings land as several history steps (BaseBindingManager records each bind after its apply), so a one-click Undo of the whole creation would need an engine-level grouped step; ⌘Z walks them back. Tests createCollectionPage (real Composer), DynamicPagesPane. Walked in the Vite demo 2026-10-30: Team collection → Dynamic pages → Create collection page → Create page opened 'Team profile' on the canvas with Layers beside it (Section › bound heading showing the record's value) and the toast 'Team profile created · 1 page on publish'. | Generated ordinary page + receipt \"6 pages on publish · Undo\"; not in code",
    "tier": "P1"
   },
   {
@@ -9328,8 +9328,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Saved link with missing page, publish blocked; partial: RecordTemplatePreviewDialog.tsx:53 only",
+   "verified": "drift-open",
+   "verifiedNote": "Built round 18 (L-A), not compared — board shot not fetched (round image budget spent; fetch next round). A linked page that is gone: 'Collection page missing' · 'The linked page is no longer in your pages. The collection link still exists.' · Choose page / Create collection page · 'Publishing generates none of these until a page is linked.' (the board's 'Publishing is blocked' is not what publish does — it skips the collection; and the code cannot know the page went by Undo, so it does not say so). | Saved link with missing page, publish blocked; partial: RecordTemplatePreviewDialog.tsx:53 only",
    "tier": "P1"
   },
   {
@@ -9384,7 +9384,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Filter rule + category menu; no list filter in code",
+   "verifiedNote": "Round 18 (L-A, CMS lane): Inspector surface — REQUESTS A-23 to L-B (board shot committed). | Filter rule + category menu; no list filter in code",
    "tier": "P1"
   },
   {
@@ -9505,8 +9505,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Recreate missing page modal, exact Cancel; no generator",
+   "verified": "drift-open",
+   "verifiedNote": "Built round 18 (L-A), not compared — board shot not fetched (round image budget spent; fetch next round). Create collection page from the missing state opens the same dialog; Cancel closes it and leaves the missing state as it was. | Recreate missing page modal, exact Cancel; no generator",
    "tier": "P1"
   },
   {
@@ -9605,7 +9605,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Related list record picker keeps query; not in code",
+   "verifiedNote": "Round 18 (L-A, CMS lane): Inspector surface — REQUESTS A-23 to L-B (board shot committed). | Related list record picker keeps query; not in code",
    "tier": "P1"
   },
   {
@@ -9661,7 +9661,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Card Content \"Inside list of Team · This card has no link · Edit link in Behavior ›\"; not in code",
+   "verifiedNote": "Round 18 (L-A, CMS lane): Inspector surface — REQUESTS A-23 to L-B (board shot committed). | Card Content \"Inside list of Team · This card has no link · Edit link in Behavior ›\"; not in code",
    "tier": "P1"
   },
   {

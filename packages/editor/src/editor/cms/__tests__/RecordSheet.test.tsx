@@ -25,6 +25,8 @@ const conflictMock = vi.fn((..._args: unknown[]) => false);
 type Choice = { kind: "entry"; id: string; keepMine: ReturnType<typeof vi.fn>; useTheirs: ReturnType<typeof vi.fn> };
 let claimed: ((c: Choice) => void) | null = null;
 const releaseMock = vi.fn();
+const syncListeners = new Set<() => void>();
+const owedMock = vi.fn((..._args: unknown[]) => true);
 let goneCb: ((g: { kind: "entry" | "collection"; id: string; message: string }) => void) | null = null;
 vi.mock("@/services/cmsSync", async () => {
   const m = await vi.importActual<typeof import("@/services/cmsSync")>("@/services/cmsSync");
@@ -38,7 +40,11 @@ vi.mock("@/services/cmsSync", async () => {
     consumeDirectSync: vi.fn(() => false),
     bindCmsEngine: vi.fn(),
     hydrateCmsFromServer: vi.fn(async () => undefined),
-    onCmsSyncError: () => () => undefined,
+    onCmsSyncError: (cb: () => void) => {
+      syncListeners.add(cb);
+      return () => syncListeners.delete(cb);
+    },
+    isCmsEntrySaveOwed: (...args: unknown[]) => owedMock(...args),
     onCmsConflict: () => () => undefined,
     claimCmsConflict: (_kind: string, _id: string, cb: (c: Choice) => void) => {
       claimed = cb;
@@ -461,6 +467,17 @@ describe("RecordSheet · Leave without saving? with Save and leave (2L9 C1)", ()
       expect(go).toHaveBeenCalledTimes(1);
     });
 
+    it("the page already on the canvas still asks, and says so (125:35603)", async () => {
+      await dirtyRecord();
+      const go = vi.fn();
+      act(() => cmsWorkspace.exit(go, { name: "Home", exists: () => true, isCurrent: true }));
+      expect(screen.getByTestId("cms-leave-body").textContent).toMatch(/You asked to open Home in Editor\.$/);
+      expect(screen.getByTestId("cms-leave-note")).toHaveTextContent(
+        "Home is still the remembered canvas page. Returning to it leaves this record form.",
+      );
+      expect(go).not.toHaveBeenCalled();
+    });
+
     it("Save and leave: Saving… until the save lands, then the page opens", async () => {
       let finish: (v: boolean) => void = () => undefined;
       syncMock.mockImplementationOnce(() => new Promise<boolean>((r) => (finish = r)));
@@ -483,7 +500,37 @@ describe("RecordSheet · Leave without saving? with Save and leave (2L9 C1)", ()
       expect(go).not.toHaveBeenCalled();
     });
 
-    it("a failed save offers Retry save (122:44343)", async () => {
+    it("Keep editing over a queued save holds the revision until the queue lands it (126:35760)", async () => {
+      vi.useFakeTimers({ shouldAdvanceTime: true });
+      try {
+        syncMock.mockImplementationOnce(async () => false);
+        await dirtyRecord();
+        const go = pageExit();
+        fireEvent.click(screen.getByTestId("cms-leave-save"));
+        await waitFor(() => expect(screen.getByTestId("cms-leave-body").textContent).toMatch(/is queued\./));
+        fireEvent.click(screen.getByTestId("cms-leave-keep"));
+        expect(screen.getByTestId("cms-sheet-state")).toHaveTextContent("Record · Offline, save pending");
+        expect(screen.getByTestId("cms-sheet-save")).toHaveTextContent("Save pending");
+        expect(screen.getByTestId("cms-sheet-save")).toBeDisabled();
+        expect(screen.getByTestId("cms-sheet-cancel-unavailable")).toBeDisabled();
+        expect(screen.getByText("This submitted save can’t be cancelled.")).toBeInTheDocument();
+        expect(screen.queryByTestId("cms-sheet-save-banner")).toBeNull();
+        expect(screen.getByTestId("cms-sheet").querySelector("fieldset")).toBeDisabled();
+        /* A failed replay keeps it held; the drain releases it as saved. */
+        await act(async () => { syncListeners.forEach((l) => l()); await vi.advanceTimersByTimeAsync(5); });
+        expect(screen.getByTestId("cms-sheet-save")).toHaveTextContent("Save pending");
+        owedMock.mockReturnValue(false);
+        await act(async () => { syncListeners.forEach((l) => l()); await vi.advanceTimersByTimeAsync(5); });
+        expect(screen.getByTestId("cms-sheet-state")).toHaveTextContent("Record · Saved");
+        expect(screen.getByTestId("cms-sheet").querySelector("fieldset")).not.toBeDisabled();
+        expect(go).not.toHaveBeenCalled();
+      } finally {
+        owedMock.mockReturnValue(true);
+        vi.useRealTimers();
+      }
+    });
+
+        it("a failed save offers Retry save (122:44343)", async () => {
       const { composer } = await dirtyRecord();
       composer.cms.collections.updateContentItem.mockImplementationOnce(() => Promise.reject(new Error("500")));
       const go = pageExit();

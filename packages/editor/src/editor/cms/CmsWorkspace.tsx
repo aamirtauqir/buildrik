@@ -366,7 +366,20 @@ export function CmsWorkspace({ composer, onCreateCollection, onOpenMediaLibrary,
   } else if (ws.tab === "fields") {
     body = <FieldsTable collection={collection} usage={usage} selectedId={selectedField?.id ?? null} onSelect={setFieldId} />;
   } else if (ws.tab === "dynamic-pages") {
-    body = <DynamicPagesPane composer={composer} collection={collection} records={panel.records} />;
+    body = (
+      <DynamicPagesPane
+        composer={composer}
+        collection={collection}
+        records={panel.records}
+        /* 187:21418 — a made collection page opens on the canvas, Layers beside it. */
+        onOpenPage={(pageId) =>
+          cmsWorkspace.exit(() => {
+            composer?.elements.setActivePage(pageId);
+            composer?.emit(EVENTS.UI_PANEL_OPEN, { panel: "layers" });
+          })
+        }
+      />
+    );
   } else if (ws.tab === "settings") {
     body = <CollectionSettingsPane composer={composer} collection={collection} records={panel.records} />;
   } else {
