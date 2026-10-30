@@ -534,10 +534,13 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
         {/* design-2l9 147:75914: the open page heads its tree. */}
         {activePage && !state.searchHook.isSearching && (
           <div className="tw:flex tw:h-8 tw:items-center tw:gap-2 tw:px-3 tw:text-[13px] tw:font-medium tw:text-[var(--bk-ink)]" data-testid="layers-page-row">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="tw:flex-none tw:text-[var(--bk-ink-soft)]">
-              <path d="M14 3H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V9z" />
-              <path d="M14 3v6h6" />
-            </svg>
+            {/* 101:42581: an empty page's row is its name alone. */}
+            {state.layers.length > 0 && (
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="tw:flex-none tw:text-[var(--bk-ink-soft)]">
+                <path d="M14 3H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V9z" />
+                <path d="M14 3v6h6" />
+              </svg>
+            )}
             <span className="tw:truncate">{activePage.name}</span>
           </div>
         )}

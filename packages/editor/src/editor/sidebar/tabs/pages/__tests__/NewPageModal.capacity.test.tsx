@@ -66,6 +66,10 @@ describe("NewPageModal — capacity", () => {
     expect(screen.getByTestId("new-page-create")).toBeDisabled();
     await act(async () => fail(new Error("offline")));
     expect(screen.getByTestId("new-page-capacity")).toHaveTextContent("Couldn’t check page capacityYour page name and navigation choice are retained.");
+    // re-baseline: New page capacity — 101:38980 / 101:39695: the head is red and Retry check comes after Create page.
+    expect(screen.getByTestId("new-page-capacity-head").className).toContain("tw:text-[var(--bk-error-text)]");
+    const foot = screen.getByTestId("modal-foot-new-page-modal");
+    expect(Array.from(foot.querySelectorAll("button")).map((b) => b.textContent)).toEqual(["Cancel", "Create page", "Retry check"]);
     overview.mockResolvedValue({ billing: { plan: "PRO", priceMonthly: 29, pagesPerSite: 30 } });
     fireEvent.click(screen.getByTestId("new-page-capacity-retry"));
     await waitFor(() => expect(screen.getByTestId("new-page-capacity")).toHaveTextContent("3 of 30 pages on Pro"));

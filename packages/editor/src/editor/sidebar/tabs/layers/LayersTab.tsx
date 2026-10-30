@@ -173,13 +173,21 @@ export const LayersTab: React.FC<LayersTabProps> = ({
     matches: null,
   });
 
-  // Subscribe to stats event from LayersPanel
-  React.useEffect(() => {
+  /* Empty only once the tree has reported a count of 0 (101:42581) — before
+     its first report the count is unknown, not zero. */
+  const [pageEmpty, setPageEmpty] = React.useState(false);
+
+  /* Subscribe to stats event from LayersPanel — in a LAYOUT effect: the panel
+     is a child and emits from its own passive effect on mount, which runs
+     before this component's passive effects, so a plain useEffect missed the
+     first count (an empty page then never reported its 0). */
+  React.useLayoutEffect(() => {
     if (!composer) return;
     const onStats = (data: unknown) => {
       const d = data as { total: number; selected: number; matches?: number | null; hiddenIn?: string | null; selectionState?: string | null };
       if (typeof d?.total === "number" && typeof d?.selected === "number") {
         setStats({ total: d.total, selected: d.selected, matches: d.matches ?? null, hiddenIn: d.hiddenIn ?? null, selectionState: d.selectionState ?? null });
+        setPageEmpty(d.total === 0);
       }
     };
     composer.on("layers:stats-change", onStats);
@@ -294,6 +302,8 @@ export const LayersTab: React.FC<LayersTabProps> = ({
         <div className="tw:min-w-0 tw:flex-1">
           <PanelSearch placeholder={LAYERS_SEARCH_PLACEHOLDER} value={search} onChange={setSearch} data-testid="layers-search" />
         </div>
+        {/* 101:42581: an empty page has nothing to display — no View. */}
+        {!pageEmpty && (
         <Button
           type="button"
           color="light"
@@ -308,6 +318,7 @@ export const LayersTab: React.FC<LayersTabProps> = ({
         >
           View
         </Button>
+        )}
       </div>
       <div className="bdc-pbody bdc-pbody-scroll">
         {/* `composer` alone is not "ready": useComposerInit sets it
@@ -338,8 +349,8 @@ export const LayersTab: React.FC<LayersTabProps> = ({
       {/* Board 142:58 Count footer — the node count lives here, not in the
           header subtitle; the header stays a bare label. Gone when the tree
           failed (781:4217), because a count of a list that did not load is
-          not a fact. */}
-      {!treeFailed && (
+          not a fact — nor on an empty page (101:42581 draws none). */}
+      {!treeFailed && !pageEmpty && (
         <div className="bdc-lcount" data-testid="layers-count" aria-live="polite">
           {/* The span is the board's own second node (142:59 inside 142:58):
               the band carries the height, the run carries the type. */}

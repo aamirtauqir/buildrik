@@ -107,10 +107,10 @@ export const PagesTab: React.FC<PagesTabProps> = ({
   openSettingsRequest,
 }) => {
   const p = usePages(composer);
-  /* Board 63:20585: a page that leaves the list and comes back (⌘Z after a
-     delete) is named under the list — "About restored. Page settings and URL
-     retained." — until another page is opened. */
-  const [restored, setRestored] = React.useState<{ id: string; name: string } | null>(null);
+  /* The note under the list, until another page is opened: a page that left
+     the list and came back (⌘Z after a delete, board 63:20585) or a rename
+     that kept its URL (63:23182). */
+  const [notice, setNotice] = React.useState<{ text: string; open?: { id: string; label: string } } | null>(null);
   const seen = React.useRef<{ ids: Set<string>; gone: Set<string> }>({ ids: new Set(), gone: new Set() });
   React.useEffect(() => {
     const now = new Set(p.pages.map((pg) => pg.id));
@@ -121,7 +121,10 @@ export const PagesTab: React.FC<PagesTabProps> = ({
     for (const pg of p.pages) {
       if (gone.has(pg.id)) {
         gone.delete(pg.id);
-        setRestored({ id: pg.id, name: pg.name });
+        setNotice({
+          text: `${pg.name} restored. Page settings and URL retained.`,
+          open: { id: pg.id, label: `Open ${pg.name} in Editor` },
+        });
       }
     }
     seen.current.ids = now;
@@ -295,8 +298,12 @@ export const PagesTab: React.FC<PagesTabProps> = ({
         }
       }
       setNameError(null);
-      const before = p.pages.find((pg) => pg.id === pageId)?.slug;
+      const page = p.pages.find((pg) => pg.id === pageId);
+      const before = page?.slug;
       p.commitRename(pageId, name, updateUrl);
+      if (!updateUrl && page && !page.isHome && trimmed && trimmed !== page.name) {
+        setNotice({ text: `Page renamed. URL kept at ${pageRoute(page)}.` });
+      }
       /* Boards 6887:75724 / 75760 / 79128: "Update URL" lands in Page settings
          with the redirect offer for the URL it just moved off. */
       if (updateUrl && before) {
@@ -644,7 +651,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
           ) : (
           <PageList
             pages={p.pages}
-            restored={restored}
+            notice={notice}
             renamingPageId={p.renamingPageId}
             nameError={nameError}
             loadError={p.loadError}
@@ -660,7 +667,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
             onAddFolder={() => setNewFolderId(f.createFolder("New Folder"))}
             newFolderId={newFolderId}
             onSelectPage={(id) => {
-              setRestored(null);
+              setNotice(null);
               p.selectPage(id);
             }}
             onToggleSelect={handleToggleSelect}
