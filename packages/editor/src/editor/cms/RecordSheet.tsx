@@ -29,6 +29,7 @@ import { recordStatusBadge, recordTitle } from "./RecordsTable";
 import { TypedDeleteDialog } from "./TypedDeleteDialog";
 import { RecordPreview } from "./RecordPreview";
 import { RecordLeaveDialog, type RecordLeavePhase } from "./RecordLeaveDialog";
+import { RecordSheetFooter } from "./RecordSheetFooter";
 import { RecordFieldControl, isEmptyValue, type OpenMediaLibrary } from "./RecordFieldControl";
 import { RecordTemplatePreviewDialog } from "./RecordTemplatePreviewDialog";
 import { applyCmsPattern, cmsSlugField, cmsSlugify } from "@buildrik/shared/schemas/cms";
@@ -65,9 +66,6 @@ export interface RecordSheetProps {
   gone?: boolean;
 }
 
-/* 165:520 footer: Cancel 96 × 32, Save record 160 × 32. */
-const FOOT_BTN_SECONDARY = "tw:h-8 tw:w-24 tw:px-3 tw:py-0 tw:text-[13px] tw:leading-5 tw:font-medium tw:rounded-[6px]";
-const FOOT_BTN_PRIMARY = "tw:h-8 tw:w-40 tw:px-3 tw:py-0 tw:text-[13px] tw:leading-5 tw:font-medium tw:rounded-[6px]";
 /* 8139:217692 — the conflict choice: 32 tall, 12 inline, 13/20 medium. */
 const CHOICE_BTN = "tw:h-8 tw:px-3 tw:py-1 tw:text-[13px] tw:leading-5 tw:font-medium tw:rounded-[6px]";
 
@@ -175,6 +173,14 @@ export function RecordSheet({
   /* 126:36751: a page removed while the leave waited opens nothing — the
      record and its draft stay, and the dialog says so. */
   const [removedTo, setRemovedTo] = React.useState<string | null>(null);
+  /* 128:39584 — after "no longer available", the record says the draft stayed. */
+  const [removedNote, setRemovedNote] = React.useState<string | null>(null);
+  /* 125:35023 / 125:36161: a page leave that waits for the record to become
+     savable — "After saving: Open About" — until Save and leave or Cancel
+     navigation clears it. Real intent: returnTo holds the page. */
+  const [pending, setPending] = React.useState(false);
+  /* 122:43331 — Form / Preview. Preview renders the record from these fields. */
+  const [view, setView] = React.useState<"form" | "preview">("form");
   const goTo = (intent: LeaveIntent) => {
     if (intent.page && !intent.page.exists()) {
       setRemovedTo(intent.page.name);
@@ -319,6 +325,7 @@ export function RecordSheet({
   };
 
   const save = async () => {
+    setPending(false);
     setSaving(true);
     setSaveError(null);
     try {
@@ -383,6 +390,9 @@ export function RecordSheet({
   const nameField = collection.fields.find((f) => f.slug === nameSlug);
   const nameMissing = Boolean(nameField) && isEmptyValue(form[nameSlug]);
   const canSave = !blocked && !noFields && !(!record && nameMissing);
+  /* 128:39389: a published record missing a required field cannot be saved —
+     said before the save, not after a refusal. */
+  const requiredBlock = published && missing.length > 0;
   /* F2.14 — the save behind "Save and leave" did not land: the edits stay,
      the way out waits for Retry and return. */
   const paused = returnTo !== null && saveError !== null && !saving;
@@ -392,6 +402,8 @@ export function RecordSheet({
   /* The page leave follows the real save (RecordLeaveDialog). */
   const leavePhase: RecordLeavePhase | null = removedTo
     ? "removed"
+    : pending
+      ? null
     : leaveTo?.page
       ? "ask"
       : returnTo?.page && saving
@@ -446,27 +458,32 @@ export function RecordSheet({
         }
       }}
     >
-      {/* 165:520 — "‹ Blog records" 61 in, the title 52 after it. */}
-      <div className="tw:flex tw:h-12 tw:flex-none tw:items-center tw:pl-[61px] tw:pr-6">
-        <div className="tw:flex tw:w-[884px] tw:min-w-0 tw:shrink tw:items-center tw:gap-[52px]">
-          <Button
-            size="xs"
-            variant="link"
-            className="tw:h-auto tw:min-h-0 tw:flex-none tw:p-0 tw:text-[13px] tw:font-normal"
-            data-testid="cms-sheet-crumb"
-            onClick={() => guard(onClose)}
-          >
-            ‹ {collection.name} records
-          </Button>
-        <h3 className="tw:m-0 tw:min-w-0 tw:truncate tw:text-[14px] tw:leading-5 tw:font-semibold tw:text-[var(--bk-ink)]" data-testid="cms-sheet-title">
-          {title}
+      {/* design-2l9 122:43331 — "Blog › Studio launch", then the Form /
+          Preview switch; the record menu keeps the far end. */}
+      <div className="tw:flex tw:h-12 tw:flex-none tw:items-center tw:gap-3 tw:pl-6 tw:pr-6">
+        <h3 className="tw:m-0 tw:min-w-0 tw:truncate tw:text-[13px] tw:leading-5 tw:font-semibold tw:text-[var(--bk-ink)]" data-testid="cms-sheet-title">
+          {`${collection.name} › ${title}`}
         </h3>
-        <span className="tw:flex-1" />
         {statusBadge && statusBadge.tone === "warning" ? (
           <span className="tw:flex-none tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-soft)]" data-testid="cms-sheet-status">
             {statusBadge.label}
           </span>
         ) : null}
+        <span className="tw:flex-1 tw:max-w-[392px]" />
+        <div className="tw:flex tw:flex-none tw:items-center tw:gap-1" role="group" aria-label="Record view">
+          {(["form", "preview"] as const).map((v) => (
+            <Button
+              key={v}
+              size="xs"
+              variant={view === v ? "secondary" : "ghost"}
+              aria-pressed={view === v}
+              className="tw:h-8 tw:min-h-0 tw:px-4 tw:text-[13px] tw:font-normal"
+              data-testid={`cms-sheet-view-${v}`}
+              onClick={() => setView(v)}
+            >
+              {v === "form" ? "Form" : "Preview"}
+            </Button>
+          ))}
         </div>
         <span className="tw:flex-1" />
         {record ? (
@@ -490,7 +507,52 @@ export function RecordSheet({
       </div>
 
       <div className="tw:flex tw:min-h-0 tw:flex-1 tw:gap-12 tw:overflow-hidden tw:pl-6 tw:pr-6">
-        <div className="tw:flex tw:min-h-0 tw:min-w-0 tw:max-w-[676px] tw:flex-1 tw:flex-col tw:gap-4 tw:overflow-y-auto tw:pb-4 tw:pt-8">
+        {view === "preview" ? (
+          /* 122:43331 Preview: the record as these fields render it. */
+          <RecordPreview
+            dirty={dirty}
+            collection={collection}
+            form={form}
+            title={title}
+            onPreviewSaved={record ? () => setTemplatePreviewOpen(true) : undefined}
+          />
+        ) : (
+        <div className="tw:flex tw:min-h-0 tw:min-w-0 tw:max-w-[500px] tw:flex-1 tw:flex-col tw:gap-4 tw:overflow-y-auto tw:pb-4 tw:pt-4">
+          <span
+            className={`tw:flex-none tw:text-[12px] tw:leading-[18px] ${
+              saveError && !blocked && saveError !== OFFLINE
+                ? "tw:text-[var(--bk-error-text)]"
+                : dirty && !saving
+                  ? "tw:text-[var(--bk-warning-text)]"
+                  : "tw:text-[var(--bk-ink-soft)]"
+            }`}
+            role={saveError && !blocked && !paused && saveError !== FAILED && saveError !== OFFLINE ? "alert" : undefined}
+            data-testid="cms-sheet-state"
+          >
+            {"Record · "}
+            {gone
+              ? "Your change to it wasn't saved."
+              : conflict
+                ? "Your changes are waiting for a conflict choice."
+                : saving
+                  ? "Saving…"
+                  : paused
+                    ? "Couldn’t save · return paused"
+                    : saveError === FAILED
+                      ? /* 126:35945 — "Record · Couldn’t save — Retry". */
+                        "Couldn’t save — Retry"
+                      : saveError === OFFLINE
+                        ? "Offline, save pending"
+                        : saveError ??
+                          (noFields
+                            ? "Add a field to this collection before saving a record."
+                            : dirty
+                              ? "Unsaved changes"
+                              : record
+                                ? /* 173:16169 */ "Saved"
+                                : "New record · nothing saved yet")}
+          </span>
+
           {paused ? (
             <div className="tw:flex tw:flex-none tw:flex-col tw:gap-0.5 tw:rounded-[6px] tw:bg-[var(--bk-error-tint)] tw:px-4 tw:py-2" role="alert" data-testid="cms-sheet-return-paused">
               <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">
@@ -576,87 +638,36 @@ export function RecordSheet({
               </span>
             </div>
           )}
+          {removedNote ? (
+            <p className="tw:m-0 tw:flex-none tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-warning-text)]" data-testid="cms-sheet-removed-note">
+              {`${removedNote} was removed. Your ${title} draft is retained.`}
+            </p>
+          ) : null}
         </div>
-        <RecordPreview
-          dirty={dirty}
-          collection={collection}
-          form={form}
-          title={title}
-          onPreviewSaved={record ? () => setTemplatePreviewOpen(true) : undefined}
-        />
+        )}
       </div>
 
-      <footer className="tw:flex tw:h-14 tw:flex-none tw:items-center tw:gap-3 tw:pl-6 tw:pr-[44px]">
-        <span className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
-          <span
-            className={`tw:text-[12px] tw:leading-[18px] ${saveError && !blocked && saveError !== OFFLINE ? "tw:text-[var(--bk-error-text)]" : "tw:text-[var(--bk-ink-soft)]"}`}
-            role={saveError && !blocked && !paused && saveError !== FAILED && saveError !== OFFLINE ? "alert" : undefined}
-            data-testid="cms-sheet-state"
-          >
-            {gone
-              ? "Your change to it wasn't saved."
-              : conflict
-                ? "Your changes are waiting for a conflict choice."
-                : saving
-                  ? "Saving…"
-                  : paused
-                    ? "Couldn’t save · return paused"
-                    : saveError === FAILED
-                      ? /* 165:1072 — the banner above says the edits are kept. */
-                        "Couldn’t save"
-                      : saveError === OFFLINE
-                        ? "Offline · Not saved"
-                        : saveError ??
-                          (noFields
-                            ? "Add a field to this collection before saving a record."
-                            : dirty
-                              ? "Unsaved changes"
-                              : record
-                                ? /* 173:16169 */ "Saved"
-                                : "New record · nothing saved yet")}
-          </span>
-          {/* 6749:59940 — a new record says what Save needs and what it does. */}
-          {!record && !saveError && !blocked ? (
-            <span className="tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="cms-sheet-new-hint">
-              {nameMissing ? `Enter a ${nameField?.name ?? "name"} before saving. ` : ""}Save record creates this {singular} with every
-              field above. Publishing the site makes it live.
-            </span>
-          ) : null}
-        </span>
-        {returnTo && saving ? (
-          /* 168:21620 — the way out can be called off while the save runs. */
-          <Button size="xs" variant="secondary" className={FOOT_BTN_SECONDARY} data-testid="cms-sheet-stay" onClick={stayHere}>
-            Cancel
-          </Button>
-        ) : returnCancelled && saving ? (
-          <>
-            <Button size="xs" variant="secondary" className={`${FOOT_BTN_SECONDARY} tw:w-auto!`} disabled data-testid="cms-sheet-cancel-unavailable">
-              Cancel unavailable
-            </Button>
-            <span className="tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-soft)]">This submitted save can’t be cancelled.</span>
-          </>
-        ) : paused ? (
-          <Button size="xs" variant="secondary" className={FOOT_BTN_SECONDARY} data-testid="cms-sheet-cancel-return" onClick={() => holdReturn(null)}>
-            Cancel
-          </Button>
-        ) : (
-          /* 165:797 — Cancel stays usable while a save runs. */
-          <Button size="xs" variant="secondary" className={FOOT_BTN_SECONDARY} data-testid="cms-sheet-cancel" onClick={() => guard(onClose)}>
-            Cancel
-          </Button>
-        )}
-        <Button size="xs" className={FOOT_BTN_PRIMARY} disabled={!canSave || (!dirty && !!record) || saving} data-testid="cms-sheet-save" onClick={() => void save()}>
-          {saving
-            ? "Saving…"
-            : paused
-              ? "Retry and return"
-              : saveError === FAILED && !blocked
-                ? "Retry"
-                : saveError && saveError !== OFFLINE && !blocked
-                  ? "Retry save"
-                  : "Save record"}
-        </Button>
-      </footer>
+      <RecordSheetFooter
+        pendingPage={pending && returnTo?.page && !saving ? returnTo.page.name : null}
+        onCancelNavigation={() => {
+          setPending(false);
+          holdReturn(null);
+        }}
+        saveDisabled={!canSave || requiredBlock || (!dirty && !!record) || saving}
+        saveLeaveDisabled={requiredBlock || !canSave}
+        saveLabel={saving ? "Saving…" : paused ? "Retry and return" : saveError && saveError !== OFFLINE && !blocked ? "Retry save" : "Save record"}
+        onSave={() => void save()}
+        cancel={returnTo && saving ? "stay" : returnCancelled && saving ? "unavailable" : paused ? "drop-return" : "close"}
+        onStay={stayHere}
+        onDropReturn={() => holdReturn(null)}
+        onClose={() => guard(onClose)}
+        requiredNote={requiredBlock && !saving ? `Enter a ${missing[0].name.toLowerCase()} before saving.` : null}
+        newHint={
+          !record && !saveError && !blocked
+            ? `${nameMissing ? `Enter a ${nameField?.name ?? "name"} before saving. ` : ""}Save record creates this ${singular} with every field above. Publishing the site makes it live.`
+            : null
+        }
+      />
 
       {/* 165:2184 · 168:21408 · 173:17098 — "Keep editing" takes focus, and
           Escape / the scrim give the same answer; "Save and leave" saves, then
@@ -720,9 +731,13 @@ export function RecordSheet({
         canSave={canSave}
         keepRef={keepRef}
         onKeepEditing={() => {
-          if (removedTo) setRemovedTo(null);
-          else if (leaveTo) setLeaveTo(null);
+          if (removedTo) {
+            setRemovedNote(removedTo);
+            setRemovedTo(null);
+          } else if (leaveTo) setLeaveTo(null);
           else if (saving) stayHere();
+          /* A refusal keeps the page pending while the record is fixed. */
+          else if (leavePhase === "refused") setPending(true);
           else holdReturn(null);
         }}
         onDiscard={() => {
@@ -735,7 +750,8 @@ export function RecordSheet({
           setLeaveTo(null);
           if (!intent) return;
           holdReturn(intent);
-          void save();
+          if (requiredBlock) setPending(true);
+          else void save();
         }}
         onRetry={() => void save()}
       />

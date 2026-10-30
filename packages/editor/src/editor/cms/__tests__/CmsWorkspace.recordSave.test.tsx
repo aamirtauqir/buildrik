@@ -47,7 +47,7 @@ async function openNewAndSave(composer: unknown) {
   fireEvent.change(await screen.findByLabelText(/Name/), { target: { value: "Hello" } });
   fireEvent.click(screen.getByTestId("cms-sheet-save"));
   /* Settled: queued (offline banner) or refused (the reason in the footer). */
-  await waitFor(() => expect(screen.getByTestId("cms-sheet-state").textContent).toMatch(/Offline · Not saved|already uses/));
+  await waitFor(() => expect(screen.getByTestId("cms-sheet-state").textContent).toMatch(/Offline, save pending|already uses/));
 }
 
 describe("a new record's second save after a queued one (CMS-01)", () => {
@@ -79,7 +79,7 @@ describe("a new record's second save after a queued one (CMS-01)", () => {
     sync.invalid = "Another record already uses the Slug “x”.";
     const { composer } = makeEngine({ collections: [COL] });
     await openNewAndSave(composer);
-    expect(screen.getByTestId("cms-sheet-state").textContent).toBe("Another record already uses the Slug “x”.");
+    expect(screen.getByTestId("cms-sheet-state").textContent).toBe("Record · Another record already uses the Slug “x”.");
   });
 });
 
