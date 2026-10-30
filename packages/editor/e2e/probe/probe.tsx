@@ -838,7 +838,17 @@ function RestoredProbe() {
 
 function ShellProbe() {
   const tab = (new URLSearchParams(location.search).get("tab") ?? "pages") as GroupedTabId;
-  const composer = React.useMemo(() => listingsComposer(), []);
+  const composer = React.useMemo(() => {
+    const c = listingsComposer();
+    /* `?refuse=<page name>`: the engine refuses that page's delete, the one
+       way a real bulk delete partly fails (139:48427). */
+    const refuse = new URLSearchParams(location.search).get("refuse");
+    if (refuse) {
+      const del = c.elements.deletePage.bind(c.elements);
+      c.elements.deletePage = (id: string) => (c.elements.getPage(id)?.name === refuse ? false : del(id));
+    }
+    return c;
+  }, []);
   return (
     <div data-probe="pages-shell" style={{ width: "100vw", height: "100vh" }}>
       <ToastProvider>
@@ -2430,6 +2440,18 @@ const CASES: Record<string, () => React.ReactElement> = {
           onDeviceChange={() => {}}
           pageWidth={1440}
           onCustomWidth={() => {}}
+          /* 153:79518's two guides, as the site would hold them. */
+          guides={{
+            list: [
+              { id: "g-v", type: "vertical", position: 320, locked: false },
+              { id: "g-h", type: "horizontal", position: 120, locked: false },
+            ],
+            add: () => {},
+            update: () => {},
+            setLocked: () => {},
+            remove: () => {},
+            restore: () => {},
+          }}
         />
       </div>
     </div>
