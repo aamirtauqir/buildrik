@@ -97,6 +97,7 @@ import { DSModeProvider } from "@/editor/design-system/state/DSModeContext";
 import { LayerTreeItem } from "@/editor/panels/layers/LayerTreeItem";
 import { renameElement } from "@/editor/panels/layers/hooks/layersPersistence";
 import { PagesTab } from "@/editor/sidebar/tabs/pages/PagesTab";
+import { CanvasEmptyCTA } from "@/editor/canvas/CanvasEmptyCTA";
 import { showInsertReceipt } from "@/editor/sidebar/tabs/build/insertGroupRequest";
 import { LeftSidebar } from "@/editor/sidebar/LeftSidebar";
 import type { GroupedTabId } from "@/editor/rail/tabsConfig";
@@ -2773,6 +2774,13 @@ const CASES: Record<string, () => React.ReactElement> = {
       </ToastProvider>
     </div>
   ),
+  /* design-2l9 101:42581 — the empty canvas CTA inside a 760×580 page card
+     (owner 2026-10-30 keeps its cards and actions). */
+  "canvas-empty": () => (
+    <div data-probe="canvas-empty" style={{ position: "relative", width: 760, height: 580, background: "#fff" }}>
+      <CanvasEmptyCTA onBrowseTemplates={() => {}} onAddBlock={() => {}} onStartBlank={() => {}} />
+    </div>
+  ),
   /* design-2l9 101:42581 — Layers on an empty page ("Services"). */
   "layers-empty": () => {
     const c = new Composer({} as never);
@@ -4420,6 +4428,11 @@ if (name.startsWith("pages-")) {
    its ground and its row rules, and it reaches the app through Topbar, not
    through NotificationPanel. Per-case for the same reason as history.css —
    the file also claims .bk-topbar* and .bk-notif-*. */
+/* Canvas.css carries .bd-canvas-empty-cta; Canvas.tsx imports it, but the
+   canvas-empty case mounts only the CTA. */
+if (name === "canvas-empty") {
+  await import("@/editor/canvas/Canvas.css");
+}
 if (name.startsWith("notifications-")) {
   await import("@/editor/shell/header.css");
 }

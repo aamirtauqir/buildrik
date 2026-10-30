@@ -840,9 +840,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "code:owner-keeps-empty-canvas-actions",
    "verified": "drift-open",
-   "verifiedNote": "Compared 2026-10-30 (board shots/101-42581.png). Layers half fixed (probe layers-empty): the page row is its name alone and 'Empty page · Add elements to begin' sits under it; no View, no count footer on an empty page (the count also now reaches LayersTab on mount — it was missed). Open: the canvas draws only 'Your page is ready' / 'Use Add to insert elements or sections.'; the code still adds three template cards and Browse all templates · Add a block · Start blank — removing the empty page's only doors is waiting on an owner call. The 'Services created · Added to site navigation' receipt is the shared Toast's placement. owner:empty-canvas-actions — the canvas half goes to the owner (lead, round 6); code unchanged.",
+   "verifiedNote": "owner 2026-10-30 — actions kept; layout and copy around them still follow the board. probe-compared 2026-10-30 (cases canvas-empty and layers-empty; board shots/101-42581.png): 'Your page is ready' 16/600 with 'Use Add to insert elements or sections.' straight under it, one left-aligned block whose left edge sits 180 into a 760 page card (board 176 of 752); the three template cards and Browse all templates · Add a block · Start blank share that edge below it (the board draws none of them — owner keeps them, so the block cannot also sit at the card's vertical middle). Layers: the page row is its name alone with 'Empty page · Add elements to begin' under it; no View, no count footer.",
    "tier": "P1"
   },
   {

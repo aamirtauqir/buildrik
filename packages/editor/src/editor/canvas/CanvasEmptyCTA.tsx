@@ -65,6 +65,10 @@ function ctaBoxStyle(span: FrameSpan | null | undefined, scale: number): React.C
   return style;
 }
 
+/* The CTA's column: every part shares one left edge, 400 wide at most — the
+   board's block sits 176 in from a 752 page card. */
+const COLUMN = "tw:flex tw:w-full tw:max-w-[400px] tw:flex-col tw:text-left";
+
 /** The board's three cards. */
 const CARD_COUNT = 3;
 
@@ -85,13 +89,18 @@ export function CanvasEmptyCTA({
       style={ctaBoxStyle(span, scale)}
     >
       <>
-          <p className="bd-canvas-empty-cta__title" data-testid="canvas-empty-cta-title">
-            Your page is ready
-          </p>
-          <p className="bd-canvas-empty-cta__subtitle" data-testid="canvas-empty-cta-subtitle">
-            Use Add to insert elements or sections.
-          </p>
-          <ul className="bd-canvas-empty-cta__cards" data-testid="canvas-empty-cta-cards">
+          {/* 101:42581: the title and its sentence are one left-aligned
+              block, the sentence straight under the title. Owner 2026-10-30
+              keeps the cards and actions below it; they share its left edge. */}
+          <div className={COLUMN} data-testid="canvas-empty-cta-head">
+            <p className="bd-canvas-empty-cta__title" data-testid="canvas-empty-cta-title">
+              Your page is ready
+            </p>
+            <p className="bd-canvas-empty-cta__subtitle" data-testid="canvas-empty-cta-subtitle">
+              Use Add to insert elements or sections.
+            </p>
+          </div>
+          <ul className="bd-canvas-empty-cta__cards tw:max-w-[400px]!" data-testid="canvas-empty-cta-cards">
             {cards.map((t) => (
               <li key={t.id}>
                 <Button
@@ -116,7 +125,7 @@ export function CanvasEmptyCTA({
               </li>
             ))}
           </ul>
-          <div className="bd-canvas-empty-cta__actions" data-testid="canvas-empty-cta-actions">
+          <div className={`bd-canvas-empty-cta__actions ${COLUMN} tw:flex-row! tw:justify-start!`} data-testid="canvas-empty-cta-actions">
             {/* Board 4428:44164: Browse all templates is the primary; Add a
                 block is a bordered secondary; Start blank is a plain text
                 action. */}
