@@ -6,7 +6,7 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect, vi, beforeEach, beforeAll, afterEach } from "vitest";
-import { render, screen, fireEvent, cleanup, waitFor, configure } from "@testing-library/react";
+import { render, screen, within, fireEvent, cleanup, waitFor, configure } from "@testing-library/react";
 import { Composer } from "@/engine/Composer";
 import { FormAfterSubmitSection } from "../FormAfterSubmitSection";
 
@@ -75,7 +75,7 @@ describe("Form › AFTER SUBMIT + PROTECTION", () => {
     await waitFor(() => screen.getByLabelText("Then"));
 
     fireEvent.change(screen.getByLabelText("Then"), { target: { value: "REDIRECT" } });
-    await waitFor(() => expect(screen.getByLabelText("Redirect to")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByTestId("form-redirect-to")).toBeInTheDocument());
     // No network call yet — the row would be `REDIRECT` with no target, which
     // the server schema refuses. Sending it anyway (and the UI just showing
     // REDIRECT as if it saved) was exactly I1's silent-failure bug.
@@ -86,12 +86,13 @@ describe("Form › AFTER SUBMIT + PROTECTION", () => {
     render(<FormAfterSubmitSection elementId="f" composer={project()} isOpen />);
     await waitFor(() => screen.getByLabelText("Then"));
     fireEvent.change(screen.getByLabelText("Then"), { target: { value: "REDIRECT" } });
-    await waitFor(() => screen.getByLabelText("Redirect to"));
+    await waitFor(() => screen.getByTestId("form-redirect-to"));
 
     /* 156:11319: the select's "Custom URL…" opens the URL row. */
-    fireEvent.change(screen.getByLabelText("Redirect to"), { target: { value: "__custom" } });
-    fireEvent.change(screen.getByLabelText("URL"), { target: { value: "https://example.com/thanks" } });
-    fireEvent.blur(screen.getByLabelText("URL"));
+    /* F25: the row opens Choose page or URL; an absolute URL goes through Use URL. */
+    fireEvent.click(screen.getByTestId("form-redirect-to"));
+    fireEvent.change(screen.getByLabelText("Or use an absolute URL"), { target: { value: "https://example.com/thanks" } });
+    fireEvent.click(screen.getByRole("button", { name: "Use URL" }));
     await waitFor(() => expect(api.forms.updateBlock.mutate).toHaveBeenCalledWith(
       expect.objectContaining({
         siteId: "s1",
@@ -106,13 +107,13 @@ describe("Form › AFTER SUBMIT + PROTECTION", () => {
     render(<FormAfterSubmitSection elementId="f" composer={project()} isOpen />);
     await waitFor(() => screen.getByLabelText("Then"));
     fireEvent.change(screen.getByLabelText("Then"), { target: { value: "REDIRECT" } });
-    await waitFor(() => screen.getByLabelText("Redirect to"));
-    fireEvent.change(screen.getByLabelText("Redirect to"), { target: { value: "__custom" } });
-    fireEvent.change(screen.getByLabelText("URL"), { target: { value: "https:/fieldwork" } });
-    fireEvent.blur(screen.getByLabelText("URL"));
+    await waitFor(() => screen.getByTestId("form-redirect-to"));
+    fireEvent.click(screen.getByTestId("form-redirect-to"));
+    fireEvent.change(screen.getByLabelText("Or use an absolute URL"), { target: { value: "https:/fieldwork" } });
+    fireEvent.click(screen.getByRole("button", { name: "Use URL" }));
     expect(screen.getByTestId("form-redirect-url-error")).toHaveTextContent("Enter a complete https:// or http:// URL.");
-    expect(screen.getByLabelText("URL")).toHaveValue("https:/fieldwork");
-    expect(screen.getByLabelText("URL")).toHaveAttribute("aria-invalid", "true");
+    expect(screen.getByLabelText("Or use an absolute URL")).toHaveValue("https:/fieldwork");
+    expect(screen.getByLabelText("Or use an absolute URL")).toHaveAttribute("aria-invalid", "true");
     expect(api.forms.updateBlock.mutate).not.toHaveBeenCalled();
   });
 
@@ -132,7 +133,7 @@ describe("Form › AFTER SUBMIT + PROTECTION", () => {
       ...defaults, successAction: "REDIRECT", redirectUrl: "https://example.com/thanks",
     });
     render(<FormAfterSubmitSection elementId="f" composer={project()} isOpen />);
-    await waitFor(() => screen.getByLabelText("Redirect to"));
+    await waitFor(() => screen.getByTestId("form-redirect-to"));
 
     fireEvent.change(screen.getByLabelText("Then"), { target: { value: "" } });
     await waitFor(() => expect(api.forms.updateBlock.mutate).toHaveBeenCalledWith(
@@ -265,7 +266,7 @@ describe("Form › AFTER SUBMIT + PROTECTION", () => {
     expect(screen.getByTestId("form-settings-status")).toHaveTextContent("Choose a destination to save");
   });
 
-  it("F19: Redirect to lists the site's pages, writes a page's served path, and keeps an outside URL as Custom", async () => {
+  it("F19/F25: the picker lists the site's pages, and a page writes its served path", async () => {
     const composer = project();
     composer.elements.createPage("Thanks");
     const thanks = composer.elements.getAllPages().find((p) => p.name === "Thanks")!;
@@ -273,20 +274,24 @@ describe("Form › AFTER SUBMIT + PROTECTION", () => {
     render(<FormAfterSubmitSection elementId="f" composer={composer} isOpen />);
     await waitFor(() => screen.getByLabelText("Then"));
     fireEvent.change(screen.getByLabelText("Then"), { target: { value: "REDIRECT" } });
-    const select = screen.getByLabelText("Redirect to") as HTMLSelectElement;
-    expect(Array.from(select.options).map((o) => o.textContent)).toEqual(expect.arrayContaining(["Home", "Thanks", "Custom URL…"]));
-    const thanksPath = Array.from(select.options).find((o) => o.textContent === "Thanks")!.value;
-    fireEvent.change(select, { target: { value: thanksPath } });
+    /* F25: the picker lists the site's pages as "{name} · {path}". */
+    fireEvent.click(screen.getByTestId("form-redirect-to"));
+    const rows = within(screen.getByRole("list", { name: "Pages" })).getAllByRole("listitem").map((r) => r.textContent);
+    expect(rows).toEqual(expect.arrayContaining(["Home · /", expect.stringMatching(/^Thanks · \/.+\.html$/)]));
+    const thanksRow = rows.find((t) => t?.startsWith("Thanks"))!;
+    const thanksPath = thanksRow.split(" · ")[1];
+    fireEvent.click(within(screen.getByRole("list", { name: "Pages" })).getAllByRole("listitem").find((r) => r.textContent === thanksRow)!);
     await waitFor(() => expect(api.forms.updateBlock.mutate).toHaveBeenCalledWith(expect.objectContaining({ successAction: "REDIRECT", redirectUrl: thanksPath })));
     expect(thanksPath).toMatch(/^\/.+\.html$/);
   });
 
-  it("F19: a loaded outside URL reads as Custom URL with its value", async () => {
+  it("F19/F25: a loaded outside URL reads as the URL on the row and in the picker's URL field", async () => {
     api.forms.getBlock.query.mockResolvedValue({ ...defaults, successAction: "REDIRECT", redirectUrl: "https://example.com/thanks" });
     render(<FormAfterSubmitSection elementId="f" composer={project()} isOpen />);
-    await waitFor(() => screen.getByLabelText("Redirect to"));
-    expect(screen.getByLabelText("Redirect to")).toHaveValue("__custom");
-    expect(screen.getByLabelText("URL")).toHaveValue("https://example.com/thanks");
+    await waitFor(() => screen.getByTestId("form-redirect-to"));
+    expect(screen.getByTestId("form-redirect-to")).toHaveTextContent("https://example.com/thanks");
+    fireEvent.click(screen.getByTestId("form-redirect-to"));
+    expect(screen.getByLabelText("Or use an absolute URL")).toHaveValue("https://example.com/thanks");
   });
 
   it("F16: loading reads 'Loading form settings…'", () => {

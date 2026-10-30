@@ -4554,8 +4554,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Lane L-B round 16, compared with the board PNG: built — an incomplete custom URL ('https:/fieldwork') is refused on commit with 'Enter a complete https:// or http:// URL.', the field red and its draft kept, nothing saved (unit-tested). Open: the board's destination picker is a popover ('Choose page or URL', search, the pages as 'Home · /', 'Or use an absolute URL', Cancel / Use URL); live is the 'Redirect to' select with 'Custom URL…' opening a URL row.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B round 17, side by side with the board PNG (probe ?block=contact-form&shell=1&siteId&formBlock={REDIRECT, no URL}, Behavior › Redirect to): the row opens 'Choose page or URL' beside the column — 'Search pages…', the site's real pages as '{name} · {path}' (the served paths a link uses), 'Or use an absolute URL', the URL field, Cancel, and 'Use URL'. 'https:/fieldwork' is refused with 'Enter a complete https:// or http:// URL.', the field red, the draft kept, nothing saved (unit-tested). Replaces the select + 'Custom URL…' row. The probe page has one page (Home · /); the board's four are its sample.",
    "tier": "P1"
   },
   {
@@ -4577,8 +4577,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Lane L-B round 16, compared with the board PNG: the board's state is the Redirect row with 'https://fieldwork.test/thanks' and Form settings status 'Saving...' — live writes the action and URL in one call (I1) and the status reads 'Saving…' while it is in flight (unit-tested; FormAfterSubmitSection tests). Not walked live: the probe's tab click did not take in the saving mode this round.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B round 17, side by side with the board PNG (probe contact-form, formBlock {REDIRECT https://fieldwork.test/thanks}, formMode=saving, Send to edited): Redirect · the URL on the row, Notifications, Spam protection, Form settings status 'Saving…' while the bundled save is in flight. The board's grey value box is the picker row's own look live (PickRow with its chevron).",
    "tier": "P1"
   },
   {
@@ -4810,8 +4810,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No \"Unapplied font size\" Keep editing / Revert and switch guard",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B round 17, side by side with the board PNG (probe ?type=text&styles={font-size:24px}: Font size '24pxx' + Enter, then the Behavior tab): the tab does not switch; 'Unapplied font size' / 'Text has an invalid Font size draft: “24pxx”. Keep editing it, or revert to the applied 24px before switching tabs.' · Keep editing · Revert and switch. Keep editing stays; Revert and switch puts 24px back and switches (walked live: lands on Behavior). The number field holds its unreadable entry for the guard (unappliedDraft; unit-tested). Difference: the board makes Keep editing the blue button; live the confirm (Revert and switch) is primary, so Escape / closing never reverts.",
    "tier": "P1"
   },
   {
@@ -4944,8 +4944,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No Play/Stop canvas preview",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B round 17, side by side with the board PNG (probe ?type=text&canvasParent&interactions=[scroll-into-view], open it, Play): the editor's player is the interaction's CSS animation on the canvas node (it ends filled); Play becomes Stop with 'Previewing on the canvas. Stopping restores the authored appearance.', and Stop (or leaving the screen) takes the animation off the node. Unit-tested.",
    "tier": "P1"
   },
   {
@@ -4966,8 +4966,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No missing-target fallback state",
+   "verified": "drift-fixed",
+   "verifiedNote": "Lane L-B round 17, side by side with the board PNG (probe ?interactions=[{target:'#gone'}], open it): Animate reads 'Missing target' and 'The saved target no longer exists. Output falls back to Text until you choose a target.' (warning ink). From the real lookup: a saved selector target that matches nothing on the canvas page — the published runtime animates the element itself then (interactionRuntime `target`). A selector that matches reads as itself, no warning (unit-tested).",
    "tier": "P1"
   },
   {

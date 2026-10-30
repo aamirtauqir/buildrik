@@ -27,7 +27,8 @@ import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
 import type { DeviceType } from "@/shared/types";
 import type { BreakpointId } from "@/shared/types/breakpoints";
 import type { IconConfig, MediaAsset, MediaAssetType } from "@/shared/types/media";
-import { Tabs, useToast } from "@/editor/chrome-ui";
+import { ConfirmDialog, Tabs, useToast } from "@/editor/chrome-ui";
+import { getUnappliedDraft, type UnappliedDraft } from "./shared/controls/unappliedDraft";
 import { useComposerSelection } from "../canvas/hooks/useComposerSelection";
 import { useProjectLoading } from "../shell/hooks/useProjectLoading";
 import { useSaveConflict } from "../shell/hooks/useSaveConflict";
@@ -342,6 +343,30 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     advancedState,
   });
 
+  /* 2L9 I05: leaving a tab with an unreadable entry asks first. */
+  const [leaving, setLeaving] = React.useState<{ tab: TabId; draft: UnappliedDraft } | null>(null);
+  const requestTab = (tab: TabId) => {
+    const draft = getUnappliedDraft();
+    if (draft && tab !== activeTab) setLeaving({ tab, draft });
+    else setActiveTab(tab);
+  };
+  const leaveGuard = leaving ? (
+    <ConfirmDialog
+      open
+      onClose={() => setLeaving(null)}
+      onConfirm={() => {
+        leaving.draft.revert();
+        setActiveTab(leaving.tab);
+        setLeaving(null);
+      }}
+      title={`Unapplied ${leaving.draft.label.toLowerCase()}`}
+      message={`${getLayerName(composer?.elements.getElement(selectedElement?.id ?? "")) ?? elementTypeLabel(selectedElement?.type ?? "")} has an invalid ${leaving.draft.label} draft: “${leaving.draft.draft}”. Keep editing it, or revert to the applied ${leaving.draft.applied} before switching tabs.`}
+      cancelLabel="Keep editing"
+      confirmLabel="Revert and switch"
+      testId="inspector-unapplied-guard"
+    />
+  ) : null;
+
   /* Board 159:102 — while the site is still arriving there is nothing to
      select; an empty canvas message would read as "your site is empty". */
   if (projectLoading && !selectedElement)
@@ -434,13 +459,14 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
             <Tabs
               tabs={INSPECTOR_TABS}
               value={activeTab}
-              onChange={(id) => setActiveTab(id as TabId)}
+              onChange={(id) => requestTab(id as TabId)}
               label="Inspector tabs"
               panelId="inspector-tabpanel"
               data-testid="inspector-tab-strip"
               className="tw:h-10 tw:px-3 tw:py-1 tw:gap-1 tw:border-0"
               tabClassName={INSPECTOR_TAB_CLASS}
             />
+            {leaveGuard}
             {showContextRow ? (
               <ContextRow
                 state={currentPseudoState}

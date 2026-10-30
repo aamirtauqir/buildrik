@@ -45,18 +45,18 @@
  *
  * @license BSD-3-Clause
  */
-import { InspectorFieldContext } from "@/editor/inspector/shared/controls/InspectorFieldContext";
+import { InspectorFieldContext, useInspectorField } from "@/editor/inspector/shared/controls/InspectorFieldContext";
 import { useOnlineStatus } from "@/shared/hooks/useOnlineStatus";
 import * as React from "react";
 import type { Composer } from "@/engine";
 import { getBuildrikClient } from "@/services/api-client";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
-import { Button } from "@/editor/chrome-ui";
+import { Button, Popover, TextField } from "@/editor/chrome-ui";
 import { Section, SelectRow, type SectionTier } from "../shared/controls";
-import { GROUP_TITLE } from "../shared/controls/controlClasses";
+import { GROUP_TITLE, WIDE_BUTTON } from "../shared/controls/controlClasses";
 import { pageFileNames } from "@/engine/export/pageFiles";
-import { CommitRow, NoteRow } from "./behaviourRows";
+import { CommitRow, NoteRow, PickRow } from "./behaviourRows";
 import { CheckRow } from "../shared/controls/CheckRow";
 
 export interface FormAfterSubmitSectionProps {
@@ -97,62 +97,123 @@ function valuesEqual(a: unknown, b: unknown): boolean {
   return normalize(a) === normalize(b);
 }
 
-const CUSTOM = "__custom";
-
 /** A page's served path, as the published site writes it (`pageFileNames`):
  *  the home page is "/", every other "/<slug>.html". */
 const pagePath = (file: string) => (file === "index.html" ? "/" : `/${file}`);
 
 /**
- * "Redirect to" (2L9 156:11319, F19): the site's pages in one select, the
- * same list a link chooses from, then "Custom URL…" for anything else — a
- * value that is not one of the pages is a custom URL.
+ * "Redirect to" (2L9 F25, 159:8570): the row opens "Choose page or URL" beside
+ * the column — a search, the site's real pages as "{name} · {path}" (the
+ * same served paths a link uses), then "Or use an absolute URL" with its
+ * own Use URL. A value that is not one of the pages is a URL.
  */
 function RedirectRow({ composer, value, onCommit }: { composer: Composer | null; value: string; onCommit: (v: string) => void }) {
+  const field = useInspectorField();
   const pages = composer?.elements.getAllPages() ?? [];
   const files = pageFileNames(pages);
   const options = pages.map((p) => ({ value: pagePath(files.get(p.id) ?? "index.html"), label: p.name }));
-  const onPage = options.some((o) => o.value === value);
-  const [custom, setCustom] = React.useState(Boolean(value) && !onPage);
+  const current = options.find((o) => o.value === value);
+  const [open, setOpen] = React.useState(false);
+  const [query, setQuery] = React.useState("");
+  const [url, setUrl] = React.useState(current ? "" : value);
   const [urlError, setUrlError] = React.useState(false);
   const urlErrorId = React.useId();
+  const shown = options.filter((o) => `${o.label} ${o.value}`.toLowerCase().includes(query.trim().toLowerCase()));
+
+  const close = () => {
+    setOpen(false);
+    setQuery("");
+    setUrlError(false);
+  };
+  const choose = (v: string) => {
+    onCommit(v);
+    close();
+  };
+  const applyUrl = () => {
+    /* An incomplete URL is refused here, the draft kept, nothing saved. */
+    if (!COMPLETE_URL.test(url.trim())) return setUrlError(true);
+    choose(url.trim());
+  };
+
   return (
-    <>
-      <SelectRow
-        label="Redirect to"
-        value={custom ? CUSTOM : onPage ? value : ""}
-        placeholder="Choose page or URL…"
-        options={[...options, { value: CUSTOM, label: "Custom URL…" }]}
-        onChange={(v) => {
-          setCustom(v === CUSTOM);
-          if (v && v !== CUSTOM) onCommit(v);
-        }}
-      />
-      {custom && (
-        <>
-          <CommitRow
-            label="URL"
-            type="text"
-            placeholder="https://example.com/thanks"
-            value={onPage ? "" : value}
-            onCommit={(v) => {
-              /* 2L9 F25: an incomplete URL is refused here, the draft kept
-                 in the field, nothing saved. */
-              if (v.trim() && !COMPLETE_URL.test(v.trim())) return setUrlError(true);
-              setUrlError(false);
-              onCommit(v);
+    <Popover
+      open={open}
+      onClose={close}
+      placement="bottom-end"
+      beside=".layout-shell__inspector"
+      label="Choose page or URL"
+      block
+      className="tw:w-[240px] tw:p-2"
+      trigger={
+        <div className="tw:min-w-0 tw:flex-1">
+          <PickRow
+            label="Redirect to"
+            value={current ? current.label : value || "Choose page or URL…"}
+            onOpen={() => {
+              if (!field.readOnly) setOpen((v) => !v);
             }}
-            onDraft={() => setUrlError(false)}
-            error={urlError ? { id: urlErrorId } : null}
+            testId="form-redirect-to"
           />
-          {urlError ? (
-            <p id={urlErrorId} role="alert" className="tw:m-0 tw:pb-1 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-error-text)]" data-testid="form-redirect-url-error">
-              Enter a complete https:// or http:// URL.
-            </p>
-          ) : null}
-        </>
-      )}
-    </>
+        </div>
+      }
+    >
+      <div className="tw:flex tw:flex-col tw:gap-1" data-testid="form-redirect-picker">
+        <div className="tw:px-1 tw:pb-1 tw:text-[12px] tw:font-semibold tw:text-[var(--bk-ink)]">Choose page or URL</div>
+        <TextField
+          aria-label="Search pages"
+          placeholder="Search pages…"
+          className="bdi-text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
+        <div className="tw:flex tw:flex-col" role="list" aria-label="Pages">
+          {shown.map((o) => (
+            <Button
+              key={o.value}
+              type="button"
+              variant="ghost"
+              size="xs"
+              role="listitem"
+              aria-current={o.value === value || undefined}
+              className="tw:h-8 tw:w-full tw:justify-start tw:px-1 tw:text-[12px] tw:font-normal tw:text-[var(--bk-ink)]"
+              onClick={() => choose(o.value)}
+            >
+              {o.label} · {o.value}
+            </Button>
+          ))}
+          {shown.length === 0 ? <NoteRow>No page matches “{query}”.</NoteRow> : null}
+        </div>
+        <label htmlFor="form-redirect-url" className="tw:px-1 tw:pt-1 tw:text-[12px] tw:text-[var(--bk-ink-muted)]">
+          Or use an absolute URL
+        </label>
+        <TextField
+          id="form-redirect-url"
+          className={`bdi-text${urlError ? " tw:border-[var(--bk-error)]!" : ""}`}
+          placeholder="https://example.com/thanks"
+          value={url}
+          aria-invalid={urlError || undefined}
+          aria-describedby={urlError ? urlErrorId : undefined}
+          onChange={(e) => {
+            setUrl(e.target.value);
+            setUrlError(false);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") applyUrl();
+          }}
+        />
+        <Button type="button" variant="ghost" size="xs" className="tw:h-8 tw:w-full tw:justify-start tw:px-1 tw:text-[12px] tw:font-normal" onClick={close}>
+          Cancel
+        </Button>
+        {urlError ? (
+          <p id={urlErrorId} role="alert" className="tw:m-0 tw:px-1 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-error-text)]" data-testid="form-redirect-url-error">
+            Enter a complete https:// or http:// URL.
+          </p>
+        ) : null}
+        <Button color="light" size="xs" className={WIDE_BUTTON} disabled={!url.trim()} onClick={applyUrl} data-testid="form-redirect-use-url">
+          Use URL
+        </Button>
+      </div>
+    </Popover>
   );
 }
 

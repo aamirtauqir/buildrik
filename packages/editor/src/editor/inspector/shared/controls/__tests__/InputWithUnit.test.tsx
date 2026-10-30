@@ -7,7 +7,7 @@
  * @license BSD-3-Clause
  */
 
-import { cleanup, render, screen, fireEvent } from "@testing-library/react";
+import { act, cleanup, render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import * as React from "react";
 import { InputWithUnit, parseEntry } from "../InputControls";
@@ -311,5 +311,20 @@ describe("InputWithUnit — a unit change that converts (2L9 I07)", () => {
     );
     fireEvent.change(screen.getByRole("combobox", { name: "Width unit" }), { target: { value: "vw" } });
     expect(announce).not.toHaveBeenCalled();
+  });
+});
+
+describe("InputWithUnit — an unreadable entry is held for the tab guard (2L9 I05)", () => {
+  it("registers while invalid with label, draft and applied value; revert restores; clears once fixed", async () => {
+    const { getUnappliedDraft } = await import("../unappliedDraft");
+    render(<InputWithUnit label="Font size" value="24px" onChange={vi.fn()} />);
+    const input = screen.getByRole("textbox", { name: /^Font size/ });
+    fireEvent.change(input, { target: { value: "24pxx" } });
+    fireEvent.keyDown(input, { key: "Enter" });
+    const held = getUnappliedDraft();
+    expect(held).toMatchObject({ label: "Font size", draft: "24pxx", applied: "24px" });
+    act(() => held!.revert());
+    expect(input).toHaveValue("24");
+    expect(getUnappliedDraft()).toBeNull();
   });
 });

@@ -2851,10 +2851,10 @@ const CASES: Record<string, () => React.ReactElement> = {
     const interactionsQ = q.get("interactions");
     if (interactionsQ)
       el.setInteractions(
-        (JSON.parse(interactionsQ) as Array<{ trigger: string; preset?: string; enabled?: boolean }>).map((it, i) => ({
+        (JSON.parse(interactionsQ) as Array<{ trigger: string; preset?: string; enabled?: boolean; target?: string }>).map((it, i) => ({
           id: `probe-interaction-${i}`,
           trigger: it.trigger,
-          animation: { preset: it.preset ?? "fadeIn", duration: 600, delay: 0, easing: "power2.out" },
+          animation: { preset: it.preset ?? "fadeIn", duration: 600, delay: 0, easing: "power2.out", ...(it.target ? { target: it.target } : {}) },
           enabled: it.enabled !== false,
         })),
       );

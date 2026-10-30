@@ -12,6 +12,7 @@
  * @license BSD-3-Clause
  */
 
+import { setUnappliedDraft } from "./unappliedDraft";
 import { isTokenVar, resolveTokenVar } from "../tokenBindingDetection";
 import { ChevronDown, ChevronUp, Info } from "lucide-react";
 import * as React from "react";
@@ -296,6 +297,13 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
     setInvalid(false);
   }, [shown]);
 
+  /* 2L9 I05: while the entry is unreadable, the tab strip asks before
+     leaving it (ProInspector). */
+  const owner = React.useMemo(() => Symbol(label || property || "field"), [label, property]);
+  React.useEffect(() => {
+    setUnappliedDraft(owner, invalid ? { label: label || ariaLabel || "Value", draft: text, applied: value, revert: () => restore() } : null);
+    return () => setUnappliedDraft(owner, null);
+  });
   const restore = () => {
     setText(shown);
     setInvalid(false);
