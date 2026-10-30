@@ -102,6 +102,13 @@ describe("InspectorHeader", () => {
     });
   });
 
+  it("S22: the element's own lock reads 'Read only · {name} is locked' on every tab, with no state Select", () => {
+    heading.setLocked(true);
+    mount();
+    expect(rowOf("inspector-editing-row").textContent).toBe("Read only · Heading is locked");
+    expect(screen.queryByRole("combobox")).toBeNull();
+  });
+
   it('the Editing select is reachable by Tab and labelled "Editing"', async () => {
     const user = userEvent.setup();
     mount();

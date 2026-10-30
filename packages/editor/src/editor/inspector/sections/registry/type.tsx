@@ -55,7 +55,8 @@ export const TYPE_SECTIONS: Record<string, AnySectionEntry> = {
   "type-layout": defineSection({
     tab: "style",
     title: "Type",
-    frameTitle: (ctx) => elementTypeLabel(ctx.selectedElement.type),
+    /* 2L9 A02: a grid's block is "Grid layout". */
+    frameTitle: (ctx) => (ctx.caps.typeBlock === "grid" ? "Grid layout" : elementTypeLabel(ctx.selectedElement.type)),
     open: "always",
     capability: (caps) => hasBody(caps) && LAYOUT_TYPE_BLOCKS.has(caps.typeBlock!),
     Component: TypeBlockSection,

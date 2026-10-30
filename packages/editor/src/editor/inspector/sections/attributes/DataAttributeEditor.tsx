@@ -10,6 +10,9 @@ import * as React from "react";
 import type { Composer } from "@/engine";
 import { Button, TextInput } from "@/editor/chrome-ui";
 import { writeElement } from "@/engine/commands/commandOperations";
+import { CommitRow, NoteRow } from "../behaviourRows";
+import { useElementVersion } from "../typeBlock/bodies/bodyRows";
+import { WIDE_BUTTON } from "@/editor/inspector/shared/controls/controlClasses";
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -102,5 +105,55 @@ export const DataAttributeEditor: React.FC<DataAttributeEditorProps> = ({
     </div>
   );
 };
+
+/** The aria-* / data-* attributes the element really carries (editor
+ *  markers excluded). */
+export function customAttributesOf(attrs: Readonly<Record<string, string>>): [string, string][] {
+  return Object.entries(attrs).filter(([k]) => (k.startsWith("aria-") || k.startsWith("data-")) && !k.startsWith("data-buildrick") && !k.startsWith("data-bk-"));
+}
+
+/**
+ * 2L9 A11 `247:26594` "Custom attributes · {n} set": each aria-* / data-*
+ * attribute the element has, its value editable (one step each); an
+ * attribute authored empty says so and can be removed; the element's
+ * internal id is shown read-only — it is not an attribute anyone may edit.
+ */
+export function CustomAttributesList({ elementId, composer }: DataAttributeEditorProps) {
+  useElementVersion(composer);
+  const el = composer?.elements.getElement(elementId);
+  if (!composer || !el) return null;
+  const list = customAttributesOf(el.getAttributes?.() ?? {});
+  const write = (label: string, fn: (e: NonNullable<typeof el>) => void) => writeElement(composer, el, label, fn);
+  return (
+    <div className="tw:flex tw:flex-col tw:gap-1 tw:pb-2" data-testid="inspector-custom-attributes">
+      <div className="tw:flex tw:items-center tw:justify-between tw:pt-1">
+        <span className="tw:text-[13px] tw:font-semibold tw:leading-5 tw:text-[var(--bk-ink)]">Custom attributes</span>
+        <span className="tw:text-[12px] tw:text-[var(--bk-ink-muted)]">{list.length} set</span>
+      </div>
+      {list.map(([key, value]) => (
+        <React.Fragment key={key}>
+          <CommitRow label={key} value={value} onCommit={(v) => write("attribute-change", (e) => e.setAttribute(key, v))} testId={`custom-attr-${key}`} />
+          {value === "" ? (
+            <>
+              <NoteRow>Empty is authored empty. Remove deletes the attribute.</NoteRow>
+              <Button color="light" size="xs" className={WIDE_BUTTON} onClick={() => write("attribute-remove", (e) => e.removeAttribute(key))} data-testid={`custom-attr-remove-${key}`}>
+                Remove {key}
+              </Button>
+            </>
+          ) : null}
+        </React.Fragment>
+      ))}
+      <div className="bdi-row-ctrl">
+        <span className="bdi-lb">Internal ID</span>
+        <span className="bdi-row-content">
+          <span className="tw:flex tw:h-7 tw:min-w-0 tw:flex-1 tw:items-center tw:truncate tw:rounded-[4px] tw:bg-[var(--bk-bg-subtle)] tw:px-2 tw:text-[12px] tw:text-[var(--bk-ink-muted)]" data-testid="custom-attr-internal-id">
+            {el.getId()}
+          </span>
+        </span>
+      </div>
+      <NoteRow>Internal identity is protected.</NoteRow>
+    </div>
+  );
+}
 
 export default DataAttributeEditor;

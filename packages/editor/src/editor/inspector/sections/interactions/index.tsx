@@ -10,11 +10,11 @@ import * as React from "react";
 import { Section } from "@/editor/inspector/shared/controls";
 import { AddInteractionPanel } from "./AddInteractionPanel";
 import { InteractionItem } from "./InteractionItem";
-import { ElementAnimationRow, ElementAnimationEditor } from "./ElementAnimationRow";
+import { animatedProperties, ElementAnimationRow, ElementAnimationEditor, type AnimationConflict } from "./ElementAnimationRow";
 import { InteractionEditor } from "./InteractionEditor";
 import { DEFAULT_ANIMATION_CONFIG, type AnimationPreset } from "@/engine/interactions/types";
 import { DEFAULT_ANIMATION, type AnimationConfig } from "@/shared/types/animations";
-import { type Interaction, type InteractionTrigger, type InteractionsSectionProps } from "./types";
+import { type Interaction, type InteractionTrigger, type InteractionsSectionProps, ANIMATION_PRESETS, getTriggerInfo } from "./types";
 import { Button, useToast } from "@/editor/chrome-ui";
 import { LockRefusalNote, setLockRefusal, useLockRefusal } from "@/editor/inspector/components/LockRefusal";
 import { closeSubview, openSubview } from "@/editor/inspector/tabs/subviewStore";
@@ -31,6 +31,21 @@ export { AddInteractionPanel } from "./AddInteractionPanel";
 // ============================================================================
 // COMPONENT
 // ============================================================================
+
+/** 2L9 A10: enabled interactions that animate a property the element's CSS
+ *  animation also animates — named "{trigger} · {preset}". */
+function animationConflicts(animation: AnimationConfig, interactions: readonly Interaction[]): AnimationConflict[] {
+  const mine = animatedProperties(animation.type);
+  const out: AnimationConflict[] = [];
+  for (const i of interactions) {
+    if (!i.enabled) continue;
+    const shared = [...animatedProperties(i.animation.preset)].find((p) => mine.has(p));
+    if (!shared) continue;
+    const preset = ANIMATION_PRESETS.find((p) => p.value === i.animation.preset)?.label ?? i.animation.preset;
+    out.push({ id: i.id, label: `${getTriggerInfo(i.trigger).label} · ${preset}`, property: shared });
+  }
+  return out;
+}
 
 export const InteractionsSection: React.FC<InteractionsSectionProps> = ({
   interactions: interactionsProp,
@@ -203,6 +218,11 @@ export const InteractionsSection: React.FC<InteractionsSectionProps> = ({
             {back(backToList, () => setAnimationOpen(false))}
             <ElementAnimationEditor
               animation={editingAnimation}
+              conflicts={animationConflicts(editingAnimation, interactions)}
+              onInspect={(id) => {
+                setAnimationOpen(false);
+                setEditingId(id);
+              }}
               onChange={(next) => {
                 onAnimationChange(next);
                 if (!next) setAnimationOpen(false);

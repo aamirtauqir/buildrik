@@ -47,6 +47,9 @@ describe("Shadow — layer rows (2L9 161:12525)", () => {
     const p = props({ "box-shadow": "0 1px 2px red, inset 0 2px 4px blue" });
     render(<ShadowSection {...p} />);
     expect(screen.getByText("2 layers")).toBeInTheDocument();
+    /* A08: several layers read back as authored first; Edit layers opens them. */
+    expect(screen.getByTestId("inspector-shadow-summary")).toHaveTextContent("0 1px 2px red, inset 0 2px 4px blue");
+    fireEvent.click(screen.getByRole("button", { name: "Edit layers" }));
     fireEvent.click(screen.getByRole("button", { name: "Remove layer 2" }));
     expect(p.onChange).toHaveBeenLastCalledWith("box-shadow", "0px 1px 2px 0px red");
   });
@@ -99,13 +102,16 @@ describe("Filters — blur and the rest, merged into one filter value", () => {
 });
 
 describe("Transform & motion", () => {
-  it("rotate keeps scale; the transition rows write their longhands", () => {
+  it("A08: Scale reads as a percent; rotate keeps scale; the transition rows write their longhands", () => {
     const p = props({ transform: "scale(1.5)" });
     render(<TransformMotionSection {...p} />);
-    fireEvent.change(screen.getByLabelText("Rotate"), { target: { value: "45" } });
+    expect(screen.getByLabelText("Scale")).toHaveValue("150");
+    const rotate = screen.getByLabelText("Rotate");
+    fireEvent.change(rotate, { target: { value: "45" } });
+    fireEvent.blur(rotate);
     expect(p.onChange).toHaveBeenCalledWith("transform", "scale(1.5) rotate(45deg)");
-    fireEvent.change(screen.getByLabelText("Animate"), { target: { value: "opacity" } });
-    expect(p.onChange).toHaveBeenLastCalledWith("transition-property", "opacity");
+    fireEvent.change(screen.getByLabelText("Property"), { target: { value: "transform, opacity" } });
+    expect(p.onChange).toHaveBeenLastCalledWith("transition-property", "transform, opacity");
   });
 
   /* QA 2026-10-02: unset Move X / Move Y / Duration / Delay showed "0px",
@@ -127,8 +133,11 @@ describe("Advanced", () => {
     render(<EffectsAdvancedSection {...p} />);
     fireEvent.change(screen.getByLabelText("Cursor"), { target: { value: "pointer" } });
     expect(p.onChange).toHaveBeenCalledWith("cursor", "pointer");
-    fireEvent.change(screen.getByLabelText("Blend"), { target: { value: "multiply" } });
+    fireEvent.change(screen.getByLabelText("Blend mode"), { target: { value: "multiply" } });
     expect(p.onChange).toHaveBeenLastCalledWith("mix-blend-mode", "multiply");
+    /* A09: Will change is written as typed — a list like "transform, opacity". */
+    fireEvent.change(screen.getByLabelText("Will change"), { target: { value: "transform, opacity" } });
+    expect(p.onChange).toHaveBeenLastCalledWith("will-change", "transform, opacity");
   });
 });
 

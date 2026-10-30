@@ -87,9 +87,9 @@ describe("LayoutSection — Position, and no size", () => {
 
   it("overflow and visibility are not here — they are Advanced layout", () => {
     renderLayout({}, { onAdvancedToggle: vi.fn(), advancedExpanded: true });
-    expect(screen.queryByText("Overflow")).not.toBeInTheDocument();
+    expect(screen.queryByText("Overflow X")).not.toBeInTheDocument();
     render(<LayoutAdvancedSection styles={{}} onChange={vi.fn()} isOpen />);
     expect(screen.getByText("Advanced layout")).toBeInTheDocument();
-    expect(screen.getByText("Overflow")).toBeInTheDocument();
+    expect(screen.getByText("Overflow X")).toBeInTheDocument();
   });
 });

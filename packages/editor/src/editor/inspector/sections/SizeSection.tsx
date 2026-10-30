@@ -24,7 +24,7 @@ import { TokenPickerPopover } from "../shared/TokenPickerPopover";
 import { isTokenVar, resolveTokenVar } from "../shared/tokenBindingDetection";
 import { ButtonGroup, InputWithUnit, MoreSettingsToggle, Section, SelectRow } from "../shared/controls";
 import { useInspectorField } from "../shared/controls/InspectorFieldContext";
-import { CHAIN_BOUND, CHAIN_ROW, CHAIN_TRIGGER } from "../shared/controls/controlClasses";
+import { CHAIN_BOUND, CHAIN_ROW, CHAIN_TRIGGER, GROUP_TITLE } from "../shared/controls/controlClasses";
 import { resolveTokenLiteral } from "@buildrik/shared/tokens";
 
 // ============================================================================
@@ -306,6 +306,8 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
       {fit && (
         <ButtonGroup label="Fit" property="object-fit" value={styles["object-fit"] ?? ""} options={FIT_OPTIONS} onChange={(v) => onChange("object-fit", v)} />
       )}
+      {/* 2L9 A03: the limits are headed "Size constraints". */}
+      {advancedExpanded && LIMITS.some((l) => !hidden(l.property)) ? <div className={GROUP_TITLE}>Size constraints</div> : null}
       {advancedExpanded &&
         LIMITS.filter((l) => !hidden(l.property)).map((l) => (
           <InputWithUnit

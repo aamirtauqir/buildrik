@@ -1,7 +1,7 @@
 /**
  * ItemControls — how an element sits inside a flex or grid PARENT, as its
  * own section while the parent is one (2L9 247:22853 "Flex item": Grow ·
- * Shrink · Basis · Order · Align self; a grid child: Column span · Row span
+ * Shrink · Basis · Order · Align self; a grid child (A02): Column · Row
  * · Align self · Justify self). Before 2L9 these sat in Size, Grow and Align
  * self on the face and the rest behind More settings; the board draws the
  * group whole.
@@ -39,14 +39,6 @@ const GRID_SELF_OPTIONS = [
   { value: "end", label: "End" },
   { value: "stretch", label: "Stretch" },
 ];
-const SPAN_OPTIONS = [
-  { value: "span 1", label: "1" },
-  { value: "span 2", label: "2" },
-  { value: "span 3", label: "3" },
-  { value: "span 4", label: "4" },
-  { value: "1 / -1", label: "Full row" },
-];
-
 const numberOrEmpty = (v: string) => (v === "" || /^\d*\.?\d+$/.test(v) ? v : null);
 
 function ItemControls({ parent, styles, onChange }: ItemControlsProps) {
@@ -56,26 +48,11 @@ function ItemControls({ parent, styles, onChange }: ItemControlsProps) {
   };
 
   if (parent === "grid") {
-    const withCurrent = (value: string) =>
-      value && !SPAN_OPTIONS.some((o) => o.value === value) ? [...SPAN_OPTIONS, { value, label: value }] : SPAN_OPTIONS;
+    /* 2L9 A02: Column / Row are the written placement ("2 / span 2"). */
     return (
       <>
-        <SelectRow
-          label="Column span"
-          property="grid-column"
-          value={styles["grid-column"] || ""}
-          options={withCurrent(styles["grid-column"] || "")}
-          placeholder="Auto"
-          onChange={(v) => onChange("grid-column", v)}
-        />
-        <SelectRow
-          label="Row span"
-          property="grid-row"
-          value={styles["grid-row"] || ""}
-          options={withCurrent(styles["grid-row"] || "")}
-          placeholder="Auto"
-          onChange={(v) => onChange("grid-row", v)}
-        />
+        <InputRow label="Column" property="grid-column" placeholder="auto" value={styles["grid-column"] || ""} onChange={(v) => onChange("grid-column", v)} />
+        <InputRow label="Row" property="grid-row" placeholder="auto" value={styles["grid-row"] || ""} onChange={(v) => onChange("grid-row", v)} />
         <SelectRow label="Align self" property="align-self" value={styles["align-self"] || "auto"} options={GRID_SELF_OPTIONS} onChange={(v) => onChange("align-self", v)} />
         <SelectRow label="Justify self" property="justify-self" value={styles["justify-self"] || "auto"} options={GRID_SELF_OPTIONS} onChange={(v) => onChange("justify-self", v)} />
       </>

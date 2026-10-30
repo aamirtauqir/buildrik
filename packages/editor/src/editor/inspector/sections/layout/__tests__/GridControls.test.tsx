@@ -48,15 +48,17 @@ describe("GridControls — board 17", () => {
     expect(onChange.mock.calls.every(([, v]) => v !== "repeat(0, 1fr)" && v !== "repeat(-1, 1fr)")).toBe(true);
   });
 
-  it("More settings: custom tracks, rows, flow, alignment, row / column gap", () => {
+  it("A02: Tracks, Rows, Flow, Align / Justify rows on the face; More settings: row / column gap and item alignment", () => {
     const { onChange } = renderGrid();
-    fireEvent.click(screen.getByRole("button", { name: "More settings" }));
-    fireEvent.change(screen.getByLabelText("Column tracks"), { target: { value: "250px 1fr" } });
+    fireEvent.change(screen.getByLabelText("Align rows"), { target: { value: "center" } });
+    expect(onChange).toHaveBeenLastCalledWith("align-content", "center");
+    fireEvent.change(screen.getByLabelText("Tracks"), { target: { value: "250px 1fr" } });
     expect(onChange).toHaveBeenLastCalledWith("grid-template-columns", "250px 1fr");
     fireEvent.change(screen.getByLabelText("Rows"), { target: { value: "auto 1fr" } });
     expect(onChange).toHaveBeenLastCalledWith("grid-template-rows", "auto 1fr");
     fireEvent.change(screen.getByLabelText("Flow"), { target: { value: "column" } });
     expect(onChange).toHaveBeenLastCalledWith("grid-auto-flow", "column");
+    fireEvent.click(screen.getByRole("button", { name: "More settings" }));
     fireEvent.change(screen.getByLabelText("Column gap"), { target: { value: "12" } });
     expect(onChange).toHaveBeenLastCalledWith("column-gap", "12px");
     fireEvent.click(screen.getByRole("button", { name: "justify: center, align: center" }));
