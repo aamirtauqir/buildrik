@@ -31,7 +31,7 @@ import { Tabs } from "@/editor/chrome-ui";
 import { useComposerSelection } from "../canvas/hooks/useComposerSelection";
 import { useProjectLoading } from "../shell/hooks/useProjectLoading";
 import { useSaveConflict } from "../shell/hooks/useSaveConflict";
-import { ApplyStyleDialog } from "./components/ApplyStyleDialog";
+import { openSubview } from "./tabs/subviewStore";
 import { ContextRow } from "./components/ContextRow";
 import { getLayerName } from "../panels/layers/hooks/layersPersistence";
 import { ComponentRow } from "./sections/ComponentRow";
@@ -134,11 +134,13 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     };
   }, [composer]);
 
-  /* ⋯ "Apply style to all … on this page" asks for its confirm (DD-6b). */
-  const [applyStyleFor, setApplyStyleFor] = React.useState<string | null>(null);
+  /* ⋯ "Apply style to all … on this page" reviews first, as the tab's body
+     (2L9 S11 — it was a confirm dialog, DD-6b). */
   React.useEffect(() => {
     if (!composer) return;
-    const onRequest = (p: { elementId?: string }) => setApplyStyleFor(p?.elementId ?? null);
+    const onRequest = (p: { elementId?: string }) => {
+      if (p?.elementId) openSubview({ kind: "apply-style", elementId: p.elementId });
+    };
     composer.on(EVENTS.UI_APPLY_STYLE_REQUESTED, onRequest);
     return () => {
       composer.off(EVENTS.UI_APPLY_STYLE_REQUESTED, onRequest);
@@ -372,13 +374,6 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
   return withViewOnly(
     <InspectorFieldContext.Provider value={fieldContext}>
       <div className="bdi-panel" data-testid="inspector-panel" data-readonly={readOnly || undefined}>
-        <ApplyStyleDialog
-          composer={composer}
-          elementId={applyStyleFor}
-          breakpoint={currentBreakpoint}
-          pseudo={currentPseudoState}
-          onClose={() => setApplyStyleFor(null)}
-        />
         {/* Live region for the selection announcement. */}
         <div role="status" aria-live="polite" aria-atomic="true" className="bdi-sr-only">
           {elementTypeLabel(selectedElement.type)} selected
@@ -457,6 +452,8 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
                 >
                   <InspectorTabContent
                     tabId={activeTab}
+                    breakpoint={currentBreakpoint}
+                    pseudoState={currentPseudoState}
                     composer={composer}
                     selectedElement={selectedElement}
                     selectedIds={targetIds}

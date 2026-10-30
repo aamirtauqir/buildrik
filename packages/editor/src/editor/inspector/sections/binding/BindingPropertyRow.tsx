@@ -14,7 +14,7 @@
  *
  * @license BSD-3-Clause
  */
-import { ChevronRight, Database } from "lucide-react";
+import { MoreHorizontal, Database } from "lucide-react";
 import * as React from "react";
 import type { Composer } from "@/engine";
 import { IconButton } from "@/editor/chrome-ui";
@@ -112,14 +112,17 @@ export function BindingPropertyRow({ composer, elementId, onOpenCreateCollection
 
   return (
     <>
-      <div className="bdi-row-ctrl tw:items-start" data-testid="binding-row">
-        <span className="bdi-lb">{label}</span>
+      {/* 2L9 255:93321 (D01) / 173:9757 (B5-D04): the property's name, then
+          the binding as one full-width tinted card — source, value, ⋯ — and
+          where its record comes from under it. */}
+      <div className="tw:flex tw:flex-col tw:gap-1.5 tw:py-1" data-testid="binding-row">
+        <span className="tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)]">{label}</span>
         <div
           role="button"
           tabIndex={0}
           aria-label={`${label} binding · ${sourceLabel(state)} — open binding`}
           data-testid="binding-open"
-          className="bdi-row-content tw:flex tw:cursor-pointer tw:items-start tw:gap-1 tw:rounded-[4px] tw:hover:bg-[var(--bk-bg-subtle)] tw:focus-visible:outline-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]"
+          className="tw:flex tw:cursor-pointer tw:items-center tw:gap-2 tw:rounded-[4px] tw:bg-[var(--bk-accent-subtle)] tw:px-2 tw:py-1.5 tw:hover:brightness-[0.98] tw:focus-visible:outline-none tw:focus-visible:[box-shadow:var(--bk-shadow-focus)]"
           onClick={() => openSubview({ kind: "binding", elementId })}
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.key === " ") {
@@ -128,19 +131,19 @@ export function BindingPropertyRow({ composer, elementId, onOpenCreateCollection
             }
           }}
         >
-          <span className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:text-[12px] tw:leading-4">
-            <span className="tw:truncate tw:font-medium tw:text-[var(--bk-accent-text)]" data-testid="binding-source">
+          <span className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:leading-4">
+            <span className="tw:truncate tw:text-[13px] tw:text-[var(--bk-ink)]" data-testid="binding-source">
               {sourceLabel(state)}
             </span>
-            <span className="tw:truncate tw:text-[var(--bk-ink)]" data-testid="binding-preview">
+            <span className="tw:truncate tw:text-[12px] tw:text-[var(--bk-ink-soft)]" data-testid="binding-preview">
               {state.status?.kind === "loading" ? "Loading…" : state.status && state.status.kind !== "empty-fallback" ? "Preview unavailable" : state.preview?.value || state.binding.fallback || "—"}
             </span>
-            <span className="tw:truncate tw:text-[11px] tw:text-[var(--bk-ink-muted)]" data-testid="binding-context">
-              {contextLine(state)}
-            </span>
           </span>
-          <ChevronRight size={12} aria-hidden="true" className="tw:mt-0.5 tw:shrink-0 tw:text-[var(--bk-ink-muted)]" />
+          <MoreHorizontal size={14} aria-hidden="true" className="tw:shrink-0 tw:text-[var(--bk-ink-soft)]" />
         </div>
+        <span className="tw:truncate tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="binding-context">
+          {contextLine(state)}
+        </span>
       </div>
       {status ? (
         <>

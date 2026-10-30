@@ -2663,6 +2663,13 @@ const CASES: Record<string, () => React.ReactElement> = {
     const bp = (q.get("bp") ?? "desktop") as "desktop" | "tablet" | "mobile";
     const bpStyles = q.get("bpStyles");
     if (bpStyles && bp !== "desktop") c.styles.setBreakpointStyle(el.getId(), bp, JSON.parse(bpStyles) as Record<string, string>);
+    /* `?peers=3&lockedPeers=1` — same-kind elements on the page (S11). */
+    for (let i = 0; i < Number(q.get("peers") ?? 0) + Number(q.get("lockedPeers") ?? 0); i++) {
+      const peer = c.elements.createElement(type as never, { content: `Peer ${i + 1}` } as never);
+      c.elements.addElement(peer, page.root.id);
+      c.elements.getElement(peer.getId())?.setTagName(el.getTagName());
+      if (i >= Number(q.get("peers") ?? 0)) c.elements.getElement(peer.getId())?.setLocked(true);
+    }
     /* `?hoverStyles={…}` — the element's :hover rule (S13). */
     const hoverStyles = q.get("hoverStyles");
     if (hoverStyles) c.styles.setRule(`[data-buildrick-id="${el.getId()}"]`, JSON.parse(hoverStyles) as Record<string, string>, { pseudo: ":hover" });
