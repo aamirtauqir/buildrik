@@ -2137,7 +2137,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "probe-compared 2026-10-30 (case canvas-grid-panel, View; board shots/145-64586.png): fixed the head — 'Canvas view' 13/600 and a text Close, as Grid and snapping (was a small-caps label). Round 10: the Rulers row reads 'Rulers and guides' (the rulers are where guides are placed; no '…' — it toggles, the board's guide-detail dialog (S11) does not exist). Focus mode left out: owner:focus-mode (open owner decision). Still open: the board's 'Canvas view preferences' foot (no destination exists); the shared MenuItem's checkbox squares and the chord hints the board omits; Spacing/Badges/X-Ray kept (code-ahead). | lead4 2026-10-27 (A-14): the View menu opens downward from the top bar.",
+   "verifiedNote": "Round 28: the board's Focus mode row is out by owner decision (founder:no-focus-mode, 2026-10-30). Still open for: the 'Canvas view preferences' foot (no destination exists), the shared MenuItem's checkbox squares and chord hints the board omits; Spacing/Badges/X-Ray kept (code-ahead). Head fixed and compared 2026-10-30 (canvas-grid-panel, View).",
    "tier": "P1"
   },
   {
@@ -3692,9 +3692,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "founder:no-focus-mode",
    "verified": "drift-open",
-   "verifiedNote": "Search exists; no macOS/Windows key toggle or single-key preference",
+   "verifiedNote": "Owner 2026-10-30 (via coordinator): no Focus mode, so the shortcut sheet has no Focus mode entry to search for; the sheet itself is covered by its other rows.",
    "inheritsFrom": "263:255899",
    "tier": "P2"
   },
@@ -21781,9 +21781,9 @@
    "page": "07",
    "family": "recovery",
    "status": "active",
-   "authority": "board",
+   "authority": "founder:no-focus-mode",
    "verified": "no",
-   "verifiedNote": "No hide-all-panels mode or \"Show panels\" control anywhere in shell",
+   "verifiedNote": "Owner 2026-10-30 (via coordinator): no Focus mode — the hide-all-panels mode and its 'Show panels' control are not built.",
    "tier": "P2"
   },
   {
@@ -23146,9 +23146,9 @@
    "page": "09",
    "family": "play",
    "status": "active",
-   "authority": "board",
+   "authority": "founder:unsourced-list-is-a-tip",
    "verified": "drift-open",
-   "verifiedNote": "Round 25, probe-compared (issues-cards): the card layout matches — red-tint blocker card '✕ <sentence>' / location / Fix ›, grey tips. The 'collection list has no source' issue now exists (useIssuesFeed, A-35, from composer.cms.bindings), but as a TIP until the owner decides whether publish refuses it — so this board's '1 issue blocks publishing' is not what the editor says for it today. Open on that owner decision; the message is 'Collection list has no source' (the list's layer name is not in the exported element data).",
+   "verifiedNote": "Owner 2026-10-30 (via coordinator): a collection list with no source is a tip, never a publish blocker. The editor raises it as a tip (useIssuesFeed, A-35) and the Issues cards match the board's layout (round 25, probe issues-cards); the board's '1 issue blocks publishing' is overridden by this decision.",
    "tier": "P1"
   },
   {
