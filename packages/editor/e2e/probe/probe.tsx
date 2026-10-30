@@ -3145,7 +3145,19 @@ const CASES: Record<string, () => React.ReactElement> = {
         if (conditionQ) c.cms.bindings.setCondition(el.getId(), JSON.parse(conditionQ));
         if (q.get("legacyCondition"))
           el.setDataBinding("condition", { type: "condition", sourceId: "", path: "", condition: { operator: "exists", left: "opening_hours.sunday" } } as never);
-        if (q.get("cms") !== "unbound" && !q.get("unbound")) c.cms.bindings.bindToField(el.getId(), col.id, q.get("cms") === "template" ? undefined : item?.id, "title", "content" as never);
+        /* `&bindState=` — the binding's status lines (B5-D11–D15): `empty`
+           (the record's title blank, fallback "Untitled article"), `loading`
+           (records never arrive), `fail` (the load rejects), `missing` (bound
+           to a field the collection lacks), `incompatible` (title is now an
+           image field). */
+        const bindState = q.get("bindState");
+        if (bindState === "empty" && item) await c.cms.collections.updateContentItem(item.id, { title: "" } as never);
+        if (bindState === "incompatible")
+          await c.cms.collections.updateCollection(col.id, { fields: [{ id: "f-title", name: "Title", slug: "title", type: "image" }] } as never);
+        if (bindState === "loading") c.cms.collections.getContentItems = (() => new Promise(() => undefined)) as never;
+        if (bindState === "fail") c.cms.collections.getContentItems = (() => Promise.reject(new Error("offline"))) as never;
+        if (q.get("cms") !== "unbound" && !q.get("unbound"))
+          c.cms.bindings.bindToField(el.getId(), col.id, q.get("cms") === "template" ? undefined : item?.id, bindState === "missing" ? "gone" : "title", "content" as never, bindState === "empty" ? "Untitled article" : undefined);
         c.selection.select(el);
       })();
     }

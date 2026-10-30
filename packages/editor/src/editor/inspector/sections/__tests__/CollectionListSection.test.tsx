@@ -20,7 +20,7 @@ const MENU = {
   ],
 };
 
-function makeComposer(bound: { collectionId: string; limit?: number } | null = null) {
+function makeComposer(bound: { collectionId: string; limit?: number; sort?: Array<{ field: string; dir: "asc" | "desc" }> } | null = null) {
   const bindCollectionList = vi.fn();
   const unbindCollection = vi.fn();
   const setListQuery = vi.fn(() => true);
@@ -113,6 +113,19 @@ describe("CollectionListSection", () => {
     const at = ["Source", "+ New collection…", "Open collection", "Filter", "+ Add filter", "Match", "Sort", "Direction", "+ Then by", "Show", "Skip"].map((t) => text.indexOf(t));
     expect(at.every((i) => i >= 0)).toBe(true);
     expect([...at].sort((a, b) => a - b)).toEqual(at);
+  });
+
+  it("2L9 B5-D79: with three sort keys a band counts them under the first key, and + Then by is gone", () => {
+    const sort = [{ field: "_updated", dir: "desc" as const }, { field: "name", dir: "asc" as const }, { field: "_created", dir: "desc" as const }];
+    renderSection(makeComposer({ collectionId: "menu", sort }).composer);
+    expect(screen.getByTestId("collection-sort-count")).toHaveTextContent("3 sort keys");
+    expect(screen.getAllByRole("combobox", { name: "Then by" })).toHaveLength(2);
+    expect(screen.queryByTestId("collection-then-by")).toBeNull();
+  });
+
+  it("one sort key: no count band", () => {
+    renderSection(makeComposer({ collectionId: "menu" }).composer);
+    expect(screen.queryByTestId("collection-sort-count")).toBeNull();
   });
 
   it("Open collection › opens the CMS on the bound collection's table, naming where it came from (C-11)", () => {

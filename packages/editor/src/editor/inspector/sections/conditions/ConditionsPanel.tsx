@@ -46,10 +46,19 @@ const PLAIN =
 const NOTE = "tw:m-0 tw:py-1 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 const CARD = "tw:flex tw:flex-col tw:gap-1 tw:rounded-[6px] tw:bg-[var(--bk-bg-subtle)] tw:p-2";
 
+/** Rules whose field the collection no longer has (2L9 B5-D35 / D45 / D58);
+ *  a dotted path names its field by the first segment. */
+function missingRules(state: Pick<ConditionsState, "condition" | "collection">): Array<{ rule: CmsConditionRule; i: number }> {
+  if (!state.condition || !state.collection) return [];
+  const slugs = new Set(state.collection.fields.map((f) => f.slug));
+  return state.condition.rules.map((rule, i) => ({ rule, i })).filter(({ rule }) => !slugs.has(rule.field.split(".")[0]));
+}
+
 /** "1 · Hidden" — what the closed row says. */
-export function conditionsSummary(state: Pick<ConditionsState, "condition" | "passes" | "legacy">): string | null {
+export function conditionsSummary(state: Pick<ConditionsState, "condition" | "passes" | "legacy" | "collection">): string | null {
   if (state.condition) {
     const n = state.condition.rules.length;
+    if (missingRules(state).length > 0) return `${n} · Needs repair`;
     return state.passes === null ? `${n}` : `${n} · ${state.passes ? "Shown" : "Hidden"}`;
   }
   if (state.legacy) return "1 · Inactive";
@@ -175,6 +184,7 @@ export function ConditionsPanel({ composer, elementId }: { composer: Composer | 
   const state = useConditions(composer, elementId);
   const { addToast } = useToast();
   const [reviewLegacy, setReviewLegacy] = React.useState(true);
+  const rulesRef = React.useRef<HTMLDivElement>(null);
   const back = () => closeSubview("conditions");
 
   const write = (next: CmsCondition | null, label: string, receipt: string) => {
@@ -276,6 +286,11 @@ export function ConditionsPanel({ composer, elementId }: { composer: Composer | 
   }
 
   const failing = state.failing;
+  /* 2L9 B5-D35 / D45: a rule whose field the collection no longer has. The
+     shared evaluator reads it as empty, so the live result is the same as
+     the canvas's — the line says which, not the board's "will show". */
+  const missing = missingRules(state);
+  const focusField = (i: number) => rulesRef.current?.querySelector<HTMLSelectElement>(`[data-rule-index="${i}"] select`)?.focus();
   return (
     <div className="tw:flex tw:flex-col tw:gap-2 tw:px-3 tw:py-2" data-testid="conditions-panel">
       {header}
@@ -289,10 +304,28 @@ export function ConditionsPanel({ composer, elementId }: { composer: Composer | 
         ]}
         onChange={(match) => state.set({ ...state.condition!, match: match as "all" | "any" }, "Edit visibility condition")}
       />
-      {state.condition.rules.map((rule, i) => (
-        <RuleCard key={i} rule={rule} fields={state.collection?.fields ?? []} onChange={(r) => editRule(i, r)} onRemove={() => removeRule(i)} />
-      ))}
-      {state.passes === false ? (
+      <div ref={rulesRef} className="tw:flex tw:flex-col tw:gap-2">
+        {state.condition.rules.map((rule, i) => (
+          <div key={i} data-rule-index={i}>
+            <RuleCard rule={rule} fields={state.collection?.fields ?? []} onChange={(r) => editRule(i, r)} onRemove={() => removeRule(i)} />
+          </div>
+        ))}
+      </div>
+      {missing.length > 0 ? (
+        <div data-testid="conditions-missing">
+          {missing.map(({ rule, i }) => (
+            <p key={i} className={NOTE}>
+              {rule.field.split(".").pop()} no longer exists —{" "}
+              <Button type="button" variant="link" size="xs" className="tw:inline tw:h-auto tw:p-0 tw:text-[12px] tw:font-normal" onClick={() => focusField(i)}>
+                Choose field
+              </Button>
+            </p>
+          ))}
+          {state.passes !== null ? (
+            <p className={NOTE}>Read as empty on the live site — this element will {state.passes ? "show" : "hide"}.</p>
+          ) : null}
+        </div>
+      ) : state.passes === false ? (
         <div data-testid="conditions-result">
           {failing ? (
             <p className={NOTE}>
@@ -304,9 +337,13 @@ export function ConditionsPanel({ composer, elementId }: { composer: Composer | 
           <p className={NOTE}>Hidden on this record — showing as ghost.</p>
         </div>
       ) : state.passes === true ? (
-        <p className={NOTE} data-testid="conditions-result">
-          Shown on this record.
-        </p>
+        <div data-testid="conditions-result">
+          {/* 2L9 B5-D46: one "is set" rule names what made it true. */}
+          {state.condition.rules.length === 1 && state.condition.rules[0].op === "set" ? (
+            <p className={NOTE}>{ruleLabel(state.condition.rules[0], state.collection)} is set. This condition is true.</p>
+          ) : null}
+          <p className={NOTE}>Shown on this record and in published output.</p>
+        </div>
       ) : null}
       <Button color="light" size="xs" className={PLAIN} onClick={addRule} data-testid="conditions-add-rule">
         + Add rule

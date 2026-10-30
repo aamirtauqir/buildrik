@@ -21,6 +21,13 @@ import { CommitRow, NoteRow } from "./behaviourRows";
 import { CheckRow } from "../shared/controls/CheckRow";
 import { isEmail, isPhoneNumber } from "@/shared/utils/helpers/validation";
 import { writeElement } from "@/engine/commands/commandOperations";
+import { Button } from "@/editor/chrome-ui";
+import { cmsWorkspace } from "@/editor/cms/cmsWorkspaceStore";
+import { WIDE_BUTTON } from "../shared/controls/controlClasses";
+import { RECORD_PAGE_HREF as RECORD_HREF, useCmsBinding } from "./binding/useCmsBinding";
+import { useInspectorField } from "../shared/controls/InspectorFieldContext";
+import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
+import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
 
 export interface LinkSectionProps {
   selectedElement: {
@@ -39,7 +46,9 @@ export interface LinkSectionProps {
 /** "example.com", "www.example.co.uk/menu" — a host with a TLD, no scheme. */
 const BARE_DOMAIN = /^[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,}(:\d+)?([/?#]\S*)?$/i;
 
-type LinkType = "none" | "page" | "url" | "email" | "phone" | "anchor";
+type LinkType = "none" | "record" | "page" | "url" | "email" | "phone" | "anchor";
+
+
 
 const ErrorText: React.FC<{ message: string }> = ({ message }) => (
   <p role="alert" className="tw:m-0 tw:pb-1 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-error-text)]">
@@ -81,6 +90,10 @@ export const LinkSection: React.FC<LinkSectionProps> = ({
   const [anchorError, setAnchorError] = React.useState(false);
 
   const isLinkable = LINKABLE_TYPES.has(selectedElement.type);
+  const { listCollection } = useCmsBinding(composer, selectedElement.id);
+  const recordPages = Boolean(listCollection?.pageSlugPattern);
+  const { announce } = useInspectorField();
+  const linkName = (el: Element | null | undefined) => (el ? getLayerName(el) ?? elementTypeLabel(el.getType()) : "Element");
   /* Rel is read off the element on render; an undo / redo re-renders it. */
   const [, refresh] = React.useReducer((n: number) => n + 1, 0);
   React.useEffect(() => {
@@ -129,6 +142,8 @@ export const LinkSection: React.FC<LinkSectionProps> = ({
     // Determine link type from href
     if (!href) {
       setLinkType("none");
+    } else if (href === RECORD_HREF) {
+      setLinkType("record");
     } else if (href.startsWith("#page:")) {
       setLinkType("page");
       setSelectedPageId(href.replace("#page:", ""));
@@ -188,7 +203,8 @@ export const LinkSection: React.FC<LinkSectionProps> = ({
     const el = selectedElement?.id ? composer?.elements.getElement(selectedElement.id) : null;
     if (!composer || !el) return;
     const href =
-      type === "page" && selectedPageId ? `#page:${selectedPageId}`
+      type === "record" && recordPages ? RECORD_HREF
+      : type === "page" && selectedPageId ? `#page:${selectedPageId}`
       : type === "url" && /^https?:\/\//.test(externalUrl) ? externalUrl
       : type === "email" && isEmail(emailAddress) ? `mailto:${emailAddress}`
       : type === "phone" && isPhoneNumber(phoneNumber) ? `tel:${phoneNumber}`
@@ -203,6 +219,8 @@ export const LinkSection: React.FC<LinkSectionProps> = ({
     });
     /* The UI follows the write: a locked element keeps its displayed type. */
     if (!ran) return;
+    /* B5-D92: "Card linked to its record page · Undo". */
+    if (href === RECORD_HREF) announce(`${linkName(el)} linked to its record page`);
     setLinkType(type as LinkType);
     if (noTab) setTarget("_self");
   };
@@ -269,7 +287,7 @@ export const LinkSection: React.FC<LinkSectionProps> = ({
   if (!isLinkable) return null;
 
   const rel = composer?.elements.getElement(selectedElement.id)?.getAttribute?.("rel") || "";
-  const opensInTab = linkType === "page" || linkType === "url" || linkType === "anchor";
+  const opensInTab = linkType === "record" || linkType === "page" || linkType === "url" || linkType === "anchor";
   const pageOptions = pages.map((page) => ({ value: page.id, label: page.name }));
 
   return (
@@ -280,9 +298,19 @@ export const LinkSection: React.FC<LinkSectionProps> = ({
         label="Link to"
         value={linkType === "none" ? "" : linkType}
         onChange={(v) => handleLinkTypeChange(v || "none")}
-        options={LINK_TYPE_OPTIONS}
+        options={listCollection ? [{ value: "record", label: "This record\u2019s page" }, ...LINK_TYPE_OPTIONS] : LINK_TYPE_OPTIONS}
         placeholder="None"
       />
+
+      {linkType === "record" && listCollection ? (
+        recordPages ? (
+          <NoteRow testId="link-record-note">
+            Each {listCollection.name} {linkName(composer?.elements.getElement(selectedElement.id)).toLowerCase()} opens its own generated page.
+          </NoteRow>
+        ) : (
+          <NoteRow testId="link-record-note">{listCollection.name} has no page per record.</NoteRow>
+        )
+      ) : null}
 
       {linkType === "page" && (
         <SelectRow label="Page" value={selectedPageId} onChange={handlePageSelect} options={pageOptions} placeholder="Choose a page…" />
@@ -324,11 +352,29 @@ export const LinkSection: React.FC<LinkSectionProps> = ({
             onChange={(on) => updateTarget(on ? "_blank" : "_self")}
             testId="link-new-tab"
           />
-          <CommitRow label="Rel" value={rel} onCommit={updateRel} placeholder="nofollow" testId="link-rel" />
+          {linkType === "record" ? null : <CommitRow label="Rel" value={rel} onCommit={updateRel} placeholder="nofollow" testId="link-rel" />}
         </>
       )}
 
-      <NoteRow testId="link-hint">Changing Link to clears the old destination</NoteRow>
+      {linkType === "record" && listCollection && !recordPages ? (
+        <div className="tw:flex tw:flex-col tw:gap-1 tw:pt-2">
+          {/* B5-D87: the collection makes no pages yet — its Dynamic pages tab makes them. */}
+          <Button
+            variant="primary"
+            size="xs"
+            className={`${WIDE_BUTTON} tw:text-white!`}
+            data-testid="link-create-collection-page"
+            onClick={() => {
+              cmsWorkspace.openRequest({ collectionId: listCollection.id, tab: "dynamic-pages" });
+              composer?.emit(EVENTS.UI_PANEL_OPEN, { panel: "content" });
+            }}
+          >
+            Create collection page
+          </Button>
+        </div>
+      ) : null}
+
+      {linkType === "record" ? null : <NoteRow testId="link-hint">Changing Link to clears the old destination</NoteRow>}
     </Section>
   );
 };

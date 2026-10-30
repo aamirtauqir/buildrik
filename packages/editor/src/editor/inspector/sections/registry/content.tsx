@@ -12,6 +12,7 @@ import { isJustAdded } from "../justAddedField";
 import { isTableCell, TableAccessibilitySection, TableCellSection, TableStructureSection } from "../TableSections";
 import { adaptElementProps, defineSection, ownSection as own, type AnySectionEntry } from "./_shared";
 import { CmsBindingSection } from "../CmsBindingSection";
+import { BindingStatusSection } from "../binding/BindingStatusSection";
 import { ConditionsSection } from "../conditions/ConditionsPanel";
 import { TabPanelSection, TabsSection } from "../TabsSection";
 import { componentTriggerOf, DialogContentSection, isModalTrigger, ModalRelationshipSection } from "../ModalSections";
@@ -91,6 +92,18 @@ export const CONTENT_SECTIONS: Record<string, AnySectionEntry> = {
     Component: CmsBindingSection,
     styleKeys: [],
     adaptProps: (ctx) => ({ ...adaptElementProps(ctx), onOpenCreateCollection: ctx.onOpenCreateCollection }),
+  }),
+
+  /* B5-D11…D15 (173:14104): a bound property's trouble, last on the tab. */
+  "binding-status": defineSection({
+    tab: "content",
+    title: "Binding status",
+    open: "always",
+    capability: (caps) => caps.cmsBindable && !caps.isStructuralChild,
+    shouldRender: (ctx) => Boolean(ctx.composer?.cms?.bindings?.getBindings?.(ctx.selectedElement.id)?.length),
+    Component: BindingStatusSection,
+    styleKeys: [],
+    adaptProps: (ctx) => ({ composer: ctx.composer, elementId: ctx.selectedElement.id }),
   }),
 
   /* 2L9 F02: a field's validation, shut with a summary under its block. */

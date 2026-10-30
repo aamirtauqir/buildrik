@@ -70,12 +70,14 @@ const mount = (c: unknown) =>
   );
 
 describe("Conditions", () => {
-  it("summary: '{n} · Hidden | Shown', '1 · Inactive' for an old one, 'None'", () => {
+  it("summary: '{n} · Hidden | Shown', '1 · Needs repair' (B5-D58), '1 · Inactive' for an old one, 'None'", () => {
     const c: CmsCondition = { match: "all", rules: [{ field: "sunday", op: "set" }] };
-    expect(conditionsSummary({ condition: c, passes: false, legacy: null })).toBe("1 · Hidden");
-    expect(conditionsSummary({ condition: c, passes: true, legacy: null })).toBe("1 · Shown");
-    expect(conditionsSummary({ condition: null, passes: null, legacy: { expression: {} as never, converted: null } })).toBe("1 · Inactive");
-    expect(conditionsSummary({ condition: null, passes: null, legacy: null })).toBe("None");
+    const collection = BLOG as never;
+    expect(conditionsSummary({ condition: c, passes: false, legacy: null, collection })).toBe("1 · Hidden");
+    expect(conditionsSummary({ condition: c, passes: true, legacy: null, collection })).toBe("1 · Shown");
+    expect(conditionsSummary({ condition: { match: "all", rules: [{ field: "opening_hours.sunday", op: "set" }] }, passes: false, legacy: null, collection })).toBe("1 · Needs repair");
+    expect(conditionsSummary({ condition: null, passes: null, legacy: { expression: {} as never, converted: null }, collection })).toBe("1 · Inactive");
+    expect(conditionsSummary({ condition: null, passes: null, legacy: null, collection })).toBe("None");
   });
 
   it("D08: a rule card, and what the preview record makes of it", async () => {
@@ -86,6 +88,23 @@ describe("Conditions", () => {
     await waitFor(() => expect(screen.getByTestId("conditions-result")).toHaveTextContent("Sunday is empty. This condition is false."));
     expect(screen.getByTestId("conditions-result")).toHaveTextContent("Hidden on this record — showing as ghost.");
     expect(screen.getByText("Hidden content stays in the page source. Do not use conditions to protect private information.")).toBeTruthy();
+  });
+
+  it("B5-D46: a true 'is set' rule names it and says it ships", async () => {
+    const { composer } = makeComposer({ condition: { match: "all", rules: [{ field: "title", op: "set" }] } });
+    mount(composer);
+    await waitFor(() => expect(screen.getByTestId("conditions-result")).toHaveTextContent("Title is set. This condition is true."));
+    expect(screen.getByTestId("conditions-result")).toHaveTextContent("Shown on this record and in published output.");
+  });
+
+  it("B5-D35 / D45: a field the collection no longer has — 'no longer exists — Choose field' and the live result as the evaluator reads it", async () => {
+    const { composer } = makeComposer({ condition: { match: "all", rules: [{ field: "opening_hours.sunday", op: "set" }] } });
+    mount(composer);
+    await waitFor(() => expect(screen.getByTestId("conditions-missing")).toHaveTextContent("sunday no longer exists — Choose field"));
+    expect(screen.getByTestId("conditions-missing")).toHaveTextContent("Read as empty on the live site — this element will hide.");
+    expect(screen.queryByTestId("conditions-result")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Choose field" }));
+    expect(document.activeElement).toBe(screen.getByLabelText("Field"));
   });
 
   it("D10: removing the last rule removes the condition, with its receipt", () => {

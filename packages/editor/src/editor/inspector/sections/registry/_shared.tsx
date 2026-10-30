@@ -83,6 +83,7 @@ export type SectionId =
   | "table-cell"
   | "gallery"
   | "gallery-image"
+  | "binding-status"
   | "table-wrapper"
   | "semantics"
   | "attributes"

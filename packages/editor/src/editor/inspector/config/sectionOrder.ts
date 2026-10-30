@@ -45,6 +45,8 @@ const CONTENT_ORDER: readonly SectionId[] = [
   /* B-11: Conditions sit above Advanced attributes (2L9 B4-D04). */
   "conditions",
   "attributes",
+  /* B5-D13: a bound property's trouble closes the tab. */
+  "binding-status",
 ];
 
 const STYLE_ORDER: readonly SectionId[] = [
