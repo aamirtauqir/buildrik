@@ -63,6 +63,15 @@ describe("Modal — board frame", () => {
     expect(scrim.className).not.toContain("tw:before:basis-[31vh]");
   });
 
+  /* A-41 (257:51318 / 257:52890): over the CMS Fields panel the frame's top is 128. */
+  it("placement=\"panel\" sits the frame at 128, not the 31vh spacer", () => {
+    render(<Modal open onClose={() => {}} title="Change Reading time type" testId="m" placement="panel" />);
+    const scrim = screen.getByTestId("overlay-scrim");
+    expect(scrim.className).toContain("tw:items-start");
+    expect(scrim.className).toContain("tw:pt-32");
+    expect(scrim.className).not.toContain("tw:before:basis-[31vh]");
+  });
+
   /* Form dialogs draw the DS "Footer" (7431:145583 on 4418:142143): a top rule
      and 16/24 padding. Confirms draw bare "Dialog actions" (7564:185450,
      4428:151964) — the default stays borderless. */

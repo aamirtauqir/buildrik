@@ -106,8 +106,9 @@ export interface ModalProps {
   footerAlign?: "start" | "end";
   /** Where the frame sits. Default: the 2L9 dialog placement (top at 31vh).
    *  "workspace": a tall dialog drawn from the workspace's top, under the
-   *  topbar (187:20616). */
-  placement?: "default" | "workspace";
+   *  topbar (187:20616). "panel": over a full-width panel's content, top
+   *  128 (CMS Fields 257:51318). */
+  placement?: "default" | "workspace" | "panel";
 }
 
 export function Modal({
@@ -115,7 +116,7 @@ export function Modal({
 }: ModalProps) {
   const titleId = React.useId();
   return (
-    <OverlayMount open={open} onClose={onClose} labelledBy={titleId} dismissOnScrimClick={dismissOnScrimClick} dirty={dirty} align={placement === "workspace" ? "workspace" : "center"}>
+    <OverlayMount open={open} onClose={onClose} labelledBy={titleId} dismissOnScrimClick={dismissOnScrimClick} dirty={dirty} align={placement === "default" ? "center" : placement}>
       <div className={[MODAL_FRAME_BASE_CLASS, WIDTH_CLASS[width ?? KIND_WIDTH[kind]], closeButton ? "tw:relative" : ""].join(" ")} data-testid={testId}>
         <div className={MODAL_HEAD_CLASS}>
           <span className={MODAL_TITLE_CLASS} id={titleId}>

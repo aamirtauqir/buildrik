@@ -12093,9 +12093,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "open:cms-dialog-top-128 (REQUESTS A-41)",
-   "verified": "drift-open",
-   "verifiedNote": "Probe-compared 2026-10-31 (case cms-type-change; board shots/257-51318.png). Fixed: 720 wide (was 560); subtitle '20 records have a value. Preview the first five before changing Number to Text.' (was 'Number → Text'); the preview is a mono table (title · value · → · new); summary 'Lossless conversion · Used by 0 · Values remain intact.' (Used by from the field's usages). Open: the board's dialog top is 128, the shared Modal's is 31vh (279) — A-41.",
+   "authority": "board",
+   "verified": "drift-fixed",
+   "verifiedNote": "Probe-compared 2026-10-31 (case cms-type-change; board shots/257-51318.png). Fixed: 720 wide (was 560); subtitle '20 records have a value. Preview the first five before changing Number to Text.' (was 'Number → Text'); the preview is a mono table (title · value · → · new); summary 'Lossless conversion · Used by 0 · Values remain intact.' (Used by from the field's usages). A-41 closed 2026-10-31: Modal placement=\"panel\" puts the frame's top at 128 (measured in the probe, x360 y128 720 wide).",
    "tier": "P2"
   },
   {
@@ -12126,9 +12126,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "open:cms-dialog-top-128 (REQUESTS A-41)",
-   "verified": "drift-open",
-   "verifiedNote": "Probe-compared 2026-10-31 (cms-type-change&apply=hang, Convert; shots/257-51906.png). Fixed: 720 wide; 'Waiting for the server to confirm all 20 values.' The board's second sentence ('Fields and saved values remain unchanged until acknowledgment') is not true in code — the type moves first (CmsWorkspace.changeType) — so it is left out. Open: top 128 vs 31vh (A-41).",
+   "authority": "board",
+   "verified": "drift-fixed",
+   "verifiedNote": "Probe-compared 2026-10-31 (cms-type-change&apply=hang, Convert; shots/257-51906.png). Fixed: 720 wide; 'Waiting for the server to confirm all 20 values.' The board's second sentence ('Fields and saved values remain unchanged until acknowledgment') is not true in code — the type moves first (CmsWorkspace.changeType) — so it is left out. A-41 closed 2026-10-31: Modal placement=\"panel\" puts the frame's top at 128 (measured in the probe, x360 y128 720 wide).",
    "tier": "P2"
   },
   {
@@ -12137,9 +12137,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "open:cms-dialog-top-128 (REQUESTS A-41)",
-   "verified": "drift-open",
-   "verifiedNote": "Compared 2026-10-31 with the convert pending state (same Modal): 720 wide; copy now 'Waiting for acknowledgment. The 20 stored values remain unchanged until the server confirms each one.' ('each one': values are written per record). Open: top 128 vs 31vh (A-41).",
+   "authority": "board",
+   "verified": "drift-fixed",
+   "verifiedNote": "Compared 2026-10-31 with the convert pending state (same Modal): 720 wide; copy now 'Waiting for acknowledgment. The 20 stored values remain unchanged until the server confirms each one.' ('each one': values are written per record). A-41 closed 2026-10-31: Modal placement=\"panel\" puts the frame's top at 128 (measured in the probe, x360 y128 720 wide).",
    "tier": "P2"
   },
   {
@@ -12159,9 +12159,9 @@
    "page": "05",
    "family": "cms",
    "status": "active",
-   "authority": "open:cms-dialog-top-128 (REQUESTS A-41)",
-   "verified": "drift-open",
-   "verifiedNote": "Probe-compared 2026-10-31 (cms-type-change&apply=fail; shots/257-52512.png): title, Back to Fields · Retry match; 720 wide (was 560). Body is code: the type moves before the values, so the copy says some values may still need converting, not the board's 'all values unchanged'. Open: top 128 vs 31vh (A-41).",
+   "authority": "board",
+   "verified": "drift-fixed",
+   "verifiedNote": "Probe-compared 2026-10-31 (cms-type-change&apply=fail; shots/257-52512.png): title, Back to Fields · Retry match; 720 wide (was 560). Body is code: the type moves before the values, so the copy says some values may still need converting, not the board's 'all values unchanged'. A-41 closed 2026-10-31: Modal placement=\"panel\" puts the frame's top at 128 (measured in the probe, x360 y128 720 wide).",
    "tier": "P2"
   },
   {
@@ -23162,7 +23162,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "2026-10-31 L-A: Fix › on 'Collection list has no source' selects the list (A-35); the Inspector's list block ('Choose collection…', 'No source selected. This list cannot publish yet.') is L-B's. Still open: '‹ Back to Issues' at the Inspector's head after Fix › / Open image › — the Issues ⇄ Inspector swap lives in StudioPanels/AquibraStudio (REQUESTS A-39). The board's canvas is the prototype's abstract placeholder.",
+   "verifiedNote": "Round 34 L-A: '‹ Back to Issues' built (A-39) — StudioPanels heads the Inspector with the centred accent link once Fix › selects the list, reopening Issues (test StudioPanels.inspectorColumn). Built, not compared live (shell-level state, out of the probe's reach); the list block under it is L-B's. The board's canvas is the prototype's abstract placeholder.",
    "tier": "P1"
   },
   {
