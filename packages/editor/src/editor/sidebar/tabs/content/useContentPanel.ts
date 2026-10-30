@@ -30,7 +30,6 @@ import {
 export type ContentView =
   | { kind: "root" }
   | { kind: "sources" }
-  | { kind: "variables" }
   | { kind: "conditions" };
 
 export interface ConditionRow {
@@ -290,6 +289,21 @@ export function useContentPanel(composer: Composer | null): UseContentPanelRetur
     },
     [composer, reload],
   );
+
+  /* Two readers hold this hook (the drawer and the CMS workspace's Site
+     variables page, B5-V01); a write through either lands in the project,
+     so each re-reads it there. */
+  React.useEffect(() => {
+    if (!composer) return;
+    const sync = () => {
+      const vars = composer.getProjectSettings()?.siteVariables;
+      if (vars) setVariablesState((prev) => (prev === vars ? prev : vars));
+    };
+    composer.on(EVENTS.PROJECT_CHANGED, sync);
+    return () => {
+      composer.off(EVENTS.PROJECT_CHANGED, sync);
+    };
+  }, [composer]);
 
   const setVariables = React.useCallback(
     (vars: SiteVariable[]) => {

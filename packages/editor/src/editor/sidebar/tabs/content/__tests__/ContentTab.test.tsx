@@ -12,11 +12,26 @@ import { render, screen, fireEvent, cleanup, waitFor, act, within } from "@testi
 import { ContentTab } from "../ContentTab";
 import { SOURCES_IN_RELEASE } from "../ContentRootView";
 import { cmsWorkspace } from "@/editor/cms/cmsWorkspaceStore";
+import { CmsWorkspace } from "@/editor/cms/CmsWorkspace";
+import { ToastProvider } from "@/editor/chrome-ui";
+
+/* B5-V01 (260:235689): Site variables opens as the CMS workspace's page, so
+   the variables tests mount the drawer beside the workspace, as the shell
+   does. */
+const withWorkspace = (composer: unknown, tab: React.ReactElement) => (
+  <ToastProvider>
+    {tab}
+    <CmsWorkspace composer={composer as never} />
+  </ToastProvider>
+);
 import { makeEngine, MENU, ITEM } from "@/editor/cms/__tests__/fakeCmsEngine";
 import { CMSValidationError } from "@/engine/cms/CollectionManager";
 
 beforeEach(() => localStorage.clear());
-afterEach(() => cleanup());
+afterEach(() => {
+  cleanup();
+  cmsWorkspace.reset();
+});
 
 describe("ContentTab", () => {
   it("empty project shows the board 149:7 empty state with the create CTA", async () => {
@@ -28,7 +43,7 @@ describe("ContentTab", () => {
 
   it("A-17/A09-8: the zero state also offers the Site variables/Conditions doors it owns; Sources is hidden (BD-39)", async () => {
     const { composer } = makeEngine();
-    render(<ContentTab composer={composer as never} onCreateCollection={vi.fn()} />);
+    render(withWorkspace(composer, <ContentTab composer={composer as never} onCreateCollection={vi.fn()} />));
     await screen.findByTestId("content-empty");
     expect(screen.queryByTestId("content-empty-sources")).toBeNull();
     fireEvent.click(screen.getByTestId("content-empty-variables"));
@@ -79,7 +94,7 @@ describe("ContentTab", () => {
       JSON.stringify([{ key: "name", value: "Bella Cucina" }]),
     );
     const { composer, sources } = makeEngine();
-    render(<ContentTab composer={composer as never} />);
+    render(withWorkspace(composer, <ContentTab composer={composer as never} />));
     fireEvent.click(await screen.findByText("Site variables"));
     expect(await screen.findByText("{{site.name}}")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "+ New variable" }));
@@ -224,7 +239,7 @@ describe("Site variables · placeholder usages (2L9 C8)", () => {
       { getId: () => "t1", getType: () => "text", getContent: () => "Call {{site.phone}} or {{ site.phone }}", getDataBindings: () => ({}), getCustomData: () => undefined } as never,
       { getId: () => "t2", getType: () => "heading", getContent: () => "Phone: {{site.phone}}", getDataBindings: () => ({}), getCustomData: () => undefined } as never,
     );
-    render(<ContentTab composer={engine.composer as never} />);
+    render(withWorkspace(engine.composer, <ContentTab composer={engine.composer as never} />));
     fireEvent.click(await screen.findByText("Site variables"));
     await screen.findByText("{{site.phone}}");
     return engine;

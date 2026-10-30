@@ -1,8 +1,8 @@
 /**
  * OptionsEditor — an option field's choices (2L9 B5-T12 `167:6844`): one
  * "Label and saved value" field per option, "+ Add option" under them, and
- * what a record may pick ("Records choose one option." / "…any number of
- * options."). Used by + Add field's configure step and the field inspector.
+ * what a record may pick ("Records choose one option." / "…more than one
+ * option."). Used by + Add field's configure step and the field inspector.
  * Blank rows and repeats are dropped on commit (shared `cmsOptionsFrom`).
  *
  * @license BSD-3-Clause
@@ -62,7 +62,7 @@ export function OptionsEditor({ id, options, onChange, live = false, multiple = 
         </Button>
       </div>
       <p className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]">
-        {multiple ? "Records choose any number of options." : "Records choose one option."}
+        {multiple ? "Records can choose more than one option." : "Records choose one option."}
       </p>
     </div>
   );

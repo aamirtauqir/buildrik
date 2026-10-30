@@ -87,7 +87,7 @@ describe("AddFieldDialog", () => {
     const { onAdd } = mount();
     fireEvent.click(screen.getByTestId("cms-add-field-type-multiselect"));
     fireEvent.change(screen.getByTestId("cms-add-field-name"), { target: { value: "Tags" } });
-    expect(screen.getByText("Records choose any number of options.")).toBeInTheDocument();
+    expect(screen.getByText("Records can choose more than one option.")).toBeInTheDocument();
     for (const [i, v] of ["Vegan", " Spicy ", "", "Vegan"].entries()) {
       if (i > 0) fireEvent.click(screen.getByTestId("cms-add-field-options-add"));
       fireEvent.change(screen.getByTestId(`cms-add-field-options-${i}`), { target: { value: v } });
@@ -165,5 +165,28 @@ describe("AddFieldDialog", () => {
     fireEvent.change(screen.getByTestId("cms-add-field-default"), { target: { value: "90" } });
     expect(screen.getByTestId("cms-add-field-default-error")).toHaveTextContent("Default value must be at most 60");
     expect(screen.getByTestId("cms-add-field-save")).toBeDisabled();
+  });
+
+  /* 2L9 167:4689…167:8207: each type shows its own settings. */
+  it.each([
+    ["richtext", ["Default value", "Placeholder"], ["Minimum length"]],
+    ["email", ["Default and record values must be valid email addresses.", "Placeholder"], ["Minimum length"]],
+    ["number", ["Minimum", "Maximum", "Empty limits are unset; they do not mean zero."], []],
+    ["date", ["No default is set.", "Placeholder"], []],
+    ["image", ["Placeholder"], ["Default value"]],
+  ])("%s shows the board's settings", (type, present, absent) => {
+    mount();
+    fireEvent.click(screen.getByTestId(`cms-add-field-type-${type}`));
+    for (const t of present) expect(screen.getByText(t)).toBeInTheDocument();
+    for (const t of absent) expect(screen.queryByText(t)).toBeNull();
+  });
+
+  it("a yes/no default of Yes is stored as true; No stores nothing", async () => {
+    const { onAdd } = mount();
+    fireEvent.click(screen.getByTestId("cms-add-field-type-boolean"));
+    fireEvent.change(screen.getByTestId("cms-add-field-name"), { target: { value: "Featured" } });
+    fireEvent.change(screen.getByTestId("cms-add-field-default"), { target: { value: "true" } });
+    fireEvent.click(screen.getByTestId("cms-add-field-save"));
+    await waitFor(() => expect(onAdd).toHaveBeenCalledWith({ name: "Featured", slug: "featured", type: "boolean", defaultValue: true }));
   });
 });

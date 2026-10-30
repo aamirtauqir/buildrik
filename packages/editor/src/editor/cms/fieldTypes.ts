@@ -80,6 +80,7 @@ export const TYPED_VALUE_TYPES: ReadonlySet<CMSFieldType> = new Set([
 export function parseDefault(type: CMSFieldType, raw: string): unknown {
   const t = raw.trim();
   if (t === "") return undefined;
+  if (type === "boolean") return t === "true";
   return type === "number" ? Number(t) : t;
 }
 

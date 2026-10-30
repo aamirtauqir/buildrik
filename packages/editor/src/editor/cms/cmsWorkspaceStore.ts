@@ -39,6 +39,9 @@ export interface CmsWorkspaceState {
    *  with a record open — the workspace (and the draft) stays up beside it,
    *  and opening a page asks the record first. */
   overPages?: boolean;
+  /** A Data page in the workspace instead of a collection — 2L9 B5-V01
+   *  `260:235689` draws Site variables as a full page, not a drawer subview. */
+  page?: "variables";
 }
 
 /** `ui:cms-open` (EVENTS.UI_CMS_OPEN) — open a collection's table, and with
@@ -101,12 +104,14 @@ function navigate(next: CmsWorkspaceState): void {
 export const cmsWorkspace = {
   get: (): CmsWorkspaceState => state,
   openCollection: (collectionId: string | null, tab: CmsTab = "records"): void =>
-    navigate({ ...state, collectionId, tab, recordId: null }),
+    navigate({ ...state, collectionId, tab, recordId: null, page: undefined }),
+  /** Site variables as the workspace's page (B5-V01). */
+  openVariables: (): void => navigate({ ...state, collectionId: null, recordId: null, page: "variables" }),
   setTab: (tab: CmsTab): void => navigate({ ...state, tab, recordId: null }),
   openRecord: (recordId: string | null): void => navigate({ ...state, tab: "records", recordId }),
   /** One write for both, so the table never renders a frame without its sheet. */
   openRequest: ({ collectionId, recordId, tab, origin }: CmsOpenRequest): void =>
-    navigate({ collectionId, tab: tab ?? "records", recordId: recordId ?? null, origin: origin ?? state.origin }),
+    navigate({ collectionId, tab: tab ?? "records", recordId: recordId ?? null, origin: origin ?? state.origin, page: undefined }),
   /** A mounted workspace holds the visit open; the release ends it — and
    *  its way back — unless another mount took over in the meantime (React's
    *  StrictMode mounts, unmounts and remounts once in development, which
