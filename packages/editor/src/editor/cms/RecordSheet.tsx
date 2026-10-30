@@ -28,10 +28,11 @@ import { fieldDefault } from "@/editor/sidebar/tabs/content/contentPanelUtils";
 import { recordStatusBadge, recordTitle } from "./RecordsTable";
 import { TypedDeleteDialog } from "./TypedDeleteDialog";
 import { RecordPreview } from "./RecordPreview";
+import { RecordLeaveDialog, type RecordLeavePhase } from "./RecordLeaveDialog";
 import { RecordFieldControl, isEmptyValue, type OpenMediaLibrary } from "./RecordFieldControl";
 import { RecordTemplatePreviewDialog } from "./RecordTemplatePreviewDialog";
 import { applyCmsPattern, cmsSlugField, cmsSlugify } from "@buildrik/shared/schemas/cms";
-import { CMS_TAB_LABEL, cmsWorkspace, type CmsTab, type CmsWorkspaceState } from "./cmsWorkspaceStore";
+import { CMS_TAB_LABEL, cmsWorkspace, type CmsExitPage, type CmsTab, type CmsWorkspaceState } from "./cmsWorkspaceStore";
 import { shellDirty } from "@/editor/shell/shellDirtyRegistry";
 import { claimCmsConflict, isCmsConflictPending, type CmsConflict } from "@/services/cmsSync";
 
@@ -81,6 +82,8 @@ interface LeaveIntent {
   go: () => void;
   to: string | null;
   origin?: boolean;
+  /** A page picked in the Pages drawer over the workspace (122:44151). */
+  page?: CmsExitPage;
 }
 
 function blank(fields: CMSField[]): Record<string, unknown> {
@@ -169,6 +172,16 @@ export function RecordSheet({
     leaving$.current = true;
     go();
   };
+  /* 126:36751: a page removed while the leave waited opens nothing — the
+     record and its draft stay, and the dialog says so. */
+  const [removedTo, setRemovedTo] = React.useState<string | null>(null);
+  const goTo = (intent: LeaveIntent) => {
+    if (intent.page && !intent.page.exists()) {
+      setRemovedTo(intent.page.name);
+      return;
+    }
+    leave(intent.go);
+  };
   /* A deleted record has nothing left to discard: its edit is already lost. */
   const guard = (go: () => void, to: string | null = null, toOrigin = false) =>
     dirty && !gone ? setLeaveTo({ go, to, origin: toOrigin }) : leave(go);
@@ -200,9 +213,9 @@ export function RecordSheet({
   originRef.current = origin;
   React.useEffect(
     () =>
-      cmsWorkspace.setExitGuard((go) => {
+      cmsWorkspace.setExitGuard((go, page) => {
         if (leaving$.current || !stillDirty.current) return false;
-        setLeaveTo({ go, to: originRef.current, origin: originRef.current !== null });
+        setLeaveTo(page ? { go, to: page.name, page } : { go, to: originRef.current, origin: originRef.current !== null });
         return true;
       }),
     [],
@@ -270,7 +283,8 @@ export function RecordSheet({
       return;
     }
     stayRef.current = false;
-    leave(back ? back.go : onClose);
+    if (back) goTo(back);
+    else leave(onClose);
   };
   const stayHere = () => {
     holdReturn(null);
@@ -375,6 +389,16 @@ export function RecordSheet({
   /* "Return to Heading" (174:14111): an element origin is named by its first
      part, a CMS place in full. */
   const pausedTo = returnTo?.to ? (returnTo.origin ? returnTo.to.split(" · ")[0] : returnTo.to) : null;
+  /* The page leave follows the real save (RecordLeaveDialog). */
+  const leavePhase: RecordLeavePhase | null = removedTo
+    ? "removed"
+    : leaveTo?.page
+      ? "ask"
+      : returnTo?.page && saving
+        ? "saving"
+        : returnTo?.page && paused
+          ? saveError === OFFLINE ? "queued" : saveError === FAILED ? "failed" : "refused"
+          : null;
   const set = (slug: string, v: unknown) => {
     if (slug === slugKey) setSlugTouched(true);
     setForm((p) => ({
@@ -491,7 +515,8 @@ export function RecordSheet({
             </div>
           ) : returnCancelled && saving ? (
             <p className="tw:m-0 tw:flex-none tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]" role="status" data-testid="cms-sheet-return-cancelled">
-              Return cancelled. Your record save is still in progress.
+              {/* 126:37330 — navigation called off; the submitted save runs on. */}
+              Record · Saving continues; stay here
             </p>
           ) : null}
 
@@ -523,7 +548,10 @@ export function RecordSheet({
             </div>
           ) : null}
 
-          {[...collection.fields].sort((a, b) => a.order - b.order).map(control)}
+          {/* 126:37330: the submitted save owns the fields until it settles. */}
+          <fieldset disabled={returnCancelled && saving} className="tw:m-0 tw:flex tw:min-w-0 tw:flex-col tw:gap-4 tw:border-0 tw:p-0">
+            {[...collection.fields].sort((a, b) => a.order - b.order).map(control)}
+          </fieldset>
 
 
           {/* The publishing switch closes the form (165:2184's "Published —
@@ -600,6 +628,13 @@ export function RecordSheet({
           <Button size="xs" variant="secondary" className={FOOT_BTN_SECONDARY} data-testid="cms-sheet-stay" onClick={stayHere}>
             Cancel
           </Button>
+        ) : returnCancelled && saving ? (
+          <>
+            <Button size="xs" variant="secondary" className={`${FOOT_BTN_SECONDARY} tw:w-auto!`} disabled data-testid="cms-sheet-cancel-unavailable">
+              Cancel unavailable
+            </Button>
+            <span className="tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-soft)]">This submitted save can’t be cancelled.</span>
+          </>
         ) : paused ? (
           <Button size="xs" variant="secondary" className={FOOT_BTN_SECONDARY} data-testid="cms-sheet-cancel-return" onClick={() => holdReturn(null)}>
             Cancel
@@ -627,7 +662,7 @@ export function RecordSheet({
           Escape / the scrim give the same answer; "Save and leave" saves, then
           takes the way out the person chose. */}
       <Modal
-        open={leaveTo !== null}
+        open={leaveTo !== null && !leaveTo.page}
         onClose={() => setLeaveTo(null)}
         title="Leave without saving?"
         kind="form"
@@ -675,6 +710,35 @@ export function RecordSheet({
               : `${crumb} has unsaved record edits.`}
         </p>
       </Modal>
+      <RecordLeaveDialog
+        phase={leavePhase}
+        recordLabel={`${collection.name} record “${crumb}”`}
+        collectionName={collection.name}
+        to={removedTo ?? leaveTo?.page?.name ?? returnTo?.page?.name ?? ""}
+        current={composer?.elements.getActivePage?.()?.name ?? null}
+        reason={leavePhase === "refused" ? saveError : null}
+        canSave={canSave}
+        keepRef={keepRef}
+        onKeepEditing={() => {
+          if (removedTo) setRemovedTo(null);
+          else if (leaveTo) setLeaveTo(null);
+          else if (saving) stayHere();
+          else holdReturn(null);
+        }}
+        onDiscard={() => {
+          const intent = leaveTo;
+          setLeaveTo(null);
+          if (intent) goTo(intent);
+        }}
+        onSaveAndLeave={() => {
+          const intent = leaveTo;
+          setLeaveTo(null);
+          if (!intent) return;
+          holdReturn(intent);
+          void save();
+        }}
+        onRetry={() => void save()}
+      />
       {record ? (
         <TypedDeleteDialog
           open={typedDelete}

@@ -439,6 +439,65 @@ describe("RecordSheet · Leave without saving? with Save and leave (2L9 C1)", ()
     return engine;
   };
 
+  /* design-2l9 122:44151 … 126:36751 — a page picked in the Pages drawer
+     over the workspace leaves through the record, following the real save. */
+  describe("leaving for a page (Pages over CMS)", () => {
+    const pageExit = (exists = () => true) => {
+      const go = vi.fn();
+      act(() => cmsWorkspace.exit(go, { name: "About", exists }));
+      return go;
+    };
+
+    it("asks, naming the page; Discard opens it", async () => {
+      await dirtyRecord();
+      const go = pageExit();
+      expect(screen.getByTestId("cms-leave-body").textContent).toMatch(/record “Margherita” has unsaved changes\. You asked to open About\.$/);
+      expect(screen.getByTestId("cms-leave-note")).toHaveTextContent("Only this record’s draft is affected.");
+      fireEvent.click(screen.getByTestId("cms-leave-discard"));
+      expect(go).toHaveBeenCalledTimes(1);
+    });
+
+    it("Save and leave: Saving… until the save lands, then the page opens", async () => {
+      let finish: (v: boolean) => void = () => undefined;
+      syncMock.mockImplementationOnce(() => new Promise<boolean>((r) => (finish = r)));
+      await dirtyRecord();
+      const go = pageExit();
+      fireEvent.click(screen.getByTestId("cms-leave-save"));
+      await waitFor(() => expect(screen.getByTestId("cms-leave-body").textContent).toMatch(/· Saving…$/));
+      expect(screen.getByTestId("cms-leave-note")).toHaveTextContent("After a confirmed save: Open About.");
+      expect(go).not.toHaveBeenCalled();
+      await act(async () => finish(true));
+      await waitFor(() => expect(go).toHaveBeenCalledTimes(1));
+    });
+
+    it("a queued save does not open the page (125:35409)", async () => {
+      syncMock.mockImplementationOnce(async () => false);
+      await dirtyRecord();
+      const go = pageExit();
+      fireEvent.click(screen.getByTestId("cms-leave-save"));
+      await waitFor(() => expect(screen.getByTestId("cms-leave-body").textContent).toMatch(/is queued\. .*so About has not been opened\.$/));
+      expect(go).not.toHaveBeenCalled();
+    });
+
+    it("a failed save offers Retry save (122:44343)", async () => {
+      const { composer } = await dirtyRecord();
+      composer.cms.collections.updateContentItem.mockImplementationOnce(() => Promise.reject(new Error("500")));
+      const go = pageExit();
+      fireEvent.click(screen.getByTestId("cms-leave-save"));
+      await waitFor(() => expect(screen.getByTestId("cms-leave-body").textContent).toMatch(/^Couldn’t save .*About has not been opened\.$/));
+      expect(screen.getByTestId("cms-leave-retry")).toBeInTheDocument();
+      expect(go).not.toHaveBeenCalled();
+    });
+
+    it("a page removed meanwhile opens nothing and keeps the draft (126:36751)", async () => {
+      await dirtyRecord();
+      const go = pageExit(() => false);
+      fireEvent.click(screen.getByTestId("cms-leave-discard"));
+      expect(go).not.toHaveBeenCalled();
+      expect(screen.getByText("About is no longer available")).toBeInTheDocument();
+    });
+  });
+
   it("names the record when the way out has no named destination", async () => {
     await dirtyRecord();
     fireEvent.click(screen.getByTestId("cms-sheet-cancel"));
@@ -495,9 +554,9 @@ describe("RecordSheet · Leave without saving? with Save and leave (2L9 C1)", ()
     expect(screen.getByTestId("cms-sheet-save")).toBeDisabled();
     expect(screen.getByTestId("cms-sheet-stay")).toHaveTextContent("Cancel");
     fireEvent.click(screen.getByTestId("cms-sheet-stay"));
-    expect(screen.getByTestId("cms-sheet-return-cancelled")).toHaveTextContent(
-      "Return cancelled. Your record save is still in progress.",
-    );
+    /* Re-baseline design-2l9 126:37330. */
+    expect(screen.getByTestId("cms-sheet-return-cancelled")).toHaveTextContent("Record · Saving continues; stay here");
+    expect(screen.getByTestId("cms-sheet-cancel-unavailable")).toBeDisabled();
     await act(async () => finish(true));
     await waitFor(() => expect(screen.queryByTestId("cms-sheet-return-cancelled")).toBeNull());
     expect(screen.getByTestId("cms-sheet")).toBeInTheDocument();
