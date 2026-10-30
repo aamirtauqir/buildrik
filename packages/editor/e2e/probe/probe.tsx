@@ -2728,8 +2728,14 @@ const CASES: Record<string, () => React.ReactElement> = {
         c.selection.select(inst);
       })();
     }
+    /* `?page=1` — nothing selected: the Inspector's page panel (board 21,
+       P28). `?pageName=About` renames the page. */
+    const pageOnly = !!q.get("page");
+    const pageName = q.get("pageName");
+    if (pageName) c.elements.updatePage(page.id, { name: pageName });
     function Host() {
       const { selectedElement } = useComposerSelection({ composer: c });
+      if (pageOnly) return <ProInspector composer={c} currentBreakpoint={bp} selectedElement={null} />;
       const sel = selectedElement ?? el;
       return <ProInspector composer={c} currentBreakpoint={bp} selectedElement={{ id: sel.getId(), type: sel.getType(), tagName: sel.getTagName() }} />;
     }

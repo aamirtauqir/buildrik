@@ -46,17 +46,20 @@ afterEach(() => {
 });
 
 describe("PagePanel — board 21", () => {
-  it("names the page: path 'Home', then 'Home · Page' with ⋯ and ✕ — no AI entry point (owner: no AI in the UI)", () => {
+  it("names the page: 'Home · Page' with ⋯ and ✕, the path and 'Editing Desktop · Page appearance' under it — no AI entry point (owner: no AI in the UI)", () => {
     setup();
-    expect(screen.getByTestId("inspector-breadcrumb")).toHaveTextContent("Home");
     expect(screen.getByTestId("inspector-element-name")).toHaveTextContent("Home · Page");
+    expect(screen.getByTestId("inspector-breadcrumb")).toHaveTextContent("Home · Page");
+    /* 2L9 S06: the path sits under the name, then what is being edited. */
+    expect(screen.getByTestId("inspector-element-name").compareDocumentPosition(screen.getByTestId("inspector-breadcrumb")) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(screen.getByTestId("inspector-page-editing")).toHaveTextContent("Editing Desktop · Page appearance");
     expect(screen.queryByTestId("inspector-ai-chip")).toBeNull();
     expect(screen.queryByRole("button", { name: /Ask AI/ })).toBeNull();
     expect(screen.getByTestId("inspector-page-menu")).toBeInTheDocument();
     expect(screen.getByTestId("inspector-hide")).toBeInTheDocument();
   });
 
-  it("Fill, Size, Typography, Spacing — in the board's order, and nothing else", () => {
+  it("Background, Size, Typography, Spacing, then Page settings — in the board's order (2L9 S06), and nothing else", () => {
     setup();
     const panel = screen.getByTestId("inspector-page-panel");
     const ids = Array.from(panel.querySelectorAll('[data-testid^="inspector-section-"]'))
@@ -67,6 +70,7 @@ describe("PagePanel — board 21", () => {
       "inspector-section-size",
       "inspector-section-typography",
       "inspector-section-spacing",
+      "inspector-section-page-settings",
     ]);
   });
 

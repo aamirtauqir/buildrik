@@ -2,14 +2,15 @@
  * PagePanel — what the Inspector shows when nothing is selected, or the page
  * root is (DD-13, board 21):
  *
- *   Home                                   ← the path: the page alone
  *   Home · Page                      ⋯  ✕     (no AI entry point — owner, no AI this version)
- *   Fill        Background
+ *   Home · Page                            ← the path (2L9 S06)
+ *   Editing Desktop · Page appearance
+ *   Background  Color
  *   Size        Max width
  *   Typography  Font · Text colour
  *   Spacing     the margin / padding box
- *                                SEO and social ↗
- *   Your place here is kept
+ *   Page settings  [ SEO and social ]
+ *                  Opens Home’s Page settings. Appearance stays here.
  *
  * No tabs, no context row, no Link / CMS / Visibility / Interactions. The
  * four sections are the registry's `page: true` entries rendered with
@@ -25,24 +26,25 @@
  * @license BSD-3-Clause
  */
 
-import { ExternalLink, MoreHorizontal, X } from "lucide-react";
+import { MoreHorizontal, X } from "lucide-react";
 import * as React from "react";
 import type { Composer } from "@/engine";
 import { Breadcrumb, Button, IconButton, Menu, MenuItem, Popover } from "@/editor/chrome-ui";
 import { capabilitiesFor } from "@/shared/constants/elementCapabilities";
 import { EVENTS } from "@/shared/constants/events";
-import { isValidBreakpoint } from "@/shared/constants/breakpoints";
+import { BREAKPOINTS, isValidBreakpoint } from "@/shared/constants/breakpoints";
 import type { BreakpointId } from "@/shared/types/breakpoints";
 import { useSaveConflict } from "@/editor/shell/hooks/useSaveConflict";
 import { computeEffectiveStyles, deriveCssContext, getPropertyStates } from "../config/cssContext";
 import { useFieldOverrides } from "../hooks/useFieldOverrides";
 import { resolveDisplayMode, useInspectorSections } from "../hooks/useInspectorSections";
 import { useStyleHandlers } from "../hooks/useStyleHandlers";
-import { ActionRow, NoteRow } from "../sections/behaviourRows";
+import { NoteRow } from "../sections/behaviourRows";
 import { EMPTY_MIXED_KEYS, SECTION_REGISTRY, type SectionContext, type SectionId } from "../sections/registry";
 import { InspectorFieldContext, type InspectorFieldContextValue } from "../shared/controls/InspectorFieldContext";
 import { sectionOverrideMarks } from "../shared/controls/OverrideDot";
-import { SectionFrameContext, type SectionFrame } from "../shared/controls/Section";
+import { Section, SectionFrameContext, type SectionFrame } from "../shared/controls/Section";
+import { WIDE_BUTTON } from "../shared/controls/controlClasses";
 
 export interface PagePanelProps {
   composer: Composer | null | undefined;
@@ -162,7 +164,7 @@ export function PagePanel({ composer }: PagePanelProps) {
     <InspectorFieldContext.Provider value={fieldContext}>
       <div className="bdi-panel" data-testid="inspector-page-panel" data-readonly={readOnly || undefined}>
         {appliedTemplate ? <TemplateAppliedBanner name={appliedTemplate} pageName={page.name} onDismiss={dismissTemplate} /> : null}
-        <PageHeader composer={composer} pageName={page.name} pageId={page.id} />
+        <PageHeader composer={composer} pageName={page.name} pageId={page.id} breakpoint={breakpoint} />
         <div className="bdi-panel-scroll">
           <div className="bdi-body">
             {PAGE_SECTIONS.map((id, i) => {
@@ -207,18 +209,14 @@ export function PagePanel({ composer }: PagePanelProps) {
                 </SectionFrameContext.Provider>
               );
             })}
-            <div className="tw:border-t tw:border-[var(--bk-border)] tw:px-3">
-              <ActionRow
-                testId="inspector-page-seo"
-                onClick={openSeo}
-                icon={<ExternalLink size={12} aria-hidden="true" className="tw:shrink-0" />}
-              >
+            {/* 2L9 S06: its own "Page settings" group — a full-width
+                button, and the note under it. */}
+            <Section title="Page settings" isOpen onToggle={NO_OP} id="inspector-section-page-settings">
+              <Button color="light" size="xs" className={WIDE_BUTTON} onClick={openSeo} data-testid="inspector-page-seo">
                 SEO and social
-              </ActionRow>
-            </div>
-            <div className="tw:px-4">
+              </Button>
               <NoteRow testId="inspector-page-note">Opens {page.name}’s Page settings. Appearance stays here.</NoteRow>
-            </div>
+            </Section>
           </div>
         </div>
       </div>
@@ -226,15 +224,15 @@ export function PagePanel({ composer }: PagePanelProps) {
   );
 }
 
-/** Board 21's header: the path is the page alone; the name reads "Home · Page". */
-function PageHeader({ composer, pageName, pageId }: { composer: Composer; pageName: string; pageId: string }) {
+/** 2L9 S06's header: "Home · Page", the path under it, then what is being
+ *  edited ("Editing Desktop · Page appearance"). */
+function PageHeader({ composer, pageName, pageId, breakpoint }: { composer: Composer; pageName: string; pageId: string; breakpoint: BreakpointId }) {
   const [menuOpen, setMenuOpen] = React.useState(false);
   return (
     <div className="tw:flex tw:flex-col tw:gap-1 tw:p-3" data-testid="inspector-header">
-      <Breadcrumb label="Element path" items={[{ id: "page", label: pageName }]} data-testid="inspector-breadcrumb" />
       <div className="tw:flex tw:items-center tw:gap-1">
         <span
-          className="tw:min-w-0 tw:flex-1 tw:truncate tw:text-[13px] tw:font-semibold tw:leading-4 tw:text-[var(--bk-ink-soft)]"
+          className="tw:min-w-0 tw:flex-1 tw:truncate tw:text-[13px] tw:font-semibold tw:leading-4 tw:text-[var(--bk-ink)]"
           data-testid="inspector-element-name"
         >
           {pageName} · Page
@@ -280,6 +278,10 @@ function PageHeader({ composer, pageName, pageId }: { composer: Composer; pageNa
           <X size={16} aria-hidden="true" />
         </IconButton>
       </div>
+      <Breadcrumb label="Element path" items={[{ id: "page", label: `${pageName} · Page` }]} data-testid="inspector-breadcrumb" />
+      <p className="tw:m-0 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="inspector-page-editing">
+        Editing {BREAKPOINTS[breakpoint].name} · Page appearance
+      </p>
     </div>
   );
 }
