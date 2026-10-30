@@ -52,6 +52,17 @@ describe("Modal — board frame", () => {
     expect(scrim.className).not.toContain("tw:justify-center");
   });
 
+  /* design-2l9 187:20616 / 191:31132: a tall dialog drawn from the top of
+     the workspace (frame top 56, under the topbar) — opt-in; the default
+     placement above is unchanged. */
+  it("placement=\"workspace\" sits the frame at the workspace's top (56), not the 31vh spacer", () => {
+    render(<Modal open onClose={() => {}} title="Create collection page" testId="m" placement="workspace" />);
+    const scrim = screen.getByTestId("overlay-scrim");
+    expect(scrim.className).toContain("tw:items-start");
+    expect(scrim.className).toContain("tw:pt-14");
+    expect(scrim.className).not.toContain("tw:before:basis-[31vh]");
+  });
+
   /* Form dialogs draw the DS "Footer" (7431:145583 on 4418:142143): a top rule
      and 16/24 padding. Confirms draw bare "Dialog actions" (7564:185450,
      4428:151964) — the default stays borderless. */
