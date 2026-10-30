@@ -1,7 +1,7 @@
 /**
  * Analytics — 2L9 B8-AN01…AN06 (245:45159…245:46449): one card per provider
  * (Google Analytics, Google Tag Manager, Meta Pixel, Microsoft Clarity), each
- * a single row — the id's label, the id, the switch with "Enabled"/"Off".
+ * a single row — the id's label, the id, the switch labelled "Enabled".
  * Google Analytics adds the tracker's status in words ("Not verified" /
  * "Waiting for data" / "Receiving data") with Verify, the last received line,
  * and "Buildrick tracker status; this does not confirm Google Analytics
@@ -25,6 +25,7 @@
  */
 
 import * as React from "react";
+import { useOnlineStatus } from "@/shared/hooks/useOnlineStatus";
 import { Button, ToggleSwitch } from "@/editor/chrome-ui";
 import { getBuildrikClient } from "@/services/api-client";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
@@ -101,7 +102,7 @@ export function lastReceivedLine(status: AnalyticsStatus | null): string {
 // ─────────────────────────────────────────────────────────────────────────────
 // ProviderRow — 2L9 B8-AN01 245:45159: one row per provider — the id's label
 // in a 192 column, the id (368), and the provider's switch with its state
-// word ("Enabled" / "Off", 104) at the right. `stem` keeps the search
+// word ("Enabled", 104) at the right. `stem` keeps the search
 // landing (`set-field-<stem>`); the switch keeps its `enable-…` id.
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -137,7 +138,8 @@ const ProviderRow: React.FC<ProviderRowProps> = ({ stem, label, inputId, switchI
         sizing="md"
         data-testid={switchTestId}
       />
-      <span aria-hidden>{enabled ? "Enabled" : "Off"}</span>
+      {/* B8-AN01: the switch's label reads "Enabled" on or off — the switch shows the state. */}
+      <span aria-hidden>Enabled</span>
     </div>
   </div>
 );
@@ -159,6 +161,7 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
   registerRetryLoad,
   saveError,
   registerFieldErrors,
+  registerFooterMessage,
   fieldErrors,
 }) => {
   const { value: stored } = useSettingsScreen(
@@ -241,6 +244,8 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
     { onLoadStateChange, registerRetryLoad }
   );
 
+  /* B8-AN07: offline, the tracker's status cannot be read. */
+  const online = useOnlineStatus();
   const gaError = validateProviderId("googleAnalytics", gaId);
   const gtmError = validateProviderId("googleTagManager", gtmId);
   const pixelError = validateProviderId("facebookPixel", pixelId);
@@ -302,6 +307,13 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
     registerFieldErrors(Object.keys(errors).length > 0 ? errors : null);
   }, [registerFieldErrors, gaError, gtmError, pixelError, clarityError]);
   React.useEffect(() => () => registerFieldErrors?.(null), [registerFieldErrors]);
+  /* B8-AN05: while an id is malformed the footer names it instead of "Unsaved changes". */
+  const fixWhat = gaError ? "measurement ID" : gtmError ? "container ID" : pixelError ? "pixel ID" : clarityError ? "project ID" : null;
+  React.useEffect(() => {
+    if (!registerFooterMessage) return;
+    registerFooterMessage(fixWhat ? `Fix the ${fixWhat} before saving` : null);
+    return () => registerFooterMessage(null);
+  }, [registerFooterMessage, fixWhat]);
 
   // On Save the shell calls this and saves what it returns (ScreenProps.registerFlushHandler). The
   // other providers' `verifiedAt` ride through from the stored config.
@@ -383,31 +395,31 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
             </div>
           )}
         </ProviderRow>
-        {/* B8-AN01…AN06: the status word over one detail line, Verify at the right;
-            the tracker note; a failed check's sentence in error ink under it. */}
+        {/* B8-AN01…AN06: the status word with Verify at the right, the tracker
+            note, then one detail line under it (AN03/AN04) or a failed check's
+            sentence in error ink (AN06). */}
         <div className="tw:col-span-full tw:flex tw:min-h-8 tw:items-center tw:gap-3" data-testid="set-field-connection-status">
           <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col" data-testid="set-field-last-received-data">
-            <span className="tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]" role="status" data-testid="set-an-ga-status">
-              {verifying ? "Checking status…" : verifyFailed ? "Couldn’t check status" : STATUS_WORDS[pill]}
+            <span
+              className={`tw:text-[length:var(--bk-text-13)] tw:leading-5 ${
+                verifyFailed || !online
+                  ? "tw:text-[var(--bk-ink-muted)]"
+                  : !verifying && pill === "RECEIVING DATA"
+                    ? "tw:text-[var(--bk-success-text)]"
+                    : "tw:text-[var(--bk-ink)]"
+              }`}
+              role="status"
+              data-testid="set-an-ga-status"
+            >
+              {!online ? "Status unavailable offline" : verifying ? "Checking status…" : verifyFailed ? "Couldn’t check status" : STATUS_WORDS[pill]}
             </span>
-            {verifying || verifyFailed ? null : pill === "RECEIVING DATA" ? (
-              <span className={NOTE} data-testid="set-an-ga-last">
-                {lastReceivedLine(status)}
-              </span>
-            ) : pill === "NO DATA YET" ? (
-              <span className={NOTE} data-testid="set-an-ga-verified">
-                {gaVerifiedAt !== stored.gaVerifiedAt
-                  ? "No events received yet. Verification is an unsaved setting."
-                  : `No events received yet · verified on ${formatDay(gaVerifiedAt!)}`}
-              </span>
-            ) : null}
           </div>
           <Button
             type="button"
             variant="secondary"
             size="xs"
             className={`${SET_BTN} tw:w-37 tw:shrink-0`}
-            disabled={verifying}
+            disabled={verifying || !online}
             onClick={verify}
             data-testid="set-an-ga-verify"
           >
@@ -417,9 +429,19 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({
         <p className={`${NOTE} tw:col-span-full`} data-testid="set-an-ga-disclaimer">
           Buildrick tracker status; this does not confirm Google Analytics delivery.
         </p>
-        {verifyFailed ? (
+        {!online ? null : verifyFailed ? (
           <p className="tw:col-span-full tw:m-0 tw:text-[length:var(--bk-text-12)] tw:leading-4 tw:text-[var(--bk-error)]" role="alert" data-testid="set-an-ga-verify-error">
             The status service did not respond. Try Verify again.
+          </p>
+        ) : verifying ? null : pill === "RECEIVING DATA" ? (
+          <p className={`${NOTE} tw:col-span-full`} data-testid="set-an-ga-last">
+            {lastReceivedLine(status)}
+          </p>
+        ) : pill === "NO DATA YET" ? (
+          <p className={`${NOTE} tw:col-span-full`} data-testid="set-an-ga-verified">
+            {gaVerifiedAt !== stored.gaVerifiedAt
+              ? "No events received yet. Verification is an unsaved setting."
+              : `No events received yet · verified on ${formatDay(gaVerifiedAt!)}`}
           </p>
         ) : null}
       </Section>

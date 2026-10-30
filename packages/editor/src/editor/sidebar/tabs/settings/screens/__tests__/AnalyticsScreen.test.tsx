@@ -64,6 +64,7 @@ function setup(opts: {
   settings?: Record<string, unknown>;
   registerFieldErrors?: (errors: Readonly<Record<string, string>> | null) => void;
   fieldErrors?: Readonly<Record<string, string>>;
+  registerFooterMessage?: (message: string | null) => void;
 } = {}) {
   const composer = createMockComposer({ projectSettings: opts.settings ?? {} });
   const utils = render(
@@ -77,6 +78,7 @@ function setup(opts: {
       saveError={opts.saveError}
       registerFieldErrors={opts.registerFieldErrors}
       fieldErrors={opts.fieldErrors}
+      registerFooterMessage={opts.registerFooterMessage}
     />,
   );
   return { composer, ...utils };
@@ -104,7 +106,7 @@ describe("AnalyticsScreen — the frame's cards and rows", () => {
 
     const ga = within(screen.getByTestId("set-card-google-analytics"));
     expect(ga.getByTestId("set-field-label-google-analytics-id")).toHaveTextContent("Measurement ID");
-    expect(ga.getByTestId("set-field-google-analytics-id")).toHaveTextContent("Off");
+    expect(ga.getByTestId("set-field-google-analytics-id")).toHaveTextContent("Enabled");
     expect(ga.getByTestId("set-field-connection-status")).toBeInTheDocument();
     expect(ga.getByTestId("set-field-last-received-data")).toBeInTheDocument();
     expect(ga.getByTestId("set-an-ga-verify")).toHaveTextContent("Verify");
@@ -385,7 +387,7 @@ describe("AnalyticsScreen — id normalisation", () => {
 
 describe("AnalyticsScreen — validation (3397:34148)", () => {
   const GA_SENTENCE =
-    "This doesn't look right. Your Google Analytics ID should start with G- followed by 10 characters, like G-ABCD123456.";
+    "Enter a valid Google Analytics measurement ID.";
 
   it("a malformed Measurement ID flags the field and says the frame's sentence under it; an empty one is not an error", async () => {
     setup();
@@ -409,15 +411,15 @@ describe("AnalyticsScreen — validation (3397:34148)", () => {
     expect(gtmInput()).toHaveAttribute("aria-invalid", "true");
     expect(gtmInput()).toHaveAttribute("aria-describedby", "gtm-error");
     expect(screen.getByTestId("set-an-gtm-error")).toHaveTextContent(
-      "Your GTM Container ID should start with GTM- followed by 6 to 8 characters, like GTM-ABC1234.",
+      "Enter a valid Google Tag Manager container ID.",
     );
     fireEvent.change(pixelInput(), { target: { value: "12345678" } });
     expect(pixelInput()).toHaveAttribute("aria-invalid", "true");
-    expect(screen.getByTestId("set-an-pixel-error")).toHaveTextContent("Your Pixel ID should be 15 or 16 digits, like 1234567890123456.");
+    expect(screen.getByTestId("set-an-pixel-error")).toHaveTextContent("Enter a valid Meta Pixel ID.");
     fireEvent.change(clarityInput(), { target: { value: "abc" } });
     expect(clarityInput()).toHaveAttribute("aria-invalid", "true");
     expect(screen.getByTestId("set-an-clarity-error")).toHaveTextContent(
-      "Your Clarity Project ID should be 10 letters or digits, like abcdefghij.",
+      "Enter a valid Microsoft Clarity project ID.",
     );
     expect(screen.getAllByRole("alert")).toHaveLength(3);
   });
@@ -445,7 +447,7 @@ describe("AnalyticsScreen — validation (3397:34148)", () => {
     const { composer } = setup({ registerFlushHandler: (h) => { flush = h; } });
     await loaded();
     fireEvent.change(pixelInput(), { target: { value: "12345678" } });
-    expect(() => flush!()).toThrow("Your Pixel ID should be 15 or 16 digits");
+    expect(() => flush!()).toThrow("Enter a valid Meta Pixel ID.");
     expect(composer.setProjectSettings).not.toHaveBeenCalled();
     fireEvent.change(pixelInput(), { target: { value: "123456789012345" } });
     expect(flush!()).toMatchObject({ analytics: { facebookPixel: { pixelId: "123456789012345" } } });
@@ -543,10 +545,20 @@ describe("AnalyticsScreen — field errors", () => {
     await loaded();
     fireEvent.change(pixelInput(), { target: { value: "12345678" } });
     expect(registerFieldErrors).toHaveBeenLastCalledWith({
-      "analytics.facebookPixel.pixelId": expect.stringContaining("Your Pixel ID should be 15 or 16 digits"),
+      "analytics.facebookPixel.pixelId": expect.stringContaining("Enter a valid Meta Pixel ID."),
     });
     fireEvent.change(pixelInput(), { target: { value: "123456789012345" } });
     expect(registerFieldErrors).toHaveBeenLastCalledWith(null);
+  });
+
+  it("names the malformed id in the footer (B8-AN05)", async () => {
+    const registerFooterMessage = vi.fn();
+    setup({ registerFooterMessage });
+    await loaded();
+    fireEvent.change(gaInput(), { target: { value: "G-123" } });
+    expect(registerFooterMessage).toHaveBeenLastCalledWith("Fix the measurement ID before saving");
+    fireEvent.change(gaInput(), { target: { value: "G-ABCD123456" } });
+    expect(registerFooterMessage).toHaveBeenLastCalledWith(null);
   });
 
   it("shows the server's refusal under the field it names", async () => {

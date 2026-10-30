@@ -20,7 +20,7 @@ describe("validateProviderId", () => {
     expect(validateProviderId("googleAnalytics", "G-ABCD123456")).toBeNull();
     expect(validateProviderId("googleAnalytics", "g-abcd123456")).toBeNull();
     const sentence =
-      "This doesn't look right. Your Google Analytics ID should start with G- followed by 10 characters, like G-ABCD123456.";
+      "Enter a valid Google Analytics measurement ID.";
     expect(validateProviderId("googleAnalytics", "G-ABC")).toBe(sentence);
     expect(validateProviderId("googleAnalytics", "G-ABCD1234567")).toBe(sentence);
     expect(validateProviderId("googleAnalytics", "UA-12345678-1")).toBe(sentence);
@@ -32,7 +32,7 @@ describe("validateProviderId", () => {
     expect(validateProviderId("googleTagManager", "GTM-ABC1234")).toBeNull();
     expect(validateProviderId("googleTagManager", "GTM-ABC12345")).toBeNull();
     const sentence =
-      "This doesn't look right. Your GTM Container ID should start with GTM- followed by 6 to 8 characters, like GTM-ABC1234.";
+      "Enter a valid Google Tag Manager container ID.";
     expect(validateProviderId("googleTagManager", "GTM-ABC12")).toBe(sentence);
     expect(validateProviderId("googleTagManager", "GTM-ABC123456")).toBe(sentence);
     expect(validateProviderId("googleTagManager", "G-ABCD123456")).toBe(sentence);
@@ -41,7 +41,7 @@ describe("validateProviderId", () => {
   it("Meta Pixel: 15 or 16 digits", () => {
     expect(validateProviderId("facebookPixel", "123456789012345")).toBeNull();
     expect(validateProviderId("facebookPixel", "1234567890123456")).toBeNull();
-    const sentence = "This doesn't look right. Your Pixel ID should be 15 or 16 digits, like 1234567890123456.";
+    const sentence = "Enter a valid Meta Pixel ID.";
     expect(validateProviderId("facebookPixel", "12345678901234")).toBe(sentence);
     expect(validateProviderId("facebookPixel", "12345678901234567")).toBe(sentence);
     expect(validateProviderId("facebookPixel", "12345678901234a")).toBe(sentence);
@@ -50,7 +50,7 @@ describe("validateProviderId", () => {
   it("Microsoft Clarity: exactly 10 letters or digits", () => {
     expect(validateProviderId("microsoftClarity", "abcdefghij")).toBeNull();
     expect(validateProviderId("microsoftClarity", "a1b2c3d4e5")).toBeNull();
-    const sentence = "This doesn't look right. Your Clarity Project ID should be 10 letters or digits, like abcdefghij.";
+    const sentence = "Enter a valid Microsoft Clarity project ID.";
     expect(validateProviderId("microsoftClarity", "abcdefghi")).toBe(sentence);
     expect(validateProviderId("microsoftClarity", "abcdefghijk")).toBe(sentence);
     expect(validateProviderId("microsoftClarity", "abcde-ghij")).toBe(sentence);

@@ -410,7 +410,7 @@ describe("SettingsTab — the shell", () => {
     // 8134:212718: a clean footer screen keeps its save bar, both actions disabled.
     expect(footStatus()).toBe("Saved");
     expect((screen.getByTestId("set-foot-save") as HTMLButtonElement).disabled).toBe(true);
-    expect((screen.getByTestId("set-foot-discard") as HTMLButtonElement).disabled).toBe(true);
+    expect(screen.queryByTestId("set-foot-discard")).toBeNull();
     expect(screen.getByTestId("set-card-site")).toBeTruthy();
   });
 
@@ -506,7 +506,7 @@ describe("SettingsTab — doors", () => {
     fireEvent.keyDown(document.body, { key: "Escape" });
     expect(onClose).toHaveBeenCalledTimes(2);
     // A clean screen's Discard is disabled (8134:212718).
-    expect((screen.getByTestId("set-foot-discard") as HTMLButtonElement).disabled).toBe(true);
+    expect(screen.queryByTestId("set-foot-discard")).toBeNull();
     // An input keeps its own Escape.
     const input = await screen.findByLabelText("Site name");
     fireEvent.keyDown(input, { key: "Escape" });

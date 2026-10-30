@@ -10,8 +10,8 @@
  *
  * Approve had an explicit confirm; the terminal, irreversible path carrying
  * the client's reasoning had none. Since the Figma parity pass (board
- * 4418:121999) "Request changes" opens the notes beside the snapshot and the
- * round closes only from "Send change request" there — the second step.
+ * 4418:121999), and since 2L9 (GAP-RV 276:30195) a dialog: the note posts
+ * first and the round closes only once it lands.
  *
  * @license BSD-3-Clause
  */
@@ -73,71 +73,70 @@ beforeEach(() => {
 });
 
 const typeNote = (text: string) => {
-  fireEvent.change(screen.getByPlaceholderText("Anything you'd like changed?"), {
-    target: { value: text },
-  });
+  fireEvent.change(screen.getByLabelText("Your note"), { target: { value: text } });
 };
 
-describe("Request changes carries the note the client typed", () => {
-  const openNotes = () => fireEvent.click(screen.getByText("Request changes"));
+describe("Request changes carries the note the client typed (2L9 GAP-RV)", () => {
+  const openDialog = () => fireEvent.click(screen.getByText("Request changes"));
+  const submit = () => fireEvent.click(screen.getByTestId("rc-submit"));
 
-  it("does not close the round straight from the button — it opens the notes", () => {
+  it("does not close the round straight from the button — it asks first", () => {
     render(<ReviewClient token="t" />);
-    openNotes();
+    openDialog();
     expect(resolveMutate).not.toHaveBeenCalled();
-    expect(screen.getByText("Your notes")).toBeTruthy();
-    expect(screen.getByText("Send change request")).toBeTruthy();
+    expect(screen.getByText("Request changes to Round 3?")).toBeTruthy();
   });
 
-  it("sends the typed note before closing the round", () => {
+  it("posts the note, says so, then marks the round (276:30262 → 30321)", () => {
     render(<ReviewClient token="t" />);
-    openNotes();
+    openDialog();
     typeNote("The hero photo is too dark");
-    fireEvent.click(screen.getByText("Send change request"));
-
-    expect(commentMutate).toHaveBeenCalledWith(
-      { token: "t", body: "The hero photo is too dark" },
-      expect.anything(),
-    );
-    /* The round closes only from the note's onSuccess. If the note cannot be
-       sent, the round must stay open — otherwise the reason is lost exactly
-       when it mattered. */
+    submit();
+    expect(commentMutate).toHaveBeenCalledWith({ token: "t", body: "The hero photo is too dark" }, expect.anything());
+    expect(screen.getByText("Posting your note…")).toBeTruthy();
+    expect(screen.getByText("Your draft is kept until the comment is confirmed.")).toBeTruthy();
+    /* The round closes only from the note's onSuccess. */
     expect(resolveMutate).not.toHaveBeenCalled();
-    const onSuccess = commentMutate.mock.calls[0][1].onSuccess as () => void;
-    onSuccess();
-    expect(resolveMutate).toHaveBeenCalledWith(
-      { token: "t", status: "CHANGES_REQUESTED" },
-      expect.anything(),
-    );
+    act(() => (commentMutate.mock.calls[0][1].onSuccess as () => void)());
+    expect(resolveMutate).toHaveBeenCalledWith({ token: "t", status: "CHANGES_REQUESTED" }, expect.anything());
+    expect(screen.getByText("Requesting changes…")).toBeTruthy();
+    expect(screen.getByText("Your note was posted: “The hero photo is too dark”")).toBeTruthy();
+    expect(screen.getByText("Waiting to mark Round 3 as Changes requested.")).toBeTruthy();
   });
 
-  it("says plainly that no note means no reason reaches the designer", () => {
+  it("a note that did not post keeps the draft and the round (276:30499)", () => {
     render(<ReviewClient token="t" />);
-    openNotes();
-    expect(screen.getByText(/will not be told what to change/)).toBeTruthy();
+    openDialog();
+    typeNote("Warmer photo");
+    submit();
+    act(() => (commentMutate.mock.calls[0][1].onError as () => void)());
+    expect(screen.getByText("Your note wasn’t posted")).toBeTruthy();
+    expect(screen.getByText("Draft kept. Round 3 is still open.")).toBeTruthy();
+    expect(resolveMutate).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByTestId("rc-keep-editing"));
+    expect((screen.getByLabelText("Your note") as HTMLTextAreaElement).value).toBe("Warmer photo");
+  });
+
+  it("a round that did not close retries the status only (276:30380)", () => {
+    render(<ReviewClient token="t" />);
+    openDialog();
+    typeNote("Warmer photo");
+    submit();
+    act(() => (commentMutate.mock.calls[0][1].onSuccess as () => void)());
+    act(() => (resolveMutate.mock.calls[0][1].onError as () => void)());
+    expect(screen.getByText("Your note was posted; the round is still open")).toBeTruthy();
+    expect(screen.getByText("Retry only updates the round status. It won’t post your note again.")).toBeTruthy();
+    fireEvent.click(screen.getByTestId("rc-retry-status"));
+    expect(commentMutate).toHaveBeenCalledTimes(1);
+    expect(resolveMutate).toHaveBeenCalledTimes(2);
   });
 
   it("still closes the round with no note", () => {
     render(<ReviewClient token="t" />);
-    openNotes();
-    fireEvent.click(screen.getByText("Send change request"));
+    openDialog();
+    submit();
     expect(commentMutate).not.toHaveBeenCalled();
-    expect(resolveMutate).toHaveBeenCalledWith(
-      { token: "t", status: "CHANGES_REQUESTED" },
-      expect.anything(),
-    );
-  });
-
-  /* 4418:122170: a request that did not land keeps everything and offers
-     "Send again" — the round is still open. */
-  it("a failed send says nothing was lost and offers Send again", () => {
-    render(<ReviewClient token="t" />);
-    openNotes();
-    fireEvent.click(screen.getByText("Send change request"));
-    const onError = resolveMutate.mock.calls[0][1].onError as () => void;
-    act(() => onError());
-    expect(screen.getByText("Your change request wasn’t sent.")).toBeTruthy();
-    expect(screen.getByText("Send again")).toBeTruthy();
+    expect(resolveMutate).toHaveBeenCalledWith({ token: "t", status: "CHANGES_REQUESTED" }, expect.anything());
   });
 });
 
