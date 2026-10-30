@@ -177,8 +177,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Built and probe-compared 2026-10-30 (case pages-live-site; board shots/63-15255.png): 'Update URL' on a live page — the site has a publishedUrl and the page is not hidden from publish (real state) — asks 'Change this live page’s URL?' / 'About is live at /about. Changing it to /our-story can break old links after publishing. You can add a redirect after the change.' Cancel · Change URL; Cancel changes nothing, an unpublished site is not asked (test PagesTab.liveUrl). Open: the shared ConfirmDialog draws it wider with its buttons on the right; the board has a 480 card with them on the left.",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-30 (case pages-live-site; board shots/63-15255.png): 'Update URL' on a live page — the site has a publishedUrl and the page is not hidden from publish (real state) — asks 'Change this live page’s URL?' / 'About is live at /about. Changing it to /our-story can break old links after publishing. You can add a redirect after the change.' in a 480 × 176 card (board 480 × ~178), Cancel outlined and Change URL on the LEFT — ConfirmDialog gained actionsAlign / cancelStyle props (defaults unchanged; contract test ConfirmDialog.layout). Cancel changes nothing; an unpublished site is not asked (test PagesTab.liveUrl).",
    "tier": "P1"
   },
   {
@@ -853,7 +853,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Built and probe-compared 2026-10-30 (case templates-resource-area&page=Services; board shots/104-28892.png): a visit from New page shows 'Creating “Services”' / 'Add to site navigation' with Change, and the back door reads '‹ Back to New page'; both reopen New page with the name and choice, From template (tests TemplatesTab.workspace / NewPageModal). Open: the board's strip spans under a slim header in a redesigned Templates workspace (Show · All/Built-in/Saved, cards with Preview) — that layout is L-C's Templates surface; and the strip's '· 6 of 10 pages on Free' is not carried.",
+   "verifiedNote": "Built and probe-compared 2026-10-30 (case templates-resource-area&page=Services; board shots/104-28892.png): a visit from New page shows 'Creating “Services”' / 'Add to site navigation' with Change, and the back door reads '‹ Back to New page'; both reopen New page with the name and choice, From template (tests TemplatesTab.workspace / NewPageModal). Open: the board's strip spans under a slim header in a redesigned Templates workspace (Show · All/Built-in/Saved, cards with Preview) — that layout is L-C's Templates surface . The strip now carries '· n of N pages on Plan' from the same capacity New page reads (server page limit + real page count), hidden while unknown or unlimited — probe-compared with a routed capacity answer: 'Add to site navigation · 1 of 10 pages on Free'.",
    "tier": "P1"
   },
   {

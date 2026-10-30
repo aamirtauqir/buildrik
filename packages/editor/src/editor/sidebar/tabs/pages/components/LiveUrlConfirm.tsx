@@ -25,6 +25,11 @@ export function LiveUrlConfirm({ change, onCancel, onConfirm }: { change: LiveUr
       title="Change this live page’s URL?"
       message={`${change.current} is live at ${change.from}. Changing it to ${change.to} can break old links after publishing. You can add a redirect after the change.`}
       confirmLabel="Change URL"
+      /* 63:15255: a 480 card, Cancel outlined, both actions on the left. */
+      width="sm"
+      actionsAlign="start"
+      cancelStyle="outline"
+      testId="pages-live-url"
       onClose={onCancel}
       onConfirm={onConfirm}
     />

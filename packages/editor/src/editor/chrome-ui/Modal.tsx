@@ -101,10 +101,13 @@ export interface ModalProps {
   testId?: string;
   /** A ✕ at the head's right edge (6752:59256 New page draws one). */
   closeButton?: boolean;
+  /** Where the footer's buttons sit — "end" (default, right) or "start"
+   *  (left, as design-2l9's page confirms draw them, e.g. 63:15255). */
+  footerAlign?: "start" | "end";
 }
 
 export function Modal({
-  open, onClose, title, subtitle, kind = "question", width, children, footer, dismissOnScrimClick, dirty, testId, closeButton,
+  open, onClose, title, subtitle, kind = "question", width, children, footer, dismissOnScrimClick, dirty, testId, closeButton, footerAlign = "end",
 }: ModalProps) {
   const titleId = React.useId();
   return (
@@ -118,7 +121,7 @@ export function Modal({
         </div>
         {children ? <div className={MODAL_BODY_CLASS}>{children}</div> : null}
         {footer ? (
-          <div className={MODAL_FOOT_CLASS} data-testid={`modal-foot-${testId ?? "modal"}`}>
+          <div className={footerAlign === "start" ? `${MODAL_FOOT_CLASS} tw:justify-start!` : MODAL_FOOT_CLASS} data-testid={`modal-foot-${testId ?? "modal"}`}>
             {footer}
           </div>
         ) : null}
