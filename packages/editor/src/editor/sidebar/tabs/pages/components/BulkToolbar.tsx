@@ -16,6 +16,8 @@ interface Props {
   /** The selected pages' names, for the Move dialog's line. */
   selectedNames: string[];
   folders: FolderItem[];
+  /** Some selected page sits in a folder — only then is Top level a move. */
+  anyInFolder: boolean;
   onDuplicate: () => void;
   onMoveToFolder: (folderId: string) => void;
   onRemoveFromFolders: () => void;
@@ -31,6 +33,7 @@ export const BulkToolbar: React.FC<Props> = ({
   selectedCount,
   selectedNames,
   folders,
+  anyInFolder,
   onDuplicate,
   onMoveToFolder,
   onRemoveFromFolders,
@@ -65,6 +68,7 @@ export const BulkToolbar: React.FC<Props> = ({
         open={moveOpen}
         pageNames={selectedNames}
         folders={folders}
+        offerTopLevel={anyInFolder || folders.length === 0}
         onClose={() => setMoveOpen(false)}
         onMove={(target) => {
           setMoveOpen(false);

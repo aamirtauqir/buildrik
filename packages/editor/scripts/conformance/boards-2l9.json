@@ -1364,7 +1364,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "probe-compared 2026-10-30 (same recipe, then Create folder; board shots/127-37393.png): the list matches — 'Client projects · 0 pages · Folder' under Studio — and the receipt reads 'Client projects created · Only visible to you'. Open: the receipt is the shared chrome-ui Toast (✕ icon, its own position), the board draws a text 'Close'; not forked here.",
+   "verifiedNote": "probe-compared 2026-10-30 (shots/127-37393.png): the list matches and the receipt reads 'Client projects created · Only visible to you'. Open, by design: the boards disagree on the toast's dismiss — 127:37393 draws a text 'Close' at the right, 101:42581 ('Services created…') and 63:23182 ('Our story renamed · URL kept' + an outlined Undo button) draw no dismiss at all, and 127:38819 / 127:39528 a text Undo only — so the shared Toast's ✕ was not changed.",
    "tier": "P1"
   },
   {
@@ -1386,7 +1386,7 @@
    "status": "active",
    "authority": "blocked:requests-13-folder-undo",
    "verified": "drift-open",
-   "verifiedNote": "probe-compared 2026-10-30 (board shots/127-38819.png): receipt 'About moved to Studio · /about unchanged' is built (shared Toast). Blocked: the board's Undo needs folder moves in composer history (REQUESTS #13); not stubbed.",
+   "verifiedNote": "probe-compared 2026-10-30 (board shots/127-38819.png): receipt 'About moved to Studio · /about unchanged' is built (shared Toast). Blocked: the board's Undo. Folder moves cannot become undo steps from pages/: HistoryManager records whole-project snapshots (record/captureUndo over importProject) and has no public custom-step API, and folders live outside the project (useFolders + pageFolderRemote). Needs an engine history change (REQUESTS #13). Re-checked round 9.",
    "tier": "P1"
   },
   {
@@ -1406,9 +1406,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:requests-13-folder-undo",
    "verified": "drift-open",
-   "verifiedNote": "L-A S6: receipt '{Page} removed from {Folder} · Page kept' built (from the Move dialog's Top level); no Undo (REQUESTS #13). Not compared.",
+   "verifiedNote": "Receipt '{Page} removed from {Folder} · Page kept' built; not image-compared this round. Blocked on the board's Undo — Folder moves cannot become undo steps from pages/: HistoryManager records whole-project snapshots (record/captureUndo over importProject) and has no public custom-step API, and folders live outside the project (useFolders + pageFolderRemote). Needs an engine history change (REQUESTS #13). | L-A S6: receipt '{Page} removed from {Folder} · Page kept' built (from the Move dialog's Top level); no Undo (REQUESTS #13). Not compared.",
    "tier": "P1"
   },
   {
@@ -1461,9 +1461,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:requests-13-folder-undo",
    "verified": "drift-open",
-   "verifiedNote": "L-A S6: receipt '{Page} moved to {Folder} · {url} unchanged' built; no Undo (REQUESTS #13).",
+   "verifiedNote": "Receipt '{Page} moved to {Folder} · {url} unchanged' built; not image-compared this round. Blocked on the board's Undo — Folder moves cannot become undo steps from pages/: HistoryManager records whole-project snapshots (record/captureUndo over importProject) and has no public custom-step API, and folders live outside the project (useFolders + pageFolderRemote). Needs an engine history change (REQUESTS #13). | L-A S6: receipt '{Page} moved to {Folder} · {url} unchanged' built; no Undo (REQUESTS #13).",
    "tier": "P1"
   },
   {
@@ -1566,9 +1566,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:requests-13-folder-undo",
    "verified": "drift-open",
-   "verifiedNote": "L-A S6 built: Move down reorders among top-level pages (rootMove, unit-tested), receipt '{Page} moved to position {n}'; no Undo — page order is not in composer history (REQUESTS #13).",
+   "verifiedNote": "Receipt '{Page} moved to position {n}' (page order is not in composer history either) built; not image-compared this round. Blocked on the board's Undo — Folder moves cannot become undo steps from pages/: HistoryManager records whole-project snapshots (record/captureUndo over importProject) and has no public custom-step API, and folders live outside the project (useFolders + pageFolderRemote). Needs an engine history change (REQUESTS #13). | L-A S6 built: Move down reorders among top-level pages (rootMove, unit-tested), receipt '{Page} moved to position {n}'; no Undo — page order is not in composer history (REQUESTS #13).",
    "tier": "P1"
   },
   {
@@ -1623,8 +1623,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-A wave 3 built: the folder's ⋯ opens '{Folder}', 'Only you see this folder. Deleting it keeps {pages} at the top level.', Rename folder… (code's, kept), 'Delete folder · keep page(s)'. Not probe-compared (no board PNG).",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-30 (case pages-shell, New folder 'Client projects' → its ⋯; board shots/137-57493.png): titled with the folder's name (12/600, was a small-caps label), 'Only you see this folder. Deleting it keeps … at the top level.' 12px, 'Delete folder · keep page(s)' red, and 'Close menu' added. Kept: Rename folder… (code's). Not matched: the board opens it beside the panel; the panel's Popover is clipped by the drawer, so it stays under the ⋯.",
    "tier": "P1"
   },
   {
@@ -1711,9 +1711,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "blocked:requests-13-folder-undo",
    "verified": "drift-open",
-   "verifiedNote": "L-A S8 built, not compared: one receipt '{n} pages duplicated · Originals kept' (usePages.duplicatePages) instead of one toast per page. Board's Undo not offered (duplicate is outside composer history — REQUESTS #13 family).",
+   "verifiedNote": "Receipt '{n} pages duplicated · Originals kept' built; not image-compared this round. Blocked on the board's Undo — Folder moves cannot become undo steps from pages/: HistoryManager records whole-project snapshots (record/captureUndo over importProject) and has no public custom-step API, and folders live outside the project (useFolders + pageFolderRemote). Needs an engine history change (REQUESTS #13). | L-A S8 built, not compared: one receipt '{n} pages duplicated · Originals kept' (usePages.duplicatePages) instead of one toast per page. Board's Undo not offered (duplicate is outside composer history — REQUESTS #13 family).",
    "tier": "P1"
   },
   {
@@ -1723,8 +1723,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-A S8 built, not compared: 'Move {n} pages to…', '{names}. Only your folder organization changes; page URLs and the homepage stay the same.', primary 'Move {n} pages'.",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-30 (case pages-shell, three pages checked → Move to…; board shots/139-51389.png): 'Move 3 pages to…', the names line, Cancel · 'Move 3 pages' (88 / 208), 480×220. Fixed: when no selected page is in a folder, Top level is not offered (the board draws only the folder) — a move to top level would change nothing. Test BulkToolbar.",
    "tier": "P1"
   },
   {
@@ -2137,7 +2137,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "lead4 2026-10-27 (A-14): the View menu opens downward from the top bar (probe canvas-grid-panel, menu top 103, right edge 1140). | L-A S4 built, not compared: 'Canvas view' menu — Grid · {n} px › (dialog), Rulers ⌘R, Snap guides ⌘; — then Spacing/Badges/X-Ray kept under a rule (code-ahead). Still open: 'Rulers and guides…' list (S11, shared guides) and Show outlines / Focus mode (REQUESTS #12).",
+   "verifiedNote": "probe-compared 2026-10-30 (case canvas-grid-panel, View; board shots/145-64586.png): fixed the head — 'Canvas view' 13/600 and a text Close, as Grid and snapping (was a small-caps label). Still open: 'Rulers and guides…' (S11 shared guides) and Focus mode (REQUESTS #12); the board's 'Canvas view preferences' foot (no destination exists); the shared MenuItem's checkbox squares and the chord hints the board omits; Spacing/Badges/X-Ray kept (code-ahead). | lead4 2026-10-27 (A-14): the View menu opens downward from the top bar.",
    "tier": "P1"
   },
   {
@@ -2158,8 +2158,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-A S4 built, not compared: 'Enter a whole number from 1 to 100 px. Current grid stays {n} px.' and Apply disabled for 1.5.",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-30 (case canvas-grid-panel, View → Grid, '1.5'; board shots/145-65448.png): red field, presets, 'Whole number · 1–100 px' kept under the presets, Cancel · Apply (off), then 'Enter a whole number from 1 to 100 px. Current grid stays 7 px.' in red under the actions — it used to replace the hint above them.",
    "tier": "P1"
   },
   {
@@ -2309,8 +2309,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-A S3 built, not compared: 'Enter a number from 240 to 2560. The page stays at {w} px.'; Enter refused while invalid.",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-30 (case canvas-grid-panel, width chip, '100'; board shots/145-71444.png): 'Page width' with a text Close (added), red field, 'Enter a number from 240 to 2560. The page stays at 1440 px.' now wrapping inside the 240 panel (it ran past it), the six presets, 'Custom width: 240–2560 px.' Not drawn on purpose: '…Saved for your editor on this site.' (the width is session-only), and the board's '14px40' cannot be typed — the field keeps digits only.",
    "tier": "P1"
   },
   {
@@ -2847,7 +2847,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-A wave 2: footer '… · 1 selected · Dimmed' built; the inspector's 'Dimmed in editor only · Show normally · Hide on live site…' banner is L-B's. Not compared.",
+   "verifiedNote": "probe-compared 2026-10-30 (case layers-tree, row selected then its eye; board shots/147-78900.png): footer '8 layers · 1 selected · Dimmed', the row's name greyed with the eye-off. Open: the board's selected pill stops short of the eye-off (live the icon sits inside it), and the board has no 'dimmed in the editor… Show normally in editor' note under the tree — it moves to the inspector's 'Dimmed in editor only' banner (L-B, not built yet), so the Layers note stays until that lands.",
    "tier": "P1"
   },
   {
@@ -2857,8 +2857,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-A S2 + wave 2, not compared: 'No layers match “q”' / 'Search by name, type, tag or ID.' / Clear search; footer '{N} layers · No matches'.",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-30 (case layers-5000, 'Unmatched layer' typed; board shots/147-79328.png): left-aligned 'No layers match “Unmatched layer”' 12/600, 'Search by name, type, tag or ID.' muted, Clear search as a blue link; footer '5,000 layers · No matches'. Fixed: the glyph, centring, outlined button and the ⌘K 'Search everywhere' hand-off removed (⌘K still opens the palette), as Pages' 63:22616. Shared PanelNoResults deleted (Layers was its only user).",
    "tier": "P1"
   },
   {
@@ -2880,8 +2880,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-A S2 built, not compared: ⋯ adds 'Collapse to selection' (only the selection's ancestors stay open; disabled with nothing selected) and 'Select mode'. Widen panel kept (code-ahead).",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-30 (case layers-tree, ⋯; board shots/152-78185.png): Expand all · Collapse all · Collapse to selection (off with nothing selected) · Select mode · Close menu, the menu ~panel wide. Fixed: 'Close menu' added and the stray rule removed when there is no Widen panel row.",
    "tier": "P1"
   },
   {

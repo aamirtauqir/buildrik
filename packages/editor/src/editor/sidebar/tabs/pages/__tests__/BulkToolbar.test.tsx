@@ -15,6 +15,7 @@ const baseProps = {
   selectedCount: 3,
   selectedNames: ["Menu", "Contact", "About"],
   folders,
+  anyInFolder: true,
   onDuplicate: vi.fn(),
   onMoveToFolder: vi.fn(),
   onRemoveFromFolders: vi.fn(),
@@ -70,6 +71,13 @@ describe("BulkToolbar", () => {
     fireEvent.click(screen.getByText("Top level (no folder)"));
     fireEvent.click(screen.getByRole("button", { name: "Move 3 pages" }));
     expect(fn).toHaveBeenCalledTimes(1);
+  });
+
+  it("pages all at the top level get no Top level choice (139:51389)", () => {
+    render(<BulkToolbar {...baseProps} anyInFolder={false} />);
+    fireEvent.click(screen.getByText(/Move to…/));
+    expect(screen.getByText("Marketing")).toBeInTheDocument();
+    expect(screen.queryByText("Top level (no folder)")).toBeNull();
   });
 
   it("Delete reads in the error red", () => {

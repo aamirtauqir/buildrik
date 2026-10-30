@@ -28,6 +28,8 @@ export interface MovePagesDialogProps {
   onMove: (target: string) => void;
   /** One page only: where it is now (folder id or TOP_LEVEL) and its URL. */
   current?: { target: string; url: string };
+  /** 139:51389: pages that are all at the top level get no Top level choice. */
+  offerTopLevel?: boolean;
   onClose: () => void;
 }
 
@@ -38,14 +40,17 @@ const ROW_PICKED = "tw:bg-[var(--bk-accent-tint)]";
 const RADIO = "tw:border-[var(--bk-ink-muted)] tw:bg-[var(--bk-bg-card)]";
 const BTN = "tw:h-8 tw:min-h-0 tw:px-5 tw:text-[13px]";
 
-export function MovePagesDialog({ open, pageNames, folders, onMove, onClose, current }: MovePagesDialogProps) {
+export function MovePagesDialog({ open, pageNames, folders, onMove, onClose, current, offerTopLevel = true }: MovePagesDialogProps) {
   const [picked, setPicked] = React.useState<string>(TOP_LEVEL);
   React.useEffect(() => {
     if (open) setPicked(folders.find((f) => f.id !== current?.target)?.id ?? TOP_LEVEL);
   }, [open, folders, current?.target]);
 
   const count = pageNames.length;
-  const targets = [...folders.map((f) => ({ id: f.id, name: f.name })), { id: TOP_LEVEL, name: "Top level (no folder)" }];
+  const targets = [
+    ...folders.map((f) => ({ id: f.id, name: f.name })),
+    ...(offerTopLevel ? [{ id: TOP_LEVEL, name: "Top level (no folder)" }] : []),
+  ];
   const pickedFolder = folders.find((f) => f.id === picked);
   const single = current && count === 1 ? pageNames[0] : null;
   const already = single !== null && picked === current?.target;

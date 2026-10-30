@@ -549,7 +549,6 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
         {state.searchHook.isSearching && filteredLayers.length === 0 && (
           <LayersNoResults
             search={state.search}
-            onSearchEverywhere={composer ? (query) => composer.emit(EVENTS.UI_TOGGLE_COMMAND_PALETTE, { query }) : undefined}
             onClear={onClearSearch}
           />
         )}

@@ -97,14 +97,10 @@ export function GridSnapPanel({ gridOn, gridSize, onClose, onApply }: GridSnapPa
             </Button>
           ))}
         </div>
-        <span
-          className={`tw:text-[11px] tw:leading-4 ${size === null ? "tw:text-[var(--bk-error-text)]" : "tw:text-[var(--bk-ink-muted)]"}`}
-          data-testid="grid-snap-hint"
-          role={size === null ? "alert" : undefined}
-        >
-          {size === null
-            ? `Enter a whole number from ${GRID_RANGE.min} to ${GRID_RANGE.max} px. Current grid stays ${gridSize} px.`
-            : `Whole number · ${GRID_RANGE.min}–${GRID_RANGE.max} px`}
+        {/* 145:65448: the range stays under the presets; a refused value is
+            said in red under the actions. */}
+        <span className="tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]" data-testid="grid-snap-hint">
+          {`Whole number · ${GRID_RANGE.min}–${GRID_RANGE.max} px`}
         </span>
       </div>
       <div className="tw:flex tw:justify-end tw:gap-2">
@@ -115,6 +111,11 @@ export function GridSnapPanel({ gridOn, gridSize, onClose, onApply }: GridSnapPa
           Apply
         </Button>
       </div>
+      {size === null && (
+        <span className="tw:-mt-2 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-error-text)]" data-testid="grid-snap-error" role="alert">
+          {`Enter a whole number from ${GRID_RANGE.min} to ${GRID_RANGE.max} px. Current grid stays ${gridSize} px.`}
+        </span>
+      )}
     </div>
   );
 }
