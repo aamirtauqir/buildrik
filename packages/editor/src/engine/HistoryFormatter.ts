@@ -55,6 +55,7 @@ export function generateLabelFromEntry(entry: HistoryEntry): string {
   if (entry.type === "checkpoint") {
     return "Checkpoint";
   }
+  if (entry.type === "custom") return entry.label;
 
   if (entry.label) {
     return formatTransactionLabel(entry.label);

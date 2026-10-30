@@ -21,7 +21,7 @@ export type ChangeType = "style" | "text" | "layout" | "content" | "other";
 /**
  * History entry types
  */
-export type HistoryEntryType = "checkpoint" | "patch";
+export type HistoryEntryType = "checkpoint" | "patch" | "custom";
 
 /**
  * Base history entry
@@ -58,9 +58,30 @@ export interface PatchEntry extends BaseHistoryEntry {
 }
 
 /**
+ * Custom entry — a step whose state lives OUTSIDE the project snapshot (page
+ * folders, a per-user organisation), recorded with `history.recordCustom`.
+ * It changes no project data, so state reconstruction passes over it; undo
+ * and redo run its own functions instead of restoring a snapshot.
+ */
+export interface CustomEntry extends BaseHistoryEntry {
+  type: "custom";
+  label: string;
+  undo: () => void;
+  redo: () => void;
+}
+
+/** What `history.recordCustom` takes. */
+export interface CustomStep {
+  /** User-facing, as the History panel and receipts say it. */
+  label: string;
+  undo: () => void;
+  redo: () => void;
+}
+
+/**
  * Union type for history entries
  */
-export type HistoryEntry = CheckpointEntry | PatchEntry;
+export type HistoryEntry = CheckpointEntry | PatchEntry | CustomEntry;
 
 /**
  * Public type for a single change in history (for UI display)
@@ -91,7 +112,7 @@ export interface HistoryDisplayEntry {
   /** Label describing this action */
   label: string;
   /** Entry type */
-  type: "checkpoint" | "patch";
+  type: HistoryEntryType;
   /** Formatted changes (for patch entries) */
   changes: HistoryChange[];
   /** User ID of who created this entry (for team attribution, spec §2.10) */

@@ -243,7 +243,9 @@ export function useAutoMilestone(
           id: e.id,
           label: e.label,
           timestamp: e.timestamp,
-          type: e.type,
+          /* The server's schema knows checkpoint | patch; a custom step
+             (folders) is a change like a patch. */
+          type: e.type === "checkpoint" ? ("checkpoint" as const) : ("patch" as const),
         }));
 
         const pageCount = composer.exportProject().pages.length;

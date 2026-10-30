@@ -24,7 +24,7 @@ import { deepClone } from "../shared/utils/helpers";
 import type { OTOperation } from "./collaboration/OTTypes";
 import type { Composer } from "./Composer";
 import { buildHistoryDisplayEntries } from "./HistoryFormatter";
-import type { HistoryEntry, CheckpointEntry, HistoryConfig } from "./historyTypes";
+import type { HistoryEntry, CheckpointEntry, CustomStep, HistoryConfig } from "./historyTypes";
 import { createPatch, applyPatch, reversePatch, isPatchEmpty, type Patch } from "./utils/JsonPatch";
 
 // Re-export public types so consumers keep the same import path
@@ -376,6 +376,54 @@ export class HistoryManager {
     this.trimHistory();
   }
 
+  /**
+   * Record a step whose state lives outside the project snapshot — page
+   * folders today — on the SAME stack as the snapshot steps, so ⌘Z / ⌘⇧Z and
+   * a receipt's Undo walk one history in order. The caller has already made
+   * the change; `undo` reverses it and `redo` makes it again. Neither may
+   * change project data (that would desync the snapshot cache — record those
+   * the normal way). Any edit still in the coalesce window is committed first
+   * so it lands below this step, and the step clears the redo stack like any
+   * new edit.
+   */
+  recordCustom(step: CustomStep): void {
+    if (this.isDestroyed || !this.isRecording || this.composer.writeLocked) return;
+    this.flushPending();
+    this.undoStack.push({
+      type: "custom",
+      timestamp: Date.now(),
+      label: step.label,
+      undo: step.undo,
+      redo: step.redo,
+      userId: this.currentUserId,
+    });
+    this.redoStack = [];
+    this.trimHistory();
+    this.lastActionRecorded = true;
+    this.lastUnrecordedLabel = undefined;
+    this.composer.emit(EVENTS.HISTORY_RECORDED, { label: step.label });
+  }
+
+  /** Undo or redo one custom step: its own function, no snapshot restore. A
+   *  throwing function leaves both stacks as they were. */
+  private runCustom(entry: HistoryEntry & { type: "custom" }, direction: "undo" | "redo"): boolean {
+    const [from, to] = direction === "undo" ? [this.undoStack, this.redoStack] : [this.redoStack, this.undoStack];
+    try {
+      entry[direction]();
+    } catch (err) {
+      from.push(entry);
+      console.warn(`[HistoryManager] custom ${direction} failed:`, err);
+      return false;
+    }
+    to.push(entry);
+    this.lastActionRecorded = true;
+    this.lastUnrecordedLabel = undefined;
+    this.composer.emit(direction === "undo" ? EVENTS.HISTORY_UNDO : EVENTS.HISTORY_REDO, {
+      entry: { timestamp: Date.now(), snapshot: this.getCurrentState(), label: entry.label },
+    });
+    return true;
+  }
+
   // ─── Snapshot helpers ───────────────────────────────────────────────────────
 
   /* PD-12 / A-4: undo scope = the element tree + the design tokens, nothing
@@ -469,9 +517,10 @@ export class HistoryManager {
       const entry = this.undoStack[i];
       if (entry.type === "patch") {
         state = applyPatch(state, entry.patch);
-      } else {
-        state = deepClone((entry as CheckpointEntry).snapshot);
+      } else if (entry.type === "checkpoint") {
+        state = deepClone(entry.snapshot);
       }
+      /* A custom step changed nothing in the project — pass over it. */
     }
 
     return state;
@@ -532,6 +581,7 @@ export class HistoryManager {
     }
 
     const current = this.undoStack.pop()!;
+    if (current.type === "custom") return this.runCustom(current, "undo");
 
     // Build the redo entry + target state inside try/catch. JSON-Patch path
     // navigation throws when the recorded patch references a tree shape that
@@ -652,6 +702,7 @@ export class HistoryManager {
     }
 
     const entry = this.redoStack.pop()!;
+    if (entry.type === "custom") return this.runCustom(entry, "redo");
     const currentState = this.getCurrentState();
 
     // applyPatch throws "Cannot navigate path" when the patch's recorded path
@@ -691,28 +742,35 @@ export class HistoryManager {
   private updatePatchCounter(): void {
     this.patchesSinceCheckpoint = 0;
     for (let i = this.undoStack.length - 1; i >= 0; i--) {
-      if (this.undoStack[i].type === "checkpoint") break;
-      this.patchesSinceCheckpoint++;
+      const type = this.undoStack[i].type;
+      if (type === "checkpoint") break;
+      if (type === "patch") this.patchesSinceCheckpoint++;
     }
   }
 
   private trimHistory(): void {
     while (this.undoStack.length > this.config.maxHistory) {
-      const removed = this.undoStack.shift();
-
-      if (removed?.type === "checkpoint" && this.undoStack.length > 0) {
-        const next = this.undoStack[0];
-        if (next.type === "patch") {
-          const state = this.reconstructState(0);
-          this.undoStack[0] = {
+      /* Dropping the oldest checkpoint: the next state-bearing entry becomes
+         the new checkpoint. Its state is rebuilt BEFORE the drop — afterwards
+         there is no checkpoint left to rebuild from — and custom steps in
+         between carry no state, so the search passes over them. */
+      if (this.undoStack[0]?.type === "checkpoint") {
+        const k = this.undoStack.findIndex((e, i) => i > 0 && e.type !== "custom");
+        const next = k > 0 ? this.undoStack[k] : undefined;
+        if (next?.type === "patch") {
+          this.undoStack[k] = {
             type: "checkpoint",
             timestamp: next.timestamp,
-            snapshot: state,
+            snapshot: this.reconstructState(k),
             label: next.label,
           };
         }
       }
+      this.undoStack.shift();
     }
+    /* The bottom of the stack is the baseline state, never a step. A custom
+       step trimmed down to it can no longer be undone — drop it. */
+    while (this.undoStack.length > 1 && this.undoStack[0].type === "custom") this.undoStack.shift();
   }
 
   // ─── Public query API ───────────────────────────────────────────────────────
@@ -750,7 +808,7 @@ export class HistoryManager {
     let patchCount = 0;
     for (const entry of this.undoStack) {
       if (entry.type === "checkpoint") checkpointCount++;
-      else patchCount++;
+      else if (entry.type === "patch") patchCount++;
     }
     return {
       undoCount: this.undoStack.length,
@@ -806,6 +864,12 @@ export class HistoryManager {
 
       // Clear redo stack
       this.redoStack = [];
+
+      /* Custom steps after the target hold state the snapshot cannot carry
+         (folders) — undo them, newest first, so the restore reaches them too. */
+      for (const later of this.undoStack.slice(entry.index + 1).reverse()) {
+        if (later.type === "custom") later.undo();
+      }
 
       // Replace everything after target with a checkpoint at target position
       this.undoStack = this.undoStack.slice(0, entry.index + 1);
