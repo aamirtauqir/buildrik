@@ -5068,8 +5068,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Field list has no Select/options rows; no data-loss confirm (BD-29, owner-approved 2026-10-19)",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 23, probe ?block=contact-form + a real select (3 options, 'Research' selected) side by side with shots/170-122442.png: Field · Type Select, Label, Name + note, Required, Default value (a select over the options, writes `selected`, one step), 'Options · 3 options' with 'Research · Default', 'Labels and saved values are identical.' (or 'Saved values differ…' when an option has its own value). Match, except: no Placeholder row on a select — a native <select> has no placeholder attribute (the board's 'Choose a topic…' would be a fake option), and the existing one-per-line options editor stays under the list (capability kept).",
    "tier": "P1"
   },
   {
@@ -5079,8 +5079,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Field list has no Select/options rows; no data-loss confirm (BD-29, owner-approved 2026-10-19)",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 23, probe ?block=contact-form + the select, form selected, side by side with shots/170-122820.png: Fields list 'Topic · Select · Required' among Text / Textarea / Submit button rows, + Add field, 'Drag to reorder, or use a field’s menu.' Match (the fixture's extra Email field is the block's own).",
    "tier": "P1"
   },
   {
@@ -5090,8 +5090,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Field list has no Select/options rows; no data-loss confirm (BD-29, owner-approved 2026-10-19)",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 23: on a select the Type row's 'Field type' card offers exactly Text · Select · Cancel (fieldBody typeOptions), side by side with shots/170-123180.png. Match; picking Text opens the F34 confirm instead of applying.",
    "tier": "P1"
   },
   {
@@ -5101,8 +5101,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Field list has no Select/options rows; no data-loss confirm (BD-29, owner-approved 2026-10-19)",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 23, probe → Type › Text, full-frame shot side by side with shots/170-123569.png: 'Change Topic to Text?', 'The 3 options—Design, Research and Studio—will be removed. The current default “Research” stays as text.', Cancel (primary, focused — the default) and 'Change to Text'. Match; the dialog is centred by chrome-ui Modal (board draws it higher).",
    "tier": "P1"
   },
   {
@@ -5112,8 +5112,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Field list has no Select/options rows; no data-loss confirm (BD-29, owner-approved 2026-10-19)",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 23, probe → Change to Text, side by side with shots/170-123968.png: Type Text, Label Topic, Placeholder, Name topic, Required, Default value 'Research', Validation / Advanced attributes; toast 'Topic changed to Text · Undo'. convertSelectToText keeps the element id, attributes, classes, styles at every breakpoint and lock; ONE history step, Undo restores the options, their order and the default (test formBodies 'Select → Text').",
    "tier": "P1"
   },
   {
@@ -5123,8 +5123,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Field list has no Select/options rows; no data-loss confirm (BD-29, owner-approved 2026-10-19)",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 23, the acceptance note board: loss disclosed by name with Cancel the default; one atomic reversible step; the field keeps its identity (same id — no replace-with-new-id), label, key and styling; before converting, a field with CMS bindings / a condition / a list binding is refused with its reason (conversionRefusal) rather than converted. Lossless input↔textarea swaps still apply directly with Undo (F29/F30).",
    "tier": "P1"
   },
   {

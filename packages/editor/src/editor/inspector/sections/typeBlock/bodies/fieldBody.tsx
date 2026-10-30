@@ -29,10 +29,22 @@ import * as React from "react";
 import type { TypeBlockBodyProps } from "@/editor/inspector/config/typeBlocks";
 import type { Element } from "@/engine/elements/Element";
 import { writeElement } from "@/engine/commands/commandOperations";
-import { Button, Menu, MenuItem, Popover, useToast } from "@/editor/chrome-ui";
+import { Button, Menu, MenuItem, Modal, Popover, useToast } from "@/editor/chrome-ui";
+import { SelectRow } from "@/editor/inspector/shared/controls";
 import { CheckRow } from "@/editor/inspector/shared/controls/CheckRow";
 import { CommitRow, NoteRow, PickRow } from "@/editor/inspector/sections/behaviourRows";
-import { fieldLabelText, fieldType, formOf, nameTaken, replaceField, writeFieldLabel } from "@/editor/inspector/sections/formFieldModel";
+import {
+  conversionRefusal,
+  convertSelectToText,
+  fieldLabelText,
+  fieldType,
+  formOf,
+  nameTaken,
+  replaceField,
+  selectOptions,
+  setSelectDefault,
+  writeFieldLabel,
+} from "@/editor/inspector/sections/formFieldModel";
 import { handleTextareaDefaultChange } from "../attributeWriter";
 import { isAttrOn } from "../blockRows";
 import { PropertyRows, clobberingWarning, type PropertyConfig } from "../PropertyField";
@@ -120,6 +132,15 @@ function TypeRow({
   );
 }
 
+/** F34: the exact loss, by name. */
+function conversionMessage(options: ReadonlyArray<{ label: string; isDefault: boolean }>): string {
+  const names = options.map((o) => o.label);
+  const list = names.length <= 1 ? names.join("") : `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}`;
+  const lost = names.length === 0 ? "It has no options." : `The ${names.length === 1 ? "option" : `${names.length} options`}—${list}—will be removed.`;
+  const kept = options.find((o) => o.isDefault);
+  return kept ? `${lost} The current default “${kept.label}” stays as text.` : lost;
+}
+
 export const FieldBody: React.FC<TypeBlockBodyProps> = (props) => {
   const { composer, element } = props;
   useElementVersion(composer);
@@ -127,6 +148,7 @@ export const FieldBody: React.FC<TypeBlockBodyProps> = (props) => {
   const [nameError, setNameError] = React.useState<string | null>(null);
   const nameErrorId = React.useId();
   const [typeOpen, setTypeOpen] = React.useState(false);
+  const [convertOpen, setConvertOpen] = React.useState(false);
   const labelRef = React.useRef<HTMLInputElement>(null);
   const [nameDraft, setNameDraft] = React.useState<string | null>(null);
   React.useEffect(() => {
@@ -149,10 +171,20 @@ export const FieldBody: React.FC<TypeBlockBodyProps> = (props) => {
     });
   /* 2L9 F08: Password is legacy — offered only to the field that already
      is one (so its row still names it), never as a new choice. */
+  /* BD-29 (F33): a select converts to Text only, after the confirm. */
   const typeOptions =
-    tag === "select" ? [{ value: type, label: "Select" }] : TYPE_OPTIONS.filter((o) => o.value !== "password" || type === "password");
+    tag === "select"
+      ? [
+          { value: "text", label: "Text" },
+          { value: type, label: "Select" },
+        ]
+      : TYPE_OPTIONS.filter((o) => o.value !== "password" || type === "password");
   const setType = (next: string) => {
     if (next === type) return;
+    if (tag === "select") {
+      setConvertOpen(true);
+      return;
+    }
     let swapped = null as Element | null;
     const done = write("field-type", () => {
       if (type === "textarea" || next === "textarea") swapped = replaceField(composer, field, next);
@@ -193,6 +225,17 @@ export const FieldBody: React.FC<TypeBlockBodyProps> = (props) => {
       else if (value) field.setAttribute("value", value);
       else field.removeAttribute("value");
     });
+  const options = tag === "select" ? selectOptions(field) : [];
+  const fieldName = fieldLabelText(scope, field) || "Field";
+  /* F34 → F35: one atomic, reversible step; the field keeps its id. */
+  const convert = () => {
+    setConvertOpen(false);
+    let made: Element | null = null;
+    if (!write("Change field type", () => (made = convertSelectToText(composer, field))) || !made) return;
+    composer.selection.select(made);
+    addToast({ description: `${fieldName} changed to Text`, tone: "info", action: { label: "Undo", onClick: composer.history.captureUndo() } });
+  };
+  const refusal = tag === "select" ? conversionRefusal(composer, field) : null;
   const defaultValue = (type === "textarea" ? field.getAttribute("value") || field.getContent?.() : field.getAttribute("value")) ?? "";
   const extraRows = EXTRA_ROWS[tag] ?? [];
 
@@ -260,6 +303,50 @@ export const FieldBody: React.FC<TypeBlockBodyProps> = (props) => {
         testId="form-field-required"
       />
       {tag !== "select" && !props.justAdded ? <CommitRow label="Default value" value={defaultValue} onCommit={setDefault} testId="form-field-default" /> : null}
+      {tag === "select" && options.length ? (
+        <>
+          <SelectRow
+            label="Default value"
+            value={String(Math.max(0, options.findIndex((o) => o.isDefault)))}
+            placeholder={null}
+            options={options.map((o, i) => ({ value: String(i), label: o.label }))}
+            onChange={(v) => write("field-default", () => setSelectDefault(field, Number(v)))}
+          />
+          <div className="tw:flex tw:items-center tw:justify-between tw:pt-3" data-testid="form-field-options">
+            <span className={SUBTITLE}>Options</span>
+            <span className="tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">{options.length === 1 ? "1 option" : `${options.length} options`}</span>
+          </div>
+          {options.map((o, i) => (
+            <div key={i} className="tw:flex tw:h-7 tw:items-center tw:justify-center tw:text-[12px] tw:text-[var(--bk-ink)]">
+              {o.label}
+              {o.isDefault ? " · Default" : ""}
+            </div>
+          ))}
+          <NoteRow>
+            {options.every((o) => o.value === null || o.value === o.label) ? "Labels and saved values are identical." : "Saved values differ from the labels shown."}
+          </NoteRow>
+        </>
+      ) : null}
+      {refusal && convertOpen ? <NoteRow tone="error">{refusal}</NoteRow> : null}
+      <Modal
+        open={convertOpen && !refusal}
+        onClose={() => setConvertOpen(false)}
+        title={`Change ${fieldName} to Text?`}
+        kind="question"
+        testId="form-field-convert"
+        footer={
+          <>
+            <Button size="xs" autoFocus onClick={() => setConvertOpen(false)} data-testid="form-field-convert-cancel">
+              Cancel
+            </Button>
+            <Button color="light" size="xs" onClick={convert} data-testid="form-field-convert-confirm">
+              Change to Text
+            </Button>
+          </>
+        }
+      >
+        <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">{conversionMessage(options)}</p>
+      </Modal>
       {extraRows.length ? <PropertyRows composer={composer} element={element} targetIds={[element.id]} rows={extraRows} /> : null}
     </>
   );

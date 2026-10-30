@@ -16,6 +16,7 @@
 
 import type { Composer } from "@/engine";
 import type { Element } from "@/engine/elements/Element";
+import type { ElementData } from "@/shared/types/element";
 import { escapeHTML, unescapeHTML } from "@/shared/utils/html/encoding";
 
 const NOT_FIELDS = new Set(["submit", "button", "reset", "hidden", "image"]);
@@ -127,11 +128,22 @@ export function formOf(field: Element): Element | null {
   return null;
 }
 
-/** Swap an input for a textarea (or back), keeping name / placeholder /
- *  place. Returns the new element. Callers own the lock gate + transaction. */
+/** What a field carries across a tag change: everything but its type, tag,
+ *  content and children — the id (BD-29: a conversion never replaces the
+ *  identity), classes, styles at every breakpoint, lock, layer data. */
+function identityOf(el: Element): Partial<ElementData> {
+  const data: Partial<ElementData> = el.getData();
+  for (const key of ["type", "tagName", "content", "contentFormat", "children", "attributes"] as const) delete data[key];
+  return data;
+}
+
+/** Swap an input for a textarea (or back), keeping the field's identity,
+ *  name / placeholder / place. Returns the swapped element (same id). Callers
+ *  own the lock gate + transaction. */
 export function replaceField(composer: Composer, el: Element, type: string): Element | null {
   const parent = el.getParent();
   if (!parent) return null;
+  const identity = identityOf(el);
   const index = parent.getChildIndex(el);
   const attributes: Record<string, string> = {};
   for (const name of ["name", "placeholder", "aria-label", "required", "id", "minlength", "maxlength"]) {
@@ -139,9 +151,75 @@ export function replaceField(composer: Composer, el: Element, type: string): Ele
     if (v !== undefined) attributes[name] = v;
   }
   if (type !== "textarea") attributes.type = type;
-  const next = composer.elements.createElement(type === "textarea" ? "textarea" : "input", { attributes });
   composer.elements.removeElement(el.getId());
+  const next = composer.elements.createElement(type === "textarea" ? "textarea" : "input", { ...identity, attributes });
   composer.elements.addElement(next, parent.getId(), index);
   return next;
 }
 
+
+/** One `<option>` of a select: what it shows, what it submits, and whether it is the default. */
+export interface FieldOption {
+  label: string;
+  /** Its own `value`, or null when the label is what it submits. */
+  value: string | null;
+  isDefault: boolean;
+}
+
+/** A select's options, in order. The default is the `selected` one, else the
+ *  first — what the browser shows before anyone chooses. */
+export function selectOptions(field: Element): FieldOption[] {
+  const rows = [...(field.getContent?.() ?? "").matchAll(/<option([^>]*)>([\s\S]*?)<\/option>/gi)].map((m) => ({
+    label: textOf(m[2]),
+    value: /\bvalue\s*=\s*"([^"]*)"/i.exec(m[1])?.[1] ?? /\bvalue\s*=\s*'([^']*)'/i.exec(m[1])?.[1] ?? null,
+    selected: /\bselected\b/i.test(m[1]),
+  }));
+  const chosen = Math.max(0, rows.findIndex((r) => r.selected));
+  return rows.map((r, i) => ({ label: r.label, value: r.value, isDefault: rows.length > 0 && i === chosen }));
+}
+
+/** Why a select cannot become a text field without losing a reference, or null. */
+export function conversionRefusal(composer: Composer, field: Element): string | null {
+  const elId = field.getId();
+  const bindings = composer.cms?.bindings;
+  if (bindings?.getBindings?.(elId).length || bindings?.getCondition?.(elId) || bindings?.getCollectionBinding?.(elId)) {
+    return "This field has CMS bindings or a condition. Remove them first; the field keeps its identity only without them.";
+  }
+  return null;
+}
+
+/**
+ * BD-29 (2L9 B4-F33…F35): a select becomes a text field IN PLACE — the same
+ * element id (so selection, history and anything that names the field keep
+ * pointing at it), its label, key, required state, accessible name and
+ * styling. The options go; the default option's text stays as the value.
+ * Callers own the lock gate and the transaction (one Undo restores the
+ * options, their order and the default).
+ */
+export function convertSelectToText(composer: Composer, field: Element): Element | null {
+  const parent = field.getParent();
+  if (!parent || conversionRefusal(composer, field)) return null;
+  const id = field.getId();
+  const data = identityOf(field);
+  const index = parent.getChildIndex(field);
+  const fallback = selectOptions(field).find((o) => o.isDefault);
+  const attributes: Record<string, string> = { ...(field.getData().attributes ?? {}), type: "text" };
+  delete attributes.multiple;
+  delete attributes.size;
+  if (fallback) attributes.value = fallback.value ?? fallback.label;
+  composer.elements.removeElement(id);
+  const next = composer.elements.createElement("input", { ...data, tagName: "input", attributes });
+  composer.elements.addElement(next, parent.getId(), index);
+  return next;
+}
+
+/** Make the option at `index` the select's default (`selected`), the others not. */
+export function setSelectDefault(field: Element, index: number): void {
+  let i = -1;
+  const html = (field.getContent?.() ?? "").replace(/<option([^>]*)>/gi, (_m, attrs: string) => {
+    i += 1;
+    const rest = attrs.replace(/\s+selected(=("[^"]*"|'[^']*'|\S+))?/gi, "");
+    return `<option${rest}${i === index ? " selected" : ""}>`;
+  });
+  field.setContent(html);
+}
