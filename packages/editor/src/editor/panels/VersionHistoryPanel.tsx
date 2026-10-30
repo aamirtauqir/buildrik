@@ -86,8 +86,10 @@ const NOTICE_BASE =
   "tw:flex tw:flex-col tw:gap-[2px] tw:px-[var(--bk-space-16)] tw:py-2.5";
 /* Board 4418:74511 — 13/20 ink-soft body, then a 12/16 muted footnote. */
 /* 4418:173587 / 6881:70883 — the details overlay's 13/20 ink lines. */
+/* 2L9 B7-H15 (230:20770): a plain muted line under the filter row, not a
+   tinted callout. */
 const OFFLINE_NOTE =
-  "tw:m-0 tw:mx-4 tw:mb-2 tw:rounded-md tw:bg-[var(--bk-warning-tint)] tw:px-3 tw:py-2 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-warning-text)]";
+  "tw:m-0 tw:px-3 tw:pb-1 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 const DETAILS_LINE = "tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]";
 const RESTORE_CONFIRM_BODY = "tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-soft)]";
 const RESTORE_CONFIRM_SUB = "tw:mt-3 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)]";

@@ -168,11 +168,13 @@ describe("HistoryTab shell", () => {
 
   /* 4418:73791 ends the Session tab with the same "+ Save a version" footer
      Saves carries — it was only on Saves. */
-  it("Session carries the + Save a version footer", () => {
+  /* 2L9 H01 (230:12999): Session has no footer; "+ Save a version" is on
+     Saves (H04), one tab away. */
+  it("Session draws no footer; + Save a version stays on Saves (VersionHistoryPanel's own list)", () => {
     renderTab();
-    expect(screen.getByTestId("saves-save-version")).toHaveTextContent("+ Save a version");
-    fireEvent.click(screen.getByTestId("saves-save-version"));
-    expect(screen.getByRole("dialog")).toHaveTextContent("Save a version");
+    expect(screen.queryByTestId("saves-save-version")).toBeNull();
+    expect(screen.queryByTestId("history-prune-note")).toBeNull();
+    expect(screen.getByRole("tab", { name: /Saves/ })).toBeEnabled();
   });
 
   it("draws no search field until ⋯ › Search asks for one (board 4418:73791)", () => {

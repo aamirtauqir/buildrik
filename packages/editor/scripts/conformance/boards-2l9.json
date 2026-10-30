@@ -22243,9 +22243,9 @@
    "page": "07",
    "family": "recovery",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-G probe-compared 2026-10-30 (history-tab?view=session) vs shots/230-12999.png — DRIFT, open: the board's list has '— Opened Home —' and '— Undo history cleared 09:58 —' separators (the engine records neither a page-open nor a clear time today), a hint line 'Esc closes History' (code: Esc collapses the expanded row), and no footer — the panel still prints 'This session only — the last 100 steps…' and '+ Save a version' (from older board 163:2). Rows match: step, then 'time · you' (author shows only when the step is stamped with a user). | L-F W2: built, not compared. Two-line Session rows (step, then \"time · you\"), Restore to here on the hovered / j-k row, j/k hint under the list. \"verb · target · place\" needs target + page on each history entry, which the engine does not record (code:history-entry-no-target, part); session markers (Opened Home, Undo history cleared) likewise have no data.",
+   "authority": "code:history-entry-no-target",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-C 2026-10-31 probe-compared (history-tab?view=session, hover row 1) vs shots/230-12999.png: '— Opened Home —' heads the steps and '— Undo history cleared HH:MM —' closes the list (shared/utils/historySessionMarkers: PAGE_CHANGED settled after the task, and the user's own clears — not the bootstrap clear); rows inset 12, 13/18 step then 12/16 'time · you' in sans; the pointed/j-k row is accent-tinted with 'Restore to here' under its time; keys hint follows the list; no footer (Save a version stays on Saves). Code wins: the step label stays the engine's (no target/page on entries) and the hint says 'Esc to collapse' (Esc collapses the open step).",
    "tier": "P2"
   },
   {
@@ -22254,9 +22254,9 @@
    "page": "07",
    "family": "recovery",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-F W2: built, not compared. Confirm titled Restore to “{step}”? · Cancel · Restore to here. Body says the later steps are removed and that this can’t be undone — the board's \"You can still undo the restore\" is false for restoreEntry (code:restore-truncates, part).",
+   "authority": "code:restore-truncates",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-C 2026-10-31 probe-compared (history-tab, hover row, Restore to here) vs shots/230-13557.png: title 'Restore to “{step}”?', Cancel · Restore to here. Code wins on the body and tone: restoreEntry truncates the stack for good, so the body says the later steps are removed and that this can’t be undone (not 'You can still undo the restore'), and the confirm is destructive red where the board draws blue. | L-F W2: built, not compared. Confirm titled Restore to “{step}”? · Cancel · Restore to here. Body says the later steps are removed and that this can’t be undone — the board's \"You can still undo the restore\" is false for restoreEntry (code:restore-truncates, part).",
    "tier": "P2"
   },
   {
@@ -22278,7 +22278,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-fixed",
-   "verifiedNote": "L-G probe-compared 2026-10-30 (case history-tab?view=saves, real Composer, 280 drawer) vs shots/230-14662.png: Session · Saves · Published pill tabs with Saves filled, 'Filter: All ▾' chip and 'Save a version' on one row, the empty list's two lines, the prune note at the foot. The open filter menu (All · Named · Auto-saves · By <author>) is L-F W3's, pinned in its tests; not screenshotted open. The panel's host column (inspector side on the board) is the shell's. | L-F W3: built, not compared. \"Filter: All ▾\" chip with one flat menu (All · Named · Auto-saves · By <author>) and \"Save a version\" at the row's right (it was a footer). Row meta \"Named · Sam · Yesterday 17:20\" not yet adopted (row keeps time · relative · N changes; the N-changes door is code-ahead, kept).",
+   "verifiedNote": "L-C 2026-10-31 rows adopted: name, then 'Named · {author} · {when}' (auto-saves: just '{when}'), Today/Yesterday {time}, weekday within the week, else day month; no Today/Yesterday bands, no mono time, no Auto badge; 50 pitch inset 12. The 'N changes' door stays (code-ahead). | L-G probe-compared 2026-10-30 (case history-tab?view=saves, real Composer, 280 drawer) vs shots/230-14662.png: Session · Saves · Published pill tabs with Saves filled, 'Filter: All ▾' chip and 'Save a version' on one row, the empty list's two lines, the prune note at the foot. The open filter menu (All · Named · Auto-saves · By <author>) is L-F W3's, pinned in its tests; not screenshotted open. The panel's host column (inspector side on the board) is the shell's. | L-F W3: built, not compared. \"Filter: All ▾\" chip with one flat menu (All · Named · Auto-saves · By <author>) and \"Save a version\" at the row's right (it was a footer). Row meta \"Named · Sam · Yesterday 17:20\" not yet adopted (row keeps time · relative · N changes; the N-changes door is code-ahead, kept).",
    "tier": "P2"
   },
   {
@@ -22311,7 +22311,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "L-F W3: built, not compared. Delete… opens ConfirmDialog \"Delete “{name}”?\" / \"This version can’t be restored after it’s deleted.\" · Cancel · Delete version (the inline row confirm is gone).",
+   "verifiedNote": "L-C 2026-10-31 probe-compared (saves, ⋯ › Delete) vs shots/230-16354.png: rows, title 'Delete “{name}”?', body and Cancel · Delete version match. Left: the board draws Delete version as an outline button with red text; the shared ConfirmDialog tone=destructive is a solid red button everywhere — a chrome-ui decision for the lead, not this panel. | L-F W3: built, not compared. Delete… opens ConfirmDialog \"Delete “{name}”?\" / \"This version can’t be restored after it’s deleted.\" · Cancel · Delete version (the inline row confirm is gone).",
    "tier": "P2"
   },
   {
@@ -22398,8 +22398,8 @@
    "family": "recovery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-F W3: built, not compared. Offline: the list stays, a note reads \"Needs a connection to save, restore or delete versions. This list was loaded at HH:MM.\" and Save a version is aria-disabled with that reason.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-C 2026-10-31 probe-compared (saves, one named save, context offline) vs shots/230-20770.png: 'Save a version' greyed (reason on hover), a plain muted line 'Needs a connection to save, restore or delete versions. This list was loaded at HH:MM.' under the filter row (was an amber callout), rows unchanged. | L-F W3: built, not compared. Offline: the list stays, a note reads \"Needs a connection to save, restore or delete versions. This list was loaded at HH:MM.\" and Save a version is aria-disabled with that reason.",
    "tier": "P2"
   },
   {

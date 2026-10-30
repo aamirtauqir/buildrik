@@ -151,11 +151,14 @@ describe("ActivityView — restoring from a timestamp is confirmed", () => {
       setHistory(twoEntries(), false);
       const { container } = render(<ActivityView composer={composer as never} />);
 
+      /* 2L9 H01: Restore to here is on the pointed (or j/k) row only. */
+      expect(container.querySelectorAll(".entry-restore-btn").length).toBe(0);
+      fireEvent.mouseEnter(screen.getByTestId("history-change-1"));
       const timeButtons = container.querySelectorAll(".entry-restore-btn");
-      expect(timeButtons.length).toBe(2);
+      expect(timeButtons.length).toBe(1);
 
       // Second row = one step back; restoring it discards the newer change.
-      fireEvent.click(timeButtons[1]);
+      fireEvent.click(timeButtons[0]);
       expect(composer.history.restoreEntry).not.toHaveBeenCalled();
 
       // A confirmation naming the loss stands between the click and the engine.
@@ -179,7 +182,8 @@ describe("ActivityView — restoring from a timestamp is confirmed", () => {
       setHistory(twoEntries(), false);
       const { container } = render(<ActivityView composer={composer as never} />);
 
-      fireEvent.click(container.querySelectorAll(".entry-restore-btn")[1]);
+      fireEvent.mouseEnter(screen.getByTestId("history-change-1"));
+      fireEvent.click(container.querySelector(".entry-restore-btn")!);
       fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
 
       expect(composer.history.restoreEntry).not.toHaveBeenCalled();
@@ -194,6 +198,7 @@ describe("ActivityView — restoring from a timestamp is confirmed", () => {
     try {
       setHistory(twoEntries(), false);
       const { container } = render(<ActivityView composer={makeComposer() as never} />);
+      fireEvent.mouseEnter(screen.getByTestId("history-change-0"));
 
       const label = container.querySelector(".entry-restore-btn")?.textContent ?? "";
       expect(label).not.toMatch(/jump/i);
@@ -264,6 +269,7 @@ describe("ActivityView — FC-9 (fix-all 2026-09-25): readOnly disables Restore"
       const composer = makeComposer();
       setHistory([entry({ id: "h1", label: "Move heading" })], false);
       const { container } = render(<ActivityView composer={composer as never} readOnly />);
+      fireEvent.mouseEnter(screen.getByTestId("history-change-0"));
 
       const timeBtn = container.querySelector(".entry-restore-btn") as HTMLElement;
       expect(timeBtn).toHaveAttribute("aria-disabled", "true");
@@ -282,11 +288,80 @@ describe("ActivityView — FC-9 (fix-all 2026-09-25): readOnly disables Restore"
       const composer = makeComposer();
       setHistory([entry({ id: "h1", label: "Move heading" })], false);
       const { container } = render(<ActivityView composer={composer as never} />);
+      fireEvent.mouseEnter(screen.getByTestId("history-change-0"));
 
       const timeBtn = container.querySelector(".entry-restore-btn") as HTMLElement;
       expect(timeBtn).not.toHaveAttribute("aria-disabled");
     } finally {
       restore();
+    }
+  });
+});
+
+/* 2L9 B7-H01 230:12999 — the session markers between steps: a page open heads
+   the steps made on it, a user clear closes the list. Both are read from the
+   session log (historySessionMarkers), never inferred from the stack. */
+describe("ActivityView — session markers (2L9 H01)", () => {
+  const makeComposer = () => {
+    const handlers = new Map<string, () => void>();
+    let active = { id: "p-home", name: "Home" };
+    const pages: Record<string, { id: string; name: string }> = {
+      "p-home": { id: "p-home", name: "Home" },
+      "p-about": { id: "p-about", name: "About" },
+    };
+    return {
+      on: (ev: string, fn: () => void) => handlers.set(ev, fn),
+      elements: { getActivePage: () => active, getPage: (id: string) => pages[id] },
+      open(id: string) {
+        active = pages[id];
+        handlers.get("page:changed")?.();
+      },
+    };
+  };
+
+  it("heads the steps with the page they were made on and ends with the clear", async () => {
+    const { recordHistoryCleared } = await import("@/shared/utils/historySessionMarkers");
+    const restore = withHeight(400);
+    try {
+      const composer = makeComposer();
+      recordHistoryCleared(composer as never);
+      const later = Date.now() + 60_000;
+      setHistory([
+        entry({ id: "h2", label: "Changed padding", timestamp: later + 1000 }),
+        entry({ id: "h1", label: "Changed text", timestamp: later }),
+      ]);
+      const view = renderView({ composer: composer as never });
+      const slots = [...view.container.querySelectorAll("[role=listitem]")].map((n) =>
+        n.getAttribute("data-testid")?.startsWith("history-marker") ? n.textContent : "step",
+      );
+      expect(slots[0]).toBe("— Opened Home —");
+      expect(slots.slice(1, 3)).toEqual(["step", "step"]);
+      expect(slots[3]).toMatch(/^— Undo history cleared \d{1,2}:\d{2} —$/);
+    } finally {
+      restore();
+    }
+  });
+
+  it("puts a page opened after the last step on top, and a search shows steps only", async () => {
+    vi.useFakeTimers();
+    const restore = withHeight(400);
+    try {
+      const composer = makeComposer();
+      setHistory([entry({ id: "h1", label: "Changed text", timestamp: Date.now() + 10 })]);
+      vi.setSystemTime(Date.now() + 60_000);
+      const view = renderView({ composer: composer as never });
+      composer.open("p-about");
+      await vi.runAllTimersAsync();
+      view.rerender(<ActivityView composer={composer as never} />);
+      expect(screen.getByTestId("history-marker-page-1").textContent).toBe("— Opened About —");
+      // Home was opened after that step, and no step was made on it: no header.
+      expect(screen.queryByTestId("history-marker-page-0")).toBeNull();
+
+      view.rerender(<ActivityView composer={composer as never} searchQuery="text" />);
+      expect(view.container.querySelector("[data-testid^=history-marker]")).toBeNull();
+    } finally {
+      restore();
+      vi.useRealTimers();
     }
   });
 });

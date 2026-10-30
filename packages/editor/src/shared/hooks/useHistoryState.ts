@@ -9,6 +9,7 @@ import * as React from "react";
 import type { Composer } from "@/engine";
 import type { HistoryDisplayEntry } from "@/engine/HistoryManager";
 import { EVENTS } from "../constants/events";
+import { recordHistoryCleared, trackHistorySessionMarkers } from "../utils/historySessionMarkers";
 
 export interface UseHistoryStateReturn {
   /** Current history stack (chronological, most recent first) */
@@ -51,6 +52,9 @@ export function useHistoryState(composer: Composer | null): UseHistoryStateRetur
 
     // Initial load
     updateState();
+    /* The page opens and clears the Session list draws between steps (2L9
+       H01) are not on the stack; their log starts with the first bridge. */
+    trackHistorySessionMarkers(composer);
 
     /* Every event after which canUndo()/canRedo() may have changed.
        `importProject` (project load, undo/redo internals, version restore)
@@ -89,7 +93,9 @@ export function useHistoryState(composer: Composer | null): UseHistoryStateRetur
     // history.clear() now re-seeds its own baseline checkpoint, so the old
     // compensating forceCheckpoint here would leave TWO checkpoints — making
     // canUndo() true right after a clear (undo to an identical state).
-    composer?.history?.clear();
+    if (!composer?.history) return;
+    recordHistoryCleared(composer);
+    composer.history.clear();
   }, [composer]);
 
   return {

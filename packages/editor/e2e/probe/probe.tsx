@@ -18,6 +18,7 @@
  *
  * @license BSD-3-Clause
  */
+import { recordHistoryCleared, trackHistorySessionMarkers } from "@/shared/utils/historySessionMarkers";
 import { RecordLeaveDialog, type RecordLeavePhase } from "@/editor/cms/RecordLeaveDialog";
 import { RichTextEditor } from "@/editor/panels/RichTextEditor";
 import { CreateComponentModal } from "@/editor/shell/modals/CreateComponentModal";
@@ -1722,7 +1723,7 @@ const reviewHost = (name: string, children: React.ReactNode) => (
     data-probe={name}
     style={{ width: 280, height: 812, display: "flex", flexDirection: "column", background: "#fff" }}
   >
-    {children}
+    <ToastProvider>{children}</ToastProvider>
   </div>
 );
 
@@ -5230,6 +5231,11 @@ const CASES: Record<string, () => React.ReactElement> = {
       root: { id: "hx-root", type: "container", tagName: "div", classes: ["buildrick-page-root"], children: [] },
     });
     c.elements.setActivePage(page.id);
+    /* H01's markers: the session log opens on Home, then a user clear —
+       the steps below are made after it. */
+    trackHistorySessionMarkers(c);
+    recordHistoryCleared(c);
+    c.history.clear();
     for (const [id, type, text] of [["hx-h", "heading", "Thoughtful design."], ["hx-t", "text", "Good design makes room."]] as const) {
       c.elements.addElement(c.elements.createElement(type as never, { id, content: text }), page.root.id);
     }
