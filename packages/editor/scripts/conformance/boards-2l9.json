@@ -123,7 +123,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Board: 'Back to editor · Home · Draft preview · Tablet · 768px' + fidelity notice; code: '‹ Back to canvas', opens at Desktop",
+   "verifiedNote": "Board compared (shots/8-3262.png); built 2026-10-30 (PreviewOverlay): 'Back to editor' (was '‹ Back to canvas'), '{Page} · Draft preview', and the line 'ⓘ Fonts and colors may differ slightly until published' under the bar (the preview renders the editor's draft HTML, not the published build). Kept, off-board: the device switcher (widths printed), page menu and Share preview. Opening at the editor's current device needs the caller to pass it — PreviewOverlay takes initialDevice; AquibraStudio (founder WIP, not edited) is REQUESTS A-22. Test PreviewOverlay. | Board: 'Back to editor · Home · Draft preview · Tablet · 768px' + fidelity notice; code: '‹ Back to canvas', opens at Desktop",
    "tier": "P1"
   },
   {
@@ -398,8 +398,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No return receipt 'Redirect saved · /a → /b · Applies on next publish' inside SEO",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-30 (case pages-settings-redirect&saved=1; board shots/67-11341.png): built — back from Settings › Redirects with the repair saved ('Back to About SEO'), the SEO tab reads 'Redirect saved · /about → /our-story · Applies on next publish' under the overrides note, and the redirect offer is answered (not shown again). The request carries redirectSaved through StudioPanels → PagesTab → the drawer. 'Applies on next publish' is true: redirects reach visitors through the publish (Settings › Redirects copy, redirect.service). Tests SeoTab / RedirectsScreen / StudioPanels.openRequests.",
    "tier": "P1"
   },
   {
@@ -864,7 +864,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Preview exists; board adds Desktop/Tablet/Mobile + 'Uses your brand colors' (L-C)",
+   "verifiedNote": "probe-compared 2026-10-30 (case templates-resource-area&page=Services, SaaS Landing; board shots/105-29094.png): built — Desktop · Tablet · Mobile as tabs at the top left of the preview well, the picked one on the accent tint (was a quiet corner toggle), and while creating a page Create page alone (Replace page… hidden). Open: the board drops the catalogue column for '‹ Back to templates' + the name in the head, and keeps the 'Creating “Services”' strip over the preview — the Templates workspace layout (as 104:28892). Test TemplatePreview. | Preview exists; board adds Desktop/Tablet/Mobile + 'Uses your brand colors' (L-C)",
    "tier": "P1"
   },
   {
@@ -1052,9 +1052,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "code:pages-are-local-document",
    "verified": "no",
-   "verifiedNote": "No navigation-pending/saving/offline/invalid-slug draft states",
+   "verifiedNote": "Board compared (shots/109-44109.png): offline, page settings read 'Unsaved settings · Needs a connection to save' with Save off. Not true here: Save writes the page in the editor's own document (composer.elements.updatePage), which works offline; the server copy follows through the site's autosave, whose offline state is the global banner (GlobalBannerSlot, navigator.onLine). A Save that needs a connection would refuse something that succeeds. | No navigation-pending/saving/offline/invalid-slug draft states",
    "tier": "P1"
   },
   {
@@ -2834,9 +2834,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "code:lock-not-inherited",
    "verified": "no",
-   "verifiedNote": "Lock exists; no 'Locked by Hero' inheritance, reveal or unlock banner",
+   "verifiedNote": "Lead 2026-10-30: lock is not inherited in the engine — unlocking Hero changes nothing for Text, which was never locked by it; the board's 'Locked by Hero … reveal / unlock' inheritance does not exist. Pending the owner's answer to \"should a parent lock its children?\" (as 147:77668 / 147:78110). | Lock exists; no 'Locked by Hero' inheritance, reveal or unlock banner",
    "tier": "P1"
   },
   {
@@ -4003,8 +4003,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Built 2026-10-30 (panels/RichTextEditor): the inline toolbar is the board's compact row 'Heading ▾ · B · I · U · Lists · Align · Color · Link · … · Done' — Lists / Align / Heading are menus, Color the text-colour field, Done commits the edit through the same blur the click-away uses (useCanvasInlineCommands 'commitEdit'); the 18-control bar's other tools moved behind '…' (TX05). Test RichTextEditor. '…' holds Strikethrough, Indent, Outdent, Text highlight… (swaps to its colour field in place), Clear formatting, and Text size (the old size select — kept, the board's list does not name it). Not image-compared (board not fetched). | Prior: Overflow menu 'Strikethrough · Indent · Outdent · Text highlight · Clear formatting' not a menu in code",
+   "verified": "drift-fixed",
+   "verifiedNote": "probe-compared 2026-10-30 (case canvas-text-toolbar, '…'; board shots/423-98182.png): Strikethrough · Indent · Outdent · Text highlight · Clear formatting, labels centred in a 240 menu, and 'Close menu' as an outlined row (added); the strikethrough check slot removed (the board draws none — '…' carries the active state). Kept, off-board: Text size (the old bar's size control; nothing is removed). Test RichTextEditor.",
    "tier": "P1"
   },
   {
@@ -4026,7 +4026,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Round 13: Link applies through the 'Link selected text' dialog with the draft kept (423:98532, walked live: link made, edit open, Done commits one step). Not image-compared (board not fetched). | Round 12: the toolbar's Link opens the address field with 'Apply link' (and Remove); the board's titled dialog 'Link selected text' is not drawn — not compared (board not fetched). | Prior: Link popover exists; board dialog 'Link selected text' + Apply link",
+   "verifiedNote": "Board compared (shots/423-98884.png): after Apply link the draft stays open (built, walked live round 13); the board's 'Selected text link · https://… · The link is part of the current text edit…' block is the Inspector's — L-B. | Round 13: Link applies through the 'Link selected text' dialog with the draft kept (423:98532, walked live: link made, edit open, Done commits one step). Not image-compared (board not fetched). | Round 12: the toolbar's Link opens the address field with 'Apply link' (and Remove); the board's titled dialog 'Link selected text' is not drawn — not compared (board not fetched). | Prior: Link popover exists; board dialog 'Link selected text' + Apply link",
    "tier": "P1"
   },
   {
@@ -4036,8 +4036,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 13: Link applies through the 'Link selected text' dialog with the draft kept (423:98532, walked live: link made, edit open, Done commits one step). Not image-compared (board not fetched). | Round 12: the toolbar's Link opens the address field with 'Apply link' (and Remove); the board's titled dialog 'Link selected text' is not drawn — not compared (board not fetched). | Prior: Link popover exists; board dialog 'Link selected text' + Apply link",
+   "verified": "drift-fixed",
+   "verifiedNote": "Board compared (shots/423-99224.png) and built: committing an edit that made or changed a link raises 'Text and link updated. · Undo' (useCanvasInlineEdit onCommitted { linkChanged }), else 'Text updated.'; Undo bound to that one step. Test useCanvasInlineEdit.history. The Inspector's 'Selected text link' line is L-B's.",
    "tier": "P1"
   },
   {

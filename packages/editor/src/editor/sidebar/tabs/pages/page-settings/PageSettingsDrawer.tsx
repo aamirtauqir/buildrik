@@ -44,6 +44,8 @@ interface Props {
   initialTab?: DrawerTab;
   /** The slug a rename's "Update URL" just moved the page off (G2-076). */
   previousSlug?: string;
+  /** 67:11341: the redirect Settings › Redirects just saved for this page. */
+  redirectSaved?: { from: string; to: string };
 }
 
 /* DQ-019: the card mounts in the overlay root (it rendered inside the Pages
@@ -57,7 +59,7 @@ export const PageSettingsDrawer: React.FC<Props> = (props) => (
   </Portal>
 );
 
-const PageSettingsCard: React.FC<Props> = ({ page, allPages, composer, onClose, initialTab, previousSlug }) => {
+const PageSettingsCard: React.FC<Props> = ({ page, allPages, composer, onClose, initialTab, previousSlug, redirectSaved }) => {
   const s = usePageSettings(composer, page, allPages);
   /* The page open on the canvas, when it is another one. */
   const active = allPages.find((pg) => pg.isActive);
@@ -221,7 +223,7 @@ const PageSettingsCard: React.FC<Props> = ({ page, allPages, composer, onClose, 
           <fieldset disabled={saving} className="tw:m-0 tw:min-w-0 tw:border-0 tw:p-0">
           {s.activeTab === "seo" && (
             <div id="pg-drawer-tab-seo" role="tabpanel" aria-label="SEO settings">
-              <SeoTab s={s} page={page} composer={composer} previousSlug={previousSlug} onOpenSiteDefaults={openSiteDefaults} />
+              <SeoTab s={s} page={page} composer={composer} previousSlug={previousSlug} redirectSaved={redirectSaved} onOpenSiteDefaults={openSiteDefaults} />
             </div>
           )}
           {s.activeTab === "social" && (

@@ -38,6 +38,8 @@ A-21. **L-A → owner (scope) · page trash / restore — server contract** · b
 - **Editor** — Pages "Recently deleted" (the ⋯ menu and the bulk-delete receipt) lists `pageTrash.list`; Restore calls `restore` then `importPage` and saves; the receipt reads "About restored with its URL and settings" or offers the suggested slug. Folders: a restored page returns to the top level (folders already prune deleted pages on read).
 - Open owner decisions: retention length; who may restore (EDITOR?) vs purge (ADMIN); over-limit restore = view-only page or refusal.
 
+A-22. **L-A → founder · `src/editor/shell/AquibraStudio.tsx` (preview at the current device)** · board 8:3262 (J-F1.11 "Preview / current Tablet"): the preview opens at the editor's device. `PreviewOverlay` now takes `initialDevice` (round 15); the one caller is AquibraStudio (~line 830, `<PreviewOverlay … />`), which L-A may not edit. Needed: pass `initialDevice={composer.device === "wide" ? "desktop" : composer.device}` (or the Breakpoint mapping the shell already uses). Until then the preview opens at Desktop.
+
 A-19. ~~**L-A → lead · `chrome-ui/PanelFrame` header + PanelSearch band**~~ · closed by L-A (coordinator handed it over, 2026-10-27). Measured on 63:6393 / 147:75914 / 7:18981 and on the real LayoutShell + LeftSidebar (probe `pages-shell`): the drawer head was never 12px short — the '56' was the topbar's rule; the search field already lands at the boards' y. The real deltas were the rule under the head (boards draw none), the title inset (16 → 12) and the search inset (16 → 12): PanelHeader's drawer size and PanelSearch now match. Expand is 720 and floats over the canvas (the canvas keeps its place). Every drawer fits at 1024 with no horizontal overflow.
 
 

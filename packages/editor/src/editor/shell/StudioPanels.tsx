@@ -685,7 +685,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
        request waits here for it. */
     const openPageSettings = (data: PageSettingsOpenRequest) => {
       onLeftPanelTabChange?.("pages", () => {
-        setPagesOpen({ pageId: data.pageId, tab: data.tab });
+        setPagesOpen({ pageId: data.pageId, tab: data.tab, redirectSaved: data.redirectSaved });
         openDrawer();
       });
     };
