@@ -2068,7 +2068,6 @@
    "authority": "founder:restore-over-limit-refused",
    "verified": "no",
    "verifiedNote": "Owner decision 2026-10-30 (A-21): a restore over the plan page limit is refused with \"Delete a page or upgrade to restore.\" (server PAGE_LIMIT, shown on the trash row); no view-only restored page.",
-   "inheritsFrom": "142:62396",
    "tier": "P1"
   },
   {
@@ -2112,10 +2111,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "code:no-former-folder-name",
    "verified": "drift-open",
-   "verifiedNote": "Round 29 (A-21): built, not compared. Page trash is real: the save soft-deletes (Page.deletedAt + slug tombstone), pages.trash.list/restore/purge (EDITOR restore, ADMIN purge), RecentlyDeletedView from ⋯ Recently deleted and the delete receipts. Tests RecentlyDeletedView, page-trash-service.",
-   "inheritsFrom": "63:20001",
+   "verifiedNote": "Round 30: the trash row names the caller's folder while it exists ('/about · Client projects', pages.trash.list folderName, probe ?trash=folder); a deleted folder's name is not kept on the page (it would need a new column — coordinator: code: otherwise), so the board's 'Formerly Client projects' reads '/about · Top level'.",
    "tier": "P1"
   },
   {
@@ -3084,7 +3082,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Origin shows retained shared guides; guide model missing",
+   "verifiedNote": "Round 30: the canvas these return to with the site's guides kept (canvasGuides, saved with the site) — the archetype Return 145:74465 (drift-fixed). The guide model and panel exist (RulersGuidesPanel/useCanvasGuides); this note was 'guide model missing'. Not separately compared.",
    "inheritsFrom": "145:74465",
    "tier": "P1"
   },
@@ -3120,7 +3118,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Origin shows retained shared guides; guide model missing",
+   "verifiedNote": "Round 30: the canvas these return to with the site's guides kept (canvasGuides, saved with the site) — the archetype Return 145:74465 (drift-fixed). The guide model and panel exist (RulersGuidesPanel/useCanvasGuides); this note was 'guide model missing'. Not separately compared.",
    "inheritsFrom": "145:74465",
    "tier": "P1"
   },
@@ -3130,10 +3128,10 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "code:guides-save-with-site",
    "verified": "no",
-   "verifiedNote": "No guide detail panel, lock, apply, sync/conflict states",
-   "inheritsFrom": "145:67569",
+   "verifiedNote": "Round 30: the same removal as 155:82271 (list keeps the other guides, 'Undo guide removal' above Add guide) from a sync-state origin. Guides have no sync status of their own — they save with the site (code:guides-save-with-site), so the board's sync sentence is the save status, not a panel line. Not separately compared.",
+   "inheritsFrom": "155:82271",
    "tier": "P1"
   },
   {
@@ -3156,7 +3154,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Origin shows retained shared guides; guide model missing",
+   "verifiedNote": "Round 30: the canvas these return to with the site's guides kept (canvasGuides, saved with the site) — the archetype Return 145:74465 (drift-fixed). The guide model and panel exist (RulersGuidesPanel/useCanvasGuides); this note was 'guide model missing'. Not separately compared.",
    "inheritsFrom": "145:74465",
    "tier": "P1"
   },
@@ -3190,10 +3188,10 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "code:guides-save-with-site",
    "verified": "no",
-   "verifiedNote": "No guide detail panel, lock, apply, sync/conflict states",
-   "inheritsFrom": "145:67569",
+   "verifiedNote": "Round 30: the guide detail/list of 155:83650 with Lock / Unlock, which act at once (145:67569). From a sync-state origin; guides save with the site (code:guides-save-with-site), so 'Guide changes are waiting to sync' is the save status. Not separately compared.",
+   "inheritsFrom": "155:83650",
    "tier": "P1"
   },
   {
@@ -3204,7 +3202,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Origin shows retained shared guides; guide model missing",
+   "verifiedNote": "Round 30: the canvas these return to with the site's guides kept (canvasGuides, saved with the site) — the archetype Return 145:74465 (drift-fixed). The guide model and panel exist (RulersGuidesPanel/useCanvasGuides); this note was 'guide model missing'. Not separately compared.",
    "inheritsFrom": "145:74465",
    "tier": "P1"
   },
@@ -3214,10 +3212,10 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "code:guides-save-with-site",
    "verified": "no",
-   "verifiedNote": "No guide detail panel, lock, apply, sync/conflict states",
-   "inheritsFrom": "145:67569",
+   "verifiedNote": "Round 30: the same removal as 155:82271 (list keeps the other guides, 'Undo guide removal' above Add guide) from a sync-state origin. Guides have no sync status of their own — they save with the site (code:guides-save-with-site), so the board's sync sentence is the save status, not a panel line. Not separately compared.",
+   "inheritsFrom": "155:82271",
    "tier": "P1"
   },
   {
@@ -3240,7 +3238,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Origin shows retained shared guides; guide model missing",
+   "verifiedNote": "Round 30: the canvas these return to with the site's guides kept (canvasGuides, saved with the site) — the archetype Return 145:74465 (drift-fixed). The guide model and panel exist (RulersGuidesPanel/useCanvasGuides); this note was 'guide model missing'. Not separately compared.",
    "inheritsFrom": "145:74465",
    "tier": "P1"
   },
@@ -3274,10 +3272,10 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "code:guides-save-with-site",
    "verified": "no",
-   "verifiedNote": "No guide detail panel, lock, apply, sync/conflict states",
-   "inheritsFrom": "145:67569",
+   "verifiedNote": "Round 30: the guide detail/list of 155:83650 with Lock / Unlock, which act at once (145:67569). From a sync-state origin; guides save with the site (code:guides-save-with-site), so 'Guide changes are waiting to sync' is the save status. Not separately compared.",
+   "inheritsFrom": "155:83650",
    "tier": "P1"
   },
   {
@@ -3288,7 +3286,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Origin shows retained shared guides; guide model missing",
+   "verifiedNote": "Round 30: the canvas these return to with the site's guides kept (canvasGuides, saved with the site) — the archetype Return 145:74465 (drift-fixed). The guide model and panel exist (RulersGuidesPanel/useCanvasGuides); this note was 'guide model missing'. Not separately compared.",
    "inheritsFrom": "145:74465",
    "tier": "P1"
   },
@@ -3298,10 +3296,10 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "code:guides-save-with-site",
    "verified": "no",
-   "verifiedNote": "No guide detail panel, lock, apply, sync/conflict states",
-   "inheritsFrom": "145:67569",
+   "verifiedNote": "Round 30: the same removal as 155:82271 (list keeps the other guides, 'Undo guide removal' above Add guide) from a sync-state origin. Guides have no sync status of their own — they save with the site (code:guides-save-with-site), so the board's sync sentence is the save status, not a panel line. Not separately compared.",
+   "inheritsFrom": "155:82271",
    "tier": "P1"
   },
   {
@@ -3324,7 +3322,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Origin shows retained shared guides; guide model missing",
+   "verifiedNote": "Round 30: the canvas these return to with the site's guides kept (canvasGuides, saved with the site) — the archetype Return 145:74465 (drift-fixed). The guide model and panel exist (RulersGuidesPanel/useCanvasGuides); this note was 'guide model missing'. Not separately compared.",
    "inheritsFrom": "145:74465",
    "tier": "P1"
   },
@@ -3358,10 +3356,10 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "code:guides-save-with-site",
    "verified": "no",
-   "verifiedNote": "No guide detail panel, lock, apply, sync/conflict states",
-   "inheritsFrom": "145:67569",
+   "verifiedNote": "Round 30: the guide detail/list of 155:83650 with Lock / Unlock, which act at once (145:67569). From a sync-state origin; guides save with the site (code:guides-save-with-site), so 'Guide changes are waiting to sync' is the save status. Not separately compared.",
+   "inheritsFrom": "155:83650",
    "tier": "P1"
   },
   {
@@ -3372,7 +3370,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Origin shows retained shared guides; guide model missing",
+   "verifiedNote": "Round 30: the canvas these return to with the site's guides kept (canvasGuides, saved with the site) — the archetype Return 145:74465 (drift-fixed). The guide model and panel exist (RulersGuidesPanel/useCanvasGuides); this note was 'guide model missing'. Not separately compared.",
    "inheritsFrom": "145:74465",
    "tier": "P1"
   },
@@ -3394,10 +3392,10 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "code:guides-save-with-site",
    "verified": "no",
-   "verifiedNote": "No guide detail panel, lock, apply, sync/conflict states",
-   "inheritsFrom": "145:67569",
+   "verifiedNote": "Round 30: the guide detail/list of 155:83650 with Lock / Unlock, which act at once (145:67569). From a sync-state origin; guides save with the site (code:guides-save-with-site), so 'Guide changes are waiting to sync' is the save status. Not separately compared.",
+   "inheritsFrom": "155:83650",
    "tier": "P1"
   },
   {
@@ -3408,7 +3406,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Origin shows retained shared guides; guide model missing",
+   "verifiedNote": "Round 30: the canvas these return to with the site's guides kept (canvasGuides, saved with the site) — the archetype Return 145:74465 (drift-fixed). The guide model and panel exist (RulersGuidesPanel/useCanvasGuides); this note was 'guide model missing'. Not separately compared.",
    "inheritsFrom": "145:74465",
    "tier": "P1"
   },
@@ -3418,10 +3416,10 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "code:guides-save-with-site",
    "verified": "no",
-   "verifiedNote": "No guide detail panel, lock, apply, sync/conflict states",
-   "inheritsFrom": "145:67569",
+   "verifiedNote": "Round 30: the same removal as 155:82271 (list keeps the other guides, 'Undo guide removal' above Add guide) from a sync-state origin. Guides have no sync status of their own — they save with the site (code:guides-save-with-site), so the board's sync sentence is the save status, not a panel line. Not separately compared.",
+   "inheritsFrom": "155:82271",
    "tier": "P1"
   },
   {
@@ -3444,7 +3442,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Origin shows retained shared guides; guide model missing",
+   "verifiedNote": "Round 30: the canvas these return to with the site's guides kept (canvasGuides, saved with the site) — the archetype Return 145:74465 (drift-fixed). The guide model and panel exist (RulersGuidesPanel/useCanvasGuides); this note was 'guide model missing'. Not separately compared.",
    "inheritsFrom": "145:74465",
    "tier": "P1"
   },
