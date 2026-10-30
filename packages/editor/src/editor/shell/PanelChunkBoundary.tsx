@@ -38,11 +38,16 @@ export class PanelChunkBoundary extends React.Component<{ children: React.ReactN
     /* Not ours: the boundary above shows its own fallback. */
     if (!isChunkLoadError(error)) throw error;
     return (
-      <div role="alert" data-testid="panel-updated" className="tw:flex tw:flex-col tw:items-start tw:gap-2 tw:p-4">
+      /* B7-G27 227:12184: centred in the panel it replaces, the button 96 wide. */
+      <div
+        role="alert"
+        data-testid="panel-updated"
+        className="tw:flex tw:h-full tw:flex-col tw:items-center tw:justify-center tw:gap-3 tw:p-4 tw:text-center"
+      >
         <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]">
           This part of the editor was updated. Reload to use it.
         </p>
-        <Button size="xs" onClick={() => window.location.reload()}>
+        <Button size="xs" className="tw:h-8 tw:w-24" onClick={() => window.location.reload()}>
           Reload
         </Button>
         <p className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]">Everything else keeps working.</p>

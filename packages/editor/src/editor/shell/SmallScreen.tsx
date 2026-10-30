@@ -65,22 +65,26 @@ export const PhoneScreen: React.FC = () => {
   };
   return (
     <Portal>
+      {/* B7-G33 227:15364: a white card on the app ground, 24 in from the
+          sides, its copy left-aligned with the button under it. */}
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="phone-screen-title"
         data-testid="phone-screen"
-        className="tw:fixed tw:inset-0 tw:z-[80] tw:flex tw:flex-col tw:items-center tw:justify-center tw:gap-3 tw:bg-[var(--bk-bg-panel)] tw:px-6 tw:text-center tw:[font-family:var(--bk-font-ui)]"
+        className="tw:fixed tw:inset-0 tw:z-[80] tw:flex tw:items-center tw:bg-[var(--bk-bg-app)] tw:px-6 tw:[font-family:var(--bk-font-ui)]"
       >
-        <h2 id="phone-screen-title" className="tw:m-0 tw:text-[16px] tw:font-semibold tw:leading-6 tw:text-[var(--bk-ink)]">
-          Buildrick needs a larger screen
-        </h2>
-        <p className="tw:m-0 tw:text-[14px] tw:leading-5 tw:text-[var(--bk-ink-soft)]">
-          Editing works on a computer. You can look at this site read-only here.
-        </p>
-        <Button size="sm" onClick={openReadOnly}>
-          Open read-only anyway
-        </Button>
+        <div className="tw:flex tw:w-full tw:flex-col tw:items-start tw:gap-3 tw:rounded-[var(--bk-radius-card)] tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-card)] tw:p-6">
+          <h2 id="phone-screen-title" className="tw:m-0 tw:text-[16px] tw:font-semibold tw:leading-6 tw:text-[var(--bk-ink)]">
+            Buildrick needs a larger screen
+          </h2>
+          <p className="tw:m-0 tw:text-[14px] tw:leading-5 tw:text-[var(--bk-ink-soft)]">
+            Editing works on a computer. You can look at this site read-only here.
+          </p>
+          <Button size="sm" onClick={openReadOnly}>
+            Open read-only anyway
+          </Button>
+        </div>
       </div>
     </Portal>
   );

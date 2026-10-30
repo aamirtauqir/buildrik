@@ -106,43 +106,40 @@ describe("ExportModal — rendering + export generation", () => {
 
   it("generates an export on open with the composer and default config", async () => {
     renderModal();
-    await screen.findByText(/5 elements/);
+    await waitFor(() => expect(screen.getByTestId("export-primary")).not.toBeDisabled());
     expect(mocks.engineCtor).toHaveBeenCalledWith(
       composer,
       expect.objectContaining({ format: "html", cssStyle: "embedded", minify: false })
     );
     expect(mocks.exportFn).toHaveBeenCalledTimes(1);
-    // Stats row: elements + formatted HTML/CSS sizes (canonical shared
-    // formatBytes: trimmed decimals + "Bytes" unit).
-    expect(screen.getByText(/2 KB HTML/)).toBeInTheDocument();
-    expect(screen.getByText(/512 Bytes CSS/)).toBeInTheDocument();
   });
 
-  it("renders the format grid with HTML/ZIP/React selectable and Vue/Next.js stubbed", async () => {
+  it("renders the Format row with HTML/ZIP/React and nothing else (B8-EX01)", async () => {
     renderModal();
-    await screen.findByText(/5 elements/);
+    await waitFor(() => expect(screen.getByTestId("export-primary")).not.toBeDisabled());
     // Board 1172:4825's pills carry no description — the accessible name is
     // just the format label.
     expect(screen.getByRole("radio", { name: "HTML" })).toBeInTheDocument();
     expect(screen.getByRole("radio", { name: "ZIP" })).toBeInTheDocument();
     expect(screen.getByRole("radio", { name: "React" })).toBeInTheDocument();
-    // KNOWN pin: Vue/Next.js are coming-soon stubs, not buttons.
-    expect(screen.getAllByText("Soon")).toHaveLength(2);
-    expect(screen.queryByRole("button", { name: /Vue/ })).toBeNull();
+    // 2L9 B8-EX01 draws three formats: Vue / Next.js are not offered.
+    expect(screen.queryByText("Soon")).toBeNull();
+    expect(screen.queryByText("Vue")).toBeNull();
   });
 
-  it("shows the error state when export generation rejects", async () => {
+  it("a preview that could not be built says so and offers Retry (B8-EX08)", async () => {
     mocks.exportFn.mockRejectedValue(new Error("engine exploded"));
     renderModal();
-    expect(await screen.findByText("engine exploded")).toBeInTheDocument();
+    expect(await screen.findByText("Couldn’t load the export preview.")).toBeInTheDocument();
+    expect(screen.getByTestId("export-preview-retry")).toBeInTheDocument();
     // Primary export button is disabled without a result.
-    expect(screen.getByRole("button", { name: "Export as HTML" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Export" })).toBeDisabled();
   });
 
   it("calls onClose from the Cancel button", async () => {
     const onClose = vi.fn();
     renderModal({ onClose });
-    await screen.findByText(/5 elements/);
+    await waitFor(() => expect(screen.getByTestId("export-primary")).not.toBeDisabled());
     fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
     expect(onClose).toHaveBeenCalled();
   });
@@ -155,7 +152,7 @@ describe("ExportModal — tab switching", () => {
     // of crashing on css.split of an undefined value.
     mocks.exportFn.mockResolvedValue({ ...successResult, css: ".hero { color: green; }" });
     renderModal();
-    await screen.findByText(/5 elements/);
+    await waitFor(() => expect(screen.getByTestId("export-primary")).not.toBeDisabled());
 
     fireEvent.click(screen.getByRole("tab", { name: "Code" }));
     fireEvent.click(screen.getByRole("tab", { name: "CSS" }));
@@ -165,7 +162,7 @@ describe("ExportModal — tab switching", () => {
   it("switches between Preview, Code and Options tabs", async () => {
     mocks.exportFn.mockResolvedValue({ ...successResult, css: "" });
     renderModal();
-    await screen.findByText(/5 elements/);
+    await waitFor(() => expect(screen.getByTestId("export-primary")).not.toBeDisabled());
 
     // Preview tab is default — device buttons visible.
     expect(screen.getByRole("button", { name: "Desktop (1440px)" })).toBeInTheDocument();
@@ -183,7 +180,7 @@ describe("ExportModal — tab switching", () => {
 
   it("re-generates the export when an option changes", async () => {
     renderModal();
-    await screen.findByText(/5 elements/);
+    await waitFor(() => expect(screen.getByTestId("export-primary")).not.toBeDisabled());
     expect(mocks.exportFn).toHaveBeenCalledTimes(1);
 
     fireEvent.click(screen.getByRole("tab", { name: "Options" }));
@@ -200,9 +197,9 @@ describe("ExportModal — tab switching", () => {
 describe("ExportModal — download flows", () => {
   it("downloads index.html for the HTML format", async () => {
     renderModal();
-    await screen.findByText(/5 elements/);
+    await waitFor(() => expect(screen.getByTestId("export-primary")).not.toBeDisabled());
 
-    const btn = screen.getByRole("button", { name: "Export as HTML" });
+    const btn = screen.getByRole("button", { name: "Export" });
     expect(btn).toBeEnabled();
     fireEvent.click(btn);
 
@@ -213,13 +210,30 @@ describe("ExportModal — download flows", () => {
     expect(revokeObjectURL).toHaveBeenCalledWith("blob:mock-url");
   });
 
+  it("the ready line names the file and the foot offers Close (B8-EX05)", async () => {
+    renderModal();
+    await waitFor(() => expect(screen.getByTestId("export-primary")).not.toBeDisabled());
+    fireEvent.click(screen.getByRole("button", { name: "Export" }));
+    expect(screen.getByTestId("export-foot-line").textContent).toMatch(/^Export ready — .+ downloaded$/);
+    expect(screen.getByTestId("export-done")).toHaveTextContent("Close");
+  });
+
+  it("offline, Export waits for a connection and says Preview and Code still work (B8-EX07)", async () => {
+    const onLine = vi.spyOn(navigator, "onLine", "get").mockReturnValue(false);
+    renderModal();
+    await waitFor(() => expect(mocks.exportFn).toHaveBeenCalled());
+    expect(screen.getByTestId("export-foot-line")).toHaveTextContent("Needs a connection to export. Preview and Code still work.");
+    expect(screen.getByTestId("export-primary")).toBeDisabled();
+    onLine.mockRestore();
+  });
+
   it("generates and downloads a ZIP when the ZIP format is selected", async () => {
     renderModal();
-    await screen.findByText(/5 elements/);
+    await waitFor(() => expect(screen.getByTestId("export-primary")).not.toBeDisabled());
 
     fireEvent.click(screen.getByRole("radio", { name: "ZIP" }));
     // Format change regenerates the export, then the label flips.
-    const zipBtn = await screen.findByRole("button", { name: "Export as ZIP" });
+    const zipBtn = await screen.findByRole("button", { name: "Export" });
     await waitFor(() => expect(zipBtn).toBeEnabled());
     fireEvent.click(zipBtn);
 
@@ -250,11 +264,11 @@ describe("ExportModal — download flows", () => {
       ],
     });
     renderModal();
-    await screen.findByText(/5 elements/);
+    await waitFor(() => expect(mocks.exportFn).toHaveBeenCalled());
 
     fireEvent.click(screen.getByRole("radio", { name: "React" }));
     // Pin the current label casing for the react format.
-    const reactBtn = await screen.findByRole("button", { name: "Export as REACT" });
+    const reactBtn = await screen.findByRole("button", { name: "Export" });
     await waitFor(() => expect(reactBtn).toBeEnabled());
     fireEvent.click(reactBtn);
 
@@ -277,7 +291,7 @@ describe("ExportModal — download flows", () => {
       ],
     });
     renderModal();
-    await screen.findByText(/5 elements/);
+    await waitFor(() => expect(mocks.exportFn).toHaveBeenCalled());
     fireEvent.click(screen.getByRole("radio", { name: "React" }));
 
     expect(
@@ -291,7 +305,7 @@ describe("ExportModal — download flows", () => {
 
   it("offers Download CSS only for external CSS style and downloads styles.css", async () => {
     renderModal();
-    await screen.findByText(/5 elements/);
+    await waitFor(() => expect(screen.getByTestId("export-primary")).not.toBeDisabled());
     expect(screen.queryByRole("button", { name: "Download CSS" })).toBeNull();
 
     fireEvent.click(screen.getByRole("tab", { name: "Options" }));
@@ -313,7 +327,7 @@ describe("ExportModal — download flows", () => {
      something the primary cannot: page plus stylesheet. */
   it("offers Download All only for external CSS, where it is not the primary again", async () => {
     renderModal();
-    await screen.findByText(/5 elements/);
+    await waitFor(() => expect(screen.getByTestId("export-primary")).not.toBeDisabled());
     expect(screen.queryByRole("button", { name: "Download All" })).toBeNull();
 
     fireEvent.click(screen.getByRole("tab", { name: "Options" }));
@@ -343,6 +357,6 @@ describe("ExportModal — the outcome is a toast (C5 G3-113)", () => {
     const btn = screen.getByTestId("export-primary") as HTMLButtonElement;
     await waitFor(() => expect(btn.disabled).toBe(false));
     fireEvent.click(btn);
-    await waitFor(() => expect(screen.getByText("Export failed — disk full")).toBeTruthy());
+    await waitFor(() => expect(screen.getByText("Export failed — disk full. Your options are kept.")).toBeTruthy());
   });
 });

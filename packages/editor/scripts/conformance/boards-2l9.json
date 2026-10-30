@@ -14181,7 +14181,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "export/ExportModal.tsx:288 — title \"Export site as X\"; Vue/Next \"Soon\" shown (ExportOptions.tsx:29); no Free custom-code note",
+   "verifiedNote": "L-G 2026-10-30 (partly fixed): title 'Export site' (was 'Export site as X', blurb gone), tabs above the Format row, Format is three radios HTML · ZIP · React (Vue / Next.js 'Soon' stubs removed), primary 'Export'. Still open: Preview keeps its Desktop/Tablet/Mobile switch (board draws none), Options is still the checkbox panel (board: label/value rows CSS · Minify · CSS reset · Meta and viewport · CMS content), and the Free-plan custom-code note is not shown because the export DOES include custom code today (ExportEngine:624) — owner/code call before that line can be true. | export/ExportModal.tsx:288 — title \"Export site as X\"; Vue/Next \"Soon\" shown (ExportOptions.tsx:29); no Free custom-code note",
    "tier": "P2"
   },
   {
@@ -14192,7 +14192,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "export/ExportModal.tsx:288 — title \"Export site as X\"; Vue/Next \"Soon\" shown (ExportOptions.tsx:29); no Free custom-code note",
+   "verifiedNote": "L-G 2026-10-30 (partly fixed): title 'Export site' (was 'Export site as X', blurb gone), tabs above the Format row, Format is three radios HTML · ZIP · React (Vue / Next.js 'Soon' stubs removed), primary 'Export'. Still open: Preview keeps its Desktop/Tablet/Mobile switch (board draws none), Options is still the checkbox panel (board: label/value rows CSS · Minify · CSS reset · Meta and viewport · CMS content), and the Free-plan custom-code note is not shown because the export DOES include custom code today (ExportEngine:624) — owner/code call before that line can be true. | export/ExportModal.tsx:288 — title \"Export site as X\"; Vue/Next \"Soon\" shown (ExportOptions.tsx:29); no Free custom-code note",
    "tier": "P2"
   },
   {
@@ -14203,7 +14203,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "export/ExportModal.tsx:288 — title \"Export site as X\"; Vue/Next \"Soon\" shown (ExportOptions.tsx:29); no Free custom-code note",
+   "verifiedNote": "L-G 2026-10-30 (partly fixed): title 'Export site' (was 'Export site as X', blurb gone), tabs above the Format row, Format is three radios HTML · ZIP · React (Vue / Next.js 'Soon' stubs removed), primary 'Export'. Still open: Preview keeps its Desktop/Tablet/Mobile switch (board draws none), Options is still the checkbox panel (board: label/value rows CSS · Minify · CSS reset · Meta and viewport · CMS content), and the Free-plan custom-code note is not shown because the export DOES include custom code today (ExportEngine:624) — owner/code call before that line can be true. | export/ExportModal.tsx:288 — title \"Export site as X\"; Vue/Next \"Soon\" shown (ExportOptions.tsx:29); no Free custom-code note",
    "tier": "P2"
   },
   {
@@ -14224,8 +14224,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "export/ExportModal.tsx:383 — phases exist; \"Export ready — <file> downloaded\" and reason line copy differ",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-G 2026-10-30: the export dialog is now the 2L9 frame (probe export-html-modal, 720 at y279: 'Export site', Preview · Code · Options, the Format radios, one foot) and its outcomes are one status line at the foot's left instead of replacing the body — 'Export ready — {file} downloaded' with Close · Export (no auto-clear); 'Export failed — {reason}. Your options are kept.' with Cancel · Try again; offline 'Needs a connection to export. Preview and Code still work.' with Export disabled; a preview that could not be built reads 'Couldn’t load the export preview.' with Retry. Copy pinned in ExportModal.test; the foot's buttons are the board's 32-tall 14px pair. | export/ExportModal.tsx:383 — phases exist; \"Export ready — <file> downloaded\" and reason line copy differ",
    "tier": "P2"
   },
   {
@@ -14235,8 +14235,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "export/ExportModal.tsx:383 — phases exist; \"Export ready — <file> downloaded\" and reason line copy differ",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-G 2026-10-30: the export dialog is now the 2L9 frame (probe export-html-modal, 720 at y279: 'Export site', Preview · Code · Options, the Format radios, one foot) and its outcomes are one status line at the foot's left instead of replacing the body — 'Export ready — {file} downloaded' with Close · Export (no auto-clear); 'Export failed — {reason}. Your options are kept.' with Cancel · Try again; offline 'Needs a connection to export. Preview and Code still work.' with Export disabled; a preview that could not be built reads 'Couldn’t load the export preview.' with Retry. Copy pinned in ExportModal.test; the foot's buttons are the board's 32-tall 14px pair. | export/ExportModal.tsx:383 — phases exist; \"Export ready — <file> downloaded\" and reason line copy differ",
    "tier": "P2"
   },
   {
@@ -14246,8 +14246,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "no offline handling in ExportModal",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-G 2026-10-30: the export dialog is now the 2L9 frame (probe export-html-modal, 720 at y279: 'Export site', Preview · Code · Options, the Format radios, one foot) and its outcomes are one status line at the foot's left instead of replacing the body — 'Export ready — {file} downloaded' with Close · Export (no auto-clear); 'Export failed — {reason}. Your options are kept.' with Cancel · Try again; offline 'Needs a connection to export. Preview and Code still work.' with Export disabled; a preview that could not be built reads 'Couldn’t load the export preview.' with Retry. Copy pinned in ExportModal.test; the foot's buttons are the board's 32-tall 14px pair. | no offline handling in ExportModal",
    "tier": "P2"
   },
   {
@@ -14257,8 +14257,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "no preview load-error state with Retry",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-G 2026-10-30: the export dialog is now the 2L9 frame (probe export-html-modal, 720 at y279: 'Export site', Preview · Code · Options, the Format radios, one foot) and its outcomes are one status line at the foot's left instead of replacing the body — 'Export ready — {file} downloaded' with Close · Export (no auto-clear); 'Export failed — {reason}. Your options are kept.' with Cancel · Try again; offline 'Needs a connection to export. Preview and Code still work.' with Export disabled; a preview that could not be built reads 'Couldn’t load the export preview.' with Retry. Copy pinned in ExportModal.test; the foot's buttons are the board's 32-tall 14px pair. | no preview load-error state with Retry",
    "tier": "P2"
   },
   {
@@ -14696,9 +14696,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "code:desktop-shell-no-compact",
    "verified": "no",
-   "verifiedNote": "no compact settings navigation at 1280×640",
+   "verifiedNote": "Coordinator decision 2026-10-30: no compact 1280×640 Settings navigation / fixed-footer variant — the desktop shell is the one layout (same call as the CMS compact boards). | no compact settings navigation at 1280×640",
    "tier": "P2"
   },
   {
@@ -15556,9 +15556,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "code:desktop-shell-no-compact",
    "verified": "no",
-   "verifiedNote": "no compact nav popover / fixed footer at 1280×640",
+   "verifiedNote": "Coordinator decision 2026-10-30: no compact 1280×640 Settings navigation / fixed-footer variant — the desktop shell is the one layout (same call as the CMS compact boards). | no compact nav popover / fixed footer at 1280×640",
    "tier": "P3"
   },
   {
@@ -15567,9 +15567,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "code:desktop-shell-no-compact",
    "verified": "no",
-   "verifiedNote": "no compact nav popover / fixed footer at 1280×640",
+   "verifiedNote": "Coordinator decision 2026-10-30: no compact 1280×640 Settings navigation / fixed-footer variant — the desktop shell is the one layout (same call as the CMS compact boards). | no compact nav popover / fixed footer at 1280×640",
    "tier": "P2"
   },
   {
@@ -15578,9 +15578,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "code:desktop-shell-no-compact",
    "verified": "no",
-   "verifiedNote": "no compact nav popover / fixed footer at 1280×640",
+   "verifiedNote": "Coordinator decision 2026-10-30: no compact 1280×640 Settings navigation / fixed-footer variant — the desktop shell is the one layout (same call as the CMS compact boards). | no compact nav popover / fixed footer at 1280×640",
    "tier": "P3"
   },
   {
@@ -15589,9 +15589,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "code:desktop-shell-no-compact",
    "verified": "no",
-   "verifiedNote": "no compact nav popover / fixed footer at 1280×640",
+   "verifiedNote": "Coordinator decision 2026-10-30: no compact 1280×640 Settings navigation / fixed-footer variant — the desktop shell is the one layout (same call as the CMS compact boards). | no compact nav popover / fixed footer at 1280×640",
    "tier": "P2"
   },
   {
@@ -19823,9 +19823,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:272:24319",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (No-selection-export) not walked.",
+   "verifiedNote": "L-G: board conflict — the same 'CSV ready' card with zero rows selected, worded '…No selection is required.'; 272:24319's line (compared) is the one built; export never needs a selection. | Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (No-selection-export) not walked.",
    "tier": "P3"
   },
   {
@@ -20810,9 +20810,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:277:345909",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Zero-selection-filter) not walked.",
+   "verifiedNote": "L-G: board conflict — the same 'Filter submissions' dialog with zero rows selected, worded 'Inbox view stays selected. No rows are selected.'; 277:345909's line (compared) is the one built. | Built, not compared: views + form filter + bulk select now exist (archetype 238:13598 compared); this context-grid cell (Zero-selection-filter) not walked.",
    "tier": "P3"
   },
   {
@@ -21937,8 +21937,8 @@
    "family": "recovery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-F S2: built, not compared. Slot raises the G11 banner from online/offline itself, board copy. The save path's offline toast still fires until REQUESTS #12.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-G probe-measured 2026-10-30 (case lf-banner?kind=…, 1440x900; offline and the 1000-wide window emulated in the browser): the slot's one bar at 0,56 full width × 40 — the frame L-F screenshot-compared on G04/G31 — warning tint for offline / can't reach / reconnecting / role changed, info tint for workspace deletion / narrow window; every line and button is the board's copy (Retry now; Download them · Ask an admin; Cancel deletion ↗ · ✕; ✕), buttons at the right. Live producers: F-12/F-14 landed. | L-F S2: built, not compared. Slot raises the G11 banner from online/offline itself, board copy. The save path's offline toast still fires until REQUESTS #12.",
    "tier": "P2"
   },
   {
@@ -21948,8 +21948,8 @@
    "family": "recovery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-F S2: showCantReachBanner (board copy + Retry now) ready; producer swap is REQUESTS #12. Built, not compared.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-G probe-measured 2026-10-30 (case lf-banner?kind=…, 1440x900; offline and the 1000-wide window emulated in the browser): the slot's one bar at 0,56 full width × 40 — the frame L-F screenshot-compared on G04/G31 — warning tint for offline / can't reach / reconnecting / role changed, info tint for workspace deletion / narrow window; every line and button is the board's copy (Retry now; Download them · Ask an admin; Cancel deletion ↗ · ✕; ✕), buttons at the right. Live producers: F-12/F-14 landed. | L-F S2: showCantReachBanner (board copy + Retry now) ready; producer swap is REQUESTS #12. Built, not compared.",
    "tier": "P2"
   },
   {
@@ -21959,8 +21959,8 @@
    "family": "recovery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-F S2: showReconnectingBanner (\"Reconnecting… saving {n} changes\", count optional) ready; producer is REQUESTS #12. Built, not compared.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-G probe-measured 2026-10-30 (case lf-banner?kind=…, 1440x900; offline and the 1000-wide window emulated in the browser): the slot's one bar at 0,56 full width × 40 — the frame L-F screenshot-compared on G04/G31 — warning tint for offline / can't reach / reconnecting / role changed, info tint for workspace deletion / narrow window; every line and button is the board's copy (Retry now; Download them · Ask an admin; Cancel deletion ↗ · ✕; ✕), buttons at the right. Live producers: F-12/F-14 landed. | L-F S2: showReconnectingBanner (\"Reconnecting… saving {n} changes\", count optional) ready; producer is REQUESTS #12. Built, not compared.",
    "tier": "P2"
   },
   {
@@ -22003,8 +22003,8 @@
    "family": "recovery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-F S4: built, not compared. keepBeforeOverwrite failure → \"Couldn’t keep the newer version — nothing was overwritten.\" · Cancel · Retry; onOverwrite not called.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-G: the overwrite-stopped step of the G16 dialog (screenshot-compared by L-F, 480×176): title 'Overwrite the newer version?', body, 'Couldn’t keep the newer version — nothing was overwritten.', Cancel · Retry (filled) — ConflictModal copy matches the board line for line. | L-F S4: built, not compared. keepBeforeOverwrite failure → \"Couldn’t keep the newer version — nothing was overwritten.\" · Cancel · Retry; onOverwrite not called.",
    "tier": "P2"
   },
   {
@@ -22014,8 +22014,8 @@
    "family": "recovery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-F S2: showRoleChangedBanner (copy + Download them + Ask an admin) ready, REQUESTS #14; load-time forbidden bar has both actions (Ask an admin opens Permissions, code:no-access-request-api). Built, not compared.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-G probe-measured 2026-10-30 (case lf-banner?kind=…, 1440x900; offline and the 1000-wide window emulated in the browser): the slot's one bar at 0,56 full width × 40 — the frame L-F screenshot-compared on G04/G31 — warning tint for offline / can't reach / reconnecting / role changed, info tint for workspace deletion / narrow window; every line and button is the board's copy (Retry now; Download them · Ask an admin; Cancel deletion ↗ · ✕; ✕), buttons at the right. Live producers: F-12/F-14 landed. | L-F S2: showRoleChangedBanner (copy + Download them + Ask an admin) ready, REQUESTS #14; load-time forbidden bar has both actions (Ask an admin opens Permissions, code:no-access-request-api). Built, not compared.",
    "tier": "P2"
   },
   {
@@ -22036,8 +22036,8 @@
    "family": "recovery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-F W8: built, not compared. sites.get now carries workspace.deletionScheduledAt; the slot raises \"This workspace will be deleted on {d MMM}. Publishing is off.\" with Cancel deletion ↗ (dashboard) for the owner.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-G probe-measured 2026-10-30 (case lf-banner?kind=…, 1440x900; offline and the 1000-wide window emulated in the browser): the slot's one bar at 0,56 full width × 40 — the frame L-F screenshot-compared on G04/G31 — warning tint for offline / can't reach / reconnecting / role changed, info tint for workspace deletion / narrow window; every line and button is the board's copy (Retry now; Download them · Ask an admin; Cancel deletion ↗ · ✕; ✕), buttons at the right. Live producers: F-12/F-14 landed. | L-F W8: built, not compared. sites.get now carries workspace.deletionScheduledAt; the slot raises \"This workspace will be deleted on {d MMM}. Publishing is off.\" with Cancel deletion ↗ (dashboard) for the owner.",
    "tier": "P2"
   },
   {
@@ -22047,8 +22047,8 @@
    "family": "recovery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-F W8: built, not compared. Non-owners get the same line + \"Ask the owner to cancel it.\", no action.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-G probe-measured 2026-10-30 (case lf-banner?kind=…, 1440x900; offline and the 1000-wide window emulated in the browser): the slot's one bar at 0,56 full width × 40 — the frame L-F screenshot-compared on G04/G31 — warning tint for offline / can't reach / reconnecting / role changed, info tint for workspace deletion / narrow window; every line and button is the board's copy (Retry now; Download them · Ask an admin; Cancel deletion ↗ · ✕; ✕), buttons at the right. Live producers: F-12/F-14 landed. | L-F W8: built, not compared. Non-owners get the same line + \"Ask the owner to cancel it.\", no action.",
    "tier": "P2"
   },
   {
@@ -22113,8 +22113,8 @@
    "family": "recovery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-F W8: built, not compared. PanelChunkBoundary around the drawer and full-page panels: a chunk-load error shows \"This part of the editor was updated. Reload to use it.\" · Reload · \"Everything else keeps working.\"; other errors go to the panel's own boundary.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-G probe-compared 2026-10-30 (case lf-chunk, a chunk-load error in the panel) vs shots/227-12184.png: the notice is centred in the panel it replaces — 'This part of the editor was updated. Reload to use it.' / Reload (96×32) / 'Everything else keeps working.' (was top-left with an xs button). | L-F W8: built, not compared. PanelChunkBoundary around the drawer and full-page panels: a chunk-load error shows \"This part of the editor was updated. Reload to use it.\" · Reload · \"Everything else keeps working.\"; other errors go to the panel's own boundary.",
    "tier": "P2"
   },
   {
@@ -22168,8 +22168,8 @@
    "family": "recovery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-F W7: built, not compared. Under 1024 px the slot raises the info banner \"Buildrick is built for windows at least 1024 px wide — some panels will overlap.\" (✕ keeps it away for the session); never blocks.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-G probe-measured 2026-10-30 (case lf-banner?kind=…, 1440x900; offline and the 1000-wide window emulated in the browser): the slot's one bar at 0,56 full width × 40 — the frame L-F screenshot-compared on G04/G31 — warning tint for offline / can't reach / reconnecting / role changed, info tint for workspace deletion / narrow window; every line and button is the board's copy (Retry now; Download them · Ask an admin; Cancel deletion ↗ · ✕; ✕), buttons at the right. Live producers: F-12/F-14 landed. | L-F W7: built, not compared. Under 1024 px the slot raises the info banner \"Buildrick is built for windows at least 1024 px wide — some panels will overlap.\" (✕ keeps it away for the session); never blocks.",
    "tier": "P2"
   },
   {
@@ -22179,8 +22179,8 @@
    "family": "recovery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "L-F W7: built, not compared. Coarse pointer under 640 px: full-screen \"Buildrick needs a larger screen\" / board body / Open read-only anyway (→ ?view=readonly, where it is not shown again).",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-G probe-compared 2026-10-30 (case lf-phone, 390×844 touch) vs shots/227-15364.png: now a white bordered card 24 in from the sides on the app ground, title / body / 'Open read-only anyway' left-aligned (was centred text on white, no card). | L-F W7: built, not compared. Coarse pointer under 640 px: full-screen \"Buildrick needs a larger screen\" / board body / Open read-only anyway (→ ?view=readonly, where it is not shown again).",
    "tier": "P2"
   },
   {

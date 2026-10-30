@@ -25,9 +25,6 @@ import { Button, Checkbox, Label, Radio, TextInput } from "@/editor/chrome-ui";
 /** Formats that are fully implemented and available in demo */
 const AVAILABLE_FORMATS: ExportFormat[] = ["html", "zip", "react"];
 
-/** Formats that exist in the type but require future implementation */
-const COMING_SOON_FORMATS: ExportFormat[] = ["vue", "nextjs"];
-
 const FORMAT_LABELS: Record<ExportFormat, string> = {
   html: "HTML",
   zip: "ZIP",
@@ -47,7 +44,7 @@ const SEGMENTED = "tw:flex tw:gap-2";
 const segmentColor = (selected: boolean) => (selected ? undefined : ("light" as const));
 
 // ============================================================================
-// FORMAT GRID — board 1172:4825's single-row pill selector
+// FORMAT ROW — 2L9 B8-EX01's labelled radios
 // ============================================================================
 
 export interface FormatGridProps {
@@ -55,66 +52,31 @@ export interface FormatGridProps {
   onFormatChange: (format: ExportFormat) => void;
 }
 
-/* fmt/HTML (selected), fmt/ZIP, fmt/React, fmt/Vue (dimmed + Soon),
-   fmt/Next.js (dimmed + Soon) — one row, gap 8, px-10/py-7, rounded-6,
-   11px medium. The Radio stays real (arrow keys, `role="radio"`, checked
-   state) but is visually hidden — the board's pill carries no dot, the
-   tinted fill + accent border/text ARE the checked state. */
-const PILL_BASE =
-  "tw:flex tw:items-center tw:gap-1.5 tw:rounded-md tw:border tw:px-2.5 tw:py-[7px] " +
-  "tw:text-[11px] tw:font-medium tw:cursor-pointer tw:[transition:var(--bk-transition-fast)] " +
-  "tw:aria-disabled:opacity-55 tw:aria-disabled:pointer-events-none tw:aria-disabled:select-none";
-const PILL_SELECTED = "tw:border-[var(--bk-accent)] tw:bg-[var(--bk-accent-tint)] tw:text-[var(--bk-accent-text)]";
-const PILL_IDLE = "tw:border-[var(--bk-border)] tw:bg-white tw:text-[var(--bk-ink)] tw:hover:bg-[var(--bk-bg-subtle)]";
-/* The scale has no 8px step and the ratchet locks that population at zero,
-   so the "soon" tag sits on the floor the scale does define. Micro chrome
-   furniture snapped onto --bk-text-11 in the same 2026-08-29 pass. */
-const SOON_TAG =
-  "tw:rounded tw:bg-[var(--bk-bg-subtle)] tw:px-1 tw:py-px tw:text-[length:var(--bk-text-11)] " +
-  "tw:font-medium tw:text-[var(--bk-ink-muted)]";
+/* 2L9 B8-EX01 236:4951: "Format  ○ HTML  ● ZIP  ○ React" — a label, then
+   real radios with their dots, the checked one in the accent. Vue and
+   Next.js are not offered (the board draws three formats). */
+const OPTION = "tw:flex tw:cursor-pointer tw:items-center tw:gap-2 tw:text-[length:var(--bk-text-13)] tw:leading-5";
 
 export const FormatGrid: React.FC<FormatGridProps> = ({ selectedFormat, onFormatChange }) => (
-  <div
-    role="radiogroup"
-    aria-label="Export format"
-    className="tw:flex tw:flex-wrap tw:gap-2"
-    data-testid="export-format-grid"
-  >
-    {AVAILABLE_FORMATS.map((fmt) => {
-      const checked = selectedFormat === fmt;
-      return (
-        <label
-          key={fmt}
-          className={[PILL_BASE, checked ? PILL_SELECTED : PILL_IDLE].join(" ")}
-          data-testid={`export-fmt-${fmt}`}
-        >
-          <Radio
-            className="tw:sr-only"
-            color="blue"
-            name="export-format"
-            value={fmt}
-            checked={checked}
-            onChange={() => onFormatChange(fmt)}
-          />
-          {FORMAT_LABELS[fmt]}
-        </label>
-      );
-    })}
-
-    {/* Unimplemented stubs: same row, no radio, not reachable — a disabled
-        radio would still answer to getByRole("radio") and still take an
-        arrow-key stop in the group (FormatRow precedent). */}
-    {COMING_SOON_FORMATS.map((fmt) => (
-      <label
-        key={fmt}
-        className={[PILL_BASE, PILL_IDLE].join(" ")}
-        aria-disabled="true"
-        data-testid={`export-fmt-${fmt}`}
-      >
-        {FORMAT_LABELS[fmt]}
-        <span className={SOON_TAG}>Soon</span>
-      </label>
-    ))}
+  <div className="tw:flex tw:items-center tw:gap-8" data-testid="export-format-grid">
+    <span className="tw:w-12 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-ink)]" id="export-format-label">
+      Format
+    </span>
+    <div role="radiogroup" aria-labelledby="export-format-label" className="tw:flex tw:items-center tw:gap-12">
+      {AVAILABLE_FORMATS.map((fmt) => {
+        const checked = selectedFormat === fmt;
+        return (
+          <label
+            key={fmt}
+            className={`${OPTION} ${checked ? "tw:text-[var(--bk-accent)]" : "tw:text-[var(--bk-ink)]"}`}
+            data-testid={`export-fmt-${fmt}`}
+          >
+            <Radio color="blue" name="export-format" value={fmt} checked={checked} onChange={() => onFormatChange(fmt)} />
+            {FORMAT_LABELS[fmt]}
+          </label>
+        );
+      })}
+    </div>
   </div>
 );
 
