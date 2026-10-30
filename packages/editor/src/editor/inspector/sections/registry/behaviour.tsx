@@ -59,6 +59,12 @@ function adaptInteractions(ctx: SectionContext) {
     void domEl.offsetHeight;
     domEl.style.animation = `bd-anim-${anim.preset} ${anim.duration}ms ${anim.easing} ${anim.delay}ms 1 normal forwards`;
   };
+  /* 2L9 I17: Stop restores the authored appearance — the preview's
+     animation (fill: forwards) comes off the canvas node. */
+  const onStopPreview = () => {
+    const domEl = canvasNode(ctx.selectedElement.id);
+    if (domEl) domEl.style.animation = "";
+  };
   /* G2-157 (option A): the element's CSS animation is a row of this list. */
   const getAnimation = () => {
     const el = element();
@@ -94,6 +100,7 @@ function adaptInteractions(ctx: SectionContext) {
     composer: ctx.composer,
     elementId: ctx.selectedElement.id,
     onPreview,
+    onStopPreview,
     isOpen: ctx.isOpen,
     onToggle: ctx.onToggle,
   };

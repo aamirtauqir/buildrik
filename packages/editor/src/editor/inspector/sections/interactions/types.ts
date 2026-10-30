@@ -60,6 +60,8 @@ export interface InteractionsSectionProps {
   onInteractionsChange: (interactions: Interaction[]) => void;
   /** Preview an interaction */
   onPreview?: (interaction: Interaction) => void;
+  /** End a preview: the canvas node back to its authored look (2L9 I17). */
+  onStopPreview?: () => void;
   /** With these the section follows the element live: writing interactions
    *  changes no style, so nothing re-renders the inspector — an added
    *  interaction stayed invisible until the section re-mounted. */

@@ -4,6 +4,8 @@
  * @license BSD-3-Clause
  */
 
+import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
+import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
 import * as React from "react";
 import { Section } from "@/editor/inspector/shared/controls";
 import { AddInteractionPanel } from "./AddInteractionPanel";
@@ -33,6 +35,7 @@ export const InteractionsSection: React.FC<InteractionsSectionProps> = ({
   interactions: interactionsProp,
   onInteractionsChange,
   onPreview,
+  onStopPreview,
   isOpen,
   onToggle,
   tier = "tertiary",
@@ -43,6 +46,10 @@ export const InteractionsSection: React.FC<InteractionsSectionProps> = ({
   onAnimationPreview,
 }) => {
   const [showAddPanel, setShowAddPanel] = React.useState(false);
+  const target = composer && elementId ? composer.elements.getElement(elementId) : null;
+  /* Several suites hand the section a partial element double. */
+  const elementName =
+    target && typeof target.getCustomData === "function" ? (getLayerName(target) ?? elementTypeLabel(target.getType())) : undefined;
   const [live, setLive] = React.useState<Interaction[] | null>(null);
   const [liveAnimation, setLiveAnimation] = React.useState<AnimationConfig | null | undefined>(undefined);
   /* The animation's edit screen is open (drill-in, like an interaction's). */
@@ -178,6 +185,8 @@ export const InteractionsSection: React.FC<InteractionsSectionProps> = ({
               onToggleEnabled={toggleEnabled}
               onDuplicate={duplicateInteraction}
               onPreview={onPreview}
+              onStopPreview={onStopPreview}
+              elementName={elementName}
             />
           </>
         ) : editingAnimation && onAnimationChange ? (

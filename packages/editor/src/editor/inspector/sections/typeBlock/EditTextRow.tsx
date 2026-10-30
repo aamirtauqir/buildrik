@@ -16,6 +16,7 @@ import { EVENTS } from "@/shared/constants/events";
 import { useInspectorField } from "@/editor/inspector/shared/controls/InspectorFieldContext";
 import { WIDE_BUTTON } from "@/editor/inspector/shared/controls/controlClasses";
 import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
+import { SelectedTextLink } from "./SelectedTextLink";
 import { elementTypeLabel } from "@/shared/constants/elementTypeLabels";
 
 const NOTE = "tw:m-0 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
@@ -60,6 +61,7 @@ export function EditTextRow({ composer, elementId }: EditTextRowProps) {
       >
         Edit text on canvas
       </Button>
+      <SelectedTextLink elementId={elementId} />
       {locked ? (
         <p className={NOTE} data-testid="inspector-text-locked-hint">
           Locked — unlock {name} before editing. Enter and double-click do not start an edit.

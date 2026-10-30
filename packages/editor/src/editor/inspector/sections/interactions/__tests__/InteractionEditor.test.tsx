@@ -232,3 +232,40 @@ describe("InteractionEditor — timing validation (P-11c)", () => {
     expect(written(onUpdate)).toEqual([expect.objectContaining({ duration: 10000 })]);
   });
 });
+
+describe("InteractionEditor — preview and target (2L9 I17 / I19)", () => {
+  it("I17: Play previews and becomes Stop with the restore note; Stop ends the preview", () => {
+    const onStopPreview = vi.fn();
+    const onPreview = vi.fn();
+    render(
+      <InteractionEditor interaction={makeInteraction()} onUpdate={vi.fn()} onRemove={vi.fn()} onToggleEnabled={vi.fn()} onPreview={onPreview} onStopPreview={onStopPreview} />,
+    );
+    fireEvent.click(screen.getByTestId("interaction-play"));
+    expect(onPreview).toHaveBeenCalled();
+    expect(screen.getByTestId("interaction-play")).toHaveTextContent("Stop");
+    expect(screen.getByTestId("interaction-previewing")).toHaveTextContent("Previewing on the canvas. Stopping restores the authored appearance.");
+    fireEvent.click(screen.getByTestId("interaction-play"));
+    expect(onStopPreview).toHaveBeenCalled();
+    expect(screen.getByTestId("interaction-play")).toHaveTextContent("Play");
+    expect(screen.queryByTestId("interaction-previewing")).toBeNull();
+  });
+
+  it("I19: a saved selector that matches nothing reads Missing target, with the fallback line", () => {
+    const interaction = makeInteraction({ animation: { ...makeInteraction().animation, target: "#gone" } as Interaction["animation"] });
+    render(<InteractionEditor interaction={interaction} onUpdate={vi.fn()} onRemove={vi.fn()} onToggleEnabled={vi.fn()} elementName="Text" />);
+    expect((screen.getByLabelText("Animate") as HTMLSelectElement).selectedOptions[0].textContent).toBe("Missing target");
+    expect(screen.getByTestId("interaction-missing-target")).toHaveTextContent(
+      "The saved target no longer exists. Output falls back to Text until you choose a target.",
+    );
+  });
+
+  it("I19: a selector that matches reads as itself, no warning", () => {
+    const node = document.createElement("div");
+    node.id = "here";
+    document.body.appendChild(node);
+    const interaction = makeInteraction({ animation: { ...makeInteraction().animation, target: "#here" } as Interaction["animation"] });
+    render(<InteractionEditor interaction={interaction} onUpdate={vi.fn()} onRemove={vi.fn()} onToggleEnabled={vi.fn()} />);
+    expect(screen.queryByTestId("interaction-missing-target")).toBeNull();
+    node.remove();
+  });
+});
