@@ -136,6 +136,8 @@ export interface CreatePageConfirmModalProps {
   templateName: string;
   /** The name the new page will get — the board states it before you agree. */
   newPageName: string;
+  /** The New-page choice carried here: the page also joins site navigation. */
+  addToNavigation?: boolean;
   onCancel: () => void;
   onConfirm: () => void;
 }
@@ -143,17 +145,21 @@ export interface CreatePageConfirmModalProps {
 export const CreatePageConfirmModal: React.FC<CreatePageConfirmModalProps> = ({
   templateName,
   newPageName,
+  addToNavigation = false,
   onCancel,
   onConfirm,
 }) => (
-  /* Boards 1169:4725 / 4418:54243 — the question names the template, the
-     answer names the page and says nothing else changes. */
+  /* design-2l9 106:29182: "Create Services from SaaS Landing?", what is
+     made and what is left alone, and where you land — the apply switches to
+     the page it makes (TemplatesTab.runApply). Actions on the left. */
   <Modal
     open
     onClose={onCancel}
     dismissOnScrimClick
     testId="tpl-create-confirm"
-    title={`Create a page from ‘${templateName}’?`}
+    width="lg"
+    footerAlign="start"
+    title={`Create ${newPageName} from ${templateName}?`}
     footer={
       <>
         <Button color="light" onClick={onCancel}>
@@ -164,8 +170,9 @@ export const CreatePageConfirmModal: React.FC<CreatePageConfirmModalProps> = ({
     }
   >
     <p className="tw:m-0">
-      A new page named ‘{newPageName}’ will be added. Your current pages stay unchanged.
+      {`A new page will be created${addToNavigation ? " and added to site navigation" : ""}. Your other pages and Brand settings will stay unchanged.`}
     </p>
+    <p className="tw:m-0 tw:mt-3 tw:text-[12px] tw:text-[var(--bk-ink-muted)]">{`After creation, ${newPageName} opens in the Editor.`}</p>
   </Modal>
 );
 

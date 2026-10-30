@@ -2443,12 +2443,15 @@ const CASES: Record<string, () => React.ReactElement> = {
           onDeviceChange={() => {}}
           pageWidth={1440}
           onCustomWidth={() => {}}
-          /* 153:79518's two guides, as the site would hold them. */
+          /* 153:79518's two guides, as the site would hold them; `&guides=locked`
+             is 145:67569's one locked 240 guide. */
           guides={{
-            list: [
-              { id: "g-v", type: "vertical", position: 320, locked: false },
-              { id: "g-h", type: "horizontal", position: 120, locked: false },
-            ],
+            list: new URLSearchParams(location.search).get("guides") === "locked"
+              ? [{ id: "g-v", type: "vertical", position: 240, locked: true }]
+              : [
+                  { id: "g-v", type: "vertical", position: 320, locked: false },
+                  { id: "g-h", type: "horizontal", position: 120, locked: false },
+                ],
             add: () => {},
             update: () => {},
             setLocked: () => {},

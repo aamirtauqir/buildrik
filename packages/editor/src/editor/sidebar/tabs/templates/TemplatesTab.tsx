@@ -223,7 +223,10 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
     setCreateConfirmId(id);
   }
 
+  /* 106:37032: the progress card says which page is being created. */
+  const [creatingName, setCreatingName] = React.useState<string | null>(null);
   function handleAddAsNewPage(id: string) {
+    setCreatingName(newPageName ?? findTemplate(id)?.name ?? null);
     addAsNewPageRef.current = true;
     pendingId.current = id;
     startApply();
@@ -433,6 +436,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
   React.useEffect(() => {
     if (!showProgress) {
       applyRunningRef.current = false;
+      setCreatingName(null);
       return;
     }
     if (applyRunningRef.current) return;
@@ -644,6 +648,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
           <CreatePageConfirmModal
             templateName={t.name}
             newPageName={newPageName ?? t.name}
+            addToNavigation={Boolean(newPageName) && addToNavigation !== false}
             onCancel={() => setCreateConfirmId(null)}
             onConfirm={() => {
               setCreateConfirmId(null);
@@ -679,6 +684,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
       {showProgress && (
         <ApplyProgressOverlay
           templateName={tName}
+          creating={creatingName ?? undefined}
           steps={applySteps}
           onCancel={
             applyCancellable
