@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { trpc } from "@lib/trpc/client";
 import { Button, InputField, Modal } from "@/components/dashboard/primitives";
+import { RequestChangesDialog, type RequestChangesPhase } from "@/components/reviews/request-changes-dialog";
 import { PageCrumb, SnapshotFrame, pageLabel, type SnapshotPage } from "@/components/reviews/signoff-snapshot";
 
 /**
@@ -157,9 +158,8 @@ export function ReviewClient({ token }: { token: string }) {
      other two are where the client chose to go from there. */
   const [view, setView] = useState<"auto" | "snapshot" | "notes">("auto");
   const [confirmApprove, setConfirmApprove] = useState(false);
-  /* 4418:122170: the change request did not land. Nothing is lost — the notes
-     stay, the draft stays — and the primary becomes "Send again". */
-  const [sendFailed, setSendFailed] = useState(false);
+  /* 2L9 GAP-RV-Desktop-changes: the Request changes dialog's step, null when shut. */
+  const [changes, setChanges] = useState<RequestChangesPhase | null>(null);
 
   if (review.isLoading) {
     return (
@@ -313,32 +313,36 @@ export function ReviewClient({ token }: { token: string }) {
   /* The reason and the verdict were independent controls: typing did nothing
      until "Add note" was clicked, so typing and then asking for changes closed
      the round with the text discarded and no way back. On a sign-off product
-     the reason IS the deliverable, so an unsent draft is sent first and the
-     round only closes if it lands. */
-  const sendChangeRequest = () => {
-    setSendFailed(false);
-    const closeRound = () =>
-      resolve.mutate(
-        { token, status: "CHANGES_REQUESTED" },
-        {
-          onSuccess: () => {
-            setView("auto");
-            void utils.clientReview.get.invalidate();
-          },
-          onError: () => setSendFailed(true),
+     the reason IS the deliverable, so the note is posted first and the round
+     only closes once it lands (GAP-RV 276:30195 → 30262 → 30321). A round that
+     did not close after the note landed retries the status alone (30380). */
+  const markChangesRequested = () => {
+    setChanges("resolving");
+    resolve.mutate(
+      { token, status: "CHANGES_REQUESTED" },
+      {
+        onSuccess: () => {
+          setChanges(null);
+          setDraft("");
+          setView("auto");
+          void utils.clientReview.get.invalidate();
         },
-      );
+        onError: () => setChanges("round-failed"),
+      },
+    );
+  };
+  const sendChangeRequest = () => {
     const note = draft.trim();
-    if (!note) return closeRound();
+    if (!note) return markChangesRequested();
+    setChanges("posting");
     comment.mutate(
       { token, body: note },
       {
         onSuccess: () => {
-          setDraft("");
           void utils.clientReview.comments.invalidate({ token });
-          closeRound();
+          markChangesRequested();
         },
-        onError: () => setSendFailed(true),
+        onError: () => setChanges("note-failed"),
       },
     );
   };
@@ -366,31 +370,15 @@ export function ReviewClient({ token }: { token: string }) {
       <Button className="mt-3 tw:w-full" onClick={addNote} disabled={!draft.trim() || comment.isPending}>
         {comment.isPending ? "Sending…" : "Add note"}
       </Button>
-      {comment.error && !sendFailed ? (
+      {comment.error && changes === null ? (
         <p className="mt-2 text-[12px] text-[#E02424]">{comment.error.message}</p>
-      ) : null}
-      {open && !draft.trim() && !(comments.data && comments.data.length > 0) ? (
-        /* No board draws an empty notes list (they all show notes). Sending
-           a change request with none means the designer is not told what to
-           change — say so, as the old confirm did. */
-        <p className="mt-3 text-[12px] leading-5 text-[#6B7280]">
-          Your designer will not be told what to change unless you add a note.
-        </p>
-      ) : null}
-      {sendFailed ? (
-        <div role="alert" className="mt-3 rounded-md bg-[#FDE8E8] px-3 py-3">
-          <p className="text-[13px] font-medium text-[#C81E1E]">Your change request wasn&rsquo;t sent.</p>
-          <p className="mt-1 text-[12px] leading-5 text-[#4B5563]">
-            Nothing was lost — your notes are still here. Check your connection and send again.
-          </p>
-        </div>
       ) : null}
     </aside>
   );
 
-  /* B · commenting — the page shrunk beside the notes (4418:121999). While the
-     round is open the notes lead to "Send change request"; once it is closed
-     (C's "Add another note") there is nothing left to send, only a way back. */
+  /* B · commenting — the page shrunk beside the notes (4418:121999), reached
+     from a closed round's "Add another note": nothing left to send, only a way
+     back. (An open round asks for changes in RequestChangesDialog.) */
   if (view === "notes") {
     return (
       <Shell agency={agency} crumb={signedCrumb} round={`Review round ${round}`}>
@@ -408,22 +396,8 @@ export function ReviewClient({ token }: { token: string }) {
               className={`${TEXT_ACTION} ${COMPACT}`}
               onClick={() => setView("auto")}
             >
-              {open ? "Back to design" : "Back"}
+              Back
             </Button>
-            {open ? (
-              <Button
-                size="sm"
-                className={`${COMPACT} ${sendFailed ? "tw:min-w-[152px]" : ""}`}
-                onClick={sendChangeRequest}
-                disabled={resolve.isPending || comment.isPending}
-              >
-                {comment.isPending || resolve.isPending
-                  ? "Sending…"
-                  : sendFailed
-                    ? "Send again"
-                    : "Send change request"}
-              </Button>
-            ) : null}
           </div>
         </div>
       </Shell>
@@ -436,6 +410,7 @@ export function ReviewClient({ token }: { token: string }) {
   // ends up feeling they signed off on something they never saw.
   if (!open && view === "auto") {
     const approved = data.status === "APPROVED";
+    const lastNote = comments.data?.at(-1)?.body;
     return (
       /* No snapshot on this screen, so the page is named, not switchable. */
       <Shell
@@ -445,7 +420,7 @@ export function ReviewClient({ token }: { token: string }) {
       >
         <Card>
           <CardText
-            title={approved ? "You approved this" : "You asked for changes"}
+            title={approved ? "You approved this" : `Changes requested · Round ${round}`}
             body={
               approved
                 ? data.editedSinceApproval
@@ -454,7 +429,10 @@ export function ReviewClient({ token }: { token: string }) {
                        version that no longer exists. */
                     `Heads up — ${agency} has made changes since you approved. If you were sent a new link, use that one; your approval covered the version you saw.`
                   : `Thanks — ${agency} can take it from here. You'll hear from your designer when it goes live.`
-                : "Your notes are with your designer. They'll send a new link when the changes are ready for you."
+                : /* GAP-RV 276:30445: who asked, and the note that says what. */
+                  lastNote
+                  ? `${reviewer.name} · “${lastNote}”`
+                  : "Your notes are with your designer. They'll send a new link when the changes are ready for you."
             }
           />
           <div className="mt-4 flex gap-3">
@@ -490,7 +468,7 @@ export function ReviewClient({ token }: { token: string }) {
           </p>
           {open ? (
             <>
-              <Button variant="ghost" size="sm" onClick={() => setView("notes")} disabled={resolve.isPending}>
+              <Button variant="ghost" size="sm" onClick={() => setChanges("ask")} disabled={resolve.isPending}>
                 Request changes
               </Button>
               <Button size="sm" className="tw:min-w-[157px]" onClick={() => setConfirmApprove(true)} disabled={resolve.isPending}>
@@ -509,6 +487,20 @@ export function ReviewClient({ token }: { token: string }) {
         <SnapshotFrame page={activePage} height={600} />
       </div>
 
+      <RequestChangesDialog
+        phase={changes}
+        round={round}
+        draft={draft}
+        onDraft={setDraft}
+        onCancel={() => setChanges(null)}
+        onSubmit={sendChangeRequest}
+        onCheckStatus={() => {
+          void utils.clientReview.comments.invalidate({ token });
+          void utils.clientReview.get.invalidate();
+        }}
+        onRetryStatus={markChangesRequested}
+        onKeepEditing={() => setChanges("ask")}
+      />
       {/* Approval is the signature the whole product exists to collect, so it
           is the one action that asks twice — and the confirm says what it means
           rather than "Are you sure?". No board draws it; the behaviour stays. */}

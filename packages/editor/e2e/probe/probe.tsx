@@ -177,6 +177,7 @@ import {
 import { SettingsPermissionsDialog } from "@/editor/sidebar/tabs/settings/components/SettingsPermissionsDialog";
 import { WorkspaceDoorDialog } from "@/editor/sidebar/tabs/settings/components/WorkspaceDoorDialog";
 import { PublishSettingsGuard } from "@/editor/sidebar/tabs/settings/components/PublishSettingsGuard";
+import { SettingsTab } from "@/editor/sidebar/tabs/settings/SettingsTab";
 import type { PageSummary } from "@/shared/types";
 import { ReviewTab } from "@/editor/sidebar/tabs/review/ReviewTab";
 import { PublishGateModal, type PublishGateReason } from "@/editor/shell/modals/PublishGateModal";
@@ -4935,6 +4936,103 @@ const CASES: Record<string, () => React.ReactElement> = {
       />
     </div>
   ),
+  /* The whole Site settings tab (L-G round 2) — nav, header, footer and the
+     screen, for the footer / load / role / Analytics states of page 06.
+     ?siteId=probe-site&screen=analytics&role=ADMIN
+       &status=none|receiving|hang|fail|verifyhang|verifyfail  (siteDetail.analyticsStatus)
+       &read=ok|hang|fail                (siteDetail.settings.get)
+       &save=ok|hang|fail                (every mutation)
+       &ga=G-FIELDWORK1&verified=1       (stored Google Analytics id / verifiedAt) */
+  "settings-tab": () => {
+    const q = new URLSearchParams(location.search);
+    const mode = (k: string, d: string) => q.get(k) ?? d;
+    const hang = () => new Promise<Response>(() => {});
+    const fail = (n: number) =>
+      new Response(JSON.stringify(Array.from({ length: n }, () => ({ error: { json: { message: "probe failure", code: -32603, data: { code: "INTERNAL_SERVER_ERROR", httpStatus: 500 } } } }))), {
+        status: 500,
+        headers: { "content-type": "application/json" },
+      });
+    const role = q.get("role");
+    /* verifyhang / verifyfail: the screen's first read answers, Verify's re-read hangs / fails. */
+    let statusReads = 0;
+    const statusMode = () => {
+      const m = mode("status", "none");
+      if (!m.startsWith("verify")) return m;
+      return statusReads++ === 0 ? "ok" : m.slice(6);
+    };
+    const answers: Record<string, unknown> = {
+      "sites.myRole": role ? { role } : null,
+      "siteDetail.analyticsStatus":
+        mode("status", "none") === "receiving"
+          ? { lastEventAt: new Date(Date.now() - 3_600_000).toISOString(), events24h: 128 }
+          : { lastEventAt: null, events24h: 0 },
+      "siteDetail.settings.get": {
+        cspPolicy: "default-src 'self'; img-src 'self' https: data:",
+        hstsMaxAge: 86400,
+        xFrameOptions: "SAMEORIGIN",
+        referrerPolicy: "strict-origin-when-cross-origin",
+        permissionsPolicy: "camera=(), microphone=()",
+        defaultLocale: "en-US",
+        enabledLocales: ["en-US", "de-DE"],
+        autoRedirectLocale: false,
+      },
+      "siteDetail.locales": {
+        locales: [
+          { code: "en-US", path: "/", translated: 12, total: 12, status: "LIVE", pending: [] },
+          { code: "de-DE", path: "/de-DE", translated: 10, total: 12, status: "PENDING", pending: [] },
+        ],
+        total: 12,
+      },
+    };
+    window.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
+      const href = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+      const procs = new URL(href, location.origin).pathname.split("/api/trpc/")[1]?.split(",") ?? [];
+      const isMutation = (init?.method ?? "GET").toUpperCase() === "POST";
+      const pick = isMutation
+        ? mode("save", "ok")
+        : procs.includes("siteDetail.analyticsStatus")
+          ? statusMode()
+          : procs.includes("siteDetail.settings.get") || procs.includes("siteDetail.locales")
+            ? mode("read", "ok")
+            : "ok";
+      if (pick === "hang") return hang();
+      if (pick === "fail") return fail(procs.length);
+      const body = procs.map((name) => ({ result: { data: { json: answers[name] ?? null } } }));
+      return new Response(JSON.stringify(body), { status: 200, headers: { "content-type": "application/json" } });
+    }) as typeof fetch;
+    let settings: Record<string, unknown> = {
+      seo: { siteName: "Fieldwork Studio" },
+      analytics: {
+        googleAnalytics: { enabled: true, measurementId: q.get("ga") ?? "G-FIELDWORK1", ...(q.get("verified") ? { verifiedAt: "2026-10-20T10:00:00.000Z" } : {}) },
+        googleTagManager: { enabled: true, containerId: "GTM-ABC1234" },
+        facebookPixel: { enabled: false, pixelId: "1234567890123456" },
+        microsoftClarity: { enabled: false, projectId: "abcdefghij" },
+      },
+    };
+    const composer = {
+      getProjectSettings: () => settings,
+      setProjectSettings: (next: Record<string, unknown>) => { settings = next; },
+      adoptSavedProjectSettings: (next: Record<string, unknown>) => { settings = next; },
+      getProjectMetadata: () => ({ name: "Fieldwork Studio" }),
+      updateProjectMetadata: () => undefined,
+      mergeProjectMetadata: () => undefined,
+      saveProject: () => Promise.resolve(),
+      exportProject: () => ({ pages: [] }),
+      markSaved: () => undefined,
+      isDirty: () => false,
+      emit: () => undefined,
+      on: () => undefined,
+      off: () => undefined,
+    };
+    localStorage.removeItem("settings-panel-probe-site");
+    return (
+      <div data-probe="settings-tab" className="tw:flex" style={{ width: 1440, height: 812 }}>
+        <ToastProvider>
+          <SettingsTab composer={composer as never} projectId="probe-site" userPlan="pro" initialScreen={q.get("screen") ?? "analytics"} />
+        </ToastProvider>
+      </div>
+    );
+  },
   // "settings-webhooks" (board 640:3849) removed A-12/A01-6 — webhooks moved
   // from this pane's WebhooksScreen to the dashboard's Settings >
   // Integrations, which this probe harness does not render. Board 640:3849

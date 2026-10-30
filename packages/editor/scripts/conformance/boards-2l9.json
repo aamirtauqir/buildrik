@@ -14498,9 +14498,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:245:49535",
    "verified": "drift-open",
-   "verifiedNote": "Saving state: footer 'Saving settings…', button 'Saving…' (tested), not compared. General card content now as 238:10283 (Site / Icons). Settings chrome now per board (compared 2026-10-26, probe SettingsTab on General at 1440x900 vs 238:10283/238:11495 screenshots): text-only 32px nav rows, Danger zone under Advanced, 'ORGANIZATION WORKSPACE ↗' with Members ↗ / Billing ↗ / Integrations ↗, 'Your role' + 'Permissions ›', 'Search settings' entry (Search Mode kept: owner 2026-10-04), '‹ Back to Editor · {page}' + 20/600 title in the pane header, scope chip, white body, 56px footer 'Unsaved changes' · Discard · Save settings. Still open: Settings is a full-page view, not inside the editor shell (REQUESTS), and Billing keeps its plan pill (code-ahead).",
+   "verifiedNote": "L-G: board conflict — the saving footer is drawn 'Saving…' (S03), 'Saving Security headers…' (H02) and 'Saving default language…' (L01/L06); B8-SH07 245:49535's 'Saving settings…' (compared) is the one built for every screen. | Saving state: footer 'Saving settings…', button 'Saving…' (tested), not compared. General card content now as 238:10283 (Site / Icons). Settings chrome now per board (compared 2026-10-26, probe SettingsTab on General at 1440x900 vs 238:10283/238:11495 screenshots): text-only 32px nav rows, Danger zone under Advanced, 'ORGANIZATION WORKSPACE ↗' with Members ↗ / Billing ↗ / Integrations ↗, 'Your role' + 'Permissions ›', 'Search settings' entry (Search Mode kept: owner 2026-10-04), '‹ Back to Editor · {page}' + 20/600 title in the pane header, scope chip, white body, 56px footer 'Unsaved changes' · Discard · Save settings. Still open: Settings is a full-page view, not inside the editor shell (REQUESTS), and Billing keeps its plan pill (code-ahead).",
    "tier": "P2"
   },
   {
@@ -14752,8 +14752,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Compared 2026-10-26 (wave 2) against get_metadata of 245:45159, probe SettingsTab on Analytics at 1440x900: GTM / Meta Pixel / Clarity cards 720x94 as drawn (label 192 · id · switch + Enabled/Off 104); Google Analytics adds status words (Not verified / Waiting for data / Receiving data) + Verify (148) and the tracker disclaimer. Still open: the GA card is 182 tall vs 158 — the code keeps the Last received line under the status (code-ahead, the tracker reading), which AN01 draws only in AN04.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-G probe-compared 2026-10-30 (case settings-tab, screen=analytics, role ADMIN / EDITOR, 1440x900) vs dump 245:45159 / 248:15601: four provider cards, every switch labelled 'Enabled' (was 'Off' when off — no board draws Off), 'Not verified' · Verify, the tracker note; a clean footer is 'Saved' + Save settings with no Discard (was 'All changes saved' + disabled Discard). An Editor gets the same editable screen (Analytics' minimum role is Editor). | Compared 2026-10-26 (wave 2) against get_metadata of 245:45159, probe SettingsTab on Analytics at 1440x900: GTM / Meta Pixel / Clarity cards 720x94 as drawn (label 192 · id · switch + Enabled/Off 104); Google Analytics adds status words (Not verified / Waiting for data / Receiving data) + Verify (148) and the tracker disclaimer. Still open: the GA card is 182 tall vs 158 — the code keeps the Last received line under the status (code-ahead, the tracker reading), which AN01 draws only in AN04.",
    "tier": "P3"
   },
   {
@@ -14763,8 +14763,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Wave 3: while Verify runs the status line reads 'Checking status…' and the button 'Checking…' (tested); not probe-compared (the probe composer carries no GA id).",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-G probe-compared 2026-10-30 (settings-tab, status=verifyhang, Verify clicked) vs shots/245-45416.png: 'Checking status…' with a disabled 'Checking…' Verify, tracker note under. | Wave 3: while Verify runs the status line reads 'Checking status…' and the button 'Checking…' (tested); not probe-compared (the probe composer carries no GA id).",
    "tier": "P3"
   },
   {
@@ -14773,9 +14773,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Wave 3: Verify no longer opens a dialog (the board draws none; ConnectionVerifiedDialog deleted); a fresh verification with no events reads 'No events received yet. Verification is an unsaved setting.' (tested); not probe-compared.",
+   "authority": "code:discard-kept",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-G probe-compared 2026-10-30 (settings-tab, Verify on a fresh id) vs shots/245-45673.png: 'Waiting for data', the tracker note, then 'No events received yet. Verification is an unsaved setting.' UNDER the note as drawn (moved). Footer 'Unsaved changes' keeps Discard beside Save settings — the board omits it; discarding a draft is local and stays (code). | Wave 3: Verify no longer opens a dialog (the board draws none; ConnectionVerifiedDialog deleted); a fresh verification with no events reads 'No events received yet. Verification is an unsaved setting.' (tested); not probe-compared.",
    "tier": "P3"
   },
   {
@@ -14785,8 +14785,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Wave 3: 'Receiving data' over 'Last received today at HH:MM · N events in the last 24 hours' (tested); unreachable live (no tracker events), not probe-compared.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-G probe-compared 2026-10-30 (settings-tab, status=receiving) vs shots/245-45931.png: 'Receiving data' in success ink (was ink), Verify, tracker note, then 'Last received today at HH:MM · 128 events in the last 24 hours' under the note (moved). Footer 'Saved' · Save settings. | Wave 3: 'Receiving data' over 'Last received today at HH:MM · N events in the last 24 hours' (tested); unreachable live (no tracker events), not probe-compared.",
    "tier": "P3"
   },
   {
@@ -14795,9 +14795,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/AnalyticsScreen.tsx:376 — 4 providers + verify pill exist; tracker disclaimer, status copy, footer states dif…",
+   "authority": "code:discard-kept",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-G probe-compared 2026-10-30 (settings-tab, GA id typed G-123) vs dump: field sentence now 'Enter a valid Google Analytics measurement ID.' (the other three providers in their own terms; was 'This doesn't look right…'), footer 'Fix the measurement ID before saving' (was 'Unsaved changes'), Save refused. Discard kept (code, see 245:45673). | sidebar/tabs/settings/screens/AnalyticsScreen.tsx:376 — 4 providers + verify pill exist; tracker disclaimer, status copy, footer states dif…",
    "tier": "P3"
   },
   {
@@ -14807,8 +14807,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Wave 3: the failure sentence is error ink under the tracker note, as drawn (tested); not probe-compared.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-G probe-compared 2026-10-30 (status=verifyfail) vs shots/245-46449.png: 'Couldn’t check status' in muted ink (was ink), Verify, tracker note, 'The status service did not respond. Try Verify again.' in error ink. | Wave 3: the failure sentence is error ink under the tracker note, as drawn (tested); not probe-compared.",
    "tier": "P3"
   },
   {
@@ -14817,9 +14817,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Built, not compared (offline state): Settings reads navigator.onLine; offline keeps the edits, the footer says \"Needs a connection · changes stay here, unsaved\" (SH04/AN07 wording; S05 draws \"Needs a connection — your edits stay on this screen, unsaved\"), the banner \"You’re offline. Save settings needs a connection.\", Save disabled until online (tested). AN07 also draws \"Status unavailable offline\" for the tracker status — not built.",
+   "authority": "code:discard-kept",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-G probe-compared 2026-10-30 (browser offline) vs dump: banner 'You’re offline. Last known settings remain visible.' (Analytics' own wording; Security headers keeps SH04's), 'Status unavailable offline' with Verify disabled, footer 'Needs a connection · changes stay here, unsaved'. Discard kept while a draft exists (code). | Built, not compared (offline state): Settings reads navigator.onLine; offline keeps the edits, the footer says \"Needs a connection · changes stay here, unsaved\" (SH04/AN07 wording; S05 draws \"Needs a connection — your edits stay on this screen, unsaved\"), the banner \"You’re offline. Save settings needs a connection.\", Save disabled until online (tested). AN07 also draws \"Status unavailable offline\" for the tracker status — not built.",
    "tier": "P3"
   },
   {
@@ -14829,8 +14829,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Built, not compared (saving state): footer 'Saving settings…', button 'Saving…' (tested).",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-G probe-compared 2026-10-30 (settings-tab, save=hang): footer 'Saving settings…' with only a disabled 'Saving…', as drawn. | Built, not compared (saving state): footer 'Saving settings…', button 'Saving…' (tested).",
    "tier": "P3"
   },
   {
@@ -14851,8 +14851,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/AnalyticsScreen.tsx:376 — 4 providers + verify pill exist; tracker disclaimer, status copy, footer states dif…",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-G probe-compared 2026-10-30 (settings-tab, edit then Save): footer 'Saved · applies on next publish' · Save settings, no Discard, as drawn. | sidebar/tabs/settings/screens/AnalyticsScreen.tsx:376 — 4 providers + verify pill exist; tracker disclaimer, status copy, footer states dif…",
    "tier": "P3"
   },
   {
@@ -14906,9 +14906,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Built, not compared (offline state): Settings reads navigator.onLine; offline keeps the edits, the footer says \"Needs a connection · changes stay here, unsaved\" (SH04/AN07 wording; S05 draws \"Needs a connection — your edits stay on this screen, unsaved\"), the banner \"You’re offline. Save settings needs a connection.\", Save disabled until online (tested). AN07 also draws \"Status unavailable offline\" for the tracker status — not built.",
+   "authority": "code:discard-kept",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-G probe-compared 2026-10-30 (settings-tab, headers, edit then offline) vs dump: 'You’re offline. Save settings needs a connection.' banner, footer 'Needs a connection · changes stay here, unsaved', Save disabled; Discard kept (code, see 245:45673). | Built, not compared (offline state): Settings reads navigator.onLine; offline keeps the edits, the footer says \"Needs a connection · changes stay here, unsaved\" (SH04/AN07 wording; S05 draws \"Needs a connection — your edits stay on this screen, unsaved\"), the banner \"You’re offline. Save settings needs a connection.\", Save disabled until online (tested). AN07 also draws \"Status unavailable offline\" for the tracker status — not built.",
    "tier": "P2"
   },
   {
@@ -14918,8 +14918,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Banner now 'Changing {Screen} needs {Role} access.' (tested); built, not compared. The board's footer echo of the same line is not drawn — a read-only screen has no footer in code.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-G probe-compared 2026-10-30 (settings-tab, role=EDITOR, headers / general): the read-only banner 'Changing {Screen} needs Admin access.', fields disabled, no footer. General's missing Tagline is code:no-tagline-field (238:10889). | Banner now 'Changing {Screen} needs {Role} access.' (tested); built, not compared. The board's footer echo of the same line is not drawn — a read-only screen has no footer in code.",
    "tier": "P2"
   },
   {
@@ -14941,8 +14941,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Wave 3b: while saving the footer is 'Saving settings…' with only the disabled 'Saving…' (no Discard), as drawn (tested); the probe's save fails too fast to capture the state.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-G probe-compared 2026-10-30 (settings-tab, save=hang): footer 'Saving settings…' with only a disabled 'Saving…', as drawn. | Wave 3b: while saving the footer is 'Saving settings…' with only the disabled 'Saving…' (no Discard), as drawn (tested); the probe's save fails too fast to capture the state.",
    "tier": "P2"
   },
   {
@@ -14952,8 +14952,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/HeadersScreen.tsx:117 — fields exist; \"Browser policies\" group, HSTS \"1 year · 31536000 seconds\" labels, cust…",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-G probe-compared 2026-10-30 (settings-tab, edit then Save): footer 'Saved · applies on next publish' · Save settings, no Discard, as drawn. | sidebar/tabs/settings/screens/HeadersScreen.tsx:117 — fields exist; \"Browser policies\" group, HSTS \"1 year · 31536000 seconds\" labels, cust…",
    "tier": "P2"
   },
   {
@@ -15052,8 +15052,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/AnalyticsScreen.tsx:376 — 4 providers + verify pill exist; tracker disclaimer, status copy, footer states dif…",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-G probe-compared 2026-10-30 (case settings-tab, screen=analytics, role ADMIN / EDITOR, 1440x900) vs dump 245:45159 / 248:15601: four provider cards, every switch labelled 'Enabled' (was 'Off' when off — no board draws Off), 'Not verified' · Verify, the tracker note; a clean footer is 'Saved' + Save settings with no Discard (was 'All changes saved' + disabled Discard). An Editor gets the same editable screen (Analytics' minimum role is Editor). | sidebar/tabs/settings/screens/AnalyticsScreen.tsx:376 — 4 providers + verify pill exist; tracker disclaimer, status copy, footer states dif…",
    "tier": "P3"
   },
   {
@@ -15063,8 +15063,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Banner now 'Changing General needs Admin access.' (tested); built, not compared. General's card content drift as 238:10283.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-G probe-compared 2026-10-30 (settings-tab, role=EDITOR, headers / general): the read-only banner 'Changing {Screen} needs Admin access.', fields disabled, no footer. General's missing Tagline is code:no-tagline-field (238:10889). | Banner now 'Changing General needs Admin access.' (tested); built, not compared. General's card content drift as 238:10283.",
    "tier": "P2"
   },
   {
@@ -15513,8 +15513,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Built, not compared (loading state): the load card reads 'Loading <screen>…'; the footer 'Loading settings…' (tested).",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-G probe-compared 2026-10-30 (settings-tab, read=hang / status=hang): 'Loading {Screen}…' card, footer 'Loading settings…' · Save settings — the board's copy. | Built, not compared (loading state): the load card reads 'Loading <screen>…'; the footer 'Loading settings…' (tested).",
    "tier": "P3"
   },
   {
@@ -15524,8 +15524,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Built, not compared (error state): 'Couldn’t load <screen>', 'The settings service did not respond. Your existing configuration has not changed.', Try again; footer 'Settings unavailable · Retry to continue' (tested).",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-G probe-compared 2026-10-30 (read=fail / status=fail): 'Couldn’t load {Screen}' / 'The settings service did not respond. Your existing configuration has not changed.' / Try again; footer 'Settings unavailable · Retry to continue' — the board's copy. | Built, not compared (error state): 'Couldn’t load <screen>', 'The settings service did not respond. Your existing configuration has not changed.', Try again; footer 'Settings unavailable · Retry to continue' (tested).",
    "tier": "P3"
   },
   {
@@ -15535,8 +15535,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Built, not compared (loading state): the load card reads 'Loading <screen>…'; the footer 'Loading settings…' (tested).",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-G probe-compared 2026-10-30 (settings-tab, read=hang / status=hang): 'Loading {Screen}…' card, footer 'Loading settings…' · Save settings — the board's copy. | Built, not compared (loading state): the load card reads 'Loading <screen>…'; the footer 'Loading settings…' (tested).",
    "tier": "P2"
   },
   {
@@ -15546,8 +15546,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Built, not compared (error state): 'Couldn’t load <screen>', 'The settings service did not respond. Your existing configuration has not changed.', Try again; footer 'Settings unavailable · Retry to continue' (tested).",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-G probe-compared 2026-10-30 (read=fail / status=fail): 'Couldn’t load {Screen}' / 'The settings service did not respond. Your existing configuration has not changed.' / Try again; footer 'Settings unavailable · Retry to continue' — the board's copy. | Built, not compared (error state): 'Couldn’t load <screen>', 'The settings service did not respond. Your existing configuration has not changed.', Try again; footer 'Settings unavailable · Retry to continue' (tested).",
    "tier": "P2"
   },
   {
@@ -16356,8 +16356,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "packages/dashboard/app/review/[token]/review-client.tsx:494 — request changes + note exist; posting/resolving/partial-failure states differ",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-G 2026-10-30, unit-level on the dashboard client page (coordinator: no live walk for this page): Request changes now opens RequestChangesDialog (components/reviews) with the board's copy per step — 'Request changes to Round {n}?' / note field / Cancel · Request changes; 'Posting your note…' + Check status; 'Requesting changes…' / 'Your note was posted: “…”' / 'Waiting to mark Round {n} as Changes requested.'; 'Your note was posted; the round is still open' / Back to review · Retry status (status only, the note is not posted twice); 'Your note wasn’t posted' / 'Draft kept. Round {n} is still open.' / Keep editing · Try again — request-changes-note.test + signoff-parity.test. Replaces the 4418 notes-beside-snapshot send. The page around the dialog (pins, device switch) is B8-R08's, blocked on G-2. | packages/dashboard/app/review/[token]/review-client.tsx:494 — request changes + note exist; posting/resolving/partial-failure states differ",
    "tier": "P3"
   },
   {
@@ -16367,8 +16367,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "packages/dashboard/app/review/[token]/review-client.tsx:494 — request changes + note exist; posting/resolving/partial-failure states differ",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-G 2026-10-30, unit-level on the dashboard client page (coordinator: no live walk for this page): Request changes now opens RequestChangesDialog (components/reviews) with the board's copy per step — 'Request changes to Round {n}?' / note field / Cancel · Request changes; 'Posting your note…' + Check status; 'Requesting changes…' / 'Your note was posted: “…”' / 'Waiting to mark Round {n} as Changes requested.'; 'Your note was posted; the round is still open' / Back to review · Retry status (status only, the note is not posted twice); 'Your note wasn’t posted' / 'Draft kept. Round {n} is still open.' / Keep editing · Try again — request-changes-note.test + signoff-parity.test. Replaces the 4418 notes-beside-snapshot send. The page around the dialog (pins, device switch) is B8-R08's, blocked on G-2. | packages/dashboard/app/review/[token]/review-client.tsx:494 — request changes + note exist; posting/resolving/partial-failure states differ",
    "tier": "P3"
   },
   {
@@ -16378,8 +16378,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "packages/dashboard/app/review/[token]/review-client.tsx:494 — request changes + note exist; posting/resolving/partial-failure states differ",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-G 2026-10-30, unit-level on the dashboard client page (coordinator: no live walk for this page): Request changes now opens RequestChangesDialog (components/reviews) with the board's copy per step — 'Request changes to Round {n}?' / note field / Cancel · Request changes; 'Posting your note…' + Check status; 'Requesting changes…' / 'Your note was posted: “…”' / 'Waiting to mark Round {n} as Changes requested.'; 'Your note was posted; the round is still open' / Back to review · Retry status (status only, the note is not posted twice); 'Your note wasn’t posted' / 'Draft kept. Round {n} is still open.' / Keep editing · Try again — request-changes-note.test + signoff-parity.test. Replaces the 4418 notes-beside-snapshot send. The page around the dialog (pins, device switch) is B8-R08's, blocked on G-2. | packages/dashboard/app/review/[token]/review-client.tsx:494 — request changes + note exist; posting/resolving/partial-failure states differ",
    "tier": "P3"
   },
   {
@@ -16389,8 +16389,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "packages/dashboard/app/review/[token]/review-client.tsx:494 — request changes + note exist; posting/resolving/partial-failure states differ",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-G 2026-10-30, unit-level on the dashboard client page (coordinator: no live walk for this page): Request changes now opens RequestChangesDialog (components/reviews) with the board's copy per step — 'Request changes to Round {n}?' / note field / Cancel · Request changes; 'Posting your note…' + Check status; 'Requesting changes…' / 'Your note was posted: “…”' / 'Waiting to mark Round {n} as Changes requested.'; 'Your note was posted; the round is still open' / Back to review · Retry status (status only, the note is not posted twice); 'Your note wasn’t posted' / 'Draft kept. Round {n} is still open.' / Keep editing · Try again — request-changes-note.test + signoff-parity.test. Replaces the 4418 notes-beside-snapshot send. The page around the dialog (pins, device switch) is B8-R08's, blocked on G-2. | packages/dashboard/app/review/[token]/review-client.tsx:494 — request changes + note exist; posting/resolving/partial-failure states differ",
    "tier": "P3"
   },
   {
@@ -16400,8 +16400,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "packages/dashboard/app/review/[token]/review-client.tsx:494 — request changes + note exist; posting/resolving/partial-failure states differ",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-G unit-level: the closed round now reads 'Changes requested · Round {n}' over '{reviewer} · “{last note}”' (was 'You asked for changes'); signoff-parity test C. | packages/dashboard/app/review/[token]/review-client.tsx:494 — request changes + note exist; posting/resolving/partial-failure states differ",
    "tier": "P3"
   },
   {
@@ -16411,8 +16411,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "packages/dashboard/app/review/[token]/review-client.tsx:494 — request changes + note exist; posting/resolving/partial-failure states differ",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-G 2026-10-30, unit-level on the dashboard client page (coordinator: no live walk for this page): Request changes now opens RequestChangesDialog (components/reviews) with the board's copy per step — 'Request changes to Round {n}?' / note field / Cancel · Request changes; 'Posting your note…' + Check status; 'Requesting changes…' / 'Your note was posted: “…”' / 'Waiting to mark Round {n} as Changes requested.'; 'Your note was posted; the round is still open' / Back to review · Retry status (status only, the note is not posted twice); 'Your note wasn’t posted' / 'Draft kept. Round {n} is still open.' / Keep editing · Try again — request-changes-note.test + signoff-parity.test. Replaces the 4418 notes-beside-snapshot send. The page around the dialog (pins, device switch) is B8-R08's, blocked on G-2. | packages/dashboard/app/review/[token]/review-client.tsx:494 — request changes + note exist; posting/resolving/partial-failure states differ",
    "tier": "P3"
   },
   {
@@ -16421,9 +16421,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:276:30195",
    "verified": "drift-open",
-   "verifiedNote": "packages/dashboard/app/review/[token]/review-client.tsx:494 — request changes + note exist; posting/resolving/partial-failure states differ",
+   "verifiedNote": "L-G: the phone frame of the same Request changes dialog and its steps (same copy); the phone page layout around it is B8-R14. | packages/dashboard/app/review/[token]/review-client.tsx:494 — request changes + note exist; posting/resolving/partial-failure states differ",
    "tier": "P3"
   },
   {
@@ -16432,9 +16432,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:276:30195",
    "verified": "drift-open",
-   "verifiedNote": "packages/dashboard/app/review/[token]/review-client.tsx:494 — request changes + note exist; posting/resolving/partial-failure states differ",
+   "verifiedNote": "L-G: the phone frame of the same Request changes dialog and its steps (same copy); the phone page layout around it is B8-R14. | packages/dashboard/app/review/[token]/review-client.tsx:494 — request changes + note exist; posting/resolving/partial-failure states differ",
    "tier": "P3"
   },
   {
@@ -16443,9 +16443,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:276:30195",
    "verified": "drift-open",
-   "verifiedNote": "packages/dashboard/app/review/[token]/review-client.tsx:494 — request changes + note exist; posting/resolving/partial-failure states differ",
+   "verifiedNote": "L-G: the phone frame of the same Request changes dialog and its steps (same copy); the phone page layout around it is B8-R14. | packages/dashboard/app/review/[token]/review-client.tsx:494 — request changes + note exist; posting/resolving/partial-failure states differ",
    "tier": "P3"
   },
   {
@@ -16454,9 +16454,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:276:30195",
    "verified": "drift-open",
-   "verifiedNote": "packages/dashboard/app/review/[token]/review-client.tsx:494 — request changes + note exist; posting/resolving/partial-failure states differ",
+   "verifiedNote": "L-G: the phone frame of the same Request changes dialog and its steps (same copy); the phone page layout around it is B8-R14. | packages/dashboard/app/review/[token]/review-client.tsx:494 — request changes + note exist; posting/resolving/partial-failure states differ",
    "tier": "P3"
   },
   {
@@ -16465,9 +16465,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:276:30195",
    "verified": "drift-open",
-   "verifiedNote": "packages/dashboard/app/review/[token]/review-client.tsx:494 — request changes + note exist; posting/resolving/partial-failure states differ",
+   "verifiedNote": "L-G: the phone frame of the same Request changes dialog and its steps (same copy); the phone page layout around it is B8-R14. | packages/dashboard/app/review/[token]/review-client.tsx:494 — request changes + note exist; posting/resolving/partial-failure states differ",
    "tier": "P3"
   },
   {
@@ -16476,9 +16476,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:276:30195",
    "verified": "drift-open",
-   "verifiedNote": "packages/dashboard/app/review/[token]/review-client.tsx:494 — request changes + note exist; posting/resolving/partial-failure states differ",
+   "verifiedNote": "L-G: the phone frame of the same Request changes dialog and its steps (same copy); the phone page layout around it is B8-R14. | packages/dashboard/app/review/[token]/review-client.tsx:494 — request changes + note exist; posting/resolving/partial-failure states differ",
    "tier": "P3"
   },
   {
@@ -16498,9 +16498,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:245:49535",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/LocalizationScreen.tsx:65 — staged-default save/ack/failure + Français Undo states differ",
+   "verifiedNote": "L-G: board conflict — the saving footer is drawn 'Saving…' (S03), 'Saving Security headers…' (H02) and 'Saving default language…' (L01/L06); B8-SH07 245:49535's 'Saving settings…' (compared) is the one built for every screen. | sidebar/tabs/settings/screens/LocalizationScreen.tsx:65 — staged-default save/ack/failure + Français Undo states differ",
    "tier": "P3"
   },
   {
@@ -16509,9 +16509,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:245:49790",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/LocalizationScreen.tsx:65 — staged-default save/ack/failure + Français Undo states differ",
+   "verifiedNote": "L-G: board conflict — Languages words the acknowledgement 'Saved · Deutsch applies on next publish'; SH08's generic 'Saved · applies on next publish' (compared) is built for every screen. | sidebar/tabs/settings/screens/LocalizationScreen.tsx:65 — staged-default save/ack/failure + Français Undo states differ",
    "tier": "P3"
   },
   {
@@ -16553,9 +16553,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:245:49790",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/HeadersScreen.tsx:61 — HSTS presets exist; saved/saving/failure copy differs",
+   "verifiedNote": "L-G: the same 'Saved · applies on next publish' footer as B8-SH08 245:49790 (compared), on another screen. | sidebar/tabs/settings/screens/HeadersScreen.tsx:61 — HSTS presets exist; saved/saving/failure copy differs",
    "tier": "P3"
   },
   {
@@ -16564,9 +16564,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:245:49535",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/HeadersScreen.tsx:61 — HSTS presets exist; saved/saving/failure copy differs",
+   "verifiedNote": "L-G: board conflict — the saving footer is drawn 'Saving…' (S03), 'Saving Security headers…' (H02) and 'Saving default language…' (L01/L06); B8-SH07 245:49535's 'Saving settings…' (compared) is the one built for every screen. | sidebar/tabs/settings/screens/HeadersScreen.tsx:61 — HSTS presets exist; saved/saving/failure copy differs",
    "tier": "P3"
   },
   {
@@ -16586,9 +16586,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:245:49790",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared: after a save the footer reads 'Saved · applies on next publish' (publish-scope screens) until the next edit or screen, including on the screen a Save and leave lands on; Overview/doors have no footer (the board's 'Saved just now' is the shell bottom bar). The destination screen's own content drift is tracked on its own rows.",
+   "verifiedNote": "L-G: the same 'Saved · applies on next publish' footer as B8-SH08 245:49790 (compared), on another screen. | Built, not compared: after a save the footer reads 'Saved · applies on next publish' (publish-scope screens) until the next edit or screen, including on the screen a Save and leave lands on; Overview/doors have no footer (the board's 'Saved just now' is the shell bottom bar). The destination screen's own content drift is tracked on its own rows.",
    "tier": "P3"
   },
   {
@@ -16597,9 +16597,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:245:49790",
    "verified": "drift-open",
-   "verifiedNote": "Built, not compared: after a save the footer reads 'Saved · applies on next publish' (publish-scope screens) until the next edit or screen, including on the screen a Save and leave lands on; Overview/doors have no footer (the board's 'Saved just now' is the shell bottom bar). The destination screen's own content drift is tracked on its own rows.",
+   "verifiedNote": "L-G: the same 'Saved · applies on next publish' footer as B8-SH08 245:49790 (compared), on another screen. | Built, not compared: after a save the footer reads 'Saved · applies on next publish' (publish-scope screens) until the next edit or screen, including on the screen a Save and leave lands on; Overview/doors have no footer (the board's 'Saved just now' is the shell bottom bar). The destination screen's own content drift is tracked on its own rows.",
    "tier": "P3"
   },
   {
@@ -16609,8 +16609,8 @@
    "family": "site-delivery",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "L-D S1: BrandWorkspace door reads \"‹ Back to Site settings\" and reopens Settings at the screen it came from (requestBrandReturn); reachable once REQUESTS #11 lands in SettingsTab. Board's Undo|Redo in the Brand header not adopted (one undo). Built, not compared. Settings side done (L-E, D-11): Brand ↗ calls requestBrandReturn(composer, {screen}) before opening Brand.",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-G 2026-10-30, compared against the board's text (dump) and the tests, no screenshot: what this board adds to the Brand Colors page is the door — '‹ Back to Site settings' (BrandWorkspace backLabel when Site settings opened Brand, BrandWorkspace.shell.test) — and the return to the screen Settings came from (requestBrandReturn, SettingsTab test 'Brand ↗ leaves a return…'; the door emits ui:panel-open {settings, screen}). The Brand page itself is compared on the brand family's rows (L-D). | L-D S1: BrandWorkspace door reads \"‹ Back to Site settings\" and reopens Settings at the screen it came from (requestBrandReturn); reachable once REQUESTS #11 lands in SettingsTab. Board's Undo|Redo in the Brand header not adopted (one undo). Built, not compared. Settings side done (L-E, D-11): Brand ↗ calls requestBrandReturn(composer, {screen}) before opening Brand.",
    "tier": "P3"
   },
   {
@@ -17451,9 +17451,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:245:49535",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/LocalizationScreen.tsx:65 — staged-default save/ack/failure + Français Undo states differ",
+   "verifiedNote": "L-G: board conflict — the saving footer is drawn 'Saving…' (S03), 'Saving Security headers…' (H02) and 'Saving default language…' (L01/L06); B8-SH07 245:49535's 'Saving settings…' (compared) is the one built for every screen. | sidebar/tabs/settings/screens/LocalizationScreen.tsx:65 — staged-default save/ack/failure + Français Undo states differ",
    "tier": "P3"
   },
   {
@@ -17462,9 +17462,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:245:49790",
    "verified": "drift-open",
-   "verifiedNote": "sidebar/tabs/settings/screens/LocalizationScreen.tsx:65 — staged-default save/ack/failure + Français Undo states differ",
+   "verifiedNote": "L-G: board conflict — Languages words the acknowledgement 'Saved · Deutsch applies on next publish'; SH08's generic 'Saved · applies on next publish' (compared) is built for every screen. | sidebar/tabs/settings/screens/LocalizationScreen.tsx:65 — staged-default save/ack/failure + Français Undo states differ",
    "tier": "P3"
   },
   {
@@ -17484,9 +17484,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:277:27516",
    "verified": "no",
-   "verifiedNote": "L-D S1: same door as 277:27516 (screen = the discarded Security draft's screen). Built, not compared. Settings side done (L-E, D-11): Brand ↗ calls requestBrandReturn(composer, {screen}) before opening Brand.",
+   "verifiedNote": "L-G: the same Brand door returning to another settings screen (a discarded Security draft, acknowledged Security, Languages); the board text is identical apart from the screen. | L-D S1: same door as 277:27516 (screen = the discarded Security draft's screen). Built, not compared. Settings side done (L-E, D-11): Brand ↗ calls requestBrandReturn(composer, {screen}) before opening Brand.",
    "tier": "P3"
   },
   {
@@ -17495,9 +17495,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:277:27516",
    "verified": "no",
-   "verifiedNote": "L-D S1: same door as 277:27516. Built, not compared. Settings side done (L-E, D-11): Brand ↗ calls requestBrandReturn(composer, {screen}) before opening Brand.",
+   "verifiedNote": "L-G: the same Brand door returning to another settings screen (a discarded Security draft, acknowledged Security, Languages); the board text is identical apart from the screen. | L-D S1: same door as 277:27516. Built, not compared. Settings side done (L-E, D-11): Brand ↗ calls requestBrandReturn(composer, {screen}) before opening Brand.",
    "tier": "P3"
   },
   {
@@ -20144,9 +20144,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:277:27516",
    "verified": "no",
-   "verifiedNote": "L-D S1: same door as 277:27516 (returns to Languages). Built, not compared. Settings side done (L-E, D-11): Brand ↗ calls requestBrandReturn(composer, {screen}) before opening Brand.",
+   "verifiedNote": "L-G: the same Brand door returning to another settings screen (a discarded Security draft, acknowledged Security, Languages); the board text is identical apart from the screen. | L-D S1: same door as 277:27516 (returns to Languages). Built, not compared. Settings side done (L-E, D-11): Brand ↗ calls requestBrandReturn(composer, {screen}) before opening Brand.",
    "tier": "P3"
   },
   {
@@ -20755,9 +20755,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:276:30380",
    "verified": "drift-open",
-   "verifiedNote": "packages/dashboard/app/review/[token]/review-client.tsx:494 — request changes + note exist; posting/resolving/partial-failure states differ",
+   "verifiedNote": "L-G: 'Back to review' after the round stayed open — the posted note is in the client's notes list and the round stays open; the page's comments layout around it is B8-R08/R14 (pins blocked on G-2). | packages/dashboard/app/review/[token]/review-client.tsx:494 — request changes + note exist; posting/resolving/partial-failure states differ",
    "tier": "P3"
   },
   {
@@ -20766,9 +20766,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:276:30380",
    "verified": "drift-open",
-   "verifiedNote": "packages/dashboard/app/review/[token]/review-client.tsx:494 — request changes + note exist; posting/resolving/partial-failure states differ",
+   "verifiedNote": "L-G: 'Back to review' after the round stayed open — the posted note is in the client's notes list and the round stays open; the page's comments layout around it is B8-R08/R14 (pins blocked on G-2). | packages/dashboard/app/review/[token]/review-client.tsx:494 — request changes + note exist; posting/resolving/partial-failure states differ",
    "tier": "P3"
   },
   {
@@ -20777,9 +20777,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "superseded:276:30380",
    "verified": "drift-open",
-   "verifiedNote": "packages/dashboard/app/review/[token]/review-client.tsx:494 — request changes + note exist; posting/resolving/partial-failure states differ",
+   "verifiedNote": "L-G: 'Back to review' after the round stayed open — the posted note is in the client's notes list and the round stays open; the page's comments layout around it is B8-R08/R14 (pins blocked on G-2). | packages/dashboard/app/review/[token]/review-client.tsx:494 — request changes + note exist; posting/resolving/partial-failure states differ",
    "tier": "P3"
   },
   {
@@ -22553,9 +22553,9 @@
    "page": "07",
    "family": "recovery",
    "status": "out-of-scope",
-   "authority": "board",
+   "authority": "superseded:gap-audit-board",
    "verified": "no",
-   "verifiedNote": "blocked:handoff-note: Annotation board, no UI; suggest manifest status out-of-scope",
+   "verifiedNote": "L-G: handoff annotation board, not a UI state. | blocked:handoff-note: Annotation board, no UI; suggest manifest status out-of-scope",
    "tier": "P2"
   },
   {

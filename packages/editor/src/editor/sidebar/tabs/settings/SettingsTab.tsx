@@ -1076,7 +1076,8 @@ export const SettingsTab: React.FC<
               className="tw:w-full tw:max-w-180 tw:shrink-0 tw:rounded-[var(--bk-radius-sm)] tw:bg-[var(--bk-warning-tint)] tw:px-4 tw:py-3 tw:text-[length:var(--bk-text-13)] tw:leading-5 tw:text-[var(--bk-warning-text)]"
               data-testid="set-offline"
             >
-              You’re offline. Save settings needs a connection.
+              {/* B8-AN07 words it for the screen whose status needs the network. */}
+              {currentScreen === "analytics" ? "You’re offline. Last known settings remain visible." : "You’re offline. Save settings needs a connection."}
             </div>
           ) : null}
           {trimmed ? (
@@ -1134,8 +1135,9 @@ export const SettingsTab: React.FC<
             >
               {footStatus.text}
             </span>
-            {/* B8-SH07: while the save runs the footer is the status and Saving… only. */}
-            {saving ? null : (
+            {/* B8-SH07: while the save runs the footer is the status and Saving… only;
+                B8-AN01: a clean screen draws "Saved" and Save settings, no Discard. */}
+            {saving || (!screenIsDirty && !saveError) ? null : (
             <Button
               type="button"
               variant="secondary"
