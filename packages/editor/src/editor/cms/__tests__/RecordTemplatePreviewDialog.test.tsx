@@ -18,21 +18,31 @@ vi.mock("../recordTemplatePreview", () => ({
 
 import { RecordTemplatePreviewDialog } from "../RecordTemplatePreviewDialog";
 
-const MENU = { id: "col-1", name: "Menu items", pageTemplatePath: "menu-item.html" } as unknown as CMSCollection;
-const RECORD = { id: "r1", collectionId: "col-1", data: { name: "Margherita" }, status: "published", createdAt: "", updatedAt: "" } as CMSContentItem;
+const MENU = {
+  id: "col-1",
+  name: "Menu items",
+  displayField: "name",
+  pageTemplatePath: "menu-item.html",
+  fields: [
+    { id: "f1", name: "Name", slug: "name", type: "text", order: 0 },
+    { id: "f2", name: "Description", slug: "description", type: "textarea", order: 1 },
+  ],
+} as unknown as CMSCollection;
+const RECORD = { id: "r1", collectionId: "col-1", data: { name: "Margherita", description: "Tomato and basil." }, status: "published", createdAt: "", updatedAt: "" } as CMSContentItem;
 
 beforeEach(() => renderPreviewMock.mockReset());
 afterEach(() => cleanup());
 
 describe("RecordTemplatePreviewDialog", () => {
-  it("renders the template preview in an iframe once the render resolves", async () => {
+  /* 183:20974: the SAVED record as its card; the page preview one click away. */
+  it("shows the saved record's card, then offers the page preview once it is rendered", async () => {
     renderPreviewMock.mockResolvedValueOnce({ ok: true, html: "<h1>Margherita</h1>" });
     render(
       <RecordTemplatePreviewDialog composer={{} as never} collection={MENU} record={RECORD} onClose={vi.fn()} onChooseTemplate={vi.fn()} />,
     );
-    const frame = (await screen.findByTestId("cms-record-template-preview-frame")) as HTMLIFrameElement;
-    expect(frame.srcdoc).toBe("<h1>Margherita</h1>");
-    expect(screen.getByTestId("cms-record-template-preview-open")).toBeEnabled();
+    expect(screen.getByTestId("cms-record-template-preview-subtitle")).toHaveTextContent("Margherita · Last saved version");
+    expect(screen.getByTestId("cms-record-preview-card")).toHaveTextContent("MargheritaTomato and basil.");
+    expect(await screen.findByTestId("cms-record-template-preview-open")).toHaveTextContent("Open page preview");
   });
 
   it("Open in new tab renders the page only inside a sandbox=\"\" iframe, never as a same-origin blob page (I-1a)", async () => {
@@ -44,8 +54,7 @@ describe("RecordTemplatePreviewDialog", () => {
     render(
       <RecordTemplatePreviewDialog composer={{} as never} collection={MENU} record={RECORD} onClose={vi.fn()} onChooseTemplate={vi.fn()} />,
     );
-    await screen.findByTestId("cms-record-template-preview-frame");
-    fireEvent.click(screen.getByTestId("cms-record-template-preview-open"));
+    fireEvent.click(await screen.findByTestId("cms-record-template-preview-open"));
     expect(openSpy).toHaveBeenCalledWith("about:blank", "_blank");
     expect(blobSpy).not.toHaveBeenCalled();
     expect(tab.opener).toBeNull();
@@ -71,18 +80,19 @@ describe("RecordTemplatePreviewDialog", () => {
     expect(onChooseTemplate).toHaveBeenCalled();
   });
 
-  it("says the composer isn't ready rather than hanging when composer is null", async () => {
+  it("without a composer, or when the page render throws, the card stays and no page preview is offered", async () => {
     render(<RecordTemplatePreviewDialog composer={null} collection={MENU} record={RECORD} onClose={vi.fn()} onChooseTemplate={vi.fn()} />);
-    expect(await screen.findByTestId("cms-record-template-preview-error")).toHaveTextContent("isn't ready yet");
+    expect(screen.getByTestId("cms-record-preview-card")).toHaveTextContent("Margherita");
     expect(renderPreviewMock).not.toHaveBeenCalled();
-  });
-
-  it("shows a generic refusal when rendering throws", async () => {
+    expect(screen.queryByTestId("cms-record-template-preview-open")).toBeNull();
+    cleanup();
     renderPreviewMock.mockRejectedValueOnce(new Error("boom"));
     render(
       <RecordTemplatePreviewDialog composer={{} as never} collection={MENU} record={RECORD} onClose={vi.fn()} onChooseTemplate={vi.fn()} />,
     );
-    expect(await screen.findByTestId("cms-record-template-preview-error")).toHaveTextContent("Couldn't render this preview");
+    await Promise.resolve();
+    expect(screen.queryByTestId("cms-record-template-preview-open")).toBeNull();
+    expect(screen.getByTestId("cms-record-preview-card")).toHaveTextContent("Margherita");
   });
 
   it("Close calls onClose", async () => {
@@ -91,7 +101,6 @@ describe("RecordTemplatePreviewDialog", () => {
     render(
       <RecordTemplatePreviewDialog composer={{} as never} collection={MENU} record={RECORD} onClose={onClose} onChooseTemplate={vi.fn()} />,
     );
-    await screen.findByTestId("cms-record-template-preview-frame");
     fireEvent.click(screen.getByTestId("cms-record-template-preview-close"));
     expect(onClose).toHaveBeenCalled();
   });

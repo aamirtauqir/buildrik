@@ -9229,8 +9229,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Round 22 (correction): 'Preview saved record' exists — RecordTemplatePreviewDialog renders the SAVED record (record prop, not the form) through the collection page, so the draft is excluded as the board says. Drift: the board draws a 512 card ('{record} · Last saved version', title, excerpt, Close); the code shows the whole template page (720+, iframe, Open in new tab). Not compared beyond that. | Round 22: the compact frame is not reachable (see 180:17867).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Built + compared 2026-10-30 (round 23) with shots/183-20974.png, probe cms-workspace&record=post-1 at 1280×640 with an unsaved title edit: 'Preview saved record' is now the board's card — '{record} · Last saved version', the SAVED record's title (20 semibold) and summary, Close — from record.data, never the form (the draft 'A clearer point of view' did not appear). 720 wide as the board measures (576 of 1024 at 1280 ⇒ 720). Kept: the collection page rendered with the saved record, as 'Open page preview' (sandboxed new tab) once it renders, and the no-template note with 'Choose a template page'. The compact frame around it is code:cms-drawer-kept-at-1280. Shared card: RecordPreview.RecordCard (the form preview draws the same card from the form). Tests RecordTemplatePreviewDialog.",
    "tier": "P1"
   },
   {
@@ -22982,8 +22982,8 @@
    "family": "play",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Not L-B's surface: the leave-draft dialog is the CMS record sheet (cms/RecordSheet.tsx, lane L-C). Listed in drifts-b by its Play journey; handed back.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Play journey F2 compared 2026-10-30 (round 23): F2.08 leave-draft guard ('Your destination is {origin}.' · Keep editing / Discard changes / Save and leave) — the same state as 173:17098, probe-compared in round 22 (cms-workspace&record=post-1&origin=…, port 5171) and matching this frame's copy, controls and order. The record body follows 122:43331 (one 500 column) where this prototype draws the older two-column form. | Not L-B's surface: the leave-draft dialog is the CMS record sheet (cms/RecordSheet.tsx, lane L-C). Listed in drifts-b by its Play journey; handed back.",
    "tier": "P1"
   },
   {
@@ -22993,8 +22993,8 @@
    "family": "play",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "Not L-B's surface: the record sheet's saving state (cms/RecordSheet.tsx, lane L-C). Handed back.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Play journey F2 compared 2026-10-30 (round 23): F2.09 save and return pending ('Saving record…' pill · Stay here / Saving…) — the same state as 173:16635, probe-compared in round 22 (cms-workspace&record=post-1&origin=…, port 5171) and matching this frame's copy, controls and order. The record body follows 122:43331 (one 500 column) where this prototype draws the older two-column form. | Not L-B's surface: the record sheet's saving state (cms/RecordSheet.tsx, lane L-C). Handed back.",
    "tier": "P1"
   },
   {
@@ -23026,8 +23026,8 @@
    "family": "play",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "drift-open — L-C C2 built the record side (origin label, Save and leave back); landing on the same binding subview waits on REQUESTS #12 (lead, StudioPanels backToCanvas).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Play F2.12 walked end to end 2026-10-30 (round 23) in the Vite demo and compared with shots/302-16675.png: Blog collection → Dynamic pages → Create collection page → select the bound heading → 'Title text · Blog.title ›' → Open record › → edit the title → ‹ {origin} → Save and leave → back on the canvas, the heading still selected, Layers with the bound glyph, the record bar on the edited record, and the Inspector on the SAME binding subview (‹ Back to Content · Title text binding · Source / Format / If empty / Preview / Open record › / Unbind — keep shown text) — match. The walk found and fixed a break: the saved record still told the shell it was dirty, so the way back met a false 'Unsaved changes · Leave and lose changes' (RecordSheet.leave now clears it; test RecordSheet 'reads ‹ <origin>'). Left to L-B: the subview's Preview value stays the pre-save text until re-selected (REQUESTS A-28). | drift-open — L-C C2 built the record side (origin label, Save and leave back); landing on the same binding subview waits on REQUESTS #12 (lead, StudioPanels backToCanvas).",
    "tier": "P1"
   },
   {
@@ -23048,8 +23048,8 @@
    "family": "play",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C C1: failed Save and leave keeps edits, \"Your edits are still here. Return to X is paused.\", footer \"Couldn’t save · return paused\", Cancel · Retry and return.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Play journey F2 compared 2026-10-30 (round 23): F2.14 save rejected, draft kept ('Your edits are still here. Return to Heading is paused.' · Cancel / Retry and return) — the same state as 174:14111, probe-compared in round 22 (cms-workspace&record=post-1&origin=…, port 5171) and matching this frame's copy, controls and order. The record body follows 122:43331 (one 500 column) where this prototype draws the older two-column form. | built, not compared — L-C C1: failed Save and leave keeps edits, \"Your edits are still here. Return to X is paused.\", footer \"Couldn’t save · return paused\", Cancel · Retry and return.",
    "tier": "P1"
   },
   {
@@ -23059,8 +23059,8 @@
    "family": "play",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C C1: Stay here during Save and leave shows \"Return cancelled. Your record save is still in progress.\"; record stays open.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Play journey F2 compared 2026-10-30 (round 23): F2.15 return cancelled, save pending ('Return cancelled. Your record save is still in progress.' · Saving… / Saving…) — the same state as 177:16850, probe-compared in round 22 (cms-workspace&record=post-1&origin=…, port 5171) and matching this frame's copy, controls and order. The record body follows 122:43331 (one 500 column) where this prototype draws the older two-column form. | built, not compared — L-C C1: Stay here during Save and leave shows \"Return cancelled. Your record save is still in progress.\"; record stays open.",
    "tier": "P1"
   },
   {

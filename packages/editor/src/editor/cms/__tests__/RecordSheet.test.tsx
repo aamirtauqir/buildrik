@@ -743,7 +743,12 @@ describe("RecordSheet · the way back names its origin (2L9 C2)", () => {
     fireEvent.click(btn);
     expect(await screen.findByTestId("cms-discard-body")).toHaveTextContent("Your destination is Heading · Title binding.");
     fireEvent.click(screen.getByTestId("cms-discard-save"));
+    /* Play F2.12: the way back must not meet the shell's own "Unsaved
+       changes" guard — the record was just saved. */
+    let dirtyAtLeave: boolean | null = null;
+    back.mockImplementation(() => (dirtyAtLeave = shellDirty.get()));
     await waitFor(() => expect(back).toHaveBeenCalled());
+    expect(dirtyAtLeave).toBe(false);
   });
 
   it("a failed save on the way back pauses it under the origin's name", async () => {

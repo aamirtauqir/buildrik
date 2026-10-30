@@ -15,6 +15,29 @@ const text = (v: unknown) => (v === undefined || v === null ? "" : String(v));
 const firstOf = (fields: CMSField[], types: CMSField["type"][], skip: string[] = []) =>
   fields.find((f) => types.includes(f.type) && !skip.includes(f.slug));
 
+/** The record as the site's card draws it — from `values` (the form's, or
+ *  the saved record's for 183:20974): image, title, a summary, a short line. */
+export function RecordCard({ collection, values, title, meta: showMeta = true }: { collection: CMSCollection; values: Record<string, unknown>; title: string; meta?: boolean }) {
+  const fields = [...collection.fields].sort((a, b) => a.order - b.order);
+  const display = collection.displayField ?? "name";
+  const image = firstOf(fields, ["image"]);
+  /* The summary under the title (an excerpt), then a short line under that
+     (an author) — never the title itself or the URL slug. */
+  const body = firstOf(fields, ["textarea", "richtext", "text"], [display, "slug"]);
+  const meta = firstOf(fields, ["reference", "select", "text"], [display, "slug", body?.slug ?? ""]);
+  const bodyText = body ? (body.type === "richtext" ? stripAllTags(text(values[body.slug])) : text(values[body.slug])) : "";
+  const src = image ? text(values[image.slug]) : "";
+  const metaValue = meta && meta.type !== "reference" ? text(values[meta.slug]) : "";
+  return (
+    <div className="tw:flex tw:flex-col tw:gap-4" data-testid="cms-record-preview-card">
+      {src ? <img src={src} alt="" className="tw:h-32 tw:w-full tw:rounded-[6px] tw:object-cover" /> : null}
+      <div className="tw:m-0 tw:text-[20px] tw:leading-7 tw:font-semibold tw:text-[var(--bk-ink)] tw:[overflow-wrap:anywhere]">{title}</div>
+      {bodyText ? <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-soft)]">{bodyText}</p> : null}
+      {showMeta && metaValue ? <p className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]">{metaValue}</p> : null}
+    </div>
+  );
+}
+
 export function RecordPreview({
   collection,
   form,
@@ -30,16 +53,6 @@ export function RecordPreview({
   /** Absent for a record that is not saved yet — there is nothing saved to preview. */
   onPreviewSaved?: () => void;
 }) {
-  const fields = [...collection.fields].sort((a, b) => a.order - b.order);
-  const display = collection.displayField ?? "name";
-  const image = firstOf(fields, ["image"]);
-  /* The summary under the title (an excerpt), then a short line under that
-     (an author) — never the title itself or the URL slug. */
-  const body = firstOf(fields, ["textarea", "richtext", "text"], [display, "slug"]);
-  const meta = firstOf(fields, ["reference", "select", "text"], [display, "slug", body?.slug ?? ""]);
-  const bodyText = body ? (body.type === "richtext" ? stripAllTags(text(form[body.slug])) : text(form[body.slug])) : "";
-  const src = image ? text(form[image.slug]) : "";
-  const metaValue = meta && meta.type !== "reference" ? text(form[meta.slug]) : "";
 
   return (
     <aside
@@ -49,11 +62,8 @@ export function RecordPreview({
     >
       <h4 className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:font-semibold tw:text-[var(--bk-ink)]">{dirty ? "Preview (unsaved)" : "Preview"}</h4>
       <p className="tw:m-0 tw:mt-4 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]">Reflects the values in this form.</p>
-      <div className="tw:mt-5 tw:flex tw:flex-col tw:gap-4" data-testid="cms-record-preview-card">
-        {src ? <img src={src} alt="" className="tw:h-32 tw:w-full tw:rounded-[6px] tw:object-cover" /> : null}
-        <p className="tw:m-0 tw:text-[20px] tw:leading-7 tw:font-semibold tw:text-[var(--bk-ink)] tw:[overflow-wrap:anywhere]">{title}</p>
-        {bodyText ? <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-soft)]">{bodyText}</p> : null}
-        {metaValue ? <p className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]">{metaValue}</p> : null}
+      <div className="tw:mt-5">
+        <RecordCard collection={collection} values={form} title={title} />
       </div>
       {onPreviewSaved ? (
         <Button size="xs" variant="secondary" className="tw:mt-6 tw:h-8 tw:w-[260px] tw:text-[13px] tw:font-medium" onClick={onPreviewSaved} data-testid="cms-sheet-preview-template">

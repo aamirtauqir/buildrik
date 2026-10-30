@@ -171,6 +171,7 @@ export function RecordSheet({
   const leaving$ = React.useRef(false);
   const leave = (go: () => void) => {
     leaving$.current = true;
+    shellDirty.set("cms-record", false); // Play F2.12: a saved/discarded record must not meet the shell's "Unsaved changes"
     go();
   };
   /* 126:36751: a page removed while the leave waited opens nothing — the
@@ -300,8 +301,7 @@ export function RecordSheet({
     stayRef.current = true;
     setReturnCancelled(true);
   };
-  /* 126:35760 — a queued save holds the record until the queue answers it. */
-  const queued = useQueuedSaveLock(record?.id ?? null, (how) => {
+  const queued = useQueuedSaveLock(record?.id ?? null, (how) => { // 126:35760 — a queued save holds the record
     if (how === "conflict") return;
     setSaveError(null);
     stayRef.current = true;
