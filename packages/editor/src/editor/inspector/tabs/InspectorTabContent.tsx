@@ -41,6 +41,7 @@ import type { BreakpointId } from "@/shared/types/breakpoints";
 import type { PseudoStateId } from "@/shared/types";
 import { ResetStyleReview } from "../components/ResetStyleReview";
 import { ChooseFont } from "../sections/typography/ChooseFont";
+import { RenameCard } from "../components/RenameCard";
 import { ApplyStyleResultNote, ApplyStyleReview, useApplyStyleResult } from "../components/ApplyStyleReview";
 
 // ============================================================================
@@ -169,6 +170,10 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
         onClose={() => closeSubview("font-picker")}
       />
     );
+  }
+
+  if (subviewHere === "rename") {
+    return <RenameCard composer={composer} elementId={selectedElement.id} onClose={() => closeSubview("rename")} />;
   }
 
   if (subviewHere === "reset-style" && composer) {

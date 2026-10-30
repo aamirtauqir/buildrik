@@ -1,7 +1,7 @@
 /**
  * G2-139: the inspector header names the element by its layer name (or its
  * type) and renames it in place — the same name Layers, the canvas tag and
- * the canvas bar show.
+ * the canvas bar show. Renaming opens the rename card (S28).
  *
  * @license BSD-3-Clause
  */
@@ -9,6 +9,7 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent, act } from "@testing-library/react";
 import { EVENTS } from "@/shared/constants/events";
 import { ElementNameField } from "../ElementNameField";
+import { openSubview, useSubview } from "@/editor/inspector/tabs/subviewStore";
 
 function setup(layerName?: string) {
   const handlers = new Map<string, (p: unknown) => void>();
@@ -36,25 +37,21 @@ describe("ElementNameField", () => {
     expect(screen.getByTestId("inspector-element-name")).toHaveTextContent("Section");
   });
 
-  it("double-click edits; Enter saves through renameElement", () => {
-    const { el, composer } = setup();
+  it("double-click, Enter or F2 opens the rename card (2L9 S28) — the one rename path, no inline edit", () => {
+    setup("Hero");
+    let opened: unknown = null;
+    function Probe() {
+      opened = useSubview();
+      return null;
+    }
+    render(<Probe />);
     fireEvent.doubleClick(screen.getByTestId("inspector-element-name"));
-    const input = screen.getByRole("textbox", { name: "Element name" });
-    fireEvent.change(input, { target: { value: "Hero" } });
-    fireEvent.keyDown(input, { key: "Enter" });
-    expect(el.setData).toHaveBeenCalledWith("layerName", "Hero");
-    expect(composer.emit).toHaveBeenCalledWith(EVENTS.ELEMENT_RENAMED, { id: "e1", name: "Hero" });
-    expect(screen.getByTestId("inspector-element-name")).toHaveTextContent("Hero");
-  });
-
-  it("Escape cancels", () => {
-    const { el } = setup("Hero");
-    fireEvent.doubleClick(screen.getByTestId("inspector-element-name"));
-    const input = screen.getByRole("textbox", { name: "Element name" });
-    fireEvent.change(input, { target: { value: "Other" } });
-    fireEvent.keyDown(input, { key: "Escape" });
-    expect(el.setData).not.toHaveBeenCalled();
-    expect(screen.getByTestId("inspector-element-name")).toHaveTextContent("Hero");
+    expect(opened).toEqual({ kind: "rename", elementId: "e1" });
+    expect(screen.queryByRole("textbox")).toBeNull();
+    act(() => openSubview(null));
+    fireEvent.keyDown(screen.getByTestId("inspector-element-name"), { key: "F2" });
+    expect(opened).toEqual({ kind: "rename", elementId: "e1" });
+    act(() => openSubview(null));
   });
 
   it("follows a rename made elsewhere (Layers)", () => {

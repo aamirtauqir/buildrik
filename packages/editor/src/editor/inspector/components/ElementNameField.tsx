@@ -1,16 +1,17 @@
 /**
  * ElementNameField — the inspector header's element name (G2-139): the
- * layer name when the element has one, else its type; double-click (or
- * Enter on it) renames in place. Writes go through renameElement, the same
- * writer Layers uses, so Layers, the canvas tag and the canvas bar follow.
+ * layer name when the element has one, else its type. Double-click (or
+ * Enter / F2 on it) opens the rename card (2L9 S28, `RenameCard`) — the one
+ * rename path; the card writes through renameElement, the writer Layers
+ * uses, so Layers, the canvas tag and the canvas bar follow.
  *
  * @license BSD-3-Clause
  */
 import * as React from "react";
 import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants/events";
-import { TextInput } from "@/editor/chrome-ui";
-import { getLayerName, renameElement } from "@/editor/panels/layers/hooks/layersPersistence";
+import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
+import { openSubview } from "../tabs/subviewStore";
 
 export interface ElementNameFieldProps {
   composer: Composer | null | undefined;
@@ -25,11 +26,9 @@ export function ElementNameField({ composer, elementId, typeLabel }: ElementName
     [composer, elementId],
   );
   const [name, setName] = React.useState<string | null>(read);
-  const [editing, setEditing] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     setName(read());
-    setEditing(null);
     if (!composer) return;
     const onRenamed = (p: { id: string; name: string | null }) => {
       if (p.id === elementId) setName(p.name);
@@ -40,30 +39,7 @@ export function ElementNameField({ composer, elementId, typeLabel }: ElementName
     };
   }, [composer, elementId, read]);
 
-  const commit = () => {
-    if (editing === null) return;
-    renameElement(composer, elementId, editing);
-    setName(editing.trim() || null);
-    setEditing(null);
-  };
-
-  if (editing !== null) {
-    return (
-      <TextInput
-        aria-label="Element name"
-        sizing="sm"
-        autoFocus
-        value={editing}
-        placeholder={typeLabel}
-        onChange={(e) => setEditing(e.target.value)}
-        onBlur={commit}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") commit();
-          else if (e.key === "Escape") setEditing(null);
-        }}
-      />
-    );
-  }
+  const rename = () => openSubview({ kind: "rename", elementId });
 
   return (
     <div
@@ -71,11 +47,11 @@ export function ElementNameField({ composer, elementId, typeLabel }: ElementName
       data-testid="inspector-element-name"
       title="Double-click to rename"
       tabIndex={0}
-      onDoubleClick={() => setEditing(name ?? "")}
+      onDoubleClick={rename}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === "F2") {
           e.preventDefault();
-          setEditing(name ?? "");
+          rename();
         }
       }}
     >

@@ -2828,8 +2828,15 @@ const CASES: Record<string, () => React.ReactElement> = {
     }
     return (
       <ToastProvider>
-        <div data-probe="inspector-panel" className="tw:flex tw:h-[860px] tw:w-[300px] tw:flex-col tw:bg-white">
-          <Host />
+        {/* `?shell=1` — the panel in the shell's right column (`.layout-shell__inspector`
+            at the 1440 frame's right edge), for popovers placed `beside` it (I20). */}
+        <div
+          className={q.get("shell") ? "layout-shell__inspector" : undefined}
+          style={q.get("shell") ? { position: "fixed", top: 0, right: 0, width: 300, height: 860, transform: "none" } : undefined}
+        >
+          <div data-probe="inspector-panel" className="tw:flex tw:h-[860px] tw:w-[300px] tw:flex-col tw:bg-white">
+            <Host />
+          </div>
         </div>
       </ToastProvider>
     );
@@ -2920,6 +2927,41 @@ const CASES: Record<string, () => React.ReactElement> = {
   "layers-tree": () => (
     <div data-probe="layers-tree"><LayersProbe /></div>
   ),
+  /* 147:78900 end to end: the real Layers tab and the Inspector on one
+     composer, with stand-in canvas nodes for Layers' data-hidden to land on.
+     Dim lx-heading with its eye; the Inspector's "Show normally" un-dims it
+     through Layers (B-20). */
+  "layers-dimmed-inspector": () => {
+    const c = layersComposer();
+    for (const el of c.elements.getAllElements()) {
+      if (document.querySelector(`[data-buildrick-id="${el.getId()}"]`)) continue;
+      const node = document.createElement("div");
+      node.setAttribute("data-buildrick-id", el.getId());
+      node.style.cssText = "position:absolute;left:-9999px;";
+      document.body.appendChild(node);
+    }
+    function Host() {
+      const { selectedElement } = useComposerSelection({ composer: c });
+      React.useEffect(() => {
+        const h = c.elements.getElement("lx-heading");
+        if (h) c.selection.select(h);
+      }, []);
+      const sel = selectedElement;
+      return sel ? <ProInspector composer={c} selectedElement={{ id: sel.getId(), type: sel.getType(), tagName: sel.getTagName() }} /> : null;
+    }
+    return (
+      <ToastProvider>
+        <div data-probe="layers-dimmed-inspector" className="tw:flex tw:gap-4">
+          <div className="tw:flex tw:h-[812px] tw:w-70 tw:flex-col tw:overflow-hidden tw:bg-white">
+            <LayersTab composer={c} onClose={() => {}} />
+          </div>
+          <div data-probe="inspector-panel" className="tw:flex tw:h-[812px] tw:w-[300px] tw:flex-col tw:bg-white">
+            <Host />
+          </div>
+        </div>
+      </ToastProvider>
+    );
+  },
   "layers-collapsed-selection": () => (
     <div data-probe="layers-collapsed-selection">
       <LayersProbe select={["lx-heading"]} collapse />

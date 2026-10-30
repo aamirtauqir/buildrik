@@ -11,7 +11,8 @@
  *                 S15): Style / Effects show nothing under it;
  *   reset-style — the review before Reset style (S20): the tab's whole body;
  *   apply-style — the review before Apply style to all … (S11): the same;
- *   font-picker — Choose font (R02), the one font picker: the same.
+ *   font-picker — Choose font (R02), the one font picker: the same;
+ *   rename      — the element's name card (S28): the same.
  * The section that opens it and the tab renderer that honours it are
  * different components, so the value lives here. Selecting another element
  * closes it (the renderer shows it only for the element it was opened on).
@@ -20,7 +21,7 @@
  */
 import * as React from "react";
 
-export type SubviewKind = "binding" | "interaction" | "add-field" | "override-review" | "reset-style" | "apply-style" | "font-picker";
+export type SubviewKind = "binding" | "interaction" | "add-field" | "override-review" | "reset-style" | "apply-style" | "font-picker" | "rename";
 export interface Subview {
   kind: SubviewKind;
   elementId: string;
