@@ -6,7 +6,8 @@
 import * as React from "react";
 import type { AnimationConfig, AnimationDirection, AnimationFillMode } from "@/shared/types/animations";
 import { DEFAULT_ANIMATION } from "@/shared/types/animations";
-import { Select } from "@/editor/chrome-ui";
+import { BK_SELECT_BARE_VALUE_THEME, Select } from "@/editor/chrome-ui";
+import { ChevronDown } from "lucide-react";
 import { SelectRow } from "@/editor/inspector/shared/controls";
 import { CommitRow } from "@/editor/inspector/sections/behaviourRows";
 // Re-export for backwards compatibility
@@ -130,7 +131,8 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
           Preset
         </label>
         <div className="bdi-row-content">
-          <Select id="anim-preset-select" sizing="sm" className="tw:w-full" value={animation.type} onChange={(e) => updateAnimation({ type: e.target.value })}>
+          <div className="bdi-ddn">
+          <Select id="anim-preset-select" className="bdi-v" theme={BK_SELECT_BARE_VALUE_THEME} value={animation.type} onChange={(e) => updateAnimation({ type: e.target.value })}>
             {GROUPS.map(([group, list]) => (
               <optgroup key={group} label={group}>
                 {list.map((a) => (
@@ -141,6 +143,8 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
               </optgroup>
             ))}
           </Select>
+          <ChevronDown size={12} aria-hidden="true" className="bdi-c" />
+          </div>
         </div>
       </div>
       {trigger ? (

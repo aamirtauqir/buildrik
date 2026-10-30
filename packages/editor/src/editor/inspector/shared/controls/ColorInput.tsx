@@ -10,6 +10,7 @@ import { Popover, Button, TextField } from "@/editor/chrome-ui";
 import { ChevronDown, Link2, Link2Off } from "lucide-react";
 import * as React from "react";
 import { useInspectorField } from "./InspectorFieldContext";
+import { useSharedColor } from "./ColorSources";
 import { FieldDot } from "./FieldDot";
 import { ErrorLine } from "./Section";
 import { fieldTestId, labelTestId, rowTestId } from "./ControlRow";
@@ -118,8 +119,11 @@ export const ColorInput: React.FC<ColorInputProps> = ({
   property,
   inheritedValue,
 }) => {
-  const field = useInspectorField(property);
-  const value = ownValue || (field.mixed ? "" : (inheritedValue ?? ""));
+  const baseField = useInspectorField(property);
+  /* B05: Mixed only by source — every target shows one colour — reads that colour. */
+  const shared = useSharedColor(property);
+  const field = shared ? { ...baseField, mixed: false } : baseField;
+  const value = shared?.value ?? (ownValue || (field.mixed ? "" : (inheritedValue ?? "")));
   const [isOpen, setIsOpen] = React.useState(false);
 
   const { tokens: colorTokens } = useColorRegistry();
