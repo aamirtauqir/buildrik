@@ -7705,8 +7705,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "probe 2026-10-27: banner now sits over the fields and the footer reads 'Offline · Not saved'; the queued (offline) state cannot be produced in the probe — its save mirror has no server and reports reached.",
+   "verified": "drift-fixed",
+   "verifiedNote": "Probe-compared 2026-10-30 (round 18, cms-workspace&offline=1&siteId — the real mirror to an absent server queues) with shots/165-1625.png: the warning banner sits over the fields, 'You’re offline' · 'Your edits are not saved to the server. Keep this tab open.' — copy and placement match; the edits stay in the fields. This board's footer note 'Offline · Not saved' is the record state line at the top since 122:43331 ('Record · Offline, save pending', as 126:35760 draws it). Save record is off in the app once the local write lands (the probe composer keeps static rows, so it stays dirty there). | probe 2026-10-27: banner now sits over the fields and the footer reads 'Offline · Not saved'; the queued (offline) state cannot be produced in the probe — its save mirror has no server and reports reached.",
    "tier": "P1"
   },
   {
@@ -7727,8 +7727,8 @@
    "family": "cms",
    "status": "active",
    "authority": "board",
-   "verified": "drift-open",
-   "verifiedNote": "lead4 2026-10-27: C-16 closed in chrome-ui (ebb468e88) — Modal title 16/24, frame top at 31vh (279 on 900, probe-measured in tpl-replace-confirm / lf-session-dialog); this board not re-probed. | probe-compared 2026-10-27: Keep editing is the filled primary, Discard changes / Save and leave outlined, dialog 480 wide, copy matches. Open: dialog sits viewport-centred (board top ≈280) and its title is 20px vs board ≈16 — both chrome-ui Modal (REQUESTS C-16).",
+   "verified": "drift-fixed",
+   "verifiedNote": "Probe-compared 2026-10-30 (round 18, cms-workspace&record=post-1, port 5171) with shots/165-2184.png: title edited, Cancel → 'Leave without saving?' · '{record} has unsaved record edits.' · Keep editing (filled, focused) / Discard changes / Save and leave in one right-aligned row; dialog 480 wide at top 279 of 900 (board ≈280), title 16/24 — match. The sheet behind follows the later record board 122:43331 (state line at the top, one 500 column), not this board's two-column form. | lead4 2026-10-27: C-16 closed in chrome-ui (ebb468e88) — Modal title 16/24, frame top at 31vh (279 on 900, probe-measured in tpl-replace-confirm / lf-session-dialog); this board not re-probed. | probe-compared 2026-10-27: Keep editing is the filled primary, Discard changes / Save and leave outlined, dialog 480 wide, copy matches. Open: dialog sits viewport-centred (board top ≈280) and its title is 20px vs board ≈16 — both chrome-ui Modal (REQUESTS C-16).",
    "tier": "P1"
   },
   {
@@ -8525,7 +8525,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Board: grouped source popover (record/list item/specific record/Site/Page, Live=Planned). Code: Collection select only; no Site/Page",
+   "verifiedNote": "Round 18 (L-A, CMS lane): Inspector surface — REQUESTS A-23 to L-B (board shot committed). | Board: grouped source popover (record/list item/specific record/Site/Page, Live=Planned). Code: Collection select only; no Site/Page",
    "tier": "P1"
   },
   {
@@ -8536,7 +8536,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Board lists incompatible fields with reasons; code hides them (CmsBindingSection.tsx:57,132)",
+   "verifiedNote": "Round 18 (L-A, CMS lane): Inspector surface — REQUESTS A-23 to L-B (board shot committed). | Board lists incompatible fields with reasons; code hides them (CmsBindingSection.tsx:57,132)",
    "tier": "P1"
   },
   {
@@ -8547,7 +8547,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (cms-brand): unreachable live — Needs a Blog dynamic template page with a heading bound to Blog.title. QA site has no collection/template; converting a shared QA page was not done (other agents' tabs raised 2 site conflicts). | prior: Lane L-B C-13 (built, not compared): bound — Dynamic bindings heads Content; the property row reads '{Collection} · {field}', the preview value and 'This page’s record · i of N'.",
+   "verifiedNote": "Round 18 (L-A, CMS lane): Inspector surface — REQUESTS A-23 to L-B (board shot committed). | Compared live 2026-10-26 (cms-brand): unreachable live — Needs a Blog dynamic template page with a heading bound to Blog.title. QA site has no collection/template; converting a shared QA page was not done (other agents' tabs raised 2 site conflicts). | prior: Lane L-B C-13 (built, not compared): bound — Dynamic bindings heads Content; the property row reads '{Collection} · {field}', the preview value and 'This page’s record · i of N'.",
    "tier": "P1"
   },
   {
@@ -8558,7 +8558,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (cms-brand): unreachable live — Binding subview needs a bound heading on a collection template page; same blocker as 173:9757. | prior: Lane L-B C-13 (built, not compared): binding subview — see 302:13946.",
+   "verifiedNote": "Round 18 (L-A, CMS lane): Inspector surface — REQUESTS A-23 to L-B (board shot committed). | Compared live 2026-10-26 (cms-brand): unreachable live — Binding subview needs a bound heading on a collection template page; same blocker as 173:9757. | prior: Lane L-B C-13 (built, not compared): binding subview — see 302:13946.",
    "tier": "P1"
   },
   {
@@ -8603,7 +8603,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Canvas record row (Record ‹ › Show drafts) + picker popover absent; code previews first published record only (CmsBindingSection.tsx:178)",
+   "verifiedNote": "Round 18 (L-A): the canvas record bar is L-A's, but the preview choice lives in the engine (CMSBindingManager.resolveBinding previews the first published record) — REQUESTS A-24 to the lead; L-A builds the bar once it exists. | Canvas record row (Record ‹ › Show drafts) + picker popover absent; code previews first published record only (CmsBindingSection.tsx:178)",
    "tier": "P1"
   },
   {
@@ -9130,7 +9130,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Content summary \"1 · Hidden\" + receipt; no condition status in inspector",
+   "verifiedNote": "Round 18 (L-A, CMS lane): Inspector surface — REQUESTS A-23 to L-B (board shot committed). | Content summary \"1 · Hidden\" + receipt; no condition status in inspector",
    "tier": "P1"
   },
   {
@@ -9384,7 +9384,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Filter rule + category menu; no list filter in code",
+   "verifiedNote": "Round 18 (L-A, CMS lane): Inspector surface — REQUESTS A-23 to L-B (board shot committed). | Filter rule + category menu; no list filter in code",
    "tier": "P1"
   },
   {
@@ -9605,7 +9605,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Related list record picker keeps query; not in code",
+   "verifiedNote": "Round 18 (L-A, CMS lane): Inspector surface — REQUESTS A-23 to L-B (board shot committed). | Related list record picker keeps query; not in code",
    "tier": "P1"
   },
   {
@@ -9661,7 +9661,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Card Content \"Inside list of Team · This card has no link · Edit link in Behavior ›\"; not in code",
+   "verifiedNote": "Round 18 (L-A, CMS lane): Inspector surface — REQUESTS A-23 to L-B (board shot committed). | Card Content \"Inside list of Team · This card has no link · Edit link in Behavior ›\"; not in code",
    "tier": "P1"
   },
   {

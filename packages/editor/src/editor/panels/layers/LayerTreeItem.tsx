@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Database } from "lucide-react";
 import { getEditorViewMode } from "@shared/utils/editorViewMode";
 import { useEditLocks } from "@/editor/shared/useEditLocks";
 import type { Composer } from "@/engine";
@@ -134,9 +134,10 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
      list when "Show dimmed layers" is off — its children go with it, since a
      dimmed parent dims them on the canvas too. */
   if (isHidden && !displayPrefs.showDimmed) return null;
+  /* design-2l9 173:9757 / 189:22915: a bound row always carries its glyph;
+     "Highlight CMS-bound" (147:76329, off by default) adds the row tint. */
   const isCmsBound =
-    displayPrefs.highlightCmsBound &&
-    !!composer &&
+    !!composer?.cms &&
     (composer.cms.bindings.getBindings(layer.id).length > 0 || composer.cms.bindings.hasCollectionBinding(layer.id));
 
   /* v3 board 4418:81300's indent ladder: 16px chevron boxes at 16 / 32 / 48
@@ -156,7 +157,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
     isSelected ? "bdc-sel" : "",
     isCanvasHovered ? "bdc-canvas-hover" : "",
     isHidden ? "bdc-hidden" : "",
-    isCmsBound ? "bdc-cms-bound" : "",
+    isCmsBound && displayPrefs.highlightCmsBound ? "bdc-cms-bound" : "",
     isEditing ? "bdc-editing" : "",
     isDragging ? "is-dragging" : "",
     hasChildren ? "" : "bdc-leaf",
@@ -340,11 +341,6 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
             {displayPrefs.showHtmlBadges && (
               <span className="bdc-lr-tag" aria-hidden>{layer.tagName}</span>
             )}
-            {isCmsBound && (
-              <span className="bdc-lr-tag" title="Bound to CMS" role="img" aria-label="Bound to CMS" data-testid={`layer-cms-badge-${layer.id}`}>
-                CMS
-              </span>
-            )}
             {layer.breakpointOverrides?.mobile?.hidden && (
               <span className="bdc-lr-bp" title="Hidden on mobile" role="img" aria-label="Hidden on mobile">M</span>
             )}
@@ -423,6 +419,18 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
             )}
           </svg>
         </Button>
+        )}
+        {/* design-2l9 173:9757 / 189:22915: the bound glyph closes the row. */}
+        {isCmsBound && (
+          <span
+            className="tw:inline-flex tw:flex-none tw:items-center tw:text-[var(--bk-ink-muted)]"
+            title="Bound to CMS"
+            role="img"
+            aria-label="Bound to CMS"
+            data-testid={`layer-cms-badge-${layer.id}`}
+          >
+            <Database size={14} aria-hidden="true" />
+          </span>
         )}
         {/* design-2l9 147:77189: a search result names where it sits on its
             own line under the row ("Services › Card 1"), 12 in. */}

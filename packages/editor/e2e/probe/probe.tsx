@@ -978,6 +978,9 @@ function layersComposer(): Composer {
   });
   c.elements.setActivePage(page.id);
   const rootId = page.root.id;
+  /* `&bound=lx-heading,…`: those rows answer as CMS-bound (173:9757's glyph). */
+  const bound = new Set((new URLSearchParams(location.search).get("bound") ?? "").split(",").filter(Boolean));
+  if (bound.size) c.cms.bindings.hasCollectionBinding = (id: string) => bound.has(id);
   for (const s of LAYERS_SEED) {
     const el = c.elements.createElement(s.type as never, { id: s.id, content: s.name });
     c.elements.addElement(el, s.parent ?? rootId);
