@@ -102,5 +102,6 @@ describe("SVG — 2L9 B69/03 (249:72047)", () => {
     expect(rowLabels(container)).toEqual(expect.arrayContaining(["ViewBox", "Role", "Labelled by"]));
     fireEvent.change(screen.getByLabelText("Labelled by"), { target: { value: "icon-title" } });
     expect(el().getAttribute("aria-labelledby")).toBe("icon-title");
+    expect(screen.getByTestId("inspector-svg-representation")).toHaveTextContent("RepresentationInline SVG");
   });
 });

@@ -30,7 +30,8 @@ import { getCurrentIconConfig, handleIconSelectAction, handleVideoPosterChange, 
 import { PropertyRows, type PropertyConfig } from "../PropertyField";
 import { Note, Warning, useElementVersion } from "./bodyRows";
 import { CheckRow } from "@/editor/inspector/shared/controls/CheckRow";
-import { GROUP_TITLE } from "@/editor/inspector/shared/controls/controlClasses";
+import { GROUP_TITLE, WIDE_BUTTON } from "@/editor/inspector/shared/controls/controlClasses";
+import { ELEMENT_ACTIONS } from "@/editor/shared/elementActions";
 
 const LOADING_OPTIONS = [
   { value: "lazy", label: "Lazy" },
@@ -177,13 +178,43 @@ const SVG_ROWS: readonly PropertyConfig[] = [
 /** SVG: its source and attributes. Icon: the icon picker door and its size / stroke. */
 const Svg: React.FC<TypeBlockBodyProps> = (p) => {
   const { composer, element, onOpenIconPicker } = p;
-  if (element.type !== "icon")
+  if (element.type !== "icon") {
+    /* B69/03: Representation (inline markup or a file), and the drawn shapes
+       live in Layers — "Inspect in Layers" is the registry's Show in Layers.
+       Replacing the file is the source row's door (S34 reviews the loss). */
+    const el = composer?.elements.getElement(element.id);
+    const inline = !!el && el.getTagName().toLowerCase() === "svg";
+    const shapes = inline ? (el?.getChildren().length ?? 0) : 0;
     return (
       <>
         <Source {...p} />
+        <div className="bdi-row-ctrl" data-testid="inspector-svg-representation">
+          <span className="bdi-lb">Representation</span>
+          <div className="bdi-row-content">
+            <span className="tw:flex tw:h-6 tw:w-full tw:items-center tw:rounded-[4px] tw:bg-[var(--bk-bg-subtle)] tw:px-2 tw:text-[12px] tw:text-[var(--bk-ink)]">
+              {inline ? "Inline SVG" : "SVG file"}
+            </span>
+          </div>
+        </div>
         <PropertyRows composer={composer} element={element} targetIds={p.targetIds} rows={SVG_ROWS} />
+        {shapes > 0 && composer && el ? (
+          <div className="tw:flex tw:flex-col tw:gap-2 tw:py-1">
+            <Note>{`Native shapes · ${shapes}`}</Note>
+            <Button
+              type="button"
+              size="xs"
+              color="light"
+              className={WIDE_BUTTON}
+              onClick={() => ELEMENT_ACTIONS["show-in-layers"].run({ composer, element: el, isRoot: false })}
+              data-testid="inspector-svg-inspect-shapes"
+            >
+              Inspect in Layers
+            </Button>
+          </div>
+        ) : null}
       </>
     );
+  }
   const choose = (icon: IconConfig) => {
     if (!composer) return;
     /* P-1: the lock gate — a locked icon keeps its glyph. */
