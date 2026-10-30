@@ -5,12 +5,13 @@
  * drawer's pick mode. SVG too — no full-page library (was "Manage SVG").
  * @license BSD-3-Clause
  */
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { createTestComposer, installEngineBrowserStubs, removeEngineBrowserStubs } from "@/engine/__tests__/test-utils/realComposer";
 import type { ElementData } from "@/shared/types";
 import type { MediaAsset } from "@/shared/types/media";
 import { SourceRow, sourceMeta } from "../SourceRow";
+import { ToastProvider } from "@/editor/chrome-ui";
 
 beforeAll(installEngineBrowserStubs);
 afterAll(removeEngineBrowserStubs);
@@ -22,7 +23,11 @@ function setup(element: ElementData, assets: Partial<MediaAsset>[] = []) {
   } as never);
   vi.spyOn(composer.media, "getAssets").mockReturnValue(assets as MediaAsset[]);
   const pick = vi.fn();
-  render(<SourceRow composer={composer} element={{ id: element.id, type: element.type }} targetIds={[element.id]} onOpenMediaLibrary={pick} />);
+  render(
+    <ToastProvider>
+      <SourceRow composer={composer} element={{ id: element.id, type: element.type }} targetIds={[element.id]} onOpenMediaLibrary={pick} />
+    </ToastProvider>,
+  );
   return { composer, pick, el: () => composer.elements.getElement(element.id)! };
 }
 
@@ -66,21 +71,34 @@ describe("SourceRow", () => {
     expect(el().getChildren()[0].getAttribute("src")).toBe("https://x.example/new.mp4");
   });
 
-  it("svg: opens the drawer's pick mode (not the full library); an inline <svg> becomes an <img> of the file", () => {
+  it("svg (S34/S35): pick mode takes images too; the pick is reviewed, then the SAME element becomes an image in one Undo", () => {
     const { pick, el, composer } = setup({
       id: "g",
       type: "svg",
       tagName: "svg",
+      attributes: { viewBox: "0 0 24 24", "aria-label": "Brand mark" },
+      styles: { width: "48px" },
       children: [{ id: "c", type: "container", tagName: "circle", children: [] }],
     });
     const emit = vi.spyOn(composer, "emit");
     fireEvent.click(screen.getByRole("button", { name: "Choose SVG" }));
-    expect(pick.mock.calls[0][0]).toEqual(["svg"]);
+    expect(pick.mock.calls[0][0]).toEqual(["image", "svg"]);
     expect(emit).not.toHaveBeenCalledWith("ui:switch-tab", expect.objectContaining({ fullPage: true }));
-    pick.mock.calls[0][1]({ src: "https://x.example/logo-mark.svg" });
-    expect(el().getTagName()).toBe("img");
-    expect(el().getType()).toBe("svg");
+    act(() => pick.mock.calls[0][1]({ src: "https://x.example/brand-mark.png", name: "brand-mark.png", mimeType: "image/png" }));
+    /* Nothing written yet: the loss is named first. */
+    expect(el().getTagName()).toBe("svg");
+    expect(screen.getByTestId("inspector-svg-replace")).toHaveTextContent("removes its internal SVG paths");
+    composer.history.flushPending();
+    const before = composer.history.getUndoCount();
+    fireEvent.click(screen.getByTestId("inspector-svg-replace-confirm"));
+    composer.history.flushPending();
+    expect(composer.history.getUndoCount()).toBe(before + 1);
+    expect([el().getType(), el().getTagName(), el().getAttribute("src"), el().getAttribute("alt"), el().getAttribute("viewBox"), el().getStyles().width]).toEqual([
+      "image", "img", "https://x.example/brand-mark.png", "Brand mark", undefined, "48px",
+    ]);
     expect(el().getChildren()).toHaveLength(0);
-    expect(el().getAttribute("src")).toBe("https://x.example/logo-mark.svg");
+    expect(screen.getByText("SVG replaced with image.")).toBeInTheDocument();
+    composer.history.undo();
+    expect([el().getType(), el().getTagName(), el().getChildren().length]).toEqual(["svg", "svg", 1]);
   });
 });

@@ -6418,8 +6418,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No SVG→image replacement with content-loss confirm",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 24, probe ?block=svg&layerName=Brand mark&mediaPick={brand-mark.png} → Choose SVG (pick mode now offers images too), side by side with shots/258-38731.png: 'Replace inline SVG', New source 'brand-mark.png', 'This changes the SVG element to an image and removes its internal SVG paths. Existing outer styles and placement are preserved.', primary 'Replace with image', 'Keep SVG'. Nothing is written until Replace — the old pick silently turned the svg into an <img> and dropped its paths. Drift kept: the type block's own 'Svg' heading sits above the card.",
    "tier": "P1"
   },
   {
@@ -6429,8 +6429,8 @@
    "family": "inspector",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No SVG→image replacement with content-loss confirm",
+   "verified": "drift-fixed",
+   "verifiedNote": "L-B round 24, probe → Replace with image, side by side with shots/258-39198.png: the SAME element (id, outer attributes and styles — replaceInPlace) is an image of the file in ONE history step, svg-only attributes dropped, aria-label carried into Alt; Content shows the Image body (Source brand-mark.png, Alt text, Loading); toast 'SVG replaced with image. · Undo' restores the svg with its paths (test SourceRow S34/S35). Match; the Image body is the existing 36:2 layout (source card), not the board's three plain rows.",
    "tier": "P1"
   },
   {

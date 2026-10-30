@@ -3050,7 +3050,17 @@ const CASES: Record<string, () => React.ReactElement> = {
       const { selectedElement } = useComposerSelection({ composer: c });
       if (pageOnly) return <ProInspector composer={c} currentBreakpoint={bp} selectedElement={null} />;
       const sel = selectedElement ?? el;
-      return <ProInspector composer={c} currentBreakpoint={bp} selectedElement={{ id: sel.getId(), type: sel.getType(), tagName: sel.getTagName() }} />;
+      /* `?mediaPick={"src":…,"name":…,"mimeType":…}` — the media drawer's pick
+         answers with this asset (S34: an image chosen for an inline SVG). */
+      const mediaPick = q.get("mediaPick");
+      return (
+        <ProInspector
+          composer={c}
+          currentBreakpoint={bp}
+          selectedElement={{ id: sel.getId(), type: sel.getType(), tagName: sel.getTagName() }}
+          onOpenMediaLibrary={mediaPick ? (_types, onSelect) => onSelect(JSON.parse(mediaPick) as never) : undefined}
+        />
+      );
     }
     return (
       <ToastProvider>
