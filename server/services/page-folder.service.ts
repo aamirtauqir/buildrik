@@ -44,7 +44,7 @@ export async function listPageFolders(userId: string, siteId: string): Promise<P
       orderBy: [{ position: "asc" }, { createdAt: "asc" }],
       select: SELECT,
     }),
-    prisma.page.findMany({ where: { siteId }, select: { id: true } }),
+    prisma.page.findMany({ where: { siteId, deletedAt: null }, select: { id: true } }),
   ]);
   const live = new Set(pages.map((p) => p.id));
   return folders.map((f) => ({ ...f, pageIds: f.pageIds.filter((id) => live.has(id)) }));
@@ -80,7 +80,7 @@ export async function deletePageFolder(userId: string, folderId: string): Promis
 
 export async function movePageToFolder(userId: string, input: MovePageToFolderInput): Promise<PageFolder[]> {
   await checkSiteRole(prisma, userId, input.siteId, "EDITOR");
-  const page = await prisma.page.findUnique({ where: { id: input.pageId }, select: { siteId: true } });
+  const page = await prisma.page.findFirst({ where: { id: input.pageId, deletedAt: null }, select: { siteId: true } });
   if (!page || page.siteId !== input.siteId) throw new Error("PAGE_NOT_FOUND");
 
   const folders = await prisma.pageFolder.findMany({

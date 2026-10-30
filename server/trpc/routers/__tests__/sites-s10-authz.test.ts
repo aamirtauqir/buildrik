@@ -14,6 +14,7 @@ const assertSiteAccessMock = vi.fn();
 const duplicateSiteMock = vi.fn();
 const getScheduledPublishMock = vi.fn();
 const saveProjectFromEditorMock = vi.fn();
+const cancelPublishMock = vi.fn();
 
 vi.mock("@/server/auth", () => ({ auth: vi.fn().mockResolvedValue(null) }));
 vi.mock("@/server/services/api-token.service", () => ({
@@ -53,7 +54,7 @@ vi.mock("@/server/services/folder.service", () => ({
 }));
 vi.mock("@/server/services/publish.service", () => ({
   runPrePublishChecks: vi.fn(), startPublish: vi.fn(), getPublishStatus: vi.fn(),
-  cancelPublish: vi.fn(), unpublishSite: vi.fn(), getPublishHistory: vi.fn(),
+  cancelPublish: (...a: unknown[]) => cancelPublishMock(...a), unpublishSite: vi.fn(), getPublishHistory: vi.fn(),
   rollbackPublish: vi.fn(),
 }));
 vi.mock("@/server/services/scheduled-publish.service", () => ({
@@ -87,7 +88,7 @@ import { PageSlugTakenError } from "@/server/services/sites.service";
 const ctx = () => ({ session: { user: { id: "u_1" } }, prisma: {} as never });
 
 beforeEach(() => {
-  [checkSiteRoleMock, checkWorkspaceRoleMock, assertSiteAccessMock, duplicateSiteMock, getScheduledPublishMock, saveProjectFromEditorMock].forEach((m) =>
+  [checkSiteRoleMock, checkWorkspaceRoleMock, assertSiteAccessMock, duplicateSiteMock, getScheduledPublishMock, saveProjectFromEditorMock, cancelPublishMock].forEach((m) =>
     m.mockReset(),
   );
 });
@@ -179,5 +180,29 @@ describe("sites.saveProject — a save that outran its transaction", () => {
     await expect(
       caller.saveProject({ siteId: "s_a", projectData: { version: "1", pages: [], styles: [], assets: [] } } as never),
     ).rejects.toMatchObject({ code: "INTERNAL_SERVER_ERROR", message: expect.stringContaining("took too long") });
+  });
+});
+
+/* PB08 "Cancel (not started)": a queued publish is cancelled by an ADMIN only.
+   The check is the router's, against the job's site. */
+describe("sites.cancelPublish — ADMIN only", () => {
+  const jobCtx = () => ({
+    session: { user: { id: "u_1" } },
+    prisma: { publishBuildJob: { findUnique: vi.fn().mockResolvedValue({ siteId: "s_1" }) } } as never,
+  });
+
+  it("an EDITOR is FORBIDDEN and nothing is cancelled", async () => {
+    checkSiteRoleMock.mockRejectedValueOnce(new PermissionError("FORBIDDEN", "Insufficient permissions"));
+    const caller = sitesRouter.createCaller(jobCtx() as never);
+    await expect(caller.cancelPublish({ jobId: "j_1" })).rejects.toMatchObject({ code: "FORBIDDEN" });
+    expect(checkSiteRoleMock).toHaveBeenCalledWith(expect.anything(), "u_1", "s_1", "ADMIN");
+    expect(cancelPublishMock).not.toHaveBeenCalled();
+  });
+
+  it("an ADMIN cancels", async () => {
+    checkSiteRoleMock.mockResolvedValueOnce(undefined);
+    cancelPublishMock.mockResolvedValueOnce({ id: "j_1", status: "CANCELLED" });
+    const caller = sitesRouter.createCaller(jobCtx() as never);
+    await expect(caller.cancelPublish({ jobId: "j_1" })).resolves.toMatchObject({ status: "CANCELLED" });
   });
 });

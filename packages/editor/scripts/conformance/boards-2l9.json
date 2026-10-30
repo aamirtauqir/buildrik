@@ -1680,7 +1680,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-fixed",
-   "verifiedNote": "probe-compared 2026-10-30 (case pages-shell&refuse=Work — the probe makes the engine refuse Work's delete; Home, About, Work selected → Delete; board shots/139-48427.png): card '1 deleted · 1 kept · 1 failed' / 'About — deleted' / 'Home — kept; it is the homepage' / 'Work — delete failed; page kept' (red) / 'Retry delete Work', Work stays selected; receipt 'About deleted. Home and Work are still available. · Undo'. The board's 'Recently deleted' link is not drawn: there is no page trash (REQUESTS A-21). Built 2026-10-30 (useBulkDelete + BulkDeleteResult): only outcomes the delete really produces — the homepage (or the last page) KEPT by the guard and never sent, a page the engine refuses (deletePage → false) FAILED, kept and left selected with a retry, the rest deleted. Tests useBulkDelete.",
+   "verifiedNote": "probe-compared 2026-10-30 (case pages-shell&refuse=Work — the probe makes the engine refuse Work's delete; Home, About, Work selected → Delete; board shots/139-48427.png): card '1 deleted · 1 kept · 1 failed' / 'About — deleted' / 'Home — kept; it is the homepage' / 'Work — delete failed; page kept' (red) / 'Retry delete Work', Work stays selected; receipt 'About deleted. Home and Work are still available. · Undo'. Round 29: the receipt now carries the 'Recently deleted' link (A-21), opening the page trash; not re-compared. Built 2026-10-30 (useBulkDelete + BulkDeleteResult): only outcomes the delete really produces — the homepage (or the last page) KEPT by the guard and never sent, a page the engine refuses (deletePage → false) FAILED, kept and left selected with a retry, the rest deleted. Tests useBulkDelete.",
    "tier": "P1"
   },
   {
@@ -1790,8 +1790,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No page trash; delete is composer-local undo only. Server work needed (full tRPC chain)",
+   "verified": "drift-open",
+   "verifiedNote": "Round 29 (A-21): built, not compared. Page trash is real: the save soft-deletes (Page.deletedAt + slug tombstone), pages.trash.list/restore/purge (EDITOR restore, ADMIN purge), RecentlyDeletedView from ⋯ Recently deleted and the delete receipts. Tests RecentlyDeletedView, page-trash-service.",
    "inheritsFrom": "63:20001",
    "tier": "P3"
   },
@@ -1802,8 +1802,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No restore-with-new-slug flow",
+   "verified": "drift-open",
+   "verifiedNote": "Round 29 (A-21): built, not compared. Page trash is real: the save soft-deletes (Page.deletedAt + slug tombstone), pages.trash.list/restore/purge (EDITOR restore, ADMIN purge), RecentlyDeletedView from ⋯ Recently deleted and the delete receipts. Tests RecentlyDeletedView, page-trash-service.",
    "tier": "P1"
   },
   {
@@ -1813,8 +1813,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No restore-with-new-slug flow",
+   "verified": "drift-open",
+   "verifiedNote": "Round 29 (A-21): built, not compared. Page trash is real: the save soft-deletes (Page.deletedAt + slug tombstone), pages.trash.list/restore/purge (EDITOR restore, ADMIN purge), RecentlyDeletedView from ⋯ Recently deleted and the delete receipts. Tests RecentlyDeletedView, page-trash-service.",
    "tier": "P1"
   },
   {
@@ -1824,8 +1824,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No page trash",
+   "verified": "drift-open",
+   "verifiedNote": "Round 29 (A-21): built, not compared. Page trash is real: the save soft-deletes (Page.deletedAt + slug tombstone), pages.trash.list/restore/purge (EDITOR restore, ADMIN purge), RecentlyDeletedView from ⋯ Recently deleted and the delete receipts. Tests RecentlyDeletedView, page-trash-service.",
    "tier": "P1"
   },
   {
@@ -1835,8 +1835,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No permanent delete (Admin)",
+   "verified": "drift-open",
+   "verifiedNote": "Round 29 (A-21): built, not compared. Page trash is real: the save soft-deletes (Page.deletedAt + slug tombstone), pages.trash.list/restore/purge (EDITOR restore, ADMIN purge), RecentlyDeletedView from ⋯ Recently deleted and the delete receipts. Tests RecentlyDeletedView, page-trash-service.",
    "tier": "P1"
   },
   {
@@ -1846,8 +1846,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No permanent delete (Admin)",
+   "verified": "drift-open",
+   "verifiedNote": "Round 29 (A-21): built, not compared. Page trash is real: the save soft-deletes (Page.deletedAt + slug tombstone), pages.trash.list/restore/purge (EDITOR restore, ADMIN purge), RecentlyDeletedView from ⋯ Recently deleted and the delete receipts. Tests RecentlyDeletedView, page-trash-service.",
    "tier": "P1"
   },
   {
@@ -1857,8 +1857,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No page trash",
+   "verified": "drift-open",
+   "verifiedNote": "Round 29 (A-21): built, not compared. Page trash is real: the save soft-deletes (Page.deletedAt + slug tombstone), pages.trash.list/restore/purge (EDITOR restore, ADMIN purge), RecentlyDeletedView from ⋯ Recently deleted and the delete receipts. Tests RecentlyDeletedView, page-trash-service.",
    "tier": "P3"
   },
   {
@@ -1868,8 +1868,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No page trash",
+   "verified": "drift-open",
+   "verifiedNote": "Round 29 (A-21): built, not compared. Page trash is real: the save soft-deletes (Page.deletedAt + slug tombstone), pages.trash.list/restore/purge (EDITOR restore, ADMIN purge), RecentlyDeletedView from ⋯ Recently deleted and the delete receipts. Tests RecentlyDeletedView, page-trash-service.",
    "tier": "P1"
   },
   {
@@ -1879,8 +1879,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No page trash",
+   "verified": "drift-open",
+   "verifiedNote": "Round 29 (A-21): built, not compared. Page trash is real: the save soft-deletes (Page.deletedAt + slug tombstone), pages.trash.list/restore/purge (EDITOR restore, ADMIN purge), RecentlyDeletedView from ⋯ Recently deleted and the delete receipts. Tests RecentlyDeletedView, page-trash-service.",
    "tier": "P3"
   },
   {
@@ -1889,9 +1889,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "founder:restore-over-limit-refused",
    "verified": "no",
-   "verifiedNote": "No plan-limit/view-only restore or plan options dialog",
+   "verifiedNote": "Owner decision 2026-10-30 (A-21): a restore over the plan page limit is refused with \"Delete a page or upgrade to restore.\" (server PAGE_LIMIT, shown on the trash row); no view-only restored page.",
    "tier": "P1"
   },
   {
@@ -1913,8 +1913,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No restore receipt",
+   "verified": "drift-open",
+   "verifiedNote": "Round 29 (A-21): built, not compared. Page trash is real: the save soft-deletes (Page.deletedAt + slug tombstone), pages.trash.list/restore/purge (EDITOR restore, ADMIN purge), RecentlyDeletedView from ⋯ Recently deleted and the delete receipts. Tests RecentlyDeletedView, page-trash-service.",
    "tier": "P1"
   },
   {
@@ -1947,9 +1947,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "founder:restore-over-limit-refused",
    "verified": "no",
-   "verifiedNote": "No view-only state for a page above plan limit",
+   "verifiedNote": "Owner decision 2026-10-30 (A-21): a restore over the plan page limit is refused with \"Delete a page or upgrade to restore.\" (server PAGE_LIMIT, shown on the trash row); no view-only restored page.",
    "tier": "P1"
   },
   {
@@ -1959,8 +1959,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No page trash; delete is composer-local undo only. Server work needed (full tRPC chain)",
+   "verified": "drift-open",
+   "verifiedNote": "Round 29 (A-21): built, not compared. Page trash is real: the save soft-deletes (Page.deletedAt + slug tombstone), pages.trash.list/restore/purge (EDITOR restore, ADMIN purge), RecentlyDeletedView from ⋯ Recently deleted and the delete receipts. Tests RecentlyDeletedView, page-trash-service.",
    "inheritsFrom": "63:20001",
    "tier": "P1"
   },
@@ -1994,8 +1994,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Return frames of the trash flow; origin restore depends on trash",
+   "verified": "drift-open",
+   "verifiedNote": "Round 29 (A-21): built, not compared. Page trash is real: the save soft-deletes (Page.deletedAt + slug tombstone), pages.trash.list/restore/purge (EDITOR restore, ADMIN purge), RecentlyDeletedView from ⋯ Recently deleted and the delete receipts. Tests RecentlyDeletedView, page-trash-service.",
    "inheritsFrom": "142:62396",
    "tier": "P3"
   },
@@ -2006,8 +2006,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Return frames of the trash flow; origin restore depends on trash",
+   "verified": "drift-open",
+   "verifiedNote": "Round 29 (A-21): built, not compared. Page trash is real: the save soft-deletes (Page.deletedAt + slug tombstone), pages.trash.list/restore/purge (EDITOR restore, ADMIN purge), RecentlyDeletedView from ⋯ Recently deleted and the delete receipts. Tests RecentlyDeletedView, page-trash-service.",
    "inheritsFrom": "142:62396",
    "tier": "P1"
   },
@@ -2018,8 +2018,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Return frames of the trash flow; origin restore depends on trash",
+   "verified": "drift-open",
+   "verifiedNote": "Round 29 (A-21): built, not compared. Page trash is real: the save soft-deletes (Page.deletedAt + slug tombstone), pages.trash.list/restore/purge (EDITOR restore, ADMIN purge), RecentlyDeletedView from ⋯ Recently deleted and the delete receipts. Tests RecentlyDeletedView, page-trash-service.",
    "inheritsFrom": "142:62396",
    "tier": "P1"
   },
@@ -2030,8 +2030,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Return frames of the trash flow; origin restore depends on trash",
+   "verified": "drift-open",
+   "verifiedNote": "Round 29 (A-21): built, not compared. Page trash is real: the save soft-deletes (Page.deletedAt + slug tombstone), pages.trash.list/restore/purge (EDITOR restore, ADMIN purge), RecentlyDeletedView from ⋯ Recently deleted and the delete receipts. Tests RecentlyDeletedView, page-trash-service.",
    "inheritsFrom": "142:62396",
    "tier": "P3"
   },
@@ -2042,8 +2042,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Return frames of the trash flow; origin restore depends on trash",
+   "verified": "drift-open",
+   "verifiedNote": "Round 29 (A-21): built, not compared. Page trash is real: the save soft-deletes (Page.deletedAt + slug tombstone), pages.trash.list/restore/purge (EDITOR restore, ADMIN purge), RecentlyDeletedView from ⋯ Recently deleted and the delete receipts. Tests RecentlyDeletedView, page-trash-service.",
    "inheritsFrom": "142:62396",
    "tier": "P1"
   },
@@ -2054,8 +2054,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Return frames of the trash flow; origin restore depends on trash",
+   "verified": "drift-open",
+   "verifiedNote": "Round 29 (A-21): built, not compared. Page trash is real: the save soft-deletes (Page.deletedAt + slug tombstone), pages.trash.list/restore/purge (EDITOR restore, ADMIN purge), RecentlyDeletedView from ⋯ Recently deleted and the delete receipts. Tests RecentlyDeletedView, page-trash-service.",
    "inheritsFrom": "142:62396",
    "tier": "P3"
   },
@@ -2065,9 +2065,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "founder:restore-over-limit-refused",
    "verified": "no",
-   "verifiedNote": "Return frames of the trash flow; origin restore depends on trash",
+   "verifiedNote": "Owner decision 2026-10-30 (A-21): a restore over the plan page limit is refused with \"Delete a page or upgrade to restore.\" (server PAGE_LIMIT, shown on the trash row); no view-only restored page.",
    "inheritsFrom": "142:62396",
    "tier": "P1"
   },
@@ -2090,8 +2090,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "Return frames of the trash flow; origin restore depends on trash",
+   "verified": "drift-open",
+   "verifiedNote": "Round 29 (A-21): built, not compared. Page trash is real: the save soft-deletes (Page.deletedAt + slug tombstone), pages.trash.list/restore/purge (EDITOR restore, ADMIN purge), RecentlyDeletedView from ⋯ Recently deleted and the delete receipts. Tests RecentlyDeletedView, page-trash-service.",
    "inheritsFrom": "142:62396",
    "tier": "P1"
   },
@@ -2102,8 +2102,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No restore-with-new-slug flow",
+   "verified": "drift-open",
+   "verifiedNote": "Round 29 (A-21): built, not compared. Page trash is real: the save soft-deletes (Page.deletedAt + slug tombstone), pages.trash.list/restore/purge (EDITOR restore, ADMIN purge), RecentlyDeletedView from ⋯ Recently deleted and the delete receipts. Tests RecentlyDeletedView, page-trash-service.",
    "tier": "P1"
   },
   {
@@ -2113,8 +2113,8 @@
    "family": "editor",
    "status": "active",
    "authority": "board",
-   "verified": "no",
-   "verifiedNote": "No page trash; delete is composer-local undo only. Server work needed (full tRPC chain)",
+   "verified": "drift-open",
+   "verifiedNote": "Round 29 (A-21): built, not compared. Page trash is real: the save soft-deletes (Page.deletedAt + slug tombstone), pages.trash.list/restore/purge (EDITOR restore, ADMIN purge), RecentlyDeletedView from ⋯ Recently deleted and the delete receipts. Tests RecentlyDeletedView, page-trash-service.",
    "inheritsFrom": "63:20001",
    "tier": "P1"
   },
@@ -2124,9 +2124,9 @@
    "page": "03",
    "family": "editor",
    "status": "active",
-   "authority": "board",
+   "authority": "founder:restore-over-limit-refused",
    "verified": "no",
-   "verifiedNote": "No plan-limit/view-only restore or plan options dialog",
+   "verifiedNote": "Owner decision 2026-10-30 (A-21): a restore over the plan page limit is refused with \"Delete a page or upgrade to restore.\" (server PAGE_LIMIT, shown on the trash row); no view-only restored page.",
    "tier": "P1"
   },
   {
@@ -13937,9 +13937,9 @@
    "page": "06",
    "family": "site-delivery",
    "status": "active",
-   "authority": "board",
+   "authority": "code:page-level-diff",
    "verified": "drift-open",
-   "verifiedNote": "Round 28: A-33 built the draft-vs-live diff (sites.publishPreviewDiff, page-level: changed / added / removed + CMS records since the last publish); the tray's 'See all ›' opens the one Compare on live vs current. Still open: this board's subview lists each page with an element-level summary ('Hero text, 2 images', 'Section added') and its own Compare ›, which a page-level diff cannot say; and 'Brand: primary, accent changed' (no brand-token diff exists).",
+   "verifiedNote": "Round 28: A-33 built the draft-vs-live diff (sites.publishPreviewDiff, page-level: changed / added / removed + CMS records since the last publish); the tray's 'See all ›' opens the one Compare on live vs current. Still open: this board's subview lists each page with an element-level summary ('Hero text, 2 images', 'Section added') and its own Compare ›, which a page-level diff cannot say; and 'Brand: primary, accent changed' (no brand-token diff exists). Round 29: no element-level summary exists (sites.publishPreviewDiff is page-level only), so the per-page \"Hero text, 2 images\" lines follow the code contract.",
    "tier": "P1"
   },
   {

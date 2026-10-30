@@ -56,6 +56,9 @@ import { useBulkDelete } from "./useBulkDelete";
 import { BulkDeleteResult } from "./components/BulkDeleteResult";
 import { useDynamicPagesSummary } from "./useDynamicPagesSummary";
 import { pageFileNames } from "@/engine/export";
+import { RecentlyDeletedView } from "./components/RecentlyDeletedView";
+import { useEditorRole } from "@/editor/shell/hooks/useEditorRole";
+import { roleAtLeast } from "@/services/RoleService";
 import "./PagesTab.css";
 
 type PageView = "pages" | "listings" | "structure";
@@ -112,7 +115,11 @@ export const PagesTab: React.FC<PagesTabProps> = ({
   onRequestTemplates,
   openSettingsRequest,
 }) => {
-  const p = usePages(composer);
+  /* A-21: "Recently deleted" replaces the panel's body until ‹ Back to Pages. */
+  const [trashOpen, setTrashOpen] = React.useState(false);
+  const openTrash = React.useCallback(() => setTrashOpen(true), []);
+  const canPurge = roleAtLeast(useEditorRole(), "ADMIN") !== false;
+  const p = usePages(composer, { onOpenTrash: openTrash });
   const { notice, setNotice } = usePagesNotice(p.pages);
 
   // Folders — sidebar-only, localStorage-persisted
@@ -476,6 +483,19 @@ export const PagesTab: React.FC<PagesTabProps> = ({
   const menuRootIndex = p.contextMenu ? rootIds.indexOf(p.contextMenu.pageId) : -1;
   const menuFolderName = f.folders.find((fd) => fd.id === menuFolderId)?.name;
 
+  if (trashOpen) {
+    return (
+      <RecentlyDeletedView
+        composer={composer}
+        siteId={folderScopeId}
+        canPurge={canPurge}
+        onBack={() => setTrashOpen(false)}
+        onClose={onClose}
+        onHelpClick={onHelpClick}
+      />
+    );
+  }
+
   return (
     // `bd-pg-panel` is the DS V2 root class — new PagesTab.css uses it as the
     // scope for all `.bd-pg-*` rules including the active-row 2px cobalt bar
@@ -530,8 +550,8 @@ export const PagesTab: React.FC<PagesTabProps> = ({
               {/* design-2l9 board 65:17148: Select pages… · Listings · Show
                   structure · Reload, no rule, 280 wide from the drawer's left
                   edge. Listings widens the drawer by itself, so the old
-                  "Widen panel" row is gone. The board's "Recently deleted"
-                  is the page trash (P3, not built). */}
+                  "Widen panel" row is gone. "Recently deleted" is the page
+                  trash (A-21). */}
               <Menu label="Pages options" className="tw:-mx-2 tw:w-[276px]">
                 <MenuItem data-testid="pages-menu-select" onClick={runMenu(() => setSelectMode(true))}>
                   Select pages…
@@ -544,6 +564,9 @@ export const PagesTab: React.FC<PagesTabProps> = ({
                 </MenuItem>
                 <MenuItem data-testid="pages-menu-reload" onClick={runMenu(p.retrySync)}>
                   Reload
+                </MenuItem>
+                <MenuItem data-testid="pages-menu-trash" onClick={runMenu(openTrash)}>
+                  Recently deleted
                 </MenuItem>
               </Menu>
             </Popover>

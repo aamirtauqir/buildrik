@@ -262,6 +262,7 @@ export async function getShareDraftRows(siteId: string) {
       socialLinks: true,
       touchIcon: true,
       sitePages: {
+        where: { deletedAt: null },
         select: {
           id: true,
           name: true,

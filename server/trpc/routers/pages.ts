@@ -23,7 +23,11 @@ import {
   updatePageFolderSchema,
   deletePageFolderSchema,
   movePageToFolderSchema,
+  listPageTrashSchema,
+  restorePageSchema,
+  purgePageSchema,
 } from "@buildrik/shared/schemas/pages";
+import { listPageTrash, restorePage, purgePage, PageTrashError } from "@/server/services/page-trash.service";
 import {
   listPageFolders,
   createPageFolder,
@@ -75,7 +79,7 @@ export const pagesRouter = router({
   }),
   delete: protectedProcedure.input(deletePageSchema).mutation(async ({ ctx, input }) => {
     await guardSiteEditor(ctx.prisma, ctx.session.user.id, input.siteId);
-    try { await deletePage(input); }
+    try { await deletePage({ ...input, userId: ctx.session.user.id }); }
     catch (e: unknown) {
       if (e instanceof Error && e.message === "LAST_PAGE") throw new TRPCError({ code: "BAD_REQUEST", message: "Cannot delete last page." });
       if (e instanceof Error && e.message === "NOT_FOUND") throw new TRPCError({ code: "NOT_FOUND", message: "Page not found." });
@@ -131,7 +135,38 @@ export const pagesRouter = router({
       translateFolderError(() => movePageToFolder(ctx.session.user.id, input)),
     ),
   }),
+
+  /* Page trash — "Recently deleted" (A-21). List + restore: EDITOR+;
+     permanent delete: ADMIN. Role checks run in the service. */
+  trash: router({
+    list: protectedProcedure.input(listPageTrashSchema).query(({ ctx, input }) =>
+      translateTrashError(() => listPageTrash(ctx.session.user.id, input.siteId)),
+    ),
+    restore: protectedProcedure.input(restorePageSchema).mutation(({ ctx, input }) =>
+      translateTrashError(() => restorePage(ctx.session.user.id, input)),
+    ),
+    purge: protectedProcedure.input(purgePageSchema).mutation(({ ctx, input }) =>
+      translateTrashError(() => purgePage(ctx.session.user.id, input)),
+    ),
+  }),
 });
+
+/* SLUG_TAKEN carries the suggested free slug after the prefix
+   (`SLUG_TAKEN:about-2`) so the restore dialog can offer it (142:53954). */
+async function translateTrashError<T>(run: () => Promise<T>): Promise<T> {
+  try {
+    return await run();
+  } catch (e) {
+    if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+    if (e instanceof PageTrashError) {
+      if (e.code === "NOT_FOUND") throw new TRPCError({ code: "NOT_FOUND", message: e.message });
+      if (e.code === "SLUG_TAKEN") throw new TRPCError({ code: "CONFLICT", message: `SLUG_TAKEN:${e.suggestedSlug ?? ""}` });
+      if (e.code === "PAGE_LIMIT") throw new TRPCError({ code: "PRECONDITION_FAILED", message: e.message });
+      throw new TRPCError({ code: "BAD_REQUEST", message: e.message });
+    }
+    throw e;
+  }
+}
 
 async function translateFolderError<T>(run: () => Promise<T>): Promise<T> {
   try {

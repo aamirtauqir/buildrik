@@ -39,6 +39,9 @@ export interface ConfirmDialogProps {
    */
   tone?: "default" | "warning" | "destructive";
   busy?: boolean;
+  /** The confirm stays disabled until the dialog's own input allows it (a
+   *  typed-name confirm, design-2l9 142:55781 → 142:56347). Not busy: no spinner. */
+  confirmDisabled?: boolean;
   /** Forwarded to Modal, which stamps `<testId>` on the frame and
    *  `<testId>-foot` on the footer; the confirm button takes `<testId>-confirm`
    *  so a recipe can drive the dialog to its own result state. Confirms are
@@ -89,7 +92,7 @@ const SUCCESS_MESSAGE = "tw:m-0 tw:mt-4 tw:text-[13px] tw:leading-5 tw:text-[var
 const SUCCESS_CLOSING = "tw:m-0 tw:mt-1 tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
 
 export function ConfirmDialog({
-  open, onClose, onConfirm, title, message, confirmLabel, cancelLabel = "Cancel", tone = "default", busy, testId, success, width, closeButton,
+  open, onClose, onConfirm, title, message, confirmLabel, cancelLabel = "Cancel", tone = "default", busy, confirmDisabled, testId, success, width, closeButton,
   actionsAlign = "end", cancelStyle = "text",
 }: ConfirmDialogProps) {
   const [done, setDone] = React.useState(false);
@@ -173,7 +176,7 @@ export function ConfirmDialog({
                 : undefined
             }
             size="xs"
-            disabled={busy}
+            disabled={busy || confirmDisabled}
             aria-busy={busy || undefined}
             data-testid={testId ? `${testId}-confirm` : undefined}
             onClick={() => {

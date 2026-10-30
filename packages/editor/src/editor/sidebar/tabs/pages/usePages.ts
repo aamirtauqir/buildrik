@@ -103,8 +103,17 @@ export interface DeletePagesOptions {
   onUndone?: () => void;
 }
 
-export function usePages(composer: Composer | null): UsePagesReturn {
+export interface UsePagesOptions {
+  /** The delete receipts' "Recently deleted" (board 139:48427, A-21). */
+  onOpenTrash?: () => void;
+}
+
+export function usePages(composer: Composer | null, { onOpenTrash }: UsePagesOptions = {}): UsePagesReturn {
   const { addToast } = useToast();
+  const trashAction = React.useMemo(
+    () => (onOpenTrash ? { secondaryAction: { label: "Recently deleted", onClick: onOpenTrash } } : {}),
+    [onOpenTrash],
+  );
   const [pageRows, setPages] = React.useState<PageItem[]>([]);
   /* `isActive` is derived from the one active-page source, not set inside
      the list sync — the list and the active id used to come from separate
@@ -369,9 +378,10 @@ export function usePages(composer: Composer | null): UsePagesReturn {
             undoDelete?.();
           },
         },
+        ...trashAction,
       });
     },
-    [composer, pages, addToast]
+    [composer, pages, addToast, trashAction]
   );
 
   /** v3 4418:96537 "one toast per action": a bulk delete reports once —
@@ -392,10 +402,11 @@ export function usePages(composer: Composer | null): UsePagesReturn {
         tone: "info",
         duration: 8000,
         action: { label: "Undo", onClick: () => { if (undoDelete?.()) opts.onUndone?.(); } },
+        ...trashAction,
       });
       return result;
     },
-    [composer, pages, addToast]
+    [composer, pages, addToast, trashAction]
   );
 
   const setHomepage = React.useCallback(

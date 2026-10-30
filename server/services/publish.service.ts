@@ -81,7 +81,7 @@ export async function runPrePublishChecks(siteId: string): Promise<PrePublishChe
        Filtered here rather than in SQL: `settings` is a JSON column and a
        null-safe path filter is more fragile than reading a handful of rows. */
     prisma.page.findMany({
-      where: { siteId },
+      where: { siteId, deletedAt: null },
       select: { id: true, name: true, blocks: true, settings: true, slug: true, isHomePage: true },
     }),
     prisma.site.findUnique({

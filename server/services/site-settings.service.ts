@@ -207,7 +207,7 @@ export async function getSiteSettings(siteId: string) {
      was permanently "Not set" no matter what anyone typed. Read the home page's
      SEO here and let the tab prefer it. */
   const homePage = await prisma.page.findFirst({
-    where: { siteId },
+    where: { siteId, deletedAt: null },
     orderBy: [{ isHomePage: "desc" }, { position: "asc" }],
     select: { name: true, seoTitle: true, seoDescription: true, settings: true },
   });

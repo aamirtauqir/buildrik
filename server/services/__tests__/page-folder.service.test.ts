@@ -10,7 +10,7 @@ vi.mock("@/server/services/permission.service", () => ({
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     pageFolder: { findMany: vi.fn(), findUnique: vi.fn(), create: vi.fn(), update: vi.fn(), delete: vi.fn(), count: vi.fn() },
-    page: { findMany: vi.fn(), findUnique: vi.fn() },
+    page: { findMany: vi.fn(), findFirst: vi.fn() },
     $transaction: vi.fn(async (ops: unknown[]) => ops),
   },
 }));
@@ -77,7 +77,7 @@ describe("page folders — personal", () => {
 
 describe("movePageToFolder", () => {
   beforeEach(() => {
-    db.page.findUnique.mockResolvedValue({ siteId: "s1" } as never);
+    db.page.findFirst.mockResolvedValue({ siteId: "s1" } as never);
     db.pageFolder.findMany.mockResolvedValue([
       { id: "f1", name: "A", collapsed: false, pageIds: ["p1", "p2"] },
       { id: "f2", name: "B", collapsed: false, pageIds: [] },
@@ -102,7 +102,7 @@ describe("movePageToFolder", () => {
   });
 
   it("refuses a page from another site and a folder that is not the caller's", async () => {
-    db.page.findUnique.mockResolvedValueOnce({ siteId: "other" } as never);
+    db.page.findFirst.mockResolvedValueOnce({ siteId: "other" } as never);
     await expect(movePageToFolder("u1", { siteId: "s1", pageId: "p9", folderId: "f1" })).rejects.toThrow("PAGE_NOT_FOUND");
     await expect(movePageToFolder("u1", { siteId: "s1", pageId: "p1", folderId: "not-mine" })).rejects.toThrow("FOLDER_NOT_FOUND");
     expect(db.pageFolder.update).not.toHaveBeenCalled();
