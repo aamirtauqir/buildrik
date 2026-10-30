@@ -50,8 +50,20 @@ import { AchievementPrompt } from "@/editor/onboarding/AchievementPrompt";
 import { SaveStatus } from "@/editor/chrome-ui";
 import { LoadErrorBanner } from "@/editor/shell/LoadErrorBanner";
 import { GlobalBannerSlot } from "@/editor/shell/GlobalBannerSlot";
-import { OFFLINE_BANNER, showGlobalBanner, showNewVersionBanner, showSessionExpiredBanner } from "@/editor/shell/globalBanners";
+import {
+  NARROW_WINDOW_BANNER,
+  OFFLINE_BANNER,
+  showCantReachBanner,
+  showGlobalBanner,
+  showNewVersionBanner,
+  showReconnectingBanner,
+  showRoleChangedBanner,
+  showSessionExpiredBanner,
+  showWorkspaceDeletionBanner,
+} from "@/editor/shell/globalBanners";
 import { createTabHandoff } from "@/editor/shell/tabHandoff";
+import { PhoneScreen } from "@/editor/shell/SmallScreen";
+import { PanelChunkBoundary } from "@/editor/shell/PanelChunkBoundary";
 import { EditorStoppedBoundary } from "@/editor/shell/EditorStoppedScreen";
 import { registerWorkSnapshot } from "@/editor/shell/workSnapshot";
 import { setKeptWorkOffer } from "@/editor/shell/keptWorkOffer";
@@ -5546,6 +5558,47 @@ Object.assign(CASES, {
           </EditorStoppedBoundary>
         </div>
       </ToastProvider>
+    );
+  },
+  /* B7-G11/G12/G13/G18/G20/G21/G32 (L-G): one slot banner per ?kind=. */
+  "lf-banner": () => {
+    const kind = new URLSearchParams(location.search).get("kind");
+    if (kind === "offline") showGlobalBanner(OFFLINE_BANNER);
+    else if (kind === "cant-reach") showCantReachBanner(() => undefined);
+    else if (kind === "reconnecting") showReconnectingBanner(12);
+    else if (kind === "role") showRoleChangedBanner({ download: () => undefined, askAdmin: () => undefined });
+    else if (kind === "deletion-owner") showWorkspaceDeletionBanner(new Date("2026-11-12T00:00:00Z"), () => undefined);
+    else if (kind === "deletion-other") showWorkspaceDeletionBanner(new Date("2026-11-12T00:00:00Z"), null);
+    else if (kind === "narrow") showGlobalBanner(NARROW_WINDOW_BANNER);
+    return (
+      <ToastProvider>
+        <div data-probe="lf-banner" style={{ width: "100vw" }}>
+          {LF_TOPBAR}
+          <GlobalBannerSlot />
+        </div>
+      </ToastProvider>
+    );
+  },
+  /* B7-G33 227:15364 (L-G): the phone screen. */
+  "lf-phone": () => (
+    <div data-probe="lf-phone">
+      <PhoneScreen />
+    </div>
+  ),
+  /* B7-G27 227:12184 (L-G): a panel whose code chunk failed to load, in the
+     280-wide drawer the board draws it in. */
+  "lf-chunk": () => {
+    const Broken: React.FC = () => {
+      const e = new Error("Failed to fetch dynamically imported module: /assets/Panel.js");
+      e.name = "ChunkLoadError";
+      throw e;
+    };
+    return (
+      <div data-probe="lf-chunk" className="tw:h-203 tw:w-70 tw:bg-white">
+        <PanelChunkBoundary>
+          <Broken />
+        </PanelChunkBoundary>
+      </div>
     );
   },
   "lf-more": () => {
