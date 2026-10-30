@@ -8,7 +8,6 @@
 import * as React from "react";
 import { Z_LAYERS } from "@/shared/constants/canvas";
 import type { CanvasGuide } from "@/shared/types/canvas";
-import { canvasTokens } from "@/styles/tokens";
 
 export interface GuidesOverlayProps {
   /** Current guides */
@@ -35,7 +34,14 @@ const DraggableGuide: React.FC<{
 }> = ({ guide, zoom, onDrag, onRemove }) => {
   const [isDragging, setIsDragging] = React.useState(false);
   const scale = zoom / 100;
-  const position = guide.position * scale;
+  /* The overlay sits inside the zoomed canvas (as SmartGuidesOverlay does),
+     so a guide is placed in canvas units — multiplying by the zoom here put
+     it at position × zoom², off its ruler mark at any zoom but 100% (walked
+     live at 61%: a 200 guide drew at the ruler's ~120). Hit area and line
+     width are divided back so they read the same on screen. */
+  const position = guide.position;
+  const hit = HIT_AREA / scale;
+  const line = 1 / scale;
 
   const handleMouseDown = React.useCallback(
     (e: React.MouseEvent) => {
@@ -74,7 +80,9 @@ const DraggableGuide: React.FC<{
     [onRemove]
   );
 
-  const color = guide.color || canvasTokens.colors.primary.default;
+  /* design-2l9 145:74465 / 145:67569 / 153:79518 draw ruler guides red —
+     a canvas marker, apart from the blue selection they cross. */
+  const color = guide.color || "var(--bk-red-500)";
 
   if (guide.type === "horizontal") {
     return (
@@ -85,8 +93,8 @@ const DraggableGuide: React.FC<{
           position: "absolute",
           left: 0,
           right: 0,
-          top: position - HIT_AREA / 2,
-          height: HIT_AREA,
+          top: position - hit / 2,
+          height: hit,
           cursor: guide.locked ? "not-allowed" : "ns-resize",
           zIndex: Z_LAYERS.guides,
         }}
@@ -96,8 +104,8 @@ const DraggableGuide: React.FC<{
             position: "absolute",
             left: 0,
             right: 0,
-            top: HIT_AREA / 2,
-            height: 1,
+            top: hit / 2,
+            height: line,
             background: color,
             opacity: isDragging ? 1 : 0.8,
             boxShadow: isDragging ? `0 0 4px ${color}` : "none",
@@ -116,8 +124,8 @@ const DraggableGuide: React.FC<{
         position: "absolute",
         top: 0,
         bottom: 0,
-        left: position - HIT_AREA / 2,
-        width: HIT_AREA,
+        left: position - hit / 2,
+        width: hit,
         cursor: guide.locked ? "not-allowed" : "ew-resize",
         zIndex: Z_LAYERS.guides,
       }}
@@ -127,8 +135,8 @@ const DraggableGuide: React.FC<{
           position: "absolute",
           top: 0,
           bottom: 0,
-          left: HIT_AREA / 2,
-          width: 1,
+          left: hit / 2,
+          width: line,
           background: color,
           opacity: isDragging ? 1 : 0.8,
           boxShadow: isDragging ? `0 0 4px ${color}` : "none",
