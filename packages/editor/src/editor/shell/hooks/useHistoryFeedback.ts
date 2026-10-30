@@ -80,6 +80,7 @@ const ACTION_DESCRIPTIONS: Record<string, string> = {
   reorder: "Reordered layer",
   "reorder-section": "Reordered section",
   "reorder pages": "Reordered pages",
+  "duplicate pages": "Duplicated pages",
   "detach instance": "Detached component instance",
   "move-layer-top": "Brought layer to front",
   "move-layer-bottom": "Sent layer to back",
