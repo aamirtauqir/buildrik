@@ -10794,7 +10794,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C 2026-11-13: a taken name (case and outer spaces ignored) shows \"Another component is called <existing name>. You can still create it.\" under Name and Create stays enabled (src/editor/shell/modals/CreateComponentModal.tsx, CreateComponentModal.test.tsx B6-K10). Board not compared: Figma unreachable from the session. Usage line still reads \"84 of 100 components\" where this board writes \"… components on this site\".",
+   "verifiedNote": "built to the board, live not compared — L-C 2026-11-13: get_design_context 215:47068 read; the warning is 215:47073 (12/16, --bk-warning-text, 6px under the field) and CreateComponentModal.tsx now draws it so; copy and non-blocking Create match (CreateComponentModal.test.tsx B6-K10). Live walk not done (needs a signed-in QA session). Open for the owner: this board writes the usage line \"84 of 100 components on this site\", while B4-G05…G12 (8 boards) and the code write \"84 of 100 components\"; the rest of this dialog (scope rows as radios with captions) also follows G05, not this board.",
    "tier": "P2"
   },
   {
@@ -10949,7 +10949,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C 2026-11-13: fetchComponentLibrary returns null on a failed read (was a silent []); the scope reads \"Component library · —\"; the library scope shows \"Couldn’t load the component library\" / \"Your site’s own components are still available under This site.\" + Retry (PanelErrorState retryLabel); This site keeps listing (ComponentsTab.libraryError.test.tsx). Board not compared: Figma unreachable from the session.",
+   "verifiedNote": "built to the board, live not compared — L-C 2026-11-13: get_design_context 217:43468 read; ComponentsTab.tsx draws 14/20/600 ink title, 12/16 ink-soft body and a 96×32 primary Retry at 24px inset, and the scope count \"—\" (217:43453). fetchComponentLibrary returns null on a failed read (was a silent []). ComponentsTab.libraryError.test.tsx. Live walk not done (needs a signed-in QA session and a failing library read).",
    "tier": "P2"
   },
   {

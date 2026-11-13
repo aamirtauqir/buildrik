@@ -380,13 +380,24 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
             ) : null}
           </div>
           {scope === "library" && state.libraryLoadFailed ? (
-            /* 217:43415 (B6-K24): the site's own masters still list under This site. */
-            <PanelErrorState
-              title="Couldn’t load the component library"
-              message="Your site’s own components are still available under This site."
-              onRetry={state.retryLibraryLoad}
-              retryLabel="Retry"
-            />
+            /* 217:43468 (B6-K24): 14/600 ink title, 12 ink-soft body, a 96px
+               primary Retry; the site's own masters still list under This site. */
+            <div role="alert" className="tw:flex tw:flex-col tw:items-start tw:px-6 tw:pt-2" data-testid="comp-library-error">
+              <p className="tw:m-0 tw:text-[14px] tw:leading-5 tw:font-semibold tw:text-[var(--bk-ink)]">
+                Couldn’t load the component library
+              </p>
+              <p className="tw:m-0 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)]">
+                Your site’s own components are still available under This site.
+              </p>
+              <Button
+                size="xs"
+                className="tw:h-8 tw:w-24 tw:rounded tw:text-[13px] tw:font-medium"
+                data-testid="comp-library-retry"
+                onClick={state.retryLibraryLoad}
+              >
+                Retry
+              </Button>
+            </div>
           ) : scope === "library" ? (
             <>
               <div className={SECTION_HEADER} data-testid="comp-section-header">

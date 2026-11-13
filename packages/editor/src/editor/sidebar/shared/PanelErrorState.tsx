@@ -30,17 +30,14 @@ export interface PanelErrorStateProps {
   title?: string;
   /** Error message to display */
   message?: string;
-  /** Retry callback — shows the retry button when provided */
+  /** Retry callback — shows "Try again" button when provided */
   onRetry?: () => void;
-  /** The retry button's label where the board writes its own ("Retry", 217:43415). */
-  retryLabel?: string;
 }
 
 export const PanelErrorState: React.FC<PanelErrorStateProps> = ({
   title = "Something went wrong",
   message = "Something went wrong",
   onRetry,
-  retryLabel = "Try again",
 }) => (
   <div
     className="tw:flex tw:flex-col tw:gap-1.5 tw:px-6 tw:pt-9 tw:pb-8 tw:leading-[normal]"
@@ -69,7 +66,7 @@ export const PanelErrorState: React.FC<PanelErrorStateProps> = ({
         data-testid="panel-load-error-retry"
         className="tw:min-h-5 tw:self-start tw:p-0 tw:text-[13px] tw:font-normal tw:text-[var(--bk-accent-text)]"
       >
-        {retryLabel}
+        Try again
       </Button>
     ) : null}
   </div>

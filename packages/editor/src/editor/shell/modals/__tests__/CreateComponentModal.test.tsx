@@ -192,6 +192,8 @@ describe("CreateComponentModal — 2L9 B6-K10 duplicate name", () => {
     expect(screen.getByTestId("create-component-name-duplicate")).toHaveTextContent(
       "Another component is called Hero card. You can still create it.",
     );
+    // 215:47073: warning text, not the muted note colour.
+    expect(screen.getByTestId("create-component-name-duplicate").className).toContain("--bk-warning-text");
     const submit = screen.getByRole("button", { name: "Create and share component" });
     expect(submit).toBeEnabled();
     fireEvent.click(submit);

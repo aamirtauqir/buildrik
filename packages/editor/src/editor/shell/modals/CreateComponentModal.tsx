@@ -176,7 +176,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({ isOp
             </p>
           )}
           {sameName ? (
-            <p id="create-component-name-duplicate" className={`${NOTE} tw:mb-2`} data-testid="create-component-name-duplicate">
+            <p id="create-component-name-duplicate" className={WARNING} data-testid="create-component-name-duplicate">
               Another component is called {sameName}. You can still create it.
             </p>
           ) : null}
@@ -256,6 +256,8 @@ const NAME_MAX = 200;
 const LEAD = "tw:m-0 tw:mb-4 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]";
 const LABEL = "tw:mb-2 tw:block tw:text-[13px] tw:font-medium tw:text-[var(--bk-ink)]";
 const NOTE = "tw:m-0 tw:py-2 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-muted)]";
+/* 215:47073 (B6-K10): 12 / 16 warning text, 6px under the field. */
+const WARNING = "tw:m-0 tw:mt-1.5 tw:mb-2 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-warning-text)]";
 const CHECK_ROW = "tw:flex tw:items-center tw:gap-2 tw:py-2 tw:text-[13px] tw:text-[var(--bk-ink-soft)] tw:cursor-pointer";
 
 export default CreateComponentModal;

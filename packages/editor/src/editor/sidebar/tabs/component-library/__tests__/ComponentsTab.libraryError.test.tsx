@@ -50,16 +50,19 @@ describe("ComponentsTab — component library failed to load (2L9 B6-K24)", () =
     fetchLibrary.mockResolvedValueOnce(null);
     mount();
     fireEvent.click(await screen.findByRole("tab", { name: "Component library · —" }));
-    expect(screen.getByTestId("panel-load-error-title")).toHaveTextContent("Couldn’t load the component library");
-    expect(screen.getByTestId("panel-load-error-desc")).toHaveTextContent(
-      "Your site’s own components are still available under This site.",
+    const error = screen.getByTestId("comp-library-error");
+    expect(error).toHaveTextContent(
+      "Couldn’t load the component libraryYour site’s own components are still available under This site.Retry",
     );
+    // 217:43468: an ink title (not error red) and a primary 32px Retry.
+    expect(error.querySelector("p")?.className).toContain("--bk-ink)");
+    expect(screen.getByTestId("comp-library-retry").className).toContain("tw:h-8");
     expect(screen.queryByTestId("comp-empty-library")).toBeNull();
 
     fetchLibrary.mockResolvedValueOnce([{ componentId: "price", name: "Price row", siteCount: 2, onThisSite: false }]);
     fireEvent.click(screen.getByRole("button", { name: "Retry" }));
     await waitFor(() => expect(screen.getByTestId("comp-lib-price")).toHaveTextContent("Price rowNot on this site"));
-    expect(screen.queryByTestId("panel-load-error")).toBeNull();
+    expect(screen.queryByTestId("comp-library-error")).toBeNull();
     expect(screen.getByRole("tab", { name: "Component library · 1" })).toBeInTheDocument();
     expect(fetchLibrary).toHaveBeenCalledTimes(2);
   });
@@ -69,6 +72,6 @@ describe("ComponentsTab — component library failed to load (2L9 B6-K24)", () =
     mount();
     fireEvent.click(await screen.findByRole("tab", { name: "Component library · 0" }));
     expect(screen.getByTestId("comp-empty-library")).toBeInTheDocument();
-    expect(screen.queryByTestId("panel-load-error")).toBeNull();
+    expect(screen.queryByTestId("comp-library-error")).toBeNull();
   });
 });
