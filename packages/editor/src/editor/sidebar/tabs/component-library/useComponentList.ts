@@ -69,10 +69,17 @@ export function useComponentList(composer: Composer | null): UseComponentListRes
     composer.on(EVENTS.COMPONENT_LIST_UPDATED, loadComponents);
     composer.on(EVENTS.COMPONENT_LIST_UPDATED, loadLibrary);
     composer.on(EVENTS.PAGE_CHANGED, loadComponents);
+    /* A row's "N uses" is read at render: an instance placed or detached has
+       to re-render the list, or Detach all left "12 uses" standing
+       (2L9 217:41451). */
+    composer.on(EVENTS.COMPONENT_INSTANTIATED, loadComponents);
+    composer.on(EVENTS.INSTANCE_DETACHED, loadComponents);
     return () => {
       composer.off(EVENTS.COMPONENT_LIST_UPDATED, loadComponents);
       composer.off(EVENTS.COMPONENT_LIST_UPDATED, loadLibrary);
       composer.off(EVENTS.PAGE_CHANGED, loadComponents);
+      composer.off(EVENTS.COMPONENT_INSTANTIATED, loadComponents);
+      composer.off(EVENTS.INSTANCE_DETACHED, loadComponents);
     };
   }, [composer, loadLibrary]);
 

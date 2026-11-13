@@ -61,6 +61,8 @@ function makeComposer() {
       getInstancesOfComponent: () => [{ elementId: "e1" }, { elementId: "e2" }, { elementId: "e3" }],
       detachInstance,
       updateComponent,
+      snapshotComponent: () => ({ component: { id: "c1" }, instances: [{ elementId: "e1" }, { elementId: "e2" }, { elementId: "e3" }] }),
+      relinkInstances: vi.fn(() => 3),
     },
   } as unknown as Composer;
   return { composer, detachInstance, updateComponent, setActivePage, select };
@@ -91,33 +93,19 @@ describe("ComponentDetailScreen — master screen (4418:142876)", () => {
     expect(screen.queryByText("Tags")).toBeNull();
   });
 
-  it("Detach all confirms, then detaches every instance", () => {
+  /* 2L9 217:41451 (B6-K17): no dialog — Detach all detaches every instance,
+     says how many on how many pages, and Undo relinks them. */
+  it("Detach all detaches every instance at once and offers Undo", async () => {
     const { composer, detachInstance } = makeComposer();
     renderMaster(composer);
     fireEvent.click(screen.getByTestId("component-more"));
     fireEvent.click(screen.getByTestId("component-detach-all"));
-    expect(detachInstance).not.toHaveBeenCalled();
-    expect(screen.getByText("Detach all 3 instances of Menu card?")).toBeTruthy();
-    fireEvent.click(screen.getByTestId("component-detach-all-confirm-confirm"));
-    expect(detachInstance.mock.calls.map((c) => c[0])).toEqual(["e1", "e2", "e3"]);
-  });
-
-  /* Board 4418:143126: the list reports it ("18 instances detached"), so the
-     screen hands the count up and goes back instead of toasting. */
-  it("Detach all hands the count to onDetachedAll and goes back", async () => {
-    const { composer } = makeComposer();
-    const onDetachedAll = vi.fn();
-    const onBack = vi.fn();
-    render(
-      <ToastProvider>
-        <ComponentDetailScreen component={makeComponent()} composer={composer} onBack={onBack} onDetachedAll={onDetachedAll} />
-      </ToastProvider>,
-    );
-    fireEvent.click(screen.getByTestId("component-more"));
-    fireEvent.click(screen.getByTestId("component-detach-all"));
-    fireEvent.click(screen.getByTestId("component-detach-all-confirm-confirm"));
-    await waitFor(() => expect(onDetachedAll).toHaveBeenCalledWith(3));
-    expect(onBack).toHaveBeenCalled();
+    expect(screen.queryByTestId("component-detach-all-confirm")).toBeNull();
+    await waitFor(() => expect(detachInstance.mock.calls.map((c) => c[0])).toEqual(["e1", "e2", "e3"]));
+    expect(await screen.findByText("Detached 3 instances on 2 pages from Menu card")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Undo" }));
+    const relink = (composer as unknown as { components: { relinkInstances: ReturnType<typeof vi.fn> } }).components.relinkInstances;
+    expect(relink).toHaveBeenCalledWith([{ elementId: "e1" }, { elementId: "e2" }, { elementId: "e3" }]);
   });
 
   /* Flow-check (2026-09-25): a used-on row click used to ONLY switch page —
@@ -188,20 +176,6 @@ describe("ComponentDetailScreen — master screen (4418:142876)", () => {
       );
       fireEvent.click(screen.getByTestId("component-name"));
       fireEvent.keyDown(screen.getByTestId("component-rename-input"), { key: "Escape" });
-      expect(onBack).not.toHaveBeenCalled();
-    });
-
-    it("does not back out while Detach all's confirm is open", () => {
-      const { composer } = makeComposer();
-      const onBack = vi.fn();
-      render(
-        <ToastProvider>
-          <ComponentDetailScreen component={makeComponent()} composer={composer} onBack={onBack} />
-        </ToastProvider>,
-      );
-      fireEvent.click(screen.getByTestId("component-more"));
-      fireEvent.click(screen.getByTestId("component-detach-all"));
-      fireEvent.keyDown(document, { key: "Escape" });
       expect(onBack).not.toHaveBeenCalled();
     });
   });

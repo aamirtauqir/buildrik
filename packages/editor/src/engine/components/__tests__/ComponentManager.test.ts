@@ -478,6 +478,46 @@ describe("ComponentManager — snapshot / restore for toast Undo", () => {
     expect(created.at(-1)?.[1]).toMatchObject({ component: { id: comp.id } });
   });
 
+  /* 2L9 217:41451 (B6-K17): Detach all's Undo relinks every instance whose
+     element is still on the site, overrides and all. */
+  it("relinkInstances restores detached instances with their overrides", async () => {
+    const { composer, manager, mgr, page } = makeStack();
+    const card = sourceElement(manager, page.root.id);
+    const comp = (await mgr.createComponent("Card", card.getId()))!;
+    const i1 = (await mgr.instantiateComponent(comp.id, page.root.id))!;
+    const i2 = (await mgr.instantiateComponent(comp.id, page.root.id))!;
+    const snap = mgr.snapshotComponent(comp.id)!;
+    const withOverride = snap.instances.find((r) => r.elementId === i1)!;
+    withOverride.overrides = [{ path: "styles.color", value: "red" } as never];
+
+    await mgr.detachInstance(i1);
+    await mgr.detachInstance(i2);
+    expect(mgr.getInstancesOfComponent(comp.id)).toHaveLength(0);
+    const before = emitsOf(composer, EVENTS.COMPONENT_LIST_UPDATED).length;
+
+    expect(mgr.relinkInstances(snap.instances)).toBe(2);
+    expect(mgr.isInstance(i1)).toBe(true);
+    expect(mgr.isInstance(i2)).toBe(true);
+    expect(manager.getElement(i1)!.getData().data?.componentInstance).toMatchObject({
+      componentId: comp.id,
+      isDetached: false,
+      overrides: [{ path: "styles.color", value: "red" }],
+    });
+    expect(emitsOf(composer, EVENTS.COMPONENT_LIST_UPDATED).length).toBe(before + 1);
+  });
+
+  it("relinkInstances skips elements that are gone and masters that are gone", async () => {
+    const { manager, mgr, page } = makeStack();
+    const card = sourceElement(manager, page.root.id);
+    const comp = (await mgr.createComponent("Card", card.getId()))!;
+    const i1 = (await mgr.instantiateComponent(comp.id, page.root.id))!;
+    const snap = mgr.snapshotComponent(comp.id)!;
+    await mgr.detachInstance(i1);
+    expect(mgr.relinkInstances([{ ...snap.instances[0], elementId: "ghost" }])).toBe(0);
+    expect(mgr.relinkInstances([{ ...snap.instances[0], componentId: "ghost" }])).toBe(0);
+    expect(mgr.isInstance(i1)).toBe(false);
+  });
+
   it("a snapshot is a copy — detaching does not mark its instance records detached", async () => {
     const { manager, mgr, page } = makeStack();
     const card = sourceElement(manager, page.root.id);

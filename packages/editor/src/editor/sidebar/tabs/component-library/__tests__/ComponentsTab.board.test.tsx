@@ -65,10 +65,9 @@ describe("ComponentsTab — 2L9 215:43588 (B6-K02) resource area", () => {
     expect(screen.queryByTestId("comp-row-new-hdr")).toBeNull();
   });
 
-  /* Board 4418:143126: after Detach all, the list opens on "N instances
-     detached" + "{name} is still saved…", and that master's row is dimmed
-     with "0 linked instances". */
-  it("reports a Detach all on the list and dims the master's row", async () => {
+  /* 2L9 217:41451 (B6-K17): after Detach all the row reads "0 uses" — no
+     notice above the list, no dimmed row — and the summary stays open. */
+  it("after Detach all the row reads 0 uses and the summary stays open", async () => {
     const composer = createMockComposer({ components: [c("menu", "Menu card"), c("hdr", "Site header")] });
     const live = new Map<string, string[]>([["menu", ["i1", "i2"]], ["hdr", ["i3"]]]);
     Object.assign(composer.components, {
@@ -76,6 +75,7 @@ describe("ComponentsTab — 2L9 215:43588 (B6-K02) resource area", () => {
       getInstancesOfComponent: (id: string) => (live.get(id) ?? []).map((elementId) => ({ elementId })),
       detachInstance: vi.fn(async (elementId: string) => {
         for (const [k, v] of live) live.set(k, v.filter((x) => x !== elementId));
+        composer.emit(EVENTS.INSTANCE_DETACHED, { instanceId: elementId });
         return true;
       }),
       isInstance: () => false,
@@ -88,12 +88,11 @@ describe("ComponentsTab — 2L9 215:43588 (B6-K02) resource area", () => {
     fireEvent.click(await screen.findByTestId("comp-row-menu"));
     fireEvent.click(await screen.findByTestId("component-more"));
     fireEvent.click(await screen.findByTestId("component-detach-all"));
-    fireEvent.click(screen.getByTestId("component-detach-all-confirm-confirm"));
-    const notice = await screen.findByTestId("comp-detach-notice");
-    expect(notice.textContent).toBe("2 instances detachedMenu card is still saved. Existing page content keeps its appearance.");
-    expect(screen.getByTestId("comp-row-count-menu").textContent).toBe("0 linked instances");
-    expect(screen.getByTestId("comp-row-menu").className).toContain("tw:opacity-40");
-    expect(screen.getByTestId("comp-row-hdr").className).not.toContain("tw:opacity-40");
+    expect(await screen.findByText(/^Detached 2 instances on \d pages? from Menu card$/)).toBeTruthy();
+    expect(screen.queryByTestId("comp-detach-notice")).toBeNull();
+    expect(screen.getByTestId("comp-row-count-menu").textContent).toBe("0 uses");
+    expect(screen.getByTestId("comp-row-menu").className).not.toContain("tw:opacity-40");
+    expect(screen.getByTestId("component-usedon-toggle").textContent).toBe("Not used on any page");
   });
 
   it("the empty state keeps the navigation and the way back", async () => {

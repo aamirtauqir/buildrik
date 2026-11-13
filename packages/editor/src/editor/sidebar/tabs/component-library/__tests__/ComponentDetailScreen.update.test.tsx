@@ -121,12 +121,17 @@ describe("ComponentDetailScreen — Update component", () => {
   /* Board 4418:143371: "Menu card updated · 18 linked instances updated · Undo". */
   it("confirms the fan-out on a clean update, with an Undo that reverts the master", async () => {
     const { composer } = makeComposer();
+    /* 2L9 217:41149 (B6-K16): the toast names the source and its page. */
+    Object.assign((composer as unknown as { elements: object }).elements, {
+      getElement: (id: string) => (id === "el-9" ? { getType: () => "section", getCustomData: (k: string) => (k === "layerName" ? "Section 3" : undefined) } : null),
+      getActivePage: () => ({ id: "home", name: "Home" }),
+    });
     renderScreen(composer, "el-9");
 
     fireEvent.click(updateButton());
     fireEvent.click(confirmButton());
 
-    await waitFor(() => expect(toastText()).toContain("CTA updated · 2 linked instances updated"));
+    await waitFor(() => expect(toastText()).toContain("CTA updated from Section 3 on Home · 2 instances"));
     fireEvent.click(screen.getByRole("button", { name: "Undo" }));
     const revert = (composer as unknown as { components: { revertComponentMaster: ReturnType<typeof vi.fn> } }).components
       .revertComponentMaster;

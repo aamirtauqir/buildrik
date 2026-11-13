@@ -86,11 +86,6 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
   const [sort, setSort] = React.useState<SortKey>("used");
   const [importing, setImporting] = React.useState(false);
 
-  // Board 4418:143126: the last Detach all, reported at the top of the list.
-  const [detached, setDetached] = React.useState<{ id: string; name: string; count: number } | null>(null);
-  React.useEffect(() => {
-    if (state.detailComponent) setDetached(null);
-  }, [state.detailComponent]);
 
   // Which of this site's masters are shared from the workspace library.
   // v3 FC-10: read from useComponentsState (→ useComponentList) instead of
@@ -130,7 +125,6 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         onBackToInstance={state.backToInstance}
         onInsert={state.handleDetailInsert}
         onDelete={state.handleDetailDelete}
-        onDetachedAll={(count) => setDetached({ id: detail.id, name: detail.name, count })}
         selectedElementId={state.canvasSelection[0] ?? null}
       />
     ) : null;
@@ -268,7 +262,6 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
 
   const renderRow = (component: (typeof state.components)[number], isLinked: boolean) => {
     const n = uses(component.id);
-    const justDetached = detached?.id === component.id && n === 0;
     return (
       <div
         key={component.id}
@@ -276,7 +269,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         tabIndex={0}
         draggable
         aria-current={detail?.id === component.id || undefined}
-        className={`${ROW} tw:cursor-pointer tw:select-none ${detail?.id === component.id ? "tw:bg-[var(--bk-accent-subtle)]" : "tw:hover:bg-[var(--bk-bg-subtle)]"}${justDetached ? " tw:opacity-40" : ""}`}
+        className={`${ROW} tw:cursor-pointer tw:select-none ${detail?.id === component.id ? "tw:bg-[var(--bk-accent-subtle)]" : "tw:hover:bg-[var(--bk-bg-subtle)]"}`}
         data-testid={`comp-row-${component.id}`}
         onClick={() => state.handleViewDetail(component)}
         onDragStart={(e) => state.handleDragStart(e, component)}
@@ -303,7 +296,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
           className="tw:w-[120px] tw:shrink-0 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)]"
           data-testid={`comp-row-count-${component.id}`}
         >
-          {justDetached ? "0 linked instances" : `${n} ${n === 1 ? "use" : "uses"}`}
+          {`${n} ${n === 1 ? "use" : "uses"}`}
         </span>
         <span className="tw:flex tw:min-w-0 tw:flex-1 tw:items-center">
           {isNew(component.createdAt) && (
@@ -343,16 +336,6 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
       )}
       <div aria-live="polite">
         <span className="bd-sr-only">{state.components.length} components found</span>
-        {detached && (
-          <div className="tw:flex tw:flex-col tw:gap-1.5 tw:pb-2 tw:text-[var(--bk-ink)]" role="status" data-testid="comp-detach-notice">
-            <p className="tw:m-0 tw:text-[14px] tw:leading-[normal]">
-              {detached.count} instance{detached.count === 1 ? "" : "s"} detached
-            </p>
-            <p className="tw:m-0 tw:text-[12px] tw:leading-[normal]">
-              {detached.name} is still saved. Existing page content keeps its appearance.
-            </p>
-          </div>
-        )}
         {scope === "library" && state.libraryLoadFailed ? (
           /* 217:43468 (B6-K24): 14/600 ink title, 12 ink-soft body, a 96px
              primary Retry; the site's own masters still list under This site. */

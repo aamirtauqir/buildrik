@@ -536,6 +536,30 @@ export class ComponentManager {
   }
 
   /**
+   * Relink instance records (from `snapshotComponent`) whose element and
+   * master are still on the site, overrides and all. The Undo of Detach all
+   * (2L9 217:41451) and the second half of a delete's Undo. Returns how many
+   * relinked.
+   */
+  relinkInstances(records: readonly ComponentInstance[]): number {
+    if (this.composer.writeLocked) return 0;
+    let relinked = 0;
+    for (const record of records) {
+      const element = this.composer.elements.getElement(record.elementId);
+      if (!element || !this.components.has(record.componentId)) continue;
+      const instance: ComponentInstance = { ...deepClone(record), isDetached: false };
+      this.instances.set(record.elementId, instance);
+      element.setData("componentInstance", instance);
+      relinked++;
+    }
+    if (relinked > 0) {
+      this.composer.markDirty();
+      this.composer.emit(EVENTS.COMPONENT_LIST_UPDATED, { components: this.getAllComponents() });
+    }
+    return relinked;
+  }
+
+  /**
    * Undo of a delete: re-register the snapshot's master and relink every
    * instance whose element is still on the site. Returns how many relinked.
    */
@@ -545,16 +569,7 @@ export class ComponentManager {
     await saveComponent(component, this.projectId);
     this.components.set(component.id, component);
 
-    let relinked = 0;
-    for (const record of snapshot.instances) {
-      const element = this.composer.elements.getElement(record.elementId);
-      if (!element) continue;
-      const instance: ComponentInstance = { ...deepClone(record), isDetached: false };
-      this.instances.set(record.elementId, instance);
-      element.setData("componentInstance", instance);
-      relinked++;
-    }
-    if (relinked > 0) this.composer.markDirty();
+    const relinked = this.relinkInstances(snapshot.instances);
     /* The server mirror re-upserts on COMPONENT_CREATED; without it the undone
        delete stayed deleted on the server and came back after a reload
        (audit L2-010). */

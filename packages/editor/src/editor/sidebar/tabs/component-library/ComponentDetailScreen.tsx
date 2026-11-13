@@ -23,6 +23,7 @@ import { INSTANTIATE_TOASTS, instantiateComponentAtSelection } from "./instantia
    the name is Review's, the behaviour (page switch → select → scrollIntoView)
    is exactly what "click a used-on row" needs too. */
 import { locateComment as locateOnCanvas } from "@/editor/sidebar/tabs/review/locate";
+import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
 // ============================================
 // Types
 // ============================================
@@ -45,8 +46,6 @@ export interface ComponentDetailScreenProps {
   onDuplicate?: () => void;
   /** Callback when component is deleted */
   onDelete?: () => void;
-  /** Detach all finished — the list reports the count (board 4418:143126). */
-  onDetachedAll?: (count: number) => void;
   /** The element currently selected on canvas — what "Update component" promotes. */
   selectedElementId?: string | null;
 }
@@ -105,7 +104,6 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
   onInsert,
   onDuplicate,
   onDelete,
-  onDetachedAll,
   selectedElementId = null,
 }) => {
   // DrillInHeader handles focus-on-mount automatically
@@ -119,7 +117,6 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
   const [showUpdateConfirm, setShowUpdateConfirm] = React.useState(false);
 
 
-  const [showDetachAll, setShowDetachAll] = React.useState(false);
   const [exporting, setExporting] = React.useState(false);
   const [renaming, setRenaming] = React.useState(false);
   const [draftName, setDraftName] = React.useState(component.name);
@@ -135,14 +132,14 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key !== "Escape" || e.defaultPrevented) return;
-      if (renaming || showDeleteConfirm || showUpdateConfirm || showDetachAll) return;
+      if (renaming || showDeleteConfirm || showUpdateConfirm) return;
       const target = e.target as HTMLElement | null;
       if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable)) return;
       backOut();
     };
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [backOut, renaming, showDeleteConfirm, showUpdateConfirm, showDetachAll]);
+  }, [backOut, renaming, showDeleteConfirm, showUpdateConfirm]);
 
   // Handle insert action — the shared insert (A-15), same words as Add.
   const handleInsert = async () => {
@@ -189,11 +186,13 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
 
     void captureComponentThumbnail(composer, component.id, selectedElementId);
 
-    // Board 4418:143371: "Menu card updated · 18 linked instances updated · Undo".
-    const headline =
-      instancesSynced > 0
-        ? `${component.name} updated · ${count(instancesSynced, "linked instance", "linked instances")} updated`
-        : `${component.name} updated`;
+    /* 2L9 217:41149 (B6-K16): "Hero card updated from Section 3 on Home ·
+       12 instances · Undo" — names what it was updated from, and where. */
+    const sourceEl = composer.elements.getElement(selectedElementId);
+    const source = (sourceEl && getLayerName(sourceEl)) || "the selection";
+    const pageName = composer.elements.getActivePage()?.name;
+    const from = `${component.name} updated from ${source}${pageName ? ` on ${pageName}` : ""}`;
+    const headline = instancesSynced > 0 ? `${from} · ${count(instancesSynced, "instance", "instances")}` : from;
     const action = before && {
       label: "Undo",
       onClick: () => void composer.components.revertComponentMaster(component.id, before.component.masterTree),
@@ -260,12 +259,18 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
   const structure = component.masterTree?.children ?? [];
   const siteName = composer?.getProjectMetadata?.()?.name || "this site";
 
-  const confirmDetachAll = async () => {
-    setShowDetachAll(false);
-    if (!composer) return;
+  /* 2L9 217:41451 (B6-K17): Detach all asks nothing — it reports what it did
+     and offers Undo, which relinks every instance with its overrides. */
+  const detachAll = async () => {
+    if (!composer || instances.length === 0) return;
+    const snapshot = composer.components.snapshotComponent(component.id);
+    const onPages = usedOn.length;
+    const n = instances.length;
     await Promise.all(instances.map((inst) => composer.components.detachInstance(inst.elementId)));
-    onDetachedAll?.(instances.length);
-    onBack();
+    addToast({
+      description: `Detached ${count(n, "instance", "instances")} on ${count(onPages, "page", "pages")} from ${component.name}`,
+      ...(snapshot && { action: { label: "Undo", onClick: () => void composer.components.relinkInstances(snapshot.instances) } }),
+    });
   };
 
   const commitRename = async () => {
@@ -352,18 +357,23 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
       </div>
 
       <div className="tw:flex tw:flex-col">
-        <Button
-          variant="link"
-          size="xs"
-          className={LINK}
-          aria-expanded={open === "usedOn"}
-          onClick={() => toggle("usedOn")}
-          data-testid="component-usedon-toggle"
-        >
-          {instanceCount === 0
-            ? "Not used on this site ›"
-            : `Used in ${count(instanceCount, "place", "places")} on ${count(usedOn.length, "page", "pages")} ›`}
-        </Button>
+        {instanceCount === 0 ? (
+          /* 217:41451 — after Detach all: nothing to open. */
+          <p className="tw:m-0 tw:flex tw:h-8 tw:items-center tw:pl-3 tw:text-[13px] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink-soft)]" data-testid="component-usedon-toggle">
+            Not used on any page
+          </p>
+        ) : (
+          <Button
+            variant="link"
+            size="xs"
+            className={LINK}
+            aria-expanded={open === "usedOn"}
+            onClick={() => toggle("usedOn")}
+            data-testid="component-usedon-toggle"
+          >
+            {`Used in ${count(instanceCount, "place", "places")} on ${count(usedOn.length, "page", "pages")} ›`}
+          </Button>
+        )}
         {open === "usedOn" ? (
           <div data-testid="component-usedon-header" className="tw:flex tw:flex-col">
             {usedOn.map(({ page, count: n, firstInstanceId }) => {
@@ -464,7 +474,7 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
             <MenuItem data-testid="component-export" onClick={runMore(() => setExporting(true))}>
               Export package…
             </MenuItem>
-            <MenuItem data-testid="component-detach-all" disabled={instanceCount === 0} onClick={runMore(() => setShowDetachAll(true))}>
+            <MenuItem data-testid="component-detach-all" disabled={instanceCount === 0} onClick={runMore(() => void detachAll())}>
               Detach all
             </MenuItem>
             <MenuItem data-testid="component-delete" onClick={runMore(handleDelete)}>
@@ -499,15 +509,6 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
         }
         confirmLabel="Update component"
         tone="destructive"
-      />
-      <ConfirmDialog
-        open={showDetachAll}
-        testId="component-detach-all-confirm"
-        onClose={() => setShowDetachAll(false)}
-        onConfirm={() => void confirmDetachAll()}
-        title={`Detach all ${instanceCount} instance${instanceCount === 1 ? "" : "s"} of ${component.name}?`}
-        message={`They become independent elements and keep their content and appearance; they will no longer follow updates to the ${component.name} master.`}
-        confirmLabel="Detach all"
       />
       {exporting ? (
         <ExportPackageDialog component={component} all={composer?.components?.getAllComponents() ?? [component]} onClose={() => setExporting(false)} />

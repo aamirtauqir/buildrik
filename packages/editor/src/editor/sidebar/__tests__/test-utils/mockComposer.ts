@@ -146,6 +146,7 @@ export function createMockComposer(opts: CreateMockComposerOpts = {}): MockCompo
       return c ? { component: { ...c }, instances: [] } : null;
     }),
     restoreDeletedComponent: vi.fn(async () => 0),
+    relinkInstances: vi.fn(() => 0),
   };
 
   const selection = {

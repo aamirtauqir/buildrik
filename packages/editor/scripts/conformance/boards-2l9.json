@@ -10861,7 +10861,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Toast+Undo exists (src/editor/sidebar/tabs/component-library/ComponentDetailScreen.tsx:189) but copy \"X updated · N linked instances update…",
+   "verifiedNote": "built to the board copy, live not compared — L-C 2026-11-14: the Update from selection toast reads \"{name} updated from {source layer name} on {page} · N instances\" with Undo (reverts the master), as 217:41149 draws (\"Hero card updated from Section 3 on Home · 12 instances\"); the overrides-lost warning keeps the same headline (ComponentDetailScreen.update.test.tsx). Review update / v5 is not built (versioned library updates are out of this version).",
    "tier": "P2"
   },
   {
@@ -10872,7 +10872,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Code asks ConfirmDialog (src/editor/sidebar/tabs/component-library/ComponentDetailScreen.tsx:470) and list notice has no Undo (src/editor/s…",
+   "verifiedNote": "built to the board, live not compared — L-C 2026-11-14: Detach all (More actions ⋯) asks nothing; it detaches every instance and toasts \"Detached N instances on M pages from {name}\" with Undo, which relinks every instance with its overrides (ComponentManager.relinkInstances, shared with a delete's Undo). The summary stays open and reads \"Not used on any page\"; the row reads \"0 uses\" (the list now re-renders on INSTANCE_DETACHED / COMPONENT_INSTANTIATED). The drawer-era list notice and dimmed row (4418:143126) are gone. Tests: ComponentManager.test.ts relinkInstances, ComponentDetailScreen.detach-confirm.test.tsx, ComponentsTab.board.test.tsx.",
    "tier": "P2"
   },
   {
