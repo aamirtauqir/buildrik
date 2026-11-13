@@ -32,6 +32,10 @@ vi.mock("../tabs/templates/TemplatesTab", () => ({
   default: () => <div data-testid="fp-templates" />,
 }));
 
+vi.mock("../tabs/ComponentsTab", () => ({
+  default: () => <div data-testid="fp-components" />,
+}));
+
 const common = { onClose: vi.fn() };
 
 function renderRouter(activeTab: string, extra = {}) {
@@ -71,6 +75,9 @@ describe("FullPageRouter", () => {
     ["assets", "mgr-host", "fp-library", "fullpage"],
     ["settings", "set-host", "fp-settings", "fullpage"],
     ["design", "brand-host", "fp-brand", null],
+    /* 2L9 215:43588 (B6-K02): Components is a resource area too. Like Brand it
+       leaves ⌘Z to the composer — detach and delete are composer writes. */
+    ["components", "comp-host", "fp-components", null],
   ])("renders %s in place, not in the overlay root", async (tab, hostId, bodyId, surface) => {
     const { container } = renderRouter(tab);
     const host = await screen.findByTestId(hostId);

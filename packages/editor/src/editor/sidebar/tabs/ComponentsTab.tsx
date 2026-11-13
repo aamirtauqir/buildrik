@@ -35,8 +35,6 @@ const SECTION_HEADER =
 
 export const ComponentsTab: React.FC<ComponentsTabProps> = ({
   composer,
-  compactMode = false,
-  onCreateNew,
   onComponentSelect,
   selectedComponentId,
   isExpanded,
@@ -53,6 +51,23 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
     onHelpClick,
   });
   const { addToast } = useToast();
+  /* "+ Create component" makes a master from the canvas selection. With
+     nothing selected it says what is missing — it used to do nothing at all
+     (measured live 2026-08-22). Lived in LeftSidebar while Components was a
+     drawer; the resource area (2L9 215:43588) owns it. */
+  const handleCreate = React.useCallback(() => {
+    if (!composer?.components?.isAvailable?.()) return;
+    const elementId = composer.selection.getSelectedIds()[0];
+    if (!elementId) {
+      addToast({
+        description: "Select an element on the canvas first — a component is made from something.",
+        tone: "info",
+        duration: 4000,
+      });
+      return;
+    }
+    composer.emit(EVENTS.COMPONENT_CREATE_REQUESTED, { elementId });
+  }, [composer, addToast]);
   const [scope, setScope] = React.useState<Scope>("site");
   const [query, setQuery] = React.useState("");
   const [sort, setSort] = React.useState<SortKey>("used");
@@ -165,29 +180,6 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
   // ── Empty state ───────────────────────────────────────────────────────────────
 
   if (state.components.length === 0) {
-    if (compactMode) {
-      /* Was bare unstyled markup — the audits' "fifth empty-state language".
-         The shared EmptyState is the only one. */
-      return (
-        <EmptyState
-          size="sm"
-          align="start"
-          body="No components saved yet."
-          action={
-            onCreateNew && (
-              <Button
-                variant="link"
-                size="xs"
-                onClick={onCreateNew}
-                title="Right-click any element to save as component"
-              >
-                + New
-              </Button>
-            )
-          }
-        />
-      );
-    }
     return (
       <PanelFrame className="tw:h-full">
         {backRow}
@@ -219,10 +211,10 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
             Select an element on the canvas and save it as a component to reuse
             it everywhere.
           </EmptyStateDesc>
-          {onCreateNew && (
+          {(
             <Button
               color="light"
-              onClick={onCreateNew}
+              onClick={handleCreate}
               data-testid="comp-empty-create-link"
               className="tw:self-start tw:border-transparent tw:bg-transparent tw:p-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-accent)] tw:hover:underline"
             >
@@ -230,7 +222,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
             </Button>
           )}
         </div>
-        {onCreateNew && (
+        {(
           <div
             className="tw:flex tw:bg-[var(--bk-bg-panel)] tw:border-t tw:border-[var(--bk-border)] tw:px-4 tw:py-2.5 tw:shrink-0"
             data-testid="comp-footer"
@@ -239,7 +231,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
               size="xs"
               className="tw:h-7 tw:rounded-lg tw:px-3 tw:py-1.5 tw:text-[13px] tw:font-medium"
               data-testid="comp-create"
-              onClick={onCreateNew}
+              onClick={handleCreate}
             >
               + Create component
             </Button>
@@ -446,7 +438,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         </div>
       </div>
       {/* Board 641:2596 panel footer — the screen's ONE primary button. */}
-      {onCreateNew && (
+      {(
         <div
           className="tw:flex tw:bg-[var(--bk-bg-panel)] tw:border-t tw:border-[var(--bk-border)] tw:px-4 tw:py-2.5 tw:shrink-0"
           data-testid="comp-footer"
@@ -455,7 +447,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
             size="xs"
             className="tw:h-7 tw:rounded-lg tw:px-3 tw:py-1.5 tw:text-[13px] tw:font-medium"
             data-testid="comp-create"
-            onClick={onCreateNew}
+            onClick={handleCreate}
           >
             + Create component
           </Button>

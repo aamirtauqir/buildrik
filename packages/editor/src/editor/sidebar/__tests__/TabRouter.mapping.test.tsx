@@ -51,7 +51,6 @@ function renderRouter(activeTab: GroupedTabId, extra: Partial<TabRouterProps> = 
       activeTab={activeTab}
       composer={null}
       commonTabProps={{ isExpanded: false, onExpandToggle: noop, onHelpClick: noop, onClose: noop }}
-      onCreateComponent={noop}
       {...extra}
     />
   );
@@ -110,17 +109,12 @@ describe("TabRouter — templates", () => {
   });
 });
 
-describe("TabRouter — components tab", () => {
-  /* There is one Components panel now. Two shipped for months behind
-     VITE_FEATURE_COMPONENTS_V2 — and because only the NEXT_PUBLIC_ half of a
-     flag reaches production, and nothing ever set it, the flag ONLY ever
-     selected between "what the port-5050 demo shows" and "what every real user
-     sees". No flag can reach this case again. */
-  it("renders ComponentsTab, whatever the flags say", async () => {
-    flags.enabled.add("componentsV2");
-    renderRouter("components");
-    expect(await screen.findByTestId("tab-components-legacy")).toBeInTheDocument();
-    expect(screen.queryByTestId("tab-components-v2")).toBeNull();
+/* 2L9 215:43588 (B6-K02): Components is a resource area — a drawer copy here
+   would be a second, invisible panel. */
+describe("TabRouter — components", () => {
+  it("renders nothing for components — the view belongs to FullPageRouter", () => {
+    const { container } = renderRouter("components");
+    expect(container).toBeEmptyDOMElement();
   });
 });
 

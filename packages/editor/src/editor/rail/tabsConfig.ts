@@ -131,7 +131,9 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
     // Templates for IA symmetry in CREATION zone.
     pattern: "card-drill-in",
     shortcut: "⇧A",
-    mode: "panel",
+    // 2L9 215:43588 (B6-K02): a resource area — nav, list and detail beside
+    // the rail, like Assets and Settings — rendered by FullPageRouter.
+    mode: "fullpage",
     // Reclassified 2026-05-22: Components is a library (browse + insert
     // reusable patterns) — same mental class as Add/Templates. Moved to
     // CREATION zone for IA symmetry. Previously labeled "Comps" (truncated)

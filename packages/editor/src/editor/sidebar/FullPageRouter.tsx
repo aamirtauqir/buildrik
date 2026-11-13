@@ -72,6 +72,7 @@ const LibraryManager = React.lazy(() =>
   import("../media/LibraryManager").then((m) => ({ default: m.LibraryManager }))
 );
 const SettingsTab = React.lazy(() => import("./tabs/settings/SettingsTab"));
+const ComponentsTab = React.lazy(() => import("./tabs/ComponentsTab"));
 const loadBrandWorkspace = () => import("@/editor/design-system/ui/BrandWorkspace");
 
 /* The resource-area host: fills the fullpage slot, in place. */
@@ -212,6 +213,16 @@ export const FullPageRouter: React.FC<FullPageRouterProps> = ({
           />
         </div>
       ) : null;
+
+    /* 2L9 215:43588 (B6-K02): Components is a resource area. No
+       data-bk-surface, like Brand: detach and delete are composer writes and
+       their ⌘Z must reach the composer. */
+    case "components":
+      return (
+        <div className={RESOURCE_HOST} data-testid="comp-host">
+          <ComponentsTab composer={composer} onClose={commonTabProps.onClose} />
+        </div>
+      );
 
     case "settings":
       return (

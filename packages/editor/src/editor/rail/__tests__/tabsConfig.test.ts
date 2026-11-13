@@ -24,6 +24,10 @@ describe("tabsConfig helpers", () => {
       expect(getTabMode("settings")).toBe("fullpage");
     });
 
+    it("returns 'fullpage' for Components (2L9 215:43588 — a resource area, not a drawer)", () => {
+      expect(getTabMode("components")).toBe("fullpage");
+    });
+
     it("returns 'panel' for History tab", () => {
       expect(getTabMode("history")).toBe("panel");
     });

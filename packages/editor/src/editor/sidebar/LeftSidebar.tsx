@@ -16,7 +16,7 @@ import type { GroupedTabId, GroupedTabConfig } from "../rail/tabsConfig";
 import { getTabConfig, getFigmaRailGroups, RAIL_FIGMA_IDS, VIEWER_TABS } from "../rail/tabsConfig";
 import type { BlockData } from "@/shared/types";
 import type { PageSettingsOpenRequest } from "./tabs/pages/types";
-import { Button, HintTooltip, Menu, MenuGroup, MenuItem, Popover, useToast } from "@/editor/chrome-ui";
+import { Button, HintTooltip, Menu, MenuGroup, MenuItem, Popover } from "@/editor/chrome-ui";
 import { useEditLocks } from "@/editor/shared/useEditLocks";
 import { InspectorErrorBoundary } from "../inspector/components/InspectorErrorBoundary";
 import { PanelSkeleton, SidebarErrorFallback } from "./SidebarFallbacks";
@@ -421,45 +421,6 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   );
   useSidebarKeyboard(openTab, disabledTabs);
 
-  const { addToast } = useToast();
-
-  // Component creation handler
-  const handleCreateComponent = React.useCallback(() => {
-    if (!composer) return;
-    /*
-      The guard used to ask `composer.elements` for a `getComponents` method.
-      No such method exists anywhere — the components API lives on
-      `composer.components` (`ComponentManager.isAvailable()` at :483), which is
-      what every other caller checks, ComponentsTab included at its own :118.
-
-      So the guard was always false and this handler always returned on its
-      second line. It is what the Components panel's empty state calls from BOTH
-      of its actions — the inline "Create component" link and the footer
-      "+ Create component" button — so the only two things that panel offers a
-      new user did nothing at all. Measured live: zero dialogs, no toast, no
-      console error. Silence is what a wrong-manager typeof check buys.
-    */
-    if (!composer.components?.isAvailable?.()) return;
-    const selectedIds = composer.selection.getSelectedIds();
-    const elementId = selectedIds[0];
-    /* And with NOTHING selected it returned silently on the next line, which is
-       the state the empty state is FOR: both of its actions sit under copy that
-       says "Select an element on the canvas and save it as a component", and a
-       new user who clicks them first got no dialog, no toast, nothing. Say what
-       is missing instead of saying nothing. Measured live 2026-08-22: three
-       clicks (the header +, the inline link, the footer button), zero change of
-       any kind. */
-    if (!elementId) {
-      addToast({
-        description: "Select an element on the canvas first — a component is made from something.",
-        tone: "info",
-        duration: 4000,
-      });
-      return;
-    }
-    composer.emit(EVENTS.COMPONENT_CREATE_REQUESTED, { elementId });
-  }, [composer, addToast]);
-
   // Panel header info
   const tabConfig = getTabConfig(activeTab);
   const panelTitle = tabConfig?.label ?? "Panel";
@@ -569,7 +530,6 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
                   onElementSelect={onElementSelect}
                   canvasHoveredId={canvasHoveredId}
                   onSwitchToTemplates={() => onTabChange("templates")}
-                  onCreateComponent={handleCreateComponent}
                   projectId={projectId}
                   onOpenLibrary={onOpenLibrary}
                   onOpenImageEditor={onOpenImageEditor}

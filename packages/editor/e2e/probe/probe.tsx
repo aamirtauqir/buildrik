@@ -3694,7 +3694,6 @@ const CASES: Record<string, () => React.ReactElement> = {
         <div className="tw:flex tw:h-203 tw:w-70 tw:flex-col tw:overflow-hidden tw:bg-white">
           <ComponentsTab
             composer={COMPONENTS_COMPOSER}
-            onCreateNew={() => {}}
             onExpandToggle={() => {}}
             onClose={() => {}}
           />

@@ -23,7 +23,7 @@ function mount(components: never[]) {
   Object.assign(composer.components, { isAvailable: () => true, getInstancesOfComponent: () => new Array(6) });
   render(
     <ToastProvider>
-      <ComponentsTab composer={composer as never} onCreateNew={vi.fn()} />
+      <ComponentsTab composer={composer as never} />
     </ToastProvider>,
   );
   return composer;
@@ -71,7 +71,7 @@ describe("ComponentsTab — board 4418:142419", () => {
     });
     render(
       <ToastProvider>
-        <ComponentsTab composer={composer as never} onCreateNew={vi.fn()} />
+        <ComponentsTab composer={composer as never} />
       </ToastProvider>,
     );
     fireEvent.click(await screen.findByTestId("comp-row-menu"));
