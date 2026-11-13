@@ -279,7 +279,7 @@ export function getTabConfig(tabId: GroupedTabId): GroupedTabConfig | undefined 
 //   ai         → contextual: canvas selection ✨ + ⌘K command palette
 //   templates  → Pages panel "From template" (new-page flow) + ⌘K + shortcut T
 //   components → shortcut ⇧A + ⌘K ("Open Components"); reached from inside
-//                Add too — the Mine group's "Manage components ›" row
+//                Add too — the Mine group's "Components ›" row
 //                (G2-107) opens this same panel. v3 Q4 puts Components
 //                under Add, not Brand — an earlier version of this comment
 //                said "folds into Brand · components", which the v3 IA

@@ -72,7 +72,8 @@ export function buildInsertGroups(
     { id: "blocks", label: "BLOCKS", count: blockRows.length, kind: "inline" },
     /* Board 4428:140817 names them by where they come from. */
     { id: "components", label: "BUILT-IN COMPONENTS", count: componentRows.length, kind: "inline" },
-    { id: "mine", label: "SAVED COMPONENTS", count: mineCount, kind: "inline" },
+    /* 215:43556 (B6-K01): "Saved components · This site". */
+    { id: "mine", label: "Saved components · This site", count: mineCount, kind: "inline" },
   ];
 }
 

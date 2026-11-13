@@ -10692,9 +10692,9 @@
    "page": "05",
    "family": "components",
    "status": "active",
-   "authority": "board",
+   "authority": "founder:k01-door-copy-only-add-tabs-stay",
    "verified": "drift-open",
-   "verifiedNote": "Add row reads \"Manage components ›\" (build/components/GroupSection.tsx:522); board door is \"Components ›\" over a Saved components list",
+   "verifiedNote": "Owner 2026-11-13: K01 conflicts with J-F1.02 7:18981 (drift-fixed) and PLAY F1.02 302:3965 (match), which keep Add's ⋯ header and Elements / Blocks / Components tabs. Decision: only the door changes. Built (L-C 2026-11-13, get_design_context 215:43544): the saved group is \"Saved components · This site\" (215:43556) and its last row is \"Components ›\" as a 13/500 accent link (215:43547), still opening the Components area (BuildTab.test.tsx). The header placement, tab-less drawer and 40px thumbnail rows of this board are not built. Sibling group \"BUILT-IN COMPONENTS\" is still uppercase. Live not compared.",
    "tier": "P2"
   },
   {

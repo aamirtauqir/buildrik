@@ -33,7 +33,7 @@ interface GroupSectionProps {
   /** MINE (board 1069:4970): the user's own components as plain rows. */
   mine?: ComponentDefinition[];
   /** FROM LIBRARY (board 4418:99857): the workspace's shared masters, listed
-   *  under SAVED COMPONENTS before "Manage components ›". */
+   *  under "Saved components · This site" before "Components ›". */
   library?: ReadonlyArray<{ componentId: string; name: string }>;
   onLibraryInsert?: (componentId: string) => void;
   onDragStart: DragStartFn;
@@ -42,7 +42,7 @@ interface GroupSectionProps {
   onElClick: ElClickFn;
   onBlockInsert?: (block: BlockDefinition) => void;
   onMineInsert?: (component: ComponentDefinition) => void;
-  /** "Manage components ›" at the end of SAVED COMPONENTS (4418:99857). */
+  /** "Components ›" at the end of the saved group (4418:99857; copy 2L9 215:43547). */
   onManageComponents?: () => void;
   /** ★ on element rows (G2-115): which names are favourites, and the toggle. */
   favs?: Set<string>;
@@ -516,13 +516,16 @@ export const GroupSection: React.FC<GroupSectionProps> = ({
             role="button"
             tabIndex={0}
             data-testid="insert-mine-manage"
-            className="tw:flex tw:items-center tw:h-[var(--bk-size-row-dense)] tw:pl-[var(--bk-space-28)] tw:pr-[var(--bk-space-16)] tw:rounded-[4px] tw:cursor-pointer tw:text-[13px] tw:leading-[20px] tw:text-[var(--bk-ink)] hover:tw:bg-[var(--bk-bg-subtle)]"
+            className="tw:flex tw:items-center tw:h-[var(--bk-size-row-dense)] tw:pl-[var(--bk-space-28)] tw:pr-[var(--bk-space-16)] tw:rounded-[4px] tw:cursor-pointer tw:text-[13px] tw:leading-[20px] tw:font-medium tw:text-[var(--bk-accent)] hover:tw:bg-[var(--bk-bg-subtle)]"
             onClick={onManageComponents}
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onManageComponents(); }
             }}
           >
-            Manage components ›
+            {/* 215:43547 (B6-K01): the door is a 13/500 accent link, "Components ›".
+                It stays at the end of the group because the Add tabs and ⋯ of
+                7:18981 / 302:3965 hold the header (owner, 2026-11-13). */}
+            Components ›
           </div>
         )}
       </>

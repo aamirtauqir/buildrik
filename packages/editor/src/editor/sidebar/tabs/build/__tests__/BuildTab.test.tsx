@@ -58,7 +58,8 @@ describe("BuildTab — board 137:2 taxonomy", () => {
     openTab("Blocks");
     expect(screen.getByTestId("insert-group-blocks")).toBeTruthy();
     openTab("Components");
-    for (const label of ["BUILT-IN COMPONENTS", "SAVED COMPONENTS"]) expect(screen.getByText(label)).toBeTruthy();
+    // 215:43556 (B6-K01) names the saved group "Saved components · This site".
+    for (const label of ["BUILT-IN COMPONENTS", "Saved components · This site"]) expect(screen.getByText(label)).toBeTruthy();
     expect(screen.queryByText("TEMPLATES")).toBeNull();
   });
 
@@ -133,7 +134,7 @@ describe("BuildTab — element row icons come from the shared lucide map", () =>
 });
 
 /* G2-111 — board 4418:99857: SAVED COMPONENTS rows carry a ⠿ grip and drag
-   onto the canvas; the group ends in "Manage components ›"; an empty group
+   onto the canvas; the group ends in "Components ›" (2L9 215:43547); an empty group
    says how to make one. */
 describe("BuildTab — SAVED COMPONENTS (G2-111)", () => {
   const composerWith = (saved: Array<{ id: string; name: string }>) => {
@@ -160,11 +161,15 @@ describe("BuildTab — SAVED COMPONENTS (G2-111)", () => {
     expect(setData).toHaveBeenCalledWith("application/x-aquibra-component", "c1");
   });
 
-  it("Manage components › opens the Components panel", () => {
+  /* 215:43547 (B6-K01): the door reads "Components ›" as a 13/500 accent link. */
+  it("Components › opens the Components panel", () => {
     const { composer, emit } = composerWith([{ id: "c1", name: "Menu card" }]);
     renderTab({ composer });
     openTab("Components");
-    fireEvent.click(screen.getByTestId("insert-mine-manage"));
+    const door = screen.getByTestId("insert-mine-manage");
+    expect(door.textContent).toBe("Components ›");
+    expect(door.className).toContain("--bk-accent)");
+    fireEvent.click(door);
     expect(emit).toHaveBeenCalledWith("ui:switch-tab", { tab: "components" });
   });
 
