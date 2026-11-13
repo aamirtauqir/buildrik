@@ -105,7 +105,7 @@ do NOT apply here):
 
 ## Aesthetic Direction
 - **Direction:** Industrial / Utilitarian, **light chrome**. Premium tool, not premium marketing. "Webflow meets Linear, daylight edition."
-- **Decoration level:** Minimal. Surfaces communicate depth through layered warm neutrals and hairline borders. No gradients, no blobs, no grain, no decorative texture, no shadows beyond subtle elevation on modals.
+- **Decoration level:** Minimal. Surfaces communicate depth through layered warm neutrals and hairline borders. No gradients, no blobs, no grain, no decorative texture, no decorative shadows — elevation only on floating layers (menus/popovers `--bk-shadow-drag`, modals/overlays `--bk-shadow-overlay`) *(R-1018, V4)*.
 - **Mood:** A calm, daylit studio. The chrome steps out of the way so the canvas (the user's actual work) is the loudest thing on screen. Confidence without showmanship.
 - **Reference points (in-distribution, not copied):** Linear light mode, Vercel dashboard, Notion, Arc browser toolbar. Not: Figma (too colorful in chrome), Canva (too soft).
 
@@ -114,8 +114,8 @@ do NOT apply here):
 The editor chrome contains **zero pure-black or near-black surfaces**. This is the single most important visual rule after the accent rule.
 
 - No `#000`, `#0a0a0a`, `#14141f`, `#1F2937` (near-black navy), or any hex with all three RGB channels under `0x35` as a surface, background, or fill.
-- Text can be dark — darkest allowed is `#334155` (slate-700) — but never `#000` or `#1F2937`.
-- Account avatar, context menus, tooltips all follow this. The legacy `#1F2937` avatar pill is replaced by cobalt-on-white.
+- Text uses the ink scale. **The ink token governs:** the darkest text is `--bk-ink` `#111827` (gray-900), the live generated token used everywhere — never `#000`. *(R-1018, V9: this line capped text at `#334155` slate-700, which contradicted the live `--bk-ink` since the 2026-07-29 Flowbite re-base. The rule is about black/near-black **surfaces**; text follows the token.)*
+- Account avatar and context menus follow this. The legacy `#1F2937` avatar pill is replaced by cobalt-on-white. **Tooltips are the one exception:** an ink bubble with white text, lifted by owner decision #25 on 2026-09-24 (`chrome-ui/tooltipTheme.ts`) *(R-1018)*.
 - Icons inherit `currentColor` from the text scale. No independent "icon-only dark tone."
 
 If you are tempted to reach for black for emphasis, use `--accent` (cobalt) instead. It carries the same weight without violating the rule.
@@ -146,7 +146,9 @@ so following the doc produced a build failure. The `ui` stack also carried
 `-apple-system, BlinkMacSystemFont, "Segoe UI"`, which is what the rule directly
 above this block forbids; removed from the token source the same day.)*
 
-**Type ramp (Figma "Type — 11 styles"):** ui/11 caption (11/16, 500) · ui/12 small (12/16) · ui/13 row label (13/20, 400/500) · ui/14 panel title (14/20, 600) · ui/16 heading (16/24, 600, −0.06em) · ui/20 heading lg (20/28, 600) · ui/24 title (24/32, 600) · data/11–13 in Geist Mono. **Weights cap at 600 — no 700 anywhere in chrome.** Editor chrome lives mostly at 12–14. Panel/drawer headers = 11/500 UPPERCASE ink-soft.
+**Type ramp (Figma "Type — 11 styles"):** ui/11 caption (11/16, 500) · ui/12 small (12/16) · ui/13 row label (13/20, 400/500) · ui/14 panel title (14/20, 600) · ui/16 heading (16/24, 600, −0.06em) · ui/20 heading lg (20/28, 600) · ui/24 title (24/32, 600) · data/11–13 in Geist Mono. **Weights cap at 600 — no 700 anywhere in chrome.** Editor chrome lives mostly at 12–14.
+
+**Header ladder (one role per size — R-1018, V6, 2026-10-18):** area title **20/30/600** (Settings, CMS, Brand, Templates, Components area headers; leading-30 replaces ui/20's 28 at the next Figma regeneration) · dialog / L1 header **16/24/600** · panel / task header **14/20/600** (Add, Layers, right task host, Inspector element name) · section header **12/16/600, sentence case** (Inspector sections, menu groups, list group headers) · body/control 13/20 (labels 500) · meta/caption 12/16 ink-muted · micro label **11/16/500** for rail labels, box-model labels and badges only. **No uppercase headers.** (The line "Panel/drawer headers = 11/500 UPPERCASE ink-soft" that stood here contradicted ui/14 panel title in the same sentence and is deleted.) Source: `packages/editor/docs/audit-and-design-2026-10-16/design-audit-2026-10-18/DESIGN_SYSTEM_SPECIFICATION.md` §2.3.
 
 ## Color — the Flowbite palette (founder-confirmed 2026-07-29)
 
@@ -177,22 +179,44 @@ floating drawers).
 ```
 --bk-border:         #E5E7EB   /* gray-200, default hairline */
 --bk-border-medium:  #D1D5DB   /* gray-300, inputs + buttons */
---bk-border-input:   #9CA3AF   /* gray-400 */
---bk-border-strong:  #9CA3AF   /* gray-400, hover */
+--bk-border-input:   #868C97   /* interactive control boundary (needs 3:1) */
+--bk-border-strong:  #868C97   /* hover / strong boundary */
 ```
 
+*(R-1018: input/strong re-transcribed from `tokens.generated.css`; this block said
+`#9CA3AF` gray-400, which is no longer the token. Measured: `#868C97` = 3.38:1 on
+white, 3.07 on `#F3F4F6`, **2.89 on accent-subtle** — an input inside a selected
+row keeps no fill change or uses an `--bk-ink-muted` border.)*
+
 Focus = accent border + `--bk-shadow-focus: 0 0 0 2px rgba(26,86,219,.30)` —
-a soft 2px accent ring, the Flowbite focus language at editor density.
+a soft 2px accent ring, the Flowbite focus language at editor density. **This is
+current** (founder 2026-07-29); the 2026-07-26 "2px accent with no halo" entry in
+the Decisions Log is superseded by it *(R-1018)*.
 
 ### Text — the ink scale (no pure black, ever)
 
 ```
 --bk-ink:          #111827   /* gray-900 — primary text */
 --bk-ink-soft:     #4B5563   /* gray-600 — secondary labels, panel headers */
---bk-ink-muted:    #6B7280   /* gray-500 — captions, counts, footer */
+--bk-ink-muted:    #6C7079   /* captions, counts, footer (re-transcribed R-1018; was written #6B7280) */
 --bk-ink-disabled: #D1D5DB   /* gray-300 — visibly inert */
 --bk-accent-on:    #FFFFFF   /* white on accent surfaces */
 ```
+
+**Measured contrast (WCAG 2.x, from token values — R-1018; replaces the earlier
+"11.6 / 7.0 / 3.7" claims):**
+
+| Text | on `#FFFFFF` | on `#F3F4F6` | on accent-tint (hover) | on accent-subtle (selected) |
+|---|---|---|---|---|
+| `--bk-ink` | 17.74 | 16.12 | 16.08 | 15.19 |
+| `--bk-ink-soft` | 7.56 | 6.87 | 6.85 | 6.47 |
+| `--bk-ink-muted` | **4.96** | 4.51 | 4.499 (fails) | **4.25 (fails)** |
+
+Rule: on any accent-filled row (hover on accent-family items, or selected), meta
+text switches from ink-muted to **ink-soft**. On `#F3F4F6` ink-muted passes by
+0.01, so no further dimming is allowed there. Opacity-dimmed text is banned; use
+ink-muted (+ italic or an icon). Disabled-with-reason text uses ink-muted, not
+ink-disabled (1.47:1).
 
 ### Accent (single blue — the guard against a second blue)
 
@@ -218,10 +242,16 @@ frame/alpha opacity. Alpha survives only where transparency is the point
 --bk-success: #0E9F6E   --bk-success-text: #057A55   --bk-success-tint: #DEF7EC
 --bk-warning: #C27803   --bk-warning-text: #723B13   --bk-warning-tint: #FDFDEA
 --bk-error:   #E02424   --bk-error-text:   #C81E1E   --bk-error-tint:   #FDE8E8
---info:       = accent (blue family — one blue)
+info:         no token — NEUTRAL: --bk-ink-soft on --bk-bg-subtle + info icon (R-1018, V2)
 ```
 
-Fill = dots/icons/borders. Text = labels on the matching tint. Tint = the chip/badge background. Use for status indicators only (save state, validation, toasts). Never for decoration.
+Fill = dots/icons/borders. Text = labels on the matching tint. Tint = the chip/badge background. Use for status indicators only (save state, validation, toasts). Never for decoration. **Info banners are neutral grey + icon** — "info = accent" made info banners read as CTAs (R-1018, V2).
+
+### Selection, hover, canvas overlays *(R-1018)*
+
+- Hover on neutral rows: `--bk-bg-subtle`. Hover on accent-family items (rail, tabs): `--bk-accent-tint`.
+- Selected rows, tree items, cards: `--bk-accent-subtle` fill + ink text (meta → ink-soft). One hover token, one selected token.
+- Canvas selection, drop target and insertion line: accent. **Snap / alignment guides are red** — new token `--bk-canvas-guide` (proposed red-500 `#F05252`; added through Figma → `generate.mjs`, pending) (V3). Box model keeps `--bk-boxmodel-*`. CMS-bound badge: ink-soft on bg-subtle + icon (not accent). Lock badge: warning-text on warning-tint.
 
 ## Spacing
 - **Base unit:** 4px.
@@ -229,14 +259,16 @@ Fill = dots/icons/borders. Text = labels on the matching tint. Tint = the chip/b
 - **Scale:** 2 / 4 / 8 / 12 / 16 / 24 / 32 / 48 / 64.
 
 ## Layout
-- **Editor:** Grid-disciplined. Topbar (56px) / Left rail (60px) / **Drawer 280px — all six panels** / canvas (flex) / **right inspector 300px**. *(Corrected 2026-07-19: read "240 nav / 320 authoring" and "inspector 320px". Both were the previous IA and both were outside the supersede banner below, so they read as live. The canonical source for every chrome dimension is `docs/designs/2026-07-18-editor-shell-wireframes.md` — this line exists only so it does not contradict it.)*
-- **Border radius scale (Flowbite):** `sm: 4px` (row corners, small chips), `md: 6px` (icon tiles, compact controls), `lg: 8px` (buttons, inputs, panels, cards, modals — Flowbite rounded-lg), `full: 9999px` (pills, avatars).
+- **Editor:** Grid-disciplined. Topbar (56px) / Left rail (**56px**, GEO-01) / **Add/Layers drawer 284px (260–360)** / canvas (flex) / **right Inspector 300px** or task host 360px (320–420) *(R-1018 — this line said rail 60 / drawer 280 "all six panels"; those are the as-built token values until Figma regeneration)*. *(Corrected 2026-07-19: read "240 nav / 320 authoring" and "inspector 320px". Both were the previous IA and both were outside the supersede banner below, so they read as live. The canonical source for every chrome dimension is `docs/designs/2026-07-18-editor-shell-wireframes.md` — this line exists only so it does not contradict it.)*
+- **Editor geometry (R-1018 — GEO-01, approved BD-21, supersedes the line above where they differ):** topbar 56 · **rail 56** · **Add/Layers drawer 284 (260–360, bounded resize)** · Inspector 300 fixed (overlay ≤1366 = 300 + 12 inset) · **right task host 360 (320–420)** · resource local nav 240 · resource detail 320 · **area header 56** · task header/footer 48 · drawer header 44 · bottom bar / drawer footer 32 · canvas toolbar 44 · dialogs 480 / 560 / 640 / 720 / 960 · **popovers 240 / 280 / 360** (V7) · toast 460 max. **Tokens pending Figma regeneration:** the generated tokens still say rail 60, drawer 280, panel-right 300, header 44, panel-footer 44 (`tokens.generated.css`); they change only through Figma → `node scripts/tokens/generate.mjs`, never by hand. Full table: `packages/editor/docs/audit-and-design-2026-10-16/design-audit-2026-10-18/DESIGN_SYSTEM_SPECIFICATION.md` §2.6 and `REMAINING-IA-HANDOFF.md` GEO-01.
+- **Border radius scale (Flowbite) — split by surface (G13, 2026-09-02):** panel chrome (panels, headers, toolbars, rows, inspector sections, rail) ≤ `sm: 4px`; `md: 6px` icon tiles, toast; `lg: 8px` form atoms (buttons, inputs, selects, chips), cards, popovers, menus — Flowbite rounded-lg; `xl: 12px` modals; `full: 9999px` pills, avatars *(R-1018: this line said lg 8 for "panels … modals", which contradicted G13 and §Chrome Axioms A1.3)*.
 - **Topbar height:** 56px — canonical. All other chrome heights flow from this rhythm.
-- **Panel header height:** 44px — matches sidebar contract. Every drawer panel (Add, Layers, Pages, Assets, CMS root, Components, History) uses `PanelHeader` at 44. Three named variants are drawn by their own boards and are not drift (DQ-027, measured 2026-10-10):
+- **Panel header height:** 44px — the **drawer** header only: **Add and Layers** use `PanelHeader` at 44. Editor **areas** (CMS, Assets, Brand, Site settings, Templates, Components) use the **56px area header**; right-host **tasks** (incl. History) use the **48px task header** (GEO-01 / DS §2.6) *(R-1018 — this line listed Pages, Assets, CMS root, Components and History at 44)*. Three named variants are drawn by their own boards and are not drift (DQ-027, measured 2026-10-10):
   - **Workspace header, 56px** — a full-width workspace beside the drawer carries its own 16/600 title bar under the topbar: CMS collection (`cms-ws-header`, board 4428:143182 "Collection header" 1100×56).
   - **Workspace page, no PanelHeader** — Brand replaces the drawer and canvas with a full-page workspace: the nav column opens with `‹ Back to canvas` (board 7315:80955) over an `h1` "Brand" at 24/600, and each page titles itself with an `h2` at 20/600 (both on the ui/* ramp).
   - **Inspector header, 72px** — breadcrumb, element title and the ✦ AI / ⋯ / ✕ actions on two lines (Inspector v4, board 7993:198599).
-  A new surface uses `PanelHeader` (44) unless its board draws one of these.
+  - **Task header, 48px** — the right task host (Publish, Review, History, Activity, Issues), `panels/12-RIGHT-TASK-HOST.md` *(R-1018)*.
+  A new surface uses `PanelHeader` (44) unless its board draws one of these. **Header type follows the ladder in §Typography (V6):** area headers (56) title 20/30/600, drawer/task headers 14/20/600 — the 16/600 workspace title and 24/600 Brand `h1` above are as-built values that move to the ladder *(R-1018)*.
 
 ## Overflow — what happens when the content is longer than the box
 
@@ -273,7 +305,7 @@ more; something has to be able to show it.
 ## Motion
 - **Approach:** Minimal-functional. Only transitions that aid comprehension.
 - **Easing:** house curve `cubic-bezier(0.2, 0, 0, 1)` (ease-out) for enter/hover; `ease-in` for exit.
-- **Duration (Figma motion tokens, 2026-07-26):** hover/press `100ms` (fast), panel/drawer `160ms` (base), modal/overlay enter `240ms` (slow). No spring physics. No scroll choreography. No entrance animations on first paint. No hover lifts/scales — the design moves color, not geometry.
+- **Duration (Figma motion tokens, 2026-07-26) — these three only (R-1018, V5):** `100ms` fast (hover, press, focus, tooltip in) · `160ms` base (popover/menu open, row expand, toast in) · `240ms` slow (sheet/overlay/task-host slide, banner slide). **No other durations** (e.g. palette 120 → 100) and **no pulse** or other decorative loop. Every animation names its `prefers-reduced-motion` result (fade → instant; slide → fade 100). This replaces the old "≤150 ms only" wording in Axiom A3. No spring physics. No scroll choreography. No entrance animations on first paint. No hover lifts/scales — the design moves color, not geometry.
 - **Reduced motion:** respect `prefers-reduced-motion: reduce` — disable all non-essential transitions.
 
 ## ⚠ Editor layout sections — SUPERSEDED 2026-07-18
@@ -287,11 +319,11 @@ The live editor layout is:
 
 | Concern | Now |
 |---|---|
-| Rail | **6 flat tool icons**, no zones, frequency-ordered: Insert · Layers · Pages · Media · Content · Brand |
-| Retired from the rail | Templates (dissolved into the New-Page flow + Insert) · AI (⌘K + canvas selection toolbar) · Settings & Publish (the separate Site full-page) · History (the save-status pill → Versions) |
-| Comments | a canvas **mode** (💬, key `C`), not a panel |
-| Shortcuts | `A` Insert · `P` Pages · `L` Layers · `M` Media · `D` Content · `B` Brand · `C` comment · `⌘P` preview · `⌘K` palette |
-| Panel width | **280 for all six** (declared override of the 240/320 Width Rule below — 240 cannot hold the Pages SEO table or a deep Layers tree. Was 320 until 2026-09-01: the "320 floor" came from Media's fixed 136px asset cells, and that number was then cited as the reason the drawer could not narrow. Cells made fluid, measured live at 280 with no overflow.) |
+| Rail | **SSOT is `packages/editor/docs/audit-and-design-2026-10-16/panels/02-LEFT-RAIL.md`** (Add · Layers │ Assets · CMS · Brand │ Help, BD-05). Not restated here — the "6 flat tool icons: Insert · Layers · Pages · Media · Content · Brand" list that stood here was stale *(R-1018)* |
+| Retired from the rail | Pages → bottom bar; Site settings → topbar (BD-14); Templates and Components → their own areas; see panel 02 *(R-1018)* |
+| Comments | a canvas **mode**, not a panel (icon per the Lucide set, no emoji) |
+| Shortcuts | **SSOT is `panels/00-SHARED-CONTRACTS.md` SC-12** (scope/platform table). Not restated here *(R-1018 — the `A/P/L/M/D/B` list was stale)* |
+| Panel width | Add/Layers **284 (260–360)** per GEO-01; the other drawers became areas. The 280 drawer token is as-built until Figma regeneration *(R-1018)* |
 
 **Authoritative layout specs — build from these, not from the sections below:**
 - `docs/designs/2026-07-17-editor-product-redesign-complete.md` **§4.3** — the placement map (what goes where)
@@ -299,7 +331,7 @@ The live editor layout is:
 - `docs/designs/2026-07-18-site-fullpage-wireframes.md` — the Site full-page area
 - `docs/prd/editor/14-screen-specs.md` — per-screen specs
 
-**What in DESIGN.md still holds and is still SSOT:** every *value* — colour, typography, spacing scale, motion timings, row density (28h dense / 32h standard), the NO BLACK rule, accent, semantic colours, token namespace, chrome axioms, anti-slop rules, accessibility. Only the *layout* sections below are stale.
+**What in DESIGN.md still holds and is still SSOT:** every *value* — colour, typography, spacing scale, motion timings, row density (28 dense / 32 tool / 40 thumbnail resource lists / 48 / 56 — R-1018), the NO BLACK rule, accent, semantic colours, token namespace, chrome axioms, anti-slop rules, accessibility. Only the *layout* sections below are stale.
 
 *Note: these sections already contradict each other — "11 rail-visible tabs" at Sidebar Panel System vs "Composition Map — 8 Tabs" — which is part of why they should not be built from.*
 
@@ -340,7 +372,7 @@ header canonicalization (commits `0a2410a4`..`f9377302`).
 
 | Width | Mode | Tabs | Purpose |
 |-------|------|------|---------|
-| **280px** | drawer | every drawer panel | One drawer width, one token: `--bk-size-drawer: 280px`. Change it in Figma, re-export, regenerate — never by hand. |
+| **284px (260–360)** | drawer | Add, Layers | GEO-01 *(R-1018)*. The token `--bk-size-drawer` still reads 280 until it is changed in Figma, re-exported and regenerated — never by hand. Other former drawers are areas. |
 | **Fullpage** | surface | Templates, Media, Settings, Design | Grids, forms, token editors. |
 
 *(A 240px "nav mode" row sat here until 2026-08-03, contradicting §Layout above
@@ -355,19 +387,21 @@ pinned to a hardcoded number while the panel sized from the token. The matching
 
 | Height | Use | Typography |
 |--------|-----|-----------|
-| **28px** | Layers tree, dense lists | 12px label |
-| **32px** | Standard list rows | 13px label |
-| **48px** | Cards with metadata | 13px + 11px mono meta line |
+| **28px** | Layers compact mode, dense lists | 12px label |
+| **32px** | Tool lists: Add items, Layers default, menus, Inspector rows, palette rows | 13px label |
+| **40px** | **Resource lists with a thumbnail** — Pages, Assets list view, CMS records, Components, People (R-1018, V1) | 13px label + thumbnail |
+| **48px** | Two-line compact rows, cards with metadata | 13px + 11px mono meta line |
+| **56px** | Two-line rows with avatar | 13px + 12px meta |
 
-Never 40px. Desktop power users want density.
+40px is for thumbnail resource lists only (owner-approved deviation V1, 2026-10-18); tool lists stay 32. Desktop power users want density. *(This said "Never 40px" until 2026-10-18.)*
 
 ### Content Rules
 
 1. **Numeric values use Geist Mono + `tabular-nums`.** Page counts, file sizes, timestamps, version numbers, dimensions, slugs.
 2. **Icons only where they disambiguate.** Labels carry.
 3. **No category-colored accents.** Category is grouping + label, not hue.
-4. **Hover is quiet.** `background: var(--accent-subtle)` or `background: var(--aqb-bg-subtle)`.
-5. **Selection is cobalt-tinted.** `background: var(--accent-tint)`, `color: var(--accent)`.
+4. **Hover is quiet.** Neutral rows `background: var(--bk-bg-subtle)`; accent-family items (rail, tabs) `var(--bk-accent-tint)` *(R-1018; dead `--aqb-*` name removed)*.
+5. **Selection is cobalt-tinted.** `background: var(--bk-accent-subtle)`, ink text (meta → ink-soft) — one selected token, see §Color › Selection *(R-1018: this said accent-tint, contradicting §Color)*.
 6. **Empty states are typographic.** 13px muted title, 12px tertiary body, one primary action. No illustrations.
 
 ### Composition Map — 8 Tabs (light chrome)
@@ -385,7 +419,7 @@ Never 40px. Desktop power users want density.
 
 ### Rail Rules
 
-Rail is 60px, `--aqb-bg-panel` (`#F8FAFC`), three zones (Creation / Structure / Config) separated by `--aqb-border` hairlines. Active button has a 3px cobalt left bar AND `--accent-tint` background. Every tab has a rail button — Design and Publish get buttons (previously keyboard-only).
+*(R-1018)* Rail is **56px** (GEO-01; the generated `--bk-size-rail` still reads 60 until Figma regeneration) on `--bk-bg-app`, groups separated by `--bk-border` hairlines. Items and groups: `panels/02-LEFT-RAIL.md` (not restated here). Active item has a 3px accent bar AND `--bk-accent-tint` background. (This line described a 60px three-zone rail on dead `--aqb-*` tokens.)
 
 ## Anti-Slop Rules — **editor chrome only** (enforce in QA and code review)
 
@@ -398,7 +432,7 @@ Rail is 60px, `--aqb-bg-panel` (`#F8FAFC`), three zones (Creation / Structure / 
 > ink hero surfaces, brand-coloured app tiles, multi-column card grids). The doc was
 > wrong, not the code. Auth and onboarding follow their own scoped sections.
 
-1. **NO black or near-black surfaces.** No `#000`, `#14141f`, `#1F2937`. Primary text caps at `#334155` slate-700.
+1. **NO black or near-black surfaces.** No `#000`, `#14141f`, `#1F2937`. Primary text = `--bk-ink` `#111827` (the token governs — R-1018, V9); tooltips excepted per decision #25.
 2. No purple, violet, indigo gradients. Ever.
 3. No 3-column feature grid with icons in colored circles.
 4. No centered-everything sections.
@@ -407,14 +441,14 @@ Rail is 60px, `--aqb-bg-panel` (`#F8FAFC`), three zones (Creation / Structure / 
 7. No colored left-border card treatment.
 8. No default font stacks. No specific named fallbacks (`Helvetica`, `Arial`, `system-ui`).
 9. Cards earn their existence. If it's not interactive, don't wrap it in a card.
-10. No shadows on flat surfaces. Depth is hairline borders + warm neutral layering. Only modals get elevation shadow.
+10. **No decorative shadows.** Depth is hairline borders + warm neutral layering. Elevation tokens only on floating layers: menus/popovers `--bk-shadow-drag`, modals/overlays `--bk-shadow-overlay` *(R-1018, V4 — was "Only modals get elevation shadow", which contradicted the 3-step scale in §Color)*.
 11. No category-colored accents (e.g., `--media-img: #3b82f6`). One accent only.
 12. No per-row action strips. Actions live in hover-reveal overflow menus.
 
 ## Accessibility
 
-- WCAG AA minimum on all body text. Primary text on panel: 11.6:1 (AAA). Secondary: 7.0:1 (AAA). Muted: 3.7:1 (AA large).
-- Keyboard navigable. Global: `⌘K` (command palette), `⌘Z` / `⌘⇧Z` (undo/redo), `⌘P` (preview). Rail: `A / T / M / Z / P / ⇧A / D / S / U / H` per tab shortcut.
+- WCAG AA minimum on all body text. Measured on white: ink 17.74:1, ink-soft 7.56:1, ink-muted 4.96:1 (AA normal text); ink-muted fails on accent-filled rows (4.25 on accent-subtle) → ink-soft there. Full table in §Color *(R-1018; replaces "11.6 / 7.0 / 3.7")*.
+- Keyboard navigable. Shortcut keys, scope and platform: **`panels/00-SHARED-CONTRACTS.md` SC-12 is the SSOT** — not restated here *(R-1018; the rail `A / T / M / Z / P / ⇧A / D / S / U / H` list was stale)*.
 - Touch targets ≥ 44×44 on marketing site (editor is desktop-only).
 - ARIA landmarks on main editor regions (topbar, rail, sidebar, canvas, inspector).
 - Respect `prefers-reduced-motion: reduce` — disable all non-essential transitions.
@@ -433,9 +467,10 @@ Rail is 60px, `--aqb-bg-panel` (`#F8FAFC`), three zones (Creation / Structure / 
 
 | Date | Decision | Rationale |
 |------|----------|-----------|
+| 2026-10-18 | **Editor-chrome corrections + owner decisions V1–V9 (approved deviations)** | Owner approved all 45 decisions of the 2026-10-18 design audit (`packages/editor/docs/audit-and-design-2026-10-16/design-audit-2026-10-18/OWNER-DECISIONS-2026-10-18.md`), including the DESIGN.md deviations, as CLAUDE.md requires. Applied: **V1** row density adds 40 for thumbnail resource lists (Pages included; tool lists 32) · **V2** info banners neutral grey + icon (no "info = accent") · **V3** red snap/alignment guides, new token `--bk-canvas-guide` via Figma · **V4** menus/popovers use `shadow-drag`; anti-slop #10 → "no decorative shadows" · **V5** motion 100/160/240 only, no pulse, reduced-motion result named; "≤150 ms" retired · **V6** header ladder (area 20/30/600 · panel/task 14/20/600 · section 12/16/600 sentence case); "Panel/drawer headers = 11/500 UPPERCASE" deleted · **V7** popover widths 240/280/360 · **V9** ink token `#111827` governs text; NO BLACK reworded to surfaces. Plus DS-spec §6 corrections: §Color re-transcribed from `tokens.generated.css` (border-input/strong `#868C97`, ink-muted `#6C7079`) with measured contrast replacing the old claims; one hover + one selected token; focus = accent border + soft ring (2026-07-29) — the 2026-07-26 "no halo" wording is superseded; radius keeps the G13 surface split; dead `--buildrick-*` / `--aqb-*` names → `--bk-*`; §Layout adopts GEO-01 (rail 56, drawer 284 260–360, task host 360 320–420, area header 56; tokens pending Figma regeneration); tooltip exception (decision #25) recorded; rail and shortcut lists point to panel 02 and SC-12. Auth, dashboard and onboarding sections untouched. |
 | 2026-07-30 | **Dashboard/auth/onboarding Flowbite migration SHIPPED (Tailwind-native)** | Closes the 2026-07-29 "pending Flowbite migration" for the three Next.js surfaces. `flowbite-react` installed in `packages/dashboard`; `@plugin "flowbite-react/plugin/tailwindcss"` wired in `app/globals.css` (no prefix — no customer canvas in the dashboard, so Tailwind preflight is fine). All `@theme` token VALUES flipped to the canonical Flowbite set mirrored from the editor's `tokens.generated.css`: accent `#1A56DB`/`#1E429F`, subtle `#E1EFFE`, tint `#EBF5FF`; neutrals → Flowbite gray (`#111827`/`#4B5563`/`#6B7280`, borders `#E5E7EB`/`#D1D5DB`, bg `#F3F4F6`); semantic triads → Flowbite green/yellow/red (`#0E9F6E`/`#C27803`/`#E02424` + tints); destructive `#9B1C1C`. Token NAMES (`--color-*`, `auth-*`, `onb-*`) unchanged — consumers untouched. Inline old-palette hexes swept in 10 files (review-client, editor-route skeleton/boundary, templates, learn, domains, cancel-modal, ticket-form, review-invite email, workspace-form DEFAULT_ACCENT). Primitives' internals move to flowbite-react components in the same arc (keeper rule: primitive API stays, paint changes). |
 | 2026-07-29 | **Flowbite palette CONFIRMED as the product design language; accent → `#1A56DB`** | Founder confirmed the Flowbite re-base of the Figma foundation (2026-07-28) as final. Single accent moves `#406ED6` → **`#1A56DB`** (blue-700; hover blue-800 `#1E429F`, pressed blue-900 `#233876`, subtle blue-100 `#E1EFFE`, tint blue-50 `#EBF5FF`). Neutrals move slate → Flowbite gray (ink `#111827`/`#4B5563`/`#6B7280`); semantic triads → Flowbite green/yellow/red; radius lg 8px (rounded-lg) on buttons/inputs/cards/modals; focus = accent border + soft 2px ring `rgba(26,86,219,.30)`. Purple ramp allowed as identity/semantic data only (avatar tones, PRO badge) — still banned as accent/gradient. **Editor SHIPPED on this** via `ds/fresh-token-system` (generated `--bk-*` tokens + `src/editor/ui/` library, migration 402→0). Dashboard/auth/onboarding stay on `#406ED6` pending their Flowbite migration (Tailwind-native route expected). Values in this doc's §Color are transcriptions of `tokens.generated.css` — Figma is the source of truth. |
-| 2026-07-26 | **Editor chrome DS replaced with the Figma "Buildrick — Product" foundation** | Founder-directed replacement (Figma file `g4GzQFqzNYz5sosz1QtZXC`): the editor's token layer was rewritten from the file's Foundations page and all 173 shipped components. Concrete flips: editor UI font Inter Tight → **Inter**; accent shades corrected (hover `#2E56B8` — was lighter `#5E86E0`; pressed `#264899`); accent/semantic tints became **pre-mixed opaque** values (`accent-subtle #EBF1FF`, `accent-tint #ECF0FB`, success/warning/error tints `#E3F4E9/#FAECDC/#FBE5E5`) per the Figma "never frame opacity" rule; text ramp darkened onto the ink scale (`#0F172A/#485465/#656F7E`); elevation collapsed to the 3-step raised/drag/overlay scale; focus = 2px accent with **no halo**; motion re-based to 100/160/240ms ease-out with hover lifts/scales retired; weights cap at 600. Legacy token names survive only as references onto the new set — no legacy value survives. Conformance locked by `figma-32-2-conformance.test.ts` (rewritten against the new file). |
+| 2026-07-26 | **Editor chrome DS replaced with the Figma "Buildrick — Product" foundation** | Founder-directed replacement (Figma file `g4GzQFqzNYz5sosz1QtZXC`): the editor's token layer was rewritten from the file's Foundations page and all 173 shipped components. Concrete flips: editor UI font Inter Tight → **Inter**; accent shades corrected (hover `#2E56B8` — was lighter `#5E86E0`; pressed `#264899`); accent/semantic tints became **pre-mixed opaque** values (`accent-subtle #EBF1FF`, `accent-tint #ECF0FB`, success/warning/error tints `#E3F4E9/#FAECDC/#FBE5E5`) per the Figma "never frame opacity" rule; text ramp darkened onto the ink scale (`#0F172A/#485465/#656F7E`); elevation collapsed to the 3-step raised/drag/overlay scale; focus = 2px accent with **no halo** *(superseded 2026-07-29 by accent border + soft 2px ring — R-1018)*; motion re-based to 100/160/240ms ease-out with hover lifts/scales retired; weights cap at 600. Legacy token names survive only as references onto the new set — no legacy value survives. Conformance locked by `figma-32-2-conformance.test.ts` (rewritten against the new file). |
 | 2026-07-21 | **Dashboard IA follow-up — Templates → top nav, Help → Resources, Projects → Sites** | Post-IA-v2 cleanup (Codex dashboard audit): Templates moved out of the sidebar into the ecosystem top nav (it's a browse-the-catalog surface, not a workspace destination); the labeled Support group was dropped — Getting started folds into the main sidebar group and Help centre moves into Resources; the `Projects` sidebar item was relabelled **Sites** (route unchanged, `/dashboard/projects`). Sidebar settles at a single 6-item group `Home · Getting started · Sites · Agency (agency-only) · Media · Settings`. SSOT `components/dashboard/shell/nav.ts` reflects this; the shell bullets above were updated to match. No accent/token change. |
 | 2026-07-18 | **Single accent → `#406ED6` (UI kit); onboarding's scoped blue retired** | Founder adopted the supplied UI kit (`docs/design/dashboard-ui-kit.md`) over the cobalt reskin values, and chose to flip auth + onboarding with the dashboard so the kit's "one blue" rule (§7.2) actually holds. `--color-primary`, `--color-auth-cta` and `--color-onb-primary` all → `#406ED6` (hover `#2E56B8`); `--color-nav-label-active` → `#2E56B8`. The `.onb-scope` focus override and the short-lived `.dash-scope` override were both deleted — with one accent there is nothing to scope, and the global ring now resolves to `--color-primary`. Supersedes the 2026-07-12 RED→COBALT unification for these three surfaces. **Editor chrome remains cobalt `#2D6DFF`** in its own `--buildrick-*` DS (separate token contract + CI gates) and is a pending migration — until it lands, editor and app chrome differ. |
 | 2026-07-18 | **Anti-Slop Rules scoped to editor chrome; dashboard allowances made explicit** | The 12 anti-slop rules sat at top level and read as global, but were written alongside the editor Rail/Composition specs. As global rules they contradicted shipped dashboard code on four counts — card elevation shadows (#10), the ink `#141924` featured surface and filter chip (#1), per-app brand tile colours (#11), and the multi-column grid of coloured icon tiles (#3) — and the Dashboard section already prescribed `shadow-card`, so the doc contradicted itself. Rules retitled editor-chrome-only; the dashboard section now lists what it explicitly allows. The editor keeps the guard (light chrome / no-black is a real decision there). Cobalt remains the single accent everywhere — brand tile colours are illustrative data, never accents. Also scoped the "never name a specific fallback font" typography rule to the editor, since the dashboard deliberately sets `'Inter', 'Inter Tight', sans-serif` on its shell root. No code change. |
@@ -509,18 +544,18 @@ NOT exempt (in scope, enforced): `features/design-system/ui/**` — this is the 
 Two tiers within chrome. Axioms apply differently to each.
 
 - **Panel chrome** — panel shells, headers, toolbars, content backgrounds, sidebar rows, inspector sections, rail zones, canvas overlays, topbar containers. Zero-decoration rules apply strictly.
-- **Form atoms** — `Button`, `Input`, `Select`, `Toggle`, `Tooltip`, `Toast`, `Modal`, `IconButton`, `Kbd`, `Badge`. These are atomic primitives inside panels. They may use the full `--buildrick-radius-*` scale (sm 4 / md 8 / lg 12 / xl 16) and `--buildrick-shadow-*` tokens. They are NOT panel chrome.
+- **Form atoms** — `Button`, `Input`, `Select`, `Toggle`, `Tooltip`, `Toast`, `Modal`, `IconButton`, `Kbd`, `Badge`. These are atomic primitives inside panels. They may use the full `--bk-radius-*` scale (sm 4 / md 6 / lg 8 / xl 12) and `--bk-shadow-*` tokens *(R-1018: the dead `--buildrick-radius-*` / `--buildrick-shadow-*` names and their old values are gone; G13 surface split unchanged)*. They are NOT panel chrome.
 
 ### Axiom A1 — Zero Decoration on Panel Chrome
 
 Panel chrome must be visually restrained. Canvas (user content) owns decoration; panel chrome is the instrument chassis.
 
 1. **No gradients** in panel chrome (`linear-gradient`, `radial-gradient`, `conic-gradient`).
-2. **Box-shadow in chrome must come from a `--buildrick-shadow-*` token** — not from raw `rgba(...)` or hex values inline. Allowed tokens: `shadow-xs/sm/md/lg/xl`, `shadow-dropdown`, `shadow-modal`, `shadow-hover`, `shadow-inner`, and the `glow-*` family for focus rings. Use `shadow-dropdown` or `shadow-modal` for floating panels; never invent a raw shadow.
-3. **`border-radius` ≤ 4px on panel chrome containers.** Panels, headers, toolbars, footers, sidebar rows, inspector sections, rail zones all cap at `--buildrick-radius-sm` (4px). **Form atoms and overlays are exempt** (see tier above) — a modal, dialog, popover, toast or form atom is not a panel chrome container and keeps the full radius scale (8 on buttons/inputs/cards, 12 on modals). *The rule is split by **surface**, not by number* (founder call G13, 2026-09-02).
+2. **Box-shadow in chrome must come from a `--bk-shadow-*` token** — not from raw `rgba(...)` or hex values inline. Allowed tokens: `--bk-shadow-raised`, `--bk-shadow-drag` (menus, popovers, picked-up state), `--bk-shadow-overlay` (modals, sheets, overlays), `--bk-shadow-focus` (focus ring). Never invent a raw shadow *(R-1018: dead `--buildrick-shadow-*` list replaced)*.
+3. **`border-radius` ≤ 4px on panel chrome containers.** Panels, headers, toolbars, footers, sidebar rows, inspector sections, rail zones all cap at `--bk-radius-sm` (4px). **Form atoms and overlays are exempt** (see tier above) — a modal, dialog, popover, toast or form atom is not a panel chrome container and keeps the full radius scale (8 on buttons/inputs/cards, 12 on modals). *The rule is split by **surface**, not by number* (founder call G13, 2026-09-02).
 
    This exemption has to be maintained in the gate as well as here, and it was not: every path in `ds-grep-gates.sh`'s `FORM_ATOM_EXCLUDE` named `shared/ui/…`, a directory that stopped existing when the form atoms moved to `editor/chrome-ui/`. The list matched nothing, Gate 13 counted 19 modal/overlay declarations against the chrome budget, and any modal adopting the boards' r12 pushed the count over baseline — which is why the r12 review modal (1172:4840) and the r6 starter swatch (152:137) were both reverted *after* they landed. The written rule was right for months while the gate enforced the opposite. **When a component file moves, move its name in `FORM_ATOM_EXCLUDE`/`OVERLAY_EXCLUDE` in the same commit**, and plant a violation to watch the gate fail before believing a PASS.
-4. **Editor chrome: 20px minimum hit target; the glyph inside it may be smaller.** The eye/lock controls on a Layers row draw a 10×10 glyph inside a 20px box (`layers-v2.css:162-168`), and that is the contract — a board that draws only the 10×10 glyph is describing the mark, not the target. Rest colour is `--bk-ink-muted` (`#6B7280`): gray-300 on white is **1.47:1** and cannot satisfy 1.4.11. (Rule 413 below covers marketing only; this line covers the editor. Founder call G3, 2026-09-02.)
+4. **Editor chrome targets: controls min 32px; in-row icon buttons 24px with ≥ 8px spacing between them; the glyph inside may be smaller** *(R-1018 — V decisions / SC-27 targets; this rule said "20px minimum hit target")*. The eye/lock controls on a Layers row draw a 10×10 glyph inside a 24px target (today 20px, `layers-v2.css:162-168`, until the rebuild) — a board that draws only the glyph is describing the mark, not the target. Rest colour is `--bk-ink-muted` (`#6C7079`, R-1018): gray-300 on white is **1.47:1** and cannot satisfy 1.4.11. (Rule 413 below covers marketing only; this line covers the editor. Founder call G3, 2026-09-02.)
 5. **No decorative hover effects on panel chrome** — no glow, no scale, no rotate, no tint animations on panel containers. Hover on rows uses a background-color change to a hover-surface token. Form-atom hover states (button color shift, input focus ring) are unchanged.
 
 **Rationale.** Adobe Spectrum, VS Code, Figma UI3, and every professional DAW/CAD/game-engine converge on this: decorative panel chrome competes with user content for attention and trains users to mistake chrome for editable objects.
@@ -531,7 +566,7 @@ Restates and sharpens the existing §Color rules.
 
 1. **The accent is used ONLY where §Color §Accent Usage Rules already allow** — primary CTA, selection outlines and selected-row tint, active rail/tab indicator, focus rings, account avatar. Nowhere else in chrome. (`#1A56DB` in design AND code since 2026-07-30; was `#406ED6` from 2026-07-21.)
 2. **Semantic colors (`--success`, `--warning`, `--error`, `--info`) are used ONLY in functional status indicators** — Toast, SyncStatusIndicator, save-state badges, validation messages. Never as decoration elsewhere in chrome.
-3. **No decorative tint** in panel headers, sidebar section backgrounds, toolbar fills. Chrome uses the neutral surface tokens (`--aqb-bg-*` / `--buildrick-bg-panel*`) only.
+3. **No decorative tint** in panel headers, sidebar section backgrounds, toolbar fills. Chrome uses the neutral surface tokens (`--bk-bg-*`) only *(R-1018: dead `--aqb-*` / `--buildrick-*` names)*.
 4. **Chrome must survive any user canvas color.** A user building a hot-pink brand site and a user building a forest-green one must see the same chrome affordances.
 
 **Rationale.** The microscope/DAW invariant: hue on chrome biases the user's perception of hue in their own content. Chrome separates via luminance + typography + iconography.
@@ -539,8 +574,8 @@ Restates and sharpens the existing §Color rules.
 ### Axiom A3 — No Motion Beyond Function
 
 1. **No scroll choreography, no parallax, no spring physics.**
-2. **Allowed:** 100-150ms ease-out transitions on background-color, opacity, transform (drag only). Nothing else.
-3. **No entrance/exit animations** on panels, modals, menus beyond a simple opacity fade ≤150ms.
+2. **Allowed:** the three motion tokens only — 100 / 160 / 240 ms (§Motion) — on background-color, opacity, transform (drag only). No pulse or other decorative loop *(R-1018, V5: replaces "100-150ms" and "≤150ms")*.
+3. **Entrance/exit** on menus/popovers (160) and sheets/overlays/task host (240) only; each names its reduced-motion result (fade → instant; slide → fade 100).
 
 ### Enforcement
 
@@ -549,7 +584,7 @@ Enforcement has two layers. Both run in WARN mode at introduction, tied to `.chr
 1. **`no-restricted-syntax` rules inside `eslint.config.mjs`** — scoped via `files: ["src/editor/**/*.{ts,tsx}", ...]` overrides. Catches most Emotion tagged-template-literal and JSX object-literal cases. ESLint is advisory only (CI step allows non-blocking `|| true`); real enforcement lives in the grep gates.
 2. **Grep gates 11-14 in `scripts/ds-grep-gates.sh`**, backed by `scripts/.chrome-axioms-baseline`:
    - Gate 11 — no gradients in panel chrome
-   - Gate 12 — no raw box-shadow literals in panel chrome (must use `--buildrick-shadow-*` tokens)
+   - Gate 12 — no raw box-shadow literals in panel chrome (must use `--bk-shadow-*` tokens)
    - Gate 13 — `border-radius` ≤ 4px on panel chrome (form atoms exempt)
    - Gate 14 — magic layout literals (44/48/56/60/28/32/36/40/240/300/320) — migrate to `src/shared/constants/layout.ts` when it lands (Week 1, Survivor #3)
 
