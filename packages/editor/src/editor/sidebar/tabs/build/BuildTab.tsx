@@ -33,7 +33,7 @@ import { CATALOG } from "./catalog/catalog";
 import { EVENTS } from "@/shared/constants";
 import type { ComponentDefinition } from "@/shared/types/components";
 import { useComponentList } from "../component-library/useComponentList";
-import { INSTANTIATE_TOASTS, instantiateComponentAtSelection } from "../component-library/instantiate";
+import { INSTANTIATE_TOASTS, insertLibraryComponent, instantiateComponentAtSelection } from "../component-library/instantiate";
 import { fetchLibraryComponent } from "@/services/componentSync";
 import "./BuildTab.css";
 
@@ -143,31 +143,12 @@ export const BuildTab: React.FC<BuildTabProps> = ({
     addToast(INSTANTIATE_TOASTS[await instantiateComponentAtSelection(composer, c.id)]);
   }, [composer, addToast]);
 
-  /* FROM LIBRARY: bring the workspace master onto this site under its shared
-     id (ComponentManager.adoptLibraryComponent — mirrored as this site's copy,
-     which is what "linked" means), then insert it like a saved one. */
+  /* FROM LIBRARY: the shared library insert (instantiate.ts) — adopt the
+     workspace master under its shared id, then insert it like a saved one. */
   const insertFromLibrary = React.useCallback(async (componentId: string) => {
     if (!composer) return;
-    try {
-      const existing = composer.components.getComponent(componentId);
-      const definition = existing ?? (await fetchLibraryComponent(componentId));
-      if (!definition) {
-        addToast({ description: "That component is no longer in the library.", tone: "warning" });
-        return;
-      }
-      const adopted = existing ?? (await composer.components.adoptLibraryComponent(definition));
-      await insertMine(adopted);
-    } catch (err) {
-      // A damaged library copy fails the same way every time — retrying won't help.
-      const damaged = err instanceof Error && err.message === "LIBRARY_MASTER_MALFORMED";
-      addToast({
-        description: damaged
-          ? "This library component is damaged and can't be added."
-          : "Couldn't add component. Try again.",
-        tone: "error",
-      });
-    }
-  }, [composer, addToast, insertMine]);
+    addToast(await insertLibraryComponent(composer, componentId, fetchLibraryComponent));
+  }, [composer, addToast]);
 
   // Board 6887:78320: ⋯ › Paste HTML… opens a dialog (prefilled from the
   // clipboard) and Insert sends the text down the SAME BlockData insert path

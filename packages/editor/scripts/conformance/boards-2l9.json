@@ -10728,7 +10728,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — Library scope lists 'Not on this site'/'On this site'. No versions, Restricted row, sort, side detail. With 0 site components the manager shows 'No components yet' and hides library scope. | prior: drift-open — L-C D7: Component library scope lists shared masters with \"On this site / Not on this site\"; versions and Restricted state not built. Not compared.",
+   "verifiedNote": "built to the board, live not compared — L-C 2026-11-14 (get_design_context 215:44566, 215:44627; metadata 215:44300): Component library scope lists shared masters as 40px rows (thumbnail, name, Component library chip, On this site / Not on this site at 12 ink-soft); choosing one opens LibraryDetailPane (preview, name 16/600, chip, Not on this site yet › → Used on N sites in this workspace, Structure · N › from the library copy, Insert on this site via insertLibraryComponent — the same path as Add FROM LIBRARY, now shared in instantiate.ts). Not built: the version in the chip and the Restricted chip / Event banner note (the library read carries neither a version nor whether this user can open the source site — server change), the row ⋯ menu, and More actions on a library master. Tests: ComponentsTab.linked.test.tsx, instantiate.test.ts insertLibraryComponent.",
    "tier": "P2"
   },
   {

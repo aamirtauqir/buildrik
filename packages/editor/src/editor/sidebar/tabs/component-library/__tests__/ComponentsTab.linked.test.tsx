@@ -16,6 +16,11 @@ vi.mock("@/services/componentSync", () => ({
     { componentId: "btn", name: "Button / primary", siteCount: 3, onThisSite: true },
     { componentId: "price", name: "Price row", siteCount: 2, onThisSite: false },
   ]),
+  fetchLibraryComponent: vi.fn(async (id: string) => ({
+    id,
+    name: "Price row",
+    masterTree: { type: "section", children: [{ id: "h", type: "heading" }, { id: "p", type: "text" }] },
+  })),
 }));
 
 import { ComponentsTab } from "@/editor/sidebar/tabs/ComponentsTab";
@@ -75,7 +80,23 @@ describe("ComponentsTab — This page · This site · Component library (2L9 215
   it("Component library names whether each shared master is on this site", async () => {
     mountScoped();
     fireEvent.click(await screen.findByRole("tab", { name: "Component library · 2" }));
-    expect(screen.getByTestId("comp-lib-btn")).toHaveTextContent("Button / primaryOn this site");
-    expect(screen.getByTestId("comp-lib-price")).toHaveTextContent("Price rowNot on this site");
+    /* 215:44566 — the site row's frame: chip, then where it is. */
+    expect(screen.getByTestId("comp-lib-btn").className).toContain("tw:h-10");
+    expect(screen.getByTestId("comp-lib-status-btn").textContent).toBe("On this site");
+    expect(screen.getByTestId("comp-lib-status-price").textContent).toBe("Not on this site");
+    expect(screen.getByTestId("comp-lib-price")).toHaveTextContent("Component library");
+
+    /* 215:44616 — choosing one opens its summary with "Insert on this site". */
+    fireEvent.click(screen.getByTestId("comp-lib-price"));
+    expect(screen.getByTestId("comp-lib-price")).toHaveAttribute("aria-current", "true");
+    expect(screen.getByTestId("library-name").textContent).toBe("Price row");
+    expect(screen.getByTestId("library-sites-toggle").textContent).toBe("Not on this site yet ›");
+    fireEvent.click(screen.getByTestId("library-sites-toggle"));
+    expect(screen.getByTestId("library-sites").textContent).toBe("Used on 2 sites in this workspace. Insert it to add it here.");
+    fireEvent.click(await screen.findByText("Structure · 2 ›"));
+    expect(screen.getAllByTestId("library-structure-row")).toHaveLength(2);
+    expect(screen.getByTestId("library-insert").textContent).toBe("Insert on this site");
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(screen.queryByTestId("library-master")).toBeNull();
   });
 });

@@ -18,6 +18,7 @@ import { ComponentIcon } from "./component-library/ComponentIcon";
 import type { ComponentsTabProps } from "./component-library/types";
 import { useComponentsState } from "./component-library/useComponentsState";
 import { ImportPackageDialog } from "./component-library/ImportPackageDialog";
+import { LibraryDetailPane } from "./component-library/LibraryDetailPane";
 
 import "./component-library/ComponentsTab.css";
 import { EVENTS } from "@/shared/constants";
@@ -85,6 +86,8 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
   const [query, setQuery] = React.useState("");
   const [sort, setSort] = React.useState<SortKey>("used");
   const [importing, setImporting] = React.useState(false);
+  /* 215:44616 — the library master chosen in the Component library scope. */
+  const [libraryPick, setLibraryPick] = React.useState<string | null>(null);
 
 
   // Which of this site's masters are shared from the workspace library.
@@ -115,8 +118,11 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
 
   /* 215:47035 — the chosen master's summary, beside the list. */
   const detail = state.detailComponent;
+  const pickedLibrary = scope === "library" ? library.find((l) => l.componentId === libraryPick) : undefined;
   const pane =
-    composer?.components?.isAvailable() && !state.error && detail ? (
+    composer?.components?.isAvailable() && !state.error && pickedLibrary ? (
+      <LibraryDetailPane entry={pickedLibrary} composer={composer} onClose={() => setLibraryPick(null)} />
+    ) : composer?.components?.isAvailable() && !state.error && detail ? (
       <ComponentDetailScreen
         component={detail}
         composer={composer}
@@ -358,17 +364,35 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         ) : scope === "library" ? (
           <>
             <p className={LIST_COUNT} data-testid="comp-section-header">Component library · {libraryShown.length}</p>
-            {libraryShown.map((l) => (
-              <div key={l.componentId} className={ROW} data-testid={`comp-lib-${l.componentId}`}>
-                <Thumb />
-                <span className="tw:w-[190px] tw:shrink-0 tw:truncate tw:text-[13px] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)]" title={l.name}>
-                  {l.name}
-                </span>
-                <span className="tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)]">
-                  {l.onThisSite ? "On this site" : "Not on this site"}
-                </span>
-              </div>
-            ))}
+            {libraryShown.map((l) => {
+              const picked = libraryPick === l.componentId;
+              return (
+                /* 215:44566 — the site row's frame: chip, then "Not on this site". */
+                <div
+                  key={l.componentId}
+                  role="button"
+                  tabIndex={0}
+                  aria-current={picked || undefined}
+                  className={`${ROW} tw:cursor-pointer tw:select-none ${picked ? "tw:bg-[var(--bk-accent-subtle)]" : "tw:hover:bg-[var(--bk-bg-subtle)]"}`}
+                  data-testid={`comp-lib-${l.componentId}`}
+                  onClick={() => setLibraryPick(l.componentId)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setLibraryPick(l.componentId); }
+                  }}
+                >
+                  <Thumb />
+                  <span className="tw:w-[190px] tw:shrink-0 tw:truncate tw:text-[13px] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)]" title={l.name}>
+                    {l.name}
+                  </span>
+                  <span className="tw:flex tw:w-[168px] tw:shrink-0 tw:items-center">
+                    <span className={`${CHIP} tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink-soft)]`}>Component library</span>
+                  </span>
+                  <span className="tw:w-[120px] tw:shrink-0 tw:text-[12px] tw:leading-4 tw:text-[var(--bk-ink-soft)]" data-testid={`comp-lib-status-${l.componentId}`}>
+                    {l.onThisSite ? "On this site" : "Not on this site"}
+                  </span>
+                </div>
+              );
+            })}
             {library.length === 0 ? (
               <p className={NOTE} data-testid="comp-empty-library">
                 No components are shared across this workspace yet.

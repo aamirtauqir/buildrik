@@ -61,7 +61,7 @@ describe("ComponentsTab — component library failed to load (2L9 B6-K24)", () =
 
     fetchLibrary.mockResolvedValueOnce([{ componentId: "price", name: "Price row", siteCount: 2, onThisSite: false }]);
     fireEvent.click(screen.getByRole("button", { name: "Retry" }));
-    await waitFor(() => expect(screen.getByTestId("comp-lib-price")).toHaveTextContent("Price rowNot on this site"));
+    await waitFor(() => expect(screen.getByTestId("comp-lib-status-price")).toHaveTextContent("Not on this site"));
     expect(screen.queryByTestId("comp-library-error")).toBeNull();
     expect(screen.getByRole("tab", { name: "Component library · 1" })).toBeInTheDocument();
     expect(fetchLibrary).toHaveBeenCalledTimes(2);
