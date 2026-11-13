@@ -72,6 +72,7 @@ describe("ComponentDetailScreen — Delete master", () => {
         <ComponentDetailScreen component={component} composer={composer} onBack={onBack} selectedElementId={null} />
       </ToastProvider>,
     );
+    fireEvent.click(screen.getByTestId("component-more"));
     fireEvent.click(screen.getByTestId("component-delete"));
     fireEvent.click(screen.getByRole("button", { name: "Delete" }));
     await waitFor(() => expect(screen.getByText("Menu card deleted · 18 instances detached")).toBeInTheDocument());

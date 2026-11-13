@@ -86,6 +86,7 @@ describe("ComponentsTab — 2L9 215:43588 (B6-K02) resource area", () => {
       </ToastProvider>,
     );
     fireEvent.click(await screen.findByTestId("comp-row-menu"));
+    fireEvent.click(await screen.findByTestId("component-more"));
     fireEvent.click(await screen.findByTestId("component-detach-all"));
     fireEvent.click(screen.getByTestId("component-detach-all-confirm-confirm"));
     const notice = await screen.findByTestId("comp-detach-notice");
@@ -100,5 +101,21 @@ describe("ComponentsTab — 2L9 215:43588 (B6-K02) resource area", () => {
     expect((await screen.findByTestId("comp-back-row")).textContent).toBe("‹ Back to Add");
     expect(screen.getByTestId("comp-nav")).toBeInTheDocument();
     expect(screen.getByTestId("comp-empty").textContent).toMatch(/^No components yet\./);
+  });
+
+  /* 215:47035 — choosing a row opens its summary beside the list; the list
+     stays and the row reads as chosen. Escape closes the summary. */
+  it("a chosen row opens the summary pane beside the list", async () => {
+    mount([c("hdr", "Site header"), c("ftr", "Footer")]);
+    fireEvent.click(await screen.findByTestId("comp-row-hdr"));
+    expect(screen.getByTestId("component-master")).toBeInTheDocument();
+    expect(screen.getByTestId("component-name").textContent).toBe("Site header");
+    expect(screen.getByTestId("comp-row-ftr")).toBeInTheDocument();
+    expect(screen.getByTestId("comp-row-hdr")).toHaveAttribute("aria-current", "true");
+    expect(screen.getByTestId("comp-row-hdr").className).toContain("--bk-accent-subtle");
+    fireEvent.click(screen.getByTestId("comp-row-ftr"));
+    expect(screen.getByTestId("component-name").textContent).toBe("Footer");
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(screen.queryByTestId("component-master")).toBeNull();
   });
 });

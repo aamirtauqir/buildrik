@@ -105,27 +105,6 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
     }
   }, [pendingToast, addToast, setPendingToast]);
 
-  // ── Drill-in detail view ──────────────────────────────────────────────────────
-
-  if (composer?.components?.isAvailable() && !state.error && state.detailComponent) {
-    return (
-      <ComponentDetailScreen
-        component={state.detailComponent}
-        composer={composer}
-        onBack={state.handleBackFromDetail}
-        onBackToInstance={state.backToInstance}
-        onClose={onClose}
-        onInsert={state.handleDetailInsert}
-        onDelete={state.handleDetailDelete}
-        onDetachedAll={(count) => {
-          const { id, name } = state.detailComponent!;
-          setDetached({ id, name, count });
-        }}
-        selectedElementId={state.canvasSelection[0] ?? null}
-      />
-    );
-  }
-
   // ── Area frame: navigation · header · body (215:43588) ───────────────────────
 
   const linkedIds = new Set(library.filter((l) => l.onThisSite).map((l) => l.componentId));
@@ -138,6 +117,23 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
     /* 217:43453: a library that did not load has no count. */
     { id: "library", label: "Component library", count: state.libraryLoadFailed ? "—" : String(library.length) },
   ];
+
+  /* 215:47035 — the chosen master's summary, beside the list. */
+  const detail = state.detailComponent;
+  const pane =
+    composer?.components?.isAvailable() && !state.error && detail ? (
+      <ComponentDetailScreen
+        component={detail}
+        composer={composer}
+        linked={linkedIds.has(detail.id)}
+        onBack={state.handleBackFromDetail}
+        onBackToInstance={state.backToInstance}
+        onInsert={state.handleDetailInsert}
+        onDelete={state.handleDetailDelete}
+        onDetachedAll={(count) => setDetached({ id: detail.id, name: detail.name, count })}
+        selectedElementId={state.canvasSelection[0] ?? null}
+      />
+    ) : null;
 
   const frame = (body: React.ReactNode) => (
     <div className="tw:flex tw:h-full tw:min-h-0 tw:bg-[var(--bk-bg-panel)]" data-testid="comp-panel">
@@ -211,7 +207,10 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
             </Button>
           </div>
         </div>
-        <div className="tw:min-h-0 tw:flex-1 tw:overflow-auto tw:px-6 tw:pt-2">{body}</div>
+        <div className="tw:flex tw:min-h-0 tw:flex-1">
+          <div className="tw:min-h-0 tw:min-w-0 tw:flex-1 tw:overflow-auto tw:px-6 tw:pt-2">{body}</div>
+          {pane}
+        </div>
       </div>
       {importing ? <ImportPackageDialog composer={composer} onClose={() => setImporting(false)} /> : null}
       <ConfirmDialog
@@ -276,7 +275,8 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         role="button"
         tabIndex={0}
         draggable
-        className={`${ROW} tw:cursor-pointer tw:select-none tw:hover:bg-[var(--bk-bg-subtle)]${justDetached ? " tw:opacity-40" : ""}`}
+        aria-current={detail?.id === component.id || undefined}
+        className={`${ROW} tw:cursor-pointer tw:select-none ${detail?.id === component.id ? "tw:bg-[var(--bk-accent-subtle)]" : "tw:hover:bg-[var(--bk-bg-subtle)]"}${justDetached ? " tw:opacity-40" : ""}`}
         data-testid={`comp-row-${component.id}`}
         onClick={() => state.handleViewDetail(component)}
         onDragStart={(e) => state.handleDragStart(e, component)}

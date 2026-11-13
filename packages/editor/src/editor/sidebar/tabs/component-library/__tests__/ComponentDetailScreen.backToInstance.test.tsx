@@ -31,7 +31,7 @@ const composer = {
 } as never;
 
 describe("ComponentDetailScreen — Back to instance (§13)", () => {
-  it("the back row reads Back to instance and runs it; the footer still lists all", () => {
+  it("the back row reads Back to instance and runs it", () => {
     const onBack = vi.fn();
     const onBackToInstance = vi.fn();
     render(
@@ -44,8 +44,6 @@ describe("ComponentDetailScreen — Back to instance (§13)", () => {
     fireEvent.click(row);
     expect(onBackToInstance).toHaveBeenCalledTimes(1);
     expect(onBack).not.toHaveBeenCalled();
-    fireEvent.click(screen.getByTestId("component-all-saved"));
-    expect(onBack).toHaveBeenCalledTimes(1);
   });
 
   it("Escape goes where the back row goes", () => {
@@ -59,12 +57,13 @@ describe("ComponentDetailScreen — Back to instance (§13)", () => {
     expect(onBackToInstance).toHaveBeenCalledTimes(1);
   });
 
-  it("without an instance to return to, the row is Saved components", () => {
+  /* 2L9 215:47035 — the pane sits beside the list, so it needs no way back. */
+  it("without an instance to return to, there is no back row", () => {
     render(
       <ToastProvider>
         <ComponentDetailScreen component={component} composer={composer} onBack={vi.fn()} />
       </ToastProvider>,
     );
-    expect(screen.getByTestId("component-back-row").textContent).toMatch(/Saved components$/);
+    expect(screen.queryByTestId("component-back-row")).toBeNull();
   });
 });

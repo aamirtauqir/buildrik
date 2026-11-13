@@ -10,7 +10,7 @@
  */
 
 import * as React from "react";
-import { ConfirmDialog, useToast, Button, IconButton, PanelBackRow, TextInput, type ToastInput } from "@/editor/chrome-ui";
+import { ConfirmDialog, useToast, Button, Menu, MenuItem, Popover, TextInput, type ToastInput } from "@/editor/chrome-ui";
 import type { Composer } from "@/engine";
 import type { ComponentDefinition } from "@/shared/types/components";
 import { ELEMENT_TYPE_LABELS } from "@/shared/constants/elementTypeLabels";
@@ -37,8 +37,8 @@ export interface ComponentDetailScreenProps {
   /** §13: opened from an instance's "Edit master ›" — the back row returns
    *  to that instance instead of the list. */
   onBackToInstance?: () => void;
-  /** Close the panel */
-  onClose?: () => void;
+  /** The master is shared from the workspace library (scope chip, 215:47042). */
+  linked?: boolean;
   /** Callback when component is inserted */
   onInsert?: () => void;
   /** Callback when component is duplicated */
@@ -51,11 +51,12 @@ export interface ComponentDetailScreenProps {
   selectedElementId?: string | null;
 }
 
-const SECTION_HEADER =
-  "tw:flex tw:items-center tw:gap-2 tw:h-7 tw:px-4 tw:text-[11px] tw:leading-4 tw:font-medium tw:tracking-[0.88px] tw:text-[var(--bk-ink-muted)]";
-const LIST_ROW = "tw:flex tw:items-center tw:gap-2 tw:h-8 tw:px-4 tw:rounded tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]";
+const LIST_ROW = "tw:flex tw:items-center tw:gap-2 tw:h-8 tw:pl-3 tw:pr-1 tw:rounded tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]";
 const ROW_META = "tw:ml-auto tw:text-[11px] tw:leading-4 tw:text-[var(--bk-ink-muted)] tw:whitespace-nowrap";
-const BTN_28 = "tw:w-full tw:h-7 tw:px-3 tw:py-1 tw:rounded-md tw:text-[13px] tw:font-medium tw:focus:ring-0";
+/* 215:47050 — 32 high, full width, 4px radius, 13/500. */
+const BTN_32 = "tw:w-full tw:h-8 tw:rounded tw:text-[13px] tw:font-medium tw:focus:ring-0";
+/* 215:47046 — a 13/500 accent link, 12 in, 32 high. */
+const LINK = "tw:h-8 tw:w-full tw:justify-start tw:pl-3 tw:text-[13px] tw:font-medium";
 
 // ============================================
 // Component
@@ -100,7 +101,7 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
   composer,
   onBack,
   onBackToInstance,
-  onClose,
+  linked = false,
   onInsert,
   onDuplicate,
   onDelete,
@@ -278,175 +279,199 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
     if (!ok) addToast({ description: "Couldn't rename this component.", tone: "error", duration: 4000 });
   };
 
+  /* 215:47046 / 215:47048 — "Used in … ›" and "Structure ›" open their lists. */
+  const [open, setOpen] = React.useState<"usedOn" | "structure" | null>(null);
+  const [moreOpen, setMoreOpen] = React.useState(false);
+  const runMore = (fn: () => void) => () => {
+    setMoreOpen(false);
+    fn();
+  };
+  const toggle = (which: "usedOn" | "structure") => setOpen((v) => (v === which ? null : which));
+
   return (
-    <div className="tw:flex tw:flex-col tw:h-full tw:min-h-0" data-testid="component-master">
-      <PanelBackRow
-        label={onBackToInstance ? "Back to instance" : "Saved components"}
-        onClick={backOut}
-        data-testid="component-back-row"
-      />
-      <div className="tw:flex tw:items-center tw:gap-2 tw:h-11 tw:px-4 tw:shrink-0">
-        <span className="tw:flex-1 tw:text-[14px] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)]">Components</span>
-        {onClose && (
-          <IconButton label="Close" size="sm" onClick={onClose}>
-            ✕
-          </IconButton>
+    /* 215:47035 — the summary pane: 320 wide, a hairline on its left, 24 in,
+       12 between: preview, name, chips, two links, then the actions. */
+    <aside
+      aria-label={`${component.name} component`}
+      className="tw:flex tw:h-full tw:min-h-0 tw:w-80 tw:shrink-0 tw:flex-col tw:gap-3 tw:overflow-y-auto tw:border-l tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:p-6"
+      data-testid="component-master"
+    >
+      {onBackToInstance ? (
+        /* §13: opened from an instance's "Edit master ›". */
+        <Button variant="link" size="xs" className={LINK} onClick={onBackToInstance} data-testid="component-back-row">
+          ‹ Back to instance
+        </Button>
+      ) : null}
+
+      {/* 215:47036 — 272×152 preview on bg-subtle. */}
+      <div className="tw:flex tw:h-[152px] tw:w-full tw:shrink-0 tw:items-center tw:justify-center tw:overflow-hidden tw:rounded tw:bg-[var(--bk-bg-subtle)]" data-testid="component-preview">
+        {component.thumbnail ? (
+          <img src={component.thumbnail} alt={component.name} className="tw:max-h-full tw:max-w-full tw:object-contain" />
+        ) : (
+          <span className="tw:text-[12px] tw:text-[var(--bk-ink-muted)]">No preview yet</span>
         )}
       </div>
 
-      <div className="tw:flex-1 tw:min-h-0 tw:overflow-y-auto tw:flex tw:flex-col">
-        {/* Master component scope — 4418:142876 */}
-        <div className="tw:flex tw:flex-col tw:items-start tw:gap-1.5 tw:px-3 tw:py-2">
-          {renaming ? (
-            <TextInput
-              autoFocus
-              sizing="sm"
-              aria-label="Component name"
-              data-testid="component-rename-input"
-              value={draftName}
-              onChange={(e) => setDraftName(e.target.value)}
-              onBlur={() => void commitRename()}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") void commitRename();
-                if (e.key === "Escape") { setDraftName(component.name); setRenaming(false); }
-              }}
-              className="tw:w-full"
-            />
-          ) : (
-            <p className="tw:m-0 tw:w-full tw:text-[14px] tw:leading-5 tw:text-[var(--bk-ink)]">
-              Master component ·{" "}
-              <span
-                role="button"
-                tabIndex={0}
-                title="Rename"
-                data-testid="component-name"
-                className="tw:cursor-text tw:rounded-sm hover:tw:bg-[var(--bk-bg-subtle)]"
-                onClick={() => setRenaming(true)}
-                onKeyDown={(e) => { if (e.key === "Enter") setRenaming(true); }}
-              >
-                {component.name}
-              </span>
-            </p>
-          )}
-          <p className="tw:m-0 tw:w-full tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink)]" data-testid="component-linked">
-            {instanceCount} linked instance{instanceCount === 1 ? "" : "s"} on {siteName}. Updating this master affects those instances. Inserting adds one instance.
-          </p>
-          <Button
-            color="light"
-            onClick={handleInsert}
-            data-testid="component-insert"
-            className="tw:h-7 tw:border-0 tw:bg-transparent tw:px-3 tw:text-[13px] tw:font-medium tw:text-[var(--bk-accent)] tw:focus:ring-0"
-          >
-            Insert from saved components
-          </Button>
-          <Button
-            onClick={() => setShowUpdateConfirm(true)}
-            disabled={!selectedElementId}
-            title={selectedElementId ? undefined : "Select an element on the canvas to update this master from"}
-            data-testid="component-update"
-            className={BTN_28}
-          >
-            Update from selection…
-          </Button>
-          <Button
-            color="light"
-            onClick={() => setShowDetachAll(true)}
-            disabled={instanceCount === 0}
-            data-testid="component-detach-all"
-            className={`${BTN_28} tw:bg-white tw:border-[var(--bk-border)] tw:text-[var(--bk-gray-700)]`}
-          >
-            Detach all
-          </Button>
-          <Button
-            color="light"
-            onClick={handleDuplicate}
-            data-testid="component-duplicate"
-            className={`${BTN_28} tw:bg-white tw:border-[var(--bk-border)] tw:text-[var(--bk-gray-700)]`}
-          >
-            Duplicate master
-          </Button>
-          {/* 2L9 220:42920 — a .brcomponent of this master and the ones nested in it. */}
-          <Button
-            color="light"
-            onClick={() => setExporting(true)}
-            data-testid="component-export"
-            className={`${BTN_28} tw:bg-white tw:border-[var(--bk-border)] tw:text-[var(--bk-gray-700)]`}
-          >
-            Export package…
-          </Button>
-          <Button color="red" onClick={handleDelete} data-testid="component-delete" className={BTN_28}>
-            Delete {component.name} master
-          </Button>
-        </div>
+      {/* 215:47040 — the name, 16/24/600; it renames inline (G2-124). */}
+      {renaming ? (
+        <TextInput
+          autoFocus
+          sizing="sm"
+          aria-label="Component name"
+          data-testid="component-rename-input"
+          value={draftName}
+          onChange={(e) => setDraftName(e.target.value)}
+          onBlur={() => void commitRename()}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") void commitRename();
+            if (e.key === "Escape") { setDraftName(component.name); setRenaming(false); }
+          }}
+          className="tw:w-full"
+        />
+      ) : (
+        <h3
+          title="Rename"
+          tabIndex={0}
+          data-testid="component-name"
+          className="tw:m-0 tw:cursor-text tw:truncate tw:rounded-sm tw:text-[16px] tw:leading-6 tw:font-semibold tw:text-[var(--bk-ink)] hover:tw:bg-[var(--bk-bg-subtle)]"
+          onClick={() => setRenaming(true)}
+          onKeyDown={(e) => { if (e.key === "Enter") setRenaming(true); }}
+        >
+          {component.name}
+        </h3>
+      )}
 
-        {/* Master preview */}
-        <div className="tw:relative tw:h-[140px] tw:shrink-0 tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-subtle)]" data-testid="component-preview">
-          <p className="tw:absolute tw:left-[11px] tw:top-[7px] tw:m-0 tw:text-[11px] tw:leading-4 tw:font-medium tw:text-[var(--bk-gray-500)]">
-            Master preview · {component.name}
-          </p>
-          <div className="tw:absolute tw:left-[11px] tw:top-[25px] tw:h-[100px] tw:w-[256px] tw:overflow-hidden tw:rounded-md tw:border tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:flex tw:items-center tw:justify-center">
-            {component.thumbnail ? (
-              <img src={component.thumbnail} alt={component.name} className="tw:max-h-full tw:max-w-full tw:object-contain" />
-            ) : (
-              <span className="tw:text-[12px] tw:text-[var(--bk-ink-muted)]">No preview yet</span>
-            )}
-          </div>
-        </div>
-
-        <div className={SECTION_HEADER} data-testid="component-structure-header">
-          <span className="tw:flex-1">STRUCTURE</span>
-          <span className="tw:font-[family-name:var(--bk-font-mono)]">{structure.length}</span>
-        </div>
-        {structure.map((child, i) => {
-          const layerName = typeof child.data?.layerName === "string" ? child.data.layerName : undefined;
-          const bound = child.dataBindings && Object.keys(child.dataBindings).length > 0;
-          return (
-            <div key={child.id ?? i} className={LIST_ROW} data-testid="component-structure-row">
-              <span className="tw:truncate">{layerName ?? ELEMENT_TYPE_LABELS[child.type] ?? child.type}</span>
-              <span className={ROW_META}>{child.type}{bound ? " · CMS bound" : ""}</span>
-            </div>
-          );
-        })}
-
-        <div className={SECTION_HEADER} data-testid="component-usedon-header">
-          <span className="tw:flex-1">USED ON</span>
-          <span className="tw:font-[family-name:var(--bk-font-mono)]">{usedOn.length}</span>
-        </div>
-        {usedOn.map(({ page, count, firstInstanceId }) => {
-          const jumpToUsage = () => {
-            if (!composer) return;
-            if (firstInstanceId) {
-              locateOnCanvas(composer, { pageId: page.id, targetSelector: firstInstanceId });
-            } else {
-              composer.elements.setActivePage(page.id);
-            }
-          };
-          return (
-            <div
-              key={page.id}
-              role="button"
-              tabIndex={0}
-              className={`${LIST_ROW} tw:cursor-pointer hover:tw:bg-[var(--bk-bg-subtle)]`}
-              data-testid={`component-usedon-${page.id}`}
-              onClick={jumpToUsage}
-              onKeyDown={(e) => { if (e.key === "Enter") jumpToUsage(); }}
-            >
-              <span className="tw:truncate">{page.name}</span>
-              <span className={ROW_META}>{count} instance{count === 1 ? "" : "s"}</span>
-            </div>
-          );
-        })}
+      {/* 215:47041 — where the master lives. */}
+      <div className="tw:flex tw:gap-1.5">
+        <span
+          className="tw:inline-flex tw:h-[22px] tw:items-center tw:rounded-full tw:bg-[var(--bk-bg-subtle)] tw:px-2 tw:text-[11px] tw:leading-4 tw:font-medium tw:text-[var(--bk-ink-soft)]"
+          data-testid="component-scope"
+        >
+          {linked ? "Component library" : component.pageId ? "This page" : "This site"}
+        </span>
       </div>
 
-      <div className="tw:flex tw:h-11 tw:shrink-0 tw:items-center tw:border-t tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:px-4 tw:py-2">
+      <div className="tw:flex tw:flex-col">
+        <Button
+          variant="link"
+          size="xs"
+          className={LINK}
+          aria-expanded={open === "usedOn"}
+          onClick={() => toggle("usedOn")}
+          data-testid="component-usedon-toggle"
+        >
+          {instanceCount === 0
+            ? "Not used on this site ›"
+            : `Used in ${count(instanceCount, "place", "places")} on ${count(usedOn.length, "page", "pages")} ›`}
+        </Button>
+        {open === "usedOn" ? (
+          <div data-testid="component-usedon-header" className="tw:flex tw:flex-col">
+            {usedOn.map(({ page, count: n, firstInstanceId }) => {
+              const jumpToUsage = () => {
+                if (!composer) return;
+                if (firstInstanceId) {
+                  locateOnCanvas(composer, { pageId: page.id, targetSelector: firstInstanceId });
+                } else {
+                  composer.elements.setActivePage(page.id);
+                }
+              };
+              return (
+                <div
+                  key={page.id}
+                  role="button"
+                  tabIndex={0}
+                  className={`${LIST_ROW} tw:cursor-pointer hover:tw:bg-[var(--bk-bg-subtle)]`}
+                  data-testid={`component-usedon-${page.id}`}
+                  onClick={jumpToUsage}
+                  onKeyDown={(e) => { if (e.key === "Enter") jumpToUsage(); }}
+                >
+                  <span className="tw:truncate">{page.name}</span>
+                  <span className={ROW_META}>{n} instance{n === 1 ? "" : "s"}</span>
+                </div>
+              );
+            })}
+          </div>
+        ) : null}
+        <Button
+          variant="link"
+          size="xs"
+          className={LINK}
+          aria-expanded={open === "structure"}
+          onClick={() => toggle("structure")}
+          data-testid="component-structure-header"
+        >
+          Structure · {structure.length} ›
+        </Button>
+        {open === "structure"
+          ? structure.map((child, i) => {
+              const layerName = typeof child.data?.layerName === "string" ? child.data.layerName : undefined;
+              const bound = child.dataBindings && Object.keys(child.dataBindings).length > 0;
+              return (
+                <div key={child.id ?? i} className={LIST_ROW} data-testid="component-structure-row">
+                  <span className="tw:truncate">{layerName ?? ELEMENT_TYPE_LABELS[child.type] ?? child.type}</span>
+                  <span className={ROW_META}>{child.type}{bound ? " · CMS bound" : ""}</span>
+                </div>
+              );
+            })
+          : null}
+      </div>
+
+      {/* 215:47050 — Insert (primary), Update from selection… (secondary),
+          More actions ⋯ (ghost), each 32 high, 8 apart. */}
+      <div className="tw:flex tw:flex-col tw:gap-2">
+        <Button size="xs" onClick={handleInsert} data-testid="component-insert" className={BTN_32}>
+          Insert
+        </Button>
         <Button
           color="light"
-          onClick={onBack}
-          data-testid="component-all-saved"
-          className="tw:h-7 tw:flex-1 tw:rounded-md tw:border-[var(--bk-border)] tw:bg-white tw:text-[13px] tw:font-medium tw:focus:ring-0"
+          size="xs"
+          onClick={() => setShowUpdateConfirm(true)}
+          disabled={!selectedElementId}
+          title={selectedElementId ? undefined : "Select an element on the canvas to update this master from"}
+          data-testid="component-update"
+          className={`${BTN_32} tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:text-[var(--bk-ink)]`}
         >
-          ‹&nbsp;&nbsp;All saved components
+          Update from selection…
         </Button>
+        <Popover
+          open={moreOpen}
+          onClose={() => setMoreOpen(false)}
+          placement="bottom-end"
+          label="More actions"
+          trigger={
+            <Button
+              color="light"
+              size="xs"
+              aria-haspopup="menu"
+              aria-expanded={moreOpen}
+              onClick={() => setMoreOpen((v) => !v)}
+              data-testid="component-more"
+              className={`${BTN_32} tw:border-0 tw:bg-transparent tw:text-[var(--bk-ink)] tw:shadow-none`}
+            >
+              More actions ⋯
+            </Button>
+          }
+        >
+          {/* 215:47055 — Rename · Duplicate · Export · Detach all · Delete. */}
+          <Menu label="More actions" className="tw:w-[272px]">
+            <MenuItem data-testid="component-rename" onClick={runMore(() => setRenaming(true))}>
+              Rename
+            </MenuItem>
+            <MenuItem data-testid="component-duplicate" onClick={runMore(() => void handleDuplicate())}>
+              Duplicate
+            </MenuItem>
+            {/* 2L9 220:42920 — a .brcomponent of this master and the ones nested in it. */}
+            <MenuItem data-testid="component-export" onClick={runMore(() => setExporting(true))}>
+              Export package…
+            </MenuItem>
+            <MenuItem data-testid="component-detach-all" disabled={instanceCount === 0} onClick={runMore(() => setShowDetachAll(true))}>
+              Detach all
+            </MenuItem>
+            <MenuItem data-testid="component-delete" onClick={runMore(handleDelete)}>
+              Delete
+            </MenuItem>
+          </Menu>
+        </Popover>
       </div>
 
       <ConfirmDialog
@@ -487,7 +512,7 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
       {exporting ? (
         <ExportPackageDialog component={component} all={composer?.components?.getAllComponents() ?? [component]} onClose={() => setExporting(false)} />
       ) : null}
-    </div>
+    </aside>
   );
 };
 
