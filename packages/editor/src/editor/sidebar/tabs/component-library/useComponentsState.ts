@@ -43,7 +43,8 @@ export function useComponentsState({
   onHelpClick,
 }: UseComponentsStateParams) {
   // v3 FC-10: the load + subscribe shape lives once, in useComponentList.
-  const { components, isLoaded, error, setError, library } = useComponentList(composer);
+  const { components, isLoaded, error, setError, library, libraryLoadFailed, retryLibraryLoad } =
+    useComponentList(composer);
 
   // Use controlled selectedId if provided, otherwise internal state
   const [internalSelectedId, setInternalSelectedId] = React.useState<string | null>(null);
@@ -228,6 +229,8 @@ export function useComponentsState({
     // v3 FC-10: ComponentsTab reads its "which masters are library-linked"
     // list from here instead of fetching it a second time in the same tree.
     library,
+    libraryLoadFailed,
+    retryLibraryLoad,
     // Selection
     selectedId,
     setSelectedId,

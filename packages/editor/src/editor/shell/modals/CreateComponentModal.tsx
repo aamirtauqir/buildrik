@@ -74,11 +74,16 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({ isOp
   const [isCreating, setIsCreating] = React.useState(false);
   const [failed, setFailed] = React.useState(false);
 
-  const used = isOpen && composer ? composer.components.getAllComponents().length : 0;
+  const existing = isOpen && composer ? composer.components.getAllComponents() : [];
+  const used = existing.length;
   const max = DEFAULT_COMPONENT_CONFIG.maxComponents;
   const atLimit = used >= max;
   const trimmed = name.trim();
   const nameValid = trimmed.length >= 1 && trimmed.length <= NAME_MAX;
+  // B6-K10: a taken name warns but does not block.
+  const sameName = nameValid
+    ? existing.find((c) => c?.name?.trim().toLowerCase() === trimmed.toLowerCase())?.name.trim()
+    : undefined;
   const matches = React.useMemo(
     () => (isOpen && composer && elementId ? findMatchingElements(composer, elementId) : []),
     [isOpen, composer, elementId],
@@ -153,15 +158,28 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({ isOp
             autoFocus
             maxLength={NAME_MAX}
             aria-invalid={nameValid ? undefined : true}
-            aria-describedby={nameValid ? undefined : "create-component-name-error"}
+            aria-describedby={
+              nameValid ? (sameName ? "create-component-name-duplicate" : undefined) : "create-component-name-error"
+            }
             data-testid="create-component-name"
-            className={nameValid ? "tw:mb-4 tw:w-full" : "tw:w-full tw:[&_input]:border-[var(--bk-error)]!"}
+            className={
+              !nameValid
+                ? "tw:w-full tw:[&_input]:border-[var(--bk-error)]!"
+                : sameName
+                  ? "tw:w-full"
+                  : "tw:mb-4 tw:w-full"
+            }
           />
           {nameValid ? null : (
             <p id="create-component-name-error" className={`${NOTE} tw:mb-2`} data-testid="create-component-name-error">
               Enter a name between 1 and {NAME_MAX} characters.
             </p>
           )}
+          {sameName ? (
+            <p id="create-component-name-duplicate" className={`${NOTE} tw:mb-2`} data-testid="create-component-name-duplicate">
+              Another component is called {sameName}. You can still create it.
+            </p>
+          ) : null}
           <div className={LABEL} id="create-component-scope-label">
             Where it can be used
           </div>

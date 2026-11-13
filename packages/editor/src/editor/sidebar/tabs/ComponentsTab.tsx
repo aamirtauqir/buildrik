@@ -268,7 +268,8 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
   const SCOPES = [
     { id: "page", label: `This page · ${onPage.length}` },
     { id: "site", label: `This site · ${onSite.length}` },
-    { id: "library", label: `Component library · ${library.length}` },
+    /* 217:43415: a library that did not load has no count. */
+    { id: "library", label: `Component library · ${state.libraryLoadFailed ? "—" : library.length}` },
   ] as const;
   const renderRow = (component: (typeof state.components)[number], isLinked: boolean) => {
     const n = uses(component.id);
@@ -378,7 +379,15 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
               </Select>
             ) : null}
           </div>
-          {scope === "library" ? (
+          {scope === "library" && state.libraryLoadFailed ? (
+            /* 217:43415 (B6-K24): the site's own masters still list under This site. */
+            <PanelErrorState
+              title="Couldn’t load the component library"
+              message="Your site’s own components are still available under This site."
+              onRetry={state.retryLibraryLoad}
+              retryLabel="Retry"
+            />
+          ) : scope === "library" ? (
             <>
               <div className={SECTION_HEADER} data-testid="comp-section-header">
                 <span className="tw:flex-1">Component library · {libraryShown.length}</span>

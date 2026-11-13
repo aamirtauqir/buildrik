@@ -180,8 +180,9 @@ export interface LibraryComponentEntry {
 }
 
 /** The workspace's shared masters as seen from this site; [] when there is no
- *  site (demo) or the read fails — the group then simply has no rows. */
-export async function fetchComponentLibrary(): Promise<LibraryComponentEntry[]> {
+ *  site (demo), null when the read fails — so the Components panel can say the
+ *  library did not load (2L9 217:43415) instead of showing it as empty. */
+export async function fetchComponentLibrary(): Promise<LibraryComponentEntry[] | null> {
   const siteId = getSiteIdFromUrl();
   if (!siteId) return [];
   try {
@@ -190,7 +191,7 @@ export async function fetchComponentLibrary(): Promise<LibraryComponentEntry[]> 
   } catch (e) {
     // eslint-disable-next-line no-console
     console.warn("[component-sync] library read failed", e);
-    return [];
+    return null;
   }
 }
 

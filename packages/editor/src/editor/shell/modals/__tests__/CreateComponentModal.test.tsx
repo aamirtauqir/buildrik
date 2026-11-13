@@ -173,3 +173,48 @@ describe("CreateComponentModal — 2L9 G05 / G06", () => {
     expect(createComponent).toHaveBeenCalledWith("Hero", "el-1", { prefillFromDs: true, pageId: "page-home" });
   });
 });
+
+/* 2L9 215:46667 (B6-K10): a name another component already has is a warning,
+   not a refusal — "Another component is called Hero card. You can still
+   create it." and the primary stays enabled. */
+describe("CreateComponentModal — 2L9 B6-K10 duplicate name", () => {
+  function withNames(names: string[]) {
+    const made = makeComposer();
+    (made.composer as unknown as { components: { getAllComponents: () => unknown[] } }).components.getAllComponents =
+      () => names.map((name) => ({ name }));
+    return made;
+  }
+
+  it("warns under Name when another component has the name, and Create stays enabled", async () => {
+    const { composer, createComponent } = withNames(["Footer", "Hero card"]);
+    const { onClose } = renderModal(composer);
+    fireEvent.change(screen.getByLabelText("Name"), { target: { value: "Hero card" } });
+    expect(screen.getByTestId("create-component-name-duplicate")).toHaveTextContent(
+      "Another component is called Hero card. You can still create it.",
+    );
+    const submit = screen.getByRole("button", { name: "Create and share component" });
+    expect(submit).toBeEnabled();
+    fireEvent.click(submit);
+    await waitFor(() => expect(onClose).toHaveBeenCalled());
+    expect(createComponent).toHaveBeenCalledWith("Hero card", "el-1", { prefillFromDs: true, pageId: null });
+  });
+
+  it("matches ignoring case and outer spaces, and names the other component as it is spelled", () => {
+    const { composer } = withNames(["Hero card"]);
+    renderModal(composer);
+    fireEvent.change(screen.getByLabelText("Name"), { target: { value: "  hero CARD " } });
+    expect(screen.getByTestId("create-component-name-duplicate")).toHaveTextContent(
+      "Another component is called Hero card. You can still create it.",
+    );
+  });
+
+  it("says nothing for a new name, and the empty-name error replaces the warning", () => {
+    const { composer } = withNames(["Hero card"]);
+    renderModal(composer);
+    fireEvent.change(screen.getByLabelText("Name"), { target: { value: "Services grid" } });
+    expect(screen.queryByTestId("create-component-name-duplicate")).toBeNull();
+    fireEvent.change(screen.getByLabelText("Name"), { target: { value: "" } });
+    expect(screen.queryByTestId("create-component-name-duplicate")).toBeNull();
+    expect(screen.getByTestId("create-component-name-error")).toBeInTheDocument();
+  });
+});

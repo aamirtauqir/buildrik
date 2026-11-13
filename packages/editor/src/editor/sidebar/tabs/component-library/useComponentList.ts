@@ -29,8 +29,12 @@ export interface UseComponentListResult {
   /** Set if `getAllComponents()` threw; the caller decides how to show it. */
   error: string | null;
   setError: (error: string | null) => void;
-  /** The workspace's shared library entries (fetchComponentLibrary). */
+  /** The workspace's shared library entries (fetchComponentLibrary); [] while
+   *  the read has failed. */
   library: LibraryComponentEntry[];
+  /** The last library read failed (2L9 217:43415); Add simply shows no rows. */
+  libraryLoadFailed: boolean;
+  retryLibraryLoad: () => void;
 }
 
 export function useComponentList(composer: Composer | null): UseComponentListResult {
@@ -38,6 +42,14 @@ export function useComponentList(composer: Composer | null): UseComponentListRes
   const [isLoaded, setIsLoaded] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [library, setLibrary] = React.useState<LibraryComponentEntry[]>([]);
+  const [libraryLoadFailed, setLibraryLoadFailed] = React.useState(false);
+
+  const loadLibrary = React.useCallback(() => {
+    void fetchComponentLibrary().then((rows) => {
+      setLibrary(rows ?? []);
+      setLibraryLoadFailed(rows === null);
+    });
+  }, []);
 
   React.useEffect(() => {
     if (!composer?.components) return;
@@ -52,8 +64,6 @@ export function useComponentList(composer: Composer | null): UseComponentListRes
         setError(e instanceof Error ? e.message : "Failed to load components");
       }
     };
-    const loadLibrary = () => void fetchComponentLibrary().then(setLibrary);
-
     loadComponents();
     loadLibrary();
     composer.on(EVENTS.COMPONENT_LIST_UPDATED, loadComponents);
@@ -64,7 +74,7 @@ export function useComponentList(composer: Composer | null): UseComponentListRes
       composer.off(EVENTS.COMPONENT_LIST_UPDATED, loadLibrary);
       composer.off(EVENTS.PAGE_CHANGED, loadComponents);
     };
-  }, [composer]);
+  }, [composer, loadLibrary]);
 
-  return { components, isLoaded, error, setError, library };
+  return { components, isLoaded, error, setError, library, libraryLoadFailed, retryLibraryLoad: loadLibrary };
 }

@@ -365,12 +365,12 @@ describe("componentSync — G2-118 scope + library", () => {
     expect(upsert).toHaveBeenLastCalledWith(expect.objectContaining({ componentId: "c2", pageId: null }));
   });
 
-  it("reads the library for the URL site, and [] when the read fails", async () => {
+  it("reads the library for the URL site, and null when the read fails (217:43415)", async () => {
     library.mockResolvedValueOnce([{ componentId: "b", name: "Button", siteCount: 2, onThisSite: false, updatedAt: new Date() }]);
     await expect(fetchComponentLibrary()).resolves.toEqual([{ componentId: "b", name: "Button", siteCount: 2, onThisSite: false }]);
     expect(library).toHaveBeenCalledWith({ siteId: "site-123" });
     library.mockRejectedValueOnce(new Error("offline"));
-    await expect(fetchComponentLibrary()).resolves.toEqual([]);
+    await expect(fetchComponentLibrary()).resolves.toBeNull();
   });
 
   it("fetches one library master's definition for this site", async () => {
