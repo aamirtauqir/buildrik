@@ -10705,7 +10705,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Compared live 2026-10-26 (cms-brand): DRIFT — Reached by inserting Hero Section locally (discarded). Scopes are horizontal tabs in a drawer, not left nav; no thumbs/badges/⋯/side detail/Recently deleted; Sort caret overlaps 'used'. | prior: drift-open — L-C D7: scopes \"This page · N / This site · N / Component library · N\", Search components, Sort (Most used/Name/Newest), \"This site · N\" list with source + uses built in the drawer; full workspace nav, Import package…, Recently deleted, side detail pane and row ⋯ not built. Not compared",
+   "verifiedNote": "built to the board, live not compared — L-C 2026-11-14 (0840d9508, d32f24e4b, 08fa21036; get_design_context 215:46695, 215:46714, 215:46932, 215:46933, 215:47007, 215:47035): Components is a resource area (FullPageRouter, beside the rail); 240px navigation with This page · This site · Component library and counts, Import package…; header ‹ Back to Add, title 20/30/600, Search 320, Sort 160, + Create component 160 primary; list count 12/16/600 ink-soft and 40px rows (thumbnail, name, scope chip, N uses, New on success-tint); a chosen row opens the 320px summary pane beside the list (preview, name 16/600, scope chip, Used in … ›, Structure ›, Insert, Update from selection…, More actions ⋯ menu). Not built: Recently deleted (no component trash, B6-K19), version chips and Update available / Local changes (versioned library updates are out of this version), the row ⋯ menu. Live walk not done (needs a signed-in QA session).",
    "tier": "P2"
   },
   {
@@ -10716,7 +10716,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "drift-open — L-C D7: scopes \"This page · N / This site · N / Component library · N\", Search components, Sort (Most used/Name/Newest), \"This site · N\" list with source + uses built in the drawer; full workspace nav, Import package…, Recently deleted, side detail pane and row ⋯ not built. Not compared.",
+   "verifiedNote": "built to the board, live not compared — L-C 2026-11-14 (0840d9508, d32f24e4b, 08fa21036; get_design_context 215:46695, 215:46714, 215:46932, 215:46933, 215:47007, 215:47035): Components is a resource area (FullPageRouter, beside the rail); 240px navigation with This page · This site · Component library and counts, Import package…; header ‹ Back to Add, title 20/30/600, Search 320, Sort 160, + Create component 160 primary; list count 12/16/600 ink-soft and 40px rows (thumbnail, name, scope chip, N uses, New on success-tint); a chosen row opens the 320px summary pane beside the list (preview, name 16/600, scope chip, Used in … ›, Structure ›, Insert, Update from selection…, More actions ⋯ menu). Not built: Recently deleted (no component trash, B6-K19), version chips and Update available / Local changes (versioned library updates are out of this version), the row ⋯ menu. Live walk not done (needs a signed-in QA session). This page scope: the same list filtered to masters scoped to the open page, with the 217:43651 empty state.",
    "inheritsFrom": "215:43588",
    "tier": "P2"
   },

@@ -30,8 +30,6 @@ interface UseComponentsStateParams {
   selectedComponentId?: string | null;
   onComponentSelect?: (component: ComponentDefinition | null) => void;
   onClose?: () => void;
-  onExpandToggle?: () => void;
-  onHelpClick?: () => void;
 }
 
 export function useComponentsState({
@@ -39,8 +37,6 @@ export function useComponentsState({
   selectedComponentId,
   onComponentSelect,
   onClose,
-  onExpandToggle,
-  onHelpClick,
 }: UseComponentsStateParams) {
   // v3 FC-10: the load + subscribe shape lives once, in useComponentList.
   const { components, isLoaded, error, setError, library, libraryLoadFailed, retryLibraryLoad } =
@@ -216,12 +212,7 @@ export function useComponentsState({
   // Derived state
   const canCreateComponent = canvasSelection.length > 0;
   const isAtComponentLimit = components.length >= MAX_COMPONENTS;
-  const isStandaloneMode = onClose !== undefined || onExpandToggle !== undefined;
 
-  // No fallback: PanelHeader hides the help affordance when the handler is
-  // undefined, which is what we want. The old fallback opened docs.aquibra.com —
-  // a domain from a project this was forked from, which does not resolve.
-  const handleHelpClickFn = onHelpClick;
 
   return {
     // Components
@@ -264,8 +255,6 @@ export function useComponentsState({
     isAtComponentLimit,
     maxComponents: MAX_COMPONENTS,
     // Standalone
-    isStandaloneMode,
-    handleHelpClick: handleHelpClickFn,
   };
 
 }

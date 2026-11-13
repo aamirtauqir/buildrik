@@ -3685,18 +3685,13 @@ const CASES: Record<string, () => React.ReactElement> = {
     </div>
   ),
   // ── Components · library (board 641:2546) ────────────────────────────────
-  // onExpandToggle + onClose are what put the panel in `isStandaloneMode`, and
-  // therefore what draws the 44h header the board opens with; onHelpClick is
-  // left off because the board's header carries exactly two 16px controls.
+  // 2L9 215:43588: Components is a resource area — beside the 56px rail,
+  // between the 56px topbar and the 32px bottom bar (1384×812).
   "components-library": () => (
     <div data-probe="components-library">
       <ToastProvider>
-        <div className="tw:flex tw:h-203 tw:w-70 tw:flex-col tw:overflow-hidden tw:bg-white">
-          <ComponentsTab
-            composer={COMPONENTS_COMPOSER}
-            onExpandToggle={() => {}}
-            onClose={() => {}}
-          />
+        <div className="tw:flex tw:h-[812px] tw:w-[1384px] tw:flex-col tw:overflow-hidden tw:bg-white">
+          <ComponentsTab composer={COMPONENTS_COMPOSER} onClose={() => {}} />
         </div>
       </ToastProvider>
     </div>
