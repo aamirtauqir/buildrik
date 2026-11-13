@@ -49,10 +49,12 @@ describe("ComponentsTab — This page · This site · Component library (2L9 215
 
   it("This site lists site masters, a linked one with its source, most used first; another page's never shows", async () => {
     mountScoped();
-    await screen.findByText("Component library · 2");
+    await screen.findByRole("tab", { name: "Component library · 2" });
     expect(screen.getByTestId("comp-section-header").textContent).toBe("This site · 2");
-    expect(within(screen.getByTestId("comp-row-btn")).getByTestId("comp-row-count-btn").textContent).toBe("24 uses · Component library");
-    expect(screen.getByTestId("comp-row-count-hdr").textContent).not.toMatch(/Component library/);
+    /* 215:46939 — the source is a scope chip beside the uses. */
+    expect(within(screen.getByTestId("comp-row-btn")).getByTestId("comp-row-count-btn").textContent).toBe("24 uses");
+    expect(screen.getByTestId("comp-row-scope-btn").textContent).toBe("Component library");
+    expect(screen.getByTestId("comp-row-scope-hdr").textContent).toBe("This site");
     expect(screen.queryByTestId("comp-row-menu-hero")).toBeNull();
     expect(screen.queryByTestId("comp-row-intro")).toBeNull();
     const order = [...document.querySelectorAll("[data-testid^='comp-row-'][role='button']")].map((n) => n.getAttribute("data-testid"));

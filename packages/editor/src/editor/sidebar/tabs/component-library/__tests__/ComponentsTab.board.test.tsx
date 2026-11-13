@@ -1,7 +1,8 @@
 /**
- * Board 4418:142419 (Add › Manage components): a "‹  Add" back row, the
- * intro sentence, section headers with a count, rows without a chevron, and
- * "+ Create component" in the pinned footer.
+ * 2L9 215:43588 (B6-K02): the Components resource area — navigation with
+ * scope counts, "‹ Back to Add", search, sort and "+ Create component" in the
+ * header, and 40px rows with a scope chip and uses. (Replaced the drawer test
+ * for board 4418:142419: back row, pinned footer.)
  *
  * @license BSD-3-Clause
  */
@@ -29,22 +30,32 @@ function mount(components: never[]) {
   return composer;
 }
 
-describe("ComponentsTab — board 4418:142419", () => {
-  it("draws the back row, the scopes, a counted section header and chevron-less rows", async () => {
+describe("ComponentsTab — 2L9 215:43588 (B6-K02) resource area", () => {
+  it("draws the navigation, the header and 40px rows with scope chip and uses", async () => {
     const composer = mount([c("hdr", "Site header"), c("ftr", "Footer")]);
+    /* 215:46716 — "‹ Back to Add" returns to Add. */
     const back = await screen.findByTestId("comp-back-row");
-    expect(back.textContent?.replace(/\s+/g, " ")).toBe("‹ Add");
+    expect(back.textContent).toBe("‹ Back to Add");
     fireEvent.click(back);
     expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_SWITCH_TAB, { tab: "add" });
 
-    /* 2L9 215:43588 — scopes with counts, then "This site · N" (no intro). */
-    expect(screen.queryByTestId("comp-intro")).toBeNull();
-    expect(screen.getAllByRole("tab").map((t) => t.textContent)).toEqual(["This page · 0", "This site · 2", "Component library · 0"]);
+    /* 215:46695 — the scopes as a vertical list with counts, This site chosen. */
+    expect(screen.getAllByRole("tab").map((t) => t.getAttribute("aria-label"))).toEqual(["This page · 0", "This site · 2", "Component library · 0"]);
+    expect(screen.getByRole("tab", { name: "This site · 2" })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("tab", { name: "This site · 2" }).className).toContain("--bk-accent-subtle");
+    expect(screen.getByTestId("comp-import-open").textContent).toBe("Import package…");
+
+    /* 215:46714 — + Create component sits in the header, not a footer. */
+    expect(screen.getByTestId("comp-create").textContent).toBe("+ Create component");
+    expect(screen.queryByTestId("comp-footer")).toBeNull();
+
+    /* 215:46932 / 215:46933 — "This site · N", then 40px rows. */
     expect(screen.getByTestId("comp-section-header").textContent).toBe("This site · 2");
-    expect(screen.getByTestId("comp-row-hdr").textContent).toBe("Site header6 uses");
+    expect(screen.getByTestId("comp-row-hdr").className).toContain("tw:h-10");
+    expect(screen.getByTestId("comp-row-scope-hdr").textContent).toBe("This site");
+    expect(screen.getByTestId("comp-row-count-hdr").textContent).toBe("6 uses");
     /* 2L9 217:43947 — the full name on hover, however the row truncates it. */
     expect(screen.getByTestId("comp-row-name-hdr")).toHaveAttribute("title", "Site header");
-    expect(screen.getByTestId("comp-footer").textContent).toBe("+ Create component");
   });
 
   /* Board 4418:166980: a master made in this session is badged New. */
@@ -84,8 +95,10 @@ describe("ComponentsTab — board 4418:142419", () => {
     expect(screen.getByTestId("comp-row-hdr").className).not.toContain("tw:opacity-40");
   });
 
-  it("the empty state keeps the back row too", async () => {
+  it("the empty state keeps the navigation and the way back", async () => {
     mount([]);
-    expect((await screen.findByTestId("comp-back-row")).textContent?.replace(/\s+/g, " ")).toBe("‹ Add");
+    expect((await screen.findByTestId("comp-back-row")).textContent).toBe("‹ Back to Add");
+    expect(screen.getByTestId("comp-nav")).toBeInTheDocument();
+    expect(screen.getByTestId("comp-empty").textContent).toMatch(/^No components yet\./);
   });
 });
