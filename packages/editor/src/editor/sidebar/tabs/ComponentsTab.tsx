@@ -201,7 +201,10 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
             color="light"
             size="xs"
             className="tw:h-8 tw:w-full tw:justify-start tw:border-0 tw:bg-transparent tw:pl-3 tw:text-[13px] tw:font-medium tw:text-[var(--bk-ink)] tw:shadow-none tw:hover:bg-[var(--bk-bg-subtle)] tw:focus:ring-0"
-            onClick={() => setImporting(true)}
+            onClick={() => {
+              setImporting(true);
+              setCompactNavOpen(false);
+            }}
             data-testid="comp-import-open"
           >
             Import package…

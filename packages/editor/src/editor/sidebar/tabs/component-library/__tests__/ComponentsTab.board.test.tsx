@@ -302,4 +302,35 @@ describe("ComponentsTab — 2L9 215:43588 (B6-K02) resource area", () => {
       mm.mockRestore();
     }
   });
+
+  /* Import from the folded navigation opens the dialog and closes the
+     popover; widening past 1440 brings the column back. */
+  it("folded Import opens the dialog; widening restores the column", async () => {
+    let matches = true;
+    const listeners: Array<() => void> = [];
+    const mm = vi.spyOn(window, "matchMedia").mockImplementation(
+      (q: string) =>
+        ({
+          get matches() {
+            return matches;
+          },
+          media: q,
+          addEventListener: (_: string, fn: () => void) => listeners.push(fn),
+          removeEventListener: () => {},
+        }) as never,
+    );
+    try {
+      mount([c("hdr", "Site header")]);
+      fireEvent.click(await screen.findByTestId("comp-compact-nav"));
+      fireEvent.click(screen.getByTestId("comp-import-open"));
+      expect(screen.getByTestId("comp-import-continue")).toBeInTheDocument();
+      expect(screen.getByTestId("comp-compact-nav")).toHaveAttribute("aria-expanded", "false");
+      matches = false;
+      act(() => listeners.forEach((fn) => fn()));
+      expect(screen.getByTestId("comp-nav")).toBeInTheDocument();
+      expect(screen.queryByTestId("comp-compact-nav")).toBeNull();
+    } finally {
+      mm.mockRestore();
+    }
+  });
 });
