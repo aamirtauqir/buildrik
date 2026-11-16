@@ -11,7 +11,7 @@
  */
 
 import * as React from "react";
-import { Button, ConfirmDialog, EmptyState, EmptyStateDesc, EmptyStateTitle, PanelSearch, Select, SkeletonListItem, Tooltip, useToast } from "@/editor/chrome-ui";
+import { Button, ConfirmDialog, EmptyState, EmptyStateDesc, EmptyStateTitle, IconButton, Menu, MenuItem, PanelSearch, Popover, Select, SkeletonListItem, Tooltip, useToast } from "@/editor/chrome-ui";
 import { PanelErrorState } from "../shared/PanelErrorState";
 import { ComponentDetailScreen, componentDeleteCopy } from "./component-library/ComponentDetailScreen";
 import { ComponentIcon } from "./component-library/ComponentIcon";
@@ -20,6 +20,7 @@ import { useComponentsState } from "./component-library/useComponentsState";
 import { ImportPackageDialog } from "./component-library/ImportPackageDialog";
 import { LibraryDetailPane } from "./component-library/LibraryDetailPane";
 import { UsedOnView } from "./component-library/UsedOnView";
+import { ExportPackageDialog } from "./component-library/ExportPackageDialog";
 
 import "./component-library/ComponentsTab.css";
 import { EVENTS } from "@/shared/constants";
@@ -91,6 +92,12 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
   const [libraryPick, setLibraryPick] = React.useState<string | null>(null);
   /* 217:42647 — the chosen master's places, shown in the list's stead. */
   const [usedOnFor, setUsedOnFor] = React.useState<string | null>(null);
+  /* 228:46316 (B6-K41) — the row ⋯ menu: which row's menu is open, the
+     master being exported, and a Rename request for the summary pane. */
+  const [rowMenu, setRowMenu] = React.useState<string | null>(null);
+  const [exportId, setExportId] = React.useState<string | null>(null);
+  const [renameFor, setRenameFor] = React.useState<string | null>(null);
+  const consumeRename = React.useCallback(() => setRenameFor(null), []);
 
 
   // Which of this site's masters are shared from the workspace library.
@@ -131,6 +138,8 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         composer={composer}
         linked={linkedIds.has(detail.id)}
         onShowUsedOn={() => setUsedOnFor(detail.id)}
+        startRenaming={renameFor === detail.id}
+        onRenameConsumed={consumeRename}
         onBack={state.handleBackFromDetail}
         onBackToInstance={state.backToInstance}
         onInsert={state.handleDetailInsert}
@@ -217,11 +226,23 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         </div>
       </div>
       {importing ? <ImportPackageDialog composer={composer} onClose={() => setImporting(false)} /> : null}
+      {exportId && composer?.components?.getComponent(exportId) ? (
+        <ExportPackageDialog
+          component={composer.components.getComponent(exportId)!}
+          all={composer.components.getAllComponents()}
+          onClose={() => setExportId(null)}
+        />
+      ) : null}
       <ConfirmDialog
         open={!!state.confirmDelete}
         onClose={() => state.setConfirmDelete(null)}
         onConfirm={() => {
-          void state.confirmDeleteAction().then((toast) => toast && addToast(toast));
+          const deleting = state.confirmDelete?.id;
+          void state.confirmDeleteAction().then((toast) => {
+            if (toast) addToast(toast);
+            /* The summary must not outlive the master it shows. */
+            if (deleting && state.detailComponent?.id === deleting) state.handleBackFromDetail();
+          });
         }}
         {...componentDeleteCopy(
           state.confirmDelete?.name ?? "",
@@ -270,6 +291,10 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
     );
   const libraryShown = library.filter((l) => !needle || l.name.toLowerCase().includes(needle));
 
+  const runRow = (fn: () => void) => () => {
+    setRowMenu(null);
+    fn();
+  };
   const renderRow = (component: (typeof state.components)[number], isLinked: boolean) => {
     const n = uses(component.id);
     return (
@@ -317,6 +342,50 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
               New
             </span>
           )}
+        </span>
+        {/* 228:46316 (B6-K41) — Insert · Rename · Duplicate · Export… · Delete. */}
+        <span onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
+          <Popover
+            open={rowMenu === component.id}
+            onClose={() => setRowMenu(null)}
+            placement="bottom-end"
+            label={`${component.name} actions`}
+            trigger={
+              <IconButton
+                label={`${component.name} actions`}
+                aria-haspopup="menu"
+                aria-expanded={rowMenu === component.id}
+                data-testid={`comp-row-more-${component.id}`}
+                onClick={() => setRowMenu((v) => (v === component.id ? null : component.id))}
+              >
+                ⋯
+              </IconButton>
+            }
+          >
+            <Menu label={`${component.name} actions`} className="tw:w-[200px]">
+              <MenuItem data-testid="comp-row-insert" onClick={runRow(() => void state.handleInstantiate(component.id))}>
+                Insert
+              </MenuItem>
+              <MenuItem
+                data-testid="comp-row-rename"
+                onClick={runRow(() => {
+                  state.handleViewDetail(component);
+                  setRenameFor(component.id);
+                })}
+              >
+                Rename
+              </MenuItem>
+              <MenuItem data-testid="comp-row-duplicate" onClick={runRow(() => void state.handleDuplicate(component.id))}>
+                Duplicate
+              </MenuItem>
+              <MenuItem data-testid="comp-row-export" onClick={runRow(() => setExportId(component.id))}>
+                Export…
+              </MenuItem>
+              <MenuItem danger data-testid="comp-row-delete" onClick={runRow(() => state.handleDelete(component.id))}>
+                Delete
+              </MenuItem>
+            </Menu>
+          </Popover>
         </span>
       </div>
     );

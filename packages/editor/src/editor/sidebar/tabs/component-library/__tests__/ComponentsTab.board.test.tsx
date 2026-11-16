@@ -7,7 +7,7 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import * as React from "react";
 import { ToastProvider } from "@/editor/chrome-ui";
 import { EVENTS } from "@/shared/constants";
@@ -148,5 +148,48 @@ describe("ComponentsTab — 2L9 215:43588 (B6-K02) resource area", () => {
       "Select a section on the canvas and choose Save as component… in Layers or the Inspector. Choose This page to keep it here only.",
     );
     expect(body.className).toContain("--bk-ink-soft");
+  });
+
+  /* 228:46316 (B6-K41): each row's ⋯ — Insert, Rename, Duplicate, Export…,
+     Delete (red). Opening it does not open the row. */
+  it("the row menu runs Insert, Rename, Duplicate and Delete", async () => {
+    const composer = mount([c("hdr", "Site header"), c("ftr", "Footer")]);
+    fireEvent.click(await screen.findByTestId("comp-row-more-hdr"));
+    expect(screen.queryByTestId("component-master")).toBeNull();
+    const items = ["comp-row-insert", "comp-row-rename", "comp-row-duplicate", "comp-row-export", "comp-row-delete"];
+    expect(items.map((id) => screen.getByTestId(id).textContent)).toEqual(["Insert", "Rename", "Duplicate", "Export…", "Delete"]);
+    expect(screen.getByTestId("comp-row-delete").className).toMatch(/error|red/);
+
+    fireEvent.click(screen.getByTestId("comp-row-duplicate"));
+    await waitFor(() => expect(composer.components.duplicateComponent).toHaveBeenCalledWith("hdr"));
+
+    fireEvent.click(screen.getByTestId("comp-row-more-hdr"));
+    fireEvent.click(screen.getByTestId("comp-row-insert"));
+    /* The shared insert answers in a toast either way (instantiate.ts). */
+    expect(await screen.findByText(/^(Component added to canvas|Open a page first to add this component\.)$/)).toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId("comp-row-more-hdr"));
+    fireEvent.click(screen.getByTestId("comp-row-rename"));
+    expect(screen.getByTestId("component-master")).toBeInTheDocument();
+    expect(screen.getByTestId("component-rename-input")).toHaveValue("Site header");
+
+    fireEvent.click(screen.getByTestId("comp-row-more-ftr"));
+    fireEvent.click(screen.getByTestId("comp-row-delete"));
+    expect(await screen.findByText("Delete “Footer”?")).toBeInTheDocument();
+  });
+
+  /* A Rename from the row menu is one request: a summary opened later must
+     not start in rename. */
+  it("Rename from the menu does not stick to later summaries", async () => {
+    mount([c("hdr", "Site header"), c("ftr", "Footer")]);
+    fireEvent.click(await screen.findByTestId("comp-row-more-hdr"));
+    fireEvent.click(screen.getByTestId("comp-row-rename"));
+    expect(screen.getByTestId("component-rename-input")).toBeInTheDocument();
+    fireEvent.keyDown(screen.getByTestId("component-rename-input"), { key: "Escape" });
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(screen.queryByTestId("component-master")).toBeNull();
+    fireEvent.click(screen.getByTestId("comp-row-ftr"));
+    expect(screen.queryByTestId("component-rename-input")).toBeNull();
+    expect(screen.getByTestId("component-name").textContent).toBe("Footer");
   });
 });

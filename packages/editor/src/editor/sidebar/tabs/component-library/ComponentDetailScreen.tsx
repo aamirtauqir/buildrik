@@ -42,6 +42,10 @@ export interface ComponentDetailScreenProps {
   linked?: boolean;
   /** "Used in … ›" (215:47046) opens the places view (217:42647). */
   onShowUsedOn?: () => void;
+  /** The row menu's Rename (228:46316): put the name in edit once, then
+   *  report the request consumed so a later summary does not start in rename. */
+  startRenaming?: boolean;
+  onRenameConsumed?: () => void;
   /** Callback when component is inserted */
   onInsert?: () => void;
   /** Callback when component is duplicated */
@@ -104,6 +108,8 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
   onBackToInstance,
   linked = false,
   onShowUsedOn,
+  startRenaming = false,
+  onRenameConsumed,
   onInsert,
   onDuplicate,
   onDelete,
@@ -122,6 +128,11 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
 
   const [exporting, setExporting] = React.useState(false);
   const [renaming, setRenaming] = React.useState(false);
+  React.useEffect(() => {
+    if (!startRenaming) return;
+    setRenaming(true);
+    onRenameConsumed?.();
+  }, [startRenaming, onRenameConsumed]);
   const [draftName, setDraftName] = React.useState(component.name);
   /* The back row's (and Escape's) one level up. */
   const backOut = onBackToInstance ?? onBack;

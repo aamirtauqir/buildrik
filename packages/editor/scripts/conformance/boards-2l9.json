@@ -11516,7 +11516,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Rows have no ⋯ menu (src/editor/sidebar/tabs/ComponentsTab.tsx:255); Rename/Duplicate/Delete are detail buttons (src/editor/sidebar/tabs/co…",
+   "verifiedNote": "built to the board, live not compared — L-C 2026-11-16 (screenshot 228:46316 read): each site row has a ⋯ IconButton opening a 200px chrome-ui Menu below it (bottom-end): Insert (the shared insert, same toasts), Rename (opens the summary with the name in edit), Duplicate (duplicateComponent, toast), Export… (ExportPackageDialog), Delete (danger, the same confirm and Undo toast; closes the summary if it shows that master). Opening ⋯ does not choose the row. Not built: a ⋯ on Component library rows (library masters belong to their own site). Test: ComponentsTab.board.test.tsx \"the row menu runs…\".",
    "tier": "P2"
   },
   {
