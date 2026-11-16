@@ -258,4 +258,26 @@ describe("ComponentsTab — 2L9 215:43588 (B6-K02) resource area", () => {
     expect(composer.selection.select).toHaveBeenCalledWith(instance);
     expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_SWITCH_TAB, { tab: "layers" });
   });
+
+  /* The way back belongs to the master the door opened: choosing another row
+     returns the header to "‹ Back to Add". The Inspector's door (no "from")
+     keeps the summary's "‹ Back to instance". */
+  it("Back to Layers does not follow to another master; the Inspector door keeps Back to instance", async () => {
+    const composer = createMockComposer({ components: [c("hdr", "Site header"), c("ftr", "Footer")] });
+    Object.assign(composer.components, { isAvailable: () => true, getInstancesOfComponent: () => [] });
+    Object.assign(composer.elements, { getElement: (id: string) => (id === "inst-1" ? { getId: () => "inst-1" } : null) });
+    Object.assign(composer.selection, { select: vi.fn() });
+    requestOpenMaster(composer as never, "hdr", "inst-1", "layers");
+    render(
+      <ToastProvider>
+        <ComponentsTab composer={composer as never} />
+      </ToastProvider>,
+    );
+    expect((await screen.findByTestId("comp-back-row")).textContent).toBe("‹ Back to Layers · Site header");
+    fireEvent.click(screen.getByTestId("comp-row-ftr"));
+    expect(screen.getByTestId("comp-back-row").textContent).toBe("‹ Back to Add");
+    act(() => requestOpenMaster(composer as never, "hdr", "inst-1"));
+    expect(screen.getByTestId("comp-back-row").textContent).toBe("‹ Back to Add");
+    expect(screen.getByTestId("component-back-row").textContent).toBe("‹ Back to instance");
+  });
 });
