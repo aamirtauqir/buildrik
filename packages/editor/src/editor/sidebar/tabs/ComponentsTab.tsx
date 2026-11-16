@@ -114,6 +114,12 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
     }
   }, [pendingToast, addToast, setPendingToast]);
   const online = useOnlineStatus();
+  /* A library that failed while offline loads again once the connection
+     returns, without a Retry click. */
+  const { libraryLoadFailed, retryLibraryLoad } = state;
+  React.useEffect(() => {
+    if (online && libraryLoadFailed) retryLibraryLoad();
+  }, [online]); // eslint-disable-line react-hooks/exhaustive-deps -- only on reconnect
 
   // ── Area frame: navigation · header · body (215:43588) ───────────────────────
 

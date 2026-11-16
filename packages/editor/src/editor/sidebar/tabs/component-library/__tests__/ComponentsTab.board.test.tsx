@@ -7,7 +7,7 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { act, render, screen, fireEvent, waitFor } from "@testing-library/react";
 import * as React from "react";
 import { ToastProvider } from "@/editor/chrome-ui";
 import { EVENTS } from "@/shared/constants";
@@ -16,6 +16,7 @@ import { createMockComposer } from "@/editor/sidebar/__tests__/test-utils/mockCo
 vi.mock("@/services/componentSync", () => ({ fetchComponentLibrary: vi.fn(async () => []) }));
 
 import { ComponentsTab } from "@/editor/sidebar/tabs/ComponentsTab";
+import { fetchComponentLibrary } from "@/services/componentSync";
 
 const c = (id: string, name: string) => ({ id, name, masterTree: {}, createdAt: 1, updatedAt: 1, version: 1 }) as never;
 
@@ -209,6 +210,25 @@ describe("ComponentsTab — 2L9 215:43588 (B6-K02) resource area", () => {
       fireEvent.click(screen.getByRole("tab", { name: "Component library · —" }));
       expect(screen.getByTestId("comp-offline-note")).toBeInTheDocument();
       expect(screen.queryByTestId("comp-empty-library")).toBeNull();
+    } finally {
+      online.mockRestore();
+    }
+  });
+
+  /* Back online, the note goes and the library count returns without a reload. */
+  it("coming back online clears the note and restores the library count", async () => {
+    const online = vi.spyOn(navigator, "onLine", "get").mockReturnValue(false);
+    /* Opened offline, the library fetch fails (null). */
+    vi.mocked(fetchComponentLibrary).mockResolvedValueOnce(null);
+    try {
+      mount([c("hdr", "Site header")]);
+      await screen.findByTestId("comp-offline-note");
+      online.mockReturnValue(true);
+      act(() => {
+        window.dispatchEvent(new Event("online"));
+      });
+      expect(screen.queryByTestId("comp-offline-note")).toBeNull();
+      expect(await screen.findByRole("tab", { name: "Component library · 0" })).toBeInTheDocument();
     } finally {
       online.mockRestore();
     }
