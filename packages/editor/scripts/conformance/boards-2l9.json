@@ -10916,7 +10916,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "src/editor/sidebar/tabs/component-library/ComponentDetailScreen.tsx:400 USED ON is per page, locates first instance only; board lists each …",
+   "verifiedNote": "built to the board, live not compared — L-C 2026-11-16 (get_design_context 217:42647, metadata 217:42594): the summary's Used in N places on M pages › opens UsedOnView in the list's stead — ‹ Back to {name}, title 20/30/600 \"{name} is used in N places on M pages\", one 49px row per top-level section holding instances (page 13/500 ink, \"Section N · name\" or \"name (N instances)\" 13 ink-soft, a 120×32 secondary Locate ›), and \"Locate opens the page with that instance selected.\" Locate selects the first instance of that place on its page (locateComment). usedOnPlaces is the one instance→page walk; the summary counts read it too. Not built: the board's second sentence \"Back returns here with the list and search kept\" — leaving Components for the canvas does not keep this view (not verified, not claimed). Tests: UsedOnView.test.tsx, ComponentsTab.board.test.tsx.",
    "tier": "P2"
   },
   {

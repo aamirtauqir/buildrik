@@ -19,6 +19,7 @@ import type { ComponentsTabProps } from "./component-library/types";
 import { useComponentsState } from "./component-library/useComponentsState";
 import { ImportPackageDialog } from "./component-library/ImportPackageDialog";
 import { LibraryDetailPane } from "./component-library/LibraryDetailPane";
+import { UsedOnView } from "./component-library/UsedOnView";
 
 import "./component-library/ComponentsTab.css";
 import { EVENTS } from "@/shared/constants";
@@ -88,6 +89,8 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
   const [importing, setImporting] = React.useState(false);
   /* 215:44616 — the library master chosen in the Component library scope. */
   const [libraryPick, setLibraryPick] = React.useState<string | null>(null);
+  /* 217:42647 — the chosen master's places, shown in the list's stead. */
+  const [usedOnFor, setUsedOnFor] = React.useState<string | null>(null);
 
 
   // Which of this site's masters are shared from the workspace library.
@@ -122,11 +125,12 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
   const pane =
     composer?.components?.isAvailable() && !state.error && pickedLibrary ? (
       <LibraryDetailPane entry={pickedLibrary} composer={composer} onClose={() => setLibraryPick(null)} />
-    ) : composer?.components?.isAvailable() && !state.error && detail ? (
+    ) : composer?.components?.isAvailable() && !state.error && detail && usedOnFor !== detail.id ? (
       <ComponentDetailScreen
         component={detail}
         composer={composer}
         linked={linkedIds.has(detail.id)}
+        onShowUsedOn={() => setUsedOnFor(detail.id)}
         onBack={state.handleBackFromDetail}
         onBackToInstance={state.backToInstance}
         onInsert={state.handleDetailInsert}
@@ -329,6 +333,10 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         </EmptyStateDesc>
       </div>,
     );
+  }
+
+  if (composer && detail && usedOnFor === detail.id) {
+    return frame(<UsedOnView component={detail} composer={composer} onBack={() => setUsedOnFor(null)} />);
   }
 
   return frame(

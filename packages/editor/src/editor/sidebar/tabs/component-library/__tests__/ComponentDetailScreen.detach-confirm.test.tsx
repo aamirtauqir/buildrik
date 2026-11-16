@@ -113,31 +113,15 @@ describe("ComponentDetailScreen — master screen (4418:142876)", () => {
      as nothing happening at all: no selection, no scroll. It now also
      selects one of the page's actual instances (`locateOnCanvas`, the same
      page-switch/select/scroll seam Review's "Locate ›" row uses). */
-  it("STRUCTURE lists the master's parts; USED ON the pages with instances, which jump to an instance on click", () => {
-    const { composer, setActivePage, select } = makeComposer();
+  it("STRUCTURE lists the master's parts; Used in counts places and pages", () => {
+    const { composer } = makeComposer();
     renderMaster(composer);
     fireEvent.click(screen.getByTestId("component-structure-header"));
     expect(screen.getByTestId("component-structure-header").textContent).toContain("3");
     const rows = screen.getAllByTestId("component-structure-row").map((r) => r.textContent);
     expect(rows).toEqual(["Imageimage", "Titleheading", "Texttext · CMS bound"]);
-    fireEvent.click(screen.getByTestId("component-usedon-toggle"));
-    expect(screen.getByTestId("component-usedon-home").textContent).toBe("Home2 instances");
-    expect(screen.getByTestId("component-usedon-menu").textContent).toBe("Menu1 instance");
-    expect(screen.queryByTestId("component-usedon-about")).toBeNull();
-
-    // Menu isn't the active page ("home" is) — switches, then selects e3.
-    fireEvent.click(screen.getByTestId("component-usedon-menu"));
-    expect(setActivePage).toHaveBeenCalledWith("menu");
-    expect(select).toHaveBeenCalledWith(expect.objectContaining({ getId: expect.any(Function) }));
-    expect((select.mock.calls[0][0] as { getId: () => string }).getId()).toBe("e3");
-
-    // Home IS already active — no page switch, but still selects an instance
-    // (e1, the first of its two) instead of doing nothing.
-    setActivePage.mockClear();
-    select.mockClear();
-    fireEvent.click(screen.getByTestId("component-usedon-home"));
-    expect(setActivePage).not.toHaveBeenCalled();
-    expect((select.mock.calls[0][0] as { getId: () => string }).getId()).toBe("e1");
+    /* 2L9 217:42647 — "Used in … ›" opens the places view (UsedOnView.test). */
+    expect(screen.getByTestId("component-usedon-toggle").textContent).toBe("Used in 3 places on 2 pages ›");
   });
 
   it("the name renames inline (G2-124)", async () => {

@@ -22,7 +22,7 @@ import { INSTANTIATE_TOASTS, instantiateComponentAtSelection } from "./instantia
    seam"). Reused rather than re-implemented for the used-on row below —
    the name is Review's, the behaviour (page switch → select → scrollIntoView)
    is exactly what "click a used-on row" needs too. */
-import { locateComment as locateOnCanvas } from "@/editor/sidebar/tabs/review/locate";
+import { usedOnPlaces } from "./UsedOnView";
 import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
 // ============================================
 // Types
@@ -40,6 +40,8 @@ export interface ComponentDetailScreenProps {
   onBackToInstance?: () => void;
   /** The master is shared from the workspace library (scope chip, 215:47042). */
   linked?: boolean;
+  /** "Used in … ›" (215:47046) opens the places view (217:42647). */
+  onShowUsedOn?: () => void;
   /** Callback when component is inserted */
   onInsert?: () => void;
   /** Callback when component is duplicated */
@@ -101,6 +103,7 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
   onBack,
   onBackToInstance,
   linked = false,
+  onShowUsedOn,
   onInsert,
   onDuplicate,
   onDelete,
@@ -238,24 +241,11 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
   // Instance count for delete message
   const instanceCount = composer?.components?.getInstancesOfComponent?.(component.id)?.length ?? 0;
 
-  /* Instances by page — USED ON. Flow-check (2026-09-25): clicking a row only
-     switched page — on the page that was already active (the common case,
-     since you opened the master from something on it), that reads as
-     "nothing happened": no selection, no scroll, row just highlights.
-     `firstInstanceId` lets the click select + scroll to an actual instance,
-     not just land on its page. */
+  /* 2L9 217:42647 (B6-K21): the places it is used, from the one walk up to a
+     page (usedOnPlaces); "Used in … ›" opens them as their own view. */
   const instances = composer?.components?.getInstancesOfComponent?.(component.id) ?? [];
-  const pages = composer?.elements.getAllPages?.() ?? [];
-  const usedOn = pages
-    .map((page) => {
-      const pageInstances = instances.filter((inst) => {
-        let el = composer?.elements.getElement(inst.elementId) ?? null;
-        while (el?.getParent()) el = el.getParent();
-        return el?.getId() === page.root?.id;
-      });
-      return { page, count: pageInstances.length, firstInstanceId: pageInstances[0]?.elementId ?? null };
-    })
-    .filter((row) => row.count > 0);
+  const places = usedOnPlaces(composer, component.id);
+  const pageCount = new Set(places.map((p) => p.page.id)).size;
   const structure = component.masterTree?.children ?? [];
   const siteName = composer?.getProjectMetadata?.()?.name || "this site";
 
@@ -264,7 +254,7 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
   const detachAll = async () => {
     if (!composer || instances.length === 0) return;
     const snapshot = composer.components.snapshotComponent(component.id);
-    const onPages = usedOn.length;
+    const onPages = pageCount;
     const n = instances.length;
     await Promise.all(instances.map((inst) => composer.components.detachInstance(inst.elementId)));
     addToast({
@@ -285,13 +275,13 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
   };
 
   /* 215:47046 / 215:47048 — "Used in … ›" and "Structure ›" open their lists. */
-  const [open, setOpen] = React.useState<"usedOn" | "structure" | null>(null);
+  const [open, setOpen] = React.useState<"structure" | null>(null);
   const [moreOpen, setMoreOpen] = React.useState(false);
   const runMore = (fn: () => void) => () => {
     setMoreOpen(false);
     fn();
   };
-  const toggle = (which: "usedOn" | "structure") => setOpen((v) => (v === which ? null : which));
+  const toggle = (which: "structure") => setOpen((v) => (v === which ? null : which));
 
   return (
     /* 215:47035 — the summary pane: 320 wide, a hairline on its left, 24 in,
@@ -367,41 +357,12 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
             variant="link"
             size="xs"
             className={LINK}
-            aria-expanded={open === "usedOn"}
-            onClick={() => toggle("usedOn")}
+            onClick={onShowUsedOn}
             data-testid="component-usedon-toggle"
           >
-            {`Used in ${count(instanceCount, "place", "places")} on ${count(usedOn.length, "page", "pages")} ›`}
+            {`Used in ${count(instanceCount, "place", "places")} on ${count(pageCount, "page", "pages")} ›`}
           </Button>
         )}
-        {open === "usedOn" ? (
-          <div data-testid="component-usedon-header" className="tw:flex tw:flex-col">
-            {usedOn.map(({ page, count: n, firstInstanceId }) => {
-              const jumpToUsage = () => {
-                if (!composer) return;
-                if (firstInstanceId) {
-                  locateOnCanvas(composer, { pageId: page.id, targetSelector: firstInstanceId });
-                } else {
-                  composer.elements.setActivePage(page.id);
-                }
-              };
-              return (
-                <div
-                  key={page.id}
-                  role="button"
-                  tabIndex={0}
-                  className={`${LIST_ROW} tw:cursor-pointer hover:tw:bg-[var(--bk-bg-subtle)]`}
-                  data-testid={`component-usedon-${page.id}`}
-                  onClick={jumpToUsage}
-                  onKeyDown={(e) => { if (e.key === "Enter") jumpToUsage(); }}
-                >
-                  <span className="tw:truncate">{page.name}</span>
-                  <span className={ROW_META}>{n} instance{n === 1 ? "" : "s"}</span>
-                </div>
-              );
-            })}
-          </div>
-        ) : null}
         <Button
           variant="link"
           size="xs"

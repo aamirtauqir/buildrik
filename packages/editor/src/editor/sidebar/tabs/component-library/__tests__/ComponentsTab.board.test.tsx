@@ -21,7 +21,7 @@ const c = (id: string, name: string) => ({ id, name, masterTree: {}, createdAt: 
 
 function mount(components: never[]) {
   const composer = createMockComposer({ components });
-  Object.assign(composer.components, { isAvailable: () => true, getInstancesOfComponent: () => new Array(6) });
+  Object.assign(composer.components, { isAvailable: () => true, getInstancesOfComponent: () => Array.from({ length: 6 }, (_, i) => ({ elementId: `i${i}` })) });
   render(
     <ToastProvider>
       <ComponentsTab composer={composer as never} />
@@ -116,5 +116,19 @@ describe("ComponentsTab — 2L9 215:43588 (B6-K02) resource area", () => {
     expect(screen.getByTestId("component-name").textContent).toBe("Footer");
     fireEvent.keyDown(document, { key: "Escape" });
     expect(screen.queryByTestId("component-master")).toBeNull();
+  });
+
+  /* 2L9 217:42647 (B6-K21): "Used in … ›" shows the places in the list's
+     stead; "‹ Back to {name}" brings the list and the summary back. */
+  it("Used in opens the places view and Back returns to the list", async () => {
+    mount([c("hdr", "Site header"), c("ftr", "Footer")]);
+    fireEvent.click(await screen.findByTestId("comp-row-hdr"));
+    fireEvent.click(screen.getByTestId("component-usedon-toggle"));
+    expect(screen.getByTestId("comp-usedon")).toBeInTheDocument();
+    expect(screen.queryByTestId("comp-row-ftr")).toBeNull();
+    expect(screen.queryByTestId("component-master")).toBeNull();
+    fireEvent.click(screen.getByTestId("comp-usedon-back"));
+    expect(screen.getByTestId("comp-row-ftr")).toBeInTheDocument();
+    expect(screen.getByTestId("component-name").textContent).toBe("Site header");
   });
 });
