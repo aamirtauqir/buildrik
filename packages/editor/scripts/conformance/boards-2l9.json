@@ -10960,7 +10960,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C D7: This page scope empty: \"No components on this page yet\" + the board's how-to sentence.",
+   "verifiedNote": "built to the board, live not compared — L-C 2026-11-16 (screenshot 217:43651 read): This page with no masters shows \"No components on this page yet\" at 14/20/600 ink over the how-to sentence at 13/20 ink-soft (was 13/500 and 12/18 muted); copy matches the board. Test: ComponentsTab.board.test.tsx \"This page with no masters…\".",
    "tier": "P2"
   },
   {
@@ -10971,7 +10971,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "built, not compared — L-C C9: row name carries a full-name tooltip; count reads \"N uses\" (+ \"· Component library\" for linked masters). Source/version line and ⋯ menu wait on the Components workspace slice.",
+   "verifiedNote": "built to the board, live not compared — L-C 2026-11-16 (screenshot 217:43947 read): a long name truncates in the 190px name column and reads in full in the chrome-ui ink Tooltip under the row (bottom-start, no arrow), not a native title. Uses read \"N uses\" with the source as a scope chip. Not built: the version in the chip and Update available / Local changes (versioned library updates are out of this version). Test: ComponentsTab.board.test.tsx.",
    "tier": "P2"
   },
   {

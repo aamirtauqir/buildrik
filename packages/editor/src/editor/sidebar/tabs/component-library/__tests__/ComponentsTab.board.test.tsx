@@ -55,7 +55,9 @@ describe("ComponentsTab — 2L9 215:43588 (B6-K02) resource area", () => {
     expect(screen.getByTestId("comp-row-scope-hdr").textContent).toBe("This site");
     expect(screen.getByTestId("comp-row-count-hdr").textContent).toBe("6 uses");
     /* 2L9 217:43947 — the full name on hover, however the row truncates it. */
-    expect(screen.getByTestId("comp-row-name-hdr")).toHaveAttribute("title", "Site header");
+    /* 217:43947 (B6-K26) — the full name in the ink tooltip, not a native title. */
+    expect(screen.getByTestId("comp-row-name-hdr")).not.toHaveAttribute("title");
+    expect(screen.getAllByRole("tooltip", { hidden: true }).map((t) => t.textContent)).toContain("Site header");
   });
 
   /* Board 4418:166980: a master made in this session is badged New. */
@@ -130,5 +132,21 @@ describe("ComponentsTab — 2L9 215:43588 (B6-K02) resource area", () => {
     fireEvent.click(screen.getByTestId("comp-usedon-back"));
     expect(screen.getByTestId("comp-row-ftr")).toBeInTheDocument();
     expect(screen.getByTestId("component-name").textContent).toBe("Site header");
+  });
+
+  /* 217:43651 (B6-K25): This page with none — a 14/600 ink title and the
+     13 ink-soft how-to under it. */
+  it("This page with no masters says so and how to make one", async () => {
+    mount([c("hdr", "Site header")]);
+    fireEvent.click(await screen.findByRole("tab", { name: "This page · 0" }));
+    const empty = screen.getByTestId("comp-empty-page");
+    const [title, body] = Array.from(empty.querySelectorAll("p"));
+    expect(title.textContent).toBe("No components on this page yet");
+    expect(title.className).toContain("tw:text-[14px]");
+    expect(title.className).toContain("tw:font-semibold");
+    expect(body.textContent).toBe(
+      "Select a section on the canvas and choose Save as component… in Layers or the Inspector. Choose This page to keep it here only.",
+    );
+    expect(body.className).toContain("--bk-ink-soft");
   });
 });

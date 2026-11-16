@@ -11,7 +11,7 @@
  */
 
 import * as React from "react";
-import { Button, ConfirmDialog, EmptyState, EmptyStateDesc, EmptyStateTitle, PanelSearch, Select, SkeletonListItem, useToast } from "@/editor/chrome-ui";
+import { Button, ConfirmDialog, EmptyState, EmptyStateDesc, EmptyStateTitle, PanelSearch, Select, SkeletonListItem, Tooltip, useToast } from "@/editor/chrome-ui";
 import { PanelErrorState } from "../shared/PanelErrorState";
 import { ComponentDetailScreen, componentDeleteCopy } from "./component-library/ComponentDetailScreen";
 import { ComponentIcon } from "./component-library/ComponentIcon";
@@ -288,14 +288,16 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         }}
       >
         <Thumb />
-        {/* 2L9 217:43947 — a cut-off name is read in full on hover. */}
-        <span
-          className="tw:w-[190px] tw:shrink-0 tw:truncate tw:text-[13px] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)]"
-          title={component.name}
-          data-testid={`comp-row-name-${component.id}`}
-        >
-          {component.name}
-        </span>
+        {/* 2L9 217:43947 (B6-K26) — a cut-off name is read in full in the ink
+            tooltip under the row (DESIGN.md: tooltips are the one ink bubble). */}
+        <Tooltip content={component.name} placement="bottom-start" arrow={false}>
+          <span
+            className="tw:block tw:w-[190px] tw:shrink-0 tw:truncate tw:text-[13px] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)]"
+            data-testid={`comp-row-name-${component.id}`}
+          >
+            {component.name}
+          </span>
+        </Tooltip>
         <span className="tw:flex tw:w-[168px] tw:shrink-0 tw:items-center">
           <span className={`${CHIP} tw:bg-[var(--bk-bg-subtle)] tw:text-[var(--bk-ink-soft)]`} data-testid={`comp-row-scope-${component.id}`}>
             {isLinked ? "Component library" : component.pageId ? "This page" : "This site"}
@@ -416,8 +418,9 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
             {scope === "page" && onPage.length === 0 ? (
               /* 217:43651 */
               <div className="tw:flex tw:flex-col tw:gap-1" data-testid="comp-empty-page">
-                <p className="tw:m-0 tw:text-[13px] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)]">No components on this page yet</p>
-                <p className="tw:m-0 tw:text-[12px] tw:leading-[18px] tw:text-[var(--bk-ink-muted)]">
+                {/* 217:43651 (B6-K25) — 14/20/600 ink, then 13/20 ink-soft. */}
+                <p className="tw:m-0 tw:text-[14px] tw:leading-5 tw:font-semibold tw:text-[var(--bk-ink)]">No components on this page yet</p>
+                <p className="tw:m-0 tw:max-w-[776px] tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink-soft)]">
                   Select a section on the canvas and choose Save as component… in Layers or the Inspector. Choose This page to keep it
                   here only.
                 </p>
