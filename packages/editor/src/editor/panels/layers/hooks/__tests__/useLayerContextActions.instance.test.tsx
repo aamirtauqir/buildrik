@@ -37,7 +37,7 @@ describe("useLayerContextActions — instance rows (B6-K22)", () => {
     const { composer, run } = setup();
     act(() => run("goToMain", "hero-1"));
     expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_SWITCH_TAB, { tab: "components" });
-    expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_COMPONENTS_OPEN_MASTER, { componentId: "hero", instanceId: "hero-1" });
+    expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_COMPONENTS_OPEN_MASTER, { componentId: "hero", instanceId: "hero-1", from: "layers" });
   });
 
   it("Detach instance detaches and says so with Undo", async () => {

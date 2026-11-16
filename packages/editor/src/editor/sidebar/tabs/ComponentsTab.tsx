@@ -136,6 +136,15 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
 
   /* 215:47035 — the chosen master's summary, beside the list. */
   const detail = state.detailComponent;
+  /* 228:46016 (B6-K40): reached from Layers, the header's way back returns
+     there with the instance selected, in place of "‹ Back to Add". */
+  const backToLayers =
+    state.returnFrom === "layers" && state.backToInstance && detail
+      ? () => {
+          state.backToInstance?.();
+          composer?.emit(EVENTS.UI_SWITCH_TAB, { tab: "layers" });
+        }
+      : null;
   const pickedLibrary = scope === "library" ? library.find((l) => l.componentId === libraryPick) : undefined;
   const pane =
     composer?.components?.isAvailable() && !state.error && pickedLibrary ? (
@@ -149,7 +158,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         startRenaming={renameFor === detail.id}
         onRenameConsumed={consumeRename}
         onBack={state.handleBackFromDetail}
-        onBackToInstance={state.backToInstance}
+        onBackToInstance={backToLayers ? undefined : state.backToInstance}
         onInsert={state.handleDetailInsert}
         onDelete={state.handleDetailDelete}
         selectedElementId={state.canvasSelection[0] ?? null}
@@ -205,9 +214,9 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
               size="xs"
               className="tw:h-8 tw:w-52 tw:text-[13px] tw:font-medium"
               data-testid="comp-back-row"
-              onClick={() => composer?.emit(EVENTS.UI_SWITCH_TAB, { tab: "add" })}
+              onClick={backToLayers ?? (() => composer?.emit(EVENTS.UI_SWITCH_TAB, { tab: "add" }))}
             >
-              ‹ Back to Add
+              {backToLayers && detail ? `‹ Back to Layers · ${detail.name}` : "‹ Back to Add"}
             </Button>
             <h1 className="tw:m-0 tw:min-w-0 tw:flex-1 tw:truncate tw:text-[20px] tw:leading-[30px] tw:font-semibold tw:text-[var(--bk-ink)]">
               Components

@@ -163,6 +163,7 @@ export function useComponentsState({
      master's "‹ Back to instance" gives back. A master reached from the list
      has none. */
   const [returnInstanceId, setReturnInstanceId] = React.useState<string | null>(null);
+  const [returnFrom, setReturnFrom] = React.useState<"layers" | null>(null);
 
   // "Edit master ›" from an instance (openMasterRequest.ts): a request made
   // before this panel mounted is taken here; a mounted panel hears the event.
@@ -175,6 +176,7 @@ export function useComponentsState({
         setDetailComponent(c);
         setSelectedId(c.id);
         setReturnInstanceId(request?.instanceId ?? null);
+        setReturnFrom(request?.from ?? null);
       }
     };
     open(takePendingMaster(composer));
@@ -187,6 +189,7 @@ export function useComponentsState({
   const handleBackFromDetail = React.useCallback(() => {
     setDetailComponent(null);
     setReturnInstanceId(null);
+    setReturnFrom(null);
   }, []);
 
   const returnInstance = returnInstanceId ? composer?.elements.getElement(returnInstanceId) : undefined;
@@ -239,6 +242,7 @@ export function useComponentsState({
     handleViewDetail,
     handleBackFromDetail,
     backToInstance,
+    returnFrom,
     handleDetailInsert,
     handleDetailDelete,
     // Dialog state (replaces native dialogs)

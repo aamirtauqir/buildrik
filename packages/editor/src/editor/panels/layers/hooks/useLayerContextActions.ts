@@ -126,7 +126,7 @@ export function useLayerContextActions(
         /* 2L9 B6-K22: the same doors as the Inspector's component row. */
         case "goToMain": {
           const inst = composer?.components?.getInstanceByElementId(nodeId);
-          if (composer && inst) requestOpenMaster(composer, inst.componentId, nodeId);
+          if (composer && inst) requestOpenMaster(composer, inst.componentId, nodeId, "layers");
           break;
         }
         case "detachInstance": {

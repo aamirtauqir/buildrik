@@ -19,12 +19,15 @@ export interface OpenMasterRequest {
   componentId: string;
   /** The instance the door was opened on. */
   instanceId?: string;
+  /** Where the door was — Layers' "Go to main component ›" (2L9 B6-K40)
+   *  makes the way back "‹ Back to Layers · {name}". */
+  from?: "layers";
 }
 
 const pending = new WeakMap<Composer, OpenMasterRequest>();
 
-export function requestOpenMaster(composer: Composer, componentId: string, instanceId?: string): void {
-  const request: OpenMasterRequest = instanceId ? { componentId, instanceId } : { componentId };
+export function requestOpenMaster(composer: Composer, componentId: string, instanceId?: string, from?: "layers"): void {
+  const request: OpenMasterRequest = instanceId ? { componentId, instanceId, ...(from ? { from } : {}) } : { componentId };
   pending.set(composer, request);
   composer.emit(EVENTS.UI_SWITCH_TAB, { tab: "components" });
   composer.emit(EVENTS.UI_COMPONENTS_OPEN_MASTER, request);

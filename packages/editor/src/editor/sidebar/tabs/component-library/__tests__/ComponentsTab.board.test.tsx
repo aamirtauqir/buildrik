@@ -16,6 +16,7 @@ import { createMockComposer } from "@/editor/sidebar/__tests__/test-utils/mockCo
 vi.mock("@/services/componentSync", () => ({ fetchComponentLibrary: vi.fn(async () => []) }));
 
 import { ComponentsTab } from "@/editor/sidebar/tabs/ComponentsTab";
+import { requestOpenMaster } from "@/editor/sidebar/tabs/component-library/openMasterRequest";
 import { fetchComponentLibrary } from "@/services/componentSync";
 
 const c = (id: string, name: string) => ({ id, name, masterTree: {}, createdAt: 1, updatedAt: 1, version: 1 }) as never;
@@ -232,5 +233,29 @@ describe("ComponentsTab — 2L9 215:43588 (B6-K02) resource area", () => {
     } finally {
       online.mockRestore();
     }
+  });
+
+  /* 228:46016 (B6-K40): opened from Layers' "Go to main component ›", the
+     header's way back reads "‹ Back to Layers · {name}" and returns to Layers
+     with the instance selected; the summary has no second back row. */
+  it("opened from Layers, the header goes back to Layers with the instance", async () => {
+    const composer = createMockComposer({ components: [c("hdr", "Site header"), c("ftr", "Footer")] });
+    const instance = { getId: () => "inst-1" };
+    Object.assign(composer.components, { isAvailable: () => true, getInstancesOfComponent: () => [] });
+    Object.assign(composer.elements, { getElement: (id: string) => (id === "inst-1" ? instance : null) });
+    Object.assign(composer.selection, { select: vi.fn() });
+    requestOpenMaster(composer as never, "hdr", "inst-1", "layers");
+    render(
+      <ToastProvider>
+        <ComponentsTab composer={composer as never} />
+      </ToastProvider>,
+    );
+    const back = await screen.findByTestId("comp-back-row");
+    expect(back.textContent).toBe("‹ Back to Layers · Site header");
+    expect(screen.getByTestId("component-name").textContent).toBe("Site header");
+    expect(screen.queryByTestId("component-back-row")).toBeNull();
+    fireEvent.click(back);
+    expect(composer.selection.select).toHaveBeenCalledWith(instance);
+    expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_SWITCH_TAB, { tab: "layers" });
   });
 });

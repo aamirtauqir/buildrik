@@ -11505,7 +11505,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Back row \"Back to instance\" from Inspector Edit master (src/editor/sidebar/tabs/component-library/ComponentDetailScreen.tsx:282); board \"‹ …",
+   "verifiedNote": "built to the board, live not compared — L-C 2026-11-16 (screenshot 228:46016 read): Layers’ \"Go to main component ›\" opens Components on the master with the request marked from Layers. The header’s way back then reads \"‹ Back to Layers · {name}\" in place of \"‹ Back to Add\"; it re-selects the instance and switches to Layers. The summary drops its own \"‹ Back to instance\" row, as on the board. The Inspector door keeps \"‹ Back to instance\". Test: ComponentsTab.board.test.tsx \"opened from Layers…\".",
    "tier": "P2"
   },
   {
