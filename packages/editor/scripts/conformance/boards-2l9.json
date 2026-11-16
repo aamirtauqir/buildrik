@@ -10982,7 +10982,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No Components navigation to collapse; topbar part is phase1",
+   "verifiedNote": "built to the board, live not compared — L-C 2026-11-16 (screenshot 217:44243 read): below the 1440 frame (useCompactWidth, (max-width: 1439px), the query Brand B6-B51 uses), the 240px navigation column is not drawn. A \"Components navigation\" button sits in the header after the way back; its popover holds the scopes with counts and Import package…, and choosing a scope closes it. The list and the 320 summary keep the width. Not done: Brand still has its own private copy of the hook, because lane B has uncommitted changes in BrandWorkspace.tsx; point it at shared/hooks/useCompactWidth once that lands. The topbar part of the board is phase 1. Test: ComponentsTab.board.test.tsx \"at 1280…\".",
    "tier": "P2"
   },
   {

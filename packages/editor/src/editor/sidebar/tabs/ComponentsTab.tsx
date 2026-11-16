@@ -25,6 +25,7 @@ import { ExportPackageDialog } from "./component-library/ExportPackageDialog";
 import "./component-library/ComponentsTab.css";
 import { EVENTS } from "@/shared/constants";
 import { useOnlineStatus } from "@/shared/hooks/useOnlineStatus";
+import { useCompactWidth } from "@/shared/hooks/useCompactWidth";
 export type { ComponentsTabProps };
 
 
@@ -114,6 +115,8 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
     }
   }, [pendingToast, addToast, setPendingToast]);
   const online = useOnlineStatus();
+  const compact = useCompactWidth();
+  const [compactNavOpen, setCompactNavOpen] = React.useState(false);
   /* A library that failed while offline loads again once the connection
      returns, without a Retry click. */
   const { libraryLoadFailed, retryLibraryLoad } = state;
@@ -165,11 +168,8 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
       />
     ) : null;
 
-  const frame = (body: React.ReactNode) => (
-    <div className="tw:flex tw:h-full tw:min-h-0 tw:bg-[var(--bk-bg-panel)]" data-testid="comp-panel">
-      {/* 215:46695 — 240 wide, 16 in, 8 between; the area title is 20/30/600. */}
-      <nav aria-label="Components" className="tw:flex tw:w-60 tw:shrink-0 tw:flex-col tw:gap-2 tw:p-4" data-testid="comp-nav">
-        <h2 className="tw:m-0 tw:text-[20px] tw:leading-[30px] tw:font-semibold tw:text-[var(--bk-ink)]">Components</h2>
+  const navBody = (
+    <>
         <div role="tablist" aria-orientation="vertical" aria-label="Components" className="tw:flex tw:flex-col tw:gap-2" data-testid="comp-scopes">
           {SCOPES.map((s) => {
             const on = scope === s.id;
@@ -182,7 +182,10 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
                 aria-selected={on}
                 aria-label={`${s.label} · ${s.count}`}
                 data-testid={`comp-scope-${s.id}`}
-                onClick={() => setScope(s.id)}
+                onClick={() => {
+                  setScope(s.id);
+                  setCompactNavOpen(false);
+                }}
                 className={`tw:h-8 tw:w-full tw:justify-start tw:rounded-md tw:border-0 tw:px-3 tw:shadow-none tw:focus:ring-0 ${on ? "tw:bg-[var(--bk-accent-subtle)]" : "tw:bg-transparent tw:hover:bg-[var(--bk-bg-subtle)]"}`}
               >
                 <span className="tw:flex-1 tw:text-left tw:text-[13px] tw:leading-5 tw:font-medium tw:text-[var(--bk-ink)]">{s.label}</span>
@@ -204,7 +207,18 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
             Import package…
           </Button>
         </div>
+    </>
+  );
+
+  const frame = (body: React.ReactNode) => (
+    <div className="tw:flex tw:h-full tw:min-h-0 tw:bg-[var(--bk-bg-panel)]" data-testid="comp-panel">
+      {/* 215:46695 — 240 wide, 16 in, 8 between; the area title is 20/30/600. */}
+      {compact ? null : (
+      <nav aria-label="Components" className="tw:flex tw:w-60 tw:shrink-0 tw:flex-col tw:gap-2 tw:p-4" data-testid="comp-nav">
+        <h2 className="tw:m-0 tw:text-[20px] tw:leading-[30px] tw:font-semibold tw:text-[var(--bk-ink)]">Components</h2>
+        {navBody}
       </nav>
+      )}
       <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
         {/* 215:46714 — 24 in, 12 down; "‹ Back to Add" in a 208 slot, then the title. */}
         <div className="tw:flex tw:shrink-0 tw:flex-col tw:gap-2 tw:px-6 tw:py-3">
@@ -218,6 +232,29 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
             >
               {backToLayers && detail ? `‹ Back to Layers · ${detail.name}` : "‹ Back to Add"}
             </Button>
+            {compact ? (
+              /* 217:44243 (B6-K27): below 1440 the navigation folds behind this. */
+              <Popover
+                open={compactNavOpen}
+                onClose={() => setCompactNavOpen(false)}
+                placement="bottom"
+                label="Components navigation"
+                trigger={
+                  <Button
+                    color="light"
+                    size="xs"
+                    className="tw:h-8 tw:shrink-0 tw:rounded tw:px-3 tw:text-[13px] tw:font-medium"
+                    aria-expanded={compactNavOpen}
+                    onClick={() => setCompactNavOpen((v) => !v)}
+                    data-testid="comp-compact-nav"
+                  >
+                    Components navigation
+                  </Button>
+                }
+              >
+                <div className="tw:flex tw:w-60 tw:flex-col tw:gap-2 tw:p-4">{navBody}</div>
+              </Popover>
+            ) : null}
             <h1 className="tw:m-0 tw:min-w-0 tw:flex-1 tw:truncate tw:text-[20px] tw:leading-[30px] tw:font-semibold tw:text-[var(--bk-ink)]">
               Components
             </h1>

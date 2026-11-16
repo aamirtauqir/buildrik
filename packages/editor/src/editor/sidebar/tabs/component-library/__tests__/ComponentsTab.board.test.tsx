@@ -280,4 +280,26 @@ describe("ComponentsTab — 2L9 215:43588 (B6-K02) resource area", () => {
     expect(screen.getByTestId("comp-back-row").textContent).toBe("‹ Back to Add");
     expect(screen.getByTestId("component-back-row").textContent).toBe("‹ Back to instance");
   });
+
+  /* 217:44243 (B6-K27): below the 1440 frame the navigation column folds
+     behind a "Components navigation" button in the header; its popover
+     holds the scopes and Import, and choosing a scope closes it. */
+  it("at 1280 the navigation folds behind Components navigation", async () => {
+    const mm = vi.spyOn(window, "matchMedia").mockImplementation(
+      (q: string) => ({ matches: q === "(max-width: 1439px)", media: q, addEventListener: () => {}, removeEventListener: () => {} }) as never,
+    );
+    try {
+      mount([c("hdr", "Site header")]);
+      const toggle = await screen.findByTestId("comp-compact-nav");
+      expect(toggle.textContent).toBe("Components navigation");
+      expect(screen.queryByTestId("comp-nav")).toBeNull();
+      fireEvent.click(toggle);
+      expect(screen.getByTestId("comp-import-open")).toBeInTheDocument();
+      fireEvent.click(screen.getByRole("tab", { name: "This page · 0" }));
+      expect(screen.getByTestId("comp-section-header").textContent).toBe("This page · 0");
+      expect(screen.queryByRole("tab", { name: "This site · 1" })).toBeNull();
+    } finally {
+      mm.mockRestore();
+    }
+  });
 });
