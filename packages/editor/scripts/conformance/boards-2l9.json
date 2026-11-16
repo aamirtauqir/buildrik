@@ -10816,7 +10816,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "src/editor/sidebar/tabs/component-library/ComponentDetailScreen.tsx:340 needs a pre-selected element + ConfirmDialog (:455); board has revi…",
+   "verifiedNote": "built to the board, live not compared — L-C 2026-11-16 (screenshot 217:40171 read): the summary’s \"Update from selection…\" is always offered and begins a session (sourcePick.ts). The list and summary give way to \"‹ Back to {name}\", the 20/600 title \"Update {name} from a selection\", the 13 ink-soft explanation, then \"Choose on canvas\" (primary) and Cancel. The old confirm dialog and its \"select something first\" disable are gone. Test: ComponentsTab.board.test.tsx \"Update from selection: choose, then review…\".",
    "tier": "P2"
   },
   {
@@ -10827,7 +10827,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No canvas source-pick mode (banner, Cancel, Return to component review)",
+   "verifiedNote": "built to the board, live not compared — L-C 2026-11-16 (design context 217:40815 read): \"Choose on canvas\" closes the left panel (UI_LEFT_PANEL_CLOSE, StudioPanels). An accent-tint bar over the canvas (ComponentSourcePickBar, 880 max, 48 high, md radius) reads \"Choose the section to update {name} from. Locked and nested component content can’t be chosen.\", with Cancel and a disabled \"Return to component review\". Selections that cannot be a source (locked, under a lock, inside an instance, a page root) do not count. Test: ComponentSourcePickBar.test.tsx.",
    "tier": "P2"
   },
   {
@@ -10838,7 +10838,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "Source-chosen canvas state missing",
+   "verifiedNote": "built to the board, live not compared — L-C 2026-11-16 (metadata 217:40648 read): a pickable canvas selection becomes the source. The bar reads \"{Section N on Page} is selected as the source for {name}.\" and Return to component review enables. Not built: the canvas label \"Section 3 · selected source\" over the section; the selection ring marks it instead. Test: ComponentSourcePickBar.test.tsx.",
    "inheritsFrom": "217:40475",
    "tier": "P2"
   },
@@ -10850,7 +10850,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Confirm text only (src/editor/sidebar/tabs/component-library/ComponentDetailScreen.tsx:458); board shows instances/overrides kept/dropped b…",
+   "verifiedNote": "built to the board, live not compared — L-C 2026-11-16 (design context 217:40878 read): Return reopens Components on the review. It shows \"Update {name} from {source on page}\"; two columns, \"{name} now\" (the thumbnail) and \"From {source}\" (180 previews); rows Instances affected (\"N on M pages\"), Overrides kept, Overrides that no longer apply (\"n · Page › place\"), all from ComponentManager.previewMasterUpdate, the update’s own override arithmetic run on copies; then Choose another · Cancel · Update. Update commits, says \"{name} updated from {source on page} · N instances\" with Undo, and returns to the list. Not built: the library \"local changes / other sites keep v4\" line (versioned updates are out of scope) and a rendered \"From\" preview (grey box). Tests: ComponentsTab.board.test.tsx, ComponentDetailScreen.update.test.tsx, ComponentManager.test.ts previewMasterUpdate.",
    "tier": "P2"
   },
   {

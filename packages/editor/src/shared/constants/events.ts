@@ -339,6 +339,12 @@ export const EVENTS = {
   UI_NEW_PAGE_REQUESTED: "ui:new-page-requested",
   /** Rail switches to a named tab. Six emitters, no constant until now. */
   UI_SWITCH_TAB: "ui:switch-tab",
+  /** Close the left panel — the canvas gets the room (2L9 B6-K13: choosing
+   *  a component's source on the canvas). */
+  UI_LEFT_PANEL_CLOSE: "ui:left-panel:close",
+  /** "Update {component} from a selection" moved on (component-library/
+   *  sourcePick.ts): begun, picking on the canvas, source chosen, review, ended. */
+  UI_COMPONENT_SOURCE_PICK: "ui:component-source-pick",
   /** Add panel expands one named group (`{ group: InsertGroupId }`). The
    *  context menu's "Replace with block…" opens Add AND lands on BLOCKS —
    *  switching the tab alone leaves the user at ELEMENTS. */

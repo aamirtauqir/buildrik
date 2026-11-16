@@ -270,6 +270,39 @@ describe("ComponentManager.updateComponentMaster — version bump + autosync", (
   });
 });
 
+/* 2L9 217:40825 (B6-K15): the review before "Update" says what the update
+   would do — instances affected, overrides kept, overrides that no longer
+   apply — without doing it. */
+describe("ComponentManager.previewMasterUpdate", () => {
+  it("counts kept and lost overrides per instance and changes nothing", async () => {
+    const { manager, mgr, page } = makeStack();
+    const card = sourceElement(manager, page.root.id);
+    const comp = (await mgr.createComponent("Card", card.getId()))!;
+    const a = (await mgr.instantiateComponent(comp.id, page.root.id))!;
+    const b = (await mgr.instantiateComponent(comp.id, page.root.id))!;
+    manager.getElement(a)!.getChildren()[0].setStyle("color", "hotpink");
+    manager.getElement(b)!.setStyle("padding", "8px");
+
+    // The source drops the heading: a's override loses its target, b's stays.
+    const source = sourceElement(manager, page.root.id);
+    manager.removeElement(source.getChildren()[0].getId());
+    const version = mgr.getComponent(comp.id)!.version;
+
+    const preview = mgr.previewMasterUpdate(comp.id, source.getId());
+    expect(preview).toEqual({ instances: 2, overridesKept: 1, lost: [{ elementId: a, count: 1 }] });
+    expect(mgr.getComponent(comp.id)!.version).toBe(version);
+    expect(mgr.getInstance(a)!.overrides).toHaveLength(1);
+  });
+
+  it("is null for an unknown master or source", async () => {
+    const { manager, mgr, page } = makeStack();
+    const card = sourceElement(manager, page.root.id);
+    const comp = (await mgr.createComponent("Card", card.getId()))!;
+    expect(mgr.previewMasterUpdate("ghost", card.getId())).toBeNull();
+    expect(mgr.previewMasterUpdate(comp.id, "ghost")).toBeNull();
+  });
+});
+
 describe("ComponentManager.duplicateComponent", () => {
   it("returns null for a missing source", async () => {
     const { mgr } = makeStack();

@@ -14,16 +14,15 @@ import { ConfirmDialog, useToast, Button, Menu, MenuItem, Popover, TextInput, ty
 import type { Composer } from "@/engine";
 import type { ComponentDefinition } from "@/shared/types/components";
 import { ELEMENT_TYPE_LABELS } from "@/shared/constants/elementTypeLabels";
-import { captureComponentThumbnail } from "./captureComponentThumbnail";
 import { ExportPackageDialog } from "./ExportPackageDialog";
 import { INSTANTIATE_TOASTS, instantiateComponentAtSelection } from "./instantiate";
+import { beginUpdateFromSelection } from "./sourcePick";
 /* Same "switch page, then select + scroll to the element" seam Review's
    Locate row uses (`locateComment`'s own header: "the REGRESSION-guarded
    seam"). Reused rather than re-implemented for the used-on row below —
    the name is Review's, the behaviour (page switch → select → scrollIntoView)
    is exactly what "click a used-on row" needs too. */
 import { usedOnPlaces } from "./UsedOnView";
-import { getLayerName } from "@/editor/panels/layers/hooks/layersPersistence";
 // ============================================
 // Types
 // ============================================
@@ -52,8 +51,6 @@ export interface ComponentDetailScreenProps {
   onDuplicate?: () => void;
   /** Callback when component is deleted */
   onDelete?: () => void;
-  /** The element currently selected on canvas — what "Update component" promotes. */
-  selectedElementId?: string | null;
 }
 
 const LIST_ROW = "tw:flex tw:items-center tw:gap-2 tw:h-8 tw:pl-3 tw:pr-1 tw:rounded tw:text-[13px] tw:leading-5 tw:text-[var(--bk-ink)]";
@@ -113,7 +110,6 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
   onInsert,
   onDuplicate,
   onDelete,
-  selectedElementId = null,
 }) => {
   // DrillInHeader handles focus-on-mount automatically
   const { addToast } = useToast();
@@ -123,7 +119,6 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
 
   // "Update component" confirmation — the change is destructive to instance
   // overrides, so it is never one click.
-  const [showUpdateConfirm, setShowUpdateConfirm] = React.useState(false);
 
 
   const [exporting, setExporting] = React.useState(false);
@@ -146,14 +141,14 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key !== "Escape" || e.defaultPrevented) return;
-      if (renaming || showDeleteConfirm || showUpdateConfirm) return;
+      if (renaming || showDeleteConfirm) return;
       const target = e.target as HTMLElement | null;
       if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable)) return;
       backOut();
     };
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [backOut, renaming, showDeleteConfirm, showUpdateConfirm]);
+  }, [backOut, renaming, showDeleteConfirm]);
 
   // Handle insert action — the shared insert (A-15), same words as Add.
   const handleInsert = async () => {
@@ -173,62 +168,6 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
     }
   };
 
-  /**
-   * Promote the canvas selection to this component's master.
-   *
-   * This is the door onto `updateComponentMaster` — the engine half has been
-   * built and tested for months with no caller, so "change it once and every
-   * instance follows", the reason components exist, could not be reached from
-   * the product at all.
-   */
-  const confirmUpdateAction = async () => {
-    setShowUpdateConfirm(false);
-    if (!composer || !selectedElementId) return;
-
-    const before = composer.components.snapshotComponent(component.id);
-    const { updated, instancesSynced, overridesDropped } =
-      await composer.components.updateComponentMaster(component.id, selectedElementId);
-
-    if (!updated) {
-      addToast({
-        description: `Couldn't update "${component.name}" from that selection.`,
-        tone: "error",
-        duration: 4000,
-      });
-      return;
-    }
-
-    void captureComponentThumbnail(composer, component.id, selectedElementId);
-
-    /* 2L9 217:41149 (B6-K16): "Hero card updated from Section 3 on Home ·
-       12 instances · Undo" — names what it was updated from, and where. */
-    const sourceEl = composer.elements.getElement(selectedElementId);
-    const source = (sourceEl && getLayerName(sourceEl)) || "the selection";
-    const pageName = composer.elements.getActivePage()?.name;
-    const from = `${component.name} updated from ${source}${pageName ? ` on ${pageName}` : ""}`;
-    const headline = instancesSynced > 0 ? `${from} · ${count(instancesSynced, "instance", "instances")}` : from;
-    const action = before && {
-      label: "Undo",
-      onClick: () => void composer.components.revertComponentMaster(component.id, before.component.masterTree),
-    };
-
-    // Overrides whose target the new master no longer has cannot be re-applied.
-    // They are gone; the engine used to report that only to devError, which is
-    // a no-op in production, so the user watched their edits revert in silence.
-    if (overridesDropped > 0) {
-      addToast({
-        description: `${headline}. ${overridesDropped} override${
-          overridesDropped === 1 ? "" : "s"
-        } couldn't be re-applied and ${overridesDropped === 1 ? "was" : "were"} lost.`,
-        tone: "warning",
-        duration: 8000,
-        ...(action && { action }),
-      });
-      return;
-    }
-
-    addToast({ description: headline, ...(action && { action }) });
-  };
 
   // Handle delete action — opens ConfirmDialog
   const handleDelete = () => {
@@ -407,9 +346,7 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
         <Button
           color="light"
           size="xs"
-          onClick={() => setShowUpdateConfirm(true)}
-          disabled={!selectedElementId}
-          title={selectedElementId ? undefined : "Select an element on the canvas to update this master from"}
+          onClick={() => composer && beginUpdateFromSelection(composer, component.id)}
           data-testid="component-update"
           className={`${BTN_32} tw:border-[var(--bk-border)] tw:bg-[var(--bk-bg-panel)] tw:text-[var(--bk-ink)]`}
         >
@@ -464,22 +401,6 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
            instances (real count). One copy for both delete doors. */
         {...componentDeleteCopy(component.name, instanceCount)}
         confirmLabel="Delete"
-        tone="destructive"
-      />
-      <ConfirmDialog
-        open={showUpdateConfirm}
-        onClose={() => setShowUpdateConfirm(false)}
-        onConfirm={confirmUpdateAction}
-        title="Update component"
-        message={
-          /* ⌘Z alone reverts the pages, not the component definition (measured),
-             so the way back is the toast's Undo, which restores the master. */
-          (instanceCount > 0
-            ? `Replace "${component.name}" with the element selected on the canvas? ${instanceCount} instance(s) will change to match. Any edits made on an instance are kept where they still fit, and lost where the new version no longer has that part. `
-            : `Replace "${component.name}" with the element selected on the canvas? `) +
-          "To go back, use Undo on the confirmation that follows."
-        }
-        confirmLabel="Update component"
         tone="destructive"
       />
       {exporting ? (

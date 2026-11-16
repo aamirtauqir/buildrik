@@ -17,6 +17,14 @@ vi.mock("@/services/componentSync", () => ({ fetchComponentLibrary: vi.fn(async 
 
 import { ComponentsTab } from "@/editor/sidebar/tabs/ComponentsTab";
 import { requestOpenMaster } from "@/editor/sidebar/tabs/component-library/openMasterRequest";
+import {
+  beginUpdateFromSelection,
+  cancelUpdateFromSelection,
+  chooseOnCanvas,
+  getSourcePick,
+  returnToReview,
+  setPickedSource,
+} from "@/editor/sidebar/tabs/component-library/sourcePick";
 import { fetchComponentLibrary } from "@/services/componentSync";
 
 const c = (id: string, name: string) => ({ id, name, masterTree: {}, createdAt: 1, updatedAt: 1, version: 1 }) as never;
@@ -332,5 +340,77 @@ describe("ComponentsTab — 2L9 215:43588 (B6-K02) resource area", () => {
     } finally {
       mm.mockRestore();
     }
+  });
+
+  /* 217:40171 (B6-K12) → 217:40825 (B6-K15): "Update from selection…" puts
+     the explanation in the list's place; with a source chosen on the canvas,
+     the review shows what the update would do and Update commits it. */
+  it("Update from selection: choose, then review with the preview's counts", async () => {
+    const composer = mount([c("hdr", "Site header"), c("ftr", "Footer")]);
+    const section = { getId: () => "sec-3", getType: () => "section", getParent: () => root, getChildren: () => [], isLocked: () => false, getCustomData: () => undefined };
+    const root = { getId: () => "root", getType: () => "body", getParent: () => null, getChildren: () => [{ getId: () => "a" }, { getId: () => "b" }, section], isLocked: () => false, getCustomData: () => undefined };
+    Object.assign(composer.elements, {
+      getElement: (id: string) => (id === "sec-3" ? section : null),
+      getAllPages: () => [{ id: "home", name: "Home", root: { id: "root" } }],
+    });
+    Object.assign(composer.components, {
+      previewMasterUpdate: vi.fn(() => ({ instances: 6, overridesKept: 9, lost: [] })),
+      updateComponentMaster: vi.fn(async () => ({ updated: true, instancesSynced: 6, overridesDropped: 0 })),
+      snapshotComponent: () => null,
+      findInstanceContainingElement: () => null,
+    });
+    fireEvent.click(await screen.findByTestId("comp-row-hdr"));
+    fireEvent.click(screen.getByTestId("component-update"));
+
+    const choose = screen.getByTestId("comp-update-choose");
+    expect(choose.querySelector("h2")?.textContent).toBe("Update Site header from a selection");
+    expect(screen.queryByTestId("comp-row-ftr")).toBeNull();
+    expect(screen.queryByTestId("component-master")).toBeNull();
+
+    fireEvent.click(screen.getByTestId("comp-update-choose-canvas"));
+    expect(composer.emit).toHaveBeenCalledWith(EVENTS.UI_LEFT_PANEL_CLOSE);
+    act(() => setPickedSource(composer as never, "sec-3"));
+    act(() => returnToReview(composer as never));
+
+    const review = screen.getByTestId("comp-update-review");
+    expect(review.querySelector("h2")?.textContent).toBe("Update Site header from Section 3 on Home");
+    expect(screen.getByTestId("comp-update-kept").textContent).toBe("Overrides kept9");
+    expect(screen.getByTestId("comp-update-lost").textContent).toBe("Overrides that no longer applyNone");
+    fireEvent.click(screen.getByTestId("comp-update-commit"));
+    expect(await screen.findByText("Site header updated from Section 3 on Home · 6 instances")).toBeInTheDocument();
+    expect(screen.getByTestId("comp-row-ftr")).toBeInTheDocument();
+  });
+
+  it("Cancel from the explanation returns to the list", async () => {
+    mount([c("hdr", "Site header")]);
+    fireEvent.click(await screen.findByTestId("comp-row-hdr"));
+    fireEvent.click(screen.getByTestId("component-update"));
+    fireEvent.click(screen.getByTestId("comp-update-cancel"));
+    expect(screen.queryByTestId("comp-update-choose")).toBeNull();
+    expect(screen.getByTestId("comp-row-hdr")).toBeInTheDocument();
+  });
+
+  /* A session whose master is gone ends instead of hanging on. */
+  it("an update session for a deleted master ends and the list returns", async () => {
+    const composer = mount([c("hdr", "Site header")]);
+    act(() => beginUpdateFromSelection(composer as never, "ghost"));
+    await waitFor(() => expect(getSourcePick(composer as never)).toBeNull());
+    expect(screen.getByTestId("comp-row-hdr")).toBeInTheDocument();
+  });
+
+  /* The chosen source was deleted after it was chosen: no Update, and why. */
+  it("a review whose source is gone cannot Update and says to choose another", async () => {
+    const composer = mount([c("hdr", "Site header")]);
+    Object.assign(composer.components, { previewMasterUpdate: () => null });
+    await screen.findByTestId("comp-row-hdr");
+    act(() => {
+      beginUpdateFromSelection(composer as never, "hdr");
+      chooseOnCanvas(composer as never);
+      setPickedSource(composer as never, "deleted-section");
+      returnToReview(composer as never);
+    });
+    expect(screen.getByTestId("comp-update-commit")).toBeDisabled();
+    expect(screen.getByTestId("comp-update-gone").textContent).toBe("The chosen section is no longer on the page. Choose another.");
+    act(() => cancelUpdateFromSelection(composer as never));
   });
 });

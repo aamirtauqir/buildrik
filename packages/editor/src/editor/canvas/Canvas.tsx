@@ -28,6 +28,7 @@ import { useEditLocks } from "@/editor/shared/useEditLocks";
 import { useProjectLoading } from "../shell/hooks/useProjectLoading";
 import { CanvasFooterToolbar } from "./CanvasFooterToolbar";
 import { CanvasRecordBar } from "./CanvasRecordBar";
+import { ComponentSourcePickBar } from "./ComponentSourcePickBar";
 import { DeviceFramePreview, DeviceFrameToggle } from "./DeviceFramePreview";
 import {
   wrapperStyles,
@@ -805,6 +806,8 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
         )}
         {/* 173:12022 — on a collection template page: which record the canvas previews. */}
         {showFooterToolbar && !readOnly ? <CanvasRecordBar composer={composer} /> : null}
+        {/* 217:40475 / 217:40648 — choosing a component's source on the canvas. */}
+        {!readOnly ? <ComponentSourcePickBar composer={composer} /> : null}
         <div ref={scrollRef} className="bd-canvas-scroll">
         <DeviceFramePreview device={device} active={deviceFrameActive}>
         {/* A column only when the width label is drawn under the page; on

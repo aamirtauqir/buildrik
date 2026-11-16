@@ -69,7 +69,7 @@ describe("ComponentDetailScreen — Delete master", () => {
     const onBack = vi.fn();
     render(
       <ToastProvider>
-        <ComponentDetailScreen component={component} composer={composer} onBack={onBack} selectedElementId={null} />
+        <ComponentDetailScreen component={component} composer={composer} onBack={onBack} />
       </ToastProvider>,
     );
     fireEvent.click(screen.getByTestId("component-more"));

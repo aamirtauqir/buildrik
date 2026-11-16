@@ -801,6 +801,19 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
     };
   }, [composer, onLeftPanelTabChange, isLeftPanelOpen, onLeftPanelToggle, viewerChrome, addToast]);
 
+  /* 2L9 B6-K13: choosing a component's source on the canvas gives the canvas
+     the room — the left panel closes (sourcePick.chooseOnCanvas). */
+  React.useEffect(() => {
+    if (!composer) return;
+    const close = () => {
+      if (isLeftPanelOpen) onLeftPanelToggle?.();
+    };
+    composer.on(EVENTS.UI_LEFT_PANEL_CLOSE, close);
+    return () => {
+      composer.off(EVENTS.UI_LEFT_PANEL_CLOSE, close);
+    };
+  }, [composer, isLeftPanelOpen, onLeftPanelToggle]);
+
   // Canvas hover sync
   React.useEffect(() => {
     if (!composer) return;

@@ -23,7 +23,7 @@ import type {
 import { deepClone } from "@/shared/utils/helpers";
 import { sanitizeElementTreeContent } from "@/shared/utils/html/sanitization";
 import type { Composer } from "../Composer";
-import { ComponentInstanceUtils, usableOverrides } from "./ComponentInstance";
+import { ComponentInstanceUtils, applyOverridesToTree, usableOverrides } from "./ComponentInstance";
 import {
   type InstanceMaps,
   instantiateComponent,
@@ -43,6 +43,15 @@ export interface UpdateMasterOutcome {
   updated: boolean;
   instancesSynced: number;
   overridesDropped: number;
+}
+
+/** What `updateComponentMaster` WOULD do from a source — the review before
+ *  the update (2L9 B6-K15). `lost` lists, per instance, the overrides whose
+ *  target the new master does not have. */
+export interface MasterUpdatePreview {
+  instances: number;
+  overridesKept: number;
+  lost: Array<{ elementId: string; count: number }>;
 }
 
 /**
@@ -386,6 +395,28 @@ export class ComponentManager {
     // still carries instance bookkeeping that toJSON copies verbatim.
     this.instanceUtils.clearInstanceMarkers(promoted);
     return this.applyMaster(component, promoted);
+  }
+
+  /**
+   * The update `updateComponentMaster(id, elementId)` would make, measured on
+   * copies: the same promoted tree and the same override application sync
+   * uses, so the review and the update cannot disagree. Writes nothing.
+   */
+  previewMasterUpdate(id: string, elementId: string): MasterUpdatePreview | null {
+    const component = this.components.get(id);
+    const tree = component ? this.composer.elements.getElement(elementId)?.toJSON() : null;
+    if (!component || !tree) return null;
+    const promoted = deepClone(tree);
+    this.instanceUtils.clearInstanceMarkers(promoted);
+    let overridesKept = 0;
+    const lost: MasterUpdatePreview["lost"] = [];
+    const live = getInstancesOfComponent(this.maps, id).filter((i) => !i.isDetached);
+    for (const instance of live) {
+      const { applied, dropped } = applyOverridesToTree(deepClone(promoted), instance.overrides);
+      overridesKept += applied;
+      if (dropped > 0) lost.push({ elementId: instance.elementId, count: dropped });
+    }
+    return { instances: live.length, overridesKept, lost };
   }
 
   /** Undo of an update: put a snapshot's master back and fan it out again. */

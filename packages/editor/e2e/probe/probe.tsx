@@ -3705,7 +3705,6 @@ const CASES: Record<string, () => React.ReactElement> = {
               component={DETACH_COMPONENT}
               composer={DETACH_COMPOSER}
               onBack={() => {}}
-              selectedElementId="el-1"
             />
           </AutoOpen>
         </DSModeProvider>,

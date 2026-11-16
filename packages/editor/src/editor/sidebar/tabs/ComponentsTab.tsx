@@ -26,6 +26,8 @@ import "./component-library/ComponentsTab.css";
 import { EVENTS } from "@/shared/constants";
 import { useOnlineStatus } from "@/shared/hooks/useOnlineStatus";
 import { useCompactWidth } from "@/shared/hooks/useCompactWidth";
+import { UpdateFromSelectionView } from "./component-library/UpdateFromSelectionView";
+import { cancelUpdateFromSelection, useSourcePick } from "./component-library/sourcePick";
 export type { ComponentsTabProps };
 
 
@@ -116,6 +118,14 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
   }, [pendingToast, addToast, setPendingToast]);
   const online = useOnlineStatus();
   const compact = useCompactWidth();
+  /* 2L9 B6-K12 → K15: an "Update from a selection" in progress takes the
+     list's place (and the summary's) until it is updated or cancelled. */
+  const pick = useSourcePick(composer);
+  const updating = pick ? composer?.components?.getComponent(pick.componentId) : null;
+  /* A session whose master was deleted ends rather than hanging on. */
+  React.useEffect(() => {
+    if (composer && pick && !updating) cancelUpdateFromSelection(composer);
+  }, [composer, pick, updating]);
   const [compactNavOpen, setCompactNavOpen] = React.useState(false);
   /* A library that failed while offline loads again once the connection
      returns, without a Retry click. */
@@ -149,8 +159,9 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         }
       : null;
   const pickedLibrary = scope === "library" ? library.find((l) => l.componentId === libraryPick) : undefined;
-  const pane =
-    composer?.components?.isAvailable() && !state.error && pickedLibrary ? (
+  const pane = updating
+    ? null
+    : composer?.components?.isAvailable() && !state.error && pickedLibrary ? (
       <LibraryDetailPane entry={pickedLibrary} composer={composer} onClose={() => setLibraryPick(null)} />
     ) : composer?.components?.isAvailable() && !state.error && detail && usedOnFor !== detail.id ? (
       <ComponentDetailScreen
@@ -164,7 +175,6 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         onBackToInstance={backToLayers ? undefined : state.backToInstance}
         onInsert={state.handleDetailInsert}
         onDelete={state.handleDetailDelete}
-        selectedElementId={state.canvasSelection[0] ?? null}
       />
     ) : null;
 
@@ -461,6 +471,10 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         </EmptyStateDesc>
       </div>,
     );
+  }
+
+  if (composer && pick && updating) {
+    return frame(<UpdateFromSelectionView composer={composer} component={updating} pick={pick} />);
   }
 
   if (composer && detail && usedOnFor === detail.id) {
