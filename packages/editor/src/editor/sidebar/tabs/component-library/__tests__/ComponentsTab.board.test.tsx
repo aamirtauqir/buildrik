@@ -192,4 +192,25 @@ describe("ComponentsTab — 2L9 215:43588 (B6-K02) resource area", () => {
     expect(screen.queryByTestId("component-rename-input")).toBeNull();
     expect(screen.getByTestId("component-name").textContent).toBe("Footer");
   });
+
+  /* 217:43115 (B6-K23): offline, the site's masters still list; a warning
+     note says so, the library count is "—" and the library asks for a
+     connection. Import and Export are local files here, so they stay. */
+  it("offline: note above the list, library count — and the library waits", async () => {
+    const online = vi.spyOn(navigator, "onLine", "get").mockReturnValue(false);
+    try {
+      mount([c("hdr", "Site header")]);
+      const note = await screen.findByTestId("comp-offline-note");
+      expect(note.textContent).toBe("You’re offline. This site’s components still work and sync later. Component library needs a connection.");
+      expect(note.className).toContain("--bk-warning-tint");
+      expect(screen.getByTestId("comp-row-hdr")).toBeInTheDocument();
+      expect(screen.getByRole("tab", { name: "Component library · —" })).toBeInTheDocument();
+      expect(screen.getByTestId("comp-import-open")).not.toBeDisabled();
+      fireEvent.click(screen.getByRole("tab", { name: "Component library · —" }));
+      expect(screen.getByTestId("comp-offline-note")).toBeInTheDocument();
+      expect(screen.queryByTestId("comp-empty-library")).toBeNull();
+    } finally {
+      online.mockRestore();
+    }
+  });
 });

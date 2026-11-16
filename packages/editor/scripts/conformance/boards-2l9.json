@@ -10938,7 +10938,7 @@
    "status": "active",
    "authority": "board",
    "verified": "no",
-   "verifiedNote": "No offline state; library read fails silent to [] (services/componentSync.ts:190)",
+   "verifiedNote": "built to the board, live not compared — L-C 2026-11-16 (design context 217:43409 / 217:43154 read): offline (useOnlineStatus), a warning-tint note (12 in, 6 radius, 13/20 --bk-warning-text) heads the list: \"You’re offline. This site’s components still work and sync later. Component library needs a connection.\"; the Component library count reads —, and its scope shows only the note. Board copy also names Import, Export and Recently deleted: Import/Export are local files in the code (componentPackage, no network) so they stay enabled and are not named (code contract wins), and Recently deleted is not built (K19). Not built: the nav caption 228:45990 (nothing in the nav needs a connection) and \"Review update · Needs a connection\" (versioned updates, out). Test: ComponentsTab.board.test.tsx \"offline: …\".",
    "tier": "P2"
   },
   {

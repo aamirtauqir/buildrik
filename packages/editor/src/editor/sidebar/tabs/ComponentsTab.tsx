@@ -24,6 +24,7 @@ import { ExportPackageDialog } from "./component-library/ExportPackageDialog";
 
 import "./component-library/ComponentsTab.css";
 import { EVENTS } from "@/shared/constants";
+import { useOnlineStatus } from "@/shared/hooks/useOnlineStatus";
 export type { ComponentsTabProps };
 
 
@@ -112,6 +113,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
       setPendingToast(null);
     }
   }, [pendingToast, addToast, setPendingToast]);
+  const online = useOnlineStatus();
 
   // ── Area frame: navigation · header · body (215:43588) ───────────────────────
 
@@ -123,7 +125,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
     { id: "page", label: "This page", count: String(onPage.length) },
     { id: "site", label: "This site", count: String(onSite.length) },
     /* 217:43453: a library that did not load has no count. */
-    { id: "library", label: "Component library", count: state.libraryLoadFailed ? "—" : String(library.length) },
+    { id: "library", label: "Component library", count: !online || state.libraryLoadFailed ? "—" : String(library.length) },
   ];
 
   /* 215:47035 — the chosen master's summary, beside the list. */
@@ -421,7 +423,18 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
       )}
       <div aria-live="polite">
         <span className="bd-sr-only">{state.components.length} components found</span>
-        {scope === "library" && state.libraryLoadFailed ? (
+        {!online ? (
+          /* 217:43409 (B6-K23) — 12 in, 6 radius, warning tint, 13/20 warning
+             text. Import and Export are local files, so only the library
+             is named as needing a connection. */
+          <p
+            className="tw:m-0 tw:mb-2 tw:rounded-md tw:bg-[var(--bk-warning-tint)] tw:p-3 tw:text-[13px] tw:leading-5 tw:text-[var(--bk-warning-text)]"
+            data-testid="comp-offline-note"
+          >
+            You’re offline. This site’s components still work and sync later. Component library needs a connection.
+          </p>
+        ) : null}
+        {scope === "library" && !online ? null : scope === "library" && state.libraryLoadFailed ? (
           /* 217:43468 (B6-K24): 14/600 ink title, 12 ink-soft body, a 96px
              primary Retry; the site's own masters still list under This site. */
           <div role="alert" className="tw:flex tw:flex-col tw:items-start" data-testid="comp-library-error">
