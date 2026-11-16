@@ -27,6 +27,7 @@ import type { Composer } from "@/engine";
 import type { ComponentDefinition } from "@/shared/types/components";
 import { Button, ConfirmDialog, useToast } from "@/editor/chrome-ui";
 import { requestOpenMaster } from "@/editor/sidebar/tabs/component-library/openMasterRequest";
+import { detachInstanceWithUndo } from "@/editor/sidebar/tabs/component-library/instantiate";
 import { canWrite } from "@/engine/commands/commandOperations";
 import { SelectRow } from "../shared/controls";
 import { NoteRow } from "./behaviourRows";
@@ -111,21 +112,9 @@ export const ComponentRow: React.FC<ComponentRowProps> = ({ composer, elementId 
 
   const detach = async () => {
     if (!writable()) return;
-    try {
-      const ok = await composer.components.detachInstance(instanceId);
-      if (ok) {
-        setInfo(null);
-        addToast({
-          description: `${component.name} detached`,
-          tone: "info",
-          action: { label: "Undo", onClick: composer.history.captureUndo() },
-        });
-        return;
-      }
-      addToast({ description: "Couldn't detach this instance. It may already be detached.", tone: "error" });
-    } catch {
-      addToast({ description: "Couldn't detach this instance. Try again.", tone: "error" });
-    }
+    const { ok, toast } = await detachInstanceWithUndo(composer, instanceId, component.name);
+    if (ok) setInfo(null);
+    addToast(toast);
   };
 
   const reset = () => {

@@ -113,3 +113,25 @@ describe("LayerContextMenu — chrome-ui Menu keyboard contract", () => {
     expect(stops).toHaveLength(1);
   });
 });
+
+/* 2L9 217:42918 (B6-K22): an instance row's menu leads with the link to its
+   main component and Detach instance. Only for one row — a link opens one. */
+describe("LayerContextMenu — an instance row (B6-K22)", () => {
+  it("leads with Go to main component › and Detach instance", () => {
+    const { onAction } = mount({ inSelection: false, selectedCount: 1, nodeId: "hero-1", nodeName: "Hero card", isInstance: true });
+    const items = screen.getAllByRole("menuitem").map((n) => n.getAttribute("data-testid"));
+    expect(items.slice(0, 2)).toEqual(["layer-menu-go-to-main", "layer-menu-detach-instance"]);
+    expect(screen.getByTestId("layer-menu-go-to-main").textContent).toBe("Go to main component ›");
+    expect(screen.getByTestId("layer-menu-detach-instance").textContent).toBe("Detach instance");
+    fireEvent.click(screen.getByTestId("layer-menu-go-to-main"));
+    expect(onAction).toHaveBeenCalledWith("goToMain", "hero-1");
+  });
+
+  it("a plain element or a multi-selection has neither", () => {
+    mount({ inSelection: false, selectedCount: 1 });
+    expect(screen.queryByTestId("layer-menu-go-to-main")).toBeNull();
+    cleanup();
+    mount({ isInstance: true });
+    expect(screen.queryByTestId("layer-menu-detach-instance")).toBeNull();
+  });
+});

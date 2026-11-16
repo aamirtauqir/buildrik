@@ -10927,7 +10927,7 @@
    "status": "active",
    "authority": "board",
    "verified": "drift-open",
-   "verifiedNote": "Layers shows ◇ badge only (editor/panels/layers/LayerTreeItem.tsx:319); Go to/Detach live in Inspector ComponentRow.tsx:131,158",
+   "verifiedNote": "built to the board, live not compared — L-C 2026-11-16 (screenshot 217:42918 read): right-click an instance row in Layers and the menu leads with \"Go to main component ›\" (requestOpenMaster — the Inspector’s Edit main component door: Components opens on the master, Back to instance returns) and \"Detach instance\" (detachInstanceWithUndo, now shared with the Inspector’s Detach: \"{name} detached\" + Undo), then a separator. One row only; a multi-selection menu has neither. Kept, not on the board: the rest of the row menu (Cut/Copy/…/Copy link) stays below, since dropping it would take capabilities away from instance rows. Test: LayerContextMenu.test.tsx \"an instance row (B6-K22)\".",
    "tier": "P2"
   },
   {

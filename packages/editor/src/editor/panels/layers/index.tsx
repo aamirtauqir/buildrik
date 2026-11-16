@@ -620,6 +620,7 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
           y={state.contextMenu.y}
           nodeId={state.contextMenu.nodeId}
           hasClipboard={!!composer?.clipboard?.length}
+          isInstance={!!composer?.components?.isInstance(state.contextMenu.nodeId)}
           nodeName={state.contextMenu.nodeName}
           selectedCount={selectedCount}
           inSelection={state.selectionHook.selectedIds.has(state.contextMenu.nodeId)}

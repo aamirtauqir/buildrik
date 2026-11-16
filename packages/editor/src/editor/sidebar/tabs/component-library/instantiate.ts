@@ -17,6 +17,7 @@
  */
 
 import type { Composer } from "@/engine";
+import type { ToastInput } from "@/editor/chrome-ui";
 import type { ComponentDefinition } from "@/shared/types/components";
 
 export type InstantiateResult = "ok" | "no-parent" | "error";
@@ -75,5 +76,22 @@ export async function insertLibraryComponent(
   } catch (err) {
     const damaged = err instanceof Error && err.message === "LIBRARY_MASTER_MALFORMED";
     return damaged ? LIBRARY_TOASTS.damaged : INSTANTIATE_TOASTS.error;
+  }
+}
+
+/** Detach one instance — the Inspector's Detach and Layers' "Detach instance"
+ *  (2L9 B6-K22) — with the one receipt: "{name} detached" + Undo. */
+export async function detachInstanceWithUndo(
+  composer: Composer,
+  instanceId: string,
+  name: string,
+): Promise<{ ok: boolean; toast: ToastInput }> {
+  try {
+    if (await composer.components.detachInstance(instanceId)) {
+      return { ok: true, toast: { description: `${name} detached`, tone: "info", action: { label: "Undo", onClick: composer.history.captureUndo() } } };
+    }
+    return { ok: false, toast: { description: "Couldn't detach this instance. It may already be detached.", tone: "error" } };
+  } catch {
+    return { ok: false, toast: { description: "Couldn't detach this instance. Try again.", tone: "error" } };
   }
 }

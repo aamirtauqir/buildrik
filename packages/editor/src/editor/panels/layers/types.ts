@@ -98,4 +98,6 @@ export type LayerAction =
   | "duplicate"
   | "delete"
   | "group"
-  | "moveToPage";
+  | "moveToPage"
+  | "goToMain"
+  | "detachInstance";
