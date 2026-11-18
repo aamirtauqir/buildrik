@@ -295,7 +295,7 @@ existed in this table until 2026-08-16.
 | ~~`NEXT_PUBLIC_FEATURE_COMPONENTS_V2`~~ | **Deleted 2026-08-16.** It selected between two Components panels, and because only the `NEXT_PUBLIC_` half ships, it only ever meant "the port-5050 demo shows `ComponentsPanelV2`, every real user sees `ComponentsTab`". `ComponentsTab` is the one built to board 641:2546, so `ComponentsPanelV2` and the flag are gone. | — |
 | `NEXT_PUBLIC_FEATURE_DS_AI` | AI entry points in the Brand / design-system panel, **and the server's `theme.extractBrandFromUrl`** (Brand from a website URL — `NOT_FOUND` unless exactly `"true"`; read on the server too, inlined at build like Collab). | No |
 | `NEXT_PUBLIC_FEATURE_CMS_DATA_SOURCES` | CMS Data sources (the CMS drawer's Sources row and its zero-state "Open Sources" door) — **hidden by default this version** (BD-39 (8)): sources live only in `DataManager`'s in-memory Map, nothing saves them and a reload drops them. The code stays; exactly `"true"` shows it. Pair with `VITE_FEATURE_CMS_DATA_SOURCES` for the port-5050 demo. Editor-only, no server read. | No — leave unset until sources have a persisted home |
-| `NEXT_PUBLIC_FEATURE_COLLAB` | Real-time collaboration (presence avatars, connection pill, remote cursors). Merge model today is last-write-wins. **Also the server kill switch** (S-12, 2026-09-26): `/api/collab/:siteId/ops` and `/api/sse/collab/:siteId` return 404 unless it is exactly `"true"` (`isCollabEnabled`, `collab.service.ts`). Next inlines it at build time on the server too, so the routes and the button always agree. `gate:baked-flags` fails a bundle with it baked `"true"`. | No — enable when the collab arc ships (and drop it from `check-baked-flags.mjs`'s `FORBIDDEN` then) |
+| `NEXT_PUBLIC_FEATURE_COLLAB` | Real-time collaboration (presence avatars, connection pill, remote cursors). Merge model today is **not** last-write-wins: own optimistic edits are never re-placed at their server order and "remote wins" is applied per client, so concurrent edits can diverge; a joiner also replays the retained op log from seq 0 (Panel 21 §13 defects 1, 5, 15). Design: `packages/editor/docs/audit-and-design-2026-10-16/panels/21-COLLABORATION.md` (Phase A presence, Phase B live editing). **Also the server kill switch** (S-12, 2026-09-26): `/api/collab/:siteId/ops` and `/api/sse/collab/:siteId` return 404 unless it is exactly `"true"` (`isCollabEnabled`, `collab.service.ts`). Next inlines it at build time on the server too, so the routes and the button always agree. `gate:baked-flags` fails a bundle with it baked `"true"`. | No — enable when the collab arc ships (and drop it from `check-baked-flags.mjs`'s `FORBIDDEN` then) |
 
 `scripts/check-prod-env.mjs` checks none of these (`check-baked-flags.mjs` checks the
 built bundle: Publish must be `"true"`, Collab must not be). A flag that is silently false in
@@ -393,3 +393,38 @@ Key routing rules:
 - Design system, brand → invoke design-consultation
 - Visual audit, design polish → invoke design-review
 - Architecture review → invoke plan-eng-review
+
+<!-- BEGIN PRODUCT-DESIGN-GUARD -->
+## Conditional Buildrick product-design workflow
+
+For product-specific UI/UX work, first apply `product-design-guard`: design,
+redesign, audits, new user-facing features, panels, controls, navigation,
+panel width/height, clutter reduction, ownership, responsive workspace layout,
+shared design components, Figma work, or implementation of a design.
+Recognize intent in English, Hindi, Urdu and Roman Urdu, including follow-ups
+such as "isko better karo", "naya feature add karo", and "panel theek karo".
+
+Preserve existing capabilities and user data, not the old layout at any cost.
+Inspect the existing product before deciding where the new capability belongs.
+Choose whether to extend, regroup, resize, split, merge or redesign affected
+panels; justify ownership, navigation, geometry and integration. Do not append
+controls or invent current product facts to avoid that work.
+
+Use the skill before other design/Figma/frontend skills for the task, while
+obeying their tool-specific prerequisites. Do not reinvoke it recursively.
+Its activation grants no additional edit, publishing or deployment permission.
+Design-only work must remain separate from application-code changes.
+After substantive design work (C2/C3 or shared systems), have the
+`design-guard-reviewer` subagent check the quality gates independently before
+declaring readiness. It is read-only and cannot approve scope changes.
+
+Apply only to the current relevant task and dependencies. Stop the design
+procedure for unrelated conversation, emails, translation or backend-only work
+with no user-facing impact. Reassess scope when the user changes tasks.
+
+If the skill is unavailable, report it. Read
+`.claude/skills/product-design-guard/SKILL.md` and applicable linked references
+only if those files exist and access is permitted; do not claim invocation.
+If missing, continue safe evidence gathering and report the setup gap.
+Do not treat an unavailable skill or test tool as permission to invent results.
+<!-- END PRODUCT-DESIGN-GUARD -->

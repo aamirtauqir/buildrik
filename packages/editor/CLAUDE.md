@@ -1,5 +1,13 @@
 # CLAUDE.md — Buildrik (Aquibra Editor L2)
 
+## Standing user role for product work
+
+Read [AGENTS.md](AGENTS.md) before answering Buildrick/editor product questions
+or making design suggestions. It records the user's Principal Product Designer
+role, required judgment and current audit boundaries. Apply it to brief follow-ups
+as well as formal tasks; do not require the user to repeat the role. Explicit
+current user instructions take precedence over older workflow assumptions below.
+
 ## Project Overview
 
 Visual web builder/editor. React 18 + TypeScript + Vite. Chrome styling =
